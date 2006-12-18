@@ -1,0 +1,66 @@
+<config profile="Default" >
+ <profile name="Default" >
+  <plugin uid="{8074a197-3b77-4bb0-9bd3-6f06d5cb8d15}" >
+   <stream ns="lion@jrudevels.org/Vacuum" value="Lion@jrudevels.org/Vacuum" >
+    <version value="1.0" />
+    <lang value="ru" />
+    <password value="97100" />
+    <host value="jrudevels.org" />
+    <port value="5222" />
+    <connection>
+     <proxyType value="0" />
+     <proxyHost value="" />
+     <proxyPort value="0" />
+     <proxyUsername value="" />
+     <proxyPassword value="" />
+     <pollServer value="" />
+    </connection>
+   </stream>
+   <stream ns="test1@potapov/Vacuum" value="Test1@potapov/Vacuum" >
+    <version value="1.0" />
+    <lang value="ru" />
+    <password value="1" />
+    <host value="potapov" />
+    <port value="5222" />
+    <connection>
+     <proxyType value="0" />
+     <proxyHost value="" />
+     <proxyPort value="0" />
+     <proxyUsername value="" />
+     <proxyPassword value="" />
+     <pollServer value="" />
+    </connection>
+   </stream>
+   <stream ns="test@potapov/Vacuum" value="Test@potapov/Vacuum" >
+    <version value="1.0" />
+    <lang value="ru" />
+    <password value="1" />
+    <host value="potapov" />
+    <port value="5222" />
+    <connection>
+     <proxyType value="0" />
+     <proxyHost value="" />
+     <proxyPort value="0" />
+     <proxyUsername value="" />
+     <proxyPassword value="" />
+     <pollServer value="" />
+    </connection>
+   </stream>
+   <stream ns="test2@potapov/Vacuum" value="Test2@potapov/Vacuum" >
+    <version value="1.0" />
+    <lang value="ru" />
+    <password value="1" />
+    <host value="potapov" />
+    <port value="5222" />
+    <connection>
+     <proxyType value="0" />
+     <proxyHost value="220.194.57.126" />
+     <proxyPort value="1080" />
+     <proxyUsername value="wrong" />
+     <proxyPassword value="" />
+     <pollServer value="" />
+    </connection>
+   </stream>
+  </plugin>
+ </profile>
+</config>
