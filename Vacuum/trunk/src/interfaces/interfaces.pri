@@ -3,4 +3,5 @@ HEADERS += ipluginmanager.h \
            isettings.h \
            istanzaprocessor.h \
            iroster.h \
-           ipresence.h
+           ipresence.h \
+           irostermodel.h

@@ -8,4 +8,5 @@ SUBDIRS = settings \
           saslsession \
           stanzaprocessor \
           roster \
-          presence
+          presence \
+          rostermodel
