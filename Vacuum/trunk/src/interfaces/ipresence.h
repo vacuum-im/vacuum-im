@@ -25,7 +25,7 @@ public:
   virtual Show show() const =0;
   virtual const QString &status() const =0;
   virtual qint8 priority() const =0;
-  virtual IPresenceItem *item(const Jid &) =0;
+  virtual IPresenceItem *item(const Jid &) const =0;
   virtual QList<IPresenceItem *> items() const =0;
   virtual QList<IPresenceItem *> items(const Jid &) const =0;
 public slots:
@@ -42,7 +42,7 @@ class IPresenceItem
 {
 public:
   virtual QObject *instance() =0;
-  virtual IPresence *presence() =0;
+  virtual IPresence *presence() const =0;
   virtual const Jid &jid() const =0;
   virtual IPresence::Show show() const =0;
   virtual const QString &status() const =0;
@@ -54,7 +54,7 @@ class IPresencePlugin
 public:
   virtual QObject *instance() =0;
   virtual IPresence *newPresence(IXmppStream *) =0;
-  virtual IPresence *getPresence(const Jid &) =0;
+  virtual IPresence *getPresence(const Jid &) const =0;
   virtual void removePresence(const Jid &) =0;
 signals:
   virtual void presenceAdded(IPresence *) =0;

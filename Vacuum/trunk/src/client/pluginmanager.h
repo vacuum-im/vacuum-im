@@ -53,22 +53,22 @@ public:
   virtual void initPlugins();
   virtual void startPlugins();
   virtual bool unloadPlugin(const QUuid &AUuid);
-  virtual QApplication *application();
-  virtual IPlugin* getPlugin(const QUuid &uid);
-  virtual QList<IPlugin *> getPlugins();
-  virtual QList<IPlugin *> getPlugins(const QString &AClassName);
+  virtual QApplication *application() const;
+  virtual IPlugin* getPlugin(const QUuid &uid) const;
+  virtual QList<IPlugin *> getPlugins() const;
+  virtual QList<IPlugin *> getPlugins(const QString &AClassName) const;
   virtual const PluginInfo *getPluginInfo(const QUuid &AUuid) const;
-  virtual QVector<QUuid> getDependencesOn(const QUuid &AUuid);
-  virtual QVector<QUuid> getDependencesFor(const QUuid &AUuid);
+  virtual QVector<QUuid> getDependencesOn(const QUuid &AUuid) const;
+  virtual QVector<QUuid> getDependencesFor(const QUuid &AUuid) const;
 public slots:
   virtual void quit();
 signals:
     virtual void aboutToQuit();
 protected:
-  PluginItem *getPluginItem(const QUuid &AUuid);
-  bool checkDependences(PluginItem *APluginItem);
-  bool checkConflicts(PluginItem *APluginItem);
-  QList<QUuid> getConflicts(PluginItem *APluginItem);
+  PluginItem *getPluginItem(const QUuid &AUuid) const;
+  bool checkDependences(PluginItem *APluginItem) const;
+  bool checkConflicts(PluginItem *APluginItem) const;
+  QList<QUuid> getConflicts(PluginItem *APluginItem) const;
 private:
   QList<PluginItem *> FPluginItems;
 };

@@ -19,7 +19,7 @@ public:
 
   //IPresenceItem
   virtual QObject *instance() { return this; }
-  virtual IPresence *presence() { return FPresence; }
+  virtual IPresence *presence() const { return FPresence; }
   virtual const Jid &jid() const { return FItemJid; }
   virtual IPresence::Show show() const { return FShow; }
   virtual const QString &status() const { return FStatus; }

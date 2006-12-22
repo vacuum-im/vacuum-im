@@ -71,18 +71,14 @@ IPresence *PresencePlugin::newPresence(IXmppStream *AStream)
   return presence;
 }
 
-IPresence *PresencePlugin::getPresence(const Jid &AStreamJid)
+IPresence *PresencePlugin::getPresence(const Jid &AStreamJid) const
 {
   int i =0;
   while (i<FPresences.count())
   {
-    QPointer<Presence> presence = FPresences.at(i);
-    if (presence.isNull())
-      FPresences.removeAt(i); 
-    else if (presence->streamJid() == AStreamJid)
-      return presence;
-    else 
-      i++;
+    if (FPresences.at(i)->streamJid() == AStreamJid)
+      return FPresences.at(i);
+    i++;
   }
   return 0;
 }

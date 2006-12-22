@@ -146,12 +146,12 @@ bool PluginManager::unloadPlugin(const QUuid &AUuid)
   return true;
 }
 
-QApplication *PluginManager::application()
+QApplication *PluginManager::application() const
 {
   return (QApplication *)parent();
 }
 
-QList<IPlugin*> PluginManager::getPlugins()
+QList<IPlugin*> PluginManager::getPlugins() const
 {
   QList<IPlugin *> plugins;
   
@@ -162,7 +162,7 @@ QList<IPlugin*> PluginManager::getPlugins()
   return plugins;
 }
 
-QList<IPlugin*> PluginManager::getPlugins(const QString &AClassName)
+QList<IPlugin*> PluginManager::getPlugins(const QString &AClassName) const
 {
   QList<IPlugin*> plugins;
   PluginItem *pluginItem;
@@ -173,7 +173,7 @@ QList<IPlugin*> PluginManager::getPlugins(const QString &AClassName)
   return plugins;
 }
 
-IPlugin* PluginManager::getPlugin(const QUuid &AUuid) 
+IPlugin* PluginManager::getPlugin(const QUuid &AUuid) const 
 { 
   PluginItem *pluginItem;
   foreach (pluginItem, FPluginItems)
@@ -193,7 +193,7 @@ const PluginInfo *PluginManager::getPluginInfo(const QUuid &AUuid) const
   return 0;
 }
 
-QVector<QUuid> PluginManager::getDependencesOn(const QUuid &AUuid)
+QVector<QUuid> PluginManager::getDependencesOn(const QUuid &AUuid) const
 {
   static QStack<QUuid> deepStack;
   deepStack.push(AUuid);
@@ -211,7 +211,7 @@ QVector<QUuid> PluginManager::getDependencesOn(const QUuid &AUuid)
   return plugins;
 }
 
-QVector<QUuid> PluginManager::getDependencesFor(const QUuid &AUuid)
+QVector<QUuid> PluginManager::getDependencesFor(const QUuid &AUuid) const
 {
   static QStack<QUuid> deepStack;
   deepStack.push(AUuid);
@@ -235,7 +235,7 @@ QVector<QUuid> PluginManager::getDependencesFor(const QUuid &AUuid)
   return plugins;
 }
 
-PluginItem *PluginManager::getPluginItem(const QUuid &AUuid)
+PluginItem *PluginManager::getPluginItem(const QUuid &AUuid) const
 { 
   PluginItem *pluginItem;
   foreach(pluginItem, FPluginItems)
@@ -245,7 +245,7 @@ PluginItem *PluginManager::getPluginItem(const QUuid &AUuid)
   return 0;
 }
 
-bool PluginManager::checkDependences(PluginItem *APluginItem)
+bool PluginManager::checkDependences(PluginItem *APluginItem) const
 { 
   QUuid depend;
   foreach(depend, APluginItem->info()->dependences)
@@ -263,7 +263,7 @@ bool PluginManager::checkDependences(PluginItem *APluginItem)
   return true;
 }
 
-bool PluginManager::checkConflicts(PluginItem *APluginItem)
+bool PluginManager::checkConflicts(PluginItem *APluginItem) const
 { 
   int i=0;
   bool hasConflict = false;
@@ -282,7 +282,7 @@ bool PluginManager::checkConflicts(PluginItem *APluginItem)
   return !hasConflict;
 }
 
-QList<QUuid> PluginManager::getConflicts(PluginItem *APluginItem) 
+QList<QUuid> PluginManager::getConflicts(PluginItem *APluginItem) const 
 {
   QSet<QUuid> plugins;
   QUuid conflict;

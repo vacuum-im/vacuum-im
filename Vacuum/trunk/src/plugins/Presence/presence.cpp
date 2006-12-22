@@ -80,7 +80,7 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
   return hooked;
 }
 
-IPresenceItem *Presence::item(const Jid &AItemJid)
+IPresenceItem *Presence::item(const Jid &AItemJid) const
 {
   PresenceItem *pItem;
   foreach(pItem, FItems)

@@ -30,7 +30,7 @@ public:
   virtual Show show() const { return FShow; }
   virtual const QString &status() const { return FStatus; }
   virtual qint8 priority() const { return FPriority; }
-  virtual IPresenceItem *item(const Jid &AItemJid);
+  virtual IPresenceItem *item(const Jid &AItemJid) const;
   virtual QList<IPresenceItem *> items() const;
   virtual QList<IPresenceItem *> items(const Jid &AItemJid) const;
 public slots:

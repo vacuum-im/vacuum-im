@@ -40,13 +40,13 @@ public:
   virtual void initPlugins() =0;
   virtual void startPlugins() =0;
   virtual bool unloadPlugin(const QUuid &) =0;
-  virtual QApplication *application() =0;
-  virtual QList<IPlugin *> getPlugins() =0;
-  virtual QList<IPlugin *> getPlugins(const QString &) =0;
-  virtual IPlugin* getPlugin(const QUuid &) =0;
+  virtual QApplication *application() const =0;
+  virtual QList<IPlugin *> getPlugins() const =0;
+  virtual QList<IPlugin *> getPlugins(const QString &) const =0;
+  virtual IPlugin* getPlugin(const QUuid &) const=0;
   virtual const PluginInfo *getPluginInfo(const QUuid &) const =0;
-  virtual QVector<QUuid> getDependencesOn(const QUuid &) =0;
-  virtual QVector<QUuid> getDependencesFor(const QUuid &) =0;
+  virtual QVector<QUuid> getDependencesOn(const QUuid &) const =0;
+  virtual QVector<QUuid> getDependencesFor(const QUuid &) const =0;
 signals:
   virtual void aboutToQuit() =0;
 public slots:

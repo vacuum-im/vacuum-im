@@ -2,7 +2,6 @@
 #define PRESENCEPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include <QPointer>
 #include "interfaces/ipluginmanager.h"
 #include "interfaces/ipresence.h"
 #include "presence.h"
@@ -31,7 +30,7 @@ public:
 
   //IPresencePlugin
   virtual IPresence *newPresence(IXmppStream *AStream);
-  virtual IPresence *getPresence(const Jid &AStreamJid);
+  virtual IPresence *getPresence(const Jid &AStreamJid) const;
   virtual void removePresence(const Jid &AStreamJid);
 signals:
   virtual void presenceAdded(IPresence *);
@@ -47,7 +46,7 @@ protected slots:
 private:
   IStanzaProcessor *FStanzaProcessor;
 private:
-  QList<QPointer<Presence>> FPresences;
+  QList<Presence *> FPresences;
   QObjectCleanupHandler FCleanupHandler;
 };
 
