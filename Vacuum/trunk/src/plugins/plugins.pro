@@ -7,4 +7,5 @@ SUBDIRS = settings \
           saslbind \
           saslsession \
           stanzaprocessor \
-          roster
+          roster \
+          presence
