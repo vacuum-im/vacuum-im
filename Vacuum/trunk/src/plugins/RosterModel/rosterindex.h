@@ -13,31 +13,32 @@ class RosterIndex :
   Q_INTERFACES(IRosterIndex);
 
 public:
-  RosterIndex(int AType);
+  RosterIndex(int AType, const QString &AId);
   ~RosterIndex();
 
   QObject *instance() { return this; }
 
   //IRosterIndex
-  virtual int type() const { return FType; }
+  virtual int type() const { return data(DR_Type).toInt(); }
+  virtual QString id() const { return data(DR_Id).toString(); }
   virtual void setParentIndex(IRosterIndex *AIndex);
   virtual IRosterIndex *parentIndex() const { return FParentIndex; } 
   virtual int row() const;
   virtual void appendChild(IRosterIndex *AIndex);
   virtual bool removeChild(IRosterIndex *Aindex, bool ARecurse = false);
   virtual int childCount() const { return FChilds.count(); }
-  virtual IRosterIndex *child(int ARow) const { return FChilds.at(ARow); }
+  virtual IRosterIndex *child(int ARow) const { return FChilds.value(ARow,0); }
   virtual int childRow(const IRosterIndex *AIndex) const; 
   virtual IRosterIndexDataHolder *setDataHolder(int ARole, IRosterIndexDataHolder *ADataHolder);
   virtual bool setData(int ARole, const QVariant &AData);
   virtual QVariant data(int ARole) const;
+  virtual IRosterIndexList findChild(const QHash<int, QVariant> AData, bool ARecurse = false) const;
 signals:
-  virtual void dataChanged();
+  virtual void dataChanged(IRosterIndex *);
 protected slots:
   virtual void onChildIndexDestroyed(QObject *AIndex);
   virtual void onDataHolderChanged();
 private:
-  int FType;
   IRosterIndex *FParentIndex;
   QList<IRosterIndex *> FChilds;
   QHash<int, IRosterIndexDataHolder *> FDataHolders;
