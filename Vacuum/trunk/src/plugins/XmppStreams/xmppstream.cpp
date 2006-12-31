@@ -137,11 +137,10 @@ bool XmppStream::processFeatures(const QDomElement &AFeatures)
   if (!AFeatures.isNull())
     FActiveFeatures = AFeatures;
 
-  int i = 0;
   QDomElement elem;
-  while (i<FActiveFeatures.childNodes().count())
+  while (FActiveFeatures.childNodes().count()>0)
   {
-    elem = FActiveFeatures.childNodes().item(i++).toElement();
+    elem = FActiveFeatures.childNodes().item(0).toElement();
     FActiveFeatures.removeChild(elem); 
     if (startFeature(elem))
       return true;

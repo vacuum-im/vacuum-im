@@ -62,7 +62,7 @@ IRoster *RosterPlugin::newRoster(IXmppStream *AStream)
   if (!roster)
   {
     roster = new Roster(AStream, FStanzaProcessor, AStream->instance());
-    connect(roster->instance(),SIGNAL(destroyed(QObject *)),SLOT(onRosterDestroyed(QObject *)));
+    connect(roster,SIGNAL(destroyed(QObject *)),SLOT(onRosterDestroyed(QObject *)));
     FCleanupHandler.add(roster); 
     FRosters.append(roster); 
     return roster; 
@@ -71,18 +71,14 @@ IRoster *RosterPlugin::newRoster(IXmppStream *AStream)
   return roster;
 }
 
-IRoster *RosterPlugin::getRoster(const Jid &AStreamJid)
+IRoster *RosterPlugin::getRoster(const Jid &AStreamJid) const
 {
   int i = 0;
   while (i < FRosters.count())
   {
-    QPointer<Roster> roster = FRosters.at(i);
-    if (roster.isNull())
-      FRosters.removeAt(i);  
-    else if (roster->streamJid() == AStreamJid)
-      return roster;
-    else
-      i++;
+    if (FRosters.at(i)->streamJid() == AStreamJid)
+      return FRosters.at(i);
+    i++;
   }
   return 0;    
 }

@@ -2,7 +2,6 @@
 #define ROSTERPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include <QPointer>
 #include "interfaces/ipluginmanager.h"
 #include "interfaces/ipresence.h"
 #include "roster.h"
@@ -31,7 +30,7 @@ public:
 
   //IRosterPlugin
   virtual IRoster *newRoster(IXmppStream *AStream);
-  virtual IRoster *getRoster(const Jid &AStreamJid);
+  virtual IRoster *getRoster(const Jid &AStreamJid) const;
   virtual void removeRoster(const Jid &AStreamJid);
 signals:
   virtual void rosterAdded(IRoster *);
@@ -51,7 +50,7 @@ protected slots:
 private:
   IStanzaProcessor *FStanzaProcessor;
 private:
-  QList<QPointer<Roster>> FRosters;
+  QList<Roster *> FRosters;
   QObjectCleanupHandler FCleanupHandler;
 };
 

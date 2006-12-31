@@ -11,11 +11,11 @@ class ISettings {
 public:
   virtual QObject* instance() =0;
   virtual QVariant valueNS(const QString &AName, const QString &ANameNS, 
-    const QVariant &ADefault=QVariant()) =0;
-  virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) =0;
+    const QVariant &ADefault=QVariant()) const =0;
+  virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const =0;
+  virtual QHash<QString,QVariant> values(const QString &AName) const =0;
   virtual ISettings &setValueNS(const QString &AName, const QString &ANameNS, 
     const QVariant &AValue) =0;
-  virtual QHash<QString,QVariant> values(const QString &AName) =0;
   virtual ISettings &setValue(const QString &AName, const QVariant &AValue) =0;
   virtual ISettings &delValueNS(const QString &AName, const QString &ANameNS) =0;
   virtual ISettings &delValue(const QString &AName) =0;
@@ -32,7 +32,7 @@ public:
   virtual QString fileName() const =0;
   virtual bool setFileName(const QString &) =0;
   virtual bool saveSettings() =0;
-  virtual QDomDocument document() =0;
+  virtual QDomDocument document() const=0;
   virtual QString profile() const =0;
   virtual QDomElement setProfile(const QString &) =0;
   virtual QDomElement getProfile(const QString &) =0;

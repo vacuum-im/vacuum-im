@@ -39,8 +39,10 @@ public slots:
   virtual bool setStatus(const QString &AStatus, const Jid &AToJid = Jid());
   virtual bool setPriority(qint8 APriority, const Jid &AToJid = Jid());
 signals:
+  virtual void opened();
   virtual void selfPresence(IPresence::Show, const QString &, qint8, const Jid &);
   virtual void presenceItem(IPresenceItem *APresenceItem);
+  virtual void closed();
 protected slots:
   virtual void onStreamOpened(IXmppStream *);
   virtual void onStreamAboutToClose(IXmppStream *);

@@ -19,9 +19,9 @@ public:
   //ISettings
   virtual QObject *instance() { return this; }
   virtual QVariant valueNS(const QString &AName, const QString &ANameNS, 
-    const QVariant &ADefault=QVariant());
-  virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant());
-  virtual QHash<QString,QVariant> values(const QString &AName);
+    const QVariant &ADefault=QVariant()) const;
+  virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const;
+  virtual QHash<QString,QVariant> values(const QString &AName) const;
   virtual ISettings &setValueNS(const QString &AName, const QString &ANameNS, 
     const QVariant &AValue);
   virtual ISettings &setValue(const QString &AName, const QVariant &AValue);
@@ -32,7 +32,7 @@ signals:
   virtual void opened();
   virtual void closed();
 protected:
-  QDomElement getElement(const QString &AName, const QString &ANameNS, bool ACreate);
+  QDomElement getElement(const QString &AName, const QString &ANameNS, bool ACreate) const;
   void delNSRecurse(const QString &ANameNS, QDomNode node);
 private slots:
   virtual void onProfileOpened();

@@ -29,6 +29,14 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
 
     if (AStanza.type() != "error")
     {
+      if (!FOpenId.isEmpty() && FOpenId == AStanza.id())
+      {
+        FOpenId.clear();
+        FOpen = true;
+        emit opened();
+        hooked = true;
+      }
+
       QDomElement stanzaItem = AStanza.element().firstChildElement("query").firstChildElement("item");
       while (!stanzaItem.isNull())
       {
@@ -81,13 +89,6 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
         result.setId(AStanza.id()).setType("result");  
         FStanzaProcessor->sendStanzaOut(FStream->jid(),result); 
       }
-      else if (!FOpenId.isEmpty() && FOpenId == AStanza.id())
-      {
-        FOpenId.clear();
-        FOpen = true;
-        emit opened();
-        hooked = true;
-      }
     }
     else
     {
@@ -134,7 +135,7 @@ void Roster::iqStanzaTimeOut(const QString &AId)
   Q_UNUSED(AId);
 }
 
-IRosterItem *Roster::item(const Jid &AItemJid)
+IRosterItem *Roster::item(const Jid &AItemJid) const
 {
   RosterItem *item;
   foreach(item, FItems)

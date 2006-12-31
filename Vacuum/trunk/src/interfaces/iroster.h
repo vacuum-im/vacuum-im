@@ -11,7 +11,7 @@ class IRoster;
 class IRosterItem {
 public:
   virtual QObject *instance() =0;
-  virtual IRoster *roster() =0;
+  virtual IRoster *roster() const =0;
   virtual const Jid &jid() const =0;
   virtual const QString &name() const =0;
   virtual const QString &subscription() const =0;
@@ -31,7 +31,8 @@ public:
   virtual QObject *instance() =0;
   virtual const Jid &streamJid() const =0;
   virtual bool isOpen() const =0;
-  virtual IRosterItem *item(const Jid &) =0;
+  virtual QString groupDelimiter() const =0;
+  virtual IRosterItem *item(const Jid &) const=0;
   virtual QList<IRosterItem *> items() const =0;
   virtual QList<IRosterItem *> groupItems(const QString &) const =0;
   virtual QSet<QString> groups() const =0;
@@ -53,7 +54,7 @@ class IRosterPlugin {
 public:
   virtual QObject *instance() =0;
   virtual IRoster *newRoster(IXmppStream *) =0;
-  virtual IRoster *getRoster(const Jid &) =0;
+  virtual IRoster *getRoster(const Jid &) const =0;
   virtual void removeRoster(const Jid &) =0;
 signals:
   virtual void rosterAdded(IRoster *) =0;

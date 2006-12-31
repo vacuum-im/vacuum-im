@@ -181,6 +181,8 @@ void Presence::onStreamOpened(IXmppStream *)
 {
   if (!FPresenceHandler)
     FPresenceHandler = FStanzaProcessor->setHandler(this,"/presence",IStanzaProcessor::DirectionIn,0,FStream->jid());   
+  emit opened();
+  //setPresence(IPresence::Online,"Hellow world",5); 
 }
 
 void Presence::onStreamAboutToClose(IXmppStream *)
@@ -193,4 +195,5 @@ void Presence::onStreamClosed(IXmppStream *)
 {
   FStanzaProcessor->removeHandler(FPresenceHandler);
   FPresenceHandler = 0;
+  emit closed();
 }

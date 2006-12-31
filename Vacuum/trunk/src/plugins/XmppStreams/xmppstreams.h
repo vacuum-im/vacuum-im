@@ -29,7 +29,7 @@ public:
   //IXmppStreams
   virtual IXmppStream *newStream(const Jid &AJid);
   virtual bool addStream(IXmppStream *);
-  virtual IXmppStream *getStream(const Jid &AJid);
+  virtual IXmppStream *getStream(const Jid &AJid) const;
   virtual const QList<IXmppStream *> &getStreams() const { return FStreams; }
   virtual void removeStream(IXmppStream *);
 signals:

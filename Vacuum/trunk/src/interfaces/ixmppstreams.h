@@ -88,10 +88,10 @@ public:
   virtual qint16 port() const=0;
   virtual void setPassword(const QString &)=0;
   virtual QString password() const=0;
-  virtual void setDefaultLang(const QString &) { return; }
-  virtual QString defaultLang() const { return QString(); }
-  virtual void setXmppVersion(const QString &) { return; }
-  virtual QString xmppVersion() const { return QString("0.0"); }
+  virtual void setDefaultLang(const QString &) =0;
+  virtual QString defaultLang() const =0;
+  virtual void setXmppVersion(const QString &) =0;
+  virtual QString xmppVersion() const =0;
   virtual IStreamConnection *connection()=0;
   virtual bool setConnection(IStreamConnection *) =0;
   virtual void addFeature(IStreamFeature *)=0;
@@ -115,7 +115,7 @@ public:
   virtual QObject *instance()=0;
   virtual IXmppStream *newStream(const Jid &)=0;
   virtual bool addStream(IXmppStream *)=0;
-  virtual IXmppStream *getStream(const Jid &)=0;
+  virtual IXmppStream *getStream(const Jid &) const=0;
   virtual const QList<IXmppStream *> &getStreams() const=0;
   virtual void removeStream(IXmppStream *)=0;
 signals:

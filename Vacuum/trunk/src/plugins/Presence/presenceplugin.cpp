@@ -96,9 +96,11 @@ void PresencePlugin::removePresence(const Jid &AStreamJid)
 void PresencePlugin::onStreamAdded(IXmppStream *AStream)
 {
   IPresence *presence = newPresence(AStream);
+  connect(presence->instance(),SIGNAL(opened()),SLOT(onPresenceOpened()));
   connect(presence->instance(),SIGNAL(presenceItem(IPresenceItem *)),SLOT(onPresenceItem(IPresenceItem *)));
   connect(presence->instance(),SIGNAL(selfPresence(IPresence::Show, const QString &, qint8, const Jid &)),
     SLOT(onSelfPresence(IPresence::Show, const QString &, qint8, const Jid &)));
+  connect(presence->instance(),SIGNAL(closed()),SLOT(onPresenceClosed()));
   emit presenceAdded(presence); 
 }
 
@@ -110,6 +112,13 @@ void PresencePlugin::onStreamRemoved(IXmppStream *AStream)
     emit presenceRemoved(presence);
     removePresence(presence->streamJid());
   }
+}
+
+void PresencePlugin::onPresenceOpened()
+{
+  Presence *presence = qobject_cast<Presence *>(sender());
+  if (presence)
+    emit presenceOpened(presence);
 }
 
 void PresencePlugin::onSelfPresence(IPresence::Show AShow, const QString &AStatus, 
@@ -125,6 +134,13 @@ void PresencePlugin::onPresenceItem(IPresenceItem *APresenceItem)
   Presence *presence = qobject_cast<Presence *>(sender());
   if (presence)
     emit presenceItem(presence,APresenceItem); 
+}
+
+void PresencePlugin::onPresenceClosed()
+{
+  Presence *presence = qobject_cast<Presence *>(sender());
+  if (presence)
+    emit presenceClosed(presence);
 }
 
 void PresencePlugin::onPresenceDestroyed(QObject *APresence)

@@ -140,7 +140,7 @@ IXmppStream *XmppStreams::newStream(const Jid &AJid)
   return stream;
 }
 
-IXmppStream *XmppStreams::getStream(const Jid &AJid)
+IXmppStream *XmppStreams::getStream(const Jid &AJid) const
 {
   foreach(IXmppStream *stream,FStreams)
     if (stream->jid() == AJid) 
@@ -226,38 +226,38 @@ void XmppStreams::onStreamError(IXmppStream *AStream, const QString &AErrStr)
 
 void XmppStreams::onConfigOpened()
 {
-  //IXmppStream *stream = newStream("Test2@potapov/Vacuum");
-  //stream->setDefaultLang("ru"); 
-  //stream->setXmppVersion("1.0");
-  //stream->setPassword("1");
-  //stream->connection()->setProxyType(0);
-  //stream->connection()->setProxyUsername("wrong");  
-  //stream->connection()->setProxyHost("220.194.57.126");
-  //stream->connection()->setProxyPort(1080);
-  //addStream(stream);
-  //stream->open(); 
+  IXmppStream *stream = newStream("Test2@potapov/Vacuum");
+  stream->setDefaultLang("ru"); 
+  stream->setXmppVersion("1.0");
+  stream->setPassword("1");
+  stream->connection()->setProxyType(0);
+  stream->connection()->setProxyUsername("wrong");  
+  stream->connection()->setProxyHost("220.194.57.126");
+  stream->connection()->setProxyPort(1080);
+  addStream(stream);
+  stream->open(); 
 
   //deleteStream(stream);
 
-  QHash<QString,QVariant> streams = FSettings->values("stream"); 
-  QList<QString> NS = streams.keys(); 
-  for(int i=0;i<NS.count();i++)
-  {
-    IXmppStream *stream = newStream(streams[NS[i]].toString());
-    stream->setDefaultLang(FSettings->valueNS("stream[]:lang",NS[i],"ru").toString()); 
-    stream->setXmppVersion(FSettings->valueNS("stream[]:version",NS[i],"1.0").toString());
-    stream->setPassword(FSettings->valueNS("stream[]:password",NS[i],"").toString());
-    stream->connection()->setProxyType(FSettings->valueNS("stream[]:connection:proxyType",NS[i],0).toInt());
-    stream->connection()->setProxyHost(FSettings->valueNS("stream[]:connection:proxyHost",NS[i],"").toString());
-    stream->connection()->setProxyPort(FSettings->valueNS("stream[]:connection:proxyPort",NS[i],1080).toInt());
-    stream->connection()->setProxyPassword(FSettings->valueNS("stream[]:connection:proxyPassword",NS[i],"").toString());
-    stream->connection()->setProxyUsername(FSettings->valueNS("stream[]:connection:proxyUsername",NS[i],"").toString());
-    stream->connection()->setProxyPassword(FSettings->valueNS("stream[]:connection:proxyPassword",NS[i],"").toString());
-    stream->connection()->setPollServer(FSettings->valueNS("stream[]:connection:pollServer",NS[i],"").toString());
-    addStream(stream);
-    if (FSettings->valueNS("stream[]:autoConnect",NS[i],true).toBool())
-      stream->open(); 
-  }
+  //QHash<QString,QVariant> streams = FSettings->values("stream"); 
+  //QList<QString> NS = streams.keys(); 
+  //for(int i=0;i<NS.count();i++)
+  //{
+  //  IXmppStream *stream = newStream(streams[NS[i]].toString());
+  //  stream->setDefaultLang(FSettings->valueNS("stream[]:lang",NS[i],"ru").toString()); 
+  //  stream->setXmppVersion(FSettings->valueNS("stream[]:version",NS[i],"1.0").toString());
+  //  stream->setPassword(FSettings->valueNS("stream[]:password",NS[i],"").toString());
+  //  stream->connection()->setProxyType(FSettings->valueNS("stream[]:connection:proxyType",NS[i],0).toInt());
+  //  stream->connection()->setProxyHost(FSettings->valueNS("stream[]:connection:proxyHost",NS[i],"").toString());
+  //  stream->connection()->setProxyPort(FSettings->valueNS("stream[]:connection:proxyPort",NS[i],1080).toInt());
+  //  stream->connection()->setProxyPassword(FSettings->valueNS("stream[]:connection:proxyPassword",NS[i],"").toString());
+  //  stream->connection()->setProxyUsername(FSettings->valueNS("stream[]:connection:proxyUsername",NS[i],"").toString());
+  //  stream->connection()->setProxyPassword(FSettings->valueNS("stream[]:connection:proxyPassword",NS[i],"").toString());
+  //  stream->connection()->setPollServer(FSettings->valueNS("stream[]:connection:pollServer",NS[i],"").toString());
+  //  addStream(stream);
+  //  if (FSettings->valueNS("stream[]:autoConnect",NS[i],true).toBool())
+  //    stream->open(); 
+  //}
 }
 
 void XmppStreams::onConfigClosed()

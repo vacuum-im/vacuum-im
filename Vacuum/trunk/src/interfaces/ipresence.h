@@ -34,8 +34,10 @@ public slots:
   virtual bool setStatus(const QString &AStatus, const Jid &AToJid = Jid()) =0;
   virtual bool setPriority(qint8 APriority, const Jid &AToJid = Jid()) =0;
 signals:
+  virtual void opened() =0;
   virtual void selfPresence(Show , const QString &, qint8 , const Jid &) =0;
   virtual void presenceItem(IPresenceItem *) =0;
+  virtual void closed() =0;
 };
 
 class IPresenceItem
@@ -58,7 +60,10 @@ public:
   virtual void removePresence(const Jid &) =0;
 signals:
   virtual void presenceAdded(IPresence *) =0;
+  virtual void presenceOpened(IPresence *) =0;
+  virtual void selfPresence(IPresence *,IPresence::Show , const QString &, qint8 , const Jid &) =0;
   virtual void presenceItem(IPresence *, IPresenceItem *) =0;
+  virtual void presenceClosed(IPresence *) =0;
   virtual void presenceRemoved(IPresence *) =0;
 };
 

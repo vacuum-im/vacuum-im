@@ -18,7 +18,7 @@ Settings::~Settings()
 }
 
 QVariant Settings::valueNS(const QString &AName, const QString &ANameNS, 
-                           const QVariant &ADefault)
+                           const QVariant &ADefault) const
 {
   if (!FSettingsOpened || AName.isEmpty())
     return ADefault;
@@ -30,12 +30,12 @@ QVariant Settings::valueNS(const QString &AName, const QString &ANameNS,
   return ADefault;
 }
 
-QVariant Settings::value(const QString &AName, const QVariant &ADefault)
+QVariant Settings::value(const QString &AName, const QVariant &ADefault) const
 {
   return valueNS(AName,"",ADefault);
 }
 
-QHash<QString,QVariant> Settings::values(const QString &AName)
+QHash<QString,QVariant> Settings::values(const QString &AName) const
 {
   QHash<QString,QVariant> result;
 
@@ -126,7 +126,7 @@ ISettings &Settings::delNS(const QString &ANameNS)
 }
 
 QDomElement Settings::getElement(const QString &AName, const QString &ANameNS, 
-                                 bool ACreate)
+                                 bool ACreate) const
 {
   if (!FSettingsOpened)
     return QDomElement();

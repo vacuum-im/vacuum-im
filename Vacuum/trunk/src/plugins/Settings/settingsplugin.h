@@ -34,7 +34,7 @@ public:
   virtual QString fileName() const { return FFile.fileName(); }
   virtual bool setFileName(const QString &);
   virtual bool saveSettings();
-  virtual QDomDocument document() { return FSettings; }
+  virtual QDomDocument document() const { return FSettings; }
   virtual QString profile() const { return FProfile.tagName(); }
   virtual QDomElement setProfile(const QString &);
   virtual QDomElement getProfile(const QString &);

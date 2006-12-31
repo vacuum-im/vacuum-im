@@ -22,7 +22,7 @@ public:
   ~RosterItem() {}
 
   virtual QObject *instance() { return this; }
-  virtual IRoster *roster() { return FRoster; }
+  virtual IRoster *roster() const { return FRoster; }
   virtual const Jid &jid() const {return FJid; }
   virtual const QString &name() const { return FName; }
   virtual const QString &subscription() const { return FSubscr; }
@@ -70,7 +70,8 @@ public:
   //Roster
   virtual const Jid &streamJid() const { return FStream->jid(); }
   virtual bool isOpen() const { return FOpen; }
-  virtual IRosterItem *item(const Jid &AItemJid);
+  virtual QString groupDelimiter() const { return "::"; }
+  virtual IRosterItem *item(const Jid &AItemJid) const;
   virtual QList<IRosterItem *> items() const;
   virtual QList<IRosterItem *> groupItems(const QString &AGroup) const;
   virtual QSet<QString> groups() const;
