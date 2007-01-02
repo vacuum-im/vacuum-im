@@ -33,8 +33,13 @@ public:
   virtual bool setData(int ARole, const QVariant &AData);
   virtual QVariant data(int ARole) const;
   virtual IRosterIndexList findChild(const QHash<int, QVariant> AData, bool ARecurse = false) const;
+  virtual void setRemoveOnLastChildRemoved(bool ARemove) { FRemoveOnLastChildRemoved = ARemove; }
 signals:
   virtual void dataChanged(IRosterIndex *);
+  virtual void childAboutToBeInserted(IRosterIndex *);
+  virtual void childInserted(IRosterIndex *);
+  virtual void childAboutToBeRemoved(IRosterIndex *);
+  virtual void childRemoved(IRosterIndex *);
 protected slots:
   virtual void onChildIndexDestroyed(QObject *AIndex);
   virtual void onDataHolderChanged();
@@ -43,6 +48,7 @@ private:
   QList<IRosterIndex *> FChilds;
   QHash<int, IRosterIndexDataHolder *> FDataHolders;
   QHash<int, QVariant> FData;
+  bool FRemoveOnLastChildRemoved;
 };
 
 #endif // ROSTERINDEX_H
