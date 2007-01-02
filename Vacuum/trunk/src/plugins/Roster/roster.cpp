@@ -76,6 +76,7 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
           if (rosterItem)
           {
             emit itemRemoved(rosterItem);
+            FItems.removeAt(FItems.indexOf(rosterItem));  
             delete rosterItem;
           }
           hooked = true;
