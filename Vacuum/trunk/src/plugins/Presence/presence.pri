@@ -1,6 +1,6 @@
 HEADERS = presenceitem.h \
           presence.h \
-          presenceplugin. h 
+          presenceplugin.h 
 
 SOURCES = presenceitem.cpp \
           presence.cpp \
