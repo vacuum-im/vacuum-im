@@ -36,6 +36,7 @@ public:
   virtual QString blankGroupName() const { return tr("Blank Group"); }
   virtual QString transportsGroupName() const { return tr("Transports"); }
   virtual QString myResourcesGroupName() const { return tr("My Resources"); }
+  virtual QString notInRosterGroupName() const { return tr("Not In Roster"); }
 signals:
   virtual void indexInserted(IRosterIndex *);
   virtual void indexRemoved(IRosterIndex *);

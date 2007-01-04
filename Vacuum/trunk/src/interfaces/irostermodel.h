@@ -27,8 +27,9 @@ public:
     IT_Root,
     IT_Group,
     IT_BlankGroup,
-    IT_MyResourcesGroup,
     IT_TransportsGroup,
+    IT_MyResourcesGroup,
+    IT_NotInRosterGroup,
     IT_Contact,
     IT_Transport,
     IT_MyResource,
@@ -37,10 +38,10 @@ public:
   enum DataRole {
     DR_Type = Qt::UserRole, 
     DR_Id,
+    DR_Jid,
     DR_StreamJid,
     DR_RosterJid,
     DR_RosterGroup,
-    DR_Jid,
     DR_Show,
     DR_Status,
     DR_Priority,
@@ -67,6 +68,10 @@ public:
   virtual void setRemoveOnLastChildRemoved(bool ARemove) =0;
 signals:
   virtual void dataChanged(IRosterIndex *) =0;
+  virtual void childAboutToBeInserted(IRosterIndex *) =0;
+  virtual void childInserted(IRosterIndex *) =0;
+  virtual void childAboutToBeRemoved(IRosterIndex *) =0;
+  virtual void childRemoved(IRosterIndex *) =0;
 };
 
 class IRosterModel :
@@ -77,12 +82,13 @@ public:
   virtual IRosterIndex *rootIndex() const =0;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *) =0;
   virtual IRosterIndex *createGroup(const QString &AName, int AType, IRosterIndex *) =0;
-  virtual IRosterIndex *findRosterIndex(int AType, const QVariant &AId, IRosterIndex *) const=0;
-  virtual IRosterIndex *findGroup(const QString &AName, int AType, IRosterIndex *) const=0;
+  virtual IRosterIndex *findRosterIndex(int AType, const QVariant &AId, IRosterIndex *) const =0;
+  virtual IRosterIndex *findGroup(const QString &AName, int AType, IRosterIndex *) const =0;
   virtual bool removeRosterIndex(IRosterIndex *) =0;
   virtual QString blankGroupName() const =0;
   virtual QString transportsGroupName() const =0;
   virtual QString myResourcesGroupName() const =0;
+  virtual QString notInRosterGroupName() const =0;
 signals:
   virtual void indexInserted(IRosterIndex *) =0;
   virtual void indexRemoved(IRosterIndex *) =0;
