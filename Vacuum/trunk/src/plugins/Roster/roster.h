@@ -24,9 +24,9 @@ public:
   virtual QObject *instance() { return this; }
   virtual IRoster *roster() const { return FRoster; }
   virtual const Jid &jid() const {return FJid; }
-  virtual const QString &name() const { return FName; }
-  virtual const QString &subscription() const { return FSubscr; }
-  virtual const QString &ask() const { return FAsk; }
+  virtual QString name() const { if (!FName.isEmpty()) return FName; else return FJid.bare();  }
+  virtual QString subscription() const { return FSubscr; }
+  virtual QString ask() const { return FAsk; }
   virtual const QSet<QString> &groups() const { return FGroups; }
 protected:
   virtual RosterItem &setName(const QString &AName) { FName = AName; return *this; }

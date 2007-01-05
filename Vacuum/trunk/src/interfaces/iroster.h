@@ -13,9 +13,9 @@ public:
   virtual QObject *instance() =0;
   virtual IRoster *roster() const =0;
   virtual const Jid &jid() const =0;
-  virtual const QString &name() const =0;
-  virtual const QString &subscription() const =0;
-  virtual const QString &ask() const =0;
+  virtual QString name() const =0;
+  virtual QString subscription() const =0;
+  virtual QString ask() const =0;
   virtual const QSet<QString> &groups() const =0;
 };
 
