@@ -337,30 +337,37 @@ void RosterModel::onPresenceItem(IPresenceItem *APresenceItem)
     data.insert(IRosterIndex::DR_Type,itemType);
     data.insert(IRosterIndex::DR_Id,APresenceItem->jid().prep().full());
     IRosterIndexList indexList = FRootIndex->findChild(data,true);
-    if (!indexList.empty())
+    IRosterIndex *index;
+    int presItemCount = APresenceItem->presence()->items(APresenceItem->jid()).count();
+    foreach (index,indexList)
     {
-      int presItemCount = APresenceItem->presence()->items(APresenceItem->jid()).count();
-      IRosterIndex *index;
-      foreach (index,indexList)
+      if (itemType == IRosterIndex::IT_MyResource || presItemCount > 1)
       {
-        if (itemType == IRosterIndex::IT_MyResource || presItemCount > 1)
-        {
-          removeRosterIndex(index);
-        }
-        else if (presItemCount == 1)
-        {
-          index->setData(IRosterIndex::DR_Id,APresenceItem->jid().prep().bare());
-          index->setData(IRosterIndex::DR_Jid,APresenceItem->jid().bare());
-          index->setData(IRosterIndex::DR_Show,APresenceItem->show());
-          index->setData(IRosterIndex::DR_Status,APresenceItem->status());
-          index->setData(IRosterIndex::DR_Priority,QVariant()); 
-        }
+        removeRosterIndex(index);
+      }
+      else if (presItemCount == 1)
+      {
+        index->setData(IRosterIndex::DR_Id,APresenceItem->jid().prep().bare());
+        index->setData(IRosterIndex::DR_Jid,APresenceItem->jid().bare());
+        index->setData(IRosterIndex::DR_Show,APresenceItem->show());
+        index->setData(IRosterIndex::DR_Status,APresenceItem->status());
+        index->setData(IRosterIndex::DR_Priority,QVariant()); 
       }
     }
   }
   else if (APresenceItem->show() == IPresence::Error)
   {
-
+    QHash<int,QVariant> data;
+    data.insert(IRosterIndex::DR_Type,itemType);
+    data.insert(IRosterIndex::DR_Id,APresenceItem->jid().prep().full());
+    IRosterIndexList indexList = FRootIndex->findChild(data,true);
+    IRosterIndex *index;
+    foreach(index,indexList)
+    {
+      index->setData(IRosterIndex::DR_Show,APresenceItem->show());
+      index->setData(IRosterIndex::DR_Status,APresenceItem->status());
+      index->setData(IRosterIndex::DR_Priority,QVariant()); 
+    }
   }
   else
   {
