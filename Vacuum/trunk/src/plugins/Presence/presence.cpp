@@ -147,8 +147,8 @@ bool Presence::setPresence(Show AShow, const QString &AStatus, qint8 APriority, 
         FShow = AShow;
         FStatus = AStatus;
         FPriority = APriority;
-        emit selfPresence(FShow,FStatus,FPriority,AToJid);
       }
+      emit selfPresence(FShow,FStatus,FPriority,AToJid);
       return true;
     }
   } 
@@ -182,13 +182,24 @@ void Presence::onStreamOpened(IXmppStream *)
   if (!FPresenceHandler)
     FPresenceHandler = FStanzaProcessor->setHandler(this,"/presence",IStanzaProcessor::DirectionIn,0,FStream->jid());   
   emit opened();
-  //setPresence(IPresence::Online,"Hellow world",5); 
+  setPresence(IPresence::Online,"Hellow world",5); 
 }
 
 void Presence::onStreamAboutToClose(IXmppStream *)
 {
+  while (FItems.count() > 0)
+  {
+    PresenceItem *item = FItems.at(0);
+    item->setShow(Offline);
+    item->setStatus("");
+    item->setPriority(0);
+    emit presenceItem(item);
+    delete item;
+    FItems.removeAt(0); 
+  }
+
   if (FShow != Offline)
-    setPresence(IPresence::Offline,"Disconnected",0); 
+    setPresence(Offline,"Disconnected",0); 
 }
 
 void Presence::onStreamClosed(IXmppStream *)
