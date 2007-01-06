@@ -57,14 +57,34 @@ void XmppStream::setJid(const Jid &AJid)
     FJid = AJid;
 }
 
-qint64 XmppStream::sendStanza(const Stanza &stanza)
+qint64 XmppStream::sendStanza(const Stanza &AStanza)
 {
   if (FStreamState != SS_OFFLINE)
   {
+    Stanza stanza(AStanza);
+    int i = FFeatures.count();
+    while (i>0)
+    {
+      IStreamFeature *feature = FFeatures.at(--i);
+      if (feature->needHook(IStreamFeature::DirectionOut))
+        if (feature->hookElement(&stanza.element(),IStreamFeature::DirectionOut))
+          return 0; 
+    }
+
+    QByteArray data = stanza.toByteArray(); 
+    i = FFeatures.count();
+    while (i>0)
+    {
+      IStreamFeature *feature = FFeatures.at(--i);
+      if (feature->needHook(IStreamFeature::DirectionOut))
+        if (feature->hookData(&data,IStreamFeature::DirectionOut))
+          return 0; 
+    }
+
     qDebug() << "\nStanza out" << FJid.full()<< ":\n" << stanza.toString(); 
-    return FConnection->write(stanza.toByteArray());
+    return FConnection->write(data);
   }
-  return false;
+  return 0;
 }
 
 IStreamConnection *XmppStream::connection()
@@ -82,7 +102,7 @@ bool XmppStream::setConnection(IStreamConnection *AConnection)
 
   if (FConnection)
   {
-    FConnection->instance()->~QObject();
+    FConnection->instance()->~QObject(); 
     FConnection = 0;
   }
 
@@ -100,12 +120,11 @@ bool XmppStream::setConnection(IStreamConnection *AConnection)
 
 void XmppStream::addFeature(IStreamFeature *AStreamFeature) 
 {
-  if (!FFeatures.contains(AStreamFeature))
+  if (AStreamFeature && !FFeatures.contains(AStreamFeature))
   {
-    QObject *obj = AStreamFeature->instance();
-    connect(obj,SIGNAL(finished(bool)),SLOT(onFeatureFinished(bool)));
-    connect(obj,SIGNAL(error(const QString &)),SLOT(onFeatureError(const QString &)));
-    connect(obj,SIGNAL(destroyed(QObject *)),SLOT(onFeatureDestroyed(QObject *)));
+    connect(AStreamFeature->instance(),SIGNAL(finished(bool)),SLOT(onFeatureFinished(bool)));
+    connect(AStreamFeature->instance(),SIGNAL(error(const QString &)),SLOT(onFeatureError(const QString &)));
+    connect(AStreamFeature->instance(),SIGNAL(destroyed(QObject *)),SLOT(onFeatureDestroyed(QObject *)));
     FFeatures.append(AStreamFeature);
   }
 }
@@ -184,17 +203,18 @@ bool XmppStream::startFeature(const QDomElement &AElem)
 
 void XmppStream::sortFeature(IStreamFeature *AFeature)
 {
-  if (!(FFeatures.count()>1)) return;
+  if (FFeatures.count() < 2) return;
+
   if (AFeature)
   {
-    if (!AFeature->needHook()) 
+    if (!AFeature->needHook(IStreamFeature::DirectionIn)) 
     {
       FFeatures.replace(FFeatures.count()-1,AFeature); 
       return; 
     }
     int index = FFeatures.indexOf(AFeature);
     int i=0;
-    while (i<FFeatures.count() && i != index && FFeatures[i]->needHook())
+    while (i<FFeatures.count() && i != index && FFeatures.at(i)->needHook(IStreamFeature::DirectionIn))
       i++;
     if (i<FFeatures.count() && i != index)
       FFeatures.move(index,i);
@@ -203,7 +223,7 @@ void XmppStream::sortFeature(IStreamFeature *AFeature)
   {
     int index=0;
     for (int i=0; i<FFeatures.count(); i++)
-      if (FFeatures[index]->needHook())
+      if (FFeatures.at(index) ->needHook(IStreamFeature::DirectionIn))
         index++;
       else
         FFeatures.move(index,FFeatures.count()-1);  
@@ -223,9 +243,9 @@ void XmppStream::onConnectionReadyRead(qint64 ABytes)
   IStreamFeature *feature;
   while (i<FFeatures.count()) 
   {
-    feature = FFeatures[i++];
-    if (feature->needHook())
-      if (feature->hookData(&data))
+    feature = FFeatures.at(i++);
+    if (feature->needHook(IStreamFeature::DirectionIn))
+      if (feature->hookData(&data,IStreamFeature::DirectionIn))
         return; 
   }
   if (!data.isEmpty())
@@ -270,9 +290,9 @@ void XmppStream::onParserElement(const QDomElement &AElem)
   int i = 0;
   while (i<FFeatures.count()) 
   {
-    feature = FFeatures[i++];
-    if (feature->needHook())
-      if (feature->hookElement(&elem)) 
+    feature = FFeatures.at(i++);
+    if (feature->needHook(IStreamFeature::DirectionIn))
+      if (feature->hookElement(&elem,IStreamFeature::DirectionIn)) 
         return;
   }
 
@@ -337,5 +357,6 @@ void XmppStream::onFeatureError(const QString &AErrStr)
 
 void XmppStream::onFeatureDestroyed(QObject *AFeature)
 {
-  removeFeature((IStreamFeature *)AFeature);
+  IStreamFeature *feature = dynamic_cast<IStreamFeature *>(AFeature);
+  removeFeature(feature);
 }

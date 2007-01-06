@@ -20,7 +20,7 @@ public:
   //IXmppStream
   virtual QObject *instance() { return this; }
   virtual bool isOpen() const { return FOpen; }
-  virtual qint64 sendStanza(const Stanza &stanza);
+  virtual qint64 sendStanza(const Stanza &AStanza);
   virtual QString streamId() const { return FStreamId; }
   virtual QString lastError() const { return FLastError; };
   virtual void setJid(const Jid &AJid);

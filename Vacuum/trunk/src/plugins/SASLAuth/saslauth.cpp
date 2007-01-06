@@ -143,9 +143,17 @@ bool SASLAuth::start(const QDomElement &AElem)
   return false;
 }
 
-bool SASLAuth::hookElement(QDomElement *AElem)
+bool SASLAuth::needHook(Direction ADirection) const
 {
-  if (AElem->namespaceURI() != NS_FEATURE_SASL)
+  if (ADirection == DirectionIn) 
+    return FNeedHook; 
+  
+  return false;
+}
+
+bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
+{
+  if (ADirection != DirectionIn || AElem->namespaceURI() != NS_FEATURE_SASL)
     return false;
 
   if (AElem->tagName() == "success")

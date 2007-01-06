@@ -27,9 +27,17 @@ bool SASLSession::start(const QDomElement &AElem)
   return true;
 }
 
-bool SASLSession::hookElement(QDomElement *AElem)
+bool SASLSession::needHook(Direction ADirection) const
 {
-  if (AElem->attribute("id") == "session")
+  if (ADirection == DirectionIn) 
+    return FNeedHook; 
+  
+  return false;
+}
+
+bool SASLSession::hookElement(QDomElement *AElem, Direction ADirection)
+{
+  if (ADirection == DirectionIn && AElem->attribute("id") == "session")
   {
     FNeedHook = false;
     if (AElem->attribute("type") == "result")

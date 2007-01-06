@@ -32,9 +32,17 @@ bool SASLBind::start(const QDomElement &AElem)
   return true;
 }
 
-bool SASLBind::hookElement(QDomElement *AElem)
+bool SASLBind::needHook(Direction ADirection) const
 {
-  if (AElem->attribute("id") == "bind")
+  if (ADirection == DirectionIn) 
+    return FNeedHook; 
+  
+  return false;
+}
+
+bool SASLBind::hookElement(QDomElement *AElem, Direction ADirection)
+{
+  if (ADirection == DirectionIn && AElem->attribute("id") == "bind")
   {
     FNeedHook = false;
     if (AElem->attribute("type") == "result")

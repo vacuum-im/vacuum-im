@@ -51,14 +51,19 @@ class IXmppStream;
 class IStreamFeature
 {
 public:
+  enum Direction {
+    DirectionIn,
+    DirectionOut,
+  };
+public:
   virtual QObject *instance()=0;
   virtual QString name() const=0;
   virtual QString nsURI() const=0;
   virtual IXmppStream *stream() const =0;
   virtual bool start(const QDomElement &)=0; 
-  virtual bool needHook() const=0;
-  virtual bool hookData(QByteArray *)=0;
-  virtual bool hookElement(QDomElement *)=0;
+  virtual bool needHook(Direction) const=0;
+  virtual bool hookData(QByteArray *,Direction)=0;
+  virtual bool hookElement(QDomElement *,Direction)=0;
 signals:
   virtual void finished(bool restartStream)=0; 
   virtual void error(const QString &errStr)=0;

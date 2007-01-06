@@ -27,9 +27,9 @@ public:
   virtual QString nsURI() const { return NS_FEATURE_SESSION; }
   virtual IXmppStream *stream() const { return FStream; }
   virtual bool start(const QDomElement &AElem); 
-  virtual bool needHook() const { return FNeedHook; }
-  virtual bool hookData(QByteArray *) { return false; }
-  virtual bool hookElement(QDomElement *AElem);
+  virtual bool needHook(Direction ADirection) const;
+  virtual bool hookData(QByteArray *,Direction) { return false; }
+  virtual bool hookElement(QDomElement *AElem, Direction ADirection);
 signals:
   virtual void finished(bool); 
   virtual void error(const QString &);

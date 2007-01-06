@@ -51,9 +51,17 @@ bool IqAuth::start(const QDomElement &AElem)
   return true;
 }
 
-bool IqAuth::hookElement(QDomElement *AElem)
+bool IqAuth::needHook(Direction ADirection) const
 {
-  if (AElem->attribute("id") == "auth")
+  if (ADirection == DirectionIn) 
+    return FNeedHook; 
+  
+  return false;
+}
+
+bool IqAuth::hookElement(QDomElement *AElem,Direction ADirection)
+{
+  if (ADirection == DirectionIn && AElem->attribute("id") == "auth")
   {
     FNeedHook = false;
     if (AElem->attribute("type") == "result")
