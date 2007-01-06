@@ -1,6 +1,8 @@
-HEADERS = roster.h \
+HEADERS = rosteritem.h \
+          roster.h \
           rosterplugin.h
 
-SOURCES = roster.cpp \
+SOURCES = rosteritem.h \
+          roster.cpp \
           rosterplugin.cpp
 

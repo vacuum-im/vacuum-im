@@ -4,8 +4,8 @@
 Roster::Roster(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject *parent) 
   : QObject(parent)
 {
-  connect(AStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(open()));
-  connect(AStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(close())); 
+  connect(AStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
+  connect(AStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
   FStream = AStream;
   FStanzaProcessor = AStanzaProcessor;
   FOpen = false;
@@ -208,7 +208,6 @@ void Roster::close()
 
   FOpen = false;
   FOpenId.clear();
-  qDeleteAll(FItems);
 }
 
 void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups)
@@ -260,5 +259,15 @@ void Roster::sendSubscription(const Jid &AItemJid, IRoster::SubscriptionType ATy
   Stanza subscr("presence");
   subscr.setTo(AItemJid.bare()).setType(type); 
   FStanzaProcessor->sendStanzaOut(FStream->jid(),subscr);  
+}
+
+void Roster::onStreamOpened(IXmppStream *)
+{
+  open();
+}
+
+void Roster::onStreamClosed(IXmppStream *)
+{
+  close();
 }
 
