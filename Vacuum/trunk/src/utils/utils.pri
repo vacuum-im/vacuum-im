@@ -4,11 +4,13 @@ HEADERS += utilsexport.h \
            sha1.h \
            md5.h \
            errorhandler.h \
-           stanza.h 
+           stanza.h \
+           action.h
 
 SOURCES += jid.cpp \
            versionparser.cpp \
            sha1.cpp \
            md5.cpp \
            errorhandler.cpp \
-           stanza.cpp
+           stanza.cpp \
+           action.cpp
