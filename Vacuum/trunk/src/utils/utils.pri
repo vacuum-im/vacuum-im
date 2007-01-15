@@ -5,7 +5,8 @@ HEADERS += utilsexport.h \
            md5.h \
            errorhandler.h \
            stanza.h \
-           action.h
+           action.h \
+           menu.h
 
 SOURCES += jid.cpp \
            versionparser.cpp \
@@ -13,4 +14,5 @@ SOURCES += jid.cpp \
            md5.cpp \
            errorhandler.cpp \
            stanza.cpp \
-           action.cpp
+           action.cpp \
+           menu.cpp
