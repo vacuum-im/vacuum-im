@@ -95,7 +95,6 @@ void RosterModelPlugin::onRosterAdded(IRoster *ARoster)
   if (presence && !getRosterModel(ARoster->streamJid()))
   {
     IRosterModel *model = newRosterModel(ARoster,presence);
-    connect(model->instance(),SIGNAL(destroyed(QObject *)),SLOT(onRosterModelDestroyed(QObject *)));
     emit rosterModelAdded(model);
     //QTreeView *view = new QTreeView(0);
     //view->setModel(model);
@@ -121,7 +120,6 @@ void RosterModelPlugin::onPresenceAdded(IPresence *APresence)
   if (roster && !getRosterModel(APresence->streamJid()))
   {
     IRosterModel *model = newRosterModel(roster,APresence);
-    connect(model->instance(),SIGNAL(destroyed(QObject *)),SLOT(onRosterModelDestroyed(QObject *)));
     emit rosterModelAdded(model);
   }
 }
@@ -138,7 +136,7 @@ void RosterModelPlugin::onPresenceRemoved(IPresence *APresence)
 
 void RosterModelPlugin::onRosterModelDestroyed(QObject *ARosterModel)
 {
-  RosterModel *roster = (RosterModel *)ARosterModel;
+  RosterModel *roster = dynamic_cast<RosterModel *>(ARosterModel);
   if (FRosterModels.contains(roster))
     FRosterModels.removeAt(FRosterModels.indexOf(roster));  
 }

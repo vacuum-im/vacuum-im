@@ -6,6 +6,7 @@
 #include "rosterindex.h"
 
 class RosterModel : 
+  virtual public QAbstractItemModel,
   public IRosterModel
 {
   Q_OBJECT;

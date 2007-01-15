@@ -81,7 +81,7 @@ signals:
 };
 
 class IRosterModel :
-  public QAbstractItemModel
+  virtual public QAbstractItemModel
 {
 public:
   virtual QObject *instance() =0;

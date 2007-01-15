@@ -2,6 +2,7 @@
 #include "rostermodel.h"
 
 RosterModel::RosterModel(IRoster *ARoster, IPresence *APresence)
+  : QAbstractItemModel(ARoster->instance())
 {
   FRoster = ARoster;
   FPresence = APresence;
@@ -21,7 +22,6 @@ RosterModel::RosterModel(IRoster *ARoster, IPresence *APresence)
   {
     connect(ARoster->instance(),SIGNAL(itemPush(IRosterItem *)),SLOT(onRosterItemPush(IRosterItem *))); 
     connect(ARoster->instance(),SIGNAL(itemRemoved(IRosterItem *)),SLOT(onRosterItemRemoved(IRosterItem *))); 
-    setParent(ARoster->instance());
     FRootIndex->setData(Qt::DisplayRole, ARoster->streamJid().full());
     FRootIndex->setData(IRosterIndex::DR_StreamJid,ARoster->streamJid().prep().full()); 
   }

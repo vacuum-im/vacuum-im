@@ -169,7 +169,7 @@ IRosterIndexList RosterIndex::findChild(const QHash<int, QVariant> AData, bool A
 
 void RosterIndex::onChildIndexDestroyed(QObject *AIndex)
 {
-  IRosterIndex *index = qobject_cast<IRosterIndex *>(AIndex);
+  IRosterIndex *index = dynamic_cast<IRosterIndex *>(AIndex);
   if (FChilds.contains(index))
   {
     emit childAboutToBeRemoved(index);
