@@ -143,7 +143,7 @@ void RosterPlugin::onRosterItemRemoved(IRosterItem *ARosterItem)
 
 void RosterPlugin::onRosterDestroyed(QObject *ARoster)
 {
-  Roster *roster = (Roster *)ARoster;
+  Roster *roster = qobject_cast<Roster *>(ARoster);
   if (FRosters.contains(roster))
     FRosters.removeAt(FRosters.indexOf(roster)); 
 }

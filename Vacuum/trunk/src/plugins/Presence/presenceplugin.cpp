@@ -145,7 +145,7 @@ void PresencePlugin::onPresenceClosed()
 
 void PresencePlugin::onPresenceDestroyed(QObject *APresence)
 {
-  Presence *presence = (Presence *)APresence;
+  Presence *presence = qobject_cast<Presence *>(APresence);
   if (FPresences.contains(presence))
     FPresences.removeAt(FPresences.indexOf(presence)); 
 }
