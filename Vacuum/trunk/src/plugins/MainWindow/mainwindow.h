@@ -6,6 +6,7 @@
 #include "utils/menu.h"
 
 class MainWindow : 
+  virtual public QMainWindow,
   public IMainWindow
 {
   Q_OBJECT;

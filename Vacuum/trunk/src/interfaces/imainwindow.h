@@ -9,7 +9,7 @@
 #include "utils/menu.h"
 
 class IMainWindow :
-  public QMainWindow
+  virtual public QMainWindow
 {
 public:
   virtual QObject *instance() = 0;

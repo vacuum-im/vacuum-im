@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags)
+  : QMainWindow(AParent,AFlags)
 {
   qDebug() << "MainWindow";
   setParent(AParent);
