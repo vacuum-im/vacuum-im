@@ -23,10 +23,13 @@ public:
   virtual bool hasChildren(const QModelIndex &AParent) const;
   virtual int rowCount(const QModelIndex &AParent = QModelIndex()) const;
   virtual int columnCount(const QModelIndex &AParent = QModelIndex()) const;
+  virtual Qt::ItemFlags flags(const QModelIndex &AIndex) const; 
   virtual QVariant data(const QModelIndex &AIndex, int ARole = Qt::DisplayRole) const;
   virtual QVariant headerData(int ASection, Qt::Orientation AOrientation, int ARole = Qt::DisplayRole) const;
 
   //IRosterModel
+  virtual IRoster *roster() const { return FRoster; }
+  virtual IPresence *presence() const { return FPresence; }
   virtual IRosterIndex *rootIndex() const { return FRootIndex; }
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent);
   virtual IRosterIndex *createGroup(const QString &AName, int AType, IRosterIndex *AParent);
@@ -39,6 +42,7 @@ public:
   virtual QString notInRosterGroupName() const { return tr("Not In Roster"); }
 signals:
   virtual void indexInserted(IRosterIndex *);
+  virtual void indexChanged(IRosterIndex *);
   virtual void indexRemoved(IRosterIndex *);
 protected slots:
   void onRosterItemPush(IRosterItem *ARosterItem);

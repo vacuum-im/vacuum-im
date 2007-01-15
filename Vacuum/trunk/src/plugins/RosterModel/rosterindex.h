@@ -1,7 +1,6 @@
 #ifndef ROSTERINDEX_H
 #define ROSTERINDEX_H
 
-#include <QList>
 #include <QHash>
 #include "interfaces/irostermodel.h"
 
@@ -30,6 +29,8 @@ public:
   virtual IRosterIndex *child(int ARow) const { return FChilds.value(ARow,0); }
   virtual int childRow(const IRosterIndex *AIndex) const; 
   virtual IRosterIndexDataHolder *setDataHolder(int ARole, IRosterIndexDataHolder *ADataHolder);
+  virtual void setFlags(const Qt::ItemFlags &AFlags) { FFlags = AFlags; } 
+  virtual Qt::ItemFlags flags() const { return FFlags; }
   virtual bool setData(int ARole, const QVariant &AData);
   virtual QVariant data(int ARole) const;
   virtual IRosterIndexList findChild(const QHash<int, QVariant> AData, bool ARecurse = false) const;
@@ -48,6 +49,7 @@ private:
   QList<IRosterIndex *> FChilds;
   QHash<int, IRosterIndexDataHolder *> FDataHolders;
   QHash<int, QVariant> FData;
+  Qt::ItemFlags FFlags;
   bool FRemoveOnLastChildRemoved;
 };
 

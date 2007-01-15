@@ -3,9 +3,10 @@
 
 RosterIndex::RosterIndex(int AType, const QString &AId)
 {
+  FParentIndex =0;
   FData.insert(DR_Type,AType);
   FData.insert(DR_Id,AId);
-  FParentIndex =0;
+  FFlags = (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
   FRemoveOnLastChildRemoved = false;
   //qDebug() << "RosterIndex" << id();
 }
@@ -102,12 +103,12 @@ IRosterIndexDataHolder *RosterIndex::setDataHolder(int ARole, IRosterIndexDataHo
 
 bool RosterIndex::setData(int ARole, const QVariant &AData)
 {
-  QVariant oldData = data(ARole);
   bool dataSet = false;
+  QVariant oldData = data(ARole);
 
   IRosterIndexDataHolder *dataHolder = FDataHolders.value(ARole,0);
   if (!dataHolder)
-    dataHolder = FDataHolders.value(-1,0);
+    dataHolder = FDataHolders.value(DR_AnyRole,0);
 
   if (!dataHolder)
   {
@@ -132,13 +133,13 @@ QVariant RosterIndex::data(int ARole) const
 
   IRosterIndexDataHolder *dataHolder = FDataHolders.value(ARole,0);
   if (!dataHolder)
-    dataHolder = FDataHolders.value(-1,0);
+    dataHolder = FDataHolders.value(DR_AnyRole,0);
 
   if (dataHolder)
     data = dataHolder->data(this,ARole);
 
-  if (!data.isValid() && FData.contains(ARole))
-    data = FData.value(ARole);
+  if (!data.isValid())
+    data = FData.value(ARole,QVariant());
   
   return data;
 }
@@ -159,7 +160,6 @@ IRosterIndexList RosterIndex::findChild(const QHash<int, QVariant> AData, bool A
     }
     if (cheked)
       indexes.append(index);
-
     if (ARecurse)
       indexes += index->findChild(AData,ARecurse); 
   }
@@ -169,7 +169,7 @@ IRosterIndexList RosterIndex::findChild(const QHash<int, QVariant> AData, bool A
 
 void RosterIndex::onChildIndexDestroyed(QObject *AIndex)
 {
-  IRosterIndex *index = (IRosterIndex *)AIndex;
+  IRosterIndex *index = qobject_cast<IRosterIndex *>(AIndex);
   if (FChilds.contains(index))
   {
     emit childAboutToBeRemoved(index);

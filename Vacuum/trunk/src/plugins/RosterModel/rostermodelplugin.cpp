@@ -97,9 +97,9 @@ void RosterModelPlugin::onRosterAdded(IRoster *ARoster)
     IRosterModel *model = newRosterModel(ARoster,presence);
     connect(model->instance(),SIGNAL(destroyed(QObject *)),SLOT(onRosterModelDestroyed(QObject *)));
     emit rosterModelAdded(model);
-    QTreeView *view = new QTreeView(0);
-    view->setModel(model);
-    view->show(); 
+    //QTreeView *view = new QTreeView(0);
+    //view->setModel(model);
+    //view->show(); 
   }
 }
 

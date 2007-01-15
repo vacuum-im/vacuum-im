@@ -23,7 +23,7 @@ signals:
 class IRosterIndex
 {
 public:
-  enum IndexType {
+  enum {
     IT_Root,
     IT_Group,
     IT_BlankGroup,
@@ -33,9 +33,10 @@ public:
     IT_Contact,
     IT_Transport,
     IT_MyResource,
-    IT_UserDefined = 16
+    IT_UserDefined = 32
   };
-  enum DataRole {
+  enum {
+    DR_AnyRole = -1,
     DR_Type = Qt::UserRole, 
     DR_Id,
     DR_Jid,
@@ -45,6 +46,9 @@ public:
     DR_Show,
     DR_Status,
     DR_Priority,
+    DR_Self_Show,
+    DR_Self_Status,
+    DR_Self_Priority,
     DR_Subscription,
     DR_Ask,
     DR_UserDefined = Qt::UserRole+32
@@ -56,14 +60,16 @@ public:
   virtual void setParentIndex(IRosterIndex *) =0;
   virtual IRosterIndex *parentIndex() const =0; 
   virtual int row() const =0;
-  virtual bool setData(int ARole, const QVariant &) =0;
-  virtual QVariant data(int ARole) const =0;
   virtual IRosterIndexDataHolder *setDataHolder(int ARole, IRosterIndexDataHolder *) =0;
   virtual void appendChild(IRosterIndex *) =0;
   virtual bool removeChild(IRosterIndex *, bool ARecurse = false) =0;
   virtual IRosterIndex *child(int ARow) const =0;
   virtual int childCount() const =0;
   virtual int childRow(const IRosterIndex *) const =0;
+  virtual void setFlags(const Qt::ItemFlags &AFlags) =0;
+  virtual Qt::ItemFlags flags() const =0;
+  virtual bool setData(int ARole, const QVariant &) =0;
+  virtual QVariant data(int ARole) const =0;
   virtual IRosterIndexList findChild(const QHash<int, QVariant> AData, bool ARecurse = false) const =0;
   virtual void setRemoveOnLastChildRemoved(bool ARemove) =0;
 signals:
@@ -79,6 +85,8 @@ class IRosterModel :
 {
 public:
   virtual QObject *instance() =0;
+  virtual IRoster *roster() const =0;
+  virtual IPresence *presence() const =0;
   virtual IRosterIndex *rootIndex() const =0;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *) =0;
   virtual IRosterIndex *createGroup(const QString &AName, int AType, IRosterIndex *) =0;
@@ -91,6 +99,7 @@ public:
   virtual QString notInRosterGroupName() const =0;
 signals:
   virtual void indexInserted(IRosterIndex *) =0;
+  virtual void indexChanged(IRosterIndex *) =0;
   virtual void indexRemoved(IRosterIndex *) =0;
 };
 
