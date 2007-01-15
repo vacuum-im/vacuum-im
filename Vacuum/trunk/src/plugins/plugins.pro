@@ -9,4 +9,5 @@ SUBDIRS = settings \
           stanzaprocessor \
           roster \
           presence \
-          rostermodel
+          rostermodel \
+          mainwindow

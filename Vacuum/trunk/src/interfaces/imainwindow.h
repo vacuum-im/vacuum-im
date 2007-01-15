@@ -1,0 +1,36 @@
+#ifndef IMAINWINDOW_H
+#define IMAINWINDOW_H
+
+#include <QMainWindow>
+#include <QVBoxLayout>
+#include <QStackedWidget>
+#include <QScrollArea>
+#include <QToolBar>
+#include "utils/menu.h"
+
+class IMainWindow :
+  public QMainWindow
+{
+public:
+  virtual QObject *instance() = 0;
+  virtual QVBoxLayout *mainLayout() const =0;
+  virtual QStackedWidget *upperWidget() const = 0;
+  virtual QStackedWidget *middleWidget() const = 0;
+  virtual QStackedWidget *bottomWidget() const = 0;
+  virtual QScrollArea *rostersArea() const = 0;
+  virtual QVBoxLayout *rostersLayout() const = 0;
+  virtual QToolBar *mainToolBar() const = 0;
+  virtual Menu *mainMenu() const = 0;
+};
+
+class IMainWindowPlugin 
+{
+public:
+  virtual QObject *instance() = 0;
+  virtual IMainWindow *mainWindow() const = 0;
+};
+
+Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.0")
+Q_DECLARE_INTERFACE(IMainWindowPlugin,"Vacuum.Plugin.IMainWindowPlugin/1.0")
+
+#endif
