@@ -25,6 +25,7 @@ class IRosterIndex
 public:
   enum {
     IT_Root,
+    IT_StreamRoot,
     IT_Group,
     IT_BlankGroup,
     IT_TransportsGroup,
@@ -38,9 +39,9 @@ public:
   enum {
     DR_AnyRole = -1,
     DR_Type = Qt::UserRole, 
+    DR_StreamJid,
     DR_Id,
     DR_Jid,
-    DR_StreamJid,
     DR_RosterJid,
     DR_RosterGroup,
     DR_Show,
@@ -80,13 +81,17 @@ signals:
   virtual void childRemoved(IRosterIndex *) =0;
 };
 
-class IRosterModel :
+class IRostersModel :
   virtual public QAbstractItemModel
 {
 public:
   virtual QObject *instance() =0;
-  virtual IRoster *roster() const =0;
-  virtual IPresence *presence() const =0;
+  virtual IRosterIndex *appendStream(IRoster *ARoster, IPresence *APresence) =0;
+  virtual QStringList streams() const =0;
+  virtual bool removeStream(const QString &AStreamJid) =0;
+  virtual IRoster *getRoster(const QString &AStreamJid) const =0;
+  virtual IPresence *getPresence(const QString &AStreamJid) const =0;
+  virtual IRosterIndex *getStreamRoot(const QString &AStreamJid) const =0;
   virtual IRosterIndex *rootIndex() const =0;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *) =0;
   virtual IRosterIndex *createGroup(const QString &AName, int AType, IRosterIndex *) =0;
@@ -98,26 +103,29 @@ public:
   virtual QString myResourcesGroupName() const =0;
   virtual QString notInRosterGroupName() const =0;
 signals:
+  virtual void streamAdded(const Jid &) =0;
+  virtual void streamRemoved(const Jid &) =0;
   virtual void indexInserted(IRosterIndex *) =0;
   virtual void indexChanged(IRosterIndex *) =0;
   virtual void indexRemoved(IRosterIndex *) =0;
 };
 
-class IRosterModelPlugin 
+
+class IRostersModelPlugin 
 {
 public:
   virtual QObject *instance() =0;
-  virtual IRosterModel *newRosterModel(IRoster *, IPresence *) =0;
-  virtual IRosterModel *getRosterModel(const Jid &) const =0;
-  virtual void removeRosterModel(const Jid &) =0;
+  virtual IRostersModel *rostersModel() =0;
+  virtual bool addStreamRoster(IRoster *, IPresence *) =0;
+  virtual bool removeStreamRoster(const Jid &AStreamJid) =0;
 signals:
-  virtual void rosterModelAdded(IRosterModel *) =0;
-  virtual void rosterModelRemoved(IRosterModel *) =0;
+  virtual void streamRosterAdded(const Jid &AStreamJid) =0;
+  virtual void streamRosterRemoved(const Jid &AStreamJid) =0;
 };
 
 Q_DECLARE_INTERFACE(IRosterIndexDataHolder,"Vacuum.Plugin.IRosterIndexDataHolder/1.0");
 Q_DECLARE_INTERFACE(IRosterIndex,"Vacuum.Plugin.IRosterIndex/1.0");
-Q_DECLARE_INTERFACE(IRosterModel,"Vacuum.Plugin.IRosterModel/1.0");
-Q_DECLARE_INTERFACE(IRosterModelPlugin,"Vacuum.Plugin.IRosterModelPlugin/1.0");
+Q_DECLARE_INTERFACE(IRostersModel,"Vacuum.Plugin.IRostersModel/1.0");
+Q_DECLARE_INTERFACE(IRostersModelPlugin,"Vacuum.Plugin.IRostersModelPlugin/1.0");
 
 #endif
