@@ -32,7 +32,7 @@ bool MainWindow::start()
 
 void MainWindow::createLayouts()
 {
-  FRostersLayout = new QVBoxLayout;
+  FRostersLayout = new RosterLayout(0);
   FRostersLayout->setMargin(2);
   FRostersArea = new QScrollArea;
   FRostersArea->setSizePolicy(QSizePolicy::Expanding ,QSizePolicy::Expanding);

@@ -4,6 +4,7 @@
 #include "interfaces/ipluginmanager.h"
 #include "interfaces/imainwindow.h"
 #include "utils/menu.h"
+#include "rosterlayout.h"
 
 class MainWindow : 
   virtual public QMainWindow,
@@ -27,7 +28,7 @@ public:
   virtual QStackedWidget *middleWidget() const { return FMiddleWidget; }
   virtual QStackedWidget *bottomWidget() const { return FBottomWidget; }
   virtual QScrollArea *rostersArea() const { return FRostersArea; }
-  virtual QVBoxLayout *rostersLayout() const { return FRostersLayout; }
+  virtual QLayout *rostersLayout() const { return FRostersLayout; }
   virtual QToolBar *mainToolBar() const { return FMainToolBar; }
   virtual Menu *mainMenu() const { return mnuMain; }
 protected:
@@ -49,7 +50,7 @@ private:
   QStackedWidget  *FMiddleWidget;
   QStackedWidget  *FBottomWidget;
   QScrollArea     *FRostersArea;
-  QVBoxLayout     *FRostersLayout;
+  RosterLayout    *FRostersLayout;
   QToolBar        *FMainToolBar;
 };
 

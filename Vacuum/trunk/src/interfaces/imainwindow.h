@@ -18,7 +18,7 @@ public:
   virtual QStackedWidget *middleWidget() const = 0;
   virtual QStackedWidget *bottomWidget() const = 0;
   virtual QScrollArea *rostersArea() const = 0;
-  virtual QVBoxLayout *rostersLayout() const = 0;
+  virtual QLayout *rostersLayout() const = 0;
   virtual QToolBar *mainToolBar() const = 0;
   virtual Menu *mainMenu() const = 0;
 };
