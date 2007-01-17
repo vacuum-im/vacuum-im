@@ -2,7 +2,7 @@
 #define ROSTERINDEX_H
 
 #include <QHash>
-#include "interfaces/irostermodel.h"
+#include "interfaces/irostersmodel.h"
 
 class RosterIndex : 
   public QObject,

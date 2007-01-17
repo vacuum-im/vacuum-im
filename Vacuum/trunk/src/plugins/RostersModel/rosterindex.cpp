@@ -8,12 +8,11 @@ RosterIndex::RosterIndex(int AType, const QString &AId)
   FData.insert(DR_Id,AId);
   FFlags = (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
   FRemoveOnLastChildRemoved = false;
-  //qDebug() << "RosterIndex" << id();
 }
 
 RosterIndex::~RosterIndex()
 {
-  //qDebug() << "~RosterIndex" << id();
+
 }
 
 void RosterIndex::setParentIndex(IRosterIndex *AIndex)

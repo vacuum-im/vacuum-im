@@ -4,6 +4,6 @@ QT += network xml
 
 LIBS += -l../../libs/utils 
 
-TARGET = rostermodel 
+TARGET = rostersmodel 
 
-include(rostermodel.pri) 
+include(rostersmodel.pri) 
