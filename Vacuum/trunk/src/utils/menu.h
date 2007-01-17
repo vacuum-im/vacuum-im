@@ -32,7 +32,7 @@ protected:
   void clearContext();
   void populateContext();
 private:
-  typedef QMultiMap<int /*Order*/,QPointer<Action>> ActionList;
+  typedef QMultiMap<int,QPointer<Action>> ActionList;
   ActionList::iterator findAction(const Action *AAction); 
   void clearNullActions();
   QAction *findOrderSeparator(int AOrder) const;

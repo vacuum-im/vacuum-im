@@ -27,7 +27,7 @@ public:
   int order() const { return FOrder; }
   bool isContextDepended() const { return FContextDepended; }
   void setContextDepended(bool AContextDepended) { FContextDepended = AContextDepended; }
-  bool contextSupported(const ActionContext &AContext) const;
+  bool contextIsSupported(const ActionContext &AContext) const;
   const ActionContext &context() const { return FContext; }
   void setContext(const ActionContext &AContext);
 signals:

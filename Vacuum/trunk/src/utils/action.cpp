@@ -27,7 +27,7 @@ Action::~Action()
 
 }
 
-bool Action::contextSupported( const ActionContext &AContext ) const
+bool Action::contextIsSupported( const ActionContext &AContext ) const
 {
   bool support = true;
   if (!isContextDepended())
