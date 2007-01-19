@@ -25,10 +25,8 @@ public:
   //IMainWindow
   virtual QVBoxLayout *mainLayout() const { return FMainLayout; }
   virtual QStackedWidget *upperWidget() const { return FUpperWidget; }
-  virtual QStackedWidget *middleWidget() const { return FMiddleWidget; }
+  virtual QStackedWidget *rostersWidget() const { return FRostersWidget; }
   virtual QStackedWidget *bottomWidget() const { return FBottomWidget; }
-  virtual QScrollArea *rostersArea() const { return FRostersArea; }
-  virtual QLayout *rostersLayout() const { return FRostersLayout; }
   virtual QToolBar *mainToolBar() const { return FMainToolBar; }
   virtual Menu *mainMenu() const { return mnuMain; }
 protected:
@@ -47,10 +45,8 @@ private:
 private:
   QVBoxLayout     *FMainLayout;
   QStackedWidget  *FUpperWidget;
-  QStackedWidget  *FMiddleWidget;
+  QStackedWidget  *FRostersWidget;
   QStackedWidget  *FBottomWidget;
-  QScrollArea     *FRostersArea;
-  RosterLayout    *FRostersLayout;
   QToolBar        *FMainToolBar;
 };
 

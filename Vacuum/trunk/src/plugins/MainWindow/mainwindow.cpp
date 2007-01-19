@@ -32,28 +32,18 @@ bool MainWindow::start()
 
 void MainWindow::createLayouts()
 {
-  FRostersLayout = new RosterLayout(0);
-  FRostersLayout->setMargin(2);
-  FRostersArea = new QScrollArea;
-  FRostersArea->setSizePolicy(QSizePolicy::Expanding ,QSizePolicy::Expanding);
-  QWidget *scrollWidget = new QWidget;
-  scrollWidget->setLayout(FRostersLayout);
-  FRostersArea->setWidget(scrollWidget);
-  FRostersArea->setWidgetResizable(true);
-
   FUpperWidget = new QStackedWidget; 
   FUpperWidget->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
 
-  FMiddleWidget = new QStackedWidget; 
-  FMiddleWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-  FMiddleWidget->addWidget(FRostersArea); 
+  FRostersWidget = new QStackedWidget; 
+  FRostersWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
   FBottomWidget = new QStackedWidget; 
   FBottomWidget->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);  
                      
   FMainLayout = new QVBoxLayout;
   FMainLayout->addWidget(FUpperWidget);  
-  FMainLayout->addWidget(FMiddleWidget);  
+  FMainLayout->addWidget(FRostersWidget);  
   FMainLayout->addWidget(FBottomWidget);  
 
   QWidget *centralWidget = new QWidget;
@@ -76,7 +66,7 @@ void MainWindow::createActions()
   actQuit->setShortcut(tr("Ctrl+Q"));
   mnuMain->addAction(actQuit);
 
-  actAbout = new Action(900,tr("About program"),this);
+  actAbout = new Action(900,tr("About vacuum"),this);
   mnuAbout = new Menu(900,"mainwindow::aboutmenu",tr("About"),this);
   mnuAbout->addAction(actAbout);
   mnuMain->addMenuActions(mnuAbout); 

@@ -29,7 +29,7 @@ public:
   virtual bool startPlugin();
 
   //IMainWindowPlugin
-  virtual IMainWindow *mainWindow() const { return FMainWindow; }
+  virtual IMainWindow *mainWindow() const;
 private:
   IPluginManager *FPluginManager;
 private:

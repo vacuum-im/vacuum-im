@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QVBoxLayout>
 #include <QStackedWidget>
-#include <QScrollArea>
 #include <QToolBar>
 #include "utils/menu.h"
 
@@ -15,10 +14,8 @@ public:
   virtual QObject *instance() = 0;
   virtual QVBoxLayout *mainLayout() const =0;
   virtual QStackedWidget *upperWidget() const = 0;
-  virtual QStackedWidget *middleWidget() const = 0;
+  virtual QStackedWidget *rostersWidget() const = 0;
   virtual QStackedWidget *bottomWidget() const = 0;
-  virtual QScrollArea *rostersArea() const = 0;
-  virtual QLayout *rostersLayout() const = 0;
   virtual QToolBar *mainToolBar() const = 0;
   virtual Menu *mainMenu() const = 0;
 };

@@ -36,4 +36,9 @@ bool MainWindowPlugin::startPlugin()
 
   return false;
 }
+
+IMainWindow * MainWindowPlugin::mainWindow() const
+{
+  return FMainWindow;
+}
 Q_EXPORT_PLUGIN2(MainWindowPlugin, MainWindowPlugin)
