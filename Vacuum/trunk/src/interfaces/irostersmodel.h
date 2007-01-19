@@ -63,7 +63,7 @@ public:
   virtual int row() const =0;
   virtual IRosterIndexDataHolder *setDataHolder(int ARole, IRosterIndexDataHolder *) =0;
   virtual void appendChild(IRosterIndex *) =0;
-  virtual bool removeChild(IRosterIndex *, bool ARecurse = false) =0;
+  virtual bool removeChild(IRosterIndex *) =0;
   virtual IRosterIndex *child(int ARow) const =0;
   virtual int childCount() const =0;
   virtual int childRow(const IRosterIndex *) const =0;
@@ -73,12 +73,12 @@ public:
   virtual QVariant data(int ARole) const =0;
   virtual IRosterIndexList findChild(const QHash<int, QVariant> AData, bool ARecurse = false) const =0;
   virtual void setRemoveOnLastChildRemoved(bool ARemove) =0;
+  virtual void setRemoveChildsOnRemoved(bool ARemove) =0;
+  virtual void setDestroyOnParentRemoved(bool ADestroy) =0;
 signals:
   virtual void dataChanged(IRosterIndex *) =0;
-  virtual void childAboutToBeInserted(IRosterIndex *) =0;
-  virtual void childInserted(IRosterIndex *) =0;
-  virtual void childAboutToBeRemoved(IRosterIndex *) =0;
-  virtual void childRemoved(IRosterIndex *) =0;
+  virtual void childInsert(IRosterIndex *) =0;
+  virtual void childRemove(IRosterIndex *) =0;
 };
 
 class IRostersModel :

@@ -3,7 +3,6 @@
 
 RostersModelPlugin::RostersModelPlugin()
 {
-  qDebug() << "RostersModelPlugin";
   FRostersModel = NULL;
   FRosterPlugin = NULL;
   FPresencePlugin = NULL;
@@ -11,7 +10,6 @@ RostersModelPlugin::RostersModelPlugin()
 
 RostersModelPlugin::~RostersModelPlugin()
 {
-  qDebug() << "~RostersModelPlugin";
   if (FRostersModel)
     delete FRostersModel;
 }
