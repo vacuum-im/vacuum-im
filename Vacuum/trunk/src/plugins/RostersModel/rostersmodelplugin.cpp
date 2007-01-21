@@ -1,6 +1,8 @@
 #include <QtDebug>
 #include "rostersmodelplugin.h"
 
+#include <QTreeView>
+
 RostersModelPlugin::RostersModelPlugin()
 {
   FRostersModel = NULL;
@@ -62,8 +64,12 @@ bool RostersModelPlugin::startPlugin()
 IRostersModel *RostersModelPlugin::rostersModel()
 {
   if (!FRostersModel)
+  {
     FRostersModel = new RostersModel(this);
-
+    QTreeView *view = new QTreeView(0);
+    view->setModel(FRostersModel);
+    view->show();
+  }
   return FRostersModel;
 }
 

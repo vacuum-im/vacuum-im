@@ -77,8 +77,10 @@ public:
   virtual void setDestroyOnParentRemoved(bool ADestroy) =0;
 signals:
   virtual void dataChanged(IRosterIndex *) =0;
-  virtual void childInsert(IRosterIndex *) =0;
-  virtual void childRemove(IRosterIndex *) =0;
+  virtual void childAboutToBeInserted(IRosterIndex *) =0;
+  virtual void childInserted(IRosterIndex *) =0;
+  virtual void childAboutToBeRemoved(IRosterIndex *) =0;
+  virtual void childRemoved(IRosterIndex *) =0;
 };
 
 class IRostersModel :

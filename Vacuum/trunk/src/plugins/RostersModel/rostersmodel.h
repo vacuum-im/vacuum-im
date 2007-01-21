@@ -56,8 +56,10 @@ protected slots:
   void onSelfPresence(IPresence::Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
   void onPresenceItem(IPresenceItem *APresenceItem);
   void onIndexDataChanged(IRosterIndex *AIndex);
-  void onIndexChildInsert(IRosterIndex *);
-  void onIndexChildRemove(IRosterIndex *);
+  void onIndexChildAboutToBeInserted(IRosterIndex *AIndex);
+  void onIndexChildInserted(IRosterIndex *AIndex);
+  void onIndexChildAboutToBeRemoved(IRosterIndex *AIndex);
+  void onIndexChildRemoved(IRosterIndex *AIndex);
 private:
   struct StreamItem {
     IRoster *roster;

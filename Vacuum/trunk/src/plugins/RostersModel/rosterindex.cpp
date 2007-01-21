@@ -7,26 +7,32 @@ RosterIndex::RosterIndex(int AType, const QString &AId)
   FData.insert(DR_Type,AType);
   FData.insert(DR_Id,AId);
   FFlags = (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-  FRemoveOnLastChildRemoved = false;
+  FRemoveOnLastChildRemoved = true;
   FRemoveChildsOnRemoved = true;
   FDestroyOnParentRemoved = true;
+  FBlokedSetParentIndex = false;
 }
 
 RosterIndex::~RosterIndex()
 {
-  removeAllChilds();
-
+  if (FChilds.count() > 0)
+    removeAllChilds();
   if (FParentIndex)
     FParentIndex->removeChild(this);
 }
 
 void RosterIndex::setParentIndex(IRosterIndex *AIndex)
 {
-  if (FParentIndex == AIndex)
+  if (FBlokedSetParentIndex || FParentIndex == AIndex)
     return;
 
+  FBlokedSetParentIndex = true;
+
   if (FParentIndex)
+  {
     FParentIndex->removeChild(this);
+    setParent(0);
+  }
 
   if (AIndex)
   {
@@ -34,14 +40,18 @@ void RosterIndex::setParentIndex(IRosterIndex *AIndex)
     FParentIndex->appendChild(this); 
     setParent(FParentIndex->instance());
   } 
-  //else
-  //{
-  //  if (FRemoveChildsOnRemoved)
-  //    removeAllChilds();
+  else
+  {
+    FParentIndex = AIndex;
 
-  //  if (FDestroyOnParentRemoved)
-  //    deleteLater();
-  //}
+    if (FRemoveChildsOnRemoved)
+      removeAllChilds();
+
+    if (FDestroyOnParentRemoved)
+      deleteLater();
+  }
+
+  FBlokedSetParentIndex = false;
 }
 
 int RosterIndex::row() const
@@ -58,8 +68,9 @@ void RosterIndex::appendChild(IRosterIndex *AIndex)
   {
     FChilds.append(AIndex); 
     AIndex->setParentIndex(this);
+    emit childAboutToBeInserted(AIndex);
     connect(AIndex->instance(),SIGNAL(destroyed(QObject *)),SLOT(onChildIndexDestroyed(QObject *)));
-    emit childInsert(AIndex);
+    emit childInserted(AIndex);
   }
 }
 
@@ -69,10 +80,11 @@ bool RosterIndex::removeChild(IRosterIndex *AIndex)
 
   if (FChilds.contains(AIndex))
   {
-    emit childRemove(AIndex);
+    emit childAboutToBeRemoved(AIndex);
     FChilds.removeAt(FChilds.indexOf(AIndex));
     AIndex->setParentIndex(0);
     disconnect(AIndex->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onChildIndexDestroyed(QObject *))); 
+    emit childRemoved(AIndex);
 
     if (FRemoveOnLastChildRemoved && FChilds.isEmpty())
       setParentIndex(0);
@@ -177,8 +189,9 @@ void RosterIndex::onChildIndexDestroyed(QObject *AIndex)
   IRosterIndex *index = dynamic_cast<IRosterIndex *>(AIndex);
   if (FChilds.contains(index))
   {
-    emit childRemove(index);
+    emit childAboutToBeRemoved(index);
     FChilds.removeAt(FChilds.indexOf(index));  
+    emit childRemoved(index);
   }
 }
 

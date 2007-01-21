@@ -9,10 +9,14 @@ RostersModel::RostersModel(QObject *parent)
   FRootIndex->setParent(this);
   connect(FRootIndex,SIGNAL(dataChanged(IRosterIndex *)),
     SLOT(onIndexDataChanged(IRosterIndex *)));
-  connect(FRootIndex,SIGNAL(childInsert(IRosterIndex *)),
-    SLOT(onIndexChildInsert(IRosterIndex *)));
-  connect(FRootIndex,SIGNAL(childRemove(IRosterIndex *)),
-    SLOT(onIndexChildRemove(IRosterIndex *)));
+  connect(FRootIndex,SIGNAL(childAboutToBeInserted(IRosterIndex *)),
+    SLOT(onIndexChildAboutToBeInserted(IRosterIndex *)));
+  connect(FRootIndex,SIGNAL(childInserted(IRosterIndex *)),
+    SLOT(onIndexChildInserted(IRosterIndex *)));
+  connect(FRootIndex,SIGNAL(childAboutToBeRemoved(IRosterIndex *)),
+    SLOT(onIndexChildAboutToBeRemoved(IRosterIndex *)));
+  connect(FRootIndex,SIGNAL(childRemoved(IRosterIndex *)),
+    SLOT(onIndexChildRemoved(IRosterIndex *)));
 }
 
 RostersModel::~RostersModel()
@@ -254,11 +258,9 @@ IRosterIndex *RostersModel::findGroup( const QString &AName, int AType, IRosterI
 
 bool RostersModel::removeRosterIndex( IRosterIndex *AIndex )
 {
-  RosterIndex *index = qobject_cast<RosterIndex *>(AIndex->instance());
-  if (index && index != FRootIndex)
+  if (AIndex && AIndex != FRootIndex)
   {
-    index->setParentIndex(0);
-    delete index;
+    AIndex->setParentIndex(0);
     return true;
   }
   return false;
@@ -559,7 +561,7 @@ void RostersModel::onIndexDataChanged( IRosterIndex *AIndex )
   emit indexChanged(AIndex);
 }
 
-void RostersModel::onIndexChildInsert( IRosterIndex *AIndex )
+void RostersModel::onIndexChildAboutToBeInserted( IRosterIndex *AIndex )
 {
   IRosterIndex *parentIndex = AIndex->parentIndex();
   if (parentIndex)
@@ -568,31 +570,47 @@ void RostersModel::onIndexChildInsert( IRosterIndex *AIndex )
 
     connect(AIndex->instance(),SIGNAL(dataChanged(IRosterIndex *)),
       SLOT(onIndexDataChanged(IRosterIndex *)));
-    connect(AIndex->instance(),SIGNAL(childInsert(IRosterIndex *)),
-      SLOT(onIndexChildInsert(IRosterIndex *)));
-    connect(AIndex->instance(),SIGNAL(childRemove(IRosterIndex *)),
-      SLOT(onIndexChildRemove(IRosterIndex *)));
-
-    endInsertRows();
-    emit indexInserted(AIndex);
+    connect(AIndex->instance(),SIGNAL(childAboutToBeInserted(IRosterIndex *)),
+      SLOT(onIndexChildAboutToBeInserted(IRosterIndex *)));
+    connect(AIndex->instance(),SIGNAL(childInserted(IRosterIndex *)),
+      SLOT(onIndexChildInserted(IRosterIndex *)));
+    connect(AIndex->instance(),SIGNAL(childAboutToBeRemoved(IRosterIndex *)),
+      SLOT(onIndexChildAboutToBeRemoved(IRosterIndex *)));
+    connect(AIndex->instance(),SIGNAL(childRemoved(IRosterIndex *)),
+      SLOT(onIndexChildRemoved(IRosterIndex *)));
   }
 }
 
-void RostersModel::onIndexChildRemove( IRosterIndex *AIndex )
+void RostersModel::onIndexChildInserted( IRosterIndex *AIndex)
+{
+  endInsertRows();
+  emit indexInserted(AIndex);
+}
+
+void RostersModel::onIndexChildAboutToBeRemoved( IRosterIndex *AIndex )
 {
   IRosterIndex *parentIndex = AIndex->parentIndex();
+  //qDebug() << "Remove from" << parentIndex->id() << parentIndex->row() << "index" << AIndex->id() << AIndex->row();
   if (parentIndex)
   {
     beginRemoveRows(createIndex(parentIndex->row(),0,parentIndex),AIndex->row(),AIndex->row());
 
     disconnect(AIndex->instance(),SIGNAL(dataChanged(IRosterIndex *)),
-      this, SLOT(onIndexDataChanged(IRosterIndex *)));
-    disconnect(AIndex->instance(),SIGNAL(childInsert(IRosterIndex *)),
-      this, SLOT(onIndexChildInsert(IRosterIndex *)));
-    disconnect(AIndex->instance(),SIGNAL(childRemove(IRosterIndex *)),
-      this, SLOT(onIndexChildRemove(IRosterIndex *)));
-
-    endRemoveRows();
-    emit indexRemoved(AIndex);
+      this,SLOT(onIndexDataChanged(IRosterIndex *)));
+    disconnect(AIndex->instance(),SIGNAL(childAboutToBeInserted(IRosterIndex *)),
+      this,SLOT(onIndexChildAboutToBeInserted(IRosterIndex *)));
+    disconnect(AIndex->instance(),SIGNAL(childInserted(IRosterIndex *)),
+      this,SLOT(onIndexChildInserted(IRosterIndex *)));
+    disconnect(AIndex->instance(),SIGNAL(childAboutToBeRemoved(IRosterIndex *)),
+      this,SLOT(onIndexChildAboutToBeRemoved(IRosterIndex *)));
+    disconnect(AIndex->instance(),SIGNAL(childRemoved(IRosterIndex *)),
+      this,SLOT(onIndexChildRemoved(IRosterIndex *)));
   }
+}
+
+void RostersModel::onIndexChildRemoved(IRosterIndex *AIndex)
+{
+  endRemoveRows();
+  emit indexRemoved(AIndex);
+
 }

@@ -40,8 +40,10 @@ public:
   virtual void setDestroyOnParentRemoved(bool ADestroy) {FDestroyOnParentRemoved = ADestroy; }
 signals:
   virtual void dataChanged(IRosterIndex *);
-  virtual void childInsert(IRosterIndex *);
-  virtual void childRemove(IRosterIndex *);
+  virtual void childAboutToBeInserted(IRosterIndex *);
+  virtual void childInserted(IRosterIndex *);
+  virtual void childAboutToBeRemoved(IRosterIndex *);
+  virtual void childRemoved(IRosterIndex *);
 protected slots:
   virtual void onChildIndexDestroyed(QObject *AIndex);
   virtual void onDataHolderChanged();
@@ -54,6 +56,7 @@ private:
   bool FRemoveOnLastChildRemoved;
   bool FRemoveChildsOnRemoved;
   bool FDestroyOnParentRemoved;
+  bool FBlokedSetParentIndex;
 };
 
 #endif // ROSTERINDEX_H
