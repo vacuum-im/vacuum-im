@@ -10,4 +10,5 @@ SUBDIRS = settings \
           roster \
           presence \
           rostersmodel \
-          mainwindow
+          mainwindow \
+          rostersview
