@@ -34,7 +34,7 @@ public:
   virtual IRoster *getRoster(const QString &AStreamJid) const;
   virtual IPresence *getPresence(const QString &AStreamJid) const;
   virtual IRosterIndex *rootIndex() const { return FRootIndex; }
-  virtual IRosterIndex *getStreamRoot(const QString &AStreamJid) const;
+  virtual IRosterIndex *getStreamRoot(const Jid &AStreamJid) const;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent);
   virtual IRosterIndex *createGroup(const QString &AName, int AType, IRosterIndex *AParent);
   virtual IRosterIndex *findRosterIndex(int AType, const QVariant &AId, IRosterIndex *AParent) const;
@@ -47,9 +47,9 @@ public:
 signals:
   virtual void streamAdded(const Jid &);
   virtual void streamRemoved(const Jid &);
-  virtual void indexInserted(IRosterIndex *);
+  virtual void indexInsert(IRosterIndex *);
   virtual void indexChanged(IRosterIndex *);
-  virtual void indexRemoved(IRosterIndex *);
+  virtual void indexRemove(IRosterIndex *);
 protected slots:
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onRosterItemRemoved(IRosterItem *ARosterItem);

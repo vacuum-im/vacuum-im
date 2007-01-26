@@ -66,9 +66,6 @@ IRostersModel *RostersModelPlugin::rostersModel()
   if (!FRostersModel)
   {
     FRostersModel = new RostersModel(this);
-    QTreeView *view = new QTreeView(0);
-    view->setModel(FRostersModel);
-    view->show();
   }
   return FRostersModel;
 }
@@ -80,7 +77,7 @@ bool RostersModelPlugin::addStreamRoster(IRoster *ARoster, IPresence *APresence)
 
 bool RostersModelPlugin::removeStreamRoster(const Jid &AStreamJid)
 {
-  return rostersModel()->removeStream(AStreamJid.prep().full());
+  return rostersModel()->removeStream(AStreamJid.pFull());
 }
 
 void RostersModelPlugin::onRosterAdded(IRoster *ARoster)
@@ -94,7 +91,7 @@ void RostersModelPlugin::onRosterAdded(IRoster *ARoster)
 
 void RostersModelPlugin::onRosterRemoved(IRoster *ARoster)
 {
-  if (rostersModel()->streams().contains(ARoster->streamJid().prep().full()))
+  if (rostersModel()->streams().contains(ARoster->streamJid().pFull()))
   {
     emit streamRosterRemoved(ARoster->streamJid());
     removeStreamRoster(ARoster->streamJid());
@@ -112,7 +109,7 @@ void RostersModelPlugin::onPresenceAdded(IPresence *APresence)
 
 void RostersModelPlugin::onPresenceRemoved(IPresence *APresence)
 {
-  if (rostersModel()->streams().contains(APresence->streamJid().prep().full()))
+  if (rostersModel()->streams().contains(APresence->streamJid().pFull()))
   {
     emit streamRosterRemoved(APresence->streamJid());
     removeStreamRoster(APresence->streamJid());

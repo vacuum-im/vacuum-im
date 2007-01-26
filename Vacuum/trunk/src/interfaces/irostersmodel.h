@@ -93,7 +93,7 @@ public:
   virtual bool removeStream(const QString &AStreamJid) =0;
   virtual IRoster *getRoster(const QString &AStreamJid) const =0;
   virtual IPresence *getPresence(const QString &AStreamJid) const =0;
-  virtual IRosterIndex *getStreamRoot(const QString &AStreamJid) const =0;
+  virtual IRosterIndex *getStreamRoot(const Jid &AStreamJid) const =0;
   virtual IRosterIndex *rootIndex() const =0;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *) =0;
   virtual IRosterIndex *createGroup(const QString &AName, int AType, IRosterIndex *) =0;
@@ -107,9 +107,9 @@ public:
 signals:
   virtual void streamAdded(const Jid &) =0;
   virtual void streamRemoved(const Jid &) =0;
-  virtual void indexInserted(IRosterIndex *) =0;
+  virtual void indexInsert(IRosterIndex *) =0;
   virtual void indexChanged(IRosterIndex *) =0;
-  virtual void indexRemoved(IRosterIndex *) =0;
+  virtual void indexRemove(IRosterIndex *) =0;
 };
 
 

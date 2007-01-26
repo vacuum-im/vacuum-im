@@ -12,12 +12,12 @@ class UTILS_EXPORT Jid :
 
 public:
   Jid(const QString &ANode, const QString &ADomane, const QString &AResource, QObject *parent = 0);
-  Jid(const QString &jidStr = QString(), QObject *parent = 0);
+  Jid(const QString &AJidStr = QString(), QObject *parent = 0);
   Jid(const char *ch, QObject *parent = 0);
   Jid(const Jid &AJid);
   ~Jid();
 
-  Jid &setJid(const QString &jidStr);
+  Jid &setJid(const QString &AJidStr);
   void setNode(const QString &ANode) { FNode = ANode; }
   QString node() const { return FNode; }
   void setDomane(const QString &ADomane) { FDomane = ADomane; }
@@ -27,16 +27,18 @@ public:
   bool isValid() const;
   QString full() const { return toString(true); }
   QString bare() const { return toString(false); }
+  QString pFull() const { return prep().full(); }
+  QString pBare() const { return prep().bare(); }
   Jid prep() const;
   bool equals(const Jid &AJid, bool withRes = true) const;
-  Jid& operator =(const Jid &AJid);
-  Jid& operator =(const QString &jidStr) { return setJid(jidStr); }
+  Jid& operator =(const Jid &AJid) { return setJid(AJid.full()); }
+  Jid& operator =(const QString &AJidStr) { return setJid(AJidStr); }
   bool operator ==(const Jid &AJid) const { return equals(AJid); }
-  bool operator ==(const QString &jidStr) const;
+  bool operator ==(const QString &AJidStr) const { return equals(Jid(AJidStr)); }
   bool operator !=(const Jid &AJid) const { return !equals(AJid); }
-  bool operator !=(const QString &jidStr) const;
-  bool operator <(const Jid &AJid) const { return prep().full() < AJid.prep().full(); }
-  bool operator >(const Jid &AJid) const { return prep().full() > AJid.prep().full(); }
+  bool operator !=(const QString &AJidStr) const { return !equals(Jid(AJidStr)); }
+  bool operator <(const Jid &AJid) const { return pFull() < AJid.pFull(); }
+  bool operator >(const Jid &AJid) const { return pFull() > AJid.pFull(); }
 protected:
   QString toString(bool withRes = true) const;
 private:

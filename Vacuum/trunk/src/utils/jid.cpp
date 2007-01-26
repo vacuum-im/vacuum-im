@@ -10,11 +10,11 @@ Jid::Jid(const QString &ANode, const QString &ADomane,
   setResource(AResource);
 }
 
-Jid::Jid(const QString &jidStr, QObject *parent)
+Jid::Jid(const QString &AJidStr, QObject *parent)
   : QObject(parent)
 {
-  if (!jidStr.isEmpty()) 
-    setJid(jidStr);
+  if (!AJidStr.isEmpty()) 
+    setJid(AJidStr);
 }
 
 Jid::Jid(const char *ch, QObject *parent)
@@ -51,26 +51,26 @@ bool Jid::isValid() const
   return true;
 }
 
-Jid& Jid::setJid(const QString &jidStr)
+Jid& Jid::setJid(const QString &AJidStr)
 {	
-  int at = jidStr.indexOf("@");
+  int at = AJidStr.indexOf("@");
 
   int slash;
-  if ((slash = jidStr.indexOf("/", at+1)) == -1)
-    slash = jidStr.size();
+  if ((slash = AJidStr.indexOf("/", at+1)) == -1)
+    slash = AJidStr.size();
 
   if (at>0)
-    FNode = jidStr.left(at);
+    FNode = AJidStr.left(at);
   else 
     FNode.clear(); 
 
-  if (slash < jidStr.size()-1)
-    FResource = jidStr.right(jidStr.size()-1 - slash);
+  if (slash < AJidStr.size()-1)
+    FResource = AJidStr.right(AJidStr.size()-1 - slash);
   else
     FResource.clear();  
 
   if (slash-at-1>0)
-    FDomane = jidStr.mid(at+1,slash-at-1);
+    FDomane = AJidStr.mid(at+1,slash-at-1);
   else
     FDomane.clear();
 
@@ -104,22 +104,7 @@ bool Jid::equals(const Jid &AJid, bool withRes) const
     (!withRes || FResource == AJid.resource()); 
 }
 
-Jid &Jid::operator =(const Jid &AJid)
-{
-  return setJid(AJid.full());
-}
-
-bool Jid::operator ==(const QString &jidStr) const
-{
-  return equals(Jid(jidStr));
-}
-
-bool Jid::operator !=(const QString &jidStr) const
-{
-  return !equals(Jid(jidStr));
-}
-
 uint qHash(const Jid &key)
 {
-  return qHash(key.prep().full()); 
+  return qHash(key.pFull()); 
 }

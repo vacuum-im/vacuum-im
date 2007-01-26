@@ -54,8 +54,8 @@ void MainWindow::createLayouts()
 void MainWindow::createToolBars()
 {
   FMainToolBar = addToolBar(tr("Main"));
-  FMainToolBar->setMovable(false); 
-  addToolBar(Qt::LeftToolBarArea,FMainToolBar);
+  //FMainToolBar->setMovable(false); 
+  addToolBar(Qt::BottomToolBarArea,FMainToolBar);
 }
 
 void MainWindow::createActions()

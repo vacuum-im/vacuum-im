@@ -265,7 +265,7 @@ void XmppStreams::onConfigClosed()
   while (FAddedStreams.count()>0) 
   {
     IXmppStream *stream = FAddedStreams[0];
-    //QString NS = stream->jid().prep().full();
+    //QString NS = stream->jid().pFull();
     //FSettings->setValueNS("stream",NS,stream->jid().full());     
     //FSettings->setValueNS("stream[]:version",NS,stream->xmppVersion());     
     //FSettings->setValueNS("stream[]:lang",NS,stream->defaultLang());     
