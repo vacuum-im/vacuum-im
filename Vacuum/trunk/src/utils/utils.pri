@@ -6,7 +6,8 @@ HEADERS += utilsexport.h \
            errorhandler.h \
            stanza.h \
            action.h \
-           menu.h
+           menu.h \
+           unzipfile.h
 
 SOURCES += jid.cpp \
            versionparser.cpp \
@@ -15,4 +16,5 @@ SOURCES += jid.cpp \
            errorhandler.cpp \
            stanza.cpp \
            action.cpp \
-           menu.cpp
+           menu.cpp \
+           unzipfile.cpp
