@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QObjectCleanupHandler>
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/ixmppstreams.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/ixmppstreams.h"
 
 #define SASLAUTH_UUID "{E583F155-BE87-4919-8769-5C87088F0F57}"
 #define NS_FEATURE_SASL "urn:ietf:params:xml:ns:xmpp-sasl"

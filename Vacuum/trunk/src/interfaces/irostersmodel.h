@@ -4,8 +4,8 @@
 #include <QVariant>
 #include <QAbstractItemModel>
 #include <QHash>
-#include "interfaces/iroster.h"
-#include "interfaces/ipresence.h"
+#include "../../interfaces/iroster.h"
+#include "../../interfaces/ipresence.h"
 
 class IRosterIndex;
 typedef QList<IRosterIndex *> IRosterIndexList;

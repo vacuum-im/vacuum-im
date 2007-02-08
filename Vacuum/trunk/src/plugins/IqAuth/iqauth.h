@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QDomDocument>
 #include <QObjectCleanupHandler>
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/ixmppstreams.h"
-#include "utils/jid.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/ixmppstreams.h"
+#include "../../utils/jid.h"
 
 
 #define IQAUTH_UUID "{1E3645BC-313F-49e9-BD00-4CC062EE76A7}"

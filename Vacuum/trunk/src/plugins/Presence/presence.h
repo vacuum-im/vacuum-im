@@ -2,9 +2,9 @@
 #define PRESENCE_H
 
 #include <QObject>
-#include "interfaces/ipresence.h"
-#include "interfaces/istanzaprocessor.h"
-#include "interfaces/ixmppstreams.h"
+#include "../../interfaces/ipresence.h"
+#include "../../interfaces/istanzaprocessor.h"
+#include "../../interfaces/ixmppstreams.h"
 #include "presenceitem.h"
 
 class Presence : 

@@ -2,7 +2,7 @@
 #define PLUGINMANAGER_H
 
 #include <QPluginLoader>
-#include <interfaces/ipluginmanager.h>
+#include <../../interfaces/ipluginmanager.h>
 
 class PluginItem :
   public QObject

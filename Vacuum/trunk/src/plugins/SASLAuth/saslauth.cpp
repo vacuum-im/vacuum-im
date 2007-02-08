@@ -2,9 +2,9 @@
 #include <QtDebug>
 #include <QMultiHash>
 #include <QStringList>
-#include "utils/stanza.h"
-#include "utils/errorhandler.h"
-#include "utils/md5.h"
+#include "../../utils/stanza.h"
+#include "../../utils/errorhandler.h"
+#include "../../utils/md5.h"
 
 
 static QMultiHash<QString, QString> parseChallenge(const QString &chl)

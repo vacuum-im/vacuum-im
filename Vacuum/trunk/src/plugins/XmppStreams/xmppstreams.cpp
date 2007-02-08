@@ -1,6 +1,6 @@
 #include "xmppstreams.h"
 #include <QtDebug>
-#include "utils/errorhandler.h"
+#include "../../utils/errorhandler.h"
 #include "xmppstream.h"
 
 

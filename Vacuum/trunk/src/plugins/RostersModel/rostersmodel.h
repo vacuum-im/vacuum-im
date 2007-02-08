@@ -1,8 +1,8 @@
 #ifndef ROSTERSMODEL_H
 #define ROSTERSMODEL_H
 
-#include "interfaces/irostersmodel.h"
-#include "utils/jid.h"
+#include "../../interfaces/irostersmodel.h"
+#include "../../utils/jid.h"
 #include "rosterindex.h"
 
 class RostersModel : 

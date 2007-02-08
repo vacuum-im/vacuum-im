@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QDomDocument>
-#include "utils/versionparser.h"
-#include "interfaces/ixmppstreams.h"
+#include "../../utils/versionparser.h"
+#include "../../interfaces/ixmppstreams.h"
 #include "streamparser.h"
 
 class XmppStream : 

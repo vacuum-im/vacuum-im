@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
-#include "interfaces/ixmppstreams.h"
+#include "../../interfaces/ixmppstreams.h"
 
 class StreamConnection : 
   public QObject,

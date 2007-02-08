@@ -2,8 +2,8 @@
 #define PRESENCEITEM_H
 
 #include <QObject>
-#include "interfaces/ipresence.h"
-#include "utils/jid.h"
+#include "../../interfaces/ipresence.h"
+#include "../../utils/jid.h"
 
 class PresenceItem : 
   public QObject,

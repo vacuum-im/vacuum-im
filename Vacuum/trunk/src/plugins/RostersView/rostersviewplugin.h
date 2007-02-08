@@ -2,10 +2,10 @@
 #define ROSTERSVIEWPLUGIN_H
 
 #include <QPointer>
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/imainwindow.h"
-#include "interfaces/irostersmodel.h"
-#include "interfaces/irostersview.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/imainwindow.h"
+#include "../../interfaces/irostersmodel.h"
+#include "../../interfaces/irostersview.h"
 #include "rostersview.h"
 
 #define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"

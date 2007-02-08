@@ -1,7 +1,7 @@
 #include "saslsession.h"
 #include <QtDebug>
-#include "utils/errorhandler.h"
-#include "utils/stanza.h"
+#include "../../utils/errorhandler.h"
+#include "../../utils/stanza.h"
 
 SASLSession::SASLSession(IXmppStream *AStream)
 : QObject(AStream->instance())

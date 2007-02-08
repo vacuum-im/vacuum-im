@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "interfaces/isettings.h"
+#include "../../interfaces/isettings.h"
 
 class Settings : 
   public QObject,

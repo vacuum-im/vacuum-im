@@ -2,7 +2,7 @@
 #define IROSTERSVIEW_H
 
 #include <QTreeView>
-#include "interfaces/irostersmodel.h"
+#include "../../interfaces/irostersmodel.h"
 
 
 class IRostersView :

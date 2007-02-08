@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QFile>
 #include <QObjectCleanupHandler>
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/isettings.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/isettings.h"
 #include "settings.h"
 
 #define SETTINGS_UUID "{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"

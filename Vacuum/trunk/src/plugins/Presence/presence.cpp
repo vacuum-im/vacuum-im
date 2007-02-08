@@ -1,5 +1,5 @@
 #include "presence.h"
-#include "utils/errorhandler.h"
+#include "../../utils/errorhandler.h"
 
 Presence::Presence(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject *parent)
   : QObject(parent)

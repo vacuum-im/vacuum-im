@@ -1,7 +1,7 @@
 #include "saslbind.h"
 #include <QtDebug>
-#include "utils/errorhandler.h"
-#include "utils/stanza.h"
+#include "../../utils/errorhandler.h"
+#include "../../utils/stanza.h"
 
 SASLBind::SASLBind(IXmppStream *AStream)
   : QObject(AStream->instance())

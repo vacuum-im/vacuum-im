@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QDomDocument>
 #include <QObjectCleanupHandler>
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/ixmppstreams.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/ixmppstreams.h"
 
 #define SASLBIND_UUID "{DED996DA-342A-4da8-B8F3-0CA4EB08D8AF}"
 #define NS_FEATURE_BIND "urn:ietf:params:xml:ns:xmpp-bind"

@@ -1,8 +1,8 @@
 #include "iqauth.h"
 #include <QtDebug>
-#include "utils/sha1.h"
-#include "utils/errorhandler.h"
-#include "utils/stanza.h"
+#include "../../utils/sha1.h"
+#include "../../utils/errorhandler.h"
+#include "../../utils/stanza.h"
 
 IqAuth::IqAuth(IXmppStream *AStream)
   : QObject(AStream->instance())

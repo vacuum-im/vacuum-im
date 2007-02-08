@@ -2,8 +2,8 @@
 #define MAINWINDOWPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/imainwindow.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/imainwindow.h"
 #include "mainwindow.h"
 
 #define MAINWINDOW_UUID "{A6F3D775-8464-4599-AB79-97BA1BAA6E96}";

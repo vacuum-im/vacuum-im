@@ -1,7 +1,7 @@
 #ifndef ROSTERITEM_H
 #define ROSTERITEM_H
 
-#include "interfaces/iroster.h"
+#include "../../interfaces/iroster.h"
 
 class RosterItem : 
   public QObject,

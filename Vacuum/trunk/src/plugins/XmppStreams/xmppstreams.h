@@ -1,9 +1,9 @@
 #ifndef XMPPSTREAMS_H
 #define XMPPSTREAMS_H
 
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/ixmppstreams.h"
-#include "interfaces/isettings.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/ixmppstreams.h"
+#include "../../interfaces/isettings.h"
 
 #define XMPPSTREAMS_UUID "{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"
 

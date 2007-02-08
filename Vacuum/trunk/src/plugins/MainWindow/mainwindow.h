@@ -1,9 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/imainwindow.h"
-#include "utils/menu.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/imainwindow.h"
+#include "../../utils/menu.h"
 #include "rosterlayout.h"
 
 class MainWindow : 

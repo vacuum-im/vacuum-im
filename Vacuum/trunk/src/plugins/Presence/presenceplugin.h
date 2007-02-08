@@ -2,8 +2,8 @@
 #define PRESENCEPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/ipresence.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/ipresence.h"
 #include "presence.h"
 
 #define PRESENCE_UUID "{511A07C4-FFA4-43ce-93B0-8C50409AFC0E}"

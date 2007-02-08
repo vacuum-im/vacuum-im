@@ -2,8 +2,8 @@
 #define ISTANZAPROCESSOR_H
 
 #include <QStringList>
-#include "utils/jid.h"
-#include "utils/stanza.h"
+#include "../../utils/jid.h"
+#include "../../utils/stanza.h"
 
 typedef quint32 HandlerId;
 typedef quint32 PriorityId;

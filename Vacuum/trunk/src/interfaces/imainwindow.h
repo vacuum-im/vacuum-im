@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include <QStackedWidget>
 #include <QToolBar>
-#include "utils/menu.h"
+#include "../../utils/menu.h"
 
 class IMainWindow :
   virtual public QMainWindow

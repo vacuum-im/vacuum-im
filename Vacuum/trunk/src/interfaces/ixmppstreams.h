@@ -4,8 +4,8 @@
 #include <QStringList>
 #include <QByteArray>
 #include <QTcpSocket>
-#include "utils/jid.h"
-#include "utils/stanza.h"
+#include "../../utils/jid.h"
+#include "../../utils/stanza.h"
 
 #define NS_JABBER_CLIENT		"jabber:client"
 #define NS_JABBER_STREAMS		"http://etherx.jabber.org/streams"

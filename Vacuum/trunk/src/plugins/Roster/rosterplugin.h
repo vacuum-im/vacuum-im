@@ -2,8 +2,8 @@
 #define ROSTERPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/ipresence.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/ipresence.h"
 #include "roster.h"
 
 #define ROSTER_UUID "{5306971C-2488-40d9-BA8E-C83327B2EED5}";

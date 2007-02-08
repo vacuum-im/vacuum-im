@@ -1,8 +1,8 @@
 #ifndef ROSTERSMODELPLUGIN_H
 #define ROSTERSMODELPLUGIN_H
 
-#include "interfaces/ipluginmanager.h"
-#include "interfaces/irostersmodel.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/irostersmodel.h"
 #include "rostersmodel.h"
 
 #define ROSTERSMODEL_UUID "{C1A1BBAB-06AF-41c8-BFBE-959F1065D80D}"

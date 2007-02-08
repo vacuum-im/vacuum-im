@@ -1,6 +1,6 @@
 #include "xmppstream.h"
 #include <QtDebug>
-#include "utils/errorhandler.h"
+#include "../../utils/errorhandler.h"
 #include "streamconnection.h"
 
 XmppStream::XmppStream(const Jid &AJid, QObject *parent)
