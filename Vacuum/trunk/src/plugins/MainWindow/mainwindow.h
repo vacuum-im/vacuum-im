@@ -3,8 +3,8 @@
 
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imainwindow.h"
+#include "../../interfaces/isettings.h"
 #include "../../utils/menu.h"
-#include "rosterlayout.h"
 
 class MainWindow : 
   virtual public QMainWindow,
@@ -17,7 +17,7 @@ public:
   MainWindow(QWidget *AParent = NULL, Qt::WindowFlags AFlags = 0);
   ~MainWindow();
 
-  bool init(IPluginManager *APluginManager);
+  bool init(IPluginManager *APluginManager, ISettings *ASettings);
   bool start();
 
   virtual QObject *instance() { return this; }
@@ -32,16 +32,21 @@ public:
 protected:
   void createLayouts();
   void createToolBars(); 
+  void createMenus();
   void createActions();
   void connectActions();
+protected slots:
+  void onSettingsOpened();
+  void onSettingsClosed();
+protected:
+  virtual void closeEvent(QCloseEvent *AEvent);
 protected:
   Menu *mnuMain;
-  Menu *mnuAbout;
 protected:
   Action *actQuit;
-  Action *actAbout;
 private:
   IPluginManager *FPluginManager;
+  ISettings *FSettings;
 private:
   QVBoxLayout     *FMainLayout;
   QStackedWidget  *FUpperWidget;

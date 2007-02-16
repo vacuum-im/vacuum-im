@@ -1,14 +1,16 @@
 #include <QtDebug>
 #include "mainwindow.h"
+#include <QCloseEvent>
 
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags)
   : QMainWindow(AParent,AFlags)
 {
   qDebug() << "MainWindow";
-  setParent(AParent);
-  setWindowFlags(AFlags);
+  FPluginManager = NULL;
+  FSettings = NULL;
   createLayouts();
   createToolBars();
+  createMenus();
   createActions();
 }
 
@@ -17,9 +19,15 @@ MainWindow::~MainWindow()
   qDebug() << "~MainWindow";
 }
 
-bool MainWindow::init(IPluginManager *APluginManager)
+bool MainWindow::init(IPluginManager *APluginManager, ISettings *ASettings)
 {
   FPluginManager = APluginManager;
+  FSettings = ASettings;
+  if (FSettings)
+  {
+    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
+    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
+  }
   connectActions();
   return true;
 }
@@ -54,27 +62,40 @@ void MainWindow::createLayouts()
 void MainWindow::createToolBars()
 {
   FMainToolBar = addToolBar(tr("Main"));
-  //FMainToolBar->setMovable(false); 
-  addToolBar(Qt::BottomToolBarArea,FMainToolBar);
+  FMainToolBar->setMovable(false); 
+  addToolBar(Qt::TopToolBarArea,FMainToolBar);
+}
+
+void MainWindow::createMenus()
+{
+  mnuMain = new Menu(0,"mainwindow::mainmenu",tr("Menu"),this);
+  FMainToolBar->addAction(mnuMain->menuAction()); 
 }
 
 void MainWindow::createActions()
 {
-  mnuMain = new Menu(0,"mainwindow::mainmenu",tr("Menu"),this);
-
   actQuit = new Action(1000,tr("Quit"),this);
-  actQuit->setShortcut(tr("Ctrl+Q"));
   mnuMain->addAction(actQuit);
-
-  actAbout = new Action(900,tr("About vacuum"),this);
-  mnuAbout = new Menu(900,"mainwindow::aboutmenu",tr("About"),this);
-  mnuAbout->addAction(actAbout);
-  mnuMain->addMenuActions(mnuAbout); 
-
-  FMainToolBar->addAction(mnuMain->menuAction()); 
 }
 
 void MainWindow::connectActions()
 {
   connect(actQuit,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
+}
+
+void MainWindow::onSettingsOpened()
+{
+  setGeometry(FSettings->value("window:geometry",geometry()).toRect());
+}
+
+void MainWindow::onSettingsClosed()
+{
+  if (isVisible())
+    FSettings->setValue("window:geometry",geometry());
+}
+
+void MainWindow::closeEvent( QCloseEvent *AEvent )
+{
+  showMinimized();
+  AEvent->ignore();
 }

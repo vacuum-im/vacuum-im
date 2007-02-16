@@ -2,6 +2,8 @@
 
 MainWindowPlugin::MainWindowPlugin()
 {
+  FPluginManager = NULL;
+  FSettings = NULL;
   FMainWindow = new MainWindow();
   FCleanupHandler.add(FMainWindow); 
 }
@@ -23,8 +25,18 @@ void MainWindowPlugin::getPluginInfo(PluginInfo *APluginInfo)
 
 bool MainWindowPlugin::initPlugin(IPluginManager *APluginManager)
 {
+  FPluginManager = APluginManager;
+
+  IPlugin *plugin = FPluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  if (plugin)
+  {
+    ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    if (settingsPlugin)
+      FSettings = settingsPlugin->newSettings(MAINWINDOW_UUID,this);
+  }
+
   if (FMainWindow)
-    return FMainWindow->init(APluginManager); 
+    return FMainWindow->init(FPluginManager, FSettings); 
 
   return false;
 }

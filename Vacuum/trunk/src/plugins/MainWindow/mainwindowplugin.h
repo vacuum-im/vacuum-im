@@ -4,9 +4,10 @@
 #include <QObjectCleanupHandler>
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imainwindow.h"
+#include "../../interfaces/isettings.h"
 #include "mainwindow.h"
 
-#define MAINWINDOW_UUID "{A6F3D775-8464-4599-AB79-97BA1BAA6E96}";
+#define MAINWINDOW_UUID "{A6F3D775-8464-4599-AB79-97BA1BAA6E96}"
 
 class MainWindowPlugin :
   public QObject,
@@ -32,6 +33,7 @@ public:
   virtual IMainWindow *mainWindow() const;
 private:
   IPluginManager *FPluginManager;
+  ISettings *FSettings;
 private:
   MainWindow *FMainWindow;
   QObjectCleanupHandler FCleanupHandler;
