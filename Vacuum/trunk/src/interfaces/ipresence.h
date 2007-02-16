@@ -11,12 +11,12 @@ class IPresence
 {
 public:
   enum Show {
+    Offline,
     Online,
     Chat,
     Away,
     DoNotDistrib,
     ExtendedAway,
-    Offline,
     Error
   };
 public:
