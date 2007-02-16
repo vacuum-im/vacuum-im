@@ -10,7 +10,7 @@
 PluginManager::PluginManager(QObject *parent)
   : QObject(parent)
 {
-
+  connect(parent,SIGNAL(aboutToQuit()),SLOT(onAboutToQuit()));
 }
 
 PluginManager::~PluginManager()
@@ -235,6 +235,12 @@ QVector<QUuid> PluginManager::getDependencesFor(const QUuid &AUuid) const
   return plugins;
 }
 
+void PluginManager::onAboutToQuit()
+{
+  qDebug() << "\n\n<--Quiting application--> \n\n";
+  emit aboutToQuit();
+}
+
 PluginItem *PluginManager::getPluginItem(const QUuid &AUuid) const
 { 
   PluginItem *pluginItem;
@@ -301,7 +307,5 @@ QList<QUuid> PluginManager::getConflicts(PluginItem *APluginItem) const
 
 void PluginManager::quit() 
 {
-  qDebug() << "\n\n<--Quiting application--> \n\n";
-  emit aboutToQuit();
   QTimer::singleShot(10,parent(),SLOT(quit())); 
 }

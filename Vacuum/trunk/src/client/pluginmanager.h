@@ -63,7 +63,9 @@ public:
 public slots:
   virtual void quit();
 signals:
-    virtual void aboutToQuit();
+  virtual void aboutToQuit();
+protected slots:
+  void onAboutToQuit();
 protected:
   PluginItem *getPluginItem(const QUuid &AUuid) const;
   bool checkDependences(PluginItem *APluginItem) const;
