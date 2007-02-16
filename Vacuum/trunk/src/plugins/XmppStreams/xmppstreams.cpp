@@ -28,8 +28,8 @@ bool XmppStreams::initPlugin(IPluginManager *APluginManager)
 
   if (FSettings)
   {
-    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onConfigOpened()));
-    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onConfigClosed()));
+    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
+    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
   }
   else
   {
@@ -224,15 +224,15 @@ void XmppStreams::onStreamError(IXmppStream *AStream, const QString &AErrStr)
   emit error(AStream,AErrStr);
 }
 
-void XmppStreams::onConfigOpened()
+void XmppStreams::onSettingsOpened()
 {
   IXmppStream *stream = newStream("Test2@potapov/Vacuum");
   stream->setDefaultLang("ru"); 
   stream->setXmppVersion("1.0");
   stream->setPassword("1");
   stream->connection()->setProxyType(0);
-  stream->connection()->setProxyUsername("wrong");  
-  stream->connection()->setProxyHost("220.194.57.126");
+  stream->connection()->setProxyUsername("");  
+  stream->connection()->setProxyHost("");
   stream->connection()->setProxyPort(1080);
   addStream(stream);
   stream->open(); 
@@ -260,7 +260,7 @@ void XmppStreams::onConfigOpened()
   //}
 }
 
-void XmppStreams::onConfigClosed()
+void XmppStreams::onSettingsClosed()
 {
   while (FAddedStreams.count()>0) 
   {

@@ -34,6 +34,8 @@ signals:
 protected:
   QDomElement getElement(const QString &AName, const QString &ANameNS, bool ACreate) const;
   void delNSRecurse(const QString &ANameNS, QDomNode node);
+  static QString variantToString(const QVariant &AVariant);
+  static QVariant stringToVariant(const QString &AString, QVariant::Type AType, const QVariant &ADefault);
 private slots:
   virtual void onProfileOpened();
   virtual void onProfileClosed();

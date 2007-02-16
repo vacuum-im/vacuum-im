@@ -48,8 +48,8 @@ protected slots:
   void onStreamClosed(IXmppStream *);
   void onStreamError(IXmppStream *, const QString &AErrStr);
   //IConfigurator
-  void onConfigOpened();
-  void onConfigClosed();
+  void onSettingsOpened();
+  void onSettingsClosed();
 private: //interfaces
   IPluginManager *FPluginManager;
   ISettings *FSettings; 
