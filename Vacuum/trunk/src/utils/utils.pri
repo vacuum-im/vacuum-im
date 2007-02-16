@@ -7,7 +7,8 @@ HEADERS += utilsexport.h \
            stanza.h \
            action.h \
            menu.h \
-           unzipfile.h
+           unzipfile.h \
+           iconset.h \
 
 SOURCES += jid.cpp \
            versionparser.cpp \
@@ -17,4 +18,5 @@ SOURCES += jid.cpp \
            stanza.cpp \
            action.cpp \
            menu.cpp \
-           unzipfile.cpp
+           unzipfile.cpp \
+           iconset.cpp \
