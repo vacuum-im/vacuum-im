@@ -3,6 +3,7 @@
 
 #include <QVariant>
 #include <QAbstractItemModel>
+#include <QAbstractItemDelegate>
 #include <QHash>
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
@@ -16,14 +17,15 @@ public:
   virtual QObject *instance() =0;
   virtual bool setData(IRosterIndex *, int ARole, const QVariant &) =0;
   virtual QVariant data(const IRosterIndex *, int ARole) const =0;
+  virtual QList<int> roles() const =0;
 signals:
-  virtual void dataChanged() =0;
+  virtual void dataChanged(IRosterIndex *, int ARole) =0;
 };
 
 class IRosterIndex
 {
 public:
-  enum {
+  enum ItemType {
     IT_Root,
     IT_StreamRoot,
     IT_Group,
@@ -34,9 +36,9 @@ public:
     IT_Contact,
     IT_Transport,
     IT_MyResource,
-    IT_UserDefined = 32
+    IT_UserDefined = 64
   };
-  enum {
+  enum DataRole{
     DR_AnyRole = -1,
     DR_Type = Qt::UserRole, 
     DR_StreamJid,
@@ -44,6 +46,7 @@ public:
     DR_Jid,
     DR_RosterJid,
     DR_RosterGroup,
+    DR_RosterName,
     DR_Show,
     DR_Status,
     DR_Priority,
@@ -52,7 +55,7 @@ public:
     DR_Self_Priority,
     DR_Subscription,
     DR_Ask,
-    DR_UserDefined = Qt::UserRole+32
+    DR_UserDefined = Qt::UserRole+64
   };
 public:
   virtual QObject *instance() =0;
@@ -62,6 +65,7 @@ public:
   virtual IRosterIndex *parentIndex() const =0; 
   virtual int row() const =0;
   virtual IRosterIndexDataHolder *setDataHolder(int ARole, IRosterIndexDataHolder *) =0;
+  virtual QHash<int,IRosterIndexDataHolder *> setDataHolder(IRosterIndexDataHolder *) =0;
   virtual void appendChild(IRosterIndex *) =0;
   virtual bool removeChild(IRosterIndex *) =0;
   virtual IRosterIndex *child(int ARow) const =0;
@@ -71,10 +75,14 @@ public:
   virtual Qt::ItemFlags flags() const =0;
   virtual bool setData(int ARole, const QVariant &) =0;
   virtual QVariant data(int ARole) const =0;
+  virtual void setItemDelegate(QAbstractItemDelegate *AItemDelegate) =0;
+  virtual QAbstractItemDelegate *itemDelegate() const =0;
   virtual IRosterIndexList findChild(const QHash<int, QVariant> AData, bool ARecurse = false) const =0;
   virtual void setRemoveOnLastChildRemoved(bool ARemove) =0;
   virtual void setRemoveChildsOnRemoved(bool ARemove) =0;
   virtual void setDestroyOnParentRemoved(bool ADestroy) =0;
+public slots:
+  virtual void onDataChanged(int ARole = IRosterIndex::DR_AnyRole) =0;
 signals:
   virtual void dataChanged(IRosterIndex *) =0;
   virtual void childAboutToBeInserted(IRosterIndex *) =0;
@@ -111,7 +119,6 @@ signals:
   virtual void indexChanged(IRosterIndex *) =0;
   virtual void indexRemove(IRosterIndex *) =0;
 };
-
 
 class IRostersModelPlugin 
 {

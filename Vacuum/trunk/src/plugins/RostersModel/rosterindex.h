@@ -30,14 +30,19 @@ public:
   virtual IRosterIndex *child(int ARow) const { return FChilds.value(ARow,0); }
   virtual int childRow(const IRosterIndex *AIndex) const; 
   virtual IRosterIndexDataHolder *setDataHolder(int ARole, IRosterIndexDataHolder *ADataHolder);
+  virtual QHash<int,IRosterIndexDataHolder *> setDataHolder(IRosterIndexDataHolder *ADataHolder);
   virtual void setFlags(const Qt::ItemFlags &AFlags) { FFlags = AFlags; } 
   virtual Qt::ItemFlags flags() const { return FFlags; }
   virtual bool setData(int ARole, const QVariant &AData);
   virtual QVariant data(int ARole) const;
+  virtual void setItemDelegate(QAbstractItemDelegate *AItemDelegate) { FItemDelegate = AItemDelegate; }
+  virtual QAbstractItemDelegate *itemDelegate() const { return FItemDelegate; }
   virtual IRosterIndexList findChild(const QHash<int, QVariant> AData, bool ARecurse = false) const;
   virtual void setRemoveOnLastChildRemoved(bool ARemove) { FRemoveOnLastChildRemoved = ARemove; }
   virtual void setRemoveChildsOnRemoved(bool ARemove) { FRemoveChildsOnRemoved = ARemove; }
   virtual void setDestroyOnParentRemoved(bool ADestroy) {FDestroyOnParentRemoved = ADestroy; }
+public slots:
+  virtual void onDataChanged(int ARole = IRosterIndex::DR_AnyRole);
 signals:
   virtual void dataChanged(IRosterIndex *);
   virtual void childAboutToBeInserted(IRosterIndex *);
@@ -46,13 +51,13 @@ signals:
   virtual void childRemoved(IRosterIndex *);
 protected slots:
   virtual void onChildIndexDestroyed(QObject *AIndex);
-  virtual void onDataHolderChanged();
 private:
   IRosterIndex *FParentIndex;
   QList<IRosterIndex *> FChilds;
   QHash<int, IRosterIndexDataHolder *> FDataHolders;
   QHash<int, QVariant> FData;
   Qt::ItemFlags FFlags;
+  QAbstractItemDelegate *FItemDelegate;
   bool FRemoveOnLastChildRemoved;
   bool FRemoveChildsOnRemoved;
   bool FDestroyOnParentRemoved;

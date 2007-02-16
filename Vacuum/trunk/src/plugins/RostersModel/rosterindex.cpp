@@ -3,10 +3,11 @@
 
 RosterIndex::RosterIndex(int AType, const QString &AId)
 {
-  FParentIndex =0;
+  FParentIndex = NULL;
   FData.insert(DR_Type,AType);
   FData.insert(DR_Id,AId);
   FFlags = (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  FItemDelegate = NULL;
   FRemoveOnLastChildRemoved = true;
   FRemoveChildsOnRemoved = true;
   FDestroyOnParentRemoved = true;
@@ -107,40 +108,51 @@ int RosterIndex::childRow(const IRosterIndex *AIndex) const
 
 IRosterIndexDataHolder *RosterIndex::setDataHolder(int ARole, IRosterIndexDataHolder *ADataHolder)
 {
-  IRosterIndexDataHolder *dataHolder = FDataHolders.value(ARole,0);
+  IRosterIndexDataHolder *oldDataHolder = FDataHolders.value(ARole,0);
+  if (oldDataHolder != ADataHolder)
+  {
+    if (ADataHolder)
+      FDataHolders.insert(ARole,ADataHolder);
+    else
+      FDataHolders.remove(ARole);
+  }
+  return oldDataHolder;
+}
 
-  if (ADataHolder)
-    FDataHolders.insert(ARole,ADataHolder);
-  else
-    FDataHolders.remove(ARole);
-
-  return dataHolder;
+QHash<int,IRosterIndexDataHolder *> RosterIndex::setDataHolder(IRosterIndexDataHolder *ADataHolder)
+{
+  QHash<int,IRosterIndexDataHolder *> oldDataHolders;
+  int role;
+  foreach(role, ADataHolder->roles())
+    oldDataHolders.insert(role,setDataHolder(role,ADataHolder));
+  return oldDataHolders;
 }
 
 bool RosterIndex::setData(int ARole, const QVariant &AData)
 {
-  bool dataSet = false;
+  bool dataSeted = false;
   QVariant oldData = data(ARole);
 
   IRosterIndexDataHolder *dataHolder = FDataHolders.value(ARole,0);
   if (!dataHolder)
     dataHolder = FDataHolders.value(DR_AnyRole,0);
 
-  if (!dataHolder)
+  if (dataHolder)
+    dataSeted = dataHolder->setData(this,ARole,AData);
+
+  if (!dataSeted)
   {
     if (AData.isValid()) 
       FData.insert(ARole,AData);
     else
       FData.remove(ARole); 
-    dataSet = true;
+    dataSeted = true;
   }
-  else
-    dataSet = dataHolder->setData(this,ARole,AData);
 
-  if (dataSet && oldData != AData)
+  if (dataSeted && oldData != AData)
     emit dataChanged(this);
 
-  return dataSet;
+  return dataSeted;
 }
 
 QVariant RosterIndex::data(int ARole) const
@@ -183,6 +195,11 @@ IRosterIndexList RosterIndex::findChild(const QHash<int, QVariant> AData, bool A
   return indexes;  
 }
 
+void RosterIndex::onDataChanged(int /*ARole*/)
+{
+  emit dataChanged(this);
+}
+
 void RosterIndex::onChildIndexDestroyed(QObject *AIndex)
 {
 // TODO:   Не работает преобразование
@@ -193,9 +210,4 @@ void RosterIndex::onChildIndexDestroyed(QObject *AIndex)
     FChilds.removeAt(FChilds.indexOf(index));  
     emit childRemoved(index);
   }
-}
-
-void RosterIndex::onDataHolderChanged()
-{
-  emit dataChanged(this);
 }
