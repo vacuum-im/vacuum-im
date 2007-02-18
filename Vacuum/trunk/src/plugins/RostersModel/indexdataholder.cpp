@@ -1,8 +1,7 @@
 #include "indexdataholder.h"
 
 IndexDataHolder::IndexDataHolder(QObject *AParent) :
-  QObject(AParent), 
-  FRosterIconset(AParent)
+  QObject(AParent) 
 {
   FRosterIconset.openFile("../../iconsets/rostersmodel/default.jisp");
 }

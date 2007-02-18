@@ -2,8 +2,9 @@
 #define ICONSET_H
 
 #include <QList>
-#include <QDomDocument>
 #include <QIcon>
+#include <QDomDocument>
+#include <QSharedData>
 #include "utilsexport.h"
 #include "unzipfile.h"
 
@@ -12,11 +13,9 @@ class IconSetData;
 class UTILS_EXPORT IconSet : 
   private UnzipFile
 {
-  Q_OBJECT;
-
 public:
-  IconSet(QObject *AParent = NULL);
-  IconSet(const QString &AFileName, QObject *AParent = NULL);
+  IconSet();
+  IconSet(const QString &AFileName);
   ~IconSet();
 
   bool openFile(const QString &AFileName);

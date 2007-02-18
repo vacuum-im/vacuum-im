@@ -1,58 +1,12 @@
 #include "unzipfile.h"
-#include <QFile>
-#include <QHash>
-
-class UnzipFileData :
-  public QSharedData
-{
-public:
-  struct ZippedFile {
-    QString name;
-    unsigned long size;
-    QByteArray data;
-  };
-public:
-  UnzipFileData()
-  {
-    FUNZFile = NULL;
-    FCashData = false;
-  }
-  UnzipFileData(const QString &AZipFileName)
-  {
-    FZipFileName = AZipFileName;
-    FUNZFile = unzOpen(QFile::encodeName(AZipFileName));
-    FCashData = false;
-  }
-  UnzipFileData(const UnzipFileData &AOther) :
-    QSharedData(AOther)
-  {
-    FZipFileName = AOther.FZipFileName;
-    FUNZFile = AOther.FUNZFile;  //unzOpen(QFile::encodeName(AZipFileName));
-    FZippedFiles = AOther.FZippedFiles;
-    FCashData = AOther.FCashData;
-  }
-  ~UnzipFileData()
-  { 
-    if (FUNZFile)
-      unzClose(FUNZFile);
-    qDeleteAll(FZippedFiles);
-  }
-public:
-  unzFile FUNZFile;    
-  QString FZipFileName;
-  QHash<QString,ZippedFile *> FZippedFiles;
-  bool FCashData;
-};
 
 
-UnzipFile::UnzipFile(QObject *AParent)
-  : QObject(AParent)
+UnzipFile::UnzipFile()
 {
   d = new UnzipFileData();
 }
 
-UnzipFile::UnzipFile(const QString &AZipFileName, QObject *AParent)
-  : QObject(AParent)
+UnzipFile::UnzipFile(const QString &AZipFileName)
 {
   d = new UnzipFileData(AZipFileName);
   if (d->FUNZFile != NULL)

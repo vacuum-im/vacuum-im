@@ -24,14 +24,14 @@ public:
 };
 
 
-IconSet::IconSet(QObject *AParent) :
-  UnzipFile(AParent)
+IconSet::IconSet() :
+  UnzipFile()
 {
   d = new IconSetData;
 }
 
-IconSet::IconSet(const QString &AFileName, QObject *AParent) :
-  UnzipFile(AFileName,AParent)
+IconSet::IconSet(const QString &AFileName) :
+  UnzipFile(AFileName)
 {
   d = new IconSetData;
   loadIconDefination();
@@ -43,6 +43,7 @@ IconSet::~IconSet()
 }
 bool IconSet::openFile(const QString &AFileName)
 {
+  d.detach();
   d->FIconByFile.clear();
   d->FFileByName.clear();
   d->FFileByTagValue.clear();
