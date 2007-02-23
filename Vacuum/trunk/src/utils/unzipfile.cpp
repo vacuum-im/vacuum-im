@@ -3,14 +3,13 @@
 
 UnzipFile::UnzipFile()
 {
-  d = new UnzipFileData();
+  d = new UnzipFileData;
 }
 
 UnzipFile::UnzipFile(const QString &AZipFileName)
 {
-  d = new UnzipFileData(AZipFileName);
-  if (d->FUNZFile != NULL)
-    loadZippedFilesInfo();
+  d = new UnzipFileData;
+  openFile(AZipFileName);
 }
 
 UnzipFile::~UnzipFile()
@@ -20,10 +19,13 @@ UnzipFile::~UnzipFile()
 
 bool UnzipFile::openFile(const QString &AZipFileName)
 {
-  d->FZipFileName = AZipFileName;
+  if (d->FUNZFile)
+    unzClose(d->FUNZFile);
   qDeleteAll(d->FZippedFiles);
+
+  d->FZipFileName = AZipFileName;
   d->FUNZFile = unzOpen(QFile::encodeName(AZipFileName));
-  if (d->FUNZFile != NULL)
+  if (d->FUNZFile)
     return loadZippedFilesInfo();
   return false;
 }

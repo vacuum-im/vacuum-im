@@ -23,17 +23,14 @@ public:
     FUNZFile = NULL;
     FCashData = false;
   }
-  UnzipFileData(const QString &AZipFileName)
-  {
-    FZipFileName = AZipFileName;
-    FUNZFile = unzOpen(QFile::encodeName(AZipFileName));
-    FCashData = false;
-  }
   UnzipFileData(const UnzipFileData &AOther) :
     QSharedData(AOther)
   {
     FZipFileName = AOther.FZipFileName;
-    FUNZFile = AOther.FUNZFile;  //unzOpen(QFile::encodeName(AZipFileName));
+    if (AOther.FUNZFile)
+      FUNZFile = unzOpen(QFile::encodeName(FZipFileName));
+    else
+      FUNZFile = NULL;
     FZippedFiles = AOther.FZippedFiles;
     FCashData = AOther.FCashData;
   }

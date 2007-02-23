@@ -1,49 +1,24 @@
 #include "iconset.h"
-#include <QHash>
-#include <QtDebug>
 
-class IconSetData :
-  public QSharedData
-{
-public:
-  IconSetData() { qDebug() << "IconsetData create"; }
-  IconSetData(const IconSetData &AOther)
-  {
-    qDebug() << "IconsetData copy";
-    FIconDef = AOther.FIconDef;
-    FIconByFile = AOther.FIconByFile;
-    FFileByName = AOther.FFileByName;
-    FFileByTagValue = AOther.FFileByTagValue;
-  }
-  ~IconSetData() { qDebug() << "IconsetData delete"; }
-public:
-  QDomDocument FIconDef;
-  QHash<QString,QIcon> FIconByFile;
-  QHash<QString,QString> FFileByName;
-  QHash<QString/*Tag*/,QHash<QString/*Value*/,QString/*File*/> > FFileByTagValue;
-};
-
-
-IconSet::IconSet() :
+Iconset::Iconset() :
   UnzipFile()
 {
-  d = new IconSetData;
+  d = new IconsetData;
 }
 
-IconSet::IconSet(const QString &AFileName) :
+Iconset::Iconset(const QString &AFileName) :
   UnzipFile(AFileName)
 {
-  d = new IconSetData;
+  d = new IconsetData;
   loadIconDefination();
 }
 
-IconSet::~IconSet()
+Iconset::~Iconset()
 {
 
 }
-bool IconSet::openFile(const QString &AFileName)
+bool Iconset::openFile(const QString &AFileName)
 {
-  d.detach();
   d->FIconByFile.clear();
   d->FFileByName.clear();
   d->FFileByTagValue.clear();
@@ -51,42 +26,42 @@ bool IconSet::openFile(const QString &AFileName)
   return loadIconDefination();
 }
 
-bool IconSet::isValid() const 
+bool Iconset::isValid() const 
 { 
   return !d->FIconDef.isNull(); 
 }
 
-const QString &IconSet::fileName() const 
+const QString &Iconset::fileName() const 
 { 
   return zipFileName(); 
 }
 
-const QDomDocument IconSet::iconDef() const 
+const QDomDocument Iconset::iconDef() const 
 { 
   return d->FIconDef; 
 }
 
-QList<QString> IconSet::iconFiles() const 
+QList<QString> Iconset::iconFiles() const 
 { 
   return d->FIconByFile.keys(); 
 }
 
-QList<QString> IconSet::iconNames() const 
+QList<QString> Iconset::iconNames() const 
 { 
   return d->FFileByName.keys(); 
 }
 
-QList<QString> IconSet::tags() const 
+QList<QString> Iconset::tags() const 
 { 
   return  d->FFileByTagValue.keys(); 
 }
 
-QList<QString> IconSet::tagValues( const QString &ATagName ) const
+QList<QString> Iconset::tagValues( const QString &ATagName ) const
 {
   return d->FFileByTagValue.value(ATagName).keys();
 }
 
-QIcon IconSet::iconByFile( const QString &AFileName ) const
+QIcon Iconset::iconByFile( const QString &AFileName ) const
 {
   if (d->FIconByFile.contains(AFileName))
   {
@@ -106,17 +81,17 @@ QIcon IconSet::iconByFile( const QString &AFileName ) const
   return QIcon();
 }
 
-QIcon IconSet::iconByName( const QString &AIconName ) const
+QIcon Iconset::iconByName( const QString &AIconName ) const
 {
   return iconByFile(d->FFileByName.value(AIconName));
 }
 
-QIcon IconSet::iconByTagValue( const QString &ATag, QString &AValue ) const
+QIcon Iconset::iconByTagValue( const QString &ATag, QString &AValue ) const
 {
   return iconByFile(d->FFileByTagValue.value(ATag).value(AValue));
 }
 
-bool IconSet::loadIconDefination()
+bool Iconset::loadIconDefination()
 {
   if (UnzipFile::isValid() && fileNames().contains("icondef.xml"))
   {

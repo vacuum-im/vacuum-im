@@ -4,19 +4,36 @@
 #include <QList>
 #include <QIcon>
 #include <QDomDocument>
-#include <QSharedData>
 #include "utilsexport.h"
 #include "unzipfile.h"
 
-class IconSetData;
+class IconsetData :
+  public QSharedData
+{
+public:
+  IconsetData() {}
+  IconsetData(const IconsetData &AOther)
+  {
+    FIconDef = AOther.FIconDef;
+    FIconByFile = AOther.FIconByFile;
+    FFileByName = AOther.FFileByName;
+    FFileByTagValue = AOther.FFileByTagValue;
+  }
+  ~IconsetData() {}
+public:
+  QDomDocument FIconDef;
+  QHash<QString,QIcon> FIconByFile;
+  QHash<QString,QString> FFileByName;
+  QHash<QString/*Tag*/,QHash<QString/*Value*/,QString/*File*/> > FFileByTagValue;
+};
 
-class UTILS_EXPORT IconSet : 
+class UTILS_EXPORT Iconset : 
   private UnzipFile
 {
 public:
-  IconSet();
-  IconSet(const QString &AFileName);
-  ~IconSet();
+  Iconset();
+  Iconset(const QString &AFileName);
+  ~Iconset();
 
   bool openFile(const QString &AFileName);
   bool isValid() const;
@@ -32,7 +49,7 @@ public:
 protected:
   bool loadIconDefination();  
 private:
-  mutable QSharedDataPointer<IconSetData> d;
+  mutable QSharedDataPointer<IconsetData> d;
 };
 
 #endif // ICONSET_H
