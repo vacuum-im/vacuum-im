@@ -53,6 +53,8 @@ signals:
 protected slots:
   virtual void onStreamOpened(IXmppStream *);
   virtual void onStreamClosed(IXmppStream *);
+protected:
+  void clearItems();
 private:
   IXmppStream *FStream;
   IStanzaProcessor *FStanzaProcessor;

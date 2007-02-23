@@ -186,7 +186,9 @@ void Roster::open()
   Stanza query("iq");
   query.setId(FOpenId).setType("get");
   query.addElement("query","jabber:iq:roster"); 
-  if (!FStanzaProcessor->sendStanzaOut(FStream->jid(),query))
+  if (FStanzaProcessor->sendStanzaOut(FStream->jid(),query))
+    clearItems();
+  else
     close();  
 }
 
@@ -271,3 +273,14 @@ void Roster::onStreamClosed(IXmppStream *)
   close();
 }
 
+void Roster::clearItems()
+{
+  RosterItem *item;
+  while (FItems.count() >0)
+  {
+    item = FItems.at(0);
+    emit itemRemoved(item);
+    FItems.removeAt(0);
+    delete item; 
+  }
+}
