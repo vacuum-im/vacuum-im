@@ -1,5 +1,4 @@
 #include "rostersview.h"
-#include <QHeaderView>
 #include "rosterindexdelegate.h"
 
 RostersView::RostersView(IRostersModel *AModel, QWidget *AParent)
@@ -9,7 +8,9 @@ RostersView::RostersView(IRostersModel *AModel, QWidget *AParent)
   setModel(AModel);
   setItemDelegate(new RosterIndexDelegate(this));
   header()->hide();
+  setIndentation(3);
   setRootIsDecorated(false);
+  setSelectionMode(NoSelection);
 }
 
 RostersView::~RostersView()

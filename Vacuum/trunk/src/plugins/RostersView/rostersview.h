@@ -1,6 +1,8 @@
 #ifndef ROSTERSVIEW_H
 #define ROSTERSVIEW_H
 
+#include <QHeaderView>
+#include <QMouseEvent>
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/irostersview.h"
 
@@ -19,9 +21,10 @@ public:
 
   //IRostersView
   virtual IRostersModel *rostersModel() const { return FRostersModel; }
-
+protected:
+  void drawBranches (QPainter *, const QRect &, const QModelIndex &) const {}
 private:
-  IRostersModel *FRostersModel;    
+  IRostersModel *FRostersModel; 
 };
 
 #endif // ROSTERSVIEW_H

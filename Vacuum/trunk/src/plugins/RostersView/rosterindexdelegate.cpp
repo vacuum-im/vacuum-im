@@ -16,9 +16,6 @@ void RosterIndexDelegate::paint(QPainter *APainter,
                                 const QStyleOptionViewItem &AOption,  
                                 const QModelIndex &AIndex) const
 {
-  QItemDelegate::paint(APainter,AOption,AIndex);
-  return;
-
   IRosterIndex *rosterIndex = static_cast<IRosterIndex *>(AIndex.internalPointer());
   if (rosterIndex && rosterIndex->itemDelegate())
   {
@@ -26,17 +23,20 @@ void RosterIndexDelegate::paint(QPainter *APainter,
     return;
   }
 
+  QRect freeRect = AOption.rect;
   APainter->save();
 
-  QRect freeRect = drawBackground(APainter,AOption,AIndex,AOption.rect);
+  drawBackground(APainter,AOption,AIndex,AOption.rect);
   
   QRect usedRect = drawDecoration(APainter,AOption,AIndex,freeRect); 
   if (!usedRect.isNull())
-    freeRect.setLeft(usedRect.left()+2);
+    freeRect.setLeft(usedRect.right()+1);
   
   usedRect = drawDisplay(APainter,AOption,AIndex,freeRect);
   if (!usedRect.isNull())
-    freeRect.setLeft(usedRect.left()+2);
+    freeRect.setLeft(usedRect.right()+1);
+
+  drawFocus(APainter,AOption,AOption.rect);
 
   APainter->restore();
 }
@@ -86,6 +86,12 @@ QRect RosterIndexDelegate::drawDisplay(QPainter *APainter, const QStyleOptionVie
     }
   }
   return QRect();
+}
+
+void RosterIndexDelegate::drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption,  
+                                     const QRect &ARect) const 
+{
+  QItemDelegate::drawFocus(APainter,AOption,ARect);
 }
 
 QIcon::Mode RosterIndexDelegate::getIconMode( QStyle::State AState )

@@ -25,6 +25,8 @@ protected:
     const QModelIndex &AIndex, const QRect &ARect) const;
   virtual QRect drawDisplay(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QModelIndex &AIndex, const QRect &ARect) const;
+  virtual void drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption, 
+    const QRect &ARect) const;
 private:
   static QIcon::Mode getIconMode(QStyle::State AState);
   static QIcon::State getIconState(QStyle::State AState);
