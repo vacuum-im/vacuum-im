@@ -1,9 +1,9 @@
 #include "indexdataholder.h"
 
 IndexDataHolder::IndexDataHolder(QObject *AParent) :
-  QObject(AParent) 
+  QObject(AParent), FIconStorage(this)
 {
-  FRosterIconset.openFile("../../iconsets/rostersmodel/default.jisp");
+  FRosterIconset = FIconStorage.getIconset("../../iconsets/rostersmodel/default.jisp");
 }
 
 IndexDataHolder::~IndexDataHolder()
@@ -29,7 +29,7 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       return statusIcon(AIndex);
     case Qt::BackgroundColorRole:
       return Qt::darkGray;
-    case Qt::TextColorRole:
+    case Qt::ForegroundRole:
       return Qt::white;
     } 
     break;
@@ -109,7 +109,7 @@ QList<int> IndexDataHolder::roles() const
                       << Qt::DecorationRole 
                       << Qt::FontRole 
                       << Qt::BackgroundColorRole 
-                      << Qt::TextColorRole;
+                      << Qt::ForegroundRole;
 }
 
 QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const
@@ -139,6 +139,5 @@ QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const
   case IPresence::Error: 
     return FRosterIconset.iconByName("status/error");
   }
-
   return QIcon();
 }
