@@ -47,6 +47,9 @@ protected slots:
   virtual void onStreamOpened(IXmppStream *);
   virtual void onStreamAboutToClose(IXmppStream *);
   virtual void onStreamClosed(IXmppStream *);
+  virtual void onStreamError(IXmppStream *, const QString &AError);
+protected:
+  void clearItems();
 private:
   IXmppStream *FStream;
   IStanzaProcessor *FStanzaProcessor;

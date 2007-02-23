@@ -4,10 +4,11 @@
 Presence::Presence(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject *parent)
   : QObject(parent)
 {
+  FStream = AStream;
   connect(AStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *))); 
   connect(AStream->instance(),SIGNAL(aboutToClose(IXmppStream *)),SLOT(onStreamAboutToClose(IXmppStream *))); 
   connect(AStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
-  FStream = AStream;
+  connect(AStream->instance(),SIGNAL(error(IXmppStream *, const QString &)),SLOT(onStreamError(IXmppStream *, const QString &))); 
   FStanzaProcessor = AStanzaProcessor;
   FPresenceHandler = 0;
   FShow = Offline;
@@ -37,7 +38,7 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
      
     if (AStanza.type() == "error")
     {
-      ErrorHandler err(ErrorHandler::DEFAULTNS,AStanza.element(),this);
+      ErrorHandler err(ErrorHandler::DEFAULTNS,AStanza.element());
       pItem->setShow(Error);
       pItem->setStatus(err.meaning());
       pItem->setPriority(0);
@@ -187,6 +188,28 @@ void Presence::onStreamOpened(IXmppStream *)
 
 void Presence::onStreamAboutToClose(IXmppStream *)
 {
+  clearItems();
+  if (FShow != Offline)
+    setPresence(Offline,tr("Disconnected"),0); 
+}
+
+void Presence::onStreamClosed(IXmppStream *)
+{
+  FStanzaProcessor->removeHandler(FPresenceHandler);
+  FPresenceHandler = 0;
+  emit closed();
+}
+
+void Presence::onStreamError(IXmppStream *, const QString &AError)
+{
+  clearItems();
+  FShow = IPresence::Error;
+  FStatus = AError;
+  emit selfPresence(FShow,FStatus,FPriority,Jid());
+}
+
+void Presence::clearItems()
+{
   while (FItems.count() > 0)
   {
     PresenceItem *item = FItems.at(0);
@@ -197,14 +220,4 @@ void Presence::onStreamAboutToClose(IXmppStream *)
     delete item;
     FItems.removeAt(0); 
   }
-
-  if (FShow != Offline)
-    setPresence(Offline,"Disconnected",0); 
-}
-
-void Presence::onStreamClosed(IXmppStream *)
-{
-  FStanzaProcessor->removeHandler(FPresenceHandler);
-  FPresenceHandler = 0;
-  emit closed();
 }
