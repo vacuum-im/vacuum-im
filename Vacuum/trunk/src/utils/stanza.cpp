@@ -1,4 +1,3 @@
-#include "errorhandler.h"
 #include "stanza.h"
 
 Stanza::Stanza(const QDomElement &AElem, QObject *parent)

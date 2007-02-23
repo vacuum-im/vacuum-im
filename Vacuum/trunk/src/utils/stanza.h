@@ -4,6 +4,7 @@
 #include <QDomDocument>
 #include <QObject>
 #include "utilsexport.h"
+#include "errorhandler.h"
 
 class UTILS_EXPORT Stanza : 
   public QObject
@@ -52,7 +53,7 @@ public:
   virtual bool canReplyError() const;
   virtual Stanza replyError(const QString &ACondition, 
     const QString &ANamespace = "urn:ietf:params:xml:ns:xmpp-stanzas",
-    int ACode = -1, 
+    int ACode = ErrorHandler::UNKNOWN, 
     const QString &AText = "") const;
 
   QString toString() const { return FDoc.toString(); }
