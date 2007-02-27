@@ -2,7 +2,7 @@
 #define INDEXDATAHOLDER_H
 
 #include "../../interfaces/irostersmodel.h"
-#include "../../utils/iconstorage.h"
+#include "../../utils/skin.h"
 
 class IndexDataHolder : 
   public QObject,
@@ -24,8 +24,7 @@ signals:
 protected:
   QIcon statusIcon(const IRosterIndex *AIndex) const;
 private:
-  IconStorage FIconStorage;
-  Iconset FRosterIconset;
+  SkinIconset FRosterIconset;
 };
 
 #endif // INDEXDATAHOLDER_H
