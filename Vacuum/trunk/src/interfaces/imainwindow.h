@@ -16,7 +16,8 @@ public:
   virtual QStackedWidget *upperWidget() const = 0;
   virtual QStackedWidget *rostersWidget() const = 0;
   virtual QStackedWidget *bottomWidget() const = 0;
-  virtual QToolBar *mainToolBar() const = 0;
+  virtual QToolBar *topToolBar() const =0;
+  virtual QToolBar *bottomToolBar() const =0;
   virtual Menu *mainMenu() const = 0;
 };
 

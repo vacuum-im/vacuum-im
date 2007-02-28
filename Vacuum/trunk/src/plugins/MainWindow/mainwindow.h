@@ -5,6 +5,7 @@
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/menu.h"
+#include "../../utils/skin.h"
 
 class MainWindow : 
   virtual public QMainWindow,
@@ -27,7 +28,8 @@ public:
   virtual QStackedWidget *upperWidget() const { return FUpperWidget; }
   virtual QStackedWidget *rostersWidget() const { return FRostersWidget; }
   virtual QStackedWidget *bottomWidget() const { return FBottomWidget; }
-  virtual QToolBar *mainToolBar() const { return FMainToolBar; }
+  virtual QToolBar *topToolBar() const { return FTopToolBar; }
+  virtual QToolBar *bottomToolBar() const { return FTopToolBar; }
   virtual Menu *mainMenu() const { return mnuMain; }
 protected:
   void createLayouts();
@@ -38,12 +40,16 @@ protected:
 protected slots:
   void onSettingsOpened();
   void onSettingsClosed();
+  void onSkinChanged(const QString &ASkinName);
 protected:
   virtual void closeEvent(QCloseEvent *AEvent);
+  void updateIcons();
 protected:
   Menu *mnuMain;
 protected:
   Action *actQuit;
+private:
+  SkinIconset FSystemIconset;
 private:
   IPluginManager *FPluginManager;
   ISettings *FSettings;
@@ -52,7 +58,8 @@ private:
   QStackedWidget  *FUpperWidget;
   QStackedWidget  *FRostersWidget;
   QStackedWidget  *FBottomWidget;
-  QToolBar        *FMainToolBar;
+  QToolBar        *FTopToolBar;
+  QToolBar        *FBottomToolBar;
 };
 
 #endif // MAINWINDOW_H

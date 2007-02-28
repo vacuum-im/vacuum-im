@@ -6,12 +6,15 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags)
   : QMainWindow(AParent,AFlags)
 {
   qDebug() << "MainWindow";
+  FSystemIconset.openFile("system/default.jisp");
+  connect(&FSystemIconset,SIGNAL(reseted(const QString &)),SLOT(onSkinChanged(const QString &)));
   FPluginManager = NULL;
   FSettings = NULL;
   createLayouts();
   createToolBars();
   createMenus();
   createActions();
+  updateIcons();
 }
 
 MainWindow::~MainWindow()
@@ -42,12 +45,14 @@ void MainWindow::createLayouts()
 {
   FUpperWidget = new QStackedWidget; 
   FUpperWidget->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
+  FUpperWidget->setVisible(false);
 
   FRostersWidget = new QStackedWidget; 
   FRostersWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
   FBottomWidget = new QStackedWidget; 
   FBottomWidget->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);  
+  FBottomWidget->setVisible(false);
                      
   FMainLayout = new QVBoxLayout;
   FMainLayout->addWidget(FUpperWidget);  
@@ -61,20 +66,26 @@ void MainWindow::createLayouts()
 
 void MainWindow::createToolBars()
 {
-  FMainToolBar = addToolBar(tr("Main"));
-  FMainToolBar->setMovable(false); 
-  addToolBar(Qt::TopToolBarArea,FMainToolBar);
+  FTopToolBar = addToolBar(tr("Top ToolBar"));
+  FTopToolBar->setMovable(false); 
+  addToolBar(Qt::TopToolBarArea,FTopToolBar);
+
+  FBottomToolBar = addToolBar(tr("Bottom ToolBar"));
+  FBottomToolBar->setMovable(false); 
+  addToolBar(Qt::BottomToolBarArea,FBottomToolBar);
 }
 
 void MainWindow::createMenus()
 {
-  mnuMain = new Menu(0,"mainwindow::mainmenu",tr("Menu"),this);
-  FMainToolBar->addAction(mnuMain->menuAction()); 
+  mnuMain = new Menu(0,"mainwindow::menu::mainmenu",this);
+  mnuMain->setTitle(tr("Menu"));
+  FBottomToolBar->addAction(mnuMain->menuAction()); 
 }
 
 void MainWindow::createActions()
 {
-  actQuit = new Action(1000,tr("Quit"),this);
+  actQuit = new Action(1000,"mainwindow::action::quit",this);
+  actQuit->setText(tr("Quit"));
   mnuMain->addAction(actQuit);
 }
 
@@ -94,8 +105,25 @@ void MainWindow::onSettingsClosed()
     FSettings->setValue("window:geometry",geometry());
 }
 
+void MainWindow::onSkinChanged(const QString &/*ASkinName*/)
+{
+  updateIcons();
+}
+
 void MainWindow::closeEvent( QCloseEvent *AEvent )
 {
   showMinimized();
   AEvent->ignore();
+}
+
+void MainWindow::updateIcons()
+{
+  if (mnuMain)
+  {
+    mnuMain->setIcon(FSystemIconset.iconByName("psi/jabber"));
+    mnuMain->menuAction()->setIcon(mnuMain->icon());
+  }
+
+  if (actQuit)
+    actQuit->setIcon(FSystemIconset.iconByName("psi/quit"));
 }
