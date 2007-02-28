@@ -13,9 +13,11 @@ class UTILS_EXPORT Menu :
   Q_OBJECT;
 
 public:
-  Menu(int AOrder, const QString &AMenuId, const QString &ATitle, QWidget *AParent = 0);
+  Menu(int AOrder, const QString &AMenuId, QWidget *AParent = NULL);
   ~Menu();
+
   int order() const { return FOrder; }
+  const QString &menuId() const { return FMenuId; }
   void addContext(const ActionContext &AContext);
   void addAction(Action *AAction);
   void addMenuActions(const Menu *AMenu);

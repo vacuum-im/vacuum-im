@@ -15,16 +15,15 @@ class UTILS_EXPORT Action :
 
 public:
   enum ContextTypes {
-    CT_UserDefined = 32
+    CT_UserDefined = 64
   }; 
 
 public:
-  Action(int AOrder, QObject *AParent);
-  Action(int AOrder, const QString &AText, QObject *AParent);
-  Action(int AOrder, const QIcon &AIcon, const QString &AText, QObject *AParent);
+  Action(int AOrder, const QString &AActionId, QObject *AParent = NULL);
   ~Action();
 
   int order() const { return FOrder; }
+  const QString &actionId() const { return FActionId; }
   bool isContextDepended() const { return FContextDepended; }
   void setContextDepended(bool AContextDepended) { FContextDepended = AContextDepended; }
   bool contextIsSupported(const ActionContext &AContext) const;
@@ -37,6 +36,7 @@ protected:
   void onNewContext();
 private:
   int FOrder;
+  QString FActionId;
   bool FContextDepended;
   ActionContext FContext;
 };

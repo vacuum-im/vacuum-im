@@ -1,24 +1,11 @@
 #include <QtDebug>
 #include "action.h"
 
-Action::Action(int AOrder, QObject *AParent)
+Action::Action(int AOrder, const QString &AActionId, QObject *AParent)
   : QAction(AParent)
 {
   FOrder = AOrder;
-  FContextDepended = false; 
-}
-
-Action::Action(int AOrder, const QString &AText, QObject *AParent)
-  : QAction(AText,AParent)
-{
-  FOrder = AOrder;
-  FContextDepended = false; 
-}
-
-Action::Action(int AOrder, const QIcon &AIcon, const QString &AText, QObject *AParent)
-  : QAction(AIcon,AText,AParent)
-{
-  FOrder = AOrder;
+  FActionId = AActionId;
   FContextDepended = false; 
 }
 

@@ -1,8 +1,8 @@
 #include <QtDebug>
 #include "menu.h"
 
-Menu::Menu(int AOrder, const QString &AMenuId, const QString &ATitle, QWidget *AParent)
-  : QMenu(ATitle,AParent)
+Menu::Menu(int AOrder, const QString &AMenuId, QWidget *AParent)
+  : QMenu(AParent)
 {
   FOrder = AOrder;
   FMenuId = AMenuId;
@@ -63,7 +63,7 @@ Action *Menu::menuAction()
 {
   if (!FMenuAction)
   {
-    FMenuAction = new Action(order(),this);
+    FMenuAction = new Action(order(),FMenuId,this);
     FMenuAction->setMenu(this); 
     FMenuAction->setContextDepended(true); 
   }
