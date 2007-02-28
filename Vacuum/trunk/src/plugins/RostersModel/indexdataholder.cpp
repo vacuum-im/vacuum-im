@@ -3,7 +3,7 @@
 IndexDataHolder::IndexDataHolder(QObject *AParent) :
   QObject(AParent)
 {
-  FRosterIconset.openFile("status/default.jisp");
+  FStatusIconset.openFile("status/default.jisp");
 }
 
 IndexDataHolder::~IndexDataHolder()
@@ -45,6 +45,10 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       return AIndex->data(IRosterIndex::DR_Id);
     case Qt::BackgroundColorRole:
       return Qt::lightGray;
+    case IRosterIndex::DR_ShowGroupExpander:
+      return true;
+    case IRosterIndex::DR_FontWeight:
+      return QFont::DemiBold;
     } 
     break;
   
@@ -80,7 +84,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
         }
         return display;
       }
-
     case Qt::DecorationRole: 
       return statusIcon(AIndex);
     } 
@@ -94,7 +97,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
         Jid indexJid(AIndex->data(IRosterIndex::DR_Jid).toString());
         return indexJid.resource();
       }
-
     case Qt::DecorationRole: 
       return statusIcon(AIndex);
     } 
@@ -107,37 +109,38 @@ QList<int> IndexDataHolder::roles() const
 {
   return QList<int>() << Qt::DisplayRole 
                       << Qt::DecorationRole 
-                      << Qt::FontRole 
                       << Qt::BackgroundColorRole 
-                      << Qt::ForegroundRole;
+                      << Qt::ForegroundRole
+                      << IRosterIndex::DR_FontWeight
+                      << IRosterIndex::DR_ShowGroupExpander;
 }
 
 QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const
 {
-  if (!FRosterIconset.isValid())
+  if (!FStatusIconset.isValid())
     return QIcon();
 
   if (AIndex->data(IRosterIndex::DR_Ask).toString() == "subscribe")
-    return FRosterIconset.iconByName("status/ask");
+    return FStatusIconset.iconByName("ask");
   if (AIndex->data(IRosterIndex::DR_Subscription).toString() == "none")
-    return FRosterIconset.iconByName("status/noauth");
+    return FStatusIconset.iconByName("noauth");
 
   switch (AIndex->data(IRosterIndex::DR_Show).toInt())
   {
   case IPresence::Offline: 
-    return FRosterIconset.iconByName("status/offline");
+    return FStatusIconset.iconByName("offline");
   case IPresence::Online: 
-    return FRosterIconset.iconByName("status/online");
+    return FStatusIconset.iconByName("online");
   case IPresence::Chat: 
-    return FRosterIconset.iconByName("status/chat");
+    return FStatusIconset.iconByName("chat");
   case IPresence::Away: 
-    return FRosterIconset.iconByName("status/away");
+    return FStatusIconset.iconByName("away");
   case IPresence::ExtendedAway: 
-    return FRosterIconset.iconByName("status/xa");
+    return FStatusIconset.iconByName("xa");
   case IPresence::DoNotDistrib: 
-    return FRosterIconset.iconByName("status/dnd");
+    return FStatusIconset.iconByName("dnd");
   case IPresence::Error: 
-    return FRosterIconset.iconByName("status/error");
+    return FStatusIconset.iconByName("error");
   }
   return QIcon();
 }

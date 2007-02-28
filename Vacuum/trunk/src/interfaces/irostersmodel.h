@@ -41,8 +41,9 @@ public:
   enum DataRole{
     DR_AnyRole = -1,
     DR_Type = Qt::UserRole, 
-    DR_StreamJid,
     DR_Id,
+    //XMPP Roles
+    DR_StreamJid,
     DR_Jid,
     DR_RosterJid,
     DR_RosterGroup,
@@ -55,6 +56,14 @@ public:
     DR_Self_Priority,
     DR_Subscription,
     DR_Ask,
+    //Decoration
+    DR_ShowGroupExpander,
+    DR_FontHint,
+    DR_FontSize,
+    DR_FontWeight,
+    DR_FontStyle,
+    DR_FontUnderline,
+    //User roles
     DR_UserDefined = Qt::UserRole+64
   };
 public:

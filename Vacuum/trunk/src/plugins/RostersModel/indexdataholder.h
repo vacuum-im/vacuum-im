@@ -24,7 +24,7 @@ signals:
 protected:
   QIcon statusIcon(const IRosterIndex *AIndex) const;
 private:
-  SkinIconset FRosterIconset;
+  SkinIconset FStatusIconset;
 };
 
 #endif // INDEXDATAHOLDER_H
