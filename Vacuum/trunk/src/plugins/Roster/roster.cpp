@@ -196,7 +196,7 @@ void Roster::close()
 {
   if (isOpen())
     emit closed();
-  
+
   if (FRosterHandler!=0)
   {
     FStanzaProcessor->removeHandler(FRosterHandler); 

@@ -32,6 +32,7 @@ public:
 
   //Roster
   virtual const Jid &streamJid() const { return FStream->jid(); }
+  virtual IXmppStream *xmppStream() const { return FStream; }
   virtual bool isOpen() const { return FOpen; }
   virtual QString groupDelimiter() const { return "::"; }
   virtual IRosterItem *item(const Jid &AItemJid) const;

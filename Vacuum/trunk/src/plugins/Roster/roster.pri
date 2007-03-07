@@ -2,7 +2,7 @@ HEADERS = rosteritem.h \
           roster.h \
           rosterplugin.h
 
-SOURCES = rosteritem.h \
+SOURCES = rosteritem.cpp \
           roster.cpp \
           rosterplugin.cpp
 
