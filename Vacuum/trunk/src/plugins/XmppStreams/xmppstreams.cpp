@@ -235,7 +235,18 @@ void XmppStreams::onSettingsOpened()
   stream->connection()->setProxyHost("");
   stream->connection()->setProxyPort(1080);
   addStream(stream);
-  stream->open(); 
+  //stream->open(); 
+
+  stream = newStream("Test3@potapov/Vacuum");
+  stream->setDefaultLang("ru"); 
+  stream->setXmppVersion("1.0");
+  stream->setPassword("1");
+  stream->connection()->setProxyType(0);
+  stream->connection()->setProxyUsername("");  
+  stream->connection()->setProxyHost("");
+  stream->connection()->setProxyPort(1080);
+  addStream(stream);
+  //stream->open(); 
 
   //deleteStream(stream);
 

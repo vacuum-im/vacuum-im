@@ -263,6 +263,7 @@ void XmppStream::onConnectionError(const QString &AErrStr)
 {
   qDebug() << "CONNECTION" << FJid.full() << "ERROR:" << AErrStr;
   FLastError = AErrStr;
+  FStreamState = SS_OFFLINE;
   emit error(this, AErrStr);
 }
 
