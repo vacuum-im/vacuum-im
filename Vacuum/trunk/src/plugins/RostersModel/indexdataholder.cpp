@@ -31,6 +31,8 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       return Qt::darkGray;
     case Qt::ForegroundRole:
       return Qt::white;
+    case IRosterIndex::DR_FontWeight:
+      return QFont::Bold;
     } 
     break;
   
@@ -139,6 +141,8 @@ QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const
     return FStatusIconset.iconByName("xa");
   case IPresence::DoNotDistrib: 
     return FStatusIconset.iconByName("dnd");
+  case IPresence::Invisible: 
+    return FStatusIconset.iconByName("invisible");
   case IPresence::Error: 
     return FStatusIconset.iconByName("error");
   }

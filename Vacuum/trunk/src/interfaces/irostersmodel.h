@@ -69,6 +69,7 @@ public:
 public:
   virtual QObject *instance() =0;
   virtual int type() const =0;
+  virtual int newType() const =0;
   virtual QString id() const =0;
   virtual void setParentIndex(IRosterIndex *) =0;
   virtual IRosterIndex *parentIndex() const =0; 
@@ -82,6 +83,7 @@ public:
   virtual int childRow(const IRosterIndex *) const =0;
   virtual void setFlags(const Qt::ItemFlags &AFlags) =0;
   virtual Qt::ItemFlags flags() const =0;
+  virtual int newRole() const =0;
   virtual bool setData(int ARole, const QVariant &) =0;
   virtual QVariant data(int ARole) const =0;
   virtual void setItemDelegate(QAbstractItemDelegate *AItemDelegate) =0;
