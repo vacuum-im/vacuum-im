@@ -7,6 +7,9 @@
 #include "../../utils/menu.h"
 #include "../../utils/skin.h"
 
+#define MAINWINDOW_MENU_MAIN_ORDER 0
+#define MAINWINDOW_ACTION_QUIT_ORDER 1000
+
 class MainWindow : 
   virtual public QMainWindow,
   public IMainWindow
@@ -29,7 +32,7 @@ public:
   virtual QStackedWidget *rostersWidget() const { return FRostersWidget; }
   virtual QStackedWidget *bottomWidget() const { return FBottomWidget; }
   virtual QToolBar *topToolBar() const { return FTopToolBar; }
-  virtual QToolBar *bottomToolBar() const { return FTopToolBar; }
+  virtual QToolBar *bottomToolBar() const { return FBottomToolBar; }
   virtual Menu *mainMenu() const { return mnuMain; }
 protected:
   void createLayouts();

@@ -72,19 +72,19 @@ void MainWindow::createToolBars()
 
   FBottomToolBar = addToolBar(tr("Bottom ToolBar"));
   FBottomToolBar->setMovable(false); 
+  FBottomToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   addToolBar(Qt::BottomToolBarArea,FBottomToolBar);
 }
 
 void MainWindow::createMenus()
 {
-  mnuMain = new Menu(0,"mainwindow::menu::mainmenu",this);
-  mnuMain->setTitle(tr("Menu"));
+  mnuMain = new Menu(MAINWINDOW_MENU_MAIN_ORDER,this);
   FBottomToolBar->addAction(mnuMain->menuAction()); 
 }
 
 void MainWindow::createActions()
 {
-  actQuit = new Action(1000,"mainwindow::action::quit",this);
+  actQuit = new Action(MAINWINDOW_ACTION_QUIT_ORDER,this);
   actQuit->setText(tr("Quit"));
   mnuMain->addAction(actQuit);
 }
