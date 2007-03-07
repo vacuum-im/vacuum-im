@@ -17,11 +17,13 @@ public:
     Away,
     DoNotDistrib,
     ExtendedAway,
+    Invisible,
     Error
   };
 public:
   virtual QObject *instance() =0;
   virtual const Jid &streamJid() const =0;
+  virtual IXmppStream *xmppStream() const =0;
   virtual Show show() const =0;
   virtual const QString &status() const =0;
   virtual qint8 priority() const =0;

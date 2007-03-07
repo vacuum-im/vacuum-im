@@ -27,6 +27,7 @@ public:
   
   //IPresence
   virtual const Jid &streamJid() const { return FStream->jid(); }
+  virtual IXmppStream *xmppStream() const { return FStream; }
   virtual Show show() const { return FShow; }
   virtual const QString &status() const { return FStatus; }
   virtual qint8 priority() const { return FPriority; }
@@ -45,7 +46,6 @@ signals:
   virtual void closed();
 protected slots:
   virtual void onStreamOpened(IXmppStream *);
-  virtual void onStreamAboutToClose(IXmppStream *);
   virtual void onStreamClosed(IXmppStream *);
   virtual void onStreamError(IXmppStream *, const QString &AError);
 protected:
