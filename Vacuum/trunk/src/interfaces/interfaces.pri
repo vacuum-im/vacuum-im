@@ -6,4 +6,5 @@ HEADERS += ipluginmanager.h \
            ipresence.h \
            irostersmodel.h \
            imainwindow.h \
-           irostersview.h
+           irostersview.h \
+           istatuschanger.h
