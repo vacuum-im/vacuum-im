@@ -1,12 +1,12 @@
 #include <QtDebug>
 #include "action.h"
 
-Action::Action(int AOrder, const QString &AActionId, QObject *AParent)
+int Action::FNewRole = Action::DR_UserDefined + 1;
+
+Action::Action(int AOrder, QObject *AParent)
   : QAction(AParent)
 {
   FOrder = AOrder;
-  FActionId = AActionId;
-  FContextDepended = false; 
 }
 
 Action::~Action()
@@ -14,25 +14,22 @@ Action::~Action()
 
 }
 
-bool Action::contextIsSupported( const ActionContext &AContext ) const
+int Action::newRole()
 {
-  bool support = true;
-  if (!isContextDepended())
-    supportContext(this,AContext,support);
-  return support;
+  FNewRole++;
+  return FNewRole;
 }
 
-void Action::setContext(const ActionContext &AContext)
+void Action::setData(int ARole, const QVariant &AData)
 {
-  if (FContext != AContext)
-  {
-    FContext = AContext;
-    onNewContext();
-  }
+  if (AData.isValid())
+    FData.insert(ARole,AData);
+  else
+    FData.remove(ARole);
 }
 
-void Action::onNewContext()
+QVariant Action::data(int ARole) const
 {
-  if (isContextDepended())
-    emit newContext(this,FContext);
+  return FData.value(ARole);
 }
+

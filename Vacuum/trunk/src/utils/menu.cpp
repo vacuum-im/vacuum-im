@@ -1,14 +1,12 @@
 #include <QtDebug>
 #include "menu.h"
 
-Menu::Menu(int AOrder, const QString &AMenuId, QWidget *AParent)
+Menu::Menu(int AOrder, QWidget *AParent)
   : QMenu(AParent)
 {
   FOrder = AOrder;
-  FMenuId = AMenuId;
   FMenuAction = 0;
   setSeparatorsCollapsible(true);
-  connect(this,SIGNAL(aboutToShow()),SLOT(onAboutToShow()));
 }
 
 Menu::~Menu()
@@ -63,9 +61,8 @@ Action *Menu::menuAction()
 {
   if (!FMenuAction)
   {
-    FMenuAction = new Action(order(),FMenuId,this);
+    FMenuAction = new Action(order(),this);
     FMenuAction->setMenu(this); 
-    FMenuAction->setContextDepended(true); 
   }
   FMenuAction->setIcon(icon());
   FMenuAction->setText(title());
@@ -95,47 +92,6 @@ void Menu::clear()
 {
   FActions.clear();
   QMenu::clear(); 
-}
-
-void Menu::addContext(const ActionContext &AContext)
-{
-  FContext.unite(AContext);
-}
-
-void Menu::populateContext()
-{
-  ActionList::iterator i = FActions.begin();
-  while (i!=FActions.end())
-  {
-    if (!i.value().isNull())
-    {
-      if (i.value()->isContextDepended())
-      {
-        i.value()->setContext(FContext); 
-        Menu *actionMenu = qobject_cast<Menu *>(i.value()->menu());
-        if (actionMenu)
-        {
-          actionMenu->FContext = FContext;
-          actionMenu->populateContext(); 
-        }
-      }
-      ++i;
-   }
-    else
-      i = FActions.erase(i);
-  }
-}
-
-void Menu::clearContext()
-{
-  FContext.clear();
-}
-
-void Menu::onAboutToShow()
-{
-  clearContext();
-  emit setContext(this);
-  populateContext();
 }
 
 Menu::ActionList::iterator Menu::findAction(const Action *AAction)

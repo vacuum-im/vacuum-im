@@ -6,39 +6,33 @@
 #include <QVariant>
 #include "utilsexport.h"
 
-typedef QHash<int,QVariant> ActionContext;
-
 class UTILS_EXPORT Action : 
   public QAction
 {
   Q_OBJECT;
 
 public:
-  enum ContextTypes {
-    CT_UserDefined = 64
+  enum DataRoles {
+    DR_Parametr1,
+    DR_Parametr2,
+    DR_Parametr3,
+    DR_Parametr4,
+    DR_StreamJid,
+    DR_UserDefined = 64
   }; 
 
 public:
-  Action(int AOrder, const QString &AActionId, QObject *AParent = NULL);
+  Action(int AOrder, QObject *AParent = NULL);
   ~Action();
 
   int order() const { return FOrder; }
-  const QString &actionId() const { return FActionId; }
-  bool isContextDepended() const { return FContextDepended; }
-  void setContextDepended(bool AContextDepended) { FContextDepended = AContextDepended; }
-  bool contextIsSupported(const ActionContext &AContext) const;
-  const ActionContext &context() const { return FContext; }
-  void setContext(const ActionContext &AContext);
-signals:
-  void newContext(Action *, const ActionContext &);
-  void supportContext(const Action *, const ActionContext &, bool &) const;
-protected:
-  void onNewContext();
+  static int newRole();
+  void setData(int ARole, const QVariant &AData);
+  QVariant data(int ARole) const;
 private:
+  static int FNewRole;
   int FOrder;
-  QString FActionId;
-  bool FContextDepended;
-  ActionContext FContext;
+  QHash<int,QVariant> FData;
 };
 
 #endif // ACTION_H
