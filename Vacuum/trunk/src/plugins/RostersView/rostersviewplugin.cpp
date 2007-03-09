@@ -1,4 +1,5 @@
 #include "rostersviewplugin.h"
+#include "sortfilterproxymodel.h"
 
 RostersViewPlugin::RostersViewPlugin()
 {
