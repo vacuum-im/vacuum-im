@@ -69,7 +69,7 @@ private:
   };
   RosterIndex *FRootIndex;
   QHash<QString,StreamItem> FStreams;
-  /*static*/ IndexDataHolder *FIndexDataHolder;
+  IndexDataHolder *FIndexDataHolder;
 };
 
 #endif // ROSTERSMODEL_H

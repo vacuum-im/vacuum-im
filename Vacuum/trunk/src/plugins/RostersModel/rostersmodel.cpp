@@ -4,8 +4,7 @@
 RostersModel::RostersModel(QObject *parent)
   : QAbstractItemModel(parent)
 {
-  qDebug() << "RostersModel";
-  FIndexDataHolder = new IndexDataHolder(0);
+  FIndexDataHolder = new IndexDataHolder(this);
   FRootIndex = new RosterIndex(IRosterIndex::IT_Root,"IT_Root");
   FRootIndex->setParent(this);
   connect(FRootIndex,SIGNAL(dataChanged(IRosterIndex *)),
@@ -23,16 +22,12 @@ RostersModel::RostersModel(QObject *parent)
 RostersModel::~RostersModel()
 {
   qDebug() << "~RostersModel";
-  delete FRootIndex;
-  delete FIndexDataHolder;
 }
 
 QModelIndex RostersModel::index(int ARow, int AColumn, const QModelIndex &AParent) const
 {
-  IRosterIndex *parentIndex;
-  if (!AParent.isValid())
-    parentIndex = FRootIndex;
-  else
+  IRosterIndex *parentIndex = FRootIndex;
+  if (AParent.isValid())
     parentIndex = static_cast<IRosterIndex *>(AParent.internalPointer());
 
   IRosterIndex *childIndex = parentIndex->child(ARow);
@@ -51,7 +46,7 @@ QModelIndex RostersModel::parent(const QModelIndex &AIndex) const
   IRosterIndex *curIndex = static_cast<IRosterIndex *>(AIndex.internalPointer());
   IRosterIndex *parentIndex = curIndex->parentIndex();
 
-  if (parentIndex && parentIndex != FRootIndex)
+  if (parentIndex != FRootIndex && parentIndex)
     return createIndex(parentIndex->row(),0,parentIndex); 
 
   return QModelIndex();
@@ -59,26 +54,20 @@ QModelIndex RostersModel::parent(const QModelIndex &AIndex) const
 
 bool RostersModel::hasChildren(const QModelIndex &AParent) const
 {
-  IRosterIndex *parentIndex;
-  if (!AParent.isValid())
-    parentIndex = FRootIndex;
-  else
+  IRosterIndex *parentIndex = FRootIndex;
+  if (AParent.isValid())
     parentIndex = static_cast<IRosterIndex *>(AParent.internalPointer());
-  if (parentIndex)
-    return parentIndex->childCount() > 0;
-  return false;
+
+  return parentIndex->childCount() > 0;
 }
 
 int RostersModel::rowCount(const QModelIndex &AParent) const
 {
-  if (!AParent.isValid())
-    return FRootIndex->childCount();
+  IRosterIndex *parentIndex = FRootIndex;
+  if (AParent.isValid())
+    parentIndex = static_cast<IRosterIndex *>(AParent.internalPointer());
 
-  IRosterIndex *parentIndex = static_cast<IRosterIndex *>(AParent.internalPointer());
-  if (parentIndex)
-    return parentIndex->childCount();
-
-  return 0;
+  return parentIndex->childCount();
 }
 
 int RostersModel::columnCount(const QModelIndex &/*AParent*/) const
@@ -88,7 +77,10 @@ int RostersModel::columnCount(const QModelIndex &/*AParent*/) const
 
 Qt::ItemFlags RostersModel::flags(const QModelIndex &AIndex) const
 {
-  IRosterIndex *index = (IRosterIndex *)AIndex.internalPointer(); 
+  if (!AIndex.isValid())
+    return 0;
+
+  IRosterIndex *index = static_cast<IRosterIndex *>(AIndex.internalPointer()); 
   return index->flags();  
 }
 
@@ -98,10 +90,7 @@ QVariant RostersModel::data(const QModelIndex &AIndex, int ARole) const
     return QVariant();
 
   IRosterIndex *index = static_cast<IRosterIndex *>(AIndex.internalPointer());
-  if (index)
-    return index->data(ARole);
-
-  return QVariant();
+  return index->data(ARole);
 }
 
 IRosterIndex *RostersModel::appendStream( IRoster *ARoster, IPresence *APresence )
@@ -206,7 +195,8 @@ IRosterIndex *RostersModel::createRosterIndex( int AType, const QString &AId, IR
       index->setParentIndex(AParent);
       index->setData(RosterIndex::DR_StreamJid,AParent->data(RosterIndex::DR_StreamJid));
     }
-    index->setDataHolder(FIndexDataHolder);
+    if (AType < IRosterIndex::IT_UserDefined)
+      index->setDataHolder(FIndexDataHolder);
  }
   return index;
 }

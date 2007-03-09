@@ -1,8 +1,8 @@
 #include <QtDebug>
 #include "rosterindex.h"
 
-int RosterIndex::FNewRole = RosterIndex::DR_UserDefined + 1;
-int RosterIndex::FNewType = RosterIndex::IT_UserDefined + 1;
+int IRosterIndex::FNewType = IRosterIndex::IT_UserDynamic + 1;
+int IRosterIndex::FNewRole = IRosterIndex::DR_UserDynamic + 1;
 
 RosterIndex::RosterIndex(int AType, const QString &AId)
 {
@@ -23,12 +23,6 @@ RosterIndex::~RosterIndex()
     removeAllChilds();
   if (FParentIndex)
     FParentIndex->removeChild(this);
-}
-
-int RosterIndex::newType() const
-{
-  FNewType++;
-  return FNewType;
 }
 
 void RosterIndex::setParentIndex(IRosterIndex *AIndex)
@@ -135,12 +129,6 @@ QHash<int,IRosterIndexDataHolder *> RosterIndex::setDataHolder(IRosterIndexDataH
   foreach(role, ADataHolder->roles())
     oldDataHolders.insert(role,setDataHolder(role,ADataHolder));
   return oldDataHolders;
-}
-
-int RosterIndex::newRole() const
-{
-  FNewRole++;
-  return FNewRole;
 }
 
 bool RosterIndex::setData(int ARole, const QVariant &AData)

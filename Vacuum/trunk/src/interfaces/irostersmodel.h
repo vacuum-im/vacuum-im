@@ -36,7 +36,8 @@ public:
     IT_Contact,
     IT_Transport,
     IT_MyResource,
-    IT_UserDefined = 64
+    IT_UserDefined = 64,
+    IT_UserDynamic = IT_UserDefined + 1048576
   };
   enum DataRole{
     DR_AnyRole = -1,
@@ -64,12 +65,13 @@ public:
     DR_FontStyle,
     DR_FontUnderline,
     //User roles
-    DR_UserDefined = Qt::UserRole+64
+    DR_UserDefined = Qt::UserRole + 64,
+    DR_UserDynamic = DR_UserDefined + 1048576
   };
 public:
   virtual QObject *instance() =0;
   virtual int type() const =0;
-  virtual int newType() const =0;
+  virtual int newType() const {FNewType++; return FNewType;}
   virtual QString id() const =0;
   virtual void setParentIndex(IRosterIndex *) =0;
   virtual IRosterIndex *parentIndex() const =0; 
@@ -83,7 +85,7 @@ public:
   virtual int childRow(const IRosterIndex *) const =0;
   virtual void setFlags(const Qt::ItemFlags &AFlags) =0;
   virtual Qt::ItemFlags flags() const =0;
-  virtual int newRole() const =0;
+  virtual int newRole() const {FNewRole++; return FNewRole;}
   virtual bool setData(int ARole, const QVariant &) =0;
   virtual QVariant data(int ARole) const =0;
   virtual void setItemDelegate(QAbstractItemDelegate *AItemDelegate) =0;
@@ -100,6 +102,9 @@ signals:
   virtual void childInserted(IRosterIndex *) =0;
   virtual void childAboutToBeRemoved(IRosterIndex *) =0;
   virtual void childRemoved(IRosterIndex *) =0;
+private:
+  static int FNewType;
+  static int FNewRole;
 };
 
 class IRostersModel :

@@ -19,7 +19,6 @@ public:
 
   //IRosterIndex
   virtual int type() const { return data(DR_Type).toInt(); }
-  virtual int newType() const;
   virtual QString id() const { return data(DR_Id).toString(); }
   virtual void setParentIndex(IRosterIndex *AIndex);
   virtual IRosterIndex *parentIndex() const { return FParentIndex; } 
@@ -34,7 +33,6 @@ public:
   virtual QHash<int,IRosterIndexDataHolder *> setDataHolder(IRosterIndexDataHolder *ADataHolder);
   virtual void setFlags(const Qt::ItemFlags &AFlags) { FFlags = AFlags; } 
   virtual Qt::ItemFlags flags() const { return FFlags; }
-  virtual int newRole() const;
   virtual bool setData(int ARole, const QVariant &AData);
   virtual QVariant data(int ARole) const;
   virtual void setItemDelegate(QAbstractItemDelegate *AItemDelegate) { FItemDelegate = AItemDelegate; }
@@ -54,8 +52,6 @@ signals:
 protected slots:
   virtual void onChildIndexDestroyed(QObject *AIndex);
 private:
-  static int FNewRole;
-  static int FNewType;
   IRosterIndex *FParentIndex;
   QList<IRosterIndex *> FChilds;
   QHash<int, IRosterIndexDataHolder *> FDataHolders;
