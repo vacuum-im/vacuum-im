@@ -7,6 +7,8 @@
 #include "utilsexport.h"
 #include "action.h"
 
+class Action;
+
 class UTILS_EXPORT Menu : 
   public QMenu
 {
@@ -22,6 +24,8 @@ public:
   void removeAction(Action *AAction);
   void clear();
   Action *menuAction();
+  void setIcon(const QIcon &AIcon);
+  void setTitle(const QString &ATitle);
 signals:
   void addedAction(QAction *);
   void removedAction(QAction *);

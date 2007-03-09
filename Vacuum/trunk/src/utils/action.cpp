@@ -33,3 +33,11 @@ QVariant Action::data(int ARole) const
   return FData.value(ARole);
 }
 
+void Action::setMenu(Menu *AMenu)
+{
+  setIcon(AMenu->icon());
+  setText(AMenu->title());
+  setToolTip(AMenu->toolTip());
+  setWhatsThis(AMenu->whatsThis());
+  QAction::setMenu(AMenu);
+}

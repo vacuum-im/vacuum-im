@@ -71,6 +71,20 @@ Action *Menu::menuAction()
   return FMenuAction;
 }
 
+void Menu::setIcon( const QIcon &AIcon )
+{
+  if (FMenuAction)
+    FMenuAction->setIcon(AIcon);
+  QMenu::setIcon(AIcon);
+}
+
+void Menu::setTitle(const QString &ATitle)
+{
+  if (FMenuAction)
+    FMenuAction->setText(ATitle);
+  QMenu::setTitle(ATitle);
+}
+
 void Menu::removeAction(Action *AAction)
 {
   clearNullActions();
