@@ -57,15 +57,15 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
           rosterItem->setSubscription(subscr);   
           rosterItem->setAsk(stanzaItem.attribute("ask"));
           
-          QSet<QString> groups;
+          QSet<QString> allItemGroups;
           QDomElement groupElem = stanzaItem.firstChildElement("group"); 
           while (!groupElem.isNull())
           {
             if (groupElem.firstChild().isText())
-              groups.insert(groupElem.firstChild().toText().data());
+              allItemGroups.insert(groupElem.firstChild().toText().data());
             groupElem = groupElem.nextSiblingElement("group"); 
           }
-          rosterItem->setGroups(groups); 
+          rosterItem->setGroups(allItemGroups); 
 
           emit itemPush(rosterItem); 
           hooked = true;
@@ -138,39 +138,136 @@ void Roster::iqStanzaTimeOut(const QString &AId)
 
 IRosterItem *Roster::item(const Jid &AItemJid) const
 {
-  RosterItem *item;
-  foreach(item, FItems)
-    if (item->jid().equals(AItemJid,false))
-      return item; 
+  RosterItem *rosterItem;
+  foreach(rosterItem, FItems)
+    if (rosterItem->jid().equals(AItemJid,false))
+      return rosterItem; 
   return 0;
 }
 
 QList<IRosterItem *> Roster::items() const
 {
-  QList<IRosterItem *> items;
-  RosterItem *item;
-  foreach(item, FItems)
-    items.append(item); 
-  return items;
-}
-
-QList<IRosterItem *> Roster::groupItems(const QString &AGroup) const
-{
-  QList<IRosterItem *> items;
-  RosterItem *item;
-  foreach(item, FItems)
-    if (item->groups().contains(AGroup))
-      items.append(item); 
-  return items;
+  QList<IRosterItem *> rosterItems;
+  RosterItem *rosterItem;
+  foreach(rosterItem, FItems)
+    rosterItems.append(rosterItem); 
+  return rosterItems;
 }
 
 QSet<QString> Roster::groups() const
 {
-  QSet<QString> groups;
-  RosterItem *item;
-  foreach(item, FItems)
-    groups += item->groups();
-  return groups;
+  QSet<QString> allGroups;
+  RosterItem *rosterItem;
+  foreach(rosterItem, FItems)
+    allGroups += rosterItem->groups();
+  return allGroups;
+}
+
+QList<IRosterItem *> Roster::groupItems(const QString &AGroup) const
+{
+  QList<IRosterItem *> rosterItems;
+  RosterItem *rosterItem;
+  foreach(rosterItem, FItems)
+  {
+    QString itemGroup;
+    QSet<QString> allItemGroups = rosterItem->groups();
+    foreach(itemGroup,allItemGroups)
+      if (itemGroup.startsWith(AGroup))
+      {
+        rosterItems.append(rosterItem); 
+        break;
+      }
+  }
+  return rosterItems;
+}
+
+QSet<QString> Roster::itemGroups(const Jid &AItemJid) const
+{
+  IRosterItem *rosterItem = item(AItemJid);
+  if (rosterItem)
+    return rosterItem->groups();
+  return QSet<QString>();
+}
+
+void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups)
+{
+  Stanza query("iq");
+  query.setId(FStanzaProcessor->newId()).setType("set");
+  QDomElement itemElem = query.addElement("query",NS_JABBER_ROSTER).appendChild(query.createElement("item")).toElement();
+  if (!AItemJid.node().isEmpty())
+    itemElem.setAttribute("jid",AItemJid.bare());
+  else
+    itemElem.setAttribute("jid",AItemJid.full());
+  if (!AName.isEmpty()) 
+    itemElem.setAttribute("name",AName); 
+
+  QSet<QString>::const_iterator i = AGroups.begin();
+  while (i!=AGroups.end())
+    itemElem.appendChild(query.createElement("group").appendChild(query.createTextNode(*i++)));
+
+  FStanzaProcessor->sendIqStanza(this,FStream->jid(),query,0);
+}
+
+void Roster::sendSubscription(const Jid &AItemJid, IRoster::SubscriptionType AType)
+{
+  QString type;
+  if (AType == IRoster::Subscribe)
+    type = "subscribe";
+  else if (AType == IRoster::Subscribed)
+    type = "subscribed";
+  else if (AType == IRoster::Unsubscribe)
+    type = "unsubscribe";
+  else if (AType == IRoster::Unsubscribed)
+    type = "unsubscribed";
+  else return;
+
+  Stanza subscr("presence");
+  subscr.setTo(AItemJid.bare()).setType(type); 
+  FStanzaProcessor->sendStanzaOut(FStream->jid(),subscr);  
+}
+
+void Roster::removeItem(const Jid &AItemJid)
+{
+  Stanza query("iq");
+  query.setId(FStanzaProcessor->newId()).setType("set");
+  QDomElement itemElem = query.addElement("query",NS_JABBER_ROSTER).appendChild(query.createElement("item")).toElement();
+  if (!AItemJid.node().isEmpty())
+    itemElem.setAttribute("jid",AItemJid.bare());
+  else
+    itemElem.setAttribute("jid",AItemJid.full());
+  itemElem.setAttribute("subscription","remove"); 
+
+  FStanzaProcessor->sendIqStanza(this,FStream->jid(),query,0);
+}
+
+void Roster::renameItem( const Jid &AItemJid, const QString &AName )
+{
+
+}
+
+void Roster::copyItemToGroup(const Jid &AItemJid, const QString &AGroup)
+{
+
+}
+
+void Roster::moveItemToGroup( const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo )
+{
+
+}
+
+void Roster::deleteItemFromGroup( const Jid &AItemJid, const QString &AGroup )
+{
+
+}
+
+void Roster::renameGroup( const QString &AGroupFrom, const QString &AGroupTo )
+{
+
+}
+
+void Roster::deleteGroup( const QString &AGroup )
+{
+
 }
 
 void Roster::open()
@@ -212,57 +309,6 @@ void Roster::close()
   FOpenId.clear();
 }
 
-void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups)
-{
-  Stanza query("iq");
-  query.setId(FStanzaProcessor->newId()).setType("set");
-  QDomElement item = query.addElement("query",NS_JABBER_ROSTER).appendChild(query.createElement("item")).toElement();
-  if (!AItemJid.node().isEmpty())
-    item.setAttribute("jid",AItemJid.bare());
-  else
-    item.setAttribute("jid",AItemJid.full());
-  if (!AName.isEmpty()) 
-    item.setAttribute("name",AName); 
-  
-  QSet<QString>::const_iterator i = AGroups.begin();
-  while (i!=AGroups.end())
-    item.appendChild(query.createElement("group").appendChild(query.createTextNode(*i++)));
-
-  FStanzaProcessor->sendIqStanza(this,FStream->jid(),query,0);
-}
-
-void Roster::removeItem(const Jid &AItemJid)
-{
-  Stanza query("iq");
-  query.setId(FStanzaProcessor->newId()).setType("set");
-  QDomElement item = query.addElement("query",NS_JABBER_ROSTER).appendChild(query.createElement("item")).toElement();
-  if (!AItemJid.node().isEmpty())
-    item.setAttribute("jid",AItemJid.bare());
-  else
-    item.setAttribute("jid",AItemJid.full());
-  item.setAttribute("subscription","remove"); 
-
-  FStanzaProcessor->sendIqStanza(this,FStream->jid(),query,0);
-}
-
-void Roster::sendSubscription(const Jid &AItemJid, IRoster::SubscriptionType AType)
-{
-  QString type;
-  if (AType == IRoster::Subscribe)
-    type = "subscribe";
-  else if (AType == IRoster::Subscribed)
-    type = "subscribed";
-  else if (AType == IRoster::Unsubscribe)
-    type = "unsubscribe";
-  else if (AType == IRoster::Unsubscribed)
-    type = "unsubscribed";
-  else return;
-  
-  Stanza subscr("presence");
-  subscr.setTo(AItemJid.bare()).setType(type); 
-  FStanzaProcessor->sendStanzaOut(FStream->jid(),subscr);  
-}
-
 void Roster::onStreamOpened(IXmppStream *)
 {
   open();
@@ -275,12 +321,13 @@ void Roster::onStreamClosed(IXmppStream *)
 
 void Roster::clearItems()
 {
-  RosterItem *item;
+  RosterItem *rosterItem;
   while (FItems.count() >0)
   {
-    item = FItems.at(0);
-    emit itemRemoved(item);
+    rosterItem = FItems.at(0);
+    emit itemRemoved(rosterItem);
     FItems.removeAt(0);
-    delete item; 
+    delete rosterItem; 
   }
 }
+

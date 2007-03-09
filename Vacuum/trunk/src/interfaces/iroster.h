@@ -35,14 +35,23 @@ public:
   virtual QString groupDelimiter() const =0;
   virtual IRosterItem *item(const Jid &) const=0;
   virtual QList<IRosterItem *> items() const =0;
-  virtual QList<IRosterItem *> groupItems(const QString &) const =0;
   virtual QSet<QString> groups() const =0;
+  virtual QList<IRosterItem *> groupItems(const QString &) const =0;
+  virtual QSet<QString> itemGroups(const Jid &) const =0;
+  virtual void setItem(const Jid &, const QString &, const QSet<QString> &) =0;
+  virtual void sendSubscription(const Jid &, SubscriptionType) =0; 
+  virtual void removeItem(const Jid &) =0;
+  //Item operations
+  virtual void renameItem(const Jid &, const QString &) =0;
+  virtual void copyItemToGroup(const Jid &, const QString &) =0;
+  virtual void moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo) =0;
+  virtual void deleteItemFromGroup(const Jid &, const QString &) =0;
+  //Group operations
+  virtual void renameGroup(const QString &AGroupFrom, const QString &AGroupTo) =0;
+  virtual void deleteGroup(const QString &) =0;
 public slots:
   virtual void open() =0;
   virtual void close() =0;
-  virtual void setItem(const Jid &, const QString &, const QSet<QString> &) =0;
-  virtual void removeItem(const Jid &) =0;
-  virtual void sendSubscription(const Jid &, SubscriptionType) =0; 
 signals:
   virtual void opened() =0;
   virtual void closed() =0;

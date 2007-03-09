@@ -30,21 +30,30 @@ public:
   virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void iqStanzaTimeOut(const QString &AId);
 
-  //Roster
+  //IRoster
   virtual const Jid &streamJid() const { return FStream->jid(); }
   virtual IXmppStream *xmppStream() const { return FStream; }
   virtual bool isOpen() const { return FOpen; }
   virtual QString groupDelimiter() const { return "::"; }
   virtual IRosterItem *item(const Jid &AItemJid) const;
   virtual QList<IRosterItem *> items() const;
-  virtual QList<IRosterItem *> groupItems(const QString &AGroup) const;
   virtual QSet<QString> groups() const;
+  virtual QList<IRosterItem *> groupItems(const QString &AGroup) const;
+  virtual QSet<QString> itemGroups(const Jid &AItemJid) const;
+  virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups);
+  virtual void sendSubscription(const Jid &AItemJid, SubscriptionType AType); 
+  virtual void removeItem(const Jid &AItemJid);
+  //Item operations
+  virtual void renameItem(const Jid &AItemJid, const QString &AName);
+  virtual void copyItemToGroup(const Jid &AItemJid, const QString &AGroup);
+  virtual void moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo);
+  virtual void deleteItemFromGroup(const Jid &AItemJid, const QString &AGroup);
+  //Group operations
+  virtual void renameGroup(const QString &AGroupFrom, const QString &AGroupTo);
+  virtual void deleteGroup(const QString &AGroup);
 public slots:
   virtual void open();
   virtual void close();
-  virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups);
-  virtual void removeItem(const Jid &AItemJid);
-  virtual void sendSubscription(const Jid &AItemJid, SubscriptionType AType); 
 signals:
   virtual void opened();
   virtual void closed();
