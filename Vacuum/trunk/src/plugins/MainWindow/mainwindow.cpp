@@ -5,11 +5,11 @@
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags)
   : QMainWindow(AParent,AFlags)
 {
-  qDebug() << "MainWindow";
   FSystemIconset.openFile("system/default.jisp");
   connect(&FSystemIconset,SIGNAL(reseted(const QString &)),SLOT(onSkinChanged(const QString &)));
   FPluginManager = NULL;
   FSettings = NULL;
+  setIconSize(QSize(16,16));
   createLayouts();
   createToolBars();
   createMenus();
