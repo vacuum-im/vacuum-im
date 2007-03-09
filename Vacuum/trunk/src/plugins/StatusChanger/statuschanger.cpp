@@ -51,6 +51,17 @@ bool StatusChanger::initPlugin(IPluginManager *APluginManager)
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+
+  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+    if (FRostersViewPlugin)
+    {
+      connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(const QModelIndex &, Menu *)),
+        SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+    }
+  }
   
   return FPresencePlugin!=NULL;
 }
@@ -198,16 +209,13 @@ void StatusChanger::updateMenu(IPresence *APresence)
 {
   if (!APresence)
   {
-    QIcon icon = getStatusIcon(FBaseShow);
-    QString text = getStatusText(FBaseShow);
-    FMenu->setIcon(icon);
-    FMenu->setTitle(text);
-    FMenu->menuAction()->setIcon(icon);
+    FMenu->setIcon(getStatusIcon(FBaseShow));
+    FMenu->setTitle(getStatusText(FBaseShow));
   }
   else if (FStreamMenus.contains(APresence))
   {
     Menu *menu = FStreamMenus.value(APresence);
-    menu->menuAction()->setIcon(getStatusIcon(APresence->show()));
+    menu->setIcon(getStatusIcon(APresence->show()));
   }
 }
 
@@ -230,6 +238,7 @@ void StatusChanger::removeStreamMenu(IPresence *APresence)
   {
     Menu *menu = FStreamMenus.value(APresence,NULL);
     FStreamMenus.remove(APresence);
+    menu->clear();
     delete menu;
   }
 }
@@ -373,6 +382,22 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 void StatusChanger::onSkinChanged(const QString &)
 {
   updateMenu();
+}
+
+void StatusChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu)
+{
+  if (AIndex.isValid() && AIndex.data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
+  {
+    QString streamJid = AIndex.data(IRosterIndex::DR_StreamJid).toString();
+    Menu *menu = streamMenu(streamJid);
+    if (menu)
+    {
+      Action *action = new Action(STATUSMENU_MENU_STREAM_ORDER,AMenu);
+      action->setMenu(menu);
+      action->setText(tr("Status"));
+      AMenu->addAction(action);
+    }
+  }
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

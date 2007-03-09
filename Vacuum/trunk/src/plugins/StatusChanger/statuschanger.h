@@ -5,6 +5,7 @@
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatuschanger.h"
 #include "../../interfaces/imainwindow.h"
+#include "../../interfaces/irostersview.h"
 #include "../../utils/skin.h"
 
 #define STATUSCHANGER_UUID "{F0D57BD2-0CD4-4606-9CEE-15977423F8DC}"
@@ -56,9 +57,11 @@ protected slots:
   void onPresenceClosed(IPresence *APresence);
   void onPresenceRemoved(IPresence *APresence);
   void onSkinChanged(const QString &ASkinName);
+  void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
 private:
   IPresencePlugin *FPresencePlugin;
   IMainWindowPlugin *FMainWindowPlugin;
+  IRostersViewPlugin *FRostersViewPlugin;
 private:
   Menu *FMenu;
   QHash<IPresence *, Menu *> FStreamMenus;
