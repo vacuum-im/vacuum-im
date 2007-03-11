@@ -1,5 +1,5 @@
 #include "rostersviewplugin.h"
-#include "sortfilterproxymodel.h"
+//#include "sortfilterproxymodel.h"
 
 RostersViewPlugin::RostersViewPlugin()
 {
@@ -50,4 +50,5 @@ IRostersView *RostersViewPlugin::rostersView()
 
   return FRostersView;
 }
+
 Q_EXPORT_PLUGIN2(RostersViewPlugin, RostersViewPlugin)

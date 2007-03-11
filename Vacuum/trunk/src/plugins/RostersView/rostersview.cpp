@@ -2,7 +2,7 @@
 #include "rostersview.h"
 #include <QHeaderView>
 #include "rosterindexdelegate.h"
-#include "sortfilterproxymodel.h"
+//#include "sortfilterproxymodel.h"
 
 RostersView::RostersView(IRostersModel *AModel, QWidget *AParent)
   : QTreeView(AParent)
