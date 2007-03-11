@@ -12,4 +12,5 @@ SUBDIRS = settings \
           rostersmodel \
           mainwindow \
           rostersview \
-          statuschanger
+          statuschanger \
+          rosterchanger
