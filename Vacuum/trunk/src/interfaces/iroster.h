@@ -45,10 +45,10 @@ public:
   virtual void renameItem(const Jid &, const QString &) =0;
   virtual void copyItemToGroup(const Jid &, const QString &) =0;
   virtual void moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo) =0;
-  virtual void deleteItemFromGroup(const Jid &, const QString &) =0;
+  virtual void removeItemFromGroup(const Jid &, const QString &) =0;
   //Group operations
   virtual void renameGroup(const QString &AGroupFrom, const QString &AGroupTo) =0;
-  virtual void deleteGroup(const QString &) =0;
+  virtual void removeGroup(const QString &) =0;
 public slots:
   virtual void open() =0;
   virtual void close() =0;

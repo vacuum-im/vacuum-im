@@ -240,34 +240,91 @@ void Roster::removeItem(const Jid &AItemJid)
   FStanzaProcessor->sendIqStanza(this,FStream->jid(),query,0);
 }
 
-void Roster::renameItem( const Jid &AItemJid, const QString &AName )
+void Roster::renameItem(const Jid &AItemJid, const QString &AName)
 {
-
+  IRosterItem *rosterItem = item(AItemJid);
+  if (rosterItem)
+    setItem(AItemJid,AName,rosterItem->groups());
 }
 
 void Roster::copyItemToGroup(const Jid &AItemJid, const QString &AGroup)
 {
-
+  IRosterItem *rosterItem = item(AItemJid);
+  if (rosterItem)
+  {
+    QSet<QString> allItemGroups = rosterItem->groups();
+    setItem(AItemJid,rosterItem->name(),allItemGroups << AGroup);
+  }
 }
 
-void Roster::moveItemToGroup( const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo )
+void Roster::moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo)
 {
-
+  IRosterItem *rosterItem = item(AItemJid);
+  if (rosterItem)
+  {
+    QSet<QString> allItemGroups = rosterItem->groups();
+    if (allItemGroups.contains(AGroupFrom))
+    {
+      allItemGroups -= AGroupFrom;
+      setItem(AItemJid,rosterItem->name(),allItemGroups += AGroupTo);
+    }
+  }
 }
 
-void Roster::deleteItemFromGroup( const Jid &AItemJid, const QString &AGroup )
+void Roster::removeItemFromGroup( const Jid &AItemJid, const QString &AGroup )
 {
-
+  IRosterItem *rosterItem = item(AItemJid);
+  if (rosterItem)
+  {
+    QSet<QString> allItemGroups = rosterItem->groups();
+    if (allItemGroups.contains(AGroup))
+      setItem(AItemJid,rosterItem->name(),allItemGroups -= AGroup);
+  }
 }
 
-void Roster::renameGroup( const QString &AGroupFrom, const QString &AGroupTo )
+void Roster::renameGroup(const QString &AGroupFrom, const QString &AGroupTo)
 {
-
+  IRosterItem *rosterItem;
+  QList<IRosterItem *> allGroupItems = groupItems(AGroupFrom);
+  foreach(rosterItem, allGroupItems)
+  {
+    QString group;
+    QSet<QString> newItemGroups;
+    QSet<QString> allItemGroups = rosterItem->groups();
+    foreach(group,allItemGroups)
+    {
+      QString newGroup = group;
+      if (newGroup.startsWith(AGroupFrom))
+      {
+        newGroup.remove(0,AGroupFrom.size());
+        newGroup.prepend(AGroupTo);
+      }
+      newItemGroups += newGroup;
+    }
+    setItem(rosterItem->jid(),rosterItem->name(),newItemGroups);
+  }
 }
 
-void Roster::deleteGroup( const QString &AGroup )
+void Roster::removeGroup( const QString &AGroup )
 {
-
+  IRosterItem *rosterItem;
+  QList<IRosterItem *> allGroupItems = groupItems(AGroup);
+  foreach(rosterItem, allGroupItems)
+  {
+    QSet<QString> allItemGroups = rosterItem->groups();
+    QSet<QString>::iterator group = allItemGroups.begin();
+    while (group != allItemGroups.end())
+    {
+      if ((*group).startsWith(AGroup))
+        group = allItemGroups.erase(group);
+      else
+        group++;
+    }
+    if (allItemGroups.isEmpty())
+      removeItem(rosterItem->jid());
+    else
+      setItem(rosterItem->jid(),rosterItem->name(),allItemGroups);
+  }
 }
 
 void Roster::open()

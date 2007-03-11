@@ -47,10 +47,10 @@ public:
   virtual void renameItem(const Jid &AItemJid, const QString &AName);
   virtual void copyItemToGroup(const Jid &AItemJid, const QString &AGroup);
   virtual void moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo);
-  virtual void deleteItemFromGroup(const Jid &AItemJid, const QString &AGroup);
+  virtual void removeItemFromGroup(const Jid &AItemJid, const QString &AGroup);
   //Group operations
   virtual void renameGroup(const QString &AGroupFrom, const QString &AGroupTo);
-  virtual void deleteGroup(const QString &AGroup);
+  virtual void removeGroup(const QString &AGroup);
 public slots:
   virtual void open();
   virtual void close();
