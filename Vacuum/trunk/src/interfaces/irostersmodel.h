@@ -49,6 +49,7 @@ public:
     DR_RosterJid,
     DR_RosterGroup,
     DR_RosterName,
+    DR_GroupName,
     DR_Show,
     DR_Status,
     DR_Priority,
@@ -119,10 +120,12 @@ public:
   virtual IPresence *getPresence(const QString &AStreamJid) const =0;
   virtual IRosterIndex *getStreamRoot(const Jid &AStreamJid) const =0;
   virtual IRosterIndex *rootIndex() const =0;
-  virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *) =0;
-  virtual IRosterIndex *createGroup(const QString &AName, int AType, IRosterIndex *) =0;
-  virtual IRosterIndex *findRosterIndex(int AType, const QVariant &AId, IRosterIndex *) const =0;
-  virtual IRosterIndex *findGroup(const QString &AName, int AType, IRosterIndex *) const =0;
+  virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) =0;
+  virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, 
+    int AType, IRosterIndex *AParent) =0;
+  virtual IRosterIndex *findRosterIndex(int AType, const QVariant &AId, IRosterIndex *AParent) const =0;
+  virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, 
+    int AType, IRosterIndex *AParent) const =0;
   virtual bool removeRosterIndex(IRosterIndex *) =0;
   virtual QString blankGroupName() const =0;
   virtual QString transportsGroupName() const =0;

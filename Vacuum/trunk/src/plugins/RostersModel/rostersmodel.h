@@ -37,9 +37,9 @@ public:
   virtual IRosterIndex *rootIndex() const { return FRootIndex; }
   virtual IRosterIndex *getStreamRoot(const Jid &AStreamJid) const;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent);
-  virtual IRosterIndex *createGroup(const QString &AName, int AType, IRosterIndex *AParent);
+  virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent);
   virtual IRosterIndex *findRosterIndex(int AType, const QVariant &AId, IRosterIndex *AParent) const;
-  virtual IRosterIndex *findGroup(const QString &AName, int AType, IRosterIndex *AParent) const;
+  virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const;
   virtual bool removeRosterIndex(IRosterIndex *AIndex);
   virtual QString blankGroupName() const { return tr("Blank Group"); }
   virtual QString transportsGroupName() const { return tr("Transports"); }
