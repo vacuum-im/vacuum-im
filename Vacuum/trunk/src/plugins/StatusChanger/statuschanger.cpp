@@ -54,22 +54,22 @@ bool StatusChanger::initPlugin(IPluginManager *APluginManager)
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin)
-  {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-    if (FRostersViewPlugin)
-    {
-      connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-        SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
-    }
-  }
   
   return FPresencePlugin!=NULL;
 }
 
 bool StatusChanger::startPlugin()
 {
+  if (FRostersViewPlugin)
+  {
+    connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(const QModelIndex &, Menu *)),
+      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+  }
+
   if (FMainWindowPlugin)
     FMainWindowPlugin->mainWindow()->bottomToolBar()->addAction(FMenu->menuAction());
+
   return true;
 }
 
