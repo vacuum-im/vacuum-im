@@ -5,7 +5,7 @@
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags)
   : QMainWindow(AParent,AFlags)
 {
-  FSystemIconset.openFile("system/default.jisp");
+  FSystemIconset.openFile("system/common.jisp");
   connect(&FSystemIconset,SIGNAL(reseted(const QString &)),SLOT(onSkinChanged(const QString &)));
   FPluginManager = NULL;
   FSettings = NULL;

@@ -5,7 +5,7 @@ RosterIndexDelegate::RosterIndexDelegate(QObject *AParent)
   : QItemDelegate(AParent)
 {
   FRostersView = qobject_cast<IRostersView *>(AParent);
-  FRosterIconset.openFile("roster/default.jisp");
+  FRosterIconset.openFile("roster/common.jisp");
 }
 
 RosterIndexDelegate::~RosterIndexDelegate()

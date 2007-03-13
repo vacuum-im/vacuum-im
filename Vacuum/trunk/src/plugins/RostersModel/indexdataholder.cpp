@@ -3,7 +3,7 @@
 IndexDataHolder::IndexDataHolder(QObject *AParent) :
   QObject(AParent)
 {
-  FStatusIconset.openFile("status/default.jisp");
+  FStatusIconset.openFile("status/common.jisp");
 }
 
 IndexDataHolder::~IndexDataHolder()
