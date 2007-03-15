@@ -29,6 +29,8 @@ public:
 signals:
   void addedAction(QAction *);
   void removedAction(QAction *);
+protected slots:
+  void onMenuActionTriggered(bool);
 private:
   typedef QMultiMap<int,QPointer<Action>> ActionList;
   ActionList::iterator findAction(const Action *AAction); 

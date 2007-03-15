@@ -5,7 +5,7 @@ Menu::Menu(int AOrder, QWidget *AParent)
   : QMenu(AParent)
 {
   FOrder = AOrder;
-  FMenuAction = 0;
+  FMenuAction = NULL;
   setSeparatorsCollapsible(true);
 }
 
@@ -35,7 +35,22 @@ void Menu::addAction(Action *AAction)
       insertSeparator(AAction)->setData(AAction->order());
     }
     else
-      QMenu::insertAction(i.value(),AAction); 
+    {
+      int index = 0; 
+      QAction *action = NULL;
+      QList<QAction *> actionList = actions();
+      while(index<actionList.count() && !action)
+      {
+        action = actionList.at(index);
+        if (!action->isSeparator() || action->data().toInt() <= AAction->order())
+          action = NULL;
+        index++;
+      }
+      if (action)
+        QMenu::insertAction(action,AAction); 
+      else
+        QMenu::addAction(AAction); 
+    }
 
     FActions.insertMulti(AAction->order(),AAction);
   
@@ -62,7 +77,8 @@ Action *Menu::menuAction()
   if (!FMenuAction)
   {
     FMenuAction = new Action(order(),this);
-    FMenuAction->setMenu(this); 
+    FMenuAction->setMenu(this);
+    connect(FMenuAction,SIGNAL(triggered(bool)),SLOT(onMenuActionTriggered(bool)));
   }
   FMenuAction->setIcon(icon());
   FMenuAction->setText(title());
@@ -104,6 +120,18 @@ void Menu::removeAction(Action *AAction)
 
 void Menu::clear() 
 {
+  QPointer<Action> action;
+  foreach(action,FActions)
+  {
+    if (!action.isNull())
+    {
+      Menu *menu = action->menu();
+      if (menu && menu->parent() == this)
+        delete menu;
+      else if (action->parent() == this)
+        delete action;
+    }
+  }
   FActions.clear();
   QMenu::clear(); 
 }
@@ -143,5 +171,10 @@ QAction *Menu::findOrderSeparator(int AOrder) const
     if (action->isSeparator() && action->data().toInt() == AOrder)
       return action;
   return 0;
+}
+
+void Menu::onMenuActionTriggered(bool)
+{
+
 }
 
