@@ -113,6 +113,7 @@ bool StanzaProcessor::sendIqStanza(IStanzaProcessorIqOwner *AIqOwner,
       else 
         iqItem.timer = 0;
       iqItem.owner = AIqOwner;
+      iqItem.streamJid = AStreamJid;
       FIqStanzaItems.insert(AStanza.id(),iqItem);
     }
     return true;
