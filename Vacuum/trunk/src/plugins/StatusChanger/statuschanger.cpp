@@ -3,7 +3,11 @@
 StatusChanger::StatusChanger()
 {
   FBaseShow = IPresence::Error;
-  FStatusIconset.openFile("status/default.jisp");
+  FStatusIconset.openFile("status/common.jisp");
+  FPresencePlugin = NULL;
+  //FRosterPlugin = NULL;
+  FMainWindowPlugin = NULL;
+  FRostersViewPlugin = NULL;
   connect(&FStatusIconset,SIGNAL(reseted(const QString &)),SLOT(onSkinChanged(const QString &)));
   FMenu = new Menu(STATUSMENU_MENU_MAIN_ORDER,NULL);
   createStatusActions();
@@ -47,6 +51,12 @@ bool StatusChanger::initPlugin(IPluginManager *APluginManager)
         SLOT(onPresenceRemoved(IPresence *)));
     }
   }
+
+  //plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  //if (plugin)
+  //{
+  //  FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+  //}
 
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
@@ -149,57 +159,71 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   }
 
   Action *action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
-  action->setIcon(getStatusIcon(IPresence::Offline));
-  action->setText(getStatusText(IPresence::Offline));
-  action->setData(Action::DR_Parametr1,IPresence::Offline);
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
-  menu->addAction(action);
-
-  action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
-  action->setIcon(getStatusIcon(IPresence::Invisible));
-  action->setText(getStatusText(IPresence::Invisible));
-  action->setData(Action::DR_Parametr1,IPresence::Invisible);
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
-  menu->addAction(action);
-
-  action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
-  action->setIcon(getStatusIcon(IPresence::DoNotDistrib));
-  action->setText(getStatusText(IPresence::DoNotDistrib));
-  action->setData(Action::DR_Parametr1,IPresence::DoNotDistrib);
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
-  menu->addAction(action);
-
-  action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
-  action->setIcon(getStatusIcon(IPresence::ExtendedAway));
-  action->setText(getStatusText(IPresence::ExtendedAway));
-  action->setData(Action::DR_Parametr1,IPresence::ExtendedAway);
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
-  menu->addAction(action);
-
-  action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
-  action->setIcon(getStatusIcon(IPresence::Away));
-  action->setText(getStatusText(IPresence::Away));
-  action->setData(Action::DR_Parametr1,IPresence::Away);
+  action->setIcon(getStatusIcon(IPresence::Online));
+  action->setText(getStatusName(IPresence::Online));
+  action->setData(Action::DR_Parametr1,IPresence::Online);
+  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Online));
+  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Online));
   action->setData(Action::DR_StreamJid,streamJid);
   connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
   menu->addAction(action);
 
   action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
   action->setIcon(getStatusIcon(IPresence::Chat));
-  action->setText(getStatusText(IPresence::Chat));
+  action->setText(getStatusName(IPresence::Chat));
   action->setData(Action::DR_Parametr1,IPresence::Chat);
+  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Chat));
+  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Chat));
   action->setData(Action::DR_StreamJid,streamJid);
   connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
   menu->addAction(action);
 
   action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
-  action->setIcon(getStatusIcon(IPresence::Online));
-  action->setText(getStatusText(IPresence::Online));
-  action->setData(Action::DR_Parametr1,IPresence::Online);
+  action->setIcon(getStatusIcon(IPresence::Away));
+  action->setText(getStatusName(IPresence::Away));
+  action->setData(Action::DR_Parametr1,IPresence::Away);
+  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Away));
+  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Away));
+  action->setData(Action::DR_StreamJid,streamJid);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  menu->addAction(action);
+
+  action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
+  action->setIcon(getStatusIcon(IPresence::ExtendedAway));
+  action->setText(getStatusName(IPresence::ExtendedAway));
+  action->setData(Action::DR_Parametr1,IPresence::ExtendedAway);
+  action->setData(Action::DR_Parametr2,getStatusText(IPresence::ExtendedAway));
+  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::ExtendedAway));
+  action->setData(Action::DR_StreamJid,streamJid);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  menu->addAction(action);
+
+  action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
+  action->setIcon(getStatusIcon(IPresence::DoNotDistrib));
+  action->setText(getStatusName(IPresence::DoNotDistrib));
+  action->setData(Action::DR_Parametr1,IPresence::DoNotDistrib);
+  action->setData(Action::DR_Parametr2,getStatusText(IPresence::DoNotDistrib));
+  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::DoNotDistrib));
+  action->setData(Action::DR_StreamJid,streamJid);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  menu->addAction(action);
+
+  action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
+  action->setIcon(getStatusIcon(IPresence::Invisible));
+  action->setText(getStatusName(IPresence::Invisible));
+  action->setData(Action::DR_Parametr1,IPresence::Invisible);
+  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Invisible));
+  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Invisible));
+  action->setData(Action::DR_StreamJid,streamJid);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  menu->addAction(action);
+
+  action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
+  action->setIcon(getStatusIcon(IPresence::Offline));
+  action->setText(getStatusName(IPresence::Offline));
+  action->setData(Action::DR_Parametr1,IPresence::Offline);
+  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Offline));
+  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Offline));
   action->setData(Action::DR_StreamJid,streamJid);
   connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
   menu->addAction(action);
@@ -267,7 +291,7 @@ QIcon StatusChanger::getStatusIcon(IPresence::Show AShow) const
   return QIcon();
 }
 
-QString StatusChanger::getStatusText(IPresence::Show AShow) const
+QString StatusChanger::getStatusName(IPresence::Show AShow) const
 {
   switch (AShow)
   {
@@ -281,6 +305,30 @@ QString StatusChanger::getStatusText(IPresence::Show AShow) const
     return tr("Away");
   case IPresence::ExtendedAway: 
     return tr("Not Available");
+  case IPresence::DoNotDistrib: 
+    return tr("Do Not Distrib");
+  case IPresence::Invisible: 
+    return tr("Invisible");
+  case IPresence::Error: 
+    return tr("Error");
+  }
+  return tr("Unknown");
+}
+
+QString StatusChanger::getStatusText(IPresence::Show AShow) const
+{
+  switch (AShow)
+  {
+  case IPresence::Offline: 
+    return tr("Offline");
+  case IPresence::Online: 
+    return tr("Online");
+  case IPresence::Chat: 
+    return tr("I`am free for chat");
+  case IPresence::Away: 
+    return tr("I`am away from my desk");
+  case IPresence::ExtendedAway: 
+    return tr("Not available");
   case IPresence::DoNotDistrib: 
     return tr("Do Not Distrib");
   case IPresence::Invisible: 
@@ -322,7 +370,9 @@ void StatusChanger::onStatusTriggered(bool)
   {
     QString streamJid = action->data(Action::DR_StreamJid).toString();
     IPresence::Show show = (IPresence::Show)action->data(Action::DR_Parametr1).toInt();
-    setPresence(show,getStatusText(show),getStatusPriority(show),streamJid);
+    QString status = action->data(Action::DR_Parametr2).toString();
+    int priority = action->data(Action::DR_Parametr3).toInt();
+    setPresence(show,status,priority,streamJid);
   }
 }
 

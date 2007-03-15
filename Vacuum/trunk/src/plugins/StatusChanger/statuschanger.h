@@ -4,6 +4,7 @@
 #include <QHash>
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatuschanger.h"
+#include "../../interfaces/iroster.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/irostersview.h"
 #include "../../utils/skin.h"
@@ -46,6 +47,7 @@ protected:
   void addStreamMenu(IPresence *APresence);
   void removeStreamMenu(IPresence *APresence);
   QIcon getStatusIcon(IPresence::Show AShow) const;
+  QString getStatusName(IPresence::Show AShow) const;
   QString getStatusText(IPresence::Show AShow) const;
   int getStatusPriority(IPresence::Show AShow) const;
 protected slots:
@@ -60,6 +62,7 @@ protected slots:
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
 private:
   IPresencePlugin *FPresencePlugin;
+  //IRosterPlugin *FRosterPlugin;
   IMainWindowPlugin *FMainWindowPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
