@@ -34,7 +34,7 @@ public:
   virtual const Jid &streamJid() const { return FStream->jid(); }
   virtual IXmppStream *xmppStream() const { return FStream; }
   virtual bool isOpen() const { return FOpen; }
-  virtual QString groupDelimiter() const { return "::"; }
+  virtual QString groupDelimiter() const { return FGroupDelim; }
   virtual IRosterItem *item(const Jid &AItemJid) const;
   virtual QList<IRosterItem *> items() const;
   virtual QSet<QString> groups() const;
@@ -43,13 +43,15 @@ public:
   virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups);
   virtual void sendSubscription(const Jid &AItemJid, SubscriptionType AType); 
   virtual void removeItem(const Jid &AItemJid);
-  //Item operations
+  //Operations on items
   virtual void renameItem(const Jid &AItemJid, const QString &AName);
   virtual void copyItemToGroup(const Jid &AItemJid, const QString &AGroup);
   virtual void moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo);
   virtual void removeItemFromGroup(const Jid &AItemJid, const QString &AGroup);
-  //Group operations
-  virtual void renameGroup(const QString &AGroupFrom, const QString &AGroupTo);
+  //Operations on group
+  virtual void renameGroup(const QString &AGroup, const QString &AGroupTo);
+  virtual void copyGroupToGroup(const QString &AGroup, const QString &AGroupTo);
+  virtual void moveGroupToGroup(const QString &AGroup, const QString &AGroupTo);
   virtual void removeGroup(const QString &AGroup);
 public slots:
   virtual void open();
@@ -60,17 +62,21 @@ signals:
   virtual void itemPush(IRosterItem *);
   virtual void itemRemoved(IRosterItem *);
   virtual void subscription(const Jid &AItemJid, SubscriptionType AType);
+protected:
+  bool requestGroupDelimiter();
+  bool requestRosterItems();
+  void clearItems();
 protected slots:
   virtual void onStreamOpened(IXmppStream *);
   virtual void onStreamClosed(IXmppStream *);
-protected:
-  void clearItems();
 private:
   IXmppStream *FStream;
   IStanzaProcessor *FStanzaProcessor;
 private:
   bool FOpen;
   QString FOpenId;
+  QString FGroupDelimId;
+  QString FGroupDelim;
   QList<RosterItem *> FItems;
   HandlerId FRosterHandler;
   HandlerId FSubscrHandler;

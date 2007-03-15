@@ -41,14 +41,16 @@ public:
   virtual void setItem(const Jid &, const QString &, const QSet<QString> &) =0;
   virtual void sendSubscription(const Jid &, SubscriptionType) =0; 
   virtual void removeItem(const Jid &) =0;
-  //Item operations
+  //Operations on items
   virtual void renameItem(const Jid &, const QString &) =0;
   virtual void copyItemToGroup(const Jid &, const QString &) =0;
   virtual void moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo) =0;
   virtual void removeItemFromGroup(const Jid &, const QString &) =0;
-  //Group operations
-  virtual void renameGroup(const QString &AGroupFrom, const QString &AGroupTo) =0;
-  virtual void removeGroup(const QString &) =0;
+  //Operations on group
+  virtual void renameGroup(const QString &AGroup, const QString &AGroupTo) =0;
+  virtual void copyGroupToGroup(const QString &AGroup, const QString &AGroupTo) =0;
+  virtual void moveGroupToGroup(const QString &AGroup, const QString &AGroupTo) =0;
+  virtual void removeGroup(const QString &AGroup) =0;
 public slots:
   virtual void open() =0;
   virtual void close() =0;
