@@ -30,11 +30,11 @@ public:
     IT_StreamRoot,
     IT_Group,
     IT_BlankGroup,
-    IT_TransportsGroup,
-    IT_MyResourcesGroup,
     IT_NotInRosterGroup,
+    IT_MyResourcesGroup,
+    IT_AgentsGroup,
     IT_Contact,
-    IT_Transport,
+    IT_Agent,
     IT_MyResource,
     IT_UserDefined = 64,
     IT_UserDynamic = IT_UserDefined + 1048576
@@ -128,7 +128,7 @@ public:
     int AType, IRosterIndex *AParent) const =0;
   virtual bool removeRosterIndex(IRosterIndex *) =0;
   virtual QString blankGroupName() const =0;
-  virtual QString transportsGroupName() const =0;
+  virtual QString agentsGroupName() const =0;
   virtual QString myResourcesGroupName() const =0;
   virtual QString notInRosterGroupName() const =0;
 signals:

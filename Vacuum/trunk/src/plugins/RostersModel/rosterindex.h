@@ -51,6 +51,8 @@ signals:
   virtual void childRemoved(IRosterIndex *);
 protected slots:
   virtual void onChildIndexDestroyed(QObject *AIndex);
+  virtual void onRemoveByLastChildRemoved();
+  virtual void onDestroyByParentRemoved();
 private:
   IRosterIndex *FParentIndex;
   QList<IRosterIndex *> FChilds;

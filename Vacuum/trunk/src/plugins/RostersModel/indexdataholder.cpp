@@ -38,7 +38,7 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
   
   case IRosterIndex::IT_Group:
   case IRosterIndex::IT_BlankGroup:
-  case IRosterIndex::IT_TransportsGroup:
+  case IRosterIndex::IT_AgentsGroup:
   case IRosterIndex::IT_MyResourcesGroup:
   case IRosterIndex::IT_NotInRosterGroup:
     switch (ARole)
@@ -73,7 +73,7 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
     } 
     break;
   
-  case IRosterIndex::IT_Transport:
+  case IRosterIndex::IT_Agent:
     switch (ARole)
     {
     case Qt::DisplayRole:

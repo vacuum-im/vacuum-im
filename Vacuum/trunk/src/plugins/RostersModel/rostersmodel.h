@@ -42,7 +42,7 @@ public:
   virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const;
   virtual bool removeRosterIndex(IRosterIndex *AIndex);
   virtual QString blankGroupName() const { return tr("Blank Group"); }
-  virtual QString transportsGroupName() const { return tr("Transports"); }
+  virtual QString agentsGroupName() const { return tr("Agents"); }
   virtual QString myResourcesGroupName() const { return tr("My Resources"); }
   virtual QString notInRosterGroupName() const { return tr("Not In Roster"); }
 signals:

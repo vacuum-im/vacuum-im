@@ -283,16 +283,16 @@ void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
   QString itemId = ARosterItem->jid().pFull();
   int itemType = IRosterIndex::IT_Contact;
   if (ARosterItem->jid().node().isEmpty())
-    itemType = IRosterIndex::IT_Transport;
+    itemType = IRosterIndex::IT_Agent;
 
   QString groupDelim = ARosterItem->roster()->groupDelimiter();
   int groupType; 
   QString groupDisplay;
   QSet<QString> itemGroups; 
-  if (itemType == IRosterIndex::IT_Transport)
+  if (itemType == IRosterIndex::IT_Agent)
   {
-    groupType = IRosterIndex::IT_TransportsGroup;
-    groupDisplay = transportsGroupName();
+    groupType = IRosterIndex::IT_AgentsGroup;
+    groupDisplay = agentsGroupName();
     itemGroups.insert(""); 
   }
   else if (ARosterItem->groups().isEmpty())
@@ -309,6 +309,7 @@ void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
 
   IRosterIndex *index;
   QHash<int,QVariant> data;
+  data.insert(IRosterIndex::DR_Type,itemType);
   data.insert(IRosterIndex::DR_RosterJid,ARosterItem->jid().pBare());     
   IRosterIndexList curItemList = streamRoot->findChild(data,true);
   QSet<QString> curGroups;
@@ -317,19 +318,18 @@ void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
   QSet<QString> newGroups = itemGroups - curGroups;
   QSet<QString> oldGroups = curGroups - itemGroups; 
 
-  bool resendPresence = false;
   IRosterIndexList itemList; 
-  QSet<QString>::const_iterator group = itemGroups.begin();
-  while (group!=itemGroups.end())
+  QString group;
+  foreach(group,itemGroups)
   {
     IRosterIndex *groupIndex;
     if (groupType != IRosterIndex::IT_Group)
       groupIndex = createGroup(groupDisplay,groupDelim,groupType,streamRoot);
     else 
-      groupIndex = createGroup(*group,groupDelim,groupType,streamRoot);
+      groupIndex = createGroup(group,groupDelim,groupType,streamRoot);
 
     IRosterIndexList groupItemList;
-    if (newGroups.contains(*group) && !oldGroups.isEmpty())
+    if (newGroups.contains(group) && !oldGroups.isEmpty())
     {
       IRosterIndex *oldGroupIndex;
       QString oldGroup = oldGroups.values().value(0);
@@ -343,20 +343,36 @@ void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
         foreach(index,groupItemList)
         {
           index->setParentIndex(groupIndex);
-          index->setData(IRosterIndex::DR_RosterGroup,*group);  
+          index->setData(IRosterIndex::DR_RosterGroup,group);  
         }
       }
     }
+    else
+      groupItemList = groupIndex->findChild(data);
 
     if (groupItemList.isEmpty())
     {
-      index = createRosterIndex(itemType,itemId,groupIndex);
-      index->setData(IRosterIndex::DR_Jid,ARosterItem->jid().bare());
-      index->setData(IRosterIndex::DR_StreamJid,ARosterItem->roster()->streamJid().pFull());     
-      index->setData(IRosterIndex::DR_RosterJid,ARosterItem->jid().pBare());
-      index->setData(IRosterIndex::DR_RosterGroup,*group); 
-      groupItemList.append(index); 
-      resendPresence = true;
+      int presIndex = 0;
+      QList<IPresenceItem *> presItems = streamPresence->items(ARosterItem->jid());
+      do 
+      {
+        index = createRosterIndex(itemType,itemId,groupIndex);
+        index->setData(IRosterIndex::DR_Jid,ARosterItem->jid().bare());
+        index->setData(IRosterIndex::DR_StreamJid,ARosterItem->roster()->streamJid().pFull());     
+        index->setData(IRosterIndex::DR_RosterJid,ARosterItem->jid().pBare());
+        index->setData(IRosterIndex::DR_RosterGroup,group); 
+        
+        IPresenceItem *presItem = presItems.value(presIndex++,NULL);
+        if (presItem)
+        {
+          index->setData(IRosterIndex::DR_Id,presItem->jid().pFull());
+          index->setData(IRosterIndex::DR_Jid,presItem->jid().full());
+          index->setData(IRosterIndex::DR_Show,presItem->show());
+          index->setData(IRosterIndex::DR_Status,presItem->status());
+          index->setData(IRosterIndex::DR_Priority,presItem->priority());
+        }
+        groupItemList.append(index); 
+      } while(presIndex < presItems.count());
     }
 
     foreach(index,groupItemList)
@@ -366,20 +382,11 @@ void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
       index->setData(IRosterIndex::DR_Ask,ARosterItem->ask());
       itemList.append(index);
     }
-    group++;
   }
 
   foreach(index,curItemList)
     if (!itemList.contains(index))
       removeRosterIndex(index);
-
-  if (resendPresence && streamPresence)
-  {
-    IPresenceItem *presItem;
-    QList<IPresenceItem *> presItems = streamPresence->items(ARosterItem->jid());
-    foreach(presItem,presItems)
-      onPresenceItem(presItem);
-  }
 }
 
 void RostersModel::onRosterItemRemoved(IRosterItem *ARosterItem)
@@ -450,7 +457,7 @@ void RostersModel::onPresenceItem(IPresenceItem *APresenceItem)
   if (APresenceItem->jid().equals(streamPresence->streamJid(),false))
     itemType = IRosterIndex::IT_MyResource; 
   else if (APresenceItem->jid().node().isEmpty())
-    itemType = IRosterIndex::IT_Transport; 
+    itemType = IRosterIndex::IT_Agent; 
 
   if (APresenceItem->show() == IPresence::Offline)
   {
@@ -466,7 +473,7 @@ void RostersModel::onPresenceItem(IPresenceItem *APresenceItem)
       {
         removeRosterIndex(index);
       }
-      else if (presItemCount == 1)
+      else
       {
         index->setData(IRosterIndex::DR_Id,APresenceItem->jid().pBare());
         index->setData(IRosterIndex::DR_Jid,APresenceItem->jid().bare());
@@ -480,7 +487,7 @@ void RostersModel::onPresenceItem(IPresenceItem *APresenceItem)
   {
     QHash<int,QVariant> data;
     data.insert(IRosterIndex::DR_Type,itemType);
-    data.insert(IRosterIndex::DR_Id,APresenceItem->jid().pFull());
+    data.insert(IRosterIndex::DR_RosterJid,APresenceItem->jid().pBare());
     IRosterIndexList indexList = streamRoot->findChild(data,true);
     IRosterIndex *index;
     foreach(index,indexList)
@@ -512,8 +519,8 @@ void RostersModel::onPresenceItem(IPresenceItem *APresenceItem)
         IRosterIndex *groupIndex = 0;
         if (itemType == IRosterIndex::IT_MyResource)
           groupIndex = createGroup(myResourcesGroupName(),groupDelim,IRosterIndex::IT_MyResourcesGroup,streamRoot);
-        else if (itemType == IRosterIndex::IT_Transport)
-          groupIndex = findGroup(transportsGroupName(),groupDelim,IRosterIndex::IT_Group,streamRoot);
+        else if (itemType == IRosterIndex::IT_Agent)
+          groupIndex = findGroup(agentsGroupName(),groupDelim,IRosterIndex::IT_AgentsGroup,streamRoot);
         else if (group.isEmpty()) 
           groupIndex = findGroup(blankGroupName(),groupDelim,IRosterIndex::IT_BlankGroup,streamRoot);
         else
