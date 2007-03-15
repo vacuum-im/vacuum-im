@@ -8,15 +8,15 @@ Settings::Settings(const QUuid &AUuid, ISettingsPlugin *ASettingsPlugin, QObject
 	: QObject(parent)
 {
   FUuid = AUuid;
-  FSettingsPlugin = ASettingsPlugin;
   FSettingsOpened = false;
+  FSettingsPlugin = ASettingsPlugin;
   connect(FSettingsPlugin->instance(),SIGNAL(profileOpened()),SLOT(onProfileOpened()));
   connect(FSettingsPlugin->instance(),SIGNAL(profileClosed()),SLOT(onProfileClosed()));
 }
 
 Settings::~Settings()
 {
-  qDebug() << "~Settings";
+
 }
 
 QVariant Settings::valueNS(const QString &AName, const QString &ANameNS, 

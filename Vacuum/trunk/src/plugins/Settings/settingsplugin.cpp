@@ -6,11 +6,11 @@
 SettingsPlugin::SettingsPlugin()
 {
   FProfileOpened = false;
+  FFile.setParent(this);
 }
 
 SettingsPlugin::~SettingsPlugin()
 {
-  qDebug() << "~SettingsPlugin";
   FCleanupHandler.clear(); 
 }
 
@@ -27,15 +27,9 @@ void SettingsPlugin::getPluginInfo(PluginInfo *info)
 bool SettingsPlugin::initPlugin(IPluginManager *APluginManager)
 {
   FPluginManager = APluginManager;
+  connect(FPluginManager->instance(),SIGNAL(aboutToQuit()),SLOT(onPluginManagerQuit()));
 
-  QObject *obj = FPluginManager->instance();
-  connect(obj,SIGNAL(aboutToQuit()),SLOT(onPluginManagerQuit()));
-
-  FFile.setParent(this);
-  bool ready = setFileName("config.xml");
-  if (!ready)
-    qDebug() << "CANT OPEN CONFIG FILE " << FFile.fileName();
-  return ready;
+  return setFileName("config.xml");
 }
 
 bool SettingsPlugin::startPlugin()
@@ -45,9 +39,9 @@ bool SettingsPlugin::startPlugin()
 }
 
 //ISettings
-ISettings *SettingsPlugin::newSettings(const QUuid &AUuid, QObject *parent)
+ISettings *SettingsPlugin::newSettings(const QUuid &APluginId, QObject *AParent)
 {
-  Settings *settings = new Settings(AUuid,this,parent);
+  Settings *settings = new Settings(APluginId,this,AParent);
   FCleanupHandler.add(settings); 
   return settings;
 }
@@ -57,33 +51,31 @@ bool SettingsPlugin::setFileName(const QString &AFileName)
   if (FFile.isOpen())
     FFile.close(); 
 
-  FFile.setFileName(AFileName);
-  if (!FFile.exists())
+  if (FProfileOpened)
   {
-    FFile.open(QIODevice::WriteOnly | QIODevice::Truncate);
-    FFile.close(); 
-    return true;
+    FProfileOpened = false;
+    emit profileClosed();
   }
 
-  if (FFile.open(QIODevice::ReadOnly))
-  {
-    if (FProfileOpened)
-    {
-      FProfileOpened = false;
-      emit profileClosed();
-    }
+  FFile.setFileName(AFileName);
 
+  if (!FFile.exists())
+  {
+    if (FFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+      FFile.close(); 
+      return true;
+    }
+  }
+  else if (FFile.open(QIODevice::ReadOnly))
+  {
     if (FFile.size() == 0 || FSettings.setContent(FFile.readAll(),true))
     {
       FFile.close();
       return true;
     }
-
-    qDebug() << "WRONG SETTINGS FORMAT IN:" << AFileName;
     FFile.close();
-    return false;
   }
-  qDebug() << "CANT OPEN SETTINGS IN FILE" << FFile.fileName(); 
   return false;
 }
 
@@ -98,7 +90,6 @@ bool SettingsPlugin::saveSettings()
     FFile.close(); 
     return true;
   }
-  qDebug() << "CANT SAVE SETTINGS TO FILE" << FFile.fileName(); 
   return false;
 }
 
@@ -152,18 +143,17 @@ QDomElement SettingsPlugin::getPluginNode(const QUuid &AId)
   if (FProfile.isNull())
     return QDomElement();
 
-  QDomNode node = FProfile.firstChild();  
-  while (!node.isNull())
+  QDomElement elem = FProfile.firstChildElement("plugin");  
+  while (!elem.isNull() && elem.attribute("uid") != AId)
+    elem = elem.nextSiblingElement("plugin");
+
+  if (elem.isNull())
   {
-    if (node.isElement())
-      if (node.toElement().tagName() == "plugin")
-        if (node.toElement().attribute("uid") == AId)
-          return node.toElement(); 
-    node = node.nextSibling(); 
+    elem = FProfile.appendChild(FSettings.createElement("plugin")).toElement();
+    elem.setAttribute("uid",AId.toString()); 
   }
-  node = FProfile.appendChild(FSettings.createElement("plugin"));
-  node.toElement().setAttribute("uid",AId.toString()); 
-  return node.toElement();
+
+  return elem;
 }
 
 void SettingsPlugin::onPluginManagerQuit()

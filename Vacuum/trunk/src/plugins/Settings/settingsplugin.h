@@ -30,15 +30,15 @@ public:
 	virtual bool startPlugin();
 
   //ISettings
-  virtual ISettings *newSettings(const QUuid &AUuid, QObject *parent);
+  virtual ISettings *newSettings(const QUuid &APluginId, QObject *AParent);
   virtual QString fileName() const { return FFile.fileName(); }
-  virtual bool setFileName(const QString &);
+  virtual bool setFileName(const QString &AFileName);
   virtual bool saveSettings();
   virtual QDomDocument document() const { return FSettings; }
   virtual QString profile() const { return FProfile.tagName(); }
-  virtual QDomElement setProfile(const QString &);
-  virtual QDomElement getProfile(const QString &);
-  virtual QDomElement getPluginNode(const QUuid &);
+  virtual QDomElement setProfile(const QString &AProfile);
+  virtual QDomElement getProfile(const QString &AProfile);
+  virtual QDomElement getPluginNode(const QUuid &AId);
 signals:
   virtual void profileOpened();
   virtual void profileClosed();
