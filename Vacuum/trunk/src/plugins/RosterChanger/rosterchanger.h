@@ -5,6 +5,7 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/iroster.h"
 #include "../../utils/menu.h"
+#include "../../utils/skin.h"
 
 #define ROSTERCHANGER_UUID "{018E7891-2743-4155-8A70-EAB430573500}"
 
@@ -30,19 +31,27 @@ public:
   virtual bool startPlugin();
 
   //IRosterChanger
+protected:
+  Menu *createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
+    bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
 protected slots:
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
+  //Operations on items
   void onRenameItem(bool);
   void onCopyItemToGroup(bool);
   void onMoveItemToGroup(bool);
   void onRemoveItemFromGroup(bool);
+  void onRemoveItemFromRoster(bool);
+  //Operations on group
   void onRenameGroup(bool);
+  void onCopyGroupToGroup(bool);
+  void onMoveGroupToGroup(bool);
   void onRemoveGroup(bool);
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
-    
+  SkinIconset FSystemIconset;    
 };
 
 #endif // ROSTERCHANGER_H
