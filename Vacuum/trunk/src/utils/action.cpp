@@ -7,6 +7,7 @@ Action::Action(int AOrder, QObject *AParent)
   : QAction(AParent)
 {
   FOrder = AOrder;
+  FMenu = NULL;
 }
 
 Action::~Action()
@@ -28,6 +29,11 @@ void Action::setData(int ARole, const QVariant &AData)
     FData.remove(ARole);
 }
 
+void Action::setData(const QHash<int,QVariant> &AData)
+{
+  FData.unite(AData);
+}
+
 QVariant Action::data(int ARole) const
 {
   return FData.value(ARole);
@@ -35,9 +41,13 @@ QVariant Action::data(int ARole) const
 
 void Action::setMenu(Menu *AMenu)
 {
-  setIcon(AMenu->icon());
-  setText(AMenu->title());
-  setToolTip(AMenu->toolTip());
-  setWhatsThis(AMenu->whatsThis());
+  FMenu = AMenu;
+  if (AMenu)
+  {
+    setIcon(AMenu->icon());
+    setText(AMenu->title());
+    setToolTip(AMenu->toolTip());
+    setWhatsThis(AMenu->whatsThis());
+  }
   QAction::setMenu(AMenu);
 }
