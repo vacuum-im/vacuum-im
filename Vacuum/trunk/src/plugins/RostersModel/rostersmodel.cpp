@@ -21,7 +21,7 @@ RostersModel::RostersModel(QObject *parent)
 
 RostersModel::~RostersModel()
 {
-  qDebug() << "~RostersModel";
+
 }
 
 QModelIndex RostersModel::index(int ARow, int AColumn, const QModelIndex &AParent) const
@@ -280,7 +280,7 @@ void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
   IPresence *streamPresence = streamItem.presence;
   IRosterIndex *streamRoot = streamItem.root;
 
-  QString itemId = ARosterItem->jid().pFull();
+  QString rosterJid = ARosterItem->jid().pBare();
   int itemType = IRosterIndex::IT_Contact;
   if (ARosterItem->jid().node().isEmpty())
     itemType = IRosterIndex::IT_Agent;
@@ -310,7 +310,7 @@ void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
   IRosterIndex *index;
   QHash<int,QVariant> data;
   data.insert(IRosterIndex::DR_Type,itemType);
-  data.insert(IRosterIndex::DR_RosterJid,ARosterItem->jid().pBare());     
+  data.insert(IRosterIndex::DR_RosterJid,rosterJid);     
   IRosterIndexList curItemList = streamRoot->findChild(data,true);
   QSet<QString> curGroups;
   foreach(index,curItemList)
@@ -356,10 +356,10 @@ void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
       QList<IPresenceItem *> presItems = streamPresence->items(ARosterItem->jid());
       do 
       {
-        index = createRosterIndex(itemType,itemId,groupIndex);
+        index = createRosterIndex(itemType,rosterJid,groupIndex);
         index->setData(IRosterIndex::DR_Jid,ARosterItem->jid().bare());
-        index->setData(IRosterIndex::DR_StreamJid,ARosterItem->roster()->streamJid().pFull());     
-        index->setData(IRosterIndex::DR_RosterJid,ARosterItem->jid().pBare());
+        index->setData(IRosterIndex::DR_StreamJid,streamJid);     
+        index->setData(IRosterIndex::DR_RosterJid,rosterJid);
         index->setData(IRosterIndex::DR_RosterGroup,group); 
         
         IPresenceItem *presItem = presItems.value(presIndex++,NULL);
@@ -596,7 +596,6 @@ void RostersModel::onIndexChildInserted(IRosterIndex *)
 void RostersModel::onIndexChildAboutToBeRemoved(IRosterIndex *AIndex)
 {
   IRosterIndex *parentIndex = AIndex->parentIndex();
-  //qDebug() << "Remove from" << parentIndex->id() << parentIndex->row() << "index" << AIndex->id() << AIndex->row();
   if (parentIndex)
   {
     beginRemoveRows(createIndex(parentIndex->row(),0,parentIndex),AIndex->row(),AIndex->row());
