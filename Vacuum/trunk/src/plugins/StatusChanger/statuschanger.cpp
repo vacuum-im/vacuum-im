@@ -5,7 +5,7 @@ StatusChanger::StatusChanger()
   FBaseShow = IPresence::Error;
   FStatusIconset.openFile("status/common.jisp");
   FPresencePlugin = NULL;
-  //FRosterPlugin = NULL;
+  FRosterPlugin = NULL;
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
   connect(&FStatusIconset,SIGNAL(reseted(const QString &)),SLOT(onSkinChanged(const QString &)));
@@ -41,22 +41,23 @@ bool StatusChanger::initPlugin(IPluginManager *APluginManager)
     {
       connect(plugin->instance(),SIGNAL(presenceAdded(IPresence *)),
         SLOT(onPresenceAdded(IPresence *)));
-      connect(plugin->instance(),SIGNAL(presenceOpened(IPresence *)),
-        SLOT(onPresenceOpened(IPresence *)));
       connect(plugin->instance(),SIGNAL(selfPresence(IPresence *, IPresence::Show, const QString &, qint8, const Jid &)),
         SLOT(onSelfPresence(IPresence *, IPresence::Show, const QString &, qint8, const Jid &)));
-      connect(plugin->instance(),SIGNAL(presenceClosed(IPresence *)),
-        SLOT(onPresenceClosed(IPresence *)));
       connect(plugin->instance(),SIGNAL(presenceRemoved(IPresence *)),
         SLOT(onPresenceRemoved(IPresence *)));
     }
   }
 
-  //plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
-  //if (plugin)
-  //{
-  //  FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-  //}
+  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+    if (FRosterPlugin)
+    {
+      connect(FRosterPlugin->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
+      connect(FRosterPlugin->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
+    }
+  }
 
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
@@ -136,6 +137,16 @@ void StatusChanger::setPresence(IPresence::Show AShow, const QString &AStatus,
 
     if (AShow == IPresence::Offline && presence->xmppStream()->isOpen())
       presence->xmppStream()->close();
+  }
+}
+
+void StatusChanger::startPresence(IPresence *APresence)
+{
+  if (FWaitOnline.contains(APresence))
+  {
+    PresenceItem item = FWaitOnline.value(APresence);
+    APresence->setPresence(item.show,item.status,item.priority,Jid());
+    FWaitOnline.remove(APresence);
   }
 }
 
@@ -382,16 +393,6 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
   addStreamMenu(APresence);
 }
 
-void StatusChanger::onPresenceOpened(IPresence *APresence)
-{
-  if (FWaitOnline.contains(APresence))
-  {
-    PresenceItem item = FWaitOnline.value(APresence);
-    APresence->setPresence(item.show,item.status,item.priority,Jid());
-    FWaitOnline.remove(APresence);
-  }
-}
-
 void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
                                    const QString &, qint8 , const Jid &)
 {
@@ -415,11 +416,6 @@ void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
       setBaseShow(AShow);
   }
   updateMenu(APresence);
-}
-
-void StatusChanger::onPresenceClosed(IPresence *APresence)
-{
-  FWaitOnline.remove(APresence);
 }
 
 void StatusChanger::onPresenceRemoved(IPresence *APresence)
@@ -448,6 +444,18 @@ void StatusChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       AMenu->addAction(action);
     }
   }
+}
+
+void StatusChanger::onRosterOpened(IRoster *ARoster)
+{
+  IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
+  startPresence(presence);
+}
+
+void StatusChanger::onRosterClosed(IRoster *ARoster)
+{
+  IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
+  FWaitOnline.remove(presence);
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

@@ -41,6 +41,7 @@ public:
   virtual void setPresence(IPresence::Show AShow, const QString &AStatus, 
     int APriority, const Jid &AStreamJid = Jid());
 protected:
+  void startPresence(IPresence *APresence);
   void setBaseShow(IPresence::Show AShow);
   void createStatusActions(IPresence *APresence = NULL);
   void updateMenu(IPresence *APresence = NULL);
@@ -53,16 +54,16 @@ protected:
 protected slots:
   void onStatusTriggered(bool);
   void onPresenceAdded(IPresence *APresence);
-  void onPresenceOpened(IPresence *APresence);
   void onSelfPresence(IPresence *, IPresence::Show AShow, 
     const QString &, qint8 , const Jid &);
-  void onPresenceClosed(IPresence *APresence);
   void onPresenceRemoved(IPresence *APresence);
   void onSkinChanged(const QString &ASkinName);
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
+  void onRosterOpened(IRoster *ARoster);
+  void onRosterClosed(IRoster *ARoster);
 private:
   IPresencePlugin *FPresencePlugin;
-  //IRosterPlugin *FRosterPlugin;
+  IRosterPlugin *FRosterPlugin;
   IMainWindowPlugin *FMainWindowPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
