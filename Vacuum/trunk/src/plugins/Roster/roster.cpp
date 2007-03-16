@@ -4,18 +4,18 @@
 Roster::Roster(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject *parent) 
   : QObject(parent)
 {
-  connect(AStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-  connect(AStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
   FStream = AStream;
   FStanzaProcessor = AStanzaProcessor;
   FOpen = false;
   FRosterHandler = 0;
   FSubscrHandler = 0;
+  connect(FStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
+  connect(FStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
 }
 
 Roster::~Roster()
 {
-  qDebug() << "~Roster";
+
 }
 
 bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
@@ -47,10 +47,11 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
           RosterItem *rosterItem = (RosterItem *)item(itemJid);
           if (!rosterItem)
           {
-            if (!itemJid.node().isEmpty())  
-              rosterItem = new RosterItem(itemJid.bare(),this);
-            else
-              rosterItem = new RosterItem(itemJid,this);
+            //if (!itemJid.node().isEmpty())  
+            //  rosterItem = new RosterItem(itemJid.bare(),this);
+            //else
+            //  rosterItem = new RosterItem(itemJid,this);
+            rosterItem = new RosterItem(itemJid.bare(),this);
             FItems.append(rosterItem); 
           }
           rosterItem->setName(stanzaItem.attribute("name"));
@@ -127,6 +128,7 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
 
 void Roster::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
 {
+  Q_UNUSED(AStreamJid);
   if (!FGroupDelimId.isEmpty() && AStanza.id() == FGroupDelimId)
   {
     FGroupDelimId.clear();
