@@ -40,6 +40,8 @@ public:
   virtual IPresence::Show baseShow() const { return FBaseShow; }
   virtual void setPresence(IPresence::Show AShow, const QString &AStatus, 
     int APriority, const Jid &AStreamJid = Jid());
+public slots:
+  void onChangeStatus(bool);
 protected:
   void startPresence(IPresence *APresence);
   void setBaseShow(IPresence::Show AShow);
@@ -52,7 +54,6 @@ protected:
   QString getStatusText(IPresence::Show AShow) const;
   int getStatusPriority(IPresence::Show AShow) const;
 protected slots:
-  void onStatusTriggered(bool);
   void onPresenceAdded(IPresence *APresence);
   void onSelfPresence(IPresence *, IPresence::Show AShow, 
     const QString &, qint8 , const Jid &);

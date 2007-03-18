@@ -133,10 +133,26 @@ void StatusChanger::setPresence(IPresence::Show AShow, const QString &AStatus,
         FWaitOnline.insert(presence,item);
         presence->xmppStream()->open();
       }
-    };
+    }
 
-    if (AShow == IPresence::Offline && presence->xmppStream()->isOpen())
+    if (AShow == IPresence::Offline)
+    {
       presence->xmppStream()->close();
+      FWaitOnline.remove(presence);
+    }
+  }
+}
+
+void StatusChanger::onChangeStatus(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QString streamJid = action->data(Action::DR_StreamJid).toString();
+    IPresence::Show show = (IPresence::Show)action->data(Action::DR_Parametr1).toInt();
+    QString status = action->data(Action::DR_Parametr2).toString();
+    int priority = action->data(Action::DR_Parametr3).toInt();
+    setPresence(show,status,priority,streamJid);
   }
 }
 
@@ -176,7 +192,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Online));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Online));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
   menu->addAction(action);
 
   action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
@@ -186,7 +202,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Chat));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Chat));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
   menu->addAction(action);
 
   action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
@@ -196,7 +212,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Away));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Away));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
   menu->addAction(action);
 
   action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
@@ -206,7 +222,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::ExtendedAway));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::ExtendedAway));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
   menu->addAction(action);
 
   action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
@@ -216,7 +232,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::DoNotDistrib));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::DoNotDistrib));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
   menu->addAction(action);
 
   action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
@@ -226,7 +242,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Invisible));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Invisible));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
   menu->addAction(action);
 
   action = new Action(STATUSMENU_MENU_MAIN_ORDER,menu);
@@ -236,7 +252,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Offline));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Offline));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onStatusTriggered(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
   menu->addAction(action);
 }
 
@@ -245,7 +261,7 @@ void StatusChanger::updateMenu(IPresence *APresence)
   if (!APresence)
   {
     FMenu->setIcon(getStatusIcon(FBaseShow));
-    FMenu->setTitle(getStatusText(FBaseShow));
+    FMenu->setTitle(getStatusName(FBaseShow));
   }
   else if (FStreamMenus.contains(APresence))
   {
@@ -372,19 +388,6 @@ int StatusChanger::getStatusPriority(IPresence::Show AShow) const
     return 0;
   }
   return -1;
-}
-
-void StatusChanger::onStatusTriggered(bool)
-{
-  Action *action = qobject_cast<Action *>(sender());
-  if (action)
-  {
-    QString streamJid = action->data(Action::DR_StreamJid).toString();
-    IPresence::Show show = (IPresence::Show)action->data(Action::DR_Parametr1).toInt();
-    QString status = action->data(Action::DR_Parametr2).toString();
-    int priority = action->data(Action::DR_Parametr3).toInt();
-    setPresence(show,status,priority,streamJid);
-  }
 }
 
 void StatusChanger::onPresenceAdded(IPresence *APresence)
