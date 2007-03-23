@@ -41,9 +41,8 @@ public:
   virtual void setPresence(IPresence::Show AShow, const QString &AStatus, 
     int APriority, const Jid &AStreamJid = Jid());
 public slots:
-  void onChangeStatus(bool);
+  virtual void onChangeStatus(bool);
 protected:
-  void startPresence(IPresence *APresence);
   void setBaseShow(IPresence::Show AShow);
   void createStatusActions(IPresence *APresence = NULL);
   void updateMenu(IPresence *APresence = NULL);

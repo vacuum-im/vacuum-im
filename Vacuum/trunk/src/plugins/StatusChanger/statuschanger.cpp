@@ -122,23 +122,26 @@ void StatusChanger::setPresence(IPresence::Show AShow, const QString &AStatus,
 
   foreach(presence,presences)
   {
-    if (!presence->setPresence(AShow,AStatus,APriority,Jid()))
-    {
-      if (!presence->xmppStream()->isOpen() && AShow != IPresence::Offline)
-      {
-        PresenceItem item;
-        item.show = AShow;
-        item.status = AStatus;
-        item.priority = APriority;
-        FWaitOnline.insert(presence,item);
-        presence->xmppStream()->open();
-      }
-    }
-
     if (AShow == IPresence::Offline)
     {
+      presence->setPresence(AShow,AStatus,APriority,Jid());
       presence->xmppStream()->close();
       FWaitOnline.remove(presence);
+    }
+    else if (!FWaitOnline.contains(presence))
+    {
+      if (!presence->setPresence(AShow,AStatus,APriority,Jid()))
+      {
+        if (!presence->xmppStream()->isOpen())
+        {
+          PresenceItem item;
+          item.show = AShow;
+          item.status = AStatus;
+          item.priority = APriority;
+          FWaitOnline.insert(presence,item);
+          presence->xmppStream()->open();
+        }
+      }
     }
   }
 }
@@ -153,16 +156,6 @@ void StatusChanger::onChangeStatus(bool)
     QString status = action->data(Action::DR_Parametr2).toString();
     int priority = action->data(Action::DR_Parametr3).toInt();
     setPresence(show,status,priority,streamJid);
-  }
-}
-
-void StatusChanger::startPresence(IPresence *APresence)
-{
-  if (FWaitOnline.contains(APresence))
-  {
-    PresenceItem item = FWaitOnline.value(APresence);
-    APresence->setPresence(item.show,item.status,item.priority,Jid());
-    FWaitOnline.remove(APresence);
   }
 }
 
@@ -399,6 +392,7 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
 void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
                                    const QString &, qint8 , const Jid &)
 {
+  FWaitOnline.remove(APresence);
   if (AShow != FBaseShow)
   {
     if (AShow == IPresence::Offline || AShow == IPresence::Error)
@@ -452,7 +446,12 @@ void StatusChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
 void StatusChanger::onRosterOpened(IRoster *ARoster)
 {
   IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
-  startPresence(presence);
+  if (FWaitOnline.contains(presence))
+  {
+    PresenceItem item = FWaitOnline.value(presence);
+    presence->setPresence(item.show,item.status,item.priority,Jid());
+    FWaitOnline.remove(presence);
+  }
 }
 
 void StatusChanger::onRosterClosed(IRoster *ARoster)
