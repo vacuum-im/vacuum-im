@@ -3,9 +3,16 @@
 
 RostersViewPlugin::RostersViewPlugin()
 {
+  FStatusIconset.openFile("status/common.jisp");
   FRostersModelPlugin = 0;
   FMainWindowPlugin = 0;
   FRostersView = 0;
+
+  FShowOffline = new Action(500,this);
+  FShowOffline->setIcon(FStatusIconset.iconByName("offline"));
+  FShowOffline->setToolTip(tr("Show offline contacts"));
+  FShowOffline->setCheckable(true);
+  FShowOffline->setChecked(true);
 }
 
 RostersViewPlugin::~RostersViewPlugin()
@@ -39,7 +46,12 @@ bool RostersViewPlugin::initPlugin(IPluginManager *APluginManager)
 bool RostersViewPlugin::startPlugin()
 {
   if (FRostersModelPlugin && FMainWindowPlugin)
+  {
     FMainWindowPlugin->mainWindow()->rostersWidget()->insertWidget(0,rostersView());
+    FMainWindowPlugin->mainWindow()->topToolBar()->addAction(FShowOffline);
+    connect(FShowOffline,SIGNAL(triggered(bool)),FRostersView,SLOT(setShowOfflineContacts(bool)));
+    connect(FRostersView,SIGNAL(showOfflineContactsChanged(bool)),SLOT(onShowOfflineContactsChanged(bool)));
+  }
   return true;
 }
 
@@ -49,6 +61,11 @@ IRostersView *RostersViewPlugin::rostersView()
     FRostersView = new RostersView(FRostersModelPlugin->rostersModel(),0);
 
   return FRostersView;
+}
+
+void RostersViewPlugin::onShowOfflineContactsChanged(bool AShow)
+{
+  FShowOffline->setChecked(AShow);
 }
 
 Q_EXPORT_PLUGIN2(RostersViewPlugin, RostersViewPlugin)

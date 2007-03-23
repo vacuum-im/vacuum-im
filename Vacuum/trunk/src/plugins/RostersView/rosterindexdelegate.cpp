@@ -4,7 +4,6 @@
 RosterIndexDelegate::RosterIndexDelegate(QObject *AParent)
   : QItemDelegate(AParent)
 {
-  FRostersView = qobject_cast<IRostersView *>(AParent);
   FRosterIconset.openFile("roster/common.jisp");
 }
 
@@ -17,13 +16,6 @@ void RosterIndexDelegate::paint(QPainter *APainter,
                                 const QStyleOptionViewItem &AOption,  
                                 const QModelIndex &AIndex) const
 {
-  IRosterIndex *rosterIndex = static_cast<IRosterIndex *>(AIndex.internalPointer());
-  if (rosterIndex && rosterIndex->itemDelegate())
-  {
-    rosterIndex->itemDelegate()->paint(APainter,AOption,AIndex);
-    return;
-  }
-
   QStyleOptionViewItem option = setOptions(AIndex,AOption);
 
   QRect freeRect = option.rect;
@@ -31,10 +23,8 @@ void RosterIndexDelegate::paint(QPainter *APainter,
 
   drawBackground(APainter,option,AIndex,option.rect);
 
-  QRect usedRect = drawBranches(APainter,option,AIndex,freeRect); 
-  if (!usedRect.isNull())
-    freeRect.setLeft(usedRect.right()+1);
-  
+  QRect usedRect;
+
   usedRect = drawDecoration(APainter,option,AIndex,freeRect); 
   if (!usedRect.isNull())
     freeRect.setLeft(usedRect.right()+1);
@@ -51,10 +41,6 @@ void RosterIndexDelegate::paint(QPainter *APainter,
 QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption,  
                                     const QModelIndex &AIndex) const
 {
-  IRosterIndex *rosterIndex = static_cast<IRosterIndex *>(AIndex.internalPointer());
-  if (rosterIndex && rosterIndex->itemDelegate())
-    return rosterIndex->itemDelegate()->sizeHint(AOption,AIndex);
-
   return QItemDelegate::sizeHint(AOption,AIndex);
 }
 
@@ -63,29 +49,6 @@ QRect RosterIndexDelegate::drawBackground(QPainter *APainter, const QStyleOption
 {
   QItemDelegate::drawBackground(APainter,AOption,AIndex);
   return AOption.rect;
-}
-
-QRect RosterIndexDelegate::drawBranches(QPainter *APainter, const QStyleOptionViewItem &AOption,  
-                                        const QModelIndex &AIndex, const QRect &ARect) const
-{
-  QVariant data = AIndex.data(IRosterIndex::DR_ShowGroupExpander);
-  if (data.isValid() && data.toBool())
-  {
-    QIcon icon;
-    if (FRostersView->isExpanded(AIndex))
-      icon = FRosterIconset.iconByName("groupOpen");
-    else
-      icon = FRosterIconset.iconByName("groupClosed");
-    if (!icon.isNull())
-    {
-      QSize iconSize = icon.actualSize(AOption.decorationSize,getIconMode(AOption.state),getIconState(AOption.state));
-      QRect iconRect = ARect.intersected(QRect(ARect.topLeft(),iconSize));
-      QPixmap iconPixmap = icon.pixmap(iconSize,getIconMode(AOption.state),getIconState(AOption.state));
-      QItemDelegate::drawDecoration(APainter,AOption,iconRect,iconPixmap);
-      return iconRect;
-    }
-  }
-  return QRect();
 }
 
 QRect RosterIndexDelegate::drawDecoration(QPainter *APainter, const QStyleOptionViewItem &AOption,  

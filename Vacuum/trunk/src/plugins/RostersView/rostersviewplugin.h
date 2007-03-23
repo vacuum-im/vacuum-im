@@ -6,6 +6,8 @@
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/irostersview.h"
+#include "../../utils/action.h"
+#include "../../utils/skin.h"
 #include "rostersview.h"
 
 #define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"
@@ -32,12 +34,17 @@ public:
 
   //IRostersViewPlugin
   virtual IRostersView *rostersView();
-
+  virtual Action *showOfflineAction() const { return FShowOffline; }
+public slots:
+  virtual void onShowOfflineContactsChanged(bool AShow);
 private:
   IRostersModelPlugin *FRostersModelPlugin;
   IMainWindowPlugin *FMainWindowPlugin;
 private:
-  RostersView *FRostersView;   
+  Action *FShowOffline;
+private:
+  SkinIconset FStatusIconset;
+  RostersView *FRostersView; 
 };
 
 #endif // ROSTERSVIEWPLUGIN_H

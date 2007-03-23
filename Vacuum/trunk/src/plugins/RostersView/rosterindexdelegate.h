@@ -22,8 +22,6 @@ public:
 protected:
   virtual QRect drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QModelIndex &AIndex, const QRect &ARect) const;
-  virtual QRect drawBranches(QPainter *APainter, const QStyleOptionViewItem &AOption, 
-    const QModelIndex &AIndex, const QRect &ARect) const;
   virtual QRect drawDecoration(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QModelIndex &AIndex, const QRect &ARect) const;
   virtual QRect drawDisplay(QPainter *APainter, const QStyleOptionViewItem &AOption, 
@@ -35,8 +33,6 @@ protected:
 private:
   static QIcon::Mode getIconMode(QStyle::State AState);
   static QIcon::State getIconState(QStyle::State AState);
-private:
-  IRostersView *FRostersView;
 private:
   SkinIconset FRosterIconset;
 };
