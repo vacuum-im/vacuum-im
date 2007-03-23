@@ -7,6 +7,9 @@
 #include "utilsexport.h"
 #include "action.h"
 
+#define DEFAULT_ACTION_GROUP 500
+#define NULL_ACTION_GROUP -1
+
 class Action;
 
 class UTILS_EXPORT Menu : 
@@ -15,13 +18,14 @@ class UTILS_EXPORT Menu :
   Q_OBJECT;
 
 public:
-  Menu(int AOrder, QWidget *AParent = NULL);
+  Menu(QWidget *AParent = NULL);
   ~Menu();
 
-  int order() const { return FOrder; }
-  void addAction(Action *AAction);
-  void addMenuActions(const Menu *AMenu);
+  void addAction(Action *AAction, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
+  void addMenuActions(const Menu *AMenu, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
   void removeAction(Action *AAction);
+  int actionGroup(const Action *AAction) const;
+  QList<Action *> actions(int AGroup = NULL_ACTION_GROUP) const;
   void clear();
   Action *menuAction();
   void setIcon(const QIcon &AIcon);
@@ -31,15 +35,12 @@ signals:
   void removedAction(QAction *);
 protected slots:
   void onMenuActionTriggered(bool);
+  void onActionDestroyed(QObject *AAction);
 private:
-  typedef QMultiMap<int,QPointer<Action>> ActionList;
-  ActionList::iterator findAction(const Action *AAction); 
-  void clearNullActions();
-  QAction *findOrderSeparator(int AOrder) const;
-private:
-  int FOrder;
-  Action *FMenuAction;
+  typedef QMultiMap<int,Action *> ActionList;
   ActionList FActions;
+  QMap<int,QAction *> FSeparators;
+  Action *FMenuAction;
 };
 
 #endif // MENU_H

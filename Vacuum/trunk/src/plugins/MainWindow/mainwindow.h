@@ -7,8 +7,7 @@
 #include "../../utils/menu.h"
 #include "../../utils/skin.h"
 
-#define MAINWINDOW_MENU_MAIN_ORDER 0
-#define MAINWINDOW_ACTION_QUIT_ORDER 1000
+#define MAINWINDOW_ACTION_GROUP_QUIT 1000
 
 class MainWindow : 
   virtual public QMainWindow,

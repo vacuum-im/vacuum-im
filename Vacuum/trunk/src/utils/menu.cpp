@@ -1,10 +1,9 @@
 #include <QtDebug>
 #include "menu.h"
 
-Menu::Menu(int AOrder, QWidget *AParent)
+Menu::Menu(QWidget *AParent)
   : QMenu(AParent)
 {
-  FOrder = AOrder;
   FMenuAction = NULL;
   setSeparatorsCollapsible(true);
 }
@@ -14,74 +13,79 @@ Menu::~Menu()
 
 }
 
-void Menu::addAction(Action *AAction)
+void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 {
-  if (!AAction)
-    return;
-
-  clearNullActions();
-
-  ActionList::iterator i = findAction(AAction);
-  if (i == FActions.end())
+  ActionList::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
+  if (it != FActions.end())
   {
-    i = FActions.find(AAction->order());  
-    if (i == FActions.end())  
+    if (FActions.values(it.key()).count() == 1)
+      FSeparators.remove(it.key());
+    FActions.erase(it);
+    QMenu::removeAction(AAction);  
+  }
+
+  it = FActions.find(AGroup);  
+  if (it == FActions.end())  
+  {
+    it = FActions.lowerBound(AGroup);
+    if (it != FActions.end())
     {
-      i = FActions.lowerBound(AAction->order());
-      if (i == FActions.end())
-        QMenu::addAction(AAction); 
-      else
-        QMenu::insertAction(findOrderSeparator(i.value()->order()),AAction);
-      insertSeparator(AAction)->setData(AAction->order());
+      QAction *sepataror = FSeparators.value(it.key()); 
+      QMenu::insertAction(sepataror,AAction);
     }
     else
+      QMenu::addAction(AAction); 
+    FSeparators.insert(AGroup,insertSeparator(AAction));
+  }
+  else
+  {
+    QAction *befour = NULL;
+    if (ASort)
     {
-      int index = 0; 
-      QAction *action = NULL;
-      QList<QAction *> actionList = actions();
-      while(index<actionList.count() && !action)
+      while (!befour && it != FActions.end() && it.key() == AGroup)
       {
-        action = actionList.at(index);
-        if (!action->isSeparator() || action->data().toInt() <= AAction->order())
-          action = NULL;
-        index++;
+        if (QString::localeAwareCompare(it.value()->text(),AAction->text()) > 0)
+          befour = it.value();
+        it++;
       }
-      if (action)
-        QMenu::insertAction(action,AAction); 
-      else
-        QMenu::addAction(AAction); 
     }
 
-    FActions.insertMulti(AAction->order(),AAction);
-  
-    emit addedAction(AAction);
+    if (!befour)
+    {
+      QMap<int,QAction *>::const_iterator sepIt= FSeparators.upperBound(AGroup);
+      if (sepIt != FSeparators.constEnd())
+        befour = sepIt.value();
+    }
+
+    if (befour)
+      QMenu::insertAction(befour,AAction); 
+    else
+      QMenu::addAction(AAction); 
   }
+
+  FActions.insertMulti(AGroup,AAction);
+  connect(AAction,SIGNAL(destroyed(QObject *)),SLOT(onActionDestroyed(QObject *)));
+  emit addedAction(AAction);
 }
 
-void Menu::addMenuActions(const Menu *AMenu)
+void Menu::addMenuActions(const Menu *AMenu, int AGroup, bool ASort)
 {
-  QAction *qaction;
-  QList<QAction *> actionList = AMenu->actions();
-  foreach(qaction,actionList)
-  {
-    Action *action = qobject_cast<Action *>(qaction);
-    if (action)
-      addAction(action);
-    else
-      QMenu::addAction(qaction);
-  }
+  Action *action;
+  QList<Action *> actionList = AMenu->actions(AGroup);
+  foreach(action,actionList)
+    addAction(action,AMenu->actionGroup(action),ASort);
 }
 
 Action *Menu::menuAction()
 {
   if (!FMenuAction)
   {
-    FMenuAction = new Action(order(),this);
+    FMenuAction = new Action(this);
     FMenuAction->setMenu(this);
+    FMenuAction->setIcon(icon());
+    FMenuAction->setText(title());
     connect(FMenuAction,SIGNAL(triggered(bool)),SLOT(onMenuActionTriggered(bool)));
   }
-  FMenuAction->setIcon(icon());
-  FMenuAction->setText(title());
   FMenuAction->setToolTip(toolTip());
   FMenuAction->setWhatsThis(whatsThis()); 
   return FMenuAction;
@@ -103,74 +107,54 @@ void Menu::setTitle(const QString &ATitle)
 
 void Menu::removeAction(Action *AAction)
 {
-  clearNullActions();
-
-  ActionList::iterator i = findAction(AAction);
-  if (i != FActions.end())
+  ActionList::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
+  if (it != FActions.end())
   {
+    disconnect(AAction,SIGNAL(destroyed(QObject *)),this,SLOT(onActionDestroyed(QObject *)));
+
     emit removedAction(AAction);
 
-    if (FActions.values(AAction->order()).count() == 1)
-      QMenu::removeAction(findOrderSeparator(AAction->order()));  
+    if (FActions.values(it.key()).count() == 1)
+    {
+      QAction *separator = FSeparators.value(it.key());
+      FSeparators.remove(it.key());
+      QMenu::removeAction(separator);  
+    }
 
-    FActions.erase(i);
+    FActions.erase(it);
     QMenu::removeAction(AAction); 
   }
 }
 
+int Menu::actionGroup(const Action *AAction) const
+{
+  ActionList::const_iterator it = qFind(FActions.begin(),FActions.end(),AAction);
+  if (it != FActions.constEnd())
+    return it.key();
+  return NULL_ACTION_GROUP;
+}
+
+QList<Action *> Menu::actions(int AGroup) const
+{
+  if (AGroup != NULL_ACTION_GROUP)
+    return FActions.values();
+  return FActions.values(AGroup);
+}
+
 void Menu::clear() 
 {
-  QPointer<Action> action;
+  Action * action;
   foreach(action,FActions)
   {
-    if (!action.isNull())
-    {
-      Menu *menu = action->menu();
-      if (menu && menu->parent() == this)
-        delete menu;
-      else if (action->parent() == this)
-        delete action;
-    }
+    Menu *menu = action->menu();
+    if (menu && menu->parent() == this)
+      delete menu;
+    else if (action->parent() == this)
+      delete action;
   }
+  FSeparators.clear();
   FActions.clear();
   QMenu::clear(); 
-}
-
-Menu::ActionList::iterator Menu::findAction(const Action *AAction)
-{
-  if (!AAction)
-    return FActions.end();
-
-  ActionList::iterator i = FActions.find(AAction->order());
-  while (i != FActions.end() && i.key() == AAction->order() && i.value() != AAction)
-    ++i;
-  
-  if (i.key() == AAction->order())
-    return i;
-
-  return FActions.end();
-}
-
-void Menu::clearNullActions()
-{
-  ActionList::iterator i = FActions.begin();
-  while (i!=FActions.end())
-  {
-    if (i.value().isNull())
-      i = FActions.erase(i);
-    else
-      ++i;
-  }
-}
-
-QAction *Menu::findOrderSeparator(int AOrder) const
-{
-  QAction *action;
-  QList<QAction *> actionList = actions();
-  foreach(action,actionList)
-    if (action->isSeparator() && action->data().toInt() == AOrder)
-      return action;
-  return 0;
 }
 
 void Menu::onMenuActionTriggered(bool)
@@ -178,3 +162,9 @@ void Menu::onMenuActionTriggered(bool)
 
 }
 
+void Menu::onActionDestroyed(QObject *AAction)
+{
+  Action *action = qobject_cast<Action *>(AAction);
+  if (action)
+    removeAction(action);
+}

@@ -78,15 +78,15 @@ void MainWindow::createToolBars()
 
 void MainWindow::createMenus()
 {
-  mnuMain = new Menu(MAINWINDOW_MENU_MAIN_ORDER,this);
+  mnuMain = new Menu(this);
   FBottomToolBar->addAction(mnuMain->menuAction()); 
 }
 
 void MainWindow::createActions()
 {
-  actQuit = new Action(MAINWINDOW_ACTION_QUIT_ORDER,this);
+  actQuit = new Action(this);
   actQuit->setText(tr("Quit"));
-  mnuMain->addAction(actQuit);
+  mnuMain->addAction(actQuit,MAINWINDOW_ACTION_GROUP_QUIT);
 }
 
 void MainWindow::connectActions()

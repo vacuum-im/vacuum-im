@@ -3,22 +3,15 @@
 
 int Action::FNewRole = Action::DR_UserDefined + 1;
 
-Action::Action(int AOrder, QObject *AParent)
+Action::Action(QObject *AParent)
   : QAction(AParent)
 {
-  FOrder = AOrder;
   FMenu = NULL;
 }
 
 Action::~Action()
 {
 
-}
-
-int Action::newRole()
-{
-  FNewRole++;
-  return FNewRole;
 }
 
 void Action::setData(int ARole, const QVariant &AData)
@@ -51,3 +44,10 @@ void Action::setMenu(Menu *AMenu)
   }
   QAction::setMenu(AMenu);
 }
+
+int Action::newRole()
+{
+  FNewRole++;
+  return FNewRole;
+}
+

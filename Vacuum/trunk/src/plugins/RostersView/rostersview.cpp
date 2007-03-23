@@ -10,7 +10,7 @@ RostersView::RostersView(IRostersModel *AModel, QWidget *AParent)
   FRostersModel = AModel;
   connect(FRostersModel,SIGNAL(streamAdded(const Jid &)),SLOT(onModelStreamAdded(const Jid &)));
   connect(FRostersModel,SIGNAL(streamRemoved(const Jid &)),SLOT(onModelStreamRemoved(const Jid &)));
-  FContextMenu = new Menu(0,this);
+  FContextMenu = new Menu(this);
 
   header()->hide();
   setIndentation(8);

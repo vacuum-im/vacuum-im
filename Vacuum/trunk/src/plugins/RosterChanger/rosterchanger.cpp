@@ -49,10 +49,11 @@ bool RosterChanger::startPlugin()
   return true;
 }
 
+//IRosterChanger
 Menu * RosterChanger::createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
                                       bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent)
 {
-  Menu *menu = new Menu(ROSTERCHANGER_MENU_ORDER,AParent);
+  Menu *menu = new Menu(AParent);
   IRoster *roster = FRosterPlugin->getRoster(AData.value(Action::DR_StreamJid).toString());
   if (roster)
   {
@@ -75,34 +76,34 @@ Menu * RosterChanger::createGroupMenu(const QHash<int,QVariant> AData, const QSe
 
         if (!menus.contains(groupName))
         {
-          Menu *groupMenu = new Menu(ROSTERCHANGER_MENU_ORDER,parentMenu);
+          Menu *groupMenu = new Menu(parentMenu);
           groupMenu->setTitle(groupTree.at(index));
           //groupMenu->setIcon(FSystemIconset.iconByName("psi/groupChat"));
 
           if (!AExceptGroups.contains(groupName))
           {
-            Action *curGroupAction = new Action(ROSTERCHANGER_MENU_ORDER+1,groupMenu);
+            Action *curGroupAction = new Action(groupMenu);
             curGroupAction->setText(tr("This group"));
             //curGroupAction->setIcon(FSystemIconset.iconByName("psi/groupChat"));
             curGroupAction->setData(AData);
             curGroupAction->setData(Action::DR_Parametr4,groupName);
             connect(curGroupAction,SIGNAL(triggered(bool)),ASlot);
-            groupMenu->addAction(curGroupAction);
+            groupMenu->addAction(curGroupAction,ROSTERCHANGER_ACTION_GROUP+1);
           }
 
           if (ANewGroup)
           {
-            Action *newGroupAction = new Action(ROSTERCHANGER_MENU_ORDER+1,groupMenu);
+            Action *newGroupAction = new Action(groupMenu);
             newGroupAction->setText(tr("Create new..."));
             //newGroupAction->setIcon(FSystemIconset.iconByName("psi/groupChat"));
             newGroupAction->setData(AData);
             newGroupAction->setData(Action::DR_Parametr4,groupName+groupDelim);
             connect(newGroupAction,SIGNAL(triggered(bool)),ASlot);
-            groupMenu->addAction(newGroupAction);
+            groupMenu->addAction(newGroupAction,ROSTERCHANGER_ACTION_GROUP+1);
           }
 
           menus.insert(groupName,groupMenu);
-          parentMenu->addAction(groupMenu->menuAction());
+          parentMenu->addAction(groupMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP,true);
           parentMenu = groupMenu;
         }
         else
@@ -114,24 +115,24 @@ Menu * RosterChanger::createGroupMenu(const QHash<int,QVariant> AData, const QSe
 
     if (ARootGroup)
     {
-      Action *curGroupAction = new Action(ROSTERCHANGER_MENU_ORDER+1,menu);
+      Action *curGroupAction = new Action(menu);
       curGroupAction->setText(tr("Root"));
       //curGroupAction->setIcon(FSystemIconset.iconByName("psi/groupChat"));
       curGroupAction->setData(AData);
       curGroupAction->setData(Action::DR_Parametr4,"");
       connect(curGroupAction,SIGNAL(triggered(bool)),ASlot);
-      menu->addAction(curGroupAction);
+      menu->addAction(curGroupAction,ROSTERCHANGER_ACTION_GROUP+1);
     }
 
     if (ANewGroup)
     {
-      Action *newGroupAction = new Action(ROSTERCHANGER_MENU_ORDER+1,menu);
+      Action *newGroupAction = new Action(menu);
       newGroupAction->setText(tr("Create new..."));
       //newGroupAction->setIcon(FSystemIconset.iconByName("psi/groupChat"));
       newGroupAction->setData(AData);
       newGroupAction->setData(Action::DR_Parametr4,groupDelim);
       connect(newGroupAction,SIGNAL(triggered(bool)),ASlot);
-      menu->addAction(newGroupAction);
+      menu->addAction(newGroupAction,ROSTERCHANGER_ACTION_GROUP+1);
     }
   }
   return menu;
@@ -161,42 +162,42 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       data.insert(Action::DR_StreamJid,streamJid);
 
       Action *action;
-      action = new Action(ROSTERCHANGER_MENU_ORDER,AMenu);
+      action = new Action(AMenu);
       action->setText(tr("Rename..."));
       //action->setIcon(FSystemIconset.iconByName("psi/groupChat"));
       action->setData(data);
       connect(action,SIGNAL(triggered(bool)),SLOT(onRenameItem(bool)));
-      AMenu->addAction(action);
+      AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
 
       if (itemType == IRosterIndex::IT_Contact)
       {
         Menu *copyItem = createGroupMenu(data,exceptGroups,true,false,SLOT(onCopyItemToGroup(bool)),AMenu);
         copyItem->setTitle(tr("Copy to group"));
         //copyItem->setIcon(FSystemIconset.iconByName("psi/groupChat"));
-        AMenu->addAction(copyItem->menuAction());
+        AMenu->addAction(copyItem->menuAction(),ROSTERCHANGER_ACTION_GROUP);
 
         Menu *moveItem = createGroupMenu(data,exceptGroups,true,false,SLOT(onMoveItemToGroup(bool)),AMenu);
         moveItem->setTitle(tr("Move to group"));
         //moveItem->setIcon(FSystemIconset.iconByName("psi/groupChat"));
-        AMenu->addAction(moveItem->menuAction());
+        AMenu->addAction(moveItem->menuAction(),ROSTERCHANGER_ACTION_GROUP);
       }
 
       if (!AIndex.data(IRosterIndex::DR_RosterGroup).toString().isEmpty())
       {
-        action = new Action(ROSTERCHANGER_MENU_ORDER,AMenu);
+        action = new Action(AMenu);
         action->setText(tr("Remove from group"));
         //action->setIcon(FSystemIconset.iconByName("psi/remove"));
         action->setData(data);
         connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromGroup(bool)));
-        AMenu->addAction(action);
+        AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
       }
 
-      action = new Action(ROSTERCHANGER_MENU_ORDER,AMenu);
+      action = new Action(AMenu);
       action->setText(tr("Remove from roster"));
       //action->setIcon(FSystemIconset.iconByName("psi/remove"));
       action->setData(data);
       connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromRoster(bool)));
-      AMenu->addAction(action);
+      AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
     }
     else if (itemType == IRosterIndex::IT_Group)
     {
@@ -205,12 +206,12 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       data.insert(Action::DR_StreamJid,streamJid);
       
       Action *action;
-      action = new Action(ROSTERCHANGER_MENU_ORDER,AMenu);
+      action = new Action(AMenu);
       action->setText(tr("Rename..."));
       //action->setIcon(FSystemIconset.iconByName("psi/groupChat"));
       action->setData(data);
       connect(action,SIGNAL(triggered(bool)),SLOT(onRenameGroup(bool)));
-      AMenu->addAction(action);
+      AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
 
       QSet<QString> exceptGroups;
       exceptGroups << AIndex.data(IRosterIndex::DR_GroupName).toString();
@@ -218,19 +219,19 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       Menu *copyGroup = createGroupMenu(data,exceptGroups,true,true,SLOT(onCopyGroupToGroup(bool)),AMenu);
       copyGroup->setTitle(tr("Copy to group"));
       //copyGroup->setIcon(FSystemIconset.iconByName("psi/groupChat"));
-      AMenu->addAction(copyGroup->menuAction());
+      AMenu->addAction(copyGroup->menuAction(),ROSTERCHANGER_ACTION_GROUP);
 
       Menu *moveGroup = createGroupMenu(data,exceptGroups,true,true,SLOT(onMoveGroupToGroup(bool)),AMenu);
       moveGroup->setTitle(tr("Move to group"));
       //moveGroup->setIcon(FSystemIconset.iconByName("psi/groupChat"));
-      AMenu->addAction(moveGroup->menuAction());
+      AMenu->addAction(moveGroup->menuAction(),ROSTERCHANGER_ACTION_GROUP);
 
-      action = new Action(ROSTERCHANGER_MENU_ORDER,AMenu);
+      action = new Action(AMenu);
       action->setText(tr("Remove"));
       //action->setIcon(FSystemIconset.iconByName("psi/remove"));
       action->setData(data);
       connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveGroup(bool)));
-      AMenu->addAction(action);
+      AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
     }
   }
 }

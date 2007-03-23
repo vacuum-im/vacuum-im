@@ -26,19 +26,17 @@ public:
   }; 
 
 public:
-  Action(int AOrder, QObject *AParent = NULL);
+  Action(QObject *AParent = NULL);
   ~Action();
 
-  int order() const { return FOrder; }
-  static int newRole();
   void setData(int ARole, const QVariant &AData);
   void setData(const QHash<int,QVariant> &AData);
   QVariant data(int ARole) const;
   void setMenu(Menu *AMenu);
   Menu *menu() const { return FMenu; }
+  static int newRole();
 private:
   static int FNewRole;
-  int FOrder;
   Menu *FMenu;
   QHash<int,QVariant> FData;
 };

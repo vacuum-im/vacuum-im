@@ -8,7 +8,7 @@ RostersViewPlugin::RostersViewPlugin()
   FMainWindowPlugin = 0;
   FRostersView = 0;
 
-  FShowOffline = new Action(500,this);
+  FShowOffline = new Action(this);
   FShowOffline->setIcon(FStatusIconset.iconByName("offline"));
   FShowOffline->setToolTip(tr("Show offline contacts"));
   FShowOffline->setCheckable(true);
