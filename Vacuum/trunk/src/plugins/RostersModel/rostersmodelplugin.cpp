@@ -17,7 +17,7 @@ RostersModelPlugin::~RostersModelPlugin()
 }
 
 //IPlugin
-void RostersModelPlugin::getPluginInfo(PluginInfo *APluginInfo)
+void RostersModelPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Creating and handling roster tree");

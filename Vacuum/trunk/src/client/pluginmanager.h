@@ -18,7 +18,7 @@ public:
     FLoader->setParent(this);
     FInfo = new PluginInfo;
     FPlugin = qobject_cast<IPlugin *>(FLoader->instance());
-    FPlugin->getPluginInfo(FInfo);
+    FPlugin->pluginInfo(FInfo);
     FPlugin->instance()->setParent(FLoader);  
   }
   ~PluginItem()

@@ -20,7 +20,7 @@ StatusChanger::~StatusChanger()
 }
 
 //IPlugin
-void StatusChanger::getPluginInfo(PluginInfo *APluginInfo)
+void StatusChanger::pluginInfo(PluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing and change status");

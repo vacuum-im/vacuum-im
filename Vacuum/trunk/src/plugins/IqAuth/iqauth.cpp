@@ -98,15 +98,15 @@ IqAuthPlugin::~IqAuthPlugin()
   FCleanupHandler.clear(); 
 }
 
-void IqAuthPlugin::getPluginInfo(PluginInfo *info)
+void IqAuthPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
-  info->author = tr("Potapov S.A. aka Lion");
-  info->description = tr("Implementation of Non-SASL Authentication (JEP-0078)");
-  info->homePage = "http://jrudevels.org";
-  info->name = "Non-SASL Authentication";
-  info->uid = IQAUTH_UUID;
-  info->version = "0.1";
-  info->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
+  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->description = tr("Implementation of Non-SASL Authentication (JEP-0078)");
+  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->name = "Non-SASL Authentication";
+  APluginInfo->uid = IQAUTH_UUID;
+  APluginInfo->version = "0.1";
+  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
 }
 
 bool IqAuthPlugin::initPlugin(IPluginManager *APluginManager)

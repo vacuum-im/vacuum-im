@@ -74,15 +74,15 @@ SASLSessionPlugin::~SASLSessionPlugin()
   FCleanupHandler.clear(); 
 }
 
-void SASLSessionPlugin::getPluginInfo(PluginInfo *info)
+void SASLSessionPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
-  info->author = tr("Potapov S.A. aka Lion");
-  info->description = tr("Implementation of Session Establishment (XMPP-IM)");
-  info->homePage = "http://jrudevels.org";
-  info->name = "Session Establishment";
-  info->uid = SASLSESSION_UUID;
-  info->version = "0.1";
-  info->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
+  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->description = tr("Implementation of Session Establishment (XMPP-IM)");
+  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->name = "Session Establishment";
+  APluginInfo->uid = SASLSESSION_UUID;
+  APluginInfo->version = "0.1";
+  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
 }
 
 bool SASLSessionPlugin::initPlugin(IPluginManager *APluginManager)

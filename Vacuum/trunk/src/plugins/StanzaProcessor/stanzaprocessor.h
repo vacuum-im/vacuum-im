@@ -26,8 +26,8 @@ public:
   virtual QObject* instance() { return this; }
 
   //IPlugin
-  virtual QUuid getPluginUuid() const { return STANZAPROCESSOR_UUID; }
-  virtual void getPluginInfo(PluginInfo *APluginInfo);
+  virtual QUuid pluginUuid() const { return STANZAPROCESSOR_UUID; }
+  virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initPlugin(IPluginManager *APluginManager);
   virtual bool startPlugin();
 

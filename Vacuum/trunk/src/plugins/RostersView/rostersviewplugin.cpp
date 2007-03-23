@@ -20,7 +20,7 @@ RostersViewPlugin::~RostersViewPlugin()
 
 }
 
-void RostersViewPlugin::getPluginInfo(PluginInfo *APluginInfo)
+void RostersViewPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Representing roster to user");

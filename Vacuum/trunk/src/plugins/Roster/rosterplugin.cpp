@@ -12,7 +12,7 @@ RosterPlugin::~RosterPlugin()
   FCleanupHandler.clear(); 
 }
 
-void RosterPlugin::getPluginInfo(PluginInfo *APluginInfo)
+void RosterPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing roster and subscriptions");

@@ -117,15 +117,15 @@ bool XmppStreams::startPlugin()
   return true;
 }
 
-void XmppStreams::getPluginInfo(PluginInfo *info)
+void XmppStreams::pluginInfo(PluginInfo *APluginInfo)
 {
-  info->author = "Potapov S.A. aka Lion";
-  info->description = tr("Managing XMPP streams, implementation of XMPP-Core");
-  info->homePage = "http://jrudevels.org";
-  info->name = tr("XMPP Streams Manager"); 
-  info->uid = XMPPSTREAMS_UUID;
-  info ->version = "0.1";
-  info->dependences.append("{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"); //ISettings  
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->description = tr("Managing XMPP streams, implementation of XMPP-Core");
+  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->name = tr("XMPP Streams Manager"); 
+  APluginInfo->uid = XMPPSTREAMS_UUID;
+  APluginInfo ->version = "0.1";
+  APluginInfo->dependences.append("{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"); //ISettings  
 }
 
 //IXmppStreams

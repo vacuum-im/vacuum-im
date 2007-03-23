@@ -24,9 +24,9 @@ public:
 	virtual QObject *instance() {return this;}
 	
 	//IPlugin
-	virtual QUuid getPluginUuid() const { return SETTINGS_UUID; }
-	virtual void getPluginInfo(PluginInfo *);
-	virtual bool initPlugin(IPluginManager *);
+	virtual QUuid pluginUuid() const { return SETTINGS_UUID; }
+	virtual void pluginInfo(PluginInfo *APluginInfo);
+	virtual bool initPlugin(IPluginManager *APluginManager);
 	virtual bool startPlugin();
 
   //ISettings

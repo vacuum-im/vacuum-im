@@ -259,15 +259,15 @@ SASLAuthPlugin::~SASLAuthPlugin()
   FCleanupHandler.clear(); 
 }
 
-void SASLAuthPlugin::getPluginInfo(PluginInfo *info)
+void SASLAuthPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
-  info->author = tr("Potapov S.A. aka Lion");
-  info->description = tr("Implementation of SASL Authentication (XMPP-Core)");
-  info->homePage = "http://jrudevels.org";
-  info->name = "SASL Authentication";
-  info->uid = SASLAUTH_UUID;
-  info->version = "0.1";
-  info->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
+  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->description = tr("Implementation of SASL Authentication (XMPP-Core)");
+  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->name = "SASL Authentication";
+  APluginInfo->uid = SASLAUTH_UUID;
+  APluginInfo->version = "0.1";
+  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
 }
 
 bool SASLAuthPlugin::initPlugin(IPluginManager *APluginManager)

@@ -14,14 +14,14 @@ SettingsPlugin::~SettingsPlugin()
   FCleanupHandler.clear(); 
 }
 
-void SettingsPlugin::getPluginInfo(PluginInfo *info)
+void SettingsPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
-  info->author = "Potapov S.A. aka Lion";
-  info->description = tr("Managing profiles and settings");
-  info->homePage = "http://jrudevels.org";
-  info->name = tr("Settings Manager"); 
-  info->uid = SETTINGS_UUID;
-  info ->version = "0.1";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->description = tr("Managing profiles and settings");
+  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->name = tr("Settings Manager"); 
+  APluginInfo->uid = SETTINGS_UUID;
+  APluginInfo ->version = "0.1";
 }
 
 bool SettingsPlugin::initPlugin(IPluginManager *APluginManager)

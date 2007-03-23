@@ -13,7 +13,7 @@ MainWindowPlugin::~MainWindowPlugin()
   delete FMainWindow;
 }
 
-void MainWindowPlugin::getPluginInfo(PluginInfo *APluginInfo)
+void MainWindowPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Main window holder");

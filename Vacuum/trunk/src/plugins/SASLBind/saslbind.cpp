@@ -89,15 +89,15 @@ SASLBindPlugin::~SASLBindPlugin()
   FCleanupHandler.clear(); 
 }
 
-void SASLBindPlugin::getPluginInfo(PluginInfo *info)
+void SASLBindPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
-  info->author = tr("Potapov S.A. aka Lion");
-  info->description = tr("Implementation of Resource Binding (XMPP-Core)");
-  info->homePage = "http://jrudevels.org";
-  info->name = "Resource Binding";
-  info->uid = SASLBIND_UUID;
-  info->version = "0.1";
-  info->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
+  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->description = tr("Implementation of Resource Binding (XMPP-Core)");
+  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->name = "Resource Binding";
+  APluginInfo->uid = SASLBIND_UUID;
+  APluginInfo->version = "0.1";
+  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
 }
 
 bool SASLBindPlugin::initPlugin(IPluginManager *APluginManager)

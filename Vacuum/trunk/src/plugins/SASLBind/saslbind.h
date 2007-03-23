@@ -56,9 +56,9 @@ public:
 
   //IPlugin
   virtual QObject *instance() { return this; }
-  virtual QUuid getPluginUuid() const { return SASLBIND_UUID; }
-  virtual void getPluginInfo(PluginInfo *info);
-  virtual bool initPlugin(IPluginManager *);
+  virtual QUuid pluginUuid() const { return SASLBIND_UUID; }
+  virtual void pluginInfo(PluginInfo *APluginInfo);
+  virtual bool initPlugin(IPluginManager *APluginManager);
   virtual bool startPlugin();
 
   //IStreamFeaturePlugin

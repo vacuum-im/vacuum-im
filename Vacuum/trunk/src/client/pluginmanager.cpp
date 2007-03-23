@@ -39,7 +39,7 @@ void PluginManager::loadPlugins()
         IPlugin *plugin = qobject_cast<IPlugin*>(loader->instance());
         if (plugin)	
         {
-          QUuid uid = plugin->getPluginUuid();
+          QUuid uid = plugin->pluginUuid();
           if (!getPlugin(uid))
           {
             PluginItem* pluginItem = new PluginItem(uid,loader,this);

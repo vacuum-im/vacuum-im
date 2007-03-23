@@ -27,9 +27,9 @@ class IPluginManager;
 class IPlugin  {
 public:
   virtual QObject *instance()=0;
-  virtual QUuid getPluginUuid() const=0;
-  virtual void getPluginInfo(PluginInfo *info)=0;
-  virtual bool initPlugin(IPluginManager *)=0;
+  virtual QUuid pluginUuid() const=0;
+  virtual void pluginInfo(PluginInfo *APluginInfo)=0;
+  virtual bool initPlugin(IPluginManager *APluginManager)=0;
   virtual bool startPlugin()=0;
 };
 
