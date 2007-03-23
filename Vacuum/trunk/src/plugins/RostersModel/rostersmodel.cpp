@@ -40,14 +40,14 @@ QModelIndex RostersModel::index(int ARow, int AColumn, const QModelIndex &AParen
 
 QModelIndex RostersModel::parent(const QModelIndex &AIndex) const
 {
-  if (!AIndex.isValid())
-    return QModelIndex();
+  if (AIndex.isValid())
+  {
+    IRosterIndex *curIndex = static_cast<IRosterIndex *>(AIndex.internalPointer());
+    IRosterIndex *parentIndex = curIndex->parentIndex();
 
-  IRosterIndex *curIndex = static_cast<IRosterIndex *>(AIndex.internalPointer());
-  IRosterIndex *parentIndex = curIndex->parentIndex();
-
-  if (parentIndex != FRootIndex && parentIndex)
-    return createIndex(parentIndex->row(),0,parentIndex); 
+    if (parentIndex != FRootIndex && parentIndex)
+      return createIndex(parentIndex->row(),0,parentIndex); 
+  }
 
   return QModelIndex();
 }
@@ -77,10 +77,10 @@ int RostersModel::columnCount(const QModelIndex &/*AParent*/) const
 
 Qt::ItemFlags RostersModel::flags(const QModelIndex &AIndex) const
 {
-  if (!AIndex.isValid())
-    return 0;
+  IRosterIndex *index = FRootIndex;
+  if (AIndex.isValid())
+    index = static_cast<IRosterIndex *>(AIndex.internalPointer());
 
-  IRosterIndex *index = static_cast<IRosterIndex *>(AIndex.internalPointer()); 
   return index->flags();  
 }
 
