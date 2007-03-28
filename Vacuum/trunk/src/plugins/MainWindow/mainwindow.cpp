@@ -1,6 +1,7 @@
 #include <QtDebug>
 #include "mainwindow.h"
 #include <QCloseEvent>
+#include <QToolButton>
 
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags)
   : QMainWindow(AParent,AFlags)
@@ -79,7 +80,11 @@ void MainWindow::createToolBars()
 void MainWindow::createMenus()
 {
   mnuMain = new Menu(this);
-  FBottomToolBar->addAction(mnuMain->menuAction()); 
+  QToolButton *tbutton = new QToolButton;
+  tbutton->setDefaultAction(mnuMain->menuAction());
+  tbutton->setPopupMode(QToolButton::InstantPopup);
+  tbutton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  FBottomToolBar->addWidget(tbutton);
 }
 
 void MainWindow::createActions()

@@ -1,4 +1,5 @@
 #include "statuschanger.h"
+#include <QToolButton>
 
 StatusChanger::StatusChanger()
 {
@@ -79,7 +80,13 @@ bool StatusChanger::startPlugin()
   }
 
   if (FMainWindowPlugin)
-    FMainWindowPlugin->mainWindow()->bottomToolBar()->addAction(FMenu->menuAction());
+  {
+    QToolButton *tbutton = new QToolButton;
+    tbutton->setDefaultAction(FMenu->menuAction());
+    tbutton->setPopupMode(QToolButton::InstantPopup);
+    tbutton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    FMainWindowPlugin->mainWindow()->bottomToolBar()->addWidget(tbutton);
+  }
 
   return true;
 }

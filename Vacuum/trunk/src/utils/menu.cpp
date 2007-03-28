@@ -84,7 +84,6 @@ Action *Menu::menuAction()
     FMenuAction->setMenu(this);
     FMenuAction->setIcon(icon());
     FMenuAction->setText(title());
-    connect(FMenuAction,SIGNAL(triggered(bool)),SLOT(onMenuActionTriggered(bool)));
   }
   FMenuAction->setToolTip(toolTip());
   FMenuAction->setWhatsThis(whatsThis()); 
@@ -155,11 +154,6 @@ void Menu::clear()
   FSeparators.clear();
   FActions.clear();
   QMenu::clear(); 
-}
-
-void Menu::onMenuActionTriggered(bool)
-{
-
 }
 
 void Menu::onActionDestroyed(QObject *AAction)
