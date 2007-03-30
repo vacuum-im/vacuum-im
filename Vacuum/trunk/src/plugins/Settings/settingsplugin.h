@@ -1,14 +1,22 @@
 #ifndef SETTINGSPLUGIN_H
 #define SETTINGSPLUGIN_H
 
-#include <QObject>
+#include <QMap>
 #include <QFile>
+#include <QPointer>
 #include <QObjectCleanupHandler>
+#include <QWidget>
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"
+#include "../../interfaces/imainwindow.h"
+#include "../../utils/action.h"
+#include "../../utils/skin.h"
 #include "settings.h"
+#include "optionsdialog.h"
 
 #define SETTINGS_UUID "{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"
+
+#define SETTINGS_ACTION_GROUP_OPTIONS 700
 
 class SettingsPlugin : 
   public QObject,
@@ -39,19 +47,47 @@ public:
   virtual QDomElement setProfile(const QString &AProfile);
   virtual QDomElement getProfile(const QString &AProfile);
   virtual QDomElement getPluginNode(const QUuid &AId);
+  virtual void openOptionsNode(const QString &ANode, const QString &AName, 
+    const QString &ADescription, const QIcon &AIcon);
+  virtual void closeOptionsNode(const QString &ANode);
+  virtual void appendOptionsHolder(IOptionsHolder *AOptionsHolder);
+  virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder);
+public slots:
+  virtual void openOptionsDialog(const QString &ANode = "");
 signals:
   virtual void profileOpened();
   virtual void profileClosed();
-private slots:
+  virtual void optionsDialogAccepted();
+  virtual void optionsDialogRejected();
+protected:
+  QWidget *createNodeWidget(const QString &ANode);
+protected slots:
+  void onOptionsDialogAccepted();
+  void onOptionsDialogRejected();
   void onPluginManagerQuit();
+  void onSkinIconsetChanged(const QString &);
 private:
   IPluginManager *FPluginManager;
+  IMainWindowPlugin *FMainWindowPlugin;
+private:
+  SkinIconset FSystemIconset;
+  Action *actOpenOptionsDialog;
 private:
   QFile FFile;
   QDomDocument FSettings;
   QDomElement FProfile;
   bool FProfileOpened;
   QObjectCleanupHandler FCleanupHandler;
+private:
+  struct OptionsNode  
+  {
+    QString name;
+    QString desc;
+    QIcon icon;
+  };
+  QMap<QString, OptionsNode *> FNodes;
+  QList<IOptionsHolder *> FOptionsHolders;
+  QPointer<OptionsDialog> FOptionsDialog;
 };
 
 #endif // SETTINGSPLUGIN_H
