@@ -2,7 +2,7 @@
  <profile name="Default" >
   <plugin uid="{a6f3d775-8464-4599-ab79-97ba1baa6e96}" >
    <window>
-    <geometry value="4::165::184::570" type="19" />
+    <geometry value="4::165::180::570" type="19" />
    </window>
   </plugin>
   <plugin uid="{8074a197-3b77-4bb0-9bd3-6f06d5cb8d15}" >
