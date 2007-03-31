@@ -121,9 +121,9 @@ QDomElement SettingsPlugin::setProfile(const QString &AProfile)
   }
 
   if (!AProfile.isEmpty()) 
-    FProfile = getProfile(AProfile);
+    FProfile = profileNode(AProfile);
   else
-    FProfile = getProfile(FSettings.documentElement().attribute("profile","Default"));
+    FProfile = profileNode(FSettings.documentElement().attribute("profile","Default"));
 
   if (!FProfile.isNull())
   {
@@ -134,7 +134,7 @@ QDomElement SettingsPlugin::setProfile(const QString &AProfile)
   return FProfile;
 }
 
-QDomElement SettingsPlugin::getProfile(const QString &AProfile) 
+QDomElement SettingsPlugin::profileNode(const QString &AProfile) 
 {
   if (AProfile.isEmpty())
     return QDomElement();
@@ -157,7 +157,7 @@ QDomElement SettingsPlugin::getProfile(const QString &AProfile)
   return profile.toElement();
 }
 
-QDomElement SettingsPlugin::getPluginNode(const QUuid &AId) 
+QDomElement SettingsPlugin::pluginNode(const QUuid &AId) 
 {
   if (FProfile.isNull())
     return QDomElement();

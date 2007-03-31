@@ -29,13 +29,13 @@ class SettingsPlugin :
 public:
   SettingsPlugin();
   ~SettingsPlugin();
-	virtual QObject *instance() {return this;}
-	
-	//IPlugin
-	virtual QUuid pluginUuid() const { return SETTINGS_UUID; }
-	virtual void pluginInfo(PluginInfo *APluginInfo);
-	virtual bool initPlugin(IPluginManager *APluginManager);
-	virtual bool startPlugin();
+  virtual QObject *instance() {return this;}
+
+  //IPlugin
+  virtual QUuid pluginUuid() const { return SETTINGS_UUID; }
+  virtual void pluginInfo(PluginInfo *APluginInfo);
+  virtual bool initPlugin(IPluginManager *APluginManager);
+  virtual bool startPlugin();
 
   //ISettings
   virtual ISettings *newSettings(const QUuid &APluginId, QObject *AParent);
@@ -45,8 +45,8 @@ public:
   virtual QDomDocument document() const { return FSettings; }
   virtual QString profile() const { return FProfile.tagName(); }
   virtual QDomElement setProfile(const QString &AProfile);
-  virtual QDomElement getProfile(const QString &AProfile);
-  virtual QDomElement getPluginNode(const QUuid &AId);
+  virtual QDomElement profileNode(const QString &AProfile);
+  virtual QDomElement pluginNode(const QUuid &AId);
   virtual void openOptionsNode(const QString &ANode, const QString &AName, 
     const QString &ADescription, const QIcon &AIcon);
   virtual void closeOptionsNode(const QString &ANode);

@@ -44,8 +44,8 @@ public:
   virtual QDomDocument document() const=0;
   virtual QString profile() const =0;
   virtual QDomElement setProfile(const QString &) =0;
-  virtual QDomElement getProfile(const QString &) =0;
-  virtual QDomElement getPluginNode(const QUuid &) =0;
+  virtual QDomElement profileNode(const QString &) =0;
+  virtual QDomElement pluginNode(const QUuid &) =0;
   virtual void openOptionsNode(const QString &ANode, const QString &AName, 
     const QString &ADescription, const QIcon &AIcon) =0;
 public slots:

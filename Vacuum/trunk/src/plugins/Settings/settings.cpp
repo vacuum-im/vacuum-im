@@ -230,7 +230,7 @@ QVariant Settings::stringToVariant( const QString &AString, QVariant::Type AType
 
 void Settings::onProfileOpened()
 {
-  FSettings = FSettingsPlugin->getPluginNode(FUuid); 
+  FSettings = FSettingsPlugin->pluginNode(FUuid); 
   if (!FSettings.isNull())
   {
     FSettingsOpened = true;
