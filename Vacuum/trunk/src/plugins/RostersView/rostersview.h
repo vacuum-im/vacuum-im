@@ -38,9 +38,6 @@ signals:
 protected:
   void drawBranches (QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   void contextMenuEvent (QContextMenuEvent *AEvent);
-protected slots:
-  void onModelStreamAdded(const Jid &AStreamJid);
-  void onModelStreamRemoved(const Jid &AStreamJid);
 private:
   IRostersModel *FRostersModel;
   QList<QAbstractProxyModel *> FProxyModels;

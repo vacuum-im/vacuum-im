@@ -8,8 +8,6 @@ RostersView::RostersView(IRostersModel *AModel, QWidget *AParent)
   : QTreeView(AParent)
 {
   FRostersModel = AModel;
-  connect(FRostersModel,SIGNAL(streamAdded(const Jid &)),SLOT(onModelStreamAdded(const Jid &)));
-  connect(FRostersModel,SIGNAL(streamRemoved(const Jid &)),SLOT(onModelStreamRemoved(const Jid &)));
   FContextMenu = new Menu(this);
 
   header()->hide();
@@ -23,6 +21,7 @@ RostersView::RostersView(IRostersModel *AModel, QWidget *AParent)
 
   FSortFilterProxyModel = new SortFilterProxyModel(this);
   FSortFilterProxyModel->setDynamicSortFilter(true);
+  addProxyModel(FSortFilterProxyModel);
 }
 
 RostersView::~RostersView()
@@ -127,18 +126,3 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
     FContextMenu->popup(AEvent->globalPos());
 }
 
-void RostersView::onModelStreamAdded(const Jid &)
-{
-  if (!FProxyModels.contains(FSortFilterProxyModel))
-    addProxyModel(FSortFilterProxyModel);
-  else
-    FSortFilterProxyModel->clear();
-}
-
-void RostersView::onModelStreamRemoved(const Jid &)
-{
-  if (FRostersModel->streams().isEmpty())
-    removeProxyModel(FSortFilterProxyModel);
-  else
-    FSortFilterProxyModel->clear();
-}

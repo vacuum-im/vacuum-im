@@ -567,12 +567,15 @@ void RostersModel::onIndexDataChanged(IRosterIndex *AIndex)
   emit indexChanged(AIndex);
 }
 
-void RostersModel::onIndexChildAboutToBeInserted( IRosterIndex *AIndex )
+void RostersModel::onIndexChildAboutToBeInserted(IRosterIndex *AIndex)
 {
   IRosterIndex *parentIndex = AIndex->parentIndex();
   if (parentIndex)
   {
-    beginInsertRows(createIndex(parentIndex->row(),0,parentIndex),AIndex->row(),AIndex->row());
+    if (parentIndex == FRootIndex)
+      beginInsertRows(QModelIndex(),AIndex->row(),AIndex->row());
+    else
+      beginInsertRows(createIndex(parentIndex->row(),0,parentIndex),AIndex->row(),AIndex->row());
 
     connect(AIndex->instance(),SIGNAL(dataChanged(IRosterIndex *)),
       SLOT(onIndexDataChanged(IRosterIndex *)));
@@ -597,8 +600,11 @@ void RostersModel::onIndexChildAboutToBeRemoved(IRosterIndex *AIndex)
 {
   IRosterIndex *parentIndex = AIndex->parentIndex();
   if (parentIndex)
-  {
-    beginRemoveRows(createIndex(parentIndex->row(),0,parentIndex),AIndex->row(),AIndex->row());
+  { 
+    if (parentIndex == FRootIndex)
+      beginRemoveRows(QModelIndex(),AIndex->row(),AIndex->row());
+    else
+      beginRemoveRows(createIndex(parentIndex->row(),0,parentIndex),AIndex->row(),AIndex->row());
     emit indexRemove(AIndex);
   }
 }
