@@ -56,6 +56,7 @@ void MainWindow::createLayouts()
   FBottomWidget->setVisible(false);
                      
   FMainLayout = new QVBoxLayout;
+  FMainLayout->setMargin(2);
   FMainLayout->addWidget(FUpperWidget);  
   FMainLayout->addWidget(FRostersWidget);  
   FMainLayout->addWidget(FBottomWidget);  

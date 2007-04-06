@@ -32,7 +32,7 @@ bool MainWindowPlugin::initPlugin(IPluginManager *APluginManager)
   {
     ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
     if (settingsPlugin)
-      FSettings = settingsPlugin->newSettings(MAINWINDOW_UUID,this);
+      FSettings = settingsPlugin->openSettings(MAINWINDOW_UUID,this);
   }
 
   if (FMainWindow)
