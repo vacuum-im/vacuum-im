@@ -33,8 +33,9 @@ public:
 signals:
   void addedAction(QAction *);
   void removedAction(QAction *);
+  void menuDestroyed(Menu *);
 protected slots:
-  void onActionDestroyed(QObject *AAction);
+  void onActionDestroyed(Action *AAction);
 private:
   typedef QMultiMap<int,Action *> ActionList;
   ActionList FActions;

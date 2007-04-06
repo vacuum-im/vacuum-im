@@ -11,7 +11,7 @@ Action::Action(QObject *AParent)
 
 Action::~Action()
 {
-
+  emit actionDestroyed(this);
 }
 
 void Action::setData(int ARole, const QVariant &AData)
@@ -34,20 +34,34 @@ QVariant Action::data(int ARole) const
 
 void Action::setMenu(Menu *AMenu)
 {
-  FMenu = AMenu;
+  if (FMenu)
+  {
+    disconnect(FMenu,SIGNAL(menuDestroyed(Menu *)),this,SLOT(onMenuDestroyed(Menu *)));
+    if (FMenu != AMenu && FMenu->parent()==this)
+      delete FMenu;
+  }
+
   if (AMenu)
   {
     setIcon(AMenu->icon());
     setText(AMenu->title());
     setToolTip(AMenu->toolTip());
     setWhatsThis(AMenu->whatsThis());
+    connect(AMenu,SIGNAL(menuDestroyed(Menu *)),SLOT(onMenuDestroyed(Menu *)));
   }
   QAction::setMenu(AMenu);
+  FMenu = AMenu;
 }
 
 int Action::newRole()
 {
   FNewRole++;
   return FNewRole;
+}
+
+void Action::onMenuDestroyed(Menu *AMenu)
+{
+  if (AMenu == FMenu)
+    FMenu = NULL;
 }
 

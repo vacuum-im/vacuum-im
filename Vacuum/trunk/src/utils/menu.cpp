@@ -10,7 +10,7 @@ Menu::Menu(QWidget *AParent)
 
 Menu::~Menu()
 {
-
+  emit menuDestroyed(this);
 }
 
 void Menu::addAction(Action *AAction, int AGroup, bool ASort)
@@ -64,7 +64,7 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
   }
 
   FActions.insertMulti(AGroup,AAction);
-  connect(AAction,SIGNAL(destroyed(QObject *)),SLOT(onActionDestroyed(QObject *)));
+  connect(AAction,SIGNAL(actionDestroyed(Action *)),SLOT(onActionDestroyed(Action *)));
   emit addedAction(AAction);
 }
 
@@ -109,7 +109,7 @@ void Menu::removeAction(Action *AAction)
   ActionList::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
   if (it != FActions.end())
   {
-    disconnect(AAction,SIGNAL(destroyed(QObject *)),this,SLOT(onActionDestroyed(QObject *)));
+    disconnect(AAction,SIGNAL(actionDestroyed(Action *)),this,SLOT(onActionDestroyed(Action *)));
 
     emit removedAction(AAction);
 
@@ -121,7 +121,7 @@ void Menu::removeAction(Action *AAction)
     }
 
     FActions.erase(it);
-    QMenu::removeAction(AAction); 
+    QMenu::removeAction(AAction);
   }
 }
 
@@ -156,9 +156,7 @@ void Menu::clear()
   QMenu::clear(); 
 }
 
-void Menu::onActionDestroyed(QObject *AAction)
+void Menu::onActionDestroyed(Action *AAction)
 {
-  Action *action = qobject_cast<Action *>(AAction);
-  if (action)
-    removeAction(action);
+  removeAction(AAction);
 }

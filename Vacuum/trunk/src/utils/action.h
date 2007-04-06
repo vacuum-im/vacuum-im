@@ -35,6 +35,10 @@ public:
   void setMenu(Menu *AMenu);
   Menu *menu() const { return FMenu; }
   static int newRole();
+signals:
+  void actionDestroyed(Action *);
+protected slots:
+  void onMenuDestroyed(Menu *AMenu);
 private:
   static int FNewRole;
   Menu *FMenu;
