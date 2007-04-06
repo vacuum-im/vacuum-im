@@ -172,21 +172,22 @@ QDomElement Settings::getElement(const QString &AName, const QString &ANameNS,
   return elem;
 }
 
-void Settings::delNSRecurse(const QString &ANameNS, QDomNode node)
+void Settings::delNSRecurse(const QString &ANameNS, QDomElement elem)
 {
-  while (!node.isNull())
+  while (!elem.isNull())
   {
-    if (node.toElement().attribute("ns") == ANameNS)
+    if (elem.attribute("ns") == ANameNS)
     {
-      QDomNode tmp = node;
-      node = node.nextSibling();
-      tmp.parentNode().removeChild(tmp); 
-      continue;
+      QDomElement oldElem = elem;
+      elem = elem.nextSiblingElement();
+      oldElem.parentNode().removeChild(oldElem); 
     } 
-    else if (node.hasChildNodes())
-      delNSRecurse(ANameNS,node.firstChild()); 
-
-    node = node.nextSibling(); 
+    else 
+    { 
+      if (elem.hasChildNodes())
+        delNSRecurse(ANameNS,elem.firstChildElement()); 
+      elem = elem.nextSiblingElement(); 
+    }
   }
 }
 

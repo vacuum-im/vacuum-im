@@ -16,8 +16,6 @@
 
 #define SETTINGS_UUID "{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"
 
-#define SETTINGS_ACTION_GROUP_OPTIONS 700
-
 class SettingsPlugin : 
   public QObject,
   public IPlugin,
@@ -38,7 +36,7 @@ public:
   virtual bool startPlugin();
 
   //ISettings
-  virtual ISettings *newSettings(const QUuid &APluginId, QObject *AParent);
+  virtual ISettings *openSettings(const QUuid &APluginId, QObject *AParent);
   virtual QString fileName() const { return FFile.fileName(); }
   virtual bool setFileName(const QString &AFileName);
   virtual bool saveSettings();
@@ -47,18 +45,25 @@ public:
   virtual QDomElement setProfile(const QString &AProfile);
   virtual QDomElement profileNode(const QString &AProfile);
   virtual QDomElement pluginNode(const QUuid &AId);
+  virtual void openOptionsDialog(const QString &ANode = "");
   virtual void openOptionsNode(const QString &ANode, const QString &AName, 
     const QString &ADescription, const QIcon &AIcon);
   virtual void closeOptionsNode(const QString &ANode);
   virtual void appendOptionsHolder(IOptionsHolder *AOptionsHolder);
   virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder);
 public slots:
-  virtual void openOptionsDialog(const QString &ANode = "");
+  virtual void openOptionsAction(bool);
 signals:
   virtual void profileOpened();
   virtual void profileClosed();
+  virtual void optionsNodeOpened(const QString &ANode);
+  virtual void optionsNodeClosed(const QString &ANode);
+  virtual void optionsHolderAdded(IOptionsHolder *);
+  virtual void optionsHolderRemoved(IOptionsHolder *);
+  virtual void optionsDialogOpened();
   virtual void optionsDialogAccepted();
   virtual void optionsDialogRejected();
+  virtual void optionsDialogClosed();
 protected:
   QWidget *createNodeWidget(const QString &ANode);
 protected slots:

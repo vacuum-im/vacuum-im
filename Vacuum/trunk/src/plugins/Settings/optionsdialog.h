@@ -3,7 +3,9 @@
 
 #include <QHash>
 #include <QDialog>
+#include <QLabel>
 #include <QTreeWidget>
+#include <QScrollArea>
 #include <QStackedWidget>
 #include <QDialogButtonBox>
 
@@ -22,10 +24,13 @@ public:
   void showNode(const QString &ANode);
 protected:
   QTreeWidgetItem *createTreeItem(const QString &ANode);
+  QString nodeFullName(const QString &ANode);
 protected slots:
   void onDialogButtonClicked(QAbstractButton *AButton);
   void onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetItem *APrevious);
 private:
+  QLabel *lblInfo;
+  QScrollArea *scaScroll;
   QStackedWidget *stwOptions;  
   QTreeWidget *trwNodes;
   QDialogButtonBox *dbbButtons;

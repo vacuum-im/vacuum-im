@@ -12,8 +12,6 @@ class IOptionsHolder {
 public:
   virtual QObject *instance() =0;
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder) const =0;
-public slots:
-  virtual void applyOptions() =0;
 };
 
 class ISettings {
@@ -37,7 +35,7 @@ signals:
 class ISettingsPlugin {
 public:
   virtual QObject *instance() =0;
-  virtual ISettings *newSettings(const QUuid &, QObject *)=0;
+  virtual ISettings *openSettings(const QUuid &, QObject *)=0;
   virtual QString fileName() const =0;
   virtual bool setFileName(const QString &) =0;
   virtual bool saveSettings() =0;
@@ -46,17 +44,28 @@ public:
   virtual QDomElement setProfile(const QString &) =0;
   virtual QDomElement profileNode(const QString &) =0;
   virtual QDomElement pluginNode(const QUuid &) =0;
+  virtual void openOptionsDialog(const QString &ANode = "") =0;
   virtual void openOptionsNode(const QString &ANode, const QString &AName, 
     const QString &ADescription, const QIcon &AIcon) =0;
+  virtual void closeOptionsNode(const QString &ANode) =0;
+  virtual void appendOptionsHolder(IOptionsHolder *) =0;
+  virtual void removeOptionsHolder(IOptionsHolder *) =0;
 public slots:
-  virtual void openOptionsDialog(const QString &ANode = "") =0;
+  virtual void openOptionsAction(bool) =0;
 signals:
   virtual void profileOpened()=0;
   virtual void profileClosed()=0;
+  virtual void optionsNodeOpened(const QString &ANode) =0;
+  virtual void optionsNodeClosed(const QString &ANode) =0;
+  virtual void optionsHolderAdded(IOptionsHolder *) =0;
+  virtual void optionsHolderRemoved(IOptionsHolder *) =0;
+  virtual void optionsDialogOpened() =0;
   virtual void optionsDialogAccepted() =0;
   virtual void optionsDialogRejected() =0;
+  virtual void optionsDialogClosed() =0;
 };
 
+Q_DECLARE_INTERFACE(IOptionsHolder,"Vacuum.Plugin.IOptionsHolder/1.0")
 Q_DECLARE_INTERFACE(ISettings,"Vacuum.Plugin.ISettings/1.0")
 Q_DECLARE_INTERFACE(ISettingsPlugin,"Vacuum.Plugin.ISettingsPlugin/1.0")
 

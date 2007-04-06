@@ -2,7 +2,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QScrollArea>
+#include <QFrame>
+#include <QScrollBar>
 #include <QPushButton>
 #include <QHeaderView>
 
@@ -11,13 +12,13 @@ OptionsDialog::OptionsDialog(QWidget *AParent)
   : QDialog(AParent)
 {
   setAttribute(Qt::WA_DeleteOnClose,true);
-  QLabel *lblInfo = new QLabel("Node name\nNode description");
+  lblInfo = new QLabel("<b>Node name</b><br>Node description");
   lblInfo->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
   lblInfo->setFrameStyle(QFrame::StyledPanel);
-  QScrollArea *scaScroll = new QScrollArea;
+  scaScroll = new QScrollArea;
+  //scaScroll->setFrameStyle(QFrame::NoFrame);  
   scaScroll->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   scaScroll->setWidgetResizable(true);
-  scaScroll->setFrameShape(QFrame::NoFrame);
   stwOptions = new QStackedWidget;
   scaScroll->setWidget(stwOptions);
   QVBoxLayout *vblRight = new QVBoxLayout;
@@ -26,8 +27,11 @@ OptionsDialog::OptionsDialog(QWidget *AParent)
   trwNodes = new QTreeWidget;
   trwNodes->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Expanding);
   trwNodes->header()->hide();
+  trwNodes->setRootIsDecorated(false);
   trwNodes->setColumnCount(1);
   trwNodes->setMaximumWidth(120);
+  trwNodes->setSortingEnabled(true);
+  trwNodes->sortByColumn(0,Qt::AscendingOrder);
   connect(trwNodes,SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
     SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
   QHBoxLayout *hblCentral = new QHBoxLayout;
@@ -36,8 +40,12 @@ OptionsDialog::OptionsDialog(QWidget *AParent)
   dbbButtons = new QDialogButtonBox(Qt::Horizontal);
   dbbButtons->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
   connect(dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
+  QFrame *line = new QFrame; 
+  line->setFrameShape(QFrame::HLine);
+  line->setFrameShadow(QFrame::Sunken);
   QVBoxLayout *vblMain = new QVBoxLayout;
   vblMain->addLayout(hblCentral);
+  vblMain->addWidget(line);
   vblMain->addWidget(dbbButtons);
   setLayout(vblMain);
   setWindowTitle(tr("Options"));
@@ -106,7 +114,7 @@ void OptionsDialog::closeNode(const QString &ANode)
   }
 }
 
-void OptionsDialog::showNode( const QString &ANode )
+void OptionsDialog::showNode(const QString &ANode)
 {
   QTreeWidgetItem *item = FNodesItems.value(ANode, NULL);
   if (item)
@@ -142,6 +150,22 @@ QTreeWidgetItem *OptionsDialog::createTreeItem(const QString &ANode)
   return nodeItem;
 }
 
+QString OptionsDialog::nodeFullName(const QString &ANode)
+{
+  QString fullName;
+  QTreeWidgetItem *item = FNodesItems.value(ANode);
+  if (item)
+  {
+    fullName = item->text(0);
+    while (item->parent())
+    {
+      item = item->parent();
+      fullName = item->text(0)+"->"+fullName; 
+    }
+  }
+  return fullName;
+}
+
 void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
 {
   switch(dbbButtons->buttonRole(AButton))
@@ -162,6 +186,17 @@ void OptionsDialog::onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetI
     currentItem = currentItem->child(0);
 
   if (FItemsStackIndex.contains(currentItem))
-    stwOptions->setCurrentIndex(FItemsStackIndex.value(currentItem));
+  {
+    QString node = currentItem->data(0,Qt::UserRole).toString();
+    OptionsNode *nodeOption = FNodes.value(node,NULL);
+    if (nodeOption)
+    {
+      lblInfo->setText(QString("<b>%1</b><br>%2").arg(nodeFullName(node)).arg(nodeOption->desc));
+      QWidget *widget = stwOptions->widget(FItemsStackIndex.value(currentItem));
+      stwOptions->setMaximumHeight(widget->sizeHint().height());
+      stwOptions->setCurrentWidget(widget);
+      scaScroll->ensureVisible(0,0);
+    }
+  }
 }
 

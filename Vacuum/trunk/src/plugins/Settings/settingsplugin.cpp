@@ -3,8 +3,9 @@
 
 #include <QTextStream>
 #include <QByteArray>
-#include <QLabel>
 #include <QVBoxLayout>
+
+#define MAINMENU_ACTION_GROUP_OPTIONS 700
 
 SettingsPlugin::SettingsPlugin()
 {
@@ -17,6 +18,7 @@ SettingsPlugin::SettingsPlugin()
 
 SettingsPlugin::~SettingsPlugin()
 {
+  onPluginManagerQuit();
   qDeleteAll(FNodes);
   FCleanupHandler.clear(); 
 }
@@ -51,14 +53,14 @@ bool SettingsPlugin::startPlugin()
     actOpenOptionsDialog = new Action(this);
     actOpenOptionsDialog->setText(tr("Options..."));
     actOpenOptionsDialog->setIcon(FSystemIconset.iconByName("psi/options"));
-    connect(actOpenOptionsDialog,SIGNAL(triggered(bool)),SLOT(openOptionsDialog()));
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(actOpenOptionsDialog,SETTINGS_ACTION_GROUP_OPTIONS,true);
+    connect(actOpenOptionsDialog,SIGNAL(triggered(bool)),SLOT(openOptionsAction(bool)));
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(actOpenOptionsDialog,MAINMENU_ACTION_GROUP_OPTIONS,true);
   }
   return true;
 }
 
-//ISettings
-ISettings *SettingsPlugin::newSettings(const QUuid &APluginId, QObject *AParent)
+//ISettingsPlugin
+ISettings *SettingsPlugin::openSettings(const QUuid &APluginId, QObject *AParent)
 {
   Settings *settings = new Settings(APluginId,this,AParent);
   FCleanupHandler.add(settings); 
@@ -188,6 +190,7 @@ void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName,
     FNodes.insert(ANode,node);
     if (!FOptionsDialog.isNull())
       FOptionsDialog->openNode(ANode,AName,ADescription,AIcon,createNodeWidget(ANode));
+    emit optionsNodeOpened(ANode);
   }
   else
   {
@@ -205,6 +208,7 @@ void SettingsPlugin::closeOptionsNode(const QString &ANode)
   OptionsNode *node = FNodes.value(ANode,NULL);
   if (node)
   {
+    emit optionsNodeClosed(ANode);
     if (!FOptionsDialog.isNull())
       FOptionsDialog->closeNode(ANode);
     FNodes.remove(ANode);
@@ -215,12 +219,19 @@ void SettingsPlugin::closeOptionsNode(const QString &ANode)
 void SettingsPlugin::appendOptionsHolder(IOptionsHolder *AOptionsHolder)
 {
   if (!FOptionsHolders.contains(AOptionsHolder))
+  {
     FOptionsHolders.append(AOptionsHolder);
+    emit optionsHolderAdded(AOptionsHolder);
+  }
 }
 
 void SettingsPlugin::removeOptionsHolder(IOptionsHolder *AOptionsHolder)
 {
-  FOptionsHolders.removeAt(FOptionsHolders.indexOf(AOptionsHolder));
+  if (!FOptionsHolders.contains(AOptionsHolder))
+  {
+    emit optionsHolderRemoved(AOptionsHolder);
+    FOptionsHolders.removeAt(FOptionsHolders.indexOf(AOptionsHolder));
+  }
 }
 
 void SettingsPlugin::openOptionsDialog(const QString &ANode)
@@ -244,10 +255,22 @@ void SettingsPlugin::openOptionsDialog(const QString &ANode)
   FOptionsDialog->show();
 }
 
+void SettingsPlugin::openOptionsAction(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QString node = action->data(Action::DR_Parametr1).toString();
+    openOptionsDialog(node);
+  }
+}
+
 QWidget *SettingsPlugin::createNodeWidget(const QString &ANode)
 {
   QWidget *nodeWidget = new QWidget;
   QVBoxLayout *nodeLayout = new QVBoxLayout;
+  nodeLayout->setMargin(6);
+  nodeLayout->setSpacing(3);
   nodeWidget->setLayout(nodeLayout);
   
   QMap<int, QWidget *> widgetsByOrder;
@@ -270,10 +293,8 @@ QWidget *SettingsPlugin::createNodeWidget(const QString &ANode)
 
 void SettingsPlugin::onOptionsDialogAccepted()
 {
-  IOptionsHolder *optionsHolder;
-  foreach(optionsHolder,FOptionsHolders)
-    optionsHolder->applyOptions();
   emit optionsDialogAccepted();
+  saveSettings();
 }
 
 void SettingsPlugin::onOptionsDialogRejected()
