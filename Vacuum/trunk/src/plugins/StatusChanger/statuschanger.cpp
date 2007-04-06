@@ -287,8 +287,7 @@ void StatusChanger::removeStreamMenu(IPresence *APresence)
 {
   if (APresence && FStreamMenus.contains(APresence))
   {
-    Menu *menu = FStreamMenus.value(APresence,NULL);
-    FStreamMenus.remove(APresence);
+    Menu *menu = FStreamMenus.take(APresence);
     menu->clear();
     delete menu;
   }
