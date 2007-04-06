@@ -28,15 +28,15 @@ public:
   virtual void setProxyType(int AProxyType) { FProxyType = AProxyType; }
   virtual int proxyType() const { return FProxyType; }
   virtual void setProxyHost(const QString &AProxyHost) { FProxyHost = AProxyHost; }
-  virtual QString proxyHost() const { return FProxyHost; }
+  virtual const QString &proxyHost() const { return FProxyHost; }
   virtual void setProxyPort(qint16 AProxyPort) { FProxyPort = AProxyPort; }
   virtual qint16 proxyPort() const { return FProxyPort; }
   virtual void setProxyUsername(const QString &AProxyUser) { FProxyUser = AProxyUser; }
-  virtual QString proxyUsername() const { return FProxyUser; }
+  virtual const QString &proxyUsername() const { return FProxyUser; }
   virtual void setProxyPassword(const QString &AProxyPassword) { FProxyPassword = AProxyPassword; }
-  virtual QString proxyPassword() const { return FProxyPassword; }
+  virtual const QString &proxyPassword() const { return FProxyPassword; }
   virtual void setPollServer(const QString &APollServer) { FPollServer = APollServer; }
-  virtual QString pollServer() const { return FPollServer; }
+  virtual const QString &pollServer() const { return FPollServer; }
   virtual qint64 bytesWriten() const { return FBytesWriten; }
   virtual qint64 bytesReaded() const { return FBytesReaded; }
 signals:
@@ -52,6 +52,11 @@ protected slots:
   void onReadTimeout();
   void onKeepAliveTimeout();
 protected:
+  void proxyConnection();
+  void socket4Connection();
+  void socket5Connection();
+  void httpsConnection();
+private:
   enum ProxyState {
     ProxyUnconnected,
     ProxyAuthType,
@@ -64,11 +69,6 @@ protected:
   quint16     FPort;
   QTimer      ReadTimer;
   QTimer      KeepAliveTimer;
-  void proxyConnection();
-  void socket4Connection();
-  void socket5Connection();
-  void httpsConnection();
-private:
   QTcpSocket  FSocket;
   int         FProxyType;
   QString     FProxyHost;

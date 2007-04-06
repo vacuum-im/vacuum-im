@@ -1,5 +1,6 @@
-#include "xmppstream.h"
 #include <QtDebug>
+#include "xmppstream.h"
+
 #include "../../utils/errorhandler.h"
 #include "streamconnection.h"
 
@@ -7,13 +8,13 @@ XmppStream::XmppStream(const Jid &AJid, QObject *parent)
   : QObject(parent), 
     FParser(this)
 {
-  FJid = AJid;
-  FConnection = 0;
   FOpen = false;
-  FStreamState = SS_OFFLINE;
-  FPort = 0;
+  FJid = AJid;
   FHost = AJid.domane();
   FPort = 5222;
+  FXmppVersion = "1.0";
+  FConnection = NULL;
+  FStreamState = SS_OFFLINE;
 
   connect(&FParser,SIGNAL(open(const QDomElement &)), SLOT(onParserOpen(const QDomElement &)));
   connect(&FParser,SIGNAL(element(const QDomElement &)), SLOT(onParserElement(const QDomElement &)));
@@ -53,8 +54,18 @@ void XmppStream::close()
 
 void XmppStream::setJid(const Jid &AJid) 
 {
-  if (FStreamState == SS_OFFLINE || FStreamState == SS_FEATURES) 
+  if (FJid != AJid && (FStreamState == SS_OFFLINE || (FStreamState == SS_FEATURES && FJid.equals(AJid,false)))) 
+  {
+    qDebug() << "Resettings stream" << FJid.full() << "to" << AJid.full();
+    
+    if (FStreamState == SS_FEATURES && !FOfflineJid.isValid())
+      FOfflineJid = FJid;
+
+    Jid befour = FJid;
+    emit jidAboutToBeChanged(this, AJid);
     FJid = AJid;
+    emit jidChanged(this, befour);
+  }
 }
 
 qint64 XmppStream::sendStanza(const Stanza &AStanza)
@@ -238,12 +249,11 @@ void XmppStream::onConnectionConnected()
 
 void XmppStream::onConnectionReadyRead(qint64 ABytes)
 {
-  QByteArray data = FConnection->read(ABytes);
   int i = 0;
   IStreamFeature *feature;
-  while (i<FFeatures.count()) 
+  QByteArray data = FConnection->read(ABytes);
+  foreach(feature, FFeatures) 
   {
-    feature = FFeatures.at(i++);
     if (feature->needHook(IStreamFeature::DirectionIn))
       if (feature->hookData(&data,IStreamFeature::DirectionIn))
         return; 
@@ -257,6 +267,12 @@ void XmppStream::onConnectionDisconnected()
   FOpen = false;
   emit closed(this);
   FStreamState = SS_OFFLINE;
+
+  if (FOfflineJid.isValid())
+  {
+    setJid(FOfflineJid);
+    FOfflineJid = Jid();
+  }
 }
 
 void XmppStream::onConnectionError(const QString &AErrStr)

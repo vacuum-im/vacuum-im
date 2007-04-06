@@ -12,8 +12,8 @@ class XmppStreams :
   public IPlugin,
   public IXmppStreams
 {
-  Q_OBJECT
-  Q_INTERFACES(IPlugin IXmppStreams)
+  Q_OBJECT;
+  Q_INTERFACES(IPlugin IXmppStreams);
 
 public:
   XmppStreams();
@@ -28,10 +28,12 @@ public:
 
   //IXmppStreams
   virtual IXmppStream *newStream(const Jid &AJid);
-  virtual bool addStream(IXmppStream *);
+  virtual void addStream(IXmppStream *AStream);
+  virtual bool isActive(IXmppStream *AStream) const { return FActiveStreams.contains(AStream); }
   virtual IXmppStream *getStream(const Jid &AJid) const;
   virtual const QList<IXmppStream *> &getStreams() const { return FStreams; }
-  virtual void removeStream(IXmppStream *);
+  virtual void removeStream(IXmppStream *AStream);
+  virtual void destroyStream(const Jid &AJid);
 signals:
   virtual void added(IXmppStream *);
   virtual void opened(IXmppStream *);
@@ -39,23 +41,20 @@ signals:
   virtual void aboutToClose(IXmppStream *);
   virtual void closed(IXmppStream *);
   virtual void error(IXmppStream *, const QString &errStr);
+  virtual void jidAboutToBeChanged(IXmppStream *, const Jid &AAfter);
+  virtual void jidChanged(IXmppStream *, const Jid &ABefour);
   virtual void removed(IXmppStream *);
 protected slots:
-  //IXmppStream
   void onStreamOpened(IXmppStream *);
   void onStreamElement(IXmppStream *, const QDomElement &elem);
   void onStreamAboutToClose(IXmppStream *);
   void onStreamClosed(IXmppStream *);
   void onStreamError(IXmppStream *, const QString &AErrStr);
-  //IConfigurator
-  void onSettingsOpened();
-  void onSettingsClosed();
-private: //interfaces
-  IPluginManager *FPluginManager;
-  ISettings *FSettings; 
+  void onStreamJidAboutToBeChanged(IXmppStream *AStream, const Jid &AAfter);
+  void onStreamJidChanged(IXmppStream *AStream, const Jid &ABefour);
 private:
   QList<IXmppStream *> FStreams;
-  QList<IXmppStream *> FAddedStreams;
+  QList<IXmppStream *> FActiveStreams;
 };
 
 #endif // XMPPSTREAMS_H

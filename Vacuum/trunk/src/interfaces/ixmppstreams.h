@@ -27,15 +27,15 @@ public:
   virtual void setProxyType(int)=0;
   virtual int proxyType() const=0;
   virtual void setProxyHost(const QString &) =0;
-  virtual QString proxyHost() const =0;
+  virtual const QString &proxyHost() const =0;
   virtual void setProxyPort(qint16) =0;
   virtual qint16 proxyPort() const =0;
   virtual void setProxyUsername(const QString &) =0;
-  virtual QString proxyUsername() const =0;
+  virtual const QString &proxyUsername() const =0;
   virtual void setProxyPassword(const QString &) =0;
-  virtual QString proxyPassword() const =0;
+  virtual const QString &proxyPassword() const =0;
   virtual void setPollServer(const QString &) =0;
-  virtual QString pollServer() const =0;
+  virtual const QString &pollServer() const =0;
   virtual qint64 bytesWriten() const =0;
   virtual qint64 bytesReaded() const =0;
 signals:
@@ -85,18 +85,18 @@ public:
   virtual qint64 sendStanza(const Stanza &stanza)=0;
   virtual void setJid(const Jid &)=0;
   virtual const Jid &jid() const=0;
-  virtual QString streamId() const=0;
-  virtual QString lastError() const=0;
+  virtual const QString &streamId() const=0;
+  virtual const QString &lastError() const=0;
   virtual void setHost(const QString &)=0;
-  virtual QString host() const=0;
+  virtual const QString &host() const=0;
   virtual void setPort(const qint16)=0;
   virtual qint16 port() const=0;
   virtual void setPassword(const QString &)=0;
-  virtual QString password() const=0;
+  virtual const QString &password() const=0;
   virtual void setDefaultLang(const QString &) =0;
-  virtual QString defaultLang() const =0;
+  virtual const QString &defaultLang() const =0;
   virtual void setXmppVersion(const QString &) =0;
-  virtual QString xmppVersion() const =0;
+  virtual const QString &xmppVersion() const =0;
   virtual IStreamConnection *connection()=0;
   virtual bool setConnection(IStreamConnection *) =0;
   virtual void addFeature(IStreamFeature *)=0;
@@ -111,6 +111,8 @@ signals:
   virtual void aboutToClose(IXmppStream *)=0;
   virtual void closed(IXmppStream *)=0;
   virtual void error(IXmppStream *, const QString &errStr)=0;
+  virtual void jidAboutToBeChanged(IXmppStream *, const Jid &AAfter) =0;
+  virtual void jidChanged(IXmppStream *, const Jid &ABefour) =0;
 };
 
 
@@ -119,10 +121,12 @@ class IXmppStreams
 public:
   virtual QObject *instance()=0;
   virtual IXmppStream *newStream(const Jid &)=0;
-  virtual bool addStream(IXmppStream *)=0;
+  virtual void addStream(IXmppStream *)=0;
+  virtual bool isActive(IXmppStream *) const=0; 
   virtual IXmppStream *getStream(const Jid &) const=0;
   virtual const QList<IXmppStream *> &getStreams() const=0;
   virtual void removeStream(IXmppStream *)=0;
+  virtual void destroyStream(const Jid &)=0;
 signals:
   virtual void added(IXmppStream *)=0;
   virtual void opened(IXmppStream *)=0;
@@ -130,6 +134,8 @@ signals:
   virtual void aboutToClose(IXmppStream *)=0;
   virtual void closed(IXmppStream *)=0;
   virtual void error(IXmppStream *, const QString &errString)=0;
+  virtual void jidAboutToBeChanged(IXmppStream *, const Jid &AAfter)=0;
+  virtual void jidChanged(IXmppStream *, const Jid &ABefour)=0;
   virtual void removed(IXmppStream *)=0;
 };
 

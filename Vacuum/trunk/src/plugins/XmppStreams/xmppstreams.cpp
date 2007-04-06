@@ -1,42 +1,22 @@
-#include "xmppstreams.h"
 #include <QtDebug>
+#include "xmppstreams.h"
+
+#include <QIcon>
 #include "../../utils/errorhandler.h"
 #include "xmppstream.h"
 
-
 XmppStreams::XmppStreams()
 {
-  FPluginManager = 0;
-  FSettings = 0;
+
 }
 
 XmppStreams::~XmppStreams()
 {
-  qDebug() << "~XmppStreams";
+
 }
 
-bool XmppStreams::initPlugin(IPluginManager *APluginManager) 
+bool XmppStreams::initPlugin(IPluginManager * /*APluginManager*/) 
 {
-  FPluginManager = APluginManager;
-  QList<IPlugin *> plugins = FPluginManager->getPlugins("ISettingsPlugin");
-  if (plugins.count() > 0)
-  {
-    ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugins[0]->instance());
-    if (settingsPlugin)
-      FSettings = settingsPlugin->newSettings(XMPPSTREAMS_UUID,this);
-  }
-
-  if (FSettings)
-  {
-    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
-    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
-  }
-  else
-  {
-    qDebug() << "SETTINGS FOR XMPPSTREAMS NOT FOUND";
-    return false;
-  }
-
   ErrorHandler::addErrorItem(NS_XMPP_STREAMS, "bad-format",
     ErrorHandler::MODIFY, ErrorHandler::BAD_REQUEST, tr("Bad Request Format"));
 
@@ -125,7 +105,6 @@ void XmppStreams::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = tr("XMPP Streams Manager"); 
   APluginInfo->uid = XMPPSTREAMS_UUID;
   APluginInfo ->version = "0.1";
-  APluginInfo->dependences.append("{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"); //ISettings  
 }
 
 //IXmppStreams
@@ -145,76 +124,83 @@ IXmppStream *XmppStreams::getStream(const Jid &AJid) const
   foreach(IXmppStream *stream,FStreams)
     if (stream->jid() == AJid) 
       return stream;
-  return 0;
+  return NULL;
 }
 
-bool XmppStreams::addStream(IXmppStream *AStream)
+void XmppStreams::addStream(IXmppStream *AStream)
 {
-  QObject *obj = AStream->instance();
-  bool connected =
-    connect(obj, SIGNAL(opened(IXmppStream *)), 
-      SLOT(onStreamOpened(IXmppStream *))) &&
-     connect(obj, SIGNAL(element(IXmppStream *, const QDomElement &)), 
-      SLOT(onStreamElement(IXmppStream *, const QDomElement &))) && 
-    connect(obj, SIGNAL(aboutToClose(IXmppStream *)), 
-      SLOT(onStreamAboutToClose(IXmppStream *))) && 
-    connect(obj, SIGNAL(closed(IXmppStream *)), 
-      SLOT(onStreamClosed(IXmppStream *))) && 
-    connect(obj, SIGNAL(error(IXmppStream *, const QString &)), 
-      SLOT(onStreamError(IXmppStream *, const QString &)));
-  if (connected)
+  if (AStream && !FActiveStreams.contains(AStream))
   {
-    FAddedStreams.append(AStream);
     qDebug() << "Stream added" << AStream->jid().full(); 
+    FActiveStreams.append(AStream);
+    connect(AStream->instance(), SIGNAL(opened(IXmppStream *)), 
+      SLOT(onStreamOpened(IXmppStream *)));
+    connect(AStream->instance(), SIGNAL(element(IXmppStream *, const QDomElement &)), 
+      SLOT(onStreamElement(IXmppStream *, const QDomElement &))); 
+    connect(AStream->instance(), SIGNAL(aboutToClose(IXmppStream *)), 
+      SLOT(onStreamAboutToClose(IXmppStream *))); 
+    connect(AStream->instance(), SIGNAL(closed(IXmppStream *)), 
+      SLOT(onStreamClosed(IXmppStream *))); 
+    connect(AStream->instance(), SIGNAL(error(IXmppStream *, const QString &)), 
+      SLOT(onStreamError(IXmppStream *, const QString &)));
+    connect(AStream->instance(), SIGNAL(jidAboutToBeChanged(IXmppStream *, const Jid &)), 
+      SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &))); 
+    connect(AStream->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), 
+      SLOT(onStreamJidChanged(IXmppStream *, const Jid &))); 
     emit added(AStream);
-  } 
-  else
-    disconnect(obj,0,this,0);
-  return connected;
+  }
 }
 
 void XmppStreams::removeStream(IXmppStream *AStream)
 {
-  if (!AStream)
-    return;
-
-  qDebug() << "Removing stream" << AStream->jid().full();
-
-  AStream->close(); 
-  
-  if (FAddedStreams.contains(AStream))
+  if (FActiveStreams.contains(AStream))
   {
+    disconnect(AStream->instance(), SIGNAL(opened(IXmppStream *)), 
+      this, SLOT(onStreamOpened(IXmppStream *)));
+    disconnect(AStream->instance(), SIGNAL(element(IXmppStream *, const QDomElement &)), 
+      this, SLOT(onStreamElement(IXmppStream *, const QDomElement &))); 
+    disconnect(AStream->instance(), SIGNAL(aboutToClose(IXmppStream *)), 
+      this, SLOT(onStreamAboutToClose(IXmppStream *))); 
+    disconnect(AStream->instance(), SIGNAL(closed(IXmppStream *)), 
+      this, SLOT(onStreamClosed(IXmppStream *))); 
+    disconnect(AStream->instance(), SIGNAL(error(IXmppStream *, const QString &)), 
+      this, SLOT(onStreamError(IXmppStream *, const QString &)));
+    disconnect(AStream->instance(), SIGNAL(jidAboutToBeChanged(IXmppStream *, const Jid &)), 
+      this, SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &))); 
+    disconnect(AStream->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), 
+      this, SLOT(onStreamJidChanged(IXmppStream *, const Jid &))); 
     emit removed(AStream);
-    FAddedStreams.removeAt(FAddedStreams.indexOf(AStream));
+    FActiveStreams.removeAt(FActiveStreams.indexOf(AStream));
   }
-  
-  if (FStreams.contains(AStream))
-    FStreams.removeAt(FStreams.indexOf(AStream));
-  
-  delete (XmppStream *)AStream;
+}
+
+void XmppStreams::destroyStream(const Jid &AJid)
+{
+  IXmppStream *stream = getStream(AJid);
+  if (stream)
+  {
+    removeStream(stream);
+    FStreams.removeAt(FStreams.indexOf(stream));
+    delete qobject_cast<XmppStream *>(stream->instance());
+  }
 }
 
 void XmppStreams::onStreamOpened(IXmppStream *AStream)
 {
-  qDebug() << "Stream opened" << AStream->jid().full(); 
   emit opened(AStream);
 }
 
 void XmppStreams::onStreamElement(IXmppStream *AStream, const QDomElement &elem)
 {
-  //qDebug() << "\nStream element" << AStream->jid().full() << ":";
-  //qDebug() << elem.ownerDocument().toString(); 
   emit element(AStream, elem);
 }
 
 void XmppStreams::onStreamAboutToClose(IXmppStream *AStream)
 {
-  qDebug() << "Stream aboutToClose" << AStream->jid().full(); 
   emit aboutToClose(AStream);
 }
 void XmppStreams::onStreamClosed(IXmppStream *AStream)
 {
-  qDebug() << "Stream closed" << AStream->jid().full(); 
   emit closed(AStream);
 }
 
@@ -224,83 +210,18 @@ void XmppStreams::onStreamError(IXmppStream *AStream, const QString &AErrStr)
   emit error(AStream,AErrStr);
 }
 
-void XmppStreams::onSettingsOpened()
+void XmppStreams::onStreamJidAboutToBeChanged(IXmppStream *AStream, const Jid &AAfter)
 {
-  IXmppStream *stream = NULL;
-  
-  stream = newStream("Test1@potapov/Vacuum");
-  stream->setDefaultLang("ru"); 
-  stream->setXmppVersion("1.0");
-  stream->setPassword("1");
-  stream->connection()->setProxyType(0);
-  stream->connection()->setProxyUsername("");  
-  stream->connection()->setProxyHost("");
-  stream->connection()->setProxyPort(1080);
-  addStream(stream);
-
-  stream = newStream("Test2@potapov/Vacuum");
-  stream->setDefaultLang("ru"); 
-  stream->setXmppVersion("1.0");
-  stream->setPassword("1");
-  stream->connection()->setProxyType(0);
-  stream->connection()->setProxyUsername("");  
-  stream->connection()->setProxyHost("");
-  stream->connection()->setProxyPort(1080);
-  addStream(stream);
-
-  stream = newStream("Test3@potapov/Vacuum");
-  stream->setDefaultLang("ru"); 
-  stream->setXmppVersion("1.0");
-  stream->setPassword("1");
-  stream->connection()->setProxyType(0);
-  stream->connection()->setProxyUsername("");  
-  stream->connection()->setProxyHost("");
-  stream->connection()->setProxyPort(1080);
-  addStream(stream);
-
-  //deleteStream(stream);
-
-  //QHash<QString,QVariant> streams = FSettings->values("stream"); 
-  //QList<QString> NS = streams.keys(); 
-  //for(int i=0;i<NS.count();i++)
-  //{
-  //  IXmppStream *stream = newStream(streams[NS[i]].toString());
-  //  stream->setDefaultLang(FSettings->valueNS("stream[]:lang",NS[i],"ru").toString()); 
-  //  stream->setXmppVersion(FSettings->valueNS("stream[]:version",NS[i],"1.0").toString());
-  //  stream->setPassword(FSettings->valueNS("stream[]:password",NS[i],"").toString());
-  //  stream->connection()->setProxyType(FSettings->valueNS("stream[]:connection:proxyType",NS[i],0).toInt());
-  //  stream->connection()->setProxyHost(FSettings->valueNS("stream[]:connection:proxyHost",NS[i],"").toString());
-  //  stream->connection()->setProxyPort(FSettings->valueNS("stream[]:connection:proxyPort",NS[i],1080).toInt());
-  //  stream->connection()->setProxyPassword(FSettings->valueNS("stream[]:connection:proxyPassword",NS[i],"").toString());
-  //  stream->connection()->setProxyUsername(FSettings->valueNS("stream[]:connection:proxyUsername",NS[i],"").toString());
-  //  stream->connection()->setProxyPassword(FSettings->valueNS("stream[]:connection:proxyPassword",NS[i],"").toString());
-  //  stream->connection()->setPollServer(FSettings->valueNS("stream[]:connection:pollServer",NS[i],"").toString());
-  //  addStream(stream);
-  //  if (FSettings->valueNS("stream[]:autoConnect",NS[i],true).toBool())
-  //    stream->open(); 
-  //}
+  emit jidAboutToBeChanged(AStream,AAfter);
+  if (isActive(AStream))
+    emit removed(AStream);
 }
 
-void XmppStreams::onSettingsClosed()
+void XmppStreams::onStreamJidChanged(IXmppStream *AStream, const Jid &ABefour)
 {
-  while (FAddedStreams.count()>0) 
-  {
-    IXmppStream *stream = FAddedStreams[0];
-    //QString NS = stream->jid().pFull();
-    //FSettings->setValueNS("stream",NS,stream->jid().full());     
-    //FSettings->setValueNS("stream[]:version",NS,stream->xmppVersion());     
-    //FSettings->setValueNS("stream[]:lang",NS,stream->defaultLang());     
-    //FSettings->setValueNS("stream[]:password",NS,stream->password());
-    //FSettings->setValueNS("stream[]:host",NS,stream->host());
-    //FSettings->setValueNS("stream[]:port",NS,stream->port()); 
-    //FSettings->setValueNS("stream[]:connection:proxyType",NS,stream->connection()->proxyType());  
-    //FSettings->setValueNS("stream[]:connection:proxyHost",NS,stream->connection()->proxyHost());  
-    //FSettings->setValueNS("stream[]:connection:proxyPort",NS,stream->connection()->proxyPort());  
-    //FSettings->setValueNS("stream[]:connection:proxyUsername",NS,stream->connection()->proxyUsername()); 
-    //FSettings->setValueNS("stream[]:connection:proxyPassword",NS,stream->connection()->proxyPassword());  
-    //FSettings->setValueNS("stream[]:connection:pollServer",NS,stream->connection()->pollServer());  
-    removeStream(stream);
-  }
+  if (isActive(AStream))
+    emit added(AStream);
+  emit jidChanged(AStream,ABefour);
 }
 
 Q_EXPORT_PLUGIN2(XmppStreamsPlugin, XmppStreams)
