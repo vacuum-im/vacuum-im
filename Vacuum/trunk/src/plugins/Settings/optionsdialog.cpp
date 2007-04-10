@@ -27,9 +27,9 @@ OptionsDialog::OptionsDialog(QWidget *AParent)
   trwNodes = new QTreeWidget;
   trwNodes->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Expanding);
   trwNodes->header()->hide();
-  trwNodes->setRootIsDecorated(false);
+  trwNodes->setIndentation(12);
   trwNodes->setColumnCount(1);
-  trwNodes->setMaximumWidth(120);
+  trwNodes->setMaximumWidth(160);
   trwNodes->setSortingEnabled(true);
   trwNodes->sortByColumn(0,Qt::AscendingOrder);
   connect(trwNodes,SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
@@ -49,7 +49,7 @@ OptionsDialog::OptionsDialog(QWidget *AParent)
   vblMain->addWidget(dbbButtons);
   setLayout(vblMain);
   setWindowTitle(tr("Options"));
-  resize(550,500);
+  resize(600,500);
 }
 
 OptionsDialog::~OptionsDialog()
