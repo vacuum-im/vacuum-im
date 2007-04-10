@@ -38,13 +38,14 @@ public:
   virtual QSet<QString> groups() const =0;
   virtual QList<IRosterItem *> groupItems(const QString &) const =0;
   virtual QSet<QString> itemGroups(const Jid &) const =0;
-  virtual void setItem(const Jid &, const QString &, const QSet<QString> &) =0;
-  virtual void sendSubscription(const Jid &, SubscriptionType) =0; 
+  virtual void setItem(const Jid &, const QString &AName, const QSet<QString> &AGroups) =0;
   virtual void removeItem(const Jid &) =0;
+  //Operations  on subscription
+  virtual void sendSubscription(const Jid &, SubscriptionType) =0; 
   //Operations on items
   virtual void renameItem(const Jid &, const QString &) =0;
   virtual void copyItemToGroup(const Jid &, const QString &) =0;
-  virtual void moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo) =0;
+  virtual void moveItemToGroup(const Jid &, const QString &AGroupFrom, const QString &AGroupTo) =0;
   virtual void removeItemFromGroup(const Jid &, const QString &) =0;
   //Operations on group
   virtual void renameGroup(const QString &AGroup, const QString &AGroupTo) =0;
