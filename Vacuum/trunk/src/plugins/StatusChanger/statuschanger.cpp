@@ -484,6 +484,7 @@ void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
       setBaseShow(AShow);
   }
   updateMenu(APresence);
+  updateAccount(APresence);
   autoReconnect(APresence);
 }
 
