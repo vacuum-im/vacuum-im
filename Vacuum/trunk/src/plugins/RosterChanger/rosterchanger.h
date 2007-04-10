@@ -5,7 +5,6 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/iroster.h"
 #include "../../utils/menu.h"
-#include "../../utils/skin.h"
 
 #define ROSTERCHANGER_UUID "{018E7891-2743-4155-8A70-EAB430573500}"
 
@@ -52,8 +51,6 @@ protected slots:
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
-private:
-  SkinIconset FSystemIconset;    
 };
 
 #endif // ROSTERCHANGER_H

@@ -6,6 +6,7 @@
 #include <QVariant>
 #include "utilsexport.h"
 #include "menu.h"
+#include "skin.h"
 
 class Menu;
 
@@ -28,21 +29,27 @@ public:
 public:
   Action(QObject *AParent = NULL);
   ~Action();
-
+  //QAction
+  Menu *menu() const { return FMenu; }
+  void setIcon(const QIcon &AIcon);
+  void setIcon(const QString &AIconsetFile, const QString &AIconName);
+  void setMenu(Menu *AMenu);
+  //Action
   void setData(int ARole, const QVariant &AData);
   void setData(const QHash<int,QVariant> &AData);
   QVariant data(int ARole) const;
-  void setMenu(Menu *AMenu);
-  Menu *menu() const { return FMenu; }
   static int newRole();
 signals:
   void actionDestroyed(Action *);
 protected slots:
   void onMenuDestroyed(Menu *AMenu);
+  void onSkinChanged();
 private:
   static int FNewRole;
   Menu *FMenu;
   QHash<int,QVariant> FData;
+  SkinIconset *FIconset;
+  QString FIconName;
 };
 
 #endif // ACTION_H

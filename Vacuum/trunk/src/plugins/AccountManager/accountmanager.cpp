@@ -6,6 +6,7 @@
 
 #define OPTIONS_NODE_ACCOUNTS "Accounts"
 #define MAINMENU_ACTION_GROUP_OPTIONS 700
+#define SYSTEM_ICONSETFILE "system/common.jisp"
 
 AccountManager::AccountManager()
 {
@@ -15,8 +16,6 @@ AccountManager::AccountManager()
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
   FAccountsSetup = NULL;
-  FSystemIconset.openFile("system/common.jisp");
-  connect(&FSystemIconset,SIGNAL(reseted(const QString &)),SLOT(onSkinChanged(const QString &)));
   srand(QTime::currentTime().msec());
 }
 
@@ -91,7 +90,7 @@ bool AccountManager::startPlugin()
   if (FMainWindowPlugin)
   {
     FAccountsSetup = new Action(this);
-    FAccountsSetup->setIcon(FSystemIconset.iconByName("psi/account"));
+    FAccountsSetup->setIcon(SYSTEM_ICONSETFILE,"psi/account");
     FAccountsSetup->setText(tr("Account setup..."));
     FAccountsSetup->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS);
     connect(FAccountsSetup,SIGNAL(triggered(bool)),
@@ -416,12 +415,6 @@ void AccountManager::onSettingsClosed()
     removeAccount(FAccounts.at(0));
 }
 
-void AccountManager::onSkinChanged(const QString & /*ASkinName*/)
-{
-  if (FAccountsSetup)
-    FAccountsSetup->setIcon(FSystemIconset.iconByName("psi/account"));
-}
-
 void AccountManager::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu)
 {
   if (AIndex.isValid() && AIndex.data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
@@ -431,7 +424,7 @@ void AccountManager::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *A
     if (account)
     {
       Action *modify = new Action(AMenu);
-      modify->setIcon(FSystemIconset.iconByName("psi/account"));
+      modify->setIcon(SYSTEM_ICONSETFILE,"psi/account");
       modify->setText(tr("Modify account..."));
       modify->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS+QString("::")+account->accountId());
       connect(modify,SIGNAL(triggered(bool)),

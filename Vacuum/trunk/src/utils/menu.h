@@ -6,6 +6,7 @@
 #include <QPointer>
 #include "utilsexport.h"
 #include "action.h"
+#include "skin.h"
 
 #define DEFAULT_ACTION_GROUP 500
 #define NULL_ACTION_GROUP -1
@@ -21,26 +22,32 @@ public:
   Menu(QWidget *AParent = NULL);
   ~Menu();
 
+  //QMenu
+  Action *menuAction();
   void addAction(Action *AAction, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
-  void addMenuActions(const Menu *AMenu, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
   void removeAction(Action *AAction);
+  void clear();
+  void setIcon(const QIcon &AIcon);
+  void setIcon(const QString &AIconsetFile, const QString &AIconName);
+  void setTitle(const QString &ATitle);
+  //Menu
+  void addMenuActions(const Menu *AMenu, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
   int actionGroup(const Action *AAction) const;
   QList<Action *> actions(int AGroup = NULL_ACTION_GROUP) const;
-  void clear();
-  Action *menuAction();
-  void setIcon(const QIcon &AIcon);
-  void setTitle(const QString &ATitle);
 signals:
   void addedAction(QAction *);
   void removedAction(QAction *);
   void menuDestroyed(Menu *);
 protected slots:
   void onActionDestroyed(Action *AAction);
+  void onSkinChanged();
 private:
   typedef QMultiMap<int,Action *> ActionList;
   ActionList FActions;
   QMap<int,QAction *> FSeparators;
   Action *FMenuAction;
+  SkinIconset *FIconset;
+  QString FIconName;
 };
 
 #endif // MENU_H

@@ -3,7 +3,7 @@
 
 RosterChanger::RosterChanger()
 {
-  FSystemIconset.openFile("system/common.jisp");
+
 }
 
 RosterChanger::~RosterChanger()

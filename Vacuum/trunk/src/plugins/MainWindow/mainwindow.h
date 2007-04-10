@@ -5,7 +5,6 @@
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/menu.h"
-#include "../../utils/skin.h"
 
 #define MAINWINDOW_ACTION_GROUP_QUIT 1000
 
@@ -42,16 +41,12 @@ protected:
 protected slots:
   void onSettingsOpened();
   void onSettingsClosed();
-  void onSkinChanged(const QString &ASkinName);
 protected:
   virtual void closeEvent(QCloseEvent *AEvent);
-  void updateIcons();
 protected:
   Menu *mnuMain;
 protected:
   Action *actQuit;
-private:
-  SkinIconset FSystemIconset;
 private:
   IPluginManager *FPluginManager;
   ISettings *FSettings;

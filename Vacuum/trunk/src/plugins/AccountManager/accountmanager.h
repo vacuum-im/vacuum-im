@@ -9,7 +9,6 @@
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/irostersview.h"
 #include "../../utils/action.h"
-#include "../../utils/skin.h"
 #include "account.h"
 #include "accountmanage.h"
 #include "accountoptions.h"
@@ -67,7 +66,6 @@ protected slots:
   void onOptionsDialogRejected();
   void onSettingsOpened();
   void onSettingsClosed();
-  void onSkinChanged(const QString &ASkinName);
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
 private:
   IPluginManager *FPluginManager;
@@ -77,7 +75,6 @@ private:
   IMainWindowPlugin *FMainWindowPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
-  SkinIconset FSystemIconset;
   Action *FAccountsSetup;
 private:
   mutable QPointer<AccountManage> FAccountManage;

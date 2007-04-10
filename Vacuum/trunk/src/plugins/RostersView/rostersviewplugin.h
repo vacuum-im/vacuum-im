@@ -7,7 +7,6 @@
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/irostersview.h"
 #include "../../utils/action.h"
-#include "../../utils/skin.h"
 #include "rostersview.h"
 
 #define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"
@@ -43,7 +42,6 @@ private:
 private:
   Action *FShowOffline;
 private:
-  SkinIconset FStatusIconset;
   RostersView *FRostersView; 
 };
 

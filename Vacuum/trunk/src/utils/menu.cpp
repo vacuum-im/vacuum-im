@@ -5,6 +5,7 @@ Menu::Menu(QWidget *AParent)
   : QMenu(AParent)
 {
   FMenuAction = NULL;
+  FIconset = NULL;
   setSeparatorsCollapsible(true);
 }
 
@@ -84,17 +85,39 @@ Action *Menu::menuAction()
     FMenuAction->setMenu(this);
     FMenuAction->setIcon(icon());
     FMenuAction->setText(title());
+    FMenuAction->setToolTip(toolTip());
+    FMenuAction->setWhatsThis(whatsThis()); 
   }
-  FMenuAction->setToolTip(toolTip());
-  FMenuAction->setWhatsThis(whatsThis()); 
   return FMenuAction;
 }
 
-void Menu::setIcon( const QIcon &AIcon )
+void Menu::setIcon(const QIcon &AIcon)
 {
+  if (FIconset)
+  {
+    FIconName.clear();
+    delete FIconset;
+    FIconset = NULL;
+  }
+  QMenu::setIcon(AIcon);
+  
   if (FMenuAction)
     FMenuAction->setIcon(AIcon);
-  QMenu::setIcon(AIcon);
+}
+
+void Menu::setIcon(const QString &AIconsetFile, const QString &AIconName)
+{
+  if (!FIconset)
+  {
+    FIconset = new SkinIconset(AIconsetFile,this);
+    connect(FIconset,SIGNAL(skinChanged()),SLOT(onSkinChanged()));
+  }
+  FIconName = AIconName;
+  FIconset->openFile(AIconsetFile);
+  QMenu::setIcon(FIconset->iconByName(AIconName));
+  
+  if (FMenuAction)
+    FMenuAction->setIcon(icon());
 }
 
 void Menu::setTitle(const QString &ATitle)
@@ -160,3 +183,14 @@ void Menu::onActionDestroyed(Action *AAction)
 {
   removeAction(AAction);
 }
+
+void Menu::onSkinChanged()
+{
+  if (FIconset)
+  {
+    QMenu::setIcon(FIconset->iconByName(FIconName));
+    if (FMenuAction)
+      FMenuAction->setIcon(icon());
+  }
+}
+

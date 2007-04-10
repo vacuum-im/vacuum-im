@@ -3,11 +3,11 @@
 #include <QCloseEvent>
 #include <QToolButton>
 
+#define SYSTEM_ICONSETFILE "system/common.jisp"
+
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags)
   : QMainWindow(AParent,AFlags)
 {
-  FSystemIconset.openFile("system/common.jisp");
-  connect(&FSystemIconset,SIGNAL(reseted(const QString &)),SLOT(onSkinChanged(const QString &)));
   FPluginManager = NULL;
   FSettings = NULL;
   setIconSize(QSize(16,16));
@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags)
   createToolBars();
   createMenus();
   createActions();
-  updateIcons();
 }
 
 MainWindow::~MainWindow()
@@ -81,6 +80,8 @@ void MainWindow::createToolBars()
 void MainWindow::createMenus()
 {
   mnuMain = new Menu(this);
+  mnuMain->setIcon(SYSTEM_ICONSETFILE,"psi/jabber");
+  mnuMain->setTitle(tr("Menu"));
   QToolButton *tbutton = new QToolButton;
   tbutton->setDefaultAction(mnuMain->menuAction());
   tbutton->setPopupMode(QToolButton::InstantPopup);
@@ -91,6 +92,7 @@ void MainWindow::createMenus()
 void MainWindow::createActions()
 {
   actQuit = new Action(this);
+  actQuit->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
   actQuit->setText(tr("Quit"));
   mnuMain->addAction(actQuit,MAINWINDOW_ACTION_GROUP_QUIT);
 }
@@ -111,25 +113,8 @@ void MainWindow::onSettingsClosed()
     FSettings->setValue("window:geometry",geometry());
 }
 
-void MainWindow::onSkinChanged(const QString &/*ASkinName*/)
+void MainWindow::closeEvent(QCloseEvent *AEvent)
 {
-  updateIcons();
-}
-
-void MainWindow::closeEvent( QCloseEvent *AEvent )
-{
-  showMinimized();
-  AEvent->ignore();
-}
-
-void MainWindow::updateIcons()
-{
-  if (mnuMain)
-  {
-    mnuMain->setIcon(FSystemIconset.iconByName("psi/jabber"));
-    mnuMain->menuAction()->setIcon(mnuMain->icon());
-  }
-
-  if (actQuit)
-    actQuit->setIcon(FSystemIconset.iconByName("psi/quit"));
+  //showMinimized();
+  //AEvent->ignore();
 }

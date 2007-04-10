@@ -2,15 +2,16 @@
 #include <QTimer>
 #include <QToolButton>
 
+#define STATUS_ICONSETFILE "status/common.jisp"
+
 StatusChanger::StatusChanger()
 {
   FBaseShow = IPresence::Error;
-  FStatusIconset.openFile("status/common.jisp");
   FPresencePlugin = NULL;
   FRosterPlugin = NULL;
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
-  connect(&FStatusIconset,SIGNAL(reseted(const QString &)),SLOT(onSkinChanged(const QString &)));
+
   FMenu = new Menu(NULL);
   createStatusActions();
   setBaseShow(IPresence::Offline);
@@ -192,7 +193,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   }
 
   Action *action = new Action(menu);
-  action->setIcon(getStatusIcon(IPresence::Online));
+  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Online));
   action->setText(getStatusName(IPresence::Online));
   action->setData(Action::DR_Parametr1,IPresence::Online);
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Online));
@@ -202,7 +203,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
-  action->setIcon(getStatusIcon(IPresence::Chat));
+  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Chat));
   action->setText(getStatusName(IPresence::Chat));
   action->setData(Action::DR_Parametr1,IPresence::Chat);
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Chat));
@@ -212,7 +213,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
-  action->setIcon(getStatusIcon(IPresence::Away));
+  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Away));
   action->setText(getStatusName(IPresence::Away));
   action->setData(Action::DR_Parametr1,IPresence::Away);
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Away));
@@ -222,7 +223,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
-  action->setIcon(getStatusIcon(IPresence::ExtendedAway));
+  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::ExtendedAway));
   action->setText(getStatusName(IPresence::ExtendedAway));
   action->setData(Action::DR_Parametr1,IPresence::ExtendedAway);
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::ExtendedAway));
@@ -232,7 +233,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
-  action->setIcon(getStatusIcon(IPresence::DoNotDistrib));
+  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::DoNotDistrib));
   action->setText(getStatusName(IPresence::DoNotDistrib));
   action->setData(Action::DR_Parametr1,IPresence::DoNotDistrib);
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::DoNotDistrib));
@@ -242,7 +243,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
-  action->setIcon(getStatusIcon(IPresence::Invisible));
+  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Invisible));
   action->setText(getStatusName(IPresence::Invisible));
   action->setData(Action::DR_Parametr1,IPresence::Invisible);
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Invisible));
@@ -252,7 +253,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
-  action->setIcon(getStatusIcon(IPresence::Offline));
+  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Offline));
   action->setText(getStatusName(IPresence::Offline));
   action->setData(Action::DR_Parametr1,IPresence::Offline);
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Offline));
@@ -266,13 +267,13 @@ void StatusChanger::updateMenu(IPresence *APresence)
 {
   if (!APresence)
   {
-    FMenu->setIcon(getStatusIcon(FBaseShow));
+    FMenu->setIcon(STATUS_ICONSETFILE,getStatusIconName(FBaseShow));
     FMenu->setTitle(getStatusName(FBaseShow));
   }
   else if (FStreamMenus.contains(APresence))
   {
     Menu *menu = FStreamMenus.value(APresence);
-    menu->setIcon(getStatusIcon(APresence->show()));
+    menu->setIcon(STATUS_ICONSETFILE,getStatusIconName(APresence->show()));
   }
 }
 
@@ -284,8 +285,8 @@ void StatusChanger::addStreamMenu(IPresence *APresence)
     menu->setTitle(APresence->streamJid().full());
     FStreamMenus.insert(APresence,menu);
     FMenu->addAction(menu->menuAction(),STATUSMENU_ACTION_GROUP_STREAM,true);
-    updateMenu(APresence);
     createStatusActions(APresence);
+    updateMenu(APresence);
   }
 }
 
@@ -349,28 +350,28 @@ void StatusChanger::autoReconnect(IPresence *APresence)
     FWaitReconnect.remove(APresence);
 }
 
-QIcon StatusChanger::getStatusIcon(IPresence::Show AShow) const
+QString StatusChanger::getStatusIconName(IPresence::Show AShow) const
 {
   switch (AShow)
   {
   case IPresence::Offline: 
-    return FStatusIconset.iconByName("offline");
+    return "offline";
   case IPresence::Online: 
-    return FStatusIconset.iconByName("online");
+    return "online";
   case IPresence::Chat: 
-    return FStatusIconset.iconByName("chat");
+    return "chat";
   case IPresence::Away: 
-    return FStatusIconset.iconByName("away");
+    return "away";
   case IPresence::ExtendedAway: 
-    return FStatusIconset.iconByName("xa");
+    return "xa";
   case IPresence::DoNotDistrib: 
-    return FStatusIconset.iconByName("dnd");
+    return "dnd";
   case IPresence::Invisible: 
-    return FStatusIconset.iconByName("invisible");
+    return "invisible";
   case IPresence::Error: 
-    return FStatusIconset.iconByName("error");
+    return "error";
   }
-  return QIcon();
+  return QString();
 }
 
 QString StatusChanger::getStatusName(IPresence::Show AShow) const
@@ -522,6 +523,7 @@ void StatusChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
     {
       Action *action = new Action(AMenu);
       action->setMenu(menu);
+      action->setIcon(menu->icon());
       action->setText(tr("Status"));
       AMenu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
     }
@@ -547,11 +549,6 @@ void StatusChanger::onReconnectTimer()
     else
       it++;
   }
-}
-
-void StatusChanger::onSkinChanged(const QString &)
-{
-  updateMenu();
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

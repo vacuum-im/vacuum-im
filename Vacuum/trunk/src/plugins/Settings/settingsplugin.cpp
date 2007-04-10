@@ -6,14 +6,14 @@
 #include <QVBoxLayout>
 
 #define MAINMENU_ACTION_GROUP_OPTIONS 700
+#define SYSTEM_ICONSETFILE "system/common.jisp"
 
 SettingsPlugin::SettingsPlugin()
 {
   actOpenOptionsDialog = NULL;
   FProfileOpened = false;
   FFile.setParent(this);
-  FSystemIconset.openFile("system/common.jisp");
-  connect(&FSystemIconset,SIGNAL(reseted(const QString &)),SLOT(onSkinIconsetChanged(const QString &)));
+  FSystemIconset.openFile(SYSTEM_ICONSETFILE);
 }
 
 SettingsPlugin::~SettingsPlugin()
@@ -51,8 +51,8 @@ bool SettingsPlugin::startPlugin()
   if (FMainWindowPlugin)
   {
     actOpenOptionsDialog = new Action(this);
+    actOpenOptionsDialog->setIcon(SYSTEM_ICONSETFILE,"psi/options");
     actOpenOptionsDialog->setText(tr("Options..."));
-    actOpenOptionsDialog->setIcon(FSystemIconset.iconByName("psi/options"));
     connect(actOpenOptionsDialog,SIGNAL(triggered(bool)),SLOT(openOptionsAction(bool)));
     FMainWindowPlugin->mainWindow()->mainMenu()->addAction(actOpenOptionsDialog,MAINMENU_ACTION_GROUP_OPTIONS,true);
   }
@@ -310,12 +310,6 @@ void SettingsPlugin::onPluginManagerQuit()
     saveSettings();
     FProfileOpened = false;
   }
-}
-
-void SettingsPlugin::onSkinIconsetChanged(const QString &)
-{
-  if (actOpenOptionsDialog)
-    actOpenOptionsDialog->setIcon(FSystemIconset.iconByName("psi/options"));
 }
 
 Q_EXPORT_PLUGIN2(SettingsPlugin, SettingsPlugin)

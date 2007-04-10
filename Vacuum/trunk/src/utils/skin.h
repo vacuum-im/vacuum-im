@@ -11,6 +11,7 @@ class UTILS_EXPORT SkinIconset :
   public QObject
 {
   Q_OBJECT;
+  friend class Skin;
 
 public:
   SkinIconset(QObject *AParent = NULL);
@@ -28,9 +29,9 @@ public:
   QIcon iconByName(const QString &AIconName) const;
   QIcon iconByTagValue(const QString &ATag, QString &AValue) const;
 signals:
-  void reseted(const QString &ASkinName);
-public slots:
-  void reset(const QString &ASkinName);
+  void skinChanged();
+protected:
+  void reset();
 private:
   QString FFileName;
   Iconset FIconset;
@@ -49,7 +50,7 @@ public:
   static void setSkin(const QString &ASkinName);
   static const QString &skin();
 protected:
-  static void resetSkin();
+  static void reset();
 private:
   static QString FPathToSkins;
   static QString FSkinName;

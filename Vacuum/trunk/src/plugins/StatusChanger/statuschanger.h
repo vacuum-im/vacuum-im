@@ -10,7 +10,6 @@
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/iaccountmanager.h"
-#include "../../utils/skin.h"
 
 #define STATUSCHANGER_UUID "{F0D57BD2-0CD4-4606-9CEE-15977423F8DC}"
 
@@ -54,7 +53,7 @@ protected:
   void updateAccount(IPresence *APresence);
   void autoConnect(IPresence *APresence);
   void autoReconnect(IPresence *APresence);
-  QIcon getStatusIcon(IPresence::Show AShow) const;
+  QString getStatusIconName(IPresence::Show AShow) const;
   QString getStatusName(IPresence::Show AShow) const;
   QString getStatusText(IPresence::Show AShow) const;
   int getStatusPriority(IPresence::Show AShow) const;
@@ -67,7 +66,6 @@ protected slots:
   void onRosterClosed(IRoster *ARoster);
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
   void onReconnectTimer();
-  void onSkinChanged(const QString &ASkinName);
 private:
   IPresencePlugin *FPresencePlugin;
   IRosterPlugin *FRosterPlugin;
@@ -88,7 +86,6 @@ private:
   QHash<IPresence *,PresenceItem> FWaitOnline;
   QHash<IPresence *,IAccount *> FAccounts;
   QHash<IPresence *,QPair<QDateTime,PresenceItem> > FWaitReconnect;
-  SkinIconset FStatusIconset;
 };
 
 #endif // STATUSCHANGER_H

@@ -70,7 +70,6 @@ protected slots:
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
   void onPluginManagerQuit();
-  void onSkinIconsetChanged(const QString &);
 private:
   IPluginManager *FPluginManager;
   IMainWindowPlugin *FMainWindowPlugin;

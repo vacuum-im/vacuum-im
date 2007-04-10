@@ -87,10 +87,10 @@ QIcon SkinIconset::iconByTagValue(const QString &ATag, QString &AValue) const
   return icon;  
 }
 
-void SkinIconset::reset(const QString &ASkinName) 
+void SkinIconset::reset() 
 {
   openFile(FFileName);
-  emit reseted(ASkinName);
+  emit skinChanged();
 }
 
 
@@ -154,7 +154,7 @@ void Skin::setPathToSkins(const QString &APathToSkins)
   if (FPathToSkins != APathToSkins)
   {
     FPathToSkins = APathToSkins;
-    resetSkin();
+    reset();
   }
 }
 
@@ -168,7 +168,7 @@ void Skin::setSkin(const QString &ASkinName)
   if (FSkinName != ASkinName)
   {
     FSkinName = ASkinName;
-    resetSkin();
+    reset();
   }
 }
 
@@ -177,12 +177,12 @@ const QString &Skin::skin()
   return FSkinName;
 }
 
-void Skin::resetSkin()
+void Skin::reset()
 {
   FIconsets.clear();
 
   QPointer<SkinIconset> skinIconset;
   foreach(skinIconset,FSkinIconsets)
-    if (!skinIconset.isNull())
-      skinIconset->reset(FSkinName);
+    //if (!skinIconset.isNull())
+      skinIconset->reset();
 }

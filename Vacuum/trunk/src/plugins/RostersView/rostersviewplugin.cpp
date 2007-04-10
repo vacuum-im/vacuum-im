@@ -1,15 +1,16 @@
 #include "rostersviewplugin.h"
 //#include "sortfilterproxymodel.h"
 
+#define STATUS_ICONSETFILE "status/common.jisp" 
+
 RostersViewPlugin::RostersViewPlugin()
 {
-  FStatusIconset.openFile("status/common.jisp");
   FRostersModelPlugin = 0;
   FMainWindowPlugin = 0;
   FRostersView = 0;
 
   FShowOffline = new Action(this);
-  FShowOffline->setIcon(FStatusIconset.iconByName("offline"));
+  FShowOffline->setIcon(STATUS_ICONSETFILE,"offline");
   FShowOffline->setToolTip(tr("Show offline contacts"));
   FShowOffline->setCheckable(true);
   FShowOffline->setChecked(true);
