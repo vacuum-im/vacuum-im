@@ -105,17 +105,17 @@ Iconset Skin::getIconset(const QString &AFileName)
   if (!fullFileName.endsWith('/'))
     fullFileName.append('/');
   
-  fullFileName+="iconset"+AFileName;
+  fullFileName+="iconset/"+AFileName;
 
   if (!FIconsets.contains(fullFileName))
   {
     Iconset iconset(fullFileName);
     if (iconset.isValid())
-      FIconsets.insert(AFileName,iconset);
+      FIconsets.insert(fullFileName,iconset);
     return iconset;
   }
   else
-    return FIconsets.value(AFileName);
+    return FIconsets.value(fullFileName);
 }
 
 Iconset Skin::getDefIconset(const QString &AFileName)
@@ -130,11 +130,11 @@ Iconset Skin::getDefIconset(const QString &AFileName)
   {
     Iconset iconset(fullFileName);
     if (iconset.isValid())
-      FIconsets.insert(AFileName,iconset);
+      FIconsets.insert(fullFileName,iconset);
     return iconset;
   }
   else
-    return FIconsets.value(AFileName);
+    return FIconsets.value(fullFileName);
 }
 
 void Skin::addSkinIconset(SkinIconset *ASkinIconset)
