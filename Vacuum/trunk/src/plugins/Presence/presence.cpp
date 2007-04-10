@@ -25,7 +25,8 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
   bool hooked = false;
   if (AHandlerId == FPresenceHandler)
   {
-    if (AStanza.from().isEmpty())
+    static QStringList availableTypes = QStringList() << "" << "unavailable" << "error"; 
+    if (AStanza.from().isEmpty() || !availableTypes.contains(AStanza.type()))
       return false;
 
     PresenceItem *pItem = (PresenceItem *)item(AStanza.from());
@@ -35,26 +36,7 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
       FItems.append(pItem); 
     }
      
-    if (AStanza.type() == "error")
-    {
-      ErrorHandler err(ErrorHandler::DEFAULTNS,AStanza.element());
-      pItem->setShow(Error);
-      pItem->setStatus(err.meaning());
-      pItem->setPriority(0);
-      emit presenceItem(pItem);
-      hooked = true;
-    }
-    else if (AStanza.type() == "unavailable")
-    {
-      pItem->setShow(Offline);
-      pItem->setStatus(AStanza.firstElement("status").firstChild().toText().data());
-      pItem->setPriority(0);
-      emit presenceItem(pItem);
-      FItems.removeAt(FItems.indexOf(pItem));
-      delete pItem;
-      hooked = true;
-    }
-    else if (AStanza.type().isEmpty())
+    if (AStanza.type().isEmpty())
     {
       QString showText = AStanza.firstElement("show").firstChild().toText().data();
       Show show;
@@ -72,6 +54,25 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
       pItem->setShow(show);
       pItem->setStatus(AStanza.firstElement("status").firstChild().toText().data());
       pItem->setPriority(AStanza.firstElement("status").firstChild().toText().data().toInt());  
+      emit presenceItem(pItem);
+      hooked = true;
+    }
+    else if (AStanza.type() == "unavailable")
+    {
+      pItem->setShow(Offline);
+      pItem->setStatus(AStanza.firstElement("status").firstChild().toText().data());
+      pItem->setPriority(0);
+      emit presenceItem(pItem);
+      FItems.removeAt(FItems.indexOf(pItem));
+      delete pItem;
+      hooked = true;
+    }
+    else if (AStanza.type() == "error")
+    {
+      ErrorHandler err(ErrorHandler::DEFAULTNS,AStanza.element());
+      pItem->setShow(Error);
+      pItem->setStatus(err.meaning());
+      pItem->setPriority(0);
       emit presenceItem(pItem);
       hooked = true;
     }

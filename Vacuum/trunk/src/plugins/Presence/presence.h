@@ -53,6 +53,7 @@ protected:
 private:
   IXmppStream *FStream;
   IStanzaProcessor *FStanzaProcessor;
+private:
   HandlerId FPresenceHandler;
   QList<PresenceItem *> FItems;
   Show FShow;
