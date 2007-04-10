@@ -1,4 +1,5 @@
 #include "statuschanger.h"
+#include <QTimer>
 #include <QToolButton>
 
 StatusChanger::StatusChanger()
@@ -68,6 +69,10 @@ bool StatusChanger::initPlugin(IPluginManager *APluginManager)
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
   
+  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  if (plugin)
+    FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+  
   return FPresencePlugin!=NULL;
 }
 
@@ -129,6 +134,7 @@ void StatusChanger::setPresence(IPresence::Show AShow, const QString &AStatus,
 
   foreach(presence,presences)
   {
+    FWaitReconnect.remove(presence);
     if (AShow == IPresence::Offline)
     {
       presence->setPresence(AShow,AStatus,APriority,Jid());
@@ -153,7 +159,7 @@ void StatusChanger::setPresence(IPresence::Show AShow, const QString &AStatus,
   }
 }
 
-void StatusChanger::onChangeStatus(bool)
+void StatusChanger::onChangeStatusAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)
@@ -192,7 +198,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Online));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Online));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
@@ -202,7 +208,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Chat));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Chat));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
@@ -212,7 +218,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Away));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Away));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
@@ -222,7 +228,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::ExtendedAway));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::ExtendedAway));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
@@ -232,7 +238,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::DoNotDistrib));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::DoNotDistrib));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
@@ -242,7 +248,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Invisible));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Invisible));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 
   action = new Action(menu);
@@ -252,7 +258,7 @@ void StatusChanger::createStatusActions(IPresence *APresence)
   action->setData(Action::DR_Parametr2,getStatusText(IPresence::Offline));
   action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Offline));
   action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatus(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
   menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
 }
 
@@ -291,6 +297,56 @@ void StatusChanger::removeStreamMenu(IPresence *APresence)
     menu->clear();
     delete menu;
   }
+}
+
+void StatusChanger::updateAccount(IPresence *APresence)
+{
+  IAccount *account = FAccounts.value(APresence,NULL);
+  if (account && APresence->show() != IPresence::Offline && APresence->show() != IPresence::Error)
+  {
+    account->setValue("presence::last::show",APresence->show());
+    account->setValue("presence::last::status",APresence->status());
+    account->setValue("presence::last::priority",APresence->priority());
+  }
+}
+
+void StatusChanger::autoConnect(IPresence *APresence)
+{
+  IAccount *account = FAccounts.value(APresence,NULL);
+  if (account && APresence->show() == IPresence::Offline)
+  {
+    if (account->autoConnect())
+    {
+      IPresence::Show show = (IPresence::Show)account->value("presence::last::show",IPresence::Online).toInt();
+      QString status = account->value("presence::last::status",getStatusText(IPresence::Online)).toString();
+      int priority = account->value("presence::last::priority",getStatusPriority(IPresence::Online)).toInt();
+      setPresence(show,status,priority,APresence->xmppStream()->jid());
+    }
+  }
+}
+
+void StatusChanger::autoReconnect(IPresence *APresence)
+{
+  IAccount *account = FAccounts.value(APresence,NULL);
+  if (account && APresence->show() == IPresence::Error)
+  {
+    if (account->autoReconnect())
+    {
+      IPresence::Show show = (IPresence::Show)account->value("presence::last::show",IPresence::Online).toInt();
+      QString status = account->value("presence::last::status",getStatusText(IPresence::Online)).toString();
+      int priority = account->value("presence::last::priority",getStatusPriority(IPresence::Online)).toInt();
+      int reconnectTime = account->value("autoReconnectTime",30000).toInt();
+      QPair<QDateTime,PresenceItem> pair;
+      pair.first = QDateTime::currentDateTime().addMSecs(reconnectTime);
+      pair.second.show = show;
+      pair.second.status = status;
+      pair.second.priority = priority;
+      FWaitReconnect.insert(APresence,pair);
+      QTimer::singleShot(reconnectTime+100,this,SLOT(onReconnectTimer()));
+    }
+  }
+  else
+    FWaitReconnect.remove(APresence);
 }
 
 QIcon StatusChanger::getStatusIcon(IPresence::Show AShow) const
@@ -393,11 +449,19 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
 {
   FPresences.append(APresence);
   addStreamMenu(APresence);
+  if (FAccountManager)
+  {
+    FAccounts.insert(APresence,FAccountManager->accountByStream(APresence->xmppStream()->jid()));
+    autoConnect(APresence);
+  }
 }
 
 void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
-                                   const QString &, qint8 , const Jid &)
+                                   const QString &, qint8 , const Jid &AJid)
 {
+  if (AJid.isValid())
+    return;
+
   FWaitOnline.remove(APresence);
   if (AShow != FBaseShow)
   {
@@ -419,6 +483,7 @@ void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
       setBaseShow(AShow);
   }
   updateMenu(APresence);
+  autoReconnect(APresence);
 }
 
 void StatusChanger::onPresenceRemoved(IPresence *APresence)
@@ -426,11 +491,25 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
   FWaitOnline.remove(APresence);
   removeStreamMenu(APresence);
   FPresences.removeAt(FPresences.indexOf(APresence));
+  FAccounts.remove(APresence);
+  FWaitReconnect.remove(APresence);
 }
 
-void StatusChanger::onSkinChanged(const QString &)
+void StatusChanger::onRosterOpened(IRoster *ARoster)
 {
-  updateMenu();
+  IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
+  if (FWaitOnline.contains(presence))
+  {
+    PresenceItem item = FWaitOnline.value(presence);
+    presence->setPresence(item.show,item.status,item.priority,Jid());
+    FWaitOnline.remove(presence);
+  }
+}
+
+void StatusChanger::onRosterClosed(IRoster *ARoster)
+{
+  IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
+  FWaitOnline.remove(presence);
 }
 
 void StatusChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu)
@@ -449,21 +528,30 @@ void StatusChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
   }
 }
 
-void StatusChanger::onRosterOpened(IRoster *ARoster)
+void StatusChanger::onReconnectTimer()
 {
-  IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
-  if (FWaitOnline.contains(presence))
+  QHash<IPresence *,QPair<QDateTime,PresenceItem> >::iterator it = FWaitReconnect.begin();
+  while (it != FWaitReconnect.end())
   {
-    PresenceItem item = FWaitOnline.value(presence);
-    presence->setPresence(item.show,item.status,item.priority,Jid());
-    FWaitOnline.remove(presence);
+    if (it.value().first <= QDateTime::currentDateTime()) 
+    {
+      IPresence *presence = it.key();
+      PresenceItem item = it.value().second;
+      it = FWaitReconnect.erase(it);
+      
+      IAccount *account = FAccounts.value(presence);
+      if (account)
+        if (presence->show() == IPresence::Error && account->autoReconnect())
+          setPresence(item.show,item.status,item.priority,presence->streamJid());
+    }
+    else
+      it++;
   }
 }
 
-void StatusChanger::onRosterClosed(IRoster *ARoster)
+void StatusChanger::onSkinChanged(const QString &)
 {
-  IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
-  FWaitOnline.remove(presence);
+  updateMenu();
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

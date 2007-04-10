@@ -13,7 +13,7 @@ public:
   virtual void setPresence(IPresence::Show AShow, const QString &AStatus, 
     int APriority, const Jid &AStreamJid = Jid()) =0;
 public slots:
-  virtual void onChangeStatus(bool) =0;
+  virtual void onChangeStatusAction(bool) =0;
 };
 
 Q_DECLARE_INTERFACE(IStatusChanger,"Vacuum.Plugin.IStatusChanger/1.0")
