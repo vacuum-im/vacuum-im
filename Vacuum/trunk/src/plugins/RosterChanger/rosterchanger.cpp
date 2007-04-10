@@ -151,17 +151,53 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
     if (itemType == IRosterIndex::IT_Contact || itemType == IRosterIndex::IT_Agent)
     {
       IRosterItem *rosterItem = roster->item(AIndex.data(IRosterIndex::DR_RosterJid).toString());
+      
+      QHash<int,QVariant> data;
+      data.insert(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_RosterJid));
+      data.insert(Action::DR_StreamJid,streamJid);
+      
+      Action *action;
+
+      Menu *subsMenu = new Menu(AMenu);
+      subsMenu->setTitle(tr("Subscription"));
+
+      action = new Action(subsMenu);
+      action->setText(tr("Send"));
+      action->setData(data);
+      action->setData(Action::DR_Parametr2,IRoster::Subscribed);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onSubscription(bool)));
+      subsMenu->addAction(action);
+
+      action = new Action(subsMenu);
+      action->setText(tr("Remove"));
+      action->setData(data);
+      action->setData(Action::DR_Parametr2,IRoster::Unsubscribed);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onSubscription(bool)));
+      subsMenu->addAction(action);
+
+      action = new Action(subsMenu);
+      action->setText(tr("Request"));
+      action->setData(data);
+      action->setData(Action::DR_Parametr2,IRoster::Subscribe);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onSubscription(bool)));
+      subsMenu->addAction(action);
+
+      action = new Action(subsMenu);
+      action->setText(tr("Refuse"));
+      action->setData(data);
+      action->setData(Action::DR_Parametr2,IRoster::Unsubscribe);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onSubscription(bool)));
+      subsMenu->addAction(action);
+
+      AMenu->addAction(subsMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP);
+
       QSet<QString> exceptGroups;
       if (rosterItem)
         exceptGroups = rosterItem->groups();
 
-      QHash<int,QVariant> data;
-      data.insert(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_RosterJid));
       data.insert(Action::DR_Parametr2,AIndex.data(IRosterIndex::DR_RosterName));
       data.insert(Action::DR_Parametr3,AIndex.data(IRosterIndex::DR_RosterGroup));
-      data.insert(Action::DR_StreamJid,streamJid);
 
-      Action *action;
       action = new Action(AMenu);
       action->setText(tr("Rename..."));
       //action->setIcon(FSystemIconset.iconByName("psi/groupChat"));
@@ -232,6 +268,22 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       action->setData(data);
       connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveGroup(bool)));
       AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
+    }
+  }
+}
+
+void RosterChanger::onSubscription(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QString streamJid = action->data(Action::DR_StreamJid).toString();
+    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    if (roster && roster->isOpen())
+    {
+      QString rosterJid = action->data(Action::DR_Parametr1).toString();
+      IRoster::SubscriptionType subsType = (IRoster::SubscriptionType)action->data(Action::DR_Parametr2).toInt();
+      roster->sendSubscription(rosterJid,subsType);
     }
   }
 }

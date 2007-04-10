@@ -36,6 +36,8 @@ protected:
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
 protected slots:
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
+  //Operations on subscription
+  void onSubscription(bool);
   //Operations on items
   void onRenameItem(bool);
   void onCopyItemToGroup(bool);
