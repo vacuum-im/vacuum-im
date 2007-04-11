@@ -1,5 +1,9 @@
 #include "rosterchanger.h"
+
 #include <QInputDialog>
+
+#define ROSTERCHANGER_ACTION_GROUP_SUBSCRIPTION 790
+#define ROSTERCHANGER_ACTION_GROUP 800
 
 RosterChanger::RosterChanger()
 {
@@ -196,7 +200,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       connect(action,SIGNAL(triggered(bool)),SLOT(onSubscription(bool)));
       subsMenu->addAction(action);
 
-      AMenu->addAction(subsMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP);
+      AMenu->addAction(subsMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP_SUBSCRIPTION);
 
       QSet<QString> exceptGroups;
       if (rosterItem)

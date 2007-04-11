@@ -8,8 +8,6 @@
 
 #define ROSTERCHANGER_UUID "{018E7891-2743-4155-8A70-EAB430573500}"
 
-#define ROSTERCHANGER_ACTION_GROUP 800
-
 class RosterChanger : 
   public QObject,
   public IPlugin
