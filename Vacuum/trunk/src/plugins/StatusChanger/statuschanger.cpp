@@ -12,14 +12,14 @@ StatusChanger::StatusChanger()
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
 
-  FMenu = new Menu(NULL);
+  mnuBase = new Menu(NULL);
   createStatusActions();
   setBaseShow(IPresence::Offline);
 }
 
 StatusChanger::~StatusChanger()
 {
-  delete FMenu;
+  delete mnuBase;
 }
 
 //IPlugin
@@ -64,11 +64,25 @@ bool StatusChanger::initPlugin(IPluginManager *APluginManager)
 
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
+  {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+    if (FMainWindowPlugin)
+    {
+      connect(FMainWindowPlugin->instance(),SIGNAL(mainWindowCreated(IMainWindow *)),
+        SLOT(onMainWindowCreated(IMainWindow *)));
+    }
+  }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin)
+  {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+    if (FRostersViewPlugin)
+    {
+      connect(FRostersViewPlugin->instance(),SIGNAL(viewCreated(IRostersView *)),
+        SLOT(onRostersViewCreated(IRostersView *)));
+    }
+  }
   
   plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
   if (plugin)
@@ -79,21 +93,6 @@ bool StatusChanger::initPlugin(IPluginManager *APluginManager)
 
 bool StatusChanger::startPlugin()
 {
-  if (FRostersViewPlugin)
-  {
-    connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
-  }
-
-  if (FMainWindowPlugin)
-  {
-    QToolButton *tbutton = new QToolButton;
-    tbutton->setDefaultAction(FMenu->menuAction());
-    tbutton->setPopupMode(QToolButton::InstantPopup);
-    tbutton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    FMainWindowPlugin->mainWindow()->bottomToolBar()->addWidget(tbutton);
-  }
-
   return true;
 }
 
@@ -184,7 +183,7 @@ void StatusChanger::setBaseShow(IPresence::Show AShow)
 
 void StatusChanger::createStatusActions(IPresence *APresence)
 {
-  Menu *menu = FMenu;
+  Menu *menu = mnuBase;
   QString streamJid;
   if (APresence)
   {
@@ -267,8 +266,8 @@ void StatusChanger::updateMenu(IPresence *APresence)
 {
   if (!APresence)
   {
-    FMenu->setIcon(STATUS_ICONSETFILE,getStatusIconName(FBaseShow));
-    FMenu->setTitle(getStatusName(FBaseShow));
+    mnuBase->setIcon(STATUS_ICONSETFILE,getStatusIconName(FBaseShow));
+    mnuBase->setTitle(getStatusName(FBaseShow));
   }
   else if (FStreamMenus.contains(APresence))
   {
@@ -281,10 +280,10 @@ void StatusChanger::addStreamMenu(IPresence *APresence)
 {
   if (APresence && !FStreamMenus.contains(APresence))
   {
-    Menu *menu = new Menu(FMenu);
+    Menu *menu = new Menu(mnuBase);
     menu->setTitle(APresence->streamJid().full());
     FStreamMenus.insert(APresence,menu);
-    FMenu->addAction(menu->menuAction(),STATUSMENU_ACTION_GROUP_STREAM,true);
+    mnuBase->addAction(menu->menuAction(),STATUSMENU_ACTION_GROUP_STREAM,true);
     createStatusActions(APresence);
     updateMenu(APresence);
   }
@@ -444,6 +443,21 @@ int StatusChanger::getStatusPriority(IPresence::Show AShow) const
     return 0;
   }
   return -1;
+}
+
+void StatusChanger::onRostersViewCreated(IRostersView *ARostersView)
+{
+  connect(ARostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
+    SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+}
+
+void StatusChanger::onMainWindowCreated(IMainWindow *AMainWindow)
+{
+  QToolButton *tbutton = new QToolButton;
+  tbutton->setDefaultAction(mnuBase->menuAction());
+  tbutton->setPopupMode(QToolButton::InstantPopup);
+  tbutton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  AMainWindow->bottomToolBar()->addWidget(tbutton);
 }
 
 void StatusChanger::onPresenceAdded(IPresence *APresence)

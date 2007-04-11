@@ -32,9 +32,9 @@ class IRostersViewPlugin
 public:
   virtual QObject *instance() = 0;
   virtual IRostersView *rostersView() =0;
-  virtual Action *showOfflineAction() const =0;
-public slots:
-  virtual void onShowOfflineContactsChanged(bool AShow) =0;
+signals:
+  virtual void viewCreated(IRostersView *) =0;
+  virtual void viewDestroyed(IRostersView *) =0;
 };
 
 Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.0");

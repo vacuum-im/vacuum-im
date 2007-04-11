@@ -60,6 +60,8 @@ protected:
   void openAccountOptionsNode(const QString &AAccountId, const QString &AName = QString());
   void closeAccountOptionsNode(const QString &AAccountId);
 protected slots:
+  void onRostersViewCreated(IRostersView *ARostersView);
+  void onMainWindowCreated(IMainWindow *AMainWindow);
   void onOptionsAccountAdded(const QString &AName);
   void onOptionsAccountRemoved(const QString &AAccountId);
   void onOptionsDialogAccepted();
@@ -75,7 +77,7 @@ private:
   IMainWindowPlugin *FMainWindowPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
-  Action *FAccountsSetup;
+  Action *actAccountsSetup;
 private:
   mutable QPointer<AccountManage> FAccountManage;
   mutable QHash<QString,QPointer<AccountOptions> > FAccountOptions;

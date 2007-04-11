@@ -33,19 +33,20 @@ bool RosterChanger::initPlugin(IPluginManager *APluginManager)
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin)
+  {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+    if (FRostersViewPlugin)
+    {
+      connect(FRostersViewPlugin->instance(),SIGNAL(viewCreated(IRostersView *)),
+        SLOT(onRostersViewCreated(IRostersView *)));
+    }
+  }
 
   return FRosterPlugin!=NULL;
 }
 
 bool RosterChanger::startPlugin()
 {
-  if (FRostersViewPlugin)
-  {
-    connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
-  }
-
   return true;
 }
 
@@ -136,6 +137,12 @@ Menu * RosterChanger::createGroupMenu(const QHash<int,QVariant> AData, const QSe
     }
   }
   return menu;
+}
+
+void RosterChanger::onRostersViewCreated(IRostersView *ARostersView)
+{
+  connect(ARostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
+    SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
 }
 
 void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu)

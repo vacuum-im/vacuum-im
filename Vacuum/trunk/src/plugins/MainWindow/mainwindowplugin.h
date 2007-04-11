@@ -1,10 +1,10 @@
 #ifndef MAINWINDOWPLUGIN_H
 #define MAINWINDOWPLUGIN_H
 
-#include <QObjectCleanupHandler>
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/isettings.h"
+#include "../../utils/action.h"
 #include "mainwindow.h"
 
 #define MAINWINDOW_UUID "{A6F3D775-8464-4599-AB79-97BA1BAA6E96}"
@@ -31,12 +31,19 @@ public:
 
   //IMainWindowPlugin
   virtual IMainWindow *mainWindow() const;
+signals:
+  virtual void mainWindowCreated(IMainWindow *);
+  virtual void mainWindowDestroyed(IMainWindow *);
+protected:
+  void createMainWindow();
+protected slots:
+  void onSettingsOpened();
+  void onSettingsClosed();
 private:
   IPluginManager *FPluginManager;
   ISettings *FSettings;
 private:
   MainWindow *FMainWindow;
-  QObjectCleanupHandler FCleanupHandler;
 };
 
 #endif // MAINWINDOW_H

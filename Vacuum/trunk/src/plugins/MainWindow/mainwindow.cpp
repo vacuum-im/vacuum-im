@@ -1,44 +1,23 @@
 #include <QtDebug>
 #include "mainwindow.h"
+
 #include <QCloseEvent>
 #include <QToolButton>
 
 #define SYSTEM_ICONSETFILE "system/common.jisp"
 
-MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags)
-  : QMainWindow(AParent,AFlags)
+MainWindow::MainWindow(Qt::WindowFlags AFlags)
+  : QMainWindow(NULL,AFlags)
 {
-  FPluginManager = NULL;
-  FSettings = NULL;
   setIconSize(QSize(16,16));
   createLayouts();
   createToolBars();
   createMenus();
-  createActions();
 }
 
 MainWindow::~MainWindow()
 {
-  qDebug() << "~MainWindow";
-}
 
-bool MainWindow::init(IPluginManager *APluginManager, ISettings *ASettings)
-{
-  FPluginManager = APluginManager;
-  FSettings = ASettings;
-  if (FSettings)
-  {
-    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
-    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
-  }
-  connectActions();
-  return true;
-}
-
-bool MainWindow::start()
-{
-  show();
-  return true;
 }
 
 void MainWindow::createLayouts()
@@ -87,30 +66,6 @@ void MainWindow::createMenus()
   tbutton->setPopupMode(QToolButton::InstantPopup);
   tbutton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   FBottomToolBar->addWidget(tbutton);
-}
-
-void MainWindow::createActions()
-{
-  actQuit = new Action(this);
-  actQuit->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
-  actQuit->setText(tr("Quit"));
-  mnuMain->addAction(actQuit,MAINWINDOW_ACTION_GROUP_QUIT);
-}
-
-void MainWindow::connectActions()
-{
-  connect(actQuit,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
-}
-
-void MainWindow::onSettingsOpened()
-{
-  setGeometry(FSettings->value("window:geometry",geometry()).toRect());
-}
-
-void MainWindow::onSettingsClosed()
-{
-  if (isVisible())
-    FSettings->setValue("window:geometry",geometry());
 }
 
 void MainWindow::closeEvent(QCloseEvent *AEvent)

@@ -36,26 +36,25 @@ void SettingsPlugin::pluginInfo(PluginInfo *APluginInfo)
 bool SettingsPlugin::initPlugin(IPluginManager *APluginManager)
 {
   FPluginManager = APluginManager;
+  connect(FPluginManager->instance(),SIGNAL(aboutToQuit()),SLOT(onPluginManagerQuit()));
   
   IPlugin *plugin = FPluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
+  {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+    if (FMainWindowPlugin)
+    {
+      connect(FMainWindowPlugin->instance(),SIGNAL(mainWindowCreated(IMainWindow *)),
+        SLOT(onMainWindowCreated(IMainWindow *)));
+    }
+  }
 
-  connect(FPluginManager->instance(),SIGNAL(aboutToQuit()),SLOT(onPluginManagerQuit()));
   return setFileName("config.xml");
 }
 
 bool SettingsPlugin::startPlugin()
 {
   setProfile(QString::null);
-  if (FMainWindowPlugin)
-  {
-    actOpenOptionsDialog = new Action(this);
-    actOpenOptionsDialog->setIcon(SYSTEM_ICONSETFILE,"psi/options");
-    actOpenOptionsDialog->setText(tr("Options..."));
-    connect(actOpenOptionsDialog,SIGNAL(triggered(bool)),SLOT(openOptionsAction(bool)));
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(actOpenOptionsDialog,MAINMENU_ACTION_GROUP_OPTIONS,true);
-  }
   return true;
 }
 
@@ -289,6 +288,15 @@ QWidget *SettingsPlugin::createNodeWidget(const QString &ANode)
   nodeLayout->addStretch();
   
   return nodeWidget;
+}
+
+void SettingsPlugin::onMainWindowCreated(IMainWindow *AMainWindow)
+{
+  actOpenOptionsDialog = new Action(this);
+  actOpenOptionsDialog->setIcon(SYSTEM_ICONSETFILE,"psi/options");
+  actOpenOptionsDialog->setText(tr("Options..."));
+  connect(actOpenOptionsDialog,SIGNAL(triggered(bool)),SLOT(openOptionsAction(bool)));
+  AMainWindow->mainMenu()->addAction(actOpenOptionsDialog,MAINMENU_ACTION_GROUP_OPTIONS,true);
 }
 
 void SettingsPlugin::onOptionsDialogAccepted()

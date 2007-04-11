@@ -3,9 +3,9 @@
 
 #include <QPointer>
 #include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/irostersview.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/irostersview.h"
 #include "../../utils/action.h"
 #include "rostersview.h"
 
@@ -33,14 +33,22 @@ public:
 
   //IRostersViewPlugin
   virtual IRostersView *rostersView();
-  virtual Action *showOfflineAction() const { return FShowOffline; }
-public slots:
-  virtual void onShowOfflineContactsChanged(bool AShow);
+signals:
+  virtual void viewCreated(IRostersView *);
+  virtual void viewDestroyed(IRostersView *);
+protected:
+  void createRostersView();
+  void createActions();
+protected slots:
+  void onRostersModelCreated(IRostersModel *);
+  void onMainWindowCreated(IMainWindow *);
+  void onShowOfflineContactsChanged(bool AShow);
+  void onRostersViewDestroyed(QObject *);
 private:
   IRostersModelPlugin *FRostersModelPlugin;
   IMainWindowPlugin *FMainWindowPlugin;
 private:
-  Action *FShowOffline;
+  Action *actShowOffline;
 private:
   RostersView *FRostersView; 
 };

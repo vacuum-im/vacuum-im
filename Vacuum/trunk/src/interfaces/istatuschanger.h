@@ -7,7 +7,7 @@
 class IStatusChanger {
 public:
   virtual QObject *instance() =0;
-  virtual Menu *mainMenu() const =0;
+  virtual Menu *baseMenu() const =0;
   virtual Menu *streamMenu(const Jid &AStreamJid) const =0;
   virtual IPresence::Show baseShow() const=0;
   virtual void setPresence(IPresence::Show AShow, const QString &AStatus, 

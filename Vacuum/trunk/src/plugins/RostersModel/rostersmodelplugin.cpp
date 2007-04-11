@@ -13,7 +13,10 @@ RostersModelPlugin::RostersModelPlugin()
 RostersModelPlugin::~RostersModelPlugin()
 {
   if (FRostersModel)
+  {
+    emit modelDestroyed(FRostersModel);
     delete FRostersModel;
+  }
 }
 
 //IPlugin
@@ -32,24 +35,22 @@ bool RostersModelPlugin::initPlugin(IPluginManager *APluginManager)
   IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
-    IRosterPlugin *rosters = qobject_cast<IRosterPlugin *>(plugin->instance());
-    if (rosters)
+    FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+    if (FRosterPlugin)
     {
-      FRosterPlugin = rosters;
-      connect(rosters->instance(), SIGNAL(rosterAdded(IRoster *)),SLOT(onRosterAdded(IRoster *))); 
-      connect(rosters->instance(), SIGNAL(rosterRemoved(IRoster *)),SLOT(onRosterRemoved(IRoster *))); 
+      connect(FRosterPlugin->instance(), SIGNAL(rosterAdded(IRoster *)),SLOT(onRosterAdded(IRoster *))); 
+      connect(FRosterPlugin->instance(), SIGNAL(rosterRemoved(IRoster *)),SLOT(onRosterRemoved(IRoster *))); 
     }
   }
 
   plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
-    IPresencePlugin *presences = qobject_cast<IPresencePlugin *>(plugin->instance());
-    if (presences)
+    FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+    if (FPresencePlugin)
     {
-      FPresencePlugin = presences;
-      connect(presences->instance(), SIGNAL(presenceAdded(IPresence *)),SLOT(onPresenceAdded(IPresence *))); 
-      connect(presences->instance(), SIGNAL(presenceRemoved(IPresence *)),SLOT(onPresenceRemoved(IPresence *))); 
+      connect(FPresencePlugin->instance(), SIGNAL(presenceAdded(IPresence *)),SLOT(onPresenceAdded(IPresence *))); 
+      connect(FPresencePlugin->instance(), SIGNAL(presenceRemoved(IPresence *)),SLOT(onPresenceRemoved(IPresence *))); 
     }
   }
   return true;
@@ -57,27 +58,33 @@ bool RostersModelPlugin::initPlugin(IPluginManager *APluginManager)
 
 bool RostersModelPlugin::startPlugin()
 {
+  createRostersModel();
   return true;
 }
 
 //IRostersModelPlugin
 IRostersModel *RostersModelPlugin::rostersModel()
 {
-  if (!FRostersModel)
-  {
-    FRostersModel = new RostersModel(this);
-  }
-  return FRostersModel;
+   return FRostersModel;
 }
 
 bool RostersModelPlugin::addStreamRoster(IRoster *ARoster, IPresence *APresence)
 {
-  return rostersModel()->appendStream(ARoster,APresence) != NULL;
+  return FRostersModel->appendStream(ARoster,APresence) != NULL;
 }
 
 bool RostersModelPlugin::removeStreamRoster(const Jid &AStreamJid)
 {
-  return rostersModel()->removeStream(AStreamJid.pFull());
+  return FRostersModel->removeStream(AStreamJid.pFull());
+}
+
+void RostersModelPlugin::createRostersModel()
+{
+  if (!FRostersModel)
+  {
+    FRostersModel = new RostersModel(this);
+    emit modelCreated(FRostersModel);
+  }
 }
 
 void RostersModelPlugin::onRosterAdded(IRoster *ARoster)

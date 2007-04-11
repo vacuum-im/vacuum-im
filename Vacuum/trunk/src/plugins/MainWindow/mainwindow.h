@@ -1,12 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imainwindow.h"
-#include "../../interfaces/isettings.h"
 #include "../../utils/menu.h"
-
-#define MAINWINDOW_ACTION_GROUP_QUIT 1000
 
 class MainWindow : 
   virtual public QMainWindow,
@@ -16,11 +12,8 @@ class MainWindow :
   Q_INTERFACES(IMainWindow);
 
 public:
-  MainWindow(QWidget *AParent = NULL, Qt::WindowFlags AFlags = 0);
+  MainWindow(Qt::WindowFlags AFlags = 0);
   ~MainWindow();
-
-  bool init(IPluginManager *APluginManager, ISettings *ASettings);
-  bool start();
 
   virtual QObject *instance() { return this; }
 
@@ -36,20 +29,10 @@ protected:
   void createLayouts();
   void createToolBars(); 
   void createMenus();
-  void createActions();
-  void connectActions();
-protected slots:
-  void onSettingsOpened();
-  void onSettingsClosed();
 protected:
   virtual void closeEvent(QCloseEvent *AEvent);
 protected:
   Menu *mnuMain;
-protected:
-  Action *actQuit;
-private:
-  IPluginManager *FPluginManager;
-  ISettings *FSettings;
 private:
   QVBoxLayout     *FMainLayout;
   QStackedWidget  *FUpperWidget;

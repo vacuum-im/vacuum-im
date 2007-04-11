@@ -67,6 +67,7 @@ signals:
 protected:
   QWidget *createNodeWidget(const QString &ANode);
 protected slots:
+  void onMainWindowCreated(IMainWindow *AMainWindow);
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
   void onPluginManagerQuit();

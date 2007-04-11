@@ -34,6 +34,7 @@ protected:
   Menu *createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
 protected slots:
+  void onRostersViewCreated(IRostersView *ARostersView);
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
   //Operations on subscription
   void onSubscription(bool);

@@ -26,6 +26,9 @@ class IMainWindowPlugin
 public:
   virtual QObject *instance() = 0;
   virtual IMainWindow *mainWindow() const = 0;
+signals:
+  virtual void mainWindowCreated(IMainWindow *) =0;
+  virtual void mainWindowDestroyed(IMainWindow *) =0;
 };
 
 Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.0")

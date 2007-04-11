@@ -147,8 +147,10 @@ public:
   virtual bool addStreamRoster(IRoster *, IPresence *) =0;
   virtual bool removeStreamRoster(const Jid &AStreamJid) =0;
 signals:
+  virtual void modelCreated(IRostersModel *) =0;
   virtual void streamRosterAdded(const Jid &AStreamJid) =0;
   virtual void streamRosterRemoved(const Jid &AStreamJid) =0;
+  virtual void modelDestroyed(IRostersModel *) =0;
 };
 
 Q_DECLARE_INTERFACE(IRosterIndexDataHolder,"Vacuum.Plugin.IRosterIndexDataHolder/1.0");

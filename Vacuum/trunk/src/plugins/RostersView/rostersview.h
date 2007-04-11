@@ -5,6 +5,7 @@
 #include <QPainter>
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
+#include "../../interfaces/isettings.h"
 #include "sortfilterproxymodel.h"
 
 class RostersView : 
@@ -40,9 +41,10 @@ protected:
   void contextMenuEvent (QContextMenuEvent *AEvent);
 private:
   IRostersModel *FRostersModel;
+private:
   QList<QAbstractProxyModel *> FProxyModels;
-  Menu *FContextMenu;
   SortFilterProxyModel *FSortFilterProxyModel;
+  Menu *FContextMenu;
 };
 
 #endif // ROSTERSVIEW_H

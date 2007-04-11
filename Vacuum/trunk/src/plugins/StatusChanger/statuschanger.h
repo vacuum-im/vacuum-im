@@ -37,7 +37,7 @@ public:
   virtual bool startPlugin();
   
   //IStatusChanger
-  virtual Menu *mainMenu() const { return FMenu; }
+  virtual Menu *baseMenu() const { return mnuBase; }
   virtual Menu *streamMenu(const Jid &AStreamJid) const;
   virtual IPresence::Show baseShow() const { return FBaseShow; }
   virtual void setPresence(IPresence::Show AShow, const QString &AStatus, 
@@ -58,6 +58,8 @@ protected:
   QString getStatusText(IPresence::Show AShow) const;
   int getStatusPriority(IPresence::Show AShow) const;
 protected slots:
+  void onRostersViewCreated(IRostersView *ARostersView);
+  void onMainWindowCreated(IMainWindow *AMainWindow);
   void onPresenceAdded(IPresence *APresence);
   void onSelfPresence(IPresence *, IPresence::Show AShow, 
     const QString &AStatus, qint8 APriority, const Jid &AJid);
@@ -73,7 +75,7 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   IAccountManager *FAccountManager;
 private:
-  Menu *FMenu;
+  Menu *mnuBase;
   QHash<IPresence *, Menu *> FStreamMenus;
 private:
   struct PresenceItem {

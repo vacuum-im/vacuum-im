@@ -32,8 +32,12 @@ public:
   virtual bool addStreamRoster(IRoster *ARoster, IPresence *APresence);
   virtual bool removeStreamRoster(const Jid &AStreamJid);
 signals:
+  virtual void modelCreated(IRostersModel *);
   virtual void streamRosterAdded(const Jid &);
   virtual void streamRosterRemoved(const Jid &);
+  virtual void modelDestroyed(IRostersModel *);
+protected:
+  void createRostersModel();
 protected slots:
   void onRosterAdded(IRoster *ARoster);
   void onRosterRemoved(IRoster *ARoster);

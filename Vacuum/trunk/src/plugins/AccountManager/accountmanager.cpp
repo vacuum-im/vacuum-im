@@ -15,7 +15,7 @@ AccountManager::AccountManager()
   FSettings = NULL;
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
-  FAccountsSetup = NULL;
+  actAccountsSetup = NULL;
   srand(QTime::currentTime().msec());
 }
 
@@ -66,11 +66,25 @@ bool AccountManager::initPlugin(IPluginManager *APluginManager)
 
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
+  {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+    if (FMainWindowPlugin)
+    {
+      connect(FMainWindowPlugin->instance(),SIGNAL(mainWindowCreated(IMainWindow *)),
+        SLOT(onMainWindowCreated(IMainWindow *)));
+    }
+  }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin)
+  {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+    if (FRostersViewPlugin)
+    {
+      connect(FRostersViewPlugin->instance(),SIGNAL(viewCreated(IRostersView *)),
+        SLOT(onRostersViewCreated(IRostersView *)));
+    }
+  }
 
   return FXmppStreams!=NULL && FSettingsPlugin!=NULL && FSettings!=NULL;
 }
@@ -80,23 +94,6 @@ bool AccountManager::startPlugin()
   FSettingsPlugin->openOptionsNode(OPTIONS_NODE_ACCOUNTS,tr("Accounts"),
     tr("Creating and removing accounts"),QIcon());
   FSettingsPlugin->appendOptionsHolder(this);
-
-  if (FRostersViewPlugin)
-  {
-    connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
-  }
-
-  if (FMainWindowPlugin)
-  {
-    FAccountsSetup = new Action(this);
-    FAccountsSetup->setIcon(SYSTEM_ICONSETFILE,"psi/account");
-    FAccountsSetup->setText(tr("Account setup..."));
-    FAccountsSetup->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS);
-    connect(FAccountsSetup,SIGNAL(triggered(bool)),
-      FSettingsPlugin->instance(),SLOT(openOptionsAction(bool)));
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FAccountsSetup,MAINMENU_ACTION_GROUP_OPTIONS,true);
-  }
   return true;
 }
 
@@ -304,6 +301,23 @@ void AccountManager::closeAccountOptionsNode(const QString &AAccountId)
     if (!options.isNull())
       delete options;
   }
+}
+
+void AccountManager::onRostersViewCreated(IRostersView *ARostersView)
+{
+  connect(ARostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
+    SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+}
+
+void AccountManager::onMainWindowCreated(IMainWindow *AMainWindow)
+{
+  actAccountsSetup = new Action(this);
+  actAccountsSetup->setIcon(SYSTEM_ICONSETFILE,"psi/account");
+  actAccountsSetup->setText(tr("Account setup..."));
+  actAccountsSetup->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS);
+  connect(actAccountsSetup,SIGNAL(triggered(bool)),
+    FSettingsPlugin->instance(),SLOT(openOptionsAction(bool)));
+  AMainWindow->mainMenu()->addAction(actAccountsSetup,MAINMENU_ACTION_GROUP_OPTIONS,true);
 }
 
 void AccountManager::onOptionsAccountAdded(const QString &AName)
