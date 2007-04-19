@@ -29,12 +29,10 @@ public:
 
   //IRostersModelPlugin
   virtual IRostersModel *rostersModel();
-  virtual bool addStreamRoster(IRoster *ARoster, IPresence *APresence);
-  virtual bool removeStreamRoster(const Jid &AStreamJid);
+  virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence);
+  virtual void removeStream(const Jid &AStreamJid);
 signals:
   virtual void modelCreated(IRostersModel *);
-  virtual void streamRosterAdded(const Jid &);
-  virtual void streamRosterRemoved(const Jid &);
   virtual void modelDestroyed(IRostersModel *);
 protected:
   void createRostersModel();

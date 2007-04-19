@@ -68,14 +68,14 @@ IRostersModel *RostersModelPlugin::rostersModel()
    return FRostersModel;
 }
 
-bool RostersModelPlugin::addStreamRoster(IRoster *ARoster, IPresence *APresence)
+IRosterIndex *RostersModelPlugin::addStream(IRoster *ARoster, IPresence *APresence)
 {
-  return FRostersModel->appendStream(ARoster,APresence) != NULL;
+  return FRostersModel->appendStream(ARoster,APresence);
 }
 
-bool RostersModelPlugin::removeStreamRoster(const Jid &AStreamJid)
+void RostersModelPlugin::removeStream(const Jid &AStreamJid)
 {
-  return FRostersModel->removeStream(AStreamJid.pFull());
+  FRostersModel->removeStream(AStreamJid.pFull());
 }
 
 void RostersModelPlugin::createRostersModel()
@@ -93,16 +93,12 @@ void RostersModelPlugin::onRosterAdded(IRoster *ARoster)
   if (FPresencePlugin)
     presence = FPresencePlugin->getPresence(ARoster->streamJid());
   if (presence)
-    addStreamRoster(ARoster,presence);
+    addStream(ARoster,presence);
 }
 
 void RostersModelPlugin::onRosterRemoved(IRoster *ARoster)
 {
-  if (rostersModel()->streams().contains(ARoster->streamJid().pFull()))
-  {
-    emit streamRosterRemoved(ARoster->streamJid());
-    removeStreamRoster(ARoster->streamJid());
-  }
+  removeStream(ARoster->streamJid());
 }
 
 void RostersModelPlugin::onPresenceAdded(IPresence *APresence)
@@ -111,16 +107,12 @@ void RostersModelPlugin::onPresenceAdded(IPresence *APresence)
   if (FRosterPlugin)
     roster = FRosterPlugin->getRoster(APresence->streamJid());
   if (roster)
-    addStreamRoster(roster,APresence);
+    addStream(roster,APresence);
 }
 
 void RostersModelPlugin::onPresenceRemoved(IPresence *APresence)
 {
-  if (rostersModel()->streams().contains(APresence->streamJid().pFull()))
-  {
-    emit streamRosterRemoved(APresence->streamJid());
-    removeStreamRoster(APresence->streamJid());
-  }
+  removeStream(APresence->streamJid());
 }
 
 Q_EXPORT_PLUGIN2(RostersModelPlugin, RostersModelPlugin)

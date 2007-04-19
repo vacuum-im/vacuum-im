@@ -41,14 +41,15 @@ public:
   virtual void setRemoveOnLastChildRemoved(bool ARemove) { FRemoveOnLastChildRemoved = ARemove; }
   virtual void setRemoveChildsOnRemoved(bool ARemove) { FRemoveChildsOnRemoved = ARemove; }
   virtual void setDestroyOnParentRemoved(bool ADestroy) {FDestroyOnParentRemoved = ADestroy; }
-public slots:
-  virtual void onDataChanged(int ARole = IRosterIndex::DR_AnyRole);
 signals:
-  virtual void dataChanged(IRosterIndex *);
+  virtual void dataChanged(IRosterIndex *, int ARole);
   virtual void childAboutToBeInserted(IRosterIndex *);
   virtual void childInserted(IRosterIndex *);
   virtual void childAboutToBeRemoved(IRosterIndex *);
   virtual void childRemoved(IRosterIndex *);
+protected:
+  //Для коррекции работы SortFilterProxyModel
+  virtual void emitParentDataChanged();
 protected slots:
   virtual void onChildIndexDestroyed(QObject *AIndex);
   virtual void onRemoveByLastChildRemoved();

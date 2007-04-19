@@ -31,7 +31,7 @@ public:
   //IRostersModel
   virtual IRosterIndex *appendStream(IRoster *ARoster, IPresence *APresence);
   virtual QStringList streams() const { return FStreams.keys(); }
-  virtual bool removeStream(const QString &AStreamJid);
+  virtual void removeStream(const QString &AStreamJid);
   virtual IRoster *getRoster(const QString &AStreamJid) const;
   virtual IPresence *getPresence(const QString &AStreamJid) const;
   virtual IRosterIndex *rootIndex() const { return FRootIndex; }
@@ -40,7 +40,8 @@ public:
   virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent);
   virtual IRosterIndex *findRosterIndex(int AType, const QVariant &AId, IRosterIndex *AParent) const;
   virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const;
-  virtual bool removeRosterIndex(IRosterIndex *AIndex);
+  virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);
+  virtual void removeRosterIndex(IRosterIndex *AIndex);
   virtual QString blankGroupName() const { return tr("Blank Group"); }
   virtual QString agentsGroupName() const { return tr("Agents"); }
   virtual QString myResourcesGroupName() const { return tr("My Resources"); }
@@ -48,15 +49,13 @@ public:
 signals:
   virtual void streamAdded(const Jid &);
   virtual void streamRemoved(const Jid &);
-  virtual void indexInsert(IRosterIndex *);
-  virtual void indexChanged(IRosterIndex *);
-  virtual void indexRemove(IRosterIndex *);
+  virtual void indexDataChanged(const QModelIndex &, int ARole);
 protected slots:
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onRosterItemRemoved(IRosterItem *ARosterItem);
   void onSelfPresence(IPresence::Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
   void onPresenceItem(IPresenceItem *APresenceItem);
-  void onIndexDataChanged(IRosterIndex *AIndex);
+  void onIndexDataChanged(IRosterIndex *AIndex, int ARole);
   void onIndexChildAboutToBeInserted(IRosterIndex *AIndex);
   void onIndexChildInserted(IRosterIndex *AIndex);
   void onIndexChildAboutToBeRemoved(IRosterIndex *AIndex);

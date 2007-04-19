@@ -72,17 +72,16 @@ void RosterIndex::appendChild(IRosterIndex *AIndex)
   if (AIndex && !FChilds.contains(AIndex))
   {
     FChilds.append(AIndex); 
-    emit childAboutToBeInserted(AIndex);
     AIndex->setParentIndex(this);
+    emit childAboutToBeInserted(AIndex);
     connect(AIndex->instance(),SIGNAL(destroyed(QObject *)),SLOT(onChildIndexDestroyed(QObject *)));
     emit childInserted(AIndex);
+    emitParentDataChanged();
   }
 }
 
 bool RosterIndex::removeChild(IRosterIndex *AIndex)
 {
-  bool removed = false;
-
   if (FChilds.contains(AIndex))
   {
     emit childAboutToBeRemoved(AIndex);
@@ -90,13 +89,14 @@ bool RosterIndex::removeChild(IRosterIndex *AIndex)
     AIndex->setParentIndex(0);
     disconnect(AIndex->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onChildIndexDestroyed(QObject *))); 
     emit childRemoved(AIndex);
+    emitParentDataChanged();
 
     if (FRemoveOnLastChildRemoved && FChilds.isEmpty())
       QTimer::singleShot(0,this,SLOT(onRemoveByLastChildRemoved()));
 
-    removed = true;
+    return true;
   }
-  return removed;
+  return false;
 }
 
 void RosterIndex::removeAllChilds()
@@ -154,7 +154,10 @@ bool RosterIndex::setData(int ARole, const QVariant &AData)
   }
 
   if (dataSeted && oldData != AData)
-    emit dataChanged(this);
+  {
+    emitParentDataChanged();
+    emit dataChanged(this, ARole);
+  }
 
   return dataSeted;
 }
@@ -199,9 +202,15 @@ IRosterIndexList RosterIndex::findChild(const QHash<int, QVariant> AData, bool A
   return indexes;  
 }
 
-void RosterIndex::onDataChanged(int /*ARole*/)
+void RosterIndex::emitParentDataChanged()
 {
-  emit dataChanged(this);
+  RosterIndex *index = NULL;
+  if (FParentIndex)
+    index = qobject_cast<RosterIndex *>(FParentIndex->instance());
+  if (index)
+    index->emitParentDataChanged();
+  if (FChilds.count() > 0)
+    emit dataChanged(this,IRosterIndex::DR_AnyRole);
 }
 
 void RosterIndex::onChildIndexDestroyed(QObject *AIndex)
@@ -227,3 +236,4 @@ void RosterIndex::onDestroyByParentRemoved()
   if (!FParentIndex)
     deleteLater();
 }
+
