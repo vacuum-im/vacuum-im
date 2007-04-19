@@ -4,10 +4,10 @@
 #include <QHeaderView>
 #include "rosterindexdelegate.h"
 
-RostersView::RostersView(IRostersModel *AModel, QWidget *AParent)
+RostersView::RostersView(QWidget *AParent)
   : QTreeView(AParent)
 {
-  FRostersModel = AModel;
+  FRostersModel = NULL;
   FContextMenu = new Menu(this);
 
   header()->hide();
@@ -17,11 +17,6 @@ RostersView::RostersView(IRostersModel *AModel, QWidget *AParent)
   setSortingEnabled(true);
   setContextMenuPolicy(Qt::DefaultContextMenu);
   setItemDelegate(new RosterIndexDelegate(this));
-  setModel(FRostersModel);
-
-  FSortFilterProxyModel = new SortFilterProxyModel(this);
-  FSortFilterProxyModel->setDynamicSortFilter(true);
-  addProxyModel(FSortFilterProxyModel);
 }
 
 RostersView::~RostersView()
@@ -29,16 +24,31 @@ RostersView::~RostersView()
 
 }
 
+void RostersView::setModel(IRostersModel *AModel)
+{
+  if (FRostersModel != AModel)
+  {
+    emit modelAboutToBeSeted(AModel);
+    FRostersModel = AModel;
+    if (!FProxyModels.isEmpty())
+      FProxyModels.first()->setSourceModel(AModel);
+    QTreeView::setModel(AModel);
+    emit modelSeted(AModel);
+  }
+}
+
 void RostersView::addProxyModel(QAbstractProxyModel *AProxyModel)
 {
   if (AProxyModel && !FProxyModels.contains(AProxyModel))
   {
-    if (!FProxyModels.isEmpty())
-      AProxyModel->setSourceModel(FProxyModels.last());
+    emit proxyModelAboutToBeAdded(AProxyModel);
+    QAbstractProxyModel *lastProxy = lastProxyModel();
+    FProxyModels.append(AProxyModel);
+    QTreeView::setModel(AProxyModel);
+    if (lastProxy)
+      AProxyModel->setSourceModel(lastProxy);
     else
       AProxyModel->setSourceModel(FRostersModel);
-    FProxyModels.append(AProxyModel);
-    setModel(AProxyModel);
     emit proxyModelAdded(AProxyModel); 
   }
 }
@@ -48,61 +58,55 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
   int index = FProxyModels.indexOf(AProxyModel);
   if (index != -1)
   {
+    emit proxyModelAboutToBeRemoved(AProxyModel);
     QAbstractProxyModel *befour = FProxyModels.value(index-1,NULL);
     QAbstractProxyModel *after = FProxyModels.value(index+1,NULL);
     if (after == NULL && befour == NULL)
-      setModel(FRostersModel);
+      QTreeView::setModel(FRostersModel);
     else if (after == NULL)
-      setModel(befour);
+      QTreeView::setModel(befour);
     else if (befour = NULL)
       after->setSourceModel(FRostersModel);
     else
       after->setSourceModel(befour);
-    FProxyModels.removeAt(index);
     AProxyModel->setSourceModel(NULL);
+    FProxyModels.removeAt(index);
     emit proxyModelRemoved(AProxyModel);
   } 
 }
 
 QModelIndex RostersView::mapToModel(const QModelIndex &AProxyIndex)
 {
-  QModelIndex index = AProxyIndex;
   if (FProxyModels.count() > 0)
   {
+    QModelIndex index = AProxyIndex;
     QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
     do 
     {
       it--;
       index = (*it)->mapToSource(index);
     } while(it != FProxyModels.constBegin());
+    return index;
   }
-  return index;
+  else
+    return AProxyIndex;
 }
 
 QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex)
 {
-  QModelIndex index = AModelIndex;
   if (FProxyModels.count() > 0)
   {
+    QModelIndex index = AModelIndex;
     QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
     while (it != FProxyModels.constEnd())
     {
       index = (*it)->mapFromSource(index);
-      it--;
+      it++;
     }
+    return index;
   }
-  return index;
-}
-
-bool RostersView::showOfflineContacts() const
-{
-  return FSortFilterProxyModel->showOffline();
-}
-
-void RostersView::setShowOfflineContacts(bool AShow)
-{
-  FSortFilterProxyModel->setShowOffline(AShow);
-  emit showOfflineContactsChanged(AShow);
+  else
+    return AModelIndex;
 }
 
 void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const

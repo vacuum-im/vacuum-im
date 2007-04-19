@@ -16,16 +16,14 @@ public:
   virtual void setSourceModel(QAbstractItemModel *ASourceModel);
   bool showOffline() const { return FShowOffline; }
   void setShowOffline(bool AShow);
+  bool sortByStatus() const { return FSortByStatus; }
+  void setSortByStatus(bool ASortByStatus);
 protected:
   virtual bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
   bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const;
-  bool hasFilteredParent(const QModelIndex &AModelIndex);
-protected slots:
-  void onSourseDataChanged(const QModelIndex &ATopLeft, const QModelIndex &ABottomRight);
-  void onSourseRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
-  void onSourseRowsRemoved(const QModelIndex &AParent, int AStart, int AEnd);
 private:
-  bool FShowOffline;    
+  bool FShowOffline;
+  bool FSortByStatus;
 };
 
 #endif // SORTFILTERPROXYMODEL_H

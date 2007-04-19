@@ -1,9 +1,13 @@
+#include <QtDebug>
 #include "sortfilterproxymodel.h"
+
+#include <QTimer>
 
 SortFilterProxyModel::SortFilterProxyModel(QObject *parent)
   : QSortFilterProxyModel(parent)
 {
   FShowOffline = true;
+  FSortByStatus = true;
 }
 
 SortFilterProxyModel::~SortFilterProxyModel()
@@ -13,27 +17,7 @@ SortFilterProxyModel::~SortFilterProxyModel()
 
 void SortFilterProxyModel::setSourceModel(QAbstractItemModel *ASourceModel)
 {
-  if (sourceModel())
-  {
-    disconnect(sourceModel(),SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
-      this, SLOT(onSourseDataChanged(const QModelIndex &, const QModelIndex &)));
-    disconnect(sourceModel(),SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-      this, SLOT(onSourseRowsInserted(const QModelIndex &,int,int)));
-    disconnect(sourceModel(),SIGNAL(rowsRemoved(const QModelIndex &,int,int)),
-      this, SLOT(onSourseRowsRemoved(const QModelIndex &,int,int)));
-  }
-
   QSortFilterProxyModel::setSourceModel(ASourceModel);
-  
-  if (sourceModel())
-  {
-    connect(sourceModel(),SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
-      SLOT(onSourseDataChanged(const QModelIndex &, const QModelIndex &)));
-    connect(sourceModel(),SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-      SLOT(onSourseRowsInserted(const QModelIndex &,int,int)));
-    connect(sourceModel(),SIGNAL(rowsRemoved(const QModelIndex &,int,int)),
-      SLOT(onSourseRowsRemoved(const QModelIndex &,int,int)));
-  }
 }
 
 void SortFilterProxyModel::setShowOffline(bool AShow)
@@ -41,9 +25,20 @@ void SortFilterProxyModel::setShowOffline(bool AShow)
   if (FShowOffline != AShow)
   {
     FShowOffline = AShow;
-    clear();    //filterChanged();
+    filterChanged();
+    clear();
   }
 }
+
+void SortFilterProxyModel::setSortByStatus(bool ASortByStatus)
+{
+  if (FSortByStatus != ASortByStatus)
+  {
+    FSortByStatus = ASortByStatus;
+    clear();
+  }
+}
+
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
@@ -53,7 +48,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
   {
     int leftShow = ALeft.data(IRosterIndex::DR_Show).toInt();
     int rightShow = ARight.data(IRosterIndex::DR_Show).toInt();
-    if (leftShow != rightShow)
+    if (FSortByStatus && leftType != IRosterIndex::IT_StreamRoot && leftShow != rightShow)
     {
       if (leftShow == IPresence::Offline)
         return true;
@@ -88,8 +83,9 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
         return indexShow != IPresence::Offline && indexShow != IPresence::Error;
       }
     case IRosterIndex::IT_Group:
-    case IRosterIndex::IT_BlankGroup:
     case IRosterIndex::IT_AgentsGroup:
+    case IRosterIndex::IT_BlankGroup:
+    case IRosterIndex::IT_NotInRosterGroup:
       {
         int childRow = 0;
         QModelIndex childIndex;
@@ -108,25 +104,3 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
   return false;
 }
 
-void SortFilterProxyModel::onSourseDataChanged(const QModelIndex &/*ATopLeft*/, const QModelIndex &ABottomRight)
-{
-  if (hasFilteredParent(ABottomRight))
-    filterChanged();
-}
-
-void SortFilterProxyModel::onSourseRowsInserted(const QModelIndex &AParent, int /*AStart*/, int /*AEnd*/)
-{
-  if (hasFilteredParent(AParent))
-    filterChanged();
-}
-
-void SortFilterProxyModel::onSourseRowsRemoved(const QModelIndex &AParent, int /*AStart*/, int /*AEnd*/)
-{
-  if (hasFilteredParent(AParent))
-    filterChanged();
-}
-
-bool SortFilterProxyModel::hasFilteredParent(const QModelIndex &/*AModelIndex*/)
-{
-  return !FShowOffline;
-}
