@@ -241,7 +241,10 @@ void Settings::onProfileOpened()
 
 void Settings::onProfileClosed()
 {
-  emit closed();
-  FSettingsOpened = false;
+  if (FSettingsOpened)
+  {
+    emit closed();
+    FSettingsOpened = false;
+  }
 }
 

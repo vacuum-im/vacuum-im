@@ -37,8 +37,8 @@ public:
 
   //ISettings
   virtual ISettings *openSettings(const QUuid &APluginId, QObject *AParent);
-  virtual QString fileName() const { return FFile.fileName(); }
-  virtual bool setFileName(const QString &AFileName);
+  virtual QString settingsFile() const { return FFile.fileName(); }
+  virtual bool setSettingsFile(const QString &AFileName);
   virtual bool saveSettings();
   virtual QDomDocument document() const { return FSettings; }
   virtual QString profile() const { return FProfile.tagName(); }
@@ -52,7 +52,7 @@ public:
   virtual void appendOptionsHolder(IOptionsHolder *AOptionsHolder);
   virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder);
 public slots:
-  virtual void openOptionsAction(bool);
+  virtual void openOptionsDialogAction(bool);
 signals:
   virtual void profileOpened();
   virtual void profileClosed();

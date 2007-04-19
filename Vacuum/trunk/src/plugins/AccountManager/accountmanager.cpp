@@ -316,7 +316,7 @@ void AccountManager::onMainWindowCreated(IMainWindow *AMainWindow)
   actAccountsSetup->setText(tr("Account setup..."));
   actAccountsSetup->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS);
   connect(actAccountsSetup,SIGNAL(triggered(bool)),
-    FSettingsPlugin->instance(),SLOT(openOptionsAction(bool)));
+    FSettingsPlugin->instance(),SLOT(openOptionsDialogAction(bool)));
   AMainWindow->mainMenu()->addAction(actAccountsSetup,MAINMENU_ACTION_GROUP_OPTIONS,true);
 }
 
@@ -442,7 +442,7 @@ void AccountManager::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *A
       modify->setText(tr("Modify account..."));
       modify->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS+QString("::")+account->accountId());
       connect(modify,SIGNAL(triggered(bool)),
-        FSettingsPlugin->instance(),SLOT(openOptionsAction(bool)));
+        FSettingsPlugin->instance(),SLOT(openOptionsDialogAction(bool)));
       AMenu->addAction(modify,MAINMENU_ACTION_GROUP_OPTIONS,true);
     }
   }

@@ -36,8 +36,8 @@ class ISettingsPlugin {
 public:
   virtual QObject *instance() =0;
   virtual ISettings *openSettings(const QUuid &, QObject *)=0;
-  virtual QString fileName() const =0;
-  virtual bool setFileName(const QString &) =0;
+  virtual QString settingsFile() const =0;
+  virtual bool setSettingsFile(const QString &) =0;
   virtual bool saveSettings() =0;
   virtual QDomDocument document() const=0;
   virtual QString profile() const =0;
@@ -51,7 +51,7 @@ public:
   virtual void appendOptionsHolder(IOptionsHolder *) =0;
   virtual void removeOptionsHolder(IOptionsHolder *) =0;
 public slots:
-  virtual void openOptionsAction(bool) =0;
+  virtual void openOptionsDialogAction(bool) =0;
 signals:
   virtual void profileOpened()=0;
   virtual void profileClosed()=0;
