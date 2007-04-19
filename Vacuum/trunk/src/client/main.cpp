@@ -9,6 +9,5 @@ int main(int argc, char *argv[])
   pm.loadPlugins();
   pm.initPlugins();
   pm.startPlugins(); 
-  //QTimer::singleShot(15000,&pm,SLOT(quit())); 
   return app.exec();
 }

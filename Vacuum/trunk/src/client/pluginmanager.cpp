@@ -1,21 +1,21 @@
-#include "pluginmanager.h"
 #include <QtDebug>
-#include <QApplication>
+#include "pluginmanager.h"
+
 #include <QTimer>
 #include <QDir>
 #include <QLibrary>
 #include <QStack>
 
 //PluginManager
-PluginManager::PluginManager(QObject *parent)
-  : QObject(parent)
+PluginManager::PluginManager(QApplication *AParent)
+  : QObject(AParent)
 {
-  connect(parent,SIGNAL(aboutToQuit()),SLOT(onAboutToQuit()));
+  connect(AParent,SIGNAL(aboutToQuit()),SLOT(onAboutToQuit()));
 }
 
 PluginManager::~PluginManager()
 {
-  qDebug() << "~PluginManager";
+
 }
 
 void PluginManager::loadPlugins()
@@ -89,6 +89,10 @@ void PluginManager::loadPlugins()
     }
     else i++;
   }
+
+  //QList<IPlugin *> settings = getPlugins("ISettingsPlugin");
+  //foreach(IPlugin *plugin, settings)
+  //  FPluginItems.move(FPluginItems.indexOf(getPluginItem(plugin->pluginUuid())),0);
 }
 
 void PluginManager::initPlugins()
@@ -102,7 +106,8 @@ void PluginManager::initPlugins()
       qDebug() << "UNLOADING PLUGIN: Plugin returned false on init" << pluginItem->info()->name;
       unloadPlugin(pluginItem->uuid());
     } 
-    else i++;
+    else 
+      i++;
   }
 }
 
@@ -117,7 +122,8 @@ void PluginManager::startPlugins()
       qDebug() << "UNLOADING PLUGIN: Plugin returned false on start" << pluginItem->info()->name;
       unloadPlugin(pluginItem->uuid());
     } 
-    else i++;
+    else 
+      i++;
   }
 }
 
@@ -151,7 +157,7 @@ QApplication *PluginManager::application() const
   return (QApplication *)parent();
 }
 
-QList<IPlugin*> PluginManager::getPlugins() const
+QList<IPlugin *> PluginManager::getPlugins() const
 {
   QList<IPlugin *> plugins;
   
@@ -162,18 +168,18 @@ QList<IPlugin*> PluginManager::getPlugins() const
   return plugins;
 }
 
-QList<IPlugin*> PluginManager::getPlugins(const QString &AClassName) const
+QList<IPlugin *> PluginManager::getPlugins(const QString &AInterface) const
 {
-  QList<IPlugin*> plugins;
+  QList<IPlugin *> plugins;
   PluginItem *pluginItem;
   foreach(pluginItem, FPluginItems)
-    if (pluginItem->plugin()->instance()->inherits(AClassName.toLatin1().data()))
+    if (pluginItem->plugin()->instance()->inherits(AInterface.toLatin1().data()))
       plugins.append(pluginItem->plugin());
 
   return plugins;
 }
 
-IPlugin* PluginManager::getPlugin(const QUuid &AUuid) const 
+IPlugin *PluginManager::getPlugin(const QUuid &AUuid) const 
 { 
   PluginItem *pluginItem;
   foreach (pluginItem, FPluginItems)

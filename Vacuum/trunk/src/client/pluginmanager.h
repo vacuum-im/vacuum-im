@@ -1,17 +1,20 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 
+#include <QObject>
+#include <QApplication>
 #include <QPluginLoader>
 #include <../../interfaces/ipluginmanager.h>
 
+//PluginItem
 class PluginItem :
   public QObject
 {
   Q_OBJECT;
 
 public:
-  PluginItem(const QUuid &AUuid, QPluginLoader *ALoader, QObject *parent)
-    : QObject(parent) 
+  PluginItem(const QUuid &AUuid, QPluginLoader *ALoader, QObject *AParent)
+    : QObject(AParent) 
   {
     FUuid = AUuid;
     FLoader = ALoader;
@@ -44,19 +47,19 @@ class PluginManager :
   Q_INTERFACES(IPluginManager);
 
 public:
-  PluginManager(QObject *parent);
+  PluginManager(QApplication *AParent);
   ~PluginManager();
+  void loadPlugins();
+  void initPlugins();
+  void startPlugins();
 
   //IPluginManager 
   virtual QObject *instance() {return this;}
-  virtual void loadPlugins();
-  virtual void initPlugins();
-  virtual void startPlugins();
   virtual bool unloadPlugin(const QUuid &AUuid);
   virtual QApplication *application() const;
   virtual IPlugin* getPlugin(const QUuid &uid) const;
   virtual QList<IPlugin *> getPlugins() const;
-  virtual QList<IPlugin *> getPlugins(const QString &AClassName) const;
+  virtual QList<IPlugin *> getPlugins(const QString &AInterface) const;
   virtual const PluginInfo *getPluginInfo(const QUuid &AUuid) const;
   virtual QVector<QUuid> getDependencesOn(const QUuid &AUuid) const;
   virtual QVector<QUuid> getDependencesFor(const QUuid &AUuid) const;
