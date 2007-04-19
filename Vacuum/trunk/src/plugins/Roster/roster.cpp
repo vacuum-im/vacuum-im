@@ -1,5 +1,7 @@
-#include "roster.h"
 #include <QtDebug>
+#include "roster.h"
+
+#include <QSet>
 
 Roster::Roster(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject *parent) 
   : QObject(parent)
@@ -15,7 +17,7 @@ Roster::Roster(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject
 
 Roster::~Roster()
 {
-
+  clearItems();
 }
 
 bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
@@ -29,8 +31,11 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
 
     if (AStanza.type() != "error")
     {
+      QSet<RosterItem *> befourItems; 
+      QSet<RosterItem *> afterItems; 
       if (!FOpenId.isEmpty() && FOpenId == AStanza.id())
       {
+        befourItems = FItems.toSet();
         FOpenId.clear();
         FOpen = true;
         emit opened();
@@ -68,6 +73,9 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
           }
           rosterItem->setGroups(allItemGroups); 
 
+          if (!befourItems.isEmpty())
+            afterItems.insert(rosterItem);
+
           emit itemPush(rosterItem); 
           hooked = true;
         }
@@ -83,6 +91,18 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
           hooked = true;
         }
         stanzaItem = stanzaItem.nextSiblingElement("item");  
+      }
+
+      if (!befourItems.isEmpty())
+      {
+        RosterItem *rosterItem;
+        QSet<RosterItem *> oldItems = befourItems - afterItems;
+        foreach(rosterItem,oldItems)
+        {
+          emit itemRemoved(rosterItem);
+          FItems.removeAt(FItems.indexOf(rosterItem));
+          delete rosterItem;
+        }
       }
 
       if (AStanza.type() == "set" && !AStanza.id().isEmpty() && hooked)
@@ -150,9 +170,7 @@ void Roster::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
 
     FGroupDelim = groupDelim;
 
-    if (requestRosterItems())
-      clearItems();
-    else
+    if (!requestRosterItems())
       close();
   }
 }
@@ -458,7 +476,7 @@ bool Roster::requestGroupDelimiter()
   Stanza query("iq");
   query.setType("get").setId(FGroupDelimId);
   query.addElement("query","jabber:iq:private").appendChild(query.createElement("roster","roster:delimiter"));
-  return FStanzaProcessor->sendIqStanza(this,FStream->jid(),query,10000);
+  return FStanzaProcessor->sendIqStanza(this,FStream->jid(),query,30000);
 }
 
 bool Roster::requestRosterItems()
