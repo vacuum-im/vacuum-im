@@ -4,7 +4,7 @@
 RosterIndexDelegate::RosterIndexDelegate(QObject *AParent)
   : QItemDelegate(AParent)
 {
-  FRosterIconset.openFile("roster/common.jisp");
+  FRosterIconset.openFile(ROSTER_ICONSETFILE);
 }
 
 RosterIndexDelegate::~RosterIndexDelegate()

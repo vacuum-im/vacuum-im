@@ -6,6 +6,8 @@
 #include "../../interfaces/ixmppstreams.h"
 #include "../../utils/jid.h"
 
+#define ACCOUNTMANAGER_UUID "{56F1AA4C-37A6-4007-ACFE-557EEBD86AF8}"
+
 class IAccount
 {
 public:

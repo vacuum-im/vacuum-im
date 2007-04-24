@@ -2,8 +2,6 @@
 #include <QTimer>
 #include <QToolButton>
 
-#define STATUS_ICONSETFILE "status/common.jisp"
-
 StatusChanger::StatusChanger()
 {
   FBaseShow = IPresence::Error;

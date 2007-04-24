@@ -4,9 +4,7 @@
 #include <QTextStream>
 #include <QByteArray>
 #include <QVBoxLayout>
-
-#define MAINMENU_ACTION_GROUP_OPTIONS 700
-#define SYSTEM_ICONSETFILE "system/common.jisp"
+#include "../../definations/actiongroups.h"
 
 SettingsPlugin::SettingsPlugin()
 {
@@ -298,7 +296,7 @@ void SettingsPlugin::onMainWindowCreated(IMainWindow *AMainWindow)
   actOpenOptionsDialog->setIcon(SYSTEM_ICONSETFILE,"psi/options");
   actOpenOptionsDialog->setText(tr("Options..."));
   connect(actOpenOptionsDialog,SIGNAL(triggered(bool)),SLOT(openOptionsDialogAction(bool)));
-  AMainWindow->mainMenu()->addAction(actOpenOptionsDialog,MAINMENU_ACTION_GROUP_OPTIONS,true);
+  AMainWindow->mainMenu()->addAction(actOpenOptionsDialog,SETTINGS_ACTION_GROUP_OPTIONS,true);
 }
 
 void SettingsPlugin::onOptionsDialogAccepted()

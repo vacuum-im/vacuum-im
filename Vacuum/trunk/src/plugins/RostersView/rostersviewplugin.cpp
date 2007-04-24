@@ -1,8 +1,6 @@
 #include <QtDebug>
 #include "rostersviewplugin.h"
 
-#define STATUS_ICONSETFILE "status/common.jisp" 
-
 RostersViewPlugin::RostersViewPlugin()
 {
   FRostersModelPlugin = NULL;

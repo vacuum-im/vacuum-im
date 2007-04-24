@@ -5,8 +5,6 @@
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/isettings.h"
 
-#define XMPPSTREAMS_UUID "{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"
-
 class XmppStreams :
   public QObject,
   public IPlugin,
@@ -23,7 +21,7 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return XMPPSTREAMS_UUID;}
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager */*APluginManager*/, int &/*AInitOrder*/) { return true; }
+  virtual bool initConnections(IPluginManager * /*APluginManager*/, int &/*AInitOrder*/) { return true; }
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }

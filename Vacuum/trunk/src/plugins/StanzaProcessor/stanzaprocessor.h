@@ -9,8 +9,6 @@
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/ixmppstreams.h"
 
-#define STANZAPROCESSOR_UUID "{1175D470-5D4A-4c29-A69E-EDA46C2BC387}"
-
 class StanzaProcessor :
   public QObject,
   public IPlugin,

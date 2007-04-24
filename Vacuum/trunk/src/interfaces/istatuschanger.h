@@ -4,6 +4,8 @@
 #include "../../interfaces/ipresence.h"
 #include "../../utils/menu.h"
 
+#define STATUSCHANGER_UUID "{F0D57BD2-0CD4-4606-9CEE-15977423F8DC}"
+
 class IStatusChanger {
 public:
   virtual QObject *instance() =0;

@@ -7,6 +7,8 @@
 #include <QToolBar>
 #include "../../utils/menu.h"
 
+#define MAINWINDOW_UUID "{A6F3D775-8464-4599-AB79-97BA1BAA6E96}"
+
 class IMainWindow :
   virtual public QMainWindow
 {

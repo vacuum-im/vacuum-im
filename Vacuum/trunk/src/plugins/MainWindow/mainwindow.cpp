@@ -4,8 +4,6 @@
 #include <QCloseEvent>
 #include <QToolButton>
 
-#define SYSTEM_ICONSETFILE "system/common.jisp"
-
 MainWindow::MainWindow(Qt::WindowFlags AFlags)
   : QMainWindow(NULL,AFlags)
 {

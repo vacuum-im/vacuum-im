@@ -14,8 +14,6 @@
 #include "settings.h"
 #include "optionsdialog.h"
 
-#define SETTINGS_UUID "{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"
-
 class SettingsPlugin : 
   public QObject,
   public IPlugin,

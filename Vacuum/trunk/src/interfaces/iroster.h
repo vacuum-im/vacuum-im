@@ -6,6 +6,8 @@
 #include "../../interfaces/ixmppstreams.h"
 #include "../../utils/jid.h"
 
+#define ROSTER_UUID "{5306971C-2488-40d9-BA8E-C83327B2EED5}";
+
 class IRoster;
 
 class IRosterItem {

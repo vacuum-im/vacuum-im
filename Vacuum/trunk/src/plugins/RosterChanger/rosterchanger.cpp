@@ -1,9 +1,7 @@
 #include "rosterchanger.h"
 
 #include <QInputDialog>
-
-#define ROSTERCHANGER_ACTION_GROUP_SUBSCRIPTION 790
-#define ROSTERCHANGER_ACTION_GROUP 800
+#include "../../definations/actiongroups.h"
 
 RosterChanger::RosterChanger()
 {

@@ -4,11 +4,11 @@
 #include <QObject>
 #include <QDomDocument>
 #include <QObjectCleanupHandler>
+#include "../../definations/namespaces.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ixmppstreams.h"
 
 #define SASLSESSION_UUID "{625B644B-E940-42b7-9DBF-C5B16B4B0616}"
-#define NS_FEATURE_SESSION "urn:ietf:params:xml:ns:xmpp-session"
 
 class SASLSession : 
   public QObject,

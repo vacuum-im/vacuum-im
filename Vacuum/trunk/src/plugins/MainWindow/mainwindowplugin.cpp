@@ -1,8 +1,6 @@
 #include "mainwindowplugin.h"
 
-#define MAINWINDOW_ACTION_GROUP_QUIT 1000
-#define SYSTEM_ICONSETFILE "system/common.jisp"
-
+#include "../../definations/actiongroups.h"
 
 MainWindowPlugin::MainWindowPlugin()
 {

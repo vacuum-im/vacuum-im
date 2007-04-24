@@ -8,6 +8,8 @@
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
 
+#define ROSTERSMODEL_UUID "{C1A1BBAB-06AF-41c8-BFBE-959F1065D80D}"
+
 class IRosterIndex;
 typedef QList<IRosterIndex *> IRosterIndexList;
 

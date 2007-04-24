@@ -2,6 +2,7 @@
 #define ROSTERSVIEWPLUGIN_H
 
 #include <QPointer>
+#include "../../definations/initorders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/imainwindow.h"
@@ -10,9 +11,6 @@
 #include "../../utils/action.h"
 #include "rostersview.h"
 #include "sortfilterproxymodel.h"
-
-#define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"
-#define ROSTERSVIEW_INITORDER 100;
 
 class RostersViewPlugin : 
   public QObject,

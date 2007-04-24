@@ -1,6 +1,7 @@
 #include <QtDebug>
 #include "xmppstream.h"
 
+#include "../../definations/namespaces.h"
 #include "../../utils/errorhandler.h"
 #include "streamconnection.h"
 
@@ -249,7 +250,6 @@ void XmppStream::onConnectionConnected()
 
 void XmppStream::onConnectionReadyRead(qint64 ABytes)
 {
-  int i = 0;
   IStreamFeature *feature;
   QByteArray data = FConnection->read(ABytes);
   foreach(feature, FFeatures) 

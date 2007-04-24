@@ -4,14 +4,12 @@
 #include <QObject>
 #include <QDomDocument>
 #include <QObjectCleanupHandler>
+#include "../../definations/namespaces.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../utils/jid.h"
 
-
 #define IQAUTH_UUID "{1E3645BC-313F-49e9-BD00-4CC062EE76A7}"
-#define NS_FEATURE_IQAUTH "http://jabber.org/features/iq-auth"
-#define NS_JABBER_IQ_AUTH "jabber:iq:auth"
 
 class IqAuth : 
   public QObject,

@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS += thirdparty client utils interfaces plugins
+SUBDIRS += thirdparty definations interfaces client utils plugins

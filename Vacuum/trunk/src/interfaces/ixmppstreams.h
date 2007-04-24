@@ -7,10 +7,7 @@
 #include "../../utils/jid.h"
 #include "../../utils/stanza.h"
 
-#define NS_JABBER_CLIENT		"jabber:client"
-#define NS_JABBER_STREAMS		"http://etherx.jabber.org/streams"
-#define NS_XMPP_STREAMS			"urn:ietf:params:xml:ns:xmpp-streams"
-
+#define XMPPSTREAMS_UUID "{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"
 
 class IStreamConnection
 {

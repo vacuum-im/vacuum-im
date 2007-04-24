@@ -4,6 +4,8 @@
 #include <QHash>
 #include <QPair>
 #include <QDateTime>
+#include "../../definations/actiongroups.h"
+#include "../../definations/initorders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatuschanger.h"
 #include "../../interfaces/iroster.h"
@@ -11,11 +13,6 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/iaccountmanager.h"
 
-#define STATUSCHANGER_UUID "{F0D57BD2-0CD4-4606-9CEE-15977423F8DC}"
-#define STATUSCHANGER_INITORDER 100;
-
-#define STATUSMENU_ACTION_GROUP_MAIN 200
-#define STATUSMENU_ACTION_GROUP_STREAM 190
 
 class StatusChanger : 
   public QObject,

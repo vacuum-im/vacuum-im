@@ -2,6 +2,7 @@
 #include "xmppstreams.h"
 
 #include <QIcon>
+#include "../../definations/namespaces.h"
 #include "../../utils/errorhandler.h"
 #include "xmppstream.h"
 

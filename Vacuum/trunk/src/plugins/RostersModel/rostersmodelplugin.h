@@ -5,8 +5,6 @@
 #include "../../interfaces/irostersmodel.h"
 #include "rostersmodel.h"
 
-#define ROSTERSMODEL_UUID "{C1A1BBAB-06AF-41c8-BFBE-959F1065D80D}"
-
 class RostersModelPlugin : 
   public QObject,
   public IPlugin,

@@ -6,6 +6,7 @@
 #include "../../interfaces/irostersmodel.h"
 #include "../../utils/menu.h"
 
+#define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"
 
 class IRostersView :
   virtual public QTreeView

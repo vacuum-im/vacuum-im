@@ -7,6 +7,10 @@
 #include "utilsexport.h"
 #include "iconset.h"
 
+#define SYSTEM_ICONSETFILE "system/common.jisp"
+#define STATUS_ICONSETFILE "status/common.jisp"
+#define ROSTER_ICONSETFILE "roster/common.jisp"
+
 class UTILS_EXPORT SkinIconset :
   public QObject
 {

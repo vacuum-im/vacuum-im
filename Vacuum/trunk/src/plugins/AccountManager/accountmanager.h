@@ -1,7 +1,9 @@
 #ifndef ACCOUNTMANAGER_H
 #define ACCOUNTMANAGER_H
 
-#include <QPointer>
+#include <QPointer> 
+#include "../../definations/actiongroups.h"
+#include "../../definations/optionnodes.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"
@@ -12,8 +14,6 @@
 #include "account.h"
 #include "accountmanage.h"
 #include "accountoptions.h"
-
-#define ACCOUNTMANAGER_UUID "{56F1AA4C-37A6-4007-ACFE-557EEBD86AF8}"
 
 class AccountManager : 
   public QObject,
