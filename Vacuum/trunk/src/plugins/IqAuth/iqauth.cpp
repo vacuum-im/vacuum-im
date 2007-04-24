@@ -1,36 +1,36 @@
-#include "iqauth.h"
 #include <QtDebug>
+#include "iqauth.h"
+
 #include "../../utils/sha1.h"
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 
-IqAuth::IqAuth(IXmppStream *AStream)
-  : QObject(AStream->instance())
+IqAuth::IqAuth(IXmppStream *AXmppStream)
+  : QObject(AXmppStream->instance())
 {
   FNeedHook = false;
-  FStream = AStream;
-  connect(FStream->instance(),SIGNAL(closed(IXmppStream *)),
+  FXmppStream = AXmppStream;
+  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)),
     SLOT(onStreamClosed(IXmppStream *)));
 }
 
 IqAuth::~IqAuth()
 {
-  qDebug() << "~IqAuth";
+
 }
 
-bool IqAuth::start(const QDomElement &AElem)
+bool IqAuth::start(const QDomElement &/*AElem*/)
 {
-  Q_UNUSED(AElem);
   bool useDigest = false;
-  QByteArray shaData = FStream->streamId().toUtf8()+FStream->password().toUtf8(); 
+  QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8(); 
   SHA1Context sha;
   useDigest = SHA1Hash(&sha, (const unsigned char *)shaData.constData(), shaData.size());
 
   Stanza setAuth("iq",this);
-  setAuth.setType("set").setTo(FStream->jid().domane()).setId("auth"); 
+  setAuth.setType("set").setTo(FXmppStream->jid().domane()).setId("auth"); 
   QDomElement query = setAuth.addElement("query",NS_JABBER_IQ_AUTH);
   query.appendChild(setAuth.createElement("username")).
-    appendChild(setAuth.createTextNode(FStream->jid().node()));
+    appendChild(setAuth.createTextNode(FXmppStream->jid().node()));
   if (useDigest)
   {
     QByteArray shaDigest(40,' ');
@@ -40,12 +40,12 @@ bool IqAuth::start(const QDomElement &AElem)
   }
   else
     query.appendChild(setAuth.createElement("password")).
-      appendChild(setAuth.createTextNode(FStream->password()));
+      appendChild(setAuth.createTextNode(FXmppStream->password()));
 
   query.appendChild(setAuth.createElement("resource")).
-    appendChild(setAuth.createTextNode(FStream->jid().resource()));
+    appendChild(setAuth.createTextNode(FXmppStream->jid().resource()));
 
-  FStream->sendStanza(setAuth);
+  FXmppStream->sendStanza(setAuth);
 
   FNeedHook = true;
   return true;
@@ -94,7 +94,6 @@ IqAuthPlugin::IqAuthPlugin()
 
 IqAuthPlugin::~IqAuthPlugin()
 {
-  qDebug() << "~IqAuthPlugin";
   FCleanupHandler.clear(); 
 }
 
@@ -109,33 +108,24 @@ void IqAuthPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
 }
 
-bool IqAuthPlugin::initPlugin(IPluginManager *APluginManager)
+bool IqAuthPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  QList<IPlugin *> plugins = APluginManager->getPlugins("IXmppStreams");
-  bool connected = false;
-  for(int i=0; i<plugins.count(); i++)
-  {
-    QObject *obj = plugins[i]->instance(); 
-    connected = connected || connect(obj,SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
-  }
-  return connected;
+  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  if (plugin)
+    connect(plugin->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
+  return plugin!=NULL;
 }
 
-bool IqAuthPlugin::startPlugin()
+IStreamFeature *IqAuthPlugin::newInstance(IXmppStream *AXmppStream)
 {
-  return true;
-}
-
-IStreamFeature *IqAuthPlugin::newInstance(IXmppStream *AStream)
-{
-  IqAuth *iqAuth = new IqAuth(AStream);
+  IqAuth *iqAuth = new IqAuth(AXmppStream);
   FCleanupHandler.add(iqAuth);
   return iqAuth;
 }
 
-void IqAuthPlugin::onStreamAdded(IXmppStream *AStream)
+void IqAuthPlugin::onStreamAdded(IXmppStream *AXmppStream)
 {
-  AStream->addFeature(newInstance(AStream)); 
+  AXmppStream->addFeature(newInstance(AXmppStream)); 
 }
 
 Q_EXPORT_PLUGIN2(IqAuthPlugin, IqAuthPlugin)

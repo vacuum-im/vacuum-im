@@ -1,5 +1,6 @@
-#include "saslbind.h"
 #include <QtDebug>
+#include "saslbind.h"
+
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 
@@ -13,12 +14,11 @@ SASLBind::SASLBind(IXmppStream *AStream)
 
 SASLBind::~SASLBind()
 {
-  qDebug() << "~SASLBind";
+
 }
 
-bool SASLBind::start(const QDomElement &AElem)
+bool SASLBind::start(const QDomElement &/*AElem*/)
 {
-  Q_UNUSED(AElem);
   FNeedHook = true;
   Stanza bind("iq");
   bind.setType("set").setId("bind"); 
@@ -85,7 +85,6 @@ SASLBindPlugin::SASLBindPlugin()
 
 SASLBindPlugin::~SASLBindPlugin()
 {
-  qDebug() << "~SASLBindPlugin";
   FCleanupHandler.clear(); 
 }
 
@@ -100,21 +99,12 @@ void SASLBindPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
 }
 
-bool SASLBindPlugin::initPlugin(IPluginManager *APluginManager)
+bool SASLBindPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  QList<IPlugin *> plugins = APluginManager->getPlugins("IXmppStreams");
-  bool connected = false;
-  for(int i=0; i<plugins.count(); i++)
-  {
-    QObject *obj = plugins[i]->instance(); 
-    connected = connected || connect(obj,SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
-  }
-  return connected;
-}
-
-bool SASLBindPlugin::startPlugin()
-{
-  return true;
+  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  if (plugin)
+    connect(plugin->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
+  return plugin!=NULL;
 }
 
 IStreamFeature *SASLBindPlugin::newInstance(IXmppStream *AStream)

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QApplication>
 #include <QPluginLoader>
+#include <QMultiHash>
 #include <../../interfaces/ipluginmanager.h>
 
 //PluginItem
@@ -58,11 +59,11 @@ public:
   virtual bool unloadPlugin(const QUuid &AUuid);
   virtual QApplication *application() const;
   virtual IPlugin* getPlugin(const QUuid &uid) const;
-  virtual QList<IPlugin *> getPlugins() const;
-  virtual QList<IPlugin *> getPlugins(const QString &AInterface) const;
+  virtual PluginList getPlugins() const;
+  virtual PluginList getPlugins(const QString &AInterface) const;
   virtual const PluginInfo *getPluginInfo(const QUuid &AUuid) const;
-  virtual QVector<QUuid> getDependencesOn(const QUuid &AUuid) const;
-  virtual QVector<QUuid> getDependencesFor(const QUuid &AUuid) const;
+  virtual QList<QUuid> getDependencesOn(const QUuid &AUuid) const;
+  virtual QList<QUuid> getDependencesFor(const QUuid &AUuid) const;
 public slots:
   virtual void quit();
 signals:

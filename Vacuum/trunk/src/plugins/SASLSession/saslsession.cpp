@@ -1,10 +1,11 @@
-#include "saslsession.h"
 #include <QtDebug>
+#include "saslsession.h"
+
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 
-SASLSession::SASLSession(IXmppStream *AStream)
-: QObject(AStream->instance())
+SASLSession::SASLSession(IXmppStream *AStream) 
+ : QObject(AStream->instance())
 {
   FNeedHook = false;
   FStream = AStream;
@@ -13,7 +14,7 @@ SASLSession::SASLSession(IXmppStream *AStream)
 
 SASLSession::~SASLSession()
 {
-  qDebug() << "~SASLSession";
+
 }
 
 bool SASLSession::start(const QDomElement &AElem)
@@ -70,7 +71,6 @@ SASLSessionPlugin::SASLSessionPlugin()
 
 SASLSessionPlugin::~SASLSessionPlugin()
 {
-  qDebug() << "~SASLSessionPlugin";
   FCleanupHandler.clear(); 
 }
 
@@ -85,21 +85,12 @@ void SASLSessionPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
 }
 
-bool SASLSessionPlugin::initPlugin(IPluginManager *APluginManager)
+bool SASLSessionPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  QList<IPlugin *> plugins = APluginManager->getPlugins("IXmppStreams");
-  bool connected = false;
-  for(int i=0; i<plugins.count(); i++)
-  {
-    QObject *obj = plugins[i]->instance(); 
-    connected = connected || connect(obj,SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
-  }
-  return connected;
-}
-
-bool SASLSessionPlugin::startPlugin()
-{
-  return true;
+  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  if (plugin)
+    connect(plugin->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
+  return plugin!=NULL;
 }
 
 IStreamFeature *SASLSessionPlugin::newInstance(IXmppStream *AStream)

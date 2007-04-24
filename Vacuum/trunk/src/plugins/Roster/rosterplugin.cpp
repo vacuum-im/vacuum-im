@@ -1,14 +1,13 @@
-#include "rosterplugin.h"
 #include <QtDebug>
+#include "rosterplugin.h"
 
 RosterPlugin::RosterPlugin()
 {
-  FStanzaProcessor = 0;
+  FStanzaProcessor = NULL;
 }
 
 RosterPlugin::~RosterPlugin()
 {
-  qDebug() << "~RosterPlugin";
   FCleanupHandler.clear(); 
 }
 
@@ -24,35 +23,22 @@ void RosterPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append("{1175D470-5D4A-4c29-A69E-EDA46C2BC387}"); //IStanzaProcessor  
 }
 
-bool RosterPlugin::initPlugin(IPluginManager *APluginManager)
+bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  QList<IPlugin *> plugins = APluginManager->getPlugins("IXmppStreams");
-  foreach(IPlugin *plugin, plugins)
+  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  if (plugin)
   {
-    IXmppStreams *streams = qobject_cast<IXmppStreams *>(plugin->instance());
-    if (streams)
-    {
-      bool streamConnected = 
-        connect(streams->instance(), SIGNAL(added(IXmppStream *)),
-          SLOT(onStreamAdded(IXmppStream *))) && 
-        connect(streams->instance(), SIGNAL(removed(IXmppStream *)),
-          SLOT(onStreamRemoved(IXmppStream *))); 
-      
-      if (!streamConnected)
-        disconnect(streams->instance(),0,this,0);
-    }
+    connect(plugin->instance(), SIGNAL(added(IXmppStream *)),
+      SLOT(onStreamAdded(IXmppStream *))); 
+    connect(plugin->instance(), SIGNAL(removed(IXmppStream *)),
+      SLOT(onStreamRemoved(IXmppStream *))); 
   }
 
-  plugins = APluginManager->getPlugins("IStanzaProcessor");
-  if (plugins.count() > 0) 
-    FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugins.at(0)->instance());
+  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  if (plugin) 
+    FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
   
-  return FStanzaProcessor!=0;
-}
-
-bool RosterPlugin::startPlugin()
-{
-  return true;
+  return FStanzaProcessor!=NULL;
 }
 
 //RosterPlugin
@@ -65,9 +51,7 @@ IRoster *RosterPlugin::newRoster(IXmppStream *AStream)
     connect(roster,SIGNAL(destroyed(QObject *)),SLOT(onRosterDestroyed(QObject *)));
     FCleanupHandler.add(roster); 
     FRosters.append(roster); 
-    return roster; 
   }
-
   return roster;
 }
 
@@ -80,7 +64,7 @@ IRoster *RosterPlugin::getRoster(const Jid &AStreamJid) const
       return FRosters.at(i);
     i++;
   }
-  return 0;    
+  return NULL;    
 }
 
 void RosterPlugin::removeRoster(const Jid &AStreamJid)

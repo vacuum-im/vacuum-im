@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QLibrary>
 #include <QStack>
+#include <QMultiMap>
 
 //PluginManager
 PluginManager::PluginManager(QApplication *AParent)
@@ -89,42 +90,42 @@ void PluginManager::loadPlugins()
     }
     else i++;
   }
-
-  //QList<IPlugin *> settings = getPlugins("ISettingsPlugin");
-  //foreach(IPlugin *plugin, settings)
-  //  FPluginItems.move(FPluginItems.indexOf(getPluginItem(plugin->pluginUuid())),0);
 }
 
 void PluginManager::initPlugins()
 {
   int i =0;
+  QMultiMap<int,IPlugin *> pluginOrder;
   while (i<FPluginItems.count())
   {
-    PluginItem *pluginItem = FPluginItems.at(i); 
-    if(!pluginItem->plugin()->initPlugin(this))
+    PluginItem *pluginItem = FPluginItems.at(i);
+    int initOrder = 0;
+    IPlugin *plugin = pluginItem->plugin();
+    if(plugin->initConnections(this,initOrder))
+    {
+      pluginOrder.insert(initOrder,plugin);
+      i++;
+    }
+    else
     {
       qDebug() << "UNLOADING PLUGIN: Plugin returned false on init" << pluginItem->info()->name;
+      i = 0;
+      pluginOrder.clear();
       unloadPlugin(pluginItem->uuid());
     } 
-    else 
-      i++;
   }
+
+  foreach(IPlugin *plugin, pluginOrder)
+    plugin->initObjects();
+
+  foreach(IPlugin *plugin, pluginOrder)
+    plugin->initSettings();
 }
 
 void PluginManager::startPlugins()
 {
-  int i =0;
-  while (i<FPluginItems.count())
-  {
-    PluginItem *pluginItem = FPluginItems.at(i); 
-    if(!pluginItem->plugin()->startPlugin())
-    {
-      qDebug() << "UNLOADING PLUGIN: Plugin returned false on start" << pluginItem->info()->name;
-      unloadPlugin(pluginItem->uuid());
-    } 
-    else 
-      i++;
-  }
+  foreach(PluginItem *pluginItem, FPluginItems)
+    pluginItem->plugin()->startPlugin();
 }
 
 bool PluginManager::unloadPlugin(const QUuid &AUuid)
@@ -135,7 +136,7 @@ bool PluginManager::unloadPlugin(const QUuid &AUuid)
     return false;
 
   QUuid uuid;
-  QVector<QUuid> depends = getDependencesOn(AUuid);
+  QList<QUuid> depends = getDependencesOn(AUuid);
   foreach(uuid, depends)
   {
     PluginItem *depend = getPluginItem(uuid);
@@ -147,7 +148,7 @@ bool PluginManager::unloadPlugin(const QUuid &AUuid)
     }
   }
   qDebug() << "Unloading plugin:" << pluginItem->info()->name;
-  FPluginItems.removeAt(FPluginItems.indexOf(pluginItem));  
+  FPluginItems.removeAt(FPluginItems.indexOf(pluginItem)); 
   delete pluginItem;
   return true;
 }
@@ -157,7 +158,7 @@ QApplication *PluginManager::application() const
   return (QApplication *)parent();
 }
 
-QList<IPlugin *> PluginManager::getPlugins() const
+PluginList PluginManager::getPlugins() const
 {
   QList<IPlugin *> plugins;
   
@@ -168,7 +169,7 @@ QList<IPlugin *> PluginManager::getPlugins() const
   return plugins;
 }
 
-QList<IPlugin *> PluginManager::getPlugins(const QString &AInterface) const
+PluginList PluginManager::getPlugins(const QString &AInterface) const
 {
   QList<IPlugin *> plugins;
   PluginItem *pluginItem;
@@ -186,7 +187,7 @@ IPlugin *PluginManager::getPlugin(const QUuid &AUuid) const
     if (pluginItem->uuid() == AUuid) 
       return pluginItem->plugin(); 
 
-  return 0;
+  return NULL;
 }
 
 const PluginInfo *PluginManager::getPluginInfo(const QUuid &AUuid) const
@@ -196,15 +197,15 @@ const PluginInfo *PluginManager::getPluginInfo(const QUuid &AUuid) const
     if (pluginItem->uuid() == AUuid) 
       return pluginItem->info(); 
 
-  return 0;
+  return NULL;
 }
 
-QVector<QUuid> PluginManager::getDependencesOn(const QUuid &AUuid) const
+QList<QUuid> PluginManager::getDependencesOn(const QUuid &AUuid) const
 {
   static QStack<QUuid> deepStack;
   deepStack.push(AUuid);
 
-  QVector<QUuid> plugins;
+  QList<QUuid> plugins;
   PluginItem *pluginItem;
   foreach(pluginItem, FPluginItems)
     if (!deepStack.contains(pluginItem->uuid()) && pluginItem->info()->dependences.contains(AUuid))
@@ -217,12 +218,12 @@ QVector<QUuid> PluginManager::getDependencesOn(const QUuid &AUuid) const
   return plugins;
 }
 
-QVector<QUuid> PluginManager::getDependencesFor(const QUuid &AUuid) const
+QList<QUuid> PluginManager::getDependencesFor(const QUuid &AUuid) const
 {
   static QStack<QUuid> deepStack;
   deepStack.push(AUuid);
 
-  QVector<QUuid> plugins;
+  QList<QUuid> plugins;
   PluginItem *pluginItem = getPluginItem(AUuid);
   if (pluginItem)
   { 
@@ -254,7 +255,7 @@ PluginItem *PluginManager::getPluginItem(const QUuid &AUuid) const
     if (pluginItem->uuid() == AUuid)
       return pluginItem;
 
-  return 0;
+  return NULL;
 }
 
 bool PluginManager::checkDependences(PluginItem *APluginItem) const
@@ -315,3 +316,4 @@ void PluginManager::quit()
 {
   QTimer::singleShot(10,parent(),SLOT(quit())); 
 }
+

@@ -16,6 +16,7 @@ AccountManager::AccountManager()
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
   actAccountsSetup = NULL;
+  FStarted = false;
   srand(QTime::currentTime().msec());
 }
 
@@ -37,15 +38,13 @@ void AccountManager::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append("{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"); //ISettings  
 }
 
-bool AccountManager::initPlugin(IPluginManager *APluginManager)
+bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   FPluginManager = APluginManager;
 
   IPlugin *plugin = FPluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
-  {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-  }
 
   plugin = FPluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
@@ -53,12 +52,6 @@ bool AccountManager::initPlugin(IPluginManager *APluginManager)
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
     if (FSettingsPlugin)
     {
-      FSettings = FSettingsPlugin->openSettings(ACCOUNTMANAGER_UUID,this);
-      if (FSettings)
-      {
-        connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
-        connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
-      }
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsDialogAccepted()));
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsDialogRejected()));
    }
@@ -86,16 +79,30 @@ bool AccountManager::initPlugin(IPluginManager *APluginManager)
     }
   }
 
-  return FXmppStreams!=NULL && FSettingsPlugin!=NULL && FSettings!=NULL;
+  return FXmppStreams!=NULL && FSettingsPlugin!=NULL;
+}
+
+bool AccountManager::initObjects()
+{
+  if (FSettingsPlugin)
+  {
+    FSettings = FSettingsPlugin->openSettings(ACCOUNTMANAGER_UUID,this);
+    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
+    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
+    FSettingsPlugin->openOptionsNode(OPTIONS_NODE_ACCOUNTS,tr("Accounts"),
+      tr("Creating and removing accounts"),QIcon());
+    FSettingsPlugin->appendOptionsHolder(this);
+  }
+  return true;
 }
 
 bool AccountManager::startPlugin()
 {
-  FSettingsPlugin->openOptionsNode(OPTIONS_NODE_ACCOUNTS,tr("Accounts"),
-    tr("Creating and removing accounts"),QIcon());
-  FSettingsPlugin->appendOptionsHolder(this);
+  showAllActiveAccounts();
+  FStarted = true;
   return true;
 }
+
 
 //IAccountManager
 IAccount *AccountManager::addAccount(const QString &AName, const Jid &AStreamJid)
@@ -303,21 +310,35 @@ void AccountManager::closeAccountOptionsNode(const QString &AAccountId)
   }
 }
 
+void AccountManager::showAllActiveAccounts()
+{
+  IAccount *account;
+  foreach (account, FAccounts)
+    if (account->isActive())
+      showAccount(account);
+}
+
 void AccountManager::onRostersViewCreated(IRostersView *ARostersView)
 {
-  connect(ARostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-    SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+  if (FSettingsPlugin)
+  {
+    connect(ARostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
+      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+  }
 }
 
 void AccountManager::onMainWindowCreated(IMainWindow *AMainWindow)
 {
-  actAccountsSetup = new Action(this);
-  actAccountsSetup->setIcon(SYSTEM_ICONSETFILE,"psi/account");
-  actAccountsSetup->setText(tr("Account setup..."));
-  actAccountsSetup->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS);
-  connect(actAccountsSetup,SIGNAL(triggered(bool)),
-    FSettingsPlugin->instance(),SLOT(openOptionsDialogAction(bool)));
-  AMainWindow->mainMenu()->addAction(actAccountsSetup,MAINMENU_ACTION_GROUP_OPTIONS,true);
+  if (FSettingsPlugin)
+  {
+    actAccountsSetup = new Action(this);
+    actAccountsSetup->setIcon(SYSTEM_ICONSETFILE,"psi/account");
+    actAccountsSetup->setText(tr("Account setup..."));
+    actAccountsSetup->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS);
+    connect(actAccountsSetup,SIGNAL(triggered(bool)),
+      FSettingsPlugin->instance(),SLOT(openOptionsDialogAction(bool)));
+    AMainWindow->mainMenu()->addAction(actAccountsSetup,MAINMENU_ACTION_GROUP_OPTIONS,true);
+  }
 }
 
 void AccountManager::onOptionsAccountAdded(const QString &AName)
@@ -413,14 +434,11 @@ void AccountManager::onOptionsDialogRejected()
 
 void AccountManager::onSettingsOpened()
 {
-  QString id;
   QList<QString> acoountsId = FSettings->values("account[]").keys();
-  foreach(id,acoountsId)
-  {
-    IAccount *account = addAccount(id);
-    if (account && account->isActive())
-      showAccount(account);
-  }
+  foreach(QString id,acoountsId)
+    addAccount(id);
+  if (FStarted)
+    showAllActiveAccounts();
 }
 
 void AccountManager::onSettingsClosed()

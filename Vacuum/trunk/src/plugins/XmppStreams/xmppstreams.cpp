@@ -15,7 +15,7 @@ XmppStreams::~XmppStreams()
 
 }
 
-bool XmppStreams::initPlugin(IPluginManager * /*APluginManager*/) 
+bool XmppStreams::initObjects()
 {
   ErrorHandler::addErrorItem(NS_XMPP_STREAMS, "bad-format",
     ErrorHandler::MODIFY, ErrorHandler::BAD_REQUEST, tr("Bad Request Format"));
@@ -89,11 +89,6 @@ bool XmppStreams::initPlugin(IPluginManager * /*APluginManager*/)
   ErrorHandler::addErrorItem(NS_XMPP_STREAMS, "xml-not-well-formed",
     ErrorHandler::CANCEL, ErrorHandler::NOT_ACCEPTABLE, tr("XML Not Well Formed"));
 
-  return true;
-}
-
-bool XmppStreams::startPlugin()
-{
   return true;
 }
 

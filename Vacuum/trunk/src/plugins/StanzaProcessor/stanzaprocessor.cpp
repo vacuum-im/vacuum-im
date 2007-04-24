@@ -1,5 +1,6 @@
-#include "stanzaprocessor.h"
 #include <QtDebug>
+#include "stanzaprocessor.h"
+
 #include <QTime>
 #include <QSet>
 #include <QMultiHash>
@@ -11,7 +12,7 @@ StanzaProcessor::StanzaProcessor()
 
 StanzaProcessor::~StanzaProcessor()
 {
-  qDebug() << "~StanzaProcessor";
+
 }
 
 void StanzaProcessor::pluginInfo(PluginInfo *APluginInfo)
@@ -25,39 +26,23 @@ void StanzaProcessor::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
 }
 
-bool StanzaProcessor::initPlugin(IPluginManager *APluginManager)
+bool StanzaProcessor::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   connect(APluginManager->instance(),SIGNAL(aboutToQuit()),SLOT(onAboutToQuit())); 
-  QList<IPlugin *> plugins = APluginManager->getPlugins("IXmppStreams");
-
-  bool connected = false;
-  IPlugin *plugin;
-  foreach(plugin, plugins)
+  
+  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  if (plugin)
   {
-    IXmppStreams *streams = qobject_cast<IXmppStreams *>(plugin->instance());
-    if (streams)
-    {
-      bool streamConnected = 
-        connect(streams->instance(), SIGNAL(added(IXmppStream *)),
-          SLOT(onStreamAdded(IXmppStream *))) && 
-        connect(streams->instance(), SIGNAL(element(IXmppStream *, const QDomElement &)),
-          SLOT(onStreamElement(IXmppStream *, const QDomElement &))) && 
-        connect(streams->instance(), SIGNAL(removed(IXmppStream *)),
-          SLOT(onStreamRemoved(IXmppStream *))); 
-      
-      if (!streamConnected)
-        disconnect(streams->instance(),0,this,0);
-      else
-        connected = true;
-    }
+    connect(plugin->instance(), SIGNAL(added(IXmppStream *)),
+      SLOT(onStreamAdded(IXmppStream *))); 
+    connect(plugin->instance(), SIGNAL(element(IXmppStream *, const QDomElement &)),
+      SLOT(onStreamElement(IXmppStream *, const QDomElement &))); 
+    connect(plugin->instance(), SIGNAL(removed(IXmppStream *)),
+      SLOT(onStreamRemoved(IXmppStream *))); 
   }
-  return connected;
+  return plugin!=NULL;
 }
 
-bool StanzaProcessor::startPlugin()
-{
-  return true;
-}
 
 //IStanzaProcessor
 QString StanzaProcessor::newId() const

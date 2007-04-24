@@ -30,7 +30,7 @@ void RostersModelPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->version = "0.1";
 }
 
-bool RostersModelPlugin::initPlugin(IPluginManager *APluginManager)
+bool RostersModelPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
   if (plugin)
@@ -56,11 +56,14 @@ bool RostersModelPlugin::initPlugin(IPluginManager *APluginManager)
   return true;
 }
 
-bool RostersModelPlugin::startPlugin()
+bool RostersModelPlugin::initObjects()
 {
-  createRostersModel();
+  FRostersModel = new RostersModel(this);
+  emit modelCreated(FRostersModel);
+
   return true;
 }
+
 
 //IRostersModelPlugin
 IRostersModel *RostersModelPlugin::rostersModel()
@@ -76,15 +79,6 @@ IRosterIndex *RostersModelPlugin::addStream(IRoster *ARoster, IPresence *APresen
 void RostersModelPlugin::removeStream(const Jid &AStreamJid)
 {
   FRostersModel->removeStream(AStreamJid.pFull());
-}
-
-void RostersModelPlugin::createRostersModel()
-{
-  if (!FRostersModel)
-  {
-    FRostersModel = new RostersModel(this);
-    emit modelCreated(FRostersModel);
-  }
 }
 
 void RostersModelPlugin::onRosterAdded(IRoster *ARoster)

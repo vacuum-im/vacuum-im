@@ -23,8 +23,10 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return XMPPSTREAMS_UUID;}
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initPlugin(IPluginManager *APluginManager);
-  virtual bool startPlugin();
+  virtual bool initConnections(IPluginManager */*APluginManager*/, int &/*AInitOrder*/) { return true; }
+  virtual bool initObjects();
+  virtual bool initSettings() { return true; }
+  virtual bool startPlugin() { return true; }
 
   //IXmppStreams
   virtual IXmppStream *newStream(const Jid &AJid);

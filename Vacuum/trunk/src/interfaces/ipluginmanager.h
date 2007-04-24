@@ -5,8 +5,8 @@
 #include <QtPlugin>
 #include <QUuid>
 #include <QUrl>
+#include <QList>
 #include <QIcon>
-#include <QVector>
 
 struct PluginInfo 
 {
@@ -29,9 +29,13 @@ public:
   virtual QObject *instance()=0;
   virtual QUuid pluginUuid() const=0;
   virtual void pluginInfo(PluginInfo *APluginInfo)=0;
-  virtual bool initPlugin(IPluginManager *APluginManager)=0;
-  virtual bool startPlugin()=0;
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder)=0;
+  virtual bool initObjects()=0;
+  virtual bool initSettings()=0;
+  virtual bool startPlugin() =0;
 };
+
+typedef QList<IPlugin *> PluginList;
 
 class IPluginManager  {
 public:
@@ -39,11 +43,11 @@ public:
   virtual bool unloadPlugin(const QUuid &) =0;
   virtual QApplication *application() const =0;
   virtual IPlugin* getPlugin(const QUuid &) const=0;
-  virtual QList<IPlugin *> getPlugins() const =0;
-  virtual QList<IPlugin *> getPlugins(const QString &AInterface) const =0;
+  virtual PluginList getPlugins() const =0;
+  virtual PluginList getPlugins(const QString &AInterface) const =0;
   virtual const PluginInfo *getPluginInfo(const QUuid &) const =0;
-  virtual QVector<QUuid> getDependencesOn(const QUuid &) const =0;
-  virtual QVector<QUuid> getDependencesFor(const QUuid &) const =0;
+  virtual QList<QUuid> getDependencesOn(const QUuid &) const =0;
+  virtual QList<QUuid> getDependencesFor(const QUuid &) const =0;
 public slots:
   virtual void quit() =0;
 signals:

@@ -12,6 +12,7 @@
 #include "sortfilterproxymodel.h"
 
 #define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"
+#define ROSTERSVIEW_INITORDER 100;
 
 class RostersViewPlugin : 
   public QObject,
@@ -30,8 +31,10 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return ROSTERSVIEW_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initPlugin(IPluginManager *APluginManager);
-  virtual bool startPlugin();
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+  virtual bool initObjects();
+  virtual bool initSettings() { return true; }
+  virtual bool startPlugin() { return true; }
 
   //IRostersViewPlugin
   virtual IRostersView *rostersView();
@@ -42,12 +45,7 @@ signals:
   virtual void viewCreated(IRostersView *);
   virtual void viewDestroyed(IRostersView *);
   virtual void showOfflineContactsChanged(bool AShow);
-protected:
-  void createRostersView();
-  void createActions();
 protected slots:
-  void onRostersModelCreated(IRostersModel *AModel);
-  void onMainWindowCreated(IMainWindow *AMainWindow);
   void onRostersViewDestroyed(QObject *);
   void onProxyAboutToBeAdded(QAbstractProxyModel *AProxyModel);
   void onProxyRemoved(QAbstractProxyModel *AProxyModel);
@@ -59,6 +57,7 @@ protected slots:
 private:
   IRostersModelPlugin *FRostersModelPlugin;
   IMainWindowPlugin *FMainWindowPlugin;
+  ISettingsPlugin *FSettingsPlugin;
   ISettings *FSettings;
 private:
   Action *actShowOffline;

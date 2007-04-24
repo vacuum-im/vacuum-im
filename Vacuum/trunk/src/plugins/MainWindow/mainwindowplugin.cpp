@@ -7,6 +7,7 @@
 MainWindowPlugin::MainWindowPlugin()
 {
   FPluginManager = NULL;
+  FSettingsPlugin = NULL;
   FSettings = NULL;
   FMainWindow = NULL;
 }
@@ -30,28 +31,41 @@ void MainWindowPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->version = "0.1";
 }
 
-bool MainWindowPlugin::initPlugin(IPluginManager *APluginManager)
+bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   FPluginManager = APluginManager;
 
   IPlugin *plugin = FPluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
+    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+
+  return true;
+}
+
+bool MainWindowPlugin::initObjects()
+{
+  if (FSettingsPlugin)
   {
-    ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (settingsPlugin)
-    {
-      FSettings = settingsPlugin->openSettings(MAINWINDOW_UUID,this);
-      connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
-      connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
-    }
+    FSettings = FSettingsPlugin->openSettings(MAINWINDOW_UUID,this);
+    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
+    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
   }
+
+  FMainWindow = new MainWindow();
+  emit mainWindowCreated(FMainWindow);
+
+  Action *action = new Action(this);
+  action->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
+  action->setText(tr("Quit"));
+  connect(action,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
+  FMainWindow->mainMenu()->addAction(action,MAINWINDOW_ACTION_GROUP_QUIT);
+
   return true;
 }
 
 bool MainWindowPlugin::startPlugin()
 {
-  if (!FSettings)
-    createMainWindow();
+  FMainWindow->show();
   return true;
 }
 
@@ -60,34 +74,14 @@ IMainWindow *MainWindowPlugin::mainWindow() const
   return FMainWindow;
 }
 
-void MainWindowPlugin::createMainWindow()
-{
-  if (!FMainWindow)
-  {
-    FMainWindow = new MainWindow();
-    
-    Action *action = new Action(this);
-    action->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
-    action->setText(tr("Quit"));
-    connect(action,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
-    FMainWindow->mainMenu()->addAction(action,MAINWINDOW_ACTION_GROUP_QUIT);
-    
-    emit mainWindowCreated(FMainWindow);
-  }
-}
-
 void MainWindowPlugin::onSettingsOpened()
 {
-  if (!FMainWindow)
-    createMainWindow();
   FMainWindow->setGeometry(FSettings->value("window:geometry",FMainWindow->geometry()).toRect());
-  FMainWindow->show();
 }
 
 void MainWindowPlugin::onSettingsClosed()
 {
   FSettings->setValue("window:geometry",FMainWindow->geometry());
-  FMainWindow->hide();
 }
 
 Q_EXPORT_PLUGIN2(MainWindowPlugin, MainWindowPlugin)

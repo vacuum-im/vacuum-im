@@ -25,15 +25,14 @@ void RosterChanger::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->uid = ROSTERCHANGER_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append("{5306971C-2488-40d9-BA8E-C83327B2EED5}"); //IRoster  
+  APluginInfo->dependences.append("{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"); //IRostersViewPlugin  
 }
 
-bool RosterChanger::initPlugin(IPluginManager *APluginManager)
+bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
   if (plugin)
-  {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-  }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin)
@@ -46,12 +45,7 @@ bool RosterChanger::initPlugin(IPluginManager *APluginManager)
     }
   }
 
-  return FRosterPlugin!=NULL;
-}
-
-bool RosterChanger::startPlugin()
-{
-  return true;
+  return FRosterPlugin!=NULL && FRostersViewPlugin!=NULL;
 }
 
 //IRosterChanger

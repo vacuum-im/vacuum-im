@@ -11,15 +11,13 @@ StatusChanger::StatusChanger()
   FRosterPlugin = NULL;
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
-
-  mnuBase = new Menu(NULL);
-  createStatusActions();
-  setBaseShow(IPresence::Offline);
+  mnuBase = NULL;
 }
 
 StatusChanger::~StatusChanger()
 {
-  delete mnuBase;
+  if (mnuBase)
+    delete mnuBase;
 }
 
 //IPlugin
@@ -34,8 +32,10 @@ void StatusChanger::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append("{511A07C4-FFA4-43ce-93B0-8C50409AFC0E}"); //IPresence  
 }
 
-bool StatusChanger::initPlugin(IPluginManager *APluginManager)
+bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+  AInitOrder = STATUSCHANGER_INITORDER;
+
   IPlugin *plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
@@ -66,11 +66,6 @@ bool StatusChanger::initPlugin(IPluginManager *APluginManager)
   if (plugin)
   {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-    if (FMainWindowPlugin)
-    {
-      connect(FMainWindowPlugin->instance(),SIGNAL(mainWindowCreated(IMainWindow *)),
-        SLOT(onMainWindowCreated(IMainWindow *)));
-    }
   }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
@@ -86,13 +81,35 @@ bool StatusChanger::initPlugin(IPluginManager *APluginManager)
   
   plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
   if (plugin)
+  {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+    if (FAccountManager)
+      connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
+  }
   
-  return FPresencePlugin!=NULL;
+  return FPresencePlugin!=NULL && FMainWindowPlugin!=NULL;
 }
 
-bool StatusChanger::startPlugin()
+bool StatusChanger::initObjects()
 {
+  mnuBase = new Menu(NULL);
+  createStatusActions(NULL);
+  
+  if (FMainWindowPlugin->mainWindow())
+  {
+    QToolButton *tbutton = new QToolButton;
+    tbutton->setDefaultAction(mnuBase->menuAction());
+    tbutton->setPopupMode(QToolButton::InstantPopup);
+    tbutton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    FMainWindowPlugin->mainWindow()->bottomToolBar()->addWidget(tbutton);
+  }
+
+  return true;
+}
+
+bool StatusChanger::initSettings()
+{
+  setBaseShow(IPresence::Offline);
   return true;
 }
 
@@ -310,21 +327,6 @@ void StatusChanger::updateAccount(IPresence *APresence)
   }
 }
 
-void StatusChanger::autoConnect(IPresence *APresence)
-{
-  IAccount *account = FAccounts.value(APresence,NULL);
-  if (account && APresence->show() == IPresence::Offline)
-  {
-    if (account->autoConnect())
-    {
-      IPresence::Show show = (IPresence::Show)account->value("presence::last::show",IPresence::Online).toInt();
-      QString status = account->value("presence::last::status",getStatusText(IPresence::Online)).toString();
-      int priority = account->value("presence::last::priority",getStatusPriority(IPresence::Online)).toInt();
-      setPresence(show,status,priority,APresence->xmppStream()->jid());
-    }
-  }
-}
-
 void StatusChanger::autoReconnect(IPresence *APresence)
 {
   IAccount *account = FAccounts.value(APresence,NULL);
@@ -451,24 +453,12 @@ void StatusChanger::onRostersViewCreated(IRostersView *ARostersView)
     SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
 }
 
-void StatusChanger::onMainWindowCreated(IMainWindow *AMainWindow)
-{
-  QToolButton *tbutton = new QToolButton;
-  tbutton->setDefaultAction(mnuBase->menuAction());
-  tbutton->setPopupMode(QToolButton::InstantPopup);
-  tbutton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  AMainWindow->bottomToolBar()->addWidget(tbutton);
-}
-
 void StatusChanger::onPresenceAdded(IPresence *APresence)
 {
   FPresences.append(APresence);
   addStreamMenu(APresence);
   if (FAccountManager)
-  {
     FAccounts.insert(APresence,FAccountManager->accountByStream(APresence->xmppStream()->jid()));
-    autoConnect(APresence);
-  }
 }
 
 void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
@@ -563,6 +553,21 @@ void StatusChanger::onReconnectTimer()
     }
     else
       it++;
+  }
+}
+
+void StatusChanger::onAccountShown(IAccount *AAccount)
+{
+  if (AAccount->autoConnect())
+  {
+    IPresence *presence = FPresencePlugin->getPresence(AAccount->streamJid());
+    if (presence && presence->show() == IPresence::Offline)
+    {
+      IPresence::Show show = (IPresence::Show)AAccount->value("presence::last::show",IPresence::Online).toInt();
+      QString status = AAccount->value("presence::last::status",getStatusText(IPresence::Online)).toString();
+      int priority = AAccount->value("presence::last::priority",getStatusPriority(IPresence::Online)).toInt();
+      setPresence(show,status,priority,presence->xmppStream()->jid());
+    }
   }
 }
 

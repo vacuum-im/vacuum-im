@@ -21,14 +21,14 @@ class IqAuth :
   Q_INTERFACES(IStreamFeature);
 
 public:
-  IqAuth(IXmppStream *AStream);
+  IqAuth(IXmppStream *AXmppStream);
   ~IqAuth();
 
   //IStreamFeature
   virtual QObject *instance() { return this; }
   virtual QString name() const { return "auth"; }
   virtual QString nsURI() const { return NS_FEATURE_IQAUTH; }
-  virtual IXmppStream *stream() const { return FStream; }
+  virtual IXmppStream *stream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction ADirection) const;
   virtual bool hookData(QByteArray *,Direction) { return false; }
@@ -38,8 +38,8 @@ signals:
   virtual void error(const QString &);
 protected slots:
   virtual void onStreamClosed(IXmppStream *);
-private: //interfaces
-  IXmppStream *FStream;
+private:
+  IXmppStream *FXmppStream;
 private:
   bool FNeedHook;
 };
@@ -62,13 +62,15 @@ public:
   virtual QObject *instance() { return this; }
   virtual QUuid pluginUuid() const { return IQAUTH_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initPlugin(IPluginManager *APluginManager);
-  virtual bool startPlugin();
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+  virtual bool initObjects() { return true; }
+  virtual bool initSettings() { return true; }
+  virtual bool startPlugin() { return true; }
 
   //IStreamFeaturePlugin
-  virtual IStreamFeature *newInstance(IXmppStream *AStream);
+  virtual IStreamFeature *newInstance(IXmppStream *AXmppStream);
 protected slots:
-  virtual void onStreamAdded(IXmppStream *);
+  virtual void onStreamAdded(IXmppStream *AXmppStream);
 private:
   QObjectCleanupHandler FCleanupHandler;
 };

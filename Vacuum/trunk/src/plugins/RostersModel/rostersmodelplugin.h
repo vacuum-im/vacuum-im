@@ -24,8 +24,10 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return ROSTERSMODEL_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initPlugin(IPluginManager *APluginManager);
-  virtual bool startPlugin();
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+  virtual bool initObjects();
+  virtual bool initSettings() { return true; }
+  virtual bool startPlugin() { return true; }
 
   //IRostersModelPlugin
   virtual IRostersModel *rostersModel();

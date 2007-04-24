@@ -25,8 +25,10 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return PRESENCE_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initPlugin(IPluginManager *APluginManager);
-  virtual bool startPlugin();
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+  virtual bool initObjects() { return true; }
+  virtual bool initSettings() { return true; }
+  virtual bool startPlugin() { return true; }
 
   //IPresencePlugin
   virtual IPresence *newPresence(IXmppStream *AStream);

@@ -33,7 +33,7 @@ void SettingsPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo ->version = "0.1";
 }
 
-bool SettingsPlugin::initPlugin(IPluginManager *APluginManager)
+bool SettingsPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   FPluginManager = APluginManager;
   connect(FPluginManager->instance(),SIGNAL(aboutToQuit()),SLOT(onPluginManagerQuit()));
@@ -48,11 +48,10 @@ bool SettingsPlugin::initPlugin(IPluginManager *APluginManager)
         SLOT(onMainWindowCreated(IMainWindow *)));
     }
   }
-
   return setSettingsFile("config.xml");
 }
 
-bool SettingsPlugin::startPlugin()
+bool SettingsPlugin::initSettings()
 {
   setProfile(QString::null);
   return true;

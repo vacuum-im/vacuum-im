@@ -1,5 +1,6 @@
-#include "saslauth.h"
 #include <QtDebug>
+#include "saslauth.h"
+
 #include <QMultiHash>
 #include <QStringList>
 #include "../../utils/stanza.h"
@@ -103,7 +104,7 @@ SASLAuth::SASLAuth(IXmppStream *AStream)
 
 SASLAuth::~SASLAuth()
 {
-  qDebug() << "~SASLAuth";
+
 }
 
 bool SASLAuth::start(const QDomElement &AElem)
@@ -255,7 +256,6 @@ SASLAuthPlugin::SASLAuthPlugin()
 
 SASLAuthPlugin::~SASLAuthPlugin()
 {
-  qDebug() << "~SASLAuthPlugin";
   FCleanupHandler.clear(); 
 }
 
@@ -270,7 +270,15 @@ void SASLAuthPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
 }
 
-bool SASLAuthPlugin::initPlugin(IPluginManager *APluginManager)
+bool SASLAuthPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+{
+  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  if (plugin)
+    connect(plugin->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
+  return plugin!=NULL;
+}
+
+bool SASLAuthPlugin::initObjects()
 {
   ErrorHandler::addErrorItem(NS_FEATURE_SASL, "aborted", 
     ErrorHandler::CANCEL, ErrorHandler::FORBIDDEN, tr("Authorization Aborted"));
@@ -293,22 +301,10 @@ bool SASLAuthPlugin::initPlugin(IPluginManager *APluginManager)
   ErrorHandler::addErrorItem(NS_FEATURE_SASL, "temporary-auth-failure", 
     ErrorHandler::CANCEL, ErrorHandler::NOT_AUTHORIZED, tr("Temporary Auth Failure"));
 
-  QList<IPlugin *> plugins = APluginManager->getPlugins("IXmppStreams");
-  bool connected = false;
-  for(int i=0; i<plugins.count(); i++)
-  {
-    QObject *obj = plugins[i]->instance(); 
-    connected = connected || connect(obj,SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
-  }
-
-  return connected;
-}
-
-bool SASLAuthPlugin::startPlugin()
-{
   return true;
 }
 
+//ISASLAuth
 IStreamFeature *SASLAuthPlugin::newInstance(IXmppStream *AStream)
 {
   SASLAuth *saslAuth = new SASLAuth(AStream);

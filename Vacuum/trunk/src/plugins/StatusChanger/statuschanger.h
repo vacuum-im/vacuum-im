@@ -12,6 +12,7 @@
 #include "../../interfaces/iaccountmanager.h"
 
 #define STATUSCHANGER_UUID "{F0D57BD2-0CD4-4606-9CEE-15977423F8DC}"
+#define STATUSCHANGER_INITORDER 100;
 
 #define STATUSMENU_ACTION_GROUP_MAIN 200
 #define STATUSMENU_ACTION_GROUP_STREAM 190
@@ -33,8 +34,10 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return STATUSCHANGER_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initPlugin(IPluginManager *APluginManager);
-  virtual bool startPlugin();
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+  virtual bool initObjects();
+  virtual bool initSettings();
+  virtual bool startPlugin() { return true; }
   
   //IStatusChanger
   virtual Menu *baseMenu() const { return mnuBase; }
@@ -51,7 +54,6 @@ protected:
   void addStreamMenu(IPresence *APresence);
   void removeStreamMenu(IPresence *APresence);
   void updateAccount(IPresence *APresence);
-  void autoConnect(IPresence *APresence);
   void autoReconnect(IPresence *APresence);
   QString getStatusIconName(IPresence::Show AShow) const;
   QString getStatusName(IPresence::Show AShow) const;
@@ -59,7 +61,6 @@ protected:
   int getStatusPriority(IPresence::Show AShow) const;
 protected slots:
   void onRostersViewCreated(IRostersView *ARostersView);
-  void onMainWindowCreated(IMainWindow *AMainWindow);
   void onPresenceAdded(IPresence *APresence);
   void onSelfPresence(IPresence *, IPresence::Show AShow, 
     const QString &AStatus, qint8 APriority, const Jid &AJid);
@@ -68,6 +69,7 @@ protected slots:
   void onRosterClosed(IRoster *ARoster);
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
   void onReconnectTimer();
+  void onAccountShown(IAccount *AAccount);
 private:
   IPresencePlugin *FPresencePlugin;
   IRosterPlugin *FRosterPlugin;

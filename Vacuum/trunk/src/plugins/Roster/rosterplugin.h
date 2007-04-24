@@ -25,8 +25,10 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return ROSTER_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initPlugin(IPluginManager *APluginManager);
-  virtual bool startPlugin();
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+  virtual bool initObjects() { return true; }
+  virtual bool initSettings() { return true; }
+  virtual bool startPlugin() { return true; }
 
   //IRosterPlugin
   virtual IRoster *newRoster(IXmppStream *AStream);

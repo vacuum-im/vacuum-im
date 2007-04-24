@@ -26,7 +26,9 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return MAINWINDOW_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initPlugin(IPluginManager *APluginManager);
+  virtual bool initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/);
+  virtual bool initObjects();
+  virtual bool initSettings() { return true; }
   virtual bool startPlugin();
 
   //IMainWindowPlugin
@@ -34,13 +36,12 @@ public:
 signals:
   virtual void mainWindowCreated(IMainWindow *);
   virtual void mainWindowDestroyed(IMainWindow *);
-protected:
-  void createMainWindow();
 protected slots:
   void onSettingsOpened();
   void onSettingsClosed();
 private:
   IPluginManager *FPluginManager;
+  ISettingsPlugin *FSettingsPlugin;
   ISettings *FSettings;
 private:
   MainWindow *FMainWindow;
