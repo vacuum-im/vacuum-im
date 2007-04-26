@@ -194,7 +194,7 @@ QVariant RosterIndex::data(int ARole) const
   return data;
 }
 
-IRosterIndexList RosterIndex::findChild(const QHash<int, QVariant> AData, bool ARecurse) const
+IRosterIndexList RosterIndex::findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds) const
 {
   IRosterIndexList indexes;
   
@@ -202,16 +202,17 @@ IRosterIndexList RosterIndex::findChild(const QHash<int, QVariant> AData, bool A
   foreach (index, FChilds)
   {
     bool cheked = true;
-    QHash<int,QVariant>::const_iterator i = AData.begin();
-    while (cheked && i!=AData.end())
+    QList<int> dataRoles = AData.keys(); 
+    QList<int>::const_iterator role = dataRoles.constBegin();
+    while (cheked && role!=dataRoles.constEnd())
     {
-      cheked = (i.value() == index->data(i.key()));
-      i++;
+      cheked = AData.values(*role).contains(index->data(*role));
+      role++;
     }
     if (cheked)
       indexes.append(index);
-    if (ARecurse)
-      indexes += index->findChild(AData,ARecurse); 
+    if (ASearchInChilds)
+      indexes += index->findChild(AData,ASearchInChilds); 
   }
 
   return indexes;  

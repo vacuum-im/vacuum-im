@@ -93,7 +93,7 @@ public:
   virtual QVariant data(int ARole) const =0;
   virtual void setItemDelegate(QAbstractItemDelegate *AItemDelegate) =0;
   virtual QAbstractItemDelegate *itemDelegate() const =0;
-  virtual IRosterIndexList findChild(const QHash<int, QVariant> AData, bool ARecurse = false) const =0;
+  virtual IRosterIndexList findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds = false) const =0;
   virtual void setRemoveOnLastChildRemoved(bool ARemove) =0;
   virtual void setRemoveChildsOnRemoved(bool ARemove) =0;
   virtual void setDestroyOnParentRemoved(bool ADestroy) =0;

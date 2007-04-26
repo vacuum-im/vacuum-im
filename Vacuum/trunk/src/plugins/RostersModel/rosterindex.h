@@ -2,6 +2,7 @@
 #define ROSTERINDEX_H
 
 #include <QHash>
+#include <QMultiHash>
 #include "../../interfaces/irostersmodel.h"
 
 class RosterIndex : 
@@ -37,7 +38,7 @@ public:
   virtual QVariant data(int ARole) const;
   virtual void setItemDelegate(QAbstractItemDelegate *AItemDelegate) { FItemDelegate = AItemDelegate; }
   virtual QAbstractItemDelegate *itemDelegate() const { return FItemDelegate; }
-  virtual IRosterIndexList findChild(const QHash<int, QVariant> AData, bool ARecurse = false) const;
+  virtual IRosterIndexList findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds = false) const;
   virtual void setRemoveOnLastChildRemoved(bool ARemove) { FRemoveOnLastChildRemoved = ARemove; }
   virtual void setRemoveChildsOnRemoved(bool ARemove) { FRemoveChildsOnRemoved = ARemove; }
   virtual void setDestroyOnParentRemoved(bool ADestroy) {FDestroyOnParentRemoved = ADestroy; }
