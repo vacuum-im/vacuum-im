@@ -15,10 +15,14 @@ public:
   IndexDataHolder(QObject *AParent);
   ~IndexDataHolder();
 
+  //IRosterIndexDataHolder
   virtual QObject *instance() { return this; }
   virtual bool setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
   virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
   virtual QList<int> roles() const;
+
+  //IndexDataHolder
+  void clear();
 signals:
   virtual void dataChanged(IRosterIndex *, int ARole);
 protected:

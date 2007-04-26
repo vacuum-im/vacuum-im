@@ -51,6 +51,7 @@ protected:
   //Для коррекции работы SortFilterProxyModel
   virtual void emitParentDataChanged();
 protected slots:
+  virtual void onDataHolderChanged(IRosterIndex *AIndex, int ARole);
   virtual void onChildIndexDestroyed(QObject *AIndex);
   virtual void onRemoveByLastChildRemoved();
   virtual void onDestroyByParentRemoved();

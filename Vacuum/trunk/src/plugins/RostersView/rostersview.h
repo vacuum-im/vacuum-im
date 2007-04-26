@@ -6,6 +6,7 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
+#include "indexdataholder.h"
 
 class RostersView : 
   virtual public QTreeView,
@@ -23,6 +24,7 @@ public:
   //IRostersView
   virtual void setModel(IRostersModel *AModel); 
   virtual IRostersModel *rostersModel() const { return FRostersModel; }
+  virtual IRosterIndexDataHolder *defaultDataHolder() const { return FIndexDataHolder; }
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel);
   virtual QAbstractProxyModel *lastProxyModel() const { return FProxyModels.value(FProxyModels.count()-1,NULL); }
   virtual void removeProxyModel(QAbstractProxyModel *AProxyModel);
@@ -39,11 +41,14 @@ signals:
 protected:
   void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   void contextMenuEvent(QContextMenuEvent *AEvent);
+protected slots:
+  void onIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
 private:
   IRostersModel *FRostersModel;
 private:
   QList<QAbstractProxyModel *> FProxyModels;
   Menu *FContextMenu;
+  IndexDataHolder *FIndexDataHolder;
 };
 
 #endif // ROSTERSVIEW_H

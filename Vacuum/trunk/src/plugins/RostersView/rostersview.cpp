@@ -9,6 +9,7 @@ RostersView::RostersView(QWidget *AParent)
 {
   FRostersModel = NULL;
   FContextMenu = new Menu(this);
+  FIndexDataHolder = new IndexDataHolder(this);
 
   header()->hide();
   setIndentation(8);
@@ -29,6 +30,19 @@ void RostersView::setModel(IRostersModel *AModel)
   if (FRostersModel != AModel)
   {
     emit modelAboutToBeSeted(AModel);
+    
+    if (FRostersModel)
+    {
+      disconnect(FRostersModel,SIGNAL(indexCreated(IRosterIndex *,IRosterIndex *)),
+        this,SLOT(onIndexCreated(IRosterIndex *, IRosterIndex *)));
+      FIndexDataHolder->clear();
+    }
+    if (AModel)
+    {
+      connect(AModel,SIGNAL(indexCreated(IRosterIndex *,IRosterIndex *)),
+        SLOT(onIndexCreated(IRosterIndex *, IRosterIndex *)));
+    }
+
     FRostersModel = AModel;
     if (!FProxyModels.isEmpty())
       FProxyModels.first()->setSourceModel(AModel);
@@ -130,3 +144,8 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
     FContextMenu->popup(AEvent->globalPos());
 }
 
+void RostersView::onIndexCreated(IRosterIndex *AIndex, IRosterIndex *)
+{
+  if (AIndex->type() < IRosterIndex::IT_UserDefined)
+    AIndex->setDataHolder(FIndexDataHolder);
+}

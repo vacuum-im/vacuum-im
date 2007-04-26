@@ -115,10 +115,24 @@ IRosterIndexDataHolder *RosterIndex::setDataHolder(int ARole, IRosterIndexDataHo
   IRosterIndexDataHolder *oldDataHolder = FDataHolders.value(ARole,0);
   if (oldDataHolder != ADataHolder)
   {
+    if (oldDataHolder)
+    {
+      disconnect(oldDataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
+        this,SLOT(onDataHolderChanged(IRosterIndex *, int)));
+    }
+    if (ADataHolder)
+    {
+      connect(ADataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
+        SLOT(onDataHolderChanged(IRosterIndex *, int)));
+    }
+
     if (ADataHolder)
       FDataHolders.insert(ARole,ADataHolder);
     else
       FDataHolders.remove(ARole);
+    
+    emitParentDataChanged();
+    dataChanged(this,ARole);
   }
   return oldDataHolder;
 }
@@ -149,14 +163,15 @@ bool RosterIndex::setData(int ARole, const QVariant &AData)
     if (AData.isValid()) 
       FData.insert(ARole,AData);
     else
-      FData.remove(ARole); 
-    dataSeted = true;
-  }
+      FData.remove(ARole);
 
-  if (dataSeted && oldData != AData)
-  {
-    emitParentDataChanged();
-    emit dataChanged(this, ARole);
+    if (oldData != AData)
+    {
+      emitParentDataChanged();
+      emit dataChanged(this, ARole);
+    }
+
+    dataSeted = true;
   }
 
   return dataSeted;
@@ -213,6 +228,15 @@ void RosterIndex::emitParentDataChanged()
     emit dataChanged(this,IRosterIndex::DR_AnyRole);
 }
 
+void RosterIndex::onDataHolderChanged(IRosterIndex *AIndex, int ARole)
+{
+ if (AIndex == this)
+ {
+   emitParentDataChanged();
+   emit dataChanged(this, ARole);
+ }
+}
+
 void RosterIndex::onChildIndexDestroyed(QObject *AIndex)
 {
 // TODO:   Не работает преобразование
@@ -236,4 +260,3 @@ void RosterIndex::onDestroyByParentRemoved()
   if (!FParentIndex)
     deleteLater();
 }
-

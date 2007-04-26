@@ -4,7 +4,6 @@
 #include "../../interfaces/irostersmodel.h"
 #include "../../utils/jid.h"
 #include "rosterindex.h"
-#include "indexdataholder.h"
 
 class RostersModel : 
   virtual public QAbstractItemModel,
@@ -72,7 +71,6 @@ private:
   };
   RosterIndex *FRootIndex;
   QHash<QString,StreamItem> FStreams;
-  IndexDataHolder *FIndexDataHolder;
 };
 
 #endif // ROSTERSMODEL_H

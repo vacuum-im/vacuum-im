@@ -15,6 +15,7 @@ public:
   virtual QObject *instance() = 0;
   virtual void setModel(IRostersModel *) =0; 
   virtual IRostersModel *rostersModel() const =0;
+  virtual IRosterIndexDataHolder *defaultDataHolder() const =0;
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel) =0;
   virtual QAbstractProxyModel *lastProxyModel() const =0;
   virtual void removeProxyModel(QAbstractProxyModel *AProxyModel) =0;

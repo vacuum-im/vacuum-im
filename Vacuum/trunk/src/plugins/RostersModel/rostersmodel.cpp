@@ -4,7 +4,6 @@
 RostersModel::RostersModel(QObject *parent)
   : QAbstractItemModel(parent)
 {
-  FIndexDataHolder = new IndexDataHolder(this);
   FRootIndex = new RosterIndex(IRosterIndex::IT_Root,"IT_Root");
   FRootIndex->setParent(this);
   connect(FRootIndex,SIGNAL(dataChanged(IRosterIndex *, int)),
@@ -188,8 +187,6 @@ IRosterIndex *RostersModel::createRosterIndex(int AType, const QString &AId, IRo
   if (!index)
   {
     index = new RosterIndex(AType,AId);
-    if (AType < IRosterIndex::IT_UserDefined)
-      index->setDataHolder(FIndexDataHolder);
     if (AParent)
       index->setData(RosterIndex::DR_StreamJid,AParent->data(RosterIndex::DR_StreamJid));
     emit indexCreated(index,AParent);

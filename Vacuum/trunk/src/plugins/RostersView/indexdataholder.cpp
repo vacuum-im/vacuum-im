@@ -139,6 +139,10 @@ QList<int> IndexDataHolder::roles() const
   return dataRoles;
 }
 
+void IndexDataHolder::clear()
+{
+  FData.clear();
+}
 QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const
 {
   if (!FStatusIconset.isValid())
@@ -170,3 +174,4 @@ QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const
   }
   return QIcon();
 }
+
