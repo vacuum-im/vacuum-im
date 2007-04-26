@@ -1,7 +1,7 @@
 #include "skin.h"
 #include <QSet>
 
-QString Skin::FPathToSkins = "../../skin";
+QString Skin::FPathToSkins = "skin";
 QString Skin::FSkinName = "default";
 QHash<QString,Iconset> Skin::FIconsets;
 QList<QPointer<SkinIconset> > Skin::FSkinIconsets;
