@@ -192,6 +192,7 @@ IRosterIndex *RostersModel::createRosterIndex(int AType, const QString &AId, IRo
       index->setDataHolder(FIndexDataHolder);
     if (AParent)
       index->setData(RosterIndex::DR_StreamJid,AParent->data(RosterIndex::DR_StreamJid));
+    emit indexCreated(index,AParent);
   }
   return index;
 }
@@ -269,6 +270,13 @@ void RostersModel::insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent
 void RostersModel::removeRosterIndex(IRosterIndex *AIndex)
 {
   AIndex->setParentIndex(0);
+}
+
+QModelIndex RostersModel::modelIndexByRosterIndex(IRosterIndex *AIndex)
+{
+  if (AIndex)
+    return createIndex(AIndex->row(),0,AIndex);
+  return QModelIndex();
 }
 
 void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
@@ -569,7 +577,7 @@ void RostersModel::onIndexDataChanged(IRosterIndex *AIndex, int ARole)
 {
   QModelIndex modelIndex = createIndex(AIndex->row(),0,AIndex);
   emit dataChanged(modelIndex,modelIndex);
-  emit indexDataChanged(modelIndex, ARole);
+  emit indexDataChanged(AIndex, ARole);
 }
 
 void RostersModel::onIndexChildAboutToBeInserted(IRosterIndex *AIndex)
@@ -595,13 +603,15 @@ void RostersModel::onIndexChildAboutToBeInserted(IRosterIndex *AIndex)
   }
 }
 
-void RostersModel::onIndexChildInserted(IRosterIndex *)
+void RostersModel::onIndexChildInserted(IRosterIndex *AIndex)
 {
   endInsertRows();
+  emit indexInserted(AIndex);
 }
 
 void RostersModel::onIndexChildAboutToBeRemoved(IRosterIndex *AIndex)
 {
+  emit indexRemoved(AIndex);
   IRosterIndex *parentIndex = AIndex->parentIndex();
   if (parentIndex)
   { 

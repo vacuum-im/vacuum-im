@@ -128,6 +128,7 @@ public:
     int AType, IRosterIndex *AParent) const =0;
   virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
   virtual void removeRosterIndex(IRosterIndex *AIndex) =0;
+  virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) =0;
   virtual QString blankGroupName() const =0;
   virtual QString agentsGroupName() const =0;
   virtual QString myResourcesGroupName() const =0;
@@ -135,7 +136,10 @@ public:
 signals:
   virtual void streamAdded(const Jid &) =0;
   virtual void streamRemoved(const Jid &) =0;
-  virtual void indexDataChanged(const QModelIndex &, int ARole) =0;
+  virtual void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
+  virtual void indexInserted(IRosterIndex *) =0;
+  virtual void indexDataChanged(IRosterIndex *, int ARole) =0;
+  virtual void indexRemoved(IRosterIndex *) =0;
 };
 
 class IRostersModelPlugin 

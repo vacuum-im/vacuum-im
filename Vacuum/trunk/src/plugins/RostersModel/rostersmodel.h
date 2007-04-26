@@ -42,6 +42,7 @@ public:
   virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const;
   virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);
   virtual void removeRosterIndex(IRosterIndex *AIndex);
+  virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex);
   virtual QString blankGroupName() const { return tr("Blank Group"); }
   virtual QString agentsGroupName() const { return tr("Agents"); }
   virtual QString myResourcesGroupName() const { return tr("My Resources"); }
@@ -49,7 +50,10 @@ public:
 signals:
   virtual void streamAdded(const Jid &);
   virtual void streamRemoved(const Jid &);
-  virtual void indexDataChanged(const QModelIndex &, int ARole);
+  virtual void indexCreated(IRosterIndex *, IRosterIndex *);
+  virtual void indexInserted(IRosterIndex *);
+  virtual void indexDataChanged(IRosterIndex *, int ARole);
+  virtual void indexRemoved(IRosterIndex *);
 protected slots:
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onRosterItemRemoved(IRosterItem *ARosterItem);
