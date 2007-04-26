@@ -11,13 +11,34 @@ IndexDataHolder::~IndexDataHolder()
 
 }
 
-bool IndexDataHolder::setData(IRosterIndex *, int , const QVariant &)
+bool IndexDataHolder::setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
 {
-  return false;
+  QHash<int,QVariant> &values = FData[AIndex];
+  if (AValue.isValid())
+  {
+    QVariant oldValue = values.value(ARole,AValue);
+    values.insert(ARole,AValue);
+    if (oldValue != AValue)
+      emit dataChanged(AIndex,ARole);
+  }
+  else
+  {
+    QVariant oldValue = values.value(ARole,AValue);
+    values.remove(ARole);
+    if (values.isEmpty())
+      FData.remove(AIndex);
+    if (oldValue != AValue)
+      emit dataChanged(AIndex,ARole);
+  }
+  return true;     
 }
 
 QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
 {
+  QVariant result = FData.value(AIndex).value(ARole);
+  if (result.isValid())
+    return result;
+
   switch (AIndex->type())
   {
   case IRosterIndex::IT_StreamRoot:
@@ -109,12 +130,13 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
 
 QList<int> IndexDataHolder::roles() const
 {
-  return QList<int>() << Qt::DisplayRole 
-                      << Qt::DecorationRole 
-                      << Qt::BackgroundColorRole 
-                      << Qt::ForegroundRole
-                      << IRosterIndex::DR_FontWeight
-                      << IRosterIndex::DR_ShowGroupExpander;
+  static QList<int> dataRoles  = QList<int>() << Qt::DisplayRole 
+                                              << Qt::DecorationRole 
+                                              << Qt::BackgroundColorRole 
+                                              << Qt::ForegroundRole
+                                              << IRosterIndex::DR_FontWeight
+                                              << IRosterIndex::DR_ShowGroupExpander;
+  return dataRoles;
 }
 
 QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const

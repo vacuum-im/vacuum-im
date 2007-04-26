@@ -25,6 +25,7 @@ protected:
   QIcon statusIcon(const IRosterIndex *AIndex) const;
 private:
   SkinIconset FStatusIconset;
+  QHash<const IRosterIndex *,QHash<int,QVariant> > FData;
 };
 
 #endif // INDEXDATAHOLDER_H
