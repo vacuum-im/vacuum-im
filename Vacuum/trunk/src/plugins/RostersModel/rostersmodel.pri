@@ -1,9 +1,7 @@
-HEADERS = indexdataholder.h \
-          rosterindex.h \
+HEADERS = rosterindex.h \
           rostersmodel.h \
           rostersmodelplugin.h
 
-SOURCES = indexdataholder.cpp \
-          rosterindex.cpp \
+SOURCES = rosterindex.cpp \
           rostersmodel.cpp \
           rostersmodelplugin.cpp
