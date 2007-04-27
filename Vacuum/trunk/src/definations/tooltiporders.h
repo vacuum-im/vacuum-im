@@ -1,0 +1,6 @@
+#ifndef TOOLTIPORDERS_H
+#define TOOLTIPORDERS_H
+
+#define ROSTERSVIEW_TOOLTIPORDER 0
+
+#endif

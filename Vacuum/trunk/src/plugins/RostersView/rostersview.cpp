@@ -156,7 +156,7 @@ bool RostersView::viewportEvent(QEvent *AEvent)
       if (index.isValid())
       {
         QMultiMap<int,QString> toolTips;
-        toolTips.insert(0,index.data(Qt::ToolTipRole).toString());
+        toolTips.insert(ROSTERSVIEW_TOOLTIPORDER,index.data(Qt::ToolTipRole).toString());
         emit toolTipMap(index,toolTips);
 
         QString allToolTips;

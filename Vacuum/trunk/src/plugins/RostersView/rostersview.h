@@ -3,6 +3,7 @@
 
 #include <QContextMenuEvent>
 #include <QPainter>
+#include "../../definations/tooltiporders.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
