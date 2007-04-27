@@ -1,5 +1,5 @@
-#ifndef ACTIONGROUPS_INC
-#define ACTIONGROUPS_INC
+#ifndef NAMESPACES_H
+#define NAMESPACES_H
 
 #define NS_XMPP_STREAMS			                    "urn:ietf:params:xml:ns:xmpp-streams"
 
