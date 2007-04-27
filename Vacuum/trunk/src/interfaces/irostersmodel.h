@@ -123,7 +123,7 @@ public:
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) =0;
   virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, 
     int AType, IRosterIndex *AParent) =0;
-  virtual IRosterIndex *findRosterIndex(int AType, const QVariant &AId, IRosterIndex *AParent) const =0;
+  virtual IRosterIndex *findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const =0;
   virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, 
     int AType, IRosterIndex *AParent) const =0;
   virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent) =0;

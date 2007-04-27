@@ -117,7 +117,6 @@ IRosterIndex *RostersModel::appendStream(IRoster *ARoster, IPresence *APresence)
       SLOT(onSelfPresence(IPresence::Show , const QString &, qint8 , const Jid &)));
     index->setData(IRosterIndex::DR_Show, APresence->show());
     index->setData(IRosterIndex::DR_Status,APresence->status());
-    index->setData(IRosterIndex::DR_Priority,APresence->priority());
   }
 
   StreamItem streamItem;
@@ -237,7 +236,7 @@ IRosterIndex *RostersModel::createGroup(const QString &AName, const QString &AGr
   return index;
 }
 
-IRosterIndex *RostersModel::findRosterIndex(int AType, const QVariant &AId, IRosterIndex *AParent) const
+IRosterIndex *RostersModel::findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const
 {
   QHash<int,QVariant> data;
   data.insert(IRosterIndex::DR_Type,AType);  
@@ -421,7 +420,10 @@ void RostersModel::onSelfPresence(IPresence::Show AShow, const QString &AStatus,
   {
     streamRoot->setData(IRosterIndex::DR_Show, AShow);
     streamRoot->setData(IRosterIndex::DR_Status, AStatus);
-    streamRoot->setData(IRosterIndex::DR_Priority, APriority);
+    if (AShow != IPresence::Offline && AShow != IPresence::Error)
+      streamRoot->setData(IRosterIndex::DR_Priority, APriority);
+    else
+      streamRoot->setData(IRosterIndex::DR_Priority, QVariant());
   }
   else                   
   {
