@@ -38,7 +38,7 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
      
     if (AStanza.type().isEmpty())
     {
-      QString showText = AStanza.firstElement("show").firstChild().toText().data();
+      QString showText = AStanza.firstElement("show").text();
       Show show;
       if (showText.isEmpty())
         show = Online;
@@ -52,15 +52,15 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
         show = ExtendedAway;
       else show = Error;
       pItem->setShow(show);
-      pItem->setStatus(AStanza.firstElement("status").firstChild().toText().data());
-      pItem->setPriority(AStanza.firstElement("status").firstChild().toText().data().toInt());  
+      pItem->setStatus(AStanza.firstElement("status").text());
+      pItem->setPriority(AStanza.firstElement("priority").text().toInt());  
       emit presenceItem(pItem);
       hooked = true;
     }
     else if (AStanza.type() == "unavailable")
     {
       pItem->setShow(Offline);
-      pItem->setStatus(AStanza.firstElement("status").firstChild().toText().data());
+      pItem->setStatus(AStanza.firstElement("status").text());
       pItem->setPriority(0);
       emit presenceItem(pItem);
       FItems.removeAt(FItems.indexOf(pItem));
