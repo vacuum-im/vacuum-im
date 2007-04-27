@@ -26,7 +26,9 @@ signals:
   virtual void proxyModelAdded(QAbstractProxyModel *) =0;
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *) =0;
   virtual void proxyModelRemoved(QAbstractProxyModel *) =0;
+signals:
   virtual void contextMenu(const QModelIndex &, Menu *) =0;
+  virtual void toolTipMap(const QModelIndex &, QMultiMap<int,QString> &AToolTips) =0;
 };
 
 

@@ -37,10 +37,14 @@ signals:
   virtual void proxyModelAdded(QAbstractProxyModel *);
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *);
   virtual void proxyModelRemoved(QAbstractProxyModel *);
+signals:
   virtual void contextMenu(const QModelIndex &AIndex, Menu *AMenu);
+  virtual void toolTipMap(const QModelIndex &AIndex, QMultiMap<int,QString> &AToolTips);
 protected:
   void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   void contextMenuEvent(QContextMenuEvent *AEvent);
+  //QAbstractItemView
+  virtual bool viewportEvent(QEvent *AEvent);
 protected slots:
   void onIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
 private:

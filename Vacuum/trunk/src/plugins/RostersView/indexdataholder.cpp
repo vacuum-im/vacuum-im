@@ -52,6 +52,8 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       return Qt::darkGray;
     case Qt::ForegroundRole:
       return Qt::white;
+    case Qt::ToolTipRole:
+      return toolTipText(AIndex);
     case IRosterIndex::DR_FontWeight:
       return QFont::Bold;
     } 
@@ -88,9 +90,10 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
           display += "/" + indexJid.resource();
         return display;
       }
-    
     case Qt::DecorationRole: 
       return statusIcon(AIndex);
+    case Qt::ToolTipRole:
+      return toolTipText(AIndex);
     } 
     break;
   
@@ -109,6 +112,8 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       }
     case Qt::DecorationRole: 
       return statusIcon(AIndex);
+    case Qt::ToolTipRole:
+      return toolTipText(AIndex);
     } 
     break;
    
@@ -122,6 +127,8 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       }
     case Qt::DecorationRole: 
       return statusIcon(AIndex);
+    case Qt::ToolTipRole:
+      return toolTipText(AIndex);
     } 
     break;
  }
@@ -134,6 +141,7 @@ QList<int> IndexDataHolder::roles() const
                                               << Qt::DecorationRole 
                                               << Qt::BackgroundColorRole 
                                               << Qt::ForegroundRole
+                                              << Qt::ToolTipRole
                                               << IRosterIndex::DR_FontWeight
                                               << IRosterIndex::DR_ShowGroupExpander;
   return dataRoles;
@@ -175,3 +183,33 @@ QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const
   return QIcon();
 }
 
+QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
+{
+  QString toolTip;
+  QString val = AIndex->data(IRosterIndex::DR_RosterName).toString();
+  if (!val.isEmpty())
+    toolTip.append(tr("<b>Name:</b> %1<br>").arg(val));
+
+  val = AIndex->data(IRosterIndex::DR_Jid).toString();
+  if (!val.isEmpty())
+    toolTip.append(tr("<b>Jid:</b> %1<br>").arg(val));
+
+  val = AIndex->data(IRosterIndex::DR_Status).toString();
+  if (!val.isEmpty())
+    toolTip.append(tr("<b>Status:</b> %1<br>").arg(val));
+
+  val = AIndex->data(IRosterIndex::DR_Priority).toString();
+  if (!val.isEmpty())
+    toolTip.append(QString(tr("<b>Priority:</b> %1<br>")).arg(val));
+
+  val = AIndex->data(IRosterIndex::DR_Subscription).toString();
+  if (!val.isEmpty())
+    toolTip.append(tr("<b>Subscription:</b> %1<br>").arg(val));
+
+  val = AIndex->data(IRosterIndex::DR_Ask).toString();
+  if (!val.isEmpty())
+    toolTip.append(tr("<b>Ask:</b> %1<br>").arg(val));
+
+  toolTip.chop(4);
+  return toolTip;
+}

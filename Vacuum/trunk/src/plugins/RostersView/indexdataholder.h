@@ -27,6 +27,7 @@ signals:
   virtual void dataChanged(IRosterIndex *, int ARole);
 protected:
   QIcon statusIcon(const IRosterIndex *AIndex) const;
+  QString toolTipText(const IRosterIndex *AIndex) const;
 private:
   SkinIconset FStatusIconset;
   QHash<const IRosterIndex *,QHash<int,QVariant> > FData;

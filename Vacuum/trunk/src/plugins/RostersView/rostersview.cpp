@@ -2,6 +2,7 @@
 #include "rostersview.h"
 
 #include <QHeaderView>
+#include <QToolTip>
 #include "rosterindexdelegate.h"
 
 RostersView::RostersView(QWidget *AParent)
@@ -144,8 +145,41 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
     FContextMenu->popup(AEvent->globalPos());
 }
 
+bool RostersView::viewportEvent(QEvent *AEvent)
+{
+  switch(AEvent->type())
+  {
+  case QEvent::ToolTip:
+    {
+      QHelpEvent *helpEvent = static_cast<QHelpEvent *>(AEvent); 
+      QModelIndex index = indexAt(helpEvent->pos());
+      if (index.isValid())
+      {
+        QMultiMap<int,QString> toolTips;
+        toolTips.insert(0,index.data(Qt::ToolTipRole).toString());
+        emit toolTipMap(index,toolTips);
+
+        QString allToolTips;
+        QMultiMap<int,QString>::const_iterator it = toolTips.constBegin();
+        while (it != toolTips.constEnd())
+        {
+          if (!it.value().isEmpty())
+            allToolTips += it.value() +"<br>";
+          it++;
+        }
+        allToolTips.chop(4);
+        QToolTip::showText(helpEvent->globalPos(),allToolTips,this);
+        return true;
+      }
+    }
+  default:
+    return QTreeView::viewportEvent(AEvent);
+  }
+}
+
 void RostersView::onIndexCreated(IRosterIndex *AIndex, IRosterIndex *)
 {
   if (AIndex->type() < IRosterIndex::IT_UserDefined)
     AIndex->setDataHolder(FIndexDataHolder);
 }
+
