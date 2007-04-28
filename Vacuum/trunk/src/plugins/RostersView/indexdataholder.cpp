@@ -186,29 +186,30 @@ QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const
 QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
 {
   QString toolTip;
+  QString mask = "<b>%1:</b> %2<br>";
   QString val = AIndex->data(IRosterIndex::DR_RosterName).toString();
   if (!val.isEmpty())
-    toolTip.append(tr("<b>Name:</b> %1<br>").arg(val));
+    toolTip.append(mask.arg(tr("Name")).arg(val));
 
   val = AIndex->data(IRosterIndex::DR_Jid).toString();
   if (!val.isEmpty())
-    toolTip.append(tr("<b>Jid:</b> %1<br>").arg(val));
+    toolTip.append(mask.arg(tr("Jid")).arg(val));
 
   val = AIndex->data(IRosterIndex::DR_Status).toString();
   if (!val.isEmpty())
-    toolTip.append(tr("<b>Status:</b> %1<br>").arg(val));
+    toolTip.append(mask.arg(tr("Status")).arg(val));
 
   val = AIndex->data(IRosterIndex::DR_Priority).toString();
   if (!val.isEmpty())
-    toolTip.append(QString(tr("<b>Priority:</b> %1<br>")).arg(val));
+    toolTip.append(mask.arg(tr("Priority")).arg(val));
 
   val = AIndex->data(IRosterIndex::DR_Subscription).toString();
   if (!val.isEmpty())
-    toolTip.append(tr("<b>Subscription:</b> %1<br>").arg(val));
+    toolTip.append(mask.arg(tr("Subscription")).arg(val));
 
   val = AIndex->data(IRosterIndex::DR_Ask).toString();
   if (!val.isEmpty())
-    toolTip.append(tr("<b>Ask:</b> %1<br>").arg(val));
+    toolTip.append(mask.arg(tr("Ask")).arg(val));
 
   toolTip.chop(4);
   return toolTip;
