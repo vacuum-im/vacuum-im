@@ -2,12 +2,11 @@
 #define ROSTERINDEXDELEGATE_H
 
 #include <QStyle>
-#include <QItemDelegate>
+#include <QAbstractItemDelegate>
 #include "../../interfaces/irostersview.h"
-#include "../../utils/skin.h"
 
 class RosterIndexDelegate : 
-  public QItemDelegate
+  public QAbstractItemDelegate
 {
   Q_OBJECT;
 
@@ -19,22 +18,23 @@ public:
     const QModelIndex &AIndex) const;
 	virtual QSize sizeHint(const QStyleOptionViewItem &AOption, 
     const QModelIndex &AIndex) const;
+  
+  int labelAt(const QStyleOptionViewItem &AOption, const QPoint &APoint, 
+    const QModelIndex &AIndex) const;
 protected:
-  virtual QRect drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, 
-    const QModelIndex &AIndex, const QRect &ARect) const;
-  virtual QRect drawDecoration(QPainter *APainter, const QStyleOptionViewItem &AOption, 
-    const QModelIndex &AIndex, const QRect &ARect) const;
-  virtual QRect drawDisplay(QPainter *APainter, const QStyleOptionViewItem &AOption, 
-    const QModelIndex &AIndex, const QRect &ARect) const;
-  virtual void drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption, 
+  QRect drawVariant(QPainter *APainter, const QStyleOptionViewItem &AOption, 
+    const QRect &ARect, const QVariant &AValue) const;
+  void drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, 
+    const QModelIndex &AIndex) const;
+  void drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QRect &ARect) const;
-  virtual QStyleOptionViewItem setOptions(const QModelIndex &AIndex,
-                                          const QStyleOptionViewItem &AOption) const;
+  QStyleOptionViewItem setOptions(const QModelIndex &AIndex,
+    const QStyleOptionViewItem &AOption) const;
+  QSize variantSize(const QStyleOptionViewItem &AOption, const QVariant &AValue) const;
+  QSize doTextLayout(QTextLayout &ATextLayout, int ALineWidth = INT_MAX>>6) const;
 private:
-  static QIcon::Mode getIconMode(QStyle::State AState);
-  static QIcon::State getIconState(QStyle::State AState);
-private:
-  SkinIconset FRosterIconset;
+  QIcon::Mode getIconMode(QStyle::State AState) const;
+  QIcon::State getIconState(QStyle::State AState) const;
 };
 
 #endif // ROSTERINDEXDELEGATE_H
