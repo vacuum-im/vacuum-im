@@ -48,10 +48,10 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       return AIndex->data(IRosterIndex::DR_Jid);
     case Qt::DecorationRole: 
       return statusIcon(AIndex);
-    case Qt::BackgroundColorRole:
-      return Qt::darkGray;
     case Qt::ForegroundRole:
       return Qt::white;
+    case Qt::BackgroundColorRole:
+      return Qt::darkGray;
     case Qt::ToolTipRole:
       return toolTipText(AIndex);
     case IRosterIndex::DR_FontWeight:
@@ -68,8 +68,10 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
     {
     case Qt::DisplayRole:  
       return AIndex->data(IRosterIndex::DR_Id);
-    case Qt::BackgroundColorRole:
-      return Qt::lightGray;
+    case Qt::ForegroundRole:
+      return Qt::blue;
+    //case Qt::BackgroundColorRole:
+    //  return Qt::lightGray;
     case IRosterIndex::DR_ShowGroupExpander:
       return true;
     case IRosterIndex::DR_FontWeight:
