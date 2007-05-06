@@ -25,7 +25,7 @@ RostersView::RostersView(QWidget *AParent)
 
   SkinIconset iconset;
   iconset.openFile(STATUS_ICONSETFILE);
-  labelId1 = createIndexLabel(10003,QString("<>"));
+  labelId1 = createIndexLabel(10001,QString("<>"));
   labelId2 = createIndexLabel(10002,iconset.iconByName("online"));
 }
 
@@ -141,7 +141,7 @@ int RostersView::createIndexLabel(int AOrder, const QVariant &ALabel)
   int labelId = 0;
   if (!ALabel.isNull())
   {
-    while (labelId == 0 || FIndexLabels.contains(labelId))
+    while (labelId == NULL_LABEL_ID || labelId == DISPLAY_LABEL_ID || FIndexLabels.contains(labelId))
       labelId = (rand()<<16)+rand();
     FIndexLabels.insert(labelId,ALabel);
     FIndexLabelOrders.insert(labelId,AOrder);
@@ -220,6 +220,11 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
   }
 }
 
+int RostersView::labelAt(const QPoint &APoint) const
+{
+  return NULL_LABEL_ID;
+}
+
 void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
 {
   QVariant data = AIndex.data(Qt::BackgroundRole);
@@ -296,7 +301,3 @@ void RostersView::onIndexRemoved(IRosterIndex *AIndex)
   }
 }
 
-int RostersView::sizeHintForColumn( int column ) const
-{
-  return INT_MAX >> 6;
-}

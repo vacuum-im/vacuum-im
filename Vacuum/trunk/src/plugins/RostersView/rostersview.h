@@ -4,6 +4,7 @@
 #include <QContextMenuEvent>
 #include <QPainter>
 #include "../../definations/tooltiporders.h"
+#include "../../definations/rosterlabelorders.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
@@ -39,6 +40,7 @@ public:
   virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel);
   virtual void insertIndexLabel(int ALabelId, IRosterIndex *AIndex);
   virtual void removeIndexLabel(int ALabelId, IRosterIndex *AIndex);
+  virtual int labelAt(const QPoint &APoint) const;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *);
   virtual void modelSeted(IRostersModel *);
@@ -52,7 +54,6 @@ signals:
 protected:
   void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   void contextMenuEvent(QContextMenuEvent *AEvent);
-  virtual int sizeHintForColumn ( int column ) const;
   //QAbstractItemView
   virtual bool viewportEvent(QEvent *AEvent);
 protected slots:

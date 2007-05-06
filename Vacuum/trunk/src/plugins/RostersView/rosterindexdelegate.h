@@ -19,7 +19,7 @@ public:
 	virtual QSize sizeHint(const QStyleOptionViewItem &AOption, 
     const QModelIndex &AIndex) const;
   
-  int labelAt(const QStyleOptionViewItem &AOption, const QPoint &APoint, 
+  int labelAt(const QPoint &APoint, const QStyleOptionViewItem &AOption,  
     const QModelIndex &AIndex) const;
 protected:
   QRect drawVariant(QPainter *APainter, const QStyleOptionViewItem &AOption, 
@@ -28,11 +28,14 @@ protected:
     const QModelIndex &AIndex) const;
   void drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QRect &ARect) const;
+  QMultiMap<int,QVariant> labelsMap(const QModelIndex &AIndex) const;
   QStyleOptionViewItem setOptions(const QModelIndex &AIndex,
     const QStyleOptionViewItem &AOption) const;
   QSize variantSize(const QStyleOptionViewItem &AOption, const QVariant &AValue) const;
+  QRect variantRect(const QStyleOptionViewItem &AOption, const QRect &ARect, const QVariant &AValue) const;
   QSize doTextLayout(QTextLayout &ATextLayout, int ALineWidth = INT_MAX>>6) const;
 private:
+  static const int spacing = 2;
   QIcon::Mode getIconMode(QStyle::State AState) const;
   QIcon::State getIconState(QStyle::State AState) const;
 };
