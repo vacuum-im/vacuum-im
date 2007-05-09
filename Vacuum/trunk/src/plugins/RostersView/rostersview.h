@@ -40,7 +40,7 @@ public:
   virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel);
   virtual void insertIndexLabel(int ALabelId, IRosterIndex *AIndex);
   virtual void removeIndexLabel(int ALabelId, IRosterIndex *AIndex);
-  virtual int labelAt(const QPoint &APoint) const;
+  virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *);
   virtual void modelSeted(IRostersModel *);
@@ -48,14 +48,20 @@ signals:
   virtual void proxyModelAdded(QAbstractProxyModel *);
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *);
   virtual void proxyModelRemoved(QAbstractProxyModel *);
-signals:
   virtual void contextMenu(const QModelIndex &AIndex, Menu *AMenu);
-  virtual void toolTipMap(const QModelIndex &AIndex, QMultiMap<int,QString> &AToolTips);
+  virtual void toolTips(const QModelIndex &AIndex, QMultiMap<int,QString> &AToolTips);
+  virtual void labelContextMenu(const QModelIndex &AIndex, int ALabelId, Menu *AMenu);
+  virtual void labelToolTips(const QModelIndex &AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+  virtual void labelClicked(const QModelIndex &AIndex, int ALabelId);
+  virtual void labelDoubleClicked(const QModelIndex &AIndex, int ALabelId, bool &AAccepted);
 protected:
   void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   void contextMenuEvent(QContextMenuEvent *AEvent);
   //QAbstractItemView
   virtual bool viewportEvent(QEvent *AEvent);
+  virtual void mouseDoubleClickEvent(QMouseEvent *AEvent);
+  virtual void mousePressEvent(QMouseEvent *AEvent);
+  virtual void mouseReleaseEvent(QMouseEvent *AEvent);
 protected slots:
   void onIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
   void onIndexRemoved(IRosterIndex *AIndex);
@@ -69,9 +75,8 @@ private:
   QHash<int, QVariant> FIndexLabels;
   QHash<int, int /*Order*/> FIndexLabelOrders;
   QHash<int, QSet<IRosterIndex *> > FIndexLabelIndexes;
-
-  int labelId1;
-  int labelId2;
+  int FPressedLabel;
+  QModelIndex FPressedIndex;
 };
 
 #endif // ROSTERSVIEW_H

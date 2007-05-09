@@ -5,6 +5,8 @@
 #include <QAbstractItemDelegate>
 #include "../../interfaces/irostersview.h"
 
+typedef QMultiMap<int,QPair<int,QVariant> > LabelsMap;
+
 class RosterIndexDelegate : 
   public QAbstractItemDelegate
 {
@@ -28,7 +30,7 @@ protected:
     const QModelIndex &AIndex) const;
   void drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QRect &ARect) const;
-  QMultiMap<int,QVariant> labelsMap(const QModelIndex &AIndex) const;
+  LabelsMap labelsMap(const QModelIndex &AIndex) const;
   QStyleOptionViewItem setOptions(const QModelIndex &AIndex,
     const QStyleOptionViewItem &AOption) const;
   QSize variantSize(const QStyleOptionViewItem &AOption, const QVariant &AValue) const;

@@ -4,6 +4,7 @@
 #include <QHeaderView>
 #include <QToolTip>
 #include <QTime>
+#include <QCursor>
 
 RostersView::RostersView(QWidget *AParent)
   : QTreeView(AParent)
@@ -11,6 +12,9 @@ RostersView::RostersView(QWidget *AParent)
   srand(QTime::currentTime().msec());
 
   FRostersModel = NULL;
+  FPressedLabel = DISPLAY_LABEL_ID;
+  FPressedIndex = QModelIndex();
+
   FContextMenu = new Menu(this);
   FIndexDataHolder = new IndexDataHolder(this);
   FRosterIndexDelegate = new RosterIndexDelegate(this);
@@ -22,11 +26,6 @@ RostersView::RostersView(QWidget *AParent)
   setSortingEnabled(true);
   setContextMenuPolicy(Qt::DefaultContextMenu);
   setItemDelegate(FRosterIndexDelegate);
-
-  SkinIconset iconset;
-  iconset.openFile(STATUS_ICONSETFILE);
-  labelId1 = createIndexLabel(10001,QString("<>"));
-  labelId2 = createIndexLabel(10002,iconset.iconByName("online"));
 }
 
 RostersView::~RostersView()
@@ -141,7 +140,7 @@ int RostersView::createIndexLabel(int AOrder, const QVariant &ALabel)
   int labelId = 0;
   if (!ALabel.isNull())
   {
-    while (labelId == NULL_LABEL_ID || labelId == DISPLAY_LABEL_ID || FIndexLabels.contains(labelId))
+    while (labelId <= DISPLAY_LABEL_ID || FIndexLabels.contains(labelId))
       labelId = (rand()<<16)+rand();
     FIndexLabels.insert(labelId,ALabel);
     FIndexLabelOrders.insert(labelId,AOrder);
@@ -220,8 +219,28 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
   }
 }
 
-int RostersView::labelAt(const QPoint &APoint) const
+int RostersView::labelAt(const QPoint &APoint, const QModelIndex &AIndex) const
 {
+  QRect indexRect = visualRect(AIndex);
+  if (indexRect.contains(APoint))
+  {
+    if (itemDelegate(AIndex) != FRosterIndexDelegate)
+      return DISPLAY_LABEL_ID;
+
+    QStyleOptionViewItemV2 option = viewOptions();
+    option.rect = indexRect;
+    option.showDecorationSelected |= selectionBehavior() & SelectRows;
+    option.state |= isExpanded(AIndex) ? QStyle::State_Open : QStyle::State_None;
+    if (hasFocus() && currentIndex() == AIndex)
+      option.state |= QStyle::State_HasFocus;
+    if (selectedIndexes().contains(AIndex))
+      option.state |= QStyle::State_Selected;
+    if ((AIndex.flags() & Qt::ItemIsEnabled) == 0)
+      option.state &= ~QStyle::State_Enabled;
+    if (indexAt(viewport()->mapFromGlobal(QCursor::pos())) == AIndex)
+      option.state |= QStyle::State_MouseOver;
+    return FRosterIndexDelegate->labelAt(APoint,option,AIndex);
+  }
   return NULL_LABEL_ID;
 }
 
@@ -240,8 +259,12 @@ void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QMo
 void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
 {
   QModelIndex index = indexAt(AEvent->pos());
+  const int labelId = labelAt(AEvent->pos(),index);
   FContextMenu->clear();
-  emit contextMenu(index,FContextMenu);
+  if (labelId > DISPLAY_LABEL_ID)
+    emit labelContextMenu(index,labelId,FContextMenu);
+  if (FContextMenu->isEmpty())
+    emit contextMenu(index,FContextMenu);
   if (!FContextMenu->isEmpty())
     FContextMenu->popup(AEvent->globalPos());
 }
@@ -256,20 +279,28 @@ bool RostersView::viewportEvent(QEvent *AEvent)
       QModelIndex index = indexAt(helpEvent->pos());
       if (index.isValid())
       {
-        QMultiMap<int,QString> toolTips;
-        toolTips.insert(ROSTERSVIEW_TOOLTIPORDER,index.data(Qt::ToolTipRole).toString());
-        emit toolTipMap(index,toolTips);
+        QMultiMap<int,QString> toolTipsMap;
 
-        QString allToolTips;
-        QMultiMap<int,QString>::const_iterator it = toolTips.constBegin();
-        while (it != toolTips.constEnd())
+        const int labelId = labelAt(helpEvent->pos(),index);
+        if (labelId > DISPLAY_LABEL_ID)
+          emit labelToolTips(index,labelId,toolTipsMap);
+
+        if (toolTipsMap.isEmpty())
+        {
+          toolTipsMap.insert(ROSTERSVIEW_TOOLTIPORDER,index.data(Qt::ToolTipRole).toString());
+          emit toolTips(index,toolTipsMap);
+        }
+
+        QString toolTipStr;
+        QMultiMap<int,QString>::const_iterator it = toolTipsMap.constBegin();
+        while (it != toolTipsMap.constEnd())
         {
           if (!it.value().isEmpty())
-            allToolTips += it.value() +"<br>";
+            toolTipStr += it.value() +"<br>";
           it++;
         }
-        allToolTips.chop(4);
-        QToolTip::showText(helpEvent->globalPos(),allToolTips,this);
+        toolTipStr.chop(4);
+        QToolTip::showText(helpEvent->globalPos(),toolTipStr,this);
         return true;
       }
     }
@@ -278,12 +309,61 @@ bool RostersView::viewportEvent(QEvent *AEvent)
   }
 }
 
+void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
+{
+  if (viewport()->rect().contains(AEvent->pos()))
+  {
+    const QModelIndex index = indexAt(AEvent->pos());
+    const int labelId = labelAt(AEvent->pos(),index);
+    if (index.isValid() && labelId > DISPLAY_LABEL_ID)
+    {
+      bool accepted = false;
+      emit labelDoubleClicked(index,labelId,accepted);
+      if (accepted) 
+        return;
+    }
+  }
+  QTreeView::mouseDoubleClickEvent(AEvent);
+}
+
+void RostersView::mousePressEvent(QMouseEvent *AEvent)
+{
+  if (viewport()->rect().contains(AEvent->pos()))
+  {
+    const QModelIndex index = indexAt(AEvent->pos());
+    const int labelId = labelAt(AEvent->pos(),index);
+    if (index.isValid() && labelId > DISPLAY_LABEL_ID)
+    {
+      FPressedLabel = labelId;
+      FPressedIndex = index;
+    }
+  }
+  QTreeView::mousePressEvent(AEvent);
+}
+
+void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
+{
+  if (viewport()->rect().contains(AEvent->pos()))
+  {
+    const QModelIndex index = indexAt(AEvent->pos());
+    const int labelId = labelAt(AEvent->pos(),index);
+    if (index.isValid() && labelId > DISPLAY_LABEL_ID)
+    {
+      if (FPressedIndex == index && FPressedLabel == labelId)
+      {
+        emit labelClicked(index,labelId);
+      }
+    }
+  }
+  FPressedLabel = DISPLAY_LABEL_ID;
+  FPressedIndex = QModelIndex();
+  QTreeView::mouseReleaseEvent(AEvent);
+}
+
 void RostersView::onIndexCreated(IRosterIndex *AIndex, IRosterIndex *)
 {
   if (AIndex->type() < IRosterIndex::IT_UserDefined)
     AIndex->setDataHolder(FIndexDataHolder);
-  //insertIndexLabel(labelId1,AIndex);
-  //insertIndexLabel(labelId2,AIndex);
 }
                                                
 void RostersView::onIndexRemoved(IRosterIndex *AIndex)

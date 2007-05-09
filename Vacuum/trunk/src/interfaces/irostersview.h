@@ -13,7 +13,7 @@ class IRostersView :
 {
 public:
   virtual QObject *instance() = 0;
-  virtual void setModel(IRostersModel *) =0; 
+  virtual void setModel(IRostersModel *AModel) =0; 
   virtual IRostersModel *rostersModel() const =0;
   virtual IRosterIndexDataHolder *defaultDataHolder() const =0;
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel) =0;
@@ -23,6 +23,7 @@ public:
   virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel) =0;
   virtual void insertIndexLabel(int ALabelId, IRosterIndex *AIndex) =0;
   virtual void removeIndexLabel(int ALabelId, IRosterIndex *AIndex) =0;
+  virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *) =0;
   virtual void modelSeted(IRostersModel *) =0;
@@ -30,9 +31,12 @@ signals:
   virtual void proxyModelAdded(QAbstractProxyModel *) =0;
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *) =0;
   virtual void proxyModelRemoved(QAbstractProxyModel *) =0;
-signals:
   virtual void contextMenu(const QModelIndex &, Menu *) =0;
-  virtual void toolTipMap(const QModelIndex &, QMultiMap<int,QString> &AToolTips) =0;
+  virtual void toolTips(const QModelIndex &, QMultiMap<int,QString> &AToolTips) =0;
+  virtual void labelContextMenu(const QModelIndex &, int ALabelId, Menu *) =0;
+  virtual void labelToolTips(const QModelIndex &, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
+  virtual void labelClicked(const QModelIndex &, int ALabelId) =0;
+  virtual void labelDoubleClicked(const QModelIndex &, int ALabelId, bool &AAccepted) =0;
 };
 
 

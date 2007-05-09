@@ -35,8 +35,8 @@ void RosterIndexDelegate::paint(QPainter *APainter,
 
   drawBackground(APainter,option,AIndex);
 
-  QMultiMap<int,QVariant> map = labelsMap(AIndex);
-  for(QMultiMap<int,QVariant>::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
+  LabelsMap map = labelsMap(AIndex);
+  for(LabelsMap::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
   {
     if (it.key() < RIGHTALIGN_LABEL_ORDER)
     {
@@ -50,7 +50,7 @@ void RosterIndexDelegate::paint(QPainter *APainter,
     }
 
     APainter->setClipRect(freeRect);
-    usedRect = drawVariant(APainter,option,freeRect,it.value());
+    usedRect = drawVariant(APainter,option,freeRect,it.value().second);
     
     if (!usedRect.isNull())
     {
@@ -76,10 +76,10 @@ QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption,
   int height = 0;
   const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin);
 
-  QMultiMap<int,QVariant> map = labelsMap(AIndex);
-  for(QMultiMap<int,QVariant>::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
+  LabelsMap map = labelsMap(AIndex);
+  for(LabelsMap::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
   {
-    QSize size = variantSize(option,it.value());
+    QSize size = variantSize(option,it.value().second);
     width += size.width() + spacing;
     height = qMax(height,size.height());
   }
@@ -90,6 +90,9 @@ QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption,
 int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, 
                                  const QModelIndex &AIndex) const
 {
+  if (!AOption.rect.contains(APoint))
+    return NULL_LABEL_ID;
+
   QStyleOptionViewItem option = setOptions(AIndex,AOption);
 
   const Qt::Alignment left = Qt::AlignLeft | Qt::AlignTop;
@@ -99,8 +102,8 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
   QRect usedRect;
   QRect freeRect = option.rect.adjusted(halfTextMargin,halfTextMargin,-halfTextMargin,-halfTextMargin);
 
-  QMultiMap<int,QVariant> map = labelsMap(AIndex);
-  for(QMultiMap<int,QVariant>::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
+  LabelsMap map = labelsMap(AIndex);
+  for(LabelsMap::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
   {
     if (it.key() < RIGHTALIGN_LABEL_ORDER)
     {
@@ -113,25 +116,12 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
       option.displayAlignment = right;
     }
 
-    usedRect = variantRect(option,freeRect,it.value());
+    usedRect = variantRect(option,freeRect,it.value().second);
 
     if (!usedRect.isNull())
     {
       if (usedRect.contains(APoint))
-      {
-        QList<QVariant> labelids = AIndex.data(IRosterIndex::DR_LabelIds).toList();
-        QList<QVariant> labelOrders = AIndex.data(IRosterIndex::DR_LabelOrders).toList();
-        QList<QVariant> labelValues = AIndex.data(IRosterIndex::DR_LabelValues).toList();
-
-        int i = labelOrders.indexOf(it.key());
-        while (i<labelOrders.count() && i == it.key())
-        {
-          if (labelValues.at(i) == it.value())
-            return labelids.at(i).toInt();
-          it++;
-        }
-        return DISPLAY_LABEL_ID;
-      }
+        return it.value().first;
 
       if (it.key() < RIGHTALIGN_LABEL_ORDER)
         freeRect.setLeft(usedRect.right()+spacing);
@@ -251,16 +241,19 @@ void RosterIndexDelegate::drawFocus(QPainter *APainter, const QStyleOptionViewIt
   QApplication::style()->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, APainter);
 }
 
-QMultiMap<int,QVariant> RosterIndexDelegate::labelsMap(const QModelIndex &AIndex) const
+LabelsMap RosterIndexDelegate::labelsMap(const QModelIndex &AIndex) const
 {
-  QMultiMap<int,QVariant> map;
-  map.insert(DECORATION_LABEL_ORDER,AIndex.data(Qt::DecorationRole));
-  map.insert(DISPLAY_LABEL_ORDER,AIndex.data(Qt::DisplayRole));
+  typedef QPair<int,QVariant> pair;
+  LabelsMap map;
 
+  map.insert(DECORATION_LABEL_ORDER,pair(DISPLAY_LABEL_ID,AIndex.data(Qt::DecorationRole)));
+  map.insert(DISPLAY_LABEL_ORDER,pair(DISPLAY_LABEL_ID,AIndex.data(Qt::DisplayRole)));
+
+  QList<QVariant> labelIds = AIndex.data(IRosterIndex::DR_LabelIds).toList();
   QList<QVariant> labelOrders = AIndex.data(IRosterIndex::DR_LabelOrders).toList();
   QList<QVariant> labelValues = AIndex.data(IRosterIndex::DR_LabelValues).toList();
   for (int ilabel = 0; ilabel < labelOrders.count(); ilabel++)
-    map.insert(labelOrders.at(ilabel).toInt(),labelValues.at(ilabel));
+    map.insert(labelOrders.at(ilabel).toInt(),pair(labelIds.at(ilabel).toInt(),labelValues.at(ilabel)));
 
   return map;
 }
@@ -351,7 +344,8 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption,
   }
 }
 
-QRect RosterIndexDelegate::variantRect(const QStyleOptionViewItem &AOption, const QRect &ARect, const QVariant &AValue) const
+QRect RosterIndexDelegate::variantRect(const QStyleOptionViewItem &AOption, const QRect &ARect, 
+                                       const QVariant &AValue) const
 {
   QSize size = variantSize(AOption,AValue);
   if (AValue.type() == QVariant::String)
@@ -376,6 +370,7 @@ QSize RosterIndexDelegate::doTextLayout(QTextLayout &ATextLayout, int ALineWidth
   ATextLayout.endLayout();
   return QSizeF(width,height).toSize();
 }
+
 
 
 
