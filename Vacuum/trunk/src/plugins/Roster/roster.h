@@ -41,7 +41,7 @@ public:
   virtual QList<IRosterItem *> groupItems(const QString &AGroup) const;
   virtual QSet<QString> itemGroups(const Jid &AItemJid) const;
   virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups);
-  virtual void sendSubscription(const Jid &AItemJid, SubscriptionType AType); 
+  virtual void sendSubscription(const Jid &AItemJid, SubscriptionType AType, const QString &AStatus = QString()); 
   virtual void removeItem(const Jid &AItemJid);
   //Operations on items
   virtual void renameItem(const Jid &AItemJid, const QString &AName);
@@ -61,7 +61,7 @@ signals:
   virtual void closed();
   virtual void itemPush(IRosterItem *);
   virtual void itemRemoved(IRosterItem *);
-  virtual void subscription(const Jid &AItemJid, SubscriptionType AType);
+  virtual void subscription(const Jid &AItemJid, SubscriptionType AType, const QString &AStatus);
 protected:
   bool requestGroupDelimiter();
   bool requestRosterItems();

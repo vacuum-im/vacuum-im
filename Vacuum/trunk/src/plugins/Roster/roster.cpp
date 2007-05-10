@@ -52,10 +52,6 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
           RosterItem *rosterItem = (RosterItem *)item(itemJid);
           if (!rosterItem)
           {
-            //if (!itemJid.node().isEmpty())  
-            //  rosterItem = new RosterItem(itemJid.bare(),this);
-            //else
-            //  rosterItem = new RosterItem(itemJid,this);
             rosterItem = new RosterItem(itemJid.bare(),this);
             FItems.append(rosterItem); 
           }
@@ -121,24 +117,25 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
   }
   else if (AHandlerId == FSubscrHandler)
   {
+    QString status = AStanza.firstElement("status").text();
     if (AStanza.type() == "subscribe")
     {
-      emit subscription(AStanza.from(),IRoster::Subscribe); 
+      emit subscription(AStanza.from(),IRoster::Subscribe,status); 
       hooked = true;
     }
     else if (AStanza.type() == "subscribed")
     {
-      emit subscription(AStanza.from(),IRoster::Subscribed); 
+      emit subscription(AStanza.from(),IRoster::Subscribed,status); 
       hooked = true;
     }
     else if (AStanza.type() == "unsubscribe")
     {
-      emit subscription(AStanza.from(),IRoster::Unsubscribe); 
+      emit subscription(AStanza.from(),IRoster::Unsubscribe,status); 
       hooked = true;
     }
     else if (AStanza.type() == "unsubscribed")
     {
-      emit subscription(AStanza.from(),IRoster::Unsubscribed); 
+      emit subscription(AStanza.from(),IRoster::Unsubscribed,status); 
       hooked = true;
     }
   }
@@ -253,7 +250,7 @@ void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QStri
   FStanzaProcessor->sendIqStanza(this,FStream->jid(),query,0);
 }
 
-void Roster::sendSubscription(const Jid &AItemJid, IRoster::SubscriptionType AType)
+void Roster::sendSubscription(const Jid &AItemJid, IRoster::SubscriptionType AType, const QString &AStatus)
 {
   QString type;
   if (AType == IRoster::Subscribe)
@@ -267,7 +264,9 @@ void Roster::sendSubscription(const Jid &AItemJid, IRoster::SubscriptionType ATy
   else return;
 
   Stanza subscr("presence");
-  subscr.setTo(AItemJid.bare()).setType(type); 
+  subscr.setTo(AItemJid.bare()).setType(type);
+  if (!AStatus.isEmpty())
+    subscr.element().appendChild(subscr.createElement("status")).setNodeValue(AStatus);
   FStanzaProcessor->sendStanzaOut(FStream->jid(),subscr);  
 }
 

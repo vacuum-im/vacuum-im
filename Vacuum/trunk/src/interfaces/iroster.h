@@ -43,7 +43,7 @@ public:
   virtual void setItem(const Jid &, const QString &AName, const QSet<QString> &AGroups) =0;
   virtual void removeItem(const Jid &) =0;
   //Operations  on subscription
-  virtual void sendSubscription(const Jid &, SubscriptionType) =0; 
+  virtual void sendSubscription(const Jid &, SubscriptionType, const QString & = QString()) =0; 
   //Operations on items
   virtual void renameItem(const Jid &, const QString &) =0;
   virtual void copyItemToGroup(const Jid &, const QString &) =0;
@@ -62,7 +62,7 @@ signals:
   virtual void closed() =0;
   virtual void itemPush(IRosterItem *) =0;
   virtual void itemRemoved(IRosterItem *) =0;
-  virtual void subscription(const Jid &, SubscriptionType) =0; 
+  virtual void subscription(const Jid &, SubscriptionType, const QString &) =0; 
 };
 
 class IRosterPlugin {
