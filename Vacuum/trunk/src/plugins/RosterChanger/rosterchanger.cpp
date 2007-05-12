@@ -197,6 +197,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
   if (roster && roster->isOpen())
   {
     int itemType = AIndex.data(IRosterIndex::DR_Type).toInt();
+    IRosterItem *rosterItem = roster->item(AIndex.data(IRosterIndex::DR_BareJid).toString());
     if (itemType == IRosterIndex::IT_StreamRoot)
     {
       QHash<int,QVariant> data;
@@ -211,10 +212,8 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
     }
     else if (itemType == IRosterIndex::IT_Contact || itemType == IRosterIndex::IT_Agent)
     {
-      IRosterItem *rosterItem = roster->item(AIndex.data(IRosterIndex::DR_RosterJid).toString());
-      
       QHash<int,QVariant> data;
-      data.insert(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_RosterJid));
+      data.insert(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_BareJid));
       data.insert(Action::DR_StreamJid,streamJid);
       
       Action *action;
@@ -252,44 +251,55 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
 
       AMenu->addAction(subsMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP_SUBSCRIPTION);
 
-      QSet<QString> exceptGroups;
       if (rosterItem)
-        exceptGroups = rosterItem->groups();
-
-      data.insert(Action::DR_Parametr2,AIndex.data(IRosterIndex::DR_RosterName));
-      data.insert(Action::DR_Parametr3,AIndex.data(IRosterIndex::DR_RosterGroup));
-
-      action = new Action(AMenu);
-      action->setText(tr("Rename..."));
-      action->setData(data);
-      connect(action,SIGNAL(triggered(bool)),SLOT(onRenameItem(bool)));
-      AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
-
-      if (itemType == IRosterIndex::IT_Contact)
       {
-        Menu *copyItem = createGroupMenu(data,exceptGroups,true,false,SLOT(onCopyItemToGroup(bool)),AMenu);
-        copyItem->setTitle(tr("Copy to group"));
-        AMenu->addAction(copyItem->menuAction(),ROSTERCHANGER_ACTION_GROUP);
+        QSet<QString> exceptGroups = rosterItem->groups();
 
-        Menu *moveItem = createGroupMenu(data,exceptGroups,true,false,SLOT(onMoveItemToGroup(bool)),AMenu);
-        moveItem->setTitle(tr("Move to group"));
-        AMenu->addAction(moveItem->menuAction(),ROSTERCHANGER_ACTION_GROUP);
-      }
+        data.insert(Action::DR_Parametr2,AIndex.data(IRosterIndex::DR_Name));
+        data.insert(Action::DR_Parametr3,AIndex.data(IRosterIndex::DR_Group));
 
-      if (!AIndex.data(IRosterIndex::DR_RosterGroup).toString().isEmpty())
-      {
         action = new Action(AMenu);
-        action->setText(tr("Remove from group"));
+        action->setText(tr("Rename..."));
         action->setData(data);
-        connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromGroup(bool)));
+        connect(action,SIGNAL(triggered(bool)),SLOT(onRenameItem(bool)));
+        AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
+
+        if (itemType == IRosterIndex::IT_Contact)
+        {
+          Menu *copyItem = createGroupMenu(data,exceptGroups,true,false,SLOT(onCopyItemToGroup(bool)),AMenu);
+          copyItem->setTitle(tr("Copy to group"));
+          AMenu->addAction(copyItem->menuAction(),ROSTERCHANGER_ACTION_GROUP);
+
+          Menu *moveItem = createGroupMenu(data,exceptGroups,true,false,SLOT(onMoveItemToGroup(bool)),AMenu);
+          moveItem->setTitle(tr("Move to group"));
+          AMenu->addAction(moveItem->menuAction(),ROSTERCHANGER_ACTION_GROUP);
+        }
+
+        if (!AIndex.data(IRosterIndex::DR_Group).toString().isEmpty())
+        {
+          action = new Action(AMenu);
+          action->setText(tr("Remove from group"));
+          action->setData(data);
+          connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromGroup(bool)));
+          AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
+        }
+
+        action = new Action(AMenu);
+        action->setText(tr("Remove from roster"));
+        action->setData(data);
+        connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromRoster(bool)));
         AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
       }
-
-      action = new Action(AMenu);
-      action->setText(tr("Remove from roster"));
-      action->setData(data);
-      connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromRoster(bool)));
-      AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
+      else
+      {
+        action = new Action(AMenu);
+        action->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
+        action->setText(tr("Add contact..."));
+        action->setData(Action::DR_StreamJid,streamJid);
+        action->setData(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_Jid));
+        connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
+        AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP_CONTACT,true);
+      }
     }
     else if (itemType == IRosterIndex::IT_Group)
     {
