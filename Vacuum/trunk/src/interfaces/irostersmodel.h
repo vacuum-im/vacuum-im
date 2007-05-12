@@ -52,7 +52,6 @@ public:
     DR_BareJid,
     DR_Name,
     DR_Group,
-    DR_GroupName,
     DR_Show,
     DR_Status,
     DR_Priority,

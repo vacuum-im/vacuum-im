@@ -204,16 +204,16 @@ IRosterIndex *RostersModel::createGroup(const QString &AName, const QString &AGr
     IRosterIndex *newIndex = (IRosterIndex *)true;
     QList<QString> groupTree = AName.split(AGroupDelim,QString::SkipEmptyParts); 
     
-    QString groupName;
-    if (AParent && AParent->data(IRosterIndex::DR_GroupName).isValid())
-      groupName = AParent->data(IRosterIndex::DR_GroupName).toString();
+    QString group;
+    if (AParent && AParent->data(IRosterIndex::DR_Group).isValid())
+      group = AParent->data(IRosterIndex::DR_Group).toString();
     
     while (newIndex && i<groupTree.count())
     {
-      if (groupName.isEmpty())
-        groupName = groupTree.at(i);
+      if (group.isEmpty())
+        group = groupTree.at(i);
       else
-        groupName += AGroupDelim + groupTree.at(i);
+        group += AGroupDelim + groupTree.at(i);
 
       newIndex = findGroup(groupTree.at(i),AGroupDelim,AType,index);
       if (newIndex)
@@ -226,11 +226,11 @@ IRosterIndex *RostersModel::createGroup(const QString &AName, const QString &AGr
     while (i<groupTree.count())
     {
       newIndex = createRosterIndex(AType,groupTree.at(i),index);
-      newIndex->setData(IRosterIndex::DR_GroupName,groupName);
+      newIndex->setData(IRosterIndex::DR_Group,group);
       insertRosterIndex(newIndex,index);
       index = newIndex;
       i++;
-      groupName += AGroupDelim + groupTree.value(i);
+      group += AGroupDelim + groupTree.value(i);
     }
   }
   return index;

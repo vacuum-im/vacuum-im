@@ -304,7 +304,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
     else if (itemType == IRosterIndex::IT_Group)
     {
       QHash<int,QVariant> data;
-      data.insert(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_GroupName));
+      data.insert(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_Group));
       data.insert(Action::DR_StreamJid,streamJid);
       
       Action *action;
@@ -315,7 +315,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
 
       QSet<QString> exceptGroups;
-      exceptGroups << AIndex.data(IRosterIndex::DR_GroupName).toString();
+      exceptGroups << AIndex.data(IRosterIndex::DR_Group).toString();
 
       Menu *copyGroup = createGroupMenu(data,exceptGroups,true,true,SLOT(onCopyGroupToGroup(bool)),AMenu);
       copyGroup->setTitle(tr("Copy to group"));
