@@ -1,0 +1,180 @@
+<ui version="4.0" >
+ <class>AddContactDialogClass</class>
+ <widget class="QDialog" name="AddContactDialogClass" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>341</width>
+    <height>261</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>AddContactDialog</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="0" column="1" >
+    <widget class="QLineEdit" name="lneJabberId" />
+   </item>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="lblJabberId" >
+     <property name="text" >
+      <string>Jabber ID:</string>
+     </property>
+     <property name="buddy" >
+      <cstring>lneJabberId</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="2" >
+    <widget class="QDialogButtonBox" name="btbButtons" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="lblNickName" >
+     <property name="text" >
+      <string>Nick:</string>
+     </property>
+     <property name="buddy" >
+      <cstring>lneNickName</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="lblGroup" >
+     <property name="text" >
+      <string>Group:</string>
+     </property>
+     <property name="buddy" >
+      <cstring>cmbGroup</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QComboBox" name="cmbGroup" >
+     <property name="editable" >
+      <bool>true</bool>
+     </property>
+     <property name="duplicatesEnabled" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QLineEdit" name="lneNickName" />
+   </item>
+   <item row="4" column="0" >
+    <widget class="QLabel" name="lblRequest" >
+     <property name="text" >
+      <string>Request:</string>
+     </property>
+     <property name="buddy" >
+      <cstring>tedRequest</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" >
+    <widget class="QTextEdit" name="tedRequest" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>7</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="acceptRichText" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" >
+    <widget class="QCheckBox" name="chbRequestSubscr" >
+     <property name="text" >
+      <string>Request subscription</string>
+     </property>
+     <property name="checked" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" >
+    <widget class="QCheckBox" name="chbSendSubscr" >
+     <property name="text" >
+      <string>Send Subscription</string>
+     </property>
+     <property name="checked" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2" >
+    <widget class="QFrame" name="frame" >
+     <property name="frameShape" >
+      <enum>QFrame::HLine</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <tabstops>
+  <tabstop>lneJabberId</tabstop>
+  <tabstop>lneNickName</tabstop>
+  <tabstop>cmbGroup</tabstop>
+  <tabstop>chbRequestSubscr</tabstop>
+  <tabstop>tedRequest</tabstop>
+  <tabstop>chbSendSubscr</tabstop>
+  <tabstop>btbButtons</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btbButtons</sender>
+   <signal>rejected()</signal>
+   <receiver>AddContactDialogClass</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>283</x>
+     <y>255</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>261</x>
+     <y>209</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chbRequestSubscr</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>tedRequest</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>299</x>
+     <y>94</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>299</x>
+     <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

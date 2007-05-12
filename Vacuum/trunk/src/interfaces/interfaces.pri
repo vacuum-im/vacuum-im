@@ -8,4 +8,5 @@ HEADERS += ipluginmanager.h \
            imainwindow.h \
            irostersview.h \
            istatuschanger.h \
-           iaccountmanager.h
+           iaccountmanager.h \
+           irosterchanger.h

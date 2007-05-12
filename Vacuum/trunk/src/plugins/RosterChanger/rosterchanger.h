@@ -1,19 +1,22 @@
 #ifndef ROSTERCHANGER_H
 #define ROSTERCHANGER_H
 
+#include "../../definations/actiongroups.h"
+#include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/iroster.h"
-#include "../../utils/menu.h"
+#include "../../interfaces/imainwindow.h"
+#include "addcontactdialog.h"
 
-#define ROSTERCHANGER_UUID "{018E7891-2743-4155-8A70-EAB430573500}"
 
 class RosterChanger : 
   public QObject,
-  public IPlugin
+  public IPlugin,
+  public IRosterChanger
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin);
+  Q_INTERFACES(IPlugin IRosterChanger);
 
 public:
   RosterChanger();
@@ -30,6 +33,11 @@ public:
   virtual bool startPlugin() { return true; }
 
   //IRosterChanger
+  virtual void showAddContactDialog(const Jid &AStreamJid, const Jid &AJid, const QString &ANick,
+    const QString &AGroup, const QString &ARequest) const;
+  virtual Menu *addContactMenu() const { return FAddContactMenu; }
+public slots:
+  virtual void showAddContactDialogByAction(bool);
 protected:
   Menu *createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
@@ -49,9 +57,19 @@ protected slots:
   void onCopyGroupToGroup(bool);
   void onMoveGroupToGroup(bool);
   void onRemoveGroup(bool);
+  //Operations on stream
+  void onAddContact(AddContactDialog *ADialog);
+protected slots:
+  void onMainWindowCreated(IMainWindow *AMainWindow);
+  void onRosterOpened(IRoster *ARoster);
+  void onRosterClosed(IRoster *ARoster);
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
+  IMainWindowPlugin *FMainWindowPlugin;
+private:
+  Menu *FAddContactMenu;
+  QHash<IRoster *,Action *> FActions;
 };
 
 #endif // ROSTERCHANGER_H

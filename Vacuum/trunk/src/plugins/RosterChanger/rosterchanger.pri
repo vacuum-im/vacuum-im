@@ -1,3 +1,7 @@
-HEADERS = rosterchanger.h
+FORMS = addcontactdialog.ui
 
-SOURCES = rosterchanger.cpp
+HEADERS = rosterchanger.h \
+          addcontactdialog.h
+
+SOURCES = rosterchanger.cpp \
+          addcontactdalog.cpp
