@@ -48,7 +48,7 @@ bool Roster::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &A
         QString subscr = stanzaItem.attribute("subscription");
         if (subscr == "both" || subscr == "to" || subscr == "from" || subscr == "none")
         {
-          Jid itemJid(stanzaItem.attribute("jid"));
+          Jid itemJid = stanzaItem.attribute("jid");
           RosterItem *rosterItem = (RosterItem *)item(itemJid);
           if (!rosterItem)
           {
@@ -201,7 +201,8 @@ QSet<QString> Roster::groups() const
   QSet<QString> allGroups;
   RosterItem *rosterItem;
   foreach(rosterItem, FItems)
-    allGroups += rosterItem->groups();
+    if (!rosterItem->jid().node().isEmpty())
+      allGroups += rosterItem->groups();
   return allGroups;
 }
 
@@ -266,7 +267,7 @@ void Roster::sendSubscription(const Jid &AItemJid, IRoster::SubscriptionType ATy
   Stanza subscr("presence");
   subscr.setTo(AItemJid.bare()).setType(type);
   if (!AStatus.isEmpty())
-    subscr.element().appendChild(subscr.createElement("status")).setNodeValue(AStatus);
+    subscr.addElement("status").appendChild(subscr.createTextNode(AStatus));
   FStanzaProcessor->sendStanzaOut(FStream->jid(),subscr);  
 }
 
