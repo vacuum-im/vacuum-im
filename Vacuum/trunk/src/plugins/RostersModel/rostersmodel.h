@@ -45,7 +45,7 @@ public:
   virtual QString blankGroupName() const { return tr("Blank Group"); }
   virtual QString agentsGroupName() const { return tr("Agents"); }
   virtual QString myResourcesGroupName() const { return tr("My Resources"); }
-  virtual QString notInRosterGroupName() const { return tr("Not In Roster"); }
+  virtual QString notInRosterGroupName() const { return tr("Not in Roster"); }
 signals:
   virtual void streamAdded(const Jid &);
   virtual void streamRemoved(const Jid &);

@@ -85,7 +85,7 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
     case Qt::DisplayRole: 
       {
         Jid indexJid(AIndex->data(IRosterIndex::DR_Jid).toString());
-        QString display = AIndex->data(IRosterIndex::DR_RosterName).toString();
+        QString display = AIndex->data(IRosterIndex::DR_Name).toString();
         if (display.isEmpty())
           display = indexJid.bare();
         if (!indexJid.resource().isEmpty())
@@ -104,7 +104,7 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
     {
     case Qt::DisplayRole:
       {
-        QString display = AIndex->data(IRosterIndex::DR_RosterName).toString();
+        QString display = AIndex->data(IRosterIndex::DR_Name).toString();
         if (display.isEmpty())
         {
           Jid indexJid(AIndex->data(IRosterIndex::DR_Jid).toString());
@@ -189,7 +189,7 @@ QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
 {
   QString toolTip;
   QString mask = "<b>%1:</b> %2<br>";
-  QString val = AIndex->data(IRosterIndex::DR_RosterName).toString();
+  QString val = AIndex->data(IRosterIndex::DR_Name).toString();
   if (!val.isEmpty())
     toolTip.append(mask.arg(tr("Name")).arg(val));
 

@@ -48,9 +48,10 @@ public:
     //XMPP Roles
     DR_StreamJid,
     DR_Jid,
-    DR_RosterJid,
-    DR_RosterGroup,
-    DR_RosterName,
+    DR_PJid,
+    DR_BareJid,
+    DR_Name,
+    DR_Group,
     DR_GroupName,
     DR_Show,
     DR_Status,
