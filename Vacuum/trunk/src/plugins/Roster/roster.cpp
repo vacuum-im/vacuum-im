@@ -215,7 +215,7 @@ QList<IRosterItem *> Roster::groupItems(const QString &AGroup) const
     QString itemGroup;
     QSet<QString> allItemGroups = rosterItem->groups();
     foreach(itemGroup,allItemGroups)
-      if (itemGroup.startsWith(AGroup))
+      if (itemGroup==AGroup || itemGroup.startsWith(AGroup+FGroupDelim))
       {
         rosterItems.append(rosterItem); 
         break;
