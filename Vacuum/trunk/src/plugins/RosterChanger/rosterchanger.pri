@@ -4,4 +4,4 @@ HEADERS = rosterchanger.h \
           addcontactdialog.h
 
 SOURCES = rosterchanger.cpp \
-          addcontactdalog.cpp
+          addcontactdialog.cpp
