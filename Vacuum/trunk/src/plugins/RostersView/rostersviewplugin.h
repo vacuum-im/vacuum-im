@@ -45,7 +45,7 @@ signals:
   virtual void showOfflineContactsChanged(bool AShow);
 protected slots:
   void onRostersViewDestroyed(QObject *);
-  void onProxyAboutToBeAdded(QAbstractProxyModel *AProxyModel);
+  void onProxyAdded(QAbstractProxyModel *AProxyModel);
   void onProxyRemoved(QAbstractProxyModel *AProxyModel);
   void onRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
   void onIndexCollapsed(const QModelIndex &AIndex);
@@ -62,6 +62,7 @@ private:
 private:
   RostersView *FRostersView; 
   SortFilterProxyModel *FSortFilterProxyModel;
+  QAbstractItemModel *FLastModel;
 };
 
 #endif // ROSTERSVIEWPLUGIN_H

@@ -9,6 +9,7 @@ RostersViewPlugin::RostersViewPlugin()
   FSettings = NULL;
   FRostersView = NULL;
   FSortFilterProxyModel = NULL;
+  FLastModel = NULL;
   actShowOffline = NULL;
 }
 
@@ -68,8 +69,8 @@ bool RostersViewPlugin::initObjects()
   {
     connect(FRostersView,SIGNAL(collapsed(const QModelIndex &)),SLOT(onIndexCollapsed(const QModelIndex &)));
     connect(FRostersView,SIGNAL(expanded(const QModelIndex &)),SLOT(onIndexExpanded(const QModelIndex &)));
-    connect(FRostersView,SIGNAL(proxyModelAboutToBeAdded(QAbstractProxyModel *)),
-      SLOT(onProxyAboutToBeAdded(QAbstractProxyModel *)));
+    connect(FRostersView,SIGNAL(proxyModelAdded(QAbstractProxyModel *)),
+      SLOT(onProxyAdded(QAbstractProxyModel *)));
     connect(FRostersView,SIGNAL(proxyModelRemoved(QAbstractProxyModel *)),
       SLOT(onProxyRemoved(QAbstractProxyModel *)));
   }
@@ -129,32 +130,33 @@ void RostersViewPlugin::onRostersViewDestroyed(QObject *)
   FRostersView = NULL;
 }
 
-void RostersViewPlugin::onProxyAboutToBeAdded(QAbstractProxyModel *AProxyModel)
+void RostersViewPlugin::onProxyAdded(QAbstractProxyModel *AProxyModel)
 {
-  QAbstractProxyModel *last = FRostersView->lastProxyModel();
-  if (last)
-    disconnect(last,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-      this,SLOT(onRowsInserted(const QModelIndex &,int,int)));
-  else
-    disconnect(FRostersView->model(),SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-      this,SLOT(onRowsInserted(const QModelIndex &,int,int)));
+  if (FLastModel)
+    disconnect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
+    this,SLOT(onRowsInserted(const QModelIndex &,int,int)));
 
-  connect(AProxyModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
+  FLastModel = AProxyModel;
+
+  connect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
     SLOT(onRowsInserted(const QModelIndex &,int,int)));
 }
 
 void RostersViewPlugin::onProxyRemoved(QAbstractProxyModel *AProxyModel)
 {
-  disconnect(AProxyModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-    this,SLOT(onRowsInserted(const QModelIndex &,int,int)));
-  
-  QAbstractProxyModel *last = FRostersView->lastProxyModel();
-  if (last)
-    connect(last,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
+  if (FLastModel == AProxyModel)
+  {
+    disconnect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
+      this,SLOT(onRowsInserted(const QModelIndex &,int,int)));
+
+    FLastModel = FRostersView->lastProxyModel();
+    if (!FLastModel)
+      FLastModel = FRostersView->model();
+
+    if (FLastModel)
+      connect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
       SLOT(onRowsInserted(const QModelIndex &,int,int)));
-  else
-    connect(FRostersView->model(),SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-      SLOT(onRowsInserted(const QModelIndex &,int,int)));
+  }
 }
 
 void RostersViewPlugin::onRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
@@ -163,7 +165,7 @@ void RostersViewPlugin::onRowsInserted(const QModelIndex &AParent, int AStart, i
   {
     QModelIndex index = FRostersView->model()->index(i,0,AParent);
     IRosterIndex::ItemType itemType = (IRosterIndex::ItemType)index.data(IRosterIndex::DR_Type).toInt();
-    QString groupName = index.data(IRosterIndex::DR_GroupName).toString();
+    QString groupName = index.data(IRosterIndex::DR_Group).toString();
     if (!groupName.isEmpty() || itemType == IRosterIndex::IT_StreamRoot)
     {
       Jid streamJid(index.data(IRosterIndex::DR_StreamJid).toString());
@@ -178,8 +180,8 @@ void RostersViewPlugin::onRowsInserted(const QModelIndex &AParent, int AStart, i
         else
           valueName = "collapsed[]";
         
-        bool collapsed = FSettings->valueNS(valueName,streamJid.pBare(),false).toBool();
-        if (!collapsed)
+        bool itemCollapsed = FSettings->valueNS(valueName,streamJid.pBare(),false).toBool();
+        if (!itemCollapsed)
         {
           FRostersView->expand(index);
         }
@@ -191,7 +193,7 @@ void RostersViewPlugin::onRowsInserted(const QModelIndex &AParent, int AStart, i
 void RostersViewPlugin::onIndexCollapsed(const QModelIndex &AIndex)
 {
   IRosterIndex::ItemType itemType = (IRosterIndex::ItemType)AIndex.data(IRosterIndex::DR_Type).toInt();
-  QString groupName = AIndex.data(IRosterIndex::DR_GroupName).toString();
+  QString groupName = AIndex.data(IRosterIndex::DR_Group).toString();
   if (!groupName.isEmpty() || itemType == IRosterIndex::IT_StreamRoot)
   {
     Jid streamJid(AIndex.data(IRosterIndex::DR_StreamJid).toString());
@@ -214,7 +216,7 @@ void RostersViewPlugin::onIndexCollapsed(const QModelIndex &AIndex)
 void RostersViewPlugin::onIndexExpanded(const QModelIndex &AIndex)
 {
   IRosterIndex::ItemType itemType = (IRosterIndex::ItemType)AIndex.data(IRosterIndex::DR_Type).toInt();
-  QString groupName = AIndex.data(IRosterIndex::DR_GroupName).toString();
+  QString groupName = AIndex.data(IRosterIndex::DR_Group).toString();
   if (!groupName.isEmpty() || itemType == IRosterIndex::IT_StreamRoot)
   {
     Jid streamJid(AIndex.data(IRosterIndex::DR_StreamJid).toString());
