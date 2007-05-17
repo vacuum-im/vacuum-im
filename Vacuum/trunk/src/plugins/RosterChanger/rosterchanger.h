@@ -1,6 +1,7 @@
 #ifndef ROSTERCHANGER_H
 #define ROSTERCHANGER_H
 
+#include "../../definations/initorders.h"
 #include "../../definations/actiongroups.h"
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/ipluginmanager.h"
@@ -28,7 +29,7 @@ public:
   virtual QUuid pluginUuid() const { return ROSTERCHANGER_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/);
-  virtual bool initObjects() { return true; }
+  virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
 
@@ -42,10 +43,9 @@ protected:
   Menu *createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
 protected slots:
-  void onRostersViewCreated(IRostersView *ARostersView);
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
   //Operations on subscription
-  void onSubscription(bool);
+  void onSendSubscription(bool);
   //Operations on items
   void onRenameItem(bool);
   void onCopyItemToGroup(bool);
@@ -60,7 +60,6 @@ protected slots:
   //Operations on stream
   void onAddContact(AddContactDialog *ADialog);
 protected slots:
-  void onMainWindowCreated(IMainWindow *AMainWindow);
   void onRosterOpened(IRoster *ARoster);
   void onRosterClosed(IRoster *ARoster);
 private:

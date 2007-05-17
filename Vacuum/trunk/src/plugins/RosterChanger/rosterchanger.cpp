@@ -23,11 +23,12 @@ void RosterChanger::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->uid = ROSTERCHANGER_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append("{5306971C-2488-40d9-BA8E-C83327B2EED5}"); //IRoster  
-  APluginInfo->dependences.append("{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"); //IRostersViewPlugin  
 }
 
-bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+  AInitOrder = ROSTERCHANGER_INITORDER;
+
   IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
@@ -43,25 +44,34 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
   if (plugin)
   {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-    if (FRostersViewPlugin)
-    {
-      connect(FRostersViewPlugin->instance(),SIGNAL(viewCreated(IRostersView *)),
-        SLOT(onRostersViewCreated(IRostersView *)));
-    }
   }
 
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
   {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-    if (FMainWindowPlugin)
-    {
-      connect(FMainWindowPlugin->instance(),SIGNAL(mainWindowCreated(IMainWindow *)),
-        SLOT(onMainWindowCreated(IMainWindow *)));
-    }
   }
 
-  return FRosterPlugin!=NULL && FRostersViewPlugin!=NULL;
+  return FRosterPlugin!=NULL;
+}
+
+bool RosterChanger::initObjects()
+{
+  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
+  {
+    connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(const QModelIndex &, Menu *)),
+      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+  }
+
+  if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
+  {
+    FAddContactMenu = new Menu(FMainWindowPlugin->mainWindow()->mainMenu());
+    FAddContactMenu->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
+    FAddContactMenu->setTitle(tr("Add contact"));
+    FAddContactMenu->menuAction()->setEnabled(false);
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FAddContactMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP_CONTACT,true);
+  }
+  return true;
 }
 
 //IRosterChanger
@@ -181,12 +191,6 @@ Menu * RosterChanger::createGroupMenu(const QHash<int,QVariant> AData, const QSe
   return menu;
 }
 
-void RosterChanger::onRostersViewCreated(IRostersView *ARostersView)
-{
-  connect(ARostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-    SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
-}
-
 void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu)
 {
   if (!AIndex.isValid())
@@ -225,28 +229,28 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       action->setText(tr("Send"));
       action->setData(data);
       action->setData(Action::DR_Parametr2,IRoster::Subscribed);
-      connect(action,SIGNAL(triggered(bool)),SLOT(onSubscription(bool)));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onSendSubscription(bool)));
       subsMenu->addAction(action);
 
       action = new Action(subsMenu);
       action->setText(tr("Remove"));
       action->setData(data);
       action->setData(Action::DR_Parametr2,IRoster::Unsubscribed);
-      connect(action,SIGNAL(triggered(bool)),SLOT(onSubscription(bool)));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onSendSubscription(bool)));
       subsMenu->addAction(action);
 
       action = new Action(subsMenu);
       action->setText(tr("Request"));
       action->setData(data);
       action->setData(Action::DR_Parametr2,IRoster::Subscribe);
-      connect(action,SIGNAL(triggered(bool)),SLOT(onSubscription(bool)));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onSendSubscription(bool)));
       subsMenu->addAction(action);
 
       action = new Action(subsMenu);
       action->setText(tr("Refuse"));
       action->setData(data);
       action->setData(Action::DR_Parametr2,IRoster::Unsubscribe);
-      connect(action,SIGNAL(triggered(bool)),SLOT(onSubscription(bool)));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onSendSubscription(bool)));
       subsMenu->addAction(action);
 
       AMenu->addAction(subsMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP_SUBSCRIPTION);
@@ -334,7 +338,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
   }
 }
 
-void RosterChanger::onSubscription(bool)
+void RosterChanger::onSendSubscription(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)
@@ -593,15 +597,6 @@ void RosterChanger::onAddContact(AddContactDialog *ADialog)
     else
       QMessageBox::information(NULL,streamJid.full(),tr("Contact <b>%1</b> already exists.").arg(contactJid.bare()));
   }
-}
-
-void RosterChanger::onMainWindowCreated(IMainWindow *AMainWindow)
-{
-  FAddContactMenu = new Menu(AMainWindow->mainMenu());
-  FAddContactMenu->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
-  FAddContactMenu->setTitle(tr("Add contact"));
-  FAddContactMenu->menuAction()->setEnabled(false);
-  AMainWindow->mainMenu()->addAction(FAddContactMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP_CONTACT,true);
 }
 
 void RosterChanger::onRosterOpened(IRoster *ARoster)
