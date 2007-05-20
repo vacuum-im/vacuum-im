@@ -175,13 +175,13 @@ void RostersView::updateIndexLabel(int ALabelId, const QVariant &ALabel)
 
 void RostersView::insertIndexLabel(int ALabelId, IRosterIndex *AIndex)
 {
-  if (AIndex && FIndexLabels.contains(ALabelId))
+  if (AIndex && FIndexLabels.contains(ALabelId) && !FIndexLabelIndexes.value(ALabelId).contains(AIndex))
   {
     int order = FIndexLabelOrders.value(ALabelId);
     QVariant label = FIndexLabels.value(ALabelId);
     QList<QVariant> ids = AIndex->data(IRosterIndex::DR_LabelIds).toList();
-    QList<QVariant> orders = AIndex->data(IRosterIndex::DR_LabelOrders).toList();
     QList<QVariant> labels = AIndex->data(IRosterIndex::DR_LabelValues).toList();
+    QList<QVariant> orders = AIndex->data(IRosterIndex::DR_LabelOrders).toList();
     int i = 0;
     while (i<orders.count() && orders.at(i).toInt() < order)
       i++;
@@ -190,8 +190,8 @@ void RostersView::insertIndexLabel(int ALabelId, IRosterIndex *AIndex)
     labels.insert(i,label);
     FIndexLabelIndexes[ALabelId] += AIndex;
     AIndex->setData(IRosterIndex::DR_LabelIds,ids);
-    AIndex->setData(IRosterIndex::DR_LabelOrders,orders);
     AIndex->setData(IRosterIndex::DR_LabelValues,labels);
+    AIndex->setData(IRosterIndex::DR_LabelOrders,orders);
   }
 }
 
@@ -202,10 +202,10 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
     int order = FIndexLabelOrders.value(ALabelId);
     QVariant label = FIndexLabels.value(ALabelId);
     QList<QVariant> ids = AIndex->data(IRosterIndex::DR_LabelIds).toList();
-    QList<QVariant> orders = AIndex->data(IRosterIndex::DR_LabelOrders).toList();
     QList<QVariant> labels = AIndex->data(IRosterIndex::DR_LabelValues).toList();
+    QList<QVariant> orders = AIndex->data(IRosterIndex::DR_LabelOrders).toList();
     int i = 0;
-    while (i<orders.count() && (orders.at(i).toInt()!=order || labels.at(i)!=label))
+    while (i<orders.count() && ids.at(i).toInt()!=ALabelId)
       i++;
     ids.removeAt(i);
     orders.removeAt(i);
@@ -213,9 +213,9 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
     FIndexLabelIndexes[ALabelId] -= AIndex;
     if (FIndexLabelIndexes[ALabelId].isEmpty())
       FIndexLabelIndexes.remove(ALabelId);
-    AIndex->setData(IRosterIndex::DR_LabelIds,ids);
     AIndex->setData(IRosterIndex::DR_LabelOrders,orders);
     AIndex->setData(IRosterIndex::DR_LabelValues,labels);
+    AIndex->setData(IRosterIndex::DR_LabelIds,ids);
   }
 }
 
