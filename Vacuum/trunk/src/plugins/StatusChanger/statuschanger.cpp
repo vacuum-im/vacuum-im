@@ -5,10 +5,14 @@
 StatusChanger::StatusChanger()
 {
   FBaseShow = IPresence::Error;
+  FConnectingLabel = NULL_LABEL_ID;
   FPresencePlugin = NULL;
   FRosterPlugin = NULL;
   FMainWindowPlugin = NULL;
+  FRostersView = NULL;
   FRostersViewPlugin = NULL;
+  FRostersModel = NULL;
+  FRostersModelPlugin = NULL;
   mnuBase = NULL;
 }
 
@@ -70,13 +74,14 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
   if (plugin)
   {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-    if (FRostersViewPlugin)
-    {
-      connect(FRostersViewPlugin->instance(),SIGNAL(viewCreated(IRostersView *)),
-        SLOT(onRostersViewCreated(IRostersView *)));
-    }
   }
   
+  plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
+  }
+
   plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
   if (plugin)
   {
@@ -90,16 +95,32 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 bool StatusChanger::initObjects()
 {
+  FRosterIconset.openFile(ROSTER_ICONSETFILE);
+  connect(&FRosterIconset,SIGNAL(skinChanged()),SLOT(onSkinChanged()));
+
   mnuBase = new Menu(NULL);
   createStatusActions(NULL);
-  
-  if (FMainWindowPlugin->mainWindow())
+ 
+  if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
   {
     QToolButton *tbutton = new QToolButton;
     tbutton->setDefaultAction(mnuBase->menuAction());
     tbutton->setPopupMode(QToolButton::InstantPopup);
     tbutton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     FMainWindowPlugin->mainWindow()->bottomToolBar()->addWidget(tbutton);
+  }
+
+  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
+  {
+    FRostersView = FRostersViewPlugin->rostersView();
+    FConnectingLabel = FRostersView->createIndexLabel(STREAMCONNECTING_LABEL_ORDER,FRosterIconset.iconByName("connecting"));
+    connect(FRostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
+      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+  }
+
+  if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
+  {
+    FRostersModel = FRostersModelPlugin->rostersModel();
   }
 
   return true;
@@ -154,7 +175,7 @@ void StatusChanger::setPresence(IPresence::Show AShow, const QString &AStatus,
     {
       presence->setPresence(AShow,AStatus,APriority,Jid());
       presence->xmppStream()->close();
-      FWaitOnline.remove(presence);
+      removeWaitOnline(presence);
     }
     else if (!FWaitOnline.contains(presence))
     {
@@ -166,7 +187,7 @@ void StatusChanger::setPresence(IPresence::Show AShow, const QString &AStatus,
           item.show = AShow;
           item.status = AStatus;
           item.priority = APriority;
-          FWaitOnline.insert(presence,item);
+          insertWaitOnline(presence,item);
           presence->xmppStream()->open();
         }
       }
@@ -445,10 +466,26 @@ int StatusChanger::getStatusPriority(IPresence::Show AShow) const
   return -1;
 }
 
-void StatusChanger::onRostersViewCreated(IRostersView *ARostersView)
+void StatusChanger::insertWaitOnline(IPresence *APresence, PresenceItem &AItem)
 {
-  connect(ARostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-    SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+  FWaitOnline.insert(APresence,AItem);
+  if (FRostersModel && FRostersView)
+  {
+    IRosterIndex *index = FRostersModel->getStreamRoot(APresence->xmppStream()->jid());
+    if (index)
+      FRostersView->insertIndexLabel(FConnectingLabel,index);
+  }
+}
+
+void StatusChanger::removeWaitOnline(IPresence *APresence)
+{
+  FWaitOnline.remove(APresence);
+  if (FRostersModel && FRostersView)
+  {
+    IRosterIndex *index = FRostersModel->getStreamRoot(APresence->xmppStream()->jid());
+    if (index)
+      FRostersView->removeIndexLabel(FConnectingLabel,index);
+  }
 }
 
 void StatusChanger::onPresenceAdded(IPresence *APresence)
@@ -465,7 +502,7 @@ void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
   if (AJid.isValid())
     return;
 
-  FWaitOnline.remove(APresence);
+  removeWaitOnline(APresence);
   if (AShow != FBaseShow)
   {
     if (AShow == IPresence::Offline || AShow == IPresence::Error)
@@ -492,7 +529,7 @@ void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
 
 void StatusChanger::onPresenceRemoved(IPresence *APresence)
 {
-  FWaitOnline.remove(APresence);
+  removeWaitOnline(APresence);
   removeStreamMenu(APresence);
   FPresences.removeAt(FPresences.indexOf(APresence));
   FAccounts.remove(APresence);
@@ -506,14 +543,14 @@ void StatusChanger::onRosterOpened(IRoster *ARoster)
   {
     PresenceItem item = FWaitOnline.value(presence);
     presence->setPresence(item.show,item.status,item.priority,Jid());
-    FWaitOnline.remove(presence);
+    removeWaitOnline(presence);
   }
 }
 
 void StatusChanger::onRosterClosed(IRoster *ARoster)
 {
   IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
-  FWaitOnline.remove(presence);
+  removeWaitOnline(presence);
 }
 
 void StatusChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu)
@@ -567,6 +604,12 @@ void StatusChanger::onAccountShown(IAccount *AAccount)
       setPresence(show,status,priority,presence->xmppStream()->jid());
     }
   }
+}
+
+void StatusChanger::onSkinChanged()
+{
+  if (FRostersView)
+    FRostersView->updateIndexLabel(FConnectingLabel,FRosterIconset.iconByName("connecting"));
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

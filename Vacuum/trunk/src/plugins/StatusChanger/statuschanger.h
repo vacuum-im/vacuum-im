@@ -6,12 +6,15 @@
 #include <QDateTime>
 #include "../../definations/actiongroups.h"
 #include "../../definations/initorders.h"
+#include "../../definations/rosterlabelorders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatuschanger.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/irostersview.h"
+#include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/iaccountmanager.h"
+#include "../../utils/skin.h"
 
 
 class StatusChanger : 
@@ -45,6 +48,11 @@ public:
 public slots:
   virtual void onChangeStatusAction(bool);
 protected:
+  struct PresenceItem {
+    IPresence::Show show;
+    QString status;
+    int priority;
+  };
   void setBaseShow(IPresence::Show AShow);
   void createStatusActions(IPresence *APresence = NULL);
   void updateMenu(IPresence *APresence = NULL);
@@ -56,8 +64,9 @@ protected:
   QString getStatusName(IPresence::Show AShow) const;
   QString getStatusText(IPresence::Show AShow) const;
   int getStatusPriority(IPresence::Show AShow) const;
+  void insertWaitOnline(IPresence *APresence, PresenceItem &AItem);
+  void removeWaitOnline(IPresence *APresence);
 protected slots:
-  void onRostersViewCreated(IRostersView *ARostersView);
   void onPresenceAdded(IPresence *APresence);
   void onSelfPresence(IPresence *, IPresence::Show AShow, 
     const QString &AStatus, qint8 APriority, const Jid &AJid);
@@ -67,22 +76,23 @@ protected slots:
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
   void onReconnectTimer();
   void onAccountShown(IAccount *AAccount);
+  void onSkinChanged();
 private:
   IPresencePlugin *FPresencePlugin;
   IRosterPlugin *FRosterPlugin;
   IMainWindowPlugin *FMainWindowPlugin;
+  IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
+  IRostersModel *FRostersModel;
+  IRostersModelPlugin *FRostersModelPlugin;
   IAccountManager *FAccountManager;
 private:
   Menu *mnuBase;
   QHash<IPresence *, Menu *> FStreamMenus;
 private:
-  struct PresenceItem {
-    IPresence::Show show;
-    QString status;
-    int priority;
-  };
   IPresence::Show FBaseShow;
+  int FConnectingLabel;
+  SkinIconset FRosterIconset;
   QList<IPresence *> FPresences;
   QHash<IPresence *,PresenceItem> FWaitOnline;
   QHash<IPresence *,IAccount *> FAccounts;
