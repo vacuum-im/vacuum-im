@@ -463,7 +463,14 @@ void RosterChanger::onRemoveItemFromRoster(bool)
     QString streamJid = action->data(Action::DR_StreamJid).toString();
     IRoster *roster = FRosterPlugin->getRoster(streamJid);
     if (roster && roster->isOpen())
-      roster->removeItem(action->data(Action::DR_Parametr1).toString());
+    {
+      QString contactJid = action->data(Action::DR_Parametr1).toString();
+      int button = QMessageBox::question(NULL,tr("Remove contact"),
+        tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(contactJid),
+        QMessageBox::Yes | QMessageBox::No);
+      if (button == QMessageBox::Yes)
+        roster->removeItem(contactJid);
+    }
   }
 }
 
