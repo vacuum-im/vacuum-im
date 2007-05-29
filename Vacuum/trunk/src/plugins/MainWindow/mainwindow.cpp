@@ -68,6 +68,6 @@ void MainWindow::createMenus()
 
 void MainWindow::closeEvent(QCloseEvent *AEvent)
 {
-  //showMinimized();
-  //AEvent->ignore();
+  hide();
+  AEvent->ignore();
 }

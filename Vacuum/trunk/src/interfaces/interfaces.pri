@@ -9,4 +9,5 @@ HEADERS += ipluginmanager.h \
            irostersview.h \
            istatuschanger.h \
            iaccountmanager.h \
-           irosterchanger.h
+           irosterchanger.h \
+           itraymanager.h

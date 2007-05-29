@@ -46,7 +46,27 @@ bool SettingsPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
         SLOT(onMainWindowCreated(IMainWindow *)));
     }
   }
+
+  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  if (plugin)
+  {
+    FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
+    if (FTrayManager)
+    {
+      connect(FTrayManager->instance(),SIGNAL(contextMenu(int, Menu *)),SLOT(onTrayContextMenu(int, Menu *)));
+    }
+  }
+
   return setSettingsFile("config.xml");
+}
+
+bool SettingsPlugin::initObjects()
+{
+  actOpenOptionsDialog = new Action(this);
+  actOpenOptionsDialog->setIcon(SYSTEM_ICONSETFILE,"psi/options");
+  actOpenOptionsDialog->setText(tr("Options..."));
+  connect(actOpenOptionsDialog,SIGNAL(triggered(bool)),SLOT(openOptionsDialogAction(bool)));
+  return true;
 }
 
 bool SettingsPlugin::initSettings()
@@ -292,10 +312,6 @@ QWidget *SettingsPlugin::createNodeWidget(const QString &ANode)
 
 void SettingsPlugin::onMainWindowCreated(IMainWindow *AMainWindow)
 {
-  actOpenOptionsDialog = new Action(this);
-  actOpenOptionsDialog->setIcon(SYSTEM_ICONSETFILE,"psi/options");
-  actOpenOptionsDialog->setText(tr("Options..."));
-  connect(actOpenOptionsDialog,SIGNAL(triggered(bool)),SLOT(openOptionsDialogAction(bool)));
   AMainWindow->mainMenu()->addAction(actOpenOptionsDialog,SETTINGS_ACTION_GROUP_OPTIONS,true);
 }
 
@@ -321,6 +337,11 @@ void SettingsPlugin::onPluginManagerQuit()
     saveSettings();
     FProfileOpened = false;
   }
+}
+
+void SettingsPlugin::onTrayContextMenu(int /*ANotifyId*/, Menu *AMenu)
+{
+  AMenu->addAction(actOpenOptionsDialog,SETTINGS_ACTION_GROUP_OPTIONS,true);
 }
 
 Q_EXPORT_PLUGIN2(SettingsPlugin, SettingsPlugin)

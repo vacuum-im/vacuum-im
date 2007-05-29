@@ -5,6 +5,7 @@
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/action.h"
+#include "../../interfaces/itraymanager.h"
 #include "mainwindow.h"
 
 class MainWindowPlugin :
@@ -35,12 +36,17 @@ signals:
   virtual void mainWindowCreated(IMainWindow *);
   virtual void mainWindowDestroyed(IMainWindow *);
 protected slots:
+  void onTrayContextMenu(int ANotifyId, Menu *AMenu);
+  void onTrayNotifyActivated(int ANotifyId);
   void onSettingsOpened();
   void onSettingsClosed();
 private:
   IPluginManager *FPluginManager;
   ISettingsPlugin *FSettingsPlugin;
   ISettings *FSettings;
+  ITrayManager *FTrayManager;
+private:
+  Action *actQuit;
 private:
   MainWindow *FMainWindow;
 };

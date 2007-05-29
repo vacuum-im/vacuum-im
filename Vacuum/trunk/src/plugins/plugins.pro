@@ -14,4 +14,5 @@ SUBDIRS = settings \
           rostersview \
           statuschanger \
           rosterchanger \
-          accountmanager
+          accountmanager \
+          traymanager

@@ -9,6 +9,7 @@
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/imainwindow.h"
+#include "../../interfaces/itraymanager.h"
 #include "../../utils/action.h"
 #include "../../utils/skin.h"
 #include "settings.h"
@@ -31,7 +32,7 @@ public:
   virtual QUuid pluginUuid() const { return SETTINGS_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects() { return true; }
+  virtual bool initObjects();
   virtual bool initSettings();
   virtual bool startPlugin() { return true; }
 
@@ -71,9 +72,11 @@ protected slots:
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
   void onPluginManagerQuit();
+  void onTrayContextMenu(int ANotifyId, Menu *AMenu);
 private:
   IPluginManager *FPluginManager;
   IMainWindowPlugin *FMainWindowPlugin;
+  ITrayManager *FTrayManager;
 private:
   SkinIconset FSystemIconset;
   Action *actOpenOptionsDialog;

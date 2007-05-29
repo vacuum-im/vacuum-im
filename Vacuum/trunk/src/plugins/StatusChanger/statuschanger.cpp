@@ -89,6 +89,16 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     if (FAccountManager)
       connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
   }
+
+  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  if (plugin)
+  {
+    FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
+    if (FTrayManager)
+    {
+      connect(FTrayManager->instance(),SIGNAL(contextMenu(int, Menu *)),SLOT(onTrayContextMenu(int, Menu *)));
+    }
+  }
   
   return FPresencePlugin!=NULL && FMainWindowPlugin!=NULL;
 }
@@ -304,6 +314,9 @@ void StatusChanger::updateMenu(IPresence *APresence)
   {
     mnuBase->setIcon(STATUS_ICONSETFILE,getStatusIconName(FBaseShow));
     mnuBase->setTitle(getStatusName(FBaseShow));
+
+    if (FTrayManager)
+      FTrayManager->setBaseIcon(mnuBase->icon());
   }
   else if (FStreamMenus.contains(APresence))
   {
@@ -568,6 +581,15 @@ void StatusChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       AMenu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
     }
   }
+}
+
+void StatusChanger::onTrayContextMenu(int /*ANotifyId*/, Menu *AMenu)
+{
+  Action *action = new Action(AMenu);
+  action->setIcon(mnuBase->icon());
+  action->setText(tr("Status"));
+  action->setMenu(mnuBase);
+  AMenu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN,true);
 }
 
 void StatusChanger::onReconnectTimer()

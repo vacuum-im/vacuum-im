@@ -14,6 +14,7 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/iaccountmanager.h"
+#include "../../interfaces/itraymanager.h"
 #include "../../utils/skin.h"
 
 
@@ -74,6 +75,7 @@ protected slots:
   void onRosterOpened(IRoster *ARoster);
   void onRosterClosed(IRoster *ARoster);
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
+  void onTrayContextMenu(int ANotifyId, Menu *AMenu);
   void onReconnectTimer();
   void onAccountShown(IAccount *AAccount);
   void onSkinChanged();
@@ -86,6 +88,7 @@ private:
   IRostersModel *FRostersModel;
   IRostersModelPlugin *FRostersModelPlugin;
   IAccountManager *FAccountManager;
+  ITrayManager *FTrayManager;
 private:
   Menu *mnuBase;
   QHash<IPresence *, Menu *> FStreamMenus;

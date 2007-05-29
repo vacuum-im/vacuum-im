@@ -8,6 +8,7 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/imainwindow.h"
+#include "../../interfaces/itraymanager.h"
 #include "addcontactdialog.h"
 
 
@@ -44,6 +45,7 @@ protected:
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
 protected slots:
   void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
+  void onTrayContextMenu(int ANotifyId, Menu *AMenu);
   //Operations on subscription
   void onSendSubscription(bool);
   //Operations on items
@@ -66,6 +68,7 @@ private:
   IRosterPlugin *FRosterPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
   IMainWindowPlugin *FMainWindowPlugin;
+  ITrayManager *FTrayManager;
 private:
   Menu *FAddContactMenu;
   QHash<IRoster *,Action *> FActions;

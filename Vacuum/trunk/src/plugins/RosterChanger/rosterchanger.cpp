@@ -52,6 +52,16 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  if (plugin)
+  {
+    FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
+    if (FTrayManager)
+    {
+      connect(FTrayManager->instance(),SIGNAL(contextMenu(int, Menu *)),SLOT(onTrayContextMenu(int, Menu *)));
+    }
+  }
+
   return FRosterPlugin!=NULL;
 }
 
@@ -336,6 +346,12 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
     }
   }
+}
+
+void RosterChanger::onTrayContextMenu(int /*ANotifyId*/, Menu *AMenu)
+{
+  if (FAddContactMenu->isEnabled())
+    AMenu->addAction(FAddContactMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP_CONTACT,true);
 }
 
 void RosterChanger::onSendSubscription(bool)

@@ -37,6 +37,16 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
   if (plugin)
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
 
+  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  if (plugin)
+  {
+    FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
+    if (FTrayManager)
+    {
+      connect(FTrayManager->instance(),SIGNAL(contextMenu(int, Menu *)),SLOT(onTrayContextMenu(int, Menu *)));
+      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int)),SLOT(onTrayNotifyActivated(int)));
+    }
+  }
   return true;
 }
 
@@ -52,11 +62,11 @@ bool MainWindowPlugin::initObjects()
   FMainWindow = new MainWindow();
   emit mainWindowCreated(FMainWindow);
 
-  Action *action = new Action(this);
-  action->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
-  action->setText(tr("Quit"));
-  connect(action,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
-  FMainWindow->mainMenu()->addAction(action,MAINWINDOW_ACTION_GROUP_QUIT);
+  actQuit = new Action(this);
+  actQuit->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
+  actQuit->setText(tr("Quit"));
+  connect(actQuit,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
+  FMainWindow->mainMenu()->addAction(actQuit,MAINWINDOW_ACTION_GROUP_QUIT);
 
   return true;
 }
@@ -70,6 +80,22 @@ bool MainWindowPlugin::startPlugin()
 IMainWindow *MainWindowPlugin::mainWindow() const
 {
   return FMainWindow;
+}
+
+void MainWindowPlugin::onTrayContextMenu(int /*ANotifyId*/, Menu *AMenu)
+{
+  AMenu->addAction(actQuit,MAINWINDOW_ACTION_GROUP_QUIT,true);
+}
+
+void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId)
+{
+  if (FMainWindow && ANotifyId == 0)
+  {
+    if (FMainWindow->isVisible())
+      FMainWindow->hide();
+    else
+      FMainWindow->show();
+  }
 }
 
 void MainWindowPlugin::onSettingsOpened()
