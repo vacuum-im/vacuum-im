@@ -6,6 +6,7 @@
 RosterChanger::RosterChanger()
 {
   FAddContactMenu = NULL;
+  FTrayManager = NULL;
 }
 
 RosterChanger::~RosterChanger()

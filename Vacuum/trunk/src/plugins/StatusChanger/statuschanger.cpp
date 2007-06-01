@@ -13,6 +13,7 @@ StatusChanger::StatusChanger()
   FRostersViewPlugin = NULL;
   FRostersModel = NULL;
   FRostersModelPlugin = NULL;
+  FTrayManager = NULL;
   mnuBase = NULL;
 }
 

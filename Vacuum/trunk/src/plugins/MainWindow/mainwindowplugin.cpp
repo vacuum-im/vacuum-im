@@ -7,6 +7,7 @@ MainWindowPlugin::MainWindowPlugin()
   FPluginManager = NULL;
   FSettingsPlugin = NULL;
   FSettings = NULL;
+  FTrayManager = NULL;
   FMainWindow = NULL;
 }
 

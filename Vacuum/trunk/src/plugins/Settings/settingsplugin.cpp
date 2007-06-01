@@ -9,6 +9,7 @@
 SettingsPlugin::SettingsPlugin()
 {
   actOpenOptionsDialog = NULL;
+  FTrayManager = NULL;
   FProfileOpened = false;
   FFile.setParent(this);
   FSystemIconset.openFile(SYSTEM_ICONSETFILE);
