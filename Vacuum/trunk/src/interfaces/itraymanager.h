@@ -12,8 +12,8 @@ public:
   virtual QString toolTip() const =0;
   virtual QIcon baseIcon() const =0;
   virtual void setBaseIcon(const QIcon &AIcon) =0;
-  virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip) =0;
-  virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip) =0;
+  virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink) =0;
+  virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, bool ABlink) =0;
   virtual void removeNotify(int ANotifyId) =0;
 signals:
   virtual void contextMenu(int ANotifyId, Menu *AMenu) =0;

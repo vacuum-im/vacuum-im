@@ -2,15 +2,19 @@
 
 #include <QContextMenuEvent>
 
-int TrayManager::FNextNotifyId = 10;
+int TrayManager::FNextNotifyId = 1;
 
 TrayManager::TrayManager()
 {
+  FCurNotifyId = 0;
   FContextMenu = new Menu;
   FTrayIcon.setContextMenu(FContextMenu);
 
-  FCurNotifyId = 0;
-  connect(&FTrayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
+  FBlinkTimer.setInterval(500);
+  connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimer()));
+
+  connect(&FTrayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+    SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
 }
 
 TrayManager::~TrayManager()
@@ -21,7 +25,7 @@ TrayManager::~TrayManager()
 void TrayManager::pluginInfo(PluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing tray icon and events");
+  APluginInfo->description = tr("Managing tray icon");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Tray manager"); 
   APluginInfo->uid = TRAYMANAGER_UUID;
@@ -38,35 +42,34 @@ bool TrayManager::startPlugin()
 void TrayManager::setBaseIcon(const QIcon &AIcon)
 {
   FBaseIcon = AIcon;
-  FTrayIcon.setIcon(AIcon);
+  if (FCurNotifyId == 0)
+    setTrayIcon(AIcon,"",false);
 }
 
-int TrayManager::appendNotify(const QIcon &AIcon, const QString &AToolTip)
+int TrayManager::appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink)
 {
   int notifyId = FNextNotifyId++;
+  FCurNotifyId = notifyId;
   NotifyItem *notify = new NotifyItem;
   notify->icon = AIcon;
   notify->toolTip = AToolTip;
-  FCurNotifyId = notifyId;
+  notify->blink = ABlink;
   FNotifyItems.insert(notifyId,notify);
-  FTrayIcon.setIcon(AIcon);
-  FTrayIcon.setToolTip(AToolTip);
+  setTrayIcon(AIcon,AToolTip,ABlink);
   emit notifyAdded(notifyId);
   return notifyId;
 }
 
-void TrayManager::updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip)
+void TrayManager::updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, bool ABlink)
 {
   NotifyItem *notify = FNotifyItems.value(ANotifyId,NULL);
   if (notify)
   {
     notify->icon = AIcon;
     notify->toolTip = AToolTip;
+    notify->blink = ABlink;
     if (FCurNotifyId = ANotifyId)
-    {
-      FTrayIcon.setIcon(AIcon);
-      FTrayIcon.setToolTip(AToolTip);
-    }
+      setTrayIcon(AIcon,AToolTip,ABlink);
   }
 }
 
@@ -82,24 +85,34 @@ void TrayManager::removeNotify(int ANotifyId)
       if (FNotifyItems.isEmpty())
       {
         FCurNotifyId = 0;
-        FTrayIcon.setIcon(FBaseIcon);
-        FTrayIcon.setToolTip("");
+        setTrayIcon(FBaseIcon,"",false);
       }
       else
       {
         FCurNotifyId = FNotifyItems.keys().last();
         notify = FNotifyItems.value(FCurNotifyId);
-        FTrayIcon.setIcon(notify->icon);
-        FTrayIcon.setToolTip(notify->toolTip);
+        setTrayIcon(notify->icon,notify->toolTip,notify->blink);
       }
     }
     emit notifyRemoved(ANotifyId);
   }
 }
 
+void TrayManager::setTrayIcon(const QIcon &AIcon, const QString &AToolTip, bool ABlink)
+{
+  FCurIcon = AIcon;
+  FBlinkShow = true;
+  if (ABlink)
+    FBlinkTimer.start();
+  else
+    FBlinkTimer.stop();
+  FTrayIcon.setIcon(AIcon);
+  FTrayIcon.setToolTip(AToolTip);
+}
+
 void TrayManager::onActivated(QSystemTrayIcon::ActivationReason AReason)
 {
-  if (AReason == QSystemTrayIcon::Trigger)
+  if (AReason == QSystemTrayIcon::DoubleClick)
   {
     int notifyId = 0;
     if (!FNotifyItems.isEmpty())
@@ -112,6 +125,15 @@ void TrayManager::onActivated(QSystemTrayIcon::ActivationReason AReason)
     FContextMenu->clear();
     emit contextMenu(FCurNotifyId,FContextMenu);
   }
+}
+
+void TrayManager::onBlinkTimer()
+{
+  if (FBlinkShow)
+    FTrayIcon.setIcon(QIcon());
+  else
+    FTrayIcon.setIcon(FCurIcon);
+  FBlinkShow = !FBlinkShow;
 }
 
 Q_EXPORT_PLUGIN2(TrayManagerPlugin, TrayManager)
