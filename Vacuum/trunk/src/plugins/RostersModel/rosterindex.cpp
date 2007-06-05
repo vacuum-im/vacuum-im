@@ -76,7 +76,7 @@ void RosterIndex::appendChild(IRosterIndex *AIndex)
     emit childAboutToBeInserted(AIndex);
     connect(AIndex->instance(),SIGNAL(destroyed(QObject *)),SLOT(onChildIndexDestroyed(QObject *)));
     emit childInserted(AIndex);
-    emitParentDataChanged();
+    emit dataChanged(this,DR_AnyRole);
   }
 }
 
@@ -89,7 +89,7 @@ bool RosterIndex::removeChild(IRosterIndex *AIndex)
     AIndex->setParentIndex(0);
     disconnect(AIndex->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onChildIndexDestroyed(QObject *))); 
     emit childRemoved(AIndex);
-    emitParentDataChanged();
+    emit dataChanged(this,DR_AnyRole);
 
     if (FRemoveOnLastChildRemoved && FChilds.isEmpty())
       QTimer::singleShot(0,this,SLOT(onRemoveByLastChildRemoved()));
@@ -131,7 +131,6 @@ IRosterIndexDataHolder *RosterIndex::setDataHolder(int ARole, IRosterIndexDataHo
     else
       FDataHolders.remove(ARole);
     
-    emitParentDataChanged();
     dataChanged(this,ARole);
   }
   return oldDataHolder;
@@ -167,7 +166,6 @@ bool RosterIndex::setData(int ARole, const QVariant &AData)
 
     if (oldData != AData)
     {
-      emitParentDataChanged();
       emit dataChanged(this, ARole);
     }
 
@@ -218,22 +216,11 @@ IRosterIndexList RosterIndex::findChild(const QMultiHash<int, QVariant> AData, b
   return indexes;  
 }
 
-void RosterIndex::emitParentDataChanged()
-{
-  RosterIndex *index = NULL;
-  if (FParentIndex)
-    index = qobject_cast<RosterIndex *>(FParentIndex->instance());
-  if (index)
-    index->emitParentDataChanged();
-  if (FChilds.count() > 0)
-    emit dataChanged(this,IRosterIndex::DR_AnyRole);
-}
-
 void RosterIndex::onDataHolderChanged(IRosterIndex *AIndex, int ARole)
 {
  if (AIndex == this)
  {
-   emitParentDataChanged();
+   //emitParentDataChanged();
    emit dataChanged(this, ARole);
  }
 }

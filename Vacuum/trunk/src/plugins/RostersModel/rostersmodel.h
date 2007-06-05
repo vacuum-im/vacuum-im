@@ -53,6 +53,8 @@ signals:
   virtual void indexInserted(IRosterIndex *);
   virtual void indexDataChanged(IRosterIndex *, int ARole);
   virtual void indexRemoved(IRosterIndex *);
+protected:
+  void emitDelayedDataChanged(IRosterIndex *AIndex);
 protected slots:
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onRosterItemRemoved(IRosterItem *ARosterItem);
@@ -63,6 +65,7 @@ protected slots:
   void onIndexChildInserted(IRosterIndex *AIndex);
   void onIndexChildAboutToBeRemoved(IRosterIndex *AIndex);
   void onIndexChildRemoved(IRosterIndex *AIndex);
+  void onDelayedDataChanged();
 private:
   struct StreamItem {
     IRoster *roster;
@@ -71,6 +74,7 @@ private:
   };
   RosterIndex *FRootIndex;
   QHash<QString,StreamItem> FStreams;
+  QSet<IRosterIndex *> FChangedIndexes;
 };
 
 #endif // ROSTERSMODEL_H

@@ -1,6 +1,8 @@
 #include <QtDebug>
 #include "rostersmodel.h"
 
+#include <QTimer>
+
 RostersModel::RostersModel(QObject *parent)
   : QAbstractItemModel(parent)
 {
@@ -273,6 +275,24 @@ QModelIndex RostersModel::modelIndexByRosterIndex(IRosterIndex *AIndex)
   if (AIndex)
     return createIndex(AIndex->row(),0,AIndex);
   return QModelIndex();
+}
+
+void RostersModel::emitDelayedDataChanged(IRosterIndex *AIndex)
+{
+  FChangedIndexes -= AIndex;
+  if (AIndex!=FRootIndex)
+  {
+    QModelIndex modelIndex = createIndex(AIndex->row(),0,AIndex);
+    emit dataChanged(modelIndex,modelIndex);
+  }
+
+  IRosterIndexList childs;
+  foreach(IRosterIndex *index, FChangedIndexes)
+    if (index->parentIndex() == AIndex)
+      childs.append(index);
+
+  foreach(IRosterIndex *index, childs)
+    emitDelayedDataChanged(index);
 }
 
 void RostersModel::onRosterItemPush(IRosterItem *ARosterItem)
@@ -586,8 +606,9 @@ void RostersModel::onPresenceItem(IPresenceItem *APresenceItem)
 
 void RostersModel::onIndexDataChanged(IRosterIndex *AIndex, int ARole)
 {
-  QModelIndex modelIndex = createIndex(AIndex->row(),0,AIndex);
-  emit dataChanged(modelIndex,modelIndex);
+  if (FChangedIndexes.isEmpty())
+    QTimer::singleShot(0,this,SLOT(onDelayedDataChanged()));
+  FChangedIndexes+=AIndex;
   emit indexDataChanged(AIndex, ARole);
 }
 
@@ -622,6 +643,7 @@ void RostersModel::onIndexChildInserted(IRosterIndex *AIndex)
 
 void RostersModel::onIndexChildAboutToBeRemoved(IRosterIndex *AIndex)
 {
+  FChangedIndexes-=AIndex;
   emit indexRemoved(AIndex);
   IRosterIndex *parentIndex = AIndex->parentIndex();
   if (parentIndex)
@@ -646,5 +668,21 @@ void RostersModel::onIndexChildRemoved(IRosterIndex *AIndex)
   disconnect(AIndex->instance(),SIGNAL(childRemoved(IRosterIndex *)),
     this,SLOT(onIndexChildRemoved(IRosterIndex *)));
   endRemoveRows();
+}
+
+void RostersModel::onDelayedDataChanged()
+{
+  //Вызывает dataChanged у всех родителей для поддержки SortFilterProxyModel
+  QSet<IRosterIndex *> childIndexes = FChangedIndexes;
+  foreach(IRosterIndex *index,childIndexes)
+  {
+    IRosterIndex *parentIndex = index->parentIndex();
+    while (parentIndex)
+    {
+      FChangedIndexes+=parentIndex;
+      parentIndex = parentIndex->parentIndex();
+    }
+  }
+  emitDelayedDataChanged(FRootIndex);
 }
 

@@ -48,9 +48,6 @@ signals:
   virtual void childInserted(IRosterIndex *);
   virtual void childAboutToBeRemoved(IRosterIndex *);
   virtual void childRemoved(IRosterIndex *);
-protected:
-  //Для коррекции работы SortFilterProxyModel
-  virtual void emitParentDataChanged();
 protected slots:
   virtual void onDataHolderChanged(IRosterIndex *AIndex, int ARole);
   virtual void onChildIndexDestroyed(QObject *AIndex);
