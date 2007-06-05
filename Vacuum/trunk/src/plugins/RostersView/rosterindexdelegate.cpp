@@ -1,3 +1,4 @@
+#include <QtDebug>
 #include "rosterindexdelegate.h"
 
 #include <QApplication>
@@ -10,7 +11,7 @@
 RosterIndexDelegate::RosterIndexDelegate(QObject *AParent)
   : QAbstractItemDelegate(AParent)
 {
-
+  FShowBlinkLabels = true;
 }
 
 RosterIndexDelegate::~RosterIndexDelegate()
@@ -33,7 +34,7 @@ void RosterIndexDelegate::paint(QPainter *APainter,
   QRect usedRect;
   QRect freeRect = option.rect.adjusted(halfTextMargin,halfTextMargin,-halfTextMargin,-halfTextMargin);
 
-  drawBackground(APainter,option,AIndex);
+  drawBackground(APainter,option,option.rect,AIndex);
 
   LabelsMap map = labelsMap(AIndex);
   for(LabelsMap::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
@@ -49,10 +50,15 @@ void RosterIndexDelegate::paint(QPainter *APainter,
       option.displayAlignment = right;
     }
 
-    APainter->setClipRect(freeRect);
-    usedRect = drawVariant(APainter,option,freeRect,it.value().second);
+    if (FShowBlinkLabels || !FBlinkLabels.contains(it.value().first))
+    {
+      APainter->setClipRect(freeRect);
+      usedRect = drawVariant(APainter,option,freeRect,it.value().second);
+    }
+    else
+      usedRect = variantRect(option,freeRect,it.value().second);
     
-    if (!usedRect.isNull())
+    if (!usedRect.isEmpty())
     {
       if (it.key() < RIGHTALIGN_LABEL_ORDER)
         freeRect.setLeft(usedRect.right()+spacing);
@@ -118,7 +124,7 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
 
     usedRect = variantRect(option,freeRect,it.value().second);
 
-    if (!usedRect.isNull())
+    if (!usedRect.isEmpty())
     {
       if (usedRect.contains(APoint))
         return it.value().first;
@@ -131,6 +137,51 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
   }
 
   return DISPLAY_LABEL_ID;
+}
+
+QRect RosterIndexDelegate::labelRect(int ALabelId, const QStyleOptionViewItem &AOption, 
+                                     const QModelIndex &AIndex) const
+{
+  if (AOption.rect.isEmpty())
+    return QRect();
+
+  QStyleOptionViewItem option = setOptions(AIndex,AOption);
+
+  const Qt::Alignment left = Qt::AlignLeft | Qt::AlignTop;
+  const Qt::Alignment right = Qt::AlignRight | Qt::AlignTop;
+  const int halfTextMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) >> 1;
+
+  QRect usedRect;
+  QRect freeRect = option.rect.adjusted(halfTextMargin,halfTextMargin,-halfTextMargin,-halfTextMargin);
+
+  LabelsMap map = labelsMap(AIndex);
+  for(LabelsMap::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
+  {
+    if (it.key() < RIGHTALIGN_LABEL_ORDER)
+    {
+      option.decorationAlignment = left;
+      option.displayAlignment = left;
+    }
+    else
+    {
+      option.decorationAlignment = right;
+      option.displayAlignment = right;
+    }
+
+    usedRect = variantRect(option,freeRect,it.value().second);
+
+    if (it.value().first == ALabelId)
+      return usedRect;
+
+    if (!usedRect.isEmpty())
+    {
+      if (it.key() < RIGHTALIGN_LABEL_ORDER)
+        freeRect.setLeft(usedRect.right()+spacing);
+      else
+        freeRect.setRight(usedRect.left()-spacing);
+    }
+  }
+  return QRect();
 }
 
 QRect RosterIndexDelegate::drawVariant(QPainter *APainter, const QStyleOptionViewItem &AOption, 
@@ -204,13 +255,13 @@ QRect RosterIndexDelegate::drawVariant(QPainter *APainter, const QStyleOptionVie
 }
 
 void RosterIndexDelegate::drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption,  
-                                         const QModelIndex &AIndex) const
+                                         const QRect &ARect, const QModelIndex &AIndex) const
 {
   if (AOption.showDecorationSelected && (AOption.state & QStyle::State_Selected)) {
     QPalette::ColorGroup cg = AOption.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
     if (cg == QPalette::Normal && !(AOption.state & QStyle::State_Active))
       cg = QPalette::Inactive;
-    APainter->fillRect(AOption.rect, AOption.palette.brush(cg, QPalette::Highlight));
+    APainter->fillRect(ARect, AOption.palette.brush(cg, QPalette::Highlight));
   } 
   else 
   {
@@ -218,8 +269,8 @@ void RosterIndexDelegate::drawBackground(QPainter *APainter, const QStyleOptionV
     if (qVariantCanConvert<QBrush>(value)) 
     {
       QPointF oldBO = APainter->brushOrigin();
-      APainter->setBrushOrigin(AOption.rect.topLeft());
-      APainter->fillRect(AOption.rect, qvariant_cast<QBrush>(value));
+      APainter->setBrushOrigin(ARect.topLeft());
+      APainter->fillRect(ARect, qvariant_cast<QBrush>(value));
       APainter->setBrushOrigin(oldBO);
     }
   }
@@ -370,8 +421,4 @@ QSize RosterIndexDelegate::doTextLayout(QTextLayout &ATextLayout, int ALineWidth
   ATextLayout.endLayout();
   return QSizeF(width,height).toSize();
 }
-
-
-
-
 

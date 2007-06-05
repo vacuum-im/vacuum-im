@@ -3,6 +3,7 @@
 
 #include <QContextMenuEvent>
 #include <QPainter>
+#include <QTimer>
 #include "../../definations/tooltiporders.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../interfaces/irostersview.h"
@@ -36,11 +37,13 @@ public:
   virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex);
   virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex);
   //--IndexLabel
-  virtual int createIndexLabel(int AOrder, const QVariant &ALabel);
-  virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel);
+  virtual int createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags = 0);
+  virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFlags = 0);
   virtual void insertIndexLabel(int ALabelId, IRosterIndex *AIndex);
   virtual void removeIndexLabel(int ALabelId, IRosterIndex *AIndex);
+  virtual void destroyIndexLabel(int ALabelId);
   virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const;
+  virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *);
   virtual void modelSeted(IRostersModel *);
@@ -57,6 +60,9 @@ signals:
 protected:
   void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   void contextMenuEvent(QContextMenuEvent *AEvent);
+  QStyleOptionViewItemV2 indexOption(const QModelIndex &AIndex) const;
+  void appendBlinkLabel(int ALabelId);
+  void removeBlinkLabel(int ALabelId);
   //QAbstractItemView
   virtual bool viewportEvent(QEvent *AEvent);
   virtual void mouseDoubleClickEvent(QMouseEvent *AEvent);
@@ -65,8 +71,13 @@ protected:
 protected slots:
   void onIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
   void onIndexRemoved(IRosterIndex *AIndex);
+  void onBlinkTimer();
 private:
   IRostersModel *FRostersModel;
+private:
+  QTimer FBlinkTimer;
+  QSet<int> FBlinkLabels;
+  bool FBlinkShow;
 private:
   Menu *FContextMenu;
   IndexDataHolder *FIndexDataHolder;
@@ -74,6 +85,7 @@ private:
   QList<QAbstractProxyModel *> FProxyModels;
   QHash<int, QVariant> FIndexLabels;
   QHash<int, int /*Order*/> FIndexLabelOrders;
+  QHash<int, int /*Flags*/> FIndexLabelFlags;
   QHash<int, QSet<IRosterIndex *> > FIndexLabelIndexes;
   int FPressedLabel;
   QModelIndex FPressedIndex;

@@ -70,6 +70,7 @@ public:
     DR_LabelIds,
     DR_LabelOrders,
     DR_LabelValues,
+    DR_LabelFlags,
     //User roles
     DR_UserDefined = Qt::UserRole + 64,
     DR_UserDynamic = DR_UserDefined + 1048576

@@ -23,11 +23,16 @@ public:
   
   int labelAt(const QPoint &APoint, const QStyleOptionViewItem &AOption,  
     const QModelIndex &AIndex) const;
+  QRect labelRect(int ALabelId, const QStyleOptionViewItem &AOption,  
+    const QModelIndex &AIndex) const;
+  void appendBlinkLabel(int ALabelId) { FBlinkLabels+=ALabelId; }
+  void removeBlinkLabel(int ALabelId) { FBlinkLabels-=ALabelId; }
+  void setShowBlinkLabels(bool AShow) { FShowBlinkLabels = AShow; }
 protected:
   QRect drawVariant(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QRect &ARect, const QVariant &AValue) const;
   void drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, 
-    const QModelIndex &AIndex) const;
+    const QRect &ARect, const QModelIndex &AIndex) const;
   void drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QRect &ARect) const;
   LabelsMap labelsMap(const QModelIndex &AIndex) const;
@@ -40,6 +45,9 @@ private:
   static const int spacing = 2;
   QIcon::Mode getIconMode(QStyle::State AState) const;
   QIcon::State getIconState(QStyle::State AState) const;
+private:
+  QSet<int> FBlinkLabels;
+  bool FShowBlinkLabels;
 };
 
 #endif // ROSTERINDEXDELEGATE_H

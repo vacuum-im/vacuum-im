@@ -12,6 +12,10 @@ class IRostersView :
   virtual public QTreeView
 {
 public:
+  enum LabelFlags {
+    LabelBlink        =0x1
+  };
+public:
   virtual QObject *instance() = 0;
   virtual void setModel(IRostersModel *AModel) =0; 
   virtual IRostersModel *rostersModel() const =0;
@@ -19,11 +23,13 @@ public:
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel) =0;
   virtual QAbstractProxyModel *lastProxyModel() const =0;
   virtual void removeProxyModel(QAbstractProxyModel *AProxyModel) =0;
-  virtual int createIndexLabel(int AOrder, const QVariant &ALabel) =0;
-  virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel) =0;
+  virtual int createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags = 0) =0;
+  virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFlags = 0) =0;
   virtual void insertIndexLabel(int ALabelId, IRosterIndex *AIndex) =0;
   virtual void removeIndexLabel(int ALabelId, IRosterIndex *AIndex) =0;
+  virtual void destroyIndexLabel(int ALabelId) =0;
   virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
+  virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const =0;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *) =0;
   virtual void modelSeted(IRostersModel *) =0;

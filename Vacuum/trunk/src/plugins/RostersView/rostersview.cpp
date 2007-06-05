@@ -19,6 +19,10 @@ RostersView::RostersView(QWidget *AParent)
   FIndexDataHolder = new IndexDataHolder(this);
   FRosterIndexDelegate = new RosterIndexDelegate(this);
 
+  FBlinkShow = true;
+  FBlinkTimer.setInterval(500);
+  connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimer()));
+
   header()->hide();
   setIndentation(10);
   setRootIsDecorated(false);
@@ -135,40 +139,43 @@ QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex)
     return AModelIndex;
 }
 
-int RostersView::createIndexLabel(int AOrder, const QVariant &ALabel)
+int RostersView::createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags)
 {
   int labelId = 0;
-  if (!ALabel.isNull())
+  if (ALabel.isValid())
   {
     while (labelId <= DISPLAY_LABEL_ID || FIndexLabels.contains(labelId))
       labelId = (rand()<<16)+rand();
     FIndexLabels.insert(labelId,ALabel);
     FIndexLabelOrders.insert(labelId,AOrder);
+    FIndexLabelFlags.insert(labelId,AFlags);
+    if (AFlags & IRostersView::LabelBlink)
+      appendBlinkLabel(labelId);
   }
   return labelId;
 }
 
-void RostersView::updateIndexLabel(int ALabelId, const QVariant &ALabel)
+void RostersView::updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFlags)
 {
-  if (FIndexLabels.contains(ALabelId) && FIndexLabels.value(ALabelId)!=ALabel)
+  if (ALabel.isValid() && FIndexLabels.contains(ALabelId) && FIndexLabels.value(ALabelId)!=ALabel)
   {
-    if (!ALabel.isValid())
+    FIndexLabels[ALabelId] = ALabel;
+    FIndexLabelFlags[ALabelId] = AFlags;
+    foreach (IRosterIndex *index, FIndexLabelIndexes.value(ALabelId))
     {
-      FIndexLabels[ALabelId] = ALabel;
-      foreach (IRosterIndex *index, FIndexLabelIndexes.value(ALabelId))
-      {
-        insertIndexLabel(ALabelId,index);
-      }
-    }
-    else
-    {
-      foreach (IRosterIndex *index, FIndexLabelIndexes.value(ALabelId))
-      {
-        removeIndexLabel(ALabelId,index);
-      }
-      FIndexLabels.remove(ALabelId);
-      FIndexLabelOrders.remove(ALabelId);
-      FIndexLabelIndexes.remove(ALabelId);
+      QList<QVariant> ids = index->data(IRosterIndex::DR_LabelIds).toList();
+      QList<QVariant> labels = index->data(IRosterIndex::DR_LabelValues).toList();
+      QList<QVariant> flags = index->data(IRosterIndex::DR_LabelFlags).toList();
+      int i = 0;
+      while (ids.at(i).toInt()!=ALabelId) i++;
+      labels[i] = ALabel;
+      flags[i] = AFlags;
+      if (AFlags & IRostersView::LabelBlink)
+        appendBlinkLabel(ALabelId);
+      else
+        removeBlinkLabel(ALabelId);
+      index->setData(IRosterIndex::DR_LabelValues,labels);
+      index->setData(IRosterIndex::DR_LabelFlags,flags);
     }
   }
 }
@@ -177,20 +184,21 @@ void RostersView::insertIndexLabel(int ALabelId, IRosterIndex *AIndex)
 {
   if (AIndex && FIndexLabels.contains(ALabelId) && !FIndexLabelIndexes.value(ALabelId).contains(AIndex))
   {
-    int order = FIndexLabelOrders.value(ALabelId);
-    QVariant label = FIndexLabels.value(ALabelId);
     QList<QVariant> ids = AIndex->data(IRosterIndex::DR_LabelIds).toList();
     QList<QVariant> labels = AIndex->data(IRosterIndex::DR_LabelValues).toList();
     QList<QVariant> orders = AIndex->data(IRosterIndex::DR_LabelOrders).toList();
+    QList<QVariant> flags = AIndex->data(IRosterIndex::DR_LabelFlags).toList();
     int i = 0;
-    while (i<orders.count() && orders.at(i).toInt() < order)
-      i++;
+    int order = FIndexLabelOrders.value(ALabelId);
+    while (i<orders.count() && orders.at(i).toInt() < order) i++;
     ids.insert(i,ALabelId);
     orders.insert(i,order);
-    labels.insert(i,label);
+    labels.insert(i,FIndexLabels.value(ALabelId)); 
+    flags.insert(i,FIndexLabelFlags.value(ALabelId));
     FIndexLabelIndexes[ALabelId] += AIndex;
     AIndex->setData(IRosterIndex::DR_LabelIds,ids);
     AIndex->setData(IRosterIndex::DR_LabelValues,labels);
+    AIndex->setData(IRosterIndex::DR_LabelFlags,flags);
     AIndex->setData(IRosterIndex::DR_LabelOrders,orders);
   }
 }
@@ -199,49 +207,54 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
 {
   if (AIndex && FIndexLabels.contains(ALabelId) && FIndexLabelIndexes.value(ALabelId).contains(AIndex))
   {
-    int order = FIndexLabelOrders.value(ALabelId);
-    QVariant label = FIndexLabels.value(ALabelId);
     QList<QVariant> ids = AIndex->data(IRosterIndex::DR_LabelIds).toList();
     QList<QVariant> labels = AIndex->data(IRosterIndex::DR_LabelValues).toList();
     QList<QVariant> orders = AIndex->data(IRosterIndex::DR_LabelOrders).toList();
+    QList<QVariant> flags = AIndex->data(IRosterIndex::DR_LabelFlags).toList();
     int i = 0;
-    while (i<orders.count() && ids.at(i).toInt()!=ALabelId)
-      i++;
+    while (i<ids.count() && ids.at(i).toInt()!=ALabelId) i++;
     ids.removeAt(i);
     orders.removeAt(i);
     labels.removeAt(i);
+    flags.removeAt(i);
     FIndexLabelIndexes[ALabelId] -= AIndex;
     if (FIndexLabelIndexes[ALabelId].isEmpty())
       FIndexLabelIndexes.remove(ALabelId);
     AIndex->setData(IRosterIndex::DR_LabelOrders,orders);
+    AIndex->setData(IRosterIndex::DR_LabelFlags,flags);
     AIndex->setData(IRosterIndex::DR_LabelValues,labels);
     AIndex->setData(IRosterIndex::DR_LabelIds,ids);
   }
 }
 
+void RostersView::destroyIndexLabel(int ALabelId)
+{
+  if (FIndexLabels.contains(ALabelId))
+  {
+    removeBlinkLabel(ALabelId);
+    foreach (IRosterIndex *index, FIndexLabelIndexes.value(ALabelId))
+      removeIndexLabel(ALabelId,index);
+    FIndexLabels.remove(ALabelId);
+    FIndexLabelOrders.remove(ALabelId);
+    FIndexLabelFlags.remove(ALabelId);
+    FIndexLabelIndexes.remove(ALabelId);
+  }
+}
+
 int RostersView::labelAt(const QPoint &APoint, const QModelIndex &AIndex) const
 {
-  QRect indexRect = visualRect(AIndex);
-  if (indexRect.contains(APoint))
-  {
-    if (itemDelegate(AIndex) != FRosterIndexDelegate)
-      return DISPLAY_LABEL_ID;
+  if (itemDelegate(AIndex) != FRosterIndexDelegate)
+    return DISPLAY_LABEL_ID;
 
-    QStyleOptionViewItemV2 option = viewOptions();
-    option.rect = indexRect;
-    option.showDecorationSelected |= selectionBehavior() & SelectRows;
-    option.state |= isExpanded(AIndex) ? QStyle::State_Open : QStyle::State_None;
-    if (hasFocus() && currentIndex() == AIndex)
-      option.state |= QStyle::State_HasFocus;
-    if (selectedIndexes().contains(AIndex))
-      option.state |= QStyle::State_Selected;
-    if ((AIndex.flags() & Qt::ItemIsEnabled) == 0)
-      option.state &= ~QStyle::State_Enabled;
-    if (indexAt(viewport()->mapFromGlobal(QCursor::pos())) == AIndex)
-      option.state |= QStyle::State_MouseOver;
-    return FRosterIndexDelegate->labelAt(APoint,option,AIndex);
-  }
-  return NULL_LABEL_ID;
+  return FRosterIndexDelegate->labelAt(APoint,indexOption(AIndex),AIndex);
+}
+
+QRect RostersView::labelRect(int ALabeld, const QModelIndex &AIndex) const
+{
+  if (itemDelegate(AIndex) != FRosterIndexDelegate)
+    return QRect();
+
+  return FRosterIndexDelegate->labelRect(ALabeld,indexOption(AIndex),AIndex);
 }
 
 void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
@@ -267,6 +280,39 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
     emit contextMenu(index,FContextMenu);
   if (!FContextMenu->isEmpty())
     FContextMenu->popup(AEvent->globalPos());
+}
+
+QStyleOptionViewItemV2 RostersView::indexOption(const QModelIndex &AIndex) const
+{
+  QStyleOptionViewItemV2 option = viewOptions();
+  option.rect = visualRect(AIndex);
+  option.showDecorationSelected |= selectionBehavior() & SelectRows;
+  option.state |= isExpanded(AIndex) ? QStyle::State_Open : QStyle::State_None;
+  if (hasFocus() && currentIndex() == AIndex)
+    option.state |= QStyle::State_HasFocus;
+  if (selectedIndexes().contains(AIndex))
+    option.state |= QStyle::State_Selected;
+  if ((AIndex.flags() & Qt::ItemIsEnabled) == 0)
+    option.state &= ~QStyle::State_Enabled;
+  if (indexAt(viewport()->mapFromGlobal(QCursor::pos())) == AIndex)
+    option.state |= QStyle::State_MouseOver;
+  return option;
+}
+
+void RostersView::appendBlinkLabel(int ALabelId)
+{
+  FBlinkLabels+=ALabelId;
+  FRosterIndexDelegate->appendBlinkLabel(ALabelId);
+  if (!FBlinkTimer.isActive())
+    FBlinkTimer.start();
+}
+
+void RostersView::removeBlinkLabel(int ALabelId)
+{
+  FBlinkLabels-=ALabelId;
+  FRosterIndexDelegate->removeBlinkLabel(ALabelId);
+  if (FBlinkLabels.isEmpty() && FBlinkTimer.isActive())
+    FBlinkTimer.stop();
 }
 
 bool RostersView::viewportEvent(QEvent *AEvent)
@@ -378,6 +424,25 @@ void RostersView::onIndexRemoved(IRosterIndex *AIndex)
       it = FIndexLabelIndexes.erase(it);
     else
       it++;
+  }
+}
+
+void RostersView::onBlinkTimer()
+{
+  FBlinkShow = !FBlinkShow;
+  FRosterIndexDelegate->setShowBlinkLabels(FBlinkShow);
+  foreach(int labelId,FBlinkLabels)
+  {
+    foreach(IRosterIndex *index, FIndexLabelIndexes.value(labelId))
+    {
+      QModelIndex modelIndex = mapFromModel(FRostersModel->modelIndexByRosterIndex(index));
+      if (modelIndex.isValid())
+      {
+        QRect rect = visualRect(modelIndex).adjusted(1,1,-1,-1);
+        if (!rect.isEmpty())
+          viewport()->repaint(rect);
+      }
+    }
   }
 }
 
