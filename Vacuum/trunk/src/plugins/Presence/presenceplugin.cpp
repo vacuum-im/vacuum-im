@@ -31,6 +31,10 @@ bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
   {
     connect(plugin->instance(), SIGNAL(added(IXmppStream *)),
       SLOT(onStreamAdded(IXmppStream *))); 
+    connect(plugin->instance(), SIGNAL(jidAboutToBeChanged(IXmppStream *, const Jid &)),
+      SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &))); 
+    connect(plugin->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)),
+      SLOT(onStreamJidChanged(IXmppStream *, const Jid &))); 
     connect(plugin->instance(), SIGNAL(removed(IXmppStream *)),
       SLOT(onStreamRemoved(IXmppStream *))); 
   }
@@ -90,13 +94,26 @@ void PresencePlugin::onStreamAdded(IXmppStream *AStream)
   emit presenceAdded(presence); 
 }
 
+void PresencePlugin::onStreamJidAboutToBeChanged(IXmppStream *AStream, const Jid &)
+{
+  FChangingStreams.append(AStream);
+}
+
+void PresencePlugin::onStreamJidChanged(IXmppStream *AStream, const Jid &)
+{
+  FChangingStreams.removeAt(FChangingStreams.indexOf(AStream));
+}
+
 void PresencePlugin::onStreamRemoved(IXmppStream *AStream)
 {
-  IPresence *presence = getPresence(AStream->jid());
-  if (presence)
+  if (!FChangingStreams.contains(AStream))
   {
-    emit presenceRemoved(presence);
-    removePresence(presence->streamJid());
+    IPresence *presence = getPresence(AStream->jid());
+    if (presence)
+    {
+      emit presenceRemoved(presence);
+      removePresence(presence->streamJid());
+    }
   }
 }
 

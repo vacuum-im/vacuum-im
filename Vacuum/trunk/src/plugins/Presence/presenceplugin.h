@@ -41,6 +41,8 @@ signals:
   virtual void presenceRemoved(IPresence *);
 protected slots:
   void onStreamAdded(IXmppStream *AStream);
+  void onStreamJidAboutToBeChanged(IXmppStream *AStream, const Jid &);
+  void onStreamJidChanged(IXmppStream *AStream, const Jid &);
   void onStreamRemoved(IXmppStream *AStream);
   void onPresenceOpened();
   void onSelfPresence(IPresence::Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
@@ -51,6 +53,7 @@ private:
   IStanzaProcessor *FStanzaProcessor;
 private:
   QList<Presence *> FPresences;
+  QList<IXmppStream *> FChangingStreams;
   QObjectCleanupHandler FCleanupHandler;
 };
 
