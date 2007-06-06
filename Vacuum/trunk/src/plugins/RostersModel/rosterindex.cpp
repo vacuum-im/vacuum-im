@@ -76,7 +76,6 @@ void RosterIndex::appendChild(IRosterIndex *AIndex)
     emit childAboutToBeInserted(AIndex);
     connect(AIndex->instance(),SIGNAL(destroyed(QObject *)),SLOT(onChildIndexDestroyed(QObject *)));
     emit childInserted(AIndex);
-    emit dataChanged(this,DR_AnyRole);
   }
 }
 
@@ -89,7 +88,6 @@ bool RosterIndex::removeChild(IRosterIndex *AIndex)
     AIndex->setParentIndex(0);
     disconnect(AIndex->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onChildIndexDestroyed(QObject *))); 
     emit childRemoved(AIndex);
-    emit dataChanged(this,DR_AnyRole);
 
     if (FRemoveOnLastChildRemoved && FChilds.isEmpty())
       QTimer::singleShot(0,this,SLOT(onRemoveByLastChildRemoved()));
