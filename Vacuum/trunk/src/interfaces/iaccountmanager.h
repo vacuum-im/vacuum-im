@@ -70,6 +70,12 @@ public:
   virtual IAccount *accountByStream(const Jid &AStreamJid) const =0;
   virtual void removeAccount(IAccount *AAccount) =0;
   virtual void destroyAccount(const QString &AAccountId) =0;
+signals:
+  virtual void added(IAccount *) =0;
+  virtual void shown(IAccount *) =0;
+  virtual void hidden(IAccount *) =0;
+  virtual void removed(IAccount *) =0;
+  virtual void destroyed(IAccount *) =0;
 };
 
 Q_DECLARE_INTERFACE(IAccount,"Vacuum.Plugin.IAccount/1.0")
