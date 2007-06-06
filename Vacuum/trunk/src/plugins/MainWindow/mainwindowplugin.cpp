@@ -92,15 +92,9 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId)
 {
   if (FMainWindow && ANotifyId == 0)
   {
-    if (FMainWindow->isVisible())
-    {
-      FMainWindow->hide();
-    }
-    else
-    {
+    if (!FMainWindow->isVisible())
       FMainWindow->show();
-      FMainWindow->activateWindow();
-    }
+    FMainWindow->activateWindow();
   }
 }
 
