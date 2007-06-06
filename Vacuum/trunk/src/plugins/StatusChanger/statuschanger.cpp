@@ -118,6 +118,7 @@ bool StatusChanger::initObjects()
     tbutton->setDefaultAction(mnuBase->menuAction());
     tbutton->setPopupMode(QToolButton::InstantPopup);
     tbutton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    tbutton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
     FMainWindowPlugin->mainWindow()->bottomToolBar()->addWidget(tbutton);
   }
 
