@@ -223,8 +223,7 @@ QWidget *AccountManager::optionsWidget(const QString &ANode, int &/*AOrder*/) co
         SLOT(onOptionsAccountAdded(const QString &)));
       connect(FAccountManage,SIGNAL(accountRemoved(const QString &)),
         SLOT(onOptionsAccountRemoved(const QString &)));
-      IAccount *account;
-      foreach(account,FAccounts)
+      foreach(IAccount *account,FAccounts)
       {
         FAccountManage->setAccount(account->accountId(),account->name(),
           account->streamJid().full(),account->isActive());
@@ -419,13 +418,13 @@ void AccountManager::onOptionsDialogRejected()
 
   QSet<QString> allAccounts = FAccountOptions.keys().toSet();
   QSet<QString> newAccounts = allAccounts - curAccounts;
+  QSet<QString> oldAccounts = curAccounts - allAccounts;
 
-  QString id;
-  foreach(id,newAccounts)
-  {
-    FAccountManage->removeAccount(id);
+  foreach(QString id,newAccounts)
     closeAccountOptionsNode(id);
-  }
+
+  foreach(QString id,oldAccounts)
+    openAccountOptionsNode(id,"");
 }
 
 void AccountManager::onSettingsOpened()
