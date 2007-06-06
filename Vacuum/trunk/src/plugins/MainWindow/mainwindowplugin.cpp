@@ -60,7 +60,7 @@ bool MainWindowPlugin::initObjects()
     connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
   }
 
-  FMainWindow = new MainWindow();
+  FMainWindow = new MainWindow(Qt::Tool);
   emit mainWindowCreated(FMainWindow);
 
   actQuit = new Action(this);
@@ -93,9 +93,14 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId)
   if (FMainWindow && ANotifyId == 0)
   {
     if (FMainWindow->isVisible())
+    {
       FMainWindow->hide();
+    }
     else
+    {
       FMainWindow->show();
+      FMainWindow->activateWindow();
+    }
   }
 }
 
