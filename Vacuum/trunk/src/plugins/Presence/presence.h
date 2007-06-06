@@ -16,7 +16,7 @@ class Presence :
   Q_INTERFACES(IPresence IStanzaProcessorHandler);
 
 public:
-  Presence(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject *parent);
+  Presence(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor);
   ~Presence();
 
   virtual QObject *instance() { return this; }

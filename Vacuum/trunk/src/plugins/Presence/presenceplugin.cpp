@@ -53,7 +53,7 @@ IPresence *PresencePlugin::newPresence(IXmppStream *AStream)
   Presence *presence = (Presence *)getPresence(AStream->jid());
   if (!presence)
   {
-    presence = new Presence(AStream,FStanzaProcessor,AStream->instance());
+    presence = new Presence(AStream,FStanzaProcessor);
     connect(presence,SIGNAL(destroyed(QObject *)),SLOT(onPresenceDestroyed(QObject *)));
     FCleanupHandler.add(presence); 
     FPresences.append(presence); 

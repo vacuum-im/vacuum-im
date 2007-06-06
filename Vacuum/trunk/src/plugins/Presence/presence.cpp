@@ -1,8 +1,8 @@
 #include "presence.h"
 #include "../../utils/errorhandler.h"
 
-Presence::Presence(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject *parent)
-  : QObject(parent)
+Presence::Presence(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor)
+  : QObject(AStream->instance())
 {
   FStream = AStream;
   connect(AStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *))); 
