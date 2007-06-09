@@ -74,7 +74,7 @@ protected slots:
   void onPresenceRemoved(IPresence *APresence);
   void onRosterOpened(IRoster *ARoster);
   void onRosterClosed(IRoster *ARoster);
-  void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
+  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onTrayContextMenu(int ANotifyId, Menu *AMenu);
   void onReconnectTimer();
   void onAccountShown(IAccount *AAccount);

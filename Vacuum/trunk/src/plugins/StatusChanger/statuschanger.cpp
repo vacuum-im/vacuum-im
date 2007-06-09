@@ -126,8 +126,8 @@ bool StatusChanger::initObjects()
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FConnectingLabel = FRostersView->createIndexLabel(STREAMCONNECTING_LABEL_ORDER,FRosterIconset.iconByName("connecting"));
-    connect(FRostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+    connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
+      SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
 
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
@@ -568,11 +568,11 @@ void StatusChanger::onRosterClosed(IRoster *ARoster)
   removeWaitOnline(presence);
 }
 
-void StatusChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu)
+void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex.isValid() && AIndex.data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
+  if (AIndex->data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
   {
-    QString streamJid = AIndex.data(IRosterIndex::DR_StreamJid).toString();
+    QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
     Menu *menu = streamMenu(streamJid);
     if (menu)
     {

@@ -71,7 +71,7 @@ protected slots:
   void onOptionsDialogRejected();
   void onSettingsOpened();
   void onSettingsClosed();
-  void onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu);
+  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 private:
   IPluginManager *FPluginManager;
   ISettingsPlugin *FSettingsPlugin;

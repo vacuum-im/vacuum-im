@@ -317,8 +317,8 @@ void AccountManager::onRostersViewCreated(IRostersView *ARostersView)
 {
   if (FSettingsPlugin)
   {
-    connect(ARostersView,SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+    connect(ARostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
+      SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
 }
 
@@ -442,11 +442,11 @@ void AccountManager::onSettingsClosed()
     removeAccount(FAccounts.at(0));
 }
 
-void AccountManager::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu)
+void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex.isValid() && AIndex.data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
+  if (AIndex && AIndex->data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
   {
-    QString streamJid = AIndex.data(IRosterIndex::DR_StreamJid).toString();
+    QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
     IAccount *account = accountByStream(streamJid);
     if (account)
     {

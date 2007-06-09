@@ -23,6 +23,8 @@ public:
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel) =0;
   virtual QAbstractProxyModel *lastProxyModel() const =0;
   virtual void removeProxyModel(QAbstractProxyModel *AProxyModel) =0;
+  virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex) =0;
+  virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) =0;
   virtual int createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags = 0) =0;
   virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFlags = 0) =0;
   virtual void insertIndexLabel(int ALabelId, IRosterIndex *AIndex) =0;
@@ -37,12 +39,12 @@ signals:
   virtual void proxyModelAdded(QAbstractProxyModel *) =0;
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *) =0;
   virtual void proxyModelRemoved(QAbstractProxyModel *) =0;
-  virtual void contextMenu(const QModelIndex &, Menu *) =0;
-  virtual void toolTips(const QModelIndex &, QMultiMap<int,QString> &AToolTips) =0;
-  virtual void labelContextMenu(const QModelIndex &, int ALabelId, Menu *) =0;
-  virtual void labelToolTips(const QModelIndex &, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
-  virtual void labelClicked(const QModelIndex &, int ALabelId) =0;
-  virtual void labelDoubleClicked(const QModelIndex &, int ALabelId, bool &AAccepted) =0;
+  virtual void contextMenu(IRosterIndex *, Menu *) =0;
+  virtual void toolTips(IRosterIndex *, QMultiMap<int,QString> &AToolTips) =0;
+  virtual void labelContextMenu(IRosterIndex *, int ALabelId, Menu *) =0;
+  virtual void labelToolTips(IRosterIndex *, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
+  virtual void labelClicked(IRosterIndex *, int ALabelId) =0;
+  virtual void labelDoubleClicked(IRosterIndex *, int ALabelId, bool &AAccepted) =0;
 };
 
 

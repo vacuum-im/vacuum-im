@@ -51,12 +51,12 @@ signals:
   virtual void proxyModelAdded(QAbstractProxyModel *);
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *);
   virtual void proxyModelRemoved(QAbstractProxyModel *);
-  virtual void contextMenu(const QModelIndex &AIndex, Menu *AMenu);
-  virtual void toolTips(const QModelIndex &AIndex, QMultiMap<int,QString> &AToolTips);
-  virtual void labelContextMenu(const QModelIndex &AIndex, int ALabelId, Menu *AMenu);
-  virtual void labelToolTips(const QModelIndex &AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
-  virtual void labelClicked(const QModelIndex &AIndex, int ALabelId);
-  virtual void labelDoubleClicked(const QModelIndex &AIndex, int ALabelId, bool &AAccepted);
+  virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  virtual void toolTips(IRosterIndex *AIndex, QMultiMap<int,QString> &AToolTips);
+  virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
+  virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+  virtual void labelClicked(IRosterIndex *AIndex, int ALabelId);
+  virtual void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
 protected:
   void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   void contextMenuEvent(QContextMenuEvent *AEvent);
@@ -88,7 +88,7 @@ private:
   QHash<int, int /*Flags*/> FIndexLabelFlags;
   QHash<int, QSet<IRosterIndex *> > FIndexLabelIndexes;
   int FPressedLabel;
-  QModelIndex FPressedIndex;
+  IRosterIndex *FPressedIndex;
 };
 
 #endif // ROSTERSVIEW_H

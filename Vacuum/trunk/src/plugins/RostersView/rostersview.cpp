@@ -13,7 +13,7 @@ RostersView::RostersView(QWidget *AParent)
 
   FRostersModel = NULL;
   FPressedLabel = DISPLAY_LABEL_ID;
-  FPressedIndex = QModelIndex();
+  FPressedIndex = NULL;
 
   FContextMenu = new Menu(this);
   FIndexDataHolder = new IndexDataHolder(this);
@@ -271,8 +271,12 @@ void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QMo
 
 void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
 {
-  QModelIndex index = indexAt(AEvent->pos());
-  const int labelId = labelAt(AEvent->pos(),index);
+  QModelIndex modelIndex = indexAt(AEvent->pos());
+  const int labelId = labelAt(AEvent->pos(),modelIndex);
+
+  modelIndex = mapToModel(modelIndex);
+  IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
+  
   FContextMenu->clear();
   if (labelId > DISPLAY_LABEL_ID)
     emit labelContextMenu(index,labelId,FContextMenu);
@@ -322,18 +326,21 @@ bool RostersView::viewportEvent(QEvent *AEvent)
   case QEvent::ToolTip:
     {
       QHelpEvent *helpEvent = static_cast<QHelpEvent *>(AEvent); 
-      QModelIndex index = indexAt(helpEvent->pos());
-      if (index.isValid())
+      QModelIndex modelIndex = indexAt(helpEvent->pos());
+      if (modelIndex.isValid())
       {
         QMultiMap<int,QString> toolTipsMap;
+        const int labelId = labelAt(helpEvent->pos(),modelIndex);
+        
+        modelIndex = mapToModel(modelIndex);
+        IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
 
-        const int labelId = labelAt(helpEvent->pos(),index);
         if (labelId > DISPLAY_LABEL_ID)
           emit labelToolTips(index,labelId,toolTipsMap);
 
         if (toolTipsMap.isEmpty())
         {
-          toolTipsMap.insert(ROSTERSVIEW_TOOLTIPORDER,index.data(Qt::ToolTipRole).toString());
+          toolTipsMap.insert(ROSTERSVIEW_TOOLTIPORDER,index->data(Qt::ToolTipRole).toString());
           emit toolTips(index,toolTipsMap);
         }
 
@@ -359,10 +366,13 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 {
   if (viewport()->rect().contains(AEvent->pos()))
   {
-    const QModelIndex index = indexAt(AEvent->pos());
-    const int labelId = labelAt(AEvent->pos(),index);
-    if (index.isValid() && labelId > DISPLAY_LABEL_ID)
+    QModelIndex modelIndex = indexAt(AEvent->pos());
+    const int labelId = labelAt(AEvent->pos(),modelIndex);
+    if (modelIndex.isValid() && labelId > DISPLAY_LABEL_ID)
     {
+      modelIndex = mapToModel(modelIndex);
+      IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
+     
       bool accepted = false;
       emit labelDoubleClicked(index,labelId,accepted);
       if (accepted) 
@@ -376,12 +386,13 @@ void RostersView::mousePressEvent(QMouseEvent *AEvent)
 {
   if (viewport()->rect().contains(AEvent->pos()))
   {
-    const QModelIndex index = indexAt(AEvent->pos());
-    const int labelId = labelAt(AEvent->pos(),index);
-    if (index.isValid() && labelId > DISPLAY_LABEL_ID)
+    QModelIndex modelIndex = indexAt(AEvent->pos());
+    const int labelId = labelAt(AEvent->pos(),modelIndex);
+    if (modelIndex.isValid() && labelId > DISPLAY_LABEL_ID)
     {
+      modelIndex = mapToModel(modelIndex);
+      FPressedIndex = static_cast<IRosterIndex *>(modelIndex.internalPointer());
       FPressedLabel = labelId;
-      FPressedIndex = index;
     }
   }
   QTreeView::mousePressEvent(AEvent);
@@ -391,10 +402,12 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 {
   if (viewport()->rect().contains(AEvent->pos()))
   {
-    const QModelIndex index = indexAt(AEvent->pos());
-    const int labelId = labelAt(AEvent->pos(),index);
-    if (index.isValid() && labelId > DISPLAY_LABEL_ID)
+    QModelIndex modelIndex = indexAt(AEvent->pos());
+    const int labelId = labelAt(AEvent->pos(),modelIndex);
+    if (modelIndex.isValid() && labelId > DISPLAY_LABEL_ID)
     {
+      modelIndex = mapToModel(modelIndex);
+      IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
       if (FPressedIndex == index && FPressedLabel == labelId)
       {
         emit labelClicked(index,labelId);
@@ -402,7 +415,7 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
     }
   }
   FPressedLabel = DISPLAY_LABEL_ID;
-  FPressedIndex = QModelIndex();
+  FPressedIndex = NULL;
   QTreeView::mouseReleaseEvent(AEvent);
 }
 
