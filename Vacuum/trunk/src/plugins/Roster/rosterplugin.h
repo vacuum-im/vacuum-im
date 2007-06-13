@@ -35,9 +35,10 @@ public:
 signals:
   virtual void rosterAdded(IRoster *);
   virtual void rosterOpened(IRoster *);
+  virtual void rosterClosed(IRoster *);
   virtual void rosterItemPush(IRoster *, IRosterItem *);
   virtual void rosterItemRemoved(IRoster *, IRosterItem *);
-  virtual void rosterClosed(IRoster *);
+  virtual void rosterSubscription(IRoster *, const Jid &, IRoster::SubsType, const QString &);
   virtual void rosterRemoved(IRoster *);
 protected slots:
   void onStreamAdded(IXmppStream *AStream);
@@ -46,6 +47,7 @@ protected slots:
   void onRosterClosed();
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onRosterItemRemoved(IRosterItem *ARosterItem);
+  void onRosterSubscription(const Jid &AJid, IRoster::SubsType ASType, const QString &AStatus);
   void onRosterDestroyed(QObject *ARoster);
 private:
   IStanzaProcessor *FStanzaProcessor;

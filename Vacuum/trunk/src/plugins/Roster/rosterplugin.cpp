@@ -47,7 +47,7 @@ IRoster *RosterPlugin::newRoster(IXmppStream *AStream)
   Roster *roster = (Roster *)getRoster(AStream->jid());
   if (!roster)
   {
-    roster = new Roster(AStream, FStanzaProcessor, AStream->instance());
+    roster = new Roster(AStream, FStanzaProcessor);
     connect(roster,SIGNAL(destroyed(QObject *)),SLOT(onRosterDestroyed(QObject *)));
     FCleanupHandler.add(roster); 
     FRosters.append(roster); 
@@ -84,6 +84,8 @@ void RosterPlugin::onStreamAdded(IXmppStream *AStream)
   connect(roster->instance(),SIGNAL(closed()),SLOT(onRosterClosed()));
   connect(roster->instance(),SIGNAL(itemPush(IRosterItem *)),SLOT(onRosterItemPush(IRosterItem *)));
   connect(roster->instance(),SIGNAL(itemRemoved(IRosterItem *)),SLOT(onRosterItemRemoved(IRosterItem *)));
+  connect(roster->instance(),SIGNAL(subscription(const Jid &, IRoster::SubsType, const QString &)),
+    SLOT(onRosterSubscription(const Jid &, IRoster::SubsType, const QString &)));
   emit rosterAdded(roster); 
 }
 
@@ -123,6 +125,13 @@ void RosterPlugin::onRosterItemRemoved(IRosterItem *ARosterItem)
   Roster *roster = qobject_cast<Roster *>(sender());
   if (roster)
     emit rosterItemRemoved(roster,ARosterItem); 
+}
+
+void RosterPlugin::onRosterSubscription(const Jid &AJid, IRoster::SubsType ASType, const QString &AStatus)
+{
+  Roster *roster = qobject_cast<Roster *>(sender());
+  if (roster)
+    emit rosterSubscription(roster,AJid,ASType,AStatus);
 }
 
 void RosterPlugin::onRosterDestroyed(QObject *ARoster)

@@ -3,8 +3,8 @@
 
 #include <QSet>
 
-Roster::Roster(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject *parent) 
-  : QObject(parent)
+Roster::Roster(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor) 
+  : QObject(AStream->instance())
 {
   FStream = AStream;
   FStanzaProcessor = AStanzaProcessor;
@@ -251,7 +251,7 @@ void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QStri
   FStanzaProcessor->sendIqStanza(this,FStream->jid(),query,0);
 }
 
-void Roster::sendSubscription(const Jid &AItemJid, IRoster::SubscriptionType AType, const QString &AStatus)
+void Roster::sendSubscription(const Jid &AItemJid, IRoster::SubsType AType, const QString &AStatus)
 {
   QString type;
   if (AType == IRoster::Subscribe)

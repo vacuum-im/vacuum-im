@@ -17,7 +17,7 @@ class Roster :
   Q_INTERFACES(IRoster IStanzaProcessorHandler IStanzaProcessorIqOwner);
 
 public:
-  Roster(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor, QObject *parent);
+  Roster(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor);
   ~Roster();
 
   virtual QObject *instance() { return this; }
@@ -41,7 +41,7 @@ public:
   virtual QList<IRosterItem *> groupItems(const QString &AGroup) const;
   virtual QSet<QString> itemGroups(const Jid &AItemJid) const;
   virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups);
-  virtual void sendSubscription(const Jid &AItemJid, SubscriptionType AType, const QString &AStatus = QString()); 
+  virtual void sendSubscription(const Jid &AItemJid, SubsType AType, const QString &AStatus = QString()); 
   virtual void removeItem(const Jid &AItemJid);
   //Operations on items
   virtual void renameItem(const Jid &AItemJid, const QString &AName);
@@ -61,7 +61,7 @@ signals:
   virtual void closed();
   virtual void itemPush(IRosterItem *);
   virtual void itemRemoved(IRosterItem *);
-  virtual void subscription(const Jid &AItemJid, SubscriptionType AType, const QString &AStatus);
+  virtual void subscription(const Jid &AItemJid, IRoster::SubsType AType, const QString &AStatus);
 protected:
   bool requestGroupDelimiter();
   bool requestRosterItems();
