@@ -2,11 +2,22 @@
 
 #include <QInputDialog>
 #include <QMessageBox>
+#include "subscriptiondialog.h"
 
 RosterChanger::RosterChanger()
 {
-  FAddContactMenu = NULL;
+  FRosterPlugin = NULL;
+  FRostersModelPlugin = NULL;
+  FRostersModel = NULL;
+  FRostersViewPlugin = NULL;
+  FRostersView = NULL;
+  FMainWindowPlugin = NULL;
   FTrayManager = NULL;
+
+  FAddContactMenu = NULL;
+  FSubsLabelId = 0;
+
+  FSystemIconset.openFile(SYSTEM_ICONSETFILE);
 }
 
 RosterChanger::~RosterChanger()
@@ -38,7 +49,16 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     {
       connect(FRosterPlugin->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
       connect(FRosterPlugin->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
+      connect(FRosterPlugin->instance(),
+        SIGNAL(rosterSubscription(IRoster *, const Jid &, IRoster::SubsType, const QString &)),
+        SLOT(onReceiveSubscription(IRoster *, const Jid &, IRoster::SubsType, const QString &)));
     }
+  }
+
+  plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
   }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
@@ -60,6 +80,7 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     if (FTrayManager)
     {
       connect(FTrayManager->instance(),SIGNAL(contextMenu(int, Menu *)),SLOT(onTrayContextMenu(int, Menu *)));
+      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int)),SLOT(onTrayNotifyActivated(int)));
     }
   }
 
@@ -68,10 +89,22 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 bool RosterChanger::initObjects()
 {
+  if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
+  {
+    FRostersModel = FRostersModelPlugin->rostersModel();
+  }
+
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
   {
-    connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(const QModelIndex &, Menu *)),
-      SLOT(onRostersViewContextMenu(const QModelIndex &, Menu *)));
+    FRostersView = FRostersViewPlugin->rostersView();
+    FSubsLabelId = FRostersView->createIndexLabel(ROSTERCHANGER_LABEL_ORDER,
+      FSystemIconset.iconByName("psi/events"),IRostersView::LabelBlink);
+    connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
+      SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersView,SIGNAL(labelDoubleClicked(IRosterIndex *, int, bool &)),
+      SLOT(onRosterLabelDClicked(IRosterIndex *, int, bool &)));
+    connect(FRostersView,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
+      SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
   }
 
   if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
@@ -202,21 +235,51 @@ Menu * RosterChanger::createGroupMenu(const QHash<int,QVariant> AData, const QSe
   return menu;
 }
 
-void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AMenu)
+IRosterIndexList RosterChanger::getContactIndexList(const Jid &AStreamJid, const Jid &AJid)
 {
-  if (!AIndex.isValid())
-    return;
+  IRosterIndexList indexList;
+  if (FRostersModel)
+  {
+    IRosterIndex *streamRoot = FRostersModel->getStreamRoot(AStreamJid);
+    if (streamRoot)
+    {
+      IRosterIndex::ItemType type = IRosterIndex::IT_Contact;
+      if (AJid.node().isEmpty())
+        type = IRosterIndex::IT_Agent;
+      QHash<int,QVariant> data;
+      data.insert(IRosterIndex::DR_Type, type);
+      data.insert(IRosterIndex::DR_BareJid, AJid.pBare());
+      indexList = streamRoot->findChild(data,true);
+      if (indexList.isEmpty())
+      {
+        IRoster *roster = FRostersModel->getRoster(AStreamJid.pFull());
+        IRosterIndex *notInRosterGroup = FRostersModel->createGroup(FRostersModel->notInRosterGroupName(),
+          roster->groupDelimiter(),IRosterIndex::IT_NotInRosterGroup,streamRoot);
+        IRosterIndex *index = FRostersModel->createRosterIndex(type,AJid.pBare(),notInRosterGroup);
+        index->setData(IRosterIndex::DR_Jid,AJid.full());
+        index->setData(IRosterIndex::DR_PJid,AJid.pFull());
+        index->setData(IRosterIndex::DR_BareJid,AJid.pBare());
+        index->setData(IRosterIndex::DR_Group,FRostersModel->notInRosterGroupName());
+        FRostersModel->insertRosterIndex(index,notInRosterGroup);
+        indexList.append(index);
+      }
+    }
+  }
+  return indexList;
+}
 
-  QString streamJid = AIndex.data(IRosterIndex::DR_StreamJid).toString();
+void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+{
+  QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
   IRoster *roster = FRosterPlugin->getRoster(streamJid);
   if (roster && roster->isOpen())
   {
-    int itemType = AIndex.data(IRosterIndex::DR_Type).toInt();
-    IRosterItem *rosterItem = roster->item(AIndex.data(IRosterIndex::DR_BareJid).toString());
+    int itemType = AIndex->data(IRosterIndex::DR_Type).toInt();
+    IRosterItem *rosterItem = roster->item(AIndex->data(IRosterIndex::DR_BareJid).toString());
     if (itemType == IRosterIndex::IT_StreamRoot)
     {
       QHash<int,QVariant> data;
-      data.insert(Action::DR_StreamJid,AIndex.data(IRosterIndex::DR_Jid));
+      data.insert(Action::DR_StreamJid,AIndex->data(IRosterIndex::DR_Jid));
 
       Action *action = new Action(AMenu);
       action->setText(tr("Add contact..."));
@@ -228,7 +291,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
     else if (itemType == IRosterIndex::IT_Contact || itemType == IRosterIndex::IT_Agent)
     {
       QHash<int,QVariant> data;
-      data.insert(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_BareJid));
+      data.insert(Action::DR_Parametr1,AIndex->data(IRosterIndex::DR_BareJid));
       data.insert(Action::DR_StreamJid,streamJid);
       
       Action *action;
@@ -270,8 +333,8 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       {
         QSet<QString> exceptGroups = rosterItem->groups();
 
-        data.insert(Action::DR_Parametr2,AIndex.data(IRosterIndex::DR_Name));
-        data.insert(Action::DR_Parametr3,AIndex.data(IRosterIndex::DR_Group));
+        data.insert(Action::DR_Parametr2,AIndex->data(IRosterIndex::DR_Name));
+        data.insert(Action::DR_Parametr3,AIndex->data(IRosterIndex::DR_Group));
 
         action = new Action(AMenu);
         action->setText(tr("Rename..."));
@@ -290,7 +353,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
           AMenu->addAction(moveItem->menuAction(),ROSTERCHANGER_ACTION_GROUP);
         }
 
-        if (!AIndex.data(IRosterIndex::DR_Group).toString().isEmpty())
+        if (!AIndex->data(IRosterIndex::DR_Group).toString().isEmpty())
         {
           action = new Action(AMenu);
           action->setText(tr("Remove from group"));
@@ -311,7 +374,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
         action->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
         action->setText(tr("Add contact..."));
         action->setData(Action::DR_StreamJid,streamJid);
-        action->setData(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_Jid));
+        action->setData(Action::DR_Parametr1,AIndex->data(IRosterIndex::DR_Jid));
         connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
         AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP_CONTACT,true);
       }
@@ -319,7 +382,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
     else if (itemType == IRosterIndex::IT_Group)
     {
       QHash<int,QVariant> data;
-      data.insert(Action::DR_Parametr1,AIndex.data(IRosterIndex::DR_Group));
+      data.insert(Action::DR_Parametr1,AIndex->data(IRosterIndex::DR_Group));
       data.insert(Action::DR_StreamJid,streamJid);
       
       Action *action;
@@ -330,7 +393,7 @@ void RosterChanger::onRostersViewContextMenu(const QModelIndex &AIndex, Menu *AM
       AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
 
       QSet<QString> exceptGroups;
-      exceptGroups << AIndex.data(IRosterIndex::DR_Group).toString();
+      exceptGroups << AIndex->data(IRosterIndex::DR_Group).toString();
 
       Menu *copyGroup = createGroupMenu(data,exceptGroups,true,true,SLOT(onCopyGroupToGroup(bool)),AMenu);
       copyGroup->setTitle(tr("Copy to group"));
@@ -365,10 +428,40 @@ void RosterChanger::onSendSubscription(bool)
     if (roster && roster->isOpen())
     {
       QString rosterJid = action->data(Action::DR_Parametr1).toString();
-      IRoster::SubscriptionType subsType = (IRoster::SubscriptionType)action->data(Action::DR_Parametr2).toInt();
+      IRoster::SubsType subsType = (IRoster::SubsType)action->data(Action::DR_Parametr2).toInt();
       roster->sendSubscription(rosterJid,subsType);
     }
   }
+}
+
+void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid, 
+                                          IRoster::SubsType AType, const QString &AStatus)
+{
+  Jid sjid = ARoster->streamJid();
+  QList<SubsItem *> &subsItems = FSubsItems[AFromJid];
+  
+  SubsItem *subsItem = new SubsItem;
+  subsItem->streamJid = sjid;
+  subsItem->contactJid = AFromJid;
+  subsItem->type = AType;
+  subsItem->status = AStatus;
+  subsItem->time = QDateTime::currentDateTime();
+
+  if (FTrayManager)
+  {
+    subsItem->trayId = FTrayManager->appendNotify(FSystemIconset.iconByName("psi/events"),
+      QString(tr("Subscription event from %1")).arg(AFromJid.full()),true);
+    FTrayIdToJid.insert(subsItem->trayId,AFromJid);
+  }
+
+  if (FRostersView)
+  {
+    IRosterIndexList indexList = getContactIndexList(sjid,AFromJid);
+    foreach(IRosterIndex *index, indexList)
+      FRostersView->insertIndexLabel(FSubsLabelId,index);
+  }
+
+  subsItems.append(subsItem);
 }
 
 void RosterChanger::onRenameItem(bool)
@@ -648,6 +741,32 @@ void RosterChanger::onRosterClosed(IRoster *ARoster)
     if (FActions.count() == 0)
       FAddContactMenu->menuAction()->setEnabled(false);
     delete action;
+  }
+}
+
+void RosterChanger::onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted)
+{
+  if (ALabelId == FSubsLabelId)
+  {
+    FRostersView->removeIndexLabel(ALabelId,AIndex);
+    AAccepted = true;
+  }
+}
+
+void RosterChanger::onRosterLabelToolTips(IRosterIndex *AModelIndex, int ALabelId, 
+                                          QMultiMap<int,QString> &AToolTips)
+{
+  if (ALabelId == FSubsLabelId)
+  {
+
+  }
+}
+
+void RosterChanger::onTrayNotifyActivated(int ANotifyId)
+{
+  if (FTrayIdToJid.contains(ANotifyId))
+  {
+
   }
 }
 
