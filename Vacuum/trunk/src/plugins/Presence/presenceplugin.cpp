@@ -106,15 +106,15 @@ void PresencePlugin::onStreamJidChanged(IXmppStream *AStream, const Jid &)
 
 void PresencePlugin::onStreamRemoved(IXmppStream *AStream)
 {
-  if (!FChangingStreams.contains(AStream))
-  {
+  //if (!FChangingStreams.contains(AStream))
+  //{
     IPresence *presence = getPresence(AStream->jid());
     if (presence)
     {
       emit presenceRemoved(presence);
       removePresence(presence->streamJid());
     }
-  }
+  //}
 }
 
 void PresencePlugin::onPresenceOpened()
