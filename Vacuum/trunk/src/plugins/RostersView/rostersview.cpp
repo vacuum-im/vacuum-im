@@ -272,18 +272,21 @@ void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QMo
 void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
 {
   QModelIndex modelIndex = indexAt(AEvent->pos());
-  const int labelId = labelAt(AEvent->pos(),modelIndex);
+  if (modelIndex.isValid())
+  {
+    const int labelId = labelAt(AEvent->pos(),modelIndex);
 
-  modelIndex = mapToModel(modelIndex);
-  IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-  
-  FContextMenu->clear();
-  if (labelId > DISPLAY_LABEL_ID)
-    emit labelContextMenu(index,labelId,FContextMenu);
-  if (FContextMenu->isEmpty())
-    emit contextMenu(index,FContextMenu);
-  if (!FContextMenu->isEmpty())
-    FContextMenu->popup(AEvent->globalPos());
+    modelIndex = mapToModel(modelIndex);
+    IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
+
+    FContextMenu->clear();
+    if (labelId > DISPLAY_LABEL_ID)
+      emit labelContextMenu(index,labelId,FContextMenu);
+    if (FContextMenu->isEmpty())
+      emit contextMenu(index,FContextMenu);
+    if (!FContextMenu->isEmpty())
+      FContextMenu->popup(AEvent->globalPos());
+  }
 }
 
 QStyleOptionViewItemV2 RostersView::indexOption(const QModelIndex &AIndex) const
