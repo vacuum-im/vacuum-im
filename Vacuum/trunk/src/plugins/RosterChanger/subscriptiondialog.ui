@@ -44,28 +44,18 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="font" >
+        <font>
+         <weight>75</weight>
+         <italic>false</italic>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="frameShape" >
         <enum>QFrame::StyledPanel</enum>
        </property>
        <property name="text" >
         <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="lblTime" >
-       <property name="text" >
-        <string>Time:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="lblDateTime" >
-       <property name="frameShape" >
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="text" >
-        <string>99.99.9999 99:99</string>
        </property>
       </widget>
      </item>
@@ -101,6 +91,23 @@
        </property>
        <property name="text" >
         <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblTime" >
+       <property name="text" >
+        <string>Time:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblDateTime" >
+       <property name="frameShape" >
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="text" >
+        <string>99.99.9999 99:99:99</string>
        </property>
       </widget>
      </item>
@@ -150,7 +157,7 @@
         <string>Confirm subscription request</string>
        </property>
        <property name="text" >
-        <string>Add/Auth</string>
+        <string>Auth</string>
        </property>
       </widget>
      </item>

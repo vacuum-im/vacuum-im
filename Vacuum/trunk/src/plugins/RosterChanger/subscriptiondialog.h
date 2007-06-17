@@ -22,8 +22,8 @@ public:
   ~SubscriptionDialog();
 
   void setupDialog(const Jid &AStreamJid, const Jid &AContactJid, QDateTime ATime, 
-    IRoster::SubsType ASubsType, const QString &AStatus);
-  void setNext(bool ANext);
+    IRoster::SubsType ASubsType, const QString &AStatus, const QString &ASubs);
+  void setNextCount(int ANext);
   Action *dialogAction() const { return FDialogAction; }
   
   //ISubscriptionDialog
@@ -32,6 +32,7 @@ public:
   virtual const QDateTime &dateTime() const { return FDateTime; }
   virtual int subsType() const { return FSubsType; }
   virtual const QString &status() const { return FStatus; }
+  virtual const QString &subscription() const { return FSubscription; }
   virtual QTextEdit *message() const { return tedMessage; }
   virtual QToolBar *toolBar() const { return FToolBar; }
   virtual QButtonGroup *buttonGroup() const { return FButtonGroup; }
@@ -50,6 +51,8 @@ private:
   QDateTime FDateTime;
   IRoster::SubsType FSubsType;
   QString FStatus;
+  int FNextCount;
+  QString FSubscription;
 };
 
 #endif // SUBSCRIPTIONDIALOG_H

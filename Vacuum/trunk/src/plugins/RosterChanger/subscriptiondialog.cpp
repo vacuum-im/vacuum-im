@@ -22,13 +22,14 @@ SubscriptionDialog::~SubscriptionDialog()
 }
 
 void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJid, QDateTime ATime, 
-                                     IRoster::SubsType ASubsType, const QString &AStatus)
+                                     IRoster::SubsType ASubsType, const QString &AStatus, const QString &ASubs)
 {
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
   FDateTime = ATime;
   FSubsType = ASubsType;
   FStatus = AStatus;
+  FSubscription = ASubs;
 
   FDialogAction->setData(Action::DR_StreamJid,AStreamJid.pFull());
   FDialogAction->setData(Action::DR_Parametr1,AContactJid.pBare());
@@ -57,7 +58,7 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
     }
   case IRoster::Unsubscribe:
     {
-      tedMessage->setText(tr("<b>Subscription refused</b><br>"));
+      tedMessage->setText(tr("<b>Subscription refused</b>"));
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
       tedMessage->append(tr("<b>%1 unsubscribed from your presence.</b>").arg(AContactJid.bare()));
@@ -65,26 +66,35 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
     }
   case IRoster::Unsubscribed:
     {
-      tedMessage->setText(tr("<b>Subscription rejected</b><br>"));
+      tedMessage->setText(tr("<b>Subscription rejected</b>"));
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
       tedMessage->append(tr("<b>You are now unsubscribed from %1 presence.</b>").arg(AContactJid.bare()));
       break;
     }
   }
+
   tedMessage->append(tr("<br>Click <b>Ask</b> to ask for contact presence subscription."));
-  tedMessage->append(tr("Click <b>Add/Auth</b> to authorize the subscription and add the contact to your contact list."));
+  tedMessage->append(tr("Click <b>Auth</b> to authorize the subscription and add the contact to your contact list."));
   tedMessage->append(tr("Click <b>Refuse</b> to refuse from presence subscription."));
   tedMessage->append(tr("Click <b>Reject</b> to reject the presence subscription."));
+
   emit dialogReady();
 }
 
-void SubscriptionDialog::setNext(bool ANext)
+void SubscriptionDialog::setNextCount(int ANextCount)
 {
-  if (ANext)
+  FNextCount = ANextCount;
+  if (FNextCount>0)
+  {
+    pbtNext->setText(tr("Next - %1").arg(FNextCount));
     pbtNext->setEnabled(true);
+  }
   else
+  {
+    pbtNext->setText(tr("Next"));
     pbtNext->setEnabled(false);
+  }
 }
 
 void SubscriptionDialog::onButtonClicked(int AId)

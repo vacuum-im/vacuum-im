@@ -2,7 +2,6 @@
 
 #include <QInputDialog>
 #include <QMessageBox>
-#include "subscriptiondialog.h"
 
 RosterChanger::RosterChanger()
 {
@@ -15,6 +14,7 @@ RosterChanger::RosterChanger()
   FTrayManager = NULL;
 
   FAddContactMenu = NULL;
+  FSubsId = 0;
   FSubsLabelId = 0;
 
   FSystemIconset.openFile(SYSTEM_ICONSETFILE);
@@ -22,7 +22,7 @@ RosterChanger::RosterChanger()
 
 RosterChanger::~RosterChanger()
 {
-
+  qDeleteAll(FSubsItems);
 }
 
 //IPlugin
@@ -268,6 +268,69 @@ IRosterIndexList RosterChanger::getContactIndexList(const Jid &AStreamJid, const
   return indexList;
 }
 
+void RosterChanger::openSubsDialog(int ASubsId)
+{
+  if (FSubsItems.contains(ASubsId))
+  {
+    SubsItem *subsItem = FSubsItems.value(ASubsId);
+
+    if (FSubsDialog.isNull())
+    {
+      FSubsDialog = new SubscriptionDialog;
+      connect(FSubsDialog,SIGNAL(setupNext()),SLOT(onSubsDialogSetupNext()));
+      connect(FSubsDialog->dialogAction(),SIGNAL(triggered(bool)),SLOT(onSendSubscription(bool)));
+    }
+    
+    QString subs = "none";
+    IRoster *roster = FRosterPlugin->getRoster(subsItem->streamJid);
+    if (roster && roster->isOpen())
+    {
+      IRosterItem *rosterItem = roster->item(subsItem->contactJid);
+      if (rosterItem)
+        subs = rosterItem->subscription();
+    }
+
+    FSubsDialog->setupDialog(subsItem->streamJid,subsItem->contactJid,subsItem->time,subsItem->type,subsItem->status,subs);
+    FSubsDialog->show();
+    FSubsDialog->activateWindow();
+
+    removeSubsMessage(ASubsId);
+  }
+}
+
+void RosterChanger::removeSubsMessage(int ASubsId)
+{
+  if (FSubsItems.contains(ASubsId))
+  {
+    SubsItem *subsItem = FSubsItems.take(ASubsId);
+
+    if (!FSubsDialog.isNull())
+      FSubsDialog->setNextCount(FSubsItems.count());
+
+    if (FTrayManager)
+      FTrayManager->removeNotify(subsItem->trayId);
+
+    if (FRostersView)
+    {
+      bool removeLabel = true;
+      foreach(SubsItem *sItem,FSubsItems)
+        if (sItem->streamJid == subsItem->streamJid && sItem->contactJid.equals(subsItem->contactJid,false))
+        {
+          removeLabel = false;
+          break;
+        };
+      if (removeLabel)
+      {
+        IRosterIndexList indexList = getContactIndexList(subsItem->streamJid, subsItem->contactJid);
+        foreach(IRosterIndex *index, indexList)
+          FRostersView->removeIndexLabel(FSubsLabelId,index);
+      }
+    }
+
+    delete subsItem;
+  }
+}
+
 void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
@@ -291,8 +354,8 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     else if (itemType == IRosterIndex::IT_Contact || itemType == IRosterIndex::IT_Agent)
     {
       QHash<int,QVariant> data;
-      data.insert(Action::DR_Parametr1,AIndex->data(IRosterIndex::DR_BareJid));
       data.insert(Action::DR_StreamJid,streamJid);
+      data.insert(Action::DR_Parametr1,AIndex->data(IRosterIndex::DR_BareJid));
       
       Action *action;
 
@@ -361,12 +424,6 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
           connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromGroup(bool)));
           AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
         }
-
-        action = new Action(AMenu);
-        action->setText(tr("Remove from roster"));
-        action->setData(data);
-        connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromRoster(bool)));
-        AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
       }
       else
       {
@@ -378,6 +435,12 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
         connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
         AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP_CONTACT,true);
       }
+
+      action = new Action(AMenu);
+      action->setText(tr("Remove from roster"));
+      action->setData(data);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromRoster(bool)));
+      AMenu->addAction(action,ROSTERCHANGER_ACTION_GROUP);
     }
     else if (itemType == IRosterIndex::IT_Group)
     {
@@ -437,11 +500,8 @@ void RosterChanger::onSendSubscription(bool)
 void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid, 
                                           IRoster::SubsType AType, const QString &AStatus)
 {
-  Jid sjid = ARoster->streamJid();
-  QList<SubsItem *> &subsItems = FSubsItems[AFromJid];
-  
   SubsItem *subsItem = new SubsItem;
-  subsItem->streamJid = sjid;
+  subsItem->streamJid = ARoster->streamJid();
   subsItem->contactJid = AFromJid;
   subsItem->type = AType;
   subsItem->status = AStatus;
@@ -450,18 +510,20 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid,
   if (FTrayManager)
   {
     subsItem->trayId = FTrayManager->appendNotify(FSystemIconset.iconByName("psi/events"),
-      QString(tr("Subscription event from %1")).arg(AFromJid.full()),true);
-    FTrayIdToJid.insert(subsItem->trayId,AFromJid);
+      tr("Subscription message from %1").arg(AFromJid.full()),true);
   }
 
   if (FRostersView)
   {
-    IRosterIndexList indexList = getContactIndexList(sjid,AFromJid);
+    IRosterIndexList indexList = getContactIndexList(ARoster->streamJid(),AFromJid);
     foreach(IRosterIndex *index, indexList)
       FRostersView->insertIndexLabel(FSubsLabelId,index);
   }
 
-  subsItems.append(subsItem);
+  FSubsItems.insert(FSubsId++,subsItem);
+
+  if (!FSubsDialog.isNull())
+    FSubsDialog->setNextCount(FSubsItems.count());
 }
 
 void RosterChanger::onRenameItem(bool)
@@ -574,12 +636,27 @@ void RosterChanger::onRemoveItemFromRoster(bool)
     IRoster *roster = FRosterPlugin->getRoster(streamJid);
     if (roster && roster->isOpen())
     {
-      QString contactJid = action->data(Action::DR_Parametr1).toString();
-      int button = QMessageBox::question(NULL,tr("Remove contact"),
-        tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(contactJid),
-        QMessageBox::Yes | QMessageBox::No);
-      if (button == QMessageBox::Yes)
-        roster->removeItem(contactJid);
+      QString rosterJid = action->data(Action::DR_Parametr1).toString();
+      IRosterItem *rosterItem = roster->item(rosterJid);
+      if (rosterItem)
+      {
+        int button = QMessageBox::question(NULL,tr("Remove contact"),
+          tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(rosterJid),
+          QMessageBox::Yes | QMessageBox::No);
+        if (button == QMessageBox::Yes)
+          roster->removeItem(rosterJid);
+      }
+      else if (FRostersModel)
+      {
+        QMultiHash<int, QVariant> data;
+        data.insert(IRosterIndex::DR_Type,IRosterIndex::IT_Contact);
+        data.insert(IRosterIndex::DR_Type,IRosterIndex::IT_Agent);
+        data.insert(IRosterIndex::DR_BareJid,rosterJid);
+        IRosterIndex *streamRoot = FRostersModel->getStreamRoot(streamJid);
+        IRosterIndexList indexList = streamRoot->findChild(data,true);
+        foreach(IRosterIndex *index, indexList)
+          FRostersModel->removeRosterIndex(index);
+      }
     }
   }
 }
@@ -748,26 +825,46 @@ void RosterChanger::onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bo
 {
   if (ALabelId == FSubsLabelId)
   {
-    FRostersView->removeIndexLabel(ALabelId,AIndex);
     AAccepted = true;
+    Jid sJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
+    Jid cJid = AIndex->data(IRosterIndex::DR_BareJid).toString();
+    QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
+    while (it != FSubsItems.end())
+    {
+      if (it.value()->streamJid == sJid && it.value()->contactJid.equals(cJid,false))
+      {
+        openSubsDialog(it.key());
+        break;
+      }
+      it++;
+    }
   }
 }
 
-void RosterChanger::onRosterLabelToolTips(IRosterIndex *AModelIndex, int ALabelId, 
-                                          QMultiMap<int,QString> &AToolTips)
+void RosterChanger::onRosterLabelToolTips(IRosterIndex * /*AIndex*/, int /*ALabelId*/, 
+                                          QMultiMap<int,QString> &/*AToolTips*/)
 {
-  if (ALabelId == FSubsLabelId)
-  {
 
-  }
 }
 
 void RosterChanger::onTrayNotifyActivated(int ANotifyId)
 {
-  if (FTrayIdToJid.contains(ANotifyId))
+  QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
+  while (it != FSubsItems.end())
   {
-
+    if (it.value()->trayId == ANotifyId)
+    {
+      openSubsDialog(it.key());
+      break;
+    }
+    it++;
   }
+}
+
+void RosterChanger::onSubsDialogSetupNext()
+{
+  if (FSubsItems.count()>0)
+    openSubsDialog(FSubsItems.keys().first());
 }
 
 Q_EXPORT_PLUGIN2(RosterChangerPlugin, RosterChanger)

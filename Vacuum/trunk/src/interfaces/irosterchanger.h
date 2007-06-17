@@ -29,6 +29,7 @@ public:
   virtual QTextEdit *message() const =0;
   virtual QToolBar *toolBar() const =0;
   virtual QButtonGroup *buttonGroup() const =0;
+  virtual const QString &subscription() const =0;
 signals:
   virtual void dialogReady() =0;
   virtual void setupNext() =0;

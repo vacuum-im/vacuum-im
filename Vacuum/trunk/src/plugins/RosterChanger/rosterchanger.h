@@ -2,6 +2,7 @@
 #define ROSTERCHANGER_H
 
 #include <QDateTime>
+#include <QPointer>
 #include "../../definations/initorders.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterlabelorders.h"
@@ -14,6 +15,7 @@
 #include "../../interfaces/itraymanager.h"
 #include "../../utils/skin.h"
 #include "addcontactdialog.h"
+#include "subscriptiondialog.h"
 
 struct SubsItem 
 {
@@ -58,6 +60,8 @@ protected:
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
 protected:
   IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AJid);
+  void openSubsDialog(int ASubsId);
+  void removeSubsMessage(int ASubsId);
 protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onTrayContextMenu(int ANotifyId, Menu *AMenu);
@@ -84,6 +88,7 @@ protected slots:
   void onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onTrayNotifyActivated(int ANotifyId);
+  void onSubsDialogSetupNext();
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersModelPlugin *FRostersModelPlugin;
@@ -95,11 +100,12 @@ private:
 private:
   Menu *FAddContactMenu;
   SkinIconset FSystemIconset;
+  QPointer<SubscriptionDialog> FSubsDialog;
 private:
+  int FSubsId;
   int FSubsLabelId;
   QHash<IRoster *,Action *> FActions;
-  QHash<Jid,QList<SubsItem *> > FSubsItems;
-  QHash<int,Jid> FTrayIdToJid;
+  QHash<int,SubsItem *> FSubsItems;
 };
 
 #endif // ROSTERCHANGER_H
