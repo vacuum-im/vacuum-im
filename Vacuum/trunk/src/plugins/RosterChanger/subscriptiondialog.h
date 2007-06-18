@@ -33,7 +33,7 @@ public:
   virtual int subsType() const { return FSubsType; }
   virtual const QString &status() const { return FStatus; }
   virtual const QString &subscription() const { return FSubscription; }
-  virtual QTextEdit *message() const { return tedMessage; }
+  virtual QTextEdit *textEditor() const { return tedMessage; }
   virtual QToolBar *toolBar() const { return FToolBar; }
   virtual QButtonGroup *buttonGroup() const { return FButtonGroup; }
 signals:

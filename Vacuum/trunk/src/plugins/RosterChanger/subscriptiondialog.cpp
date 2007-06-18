@@ -7,11 +7,12 @@ SubscriptionDialog::SubscriptionDialog(QWidget *AParent)
   FToolBar = new QToolBar(this);
   vboxLayout->insertWidget(vboxLayout->indexOf(tedMessage),FToolBar);
   FButtonGroup = new QButtonGroup(this);
-  FButtonGroup->addButton(pbtNext,NextButton);
   FButtonGroup->addButton(pbtSubscribe,AskButton);
   FButtonGroup->addButton(pbtSubscribed,AuthButton);
   FButtonGroup->addButton(pbtUnsubscribe,RefuseButton);
   FButtonGroup->addButton(pbtUnsubscribed,RejectButton);
+  FButtonGroup->addButton(pbtNext,NextButton);
+  FButtonGroup->addButton(pbtClose,CloseButton);
   connect(FButtonGroup,SIGNAL(buttonClicked(int)),SLOT(onButtonClicked(int)));
   FDialogAction = new Action(this);
 }
@@ -36,7 +37,11 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
 
   lblAccountJid->setText(AStreamJid.full());
   lblFromJid->setText(AContactJid.bare());
-  lblDateTime->setText(ATime.toString());
+  lblDateTime->setText(ATime.toString(Qt::LocaleDate));
+
+  bool subsTo = (ASubs == "to" || ASubs == "both");
+  bool subsFrom = (ASubs == "from" || ASubs == "both");
+  QSet<ButtonId> showButtons;
 
   switch(ASubsType) 
   {
@@ -46,6 +51,11 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
       tedMessage->append(tr("<b>%1 wants to subscribe to your presence.</b>").arg(AContactJid.bare()));
+      
+      showButtons << AuthButton << RejectButton;
+      if (!subsTo)
+        showButtons << AskButton;
+      
       break;
     }
   case IRoster::Subscribed:
@@ -54,6 +64,11 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
       tedMessage->append(tr("<b>You are now authorized for %1 presence.</b>").arg(AContactJid.bare()));
+
+      showButtons << RefuseButton;
+      if (!subsFrom)
+        showButtons << AuthButton;
+
       break;
     }
   case IRoster::Unsubscribe:
@@ -62,6 +77,10 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
       tedMessage->append(tr("<b>%1 unsubscribed from your presence.</b>").arg(AContactJid.bare()));
+
+      if (subsTo)
+        showButtons << RefuseButton;
+
       break;
     }
   case IRoster::Unsubscribed:
@@ -70,14 +89,47 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
       tedMessage->append(tr("<b>You are now unsubscribed from %1 presence.</b>").arg(AContactJid.bare()));
+
+      showButtons << AskButton;
+      if (subsFrom)
+        showButtons << RejectButton;
+
       break;
     }
   }
 
-  tedMessage->append(tr("<br>Click <b>Ask</b> to ask for contact presence subscription."));
-  tedMessage->append(tr("Click <b>Auth</b> to authorize the subscription and add the contact to your contact list."));
-  tedMessage->append(tr("Click <b>Refuse</b> to refuse from presence subscription."));
-  tedMessage->append(tr("Click <b>Reject</b> to reject the presence subscription."));
+  tedMessage->append("<br>");
+  if (showButtons.contains(AskButton))
+  {
+    pbtSubscribe->setEnabled(true);
+    tedMessage->append(tr("Click <b>Ask</b> to ask for contact presence subscription."));
+  }
+  else
+    pbtSubscribe->setEnabled(false);
+
+  if (showButtons.contains(AuthButton))
+  {
+    pbtSubscribed->setEnabled(true);
+    tedMessage->append(tr("Click <b>Auth</b> to authorize the subscription."));
+  }
+  else
+    pbtSubscribed->setEnabled(false);
+
+  if (showButtons.contains(RefuseButton))
+  {
+    pbtUnsubscribe->setEnabled(true);
+    tedMessage->append(tr("Click <b>Refuse</b> to refuse from presence subscription."));
+  }
+  else
+    pbtUnsubscribe->setEnabled(false);
+
+  if (showButtons.contains(RejectButton))
+  {
+    pbtUnsubscribed->setEnabled(true);
+    tedMessage->append(tr("Click <b>Reject</b> to reject the presence subscription."));
+  }
+  else
+    pbtUnsubscribed->setEnabled(false);
 
   emit dialogReady();
 }
@@ -130,6 +182,13 @@ void SubscriptionDialog::onButtonClicked(int AId)
     }
   case NextButton:
     {
+      break;
+    }
+  case CloseButton:
+    {
+      reject();
+      doNext = false;
+      doAccept = false;
       break;
     }
   default:

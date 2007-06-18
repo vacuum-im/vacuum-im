@@ -18,7 +18,8 @@ public:
     AskButton,
     AuthButton,
     RefuseButton,
-    RejectButton
+    RejectButton,
+    CloseButton
   };
 public:
   virtual const Jid &streamJid() const =0;
@@ -26,7 +27,7 @@ public:
   virtual const QDateTime &dateTime() const =0;
   virtual int subsType() const =0;
   virtual const QString &status() const =0;
-  virtual QTextEdit *message() const =0;
+  virtual QTextEdit *textEditor() const =0;
   virtual QToolBar *toolBar() const =0;
   virtual QButtonGroup *buttonGroup() const =0;
   virtual const QString &subscription() const =0;
