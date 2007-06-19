@@ -56,7 +56,7 @@ public:
   virtual QObject *instance()=0;
   virtual QString name() const=0;
   virtual QString nsURI() const=0;
-  virtual IXmppStream *stream() const =0;
+  virtual IXmppStream *xmppStream() const =0;
   virtual bool start(const QDomElement &)=0; 
   virtual bool needHook(Direction) const=0;
   virtual bool hookData(QByteArray *,Direction)=0;
@@ -70,7 +70,12 @@ signals:
 class IStreamFeaturePlugin
 {
 public:
-  virtual IStreamFeature *newInstance(IXmppStream *)=0;
+  virtual IStreamFeature *addFeature(IXmppStream *) =0;
+  virtual IStreamFeature *getFeature(const Jid &AStreamJid) const =0;
+  virtual void removeFeature(IXmppStream *AXmppStream) =0;
+signals:
+  virtual void featureAdded(IStreamFeature *) =0;
+  virtual void featureRemoved(IStreamFeature *) =0;
 };
 
 
@@ -121,7 +126,7 @@ public:
   virtual void addStream(IXmppStream *)=0;
   virtual bool isActive(IXmppStream *) const=0; 
   virtual IXmppStream *getStream(const Jid &) const=0;
-  virtual const QList<IXmppStream *> &getStreams() const=0;
+  virtual QList<IXmppStream *> getStreams() const=0;
   virtual void removeStream(IXmppStream *)=0;
   virtual void destroyStream(const Jid &)=0;
 signals:

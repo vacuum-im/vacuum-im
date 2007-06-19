@@ -93,13 +93,13 @@ static QByteArray getRespValue(const QByteArray &realm,
 }
 
 
-SASLAuth::SASLAuth(IXmppStream *AStream)
-: QObject(AStream->instance())
+SASLAuth::SASLAuth(IXmppStream *AXmppStream)
+: QObject(AXmppStream->instance())
 {
   FNeedHook = false;
   chlNumber = 0;
-  FStream = AStream;
-  connect(FStream->instance(),SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+  FXmppStream = AXmppStream;
+  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
 }
 
 SASLAuth::~SASLAuth()
@@ -122,7 +122,7 @@ bool SASLAuth::start(const QDomElement &AElem)
       FNeedHook = true;
       Stanza auth("auth");
       auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mech); 
-      FStream->sendStanza(auth);   
+      FXmppStream->sendStanza(auth);   
       return true;
     }
     else if (mech == "PLAIN")
@@ -131,13 +131,13 @@ bool SASLAuth::start(const QDomElement &AElem)
       FNeedHook = true;
       QByteArray resp;
       resp.append('\0')
-        .append(FStream->jid().node().toUtf8())
+        .append(FXmppStream->jid().node().toUtf8())
         .append('\0')
-        .append(FStream->password().toUtf8());
+        .append(FXmppStream->password().toUtf8());
       Stanza auth("auth");
       auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mech);
       auth.element().appendChild(auth.createTextNode(resp.toBase64()));    
-      FStream->sendStanza(auth);   
+      FXmppStream->sendStanza(auth);   
       return true;
     }
   }
@@ -167,7 +167,6 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
   {
     FNeedHook = false;
     ErrorHandler err(NS_FEATURE_SASL,AElem->firstChild().toElement().tagName());
-    err.setContext(tr("During SASL authorization there was an error:"));
     emit error(err.message()); 
     return true;
   }
@@ -175,7 +174,6 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
   {
     FNeedHook = false;
     ErrorHandler err(NS_FEATURE_SASL,"aborted");
-    err.setContext(tr("During SASL authorization there was an error:"));
     emit error(err.message()); 
     return true;
   }
@@ -188,10 +186,10 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
       QMultiHash<QString, QString> params = parseChallenge(chl);
       realm = params.value("realm");
       if (realm.isEmpty())
-        realm = FStream->jid().domane();
+        realm = FXmppStream->jid().domane();
       QByteArray _realm = realm.toUtf8(); 
-      QString user = FStream->jid().node();
-      QString pass = FStream->password();
+      QString user = FXmppStream->jid().node();
+      QString pass = FXmppStream->password();
       nonce = params.value("nonce");
       QByteArray randBytes(32,' ');
       for(int i=0; i<31; i++)
@@ -199,7 +197,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
       cnonce = randBytes.toBase64();
       QString nc = "00000001";
       qop = params.value("qop");
-      uri = "xmpp/" + FStream->jid().domane();
+      uri = "xmpp/" + FXmppStream->jid().domane();
       QByteArray respValue = getRespValue(realm.toUtf8(),
         user.toUtf8(),
         pass.toUtf8(),
@@ -219,7 +217,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
       Stanza response("response");
       response.setAttribute("xmlns",NS_FEATURE_SASL);
       response.element().appendChild(response.createTextNode(resp.toAscii().toBase64())); 
-      FStream->sendStanza(response);
+      FXmppStream->sendStanza(response);
       return true;
     }
     else if (chlNumber == 1)
@@ -227,7 +225,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
       chlNumber--;
       Stanza response("response");
       response.setAttribute("xmlns",NS_FEATURE_SASL);
-      FStream->sendStanza(response);   
+      FXmppStream->sendStanza(response);   
       return true;
     }
   }
@@ -256,7 +254,7 @@ SASLAuthPlugin::SASLAuthPlugin()
 
 SASLAuthPlugin::~SASLAuthPlugin()
 {
-  FCleanupHandler.clear(); 
+
 }
 
 void SASLAuthPlugin::pluginInfo(PluginInfo *APluginInfo)
@@ -267,14 +265,17 @@ void SASLAuthPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = "SASL Authentication";
   APluginInfo->uid = SASLAUTH_UUID;
   APluginInfo->version = "0.1";
-  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
 bool SASLAuthPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
+  {
     connect(plugin->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
+    connect(plugin->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
+  }
   return plugin!=NULL;
 }
 
@@ -304,17 +305,61 @@ bool SASLAuthPlugin::initObjects()
   return true;
 }
 
-//ISASLAuth
-IStreamFeature *SASLAuthPlugin::newInstance(IXmppStream *AStream)
+//IStreamFeature
+IStreamFeature *SASLAuthPlugin::addFeature(IXmppStream *AXmppStream)
 {
-  SASLAuth *saslAuth = new SASLAuth(AStream);
-  FCleanupHandler.add(saslAuth);
+  SASLAuth *saslAuth = (SASLAuth *)getFeature(AXmppStream->jid());
+  if (!saslAuth)
+  {
+    SASLAuth *saslAuth = new SASLAuth(AXmppStream);
+    connect(saslAuth,SIGNAL(destroyed(QObject *)),SLOT(onSASLAuthDestroyed(QObject *)));
+    FFeatures.append(saslAuth);
+    FCleanupHandler.add(saslAuth);
+    AXmppStream->addFeature(saslAuth);
+  }
   return saslAuth;
 }
 
-void SASLAuthPlugin::onStreamAdded(IXmppStream *AStream)
+IStreamFeature *SASLAuthPlugin::getFeature(const Jid &AStreamJid) const
 {
-  AStream->addFeature(newInstance(AStream)); 
+  foreach(SASLAuth *feature, FFeatures)
+    if (feature->xmppStream()->jid() == AStreamJid)
+      return feature;
+  return NULL;
 }
 
+void SASLAuthPlugin::removeFeature(IXmppStream *AXmppStream)
+{
+  SASLAuth *saslAuth = (SASLAuth *)getFeature(AXmppStream->jid());
+  if (saslAuth)
+  {
+    disconnect(saslAuth,SIGNAL(destroyed(QObject *)),this,SLOT(onSASLAuthDestroyed(QObject *)));
+    FFeatures.removeAt(FFeatures.indexOf(saslAuth));
+    AXmppStream->removeFeature(saslAuth);
+    delete saslAuth;
+  }
+}
+
+void SASLAuthPlugin::onStreamAdded(IXmppStream *AXmppStream)
+{
+  IStreamFeature *feature = addFeature(AXmppStream); 
+  emit featureAdded(feature);
+}
+
+void SASLAuthPlugin::onStreamRemoved(IXmppStream *AXmppStream)
+{
+  IStreamFeature *feature = getFeature(AXmppStream->jid());
+  if (feature)
+  {
+    emit featureRemoved(feature);
+    removeFeature(AXmppStream);
+  }
+}
+
+void SASLAuthPlugin::onSASLAuthDestroyed(QObject *AObject)
+{
+  SASLAuth *saslAuth = qobject_cast<SASLAuth *>(AObject);
+  if (FFeatures.contains(saslAuth))
+    FFeatures.removeAt(FFeatures.indexOf(saslAuth));
+}
 Q_EXPORT_PLUGIN2(SASLAuthPlugin, SASLAuthPlugin)

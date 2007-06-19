@@ -71,16 +71,14 @@ protected:
   virtual bool processStanzaOut(const Jid &AStreamJid, Stanza *AStanza);
   virtual bool processIqStanza(const Jid &AStreamJid, const Stanza &AStanza);
 protected slots:
-  void onAboutToQuit();
-  void onStreamAdded(IXmppStream *AStream);
   void onStreamElement(IXmppStream *AStream, const QDomElement &AElem);
-  void onStreamRemoved(IXmppStream *AStream);
+  void onStreamJidChanged(IXmppStream *AStream, const Jid &ABefour);
   void onIqStanzaTimeOut();
   void onPriorityOwnerDestroyed(QObject *AOwner);
   void onHandlerOwnerDestroyed(QObject *AOwner);
   void onIqStanzaOwnerDestroyed(QObject *AOwner);
 private:
-  QHash<Jid, IXmppStream *> FStreams;
+  IXmppStreams *FXmppStreams;
 private:
   QHash<QString, IqStanzaItem> FIqStanzaItems;
   QVector<PriorityId> FPriorities;

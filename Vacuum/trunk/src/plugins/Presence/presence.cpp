@@ -1,13 +1,14 @@
 #include "presence.h"
 #include "../../utils/errorhandler.h"
 
-Presence::Presence(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor)
-  : QObject(AStream->instance())
+Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
+  : QObject(AXmppStream->instance())
 {
-  FStream = AStream;
-  connect(AStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *))); 
-  connect(AStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
-  connect(AStream->instance(),SIGNAL(error(IXmppStream *, const QString &)),SLOT(onStreamError(IXmppStream *, const QString &))); 
+  FXmppStream = AXmppStream;
+  connect(AXmppStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *))); 
+  connect(AXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
+  connect(AXmppStream->instance(),SIGNAL(error(IXmppStream *, const QString &)),
+    SLOT(onStreamError(IXmppStream *, const QString &))); 
   FStanzaProcessor = AStanzaProcessor;
   FPresenceHandler = 0;
   FShow = Offline;
@@ -33,7 +34,7 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
     if (!pItem)
     {
       pItem = new PresenceItem(AStanza.from(),this);
-      FItems.append(pItem); 
+      FPresenceItems.append(pItem); 
     }
      
     if (AStanza.type().isEmpty())
@@ -63,7 +64,7 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
       pItem->setStatus(AStanza.firstElement("status").text());
       pItem->setPriority(0);
       emit presenceItem(pItem);
-      FItems.removeAt(FItems.indexOf(pItem));
+      FPresenceItems.removeAt(FPresenceItems.indexOf(pItem));
       delete pItem;
       hooked = true;
     }
@@ -84,7 +85,7 @@ bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza 
 IPresenceItem *Presence::item(const Jid &AItemJid) const
 {
   PresenceItem *pItem;
-  foreach(pItem, FItems)
+  foreach(pItem, FPresenceItems)
     if (pItem->jid() == AItemJid)
       return pItem;
   return 0;
@@ -94,7 +95,7 @@ QList<IPresenceItem *> Presence::items() const
 {
   QList<IPresenceItem *> pItems;
   PresenceItem *pItem;
-  foreach(pItem, FItems)
+  foreach(pItem, FPresenceItems)
     pItems.append(pItem); 
   return pItems;
 }
@@ -103,7 +104,7 @@ QList<IPresenceItem *> Presence::items(const Jid &AItemJid) const
 {
   QList<IPresenceItem *> pItems;
   PresenceItem *pItem;
-  foreach(pItem, FItems)
+  foreach(pItem, FPresenceItems)
     if (pItem->jid().equals(AItemJid,false))
       pItems.append(pItem); 
   return pItems;
@@ -111,7 +112,7 @@ QList<IPresenceItem *> Presence::items(const Jid &AItemJid) const
 
 bool Presence::setPresence(Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid)
 {
-  if (FStream->isOpen())
+  if (FXmppStream->isOpen())
   {
     QString show;
     switch (AShow)
@@ -144,7 +145,7 @@ bool Presence::setPresence(Show AShow, const QString &AStatus, qint8 APriority, 
     if (!AStatus.isEmpty()) 
       pres.addElement("status").appendChild(pres.createTextNode(AStatus));
     
-    if (FStanzaProcessor->sendStanzaOut(FStream->jid(), pres))
+    if (FStanzaProcessor->sendStanzaOut(FXmppStream->jid(), pres))
     {
       if (!AToJid.isValid())
       {
@@ -183,10 +184,34 @@ bool Presence::setPriority(qint8 APriority, const Jid &AToJid)
   return setPresence(FShow,FStatus,APriority,AToJid);
 }
 
+void Presence::clearItems()
+{
+  while (FPresenceItems.count() > 0)
+  {
+    PresenceItem *item = FPresenceItems.at(0);
+    item->setShow(Offline);
+    item->setStatus("");
+    item->setPriority(0);
+    emit presenceItem(item);
+    delete item;
+    FPresenceItems.removeAt(0); 
+  }
+}
+
+void Presence::setStanzaHandlers()
+{
+  FPresenceHandler = FStanzaProcessor->setHandler(this,"/presence",IStanzaProcessor::DirectionIn,0,streamJid());   
+}
+
+void Presence::removeStanzaHandlers()
+{
+  FStanzaProcessor->removeHandler(FPresenceHandler);
+  FPresenceHandler = 0;
+}
+
 void Presence::onStreamOpened(IXmppStream *)
 {
-  if (!FPresenceHandler)
-    FPresenceHandler = FStanzaProcessor->setHandler(this,"/presence",IStanzaProcessor::DirectionIn,0,FStream->jid());   
+  setStanzaHandlers();
   emit opened();
 }
 
@@ -200,9 +225,8 @@ void Presence::onStreamClosed(IXmppStream *)
     FPriority = 0;
     emit selfPresence(FShow,FStatus,FPriority,Jid());
   }
+  removeStanzaHandlers();
   emit closed();
-  FStanzaProcessor->removeHandler(FPresenceHandler);
-  FPresenceHandler = 0;
 }
 
 void Presence::onStreamError(IXmppStream *, const QString &AError)
@@ -213,16 +237,3 @@ void Presence::onStreamError(IXmppStream *, const QString &AError)
   emit selfPresence(FShow,FStatus,FPriority,Jid());
 }
 
-void Presence::clearItems()
-{
-  while (FItems.count() > 0)
-  {
-    PresenceItem *item = FItems.at(0);
-    item->setShow(Offline);
-    item->setStatus("");
-    item->setPriority(0);
-    emit presenceItem(item);
-    delete item;
-    FItems.removeAt(0); 
-  }
-}

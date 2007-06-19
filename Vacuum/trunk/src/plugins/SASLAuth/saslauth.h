@@ -17,13 +17,13 @@ class SASLAuth :
   Q_INTERFACES(IStreamFeature);
 
 public:
-  SASLAuth(IXmppStream *AStream);
+  SASLAuth(IXmppStream *AXmppStream);
   ~SASLAuth();
 
   virtual QObject *instance() { return this; }
   virtual QString name() const { return "mechanisms"; }
   virtual QString nsURI() const { return NS_FEATURE_SASL; }
-  virtual IXmppStream *stream() const { return FStream; }
+  virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction ADirection) const;
   virtual bool hookData(QByteArray *, Direction) { return false; }
@@ -33,8 +33,8 @@ signals:
   virtual void error(const QString &);
 protected slots:
   void onStreamClosed(IXmppStream *);
-private: //interfaces
-  IXmppStream *FStream;
+private: 
+  IXmppStream *FXmppStream;
 private:
   bool FNeedHook;
   QString FMechanism;
@@ -65,10 +65,18 @@ public:
   virtual bool startPlugin() { return true; }
 
   //IStreamFeaturePlugin
-  IStreamFeature *newInstance(IXmppStream *AStream);
+  virtual IStreamFeature *addFeature(IXmppStream *AXmppStream);
+  virtual IStreamFeature *getFeature(const Jid &AStreamJid) const;
+  virtual void removeFeature(IXmppStream *AXmppStream);
+signals:
+  virtual void featureAdded(IStreamFeature *);
+  virtual void featureRemoved(IStreamFeature *);
 protected slots:
-  void onStreamAdded(IXmppStream *);
+  void onStreamAdded(IXmppStream *AXmppStream);
+  void onStreamRemoved(IXmppStream *AXmppStream);
+  void onSASLAuthDestroyed(QObject *AObject);
 private:
+  QList<SASLAuth *> FFeatures;
   QObjectCleanupHandler FCleanupHandler;
 };
 

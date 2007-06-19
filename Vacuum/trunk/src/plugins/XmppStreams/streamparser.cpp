@@ -11,7 +11,7 @@ StreamParser::StreamParser(QObject *parent)
 
 StreamParser::~StreamParser()
 {
-  qDebug() << "~StreamParser";
+
 }
 
 bool StreamParser::parceData(const QString &data)

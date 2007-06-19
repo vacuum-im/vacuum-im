@@ -28,7 +28,7 @@ public:
   virtual QVariant data(const QModelIndex &AIndex, int ARole = Qt::DisplayRole) const;
 
   //IRostersModel
-  virtual IRosterIndex *appendStream(IRoster *ARoster, IPresence *APresence);
+  virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence);
   virtual QStringList streams() const { return FStreams.keys(); }
   virtual void removeStream(const QString &AStreamJid);
   virtual IRoster *getRoster(const QString &AStreamJid) const;
@@ -49,6 +49,7 @@ public:
 signals:
   virtual void streamAdded(const Jid &);
   virtual void streamRemoved(const Jid &);
+  virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
   virtual void indexCreated(IRosterIndex *, IRosterIndex *);
   virtual void indexInserted(IRosterIndex *);
   virtual void indexDataChanged(IRosterIndex *, int ARole);
@@ -56,6 +57,7 @@ signals:
 protected:
   void emitDelayedDataChanged(IRosterIndex *AIndex);
 protected slots:
+  void onStreamJidChanged(IXmppStream *AXmppStream,const Jid &ABefour);
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onRosterItemRemoved(IRosterItem *ARosterItem);
   void onSelfPresence(IPresence::Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);

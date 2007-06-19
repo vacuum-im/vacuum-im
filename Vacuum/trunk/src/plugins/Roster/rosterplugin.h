@@ -29,26 +29,26 @@ public:
   virtual bool startPlugin() { return true; }
 
   //IRosterPlugin
-  virtual IRoster *newRoster(IXmppStream *AStream);
+  virtual IRoster *addRoster(IXmppStream *AXmppStream);
   virtual IRoster *getRoster(const Jid &AStreamJid) const;
-  virtual void removeRoster(const Jid &AStreamJid);
+  virtual void removeRoster(IXmppStream *AXmppStream);
 signals:
   virtual void rosterAdded(IRoster *);
   virtual void rosterOpened(IRoster *);
-  virtual void rosterClosed(IRoster *);
   virtual void rosterItemPush(IRoster *, IRosterItem *);
   virtual void rosterItemRemoved(IRoster *, IRosterItem *);
   virtual void rosterSubscription(IRoster *, const Jid &, IRoster::SubsType, const QString &);
   virtual void rosterRemoved(IRoster *);
+  virtual void rosterClosed(IRoster *);
 protected slots:
-  void onStreamAdded(IXmppStream *AStream);
-  void onStreamRemoved(IXmppStream *AStream);
   void onRosterOpened();
-  void onRosterClosed();
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onRosterItemRemoved(IRosterItem *ARosterItem);
   void onRosterSubscription(const Jid &AJid, IRoster::SubsType ASType, const QString &AStatus);
-  void onRosterDestroyed(QObject *ARoster);
+  void onRosterClosed();
+  void onStreamAdded(IXmppStream *AStream);
+  void onStreamRemoved(IXmppStream *AStream);
+  void onRosterDestroyed(QObject *AObject);
 private:
   IStanzaProcessor *FStanzaProcessor;
 private:

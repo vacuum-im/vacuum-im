@@ -27,12 +27,12 @@ public:
   virtual bool startPlugin() { return true; }
 
   //IXmppStreams
-  virtual IXmppStream *newStream(const Jid &AJid);
-  virtual void addStream(IXmppStream *AStream);
-  virtual bool isActive(IXmppStream *AStream) const { return FActiveStreams.contains(AStream); }
-  virtual IXmppStream *getStream(const Jid &AJid) const;
-  virtual const QList<IXmppStream *> &getStreams() const { return FStreams; }
-  virtual void removeStream(IXmppStream *AStream);
+  virtual IXmppStream *newStream(const Jid &AStreamJid);
+  virtual void addStream(IXmppStream *AXmppStream);
+  virtual bool isActive(IXmppStream *AXmppStream) const { return FActiveStreams.contains(AXmppStream); }
+  virtual IXmppStream *getStream(const Jid &AStreamJid) const;
+  virtual QList<IXmppStream *> getStreams() const { return FStreams; }
+  virtual void removeStream(IXmppStream *AXmppStream);
   virtual void destroyStream(const Jid &AJid);
 signals:
   virtual void added(IXmppStream *);
@@ -45,11 +45,11 @@ signals:
   virtual void jidChanged(IXmppStream *, const Jid &ABefour);
   virtual void removed(IXmppStream *);
 protected slots:
-  void onStreamOpened(IXmppStream *);
-  void onStreamElement(IXmppStream *, const QDomElement &elem);
-  void onStreamAboutToClose(IXmppStream *);
-  void onStreamClosed(IXmppStream *);
-  void onStreamError(IXmppStream *, const QString &AErrStr);
+  void onStreamOpened(IXmppStream *AXmppStream);
+  void onStreamElement(IXmppStream *AXmppStream, const QDomElement &elem);
+  void onStreamAboutToClose(IXmppStream *AXmppStream);
+  void onStreamClosed(IXmppStream *AXmppStream);
+  void onStreamError(IXmppStream *AXmppStream, const QString &AErrStr);
   void onStreamJidAboutToBeChanged(IXmppStream *AStream, const Jid &AAfter);
   void onStreamJidChanged(IXmppStream *AStream, const Jid &ABefour);
 private:

@@ -25,7 +25,6 @@ StreamConnection::StreamConnection(QObject *parent)
 
 StreamConnection::~StreamConnection()
 {
-  qDebug() << "~StreamConnection";
   close();
 }
 
@@ -48,8 +47,6 @@ void StreamConnection::connectToHost(const QString &AHost, qint16 APort)
 qint64 StreamConnection::write(const QByteArray &AData) 
 {
   KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
-  //qDebug() << "Out:"<<AData.size()<<"bytes";
-  //qDebug() << AData.trimmed();
   qint64 bytes = FSocket.write(AData);
   if (bytes > 0)
     FBytesWriten += bytes;
@@ -62,8 +59,6 @@ QByteArray StreamConnection::read(qint64 ABytes)
   QByteArray data(ABytes,' ');
   qint64 readBytes = FSocket.read(data.data(),ABytes);
   FBytesReaded += readBytes;
-  //qDebug() << "In:" << readBytes <<"bytes";
-  //qDebug() << data.trimmed();
   return data;
 }
 
@@ -92,8 +87,7 @@ QStringList StreamConnection::proxyTypes() const
                         << "SOCKS4 Proxy"          //1
                         << "SOCKS4A proxy"         //2
                         << "SOCKS5 Proxy"          //3
-                        << "HTTPS Proxy"           //4
-                        << "HTTP Polling";         //5
+                        << "HTTPS Proxy";          //4
 }
 
 void StreamConnection::onSocketConnected()

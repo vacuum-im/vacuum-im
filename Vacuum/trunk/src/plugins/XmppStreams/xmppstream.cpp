@@ -25,7 +25,6 @@ XmppStream::XmppStream(const Jid &AJid, QObject *parent)
 
 XmppStream::~XmppStream()
 {
-  qDebug() << "~XmppStream " << FJid.full();
   close();
 }
 
@@ -57,8 +56,6 @@ void XmppStream::setJid(const Jid &AJid)
 {
   if (FJid != AJid && (FStreamState == SS_OFFLINE || (FStreamState == SS_FEATURES && FJid.equals(AJid,false)))) 
   {
-    qDebug() << "Resettings stream" << FJid.full() << "to" << AJid.full();
-    
     if (FStreamState == SS_FEATURES && !FOfflineJid.isValid())
       FOfflineJid = FJid;
 

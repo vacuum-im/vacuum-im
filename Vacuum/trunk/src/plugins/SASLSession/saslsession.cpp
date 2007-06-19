@@ -4,12 +4,12 @@
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 
-SASLSession::SASLSession(IXmppStream *AStream) 
- : QObject(AStream->instance())
+SASLSession::SASLSession(IXmppStream *AXmppStream) 
+ : QObject(AXmppStream->instance())
 {
   FNeedHook = false;
-  FStream = AStream;
-  connect(FStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+  FXmppStream = AXmppStream;
+  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
 }
 
 SASLSession::~SASLSession()
@@ -24,7 +24,7 @@ bool SASLSession::start(const QDomElement &AElem)
   Stanza session("iq");
   session.setType("set").setId("session"); 
   session.addElement("session",NS_FEATURE_SESSION);
-  FStream->sendStanza(session); 
+  FXmppStream->sendStanza(session); 
   return true;
 }
 
@@ -49,7 +49,6 @@ bool SASLSession::hookElement(QDomElement *AElem, Direction ADirection)
     else if (AElem->attribute("type") == "error")
     {
       ErrorHandler err(ErrorHandler::DEFAULTNS, *AElem);
-      err.setContext(tr("During session establishment there was an error:")); 
       emit error(err.message());
       return true;
     }
@@ -71,7 +70,7 @@ SASLSessionPlugin::SASLSessionPlugin()
 
 SASLSessionPlugin::~SASLSessionPlugin()
 {
-  FCleanupHandler.clear(); 
+
 }
 
 void SASLSessionPlugin::pluginInfo(PluginInfo *APluginInfo)
@@ -82,27 +81,77 @@ void SASLSessionPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = "Session Establishment";
   APluginInfo->uid = SASLSESSION_UUID;
   APluginInfo->version = "0.1";
-  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID); 
 }
 
 bool SASLSessionPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
+  {
     connect(plugin->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
+    connect(plugin->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
+  }
   return plugin!=NULL;
 }
 
-IStreamFeature *SASLSessionPlugin::newInstance(IXmppStream *AStream)
+//IStreamFeature
+IStreamFeature *SASLSessionPlugin::addFeature(IXmppStream *AXmppStream)
 {
-  SASLSession *saslSession = new SASLSession(AStream);
-  FCleanupHandler.add(saslSession);
+  SASLSession *saslSession = (SASLSession *)getFeature(AXmppStream->jid());
+  if (!saslSession)
+  {
+    saslSession = new SASLSession(AXmppStream);
+    connect(saslSession,SIGNAL(destroyed(QObject *)),SLOT(onSASLSessionDestroyed(QObject *)));
+    FFeatures.append(saslSession);
+    FCleanupHandler.add(saslSession);
+    AXmppStream->addFeature(saslSession);
+  }
   return saslSession;
 }
 
-void SASLSessionPlugin::onStreamAdded(IXmppStream *AStream)
+IStreamFeature *SASLSessionPlugin::getFeature(const Jid &AStreamJid) const
 {
-  AStream->addFeature(newInstance(AStream)); 
+  foreach(SASLSession *feature, FFeatures)
+    if (feature->xmppStream()->jid() == AStreamJid)
+      return feature;
+  return NULL;
+}
+
+void SASLSessionPlugin::removeFeature(IXmppStream *AXmppStream)
+{
+  SASLSession *saslSession = (SASLSession *)getFeature(AXmppStream->jid());
+  if (saslSession)
+  {
+    disconnect(saslSession,SIGNAL(destroyed(QObject *)),this,SLOT(onSASLSessionDestroyed(QObject *)));
+    FFeatures.removeAt(FFeatures.indexOf(saslSession));
+    AXmppStream->removeFeature(saslSession);
+    delete saslSession;
+  }
+}
+
+
+void SASLSessionPlugin::onStreamAdded(IXmppStream *AXmppStream)
+{
+  IStreamFeature *feature = addFeature(AXmppStream); 
+  emit featureAdded(feature);
+}
+
+void SASLSessionPlugin::onStreamRemoved( IXmppStream *AXmppStream )
+{
+  IStreamFeature *feature = getFeature(AXmppStream->jid());
+  if (feature)
+  {
+    emit featureRemoved(feature);
+    removeFeature(AXmppStream);
+  }
+}
+
+void SASLSessionPlugin::onSASLSessionDestroyed( QObject *AObject )
+{
+  SASLSession *saslSession = qobject_cast<SASLSession *>(AObject);
+  if (FFeatures.contains(saslSession))
+    FFeatures.removeAt(FFeatures.indexOf(saslSession));
 }
 
 Q_EXPORT_PLUGIN2(SASLSessionPlugin, SASLSessionPlugin)

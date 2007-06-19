@@ -3,6 +3,7 @@
 #include <QSet>
 #include <QIcon>
 #include <QTime>
+#include <QMessageBox>
 
 AccountManager::AccountManager()
 {
@@ -361,16 +362,32 @@ void AccountManager::onOptionsDialogAccepted()
   QSet<QString> newAccounts = allAccounts - curAccounts;
   QSet<QString> oldAccounts = curAccounts - allAccounts;
 
-  QString id;
-  foreach(id,oldAccounts)
+  foreach(QString id,oldAccounts)
     destroyAccount(id);
 
-  foreach(id,allAccounts)
+  foreach(QString id,allAccounts)
   {
     QPointer<AccountOptions> options = FAccountOptions.value(id);
-    QString name = options->option(AccountOptions::AO_Name).toString();
     Jid streamJid = options->option(AccountOptions::AO_StreamJid).toString();
-    if (!name.isEmpty() && !streamJid.node().isEmpty() && !streamJid.domane().isEmpty())
+    QString name = options->option(AccountOptions::AO_Name).toString();
+    if (name.isEmpty())
+      name= streamJid.full();
+
+    bool canApply = true;
+    QString warningMessage = tr("'%1' account changes cannot by applied:<br><br>").arg(name);
+    if (streamJid.node().isEmpty() || streamJid.domane().isEmpty())
+    {
+      canApply = false;
+      warningMessage += tr("- jabber ID is not valid<br>");
+    }
+    account = accountByStream(streamJid);
+    if (account && account->accountId()!=id)
+    {
+      canApply = false;
+      warningMessage += tr("- jabber ID '%1' already exists<br>").arg(streamJid.full());
+    }
+
+    if (canApply)
     {
       if (!newAccounts.contains(id))
       {
@@ -401,10 +418,14 @@ void AccountManager::onOptionsDialogAccepted()
       else
         hideAccount(account);
     } 
-    else if (newAccounts.contains(id))
+    else
     {
-      FAccountManage->removeAccount(id);
-      closeAccountOptionsNode(id);
+      if (newAccounts.contains(id))
+      {
+        FAccountManage->removeAccount(id);
+        closeAccountOptionsNode(id);
+      }
+      QMessageBox::warning(NULL,tr("Account options canceled"),warningMessage);
     }
   }
 }

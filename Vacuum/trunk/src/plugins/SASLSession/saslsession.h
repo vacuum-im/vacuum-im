@@ -18,14 +18,14 @@ class SASLSession :
   Q_INTERFACES(IStreamFeature);
 
 public:
-  SASLSession(IXmppStream *AStream);
+  SASLSession(IXmppStream *AXmppStream);
   ~SASLSession();
 
   //IStreamFeature
   virtual QObject *instance() { return this; }
   virtual QString name() const { return "session"; }
   virtual QString nsURI() const { return NS_FEATURE_SESSION; }
-  virtual IXmppStream *stream() const { return FStream; }
+  virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction ADirection) const;
   virtual bool hookData(QByteArray *,Direction) { return false; }
@@ -35,8 +35,8 @@ signals:
   virtual void error(const QString &);
 protected slots:
   void onStreamClosed(IXmppStream *);
-private: //interfaces
-  IXmppStream *FStream;
+private:
+  IXmppStream *FXmppStream;
 private:
   bool FNeedHook;
 };
@@ -64,10 +64,18 @@ public:
   virtual bool startPlugin() { return true; }
 
   //IStreamFeaturePlugin
-  IStreamFeature *newInstance(IXmppStream *AStream);
+  virtual IStreamFeature *addFeature(IXmppStream *AXmppStream);
+  virtual IStreamFeature *getFeature(const Jid &AStreamJid) const;
+  virtual void removeFeature(IXmppStream *AXmppStream);
+signals:
+  virtual void featureAdded(IStreamFeature *);
+  virtual void featureRemoved(IStreamFeature *);
 protected slots:
-  void onStreamAdded(IXmppStream *);
+  void onStreamAdded(IXmppStream *AXmppStream);
+  void onStreamRemoved(IXmppStream *AXmppStream);
+  void onSASLSessionDestroyed(QObject *AObject);
 private:
+  QList<SASLSession *> FFeatures;
   QObjectCleanupHandler FCleanupHandler;
 };
 

@@ -4,12 +4,12 @@
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 
-SASLBind::SASLBind(IXmppStream *AStream)
-  : QObject(AStream->instance())
+SASLBind::SASLBind(IXmppStream *AXmppStream)
+  : QObject(AXmppStream->instance())
 {
   FNeedHook = false;
-  FStream = AStream;
-  connect(FStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+  FXmppStream = AXmppStream;
+  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
 }
 
 SASLBind::~SASLBind()
@@ -22,13 +22,13 @@ bool SASLBind::start(const QDomElement &/*AElem*/)
   FNeedHook = true;
   Stanza bind("iq");
   bind.setType("set").setId("bind"); 
-  if (FStream->jid().resource().isEmpty())
+  if (FXmppStream->jid().resource().isEmpty())
     bind.addElement("bind",NS_FEATURE_BIND);
   else
     bind.addElement("bind",NS_FEATURE_BIND)
       .appendChild(bind.createElement("resource"))
-      .appendChild(bind.createTextNode(FStream->jid().resource()));
-  FStream->sendStanza(bind); 
+      .appendChild(bind.createTextNode(FXmppStream->jid().resource()));
+  FXmppStream->sendStanza(bind); 
   return true;
 }
 
@@ -51,19 +51,18 @@ bool SASLBind::hookElement(QDomElement *AElem, Direction ADirection)
       if (jid.isEmpty())
       {
         Stanza errStanza = Stanza(*AElem).replyError("jid-malformed");
-        FStream->sendStanza(errStanza);
+        FXmppStream->sendStanza(errStanza);
         ErrorHandler err(ErrorHandler::DEFAULTNS,errStanza.element()); 
         emit error(err.message());
         return true;
       };
-      FStream->setJid(jid); 
+      FXmppStream->setJid(jid); 
       emit finished(false);
       return true;
     }
     else if (AElem->attribute("type") == "error")
     {
       ErrorHandler err(ErrorHandler::DEFAULTNS, *AElem);
-      err.setContext(tr("During resource bind there was an error:")); 
       emit error(err.message());
       return true;
     }
@@ -85,7 +84,7 @@ SASLBindPlugin::SASLBindPlugin()
 
 SASLBindPlugin::~SASLBindPlugin()
 {
-  FCleanupHandler.clear(); 
+
 }
 
 void SASLBindPlugin::pluginInfo(PluginInfo *APluginInfo)
@@ -96,27 +95,76 @@ void SASLBindPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = "Resource Binding";
   APluginInfo->uid = SASLBIND_UUID;
   APluginInfo->version = "0.1";
-  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
 bool SASLBindPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
+  {
     connect(plugin->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
+    connect(plugin->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
+  }
   return plugin!=NULL;
 }
 
-IStreamFeature *SASLBindPlugin::newInstance(IXmppStream *AStream)
+//IStreamFeature
+IStreamFeature *SASLBindPlugin::addFeature(IXmppStream *AXmppStream)
 {
-  SASLBind *saslBind = new SASLBind(AStream);
-  FCleanupHandler.add(saslBind);
+  SASLBind *saslBind = (SASLBind *)getFeature(AXmppStream->jid());
+  if (!saslBind)
+  {
+    saslBind = new SASLBind(AXmppStream);
+    connect(saslBind,SIGNAL(destroyed(QObject *)),SLOT(onSASLBindDestroyed(QObject *)));
+    FFeatures.append(saslBind);
+    FCleanupHandler.add(saslBind);
+    AXmppStream->addFeature(saslBind);
+  }
   return saslBind;
 }
 
-void SASLBindPlugin::onStreamAdded(IXmppStream *AStream)
+IStreamFeature *SASLBindPlugin::getFeature(const Jid &AStreamJid) const
 {
-  AStream->addFeature(newInstance(AStream)); 
+  foreach(SASLBind *feature, FFeatures)
+    if (feature->xmppStream()->jid() == AStreamJid)
+      return feature;
+  return NULL;
+}
+
+void SASLBindPlugin::removeFeature( IXmppStream *AXmppStream )
+{
+  SASLBind *saslBind = (SASLBind *)getFeature(AXmppStream->jid());
+  if (saslBind)
+  {
+    disconnect(saslBind,SIGNAL(destroyed(QObject *)),this,SLOT(onSASLBindDestroyed(QObject *)));
+    FFeatures.removeAt(FFeatures.indexOf(saslBind));
+    AXmppStream->removeFeature(saslBind);
+    delete saslBind;
+  }
+}
+
+void SASLBindPlugin::onStreamAdded(IXmppStream *AXmppStream)
+{
+  IStreamFeature *feature = addFeature(AXmppStream); 
+  emit featureAdded(feature);
+}
+
+void SASLBindPlugin::onStreamRemoved(IXmppStream *AXmppStream)
+{
+  IStreamFeature *feature = getFeature(AXmppStream->jid());
+  if (feature)
+  {
+    emit featureRemoved(feature);
+    removeFeature(AXmppStream);
+  }
+}
+
+void SASLBindPlugin::onSASLBindDestroyed(QObject *AObject)
+{
+  SASLBind *saslBind = qobject_cast<SASLBind *>(AObject);
+  if (FFeatures.contains(saslBind))
+    FFeatures.removeAt(FFeatures.indexOf(saslBind));
 }
 
 Q_EXPORT_PLUGIN2(SASLBindPlugin, SASLBindPlugin)

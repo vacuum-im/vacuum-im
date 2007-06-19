@@ -73,7 +73,7 @@ IRostersModel *RostersModelPlugin::rostersModel()
 
 IRosterIndex *RostersModelPlugin::addStream(IRoster *ARoster, IPresence *APresence)
 {
-  return FRostersModel->appendStream(ARoster,APresence);
+  return FRostersModel->addStream(ARoster,APresence);
 }
 
 void RostersModelPlugin::removeStream(const Jid &AStreamJid)

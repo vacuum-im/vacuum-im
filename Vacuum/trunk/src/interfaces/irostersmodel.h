@@ -117,7 +117,7 @@ class IRostersModel :
 {
 public:
   virtual QObject *instance() =0;
-  virtual IRosterIndex *appendStream(IRoster *ARoster, IPresence *APresence) =0;
+  virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence) =0;
   virtual QStringList streams() const =0;
   virtual void removeStream(const QString &AStreamJid) =0;
   virtual IRoster *getRoster(const QString &AStreamJid) const =0;
@@ -140,6 +140,7 @@ public:
 signals:
   virtual void streamAdded(const Jid &) =0;
   virtual void streamRemoved(const Jid &) =0;
+  virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;
   virtual void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
   virtual void indexInserted(IRosterIndex *) =0;
   virtual void indexDataChanged(IRosterIndex *, int ARole) =0;

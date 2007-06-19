@@ -818,6 +818,22 @@ void RosterChanger::onRosterClosed(IRoster *ARoster)
     if (FActions.count() == 0)
       FAddContactMenu->menuAction()->setEnabled(false);
     delete action;
+
+    Jid streamJid = ARoster->streamJid();
+    if (!FSubsDialog.isNull() && FSubsDialog->streamJid() == streamJid)
+      FSubsDialog->reject();
+
+    QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
+    while (it != FSubsItems.end())
+    {
+      if (it.value()->streamJid == streamJid)
+      {
+        removeSubsMessage(it.key());
+        it = FSubsItems.begin(); 
+      }
+      else
+        it++;
+    }
   }
 }
 

@@ -26,7 +26,7 @@ public:
   virtual QObject *instance() { return this; }
   virtual QString name() const { return "auth"; }
   virtual QString nsURI() const { return NS_FEATURE_IQAUTH; }
-  virtual IXmppStream *stream() const { return FXmppStream; }
+  virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction ADirection) const;
   virtual bool hookData(QByteArray *,Direction) { return false; }
@@ -66,10 +66,18 @@ public:
   virtual bool startPlugin() { return true; }
 
   //IStreamFeaturePlugin
-  virtual IStreamFeature *newInstance(IXmppStream *AXmppStream);
+  virtual IStreamFeature *addFeature(IXmppStream *AXmppStream);
+  virtual IStreamFeature *getFeature(const Jid &AStreamJid) const;
+  virtual void removeFeature(IXmppStream *AXmppStream);
+signals:
+  virtual void featureAdded(IStreamFeature *);
+  virtual void featureRemoved(IStreamFeature *);
 protected slots:
-  virtual void onStreamAdded(IXmppStream *AXmppStream);
+  void onStreamAdded(IXmppStream *AXmppStream);
+  void onStreamRemoved(IXmppStream *AXmppStream);
+  void onIqAuthDestroyed(QObject *AObject);
 private:
+  QList<IqAuth *> FFeatures;
   QObjectCleanupHandler FCleanupHandler;
 };
 

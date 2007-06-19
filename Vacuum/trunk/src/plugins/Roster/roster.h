@@ -17,7 +17,7 @@ class Roster :
   Q_INTERFACES(IRoster IStanzaProcessorHandler IStanzaProcessorIqOwner);
 
 public:
-  Roster(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor);
+  Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor);
   ~Roster();
 
   virtual QObject *instance() { return this; }
@@ -31,8 +31,10 @@ public:
   virtual void iqStanzaTimeOut(const QString &AId);
 
   //IRoster
-  virtual const Jid &streamJid() const { return FStream->jid(); }
-  virtual IXmppStream *xmppStream() const { return FStream; }
+  virtual const Jid &streamJid() const { return FXmppStream->jid(); }
+  virtual IXmppStream *xmppStream() const { return FXmppStream; }
+  virtual void open();
+  virtual void close();
   virtual bool isOpen() const { return FOpen; }
   virtual QString groupDelimiter() const { return FGroupDelim; }
   virtual IRosterItem *item(const Jid &AItemJid) const;
@@ -53,31 +55,30 @@ public:
   virtual void copyGroupToGroup(const QString &AGroup, const QString &AGroupTo);
   virtual void moveGroupToGroup(const QString &AGroup, const QString &AGroupTo);
   virtual void removeGroup(const QString &AGroup);
-public slots:
-  virtual void open();
-  virtual void close();
 signals:
   virtual void opened();
-  virtual void closed();
   virtual void itemPush(IRosterItem *);
   virtual void itemRemoved(IRosterItem *);
   virtual void subscription(const Jid &AItemJid, IRoster::SubsType AType, const QString &AStatus);
+  virtual void closed();
 protected:
   bool requestGroupDelimiter();
   bool requestRosterItems();
   void clearItems();
+  void setStanzaHandlers();
+  void removeStanzaHandlers();
 protected slots:
-  virtual void onStreamOpened(IXmppStream *);
-  virtual void onStreamClosed(IXmppStream *);
+  void onStreamOpened(IXmppStream *);
+  void onStreamClosed(IXmppStream *);
 private:
-  IXmppStream *FStream;
+  IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;
 private:
   bool FOpen;
   QString FOpenId;
   QString FGroupDelimId;
   QString FGroupDelim;
-  QList<RosterItem *> FItems;
+  QList<RosterItem *> FRosterItems;
   HandlerId FRosterHandler;
   HandlerId FSubscrHandler;
 };

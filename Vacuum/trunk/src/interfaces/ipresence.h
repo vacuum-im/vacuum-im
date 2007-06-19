@@ -59,9 +59,9 @@ class IPresencePlugin
 {
 public:
   virtual QObject *instance() =0;
-  virtual IPresence *newPresence(IXmppStream *) =0;
+  virtual IPresence *addPresence(IXmppStream *) =0;
   virtual IPresence *getPresence(const Jid &) const =0;
-  virtual void removePresence(const Jid &) =0;
+  virtual void removePresence(IXmppStream *) =0;
 signals:
   virtual void presenceAdded(IPresence *) =0;
   virtual void presenceOpened(IPresence *) =0;

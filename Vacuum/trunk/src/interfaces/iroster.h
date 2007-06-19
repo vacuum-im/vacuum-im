@@ -33,6 +33,8 @@ public:
   virtual QObject *instance() =0;
   virtual const Jid &streamJid() const =0;
   virtual IXmppStream *xmppStream() const =0;
+  virtual void open() =0;
+  virtual void close() =0;
   virtual bool isOpen() const =0;
   virtual QString groupDelimiter() const =0;
   virtual IRosterItem *item(const Jid &) const=0;
@@ -54,30 +56,27 @@ public:
   virtual void copyGroupToGroup(const QString &AGroup, const QString &AGroupTo) =0;
   virtual void moveGroupToGroup(const QString &AGroup, const QString &AGroupTo) =0;
   virtual void removeGroup(const QString &AGroup) =0;
-public slots:
-  virtual void open() =0;
-  virtual void close() =0;
 signals:
   virtual void opened() =0;
-  virtual void closed() =0;
   virtual void itemPush(IRosterItem *) =0;
   virtual void itemRemoved(IRosterItem *) =0;
   virtual void subscription(const Jid &, IRoster::SubsType, const QString &) =0; 
+  virtual void closed() =0;
 };
 
 class IRosterPlugin {
 public:
   virtual QObject *instance() =0;
-  virtual IRoster *newRoster(IXmppStream *) =0;
+  virtual IRoster *addRoster(IXmppStream *) =0;
   virtual IRoster *getRoster(const Jid &) const =0;
-  virtual void removeRoster(const Jid &) =0;
+  virtual void removeRoster(IXmppStream *) =0;
 signals:
   virtual void rosterAdded(IRoster *) =0;
   virtual void rosterOpened(IRoster *) =0;
-  virtual void rosterClosed(IRoster *) =0;
   virtual void rosterItemPush(IRoster *, IRosterItem *) =0;
   virtual void rosterItemRemoved(IRoster *, IRosterItem *) =0;
   virtual void rosterSubscription(IRoster *, const Jid &, IRoster::SubsType, const QString &) =0;
+  virtual void rosterClosed(IRoster *) =0;
   virtual void rosterRemoved(IRoster *) =0;
 };
 

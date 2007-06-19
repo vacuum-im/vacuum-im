@@ -34,8 +34,6 @@ public:
 signals:
   virtual void modelCreated(IRostersModel *);
   virtual void modelDestroyed(IRostersModel *);
-protected:
-  void createRostersModel();
 protected slots:
   void onRosterAdded(IRoster *ARoster);
   void onRosterRemoved(IRoster *ARoster);

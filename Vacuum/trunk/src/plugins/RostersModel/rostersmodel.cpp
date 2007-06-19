@@ -94,7 +94,7 @@ QVariant RostersModel::data(const QModelIndex &AIndex, int ARole) const
   return index->data(ARole);
 }
 
-IRosterIndex *RostersModel::appendStream(IRoster *ARoster, IPresence *APresence)
+IRosterIndex *RostersModel::addStream(IRoster *ARoster, IPresence *APresence)
 {
   if (!ARoster)
     return NULL;
@@ -105,12 +105,15 @@ IRosterIndex *RostersModel::appendStream(IRoster *ARoster, IPresence *APresence)
     return FStreams.value(streamJid.pFull()).root;
   
   connect(ARoster->instance(),SIGNAL(itemPush(IRosterItem *)),SLOT(onRosterItemPush(IRosterItem *))); 
-  connect(ARoster->instance(),SIGNAL(itemRemoved(IRosterItem *)),SLOT(onRosterItemRemoved(IRosterItem *))); 
+  connect(ARoster->instance(),SIGNAL(itemRemoved(IRosterItem *)),SLOT(onRosterItemRemoved(IRosterItem *)));
+  connect(ARoster->xmppStream()->instance(),SIGNAL(jidChanged(IXmppStream *,const Jid &)),
+    SLOT(onStreamJidChanged(IXmppStream *,const Jid &)));
 
   IRosterIndex *index = createRosterIndex(IRosterIndex::IT_StreamRoot,streamJid.pFull(),FRootIndex);
   index->setRemoveOnLastChildRemoved(false);
   index->setData(IRosterIndex::DR_StreamJid,streamJid.pFull());
   index->setData(IRosterIndex::DR_Jid,streamJid.full());
+  index->setData(IRosterIndex::DR_PJid,streamJid.pFull());
 
   if (APresence)
   {
@@ -146,6 +149,8 @@ void RostersModel::removeStream(const QString &AStreamJid)
       SLOT(onRosterItemPush(IRosterItem *))); 
     disconnect(streamRoster->instance(),SIGNAL(itemRemoved(IRosterItem *)),this,
       SLOT(onRosterItemRemoved(IRosterItem *))); 
+    disconnect(streamRoster->xmppStream()->instance(),SIGNAL(jidChanged(IXmppStream *,const Jid &)),this,
+      SLOT(onStreamJidChanged(IXmppStream *,const Jid &)));
     
     if (streamPresence)
     {
@@ -435,6 +440,30 @@ void RostersModel::onRosterItemRemoved(IRosterItem *ARosterItem)
   IRosterIndex *index;
   foreach(index, itemList)
     removeRosterIndex(index);    
+}
+
+void RostersModel::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
+{
+  IRosterIndex *streamRoot = getStreamRoot(ABefour);
+  if (streamRoot)
+  {
+    Jid newStreamJid = AXmppStream->jid();
+
+    QHash<int,QVariant> data;
+    data.insert(IRosterIndex::DR_StreamJid,ABefour.pFull());
+    IRosterIndexList itemList = FRootIndex->findChild(data,true);
+    foreach(IRosterIndex *index, itemList)
+      index->setData(IRosterIndex::DR_StreamJid,newStreamJid.pFull());
+
+    streamRoot->setData(IRosterIndex::DR_Id,newStreamJid.pFull());
+    streamRoot->setData(IRosterIndex::DR_Jid,newStreamJid.full());
+    streamRoot->setData(IRosterIndex::DR_PJid,newStreamJid.pFull());
+
+    StreamItem streamItem = FStreams.take(ABefour.pFull());
+    FStreams.insert(newStreamJid.pFull(),streamItem);
+
+    emit streamJidChanged(ABefour,newStreamJid);
+  }
 }
 
 void RostersModel::onSelfPresence(IPresence::Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid)

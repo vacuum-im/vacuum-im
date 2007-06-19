@@ -79,6 +79,7 @@ protected slots:
   void onReconnectTimer();
   void onAccountShown(IAccount *AAccount);
   void onSkinChanged();
+  void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
 private:
   IPresencePlugin *FPresencePlugin;
   IRosterPlugin *FRosterPlugin;

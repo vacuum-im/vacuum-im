@@ -28,19 +28,19 @@ void StanzaProcessor::pluginInfo(PluginInfo *APluginInfo)
 
 bool StanzaProcessor::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  connect(APluginManager->instance(),SIGNAL(aboutToQuit()),SLOT(onAboutToQuit())); 
-  
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
   {
-    connect(plugin->instance(), SIGNAL(added(IXmppStream *)),
-      SLOT(onStreamAdded(IXmppStream *))); 
-    connect(plugin->instance(), SIGNAL(element(IXmppStream *, const QDomElement &)),
-      SLOT(onStreamElement(IXmppStream *, const QDomElement &))); 
-    connect(plugin->instance(), SIGNAL(removed(IXmppStream *)),
-      SLOT(onStreamRemoved(IXmppStream *))); 
+    FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+    if (FXmppStreams)
+    {
+      connect(FXmppStreams->instance(), SIGNAL(element(IXmppStream *, const QDomElement &)),
+        SLOT(onStreamElement(IXmppStream *, const QDomElement &))); 
+      connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)),
+        SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
+    }
   }
-  return plugin!=NULL;
+  return FXmppStreams!=NULL;
 }
 
 
@@ -64,7 +64,7 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza
   Stanza stanza(AStanza);
   if (!processStanzaOut(AStreamJid,&stanza))
   {
-    IXmppStream *stream = FStreams.value(AStreamJid,0);
+    IXmppStream *stream = FXmppStreams->getStream(AStreamJid);
     if (stream)
       sended = stream->sendStanza(stanza) > 0;
   }
@@ -410,18 +410,6 @@ bool StanzaProcessor::processIqStanza(const Jid &AStreamJid, const Stanza &AStan
   return false;
 }
 
-void StanzaProcessor::onAboutToQuit()
-{
-  disconnect(this,SLOT(onPriorityOwnerDestroyed(QObject *)));
-  disconnect(this,SLOT(onHandlerOwnerDestroyed(QObject *)));
-  disconnect(this,SLOT(onIqStanzaOwnerDestroyed(QObject *)));
-}
-
-void StanzaProcessor::onStreamAdded(IXmppStream *AStream)
-{
-  FStreams.insert(AStream->jid(),AStream); 
-}
-
 void StanzaProcessor::onStreamElement(IXmppStream *AStream, const QDomElement &AElem)
 {
   Stanza stanza(AElem);
@@ -429,9 +417,17 @@ void StanzaProcessor::onStreamElement(IXmppStream *AStream, const QDomElement &A
     sendStanzaOut(AStream->jid(), stanza.replyError("service-unavailable")); 
 }
 
-void StanzaProcessor::onStreamRemoved(IXmppStream *AStream)
+void StanzaProcessor::onStreamJidChanged(IXmppStream *AStream, const Jid &ABefour)
 {
-  FStreams.remove(AStream->jid()); 
+  Jid newStreamJid = AStream->jid();
+  
+  foreach(IqStanzaItem item, FIqStanzaItems)
+    if (item.streamJid == ABefour)
+      item.streamJid = newStreamJid;
+
+  foreach(HandlerItem item, FHandlerItems)
+    if (item.streamJid == ABefour)
+      item.streamJid = newStreamJid;
 }
 
 void StanzaProcessor::onIqStanzaTimeOut()

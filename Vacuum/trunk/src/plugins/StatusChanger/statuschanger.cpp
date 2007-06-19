@@ -133,6 +133,8 @@ bool StatusChanger::initObjects()
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
   {
     FRostersModel = FRostersModelPlugin->rostersModel();
+    connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
+      SLOT(onStreamJidChanged(const Jid &, const Jid &)));
   }
 
   return true;
@@ -634,6 +636,17 @@ void StatusChanger::onSkinChanged()
 {
   if (FRostersView)
     FRostersView->updateIndexLabel(FConnectingLabel,FRosterIconset.iconByName("connecting"));
+}
+
+void StatusChanger::onStreamJidChanged(const Jid &/*ABefour*/, const Jid &AAfter)
+{
+  IPresence *presence = FPresencePlugin->getPresence(AAfter);
+  Menu *menu = streamMenu(AAfter);
+  if (menu && FPresences.contains(presence))
+  {
+    menu->clear();
+    createStatusActions(presence);
+  }
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

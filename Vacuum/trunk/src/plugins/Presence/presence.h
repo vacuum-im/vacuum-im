@@ -16,7 +16,7 @@ class Presence :
   Q_INTERFACES(IPresence IStanzaProcessorHandler);
 
 public:
-  Presence(IXmppStream *AStream, IStanzaProcessor *AStanzaProcessor);
+  Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor);
   ~Presence();
 
   virtual QObject *instance() { return this; }
@@ -26,8 +26,8 @@ public:
   virtual bool stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   
   //IPresence
-  virtual const Jid &streamJid() const { return FStream->jid(); }
-  virtual IXmppStream *xmppStream() const { return FStream; }
+  virtual const Jid &streamJid() const { return FXmppStream->jid(); }
+  virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual Show show() const { return FShow; }
   virtual const QString &status() const { return FStatus; }
   virtual qint8 priority() const { return FPriority; }
@@ -44,18 +44,20 @@ signals:
   virtual void selfPresence(IPresence::Show, const QString &, qint8, const Jid &);
   virtual void presenceItem(IPresenceItem *APresenceItem);
   virtual void closed();
-protected slots:
-  virtual void onStreamOpened(IXmppStream *);
-  virtual void onStreamClosed(IXmppStream *);
-  virtual void onStreamError(IXmppStream *, const QString &AError);
 protected:
   void clearItems();
+  void setStanzaHandlers();
+  void removeStanzaHandlers();
+protected slots:
+  void onStreamOpened(IXmppStream *);
+  void onStreamClosed(IXmppStream *);
+  void onStreamError(IXmppStream *, const QString &AError);
 private:
-  IXmppStream *FStream;
+  IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;
 private:
   HandlerId FPresenceHandler;
-  QList<PresenceItem *> FItems;
+  QList<PresenceItem *> FPresenceItems;
   Show FShow;
   QString FStatus;
   qint8 FPriority;

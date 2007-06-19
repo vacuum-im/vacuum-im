@@ -72,7 +72,6 @@ bool IqAuth::hookElement(QDomElement *AElem,Direction ADirection)
     else if (AElem->attribute("type") == "error")
     {
       ErrorHandler err(ErrorHandler::DEFAULTNS,*AElem);
-      err.setContext(tr("During authorization there was an error:")); 
       emit error(err.message());
       return true;
     };
@@ -105,27 +104,75 @@ void IqAuthPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = "Non-SASL Authentication";
   APluginInfo->uid = IQAUTH_UUID;
   APluginInfo->version = "0.1";
-  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID);  
 }
 
 bool IqAuthPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
+  {
     connect(plugin->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
+    connect(plugin->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
+  }
   return plugin!=NULL;
 }
 
-IStreamFeature *IqAuthPlugin::newInstance(IXmppStream *AXmppStream)
+//IStreamFeature
+IStreamFeature *IqAuthPlugin::addFeature(IXmppStream *AXmppStream)
 {
-  IqAuth *iqAuth = new IqAuth(AXmppStream);
-  FCleanupHandler.add(iqAuth);
+  IqAuth *iqAuth = (IqAuth *)getFeature(AXmppStream->jid());
+  if (!iqAuth)
+  {
+    iqAuth = new IqAuth(AXmppStream);
+    connect(iqAuth,SIGNAL(destroyed(QObject *)),SLOT(onIqAuthDestroyed(QObject *)));
+    FFeatures.append(iqAuth);
+    FCleanupHandler.add(iqAuth);
+    AXmppStream->addFeature(iqAuth);
+  }
   return iqAuth;
+}
+
+IStreamFeature *IqAuthPlugin::getFeature(const Jid &AStreamJid) const
+{
+  foreach(IqAuth *feature, FFeatures)
+    if (feature->xmppStream()->jid() == AStreamJid)
+      return feature;
+  return NULL;
+}
+
+void IqAuthPlugin::removeFeature(IXmppStream *AXmppStream)
+{
+  IqAuth *iqAuth = (IqAuth *)getFeature(AXmppStream->jid());
+  if (iqAuth)
+  {
+    disconnect(iqAuth,SIGNAL(destroyed(QObject *)),this,SLOT(onIqAuthDestroyed(QObject *)));
+    FFeatures.removeAt(FFeatures.indexOf(iqAuth));
+    AXmppStream->removeFeature(iqAuth);
+    delete iqAuth;
+  }
 }
 
 void IqAuthPlugin::onStreamAdded(IXmppStream *AXmppStream)
 {
-  AXmppStream->addFeature(newInstance(AXmppStream)); 
+  IStreamFeature *feature = addFeature(AXmppStream); 
+  emit featureAdded(feature);
 }
 
+void IqAuthPlugin::onStreamRemoved(IXmppStream *AXmppStream)
+{
+  IStreamFeature *feature = getFeature(AXmppStream->jid());
+  if (feature)
+  {
+    emit featureRemoved(feature);
+    removeFeature(AXmppStream);
+  }
+}
+
+void IqAuthPlugin::onIqAuthDestroyed(QObject *AObject)
+{
+  IqAuth *iqAuth = qobject_cast<IqAuth *>(AObject);
+  if (FFeatures.contains(iqAuth))
+    FFeatures.removeAt(FFeatures.indexOf(iqAuth));
+}
 Q_EXPORT_PLUGIN2(IqAuthPlugin, IqAuthPlugin)
