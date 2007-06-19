@@ -107,36 +107,68 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 
 QModelIndex RostersView::mapToModel(const QModelIndex &AProxyIndex)
 {
+  QModelIndex index = AProxyIndex;
   if (FProxyModels.count() > 0)
   {
-    QModelIndex index = AProxyIndex;
     QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
     do 
     {
       it--;
       index = (*it)->mapToSource(index);
     } while(it != FProxyModels.constBegin());
-    return index;
   }
-  else
-    return AProxyIndex;
+  return index;
 }
 
 QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex)
 {
+  QModelIndex index = AModelIndex;
   if (FProxyModels.count() > 0)
   {
-    QModelIndex index = AModelIndex;
     QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
     while (it != FProxyModels.constEnd())
     {
       index = (*it)->mapFromSource(index);
       it++;
     }
-    return index;
   }
-  else
-    return AModelIndex;
+  return index;
+}
+
+QModelIndex RostersView::mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex)
+{
+  QModelIndex index = AModelIndex;
+  if (FProxyModels.count() > 0)
+  {
+    QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
+    while (it!=FProxyModels.constEnd())
+    {
+      index = (*it)->mapFromSource(index);
+      if ((*it) == AProxyModel)
+        return index;
+      it++;
+    }
+  }
+  return index;
+}
+
+QModelIndex RostersView::mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex)
+{
+  QModelIndex index = AProxyIndex;
+  if (FProxyModels.count() > 0)
+  {
+    bool doMap = false;
+    QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
+    do 
+    {
+      it--;
+      if ((*it) == AProxyModel)
+        doMap = true;
+      if (doMap)
+        index = (*it)->mapToSource(index);
+    } while(it != FProxyModels.constBegin());
+  }
+  return index;
 }
 
 int RostersView::createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags)

@@ -21,10 +21,13 @@ public:
   virtual IRostersModel *rostersModel() const =0;
   virtual IRosterIndexDataHolder *defaultDataHolder() const =0;
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel) =0;
+  virtual QList<QAbstractProxyModel *> proxyModels() const =0;
   virtual QAbstractProxyModel *lastProxyModel() const =0;
   virtual void removeProxyModel(QAbstractProxyModel *AProxyModel) =0;
   virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex) =0;
   virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) =0;
+  virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) =0;
+  virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) =0;
   virtual int createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags = 0) =0;
   virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFlags = 0) =0;
   virtual void insertIndexLabel(int ALabelId, IRosterIndex *AIndex) =0;
