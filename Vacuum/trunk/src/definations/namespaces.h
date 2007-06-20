@@ -6,6 +6,7 @@
 #define NS_JABBER_CLIENT		                    "jabber:client"
 #define NS_JABBER_STREAMS		                    "http://etherx.jabber.org/streams"
 #define NS_JABBER_IQ_AUTH                       "jabber:iq:auth"
+#define NS_JABBER_ROSTER                        "jabber:iq:roster"
 
 #define NS_FEATURE_IQAUTH                       "http://jabber.org/features/iq-auth"
 #define NS_FEATURE_SASL                         "urn:ietf:params:xml:ns:xmpp-sasl"

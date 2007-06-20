@@ -1,11 +1,10 @@
 #ifndef ROSTER_H
 #define ROSTER_H
 
+#include "../../definations/namespaces.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "rosteritem.h"
-
-#define NS_JABBER_ROSTER "jabber:iq:roster"
 
 class Roster :
   public QObject,
