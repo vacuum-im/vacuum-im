@@ -3,13 +3,13 @@
 
 #include <QHeaderView>
 #include <QToolTip>
-#include <QTime>
 #include <QCursor>
 
 RostersView::RostersView(QWidget *AParent)
   : QTreeView(AParent)
 {
-  srand(QTime::currentTime().msec());
+  FLabelId = 1;
+  FHookerId = 1;
 
   FRostersModel = NULL;
   FPressedLabel = DISPLAY_LABEL_ID;
@@ -34,7 +34,8 @@ RostersView::RostersView(QWidget *AParent)
 
 RostersView::~RostersView()
 {
-
+  while (FClickHookerItems.count()>0)
+    destroyClickHooker(FClickHookerItems.at(0)->hookerId);
 }
 
 void RostersView::setModel(IRostersModel *AModel)
@@ -176,8 +177,7 @@ int RostersView::createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags
   int labelId = 0;
   if (ALabel.isValid())
   {
-    while (labelId <= DISPLAY_LABEL_ID || FIndexLabels.contains(labelId))
-      labelId = (rand()<<16)+rand();
+    labelId = FLabelId++;
     FIndexLabels.insert(labelId,ALabel);
     FIndexLabelOrders.insert(labelId,AOrder);
     FIndexLabelFlags.insert(labelId,AFlags);
@@ -287,6 +287,66 @@ QRect RostersView::labelRect(int ALabeld, const QModelIndex &AIndex) const
     return QRect();
 
   return FRosterIndexDelegate->labelRect(ALabeld,indexOption(AIndex),AIndex);
+}
+
+int RostersView::createClickHooker(IRostersClickHooker *AHooker, int APriority, bool AAutoRemove)
+{
+  int i = 0;
+  while (i < FClickHookerItems.count() && FClickHookerItems.at(i)->priority >= APriority)
+    i++;
+  ClickHookerItem *item = new ClickHookerItem;
+  item->hookerId = FHookerId++;
+  item->hooker = AHooker;
+  item->priority = APriority;
+  item->autoRemove = AAutoRemove;
+  FClickHookerItems.insert(i,item);
+  return item->hookerId;
+}
+
+void RostersView::insertClickHooker(int AHookerId, IRosterIndex *AIndex)
+{
+  int i = 0;
+  while (i < FClickHookerItems.count())
+  {
+    ClickHookerItem *item = FClickHookerItems.at(i);
+    if (item->hookerId == AHookerId)
+    {
+      item->indexes += AIndex;
+      break;
+    }
+    i++;
+  }
+}
+
+void RostersView::removeClickHooker(int AHookerId, IRosterIndex *AIndex)
+{
+  int i = 0;
+  while (i < FClickHookerItems.count())
+  {
+    ClickHookerItem *item = FClickHookerItems.at(i);
+    if (item->hookerId == AHookerId)
+    {
+      item->indexes -= AIndex;
+      break;
+    }
+    i++;
+  }
+}
+
+void RostersView::destroyClickHooker(int AHookerId)
+{
+  int i = 0;
+  while (i < FClickHookerItems.count())
+  {
+    ClickHookerItem *item = FClickHookerItems.at(i);
+    if (item->hookerId == AHookerId)
+    {
+      FClickHookerItems.removeAt(i);
+      delete item;
+      break;
+    }
+    i++;
+  }
 }
 
 void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
@@ -399,22 +459,39 @@ bool RostersView::viewportEvent(QEvent *AEvent)
 
 void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 {
+  bool accepted = false;
   if (viewport()->rect().contains(AEvent->pos()))
   {
     QModelIndex modelIndex = indexAt(AEvent->pos());
     const int labelId = labelAt(AEvent->pos(),modelIndex);
-    if (modelIndex.isValid() && labelId > DISPLAY_LABEL_ID)
+    if (modelIndex.isValid())
     {
       modelIndex = mapToModel(modelIndex);
       IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-     
-      bool accepted = false;
-      emit labelDoubleClicked(index,labelId,accepted);
-      if (accepted) 
-        return;
+      if (labelId == DISPLAY_LABEL_ID)
+      {
+        int i = 0;
+        while (!accepted && i<FClickHookerItems.count())
+        {
+          ClickHookerItem *item = FClickHookerItems.at(i);
+          if (item->indexes.contains(index) || item->indexes.contains(NULL))
+          {
+            accepted = item->hooker->rosterIndexClicked(index,item->hookerId);
+            if (accepted && item->autoRemove)
+              destroyClickHooker(item->hookerId);
+            else
+              i++;
+          }
+          else
+            i++;
+        }
+      }
+      else
+        emit labelDoubleClicked(index,labelId,accepted);
     }
   }
-  QTreeView::mouseDoubleClickEvent(AEvent);
+  if (!accepted)
+    QTreeView::mouseDoubleClickEvent(AEvent);
 }
 
 void RostersView::mousePressEvent(QMouseEvent *AEvent)
@@ -472,6 +549,15 @@ void RostersView::onIndexRemoved(IRosterIndex *AIndex)
       it = FIndexLabelIndexes.erase(it);
     else
       it++;
+  }
+
+  int i = 0;
+  while (i<FClickHookerItems.count())
+  {
+    ClickHookerItem *item = FClickHookerItems.at(i);
+    if (item->indexes.contains(AIndex))
+      item->indexes -= AIndex;
+    i++;
   }
 }
 

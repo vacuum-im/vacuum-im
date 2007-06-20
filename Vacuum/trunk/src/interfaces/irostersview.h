@@ -8,6 +8,12 @@
 
 #define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"
 
+class IRostersClickHooker
+{
+public:
+  virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AHookerId) =0;
+};
+
 class IRostersView :
   virtual public QTreeView
 {
@@ -20,6 +26,7 @@ public:
   virtual void setModel(IRostersModel *AModel) =0; 
   virtual IRostersModel *rostersModel() const =0;
   virtual IRosterIndexDataHolder *defaultDataHolder() const =0;
+  //--ProxyModels
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel) =0;
   virtual QList<QAbstractProxyModel *> proxyModels() const =0;
   virtual QAbstractProxyModel *lastProxyModel() const =0;
@@ -28,6 +35,7 @@ public:
   virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) =0;
   virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) =0;
   virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) =0;
+  //--IndexLabel
   virtual int createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags = 0) =0;
   virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFlags = 0) =0;
   virtual void insertIndexLabel(int ALabelId, IRosterIndex *AIndex) =0;
@@ -35,6 +43,11 @@ public:
   virtual void destroyIndexLabel(int ALabelId) =0;
   virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
   virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const =0;
+  //--ClickHookers
+  virtual int createClickHooker(IRostersClickHooker *AHooker, int APriority, bool AAutoRemove = false) =0;
+  virtual void insertClickHooker(int AHookerId, IRosterIndex *AIndex) =0;
+  virtual void removeClickHooker(int AHookerId, IRosterIndex *AIndex) =0;
+  virtual void destroyClickHooker(int AHookerId) =0;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *) =0;
   virtual void modelSeted(IRostersModel *) =0;

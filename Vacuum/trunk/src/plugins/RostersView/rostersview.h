@@ -47,6 +47,11 @@ public:
   virtual void destroyIndexLabel(int ALabelId);
   virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const;
   virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const;
+  //--ClickHookers
+  virtual int createClickHooker(IRostersClickHooker *AHooker, int APriority, bool AAutoRemove = false);
+  virtual void insertClickHooker(int AHookerId, IRosterIndex *AIndex);
+  virtual void removeClickHooker(int AHookerId, IRosterIndex *AIndex);
+  virtual void destroyClickHooker(int AHookerId);
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *);
   virtual void modelSeted(IRostersModel *);
@@ -78,20 +83,33 @@ protected slots:
 private:
   IRostersModel *FRostersModel;
 private:
+  Menu *FContextMenu;
+private:
+  int FLabelId;
   QTimer FBlinkTimer;
   QSet<int> FBlinkLabels;
   bool FBlinkShow;
-private:
-  Menu *FContextMenu;
-  IndexDataHolder *FIndexDataHolder;
-  RosterIndexDelegate *FRosterIndexDelegate;
-  QList<QAbstractProxyModel *> FProxyModels;
+  int FPressedLabel;
+  IRosterIndex *FPressedIndex;
   QHash<int, QVariant> FIndexLabels;
   QHash<int, int /*Order*/> FIndexLabelOrders;
   QHash<int, int /*Flags*/> FIndexLabelFlags;
   QHash<int, QSet<IRosterIndex *> > FIndexLabelIndexes;
-  int FPressedLabel;
-  IRosterIndex *FPressedIndex;
+private:
+  int FHookerId;
+  struct ClickHookerItem
+  {
+    int hookerId;
+    IRostersClickHooker *hooker;
+    QSet<IRosterIndex *> indexes;
+    int priority;
+    bool autoRemove;
+  };
+  QList<ClickHookerItem *> FClickHookerItems;
+private:
+  IndexDataHolder *FIndexDataHolder;
+  RosterIndexDelegate *FRosterIndexDelegate;
+  QList<QAbstractProxyModel *> FProxyModels;
 };
 
 #endif // ROSTERSVIEW_H
