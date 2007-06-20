@@ -10,11 +10,11 @@
 class Roster :
   public QObject,
   public IRoster,
-  private IStanzaProcessorHandler,
-  private IStanzaProcessorIqOwner
+  private IStanzaHandler,
+  private IIqStanzaOwner
 {
   Q_OBJECT;
-  Q_INTERFACES(IRoster IStanzaProcessorHandler IStanzaProcessorIqOwner);
+  Q_INTERFACES(IRoster IStanzaHandler IIqStanzaOwner);
 
 public:
   Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor);
@@ -24,7 +24,7 @@ public:
 
   //IStanzaProcessorHandler
   virtual bool editStanza(HandlerId, const Jid &, Stanza *, bool &) { return false; }
-  virtual bool stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  virtual bool readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
 
   //IStanzaProcessorIqOwner
   virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);

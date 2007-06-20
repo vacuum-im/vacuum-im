@@ -10,10 +10,10 @@
 class Presence : 
   public QObject,
   public IPresence,
-  private IStanzaProcessorHandler
+  private IStanzaHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPresence IStanzaProcessorHandler);
+  Q_INTERFACES(IPresence IStanzaHandler);
 
 public:
   Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor);
@@ -23,7 +23,7 @@ public:
 
   //IStanzaProcessorHandler
   virtual bool editStanza(HandlerId, const Jid &, Stanza *, bool &) { return false; }
-  virtual bool stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  virtual bool readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   
   //IPresence
   virtual const Jid &streamJid() const { return FXmppStream->jid(); }

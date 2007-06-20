@@ -36,19 +36,19 @@ public:
 
   virtual bool sendStanzaIn(const Jid &AStreamJid, const Stanza &AStanza);
   virtual bool sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual bool sendIqStanza(IStanzaProcessorIqOwner *AIqOwner, const Jid &AStreamJid, 
+  virtual bool sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJid, 
     const Stanza &AStanza, qint32 ATimeOut);
 
   virtual PriorityId setPriority(PriorityLevel ALevel, qint32 AOffset, QObject *AOwner=0);
   virtual void removePriority(PriorityId APriorityId);
 
-  virtual HandlerId setHandler(IStanzaProcessorHandler *, const QString &ACondition, 
+  virtual HandlerId setHandler(IStanzaHandler *, const QString &ACondition, 
     Direction ADirection, PriorityId APriorityId=0, const Jid &AStreamJid = Jid()); 
   virtual void addCondition(HandlerId AHandlerId, const QString &ACondition);
   virtual void removeHandler(HandlerId AHandlerId);
 protected:
   struct IqStanzaItem {
-    IStanzaProcessorIqOwner *owner;
+    IIqStanzaOwner *owner;
     Jid streamJid;
     QObject *timer;
   };
@@ -60,7 +60,7 @@ protected:
     QStringList befour;
   };
   struct HandlerItem {
-    IStanzaProcessorHandler *handler;
+    IStanzaHandler *handler;
     QStringList conditions;
     Direction direction;
     PriorityId priority;

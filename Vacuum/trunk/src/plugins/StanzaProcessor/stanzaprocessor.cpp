@@ -71,7 +71,7 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza
   return sended;
 }
 
-bool StanzaProcessor::sendIqStanza(IStanzaProcessorIqOwner *AIqOwner,
+bool StanzaProcessor::sendIqStanza(IIqStanzaOwner *AIqOwner,
                                    const Jid &AStreamJid, const Stanza &AStanza, 
                                    qint32 ATimeOut)
 {
@@ -148,7 +148,7 @@ void StanzaProcessor::removePriority(PriorityId APriorityId)
   }
 }
 
-HandlerId StanzaProcessor::setHandler(IStanzaProcessorHandler *AHandler, const QString &ACondition, 
+HandlerId StanzaProcessor::setHandler(IStanzaHandler *AHandler, const QString &ACondition, 
                                       Direction ADirection, PriorityId APriorityId, 
                                       const Jid &AStreamJid)
 {
@@ -345,7 +345,7 @@ bool StanzaProcessor::processStanzaIn(const Jid &AStreamJid, Stanza *AStanza)
   {
     HandlerId hId = checkedHandlers.at(index);
     HandlerItem *hItem = &FHandlerItems[hId];
-    hooked = hItem->handler->stanza(hId,AStreamJid,*AStanza,accepted);
+    hooked = hItem->handler->readStanza(hId,AStreamJid,*AStanza,accepted);
     index++;
   } 
 
@@ -384,7 +384,7 @@ bool StanzaProcessor::processStanzaOut(const Jid &AStreamJid, Stanza *AStanza)
   {
     HandlerId hId = checkedHandlers.at(index);
     HandlerItem *hItem = &FHandlerItems[hId];
-    hooked = hItem->handler->stanza(hId,AStreamJid,*AStanza,accepted);
+    hooked = hItem->handler->readStanza(hId,AStreamJid,*AStanza,accepted);
     index++;
   } 
 

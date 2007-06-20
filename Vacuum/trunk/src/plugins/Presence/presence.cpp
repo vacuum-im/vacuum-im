@@ -20,7 +20,7 @@ Presence::~Presence()
 
 }
 
-bool Presence::stanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool Presence::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   Q_UNUSED(AStreamJid);
   bool hooked = false;
