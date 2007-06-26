@@ -9,7 +9,8 @@ HEADERS += utilsexport.h \
            menu.h \
            unzipfile.h \
            iconset.h \
-           skin.h
+           skin.h \
+           message.h
 
 SOURCES += jid.cpp \
            versionparser.cpp \
@@ -21,4 +22,5 @@ SOURCES += jid.cpp \
            menu.cpp \
            unzipfile.cpp \
            iconset.cpp \
-           skin.cpp
+           skin.cpp \
+           message.cpp
