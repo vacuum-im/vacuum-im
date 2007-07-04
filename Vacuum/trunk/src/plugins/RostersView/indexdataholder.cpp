@@ -45,7 +45,12 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
     switch (ARole)
     {
     case Qt::DisplayRole:  
-      return AIndex->data(IRosterIndex::DR_Jid);
+      {
+        QString display = AIndex->data(IRosterIndex::DR_Name).toString();
+        if (display.isEmpty())
+          display = AIndex->data(IRosterIndex::DR_Jid).toString();
+        return display;
+      }
     case Qt::DecorationRole: 
       return statusIcon(AIndex);
     case Qt::ForegroundRole:
