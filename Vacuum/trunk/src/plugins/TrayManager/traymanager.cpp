@@ -7,19 +7,21 @@ int TrayManager::FNextNotifyId = 1;
 TrayManager::TrayManager()
 {
   FCurNotifyId = 0;
-  FContextMenu = new Menu;
-  FTrayIcon.setContextMenu(FContextMenu);
+  mnuContext = new Menu;
+  FTrayIcon.setContextMenu(mnuContext);
 
   FBlinkTimer.setInterval(500);
   connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimer()));
 
   connect(&FTrayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
     SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
+  connect(&FTrayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+    SIGNAL(activated(QSystemTrayIcon::ActivationReason)));
 }
 
 TrayManager::~TrayManager()
 {
-  delete FContextMenu;
+  delete mnuContext;
 }
 
 void TrayManager::pluginInfo(PluginInfo *APluginInfo)
@@ -30,6 +32,17 @@ void TrayManager::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = tr("Tray manager"); 
   APluginInfo->uid = TRAYMANAGER_UUID;
   APluginInfo->version = "0.1";
+}
+
+bool TrayManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+{
+  actQuit = new Action(mnuContext);
+  actQuit->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
+  actQuit->setText(tr("Quit"));
+  connect(actQuit,SIGNAL(triggered()),APluginManager->instance(),SLOT(quit()));
+  addAction(actQuit,MAINWINDOW_ACTION_GROUP_QUIT);
+  
+  return FTrayIcon.isSystemTrayAvailable();
 }
 
 bool TrayManager::startPlugin()
@@ -44,6 +57,16 @@ void TrayManager::setBaseIcon(const QIcon &AIcon)
   FBaseIcon = AIcon;
   if (FCurNotifyId == 0)
     setTrayIcon(AIcon,"",false);
+}
+
+void TrayManager::addAction(Action *AAction, int AGroup /*= DEFAULT_ACTION_GROUP*/, bool ASort /*= false*/)
+{
+  mnuContext->addAction(AAction,AGroup,ASort);
+}
+
+void TrayManager::removeAction(Action *AAction)
+{
+  mnuContext->removeAction(AAction);
 }
 
 int TrayManager::appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink)
@@ -119,11 +142,6 @@ void TrayManager::onActivated(QSystemTrayIcon::ActivationReason AReason)
       notifyId = FNotifyItems.keys().last();
     emit notifyActivated(notifyId);
     removeNotify(notifyId);
-  }
-  else if (AReason == QSystemTrayIcon::Context)
-  {
-    FContextMenu->clear();
-    emit contextMenu(FCurNotifyId,FContextMenu);
   }
 }
 

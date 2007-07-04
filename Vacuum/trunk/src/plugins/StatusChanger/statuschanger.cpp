@@ -32,7 +32,7 @@ void StatusChanger::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = tr("Status Changer"); 
   APluginInfo->uid = STATUSCHANGER_UUID;
   APluginInfo->version = "0.1";
-  APluginInfo->dependences.append("{511A07C4-FFA4-43ce-93B0-8C50409AFC0E}"); //IPresence  
+  APluginInfo->dependences.append(PRESENCE_UUID);
 }
 
 bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
@@ -95,13 +95,9 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
   if (plugin)
   {
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
-    if (FTrayManager)
-    {
-      connect(FTrayManager->instance(),SIGNAL(contextMenu(int, Menu *)),SLOT(onTrayContextMenu(int, Menu *)));
-    }
   }
   
-  return FPresencePlugin!=NULL && FMainWindowPlugin!=NULL;
+  return FPresencePlugin!=NULL;
 }
 
 bool StatusChanger::initObjects()
@@ -135,6 +131,11 @@ bool StatusChanger::initObjects()
     FRostersModel = FRostersModelPlugin->rostersModel();
     connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
       SLOT(onStreamJidChanged(const Jid &, const Jid &)));
+  }
+
+  if (FTrayManager)
+  {
+    FTrayManager->addAction(mnuBase->menuAction(),STATUSMENU_ACTION_GROUP_MAIN,true);
   }
 
   return true;
@@ -336,8 +337,8 @@ void StatusChanger::addStreamMenu(IPresence *APresence)
     Menu *menu = new Menu(mnuBase);
     menu->setTitle(APresence->streamJid().full());
     FStreamMenus.insert(APresence,menu);
-    mnuBase->addAction(menu->menuAction(),STATUSMENU_ACTION_GROUP_STREAM,true);
     createStatusActions(APresence);
+    mnuBase->addAction(menu->menuAction(),STATUSMENU_ACTION_GROUP_STREAM,true);
     updateMenu(APresence);
   }
 }
@@ -585,15 +586,6 @@ void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       AMenu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
     }
   }
-}
-
-void StatusChanger::onTrayContextMenu(int /*ANotifyId*/, Menu *AMenu)
-{
-  Action *action = new Action(AMenu);
-  action->setIcon(mnuBase->icon());
-  action->setText(tr("Status"));
-  action->setMenu(mnuBase);
-  AMenu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN,true);
 }
 
 void StatusChanger::onReconnectTimer()

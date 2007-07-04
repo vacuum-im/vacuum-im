@@ -2,8 +2,8 @@
 #define TRAYMANAGER_H
 
 #include <QMap>
-#include <QSystemTrayIcon>
 #include <QTimer>
+#include "../../definations/actiongroups.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/itraymanager.h"
 
@@ -24,7 +24,7 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return TRAYMANAGER_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager * /*APluginManager*/, int &/*AInitOrder*/) { return true; }
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects() { return true; }
   virtual bool initSettings() { return true; }
   virtual bool startPlugin();
@@ -34,12 +34,13 @@ public:
   virtual QString toolTip() const { return FTrayIcon.toolTip(); }
   virtual QIcon baseIcon() const { return FBaseIcon; }
   virtual void setBaseIcon(const QIcon &AIcon);
+  virtual void addAction(Action *AAction, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
+  virtual void removeAction(Action *AAction);
   virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink);
   virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, bool ABlink);
   virtual void removeNotify(int ANotifyId);
 signals:
-  virtual void contextMenu(int ANotifyId, Menu *AMenu);
-  virtual void toolTips(int ANotifyId, QMultiMap<int,QString> &AToolTips);
+  virtual void activated(QSystemTrayIcon::ActivationReason AReason);
   virtual void notifyAdded(int ANotifyId);
   virtual void notifyActivated(int ANotifyId);
   virtual void notifyRemoved(int ANotifyId);
@@ -49,7 +50,8 @@ protected slots:
   void onActivated(QSystemTrayIcon::ActivationReason AReason);
   void onBlinkTimer();
 private:
-  Menu *FContextMenu;
+  Menu *mnuContext;
+  Action *actQuit;
 private:
   QTimer FBlinkTimer;
   QSystemTrayIcon FTrayIcon;
