@@ -63,8 +63,6 @@ protected:
   void openSubsDialog(int ASubsId);
   void removeSubsMessage(int ASubsId);
 protected slots:
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  void onTrayContextMenu(int ANotifyId, Menu *AMenu);
   //Operations on subscription
   void onSendSubscription(bool);
   void onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid, 
@@ -85,10 +83,12 @@ protected slots:
 protected slots:
   void onRosterOpened(IRoster *ARoster);
   void onRosterClosed(IRoster *ARoster);
+  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onTrayNotifyActivated(int ANotifyId);
   void onSubsDialogSetupNext();
+  void onAddContactDialogDestroyed(QObject *AObject);
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersModelPlugin *FRostersModelPlugin;
@@ -106,6 +106,7 @@ private:
   int FSubsLabelId;
   QHash<IRoster *,Action *> FActions;
   QHash<int,SubsItem *> FSubsItems;
+  mutable QHash<IRoster *, QList<AddContactDialog *>> FAddContactDialogs;
 };
 
 #endif // ROSTERCHANGER_H

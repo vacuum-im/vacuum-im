@@ -6,6 +6,7 @@ AddContactDialog::AddContactDialog(QWidget *AParent)
   : QDialog(AParent)
 {
   setupUi(this);
+  setAttribute(Qt::WA_DeleteOnClose,true);
   setRequestText(tr("Please, authorize me to your presence."));
   connect(btbButtons,SIGNAL(accepted()),SLOT(onAccepted()));
 }

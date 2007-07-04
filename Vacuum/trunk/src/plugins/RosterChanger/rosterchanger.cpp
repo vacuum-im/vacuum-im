@@ -11,7 +11,7 @@ RosterChanger::RosterChanger()
   FRostersViewPlugin = NULL;
   FRostersView = NULL;
   FMainWindowPlugin = NULL;
-  FTrayManager = NULL;
+  FTrayManager = NULL; 
 
   FAddContactMenu = NULL;
   FSubsId = 0;
@@ -34,7 +34,7 @@ void RosterChanger::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = tr("Roster Changer"); 
   APluginInfo->uid = ROSTERCHANGER_UUID;
   APluginInfo->version = "0.1";
-  APluginInfo->dependences.append("{5306971C-2488-40d9-BA8E-C83327B2EED5}"); //IRoster  
+  APluginInfo->dependences.append(ROSTER_UUID); 
 }
 
 bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
@@ -79,7 +79,6 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
     if (FTrayManager)
     {
-      connect(FTrayManager->instance(),SIGNAL(contextMenu(int, Menu *)),SLOT(onTrayContextMenu(int, Menu *)));
       connect(FTrayManager->instance(),SIGNAL(notifyActivated(int)),SLOT(onTrayNotifyActivated(int)));
     }
   }
@@ -89,6 +88,7 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 bool RosterChanger::initObjects()
 {
+
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
   {
     FRostersModel = FRostersModelPlugin->rostersModel();
@@ -115,6 +115,13 @@ bool RosterChanger::initObjects()
     FAddContactMenu->menuAction()->setEnabled(false);
     FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FAddContactMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP_CONTACT,true);
   }
+
+  if (FTrayManager)
+  {
+    if (FAddContactMenu)
+      FTrayManager->addAction(FAddContactMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP_CONTACT,true);
+  }
+
   return true;
 }
 
@@ -134,6 +141,8 @@ void RosterChanger::showAddContactDialog(const Jid &AStreamJid, const Jid &AJid,
     if (!ARequest.isEmpty())
       dialog->setRequestText(ARequest);
     connect(dialog,SIGNAL(addContact(AddContactDialog *)),SLOT(onAddContact(AddContactDialog *)));
+    connect(dialog,SIGNAL(destroyed(QObject *)),SLOT(onAddContactDialogDestroyed(QObject *)));
+    FAddContactDialogs[roster].append(dialog);
     dialog->show();
   }
 }
@@ -475,12 +484,6 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   }
 }
 
-void RosterChanger::onTrayContextMenu(int /*ANotifyId*/, Menu *AMenu)
-{
-  if (FAddContactMenu->isEnabled())
-    AMenu->addAction(FAddContactMenu->menuAction(),ROSTERCHANGER_ACTION_GROUP_CONTACT,true);
-}
-
 void RosterChanger::onSendSubscription(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
@@ -818,22 +821,30 @@ void RosterChanger::onRosterClosed(IRoster *ARoster)
     if (FActions.count() == 0)
       FAddContactMenu->menuAction()->setEnabled(false);
     delete action;
+  }
 
-    Jid streamJid = ARoster->streamJid();
-    if (!FSubsDialog.isNull() && FSubsDialog->streamJid() == streamJid)
-      FSubsDialog->reject();
+  Jid streamJid = ARoster->streamJid();
+  if (!FSubsDialog.isNull() && FSubsDialog->streamJid() == streamJid)
+    FSubsDialog->reject();
 
-    QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
-    while (it != FSubsItems.end())
+  QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
+  while (it != FSubsItems.end())
+  {
+    if (it.value()->streamJid == streamJid)
     {
-      if (it.value()->streamJid == streamJid)
-      {
-        removeSubsMessage(it.key());
-        it = FSubsItems.begin(); 
-      }
-      else
-        it++;
+      removeSubsMessage(it.key());
+      it = FSubsItems.begin(); 
     }
+    else
+      it++;
+  }
+
+  if (FAddContactDialogs.contains(ARoster))
+  {
+    QList<AddContactDialog *> dialogs = FAddContactDialogs.take(ARoster);
+    foreach(AddContactDialog *dialog, dialogs)
+      delete dialog;
+    FAddContactDialogs.remove(ARoster);
   }
 }
 
@@ -881,6 +892,21 @@ void RosterChanger::onSubsDialogSetupNext()
 {
   if (FSubsItems.count()>0)
     openSubsDialog(FSubsItems.keys().first());
+}
+
+void RosterChanger::onAddContactDialogDestroyed(QObject *AObject)
+{
+  AddContactDialog *dialog = static_cast<AddContactDialog *>(AObject);
+  if (dialog)
+  {
+    QHash<IRoster *, QList<AddContactDialog *>>::iterator it = FAddContactDialogs.begin();
+    while (it != FAddContactDialogs.end())
+    {
+      if (it.value().contains(dialog))
+        it.value().removeAt(it.value().indexOf(dialog));
+      it++;
+    }
+  }
 }
 
 Q_EXPORT_PLUGIN2(RosterChangerPlugin, RosterChanger)

@@ -4,6 +4,7 @@ SubscriptionDialog::SubscriptionDialog(QWidget *AParent)
   : QDialog(AParent)
 {
   setupUi(this);
+  setAttribute(Qt::WA_DeleteOnClose,true);
   FToolBar = new QToolBar(this);
   vboxLayout->insertWidget(vboxLayout->indexOf(tedMessage),FToolBar);
   FButtonGroup = new QButtonGroup(this);
