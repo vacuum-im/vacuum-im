@@ -37,14 +37,19 @@ public:
   virtual bool startPlugin() { return true; }
 
   //ISettings
+  virtual bool isSettingsValid() const { return !FSettings.isNull(); }
+  virtual bool isProfileOpened() const { return FProfileOpened; }
   virtual ISettings *openSettings(const QUuid &APluginId, QObject *AParent);
   virtual QString settingsFile() const { return FFile.fileName(); }
   virtual bool setSettingsFile(const QString &AFileName);
   virtual bool saveSettings();
   virtual QDomDocument document() const { return FSettings; }
-  virtual QString profile() const { return FProfile.tagName(); }
-  virtual QDomElement setProfile(const QString &AProfile);
-  virtual QDomElement profileNode(const QString &AProfile);
+  virtual QDomElement addProfile(const QString &AProfile);
+  virtual QString profile() const { return FProfile.attribute("name","Default"); }
+  virtual QStringList profiles() const;
+  virtual QDomElement profileNode(const QString &AProfile = QString());
+  virtual QDomElement setProfile(const QString &AProfile = QString());
+  virtual void removeProfile(const QString &AProfile);
   virtual QDomElement pluginNode(const QUuid &AId);
   virtual void openOptionsDialog(const QString &ANode = "");
   virtual void openOptionsNode(const QString &ANode, const QString &AName, 
@@ -55,8 +60,10 @@ public:
 public slots:
   virtual void openOptionsDialogAction(bool);
 signals:
-  virtual void profileOpened();
-  virtual void profileClosed();
+  virtual void profileAdded(const QString &AProfile);
+  virtual void profileOpened(const QString &AProfile);
+  virtual void profileClosed(const QString &AProfile);
+  virtual void profileRemoved(const QString &AProfile);
   virtual void optionsNodeOpened(const QString &ANode);
   virtual void optionsNodeClosed(const QString &ANode);
   virtual void optionsHolderAdded(IOptionsHolder *);
@@ -67,12 +74,13 @@ signals:
   virtual void optionsDialogClosed();
 protected:
   QWidget *createNodeWidget(const QString &ANode);
+  void setProfileOpened();
+  void setProfileClosed();
 protected slots:
   void onMainWindowCreated(IMainWindow *AMainWindow);
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
   void onPluginManagerQuit();
-  void onTrayContextMenu(int ANotifyId, Menu *AMenu);
 private:
   IPluginManager *FPluginManager;
   IMainWindowPlugin *FMainWindowPlugin;

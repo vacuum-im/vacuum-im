@@ -37,8 +37,8 @@ protected:
   static QString variantToString(const QVariant &AVariant);
   static QVariant stringToVariant(const QString &AString, QVariant::Type AType, const QVariant &ADefault);
 private slots:
-  virtual void onProfileOpened();
-  virtual void onProfileClosed();
+  virtual void onProfileOpened(const QString &AProfile = QString());
+  virtual void onProfileClosed(const QString &AProfile = QString());
 private:
   ISettingsPlugin *FSettingsPlugin;
 private:

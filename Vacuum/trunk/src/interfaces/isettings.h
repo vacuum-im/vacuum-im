@@ -1,6 +1,7 @@
 #ifndef ISETTINGS_H
 #define ISETTINGS_H
 
+#include <QStringList>
 #include <QDomDocument>
 #include <QUuid>
 #include <QVariant>
@@ -14,6 +15,9 @@ class IOptionsHolder {
 public:
   virtual QObject *instance() =0;
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder) const =0;
+signals:
+  virtual void optionsAccepted() =0;
+  virtual void optionsRejected() =0;
 };
 
 class ISettings {
@@ -37,14 +41,19 @@ signals:
 class ISettingsPlugin {
 public:
   virtual QObject *instance() =0;
+  virtual bool isSettingsValid() const =0;
+  virtual bool isProfileOpened() const =0;
   virtual ISettings *openSettings(const QUuid &, QObject *)=0;
   virtual QString settingsFile() const =0;
   virtual bool setSettingsFile(const QString &) =0;
   virtual bool saveSettings() =0;
   virtual QDomDocument document() const=0;
+  virtual QDomElement addProfile(const QString &AProfile) =0;
   virtual QString profile() const =0;
-  virtual QDomElement setProfile(const QString &) =0;
-  virtual QDomElement profileNode(const QString &) =0;
+  virtual QStringList profiles() const =0;
+  virtual QDomElement profileNode(const QString &AProfile = QString()) =0;
+  virtual QDomElement setProfile(const QString &AProfile = QString()) =0;
+  virtual void removeProfile(const QString &AProfile) =0;
   virtual QDomElement pluginNode(const QUuid &) =0;
   virtual void openOptionsDialog(const QString &ANode = "") =0;
   virtual void openOptionsNode(const QString &ANode, const QString &AName, 
@@ -55,8 +64,10 @@ public:
 public slots:
   virtual void openOptionsDialogAction(bool) =0;
 signals:
-  virtual void profileOpened()=0;
-  virtual void profileClosed()=0;
+  virtual void profileAdded(const QString &AProfile) =0;
+  virtual void profileOpened(const QString &AProfile) =0;
+  virtual void profileClosed(const QString &AProfile) =0;
+  virtual void profileRemoved(const QString &AProfile) =0;
   virtual void optionsNodeOpened(const QString &ANode) =0;
   virtual void optionsNodeClosed(const QString &ANode) =0;
   virtual void optionsHolderAdded(IOptionsHolder *) =0;

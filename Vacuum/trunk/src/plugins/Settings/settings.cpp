@@ -1,8 +1,9 @@
-#include "settings.h"
 #include <QtDebug>
+#include "settings.h"
 #include <QStringList>
 #include <QRect>
 #include <QPoint>
+#include <QTimer>
 
 Settings::Settings(const QUuid &AUuid, ISettingsPlugin *ASettingsPlugin, QObject *parent)
 	: QObject(parent)
@@ -10,8 +11,10 @@ Settings::Settings(const QUuid &AUuid, ISettingsPlugin *ASettingsPlugin, QObject
   FUuid = AUuid;
   FSettingsOpened = false;
   FSettingsPlugin = ASettingsPlugin;
-  connect(FSettingsPlugin->instance(),SIGNAL(profileOpened()),SLOT(onProfileOpened()));
-  connect(FSettingsPlugin->instance(),SIGNAL(profileClosed()),SLOT(onProfileClosed()));
+  connect(FSettingsPlugin->instance(),SIGNAL(profileOpened(const QString &)),SLOT(onProfileOpened(const QString &)));
+  connect(FSettingsPlugin->instance(),SIGNAL(profileClosed(const QString &)),SLOT(onProfileClosed(const QString &)));
+  if (FSettingsPlugin->isProfileOpened())
+    QTimer::singleShot(0,this,SLOT(onProfileOpened()));
 }
 
 Settings::~Settings()
@@ -191,7 +194,7 @@ void Settings::delNSRecurse(const QString &ANameNS, QDomElement elem)
   }
 }
 
-QString Settings::variantToString( const QVariant &AVariant )
+QString Settings::variantToString(const QVariant &AVariant )
 {
   if (AVariant.type() == QVariant::Rect)
   {
@@ -207,7 +210,7 @@ QString Settings::variantToString( const QVariant &AVariant )
     return AVariant.toString();
 }
 
-QVariant Settings::stringToVariant( const QString &AString, QVariant::Type AType, const QVariant &ADefault)
+QVariant Settings::stringToVariant(const QString &AString, QVariant::Type AType, const QVariant &ADefault)
 {
   if (AType == QVariant::Rect)
   {
@@ -229,17 +232,17 @@ QVariant Settings::stringToVariant( const QString &AString, QVariant::Type AType
     return QVariant(AString);
 }
 
-void Settings::onProfileOpened()
+void Settings::onProfileOpened(const QString &)
 {
   FSettings = FSettingsPlugin->pluginNode(FUuid); 
-  if (!FSettings.isNull())
+  if (!FSettingsOpened && !FSettings.isNull())
   {
     FSettingsOpened = true;
     emit opened();
   }
 }
 
-void Settings::onProfileClosed()
+void Settings::onProfileClosed(const QString &)
 {
   if (FSettingsOpened)
   {
