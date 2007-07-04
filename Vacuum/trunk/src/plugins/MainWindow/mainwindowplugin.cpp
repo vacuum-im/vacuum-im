@@ -1,6 +1,5 @@
 #include "mainwindowplugin.h"
 
-#include "../../definations/actiongroups.h"
 
 MainWindowPlugin::MainWindowPlugin()
 {
@@ -44,7 +43,6 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
     if (FTrayManager)
     {
-      connect(FTrayManager->instance(),SIGNAL(contextMenu(int, Menu *)),SLOT(onTrayContextMenu(int, Menu *)));
       connect(FTrayManager->instance(),SIGNAL(notifyActivated(int)),SLOT(onTrayNotifyActivated(int)));
     }
   }
@@ -81,11 +79,6 @@ bool MainWindowPlugin::startPlugin()
 IMainWindow *MainWindowPlugin::mainWindow() const
 {
   return FMainWindow;
-}
-
-void MainWindowPlugin::onTrayContextMenu(int /*ANotifyId*/, Menu *AMenu)
-{
-  AMenu->addAction(actQuit,MAINWINDOW_ACTION_GROUP_QUIT,true);
 }
 
 void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId)

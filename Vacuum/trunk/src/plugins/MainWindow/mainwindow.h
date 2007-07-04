@@ -31,7 +31,7 @@ protected:
   void createMenus();
 protected:
   virtual void closeEvent(QCloseEvent *AEvent);
-protected:
+private:
   Menu *mnuMain;
 private:
   QVBoxLayout     *FMainLayout;

@@ -1,11 +1,12 @@
 #ifndef MAINWINDOWPLUGIN_H
 #define MAINWINDOWPLUGIN_H
 
+#include "../../definations/actiongroups.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/isettings.h"
-#include "../../utils/action.h"
 #include "../../interfaces/itraymanager.h"
+#include "../../utils/action.h"
 #include "mainwindow.h"
 
 class MainWindowPlugin :
@@ -36,7 +37,6 @@ signals:
   virtual void mainWindowCreated(IMainWindow *);
   virtual void mainWindowDestroyed(IMainWindow *);
 protected slots:
-  void onTrayContextMenu(int ANotifyId, Menu *AMenu);
   void onTrayNotifyActivated(int ANotifyId);
   void onSettingsOpened();
   void onSettingsClosed();
