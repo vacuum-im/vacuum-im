@@ -76,6 +76,8 @@ signals:
   virtual void hidden(IAccount *) =0;
   virtual void removed(IAccount *) =0;
   virtual void destroyed(IAccount *) =0;
+  virtual void optionsAccepted() =0;
+  virtual void optionsRejected() =0;
 };
 
 Q_DECLARE_INTERFACE(IAccount,"Vacuum.Plugin.IAccount/1.0")

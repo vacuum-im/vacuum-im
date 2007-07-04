@@ -31,8 +31,8 @@ void AccountManager::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = "Account manager";
   APluginInfo->uid = ACCOUNTMANAGER_UUID;
   APluginInfo->version = "0.1";
-  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
-  APluginInfo->dependences.append("{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"); //ISettings  
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID); 
+  APluginInfo->dependences.append(SETTINGS_UUID);  
 }
 
 bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -428,6 +428,7 @@ void AccountManager::onOptionsDialogAccepted()
       QMessageBox::warning(NULL,tr("Account options canceled"),warningMessage);
     }
   }
+  emit optionsAccepted();
 }
 
 void AccountManager::onOptionsDialogRejected()
@@ -446,6 +447,8 @@ void AccountManager::onOptionsDialogRejected()
 
   foreach(QString id,oldAccounts)
     openAccountOptionsNode(id,"");
+
+  emit optionsRejected();
 }
 
 void AccountManager::onSettingsOpened()
@@ -465,7 +468,7 @@ void AccountManager::onSettingsClosed()
 
 void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex && AIndex->data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
+  if (AIndex->data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
   {
     QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
     IAccount *account = accountByStream(streamJid);

@@ -57,6 +57,8 @@ signals:
   virtual void hidden(IAccount *);
   virtual void removed(IAccount *);
   virtual void destroyed(IAccount *);
+  virtual void optionsAccepted();
+  virtual void optionsRejected();
 protected:
   QString newId() const;
   void openAccountOptionsNode(const QString &AAccountId, const QString &AName = QString());
