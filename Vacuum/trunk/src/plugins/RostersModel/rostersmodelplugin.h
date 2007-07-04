@@ -3,6 +3,7 @@
 
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"
+#include "../../interfaces/iaccountmanager.h"
 #include "rostersmodel.h"
 
 class RostersModelPlugin : 
@@ -39,9 +40,11 @@ protected slots:
   void onRosterRemoved(IRoster *ARoster);
   void onPresenceAdded(IPresence *APresence);
   void onPresenceRemoved(IPresence *APresence);
+  void onAccountChanged(const QString &AName, const QVariant &AValue);
 private:
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
+  IAccountManager *FAccountManager;
 private:
   RostersModel *FRostersModel;
 };

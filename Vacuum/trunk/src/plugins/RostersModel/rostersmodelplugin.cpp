@@ -53,6 +53,13 @@ bool RostersModelPlugin::initConnections(IPluginManager *APluginManager, int &/*
       connect(FPresencePlugin->instance(), SIGNAL(presenceRemoved(IPresence *)),SLOT(onPresenceRemoved(IPresence *))); 
     }
   }
+
+  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  if (plugin)
+  {
+    FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+  }
+
   return true;
 }
 
@@ -73,7 +80,18 @@ IRostersModel *RostersModelPlugin::rostersModel()
 
 IRosterIndex *RostersModelPlugin::addStream(IRoster *ARoster, IPresence *APresence)
 {
-  return FRostersModel->addStream(ARoster,APresence);
+  IRosterIndex *streamRoot = FRostersModel->addStream(ARoster,APresence);
+  if (FAccountManager)
+  {
+    IAccount *account = FAccountManager->accountByStream(ARoster->streamJid());
+    if (account)
+    {
+      connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),
+        SLOT(onAccountChanged(const QString &, const QVariant &)));
+      streamRoot->setData(IRosterIndex::DR_Name,account->name());
+    }
+  }
+  return streamRoot;
 }
 
 void RostersModelPlugin::removeStream(const Jid &AStreamJid)
@@ -107,6 +125,20 @@ void RostersModelPlugin::onPresenceAdded(IPresence *APresence)
 void RostersModelPlugin::onPresenceRemoved(IPresence *APresence)
 {
   removeStream(APresence->streamJid());
+}
+
+void RostersModelPlugin::onAccountChanged(const QString &AName, const QVariant &/*AValue*/)
+{
+  if (AName == "name")
+  {
+    IAccount *account = qobject_cast<IAccount *>(sender());
+    if (account)
+    {
+      IRosterIndex *streamRoot = FRostersModel->getStreamRoot(account->streamJid());
+      if (streamRoot)
+        streamRoot->setData(IRosterIndex::DR_Name,account->name());
+    }
+  }
 }
 
 Q_EXPORT_PLUGIN2(RostersModelPlugin, RostersModelPlugin)
