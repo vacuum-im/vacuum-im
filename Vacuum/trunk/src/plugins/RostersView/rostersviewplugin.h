@@ -43,8 +43,15 @@ signals:
   virtual void viewCreated(IRostersView *);
   virtual void viewDestroyed(IRostersView *);
   virtual void showOfflineContactsChanged(bool AShow);
+protected:
+  void reExpandItems(const QModelIndex &AParent = QModelIndex());
+  QString getExpandSettingsName(const QModelIndex &AIndex);
+  void loadExpandedState(const QModelIndex &AIndex);
+  void saveExpandedState(const QModelIndex &AIndex);
 protected slots:
   void onRostersViewDestroyed(QObject *);
+  void onModelAboutToBeSeted(IRostersModel *AModel);
+  void onModelSeted(IRostersModel *AModel);
   void onProxyAdded(QAbstractProxyModel *AProxyModel);
   void onProxyRemoved(QAbstractProxyModel *AProxyModel);
   void onRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
@@ -63,6 +70,7 @@ private:
   RostersView *FRostersView; 
   SortFilterProxyModel *FSortFilterProxyModel;
   QAbstractItemModel *FLastModel;
+  QList<int> FSavedExpandStatusTypes;
 };
 
 #endif // ROSTERSVIEWPLUGIN_H
