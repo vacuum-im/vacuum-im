@@ -43,11 +43,12 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
     QAction *befour = NULL;
     if (ASort)
     {
-      while (!befour && it != FActions.end() && it.key() == AGroup)
+      QList<QAction *> actionList = QMenu::actions();
+      for (int i = 0; !befour && i<actionList.count(); ++i)
       {
-        if (QString::localeAwareCompare(it.value()->text(),AAction->text()) > 0)
-          befour = it.value();
-        it++;
+        if (FActions.key((Action *)actionList.at(i))==AGroup)
+          if (QString::localeAwareCompare(actionList.at(i)->text(),AAction->text()) > 0)
+            befour = actionList.at(i);
       }
     }
 
