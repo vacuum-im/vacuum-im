@@ -10,4 +10,5 @@ HEADERS += ipluginmanager.h \
            istatuschanger.h \
            iaccountmanager.h \
            irosterchanger.h \
-           itraymanager.h
+           itraymanager.h \
+           iprivatestorage

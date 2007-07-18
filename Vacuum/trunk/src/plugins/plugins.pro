@@ -15,4 +15,5 @@ SUBDIRS = settings \
           statuschanger \
           rosterchanger \
           accountmanager \
-          traymanager
+          traymanager \
+          privatestorage
