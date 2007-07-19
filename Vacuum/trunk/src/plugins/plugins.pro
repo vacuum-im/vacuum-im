@@ -16,4 +16,5 @@ SUBDIRS = settings \
           rosterchanger \
           accountmanager \
           traymanager \
-          privatestorage
+          privatestorage \
+          messenger
