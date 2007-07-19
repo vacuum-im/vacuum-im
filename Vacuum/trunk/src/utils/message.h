@@ -4,6 +4,7 @@
 #include <QSharedData>
 #include <QDateTime>
 #include <QStringList>
+#include <QVariant>
 #include "utilsexport.h"
 #include "stanza.h"
 
@@ -22,11 +23,13 @@ public:
   MessageData(const MessageData &AOther) : FStanza(AOther.FStanza) 
   {
     FDateTime = AOther.FDateTime;
+    FData = AOther.FData;
   };
   ~MessageData() {};
 public:
   Stanza FStanza;
   QDateTime FDateTime;
+  QHash<int, QVariant> FData;
 };
 
 
@@ -43,6 +46,9 @@ public:
   Stanza &stanza() { return d->FStanza; }
   const Stanza &stanza() const { return d->FStanza; }
   Message &setStanza(const Stanza &AStanza) { d->FStanza = AStanza; return *this; }
+  QVariant data(int ARole) const { return d->FData.value(ARole); }
+  void setData(int ARole, const QVariant &AData);
+  void setData(const QHash<int, QVariant> &AData);
   QString from() const { return d->FStanza.from(); }
   Message &setFrom(const QString &AFrom) { d->FStanza.setFrom(AFrom); return *this; }
   QString to() const { return d->FStanza.to(); }
@@ -65,6 +71,8 @@ public:
   QDomElement findChidByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang) const;
   QDomElement addChildByLang(const QDomElement &AParent, const QString &ATagName, 
     const QString &ALang, const QString &AText);
+signals:
+  void dataChanged(int ARole, const QVariant &ABefour);
 protected:
   QDomElement setTextToElem(QDomElement &AElem, const QString &AText);
 private:

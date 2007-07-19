@@ -17,6 +17,29 @@ Message::~Message()
 
 }
 
+void Message::setData(int ARole, const QVariant &AData)
+{
+  QVariant befour = data(ARole);
+  if (befour != AData)
+  {
+    if (AData.isValid())
+      d->FData.insert(ARole,AData);
+    else
+      d->FData.remove(ARole);
+    emit dataChanged(ARole, befour);
+  }
+}
+
+void Message::setData(const QHash<int, QVariant> &AData)
+{
+  QHash<int,QVariant>::const_iterator it = AData.constBegin();
+  while(it != AData.constEnd())
+  {
+    setData(it.key(),it.value());
+    it++;
+  }
+}
+
 QDateTime Message::dateTime() const
 {
   return d->FDateTime;
@@ -127,6 +150,5 @@ QDomElement Message::setTextToElem(QDomElement &AElem, const QString &AText)
   }
   return AElem;
 }
-
 
 
