@@ -48,7 +48,8 @@ public:
   //IMessenger
 
 protected:
-  void notifyMessage(const Message &AMessage);
+  IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AJid);
+  void notifyMessage(const Jid &AStreamJid, const Jid &AFromJid, const QString &AMesType);
 signals:
   virtual void messageReceived(Message &AMessage);
   virtual void messageWindowCreated(IMessageWindow *AWindow);

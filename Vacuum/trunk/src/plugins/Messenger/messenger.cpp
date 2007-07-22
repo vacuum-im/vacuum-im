@@ -88,14 +88,15 @@ bool Messenger::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const St
   if (!message.body().isEmpty())
   {
     emit messageReceived(message);
-    MessageWindow *mWnd = new MessageWindow(NULL);
-    emit messageWindowCreated(mWnd);
-    mWnd->setStreamJid(AStreamJid);
-    mWnd->setContactJid(message.from());
-    mWnd->dateTimeEdit()->setText(message.dateTime().toString(Qt::LocaleDate));
-    mWnd->messageEdit()->setPlainText(message.body());
-    mWnd->messageEdit()->setReadOnly(true);
-    mWnd->show();
+    notifyMessage(message.to(),message.from(),message.type());
+    //MessageWindow *mWnd = new MessageWindow(NULL);
+    //emit messageWindowCreated(mWnd);
+    //mWnd->setStreamJid(AStreamJid);
+    //mWnd->setContactJid(message.from());
+    //mWnd->dateTimeEdit()->setText(message.dateTime().toString(Qt::LocaleDate));
+    //mWnd->messageEdit()->setPlainText(message.body());
+    //mWnd->messageEdit()->setReadOnly(true);
+    //mWnd->show();
     AAccept = true;
   }
   return false;
@@ -110,9 +111,52 @@ bool Messenger::rosterIndexClicked(IRosterIndex *AIndex, int AHookerId)
   return false;
 }
 
-void Messenger::notifyMessage(const Message &AMessage)
+IRosterIndexList Messenger::getContactIndexList(const Jid &AStreamJid, const Jid &AJid)
 {
-  
+  IRosterIndexList indexList;
+  if (FRostersModel)
+  {
+    IRosterIndex *streamRoot = FRostersModel->getStreamRoot(AStreamJid);
+    if (streamRoot)
+    {
+      IRosterIndex::ItemType type = IRosterIndex::IT_Contact;
+      if (AJid.node().isEmpty())
+        type = IRosterIndex::IT_Agent;
+      QHash<int,QVariant> data;
+      data.insert(IRosterIndex::DR_Type, type);
+      data.insert(IRosterIndex::DR_PJid, AJid.pFull());
+      indexList = streamRoot->findChild(data,true);
+      if (indexList.isEmpty())
+      {
+        data.insert(IRosterIndex::DR_PJid, AJid.pBare());
+        indexList = streamRoot->findChild(data,true);
+      }
+      if (indexList.isEmpty())
+      {
+        IRoster *roster = FRostersModel->getRoster(AStreamJid.pFull());
+        IRosterIndex *notInRosterGroup = FRostersModel->createGroup(FRostersModel->notInRosterGroupName(),
+          roster->groupDelimiter(),IRosterIndex::IT_NotInRosterGroup,streamRoot);
+        IRosterIndex *index = FRostersModel->createRosterIndex(type,AJid.pBare(),notInRosterGroup);
+        index->setData(IRosterIndex::DR_Jid,AJid.full());
+        index->setData(IRosterIndex::DR_PJid,AJid.pFull());
+        index->setData(IRosterIndex::DR_BareJid,AJid.pBare());
+        index->setData(IRosterIndex::DR_Group,FRostersModel->notInRosterGroupName());
+        FRostersModel->insertRosterIndex(index,notInRosterGroup);
+        indexList.append(index);
+      }
+    }
+  }
+  return indexList;
+}
+
+void Messenger::notifyMessage(const Jid &AStreamJid, const Jid &AFromJid, const QString &/*AMesType*/)
+{
+  if (FRostersView)
+  {
+    IRosterIndexList indexList = getContactIndexList(AStreamJid,AFromJid);
+    foreach(IRosterIndex *index, indexList)
+      FRostersView->insertIndexLabel(FNormalLabelId,index);
+  }
 }
 
 void Messenger::onStreamAdded(IXmppStream *AXmppStream)
