@@ -243,6 +243,52 @@ IRosterIndex *RostersModel::createGroup(const QString &AName, const QString &AGr
   return index;
 }
 
+IRosterIndexList RostersModel::getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate)
+{
+  IRosterIndexList indexList;
+  IRosterIndex *streamRoot = getStreamRoot(AStreamJid);
+  if (streamRoot)
+  {
+    IRosterIndex::ItemType type = IRosterIndex::IT_Contact;
+    if (AContactJid.node().isEmpty())
+      type = IRosterIndex::IT_Agent;
+    else if (AContactJid.equals(AStreamJid,false))
+      type = IRosterIndex::IT_MyResource;
+
+    QHash<int,QVariant> data;
+    data.insert(IRosterIndex::DR_Type, type);
+    if (AContactJid.resource().isEmpty())
+      data.insert(IRosterIndex::DR_BareJid, AContactJid.pBare());
+    else
+      data.insert(IRosterIndex::DR_PJid, AContactJid.pFull());
+    indexList = streamRoot->findChild(data,true);
+
+    if (indexList.isEmpty() && !AContactJid.resource().isEmpty())
+    {
+      data.insert(IRosterIndex::DR_PJid, AContactJid.pBare());
+      indexList = streamRoot->findChild(data,true);
+    }
+
+    if (indexList.isEmpty() && ACreate)
+    {
+      IRoster *roster = getRoster(AStreamJid.pFull());
+      IRosterIndex *group;
+      if (type == IRosterIndex::IT_MyResource)
+        group = createGroup(myResourcesGroupName(),roster->groupDelimiter(),IRosterIndex::IT_MyResourcesGroup,streamRoot);
+      else
+        group = createGroup(notInRosterGroupName(),roster->groupDelimiter(),IRosterIndex::IT_NotInRosterGroup,streamRoot);
+      IRosterIndex *index = createRosterIndex(type,AContactJid.pFull(),group);
+      index->setData(IRosterIndex::DR_Jid,AContactJid.full());
+      index->setData(IRosterIndex::DR_PJid,AContactJid.pFull());
+      index->setData(IRosterIndex::DR_BareJid,AContactJid.pBare());
+      index->setData(IRosterIndex::DR_Group,group->data(IRosterIndex::DR_Group));
+      insertRosterIndex(index,group);
+      indexList.append(index);
+    }
+  }
+  return indexList;
+}
+
 IRosterIndex *RostersModel::findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const
 {
   QHash<int,QVariant> data;

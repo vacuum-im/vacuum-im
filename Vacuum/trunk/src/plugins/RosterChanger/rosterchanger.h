@@ -59,7 +59,6 @@ protected:
   Menu *createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
 protected:
-  IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AJid);
   void openSubsDialog(int ASubsId);
   void removeSubsMessage(int ASubsId);
 protected slots:

@@ -37,6 +37,7 @@ public:
   virtual IRosterIndex *getStreamRoot(const Jid &AStreamJid) const;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent);
   virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent);
+  virtual IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false);
   virtual IRosterIndex *findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const;
   virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const;
   virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);

@@ -244,39 +244,6 @@ Menu * RosterChanger::createGroupMenu(const QHash<int,QVariant> AData, const QSe
   return menu;
 }
 
-IRosterIndexList RosterChanger::getContactIndexList(const Jid &AStreamJid, const Jid &AJid)
-{
-  IRosterIndexList indexList;
-  if (FRostersModel)
-  {
-    IRosterIndex *streamRoot = FRostersModel->getStreamRoot(AStreamJid);
-    if (streamRoot)
-    {
-      IRosterIndex::ItemType type = IRosterIndex::IT_Contact;
-      if (AJid.node().isEmpty())
-        type = IRosterIndex::IT_Agent;
-      QHash<int,QVariant> data;
-      data.insert(IRosterIndex::DR_Type, type);
-      data.insert(IRosterIndex::DR_BareJid, AJid.pBare());
-      indexList = streamRoot->findChild(data,true);
-      if (indexList.isEmpty())
-      {
-        IRoster *roster = FRostersModel->getRoster(AStreamJid.pFull());
-        IRosterIndex *notInRosterGroup = FRostersModel->createGroup(FRostersModel->notInRosterGroupName(),
-          roster->groupDelimiter(),IRosterIndex::IT_NotInRosterGroup,streamRoot);
-        IRosterIndex *index = FRostersModel->createRosterIndex(type,AJid.pBare(),notInRosterGroup);
-        index->setData(IRosterIndex::DR_Jid,AJid.full());
-        index->setData(IRosterIndex::DR_PJid,AJid.pFull());
-        index->setData(IRosterIndex::DR_BareJid,AJid.pBare());
-        index->setData(IRosterIndex::DR_Group,FRostersModel->notInRosterGroupName());
-        FRostersModel->insertRosterIndex(index,notInRosterGroup);
-        indexList.append(index);
-      }
-    }
-  }
-  return indexList;
-}
-
 void RosterChanger::openSubsDialog(int ASubsId)
 {
   if (FSubsItems.contains(ASubsId))
@@ -319,7 +286,7 @@ void RosterChanger::removeSubsMessage(int ASubsId)
     if (FTrayManager)
       FTrayManager->removeNotify(subsItem->trayId);
 
-    if (FRostersView)
+    if (FRostersView && FRostersModel)
     {
       bool removeLabel = true;
       foreach(SubsItem *sItem,FSubsItems)
@@ -330,7 +297,7 @@ void RosterChanger::removeSubsMessage(int ASubsId)
         };
       if (removeLabel)
       {
-        IRosterIndexList indexList = getContactIndexList(subsItem->streamJid, subsItem->contactJid);
+        IRosterIndexList indexList = FRostersModel->getContactIndexList(subsItem->streamJid, subsItem->contactJid, false);
         foreach(IRosterIndex *index, indexList)
           FRostersView->removeIndexLabel(FSubsLabelId,index);
       }
@@ -516,9 +483,9 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid,
       tr("Subscription message from %1").arg(AFromJid.full()),true);
   }
 
-  if (FRostersView)
+  if (FRostersView && FRostersModel)
   {
-    IRosterIndexList indexList = getContactIndexList(ARoster->streamJid(),AFromJid);
+    IRosterIndexList indexList = FRostersModel->getContactIndexList(ARoster->streamJid(),AFromJid,true);
     foreach(IRosterIndex *index, indexList)
       FRostersView->insertIndexLabel(FSubsLabelId,index);
   }

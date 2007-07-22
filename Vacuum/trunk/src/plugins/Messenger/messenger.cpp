@@ -111,49 +111,11 @@ bool Messenger::rosterIndexClicked(IRosterIndex *AIndex, int AHookerId)
   return false;
 }
 
-IRosterIndexList Messenger::getContactIndexList(const Jid &AStreamJid, const Jid &AJid)
-{
-  IRosterIndexList indexList;
-  if (FRostersModel)
-  {
-    IRosterIndex *streamRoot = FRostersModel->getStreamRoot(AStreamJid);
-    if (streamRoot)
-    {
-      IRosterIndex::ItemType type = IRosterIndex::IT_Contact;
-      if (AJid.node().isEmpty())
-        type = IRosterIndex::IT_Agent;
-      QHash<int,QVariant> data;
-      data.insert(IRosterIndex::DR_Type, type);
-      data.insert(IRosterIndex::DR_PJid, AJid.pFull());
-      indexList = streamRoot->findChild(data,true);
-      if (indexList.isEmpty())
-      {
-        data.insert(IRosterIndex::DR_PJid, AJid.pBare());
-        indexList = streamRoot->findChild(data,true);
-      }
-      if (indexList.isEmpty())
-      {
-        IRoster *roster = FRostersModel->getRoster(AStreamJid.pFull());
-        IRosterIndex *notInRosterGroup = FRostersModel->createGroup(FRostersModel->notInRosterGroupName(),
-          roster->groupDelimiter(),IRosterIndex::IT_NotInRosterGroup,streamRoot);
-        IRosterIndex *index = FRostersModel->createRosterIndex(type,AJid.pBare(),notInRosterGroup);
-        index->setData(IRosterIndex::DR_Jid,AJid.full());
-        index->setData(IRosterIndex::DR_PJid,AJid.pFull());
-        index->setData(IRosterIndex::DR_BareJid,AJid.pBare());
-        index->setData(IRosterIndex::DR_Group,FRostersModel->notInRosterGroupName());
-        FRostersModel->insertRosterIndex(index,notInRosterGroup);
-        indexList.append(index);
-      }
-    }
-  }
-  return indexList;
-}
-
 void Messenger::notifyMessage(const Jid &AStreamJid, const Jid &AFromJid, const QString &/*AMesType*/)
 {
-  if (FRostersView)
+  if (FRostersView && FRostersModel)
   {
-    IRosterIndexList indexList = getContactIndexList(AStreamJid,AFromJid);
+    IRosterIndexList indexList = FRostersModel->getContactIndexList(AStreamJid,AFromJid,true);
     foreach(IRosterIndex *index, indexList)
       FRostersView->insertIndexLabel(FNormalLabelId,index);
   }
