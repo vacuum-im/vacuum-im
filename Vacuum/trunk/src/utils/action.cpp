@@ -49,13 +49,16 @@ void Action::setMenu(Menu *AMenu)
 
   if (AMenu)
   {
-    //setIcon(AMenu->icon());
-    //setText(AMenu->title());
-    //setToolTip(AMenu->toolTip());
-    //setWhatsThis(AMenu->whatsThis());
+    if (parent() == AMenu)
+    {
+      setIcon(AMenu->icon());
+      setText(AMenu->title());
+      setToolTip(AMenu->toolTip());
+      setWhatsThis(AMenu->whatsThis());
+    }
     connect(AMenu,SIGNAL(menuDestroyed(Menu *)),SLOT(onMenuDestroyed(Menu *)));
   }
-  QAction::setMenu(AMenu);
+  QAction::setMenu(AMenu);  //в 4.3.0 заменяет icon, text и д.р. параметры Menu на параметры Action
   FMenu = AMenu;
 }
 

@@ -84,10 +84,6 @@ Action *Menu::menuAction()
   {
     FMenuAction = new Action(this);
     FMenuAction->setMenu(this);
-    FMenuAction->setIcon(icon());
-    FMenuAction->setText(title());
-    FMenuAction->setToolTip(toolTip());
-    FMenuAction->setWhatsThis(whatsThis()); 
   }
   return FMenuAction;
 }
@@ -118,7 +114,7 @@ void Menu::setIcon(const QString &AIconsetFile, const QString &AIconName)
   QMenu::setIcon(FIconset->iconByName(AIconName));
   
   if (FMenuAction)
-    FMenuAction->setIcon(icon());
+    FMenuAction->setIcon(this->icon());
 }
 
 void Menu::setTitle(const QString &ATitle)
@@ -191,7 +187,7 @@ void Menu::onSkinChanged()
   {
     QMenu::setIcon(FIconset->iconByName(FIconName));
     if (FMenuAction)
-      FMenuAction->setIcon(icon());
+      FMenuAction->setIcon(this->icon());
   }
 }
 
