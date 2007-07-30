@@ -1,5 +1,5 @@
 FORMS = addcontactdialog.ui \
-        subscriptiondialog.h
+        subscriptiondialog.ui
 
 HEADERS = rosterchanger.h \
           addcontactdialog.h \
