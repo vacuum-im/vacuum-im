@@ -1,8 +1,12 @@
+FORMS = profiledialog.ui
+
 HEADERS = settings.h \
           settingsplugin.h \
-          optionsdialog.h
+          optionsdialog.h \
+          profiledialog.h
 
 SOURCES = settings.cpp \
           settingsplugin.cpp \
-          optionsdialog.cpp
+          optionsdialog.cpp \
+          profiledialog.cpp
 

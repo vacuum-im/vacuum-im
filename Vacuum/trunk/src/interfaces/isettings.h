@@ -53,6 +53,7 @@ public:
   virtual QStringList profiles() const =0;
   virtual QDomElement profileNode(const QString &AProfile = QString()) =0;
   virtual QDomElement setProfile(const QString &AProfile = QString()) =0;
+  virtual void renameProfile(const QString &AProfileFrom, const QString &AProfileTo) =0;
   virtual void removeProfile(const QString &AProfile) =0;
   virtual QDomElement pluginNode(const QUuid &) =0;
   virtual void openOptionsDialog(const QString &ANode = "") =0;
@@ -67,6 +68,7 @@ signals:
   virtual void profileAdded(const QString &AProfile) =0;
   virtual void profileOpened(const QString &AProfile) =0;
   virtual void profileClosed(const QString &AProfile) =0;
+  virtual void profileRenamed(const QString &AProfileFrom, const QString &AProfileTo) =0;
   virtual void profileRemoved(const QString &AProfile) =0;
   virtual void optionsNodeOpened(const QString &ANode) =0;
   virtual void optionsNodeClosed(const QString &ANode) =0;

@@ -3,11 +3,11 @@
 
 #include <QByteArray>
 #include <QVBoxLayout>
-#include "../../definations/actiongroups.h"
 
 SettingsPlugin::SettingsPlugin()
 {
-  actOpenOptionsDialog = NULL;
+  FOpenOptionsDialogAction = NULL;
+  FOpenProfileDialogAction = NULL;
   FTrayManager = NULL;
   FProfileOpened = false;
   FFile.setParent(this);
@@ -57,13 +57,22 @@ bool SettingsPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool SettingsPlugin::initObjects()
 {
-  actOpenOptionsDialog = new Action(this);
-  actOpenOptionsDialog->setEnabled(false);
-  actOpenOptionsDialog->setIcon(SYSTEM_ICONSETFILE,"psi/options");
-  actOpenOptionsDialog->setText(tr("Options..."));
-  connect(actOpenOptionsDialog,SIGNAL(triggered(bool)),SLOT(openOptionsDialogAction(bool)));
+  FOpenOptionsDialogAction = new Action(this);
+  FOpenOptionsDialogAction->setEnabled(false);
+  FOpenOptionsDialogAction->setIcon(SYSTEM_ICONSETFILE,"psi/options");
+  FOpenOptionsDialogAction->setText(tr("Options..."));
+  connect(FOpenOptionsDialogAction,SIGNAL(triggered(bool)),SLOT(openOptionsDialogAction(bool)));
+
+  FOpenProfileDialogAction = new Action(this);
+  FOpenProfileDialogAction->setIcon(SYSTEM_ICONSETFILE,"psi/profile");
+  FOpenProfileDialogAction->setText(tr("Change profile..."));
+  connect(FOpenProfileDialogAction,SIGNAL(triggered(bool)),SLOT(openProfileDialogAction(bool)));
+
   if (FTrayManager)
-    FTrayManager->addAction(actOpenOptionsDialog,SETTINGS_ACTION_GROUP_OPTIONS,true);
+  {
+    FTrayManager->addAction(FOpenOptionsDialogAction,SETTINGS_ACTION_GROUP_OPTIONS,true);
+    FTrayManager->addAction(FOpenProfileDialogAction,SETTINGS_ACTION_GROUP_OPTIONS,true);
+  }
   return true;
 }
 
@@ -172,7 +181,7 @@ QDomElement SettingsPlugin::setProfile(const QString &AProfile)
     if (profiles().contains(AProfile)) 
       FProfile = profileNode(AProfile);
     else
-      FProfile = profileNode();
+      FProfile = profileNode(profiles().value(0));
 
     if (FProfile.isNull())
       FProfile = addProfile(FSettings.documentElement().attribute("profile","Default"));
@@ -184,6 +193,18 @@ QDomElement SettingsPlugin::setProfile(const QString &AProfile)
     }
   }
   return FProfile;
+}
+
+void SettingsPlugin::renameProfile(const QString &AProfileFrom, const QString &AProfileTo)
+{
+  QDomElement profileElem = profileNode(AProfileFrom);
+  if (!profileElem.isNull())
+  {
+    if (AProfileFrom == profile())
+      FSettings.documentElement().setAttribute("profile",AProfileTo);
+    profileElem.setAttribute("name",AProfileTo);
+    emit profileRenamed(AProfileFrom,AProfileTo);
+  }
 }
 
 void SettingsPlugin::removeProfile(const QString &AProfile)
@@ -306,6 +327,13 @@ void SettingsPlugin::openOptionsDialogAction(bool)
   }
 }
 
+void SettingsPlugin::openProfileDialogAction(bool)
+{
+  if (FProfileDialog.isNull())
+    FProfileDialog = new ProfileDialog(this);
+  FProfileDialog->show();
+}
+
 QWidget *SettingsPlugin::createNodeWidget(const QString &ANode)
 {
   QWidget *nodeWidget = new QWidget;
@@ -336,7 +364,7 @@ void SettingsPlugin::setProfileOpened()
 {
   if (!FProfileOpened)
   {
-    actOpenOptionsDialog->setEnabled(true);
+    FOpenOptionsDialogAction->setEnabled(true);
     FProfileOpened = true;
     emit profileOpened(profile());
   }
@@ -349,13 +377,14 @@ void SettingsPlugin::setProfileClosed()
     emit profileClosed(profile());
     FProfileOpened = false;
     FProfile.clear();
-    actOpenOptionsDialog->setEnabled(false);
+    FOpenOptionsDialogAction->setEnabled(false);
   }
 }
 
 void SettingsPlugin::onMainWindowCreated(IMainWindow *AMainWindow)
 {
-  AMainWindow->mainMenu()->addAction(actOpenOptionsDialog,SETTINGS_ACTION_GROUP_OPTIONS,true);
+  AMainWindow->mainMenu()->addAction(FOpenOptionsDialogAction,SETTINGS_ACTION_GROUP_OPTIONS,true);
+  AMainWindow->mainMenu()->addAction(FOpenProfileDialogAction,SETTINGS_ACTION_GROUP_OPTIONS,true);
 }
 
 void SettingsPlugin::onOptionsDialogAccepted()

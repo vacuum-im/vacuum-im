@@ -6,6 +6,7 @@
 #include <QPointer>
 #include <QObjectCleanupHandler>
 #include <QWidget>
+#include "../../definations/actiongroups.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/imainwindow.h"
@@ -14,6 +15,7 @@
 #include "../../utils/skin.h"
 #include "settings.h"
 #include "optionsdialog.h"
+#include "profiledialog.h"
 
 class SettingsPlugin : 
   public QObject,
@@ -49,6 +51,7 @@ public:
   virtual QStringList profiles() const;
   virtual QDomElement profileNode(const QString &AProfile = QString());
   virtual QDomElement setProfile(const QString &AProfile = QString());
+  virtual void renameProfile(const QString &AProfileFrom, const QString &AProfileTo);
   virtual void removeProfile(const QString &AProfile);
   virtual QDomElement pluginNode(const QUuid &AId);
   virtual void openOptionsDialog(const QString &ANode = "");
@@ -59,10 +62,12 @@ public:
   virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder);
 public slots:
   virtual void openOptionsDialogAction(bool);
+  virtual void openProfileDialogAction(bool);
 signals:
   virtual void profileAdded(const QString &AProfile);
   virtual void profileOpened(const QString &AProfile);
   virtual void profileClosed(const QString &AProfile);
+  virtual void profileRenamed(const QString &AProfileFrom, const QString &AProfileTo);
   virtual void profileRemoved(const QString &AProfile);
   virtual void optionsNodeOpened(const QString &ANode);
   virtual void optionsNodeClosed(const QString &ANode);
@@ -87,7 +92,8 @@ private:
   ITrayManager *FTrayManager;
 private:
   SkinIconset FSystemIconset;
-  Action *actOpenOptionsDialog;
+  Action *FOpenOptionsDialogAction;
+  Action *FOpenProfileDialogAction;
 private:
   QFile FFile;
   QDomDocument FSettings;
@@ -104,6 +110,7 @@ private:
   QMap<QString, OptionsNode *> FNodes;
   QList<IOptionsHolder *> FOptionsHolders;
   QPointer<OptionsDialog> FOptionsDialog;
+  QPointer<ProfileDialog> FProfileDialog;
 };
 
 #endif // SETTINGSPLUGIN_H

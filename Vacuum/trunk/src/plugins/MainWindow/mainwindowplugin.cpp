@@ -56,10 +56,13 @@ bool MainWindowPlugin::initObjects()
     FSettings = FSettingsPlugin->openSettings(MAINWINDOW_UUID,this);
     connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
     connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
+    connect(FSettingsPlugin->instance(), SIGNAL(profileRenamed(const QString &, const QString &)),
+      SLOT(onProfileRenamed(const QString &, const QString &)));
   }
 
   FMainWindow = new MainWindow(Qt::Tool);
   emit mainWindowCreated(FMainWindow);
+  updateTitle();
 
   actQuit = new Action(this);
   actQuit->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
@@ -81,6 +84,18 @@ IMainWindow *MainWindowPlugin::mainWindow() const
   return FMainWindow;
 }
 
+void MainWindowPlugin::updateTitle()
+{
+  if (FMainWindow)
+  {
+    if (FSettingsPlugin && FSettingsPlugin->isProfileOpened())
+      FMainWindow->setWindowTitle("Vacuum - "+FSettingsPlugin->profile());
+    else
+      FMainWindow->setWindowTitle("Vacuum");
+  }
+
+}
+
 void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId)
 {
   if (FMainWindow && ANotifyId == 0)
@@ -94,11 +109,18 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId)
 void MainWindowPlugin::onSettingsOpened()
 {
   FMainWindow->setGeometry(FSettings->value("window:geometry",FMainWindow->geometry()).toRect());
+  updateTitle();
 }
 
 void MainWindowPlugin::onSettingsClosed()
 {
   FSettings->setValue("window:geometry",FMainWindow->geometry());
+  updateTitle();
+}
+
+void MainWindowPlugin::onProfileRenamed(const QString &, const QString &)
+{
+  updateTitle();
 }
 
 Q_EXPORT_PLUGIN2(MainWindowPlugin, MainWindowPlugin)

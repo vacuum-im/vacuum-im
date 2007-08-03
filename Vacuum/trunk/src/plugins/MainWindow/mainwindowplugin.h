@@ -36,10 +36,13 @@ public:
 signals:
   virtual void mainWindowCreated(IMainWindow *);
   virtual void mainWindowDestroyed(IMainWindow *);
+protected:
+  void updateTitle();
 protected slots:
   void onTrayNotifyActivated(int ANotifyId);
   void onSettingsOpened();
   void onSettingsClosed();
+  void onProfileRenamed(const QString &, const QString &);
 private:
   IPluginManager *FPluginManager;
   ISettingsPlugin *FSettingsPlugin;
