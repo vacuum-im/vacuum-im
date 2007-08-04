@@ -52,6 +52,21 @@ signals:
   virtual void error(IXmppStream *, const QString &errStr);
   virtual void jidAboutToBeChanged(IXmppStream *, const Jid &AAfter);
   virtual void jidChanged(IXmppStream *, const Jid &ABefour);
+protected:
+  enum StreamState {
+    SS_OFFLINE, 
+    SS_CONNECTING, 
+    SS_INITIALIZE, 
+    SS_FEATURES, 
+    SS_ONLINE 
+  }; 
+  void startStream();
+  bool processFeatures(const QDomElement &AFeatures=QDomElement());
+  bool startFeature(const QString &AName, const QString &ANamespace);
+  bool startFeature(const QDomElement &AElem);
+  void sortFeature(IStreamFeature *AFeature=0);
+  bool hookFeatureData(QByteArray *AData, IStreamFeature::Direction ADirection);
+  bool hookFeatureElement(QDomElement *AElem, IStreamFeature::Direction ADirection);
 protected slots:
   //IStreamConnection
   void onConnectionConnected();
@@ -67,19 +82,6 @@ protected slots:
   void onFeatureFinished(bool needRestart);
   void onFeatureError(const QString &AErrStr);
   void onFeatureDestroyed(QObject *AFeature);
-protected:
-  enum StreamState {
-    SS_OFFLINE, 
-    SS_CONNECTING, 
-    SS_INITIALIZE, 
-    SS_FEATURES, 
-    SS_ONLINE 
-  }; 
-  virtual void startStream();
-  virtual bool processFeatures(const QDomElement &AFeatures=QDomElement());
-  virtual bool startFeature(const QString &AName, const QString &ANamespace);
-  virtual bool startFeature(const QDomElement &AElem);
-  virtual void sortFeature(IStreamFeature *AFeature=0);
 private:
   IStreamConnection *FConnection;
   QList<IStreamFeature *>	FFeatures; 
