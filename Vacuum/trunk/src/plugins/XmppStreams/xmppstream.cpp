@@ -45,7 +45,11 @@ void XmppStream::close()
   if (FConnection) if (FConnection->isOpen())
   {
     if (FConnection->isValid())
-      FConnection->write("</stream:stream>"); 
+    {
+      QByteArray data = "</stream:stream>";
+      if (!hookFeatureData(&data,IStreamFeature::DirectionOut))
+        FConnection->write(data); 
+    }
     FConnection->close();
   }
 
@@ -73,12 +77,10 @@ qint64 XmppStream::sendStanza(const Stanza &AStanza)
     Stanza stanza(AStanza);
     if (!hookFeatureElement(&stanza.element(),IStreamFeature::DirectionOut))
     {
+      qDebug() << "\nStanza out" << FJid.full()<< ":\n" << stanza.toString(); 
       QByteArray data = stanza.toByteArray();
       if (!hookFeatureData(&data,IStreamFeature::DirectionOut))
-      {
-        qDebug() << "\nStanza out" << FJid.full()<< ":\n" << QString::fromUtf8(data.data()); 
         return FConnection->write(data);
-      }
     }
   }
   return 0;
