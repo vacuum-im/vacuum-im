@@ -180,6 +180,8 @@ QDomElement SettingsPlugin::setProfile(const QString &AProfile)
 
     if (profiles().contains(AProfile)) 
       FProfile = profileNode(AProfile);
+    else if (profiles().contains(FSettings.documentElement().attribute("profile","Default")))
+      FProfile = profileNode(FSettings.documentElement().attribute("profile","Default"));
     else
       FProfile = profileNode(profiles().value(0));
 
