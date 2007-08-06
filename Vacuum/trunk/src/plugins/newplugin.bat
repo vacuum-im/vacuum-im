@@ -1,7 +1,7 @@
 mkdir %1
 cd %1
 
-echo include(../plugins.inc)		>> %1.pro
+echo include(../plugins.inc) >> %1.pro
 echo QT += network xml >> %1.pro
 echo LIBS += -l../../libs/utils >> %1.pro
 echo TARGET = %1 >> %1.pro
