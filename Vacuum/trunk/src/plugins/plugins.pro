@@ -17,4 +17,5 @@ SUBDIRS = settings \
           accountmanager \
           traymanager \
           privatestorage \
-          messenger
+          messenger \
+          compress

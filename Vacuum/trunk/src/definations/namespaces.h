@@ -13,5 +13,7 @@
 #define NS_FEATURE_SASL                         "urn:ietf:params:xml:ns:xmpp-sasl"
 #define NS_FEATURE_BIND                         "urn:ietf:params:xml:ns:xmpp-bind"
 #define NS_FEATURE_SESSION                      "urn:ietf:params:xml:ns:xmpp-session"
+#define NS_FEATURE_COMPRESS                     "http://jabber.org/features/compress"
+#define NS_PROTOCOL_COMPRESS                    "http://jabber.org/protocol/compress"
 
 #endif
