@@ -468,6 +468,7 @@ void SettingsPlugin::setProfileClosed()
   if (FProfileOpened)
   {
     emit profileClosed(profile());
+    saveSettings();
     FProfileOpened = false;
     FSettings.clear();
     FOpenOptionsDialogAction->setEnabled(false);
@@ -496,12 +497,7 @@ void SettingsPlugin::onPluginManagerQuit()
   if (!FOptionsDialog.isNull())
     FOptionsDialog->reject();
 
-  if (FProfileOpened)
-  {
-    emit profileClosed(profile());
-    saveSettings();
-    FProfileOpened = false;
-  }
+  setProfileClosed();
 }
 
 Q_EXPORT_PLUGIN2(SettingsPlugin, SettingsPlugin)

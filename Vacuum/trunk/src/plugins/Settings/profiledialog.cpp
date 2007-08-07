@@ -175,7 +175,5 @@ void ProfileDialog::onAccepted()
   foreach (QString profile, oldProfiles)
     FSettingsPlugin->removeProfile(profile);
 
-  FSettingsPlugin->saveSettings();
-
   accept();
 }
