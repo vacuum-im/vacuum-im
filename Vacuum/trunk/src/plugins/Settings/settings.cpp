@@ -22,6 +22,22 @@ Settings::~Settings()
 
 }
 
+QByteArray Settings::encript(const QString &AValue, const QByteArray &AKey) const
+{
+  QByteArray cripted = AValue.toUtf8();
+  for (int i = 0; i<cripted.size(); ++i)
+    cripted[i] = cripted[i] ^ AKey[i % AKey.size()];
+  return cripted.toBase64();
+}
+
+QString Settings::decript(const QByteArray &AValue, const QByteArray &AKey) const
+{
+  QByteArray plain = QByteArray::fromBase64(AValue);
+  for (int i = 0; i<plain.size(); ++i)
+    plain[i] = plain[i] ^ AKey[i % AKey.size()];
+  return QString::fromUtf8(plain);
+}
+
 QVariant Settings::valueNS(const QString &AName, const QString &ANameNS, 
                            const QVariant &ADefault) const
 {

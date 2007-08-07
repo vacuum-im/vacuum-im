@@ -8,6 +8,7 @@
 #include <QHash>
 #include <QWidget>
 #include <QIcon>
+#include <QDir>
 
 #define SETTINGS_UUID "{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"
 
@@ -23,6 +24,8 @@ signals:
 class ISettings {
 public:
   virtual QObject* instance() =0;
+  virtual QByteArray encript(const QString &AValue, const QByteArray &AKey) const =0;
+  virtual QString decript(const QByteArray &AValue, const QByteArray &AKey) const =0;
   virtual QVariant valueNS(const QString &AName, const QString &ANameNS, 
     const QVariant &ADefault=QVariant()) const =0;
   virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const =0;
@@ -41,21 +44,20 @@ signals:
 class ISettingsPlugin {
 public:
   virtual QObject *instance() =0;
-  virtual bool isSettingsValid() const =0;
+  virtual bool isProfilesValid() const =0;
   virtual bool isProfileOpened() const =0;
-  virtual ISettings *openSettings(const QUuid &, QObject *)=0;
-  virtual QString settingsFile() const =0;
-  virtual bool setSettingsFile(const QString &) =0;
+  virtual const QDir &homeDir() const =0;
+  virtual const QDir &profileDir() const =0;
+  virtual ISettings *openSettings(const QUuid &APluginId, QObject *AParent)=0;
   virtual bool saveSettings() =0;
-  virtual QDomDocument document() const=0;
-  virtual QDomElement addProfile(const QString &AProfile) =0;
+  virtual bool addProfile(const QString &AProfile) =0;
   virtual QString profile() const =0;
   virtual QStringList profiles() const =0;
-  virtual QDomElement profileNode(const QString &AProfile = QString()) =0;
-  virtual QDomElement setProfile(const QString &AProfile = QString()) =0;
-  virtual void renameProfile(const QString &AProfileFrom, const QString &AProfileTo) =0;
-  virtual void removeProfile(const QString &AProfile) =0;
-  virtual QDomElement pluginNode(const QUuid &) =0;
+  virtual QDomElement profileNode(const QString &AProfile) =0;
+  virtual QDomElement pluginNode(const QUuid &APluginId) =0;
+  virtual bool setProfile(const QString &AProfile) =0;
+  virtual bool renameProfile(const QString &AProfileFrom, const QString &AProfileTo) =0;
+  virtual bool removeProfile(const QString &AProfile) =0;
   virtual void openOptionsDialog(const QString &ANode = "") =0;
   virtual void openOptionsNode(const QString &ANode, const QString &AName, 
     const QString &ADescription, const QIcon &AIcon) =0;

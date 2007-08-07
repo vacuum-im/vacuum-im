@@ -39,21 +39,20 @@ public:
   virtual bool startPlugin() { return true; }
 
   //ISettings
-  virtual bool isSettingsValid() const { return !FSettings.isNull(); }
+  virtual bool isProfilesValid() const { return !FProfiles.isNull(); }
   virtual bool isProfileOpened() const { return FProfileOpened; }
+  virtual const QDir &homeDir() const { return FHomeDir; }
+  virtual const QDir &profileDir() const { return FProfileDir; }
   virtual ISettings *openSettings(const QUuid &APluginId, QObject *AParent);
-  virtual QString settingsFile() const { return FFile.fileName(); }
-  virtual bool setSettingsFile(const QString &AFileName);
   virtual bool saveSettings();
-  virtual QDomDocument document() const { return FSettings; }
-  virtual QDomElement addProfile(const QString &AProfile);
-  virtual QString profile() const { return FProfile.attribute("name","Default"); }
+  virtual bool addProfile(const QString &AProfile);
+  virtual QString profile() const { return FProfile.attribute("name"); }
   virtual QStringList profiles() const;
-  virtual QDomElement profileNode(const QString &AProfile = QString());
-  virtual QDomElement setProfile(const QString &AProfile = QString());
-  virtual void renameProfile(const QString &AProfileFrom, const QString &AProfileTo);
-  virtual void removeProfile(const QString &AProfile);
-  virtual QDomElement pluginNode(const QUuid &AId);
+  virtual QDomElement profileNode(const QString &AProfile);
+  virtual QDomElement pluginNode(const QUuid &APluginId);
+  virtual bool setProfile(const QString &AProfile);
+  virtual bool renameProfile(const QString &AProfileFrom, const QString &AProfileTo);
+  virtual bool removeProfile(const QString &AProfile);
   virtual void openOptionsDialog(const QString &ANode = "");
   virtual void openOptionsNode(const QString &ANode, const QString &AName, 
     const QString &ADescription, const QIcon &AIcon);
@@ -95,10 +94,12 @@ private:
   Action *FOpenOptionsDialogAction;
   Action *FOpenProfileDialogAction;
 private:
-  QFile FFile;
-  QDomDocument FSettings;
-  QDomElement FProfile;
   bool FProfileOpened;
+  QDir FHomeDir;
+  QDir FProfileDir;
+  QDomElement FProfile;
+  QDomDocument FProfiles;
+  QDomDocument FSettings;
   QObjectCleanupHandler FCleanupHandler;
 private:
   struct OptionsNode  

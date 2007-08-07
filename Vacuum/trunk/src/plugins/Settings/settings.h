@@ -18,6 +18,8 @@ public:
 
   //ISettings
   virtual QObject *instance() { return this; }
+  virtual QByteArray encript(const QString &AValue, const QByteArray &AKey) const;
+  virtual QString decript(const QByteArray &AValue, const QByteArray &AKey) const;
   virtual QVariant valueNS(const QString &AName, const QString &ANameNS, 
     const QVariant &ADefault=QVariant()) const;
   virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const;

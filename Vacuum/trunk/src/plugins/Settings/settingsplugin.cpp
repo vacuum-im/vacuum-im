@@ -4,13 +4,15 @@
 #include <QByteArray>
 #include <QVBoxLayout>
 
+#define PROFILE_VERSION "1.0"
+#define SETTINGS_VERSION "1.0"
+
 SettingsPlugin::SettingsPlugin()
 {
   FOpenOptionsDialogAction = NULL;
   FOpenProfileDialogAction = NULL;
   FTrayManager = NULL;
   FProfileOpened = false;
-  FFile.setParent(this);
   FSystemIconset.openFile(SYSTEM_ICONSETFILE);
 }
 
@@ -52,7 +54,7 @@ bool SettingsPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
   }
 
-  return setSettingsFile("config.xml");
+  return true;
 }
 
 bool SettingsPlugin::initObjects()
@@ -78,8 +80,48 @@ bool SettingsPlugin::initObjects()
 
 bool SettingsPlugin::initSettings()
 {
-  setProfile();
-  return true;
+  static const char *clientDirName = ".vacuum";
+  
+  FHomeDir = QDir::home();
+  if (!FHomeDir.exists(clientDirName))
+    FHomeDir.mkdir(clientDirName);
+
+  bool settingsReady = FHomeDir.cd(clientDirName);
+  if (settingsReady)
+  {
+    if (!FHomeDir.exists("profiles"))
+      FHomeDir.mkdir("profiles");
+
+    QFile profilesFile(FHomeDir.filePath("profiles/profiles.xml"));
+    
+    if (!profilesFile.exists())
+    {
+      profilesFile.open(QIODevice::WriteOnly|QIODevice::Truncate);
+      profilesFile.close();
+    }
+    
+    settingsReady = profilesFile.open(QIODevice::ReadOnly);
+    if (!FProfiles.setContent(profilesFile.readAll(),true) || FProfiles.firstChildElement().tagName() != "profiles")
+    {
+      FProfiles.clear();
+      QDomElement elem = FProfiles.appendChild(FProfiles.createElement("profiles")).toElement();
+      elem.setAttribute("version",PROFILE_VERSION);
+      elem.setAttribute("profileName","Default");
+    }
+    profilesFile.close();
+    
+    if (settingsReady)
+    {
+      if (profiles().count() == 0)
+        addProfile("Default");
+      setProfile(FProfiles.documentElement().attribute("profileName","Default"));
+    }
+  }
+
+  if (!settingsReady)
+    qDebug() << "CANT INITIALIZE SETTINGS";
+
+  return settingsReady;
 }
 
 //ISettingsPlugin
@@ -90,67 +132,74 @@ ISettings *SettingsPlugin::openSettings(const QUuid &APluginId, QObject *AParent
   return settings;
 }
 
-bool SettingsPlugin::setSettingsFile(const QString &AFileName)
-{
-  setProfileClosed();
-  FSettings.clear();
-
-  FFile.setFileName(AFileName);
-
-  if (!FFile.exists())
-    if (FFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-      FFile.close(); 
-
-  if (FFile.open(QIODevice::ReadOnly))
-  {
-    if (FFile.size() == 0)
-    {
-      QDomElement config = FSettings.appendChild(FSettings.createElement("config")).toElement();
-      config.setAttribute("version","1.0");
-      config.setAttribute("profile","Default");
-    }
-    else
-    {
-      if (!FSettings.setContent(FFile.readAll(),true))
-        FSettings.clear();
-    }
-    FFile.close();
-  }
-  return !FSettings.isNull();
-}
-
 bool SettingsPlugin::saveSettings()
 {
-  if (FFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  bool saved = false;
+  if (isProfilesValid())
   {
-    FFile.write(FSettings.toByteArray());  
-    FFile.close(); 
-    return true;
+    QFile profilesFile(FHomeDir.filePath("profiles/profiles.xml"));
+    if (profilesFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+      profilesFile.write(FProfiles.toByteArray());
+      profilesFile.close();
+      saved = true;
+    }
+    else
+      qDebug() << "CANT SAVE PROFILES DOCUMENT.";
+    
+    if (isProfileOpened())
+    {
+      QDir settingsDir = FHomeDir;
+      settingsDir.cd("profiles");
+      settingsDir.cd(QFile::encodeName(FProfile.attribute("dir")));
+
+      QFile settingsFile(settingsDir.filePath("settings.xml"));
+      if (settingsFile.exists() && settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+      {
+        settingsFile.write(FSettings.toByteArray());
+        settingsFile.close();
+        saved = saved && true;
+      }
+    }
   }
-  return false;
+  return saved;
 }
 
-QDomElement SettingsPlugin::addProfile(const QString &AProfile)
+bool SettingsPlugin::addProfile(const QString &AProfile)
 {
-  QDomElement profileElem;
-  if (isSettingsValid())
+  if (isProfilesValid())
   {
     if (!profiles().contains(AProfile))
     {
-      profileElem = FSettings.documentElement().appendChild(FSettings.createElement("profile")).toElement();
-      profileElem.setAttribute("name",AProfile); 
-      emit profileAdded(AProfile);
+      QByteArray profileDirName = QFile::encodeName(AProfile);
+      QDir profileDir = FHomeDir;
+      profileDir.cd("profiles");
+      if (!profileDir.exists(profileDirName))
+      {
+        if (profileDir.mkdir(profileDirName))
+        {
+          QDomElement profileElem = FProfiles.documentElement().appendChild(FProfiles.createElement("profile")).toElement();
+          profileElem.setAttribute("name",AProfile);
+          profileElem.setAttribute("dir",AProfile);
+          emit profileAdded(AProfile);
+          return true;
+        }
+        else
+          qDebug() << "PROFILE NOT CREATED: Cant create profile directory.";
+      }
+      else
+        qDebug() << "PROFILE NOT CREATED: Profile directory already exists.";
     }
     else
-      profileElem = profileNode(AProfile);
+      qDebug() << "PROFILE NOT CREATED: Profile already exists.";
   }
-  return profileElem;
+  return false;
 }
 
 QStringList SettingsPlugin::profiles() const
 {
   QStringList profileList;
-  QDomElement profileElem = FSettings.documentElement().firstChildElement("profile");
+  QDomElement profileElem = FProfiles.firstChildElement().firstChildElement("profile");
   while (!profileElem.isNull())
   {
     profileList.append(profileElem.attribute("name"));
@@ -161,83 +210,125 @@ QStringList SettingsPlugin::profiles() const
 
 QDomElement SettingsPlugin::profileNode(const QString &AProfile) 
 {
-  QString profileName = AProfile;
-  if (profileName.isEmpty())
-    profileName = FSettings.documentElement().attribute("profile","Default");
-
-  QDomElement profileElem = FSettings.documentElement().firstChildElement("profile");  
-  while (!profileElem.isNull() && profileElem.attribute("name","Default") != profileName)
+  QDomElement profileElem = FProfiles.documentElement().firstChildElement("profile");  
+  while (!profileElem.isNull() && profileElem.attribute("name") != AProfile)
     profileElem = profileElem.nextSiblingElement("profile"); 
 
   return profileElem;
 }
 
-QDomElement SettingsPlugin::setProfile(const QString &AProfile)
+QDomElement SettingsPlugin::pluginNode(const QUuid &APluginId) 
 {
-  if (isSettingsValid())
+  if (isProfileOpened())
+  {
+    QDomElement node =  FSettings.documentElement().firstChildElement("plugin");  
+    while (!node.isNull() && node.attribute("pluginId") != APluginId)
+      node = node.nextSiblingElement("plugin");
+
+    if (node.isNull())
+    {
+      node = FSettings.documentElement().appendChild(FSettings.createElement("plugin")).toElement();
+      node.setAttribute("pluginId",APluginId.toString()); 
+    }
+    return node;
+  }
+  return QDomElement();
+}
+
+bool SettingsPlugin::setProfile(const QString &AProfile)
+{
+  if (profiles().contains(AProfile))
   {
     setProfileClosed();
 
-    if (profiles().contains(AProfile)) 
-      FProfile = profileNode(AProfile);
-    else if (profiles().contains(FSettings.documentElement().attribute("profile","Default")))
-      FProfile = profileNode(FSettings.documentElement().attribute("profile","Default"));
-    else
-      FProfile = profileNode(profiles().value(0));
+    QDomElement profileElem = profileNode(AProfile);
 
-    if (FProfile.isNull())
-      FProfile = addProfile(FSettings.documentElement().attribute("profile","Default"));
-
-    if (!FProfile.isNull())
+    QByteArray profileDirName = QFile::encodeName(profileElem.attribute("dir",AProfile));
+    FProfileDir = FHomeDir;
+    if (FProfileDir.cd("profiles/"+profileDirName))
     {
-      FSettings.documentElement().setAttribute("profile",FProfile.attribute("name","Default"));
-      setProfileOpened();
+      QFile settingsFile(FProfileDir.filePath("settings.xml"));
+      if (!settingsFile.exists())
+      {
+        settingsFile.open(QIODevice::WriteOnly|QIODevice::Truncate);
+        settingsFile.close();
+      }
+      if (settingsFile.open(QIODevice::ReadOnly))
+      {
+        if (!FSettings.setContent(settingsFile.readAll(),true))
+        {
+          FSettings.clear();
+          FSettings.appendChild(FSettings.createElement("settings")).toElement().setAttribute("version",SETTINGS_VERSION);
+        }
+        settingsFile.close();
+
+        FProfile = profileNode(AProfile);
+        if (!FProfile.isNull() && !FSettings.isNull())
+        {
+          FProfiles.documentElement().setAttribute("profileName",AProfile);
+          setProfileOpened();
+          return true;
+        }
+        else
+          qDebug() << "PROFILE NOT OPENED: Profile or settings node is null.";
+      }
+      else
+        qDebug() << "PROFILE NOT OPENED: Cant open settings file.";
     }
+    else
+      qDebug() << "PROFILE NOT OPENED: Profile directory not exists.";
   }
-  return FProfile;
+  return false;
 }
 
-void SettingsPlugin::renameProfile(const QString &AProfileFrom, const QString &AProfileTo)
+bool SettingsPlugin::renameProfile(const QString &AProfileFrom, const QString &AProfileTo)
 {
   QDomElement profileElem = profileNode(AProfileFrom);
-  if (!profileElem.isNull())
+  if (!profileElem.isNull() && !profiles().contains(AProfileTo))
   {
     if (AProfileFrom == profile())
-      FSettings.documentElement().setAttribute("profile",AProfileTo);
+      FProfiles.documentElement().setAttribute("profileName",AProfileTo);
+
     profileElem.setAttribute("name",AProfileTo);
+
+    QDir profilesDir = FHomeDir;
+    profilesDir.cd("profiles");
+    if (profilesDir.rename(QFile::encodeName(profileElem.attribute("dir")),QFile::encodeName(AProfileTo)))
+      profileElem.setAttribute("dir",AProfileTo);
+    else
+      qDebug() << "CANT RENAME PROFILE DIRECTORY";
+    
     emit profileRenamed(AProfileFrom,AProfileTo);
+
+    return true;
   }
+  else
+    qDebug() << "CANT RENAME PROFILE: ProfileFrom not exists or ProfileTo already exists.";
+  return false;
 }
 
-void SettingsPlugin::removeProfile(const QString &AProfile)
+bool SettingsPlugin::removeProfile(const QString &AProfile)
 {
-  if (AProfile == profile())
-    setProfileClosed();
-
   QDomElement profileElem = profileNode(AProfile);
   if (!profileElem.isNull())
   {
-    FSettings.documentElement().removeChild(profileElem);
+    if (AProfile == profile())
+    {
+      setProfileClosed();
+      FProfiles.documentElement().setAttribute("profileName",profiles().value(0));
+    }
+    FProfiles.documentElement().removeChild(profileElem);
+
+    QDir profilesDir = FHomeDir;
+    profilesDir.cd("profiles");
+    if (!profilesDir.remove(QFile::encodeName(profileElem.attribute("dir"))))
+      qDebug() << "CANT REMOVE PROFILE DIRECTORY.";
+
     emit profileRemoved(AProfile);
+
+    return true;
   }
-}
-
-QDomElement SettingsPlugin::pluginNode(const QUuid &AId) 
-{
-  if (!FProfileOpened)
-    return QDomElement();
-
-  QDomElement node = FProfile.firstChildElement("plugin");  
-  while (!node.isNull() && node.attribute("uid") != AId)
-    node = node.nextSiblingElement("plugin");
-
-  if (node.isNull())
-  {
-    node = FProfile.appendChild(FSettings.createElement("plugin")).toElement();
-    node.setAttribute("uid",AId.toString()); 
-  }
-
-  return node;
+  return false;
 }
 
 void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName,  
@@ -378,7 +469,7 @@ void SettingsPlugin::setProfileClosed()
   {
     emit profileClosed(profile());
     FProfileOpened = false;
-    FProfile.clear();
+    FSettings.clear();
     FOpenOptionsDialogAction->setEnabled(false);
   }
 }
