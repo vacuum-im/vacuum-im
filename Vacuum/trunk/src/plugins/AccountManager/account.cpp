@@ -17,6 +17,16 @@ Account::~Account()
 
 }
 
+QByteArray Account::encript(const QString &AValue, const QByteArray &AKey) const
+{
+  return FSettings->encript(AValue,AKey);
+}
+
+QString Account::decript(const QByteArray &AValue, const QByteArray &AKey) const
+{
+  return FSettings->decript(AValue,AKey);
+}
+
 QVariant Account::value(const QString &AName, const QVariant &ADefault) const
 {
   return FSettings->valueNS(QString("account[]:%1").arg(AName),FId,ADefault);
@@ -87,7 +97,7 @@ qint16 Account::port() const
 
 QString Account::password() const
 {
-  return value("password",FXmppStream->password()).toString();
+  return decript(value("password").toByteArray(),FId.toUtf8());
 }
 
 QString Account::defaultLang() const
@@ -122,7 +132,7 @@ QString Account::proxyUsername() const
 
 QString Account::proxyPassword() const
 {
-  return value("proxyPassword",FXmppStream->connection()->proxyPassword()).toString();
+  return decript(value("proxyPassword").toByteArray(),FId.toUtf8());
 }
 
 QString Account::pollServer() const
@@ -200,7 +210,7 @@ void Account::setPassword(const QString &APassword)
   if (password() != APassword)
   {
     FXmppStream->setPassword(APassword);
-    setValue("password",APassword);
+    setValue("password",encript(APassword,FId.toUtf8()));
   }
 }
 
@@ -254,7 +264,7 @@ void Account::setProxyPassword(const QString &AProxyPassword)
   if (proxyPassword() != AProxyPassword)
   {
     FXmppStream->connection()->setProxyPassword(AProxyPassword);
-    setValue("proxyPassword",AProxyPassword);
+    setValue("proxyPassword",encript(AProxyPassword, FId.toUtf8()));
   }
 }
 
@@ -287,17 +297,16 @@ void Account::initXmppStream()
 {
   if (manualHostPort())
   {
-    FXmppStream->setHost(value("host").toString());
-    FXmppStream->setPort(value("port",5222).toInt());  
+    FXmppStream->setHost(host());
+    FXmppStream->setPort(port());  
   }
-  FXmppStream->setPassword(value("password").toString());
-  FXmppStream->setDefaultLang(value("defaultLang").toString()); 
-  FXmppStream->connection()->setProxyType(value("proxyType",0).toInt());
-  FXmppStream->connection()->setProxyHost(value("proxyHost").toString());
-  FXmppStream->connection()->setProxyPort(value("proxyPort").toInt());
-  FXmppStream->connection()->setProxyPassword(value("proxyPassword").toString());
-  FXmppStream->connection()->setProxyUsername(value("proxyUsername").toString());
-  FXmppStream->connection()->setProxyPassword(value("proxyPassword").toString());
-  FXmppStream->connection()->setPollServer(value("pollServer").toString());
+  FXmppStream->setPassword(password());
+  FXmppStream->setDefaultLang(defaultLang()); 
+  FXmppStream->connection()->setProxyType(proxyType());
+  FXmppStream->connection()->setProxyHost(proxyHost());
+  FXmppStream->connection()->setProxyPort(proxyPort());
+  FXmppStream->connection()->setProxyUsername(proxyUsername());
+  FXmppStream->connection()->setProxyPassword(proxyPassword());
+  FXmppStream->connection()->setPollServer(pollServer());
 }
 

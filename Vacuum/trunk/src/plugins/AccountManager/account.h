@@ -19,6 +19,8 @@ public:
   ~Account();
   virtual QObject *instance() { return this; }
 
+  virtual QByteArray encript(const QString &AValue, const QByteArray &AKey) const;
+  virtual QString decript(const QByteArray &AValue, const QByteArray &AKey) const;
   virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const; 
   virtual void setValue(const QString &AName, const QVariant &AValue);
   virtual void delValue(const QString &AName);
