@@ -69,6 +69,7 @@ protected:
 protected slots:
   void onStreamOpened(IXmppStream *);
   void onStreamClosed(IXmppStream *);
+  void onStreamJidAboutToBeChanged(IXmppStream *, const Jid &AAfter);
 private:
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;

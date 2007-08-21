@@ -13,6 +13,8 @@ Roster::Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
   FSubscrHandler = 0;
   connect(FXmppStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
   connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
+  connect(FXmppStream->instance(),SIGNAL(jidAboutToBeChanged(IXmppStream *, const Jid &)),
+    SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &)));
 }
 
 Roster::~Roster()
@@ -504,3 +506,8 @@ void Roster::onStreamClosed(IXmppStream *)
   close();
 }
 
+void Roster::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter)
+{
+  if (!AAfter.equals(AXmppStream->jid(),false))
+    clearItems();
+}
