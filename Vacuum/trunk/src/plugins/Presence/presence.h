@@ -28,17 +28,16 @@ public:
   //IPresence
   virtual const Jid &streamJid() const { return FXmppStream->jid(); }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
+  virtual bool setPresence(Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid = Jid());
   virtual Show show() const { return FShow; }
+  virtual bool setShow(Show AShow, const Jid &AToJid = Jid());
   virtual const QString &status() const { return FStatus; }
+  virtual bool setStatus(const QString &AStatus, const Jid &AToJid = Jid());
   virtual qint8 priority() const { return FPriority; }
+  virtual bool setPriority(qint8 APriority, const Jid &AToJid = Jid());
   virtual IPresenceItem *item(const Jid &AItemJid) const;
   virtual QList<IPresenceItem *> items() const;
   virtual QList<IPresenceItem *> items(const Jid &AItemJid) const;
-public slots:
-  virtual bool setPresence(Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid = Jid());
-  virtual bool setShow(Show AShow, const Jid &AToJid = Jid());
-  virtual bool setStatus(const QString &AStatus, const Jid &AToJid = Jid());
-  virtual bool setPriority(qint8 APriority, const Jid &AToJid = Jid());
 signals:
   virtual void opened();
   virtual void selfPresence(IPresence::Show, const QString &, qint8, const Jid &);
