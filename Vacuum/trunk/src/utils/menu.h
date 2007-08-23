@@ -4,12 +4,10 @@
 #include <QMenu>
 #include <QMultiMap>
 #include <QPointer>
+#include "../../definations/actiongroups.h"
 #include "utilsexport.h"
 #include "action.h"
 #include "skin.h"
-
-#define DEFAULT_ACTION_GROUP 500
-#define NULL_ACTION_GROUP -1
 
 class Action;
 
@@ -34,6 +32,7 @@ public:
   void addMenuActions(const Menu *AMenu, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
   int actionGroup(const Action *AAction) const;
   QList<Action *> actions(int AGroup = NULL_ACTION_GROUP) const;
+  QList<Action *> findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu = false) const;
 signals:
   void addedAction(QAction *);
   void removedAction(QAction *);

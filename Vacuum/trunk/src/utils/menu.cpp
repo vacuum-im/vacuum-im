@@ -44,11 +44,30 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
     if (ASort)
     {
       QList<QAction *> actionList = QMenu::actions();
+      
+      bool sortRole = true;
+      QString sortString = AAction->data(Action::DR_SortString).toString();
+      if (sortString.isEmpty())
+      {
+        sortString = AAction->text();
+        sortRole = false;
+      }
+      
       for (int i = 0; !befour && i<actionList.count(); ++i)
       {
-        if (FActions.key((Action *)actionList.at(i))==AGroup)
-          if (QString::localeAwareCompare(actionList.at(i)->text(),AAction->text()) > 0)
+        QAction *qaction = actionList.at(i);
+        if (FActions.key((Action *)qaction)==AGroup)
+        {
+          QString curSortString = qaction->text();
+          if (sortRole)
+          {
+            Action *action = qobject_cast<Action *>(qaction);
+            if (action)
+              curSortString = action->data(Action::DR_SortString).toString();
+          }
+          if (QString::localeAwareCompare(curSortString,sortString) > 0)
             befour = actionList.at(i);
+        }
       }
     }
 
@@ -155,9 +174,28 @@ int Menu::actionGroup(const Action *AAction) const
 
 QList<Action *> Menu::actions(int AGroup) const
 {
-  if (AGroup != NULL_ACTION_GROUP)
+  if (AGroup == NULL_ACTION_GROUP)
     return FActions.values();
   return FActions.values(AGroup);
+}
+
+QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu /*= false*/) const
+{
+  QList<Action *> actionList;
+  QList<int> keys = AData.keys();
+  foreach(Action *action,FActions)
+  {
+    foreach (int key, keys)
+      if (AData.values(key).contains(action->data(key)))
+      {
+        actionList.append(action);
+        break;
+      }
+    if (ASearchInSubMenu && action->menu())
+      actionList += action->menu()->findActions(AData,ASearchInSubMenu);
+  }
+
+  return actionList;
 }
 
 void Menu::clear() 

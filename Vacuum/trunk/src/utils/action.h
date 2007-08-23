@@ -22,6 +22,7 @@ public:
     DR_Parametr3,
     DR_Parametr4,
     DR_StreamJid,
+    DR_SortString,
     DR_UserDefined = 64,
     DR_UserDynamic = DR_UserDefined + 1048576 
   }; 
