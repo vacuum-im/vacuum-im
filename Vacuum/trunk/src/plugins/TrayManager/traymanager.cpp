@@ -52,7 +52,7 @@ bool TrayManager::startPlugin()
 }
 
 //ITrayManager
-void TrayManager::setBaseIcon(const QIcon &AIcon)
+void TrayManager::setMainIcon(const QIcon &AIcon)
 {
   FBaseIcon = AIcon;
   if (FCurNotifyId == 0)

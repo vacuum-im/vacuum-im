@@ -32,8 +32,8 @@ public:
   //ITrayManager
   virtual QIcon icon() const { return FTrayIcon.icon(); }
   virtual QString toolTip() const { return FTrayIcon.toolTip(); }
-  virtual QIcon baseIcon() const { return FBaseIcon; }
-  virtual void setBaseIcon(const QIcon &AIcon);
+  virtual QIcon mainIcon() const { return FBaseIcon; }
+  virtual void setMainIcon(const QIcon &AIcon);
   virtual void addAction(Action *AAction, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
   virtual void removeAction(Action *AAction);
   virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink);
