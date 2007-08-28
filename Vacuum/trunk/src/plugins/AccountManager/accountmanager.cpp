@@ -86,7 +86,7 @@ bool AccountManager::initObjects()
     FSettings = FSettingsPlugin->openSettings(ACCOUNTMANAGER_UUID,this);
     connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
     connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
-    FSettingsPlugin->openOptionsNode(OPTIONS_NODE_ACCOUNTS,tr("Accounts"),
+    FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"),
       tr("Creating and removing accounts"),QIcon());
     FSettingsPlugin->appendOptionsHolder(this);
   }
@@ -215,7 +215,7 @@ void AccountManager::destroyAccount(const QString &AAccountId)
 //IOptionsHolder
 QWidget *AccountManager::optionsWidget(const QString &ANode, int &/*AOrder*/) const
 {
-  if (ANode == OPTIONS_NODE_ACCOUNTS)
+  if (ANode == ON_ACCOUNTS)
   {
     if (FAccountManage.isNull())
     {
@@ -232,7 +232,7 @@ QWidget *AccountManager::optionsWidget(const QString &ANode, int &/*AOrder*/) co
     }
     return FAccountManage;
   }
-  else if (ANode.startsWith(OPTIONS_NODE_ACCOUNTS + QString("::")))
+  else if (ANode.startsWith(ON_ACCOUNTS + QString("::")))
   {
     QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
     QString id = nodeTree.value(1);
@@ -281,7 +281,7 @@ QString AccountManager::newId() const
 
 void AccountManager::openAccountOptionsNode(const QString &AAccountId, const QString &AName)
 {
-  QString node = OPTIONS_NODE_ACCOUNTS+QString("::")+AAccountId;
+  QString node = ON_ACCOUNTS+QString("::")+AAccountId;
   QString name = AName;
   if (AName.isEmpty())
   {
@@ -296,7 +296,7 @@ void AccountManager::openAccountOptionsNode(const QString &AAccountId, const QSt
 
 void AccountManager::closeAccountOptionsNode(const QString &AAccountId)
 {
-  QString node = OPTIONS_NODE_ACCOUNTS+QString("::")+AAccountId;
+  QString node = ON_ACCOUNTS+QString("::")+AAccountId;
   FSettingsPlugin->closeOptionsNode(node);
   if (FAccountOptions.contains(AAccountId))
   {
@@ -330,7 +330,7 @@ void AccountManager::onMainWindowCreated(IMainWindow *AMainWindow)
     actAccountsSetup = new Action(this);
     actAccountsSetup->setIcon(SYSTEM_ICONSETFILE,"psi/account");
     actAccountsSetup->setText(tr("Account setup..."));
-    actAccountsSetup->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS);
+    actAccountsSetup->setData(Action::DR_Parametr1,ON_ACCOUNTS);
     connect(actAccountsSetup,SIGNAL(triggered(bool)),
       FSettingsPlugin->instance(),SLOT(openOptionsDialogAction(bool)));
     AMainWindow->mainMenu()->addAction(actAccountsSetup,AG_ACCOUNTMANAGER_MMENU,true);
@@ -342,7 +342,7 @@ void AccountManager::onOptionsAccountAdded(const QString &AName)
   QString id = newId();
   FAccountManage->setAccount(id,AName,QString(),Qt::Unchecked);
   openAccountOptionsNode(id,AName);
-  FSettingsPlugin->openOptionsDialog(OPTIONS_NODE_ACCOUNTS+QString("::")+id);
+  FSettingsPlugin->openOptionsDialog(ON_ACCOUNTS+QString("::")+id);
 }
 
 void AccountManager::onOptionsAccountRemoved(const QString &AAccountId)
@@ -477,7 +477,7 @@ void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       Action *modify = new Action(AMenu);
       modify->setIcon(SYSTEM_ICONSETFILE,"psi/account");
       modify->setText(tr("Modify account..."));
-      modify->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS+QString("::")+account->accountId());
+      modify->setData(Action::DR_Parametr1,ON_ACCOUNTS+QString("::")+account->accountId());
       connect(modify,SIGNAL(triggered(bool)),
         FSettingsPlugin->instance(),SLOT(openOptionsDialogAction(bool)));
       AMenu->addAction(modify,AG_ACCOUNTMANAGER_ROSTER,true);
