@@ -39,7 +39,7 @@ void RosterIndexDelegate::paint(QPainter *APainter,
   LabelsMap map = labelsMap(AIndex);
   for(LabelsMap::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
   {
-    if (it.key() < RIGHTALIGN_LABEL_ORDER)
+    if (it.key() < RLO_RIGHTALIGN)
     {
       option.decorationAlignment = left;
       option.displayAlignment = left;
@@ -60,7 +60,7 @@ void RosterIndexDelegate::paint(QPainter *APainter,
     
     if (!usedRect.isEmpty())
     {
-      if (it.key() < RIGHTALIGN_LABEL_ORDER)
+      if (it.key() < RLO_RIGHTALIGN)
         freeRect.setLeft(usedRect.right()+spacing);
       else
         freeRect.setRight(usedRect.left()-spacing);
@@ -97,7 +97,7 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
                                  const QModelIndex &AIndex) const
 {
   if (!AOption.rect.contains(APoint))
-    return NULL_LABEL_ID;
+    return RLID_NULL;
 
   QStyleOptionViewItem option = setOptions(AIndex,AOption);
 
@@ -111,7 +111,7 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
   LabelsMap map = labelsMap(AIndex);
   for(LabelsMap::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
   {
-    if (it.key() < RIGHTALIGN_LABEL_ORDER)
+    if (it.key() < RLO_RIGHTALIGN)
     {
       option.decorationAlignment = left;
       option.displayAlignment = left;
@@ -129,14 +129,14 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
       if (usedRect.contains(APoint))
         return it.value().first;
 
-      if (it.key() < RIGHTALIGN_LABEL_ORDER)
+      if (it.key() < RLO_RIGHTALIGN)
         freeRect.setLeft(usedRect.right()+spacing);
       else
         freeRect.setRight(usedRect.left()-spacing);
     }
   }
 
-  return DISPLAY_LABEL_ID;
+  return RLID_DISPLAY;
 }
 
 QRect RosterIndexDelegate::labelRect(int ALabelId, const QStyleOptionViewItem &AOption, 
@@ -157,7 +157,7 @@ QRect RosterIndexDelegate::labelRect(int ALabelId, const QStyleOptionViewItem &A
   LabelsMap map = labelsMap(AIndex);
   for(LabelsMap::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
   {
-    if (it.key() < RIGHTALIGN_LABEL_ORDER)
+    if (it.key() < RLO_RIGHTALIGN)
     {
       option.decorationAlignment = left;
       option.displayAlignment = left;
@@ -175,7 +175,7 @@ QRect RosterIndexDelegate::labelRect(int ALabelId, const QStyleOptionViewItem &A
 
     if (!usedRect.isEmpty())
     {
-      if (it.key() < RIGHTALIGN_LABEL_ORDER)
+      if (it.key() < RLO_RIGHTALIGN)
         freeRect.setLeft(usedRect.right()+spacing);
       else
         freeRect.setRight(usedRect.left()-spacing);
@@ -297,8 +297,8 @@ LabelsMap RosterIndexDelegate::labelsMap(const QModelIndex &AIndex) const
   typedef QPair<int,QVariant> pair;
   LabelsMap map;
 
-  map.insert(DECORATION_LABEL_ORDER,pair(DISPLAY_LABEL_ID,AIndex.data(Qt::DecorationRole)));
-  map.insert(DISPLAY_LABEL_ORDER,pair(DISPLAY_LABEL_ID,AIndex.data(Qt::DisplayRole)));
+  map.insert(RLO_DECORATION,pair(RLID_DISPLAY,AIndex.data(Qt::DecorationRole)));
+  map.insert(RLO_DISPLAY,pair(RLID_DISPLAY,AIndex.data(Qt::DisplayRole)));
 
   QList<QVariant> labelIds = AIndex.data(IRosterIndex::DR_LabelIds).toList();
   QList<QVariant> labelOrders = AIndex.data(IRosterIndex::DR_LabelOrders).toList();

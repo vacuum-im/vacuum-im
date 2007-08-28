@@ -19,7 +19,7 @@
 
 StatusChanger::StatusChanger()
 {
-  FConnectingLabel = NULL_LABEL_ID;
+  FConnectingLabel = RLID_NULL;
   FPresencePlugin = NULL;
   FRosterPlugin = NULL;
   FMainWindowPlugin = NULL;
@@ -165,7 +165,7 @@ bool StatusChanger::initObjects()
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    FConnectingLabel = FRostersView->createIndexLabel(STREAMCONNECTING_LABEL_ORDER,FRosterIconset.iconByName("connecting"));
+    FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,FRosterIconset.iconByName("connecting"));
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }

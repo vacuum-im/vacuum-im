@@ -1,14 +1,17 @@
 #ifndef ROSTERLABELORDERS_H
 #define ROSTERLABELORDERS_H
 
-#define NULL_LABEL_ID -1
-#define DISPLAY_LABEL_ID 0
+#define RLID_NULL                                 -1
+#define RLID_DISPLAY                              0
 
-#define DECORATION_LABEL_ORDER -1024
-#define STREAMCONNECTING_LABEL_ORDER -1000
-#define MESSAGE_LABEL_ORDER -700
-#define ROSTERCHANGER_LABEL_ORDER -500
-#define DISPLAY_LABEL_ORDER 0
-#define RIGHTALIGN_LABEL_ORDER 1024
+#define RLO_DECORATION                            -1024
+
+#define RLO_CONNECTING                            -1000
+#define RLO_MESSAGE                               -700
+#define RLO_SUBSCRIBTION                          -500
+
+#define RLO_DISPLAY                               0
+
+#define RLO_RIGHTALIGN                            1024
 
 #endif

@@ -75,7 +75,7 @@ bool Messenger::initObjects()
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    FNormalLabelId = FRostersView->createIndexLabel(MESSAGE_LABEL_ORDER,FSystemIconset.iconByName("psi/sendMessage"),IRostersView::LabelBlink);
+    FNormalLabelId = FRostersView->createIndexLabel(RLO_MESSAGE,FSystemIconset.iconByName("psi/sendMessage"),IRostersView::LabelBlink);
     FIndexClickHooker = FRostersView->createClickHooker(this,0);
   }
 

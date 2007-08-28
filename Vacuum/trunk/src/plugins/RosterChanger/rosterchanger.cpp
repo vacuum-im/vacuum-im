@@ -97,7 +97,7 @@ bool RosterChanger::initObjects()
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    FSubsLabelId = FRostersView->createIndexLabel(ROSTERCHANGER_LABEL_ORDER,
+    FSubsLabelId = FRostersView->createIndexLabel(RLO_SUBSCRIBTION,
       FSystemIconset.iconByName("psi/events"),IRostersView::LabelBlink);
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
