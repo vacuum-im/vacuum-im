@@ -33,7 +33,7 @@ void Messenger::pluginInfo(PluginInfo *APluginInfo)
 
 bool Messenger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-  AInitOrder = MESSENGER_INITORDER;
+  AInitOrder = IO_MESSENGER;
 
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin) 

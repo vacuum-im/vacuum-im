@@ -1,9 +1,9 @@
 #ifndef INITORDERS_H
 #define INITORDERS_H
 
-#define ROSTERSVIEW_INITORDER 100
-#define STATUSCHANGER_INITORDER 200
-#define ROSTERCHANGER_INITORDER 200
-#define MESSENGER_INITORDER 200
+#define IO_ROSTERSVIEW                      100
+#define IO_STATUSCHANGER                    200
+#define IO_ROSTERCHANGER                    200
+#define IO_MESSENGER                        200
 
 #endif

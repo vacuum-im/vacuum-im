@@ -41,7 +41,7 @@ void RostersViewPlugin::pluginInfo(PluginInfo *APluginInfo)
 
 bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-  AInitOrder = ROSTERSVIEW_INITORDER;
+  AInitOrder = IO_ROSTERSVIEW;
 
   IPlugin *plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
   if (plugin)

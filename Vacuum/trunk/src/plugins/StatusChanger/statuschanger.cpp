@@ -61,7 +61,7 @@ void StatusChanger::pluginInfo(PluginInfo *APluginInfo)
 
 bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-  AInitOrder = STATUSCHANGER_INITORDER;
+  AInitOrder = IO_STATUSCHANGER;
 
   IPlugin *plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin)

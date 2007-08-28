@@ -39,7 +39,7 @@ void RosterChanger::pluginInfo(PluginInfo *APluginInfo)
 
 bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-  AInitOrder = ROSTERCHANGER_INITORDER;
+  AInitOrder = IO_ROSTERCHANGER;
 
   IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
   if (plugin)
