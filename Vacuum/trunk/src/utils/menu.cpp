@@ -169,12 +169,12 @@ int Menu::actionGroup(const Action *AAction) const
   ActionList::const_iterator it = qFind(FActions.begin(),FActions.end(),AAction);
   if (it != FActions.constEnd())
     return it.key();
-  return NULL_ACTION_GROUP;
+  return AG_NULL;
 }
 
 QList<Action *> Menu::actions(int AGroup) const
 {
-  if (AGroup == NULL_ACTION_GROUP)
+  if (AGroup == AG_NULL)
     return FActions.values();
   return FActions.values(AGroup);
 }

@@ -68,7 +68,7 @@ bool MainWindowPlugin::initObjects()
   actQuit->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
   actQuit->setText(tr("Quit"));
   connect(actQuit,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
-  FMainWindow->mainMenu()->addAction(actQuit,MAINWINDOW_ACTION_GROUP_QUIT);
+  FMainWindow->mainMenu()->addAction(actQuit,AG_MAINWINDOW_MMENU_QUIT);
 
   return true;
 }

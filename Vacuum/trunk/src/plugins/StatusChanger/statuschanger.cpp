@@ -134,13 +134,13 @@ bool StatusChanger::initObjects()
   FCustomMenu->setTitle(tr("User statuses"));
   FCustomMenu->setIcon(STATUS_ICONSETFILE,"ask");
   FCustomMenu->menuAction()->setVisible(false);
-  FMainMenu->addAction(FCustomMenu->menuAction(),AG_STATUSCHANGER_CUSTOM_MENU,false);
+  FMainMenu->addAction(FCustomMenu->menuAction(),AG_STATUSCHANGER_STATUSMENU_CUSTOM_MENU,false);
 
   FEditStatusAction = new Action(FMainMenu);
   FEditStatusAction->setText(tr("Edit user statuses"));
   FEditStatusAction->setIcon(STATUS_ICONSETFILE,"ask");
   connect(FEditStatusAction,SIGNAL(triggered(bool)), SLOT(onEditStatusAction(bool)));
-  FMainMenu->addAction(FEditStatusAction,AG_STATUSCHANGER_CUSTOM_MENU,false);
+  FMainMenu->addAction(FEditStatusAction,AG_STATUSCHANGER_STATUSMENU_CUSTOM_MENU,false);
   
   createDefaultStatus();
   setMainStatusId(STATUS_OFFLINE);
@@ -621,12 +621,12 @@ void StatusChanger::createStatusActions(int AStatusId)
 {
   Menu *menu = AStatusId <= MAX_STANDART_STATUS_ID ? FMainMenu : FCustomMenu;
 
-  menu->addAction(createStatusAction(AStatusId,Jid(),menu),DEFAULT_ACTION_GROUP,true);
+  menu->addAction(createStatusAction(AStatusId,Jid(),menu),AG_DEFAULT,true);
 
   QHash<IPresence *, Menu *>::iterator it = FStreamCustomMenu.begin();
   while (it != FStreamCustomMenu.end())
   {
-    it.value()->addAction(createStatusAction(AStatusId,it.key()->streamJid(),it.value()),DEFAULT_ACTION_GROUP,true);
+    it.value()->addAction(createStatusAction(AStatusId,it.key()->streamJid(),it.value()),AG_DEFAULT,true);
     it++;
   }
   updateCustomMenu();
@@ -669,7 +669,7 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
     Menu *scMenu = new Menu(sMenu);
     scMenu->setTitle(tr("User statuses"));
     scMenu->setIcon(STATUS_ICONSETFILE,"ask");
-    sMenu->addAction(scMenu->menuAction(),AG_STATUSCHANGER_CUSTOM_MENU,true);
+    sMenu->addAction(scMenu->menuAction(),AG_STATUSCHANGER_STATUSMENU_CUSTOM_MENU,true);
     FStreamCustomMenu.insert(APresence,scMenu);
     
     Jid streamJid = APresence->streamJid();
@@ -679,17 +679,17 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
       if (it.key() > NULL_STATUS_ID)
       {
         Menu *menu = it.key() <= MAX_STANDART_STATUS_ID ? sMenu : scMenu;
-        menu->addAction(createStatusAction(it.key(),streamJid,menu),DEFAULT_ACTION_GROUP,true);
+        menu->addAction(createStatusAction(it.key(),streamJid,menu),AG_DEFAULT,true);
       }
       it++;
     }
 
     Action *action = createStatusAction(MAIN_STATUS_ID, APresence->streamJid(), sMenu);
     action->setData(ACTION_DR_STATUS_CODE, MAIN_STATUS_ID);
-    sMenu->addAction(action,AG_STATUSCHANGER_STREAMS,true);
+    sMenu->addAction(action,AG_STATUSCHANGER_STATUSMENU_STREAMS,true);
     FStreamMainStatusAction.insert(APresence,action);
 
-    FMainMenu->addAction(sMenu->menuAction(),AG_STATUSCHANGER_STREAMS,true);
+    FMainMenu->addAction(sMenu->menuAction(),AG_STATUSCHANGER_STATUSMENU_STREAMS,true);
   }
 }
 

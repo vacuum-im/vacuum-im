@@ -13,7 +13,7 @@ public:
   virtual QString toolTip() const =0;
   virtual QIcon mainIcon() const =0;
   virtual void setMainIcon(const QIcon &AIcon) =0;
-  virtual void addAction(Action *AAction, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false) =0;
+  virtual void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false) =0;
   virtual void removeAction(Action *AAction) =0;
   virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink) =0;
   virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, bool ABlink) =0;

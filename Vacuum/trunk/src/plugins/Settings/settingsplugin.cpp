@@ -72,8 +72,8 @@ bool SettingsPlugin::initObjects()
 
   if (FTrayManager)
   {
-    FTrayManager->addAction(FOpenOptionsDialogAction,SETTINGS_ACTION_GROUP_OPTIONS,true);
-    FTrayManager->addAction(FOpenProfileDialogAction,SETTINGS_ACTION_GROUP_OPTIONS,true);
+    FTrayManager->addAction(FOpenOptionsDialogAction,AG_SETTINGS_TRAY,true);
+    FTrayManager->addAction(FOpenProfileDialogAction,AG_SETTINGS_TRAY,true);
   }
   return true;
 }
@@ -477,8 +477,8 @@ void SettingsPlugin::setProfileClosed()
 
 void SettingsPlugin::onMainWindowCreated(IMainWindow *AMainWindow)
 {
-  AMainWindow->mainMenu()->addAction(FOpenOptionsDialogAction,SETTINGS_ACTION_GROUP_OPTIONS,true);
-  AMainWindow->mainMenu()->addAction(FOpenProfileDialogAction,SETTINGS_ACTION_GROUP_OPTIONS,true);
+  AMainWindow->mainMenu()->addAction(FOpenOptionsDialogAction,AG_SETTINGS_MMENU,true);
+  AMainWindow->mainMenu()->addAction(FOpenProfileDialogAction,AG_SETTINGS_MMENU,true);
 }
 
 void SettingsPlugin::onOptionsDialogAccepted()

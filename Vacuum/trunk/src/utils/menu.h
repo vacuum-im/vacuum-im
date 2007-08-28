@@ -22,16 +22,16 @@ public:
 
   //QMenu
   Action *menuAction();
-  void addAction(Action *AAction, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
+  void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
   void removeAction(Action *AAction);
   void clear();
   void setIcon(const QIcon &AIcon);
   void setIcon(const QString &AIconsetFile, const QString &AIconName);
   void setTitle(const QString &ATitle);
   //Menu
-  void addMenuActions(const Menu *AMenu, int AGroup = DEFAULT_ACTION_GROUP, bool ASort = false);
+  void addMenuActions(const Menu *AMenu, int AGroup = AG_DEFAULT, bool ASort = false);
   int actionGroup(const Action *AAction) const;
-  QList<Action *> actions(int AGroup = NULL_ACTION_GROUP) const;
+  QList<Action *> actions(int AGroup = AG_NULL) const;
   QList<Action *> findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu = false) const;
 signals:
   void addedAction(QAction *);

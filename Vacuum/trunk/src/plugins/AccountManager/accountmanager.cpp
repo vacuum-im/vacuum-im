@@ -333,7 +333,7 @@ void AccountManager::onMainWindowCreated(IMainWindow *AMainWindow)
     actAccountsSetup->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS);
     connect(actAccountsSetup,SIGNAL(triggered(bool)),
       FSettingsPlugin->instance(),SLOT(openOptionsDialogAction(bool)));
-    AMainWindow->mainMenu()->addAction(actAccountsSetup,SETTINGS_ACTION_GROUP_OPTIONS,true);
+    AMainWindow->mainMenu()->addAction(actAccountsSetup,AG_ACCOUNTMANAGER_MMENU,true);
   }
 }
 
@@ -480,7 +480,7 @@ void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       modify->setData(Action::DR_Parametr1,OPTIONS_NODE_ACCOUNTS+QString("::")+account->accountId());
       connect(modify,SIGNAL(triggered(bool)),
         FSettingsPlugin->instance(),SLOT(openOptionsDialogAction(bool)));
-      AMenu->addAction(modify,SETTINGS_ACTION_GROUP_OPTIONS,true);
+      AMenu->addAction(modify,AG_ACCOUNTMANAGER_ROSTER,true);
     }
   }
 }

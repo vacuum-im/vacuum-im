@@ -40,7 +40,7 @@ bool TrayManager::initConnections(IPluginManager *APluginManager, int &/*AInitOr
   actQuit->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
   actQuit->setText(tr("Quit"));
   connect(actQuit,SIGNAL(triggered()),APluginManager->instance(),SLOT(quit()));
-  addAction(actQuit,MAINWINDOW_ACTION_GROUP_QUIT);
+  addAction(actQuit,AG_TRAYMANAGER_TRAY_QUIT);
   
   return FTrayIcon.isSystemTrayAvailable();
 }
