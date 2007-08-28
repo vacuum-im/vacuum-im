@@ -2,9 +2,23 @@
 #include <QTimer>
 #include <QToolButton>
 
+#define MAX_TEMP_STATUS_ID                  -10
+
+#define AVN_LAST_ONLINE_STATUS              "statusChanger:lastOnlineStatus"
+#define AVN_IS_MAIN_STATUS                  "statusChanger:isMainStatus"
+#define SVN_LAST_ONLINE_MAIN_STATUS         "lastOnlineMainStatus"
+#define SVN_MAIN_STATUS_ID                  "mainStatus"
+#define SVN_STATUS                          "status[]"
+#define SVN_STATUS_CODE                     "status[]:code"
+#define SVN_STATUS_NAME                     "status[]:name"
+#define SVN_STATUS_SHOW                     "status[]:show"
+#define SVN_STATUS_TEXT                     "status[]:text"
+#define SVN_STATUS_PRIORITY                 "status[]:priority"
+#define SVN_STATUS_ICONSET                  "status[]:iconset"
+#define SVN_STATUS_ICON_NAME                "status[]:iconName"
+
 StatusChanger::StatusChanger()
 {
-  FBaseShow = IPresence::Error;
   FConnectingLabel = NULL_LABEL_ID;
   FPresencePlugin = NULL;
   FRosterPlugin = NULL;
@@ -14,13 +28,23 @@ StatusChanger::StatusChanger()
   FRostersModel = NULL;
   FRostersModelPlugin = NULL;
   FTrayManager = NULL;
-  mnuBase = NULL;
+  FSettings = NULL;
+  FSettingsPlugin = NULL;
+  FEditStatusAction = NULL;
+  FMainMenuToolButton = NULL;
+  FMainMenu = NULL;
+  FCustomMenu = NULL;
+  FSettingStatusToPresence = NULL;
 }
 
 StatusChanger::~StatusChanger()
 {
-  if (mnuBase)
-    delete mnuBase;
+  if (!FEditStatusDialog.isNull())
+    FEditStatusDialog->reject();
+  FStatusItems.remove(MAIN_STATUS_ID);
+  qDeleteAll(FStatusItems);
+  if (FMainMenu)
+    delete FMainMenu;
 }
 
 //IPlugin
@@ -67,55 +91,75 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
-  {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-  }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin)
-  {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-  }
   
   plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
   if (plugin)
-  {
     FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
-  }
 
   plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
   if (plugin)
   {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
     if (FAccountManager)
+    {
       connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
+    }
   }
 
   plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
   if (plugin)
-  {
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
-  }
   
+  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  if (plugin)
+    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+
   return FPresencePlugin!=NULL;
 }
 
 bool StatusChanger::initObjects()
 {
   FRosterIconset.openFile(ROSTER_ICONSETFILE);
-  connect(&FRosterIconset,SIGNAL(skinChanged()),SLOT(onSkinChanged()));
+  FStatusIconset.openFile(STATUS_ICONSETFILE);
+  connect(&FStatusIconset, SIGNAL(skinChanged()),SLOT(onSkinChanged()));
 
-  mnuBase = new Menu(NULL);
-  createStatusActions(NULL);
- 
+  FMainMenu = new Menu(NULL);
+
+  FCustomMenu = new Menu(FMainMenu);
+  FCustomMenu->setTitle(tr("User statuses"));
+  FCustomMenu->setIcon(STATUS_ICONSETFILE,"ask");
+  FCustomMenu->menuAction()->setVisible(false);
+  FMainMenu->addAction(FCustomMenu->menuAction(),AG_STATUSCHANGER_CUSTOM_MENU,false);
+
+  FEditStatusAction = new Action(FMainMenu);
+  FEditStatusAction->setText(tr("Edit user statuses"));
+  FEditStatusAction->setIcon(STATUS_ICONSETFILE,"ask");
+  connect(FEditStatusAction,SIGNAL(triggered(bool)), SLOT(onEditStatusAction(bool)));
+  FMainMenu->addAction(FEditStatusAction,AG_STATUSCHANGER_CUSTOM_MENU,false);
+  
+  createDefaultStatus();
+  setMainStatusId(STATUS_OFFLINE);
+
+  if (FSettingsPlugin)
+  {
+    FSettings = FSettingsPlugin->openSettings(STATUSCHANGER_UUID,this);
+    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
+    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
+  }
+
   if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
   {
-    QToolButton *tbutton = new QToolButton;
-    tbutton->setDefaultAction(mnuBase->menuAction());
-    tbutton->setPopupMode(QToolButton::InstantPopup);
-    tbutton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    tbutton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-    FMainWindowPlugin->mainWindow()->bottomToolBar()->addWidget(tbutton);
+    FMainMenuToolButton = new QToolButton;
+    FMainMenuToolButton->setDefaultAction(FMainMenu->menuAction());
+    FMainMenuToolButton->setPopupMode(QToolButton::InstantPopup);
+    FMainMenuToolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    FMainMenuToolButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    FMainWindowPlugin->mainWindow()->bottomToolBar()->addWidget(FMainMenuToolButton);
   }
 
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
@@ -135,7 +179,7 @@ bool StatusChanger::initObjects()
 
   if (FTrayManager)
   {
-    FTrayManager->addAction(mnuBase->menuAction(),STATUSMENU_ACTION_GROUP_MAIN,true);
+    FTrayManager->addAction(FMainMenu->menuAction(),AG_STATUSCHANGER_TRAY,true);
   }
 
   return true;
@@ -143,350 +187,600 @@ bool StatusChanger::initObjects()
 
 bool StatusChanger::initSettings()
 {
-  setBaseShow(IPresence::Offline);
   return true;
 }
 
+bool StatusChanger::startPlugin()
+{
+  updateMainMenu();
+  return true;
+}
 
 //IStatusChanger
+void StatusChanger::setStatus(int AStatusId, const Jid &AStreamJid)
+{
+  if (FStatusItems.contains(AStatusId)) 
+  {
+    bool changeMainStatus = !AStreamJid.isValid() && AStatusId != MAIN_STATUS_ID;
+
+    if (changeMainStatus)
+      setMainStatusId(AStatusId);
+
+    StatusItem *status = FStatusItems.value(AStatusId);
+    QHash<IPresence *, int>::const_iterator it = FStreamStatus.constBegin();
+    while (it != FStreamStatus.constEnd())
+    {
+      IPresence *presence = it.key();
+      
+      bool setStatusToPresence = presence->streamJid() == AStreamJid;
+      setStatusToPresence |= FStreamMenu.count() == 1;
+      setStatusToPresence |= changeMainStatus && FStreamMainStatus.contains(presence);
+      setStatusToPresence |= !AStreamJid.isValid() && AStatusId == MAIN_STATUS_ID;
+      setStatusToPresence |= changeMainStatus && status->show == IPresence::Offline;
+      if (setStatusToPresence)
+      {
+        if (AStatusId == MAIN_STATUS_ID)
+          FStreamMainStatus += presence;
+        else if (!changeMainStatus)
+          FStreamMainStatus -= presence;
+
+        statusAboutToBeSeted(status->code,presence->streamJid());
+        
+        FSettingStatusToPresence = presence;
+        if (!presence->setPresence((IPresence::Show)status->show,status->text,status->priority))
+        {
+          FSettingStatusToPresence = NULL;
+          if (status->show != IPresence::Offline && !presence->xmppStream()->isOpen())
+          {
+            insertConnectingLabel(presence);
+            FStreamWaitStatus.insert(presence,FStreamMainStatus.contains(presence) ? MAIN_STATUS_ID : status->code);
+            presence->xmppStream()->open();
+          }
+        }
+        else
+        {
+          FSettingStatusToPresence = NULL;
+          setStreamStatusId(presence,changeMainStatus ? MAIN_STATUS_ID : AStatusId);
+
+          if (status->show == IPresence::Offline)
+            presence->xmppStream()->close();
+          
+          if (!FStreamMainStatus.contains(presence))
+            FStreamLastStatus.insert(presence->streamJid(),AStatusId);
+          
+          updateStreamMenu(presence);
+          updateMainMenu();
+          emit statusSeted(status->code, presence->streamJid());
+        }
+      }
+      it++;
+    }
+  }
+}
+
+int StatusChanger::streamStatus(const Jid &AStreamJid) const
+{
+  QHash<IPresence *, int>::const_iterator it = FStreamStatus.constBegin();
+  while (it!=FStreamStatus.constEnd())
+  {
+    if (it.key()->streamJid() == AStreamJid)
+      return it.value();
+    it++;
+  }
+  return NULL_STATUS_ID;
+}
+
 Menu *StatusChanger::streamMenu(const Jid &AStreamJid) const
 {
-  QHash<IPresence *, Menu *>::const_iterator i = FStreamMenus.constBegin();
-  while (i!=FStreamMenus.constEnd())
+  QHash<IPresence *, Menu *>::const_iterator it = FStreamMenu.constBegin();
+  while (it!=FStreamMenu.constEnd())
   {
-    if (i.key()->streamJid() == AStreamJid)
-      return i.value();
-    i++;
+    if (it.key()->streamJid() == AStreamJid)
+      return it.value();
+    it++;
   }
   return NULL;
 }
 
-void StatusChanger::setPresence(IPresence::Show AShow, const QString &AStatus, 
-                                int APriority, const Jid &AStreamJid)
+int StatusChanger::addStatusItem(const QString &AName, int AShow, const QString &AText, int APriority)
 {
-  IPresence *presence;
-  QList<IPresence *> presences;
-
-  if (!AStreamJid.isValid())
+  int statusId = statusByName(AName);
+  if (statusId == 0 && !AName.isEmpty())
   {
-    foreach(presence,FPresences)
-      if (presence->show() == FBaseShow || AShow == IPresence::Offline)
-        presences.append(presence);
-
-    if (presences.isEmpty())
-      presences = FPresences;
-  } 
-  else
-  {
-    presence = FPresencePlugin->getPresence(AStreamJid);
-    if (presence)
-      presences.append(presence);
+    do {
+      statusId = qrand() + (qrand() << 16);
+    } while(statusId <= MAX_STANDART_STATUS_ID || FStatusItems.contains(statusId));
+    StatusItem *status = new StatusItem;
+    status->code = statusId;
+    status->name = AName;
+    status->show = AShow;
+    status->text = AText;
+    status->priority = APriority;
+    FStatusItems.insert(statusId,status);
+    createStatusActions(statusId);
+    emit statusItemAdded(statusId);
   }
+  else if (statusId > 0)
+    updateStatusItem(statusId,AName,AShow,AText,APriority);
 
-  foreach(presence,presences)
+  return statusId;
+}
+
+void StatusChanger::updateStatusItem(int AStatusId, const QString &AName, int AShow, 
+                                     const QString &AText, int APriority)
+{
+  if (FStatusItems.contains(AStatusId))
   {
-    FWaitReconnect.remove(presence);
-    if (AShow == IPresence::Offline)
+    StatusItem *status = FStatusItems.value(AStatusId);
+    if (status->name == AName || statusByName(AName) == NULL_STATUS_ID)
     {
-      presence->setPresence(AShow,AStatus,APriority,Jid());
-      presence->xmppStream()->close();
-      removeWaitOnline(presence);
-    }
-    else if (!FWaitOnline.contains(presence))
-    {
-      if (!presence->setPresence(AShow,AStatus,APriority,Jid()))
-      {
-        if (!presence->xmppStream()->isOpen())
-        {
-          PresenceItem item;
-          item.show = AShow;
-          item.status = AStatus;
-          item.priority = APriority;
-          insertWaitOnline(presence,item);
-          presence->xmppStream()->open();
-        }
-      }
+      status->name = AName;
+      status->show = AShow;
+      status->text = AText;
+      status->priority = APriority;
+      updateStatusActions(AStatusId);
+      emit statusItemChanged(AStatusId);
+      resendUpdatedStatus(AStatusId);
     }
   }
 }
 
-void StatusChanger::onChangeStatusAction(bool)
+void StatusChanger::removeStatusItem(int AStatusId)
+{
+  if (AStatusId > MAX_STANDART_STATUS_ID && FStatusItems.contains(AStatusId) && !activeStatusItems().contains(AStatusId))
+  {
+    emit statusItemRemoved(AStatusId);
+    removeStatusActions(AStatusId);
+    delete FStatusItems.take(AStatusId);;
+  }
+}
+
+QString StatusChanger::statusItemName(int AStatusId) const
+{
+  if (FStatusItems.contains(AStatusId))
+    return FStatusItems.value(AStatusId)->name;
+  return QString();
+}
+
+int StatusChanger::statusItemShow(int AStatusId) const
+{
+  if (FStatusItems.contains(AStatusId))
+    return FStatusItems.value(AStatusId)->show;
+  return -1;
+}
+
+QString StatusChanger::statusItemText(int AStatusId) const
+{
+  if (FStatusItems.contains(AStatusId))
+    return FStatusItems.value(AStatusId)->text;
+  return QString();
+}
+
+int StatusChanger::statusItemPriority(int AStatusId) const
+{
+  if (FStatusItems.contains(AStatusId))
+    return FStatusItems.value(AStatusId)->priority;
+  return 0;
+}
+
+QIcon StatusChanger::statusItemIcon(int AStatusId) const
+{
+  if (FStatusItems.contains(AStatusId))
+    return FStatusItems.value(AStatusId)->icon;
+  return QIcon();
+}
+
+QList<int> StatusChanger::activeStatusItems() const
+{
+  QList<int> active;
+  foreach (int statusId, FStreamStatus)
+    active.append(statusId == MAIN_STATUS_ID ? FStatusItems.value(MAIN_STATUS_ID)->code : statusId);
+  return active;
+}
+
+void StatusChanger::setStatusItemIcon(int AStatusId, const QIcon &AIcon)
+{
+  if (FStatusItems.contains(AStatusId))
+  {
+    StatusItem *status = FStatusItems.value(AStatusId);
+    status->icon = AIcon;
+    status->iconsetFile.clear();
+    status->iconName.clear();
+    updateStatusActions(AStatusId);
+  }
+}
+
+void StatusChanger::setStatusItemIcon(int AStatusId, const QString &AIconsetFile, const QString &AIconName)
+{
+  if (FStatusItems.contains(AStatusId))
+  {
+    StatusItem *status = FStatusItems.value(AStatusId);
+    status->icon = QIcon();
+    status->iconsetFile = AIconsetFile;
+    status->iconName = AIconName;
+    updateStatusActions(AStatusId);
+  }
+}
+
+int StatusChanger::statusByName(const QString &AName) const
+{
+  foreach(StatusItem *status, FStatusItems)
+    if (status->name.toLower() == AName.toLower())
+      return status->code;
+  return NULL_STATUS_ID;
+}
+
+QList<int> StatusChanger::statusByShow(int AShow) const
+{
+  QList<int> statuses;
+  foreach(StatusItem *status, FStatusItems)
+    if (status->show == AShow)
+      statuses.append(status->code);
+  return statuses;
+}
+
+QIcon StatusChanger::iconByShow(int AShow) const
+{
+  switch (AShow)
+  {
+  case IPresence::Offline: 
+    return FStatusIconset.iconByName("offline");
+  case IPresence::Online: 
+    return FStatusIconset.iconByName("online");
+  case IPresence::Chat: 
+    return FStatusIconset.iconByName("chat");
+  case IPresence::Away: 
+    return FStatusIconset.iconByName("away");
+  case IPresence::ExtendedAway: 
+    return FStatusIconset.iconByName("xa");
+  case IPresence::DoNotDistrib: 
+    return FStatusIconset.iconByName("dnd");
+  case IPresence::Invisible: 
+    return FStatusIconset.iconByName("invisible");
+  case IPresence::Error: 
+    return FStatusIconset.iconByName("error");
+  default:
+    return QIcon();
+  }
+}
+
+QString StatusChanger::nameByShow(int AShow) const
+{
+  switch (AShow)
+  {
+  case IPresence::Offline: 
+    return tr("Offline");
+  case IPresence::Online: 
+    return tr("Online");
+  case IPresence::Chat: 
+    return tr("Chat");
+  case IPresence::Away: 
+    return tr("Away");
+  case IPresence::ExtendedAway: 
+    return tr("Extended Away");
+  case IPresence::DoNotDistrib: 
+    return tr("Do not Distrib");
+  case IPresence::Invisible: 
+    return tr("Invisible");
+  case IPresence::Error: 
+    return tr("Error");
+  default:
+    return tr("Unknown Status");
+  }
+}
+
+void StatusChanger::setStatusByAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
     QString streamJid = action->data(Action::DR_StreamJid).toString();
-    IPresence::Show show = (IPresence::Show)action->data(Action::DR_Parametr1).toInt();
-    QString status = action->data(Action::DR_Parametr2).toString();
-    int priority = action->data(Action::DR_Parametr3).toInt();
-    setPresence(show,status,priority,streamJid);
+    int statusId = action->data(ACTION_DR_STATUS_CODE).toInt();
+    setStatus(statusId,streamJid);
   }
 }
 
-void StatusChanger::setBaseShow(IPresence::Show AShow)
+void StatusChanger::createDefaultStatus()
 {
-  if (AShow != FBaseShow)
+  StatusItem *status = new StatusItem;
+  status->code = STATUS_ONLINE;
+  status->name = tr("Online");
+  status->show = IPresence::Online;
+  status->text = tr("Online");
+  status->priority = 120;
+  status->iconsetFile = STATUS_ICONSETFILE;
+  status->iconName = "online";
+  FStatusItems.insert(status->code,status);
+  createStatusActions(status->code);
+
+  status = new StatusItem;
+  status->code = STATUS_CHAT;
+  status->name = tr("Free for Chat");
+  status->show = IPresence::Chat;
+  status->text = tr("Free for Chat");
+  status->priority = 100;
+  status->iconsetFile = STATUS_ICONSETFILE;
+  status->iconName = "chat";
+  FStatusItems.insert(status->code,status);
+  createStatusActions(status->code);
+
+  status = new StatusItem;
+  status->code = STATUS_AWAY;
+  status->name = tr("Away");
+  status->show = IPresence::Away;
+  status->text = tr("I`am away from my desk");
+  status->priority = 80;
+  status->iconsetFile = STATUS_ICONSETFILE;
+  status->iconName = "away";
+  FStatusItems.insert(status->code,status);
+  createStatusActions(status->code);
+
+  status = new StatusItem;
+  status->code = STATUS_EXAWAY;
+  status->name = tr("Extended Away");
+  status->show = IPresence::ExtendedAway;
+  status->text = tr("Not available");
+  status->priority = 60;
+  status->iconsetFile = STATUS_ICONSETFILE;
+  status->iconName = "xa";
+  FStatusItems.insert(status->code,status);
+  createStatusActions(status->code);
+
+  status = new StatusItem;
+  status->code = STATUS_DND;
+  status->name = tr("Do not Distrib");
+  status->show = IPresence::DoNotDistrib;
+  status->text = tr("Do not Distrib");
+  status->priority = 40;
+  status->iconsetFile = STATUS_ICONSETFILE;
+  status->iconName = "dnd";
+  FStatusItems.insert(status->code,status);
+  createStatusActions(status->code);
+
+  status = new StatusItem;
+  status->code = STATUS_INVISIBLE;
+  status->name = tr("Invisible");
+  status->show = IPresence::Invisible;
+  status->text = tr("Invisible");
+  status->priority = 20;
+  status->iconsetFile = STATUS_ICONSETFILE;
+  status->iconName = "invisible";
+  FStatusItems.insert(status->code,status);
+  createStatusActions(status->code);
+
+  status = new StatusItem;
+  status->code = STATUS_OFFLINE;
+  status->name = tr("Offline");
+  status->show = IPresence::Offline;
+  status->text = tr("Disconnected");
+  status->priority = 0;
+  status->iconsetFile = STATUS_ICONSETFILE;
+  status->iconName = "offline";
+  FStatusItems.insert(status->code,status);
+  createStatusActions(status->code);
+
+  status = new StatusItem;
+  status->code = STATUS_ERROR;
+  status->name = tr("Error");
+  status->show = IPresence::Error;
+  status->text = tr("Error");
+  status->priority = 0;
+  status->iconsetFile = STATUS_ICONSETFILE;
+  status->iconName = "error";
+  FStatusItems.insert(status->code,status);
+}
+
+void StatusChanger::setMainStatusId(int AStatusId)
+{
+  if (FStatusItems.contains(AStatusId))
+    FStatusItems[MAIN_STATUS_ID] = FStatusItems.value(AStatusId);
+}
+
+void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
+{
+  if (FStatusItems.contains(AStatusId))
   {
-    FBaseShow = AShow; 
-    updateMenu();
+    FStreamStatus[APresence] = AStatusId;
+    if (AStatusId > MAX_TEMP_STATUS_ID)
+      removeTempStatus(APresence);
   }
 }
 
-void StatusChanger::createStatusActions(IPresence *APresence)
+Action *StatusChanger::createStatusAction(int AStatusId, const Jid &AStreamJid, QObject *AParent) const
 {
-  Menu *menu = mnuBase;
-  QString streamJid;
-  if (APresence)
-  {
-    streamJid = APresence->streamJid().pFull();
-    menu = FStreamMenus.value(APresence);
-  }
+  StatusItem *status = FStatusItems.value(AStatusId);
 
-  Action *action = new Action(menu);
-  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Online));
-  action->setText(getStatusName(IPresence::Online));
-  action->setData(Action::DR_Parametr1,IPresence::Online);
-  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Online));
-  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Online));
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
-  menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
+  Action *action = new Action(AParent);
+  if (AStreamJid.isValid())
+    action->setData(Action::DR_StreamJid,AStreamJid.full());
+  action->setData(ACTION_DR_STATUS_CODE,AStatusId);
+  connect(action,SIGNAL(triggered(bool)),SLOT(setStatusByAction(bool)));
+  updateStatusAction(status,action);
 
-  action = new Action(menu);
-  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Chat));
-  action->setText(getStatusName(IPresence::Chat));
-  action->setData(Action::DR_Parametr1,IPresence::Chat);
-  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Chat));
-  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Chat));
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
-  menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
-
-  action = new Action(menu);
-  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Away));
-  action->setText(getStatusName(IPresence::Away));
-  action->setData(Action::DR_Parametr1,IPresence::Away);
-  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Away));
-  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Away));
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
-  menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
-
-  action = new Action(menu);
-  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::ExtendedAway));
-  action->setText(getStatusName(IPresence::ExtendedAway));
-  action->setData(Action::DR_Parametr1,IPresence::ExtendedAway);
-  action->setData(Action::DR_Parametr2,getStatusText(IPresence::ExtendedAway));
-  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::ExtendedAway));
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
-  menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
-
-  action = new Action(menu);
-  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::DoNotDistrib));
-  action->setText(getStatusName(IPresence::DoNotDistrib));
-  action->setData(Action::DR_Parametr1,IPresence::DoNotDistrib);
-  action->setData(Action::DR_Parametr2,getStatusText(IPresence::DoNotDistrib));
-  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::DoNotDistrib));
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
-  menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
-
-  action = new Action(menu);
-  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Invisible));
-  action->setText(getStatusName(IPresence::Invisible));
-  action->setData(Action::DR_Parametr1,IPresence::Invisible);
-  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Invisible));
-  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Invisible));
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
-  menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
-
-  action = new Action(menu);
-  action->setIcon(STATUS_ICONSETFILE,getStatusIconName(IPresence::Offline));
-  action->setText(getStatusName(IPresence::Offline));
-  action->setData(Action::DR_Parametr1,IPresence::Offline);
-  action->setData(Action::DR_Parametr2,getStatusText(IPresence::Offline));
-  action->setData(Action::DR_Parametr3,getStatusPriority(IPresence::Offline));
-  action->setData(Action::DR_StreamJid,streamJid);
-  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeStatusAction(bool)));
-  menu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
+  return action;
 }
 
-void StatusChanger::updateMenu(IPresence *APresence)
+void StatusChanger::updateStatusAction(StatusItem *AStatus, Action *AAction) const
 {
-  if (!APresence)
+  AAction->setText(AStatus->name);
+  if (!AStatus->iconsetFile.isEmpty() && !AStatus->iconName.isEmpty())
   {
-    mnuBase->setIcon(STATUS_ICONSETFILE,getStatusIconName(FBaseShow));
-    mnuBase->setTitle(getStatusName(FBaseShow));
-
-    if (FTrayManager)
-      FTrayManager->setBaseIcon(mnuBase->icon());
+    AAction->setIcon(AStatus->iconsetFile,AStatus->iconName);
+    AStatus->icon = AAction->icon();
   }
-  else if (FStreamMenus.contains(APresence))
+  else if (!AStatus->icon.isNull())
+    AAction->setIcon(AStatus->icon);
+  else
+    AAction->setIcon(iconByShow(AStatus->show));
+
+  int sortShow = AStatus->show != IPresence::Offline ? AStatus->show : MAX_STANDART_STATUS_ID;
+  AAction->setData(Action::DR_SortString,QString("%1-%2").arg(sortShow,5,10,QChar('0')).arg(AStatus->name));
+}
+
+void StatusChanger::createStatusActions(int AStatusId)
+{
+  Menu *menu = AStatusId <= MAX_STANDART_STATUS_ID ? FMainMenu : FCustomMenu;
+
+  menu->addAction(createStatusAction(AStatusId,Jid(),menu),DEFAULT_ACTION_GROUP,true);
+
+  QHash<IPresence *, Menu *>::iterator it = FStreamCustomMenu.begin();
+  while (it != FStreamCustomMenu.end())
   {
-    Menu *menu = FStreamMenus.value(APresence);
-    menu->setIcon(STATUS_ICONSETFILE,getStatusIconName(APresence->show()));
+    it.value()->addAction(createStatusAction(AStatusId,it.key()->streamJid(),it.value()),DEFAULT_ACTION_GROUP,true);
+    it++;
+  }
+  updateCustomMenu();
+}
+
+void StatusChanger::updateStatusActions(int AStatusId)
+{
+  StatusItem *status = FStatusItems.value(AStatusId);
+
+  QMultiHash<int, QVariant> data;
+  data.insert(ACTION_DR_STATUS_CODE,AStatusId);
+  QList<Action *> actionList = FMainMenu->findActions(data,true);
+  foreach (Action *action, actionList)
+    updateStatusAction(status,action);
+}
+
+void StatusChanger::removeStatusActions(int AStatusId)
+{
+  QMultiHash<int, QVariant> data;
+  data.insert(ACTION_DR_STATUS_CODE,AStatusId);
+  qDeleteAll(FMainMenu->findActions(data,true));
+  updateCustomMenu();
+}
+
+void StatusChanger::updateCustomMenu()
+{
+  FCustomMenu->menuAction()->setVisible(!FCustomMenu->actions().isEmpty());
+  foreach (Menu *menu, FStreamCustomMenu)
+    menu->menuAction()->setVisible(!menu->actions().isEmpty());
+}
+
+void StatusChanger::createStreamMenu(IPresence *APresence)
+{
+  if (!FStreamMenu.contains(APresence))
+  {
+    Menu *sMenu = new Menu(FMainMenu);
+    sMenu->setTitle(APresence->streamJid().full());
+    FStreamMenu.insert(APresence,sMenu);
+
+    Menu *scMenu = new Menu(sMenu);
+    scMenu->setTitle(tr("User statuses"));
+    scMenu->setIcon(STATUS_ICONSETFILE,"ask");
+    sMenu->addAction(scMenu->menuAction(),AG_STATUSCHANGER_CUSTOM_MENU,true);
+    FStreamCustomMenu.insert(APresence,scMenu);
+    
+    Jid streamJid = APresence->streamJid();
+    QHash<int, StatusItem *>::const_iterator it = FStatusItems.constBegin();
+    while (it != FStatusItems.constEnd())
+    {
+      if (it.key() > NULL_STATUS_ID)
+      {
+        Menu *menu = it.key() <= MAX_STANDART_STATUS_ID ? sMenu : scMenu;
+        menu->addAction(createStatusAction(it.key(),streamJid,menu),DEFAULT_ACTION_GROUP,true);
+      }
+      it++;
+    }
+
+    Action *action = createStatusAction(MAIN_STATUS_ID, APresence->streamJid(), sMenu);
+    action->setData(ACTION_DR_STATUS_CODE, MAIN_STATUS_ID);
+    sMenu->addAction(action,AG_STATUSCHANGER_STREAMS,true);
+    FStreamMainStatusAction.insert(APresence,action);
+
+    FMainMenu->addAction(sMenu->menuAction(),AG_STATUSCHANGER_STREAMS,true);
   }
 }
 
-void StatusChanger::addStreamMenu(IPresence *APresence)
+void StatusChanger::updateStreamMenu(IPresence *APresence)
 {
-  if (APresence && !FStreamMenus.contains(APresence))
+  int statusId = FStreamStatus.value(APresence,MAIN_STATUS_ID);
+
+  Menu *sMenu = FStreamMenu.value(APresence);
+  if (sMenu)
   {
-    Menu *menu = new Menu(mnuBase);
-    menu->setTitle(APresence->streamJid().full());
-    FStreamMenus.insert(APresence,menu);
-    createStatusActions(APresence);
-    mnuBase->addAction(menu->menuAction(),STATUSMENU_ACTION_GROUP_STREAM,true);
-    updateMenu(APresence);
+    QIcon icon = statusItemIcon(statusId);
+    if (icon.isNull())
+      sMenu->setIcon(iconByShow(statusItemShow(statusId)));
+    else
+      sMenu->setIcon(icon);
   }
+
+  Action *mAction = FStreamMainStatusAction.value(APresence);
+  if (mAction)
+    mAction->setVisible(!FStreamMainStatus.contains(APresence));
 }
 
 void StatusChanger::removeStreamMenu(IPresence *APresence)
 {
-  if (APresence && FStreamMenus.contains(APresence))
+  if (FStreamMenu.contains(APresence))
   {
-    Menu *menu = FStreamMenus.take(APresence);
-    menu->clear();
-    delete menu;
+    FStreamCustomMenu.remove(APresence);
+    FStreamMainStatusAction.remove(APresence);
+    FStreamStatus.remove(APresence);
+    FStreamWaitStatus.remove(APresence);
+    FStreamLastStatus.remove(APresence->streamJid());
+    FStreamWaitReconnect.remove(APresence);
+    removeTempStatus(APresence);
+    delete FStreamMenu.take(APresence);
   }
 }
 
-void StatusChanger::updateAccount(IPresence *APresence)
+void StatusChanger::updateMainMenu()
 {
-  IAccount *account = FAccounts.value(APresence,NULL);
-  if (account && APresence->show() != IPresence::Offline && APresence->show() != IPresence::Error)
+  int mainStatusToShow = MAIN_STATUS_ID;
+  
+  if (FStreamStatus.isEmpty())
   {
-    account->setValue("presence::last::show",APresence->show());
-    account->setValue("presence::last::status",APresence->status());
-    account->setValue("presence::last::priority",APresence->priority());
-  }
-}
-
-void StatusChanger::autoReconnect(IPresence *APresence)
-{
-  IAccount *account = FAccounts.value(APresence,NULL);
-  if (account && APresence->show() == IPresence::Error)
-  {
-    if (account->autoReconnect())
-    {
-      IPresence::Show show = (IPresence::Show)account->value("presence::last::show",IPresence::Online).toInt();
-      QString status = account->value("presence::last::status",getStatusText(IPresence::Online)).toString();
-      int priority = account->value("presence::last::priority",getStatusPriority(IPresence::Online)).toInt();
-      int reconnectTime = account->value("autoReconnectTime",30000).toInt();
-      QPair<QDateTime,PresenceItem> pair;
-      pair.first = QDateTime::currentDateTime().addMSecs(reconnectTime);
-      pair.second.show = show;
-      pair.second.status = status;
-      pair.second.priority = priority;
-      FWaitReconnect.insert(APresence,pair);
-      QTimer::singleShot(reconnectTime+100,this,SLOT(onReconnectTimer()));
-    }
+    mainStatusToShow = STATUS_OFFLINE;
+    FMainMenu->menuAction()->setEnabled(false);
   }
   else
-    FWaitReconnect.remove(APresence);
-}
-
-QString StatusChanger::getStatusIconName(IPresence::Show AShow) const
-{
-  switch (AShow)
   {
-  case IPresence::Offline: 
-    return "offline";
-  case IPresence::Online: 
-    return "online";
-  case IPresence::Chat: 
-    return "chat";
-  case IPresence::Away: 
-    return "away";
-  case IPresence::ExtendedAway: 
-    return "xa";
-  case IPresence::DoNotDistrib: 
-    return "dnd";
-  case IPresence::Invisible: 
-    return "invisible";
-  case IPresence::Error: 
-    return "error";
-  }
-  return QString();
-}
+    QList<int> statusOnline, statusOffline;
+    QHash<IPresence *, int>::const_iterator it = FStreamStatus.constBegin();
+    while (it != FStreamStatus.constEnd())
+    {
+      if (it.key()->xmppStream()->isOpen())
+        statusOnline.append(it.value());
+      else
+        statusOffline.append(it.value());
+      it++;
+    }
+    if (!statusOnline.isEmpty() && !statusOnline.contains(MAIN_STATUS_ID))
+      mainStatusToShow = statusOnline.first();
+    else if (statusOnline.isEmpty() && !statusOffline.contains(MAIN_STATUS_ID))
+      mainStatusToShow = statusOffline.first();
 
-QString StatusChanger::getStatusName(IPresence::Show AShow) const
-{
-  switch (AShow)
+    FMainMenu->menuAction()->setEnabled(true);
+  }
+  
+  QIcon mStatusIcon = statusItemIcon(mainStatusToShow);
+  if (mStatusIcon.isNull())
+    mStatusIcon = iconByShow(statusItemShow(mainStatusToShow));
+  QString mStatusName = statusItemName(mainStatusToShow);
+  FMainMenu->setIcon(mStatusIcon);
+  FMainMenu->setTitle(mStatusName);
+
+  FTrayManager->setMainIcon(mStatusIcon);
+
+  if (mainStatusToShow != MAIN_STATUS_ID)
   {
-  case IPresence::Offline: 
-    return tr("Offline");
-  case IPresence::Online: 
-    return tr("Online");
-  case IPresence::Chat: 
-    return tr("Free for Chat");
-  case IPresence::Away: 
-    return tr("Away");
-  case IPresence::ExtendedAway: 
-    return tr("Not Available");
-  case IPresence::DoNotDistrib: 
-    return tr("Do Not Distrib");
-  case IPresence::Invisible: 
-    return tr("Invisible");
-  case IPresence::Error: 
-    return tr("Error");
+    mStatusIcon = statusItemIcon(MAIN_STATUS_ID);
+    if (mStatusIcon.isNull())
+      mStatusIcon = iconByShow(statusItemShow(MAIN_STATUS_ID));
+    mStatusName = statusItemName(MAIN_STATUS_ID);
   }
-  return tr("Unknown");
-}
-
-QString StatusChanger::getStatusText(IPresence::Show AShow) const
-{
-  switch (AShow)
+  foreach (Action *action, FStreamMainStatusAction)
   {
-  case IPresence::Offline: 
-    return tr("Offline");
-  case IPresence::Online: 
-    return tr("Online");
-  case IPresence::Chat: 
-    return tr("I`am free for chat");
-  case IPresence::Away: 
-    return tr("I`am away from my desk");
-  case IPresence::ExtendedAway: 
-    return tr("Not available");
-  case IPresence::DoNotDistrib: 
-    return tr("Do Not Distrib");
-  case IPresence::Invisible: 
-    return tr("Invisible");
-  case IPresence::Error: 
-    return tr("Error");
+    action->setIcon(mStatusIcon);
+    action->setText(mStatusName);
   }
-  return tr("Unknown");
 }
 
-int StatusChanger::getStatusPriority(IPresence::Show AShow) const
+void StatusChanger::insertConnectingLabel(IPresence *APresence)
 {
-  switch (AShow)
-  {
-  case IPresence::Offline: 
-    return 0;
-  case IPresence::Online: 
-    return 4;
-  case IPresence::Chat: 
-    return 8;
-  case IPresence::Away: 
-    return 16;
-  case IPresence::ExtendedAway: 
-    return 32;
-  case IPresence::DoNotDistrib: 
-    return 64;
-  case IPresence::Invisible: 
-    return 128;
-  case IPresence::Error: 
-    return 0;
-  }
-  return -1;
-}
-
-void StatusChanger::insertWaitOnline(IPresence *APresence, PresenceItem &AItem)
-{
-  FWaitOnline.insert(APresence,AItem);
   if (FRostersModel && FRostersView)
   {
     IRosterIndex *index = FRostersModel->getStreamRoot(APresence->xmppStream()->jid());
@@ -495,9 +789,8 @@ void StatusChanger::insertWaitOnline(IPresence *APresence, PresenceItem &AItem)
   }
 }
 
-void StatusChanger::removeWaitOnline(IPresence *APresence)
+void StatusChanger::removeConnectingLabel(IPresence *APresence)
 {
-  FWaitOnline.remove(APresence);
   if (FRostersModel && FRostersView)
   {
     IRosterIndex *index = FRostersModel->getStreamRoot(APresence->xmppStream()->jid());
@@ -506,107 +799,143 @@ void StatusChanger::removeWaitOnline(IPresence *APresence)
   }
 }
 
+void StatusChanger::autoReconnect(IPresence *APresence)
+{
+  IAccount *account = FAccountManager->accountByStream(APresence->streamJid());
+  if (account && account->autoReconnect())
+  {
+    int statusId = FStreamWaitStatus.value(APresence, FStreamStatus.value(APresence));
+
+    if (statusItemShow(statusId) != IPresence::Offline)
+    {
+      int waitTime = account->value("StatusChanger:ReconnectTime",30).toInt();
+      FStreamWaitReconnect.insert(APresence,QPair<QDateTime,int>(QDateTime::currentDateTime().addSecs(waitTime),statusId));
+      QTimer::singleShot(waitTime*1000+100,this,SLOT(onReconnectTimer()));
+    }
+  }
+}
+
+int StatusChanger::createTempStatus(IPresence *APresence, int AShow, const QString &AText, int APriority)
+{
+  removeTempStatus(APresence);
+  StatusItem *status = new StatusItem;
+  status->name = tr("Unknown status");
+  status->show = AShow;
+  status->text = AText;
+  status->priority = APriority;
+  status->icon = iconByShow(AShow);
+  status->code = MAX_TEMP_STATUS_ID;
+  while (FStatusItems.contains(status->code))
+    status->code--;
+  FStatusItems.insert(status->code,status);
+  FStreamTempStatus.insert(APresence,status->code);
+  return status->code;
+}
+
+void StatusChanger::removeTempStatus(IPresence *APresence)
+{
+  if (FStreamTempStatus.contains(APresence))
+    if (!activeStatusItems().contains(FStreamTempStatus.value(APresence)))
+      delete FStatusItems.take(FStreamTempStatus.take(APresence));
+}
+
+void StatusChanger::resendUpdatedStatus(int AStatusId)
+{
+  if (FStatusItems[MAIN_STATUS_ID]->code == AStatusId)
+    setStatus(AStatusId);
+
+  QHash<IPresence *,int>::const_iterator it;
+  for (it = FStreamStatus.constBegin(); it != FStreamStatus.constEnd(); it++)
+    if (it.value() == AStatusId)
+      setStatus(AStatusId, it.key()->streamJid());
+}
+
+void StatusChanger::removeAllCustomStatuses()
+{
+  QList<int> statusList = FStatusItems.keys();
+  foreach (int statusId, statusList)
+    if (statusId > MAX_STANDART_STATUS_ID)
+      removeStatusItem(statusId);
+}
+
 void StatusChanger::onPresenceAdded(IPresence *APresence)
 {
-  FPresences.append(APresence);
-  addStreamMenu(APresence);
-  if (FAccountManager)
-    FAccounts.insert(APresence,FAccountManager->accountByStream(APresence->xmppStream()->jid()));
+  if (FStreamMenu.count() == 1)
+    FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(true);
+
+  createStreamMenu(APresence);
+  FStreamStatus.insert(APresence,STATUS_OFFLINE);
+
+  if (FStreamMenu.count() == 1)
+    FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
+
+  IAccount *account = FAccountManager->accountByStream(APresence->streamJid());
+  if (account && account->value(AVN_IS_MAIN_STATUS, true).toBool())
+    FStreamMainStatus += APresence;
+  
+  updateStreamMenu(APresence);
+  updateMainMenu();
 }
 
 void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
-                                   const QString &, qint8 , const Jid &AJid)
+                                   const QString &AText, qint8 APriority, const Jid &AJid)
 {
-  if (AJid.isValid())
-    return;
-
-  removeWaitOnline(APresence);
-  if (AShow != FBaseShow)
+  if (!AJid.isValid() && FStreamStatus.contains(APresence))
   {
-    if (AShow == IPresence::Offline || AShow == IPresence::Error)
+    if (AShow == IPresence::Error)
     {
-      IPresence::Show baseShow = AShow;
-      QList<IPresence *>::const_iterator i = FPresences.constBegin();
-      while (baseShow != FBaseShow && i != FPresences.constEnd())
-      {
-        if ((*i)->show() == FBaseShow)
-          baseShow = FBaseShow;
-        else if (baseShow == AShow && (*i)->show() != IPresence::Offline && (*i)->show() != IPresence::Error)
-          baseShow = (*i)->show();
-        i++;
-      }
-      setBaseShow(baseShow);
+      autoReconnect(APresence);
+      setStreamStatusId(APresence, STATUS_ERROR);
+      updateStreamMenu(APresence);
+      updateMainMenu();
     }
-    else
-      setBaseShow(AShow);
+    else if (FSettingStatusToPresence != APresence)
+    {
+      setStreamStatusId(APresence, createTempStatus(APresence,AShow,AText,APriority));
+      updateStreamMenu(APresence);
+      updateMainMenu();
+    }
+    if (FStreamWaitStatus.contains(APresence))
+    {
+      FStreamWaitStatus.remove(APresence);
+      removeConnectingLabel(APresence);
+    }
   }
-  updateMenu(APresence);
-  updateAccount(APresence);
-  autoReconnect(APresence);
 }
 
 void StatusChanger::onPresenceRemoved(IPresence *APresence)
 {
-  removeWaitOnline(APresence);
+  IAccount *account = FAccountManager->accountByStream(APresence->streamJid());
+  if (account)
+  {
+    bool isMainStatus = FStreamMainStatus.contains(APresence);
+    account->setValue(AVN_IS_MAIN_STATUS,isMainStatus);
+    if (!isMainStatus && account->autoConnect() && FStreamLastStatus.contains(APresence->streamJid()))  
+      account->setValue(AVN_LAST_ONLINE_STATUS,FStreamLastStatus.take(APresence->streamJid()));
+    else
+      account->delValue(AVN_LAST_ONLINE_STATUS);
+  }
+
   removeStreamMenu(APresence);
-  FPresences.removeAt(FPresences.indexOf(APresence));
-  FAccounts.remove(APresence);
-  FWaitReconnect.remove(APresence);
+
+  if (FStreamMenu.count() == 1)
+    FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
+  
+  updateMainMenu();
 }
 
 void StatusChanger::onRosterOpened(IRoster *ARoster)
 {
   IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
-  if (FWaitOnline.contains(presence))
-  {
-    PresenceItem item = FWaitOnline.value(presence);
-    presence->setPresence(item.show,item.status,item.priority,Jid());
-    removeWaitOnline(presence);
-  }
+  if (FStreamWaitStatus.contains(presence))
+    setStatus(FStreamWaitStatus.value(presence),presence->streamJid());
 }
 
 void StatusChanger::onRosterClosed(IRoster *ARoster)
 {
   IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
-  removeWaitOnline(presence);
-}
-
-void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
-{
-  if (AIndex->data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
-  {
-    QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
-    Menu *menu = streamMenu(streamJid);
-    if (menu)
-    {
-      Action *action = new Action(AMenu);
-      action->setMenu(menu);
-      action->setIcon(menu->icon());
-      action->setText(tr("Status"));
-      AMenu->addAction(action,STATUSMENU_ACTION_GROUP_MAIN);
-    }
-  }
-}
-
-void StatusChanger::onReconnectTimer()
-{
-  QHash<IPresence *,QPair<QDateTime,PresenceItem> >::iterator it = FWaitReconnect.begin();
-  while (it != FWaitReconnect.end())
-  {
-    if (it.value().first <= QDateTime::currentDateTime()) 
-    {
-      IPresence *presence = it.key();
-      PresenceItem item = it.value().second;
-      it = FWaitReconnect.erase(it);
-      
-      IAccount *account = FAccounts.value(presence);
-      if (account)
-        if (presence->show() == IPresence::Error && account->autoReconnect())
-          setPresence(item.show,item.status,item.priority,presence->streamJid());
-    }
-    else
-      it++;
-  }
+  if (FStreamWaitStatus.contains(presence))
+    setStatus(FStreamWaitStatus.value(presence),presence->streamJid());
 }
 
 void StatusChanger::onAccountShown(IAccount *AAccount)
@@ -614,12 +943,38 @@ void StatusChanger::onAccountShown(IAccount *AAccount)
   if (AAccount->autoConnect())
   {
     IPresence *presence = FPresencePlugin->getPresence(AAccount->streamJid());
-    if (presence && presence->show() == IPresence::Offline)
+    if (presence)
     {
-      IPresence::Show show = (IPresence::Show)AAccount->value("presence::last::show",IPresence::Online).toInt();
-      QString status = AAccount->value("presence::last::status",getStatusText(IPresence::Online)).toString();
-      int priority = AAccount->value("presence::last::priority",getStatusPriority(IPresence::Online)).toInt();
-      setPresence(show,status,priority,presence->xmppStream()->jid());
+      int statusId = FStreamMainStatus.contains(presence) ? MAIN_STATUS_ID : AAccount->value(AVN_LAST_ONLINE_STATUS, STATUS_ONLINE).toInt();
+      if (!FStatusItems.contains(statusId))
+        statusId = STATUS_ONLINE;
+      setStatus(statusId,presence->streamJid());
+    }
+  }
+}
+
+void StatusChanger::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
+{
+  QMultiHash<int,QVariant> data;
+  data.insert(Action::DR_StreamJid,ABefour.full());
+  QList<Action *> actionList = FMainMenu->findActions(data,true);
+  foreach (Action *action, actionList)
+    action->setData(Action::DR_StreamJid,AAfter.full());
+}
+
+void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+{
+  if (AIndex->data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
+  {
+    QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
+    Menu *menu = FStreamMenu.count() > 1 ? streamMenu(streamJid) : FMainMenu;
+    if (menu)
+    {
+      Action *action = new Action(AMenu);
+      action->setText(tr("Status"));
+      action->setMenu(menu);
+      action->setIcon(menu->menuAction()->icon());
+      AMenu->addAction(action,AG_STATUSCHANGER_ROSTER,true);
     }
   }
 }
@@ -630,15 +985,108 @@ void StatusChanger::onSkinChanged()
     FRostersView->updateIndexLabel(FConnectingLabel,FRosterIconset.iconByName("connecting"));
 }
 
-void StatusChanger::onStreamJidChanged(const Jid &/*ABefour*/, const Jid &AAfter)
+void StatusChanger::onSettingsOpened()
 {
-  IPresence *presence = FPresencePlugin->getPresence(AAfter);
-  Menu *menu = streamMenu(AAfter);
-  if (menu && FPresences.contains(presence))
+  removeAllCustomStatuses();
+
+  QList<QString> nsList = FSettings->values(SVN_STATUS_CODE).keys();
+  foreach (QString ns, nsList)
   {
-    menu->clear();
-    createStatusActions(presence);
+    int statusId = FSettings->valueNS(SVN_STATUS_CODE,ns).toInt();
+    QString statusName = FSettings->valueNS(SVN_STATUS_NAME,ns).toString();
+    if (statusId > MAX_STANDART_STATUS_ID)
+    {
+      if (statusByName(statusName) == NULL_STATUS_ID)
+      {
+        StatusItem *status = new StatusItem;
+        status->code = statusId;
+        status->name = statusName;
+        status->show = (IPresence::Show)FSettings->valueNS(SVN_STATUS_SHOW,ns).toInt();
+        status->text = FSettings->valueNS(SVN_STATUS_TEXT,ns).toString();
+        status->priority = FSettings->valueNS(SVN_STATUS_PRIORITY,ns).toInt();
+        status->iconsetFile = FSettings->valueNS(SVN_STATUS_ICONSET,ns).toString();
+        status->iconName = FSettings->valueNS(SVN_STATUS_ICON_NAME,ns).toString();
+        FStatusItems.insert(status->code,status);
+        createStatusActions(status->code);
+      }
+    }
+    else if (statusId > NULL_STATUS_ID)
+    {
+      StatusItem *status = FStatusItems.value(statusId);
+      if (status)
+      {
+        status->text = FSettings->valueNS(SVN_STATUS_TEXT,ns,status->text).toString();
+        status->priority = FSettings->valueNS(SVN_STATUS_PRIORITY,ns,status->priority).toInt();
+        updateStatusActions(statusId);
+      }
+    }
   }
+
+  int mainStatusId = FSettings->value(SVN_MAIN_STATUS_ID,STATUS_OFFLINE).toInt();
+  setMainStatusId(mainStatusId);
+}
+
+void StatusChanger::onSettingsClosed()
+{
+  if (!FEditStatusDialog.isNull())
+    FEditStatusDialog->reject();
+
+  QList<QString> nsList = FSettings->values(SVN_STATUS_CODE).keys();
+  foreach (QString ns, nsList)
+    FSettings->delValueNS(SVN_STATUS,ns);
+
+  foreach (StatusItem *status, FStatusItems)
+    if (status->code > MAX_STANDART_STATUS_ID)
+    {
+      FSettings->setValueNS(SVN_STATUS_CODE,status->name,status->code);
+      FSettings->setValueNS(SVN_STATUS_NAME,status->name,status->name);
+      FSettings->setValueNS(SVN_STATUS_SHOW,status->name,status->show);
+      FSettings->setValueNS(SVN_STATUS_TEXT,status->name,status->text);
+      FSettings->setValueNS(SVN_STATUS_PRIORITY,status->name,status->priority);
+      FSettings->setValueNS(SVN_STATUS_ICONSET,status->name,status->iconsetFile);
+      FSettings->setValueNS(SVN_STATUS_ICON_NAME,status->name,status->iconName);
+    }
+    else if (status->code > NULL_STATUS_ID)
+    {
+      FSettings->setValueNS(SVN_STATUS_CODE,status->name,status->code);
+      FSettings->setValueNS(SVN_STATUS_TEXT,status->name,status->text);
+      FSettings->setValueNS(SVN_STATUS_PRIORITY,status->name,status->priority);
+    }
+
+  FSettings->setValue(SVN_MAIN_STATUS_ID,FStatusItems.value(MAIN_STATUS_ID)->code);
+  setMainStatusId(STATUS_OFFLINE);
+
+  removeAllCustomStatuses();
+}
+
+void StatusChanger::onReconnectTimer()
+{
+  QHash<IPresence *,QPair<QDateTime,int> >::iterator it = FStreamWaitReconnect.begin();
+  while (it != FStreamWaitReconnect.end())
+  {
+    if (it.value().first <= QDateTime::currentDateTime()) 
+    {
+      if (it.key()->show() == IPresence::Error)
+      {
+        int statusId = FStatusItems.contains(it.value().second) ? it.value().second : STATUS_ONLINE;
+        setStatus(statusId,it.key()->streamJid());
+      }
+      it = FStreamWaitReconnect.erase(it);
+    }
+    else
+      it++;
+  }
+}
+
+void StatusChanger::onEditStatusAction(bool)
+{
+  if (FEditStatusDialog.isNull())
+  {
+    FEditStatusDialog = new EditStatusDialog(this);
+    FEditStatusDialog->show();
+  }
+  else
+    FEditStatusDialog->show();
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

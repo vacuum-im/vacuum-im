@@ -1,3 +1,7 @@
-HEADERS = statuschanger.h
+FORMS = editstatusdialog.ui
 
-SOURCES = statuschanger.cpp
+HEADERS = statuschanger.h \
+          editstatusdialog.h
+
+SOURCES = statuschanger.cpp \
+          editstatusdialog.cpp
