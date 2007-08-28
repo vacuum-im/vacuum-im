@@ -435,7 +435,7 @@ bool RostersView::viewportEvent(QEvent *AEvent)
 
         if (toolTipsMap.isEmpty())
         {
-          toolTipsMap.insert(ROSTERSVIEW_TOOLTIPORDER,index->data(Qt::ToolTipRole).toString());
+          toolTipsMap.insert(TTO_ROSTERSVIEW,index->data(Qt::ToolTipRole).toString());
           emit toolTips(index,toolTipsMap);
         }
 

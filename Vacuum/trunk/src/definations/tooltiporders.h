@@ -1,6 +1,6 @@
 #ifndef TOOLTIPORDERS_H
 #define TOOLTIPORDERS_H
 
-#define ROSTERSVIEW_TOOLTIPORDER 0
+#define TTO_ROSTERSVIEW                           0
 
 #endif
