@@ -40,13 +40,13 @@ void Account::setValue(const QString &AName, const QVariant &AValue)
 
 void Account::delValue(const QString &AName)
 {
-  FSettings->delValueNS(QString("account[]:%1").arg(AName),FId);
+  FSettings->deleteValueNS(QString("account[]:%1").arg(AName),FId);
   emit changed(AName,QVariant());
 }
 
 void Account::clear()
 {
-  FSettings->delNS(FId);
+  FSettings->deleteNS(FId);
 }
 
 const QString &Account::accountId() const

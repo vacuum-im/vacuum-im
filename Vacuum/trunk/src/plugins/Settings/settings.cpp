@@ -3,18 +3,13 @@
 #include <QStringList>
 #include <QRect>
 #include <QPoint>
-#include <QTimer>
 
-Settings::Settings(const QUuid &AUuid, ISettingsPlugin *ASettingsPlugin, QObject *parent)
-	: QObject(parent)
+Settings::Settings(const QUuid &APluginId, ISettingsPlugin *ASettingsPlugin)
+	: QObject(ASettingsPlugin->instance())
 {
-  FUuid = AUuid;
-  FSettingsOpened = false;
+  FPluginId = APluginId;
   FSettingsPlugin = ASettingsPlugin;
-  connect(FSettingsPlugin->instance(),SIGNAL(profileOpened(const QString &)),SLOT(onProfileOpened(const QString &)));
-  connect(FSettingsPlugin->instance(),SIGNAL(profileClosed(const QString &)),SLOT(onProfileClosed(const QString &)));
-  if (FSettingsPlugin->isProfileOpened())
-    QTimer::singleShot(0,this,SLOT(onProfileOpened()));
+  updatePluginNode();
 }
 
 Settings::~Settings()
@@ -38,12 +33,19 @@ QString Settings::decript(const QByteArray &AValue, const QByteArray &AKey) cons
   return QString::fromUtf8(plain);
 }
 
+bool Settings::isValueNSExists(const QString &AName, const QString &ANameNS) const
+{
+  return !getElement(AName, ANameNS, false).isNull();
+}
+
+bool Settings::isValueExists(const QString &AName) const
+{
+  return !getElement(AName, "", false).isNull();
+}
+
 QVariant Settings::valueNS(const QString &AName, const QString &ANameNS, 
                            const QVariant &ADefault) const
 {
-  if (!FSettingsOpened || AName.isEmpty())
-    return ADefault;
-
   QDomElement elem = getElement(AName,ANameNS,false);
   if (!elem.isNull() && elem.hasAttribute("value"))
   {
@@ -64,7 +66,7 @@ QHash<QString,QVariant> Settings::values(const QString &AName) const
 {
   QHash<QString,QVariant> result;
 
-  if (AName.isEmpty())
+  if (!isSettingsOpened() || AName.isEmpty())
     return result;
 
   QStringList path = AName.split(':',QString::SkipEmptyParts);
@@ -84,7 +86,7 @@ QHash<QString,QVariant> Settings::values(const QString &AName) const
   }
   
   i = 0;
-  QDomElement constElem = FSettings;
+  QDomElement constElem = FPluginNode;
   while (!constElem.isNull() && i<constPath.count())
   {
     if (constPath[i].endsWith("[]"))
@@ -114,14 +116,13 @@ QHash<QString,QVariant> Settings::values(const QString &AName) const
 ISettings &Settings::setValueNS(const QString &AName, const QString &ANameNS,
                                         const QVariant &AValue)
 {
-  if (!FSettingsOpened)
-    return *this;
- 
   QDomElement elem = getElement(AName,ANameNS,true);
-  elem.setAttribute("value",variantToString(AValue));  
-  if (!AValue.canConvert(QVariant::String))
-    elem.setAttribute("type",QString::number(AValue.type()));
-
+  if (!elem.isNull())
+  {
+    elem.setAttribute("value",variantToString(AValue));  
+    if (!AValue.canConvert(QVariant::String))
+      elem.setAttribute("type",QString::number(AValue.type()));
+  }
   return *this;
 }
 
@@ -130,39 +131,40 @@ ISettings &Settings::setValue(const QString &AName, const QVariant &AValue)
   return setValueNS(AName,"",AValue);
 }
 
-ISettings &Settings::delValueNS(const QString &AName, const QString &ANameNS)
+ISettings &Settings::deleteValueNS(const QString &AName, const QString &ANameNS)
 {
-  if (!FSettingsOpened)
-    return *this;
-
   QDomElement elem = getElement(AName,ANameNS,false);  
   if (!elem.isNull())
     elem.parentNode().removeChild(elem);
-
   return *this;
 }
 
-ISettings &Settings::delValue(const QString &AName)
+ISettings &Settings::deleteValue(const QString &AName)
 {
-  return delValueNS(AName,"");
+  return deleteValueNS(AName,"");
 }
 
-ISettings &Settings::delNS(const QString &ANameNS)
+ISettings &Settings::deleteNS(const QString &ANameNS)
 {
-  if (!ANameNS.isEmpty())
-    delNSRecurse(ANameNS,FSettings); 
+  if (isSettingsOpened() && !ANameNS.isEmpty())
+    delNSRecurse(ANameNS,FPluginNode); 
   return *this;
+}
+
+void Settings::updatePluginNode()
+{
+  FPluginNode = FSettingsPlugin->pluginNode(FPluginId);
 }
 
 QDomElement Settings::getElement(const QString &AName, const QString &ANameNS, 
                                  bool ACreate) const
 {
-  if (!FSettingsOpened)
+  if (!isSettingsOpened() || AName.isEmpty())
     return QDomElement();
 
   int i =0;
   bool usedNS = false;
-  QDomElement elem = FSettings;
+  QDomElement elem = FPluginNode;
   QStringList path = AName.split(':',QString::SkipEmptyParts);
   while (i<path.count())
   {
@@ -189,25 +191,6 @@ QDomElement Settings::getElement(const QString &AName, const QString &ANameNS,
     i++;
   }
   return elem;
-}
-
-void Settings::delNSRecurse(const QString &ANameNS, QDomElement elem)
-{
-  while (!elem.isNull())
-  {
-    if (elem.attribute("ns") == ANameNS)
-    {
-      QDomElement oldElem = elem;
-      elem = elem.nextSiblingElement();
-      oldElem.parentNode().removeChild(oldElem); 
-    } 
-    else 
-    { 
-      if (elem.hasChildNodes())
-        delNSRecurse(ANameNS,elem.firstChildElement()); 
-      elem = elem.nextSiblingElement(); 
-    }
-  }
 }
 
 QString Settings::variantToString(const QVariant &AVariant )
@@ -248,22 +231,22 @@ QVariant Settings::stringToVariant(const QString &AString, QVariant::Type AType,
     return QVariant(AString);
 }
 
-void Settings::onProfileOpened(const QString &)
+void Settings::delNSRecurse(const QString &ANameNS, QDomElement elem)
 {
-  FSettings = FSettingsPlugin->pluginNode(FUuid); 
-  if (!FSettingsOpened && !FSettings.isNull())
+  while (!elem.isNull())
   {
-    FSettingsOpened = true;
-    emit opened();
-  }
-}
-
-void Settings::onProfileClosed(const QString &)
-{
-  if (FSettingsOpened)
-  {
-    emit closed();
-    FSettingsOpened = false;
+    if (elem.attribute("ns") == ANameNS)
+    {
+      QDomElement oldElem = elem;
+      elem = elem.nextSiblingElement();
+      oldElem.parentNode().removeChild(oldElem); 
+    } 
+    else 
+    { 
+      if (elem.hasChildNodes())
+        delNSRecurse(ANameNS,elem.firstChildElement()); 
+      elem = elem.nextSiblingElement(); 
+    }
   }
 }
 

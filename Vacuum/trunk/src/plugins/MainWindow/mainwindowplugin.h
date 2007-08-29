@@ -46,7 +46,6 @@ protected slots:
 private:
   IPluginManager *FPluginManager;
   ISettingsPlugin *FSettingsPlugin;
-  ISettings *FSettings;
   ITrayManager *FTrayManager;
 private:
   Action *actQuit;

@@ -57,7 +57,14 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
+  {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    if (FSettingsPlugin)
+    {
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+    }
+  }
 
   return FRostersModelPlugin!=NULL && FMainWindowPlugin!=NULL;
 }
@@ -65,11 +72,7 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 bool RostersViewPlugin::initObjects()
 {
   if (FSettingsPlugin)
-  {
-    FSettings = FSettingsPlugin->openSettings(pluginUuid(),this);
-    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
-    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
-  }
+    FSettings = FSettingsPlugin->settingsForPlugin(ROSTERSVIEW_UUID);
 
   FRostersView = new RostersView;
   connect(FRostersView,SIGNAL(destroyed(QObject *)),SLOT(onRostersViewDestroyed(QObject *)));
@@ -198,7 +201,7 @@ void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
   {
     Jid streamJid(AIndex.data(IRosterIndex::DR_StreamJid).toString());
     if (FRostersView->isExpanded(AIndex))
-      FSettings->delValueNS(settingsName,streamJid.pFull());
+      FSettings->deleteValueNS(settingsName,streamJid.pFull());
     else
       FSettings->setValueNS(settingsName,streamJid.pFull(),true);
   }

@@ -3,7 +3,6 @@
 
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/isettings.h"
 
 class XmppStreams :
   public QObject,

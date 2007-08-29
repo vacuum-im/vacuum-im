@@ -28,7 +28,6 @@ StatusChanger::StatusChanger()
   FRostersModel = NULL;
   FRostersModelPlugin = NULL;
   FTrayManager = NULL;
-  FSettings = NULL;
   FSettingsPlugin = NULL;
   FEditStatusAction = NULL;
   FMainMenuToolButton = NULL;
@@ -117,7 +116,14 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
   
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
+  {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    if (FSettingsPlugin)
+    {
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+    }
+  }
 
   return FPresencePlugin!=NULL;
 }
@@ -144,13 +150,6 @@ bool StatusChanger::initObjects()
   
   createDefaultStatus();
   setMainStatusId(STATUS_OFFLINE);
-
-  if (FSettingsPlugin)
-  {
-    FSettings = FSettingsPlugin->openSettings(STATUSCHANGER_UUID,this);
-    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
-    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
-  }
 
   if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
   {
@@ -989,11 +988,12 @@ void StatusChanger::onSettingsOpened()
 {
   removeAllCustomStatuses();
 
-  QList<QString> nsList = FSettings->values(SVN_STATUS_CODE).keys();
+  ISettings *settings = FSettingsPlugin->settingsForPlugin(STATUSCHANGER_UUID);
+  QList<QString> nsList = settings->values(SVN_STATUS_CODE).keys();
   foreach (QString ns, nsList)
   {
-    int statusId = FSettings->valueNS(SVN_STATUS_CODE,ns).toInt();
-    QString statusName = FSettings->valueNS(SVN_STATUS_NAME,ns).toString();
+    int statusId = settings->valueNS(SVN_STATUS_CODE,ns).toInt();
+    QString statusName = settings->valueNS(SVN_STATUS_NAME,ns).toString();
     if (statusId > MAX_STANDART_STATUS_ID)
     {
       if (statusByName(statusName) == NULL_STATUS_ID)
@@ -1001,11 +1001,11 @@ void StatusChanger::onSettingsOpened()
         StatusItem *status = new StatusItem;
         status->code = statusId;
         status->name = statusName;
-        status->show = (IPresence::Show)FSettings->valueNS(SVN_STATUS_SHOW,ns).toInt();
-        status->text = FSettings->valueNS(SVN_STATUS_TEXT,ns).toString();
-        status->priority = FSettings->valueNS(SVN_STATUS_PRIORITY,ns).toInt();
-        status->iconsetFile = FSettings->valueNS(SVN_STATUS_ICONSET,ns).toString();
-        status->iconName = FSettings->valueNS(SVN_STATUS_ICON_NAME,ns).toString();
+        status->show = (IPresence::Show)settings->valueNS(SVN_STATUS_SHOW,ns).toInt();
+        status->text = settings->valueNS(SVN_STATUS_TEXT,ns).toString();
+        status->priority = settings->valueNS(SVN_STATUS_PRIORITY,ns).toInt();
+        status->iconsetFile = settings->valueNS(SVN_STATUS_ICONSET,ns).toString();
+        status->iconName = settings->valueNS(SVN_STATUS_ICON_NAME,ns).toString();
         FStatusItems.insert(status->code,status);
         createStatusActions(status->code);
       }
@@ -1015,14 +1015,14 @@ void StatusChanger::onSettingsOpened()
       StatusItem *status = FStatusItems.value(statusId);
       if (status)
       {
-        status->text = FSettings->valueNS(SVN_STATUS_TEXT,ns,status->text).toString();
-        status->priority = FSettings->valueNS(SVN_STATUS_PRIORITY,ns,status->priority).toInt();
+        status->text = settings->valueNS(SVN_STATUS_TEXT,ns,status->text).toString();
+        status->priority = settings->valueNS(SVN_STATUS_PRIORITY,ns,status->priority).toInt();
         updateStatusActions(statusId);
       }
     }
   }
 
-  int mainStatusId = FSettings->value(SVN_MAIN_STATUS_ID,STATUS_OFFLINE).toInt();
+  int mainStatusId = settings->value(SVN_MAIN_STATUS_ID,STATUS_OFFLINE).toInt();
   setMainStatusId(mainStatusId);
 }
 
@@ -1031,29 +1031,30 @@ void StatusChanger::onSettingsClosed()
   if (!FEditStatusDialog.isNull())
     FEditStatusDialog->reject();
 
-  QList<QString> nsList = FSettings->values(SVN_STATUS_CODE).keys();
+  ISettings *settings = FSettingsPlugin->settingsForPlugin(STATUSCHANGER_UUID);
+  QList<QString> nsList = settings->values(SVN_STATUS_CODE).keys();
   foreach (QString ns, nsList)
-    FSettings->delValueNS(SVN_STATUS,ns);
+    settings->deleteValueNS(SVN_STATUS,ns);
 
   foreach (StatusItem *status, FStatusItems)
     if (status->code > MAX_STANDART_STATUS_ID)
     {
-      FSettings->setValueNS(SVN_STATUS_CODE,status->name,status->code);
-      FSettings->setValueNS(SVN_STATUS_NAME,status->name,status->name);
-      FSettings->setValueNS(SVN_STATUS_SHOW,status->name,status->show);
-      FSettings->setValueNS(SVN_STATUS_TEXT,status->name,status->text);
-      FSettings->setValueNS(SVN_STATUS_PRIORITY,status->name,status->priority);
-      FSettings->setValueNS(SVN_STATUS_ICONSET,status->name,status->iconsetFile);
-      FSettings->setValueNS(SVN_STATUS_ICON_NAME,status->name,status->iconName);
+      settings->setValueNS(SVN_STATUS_CODE,status->name,status->code);
+      settings->setValueNS(SVN_STATUS_NAME,status->name,status->name);
+      settings->setValueNS(SVN_STATUS_SHOW,status->name,status->show);
+      settings->setValueNS(SVN_STATUS_TEXT,status->name,status->text);
+      settings->setValueNS(SVN_STATUS_PRIORITY,status->name,status->priority);
+      settings->setValueNS(SVN_STATUS_ICONSET,status->name,status->iconsetFile);
+      settings->setValueNS(SVN_STATUS_ICON_NAME,status->name,status->iconName);
     }
     else if (status->code > NULL_STATUS_ID)
     {
-      FSettings->setValueNS(SVN_STATUS_CODE,status->name,status->code);
-      FSettings->setValueNS(SVN_STATUS_TEXT,status->name,status->text);
-      FSettings->setValueNS(SVN_STATUS_PRIORITY,status->name,status->priority);
+      settings->setValueNS(SVN_STATUS_CODE,status->name,status->code);
+      settings->setValueNS(SVN_STATUS_TEXT,status->name,status->text);
+      settings->setValueNS(SVN_STATUS_PRIORITY,status->name,status->priority);
     }
 
-  FSettings->setValue(SVN_MAIN_STATUS_ID,FStatusItems.value(MAIN_STATUS_ID)->code);
+  settings->setValue(SVN_MAIN_STATUS_ID,FStatusItems.value(MAIN_STATUS_ID)->code);
   setMainStatusId(STATUS_OFFLINE);
 
   removeAllCustomStatuses();

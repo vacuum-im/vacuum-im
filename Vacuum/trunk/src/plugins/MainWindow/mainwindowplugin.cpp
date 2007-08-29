@@ -5,7 +5,6 @@ MainWindowPlugin::MainWindowPlugin()
 {
   FPluginManager = NULL;
   FSettingsPlugin = NULL;
-  FSettings = NULL;
   FTrayManager = NULL;
   FMainWindow = NULL;
 }
@@ -35,7 +34,16 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
 
   IPlugin *plugin = FPluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
+  {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    if (FSettingsPlugin)
+    {
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+      connect(FSettingsPlugin->instance(), SIGNAL(profileRenamed(const QString &, const QString &)),
+        SLOT(onProfileRenamed(const QString &, const QString &)));
+    }
+  }
 
   plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
   if (plugin)
@@ -51,15 +59,6 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
 
 bool MainWindowPlugin::initObjects()
 {
-  if (FSettingsPlugin)
-  {
-    FSettings = FSettingsPlugin->openSettings(MAINWINDOW_UUID,this);
-    connect(FSettings->instance(),SIGNAL(opened()),SLOT(onSettingsOpened()));
-    connect(FSettings->instance(),SIGNAL(closed()),SLOT(onSettingsClosed()));
-    connect(FSettingsPlugin->instance(), SIGNAL(profileRenamed(const QString &, const QString &)),
-      SLOT(onProfileRenamed(const QString &, const QString &)));
-  }
-
   FMainWindow = new MainWindow(Qt::Tool);
   emit mainWindowCreated(FMainWindow);
   updateTitle();
@@ -108,12 +107,14 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId)
 
 void MainWindowPlugin::onSettingsOpened()
 {
+  ISettings *FSettings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
   FMainWindow->setGeometry(FSettings->value("window:geometry",FMainWindow->geometry()).toRect());
   updateTitle();
 }
 
 void MainWindowPlugin::onSettingsClosed()
 {
+  ISettings *FSettings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
   FSettings->setValue("window:geometry",FMainWindow->geometry());
   updateTitle();
 }

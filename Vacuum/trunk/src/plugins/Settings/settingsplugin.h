@@ -2,9 +2,9 @@
 #define SETTINGSPLUGIN_H
 
 #include <QMap>
+#include <QHash>
 #include <QFile>
 #include <QPointer>
-#include <QObjectCleanupHandler>
 #include <QWidget>
 #include "../../definations/actiongroups.h"
 #include "../../interfaces/ipluginmanager.h"
@@ -43,7 +43,7 @@ public:
   virtual bool isProfileOpened() const { return FProfileOpened; }
   virtual const QDir &homeDir() const { return FHomeDir; }
   virtual const QDir &profileDir() const { return FProfileDir; }
-  virtual ISettings *openSettings(const QUuid &APluginId, QObject *AParent);
+  virtual ISettings *settingsForPlugin(const QUuid &APluginId);
   virtual bool saveSettings();
   virtual bool addProfile(const QString &AProfile);
   virtual QString profile() const { return FProfile.attribute("name"); }
@@ -60,14 +60,16 @@ public:
   virtual void appendOptionsHolder(IOptionsHolder *AOptionsHolder);
   virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder);
 public slots:
-  virtual void openOptionsDialogAction(bool);
-  virtual void openProfileDialogAction(bool);
+  virtual void openOptionsDialogByAction(bool);
+  virtual void openProfileDialogByAction(bool);
 signals:
   virtual void profileAdded(const QString &AProfile);
   virtual void profileOpened(const QString &AProfile);
   virtual void profileClosed(const QString &AProfile);
   virtual void profileRenamed(const QString &AProfileFrom, const QString &AProfileTo);
   virtual void profileRemoved(const QString &AProfile);
+  virtual void settingsOpened();
+  virtual void settingsClosed();
   virtual void optionsNodeOpened(const QString &ANode);
   virtual void optionsNodeClosed(const QString &ANode);
   virtual void optionsHolderAdded(IOptionsHolder *);
@@ -80,6 +82,7 @@ protected:
   QWidget *createNodeWidget(const QString &ANode);
   void setProfileOpened();
   void setProfileClosed();
+  void updateSettings();
 protected slots:
   void onMainWindowCreated(IMainWindow *AMainWindow);
   void onOptionsDialogAccepted();
@@ -100,8 +103,8 @@ private:
   QDomElement FProfile;
   QDomDocument FProfiles;
   QDomDocument FSettings;
-  QObjectCleanupHandler FCleanupHandler;
 private:
+  QHash<QUuid,Settings *> FPluginSettings;
   struct OptionsNode  
   {
     QString name;

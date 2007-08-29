@@ -20,6 +20,7 @@ SettingsPlugin::~SettingsPlugin()
 {
   onPluginManagerQuit();
   qDeleteAll(FNodes);
+  qDeleteAll(FPluginSettings);
 }
 
 void SettingsPlugin::pluginInfo(PluginInfo *APluginInfo)
@@ -63,12 +64,12 @@ bool SettingsPlugin::initObjects()
   FOpenOptionsDialogAction->setEnabled(false);
   FOpenOptionsDialogAction->setIcon(SYSTEM_ICONSETFILE,"psi/options");
   FOpenOptionsDialogAction->setText(tr("Options..."));
-  connect(FOpenOptionsDialogAction,SIGNAL(triggered(bool)),SLOT(openOptionsDialogAction(bool)));
+  connect(FOpenOptionsDialogAction,SIGNAL(triggered(bool)),SLOT(openOptionsDialogByAction(bool)));
 
   FOpenProfileDialogAction = new Action(this);
   FOpenProfileDialogAction->setIcon(SYSTEM_ICONSETFILE,"psi/profile");
   FOpenProfileDialogAction->setText(tr("Change profile..."));
-  connect(FOpenProfileDialogAction,SIGNAL(triggered(bool)),SLOT(openProfileDialogAction(bool)));
+  connect(FOpenProfileDialogAction,SIGNAL(triggered(bool)),SLOT(openProfileDialogByAction(bool)));
 
   if (FTrayManager)
   {
@@ -125,10 +126,17 @@ bool SettingsPlugin::initSettings()
 }
 
 //ISettingsPlugin
-ISettings *SettingsPlugin::openSettings(const QUuid &APluginId, QObject *AParent)
+ISettings *SettingsPlugin::settingsForPlugin(const QUuid &APluginId)
 {
-  Settings *settings = new Settings(APluginId,this,AParent);
-  FCleanupHandler.add(settings); 
+  Settings *settings;
+  if (!FPluginSettings.contains(APluginId))
+  {
+    settings = new Settings(APluginId,this);
+    FPluginSettings.insert(APluginId,settings);
+  }
+  else
+    settings = FPluginSettings.value(APluginId);
+
   return settings;
 }
 
@@ -410,7 +418,7 @@ void SettingsPlugin::openOptionsDialog(const QString &ANode)
   FOptionsDialog->show();
 }
 
-void SettingsPlugin::openOptionsDialogAction(bool)
+void SettingsPlugin::openOptionsDialogByAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)
@@ -420,7 +428,7 @@ void SettingsPlugin::openOptionsDialogAction(bool)
   }
 }
 
-void SettingsPlugin::openProfileDialogAction(bool)
+void SettingsPlugin::openProfileDialogByAction(bool)
 {
   if (FProfileDialog.isNull())
     FProfileDialog = new ProfileDialog(this);
@@ -459,6 +467,8 @@ void SettingsPlugin::setProfileOpened()
   {
     FOpenOptionsDialogAction->setEnabled(true);
     FProfileOpened = true;
+    updateSettings();
+    emit settingsOpened();
     emit profileOpened(profile());
   }
 }
@@ -468,11 +478,19 @@ void SettingsPlugin::setProfileClosed()
   if (FProfileOpened)
   {
     emit profileClosed(profile());
+    emit settingsClosed();
     saveSettings();
     FProfileOpened = false;
     FSettings.clear();
+    updateSettings();
     FOpenOptionsDialogAction->setEnabled(false);
   }
+}
+
+void SettingsPlugin::updateSettings()
+{
+  foreach (Settings *settings, FPluginSettings)
+    settings->updatePluginNode();
 }
 
 void SettingsPlugin::onMainWindowCreated(IMainWindow *AMainWindow)

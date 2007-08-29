@@ -35,7 +35,7 @@ public:
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
-  virtual bool startPlugin();
+  virtual bool startPlugin() { return true; }
   
   //IAccountManager
   virtual IAccount *addAccount(const QString &AName, const Jid &AStreamJid);
@@ -71,6 +71,8 @@ protected slots:
   void onOptionsAccountRemoved(const QString &AAccountId);
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
+  void onProfileOpened(const QString &AProfile);
+  void onProfileClosed(const QString &AProfile);
   void onSettingsOpened();
   void onSettingsClosed();
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
@@ -88,7 +90,6 @@ private:
   mutable QHash<QString,QPointer<AccountOptions> > FAccountOptions;
 private:
   QList<Account *> FAccounts;
-  bool FStarted;
 };
 
 #endif // ACCOUNTMANAGER_H
