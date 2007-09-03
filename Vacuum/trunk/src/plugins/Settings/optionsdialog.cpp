@@ -50,6 +50,7 @@ OptionsDialog::OptionsDialog(QWidget *AParent)
   setLayout(vblMain);
   setWindowTitle(tr("Options"));
   resize(600,500);
+  emit opened();
 }
 
 OptionsDialog::~OptionsDialog()
@@ -171,11 +172,16 @@ void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
   switch(dbbButtons->buttonRole(AButton))
   {
   case QDialogButtonBox::AcceptRole:
-    accept(); break;
+    accept(); 
+    emit closed();
+    break;
   case QDialogButtonBox::RejectRole:
-    reject(); break;
+    reject(); 
+    emit closed();
+    break;
   case QDialogButtonBox::ApplyRole:
-    emit accepted(); break;
+    emit accepted(); 
+    break;
   }
 }
 

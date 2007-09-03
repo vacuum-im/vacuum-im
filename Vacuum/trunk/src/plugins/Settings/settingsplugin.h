@@ -85,8 +85,10 @@ protected:
   void updateSettings();
 protected slots:
   void onMainWindowCreated(IMainWindow *AMainWindow);
+  void onOptionsDialogOpened();
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
+  void onOptionsDialogClosed();
   void onPluginManagerQuit();
 private:
   IPluginManager *FPluginManager;

@@ -15,7 +15,7 @@
 class IOptionsHolder {
 public:
   virtual QObject *instance() =0;
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder) const =0;
+  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder) =0;
 signals:
   virtual void optionsAccepted() =0;
   virtual void optionsRejected() =0;

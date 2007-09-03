@@ -403,8 +403,10 @@ void SettingsPlugin::openOptionsDialog(const QString &ANode)
     FOptionsDialog = new OptionsDialog;
     FOptionsDialog->setAttribute(Qt::WA_DeleteOnClose,true);
     FOptionsDialog->setWindowIcon(FSystemIconset.iconByName("psi/options"));
+    connect(FOptionsDialog, SIGNAL(opened()),SLOT(onOptionsDialogOpened()));
     connect(FOptionsDialog, SIGNAL(accepted()),SLOT(onOptionsDialogAccepted()));
     connect(FOptionsDialog, SIGNAL(rejected()),SLOT(onOptionsDialogRejected()));
+    connect(FOptionsDialog, SIGNAL(closed()),SLOT(onOptionsDialogClosed()));
 
     QMap<QString, OptionsNode *>::const_iterator it = FNodes.constBegin();
     while (it != FNodes.constEnd())
@@ -443,18 +445,16 @@ QWidget *SettingsPlugin::createNodeWidget(const QString &ANode)
   nodeLayout->setSpacing(3);
   nodeWidget->setLayout(nodeLayout);
   
-  QMap<int, QWidget *> widgetsByOrder;
-  IOptionsHolder *optionsHolder;
-  foreach(optionsHolder,FOptionsHolders)
+  QMultiMap<int, QWidget *> widgetsByOrder;
+  foreach(IOptionsHolder *optionsHolder,FOptionsHolders)
   {
     int order = 500;
     QWidget *itemWidget = optionsHolder->optionsWidget(ANode,order);
     if (itemWidget)
-      widgetsByOrder.insert(order,itemWidget);
+      widgetsByOrder.insertMulti(order,itemWidget);
   }
   
-  QWidget *itemWidget;
-  foreach(itemWidget,widgetsByOrder)
+  foreach(QWidget *itemWidget,widgetsByOrder)
     nodeLayout->addWidget(itemWidget);
   nodeLayout->addStretch();
   
@@ -499,6 +499,11 @@ void SettingsPlugin::onMainWindowCreated(IMainWindow *AMainWindow)
   AMainWindow->mainMenu()->addAction(FOpenProfileDialogAction,AG_SETTINGS_MMENU,true);
 }
 
+void SettingsPlugin::onOptionsDialogOpened()
+{
+  emit optionsDialogOpened();
+}
+
 void SettingsPlugin::onOptionsDialogAccepted()
 {
   emit optionsDialogAccepted();
@@ -508,6 +513,11 @@ void SettingsPlugin::onOptionsDialogAccepted()
 void SettingsPlugin::onOptionsDialogRejected()
 {
   emit optionsDialogRejected();
+}
+
+void SettingsPlugin::onOptionsDialogClosed()
+{
+  emit optionsDialogClosed();
 }
 
 void SettingsPlugin::onPluginManagerQuit()
