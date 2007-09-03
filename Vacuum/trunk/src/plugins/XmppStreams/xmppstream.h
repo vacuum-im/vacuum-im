@@ -21,37 +21,34 @@ public:
   //IXmppStream
   virtual QObject *instance() { return this; }
   virtual bool isOpen() const { return FOpen; }
+  virtual void open();
+  virtual void close();
   virtual qint64 sendStanza(const Stanza &AStanza);
   virtual const QString &streamId() const { return FStreamId; }
   virtual const QString &lastError() const { return FLastError; };
   virtual void setJid(const Jid &AJid);
   virtual const Jid &jid() const { return FJid; }
-  virtual void setHost(const QString &AHost) { FHost = AHost; }
-  virtual const QString &host() const { return FHost; }
-  virtual void setPort(const qint16 APort) { FPort = APort; }
-  virtual qint16 port() const { return FPort; }
-  virtual void setPassword(const QString &APassword) { FPassword = APassword; }
   virtual const QString &password() const { return FPassword; }
-  virtual void setDefaultLang(const QString &ADefLang) { FDefLang = ADefLang; }
+  virtual void setPassword(const QString &APassword) { FPassword = APassword; }
   virtual const QString &defaultLang() const { return FDefLang; }
-  virtual void setXmppVersion(const QString &AXmppVersion) { FXmppVersion = AXmppVersion; }
+  virtual void setDefaultLang(const QString &ADefLang) { FDefLang = ADefLang; }
   virtual const QString &xmppVersion() const { return FXmppVersion; }
-  virtual IStreamConnection *connection();
-  virtual bool setConnection(IStreamConnection *AConnection);
+  virtual void setXmppVersion(const QString &AXmppVersion) { FXmppVersion = AXmppVersion; }
+  virtual IConnection *connection() const;
+  virtual void setConnection(IConnection *AConnection);
   virtual void addFeature(IStreamFeature *AStreamFeature);
   virtual void removeFeature(IStreamFeature *AStreamFeature);
-  virtual QList<IStreamFeature *> &features() { return FFeatures; }
-public slots:
-  virtual void open();
-  virtual void close();
+  virtual QList<IStreamFeature *> features() const { return FFeatures; }
 signals:
-  virtual void opened(IXmppStream *);
-  virtual void element(IXmppStream *, const QDomElement &elem);
-  virtual void aboutToClose(IXmppStream *);
-  virtual void closed(IXmppStream *);
-  virtual void error(IXmppStream *, const QString &errStr);
-  virtual void jidAboutToBeChanged(IXmppStream *, const Jid &AAfter);
-  virtual void jidChanged(IXmppStream *, const Jid &ABefour);
+  virtual void opened(IXmppStream *AXmppStream);
+  virtual void element(IXmppStream *AXmppStream, const QDomElement &elem);
+  virtual void aboutToClose(IXmppStream *AXmppStream);
+  virtual void closed(IXmppStream *AXmppStream);
+  virtual void error(IXmppStream *AXmppStream, const QString &errStr);
+  virtual void jidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
+  virtual void jidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+  virtual void connectionAdded(IXmppStream *AXmppStream, IConnection *AConnection);
+  virtual void connectionRemoved(IXmppStream *AXmppStream, IConnection *AConnection);
 protected:
   enum StreamState {
     SS_OFFLINE, 
@@ -83,15 +80,13 @@ protected slots:
   void onFeatureError(const QString &AErrStr);
   void onFeatureDestroyed(QObject *AFeature);
 private:
-  IStreamConnection *FConnection;
+  IConnection *FConnection;
   QList<IStreamFeature *>	FFeatures; 
 private:
   bool FOpen;
   Jid FJid;
   Jid FOfflineJid;
   QString FStreamId; 
-  QString FHost;
-  qint16 FPort;
   QString FPassword;
   QString FDefLang;
   QString FXmppVersion;

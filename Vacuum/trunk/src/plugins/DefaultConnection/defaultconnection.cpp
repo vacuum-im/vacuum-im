@@ -1,41 +1,50 @@
-#include <QtDebug>
-#include "streamconnection.h"
+#include "defaultconnection.h"
+
 #include <qendian.h>
 
-#define READ_TIMEOUT 15000
-#define KEEP_ALIVE_TIMEOUT 30000
+#define READ_TIMEOUT              15000
+#define KEEP_ALIVE_TIMEOUT        30000
 
-StreamConnection::StreamConnection(QObject *parent)
-  : QObject(parent), 
-    FSocket(this)
+DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent)
+  : QObject(AParent)
 {
-  FProxyType = 0;
-  FProxyPort = 0;
-  FBytesWriten = 0;
-  FBytesReaded = 0;
+  FPlugin = APlugin;
   FProxyState = ProxyUnconnected;
+
   connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
   connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
   connect(&FSocket, SIGNAL(error(QAbstractSocket::SocketError)),
     SLOT(onSocketError(QAbstractSocket::SocketError)));
   connect(&FSocket, SIGNAL(disconnected()), SLOT(onSocketDisconnected()));
+  
   connect(&ReadTimer,SIGNAL(timeout()),SLOT(onReadTimeout()));
   connect(&KeepAliveTimer,SIGNAL(timeout()),SLOT(onKeepAliveTimeout()));
 }
 
-StreamConnection::~StreamConnection()
+DefaultConnection::~DefaultConnection()
 {
-  close();
+  disconnect();
 }
 
-void StreamConnection::connectToHost(const QString &AHost, qint16 APort)
+bool DefaultConnection::isOpen() const
 {
-  FHost = AHost;
-  FPort = APort;
+  return FSocket.state() == QAbstractSocket::ConnectedState;
+}
+
+void DefaultConnection::connectToHost()
+{
+  FHost = option(IDefaultConnection::CO_Host).toString();
+  FPort = option(IDefaultConnection::CO_Port).toInt();
+  FProxyType = option(IDefaultConnection::CO_ProxyType).toInt();
+  FProxyHost = option(IDefaultConnection::CO_ProxyHost).toString();
+  FProxyPort = option(IDefaultConnection::CO_ProxyPort).toInt();
+  FProxyUser = option(IDefaultConnection::CO_ProxyUserName).toString();
+  FProxyPassword = option(IDefaultConnection::CO_ProxyPassword).toString();
+  
   if (FProxyType == 0)
   {
     FProxyState = ProxyReady;
-    FSocket.connectToHost(AHost, APort);
+    FSocket.connectToHost(FHost, FPort);
   }
   else 
   {
@@ -44,118 +53,55 @@ void StreamConnection::connectToHost(const QString &AHost, qint16 APort)
   }
 }
 
-qint64 StreamConnection::write(const QByteArray &AData) 
+void DefaultConnection::disconnect()
 {
-  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
-  qint64 bytes = FSocket.write(AData);
-  if (bytes > 0)
-    FBytesWriten += bytes;
-  return bytes;
-}
-
-QByteArray StreamConnection::read(qint64 ABytes) 
-{
-  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
-  QByteArray data(ABytes,' ');
-  qint64 readBytes = FSocket.read(data.data(),ABytes);
-  FBytesReaded += readBytes;
-  return data;
-}
-
-bool StreamConnection::isValid() const
-{
-  return FSocket.state() == QAbstractSocket::ConnectedState;
-}
-
-bool StreamConnection::isOpen() const
-{
-  return FSocket.isOpen();
-}
-
-void StreamConnection::close()
-{
-  if (isOpen())
+  if (FSocket.isOpen())
   {
-    FSocket.disconnectFromHost();
     FSocket.flush(); 
-  }
-}
-
-QStringList StreamConnection::proxyTypes() const
-{
-  return QStringList()	<< "Direct connection"     //0
-                        << "SOCKS4 Proxy"          //1
-                        << "SOCKS4A proxy"         //2
-                        << "SOCKS5 Proxy"          //3
-                        << "HTTPS Proxy";          //4
-}
-
-void StreamConnection::onSocketConnected()
-{
-  ReadTimer.start(READ_TIMEOUT); 
-  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
-  if (FProxyState != ProxyReady)
-    proxyConnection();
-  else
-    emit connected();
-}
-
-void StreamConnection::onSocketReadyRead()
-{
-  ReadTimer.stop();
-  if (FProxyState != ProxyReady)
-    proxyConnection();
-  else
-    emit readyRead(FSocket.bytesAvailable()); 
-}
-
-void StreamConnection::onSocketDisconnected()
-{
-  ReadTimer.stop(); 
-  KeepAliveTimer.stop(); 
-  emit disconnected();
-}
-
-void StreamConnection::onSocketError(QAbstractSocket::SocketError err)
-{
-  Q_UNUSED(err);
-  emit error(FSocket.errorString());
-}
-
-void StreamConnection::onReadTimeout()
-{
-  if (isOpen())
-  {
-    ReadTimer.stop(); 
-    emit error(tr("Socket timeout"));
     FSocket.disconnectFromHost();
   }
 }
 
-void StreamConnection::onKeepAliveTimeout()
+qint64 DefaultConnection::write( const QByteArray &AData )
 {
-  if (isValid())
-    FSocket.write(" "); 
+  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
+  return FSocket.write(AData);
 }
 
-void StreamConnection::proxyConnection()
+QByteArray DefaultConnection::read(qint64 ABytes)
+{
+  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
+  return FSocket.read(ABytes);
+}
+
+QVariant DefaultConnection::option(int ARole) const
+{
+  return FOptions.value(ARole);
+}
+
+void DefaultConnection::setOption(int ARole, const QVariant &AValue)
+{
+  FOptions.insert(ARole, AValue);
+}
+
+void DefaultConnection::proxyConnection()
 {
   switch (FProxyType)
   {
-    case 1: socket4Connection();break;
-    case 2: socket4Connection();break;
-    case 3: socket5Connection();break;
-    case 4: httpsConnection();break;
+  //case 1: socket4Connection();break;
+  //case 2: socket4Connection();break;
+  case 1: socket5Connection();break;
+  case 2: httpsConnection();break;
   }
 }
 
-void StreamConnection::socket4Connection()
+void DefaultConnection::socket4Connection()
 {
   FProxyState = ProxyReady;
   emit connected();
 }
 
-void StreamConnection::socket5Connection()
+void DefaultConnection::socket5Connection()
 {
   if (FProxyState == ProxyUnconnected)
   {
@@ -194,7 +140,7 @@ void StreamConnection::socket5Connection()
     if (buf[1]  != '\0')
     {
       emit error(tr("Socket5 authentication error"));
-      close();
+      disconnect();
     }
     else
       FProxyState = ProxyConnect;
@@ -228,23 +174,23 @@ void StreamConnection::socket5Connection()
       QString err;
       switch (buf[1])
       {
-        case 1: err = tr("General SOCKS server failure.");break;
-        case 2: err = tr("Connection not allowed by ruleset.");break;
-        case 3: err = tr("Network unreachable.");break;
-        case 4: err = tr("Host unreachable.");break;
-        case 5: err = tr("Connection refused.");break;
-        case 6: err = tr("TTL expired.");break;
-        case 7: err = tr("Command not supported.");break;
-        case 8: err = tr("Address type not supported.");break;
-        default: err = tr("Unknown socks error.");break;
+      case 1: err = tr("General SOCKS server failure.");break;
+      case 2: err = tr("Connection not allowed by ruleset.");break;
+      case 3: err = tr("Network unreachable.");break;
+      case 4: err = tr("Host unreachable.");break;
+      case 5: err = tr("Connection refused.");break;
+      case 6: err = tr("TTL expired.");break;
+      case 7: err = tr("Command not supported.");break;
+      case 8: err = tr("Address type not supported.");break;
+      default: err = tr("Unknown socks error.");break;
       }
       emit error(err);
-      close();
+      disconnect();
     }
   }
 }
 
-void StreamConnection::httpsConnection()
+void DefaultConnection::httpsConnection()
 {
   if (FProxyState == ProxyUnconnected)
   {
@@ -270,7 +216,55 @@ void StreamConnection::httpsConnection()
     else
     {
       emit error(result[2]);
-      close();
+      disconnect();
     }
   }
 }
+
+void DefaultConnection::onSocketConnected()
+{
+  ReadTimer.start(READ_TIMEOUT); 
+  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
+  if (FProxyState != ProxyReady)
+    proxyConnection();
+  else
+    emit connected();
+}
+
+void DefaultConnection::onSocketReadyRead()
+{
+  ReadTimer.stop();
+  if (FProxyState != ProxyReady)
+    proxyConnection();
+  else
+    emit readyRead(FSocket.bytesAvailable()); 
+}
+
+void DefaultConnection::onSocketDisconnected()
+{
+  ReadTimer.stop(); 
+  KeepAliveTimer.stop(); 
+  emit disconnected();
+}
+
+void DefaultConnection::onSocketError(QAbstractSocket::SocketError /*err*/)
+{
+  emit error(FSocket.errorString());
+}
+
+void DefaultConnection::onReadTimeout()
+{
+  if (FSocket.isOpen())
+  {
+    ReadTimer.stop(); 
+    emit error(tr("Socket timeout"));
+    FSocket.disconnectFromHost();
+  }
+}
+
+void DefaultConnection::onKeepAliveTimeout()
+{
+  if (isOpen())
+    FSocket.write(" "); 
+}
+

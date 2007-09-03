@@ -16,30 +16,19 @@ public:
     AO_Name,
     AO_StreamJid,
     AO_Password,
-    AO_ManualHostPort,
-    AO_Host,
-    AO_Port,
     AO_DefLang,
-    AO_ProxyTypes,
-    AO_ProxyType,
-    AO_ProxyHost,
-    AO_ProxyPort,
-    AO_ProxyUser,
-    AO_ProxyPassword,
-    AO_PollServer,
-    AO_AutoConnect,
-    AO_AutoReconnect
   };
 public:
   AccountOptions(const QString &AAccountId, QWidget *AParent = NULL);
   ~AccountOptions();
+
   const QString &accountId() const { return FAccountId; }
   QVariant option(const Options &AOption) const;
   void setOption(const Options &AOption, const QVariant &AValue);
 private:
-  QString FAccountId;
-private:
   Ui::AccountOptionsClass ui;
+private:
+  QString FAccountId;
 };
 
 #endif // ACCOUNTOPTIONS_H

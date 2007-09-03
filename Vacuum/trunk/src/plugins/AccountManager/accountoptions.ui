@@ -6,26 +6,44 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>371</height>
+    <height>167</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>AccountOptions</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>0</number>
-   </property>
    <property name="spacing" >
     <number>3</number>
    </property>
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
      <property name="spacing" >
       <number>3</number>
+     </property>
+     <property name="leftMargin" >
+      <number>0</number>
+     </property>
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
      </property>
      <item>
       <widget class="QLabel" name="label" >
@@ -45,9 +63,7 @@
    <item>
     <widget class="QGroupBox" name="grbAccount" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>0</vsizetype>
+      <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -56,18 +72,39 @@
       <string>Account</string>
      </property>
      <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>4</number>
-      </property>
       <property name="spacing" >
        <number>3</number>
       </property>
+      <property name="leftMargin" >
+       <number>4</number>
+      </property>
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
       <item>
        <layout class="QGridLayout" >
-        <property name="margin" >
+        <property name="leftMargin" >
          <number>0</number>
         </property>
-        <property name="spacing" >
+        <property name="topMargin" >
+         <number>0</number>
+        </property>
+        <property name="rightMargin" >
+         <number>0</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>0</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>4</number>
+        </property>
+        <property name="verticalSpacing" >
          <number>4</number>
         </property>
         <item row="2" column="1" >
@@ -76,9 +113,7 @@
         <item row="1" column="1" >
          <widget class="QLabel" name="label_5" >
           <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>5</hsizetype>
-            <vsizetype>4</vsizetype>
+           <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -138,9 +173,7 @@
         <item row="3" column="1" >
          <widget class="QLabel" name="label_6" >
           <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>5</hsizetype>
-            <vsizetype>4</vsizetype>
+           <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -160,204 +193,6 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="grbProxy" >
-     <property name="title" >
-      <string>Proxy</string>
-     </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>4</number>
-      </property>
-      <property name="spacing" >
-       <number>3</number>
-      </property>
-      <item>
-       <layout class="QGridLayout" >
-        <property name="margin" >
-         <number>0</number>
-        </property>
-        <property name="spacing" >
-         <number>3</number>
-        </property>
-        <item row="1" column="1" >
-         <widget class="QLineEdit" name="lneProxyHost" />
-        </item>
-        <item row="1" column="2" >
-         <widget class="QLabel" name="label_13" >
-          <property name="text" >
-           <string>Port:</string>
-          </property>
-          <property name="buddy" >
-           <cstring>spbProxyPort</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" >
-         <widget class="QLabel" name="label_9" >
-          <property name="text" >
-           <string>Username:</string>
-          </property>
-          <property name="buddy" >
-           <cstring>lneProxyUser</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" >
-         <widget class="QLabel" name="label_10" >
-          <property name="text" >
-           <string>Password:</string>
-          </property>
-          <property name="buddy" >
-           <cstring>lneProxyPassword</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" >
-         <widget class="QLabel" name="label_7" >
-          <property name="text" >
-           <string>Type:</string>
-          </property>
-          <property name="buddy" >
-           <cstring>cmbProxyType</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" >
-         <widget class="QLabel" name="label_8" >
-          <property name="text" >
-           <string>Host:</string>
-          </property>
-          <property name="buddy" >
-           <cstring>lneProxyHost</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="3" >
-         <widget class="QComboBox" name="cmbProxyType" >
-          <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>7</hsizetype>
-            <vsizetype>0</vsizetype>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="3" >
-         <widget class="QLineEdit" name="lneProxyUser" />
-        </item>
-        <item row="3" column="1" colspan="3" >
-         <widget class="QLineEdit" name="lneProxyPassword" >
-          <property name="echoMode" >
-           <enum>QLineEdit::PasswordEchoOnEdit</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3" >
-         <widget class="QSpinBox" name="spbProxyPort" >
-          <property name="minimumSize" >
-           <size>
-            <width>60</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
-      <number>3</number>
-     </property>
-     <item row="1" column="2" >
-      <widget class="QLabel" name="label_12" >
-       <property name="text" >
-        <string>Port:</string>
-       </property>
-       <property name="buddy" >
-        <cstring>spbPort</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0" >
-      <widget class="QLabel" name="label_11" >
-       <property name="text" >
-        <string>Host:</string>
-       </property>
-       <property name="buddy" >
-        <cstring>lneHost</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" >
-      <widget class="QLineEdit" name="lneHost" >
-       <property name="enabled" >
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3" >
-      <widget class="QSpinBox" name="spbPort" >
-       <property name="enabled" >
-        <bool>false</bool>
-       </property>
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>5</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize" >
-        <size>
-         <width>60</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximum" >
-        <number>65535</number>
-       </property>
-       <property name="value" >
-        <number>5222</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" colspan="4" >
-      <widget class="QCheckBox" name="chbManualHostPort" >
-       <property name="text" >
-        <string>Manually specify Host and Port</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="chbAutoConnect" >
-     <property name="text" >
-      <string>Automatically connect on startup</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="chbAutoReconnect" >
-     <property name="text" >
-      <string>Automatically reconnect if disconnected</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11" />
@@ -366,50 +201,7 @@
   <tabstop>lneJabberId</tabstop>
   <tabstop>lneResource</tabstop>
   <tabstop>lnePassword</tabstop>
-  <tabstop>cmbProxyType</tabstop>
-  <tabstop>lneProxyHost</tabstop>
-  <tabstop>spbProxyPort</tabstop>
-  <tabstop>lneProxyUser</tabstop>
-  <tabstop>lneProxyPassword</tabstop>
-  <tabstop>chbManualHostPort</tabstop>
-  <tabstop>lneHost</tabstop>
-  <tabstop>spbPort</tabstop>
-  <tabstop>chbAutoConnect</tabstop>
-  <tabstop>chbAutoReconnect</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>chbManualHostPort</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lneHost</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>59</x>
-     <y>325</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>55</x>
-     <y>351</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chbManualHostPort</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>spbPort</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>358</x>
-     <y>326</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>358</x>
-     <y>343</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

@@ -26,36 +26,13 @@ public:
 
   virtual IXmppStream *xmppStream() const =0;
   virtual bool isActive() const =0;
-  virtual Jid streamJid() const =0;
-  virtual bool manualHostPort() const =0;
-  virtual QString host() const =0;
-  virtual qint16 port() const =0;
-  virtual QString password() const =0;
-  virtual QString defaultLang() const =0;
-  virtual QStringList proxyTypes() const =0;
-  virtual int proxyType() const =0;
-  virtual QString proxyHost() const =0;
-  virtual qint16 proxyPort() const =0;
-  virtual QString proxyUsername() const =0;
-  virtual QString proxyPassword() const =0;
-  virtual QString pollServer() const=0;
-  virtual bool autoConnect() const =0;
-  virtual bool autoReconnect() const =0;
   virtual void setActive(bool AActive) =0;
-  virtual void setStreamJid(const Jid &) =0;
-  virtual void setManualHostPort(bool AManual) =0;
-  virtual void setHost(const QString &) =0;
-  virtual void setPort(qint16) =0;
-  virtual void setPassword(const QString &) =0;
-  virtual void setDefaultLang(const QString &) =0;
-  virtual void setProxyType(int) =0;
-  virtual void setProxyHost(const QString &) =0;
-  virtual void setProxyPort(qint16) =0;
-  virtual void setProxyUsername(const QString &) =0;
-  virtual void setProxyPassword(const QString &) =0;
-  virtual void setPollServer(const QString &) =0;
-  virtual void setAutoConnect(bool) =0;
-  virtual void setAutoReconnect(bool) =0;
+  virtual Jid streamJid() const =0;
+  virtual void setStreamJid(const Jid &AStreamJid) =0;
+  virtual QString password() const =0;
+  virtual void setPassword(const QString &APassword) =0;
+  virtual QString defaultLang() const =0;
+  virtual void setDefaultLang(const QString &ADefLang) =0;
 signals:
   virtual void changed(const QString &AName, const QVariant &AValue) =0;
 };
@@ -79,8 +56,6 @@ signals:
   virtual void hidden(IAccount *) =0;
   virtual void removed(IAccount *) =0;
   virtual void destroyed(IAccount *) =0;
-  virtual void optionsAccepted() =0;
-  virtual void optionsRejected() =0;
 };
 
 Q_DECLARE_INTERFACE(IAccount,"Vacuum.Plugin.IAccount/1.0")

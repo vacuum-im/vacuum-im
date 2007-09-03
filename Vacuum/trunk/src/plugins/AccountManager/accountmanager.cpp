@@ -198,16 +198,18 @@ void AccountManager::destroyAccount(const QString &AAccountId)
   IAccount *account = accountById(AAccountId);
   if (account)
   {
-    account->clear();
     emit destroyed(account);
+    account->clear();
     removeAccount(account);
   }
 }
 
 
 //IOptionsHolder
-QWidget *AccountManager::optionsWidget(const QString &ANode, int &/*AOrder*/) const
+QWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder)
 {
+  AOrder = OO_ACCOUNT_OPTIONS;
+  QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
   if (ANode == ON_ACCOUNTS)
   {
     if (FAccountManage.isNull())
@@ -225,40 +227,23 @@ QWidget *AccountManager::optionsWidget(const QString &ANode, int &/*AOrder*/) co
     }
     return FAccountManage;
   }
-  else if (ANode.startsWith(ON_ACCOUNTS + QString("::")))
+  else if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
   {
-    QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
-    QString id = nodeTree.value(1);
-    AccountOptions *options = new AccountOptions(id);
-    IAccount *account = accountById(id);
+    QString accountId = nodeTree.at(1);
+    AccountOptions *options = new AccountOptions(accountId);
+    IAccount *account = accountById(accountId);
     if (account)
     {
       options->setOption(AccountOptions::AO_Name,account->name());
       options->setOption(AccountOptions::AO_StreamJid,account->streamJid().full());
       options->setOption(AccountOptions::AO_Password,account->password());
-      options->setOption(AccountOptions::AO_ManualHostPort,account->manualHostPort());
-      options->setOption(AccountOptions::AO_Host,account->host());
-      options->setOption(AccountOptions::AO_Port,account->port());
       options->setOption(AccountOptions::AO_DefLang,account->defaultLang());
-      options->setOption(AccountOptions::AO_ProxyTypes,account->xmppStream()->connection()->proxyTypes());
-      options->setOption(AccountOptions::AO_ProxyType,account->proxyType());
-      options->setOption(AccountOptions::AO_ProxyHost,account->proxyHost());
-      options->setOption(AccountOptions::AO_ProxyPort,account->proxyPort());
-      options->setOption(AccountOptions::AO_ProxyUser,account->proxyUsername());
-      options->setOption(AccountOptions::AO_ProxyPassword,account->proxyPassword());
-      options->setOption(AccountOptions::AO_PollServer,account->pollServer());
-      options->setOption(AccountOptions::AO_AutoConnect,account->autoConnect());
-      options->setOption(AccountOptions::AO_AutoReconnect,account->autoReconnect());
     }
     else
     {
-      options->setOption(AccountOptions::AO_Name,FAccountManage->accountName(id));
-      options->setOption(AccountOptions::AO_Port,5222);
-      options->setOption(AccountOptions::AO_ProxyTypes,tr("Direct connection"));
-      options->setOption(AccountOptions::AO_ProxyType,0);
-      options->setOption(AccountOptions::AO_AutoReconnect,true);
+      options->setOption(AccountOptions::AO_Name,FAccountManage->accountName(accountId));
    }
-    FAccountOptions.insert(id,options);
+    FAccountOptions.insert(accountId,options);
     return options;
   }
   return NULL;
@@ -389,19 +374,8 @@ void AccountManager::onOptionsDialogAccepted()
       }
       else
         account = addAccount(id,name,streamJid);
-      account->setManualHostPort(options->option(AccountOptions::AO_ManualHostPort).toBool());
-      account->setHost(options->option(AccountOptions::AO_Host).toString());
-      account->setPort(options->option(AccountOptions::AO_Port).toInt());
       account->setPassword(options->option(AccountOptions::AO_Password).toString());
       account->setDefaultLang(options->option(AccountOptions::AO_DefLang).toString());
-      account->setProxyType(options->option(AccountOptions::AO_ProxyType).toInt());
-      account->setProxyHost(options->option(AccountOptions::AO_ProxyHost).toString());
-      account->setProxyPort(options->option(AccountOptions::AO_ProxyPort).toInt());
-      account->setProxyUsername(options->option(AccountOptions::AO_ProxyUser).toString());
-      account->setProxyPassword(options->option(AccountOptions::AO_ProxyPassword).toString());
-      account->setPollServer(options->option(AccountOptions::AO_PollServer).toString());
-      account->setAutoConnect(options->option(AccountOptions::AO_AutoConnect).toBool());
-      account->setAutoReconnect(options->option(AccountOptions::AO_AutoReconnect).toBool());
       account->setActive(FAccountManage->accountActive(id));
       FAccountManage->setAccount(id,name,streamJid.full(),account->isActive());
       openAccountOptionsNode(id,name);

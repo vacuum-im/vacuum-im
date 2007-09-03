@@ -4,6 +4,7 @@
 #include <QPointer> 
 #include "../../definations/actiongroups.h"
 #include "../../definations/optionnodes.h"
+#include "../../definations/optionorders.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"
@@ -50,7 +51,7 @@ public:
   virtual void destroyAccount(const QString &AAccountId);
 
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder) const;
+  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
 signals:
   virtual void added(IAccount *);
   virtual void shown(IAccount *);

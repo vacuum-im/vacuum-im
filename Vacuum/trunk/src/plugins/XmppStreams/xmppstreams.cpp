@@ -142,6 +142,10 @@ void XmppStreams::addStream(IXmppStream *AXmppStream)
       SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &))); 
     connect(AXmppStream->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), 
       SLOT(onStreamJidChanged(IXmppStream *, const Jid &))); 
+    connect(AXmppStream->instance(), SIGNAL(connectionAdded(IXmppStream *, IConnection *)), 
+      SLOT(onStreamConnectionAdded(IXmppStream *, IConnection *))); 
+    connect(AXmppStream->instance(), SIGNAL(connectionRemoved(IXmppStream *, IConnection *)), 
+      SLOT(onStreamConnectionRemoved(IXmppStream *, IConnection *))); 
     FActiveStreams.append(AXmppStream);
     emit added(AXmppStream);
   }
@@ -165,6 +169,10 @@ void XmppStreams::removeStream(IXmppStream *AXmppStream)
       this, SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &))); 
     disconnect(AXmppStream->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), 
       this, SLOT(onStreamJidChanged(IXmppStream *, const Jid &))); 
+    disconnect(AXmppStream->instance(), SIGNAL(connectionAdded(IXmppStream *, IConnection *)), 
+      this, SLOT(onStreamConnectionAdded(IXmppStream *, IConnection *))); 
+    disconnect(AXmppStream->instance(), SIGNAL(connectionRemoved(IXmppStream *, IConnection *)), 
+      this, SLOT(onStreamConnectionRemoved(IXmppStream *, IConnection *))); 
     FActiveStreams.removeAt(FActiveStreams.indexOf(AXmppStream));
     emit removed(AXmppStream);
   }
@@ -214,6 +222,16 @@ void XmppStreams::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Ji
 void XmppStreams::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
   emit jidChanged(AXmppStream,ABefour);
+}
+
+void XmppStreams::onStreamConnectionAdded(IXmppStream *AXmppStream, IConnection *AConnection)
+{
+  emit connectionAdded(AXmppStream,AConnection);
+}
+
+void XmppStreams::onStreamConnectionRemoved(IXmppStream *AXmppStream, IConnection *AConnection)
+{
+  emit connectionRemoved(AXmppStream,AConnection);
 }
 
 Q_EXPORT_PLUGIN2(XmppStreamsPlugin, XmppStreams)

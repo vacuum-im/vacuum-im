@@ -9,6 +9,8 @@
 #include "../../definations/actiongroups.h"
 #include "../../definations/initorders.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/optionnodes.h"
+#include "../../definations/optionorders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatuschanger.h"
 #include "../../interfaces/ipresence.h"
@@ -21,6 +23,7 @@
 #include "../../interfaces/isettings.h"
 #include "../../utils/skin.h"
 #include "editstatusdialog.h"
+#include "accountoptionswidget.h"
 
 struct StatusItem {
   int code;
@@ -36,10 +39,11 @@ struct StatusItem {
 class StatusChanger : 
   public QObject,
   public IPlugin,
-  public IStatusChanger
+  public IStatusChanger,
+  public IOptionsHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IStatusChanger);
+  Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder);
 
 public:
   StatusChanger();
@@ -77,6 +81,9 @@ public:
   virtual QList<int> statusByShow(int AShow) const;
   virtual QIcon iconByShow(int AShow) const;
   virtual QString nameByShow(int AShow) const;
+  
+  //IOptionsHolder
+  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
 public slots:
   virtual void setStatusByAction(bool);
 signals:
@@ -85,6 +92,8 @@ signals:
   virtual void statusItemRemoved(int AStatusId);
   virtual void statusAboutToBeSeted(int AStatusId, const Jid &AStreamJid);
   virtual void statusSeted(int AStatusId, const Jid &AStreamJid);
+  virtual void optionsAccepted();
+  virtual void optionsRejected();
 protected:
   void createDefaultStatus();
   void setMainStatusId(int AStatusId);
@@ -121,6 +130,9 @@ protected slots:
   void onSettingsClosed();
   void onReconnectTimer();
   void onEditStatusAction(bool);
+  void onOptionsAccepted();
+  void onOptionsRejected();
+  void onOptionsDialogClosed();
 private:
   IPresencePlugin *FPresencePlugin;
   IRosterPlugin *FRosterPlugin;
@@ -155,6 +167,7 @@ private:
   QHash<IPresence *,QPair<QDateTime,int> >FStreamWaitReconnect;
   QHash<IPresence *,int> FStreamTempStatus;
   QSet<IPresence *> FStreamMainStatus;
+  QHash<QString,AccountOptionsWidget *> FAccountOptionsById;
 };
 
 #endif // STATUSCHANGER_H

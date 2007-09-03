@@ -6,6 +6,8 @@
 
 #define AVN_LAST_ONLINE_STATUS              "statusChanger:lastOnlineStatus"
 #define AVN_IS_MAIN_STATUS                  "statusChanger:isMainStatus"
+#define AVN_AUTOCONNECT                     "statusChanger:autoConnect"
+#define AVN_AUTORECONNECT                   "statusChanger:autoReconnect"
 #define SVN_LAST_ONLINE_MAIN_STATUS         "lastOnlineMainStatus"
 #define SVN_MAIN_STATUS_ID                  "mainStatus"
 #define SVN_STATUS                          "status[]"
@@ -107,6 +109,8 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     if (FAccountManager)
     {
       connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
+      connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),SLOT(onOptionsAccepted()));
+      connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
     }
   }
 
@@ -150,6 +154,9 @@ bool StatusChanger::initObjects()
   
   createDefaultStatus();
   setMainStatusId(STATUS_OFFLINE);
+
+  if (FSettingsPlugin)
+    FSettingsPlugin->appendOptionsHolder(this);
 
   if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
   {
@@ -466,6 +473,31 @@ QString StatusChanger::nameByShow(int AShow) const
   default:
     return tr("Unknown Status");
   }
+}
+
+QWidget *StatusChanger::optionsWidget(const QString &ANode, int &AOrder)
+{
+  QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
+  if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
+  {
+    AOrder = OO_ACCOUNT_STATUS;
+    QString accountId = nodeTree.at(1);
+    AccountOptionsWidget *widget = new AccountOptionsWidget(accountId);
+    IAccount *account = FAccountManager->accountById(accountId);
+    if (account)
+    {
+      widget->setAutoConnect(account->value(AVN_AUTOCONNECT,false).toBool());
+      widget->setAutoReconnect(account->value(AVN_AUTORECONNECT,true).toBool());
+    }
+    else
+    {
+      widget->setAutoConnect(false);
+      widget->setAutoReconnect(true);
+    }
+    FAccountOptionsById.insert(accountId,widget);
+    return widget;
+  }
+  return NULL;
 }
 
 void StatusChanger::setStatusByAction(bool)
@@ -801,7 +833,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 void StatusChanger::autoReconnect(IPresence *APresence)
 {
   IAccount *account = FAccountManager->accountByStream(APresence->streamJid());
-  if (account && account->autoReconnect())
+  if (account && account->value(AVN_AUTORECONNECT,true).toBool())
   {
     int statusId = FStreamWaitStatus.value(APresence, FStreamStatus.value(APresence));
 
@@ -909,7 +941,7 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
   {
     bool isMainStatus = FStreamMainStatus.contains(APresence);
     account->setValue(AVN_IS_MAIN_STATUS,isMainStatus);
-    if (!isMainStatus && account->autoConnect() && FStreamLastStatus.contains(APresence->streamJid()))  
+    if (!isMainStatus && account->value(AVN_AUTOCONNECT,false).toBool() && FStreamLastStatus.contains(APresence->streamJid()))  
       account->setValue(AVN_LAST_ONLINE_STATUS,FStreamLastStatus.take(APresence->streamJid()));
     else
       account->delValue(AVN_LAST_ONLINE_STATUS);
@@ -939,7 +971,7 @@ void StatusChanger::onRosterClosed(IRoster *ARoster)
 
 void StatusChanger::onAccountShown(IAccount *AAccount)
 {
-  if (AAccount->autoConnect())
+  if (AAccount->value(AVN_AUTOCONNECT,false).toBool())
   {
     IPresence *presence = FPresencePlugin->getPresence(AAccount->streamJid());
     if (presence)
@@ -1088,6 +1120,30 @@ void StatusChanger::onEditStatusAction(bool)
   }
   else
     FEditStatusDialog->show();
+}
+
+void StatusChanger::onOptionsAccepted()
+{
+  foreach (AccountOptionsWidget *widget, FAccountOptionsById)
+  {
+    IAccount *account = FAccountManager->accountById(widget->accountId());
+    if (account)
+    {
+      account->setValue(AVN_AUTOCONNECT,widget->autoConnect());
+      account->setValue(AVN_AUTORECONNECT, widget->autoReconnect());
+    }
+  }
+  emit optionsAccepted();
+}
+
+void StatusChanger::onOptionsRejected()
+{
+  emit optionsRejected();
+}
+
+void StatusChanger::onOptionsDialogClosed()
+{
+  FAccountOptionsById.clear();
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

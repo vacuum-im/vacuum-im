@@ -18,4 +18,6 @@ SUBDIRS = settings \
           traymanager \
           privatestorage \
           messenger \
-          compress
+          compress \
+          connectionmanager \
+          defaultconnection

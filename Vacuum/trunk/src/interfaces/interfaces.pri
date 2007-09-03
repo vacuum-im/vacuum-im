@@ -12,4 +12,6 @@ HEADERS += ipluginmanager.h \
            irosterchanger.h \
            itraymanager.h \
            iprivatestorage.h \
-           imessenger.h
+           imessenger.h \
+           iconnectionmanager.h \
+           idefaultconnection.h
