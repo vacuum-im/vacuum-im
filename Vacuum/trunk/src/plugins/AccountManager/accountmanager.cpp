@@ -182,14 +182,15 @@ IAccount *AccountManager::accountByStream(const Jid &AStreamJid) const
 
 void AccountManager::removeAccount(IAccount *AAccount)
 {
-  if (FAccounts.contains((Account *)AAccount))
+  Account *account = qobject_cast<Account *>(AAccount->instance());
+  if (account)
   {
-    closeAccountOptionsNode(AAccount->accountId());
-    hideAccount(AAccount);
-    FAccounts.removeAt(FAccounts.indexOf((Account *)AAccount));
-    emit removed(AAccount);
-    FXmppStreams->destroyStream(AAccount->streamJid());
-    delete qobject_cast<Account *>(AAccount->instance());
+    closeAccountOptionsNode(account->accountId());
+    hideAccount(account);
+    FAccounts.removeAt(FAccounts.indexOf(account));
+    emit removed(account);
+    FXmppStreams->destroyStream(account->streamJid());
+    delete account;
   }
 }
 
@@ -198,9 +199,14 @@ void AccountManager::destroyAccount(const QString &AAccountId)
   IAccount *account = accountById(AAccountId);
   if (account)
   {
+    closeAccountOptionsNode(account->accountId());
+    hideAccount(account);
+    FAccounts.removeAt(FAccounts.indexOf((Account *)account));
+    emit removed(account);
     emit destroyed(account);
+    FXmppStreams->destroyStream(account->streamJid());
     account->clear();
-    removeAccount(account);
+    delete qobject_cast<Account *>(account->instance());
   }
 }
 
