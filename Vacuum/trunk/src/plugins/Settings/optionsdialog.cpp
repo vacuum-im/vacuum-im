@@ -49,7 +49,7 @@ OptionsDialog::OptionsDialog(QWidget *AParent)
   vblMain->addWidget(dbbButtons);
   setLayout(vblMain);
   setWindowTitle(tr("Options"));
-  resize(600,500);
+  resize(600,600);
   emit opened();
 }
 
@@ -102,6 +102,14 @@ void OptionsDialog::closeNode(const QString &ANode)
       }
 
       OptionsNode *node = it.value();
+      int widgetIndex = stwOptions->indexOf(node->widget);
+      if (widgetIndex > -1)
+      {
+        QHash<QTreeWidgetItem *, int>::iterator sit = FItemsStackIndex.begin();
+        for (;sit != FItemsStackIndex.end();sit++)
+          if (sit.value() > widgetIndex)
+            sit.value()--;
+      }
       stwOptions->removeWidget(node->widget);
       delete node;
 
