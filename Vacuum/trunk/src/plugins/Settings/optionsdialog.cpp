@@ -175,6 +175,11 @@ QString OptionsDialog::nodeFullName(const QString &ANode)
   return fullName;
 }
 
+void OptionsDialog::closeEvent(QCloseEvent */*AEvent*/)
+{
+  emit closed();
+}
+
 void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
 {
   switch(dbbButtons->buttonRole(AButton))

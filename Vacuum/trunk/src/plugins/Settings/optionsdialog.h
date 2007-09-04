@@ -28,6 +28,7 @@ signals:
 protected:
   QTreeWidgetItem *createTreeItem(const QString &ANode);
   QString nodeFullName(const QString &ANode);
+  virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
   void onDialogButtonClicked(QAbstractButton *AButton);
   void onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetItem *APrevious);
