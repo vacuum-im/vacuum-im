@@ -126,6 +126,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),SLOT(onOptionsDialogClosed()));
     }
   }
 
