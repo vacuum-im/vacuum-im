@@ -13,10 +13,11 @@
 class DefaultConnectionPlugin : 
   public QObject,
   public IPlugin,
-  public IConnectionPlugin
+  public IConnectionPlugin,
+  public IDefaultConnectionPlugin
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IConnectionPlugin);
+  Q_INTERFACES(IPlugin IConnectionPlugin IDefaultConnectionPlugin);
 
 public:
   DefaultConnectionPlugin();
@@ -41,6 +42,9 @@ public:
   virtual void deleteSettingsNS(const QString &ASettingsNS);
   virtual QWidget *optionsWidget(const QString &ASettingsNS);
   virtual void saveOptions(const QString &ASettingsNS);
+
+  //IDefaultConnectionPlugin
+  virtual QStringList proxyTypeNames() const;
 signals:
   virtual void connectionCreated(IConnection *AConnection);
   virtual void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);

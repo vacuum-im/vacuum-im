@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>483</width>
-    <height>162</height>
+    <width>426</width>
+    <height>188</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -69,6 +69,24 @@
        </property>
        <property name="value" >
         <number>5222</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QCheckBox" name="chbUseSSL" >
+       <property name="text" >
+        <string>Use SSL connection</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chbIgnoreSSLWarnings" >
+       <property name="text" >
+        <string>Ignore SSL errors</string>
        </property>
       </widget>
      </item>

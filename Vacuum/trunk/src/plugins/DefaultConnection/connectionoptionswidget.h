@@ -17,6 +17,10 @@ public:
   void setHost(const QString &AHost);
   int port() const;
   void setPort(int APort);
+  bool useSSL() const;
+  void setUseSSL(bool AUseSSL);
+  bool ignoreSSLErrors() const;
+  void setIgnoreSSLError(bool AIgnore);
   int proxyType() const;
   void setProxyTypes(const QStringList &AProxyTypes);
   void setProxyType(int AProxyType);
@@ -28,6 +32,9 @@ public:
   void setProxyUserName(const QString &AProxyUser);
   QString proxyPassword() const;
   void setProxyPassword(const QString &APassword);
+protected slots:
+  void onUseSSLStateChanged(int AState);
+  void onProxyTypeChanged(int AIndex);
 private:
     Ui::ConnectionOptionsWidgetClass ui;
 };

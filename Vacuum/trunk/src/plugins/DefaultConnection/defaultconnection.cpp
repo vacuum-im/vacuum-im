@@ -16,6 +16,9 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
   connect(&FSocket, SIGNAL(error(QAbstractSocket::SocketError)),
     SLOT(onSocketError(QAbstractSocket::SocketError)));
   connect(&FSocket, SIGNAL(disconnected()), SLOT(onSocketDisconnected()));
+  connect(&FSocket, SIGNAL(encrypted()), SLOT(onSocketEncrypted()));
+  connect(&FSocket, SIGNAL(sslErrors(const QList<QSslError> &)), SLOT(onSocketSSLErrors(const QList<QSslError> &)));
+  connect(&FSocket, SIGNAL(modeChanged(QSslSocket::SslMode)), SIGNAL(modeChanged(QSslSocket::SslMode)));
   
   connect(&ReadTimer,SIGNAL(timeout()),SLOT(onReadTimeout()));
   connect(&KeepAliveTimer,SIGNAL(timeout()),SLOT(onKeepAliveTimeout()));
@@ -35,6 +38,8 @@ void DefaultConnection::connectToHost()
 {
   FHost = option(IDefaultConnection::CO_Host).toString();
   FPort = option(IDefaultConnection::CO_Port).toInt();
+  FUseSSL = option(IDefaultConnection::CO_UseSSL).toBool();
+  FIgnoreSSLErrors = option(IDefaultConnection::CO_IgnoreSSLErrors).toBool();
   FProxyType = option(IDefaultConnection::CO_ProxyType).toInt();
   FProxyHost = option(IDefaultConnection::CO_ProxyHost).toString();
   FProxyPort = option(IDefaultConnection::CO_ProxyPort).toInt();
@@ -44,7 +49,10 @@ void DefaultConnection::connectToHost()
   if (FProxyType == 0)
   {
     FProxyState = ProxyReady;
-    FSocket.connectToHost(FHost, FPort);
+    if (FUseSSL)
+      FSocket.connectToHostEncrypted(FHost,FPort);
+    else
+      FSocket.connectToHost(FHost, FPort);
   }
   else 
   {
@@ -62,7 +70,7 @@ void DefaultConnection::disconnect()
   }
 }
 
-qint64 DefaultConnection::write( const QByteArray &AData )
+qint64 DefaultConnection::write(const QByteArray &AData)
 {
   KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
   return FSocket.write(AData);
@@ -84,21 +92,58 @@ void DefaultConnection::setOption(int ARole, const QVariant &AValue)
   FOptions.insert(ARole, AValue);
 }
 
+bool DefaultConnection::isEncrypted() const
+{
+  return FSocket.isEncrypted();
+}
+
+void DefaultConnection::startClientEncryption()
+{
+  FSocket.startClientEncryption();
+}
+
+QSsl::SslProtocol DefaultConnection::protocol() const
+{
+  return FSocket.protocol();
+}
+
+void DefaultConnection::setProtocol(QSsl::SslProtocol AProtocol)
+{
+  FSocket.setProtocol(AProtocol);
+}
+
+void DefaultConnection::addCaCertificate(const QSslCertificate &ACertificate)
+{
+  FSocket.addCaCertificate(ACertificate);
+}
+
+QList<QSslCertificate> DefaultConnection::caCertificates() const
+{
+  return FSocket.caCertificates();
+}
+
+QSslCertificate DefaultConnection::peerCertificate() const
+{
+  return FSocket.peerCertificate();
+}
+
+void DefaultConnection::ignoreSslErrors()
+{
+  FSocket.ignoreSslErrors();
+}
+
+QList<QSslError> DefaultConnection::sslErrors() const
+{
+  return FSocket.sslErrors();
+}
+
 void DefaultConnection::proxyConnection()
 {
   switch (FProxyType)
   {
-  //case 1: socket4Connection();break;
-  //case 2: socket4Connection();break;
   case 1: socket5Connection();break;
   case 2: httpsConnection();break;
   }
-}
-
-void DefaultConnection::socket4Connection()
-{
-  FProxyState = ProxyReady;
-  emit connected();
 }
 
 void DefaultConnection::socket5Connection()
@@ -164,12 +209,7 @@ void DefaultConnection::socket5Connection()
   else if (FProxyState == ProxyConnectResult)
   {
     QByteArray buf = read(FSocket.bytesAvailable());
-    if (buf[1] == '\0')
-    {
-      FProxyState = ProxyReady;
-      emit connected();
-    }
-    else
+    if (buf[1] != '\0')
     {
       QString err;
       switch (buf[1])
@@ -187,6 +227,8 @@ void DefaultConnection::socket5Connection()
       emit error(err);
       disconnect();
     }
+    else
+      proxyReady();
   }
 }
 
@@ -208,27 +250,41 @@ void DefaultConnection::httpsConnection()
   else if (FProxyState == ProxyConnectResult)
   {
     QList<QByteArray> result = read(FSocket.bytesAvailable()).split(' ');
-    if (result[1].toInt() == 200)
-    {
-      FProxyState = ProxyReady;
-      emit connected();
-    }
-    else
+    if (result[1].toInt() != 200)
     {
       emit error(result[2]);
       disconnect();
     }
+    else
+      proxyReady();
   }
+}
+
+void DefaultConnection::proxyReady()
+{
+  FProxyState = ProxyReady;
+  if (FUseSSL)
+    FSocket.startClientEncryption();
+  else
+    connectionReady();
+}
+
+void DefaultConnection::connectionReady()
+{
+  ReadTimer.start(READ_TIMEOUT); 
+  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
+  emit connected();
 }
 
 void DefaultConnection::onSocketConnected()
 {
-  ReadTimer.start(READ_TIMEOUT); 
-  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
   if (FProxyState != ProxyReady)
+  {
+    ReadTimer.start(READ_TIMEOUT); 
     proxyConnection();
-  else
-    emit connected();
+  }
+  else if (!FUseSSL)
+    connectionReady();
 }
 
 void DefaultConnection::onSocketReadyRead()
@@ -247,9 +303,27 @@ void DefaultConnection::onSocketDisconnected()
   emit disconnected();
 }
 
-void DefaultConnection::onSocketError(QAbstractSocket::SocketError /*err*/)
+void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 {
   emit error(FSocket.errorString());
+}
+
+void DefaultConnection::onSocketEncrypted()
+{
+  if (FUseSSL)
+    connectionReady();
+  emit encrypted();
+}
+
+void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
+{
+  if (!FIgnoreSSLErrors)
+  {
+    emit sslErrors(AErrors);
+    emit error(FSocket.errorString());
+  }
+  else
+    FSocket.ignoreSslErrors();
 }
 
 void DefaultConnection::onReadTimeout()

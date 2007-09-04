@@ -1,7 +1,6 @@
 #ifndef DEFAULTCONNECTION_H
 #define DEFAULTCONNECTION_H
 
-#include <QSslSocket>
 #include <QTimer>
 #include "../../interfaces/iconnectionmanager.h"
 #include "../../interfaces/idefaultconnection.h"
@@ -28,21 +27,37 @@ public:
   virtual QByteArray read(qint64 ABytes);
   virtual QVariant option(int ARole) const;
   virtual void setOption(int ARole, const QVariant &AValue);
+
+  virtual bool isEncrypted() const;
+  virtual void startClientEncryption();
+  virtual QSsl::SslProtocol protocol() const;
+  virtual void setProtocol(QSsl::SslProtocol AProtocol);
+  virtual void addCaCertificate(const QSslCertificate &ACertificate);
+  virtual QList<QSslCertificate> caCertificates() const;
+  virtual QSslCertificate peerCertificate() const;
+  virtual void ignoreSslErrors();
+  virtual QList<QSslError> sslErrors() const;
 signals:
   virtual void connected();
   virtual void readyRead(qint64 ABytes);
   virtual void disconnected();
   virtual void error(const QString &AMessage);
+  virtual void encrypted();
+  virtual void modeChanged(QSslSocket::SslMode AMode);
+  virtual void sslErrors(const QList<QSslError> &AErrors);
 protected:
   void proxyConnection();
-  void socket4Connection();
   void socket5Connection();
   void httpsConnection();
+  void proxyReady();
+  void connectionReady();
 protected slots:
   void onSocketConnected();
   void onSocketReadyRead();
   void onSocketDisconnected();
-  void onSocketError(QAbstractSocket::SocketError err);
+  void onSocketError(QAbstractSocket::SocketError AError);
+  void onSocketEncrypted();
+  void onSocketSSLErrors(const QList<QSslError> &AErrors);
   void onReadTimeout();
   void onKeepAliveTimeout();
 private:
@@ -64,6 +79,8 @@ private:
   QHash<int, QVariant> FOptions;
   QString FHost;
   quint16 FPort;
+  bool FUseSSL;
+  bool FIgnoreSSLErrors;
   int FProxyType;
   QString FProxyHost;
   qint16  FProxyPort;

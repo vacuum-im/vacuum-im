@@ -2,6 +2,8 @@
 
 #define SVN_CONNECTION_HOST                 "connection[]:host"
 #define SVN_CONNECTION_PORT                 "connection[]:port"
+#define SVN_CONNECTION_USE_SSL              "connection[]:useSSL"
+#define SVN_CONNECTION_IGNORE_SSLERROR      "connection[]:ingnoreSSLErrors"
 #define SVN_CONNECTION_PROXY_TYPE           "connection[]:proxyType"
 #define SVN_CONNECTION_PROXY_HOST           "connection[]:proxyHost"
 #define SVN_CONNECTION_PROXY_PORT           "connection[]:proxyPort"
@@ -79,6 +81,8 @@ void DefaultConnectionPlugin::loadSettings(IConnection *AConnection, const QStri
 {
   AConnection->setOption(IDefaultConnection::CO_Host,FSettings->valueNS(SVN_CONNECTION_HOST,ASettingsNS,QString()));
   AConnection->setOption(IDefaultConnection::CO_Port,FSettings->valueNS(SVN_CONNECTION_PORT,ASettingsNS,5222));
+  AConnection->setOption(IDefaultConnection::CO_UseSSL,FSettings->valueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,false));
+  AConnection->setOption(IDefaultConnection::CO_IgnoreSSLErrors,FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,false));
   AConnection->setOption(IDefaultConnection::CO_ProxyType,FSettings->valueNS(SVN_CONNECTION_PROXY_TYPE,ASettingsNS,0));
   AConnection->setOption(IDefaultConnection::CO_ProxyHost,FSettings->valueNS(SVN_CONNECTION_PROXY_HOST,ASettingsNS,QString()));
   AConnection->setOption(IDefaultConnection::CO_ProxyPort,FSettings->valueNS(SVN_CONNECTION_PROXY_PORT,ASettingsNS,0));
@@ -92,6 +96,8 @@ void DefaultConnectionPlugin::saveSettings(IConnection *AConnection, const QStri
 {
   FSettings->setValueNS(SVN_CONNECTION_HOST,ASettingsNS,AConnection->option(IDefaultConnection::CO_Host));
   FSettings->setValueNS(SVN_CONNECTION_PORT,ASettingsNS,AConnection->option(IDefaultConnection::CO_Port));
+  FSettings->setValueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,AConnection->option(IDefaultConnection::CO_UseSSL));
+  FSettings->setValueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,AConnection->option(IDefaultConnection::CO_IgnoreSSLErrors));
   FSettings->setValueNS(SVN_CONNECTION_PROXY_TYPE,ASettingsNS,AConnection->option(IDefaultConnection::CO_ProxyType));
   FSettings->setValueNS(SVN_CONNECTION_PROXY_HOST,ASettingsNS,AConnection->option(IDefaultConnection::CO_ProxyHost));
   FSettings->setValueNS(SVN_CONNECTION_PROXY_PORT,ASettingsNS,AConnection->option(IDefaultConnection::CO_ProxyPort));
@@ -110,7 +116,9 @@ QWidget *DefaultConnectionPlugin::optionsWidget(const QString &ASettingsNS)
   ConnectionOptionsWidget *widget = new ConnectionOptionsWidget;
   widget->setHost(FSettings->valueNS(SVN_CONNECTION_HOST,ASettingsNS,QString()).toString());
   widget->setPort(FSettings->valueNS(SVN_CONNECTION_PORT,ASettingsNS,5222).toInt());
-  widget->setProxyTypes(QStringList() << tr("Direct connection") << tr("Socket5 proxy") << tr("HTTPS proxy"));
+  widget->setUseSSL(FSettings->valueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,false).toBool());
+  widget->setIgnoreSSLError(FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,false).toBool());
+  widget->setProxyTypes(proxyTypeNames());
   widget->setProxyType(FSettings->valueNS(SVN_CONNECTION_PROXY_TYPE,ASettingsNS,0).toInt());
   widget->setProxyHost(FSettings->valueNS(SVN_CONNECTION_PROXY_HOST,ASettingsNS,QString()).toString());
   widget->setProxyPort(FSettings->valueNS(SVN_CONNECTION_PROXY_PORT,ASettingsNS,0).toInt());
@@ -127,6 +135,8 @@ void DefaultConnectionPlugin::saveOptions(const QString &ASettingsNS)
   {
     FSettings->setValueNS(SVN_CONNECTION_HOST,ASettingsNS,widget->host());
     FSettings->setValueNS(SVN_CONNECTION_PORT,ASettingsNS,widget->port());
+    FSettings->setValueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,widget->useSSL());
+    FSettings->setValueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,widget->ignoreSSLErrors());
     FSettings->setValueNS(SVN_CONNECTION_PROXY_TYPE,ASettingsNS,widget->proxyType());
     FSettings->setValueNS(SVN_CONNECTION_PROXY_HOST,ASettingsNS,widget->proxyHost());
     FSettings->setValueNS(SVN_CONNECTION_PROXY_PORT,ASettingsNS,widget->proxyPort());
@@ -134,6 +144,11 @@ void DefaultConnectionPlugin::saveOptions(const QString &ASettingsNS)
     FSettings->setValueNS(SVN_CONNECTION_PROXY_PSWD,ASettingsNS,
       FSettings->encript(widget->proxyPassword(),ASettingsNS.toUtf8()));
   }
+}
+
+QStringList DefaultConnectionPlugin::proxyTypeNames() const
+{
+  return QStringList() << tr("Direct connection") << tr("Socket5 proxy") << tr("HTTPS proxy");
 }
 
 void DefaultConnectionPlugin::onOptionsDialogClosed()
