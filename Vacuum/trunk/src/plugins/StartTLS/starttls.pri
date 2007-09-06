@@ -1,5 +1,5 @@
 HEADERS = starttls.h \
-          startplsplugin.h
+          starttlsplugin.h
 
 SOURCES = starttls.cpp \
           starttlsplugin.cpp
