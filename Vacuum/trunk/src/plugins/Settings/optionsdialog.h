@@ -22,13 +22,15 @@ public:
     const QString &ADescription, const QIcon &AIcon, QWidget *AWidget);
   void closeNode(const QString &ANode);
   void showNode(const QString &ANode);
+public slots:
+  virtual void accept();
+  virtual void reject();
 signals:
   void opened();
   void closed();
 protected:
   QTreeWidgetItem *createTreeItem(const QString &ANode);
   QString nodeFullName(const QString &ANode);
-  virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
   void onDialogButtonClicked(QAbstractButton *AButton);
   void onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetItem *APrevious);

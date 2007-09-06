@@ -130,6 +130,18 @@ void OptionsDialog::showNode(const QString &ANode)
     trwNodes->setCurrentItem(item,0);
 }
 
+void OptionsDialog::accept()
+{
+  QDialog::accept();
+  emit closed();
+}
+
+void OptionsDialog::reject()
+{
+  QDialog::reject();
+  emit closed();
+}
+
 QTreeWidgetItem *OptionsDialog::createTreeItem(const QString &ANode)
 {
   QString nodeName;
@@ -175,22 +187,15 @@ QString OptionsDialog::nodeFullName(const QString &ANode)
   return fullName;
 }
 
-void OptionsDialog::closeEvent(QCloseEvent */*AEvent*/)
-{
-  emit closed();
-}
-
 void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
 {
   switch(dbbButtons->buttonRole(AButton))
   {
   case QDialogButtonBox::AcceptRole:
     accept(); 
-    emit closed();
     break;
   case QDialogButtonBox::RejectRole:
     reject(); 
-    emit closed();
     break;
   case QDialogButtonBox::ApplyRole:
     emit accepted(); 
