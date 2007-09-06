@@ -65,8 +65,13 @@ void DefaultConnection::disconnect()
 {
   if (FSocket.isOpen())
   {
-    FSocket.flush(); 
     FSocket.disconnectFromHost();
+    if (FSocket.state() != QAbstractSocket::UnconnectedState)
+      if (!FSocket.waitForDisconnected(5000))
+      {
+        emit error(tr("Disconnect from host timeout"));
+        onSocketDisconnected();
+      }
   }
 }
 
