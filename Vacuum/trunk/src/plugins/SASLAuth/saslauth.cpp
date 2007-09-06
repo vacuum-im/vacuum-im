@@ -311,7 +311,7 @@ IStreamFeature *SASLAuthPlugin::addFeature(IXmppStream *AXmppStream)
   SASLAuth *saslAuth = (SASLAuth *)getFeature(AXmppStream->jid());
   if (!saslAuth)
   {
-    SASLAuth *saslAuth = new SASLAuth(AXmppStream);
+    saslAuth = new SASLAuth(AXmppStream);
     connect(saslAuth,SIGNAL(destroyed(QObject *)),SLOT(onSASLAuthDestroyed(QObject *)));
     FFeatures.append(saslAuth);
     FCleanupHandler.add(saslAuth);
