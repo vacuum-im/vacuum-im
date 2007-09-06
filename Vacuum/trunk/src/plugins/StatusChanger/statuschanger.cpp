@@ -36,6 +36,7 @@ StatusChanger::StatusChanger()
   FMainMenu = NULL;
   FCustomMenu = NULL;
   FSettingStatusToPresence = NULL;
+  FAccountManager = NULL;
 }
 
 StatusChanger::~StatusChanger()
@@ -484,7 +485,7 @@ QWidget *StatusChanger::optionsWidget(const QString &ANode, int &AOrder)
     AOrder = OO_ACCOUNT_STATUS;
     QString accountId = nodeTree.at(1);
     AccountOptionsWidget *widget = new AccountOptionsWidget(accountId);
-    IAccount *account = FAccountManager->accountById(accountId);
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
     if (account)
     {
       widget->setAutoConnect(account->value(AVN_AUTOCONNECT,false).toBool());
@@ -605,7 +606,10 @@ void StatusChanger::createDefaultStatus()
 void StatusChanger::setMainStatusId(int AStatusId)
 {
   if (FStatusItems.contains(AStatusId))
+  {
     FStatusItems[MAIN_STATUS_ID] = FStatusItems.value(AStatusId);
+    updateMainStatusActions();
+  }
 }
 
 void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
@@ -694,8 +698,16 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 {
   if (!FStreamMenu.contains(APresence))
   {
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
+
     Menu *sMenu = new Menu(FMainMenu);
-    sMenu->setTitle(APresence->streamJid().full());
+    if (account)
+    {
+      sMenu->setTitle(account->name());
+      connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),SLOT(onAccountChanged(const QString &, const QVariant &)));
+    }
+    else
+      sMenu->setTitle(APresence->streamJid().full());
     FStreamMenu.insert(APresence,sMenu);
 
     Menu *scMenu = new Menu(sMenu);
@@ -796,14 +808,14 @@ void StatusChanger::updateMainMenu()
   FMainMenu->setTitle(mStatusName);
 
   FTrayManager->setMainIcon(mStatusIcon);
+}
 
-  if (mainStatusToShow != MAIN_STATUS_ID)
-  {
-    mStatusIcon = statusItemIcon(MAIN_STATUS_ID);
-    if (mStatusIcon.isNull())
-      mStatusIcon = iconByShow(statusItemShow(MAIN_STATUS_ID));
-    mStatusName = statusItemName(MAIN_STATUS_ID);
-  }
+void StatusChanger::updateMainStatusActions()
+{
+  QIcon mStatusIcon = statusItemIcon(MAIN_STATUS_ID);
+  if (mStatusIcon.isNull())
+    mStatusIcon = iconByShow(statusItemShow(MAIN_STATUS_ID));
+  QString mStatusName = statusItemName(MAIN_STATUS_ID);
   foreach (Action *action, FStreamMainStatusAction)
   {
     action->setIcon(mStatusIcon);
@@ -833,7 +845,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 
 void StatusChanger::autoReconnect(IPresence *APresence)
 {
-  IAccount *account = FAccountManager->accountByStream(APresence->streamJid());
+  IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
   if (account && account->value(AVN_AUTORECONNECT,true).toBool())
   {
     int statusId = FStreamWaitStatus.value(APresence, FStreamStatus.value(APresence));
@@ -901,7 +913,7 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
   if (FStreamMenu.count() == 1)
     FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
 
-  IAccount *account = FAccountManager->accountByStream(APresence->streamJid());
+  IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
   if (account && account->value(AVN_IS_MAIN_STATUS, true).toBool())
     FStreamMainStatus += APresence;
   
@@ -937,7 +949,7 @@ void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
 
 void StatusChanger::onPresenceRemoved(IPresence *APresence)
 {
-  IAccount *account = FAccountManager->accountByStream(APresence->streamJid());
+  IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
   if (account)
   {
     bool isMainStatus = FStreamMainStatus.contains(APresence);
@@ -975,7 +987,7 @@ void StatusChanger::onAccountShown(IAccount *AAccount)
   if (AAccount->value(AVN_AUTOCONNECT,false).toBool())
   {
     IPresence *presence = FPresencePlugin->getPresence(AAccount->streamJid());
-    if (presence)
+    if (FStreamMenu.contains(presence))
     {
       int statusId = FStreamMainStatus.contains(presence) ? MAIN_STATUS_ID : AAccount->value(AVN_LAST_ONLINE_STATUS, STATUS_ONLINE).toInt();
       if (!FStatusItems.contains(statusId))
@@ -1145,6 +1157,20 @@ void StatusChanger::onOptionsRejected()
 void StatusChanger::onOptionsDialogClosed()
 {
   FAccountOptionsById.clear();
+}
+
+void StatusChanger::onAccountChanged(const QString &AName, const QVariant &AValue)
+{
+  if (AName == "name")
+  {
+    IAccount *account = qobject_cast<IAccount *>(sender());
+    if (account)
+    {
+      Menu *sMenu = streamMenu(account->streamJid());
+      if (sMenu)
+        sMenu->setTitle(AValue.toString());
+    }
+  }
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

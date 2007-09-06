@@ -108,6 +108,7 @@ protected:
   void updateStreamMenu(IPresence *APresence);
   void removeStreamMenu(IPresence *APresence);
   void updateMainMenu();
+  void updateMainStatusActions();
   void insertConnectingLabel(IPresence *APresence);
   void removeConnectingLabel(IPresence *APresence);
   void autoReconnect(IPresence *APresence);
@@ -133,6 +134,7 @@ protected slots:
   void onOptionsAccepted();
   void onOptionsRejected();
   void onOptionsDialogClosed();
+  void onAccountChanged(const QString &AName, const QVariant &AValue);
 private:
   IPresencePlugin *FPresencePlugin;
   IRosterPlugin *FRosterPlugin;
