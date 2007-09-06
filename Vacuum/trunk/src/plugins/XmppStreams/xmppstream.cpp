@@ -1,6 +1,7 @@
 #include <QtDebug>
 #include "xmppstream.h"
 
+#include <QInputDialog>
 #include "../../definations/namespaces.h"
 #include "../../utils/errorhandler.h"
 
@@ -29,6 +30,12 @@ void XmppStream::open()
 {
   if (FConnection && FStreamState == SS_OFFLINE)
   {
+    if (FPassword.isEmpty())
+    {
+      FSessionPassword = QInputDialog::getText(NULL,tr("Password request"),tr("Enter password for <b>%1</b>").arg(FJid.bare()),
+        QLineEdit::Password,"",NULL,Qt::Dialog);
+    }
+
     FStreamState = SS_CONNECTING;
     FConnection->connectToHost();
   }
@@ -66,6 +73,13 @@ void XmppStream::setJid(const Jid &AJid)
     FJid = AJid;
     emit jidChanged(this, befour);
   }
+}
+
+const QString &XmppStream::password() const
+{
+  if (FPassword.isEmpty() && FStreamState == SS_FEATURES)
+    return FSessionPassword;
+  return FPassword;
 }
 
 qint64 XmppStream::sendStanza(const Stanza &AStanza)
@@ -222,7 +236,7 @@ void XmppStream::sortFeature(IStreamFeature *AFeature)
   {
     int index=0;
     for (int i=0; i<FFeatures.count(); i++)
-      if (FFeatures.at(index) ->needHook(IStreamFeature::DirectionIn))
+      if (FFeatures.at(index)->needHook(IStreamFeature::DirectionIn))
         index++;
       else
         FFeatures.move(index,FFeatures.count()-1);  

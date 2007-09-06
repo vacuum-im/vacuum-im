@@ -26,9 +26,9 @@ public:
   virtual qint64 sendStanza(const Stanza &AStanza);
   virtual const QString &streamId() const { return FStreamId; }
   virtual const QString &lastError() const { return FLastError; };
-  virtual void setJid(const Jid &AJid);
   virtual const Jid &jid() const { return FJid; }
-  virtual const QString &password() const { return FPassword; }
+  virtual void setJid(const Jid &AJid);
+  virtual const QString &password() const;
   virtual void setPassword(const QString &APassword) { FPassword = APassword; }
   virtual const QString &defaultLang() const { return FDefLang; }
   virtual void setDefaultLang(const QString &ADefLang) { FDefLang = ADefLang; }
@@ -88,6 +88,7 @@ private:
   Jid FOfflineJid;
   QString FStreamId; 
   QString FPassword;
+  QString FSessionPassword;
   QString FDefLang;
   QString FXmppVersion;
   QString FLastError;
