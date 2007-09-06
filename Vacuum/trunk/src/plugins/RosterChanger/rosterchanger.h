@@ -13,6 +13,7 @@
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/itraymanager.h"
+#include "../../interfaces/iaccountmanager.h"
 #include "../../utils/skin.h"
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
@@ -88,6 +89,7 @@ protected slots:
   void onTrayNotifyActivated(int ANotifyId);
   void onSubsDialogSetupNext();
   void onAddContactDialogDestroyed(QObject *AObject);
+  void onAccountChanged(const QString &AName, const QVariant &AValue);
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersModelPlugin *FRostersModelPlugin;
@@ -96,6 +98,7 @@ private:
   IRostersView *FRostersView;
   IMainWindowPlugin *FMainWindowPlugin;
   ITrayManager *FTrayManager;
+  IAccountManager *FAccountManager;
 private:
   Menu *FAddContactMenu;
   SkinIconset FSystemIconset;

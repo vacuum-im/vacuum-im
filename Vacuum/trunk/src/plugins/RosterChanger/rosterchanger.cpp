@@ -12,6 +12,7 @@ RosterChanger::RosterChanger()
   FRostersView = NULL;
   FMainWindowPlugin = NULL;
   FTrayManager = NULL; 
+  FAccountManager = NULL;
 
   FAddContactMenu = NULL;
   FSubsId = 0;
@@ -83,6 +84,12 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     }
   }
 
+  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  if (plugin)
+  {
+    FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+  }
+
   return FRosterPlugin!=NULL;
 }
 
@@ -111,7 +118,7 @@ bool RosterChanger::initObjects()
   {
     FAddContactMenu = new Menu(FMainWindowPlugin->mainWindow()->mainMenu());
     FAddContactMenu->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
-    FAddContactMenu->setTitle(tr("Add contact"));
+    FAddContactMenu->setTitle(tr("Add contact to"));
     FAddContactMenu->menuAction()->setEnabled(false);
     FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FAddContactMenu->menuAction(),AG_ROSTERCHANGER_MMENU,true);
   }
@@ -767,9 +774,17 @@ void RosterChanger::onRosterOpened(IRoster *ARoster)
 {
   if (FAddContactMenu && !FActions.contains(ARoster))
   {
+    IAccount *account = FAccountManager!= NULL ? FAccountManager->accountByStream(ARoster->streamJid()) : NULL;
+
     Action *action = new Action(FAddContactMenu);
     action->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
-    action->setText(ARoster->streamJid().full());
+    if (account)
+    {
+      action->setText(account->name());
+      connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),SLOT(onAccountChanged(const QString &, const QVariant &)));
+    }
+    else
+      action->setText(ARoster->streamJid().full());
     action->setData(Action::DR_StreamJid,ARoster->streamJid().full());
     connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
     FActions.insert(ARoster,action);
@@ -872,6 +887,20 @@ void RosterChanger::onAddContactDialogDestroyed(QObject *AObject)
       if (it.value().contains(dialog))
         it.value().removeAt(it.value().indexOf(dialog));
       it++;
+    }
+  }
+}
+
+void RosterChanger::onAccountChanged(const QString &AName, const QVariant &AValue)
+{
+  if (AName == "name")
+  {
+    IAccount *account = qobject_cast<IAccount *>(sender());
+    if (account)
+    {
+      Action *action = FActions.value(FRosterPlugin->getRoster(account->streamJid()),NULL);
+      if (action)
+        action->setText(AValue.toString());
     }
   }
 }
