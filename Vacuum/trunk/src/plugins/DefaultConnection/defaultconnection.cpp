@@ -320,7 +320,10 @@ void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
   if (!FIgnoreSSLErrors)
   {
     emit sslErrors(AErrors);
-    emit error(FSocket.errorString());
+    QString errorStr;
+    foreach(QSslError error, AErrors)
+      errorStr += error.errorString()+"; ";
+    emit error(errorStr);
   }
   else
     FSocket.ignoreSslErrors();
