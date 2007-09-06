@@ -20,4 +20,5 @@ SUBDIRS = settings \
           messenger \
           compress \
           connectionmanager \
-          defaultconnection
+          defaultconnection \
+          starttls
