@@ -144,13 +144,13 @@ bool StatusChanger::initObjects()
 
   FCustomMenu = new Menu(FMainMenu);
   FCustomMenu->setTitle(tr("User statuses"));
-  FCustomMenu->setIcon(STATUS_ICONSETFILE,"ask");
+  FCustomMenu->setIcon(STATUS_ICONSETFILE,"status/ask");
   FCustomMenu->menuAction()->setVisible(false);
   FMainMenu->addAction(FCustomMenu->menuAction(),AG_STATUSCHANGER_STATUSMENU_CUSTOM_MENU,false);
 
   FEditStatusAction = new Action(FMainMenu);
   FEditStatusAction->setText(tr("Edit user statuses"));
-  FEditStatusAction->setIcon(STATUS_ICONSETFILE,"ask");
+  FEditStatusAction->setIcon(STATUS_ICONSETFILE,"status/ask");
   connect(FEditStatusAction,SIGNAL(triggered(bool)), SLOT(onEditStatusAction(bool)));
   FMainMenu->addAction(FEditStatusAction,AG_STATUSCHANGER_STATUSMENU_CUSTOM_MENU,false);
   
@@ -432,21 +432,21 @@ QIcon StatusChanger::iconByShow(int AShow) const
   switch (AShow)
   {
   case IPresence::Offline: 
-    return FStatusIconset.iconByName("offline");
+    return FStatusIconset.iconByName("status/offline");
   case IPresence::Online: 
-    return FStatusIconset.iconByName("online");
+    return FStatusIconset.iconByName("status/online");
   case IPresence::Chat: 
-    return FStatusIconset.iconByName("chat");
+    return FStatusIconset.iconByName("status/chat");
   case IPresence::Away: 
-    return FStatusIconset.iconByName("away");
+    return FStatusIconset.iconByName("status/away");
   case IPresence::ExtendedAway: 
-    return FStatusIconset.iconByName("xa");
+    return FStatusIconset.iconByName("status/xa");
   case IPresence::DoNotDistrib: 
-    return FStatusIconset.iconByName("dnd");
+    return FStatusIconset.iconByName("status/dnd");
   case IPresence::Invisible: 
-    return FStatusIconset.iconByName("invisible");
+    return FStatusIconset.iconByName("status/invisible");
   case IPresence::Error: 
-    return FStatusIconset.iconByName("error");
+    return FStatusIconset.iconByName("status/error");
   default:
     return QIcon();
   }
@@ -522,7 +522,7 @@ void StatusChanger::createDefaultStatus()
   status->text = tr("Online");
   status->priority = 120;
   status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "online";
+  status->iconName = "status/online";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -533,7 +533,7 @@ void StatusChanger::createDefaultStatus()
   status->text = tr("Free for Chat");
   status->priority = 100;
   status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "chat";
+  status->iconName = "status/chat";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -544,7 +544,7 @@ void StatusChanger::createDefaultStatus()
   status->text = tr("I`am away from my desk");
   status->priority = 80;
   status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "away";
+  status->iconName = "status/away";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -555,7 +555,7 @@ void StatusChanger::createDefaultStatus()
   status->text = tr("Not available");
   status->priority = 60;
   status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "xa";
+  status->iconName = "status/xa";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -566,7 +566,7 @@ void StatusChanger::createDefaultStatus()
   status->text = tr("Do not Distrib");
   status->priority = 40;
   status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "dnd";
+  status->iconName = "status/dnd";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -577,7 +577,7 @@ void StatusChanger::createDefaultStatus()
   status->text = tr("Invisible");
   status->priority = 20;
   status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "invisible";
+  status->iconName = "status/invisible";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -588,7 +588,7 @@ void StatusChanger::createDefaultStatus()
   status->text = tr("Disconnected");
   status->priority = 0;
   status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "offline";
+  status->iconName = "status/offline";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -599,7 +599,7 @@ void StatusChanger::createDefaultStatus()
   status->text = tr("Error");
   status->priority = 0;
   status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "error";
+  status->iconName = "status/error";
   FStatusItems.insert(status->code,status);
 }
 
@@ -713,7 +713,7 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 
     Menu *scMenu = new Menu(sMenu);
     scMenu->setTitle(tr("User statuses"));
-    scMenu->setIcon(STATUS_ICONSETFILE,"ask");
+    scMenu->setIcon(STATUS_ICONSETFILE,"status/ask");
     sMenu->addAction(scMenu->menuAction(),AG_STATUSCHANGER_STATUSMENU_CUSTOM_MENU,true);
     FStreamCustomMenu.insert(APresence,scMenu);
     
@@ -1028,6 +1028,11 @@ void StatusChanger::onSkinChanged()
 {
   if (FRostersView)
     FRostersView->updateIndexLabel(FConnectingLabel,FRosterIconset.iconByName("connecting"));
+  foreach (StatusItem *statusItem, FStatusItems)
+    updateStatusActions(statusItem->code);
+  foreach (IPresence *presence, FStreamMenu.keys())
+    updateStreamMenu(presence);
+  updateMainMenu();
 }
 
 void StatusChanger::onSettingsOpened()
