@@ -30,17 +30,23 @@ void XmppStream::open()
 {
   if (FConnection && FStreamState == SS_OFFLINE)
   {
-    if (FPassword.isEmpty())
+    bool hasPassword = !FPassword.isEmpty() || !FSessionPassword.isEmpty();
+    if (!hasPassword)
     {
       FSessionPassword = QInputDialog::getText(NULL,tr("Password request"),tr("Enter password for <b>%1</b>").arg(FJid.bare()),
-        QLineEdit::Password,"",NULL,Qt::Dialog);
+        QLineEdit::Password,FSessionPassword,&hasPassword,Qt::Dialog);
     }
 
-    FStreamState = SS_CONNECTING;
-    FConnection->connectToHost();
+    if (hasPassword)
+    {
+      FStreamState = SS_CONNECTING;
+      FConnection->connectToHost();
+    }
+    else
+      emit error(this,tr("Password not specified"));
   }
   else if (!FConnection)
-   emit error(this, tr("No connection specified"));
+   emit error(this, tr("Connection not specified"));
 }
 
 void XmppStream::close()
@@ -67,6 +73,9 @@ void XmppStream::setJid(const Jid &AJid)
   {
     if (FStreamState == SS_FEATURES && !FOfflineJid.isValid())
       FOfflineJid = FJid;
+
+    if (!FJid.equals(AJid,false))
+      FSessionPassword.clear();
 
     Jid befour = FJid;
     emit jidAboutToBeChanged(this, AJid);
@@ -403,6 +412,7 @@ void XmppStream::onFeatureFinished(bool needRestart)
 
 void XmppStream::onFeatureError(const QString &AErrStr)
 {
+  FSessionPassword.clear();
   FLastError = AErrStr;
   emit error(this, AErrStr);
 
@@ -411,7 +421,7 @@ void XmppStream::onFeatureError(const QString &AErrStr)
 
 void XmppStream::onFeatureDestroyed(QObject *AFeature)
 {
-  IStreamFeature *feature = dynamic_cast<IStreamFeature *>(AFeature);
+  IStreamFeature *feature = qobject_cast<IStreamFeature *>(AFeature);
   removeFeature(feature);
 }
 
