@@ -698,7 +698,8 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 {
   if (!FStreamMenu.contains(APresence))
   {
-    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
+    Jid streamJid = APresence->streamJid();
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
 
     Menu *sMenu = new Menu(FMainMenu);
     if (account)
@@ -716,7 +717,6 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
     sMenu->addAction(scMenu->menuAction(),AG_STATUSCHANGER_STATUSMENU_CUSTOM_MENU,true);
     FStreamCustomMenu.insert(APresence,scMenu);
     
-    Jid streamJid = APresence->streamJid();
     QHash<int, StatusItem *>::const_iterator it = FStatusItems.constBegin();
     while (it != FStatusItems.constEnd())
     {
@@ -727,8 +727,9 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
       }
       it++;
     }
+    scMenu->menuAction()->setVisible(!scMenu->actions().isEmpty());
 
-    Action *action = createStatusAction(MAIN_STATUS_ID, APresence->streamJid(), sMenu);
+    Action *action = createStatusAction(MAIN_STATUS_ID, streamJid, sMenu);
     action->setData(ACTION_DR_STATUS_CODE, MAIN_STATUS_ID);
     sMenu->addAction(action,AG_STATUSCHANGER_STATUSMENU_STREAMS,true);
     FStreamMainStatusAction.insert(APresence,action);
