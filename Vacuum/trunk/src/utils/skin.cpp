@@ -149,6 +149,11 @@ void Skin::removeSkinIconset(SkinIconset *ASkinIconset)
     FSkinIconsets.removeAt(FSkinIconsets.indexOf(ASkinIconset));
 }
 
+const QString &Skin::pathToSkins()
+{
+  return FPathToSkins;
+}
+
 void Skin::setPathToSkins(const QString &APathToSkins)
 {
   if (FPathToSkins != APathToSkins)
@@ -158,9 +163,9 @@ void Skin::setPathToSkins(const QString &APathToSkins)
   }
 }
 
-const QString &Skin::pathToSkins()
+const QString &Skin::skin()
 {
-  return FPathToSkins;
+  return FSkinName;
 }
 
 void Skin::setSkin(const QString &ASkinName)
@@ -170,11 +175,6 @@ void Skin::setSkin(const QString &ASkinName)
     FSkinName = ASkinName;
     reset();
   }
-}
-
-const QString &Skin::skin()
-{
-  return FSkinName;
 }
 
 void Skin::reset()

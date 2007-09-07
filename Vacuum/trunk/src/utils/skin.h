@@ -49,10 +49,10 @@ public:
   static Iconset getDefIconset(const QString &AFileName);
   static void addSkinIconset(SkinIconset *ASkinIconset);
   static void removeSkinIconset(SkinIconset *ASkinIconset);
-  static void setPathToSkins(const QString &APathToSkins);
   static const QString &pathToSkins();
-  static void setSkin(const QString &ASkinName);
+  static void setPathToSkins(const QString &APathToSkins);
   static const QString &skin();
+  static void setSkin(const QString &ASkinName);
 protected:
   static void reset();
 private:
