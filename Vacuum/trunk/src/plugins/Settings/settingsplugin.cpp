@@ -477,6 +477,8 @@ void SettingsPlugin::setProfileClosed()
 {
   if (FProfileOpened)
   {
+    if (!FOptionsDialog.isNull())
+      FOptionsDialog->reject();
     emit profileClosed(profile());
     emit settingsClosed();
     saveSettings();
@@ -522,9 +524,6 @@ void SettingsPlugin::onOptionsDialogClosed()
 
 void SettingsPlugin::onPluginManagerQuit()
 {
-  if (!FOptionsDialog.isNull())
-    FOptionsDialog->reject();
-
   setProfileClosed();
 }
 
