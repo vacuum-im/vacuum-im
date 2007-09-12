@@ -10,7 +10,8 @@ HEADERS += utilsexport.h \
            unzipfile.h \
            iconset.h \
            skin.h \
-           message.h
+           message.h \
+           iconsetdelegate.h
 
 SOURCES += jid.cpp \
            versionparser.cpp \
@@ -23,4 +24,5 @@ SOURCES += jid.cpp \
            unzipfile.cpp \
            iconset.cpp \
            skin.cpp \
-           message.cpp
+           message.cpp \
+           iconsetdelegate.cpp
