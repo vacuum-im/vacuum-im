@@ -21,4 +21,5 @@ SUBDIRS = settings \
           compress \
           connectionmanager \
           defaultconnection \
-          starttls
+          starttls \
+          statusicons

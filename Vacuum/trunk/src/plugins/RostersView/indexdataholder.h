@@ -20,13 +20,11 @@ public:
   virtual bool setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
   virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
   virtual QList<int> roles() const;
-
-  //IndexDataHolder
+public:
   void clear();
 signals:
-  virtual void dataChanged(IRosterIndex *, int ARole);
+  virtual void dataChanged(IRosterIndex *AIndex, int ARole);
 protected:
-  QIcon statusIcon(const IRosterIndex *AIndex) const;
   QString toolTipText(const IRosterIndex *AIndex) const;
 private:
   SkinIconset FStatusIconset;

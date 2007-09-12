@@ -51,8 +51,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
           display = AIndex->data(IRosterIndex::DR_Jid).toString();
         return display;
       }
-    case Qt::DecorationRole: 
-      return statusIcon(AIndex);
     case Qt::ForegroundRole:
       return Qt::white;
     case Qt::BackgroundColorRole:
@@ -75,8 +73,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       return AIndex->data(IRosterIndex::DR_Id);
     case Qt::ForegroundRole:
       return Qt::blue;
-    //case Qt::BackgroundColorRole:
-    //  return Qt::lightGray;
     case IRosterIndex::DR_ShowGroupExpander:
       return true;
     case IRosterIndex::DR_FontWeight:
@@ -97,8 +93,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
           display += "/" + indexJid.resource();
         return display;
       }
-    case Qt::DecorationRole: 
-      return statusIcon(AIndex);
     case Qt::ToolTipRole:
       return toolTipText(AIndex);
     } 
@@ -117,8 +111,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
         }
         return display;
       }
-    case Qt::DecorationRole: 
-      return statusIcon(AIndex);
     case Qt::ToolTipRole:
       return toolTipText(AIndex);
     } 
@@ -132,8 +124,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
         Jid indexJid(AIndex->data(IRosterIndex::DR_Jid).toString());
         return indexJid.resource();
       }
-    case Qt::DecorationRole: 
-      return statusIcon(AIndex);
     case Qt::ToolTipRole:
       return toolTipText(AIndex);
     } 
@@ -145,7 +135,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
 QList<int> IndexDataHolder::roles() const
 {
   static QList<int> dataRoles  = QList<int>() << Qt::DisplayRole 
-                                              << Qt::DecorationRole 
                                               << Qt::BackgroundColorRole 
                                               << Qt::ForegroundRole
                                               << Qt::ToolTipRole
@@ -157,37 +146,6 @@ QList<int> IndexDataHolder::roles() const
 void IndexDataHolder::clear()
 {
   FData.clear();
-}
-QIcon IndexDataHolder::statusIcon(const IRosterIndex *AIndex) const
-{
-  if (!FStatusIconset.isValid())
-    return QIcon();
-
-  if (AIndex->data(IRosterIndex::DR_Ask).toString() == "subscribe")
-    return FStatusIconset.iconByName("ask");
-  if (AIndex->data(IRosterIndex::DR_Subscription).toString() == "none")
-    return FStatusIconset.iconByName("noauth");
-
-  switch (AIndex->data(IRosterIndex::DR_Show).toInt())
-  {
-  case IPresence::Offline: 
-    return FStatusIconset.iconByName("offline");
-  case IPresence::Online: 
-    return FStatusIconset.iconByName("online");
-  case IPresence::Chat: 
-    return FStatusIconset.iconByName("chat");
-  case IPresence::Away: 
-    return FStatusIconset.iconByName("away");
-  case IPresence::ExtendedAway: 
-    return FStatusIconset.iconByName("xa");
-  case IPresence::DoNotDistrib: 
-    return FStatusIconset.iconByName("dnd");
-  case IPresence::Invisible: 
-    return FStatusIconset.iconByName("invisible");
-  case IPresence::Error: 
-    return FStatusIconset.iconByName("error");
-  }
-  return QIcon();
 }
 
 QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
