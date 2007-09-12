@@ -2,6 +2,7 @@
 #define INDEXDATAHOLDER_H
 
 #include "../../interfaces/irostersmodel.h"
+#include "../../interfaces/irostersview.h"
 #include "../../utils/skin.h"
 
 class IndexDataHolder : 
@@ -22,11 +23,14 @@ public:
   virtual QList<int> roles() const;
 public:
   void clear();
+  bool checkOption(IRostersView::Option AOption) const;
+  void setOption(IRostersView::Option AOption, bool AValue);
 signals:
   virtual void dataChanged(IRosterIndex *AIndex, int ARole);
 protected:
   QString toolTipText(const IRosterIndex *AIndex) const;
 private:
+  int FOptions;
   SkinIconset FStatusIconset;
   QHash<const IRosterIndex *,QHash<int,QVariant> > FData;
 };

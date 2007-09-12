@@ -1,0 +1,61 @@
+<ui version="4.0" >
+ <class>RosterOptionsWidgetClass</class>
+ <widget class="QWidget" name="RosterOptionsWidgetClass" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>365</width>
+    <height>90</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>RosterOptionsWidget</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="chbShowOfflineContacts" >
+     <property name="text" >
+      <string>Show offline contacts</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbShowOnlineFirst" >
+     <property name="text" >
+      <string>Show online contacts first</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbShowFooterText" >
+     <property name="text" >
+      <string>Show footer text</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbShowResource" >
+     <property name="text" >
+      <string>Show resource in roster</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <resources/>
+ <connections/>
+</ui>

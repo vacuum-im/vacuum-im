@@ -3,5 +3,6 @@
 
 #define ON_ACCOUNTS                                 "Accounts"
 #define ON_STATUSICONS                              "StatusIcons"
+#define ON_ROSTER                                   "Roster"
 
 #endif

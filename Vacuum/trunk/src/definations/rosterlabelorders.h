@@ -4,6 +4,9 @@
 #define RLID_NULL                                 -1
 #define RLID_DISPLAY                              0
 
+#define RLO_GROUPEXPANDED                         -1500
+#define RLO_GROUPCOLLAPSED                        -1500
+
 #define RLO_DECORATION                            -1024
 
 #define RLO_CONNECTING                            -1000

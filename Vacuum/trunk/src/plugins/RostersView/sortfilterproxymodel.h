@@ -2,6 +2,7 @@
 #define SORTFILTERPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
+#include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/ipresence.h"
 
@@ -14,16 +15,13 @@ public:
   SortFilterProxyModel(QObject *parent = NULL);
   ~SortFilterProxyModel();
   virtual void setSourceModel(QAbstractItemModel *ASourceModel);
-  bool showOffline() const { return FShowOffline; }
-  void setShowOffline(bool AShow);
-  bool sortByStatus() const { return FSortByStatus; }
-  void setSortByStatus(bool ASortByStatus);
+  bool checkOption(IRostersView::Option AOption) const;
+  void setOption(IRostersView::Option AOption, bool AValue);
 protected:
   virtual bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
   bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const;
 private:
-  bool FShowOffline;
-  bool FSortByStatus;
+  int FOptions;
 };
 
 #endif // SORTFILTERPROXYMODEL_H

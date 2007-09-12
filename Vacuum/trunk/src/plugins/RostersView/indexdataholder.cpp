@@ -4,6 +4,7 @@ IndexDataHolder::IndexDataHolder(QObject *AParent) :
   QObject(AParent)
 {
   FStatusIconset.openFile(STATUS_ICONSETFILE);
+  FOptions = 0;
 }
 
 IndexDataHolder::~IndexDataHolder()
@@ -73,8 +74,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       return AIndex->data(IRosterIndex::DR_Id);
     case Qt::ForegroundRole:
       return Qt::blue;
-    case IRosterIndex::DR_ShowGroupExpander:
-      return true;
     case IRosterIndex::DR_FontWeight:
       return QFont::DemiBold;
     } 
@@ -89,7 +88,7 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
         QString display = AIndex->data(IRosterIndex::DR_Name).toString();
         if (display.isEmpty())
           display = indexJid.bare();
-        if (!indexJid.resource().isEmpty())
+        if (checkOption(IRostersView::ShowResource) && !indexJid.resource().isEmpty())
           display += "/" + indexJid.resource();
         return display;
       }
@@ -138,8 +137,7 @@ QList<int> IndexDataHolder::roles() const
                                               << Qt::BackgroundColorRole 
                                               << Qt::ForegroundRole
                                               << Qt::ToolTipRole
-                                              << IRosterIndex::DR_FontWeight
-                                              << IRosterIndex::DR_ShowGroupExpander;
+                                              << IRosterIndex::DR_FontWeight;
   return dataRoles;
 }
 
@@ -147,6 +145,17 @@ void IndexDataHolder::clear()
 {
   FData.clear();
 }
+
+bool IndexDataHolder::checkOption(IRostersView::Option AOption) const
+{
+  return (FOptions & AOption) > 0;
+}
+
+void IndexDataHolder::setOption(IRostersView::Option AOption, bool AValue)
+{
+  AValue ? FOptions |= AOption : FOptions &= ~AOption;
+}
+
 
 QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
 {
@@ -179,3 +188,4 @@ QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
   toolTip.chop(4);
   return toolTip;
 }
+

@@ -6,8 +6,7 @@
 SortFilterProxyModel::SortFilterProxyModel(QObject *parent)
   : QSortFilterProxyModel(parent)
 {
-  FShowOffline = true;
-  FSortByStatus = true;
+  FOptions = 0;
 }
 
 SortFilterProxyModel::~SortFilterProxyModel()
@@ -20,25 +19,17 @@ void SortFilterProxyModel::setSourceModel(QAbstractItemModel *ASourceModel)
   QSortFilterProxyModel::setSourceModel(ASourceModel);
 }
 
-void SortFilterProxyModel::setShowOffline(bool AShow)
+bool SortFilterProxyModel::checkOption(IRostersView::Option AOption) const
 {
-  if (FShowOffline != AShow)
-  {
-    FShowOffline = AShow;
-    filterChanged();
-    clear();
-  }
+  return (FOptions & AOption) == AOption;
 }
 
-void SortFilterProxyModel::setSortByStatus(bool ASortByStatus)
+void SortFilterProxyModel::setOption(IRostersView::Option AOption, bool AValue)
 {
-  if (FSortByStatus != ASortByStatus)
-  {
-    FSortByStatus = ASortByStatus;
-    clear();
-  }
+  AValue ? FOptions |= AOption : FOptions &= ~AOption;
+  filterChanged();
+  clear();
 }
-
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
@@ -48,7 +39,8 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
   {
     int leftShow = ALeft.data(IRosterIndex::DR_Show).toInt();
     int rightShow = ARight.data(IRosterIndex::DR_Show).toInt();
-    if (FSortByStatus && leftType != IRosterIndex::IT_StreamRoot && leftShow != rightShow)
+    bool showOnlineFirst = checkOption(IRostersView::ShowOnlineFirst);
+    if (showOnlineFirst && leftType != IRosterIndex::IT_StreamRoot && leftShow != rightShow)
     {
       if (leftShow == IPresence::Offline)
         return true;
@@ -66,7 +58,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
 {
-  if (FShowOffline)
+  if (checkOption(IRostersView::ShowOfflineContacts))
     return true;
 
   QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);

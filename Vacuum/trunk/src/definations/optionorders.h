@@ -9,4 +9,7 @@
 //Node = "StatusIcons"
 #define OO_STATUSICONS                            500
 
+//Node = "Roster"
+#define OO_ROSTER                                 500
+
 #endif

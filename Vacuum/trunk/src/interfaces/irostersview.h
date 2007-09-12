@@ -18,8 +18,14 @@ class IRostersView :
   virtual public QTreeView
 {
 public:
+  enum Option {
+    ShowOfflineContacts           =1,
+    ShowOnlineFirst               =2,
+    ShowFooterText                =4,
+    ShowResource                  =8
+  };
   enum LabelFlags {
-    LabelBlink        =0x1
+    LabelBlink                    =1
   };
 public:
   virtual QObject *instance() = 0;
@@ -48,6 +54,9 @@ public:
   virtual void insertClickHooker(int AHookerId, IRosterIndex *AIndex) =0;
   virtual void removeClickHooker(int AHookerId, IRosterIndex *AIndex) =0;
   virtual void destroyClickHooker(int AHookerId) =0;
+  //--FooterText
+  virtual void insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex) =0;
+  virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *) =0;
   virtual void modelSeted(IRostersModel *) =0;
@@ -69,13 +78,14 @@ class IRostersViewPlugin
 public:
   virtual QObject *instance() = 0;
   virtual IRostersView *rostersView() =0;
-  virtual bool showOfflineContacts() const =0;
+  virtual bool checkOption(IRostersView::Option AOption) const =0;
+  virtual void setOption(IRostersView::Option AOption, bool AValue) =0;
 public slots:
-  virtual void setShowOfflineContacts(bool AShow) =0;
+  virtual void setOptionByAction(bool) =0;
 signals:
   virtual void viewCreated(IRostersView *) =0;
   virtual void viewDestroyed(IRostersView *) =0;
-  virtual void showOfflineContactsChanged(bool) =0;
+  virtual void optionChanged(IRostersView::Option AOption, bool AValue) =0;
 };
 
 Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.0");

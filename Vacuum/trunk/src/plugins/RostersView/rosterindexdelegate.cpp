@@ -12,6 +12,7 @@ RosterIndexDelegate::RosterIndexDelegate(QObject *AParent)
   : QAbstractItemDelegate(AParent)
 {
   FShowBlinkLabels = true;
+  FOptions = 0;
 }
 
 RosterIndexDelegate::~RosterIndexDelegate()
@@ -31,6 +32,8 @@ void RosterIndexDelegate::paint(QPainter *APainter,
   const Qt::Alignment right = Qt::AlignRight | Qt::AlignTop;
   const int halfTextMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) >> 1;
   
+  int footHeightUsed = 0;
+  int footLeftSpace = 0;
   QRect usedRect;
   QRect freeRect = option.rect.adjusted(halfTextMargin,halfTextMargin,-halfTextMargin,-halfTextMargin);
 
@@ -64,6 +67,25 @@ void RosterIndexDelegate::paint(QPainter *APainter,
         freeRect.setLeft(usedRect.right()+spacing);
       else
         freeRect.setRight(usedRect.left()-spacing);
+      footHeightUsed = qMax(footHeightUsed,usedRect.height());
+      if (it.key() == RLO_DECORATION)
+        footLeftSpace = usedRect.right()-option.rect.left()+spacing;
+    }
+  }
+
+  bool showFooter = checkOption(IRostersView::ShowFooterText); 
+  if (showFooter)
+  {
+    freeRect = option.rect.adjusted(halfTextMargin+footLeftSpace,halfTextMargin+footHeightUsed,-halfTextMargin,-halfTextMargin);
+    option = setFooterOptions(AIndex,option);
+    QMap<QString,QVariant> footerMap = AIndex.data(IRosterIndex::DR_FooterText).toMap();
+    QMap<QString,QVariant>::const_iterator fit = footerMap.constBegin();
+    while (fit != footerMap.constEnd() && !freeRect.isEmpty())
+    {
+      APainter->setClipRect(freeRect);
+      usedRect = drawVariant(APainter,option,freeRect,fit.value());
+      freeRect.setTop(usedRect.bottom());
+      fit++;
     }
   }
 
@@ -80,6 +102,7 @@ QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption,
 
   int width = 0;
   int height = 0;
+  int footLeftSpace = 0;
   const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin);
 
   LabelsMap map = labelsMap(AIndex);
@@ -88,6 +111,23 @@ QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption,
     QSize size = variantSize(option,it.value().second);
     width += size.width() + spacing;
     height = qMax(height,size.height());
+    if (it.key() == RLO_DECORATION)
+      footLeftSpace = width;
+  }
+
+  bool showFooter = checkOption(IRostersView::ShowFooterText); 
+  if (showFooter)
+  {
+    option = setFooterOptions(AIndex,option);
+    QMap<QString,QVariant> footerMap = AIndex.data(IRosterIndex::DR_FooterText).toMap();
+    QMap<QString,QVariant>::const_iterator fit = footerMap.constBegin();
+    while (fit != footerMap.constEnd())
+    {
+      QSize size = variantSize(option,fit.value());
+      width += qMax(width, size.width() + footLeftSpace);
+      height = height + size.height();
+      fit++;
+    }
   }
 
   return QSize(width+textMargin,height+textMargin); 
@@ -182,6 +222,16 @@ QRect RosterIndexDelegate::labelRect(int ALabelId, const QStyleOptionViewItem &A
     }
   }
   return QRect();
+}
+
+bool RosterIndexDelegate::checkOption(IRostersView::Option AOption) const
+{
+  return (FOptions & AOption) > 0;
+}
+
+void RosterIndexDelegate::setOption(IRostersView::Option AOption, bool AValue)
+{
+  AValue ? FOptions |= AOption : FOptions &= ~AOption;
 }
 
 QRect RosterIndexDelegate::drawVariant(QPainter *APainter, const QStyleOptionViewItem &AOption, 
@@ -344,6 +394,18 @@ QStyleOptionViewItem RosterIndexDelegate::setOptions(const QModelIndex &AIndex,
   data = AIndex.data(IRosterIndex::DR_FontUnderline);
   if (data.isValid())
     option.font.setUnderline(data.toBool());
+
+  return option;
+}
+
+QStyleOptionViewItem RosterIndexDelegate::setFooterOptions(const QModelIndex &/*AIndex*/, 
+                                                           const QStyleOptionViewItem &AOption) const
+{
+  QStyleOptionViewItem option = AOption;
+
+  option.font.setPointSize(option.font.pointSize()-1);
+  option.font.setBold(false);
+  option.font.setItalic(true);
 
   return option;
 }

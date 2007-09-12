@@ -10,6 +10,7 @@ RostersView::RostersView(QWidget *AParent)
 {
   FLabelId = 1;
   FHookerId = 1;
+  FOptions = 0;
 
   FRostersModel = NULL;
   FPressedLabel = RLID_DISPLAY;
@@ -349,15 +350,36 @@ void RostersView::destroyClickHooker(int AHookerId)
   }
 }
 
-void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
+void RostersView::insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex)
 {
-  QVariant data = AIndex.data(Qt::BackgroundRole);
-  if (qVariantCanConvert<QBrush>(data))
-  {
-    QRect rect(ARect.right()-indentation(),ARect.top(),indentation()+1,ARect.height());
-    APainter->fillRect(rect, qvariant_cast<QBrush>(data));
-  }
+  QString footerId = intId2StringId(AOrderAndId);
+  QMap<QString,QVariant> footerMap = AIndex->data(IRosterIndex::DR_FooterText).toMap();
+  footerMap.insert(footerId, AText);
+  AIndex->setData(IRosterIndex::DR_FooterText,footerMap);
+}
 
+void RostersView::removeFooterText(int AOrderAndId, IRosterIndex *AIndex)
+{
+  QString footerId = intId2StringId(AOrderAndId);
+  QMap<QString,QVariant> footerMap = AIndex->data(IRosterIndex::DR_FooterText).toMap();
+  footerMap.remove(footerId);
+  AIndex->setData(IRosterIndex::DR_FooterText,footerMap);
+}
+
+bool RostersView::checkOption(IRostersView::Option AOption) const
+{
+  return (FOptions & AOption) > 0;
+}
+
+void RostersView::setOption(IRostersView::Option AOption, bool AValue)
+{
+  AValue ? FOptions |= AOption : FOptions &= ~AOption;
+  FRosterIndexDelegate->setOption(AOption,AValue);
+  FIndexDataHolder->setOption(AOption,AValue);
+}
+
+void RostersView::drawBranches(QPainter * APainter, const QRect &ARect, const QModelIndex &AIndex) const
+{
   QTreeView::drawBranches(APainter,ARect,AIndex);
 }
 
@@ -412,6 +434,11 @@ void RostersView::removeBlinkLabel(int ALabelId)
   FRosterIndexDelegate->removeBlinkLabel(ALabelId);
   if (FBlinkLabels.isEmpty() && FBlinkTimer.isActive())
     FBlinkTimer.stop();
+}
+
+QString RostersView::intId2StringId(int AIntId)
+{
+  return QString("%1").arg(AIntId,10,10,QLatin1Char('0'));
 }
 
 bool RostersView::viewportEvent(QEvent *AEvent)

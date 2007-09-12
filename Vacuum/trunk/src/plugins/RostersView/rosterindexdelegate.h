@@ -28,6 +28,8 @@ public:
   void appendBlinkLabel(int ALabelId) { FBlinkLabels+=ALabelId; }
   void removeBlinkLabel(int ALabelId) { FBlinkLabels-=ALabelId; }
   void setShowBlinkLabels(bool AShow) { FShowBlinkLabels = AShow; }
+  bool checkOption(IRostersView::Option AOption) const;
+  void setOption(IRostersView::Option AOption, bool AValue);
 protected:
   QRect drawVariant(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QRect &ARect, const QVariant &AValue) const;
@@ -37,6 +39,8 @@ protected:
     const QRect &ARect) const;
   LabelsMap labelsMap(const QModelIndex &AIndex) const;
   QStyleOptionViewItem setOptions(const QModelIndex &AIndex,
+    const QStyleOptionViewItem &AOption) const;
+  QStyleOptionViewItem setFooterOptions(const QModelIndex &AIndex,
     const QStyleOptionViewItem &AOption) const;
   QSize variantSize(const QStyleOptionViewItem &AOption, const QVariant &AValue) const;
   QRect variantRect(const QStyleOptionViewItem &AOption, const QRect &ARect, const QVariant &AValue) const;
@@ -48,6 +52,8 @@ private:
 private:
   QSet<int> FBlinkLabels;
   bool FShowBlinkLabels;
+private: //Options
+  int FOptions;
 };
 
 #endif // ROSTERINDEXDELEGATE_H

@@ -52,6 +52,9 @@ public:
   virtual void insertClickHooker(int AHookerId, IRosterIndex *AIndex);
   virtual void removeClickHooker(int AHookerId, IRosterIndex *AIndex);
   virtual void destroyClickHooker(int AHookerId);
+  //--FooterText
+  virtual void insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex);
+  virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *);
   virtual void modelSeted(IRostersModel *);
@@ -65,12 +68,16 @@ signals:
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   virtual void labelClicked(IRosterIndex *AIndex, int ALabelId);
   virtual void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
+public:
+  bool checkOption(IRostersView::Option AOption) const;
+  void setOption(IRostersView::Option AOption, bool AValue);
 protected:
   void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   void contextMenuEvent(QContextMenuEvent *AEvent);
   QStyleOptionViewItemV2 indexOption(const QModelIndex &AIndex) const;
   void appendBlinkLabel(int ALabelId);
   void removeBlinkLabel(int ALabelId);
+  QString intId2StringId(int AIntId);
   //QAbstractItemView
   virtual bool viewportEvent(QEvent *AEvent);
   virtual void mouseDoubleClickEvent(QMouseEvent *AEvent);
@@ -107,6 +114,7 @@ private:
   };
   QList<ClickHookerItem *> FClickHookerItems;
 private:
+  int FOptions;
   IndexDataHolder *FIndexDataHolder;
   RosterIndexDelegate *FRosterIndexDelegate;
   QList<QAbstractProxyModel *> FProxyModels;

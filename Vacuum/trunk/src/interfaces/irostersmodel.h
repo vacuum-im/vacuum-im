@@ -61,7 +61,7 @@ public:
     DR_Subscription,
     DR_Ask,
     //Decoration
-    DR_ShowGroupExpander,
+    DR_HideGroupExpander,
     DR_FontHint,
     DR_FontSize,
     DR_FontWeight,
@@ -71,6 +71,7 @@ public:
     DR_LabelOrders,
     DR_LabelValues,
     DR_LabelFlags,
+    DR_FooterText,
     //User roles
     DR_UserDefined = Qt::UserRole + 64,
     DR_UserDynamic = DR_UserDefined + 1048576
