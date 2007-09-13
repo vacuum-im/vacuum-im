@@ -349,18 +349,26 @@ void RostersView::destroyClickHooker(int AHookerId)
 
 void RostersView::insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex)
 {
-  QString footerId = intId2StringId(AOrderAndId);
-  QMap<QString,QVariant> footerMap = AIndex->data(RDR_FooterText).toMap();
-  footerMap.insert(footerId, AText);
-  AIndex->setData(RDR_FooterText,footerMap);
+  if (!AText.isEmpty())
+  {
+    QString footerId = intId2StringId(AOrderAndId);
+    QMap<QString,QVariant> footerMap = AIndex->data(RDR_FooterText).toMap();
+    footerMap.insert(footerId, AText);
+    AIndex->setData(RDR_FooterText,footerMap);
+  } 
+  else 
+    removeFooterText(AOrderAndId,AIndex);
 }
 
 void RostersView::removeFooterText(int AOrderAndId, IRosterIndex *AIndex)
 {
   QString footerId = intId2StringId(AOrderAndId);
   QMap<QString,QVariant> footerMap = AIndex->data(RDR_FooterText).toMap();
-  footerMap.remove(footerId);
-  AIndex->setData(RDR_FooterText,footerMap);
+  if (footerMap.contains(footerId))
+  {
+    footerMap.remove(footerId);
+    AIndex->setData(RDR_FooterText,footerMap);
+  }
 }
 
 bool RostersView::checkOption(IRostersView::Option AOption) const
