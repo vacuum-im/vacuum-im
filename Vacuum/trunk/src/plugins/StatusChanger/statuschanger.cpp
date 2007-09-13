@@ -19,6 +19,8 @@
 #define SVN_STATUS_ICONSET                  "status[]:iconset"
 #define SVN_STATUS_ICON_NAME                "status[]:iconName"
 
+#define FTO_STATUS                          100
+
 StatusChanger::StatusChanger()
 {
   FConnectingLabel = RLID_NULL;
@@ -619,6 +621,18 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
     FStreamStatus[APresence] = AStatusId;
     if (AStatusId > MAX_TEMP_STATUS_ID)
       removeTempStatus(APresence);
+
+    if (FRostersView && FRostersModel)
+    {
+      IRosterIndex *index = FRostersModel->getStreamRoot(APresence->streamJid());
+      if (index)
+      {
+        if (APresence->show() == IPresence::Error)
+          FRostersView->insertFooterText(FTO_STATUS,APresence->status(),index);
+        else
+          FRostersView->removeFooterText(FTO_STATUS,index);
+      }
+    }
   }
 }
 
@@ -1009,9 +1023,9 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
 
 void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
+  if (AIndex->data(RDR_Type).toInt() == RIT_StreamRoot)
   {
-    QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
+    QString streamJid = AIndex->data(RDR_StreamJid).toString();
     Menu *menu = FStreamMenu.count() > 1 ? streamMenu(streamJid) : FMainMenu;
     if (menu)
     {
