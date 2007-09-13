@@ -6,6 +6,7 @@
 #include <QTimer>
 #include "../../definations/tooltiporders.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
@@ -84,7 +85,6 @@ protected:
   virtual void mousePressEvent(QMouseEvent *AEvent);
   virtual void mouseReleaseEvent(QMouseEvent *AEvent);
 protected slots:
-  void onIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
   void onIndexRemoved(IRosterIndex *AIndex);
   void onBlinkTimer();
 private:

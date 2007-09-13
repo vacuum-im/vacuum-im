@@ -1,6 +1,7 @@
 #ifndef ROSTERSMODEL_H
 #define ROSTERSMODEL_H
 
+#include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../utils/jid.h"
 #include "rosterindex.h"
@@ -37,11 +38,13 @@ public:
   virtual IRosterIndex *getStreamRoot(const Jid &AStreamJid) const;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent);
   virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent);
+  virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);
+  virtual void removeRosterIndex(IRosterIndex *AIndex);
+  virtual void insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder);
+  virtual void removeDefaultDataHolder(IRosterIndexDataHolder *ADataHolder);
   virtual IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false);
   virtual IRosterIndex *findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const;
   virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const;
-  virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);
-  virtual void removeRosterIndex(IRosterIndex *AIndex);
   virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex);
   virtual QString blankGroupName() const { return tr("Blank Group"); }
   virtual QString agentsGroupName() const { return tr("Agents"); }
@@ -55,8 +58,11 @@ signals:
   virtual void indexInserted(IRosterIndex *);
   virtual void indexDataChanged(IRosterIndex *, int ARole);
   virtual void indexRemoved(IRosterIndex *);
+  virtual void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder);
+  virtual void defaultDataHolderRemoved(IRosterIndexDataHolder *ADataHolder);
 protected:
   void emitDelayedDataChanged(IRosterIndex *AIndex);
+  void insertDefaultDataHolders(IRosterIndex *AIndex);
 protected slots:
   void onStreamJidChanged(IXmppStream *AXmppStream,const Jid &ABefour);
   void onRosterItemPush(IRosterItem *ARosterItem);
@@ -78,6 +84,7 @@ private:
   RosterIndex *FRootIndex;
   QHash<QString,StreamItem> FStreams;
   QSet<IRosterIndex *> FChangedIndexes;
+  QList<IRosterIndexDataHolder *> FDataHolders;
 };
 
 #endif // ROSTERSMODEL_H

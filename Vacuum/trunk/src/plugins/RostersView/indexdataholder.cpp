@@ -12,44 +12,42 @@ IndexDataHolder::~IndexDataHolder()
 
 }
 
-bool IndexDataHolder::setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+QList<int> IndexDataHolder::roles() const
 {
-  QHash<int,QVariant> &values = FData[AIndex];
-  if (AValue.isValid())
-  {
-    QVariant oldValue = values.value(ARole,AValue);
-    values.insert(ARole,AValue);
-    if (oldValue != AValue)
-      emit dataChanged(AIndex,ARole);
-  }
-  else
-  {
-    QVariant oldValue = values.value(ARole,AValue);
-    values.remove(ARole);
-    if (values.isEmpty())
-      FData.remove(AIndex);
-    if (oldValue != AValue)
-      emit dataChanged(AIndex,ARole);
-  }
-  return true;     
+  static QList<int> dataRoles  = QList<int>() << Qt::DisplayRole 
+    << Qt::BackgroundColorRole 
+    << Qt::ForegroundRole
+    << Qt::ToolTipRole
+    << RDR_FontWeight;
+  return dataRoles;
+}
+
+QList<int> IndexDataHolder::types() const
+{
+  static QList<int> indexTypes  = QList<int>()  << RIT_StreamRoot 
+    << RIT_Group
+    << RIT_BlankGroup
+    << RIT_AgentsGroup
+    << RIT_MyResourcesGroup
+    << RIT_NotInRosterGroup
+    << RIT_Contact
+    << RIT_Agent
+    << RIT_MyResource;
+  return indexTypes;
 }
 
 QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
 {
-  QVariant result = FData.value(AIndex).value(ARole);
-  if (result.isValid())
-    return result;
-
   switch (AIndex->type())
   {
-  case IRosterIndex::IT_StreamRoot:
+  case RIT_StreamRoot:
     switch (ARole)
     {
     case Qt::DisplayRole:  
       {
-        QString display = AIndex->data(IRosterIndex::DR_Name).toString();
+        QString display = AIndex->data(RDR_Name).toString();
         if (display.isEmpty())
-          display = AIndex->data(IRosterIndex::DR_Jid).toString();
+          display = AIndex->data(RDR_Jid).toString();
         return display;
       }
     case Qt::ForegroundRole:
@@ -58,34 +56,34 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       return Qt::darkGray;
     case Qt::ToolTipRole:
       return toolTipText(AIndex);
-    case IRosterIndex::DR_FontWeight:
+    case RDR_FontWeight:
       return QFont::Bold;
     } 
     break;
   
-  case IRosterIndex::IT_Group:
-  case IRosterIndex::IT_BlankGroup:
-  case IRosterIndex::IT_AgentsGroup:
-  case IRosterIndex::IT_MyResourcesGroup:
-  case IRosterIndex::IT_NotInRosterGroup:
+  case RIT_Group:
+  case RIT_BlankGroup:
+  case RIT_AgentsGroup:
+  case RIT_MyResourcesGroup:
+  case RIT_NotInRosterGroup:
     switch (ARole)
     {
     case Qt::DisplayRole:  
-      return AIndex->data(IRosterIndex::DR_Id);
+      return AIndex->data(RDR_Id);
     case Qt::ForegroundRole:
       return Qt::blue;
-    case IRosterIndex::DR_FontWeight:
+    case RDR_FontWeight:
       return QFont::DemiBold;
     } 
     break;
   
-  case IRosterIndex::IT_Contact:
+  case RIT_Contact:
     switch (ARole)
     {
     case Qt::DisplayRole: 
       {
-        Jid indexJid(AIndex->data(IRosterIndex::DR_Jid).toString());
-        QString display = AIndex->data(IRosterIndex::DR_Name).toString();
+        Jid indexJid(AIndex->data(RDR_Jid).toString());
+        QString display = AIndex->data(RDR_Name).toString();
         if (display.isEmpty())
           display = indexJid.bare();
         if (checkOption(IRostersView::ShowResource) && !indexJid.resource().isEmpty())
@@ -97,15 +95,15 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
     } 
     break;
   
-  case IRosterIndex::IT_Agent:
+  case RIT_Agent:
     switch (ARole)
     {
     case Qt::DisplayRole:
       {
-        QString display = AIndex->data(IRosterIndex::DR_Name).toString();
+        QString display = AIndex->data(RDR_Name).toString();
         if (display.isEmpty())
         {
-          Jid indexJid(AIndex->data(IRosterIndex::DR_Jid).toString());
+          Jid indexJid(AIndex->data(RDR_Jid).toString());
           display = indexJid.bare();
         }
         return display;
@@ -115,12 +113,12 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
     } 
     break;
    
-  case IRosterIndex::IT_MyResource:
+  case RIT_MyResource:
     switch (ARole)
     {
     case Qt::DisplayRole:
       {
-        Jid indexJid(AIndex->data(IRosterIndex::DR_Jid).toString());
+        Jid indexJid(AIndex->data(RDR_Jid).toString());
         return indexJid.resource();
       }
     case Qt::ToolTipRole:
@@ -129,21 +127,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
     break;
  }
  return QVariant();
-}
-
-QList<int> IndexDataHolder::roles() const
-{
-  static QList<int> dataRoles  = QList<int>() << Qt::DisplayRole 
-                                              << Qt::BackgroundColorRole 
-                                              << Qt::ForegroundRole
-                                              << Qt::ToolTipRole
-                                              << IRosterIndex::DR_FontWeight;
-  return dataRoles;
-}
-
-void IndexDataHolder::clear()
-{
-  FData.clear();
 }
 
 bool IndexDataHolder::checkOption(IRostersView::Option AOption) const
@@ -161,27 +144,27 @@ QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
 {
   QString toolTip;
   QString mask = "<b>%1:</b> %2<br>";
-  QString val = AIndex->data(IRosterIndex::DR_Name).toString();
+  QString val = AIndex->data(RDR_Name).toString();
   if (!val.isEmpty())
     toolTip.append(mask.arg(tr("Name")).arg(val));
 
-  val = AIndex->data(IRosterIndex::DR_Jid).toString();
+  val = AIndex->data(RDR_Jid).toString();
   if (!val.isEmpty())
     toolTip.append(mask.arg(tr("Jid")).arg(val));
 
-  val = AIndex->data(IRosterIndex::DR_Status).toString();
+  val = AIndex->data(RDR_Status).toString();
   if (!val.isEmpty())
     toolTip.append(mask.arg(tr("Status")).arg(val));
 
-  val = AIndex->data(IRosterIndex::DR_Priority).toString();
+  val = AIndex->data(RDR_Priority).toString();
   if (!val.isEmpty())
     toolTip.append(mask.arg(tr("Priority")).arg(val));
 
-  val = AIndex->data(IRosterIndex::DR_Subscription).toString();
+  val = AIndex->data(RDR_Subscription).toString();
   if (!val.isEmpty())
     toolTip.append(mask.arg(tr("Subscription")).arg(val));
 
-  val = AIndex->data(IRosterIndex::DR_Ask).toString();
+  val = AIndex->data(RDR_Ask).toString();
   if (!val.isEmpty())
     toolTip.append(mask.arg(tr("Ask")).arg(val));
 

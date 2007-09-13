@@ -316,16 +316,16 @@ void RosterChanger::removeSubsMessage(int ASubsId)
 
 void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
+  QString streamJid = AIndex->data(RDR_StreamJid).toString();
   IRoster *roster = FRosterPlugin->getRoster(streamJid);
   if (roster && roster->isOpen())
   {
-    int itemType = AIndex->data(IRosterIndex::DR_Type).toInt();
-    IRosterItem *rosterItem = roster->item(AIndex->data(IRosterIndex::DR_BareJid).toString());
-    if (itemType == IRosterIndex::IT_StreamRoot)
+    int itemType = AIndex->data(RDR_Type).toInt();
+    IRosterItem *rosterItem = roster->item(AIndex->data(RDR_BareJid).toString());
+    if (itemType == RIT_StreamRoot)
     {
       QHash<int,QVariant> data;
-      data.insert(Action::DR_StreamJid,AIndex->data(IRosterIndex::DR_Jid));
+      data.insert(Action::DR_StreamJid,AIndex->data(RDR_Jid));
 
       Action *action = new Action(AMenu);
       action->setText(tr("Add contact..."));
@@ -334,11 +334,11 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
       AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER_ADD_CONTACT,true);
     }
-    else if (itemType == IRosterIndex::IT_Contact || itemType == IRosterIndex::IT_Agent)
+    else if (itemType == RIT_Contact || itemType == RIT_Agent)
     {
       QHash<int,QVariant> data;
       data.insert(Action::DR_StreamJid,streamJid);
-      data.insert(Action::DR_Parametr1,AIndex->data(IRosterIndex::DR_BareJid));
+      data.insert(Action::DR_Parametr1,AIndex->data(RDR_BareJid));
       
       Action *action;
 
@@ -379,8 +379,8 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       {
         QSet<QString> exceptGroups = rosterItem->groups();
 
-        data.insert(Action::DR_Parametr2,AIndex->data(IRosterIndex::DR_Name));
-        data.insert(Action::DR_Parametr3,AIndex->data(IRosterIndex::DR_Group));
+        data.insert(Action::DR_Parametr2,AIndex->data(RDR_Name));
+        data.insert(Action::DR_Parametr3,AIndex->data(RDR_Group));
 
         action = new Action(AMenu);
         action->setText(tr("Rename..."));
@@ -388,7 +388,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
         connect(action,SIGNAL(triggered(bool)),SLOT(onRenameItem(bool)));
         AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER);
 
-        if (itemType == IRosterIndex::IT_Contact)
+        if (itemType == RIT_Contact)
         {
           Menu *copyItem = createGroupMenu(data,exceptGroups,true,false,SLOT(onCopyItemToGroup(bool)),AMenu);
           copyItem->setTitle(tr("Copy to group"));
@@ -399,7 +399,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
           AMenu->addAction(moveItem->menuAction(),AG_ROSTERCHANGER_ROSTER);
         }
 
-        if (!AIndex->data(IRosterIndex::DR_Group).toString().isEmpty())
+        if (!AIndex->data(RDR_Group).toString().isEmpty())
         {
           action = new Action(AMenu);
           action->setText(tr("Remove from group"));
@@ -414,7 +414,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
         action->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
         action->setText(tr("Add contact..."));
         action->setData(Action::DR_StreamJid,streamJid);
-        action->setData(Action::DR_Parametr1,AIndex->data(IRosterIndex::DR_Jid));
+        action->setData(Action::DR_Parametr1,AIndex->data(RDR_Jid));
         connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
         AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER_ADD_CONTACT,true);
       }
@@ -425,10 +425,10 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemFromRoster(bool)));
       AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER);
     }
-    else if (itemType == IRosterIndex::IT_Group)
+    else if (itemType == RIT_Group)
     {
       QHash<int,QVariant> data;
-      data.insert(Action::DR_Parametr1,AIndex->data(IRosterIndex::DR_Group));
+      data.insert(Action::DR_Parametr1,AIndex->data(RDR_Group));
       data.insert(Action::DR_StreamJid,streamJid);
       
       Action *action;
@@ -439,7 +439,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER);
 
       QSet<QString> exceptGroups;
-      exceptGroups << AIndex->data(IRosterIndex::DR_Group).toString();
+      exceptGroups << AIndex->data(RDR_Group).toString();
 
       Menu *copyGroup = createGroupMenu(data,exceptGroups,true,true,SLOT(onCopyGroupToGroup(bool)),AMenu);
       copyGroup->setTitle(tr("Copy to group"));
@@ -626,9 +626,9 @@ void RosterChanger::onRemoveItemFromRoster(bool)
       else if (FRostersModel)
       {
         QMultiHash<int, QVariant> data;
-        data.insert(IRosterIndex::DR_Type,IRosterIndex::IT_Contact);
-        data.insert(IRosterIndex::DR_Type,IRosterIndex::IT_Agent);
-        data.insert(IRosterIndex::DR_BareJid,rosterJid);
+        data.insert(RDR_Type,RIT_Contact);
+        data.insert(RDR_Type,RIT_Agent);
+        data.insert(RDR_BareJid,rosterJid);
         IRosterIndex *streamRoot = FRostersModel->getStreamRoot(streamJid);
         IRosterIndexList indexList = streamRoot->findChild(data,true);
         foreach(IRosterIndex *index, indexList)
@@ -835,8 +835,8 @@ void RosterChanger::onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bo
   if (ALabelId == FSubsLabelId)
   {
     AAccepted = true;
-    Jid sJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
-    Jid cJid = AIndex->data(IRosterIndex::DR_BareJid).toString();
+    Jid sJid = AIndex->data(RDR_StreamJid).toString();
+    Jid cJid = AIndex->data(RDR_BareJid).toString();
     QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
     while (it != FSubsItems.end())
     {

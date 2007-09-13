@@ -5,6 +5,7 @@
 #include "../../definations/actiongroups.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"

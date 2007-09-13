@@ -2,16 +2,12 @@
 #include "rosterindex.h"
 #include <QTimer>
 
-int IRosterIndex::FNewType = IRosterIndex::IT_UserDynamic + 1;
-int IRosterIndex::FNewRole = IRosterIndex::DR_UserDynamic + 1;
-
 RosterIndex::RosterIndex(int AType, const QString &AId)
 {
   FParentIndex = NULL;
-  FData.insert(DR_Type,AType);
-  FData.insert(DR_Id,AId);
+  FData.insert(RDR_Type,AType);
+  FData.insert(RDR_Id,AId);
   FFlags = (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-  FItemDelegate = NULL;
   FRemoveOnLastChildRemoved = true;
   FRemoveChildsOnRemoved = true;
   FDestroyOnParentRemoved = true;
@@ -79,6 +75,11 @@ void RosterIndex::appendChild(IRosterIndex *AIndex)
   }
 }
 
+int RosterIndex::childRow(const IRosterIndex *AIndex) const
+{
+  return FChilds.indexOf((IRosterIndex * const)AIndex); 
+}
+
 bool RosterIndex::removeChild(IRosterIndex *AIndex)
 {
   if (FChilds.contains(AIndex))
@@ -103,91 +104,65 @@ void RosterIndex::removeAllChilds()
     removeChild(index);
 }
 
-int RosterIndex::childRow(const IRosterIndex *AIndex) const
+void RosterIndex::insertDataHolder(IRosterIndexDataHolder *ADataHolder)
 {
-  return FChilds.indexOf((IRosterIndex * const)AIndex); 
-}
+  connect(ADataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
+    SLOT(onDataHolderChanged(IRosterIndex *, int)));
 
-IRosterIndexDataHolder *RosterIndex::setDataHolder(int ARole, IRosterIndexDataHolder *ADataHolder)
-{
-  IRosterIndexDataHolder *oldDataHolder = FDataHolders.value(ARole,0);
-  if (oldDataHolder != ADataHolder)
+  foreach (int role, ADataHolder->roles())
   {
-    if (oldDataHolder)
-    {
-      disconnect(oldDataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
-        this,SLOT(onDataHolderChanged(IRosterIndex *, int)));
-    }
-    if (ADataHolder)
-    {
-      connect(ADataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
-        SLOT(onDataHolderChanged(IRosterIndex *, int)));
-    }
-
-    if (ADataHolder)
-      FDataHolders.insert(ARole,ADataHolder);
-    else
-      FDataHolders.remove(ARole);
-    
-    dataChanged(this,ARole);
+    FDataHolders[role].insert(ADataHolder->order(),ADataHolder);
+    dataChanged(this,role);
   }
-  return oldDataHolder;
+  emit dataHolderInserted(ADataHolder);
 }
 
-QHash<int,IRosterIndexDataHolder *> RosterIndex::setDataHolder(IRosterIndexDataHolder *ADataHolder)
+void RosterIndex::removeDataHolder(IRosterIndexDataHolder *ADataHolder)
 {
-  QHash<int,IRosterIndexDataHolder *> oldDataHolders;
-  int role;
-  foreach(role, ADataHolder->roles())
-    oldDataHolders.insert(role,setDataHolder(role,ADataHolder));
-  return oldDataHolders;
-}
-
-bool RosterIndex::setData(int ARole, const QVariant &AData)
-{
-  bool dataSeted = false;
-  QVariant oldData = data(ARole);
-
-  IRosterIndexDataHolder *dataHolder = FDataHolders.value(ARole,0);
-  if (!dataHolder)
-    dataHolder = FDataHolders.value(DR_AnyRole,0);
-
-  if (dataHolder)
-    dataSeted = dataHolder->setData(this,ARole,AData);
-
-  if (!dataSeted)
+  disconnect(ADataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
+    this,SLOT(onDataHolderChanged(IRosterIndex *, int)));
+  
+  foreach (int role, ADataHolder->roles())
   {
-    if (AData.isValid()) 
-      FData.insert(ARole,AData);
-    else
-      FData.remove(ARole);
-
-    if (oldData != AData)
-    {
-      emit dataChanged(this, ARole);
-    }
-
-    dataSeted = true;
+    FDataHolders[role].remove(ADataHolder->order(),ADataHolder);
+    if (FDataHolders[role].isEmpty())
+      FDataHolders.remove(role);
+    dataChanged(this,role);
   }
-
-  return dataSeted;
+  emit dataHolderRemoved(ADataHolder);
 }
 
 QVariant RosterIndex::data(int ARole) const
 {
-  QVariant data;
-
-  IRosterIndexDataHolder *dataHolder = FDataHolders.value(ARole,0);
-  if (!dataHolder)
-    dataHolder = FDataHolders.value(DR_AnyRole,0);
-
-  if (dataHolder)
-    data = dataHolder->data(this,ARole);
+  QVariant data = FData.value(ARole);
 
   if (!data.isValid())
-    data = FData.value(ARole,QVariant());
-  
+  {
+    int i = 0;
+    QList<IRosterIndexDataHolder *> dataHolders = FDataHolders.value(ARole).values();
+    while (i < dataHolders.count() && !data.isValid())
+      data = dataHolders.value(i++)->data(this,ARole);
+  }
+
   return data;
+}
+
+void RosterIndex::setData(int ARole, const QVariant &AData)
+{
+  int i = 0;
+  bool dataSeted = false;
+  QList<IRosterIndexDataHolder *> dataHolders = FDataHolders.value(ARole).values();
+  while (i < dataHolders.count() && !dataSeted)
+    dataSeted = dataHolders.value(i++)->setData(this,ARole,AData);
+  
+  if (!dataSeted)
+  {
+    if (AData.isValid())
+      FData.insert(ARole,AData);
+    else
+      FData.remove(ARole);
+    emit dataChanged(this, ARole);
+  }
 }
 
 IRosterIndexList RosterIndex::findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds) const
@@ -216,17 +191,13 @@ IRosterIndexList RosterIndex::findChild(const QMultiHash<int, QVariant> AData, b
 
 void RosterIndex::onDataHolderChanged(IRosterIndex *AIndex, int ARole)
 {
- if (AIndex == this)
- {
-   //emitParentDataChanged();
+ if (AIndex == this || AIndex == NULL)
    emit dataChanged(this, ARole);
- }
 }
 
 void RosterIndex::onChildIndexDestroyed(QObject *AIndex)
 {
-// TODO:   Не работает преобразование
-  IRosterIndex *index = dynamic_cast<IRosterIndex *>(AIndex);
+  IRosterIndex *index = qobject_cast<IRosterIndex *>(AIndex);
   if (FChilds.contains(index))
   {
     emit childAboutToBeRemoved(index);
@@ -246,3 +217,4 @@ void RosterIndex::onDestroyByParentRemoved()
   if (!FParentIndex)
     deleteLater();
 }
+

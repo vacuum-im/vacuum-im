@@ -6,6 +6,7 @@
 #include "../../definations/initorders.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"

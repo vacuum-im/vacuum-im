@@ -5,8 +5,6 @@
 #include <QPainter>
 #include <QTextOption>
 #include <QTextLayout>
-#include "../../definations/rosterlabelorders.h"
-#include "../../utils/skin.h"
 
 RosterIndexDelegate::RosterIndexDelegate(QObject *AParent)
   : QAbstractItemDelegate(AParent)
@@ -78,7 +76,7 @@ void RosterIndexDelegate::paint(QPainter *APainter,
   {
     freeRect = option.rect.adjusted(halfTextMargin+footLeftSpace,halfTextMargin+footHeightUsed,-halfTextMargin,-halfTextMargin);
     option = setFooterOptions(AIndex,option);
-    QMap<QString,QVariant> footerMap = AIndex.data(IRosterIndex::DR_FooterText).toMap();
+    QMap<QString,QVariant> footerMap = AIndex.data(RDR_FooterText).toMap();
     QMap<QString,QVariant>::const_iterator fit = footerMap.constBegin();
     while (fit != footerMap.constEnd() && !freeRect.isEmpty())
     {
@@ -119,7 +117,7 @@ QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption,
   if (showFooter)
   {
     option = setFooterOptions(AIndex,option);
-    QMap<QString,QVariant> footerMap = AIndex.data(IRosterIndex::DR_FooterText).toMap();
+    QMap<QString,QVariant> footerMap = AIndex.data(RDR_FooterText).toMap();
     QMap<QString,QVariant>::const_iterator fit = footerMap.constBegin();
     while (fit != footerMap.constEnd())
     {
@@ -350,9 +348,9 @@ LabelsMap RosterIndexDelegate::labelsMap(const QModelIndex &AIndex) const
   map.insert(RLO_DECORATION,pair(RLID_DISPLAY,AIndex.data(Qt::DecorationRole)));
   map.insert(RLO_DISPLAY,pair(RLID_DISPLAY,AIndex.data(Qt::DisplayRole)));
 
-  QList<QVariant> labelIds = AIndex.data(IRosterIndex::DR_LabelIds).toList();
-  QList<QVariant> labelOrders = AIndex.data(IRosterIndex::DR_LabelOrders).toList();
-  QList<QVariant> labelValues = AIndex.data(IRosterIndex::DR_LabelValues).toList();
+  QList<QVariant> labelIds = AIndex.data(RDR_LabelIds).toList();
+  QList<QVariant> labelOrders = AIndex.data(RDR_LabelOrders).toList();
+  QList<QVariant> labelValues = AIndex.data(RDR_LabelValues).toList();
   for (int ilabel = 0; ilabel < labelOrders.count(); ilabel++)
     map.insert(labelOrders.at(ilabel).toInt(),pair(labelIds.at(ilabel).toInt(),labelValues.at(ilabel)));
 
@@ -375,23 +373,23 @@ QStyleOptionViewItem RosterIndexDelegate::setOptions(const QModelIndex &AIndex,
   if (qVariantCanConvert<QBrush>(data))
     option.palette.setBrush(QPalette::Text, qvariant_cast<QBrush>(data));
 
-  data = AIndex.data(IRosterIndex::DR_FontHint);
+  data = AIndex.data(RDR_FontHint);
   if (data.isValid())
     option.font.setStyleHint((QFont::StyleHint)data.toInt());
   
-  data = AIndex.data(IRosterIndex::DR_FontSize);
+  data = AIndex.data(RDR_FontSize);
   if (data.isValid())
     option.font.setPointSize(data.toInt());
 
-  data = AIndex.data(IRosterIndex::DR_FontWeight);
+  data = AIndex.data(RDR_FontWeight);
   if (data.isValid())
     option.font.setWeight(data.toInt());
 
-  data = AIndex.data(IRosterIndex::DR_FontStyle);
+  data = AIndex.data(RDR_FontStyle);
   if (data.isValid())
     option.font.setStyle((QFont::Style)data.toInt());
 
-  data = AIndex.data(IRosterIndex::DR_FontUnderline);
+  data = AIndex.data(RDR_FontUnderline);
   if (data.isValid())
     option.font.setUnderline(data.toBool());
 

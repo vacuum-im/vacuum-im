@@ -19,19 +19,19 @@ RostersViewPlugin::RostersViewPlugin()
   FOptions = 0;
 
   FSaveExpandStatusTypes 
-    << IRosterIndex::IT_Group 
-    << IRosterIndex::IT_AgentsGroup 
-    << IRosterIndex::IT_BlankGroup 
-    << IRosterIndex::IT_MyResourcesGroup
-    << IRosterIndex::IT_NotInRosterGroup
-    << IRosterIndex::IT_StreamRoot;
+    << RIT_Group 
+    << RIT_AgentsGroup 
+    << RIT_BlankGroup 
+    << RIT_MyResourcesGroup
+    << RIT_NotInRosterGroup
+    << RIT_StreamRoot;
   
   FShowExpandStatusTypes
-    << IRosterIndex::IT_Group 
-    << IRosterIndex::IT_AgentsGroup 
-    << IRosterIndex::IT_BlankGroup 
-    << IRosterIndex::IT_MyResourcesGroup
-    << IRosterIndex::IT_NotInRosterGroup;
+    << RIT_Group 
+    << RIT_AgentsGroup 
+    << RIT_BlankGroup 
+    << RIT_MyResourcesGroup
+    << RIT_NotInRosterGroup;
 
   FRosterIconset.openFile(ROSTER_ICONSETFILE);
 }
@@ -188,9 +188,9 @@ void RostersViewPlugin::reExpandItems(const QModelIndex &AParent)
     for (int i = 0; i<rows; ++i)
     {
       QModelIndex index = curModel->index(i,0,AParent);
-      int itemType = index.data(IRosterIndex::DR_Type).toInt();
-      QString groupName = index.data(IRosterIndex::DR_Group).toString();
-      if (!groupName.isEmpty() || itemType == IRosterIndex::IT_StreamRoot)
+      int itemType = index.data(RDR_Type).toInt();
+      QString groupName = index.data(RDR_Group).toString();
+      if (!groupName.isEmpty() || itemType == RIT_StreamRoot)
       {
         loadExpandedState(index);
         reExpandItems(index);
@@ -202,15 +202,15 @@ void RostersViewPlugin::reExpandItems(const QModelIndex &AParent)
 QString RostersViewPlugin::getExpandSettingsName(const QModelIndex &AIndex)
 {
   QString valueName;
-  int itemType = AIndex.data(IRosterIndex::DR_Type).toInt();
+  int itemType = AIndex.data(RDR_Type).toInt();
   if (FSaveExpandStatusTypes.contains(itemType))
   {
-    Jid streamJid(AIndex.data(IRosterIndex::DR_StreamJid).toString());
+    Jid streamJid(AIndex.data(RDR_StreamJid).toString());
     if (streamJid.isValid())
     {
-      if (itemType != IRosterIndex::IT_StreamRoot)
+      if (itemType != RIT_StreamRoot)
       {
-        QString groupName = AIndex.data(IRosterIndex::DR_Group).toString();
+        QString groupName = AIndex.data(RDR_Group).toString();
         QString groupHash = QString::number(qHash(groupName),16);
         valueName = QString("collapsed[]:h%1").arg(groupHash);
       }
@@ -226,7 +226,7 @@ void RostersViewPlugin::loadExpandedState(const QModelIndex &AIndex)
   QString settingsName = getExpandSettingsName(AIndex);
   if (!settingsName.isEmpty())
   {
-    Jid streamJid(AIndex.data(IRosterIndex::DR_StreamJid).toString());
+    Jid streamJid(AIndex.data(RDR_StreamJid).toString());
     if (FSettings->valueNS(settingsName,streamJid.pFull(),false).toBool())
       FRostersView->collapse(AIndex);
     else
@@ -239,10 +239,10 @@ void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
   QString settingsName = getExpandSettingsName(AIndex);
   if (!settingsName.isEmpty())
   {
-    Jid streamJid(AIndex.data(IRosterIndex::DR_StreamJid).toString());
+    Jid streamJid(AIndex.data(RDR_StreamJid).toString());
     if (FRostersView->isExpanded(AIndex))
     {
-      if (AIndex.data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
+      if (AIndex.data(RDR_Type).toInt() == RIT_StreamRoot)
         FSettings->setValueNS(settingsName,streamJid.pFull(),false);
       else
         FSettings->deleteValueNS(settingsName,streamJid.pFull());
@@ -254,8 +254,8 @@ void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
 
 void RostersViewPlugin::setExpandedLabel(const QModelIndex &AIndex)
 {
-  int itemType = AIndex.data(IRosterIndex::DR_Type).toInt();
-  if (FShowExpandStatusTypes.contains(itemType) && !AIndex.data(IRosterIndex::DR_HideGroupExpander).toBool())
+  int itemType = AIndex.data(RDR_Type).toInt();
+  if (FShowExpandStatusTypes.contains(itemType) && !AIndex.data(RDR_HideGroupExpander).toBool())
   {
     QModelIndex modelIndex = FRostersView->mapToModel(AIndex);
     IRosterIndex *rosterIndex = static_cast<IRosterIndex *>(modelIndex.internalPointer());

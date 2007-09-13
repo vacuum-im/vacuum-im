@@ -3,7 +3,10 @@
 
 #include <QStyle>
 #include <QAbstractItemDelegate>
+#include "../../definations/rosterlabelorders.h"
+#include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/irostersview.h"
+#include "../../utils/skin.h"
 
 typedef QMultiMap<int,QPair<int,QVariant> > LabelsMap;
 

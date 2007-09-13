@@ -6,6 +6,7 @@
 #include "../../definations/initorders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/iroster.h"
@@ -64,7 +65,6 @@ signals:
 protected:
   void repaintRostersView();
 protected slots:
-  void onIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
   void onRepaintRostersView();
   void onSettingsOpened();
   void onSettingsClosed();

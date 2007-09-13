@@ -5,6 +5,7 @@
 #include "../../definations/initorders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/imainwindow.h"

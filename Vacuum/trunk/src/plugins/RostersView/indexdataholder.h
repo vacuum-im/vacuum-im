@@ -1,6 +1,8 @@
 #ifndef INDEXDATAHOLDER_H
 #define INDEXDATAHOLDER_H
 
+#include "../../definations/rosterindextyperole.h"
+#include "../../definations/rosterdataholderorders.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/irostersview.h"
 #include "../../utils/skin.h"
@@ -18,21 +20,21 @@ public:
 
   //IRosterIndexDataHolder
   virtual QObject *instance() { return this; }
-  virtual bool setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
-  virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
+  virtual int order() const { return RDHO_DEFAULT; }
   virtual QList<int> roles() const;
+  virtual QList<int> types() const;
+  virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
+  virtual bool setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/) { return false; }
 public:
-  void clear();
   bool checkOption(IRostersView::Option AOption) const;
   void setOption(IRostersView::Option AOption, bool AValue);
 signals:
-  virtual void dataChanged(IRosterIndex *AIndex, int ARole);
+  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_AnyRole);
 protected:
   QString toolTipText(const IRosterIndex *AIndex) const;
 private:
   int FOptions;
   SkinIconset FStatusIconset;
-  QHash<const IRosterIndex *,QHash<int,QVariant> > FData;
 };
 
 #endif // INDEXDATAHOLDER_H

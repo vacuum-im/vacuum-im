@@ -17,100 +17,48 @@ class IRosterIndexDataHolder
 {
 public:
   virtual QObject *instance() =0;
-  virtual bool setData(IRosterIndex *, int ARole, const QVariant &) =0;
-  virtual QVariant data(const IRosterIndex *, int ARole) const =0;
+  virtual int order() const =0;
   virtual QList<int> roles() const =0;
+  virtual QList<int> types() const =0;
+  virtual QVariant data(const IRosterIndex *AIndex, int ARole) const =0;
+  virtual bool setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue) =0;
 signals:
-  virtual void dataChanged(IRosterIndex *, int ARole) =0;
+  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0) =0;
 };
 
 class IRosterIndex
 {
 public:
-  enum ItemType {
-    IT_Root,
-    IT_StreamRoot,
-    IT_Group,
-    IT_BlankGroup,
-    IT_NotInRosterGroup,
-    IT_MyResourcesGroup,
-    IT_AgentsGroup,
-    IT_Contact,
-    IT_Agent,
-    IT_MyResource,
-    IT_UserDefined = 64,
-    IT_UserDynamic = IT_UserDefined + 1048576
-  };
-  enum DataRole{
-    DR_AnyRole = -1,
-    DR_Type = Qt::UserRole, 
-    DR_Id,
-    //XMPP Roles
-    DR_StreamJid,
-    DR_Jid,
-    DR_PJid,
-    DR_BareJid,
-    DR_Name,
-    DR_Group,
-    DR_Show,
-    DR_Status,
-    DR_Priority,
-    DR_Self_Show,
-    DR_Self_Status,
-    DR_Self_Priority,
-    DR_Subscription,
-    DR_Ask,
-    //Decoration
-    DR_HideGroupExpander,
-    DR_FontHint,
-    DR_FontSize,
-    DR_FontWeight,
-    DR_FontStyle,
-    DR_FontUnderline,
-    DR_LabelIds,
-    DR_LabelOrders,
-    DR_LabelValues,
-    DR_LabelFlags,
-    DR_FooterText,
-    //User roles
-    DR_UserDefined = Qt::UserRole + 64,
-    DR_UserDynamic = DR_UserDefined + 1048576
-  };
-public:
   virtual QObject *instance() =0;
   virtual int type() const =0;
-  virtual int newType() const {FNewType++; return FNewType;}
   virtual QString id() const =0;
-  virtual void setParentIndex(IRosterIndex *) =0;
   virtual IRosterIndex *parentIndex() const =0; 
+  virtual void setParentIndex(IRosterIndex *AIndex) =0;
   virtual int row() const =0;
-  virtual IRosterIndexDataHolder *setDataHolder(int ARole, IRosterIndexDataHolder *) =0;
-  virtual QHash<int,IRosterIndexDataHolder *> setDataHolder(IRosterIndexDataHolder *) =0;
-  virtual void appendChild(IRosterIndex *) =0;
-  virtual bool removeChild(IRosterIndex *) =0;
+  virtual void appendChild(IRosterIndex *AIndex) =0;
   virtual IRosterIndex *child(int ARow) const =0;
+  virtual int childRow(const IRosterIndex *AIndex) const =0;
   virtual int childCount() const =0;
-  virtual int childRow(const IRosterIndex *) const =0;
+  virtual bool removeChild(IRosterIndex *AIndex) =0;
+  virtual void removeAllChilds() =0;
   virtual void setFlags(const Qt::ItemFlags &AFlags) =0;
   virtual Qt::ItemFlags flags() const =0;
-  virtual int newRole() const {FNewRole++; return FNewRole;}
-  virtual bool setData(int ARole, const QVariant &) =0;
+  virtual void insertDataHolder(IRosterIndexDataHolder *ADataHolder) =0;
+  virtual void removeDataHolder(IRosterIndexDataHolder *ADataHolder) =0;
   virtual QVariant data(int ARole) const =0;
-  virtual void setItemDelegate(QAbstractItemDelegate *AItemDelegate) =0;
-  virtual QAbstractItemDelegate *itemDelegate() const =0;
+  virtual void setData(int ARole, const QVariant &) =0;
   virtual IRosterIndexList findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds = false) const =0;
   virtual void setRemoveOnLastChildRemoved(bool ARemove) =0;
   virtual void setRemoveChildsOnRemoved(bool ARemove) =0;
   virtual void setDestroyOnParentRemoved(bool ADestroy) =0;
 signals:
-  virtual void dataChanged(IRosterIndex *, int ARole = DR_AnyRole) =0;
-  virtual void childAboutToBeInserted(IRosterIndex *) =0;
-  virtual void childInserted(IRosterIndex *) =0;
-  virtual void childAboutToBeRemoved(IRosterIndex *) =0;
-  virtual void childRemoved(IRosterIndex *) =0;
-private:
-  static int FNewType;
-  static int FNewRole;
+  virtual void dataChanged(IRosterIndex *AIndex, int ARole = 0) =0;
+  virtual void dataHolderInserted(IRosterIndexDataHolder *ADataHolder) =0;
+  virtual void dataHolderRemoved(IRosterIndexDataHolder *ADataHolder) =0;
+  virtual void childAboutToBeInserted(IRosterIndex *AIndex) =0;
+  virtual void childInserted(IRosterIndex *AIndex) =0;
+  virtual void childAboutToBeRemoved(IRosterIndex *AIndex) =0;
+  virtual void childRemoved(IRosterIndex *AIndex) =0;
 };
 
 class IRostersModel :
@@ -128,13 +76,15 @@ public:
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) =0;
   virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, 
     int AType, IRosterIndex *AParent) =0;
+  virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
+  virtual void removeRosterIndex(IRosterIndex *AIndex) =0;
+  virtual void insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder) =0;
+  virtual void removeDefaultDataHolder(IRosterIndexDataHolder *ADataHolder) =0;
   virtual IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, 
     bool ACreate = false) =0;
   virtual IRosterIndex *findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const =0;
   virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, 
     int AType, IRosterIndex *AParent) const =0;
-  virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
-  virtual void removeRosterIndex(IRosterIndex *AIndex) =0;
   virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) =0;
   virtual QString blankGroupName() const =0;
   virtual QString agentsGroupName() const =0;
@@ -148,6 +98,8 @@ signals:
   virtual void indexInserted(IRosterIndex *) =0;
   virtual void indexDataChanged(IRosterIndex *, int ARole) =0;
   virtual void indexRemoved(IRosterIndex *) =0;
+  virtual void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder) =0;
+  virtual void defaultDataHolderRemoved(IRosterIndexDataHolder *ADataHolder) =0;
 };
 
 class IRostersModelPlugin 
@@ -155,11 +107,11 @@ class IRostersModelPlugin
 public:
   virtual QObject *instance() =0;
   virtual IRostersModel *rostersModel() =0;
-  virtual IRosterIndex *addStream(IRoster *, IPresence *) =0;
+  virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence) =0;
   virtual void removeStream(const Jid &AStreamJid) =0;
 signals:
-  virtual void modelCreated(IRostersModel *) =0;
-  virtual void modelDestroyed(IRostersModel *) =0;
+  virtual void modelCreated(IRostersModel *AModel) =0;
+  virtual void modelDestroyed(IRostersModel *AModel) =0;
 };
 
 Q_DECLARE_INTERFACE(IRosterIndexDataHolder,"Vacuum.Plugin.IRosterIndexDataHolder/1.0");

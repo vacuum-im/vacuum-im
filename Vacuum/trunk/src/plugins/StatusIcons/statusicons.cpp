@@ -86,8 +86,7 @@ bool StatusIcons::initObjects()
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
   {
     FDataHolder = new RosterIndexDataHolder(this);
-    connect(FRostersModelPlugin->rostersModel(),SIGNAL(indexCreated(IRosterIndex *,IRosterIndex *)),
-      SLOT(onIndexCreated(IRosterIndex *, IRosterIndex *)));
+    FRostersModelPlugin->rostersModel()->insertDefaultDataHolder(FDataHolder);
   }
 
   if (FSettingsPlugin)
@@ -339,12 +338,6 @@ void StatusIcons::repaintRostersView()
     QTimer::singleShot(0,this,SLOT(onRepaintRostersView()));
     FRepaintStarted = true;
   }
-}
-
-void StatusIcons::onIndexCreated(IRosterIndex *AIndex, IRosterIndex * /*AParent*/)
-{
-  if (FDataHolder->types().contains(AIndex->type()))
-    AIndex->setDataHolder(FDataHolder);
 }
 
 void StatusIcons::onRepaintRostersView()

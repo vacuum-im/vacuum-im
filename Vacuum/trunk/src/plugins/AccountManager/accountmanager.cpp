@@ -448,9 +448,9 @@ void AccountManager::onSettingsClosed()
 
 void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->data(IRosterIndex::DR_Type).toInt() == IRosterIndex::IT_StreamRoot)
+  if (AIndex->data(RDR_Type).toInt() == RIT_StreamRoot)
   {
-    QString streamJid = AIndex->data(IRosterIndex::DR_StreamJid).toString();
+    QString streamJid = AIndex->data(RDR_StreamJid).toString();
     IAccount *account = accountByStream(streamJid);
     if (account)
     {

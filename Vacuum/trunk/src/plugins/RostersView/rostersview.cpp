@@ -47,18 +47,15 @@ void RostersView::setModel(IRostersModel *AModel)
     
     if (FRostersModel)
     {
-      disconnect(FRostersModel,SIGNAL(indexCreated(IRosterIndex *,IRosterIndex *)),
-        this,SLOT(onIndexCreated(IRosterIndex *, IRosterIndex *)));
       disconnect(AModel,SIGNAL(indexRemoved(IRosterIndex *)),
         this,SLOT(onIndexRemoved(IRosterIndex *)));
-      FIndexDataHolder->clear();
+      FRostersModel->removeDefaultDataHolder(FIndexDataHolder);
     }
     if (AModel)
     {
-      connect(AModel,SIGNAL(indexCreated(IRosterIndex *,IRosterIndex *)),
-        SLOT(onIndexCreated(IRosterIndex *, IRosterIndex *)));
       connect(AModel,SIGNAL(indexRemoved(IRosterIndex *)),
         SLOT(onIndexRemoved(IRosterIndex *)));
+      AModel->insertDefaultDataHolder(FIndexDataHolder);
     }
 
     FRostersModel = AModel;
@@ -196,9 +193,9 @@ void RostersView::updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFl
     FIndexLabelFlags[ALabelId] = AFlags;
     foreach (IRosterIndex *index, FIndexLabelIndexes.value(ALabelId))
     {
-      QList<QVariant> ids = index->data(IRosterIndex::DR_LabelIds).toList();
-      QList<QVariant> labels = index->data(IRosterIndex::DR_LabelValues).toList();
-      QList<QVariant> flags = index->data(IRosterIndex::DR_LabelFlags).toList();
+      QList<QVariant> ids = index->data(RDR_LabelIds).toList();
+      QList<QVariant> labels = index->data(RDR_LabelValues).toList();
+      QList<QVariant> flags = index->data(RDR_LabelFlags).toList();
       int i = 0;
       while (ids.at(i).toInt()!=ALabelId) i++;
       labels[i] = ALabel;
@@ -207,8 +204,8 @@ void RostersView::updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFl
         appendBlinkLabel(ALabelId);
       else
         removeBlinkLabel(ALabelId);
-      index->setData(IRosterIndex::DR_LabelValues,labels);
-      index->setData(IRosterIndex::DR_LabelFlags,flags);
+      index->setData(RDR_LabelValues,labels);
+      index->setData(RDR_LabelFlags,flags);
     }
   }
 }
@@ -217,10 +214,10 @@ void RostersView::insertIndexLabel(int ALabelId, IRosterIndex *AIndex)
 {
   if (AIndex && FIndexLabels.contains(ALabelId) && !FIndexLabelIndexes.value(ALabelId).contains(AIndex))
   {
-    QList<QVariant> ids = AIndex->data(IRosterIndex::DR_LabelIds).toList();
-    QList<QVariant> labels = AIndex->data(IRosterIndex::DR_LabelValues).toList();
-    QList<QVariant> orders = AIndex->data(IRosterIndex::DR_LabelOrders).toList();
-    QList<QVariant> flags = AIndex->data(IRosterIndex::DR_LabelFlags).toList();
+    QList<QVariant> ids = AIndex->data(RDR_LabelIds).toList();
+    QList<QVariant> labels = AIndex->data(RDR_LabelValues).toList();
+    QList<QVariant> orders = AIndex->data(RDR_LabelOrders).toList();
+    QList<QVariant> flags = AIndex->data(RDR_LabelFlags).toList();
     int i = 0;
     int order = FIndexLabelOrders.value(ALabelId);
     while (i<orders.count() && orders.at(i).toInt() < order) i++;
@@ -229,10 +226,10 @@ void RostersView::insertIndexLabel(int ALabelId, IRosterIndex *AIndex)
     labels.insert(i,FIndexLabels.value(ALabelId)); 
     flags.insert(i,FIndexLabelFlags.value(ALabelId));
     FIndexLabelIndexes[ALabelId] += AIndex;
-    AIndex->setData(IRosterIndex::DR_LabelIds,ids);
-    AIndex->setData(IRosterIndex::DR_LabelValues,labels);
-    AIndex->setData(IRosterIndex::DR_LabelFlags,flags);
-    AIndex->setData(IRosterIndex::DR_LabelOrders,orders);
+    AIndex->setData(RDR_LabelIds,ids);
+    AIndex->setData(RDR_LabelValues,labels);
+    AIndex->setData(RDR_LabelFlags,flags);
+    AIndex->setData(RDR_LabelOrders,orders);
   }
 }
 
@@ -240,10 +237,10 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
 {
   if (AIndex && FIndexLabels.contains(ALabelId) && FIndexLabelIndexes.value(ALabelId).contains(AIndex))
   {
-    QList<QVariant> ids = AIndex->data(IRosterIndex::DR_LabelIds).toList();
-    QList<QVariant> labels = AIndex->data(IRosterIndex::DR_LabelValues).toList();
-    QList<QVariant> orders = AIndex->data(IRosterIndex::DR_LabelOrders).toList();
-    QList<QVariant> flags = AIndex->data(IRosterIndex::DR_LabelFlags).toList();
+    QList<QVariant> ids = AIndex->data(RDR_LabelIds).toList();
+    QList<QVariant> labels = AIndex->data(RDR_LabelValues).toList();
+    QList<QVariant> orders = AIndex->data(RDR_LabelOrders).toList();
+    QList<QVariant> flags = AIndex->data(RDR_LabelFlags).toList();
     int i = 0;
     while (i<ids.count() && ids.at(i).toInt()!=ALabelId) i++;
     ids.removeAt(i);
@@ -253,10 +250,10 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
     FIndexLabelIndexes[ALabelId] -= AIndex;
     if (FIndexLabelIndexes[ALabelId].isEmpty())
       FIndexLabelIndexes.remove(ALabelId);
-    AIndex->setData(IRosterIndex::DR_LabelOrders,orders);
-    AIndex->setData(IRosterIndex::DR_LabelFlags,flags);
-    AIndex->setData(IRosterIndex::DR_LabelValues,labels);
-    AIndex->setData(IRosterIndex::DR_LabelIds,ids);
+    AIndex->setData(RDR_LabelOrders,orders);
+    AIndex->setData(RDR_LabelFlags,flags);
+    AIndex->setData(RDR_LabelValues,labels);
+    AIndex->setData(RDR_LabelIds,ids);
   }
 }
 
@@ -353,17 +350,17 @@ void RostersView::destroyClickHooker(int AHookerId)
 void RostersView::insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex)
 {
   QString footerId = intId2StringId(AOrderAndId);
-  QMap<QString,QVariant> footerMap = AIndex->data(IRosterIndex::DR_FooterText).toMap();
+  QMap<QString,QVariant> footerMap = AIndex->data(RDR_FooterText).toMap();
   footerMap.insert(footerId, AText);
-  AIndex->setData(IRosterIndex::DR_FooterText,footerMap);
+  AIndex->setData(RDR_FooterText,footerMap);
 }
 
 void RostersView::removeFooterText(int AOrderAndId, IRosterIndex *AIndex)
 {
   QString footerId = intId2StringId(AOrderAndId);
-  QMap<QString,QVariant> footerMap = AIndex->data(IRosterIndex::DR_FooterText).toMap();
+  QMap<QString,QVariant> footerMap = AIndex->data(RDR_FooterText).toMap();
   footerMap.remove(footerId);
-  AIndex->setData(IRosterIndex::DR_FooterText,footerMap);
+  AIndex->setData(RDR_FooterText,footerMap);
 }
 
 bool RostersView::checkOption(IRostersView::Option AOption) const
@@ -558,12 +555,6 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
   QTreeView::mouseReleaseEvent(AEvent);
 }
 
-void RostersView::onIndexCreated(IRosterIndex *AIndex, IRosterIndex *)
-{
-  if (AIndex->type() < IRosterIndex::IT_UserDefined)
-    AIndex->setDataHolder(FIndexDataHolder);
-}
-                                               
 void RostersView::onIndexRemoved(IRosterIndex *AIndex)
 {
   QHash<int, QSet<IRosterIndex *> >::iterator it = FIndexLabelIndexes.begin();

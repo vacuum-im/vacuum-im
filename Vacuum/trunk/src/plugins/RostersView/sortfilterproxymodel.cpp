@@ -33,14 +33,14 @@ void SortFilterProxyModel::setOption(IRostersView::Option AOption, bool AValue)
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
-  int leftType = ALeft.data(IRosterIndex::DR_Type).toInt();
-  int rightType = ARight.data(IRosterIndex::DR_Type).toInt();
+  int leftType = ALeft.data(RDR_Type).toInt();
+  int rightType = ARight.data(RDR_Type).toInt();
   if (leftType == rightType)
   {
-    int leftShow = ALeft.data(IRosterIndex::DR_Show).toInt();
-    int rightShow = ARight.data(IRosterIndex::DR_Show).toInt();
+    int leftShow = ALeft.data(RDR_Show).toInt();
+    int rightShow = ARight.data(RDR_Show).toInt();
     bool showOnlineFirst = checkOption(IRostersView::ShowOnlineFirst);
-    if (showOnlineFirst && leftType != IRosterIndex::IT_StreamRoot && leftShow != rightShow)
+    if (showOnlineFirst && leftType != RIT_StreamRoot && leftShow != rightShow)
     {
       if (leftShow == IPresence::Offline)
         return true;
@@ -65,19 +65,19 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
 
   if (index.isValid())
   {
-    int indexType = index.data(IRosterIndex::DR_Type).toInt();
+    int indexType = index.data(RDR_Type).toInt();
     switch(indexType)
     {
-    case IRosterIndex::IT_Contact:
-    case IRosterIndex::IT_Agent:
+    case RIT_Contact:
+    case RIT_Agent:
       {
-        int indexShow = index.data(IRosterIndex::DR_Show).toInt();
+        int indexShow = index.data(RDR_Show).toInt();
         return indexShow != IPresence::Offline && indexShow != IPresence::Error;
       }
-    case IRosterIndex::IT_Group:
-    case IRosterIndex::IT_AgentsGroup:
-    case IRosterIndex::IT_BlankGroup:
-    case IRosterIndex::IT_NotInRosterGroup:
+    case RIT_Group:
+    case RIT_AgentsGroup:
+    case RIT_BlankGroup:
+    case RIT_NotInRosterGroup:
       {
         int childRow = 0;
         QModelIndex childIndex;

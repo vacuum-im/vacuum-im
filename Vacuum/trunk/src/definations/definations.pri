@@ -4,4 +4,6 @@ HEADERS += actiongroups.h \
            initorders.h \
            namespaces.h \
            tooltiporders.h \
-           rosterlabelorders.h
+           rosterlabelorders.h \
+           rosterindextyperole.h \
+           rosterdataholderorders.h

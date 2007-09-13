@@ -88,7 +88,7 @@ IRosterIndex *RostersModelPlugin::addStream(IRoster *ARoster, IPresence *APresen
     {
       connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),
         SLOT(onAccountChanged(const QString &, const QVariant &)));
-      streamRoot->setData(IRosterIndex::DR_Name,account->name());
+      streamRoot->setData(RDR_Name,account->name());
     }
   }
   return streamRoot;
@@ -136,7 +136,7 @@ void RostersModelPlugin::onAccountChanged(const QString &AName, const QVariant &
     {
       IRosterIndex *streamRoot = FRostersModel->getStreamRoot(account->streamJid());
       if (streamRoot)
-        streamRoot->setData(IRosterIndex::DR_Name,account->name());
+        streamRoot->setData(RDR_Name,account->name());
     }
   }
 }
