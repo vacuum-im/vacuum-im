@@ -64,35 +64,29 @@ IconsOptionsWidget::IconsOptionsWidget(IStatusIcons *AStatusIcons)
   ui.lwtDefaultIconset->addItems(FIconFiles);
   ui.lwtDefaultIconset->setCurrentRow(FIconFiles.indexOf(FStatusIcons->defaultIconFile()));
 
-  populateRulesTable(ui.twtServiceRules,FIconFiles,IStatusIcons::ServiceRule);
-  populateRulesTable(ui.twtContactRules,FIconFiles,IStatusIcons::JidRule);
-  populateRulesTable(ui.twtCustomRules,FIconFiles,IStatusIcons::CustomRule);
+  populateRulesTable(ui.twtUserRules,FIconFiles,IStatusIcons::UserRule);
+  populateRulesTable(ui.twtDefaultRules,FIconFiles,IStatusIcons::DefaultRule);
 
-  FAddRuleMapper = new QSignalMapper(this);
-  connect(FAddRuleMapper,SIGNAL(mapped(QWidget *)),SLOT(onAddRule(QWidget *)));
-  FAddRuleMapper->setMapping(ui.pbtAddService,ui.twtServiceRules);
-  connect(ui.pbtAddService,SIGNAL(clicked()),FAddRuleMapper,SLOT(map()));
-  FAddRuleMapper->setMapping(ui.pbtAddContact,ui.twtContactRules);
-  connect(ui.pbtAddContact,SIGNAL(clicked()),FAddRuleMapper,SLOT(map()));
-  FAddRuleMapper->setMapping(ui.pbtAddCustom,ui.twtCustomRules);
-  connect(ui.pbtAddCustom,SIGNAL(clicked()),FAddRuleMapper,SLOT(map()));
-
-  FDeleteRuleMapper = new QSignalMapper(this);
-  connect(FDeleteRuleMapper,SIGNAL(mapped(QWidget *)),SLOT(onDeleteRule(QWidget *)));
-  FDeleteRuleMapper->setMapping(ui.pbtDeleteService,ui.twtServiceRules);
-  connect(ui.pbtDeleteService,SIGNAL(clicked()),FDeleteRuleMapper,SLOT(map()));
-  FDeleteRuleMapper->setMapping(ui.pbtDeleteContact,ui.twtContactRules);
-  connect(ui.pbtDeleteContact,SIGNAL(clicked()),FDeleteRuleMapper,SLOT(map()));
-  FDeleteRuleMapper->setMapping(ui.pbtDeleteCustom,ui.twtCustomRules);
-  connect(ui.pbtDeleteCustom,SIGNAL(clicked()),FDeleteRuleMapper,SLOT(map()));
+  connect(ui.pbtAddUserRule,SIGNAL(clicked()),SLOT(onAddUserRule()));
+  connect(ui.pbtDeleteUserRule,SIGNAL(clicked()),SLOT(onDeleteUserRule()));
 }
 
 void IconsOptionsWidget::apply()
 {
   FStatusIcons->setDefaultIconFile(FIconFiles.value(ui.lwtDefaultIconset->currentRow(),STATUS_ICONSETFILE));
-  applyTableRules(ui.twtServiceRules,IStatusIcons::ServiceRule);
-  applyTableRules(ui.twtContactRules,IStatusIcons::JidRule);
-  applyTableRules(ui.twtCustomRules,IStatusIcons::CustomRule);
+  
+  QSet<QString> rules = FStatusIcons->rules(IStatusIcons::UserRule).toSet();
+  for (int i =0; i< ui.twtUserRules->rowCount(); ++i)
+  {
+    QString rule = ui.twtUserRules->item(i,0)->data(Qt::DisplayRole).toString();
+    QString iconFile = ui.twtUserRules->item(i,1)->data(Qt::DisplayRole).toString();
+    if (!rules.contains(rule) || FStatusIcons->ruleIconFile(rule,IStatusIcons::UserRule)!=iconFile)
+      FStatusIcons->insertRule(rule,iconFile,IStatusIcons::UserRule);
+    rules -= rule;
+  }
+
+  foreach(QString rule,rules)
+    FStatusIcons->removeRule(rule,IStatusIcons::UserRule);
 }
 
 void IconsOptionsWidget::populateRulesTable(QTableWidget *ATable, const QStringList &AIconFiles, IStatusIcons::RuleType ARuleType)
@@ -115,41 +109,19 @@ void IconsOptionsWidget::populateRulesTable(QTableWidget *ATable, const QStringL
   ATable->verticalHeader()->hide();
 }
 
-void IconsOptionsWidget::applyTableRules( QTableWidget *ATable,IStatusIcons::RuleType ARuleType )
+void IconsOptionsWidget::onAddUserRule()
 {
-  QSet<QString> rules = FStatusIcons->rules(ARuleType).toSet();
-  for (int i =0; i< ATable->rowCount(); ++i)
-  {
-    QString rule = ATable->item(i,0)->data(Qt::DisplayRole).toString();
-    QString iconFile = ATable->item(i,1)->data(Qt::DisplayRole).toString();
-    if (!rules.contains(rule) || FStatusIcons->ruleIconFile(rule,ARuleType)!=iconFile)
-      FStatusIcons->insertRule(rule,iconFile,ARuleType);
-    rules -= rule;
-  }
-
-  foreach (QString rule,rules)
-    FStatusIcons->removeRule(rule,ARuleType);
+  QTableWidgetItem *rulePattern = new QTableWidgetItem();
+  QTableWidgetItem *ruleFile = new QTableWidgetItem(STATUS_ICONSETFILE);
+  int row = ui.twtUserRules->rowCount();
+  ui.twtUserRules->insertRow(row);
+  ui.twtUserRules->setItem(row,0,rulePattern);
+  ui.twtUserRules->setItem(row,1,ruleFile);
+  ui.twtUserRules->verticalHeader()->setResizeMode(row,QHeaderView::ResizeToContents);
 }
 
-void IconsOptionsWidget::onAddRule(QWidget *ATable)
+void IconsOptionsWidget::onDeleteUserRule()
 {
-  QTableWidget *table = qobject_cast<QTableWidget *>(ATable);
-  if (table)
-  {
-    QTableWidgetItem *rulePattern = new QTableWidgetItem();
-    QTableWidgetItem *ruleFile = new QTableWidgetItem(STATUS_ICONSETFILE);
-    int row = table->rowCount();
-    table->insertRow(row);
-    table->setItem(row,0,rulePattern);
-    table->setItem(row,1,ruleFile);
-    table->verticalHeader()->setResizeMode(row,QHeaderView::ResizeToContents);
-  }
-}
-
-void IconsOptionsWidget::onDeleteRule(QWidget *ATable)
-{
-  QTableWidget *table = qobject_cast<QTableWidget *>(ATable);
-  if (table)
-    table->removeRow(table->currentRow());
+  ui.twtUserRules->removeRow(ui.twtUserRules->currentRow());
 }
 

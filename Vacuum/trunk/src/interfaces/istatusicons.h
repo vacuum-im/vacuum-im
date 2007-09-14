@@ -11,9 +11,8 @@ class IStatusIcons
 {
 public:
   enum RuleType {
-    JidRule,
-    CustomRule,
-    ServiceRule
+    UserRule,
+    DefaultRule
   };
 public:
   virtual QObject *instance() =0;

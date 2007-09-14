@@ -4,9 +4,7 @@
 
 #define SVN_DEFAULT_ICONFILE              "defaultIconFile"
 #define SVN_RULES                         "rules"
-#define SVN_JIDRULES                      "rules:jid[]"
-#define SVN_CUSTOMRULES                   "rules:custom[]"
-#define SVN_SERVICERULES                  "rules:service[]"
+#define SVN_USERRULES                     "rules:user[]"
 
 StatusIcons::StatusIcons()
 {
@@ -94,6 +92,9 @@ bool StatusIcons::initObjects()
     FSettingsPlugin->openOptionsNode(ON_STATUSICONS,tr("Status icons"), tr("Configure status icons"),QIcon());
     FSettingsPlugin->appendOptionsHolder(this);
   }
+
+  loadIconFilesRules();
+
   return true;
 }
 
@@ -127,24 +128,14 @@ void StatusIcons::insertRule(const QString &APattern, const QString &AIconFile, 
 
   switch(ARuleType)
   {
-  case JidRule:
-    {
-      Jid jid(APattern);
-      if (jid.isValid())
-        FJidRules.insert(jid.pBare(),AIconFile);
-      break;
-    }
-  case CustomRule:
-    {
-      FCustomRules.insert(APattern,AIconFile);
-      break;
-    }
-  case ServiceRule:
-    {
-      FServiceRules.insert(APattern,AIconFile);
-      break;
-    }
+  case UserRule:
+    FUserRules.insert(APattern,AIconFile);
+    break;
+  case DefaultRule:
+    FDefaultRules.insert(APattern,AIconFile);
+    break;
   }
+
   FJid2IconFile.clear();
   repaintRostersView();
   emit ruleInserted(APattern,AIconFile,ARuleType);
@@ -154,12 +145,10 @@ QStringList StatusIcons::rules(RuleType ARuleType) const
 {
   switch(ARuleType)
   {
-  case JidRule:
-    return FJidRules.keys();
-  case CustomRule:
-    return FCustomRules.keys();
-  case ServiceRule:
-    return FServiceRules.keys();
+  case UserRule:
+    return FUserRules.keys();
+  case DefaultRule:
+    return FDefaultRules.keys();
   }
   return QList<QString>();
 }
@@ -168,12 +157,10 @@ QString StatusIcons::ruleIconFile(const QString &APattern, RuleType ARuleType) c
 {
   switch(ARuleType)
   {
-  case JidRule:
-    return FJidRules.value(APattern);
-  case CustomRule:
-    return FCustomRules.value(APattern);
-  case ServiceRule:
-    return FServiceRules.value(APattern);
+  case UserRule:
+    return FUserRules.value(APattern);
+  case DefaultRule:
+    return FDefaultRules.value(APattern);
   }
   return QString();
 }
@@ -182,23 +169,12 @@ void StatusIcons::removeRule(const QString &APattern, RuleType ARuleType)
 {
   switch(ARuleType)
   {
-  case JidRule:
-    {
-      Jid jid(APattern);
-      if (jid.isValid())
-        FJidRules.remove(jid.pBare());
-      break;
-    }
-  case CustomRule:
-    {
-      FCustomRules.remove(APattern);
-      break;
-    }
-  case ServiceRule:
-    {
-      FServiceRules.remove(APattern);
-      break;
-    }
+  case UserRule:
+    FUserRules.remove(APattern);
+    break;
+  case DefaultRule:
+    FDefaultRules.remove(APattern);
+    break;
   }
   FJid2IconFile.clear();
   repaintRostersView();
@@ -207,10 +183,8 @@ void StatusIcons::removeRule(const QString &APattern, RuleType ARuleType)
 
 QIcon StatusIcons::iconByJid(const Jid &AStreamJid, const Jid &AJid) const
 {
-  int show = IPresence::Offline;
-  QString subs;
-  bool ask = false;
 
+  int show = IPresence::Offline;
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
   if (presence)
   {
@@ -219,6 +193,8 @@ QIcon StatusIcons::iconByJid(const Jid &AStreamJid, const Jid &AJid) const
       show = presenceItem->show();
   }
 
+  QString subs;
+  bool ask = false;
   IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
   if (roster)
   {
@@ -255,39 +231,25 @@ QString StatusIcons::iconFileByJid(const Jid &AJid) const
   QRegExp regExp;
   regExp.setCaseSensitivity(Qt::CaseInsensitive);
 
-  QString bare = AJid.pBare();
-  QStringList patterns = FJidRules.keys();
-  foreach (QString pattern, patterns)
-  {
-    regExp.setPattern(pattern);
-    if (bare.contains(regExp))
-    {
-      QString iconFile = FJidRules.value(pattern);
-      FJid2IconFile.insert(full,iconFile);
-      return iconFile;
-    }
-  }
-
-  patterns = FCustomRules.keys();
+  QStringList patterns = FUserRules.keys();
   foreach (QString pattern, patterns)
   {
     regExp.setPattern(pattern);
     if (full.contains(regExp))
     {
-      QString iconFile = FCustomRules.value(pattern);
+      QString iconFile = FUserRules.value(pattern);
       FJid2IconFile.insert(full,iconFile);
       return iconFile;
     }
   }
 
-  QString domane = AJid.domane();
-  patterns = FServiceRules.keys();
+  patterns = FDefaultRules.keys();
   foreach (QString pattern, patterns)
   {
     regExp.setPattern(pattern);
-    if (domane.contains(regExp))
+    if (full.contains(regExp))
     {
-      QString iconFile = FServiceRules.value(pattern);
+      QString iconFile = FDefaultRules.value(pattern);
       FJid2IconFile.insert(full,iconFile);
       return iconFile;
     }
@@ -340,6 +302,44 @@ void StatusIcons::repaintRostersView()
   }
 }
 
+void StatusIcons::loadIconFilesRules()
+{
+  clearIconFilesRules();
+
+  QDir statusIconsDir(Skin::pathToSkins()+"/"+Skin::skin()+"/iconset/status","*.jisp",QDir::Name|QDir::IgnoreCase,QDir::Files);
+  QStringList iconFiles = statusIconsDir.entryList();
+  for (int i = 0; i < iconFiles.count(); ++i)
+    iconFiles[i].prepend("status/");
+
+  foreach(QString iconFile, iconFiles)
+  {
+    UnzipFile iconset(Skin::pathToSkins()+"/"+Skin::skin()+"/iconset/"+iconFile);
+    if (iconset.isValid())
+    {
+      QDomDocument doc;
+      doc.setContent(iconset.fileData("statusicons.xml"));
+      QDomElement elem = doc.firstChildElement().firstChildElement("rule");
+      while(!elem.isNull())
+      {
+        QString pattern = elem.attribute("pattern");
+        if (!pattern.isEmpty())
+        {
+          insertRule(pattern,iconFile,IStatusIcons::DefaultRule);
+          FIconFilesRules += pattern;
+        }
+        elem = elem.nextSiblingElement("rule");
+      }
+    }
+  }
+}
+
+void StatusIcons::clearIconFilesRules()
+{
+  foreach(QString rule, FIconFilesRules)
+    removeRule(rule,IStatusIcons::DefaultRule);
+  FIconFilesRules.clear();
+}
+
 void StatusIcons::onRepaintRostersView()
 {
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
@@ -352,20 +352,11 @@ void StatusIcons::onSettingsOpened()
   ISettings *settings = FSettingsPlugin->settingsForPlugin(STATUSICONS_UUID);
   setDefaultIconFile(settings->value(SVN_DEFAULT_ICONFILE,STATUS_ICONSETFILE).toString());
 
-  QHash<QString,QVariant> rules = settings->values(SVN_JIDRULES);
+  QHash<QString,QVariant> rules = settings->values(SVN_USERRULES);
   QHash<QString,QVariant>::const_iterator it = rules.constBegin();
   for (; it != rules.constEnd(); it++)
-    insertRule(it.key(),it.value().toString(),JidRule);
+    insertRule(it.key(),it.value().toString(),UserRule);
 
-  rules = settings->values(SVN_CUSTOMRULES);
-  it = rules.constBegin();
-  for (; it != rules.constEnd(); it++)
-    insertRule(it.key(),it.value().toString(),CustomRule);
-
-  rules = settings->values(SVN_SERVICERULES);
-  it = rules.constBegin();
-  for (; it != rules.constEnd(); it++)
-    insertRule(it.key(),it.value().toString(),ServiceRule);
 }
 
 void StatusIcons::onSettingsClosed()
@@ -375,25 +366,11 @@ void StatusIcons::onSettingsClosed()
   
   settings->deleteValue(SVN_RULES);
   
-  QList<QString> patterns = FJidRules.keys();
+  QStringList patterns = FUserRules.keys();
   foreach(QString pattern, patterns)
   {
-    settings->setValueNS(SVN_JIDRULES,pattern,FJidRules.value(pattern));
-    removeRule(pattern,JidRule);
-  }
-  
-  patterns = FCustomRules.keys();
-  foreach(QString pattern, patterns)
-  {
-    settings->setValueNS(SVN_CUSTOMRULES,pattern,FCustomRules.value(pattern));
-    removeRule(pattern,CustomRule);
-  }
-  
-  patterns = FServiceRules.keys();
-  foreach(QString pattern, patterns)
-  {
-    settings->setValueNS(SVN_SERVICERULES,pattern,FServiceRules.value(pattern));
-    removeRule(pattern,ServiceRule);
+    settings->setValueNS(SVN_USERRULES,pattern,FUserRules.value(pattern));
+    removeRule(pattern,UserRule);
   }
 }
 

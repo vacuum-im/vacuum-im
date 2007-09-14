@@ -1,6 +1,7 @@
 #ifndef STATUSICONS_H
 #define STATUSICONS_H
 
+#include <QDir>
 #include <QRegExp>
 #include <QPointer>
 #include "../../definations/initorders.h"
@@ -15,6 +16,7 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/skin.h"
+#include "../../utils/unzipfile.h"
 #include "rosterindexdataholder.h"
 #include "iconsoptionswidget.h"
 
@@ -64,6 +66,8 @@ signals:
   virtual void optionsRejected();
 protected:
   void repaintRostersView();
+  void loadIconFilesRules();
+  void clearIconFilesRules();
 protected slots:
   void onRepaintRostersView();
   void onSettingsOpened();
@@ -83,9 +87,9 @@ private:
 private:
   bool FRepaintStarted;
   QString FDefaultIconFile;
-  QHash<QString, QString> FJidRules;        //bareJid -> iconFile
-  QHash<QString, QString> FCustomRules;     //RegExp(Jid) -> iconFile
-  QHash<QString, QString> FServiceRules;    //RegExp(JidNode) -> iconFile
+  QHash<QString, QString> FUserRules;
+  QHash<QString, QString> FDefaultRules;
+  QSet<QString> FIconFilesRules;
   mutable QHash<QString, QString> FJid2IconFile;
 };
 

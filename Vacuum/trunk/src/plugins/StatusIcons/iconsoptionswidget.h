@@ -33,18 +33,15 @@ public:
   void apply();
 protected:
   void populateRulesTable(QTableWidget *ATable, const QStringList &AIconFiles, IStatusIcons::RuleType ARuleType);
-  void applyTableRules(QTableWidget *ATable,IStatusIcons::RuleType ARuleType);
 protected slots:
-  void onAddRule(QWidget *ATable);
-  void onDeleteRule(QWidget *ATable);
+  void onAddUserRule();
+  void onDeleteUserRule();
 private:
   Ui::IconsOptionsWidgetClass ui;
 private:
   IStatusIcons *FStatusIcons;
 private:
   QStringList FIconFiles;
-  QSignalMapper *FAddRuleMapper;
-  QSignalMapper *FDeleteRuleMapper;
 };
 
 #endif // ICONSOPTIONSWIDGET_H
