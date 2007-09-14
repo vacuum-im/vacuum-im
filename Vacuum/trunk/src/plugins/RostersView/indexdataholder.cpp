@@ -53,7 +53,7 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
     case Qt::ForegroundRole:
       return Qt::white;
     case Qt::BackgroundColorRole:
-      return Qt::darkGray;
+      return Qt::gray;
     case Qt::ToolTipRole:
       return toolTipText(AIndex);
     case RDR_FontWeight:

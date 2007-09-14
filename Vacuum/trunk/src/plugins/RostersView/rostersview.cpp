@@ -25,7 +25,7 @@ RostersView::RostersView(QWidget *AParent)
   connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimer()));
 
   header()->hide();
-  setIndentation(10);
+  setIndentation(6);
   setRootIsDecorated(false);
   setSelectionMode(NoSelection);
   setSortingEnabled(true);
@@ -383,9 +383,43 @@ void RostersView::setOption(IRostersView::Option AOption, bool AValue)
   FIndexDataHolder->setOption(AOption,AValue);
 }
 
-void RostersView::drawBranches(QPainter * APainter, const QRect &ARect, const QModelIndex &AIndex) const
+void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
 {
-  QTreeView::drawBranches(APainter,ARect,AIndex);
+  if (AIndex.child(0,0).isValid() && !AIndex.data(RDR_HideGroupExpander).toBool())
+  {
+    QRect rect = QStyle::alignedRect(Qt::LeftToRight,Qt::AlignRight|Qt::AlignVCenter,QSize(indentation(),indentation()),ARect);
+    if (!rect.isEmpty())
+    {
+      QPainterPath path;
+      if (isExpanded(AIndex))
+      {
+        path.moveTo(rect.bottomLeft());
+        path.lineTo(rect.topRight());
+        path.lineTo(rect.bottomRight());
+        path.lineTo(rect.bottomLeft());
+      }
+      else
+      {
+        path.moveTo(rect.bottomLeft());
+        path.lineTo(rect.topLeft());
+        path.lineTo(rect.topRight() +  (rect.bottomRight()-rect.topRight())/2 );
+        path.lineTo(rect.bottomLeft());
+      }
+      APainter->save();
+      if (rect.contains(viewport()->mapFromGlobal(QCursor::pos())))
+      {
+        APainter->setPen(Qt::black);
+        APainter->setBrush(Qt::black);
+      }
+      else
+      {
+        APainter->setPen(Qt::lightGray);
+        APainter->setBrush(Qt::lightGray);
+      }
+      APainter->drawPath(path);
+      APainter->restore();
+    }
+  }
 }
 
 void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
