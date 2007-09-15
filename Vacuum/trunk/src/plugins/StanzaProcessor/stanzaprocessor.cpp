@@ -413,6 +413,10 @@ bool StanzaProcessor::processIqStanza(const Jid &AStreamJid, const Stanza &AStan
 void StanzaProcessor::onStreamElement(IXmppStream *AStream, const QDomElement &AElem)
 {
   Stanza stanza(AElem);
+  if (stanza.from().isEmpty())
+    stanza.setFrom(AStream->jid().full());
+  stanza.setTo(AStream->jid().full());
+
   if (!sendStanzaIn(AStream->jid(),stanza) && stanza.canReplyError())
     sendStanzaOut(AStream->jid(), stanza.replyError("service-unavailable")); 
 }
