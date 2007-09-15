@@ -1,13 +1,11 @@
 #include "message.h"
 
-Message::Message(QObject *AParent)
-: QObject(AParent)
+Message::Message()
 {
   d = new MessageData;
 }
 
-Message::Message(const Stanza &AStanza, QObject *AParent)
-  : QObject(AParent)
+Message::Message(const Stanza &AStanza)
 {
   d = new MessageData(AStanza);
 }
@@ -26,7 +24,6 @@ void Message::setData(int ARole, const QVariant &AData)
       d->FData.insert(ARole,AData);
     else
       d->FData.remove(ARole);
-    emit dataChanged(ARole, befour);
   }
 }
 

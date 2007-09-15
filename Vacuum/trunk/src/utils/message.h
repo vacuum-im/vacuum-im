@@ -33,14 +33,19 @@ public:
 };
 
 
-class UTILS_EXPORT Message : 
-  public QObject
+class UTILS_EXPORT Message 
 {
-  Q_OBJECT;
-
 public:
-  Message(QObject *AParent = NULL);
-  Message(const Stanza &AStanza, QObject *AParent = NULL);
+  enum MessageType
+  {
+    Normal,
+    Chat,
+    GroupChat,
+    Headline
+  };
+public:
+  Message();
+  Message(const Stanza &AStanza);
   ~Message();
 
   Stanza &stanza() { return d->FStanza; }
@@ -71,8 +76,6 @@ public:
   QDomElement findChidByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang) const;
   QDomElement addChildByLang(const QDomElement &AParent, const QString &ATagName, 
     const QString &ALang, const QString &AText);
-signals:
-  void dataChanged(int ARole, const QVariant &ABefour);
 protected:
   QDomElement setTextToElem(QDomElement &AElem, const QString &AText);
 private:
