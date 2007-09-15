@@ -10,11 +10,11 @@ using namespace Ui;
 
 class MessageWindow : 
   virtual public QMainWindow, 
-  public MessageWindowClass,
-  public IMessageWindow
+  public MessageWindowClass/*,
+  public IMessageWindow*/
 {
   Q_OBJECT;
-  Q_INTERFACES(IMessageWindow);
+  //Q_INTERFACES(IMessageWindow);
 
 public:
   MessageWindow(QWidget *AParent = NULL);

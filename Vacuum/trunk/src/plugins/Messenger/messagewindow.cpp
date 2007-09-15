@@ -14,13 +14,13 @@ MessageWindow::MessageWindow(QWidget *AParent)
   toolBarsLayout->setMargin(0);
   toolBarsLayout->addWidget(FToolBar);  
 
-  FButtonGroup = new QButtonGroup(this);
-  FButtonGroup->addButton(pbtSend,SendButton);
-  FButtonGroup->addButton(pbtReply,ReplyButton);
-  FButtonGroup->addButton(pbtQuote,QuoteButton);
-  FButtonGroup->addButton(pbtChat,ChatButton);
-  FButtonGroup->addButton(pbtNext,NextButton);
-  FButtonGroup->addButton(pbtClose,CloseButton);
+  //FButtonGroup = new QButtonGroup(this);
+  //FButtonGroup->addButton(pbtSend,SendButton);
+  //FButtonGroup->addButton(pbtReply,ReplyButton);
+  //FButtonGroup->addButton(pbtQuote,QuoteButton);
+  //FButtonGroup->addButton(pbtChat,ChatButton);
+  //FButtonGroup->addButton(pbtNext,NextButton);
+  //FButtonGroup->addButton(pbtClose,CloseButton);
 }
 
 MessageWindow::~MessageWindow()

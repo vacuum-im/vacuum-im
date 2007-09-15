@@ -1,8 +1,10 @@
 #ifndef MESSENGER_H
 #define MESSENGER_H
 
+#include "../../definations/messagedataroles.h"
 #include "../../definations/initorders.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/ixmppstreams.h"
@@ -10,7 +12,6 @@
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/itraymanager.h"
-#include "../../utils/message.h"
 #include "../../utils/skin.h"
 #include "messagewindow.h"
 
@@ -22,13 +23,13 @@ class Messenger :
   public IRostersClickHooker
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMessenger IRostersClickHooker);
+  Q_INTERFACES(IPlugin IMessenger IStanzaHandler IRostersClickHooker);
 
 public:
   Messenger();
   ~Messenger();
 
-  virtual QObject* instance() { return this; }
+  virtual QObject *instance() { return this; }
 
   //IPlugin
   virtual QUuid pluginUuid() const { return MESSENGER_UUID; }
@@ -46,16 +47,24 @@ public:
   virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AHookerId);
   
   //IMessenger
-
-protected:
-  void notifyMessage(const Jid &AStreamJid, const Jid &AFromJid, const QString &AMesType);
+  virtual int newMessageId() { FMessageId++; return FMessageId; }
+  virtual int receiveMessage(const Message &AMessage);
+  virtual void showMessage(int AMessageId);
+  virtual void removeMessage(int AMessageId);
+  virtual QList<int> messages(const Jid &AStreamJid, const Jid &AFromJid = Jid(), const QString &AMesType = "all");
 signals:
   virtual void messageReceived(Message &AMessage);
-  virtual void messageWindowCreated(IMessageWindow *AWindow);
+protected:
+  void notifyMessage(int AMessageId);
+  void unNotifyMessage(int AMessageId);
 protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);
+  void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
+  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onSkinChaged();
+  void onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
+  void onTrayNotifyActivated(int ANotifyId);
 private:
   IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;
@@ -65,11 +74,15 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   ITrayManager *FTrayManager;
 private:
+  QIcon FMessageIcon;
   SkinIconset FSystemIconset;
 private:
-  int FNormalLabelId;
+  int FMessageId;
   int FIndexClickHooker;
+  int FNormalLabelId;
+  QMap<int,Message> FMessages;
   QHash<IXmppStream *,HandlerId> FMessageHandlers;
+  QHash<int,int> FTrayId2MessageId;
 };
 
 #endif // MESSENGER_H

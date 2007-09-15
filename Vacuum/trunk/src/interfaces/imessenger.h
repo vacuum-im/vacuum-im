@@ -1,29 +1,41 @@
 #ifndef IMESSENGER_H
 #define IMESSENGER_H
 
-#include <QMainWindow>
+#include <QMenuBar>
 #include <QToolBar>
 #include <QButtonGroup>
-#include <QComboBox>
+#include <QTextEdit>
+#include "../../utils/jid.h"
+#include "../../utils/message.h"
 
 #define MESSENGER_UUID "{153A4638-B468-496f-B57C-9F30CEDFCC2E}"
 
-class IMessageWindow :
-  virtual public QMainWindow
+class IMessageWindow
 {
 public:
-  enum ButtonId {
-    SendButton,
-    ReplyButton,
-    QuoteButton,
-    ChatButton,
-    NextButton,
-    CloseButton
+  enum WindowType
+  {
+    Normal,
+    Chat,
+    GroupChat,
+    Headline
+  };
+  enum WindowKind 
+  {
+    ReadOnly,
+    WriteOnly,
+    ReadWrite
   };
 public:
-  virtual QToolBar *toolBar() const =0;
-  virtual QButtonGroup *buttonGroup() const =0;
+  virtual QObject *instance() = 0;
+  virtual WindowType type() const =0;
+  virtual WindowKind kind() const =0;
+  virtual const Jid &streamJid() const =0;
+  virtual void setStreamJid(const Jid &AStreamJid) =0;
+  virtual const Jid &contactJid() const =0;
+  virtual void setContactJid(const Jid &AContactJid) =0;
 };
+
 
 class IMessenger
 {
