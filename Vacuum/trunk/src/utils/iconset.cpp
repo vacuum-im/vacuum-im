@@ -36,9 +36,19 @@ const QString &Iconset::fileName() const
   return zipFileName(); 
 }
 
+QByteArray Iconset::fileData(const QString &AFileName) const
+{
+  return UnzipFile::fileData(AFileName);
+}
+
 const QDomDocument Iconset::iconDef() const 
 { 
   return d->FIconDef; 
+}
+
+const QString &Iconset::iconsetName() const
+{
+  return d->FIconsetName;
 }
 
 QList<QString> Iconset::iconFiles() const 
@@ -97,6 +107,9 @@ bool Iconset::loadIconDefination()
   {
     if (d->FIconDef.setContent(fileData("icondef.xml"),true))
     {
+      d->FIconsetName = d->FIconDef.firstChildElement("icondef")
+                                   .firstChildElement("meta")
+                                   .firstChildElement("name").text();
       QDomElement elem = d->FIconDef.firstChildElement("icondef").firstChildElement("icon");
       while (!elem.isNull())
       {

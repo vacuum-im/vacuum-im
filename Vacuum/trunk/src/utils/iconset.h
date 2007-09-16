@@ -14,6 +14,7 @@ public:
   IconsetData() {}
   IconsetData(const IconsetData &AOther)
   {
+    FIconsetName = AOther.FIconsetName;
     FIconDef = AOther.FIconDef;
     FIconByFile = AOther.FIconByFile;
     FFileByName = AOther.FFileByName;
@@ -21,6 +22,7 @@ public:
   }
   ~IconsetData() {}
 public:
+  QString FIconsetName;
   QDomDocument FIconDef;
   QHash<QString,QIcon> FIconByFile;
   QHash<QString,QString> FFileByName;
@@ -38,7 +40,9 @@ public:
   bool openFile(const QString &AFileName);
   bool isValid() const;
   const QString &fileName() const;
+  QByteArray fileData(const QString &AFileName) const;
   const QDomDocument iconDef() const;
+  const QString &iconsetName() const;
   QList<QString> iconFiles() const;
   QList<QString> iconNames() const;
   QList<QString> tags() const;
