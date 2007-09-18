@@ -19,8 +19,8 @@ void Action::setIcon(const QIcon &AIcon)
 {
   if (FIconset)
   {
+    disconnect(FIconset,SIGNAL(iconsetChanged()),this,SLOT(onIconsetChanged()));
     FIconName.clear();
-    delete FIconset;
     FIconset = NULL;
   }
   QAction::setIcon(AIcon);
@@ -28,13 +28,11 @@ void Action::setIcon(const QIcon &AIcon)
 
 void Action::setIcon(const QString &AIconsetFile, const QString &AIconName)
 {
-  if (!FIconset)
-  {
-    FIconset = new SkinIconset(AIconsetFile,this);
-    connect(FIconset,SIGNAL(skinChanged()),SLOT(onSkinChanged()));
-  }
   FIconName = AIconName;
-  FIconset->openFile(AIconsetFile);
+  if (FIconset)
+    disconnect(FIconset,SIGNAL(iconsetChanged()),this,SLOT(onIconsetChanged()));
+  FIconset = Skin::getSkinIconset(AIconsetFile);
+  connect(FIconset,SIGNAL(iconsetChanged()),SLOT(onIconsetChanged()));
   QAction::setIcon(FIconset->iconByName(AIconName));
 }
 
@@ -92,8 +90,7 @@ void Action::onMenuDestroyed(Menu *AMenu)
     FMenu = NULL;
 }
 
-void Action::onSkinChanged()
+void Action::onIconsetChanged()
 {
-  if (FIconset)
-    QAction::setIcon(FIconset->iconByName(FIconName));
+  QAction::setIcon(FIconset->iconByName(FIconName));
 }

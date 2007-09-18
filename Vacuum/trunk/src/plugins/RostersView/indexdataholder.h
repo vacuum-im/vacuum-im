@@ -34,7 +34,6 @@ protected:
   QString toolTipText(const IRosterIndex *AIndex) const;
 private:
   int FOptions;
-  SkinIconset FStatusIconset;
 };
 
 #endif // INDEXDATAHOLDER_H

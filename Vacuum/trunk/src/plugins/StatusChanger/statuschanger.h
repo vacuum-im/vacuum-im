@@ -127,7 +127,8 @@ protected slots:
   void onAccountShown(IAccount *AAccount);
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  void onSkinChanged();
+  void onStatusIconsetChanged();
+  void onRosterIconsetChanged();
   void onSettingsOpened();
   void onSettingsClosed();
   void onReconnectTimer();
@@ -149,8 +150,8 @@ private:
   IAccountManager *FAccountManager;
 private:
   int FConnectingLabel;
-  SkinIconset FStatusIconset;
-  SkinIconset FRosterIconset;
+  SkinIconset *FStatusIconset;
+  SkinIconset *FRosterIconset;
 private:
   Action *FEditStatusAction;
   QPointer<EditStatusDialog> FEditStatusDialog;

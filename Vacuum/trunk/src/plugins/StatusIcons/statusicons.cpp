@@ -80,7 +80,9 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &AInitOrde
 
 bool StatusIcons::initObjects()
 {
-  FStatusIconset.openFile(STATUS_ICONSETFILE);
+  FStatusIconset = Skin::getSkinIconset(STATUS_ICONSETFILE);
+  connect(FStatusIconset,SIGNAL(iconsetChanged()),SLOT(onStatusIconsetChanged()));
+
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
   {
     FDataHolder = new RosterIndexDataHolder(this);
@@ -114,7 +116,7 @@ void StatusIcons::setDefaultIconFile(const QString &AIconFile)
   if (FDefaultIconFile != AIconFile && Skin::getIconset(AIconFile).isValid())
   {
     FDefaultIconFile = AIconFile;
-    FStatusIconset.openFile(AIconFile);
+    FStatusIconset->openFile(AIconFile);
     FJid2IconFile.clear();
     repaintRostersView();
     emit defaultIconFileChanged(AIconFile);
@@ -213,13 +215,9 @@ QIcon StatusIcons::iconByJidStatus(const Jid &AJid, int AShow, const QString &AS
 {
   QString iconFile = iconFileByJid(AJid);
   QString iconName = iconNameByStatus(AShow,ASubscription,AAsk);
-  Iconset iconset = Skin::getIconset(iconFile);
-  if (!iconset.isValid())
-    iconset = Skin::getDefIconset(iconFile);
-  if (iconset.isValid())
-    return iconset.iconByName(iconName);
-  else
-    return FStatusIconset.iconByName(iconName);
+  QIcon icon = Skin::getSkinIconset(iconFile)->iconByName(iconName);
+
+  return !icon.isNull() ? icon : FStatusIconset->iconByName(iconName);
 }
 
 QString StatusIcons::iconFileByJid(const Jid &AJid) const
@@ -290,7 +288,7 @@ QString StatusIcons::iconNameByStatus(int AShow, const QString &ASubscription, b
 
 QIcon StatusIcons::iconByStatus(int AShow, const QString &ASubscription, bool AAsk) const
 {
-  return FStatusIconset.iconByName(iconNameByStatus(AShow,ASubscription,AAsk));
+  return FStatusIconset->iconByName(iconNameByStatus(AShow,ASubscription,AAsk));
 }
 
 void StatusIcons::repaintRostersView()
@@ -306,14 +304,13 @@ void StatusIcons::loadIconFilesRules()
 {
   clearIconFilesRules();
 
-  QDir statusIconsDir(Skin::pathToSkins()+"/"+Skin::skin()+"/iconset/status","*.jisp",QDir::Name|QDir::IgnoreCase,QDir::Files);
-  QStringList iconFiles = statusIconsDir.entryList();
+  QStringList iconFiles = Skin::skinFiles("iconset","status","*.jisp");
   for (int i = 0; i < iconFiles.count(); ++i)
     iconFiles[i].prepend("status/");
 
   foreach(QString iconFile, iconFiles)
   {
-    UnzipFile iconset(Skin::pathToSkins()+"/"+Skin::skin()+"/iconset/"+iconFile);
+    UnzipFile iconset(Skin::skinsDirectory()+"/"+Skin::skin()+"/iconset/"+iconFile);
     if (iconset.isValid())
     {
       QDomDocument doc;
@@ -384,6 +381,11 @@ void StatusIcons::onOptionsAccepted()
 void StatusIcons::onOptionsRejected()
 {
   emit optionsRejected();
+}
+
+void StatusIcons::onStatusIconsetChanged()
+{
+  repaintRostersView();
 }
 
 Q_EXPORT_PLUGIN2(StatusIconsPlugin, StatusIcons)

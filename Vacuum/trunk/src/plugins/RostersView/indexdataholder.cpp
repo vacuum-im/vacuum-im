@@ -3,7 +3,6 @@
 IndexDataHolder::IndexDataHolder(QObject *AParent) :
   QObject(AParent)
 {
-  FStatusIconset.openFile(STATUS_ICONSETFILE);
   FOptions = 0;
 }
 

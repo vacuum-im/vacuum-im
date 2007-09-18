@@ -39,14 +39,15 @@ signals:
   void menuDestroyed(Menu *);
 protected slots:
   void onActionDestroyed(Action *AAction);
-  void onSkinChanged();
+  void onIconsetChanged();
+private:
+  Action *FMenuAction;
+  SkinIconset *FIconset;
 private:
   typedef QMultiMap<int,Action *> ActionList;
   ActionList FActions;
-  QMap<int,QAction *> FSeparators;
-  Action *FMenuAction;
-  SkinIconset *FIconset;
   QString FIconName;
+  QMap<int,QAction *> FSeparators;
 };
 
 #endif // MENU_H

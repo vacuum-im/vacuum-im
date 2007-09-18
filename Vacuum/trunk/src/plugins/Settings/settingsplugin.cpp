@@ -4,8 +4,11 @@
 #include <QByteArray>
 #include <QVBoxLayout>
 
-#define PROFILE_VERSION "1.0"
-#define SETTINGS_VERSION "1.0"
+#define PROFILE_VERSION         "1.0"
+#define SETTINGS_VERSION        "1.0"
+
+#define IN_OPTIONS              "psi/options"
+#define IN_PROFILE              "psi/profile"
 
 SettingsPlugin::SettingsPlugin()
 {
@@ -13,7 +16,6 @@ SettingsPlugin::SettingsPlugin()
   FOpenProfileDialogAction = NULL;
   FTrayManager = NULL;
   FProfileOpened = false;
-  FSystemIconset.openFile(SYSTEM_ICONSETFILE);
 }
 
 SettingsPlugin::~SettingsPlugin()
@@ -60,14 +62,17 @@ bool SettingsPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool SettingsPlugin::initObjects()
 {
+  FSystemIconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
+  connect(FSystemIconset,SIGNAL(iconsetChanged()),SLOT(onSystemIconsetChanged()));
+
   FOpenOptionsDialogAction = new Action(this);
   FOpenOptionsDialogAction->setEnabled(false);
-  FOpenOptionsDialogAction->setIcon(SYSTEM_ICONSETFILE,"psi/options");
+  FOpenOptionsDialogAction->setIcon(SYSTEM_ICONSETFILE,IN_OPTIONS);
   FOpenOptionsDialogAction->setText(tr("Options..."));
   connect(FOpenOptionsDialogAction,SIGNAL(triggered(bool)),SLOT(openOptionsDialogByAction(bool)));
 
   FOpenProfileDialogAction = new Action(this);
-  FOpenProfileDialogAction->setIcon(SYSTEM_ICONSETFILE,"psi/profile");
+  FOpenProfileDialogAction->setIcon(SYSTEM_ICONSETFILE,IN_PROFILE);
   FOpenProfileDialogAction->setText(tr("Change profile..."));
   connect(FOpenProfileDialogAction,SIGNAL(triggered(bool)),SLOT(openProfileDialogByAction(bool)));
 
@@ -402,7 +407,7 @@ void SettingsPlugin::openOptionsDialog(const QString &ANode)
   {
     FOptionsDialog = new OptionsDialog;
     FOptionsDialog->setAttribute(Qt::WA_DeleteOnClose,true);
-    FOptionsDialog->setWindowIcon(FSystemIconset.iconByName("psi/options"));
+    FOptionsDialog->setWindowIcon(FSystemIconset->iconByName(IN_OPTIONS));
     connect(FOptionsDialog, SIGNAL(opened()),SLOT(onOptionsDialogOpened()));
     connect(FOptionsDialog, SIGNAL(accepted()),SLOT(onOptionsDialogAccepted()));
     connect(FOptionsDialog, SIGNAL(rejected()),SLOT(onOptionsDialogRejected()));
@@ -525,6 +530,12 @@ void SettingsPlugin::onOptionsDialogClosed()
 void SettingsPlugin::onPluginManagerQuit()
 {
   setProfileClosed();
+}
+
+void SettingsPlugin::onSystemIconsetChanged()
+{
+  if (!FOptionsDialog.isNull())
+    FOptionsDialog->setWindowIcon(FSystemIconset->iconByName(IN_OPTIONS));
 }
 
 Q_EXPORT_PLUGIN2(SettingsPlugin, SettingsPlugin)

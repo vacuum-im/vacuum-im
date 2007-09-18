@@ -91,6 +91,7 @@ protected slots:
   void onSubsDialogSetupNext();
   void onAddContactDialogDestroyed(QObject *AObject);
   void onAccountChanged(const QString &AName, const QVariant &AValue);
+  void onSystemIconsetChanged();
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersModelPlugin *FRostersModelPlugin;
@@ -102,7 +103,7 @@ private:
   IAccountManager *FAccountManager;
 private:
   Menu *FAddContactMenu;
-  SkinIconset FSystemIconset;
+  SkinIconset *FSystemIconset;
   QPointer<SubscriptionDialog> FSubsDialog;
 private:
   int FSubsId;

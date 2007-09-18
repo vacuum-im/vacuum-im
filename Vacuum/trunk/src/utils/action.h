@@ -44,13 +44,14 @@ signals:
   void actionDestroyed(Action *);
 protected slots:
   void onMenuDestroyed(Menu *AMenu);
-  void onSkinChanged();
+  void onIconsetChanged();
+private:
+  Menu *FMenu;
+  SkinIconset *FIconset;
 private:
   static int FNewRole;
-  Menu *FMenu;
-  QHash<int,QVariant> FData;
-  SkinIconset *FIconset;
   QString FIconName;
+  QHash<int,QVariant> FData;
 };
 
 #endif // ACTION_H

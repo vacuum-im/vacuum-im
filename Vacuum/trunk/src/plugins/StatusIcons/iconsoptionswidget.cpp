@@ -1,7 +1,6 @@
 #include "iconsoptionswidget.h"
 
 #include <QSet>
-#include <QDir>
 #include <QHeaderView>
 #include <QComboBox>
 
@@ -55,8 +54,7 @@ IconsOptionsWidget::IconsOptionsWidget(IStatusIcons *AStatusIcons)
   ui.setupUi(this);
   FStatusIcons = AStatusIcons;
 
-  QDir statusIconsDir(Skin::pathToSkins()+"/"+Skin::skin()+"/iconset/status","*.jisp",QDir::Name|QDir::IgnoreCase,QDir::Files);
-  FIconFiles = statusIconsDir.entryList();
+  FIconFiles = Skin::skinFiles("iconset","status","*.jisp");
   for (int i = 0; i < FIconFiles.count(); ++i)
     FIconFiles[i].prepend("status/");
 

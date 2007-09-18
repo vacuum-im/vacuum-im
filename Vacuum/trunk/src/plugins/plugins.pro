@@ -22,4 +22,5 @@ SUBDIRS = settings \
           connectionmanager \
           defaultconnection \
           starttls \
-          statusicons
+          statusicons \
+          skinmanager

@@ -90,12 +90,13 @@ protected slots:
   void onOptionsDialogRejected();
   void onOptionsDialogClosed();
   void onPluginManagerQuit();
+  void onSystemIconsetChanged();
 private:
   IPluginManager *FPluginManager;
   IMainWindowPlugin *FMainWindowPlugin;
   ITrayManager *FTrayManager;
 private:
-  SkinIconset FSystemIconset;
+  SkinIconset *FSystemIconset;
   Action *FOpenOptionsDialogAction;
   Action *FOpenProfileDialogAction;
 private:

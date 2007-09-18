@@ -33,9 +33,7 @@ public:
   QIcon iconByName(const QString &AIconName) const;
   QIcon iconByTagValue(const QString &ATag, QString &AValue) const;
 signals:
-  void skinChanged();
-protected:
-  void reset();
+  void iconsetChanged();
 private:
   QString FFileName;
   Iconset FIconset;
@@ -44,22 +42,28 @@ private:
 
 class UTILS_EXPORT Skin
 {
+  friend class SkinIconset;
 public:
+  static SkinIconset *getSkinIconset(const QString &AFileName);
   static Iconset getIconset(const QString &AFileName);
-  static Iconset getDefIconset(const QString &AFileName);
+  static Iconset getDefaultIconset(const QString &AFileName);
+  static QStringList skins();
+  static QStringList skinFiles(const QString &ASkinType, const QString &ASubFolder, const QString &AFilter = "*.*", const QString &ASkin = "");
+  static QIcon skinIcon(const QString &ASkin);
+  static const QString &skin();
+  static void setSkin(const QString &ASkin);
+  static const QString &skinsDirectory();
+  static void setSkinsDirectory(const QString &ASkinsDirectory);
+protected:
   static void addSkinIconset(SkinIconset *ASkinIconset);
   static void removeSkinIconset(SkinIconset *ASkinIconset);
-  static const QString &pathToSkins();
-  static void setPathToSkins(const QString &APathToSkins);
-  static const QString &skin();
-  static void setSkin(const QString &ASkinName);
-protected:
-  static void reset();
+  static void updateSkinIconsets();
 private:
-  static QString FPathToSkins;
-  static QString FSkinName;
+  static QString FSkinsDirectory;
+  static QString FSkin;
   static QHash<QString,Iconset> FIconsets;
-  static QList<QPointer<SkinIconset> > FSkinIconsets;
+  static QHash<QString,SkinIconset *> FSkinIconsets;
+  static QList<SkinIconset *> FAllSkinIconsets;
 };
 
 #endif // SKIN_H

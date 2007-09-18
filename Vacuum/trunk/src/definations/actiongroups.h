@@ -8,6 +8,7 @@
 #define AG_ROSTERCHANGER_MMENU                                  500
 #define AG_SETTINGS_MMENU                                       700
 #define AG_ACCOUNTMANAGER_MMENU                                 700
+#define AG_SKINMANAGER_MENU                                     700
 #define AG_MAINWINDOW_MMENU_QUIT                                1000
 
 //RostersView (ContextMenu)
@@ -21,6 +22,7 @@
 #define AG_STATUSCHANGER_TRAY                                   200
 #define AG_ROSTERCHANGER_TRAY                                   500
 #define AG_SETTINGS_TRAY                                        700
+#define AG_SKINMANAGER_TRAY                                     700
 #define AG_TRAYMANAGER_TRAY_QUIT                                1000
 
 //StatusChanger (StatusMenu, StreamMenu)

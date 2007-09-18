@@ -1,7 +1,6 @@
 #ifndef STATUSICONS_H
 #define STATUSICONS_H
 
-#include <QDir>
 #include <QRegExp>
 #include <QPointer>
 #include "../../definations/initorders.h"
@@ -74,6 +73,7 @@ protected slots:
   void onSettingsClosed();
   void onOptionsAccepted();
   void onOptionsRejected();
+  void onStatusIconsetChanged();
 private:
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
@@ -81,7 +81,7 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   ISettingsPlugin *FSettingsPlugin;
 private:
-  SkinIconset FStatusIconset;
+  SkinIconset *FStatusIconset;
   RosterIndexDataHolder *FDataHolder;
   QPointer<IconsOptionsWidget> FIconsOptionWidget;
 private:

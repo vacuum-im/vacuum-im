@@ -3,6 +3,9 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
+#define IN_EVENTS           "psi/events"
+#define IN_ADDCONTACT       "psi/addContact"
+
 RosterChanger::RosterChanger()
 {
   FRosterPlugin = NULL;
@@ -17,8 +20,6 @@ RosterChanger::RosterChanger()
   FAddContactMenu = NULL;
   FSubsId = 0;
   FSubsLabelId = 0;
-
-  FSystemIconset.openFile(SYSTEM_ICONSETFILE);
 }
 
 RosterChanger::~RosterChanger()
@@ -95,6 +96,8 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 bool RosterChanger::initObjects()
 {
+  FSystemIconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
+  connect(FSystemIconset,SIGNAL(iconsetChanged()),SLOT(onSystemIconsetChanged()));
 
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
   {
@@ -105,7 +108,7 @@ bool RosterChanger::initObjects()
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FSubsLabelId = FRostersView->createIndexLabel(RLO_SUBSCRIBTION,
-      FSystemIconset.iconByName("psi/events"),IRostersView::LabelBlink);
+      FSystemIconset->iconByName(IN_EVENTS),IRostersView::LabelBlink);
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
     connect(FRostersView,SIGNAL(labelDoubleClicked(IRosterIndex *, int, bool &)),
@@ -117,7 +120,7 @@ bool RosterChanger::initObjects()
   if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
   {
     FAddContactMenu = new Menu(FMainWindowPlugin->mainWindow()->mainMenu());
-    FAddContactMenu->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
+    FAddContactMenu->setIcon(SYSTEM_ICONSETFILE,IN_ADDCONTACT);
     FAddContactMenu->setTitle(tr("Add contact to"));
     FAddContactMenu->menuAction()->setEnabled(false);
     FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FAddContactMenu->menuAction(),AG_ROSTERCHANGER_MMENU,true);
@@ -486,7 +489,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid,
 
   if (FTrayManager)
   {
-    subsItem->trayId = FTrayManager->appendNotify(FSystemIconset.iconByName("psi/events"),
+    subsItem->trayId = FTrayManager->appendNotify(FSystemIconset->iconByName(IN_EVENTS),
       tr("Subscription message from %1").arg(AFromJid.full()),true);
   }
 
@@ -902,6 +905,14 @@ void RosterChanger::onAccountChanged(const QString &AName, const QVariant &AValu
       if (action)
         action->setText(AValue.toString());
     }
+  }
+}
+
+void RosterChanger::onSystemIconsetChanged()
+{
+  if (FRostersView)
+  {
+    FRostersView->updateIndexLabel(RLO_SUBSCRIBTION,FSystemIconset->iconByName(IN_EVENTS),IRostersView::LabelBlink);
   }
 }
 

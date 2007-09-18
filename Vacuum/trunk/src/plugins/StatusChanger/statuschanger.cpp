@@ -138,9 +138,10 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 bool StatusChanger::initObjects()
 {
-  FRosterIconset.openFile(ROSTER_ICONSETFILE);
-  FStatusIconset.openFile(STATUS_ICONSETFILE);
-  connect(&FStatusIconset, SIGNAL(skinChanged()),SLOT(onSkinChanged()));
+  FStatusIconset = Skin::getSkinIconset(STATUS_ICONSETFILE);
+  connect(FStatusIconset, SIGNAL(iconsetChanged()),SLOT(onStatusIconsetChanged()));
+  FRosterIconset = Skin::getSkinIconset(ROSTER_ICONSETFILE);
+  connect(FRosterIconset, SIGNAL(iconsetChanged()),SLOT(onStatusIconsetChanged()));
 
   FMainMenu = new Menu(NULL);
 
@@ -175,7 +176,7 @@ bool StatusChanger::initObjects()
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,FRosterIconset.iconByName("connecting"));
+    FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,FRosterIconset->iconByName("connecting"));
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
@@ -434,21 +435,21 @@ QIcon StatusChanger::iconByShow(int AShow) const
   switch (AShow)
   {
   case IPresence::Offline: 
-    return FStatusIconset.iconByName("status/offline");
+    return FStatusIconset->iconByName("status/offline");
   case IPresence::Online: 
-    return FStatusIconset.iconByName("status/online");
+    return FStatusIconset->iconByName("status/online");
   case IPresence::Chat: 
-    return FStatusIconset.iconByName("status/chat");
+    return FStatusIconset->iconByName("status/chat");
   case IPresence::Away: 
-    return FStatusIconset.iconByName("status/away");
+    return FStatusIconset->iconByName("status/away");
   case IPresence::ExtendedAway: 
-    return FStatusIconset.iconByName("status/xa");
+    return FStatusIconset->iconByName("status/xa");
   case IPresence::DoNotDistrib: 
-    return FStatusIconset.iconByName("status/dnd");
+    return FStatusIconset->iconByName("status/dnd");
   case IPresence::Invisible: 
-    return FStatusIconset.iconByName("status/invisible");
+    return FStatusIconset->iconByName("status/invisible");
   case IPresence::Error: 
-    return FStatusIconset.iconByName("status/error");
+    return FStatusIconset->iconByName("status/error");
   default:
     return QIcon();
   }
@@ -1038,15 +1039,19 @@ void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   }
 }
 
-void StatusChanger::onSkinChanged()
+void StatusChanger::onStatusIconsetChanged()
 {
-  if (FRostersView)
-    FRostersView->updateIndexLabel(FConnectingLabel,FRosterIconset.iconByName("connecting"));
   foreach (StatusItem *statusItem, FStatusItems)
     updateStatusActions(statusItem->code);
   foreach (IPresence *presence, FStreamMenu.keys())
     updateStreamMenu(presence);
   updateMainMenu();
+}
+
+void StatusChanger::onRosterIconsetChanged()
+{
+  if (FRostersView)
+    FRostersView->updateIndexLabel(FConnectingLabel,FRosterIconset->iconByName("connecting"));
 }
 
 void StatusChanger::onSettingsOpened()

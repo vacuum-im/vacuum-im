@@ -15,4 +15,5 @@ HEADERS += ipluginmanager.h \
            imessenger.h \
            iconnectionmanager.h \
            idefaultconnection.h \
-           istatusicons.h
+           istatusicons.h \
+           iskinmanager.h

@@ -1,20 +1,25 @@
 #include "skin.h"
-#include <QSet>
 
-QString Skin::FPathToSkins = "skin";
-QString Skin::FSkinName = "default";
+#include <QSet>
+#include <QDir>
+
+#define DEFAULT_SKIN_NAME         "default"
+
+QString Skin::FSkinsDirectory = "./skin";
+QString Skin::FSkin = DEFAULT_SKIN_NAME;
 QHash<QString,Iconset> Skin::FIconsets;
-QList<QPointer<SkinIconset> > Skin::FSkinIconsets;
+QHash<QString,SkinIconset *> Skin::FSkinIconsets;
+QList<SkinIconset *> Skin::FAllSkinIconsets;
 
 //--SkinIconset--
-SkinIconset::SkinIconset(QObject *AParent) :
-  QObject(AParent)
+SkinIconset::SkinIconset(QObject *AParent)
+  : QObject(AParent)
 {
   Skin::addSkinIconset(this);
 }
 
-SkinIconset::SkinIconset(const QString &AFileName, QObject *AParent) :
-  QObject(AParent)
+SkinIconset::SkinIconset(const QString &AFileName, QObject *AParent)
+  : QObject(AParent)
 {
   Skin::addSkinIconset(this);
   openFile(AFileName);
@@ -29,7 +34,8 @@ bool SkinIconset::openFile(const QString &AFileName)
 {
   FFileName = AFileName;
   FIconset = Skin::getIconset(AFileName);
-  FDefIconset = Skin::getDefIconset(AFileName);
+  FDefIconset = Skin::getDefaultIconset(AFileName);
+  emit iconsetChanged();
   return isValid();
 }
 
@@ -45,22 +51,22 @@ bool SkinIconset::isValid() const
 
 QList<QString> SkinIconset::iconFiles() const
 {
-  return FIconset.iconFiles().toSet().unite(FDefIconset.iconFiles().toSet()).toList() ;
+  return FIconset.isValid() ? FIconset.iconFiles() : FDefIconset.iconFiles();
 }
 
 QList<QString> SkinIconset::iconNames() const
 {
-  return FIconset.iconNames().toSet().unite(FDefIconset.iconNames().toSet()).toList() ;
+  return FIconset.isValid() ? FIconset.iconNames() : FDefIconset.iconNames();
 }
 
 QList<QString> SkinIconset::tags() const
 {
-  return FIconset.tags().toSet().unite(FDefIconset.tags().toSet()).toList() ;
+  return FIconset.isValid() ? FIconset.tags() : FDefIconset.tags();
 }
 
 QList<QString> SkinIconset::tagValues(const QString &ATagName) const
 {
-  return FIconset.tagValues(ATagName).toSet().unite(FDefIconset.tagValues(ATagName).toSet()).toList() ;
+  return FIconset.isValid() ? FIconset.tagValues(ATagName) : FDefIconset.tagValues(ATagName);
 }
 
 QIcon SkinIconset::iconByFile(const QString &AFileName) const
@@ -87,102 +93,116 @@ QIcon SkinIconset::iconByTagValue(const QString &ATag, QString &AValue) const
   return icon;  
 }
 
-void SkinIconset::reset() 
-{
-  openFile(FFileName);
-  emit skinChanged();
-}
-
 
 //--Skin--
+SkinIconset *Skin::getSkinIconset(const QString &AFileName)
+{
+  SkinIconset *skinIconset = FSkinIconsets.value(AFileName);
+  if (!skinIconset)
+  {
+    skinIconset = new SkinIconset(AFileName);
+    FSkinIconsets.insert(AFileName,skinIconset);
+  }
+  return skinIconset;
+}
+
 Iconset Skin::getIconset(const QString &AFileName)
 {
-  QString fullFileName = FPathToSkins;
-  if (!fullFileName.endsWith('/'))
-    fullFileName.append('/');
-  
-  fullFileName+=FSkinName;
-  if (!fullFileName.endsWith('/'))
-    fullFileName.append('/');
-  
-  fullFileName+="iconset/"+AFileName;
-
-  if (!FIconsets.contains(fullFileName))
+  QString skinFileName = FSkin+"/iconset/"+AFileName;
+  if (!FIconsets.contains(skinFileName))
   {
+    QString fullFileName = FSkinsDirectory+"/"+skinFileName;
     Iconset iconset(fullFileName);
     if (iconset.isValid())
-      FIconsets.insert(fullFileName,iconset);
+      FIconsets.insert(skinFileName,iconset);
     return iconset;
   }
   else
-    return FIconsets.value(fullFileName);
+    return FIconsets.value(skinFileName);
 }
 
-Iconset Skin::getDefIconset(const QString &AFileName)
+Iconset Skin::getDefaultIconset(const QString &AFileName)
 {
-  QString fullFileName = FPathToSkins;
-  if (!fullFileName.endsWith('/'))
-    fullFileName.append('/');
-  
-  fullFileName+="default/iconset/"+AFileName;
-
-  if (!FIconsets.contains(fullFileName))
+  QString skinFileName = QString(DEFAULT_SKIN_NAME)+"/iconset/"+AFileName;
+  if (!FIconsets.contains(skinFileName))
   {
+    QString fullFileName = FSkinsDirectory+"/"+skinFileName;
     Iconset iconset(fullFileName);
     if (iconset.isValid())
-      FIconsets.insert(fullFileName,iconset);
+      FIconsets.insert(skinFileName,iconset);
     return iconset;
   }
   else
-    return FIconsets.value(fullFileName);
+    return FIconsets.value(skinFileName);
 }
 
-void Skin::addSkinIconset(SkinIconset *ASkinIconset)
+QStringList Skin::skins()
 {
-  if (!FSkinIconsets.contains(ASkinIconset))
-    FSkinIconsets.append(ASkinIconset);
+  QDir dir(FSkinsDirectory,"",QDir::Name|QDir::IgnoreCase,QDir::AllDirs|QDir::NoDotAndDotDot);
+  return dir.entryList();
 }
 
-void Skin::removeSkinIconset(SkinIconset *ASkinIconset)
+QStringList Skin::skinFiles(const QString &ASkinType, const QString &ASubFolder, const QString &AFilter /*= "*.*"*/, const QString &ASkin /*= ""*/)
 {
-  if (FSkinIconsets.contains(ASkinIconset))
-    FSkinIconsets.removeAt(FSkinIconsets.indexOf(ASkinIconset));
+  QString dirPath;
+  if (ASkin.isEmpty())
+    dirPath = FSkinsDirectory+"/"+FSkin+"/"+ASkinType+"/"+ASubFolder;
+  else
+    dirPath = FSkinsDirectory+"/"+ASkin+"/"+ASkinType+"/"+ASubFolder;
+
+  QDir dir(dirPath,AFilter,QDir::Name|QDir::IgnoreCase,QDir::Files);
+  return dir.entryList();
 }
 
-const QString &Skin::pathToSkins()
+QIcon Skin::skinIcon(const QString &ASkin)
 {
-  return FPathToSkins;
-}
-
-void Skin::setPathToSkins(const QString &APathToSkins)
-{
-  if (FPathToSkins != APathToSkins)
-  {
-    FPathToSkins = APathToSkins;
-    reset();
-  }
+  return QIcon(FSkinsDirectory+"/"+ASkin+"/skinicon.png");
 }
 
 const QString &Skin::skin()
 {
-  return FSkinName;
+  return FSkin;
 }
 
-void Skin::setSkin(const QString &ASkinName)
+void Skin::setSkin(const QString &ASkin)
 {
-  if (FSkinName != ASkinName)
+  if (FSkin != ASkin)
   {
-    FSkinName = ASkinName;
-    reset();
+    FSkin = ASkin;
+    updateSkinIconsets();
   }
 }
 
-void Skin::reset()
+const QString &Skin::skinsDirectory()
+{
+  return FSkinsDirectory;
+}
+
+void Skin::setSkinsDirectory(const QString &ASkinsDirectory)
+{
+  if (FSkinsDirectory!=ASkinsDirectory)
+  {
+    FSkinsDirectory = ASkinsDirectory;
+    updateSkinIconsets();
+  }
+}
+
+void Skin::addSkinIconset(SkinIconset *ASkinIconset)
+{
+  if (!FAllSkinIconsets.contains(ASkinIconset))
+    FAllSkinIconsets.append(ASkinIconset);
+}
+
+void Skin::removeSkinIconset(SkinIconset *ASkinIconset)
+{
+  if (FAllSkinIconsets.contains(ASkinIconset))
+    FAllSkinIconsets.removeAt(FAllSkinIconsets.indexOf(ASkinIconset));
+}
+
+void Skin::updateSkinIconsets()
 {
   FIconsets.clear();
-
-  QPointer<SkinIconset> skinIconset;
-  foreach(skinIconset,FSkinIconsets)
-    //if (!skinIconset.isNull())
-      skinIconset->reset();
+  foreach(SkinIconset *skinIconset,FAllSkinIconsets)
+    skinIconset->openFile(skinIconset->fileName());
 }
+
