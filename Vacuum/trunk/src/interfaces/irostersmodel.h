@@ -91,13 +91,13 @@ public:
   virtual QString myResourcesGroupName() const =0;
   virtual QString notInRosterGroupName() const =0;
 signals:
-  virtual void streamAdded(const Jid &) =0;
-  virtual void streamRemoved(const Jid &) =0;
+  virtual void streamAdded(const Jid &AStreamJid) =0;
+  virtual void streamRemoved(const Jid &AStreamJid) =0;
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;
   virtual void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
-  virtual void indexInserted(IRosterIndex *) =0;
-  virtual void indexDataChanged(IRosterIndex *, int ARole) =0;
-  virtual void indexRemoved(IRosterIndex *) =0;
+  virtual void indexInserted(IRosterIndex *AIndex) =0;
+  virtual void indexDataChanged(IRosterIndex *AIndex, int ARole) =0;
+  virtual void indexRemoved(IRosterIndex *AIndex) =0;
   virtual void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder) =0;
   virtual void defaultDataHolderRemoved(IRosterIndexDataHolder *ADataHolder) =0;
 };
@@ -112,6 +112,7 @@ public:
 signals:
   virtual void modelCreated(IRostersModel *AModel) =0;
   virtual void modelDestroyed(IRostersModel *AModel) =0;
+  virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;
 };
 
 Q_DECLARE_INTERFACE(IRosterIndexDataHolder,"Vacuum.Plugin.IRosterIndexDataHolder/1.0");

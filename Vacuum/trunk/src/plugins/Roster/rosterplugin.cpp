@@ -37,6 +37,10 @@ bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitO
   plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+
+  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  if (plugin) 
+    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
   
   return FStanzaProcessor!=NULL;
 }
@@ -63,6 +67,13 @@ IRoster *RosterPlugin::getRoster(const Jid &AStreamJid) const
   return NULL;    
 }
 
+void RosterPlugin::loadRosterItems(const Jid &AStreamJid)
+{
+  Roster *roster = (Roster *)getRoster(AStreamJid);
+  if (roster)
+    roster->loadRosterItems(rosterFile(AStreamJid));
+}
+
 void RosterPlugin::removeRoster(IXmppStream *AXmppStream)
 {
   Roster *roster = (Roster *)getRoster(AXmppStream->jid());
@@ -72,6 +83,19 @@ void RosterPlugin::removeRoster(IXmppStream *AXmppStream)
     FRosters.removeAt(FRosters.indexOf(roster));  
     delete roster;
   }
+}
+
+QString RosterPlugin::rosterFile(const Jid &AStreamJid) const
+{
+  QString fileName = AStreamJid.pBare()+".xml";
+  fileName.replace("@","_at_");
+  QDir dir;
+  if (FSettingsPlugin)
+    dir.setPath(FSettingsPlugin->homeDir().path());
+  if (!dir.exists("rosters"))
+    dir.mkdir("rosters");
+  fileName = dir.path()+"/rosters/"+fileName;
+  return fileName;
 }
 
 void RosterPlugin::onRosterOpened()
@@ -126,6 +150,7 @@ void RosterPlugin::onStreamRemoved(IXmppStream *AXmppStream)
   IRoster *roster = getRoster(AXmppStream->jid());
   if (roster)
   {
+    roster->saveRosterItems(rosterFile(roster->streamJid()));
     emit rosterRemoved(roster);
     removeRoster(AXmppStream);
   }

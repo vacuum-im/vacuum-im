@@ -35,12 +35,14 @@ public:
 signals:
   virtual void modelCreated(IRostersModel *);
   virtual void modelDestroyed(IRostersModel *);
+  virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
 protected slots:
   void onRosterAdded(IRoster *ARoster);
   void onRosterRemoved(IRoster *ARoster);
   void onPresenceAdded(IPresence *APresence);
   void onPresenceRemoved(IPresence *APresence);
   void onAccountChanged(const QString &AName, const QVariant &AValue);
+  void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
 private:
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;

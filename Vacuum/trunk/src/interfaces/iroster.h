@@ -33,24 +33,24 @@ public:
   virtual QObject *instance() =0;
   virtual const Jid &streamJid() const =0;
   virtual IXmppStream *xmppStream() const =0;
-  virtual void open() =0;
-  virtual void close() =0;
   virtual bool isOpen() const =0;
   virtual QString groupDelimiter() const =0;
-  virtual IRosterItem *item(const Jid &) const=0;
+  virtual IRosterItem *item(const Jid &AItemJid) const=0;
   virtual QList<IRosterItem *> items() const =0;
   virtual QSet<QString> groups() const =0;
-  virtual QList<IRosterItem *> groupItems(const QString &) const =0;
-  virtual QSet<QString> itemGroups(const Jid &) const =0;
-  virtual void setItem(const Jid &, const QString &AName, const QSet<QString> &AGroups) =0;
-  virtual void removeItem(const Jid &) =0;
+  virtual QList<IRosterItem *> groupItems(const QString &AGroup) const =0;
+  virtual QSet<QString> itemGroups(const Jid &AItemJid) const =0;
+  virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups) =0;
+  virtual void removeItem(const Jid &AItemJid) =0;
+  virtual void saveRosterItems(const QString &AFileName) const =0;
+  virtual void loadRosterItems(const QString &AFileName) =0;
   //Operations  on subscription
-  virtual void sendSubscription(const Jid &, SubsType, const QString & = QString()) =0; 
+  virtual void sendSubscription(const Jid &AItemJid, SubsType ASubsType, const QString &AText = QString()) =0; 
   //Operations on items
-  virtual void renameItem(const Jid &, const QString &) =0;
-  virtual void copyItemToGroup(const Jid &, const QString &) =0;
-  virtual void moveItemToGroup(const Jid &, const QString &AGroupFrom, const QString &AGroupTo) =0;
-  virtual void removeItemFromGroup(const Jid &, const QString &) =0;
+  virtual void renameItem(const Jid &AItemJid, const QString &AName) =0;
+  virtual void copyItemToGroup(const Jid &AItemJid, const QString &AGroup) =0;
+  virtual void moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo) =0;
+  virtual void removeItemFromGroup(const Jid &AItemJid, const QString &AGroup) =0;
   //Operations on group
   virtual void renameGroup(const QString &AGroup, const QString &AGroupTo) =0;
   virtual void copyGroupToGroup(const QString &AGroup, const QString &AGroupTo) =0;
@@ -58,26 +58,27 @@ public:
   virtual void removeGroup(const QString &AGroup) =0;
 signals:
   virtual void opened() =0;
-  virtual void itemPush(IRosterItem *) =0;
-  virtual void itemRemoved(IRosterItem *) =0;
-  virtual void subscription(const Jid &, IRoster::SubsType, const QString &) =0; 
+  virtual void itemPush(IRosterItem *ARosterItem) =0;
+  virtual void itemRemoved(IRosterItem *ARosterItem) =0;
+  virtual void subscription(const Jid &AItemJid, IRoster::SubsType ASubsType, const QString &AText) =0; 
   virtual void closed() =0;
 };
 
 class IRosterPlugin {
 public:
   virtual QObject *instance() =0;
-  virtual IRoster *addRoster(IXmppStream *) =0;
-  virtual IRoster *getRoster(const Jid &) const =0;
-  virtual void removeRoster(IXmppStream *) =0;
+  virtual IRoster *addRoster(IXmppStream *AXmppStream) =0;
+  virtual IRoster *getRoster(const Jid &AStreamJid) const =0;
+  virtual void loadRosterItems(const Jid &AStreamJid) =0;
+  virtual void removeRoster(IXmppStream *AXmppStream) =0;
 signals:
-  virtual void rosterAdded(IRoster *) =0;
-  virtual void rosterOpened(IRoster *) =0;
-  virtual void rosterItemPush(IRoster *, IRosterItem *) =0;
-  virtual void rosterItemRemoved(IRoster *, IRosterItem *) =0;
-  virtual void rosterSubscription(IRoster *, const Jid &, IRoster::SubsType, const QString &) =0;
-  virtual void rosterClosed(IRoster *) =0;
-  virtual void rosterRemoved(IRoster *) =0;
+  virtual void rosterAdded(IRoster *ARoster) =0;
+  virtual void rosterOpened(IRoster *ARoster) =0;
+  virtual void rosterItemPush(IRoster *ARoster, IRosterItem *ARosterItem) =0;
+  virtual void rosterItemRemoved(IRoster *ARoster, IRosterItem *ARosterItem) =0;
+  virtual void rosterSubscription(IRoster *ARoster, const Jid &AJid, IRoster::SubsType, const QString &AText) =0;
+  virtual void rosterClosed(IRoster *ARoster) =0;
+  virtual void rosterRemoved(IRoster *ARoster) =0;
 };
 
 Q_DECLARE_INTERFACE(IRosterItem,"Vacuum.Plugin.IRosterItem/1.0")

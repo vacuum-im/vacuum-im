@@ -66,8 +66,9 @@ bool RostersModelPlugin::initConnections(IPluginManager *APluginManager, int &/*
 bool RostersModelPlugin::initObjects()
 {
   FRostersModel = new RostersModel(this);
+  connect(FRostersModel,SIGNAL(streamJidChanged(const Jid &, const Jid &)),
+    SLOT(onStreamJidChanged(const Jid &, const Jid &)));
   emit modelCreated(FRostersModel);
-
   return true;
 }
 
@@ -81,6 +82,7 @@ IRostersModel *RostersModelPlugin::rostersModel()
 IRosterIndex *RostersModelPlugin::addStream(IRoster *ARoster, IPresence *APresence)
 {
   IRosterIndex *streamRoot = FRostersModel->addStream(ARoster,APresence);
+  FRosterPlugin->loadRosterItems(ARoster->streamJid());
   if (FAccountManager)
   {
     IAccount *account = FAccountManager->accountByStream(ARoster->streamJid());
@@ -139,6 +141,13 @@ void RostersModelPlugin::onAccountChanged(const QString &AName, const QVariant &
         streamRoot->setData(RDR_Name,account->name());
     }
   }
+}
+
+void RostersModelPlugin::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
+{
+  if (!ABefour.equals(AAfter,false))
+    FRosterPlugin->loadRosterItems(AAfter);
+  emit streamJidChanged(ABefour,AAfter);
 }
 
 Q_EXPORT_PLUGIN2(RostersModelPlugin, RostersModelPlugin)

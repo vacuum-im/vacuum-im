@@ -32,8 +32,6 @@ public:
   //IRoster
   virtual const Jid &streamJid() const { return FXmppStream->jid(); }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
-  virtual void open();
-  virtual void close();
   virtual bool isOpen() const { return FOpen; }
   virtual QString groupDelimiter() const { return FGroupDelim; }
   virtual IRosterItem *item(const Jid &AItemJid) const;
@@ -44,6 +42,8 @@ public:
   virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups);
   virtual void sendSubscription(const Jid &AItemJid, SubsType AType, const QString &AStatus = QString()); 
   virtual void removeItem(const Jid &AItemJid);
+  virtual void saveRosterItems(const QString &AFileName) const;
+  virtual void loadRosterItems(const QString &AFileName);
   //Operations on items
   virtual void renameItem(const Jid &AItemJid, const QString &AName);
   virtual void copyItemToGroup(const Jid &AItemJid, const QString &AGroup);
@@ -56,20 +56,25 @@ public:
   virtual void removeGroup(const QString &AGroup);
 signals:
   virtual void opened();
-  virtual void itemPush(IRosterItem *);
-  virtual void itemRemoved(IRosterItem *);
+  virtual void itemPush(IRosterItem *ARosterItem);
+  virtual void itemRemoved(IRosterItem *ARosterItem);
   virtual void subscription(const Jid &AItemJid, IRoster::SubsType AType, const QString &AStatus);
   virtual void closed();
+public:
 protected:
-  bool requestGroupDelimiter();
-  bool requestRosterItems();
+  bool processItemsElement(const QDomElement &AItemsElem);
+  void insertRosterItem(RosterItem *AItem);
+  void removeRosterItem(RosterItem *AItem);
+  void requestGroupDelimiter();
+  void setGroupDelimiter(const QString &ADelimiter);
+  void requestRosterItems();
   void clearItems();
   void setStanzaHandlers();
   void removeStanzaHandlers();
 protected slots:
-  void onStreamOpened(IXmppStream *);
-  void onStreamClosed(IXmppStream *);
-  void onStreamJidAboutToBeChanged(IXmppStream *, const Jid &AAfter);
+  void onStreamOpened(IXmppStream *AXmppStream);
+  void onStreamClosed(IXmppStream *AXmppStream);
+  void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
 private:
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;

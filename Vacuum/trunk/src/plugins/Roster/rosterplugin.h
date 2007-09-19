@@ -4,6 +4,7 @@
 #include <QObjectCleanupHandler>
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ipresence.h"
+#include "../../interfaces/isettings.h"
 #include "roster.h"
 
 class RosterPlugin : 
@@ -31,15 +32,18 @@ public:
   //IRosterPlugin
   virtual IRoster *addRoster(IXmppStream *AXmppStream);
   virtual IRoster *getRoster(const Jid &AStreamJid) const;
+  virtual void loadRosterItems(const Jid &AStreamJid);
   virtual void removeRoster(IXmppStream *AXmppStream);
 signals:
-  virtual void rosterAdded(IRoster *);
-  virtual void rosterOpened(IRoster *);
-  virtual void rosterItemPush(IRoster *, IRosterItem *);
-  virtual void rosterItemRemoved(IRoster *, IRosterItem *);
-  virtual void rosterSubscription(IRoster *, const Jid &, IRoster::SubsType, const QString &);
-  virtual void rosterRemoved(IRoster *);
-  virtual void rosterClosed(IRoster *);
+  virtual void rosterAdded(IRoster *ARoster);
+  virtual void rosterOpened(IRoster *ARoster);
+  virtual void rosterItemPush(IRoster *ARoster, IRosterItem *ARosterItem);
+  virtual void rosterItemRemoved(IRoster *ARoster, IRosterItem *ARosterItem);
+  virtual void rosterSubscription(IRoster *ARoster, const Jid &AJid, IRoster::SubsType, const QString &AText);
+  virtual void rosterRemoved(IRoster *ARoster);
+  virtual void rosterClosed(IRoster *ARoster);
+protected:
+  QString rosterFile(const Jid &AStreamJid) const;
 protected slots:
   void onRosterOpened();
   void onRosterItemPush(IRosterItem *ARosterItem);
@@ -51,6 +55,7 @@ protected slots:
   void onRosterDestroyed(QObject *AObject);
 private:
   IStanzaProcessor *FStanzaProcessor;
+  ISettingsPlugin *FSettingsPlugin;
 private:
   QList<Roster *> FRosters;
   QObjectCleanupHandler FCleanupHandler;
