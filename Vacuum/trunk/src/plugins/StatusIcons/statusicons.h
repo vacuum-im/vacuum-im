@@ -69,11 +69,13 @@ protected:
   void clearIconFilesRules();
 protected slots:
   void onRepaintRostersView();
+  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onSettingsOpened();
   void onSettingsClosed();
   void onOptionsAccepted();
   void onOptionsRejected();
   void onStatusIconsetChanged();
+  void onSetCustomIconset(bool);
 private:
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
@@ -81,6 +83,9 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   ISettingsPlugin *FSettingsPlugin;
 private:
+  Menu *FCustomIconMenu;
+  Action *FDefaultIconAction;
+  QHash<QString,Action *> FCustomIconActions;
   SkinIconset *FStatusIconset;
   RosterIndexDataHolder *FDataHolder;
   QPointer<IconsOptionsWidget> FIconsOptionWidget;

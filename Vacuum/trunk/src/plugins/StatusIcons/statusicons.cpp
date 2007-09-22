@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "statusicons.h"
 
 #include <QTimer>
@@ -5,6 +6,9 @@
 #define SVN_DEFAULT_ICONFILE              "defaultIconFile"
 #define SVN_RULES                         "rules"
 #define SVN_USERRULES                     "rules:user[]"
+
+#define ADR_RULE                          Action::DR_Parametr1
+#define ADR_ICONSETNAME                   Action::DR_Parametr2
 
 StatusIcons::StatusIcons()
 {
@@ -14,6 +18,7 @@ StatusIcons::StatusIcons()
   FRostersViewPlugin = NULL;
   FSettingsPlugin = NULL;
 
+  FCustomIconMenu = NULL;
   FDataHolder = NULL;
   FRepaintStarted = false;
   FDefaultIconFile = STATUS_ICONSETFILE;
@@ -21,7 +26,8 @@ StatusIcons::StatusIcons()
 
 StatusIcons::~StatusIcons()
 {
-
+  if (FCustomIconMenu)
+    delete FCustomIconMenu;
 }
 
 void StatusIcons::pluginInfo(PluginInfo *APluginInfo)
@@ -83,10 +89,19 @@ bool StatusIcons::initObjects()
   FStatusIconset = Skin::getSkinIconset(STATUS_ICONSETFILE);
   connect(FStatusIconset,SIGNAL(iconsetChanged()),SLOT(onStatusIconsetChanged()));
 
+  FCustomIconMenu = new Menu;
+  FCustomIconMenu->setTitle(tr("Status icon"));
+
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
   {
     FDataHolder = new RosterIndexDataHolder(this);
     FRostersModelPlugin->rostersModel()->insertDefaultDataHolder(FDataHolder);
+  }
+
+  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
+  {
+    connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *,Menu*)),
+      SLOT(onRostersViewContextMenu(IRosterIndex *,Menu *)));
   }
 
   if (FSettingsPlugin)
@@ -116,7 +131,7 @@ void StatusIcons::setDefaultIconFile(const QString &AIconFile)
   if (FDefaultIconFile != AIconFile && Skin::getIconset(AIconFile).isValid())
   {
     FDefaultIconFile = AIconFile;
-    FStatusIconset->openFile(AIconFile);
+    FStatusIconset = Skin::getSkinIconset(AIconFile);
     FJid2IconFile.clear();
     repaintRostersView();
     emit defaultIconFileChanged(AIconFile);
@@ -215,8 +230,8 @@ QIcon StatusIcons::iconByJidStatus(const Jid &AJid, int AShow, const QString &AS
 {
   QString iconFile = iconFileByJid(AJid);
   QString iconName = iconNameByStatus(AShow,ASubscription,AAsk);
-  QIcon icon = Skin::getSkinIconset(iconFile)->iconByName(iconName);
-
+  SkinIconset *iconset = Skin::getSkinIconset(iconFile);
+  QIcon icon = iconset->iconByName(iconName);
   return !icon.isNull() ? icon : FStatusIconset->iconByName(iconName);
 }
 
@@ -308,9 +323,15 @@ void StatusIcons::loadIconFilesRules()
   for (int i = 0; i < iconFiles.count(); ++i)
     iconFiles[i].prepend("status/");
 
+  FDefaultIconAction = new Action(FCustomIconMenu);
+  FDefaultIconAction->setText(tr("Default"));
+  FDefaultIconAction->setCheckable(true);
+  connect(FDefaultIconAction,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
+  FCustomIconMenu->addAction(FDefaultIconAction,AG_DEFAULT-1,true);
+
   foreach(QString iconFile, iconFiles)
   {
-    UnzipFile iconset(Skin::skinsDirectory()+"/"+Skin::skin()+"/iconset/"+iconFile);
+    Iconset iconset(Skin::skinsDirectory()+"/"+Skin::skin()+"/iconset/"+iconFile);
     if (iconset.isValid())
     {
       QDomDocument doc;
@@ -326,12 +347,23 @@ void StatusIcons::loadIconFilesRules()
         }
         elem = elem.nextSiblingElement("rule");
       }
+
+      Action *action = new Action(FCustomIconMenu);
+      action->setIcon(iconset.iconByName(iconNameByStatus(IPresence::Online,"",false)));
+      action->setText(iconset.iconsetName());
+      action->setData(ADR_ICONSETNAME,iconFile);
+      action->setCheckable(true);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
+      FCustomIconActions.insert(iconFile,action);
+      FCustomIconMenu->addAction(action,AG_DEFAULT,true);
     }
   }
 }
 
 void StatusIcons::clearIconFilesRules()
 {
+  FCustomIconMenu->clear();
+  FCustomIconActions.clear();
   foreach(QString rule, FIconFilesRules)
     removeRule(rule,IStatusIcons::DefaultRule);
   FIconFilesRules.clear();
@@ -342,6 +374,24 @@ void StatusIcons::onRepaintRostersView()
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
     FRostersViewPlugin->rostersView()->viewport()->repaint();
   FRepaintStarted = false;
+}
+
+void StatusIcons::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+{
+  if (AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent)
+  {
+    QString rule = AIndex->data(RDR_BareJid).toString();
+    QString iconFile = ruleIconFile(rule,IStatusIcons::UserRule);
+    FDefaultIconAction->setIcon(iconByStatus(IPresence::Online,"",false));
+    FDefaultIconAction->setData(ADR_RULE,rule);
+    FDefaultIconAction->setChecked(iconFile.isEmpty());
+    foreach(Action *action,FCustomIconActions)
+    {
+      action->setData(ADR_RULE,AIndex->data(RDR_BareJid));
+      action->setChecked(action->data(ADR_ICONSETNAME).toString() == iconFile);
+    }
+    AMenu->addAction(FCustomIconMenu->menuAction(),AG_STATUSICONS_ROSTER,true);
+  }
 }
 
 void StatusIcons::onSettingsOpened()
@@ -386,6 +436,20 @@ void StatusIcons::onOptionsRejected()
 void StatusIcons::onStatusIconsetChanged()
 {
   repaintRostersView();
+}
+
+void StatusIcons::onSetCustomIconset(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QString rule = action->data(ADR_RULE).toString();
+    QString iconFile = action->data(ADR_ICONSETNAME).toString();
+    if (iconFile.isEmpty())
+      removeRule(rule,IStatusIcons::UserRule);
+    else
+      insertRule(rule,iconFile,IStatusIcons::UserRule);
+  }
 }
 
 Q_EXPORT_PLUGIN2(StatusIconsPlugin, StatusIcons)

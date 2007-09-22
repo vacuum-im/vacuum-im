@@ -15,7 +15,8 @@
 #define AG_STATUSCHANGER_ROSTER                                 200
 #define AG_ROSTERCHANGER_ROSTER_ADD_CONTACT                     300
 #define AG_ACCOUNTMANAGER_ROSTER                                700
-#define AG_ROSTERCHANGER_ROSTER_SUBSCRIPTION                    799
+#define AG_STATUSICONS_ROSTER                                   750
+#define AG_ROSTERCHANGER_ROSTER_SUBSCRIPTION                    800
 #define AG_ROSTERCHANGER_ROSTER                                 800
 
 //TrayManager (TrayMenu)
