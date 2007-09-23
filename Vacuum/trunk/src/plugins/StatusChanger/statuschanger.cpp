@@ -133,15 +133,24 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     }
   }
 
+  plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
+  if (plugin)
+  {
+    FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+    if (FStatusIcons)
+    {
+      connect(FStatusIcons->instance(),SIGNAL(defaultIconFileChanged(const QString &)),
+        SLOT(onDefaultIconFileChanged(const QString &)));
+    }
+  }
+
   return FPresencePlugin!=NULL;
 }
 
 bool StatusChanger::initObjects()
 {
-  FStatusIconset = Skin::getSkinIconset(STATUS_ICONSETFILE);
-  connect(FStatusIconset, SIGNAL(iconsetChanged()),SLOT(onStatusIconsetChanged()));
   FRosterIconset = Skin::getSkinIconset(ROSTER_ICONSETFILE);
-  connect(FRosterIconset, SIGNAL(iconsetChanged()),SLOT(onStatusIconsetChanged()));
+  connect(FRosterIconset, SIGNAL(iconsetChanged()),SLOT(onRosterIconsetChanged()));
 
   FMainMenu = new Menu(NULL);
 
@@ -432,30 +441,10 @@ QList<int> StatusChanger::statusByShow(int AShow) const
 
 QIcon StatusChanger::iconByShow(int AShow) const
 {
-  switch (AShow)
-  {
-  case IPresence::Offline: 
-    return FStatusIconset->iconByName("status/offline");
-  case IPresence::Online: 
-    return FStatusIconset->iconByName("status/online");
-  case IPresence::Chat: 
-    return FStatusIconset->iconByName("status/chat");
-  case IPresence::Away: 
-    return FStatusIconset->iconByName("status/away");
-  case IPresence::ExtendedAway: 
-    return FStatusIconset->iconByName("status/xa");
-  case IPresence::DoNotDistrib: 
-    return FStatusIconset->iconByName("status/dnd");
-  case IPresence::Invisible: 
-    return FStatusIconset->iconByName("status/invisible");
-  case IPresence::Error: 
-    return FStatusIconset->iconByName("status/error");
-  default:
-    return QIcon();
-  }
+  return FStatusIcons != NULL ? FStatusIcons->iconByStatus(AShow,"",false) : QIcon();
 }
 
-QString StatusChanger::nameByShow(int AShow) const
+QString StatusChanger::nameByShow(int AShow) const 
 {
   switch (AShow)
   {
@@ -524,8 +513,6 @@ void StatusChanger::createDefaultStatus()
   status->show = IPresence::Online;
   status->text = tr("Online");
   status->priority = 120;
-  status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "status/online";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -535,8 +522,6 @@ void StatusChanger::createDefaultStatus()
   status->show = IPresence::Chat;
   status->text = tr("Free for Chat");
   status->priority = 100;
-  status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "status/chat";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -546,8 +531,6 @@ void StatusChanger::createDefaultStatus()
   status->show = IPresence::Away;
   status->text = tr("I`am away from my desk");
   status->priority = 80;
-  status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "status/away";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -557,8 +540,6 @@ void StatusChanger::createDefaultStatus()
   status->show = IPresence::ExtendedAway;
   status->text = tr("Not available");
   status->priority = 60;
-  status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "status/xa";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -568,8 +549,6 @@ void StatusChanger::createDefaultStatus()
   status->show = IPresence::DoNotDistrib;
   status->text = tr("Do not Distrib");
   status->priority = 40;
-  status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "status/dnd";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -579,8 +558,6 @@ void StatusChanger::createDefaultStatus()
   status->show = IPresence::Invisible;
   status->text = tr("Invisible");
   status->priority = 20;
-  status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "status/invisible";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -590,8 +567,6 @@ void StatusChanger::createDefaultStatus()
   status->show = IPresence::Offline;
   status->text = tr("Disconnected");
   status->priority = 0;
-  status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "status/offline";
   FStatusItems.insert(status->code,status);
   createStatusActions(status->code);
 
@@ -601,8 +576,6 @@ void StatusChanger::createDefaultStatus()
   status->show = IPresence::Error;
   status->text = tr("Error");
   status->priority = 0;
-  status->iconsetFile = STATUS_ICONSETFILE;
-  status->iconName = "status/error";
   FStatusItems.insert(status->code,status);
 }
 
@@ -1039,7 +1012,7 @@ void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   }
 }
 
-void StatusChanger::onStatusIconsetChanged()
+void StatusChanger::onDefaultIconFileChanged(const QString &/*AIconFile*/)
 {
   foreach (StatusItem *statusItem, FStatusItems)
     updateStatusActions(statusItem->code);

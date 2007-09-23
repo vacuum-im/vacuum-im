@@ -22,6 +22,7 @@
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/itraymanager.h"
 #include "../../interfaces/isettings.h"
+#include "../../interfaces/istatusicons.h"
 #include "../../utils/skin.h"
 #include "editstatusdialog.h"
 #include "accountoptionswidget.h"
@@ -127,7 +128,7 @@ protected slots:
   void onAccountShown(IAccount *AAccount);
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  void onStatusIconsetChanged();
+  void onDefaultIconFileChanged(const QString &AIconFile);
   void onRosterIconsetChanged();
   void onSettingsOpened();
   void onSettingsClosed();
@@ -148,9 +149,9 @@ private:
   ISettingsPlugin *FSettingsPlugin;
   ITrayManager *FTrayManager;
   IAccountManager *FAccountManager;
+  IStatusIcons *FStatusIcons;
 private:
   int FConnectingLabel;
-  SkinIconset *FStatusIconset;
   SkinIconset *FRosterIconset;
 private:
   Action *FEditStatusAction;
