@@ -60,6 +60,7 @@ signals:
   virtual void itemRemoved(IRosterItem *ARosterItem);
   virtual void subscription(const Jid &AItemJid, IRoster::SubsType AType, const QString &AStatus);
   virtual void closed();
+  virtual void jidAboutToBeChanged(const Jid &AAfter);
 public:
 protected:
   bool processItemsElement(const QDomElement &AItemsElem);

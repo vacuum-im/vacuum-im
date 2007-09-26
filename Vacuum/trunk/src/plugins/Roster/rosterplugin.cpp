@@ -126,6 +126,13 @@ void RosterPlugin::onRosterSubscription(const Jid &AJid, IRoster::SubsType ASTyp
     emit rosterSubscription(roster,AJid,ASType,AStatus);
 }
 
+void RosterPlugin::onRosterJidAboutToBeChanged(const Jid &AAfter)
+{
+  Roster *roster = qobject_cast<Roster *>(sender());
+  if (roster)
+    emit rosterJidAboutToBeChanged(roster,AAfter);
+}
+
 void RosterPlugin::onRosterClosed()
 {
   Roster *roster = qobject_cast<Roster *>(sender());
@@ -142,6 +149,7 @@ void RosterPlugin::onStreamAdded(IXmppStream *AXmppStream)
   connect(roster->instance(),SIGNAL(itemRemoved(IRosterItem *)),SLOT(onRosterItemRemoved(IRosterItem *)));
   connect(roster->instance(),SIGNAL(subscription(const Jid &, IRoster::SubsType, const QString &)),
     SLOT(onRosterSubscription(const Jid &, IRoster::SubsType, const QString &)));
+  connect(roster->instance(),SIGNAL(jidAboutToBeChanged(const Jid &)),SLOT(onRosterJidAboutToBeChanged(const Jid &)));
   emit rosterAdded(roster); 
 }
 

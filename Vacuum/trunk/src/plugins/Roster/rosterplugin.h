@@ -40,8 +40,9 @@ signals:
   virtual void rosterItemPush(IRoster *ARoster, IRosterItem *ARosterItem);
   virtual void rosterItemRemoved(IRoster *ARoster, IRosterItem *ARosterItem);
   virtual void rosterSubscription(IRoster *ARoster, const Jid &AJid, IRoster::SubsType, const QString &AText);
-  virtual void rosterRemoved(IRoster *ARoster);
   virtual void rosterClosed(IRoster *ARoster);
+  virtual void rosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
+  virtual void rosterRemoved(IRoster *ARoster);
 protected:
   QString rosterFile(const Jid &AStreamJid) const;
 protected slots:
@@ -49,6 +50,7 @@ protected slots:
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onRosterItemRemoved(IRosterItem *ARosterItem);
   void onRosterSubscription(const Jid &AJid, IRoster::SubsType ASType, const QString &AStatus);
+  void onRosterJidAboutToBeChanged(const Jid &AAfter);
   void onRosterClosed();
   void onStreamAdded(IXmppStream *AStream);
   void onStreamRemoved(IXmppStream *AStream);

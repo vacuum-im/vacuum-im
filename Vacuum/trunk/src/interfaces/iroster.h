@@ -62,6 +62,7 @@ signals:
   virtual void itemRemoved(IRosterItem *ARosterItem) =0;
   virtual void subscription(const Jid &AItemJid, IRoster::SubsType ASubsType, const QString &AText) =0; 
   virtual void closed() =0;
+  virtual void jidAboutToBeChanged(const Jid &AAfter) =0;
 };
 
 class IRosterPlugin {
@@ -78,6 +79,7 @@ signals:
   virtual void rosterItemRemoved(IRoster *ARoster, IRosterItem *ARosterItem) =0;
   virtual void rosterSubscription(IRoster *ARoster, const Jid &AJid, IRoster::SubsType, const QString &AText) =0;
   virtual void rosterClosed(IRoster *ARoster) =0;
+  virtual void rosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter) =0;
   virtual void rosterRemoved(IRoster *ARoster) =0;
 };
 

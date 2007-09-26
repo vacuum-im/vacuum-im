@@ -551,5 +551,6 @@ void Roster::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AA
 {
   if (!AAfter.equals(AXmppStream->jid(),false))
     clearItems();
+  emit jidAboutToBeChanged(AAfter);
 }
 
