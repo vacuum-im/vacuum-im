@@ -10,7 +10,6 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
-#include "indexdataholder.h"
 #include "rosterindexdelegate.h" 
 
 
@@ -30,7 +29,7 @@ public:
   //IRostersView
   virtual void setModel(IRostersModel *AModel); 
   virtual IRostersModel *rostersModel() const { return FRostersModel; }
-  virtual IRosterIndexDataHolder *defaultDataHolder() const { return FIndexDataHolder; }
+  virtual bool repaintRosterIndex(IRosterIndex *AIndex);
   //--ProxyModels
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel);
   virtual QList<QAbstractProxyModel *> proxyModels() const { return FProxyModels; }
@@ -57,12 +56,14 @@ public:
   virtual void insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex);
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
 signals:
-  virtual void modelAboutToBeSeted(IRostersModel *);
-  virtual void modelSeted(IRostersModel *);
-  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *);
-  virtual void proxyModelAdded(QAbstractProxyModel *);
-  virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *);
-  virtual void proxyModelRemoved(QAbstractProxyModel *);
+  virtual void modelAboutToBeSeted(IRostersModel *AModel);
+  virtual void modelSeted(IRostersModel *AModel);
+  virtual void indexAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
+  virtual void indexInserted(const QModelIndex &AParent, int AStart, int AEnd);
+  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *AProxyModel);
+  virtual void proxyModelAdded(QAbstractProxyModel *AProxyModel);
+  virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel);
+  virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel);
   virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu);
   virtual void toolTips(IRosterIndex *AIndex, QMultiMap<int,QString> &AToolTips);
   virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
@@ -73,12 +74,17 @@ public:
   bool checkOption(IRostersView::Option AOption) const;
   void setOption(IRostersView::Option AOption, bool AValue);
 protected:
-  void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   void contextMenuEvent(QContextMenuEvent *AEvent);
   QStyleOptionViewItemV2 indexOption(const QModelIndex &AIndex) const;
   void appendBlinkLabel(int ALabelId);
   void removeBlinkLabel(int ALabelId);
   QString intId2StringId(int AIntId);
+  void removeLabels();
+  void removeClickHookers();
+  //QTreeView
+  virtual void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
+  virtual void rowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
+  virtual void rowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
   //QAbstractItemView
   virtual bool viewportEvent(QEvent *AEvent);
   virtual void mouseDoubleClickEvent(QMouseEvent *AEvent);
@@ -115,7 +121,6 @@ private:
   QList<ClickHookerItem *> FClickHookerItems;
 private:
   int FOptions;
-  IndexDataHolder *FIndexDataHolder;
   RosterIndexDelegate *FRosterIndexDelegate;
   QList<QAbstractProxyModel *> FProxyModels;
 };

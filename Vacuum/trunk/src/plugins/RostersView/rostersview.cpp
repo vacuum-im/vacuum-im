@@ -1,6 +1,7 @@
 #include <QtDebug>
 #include "rostersview.h"
 
+#include <QApplication>
 #include <QHeaderView>
 #include <QToolTip>
 #include <QCursor>
@@ -17,7 +18,6 @@ RostersView::RostersView(QWidget *AParent)
   FPressedIndex = NULL;
 
   FContextMenu = new Menu(this);
-  FIndexDataHolder = new IndexDataHolder(this);
   FRosterIndexDelegate = new RosterIndexDelegate(this);
 
   FBlinkShow = true;
@@ -25,7 +25,7 @@ RostersView::RostersView(QWidget *AParent)
   connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimer()));
 
   header()->hide();
-  setIndentation(6);
+  setIndentation(4);
   setRootIsDecorated(false);
   setSelectionMode(NoSelection);
   setSortingEnabled(true);
@@ -35,6 +35,7 @@ RostersView::RostersView(QWidget *AParent)
 
 RostersView::~RostersView()
 {
+  removeLabels();
   while (FClickHookerItems.count()>0)
     destroyClickHooker(FClickHookerItems.at(0)->hookerId);
 }
@@ -49,13 +50,14 @@ void RostersView::setModel(IRostersModel *AModel)
     {
       disconnect(AModel,SIGNAL(indexRemoved(IRosterIndex *)),
         this,SLOT(onIndexRemoved(IRosterIndex *)));
-      FRostersModel->removeDefaultDataHolder(FIndexDataHolder);
+      removeLabels();
+      removeClickHookers();
     }
+
     if (AModel)
     {
       connect(AModel,SIGNAL(indexRemoved(IRosterIndex *)),
         SLOT(onIndexRemoved(IRosterIndex *)));
-      AModel->insertDefaultDataHolder(FIndexDataHolder);
     }
 
     FRostersModel = AModel;
@@ -64,6 +66,24 @@ void RostersView::setModel(IRostersModel *AModel)
     QTreeView::setModel(AModel);
     emit modelSeted(AModel);
   }
+}
+
+bool RostersView::repaintRosterIndex(IRosterIndex *AIndex)
+{
+  if (FRostersModel)
+  {
+    QModelIndex modelIndex = mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex));
+    if (modelIndex.isValid())
+    {
+      QRect rect = visualRect(modelIndex).adjusted(1,1,-1,-1);
+      if (!rect.isEmpty())
+      {
+        viewport()->repaint(rect);
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 void RostersView::addProxyModel(QAbstractProxyModel *AProxyModel)
@@ -380,46 +400,6 @@ void RostersView::setOption(IRostersView::Option AOption, bool AValue)
 {
   AValue ? FOptions |= AOption : FOptions &= ~AOption;
   FRosterIndexDelegate->setOption(AOption,AValue);
-  FIndexDataHolder->setOption(AOption,AValue);
-}
-
-void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
-{
-  if (AIndex.child(0,0).isValid() && !AIndex.data(RDR_HideGroupExpander).toBool())
-  {
-    QRect rect = QStyle::alignedRect(Qt::LeftToRight,Qt::AlignRight|Qt::AlignVCenter,QSize(indentation(),indentation()),ARect);
-    if (!rect.isEmpty())
-    {
-      QPainterPath path;
-      if (isExpanded(AIndex))
-      {
-        path.moveTo(rect.bottomLeft());
-        path.lineTo(rect.topRight());
-        path.lineTo(rect.bottomRight());
-        path.lineTo(rect.bottomLeft());
-      }
-      else
-      {
-        path.moveTo(rect.bottomLeft());
-        path.lineTo(rect.topLeft());
-        path.lineTo(rect.topRight() +  (rect.bottomRight()-rect.topRight())/2 );
-        path.lineTo(rect.bottomLeft());
-      }
-      APainter->save();
-      if (rect.contains(viewport()->mapFromGlobal(QCursor::pos())))
-      {
-        APainter->setPen(Qt::black);
-        APainter->setBrush(Qt::black);
-      }
-      else
-      {
-        APainter->setPen(Qt::lightGray);
-        APainter->setBrush(Qt::lightGray);
-      }
-      APainter->drawPath(path);
-      APainter->restore();
-    }
-  }
 }
 
 void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
@@ -445,7 +425,21 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
 QStyleOptionViewItemV2 RostersView::indexOption(const QModelIndex &AIndex) const
 {
   QStyleOptionViewItemV2 option = viewOptions();
+  option.initFrom(this);
   option.rect = visualRect(AIndex);
+  
+  //Костыль
+  if (isRightToLeft())
+  {
+    QModelIndex pIndex = AIndex.parent();
+    while (pIndex.isValid())
+    {
+      option.rect.setLeft(option.rect.left()-indentation());
+      option.rect.setRight(option.rect.right()-indentation());
+      pIndex = pIndex.parent();
+    }
+  }
+
   option.showDecorationSelected |= selectionBehavior() & SelectRows;
   option.state |= isExpanded(AIndex) ? QStyle::State_Open : QStyle::State_None;
   if (hasFocus() && currentIndex() == AIndex)
@@ -478,6 +472,44 @@ void RostersView::removeBlinkLabel(int ALabelId)
 QString RostersView::intId2StringId(int AIntId)
 {
   return QString("%1").arg(AIntId,10,10,QLatin1Char('0'));
+}
+
+void RostersView::removeLabels()
+{
+  QList<int> labels = FIndexLabels.keys();
+  foreach (int label, labels)
+  {
+    QSet<IRosterIndex *> indexes = FIndexLabelIndexes.value(label);
+    foreach(IRosterIndex *index, indexes)
+      removeIndexLabel(label,index);
+  }
+}
+
+void RostersView::removeClickHookers()
+{
+  foreach(ClickHookerItem *hookerItem, FClickHookerItems)
+  {
+    QSet<IRosterIndex *> indexes = hookerItem->indexes;
+    foreach(IRosterIndex *index, indexes)
+      removeClickHooker(hookerItem->hookerId,index);
+  }
+}
+
+void RostersView::drawBranches(QPainter * /*APainter*/, const QRect &/*ARect*/, const QModelIndex &/*AIndex*/) const
+{
+
+}
+
+void RostersView::rowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd)
+{
+  emit indexAboutToBeRemoved(AParent,AStart,AEnd);
+  QTreeView::rowsAboutToBeRemoved(AParent,AStart,AEnd);
+}
+
+void RostersView::rowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
+{
+  QTreeView::rowsInserted(AParent,AStart,AEnd);
+  emit indexInserted(AParent,AStart,AEnd);
 }
 
 bool RostersView::viewportEvent(QEvent *AEvent)
@@ -528,11 +560,11 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
   bool accepted = false;
   if (viewport()->rect().contains(AEvent->pos()))
   {
-    QModelIndex modelIndex = indexAt(AEvent->pos());
-    const int labelId = labelAt(AEvent->pos(),modelIndex);
-    if (modelIndex.isValid())
+    QModelIndex viewIndex = indexAt(AEvent->pos());
+    const int labelId = labelAt(AEvent->pos(),viewIndex);
+    if (viewIndex.isValid())
     {
-      modelIndex = mapToModel(modelIndex);
+      QModelIndex modelIndex = mapToModel(viewIndex);
       IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
       if (labelId == RLID_DISPLAY)
       {
@@ -552,7 +584,7 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
             i++;
         }
       }
-      else
+      if (!accepted)
         emit labelDoubleClicked(index,labelId,accepted);
     }
   }
@@ -562,15 +594,17 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 
 void RostersView::mousePressEvent(QMouseEvent *AEvent)
 {
-  if (viewport()->rect().contains(AEvent->pos()))
+  if (AEvent->button()==Qt::LeftButton && viewport()->rect().contains(AEvent->pos()))
   {
-    QModelIndex modelIndex = indexAt(AEvent->pos());
-    const int labelId = labelAt(AEvent->pos(),modelIndex);
-    if (modelIndex.isValid() && labelId > RLID_DISPLAY)
+    QModelIndex viewIndex = indexAt(AEvent->pos());
+    if (viewIndex.isValid())
     {
-      modelIndex = mapToModel(modelIndex);
+      const int labelId = labelAt(AEvent->pos(),viewIndex);
+      QModelIndex modelIndex = mapToModel(viewIndex);
       FPressedIndex = static_cast<IRosterIndex *>(modelIndex.internalPointer());
       FPressedLabel = labelId;
+      if (labelId == RLID_INDICATORBRANCH)
+        setExpanded(viewIndex,!isExpanded(viewIndex));
     }
   }
   QTreeView::mousePressEvent(AEvent);
@@ -578,18 +612,16 @@ void RostersView::mousePressEvent(QMouseEvent *AEvent)
 
 void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 {
-  if (viewport()->rect().contains(AEvent->pos()))
+  if (AEvent->button()==Qt::LeftButton && viewport()->rect().contains(AEvent->pos()))
   {
-    QModelIndex modelIndex = indexAt(AEvent->pos());
-    const int labelId = labelAt(AEvent->pos(),modelIndex);
-    if (modelIndex.isValid() && labelId > RLID_DISPLAY)
+    QModelIndex viewIndex = indexAt(AEvent->pos());
+    if (viewIndex.isValid())
     {
-      modelIndex = mapToModel(modelIndex);
+      const int labelId = labelAt(AEvent->pos(),viewIndex);
+      QModelIndex modelIndex = mapToModel(viewIndex);
       IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
       if (FPressedIndex == index && FPressedLabel == labelId)
-      {
         emit labelClicked(index,labelId);
-      }
     }
   }
   FPressedLabel = RLID_DISPLAY;
@@ -626,17 +658,7 @@ void RostersView::onBlinkTimer()
   FBlinkShow = !FBlinkShow;
   FRosterIndexDelegate->setShowBlinkLabels(FBlinkShow);
   foreach(int labelId,FBlinkLabels)
-  {
     foreach(IRosterIndex *index, FIndexLabelIndexes.value(labelId))
-    {
-      QModelIndex modelIndex = mapFromModel(FRostersModel->modelIndexByRosterIndex(index));
-      if (modelIndex.isValid())
-      {
-        QRect rect = visualRect(modelIndex).adjusted(1,1,-1,-1);
-        if (!rect.isEmpty())
-          viewport()->repaint(rect);
-      }
-    }
-  }
+      repaintRosterIndex(index);
 }
 

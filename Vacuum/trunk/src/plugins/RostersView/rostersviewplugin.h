@@ -8,12 +8,15 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersview.h"
+#include "../../interfaces/iroster.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/irostersmodel.h"
+#include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/skin.h"
 #include "../../utils/action.h"
 #include "rostersview.h"
+#include "indexdataholder.h"
 #include "sortfilterproxymodel.h"
 #include "rosteroptionswidget.h"
 
@@ -47,6 +50,7 @@ public:
   virtual IRostersView *rostersView();
   virtual bool checkOption(IRostersView::Option AOption) const;
   virtual void setOption(IRostersView::Option AOption, bool AValue);
+  virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
 public slots:
   virtual void setOptionByAction(bool);
 signals:
@@ -56,43 +60,44 @@ signals:
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
-  void reExpandItems(const QModelIndex &AParent = QModelIndex());
+  void startRestoreExpandState();
   QString getExpandSettingsName(const QModelIndex &AIndex);
   void loadExpandedState(const QModelIndex &AIndex);
   void saveExpandedState(const QModelIndex &AIndex);
-  void setExpandedLabel(const QModelIndex &AIndex);
 protected slots:
-  void onOptionChanged(IRostersView::Option AOption, bool AValue);
-  void onRostersViewDestroyed(QObject *);
+  void onRostersViewDestroyed(QObject *AObject);
   void onModelAboutToBeSeted(IRostersModel *AModel);
   void onModelSeted(IRostersModel *AModel);
   void onProxyAdded(QAbstractProxyModel *AProxyModel);
   void onProxyRemoved(QAbstractProxyModel *AProxyModel);
-  void onRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
+  void onIndexInserted(const QModelIndex &AParent, int AStart, int AEnd);
   void onIndexCollapsed(const QModelIndex &AIndex);
   void onIndexExpanded(const QModelIndex &AIndex);
+  void onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
+  void onAccountDestroyed(IAccount *AAccount);
+  void onRestoreExpandState();
   void onSettingsOpened();
   void onSettingsClosed();
   void onShowOfflineContactsAction(bool AChecked);
   void onOptionsAccepted();
   void onOptionsRejected();
 private:
+  IRosterPlugin *FRosterPlugin;
   IRostersModelPlugin *FRostersModelPlugin;
   IMainWindowPlugin *FMainWindowPlugin;
-  ISettingsPlugin *FSettingsPlugin;
   ISettings *FSettings;
+  ISettingsPlugin *FSettingsPlugin;
+  IAccountManager *FAccountManager;
 private:
   Action *FShowOfflineAction;
 private:
+  bool FStartRestoreExpandState;
   int FOptions; 
-  int FExpandedLabelId;
-  int FCollapsedLabelId;
   RostersView *FRostersView; 
+  IndexDataHolder *FIndexDataHolder;
   SortFilterProxyModel *FSortFilterProxyModel;
   QAbstractItemModel *FLastModel;
   QList<int> FSaveExpandStatusTypes;
-  QList<int> FShowExpandStatusTypes;
-  SkinIconset FRosterIconset;
   QPointer<RosterOptionsWidget> FRosterOptionsWidget;
 };
 

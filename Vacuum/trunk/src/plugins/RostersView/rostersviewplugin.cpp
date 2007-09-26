@@ -1,10 +1,21 @@
 #include <QtDebug>
 #include "rostersviewplugin.h"
 
+#include <QTimer>
+
 #define SVN_SHOW_OFFLINE_CONTACTS         "showOfflineContacts"
 #define SVN_SHOW_ONLINE_FIRST             "showOnlineFirst"
 #define SVN_SHOW_FOOTER_TEXT              "showFooterText"
 #define SVN_SHOW_RESOURCE                 "showResource"
+
+#define IN_STATUS_OFFLINE                 "status/offline"
+
+#define SVN_COLLAPSE                      "collapse"
+#define SVN_ACCOUNT                       "account"
+#define SVN_GROUP                         "h%1" 
+#define SVN_COLLAPSE_ACCOUNT              SVN_COLLAPSE ":" SVN_ACCOUNT
+#define SVN_COLLAPSE_ACCOUNT_NS           SVN_COLLAPSE_ACCOUNT "[]"
+#define SVN_COLLAPSE_ACCOUNT_NS_GROUP     SVN_COLLAPSE_ACCOUNT_NS ":" SVN_GROUP
 
 RostersViewPlugin::RostersViewPlugin()
 {
@@ -13,10 +24,15 @@ RostersViewPlugin::RostersViewPlugin()
   FSettingsPlugin = NULL;
   FSettings = NULL;
   FRostersView = NULL;
+  FRosterPlugin = NULL;
+  FAccountManager = NULL;
+
+  FIndexDataHolder = NULL;
   FSortFilterProxyModel = NULL;
   FLastModel = NULL;
   FShowOfflineAction = NULL;
   FOptions = 0;
+  FStartRestoreExpandState = false;
 
   FSaveExpandStatusTypes 
     << RIT_Group 
@@ -25,15 +41,6 @@ RostersViewPlugin::RostersViewPlugin()
     << RIT_MyResourcesGroup
     << RIT_NotInRosterGroup
     << RIT_StreamRoot;
-  
-  FShowExpandStatusTypes
-    << RIT_Group 
-    << RIT_AgentsGroup 
-    << RIT_BlankGroup 
-    << RIT_MyResourcesGroup
-    << RIT_NotInRosterGroup;
-
-  FRosterIconset.openFile(ROSTER_ICONSETFILE);
 }
 
 RostersViewPlugin::~RostersViewPlugin()
@@ -70,6 +77,27 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+    if (FRosterPlugin)
+    {
+      connect(FRosterPlugin->instance(),SIGNAL(rosterJidAboutToBeChanged(IRoster *, const Jid &)),
+        SLOT(onRosterJidAboutToBeChanged(IRoster *, const Jid &)));
+    }
+  }
+
+  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  if (plugin)
+  {
+    FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+    if (FAccountManager)
+    {
+      connect(FAccountManager->instance(),SIGNAL(destroyed(IAccount *)),SLOT(onAccountDestroyed(IAccount *)));
+    }
+  }
+
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
@@ -88,40 +116,37 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 
 bool RostersViewPlugin::initObjects()
 {
+  FIndexDataHolder = new IndexDataHolder(this);
   FRostersView = new RostersView;
+  connect(FRostersView,SIGNAL(modelAboutToBeSeted(IRostersModel *)),
+    SLOT(onModelAboutToBeSeted(IRostersModel *)));
+  connect(FRostersView,SIGNAL(modelSeted(IRostersModel *)),
+    SLOT(onModelSeted(IRostersModel *)));
   connect(FRostersView,SIGNAL(destroyed(QObject *)),SLOT(onRostersViewDestroyed(QObject *)));
-
+  
   if (FSettingsPlugin)
   {
     FSettings = FSettingsPlugin->settingsForPlugin(ROSTERSVIEW_UUID);
     FSettingsPlugin->openOptionsNode(ON_ROSTER,tr("Roster"),tr("Roster view options"),QIcon());
     FSettingsPlugin->appendOptionsHolder(this);
-  }
 
-  if (FSettings)
-  {
-    connect(FRostersView,SIGNAL(modelSeted(IRostersModel *)),
-      SLOT(onModelSeted(IRostersModel *)));
-    connect(FRostersView,SIGNAL(modelAboutToBeSeted(IRostersModel *)),
-      SLOT(onModelAboutToBeSeted(IRostersModel *)));
     connect(FRostersView,SIGNAL(proxyModelAdded(QAbstractProxyModel *)),
       SLOT(onProxyAdded(QAbstractProxyModel *)));
     connect(FRostersView,SIGNAL(proxyModelRemoved(QAbstractProxyModel *)),
       SLOT(onProxyRemoved(QAbstractProxyModel *)));
+    connect(FRostersView,SIGNAL(indexInserted(const QModelIndex &, int, int)),
+      SLOT(onIndexInserted(const QModelIndex &, int, int)));
     connect(FRostersView,SIGNAL(collapsed(const QModelIndex &)),SLOT(onIndexCollapsed(const QModelIndex &)));
     connect(FRostersView,SIGNAL(expanded(const QModelIndex &)),SLOT(onIndexExpanded(const QModelIndex &)));
   }
   emit viewCreated(FRostersView);
  
-  //FExpandedLabelId = FRostersView->createIndexLabel(RLO_GROUPEXPANDED,FRosterIconset.iconByName("groupOpen"));
-  //FCollapsedLabelId = FRostersView->createIndexLabel(RLO_GROUPCOLLAPSED,FRosterIconset.iconByName("groupClosed"));
-
   if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
   {
     FMainWindowPlugin->mainWindow()->rostersWidget()->insertWidget(0,FRostersView);
 
     FShowOfflineAction = new Action(this);
-    FShowOfflineAction->setIcon(STATUS_ICONSETFILE,"status/offline");
+    FShowOfflineAction->setIcon(STATUS_ICONSETFILE,IN_STATUS_OFFLINE);
     FShowOfflineAction->setToolTip(tr("Show offline contacts"));
     FShowOfflineAction->setCheckable(true);
     connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
@@ -135,8 +160,6 @@ bool RostersViewPlugin::initObjects()
     FSortFilterProxyModel->setDynamicSortFilter(true);
     FRostersView->addProxyModel(FSortFilterProxyModel);
   }
-
-  connect(this,SIGNAL(optionChanged(IRostersView::Option,bool)),SLOT(onOptionChanged(IRostersView::Option,bool)));
 
   return true;
 }
@@ -164,8 +187,41 @@ bool RostersViewPlugin::checkOption(IRostersView::Option AOption) const
 
 void RostersViewPlugin::setOption(IRostersView::Option AOption, bool AValue)
 {
+  bool changed = checkOption(AOption) != AValue;
   AValue ? FOptions |= AOption : FOptions &= ~AOption;
-  emit optionChanged(AOption,AValue);
+  if (changed)
+  {
+    if (FRostersView)
+      FRostersView->setOption(AOption,AValue);
+    if (FIndexDataHolder)
+      FIndexDataHolder->setOption(AOption,AValue);
+    if (FSortFilterProxyModel)
+      FSortFilterProxyModel->setOption(AOption,AValue);
+    if (AOption == IRostersView::ShowOfflineContacts)
+    {
+      FShowOfflineAction->setChecked(AValue);
+      if (AValue)
+        startRestoreExpandState();
+    }
+    emit optionChanged(AOption,AValue);
+  }
+}
+
+void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
+{
+  QAbstractItemModel *curModel = FRostersView->model();
+  if (curModel)
+  {
+    if (AParent.isValid())
+      loadExpandedState(AParent);
+    int rows = curModel->rowCount(AParent);
+    for (int i = 0; i<rows; ++i)
+    {
+      QModelIndex index = curModel->index(i,0,AParent);
+      if (curModel->rowCount(index) > 0)
+        restoreExpandState(index);
+    }
+  }
 }
 
 void RostersViewPlugin::setOptionByAction(bool)
@@ -179,44 +235,33 @@ void RostersViewPlugin::setOptionByAction(bool)
   }
 }
 
-void RostersViewPlugin::reExpandItems(const QModelIndex &AParent)
+void RostersViewPlugin::startRestoreExpandState()
 {
-  QAbstractItemModel *curModel = FRostersView->model();
-  if (curModel)
+  if (!FStartRestoreExpandState)
   {
-    int rows = curModel->rowCount(AParent);
-    for (int i = 0; i<rows; ++i)
-    {
-      QModelIndex index = curModel->index(i,0,AParent);
-      int itemType = index.data(RDR_Type).toInt();
-      QString groupName = index.data(RDR_Group).toString();
-      if (!groupName.isEmpty() || itemType == RIT_StreamRoot)
-      {
-        loadExpandedState(index);
-        reExpandItems(index);
-      }
-    }
+    FStartRestoreExpandState = true;
+    QTimer::singleShot(0,this,SLOT(onRestoreExpandState()));
   }
 }
 
 QString RostersViewPlugin::getExpandSettingsName(const QModelIndex &AIndex)
 {
   QString valueName;
-  int itemType = AIndex.data(RDR_Type).toInt();
-  if (FSaveExpandStatusTypes.contains(itemType))
+  Jid streamJid(AIndex.data(RDR_StreamJid).toString());
+  if (streamJid.isValid())
   {
-    Jid streamJid(AIndex.data(RDR_StreamJid).toString());
-    if (streamJid.isValid())
+    int itemType = AIndex.data(RDR_Type).toInt();
+    if (itemType != RIT_StreamRoot)
     {
-      if (itemType != RIT_StreamRoot)
+      QString groupName = AIndex.data(RDR_Group).toString();
+      if (!groupName.isEmpty())
       {
-        QString groupName = AIndex.data(RDR_Group).toString();
         QString groupHash = QString::number(qHash(groupName),16);
-        valueName = QString("collapsed[]:h%1").arg(groupHash);
+        valueName = QString(SVN_COLLAPSE_ACCOUNT_NS_GROUP).arg(groupHash);
       }
-      else
-        valueName = "collapsed[]";
     }
+    else
+      valueName = SVN_COLLAPSE_ACCOUNT_NS;
   }
   return valueName;
 }
@@ -224,12 +269,13 @@ QString RostersViewPlugin::getExpandSettingsName(const QModelIndex &AIndex)
 void RostersViewPlugin::loadExpandedState(const QModelIndex &AIndex)
 {
   QString settingsName = getExpandSettingsName(AIndex);
-  if (!settingsName.isEmpty())
+  if (FSettings && !settingsName.isEmpty())
   {
     Jid streamJid(AIndex.data(RDR_StreamJid).toString());
-    if (FSettings->valueNS(settingsName,streamJid.pFull(),false).toBool())
+    bool isCollapsed = FSettings->valueNS(settingsName,streamJid.pFull(),false).toBool();
+    if (isCollapsed && FRostersView->isExpanded(AIndex))
       FRostersView->collapse(AIndex);
-    else
+    else if (!isCollapsed && !FRostersView->isExpanded(AIndex))
       FRostersView->expand(AIndex);
   }
 }
@@ -237,7 +283,7 @@ void RostersViewPlugin::loadExpandedState(const QModelIndex &AIndex)
 void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
 {
   QString settingsName = getExpandSettingsName(AIndex);
-  if (!settingsName.isEmpty())
+  if (FSettings && !settingsName.isEmpty())
   {
     Jid streamJid(AIndex.data(RDR_StreamJid).toString());
     if (FRostersView->isExpanded(AIndex))
@@ -252,117 +298,79 @@ void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
   }
 }
 
-void RostersViewPlugin::setExpandedLabel(const QModelIndex &AIndex)
-{
-  int itemType = AIndex.data(RDR_Type).toInt();
-  if (FShowExpandStatusTypes.contains(itemType) && !AIndex.data(RDR_HideGroupExpander).toBool())
-  {
-    QModelIndex modelIndex = FRostersView->mapToModel(AIndex);
-    IRosterIndex *rosterIndex = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-    if (rosterIndex)
-    {
-      if (FRostersView->isExpanded(AIndex))
-      {
-        FRostersView->removeIndexLabel(FCollapsedLabelId,rosterIndex);
-        FRostersView->insertIndexLabel(FExpandedLabelId,rosterIndex);
-      }
-      else
-      {
-        FRostersView->removeIndexLabel(FExpandedLabelId,rosterIndex);
-        FRostersView->insertIndexLabel(FCollapsedLabelId,rosterIndex);
-      }
-    }
-  }
-}
-
-void RostersViewPlugin::onOptionChanged(IRostersView::Option AOption, bool AValue)
-{
-  if (FRostersView)
-    FRostersView->setOption(AOption,AValue);
-  if (FSortFilterProxyModel)
-    FSortFilterProxyModel->setOption(AOption,AValue);
-  if (AOption == IRostersView::ShowOfflineContacts)
-    FShowOfflineAction->setChecked(AValue);
-}
-
 void RostersViewPlugin::onRostersViewDestroyed(QObject *)
 {
   emit viewDestroyed(FRostersView);
   FRostersView = NULL;
 }
 
-void RostersViewPlugin::onModelAboutToBeSeted(IRostersModel *AModel)
+void RostersViewPlugin::onModelAboutToBeSeted(IRostersModel * /*AModel*/)
 {
-  if (FLastModel == FRostersView->model())
-  {
-    if (FLastModel)
-      disconnect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-      this,SLOT(onRowsInserted(const QModelIndex &,int,int)));
-
-    FLastModel = AModel;
-
-    connect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-      SLOT(onRowsInserted(const QModelIndex &,int,int)));
-  }
+  if (FRostersView->rostersModel())
+    FRostersView->rostersModel()->removeDefaultDataHolder(FIndexDataHolder);
 }
 
-void RostersViewPlugin::onModelSeted(IRostersModel *)
+void RostersViewPlugin::onModelSeted(IRostersModel *AModel)
 {
-  reExpandItems();
+  AModel->insertDefaultDataHolder(FIndexDataHolder);
+  startRestoreExpandState();
 }
 
-void RostersViewPlugin::onProxyAdded(QAbstractProxyModel *AProxyModel)
+void RostersViewPlugin::onProxyAdded(QAbstractProxyModel * /*AProxyModel*/)
 {
-  if (FLastModel)
-    disconnect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-    this,SLOT(onRowsInserted(const QModelIndex &,int,int)));
-
-  FLastModel = AProxyModel;
-
-  connect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-    SLOT(onRowsInserted(const QModelIndex &,int,int)));
-  
-  reExpandItems();
+  startRestoreExpandState();
 }
 
-void RostersViewPlugin::onProxyRemoved(QAbstractProxyModel *AProxyModel)
+void RostersViewPlugin::onProxyRemoved(QAbstractProxyModel * /*AProxyModel*/)
 {
-  if (FLastModel == AProxyModel)
-  {
-    disconnect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-      this,SLOT(onRowsInserted(const QModelIndex &,int,int)));
-
-    FLastModel = FRostersView->lastProxyModel();
-    if (!FLastModel)
-      FLastModel = FRostersView->model();
-
-    if (FLastModel)
-      connect(FLastModel,SIGNAL(rowsInserted(const QModelIndex &,int,int)),
-      SLOT(onRowsInserted(const QModelIndex &,int,int)));
-  }
-  reExpandItems();
+  startRestoreExpandState();
 }
 
-void RostersViewPlugin::onRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
+void RostersViewPlugin::onIndexInserted(const QModelIndex &/*AParent*/, int /*AStart*/, int /*AEnd*/)
 {
-  for (int i = AStart; i <= AEnd; ++i)
-  {
-    QModelIndex index = FRostersView->model()->index(i,0,AParent);
-    loadExpandedState(index);
-    //setExpandedLabel(index);
-  }
+  startRestoreExpandState();
 }
 
 void RostersViewPlugin::onIndexCollapsed(const QModelIndex &AIndex)
 {
   saveExpandedState(AIndex);
-  //setExpandedLabel(AIndex);
 }
 
 void RostersViewPlugin::onIndexExpanded(const QModelIndex &AIndex)
 {
   saveExpandedState(AIndex);
-  //setExpandedLabel(AIndex);
+}
+
+void RostersViewPlugin::onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter)
+{
+  if (FSettings)
+  {
+    Jid befour = ARoster->streamJid();
+    if (befour.equals(AAfter,false))
+    {
+      QDomElement elem = FSettingsPlugin->pluginNode(ROSTERSVIEW_UUID).firstChildElement(SVN_COLLAPSE).firstChildElement(SVN_ACCOUNT);
+      while(!elem.isNull() && elem.attribute("ns")!=befour.pFull())
+        elem = elem.nextSiblingElement(SVN_ACCOUNT);
+      if (!elem.isNull())
+        elem.setAttribute("ns",AAfter.pFull());
+    }
+    else
+      FSettings->deleteValueNS(SVN_COLLAPSE_ACCOUNT_NS,befour.pFull());
+  }
+}
+
+void RostersViewPlugin::onAccountDestroyed(IAccount *AAccount)
+{
+  if (FSettings)
+  {
+    FSettings->deleteValueNS(SVN_COLLAPSE_ACCOUNT_NS,AAccount->streamJid().pFull());
+  }
+}
+
+void RostersViewPlugin::onRestoreExpandState()
+{
+  restoreExpandState();
+  FStartRestoreExpandState = false;
 }
 
 void RostersViewPlugin::onSettingsOpened()

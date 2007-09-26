@@ -13,7 +13,8 @@ IndexDataHolder::~IndexDataHolder()
 
 QList<int> IndexDataHolder::roles() const
 {
-  static QList<int> dataRoles  = QList<int>() << Qt::DisplayRole 
+  static QList<int> dataRoles  = QList<int>() 
+    << Qt::DisplayRole 
     << Qt::BackgroundColorRole 
     << Qt::ForegroundRole
     << Qt::ToolTipRole
@@ -23,7 +24,8 @@ QList<int> IndexDataHolder::roles() const
 
 QList<int> IndexDataHolder::types() const
 {
-  static QList<int> indexTypes  = QList<int>()  << RIT_StreamRoot 
+  static QList<int> indexTypes  = QList<int>()  
+    << RIT_StreamRoot 
     << RIT_Group
     << RIT_BlankGroup
     << RIT_AgentsGroup
@@ -142,30 +144,32 @@ void IndexDataHolder::setOption(IRostersView::Option AOption, bool AValue)
 QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
 {
   QString toolTip;
-  QString mask = "<b>%1:</b> %2<br>";
+  QString valueMast = "%1<br>";
+  QString paramMask = "%1: %2<br>";
+  
   QString val = AIndex->data(RDR_Name).toString();
   if (!val.isEmpty())
-    toolTip.append(mask.arg(tr("Name")).arg(val));
+    toolTip.append(valueMast.arg(val));
 
   val = AIndex->data(RDR_Jid).toString();
   if (!val.isEmpty())
-    toolTip.append(mask.arg(tr("Jid")).arg(val));
-
-  val = AIndex->data(RDR_Status).toString();
-  if (!val.isEmpty())
-    toolTip.append(mask.arg(tr("Status")).arg(val));
+    toolTip.append(valueMast.arg(val));
 
   val = AIndex->data(RDR_Priority).toString();
   if (!val.isEmpty())
-    toolTip.append(mask.arg(tr("Priority")).arg(val));
+    toolTip.append(paramMask.arg(tr("Priority")).arg(val));
+
+  val = AIndex->data(RDR_Status).toString();
+  if (!val.isEmpty())
+    toolTip.append(paramMask.arg(tr("Status")).arg(val));
 
   val = AIndex->data(RDR_Subscription).toString();
-  if (!val.isEmpty())
-    toolTip.append(mask.arg(tr("Subscription")).arg(val));
+  if (!val.isEmpty() && val != "both")
+    toolTip.append(paramMask.arg(tr("Subscription")).arg(val));
 
   val = AIndex->data(RDR_Ask).toString();
   if (!val.isEmpty())
-    toolTip.append(mask.arg(tr("Ask")).arg(val));
+    toolTip.append(paramMask.arg(tr("Ask")).arg(val));
 
   toolTip.chop(4);
   return toolTip;

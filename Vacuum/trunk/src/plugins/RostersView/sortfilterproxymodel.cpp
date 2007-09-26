@@ -27,8 +27,7 @@ bool SortFilterProxyModel::checkOption(IRostersView::Option AOption) const
 void SortFilterProxyModel::setOption(IRostersView::Option AOption, bool AValue)
 {
   AValue ? FOptions |= AOption : FOptions &= ~AOption;
-  invalidateFilter();
-  clear();
+  invalidate();
 }
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const

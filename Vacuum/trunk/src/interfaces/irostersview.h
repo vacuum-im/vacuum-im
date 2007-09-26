@@ -31,7 +31,6 @@ public:
   virtual QObject *instance() = 0;
   virtual void setModel(IRostersModel *AModel) =0; 
   virtual IRostersModel *rostersModel() const =0;
-  virtual IRosterIndexDataHolder *defaultDataHolder() const =0;
   //--ProxyModels
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel) =0;
   virtual QList<QAbstractProxyModel *> proxyModels() const =0;
@@ -80,6 +79,7 @@ public:
   virtual IRostersView *rostersView() =0;
   virtual bool checkOption(IRostersView::Option AOption) const =0;
   virtual void setOption(IRostersView::Option AOption, bool AValue) =0;
+  virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
 public slots:
   virtual void setOptionByAction(bool) =0;
 signals:

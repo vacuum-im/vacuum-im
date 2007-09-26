@@ -34,6 +34,8 @@ public:
   bool checkOption(IRostersView::Option AOption) const;
   void setOption(IRostersView::Option AOption, bool AValue);
 protected:
+  QHash<int,QRect> drawIndex(QPainter *APainter, const QStyleOptionViewItem &AOption, 
+    const QModelIndex &AIndex) const;
   QRect drawVariant(QPainter *APainter, const QStyleOptionViewItem &AOption, 
     const QRect &ARect, const QVariant &AValue) const;
   void drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, 
@@ -45,9 +47,9 @@ protected:
     const QStyleOptionViewItem &AOption) const;
   QStyleOptionViewItem setFooterOptions(const QModelIndex &AIndex,
     const QStyleOptionViewItem &AOption) const;
-  QSize variantSize(const QStyleOptionViewItem &AOption, const QVariant &AValue) const;
-  QRect variantRect(const QStyleOptionViewItem &AOption, const QRect &ARect, const QVariant &AValue) const;
-  QSize doTextLayout(QTextLayout &ATextLayout, int ALineWidth = INT_MAX>>6) const;
+  void addSize(QRect &ARect,const QRect &AAddRect, bool AIsLeftToRight) const;
+  void removeWidth(QRect &ARect, int AWidth, bool AIsLeftToRight) const;
+  Qt::Alignment labelAlignment(int ALabelOrder) const;
 private:
   static const int spacing = 2;
   QIcon::Mode getIconMode(QStyle::State AState) const;
