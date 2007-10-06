@@ -5,6 +5,7 @@
 #include <QHeaderView>
 #include <QToolTip>
 #include <QCursor>
+#include <QHelpEvent>
 
 RostersView::RostersView(QWidget *AParent)
   : QTreeView(AParent)
@@ -402,26 +403,6 @@ void RostersView::setOption(IRostersView::Option AOption, bool AValue)
   FRosterIndexDelegate->setOption(AOption,AValue);
 }
 
-void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
-{
-  QModelIndex modelIndex = indexAt(AEvent->pos());
-  if (modelIndex.isValid())
-  {
-    const int labelId = labelAt(AEvent->pos(),modelIndex);
-
-    modelIndex = mapToModel(modelIndex);
-    IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-
-    FContextMenu->clear();
-    if (labelId > RLID_DISPLAY)
-      emit labelContextMenu(index,labelId,FContextMenu);
-    if (FContextMenu->isEmpty())
-      emit contextMenu(index,FContextMenu);
-    if (!FContextMenu->isEmpty())
-      FContextMenu->popup(AEvent->globalPos());
-  }
-}
-
 QStyleOptionViewItemV2 RostersView::indexOption(const QModelIndex &AIndex) const
 {
   QStyleOptionViewItemV2 option = viewOptions();
@@ -519,30 +500,26 @@ bool RostersView::viewportEvent(QEvent *AEvent)
   case QEvent::ToolTip:
     {
       QHelpEvent *helpEvent = static_cast<QHelpEvent *>(AEvent); 
-      QModelIndex modelIndex = indexAt(helpEvent->pos());
-      if (modelIndex.isValid())
+      QModelIndex viewIndex = indexAt(helpEvent->pos());
+      if (viewIndex.isValid())
       {
         QMultiMap<int,QString> toolTipsMap;
-        const int labelId = labelAt(helpEvent->pos(),modelIndex);
+        const int labelId = labelAt(helpEvent->pos(),viewIndex);
         
-        modelIndex = mapToModel(modelIndex);
+        QModelIndex modelIndex = mapToModel(viewIndex);
         IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
 
-        if (labelId > RLID_DISPLAY)
-          emit labelToolTips(index,labelId,toolTipsMap);
+        emit labelToolTips(index,labelId,toolTipsMap);
 
-        if (toolTipsMap.isEmpty())
-        {
+        if (labelId == RLID_DISPLAY || labelId == RLID_FOOTER_TEXT || toolTipsMap.isEmpty())
           toolTipsMap.insert(TTO_ROSTERSVIEW,index->data(Qt::ToolTipRole).toString());
-          emit toolTips(index,toolTipsMap);
-        }
 
         QString toolTipStr;
         QMultiMap<int,QString>::const_iterator it = toolTipsMap.constBegin();
         while (it != toolTipsMap.constEnd())
         {
           if (!it.value().isEmpty())
-            toolTipStr += it.value() +"<br>";
+            toolTipStr += it.value()+"<br>";
           it++;
         }
         toolTipStr.chop(4);
@@ -552,6 +529,26 @@ bool RostersView::viewportEvent(QEvent *AEvent)
     }
   default:
     return QTreeView::viewportEvent(AEvent);
+  }
+}
+
+void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
+{
+  QModelIndex modelIndex = indexAt(AEvent->pos());
+  if (modelIndex.isValid())
+  {
+    const int labelId = labelAt(AEvent->pos(),modelIndex);
+
+    modelIndex = mapToModel(modelIndex);
+    IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
+
+    FContextMenu->clear();
+    if (labelId > RLID_DISPLAY)
+      emit labelContextMenu(index,labelId,FContextMenu);
+    if (FContextMenu->isEmpty())
+      emit contextMenu(index,FContextMenu);
+    if (!FContextMenu->isEmpty())
+      FContextMenu->popup(AEvent->globalPos());
   }
 }
 

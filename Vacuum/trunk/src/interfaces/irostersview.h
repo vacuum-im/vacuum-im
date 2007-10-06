@@ -57,18 +57,17 @@ public:
   virtual void insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex) =0;
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
 signals:
-  virtual void modelAboutToBeSeted(IRostersModel *) =0;
-  virtual void modelSeted(IRostersModel *) =0;
-  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *) =0;
-  virtual void proxyModelAdded(QAbstractProxyModel *) =0;
-  virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *) =0;
-  virtual void proxyModelRemoved(QAbstractProxyModel *) =0;
-  virtual void contextMenu(IRosterIndex *, Menu *) =0;
-  virtual void toolTips(IRosterIndex *, QMultiMap<int,QString> &AToolTips) =0;
-  virtual void labelContextMenu(IRosterIndex *, int ALabelId, Menu *) =0;
-  virtual void labelToolTips(IRosterIndex *, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
-  virtual void labelClicked(IRosterIndex *, int ALabelId) =0;
-  virtual void labelDoubleClicked(IRosterIndex *, int ALabelId, bool &AAccepted) =0;
+  virtual void modelAboutToBeSeted(IRostersModel *AIndex) =0;
+  virtual void modelSeted(IRostersModel *AIndex) =0;
+  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *AProxyModel) =0;
+  virtual void proxyModelAdded(QAbstractProxyModel *AProxyModel) =0;
+  virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel) =0;
+  virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel) =0;
+  virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu) =0;
+  virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu) =0;
+  virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
+  virtual void labelClicked(IRosterIndex *AIndex, int ALabelId) =0;
+  virtual void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted) =0;
 };
 
 
@@ -83,8 +82,8 @@ public:
 public slots:
   virtual void setOptionByAction(bool) =0;
 signals:
-  virtual void viewCreated(IRostersView *) =0;
-  virtual void viewDestroyed(IRostersView *) =0;
+  virtual void viewCreated(IRostersView *AIndex) =0;
+  virtual void viewDestroyed(IRostersView *AIndex) =0;
   virtual void optionChanged(IRostersView::Option AOption, bool AValue) =0;
 };
 

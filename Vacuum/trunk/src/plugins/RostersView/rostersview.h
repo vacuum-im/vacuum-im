@@ -65,7 +65,6 @@ signals:
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel);
   virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel);
   virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  virtual void toolTips(IRosterIndex *AIndex, QMultiMap<int,QString> &AToolTips);
   virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   virtual void labelClicked(IRosterIndex *AIndex, int ALabelId);
@@ -74,19 +73,21 @@ public:
   bool checkOption(IRostersView::Option AOption) const;
   void setOption(IRostersView::Option AOption, bool AValue);
 protected:
-  void contextMenuEvent(QContextMenuEvent *AEvent);
   QStyleOptionViewItemV2 indexOption(const QModelIndex &AIndex) const;
   void appendBlinkLabel(int ALabelId);
   void removeBlinkLabel(int ALabelId);
   QString intId2StringId(int AIntId);
   void removeLabels();
   void removeClickHookers();
+protected:
   //QTreeView
   virtual void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
   virtual void rowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
   virtual void rowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
   //QAbstractItemView
   virtual bool viewportEvent(QEvent *AEvent);
+  //QWidget
+  virtual void contextMenuEvent(QContextMenuEvent *AEvent);
   virtual void mouseDoubleClickEvent(QMouseEvent *AEvent);
   virtual void mousePressEvent(QMouseEvent *AEvent);
   virtual void mouseReleaseEvent(QMouseEvent *AEvent);
