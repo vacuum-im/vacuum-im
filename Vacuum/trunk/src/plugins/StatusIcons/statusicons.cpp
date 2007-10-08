@@ -274,16 +274,16 @@ QString StatusIcons::iconFileByJid(const Jid &AJid) const
 
 QString StatusIcons::iconNameByStatus(int AShow, const QString &ASubscription, bool AAsk) const
 {
-  if (AAsk)
-    return "status/ask";
-
-  if (ASubscription == "none")
-    return "status/noauth";
-
   switch (AShow)
   {
   case IPresence::Offline: 
-    return ("status/offline");
+    {
+      if (AAsk) 
+        return "status/ask";
+      if (ASubscription == "none") 
+        return "status/noauth";
+      return ("status/offline");
+    }
   case IPresence::Online: 
     return ("status/online");
   case IPresence::Chat: 
