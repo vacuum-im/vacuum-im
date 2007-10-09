@@ -113,14 +113,16 @@ QHash<QString,QVariant> Settings::values(const QString &AName) const
   return result;
 }
 
-ISettings &Settings::setValueNS(const QString &AName, const QString &ANameNS,
-                                        const QVariant &AValue)
+ISettings &Settings::setValueNS(const QString &AName, const QString &ANameNS, const QVariant &AValue)
 {
+  static QList<QVariant::Type> customVariantCasts = QList<QVariant::Type>()
+    << QVariant::Rect << QVariant::Point << QVariant::ByteArray;
+
   QDomElement elem = getElement(AName,ANameNS,true);
   if (!elem.isNull())
   {
     elem.setAttribute("value",variantToString(AValue));  
-    if (!AValue.canConvert(QVariant::String))
+    if (customVariantCasts.contains(AValue.type()))
       elem.setAttribute("type",QString::number(AValue.type()));
   }
   return *this;
@@ -193,7 +195,7 @@ QDomElement Settings::getElement(const QString &AName, const QString &ANameNS,
   return elem;
 }
 
-QString Settings::variantToString(const QVariant &AVariant )
+QString Settings::variantToString(const QVariant &AVariant)
 {
   if (AVariant.type() == QVariant::Rect)
   {
@@ -204,6 +206,10 @@ QString Settings::variantToString(const QVariant &AVariant )
   {
     QPoint point = AVariant.toPoint();
     return QString("%1::%2").arg(point.x()).arg(point.y());
+  }
+  else if (AVariant.type() == QVariant::ByteArray)
+  {
+    return qCompress(AVariant.toByteArray()).toBase64();
   }
   else
     return AVariant.toString();
@@ -226,6 +232,14 @@ QVariant Settings::stringToVariant(const QString &AString, QVariant::Type AType,
       return QPoint(parts.at(0).toInt(),parts.at(1).toInt()); 
     else
       return ADefault;
+  }
+  else if (AType == QVariant::ByteArray)
+  {
+    QByteArray result = qUncompress(QByteArray::fromBase64(AString.toLatin1()));
+    if (!result.isNull()) 
+      return result;
+    else
+     return ADefault;
   }
   else
     return QVariant(AString);
