@@ -10,11 +10,14 @@
 #define IN_OPTIONS              "psi/options"
 #define IN_PROFILE              "psi/profile"
 
+#define ADR_PROFILE             Action::DR_Parametr1
+
 SettingsPlugin::SettingsPlugin()
 {
   FOpenOptionsDialogAction = NULL;
   FOpenProfileDialogAction = NULL;
   FTrayManager = NULL;
+  FProfileMenu = NULL;
   FProfileOpened = false;
 }
 
@@ -23,6 +26,7 @@ SettingsPlugin::~SettingsPlugin()
   onPluginManagerQuit();
   qDeleteAll(FNodes);
   qDeleteAll(FPluginSettings);
+  delete FProfileMenu;
 }
 
 void SettingsPlugin::pluginInfo(PluginInfo *APluginInfo)
@@ -65,21 +69,26 @@ bool SettingsPlugin::initObjects()
   FSystemIconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
   connect(FSystemIconset,SIGNAL(iconsetChanged()),SLOT(onSystemIconsetChanged()));
 
+  FProfileMenu = new Menu;
+  FProfileMenu->setIcon(SYSTEM_ICONSETFILE,IN_PROFILE);
+  FProfileMenu->setTitle(tr("Profiles"));
+
   FOpenOptionsDialogAction = new Action(this);
   FOpenOptionsDialogAction->setEnabled(false);
   FOpenOptionsDialogAction->setIcon(SYSTEM_ICONSETFILE,IN_OPTIONS);
   FOpenOptionsDialogAction->setText(tr("Options..."));
   connect(FOpenOptionsDialogAction,SIGNAL(triggered(bool)),SLOT(openOptionsDialogByAction(bool)));
 
-  FOpenProfileDialogAction = new Action(this);
+  FOpenProfileDialogAction = new Action(FProfileMenu);
   FOpenProfileDialogAction->setIcon(SYSTEM_ICONSETFILE,IN_PROFILE);
-  FOpenProfileDialogAction->setText(tr("Change profile..."));
+  FOpenProfileDialogAction->setText(tr("Edit profiles..."));
+  FProfileMenu->addAction(FOpenProfileDialogAction,AG_DEFAULT+1);
   connect(FOpenProfileDialogAction,SIGNAL(triggered(bool)),SLOT(openProfileDialogByAction(bool)));
 
   if (FTrayManager)
   {
     FTrayManager->addAction(FOpenOptionsDialogAction,AG_SETTINGS_TRAY,true);
-    FTrayManager->addAction(FOpenProfileDialogAction,AG_SETTINGS_TRAY,true);
+    FTrayManager->addAction(FProfileMenu->menuAction(),AG_SETTINGS_TRAY,true);
   }
   return true;
 }
@@ -115,7 +124,10 @@ bool SettingsPlugin::initSettings()
       elem.setAttribute("profileName","Default");
     }
     profilesFile.close();
-    
+
+    foreach(QString profileName, profiles())
+      addProfileAction(profileName);
+
     if (settingsReady)
     {
       if (profiles().count() == 0)
@@ -194,6 +206,7 @@ bool SettingsPlugin::addProfile(const QString &AProfile)
           QDomElement profileElem = FProfiles.documentElement().appendChild(FProfiles.createElement("profile")).toElement();
           profileElem.setAttribute("name",AProfile);
           profileElem.setAttribute("dir",AProfile);
+          addProfileAction(AProfile);
           emit profileAdded(AProfile);
           return true;
         }
@@ -279,6 +292,7 @@ bool SettingsPlugin::setProfile(const QString &AProfile)
         if (!FProfile.isNull() && !FSettings.isNull())
         {
           FProfiles.documentElement().setAttribute("profileName",AProfile);
+          setActiveProfileAction(AProfile);
           setProfileOpened();
           return true;
         }
@@ -310,9 +324,9 @@ bool SettingsPlugin::renameProfile(const QString &AProfileFrom, const QString &A
       profileElem.setAttribute("dir",AProfileTo);
     else
       qDebug() << "CANT RENAME PROFILE DIRECTORY";
-    
-    emit profileRenamed(AProfileFrom,AProfileTo);
 
+    renameProfileAction(AProfileFrom,AProfileTo);
+    emit profileRenamed(AProfileFrom,AProfileTo);
     return true;
   }
   else
@@ -337,8 +351,8 @@ bool SettingsPlugin::removeProfile(const QString &AProfile)
     if (!profilesDir.remove(QFile::encodeName(profileElem.attribute("dir"))))
       qDebug() << "CANT REMOVE PROFILE DIRECTORY.";
 
+    removeProfileAction(AProfile);
     emit profileRemoved(AProfile);
-
     return true;
   }
   return false;
@@ -500,10 +514,52 @@ void SettingsPlugin::updateSettings()
     settings->updatePluginNode();
 }
 
+void SettingsPlugin::addProfileAction(const QString &AProfile)
+{
+  Action *action = new Action(FProfileMenu);
+  action->setIcon(SYSTEM_ICONSETFILE,IN_PROFILE);
+  action->setText(AProfile);
+  action->setCheckable(true);
+  action->setData(ADR_PROFILE,AProfile);
+  FProfileMenu->addAction(action,AG_DEFAULT,true);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onSetProfileByAction(bool)));
+}
+
+void SettingsPlugin::setActiveProfileAction(const QString &AProfile)
+{
+  foreach(Action *action, FProfileMenu->actions(AG_DEFAULT))
+  {
+    if (action->data(ADR_PROFILE).toString() == AProfile)
+      action->setChecked(true);
+    else
+      action->setChecked(false);
+  }
+}
+
+void SettingsPlugin::renameProfileAction(const QString &AProfileFrom, const QString &AProfileTo)
+{
+  QMultiHash<int,QVariant> data;
+  data.insert(ADR_PROFILE,AProfileFrom);
+  Action *action = FProfileMenu->findActions(data,false).value(0);
+  if (action)
+  {
+    action->setText(AProfileTo);
+    action->setData(ADR_PROFILE,AProfileTo);
+  }
+}
+
+void SettingsPlugin::removeProfileAction(const QString &AProfile)
+{
+  QMultiHash<int,QVariant> data;
+  data.insert(ADR_PROFILE,AProfile);
+  Action *action = FProfileMenu->findActions(data,false).value(0);
+  delete action;
+}
+
 void SettingsPlugin::onMainWindowCreated(IMainWindow *AMainWindow)
 {
   AMainWindow->mainMenu()->addAction(FOpenOptionsDialogAction,AG_SETTINGS_MMENU,true);
-  AMainWindow->mainMenu()->addAction(FOpenProfileDialogAction,AG_SETTINGS_MMENU,true);
+  AMainWindow->mainMenu()->addAction(FProfileMenu->menuAction(),AG_SETTINGS_MMENU,true);
 }
 
 void SettingsPlugin::onOptionsDialogOpened()
@@ -536,6 +592,16 @@ void SettingsPlugin::onSystemIconsetChanged()
 {
   if (!FOptionsDialog.isNull())
     FOptionsDialog->setWindowIcon(FSystemIconset->iconByName(IN_OPTIONS));
+}
+
+void SettingsPlugin::onSetProfileByAction(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QString profileName = action->data(ADR_PROFILE).toString();
+    setProfile(profileName);
+  }
 }
 
 Q_EXPORT_PLUGIN2(SettingsPlugin, SettingsPlugin)

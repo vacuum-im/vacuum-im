@@ -83,6 +83,10 @@ protected:
   void setProfileOpened();
   void setProfileClosed();
   void updateSettings();
+  void addProfileAction(const QString &AProfile);
+  void setActiveProfileAction(const QString &AProfile);
+  void renameProfileAction(const QString &AProfileFrom, const QString &AProfileTo);
+  void removeProfileAction(const QString &AProfile);
 protected slots:
   void onMainWindowCreated(IMainWindow *AMainWindow);
   void onOptionsDialogOpened();
@@ -91,6 +95,7 @@ protected slots:
   void onOptionsDialogClosed();
   void onPluginManagerQuit();
   void onSystemIconsetChanged();
+  void onSetProfileByAction(bool);
 private:
   IPluginManager *FPluginManager;
   IMainWindowPlugin *FMainWindowPlugin;
@@ -99,6 +104,7 @@ private:
   SkinIconset *FSystemIconset;
   Action *FOpenOptionsDialogAction;
   Action *FOpenProfileDialogAction;
+  Menu *FProfileMenu;
 private:
   bool FProfileOpened;
   QDir FHomeDir;

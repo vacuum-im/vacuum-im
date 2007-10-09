@@ -20,9 +20,7 @@ ProfileDialog::ProfileDialog(ISettingsPlugin *ASettingsPlugin)
 
   FOldProfiles = FSettingsPlugin->profiles().toSet();
   FNewProfiles = FOldProfiles;
-  ui.cmbProfiles->addItems(FOldProfiles.toList());
   ui.lstProfiles->addItems(FOldProfiles.toList());
-  ui.cmbProfiles->setCurrentIndex(ui.cmbProfiles->findText(FSettingsPlugin->profile()));
   updateDialog();
 }
 
@@ -34,7 +32,6 @@ ProfileDialog::~ProfileDialog()
 void ProfileDialog::addProfile(const QString &AProfile)
 {
   FNewProfiles += AProfile;
-  ui.cmbProfiles->addItem(AProfile);
   ui.lstProfiles->addItem(AProfile);
   updateDialog();
 }
@@ -48,8 +45,6 @@ void ProfileDialog::renameProfile(const QString &AProfileFrom, const QString &AP
 
     QListWidgetItem *listItem = ui.lstProfiles->findItems(AProfileFrom,Qt::MatchExactly).value(0);
     listItem->setText(AProfileTo);
-
-    ui.cmbProfiles->setItemText(ui.cmbProfiles->findText(AProfileFrom),AProfileTo);
   }
   else
     removeProfile(AProfileFrom);
@@ -58,9 +53,6 @@ void ProfileDialog::renameProfile(const QString &AProfileFrom, const QString &AP
 void ProfileDialog::removeProfile(const QString &AProfile)
 {
   FNewProfiles -= AProfile;
-  int cmbItem = ui.cmbProfiles->findText(AProfile);
-  if (cmbItem != -1)
-    ui.cmbProfiles->removeItem(cmbItem);
   qDeleteAll(ui.lstProfiles->findItems(AProfile,Qt::MatchExactly));
   updateDialog();
 }
@@ -153,7 +145,6 @@ void ProfileDialog::onRemoveProfileClicked()
 
 void ProfileDialog::onAccepted()
 {
-  QString newProfile = ui.cmbProfiles->currentText();
   QSet<QString> renProfiles = FRenamedProfiles.keys().toSet();
   QSet<QString> oldProfiles = FOldProfiles - FNewProfiles;
   QSet<QString> newProfiles = FNewProfiles - FOldProfiles;
@@ -168,9 +159,6 @@ void ProfileDialog::onAccepted()
 
   foreach (QString profile, newProfiles)
     FSettingsPlugin->addProfile(profile);
-
-  if (newProfile != FSettingsPlugin->profile())
-    FSettingsPlugin->setProfile(newProfile);
 
   foreach (QString profile, oldProfiles)
     FSettingsPlugin->removeProfile(profile);
