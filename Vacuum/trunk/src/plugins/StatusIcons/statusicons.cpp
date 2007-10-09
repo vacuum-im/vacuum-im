@@ -372,7 +372,10 @@ void StatusIcons::clearIconFilesRules()
 void StatusIcons::onRepaintRostersView()
 {
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
+  {
     FRostersViewPlugin->rostersView()->viewport()->repaint();
+    emit statusIconsChanged();
+  }
   FRepaintStarted = false;
 }
 
