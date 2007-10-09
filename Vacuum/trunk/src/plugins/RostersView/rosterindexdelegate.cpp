@@ -129,10 +129,9 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
     rectHash.insert(it.value().first,rect);
   }
   
-  rectHash.insert(RLID_FOOTER_TEXT,footerRect);
-
   if (showFooterText)
   {
+    rectHash.insert(RLID_FOOTER_TEXT,footerRect);
     int footerMaxWidth = sizeHintRect.width()-footerRemovedWidth;
     option = setFooterOptions(AIndex,option);
     option.displayAlignment = labelAlignment(RLO_DISPLAY);

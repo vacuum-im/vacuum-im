@@ -558,31 +558,29 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
   if (viewport()->rect().contains(AEvent->pos()))
   {
     QModelIndex viewIndex = indexAt(AEvent->pos());
-    const int labelId = labelAt(AEvent->pos(),viewIndex);
     if (viewIndex.isValid())
     {
       QModelIndex modelIndex = mapToModel(viewIndex);
       IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-      if (labelId == RLID_DISPLAY)
+      
+      const int labelId = labelAt(AEvent->pos(),viewIndex);
+      emit labelDoubleClicked(index,labelId,accepted);
+
+      int i = 0;
+      while (!accepted && i<FClickHookerItems.count())
       {
-        int i = 0;
-        while (!accepted && i<FClickHookerItems.count())
+        ClickHookerItem *item = FClickHookerItems.at(i);
+        if (item->indexes.contains(index) || item->indexes.contains(NULL))
         {
-          ClickHookerItem *item = FClickHookerItems.at(i);
-          if (item->indexes.contains(index) || item->indexes.contains(NULL))
-          {
-            accepted = item->hooker->rosterIndexClicked(index,item->hookerId);
-            if (accepted && item->autoRemove)
-              destroyClickHooker(item->hookerId);
-            else
-              i++;
-          }
+          accepted = item->hooker->rosterIndexClicked(index,item->hookerId);
+          if (accepted && item->autoRemove)
+            destroyClickHooker(item->hookerId);
           else
             i++;
         }
+        else
+          i++;
       }
-      if (!accepted)
-        emit labelDoubleClicked(index,labelId,accepted);
     }
   }
   if (!accepted)
