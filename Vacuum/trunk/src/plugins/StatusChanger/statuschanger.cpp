@@ -1018,6 +1018,7 @@ void StatusChanger::onDefaultIconFileChanged(const QString &/*AIconFile*/)
     updateStatusActions(statusItem->code);
   foreach (IPresence *presence, FStreamMenu.keys())
     updateStreamMenu(presence);
+  updateMainStatusActions();
   updateMainMenu();
 }
 
