@@ -135,6 +135,7 @@ void StatusIcons::setDefaultIconFile(const QString &AIconFile)
     FJid2IconFile.clear();
     repaintRostersView();
     emit defaultIconFileChanged(AIconFile);
+    emit defaultIconsChanged();
   }
 }
 
@@ -439,6 +440,7 @@ void StatusIcons::onOptionsRejected()
 void StatusIcons::onStatusIconsetChanged()
 {
   repaintRostersView();
+  emit defaultIconsChanged();
 }
 
 void StatusIcons::onSetCustomIconset(bool)

@@ -31,6 +31,7 @@ signals:
   virtual void defaultIconFileChanged(const QString &AIconFile) =0;
   virtual void ruleInserted(const QString &APattern, const QString &AIconFile, RuleType ARuleType) =0;
   virtual void ruleRemoved(const QString &APattern, RuleType ARuleType) =0;
+  virtual void defaultIconsChanged() =0;
   virtual void statusIconsChanged() =0;
   virtual void optionsAccepted() =0;
   virtual void optionsRejected() =0;

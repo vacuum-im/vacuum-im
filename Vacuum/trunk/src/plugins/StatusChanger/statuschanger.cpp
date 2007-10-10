@@ -139,8 +139,8 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
     if (FStatusIcons)
     {
-      connect(FStatusIcons->instance(),SIGNAL(defaultIconFileChanged(const QString &)),
-        SLOT(onDefaultIconFileChanged(const QString &)));
+      connect(FStatusIcons->instance(),SIGNAL(defaultIconsChanged()),
+        SLOT(onDefaultStatusIconsChanged()));
     }
   }
 
@@ -1012,7 +1012,7 @@ void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   }
 }
 
-void StatusChanger::onDefaultIconFileChanged(const QString &/*AIconFile*/)
+void StatusChanger::onDefaultStatusIconsChanged()
 {
   foreach (StatusItem *statusItem, FStatusItems)
     updateStatusActions(statusItem->code);

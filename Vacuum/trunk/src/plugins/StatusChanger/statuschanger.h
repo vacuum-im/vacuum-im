@@ -128,7 +128,7 @@ protected slots:
   void onAccountShown(IAccount *AAccount);
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  void onDefaultIconFileChanged(const QString &AIconFile);
+  void onDefaultStatusIconsChanged();
   void onRosterIconsetChanged();
   void onSettingsOpened();
   void onSettingsClosed();
