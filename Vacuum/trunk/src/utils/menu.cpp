@@ -16,6 +16,8 @@ Menu::~Menu()
 
 void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 {
+  QAction *befour = NULL;
+  QAction *separator = NULL;
   ActionList::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
   if (it != FActions.end())
   {
@@ -28,19 +30,13 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
   it = FActions.find(AGroup);  
   if (it == FActions.end())  
   {
-    it = FActions.lowerBound(AGroup);
-    if (it != FActions.end())
-    {
-      QAction *sepataror = FSeparators.value(it.key()); 
-      QMenu::insertAction(sepataror,AAction);
-    }
-    else
-      QMenu::addAction(AAction); 
-    FSeparators.insert(AGroup,insertSeparator(AAction));
+    befour = nextGroupSeparator(AGroup);
+    befour != NULL ? QMenu::insertAction(befour,AAction) : QMenu::addAction(AAction);
+    separator = insertSeparator(AAction);
+    FSeparators.insert(AGroup,separator);
   }
   else
   {
-    QAction *befour = NULL;
     if (ASort)
     {
       QList<QAction *> actionList = QMenu::actions();
@@ -86,7 +82,8 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 
   FActions.insertMulti(AGroup,AAction);
   connect(AAction,SIGNAL(actionDestroyed(Action *)),SLOT(onActionDestroyed(Action *)));
-  emit addedAction(AAction);
+  emit actionInserted(befour,AAction);
+  if (separator) emit separatorInserted(AAction,separator);
 }
 
 void Menu::addMenuActions(const Menu *AMenu, int AGroup, bool ASort)
@@ -149,7 +146,7 @@ void Menu::removeAction(Action *AAction)
   {
     disconnect(AAction,SIGNAL(actionDestroyed(Action *)),this,SLOT(onActionDestroyed(Action *)));
 
-    emit removedAction(AAction);
+    emit actionRemoved(AAction);
 
     if (FActions.values(it.key()).count() == 1)
     {
@@ -169,6 +166,14 @@ int Menu::actionGroup(const Action *AAction) const
   if (it != FActions.constEnd())
     return it.key();
   return AG_NULL;
+}
+
+QAction *Menu::nextGroupSeparator(int AGroup) const
+{
+  ActionList::const_iterator it = FActions.lowerBound(AGroup);
+  if (it != FActions.end())
+    return FSeparators.value(it.key());
+  return NULL;
 }
 
 QList<Action *> Menu::actions(int AGroup) const
