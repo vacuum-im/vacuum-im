@@ -11,7 +11,8 @@ HEADERS += utilsexport.h \
            iconset.h \
            skin.h \
            message.h \
-           iconsetdelegate.h
+           iconsetdelegate.h \
+           toolbarchanger.h
 
 SOURCES += jid.cpp \
            versionparser.cpp \
@@ -25,4 +26,5 @@ SOURCES += jid.cpp \
            iconset.cpp \
            skin.cpp \
            message.cpp \
-           iconsetdelegate.cpp
+           iconsetdelegate.cpp \
+           toolbarchanger.cpp
