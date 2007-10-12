@@ -109,7 +109,7 @@ QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &A
 {
   QString dLang = defLang(); 
   QDomElement elem = AParent.firstChildElement(ATagName);
-  while(!(elem.isNull() || elem.attribute("xml:lang")==ALang))
+  while(!elem.isNull() && elem.attribute("xml:lang",dLang)!=ALang)
     elem = elem.nextSiblingElement(ATagName);
   return elem;
 }
