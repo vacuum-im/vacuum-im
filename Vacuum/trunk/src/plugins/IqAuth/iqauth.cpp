@@ -26,7 +26,7 @@ bool IqAuth::start(const QDomElement &/*AElem*/)
   SHA1Context sha;
   useDigest = SHA1Hash(&sha, (const unsigned char *)shaData.constData(), shaData.size());
 
-  Stanza setAuth("iq",this);
+  Stanza setAuth("iq");
   setAuth.setType("set").setTo(FXmppStream->jid().domane()).setId("auth"); 
   QDomElement query = setAuth.addElement("query",NS_JABBER_IQ_AUTH);
   query.appendChild(setAuth.createElement("username")).

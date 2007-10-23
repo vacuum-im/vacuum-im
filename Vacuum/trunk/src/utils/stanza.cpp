@@ -1,21 +1,13 @@
 #include "stanza.h"
 
-Stanza::Stanza(const QDomElement &AElem, QObject *parent)
-  : QObject(parent)
+Stanza::Stanza(const QString &ATagName)
 {
-  FDoc.appendChild(FDoc.createElement(AElem.tagName()) = AElem);  
+  d = new StanzaData(ATagName);
 }
 
-Stanza::Stanza(const QString &ATagName, QObject *parent)
-  : QObject(parent)
+Stanza::Stanza(const QDomElement &AElem)
 {
-  FDoc.appendChild(FDoc.createElement(ATagName));
-}
-
-Stanza::Stanza(const Stanza &AStanza)
-  : QObject(AStanza.parent())
-{
-  operator =(AStanza);
+  d = new StanzaData(AElem);
 }
 
 Stanza::~Stanza()
@@ -28,36 +20,36 @@ QDomElement Stanza::firstElement(const QString &ATagName,
 {
   if (ATagName.isEmpty())
   {
-    QDomNode node = FDoc.documentElement().firstChild();
+    QDomNode node = d->FDoc.documentElement().firstChild();
     if (!ANamespace.isEmpty()) 
       while (!node.isNull() && (!node.isElement() || node.namespaceURI() != ANamespace))
         node = node.nextSibling(); 
     return node.toElement();  
   } 
   else if (ANamespace.isEmpty())
-    return FDoc.documentElement().firstChildElement(ATagName);
+    return d->FDoc.documentElement().firstChildElement(ATagName);
   else
-    return FDoc.documentElement().elementsByTagNameNS(ANamespace,ATagName).at(0).toElement(); 
+    return d->FDoc.documentElement().elementsByTagNameNS(ANamespace,ATagName).at(0).toElement(); 
 }
 
 QDomElement Stanza::addElement(const QString &ATagName, 
                                const QString &ANamespace)
 {
-  return FDoc.documentElement().appendChild(createElement(ATagName,ANamespace)).toElement();
+  return d->FDoc.documentElement().appendChild(createElement(ATagName,ANamespace)).toElement();
 }
 
 QDomElement Stanza::createElement(const QString &ATagName, 
                                   const QString &ANamespace)
 {
   if (ANamespace.isEmpty())
-    return FDoc.createElement(ATagName);
+    return d->FDoc.createElement(ATagName);
   else
-    return FDoc.createElementNS(ANamespace,ATagName);
+    return d->FDoc.createElementNS(ANamespace,ATagName);
 }
 
 QDomText Stanza::createTextNode(const QString &AData)
 {
-  return FDoc.createTextNode(AData); 
+  return d->FDoc.createTextNode(AData); 
 }
 
 bool Stanza::isValid() const
@@ -113,10 +105,4 @@ Stanza Stanza::replyError(const QString &ACondition,
       .appendChild(reply.createTextNode(AText));  
 
   return reply;
-}
-
-Stanza &Stanza::operator =(const Stanza &AStanza)
-{
-  FDoc = AStanza.document().cloneNode(true).toDocument(); 
-  return *this;
 }

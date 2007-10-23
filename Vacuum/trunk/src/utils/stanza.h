@@ -1,33 +1,51 @@
 #ifndef STANZA_H
 #define STANZA_H
 
+#include <QSharedData>
 #include <QDomDocument>
-#include <QObject>
 #include "utilsexport.h"
 #include "errorhandler.h"
 
-class UTILS_EXPORT Stanza : 
-  public QObject
+class StanzaData :
+  public QSharedData
 {
-  Q_OBJECT
-
 public:
-  Stanza(const QDomElement &AElem, QObject *parent = 0);
-  Stanza(const QString &ATagName, QObject *parent = 0);
-  Stanza(const Stanza &AStanza);
+  StanzaData(const QString &ATagName) 
+  {
+    FDoc.appendChild(FDoc.createElement(ATagName));
+  };
+  StanzaData(const QDomElement &AElem) 
+  {
+    FDoc.appendChild(FDoc.createElement(AElem.tagName()) = AElem);  
+  };
+  StanzaData(const StanzaData &AOther) 
+  {
+    FDoc = AOther.FDoc.cloneNode(true).toDocument();
+  };
+  ~StanzaData() {};
+public:
+  QDomDocument FDoc;
+};
+
+
+class UTILS_EXPORT Stanza
+{
+public:
+  Stanza(const QString &ATagName = "message");
+  Stanza(const QDomElement &AElem);
   ~Stanza();
 
-  QDomDocument document() const { return FDoc; } 
-  QDomElement element() const { return FDoc.documentElement(); }
+  QDomDocument document() const { return d->FDoc; } 
+  QDomElement element() const { return d->FDoc.documentElement(); }
 
   QString attribute(const QString &AName) const {
-    return FDoc.documentElement().attribute(AName); }
+    return d->FDoc.documentElement().attribute(AName); }
   Stanza &setAttribute(const QString &AName, const QString &AValue) {
-    FDoc.documentElement().setAttribute(AName,AValue); return *this; }
+    d->FDoc.documentElement().setAttribute(AName,AValue); return *this; }
 
-  QString tagName() const { return FDoc.documentElement().tagName(); }
+  QString tagName() const { return d->FDoc.documentElement().tagName(); }
   Stanza &setTagName(const QString &ATagName) { 
-    FDoc.documentElement().setTagName(ATagName); return *this; }
+    d->FDoc.documentElement().setTagName(ATagName); return *this; }
 
   QString type() const { return attribute("type"); }
   Stanza &setType(const QString &AType) { setAttribute("type",AType); return *this; }
@@ -49,19 +67,17 @@ public:
   QDomElement createElement(const QString &ATagName, const QString &ANamespace = "");
   QDomText createTextNode(const QString &AData);
 
-  virtual bool isValid() const;
-  virtual bool canReplyError() const;
-  virtual Stanza replyError(const QString &ACondition, 
+  bool isValid() const;
+  bool canReplyError() const;
+  Stanza replyError(const QString &ACondition, 
     const QString &ANamespace = "urn:ietf:params:xml:ns:xmpp-stanzas",
     int ACode = ErrorHandler::UNKNOWN, 
     const QString &AText = "") const;
 
-  QString toString() const { return FDoc.toString(); }
-  QByteArray toByteArray() const { return FDoc.toByteArray(); }
-
-  virtual Stanza &operator =(const Stanza &AStanza);
+  QString toString() const { return d->FDoc.toString(); }
+  QByteArray toByteArray() const { return d->FDoc.toByteArray(); }
 private:
-  QDomDocument FDoc;
+  QSharedDataPointer<StanzaData> d;  
 };
 
 #endif // STANZA_H
