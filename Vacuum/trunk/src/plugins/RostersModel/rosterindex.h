@@ -49,6 +49,7 @@ signals:
   virtual void childInserted(IRosterIndex *AIndex);
   virtual void childAboutToBeRemoved(IRosterIndex *AIndex);
   virtual void childRemoved(IRosterIndex *AIndex);
+  virtual void indexDestroyed(IRosterIndex *AIndex);
 protected slots:
   virtual void onDataHolderChanged(IRosterIndex *AIndex, int ARole);
   virtual void onChildIndexDestroyed(QObject *AIndex);

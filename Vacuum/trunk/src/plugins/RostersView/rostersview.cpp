@@ -49,16 +49,14 @@ void RostersView::setModel(IRostersModel *AModel)
     
     if (FRostersModel)
     {
-      disconnect(AModel,SIGNAL(indexRemoved(IRosterIndex *)),
-        this,SLOT(onIndexRemoved(IRosterIndex *)));
+      disconnect(FRostersModel,SIGNAL(indexDestroyed(IRosterIndex *)),this,SLOT(onIndexDestroyed(IRosterIndex *)));
       removeLabels();
       removeClickHookers();
     }
 
     if (AModel)
     {
-      connect(AModel,SIGNAL(indexRemoved(IRosterIndex *)),
-        SLOT(onIndexRemoved(IRosterIndex *)));
+      connect(AModel,SIGNAL(indexDestroyed(IRosterIndex *)), SLOT(onIndexDestroyed(IRosterIndex *)));
     }
 
     FRostersModel = AModel;
@@ -624,7 +622,7 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
   QTreeView::mouseReleaseEvent(AEvent);
 }
 
-void RostersView::onIndexRemoved(IRosterIndex *AIndex)
+void RostersView::onIndexDestroyed(IRosterIndex *AIndex)
 {
   QHash<int, QSet<IRosterIndex *> >::iterator it = FIndexLabelIndexes.begin();
   while (it!=FIndexLabelIndexes.end())

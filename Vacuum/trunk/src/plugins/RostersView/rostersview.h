@@ -92,7 +92,7 @@ protected:
   virtual void mousePressEvent(QMouseEvent *AEvent);
   virtual void mouseReleaseEvent(QMouseEvent *AEvent);
 protected slots:
-  void onIndexRemoved(IRosterIndex *AIndex);
+  void onIndexDestroyed(IRosterIndex *AIndex);
   void onBlinkTimer();
 private:
   IRostersModel *FRostersModel;

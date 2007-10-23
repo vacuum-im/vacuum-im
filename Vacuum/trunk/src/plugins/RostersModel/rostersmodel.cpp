@@ -193,6 +193,7 @@ IRosterIndex *RostersModel::createRosterIndex(int AType, const QString &AId, IRo
   if (!index)
   {
     index = new RosterIndex(AType,AId);
+    connect(index->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onIndexDestroyed(IRosterIndex *)));
     if (AParent)
       index->setData(RDR_StreamJid,AParent->data(RDR_StreamJid));
     emit indexCreated(index,AParent);
@@ -785,6 +786,11 @@ void RostersModel::onIndexChildRemoved(IRosterIndex *AIndex)
   disconnect(AIndex->instance(),SIGNAL(childRemoved(IRosterIndex *)),
     this,SLOT(onIndexChildRemoved(IRosterIndex *)));
   endRemoveRows();
+}
+
+void RostersModel::onIndexDestroyed(IRosterIndex *AIndex)
+{
+  emit indexDestroyed(AIndex);
 }
 
 void RostersModel::onDelayedDataChanged()

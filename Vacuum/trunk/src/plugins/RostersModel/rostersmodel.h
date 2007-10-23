@@ -51,13 +51,14 @@ public:
   virtual QString myResourcesGroupName() const { return tr("My Resources"); }
   virtual QString notInRosterGroupName() const { return tr("Not in Roster"); }
 signals:
-  virtual void streamAdded(const Jid &);
-  virtual void streamRemoved(const Jid &);
+  virtual void streamAdded(const Jid &AStreamJid);
+  virtual void streamRemoved(const Jid &AStreamJid);
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
-  virtual void indexCreated(IRosterIndex *, IRosterIndex *);
-  virtual void indexInserted(IRosterIndex *);
-  virtual void indexDataChanged(IRosterIndex *, int ARole);
-  virtual void indexRemoved(IRosterIndex *);
+  virtual void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
+  virtual void indexInserted(IRosterIndex *AIndex);
+  virtual void indexDataChanged(IRosterIndex *AIndex, int ARole);
+  virtual void indexRemoved(IRosterIndex *AIndex);
+  virtual void indexDestroyed(IRosterIndex *AIndex);
   virtual void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder);
   virtual void defaultDataHolderRemoved(IRosterIndexDataHolder *ADataHolder);
 protected:
@@ -74,6 +75,7 @@ protected slots:
   void onIndexChildInserted(IRosterIndex *AIndex);
   void onIndexChildAboutToBeRemoved(IRosterIndex *AIndex);
   void onIndexChildRemoved(IRosterIndex *AIndex);
+  void onIndexDestroyed(IRosterIndex *AIndex);
   void onDelayedDataChanged();
 private:
   struct StreamItem {

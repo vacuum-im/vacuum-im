@@ -59,6 +59,7 @@ signals:
   virtual void childInserted(IRosterIndex *AIndex) =0;
   virtual void childAboutToBeRemoved(IRosterIndex *AIndex) =0;
   virtual void childRemoved(IRosterIndex *AIndex) =0;
+  virtual void indexDestroyed(IRosterIndex *AIndex) =0;
 };
 
 class IRostersModel :
@@ -98,6 +99,7 @@ signals:
   virtual void indexInserted(IRosterIndex *AIndex) =0;
   virtual void indexDataChanged(IRosterIndex *AIndex, int ARole) =0;
   virtual void indexRemoved(IRosterIndex *AIndex) =0;
+  virtual void indexDestroyed(IRosterIndex *AIndex) =0;
   virtual void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder) =0;
   virtual void defaultDataHolderRemoved(IRosterIndexDataHolder *ADataHolder) =0;
 };

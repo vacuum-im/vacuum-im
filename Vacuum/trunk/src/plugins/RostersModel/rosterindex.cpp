@@ -20,6 +20,7 @@ RosterIndex::~RosterIndex()
     removeAllChilds();
   if (FParentIndex)
     FParentIndex->removeChild(this);
+  emit indexDestroyed(this);
 }
 
 void RosterIndex::setParentIndex(IRosterIndex *AIndex)
