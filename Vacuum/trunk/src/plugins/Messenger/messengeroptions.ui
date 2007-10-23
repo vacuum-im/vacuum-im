@@ -1,0 +1,75 @@
+<ui version="4.0" >
+ <class>MessengerOptionsClass</class>
+ <widget class="QWidget" name="MessengerOptionsClass" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>138</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>MessengerOptions</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="chbOpenMessageWindow" >
+     <property name="text" >
+      <string>Auto open message window</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbOpenChatWindow" >
+     <property name="text" >
+      <string>Auto open chat window</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbOpenChatInTab" >
+     <property name="text" >
+      <string>Open chat in tab window</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbViewShowHtml" >
+     <property name="text" >
+      <string>Show HTML</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbViewShowDateTime" >
+     <property name="text" >
+      <string>Show date and time</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbChatShowStatus" >
+     <property name="text" >
+      <string>Show status in chat window</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <resources/>
+ <connections/>
+</ui>

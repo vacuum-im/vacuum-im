@@ -1,45 +1,37 @@
-#ifndef MESSAGEWINDOW_H
-#define MESSAGEWINDOW_H
+#ifndef CHATWINDOW_H
+#define CHATWINDOW_H
 
 #include "../../definations/messagedataroles.h"
-#include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/message.h"
-#include "../../utils/jid.h"
-#include "ui_messagewindow.h"
+#include "../../utils/skin.h"
+#include "ui_chatwindow.h"
 
-class MessageWindow : 
-  virtual public QMainWindow, 
-  public IMessageWindow
+class ChatWindow : 
+  virtual public QMainWindow,
+  public IChatWindow
 {
   Q_OBJECT;
-  Q_INTERFACES(IMessageWindow);
+  Q_INTERFACES(IChatWindow ITabWidget);
 public:
-  MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode);
-  ~MessageWindow();
-
-  //IMessageWindow
+  ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid);
+  ~ChatWindow();
   virtual QWidget *instance() { return this; }
   virtual const Jid &streamJid() const { return FStreamJid; }
   virtual const Jid &contactJid() const { return FContactJid; }
-  virtual void addTabWidget(QWidget *AWidget);
-  virtual void removeTabWidget(QWidget *AWidget);
   virtual IInfoWidget *infoWidget() const { return FInfoWidget; }
   virtual IViewWidget *viewWidget() const { return FViewWidget; }
   virtual IEditWidget *editWidget() const { return FEditWidget; }
-  virtual IReceiversWidget *receiversWidget() const { return FReceiversWidget; }
-  virtual Mode mode() const { return FMode; }
-  virtual void setMode(Mode AMode);
   virtual void showWindow();
   virtual void closeWindow();
 signals:
-  virtual void streamJidChanged(const Jid &ABefour);
-  virtual void contactJidChanged(const Jid &ABefour);
   virtual void windowShow();
   virtual void windowClose();
+  virtual void streamJidChanged(const Jid &ABefour);
+  virtual void contactJidChanged(const Jid &ABefour);
   virtual void windowChanged();
   virtual void windowClosed();
   virtual void windowDestroyed();
@@ -48,45 +40,36 @@ protected:
   void saveWindowState();
   void loadWindowState();
   void loadActiveMessages();
-  void removeActiveMessage(int AMessageId);
+  void removeActiveMessages();
   void updateWindow();
-  void showMessage(const Message &AMessage);
-  void showNextOrClose();
-  void setContactJid(const Jid &AContactJid);
 protected:
+  virtual bool event(QEvent *AEvent);
   virtual void showEvent(QShowEvent *AEvent);
   virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
+  void onMessageReady();
   void onMessageReceived(const Message &AMessage);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onPresenceItem(IPresenceItem *APresenceItem);
   void onStatusIconsChanged();
-  void onSendButtonClicked();
-  void onReplyButtonClicked();
-  void onForwardButtonClicked();
-  void onChatButtonClicked();
-  void onNextButtonClicked();
-  void onReceiversChanged(const Jid &AReceiver);
+  void onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
 private:
-  Ui::MessageWindowClass ui;
-  IInfoWidget *FInfoWidget;
-  IViewWidget *FViewWidget;
-  IEditWidget *FEditWidget;
-  IReceiversWidget *FReceiversWidget;
+  Ui::ChatWindowClass ui;
 private:
   IMessenger *FMessenger;
   IPresence *FPresence;
   IStatusIcons *FStatusIcons;
   ISettings *FSettings;
 private:
+  IInfoWidget *FInfoWidget;
+  IViewWidget *FViewWidget;
+  IEditWidget *FEditWidget;
+private:
+  int FOptions;
   Jid FStreamJid;
   Jid FContactJid;
-  Mode FMode;
-  int FMessageId;
-  Message FMessage;
-  QString FCurrentThreadId;
   QString FSettingsValueNS;
   QList<int> FActiveMessages;
 };
 
-#endif // MESSAGEWINDOW_H
+#endif // CHATWINDOW_H

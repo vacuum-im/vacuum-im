@@ -12,6 +12,7 @@
 #define AG_MAINWINDOW_MMENU_QUIT                                1000
 
 //RostersView (ContextMenu)
+#define AG_MESSENGER                                            100
 #define AG_STATUSCHANGER_ROSTER                                 200
 #define AG_ROSTERCHANGER_ROSTER_ADD_CONTACT                     300
 #define AG_ACCOUNTMANAGER_ROSTER                                700

@@ -1,0 +1,45 @@
+<ui version="4.0" >
+ <class>EditWidgetClass</class>
+ <widget class="QWidget" name="EditWidgetClass" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>542</width>
+    <height>66</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>EditWidget</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="leftMargin" >
+    <number>2</number>
+   </property>
+   <property name="topMargin" >
+    <number>2</number>
+   </property>
+   <property name="rightMargin" >
+    <number>2</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>2</number>
+   </property>
+   <property name="horizontalSpacing" >
+    <number>0</number>
+   </property>
+   <property name="verticalSpacing" >
+    <number>0</number>
+   </property>
+   <item row="0" column="0" >
+    <widget class="QWidget" native="1" name="wdtToolBar" />
+   </item>
+   <item row="1" column="0" >
+    <widget class="QTextEdit" name="tedEditor" />
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <resources/>
+ <connections/>
+</ui>
