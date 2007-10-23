@@ -12,15 +12,18 @@ class MessageData :
   public QSharedData
 {
 public:
-  MessageData() : FStanza("message") 
+  MessageData() 
+    : FStanza("message") 
   {
     FDateTime = QDateTime::currentDateTime();
   };
-  MessageData(const Stanza &AStanza) : FStanza(AStanza) 
+  MessageData(const Stanza &AStanza) 
+    : FStanza(AStanza) 
   {
     FDateTime = QDateTime::currentDateTime();
   };
-  MessageData(const MessageData &AOther) : FStanza(AOther.FStanza) 
+  MessageData(const MessageData &AOther) 
+    : FStanza(AOther.FStanza) 
   {
     FDateTime = AOther.FDateTime;
     FData = AOther.FData;
@@ -38,6 +41,7 @@ class UTILS_EXPORT Message
 public:
   enum MessageType
   {
+    AnyType,
     Normal,
     Chat,
     GroupChat,
@@ -54,14 +58,16 @@ public:
   QVariant data(int ARole) const { return d->FData.value(ARole); }
   void setData(int ARole, const QVariant &AData);
   void setData(const QHash<int, QVariant> &AData);
+  QString id() const { return d->FStanza.id(); }
+  Message &setId(const QString &AId) { d->FStanza.setId(AId); return *this; }
   QString from() const { return d->FStanza.from(); }
   Message &setFrom(const QString &AFrom) { d->FStanza.setFrom(AFrom); return *this; }
   QString to() const { return d->FStanza.to(); }
   Message &setTo(const QString &ATo) { d->FStanza.setTo(ATo); return *this; }
   QString defLang() const { return d->FStanza.lang(); }
   Message &setDefLang(const QString &ALang) { d->FStanza.setLang(ALang); return *this; }
-  QString type() const { return d->FStanza.type(); }
-  Message &setType(const QString &AType) { d->FStanza.setType(AType); return *this; }
+  MessageType type() const;
+  Message &setType(MessageType AType);
   QDateTime dateTime() const;
   Message &setDateTime(const QDateTime &ADateTime);
   QStringList subjectLangs() const { return availableLangs(d->FStanza.element(),"subject"); }

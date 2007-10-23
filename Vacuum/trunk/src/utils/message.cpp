@@ -37,6 +37,38 @@ void Message::setData(const QHash<int, QVariant> &AData)
   }
 }
 
+Message::MessageType Message::type() const
+{
+  if (d->FStanza.type() == "chat")
+    return Chat;
+  else if (d->FStanza.type() == "groupchat")
+    return GroupChat;
+  else if (d->FStanza.type() == "headline")
+    return Headline;
+  else
+    return Normal;
+}
+
+Message &Message::setType(MessageType AType)
+{
+  switch(AType)
+  {
+  case Normal:
+    d->FStanza.setType("normal"); 
+  	break;
+  case Chat:
+    d->FStanza.setType("chat"); 
+  	break;
+  case GroupChat:
+    d->FStanza.setType("groupchat"); 
+    break;
+  case Headline:
+    d->FStanza.setType("headline"); 
+    break;
+  }
+  return *this;
+}
+
 QDateTime Message::dateTime() const
 {
   return d->FDateTime;
@@ -147,5 +179,4 @@ QDomElement Message::setTextToElem(QDomElement &AElem, const QString &AText)
   }
   return AElem;
 }
-
 
