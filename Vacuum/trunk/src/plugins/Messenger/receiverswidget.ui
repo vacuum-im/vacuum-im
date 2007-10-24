@@ -42,6 +42,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pbtUpdate" >
+       <property name="text" >
+        <string>Update</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>

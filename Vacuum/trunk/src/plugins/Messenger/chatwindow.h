@@ -68,6 +68,7 @@ private:
   int FOptions;
   Jid FStreamJid;
   Jid FContactJid;
+  QString FLastStatusShow;
   QString FSettingsValueNS;
   QList<int> FActiveMessages;
 };

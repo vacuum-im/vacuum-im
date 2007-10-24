@@ -3,6 +3,8 @@
 
 #include <QTextFrame>
 #include <QTextTable>
+#include <QScrollBar>
+#include <QResizeEvent>
 
 ViewWidget::ViewWidget(IMessenger *AMessenger, const Jid &AStreamJid, const Jid &AContactJid)
 {
@@ -13,7 +15,10 @@ ViewWidget::ViewWidget(IMessenger *AMessenger, const Jid &AStreamJid, const Jid 
   FContactJid = AContactJid;
 
   FOptions = 0;
+  FSetScrollToMax = false;
   FShowKind = ChatMessage;
+
+  ui.tedViewer->installEventFilter(this);
 
   QToolBar *toolBar = new QToolBar(ui.wdtToolBar);
   toolBar->setIconSize(QSize(16,16));
@@ -39,47 +44,45 @@ void ViewWidget::setShowKind(ShowKind AKind)
 
 void ViewWidget::showMessage(const Message &AMessage)
 {
-  Jid authorJid = AMessage.from().isEmpty() ? FStreamJid : AMessage.from();
-  QString authorNick = FJid2Nick.value(authorJid,authorJid.node());
-
-  if (FShowKind == SingleMessage)
-    document()->clear();
-
-  QTextCursor cursor = document()->rootFrame()->lastCursorPosition();
-  bool cursorVisible = textEdit()->viewport()->geometry().contains(textEdit()->cursorRect(cursor));
-
-  QTextDocument messageDoc;
-  FMessenger->messageToText(&messageDoc,AMessage,AMessage.defLang());
-
-  QTextTableFormat tableFormat;
-  tableFormat.setBorder(0);
-  tableFormat.setBorderStyle(QTextTableFormat::BorderStyle_None);
-  QTextTable *table = cursor.insertTable(1,2,tableFormat);
-
-  QTextCharFormat messageFormat;
-  messageFormat.setFont(document()->defaultFont());
-
   if (FShowKind == ChatMessage)
   {
+    QTextCursor cursor = document()->rootFrame()->lastCursorPosition();
+    bool cursorVisible = textEdit()->viewport()->geometry().contains(textEdit()->cursorRect(cursor));
+
+    Jid authorJid = AMessage.from().isEmpty() ? FStreamJid : AMessage.from();
+    QString authorNick = FJid2Nick.value(authorJid,authorJid.node());
+
+    QTextCharFormat messageFormat;
+    messageFormat.setFont(document()->defaultFont());
     QTextCharFormat timeFormat = messageFormat;
     timeFormat.setForeground(Qt::gray);
     QTextCharFormat nickFormat = messageFormat;
     nickFormat.setForeground(colorForJid(authorJid));
 
+    QTextTableFormat tableFormat;
+    tableFormat.setBorder(0);
+    tableFormat.setBorderStyle(QTextTableFormat::BorderStyle_None);
+    QTextTable *table = cursor.insertTable(1,2,tableFormat);
+
     if (FMessenger->checkOption(IMessenger::ShowDateTime))
       table->cellAt(0,0).lastCursorPosition().insertText(QString("[%1]").arg(AMessage.dateTime().toString("hh:mm")),timeFormat);
     table->cellAt(0,0).lastCursorPosition().insertText(QString("[%1]").arg(authorNick),nickFormat);
+
+    QTextDocument messageDoc;
+    FMessenger->messageToText(&messageDoc,AMessage);
+
+    if (FMessenger->checkOption(IMessenger::ShowHTML))
+      table->cellAt(0,1).lastCursorPosition().insertHtml(messageDoc.toHtml());
+    else
+      table->cellAt(0,1).lastCursorPosition().insertText(messageDoc.toPlainText().trimmed(),messageFormat);
+
+    if (cursorVisible)
+      textEdit()->verticalScrollBar()->setSliderPosition(textEdit()->verticalScrollBar()->maximum());
   }
-
-  if (FMessenger->checkOption(IMessenger::ShowHTML))
-    table->cellAt(0,1).lastCursorPosition().insertHtml(messageDoc.toHtml());
-  else
-    table->cellAt(0,1).lastCursorPosition().insertText(messageDoc.toPlainText().trimmed(),messageFormat);
-
-  if (cursorVisible)
+  else if (FShowKind == SingleMessage)
   {
-    textEdit()->setTextCursor(document()->rootFrame()->lastCursorPosition());
-    textEdit()->ensureCursorVisible();
+    document()->clear();
+    FMessenger->messageToText(document(),AMessage);
   }
 
   emit messageShown(AMessage);
@@ -150,5 +153,25 @@ void ViewWidget::setContactJid(const Jid &AContactJid)
 
     emit contactJidChanged(AContactJid);
   }
+}
+
+bool ViewWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
+{
+  if (AWatched == ui.tedViewer && AEvent->type() == QEvent::Resize)
+  {
+    QScrollBar *scrollBar = ui.tedViewer->verticalScrollBar();
+    FSetScrollToMax = FSetScrollToMax || (scrollBar->sliderPosition() == scrollBar->maximum());
+  }
+  else if (AWatched == ui.tedViewer && AEvent->type() == QEvent::Paint)
+  {
+    if (FSetScrollToMax)
+    {
+      QScrollBar *scrollBar = ui.tedViewer->verticalScrollBar();
+      scrollBar->setSliderPosition(scrollBar->maximum());
+      FSetScrollToMax = false;
+    }
+  }
+
+  return QWidget::eventFilter(AWatched,AEvent);
 }
 

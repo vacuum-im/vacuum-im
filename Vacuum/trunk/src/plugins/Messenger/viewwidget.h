@@ -38,6 +38,8 @@ signals:
   virtual void contactJidChanged(const Jid &ABefour);
   virtual void colorForJidChanged(const Jid &AJid, const QColor &AColor);
   virtual void nickForJidChanged(const Jid &AJid, const QString &ANick);
+protected:
+  virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
   Ui::ViewWidgetClass ui;
   QVBoxLayout *FToolBarLayout;
@@ -48,6 +50,7 @@ private:
   Jid FStreamJid;
   Jid FContactJid;
   int FOptions;
+  bool FSetScrollToMax;
   ShowKind FShowKind;
   QHash<Jid,QString> FJid2Nick;
   QHash<Jid,QColor> FJid2Color;

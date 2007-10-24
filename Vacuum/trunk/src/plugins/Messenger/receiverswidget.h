@@ -41,6 +41,7 @@ protected slots:
   void onSelectAllClicked();
   void onSelectNoneClicked();
   void onAddClicked();
+  void onUpdateClicked();
 private:
   Ui::ReceiversWidgetClass ui;
 private:

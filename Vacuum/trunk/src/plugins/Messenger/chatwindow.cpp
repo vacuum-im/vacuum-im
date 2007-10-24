@@ -43,8 +43,8 @@ ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   ui.wdtEdit->layout()->setMargin(0);
   connect(FEditWidget,SIGNAL(messageReady()),SLOT(onMessageReady()));
 
-  ui.sprSplitter->setStretchFactor(0,1);
-  ui.sprSplitter->setStretchFactor(1,0);
+  ui.sprSplitter->setStretchFactor(0,20);
+  ui.sprSplitter->setStretchFactor(1,1);
 
   connect(FMessenger->instance(),SIGNAL(messageReceived(const Message &)),SLOT(onMessageReceived(const Message &)));
 
@@ -279,17 +279,18 @@ void ChatWindow::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVarian
   {
     if (FMessenger->checkOption(IMessenger::ShowStatus))
     {
-      static QString lastHtml;
-      QString dateTime;
-      if (FMessenger->checkOption(IMessenger::ShowDateTime))
-        dateTime = QString("[%1] ").arg(QDateTime::currentDateTime().toString("hh::mm"));
-      QString nick = FViewWidget->nickForJid(FContactJid);
-      QString show = FInfoWidget->field(IInfoWidget::ContactShow).toString();
       QString status = FInfoWidget->field(IInfoWidget::ContactStatus).toString();
-      QString html = QString("<span style='color:green;'>%1*** %2 [%3] %4</span>").arg(dateTime).arg(nick).arg(show).arg(status);
-      if (lastHtml != html)
+      QString show = FInfoWidget->field(IInfoWidget::ContactShow).toString();
+      if (FLastStatusShow != status+show)
+      {
+        QString dateTime;
+        if (FMessenger->checkOption(IMessenger::ShowDateTime))
+          dateTime = QString("[%1] ").arg(QDateTime::currentDateTime().toString("hh::mm"));
+        QString nick = FViewWidget->nickForJid(FContactJid);
+        QString html = QString("<span style='color:green;'>%1*** %2 [%3] %4</span>").arg(dateTime).arg(nick).arg(show).arg(status);
         FViewWidget->showCustomHtml(html);
-      lastHtml = html;
+        FLastStatusShow = status+show;
+      }
     }
   }
 }

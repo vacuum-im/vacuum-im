@@ -6,6 +6,7 @@
 InfoWidget::InfoWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
+  ui.lblStatus->setMaximumHeight(QFontMetrics(ui.lblStatus->font()).height()*4+1);
 
   FAccount = NULL;
   FRoster = NULL;

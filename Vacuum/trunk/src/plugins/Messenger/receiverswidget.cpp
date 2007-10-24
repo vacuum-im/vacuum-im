@@ -19,6 +19,7 @@ ReceiversWidget::ReceiversWidget(IMessenger *AMessenger, const Jid &AStreamJid)
   connect(ui.pbtSelectAll,SIGNAL(clicked()),SLOT(onSelectAllClicked()));
   connect(ui.pbtSelectNone,SIGNAL(clicked()),SLOT(onSelectNoneClicked()));
   connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onAddClicked()));
+  connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
 
   initialize();
 }
@@ -123,7 +124,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiversGroup(const QString &AGroup)
     QTreeWidgetItem *groupItem = FGroupItems.value(curGroup,NULL);
     if (groupItem == NULL)
     {
-      QStringList columns = QStringList() << subGroup << "";
+      QStringList columns = QStringList() << ' '+subGroup << "";
       groupItem = new QTreeWidgetItem(parentGroupItem,columns);
       groupItem->setCheckState(0,parentGroupItem->checkState(0));
       groupItem->setForeground(0,Qt::blue);
@@ -174,8 +175,14 @@ void ReceiversWidget::createRosterTree()
   foreach (IRosterItem *rosterItem, rosterItems)
   {
     QSet<QString> groups = rosterItem->groups();
-    if (groups.isEmpty())
+    if (rosterItem->jid().node().isEmpty())
+    {
+      groups.clear();
+      groups.insert(tr("Agents"));
+    }
+    else if (groups.isEmpty())
       groups.insert(tr("Blank group"));
+
     foreach(QString group,groups)
     {
       QTreeWidgetItem *groupItem = getReceiversGroup(group);
@@ -194,6 +201,16 @@ void ReceiversWidget::createRosterTree()
       }
     }
   }
+
+  QList<IPresenceItem *> myResources = FPresence->items(FStreamJid);
+  foreach(IPresenceItem *presenceItem, myResources)
+  {
+    QTreeWidgetItem *groupItem = getReceiversGroup(tr("My Resources"));
+    QString name = presenceItem->jid().resource();
+    QTreeWidgetItem *contactItem = getReceiver(presenceItem->jid(),name,groupItem);
+    contactItem->setCheckState(0, Qt::Unchecked);
+  }
+
   ui.trwReceivers->expandAll();
   ui.trwReceivers->sortItems(0,Qt::AscendingOrder);
   ui.trwReceivers->header()->setResizeMode(0,QHeaderView::ResizeToContents);
@@ -249,13 +266,13 @@ void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int /*AColu
 
 void ReceiversWidget::onSelectAllClicked()
 {
-  foreach (QTreeWidgetItem *treeItem,FGroupItems)
+  foreach(QTreeWidgetItem *treeItem,FGroupItems)
     treeItem->setCheckState(0,Qt::Checked);
 }
 
 void ReceiversWidget::onSelectNoneClicked()
 {
-  foreach (QTreeWidgetItem *treeItem,FGroupItems)
+  foreach(QTreeWidgetItem *treeItem,FContactItems)
     treeItem->setCheckState(0,Qt::Unchecked);
 }
 
@@ -266,3 +283,10 @@ void ReceiversWidget::onAddClicked()
     addReceiver(contactJid);
 }
 
+void ReceiversWidget::onUpdateClicked()
+{
+  QList<Jid> savedReceivers = FReceivers;
+  createRosterTree();
+  foreach(Jid receiver, savedReceivers)
+    addReceiver(receiver);
+}

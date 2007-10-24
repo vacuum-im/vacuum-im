@@ -206,16 +206,16 @@ void MessageWindow::updateWindow()
   else if (FStatusIcons)
     setWindowIcon(FStatusIcons->iconByJid(FStreamJid,FContactJid));
 
-  if (FContactJid.isValid())
+  if (FMode == ReadMode)
   {
     QString contactName = FInfoWidget->field(IInfoWidget::ContactName).toString();
-    setWindowIconText(contactName);
-    setWindowTitle(tr("Message %1 %2").arg(FMode == ReadMode ? tr("from") : tr("to")).arg(contactName));
+    setWindowTitle(tr("Message from %2").arg(contactName));
+    setWindowIconText(windowTitle());
   }
   else
   {
-    setWindowIconText(tr("Message"));
-    setWindowTitle(windowIconText());
+    setWindowTitle(tr("Composing message"));
+    setWindowIconText(windowTitle());
   }
 
   ui.pbtNext->setVisible(!FActiveMessages.isEmpty());
