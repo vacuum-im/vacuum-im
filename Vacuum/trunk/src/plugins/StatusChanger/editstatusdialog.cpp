@@ -153,7 +153,7 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 
   int row = 0;
   QList<int> statuses = FStatusChanger->statusItems();
-  QMap<QString,int> statusOrdered;
+  QMultiMap<QString,int> statusOrdered;
   foreach (int statusId, statuses)
   {
     if (statusId > NULL_STATUS_ID)
