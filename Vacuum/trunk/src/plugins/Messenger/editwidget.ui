@@ -6,13 +6,16 @@
     <x>0</x>
     <y>0</y>
     <width>542</width>
-    <height>66</height>
+    <height>101</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>EditWidget</string>
   </property>
-  <layout class="QGridLayout" >
+  <layout class="QVBoxLayout" >
+   <property name="spacing" >
+    <number>0</number>
+   </property>
    <property name="leftMargin" >
     <number>2</number>
    </property>
@@ -25,16 +28,10 @@
    <property name="bottomMargin" >
     <number>2</number>
    </property>
-   <property name="horizontalSpacing" >
-    <number>0</number>
-   </property>
-   <property name="verticalSpacing" >
-    <number>0</number>
-   </property>
-   <item row="0" column="0" >
+   <item>
     <widget class="QWidget" native="1" name="wdtToolBar" />
    </item>
-   <item row="1" column="0" >
+   <item>
     <widget class="QTextEdit" name="tedEditor" />
    </item>
   </layout>

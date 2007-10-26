@@ -12,12 +12,21 @@ class MessengerOptions :
 public:
   MessengerOptions(QWidget *AParent = NULL);
   ~MessengerOptions();
+  QFont chatFont() const { return FChatFont; }
+  void setChatFont(const QFont &AFont);
+  QFont messageFont() const { return FMessageFont; }
+  void setMessageFont(const QFont &AFont);
   bool checkOption(IMessenger::Option AOption) const;
   void setOption(IMessenger::Option AOption, bool AValue);
+protected slots:
+  void onChangeChatFont();
+  void onChangeMessageFont();
 private:
   Ui::MessengerOptionsClass ui;
 private:
   int FOptions;
+  QFont FChatFont;
+  QFont FMessageFont;
 };
 
 #endif // MESSENGEROPTIONS_H

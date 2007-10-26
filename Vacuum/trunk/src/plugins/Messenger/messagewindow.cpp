@@ -24,10 +24,14 @@ MessageWindow::MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, cons
   FCurrentThreadId = QUuid::createUuid().toString();
 
   FInfoWidget = FMessenger->newInfoWidget(AStreamJid,AContactJid);
+
   FViewWidget = FMessenger->newViewWidget(AStreamJid,AContactJid);
   FViewWidget->setShowKind(IViewWidget::SingleMessage);
+  FViewWidget->document()->setDefaultFont(FMessenger->defaultMessageFont());
+
   FEditWidget = FMessenger->newEditWidget(AStreamJid,AContactJid);
   FEditWidget->setSendMessageKey(-1);
+  FEditWidget->document()->setDefaultFont(FMessenger->defaultMessageFont());
   FReceiversWidget = FMessenger->newReceiversWidget(FStreamJid);
   connect(FReceiversWidget,SIGNAL(receiverAdded(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
   connect(FReceiversWidget,SIGNAL(receiverRemoved(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
@@ -42,6 +46,7 @@ MessageWindow::MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, cons
   ui.wdtMessage->layout()->setMargin(0);
 
   connect(FMessenger->instance(),SIGNAL(messageReceived(const Message &)),SLOT(onMessageReceived(const Message &)));
+  connect(FMessenger->instance(),SIGNAL(defaultMessageFontChanged(const QFont &)), SLOT(onDefaultMessageFontChanged(const QFont &)));
 
   connect(ui.pbtSend,SIGNAL(clicked()),SLOT(onSendButtonClicked()));
   connect(ui.pbtReply,SIGNAL(clicked()),SLOT(onReplyButtonClicked()));
@@ -209,7 +214,7 @@ void MessageWindow::updateWindow()
   if (FMode == ReadMode)
   {
     QString contactName = FInfoWidget->field(IInfoWidget::ContactName).toString();
-    setWindowTitle(tr("Message from %2").arg(contactName));
+    setWindowTitle(tr("%1 - Message").arg(contactName));
     setWindowIconText(windowTitle());
   }
   else
@@ -390,3 +395,8 @@ void MessageWindow::onReceiversChanged(const Jid &/*AReceiver*/)
   ui.lblReceivers->setText(receiversStr);
 }
 
+void MessageWindow::onDefaultMessageFontChanged(const QFont &AFont)
+{
+  FViewWidget->document()->setDefaultFont(AFont);
+  FEditWidget->document()->setDefaultFont(AFont);
+}

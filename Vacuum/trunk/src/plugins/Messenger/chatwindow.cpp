@@ -17,6 +17,7 @@ ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   FStatusIcons = NULL;
   FSettings = NULL;
   FOptions = 0;
+  FSplitterLoaded = false;
 
   ui.setupUi(this);
 
@@ -33,11 +34,13 @@ ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
 
   FViewWidget = FMessenger->newViewWidget(AStreamJid,AContactJid);
   FViewWidget->setShowKind(IViewWidget::ChatMessage);
+  FViewWidget->document()->setDefaultFont(FMessenger->defaultChatFont());
   ui.wdtView->setLayout(new QVBoxLayout);
   ui.wdtView->layout()->addWidget(FViewWidget);
   ui.wdtView->layout()->setMargin(0);
 
   FEditWidget = FMessenger->newEditWidget(AStreamJid,AContactJid);
+  FEditWidget->document()->setDefaultFont(FMessenger->defaultChatFont());
   ui.wdtEdit->setLayout(new QVBoxLayout);
   ui.wdtEdit->layout()->addWidget(FEditWidget);
   ui.wdtEdit->layout()->setMargin(0);
@@ -47,6 +50,7 @@ ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   ui.sprSplitter->setStretchFactor(1,1);
 
   connect(FMessenger->instance(),SIGNAL(messageReceived(const Message &)),SLOT(onMessageReceived(const Message &)));
+  connect(FMessenger->instance(),SIGNAL(defaultChatFontChanged(const QFont &)), SLOT(onDefaultChatFontChanged(const QFont &)));
 
   initialize();
 }
@@ -133,7 +137,12 @@ void ChatWindow::loadWindowState()
     FSettingsValueNS = FStreamJid.pBare()+" | "+FContactJid.pBare();
     if (isWindow())
       restoreGeometry(FSettings->valueNS(SVN_GEOMETRY,FSettingsValueNS).toByteArray());
-    ui.sprSplitter->restoreState(FSettings->valueNS(SVN_SPLITTER,FSettingsValueNS).toByteArray());
+    if (!FSplitterLoaded)
+    {
+      ui.sprSplitter->restoreState(FSettings->valueNS(SVN_SPLITTER,FSettingsValueNS).toByteArray());
+      FSplitterLoaded = true;
+    }
+
   }
   FEditWidget->textEdit()->setFocus();
 }
@@ -171,7 +180,7 @@ void ChatWindow::updateWindow()
   
   QString contactName = FInfoWidget->field(IInfoWidget::ContactName).toString();
   setWindowIconText(contactName);
-  setWindowTitle(tr("Chat with %1").arg(contactName));
+  setWindowTitle(tr("%1 - Chat").arg(contactName));
   
   emit windowChanged();
 }
@@ -295,3 +304,8 @@ void ChatWindow::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVarian
   }
 }
 
+void ChatWindow::onDefaultChatFontChanged(const QFont &AFont)
+{
+  FViewWidget->document()->setDefaultFont(AFont);
+  FEditWidget->document()->setDefaultFont(AFont);
+}

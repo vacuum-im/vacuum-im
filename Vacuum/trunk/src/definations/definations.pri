@@ -6,4 +6,7 @@ HEADERS += actiongroups.h \
            tooltiporders.h \
            rosterlabelorders.h \
            rosterindextyperole.h \
-           rosterdataholderorders.h
+           rosterdataholderorders.h \
+           messagedataroles.h \
+           messagewriterorders.h \
+           resourceloaderorders.h

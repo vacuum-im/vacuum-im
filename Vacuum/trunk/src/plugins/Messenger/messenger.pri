@@ -8,6 +8,7 @@ FORMS = infowidget.ui \
         messengeroptions.ui
 
 HEADERS = messenger.h \
+          textbrowser.h \
           infowidget.h \
           viewwidget.h \
           editwidget.h \
@@ -18,6 +19,7 @@ HEADERS = messenger.h \
 	  messengeroptions.h
 
 SOURCES = messenger.cpp \
+          textbrowser.cpp \
           infowidget.cpp \
           viewwidget.cpp \
           editwidget.cpp \

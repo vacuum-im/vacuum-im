@@ -53,6 +53,7 @@ protected slots:
   void onPresenceItem(IPresenceItem *APresenceItem);
   void onStatusIconsChanged();
   void onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
+  void onDefaultChatFontChanged(const QFont &AFont);
 private:
   Ui::ChatWindowClass ui;
 private:
@@ -66,6 +67,7 @@ private:
   IEditWidget *FEditWidget;
 private:
   int FOptions;
+  bool FSplitterLoaded;
   Jid FStreamJid;
   Jid FContactJid;
   QString FLastStatusShow;

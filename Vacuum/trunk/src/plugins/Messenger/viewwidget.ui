@@ -32,18 +32,25 @@
     <widget class="QWidget" native="1" name="wdtToolBar" />
    </item>
    <item>
-    <widget class="QTextEdit" name="tedViewer" >
-     <property name="undoRedoEnabled" >
-      <bool>true</bool>
+    <widget class="TextBrowser" name="tedViewer" >
+     <property name="openExternalLinks" >
+      <bool>false</bool>
      </property>
-     <property name="readOnly" >
-      <bool>true</bool>
+     <property name="openLinks" >
+      <bool>false</bool>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>TextBrowser</class>
+   <extends>QTextBrowser</extends>
+   <header>textbrowser.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

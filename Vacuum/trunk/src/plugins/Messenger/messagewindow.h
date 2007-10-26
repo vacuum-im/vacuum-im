@@ -67,6 +67,7 @@ protected slots:
   void onChatButtonClicked();
   void onNextButtonClicked();
   void onReceiversChanged(const Jid &AReceiver);
+  void onDefaultMessageFontChanged(const QFont &AFont);
 private:
   Ui::MessageWindowClass ui;
   IInfoWidget *FInfoWidget;

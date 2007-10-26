@@ -2,10 +2,12 @@
 #define IMESSENGER_H
 
 #include <QVariant>
+#include <QFont>
 #include <QTextDocument>
 #include <QVBoxLayout>
 #include <QToolBar>
 #include <QTextEdit>
+#include <QTextBrowser>
 #include <QMainWindow>
 #include "../../interfaces/ipluginmanager.h"
 #include "../../utils/jid.h"
@@ -56,7 +58,7 @@ public:
   virtual void setStreamJid(const Jid &AStreamJid) =0;
   virtual const Jid &contactJid() const =0;
   virtual void setContactJid(const Jid &AContactJid) =0;
-  virtual QTextEdit *textEdit() const =0;
+  virtual QTextBrowser *textBrowser() const =0;
   virtual QTextDocument *document() const =0;
   virtual ToolBarChanger *toolBarChanger() const =0;
   virtual ShowKind showKind() const =0;
@@ -205,6 +207,19 @@ signals:
   virtual void windowDestroyed() =0;
 };
 
+class IMessageWriter
+{
+public:
+  virtual void writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder) =0;
+  virtual void writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder) =0;
+};
+
+class IResourceLoader
+{
+public:
+  virtual void loadResource(int AType, const QUrl &AName, QVariant &AValue);
+};
+
 class IMessenger
 {
 public:
@@ -220,6 +235,10 @@ public:
   virtual QObject *instance() = 0;
   virtual IPluginManager *pluginManager() const =0;
   virtual int newMessageId() =0;
+  virtual void insertMessageWriter(IMessageWriter *AWriter, int AOrder) =0;
+  virtual void removeMessageWriter(IMessageWriter *AWriter, int AOrder) =0;
+  virtual void insertResourceLoader(IResourceLoader *ALoader, int AOrder) =0;
+  virtual void removeResourceLoader(IResourceLoader *ALoader, int AOrder) =0;
   virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = "") const =0;
   virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = "") const =0;
   virtual bool sendMessage(const Message &AMessage, const Jid &AStreamJid) =0;
@@ -231,29 +250,51 @@ public:
   virtual bool checkOption(IMessenger::Option AOption) const =0;
   virtual void setOption(IMessenger::Option AOption, bool AValue) =0;
   //MessageWindows
+  virtual QFont defaultChatFont() const =0;
+  virtual void setDefaultChatFont(const QFont &AFont) =0;
+  virtual QFont defaultMessageFont() const =0;
+  virtual void setDefaultMessageFont(const QFont &AFont) =0;
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IReceiversWidget *newReceiversWidget(const Jid &AStreamJid) =0;
+  virtual QList<IMessageWindow *> messageWindows() const =0;
+  virtual IMessageWindow *openMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
+  virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
+  virtual QList<IChatWindow *> chatWindows() const =0;
   virtual IChatWindow *openChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual QList<int> tabWindows() const =0;
   virtual ITabWindow *openTabWindow(int AWindowId = 0) =0;
   virtual ITabWindow *findTabWindow(int AWindowId = 0) =0;
 signals:
-  virtual void messageReceived(const Message &AMessage) =0;
+  virtual void messageWriterInserted(IMessageWriter *AWriter, int AOrder) =0;
+  virtual void messageWriterRemoved(IMessageWriter *AWriter, int AOrder) =0;
+  virtual void resourceLoaderInserted(IResourceLoader *ALoader, int AOrder) =0;
+  virtual void resourceLoaderRemoved(IResourceLoader *ALoader, int AOrder) =0;
   virtual void messageNotified(int AMessageId) =0;
   virtual void messageUnNotified(int AMessageId) =0;
+  virtual void messageReceive(Message &AMessage) =0;
+  virtual void messageReceived(const Message &AMessage) =0;
   virtual void messageRemoved(const Message &AMessage) =0;
+  virtual void messageSend(Message &AMessage) =0;
   virtual void messageSent(const Message &AMessage) =0;
   virtual void optionChanged(IMessenger::Option AOption, bool AValue) =0;
   virtual void optionsAccepted() =0;
   virtual void optionsRejected() =0;
   //MessageWindows
-  virtual void tabWindowCreated(ITabWindow *AWindow) =0;
-  virtual void tabWindowDestroyed(ITabWindow *AWindow) =0;
+  virtual void defaultChatFontChanged(const QFont &AFont) =0;
+  virtual void defaultMessageFontChanged(const QFont &AFont) =0;
+  virtual void infoWidgetCreated(IInfoWidget *AInfoWidget) =0;
+  virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
+  virtual void editWidgetCreated(IEditWidget *AEditWidget) =0;
+  virtual void receiversWidgetCreated(IReceiversWidget *AReceiversWidget) =0;
+  virtual void messageWindowCreated(IMessageWindow *AWindow) =0;
+  virtual void messageWindowDestroyed(IMessageWindow *AWindow) =0;
   virtual void chatWindowCreated(IChatWindow *AWindow) =0;
   virtual void chatWindowDestroyed(IChatWindow *AWindow) =0;
+  virtual void tabWindowCreated(ITabWindow *AWindow) =0;
+  virtual void tabWindowDestroyed(ITabWindow *AWindow) =0;
 };
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
@@ -264,6 +305,8 @@ Q_DECLARE_INTERFACE(ITabWidget,"Vacuum.Plugin.ITabWidget/1.0")
 Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.0")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.0")
+Q_DECLARE_INTERFACE(IMessageWriter,"Vacuum.Plugin.IMessageWriter/1.0")
+Q_DECLARE_INTERFACE(IResourceLoader,"Vacuum.Plugin.IResourceLoader/1.0")
 Q_DECLARE_INTERFACE(IMessenger,"Vacuum.Plugin.IMessenger/1.0")
 
 #endif //IMESSENGER_H

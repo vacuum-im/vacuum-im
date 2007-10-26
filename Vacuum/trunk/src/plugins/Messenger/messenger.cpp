@@ -14,6 +14,8 @@
 #define SVN_VIEW_HTML                         SVN_VIEW ":" "showHtml"
 #define SVN_VIEW_DATETIME                     SVN_VIEW ":" "showDateTime"
 #define SVN_CHAT_STATUS                       SVN_CHAT ":" "showStatus"
+#define SVN_CHAT_FONT                         "defaultChatFont"
+#define SVN_MESSAGE_FONT                      "defaultMessageFont"
 
 #define ADR_StreamJid                         Action::DR_StreamJid
 #define ADR_ContactJid                        Action::DR_Parametr1
@@ -123,6 +125,9 @@ bool Messenger::initObjects()
   FNormalIcon = FSystemIconset->iconByName(IN_NORMAL_MESSAGE);
   FChatIcon = FSystemIconset->iconByName(IN_CHAT_MESSAGE);
 
+  insertMessageWriter(this,MWO_MESSENGER);
+  insertMessageWriter(this,MWO_MESSENGER_ANCHORS);
+
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
   {
     FRostersModel = FRostersModelPlugin->rostersModel();
@@ -133,8 +138,8 @@ bool Messenger::initObjects()
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    FNormalLabelId = FRostersView->createIndexLabel(RLO_MESSAGE,FNormalIcon,IRostersView::LabelBlink);
-    FChatLabelId = FRostersView->createIndexLabel(RLO_MESSAGE,FChatIcon,IRostersView::LabelBlink);
+    FNormalLabelId = FRostersView->createIndexLabel(RLO_MESSAGE,FNormalIcon,IRostersView::LabelBlink|IRostersView::EnsureVisible);
+    FChatLabelId = FRostersView->createIndexLabel(RLO_MESSAGE,FChatIcon,IRostersView::LabelBlink|IRostersView::EnsureVisible);
     FIndexClickHooker = FRostersView->createClickHooker(this,0);
     connect(FRostersView,SIGNAL(labelDoubleClicked(IRosterIndex *, int, bool &)),
       SLOT(onRosterLabelDClicked(IRosterIndex *, int, bool &)));
@@ -191,27 +196,112 @@ QWidget *Messenger::optionsWidget(const QString &ANode, int &/*AOrder*/)
     FMessengerOptions->setOption(ShowHTML,checkOption(ShowHTML));
     FMessengerOptions->setOption(ShowDateTime,checkOption(ShowDateTime));
     FMessengerOptions->setOption(ShowStatus,checkOption(ShowStatus));
+    FMessengerOptions->setChatFont(FChatFont);
+    FMessengerOptions->setMessageFont(FMessageFont);
     return FMessengerOptions;
   }
   return NULL;
 }
 
+void Messenger::writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
+{
+  if (AOrder == MWO_MESSENGER)
+  {
+    AMessage.setBody(ADocument->toPlainText(),ALang);
+  }
+}
+
+void Messenger::writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
+{
+  if (AOrder == MWO_MESSENGER)
+  {
+    QTextCursor cursor(ADocument);
+    cursor.insertText(AMessage.body(ALang));
+  }
+  else if (AOrder == MWO_MESSENGER_ANCHORS)
+  {
+    QRegExp regexp("\\b((https?|ftp)://|www.)[a-z0-9/\\?.=:@&%#_;\\+\\-]+");
+    regexp.setCaseSensitivity(Qt::CaseInsensitive);
+    for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
+    {
+      QTextCharFormat linkFormat = cursor.charFormat();
+      linkFormat.setAnchor(true);
+      linkFormat.setAnchorHref(cursor.selectedText());
+      cursor.setCharFormat(linkFormat);
+    }
+  }
+}
+
+void Messenger::insertMessageWriter(IMessageWriter *AWriter, int AOrder)
+{
+  if (!FMessageWriters.values(AOrder).contains(AWriter))  
+  {
+    FMessageWriters.insert(AOrder,AWriter);
+    emit messageWriterInserted(AWriter,AOrder);
+  }
+}
+
+void Messenger::removeMessageWriter(IMessageWriter *AWriter, int AOrder)
+{
+  if (FMessageWriters.values(AOrder).contains(AWriter))  
+  {
+    FMessageWriters.remove(AOrder,AWriter);
+    emit messageWriterRemoved(AWriter,AOrder);
+  }
+}
+
+void Messenger::insertResourceLoader(IResourceLoader *ALoader, int AOrder)
+{
+  if (!FResourceLoaders.values(AOrder).contains(ALoader))  
+  {
+    FResourceLoaders.insert(AOrder,ALoader);
+    emit resourceLoaderInserted(ALoader,AOrder);
+  }
+}
+
+void Messenger::removeResourceLoader(IResourceLoader *ALoader, int AOrder)
+{
+  if (FResourceLoaders.values(AOrder).contains(ALoader))  
+  {
+    FResourceLoaders.remove(AOrder,ALoader);
+    emit resourceLoaderRemoved(ALoader,AOrder);
+  }
+}
+
 void Messenger::textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang) const
 {
-  AMessage.setBody(ADocument->toPlainText(),ALang);
+  QTextDocument *documentCopy = ADocument->clone();
+  QMapIterator<int,IMessageWriter *> it(FMessageWriters);
+  it.toBack();
+  while(it.hasPrevious())
+  {
+    it.previous();
+    it.value()->writeMessage(AMessage,documentCopy,ALang,it.key());
+  }
+  delete documentCopy;
 }
 
 void Messenger::messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang) const
 {
-  QTextCursor cursor(ADocument);
-  cursor.insertText(AMessage.body(ALang));
+  Message messageCopy = AMessage;
+  QMapIterator<int,IMessageWriter *> it(FMessageWriters);
+  it.toFront();
+  while(it.hasNext())
+  {
+    it.next();
+    it.value()->writeText(messageCopy,ADocument,ALang,it.key());
+  }
 }
 
 bool Messenger::sendMessage(const Message &AMessage, const Jid &AStreamJid)
 {
-  if (FStanzaProcessor->sendStanzaOut(AStreamJid,AMessage.stanza()))
+  Message message = AMessage;
+
+  emit messageSend(message);
+  
+  if (FStanzaProcessor->sendStanzaOut(AStreamJid,message.stanza()))
   {
-    emit messageSent(AMessage);
+    emit messageSent(message);
     return true;
   }
   return false;
@@ -224,6 +314,8 @@ int Messenger::receiveMessage(const Message &AMessage)
   Message message = AMessage;
   message.setData(MDR_MESSAGEID,messageId);
   FMessages.insert(messageId,message);
+
+  emit messageReceive(message);
   
   notifyMessage(messageId);
   emit messageReceived(message);
@@ -293,24 +385,52 @@ void Messenger::setOption(IMessenger::Option AOption, bool AValue)
   }
 }
 
+void Messenger::setDefaultChatFont(const QFont &AFont)
+{
+  if (FChatFont != AFont)
+  {
+    FChatFont = AFont;
+    emit defaultChatFontChanged(FChatFont);
+  }
+}
+
+void Messenger::setDefaultMessageFont(const QFont &AFont)
+{
+  if (FMessageFont != AFont)
+  {
+    FMessageFont = AFont;
+    emit defaultMessageFontChanged(FMessageFont);
+  }
+}
+
 IInfoWidget *Messenger::newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  return new InfoWidget(this,AStreamJid,AContactJid);
+  IInfoWidget *widget = new InfoWidget(this,AStreamJid,AContactJid);
+  emit infoWidgetCreated(widget);
+  return widget;
 }
 
 IViewWidget *Messenger::newViewWidget(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  return new ViewWidget(this,AStreamJid,AContactJid);
+  IViewWidget *widget = new ViewWidget(this,AStreamJid,AContactJid);
+  connect(widget->textBrowser(),SIGNAL(loadCustomResource(int, const QUrl &, QVariant &)),
+    SLOT(onTextBrowserLoadResource(int, const QUrl &, QVariant &)));
+  emit viewWidgetCreated(widget);
+  return widget;
 }
 
 IEditWidget *Messenger::newEditWidget(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  return new EditWidget(this,AStreamJid,AContactJid);
+  IEditWidget *widget = new EditWidget(this,AStreamJid,AContactJid);
+  emit editWidgetCreated(widget);
+  return widget;
 }
 
 IReceiversWidget *Messenger::newReceiversWidget(const Jid &AStreamJid)
 {
-  return new ReceiversWidget(this,AStreamJid);
+  IReceiversWidget *widget = new ReceiversWidget(this,AStreamJid);
+  emit receiversWidgetCreated(widget);
+  return widget;
 }
 
 IMessageWindow *Messenger::openMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
@@ -415,7 +535,7 @@ void Messenger::notifyMessage(int AMessageId)
       }
     }
 
-    QString toolTip = toolTipMask.arg(fromName).arg("/"+fromResource);
+    QString toolTip = toolTipMask.arg(fromName).arg(!fromResource.isEmpty() ? "/"+fromResource : "");
     message.setData(MDR_MESSAGE_TOOLTIP,toolTip);
 
     if (FTrayManager)
@@ -671,6 +791,8 @@ void Messenger::onSettingsOpened()
   setOption(ShowHTML, settings->value(SVN_VIEW_HTML,false).toBool());
   setOption(ShowDateTime, settings->value(SVN_VIEW_DATETIME,true).toBool());
   setOption(ShowStatus, settings->value(SVN_CHAT_STATUS,true).toBool());
+  FChatFont.fromString(settings->value(SVN_CHAT_FONT,QFont().toString()).toString());
+  FMessageFont.fromString(settings->value(SVN_MESSAGE_FONT,QFont().toString()).toString());
 }
 
 void Messenger::onSettingsClosed()
@@ -682,6 +804,16 @@ void Messenger::onSettingsClosed()
   settings->setValue(SVN_VIEW_HTML,checkOption(ShowHTML));
   settings->setValue(SVN_VIEW_DATETIME,checkOption(ShowDateTime));
   settings->setValue(SVN_CHAT_STATUS,checkOption(ShowStatus));
+
+  if (FChatFont != QFont())
+    settings->setValue(SVN_CHAT_FONT,FChatFont.toString());
+  else
+    settings->deleteValue(SVN_CHAT_FONT);
+  
+  if (FMessageFont != QFont())
+    settings->setValue(SVN_MESSAGE_FONT,FMessageFont.toString());
+  else
+    settings->deleteValue(SVN_MESSAGE_FONT);
 }
 
 void Messenger::onOptionsDialogAccepted()
@@ -692,6 +824,8 @@ void Messenger::onOptionsDialogAccepted()
   setOption(ShowHTML,FMessengerOptions->checkOption(ShowHTML));
   setOption(ShowDateTime,FMessengerOptions->checkOption(ShowDateTime));
   setOption(ShowStatus,FMessengerOptions->checkOption(ShowStatus));
+  setDefaultChatFont(FMessengerOptions->chatFont());
+  setDefaultMessageFont(FMessengerOptions->messageFont());
   emit optionsAccepted();
 }
 
@@ -716,6 +850,16 @@ void Messenger::onShowWindowAction(bool)
     }
     else
       openChatWindow(streamJid,contactJid);
+  }
+}
+
+void Messenger::onTextBrowserLoadResource(int AType, const QUrl &AName, QVariant &AValue)
+{
+  QMultiMap<int,IResourceLoader *>::const_iterator it = FResourceLoaders.constBegin();
+  while(!AValue.isValid() && it!=FResourceLoaders.constEnd())
+  {
+    it.value()->loadResource(AType,AName,AValue);
+    it++;
   }
 }
 

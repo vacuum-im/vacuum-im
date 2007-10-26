@@ -20,7 +20,7 @@ public:
   virtual void setStreamJid(const Jid &AStreamJid);
   virtual const Jid &contactJid() const { return FContactJid; }
   virtual void setContactJid(const Jid &AContactJid);
-  virtual QTextEdit *textEdit() const { return ui.tedViewer; }
+  virtual QTextBrowser *textBrowser() const { return ui.tedViewer; }
   virtual QTextDocument *document() const { return ui.tedViewer->document(); }
   virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
   virtual ShowKind showKind() const { return FShowKind; }
@@ -38,6 +38,8 @@ signals:
   virtual void contactJidChanged(const Jid &ABefour);
   virtual void colorForJidChanged(const Jid &AJid, const QColor &AColor);
   virtual void nickForJidChanged(const Jid &AJid, const QString &ANick);
+protected:
+  QString getHtmlBody(const QString &AHtml);
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:

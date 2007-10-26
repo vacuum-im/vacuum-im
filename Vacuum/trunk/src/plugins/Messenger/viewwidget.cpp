@@ -47,16 +47,15 @@ void ViewWidget::showMessage(const Message &AMessage)
   if (FShowKind == ChatMessage)
   {
     QTextCursor cursor = document()->rootFrame()->lastCursorPosition();
-    bool cursorVisible = textEdit()->viewport()->geometry().contains(textEdit()->cursorRect(cursor));
+    bool cursorVisible = textBrowser()->viewport()->geometry().contains(textBrowser()->cursorRect(cursor));
 
     Jid authorJid = AMessage.from().isEmpty() ? FStreamJid : AMessage.from();
     QString authorNick = FJid2Nick.value(authorJid,authorJid.node());
 
     QTextCharFormat messageFormat;
-    messageFormat.setFont(document()->defaultFont());
-    QTextCharFormat timeFormat = messageFormat;
+    QTextCharFormat timeFormat;
     timeFormat.setForeground(Qt::gray);
-    QTextCharFormat nickFormat = messageFormat;
+    QTextCharFormat nickFormat;
     nickFormat.setForeground(colorForJid(authorJid));
 
     QTextTableFormat tableFormat;
@@ -69,20 +68,27 @@ void ViewWidget::showMessage(const Message &AMessage)
     table->cellAt(0,0).lastCursorPosition().insertText(QString("[%1]").arg(authorNick),nickFormat);
 
     QTextDocument messageDoc;
+    messageDoc.setDefaultFont(document()->defaultFont());
     FMessenger->messageToText(&messageDoc,AMessage);
 
     if (FMessenger->checkOption(IMessenger::ShowHTML))
-      table->cellAt(0,1).lastCursorPosition().insertHtml(messageDoc.toHtml());
+      table->cellAt(0,1).lastCursorPosition().insertHtml(getHtmlBody(messageDoc.toHtml()));
     else
       table->cellAt(0,1).lastCursorPosition().insertText(messageDoc.toPlainText().trimmed(),messageFormat);
 
     if (cursorVisible)
-      textEdit()->verticalScrollBar()->setSliderPosition(textEdit()->verticalScrollBar()->maximum());
+      textBrowser()->verticalScrollBar()->setSliderPosition(textBrowser()->verticalScrollBar()->maximum());
   }
   else if (FShowKind == SingleMessage)
   {
-    document()->clear();
-    FMessenger->messageToText(document(),AMessage);
+    QTextDocument messageDoc;
+    messageDoc.setDefaultFont(document()->defaultFont());
+    FMessenger->messageToText(&messageDoc,AMessage);
+
+    if (FMessenger->checkOption(IMessenger::ShowHTML))
+      document()->setHtml(getHtmlBody(messageDoc.toHtml()));
+    else
+      document()->setPlainText(messageDoc.toPlainText().trimmed());
   }
 
   emit messageShown(AMessage);
@@ -91,16 +97,13 @@ void ViewWidget::showMessage(const Message &AMessage)
 void ViewWidget::showCustomHtml(const QString &AHtml)
 {
   QTextCursor cursor = document()->rootFrame()->lastCursorPosition();
-  bool cursorVisible = textEdit()->viewport()->geometry().contains(textEdit()->cursorRect(cursor));
+  bool cursorVisible = textBrowser()->viewport()->geometry().contains(textBrowser()->cursorRect(cursor));
   
   cursor.insertHtml(AHtml);
   cursor.insertBlock();
 
   if (cursorVisible)
-  {
-    textEdit()->setTextCursor(document()->rootFrame()->lastCursorPosition());
-    textEdit()->ensureCursorVisible();
-  }
+    textBrowser()->verticalScrollBar()->setSliderPosition(textBrowser()->verticalScrollBar()->maximum());
 
   emit customHtmlShown(AHtml);
 }
@@ -153,6 +156,20 @@ void ViewWidget::setContactJid(const Jid &AContactJid)
 
     emit contactJidChanged(AContactJid);
   }
+}
+
+QString ViewWidget::getHtmlBody(const QString &AHtml)
+{
+  QRegExp bodyStart("<body.*>");
+  QRegExp bodyEnd("</body>");
+  int start = AHtml.indexOf(bodyStart);
+  int end = AHtml.lastIndexOf(bodyEnd);
+  if (start >=0 && end > start)
+  {
+    start = AHtml.indexOf(">",start)+1;
+    return AHtml.mid(start,end-start);
+  }
+  return AHtml;
 }
 
 bool ViewWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
