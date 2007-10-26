@@ -85,6 +85,23 @@ bool RostersView::repaintRosterIndex(IRosterIndex *AIndex)
   return false;
 }
 
+void RostersView::expandIndexParents(IRosterIndex *AIndex)
+{
+  QModelIndex index = FRostersModel->modelIndexByRosterIndex(AIndex);
+  index = mapFromModel(index);
+  expandIndexParents(index);
+}
+
+void RostersView::expandIndexParents(const QModelIndex &AIndex)
+{
+  QModelIndex index = AIndex;
+  while (index.parent().isValid())
+  {
+    expand(index.parent());
+    index = index.parent();
+  }
+}
+
 void RostersView::addProxyModel(QAbstractProxyModel *AProxyModel)
 {
   if (AProxyModel && !FProxyModels.contains(AProxyModel))
@@ -123,7 +140,7 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
   } 
 }
 
-QModelIndex RostersView::mapToModel(const QModelIndex &AProxyIndex)
+QModelIndex RostersView::mapToModel(const QModelIndex &AProxyIndex) const
 {
   QModelIndex index = AProxyIndex;
   if (FProxyModels.count() > 0)
@@ -138,7 +155,7 @@ QModelIndex RostersView::mapToModel(const QModelIndex &AProxyIndex)
   return index;
 }
 
-QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex)
+QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex) const
 {
   QModelIndex index = AModelIndex;
   if (FProxyModels.count() > 0)
@@ -153,7 +170,7 @@ QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex)
   return index;
 }
 
-QModelIndex RostersView::mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex)
+QModelIndex RostersView::mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const
 {
   QModelIndex index = AModelIndex;
   if (FProxyModels.count() > 0)
@@ -170,7 +187,7 @@ QModelIndex RostersView::mapToProxy(QAbstractProxyModel *AProxyModel, const QMod
   return index;
 }
 
-QModelIndex RostersView::mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex)
+QModelIndex RostersView::mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const
 {
   QModelIndex index = AProxyIndex;
   if (FProxyModels.count() > 0)
@@ -245,6 +262,8 @@ void RostersView::insertIndexLabel(int ALabelId, IRosterIndex *AIndex)
     labels.insert(i,FIndexLabels.value(ALabelId)); 
     flags.insert(i,FIndexLabelFlags.value(ALabelId));
     FIndexLabelIndexes[ALabelId] += AIndex;
+    if (FIndexLabelFlags.value(ALabelId) && EnsureVisible > 0)
+      expandIndexParents(AIndex);
     AIndex->setData(RDR_LabelIds,ids);
     AIndex->setData(RDR_LabelValues,labels);
     AIndex->setData(RDR_LabelFlags,flags);

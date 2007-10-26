@@ -25,21 +25,25 @@ public:
     ShowResource                  =8
   };
   enum LabelFlags {
-    LabelBlink                    =1
+    LabelBlink                    =1,
+    EnsureVisible                 =2
   };
 public:
   virtual QObject *instance() = 0;
   virtual void setModel(IRostersModel *AModel) =0; 
   virtual IRostersModel *rostersModel() const =0;
+  virtual bool repaintRosterIndex(IRosterIndex *AIndex) =0;
+  virtual void expandIndexParents(IRosterIndex *AIndex) =0;
+  virtual void expandIndexParents(const QModelIndex &AIndex) =0;
   //--ProxyModels
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel) =0;
   virtual QList<QAbstractProxyModel *> proxyModels() const =0;
   virtual QAbstractProxyModel *lastProxyModel() const =0;
   virtual void removeProxyModel(QAbstractProxyModel *AProxyModel) =0;
-  virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex) =0;
-  virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) =0;
-  virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) =0;
-  virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) =0;
+  virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex) const=0;
+  virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) const=0;
+  virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const=0;
+  virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const=0;
   //--IndexLabel
   virtual int createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags = 0) =0;
   virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFlags = 0) =0;

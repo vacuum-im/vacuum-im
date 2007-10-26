@@ -30,15 +30,17 @@ public:
   virtual void setModel(IRostersModel *AModel); 
   virtual IRostersModel *rostersModel() const { return FRostersModel; }
   virtual bool repaintRosterIndex(IRosterIndex *AIndex);
+  virtual void expandIndexParents(IRosterIndex *AIndex);
+  virtual void expandIndexParents(const QModelIndex &AIndex);
   //--ProxyModels
   virtual void addProxyModel(QAbstractProxyModel *AProxyModel);
   virtual QList<QAbstractProxyModel *> proxyModels() const { return FProxyModels; }
   virtual QAbstractProxyModel *lastProxyModel() const { return FProxyModels.value(FProxyModels.count()-1,NULL); }
   virtual void removeProxyModel(QAbstractProxyModel *AProxyModel);
-  virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex);
-  virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex);
-  virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex);
-  virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex);
+  virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex) const;
+  virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) const;
+  virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const;
+  virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const;
   //--IndexLabel
   virtual int createIndexLabel(int AOrder, const QVariant &ALabel, int AFlags = 0);
   virtual void updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFlags = 0);
