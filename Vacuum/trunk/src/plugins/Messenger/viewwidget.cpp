@@ -47,7 +47,7 @@ void ViewWidget::showMessage(const Message &AMessage)
   if (FShowKind == ChatMessage)
   {
     QTextCursor cursor = document()->rootFrame()->lastCursorPosition();
-    bool cursorVisible = textBrowser()->viewport()->geometry().contains(textBrowser()->cursorRect(cursor));
+    bool scrollAtEnd = textBrowser()->verticalScrollBar()->sliderPosition() == textBrowser()->verticalScrollBar()->maximum();
 
     Jid authorJid = AMessage.from().isEmpty() ? FStreamJid : AMessage.from();
     QString authorNick = FJid2Nick.value(authorJid,authorJid.node());
@@ -76,7 +76,7 @@ void ViewWidget::showMessage(const Message &AMessage)
     else
       table->cellAt(0,1).lastCursorPosition().insertText(messageDoc.toPlainText().trimmed(),messageFormat);
 
-    if (cursorVisible)
+    if (scrollAtEnd)
       textBrowser()->verticalScrollBar()->setSliderPosition(textBrowser()->verticalScrollBar()->maximum());
   }
   else if (FShowKind == SingleMessage)
@@ -97,12 +97,12 @@ void ViewWidget::showMessage(const Message &AMessage)
 void ViewWidget::showCustomHtml(const QString &AHtml)
 {
   QTextCursor cursor = document()->rootFrame()->lastCursorPosition();
-  bool cursorVisible = textBrowser()->viewport()->geometry().contains(textBrowser()->cursorRect(cursor));
+  bool scrollAtEnd = textBrowser()->verticalScrollBar()->sliderPosition() == textBrowser()->verticalScrollBar()->maximum();
   
   cursor.insertHtml(AHtml);
   cursor.insertBlock();
 
-  if (cursorVisible)
+  if (scrollAtEnd)
     textBrowser()->verticalScrollBar()->setSliderPosition(textBrowser()->verticalScrollBar()->maximum());
 
   emit customHtmlShown(AHtml);

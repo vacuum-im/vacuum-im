@@ -788,7 +788,7 @@ void Messenger::onSettingsOpened()
   setOption(OpenChatInTabWindow, settings->value(SVN_OPEN_CHAT_IN_TABWINDOW,true).toBool());
   setOption(OpenMessageWindow, settings->value(SVN_OPEN_MESSAGE_WINDOW,false).toBool());
   setOption(OpenChatWindow, settings->value(SVN_OPEN_CHAT_WINDOW,false).toBool());
-  setOption(ShowHTML, settings->value(SVN_VIEW_HTML,false).toBool());
+  setOption(ShowHTML, settings->value(SVN_VIEW_HTML,true).toBool());
   setOption(ShowDateTime, settings->value(SVN_VIEW_DATETIME,true).toBool());
   setOption(ShowStatus, settings->value(SVN_CHAT_STATUS,true).toBool());
   FChatFont.fromString(settings->value(SVN_CHAT_FONT,QFont().toString()).toString());
