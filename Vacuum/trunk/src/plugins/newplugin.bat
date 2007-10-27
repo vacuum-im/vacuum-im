@@ -10,4 +10,5 @@ echo include(%1.pri) >> %1.pro
 echo HEADERS = >> %1.pri
 echo SOURCES = >> %1.pri
 
-qmake -tp vc -o %1.vcproj %1.pro 
+cd ..
+make_vcproj.bat %1
