@@ -94,7 +94,7 @@
               <enum>QFrame::StyledPanel</enum>
              </property>
              <property name="text" >
-              <string>ghj</string>
+              <string/>
              </property>
              <property name="wordWrap" >
               <bool>true</bool>
@@ -232,7 +232,7 @@
      <x>0</x>
      <y>0</y>
      <width>604</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
