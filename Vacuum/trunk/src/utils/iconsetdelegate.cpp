@@ -24,7 +24,7 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
 
     if (!AIndex.data(IDR_HIDE_ICONSET_NAME).toBool())
     {
-      QString displayText = iconset.iconsetName();
+      QString displayText = iconset.info().name;
       if (displayText.isEmpty()) 
         displayText = iconFile;
       QRect textRect(drawRect.topLeft(),AOption.fontMetrics.size(Qt::TextSingleLine,displayText));

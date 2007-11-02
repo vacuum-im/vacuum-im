@@ -30,6 +30,16 @@ SkinIconset::~SkinIconset()
   Skin::removeSkinIconset(this);
 }
 
+bool SkinIconset::isValid() const
+{
+  return FIconset.isValid() || FDefIconset.isValid();
+}
+
+const QString &SkinIconset::fileName() const
+{
+  return FFileName;
+}
+
 bool SkinIconset::openFile(const QString &AFileName)
 {
   FFileName = AFileName;
@@ -39,60 +49,70 @@ bool SkinIconset::openFile(const QString &AFileName)
   return isValid();
 }
 
-const QString &SkinIconset::fileName() const
+QByteArray SkinIconset::fileData(const QString &AFileName) const
 {
-  return FFileName;
-}
-
-bool SkinIconset::isValid() const
-{
-  return FIconset.isValid() || FDefIconset.isValid();
+  QByteArray data = FIconset.fileData(AFileName);
+  return data.isEmpty() ? FDefIconset.fileData(AFileName) : data;
 }
 
 QList<QString> SkinIconset::iconFiles() const
 {
-  return FIconset.isValid() ? FIconset.iconFiles() : FDefIconset.iconFiles();
+  return summStringLists(FIconset.iconFiles(),FDefIconset.iconFiles());
 }
 
 QList<QString> SkinIconset::iconNames() const
 {
-  return FIconset.isValid() ? FIconset.iconNames() : FDefIconset.iconNames();
+  return summStringLists(FIconset.iconNames(),FDefIconset.iconNames());
 }
 
-QList<QString> SkinIconset::tags() const
+QList<QString> SkinIconset::tags(const QString &AFileName) const
 {
-  return FIconset.isValid() ? FIconset.tags() : FDefIconset.tags();
+  return summStringLists(FIconset.tags(AFileName),FDefIconset.tags(AFileName));
 }
 
-QList<QString> SkinIconset::tagValues(const QString &ATagName) const
+QList<QString> SkinIconset::tagValues(const QString &ATagName, const QString &AFileName) const
 {
-  return FIconset.isValid() ? FIconset.tagValues(ATagName) : FDefIconset.tagValues(ATagName);
+  return summStringLists(FIconset.tagValues(ATagName,AFileName),FDefIconset.tagValues(ATagName,AFileName));
+}
+
+QString SkinIconset::fileByIconName(const QString &AIconName) const
+{
+  QString file = FIconset.fileByIconName(AIconName);
+  return file.isEmpty() ? FDefIconset.fileByIconName(AIconName) : file;
+}
+
+QString SkinIconset::fileByTagValue(const QString &ATag, const QString &AValue) const
+{
+  QString file = FIconset.fileByTagValue(ATag,AValue);
+  return file.isEmpty() ? FDefIconset.fileByTagValue(ATag,AValue) : file;
 }
 
 QIcon SkinIconset::iconByFile(const QString &AFileName) const
 {
   QIcon icon = FIconset.iconByFile(AFileName);
-  if (icon.isNull())
-    return FDefIconset.iconByFile(AFileName);
-  return icon;  
+  return icon.isNull() ? FDefIconset.iconByFile(AFileName) : icon;  
 }
 
 QIcon SkinIconset::iconByName(const QString &AIconName) const
 {
   QIcon icon = FIconset.iconByName(AIconName);
-  if (icon.isNull())
-    return FDefIconset.iconByName(AIconName);
-  return icon;  
+  return icon.isNull() ? FDefIconset.iconByName(AIconName) : icon;  
 }
 
-QIcon SkinIconset::iconByTagValue(const QString &ATag, QString &AValue) const
+QIcon SkinIconset::iconByTagValue(const QString &ATag, const QString &AValue) const
 {
   QIcon icon = FIconset.iconByTagValue(ATag, AValue);
-  if (icon.isNull())
-    return FDefIconset.iconByTagValue(ATag, AValue);
-  return icon;  
+  return icon.isNull() ? FDefIconset.iconByTagValue(ATag, AValue) : icon;  
 }
 
+QList<QString> SkinIconset::summStringLists(const QList<QString> &AFirst, const QList<QString> &ASecond) const
+{
+  QList<QString> result = AFirst;
+  foreach(QString item, ASecond)
+    if (!result.contains(item))
+      result.append(item);
+  return result;
+}
 
 //--Skin--
 SkinIconset *Skin::getSkinIconset(const QString &AFileName)
@@ -142,7 +162,17 @@ QStringList Skin::skins()
   return dir.entryList();
 }
 
-QStringList Skin::skinFiles(const QString &ASkinType, const QString &ASubFolder, const QString &AFilter /*= "*.*"*/, const QString &ASkin /*= ""*/)
+bool Skin::skinFileExists(const QString &ASkinType, const QString &AFileName, const QString &ASubFolder, const QString &ASkin)
+{
+  QString fullFileName = FSkinsDirectory+"/"+AFileName;
+  if (ASkin.isEmpty())
+    fullFileName = FSkinsDirectory+"/"+FSkin+"/"+ASkinType+"/"+ASubFolder+"/"+AFileName;
+  else
+    fullFileName = FSkinsDirectory+"/"+ASkin+"/"+ASkinType+"/"+ASubFolder+"/"+AFileName;
+  return QFile::exists(fullFileName);
+}
+
+QStringList Skin::skinFiles(const QString &ASkinType, const QString &ASubFolder, const QString &AFilter, const QString &ASkin)
 {
   QString dirPath;
   if (ASkin.isEmpty())

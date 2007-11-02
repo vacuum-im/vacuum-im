@@ -18,7 +18,7 @@ public:
   {
     FDoc.appendChild(FDoc.createElement(AElem.tagName()) = AElem);  
   };
-  StanzaData(const StanzaData &AOther) 
+  StanzaData(const StanzaData &AOther) : QSharedData(AOther)
   {
     FDoc = AOther.FDoc.cloneNode(true).toDocument();
   };

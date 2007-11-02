@@ -21,18 +21,17 @@ public:
   UnzipFileData()
   {
     FUNZFile = NULL;
-    FCashData = false;
+    FFilesReaded = false;
   }
-  UnzipFileData(const UnzipFileData &AOther) :
-    QSharedData(AOther)
+  UnzipFileData(const UnzipFileData &AOther) : QSharedData(AOther)
   {
-    FZipFileName = AOther.FZipFileName;
     if (AOther.FUNZFile)
       FUNZFile = unzOpen(QFile::encodeName(FZipFileName));
     else
       FUNZFile = NULL;
+    FFilesReaded = AOther.FFilesReaded;
+    FZipFileName = AOther.FZipFileName;
     FZippedFiles = AOther.FZippedFiles;
-    FCashData = AOther.FCashData;
   }
   ~UnzipFileData()
   { 
@@ -41,10 +40,10 @@ public:
     qDeleteAll(FZippedFiles);
   }
 public:
+  bool FFilesReaded;
   unzFile FUNZFile;    
   QString FZipFileName;
   QHash<QString,ZippedFile *> FZippedFiles;
-  bool FCashData;
 };
 
 
@@ -52,17 +51,16 @@ class UTILS_EXPORT UnzipFile
 {
 public:
   UnzipFile();
-  UnzipFile(const QString &AZipFileName);
+  UnzipFile(const QString &AZipFileName, bool AReadFiles = false);
   ~UnzipFile();
-
-  bool openFile(const QString &AZipFileName);
   bool isValid() const;
   const QString &zipFileName() const;
+  bool openFile(const QString &AZipFileName, bool AReadFiles = false);
   QList<QString> fileNames() const;
   unsigned long fileSize(const QString &AFileName) const;
   QByteArray fileData(const QString &AFileName) const;
 protected:
-  bool loadZippedFilesInfo();
+  bool loadZippedFilesInfo(bool AReadFiles);
   QByteArray loadZippedFileData(const QString &AFileName) const;
 private:
   QSharedDataPointer<UnzipFileData> d;

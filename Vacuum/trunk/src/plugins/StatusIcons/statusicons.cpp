@@ -351,7 +351,7 @@ void StatusIcons::loadIconFilesRules()
 
       Action *action = new Action(FCustomIconMenu);
       action->setIcon(iconset.iconByName(iconNameByStatus(IPresence::Online,"",false)));
-      action->setText(iconset.iconsetName());
+      action->setText(iconset.info().name);
       action->setData(ADR_ICONSETNAME,iconFile);
       action->setCheckable(true);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));

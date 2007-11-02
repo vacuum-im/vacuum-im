@@ -38,6 +38,7 @@ public:
 signals:
   void actionInserted(QAction *ABefour, Action *AAction);
   void separatorInserted(Action *ABefour, QAction *ASeparator);
+  void separatorRemoved(QAction *ASeparator);
   void actionRemoved(Action *AAction);
   void menuDestroyed(Menu *AMenu);
 protected slots:

@@ -1,34 +1,25 @@
+#include <QtDebug>
 #include "iconset.h"
 
-Iconset::Iconset() :
-  UnzipFile()
+Iconset::Iconset()
 {
   d = new IconsetData;
 }
 
-Iconset::Iconset(const QString &AFileName) :
-  UnzipFile(AFileName)
+Iconset::Iconset(const QString &AFileName)
 {
   d = new IconsetData;
-  loadIconDefination();
+  openFile(AFileName);
 }
 
 Iconset::~Iconset()
 {
 
 }
-bool Iconset::openFile(const QString &AFileName)
-{
-  d->FIconByFile.clear();
-  d->FFileByName.clear();
-  d->FFileByTagValue.clear();
-  UnzipFile::openFile(AFileName);
-  return loadIconDefination();
-}
 
 bool Iconset::isValid() const 
 { 
-  return !d->FIconDef.isNull(); 
+  return !d->FIconFiles.isEmpty(); 
 }
 
 const QString &Iconset::fileName() const 
@@ -36,24 +27,30 @@ const QString &Iconset::fileName() const
   return zipFileName(); 
 }
 
+bool Iconset::openFile(const QString &AFileName)
+{
+  UnzipFile::openFile(AFileName);
+  return loadIconset();
+}
+
 QByteArray Iconset::fileData(const QString &AFileName) const
 {
   return UnzipFile::fileData(AFileName);
 }
 
-const QDomDocument Iconset::iconDef() const 
+const QDomDocument &Iconset::iconDef() const 
 { 
   return d->FIconDef; 
 }
 
-const QString &Iconset::iconsetName() const
+const IconsetInfo &Iconset::info() const
 {
-  return d->FIconsetName;
+  return d->FInfo;
 }
 
 QList<QString> Iconset::iconFiles() const 
 { 
-  return d->FIconByFile.keys(); 
+  return d->FIconFiles; 
 }
 
 QList<QString> Iconset::iconNames() const 
@@ -61,56 +58,74 @@ QList<QString> Iconset::iconNames() const
   return d->FFileByName.keys(); 
 }
 
-QList<QString> Iconset::tags() const 
+QList<QString> Iconset::tags(const QString &AFileName) const 
 { 
-  return  d->FFileByTagValue.keys(); 
+  return AFileName.isEmpty() ? d->FFileByTagValue.keys() : d->FTagValuesByFile.value(AFileName).keys(); 
 }
 
-QList<QString> Iconset::tagValues( const QString &ATagName ) const
+QList<QString> Iconset::tagValues(const QString &ATagName, const QString &AFileName) const
 {
-  return d->FFileByTagValue.value(ATagName).keys();
+  return AFileName.isEmpty() ? d->FFileByTagValue.value(ATagName).keys() : d->FTagValuesByFile.value(AFileName).value(ATagName);
 }
 
-QIcon Iconset::iconByFile( const QString &AFileName ) const
+QString Iconset::fileByIconName(const QString &AIconName) const
 {
-  if (d->FIconByFile.contains(AFileName))
-  {
-    QIcon icon = d->FIconByFile.value(AFileName);
-    if (icon.isNull())
-    {
-      QByteArray iconData = fileData(AFileName);
-      QPixmap pixmap;
-      pixmap.loadFromData(iconData);
-      if (!pixmap.isNull())
-        icon.addPixmap(pixmap);
-      if (!icon.isNull())
-        d->FIconByFile.insert(AFileName,icon);
-    }
-    return icon;
-  }
-  return QIcon();
+  return d->FFileByName.value(AIconName);
 }
 
-QIcon Iconset::iconByName( const QString &AIconName ) const
+QString Iconset::fileByTagValue(const QString &ATag, const QString &AValue) const
 {
-  return iconByFile(d->FFileByName.value(AIconName));
+  return d->FFileByTagValue.value(ATag).value(AValue);
 }
 
-QIcon Iconset::iconByTagValue( const QString &ATag, QString &AValue ) const
+QIcon Iconset::iconByFile(const QString &AFileName) const
 {
-  return iconByFile(d->FFileByTagValue.value(ATag).value(AValue));
+  return d->FIconByFile.value(AFileName);
 }
 
-bool Iconset::loadIconDefination()
+QIcon Iconset::iconByName(const QString &AIconName) const
 {
+  return iconByFile(fileByIconName(AIconName));
+}
+
+QIcon Iconset::iconByTagValue(const QString &ATag, const QString &AValue) const
+{
+  return iconByFile(fileByTagValue(ATag,AValue));
+}
+
+bool Iconset::loadIconset()
+{
+  d->FIconDef.clear();
+  d->FIconByFile.clear();
+  d->FIconFiles.clear();
+  d->FFileByName.clear();
+  d->FFileByTagValue.clear();
+  d->FTagValuesByFile.clear();
+
   if (UnzipFile::isValid() && fileNames().contains("icondef.xml"))
   {
     if (d->FIconDef.setContent(fileData("icondef.xml"),true))
     {
-      d->FIconsetName = d->FIconDef.firstChildElement("icondef")
-                                   .firstChildElement("meta")
-                                   .firstChildElement("name").text();
-      QDomElement elem = d->FIconDef.firstChildElement("icondef").firstChildElement("icon");
+      QDomElement elem = d->FIconDef.firstChildElement("icondef").firstChildElement("meta");
+      if (!elem.isNull())
+      {
+        d->FInfo.name = elem.firstChildElement("name").text();
+        d->FInfo.version = elem.firstChildElement("version").text();
+        d->FInfo.description = elem.firstChildElement("description").text();
+        d->FInfo.homePage = elem.firstChildElement("home").text();
+        //d->FInfo.creation = QDateTime::fromString(elem.firstChildElement("creation").text());
+        for (QDomElement aElem = elem.firstChildElement("author"); !aElem.isNull(); aElem = aElem.nextSiblingElement("author"))
+        {
+          IconsetInfo::Author author;
+          author.name = aElem.text();
+          author.email = aElem.attribute("email");
+          author.jid = aElem.attribute("jid");
+          author.homePage = aElem.attribute("www");
+          d->FInfo.authors.append(author);
+        }
+      }
+
+      elem = d->FIconDef.firstChildElement("icondef").firstChildElement("icon");
       while (!elem.isNull())
       {
         QDomElement objElem = elem.firstChildElement("object");
@@ -118,36 +133,43 @@ bool Iconset::loadIconDefination()
         {
           QString mime = objElem.attribute("mime");
           QString file = objElem.text();
-          if (mime.startsWith("image/") && fileNames().contains(file))
+          if (mime.startsWith("image") && fileNames().contains(file))
           {
-            d->FIconByFile.insert(file,QIcon());
-            QDomElement tagElem = elem.firstChildElement();
-            while (!tagElem.isNull())
+            QPixmap pixmap;
+            QByteArray iconData = fileData(file);
+            if (pixmap.loadFromData(iconData))
             {
-              QString tagName = tagElem.tagName();
-              QString tagValue = tagElem.text();
-              if (tagName == "x")
+              QIcon icon(pixmap);
+              d->FIconFiles.append(file);
+              d->FIconByFile.insert(file,icon);
+              QDomElement tagElem = elem.firstChildElement();
+              while (!tagElem.isNull())
               {
-                if (tagElem.namespaceURI() == "name")
+                QString tagName = tagElem.tagName();
+                QString tagValue = tagElem.text();
+                if (tagName == "x")
+                {
+                  if (tagElem.namespaceURI() == "name")
+                    d->FFileByName.insert(tagValue,file);
+                }
+                else if (tagName == "name")
+                {
                   d->FFileByName.insert(tagValue,file);
+                }
+                else if (tagName != "object")
+                {
+                  d->FFileByTagValue[tagName].insert(tagValue,file);
+                  d->FTagValuesByFile[file][tagName].append(tagValue);
+                }
+                tagElem = tagElem.nextSiblingElement();
               }
-              else if (tagName == "name")
-              {
-                d->FFileByName.insert(tagValue,file);
-              }
-              else if (tagName != "object")
-              {
-                d->FFileByTagValue[tagName].insert(tagValue,file);
-              }
-              tagElem = tagElem.nextSiblingElement();
             }
           }
         }
         elem = elem.nextSiblingElement("icon");
       }
-      return true;
     }
   }
-  return false;
+  return isValid();
 }
 

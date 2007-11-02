@@ -152,6 +152,7 @@ void Menu::removeAction(Action *AAction)
     {
       QAction *separator = FSeparators.value(it.key());
       FSeparators.remove(it.key());
+      emit separatorRemoved(separator);
       QMenu::removeAction(separator);  
     }
 

@@ -6,28 +6,15 @@ UnzipFile::UnzipFile()
   d = new UnzipFileData;
 }
 
-UnzipFile::UnzipFile(const QString &AZipFileName)
+UnzipFile::UnzipFile(const QString &AZipFileName, bool AReadFiles)
 {
   d = new UnzipFileData;
-  openFile(AZipFileName);
+  openFile(AZipFileName,AReadFiles);
 }
 
 UnzipFile::~UnzipFile()
 {
 
-}
-
-bool UnzipFile::openFile(const QString &AZipFileName)
-{
-  if (d->FUNZFile)
-    unzClose(d->FUNZFile);
-  qDeleteAll(d->FZippedFiles);
-
-  d->FZipFileName = AZipFileName;
-  d->FUNZFile = unzOpen(QFile::encodeName(AZipFileName));
-  if (d->FUNZFile)
-    return loadZippedFilesInfo();
-  return false;
 }
 
 bool UnzipFile::isValid() const 
@@ -40,40 +27,43 @@ const QString &UnzipFile::zipFileName() const
   return d->FZipFileName; 
 }
 
+bool UnzipFile::openFile(const QString &AZipFileName, bool AReadFiles)
+{
+  if (d->FUNZFile)
+    unzClose(d->FUNZFile);
+  qDeleteAll(d->FZippedFiles);
+
+  d->FZipFileName = AZipFileName;
+  d->FUNZFile = unzOpen(QFile::encodeName(AZipFileName));
+  if (d->FUNZFile)
+    return loadZippedFilesInfo(AReadFiles);
+  return false;
+}
+
 QList<QString> UnzipFile::fileNames() const 
 { 
   return d->FZippedFiles.keys(); 
 }
 
-unsigned long UnzipFile::fileSize( const QString &AFileName ) const
+unsigned long UnzipFile::fileSize(const QString &AFileName) const
 {
   if (d->FZippedFiles.contains(AFileName))
     return d->FZippedFiles.value(AFileName)->size;
   return 0;
 }
 
-QByteArray UnzipFile::fileData( const QString &AFileName ) const
+QByteArray UnzipFile::fileData(const QString &AFileName) const
 {
-  if (d->FZippedFiles.contains(AFileName))
-  {
-    //UnzipFileData::ZippedFile *zippedFile = d->FZippedFiles.value(AFileName);
-    //QByteArray unzippedData = zippedFile->data;
-    //if (unzippedData.isEmpty())
-    //{
-    //  unzippedData = loadZippedFileData(AFileName);
-    //  if (d->FCashData)
-    //    zippedFile->data = unzippedData;
-    //}
-    //return unzippedData;
-    return loadZippedFileData(AFileName);
-  }
-  return QByteArray();
+  UnzipFileData::ZippedFile *zippedFile = d->FFilesReaded ? d->FZippedFiles.value(AFileName) : NULL;
+  QByteArray unzippedData = zippedFile!=NULL ? zippedFile->data : loadZippedFileData(AFileName);
+  return unzippedData;
 }
 
-bool UnzipFile::loadZippedFilesInfo()
+bool UnzipFile::loadZippedFilesInfo(bool AReadFiles)
 {
   if (isValid() && unzGoToFirstFile(d->FUNZFile) == UNZ_OK)
   {
+    d->FFilesReaded = AReadFiles;
     unz_file_info fileInfo;
     char *fileNameBuff = new char[255];
     do 
@@ -83,6 +73,12 @@ bool UnzipFile::loadZippedFilesInfo()
         UnzipFileData::ZippedFile *newZippedFile = new UnzipFileData::ZippedFile;
         newZippedFile->size = fileInfo.uncompressed_size;
         newZippedFile->name = QString(fileNameBuff);
+        if (AReadFiles && unzOpenCurrentFile(d->FUNZFile) == UNZ_OK)
+        {
+          newZippedFile->data.resize(newZippedFile->size);
+          unzReadCurrentFile(d->FUNZFile,newZippedFile->data.data(),newZippedFile->data.size());
+          unzCloseCurrentFile(d->FUNZFile);
+        }
         d->FZippedFiles.insert(newZippedFile->name,newZippedFile);
       }
     } while (unzGoToNextFile(d->FUNZFile) == UNZ_OK);
@@ -92,20 +88,17 @@ bool UnzipFile::loadZippedFilesInfo()
   return false;
 }
 
-QByteArray UnzipFile::loadZippedFileData( const QString &AFileName ) const
+QByteArray UnzipFile::loadZippedFileData(const QString &AFileName) const
 {
   if (isValid() && unzLocateFile(d->FUNZFile,QFile::encodeName(AFileName),0) == UNZ_OK)
   {
-    int openResult = unzOpenCurrentFile(d->FUNZFile);
-    if (openResult == UNZ_OK)
+    if (unzOpenCurrentFile(d->FUNZFile) == UNZ_OK)
     {
       QByteArray unzippedData(fileSize(AFileName),0);
-      int readBytes = unzReadCurrentFile(d->FUNZFile,unzippedData.data(),unzippedData.size());
-      
-      if (readBytes == unzippedData.size())
-        return unzippedData;
+      unzReadCurrentFile(d->FUNZFile,unzippedData.data(),unzippedData.size());
+      unzCloseCurrentFile(d->FUNZFile);
+      return unzippedData;
     }
-    unzCloseCurrentFile(d->FUNZFile);
   }
   return QByteArray();
 }
