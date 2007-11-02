@@ -18,7 +18,7 @@
 #define MESSENGER_UUID "{153A4638-B468-496f-B57C-9F30CEDFCC2E}"
 
 class IInfoWidget : 
-  virtual public QWidget
+  public QWidget
 {
 public:
   enum InfoField {
@@ -46,7 +46,7 @@ signals:
 };
 
 class IViewWidget : 
-  virtual public QWidget
+  public QWidget
 {
 public:
   enum ShowKind {
@@ -80,7 +80,7 @@ signals:
 };
 
 class IEditWidget : 
-  virtual public QWidget
+  public QWidget
 {
 public:
   virtual const Jid &streamJid() const =0;
@@ -106,7 +106,7 @@ signals:
 };
 
 class IReceiversWidget : 
-  virtual public QWidget
+  public QWidget
 {
 public:
   virtual const Jid &streamJid() const =0;
@@ -137,7 +137,7 @@ signals:
 };
 
 class ITabWindow : 
-  virtual public QMainWindow
+  public QMainWindow
 {
 public:
   virtual void showWindow() =0;
@@ -156,7 +156,7 @@ signals:
 };
 
 class IChatWindow : 
-  virtual public QMainWindow,
+  public QMainWindow,
   public ITabWidget
 {
   Q_INTERFACES(ITabWidget);
@@ -177,7 +177,7 @@ signals:
 };
 
 class IMessageWindow : 
-  virtual public QMainWindow,
+  public QMainWindow,
   public ITabWidget
 {
   Q_INTERFACES(ITabWidget);
@@ -217,7 +217,7 @@ public:
 class IResourceLoader
 {
 public:
-  virtual void loadResource(int AType, const QUrl &AName, QVariant &AValue);
+  virtual void loadResource(int AType, const QUrl &AName, QVariant &AValue) =0;
 };
 
 class IMessenger

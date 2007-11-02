@@ -8,7 +8,6 @@
 #include "ui_viewwidget.h"
 
 class ViewWidget : 
-  virtual public QWidget,
   public IViewWidget
 {
   Q_OBJECT;

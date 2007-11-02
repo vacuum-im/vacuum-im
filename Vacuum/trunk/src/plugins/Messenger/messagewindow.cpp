@@ -183,7 +183,8 @@ void MessageWindow::loadWindowState()
 
 void MessageWindow::loadActiveMessages()
 {
-  QList<int> messagesId = FMessenger->messages(FStreamJid,FContactJid,Message::Normal);
+  QList<int> messagesId = FMessenger->messages(FStreamJid,FContactJid,Message::Normal)
+    + FMessenger->messages(FStreamJid,FContactJid,Message::Headline);
   foreach(int messageId, messagesId)
   {
     Message message = FMessenger->messageById(messageId);
@@ -281,7 +282,7 @@ void MessageWindow::onMessageReceived(const Message &AMessage)
 {
   Jid fromJid = AMessage.from();
   Jid toJid = AMessage.to();
-  if (AMessage.type() == Message::Normal && fromJid == FContactJid && toJid == FStreamJid)
+  if ((AMessage.type() == Message::Normal || AMessage.type() == Message::Headline) && fromJid == FContactJid && toJid == FStreamJid)
   {
     if (FMessageId == 0 && FMode == ReadMode)
     {

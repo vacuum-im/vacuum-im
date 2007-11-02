@@ -9,7 +9,6 @@
 #include "ui_infowidget.h"
 
 class InfoWidget : 
-  virtual public QWidget,
   public IInfoWidget
 {
   Q_OBJECT;

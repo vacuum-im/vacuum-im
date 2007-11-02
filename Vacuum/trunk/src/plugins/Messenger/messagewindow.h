@@ -12,7 +12,6 @@
 #include "ui_messagewindow.h"
 
 class MessageWindow : 
-  virtual public QMainWindow, 
   public IMessageWindow
 {
   Q_OBJECT;

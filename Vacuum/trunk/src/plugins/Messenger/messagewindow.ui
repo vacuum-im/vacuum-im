@@ -22,6 +22,9 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralWidget" >
+   <property name="autoFillBackground" >
+    <bool>true</bool>
+   </property>
    <layout class="QVBoxLayout" >
     <property name="leftMargin" >
      <number>2</number>

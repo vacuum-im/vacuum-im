@@ -11,7 +11,6 @@
 #include "ui_chatwindow.h"
 
 class ChatWindow : 
-  virtual public QMainWindow,
   public IChatWindow
 {
   Q_OBJECT;

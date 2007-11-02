@@ -10,7 +10,6 @@
 #include "ui_tabwindow.h"
 
 class TabWindow : 
-  virtual public QMainWindow,
   public ITabWindow
 {
   Q_OBJECT;

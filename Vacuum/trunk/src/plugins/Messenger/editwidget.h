@@ -5,7 +5,7 @@
 #include "ui_editwidget.h"
 
 class EditWidget : 
-  virtual public QWidget,
+  //virtual public QWidget,
   public IEditWidget
 {
   Q_OBJECT;
