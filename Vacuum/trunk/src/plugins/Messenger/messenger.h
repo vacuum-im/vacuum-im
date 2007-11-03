@@ -147,7 +147,7 @@ protected slots:
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
   void onShowWindowAction(bool);
-  void onTextBrowserLoadResource(int AType, const QUrl &AName, QVariant &AValue);
+  void onTextLoadResource(int AType, const QUrl &AName, QVariant &AValue);
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;

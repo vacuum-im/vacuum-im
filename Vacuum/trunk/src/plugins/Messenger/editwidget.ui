@@ -32,11 +32,18 @@
     <widget class="QWidget" native="1" name="wdtToolBar" />
    </item>
    <item>
-    <widget class="QTextEdit" name="tedEditor" />
+    <widget class="TextEditor" name="tedEditor" />
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>TextEditor</class>
+   <extends>QTextEdit</extends>
+   <header>texteditor.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

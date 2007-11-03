@@ -414,7 +414,7 @@ IViewWidget *Messenger::newViewWidget(const Jid &AStreamJid, const Jid &AContact
 {
   IViewWidget *widget = new ViewWidget(this,AStreamJid,AContactJid);
   connect(widget->textBrowser(),SIGNAL(loadCustomResource(int, const QUrl &, QVariant &)),
-    SLOT(onTextBrowserLoadResource(int, const QUrl &, QVariant &)));
+    SLOT(onTextLoadResource(int, const QUrl &, QVariant &)));
   emit viewWidgetCreated(widget);
   return widget;
 }
@@ -422,6 +422,8 @@ IViewWidget *Messenger::newViewWidget(const Jid &AStreamJid, const Jid &AContact
 IEditWidget *Messenger::newEditWidget(const Jid &AStreamJid, const Jid &AContactJid)
 {
   IEditWidget *widget = new EditWidget(this,AStreamJid,AContactJid);
+  connect(widget->textEdit(),SIGNAL(loadCustomResource(int, const QUrl &, QVariant &)),
+    SLOT(onTextLoadResource(int, const QUrl &, QVariant &)));
   emit editWidgetCreated(widget);
   return widget;
 }
@@ -853,7 +855,7 @@ void Messenger::onShowWindowAction(bool)
   }
 }
 
-void Messenger::onTextBrowserLoadResource(int AType, const QUrl &AName, QVariant &AValue)
+void Messenger::onTextLoadResource(int AType, const QUrl &AName, QVariant &AValue)
 {
   QMultiMap<int,IResourceLoader *>::const_iterator it = FResourceLoaders.constBegin();
   while(!AValue.isValid() && it!=FResourceLoaders.constEnd())
