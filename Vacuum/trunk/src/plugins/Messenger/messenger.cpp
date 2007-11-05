@@ -157,9 +157,12 @@ bool Messenger::initObjects()
 
 bool Messenger::readStanza(HandlerId /*AHandlerId*/, const Jid &/*AStreamJid*/, const Stanza &AStanza, bool &AAccept)
 {
-  AAccept = true;
   Message message(AStanza);
-  receiveMessage(message);
+  if (!message.body().isEmpty())
+  {
+    AAccept = true;
+    receiveMessage(message);
+  }
   return false;
 }
 
@@ -603,7 +606,7 @@ void Messenger::onStreamAdded(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && !FMessageHandlers.contains(AXmppStream))
   {
-    HandlerId handler = FStanzaProcessor->setHandler(this,"/message",IStanzaProcessor::DirectionIn,0,AXmppStream->jid());
+    HandlerId handler = FStanzaProcessor->setHandler(this,"/message/body",IStanzaProcessor::DirectionIn,0,AXmppStream->jid());
     FMessageHandlers.insert(AXmppStream,handler);
   }
 }
