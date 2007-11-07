@@ -4,15 +4,16 @@
 Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
   : QObject(AXmppStream->instance())
 {
+  FShow = Offline;
+  FPriority = 0;
+  FPresenceHandler = 0;
   FXmppStream = AXmppStream;
+  FStanzaProcessor = AStanzaProcessor;
+
   connect(AXmppStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *))); 
   connect(AXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
   connect(AXmppStream->instance(),SIGNAL(error(IXmppStream *, const QString &)),
     SLOT(onStreamError(IXmppStream *, const QString &))); 
-  FStanzaProcessor = AStanzaProcessor;
-  FPresenceHandler = 0;
-  FShow = Offline;
-  FPriority = 0;
 }
 
 Presence::~Presence()
@@ -22,25 +23,14 @@ Presence::~Presence()
 
 bool Presence::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
-  Q_UNUSED(AStreamJid);
-  bool hooked = false;
   if (AHandlerId == FPresenceHandler)
   {
-    static QStringList availableTypes = QStringList() << "" << "unavailable" << "error"; 
-    if (AStanza.from().isEmpty() || !availableTypes.contains(AStanza.type()))
-      return false;
-
-    PresenceItem *pItem = (PresenceItem *)item(AStanza.from());
-    if (!pItem)
-    {
-      pItem = new PresenceItem(AStanza.from(),this);
-      FPresenceItems.append(pItem); 
-    }
-     
+    Show show;
+    QString status;
+    int priority;
     if (AStanza.type().isEmpty())
     {
       QString showText = AStanza.firstElement("show").text();
-      Show show;
       if (showText.isEmpty())
         show = Online;
       else if (showText == "chat")
@@ -52,34 +42,50 @@ bool Presence::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Sta
       else if (showText == "xa")
         show = ExtendedAway;
       else show = Error;
-      pItem->setShow(show);
-      pItem->setStatus(AStanza.firstElement("status").text());
-      pItem->setPriority(AStanza.firstElement("priority").text().toInt());  
-      emit presenceItem(pItem);
-      hooked = true;
+      status = AStanza.firstElement("status").text();
+      priority = AStanza.firstElement("priority").text().toInt();
     }
     else if (AStanza.type() == "unavailable")
     {
-      pItem->setShow(Offline);
-      pItem->setStatus(AStanza.firstElement("status").text());
-      pItem->setPriority(0);
-      emit presenceItem(pItem);
-      FPresenceItems.removeAt(FPresenceItems.indexOf(pItem));
-      delete pItem;
-      hooked = true;
+      show = Offline;
+      status = AStanza.firstElement("status").text();
+      priority = 0;
     }
     else if (AStanza.type() == "error")
     {
       ErrorHandler err(ErrorHandler::DEFAULTNS,AStanza.element());
-      pItem->setShow(Error);
-      pItem->setStatus(err.meaning());
-      pItem->setPriority(0);
-      emit presenceItem(pItem);
-      hooked = true;
+      show = Error;
+      status = err.meaning();
+      priority = 0;
     }
+    else
+    {
+      show = Error;
+      status = tr("Wrong presence type");
+      priority = 0;
+    }
+
+    if (!AStanza.from().isEmpty() && AStreamJid != AStanza.from())
+    {
+      PresenceItem *pitem = (PresenceItem *)item(AStanza.from());
+      if (!pitem)
+      {
+        pitem = new PresenceItem(AStanza.from(),this);
+        FPresenceItems.append(pitem); 
+      }
+      pitem->setShow(show);
+      pitem->setStatus(status);
+      pitem->setPriority(priority);
+      emit presenceItem(pitem);
+    }
+    else
+    {
+      emit selfPresence(show,status,priority,Jid());
+    }
+    AAccept = true;
+    return true;
   }
-  AAccept = AAccept || hooked;
-  return hooked;
+  return false;
 }
 
 IPresenceItem *Presence::item(const Jid &AItemJid) const
@@ -112,7 +118,7 @@ QList<IPresenceItem *> Presence::items(const Jid &AItemJid) const
 
 bool Presence::setPresence(Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid)
 {
-  if (FXmppStream->isOpen())
+  if (FXmppStream->isOpen() && AShow != Error)
   {
     QString show;
     switch (AShow)
@@ -159,13 +165,15 @@ bool Presence::setPresence(Show AShow, const QString &AStatus, qint8 APriority, 
   } 
   else if (AShow == Offline || AShow == Error)
   {
-    FShow = AShow;
-    FStatus = AStatus;
-    FPriority = 0;
+    if (!AToJid.isValid())
+    {
+      FShow = AShow;
+      FStatus = AStatus;
+      FPriority = 0;
+    }
     emit selfPresence(FShow,FStatus,FPriority,AToJid);
     return true;
   }
-
   return false; 
 }
 
@@ -209,31 +217,23 @@ void Presence::removeStanzaHandlers()
   FPresenceHandler = 0;
 }
 
-void Presence::onStreamOpened(IXmppStream *)
+void Presence::onStreamOpened(IXmppStream * /*AXmppStream*/)
 {
   setStanzaHandlers();
   emit opened();
 }
 
-void Presence::onStreamClosed(IXmppStream *)
+void Presence::onStreamClosed(IXmppStream * /*AXmppStream*/)
 {
-  clearItems();
   if (FShow != Offline && FShow != Error)
-  {
-    FShow = Offline;
-    FStatus = "";
-    FPriority = 0;
-    emit selfPresence(FShow,FStatus,FPriority,Jid());
-  }
+    setPresence(Offline,tr("Stream closed"),0);
+  clearItems();
   removeStanzaHandlers();
   emit closed();
 }
 
-void Presence::onStreamError(IXmppStream *, const QString &AError)
+void Presence::onStreamError(IXmppStream * /*AXmppStream*/, const QString &AError)
 {
-  FShow = Error;
-  FStatus = AError;
-  FPriority = 0;
-  emit selfPresence(FShow,FStatus,FPriority,Jid());
+  setPresence(Error,AError,0);
 }
 

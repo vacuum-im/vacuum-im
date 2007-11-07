@@ -48,9 +48,9 @@ protected:
   void setStanzaHandlers();
   void removeStanzaHandlers();
 protected slots:
-  void onStreamOpened(IXmppStream *);
-  void onStreamClosed(IXmppStream *);
-  void onStreamError(IXmppStream *, const QString &AError);
+  void onStreamOpened(IXmppStream *AXmppStream);
+  void onStreamClosed(IXmppStream *AXmppStream);
+  void onStreamError(IXmppStream *AXmppStream, const QString &AError);
 private:
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;
