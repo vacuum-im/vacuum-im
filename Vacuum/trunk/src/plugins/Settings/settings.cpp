@@ -116,7 +116,7 @@ QHash<QString,QVariant> Settings::values(const QString &AName) const
 ISettings &Settings::setValueNS(const QString &AName, const QString &ANameNS, const QVariant &AValue)
 {
   static QList<QVariant::Type> customVariantCasts = QList<QVariant::Type>()
-    << QVariant::Rect << QVariant::Point << QVariant::ByteArray;
+    << QVariant::Rect << QVariant::Point << QVariant::ByteArray << QVariant::StringList;
 
   QDomElement elem = getElement(AName,ANameNS,true);
   if (!elem.isNull())
@@ -211,6 +211,10 @@ QString Settings::variantToString(const QVariant &AVariant)
   {
     return qCompress(AVariant.toByteArray()).toBase64();
   }
+  else if (AVariant.type() == QVariant::StringList)
+  {
+    return AVariant.toStringList().join(" || ");
+  }
   else
     return AVariant.toString();
 }
@@ -240,6 +244,14 @@ QVariant Settings::stringToVariant(const QString &AString, QVariant::Type AType,
       return result;
     else
      return ADefault;
+  }
+  else if (AType == QVariant::StringList)
+  {
+    QStringList list = AString.split(" || ");
+    if (!list.isEmpty())
+      return list;
+    else
+      return ADefault;
   }
   else
     return QVariant(AString);
