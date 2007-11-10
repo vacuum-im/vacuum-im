@@ -53,7 +53,7 @@ bool Presence::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Sta
     }
     else if (AStanza.type() == "error")
     {
-      ErrorHandler err(ErrorHandler::DEFAULTNS,AStanza.element());
+      ErrorHandler err(AStanza.element());
       show = Error;
       status = err.meaning();
       priority = 0;

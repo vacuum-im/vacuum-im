@@ -88,13 +88,13 @@ Stanza Stanza::replyError(const QString &ACondition,
   QDomElement errElem = reply.addElement("error");
   int code = ACode;
   QString condition = ACondition;
-  if (code == ErrorHandler::UNKNOWN)
-    code = ErrorHandler::conditionToCode(ANamespace,ACondition);
+  if (code == ErrorHandler::UNKNOWNCODE)
+    code = ErrorHandler::codeByCondition(ACondition, ANamespace);
   else if (ACondition.isEmpty())
-    condition = ErrorHandler::codeToCondition(ANamespace,code);
-  QString type = ErrorHandler::conditionToType(ANamespace,condition);
+    condition = ErrorHandler::coditionByCode(code,ANamespace);
+  QString type = ErrorHandler::typeByCondition(condition,ANamespace);
 
-  if (code != ErrorHandler::UNKNOWN)
+  if (code != ErrorHandler::UNKNOWNCODE)
     errElem.setAttribute("code",code); 
   if (!type.isEmpty())
     errElem.setAttribute("type",type);

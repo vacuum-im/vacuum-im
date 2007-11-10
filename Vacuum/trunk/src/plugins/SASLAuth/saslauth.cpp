@@ -166,15 +166,15 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
   else if (AElem->tagName() == "failure")
   {
     FNeedHook = false;
-    ErrorHandler err(NS_FEATURE_SASL,AElem->firstChild().toElement().tagName());
-    emit error(err.message()); 
+    ErrorHandler err(AElem->firstChild().toElement().tagName(),NS_FEATURE_SASL);
+    emit error(err.meaning()); 
     return true;
   }
   else if (AElem->tagName() == "abort")
   {
     FNeedHook = false;
-    ErrorHandler err(NS_FEATURE_SASL,"aborted");
-    emit error(err.message()); 
+    ErrorHandler err("aborted",NS_FEATURE_SASL);
+    emit error(err.meaning()); 
     return true;
   }
   else if (AElem->tagName() == "challenge")
@@ -281,26 +281,26 @@ bool SASLAuthPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool SASLAuthPlugin::initObjects()
 {
-  ErrorHandler::addErrorItem(NS_FEATURE_SASL, "aborted", 
-    ErrorHandler::CANCEL, ErrorHandler::FORBIDDEN, tr("Authorization Aborted"));
+  ErrorHandler::addErrorItem("aborted", ErrorHandler::CANCEL, 
+    ErrorHandler::FORBIDDEN, tr("Authorization Aborted"),NS_FEATURE_SASL);
 
-  ErrorHandler::addErrorItem(NS_FEATURE_SASL, "incorrect-encoding", 
-    ErrorHandler::CANCEL, ErrorHandler::NOT_ACCEPTABLE, tr("Incorrect Encoding"));
+  ErrorHandler::addErrorItem("incorrect-encoding", ErrorHandler::CANCEL, 
+    ErrorHandler::NOT_ACCEPTABLE, tr("Incorrect Encoding"),NS_FEATURE_SASL);
 
-  ErrorHandler::addErrorItem(NS_FEATURE_SASL, "invalid-authzid", 
-    ErrorHandler::CANCEL, ErrorHandler::FORBIDDEN, tr("Invalid Authzid"));
+  ErrorHandler::addErrorItem("invalid-authzid", ErrorHandler::CANCEL, 
+    ErrorHandler::FORBIDDEN, tr("Invalid Authzid"),NS_FEATURE_SASL);
 
-  ErrorHandler::addErrorItem(NS_FEATURE_SASL, "invalid-mechanism", 
-    ErrorHandler::CANCEL, ErrorHandler::NOT_ACCEPTABLE, tr("Invalid Mechanism"));
+  ErrorHandler::addErrorItem("invalid-mechanism", ErrorHandler::CANCEL, 
+    ErrorHandler::NOT_ACCEPTABLE, tr("Invalid Mechanism"),NS_FEATURE_SASL);
 
-  ErrorHandler::addErrorItem(NS_FEATURE_SASL, "mechanism-too-weak", 
-    ErrorHandler::CANCEL, ErrorHandler::NOT_ACCEPTABLE, tr("Mechanism Too Weak"));
+  ErrorHandler::addErrorItem("mechanism-too-weak", ErrorHandler::CANCEL, 
+    ErrorHandler::NOT_ACCEPTABLE, tr("Mechanism Too Weak"),NS_FEATURE_SASL);
 
-  ErrorHandler::addErrorItem(NS_FEATURE_SASL, "not-authorized", 
-    ErrorHandler::CANCEL, ErrorHandler::NOT_AUTHORIZED, tr("Not Authorized"));
+  ErrorHandler::addErrorItem("not-authorized", ErrorHandler::CANCEL, 
+    ErrorHandler::NOT_AUTHORIZED, tr("Not Authorized"),NS_FEATURE_SASL);
 
-  ErrorHandler::addErrorItem(NS_FEATURE_SASL, "temporary-auth-failure", 
-    ErrorHandler::CANCEL, ErrorHandler::NOT_AUTHORIZED, tr("Temporary Auth Failure"));
+  ErrorHandler::addErrorItem("temporary-auth-failure", ErrorHandler::CANCEL,
+    ErrorHandler::NOT_AUTHORIZED, tr("Temporary Auth Failure"),NS_FEATURE_SASL);
 
   return true;
 }

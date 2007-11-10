@@ -70,8 +70,8 @@ public:
   bool isValid() const;
   bool canReplyError() const;
   Stanza replyError(const QString &ACondition, 
-    const QString &ANamespace = "urn:ietf:params:xml:ns:xmpp-stanzas",
-    int ACode = ErrorHandler::UNKNOWN, 
+    const QString &ANamespace = EHN_DEFAULT,
+    int ACode = ErrorHandler::UNKNOWNCODE, 
     const QString &AText = "") const;
 
   QString toString() const { return d->FDoc.toString(); }

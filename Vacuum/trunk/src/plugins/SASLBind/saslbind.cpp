@@ -52,8 +52,8 @@ bool SASLBind::hookElement(QDomElement *AElem, Direction ADirection)
       {
         Stanza errStanza = Stanza(*AElem).replyError("jid-malformed");
         FXmppStream->sendStanza(errStanza);
-        ErrorHandler err(ErrorHandler::DEFAULTNS,errStanza.element()); 
-        emit error(err.message());
+        ErrorHandler err(errStanza.element()); 
+        emit error(err.meaning());
         return true;
       };
       FXmppStream->setJid(jid); 
@@ -62,8 +62,8 @@ bool SASLBind::hookElement(QDomElement *AElem, Direction ADirection)
     }
     else if (AElem->attribute("type") == "error")
     {
-      ErrorHandler err(ErrorHandler::DEFAULTNS, *AElem);
-      emit error(err.message());
+      ErrorHandler err(*AElem);
+      emit error(err.meaning());
       return true;
     }
   }

@@ -360,9 +360,8 @@ void XmppStream::onParserElement(const QDomElement &AElem)
   {
     if(AElem.tagName() == "stream:error")
     {
-      ErrorHandler err(NS_XMPP_STREAMS,AElem);
-      err.setContext(tr("During stream negotiation there was an error:")); 
-      emit error(this, err.message());
+      ErrorHandler err(AElem,NS_XMPP_STREAMS);
+      emit error(this, err.meaning());
 
       FConnection->disconnect();
     } 
