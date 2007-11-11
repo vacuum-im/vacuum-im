@@ -59,11 +59,7 @@ bool Presence::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Sta
       priority = 0;
     }
     else
-    {
-      show = Error;
-      status = tr("Wrong presence type");
-      priority = 0;
-    }
+      return false;
 
     if (!AStanza.from().isEmpty() && AStreamJid != AStanza.from())
     {
