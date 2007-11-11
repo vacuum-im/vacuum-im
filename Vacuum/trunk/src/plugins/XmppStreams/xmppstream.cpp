@@ -33,7 +33,7 @@ void XmppStream::open()
     bool hasPassword = !FPassword.isEmpty() || !FSessionPassword.isEmpty();
     if (!hasPassword)
     {
-      FSessionPassword = QInputDialog::getText(NULL,tr("Password request"),tr("Enter password for <b>%1</b>").arg(FJid.bare()),
+      FSessionPassword = QInputDialog::getText(NULL,tr("Password request"),tr("Enter password for <b>%1</b>").arg(FJid.hBare()),
         QLineEdit::Password,FSessionPassword,&hasPassword,Qt::Dialog);
     }
 
@@ -69,12 +69,12 @@ void XmppStream::close()
 
 void XmppStream::setJid(const Jid &AJid) 
 {
-  if (FJid != AJid && (FStreamState == SS_OFFLINE || (FStreamState == SS_FEATURES && FJid.equals(AJid,false)))) 
+  if (FJid != AJid && (FStreamState == SS_OFFLINE || (FStreamState == SS_FEATURES && (FJid && AJid)))) 
   {
     if (FStreamState == SS_FEATURES && !FOfflineJid.isValid())
       FOfflineJid = FJid;
 
-    if (!FJid.equals(AJid,false))
+    if (!(FJid && AJid))
       FSessionPassword.clear();
 
     Jid befour = FJid;

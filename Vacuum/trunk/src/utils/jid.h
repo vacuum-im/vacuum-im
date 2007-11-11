@@ -1,50 +1,93 @@
 #ifndef JID_H
 #define JID_H
 
-#include <QObject>
+#include <QList>
+#include <QHash>
 #include <QString>
+#include <QSharedData>
+#include <QTextDocument>
 #include "utilsexport.h"
 
-class UTILS_EXPORT Jid : 
-  public QObject
+class JidData :
+  public QSharedData
 {
-  Q_OBJECT
-
 public:
-  Jid(const QString &ANode, const QString &ADomane, const QString &AResource, QObject *parent = 0);
-  Jid(const QString &AJidStr = QString(), QObject *parent = 0);
-  Jid(const char *ch, QObject *parent = 0);
-  Jid(const Jid &AJid);
+  JidData() {};
+  JidData(const JidData &AOther) : QSharedData(AOther)
+  {
+    FNode = AOther.FNode;
+    FEscNode = AOther.FEscNode;
+    FPrepNode = AOther.FPrepNode;
+    FDomane = AOther.FDomane;
+    FPrepDomane = AOther.FPrepNode;
+    FResource = AOther.FResource;
+    FPrepResource = AOther.FPrepResource;
+  };
+  ~JidData() {};
+public:
+  QString FNode, FEscNode, FPrepNode;
+  QString FDomane, FPrepDomane;
+  QString FResource, FPrepResource;
+};
+
+class UTILS_EXPORT Jid
+{
+public:
+  Jid(const char *AJidStr);
+  Jid(const QString &AJidStr = QString());
+  Jid(const QString &ANode, const QString &ADomane, const QString &AResource);
   ~Jid();
 
-  Jid &setJid(const QString &AJidStr);
-  void setNode(const QString &ANode) { FNode = ANode; }
-  QString node() const { return FNode; }
-  void setDomane(const QString &ADomane) { FDomane = ADomane; }
-  QString domane() const { return FDomane; }
-  void setResource(const QString &AResource) { FResource = AResource; }
-  QString resource() const { return FResource; }
   bool isValid() const;
-  QString full() const { return toString(true); }
-  QString bare() const { return toString(false); }
-  QString pFull() const { return prep().full(); }
-  QString pBare() const { return prep().bare(); }
-  Jid prep() const;
-  bool equals(const Jid &AJid, bool withRes = true) const;
-  Jid& operator =(const Jid &AJid) { return setJid(AJid.full()); }
-  Jid& operator =(const QString &AJidStr) { return setJid(AJidStr); }
-  bool operator ==(const Jid &AJid) const { return equals(AJid); }
-  bool operator ==(const QString &AJidStr) const { return equals(Jid(AJidStr)); }
-  bool operator !=(const Jid &AJid) const { return !equals(AJid); }
-  bool operator !=(const QString &AJidStr) const { return !equals(Jid(AJidStr)); }
-  bool operator <(const Jid &AJid) const { return pFull() < AJid.pFull(); }
-  bool operator >(const Jid &AJid) const { return pFull() > AJid.pFull(); }
+  bool isEmpty() const;
+
+  QString node() const { return d->FNode; }
+  QString hNode() const { return Qt::escape(d->FEscNode); }
+  QString eNode() const { return d->FEscNode; }
+  QString pNode() const { return d->FPrepNode; }
+  void setNode(const QString &ANode);
+  QString domane() const { return d->FDomane; }
+  QString pDomane() const { return d->FPrepDomane; }
+  void setDomane(const QString &ADomane);
+  QString resource() const { return d->FResource; }
+  QString pResource() const { return d->FPrepResource; }
+  void setResource(const QString &AResource);
+
+  Jid prepared() const;
+  QString full() const { return toString(false,false,true); }
+  QString bare() const { return toString(false,false,false); }
+  QString hFull() const { return Qt::escape(toString(false,false,true)); }
+  QString hBare() const { return Qt::escape(toString(false,false,false)); }
+  QString eFull() const { return toString(true,false,true); }
+  QString eBare() const { return toString(true,false,false); }
+  QString pFull() const { return toString(false,true,true); }
+  QString pBare() const { return toString(false,true,false); }
+
+  Jid& operator =(const QString &AJidStr);
+  bool operator ==(const Jid &AJid) const;
+  bool operator ==(const QString &AJidStr) const;
+  bool operator !=(const Jid &AJid) const;
+  bool operator !=(const QString &AJidStr) const;
+  bool operator &&(const Jid &AJid) const;
+  bool operator &&(const QString &AJidStr) const;
+  bool operator <(const Jid &AJid) const;
+  bool operator >(const Jid &AJid) const;
+public:
+  static QString encode(const QString &AJidStr);
+  static QString decode(const QString &AEncJid);
+  static QString encode822(const QString &AJidStr);
+  static QString decode822(const QString &AEncJid);
+  static QString escape106(const QString &ANode);
+  static QString unescape106(const QString &AEscNode);
 protected:
-  QString toString(bool withRes = true) const;
+  Jid &parseString(const QString &AJidStr);
+  QString toString(bool AEscaped, bool APrepared, bool AFull) const;
+  bool equals(const Jid &AJid, bool AFull) const;
 private:
-  QString FNode;
-  QString FDomane;
-  QString FResource;
+  QSharedDataPointer<JidData> d;
+private:
+  static QList<QChar> escChars;
+  static QList<QString> escStrings;
 };
 
 #ifdef __cplusplus

@@ -209,7 +209,7 @@ void ChatWindow::closeEvent(QCloseEvent *AEvent)
 void ChatWindow::onMessageReady()
 {
   Message message;
-  message.setFrom(FStreamJid.full()).setTo(FContactJid.full()).setType(Message::Chat);
+  message.setFrom(FStreamJid.eFull()).setTo(FContactJid.eFull()).setType(Message::Chat);
   FMessenger->textToMessage(message,FEditWidget->document());
   if (!message.body().isEmpty() && FMessenger->sendMessage(message,FStreamJid))
   {
@@ -241,7 +241,7 @@ void ChatWindow::onMessageReceived(const Message &AMessage)
 
 void ChatWindow::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
-  if (AXmppStream->jid().equals(FStreamJid,false))
+  if (FStreamJid && AXmppStream->jid())
   {
     FStreamJid = AXmppStream->jid();
     FInfoWidget->setStreamJid(FStreamJid);
@@ -255,7 +255,7 @@ void ChatWindow::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour
 
 void ChatWindow::onPresenceItem(IPresenceItem *APresenceItem)
 {
-  if (APresenceItem->jid().equals(FContactJid,false))
+  if (FContactJid && APresenceItem->jid())
   {
     if (FContactJid.resource().isEmpty())
     {
@@ -279,7 +279,7 @@ void ChatWindow::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVarian
 {
   if (AField == IInfoWidget::ContactName) 
   {
-    QString selfName = FStreamJid.equals(FContactJid,false) ? FStreamJid.resource() : FStreamJid.node();
+    QString selfName = FStreamJid && FContactJid ? FStreamJid.resource() : FStreamJid.node();
     FViewWidget->setNickForJid(FStreamJid,selfName);
     FViewWidget->setNickForJid(FContactJid,AValue.toString());
     updateWindow();
@@ -296,7 +296,7 @@ void ChatWindow::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVarian
         if (FMessenger->checkOption(IMessenger::ShowDateTime))
           dateTime = QString("[%1] ").arg(QDateTime::currentDateTime().toString("hh::mm"));
         QString nick = FViewWidget->nickForJid(FContactJid);
-        QString html = QString("<span style='color:green;'>%1*** %2 [%3] %4</span>").arg(dateTime).arg(nick).arg(show).arg(status);
+        QString html = QString("<span style='color:green;'>%1*** %2 [%3] %4</span>").arg(dateTime).arg(Qt::escape(nick)).arg(show).arg(status);
         FViewWidget->showCustomHtml(html);
         FLastStatusShow = status+show;
       }

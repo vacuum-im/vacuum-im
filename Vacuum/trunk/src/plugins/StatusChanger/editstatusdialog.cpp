@@ -323,7 +323,7 @@ void EditStatusDialog::onDeleteButton(bool)
       else if (FStatusItems.contains(statusId))
       {
         int button = QMessageBox::question(this,tr("Delete status"),
-          tr("You are assured that wish to remove a status '<b>%1</b>'?").arg(FStatusItems.value(statusId)->name),
+          tr("You are assured that wish to remove a status '<b>%1</b>'?").arg(Qt::escape(FStatusItems.value(statusId)->name)),
           QMessageBox::Yes | QMessageBox::No);
         if (button == QMessageBox::Yes)
         {

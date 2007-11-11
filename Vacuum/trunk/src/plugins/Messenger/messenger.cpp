@@ -613,7 +613,7 @@ void Messenger::onStreamAdded(IXmppStream *AXmppStream)
 
 void Messenger::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter)
 {
-  if (AAfter.equals(AXmppStream->jid()),false)
+  if (AAfter && AXmppStream->jid())
   {
     QMap<int,Message>::iterator it = FMessages.begin();
     while (it != FMessages.end())
@@ -621,7 +621,7 @@ void Messenger::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid 
       if (AXmppStream->jid() == it.value().to())
       {
         unNotifyMessage(it.key());
-        it.value().setTo(AAfter.full());
+        it.value().setTo(AAfter.eFull());
       }
       it++;
     }

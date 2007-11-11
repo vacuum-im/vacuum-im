@@ -414,8 +414,8 @@ void StanzaProcessor::onStreamElement(IXmppStream *AStream, const QDomElement &A
 {
   Stanza stanza(AElem);
   if (stanza.from().isEmpty())
-    stanza.setFrom(AStream->jid().full());
-  stanza.setTo(AStream->jid().full());
+    stanza.setFrom(AStream->jid().eFull());
+  stanza.setTo(AStream->jid().eFull());
 
   if (!sendStanzaIn(AStream->jid(),stanza) && stanza.canReplyError())
     sendStanzaOut(AStream->jid(), stanza.replyError("service-unavailable")); 

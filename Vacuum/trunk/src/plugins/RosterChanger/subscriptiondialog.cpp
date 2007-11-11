@@ -36,8 +36,8 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
   FDialogAction->setData(Action::DR_StreamJid,AStreamJid.pFull());
   FDialogAction->setData(Action::DR_Parametr1,AContactJid.pBare());
 
-  lblAccountJid->setText(AStreamJid.full());
-  lblFromJid->setText(AContactJid.bare());
+  lblAccountJid->setText(AStreamJid.hFull());
+  lblFromJid->setText(AContactJid.hBare());
   lblDateTime->setText(ATime.toString(Qt::LocaleDate));
 
   bool subsTo = (ASubs == "to" || ASubs == "both");
@@ -51,7 +51,7 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
       tedMessage->setText(tr("<b>Subscription request</b>"));
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
-      tedMessage->append(tr("<b>%1 wants to subscribe to your presence.</b>").arg(AContactJid.bare()));
+      tedMessage->append(tr("<b>%1 wants to subscribe to your presence.</b>").arg(AContactJid.hBare()));
       
       showButtons << AuthButton << RejectButton;
       if (!subsTo)
@@ -64,7 +64,7 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
       tedMessage->setText(tr("<b>Subscription approved</b>"));
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
-      tedMessage->append(tr("<b>You are now authorized for %1 presence.</b>").arg(AContactJid.bare()));
+      tedMessage->append(tr("<b>You are now authorized for %1 presence.</b>").arg(AContactJid.hBare()));
 
       showButtons << RefuseButton;
       if (!subsFrom)
@@ -77,7 +77,7 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
       tedMessage->setText(tr("<b>Subscription refused</b>"));
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
-      tedMessage->append(tr("<b>%1 unsubscribed from your presence.</b>").arg(AContactJid.bare()));
+      tedMessage->append(tr("<b>%1 unsubscribed from your presence.</b>").arg(AContactJid.hBare()));
 
       if (subsTo)
         showButtons << RefuseButton;
@@ -89,7 +89,7 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
       tedMessage->setText(tr("<b>Subscription rejected</b>"));
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
-      tedMessage->append(tr("<b>You are now unsubscribed from %1 presence.</b>").arg(AContactJid.bare()));
+      tedMessage->append(tr("<b>You are now unsubscribed from %1 presence.</b>").arg(AContactJid.hBare()));
 
       showButtons << AskButton;
       if (subsFrom)

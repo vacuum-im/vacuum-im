@@ -1,4 +1,5 @@
 #include "optionsdialog.h"
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -6,7 +7,7 @@
 #include <QScrollBar>
 #include <QPushButton>
 #include <QHeaderView>
-
+#include <QTextDocument>
 
 OptionsDialog::OptionsDialog(QWidget *AParent)
   : QDialog(AParent)
@@ -215,7 +216,7 @@ void OptionsDialog::onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetI
     OptionsNode *nodeOption = FNodes.value(node,NULL);
     if (nodeOption)
     {
-      lblInfo->setText(QString("<b>%1</b><br>%2").arg(nodeFullName(node)).arg(nodeOption->desc));
+      lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(Qt::escape(nodeOption->desc)));
       QWidget *widget = stwOptions->widget(FItemsStackIndex.value(currentItem));
       stwOptions->setMaximumHeight(widget->sizeHint().height());
       stwOptions->setCurrentWidget(widget);

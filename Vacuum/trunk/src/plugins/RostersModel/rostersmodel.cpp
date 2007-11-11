@@ -298,7 +298,7 @@ IRosterIndexList RostersModel::getContactIndexList(const Jid &AStreamJid, const 
     int type = RIT_Contact;
     if (AContactJid.node().isEmpty())
       type = RIT_Agent;
-    else if (AContactJid.equals(AStreamJid,false))
+    else if (AContactJid && AStreamJid)
       type = RIT_MyResource;
 
     QHash<int,QVariant> data;
@@ -611,7 +611,7 @@ void RostersModel::onPresenceItem(IPresenceItem *APresenceItem)
   IRosterItem *rosterItem = streamRoster->item(APresenceItem->jid());
 
   int itemType = RIT_Contact;
-  if (APresenceItem->jid().equals(streamPresence->streamJid(),false))
+  if (APresenceItem->jid() && streamPresence->streamJid())
     itemType = RIT_MyResource; 
   else if (APresenceItem->jid().node().isEmpty())
     itemType = RIT_Agent; 

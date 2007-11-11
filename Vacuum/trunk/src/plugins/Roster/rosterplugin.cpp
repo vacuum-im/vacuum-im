@@ -87,8 +87,7 @@ void RosterPlugin::removeRoster(IXmppStream *AXmppStream)
 
 QString RosterPlugin::rosterFile(const Jid &AStreamJid) const
 {
-  QString fileName = AStreamJid.pBare()+".xml";
-  fileName.replace("@","_at_");
+  QString fileName = Jid::encode(AStreamJid.bare()).toLower()+".xml";
   QDir dir;
   if (FSettingsPlugin)
     dir.setPath(FSettingsPlugin->homeDir().path());

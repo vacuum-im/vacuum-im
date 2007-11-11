@@ -145,7 +145,7 @@ void RostersModelPlugin::onAccountChanged(const QString &AName, const QVariant &
 
 void RostersModelPlugin::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
 {
-  if (!ABefour.equals(AAfter,false))
+  if (!(ABefour && AAfter))
     FRosterPlugin->loadRosterItems(AAfter);
   emit streamJidChanged(ABefour,AAfter);
 }

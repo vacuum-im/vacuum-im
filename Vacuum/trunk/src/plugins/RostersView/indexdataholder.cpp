@@ -86,7 +86,7 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
         Jid indexJid(AIndex->data(RDR_Jid).toString());
         QString display = AIndex->data(RDR_Name).toString();
         if (display.isEmpty())
-          display = indexJid.bare();
+          display = indexJid.hBare();
         if (checkOption(IRostersView::ShowResource) && !indexJid.resource().isEmpty())
           display += "/" + indexJid.resource();
         return display;
@@ -105,7 +105,7 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
         if (display.isEmpty())
         {
           Jid indexJid(AIndex->data(RDR_Jid).toString());
-          display = indexJid.bare();
+          display = indexJid.hBare();
         }
         return display;
       }
@@ -149,11 +149,11 @@ QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
   
   QString val = AIndex->data(RDR_Name).toString();
   if (!val.isEmpty())
-    toolTip.append(valueMast.arg(val));
+    toolTip.append(valueMast.arg(Qt::escape(val)));
 
   val = AIndex->data(RDR_Jid).toString();
   if (!val.isEmpty())
-    toolTip.append(valueMast.arg(val));
+    toolTip.append(valueMast.arg(Qt::escape(val)));
 
   val = AIndex->data(RDR_Priority).toString();
   if (!val.isEmpty())
@@ -161,7 +161,7 @@ QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
 
   val = AIndex->data(RDR_Status).toString();
   if (!val.isEmpty())
-    toolTip.append(paramMask.arg(tr("Status")).arg(val));
+    toolTip.append(paramMask.arg(tr("Status")).arg(Qt::escape(val)));
 
   val = AIndex->data(RDR_Subscription).toString();
   if (!val.isEmpty() && val != "both")

@@ -52,7 +52,7 @@ void InfoWidget::autoSetField(InfoField AField)
   case ContactName:
     {
       QString contactName;
-      if (!FStreamJid.equals(FContactJid,false))
+      if (!(FStreamJid && FContactJid))
       {
         contactName = FContactJid.node();
         if (FRoster)
@@ -119,7 +119,7 @@ void InfoWidget::setField(InfoField AField, const QVariant &AValue)
   {
   case AccountName:
     {
-      ui.lblAccount->setText(AValue.toString());
+      ui.lblAccount->setText(Qt::escape(AValue.toString()));
       ui.wdtAccount->setVisible(!AValue.toString().isEmpty());
       break;
     };
@@ -143,29 +143,29 @@ void InfoWidget::setField(InfoField AField, const QVariant &AValue)
   case ContactName:
     {
       FContactName = AValue.toString();
-      ui.lblName->setText(QString("<b>%1</b> (%2)").arg(FContactName).arg(FContactJid.full()));
+      ui.lblName->setText(QString("<b>%1</b> (%2)").arg(Qt::escape(FContactName)).arg(FContactJid.hFull()));
       break;
     };
   case ContactShow:
     {
-      FContactShow = AValue.toString();
+      FContactShow = Qt::escape(AValue.toString());
       break;
     }
   case ContactStatus:
     {
-      ui.lblStatus->setText(AValue.toString());
+      ui.lblStatus->setText(Qt::escape(AValue.toString()));
       ui.wdtStatus->setVisible(!AValue.toString().isEmpty());
       break;
     };
   case ContactEmail:
     {
-      ui.lblEmail->setText(AValue.toString());
+      ui.lblEmail->setText(Qt::escape(AValue.toString()));
       ui.wdtEmail->setVisible(!AValue.toString().isEmpty());
       break;
     };
   case ContactClient:
     {
-      ui.lblClient->setText(AValue.toString());
+      ui.lblClient->setText(Qt::escape(AValue.toString()));
       ui.wdtClient->setVisible(!AValue.toString().isEmpty());
       break;
     };
@@ -287,7 +287,7 @@ void InfoWidget::onAccountChanged(const QString &AName, const QVariant &AValue)
 
 void InfoWidget::onRosterItemPush(IRosterItem *ARosterItem)
 {
-  if (ARosterItem->jid() == FContactJid.bare())
+  if (ARosterItem->jid() && FContactJid)
     setField(ContactName,ARosterItem->name());
 }
 

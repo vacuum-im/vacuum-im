@@ -346,7 +346,7 @@ void RostersViewPlugin::onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid 
   if (FSettings)
   {
     Jid befour = ARoster->streamJid();
-    if (befour.equals(AAfter,false))
+    if (befour && AAfter)
     {
       QDomElement elem = FSettingsPlugin->pluginNode(ROSTERSVIEW_UUID).firstChildElement(SVN_COLLAPSE).firstChildElement(SVN_ACCOUNT);
       while(!elem.isNull() && elem.attribute("ns")!=befour.pFull())

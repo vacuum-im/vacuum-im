@@ -111,7 +111,7 @@ QList<IPresenceItem *> Presence::items(const Jid &AItemJid) const
   QList<IPresenceItem *> pItems;
   PresenceItem *pItem;
   foreach(pItem, FPresenceItems)
-    if (pItem->jid().equals(AItemJid,false))
+    if (AItemJid && pItem->jid())
       pItems.append(pItem); 
   return pItems;
 }
@@ -135,7 +135,7 @@ bool Presence::setPresence(Show AShow, const QString &AStatus, qint8 APriority, 
 
     Stanza pres("presence");
     if (AToJid.isValid())
-      pres.setTo(AToJid.full());
+      pres.setTo(AToJid.eFull());
 
     if (AShow == Invisible)
       pres.setType("invisible");

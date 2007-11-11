@@ -696,7 +696,7 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
       connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),SLOT(onAccountChanged(const QString &, const QVariant &)));
     }
     else
-      sMenu->setTitle(APresence->streamJid().full());
+      sMenu->setTitle(APresence->streamJid().hFull());
     FStreamMenu.insert(APresence,sMenu);
 
     Menu *scMenu = new Menu(sMenu);

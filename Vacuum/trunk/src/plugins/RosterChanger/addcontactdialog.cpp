@@ -64,9 +64,9 @@ void AddContactDialog::setStreamJid( const Jid &AStreamJid )
 
 void AddContactDialog::setContactJid(const Jid &AJid)
 {
-  lneJabberId->setText(AJid.bare());
+  lneJabberId->setText(AJid.hBare());
   if (nick().isEmpty())
-    setNick(AJid.node());
+    setNick(AJid.hNode());
 }
 
 void AddContactDialog::setNick(const QString &ANick)
@@ -74,7 +74,7 @@ void AddContactDialog::setNick(const QString &ANick)
   if (!ANick.isEmpty())
     lneNickName->setText(ANick);
   else
-    lneNickName->setText(contactJid().node());
+    lneNickName->setText(contactJid().hNode());
 }
 
 void AddContactDialog::setGroup(const QString &AGroup)
@@ -100,14 +100,14 @@ void AddContactDialog::setRequestText(const QString &AText)
 void AddContactDialog::onAccepted()
 {
   Jid cJid = contactJid();
-  if (cJid.isValid() && !FStreamJid.equals(cJid,false))
+  if (cJid.isValid() && !(FStreamJid && cJid))
   {
     emit addContact(this);
     accept();
   }
   else
     QMessageBox::warning(this,FStreamJid.full(),
-      tr("Can`t add contact '<b>%1</b>'<br>'<b>%1</b>' is not a valid Jaber ID").arg(cJid.bare()));
+      tr("Can`t add contact '<b>%1</b>'<br>'<b>%1</b>' is not a valid Jaber ID").arg(cJid.hBare()));
 }
 
 

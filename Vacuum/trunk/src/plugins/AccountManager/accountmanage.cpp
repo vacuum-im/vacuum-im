@@ -2,6 +2,7 @@
 
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QTextDocument>
 
 #define ACCOUNT_ID_ROLE Qt::UserRole+1
 
@@ -80,7 +81,7 @@ void AccountManage::onAccountRemove()
   {
     QMessageBox::StandardButton res = QMessageBox::warning(this,
       tr("Confirm removal of an account."),
-      tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(item->text(0)),
+      tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(Qt::escape(item->text(0))),
       QMessageBox::Ok | QMessageBox::Cancel);
     
     if (res == QMessageBox::Ok)

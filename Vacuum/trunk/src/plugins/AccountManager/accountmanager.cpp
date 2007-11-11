@@ -100,7 +100,7 @@ IAccount *AccountManager::addAccount(const QString &AName, const Jid &AStreamJid
   IAccount *account = accountByStream(AStreamJid);
   if (!account)
   {
-    IXmppStream *stream = FXmppStreams->newStream(AStreamJid.full());
+    IXmppStream *stream = FXmppStreams->newStream(AStreamJid);
     account = new Account(newId(),FSettings,stream,this);
     account->setName(AName);
     FAccounts.append((Account *)account);
@@ -354,20 +354,20 @@ void AccountManager::onOptionsDialogAccepted()
     Jid streamJid = options->option(AccountOptions::AO_StreamJid).toString();
     QString name = options->option(AccountOptions::AO_Name).toString();
     if (name.isEmpty())
-      name= streamJid.full();
+      name= streamJid.hFull();
 
     bool canApply = true;
     QString warningMessage = tr("'%1' account changes cannot by applied:<br><br>").arg(name);
-    if (streamJid.node().isEmpty() || streamJid.domane().isEmpty())
+    if (!streamJid.isValid() || streamJid.node().isEmpty())
     {
       canApply = false;
-      warningMessage += tr("- jabber ID is not valid<br>");
+      warningMessage += tr(" - jabber ID is not valid<br>");
     }
     account = accountByStream(streamJid);
     if (account && account->accountId()!=id)
     {
       canApply = false;
-      warningMessage += tr("- jabber ID '%1' already exists<br>").arg(streamJid.full());
+      warningMessage += tr(" - jabber ID '%1' already exists<br>").arg(streamJid.hFull());
     }
 
     if (canApply)

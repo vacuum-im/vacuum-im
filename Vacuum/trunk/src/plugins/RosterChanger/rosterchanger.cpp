@@ -300,7 +300,7 @@ void RosterChanger::removeSubsMessage(int ASubsId)
     {
       bool removeLabel = true;
       foreach(SubsItem *sItem,FSubsItems)
-        if (sItem->streamJid == subsItem->streamJid && sItem->contactJid.equals(subsItem->contactJid,false))
+        if (sItem->streamJid == subsItem->streamJid && (sItem->contactJid && subsItem->contactJid))
         {
           removeLabel = false;
           break;
@@ -341,7 +341,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     {
       QHash<int,QVariant> data;
       data.insert(Action::DR_StreamJid,streamJid);
-      data.insert(Action::DR_Parametr1,AIndex->data(RDR_BareJid));
+      data.insert(Action::DR_Parametr1,AIndex->data(RDR_BareJid).toString());
       
       Action *action;
 
@@ -490,7 +490,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid,
   if (FTrayManager)
   {
     subsItem->trayId = FTrayManager->appendNotify(FSystemIconset->iconByName(IN_EVENTS),
-      tr("Subscription message from %1").arg(AFromJid.full()),true);
+      tr("Subscription message from %1").arg(AFromJid.hFull()),true);
   }
 
   if (FRostersView && FRostersModel)
@@ -515,10 +515,10 @@ void RosterChanger::onRenameItem(bool)
     IRoster *roster = FRosterPlugin->getRoster(streamJid);
     if (roster && roster->isOpen())
     {
-      QString rosterJid = action->data(Action::DR_Parametr1).toString();
+      Jid rosterJid = action->data(Action::DR_Parametr1).toString();
       QString oldName = action->data(Action::DR_Parametr2).toString();
       bool ok = false;
-      QString newName = QInputDialog::getText(NULL,tr("Rename contact"),tr("Enter name for: ")+rosterJid,
+      QString newName = QInputDialog::getText(NULL,tr("Rename contact"),tr("Enter name for: <b>%1</b>").arg(rosterJid.hBare()),
         QLineEdit::Normal,oldName,&ok);
       if (ok && !newName.isEmpty() && newName != oldName)
         roster->renameItem(rosterJid,newName);
@@ -616,12 +616,12 @@ void RosterChanger::onRemoveItemFromRoster(bool)
     IRoster *roster = FRosterPlugin->getRoster(streamJid);
     if (roster && roster->isOpen())
     {
-      QString rosterJid = action->data(Action::DR_Parametr1).toString();
+      Jid rosterJid = action->data(Action::DR_Parametr1).toString();
       IRosterItem *rosterItem = roster->item(rosterJid);
       if (rosterItem)
       {
         int button = QMessageBox::question(NULL,tr("Remove contact"),
-          tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(rosterJid),
+          tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(rosterJid.hBare()),
           QMessageBox::Yes | QMessageBox::No);
         if (button == QMessageBox::Yes)
           roster->removeItem(rosterJid);
@@ -631,7 +631,7 @@ void RosterChanger::onRemoveItemFromRoster(bool)
         QMultiHash<int, QVariant> data;
         data.insert(RDR_Type,RIT_Contact);
         data.insert(RDR_Type,RIT_Agent);
-        data.insert(RDR_BareJid,rosterJid);
+        data.insert(RDR_BareJid,rosterJid.pBare());
         IRosterIndex *streamRoot = FRostersModel->getStreamRoot(streamJid);
         IRosterIndexList indexList = streamRoot->findChild(data,true);
         foreach(IRosterIndex *index, indexList)
@@ -769,7 +769,7 @@ void RosterChanger::onAddContact(AddContactDialog *ADialog)
         roster->sendSubscription(contactJid,IRoster::Subscribed);
     }
     else
-      QMessageBox::information(NULL,streamJid.full(),tr("Contact <b>%1</b> already exists.").arg(contactJid.bare()));
+      QMessageBox::information(NULL,streamJid.full(),tr("Contact <b>%1</b> already exists.").arg(contactJid.hBare()));
   }
 }
 
@@ -787,7 +787,7 @@ void RosterChanger::onRosterOpened(IRoster *ARoster)
       connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),SLOT(onAccountChanged(const QString &, const QVariant &)));
     }
     else
-      action->setText(ARoster->streamJid().full());
+      action->setText(ARoster->streamJid().hFull());
     action->setData(Action::DR_StreamJid,ARoster->streamJid().full());
     connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
     FActions.insert(ARoster,action);
@@ -843,7 +843,7 @@ void RosterChanger::onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bo
     QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
     while (it != FSubsItems.end())
     {
-      if (it.value()->streamJid == sJid && it.value()->contactJid.equals(cJid,false))
+      if ((it.value()->streamJid == sJid) && (it.value()->contactJid && cJid))
       {
         openSubsDialog(it.key());
         break;

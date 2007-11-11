@@ -298,7 +298,7 @@ void MessageWindow::onMessageReceived(const Message &AMessage)
 
 void MessageWindow::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
-  if (AXmppStream->jid().equals(FStreamJid,false))
+  if (FStreamJid && AXmppStream->jid())
   {
     FStreamJid = AXmppStream->jid();
     FInfoWidget->setStreamJid(FStreamJid);
@@ -312,7 +312,7 @@ void MessageWindow::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABef
 
 void MessageWindow::onPresenceItem(IPresenceItem *APresenceItem)
 {
-  if (APresenceItem->jid().equals(FContactJid,false))
+  if (FContactJid && APresenceItem->jid())
   {
     if (FContactJid.resource().isEmpty())
       setContactJid(APresenceItem->jid());
@@ -328,7 +328,7 @@ void MessageWindow::onStatusIconsChanged()
 void MessageWindow::onSendButtonClicked()
 {
   Message message;
-  message.setFrom(FStreamJid.full()).setType(Message::Normal).setThreadId(FCurrentThreadId);
+  message.setFrom(FStreamJid.eFull()).setType(Message::Normal).setThreadId(FCurrentThreadId);
   message.setSubject(ui.lneSubject->text());
   FMessenger->textToMessage(message,FEditWidget->document());
   if (!message.body().isEmpty())
@@ -337,7 +337,7 @@ void MessageWindow::onSendButtonClicked()
     QList<Jid> receiversList = FReceiversWidget->receivers();
     foreach(Jid receiver, receiversList)
     {
-      message.setTo(receiver.full());
+      message.setTo(receiver.eFull());
       sended = FMessenger->sendMessage(message,FStreamJid) ? true : sended;
     }
     if (sended)

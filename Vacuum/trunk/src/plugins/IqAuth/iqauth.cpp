@@ -30,7 +30,7 @@ bool IqAuth::start(const QDomElement &/*AElem*/)
   setAuth.setType("set").setTo(FXmppStream->jid().domane()).setId("auth"); 
   QDomElement query = setAuth.addElement("query",NS_JABBER_IQ_AUTH);
   query.appendChild(setAuth.createElement("username")).
-    appendChild(setAuth.createTextNode(FXmppStream->jid().node()));
+    appendChild(setAuth.createTextNode(FXmppStream->jid().eNode()));
   if (useDigest)
   {
     QByteArray shaDigest(40,' ');

@@ -131,7 +131,7 @@ bool SASLAuth::start(const QDomElement &AElem)
       FNeedHook = true;
       QByteArray resp;
       resp.append('\0')
-        .append(FXmppStream->jid().node().toUtf8())
+        .append(FXmppStream->jid().eNode().toUtf8())
         .append('\0')
         .append(FXmppStream->password().toUtf8());
       Stanza auth("auth");
@@ -188,7 +188,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
       if (realm.isEmpty())
         realm = FXmppStream->jid().domane();
       QByteArray _realm = realm.toUtf8(); 
-      QString user = FXmppStream->jid().node();
+      QString user = FXmppStream->jid().eNode();
       QString pass = FXmppStream->password();
       nonce = params.value("nonce");
       QByteArray randBytes(32,' ');
