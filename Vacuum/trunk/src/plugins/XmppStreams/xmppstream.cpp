@@ -361,7 +361,7 @@ void XmppStream::onParserElement(const QDomElement &AElem)
     if(AElem.tagName() == "stream:error")
     {
       ErrorHandler err(AElem,NS_XMPP_STREAMS);
-      emit error(this, err.meaning());
+      emit error(this, err.message());
 
       FConnection->disconnect();
     } 

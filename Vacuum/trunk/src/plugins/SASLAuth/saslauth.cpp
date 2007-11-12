@@ -167,14 +167,14 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
   {
     FNeedHook = false;
     ErrorHandler err(AElem->firstChild().toElement().tagName(),NS_FEATURE_SASL);
-    emit error(err.meaning()); 
+    emit error(err.message()); 
     return true;
   }
   else if (AElem->tagName() == "abort")
   {
     FNeedHook = false;
     ErrorHandler err("aborted",NS_FEATURE_SASL);
-    emit error(err.meaning()); 
+    emit error(err.message()); 
     return true;
   }
   else if (AElem->tagName() == "challenge")

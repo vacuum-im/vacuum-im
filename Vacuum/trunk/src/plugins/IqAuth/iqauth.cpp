@@ -72,7 +72,7 @@ bool IqAuth::hookElement(QDomElement *AElem,Direction ADirection)
     else if (AElem->attribute("type") == "error")
     {
       ErrorHandler err(*AElem);
-      emit error(err.meaning());
+      emit error(err.message());
       return true;
     };
   };

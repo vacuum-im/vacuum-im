@@ -81,6 +81,7 @@ public:
   static ErrorItem *itemByCodeCondition(int &ACode, const QString &ACondition, const QString &ANsURI = EHN_DEFAULT);
   static ErrorType typeByCode(int ACode, const QString &ANsURI = EHN_DEFAULT);
   static ErrorType typeByCondition(const QString &ACondition, const QString &ANsURI = EHN_DEFAULT);
+  static QString typeToString(ErrorType AErrorType);
   static int codeByCondition(const QString &ACondition, const QString &ANsURI = EHN_DEFAULT);
   static QString coditionByCode(int ACode, const QString &ANsURI = EHN_DEFAULT);
   static QString meaningByCode(int ACode, const QString &ANsURI = EHN_DEFAULT);

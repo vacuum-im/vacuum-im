@@ -92,7 +92,7 @@ Stanza Stanza::replyError(const QString &ACondition,
     code = ErrorHandler::codeByCondition(ACondition, ANamespace);
   else if (ACondition.isEmpty())
     condition = ErrorHandler::coditionByCode(code,ANamespace);
-  QString type = ErrorHandler::typeByCondition(condition,ANamespace);
+  QString type = ErrorHandler::typeToString(ErrorHandler::typeByCondition(condition,ANamespace));
 
   if (code != ErrorHandler::UNKNOWNCODE)
     errElem.setAttribute("code",code); 

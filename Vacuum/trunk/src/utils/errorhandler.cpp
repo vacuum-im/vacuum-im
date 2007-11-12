@@ -222,6 +222,23 @@ ErrorHandler::ErrorType ErrorHandler::typeByCondition(const QString &ACondition,
   return item != NULL ? item->type : UNKNOWNTYPE;
 }
 
+QString ErrorHandler::typeToString(ErrorType AErrorType)
+{
+  switch(AErrorType)
+  {
+  case CANCEL:
+    return "cancel";
+  case WAIT:
+    return "wait";
+  case MODIFY:
+    return "modify";
+  case AUTH:
+    return "auth";
+  default:
+    return "unknown";
+  }
+}
+
 int ErrorHandler::codeByCondition(const QString &ACondition, const QString &ANsURI)
 {
   ErrorItem *item = itemByCondition(ACondition,ANsURI);

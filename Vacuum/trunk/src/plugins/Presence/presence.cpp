@@ -55,7 +55,7 @@ bool Presence::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Sta
     {
       ErrorHandler err(AStanza.element());
       show = Error;
-      status = err.meaning();
+      status = err.message();
       priority = 0;
     }
     else
