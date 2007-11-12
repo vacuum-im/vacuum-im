@@ -295,7 +295,7 @@ void EditStatusDialog::onAddbutton(bool)
       tblStatus->editItem(message);
     }
     else
-      QMessageBox::warning(this,tr("Wrong status name"),tr("Status with name '<b>%1</b>' allready exists").arg(statusName));
+      QMessageBox::warning(this,tr("Wrong status name"),tr("Status with name '<b>%1</b>' allready exists").arg(Qt::escape(statusName)));
 
   }
 }

@@ -2,6 +2,7 @@
 
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QTextDocument>
 
 ProfileDialog::ProfileDialog(ISettingsPlugin *ASettingsPlugin)
 {
@@ -118,7 +119,7 @@ void ProfileDialog::onRenameProfileClicked()
       }
     }
     else
-      QMessageBox::information(this,tr("Renaming profile"),tr("Profile <b>%1</b> allready exists.").arg(profileTo));
+      QMessageBox::information(this,tr("Renaming profile"),tr("Profile <b>%1</b> allready exists.").arg(Qt::escape(profileTo)));
   }
 }
 
@@ -132,7 +133,7 @@ void ProfileDialog::onRemoveProfileClicked()
     if (FOldProfiles.contains(oldProfile) || !FRenamedProfiles.key(oldProfile).isEmpty())
     {
       button = QMessageBox::question(this,tr("Removing profile"),
-        tr("Are you sure that wish to remove profile <b>%1</b> with accounts?").arg(oldProfile),
+        tr("Are you sure that wish to remove profile <b>%1</b> with accounts?").arg(Qt::escape(oldProfile)),
         QMessageBox::Yes|QMessageBox::No);
     }
     if (button == QMessageBox::Yes)

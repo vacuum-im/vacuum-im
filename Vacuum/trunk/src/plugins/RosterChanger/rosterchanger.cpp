@@ -490,7 +490,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid,
   if (FTrayManager)
   {
     subsItem->trayId = FTrayManager->appendNotify(FSystemIconset->iconByName(IN_EVENTS),
-      tr("Subscription message from %1").arg(AFromJid.hFull()),true);
+      tr("Subscription message from %1").arg(AFromJid.full()),true);
   }
 
   if (FRostersView && FRostersModel)
