@@ -10,9 +10,6 @@
 #define IDR_MAX_ICON_COLUMNS          Qt::UserRole+1
 #define IDR_MAX_ICON_ROWS             Qt::UserRole+2
 
-#define DEFAULT_MAX_COLUMNS           15
-#define DEFAULT_MAX_ROWS              1
-
 class UTILS_EXPORT IconsetDelegate :
   public QItemDelegate
 {
@@ -22,6 +19,7 @@ public:
   virtual QSize sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 protected:
   virtual void drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+  virtual bool editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex);
 };
 
 #endif // ICONSETDELEGATE_H
