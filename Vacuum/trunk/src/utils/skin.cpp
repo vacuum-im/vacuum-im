@@ -55,6 +55,11 @@ QByteArray SkinIconset::fileData(const QString &AFileName) const
   return data.isEmpty() ? FDefIconset.fileData(AFileName) : data;
 }
 
+const IconsetInfo &SkinIconset::info() const
+{
+  return FIconset.isValid() ? FIconset.info() : FDefIconset.info();
+}
+
 QList<QString> SkinIconset::iconFiles() const
 {
   return summStringLists(FIconset.iconFiles(),FDefIconset.iconFiles());

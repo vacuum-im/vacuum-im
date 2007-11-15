@@ -26,6 +26,7 @@ public:
   const QString &fileName() const;
   bool openFile(const QString &AFileName);
   QByteArray fileData(const QString &AFileName) const;
+  const IconsetInfo &info() const;
   QList<QString> iconFiles() const;
   QList<QString> iconNames() const;
   QList<QString> tags(const QString &AFileName = "") const;
