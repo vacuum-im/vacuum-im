@@ -74,7 +74,7 @@ void ViewWidget::showMessage(const Message &AMessage)
     if (FMessenger->checkOption(IMessenger::ShowHTML))
       table->cellAt(0,1).lastCursorPosition().insertHtml(getHtmlBody(messageDoc.toHtml()));
     else
-      table->cellAt(0,1).lastCursorPosition().insertText(messageDoc.toPlainText().trimmed(),messageFormat);
+      table->cellAt(0,1).lastCursorPosition().insertText(messageDoc.toPlainText(),messageFormat);
 
     if (scrollAtEnd)
       textBrowser()->verticalScrollBar()->setSliderPosition(textBrowser()->verticalScrollBar()->maximum());

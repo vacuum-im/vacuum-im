@@ -210,7 +210,7 @@ void Messenger::writeMessage(Message &AMessage, QTextDocument *ADocument, const 
 {
   if (AOrder == MWO_MESSENGER)
   {
-    AMessage.setBody(ADocument->toPlainText(),ALang);
+    AMessage.setBody(prepareBodyForSend(ADocument->toPlainText()),ALang);
   }
 }
 
@@ -219,7 +219,7 @@ void Messenger::writeText(Message &AMessage, QTextDocument *ADocument, const QSt
   if (AOrder == MWO_MESSENGER)
   {
     QTextCursor cursor(ADocument);
-    cursor.insertText(AMessage.body(ALang));
+    cursor.insertText(prepareBodyForReceive(AMessage.body(ALang)));
   }
   else if (AOrder == MWO_MESSENGER_ANCHORS)
   {
@@ -600,6 +600,20 @@ void Messenger::deleteStreamWindows(const Jid &AStreamJid)
       window->close();
       window->deleteLater();
     }
+}
+
+QString Messenger::prepareBodyForSend(const QString &AString) const
+{
+  QString result = AString.trimmed();
+  result.remove(QChar::ObjectReplacementCharacter);
+  return result;
+}
+
+QString Messenger::prepareBodyForReceive(const QString &AString) const
+{
+  QString result = AString.trimmed();
+  result.remove(QChar::ObjectReplacementCharacter);
+  return result;
 }
 
 void Messenger::onStreamAdded(IXmppStream *AXmppStream)

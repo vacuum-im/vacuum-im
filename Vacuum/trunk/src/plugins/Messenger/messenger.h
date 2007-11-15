@@ -127,6 +127,8 @@ protected:
   void unNotifyMessage(int AMessageId);
   void removeStreamMessages(const Jid &AStreamJid);
   void deleteStreamWindows(const Jid &AStreamJid);
+  QString prepareBodyForSend(const QString &AString) const;
+  QString prepareBodyForReceive(const QString &AString) const;
 protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
