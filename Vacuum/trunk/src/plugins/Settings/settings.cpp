@@ -247,11 +247,10 @@ QVariant Settings::stringToVariant(const QString &AString, QVariant::Type AType,
   }
   else if (AType == QVariant::StringList)
   {
-    QStringList list = AString.split(" || ");
-    if (!list.isEmpty())
-      return list;
-    else
-      return ADefault;
+    QStringList list;
+    if (!AString.isEmpty())
+      AString.split(" || ");
+    return list;
   }
   else
     return QVariant(AString);
