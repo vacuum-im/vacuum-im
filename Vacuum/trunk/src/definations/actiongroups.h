@@ -31,4 +31,7 @@
 #define AG_STATUSCHANGER_STATUSMENU_STREAMS                     350
 #define AG_STATUSCHANGER_STATUSMENU_CUSTOM_MENU                 400
 
+//EditWidgetToolbar
+#define AG_EMOTICONS_EDITWIDGET                                 500
+
 #endif

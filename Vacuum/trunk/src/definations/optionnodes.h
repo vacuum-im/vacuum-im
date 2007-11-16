@@ -5,5 +5,6 @@
 #define ON_STATUSICONS                              "StatusIcons"
 #define ON_ROSTER                                   "Roster"
 #define ON_MESSAGES                                 "Messages"
+#define ON_EMOTICONS                                "Emoticons"
 
 #endif

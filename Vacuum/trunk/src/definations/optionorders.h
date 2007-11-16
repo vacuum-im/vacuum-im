@@ -12,4 +12,7 @@
 //Node = "Roster"
 #define OO_ROSTER                                 500
 
+//Node = "Emoticons"
+#define OO_EMOTICONS                              500
+
 #endif
