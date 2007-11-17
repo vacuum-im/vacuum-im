@@ -2,6 +2,7 @@
 #define TOOLBARCHANGER_H
 
 #include <QToolBar>
+#include <QToolButton>
 #include "utilsexport.h"
 #include "menu.h"
 
@@ -14,7 +15,8 @@ public:
   ~ToolBarChanger();
   QToolBar *toolBar() const { return FToolBar; }
   void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
-  QAction *addWidget(QWidget *AWidget, int AGroup = AG_DEFAULT);
+  void addToolButton(Action *AAction, Qt::ToolButtonStyle AStyle, QToolButton::ToolButtonPopupMode AMode, int AGroup = AG_DEFAULT, bool ASort = false);
+  QAction *addWidget(QWidget *AWidget,  int AGroup = AG_DEFAULT);
   int actionGroup(const Action *AAction) const;
   QList<Action *> actions(int AGroup = AG_NULL) const;
   QList<Action *> findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu = false) const;
@@ -41,6 +43,7 @@ private:
   Menu *FToolBarMenu;
   QHash<QWidget *, QAction *> FWidgetActions;
   QHash<QAction *, QAction *> FBarSepByMenuSep;
+  QHash<Action *, QToolButton *> FActionButtons;
 };
 
 #endif // TOOLBARCHANGER_H

@@ -287,7 +287,7 @@ void Emoticons::insertSelectIconMenu(const QString &AIconsetFile)
   {
     SelectIconMenu *menu = createSelectIconMenu(AIconsetFile,widget);
     FEditWidgetByMenu.insert(menu,widget);
-    widget->toolBarChanger()->addAction(menu->menuAction(),AG_EMOTICONS_EDITWIDGET);
+    widget->toolBarChanger()->addToolButton(menu->menuAction(),Qt::ToolButtonIconOnly,QToolButton::InstantPopup,AG_EMOTICONS_EDITWIDGET);
   }
 }
 
@@ -314,7 +314,7 @@ void Emoticons::onEditWidgetCreated(IEditWidget *AWidget)
   {
     SelectIconMenu *menu = createSelectIconMenu(iconsetFile,AWidget);
     FEditWidgetByMenu.insert(menu,AWidget);
-    AWidget->toolBarChanger()->addAction(menu->menuAction(),AG_EMOTICONS_EDITWIDGET);
+    AWidget->toolBarChanger()->addToolButton(menu->menuAction(),Qt::ToolButtonIconOnly,QToolButton::InstantPopup,AG_EMOTICONS_EDITWIDGET);
   }
   connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onEditWidgetDestroyed(QObject *)));
 }
