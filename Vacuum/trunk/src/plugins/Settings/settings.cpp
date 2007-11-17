@@ -158,8 +158,7 @@ void Settings::updatePluginNode()
   FPluginNode = FSettingsPlugin->pluginNode(FPluginId);
 }
 
-QDomElement Settings::getElement(const QString &AName, const QString &ANameNS, 
-                                 bool ACreate) const
+QDomElement Settings::getElement(const QString &AName, const QString &ANameNS, bool ACreate) const
 {
   if (!isSettingsOpened() || AName.isEmpty())
     return QDomElement();
@@ -240,16 +239,13 @@ QVariant Settings::stringToVariant(const QString &AString, QVariant::Type AType,
   else if (AType == QVariant::ByteArray)
   {
     QByteArray result = qUncompress(QByteArray::fromBase64(AString.toLatin1()));
-    if (!result.isNull()) 
-      return result;
-    else
-     return ADefault;
+    return result;
   }
   else if (AType == QVariant::StringList)
   {
     QStringList list;
     if (!AString.isEmpty())
-      AString.split(" || ");
+      list = AString.split(" || ");
     return list;
   }
   else
