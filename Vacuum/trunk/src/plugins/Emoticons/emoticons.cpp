@@ -274,7 +274,6 @@ void Emoticons::createIconsetUrls()
 SelectIconMenu *Emoticons::createSelectIconMenu(const QString &AIconsetFile, QWidget *AParent)
 {
   SelectIconMenu *menu = new SelectIconMenu(AParent);
-  menu->setTitle(tr("Smiley"));
   menu->setIconset(AIconsetFile);
   connect(menu->instance(),SIGNAL(iconSelected(const QString &, const QString &)),
     SLOT(onIconSelected(const QString &, const QString &)));

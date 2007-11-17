@@ -1,11 +1,11 @@
 FORMS = emoticonsoptions.ui
 
-HEADERS = selecticonwidgwt.h \
+HEADERS = selecticonwidget.h \
           selecticonmenu.h \
           emoticonsoptions.h \
           emoticons.h
 
-SOURCES = selecticonwidgwt.cpp \
+SOURCES = selecticonwidget.cpp \
           selecticonmenu.cpp \
           emoticonsoptions.cpp \
           emoticons.cpp 

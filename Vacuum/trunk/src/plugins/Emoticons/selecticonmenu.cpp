@@ -35,15 +35,25 @@ void SelectIconMenu::setTitle(const QString &ATitle)
 
 void SelectIconMenu::setIconset(const QString &AFileName)
 {
+  if (!FIconset.isEmpty())
+  {
+    SkinIconset *iconset = Skin::getSkinIconset(FIconset);
+    disconnect(iconset,SIGNAL(iconsetChanged()),this,SLOT(onSkinIconsetChanged()));
+  }
   FIconset = AFileName;
-  SkinIconset *iconset = Skin::getSkinIconset(AFileName);
-  setIcon(iconset->iconByFile(iconset->iconFiles().value(0)));
-  connect(iconset,SIGNAL(iconsetChanged()),SLOT(onSkinIconsetChanged()));
+  if (!FIconset.isEmpty())
+  {
+    SkinIconset *iconset = Skin::getSkinIconset(FIconset);
+    connect(iconset,SIGNAL(iconsetChanged()),SLOT(onSkinIconsetChanged()));
+    onSkinIconsetChanged();
+  }
+  else
+    setEnabled(false);
 }
 
 QSize SelectIconMenu::sizeHint() const
 {
-  return FLayout->sizeHint();
+  return FSizeHint;
 }
 
 void SelectIconMenu::createWidget()
@@ -51,6 +61,7 @@ void SelectIconMenu::createWidget()
   destroyWidget();
   FWidget = new SelectIconWidget(FIconset,this);
   FLayout->addWidget(FWidget);
+  FSizeHint = FLayout->sizeHint();
   connect(FWidget,SIGNAL(iconSelected(const QString &, const QString &)),SIGNAL(iconSelected(const QString &, const QString &)));
 }
 
@@ -74,6 +85,7 @@ void SelectIconMenu::onAboutToShow()
 void SelectIconMenu::onSkinIconsetChanged()
 {
   SkinIconset *iconset = Skin::getSkinIconset(FIconset);
+  setTitle(iconset->tags().value(0));
   setIcon(iconset->iconByFile(iconset->iconFiles().value(0)));
   setEnabled(iconset->isValid());
 }

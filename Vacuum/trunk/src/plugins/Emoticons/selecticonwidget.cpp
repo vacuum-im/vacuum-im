@@ -76,7 +76,7 @@ bool SelectIconWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
   }
   else if (AEvent->type() == QEvent::MouseButtonRelease)
   {
-    if (FPressed = label)
+    if (FPressed == label)
       emit iconSelected(FIconsetFile,FFileByLabel.value(label));
     FPressed = NULL;
   }

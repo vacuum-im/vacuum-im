@@ -36,6 +36,7 @@ protected slots:
   void onAboutToShow();
   void onSkinIconsetChanged();
 private:
+  QSize FSizeHint;
   QVBoxLayout *FLayout;    
   QString FIconset;
   SelectIconWidget * FWidget;
