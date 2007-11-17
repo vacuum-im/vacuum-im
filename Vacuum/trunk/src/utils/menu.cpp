@@ -146,18 +146,24 @@ void Menu::removeAction(Action *AAction)
   {
     disconnect(AAction,SIGNAL(actionDestroyed(Action *)),this,SLOT(onActionDestroyed(Action *)));
 
-    emit actionRemoved(AAction);
-
     if (FActions.values(it.key()).count() == 1)
     {
       QAction *separator = FSeparators.value(it.key());
       FSeparators.remove(it.key());
-      emit separatorRemoved(separator);
       QMenu::removeAction(separator);  
+      emit separatorRemoved(separator);
     }
 
     FActions.erase(it);
     QMenu::removeAction(AAction);
+
+    emit actionRemoved(AAction);
+
+    Menu *menu = AAction->menu();
+    if (menu && menu->parent() == this)
+      menu->deleteLater();
+    else if (AAction->parent() == this)
+      AAction->deleteLater();
   }
 }
 
@@ -205,17 +211,8 @@ QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> AData, bool AS
 
 void Menu::clear() 
 {
-  Action * action;
-  foreach(action,FActions)
-  {
-    Menu *menu = action->menu();
-    if (menu && menu->parent() == this)
-      delete menu;
-    else if (action->parent() == this)
-      delete action;
-  }
-  FSeparators.clear();
-  FActions.clear();
+  foreach(Action *action,FActions)
+    removeAction(action);
   QMenu::clear(); 
 }
 

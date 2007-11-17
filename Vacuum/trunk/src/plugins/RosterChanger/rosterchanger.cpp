@@ -805,7 +805,6 @@ void RosterChanger::onRosterClosed(IRoster *ARoster)
     FActions.remove(ARoster);
     if (FActions.count() == 0)
       FAddContactMenu->menuAction()->setEnabled(false);
-    delete action;
   }
 
   Jid streamJid = ARoster->streamJid();
