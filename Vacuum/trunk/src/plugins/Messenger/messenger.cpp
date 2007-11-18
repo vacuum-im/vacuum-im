@@ -438,6 +438,13 @@ IReceiversWidget *Messenger::newReceiversWidget(const Jid &AStreamJid)
   return widget;
 }
 
+IToolBarWidget *Messenger::newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
+{
+  IToolBarWidget *widget = new ToolBarWidget(AInfo,AView,AEdit,AReceivers);
+  emit toolBarWidgetCreated(widget);
+  return widget;
+}
+
 IMessageWindow *Messenger::openMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
 {
   IMessageWindow *window = findMessageWindow(AStreamJid,AContactJid);

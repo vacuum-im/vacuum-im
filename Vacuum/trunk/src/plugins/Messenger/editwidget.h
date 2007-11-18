@@ -16,9 +16,6 @@ public:
   virtual void setStreamJid(const Jid &AStreamJid);
   virtual const Jid &contactJid() const { return FContactJid; }
   virtual void setContactJid(const Jid &AContactJid);
-  virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
-  virtual void addToolBar(QToolBar *AToolBar);
-  virtual void removeToolBar(QToolBar *AToolBar);
   virtual QTextEdit *textEdit() const { return ui.tedEditor; }
   virtual QTextDocument *document() const { return ui.tedEditor->document(); }
   virtual void sendMessage();
@@ -36,8 +33,6 @@ protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
   Ui::EditWidgetClass ui;
-  QVBoxLayout *FToolBarLayout;
-  ToolBarChanger *FToolBarChanger;
 private:
   IMessenger *FMessenger;
 private:

@@ -119,7 +119,10 @@
                  </sizepolicy>
                 </property>
                 <property name="frameShape" >
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::Panel</enum>
+                </property>
+                <property name="frameShadow" >
+                 <enum>QFrame::Sunken</enum>
                 </property>
                 <property name="text" >
                  <string/>
@@ -163,7 +166,10 @@
               <item>
                <widget class="QLabel" name="lblAccount" >
                 <property name="frameShape" >
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::Panel</enum>
+                </property>
+                <property name="frameShadow" >
+                 <enum>QFrame::Sunken</enum>
                 </property>
                 <property name="text" >
                  <string/>
@@ -215,7 +221,10 @@
                </sizepolicy>
               </property>
               <property name="frameShape" >
-               <enum>QFrame::StyledPanel</enum>
+               <enum>QFrame::Panel</enum>
+              </property>
+              <property name="frameShadow" >
+               <enum>QFrame::Sunken</enum>
               </property>
               <property name="wordWrap" >
                <bool>true</bool>
@@ -267,7 +276,10 @@
                  </sizepolicy>
                 </property>
                 <property name="frameShape" >
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::Panel</enum>
+                </property>
+                <property name="frameShadow" >
+                 <enum>QFrame::Sunken</enum>
                 </property>
                 <property name="text" >
                  <string/>
@@ -314,7 +326,10 @@
               <item>
                <widget class="QLabel" name="lblClient" >
                 <property name="frameShape" >
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::Panel</enum>
+                </property>
+                <property name="frameShadow" >
+                 <enum>QFrame::Sunken</enum>
                 </property>
                 <property name="text" >
                  <string/>

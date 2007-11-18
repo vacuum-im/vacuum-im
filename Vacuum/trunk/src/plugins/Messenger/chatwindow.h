@@ -24,6 +24,7 @@ public:
   virtual IInfoWidget *infoWidget() const { return FInfoWidget; }
   virtual IViewWidget *viewWidget() const { return FViewWidget; }
   virtual IEditWidget *editWidget() const { return FEditWidget; }
+  virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
   virtual void showWindow();
   virtual void closeWindow();
 signals:
@@ -64,6 +65,7 @@ private:
   IInfoWidget *FInfoWidget;
   IViewWidget *FViewWidget;
   IEditWidget *FEditWidget;
+  IToolBarWidget *FToolBarWidget;
 private:
   int FOptions;
   bool FSplitterLoaded;

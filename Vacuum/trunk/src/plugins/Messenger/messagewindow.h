@@ -30,6 +30,8 @@ public:
   virtual IViewWidget *viewWidget() const { return FViewWidget; }
   virtual IEditWidget *editWidget() const { return FEditWidget; }
   virtual IReceiversWidget *receiversWidget() const { return FReceiversWidget; }
+  virtual IToolBarWidget *viewToolBarWidget() const { return FViewToolBarWidget; }
+  virtual IToolBarWidget *editToolBarWidget() const { return FEditToolBarWidget; }
   virtual Mode mode() const { return FMode; }
   virtual void setMode(Mode AMode);
   virtual void showWindow();
@@ -73,6 +75,8 @@ private:
   IViewWidget *FViewWidget;
   IEditWidget *FEditWidget;
   IReceiversWidget *FReceiversWidget;
+  IToolBarWidget *FViewToolBarWidget;
+  IToolBarWidget *FEditToolBarWidget;
 private:
   IMessenger *FMessenger;
   IPresence *FPresence;

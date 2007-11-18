@@ -69,8 +69,8 @@ protected:
   void insertSelectIconMenu(const QString &AIconsetFile);
   void removeSelectIconMenu(const QString &AIconsetFile);
 protected slots:
-  void onEditWidgetCreated(IEditWidget *AWidget);
-  void onEditWidgetDestroyed(QObject *AObject);
+  void onToolBarWidgetCreated(IToolBarWidget *AWidget);
+  void onToolBarWidgetDestroyed(QObject *AObject);
   void onIconSelected(const QString &AIconsetFile, const QString &AIconFile);
   void onSelectIconMenuDestroyed(QObject *AObject);
   void onSkinAboutToBeChanged();
@@ -86,8 +86,8 @@ private:
 private:
   QPointer<EmoticonsOptions> FEmoticonsOptions;
 private:
-  QList<IEditWidget *> FEditWidgets;
-  QHash<SelectIconMenu *, IEditWidget *> FEditWidgetByMenu;
+  QList<IToolBarWidget *> FToolBarsWidgets;
+  QHash<SelectIconMenu *, IToolBarWidget *> FToolBarWidgetByMenu;
   QStringList FIconsets;
   QHash<QString,QUrl> FUrlByTag;
   mutable QHash<QString,QIcon> FIconByUrl;

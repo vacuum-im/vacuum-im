@@ -21,7 +21,6 @@ public:
   virtual void setContactJid(const Jid &AContactJid);
   virtual QTextBrowser *textBrowser() const { return ui.tedViewer; }
   virtual QTextDocument *document() const { return ui.tedViewer->document(); }
-  virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
   virtual ShowKind showKind() const { return FShowKind; }
   virtual void setShowKind(ShowKind AKind);
   virtual void showMessage(const Message &AMessage);
@@ -43,8 +42,6 @@ protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
   Ui::ViewWidgetClass ui;
-  QVBoxLayout *FToolBarLayout;
-  ToolBarChanger *FToolBarChanger;
 private:
   IMessenger *FMessenger;
 private:

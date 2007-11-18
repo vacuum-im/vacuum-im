@@ -14,6 +14,7 @@ HEADERS = messenger.h \
           viewwidget.h \
           editwidget.h \
           receiverswidget.h \
+          toolbarwidget.h \
           chatwindow.h \
           messagewindow.h \
           tabwindow.h \
@@ -26,6 +27,7 @@ SOURCES = messenger.cpp \
           viewwidget.cpp \
           editwidget.cpp \
           receiverswidget.cpp \
+          toolbarwidget.cpp \
           chatwindow.cpp \
           messagewindow.cpp \
           tabwindow.cpp \

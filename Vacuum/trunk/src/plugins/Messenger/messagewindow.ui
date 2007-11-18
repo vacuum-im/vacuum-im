@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>604</width>
-    <height>417</height>
+    <height>423</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -44,21 +44,24 @@
        <number>0</number>
       </property>
       <widget class="QWidget" name="tabMessage" >
+       <property name="autoFillBackground" >
+        <bool>true</bool>
+       </property>
        <attribute name="title" >
         <string>Message</string>
        </attribute>
        <layout class="QVBoxLayout" >
         <property name="leftMargin" >
-         <number>4</number>
+         <number>2</number>
         </property>
         <property name="topMargin" >
-         <number>4</number>
+         <number>2</number>
         </property>
         <property name="rightMargin" >
-         <number>4</number>
+         <number>2</number>
         </property>
         <property name="bottomMargin" >
-         <number>4</number>
+         <number>2</number>
         </property>
         <item>
          <widget class="QWidget" native="1" name="wdtInfo" />
@@ -67,13 +70,13 @@
          <widget class="QWidget" native="1" name="wdtReceivers" >
           <layout class="QHBoxLayout" >
            <property name="leftMargin" >
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="topMargin" >
             <number>0</number>
            </property>
            <property name="rightMargin" >
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="bottomMargin" >
             <number>0</number>
@@ -94,7 +97,10 @@
               </sizepolicy>
              </property>
              <property name="frameShape" >
-              <enum>QFrame::StyledPanel</enum>
+              <enum>QFrame::Panel</enum>
+             </property>
+             <property name="frameShadow" >
+              <enum>QFrame::Sunken</enum>
              </property>
              <property name="text" >
               <string/>
@@ -112,6 +118,18 @@
         </item>
         <item>
          <layout class="QHBoxLayout" >
+          <property name="leftMargin" >
+           <number>2</number>
+          </property>
+          <property name="topMargin" >
+           <number>0</number>
+          </property>
+          <property name="rightMargin" >
+           <number>2</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>0</number>
+          </property>
           <item>
            <widget class="QLabel" name="lblSubject" >
             <property name="text" >
@@ -146,6 +164,9 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QWidget" native="1" name="wdtToolBar" />
         </item>
         <item>
          <widget class="QWidget" native="1" name="wdtMessage" >

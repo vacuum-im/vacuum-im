@@ -24,6 +24,9 @@ MessageWindow::MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, cons
   FCurrentThreadId = QUuid::createUuid().toString();
 
   FInfoWidget = FMessenger->newInfoWidget(AStreamJid,AContactJid);
+  ui.wdtInfo->setLayout(new QVBoxLayout);
+  ui.wdtInfo->layout()->addWidget(FInfoWidget);
+  ui.wdtInfo->layout()->setMargin(0);
 
   FViewWidget = FMessenger->newViewWidget(AStreamJid,AContactJid);
   FViewWidget->setShowKind(IViewWidget::SingleMessage);
@@ -32,18 +35,20 @@ MessageWindow::MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, cons
   FEditWidget = FMessenger->newEditWidget(AStreamJid,AContactJid);
   FEditWidget->setSendMessageKey(-1);
   FEditWidget->document()->setDefaultFont(FMessenger->defaultMessageFont());
+
   FReceiversWidget = FMessenger->newReceiversWidget(FStreamJid);
   connect(FReceiversWidget,SIGNAL(receiverAdded(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
   connect(FReceiversWidget,SIGNAL(receiverRemoved(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
 
-  ui.wdtTabs->setCurrentWidget(ui.tabMessage);
-
-  ui.wdtInfo->setLayout(new QVBoxLayout);
-  ui.wdtInfo->layout()->addWidget(FInfoWidget);
-  ui.wdtInfo->layout()->setMargin(0);
+  FViewToolBarWidget = FMessenger->newToolBarWidget(FInfoWidget,FViewWidget,NULL,NULL);
+  FEditToolBarWidget = FMessenger->newToolBarWidget(FInfoWidget,NULL,FEditWidget,NULL);
+  ui.wdtToolBar->setLayout(new QVBoxLayout);
+  ui.wdtToolBar->layout()->setMargin(0);
 
   ui.wdtMessage ->setLayout(new QVBoxLayout);
   ui.wdtMessage->layout()->setMargin(0);
+
+  ui.wdtTabs->setCurrentWidget(ui.tabMessage);
 
   connect(FMessenger->instance(),SIGNAL(messageReceived(const Message &)),SLOT(onMessageReceived(const Message &)));
   connect(FMessenger->instance(),SIGNAL(defaultMessageFontChanged(const QFont &)), SLOT(onDefaultMessageFontChanged(const QFont &)));
@@ -79,6 +84,8 @@ void MessageWindow::setMode(Mode AMode)
   {
     ui.wdtMessage->layout()->removeWidget(FEditWidget);
     ui.wdtMessage->layout()->addWidget(FViewWidget);
+    ui.wdtToolBar->layout()->removeWidget(FEditToolBarWidget);
+    ui.wdtToolBar->layout()->addWidget(FViewToolBarWidget);
     removeTabWidget(FReceiversWidget);
   }
   else
@@ -86,6 +93,8 @@ void MessageWindow::setMode(Mode AMode)
     FReceiversWidget->addReceiver(FContactJid);
     ui.wdtMessage->layout()->removeWidget(FViewWidget);
     ui.wdtMessage->layout()->addWidget(FEditWidget);
+    ui.wdtToolBar->layout()->removeWidget(FViewToolBarWidget);
+    ui.wdtToolBar->layout()->addWidget(FEditToolBarWidget);
     addTabWidget(FReceiversWidget);
   }
   ui.wdtReceivers->setVisible(FMode == WriteMode);

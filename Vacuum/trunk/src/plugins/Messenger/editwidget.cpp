@@ -10,14 +10,6 @@ EditWidget::EditWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   FSendMessageKey = Qt::Key_Return;
   ui.tedEditor->installEventFilter(this);
 
-  QToolBar *toolBar = new QToolBar(ui.wdtToolBar);
-  toolBar->setIconSize(QSize(16,16));
-  FToolBarLayout = new QVBoxLayout();
-  FToolBarLayout->setMargin(0);
-  FToolBarLayout->addWidget(toolBar);
-  ui.wdtToolBar->setLayout(FToolBarLayout);
-  FToolBarChanger = new ToolBarChanger(toolBar);
-
   FMessenger = AMessenger;
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
@@ -26,16 +18,6 @@ EditWidget::EditWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
 EditWidget::~EditWidget()
 {
 
-}
-
-void EditWidget::addToolBar(QToolBar *AToolBar)
-{
-  FToolBarLayout->addWidget(AToolBar);
-}
-
-void EditWidget::removeToolBar(QToolBar *AToolBar)
-{
-  FToolBarLayout->removeWidget(AToolBar);
 }
 
 void EditWidget::sendMessage()

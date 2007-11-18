@@ -29,9 +29,6 @@
     <number>2</number>
    </property>
    <item>
-    <widget class="QWidget" native="1" name="wdtToolBar" />
-   </item>
-   <item>
     <widget class="TextBrowser" name="tedViewer" >
      <property name="openExternalLinks" >
       <bool>false</bool>

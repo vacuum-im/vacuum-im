@@ -38,7 +38,7 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     FMessenger = qobject_cast<IMessenger *>(plugin->instance());
     if (FMessenger)
     {
-      connect(FMessenger->instance(),SIGNAL(editWidgetCreated(IEditWidget *)),SLOT(onEditWidgetCreated(IEditWidget *)));
+      connect(FMessenger->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
     }
   }
 
@@ -283,65 +283,73 @@ SelectIconMenu *Emoticons::createSelectIconMenu(const QString &AIconsetFile, QWi
 
 void Emoticons::insertSelectIconMenu(const QString &AIconsetFile)
 {
-  foreach(IEditWidget *widget, FEditWidgets)
+  foreach(IToolBarWidget *widget, FToolBarsWidgets)
   {
     SelectIconMenu *menu = createSelectIconMenu(AIconsetFile,widget);
-    FEditWidgetByMenu.insert(menu,widget);
+    FToolBarWidgetByMenu.insert(menu,widget);
     widget->toolBarChanger()->addToolButton(menu->menuAction(),Qt::ToolButtonIconOnly,QToolButton::InstantPopup,AG_EMOTICONS_EDITWIDGET);
   }
 }
 
 void Emoticons::removeSelectIconMenu(const QString &AIconsetFile)
 {
-  QList<SelectIconMenu *> menus;
-  foreach(SelectIconMenu *menu, FEditWidgetByMenu.keys())
+  QHash<SelectIconMenu *,IToolBarWidget *>::iterator it = FToolBarWidgetByMenu.begin();
+  while (it != FToolBarWidgetByMenu.end())
+  {
+    SelectIconMenu *menu = it.key();
+    IToolBarWidget *widget = it.value();
     if (menu->iconset() == AIconsetFile)
-      menus.append(menu);
-
-  foreach(SelectIconMenu *menu, menus)
-  {
-    IEditWidget *widget = FEditWidgetByMenu.value(menu);
-    widget->toolBarChanger()->removeWidget(widget);
-    FEditWidgetByMenu.remove(menu);
-    delete menu;
+    {
+      widget->toolBarChanger()->removeAction(menu->menuAction());
+      it = FToolBarWidgetByMenu.erase(it);
+      delete menu;
+    }
+    else
+      it++;
   }
 }
 
-void Emoticons::onEditWidgetCreated(IEditWidget *AWidget)
+void Emoticons::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 {
-  FEditWidgets.append(AWidget);
-  foreach(QString iconsetFile, FIconsets)
+  if (AWidget->editWidget() != NULL)
   {
-    SelectIconMenu *menu = createSelectIconMenu(iconsetFile,AWidget);
-    FEditWidgetByMenu.insert(menu,AWidget);
-    AWidget->toolBarChanger()->addToolButton(menu->menuAction(),Qt::ToolButtonIconOnly,QToolButton::InstantPopup,AG_EMOTICONS_EDITWIDGET);
+    FToolBarsWidgets.append(AWidget);
+    foreach(QString iconsetFile, FIconsets)
+    {
+      SelectIconMenu *menu = createSelectIconMenu(iconsetFile,AWidget);
+      FToolBarWidgetByMenu.insert(menu,AWidget);
+      AWidget->toolBarChanger()->addToolButton(menu->menuAction(),Qt::ToolButtonIconOnly,QToolButton::InstantPopup,AG_EMOTICONS_EDITWIDGET);
+    }
+    connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
   }
-  connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onEditWidgetDestroyed(QObject *)));
 }
 
-void Emoticons::onEditWidgetDestroyed(QObject *AObject)
+void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
 {
-  IEditWidget *widget = static_cast<IEditWidget *>(AObject);
-  FEditWidgets.removeAt(FEditWidgets.indexOf(widget));
+  IToolBarWidget *widget = static_cast<IToolBarWidget *>(AObject);
+  FToolBarsWidgets.removeAt(FToolBarsWidgets.indexOf(widget));
 }
 
 void Emoticons::onIconSelected(const QString &AIconsetFile, const QString &AIconFile)
 {
   SelectIconMenu *menu = qobject_cast<SelectIconMenu *>(sender());
-  IEditWidget *widget = FEditWidgetByMenu.value(menu);
-  if (widget)
+  if (FToolBarWidgetByMenu.contains(menu))
   {
-    SkinIconset *iconset = Skin::getSkinIconset(AIconsetFile);
-    QString text = iconset->tagValues(SMILEY_TAG_NAME,AIconFile).value(0);
-    widget->textEdit()->setFocus();
-    widget->textEdit()->textCursor().insertText(text);
-    widget->textEdit()->textCursor().insertText(" ");
+    IEditWidget *widget = FToolBarWidgetByMenu.value(menu)->editWidget();
+    if (widget)
+    {
+      SkinIconset *iconset = Skin::getSkinIconset(AIconsetFile);
+      QString text = iconset->tagValues(SMILEY_TAG_NAME,AIconFile).value(0);
+      widget->textEdit()->setFocus();
+      widget->textEdit()->textCursor().insertText(text);
+      widget->textEdit()->textCursor().insertText(" ");
+    }
   }
 }
 
 void Emoticons::onSelectIconMenuDestroyed(QObject *AObject)
 {
-  FEditWidgetByMenu.remove((SelectIconMenu *)AObject);
+  FToolBarWidgetByMenu.remove((SelectIconMenu *)AObject);
 }
 
 void Emoticons::onSkinAboutToBeChanged()

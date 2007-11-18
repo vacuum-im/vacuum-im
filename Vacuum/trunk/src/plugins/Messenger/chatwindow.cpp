@@ -38,13 +38,18 @@ ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   ui.wdtView->setLayout(new QVBoxLayout);
   ui.wdtView->layout()->addWidget(FViewWidget);
   ui.wdtView->layout()->setMargin(0);
+  ui.wdtView->layout()->setSpacing(0);
 
   FEditWidget = FMessenger->newEditWidget(AStreamJid,AContactJid);
   FEditWidget->document()->setDefaultFont(FMessenger->defaultChatFont());
   ui.wdtEdit->setLayout(new QVBoxLayout);
   ui.wdtEdit->layout()->addWidget(FEditWidget);
   ui.wdtEdit->layout()->setMargin(0);
+  ui.wdtEdit->layout()->setSpacing(0);
   connect(FEditWidget,SIGNAL(messageReady()),SLOT(onMessageReady()));
+
+  FToolBarWidget = FMessenger->newToolBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL);
+  ui.wdtView->layout()->addWidget(FToolBarWidget);
 
   ui.sprSplitter->setStretchFactor(0,20);
   ui.sprSplitter->setStretchFactor(1,1);

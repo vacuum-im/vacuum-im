@@ -22,6 +22,7 @@
 #include "editwidget.h"
 #include "viewwidget.h"
 #include "receiverswidget.h"
+#include "toolbarwidget.h"
 #include "tabwindow.h"
 #include "messengeroptions.h"
 
@@ -85,6 +86,7 @@ public:
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IReceiversWidget *newReceiversWidget(const Jid &AStreamJid);
+  virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
   virtual QList<IMessageWindow *> messageWindows() const { return FMessageWindows; }
   virtual IMessageWindow *openMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
   virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid);
@@ -116,6 +118,7 @@ signals:
   virtual void viewWidgetCreated(IViewWidget *AViewWidget);
   virtual void editWidgetCreated(IEditWidget *AEditWidget);
   virtual void receiversWidgetCreated(IReceiversWidget *AReceiversWidget);
+  virtual void toolBarWidgetCreated(IToolBarWidget *AToolBarWidget);
   virtual void messageWindowCreated(IMessageWindow *AWindow);
   virtual void messageWindowDestroyed(IMessageWindow *AWindow);
   virtual void chatWindowCreated(IChatWindow *AWindow);

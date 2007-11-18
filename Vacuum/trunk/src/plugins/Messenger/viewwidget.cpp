@@ -20,14 +20,6 @@ ViewWidget::ViewWidget(IMessenger *AMessenger, const Jid &AStreamJid, const Jid 
 
   ui.tedViewer->installEventFilter(this);
 
-  QToolBar *toolBar = new QToolBar(ui.wdtToolBar);
-  toolBar->setIconSize(QSize(16,16));
-  FToolBarLayout = new QVBoxLayout();
-  FToolBarLayout->setMargin(0);
-  FToolBarLayout->addWidget(toolBar);
-  ui.wdtToolBar->setLayout(FToolBarLayout);
-  FToolBarChanger = new ToolBarChanger(toolBar);
-
   setColorForJid(FStreamJid,Qt::red);
   setColorForJid(FContactJid,Qt::blue);
 }

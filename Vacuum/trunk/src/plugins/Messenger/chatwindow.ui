@@ -12,6 +12,9 @@
   <property name="windowTitle" >
    <string>ChatWindow</string>
   </property>
+  <property name="autoFillBackground" >
+   <bool>true</bool>
+  </property>
   <widget class="QWidget" name="centralWidget" >
    <layout class="QVBoxLayout" >
     <property name="spacing" >
@@ -34,6 +37,12 @@
     </item>
     <item>
      <widget class="QSplitter" name="sprSplitter" >
+      <property name="sizePolicy" >
+       <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="orientation" >
        <enum>Qt::Vertical</enum>
       </property>
@@ -52,7 +61,7 @@
      <x>0</x>
      <y>0</y>
      <width>445</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

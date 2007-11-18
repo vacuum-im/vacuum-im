@@ -60,7 +60,6 @@ public:
   virtual void setContactJid(const Jid &AContactJid) =0;
   virtual QTextBrowser *textBrowser() const =0;
   virtual QTextDocument *document() const =0;
-  virtual ToolBarChanger *toolBarChanger() const =0;
   virtual ShowKind showKind() const =0;
   virtual void setShowKind(ShowKind AKind) =0;
   virtual void showMessage(const Message &AMessage) =0;
@@ -87,9 +86,6 @@ public:
   virtual void setStreamJid(const Jid &AStreamJid) =0;
   virtual const Jid &contactJid() const =0;
   virtual void setContactJid(const Jid &AContactJid) =0;
-  virtual ToolBarChanger *toolBarChanger() const =0;
-  virtual void addToolBar(QToolBar *AToolBar) =0;
-  virtual void removeToolBar(QToolBar *AToolBar) =0;
   virtual QTextEdit *textEdit() const =0;
   virtual QTextDocument *document() const =0;
   virtual void sendMessage() =0;
@@ -121,6 +117,17 @@ signals:
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void receiverAdded(const Jid &AReceiver) =0;
   virtual void receiverRemoved(const Jid &AReceiver) =0;
+};
+
+class IToolBarWidget :
+  public QToolBar
+{
+public:
+  virtual ToolBarChanger *toolBarChanger() const =0;
+  virtual IInfoWidget *infoWidget() const =0;
+  virtual IViewWidget *viewWidget() const =0;
+  virtual IEditWidget *editWidget() const =0;
+  virtual IReceiversWidget *receiversWidget() const =0;
 };
 
 class ITabWidget 
@@ -166,6 +173,7 @@ public:
   virtual IInfoWidget *infoWidget() const =0;
   virtual IViewWidget *viewWidget() const =0;
   virtual IEditWidget *editWidget() const =0;
+  virtual IToolBarWidget *toolBarWidget() const =0;
   virtual void showWindow() =0;
   virtual void closeWindow() =0;
 signals:
@@ -195,6 +203,8 @@ public:
   virtual IViewWidget *viewWidget() const =0;
   virtual IEditWidget *editWidget() const =0;
   virtual IReceiversWidget *receiversWidget() const =0;
+  virtual IToolBarWidget *viewToolBarWidget() const =0;
+  virtual IToolBarWidget *editToolBarWidget() const =0;
   virtual Mode mode() const =0;
   virtual void setMode(Mode AMode) =0;
   virtual void showWindow() =0;
@@ -258,6 +268,7 @@ public:
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IReceiversWidget *newReceiversWidget(const Jid &AStreamJid) =0;
+  virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers) =0;
   virtual QList<IMessageWindow *> messageWindows() const =0;
   virtual IMessageWindow *openMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
   virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
@@ -289,6 +300,7 @@ signals:
   virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
   virtual void editWidgetCreated(IEditWidget *AEditWidget) =0;
   virtual void receiversWidgetCreated(IReceiversWidget *AReceiversWidget) =0;
+  virtual void toolBarWidgetCreated(IToolBarWidget *AToolBarWidget) =0;
   virtual void messageWindowCreated(IMessageWindow *AWindow) =0;
   virtual void messageWindowDestroyed(IMessageWindow *AWindow) =0;
   virtual void chatWindowCreated(IChatWindow *AWindow) =0;
@@ -301,6 +313,7 @@ Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
 Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.0")
 Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.0")
 Q_DECLARE_INTERFACE(IReceiversWidget,"Vacuum.Plugin.IReceiversWidget/1.0")
+Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")
 Q_DECLARE_INTERFACE(ITabWidget,"Vacuum.Plugin.ITabWidget/1.0")
 Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.0")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")
