@@ -1,6 +1,7 @@
 #ifndef TOOLBARCHANGER_H
 #define TOOLBARCHANGER_H
 
+#include <QEvent>
 #include <QToolBar>
 #include <QToolButton>
 #include "utilsexport.h"
@@ -13,6 +14,7 @@ class UTILS_EXPORT ToolBarChanger :
 public:
   ToolBarChanger(QToolBar *AToolBar);
   ~ToolBarChanger();
+  bool isEmpty() const;
   QToolBar *toolBar() const { return FToolBar; }
   void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
   void addToolButton(Action *AAction, Qt::ToolButtonStyle AStyle, QToolButton::ToolButtonPopupMode AMode, int AGroup = AG_DEFAULT, bool ASort = false);
@@ -32,6 +34,10 @@ signals:
   void actionRemoved(Action *AAction);
   void widgetRemoved(QWidget *AWidget, QAction *AAction);
   void toolBarChangerDestroyed(ToolBarChanger *AToolBarChanger);
+protected:
+  void updateVisible();
+protected:
+  virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
   void onActionInserted(QAction *ABefour, Action *AAction);
   void onSeparatorInserted(Action *ABefour, QAction *ASeparator);
@@ -39,6 +45,8 @@ protected slots:
   void onActionRemoved(Action *AAction);
   void onWidgetDestroyed(QObject *AObject);
 private:
+  int FChangingIntVisible;
+  bool FIntVisible, FExtVisible;
   QToolBar *FToolBar;
   Menu *FToolBarMenu;
   QHash<QWidget *, QAction *> FWidgetActions;

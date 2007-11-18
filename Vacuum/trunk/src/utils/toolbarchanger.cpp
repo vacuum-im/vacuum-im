@@ -4,18 +4,27 @@ ToolBarChanger::ToolBarChanger(QToolBar *AToolBar) : QObject(AToolBar)
 {
   FToolBar = AToolBar;
   FToolBar->clear();
-  FToolBar->setVisible(false);
+  FIntVisible = false;
+  FExtVisible = FToolBar->isVisible();
+  FChangingIntVisible = 0;
+  FToolBar->installEventFilter(this);
   FToolBarMenu = new Menu;
   connect(FToolBarMenu,SIGNAL(actionInserted(QAction *, Action *)),SLOT(onActionInserted(QAction *, Action *)));
   connect(FToolBarMenu,SIGNAL(separatorInserted(Action *, QAction *)),SLOT(onSeparatorInserted(Action *, QAction *)));
   connect(FToolBarMenu,SIGNAL(separatorRemoved(QAction *)),SLOT(onSeparatorRemoved(QAction *)));
   connect(FToolBarMenu,SIGNAL(actionRemoved(Action *)),SLOT(onActionRemoved(Action *)));
+  updateVisible();
 }
 
 ToolBarChanger::~ToolBarChanger()
 {
   emit toolBarChangerDestroyed(this);
   delete FToolBarMenu;
+}
+
+bool ToolBarChanger::isEmpty() const
+{
+  return FToolBarMenu->isEmpty() && FWidgetActions.isEmpty();
 }
 
 void ToolBarChanger::addAction(Action *AAction, int AGroup, bool ASort)
@@ -39,9 +48,9 @@ QAction *ToolBarChanger::addWidget(QWidget *AWidget, int AGroup)
   QAction *befour = FToolBarMenu->nextGroupSeparator(AGroup);
   QAction *action = befour != NULL ? FToolBar->insertWidget(befour,AWidget) : FToolBar->addWidget(AWidget);
   FWidgetActions.insert(AWidget,action);
-  FToolBar->setVisible(true);
   connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
   emit widgetInserted(AWidget,action,befour);
+  updateVisible();
   return action;
 }
 
@@ -78,8 +87,8 @@ void ToolBarChanger::removeWidget(QWidget *AWidget)
     FToolBar->removeAction(action);
     FWidgetActions.remove(AWidget);
     disconnect(AWidget,SIGNAL(destroyed(QObject *)),this,SLOT(onWidgetDestroyed(QObject *)));
-    FToolBar->setVisible(!FToolBarMenu->isEmpty() || !FWidgetActions.isEmpty());
     emit widgetRemoved(AWidget,action);
+    updateVisible();
   }
 }
 
@@ -87,6 +96,39 @@ void ToolBarChanger::clear()
 {
   FToolBarMenu->clear();
   FToolBar->clear();
+}
+
+void ToolBarChanger::updateVisible()
+{
+  FIntVisible = !isEmpty();
+  if (!FToolBar->isWindow() && (FIntVisible && FExtVisible) != FToolBar->isVisible())
+  {
+    FChangingIntVisible++;
+    FToolBar->setVisible(FIntVisible && FExtVisible);
+    FChangingIntVisible--;
+  }
+}
+
+bool ToolBarChanger::eventFilter(QObject *AObject, QEvent *AEvent)
+{
+  if (AEvent->type() == QEvent::Show)
+  {
+    if (FChangingIntVisible == 0)
+      FExtVisible = true;
+    if (!FIntVisible || !FExtVisible)
+    {
+      FChangingIntVisible++;
+      FToolBar->hide();
+      FChangingIntVisible--;
+      return true;
+    }
+  }
+  else if (AEvent->type() == QEvent::Hide)
+  {
+    if (FChangingIntVisible == 0)
+      FExtVisible = false;
+  }
+  return QObject::eventFilter(AObject,AEvent);
 }
 
 void ToolBarChanger::onActionInserted(QAction *ABefour, Action *AAction)
@@ -99,8 +141,8 @@ void ToolBarChanger::onActionInserted(QAction *ABefour, Action *AAction)
   }
   else
     ABefour != NULL ? FToolBar->insertAction(ABefour,AAction) : FToolBar->addAction(AAction);
-  FToolBar->setVisible(true);
   emit actionInserted(ABefour,AAction);
+  updateVisible();
 }
 
 void ToolBarChanger::onSeparatorInserted(Action *ABefour, QAction *ASeparator)
@@ -135,8 +177,8 @@ void ToolBarChanger::onActionRemoved(Action *AAction)
   }
   else
     FToolBar->removeAction(AAction);
-  FToolBar->setVisible(!FToolBarMenu->isEmpty() || !FWidgetActions.isEmpty());
   emit actionRemoved(AAction);
+  updateVisible();
 }
 
 void ToolBarChanger::onWidgetDestroyed(QObject *AObject)
