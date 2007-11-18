@@ -73,6 +73,12 @@ bool Presence::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Sta
       pitem->setStatus(status);
       pitem->setPriority(priority);
       emit presenceItem(pitem);
+
+      if (show == Offline)
+      {
+        FPresenceItems.removeAt(FPresenceItems.indexOf(pitem));
+        delete pitem;
+      }
     }
     else
     {
