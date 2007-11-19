@@ -65,10 +65,7 @@ QString ErrorHandler::message() const
   if (!FContext.isEmpty())
     msg +=FContext+"\n\n"; 
 
-  msg += FMeaning.isEmpty() ? FCondition : FMeaning;
-
-  if (!FText.isEmpty() && FMeaning.isEmpty() && FCondition.isEmpty())
-    msg += FText;
+  msg += FText.isEmpty() ? (FMeaning.isEmpty() ? FCondition : FMeaning) : FText;
 
   return msg;
 }
