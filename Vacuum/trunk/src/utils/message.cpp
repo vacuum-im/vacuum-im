@@ -140,8 +140,9 @@ QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &A
                                     const QString &ALang) const
 {
   QString dLang = defLang(); 
+  QString aLang = ALang.isEmpty() ? dLang : ALang;
   QDomElement elem = AParent.firstChildElement(ATagName);
-  while(!elem.isNull() && elem.attribute("xml:lang",dLang)!=ALang)
+  while(!elem.isNull() && elem.attribute("xml:lang",dLang)!=aLang)
     elem = elem.nextSiblingElement(ATagName);
   return elem;
 }
@@ -153,7 +154,7 @@ QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &A
   if (elem.isNull() && !AText.isEmpty())
   {
     elem = d->FStanza.addElement(ATagName);
-    if (ALang!=defLang())
+    if (!ALang.isEmpty() && ALang!=defLang())
       elem.setAttribute("xml:lang",ALang);
   }
   if (!AText.isEmpty())
