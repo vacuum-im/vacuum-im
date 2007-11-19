@@ -45,7 +45,8 @@ public:
     Normal,
     Chat,
     GroupChat,
-    Headline
+    Headline,
+    Error
   };
 public:
   Message();

@@ -45,6 +45,8 @@ Message::MessageType Message::type() const
     return GroupChat;
   else if (d->FStanza.type() == "headline")
     return Headline;
+  else if (d->FStanza.type() == "error")
+    return Error;
   else
     return Normal;
 }
@@ -64,6 +66,9 @@ Message &Message::setType(MessageType AType)
     break;
   case Headline:
     d->FStanza.setType("headline"); 
+    break;
+  case Error:
+    d->FStanza.setType("error"); 
     break;
   }
   return *this;
