@@ -192,8 +192,7 @@ void MessageWindow::loadWindowState()
 
 void MessageWindow::loadActiveMessages()
 {
-  QList<int> messagesId = FMessenger->messages(FStreamJid,FContactJid,Message::Normal)
-    + FMessenger->messages(FStreamJid,FContactJid,Message::Headline);
+  QList<int> messagesId = FMessenger->messages(FStreamJid,FContactJid);
   foreach(int messageId, messagesId)
   {
     Message message = FMessenger->messageById(messageId);
@@ -241,19 +240,43 @@ void MessageWindow::updateWindow()
 
 void MessageWindow::showMessage(const Message &AMessage)
 {
-  if (FMode == ReadMode)
-  {
-    FMessage = AMessage;
-    FMessageId = AMessage.data(MDR_MESSAGEID).toInt();
-    FCurrentThreadId = AMessage.threadId();
-    ui.lneSubject->setText(AMessage.subject(AMessage.defLang()));
-    if (QDateTime::currentDateTime().date() == AMessage.dateTime().date())
-      ui.lblDateTime->setText(AMessage.dateTime().toString(tr("hh:mm:ss")));
-    else
-      ui.lblDateTime->setText(AMessage.dateTime().toString(tr("dd MMM hh:mm")));
-    FViewWidget->showMessage(AMessage);
-    FMessenger->removeMessage(FMessageId);
-  }
+  FMessage = AMessage;
+  FMessageId = FMessage.data(MDR_MESSAGEID).toInt();
+  FCurrentThreadId = FMessage.threadId();
+  ui.lneSubject->setText(FMessage.subject());
+  if (QDateTime::currentDateTime().date() == FMessage.dateTime().date())
+    ui.lblDateTime->setText(FMessage.dateTime().toString(tr("hh:mm:ss")));
+  else
+    ui.lblDateTime->setText(FMessage.dateTime().toString(tr("dd MMM hh:mm")));
+  if (FMessage.type() == Message::Error)
+    showErrorMessage(FMessage);
+  else
+    FViewWidget->showMessage(FMessage);
+  FMessenger->removeMessage(FMessageId);
+}
+
+void MessageWindow::showErrorMessage(const Message &AMessage)
+{
+  QTextDocument doc;
+  doc.setDefaultFont(FViewWidget->document()->defaultFont());
+  FMessenger->messageToText(&doc,AMessage);
+  ErrorHandler err(AMessage.stanza().element());
+  
+  QTextCursor cursor(&doc);
+  QTextCharFormat format;
+  format.setFontWeight(QFont::Bold);
+  cursor.insertText(tr("The message with a error code %1 is received.").arg(err.code()),format);
+  cursor.insertBlock();
+  cursor.insertBlock();
+  format.setForeground(Qt::red);
+  cursor.insertText(err.message(),format);
+  cursor.insertBlock();
+  format.setForeground(Qt::black);
+  cursor.insertText("______________");
+  cursor.insertBlock();
+
+  FViewWidget->document()->clear();
+  FViewWidget->showCustomHtml(doc.toHtml());
 }
 
 void MessageWindow::showNextOrClose()
@@ -291,7 +314,8 @@ void MessageWindow::onMessageReceived(const Message &AMessage)
 {
   Jid fromJid = AMessage.from();
   Jid toJid = AMessage.to();
-  if ((AMessage.type() == Message::Normal || AMessage.type() == Message::Headline) && fromJid == FContactJid && toJid == FStreamJid)
+  if ((AMessage.type() == Message::Normal || AMessage.type() == Message::Headline ||  AMessage.type() == Message::Error) 
+    && fromJid == FContactJid && toJid == FStreamJid)
   {
     if (FMessageId == 0 && FMode == ReadMode)
     {
@@ -410,3 +434,4 @@ void MessageWindow::onDefaultMessageFontChanged(const QFont &AFont)
   FViewWidget->document()->setDefaultFont(AFont);
   FEditWidget->document()->setDefaultFont(AFont);
 }
+

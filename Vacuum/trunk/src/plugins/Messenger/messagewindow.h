@@ -9,6 +9,7 @@
 #include "../../interfaces/isettings.h"
 #include "../../utils/message.h"
 #include "../../utils/jid.h"
+#include "../../utils/errorhandler.h"
 #include "ui_messagewindow.h"
 
 class MessageWindow : 
@@ -52,6 +53,7 @@ protected:
   void removeActiveMessage(int AMessageId);
   void updateWindow();
   void showMessage(const Message &AMessage);
+  void showErrorMessage(const Message &AMessage);
   void showNextOrClose();
   void setContactJid(const Jid &AContactJid);
 protected:
