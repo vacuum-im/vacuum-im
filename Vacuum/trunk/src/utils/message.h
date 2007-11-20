@@ -12,18 +12,15 @@ class MessageData :
   public QSharedData
 {
 public:
-  MessageData() 
-    : FStanza("message") 
+  MessageData() : FStanza("message") 
   {
     FDateTime = QDateTime::currentDateTime();
   };
-  MessageData(const Stanza &AStanza) 
-    : FStanza(AStanza) 
+  MessageData(const Stanza &AStanza) : FStanza(AStanza) 
   {
     FDateTime = QDateTime::currentDateTime();
   };
-  MessageData(const MessageData &AOther) 
-    : FStanza(AOther.FStanza) 
+  MessageData(const MessageData &AOther) : FStanza(AOther.FStanza) 
   {
     FDateTime = AOther.FDateTime;
     FData = AOther.FData;
@@ -41,12 +38,12 @@ class UTILS_EXPORT Message
 public:
   enum MessageType
   {
-    AnyType,
-    Normal,
-    Chat,
-    GroupChat,
-    Headline,
-    Error
+    AnyType     =0x00,
+    Normal      =0x01,
+    Chat        =0x02,
+    GroupChat   =0x04,
+    Headline    =0x08,
+    Error       =0x10
   };
 public:
   Message();
