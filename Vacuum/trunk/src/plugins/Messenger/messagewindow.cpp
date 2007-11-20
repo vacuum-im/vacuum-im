@@ -192,7 +192,7 @@ void MessageWindow::loadWindowState()
 
 void MessageWindow::loadActiveMessages()
 {
-  QList<int> messagesId = FMessenger->messages(FStreamJid,FContactJid);
+  QList<int> messagesId = FMessenger->messages(FStreamJid,FContactJid,Message::Normal|Message::Headline|Message::Error);
   foreach(int messageId, messagesId)
   {
     Message message = FMessenger->messageById(messageId);

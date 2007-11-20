@@ -74,7 +74,7 @@ public:
   virtual void showMessage(int AMessageId);
   virtual void removeMessage(int AMessageId);
   virtual Message messageById(int AMessageId) const { return FMessages.value(AMessageId); }
-  virtual QList<int> messages(const Jid &AStreamJid, const Jid &AFromJid = Jid(), Message::MessageType AMesType = Message::AnyType);
+  virtual QList<int> messages(const Jid &AStreamJid, const Jid &AFromJid = Jid(), int AMesTypes = Message::AnyType);
   virtual bool checkOption(IMessenger::Option AOption) const;
   virtual void setOption(IMessenger::Option AOption, bool AValue);
   //MessageWindows

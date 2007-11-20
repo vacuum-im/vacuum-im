@@ -355,7 +355,7 @@ void Messenger::removeMessage(int AMessageId)
   }
 }
 
-QList<int> Messenger::messages(const Jid &AStreamJid, const Jid &AFromJid, Message::MessageType AMesType)
+QList<int> Messenger::messages(const Jid &AStreamJid, const Jid &AFromJid, int AMesTypes)
 {
   QList<int> mIds;
   QMap<int,Message>::const_iterator it = FMessages.constBegin();
@@ -363,7 +363,7 @@ QList<int> Messenger::messages(const Jid &AStreamJid, const Jid &AFromJid, Messa
   {
     if (AStreamJid == it.value().to() 
         && (!AFromJid.isValid() || AFromJid == it.value().from())
-        && (AMesType == Message::AnyType || AMesType == it.value().type()) 
+        && (AMesTypes == Message::AnyType || (AMesTypes & it.value().type())>0) 
        )
     {
       mIds.append(it.key());
@@ -565,9 +565,15 @@ void Messenger::unNotifyMessage(int AMessageId)
   {
     const Message &message = FMessages.value(AMessageId);
 
-    int labelId = message.type()==Message::Chat ? FChatLabelId : FNormalLabelId;
+    int labelId = FChatLabelId;
+    int mesTypes = Message::Chat;
+    if (message.type() != Message::Chat)
+    {
+      labelId = FNormalLabelId;
+      mesTypes = Message::Normal | Message::Headline | Message::Error;
+    }
 
-    if (FRostersView && FRostersModel && messages(message.to(),message.from()).count() == 1)
+    if (FRostersView && FRostersModel && messages(message.to(),message.from(),mesTypes).count() <= 1)
     {
       IRosterIndexList indexList = FRostersModel->getContactIndexList(message.to(),message.from());
       foreach(IRosterIndex *index, indexList)

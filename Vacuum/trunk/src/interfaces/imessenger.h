@@ -256,7 +256,7 @@ public:
   virtual void showMessage(int AMessageId) =0;
   virtual void removeMessage(int AMessageId) =0;
   virtual Message messageById(int AMessageId) const =0;
-  virtual QList<int> messages(const Jid &AStreamJid, const Jid &AFromJid = Jid(), Message::MessageType AMesType = Message::AnyType) =0;
+  virtual QList<int> messages(const Jid &AStreamJid, const Jid &AFromJid = Jid(), int AMesTypes = Message::AnyType) =0;
   virtual bool checkOption(IMessenger::Option AOption) const =0;
   virtual void setOption(IMessenger::Option AOption, bool AValue) =0;
   //MessageWindows
