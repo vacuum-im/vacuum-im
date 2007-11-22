@@ -9,4 +9,5 @@ HEADERS += actiongroups.h \
            rosterdataholderorders.h \
            messagedataroles.h \
            messagewriterorders.h \
-           resourceloaderorders.h
+           resourceloaderorders.h \
+           stanzahandlerpriority.h

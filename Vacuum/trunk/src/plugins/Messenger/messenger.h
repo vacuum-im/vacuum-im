@@ -8,6 +8,7 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/actiongroups.h"
+#include "../../definations/stanzahandlerpriority.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/istanzaprocessor.h"
@@ -51,8 +52,8 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
-  virtual bool editStanza(HandlerId, const Jid &, Stanza *, bool &) { return false; }
-  virtual bool readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  virtual bool editStanza(int, const Jid &, Stanza *, bool &) { return false; }
+  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IRostersClickHooker
   virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AHookerId);
   //IOptionsHolder
@@ -182,7 +183,7 @@ private:
   QFont FMessageFont;
   QMap<int,Message> FMessages;
   QHash<int,int> FTrayId2MessageId;
-  QHash<IXmppStream *,HandlerId> FMessageHandlers;
+  QHash<IXmppStream *,int> FMessageHandlers;
   QMultiMap<int,IMessageWriter *> FMessageWriters;
   QMultiMap<int,IResourceLoader *> FResourceLoaders;
 };

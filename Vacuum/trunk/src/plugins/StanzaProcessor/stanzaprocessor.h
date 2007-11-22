@@ -3,6 +3,7 @@
 
 #include <QDomDocument>
 #include <QHash>
+#include <QMultiMap>
 #include <QVector>
 #include <QTimer>
 #include "../../interfaces/ipluginmanager.h"
@@ -20,72 +21,65 @@ class StanzaProcessor :
 public:
   StanzaProcessor();
   ~StanzaProcessor();
-
-  virtual QObject* instance() { return this; }
-
   //IPlugin
+  virtual QObject* instance() { return this; }
   virtual QUuid pluginUuid() const { return STANZAPROCESSOR_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects() { return true; }
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-
   //IStanzaProcessor
   virtual QString newId() const;
-
   virtual bool sendStanzaIn(const Jid &AStreamJid, const Stanza &AStanza);
   virtual bool sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual bool sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJid, 
-    const Stanza &AStanza, qint32 ATimeOut);
-
-  virtual PriorityId setPriority(PriorityLevel ALevel, qint32 AOffset, QObject *AOwner=0);
-  virtual void removePriority(PriorityId APriorityId);
-
-  virtual HandlerId setHandler(IStanzaHandler *, const QString &ACondition, 
-    Direction ADirection, PriorityId APriorityId=0, const Jid &AStreamJid = Jid()); 
-  virtual void addCondition(HandlerId AHandlerId, const QString &ACondition);
-  virtual void removeHandler(HandlerId AHandlerId);
+  virtual bool sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJid, const Stanza &AStanza, int ATimeOut);
+  virtual bool hasHandler(int AHandlerId) const { return FHandlerItems.contains(AHandlerId); }
+  virtual int insertHandler(IStanzaHandler *AHandler, const QString &ACondition, 
+    Direction ADirection, int APriority = SHP_DEFAULT, const Jid &AStreamJid = Jid()); 
+  virtual Direction handlerDirection(int AHandlerId) const;
+  virtual int handlerPriority(int AHandlerId) const;
+  virtual Jid handlerStreamJid(int AHandlerId) const;
+  virtual QStringList handlerConditions(int AHandlerId) const;
+  virtual void appendCondition(int AHandlerId, const QString &ACondition);
+  virtual void removeCondition(int AHandlerId, const QString &ACondition);
+  virtual void removeHandler(int AHandlerId);
+signals:
+  virtual void handlerInserted(int AHandlerId, IStanzaHandler *AHandler);
+  virtual void handlerRemoved(int AHandlerId);
 protected:
   struct IqStanzaItem {
+    QString stanzaId;
     IIqStanzaOwner *owner;
     Jid streamJid;
-    QObject *timer;
-  };
-  struct PriorityItem {
-    QObject *owner;
-    PriorityLevel level;
-    qint32 offset;
-    QStringList after;
-    QStringList befour;
+    QTimer *timer;
   };
   struct HandlerItem {
+    int handlerId;
     IStanzaHandler *handler;
     QStringList conditions;
     Direction direction;
-    PriorityId priority;
+    int priority;
     Jid streamJid;
   };
+protected:
   virtual bool checkCondition(const QDomElement &AElem, const QString &ACondition, const int APos = 0);
   virtual bool processStanzaIn(const Jid &AStreamJid, Stanza *AStanza);
   virtual bool processStanzaOut(const Jid &AStreamJid, Stanza *AStanza);
   virtual bool processIqStanza(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void removeIqStanzaItem(const QString &AStanzaId);
 protected slots:
   void onStreamElement(IXmppStream *AStream, const QDomElement &AElem);
   void onStreamJidChanged(IXmppStream *AStream, const Jid &ABefour);
   void onIqStanzaTimeOut();
-  void onPriorityOwnerDestroyed(QObject *AOwner);
   void onHandlerOwnerDestroyed(QObject *AOwner);
   void onIqStanzaOwnerDestroyed(QObject *AOwner);
 private:
   IXmppStreams *FXmppStreams;
 private:
   QHash<QString, IqStanzaItem> FIqStanzaItems;
-  QVector<PriorityId> FPriorities;
-  QHash<PriorityId, PriorityItem> FPriorityItems;
-  QHash<PriorityId, QList<HandlerId>> FPriorityToHandlers;
-  QHash<HandlerId, HandlerItem> FHandlerItems;
-  QVector<HandlerId> FHandlerTurn;
+  QHash<int, HandlerItem> FHandlerItems;
+  QMultiMap<int,int> FHandlerIdsByPriority;
 };
 
 #endif

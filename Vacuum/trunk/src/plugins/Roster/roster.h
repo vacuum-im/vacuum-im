@@ -1,6 +1,7 @@
 #ifndef ROSTER_H
 #define ROSTER_H
 
+#include "../../definations/stanzahandlerpriority.h"
 #include "../../definations/namespaces.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/istanzaprocessor.h"
@@ -22,8 +23,8 @@ public:
   virtual QObject *instance() { return this; }
 
   //IStanzaProcessorHandler
-  virtual bool editStanza(HandlerId, const Jid &, Stanza *, bool &) { return false; }
-  virtual bool readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  virtual bool editStanza(int, const Jid &, Stanza *, bool &) { return false; }
+  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
 
   //IStanzaProcessorIqOwner
   virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
@@ -85,8 +86,8 @@ private:
   QString FGroupDelimId;
   QString FGroupDelim;
   QList<RosterItem *> FRosterItems;
-  HandlerId FRosterHandler;
-  HandlerId FSubscrHandler;
+  int FRosterHandler;
+  int FSubscrHandler;
 };
 
 #endif

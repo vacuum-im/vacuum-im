@@ -1,5 +1,6 @@
 #include "presence.h"
-#include "../../utils/errorhandler.h"
+
+#define SHC_PRESENCE                    "/presence"
 
 Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
   : QObject(AXmppStream->instance())
@@ -21,7 +22,7 @@ Presence::~Presence()
 
 }
 
-bool Presence::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool Presence::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   if (AHandlerId == FPresenceHandler)
   {
@@ -210,7 +211,7 @@ void Presence::clearItems()
 
 void Presence::setStanzaHandlers()
 {
-  FPresenceHandler = FStanzaProcessor->setHandler(this,"/presence",IStanzaProcessor::DirectionIn,0,streamJid());   
+  FPresenceHandler = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionIn,SHP_DEFAULT,streamJid());   
 }
 
 void Presence::removeStanzaHandlers()

@@ -1,8 +1,10 @@
 #include <QtDebug>
 #include "roster.h"
-
 #include <QSet>
 #include <QFile>
+
+#define SHC_ROSTER                      "/iq/query[@xmlns='" NS_JABBER_ROSTER "']"
+#define SHC_PRESENCE                    "/presence[@type]"
 
 Roster::Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor) 
   : QObject(AXmppStream->instance())
@@ -24,7 +26,7 @@ Roster::~Roster()
   clearItems();
 }
 
-bool Roster::readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool Roster::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   Q_UNUSED(AStreamJid);
   bool hooked = false;
@@ -514,11 +516,11 @@ void Roster::requestRosterItems()
 
 void Roster::setStanzaHandlers()
 {
-  FRosterHandler = FStanzaProcessor->setHandler(this,"/iq/query[@xmlns='jabber:iq:roster']",
-    IStanzaProcessor::DirectionIn,0,FXmppStream->jid()); 
+  FRosterHandler = FStanzaProcessor->insertHandler(this,SHC_ROSTER,
+    IStanzaProcessor::DirectionIn,SHP_DEFAULT,FXmppStream->jid()); 
 
-  FSubscrHandler = FStanzaProcessor->setHandler(this,"/presence[@type]",
-    IStanzaProcessor::DirectionIn,0,FXmppStream->jid());
+  FSubscrHandler = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,
+    IStanzaProcessor::DirectionIn,SHP_DEFAULT,FXmppStream->jid());
 }
 
 void Roster::removeStanzaHandlers()

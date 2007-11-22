@@ -2,9 +2,11 @@
 #define PRESENCE_H
 
 #include <QObject>
+#include "../../definations/stanzahandlerpriority.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/ixmppstreams.h"
+#include "../../utils/errorhandler.h"
 #include "presenceitem.h"
 
 class Presence : 
@@ -22,8 +24,8 @@ public:
   virtual QObject *instance() { return this; }
 
   //IStanzaProcessorHandler
-  virtual bool editStanza(HandlerId, const Jid &, Stanza *, bool &) { return false; }
-  virtual bool readStanza(HandlerId AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  virtual bool editStanza(int, const Jid &, Stanza *, bool &) { return false; }
+  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   
   //IPresence
   virtual const Jid &streamJid() const { return FXmppStream->jid(); }
@@ -55,7 +57,7 @@ private:
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;
 private:
-  HandlerId FPresenceHandler;
+  int FPresenceHandler;
   QList<PresenceItem *> FPresenceItems;
   Show FShow;
   QString FStatus;

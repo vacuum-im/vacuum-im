@@ -17,6 +17,8 @@
 #define SVN_CHAT_FONT                         "defaultChatFont"
 #define SVN_MESSAGE_FONT                      "defaultMessageFont"
 
+#define SHC_MESSAGE                           "/message/body"
+
 #define ADR_StreamJid                         Action::DR_StreamJid
 #define ADR_ContactJid                        Action::DR_Parametr1
 #define ADR_WindowType                        Action::DR_Parametr2  
@@ -156,7 +158,7 @@ bool Messenger::initObjects()
   return true;
 }
 
-bool Messenger::readStanza(HandlerId /*AHandlerId*/, const Jid &/*AStreamJid*/, const Stanza &AStanza, bool &AAccept)
+bool Messenger::readStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, const Stanza &AStanza, bool &AAccept)
 {
   Message message(AStanza);
   if (!message.body().isEmpty())
@@ -634,7 +636,7 @@ void Messenger::onStreamAdded(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && !FMessageHandlers.contains(AXmppStream))
   {
-    HandlerId handler = FStanzaProcessor->setHandler(this,"/message/body",IStanzaProcessor::DirectionIn,0,AXmppStream->jid());
+    int handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
     FMessageHandlers.insert(AXmppStream,handler);
   }
 }
@@ -678,7 +680,7 @@ void Messenger::onStreamRemoved(IXmppStream *AXmppStream)
   removeStreamMessages(AXmppStream->jid());
   if (FStanzaProcessor && FMessageHandlers.contains(AXmppStream))
   {
-    HandlerId handler = FMessageHandlers.value(AXmppStream);
+    int handler = FMessageHandlers.value(AXmppStream);
     FStanzaProcessor->removeHandler(handler);
     FMessageHandlers.remove(AXmppStream);
   }

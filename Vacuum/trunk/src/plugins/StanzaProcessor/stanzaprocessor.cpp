@@ -62,7 +62,7 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza
 {
   bool sended = false;
   Stanza stanza(AStanza);
-  if (!processStanzaOut(AStreamJid,&stanza))
+  if (processStanzaOut(AStreamJid,&stanza))
   {
     IXmppStream *stream = FXmppStreams->getStream(AStreamJid);
     if (stream)
@@ -71,143 +71,112 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza
   return sended;
 }
 
-bool StanzaProcessor::sendIqStanza(IIqStanzaOwner *AIqOwner,
-                                   const Jid &AStreamJid, const Stanza &AStanza, 
-                                   qint32 ATimeOut)
+bool StanzaProcessor::sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJid, const Stanza &AStanza, int ATimeOut)
 {
   if (AStanza.tagName() != "iq")
-  {
-    qDebug() << "Cant set trigger on not iq stanza";
     return false;
-  }
 
   if (sendStanzaOut(AStreamJid,AStanza))
   {
     if (AIqOwner && !AStanza.id().isEmpty() && (AStanza.type() == "set" || AStanza.type() == "get"))
     {
-      connect(AIqOwner->instance(),SIGNAL(destroyed(QObject *)),SLOT(onIqStanzaOwnerDestroyed(QObject *)));
       IqStanzaItem iqItem;
       if (ATimeOut > 0)
       {
         QTimer *timer = new QTimer(this);
-        connect(timer,SIGNAL(timeout()),SLOT(onIqStanzaTimeOut()));
         timer->setSingleShot(true);  
         timer->start(ATimeOut); 
         iqItem.timer = timer;
+        connect(timer,SIGNAL(timeout()),SLOT(onIqStanzaTimeOut()));
       }
       else 
-        iqItem.timer = 0;
+        iqItem.timer = NULL;
+      iqItem.stanzaId = AStanza.id();
       iqItem.owner = AIqOwner;
       iqItem.streamJid = AStreamJid;
-      FIqStanzaItems.insert(AStanza.id(),iqItem);
+      FIqStanzaItems.insert(iqItem.stanzaId,iqItem);
+      connect(AIqOwner->instance(),SIGNAL(destroyed(QObject *)),SLOT(onIqStanzaOwnerDestroyed(QObject *)));
     }
     return true;
   }
   return false;
 }
 
-PriorityId StanzaProcessor::setPriority(PriorityLevel ALevel, qint32 AOffset, QObject *AOwner)
+int StanzaProcessor::insertHandler(IStanzaHandler *AHandler, const QString &ACondition, 
+                                Direction ADirection, int APriority, const Jid &AStreamJid)
 {
-  int index =0;
-  while (index < FPriorityItems.count())
-  {
-    const PriorityItem *pItem = &FPriorityItems.value(FPriorities.at(index));
-    if ((pItem->level > ALevel) || (pItem->level == ALevel && pItem->offset > AOffset))
-      break;
-    index++;  
-  }
-
-  PriorityId pId = rand()*rand();
-  while (pId == 0 || FPriorities.contains(pId))
-    pId++;
-  FPriorities.insert(index,pId);
-
-  if (AOwner)
-    connect(AOwner,SIGNAL(destroyed(QObject *)),SLOT(onPriorityOwnerDestroyed(QObject *)));
-  PriorityItem pItem;
-  pItem.owner = AOwner;
-  pItem.level = ALevel;
-  pItem.offset = AOffset;
-  FPriorityItems.insert(pId,pItem);
-
-  return pId;
-}
-
-void StanzaProcessor::removePriority(PriorityId APriorityId)
-{
-  if (FPriorities.contains(APriorityId))
-  {
-    if (FPriorityToHandlers.contains(APriorityId))
-    {
-      QList<HandlerId> *handlers = &FPriorityToHandlers[APriorityId];
-      while (handlers->count() > 0) 
-        removeHandler(handlers->at(0));
-    }
-    FPriorityItems.remove(APriorityId);
-    FPriorities.remove(FPriorities.indexOf(APriorityId));  
-  }
-}
-
-HandlerId StanzaProcessor::setHandler(IStanzaHandler *AHandler, const QString &ACondition, 
-                                      Direction ADirection, PriorityId APriorityId, 
-                                      const Jid &AStreamJid)
-{
-  if (!AHandler || ACondition.isEmpty() || (APriorityId > 0 && !FPriorities.contains(APriorityId)))
-  {
-    qDebug() << "WRONG setHandler PARAMETRS";
+  if (!AHandler || ACondition.isEmpty())
     return 0;
-  }
 
-  HandlerId hId = rand()*rand();
+  int hId = (rand()<<16) + rand();
   while (hId == 0 || FHandlerItems.contains(hId))
     hId++;
-  
-  FPriorityToHandlers[APriorityId].append(hId);
 
-  connect(AHandler->instance(),SIGNAL(destroyed(QObject *)),SLOT(onHandlerOwnerDestroyed(QObject *)));
   HandlerItem hItem;
+  hItem.handlerId = hId;
   hItem.handler = AHandler;
   hItem.conditions.append(ACondition);
   hItem.direction = ADirection;
-  hItem.priority = APriorityId;
+  hItem.priority = APriority;
   hItem.streamJid = AStreamJid;
-  FHandlerItems.insert(hId,hItem);
-  
-  int turn = 0;
-  if (APriorityId > 0)
-  {
-    int i =0;
-    while (i < FPriorities.count())
-    {
-      if (FPriorities.at(i) == APriorityId)
-        break;
-      turn += FPriorityToHandlers.value(FPriorities.at(i)).count();
-      i++;
-    }
-  }
-  else 
-    turn = FHandlerTurn.count();  
 
-  FHandlerTurn.insert(turn,hId); 
+  FHandlerItems.insert(hId,hItem);
+  FHandlerIdsByPriority.insertMulti(APriority,hId);
+  connect(AHandler->instance(),SIGNAL(destroyed(QObject *)),SLOT(onHandlerOwnerDestroyed(QObject *)));
+
+  emit handlerInserted(hId,AHandler);
 
   return hId;
 }
 
-void StanzaProcessor::addCondition(HandlerId AHandlerId, const QString &ACondition)
+IStanzaProcessor::Direction StanzaProcessor::handlerDirection(int AHandlerId) const
+{
+  if (FHandlerItems.contains(AHandlerId))
+    return FHandlerItems[AHandlerId].direction;
+  return IStanzaProcessor::DirectionIn;
+}
+
+int StanzaProcessor::handlerPriority(int AHandlerId) const
+{
+  if (FHandlerItems.contains(AHandlerId))
+    return FHandlerItems[AHandlerId].priority;
+  return 0;
+}
+
+Jid StanzaProcessor::handlerStreamJid(int AHandlerId) const
+{
+  if (FHandlerItems.contains(AHandlerId))
+    return FHandlerItems[AHandlerId].streamJid;
+  return Jid();
+}
+
+QStringList StanzaProcessor::handlerConditions(int AHandlerId) const
+{
+  if (FHandlerItems.contains(AHandlerId))
+    return FHandlerItems[AHandlerId].conditions;
+  return QStringList();
+}
+
+void StanzaProcessor::appendCondition(int AHandlerId, const QString &ACondition)
 {
   if (!ACondition.isEmpty() && FHandlerItems.contains(AHandlerId))
     FHandlerItems[AHandlerId].conditions.append(ACondition);
 }
 
-void StanzaProcessor::removeHandler(HandlerId AHandlerId)
+void StanzaProcessor::removeCondition(int AHandlerId, const QString &ACondition)
+{
+  if (FHandlerItems.contains(AHandlerId))
+    FHandlerItems[AHandlerId].conditions.removeAt(FHandlerItems[AHandlerId].conditions.lastIndexOf(ACondition));
+
+}
+
+void StanzaProcessor::removeHandler(int AHandlerId)
 {
   if (FHandlerItems.contains(AHandlerId))
   {
-    PriorityId priority = FHandlerItems.value(AHandlerId).priority;
-    QList<HandlerId> *handlers = &FPriorityToHandlers[priority];
-    handlers->removeAt(handlers->indexOf(AHandlerId));  
+    emit handlerRemoved(AHandlerId);
+    FHandlerIdsByPriority.remove(FHandlerItems[AHandlerId].priority,AHandlerId);
     FHandlerItems.remove(AHandlerId);
-    FHandlerTurn.remove(FHandlerTurn.indexOf(AHandlerId));  
   }
 }
 
@@ -318,35 +287,32 @@ bool StanzaProcessor::processStanzaIn(const Jid &AStreamJid, Stanza *AStanza)
 {
   bool hooked = false;
   bool accepted = false;
-  QList<HandlerId> checkedHandlers;
+  QList<int> checkedHandlers;
 
-  int index = 0;
-  while (!hooked && index < FHandlerTurn.count())
+  QMapIterator<int,int> it(FHandlerIdsByPriority);
+  while(!hooked && it.hasNext())
   {
-    HandlerId hId = FHandlerTurn.at(index);
-    HandlerItem *hItem = &FHandlerItems[hId];
-    if (hItem->direction == DirectionIn && (!hItem->streamJid.isValid() || hItem->streamJid == AStreamJid))
+    it.next();
+    HandlerItem &hItem = FHandlerItems[it.value()];
+    if (hItem.direction == DirectionIn && (!hItem.streamJid.isValid() || hItem.streamJid == AStreamJid))
     {
-      int i = 0;
-      bool checked = false;
-      while (!checked && i < hItem->conditions.count())
-        checked = checkCondition(AStanza->element(), hItem->conditions.at(i++));
-      if (checked)
+      for (int i = 0; i<hItem.conditions.count(); i++)
       {
-        hooked = hItem->handler->editStanza(hId,AStreamJid,AStanza,accepted);
-        checkedHandlers.append(hId); 
+        if (checkCondition(AStanza->element(), hItem.conditions.at(i)))
+        {
+          hooked = hItem.handler->editStanza(it.value(),AStreamJid,AStanza,accepted);
+          checkedHandlers.append(it.value()); 
+          break;
+        }
       }
     }
-    index++;
-  } 
+  }
 
-  index = 0;
-  while (!hooked && index < checkedHandlers.count())
+  for (int i = 0; !hooked && i<checkedHandlers.count(); i++)
   {
-    HandlerId hId = checkedHandlers.at(index);
-    HandlerItem *hItem = &FHandlerItems[hId];
-    hooked = hItem->handler->readStanza(hId,AStreamJid,*AStanza,accepted);
-    index++;
+    int hId = checkedHandlers.at(i);
+    HandlerItem &hItem = FHandlerItems[hId];
+    hooked = hItem.handler->readStanza(hId,AStreamJid,*AStanza,accepted);
   } 
 
   return accepted;
@@ -356,74 +322,77 @@ bool StanzaProcessor::processStanzaOut(const Jid &AStreamJid, Stanza *AStanza)
 {
   bool hooked = false;
   bool accepted = false;
-  QList<HandlerId> checkedHandlers;
+  QList<int> checkedHandlers;
 
-  int index = FHandlerTurn.count()-1;
-  while (!hooked && index >= 0)
+  QMapIterator<int,int> it(FHandlerIdsByPriority);
+  it.toBack();
+  while(!hooked && it.hasPrevious())
   {
-    HandlerId hId = FHandlerTurn.at(index);
-    HandlerItem *hItem = &FHandlerItems[hId];
-    if (hItem->direction == DirectionOut && (!hItem->streamJid.isValid() || hItem->streamJid == AStreamJid))
+    it.previous();
+    HandlerItem &hItem = FHandlerItems[it.value()];
+    if (hItem.direction == DirectionOut && (!hItem.streamJid.isValid() || hItem.streamJid == AStreamJid))
     {
-      int i = 0;
-      bool checked = false;
-      while (!checked && i < hItem->conditions.count())
-        checked = checkCondition(AStanza->element(), hItem->conditions.at(i++));
-      if (checked)
+      for (int i = 0; i<hItem.conditions.count(); i++)
       {
-        if (hItem->priority > 0)
-          hooked = hItem->handler->editStanza(hId,AStreamJid,AStanza,accepted);
-        checkedHandlers.append(hId); 
+        if (checkCondition(AStanza->element(), hItem.conditions.at(i)))
+        {
+          hooked = hItem.handler->editStanza(it.value(),AStreamJid,AStanza,accepted);
+          checkedHandlers.append(it.value()); 
+          break;
+        }
       }
     }
-    index--;
-  } 
+  }
 
-  index = 0;
-  while (!hooked && index < checkedHandlers.count())
+  for (int i = 0; !hooked && i<checkedHandlers.count(); i++)
   {
-    HandlerId hId = checkedHandlers.at(index);
-    HandlerItem *hItem = &FHandlerItems[hId];
-    hooked = hItem->handler->readStanza(hId,AStreamJid,*AStanza,accepted);
-    index++;
+    int hId = checkedHandlers.at(i);
+    HandlerItem &hItem = FHandlerItems[hId];
+    hooked = hItem.handler->readStanza(hId,AStreamJid,*AStanza,accepted);
   } 
 
-  return hooked;
+  return !hooked;
 }
 
 bool StanzaProcessor::processIqStanza(const Jid &AStreamJid, const Stanza &AStanza) 
 {
-  if (AStanza.tagName() != "iq" || AStanza.id().isEmpty() || (AStanza.type() != "result" && AStanza.type() != "error"))
+  if (!FIqStanzaItems.contains(AStanza.id()) || AStanza.tagName()!="iq" || (AStanza.type()!="result" && AStanza.type()!="error"))
     return false;
 
-  if (FIqStanzaItems.contains(AStanza.id()))  
-  { 
-    IqStanzaItem *iqItem = &FIqStanzaItems[AStanza.id()];
-    if (iqItem->streamJid == AStreamJid) 
-    {
-      delete iqItem->timer;
-      iqItem->owner->iqStanza(AStreamJid,AStanza);  
-      FIqStanzaItems.remove(AStanza.id());
-      return true;
-    }
+  IqStanzaItem &iqItem = FIqStanzaItems[AStanza.id()];
+  if (iqItem.streamJid == AStreamJid) 
+  {
+    iqItem.owner->iqStanza(AStreamJid,AStanza);  
+    removeIqStanzaItem(AStanza.id());
+    return true;
   }
   return false;
 }
 
-void StanzaProcessor::onStreamElement(IXmppStream *AStream, const QDomElement &AElem)
+void StanzaProcessor::removeIqStanzaItem(const QString &AStanzaId)
+{
+  if (FIqStanzaItems.contains(AStanzaId))
+  {
+    IqStanzaItem iqItem = FIqStanzaItems.take(AStanzaId);
+    delete iqItem.timer;
+  }
+}
+
+void StanzaProcessor::onStreamElement(IXmppStream *AXmppStream, const QDomElement &AElem)
 {
   Stanza stanza(AElem);
   if (stanza.from().isEmpty())
-    stanza.setFrom(AStream->jid().eFull());
-  stanza.setTo(AStream->jid().eFull());
+    stanza.setFrom(AXmppStream->jid().eFull());
+  stanza.setTo(AXmppStream->jid().eFull());
 
-  if (!sendStanzaIn(AStream->jid(),stanza) && stanza.canReplyError())
-    sendStanzaOut(AStream->jid(), stanza.replyError("service-unavailable")); 
+  if (!sendStanzaIn(AXmppStream->jid(),stanza))
+    if (stanza.canReplyError())
+      sendStanzaOut(AXmppStream->jid(), stanza.replyError("service-unavailable")); 
 }
 
-void StanzaProcessor::onStreamJidChanged(IXmppStream *AStream, const Jid &ABefour)
+void StanzaProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
-  Jid newStreamJid = AStream->jid();
+  Jid newStreamJid = AXmppStream->jid();
   
   foreach(IqStanzaItem item, FIqStanzaItems)
     if (item.streamJid == ABefour)
@@ -436,58 +405,37 @@ void StanzaProcessor::onStreamJidChanged(IXmppStream *AStream, const Jid &ABefou
 
 void StanzaProcessor::onIqStanzaTimeOut()
 {
-  QHash<QString, IqStanzaItem>::iterator i = FIqStanzaItems.begin();
-  while (i != FIqStanzaItems.end())
-  {
-    IqStanzaItem *iqItem = &i.value();
-    if (iqItem->timer == sender())
+  QTimer *timer = qobject_cast<QTimer *>(sender());
+  foreach(IqStanzaItem iqItem, FIqStanzaItems)
+    if (iqItem.timer == timer)
     {
-      delete (QTimer *)iqItem->timer;
-      iqItem->owner->iqStanzaTimeOut(i.key());
-      i = FIqStanzaItems.erase(i);
+      removeIqStanzaItem(iqItem.stanzaId);
+      break;
     }
-    else
-      i++;
-  }
-}
-
-void StanzaProcessor::onPriorityOwnerDestroyed(QObject *AOwner)
-{
-  int i = 0;
-  while (i<FPriorities.count())
-  {
-    if (FPriorityItems.value(FPriorities.at(i)).owner == AOwner)
-      removePriority(FPriorities.at(i));
-    else 
-      i++;
-  }
 }
 
 void StanzaProcessor::onHandlerOwnerDestroyed(QObject *AOwner)
 {
-  int i = 0;
-  while (i<FHandlerTurn.count())
-  {
-    if (FHandlerItems.value(FHandlerTurn.at(i)).handler->instance() == AOwner)
-      removeHandler(FHandlerTurn.at(i));
-    else 
-      i++;
-  }
+  QList<int> ownerHandlers;
+
+  foreach (HandlerItem hItem, FHandlerItems)
+    if (hItem.handler->instance() == AOwner)
+      ownerHandlers.append(hItem.handlerId);
+
+  foreach(int hId, ownerHandlers)
+    removeHandler(hId);
 }
 
 void StanzaProcessor::onIqStanzaOwnerDestroyed(QObject *AOwner)
 {
-  QHash<QString, IqStanzaItem>::iterator i = FIqStanzaItems.begin();
-  while (i != FIqStanzaItems.end())
-  {
-    if (i.value().owner->instance() == AOwner)
-    {
-      delete (QTimer *)i.value().timer;
-      i = FIqStanzaItems.erase(i);
-    }
-    else
-      i++;
-  }
+  QList<QString> ownerIqStatzaIds;
+
+  foreach(IqStanzaItem iqItem, FIqStanzaItems)
+    if (iqItem.owner->instance() == AOwner)
+      ownerIqStatzaIds.append(iqItem.stanzaId);
+
+  foreach(QString stanzaId, ownerIqStatzaIds)
+    removeIqStanzaItem(stanzaId);
 }
 
 Q_EXPORT_PLUGIN2(StanzaProcessor, StanzaProcessor)
