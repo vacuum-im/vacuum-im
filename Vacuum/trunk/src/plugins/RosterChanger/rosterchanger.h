@@ -87,7 +87,7 @@ protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
-  void onTrayNotifyActivated(int ANotifyId);
+  void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
   void onSubsDialogSetupNext();
   void onAddContactDialogDestroyed(QObject *AObject);
   void onAccountChanged(const QString &AName, const QVariant &AValue);

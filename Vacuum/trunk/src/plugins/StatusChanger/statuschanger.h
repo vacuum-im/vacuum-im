@@ -110,6 +110,7 @@ protected:
   void updateStreamMenu(IPresence *APresence);
   void removeStreamMenu(IPresence *APresence);
   void updateMainMenu();
+  void updateTrayToolTip();
   void updateMainStatusActions();
   void insertConnectingLabel(IPresence *APresence);
   void removeConnectingLabel(IPresence *APresence);

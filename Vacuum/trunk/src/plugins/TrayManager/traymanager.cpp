@@ -1,27 +1,25 @@
 #include "traymanager.h"
-
 #include <QContextMenuEvent>
 
-int TrayManager::FNextNotifyId = 1;
+#define IN_QUIT         "psi/quit"
 
 TrayManager::TrayManager()
 {
+  FNextNotifyId = 1;
   FCurNotifyId = 0;
-  mnuContext = new Menu;
-  FTrayIcon.setContextMenu(mnuContext);
+  FContextMenu = new Menu;
+  FTrayIcon.setContextMenu(FContextMenu);
 
   FBlinkTimer.setInterval(500);
   connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimer()));
-
   connect(&FTrayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
     SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
-  connect(&FTrayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-    SIGNAL(activated(QSystemTrayIcon::ActivationReason)));
+  connect(&FTrayIcon,SIGNAL(messageClicked()), SIGNAL(messageClicked()));
 }
 
 TrayManager::~TrayManager()
 {
-  delete mnuContext;
+  delete FContextMenu;
 }
 
 void TrayManager::pluginInfo(PluginInfo *APluginInfo)
@@ -36,11 +34,11 @@ void TrayManager::pluginInfo(PluginInfo *APluginInfo)
 
 bool TrayManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  actQuit = new Action(mnuContext);
-  actQuit->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
-  actQuit->setText(tr("Quit"));
-  connect(actQuit,SIGNAL(triggered()),APluginManager->instance(),SLOT(quit()));
-  addAction(actQuit,AG_TRAYMANAGER_TRAY_QUIT);
+  FQuitAction = new Action(FContextMenu);
+  FQuitAction->setIcon(SYSTEM_ICONSETFILE,IN_QUIT);
+  FQuitAction->setText(tr("Quit"));
+  connect(FQuitAction,SIGNAL(triggered()),APluginManager->instance(),SLOT(quit()));
+  addAction(FQuitAction,AG_TRAYMANAGER_TRAY_QUIT);
   
   return FTrayIcon.isSystemTrayAvailable();
 }
@@ -54,19 +52,33 @@ bool TrayManager::startPlugin()
 //ITrayManager
 void TrayManager::setMainIcon(const QIcon &AIcon)
 {
-  FBaseIcon = AIcon;
+  FMainIcon = AIcon;
   if (FCurNotifyId == 0)
-    setTrayIcon(AIcon,"",false);
+    setTrayIcon(FMainIcon,FMainToolTip,false);
+}
+
+void TrayManager::setMainToolTip(const QString &AToolTip)
+{
+  FMainToolTip = AToolTip;
+  if (FCurNotifyId == 0)
+    setTrayIcon(FMainIcon,FMainToolTip,false);
+}
+
+void TrayManager::showMessage(const QString &ATitle, const QString &AMessage, 
+                              QSystemTrayIcon::MessageIcon AIcon, int ATimeout)
+{
+  FTrayIcon.showMessage(ATitle,AMessage,AIcon,ATimeout);
+  emit messageShown(ATitle,AMessage,AIcon,ATimeout);
 }
 
 void TrayManager::addAction(Action *AAction, int AGroup /*= DEFAULT_ACTION_GROUP*/, bool ASort /*= false*/)
 {
-  mnuContext->addAction(AAction,AGroup,ASort);
+  FContextMenu->addAction(AAction,AGroup,ASort);
 }
 
 void TrayManager::removeAction(Action *AAction)
 {
-  mnuContext->removeAction(AAction);
+  FContextMenu->removeAction(AAction);
 }
 
 int TrayManager::appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink)
@@ -108,7 +120,7 @@ void TrayManager::removeNotify(int ANotifyId)
       if (FNotifyItems.isEmpty())
       {
         FCurNotifyId = 0;
-        setTrayIcon(FBaseIcon,"",false);
+        setTrayIcon(FMainIcon,FMainToolTip,false);
       }
       else
       {
@@ -135,14 +147,7 @@ void TrayManager::setTrayIcon(const QIcon &AIcon, const QString &AToolTip, bool 
 
 void TrayManager::onActivated(QSystemTrayIcon::ActivationReason AReason)
 {
-  if (AReason == QSystemTrayIcon::DoubleClick)
-  {
-    int notifyId = 0;
-    if (!FNotifyItems.isEmpty())
-      notifyId = FNotifyItems.keys().last();
-    emit notifyActivated(notifyId);
-    removeNotify(notifyId);
-  }
+  emit notifyActivated(FCurNotifyId,AReason);
 }
 
 void TrayManager::onBlinkTimer()

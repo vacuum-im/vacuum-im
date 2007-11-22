@@ -81,7 +81,8 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
     if (FTrayManager)
     {
-      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int)),SLOT(onTrayNotifyActivated(int)));
+      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int,QSystemTrayIcon::ActivationReason)),
+        SLOT(onTrayNotifyActivated(int,QSystemTrayIcon::ActivationReason)));
     }
   }
 
@@ -858,17 +859,21 @@ void RosterChanger::onRosterLabelToolTips(IRosterIndex * /*AIndex*/, int /*ALabe
 
 }
 
-void RosterChanger::onTrayNotifyActivated(int ANotifyId)
+void RosterChanger::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
-  QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
-  while (it != FSubsItems.end())
+  if (AReason == QSystemTrayIcon::DoubleClick)
   {
-    if (it.value()->trayId == ANotifyId)
+    QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
+    while (it != FSubsItems.end())
     {
-      openSubsDialog(it.key());
-      break;
+      if (it.value()->trayId == ANotifyId)
+      {
+        openSubsDialog(it.key());
+        FTrayManager->removeNotify(ANotifyId);
+        break;
+      }
+      it++;
     }
-    it++;
   }
 }
 

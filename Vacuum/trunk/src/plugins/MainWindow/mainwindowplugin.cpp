@@ -51,7 +51,8 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
     if (FTrayManager)
     {
-      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int)),SLOT(onTrayNotifyActivated(int)));
+      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int, QSystemTrayIcon::ActivationReason)),
+        SLOT(onTrayNotifyActivated(int,QSystemTrayIcon::ActivationReason)));
     }
   }
   return true;
@@ -95,13 +96,17 @@ void MainWindowPlugin::updateTitle()
 
 }
 
-void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId)
+void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
-  if (FMainWindow && ANotifyId == 0)
+  if (FMainWindow && ANotifyId == 0 && AReason == QSystemTrayIcon::DoubleClick)
   {
     if (!FMainWindow->isVisible())
+    {
       FMainWindow->show();
-    FMainWindow->activateWindow();
+      FMainWindow->activateWindow();
+    }
+    else
+      FMainWindow->close();
   }
 }
 

@@ -98,7 +98,8 @@ bool Messenger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
     if (FTrayManager)
     {
-      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int)),SLOT(onTrayNotifyActivated(int)));
+      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int,QSystemTrayIcon::ActivationReason)),
+        SLOT(onTrayNotifyActivated(int,QSystemTrayIcon::ActivationReason)));
     }
   }
 
@@ -747,9 +748,9 @@ void Messenger::onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bool &
   }
 }
 
-void Messenger::onTrayNotifyActivated(int ANotifyId)
+void Messenger::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
-  if (FTrayId2MessageId.contains(ANotifyId))
+  if (AReason == QSystemTrayIcon::DoubleClick && FTrayId2MessageId.contains(ANotifyId))
     showMessage(FTrayId2MessageId.value(ANotifyId));
 }
 

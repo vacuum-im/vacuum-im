@@ -799,6 +799,21 @@ void StatusChanger::updateMainMenu()
   FTrayManager->setMainIcon(mStatusIcon);
 }
 
+void StatusChanger::updateTrayToolTip()
+{
+  QString trayToolTip;
+  QHash<IPresence *, int>::const_iterator it = FStreamStatus.constBegin();
+  while (it != FStreamStatus.constEnd())
+  {
+    IAccount *account = FAccountManager->accountByStream(it.key()->streamJid());
+    if (!trayToolTip.isEmpty())
+      trayToolTip+="\n";
+    trayToolTip += tr("%1 - %2").arg(account->name()).arg(it.key()->status());
+    it++;
+  }
+  FTrayManager->setMainToolTip(trayToolTip);
+}
+
 void StatusChanger::updateMainStatusActions()
 {
   QIcon mStatusIcon = statusItemIcon(MAIN_STATUS_ID);
@@ -908,6 +923,7 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
   
   updateStreamMenu(APresence);
   updateMainMenu();
+  updateTrayToolTip();
 }
 
 void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
@@ -933,6 +949,7 @@ void StatusChanger::onSelfPresence(IPresence *APresence, IPresence::Show AShow,
       FStreamWaitStatus.remove(APresence);
       removeConnectingLabel(APresence);
     }
+    updateTrayToolTip();
   }
 }
 
@@ -955,6 +972,7 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
     FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
   
   updateMainMenu();
+  updateTrayToolTip();
 }
 
 void StatusChanger::onRosterOpened(IRoster *ARoster)

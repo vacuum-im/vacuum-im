@@ -30,19 +30,25 @@ public:
   virtual bool startPlugin();
 
   //ITrayManager
-  virtual QIcon icon() const { return FTrayIcon.icon(); }
-  virtual QString toolTip() const { return FTrayIcon.toolTip(); }
-  virtual QIcon mainIcon() const { return FBaseIcon; }
+  virtual QIcon currentIcon() const { return FCurIcon; }
+  virtual QString currentToolTip() const { return FTrayIcon.toolTip(); }
+  virtual int currentNotify() const { return FCurNotifyId; }
+  virtual QIcon mainIcon() const { return FMainIcon; }
   virtual void setMainIcon(const QIcon &AIcon);
+  virtual QString mainToolTip() const { return FTrayIcon.toolTip(); }
+  virtual void setMainToolTip(const QString &AToolTip);
+  virtual void showMessage(const QString &ATitle, const QString &AMessage, 
+    QSystemTrayIcon::MessageIcon AIcon = QSystemTrayIcon::Information, int ATimeout = 10000);
   virtual void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
   virtual void removeAction(Action *AAction);
   virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink);
   virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, bool ABlink);
   virtual void removeNotify(int ANotifyId);
 signals:
-  virtual void activated(QSystemTrayIcon::ActivationReason AReason);
+  virtual void messageClicked();
+  virtual void messageShown(const QString &ATitle, const QString &AMessage,QSystemTrayIcon::MessageIcon AIcon, int ATimeout);
   virtual void notifyAdded(int ANotifyId);
-  virtual void notifyActivated(int ANotifyId);
+  virtual void notifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
   virtual void notifyRemoved(int ANotifyId);
 protected:
   void setTrayIcon(const QIcon &AIcon, const QString &AToolTip, bool ABlink);
@@ -50,15 +56,16 @@ protected slots:
   void onActivated(QSystemTrayIcon::ActivationReason AReason);
   void onBlinkTimer();
 private:
-  Menu *mnuContext;
-  Action *actQuit;
+  Menu *FContextMenu;
+  Action *FQuitAction;
 private:
   QTimer FBlinkTimer;
   QSystemTrayIcon FTrayIcon;
 private:
-  static int FNextNotifyId;
+  int FNextNotifyId;
   int FCurNotifyId;
-  QIcon FBaseIcon;
+  QIcon FMainIcon;
+  QString FMainToolTip;
   struct NotifyItem {
     QIcon icon;
     QString toolTip;

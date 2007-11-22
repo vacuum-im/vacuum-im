@@ -140,7 +140,7 @@ protected slots:
   void onSystemIconsetChanged();
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
-  void onTrayNotifyActivated(int ANotifyId);
+  void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
   void onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
   void onMessageWindowJidChanged(const Jid &ABefour);
   void onMessageWindowDestroyed();

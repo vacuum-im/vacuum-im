@@ -39,7 +39,7 @@ signals:
 protected:
   void updateTitle();
 protected slots:
-  void onTrayNotifyActivated(int ANotifyId);
+  void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
   void onSettingsOpened();
   void onSettingsClosed();
   void onProfileRenamed(const QString &, const QString &);
