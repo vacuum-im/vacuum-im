@@ -4,6 +4,7 @@ RosterIndexDataHolder::RosterIndexDataHolder(IStatusIcons *AStatusIcons)
   : QObject(AStatusIcons->instance())
 {
   FStatusIcons = AStatusIcons;
+  connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
 }
 
 RosterIndexDataHolder::~RosterIndexDataHolder()
@@ -37,4 +38,8 @@ QVariant RosterIndexDataHolder::data(const IRosterIndex *AIndex, int /*ARole*/) 
   return QVariant();
 }
 
+void RosterIndexDataHolder::onStatusIconsChanged()
+{
+  emit dataChanged(NULL,Qt::DecorationRole);
+}
 

@@ -20,7 +20,7 @@ StatusIcons::StatusIcons()
 
   FCustomIconMenu = NULL;
   FDataHolder = NULL;
-  FRepaintStarted = false;
+  FStatusIconsChangedStarted = false;
   FDefaultIconFile = STATUS_ICONSETFILE;
 }
 
@@ -133,9 +133,9 @@ void StatusIcons::setDefaultIconFile(const QString &AIconFile)
     FDefaultIconFile = AIconFile;
     FStatusIconset = Skin::getSkinIconset(AIconFile);
     FJid2IconFile.clear();
-    repaintRostersView();
     emit defaultIconFileChanged(AIconFile);
     emit defaultIconsChanged();
+    startStatusIconsChanged();
   }
 }
 
@@ -155,8 +155,8 @@ void StatusIcons::insertRule(const QString &APattern, const QString &AIconFile, 
   }
 
   FJid2IconFile.clear();
-  repaintRostersView();
   emit ruleInserted(APattern,AIconFile,ARuleType);
+  startStatusIconsChanged();
 }
 
 QStringList StatusIcons::rules(RuleType ARuleType) const
@@ -195,8 +195,8 @@ void StatusIcons::removeRule(const QString &APattern, RuleType ARuleType)
     break;
   }
   FJid2IconFile.clear();
-  repaintRostersView();
   emit ruleRemoved(APattern,ARuleType);
+  startStatusIconsChanged();
 }
 
 QIcon StatusIcons::iconByJid(const Jid &AStreamJid, const Jid &AJid) const
@@ -307,12 +307,12 @@ QIcon StatusIcons::iconByStatus(int AShow, const QString &ASubscription, bool AA
   return FStatusIconset->iconByName(iconNameByStatus(AShow,ASubscription,AAsk));
 }
 
-void StatusIcons::repaintRostersView()
+void StatusIcons::startStatusIconsChanged()
 {
-  if (!FRepaintStarted)
+  if (!FStatusIconsChangedStarted)
   {
-    QTimer::singleShot(0,this,SLOT(onRepaintRostersView()));
-    FRepaintStarted = true;
+    QTimer::singleShot(0,this,SLOT(onStatusIconsChangedTimer()));
+    FStatusIconsChangedStarted = true;
   }
 }
 
@@ -370,14 +370,10 @@ void StatusIcons::clearIconFilesRules()
   FIconFilesRules.clear();
 }
 
-void StatusIcons::onRepaintRostersView()
+void StatusIcons::onStatusIconsChangedTimer()
 {
-  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
-  {
-    FRostersViewPlugin->rostersView()->viewport()->repaint();
-    emit statusIconsChanged();
-  }
-  FRepaintStarted = false;
+  emit statusIconsChanged();
+  FStatusIconsChangedStarted = false;
 }
 
 void StatusIcons::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
@@ -439,8 +435,8 @@ void StatusIcons::onOptionsRejected()
 
 void StatusIcons::onStatusIconsetChanged()
 {
-  repaintRostersView();
   emit defaultIconsChanged();
+  startStatusIconsChanged();
 }
 
 void StatusIcons::onSetCustomIconset(bool)

@@ -26,6 +26,8 @@ public:
   virtual bool setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/) { return false; }
 signals:
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_AnyRole);
+protected slots:
+  void onStatusIconsChanged();
 private:
   IStatusIcons *FStatusIcons;    
 };

@@ -66,11 +66,11 @@ signals:
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
-  void repaintRostersView();
+  void startStatusIconsChanged();
   void loadIconFilesRules();
   void clearIconFilesRules();
 protected slots:
-  void onRepaintRostersView();
+  void onStatusIconsChangedTimer();
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onSettingsOpened();
   void onSettingsClosed();
@@ -92,7 +92,7 @@ private:
   RosterIndexDataHolder *FDataHolder;
   QPointer<IconsOptionsWidget> FIconsOptionWidget;
 private:
-  bool FRepaintStarted;
+  bool FStatusIconsChangedStarted;
   QString FDefaultIconFile;
   QHash<QString, QString> FUserRules;
   QHash<QString, QString> FDefaultRules;
