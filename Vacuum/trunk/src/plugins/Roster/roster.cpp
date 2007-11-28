@@ -37,24 +37,17 @@ bool Roster::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &ASt
 
     if (AStanza.type() != "error")
     {
-      QSet<RosterItem *> befourItems; 
+      bool removeOld = false;
       if (!FOpenId.isEmpty() && FOpenId == AStanza.id())
       {
-        befourItems = FRosterItems.toSet();
         FOpenId.clear();
         FOpen = true;
         emit opened();
         hooked = true;
+        removeOld = true;
       }
 
-      hooked = processItemsElement(AStanza.firstElement("query")) || hooked;
-
-      if (!befourItems.isEmpty())
-      {
-        QSet<RosterItem *> oldItems = befourItems - FRosterItems.toSet();
-        foreach(RosterItem *rosterItem,oldItems)
-          removeRosterItem(rosterItem);
-      }
+      hooked = processItemsElement(AStanza.firstElement("query"),removeOld) || hooked;
 
       if (AStanza.type() == "set" && !AStanza.id().isEmpty() && hooked)
       {
@@ -425,9 +418,14 @@ void Roster::removeGroup( const QString &AGroup )
   }
 }
 
-bool Roster::processItemsElement(const QDomElement &AItemsElem)
+bool Roster::processItemsElement(const QDomElement &AItemsElem, bool ARemoveOld)
 {
   bool processed = false;
+
+  QSet<RosterItem *> oldItems; 
+  if (ARemoveOld)
+    oldItems = FRosterItems.toSet();
+
   QDomElement itemElem = AItemsElem.firstChildElement("item");
   while (!itemElem.isNull())
   {
@@ -439,6 +437,8 @@ bool Roster::processItemsElement(const QDomElement &AItemsElem)
       RosterItem *rosterItem = (RosterItem *)item(itemJid);
       if (!rosterItem)
         rosterItem = new RosterItem(itemJid,this);
+      else
+        oldItems -= rosterItem;
       rosterItem->setName(itemElem.attribute("name"));
       rosterItem->setSubscription(subscr);   
       rosterItem->setAsk(itemElem.attribute("ask"));
@@ -463,6 +463,11 @@ bool Roster::processItemsElement(const QDomElement &AItemsElem)
     }
     itemElem = itemElem.nextSiblingElement("item");  
   }
+
+  if (ARemoveOld)
+    foreach(RosterItem *rosterItem,oldItems)
+      removeRosterItem(rosterItem);
+
   return processed;
 }
 

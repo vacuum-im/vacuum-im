@@ -1,10 +1,9 @@
 #include "rosteritem.h"
 
-RosterItem::RosterItem(const Jid &AJid, QObject *parent)
-  : QObject(parent)
+RosterItem::RosterItem(const Jid &AJid, IRoster *ARoster) : QObject(ARoster->instance())
 {
   FJid = AJid; 
-  FRoster = qobject_cast<IRoster *>(parent); 
+  FRoster = ARoster; 
 }
 
 RosterItem::~RosterItem()
@@ -16,6 +15,5 @@ QString RosterItem::name() const
 {
   if (FName.isEmpty()) 
     return FJid.bare();
-
   return FName; 
 }

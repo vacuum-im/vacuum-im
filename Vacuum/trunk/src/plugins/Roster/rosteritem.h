@@ -10,11 +10,9 @@ class RosterItem :
   Q_OBJECT;
   Q_INTERFACES(IRosterItem);
   friend class Roster;
-
 public:
-  RosterItem(const Jid &AJid, QObject *parent);
+  RosterItem(const Jid &AJid, IRoster *ARoster);
   ~RosterItem();
-
   virtual QObject *instance() { return this; }
   virtual IRoster *roster() const { return FRoster; }
   virtual const Jid &jid() const {return FJid; }

@@ -64,7 +64,7 @@ signals:
   virtual void jidAboutToBeChanged(const Jid &AAfter);
 public:
 protected:
-  bool processItemsElement(const QDomElement &AItemsElem);
+  bool processItemsElement(const QDomElement &AItemsElem, bool ARemoveOld = false);
   void insertRosterItem(RosterItem *AItem);
   void removeRosterItem(RosterItem *AItem);
   void requestGroupDelimiter();
