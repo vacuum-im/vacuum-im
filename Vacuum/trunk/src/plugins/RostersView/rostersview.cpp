@@ -62,7 +62,7 @@ void RostersView::setModel(IRostersModel *AModel)
     FRostersModel = AModel;
     if (!FProxyModels.isEmpty())
       FProxyModels.first()->setSourceModel(AModel);
-    QTreeView::setModel(AModel);
+    setLastModel(AModel);
     emit modelSeted(AModel);
   }
 }
@@ -109,7 +109,7 @@ void RostersView::addProxyModel(QAbstractProxyModel *AProxyModel)
     emit proxyModelAboutToBeAdded(AProxyModel);
     QAbstractProxyModel *lastProxy = lastProxyModel();
     FProxyModels.append(AProxyModel);
-    QTreeView::setModel(AProxyModel);
+    setLastModel(AProxyModel);
     if (lastProxy)
       AProxyModel->setSourceModel(lastProxy);
     else
@@ -127,9 +127,9 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
     QAbstractProxyModel *befour = FProxyModels.value(index-1,NULL);
     QAbstractProxyModel *after = FProxyModels.value(index+1,NULL);
     if (after == NULL && befour == NULL)
-      QTreeView::setModel(FRostersModel);
+      setLastModel(FRostersModel);
     else if (after == NULL)
-      QTreeView::setModel(befour);
+      setLastModel(befour);
     else if (befour = NULL)
       after->setSourceModel(FRostersModel);
     else
@@ -491,6 +491,13 @@ void RostersView::removeClickHookers()
     foreach(IRosterIndex *index, indexes)
       removeClickHooker(hookerItem->hookerId,index);
   }
+}
+
+void RostersView::setLastModel(QAbstractItemModel *AModel)
+{
+  emit lastModelAboutToBeChanged(AModel);
+  QTreeView::setModel(AModel);
+  emit lastModelChanged(AModel);
 }
 
 void RostersView::drawBranches(QPainter * /*APainter*/, const QRect &/*ARect*/, const QModelIndex &/*AIndex*/) const

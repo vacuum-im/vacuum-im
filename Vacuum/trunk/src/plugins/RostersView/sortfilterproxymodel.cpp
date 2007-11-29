@@ -27,7 +27,8 @@ bool SortFilterProxyModel::checkOption(IRostersView::Option AOption) const
 void SortFilterProxyModel::setOption(IRostersView::Option AOption, bool AValue)
 {
   AValue ? FOptions |= AOption : FOptions &= ~AOption;
-  invalidate();
+  if (AOption == IRostersView::ShowOfflineContacts || AOption == IRostersView::ShowOnlineFirst)
+    invalidate();
 }
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
@@ -78,14 +79,9 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
     case RIT_BlankGroup:
     case RIT_NotInRosterGroup:
       {
-        int childRow = 0;
-        QModelIndex childIndex;
-        while ((childIndex = index.child(childRow,0)).isValid())
-        {
+        for(int childRow = 0; index.child(childRow,0).isValid(); childRow++)
           if (filterAcceptsRow(childRow,index))
             return true;
-          childRow++;
-        }
         return false;
       }
     default:

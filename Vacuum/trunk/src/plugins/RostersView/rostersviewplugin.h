@@ -68,6 +68,10 @@ protected slots:
   void onRostersViewDestroyed(QObject *AObject);
   void onModelAboutToBeSeted(IRostersModel *AModel);
   void onModelSeted(IRostersModel *AModel);
+  void onModelAboutToBeReset();
+  void onModelReset();
+  void onLastModelAboutToBeChanged(QAbstractItemModel *AModel);
+  void onLastModelChanged(QAbstractItemModel *AModel);
   void onProxyAdded(QAbstractProxyModel *AProxyModel);
   void onProxyRemoved(QAbstractProxyModel *AProxyModel);
   void onIndexInserted(const QModelIndex &AParent, int AStart, int AEnd);
@@ -91,6 +95,11 @@ private:
 private:
   Action *FShowOfflineAction;
 private:
+  struct  
+  {
+    int sliderPos;
+    IRosterIndex *currentIndex;
+  } FViewSavedState;
   bool FStartRestoreExpandState;
   int FOptions; 
   RostersView *FRostersView; 

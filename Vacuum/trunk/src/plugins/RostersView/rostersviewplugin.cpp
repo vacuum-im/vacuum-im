@@ -1,7 +1,7 @@
 #include <QtDebug>
 #include "rostersviewplugin.h"
-
 #include <QTimer>
+#include <QScrollBar>
 
 #define SVN_SHOW_OFFLINE_CONTACTS         "showOfflineContacts"
 #define SVN_SHOW_ONLINE_FIRST             "showOnlineFirst"
@@ -122,7 +122,12 @@ bool RostersViewPlugin::initObjects()
     SLOT(onModelAboutToBeSeted(IRostersModel *)));
   connect(FRostersView,SIGNAL(modelSeted(IRostersModel *)),
     SLOT(onModelSeted(IRostersModel *)));
-  connect(FRostersView,SIGNAL(destroyed(QObject *)),SLOT(onRostersViewDestroyed(QObject *)));
+  connect(FRostersView,SIGNAL(destroyed(QObject *)),
+    SLOT(onRostersViewDestroyed(QObject *)));
+  connect(FRostersView,SIGNAL(lastModelAboutToBeChanged(QAbstractItemModel *)),
+    SLOT(onLastModelAboutToBeChanged(QAbstractItemModel *)));
+  connect(FRostersView,SIGNAL(lastModelChanged(QAbstractItemModel *)),
+    SLOT(onLastModelChanged(QAbstractItemModel *)));
   
   if (FSettingsPlugin)
   {
@@ -188,9 +193,9 @@ bool RostersViewPlugin::checkOption(IRostersView::Option AOption) const
 void RostersViewPlugin::setOption(IRostersView::Option AOption, bool AValue)
 {
   bool changed = checkOption(AOption) != AValue;
-  AValue ? FOptions |= AOption : FOptions &= ~AOption;
   if (changed)
   {
+    AValue ? FOptions |= AOption : FOptions &= ~AOption;
     if (FRostersView)
       FRostersView->setOption(AOption,AValue);
     if (FIndexDataHolder)
@@ -316,8 +321,44 @@ void RostersViewPlugin::onModelSeted(IRostersModel *AModel)
   startRestoreExpandState();
 }
 
-void RostersViewPlugin::onProxyAdded(QAbstractProxyModel * /*AProxyModel*/)
+void RostersViewPlugin::onModelAboutToBeReset()
 {
+  FViewSavedState.sliderPos = FRostersView->verticalScrollBar()->sliderPosition();
+  if (FRostersView->currentIndex().isValid())
+    FViewSavedState.currentIndex = (IRosterIndex *)FRostersView->mapToModel(FRostersView->currentIndex()).internalPointer();
+  else
+    FViewSavedState.currentIndex = NULL;
+}
+
+void RostersViewPlugin::onModelReset()
+{
+  restoreExpandState();
+  if (FViewSavedState.currentIndex != NULL)
+    FRostersView->setCurrentIndex(FRostersView->mapFromModel(FRostersView->rostersModel()->modelIndexByRosterIndex(FViewSavedState.currentIndex)));
+  FRostersView->verticalScrollBar()->setSliderPosition(FViewSavedState.sliderPos);
+}
+
+void RostersViewPlugin::onLastModelAboutToBeChanged(QAbstractItemModel * /*AModel*/)
+{
+  if (FRostersView->rostersModel())
+  {
+    disconnect(FRostersView->rostersModel(),SIGNAL(modelAboutToBeReset()),this,SLOT(onModelAboutToBeReset()));
+    disconnect(FRostersView->rostersModel(),SIGNAL(modelReset()),this,SLOT(onModelReset()));
+  }
+}
+
+void RostersViewPlugin::onLastModelChanged(QAbstractItemModel *AModel)
+{
+  if (AModel)
+  {
+    connect(AModel,SIGNAL(modelAboutToBeReset()),SLOT(onModelAboutToBeReset()));
+    connect(AModel,SIGNAL(modelReset()),this,SLOT(onModelReset()));
+  }
+}
+
+void RostersViewPlugin::onProxyAdded(QAbstractProxyModel * AProxyModel)
+{
+  connect(AProxyModel,SIGNAL(modelReset()),SLOT(onModelReset()));
   startRestoreExpandState();
 }
 

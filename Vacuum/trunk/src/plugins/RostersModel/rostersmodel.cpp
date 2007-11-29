@@ -1,7 +1,8 @@
 #include <QtDebug>
 #include "rostersmodel.h"
-
 #include <QTimer>
+
+#define INDEX_CHANGES_FOR_RESET 20
 
 RostersModel::RostersModel(QObject *parent)
   : QAbstractItemModel(parent)
@@ -795,17 +796,26 @@ void RostersModel::onIndexDestroyed(IRosterIndex *AIndex)
 
 void RostersModel::onDelayedDataChanged()
 {
-  //Вызывает dataChanged у всех родителей для поддержки SortFilterProxyModel
-  QSet<IRosterIndex *> childIndexes = FChangedIndexes;
-  foreach(IRosterIndex *index,childIndexes)
+  //Замена сигналов изменения большого числа индексов на сброс модели
+  //из-за тормозов в сортировке в QSortFilterProxyModel
+  if (FChangedIndexes.count() < INDEX_CHANGES_FOR_RESET)
   {
-    IRosterIndex *parentIndex = index->parentIndex();
-    while (parentIndex)
+    //Вызывает dataChanged у всех родителей для поддержки SortFilterProxyModel
+    QSet<IRosterIndex *> childIndexes = FChangedIndexes;
+    foreach(IRosterIndex *index,childIndexes)
     {
-      FChangedIndexes+=parentIndex;
-      parentIndex = parentIndex->parentIndex();
+      IRosterIndex *parentIndex = index->parentIndex();
+      while (parentIndex && !FChangedIndexes.contains(parentIndex))
+      {
+        FChangedIndexes+=parentIndex;
+        parentIndex = parentIndex->parentIndex();
+      }
     }
+    emitDelayedDataChanged(FRootIndex);
   }
-  emitDelayedDataChanged(FRootIndex);
+  else
+    reset();
+
+  FChangedIndexes.clear();
 }
 

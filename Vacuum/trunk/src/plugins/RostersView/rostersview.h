@@ -60,17 +60,20 @@ public:
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AModel);
   virtual void modelSeted(IRostersModel *AModel);
-  virtual void indexAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
-  virtual void indexInserted(const QModelIndex &AParent, int AStart, int AEnd);
   virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *AProxyModel);
   virtual void proxyModelAdded(QAbstractProxyModel *AProxyModel);
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel);
   virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel);
+  virtual void lastModelAboutToBeChanged(QAbstractItemModel *AModel);
+  virtual void lastModelChanged(QAbstractItemModel *AModel);
   virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu);
   virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   virtual void labelClicked(IRosterIndex *AIndex, int ALabelId);
   virtual void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
+signals:
+  virtual void indexAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
+  virtual void indexInserted(const QModelIndex &AParent, int AStart, int AEnd);
 public:
   bool checkOption(IRostersView::Option AOption) const;
   void setOption(IRostersView::Option AOption, bool AValue);
@@ -81,6 +84,7 @@ protected:
   QString intId2StringId(int AIntId);
   void removeLabels();
   void removeClickHookers();
+  void setLastModel(QAbstractItemModel *AModel);
 protected:
   //QTreeView
   virtual void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;

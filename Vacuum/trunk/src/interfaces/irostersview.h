@@ -67,6 +67,8 @@ signals:
   virtual void proxyModelAdded(QAbstractProxyModel *AProxyModel) =0;
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel) =0;
   virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel) =0;
+  virtual void lastModelAboutToBeChanged(QAbstractItemModel *AModel) =0;
+  virtual void lastModelChanged(QAbstractItemModel *AModel) =0;
   virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu) =0;
   virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu) =0;
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;

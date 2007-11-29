@@ -138,8 +138,9 @@ bool IndexDataHolder::checkOption(IRostersView::Option AOption) const
 void IndexDataHolder::setOption(IRostersView::Option AOption, bool AValue)
 {
   AValue ? FOptions |= AOption : FOptions &= ~AOption;
+  if (AOption == IRostersView::ShowResource || AOption == IRostersView::ShowFooterText)
+    emit dataChanged(NULL,Qt::DisplayRole);
 }
-
 
 QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
 {
