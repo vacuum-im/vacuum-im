@@ -121,7 +121,7 @@ bool SettingsPlugin::initSettings()
       FProfiles.clear();
       QDomElement elem = FProfiles.appendChild(FProfiles.createElement("profiles")).toElement();
       elem.setAttribute("version",PROFILE_VERSION);
-      elem.setAttribute("profileName","Default");
+      elem.setAttribute("profileName",DEFAULT_SKIN_NAME);
     }
     profilesFile.close();
 

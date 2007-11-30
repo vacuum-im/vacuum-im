@@ -46,7 +46,7 @@ void EmoticonsOptions::init()
     item->setCheckState(Qt::Checked);
   }
 
-  QStringList allfiles = Skin::skinFiles(SKIN_TYPE_ICONSET,"emoticons","*.jisp");
+  QStringList allfiles = Skin::skinFilesWithDef(SKIN_TYPE_ICONSET,"emoticons","*.jisp");
   for (int i = 0; i < allfiles.count(); i++)
   {
     allfiles[i].prepend("emoticons/");

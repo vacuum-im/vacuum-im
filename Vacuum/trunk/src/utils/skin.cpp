@@ -3,8 +3,6 @@
 #include <QSet>
 #include <QDir>
 
-#define DEFAULT_SKIN_NAME         "default"
-
 QString Skin::FSkinsDirectory = "./skin";
 QString Skin::FSkin = DEFAULT_SKIN_NAME;
 QHash<QString,Iconset> Skin::FIconsets;
@@ -187,6 +185,14 @@ QStringList Skin::skinFiles(const QString &ASkinType, const QString &ASubFolder,
 
   QDir dir(dirPath,AFilter,QDir::Name|QDir::IgnoreCase,QDir::Files);
   return dir.entryList();
+}
+
+QStringList Skin::skinFilesWithDef(const QString &ASkinType, const QString &ASubFolder, const QString &AFilter, const QString &ASkin)
+{
+  QStringList files = skinFiles(ASkinType,ASubFolder,AFilter,ASkin);
+  if (ASkin != DEFAULT_SKIN_NAME)
+    files += (skinFiles(ASkinType,ASubFolder,AFilter,DEFAULT_SKIN_NAME).toSet() - files.toSet()).toList();
+  return files;
 }
 
 QIcon Skin::skinIcon(const QString &ASkin)

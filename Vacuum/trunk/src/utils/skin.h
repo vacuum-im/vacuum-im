@@ -7,6 +7,8 @@
 #include "utilsexport.h"
 #include "iconset.h"
 
+#define DEFAULT_SKIN_NAME                 "Default"
+
 #define SKIN_TYPE_ICONSET                 "iconset"
 
 #define SYSTEM_ICONSETFILE                "system/common.jisp"
@@ -56,6 +58,7 @@ public:
   static QStringList skins();
   static bool skinFileExists(const QString &ASkinType, const QString &AFileName, const QString &ASubFolder ="", const QString &ASkin = "");
   static QStringList skinFiles(const QString &ASkinType, const QString &ASubFolder, const QString &AFilter = "*.*", const QString &ASkin = "");
+  static QStringList skinFilesWithDef(const QString &ASkinType, const QString &ASubFolder, const QString &AFilter = "*.*", const QString &ASkin = "");
   static QIcon skinIcon(const QString &ASkin);
   static const QString &skin();
   static void setSkin(const QString &ASkin);

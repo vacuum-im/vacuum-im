@@ -320,15 +320,15 @@ void StatusIcons::loadIconFilesRules()
 {
   clearIconFilesRules();
 
-  QStringList iconFiles = Skin::skinFiles("iconset","status","*.jisp");
-  for (int i = 0; i < iconFiles.count(); ++i)
-    iconFiles[i].prepend("status/");
-
   FDefaultIconAction = new Action(FCustomIconMenu);
-  FDefaultIconAction->setText(tr("Default"));
+  FDefaultIconAction->setText(tr(DEFAULT_SKIN_NAME));
   FDefaultIconAction->setCheckable(true);
   connect(FDefaultIconAction,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
   FCustomIconMenu->addAction(FDefaultIconAction,AG_DEFAULT-1,true);
+
+  QStringList iconFiles = Skin::skinFilesWithDef(SKIN_TYPE_ICONSET,"status","*.jisp");
+  for (int i = 0; i < iconFiles.count(); ++i)
+    iconFiles[i].prepend("status/");
 
   foreach(QString iconFile, iconFiles)
   {
