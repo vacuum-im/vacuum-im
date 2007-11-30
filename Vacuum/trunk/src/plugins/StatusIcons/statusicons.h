@@ -14,6 +14,7 @@
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/isettings.h"
+#include "../../interfaces/iskinmanager.h"
 #include "../../utils/skin.h"
 #include "../../utils/unzipfile.h"
 #include "rosterindexdataholder.h"
@@ -27,24 +28,19 @@ class StatusIcons :
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IStatusIcons IOptionsHolder);
-
 public:
   StatusIcons();
   ~StatusIcons();
-
-  virtual QObject *instance() { return this; }
-
   //IPlugin
+  virtual QObject *instance() { return this; }
   virtual QUuid pluginUuid() const { return STATUSICONS_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
-
   //IStatusIcons
   virtual QString defaultIconFile() const { return FDefaultIconFile; }
   virtual void setDefaultIconFile(const QString &AIconFile);
@@ -78,12 +74,14 @@ protected slots:
   void onOptionsRejected();
   void onStatusIconsetChanged();
   void onSetCustomIconset(bool);
+  void onSkinChanged();
 private:
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
   IRostersModelPlugin *FRostersModelPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
   ISettingsPlugin *FSettingsPlugin;
+  ISkinManager *FSkinManager;
 private:
   Menu *FCustomIconMenu;
   Action *FDefaultIconAction;

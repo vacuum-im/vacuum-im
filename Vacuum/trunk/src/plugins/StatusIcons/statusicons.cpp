@@ -17,17 +17,18 @@ StatusIcons::StatusIcons()
   FRostersModelPlugin = NULL;
   FRostersViewPlugin = NULL;
   FSettingsPlugin = NULL;
+  FSkinManager = NULL;
 
+  FStatusIconset = NULL;
   FCustomIconMenu = NULL;
+  FDefaultIconAction = NULL;
   FDataHolder = NULL;
   FStatusIconsChangedStarted = false;
-  FDefaultIconFile = STATUS_ICONSETFILE;
 }
 
 StatusIcons::~StatusIcons()
 {
-  if (FCustomIconMenu)
-    delete FCustomIconMenu;
+  delete FCustomIconMenu;
 }
 
 void StatusIcons::pluginInfo(PluginInfo *APluginInfo)
@@ -81,16 +82,28 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &AInitOrde
     }
   }
 
+  plugin = APluginManager->getPlugins("ISkinManager").value(0,NULL);
+  if (plugin)
+  {
+    FSkinManager = qobject_cast<ISkinManager *>(plugin->instance());
+    if (FSkinManager)
+    {
+      connect(FSkinManager->instance(),SIGNAL(skinChanged()),SLOT(onSkinChanged()));
+    }
+  }
+
   return true;
 }
 
 bool StatusIcons::initObjects()
 {
-  FStatusIconset = Skin::getSkinIconset(STATUS_ICONSETFILE);
-  connect(FStatusIconset,SIGNAL(iconsetChanged()),SLOT(onStatusIconsetChanged()));
-
   FCustomIconMenu = new Menu;
   FCustomIconMenu->setTitle(tr("Status icon"));
+
+  setDefaultIconFile(STATUS_ICONSETFILE);
+  
+  if (!FSkinManager)
+    loadIconFilesRules();
 
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
   {
@@ -110,8 +123,6 @@ bool StatusIcons::initObjects()
     FSettingsPlugin->appendOptionsHolder(this);
   }
 
-  loadIconFilesRules();
-
   return true;
 }
 
@@ -130,8 +141,11 @@ void StatusIcons::setDefaultIconFile(const QString &AIconFile)
 {
   if (FDefaultIconFile != AIconFile && Skin::getIconset(AIconFile).isValid())
   {
+    if (FStatusIconset)
+      disconnect(FStatusIconset,SIGNAL(iconsetChanged()),this,SLOT(onStatusIconsetChanged()));
     FDefaultIconFile = AIconFile;
     FStatusIconset = Skin::getSkinIconset(AIconFile);
+    connect(FStatusIconset,SIGNAL(iconsetChanged()),SLOT(onStatusIconsetChanged()));
     FJid2IconFile.clear();
     emit defaultIconFileChanged(AIconFile);
     emit defaultIconsChanged();
@@ -332,11 +346,11 @@ void StatusIcons::loadIconFilesRules()
 
   foreach(QString iconFile, iconFiles)
   {
-    Iconset iconset(Skin::skinsDirectory()+"/"+Skin::skin()+"/iconset/"+iconFile);
-    if (iconset.isValid())
+    SkinIconset *iconset = Skin::getSkinIconset(iconFile); //(Skin::skinsDirectory()+"/"+Skin::skin()+"/iconset/"+iconFile);
+    if (iconset->isValid())
     {
       QDomDocument doc;
-      doc.setContent(iconset.fileData("statusicons.xml"));
+      doc.setContent(iconset->fileData("statusicons.xml"));
       QDomElement elem = doc.firstChildElement().firstChildElement("rule");
       while(!elem.isNull())
       {
@@ -350,8 +364,8 @@ void StatusIcons::loadIconFilesRules()
       }
 
       Action *action = new Action(FCustomIconMenu);
-      action->setIcon(iconset.iconByName(iconNameByStatus(IPresence::Online,"",false)));
-      action->setText(iconset.info().name);
+      action->setIcon(iconset->iconByName(iconNameByStatus(IPresence::Online,"",false)));
+      action->setText(iconset->info().name);
       action->setData(ADR_ICONSETNAME,iconFile);
       action->setCheckable(true);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
@@ -451,6 +465,11 @@ void StatusIcons::onSetCustomIconset(bool)
     else
       insertRule(rule,iconFile,IStatusIcons::UserRule);
   }
+}
+
+void StatusIcons::onSkinChanged()
+{
+  loadIconFilesRules();
 }
 
 Q_EXPORT_PLUGIN2(StatusIconsPlugin, StatusIcons)

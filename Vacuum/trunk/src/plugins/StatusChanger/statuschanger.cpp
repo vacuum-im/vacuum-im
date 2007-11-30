@@ -137,11 +137,6 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
   if (plugin)
   {
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
-    if (FStatusIcons)
-    {
-      connect(FStatusIcons->instance(),SIGNAL(defaultIconsChanged()),
-        SLOT(onDefaultStatusIconsChanged()));
-    }
   }
 
   return FPresencePlugin!=NULL;
@@ -152,8 +147,7 @@ bool StatusChanger::initObjects()
   FRosterIconset = Skin::getSkinIconset(ROSTER_ICONSETFILE);
   connect(FRosterIconset, SIGNAL(iconsetChanged()),SLOT(onRosterIconsetChanged()));
 
-  FMainMenu = new Menu(NULL);
-
+  FMainMenu = new Menu;
   FCustomMenu = new Menu(FMainMenu);
   FCustomMenu->setTitle(tr("User statuses"));
   FCustomMenu->setIcon(STATUS_ICONSETFILE,"status/ask");
@@ -200,6 +194,12 @@ bool StatusChanger::initObjects()
   if (FTrayManager)
   {
     FTrayManager->addAction(FMainMenu->menuAction(),AG_STATUSCHANGER_TRAY,true);
+  }
+
+  if (FStatusIcons)
+  {
+    connect(FStatusIcons->instance(),SIGNAL(defaultIconsChanged()),
+      SLOT(onDefaultStatusIconsChanged()));
   }
 
   return true;
