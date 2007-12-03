@@ -81,14 +81,14 @@ ErrorHandler &ErrorHandler::parseElement(const QDomElement &AErrElem, const QStr
   if (AErrElem.isNull()) 
     return *this;
 
-  const QDomNode *node = &AErrElem.elementsByTagName("error").at(0);
-  if (node->isNull()) 
-    node = &AErrElem;
+  QDomElement elem = AErrElem.firstChildElement("error");
+  if (elem.isNull())
+    elem = AErrElem;
 
-  const ErrorItem *item = 0;
-  FCode = node->toElement().attribute("code","0").toInt();
+  ErrorItem *item = NULL;
+  FCode = elem.attribute("code","0").toInt();
 
-  QString type = node->toElement().attribute("type");
+  QString type = elem.attribute("type");
   if (type == "cancel")
     FType = CANCEL;
   else if (type == "wait")
@@ -100,22 +100,22 @@ ErrorHandler &ErrorHandler::parseElement(const QDomElement &AErrElem, const QStr
   else
     FType = UNKNOWNTYPE;
     
-  node = &node->firstChild();
-  while (!node->isNull() && item == 0) 
+  elem = elem.firstChildElement();
+  while (!elem.isNull() && item == NULL) 
   {
-    if (FText.isNull() && node->isText())
-      FText = node->toText().data(); 
+    if (FText.isEmpty() && elem.isText())
+      FText = elem.text(); 
 
-    if (node->toElement().tagName() != "text")
+    if (elem.tagName() != "text")
     {
       bool defaultNS = false;
-      item = itemByCondition(ANsURI,node->toElement().tagName());
-      if (item == 0)
+      item = itemByCondition(ANsURI,elem.tagName());
+      if (item == NULL)
       {
-        item = itemByCondition(EHN_DEFAULT,node->toElement().tagName());
+        item = itemByCondition(EHN_DEFAULT,elem.tagName());
         defaultNS = true;
       }
-      if (item != 0)
+      if (item != NULL)
       {
         FCondition = item->condition;
         if (FCode == 0)
@@ -127,12 +127,12 @@ ErrorHandler &ErrorHandler::parseElement(const QDomElement &AErrElem, const QStr
           item = 0;
       }
       else if (FCondition.isEmpty())
-        FCondition = node->toElement().tagName();
+        FCondition = elem.tagName();
     }
     else
-      FText = node->firstChild().toText().data();
+      FText = elem.text();
 
-    node = &node->nextSibling(); 
+    elem = elem.nextSiblingElement();
   }
 
   if (FCode == 0 && !FCondition.isEmpty())
