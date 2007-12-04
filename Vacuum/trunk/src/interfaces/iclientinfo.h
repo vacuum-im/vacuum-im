@@ -1,0 +1,47 @@
+#ifndef ICLIENTINFO_H
+#define ICLIENTINFO_H
+
+#include <QDateTime>
+#include "../../utils/jid.h"
+
+#define CLIENTINFO_UUID "{3E2A0C1D-B347-43f5-B90B-5E7F87D7D8B0}"
+
+class IClientInfo 
+{
+public:
+  enum Option {
+    AutoLoadSoftwareInfo        =1
+  };
+  enum SoftwareStatus {
+    SoftwareNotLoaded,
+    SoftwareLoaded,
+    SoftwareLoading,
+    SoftwareError
+  };
+public:
+  virtual QObject *instance() =0;
+  virtual void showClientInfo(const Jid &AContactJid, const Jid &AStreamJid) =0;
+  virtual bool checkOption(IClientInfo::Option AOption) const =0;
+  virtual void setOption(IClientInfo::Option AOption, bool AValue) =0;
+  //Software Version
+  virtual bool hasSoftwareInfo(const Jid &AContactJid) const =0;
+  virtual bool requestSoftwareInfo(const Jid &AContactJid, const Jid &AStreamJid) =0;
+  virtual int softwareStatus(const Jid &AContactJid) const =0;
+  virtual QString softwareName(const Jid &AContactJid) const =0;
+  virtual QString softwareVersion(const Jid &AContactJid) const =0;
+  virtual QString softwareOs(const Jid &AContactJid) const =0;
+  //Last Activity
+  virtual bool hasLastActivity(const Jid &AContactJid) const =0;
+  virtual bool requestLastActivity(const Jid &AContactJid, const Jid &AStreamJid) =0;
+  virtual QDateTime lastActivityRequest(const Jid &AContactJid) const =0;
+  virtual QDateTime lastActivityTime(const Jid &AContactJid) const =0;
+  virtual QString lastActivityText(const Jid &AContactJid) const =0;
+signals:
+  virtual void optionChanged(IClientInfo::Option AOption, bool AValue) =0;
+  virtual void softwareInfoChanged(const Jid &AContactJid) =0; 
+  virtual void lastActivityChanged(const Jid &AContactJid) =0;
+};
+
+Q_DECLARE_INTERFACE(IClientInfo,"Vacuum.Plugin.IClientInfo/1.0")
+
+#endif

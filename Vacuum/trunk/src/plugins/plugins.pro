@@ -24,4 +24,5 @@ SUBDIRS = settings \
           starttls \
           statusicons \
           skinmanager \
-          emoticons
+          emoticons \
+          clientinfo

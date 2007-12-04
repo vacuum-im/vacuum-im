@@ -1,0 +1,40 @@
+<ui version="4.0" >
+ <class>optionswidgetClass</class>
+ <widget class="QWidget" name="optionswidgetClass" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>383</width>
+    <height>18</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>optionswidget</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="chbAutoLoadSoftwareInfo" >
+     <property name="text" >
+      <string>Auto load client version</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <resources/>
+ <connections/>
+</ui>

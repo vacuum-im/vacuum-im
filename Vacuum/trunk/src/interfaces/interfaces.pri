@@ -17,4 +17,5 @@ HEADERS += ipluginmanager.h \
            idefaultconnection.h \
            istatusicons.h \
            iskinmanager.h \
-           iemoticons.h
+           iemoticons.h \
+           iclientinfo.h

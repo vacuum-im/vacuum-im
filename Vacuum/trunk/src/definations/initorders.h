@@ -7,5 +7,6 @@
 #define IO_ROSTERCHANGER                    200
 #define IO_MESSENGER                        200
 #define IO_STATUSICONS                      200
+#define IO_CLIENTINFO                       200
 
 #endif

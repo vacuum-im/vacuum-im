@@ -8,6 +8,8 @@
 #define NS_JABBER_IQ_AUTH                       "jabber:iq:auth"
 #define NS_JABBER_ROSTER                        "jabber:iq:roster"
 #define NS_JABBER_PRIVATE                       "jabber:iq:private"
+#define NS_JABBER_VERSION                       "jabber:iq:version"
+#define NS_JABBER_LAST                          "jabber:iq:last"
 
 #define NS_FEATURE_IQAUTH                       "http://jabber.org/features/iq-auth"
 #define NS_FEATURE_SASL                         "urn:ietf:params:xml:ns:xmpp-sasl"

@@ -46,5 +46,12 @@
 #define RDR_LabelValues                             Qt::UserRole + 40
 #define RDR_LabelFlags                              Qt::UserRole + 41
 #define RDR_FooterText                              Qt::UserRole + 42
+//ClientInfo
+#define RDR_CLIENT_NAME                             Qt::UserRole + 43
+#define RDR_CLIENT_VERSION                          Qt::UserRole + 44
+#define RDR_CLIENT_OS                               Qt::UserRole + 45
+#define RDR_LAST_ACTIVITY_TIME                      Qt::UserRole + 46
+#define RDR_LAST_ACTIVITY_TEXT                      Qt::UserRole + 47
+#define RDR_ENTITY_TIME                             Qt::UserRole + 48    
 
 #endif
