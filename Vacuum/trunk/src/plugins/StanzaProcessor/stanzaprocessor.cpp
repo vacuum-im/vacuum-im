@@ -290,9 +290,10 @@ bool StanzaProcessor::processStanzaIn(const Jid &AStreamJid, Stanza *AStanza)
   QList<int> checkedHandlers;
 
   QMapIterator<int,int> it(FHandlerIdsByPriority);
-  while(!hooked && it.hasNext())
+  it.toBack();
+  while(!hooked && it.hasPrevious())
   {
-    it.next();
+    it.previous();
     HandlerItem &hItem = FHandlerItems[it.value()];
     if (hItem.direction == DirectionIn && (!hItem.streamJid.isValid() || hItem.streamJid == AStreamJid))
     {
@@ -325,10 +326,9 @@ bool StanzaProcessor::processStanzaOut(const Jid &AStreamJid, Stanza *AStanza)
   QList<int> checkedHandlers;
 
   QMapIterator<int,int> it(FHandlerIdsByPriority);
-  it.toBack();
-  while(!hooked && it.hasPrevious())
+  while(!hooked && it.hasNext())
   {
-    it.previous();
+    it.next();
     HandlerItem &hItem = FHandlerItems[it.value()];
     if (hItem.direction == DirectionOut && (!hItem.streamJid.isValid() || hItem.streamJid == AStreamJid))
     {
@@ -409,6 +409,7 @@ void StanzaProcessor::onIqStanzaTimeOut()
   foreach(IqStanzaItem iqItem, FIqStanzaItems)
     if (iqItem.timer == timer)
     {
+      iqItem.owner->iqStanzaTimeOut(iqItem.stanzaId);
       removeIqStanzaItem(iqItem.stanzaId);
       break;
     }
