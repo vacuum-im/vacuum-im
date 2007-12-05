@@ -11,6 +11,7 @@ InfoWidget::InfoWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   FAccount = NULL;
   FRoster = NULL;
   FPresence = NULL;
+  FClientInfo = NULL;
 
   FMessenger = AMessenger;
   FStreamJid = AStreamJid;
@@ -92,7 +93,10 @@ void InfoWidget::autoSetField(InfoField AField)
     };
   case ContactClient:
     {
-      setField(ContactClient,QVariant());
+      if (FClientInfo && FClientInfo->hasSoftwareInfo(FContactJid))
+        setField(ContactClient,FClientInfo->softwareName(FContactJid)+" "+FClientInfo->softwareVersion(FContactJid));
+      else
+        setField(ContactClient,QVariant());
       break;
     };
   }
@@ -252,6 +256,14 @@ void InfoWidget::initialize()
       }
     }
   }
+
+  plugin = FMessenger->pluginManager()->getPlugins("IClientInfo").value(0,NULL);
+  if (plugin)
+  {
+    FClientInfo = qobject_cast<IClientInfo *>(plugin->instance());
+    if (FClientInfo)
+      connect(FClientInfo->instance(),SIGNAL(softwareInfoChanged(const Jid &)),SLOT(onSoftwareInfoChanged(const Jid &)));
+  }
 }
 
 QString InfoWidget::showName(IPresence::Show AShow) const
@@ -300,3 +312,7 @@ void InfoWidget::onPresenceItem(IPresenceItem *APresenceItem)
   }
 }
 
+void InfoWidget::onSoftwareInfoChanged(const Jid &AContactJid)
+{
+  autoSetField(ContactClient);
+}

@@ -6,6 +6,7 @@
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
+#include "../../interfaces/iclientinfo.h"
 #include "ui_infowidget.h"
 
 class InfoWidget : 
@@ -35,6 +36,7 @@ protected slots:
   void onAccountChanged(const QString &AName, const QVariant &AValue);  
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onPresenceItem(IPresenceItem *APresenceItem);
+  void onSoftwareInfoChanged(const Jid &AContactJid);
 private:
   Ui::InfoWidgetClass ui;
 private:
@@ -42,6 +44,7 @@ private:
   IAccount *FAccount;
   IRoster *FRoster;
   IPresence *FPresence;
+  IClientInfo *FClientInfo;
 private:
   Jid FStreamJid;
   Jid FContactJid;
