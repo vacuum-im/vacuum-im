@@ -295,7 +295,7 @@ bool ClientInfo::hasSoftwareInfo(const Jid &AContactJid) const
 bool ClientInfo::requestSoftwareInfo(const Jid &AContactJid, const Jid &AStreamJid)
 {
   bool sended = false;
-  if (AStreamJid.isValid() && AContactJid.isValid() && !AContactJid.resource().isEmpty() && !FSoftwareId.values().contains(AContactJid))
+  if (AStreamJid.isValid() && AContactJid.isValid() && !FSoftwareId.values().contains(AContactJid))
   {
     Stanza iq("iq");
     iq.addElement("query",NS_JABBER_VERSION);

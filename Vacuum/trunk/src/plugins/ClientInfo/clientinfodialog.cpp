@@ -32,23 +32,20 @@ void ClientInfoDialog::updateText()
   QString html = QString("<b>%1</b> (%2)<br><br>").arg(Qt::escape(FContactName)).arg(FContactJid.hFull());
 
   //Software Info
-  if (!FContactJid.resource().isEmpty())
+  html += tr("<b>Software Info</b><br>");
+  if (FClientInfo->hasSoftwareInfo(FContactJid))
   {
-    html += tr("<b>Software Info</b><br>");
-    if (FClientInfo->hasSoftwareInfo(FContactJid))
-    {
-      html += itemMask.arg(tr("Name:")).arg(Qt::escape(FClientInfo->softwareName(FContactJid)));
-      html += itemMask.arg(tr("Version:")).arg(Qt::escape(FClientInfo->softwareVersion(FContactJid)));
-      html += itemMask.arg(tr("OS:")).arg(Qt::escape(FClientInfo->softwareOs(FContactJid)));
-    }
-    else if (FClientInfo->softwareStatus(FContactJid) == IClientInfo::SoftwareError)
-      html += itemMask.arg(tr("Error:")).arg(FClientInfo->softwareName(FContactJid));
-    else if (FClientInfo->softwareStatus(FContactJid) == IClientInfo::SoftwareNotLoaded)
-      html += tr("Not loaded<br>");
-    else
-      html += tr("Loading ...<br>");
-    html += "<br>";
+    html += itemMask.arg(tr("Name:")).arg(Qt::escape(FClientInfo->softwareName(FContactJid)));
+    html += itemMask.arg(tr("Version:")).arg(Qt::escape(FClientInfo->softwareVersion(FContactJid)));
+    html += itemMask.arg(tr("OS:")).arg(Qt::escape(FClientInfo->softwareOs(FContactJid)));
   }
+  else if (FClientInfo->softwareStatus(FContactJid) == IClientInfo::SoftwareError)
+    html += itemMask.arg(tr("Error:")).arg(FClientInfo->softwareName(FContactJid));
+  else if (FClientInfo->softwareStatus(FContactJid) == IClientInfo::SoftwareNotLoaded)
+    html += tr("Not loaded<br>");
+  else
+    html += tr("Loading ...<br>");
+  html += "<br>";
 
   //Last Activity
   html += tr("<b>Last Activity</b><br>");
