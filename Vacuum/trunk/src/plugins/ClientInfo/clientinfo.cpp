@@ -440,7 +440,7 @@ void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMult
     if (hasSoftwareInfo(contactJid))
       AToolTips.insert(TTO_SOFTWARE_INFO,tr("Client: %1 %2").arg(softwareName(contactJid)).arg(softwareVersion(contactJid)));
     
-    if (hasLastActivity(contactJid))
+    if (hasLastActivity(contactJid) && AIndex->data(RDR_Show).toInt() == IPresence::Offline)
       AToolTips.insert(TTO_LAST_ACTIVITY,tr("Offline since: %1").arg(lastActivityTime(contactJid).toString()));
   }
 }
