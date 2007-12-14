@@ -2,7 +2,7 @@
 
 #include <qendian.h>
 
-#define READ_TIMEOUT              15000
+#define READ_TIMEOUT              30000
 #define KEEP_ALIVE_TIMEOUT        30000
 
 DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent)
@@ -36,7 +36,7 @@ bool DefaultConnection::isOpen() const
 
 void DefaultConnection::connectToHost()
 {
-  if (!FSocket.isOpen())
+  if (FSocket.state() == QAbstractSocket::UnconnectedState)
   {
     FHost = option(IDefaultConnection::CO_Host).toString();
     FPort = option(IDefaultConnection::CO_Port).toInt();
