@@ -21,6 +21,8 @@ public:
   void setUseSSL(bool AUseSSL);
   bool ignoreSSLErrors() const;
   void setIgnoreSSLError(bool AIgnore);
+  bool keepAlive() const;
+  void setKeepAlive(bool AKeepAlive);
   int proxyType() const;
   void setProxyTypes(const QStringList &AProxyTypes);
   void setProxyType(int AProxyType);

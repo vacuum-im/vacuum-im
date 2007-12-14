@@ -13,6 +13,7 @@ public:
     CO_Port,
     CO_UseSSL,
     CO_IgnoreSSLErrors,
+    CO_KeepAlive,
     CO_ProxyType,
     CO_ProxyHost,
     CO_ProxyPort,

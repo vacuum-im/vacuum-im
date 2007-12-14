@@ -16,10 +16,8 @@ class DefaultConnection :
 public:
   DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent);
   ~DefaultConnection();
-
   virtual QObject *instance() { return this; }
   virtual IConnectionPlugin *ownerPlugin() const { return FPlugin; }
-
   virtual bool isOpen() const;
   virtual void connectToHost();
   virtual void disconnect();
@@ -27,7 +25,6 @@ public:
   virtual QByteArray read(qint64 ABytes);
   virtual QVariant option(int ARole) const;
   virtual void setOption(int ARole, const QVariant &AValue);
-
   virtual bool isEncrypted() const;
   virtual void startClientEncryption();
   virtual QSsl::SslProtocol protocol() const;
@@ -64,8 +61,8 @@ private:
   IConnectionPlugin *FPlugin;  
 private:
   QSslSocket FSocket;
-  QTimer ReadTimer;
-  QTimer KeepAliveTimer;
+  QTimer FReadTimer;
+  QTimer FKeepAliveTimer;
 private:
   enum ProxyState {
     ProxyUnconnected,

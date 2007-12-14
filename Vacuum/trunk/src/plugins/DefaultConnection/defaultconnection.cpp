@@ -20,8 +20,8 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
   connect(&FSocket, SIGNAL(sslErrors(const QList<QSslError> &)), SLOT(onSocketSSLErrors(const QList<QSslError> &)));
   connect(&FSocket, SIGNAL(modeChanged(QSslSocket::SslMode)), SIGNAL(modeChanged(QSslSocket::SslMode)));
   
-  connect(&ReadTimer,SIGNAL(timeout()),SLOT(onReadTimeout()));
-  connect(&KeepAliveTimer,SIGNAL(timeout()),SLOT(onKeepAliveTimeout()));
+  connect(&FReadTimer,SIGNAL(timeout()),SLOT(onReadTimeout()));
+  connect(&FKeepAliveTimer,SIGNAL(timeout()),SLOT(onKeepAliveTimeout()));
 }
 
 DefaultConnection::~DefaultConnection()
@@ -36,28 +36,32 @@ bool DefaultConnection::isOpen() const
 
 void DefaultConnection::connectToHost()
 {
-  FHost = option(IDefaultConnection::CO_Host).toString();
-  FPort = option(IDefaultConnection::CO_Port).toInt();
-  FUseSSL = option(IDefaultConnection::CO_UseSSL).toBool();
-  FIgnoreSSLErrors = option(IDefaultConnection::CO_IgnoreSSLErrors).toBool();
-  FProxyType = option(IDefaultConnection::CO_ProxyType).toInt();
-  FProxyHost = option(IDefaultConnection::CO_ProxyHost).toString();
-  FProxyPort = option(IDefaultConnection::CO_ProxyPort).toInt();
-  FProxyUser = option(IDefaultConnection::CO_ProxyUserName).toString();
-  FProxyPassword = option(IDefaultConnection::CO_ProxyPassword).toString();
-  
-  if (FProxyType == 0)
+  if (!FSocket.isOpen())
   {
-    FProxyState = ProxyReady;
-    if (FUseSSL)
-      FSocket.connectToHostEncrypted(FHost,FPort);
-    else
-      FSocket.connectToHost(FHost, FPort);
-  }
-  else 
-  {
-    FProxyState = ProxyUnconnected;
-    FSocket.connectToHost(FProxyHost, FProxyPort);
+    FHost = option(IDefaultConnection::CO_Host).toString();
+    FPort = option(IDefaultConnection::CO_Port).toInt();
+    FUseSSL = option(IDefaultConnection::CO_UseSSL).toBool();
+    FIgnoreSSLErrors = option(IDefaultConnection::CO_IgnoreSSLErrors).toBool();
+    FProxyType = option(IDefaultConnection::CO_ProxyType).toInt();
+    FProxyHost = option(IDefaultConnection::CO_ProxyHost).toString();
+    FProxyPort = option(IDefaultConnection::CO_ProxyPort).toInt();
+    FProxyUser = option(IDefaultConnection::CO_ProxyUserName).toString();
+    FProxyPassword = option(IDefaultConnection::CO_ProxyPassword).toString();
+
+    if (FProxyType == 0)
+    {
+      FProxyState = ProxyReady;
+      if (FUseSSL)
+        FSocket.connectToHostEncrypted(FHost,FPort);
+      else
+        FSocket.connectToHost(FHost, FPort);
+    }
+    else 
+    {
+      FProxyState = ProxyUnconnected;
+      FSocket.connectToHost(FProxyHost, FProxyPort);
+    }
+    FReadTimer.start(READ_TIMEOUT);
   }
 }
 
@@ -77,13 +81,13 @@ void DefaultConnection::disconnect()
 
 qint64 DefaultConnection::write(const QByteArray &AData)
 {
-  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
+  FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
   return FSocket.write(AData);
 }
 
 QByteArray DefaultConnection::read(qint64 ABytes)
 {
-  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
+  FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
   return FSocket.read(ABytes);
 }
 
@@ -163,7 +167,7 @@ void DefaultConnection::socket5Connection()
     else 
       buf += 2;
     FProxyState = ProxyAuthType;
-    ReadTimer.start(READ_TIMEOUT); 
+    FReadTimer.start(READ_TIMEOUT); 
     write(buf); 
   }
   else if (FProxyState == ProxyAuthType)
@@ -178,7 +182,7 @@ void DefaultConnection::socket5Connection()
       buf += (const char)FProxyPassword.toUtf8().size();
       buf += FProxyPassword.toUtf8(); 
       FProxyState = ProxyAuthResult;
-      ReadTimer.start(READ_TIMEOUT); 
+      FReadTimer.start(READ_TIMEOUT); 
       write(buf);
     }
     else
@@ -208,7 +212,7 @@ void DefaultConnection::socket5Connection()
     quint16 port = qToBigEndian<quint16>(FPort);
     buf += QByteArray((const char *)&port,2);
     FProxyState = ProxyConnectResult;
-    ReadTimer.start(READ_TIMEOUT); 
+    FReadTimer.start(READ_TIMEOUT); 
     write(buf);
   }
   else if (FProxyState == ProxyConnectResult)
@@ -249,7 +253,7 @@ void DefaultConnection::httpsConnection()
     buf += "Host: "+FHost.toAscii()+":"+QString("%1").arg(FPort).toAscii()+"\r\n";  
     buf += "\r\n";
     FProxyState = ProxyConnectResult;
-    ReadTimer.start(READ_TIMEOUT); 
+    FReadTimer.start(READ_TIMEOUT); 
     write(buf);
   }
   else if (FProxyState == ProxyConnectResult)
@@ -276,16 +280,17 @@ void DefaultConnection::proxyReady()
 
 void DefaultConnection::connectionReady()
 {
-  ReadTimer.start(READ_TIMEOUT); 
-  KeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
+  FReadTimer.start(READ_TIMEOUT); 
+  FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
   emit connected();
 }
 
 void DefaultConnection::onSocketConnected()
 {
+  FReadTimer.stop();
   if (FProxyState != ProxyReady)
   {
-    ReadTimer.start(READ_TIMEOUT); 
+    FReadTimer.start(READ_TIMEOUT); 
     proxyConnection();
   }
   else if (!FUseSSL)
@@ -294,7 +299,7 @@ void DefaultConnection::onSocketConnected()
 
 void DefaultConnection::onSocketReadyRead()
 {
-  ReadTimer.stop();
+  FReadTimer.stop();
   if (FProxyState != ProxyReady)
     proxyConnection();
   else
@@ -303,8 +308,8 @@ void DefaultConnection::onSocketReadyRead()
 
 void DefaultConnection::onSocketDisconnected()
 {
-  ReadTimer.stop(); 
-  KeepAliveTimer.stop(); 
+  FReadTimer.stop(); 
+  FKeepAliveTimer.stop(); 
   emit disconnected();
 }
 
@@ -338,7 +343,7 @@ void DefaultConnection::onReadTimeout()
 {
   if (FSocket.isOpen())
   {
-    ReadTimer.stop(); 
+    FReadTimer.stop(); 
     emit error(tr("Socket timeout"));
     FSocket.disconnectFromHost();
   }
@@ -346,7 +351,7 @@ void DefaultConnection::onReadTimeout()
 
 void DefaultConnection::onKeepAliveTimeout()
 {
-  if (isOpen())
+  if (isOpen() && option(IDefaultConnection::CO_KeepAlive).toBool())
     FSocket.write(" "); 
 }
 
