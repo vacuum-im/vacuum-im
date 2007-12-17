@@ -23,9 +23,7 @@ class RostersView :
 public:
   RostersView(QWidget *AParent = NULL);
   ~RostersView();
-
   virtual QObject *instance() { return this; }
-
   //IRostersView
   virtual void setModel(IRostersModel *AModel); 
   virtual IRostersModel *rostersModel() const { return FRostersModel; }
@@ -49,6 +47,11 @@ public:
   virtual void destroyIndexLabel(int ALabelId);
   virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const;
   virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const;
+  //--IndexNotify
+  virtual int appendNotify(IRosterIndexList AIndexes, int AOrder, const QIcon &AIcon, const QString &AToolTip, int AFlags=0);
+  virtual QList<int> indexNotifies(IRosterIndex *Index, int AOrder) const;
+  virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, int AFlags=0);
+  virtual void removeNotify(int ANotifyId);
   //--ClickHookers
   virtual int createClickHooker(IRostersClickHooker *AHooker, int APriority, bool AAutoRemove = false);
   virtual void insertClickHooker(int AHookerId, IRosterIndex *AIndex);
@@ -71,6 +74,9 @@ signals:
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   virtual void labelClicked(IRosterIndex *AIndex, int ALabelId);
   virtual void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
+  virtual void notifyContextMenu(IRosterIndex *AIndex, int ANotifyId, Menu *AMenu);
+  virtual void notifyActivated(IRosterIndex *AIndex, int ANotifyId);
+  virtual void notifyRemovedByIndex(IRosterIndex *AIndex, int ANotifyId);
 signals:
   virtual void indexAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
   virtual void indexInserted(const QModelIndex &AParent, int AStart, int AEnd);
@@ -115,6 +121,20 @@ private:
   QHash<int, int /*Order*/> FIndexLabelOrders;
   QHash<int, int /*Flags*/> FIndexLabelFlags;
   QHash<int, QSet<IRosterIndex *> > FIndexLabelIndexes;
+private:
+  int FNotifyId;
+  struct NotifyItem
+  {
+    int notifyId;
+    int order;
+    QIcon icon;
+    QString toolTip;
+    int flags;
+    IRosterIndexList indexes;
+  };
+  QHash<int /*id*/ ,NotifyItem> FNotifyItems;
+  QHash<int /*label*/, QList<int> > FNotifyLabelItems;
+  QHash<IRosterIndex *, QHash<int /*order*/, int /*labelid*/> > FNotifyIndexOrderLabel;
 private:
   int FHookerId;
   struct ClickHookerItem

@@ -26,7 +26,7 @@ public:
   };
   enum LabelFlags {
     LabelBlink                    =1,
-    EnsureVisible                 =2
+    LabelVisible                  =2
   };
 public:
   virtual QObject *instance() = 0;
@@ -52,6 +52,11 @@ public:
   virtual void destroyIndexLabel(int ALabelId) =0;
   virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
   virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const =0;
+  //--IndexNotify
+  virtual int appendNotify(IRosterIndexList AIndexes, int AOrder, const QIcon &AIcon, const QString &AToolTip, int AFlags=0) =0;
+  virtual QList<int> indexNotifies(IRosterIndex *Index, int AOrder) const =0;
+  virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, int AFlags=0) =0;
+  virtual void removeNotify(int ANotifyId) =0;
   //--ClickHookers
   virtual int createClickHooker(IRostersClickHooker *AHooker, int APriority, bool AAutoRemove = false) =0;
   virtual void insertClickHooker(int AHookerId, IRosterIndex *AIndex) =0;
@@ -74,6 +79,9 @@ signals:
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
   virtual void labelClicked(IRosterIndex *AIndex, int ALabelId) =0;
   virtual void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted) =0;
+  virtual void notifyContextMenu(IRosterIndex *AIndex, int ANotifyId, Menu *AMenu) =0;
+  virtual void notifyActivated(IRosterIndex *AIndex, int ANotifyId) =0;
+  virtual void notifyRemovedByIndex(IRosterIndex *AIndex, int ANotifyId) =0;
 };
 
 

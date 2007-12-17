@@ -12,6 +12,7 @@ RostersView::RostersView(QWidget *AParent)
 {
   FLabelId = 1;
   FHookerId = 1;
+  FNotifyId = 1;
   FOptions = 0;
 
   FRostersModel = NULL;
@@ -325,6 +326,89 @@ QRect RostersView::labelRect(int ALabeld, const QModelIndex &AIndex) const
   return FRosterIndexDelegate->labelRect(ALabeld,indexOption(AIndex),AIndex);
 }
 
+int RostersView::appendNotify(IRosterIndexList AIndexes, int AOrder, const QIcon &AIcon, const QString &AToolTip, int AFlags)
+{
+  if (!AIndexes.isEmpty() && !AIcon.isNull())
+  {
+    int notifyId = FNotifyId++;
+    NotifyItem notifyItem;
+    notifyItem.notifyId = notifyId;
+    notifyItem.order = AOrder;
+    notifyItem.icon = AIcon;
+    notifyItem.toolTip = AToolTip;
+    notifyItem.flags = AFlags;
+    notifyItem.indexes = AIndexes;
+    FNotifyItems.insert(notifyId,notifyItem);
+
+    foreach(IRosterIndex *index, AIndexes)
+    {
+      int labelId;
+      QHash<int, int> &indexOrderLabel = FNotifyIndexOrderLabel[index];
+      if (!indexOrderLabel.contains(AOrder))
+      {
+        labelId = createIndexLabel(AOrder,AIcon,AFlags);
+        insertIndexLabel(labelId,index);
+        indexOrderLabel.insert(AOrder,labelId);
+      }
+      else
+      {
+        labelId = indexOrderLabel.value(AOrder);
+        updateIndexLabel(labelId,AIcon,AFlags);
+        insertIndexLabel(labelId,index);
+      }
+      FNotifyLabelItems[labelId].prepend(notifyId);
+    }
+    return notifyId;
+  }
+  return 0;
+}
+
+QList<int> RostersView::indexNotifies(IRosterIndex *AIndex, int AOrder) const
+{
+  int labelId = FNotifyIndexOrderLabel.value(AIndex).value(AOrder,0);
+  return FNotifyLabelItems.value(labelId);
+}
+
+void RostersView::updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, int AFlags)
+{
+  if (FNotifyItems.contains(ANotifyId))
+  {
+    NotifyItem &notifyItem = FNotifyItems[ANotifyId];
+    notifyItem.icon = AIcon;
+    notifyItem.toolTip = AToolTip;
+    notifyItem.flags = AFlags;
+
+    foreach(IRosterIndex *index, notifyItem.indexes)
+    {
+      int labelId = FNotifyIndexOrderLabel[index].value(notifyItem.order);
+      if (FNotifyLabelItems[labelId].first() == ANotifyId)
+        updateIndexLabel(labelId,AIcon,AFlags);
+    }
+  }
+}
+
+void RostersView::removeNotify(int ANotifyId)
+{
+  if (FNotifyItems.contains(ANotifyId))
+  {
+    NotifyItem &notifyItem = FNotifyItems[ANotifyId];
+    foreach(IRosterIndex *index, notifyItem.indexes)
+    {
+      int labelId = FNotifyIndexOrderLabel[index].value(notifyItem.order);
+      QList<int> &labelItems = FNotifyLabelItems[labelId];
+      labelItems.removeAt(labelItems.indexOf(ANotifyId));
+      if (!labelItems.isEmpty())
+      {
+        NotifyItem &firstNotifyItem = FNotifyItems[labelItems.first()];
+        updateIndexLabel(labelId,firstNotifyItem.icon,firstNotifyItem.flags);
+      }
+      else
+        removeIndexLabel(labelId,index);
+    }
+    FNotifyItems.remove(ANotifyId);
+  }
+}
+
 int RostersView::createClickHooker(IRostersClickHooker *AHooker, int APriority, bool AAutoRemove)
 {
   int i = 0;
@@ -533,7 +617,14 @@ bool RostersView::viewportEvent(QEvent *AEvent)
         QModelIndex modelIndex = mapToModel(viewIndex);
         IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
 
-        emit labelToolTips(index,labelId,toolTipsMap);
+        if (FNotifyLabelItems.contains(labelId))
+        {
+          NotifyItem &notifyItem = FNotifyItems[FNotifyLabelItems.value(labelId).first()];
+          if (!notifyItem.toolTip.isEmpty())
+            toolTipsMap.insert(TTO_ROSTERSVIEW,notifyItem.toolTip);
+        }
+        else
+          emit labelToolTips(index,labelId,toolTipsMap);
 
         if (labelId == RLID_DISPLAY || labelId == RLID_FOOTER_TEXT || toolTipsMap.isEmpty())
           toolTipsMap.insert(TTO_ROSTERSVIEW,index->data(Qt::ToolTipRole).toString());
@@ -567,7 +658,9 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
     IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
 
     FContextMenu->clear();
-    if (labelId > RLID_DISPLAY)
+    if (FNotifyLabelItems.contains(labelId))
+      emit notifyContextMenu(index,FNotifyLabelItems.value(labelId).first(),FContextMenu);
+    else if (labelId > RLID_DISPLAY)
       emit labelContextMenu(index,labelId,FContextMenu);
     if (FContextMenu->isEmpty())
       emit contextMenu(index,FContextMenu);
@@ -588,23 +681,28 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
       IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
       
       const int labelId = labelAt(AEvent->pos(),viewIndex);
-      emit labelDoubleClicked(index,labelId,accepted);
 
-      int i = 0;
-      while (!accepted && i<FClickHookerItems.count())
+      if (!FNotifyLabelItems.contains(labelId))
       {
-        ClickHookerItem *item = FClickHookerItems.at(i);
-        if (item->indexes.contains(index) || item->indexes.contains(NULL))
+        int i = 0;
+        emit labelDoubleClicked(index,labelId,accepted);
+        while (!accepted && i<FClickHookerItems.count())
         {
-          accepted = item->hooker->rosterIndexClicked(index,item->hookerId);
-          if (accepted && item->autoRemove)
-            destroyClickHooker(item->hookerId);
+          ClickHookerItem *item = FClickHookerItems.at(i);
+          if (item->indexes.contains(index) || item->indexes.contains(NULL))
+          {
+            accepted = item->hooker->rosterIndexClicked(index,item->hookerId);
+            if (accepted && item->autoRemove)
+              destroyClickHooker(item->hookerId);
+            else
+              i++;
+          }
           else
             i++;
         }
-        else
-          i++;
       }
+      else
+        emit notifyActivated(index,FNotifyLabelItems.value(labelId).first());
     }
   }
   if (!accepted)
@@ -640,7 +738,12 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
       QModelIndex modelIndex = mapToModel(viewIndex);
       IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
       if (FPressedIndex == index && FPressedLabel == labelId)
-        emit labelClicked(index,labelId);
+      {
+        if (FNotifyLabelItems.contains(labelId))
+          emit notifyActivated(index,FNotifyLabelItems.value(labelId).first());
+        else
+          emit labelClicked(index,labelId);
+      }
     }
   }
   FPressedLabel = RLID_DISPLAY;
@@ -650,6 +753,28 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 
 void RostersView::onIndexDestroyed(IRosterIndex *AIndex)
 {
+  if (FNotifyIndexOrderLabel.contains(AIndex))
+  {
+    QList<int> labels = FNotifyIndexOrderLabel[AIndex].values();
+    foreach(int labelId, labels)
+    {
+      QList<int> notifyIds = FNotifyLabelItems.take(labelId);
+      foreach(int notifyId, notifyIds)
+      {
+        NotifyItem &notifyItem = FNotifyItems[notifyId];
+        if (notifyItem.indexes.count() == 1)
+        {
+          emit notifyRemovedByIndex(AIndex,notifyId);
+          removeNotify(notifyId);
+        }
+        else
+          notifyItem.indexes.removeAt(notifyItem.indexes.indexOf(AIndex));
+      }
+      destroyIndexLabel(labelId);
+    }
+    FNotifyIndexOrderLabel.remove(AIndex);
+  }
+
   QHash<int, QSet<IRosterIndex *> >::iterator it = FIndexLabelIndexes.begin();
   while (it!=FIndexLabelIndexes.end())
   {
@@ -670,6 +795,8 @@ void RostersView::onIndexDestroyed(IRosterIndex *AIndex)
       item->indexes -= AIndex;
     i++;
   }
+
+
 }
 
 void RostersView::onBlinkTimer()
