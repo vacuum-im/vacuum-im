@@ -5,41 +5,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>292</height>
+    <width>518</width>
+    <height>305</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Subscription message</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
    <item>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="lblStream" >
+    <layout class="QGridLayout" >
+     <item row="0" column="0" >
+      <widget class="QLabel" name="lblFrom" >
        <property name="text" >
-        <string>Account:</string>
+        <string>From:</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QLabel" name="lblAccountJid" >
+     <item row="0" column="1" colspan="3" >
+      <widget class="QLabel" name="lblFromJid" >
        <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>7</hsizetype>
-         <vsizetype>5</vsizetype>
+        <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -47,71 +33,70 @@
        <property name="font" >
         <font>
          <weight>75</weight>
-         <italic>false</italic>
          <bold>true</bold>
         </font>
        </property>
        <property name="frameShape" >
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::Panel</enum>
+       </property>
+       <property name="frameShadow" >
+        <enum>QFrame::Sunken</enum>
        </property>
        <property name="text" >
         <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" >
+      <widget class="QLabel" name="lblTo" >
+       <property name="text" >
+        <string>To:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" >
+      <widget class="QLabel" name="lblAccountJid" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape" >
+        <enum>QFrame::Panel</enum>
+       </property>
+       <property name="frameShadow" >
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="text" >
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2" >
+      <widget class="QLabel" name="lblReceived" >
+       <property name="text" >
+        <string>Received:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3" >
+      <widget class="QLabel" name="lblDateTime" >
+       <property name="frameShape" >
+        <enum>QFrame::Panel</enum>
+       </property>
+       <property name="frameShadow" >
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="text" >
+        <string>99:99:99</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="lblFrom" >
-       <property name="text" >
-        <string>From:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="lblFromJid" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>7</hsizetype>
-         <vsizetype>5</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="frameShape" >
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="text" >
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="lblTime" >
-       <property name="text" >
-        <string>Time:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="lblDateTime" >
-       <property name="frameShape" >
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="text" >
-        <string>99.99.9999 99:99:99</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QWidget" native="1" name="wdtToolBar" />
    </item>
    <item>
     <widget class="QTextEdit" name="tedMessage" >
@@ -122,11 +107,20 @@
    </item>
    <item>
     <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
      <property name="spacing" >
       <number>6</number>
+     </property>
+     <property name="leftMargin" >
+      <number>0</number>
+     </property>
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
      </property>
      <item>
       <widget class="QPushButton" name="pbtSubscribe" >

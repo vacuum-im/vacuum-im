@@ -16,34 +16,35 @@ class SubscriptionDialog :
 {
   Q_OBJECT;
   Q_INTERFACES(ISubscriptionDialog);
-
 public:
   SubscriptionDialog(QWidget *AParent = NULL);
   ~SubscriptionDialog();
-
-  void setupDialog(const Jid &AStreamJid, const Jid &AContactJid, QDateTime ATime, 
-    IRoster::SubsType ASubsType, const QString &AStatus, const QString &ASubs);
-  void setNextCount(int ANext);
-  Action *dialogAction() const { return FDialogAction; }
-  
   //ISubscriptionDialog
+  virtual QWidget *instance() { return this; }
   virtual const Jid &streamJid() const { return FStreamJid; }
   virtual const Jid &contactJid() const { return FContactJid; }
   virtual const QDateTime &dateTime() const { return FDateTime; }
   virtual int subsType() const { return FSubsType; }
   virtual const QString &status() const { return FStatus; }
   virtual const QString &subscription() const { return FSubscription; }
+  virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
   virtual QTextEdit *textEditor() const { return tedMessage; }
-  virtual QToolBar *toolBar() const { return FToolBar; }
   virtual QButtonGroup *buttonGroup() const { return FButtonGroup; }
 signals:
-  virtual void dialogReady();
-  virtual void setupNext();
+  virtual void dialogChanged();
+public:
+  void setupDialog(const Jid &AStreamJid, const Jid &AContactJid, QDateTime ATime, 
+    IRoster::SubsType ASubsType, const QString &AStatus, const QString &ASubs);
+  void setNextCount(int ANext);
+  Action *dialogAction() const { return FDialogAction; }
+signals:
+  void showNext();
 protected slots:
   void onButtonClicked(int AId);
 private:
   Action *FDialogAction;
   QToolBar *FToolBar;
+  ToolBarChanger *FToolBarChanger;
   QButtonGroup *FButtonGroup;
 private:
   Jid FStreamJid;

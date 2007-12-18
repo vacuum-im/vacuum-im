@@ -2,11 +2,18 @@
 
 #include <QMessageBox>
 
-AddContactDialog::AddContactDialog(QWidget *AParent)
-  : QDialog(AParent)
+AddContactDialog::AddContactDialog(const Jid &AStreamJid, const QSet<QString> &AGroups, QWidget *AParent) : QDialog(AParent)
 {
   setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
+  
+  FStreamJid = AStreamJid;
+  setWindowTitle(tr("Add contact to %1").arg(FStreamJid.bare()));
+
+  QStringList grps = AGroups.toList();
+  grps.sort();
+  cmbGroup->addItems(QStringList()<<tr("<None>")<<grps);
+
   setRequestText(tr("Please, authorize me to your presence."));
   connect(btbButtons,SIGNAL(accepted()),SLOT(onAccepted()));
 }
@@ -16,7 +23,7 @@ AddContactDialog::~AddContactDialog()
 
 }
 
-const Jid &AddContactDialog::stramJid() const
+const Jid &AddContactDialog::streamJid() const
 {
   return FStreamJid;
 }
@@ -26,9 +33,24 @@ Jid AddContactDialog::contactJid() const
   return lneJabberId->text();
 }
 
+void AddContactDialog::setContactJid(const Jid &AJid)
+{
+  lneJabberId->setText(AJid.hBare());
+  if (nick().isEmpty())
+    setNick(AJid.hNode());
+}
+
 QString AddContactDialog::nick() const
 {
   return lneNickName->text();
+}
+
+void AddContactDialog::setNick(const QString &ANick)
+{
+  if (!ANick.isEmpty())
+    lneNickName->setText(ANick);
+  else
+    lneNickName->setText(contactJid().hNode());
 }
 
 QSet<QString> AddContactDialog::groups() const
@@ -41,42 +63,6 @@ QSet<QString> AddContactDialog::groups() const
   return grps;
 }
 
-QString AddContactDialog::requestText() const
-{
-  return tedRequest->toPlainText();
-}
-
-bool AddContactDialog::requestSubscr() const
-{
-  return chbRequestSubscr->checkState() == Qt::Checked;
-}
-
-bool AddContactDialog::sendSubscr() const
-{
-  return chbSendSubscr->checkState() == Qt::Checked;
-}
-
-void AddContactDialog::setStreamJid( const Jid &AStreamJid )
-{
-  FStreamJid = AStreamJid;
-  setWindowTitle(tr("Add contact - %1").arg(FStreamJid.full()));
-}
-
-void AddContactDialog::setContactJid(const Jid &AJid)
-{
-  lneJabberId->setText(AJid.hBare());
-  if (nick().isEmpty())
-    setNick(AJid.hNode());
-}
-
-void AddContactDialog::setNick(const QString &ANick)
-{
-  if (!ANick.isEmpty())
-    lneNickName->setText(ANick);
-  else
-    lneNickName->setText(contactJid().hNode());
-}
-
 void AddContactDialog::setGroup(const QString &AGroup)
 {
   if (!AGroup.isEmpty())
@@ -85,16 +71,24 @@ void AddContactDialog::setGroup(const QString &AGroup)
     cmbGroup->setCurrentIndex(0);
 }
 
-void AddContactDialog::setGroups(const QSet<QString> &AGroups)
+QString AddContactDialog::requestText() const
 {
-  QStringList grps = AGroups.toList();
-  grps.sort();
-  cmbGroup->addItems(QStringList()<<tr("<None>")<<grps);
+  return tedRequest->toPlainText();
 }
 
 void AddContactDialog::setRequestText(const QString &AText)
 {
   tedRequest->setPlainText(AText);
+}
+
+bool AddContactDialog::requestSubscription() const
+{
+  return chbRequestSubscr->checkState() == Qt::Checked;
+}
+
+bool AddContactDialog::sendSubscription() const
+{
+  return chbSendSubscr->checkState() == Qt::Checked;
 }
 
 void AddContactDialog::onAccepted()
@@ -106,7 +100,7 @@ void AddContactDialog::onAccepted()
     accept();
   }
   else
-    QMessageBox::warning(this,FStreamJid.full(),
+    QMessageBox::warning(this,FStreamJid.bare(),
       tr("Can`t add contact '<b>%1</b>'<br>'<b>%1</b>' is not a valid Jaber ID").arg(cJid.hBare()));
 }
 

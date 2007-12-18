@@ -13,27 +13,23 @@ class AddContactDialog :
   public AddContactDialogClass
 {
   Q_OBJECT;
-
 public:
-  AddContactDialog(QWidget *AParent = NULL);
+  AddContactDialog(const Jid &AStreamJid, const QSet<QString> &AGroups, QWidget *AParent = NULL);
   ~AddContactDialog();
-  
-  const Jid &stramJid() const;
+  //IAddContactDialog  
+  const Jid &streamJid() const;
   Jid contactJid() const;
-  QString nick() const;
-  QSet<QString> groups() const;
-  QString requestText() const;
-  bool requestSubscr() const;
-  bool sendSubscr() const;
-
-  void setStreamJid(const Jid &AStreamJid);
   void setContactJid(const Jid &AJid);
+  QString nick() const;
   void setNick(const QString &ANick);
+  QSet<QString> groups() const;
   void setGroup(const QString &AGroup);
-  void setGroups(const QSet<QString> &AGroups);
+  QString requestText() const;
   void setRequestText(const QString &AText);
+  bool requestSubscription() const;
+  bool sendSubscription() const;
 signals:
-  void addContact(AddContactDialog *);
+  void addContact(AddContactDialog *ADialog);
 private slots:
   void onAccepted();
 private:

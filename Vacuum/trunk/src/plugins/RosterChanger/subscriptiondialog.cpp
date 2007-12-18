@@ -1,12 +1,16 @@
 #include "subscriptiondialog.h"
 
-SubscriptionDialog::SubscriptionDialog(QWidget *AParent)
-  : QDialog(AParent)
+SubscriptionDialog::SubscriptionDialog(QWidget *AParent) : QDialog(AParent)
 {
   setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
+  
   FToolBar = new QToolBar(this);
-  vboxLayout->insertWidget(vboxLayout->indexOf(tedMessage),FToolBar);
+  FToolBarChanger = new ToolBarChanger(FToolBar);
+  wdtToolBar->setLayout(new QVBoxLayout);
+  wdtToolBar->layout()->addWidget(FToolBar);
+  wdtToolBar->layout()->setMargin(0);
+
   FButtonGroup = new QButtonGroup(this);
   FButtonGroup->addButton(pbtSubscribe,AskButton);
   FButtonGroup->addButton(pbtSubscribed,AuthButton);
@@ -36,9 +40,12 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
   FDialogAction->setData(Action::DR_StreamJid,AStreamJid.pFull());
   FDialogAction->setData(Action::DR_Parametr1,AContactJid.pBare());
 
-  lblAccountJid->setText(AStreamJid.hFull());
   lblFromJid->setText(AContactJid.hBare());
-  lblDateTime->setText(ATime.toString(Qt::LocaleDate));
+  lblAccountJid->setText(AStreamJid.hFull());
+  if (QDateTime::currentDateTime().date() != ATime.date())
+    lblDateTime->setText(ATime.toString(Qt::LocaleDate));
+  else
+    lblDateTime->setText(ATime.time().toString(Qt::LocaleDate));
 
   bool subsTo = (ASubs == "to" || ASubs == "both");
   bool subsFrom = (ASubs == "from" || ASubs == "both");
@@ -102,37 +109,37 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
   tedMessage->append("<br>");
   if (showButtons.contains(AskButton))
   {
-    pbtSubscribe->setEnabled(true);
+    pbtSubscribe->setVisible(true);
     tedMessage->append(tr("Click <b>Ask</b> to ask for contact presence subscription."));
   }
   else
-    pbtSubscribe->setEnabled(false);
+    pbtSubscribe->setVisible(false);
 
   if (showButtons.contains(AuthButton))
   {
-    pbtSubscribed->setEnabled(true);
+    pbtSubscribed->setVisible(true);
     tedMessage->append(tr("Click <b>Auth</b> to authorize the subscription."));
   }
   else
-    pbtSubscribed->setEnabled(false);
+    pbtSubscribed->setVisible(false);
 
   if (showButtons.contains(RefuseButton))
   {
-    pbtUnsubscribe->setEnabled(true);
+    pbtUnsubscribe->setVisible(true);
     tedMessage->append(tr("Click <b>Refuse</b> to refuse from presence subscription."));
   }
   else
-    pbtUnsubscribe->setEnabled(false);
+    pbtUnsubscribe->setVisible(false);
 
   if (showButtons.contains(RejectButton))
   {
-    pbtUnsubscribed->setEnabled(true);
+    pbtUnsubscribed->setVisible(true);
     tedMessage->append(tr("Click <b>Reject</b> to reject the presence subscription."));
   }
   else
-    pbtUnsubscribed->setEnabled(false);
+    pbtUnsubscribed->setVisible(false);
 
-  emit dialogReady();
+  emit dialogChanged();
 }
 
 void SubscriptionDialog::setNextCount(int ANextCount)
@@ -141,18 +148,18 @@ void SubscriptionDialog::setNextCount(int ANextCount)
   if (FNextCount>0)
   {
     pbtNext->setText(tr("Next - %1").arg(FNextCount));
-    pbtNext->setEnabled(true);
+    pbtNext->setVisible(true);
   }
   else
   {
     pbtNext->setText(tr("Next"));
-    pbtNext->setEnabled(false);
+    pbtNext->setVisible(false);
   }
 }
 
 void SubscriptionDialog::onButtonClicked(int AId)
 {
-  bool doNext = pbtNext->isEnabled();
+  bool doNext = pbtNext->isVisible();
   bool doAccept = true;
 
   switch(AId)
@@ -200,7 +207,7 @@ void SubscriptionDialog::onButtonClicked(int AId)
   }
   
   if (doNext)
-    emit setupNext();
+    emit showNext();
   else if (doAccept)
     accept();
 }

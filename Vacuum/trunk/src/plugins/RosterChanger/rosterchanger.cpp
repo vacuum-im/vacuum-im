@@ -18,13 +18,13 @@ RosterChanger::RosterChanger()
   FAccountManager = NULL;
 
   FAddContactMenu = NULL;
+  FSubsDialog = NULL;
   FSubsId = 0;
-  FSubsLabelId = 0;
 }
 
 RosterChanger::~RosterChanger()
 {
-  qDeleteAll(FSubsItems);
+
 }
 
 //IPlugin
@@ -98,7 +98,6 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 bool RosterChanger::initObjects()
 {
   FSystemIconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-  connect(FSystemIconset,SIGNAL(iconsetChanged()),SLOT(onSystemIconsetChanged()));
 
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
   {
@@ -108,14 +107,8 @@ bool RosterChanger::initObjects()
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    FSubsLabelId = FRostersView->createIndexLabel(RLO_SUBSCRIBTION,
-      FSystemIconset->iconByName(IN_EVENTS),IRostersView::LabelBlink);
-    connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
-      SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
-    connect(FRostersView,SIGNAL(labelDoubleClicked(IRosterIndex *, int, bool &)),
-      SLOT(onRosterLabelDClicked(IRosterIndex *, int, bool &)));
-    connect(FRostersView,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
-      SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
+    connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersView,SIGNAL(notifyActivated(IRosterIndex *, int)),SLOT(onRosterNotifyActivated(IRosterIndex *, int)));
   }
 
   if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
@@ -127,10 +120,9 @@ bool RosterChanger::initObjects()
     FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FAddContactMenu->menuAction(),AG_ROSTERCHANGER_MMENU,true);
   }
 
-  if (FTrayManager)
+  if (FTrayManager && FAddContactMenu)
   {
-    if (FAddContactMenu)
-      FTrayManager->addAction(FAddContactMenu->menuAction(),AG_ROSTERCHANGER_TRAY,true);
+    FTrayManager->addAction(FAddContactMenu->menuAction(),AG_ROSTERCHANGER_TRAY,true);
   }
 
   return true;
@@ -138,14 +130,12 @@ bool RosterChanger::initObjects()
 
 //IRosterChanger
 void RosterChanger::showAddContactDialog(const Jid &AStreamJid, const Jid &AJid, const QString &ANick, 
-                                         const QString &AGroup, const QString &ARequest) const
+                                         const QString &AGroup, const QString &ARequest)
 {
   IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
   if (roster && roster->isOpen())
   {
-    AddContactDialog *dialog = new AddContactDialog(NULL);
-    dialog->setGroups(roster->groups());
-    dialog->setStreamJid(AStreamJid);
+    AddContactDialog *dialog = new AddContactDialog(roster->streamJid(),roster->groups());
     dialog->setContactJid(AJid);
     dialog->setNick(ANick);
     dialog->setGroup(AGroup);
@@ -158,22 +148,8 @@ void RosterChanger::showAddContactDialog(const Jid &AStreamJid, const Jid &AJid,
   }
 }
 
-void RosterChanger::showAddContactDialogByAction(bool)
-{
-  Action *action = qobject_cast<Action *>(sender());
-  if (action)
-  {
-    QString streamJid = action->data(Action::DR_StreamJid).toString();
-    QString contactJid = action->data(Action::DR_Parametr1).toString();
-    QString nick = action->data(Action::DR_Parametr2).toString();
-    QString group = action->data(Action::DR_Parametr3).toString();
-    QString request = action->data(Action::DR_Parametr4).toString();
-    showAddContactDialog(streamJid,contactJid,nick,group,request);
-  }
-}
-
-Menu * RosterChanger::createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
-                                      bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent)
+Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
+                                     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent)
 {
   Menu *menu = new Menu(AParent);
   IRoster *roster = FRosterPlugin->getRoster(AData.value(Action::DR_StreamJid).toString());
@@ -259,25 +235,27 @@ void RosterChanger::openSubsDialog(int ASubsId)
 {
   if (FSubsItems.contains(ASubsId))
   {
-    SubsItem *subsItem = FSubsItems.value(ASubsId);
+    SubsItem &subsItem = FSubsItems[ASubsId];
 
-    if (FSubsDialog.isNull())
+    if (!FSubsDialog)
     {
       FSubsDialog = new SubscriptionDialog;
-      connect(FSubsDialog,SIGNAL(setupNext()),SLOT(onSubsDialogSetupNext()));
+      connect(FSubsDialog,SIGNAL(showNext()),SLOT(onSubsDialogShowNext()));
       connect(FSubsDialog->dialogAction(),SIGNAL(triggered(bool)),SLOT(onSendSubscription(bool)));
+      connect(FSubsDialog,SIGNAL(destroyed(QObject *)),SLOT(onSubsDialogDestroyed(QObject *)));
+      emit subscriptionDialogCreated(FSubsDialog);
     }
     
     QString subs = "none";
-    IRoster *roster = FRosterPlugin->getRoster(subsItem->streamJid);
+    IRoster *roster = FRosterPlugin->getRoster(subsItem.streamJid);
     if (roster && roster->isOpen())
     {
-      IRosterItem *rosterItem = roster->item(subsItem->contactJid);
+      IRosterItem *rosterItem = roster->item(subsItem.contactJid);
       if (rosterItem)
         subs = rosterItem->subscription();
     }
 
-    FSubsDialog->setupDialog(subsItem->streamJid,subsItem->contactJid,subsItem->time,subsItem->type,subsItem->status,subs);
+    FSubsDialog->setupDialog(subsItem.streamJid,subsItem.contactJid,subsItem.time,subsItem.type,subsItem.status,subs);
     FSubsDialog->show();
     FSubsDialog->activateWindow();
 
@@ -289,32 +267,27 @@ void RosterChanger::removeSubsMessage(int ASubsId)
 {
   if (FSubsItems.contains(ASubsId))
   {
-    SubsItem *subsItem = FSubsItems.take(ASubsId);
-
-    if (!FSubsDialog.isNull())
+    SubsItem subsItem = FSubsItems.take(ASubsId);
+    if (FSubsDialog)
       FSubsDialog->setNextCount(FSubsItems.count());
-
+    if (FRostersView)
+      FRostersView->removeNotify(subsItem.rosterId);
     if (FTrayManager)
-      FTrayManager->removeNotify(subsItem->trayId);
+      FTrayManager->removeNotify(subsItem.trayId);
+  }
+}
 
-    if (FRostersView && FRostersModel)
-    {
-      bool removeLabel = true;
-      foreach(SubsItem *sItem,FSubsItems)
-        if (sItem->streamJid == subsItem->streamJid && (sItem->contactJid && subsItem->contactJid))
-        {
-          removeLabel = false;
-          break;
-        };
-      if (removeLabel)
-      {
-        IRosterIndexList indexList = FRostersModel->getContactIndexList(subsItem->streamJid, subsItem->contactJid, false);
-        foreach(IRosterIndex *index, indexList)
-          FRostersView->removeIndexLabel(FSubsLabelId,index);
-      }
-    }
-
-    delete subsItem;
+void RosterChanger::onShowAddContactDialog(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QString streamJid = action->data(Action::DR_StreamJid).toString();
+    QString contactJid = action->data(Action::DR_Parametr1).toString();
+    QString nick = action->data(Action::DR_Parametr2).toString();
+    QString group = action->data(Action::DR_Parametr3).toString();
+    QString request = action->data(Action::DR_Parametr4).toString();
+    showAddContactDialog(streamJid,contactJid,nick,group,request);
   }
 }
 
@@ -335,7 +308,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setText(tr("Add contact..."));
       action->setData(data);
       action->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
-      connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
       AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER_ADD_CONTACT,true);
     }
     else if (itemType == RIT_Contact || itemType == RIT_Agent)
@@ -419,7 +392,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
         action->setText(tr("Add contact..."));
         action->setData(Action::DR_StreamJid,streamJid);
         action->setData(Action::DR_Parametr1,AIndex->data(RDR_Jid));
-        connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
+        connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
         AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER_ADD_CONTACT,true);
       }
 
@@ -436,6 +409,15 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       data.insert(Action::DR_StreamJid,streamJid);
       
       Action *action;
+
+      action = new Action(AMenu);
+      action->setText(tr("Add contact..."));
+      action->setData(Action::DR_StreamJid,AIndex->data(RDR_StreamJid));
+      action->setData(Action::DR_Parametr3,AIndex->data(RDR_Group));
+      action->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
+      connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
+      AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER_ADD_CONTACT,true);
+
       action = new Action(AMenu);
       action->setText(tr("Rename..."));
       action->setData(data);
@@ -481,29 +463,25 @@ void RosterChanger::onSendSubscription(bool)
 void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid, 
                                           IRoster::SubsType AType, const QString &AStatus)
 {
-  SubsItem *subsItem = new SubsItem;
-  subsItem->streamJid = ARoster->streamJid();
-  subsItem->contactJid = AFromJid;
-  subsItem->type = AType;
-  subsItem->status = AStatus;
-  subsItem->time = QDateTime::currentDateTime();
+  SubsItem &subsItem = FSubsItems[++FSubsId];
+  subsItem.subsId = FSubsId;
+  subsItem.streamJid = ARoster->streamJid();
+  subsItem.contactJid = AFromJid;
+  subsItem.type = AType;
+  subsItem.status = AStatus;
+  subsItem.time = QDateTime::currentDateTime();
 
-  if (FTrayManager)
-  {
-    subsItem->trayId = FTrayManager->appendNotify(FSystemIconset->iconByName(IN_EVENTS),
-      tr("Subscription message from %1").arg(AFromJid.full()),true);
-  }
-
+  QIcon icon = FSystemIconset->iconByName(IN_EVENTS);
+  QString toolTip = tr("Subscription message from %1").arg(AFromJid.full());
   if (FRostersView && FRostersModel)
   {
     IRosterIndexList indexList = FRostersModel->getContactIndexList(ARoster->streamJid(),AFromJid,true);
-    foreach(IRosterIndex *index, indexList)
-      FRostersView->insertIndexLabel(FSubsLabelId,index);
+    subsItem.rosterId = FRostersView->appendNotify(indexList,RLO_SUBSCRIBTION,icon,toolTip,IRostersView::LabelBlink|IRostersView::LabelVisible);
   }
+  if (FTrayManager)
+    subsItem.trayId = FTrayManager->appendNotify(icon,toolTip,true);
 
-  FSubsItems.insert(FSubsId++,subsItem);
-
-  if (!FSubsDialog.isNull())
+  if (FSubsDialog)
     FSubsDialog->setNextCount(FSubsItems.count());
 }
 
@@ -751,7 +729,7 @@ void RosterChanger::onRemoveGroup(bool)
 
 void RosterChanger::onAddContact(AddContactDialog *ADialog)
 {
-  Jid streamJid = ADialog->stramJid();
+  Jid streamJid = ADialog->streamJid();
   IRoster *roster = FRosterPlugin->getRoster(streamJid);
   if (roster && roster->isOpen())
   {
@@ -764,9 +742,9 @@ void RosterChanger::onAddContact(AddContactDialog *ADialog)
 
       roster->setItem(contactJid,ADialog->nick(),grps);
       
-      if (ADialog->requestSubscr())
+      if (ADialog->requestSubscription())
         roster->sendSubscription(contactJid,IRoster::Subscribe,ADialog->requestText());
-      if (ADialog->sendSubscr())
+      if (ADialog->sendSubscription())
         roster->sendSubscription(contactJid,IRoster::Subscribed);
     }
     else
@@ -790,7 +768,7 @@ void RosterChanger::onRosterOpened(IRoster *ARoster)
     else
       action->setText(ARoster->streamJid().hFull());
     action->setData(Action::DR_StreamJid,ARoster->streamJid().full());
-    connect(action,SIGNAL(triggered(bool)),SLOT(showAddContactDialogByAction(bool)));
+    connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
     FActions.insert(ARoster,action);
     FAddContactMenu->addAction(action,AG_ROSTERCHANGER_ROSTER_ADD_CONTACT,true);
     FAddContactMenu->menuAction()->setEnabled(true);
@@ -808,79 +786,55 @@ void RosterChanger::onRosterClosed(IRoster *ARoster)
       FAddContactMenu->menuAction()->setEnabled(false);
   }
 
-  Jid streamJid = ARoster->streamJid();
-  if (!FSubsDialog.isNull() && FSubsDialog->streamJid() == streamJid)
+  if (FSubsDialog && FSubsDialog->streamJid() == ARoster->streamJid())
     FSubsDialog->reject();
 
-  QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
-  while (it != FSubsItems.end())
-  {
-    if (it.value()->streamJid == streamJid)
-    {
-      removeSubsMessage(it.key());
-      it = FSubsItems.begin(); 
-    }
-    else
-      it++;
-  }
+  QHash<int,SubsItem> subsItemsCopy = FSubsItems;
+  foreach(SubsItem item, subsItemsCopy)
+    if (item.streamJid == ARoster->streamJid())
+      removeSubsMessage(item.subsId);
 
   if (FAddContactDialogs.contains(ARoster))
   {
     QList<AddContactDialog *> dialogs = FAddContactDialogs.take(ARoster);
     foreach(AddContactDialog *dialog, dialogs)
       delete dialog;
-    FAddContactDialogs.remove(ARoster);
   }
 }
 
-void RosterChanger::onRosterLabelDClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted)
+void RosterChanger::onRosterNotifyActivated(IRosterIndex * /*AIndex*/, int ANotifyId)
 {
-  if (ALabelId == FSubsLabelId)
-  {
-    AAccepted = true;
-    Jid sJid = AIndex->data(RDR_StreamJid).toString();
-    Jid cJid = AIndex->data(RDR_BareJid).toString();
-    QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
-    while (it != FSubsItems.end())
+  foreach(SubsItem item, FSubsItems)
+    if (item.rosterId == ANotifyId)
     {
-      if ((it.value()->streamJid == sJid) && (it.value()->contactJid && cJid))
-      {
-        openSubsDialog(it.key());
-        break;
-      }
-      it++;
+      openSubsDialog(item.subsId);
+      break;
     }
-  }
-}
-
-void RosterChanger::onRosterLabelToolTips(IRosterIndex * /*AIndex*/, int /*ALabelId*/, 
-                                          QMultiMap<int,QString> &/*AToolTips*/)
-{
-
 }
 
 void RosterChanger::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
   if (AReason == QSystemTrayIcon::DoubleClick)
   {
-    QHash<int,SubsItem *>::iterator it = FSubsItems.begin();
-    while (it != FSubsItems.end())
-    {
-      if (it.value()->trayId == ANotifyId)
+    foreach(SubsItem item, FSubsItems)
+      if (item.trayId == ANotifyId)
       {
-        openSubsDialog(it.key());
-        FTrayManager->removeNotify(ANotifyId);
+        openSubsDialog(item.subsId);
         break;
       }
-      it++;
-    }
   }
 }
 
-void RosterChanger::onSubsDialogSetupNext()
+void RosterChanger::onSubsDialogShowNext()
 {
   if (FSubsItems.count()>0)
     openSubsDialog(FSubsItems.keys().first());
+}
+
+void RosterChanger::onSubsDialogDestroyed(QObject * /*AObject*/)
+{
+  FSubsDialog = NULL;
+  emit subscriptionDialogDestroyed(FSubsDialog);
 }
 
 void RosterChanger::onAddContactDialogDestroyed(QObject *AObject)
@@ -909,14 +863,6 @@ void RosterChanger::onAccountChanged(const QString &AName, const QVariant &AValu
       if (action)
         action->setText(AValue.toString());
     }
-  }
-}
-
-void RosterChanger::onSystemIconsetChanged()
-{
-  if (FRostersView)
-  {
-    FRostersView->updateIndexLabel(RLO_SUBSCRIBTION,FSystemIconset->iconByName(IN_EVENTS),IRostersView::LabelBlink);
   }
 }
 
