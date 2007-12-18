@@ -71,8 +71,18 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
     case RIT_Contact:
     case RIT_Agent:
       {
+        bool hasVisibleLabel = false;
+        QList<QVariant> labelFlags = index.data(RDR_LabelFlags).toList();
+        foreach(QVariant flag, labelFlags)
+        {
+          if (flag.toInt() & IRostersView::LabelVisible)
+          {
+            hasVisibleLabel = true;
+            break;
+          }
+        }
         int indexShow = index.data(RDR_Show).toInt();
-        return indexShow != IPresence::Offline && indexShow != IPresence::Error;
+        return hasVisibleLabel || (indexShow != IPresence::Offline && indexShow != IPresence::Error);
       }
     case RIT_Group:
     case RIT_AgentsGroup:
