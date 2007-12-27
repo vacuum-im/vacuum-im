@@ -396,11 +396,11 @@ void StanzaProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &AB
   
   foreach(IqStanzaItem item, FIqStanzaItems)
     if (item.streamJid == ABefour)
-      item.streamJid = newStreamJid;
+      FIqStanzaItems[item.stanzaId].streamJid = newStreamJid;
 
   foreach(HandlerItem item, FHandlerItems)
     if (item.streamJid == ABefour)
-      item.streamJid = newStreamJid;
+      FHandlerItems[item.handlerId].streamJid = newStreamJid;
 }
 
 void StanzaProcessor::onIqStanzaTimeOut()
