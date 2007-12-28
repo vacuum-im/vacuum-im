@@ -81,8 +81,11 @@ bool Presence::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &A
         delete pitem;
       }
     }
-    else
+    else if (FShow != show || FStatus != status || FPriority != priority)
     {
+      FShow = show;
+      FStatus = status;
+      FPriority = priority;
       emit selfPresence(show,status,priority,Jid());
     }
     AAccept = true;
