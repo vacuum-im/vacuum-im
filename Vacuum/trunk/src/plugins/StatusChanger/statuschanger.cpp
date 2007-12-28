@@ -216,6 +216,32 @@ bool StatusChanger::startPlugin()
   return true;
 }
 
+//IOptionsHolder
+QWidget *StatusChanger::optionsWidget(const QString &ANode, int &AOrder)
+{
+  QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
+  if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
+  {
+    AOrder = OO_ACCOUNT_STATUS;
+    QString accountId = nodeTree.at(1);
+    AccountOptionsWidget *widget = new AccountOptionsWidget(accountId);
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
+    if (account)
+    {
+      widget->setAutoConnect(account->value(AVN_AUTOCONNECT,false).toBool());
+      widget->setAutoReconnect(account->value(AVN_AUTORECONNECT,true).toBool());
+    }
+    else
+    {
+      widget->setAutoConnect(false);
+      widget->setAutoReconnect(true);
+    }
+    FAccountOptionsById.insert(accountId,widget);
+    return widget;
+  }
+  return NULL;
+}
+
 //IStatusChanger
 void StatusChanger::setStatus(int AStatusId, const Jid &AStreamJid)
 {
@@ -469,31 +495,6 @@ QString StatusChanger::nameByShow(int AShow) const
   }
 }
 
-QWidget *StatusChanger::optionsWidget(const QString &ANode, int &AOrder)
-{
-  QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
-  if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
-  {
-    AOrder = OO_ACCOUNT_STATUS;
-    QString accountId = nodeTree.at(1);
-    AccountOptionsWidget *widget = new AccountOptionsWidget(accountId);
-    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
-    if (account)
-    {
-      widget->setAutoConnect(account->value(AVN_AUTOCONNECT,false).toBool());
-      widget->setAutoReconnect(account->value(AVN_AUTORECONNECT,true).toBool());
-    }
-    else
-    {
-      widget->setAutoConnect(false);
-      widget->setAutoReconnect(true);
-    }
-    FAccountOptionsById.insert(accountId,widget);
-    return widget;
-  }
-  return NULL;
-}
-
 void StatusChanger::setStatusByAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
@@ -742,7 +743,7 @@ void StatusChanger::updateStreamMenu(IPresence *APresence)
 
   Action *mAction = FStreamMainStatusAction.value(APresence);
   if (mAction)
-    mAction->setVisible(!FStreamMainStatus.contains(APresence));
+    mAction->setVisible(FStreamStatus.value(APresence) != MAIN_STATUS_ID);
 }
 
 void StatusChanger::removeStreamMenu(IPresence *APresence)
@@ -867,7 +868,7 @@ int StatusChanger::createTempStatus(IPresence *APresence, int AShow, const QStri
 {
   removeTempStatus(APresence);
   StatusItem *status = new StatusItem;
-  status->name = tr("Unknown status");
+  status->name = nameByShow(AShow).append('*');
   status->show = AShow;
   status->text = AText;
   status->priority = APriority;

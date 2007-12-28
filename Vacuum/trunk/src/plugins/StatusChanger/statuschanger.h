@@ -50,9 +50,7 @@ class StatusChanger :
 public:
   StatusChanger();
   ~StatusChanger();
-
   virtual QObject *instance() { return this; }
-
   //IPlugin
   virtual QUuid pluginUuid() const { return STATUSCHANGER_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
@@ -60,7 +58,8 @@ public:
   virtual bool initObjects();
   virtual bool initSettings();
   virtual bool startPlugin();
-  
+  //IOptionsHolder
+  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IStatusChanger
   virtual int mainStatus() const { return FStatusItems.value(-1)->code; }
   virtual void setStatus(int AStatusId, const Jid &AStreamJid = Jid());
@@ -83,9 +82,6 @@ public:
   virtual QList<int> statusByShow(int AShow) const;
   virtual QIcon iconByShow(int AShow) const;
   virtual QString nameByShow(int AShow) const;
-  
-  //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
 public slots:
   virtual void setStatusByAction(bool);
 signals:
