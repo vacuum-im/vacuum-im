@@ -31,10 +31,7 @@
    <item>
     <widget class="TextBrowser" name="tedViewer" >
      <property name="openExternalLinks" >
-      <bool>false</bool>
-     </property>
-     <property name="openLinks" >
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
     </widget>
    </item>

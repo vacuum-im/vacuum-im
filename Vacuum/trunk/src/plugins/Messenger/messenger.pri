@@ -18,7 +18,8 @@ HEADERS = messenger.h \
           chatwindow.h \
           messagewindow.h \
           tabwindow.h \
-	  messengeroptions.h
+	  messengeroptions.h \
+          messagehandler.h
 
 SOURCES = messenger.cpp \
           textbrowser.cpp \
@@ -31,5 +32,6 @@ SOURCES = messenger.cpp \
           chatwindow.cpp \
           messagewindow.cpp \
           tabwindow.cpp \
-          messengeroptions.cpp
+          messengeroptions.cpp \
+          messagehandler.cpp
 

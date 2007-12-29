@@ -1,25 +1,17 @@
-#include <Qdebug>
 #include "chatwindow.h"
 
 #include <QTextDocumentFragment>
 
-#define IN_CHAT_MESSAGE             "psi/start-chat"
-
 #define SVN_CHATWINDOWS             "chatWindows:window[]"
 #define SVN_GEOMETRY                SVN_CHATWINDOWS ":geometry"
 #define SVN_SPLITTER                SVN_CHATWINDOWS ":splitter"  
-#define SVN_SHOW_STATUS             SVN_CHATWINDOWS ":showStatus"
-
 
 ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid)
 {
-  FPresence = NULL;
-  FStatusIcons = NULL;
-  FSettings = NULL;
-  FOptions = 0;
-  FSplitterLoaded = false;
-
   ui.setupUi(this);
+
+  FSettings = NULL;
+  FSplitterLoaded = false;
 
   FMessenger = AMessenger;
   FStreamJid = AStreamJid;
@@ -54,7 +46,6 @@ ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   ui.sprSplitter->setStretchFactor(0,20);
   ui.sprSplitter->setStretchFactor(1,1);
 
-  connect(FMessenger->instance(),SIGNAL(messageReceived(const Message &)),SLOT(onMessageReceived(const Message &)));
   connect(FMessenger->instance(),SIGNAL(defaultChatFontChanged(const QFont &)), SLOT(onDefaultChatFontChanged(const QFont &)));
 
   initialize();
@@ -63,6 +54,33 @@ ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
 ChatWindow::~ChatWindow()
 {
   emit windowDestroyed();
+  delete FInfoWidget;
+  delete FViewWidget;
+  delete FEditWidget;
+  delete FToolBarWidget;
+}
+
+void ChatWindow::setContactJid(const Jid &AContactJid)
+{
+  if (FMessenger->findChatWindow(FStreamJid,AContactJid) == NULL)
+  {
+    Jid befour = FContactJid;
+    FContactJid = AContactJid;
+    FInfoWidget->setContactJid(FContactJid);
+    FViewWidget->setContactJid(FContactJid);
+    FEditWidget->setContactJid(FContactJid);
+    emit contactJidChanged(befour);
+  }
+}
+
+bool ChatWindow::isActive() const
+{
+  return isVisible() && isActiveWindow();
+}
+
+void ChatWindow::showMessage(const Message &AMessage)
+{
+  FViewWidget->showMessage(AMessage);
 }
 
 void ChatWindow::showWindow()
@@ -83,31 +101,28 @@ void ChatWindow::closeWindow()
     emit windowClose();
 }
 
+void ChatWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle)
+{
+  setWindowIcon(AIcon);
+  setWindowIconText(AIconText);
+  setWindowTitle(ATitle);
+  emit windowChanged();
+}
+
 void ChatWindow::initialize()
 {
-  IPlugin *plugin = FMessenger->pluginManager()->getPlugins("IPresencePlugin").value(0,NULL);
+  IPlugin *plugin = FMessenger->pluginManager()->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
   {
-    IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-    if (presencePlugin)
+    IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+    if (xmppStreams)
     {
-      FPresence = presencePlugin->getPresence(FStreamJid);
-      if (FPresence)
+      IXmppStream *xmppStream = xmppStreams->getStream(FStreamJid);
+      if (xmppStream)
       {
-        connect(FPresence->instance(),SIGNAL(presenceItem(IPresenceItem *)),SLOT(onPresenceItem(IPresenceItem *)));
-        connect(FPresence->xmppStream()->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),
+        connect(xmppStream->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),
           SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
       }
-    }
-  }
-
-  plugin = FMessenger->pluginManager()->getPlugins("IStatusIcons").value(0,NULL);
-  if (plugin)
-  {
-    FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
-    if (FStatusIcons)
-    {
-      connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
     }
   }
 
@@ -120,18 +135,16 @@ void ChatWindow::initialize()
       FSettings = settingsPlugin->settingsForPlugin(MESSENGER_UUID);
     }
   }
-  FInfoWidget->autoSetFields();
-  loadActiveMessages();
 }
 
 void ChatWindow::saveWindowState()
 {
   if (FSettings)
   {
-    FSettingsValueNS = FStreamJid.pBare()+" | "+FContactJid.pBare();
+    QString valueNameNS = FStreamJid.pBare()+" | "+FContactJid.pBare();
     if (isWindow() && isVisible())
-      FSettings->setValueNS(SVN_GEOMETRY,FSettingsValueNS,saveGeometry());
-    FSettings->setValueNS(SVN_SPLITTER,FSettingsValueNS,ui.sprSplitter->saveState());
+      FSettings->setValueNS(SVN_GEOMETRY,valueNameNS,saveGeometry());
+    FSettings->setValueNS(SVN_SPLITTER,valueNameNS,ui.sprSplitter->saveState());
   }
 }
 
@@ -139,12 +152,12 @@ void ChatWindow::loadWindowState()
 {
   if (FSettings)
   {
-    FSettingsValueNS = FStreamJid.pBare()+" | "+FContactJid.pBare();
+    QString valueNameNS = FStreamJid.pBare()+" | "+FContactJid.pBare();
     if (isWindow())
-      restoreGeometry(FSettings->valueNS(SVN_GEOMETRY,FSettingsValueNS).toByteArray());
+      restoreGeometry(FSettings->valueNS(SVN_GEOMETRY,valueNameNS).toByteArray());
     if (!FSplitterLoaded)
     {
-      ui.sprSplitter->restoreState(FSettings->valueNS(SVN_SPLITTER,FSettingsValueNS).toByteArray());
+      ui.sprSplitter->restoreState(FSettings->valueNS(SVN_SPLITTER,valueNameNS).toByteArray());
       FSplitterLoaded = true;
     }
 
@@ -152,55 +165,17 @@ void ChatWindow::loadWindowState()
   FEditWidget->textEdit()->setFocus();
 }
 
-void ChatWindow::loadActiveMessages()
-{
-  QList<int> messagesId = FMessenger->messages(FStreamJid,FContactJid,Message::Chat);
-  foreach(int messageId, messagesId)
-  {
-    Message message = FMessenger->messageById(messageId);
-    onMessageReceived(message);
-  }
-}
-
-void ChatWindow::removeActiveMessages()
-{
-  if (!FActiveMessages.isEmpty() && isVisible() && isActiveWindow())
-  {
-    foreach(int messageId, FActiveMessages)
-      FMessenger->removeMessage(messageId);
-    FActiveMessages.clear();
-    updateWindow();
-  }
-}
-
-void ChatWindow::updateWindow()
-{
-  if (!FActiveMessages.isEmpty())
-  {
-    SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-    setWindowIcon(iconset->iconByName(IN_CHAT_MESSAGE));
-  }
-  else if (FStatusIcons)
-    setWindowIcon(FStatusIcons->iconByJid(FStreamJid,FContactJid));
-  
-  QString contactName = FInfoWidget->field(IInfoWidget::ContactName).toString();
-  setWindowIconText(contactName);
-  setWindowTitle(tr("%1 - Chat").arg(contactName));
-  
-  emit windowChanged();
-}
-
 bool ChatWindow::event(QEvent *AEvent)
 {
   if (AEvent->type() == QEvent::WindowActivate)
-    removeActiveMessages();
+    emit windowActivated();
   return QMainWindow::event(AEvent);
 }
 
 void ChatWindow::showEvent(QShowEvent *AEvent)
 {
   loadWindowState();
-  removeActiveMessages();
+  emit windowActivated();
   QMainWindow::showEvent(AEvent);
 }
 
@@ -213,35 +188,7 @@ void ChatWindow::closeEvent(QCloseEvent *AEvent)
 
 void ChatWindow::onMessageReady()
 {
-  Message message;
-  message.setFrom(FStreamJid.eFull()).setTo(FContactJid.eFull()).setType(Message::Chat);
-  FMessenger->textToMessage(message,FEditWidget->document());
-  if (!message.body().isEmpty() && FMessenger->sendMessage(message,FStreamJid))
-  {
-    FViewWidget->showMessage(message);
-    FEditWidget->clearEditor();
-  }
-}
-
-void ChatWindow::onMessageReceived(const Message &AMessage)
-{
-  if (AMessage.type() == Message::Chat)
-  {
-    Jid fromJid = AMessage.from();
-    Jid toJid = AMessage.to();
-    if (fromJid == FContactJid && toJid == FStreamJid)
-    {
-      FViewWidget->showMessage(AMessage);
-      int messageId = AMessage.data(MDR_MESSAGEID).toInt();
-      if (!isVisible() || !isActiveWindow())
-      {
-        FActiveMessages.append(messageId);
-        updateWindow();
-      }
-      else
-        FMessenger->removeMessage(messageId);
-    }
-  }
+  emit messageReady();
 }
 
 void ChatWindow::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
@@ -258,42 +205,13 @@ void ChatWindow::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour
     deleteLater();
 }
 
-void ChatWindow::onPresenceItem(IPresenceItem *APresenceItem)
-{
-  if (FContactJid && APresenceItem->jid())
-  {
-    if (FContactJid.resource().isEmpty())
-    {
-      Jid befour = FContactJid;
-      FContactJid = APresenceItem->jid();
-      FInfoWidget->setContactJid(FContactJid);
-      FViewWidget->setContactJid(FContactJid);
-      FEditWidget->setContactJid(FContactJid);
-      emit contactJidChanged(befour);
-    }
-    updateWindow();
-  }
-}
-
-void ChatWindow::onStatusIconsChanged()
-{
-  updateWindow();
-}
-
 void ChatWindow::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue)
 {
-  if (AField == IInfoWidget::ContactName) 
-  {
-    QString selfName = FStreamJid && FContactJid ? FStreamJid.resource() : FStreamJid.node();
-    FViewWidget->setNickForJid(FStreamJid,selfName);
-    FViewWidget->setNickForJid(FContactJid,AValue.toString());
-    updateWindow();
-  }
-  else if (AField == IInfoWidget::ContactStatus)
+  if (AField == IInfoWidget::ContactStatus)
   {
     if (FMessenger->checkOption(IMessenger::ShowStatus))
     {
-      QString status = FInfoWidget->field(IInfoWidget::ContactStatus).toString();
+      QString status = AValue.toString();
       QString show = FInfoWidget->field(IInfoWidget::ContactShow).toString();
       if (FLastStatusShow != status+show)
       {
@@ -301,7 +219,8 @@ void ChatWindow::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVarian
         if (FMessenger->checkOption(IMessenger::ShowDateTime))
           dateTime = QString("[%1] ").arg(QDateTime::currentDateTime().toString("hh::mm"));
         QString nick = FViewWidget->nickForJid(FContactJid);
-        QString html = QString("<span style='color:green;'>%1*** %2 [%3] %4</span>").arg(dateTime).arg(Qt::escape(nick)).arg(show).arg(status);
+        QString html = QString("<span style='color:green;'>%1*** %2 [%3] %4</span>").arg(dateTime).arg(Qt::escape(nick))
+                                                                                    .arg(Qt::escape(show)).arg(Qt::escape(status));
         FViewWidget->showCustomHtml(html);
         FLastStatusShow = status+show;
       }
@@ -314,3 +233,4 @@ void ChatWindow::onDefaultChatFontChanged(const QFont &AFont)
   FViewWidget->document()->setDefaultFont(AFont);
   FEditWidget->document()->setDefaultFont(AFont);
 }
+

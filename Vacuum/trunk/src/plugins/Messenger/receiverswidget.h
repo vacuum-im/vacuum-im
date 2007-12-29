@@ -26,6 +26,7 @@ public:
   virtual void removeReceiversGroup(const QString &AGroup);
   virtual void addReceiver(const Jid &AReceiver);
   virtual void removeReceiver(const Jid &AReceiver);
+  virtual void clear();
 signals:
   virtual void streamJidChanged(const Jid &ABefour);
   virtual void receiverAdded(const Jid &AReceiver);

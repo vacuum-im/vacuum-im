@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>604</width>
-    <height>423</height>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -194,33 +194,6 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QPushButton" name="pbtNext" >
-             <property name="text" >
-              <string>Next</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer>
-             <property name="orientation" >
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" >
-              <size>
-               <width>81</width>
-               <height>23</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pbtSend" >
-             <property name="text" >
-              <string>Send</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QPushButton" name="pbtReply" >
              <property name="text" >
               <string>Reply</string>
@@ -238,6 +211,33 @@
             <widget class="QPushButton" name="pbtChat" >
              <property name="text" >
               <string>Chat</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pbtSend" >
+             <property name="text" >
+              <string>Send</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pbtNext" >
+             <property name="text" >
+              <string>Next</string>
              </property>
             </widget>
            </item>

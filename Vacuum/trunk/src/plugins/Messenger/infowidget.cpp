@@ -16,6 +16,8 @@ InfoWidget::InfoWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   FMessenger = AMessenger;
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
+  FAutoFields = 0xFFFFFFFF;
+  FVisibleFields = AccountName|ContactAvatar|ContactName|ContactStatus;
 
   initialize();
 }
@@ -25,18 +27,25 @@ InfoWidget::~InfoWidget()
 
 }
 
-void InfoWidget::autoSetFields()
+void InfoWidget::autoUpdateFields()
 {
-  autoSetField(AccountName);
-  autoSetField(ContactAvatar);
-  autoSetField(ContactName);
-  autoSetField(ContactShow);
-  autoSetField(ContactStatus);
-  autoSetField(ContactEmail);
-  autoSetField(ContactClient);
+  if (isFiledAutoUpdated(AccountName))
+    autoUpdateField(AccountName);
+  if (isFiledAutoUpdated(ContactAvatar))
+    autoUpdateField(ContactAvatar);
+  if (isFiledAutoUpdated(ContactName))
+    autoUpdateField(ContactName);
+  if (isFiledAutoUpdated(ContactShow))
+    autoUpdateField(ContactShow);
+  if (isFiledAutoUpdated(ContactStatus))
+    autoUpdateField(ContactStatus);
+  if (isFiledAutoUpdated(ContactEmail))
+    autoUpdateField(ContactEmail);
+  if (isFiledAutoUpdated(ContactClient))
+    autoUpdateField(ContactClient);
 }
 
-void InfoWidget::autoSetField(InfoField AField)
+void InfoWidget::autoUpdateField(InfoField AField)
 {
   switch(AField)
   {
@@ -65,6 +74,8 @@ void InfoWidget::autoSetField(InfoField AField)
       }
       else
         contactName = FContactJid.resource();
+      if (contactName.isEmpty())
+        contactName = FContactJid.bare();
       setField(ContactName,contactName);
       break;
     };
@@ -124,7 +135,7 @@ void InfoWidget::setField(InfoField AField, const QVariant &AValue)
   case AccountName:
     {
       ui.lblAccount->setText(Qt::escape(AValue.toString()));
-      ui.wdtAccount->setVisible(!AValue.toString().isEmpty());
+      ui.wdtAccount->setVisible(isFieldVisible(AccountName) && !AValue.toString().isEmpty());
       break;
     };
   case ContactAvatar:
@@ -137,17 +148,16 @@ void InfoWidget::setField(InfoField AField, const QVariant &AValue)
         QMovie *movie = new QMovie(dataStream.device(),QByteArray(),ui.lblAvatar);
         movie->start();
         ui.lblAvatar->setMovie(movie);
-        ui.lblAvatar->setVisible(true);
         delete oldMovie;
       }
-      else
-        ui.lblAvatar->setVisible(false);
+      ui.lblAvatar->setVisible(isFieldVisible(ContactAvatar) && !data.isEmpty());
       break;
     };
   case ContactName:
     {
       FContactName = AValue.toString();
       ui.lblName->setText(QString("<b>%1</b> (%2)").arg(Qt::escape(FContactName)).arg(FContactJid.hFull()));
+      ui.lblName->setVisible(isFieldVisible(ContactName));
       break;
     };
   case ContactShow:
@@ -158,23 +168,51 @@ void InfoWidget::setField(InfoField AField, const QVariant &AValue)
   case ContactStatus:
     {
       ui.lblStatus->setText(Qt::escape(AValue.toString()));
-      ui.wdtStatus->setVisible(!AValue.toString().isEmpty());
+      ui.wdtStatus->setVisible(isFieldVisible(ContactStatus) && !AValue.toString().isEmpty());
       break;
     };
   case ContactEmail:
     {
       ui.lblEmail->setText(Qt::escape(AValue.toString()));
-      ui.wdtEmail->setVisible(!AValue.toString().isEmpty());
+      ui.wdtEmail->setVisible(isFieldVisible(ContactEmail) && !AValue.toString().isEmpty());
       break;
     };
   case ContactClient:
     {
       ui.lblClient->setText(Qt::escape(AValue.toString()));
-      ui.wdtClient->setVisible(!AValue.toString().isEmpty());
+      ui.wdtClient->setVisible(isFieldVisible(ContactClient) && !AValue.toString().isEmpty());
       break;
     };
   }
   emit fieldChanged(AField,AValue);
+}
+
+bool InfoWidget::isFiledAutoUpdated(IInfoWidget::InfoField AField) const
+{
+  return (FAutoFields & AField) > 0;
+}
+
+void InfoWidget::setFieldAutoUpdated(IInfoWidget::InfoField AField, bool AAuto)
+{
+  if (isFiledAutoUpdated(AField) != AAuto)
+  {
+    AAuto ? FAutoFields |= AField : FAutoFields &= ~AField;
+    autoUpdateField(AField);
+  }
+}
+
+bool InfoWidget::isFieldVisible(IInfoWidget::InfoField AField) const
+{
+  return (FVisibleFields & AField) >0;
+}
+
+void InfoWidget::setFieldVisible(IInfoWidget::InfoField AField, bool AVisible)
+{
+  if (isFieldVisible(AField) != AVisible)
+  {
+    AVisible ? FVisibleFields |= AField : FVisibleFields &= ~AField;
+    isFiledAutoUpdated(AField) ? autoUpdateField(AField) : setField(AField,field(AField));
+  }
 }
 
 void InfoWidget::setStreamJid(const Jid &AStreamJid)
@@ -182,7 +220,7 @@ void InfoWidget::setStreamJid(const Jid &AStreamJid)
   Jid befour = FStreamJid;
   FStreamJid = AStreamJid;
   initialize();
-  autoSetFields();
+  autoUpdateFields();
   emit streamJidChanged(befour);
 }
 
@@ -190,7 +228,7 @@ void InfoWidget::setContactJid(const Jid &AContactJid)
 {
   Jid befour = FContactJid;
   FContactJid = AContactJid;
-  autoSetFields();
+  autoUpdateFields();
   emit contactJidChanged(AContactJid);
 }
 
@@ -293,13 +331,13 @@ QString InfoWidget::showName(IPresence::Show AShow) const
 
 void InfoWidget::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
-  if (AName == "name")
+  if (isFiledAutoUpdated(AccountName) && AName == "name")
     setField(AccountName,AValue);
 }
 
 void InfoWidget::onRosterItemPush(IRosterItem *ARosterItem)
 {
-  if (ARosterItem->jid() && FContactJid)
+  if (isFiledAutoUpdated(ContactName) && (ARosterItem->jid() && FContactJid))
     setField(ContactName,ARosterItem->name());
 }
 
@@ -307,12 +345,16 @@ void InfoWidget::onPresenceItem(IPresenceItem *APresenceItem)
 {
   if (APresenceItem->jid() == FContactJid)
   {
-    setField(ContactShow,showName(APresenceItem->show()));
-    setField(ContactStatus,APresenceItem->status());
+    if (isFiledAutoUpdated(ContactShow))
+      setField(ContactShow,showName(APresenceItem->show()));
+    if (isFiledAutoUpdated(ContactStatus))
+      setField(ContactStatus,APresenceItem->status());
   }
 }
 
 void InfoWidget::onSoftwareInfoChanged(const Jid &AContactJid)
 {
-  autoSetField(ContactClient);
+  if (isFiledAutoUpdated(ContactClient) && AContactJid == FContactJid)
+    autoUpdateField(ContactClient);
 }
+

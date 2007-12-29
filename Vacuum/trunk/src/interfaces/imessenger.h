@@ -10,6 +10,7 @@
 #include <QTextBrowser>
 #include <QMainWindow>
 #include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/irostersmodel.h"
 #include "../../utils/jid.h"
 #include "../../utils/message.h"
 #include "../../utils/action.h"
@@ -22,23 +23,29 @@ class IInfoWidget :
 {
 public:
   enum InfoField {
-    AccountName,
-    ContactAvatar,
-    ContactName,
-    ContactShow,
-    ContactStatus,
-    ContactEmail,
-    ContactClient
+    AccountName       =1,
+    ContactAvatar     =2,
+    ContactName       =4,
+    ContactShow       =8,
+    ContactStatus     =16,
+    ContactEmail      =32,
+    ContactClient     =64
   };
 public:
   virtual const Jid &streamJid() const =0;
   virtual void setStreamJid(const Jid &AStreamJid) =0;
   virtual const Jid &contactJid() const =0;
   virtual void setContactJid(const Jid &AContactJid) =0;
-  virtual void autoSetFields() =0;
-  virtual void autoSetField(InfoField AField) =0;
+  virtual void autoUpdateFields() =0;
+  virtual void autoUpdateField(InfoField AField) =0;
   virtual QVariant field(InfoField AField) const =0;
   virtual void setField(InfoField AField, const QVariant &AValue) =0;
+  virtual bool isFiledAutoUpdated(IInfoWidget::InfoField AField) const =0;
+  virtual int autoUpdatedFields() const =0;
+  virtual void setFieldAutoUpdated(IInfoWidget::InfoField AField, bool AAuto) =0;
+  virtual bool isFieldVisible(IInfoWidget::InfoField AField) const =0;
+  virtual int visibleFields() const =0;
+  virtual void setFieldVisible(IInfoWidget::InfoField AField, bool AVisible) =0;
 signals:
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
@@ -68,7 +75,6 @@ public:
   virtual void setColorForJid(const Jid &AJid, const QColor &AColor) =0;
   virtual QString nickForJid(const Jid &AJid) const =0;
   virtual void setNickForJid(const Jid &AJid, const QString &ANick) =0;
-
 signals:
   virtual void messageShown(const Message &AMessage) =0;
   virtual void customHtmlShown(const QString &AHtml) =0;
@@ -113,6 +119,7 @@ public:
   virtual void removeReceiversGroup(const QString &AGroup) =0;
   virtual void addReceiver(const Jid &AReceiver) =0;
   virtual void removeReceiver(const Jid &AReceiver) =0;
+  virtual void clear() =0;
 signals:
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void receiverAdded(const Jid &AReceiver) =0;
@@ -170,18 +177,20 @@ class IChatWindow :
 public:
   virtual const Jid &streamJid() const =0;
   virtual const Jid &contactJid() const =0;
+  virtual void setContactJid(const Jid &AContactJid) =0;
   virtual IInfoWidget *infoWidget() const =0;
   virtual IViewWidget *viewWidget() const =0;
   virtual IEditWidget *editWidget() const =0;
   virtual IToolBarWidget *toolBarWidget() const =0;
-  virtual void showWindow() =0;
-  virtual void closeWindow() =0;
+  virtual bool isActive() const =0;
+  virtual void showMessage(const Message &AMessage) =0;
+  virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 signals:
+  virtual void messageReady() =0;
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
-  virtual void windowChanged() =0;
+  virtual void windowActivated() =0;
   virtual void windowClosed() =0;
-  virtual void windowDestroyed() =0;
 };
 
 class IMessageWindow : 
@@ -197,7 +206,9 @@ public:
 public:
   virtual const Jid &streamJid() const =0;
   virtual const Jid &contactJid() const =0;
+  virtual void setContactJid(const Jid &AContactJid) =0;
   virtual void addTabWidget(QWidget *AWidget) =0;
+  virtual void setCurrentTabWidget(QWidget *AWidget) =0;
   virtual void removeTabWidget(QWidget *AWidget) =0;
   virtual IInfoWidget *infoWidget() const =0;
   virtual IViewWidget *viewWidget() const =0;
@@ -207,14 +218,35 @@ public:
   virtual IToolBarWidget *editToolBarWidget() const =0;
   virtual Mode mode() const =0;
   virtual void setMode(Mode AMode) =0;
-  virtual void showWindow() =0;
-  virtual void closeWindow() =0;
+  virtual Message currentMessage() const =0;
+  virtual QString subject() const =0;
+  virtual void setSubject(const QString &ASubject) =0;
+  virtual QString threadId() const =0;
+  virtual void setThreadId(const QString &AThreadId) =0;
+  virtual int nextCount() const =0;
+  virtual void setNextCount(int ACount) =0;
+  virtual void showMessage(const Message &AMessage) =0;
+  virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 signals:
+  virtual void messageReady() =0;
+  virtual void showNextMessage() =0;
+  virtual void replyMessage() =0;
+  virtual void forwardMessage() =0;
+  virtual void showChatWindow() =0;
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
-  virtual void windowChanged() =0;
   virtual void windowClosed() =0;
-  virtual void windowDestroyed() =0;
+};
+
+class IMessageHandler
+{
+public:
+  virtual bool openWindow(IRosterIndex *AIndex) =0;
+  virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) =0;
+  virtual bool checkMessage(const Message &AMessage) =0;
+  virtual bool notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags) =0;
+  virtual void receiveMessage(int AMessageId) =0;
+  virtual void showMessage(int AMessageId) =0;
 };
 
 class IMessageWriter
@@ -244,13 +276,15 @@ public:
 public:
   virtual QObject *instance() = 0;
   virtual IPluginManager *pluginManager() const =0;
-  virtual int newMessageId() =0;
+  virtual void insertMessageHandler(IMessageHandler *AHandler, int AOrder) =0;
+  virtual void removeMessageHandler(IMessageHandler *AHandler, int AOrder) =0;
   virtual void insertMessageWriter(IMessageWriter *AWriter, int AOrder) =0;
   virtual void removeMessageWriter(IMessageWriter *AWriter, int AOrder) =0;
   virtual void insertResourceLoader(IResourceLoader *ALoader, int AOrder) =0;
   virtual void removeResourceLoader(IResourceLoader *ALoader, int AOrder) =0;
   virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = "") const =0;
   virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = "") const =0;
+  virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) const =0;
   virtual bool sendMessage(const Message &AMessage, const Jid &AStreamJid) =0;
   virtual int receiveMessage(const Message &AMessage) =0;
   virtual void showMessage(int AMessageId) =0;
@@ -270,15 +304,17 @@ public:
   virtual IReceiversWidget *newReceiversWidget(const Jid &AStreamJid) =0;
   virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers) =0;
   virtual QList<IMessageWindow *> messageWindows() const =0;
-  virtual IMessageWindow *openMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
+  virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
   virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual QList<IChatWindow *> chatWindows() const =0;
-  virtual IChatWindow *openChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
+  virtual IChatWindow *newChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual QList<int> tabWindows() const =0;
   virtual ITabWindow *openTabWindow(int AWindowId = 0) =0;
   virtual ITabWindow *findTabWindow(int AWindowId = 0) =0;
 signals:
+  virtual void messageHandlerInserted(IMessageHandler *AHandler, int AOrder) =0;
+  virtual void messageHandlerRemoved(IMessageHandler *AHandler, int AOrder) =0;
   virtual void messageWriterInserted(IMessageWriter *AWriter, int AOrder) =0;
   virtual void messageWriterRemoved(IMessageWriter *AWriter, int AOrder) =0;
   virtual void resourceLoaderInserted(IResourceLoader *ALoader, int AOrder) =0;
@@ -318,6 +354,7 @@ Q_DECLARE_INTERFACE(ITabWidget,"Vacuum.Plugin.ITabWidget/1.0")
 Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.0")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.0")
+Q_DECLARE_INTERFACE(IMessageHandler,"Vacuum.Plugin.IMessageHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageWriter,"Vacuum.Plugin.IMessageWriter/1.0")
 Q_DECLARE_INTERFACE(IResourceLoader,"Vacuum.Plugin.IResourceLoader/1.0")
 Q_DECLARE_INTERFACE(IMessenger,"Vacuum.Plugin.IMessenger/1.0")

@@ -21,10 +21,16 @@ public:
   virtual void setStreamJid(const Jid &AStreamJid);
   virtual const Jid &contactJid() const { return FContactJid; }
   virtual void setContactJid(const Jid &AContactJid);
-  virtual void autoSetFields();
-  virtual void autoSetField(InfoField AField);
+  virtual void autoUpdateFields();
+  virtual void autoUpdateField(InfoField AField);
   virtual QVariant field(InfoField AField) const;
   virtual void setField(InfoField AField, const QVariant &AValue);
+  virtual bool isFiledAutoUpdated(IInfoWidget::InfoField AField) const;
+  virtual int autoUpdatedFields() const { return FAutoFields; }
+  virtual void setFieldAutoUpdated(IInfoWidget::InfoField AField, bool AAuto);
+  virtual bool isFieldVisible(IInfoWidget::InfoField AField) const;
+  virtual int visibleFields() const { return FVisibleFields; }
+  virtual void setFieldVisible(IInfoWidget::InfoField AField, bool AVisible);
 signals:
   virtual void streamJidChanged(const Jid &ABefour);
   virtual void contactJidChanged(const Jid &ABefour);
@@ -46,6 +52,8 @@ private:
   IPresence *FPresence;
   IClientInfo *FClientInfo;
 private:
+  int FAutoFields;
+  int FVisibleFields;
   Jid FStreamJid;
   Jid FContactJid;
   QString FContactName;

@@ -84,6 +84,11 @@ void ReceiversWidget::removeReceiver(const Jid &AReceiver)
     contactItem->setCheckState(0,Qt::Unchecked);
 }
 
+void ReceiversWidget::clear()
+{
+  onSelectNoneClicked();
+}
+
 void ReceiversWidget::initialize()
 {
   IPlugin *plugin = FMessenger->pluginManager()->getPlugins("IPresencePlugin").value(0,NULL);
@@ -290,3 +295,4 @@ void ReceiversWidget::onUpdateClicked()
   foreach(Jid receiver, savedReceivers)
     addReceiver(receiver);
 }
+

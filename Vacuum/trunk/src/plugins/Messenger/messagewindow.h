@@ -4,6 +4,7 @@
 #include "../../definations/messagedataroles.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/imessenger.h"
+#include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/isettings.h"
@@ -20,12 +21,16 @@ class MessageWindow :
 public:
   MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode);
   ~MessageWindow();
-
-  //IMessageWindow
+  //ITabWidget
   virtual QWidget *instance() { return this; }
+  virtual void showWindow();
+  virtual void closeWindow();
+  //IMessageWindow
   virtual const Jid &streamJid() const { return FStreamJid; }
   virtual const Jid &contactJid() const { return FContactJid; }
+  virtual void setContactJid(const Jid &AContactJid);
   virtual void addTabWidget(QWidget *AWidget);
+  virtual void setCurrentTabWidget(QWidget *AWidget);
   virtual void removeTabWidget(QWidget *AWidget);
   virtual IInfoWidget *infoWidget() const { return FInfoWidget; }
   virtual IViewWidget *viewWidget() const { return FViewWidget; }
@@ -35,40 +40,44 @@ public:
   virtual IToolBarWidget *editToolBarWidget() const { return FEditToolBarWidget; }
   virtual Mode mode() const { return FMode; }
   virtual void setMode(Mode AMode);
-  virtual void showWindow();
-  virtual void closeWindow();
+  virtual Message currentMessage() const { return FMessage; }
+  virtual QString subject() const { return ui.lneSubject->text(); }
+  virtual void setSubject(const QString &ASubject);
+  virtual QString threadId() const { return FCurrentThreadId; }
+  virtual void setThreadId(const QString &AThreadId);
+  virtual int nextCount() const { return FNextCount; }
+  virtual void setNextCount(int ACount);
+  virtual void showMessage(const Message &AMessage);
+  virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
+  virtual void messageReady();
+  virtual void showNextMessage();
+  virtual void replyMessage();
+  virtual void forwardMessage();
+  virtual void showChatWindow();
   virtual void streamJidChanged(const Jid &ABefour);
   virtual void contactJidChanged(const Jid &ABefour);
+  virtual void windowClosed();
+  //ITabWidget
   virtual void windowShow();
   virtual void windowClose();
   virtual void windowChanged();
-  virtual void windowClosed();
   virtual void windowDestroyed();
 protected:
   void initialize();
   void saveWindowState();
   void loadWindowState();
-  void loadActiveMessages();
-  void removeActiveMessage(int AMessageId);
-  void updateWindow();
-  void showMessage(const Message &AMessage);
   void showErrorMessage(const Message &AMessage);
-  void showNextOrClose();
-  void setContactJid(const Jid &AContactJid);
 protected:
   virtual void showEvent(QShowEvent *AEvent);
   virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
-  void onMessageReceived(const Message &AMessage);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
-  void onPresenceItem(IPresenceItem *APresenceItem);
-  void onStatusIconsChanged();
   void onSendButtonClicked();
+  void onNextButtonClicked();
   void onReplyButtonClicked();
   void onForwardButtonClicked();
   void onChatButtonClicked();
-  void onNextButtonClicked();
   void onReceiversChanged(const Jid &AReceiver);
   void onDefaultMessageFontChanged(const QFont &AFont);
 private:
@@ -81,18 +90,14 @@ private:
   IToolBarWidget *FEditToolBarWidget;
 private:
   IMessenger *FMessenger;
-  IPresence *FPresence;
-  IStatusIcons *FStatusIcons;
   ISettings *FSettings;
 private:
+  int FNextCount;
   Jid FStreamJid;
   Jid FContactJid;
   Mode FMode;
-  int FMessageId;
   Message FMessage;
   QString FCurrentThreadId;
-  QString FSettingsValueNS;
-  QList<int> FActiveMessages;
 };
 
 #endif // MESSAGEWINDOW_H
