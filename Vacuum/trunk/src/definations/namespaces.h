@@ -19,4 +19,6 @@
 #define NS_PROTOCOL_COMPRESS                    "http://jabber.org/protocol/compress"
 #define NS_FEATURE_STARTTLS                     "urn:ietf:params:xml:ns:xmpp-tls"
 
+#define NS_VCARD_TEMP                           "vcard-temp"
+
 #endif

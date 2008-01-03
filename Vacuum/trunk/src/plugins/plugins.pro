@@ -25,4 +25,5 @@ SUBDIRS = settings \
           statusicons \
           skinmanager \
           emoticons \
-          clientinfo
+          clientinfo \
+          vcard

@@ -12,14 +12,15 @@
 #define AG_MAINWINDOW_MMENU_QUIT                                1000
 
 //RostersView (ContextMenu)
-#define AG_MESSENGER                                            100
-#define AG_STATUSCHANGER_ROSTER                                 200
-#define AG_ROSTERCHANGER_ROSTER_ADD_CONTACT                     300
-#define AG_ACCOUNTMANAGER_ROSTER                                700
-#define AG_STATUSICONS_ROSTER                                   750
-#define AG_CLIENTINFO_ROSTER                                    750
-#define AG_ROSTERCHANGER_ROSTER_SUBSCRIPTION                    800
-#define AG_ROSTERCHANGER_ROSTER                                 800
+#define AG_MESSENGER                                            300
+#define AG_STATUSCHANGER_ROSTER                                 400
+#define AG_ROSTERCHANGER_ROSTER_ADD_CONTACT                     500
+#define AG_ACCOUNTMANAGER_ROSTER                                500
+#define AG_STATUSICONS_ROSTER                                   500
+#define AG_CLIENTINFO_ROSTER                                    500
+#define AG_VCARD_ROSTER                                         500
+#define AG_ROSTERCHANGER_ROSTER_SUBSCRIPTION                    700
+#define AG_ROSTERCHANGER_ROSTER                                 700
 
 //TrayManager (TrayMenu)
 #define AG_STATUSCHANGER_TRAY                                   200

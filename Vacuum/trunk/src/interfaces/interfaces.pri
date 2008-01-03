@@ -18,4 +18,5 @@ HEADERS += ipluginmanager.h \
            istatusicons.h \
            iskinmanager.h \
            iemoticons.h \
-           iclientinfo.h
+           iclientinfo.h \
+           ivcard.h

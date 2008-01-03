@@ -8,5 +8,6 @@
 #define IO_MESSENGER                        200
 #define IO_STATUSICONS                      200
 #define IO_CLIENTINFO                       200
+#define IO_VCARD                            200
 
 #endif
