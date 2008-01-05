@@ -11,4 +11,5 @@ HEADERS += actiongroups.h \
            messagewriterorders.h \
            resourceloaderorders.h \
            stanzahandlerpriority.h \
-           messagehandlerorders.h
+           messagehandlerorders.h \
+           vcardvaluenames.h
