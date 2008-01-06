@@ -168,7 +168,7 @@ void VCardDialog::updateDialog()
   ui.tlbPhotoClear->setVisible(!readOnly);
   ui.tlbPhotoLoad->setVisible(!readOnly);
 
-  ui.tedComments->setPlainText(FVCard->value(VVN_DESCRIPTION).toLatin1());
+  ui.tedComments->setPlainText(FVCard->value(VVN_DESCRIPTION));
   ui.tedComments->setReadOnly(readOnly);
 }
 
