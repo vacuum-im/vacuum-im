@@ -97,6 +97,7 @@ void VCardDialog::updateDialog()
 
   ui.dedBirthday->setDate(QDate::fromString(FVCard->value(VVN_BIRTHDAY),Qt::ISODate));
   ui.dedBirthday->setReadOnly(readOnly);
+  ui.dedBirthday->setCalendarPopup(!readOnly);
   ui.cmbGender->lineEdit()->setText(FVCard->value(VVN_GENDER));
   ui.cmbGender->setEnabled(!readOnly);
   ui.lneMaritial->setText(FVCard->value(VVN_MARITALSTATUS));
