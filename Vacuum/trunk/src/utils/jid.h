@@ -19,7 +19,7 @@ public:
     FEscNode = AOther.FEscNode;
     FPrepNode = AOther.FPrepNode;
     FDomane = AOther.FDomane;
-    FPrepDomane = AOther.FPrepNode;
+    FPrepDomane = AOther.FPrepDomane;
     FResource = AOther.FResource;
     FPrepResource = AOther.FPrepResource;
   };
