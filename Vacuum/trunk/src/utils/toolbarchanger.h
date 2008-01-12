@@ -15,9 +15,13 @@ public:
   ToolBarChanger(QToolBar *AToolBar);
   ~ToolBarChanger();
   bool isEmpty() const;
+  bool separatorsVisible() const { return FSeparatorsVisible; }
+  void setSeparatorsVisible(bool ASeparatorsVisible);
+  bool manageVisibitily() const { return FManageVisibility; }
+  void setManageVisibility(bool AManageVisibility);
   QToolBar *toolBar() const { return FToolBar; }
   void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
-  void addToolButton(Action *AAction, Qt::ToolButtonStyle AStyle, QToolButton::ToolButtonPopupMode AMode, int AGroup = AG_DEFAULT, bool ASort = false);
+  QToolButton *addToolButton(Action *AAction, Qt::ToolButtonStyle AStyle, QToolButton::ToolButtonPopupMode AMode, int AGroup = AG_DEFAULT, bool ASort = false);
   QAction *addWidget(QWidget *AWidget,  int AGroup = AG_DEFAULT);
   int actionGroup(const Action *AAction) const;
   QList<Action *> actions(int AGroup = AG_NULL) const;
@@ -33,6 +37,7 @@ signals:
   void separatorRemoved(QAction *ASeparator);
   void actionRemoved(Action *AAction);
   void widgetRemoved(QWidget *AWidget, QAction *AAction);
+  void toolBarChanged();
   void toolBarChangerDestroyed(ToolBarChanger *AToolBarChanger);
 protected:
   void updateVisible();
@@ -44,9 +49,13 @@ protected slots:
   void onSeparatorRemoved(QAction *ASeparator);
   void onActionRemoved(Action *AAction);
   void onWidgetDestroyed(QObject *AObject);
+  void onChangeVisible();
 private:
+  bool FSeparatorsVisible;
+  bool FManageVisibility;
   int FChangingIntVisible;
-  bool FIntVisible, FExtVisible;
+  bool FIntVisible;
+  bool FExtVisible;
   QToolBar *FToolBar;
   Menu *FToolBarMenu;
   QHash<QWidget *, QAction *> FWidgetActions;

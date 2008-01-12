@@ -1,11 +1,15 @@
 #include "toolbarchanger.h"
 
+#include <QTimer>
+
 ToolBarChanger::ToolBarChanger(QToolBar *AToolBar) : QObject(AToolBar)
 {
   FToolBar = AToolBar;
   FToolBar->clear();
   FIntVisible = false;
   FExtVisible = FToolBar->isVisible();
+  FSeparatorsVisible = true;
+  FManageVisibility = true;
   FChangingIntVisible = 0;
   FToolBar->installEventFilter(this);
   FToolBarMenu = new Menu;
@@ -27,13 +31,26 @@ bool ToolBarChanger::isEmpty() const
   return FToolBarMenu->isEmpty() && FWidgetActions.isEmpty();
 }
 
+void ToolBarChanger::setSeparatorsVisible(bool ASeparatorsVisible)
+{
+  FSeparatorsVisible = ASeparatorsVisible;
+  foreach(QAction *separator, FBarSepByMenuSep)
+    separator->setVisible(ASeparatorsVisible);
+}
+
+void ToolBarChanger::setManageVisibility(bool AManageVisibility)
+{
+  FManageVisibility = AManageVisibility;
+  FToolBar->setVisible(FExtVisible);
+}
+
 void ToolBarChanger::addAction(Action *AAction, int AGroup, bool ASort)
 {
   FToolBarMenu->addAction(AAction,AGroup,ASort);
 }
 
-void ToolBarChanger::addToolButton(Action *AAction, Qt::ToolButtonStyle AStyle, QToolButton::ToolButtonPopupMode AMode, 
-                                   int AGroup , bool ASort)
+QToolButton *ToolBarChanger::addToolButton(Action *AAction, Qt::ToolButtonStyle AStyle, QToolButton::ToolButtonPopupMode AMode, 
+                                           int AGroup , bool ASort)
 {
   QToolButton *button = new QToolButton;
   button->setDefaultAction(AAction);
@@ -41,6 +58,7 @@ void ToolBarChanger::addToolButton(Action *AAction, Qt::ToolButtonStyle AStyle, 
   button->setToolButtonStyle(AStyle);
   FActionButtons.insert(AAction,button);
   FToolBarMenu->addAction(AAction,AGroup,ASort);
+  return button;
 }
 
 QAction *ToolBarChanger::addWidget(QWidget *AWidget, int AGroup)
@@ -101,12 +119,13 @@ void ToolBarChanger::clear()
 void ToolBarChanger::updateVisible()
 {
   FIntVisible = !isEmpty();
-  if (!FToolBar->isWindow() && (FIntVisible && FExtVisible) != FToolBar->isVisible())
+  if (FManageVisibility && !FToolBar->isWindow() && (FIntVisible && FExtVisible)!=FToolBar->isVisible())
   {
     FChangingIntVisible++;
     FToolBar->setVisible(FIntVisible && FExtVisible);
     FChangingIntVisible--;
   }
+  emit toolBarChanged();
 }
 
 bool ToolBarChanger::eventFilter(QObject *AObject, QEvent *AEvent)
@@ -115,19 +134,14 @@ bool ToolBarChanger::eventFilter(QObject *AObject, QEvent *AEvent)
   {
     if (FChangingIntVisible == 0)
       FExtVisible = true;
-    if (!FIntVisible || !FExtVisible)
-    {
-      FChangingIntVisible++;
-      FToolBar->hide();
-      FChangingIntVisible--;
-      return true;
-    }
+    if (FManageVisibility && (!FIntVisible || !FExtVisible))
+      QTimer::singleShot(0,this,SLOT(onChangeVisible()));
   }
   else if (AEvent->type() == QEvent::Hide)
   {
     if (FChangingIntVisible == 0)
       FExtVisible = false;
-  }
+ }
   return QObject::eventFilter(AObject,AEvent);
 }
 
@@ -155,6 +169,7 @@ void ToolBarChanger::onSeparatorInserted(Action *ABefour, QAction *ASeparator)
   }
   else
     separator = FToolBar->insertSeparator(ABefour);
+  separator->setVisible(FSeparatorsVisible);
   FBarSepByMenuSep.insert(ASeparator,separator);
   emit separatorInserted(ABefour,separator);
 }
@@ -187,3 +202,9 @@ void ToolBarChanger::onWidgetDestroyed(QObject *AObject)
   removeWidget(widget);
 }
 
+void ToolBarChanger::onChangeVisible()
+{
+  FChangingIntVisible++;
+  FToolBar->setVisible(FIntVisible && FExtVisible);
+  FChangingIntVisible--;
+}
