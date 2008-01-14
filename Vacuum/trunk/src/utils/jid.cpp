@@ -264,13 +264,13 @@ Jid &Jid::parseString(const QString &AJidStr)
 {	
   if (!AJidStr.isEmpty())
   {
-    int at = AJidStr.lastIndexOf("@");
-    int slash = AJidStr.indexOf("/", at+1);
+    int slash = AJidStr.indexOf("/");
     if (slash == -1)
       slash = AJidStr.size();
+    int at = AJidStr.lastIndexOf("@",slash-AJidStr.size()-1);
     setNode(at > 0 ? AJidStr.left(at) : "");
     setDomane(slash-at-1 > 0 ? AJidStr.mid(at+1,slash-at-1) : "");
-    setResource(slash < AJidStr.size()-1 ? AJidStr.right(AJidStr.size()-1 - slash) : "");
+    setResource(slash < AJidStr.size()-1 ? AJidStr.right(AJidStr.size()-slash-1) : "");
   }
   else
   {
