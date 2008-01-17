@@ -13,28 +13,22 @@ class RostersModelPlugin :
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IRostersModelPlugin);
-
 public:
   RostersModelPlugin();
   ~RostersModelPlugin();
-
   virtual QObject *instance() { return this; }
-
   //IPlugin
   virtual QUuid pluginUuid() const { return ROSTERSMODEL_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects();
+  virtual bool initObjects() { return true; }
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-
   //IRostersModelPlugin
   virtual IRostersModel *rostersModel();
   virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence);
   virtual void removeStream(const Jid &AStreamJid);
 signals:
-  virtual void modelCreated(IRostersModel *);
-  virtual void modelDestroyed(IRostersModel *);
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
 protected slots:
   void onRosterAdded(IRoster *ARoster);

@@ -48,11 +48,6 @@ bool SettingsPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
   if (plugin)
   {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-    if (FMainWindowPlugin)
-    {
-      connect(FMainWindowPlugin->instance(),SIGNAL(mainWindowCreated(IMainWindow *)),
-        SLOT(onMainWindowCreated(IMainWindow *)));
-    }
   }
 
   plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
@@ -84,6 +79,12 @@ bool SettingsPlugin::initObjects()
   FOpenProfileDialogAction->setText(tr("Edit profiles..."));
   FProfileMenu->addAction(FOpenProfileDialogAction,AG_DEFAULT+1);
   connect(FOpenProfileDialogAction,SIGNAL(triggered(bool)),SLOT(openProfileDialogByAction(bool)));
+
+  if (FMainWindowPlugin)
+  {
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FOpenOptionsDialogAction,AG_SETTINGS_MMENU,true);
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FProfileMenu->menuAction(),AG_SETTINGS_MMENU,true);
+  }
 
   if (FTrayManager)
   {
@@ -554,12 +555,6 @@ void SettingsPlugin::removeProfileAction(const QString &AProfile)
   data.insert(ADR_PROFILE,AProfile);
   Action *action = FProfileMenu->findActions(data,false).value(0);
   delete action;
-}
-
-void SettingsPlugin::onMainWindowCreated(IMainWindow *AMainWindow)
-{
-  AMainWindow->mainMenu()->addAction(FOpenOptionsDialogAction,AG_SETTINGS_MMENU,true);
-  AMainWindow->mainMenu()->addAction(FProfileMenu->menuAction(),AG_SETTINGS_MMENU,true);
 }
 
 void SettingsPlugin::onOptionsDialogOpened()

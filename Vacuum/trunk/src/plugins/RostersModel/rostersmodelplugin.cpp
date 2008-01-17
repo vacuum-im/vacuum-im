@@ -8,15 +8,15 @@ RostersModelPlugin::RostersModelPlugin()
   FRostersModel = NULL;
   FRosterPlugin = NULL;
   FPresencePlugin = NULL;
+
+  FRostersModel = new RostersModel(this);
+  connect(FRostersModel,SIGNAL(streamJidChanged(const Jid &, const Jid &)),
+    SLOT(onStreamJidChanged(const Jid &, const Jid &)));
 }
 
 RostersModelPlugin::~RostersModelPlugin()
 {
-  if (FRostersModel)
-  {
-    emit modelDestroyed(FRostersModel);
-    delete FRostersModel;
-  }
+  delete FRostersModel;
 }
 
 //IPlugin
@@ -63,20 +63,10 @@ bool RostersModelPlugin::initConnections(IPluginManager *APluginManager, int &/*
   return true;
 }
 
-bool RostersModelPlugin::initObjects()
-{
-  FRostersModel = new RostersModel(this);
-  connect(FRostersModel,SIGNAL(streamJidChanged(const Jid &, const Jid &)),
-    SLOT(onStreamJidChanged(const Jid &, const Jid &)));
-  emit modelCreated(FRostersModel);
-  return true;
-}
-
-
 //IRostersModelPlugin
 IRostersModel *RostersModelPlugin::rostersModel()
 {
-   return FRostersModel;
+  return FRostersModel;
 }
 
 IRosterIndex *RostersModelPlugin::addStream(IRoster *ARoster, IPresence *APresence)

@@ -63,8 +63,10 @@ signals:
 };
 
 class IRostersModel :
-  virtual public QAbstractItemModel
+  public QAbstractItemModel
 {
+public:
+  IRostersModel(QObject *AParent):QAbstractItemModel(AParent) {};
 public:
   virtual QObject *instance() =0;
   virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence) =0;
@@ -112,8 +114,6 @@ public:
   virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence) =0;
   virtual void removeStream(const Jid &AStreamJid) =0;
 signals:
-  virtual void modelCreated(IRostersModel *AModel) =0;
-  virtual void modelDestroyed(IRostersModel *AModel) =0;
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;
 };
 

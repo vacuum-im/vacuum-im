@@ -39,10 +39,8 @@ void RosterChanger::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append(ROSTER_UUID); 
 }
 
-bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  AInitOrder = IO_ROSTERCHANGER;
-
   IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
@@ -99,19 +97,19 @@ bool RosterChanger::initObjects()
 {
   FSystemIconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
 
-  if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
+  if (FRostersModelPlugin)
   {
     FRostersModel = FRostersModelPlugin->rostersModel();
   }
 
-  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
+  if (FRostersViewPlugin)
   {
     FRostersView = FRostersViewPlugin->rostersView();
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
     connect(FRostersView,SIGNAL(notifyActivated(IRosterIndex *, int)),SLOT(onRosterNotifyActivated(IRosterIndex *, int)));
   }
 
-  if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
+  if (FMainWindowPlugin)
   {
     FAddContactMenu = new Menu(FMainWindowPlugin->mainWindow()->mainMenu());
     FAddContactMenu->setIcon(SYSTEM_ICONSETFILE,IN_ADDCONTACT);

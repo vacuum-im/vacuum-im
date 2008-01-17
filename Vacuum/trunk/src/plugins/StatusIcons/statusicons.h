@@ -3,7 +3,6 @@
 
 #include <QRegExp>
 #include <QPointer>
-#include "../../definations/initorders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
 #include "../../definations/rosterindextyperole.h"

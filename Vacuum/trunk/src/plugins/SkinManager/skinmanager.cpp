@@ -34,10 +34,8 @@ void SkinManager::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo ->version = "0.1";
 }
 
-bool SkinManager::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool SkinManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  AInitOrder = IO_SKINMANAGER;
-
   IPlugin *plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
   {
@@ -71,7 +69,7 @@ bool SkinManager::initObjects()
   FSkinMenu->setIcon(SYSTEM_ICONSETFILE,IN_APPEARANCE);
   FSkinMenu->menuAction()->setVisible(false);
 
-  if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
+  if (FMainWindowPlugin)
   {
     FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FSkinMenu->menuAction(),AG_SKINMANAGER_MENU,true);
   }

@@ -5,6 +5,8 @@
 #include <QTime>
 #include <QMessageBox>
 
+#define IN_ACCOUNT "psi/account"
+
 AccountManager::AccountManager()
 {
   FPluginManager = NULL;
@@ -12,7 +14,7 @@ AccountManager::AccountManager()
   FSettings = NULL;
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
-  actAccountsSetup = NULL;
+  FActionSetup = NULL;
   srand(QTime::currentTime().msec());
 }
 
@@ -61,11 +63,6 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
   if (plugin)
   {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-    if (FMainWindowPlugin)
-    {
-      connect(FMainWindowPlugin->instance(),SIGNAL(mainWindowCreated(IMainWindow *)),
-        SLOT(onMainWindowCreated(IMainWindow *)));
-    }
   }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
@@ -74,8 +71,8 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
     if (FRostersViewPlugin)
     {
-      connect(FRostersViewPlugin->instance(),SIGNAL(viewCreated(IRostersView *)),
-        SLOT(onRostersViewCreated(IRostersView *)));
+      connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
+        SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
     }
   }
 
@@ -84,13 +81,20 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool AccountManager::initObjects()
 {
-  if (FSettingsPlugin)
+  if (FMainWindowPlugin)
   {
-    FSettings = FSettingsPlugin->settingsForPlugin(ACCOUNTMANAGER_UUID);
-    FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"), tr("Creating and removing accounts"),QIcon());
-    FSettingsPlugin->appendOptionsHolder(this);
+    FActionSetup = new Action(this);
+    FActionSetup->setIcon(SYSTEM_ICONSETFILE,IN_ACCOUNT);
+    FActionSetup->setText(tr("Account setup..."));
+    FActionSetup->setData(Action::DR_Parametr1,ON_ACCOUNTS);
+    connect(FActionSetup,SIGNAL(triggered(bool)),FSettingsPlugin->instance(),SLOT(openOptionsDialogByAction(bool)));
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FActionSetup,AG_ACCOUNTMANAGER_MMENU,true);
   }
-  return FSettings != NULL;
+
+  FSettings = FSettingsPlugin->settingsForPlugin(ACCOUNTMANAGER_UUID);
+  FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"), tr("Creating and removing accounts"),QIcon());
+  FSettingsPlugin->appendOptionsHolder(this);
+  return true;
 }
 
 
@@ -296,28 +300,6 @@ void AccountManager::showAllActiveAccounts()
   foreach (account, FAccounts)
     if (account->isActive())
       showAccount(account);
-}
-
-void AccountManager::onRostersViewCreated(IRostersView *ARostersView)
-{
-  if (FSettingsPlugin)
-  {
-    connect(ARostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
-      SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
-  }
-}
-
-void AccountManager::onMainWindowCreated(IMainWindow *AMainWindow)
-{
-  if (FSettingsPlugin)
-  {
-    actAccountsSetup = new Action(this);
-    actAccountsSetup->setIcon(SYSTEM_ICONSETFILE,"psi/account");
-    actAccountsSetup->setText(tr("Account setup..."));
-    actAccountsSetup->setData(Action::DR_Parametr1,ON_ACCOUNTS);
-    connect(actAccountsSetup,SIGNAL(triggered(bool)),FSettingsPlugin->instance(),SLOT(openOptionsDialogByAction(bool)));
-    AMainWindow->mainMenu()->addAction(actAccountsSetup,AG_ACCOUNTMANAGER_MMENU,true);
-  }
 }
 
 void AccountManager::onOptionsAccountAdded(const QString &AName)

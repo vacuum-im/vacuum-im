@@ -36,9 +36,8 @@ void VCardPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->version = "0.1";
 }
 
-bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  AInitOrder = IO_VCARD;
   IPlugin *plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
@@ -66,7 +65,7 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 
 bool VCardPlugin::initObjects()
 {
-  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
+  if (FRostersViewPlugin)
   {
     FRostersView = FRostersViewPlugin->rostersView();
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));

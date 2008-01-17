@@ -7,18 +7,14 @@
 #include "rosterindex.h"
 
 class RostersModel : 
-  virtual public QAbstractItemModel,
   public IRostersModel
 {
   Q_OBJECT;
   Q_INTERFACES(IRostersModel);
-
 public:
-  RostersModel(QObject *parent);
+  RostersModel(QObject *AParent);
   ~RostersModel();
-
   virtual QObject *instance() { return this; }
-
   //QAbstractItemModel
   virtual QModelIndex index(int ARow, int AColumn, const QModelIndex &AParent = QModelIndex()) const;
   virtual QModelIndex parent(const QModelIndex &AIndex) const;
@@ -27,7 +23,6 @@ public:
   virtual int columnCount(const QModelIndex &AParent = QModelIndex()) const;
   virtual Qt::ItemFlags flags(const QModelIndex &AIndex) const; 
   virtual QVariant data(const QModelIndex &AIndex, int ARole = Qt::DisplayRole) const;
-
   //IRostersModel
   virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence);
   virtual QStringList streams() const { return FStreams.keys(); }

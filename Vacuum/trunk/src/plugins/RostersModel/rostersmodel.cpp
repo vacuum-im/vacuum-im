@@ -4,8 +4,7 @@
 
 #define INDEX_CHANGES_FOR_RESET 20
 
-RostersModel::RostersModel(QObject *parent)
-  : QAbstractItemModel(parent)
+RostersModel::RostersModel(QObject *AParent):IRostersModel(AParent)
 {
   FRootIndex = new RosterIndex(RIT_Root,"IT_Root");
   FRootIndex->setParent(this);

@@ -23,7 +23,6 @@ RostersViewPlugin::RostersViewPlugin()
   FMainWindowPlugin = NULL;
   FSettingsPlugin = NULL;
   FSettings = NULL;
-  FRostersView = NULL;
   FRosterPlugin = NULL;
   FAccountManager = NULL;
 
@@ -41,12 +40,14 @@ RostersViewPlugin::RostersViewPlugin()
     << RIT_MyResourcesGroup
     << RIT_NotInRosterGroup
     << RIT_StreamRoot;
+
+  FRostersView = new RostersView;
+  connect(FRostersView,SIGNAL(destroyed(QObject *)), SLOT(onRostersViewDestroyed(QObject *)));
 }
 
 RostersViewPlugin::~RostersViewPlugin()
 {
-  if (FRostersView)
-    delete FRostersView;
+  delete FRostersView;
 }
 
 void RostersViewPlugin::pluginInfo(PluginInfo *APluginInfo)
@@ -61,10 +62,8 @@ void RostersViewPlugin::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append(MAINWINDOW_UUID);
 }
 
-bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  AInitOrder = IO_ROSTERSVIEW;
-
   IPlugin *plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
   if (plugin)
   {
@@ -117,13 +116,10 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 bool RostersViewPlugin::initObjects()
 {
   FIndexDataHolder = new IndexDataHolder(this);
-  FRostersView = new RostersView;
   connect(FRostersView,SIGNAL(modelAboutToBeSeted(IRostersModel *)),
     SLOT(onModelAboutToBeSeted(IRostersModel *)));
   connect(FRostersView,SIGNAL(modelSeted(IRostersModel *)),
     SLOT(onModelSeted(IRostersModel *)));
-  connect(FRostersView,SIGNAL(destroyed(QObject *)),
-    SLOT(onRostersViewDestroyed(QObject *)));
   connect(FRostersView,SIGNAL(lastModelAboutToBeChanged(QAbstractItemModel *)),
     SLOT(onLastModelAboutToBeChanged(QAbstractItemModel *)));
   connect(FRostersView,SIGNAL(lastModelChanged(QAbstractItemModel *)),
@@ -144,9 +140,8 @@ bool RostersViewPlugin::initObjects()
     connect(FRostersView,SIGNAL(collapsed(const QModelIndex &)),SLOT(onIndexCollapsed(const QModelIndex &)));
     connect(FRostersView,SIGNAL(expanded(const QModelIndex &)),SLOT(onIndexExpanded(const QModelIndex &)));
   }
-  emit viewCreated(FRostersView);
  
-  if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
+  if (FMainWindowPlugin)
   {
     FMainWindowPlugin->mainWindow()->rostersWidget()->insertWidget(0,FRostersView);
 
@@ -155,7 +150,7 @@ bool RostersViewPlugin::initObjects()
     FShowOfflineAction->setToolTip(tr("Show offline contacts"));
     FShowOfflineAction->setCheckable(true);
     connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
-    FMainWindowPlugin->mainWindow()->topToolBar()->addAction(FShowOfflineAction);
+    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction);
   }
 
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
@@ -229,17 +224,6 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
   }
 }
 
-void RostersViewPlugin::setOptionByAction(bool)
-{
-  Action *action = qobject_cast<Action *>(sender());
-  if (action)
-  {
-    int option = action->data(Action::DR_Parametr1).toInt();
-    bool value = action->data(Action::DR_Parametr2).toBool();
-    setOption((IRostersView::Option)option,value);
-  }
-}
-
 void RostersViewPlugin::startRestoreExpandState()
 {
   if (!FStartRestoreExpandState)
@@ -305,7 +289,6 @@ void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
 
 void RostersViewPlugin::onRostersViewDestroyed(QObject *)
 {
-  emit viewDestroyed(FRostersView);
   FRostersView = NULL;
 }
 

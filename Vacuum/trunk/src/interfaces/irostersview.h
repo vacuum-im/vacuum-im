@@ -84,7 +84,6 @@ signals:
   virtual void notifyRemovedByIndex(IRosterIndex *AIndex, int ANotifyId) =0;
 };
 
-
 class IRostersViewPlugin
 {
 public:
@@ -93,11 +92,7 @@ public:
   virtual bool checkOption(IRostersView::Option AOption) const =0;
   virtual void setOption(IRostersView::Option AOption, bool AValue) =0;
   virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
-public slots:
-  virtual void setOptionByAction(bool) =0;
 signals:
-  virtual void viewCreated(IRostersView *AIndex) =0;
-  virtual void viewDestroyed(IRostersView *AIndex) =0;
   virtual void optionChanged(IRostersView::Option AOption, bool AValue) =0;
 };
 

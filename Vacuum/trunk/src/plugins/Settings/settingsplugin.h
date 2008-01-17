@@ -29,7 +29,6 @@ public:
   SettingsPlugin();
   ~SettingsPlugin();
   virtual QObject *instance() {return this;}
-
   //IPlugin
   virtual QUuid pluginUuid() const { return SETTINGS_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
@@ -37,7 +36,6 @@ public:
   virtual bool initObjects();
   virtual bool initSettings();
   virtual bool startPlugin() { return true; }
-
   //ISettings
   virtual bool isProfilesValid() const { return !FProfiles.isNull(); }
   virtual bool isProfileOpened() const { return FProfileOpened; }
@@ -88,7 +86,6 @@ protected:
   void renameProfileAction(const QString &AProfileFrom, const QString &AProfileTo);
   void removeProfileAction(const QString &AProfile);
 protected slots:
-  void onMainWindowCreated(IMainWindow *AMainWindow);
   void onOptionsDialogOpened();
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();

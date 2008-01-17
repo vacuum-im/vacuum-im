@@ -1,7 +1,6 @@
 #ifndef VCARDPLUGIN_H
 #define VCARDPLUGIN_H
 
-#include "../../definations/initorders.h"
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"

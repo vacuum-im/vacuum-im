@@ -3,7 +3,6 @@
 
 #include <QSet>
 #include "../../definations/namespaces.h"
-#include "../../definations/initorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterdataholderorders.h"
 #include "../../definations/rosterlabelorders.h"

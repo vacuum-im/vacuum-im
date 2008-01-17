@@ -63,10 +63,8 @@ void StatusChanger::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->dependences.append(PRESENCE_UUID);
 }
 
-bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  AInitOrder = IO_STATUSCHANGER;
-
   IPlugin *plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
@@ -166,17 +164,14 @@ bool StatusChanger::initObjects()
   if (FSettingsPlugin)
     FSettingsPlugin->appendOptionsHolder(this);
 
-  if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
+  if (FMainWindowPlugin)
   {
-    FMainMenuToolButton = new QToolButton;
-    FMainMenuToolButton->setDefaultAction(FMainMenu->menuAction());
-    FMainMenuToolButton->setPopupMode(QToolButton::InstantPopup);
-    FMainMenuToolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    FMainMenuToolButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-    FMainWindowPlugin->mainWindow()->bottomToolBar()->addWidget(FMainMenuToolButton);
+    ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->bottomToolBarChanger();
+    QToolButton *toolButton = changer->addToolButton(FMainMenu->menuAction(),Qt::ToolButtonTextBesideIcon,QToolButton::InstantPopup);
+    toolButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
   }
 
-  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
+  if (FRostersViewPlugin)
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,FRosterIconset->iconByName("connecting"));
@@ -184,7 +179,7 @@ bool StatusChanger::initObjects()
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
 
-  if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
+  if (FRostersModelPlugin)
   {
     FRostersModel = FRostersModelPlugin->rostersModel();
     connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),

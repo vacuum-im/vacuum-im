@@ -6,20 +6,23 @@
 #include <QStackedWidget>
 #include <QToolBar>
 #include "../../utils/menu.h"
+#include "../../utils/toolbarchanger.h"
 
 #define MAINWINDOW_UUID "{A6F3D775-8464-4599-AB79-97BA1BAA6E96}"
 
 class IMainWindow :
-  virtual public QMainWindow
+  public QMainWindow
 {
 public:
-  virtual QObject *instance() = 0;
+  IMainWindow(QWidget *AParent = NULL, Qt::WindowFlags AFlags = 0) : QMainWindow(AParent,AFlags) {} 
+public:
   virtual QVBoxLayout *mainLayout() const =0;
   virtual QStackedWidget *upperWidget() const = 0;
   virtual QStackedWidget *rostersWidget() const = 0;
   virtual QStackedWidget *bottomWidget() const = 0;
-  virtual QToolBar *topToolBar() const =0;
-  virtual QToolBar *bottomToolBar() const =0;
+  virtual ToolBarChanger *topToolBarChanger() const =0;
+  virtual ToolBarChanger *leftToolBarChanger() const =0;
+  virtual ToolBarChanger *bottomToolBarChanger() const =0;
   virtual Menu *mainMenu() const = 0;
 };
 
@@ -28,9 +31,6 @@ class IMainWindowPlugin
 public:
   virtual QObject *instance() = 0;
   virtual IMainWindow *mainWindow() const = 0;
-signals:
-  virtual void mainWindowCreated(IMainWindow *) =0;
-  virtual void mainWindowDestroyed(IMainWindow *) =0;
 };
 
 Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.0")

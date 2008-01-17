@@ -1,21 +1,20 @@
 #include "mainwindowplugin.h"
 
+#define IN_QUIT       "psi/quit"
+#define SVN_GEOMETRY  "window:geometry"
 
 MainWindowPlugin::MainWindowPlugin()
 {
   FPluginManager = NULL;
   FSettingsPlugin = NULL;
   FTrayManager = NULL;
-  FMainWindow = NULL;
+
+  FMainWindow = new MainWindow(NULL,Qt::Tool);
 }
 
 MainWindowPlugin::~MainWindowPlugin()
 {
-  if (FMainWindow)
-  {
-    emit mainWindowDestroyed(FMainWindow);
-    delete FMainWindow;
-  }
+  delete FMainWindow;
 }
 
 void MainWindowPlugin::pluginInfo(PluginInfo *APluginInfo)
@@ -60,21 +59,17 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
 
 bool MainWindowPlugin::initObjects()
 {
-  FMainWindow = new MainWindow(Qt::Tool);
-  emit mainWindowCreated(FMainWindow);
-  updateTitle();
-
-  actQuit = new Action(this);
-  actQuit->setIcon(SYSTEM_ICONSETFILE,"psi/quit");
-  actQuit->setText(tr("Quit"));
-  connect(actQuit,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
-  FMainWindow->mainMenu()->addAction(actQuit,AG_MAINWINDOW_MMENU_QUIT);
-
+  FActionQuit = new Action(this);
+  FActionQuit->setIcon(SYSTEM_ICONSETFILE,IN_QUIT);
+  FActionQuit->setText(tr("Quit"));
+  connect(FActionQuit,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
+  FMainWindow->mainMenu()->addAction(FActionQuit,AG_MAINWINDOW_MMENU_QUIT);
   return true;
 }
 
 bool MainWindowPlugin::startPlugin()
 {
+  updateTitle();
   FMainWindow->show();
   return true;
 }
@@ -86,19 +81,15 @@ IMainWindow *MainWindowPlugin::mainWindow() const
 
 void MainWindowPlugin::updateTitle()
 {
-  if (FMainWindow)
-  {
-    if (FSettingsPlugin && FSettingsPlugin->isProfileOpened())
-      FMainWindow->setWindowTitle("Vacuum - "+FSettingsPlugin->profile());
-    else
-      FMainWindow->setWindowTitle("Vacuum");
-  }
-
+  if (FSettingsPlugin && FSettingsPlugin->isProfileOpened())
+    FMainWindow->setWindowTitle("Vacuum - "+FSettingsPlugin->profile());
+  else
+    FMainWindow->setWindowTitle("Vacuum");
 }
 
 void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
-  if (FMainWindow && ANotifyId == 0 && AReason == QSystemTrayIcon::DoubleClick)
+  if (ANotifyId == 0 && AReason == QSystemTrayIcon::DoubleClick)
   {
     if (!FMainWindow->isVisible())
     {
@@ -113,18 +104,18 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
 void MainWindowPlugin::onSettingsOpened()
 {
   ISettings *FSettings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
-  FMainWindow->setGeometry(FSettings->value("window:geometry",FMainWindow->geometry()).toRect());
+  FMainWindow->restoreGeometry(FSettings->value(SVN_GEOMETRY).toByteArray());
   updateTitle();
 }
 
 void MainWindowPlugin::onSettingsClosed()
 {
   ISettings *FSettings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
-  FSettings->setValue("window:geometry",FMainWindow->geometry());
+  FSettings->setValue(SVN_GEOMETRY,FMainWindow->saveGeometry());
   updateTitle();
 }
 
-void MainWindowPlugin::onProfileRenamed(const QString &, const QString &)
+void MainWindowPlugin::onProfileRenamed(const QString &/*AProfileFrom*/, const QString &/*AProfileTo*/)
 {
   updateTitle();
 }

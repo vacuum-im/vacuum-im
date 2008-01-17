@@ -3,7 +3,6 @@
 
 #include <QDateTime>
 #include <QPointer>
-#include "../../definations/initorders.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"

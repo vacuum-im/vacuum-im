@@ -2,7 +2,6 @@
 #define ROSTERSVIEWPLUGIN_H
 
 #include <QPointer>
-#include "../../definations/initorders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
 #include "../../definations/rosterindextyperole.h"
@@ -28,13 +27,10 @@ class RostersViewPlugin :
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsHolder);
-
 public:
   RostersViewPlugin();
   ~RostersViewPlugin();
-
   virtual QObject *instance() { return this; }
-
   //IPlugin
   virtual QUuid pluginUuid() const { return ROSTERSVIEW_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
@@ -42,20 +38,14 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-
   //IoptionHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
-
   //IRostersViewPlugin
   virtual IRostersView *rostersView();
   virtual bool checkOption(IRostersView::Option AOption) const;
   virtual void setOption(IRostersView::Option AOption, bool AValue);
   virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
-public slots:
-  virtual void setOptionByAction(bool);
 signals:
-  virtual void viewCreated(IRostersView *);
-  virtual void viewDestroyed(IRostersView *);
   virtual void optionChanged(IRostersView::Option AOption, bool AValue);
   virtual void optionsAccepted();
   virtual void optionsRejected();

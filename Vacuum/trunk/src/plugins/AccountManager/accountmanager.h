@@ -29,16 +29,14 @@ class AccountManager :
 public:
   AccountManager();
   ~AccountManager();
-
-  //IPlugin
   virtual QObject *instance() { return this; }
+  //IPlugin
   virtual QUuid pluginUuid() const { return ACCOUNTMANAGER_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  
   //IAccountManager
   virtual IAccount *addAccount(const QString &AName, const Jid &AStreamJid);
   virtual IAccount *addAccount(const QString &AAccountId, 
@@ -50,7 +48,6 @@ public:
   virtual IAccount *accountByStream(const Jid &AStreamJid) const;
   virtual void removeAccount(IAccount *AAccount);
   virtual void destroyAccount(const QString &AAccountId);
-
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
 signals:
@@ -67,8 +64,6 @@ protected:
   void closeAccountOptionsNode(const QString &AAccountId);
   void showAllActiveAccounts();
 protected slots:
-  void onRostersViewCreated(IRostersView *ARostersView);
-  void onMainWindowCreated(IMainWindow *AMainWindow);
   void onOptionsAccountAdded(const QString &AName);
   void onOptionsAccountRemoved(const QString &AAccountId);
   void onOptionsDialogAccepted();
@@ -86,7 +81,7 @@ private:
   IMainWindowPlugin *FMainWindowPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
-  Action *actAccountsSetup;
+  Action *FActionSetup;
 private:
   mutable QPointer<AccountManage> FAccountManage;
   mutable QHash<QString,QPointer<AccountOptions> > FAccountOptions;

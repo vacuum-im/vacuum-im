@@ -37,10 +37,8 @@ void ClientInfo::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->version = "0.1";
 }
 
-bool ClientInfo::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  AInitOrder = IO_CLIENTINFO;
-
   IPlugin *plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
@@ -98,7 +96,7 @@ bool ClientInfo::initObjects()
 {
   FSoftwareHandler = FStanzaProcessor->insertHandler(this,SHC_SOFTWARE,IStanzaProcessor::DirectionIn);
 
-  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
+  if (FRostersViewPlugin)
   {
     connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *,Menu*)),
       SLOT(onRostersViewContextMenu(IRosterIndex *,Menu *)));
@@ -106,7 +104,7 @@ bool ClientInfo::initObjects()
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
 
-  if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
+  if (FRostersModelPlugin)
   {
     FRostersModelPlugin->rostersModel()->insertDefaultDataHolder(this);
     connect(this,SIGNAL(softwareInfoChanged(const Jid &)),SLOT(onSoftwareInfoChanged(const Jid &)));

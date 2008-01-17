@@ -1,12 +1,11 @@
 #include <QtDebug>
 #include "mainwindow.h"
 
-#include <QCloseEvent>
-#include <QToolButton>
+#define IN_JABBER "psi/jabber"
 
-MainWindow::MainWindow(Qt::WindowFlags AFlags)
-  : QMainWindow(NULL,AFlags)
+MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags):IMainWindow(AParent,AFlags)
 {
+  setAttribute(Qt::WA_DeleteOnClose,false);
   setIconSize(QSize(16,16));
   createLayouts();
   createToolBars();
@@ -18,56 +17,76 @@ MainWindow::~MainWindow()
 
 }
 
+QMenu *MainWindow::createPopupMenu()
+{
+  return IMainWindow::createPopupMenu();
+}
+
 void MainWindow::createLayouts()
 {
   FUpperWidget = new QStackedWidget; 
-  FUpperWidget->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
+  FUpperWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+  FUpperWidget->layout()->setSizeConstraint(QLayout::SetFixedSize);
   FUpperWidget->setVisible(false);
+  connect(FUpperWidget,SIGNAL(widgetRemoved(int)),SLOT(onStackedWidgetRemoved(int)));
 
   FRostersWidget = new QStackedWidget; 
   FRostersWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
   FBottomWidget = new QStackedWidget; 
-  FBottomWidget->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);  
+  FBottomWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);  
+  FBottomWidget->layout()->setSizeConstraint(QLayout::SetFixedSize);
   FBottomWidget->setVisible(false);
-                     
+  connect(FBottomWidget,SIGNAL(widgetRemoved(int)),SLOT(onStackedWidgetRemoved(int)));
+ 
   FMainLayout = new QVBoxLayout;
   FMainLayout->setMargin(2);
   FMainLayout->addWidget(FUpperWidget);  
   FMainLayout->addWidget(FRostersWidget);  
   FMainLayout->addWidget(FBottomWidget);  
 
-  QWidget *centralWidget = new QWidget;
+  QWidget *centralWidget = new QWidget(this);
   centralWidget->setLayout(FMainLayout); 
   setCentralWidget(centralWidget);
 }
 
 void MainWindow::createToolBars()
 {
-  FTopToolBar = addToolBar(tr("Top ToolBar"));
-  FTopToolBar->setMovable(false); 
-  addToolBar(Qt::TopToolBarArea,FTopToolBar);
+  QToolBar *toolbar = addToolBar(tr("Top toolbar"));
+  toolbar->setFloatable(false);
+  toolbar->setMovable(false);
+  addToolBar(Qt::TopToolBarArea,toolbar);
+  FTopToolBarChanger = new ToolBarChanger(toolbar);
+  FTopToolBarChanger->setSeparatorsVisible(false);
 
-  FBottomToolBar = addToolBar(tr("Bottom ToolBar"));
-  FBottomToolBar->setMovable(false); 
-  FBottomToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  addToolBar(Qt::BottomToolBarArea,FBottomToolBar);
+  toolbar = addToolBar(tr("Left toolbar"));
+  toolbar->setFloatable(false);
+  toolbar->setMovable(false);
+  addToolBar(Qt::LeftToolBarArea,toolbar);
+  FLeftToolBarChanger = new ToolBarChanger(toolbar);
+  FLeftToolBarChanger->setSeparatorsVisible(false);
+
+  toolbar = addToolBar(tr("Bottom toolbar"));
+  toolbar->setFloatable(false);
+  toolbar->setMovable(false); 
+  addToolBar(Qt::BottomToolBarArea,toolbar);
+  FBottomToolBarChanger = new ToolBarChanger(toolbar);
+  FBottomToolBarChanger->setSeparatorsVisible(false);
 }
 
 void MainWindow::createMenus()
 {
-  mnuMain = new Menu(this);
-  mnuMain->setIcon(SYSTEM_ICONSETFILE,"psi/jabber");
-  mnuMain->setTitle(tr("Menu"));
-  QToolButton *tbutton = new QToolButton;
-  tbutton->setDefaultAction(mnuMain->menuAction());
-  tbutton->setPopupMode(QToolButton::InstantPopup);
-  tbutton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  FBottomToolBar->addWidget(tbutton);
+  FMainMenu = new Menu(this);
+  FMainMenu->setTitle(tr("Menu"));
+  FMainMenu->setIcon(SYSTEM_ICONSETFILE,IN_JABBER);
+  FBottomToolBarChanger->addToolButton(FMainMenu->menuAction(),Qt::ToolButtonIconOnly,QToolButton::InstantPopup);
 }
 
-void MainWindow::closeEvent(QCloseEvent *AEvent)
+void MainWindow::onStackedWidgetRemoved(int /*AIndex*/)
 {
-  hide();
-  AEvent->ignore();
+  QStackedWidget *widget = qobject_cast<QStackedWidget *>(sender());
+  if (widget == FUpperWidget)
+    FUpperWidget->setVisible(FUpperWidget->count() > 0);
+  else if (widget == FBottomWidget)
+    FBottomWidget->setVisible(FBottomWidget->count() > 0);
 }

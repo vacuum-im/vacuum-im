@@ -41,10 +41,8 @@ void StatusIcons::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->version = "0.1";
 }
 
-bool StatusIcons::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  AInitOrder = IO_STATUSICONS;
-
   IPlugin *plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin)
   {

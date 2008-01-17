@@ -61,10 +61,8 @@ void Messenger::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->version = "0.1";
 }
 
-bool Messenger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool Messenger::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  AInitOrder = IO_MESSENGER;
-
   FPluginManager = APluginManager;
 
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
@@ -128,14 +126,14 @@ bool Messenger::initObjects()
   insertMessageWriter(this,MWO_MESSENGER);
   insertMessageWriter(this,MWO_MESSENGER_ANCHORS);
 
-  if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
+  if (FRostersModelPlugin)
   {
     FRostersModel = FRostersModelPlugin->rostersModel();
     connect(FRostersModel->instance(),SIGNAL(indexCreated(IRosterIndex *, IRosterIndex *)),
       SLOT(onRosterIndexCreated(IRosterIndex *, IRosterIndex *)));
   }
 
-  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
+  if (FRostersViewPlugin)
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FIndexClickHooker = FRostersView->createClickHooker(this,0);

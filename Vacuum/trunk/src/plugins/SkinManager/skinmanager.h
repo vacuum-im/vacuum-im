@@ -1,7 +1,6 @@
 #ifndef SKINMANAGER_H
 #define SKINMANAGER_H
 
-#include "../../definations/initorders.h"
 #include "../../definations/actiongroups.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iskinmanager.h"

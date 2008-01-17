@@ -16,39 +16,32 @@ class MainWindowPlugin :
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IMainWindowPlugin);
-
 public:
   MainWindowPlugin();
   ~MainWindowPlugin();
-
   virtual QObject* instance() { return this; }
-
   //IPlugin
   virtual QUuid pluginUuid() const { return MAINWINDOW_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/);
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin();
-
   //IMainWindowPlugin
   virtual IMainWindow *mainWindow() const;
-signals:
-  virtual void mainWindowCreated(IMainWindow *);
-  virtual void mainWindowDestroyed(IMainWindow *);
 protected:
   void updateTitle();
 protected slots:
   void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
   void onSettingsOpened();
   void onSettingsClosed();
-  void onProfileRenamed(const QString &, const QString &);
+  void onProfileRenamed(const QString &AProfileFrom, const QString &AProfileTo);
 private:
   IPluginManager *FPluginManager;
   ISettingsPlugin *FSettingsPlugin;
   ITrayManager *FTrayManager;
 private:
-  Action *actQuit;
+  Action *FActionQuit;
 private:
   MainWindow *FMainWindow;
 };
