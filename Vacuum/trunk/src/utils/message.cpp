@@ -74,6 +74,11 @@ Message &Message::setType(MessageType AType)
   return *this;
 }
 
+QDateTime Message::createDateTime() const
+{
+  return d->FCreateDateTime;
+}
+
 QDateTime Message::dateTime() const
 {
   return d->FDateTime;

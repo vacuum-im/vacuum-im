@@ -14,21 +14,45 @@ class MessageData :
 public:
   MessageData() : FStanza("message") 
   {
-    FDateTime = QDateTime::currentDateTime();
+    FDateTime = delayedDateTime();
+    FCreateDateTime = QDateTime::currentDateTime();
   };
   MessageData(const Stanza &AStanza) : FStanza(AStanza) 
   {
-    FDateTime = QDateTime::currentDateTime();
+    FDateTime = delayedDateTime();
+    FCreateDateTime = QDateTime::currentDateTime();
   };
   MessageData(const MessageData &AOther) : FStanza(AOther.FStanza) 
   {
     FDateTime = AOther.FDateTime;
+    FCreateDateTime = AOther.FCreateDateTime;
     FData = AOther.FData;
   };
   ~MessageData() {};
+protected:
+  QDateTime delayedDateTime() const
+  {
+    QDomElement delayElem = FStanza.firstElement("x","urn:xmpp:delay");
+    if (delayElem.isNull())
+      delayElem = FStanza.firstElement("x","jabber:x:delay");
+    if (!delayElem.isNull())
+    {
+      QDateTime datetime = QDateTime::fromString(delayElem.attribute("stamp"),"yyyyMMddThh:mm:ss");
+      if (!datetime.isValid())
+        datetime = QDateTime::fromString(delayElem.attribute("stamp"),Qt::ISODate);
+      if (datetime.isValid())
+      {
+        datetime.setTimeSpec(Qt::UTC);
+        datetime = datetime.toTimeSpec(Qt::LocalTime);
+        return datetime;
+      }
+    }
+    return QDateTime::currentDateTime();
+  }
 public:
   Stanza FStanza;
   QDateTime FDateTime;
+  QDateTime FCreateDateTime;
   QHash<int, QVariant> FData;
 };
 
@@ -66,6 +90,7 @@ public:
   Message &setDefLang(const QString &ALang) { d->FStanza.setLang(ALang); return *this; }
   MessageType type() const;
   Message &setType(MessageType AType);
+  QDateTime createDateTime() const;
   QDateTime dateTime() const;
   Message &setDateTime(const QDateTime &ADateTime);
   QStringList subjectLangs() const { return availableLangs(d->FStanza.element(),"subject"); }
