@@ -6,6 +6,7 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterdataholderorders.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/multiuserdataroles.h"
 #include "../../definations/tooltiporders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
@@ -17,6 +18,7 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
+#include "../../interfaces/imultiuserchat.h"
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 #include "../../utils/menu.h"
@@ -91,6 +93,7 @@ protected slots:
   void onPresenceItem(IPresence *APresence, IPresenceItem *APresenceItem);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+  void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
   void onShowClientInfo(bool);
   void onClientInfoDialogClosed(const Jid &AContactJid);
   void onSettingsOpened();
@@ -107,6 +110,7 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   IRostersModelPlugin *FRostersModelPlugin;
   ISettingsPlugin *FSettingsPlugin;
+  IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
   struct SoftwareItem {
     SoftwareItem() { status = IClientInfo::SoftwareNotLoaded; }

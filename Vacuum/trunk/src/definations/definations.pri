@@ -12,4 +12,5 @@ HEADERS += actiongroups.h \
            resourceloaderorders.h \
            stanzahandlerpriority.h \
            messagehandlerorders.h \
-           vcardvaluenames.h
+           vcardvaluenames.h \
+           multiuserdataroles.h

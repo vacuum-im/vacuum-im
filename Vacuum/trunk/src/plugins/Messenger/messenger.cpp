@@ -536,7 +536,7 @@ void Messenger::notifyMessage(int AMessageId)
     IMessageHandler *handler = FHandlerForMessage.value(AMessageId);
     if (handler->notifyOptions(message,icon,toolTip,flags))
     {
-      if (FRostersView && FRostersModel)
+      if (FRostersView && FRostersModel && (flags&IRostersView::LabelVisible))
       {
         IRosterIndexList indexList = FRostersModel->getContactIndexList(message.to(),message.from(),true);
         int rosterId = FRostersView->appendNotify(indexList,RLO_MESSAGE,icon,toolTip,flags);

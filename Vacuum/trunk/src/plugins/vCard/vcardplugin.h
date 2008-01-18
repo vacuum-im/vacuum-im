@@ -4,10 +4,12 @@
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/multiuserdataroles.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ivcard.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/irostersview.h"
+#include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/stanza.h"
@@ -54,6 +56,7 @@ protected:
   void saveVCardFile(const QDomElement &AElem, const Jid &AContactJid) const;
 protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
   void onShowVCardDialogByAction(bool);
   void onVCardDialogDestroyed(QObject *ADialog);
   void onXmppStreamRemoved(IXmppStream *AXmppStream);
@@ -63,6 +66,7 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   IStanzaProcessor *FStanzaProcessor;
   ISettingsPlugin *FSettingsPlugin;
+  IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
   struct VCardItem 
   {

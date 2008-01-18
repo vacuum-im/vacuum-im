@@ -57,8 +57,9 @@ class IViewWidget :
 {
 public:
   enum ShowKind {
-    SingleMessage,
-    ChatMessage
+    NormalMessage,
+    ChatMessage,
+    GroupChatMessage
   };
 public:
   virtual const Jid &streamJid() const =0;
@@ -70,6 +71,8 @@ public:
   virtual ShowKind showKind() const =0;
   virtual void setShowKind(ShowKind AKind) =0;
   virtual void showMessage(const Message &AMessage) =0;
+  virtual void showCustomMessage(const QString &AHtml, const QDateTime &ATime=QDateTime(), 
+    const QString &ANick="", const QColor &ANickColor=Qt::blue) =0;
   virtual void showCustomHtml(const QString &AHtml) =0;
   virtual QColor colorForJid(const Jid &AJid) const =0;
   virtual void setColorForJid(const Jid &AJid, const QColor &AColor) =0;
@@ -173,7 +176,6 @@ class IChatWindow :
   public QMainWindow,
   public ITabWidget
 {
-  Q_INTERFACES(ITabWidget);
 public:
   virtual const Jid &streamJid() const =0;
   virtual const Jid &contactJid() const =0;
@@ -197,7 +199,6 @@ class IMessageWindow :
   public QMainWindow,
   public ITabWidget
 {
-  Q_INTERFACES(ITabWidget);
 public:
   enum Mode {
     ReadMode                  =1,

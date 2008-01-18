@@ -19,9 +19,6 @@ ViewWidget::ViewWidget(IMessenger *AMessenger, const Jid &AStreamJid, const Jid 
   FShowKind = ChatMessage;
 
   ui.tedViewer->installEventFilter(this);
-
-  setColorForJid(FStreamJid,Qt::red);
-  setColorForJid(FContactJid,Qt::blue);
 }
 
 ViewWidget::~ViewWidget()
@@ -32,58 +29,74 @@ ViewWidget::~ViewWidget()
 void ViewWidget::setShowKind(ShowKind AKind)
 {
   FShowKind = AKind;
+  if (FShowKind == ChatMessage)
+  {
+    setColorForJid(FStreamJid,Qt::red);
+    setColorForJid(FContactJid,Qt::blue);
+  }
 }
 
 void ViewWidget::showMessage(const Message &AMessage)
 {
-  if (FShowKind == ChatMessage)
+  if (FShowKind == NormalMessage)
+  {
+    QTextDocument messageDoc;
+    messageDoc.setDefaultFont(document()->defaultFont());
+    FMessenger->messageToText(&messageDoc,AMessage);
+    showCustomMessage(FMessenger->checkOption(IMessenger::ShowHTML) ? messageDoc.toHtml() : messageDoc.toPlainText());
+  }
+  else
+  {
+    Jid authorJid = AMessage.from().isEmpty() ? FStreamJid : AMessage.from();
+    QString authorNick = FJid2Nick.value(authorJid,FShowKind == GroupChatMessage ? authorJid.resource() : authorJid.node());
+
+    QTextDocument messageDoc;
+    FMessenger->messageToText(&messageDoc,AMessage);
+
+    if (FMessenger->checkOption(IMessenger::ShowHTML))
+      showCustomMessage(messageDoc.toHtml(),AMessage.dateTime(),authorNick,colorForJid(authorJid));
+    else
+      showCustomMessage(messageDoc.toPlainText(),AMessage.dateTime(),authorNick,colorForJid(authorJid));
+  }
+
+  emit messageShown(AMessage);
+}
+
+void ViewWidget::showCustomMessage(const QString &AHtml, const QDateTime &ATime, const QString &ANick, const QColor &ANickColor)
+{
+  if (FShowKind != NormalMessage)
   {
     QTextCursor cursor = document()->rootFrame()->lastCursorPosition();
     bool scrollAtEnd = textBrowser()->verticalScrollBar()->sliderPosition() == textBrowser()->verticalScrollBar()->maximum();
 
-    Jid authorJid = AMessage.from().isEmpty() ? FStreamJid : AMessage.from();
-    QString authorNick = FJid2Nick.value(authorJid,authorJid.node());
-
-    QTextCharFormat messageFormat;
-    QTextCharFormat timeFormat;
-    timeFormat.setForeground(Qt::gray);
-    QTextCharFormat nickFormat;
-    nickFormat.setForeground(colorForJid(authorJid));
 
     QTextTableFormat tableFormat;
     tableFormat.setBorder(0);
     tableFormat.setBorderStyle(QTextTableFormat::BorderStyle_None);
     QTextTable *table = cursor.insertTable(1,2,tableFormat);
 
-    if (FMessenger->checkOption(IMessenger::ShowDateTime))
-      table->cellAt(0,0).lastCursorPosition().insertText(QString("[%1]").arg(AMessage.dateTime().toString("hh:mm")),timeFormat);
-    table->cellAt(0,0).lastCursorPosition().insertText(QString("[%1]").arg(authorNick),nickFormat);
+    if (ATime.isValid() && FMessenger->checkOption(IMessenger::ShowDateTime))
+    {
+      QTextCharFormat timeFormat;
+      timeFormat.setForeground(Qt::gray);
+      QString timeString = QDateTime::currentDateTime().date()==ATime.date() ? tr("hh:mm") : tr("dd.MM hh:mm");
+      table->cellAt(0,0).lastCursorPosition().insertText(QString("[%1]").arg(ATime.toString(timeString)),timeFormat);
+    }
 
-    QTextDocument messageDoc;
-    messageDoc.setDefaultFont(document()->defaultFont());
-    FMessenger->messageToText(&messageDoc,AMessage);
+    if (!ANick.isEmpty())
+    {
+      QTextCharFormat nickFormat;
+      nickFormat.setForeground(ANickColor);
+      table->cellAt(0,0).lastCursorPosition().insertText(QString("[%1]").arg(ANick),nickFormat);
+    }
 
-    if (FMessenger->checkOption(IMessenger::ShowHTML))
-      table->cellAt(0,1).lastCursorPosition().insertHtml(getHtmlBody(messageDoc.toHtml()));
-    else
-      table->cellAt(0,1).lastCursorPosition().insertText(messageDoc.toPlainText(),messageFormat);
+    table->cellAt(0,1).lastCursorPosition().insertHtml(getHtmlBody(AHtml.trimmed()));
 
     if (scrollAtEnd)
       textBrowser()->verticalScrollBar()->setSliderPosition(textBrowser()->verticalScrollBar()->maximum());
   }
-  else if (FShowKind == SingleMessage)
-  {
-    QTextDocument messageDoc;
-    messageDoc.setDefaultFont(document()->defaultFont());
-    FMessenger->messageToText(&messageDoc,AMessage);
-
-    if (FMessenger->checkOption(IMessenger::ShowHTML))
-      document()->setHtml(getHtmlBody(messageDoc.toHtml()));
-    else
-      document()->setPlainText(messageDoc.toPlainText().trimmed());
-  }
-
-  emit messageShown(AMessage);
+  else
+    document()->setHtml(getHtmlBody(AHtml));
 }
 
 void ViewWidget::showCustomHtml(const QString &AHtml)
@@ -106,7 +119,7 @@ void ViewWidget::setColorForJid(const Jid &AJid, const QColor &AColor)
     FJid2Color.insert(AJid,AColor);
   else
     FJid2Color.remove(AJid);
-  colorForJidChanged(AJid,AColor);
+  emit colorForJidChanged(AJid,AColor);
 }
 
 void ViewWidget::setNickForJid(const Jid &AJid, const QString &ANick)
@@ -115,7 +128,7 @@ void ViewWidget::setNickForJid(const Jid &AJid, const QString &ANick)
     FJid2Nick.insert(AJid,ANick);
   else
     FJid2Nick.remove(ANick);
-  nickForJidChanged(AJid,ANick);
+  emit nickForJidChanged(AJid,ANick);
 }
 
 void ViewWidget::setStreamJid(const Jid &AStreamJid)
@@ -125,10 +138,13 @@ void ViewWidget::setStreamJid(const Jid &AStreamJid)
     Jid befour = FStreamJid;
     FStreamJid = AStreamJid;
 
-    setColorForJid(FStreamJid,colorForJid(befour));
-    setColorForJid(befour,QColor());
-    setNickForJid(FStreamJid,nickForJid(befour));
-    setNickForJid(befour,QString());
+    if (FShowKind == ChatMessage)
+    {
+      setColorForJid(FStreamJid,colorForJid(befour));
+      setColorForJid(befour,QColor());
+      setNickForJid(FStreamJid,nickForJid(befour));
+      setNickForJid(befour,QString());
+    }
 
     emit streamJidChanged(befour);
   }
@@ -141,10 +157,13 @@ void ViewWidget::setContactJid(const Jid &AContactJid)
     Jid befour = FContactJid;
     FContactJid = AContactJid;
 
-    setColorForJid(FContactJid,colorForJid(befour));
-    setColorForJid(befour,QColor());
-    setNickForJid(FContactJid,nickForJid(befour));
-    setNickForJid(befour,QString());
+    if (FShowKind == ChatMessage)
+    {
+      setColorForJid(FContactJid,colorForJid(befour));
+      setColorForJid(befour,QColor());
+      setNickForJid(FContactJid,nickForJid(befour));
+      setNickForJid(befour,QString());
+    }
 
     emit contactJidChanged(AContactJid);
   }

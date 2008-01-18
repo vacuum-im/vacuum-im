@@ -52,7 +52,7 @@ bool MessageHandler::openWindow(const Jid &AStreamJid, const Jid &AContactJid, M
 
 bool MessageHandler::checkMessage(const Message &AMessage)
 {
-  if (!AMessage.body().isEmpty())
+  if (!AMessage.body().isEmpty() || !AMessage.subject().isEmpty())
     return true;
   return false;
 }
@@ -61,7 +61,7 @@ bool MessageHandler::notifyOptions(const Message &AMessage, QIcon &AIcon, QStrin
 {
   Jid fromJid = AMessage.from();
   SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-  if (AMessage.type() == Message::Chat || AMessage.type() == Message::GroupChat)
+  if (AMessage.type() == Message::Chat)
     AIcon = iconset->iconByName(IN_CHAT_MESSAGE);
   else
     AIcon = iconset->iconByName(IN_NORMAL_MESSAGE);
@@ -75,7 +75,7 @@ void MessageHandler::receiveMessage(int AMessageId)
   Message message = FMessenger->messageById(AMessageId);
   Jid streamJid = message.to();
   Jid contactJid = message.from();
-  if (message.type() == Message::Chat || message.type() == Message::GroupChat)
+  if (message.type() == Message::Chat)
   {
     IChatWindow *window = getChatWindow(streamJid,contactJid);
     if (window)

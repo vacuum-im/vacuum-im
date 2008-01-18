@@ -19,4 +19,5 @@ HEADERS += ipluginmanager.h \
            iskinmanager.h \
            iemoticons.h \
            iclientinfo.h \
-           ivcard.h
+           ivcard.h \
+           imultiuserchat.h

@@ -85,25 +85,29 @@ ITabWidget *TabWindow::currentWidget() const
 
 void TabWindow::setCurrentWidget(ITabWidget *AWidget)
 {
-  ui.twtTabs->setCurrentWidget(AWidget->instance());
+  if (AWidget)
+    ui.twtTabs->setCurrentWidget(AWidget->instance());
 }
 
 void TabWindow::removeWidget(ITabWidget *AWidget)
 {
-  int index = ui.twtTabs->indexOf(AWidget->instance());
-  if (index >=0)
+  if (AWidget)
   {
-    ui.twtTabs->removeTab(index);
-    AWidget->instance()->close();
-    AWidget->instance()->setParent(NULL);
-    disconnect(AWidget->instance(),SIGNAL(windowShow()),this,SLOT(onTabWidgetShow()));
-    disconnect(AWidget->instance(),SIGNAL(windowClose()),this,SLOT(onTabWidgetClose()));
-    disconnect(AWidget->instance(),SIGNAL(windowChanged()),this,SLOT(onTabWidgetChanged()));
-    disconnect(AWidget->instance(),SIGNAL(windowDestroyed()),this,SLOT(onTabWidgetDestroyed()));
-    FNewTabAction->setVisible(ui.twtTabs->count()>1);
-    emit widgetRemoved(AWidget);
-    if (ui.twtTabs->count() == 0)
-      close();
+    int index = ui.twtTabs->indexOf(AWidget->instance());
+    if (index >=0)
+    {
+      ui.twtTabs->removeTab(index);
+      AWidget->instance()->close();
+      AWidget->instance()->setParent(NULL);
+      disconnect(AWidget->instance(),SIGNAL(windowShow()),this,SLOT(onTabWidgetShow()));
+      disconnect(AWidget->instance(),SIGNAL(windowClose()),this,SLOT(onTabWidgetClose()));
+      disconnect(AWidget->instance(),SIGNAL(windowChanged()),this,SLOT(onTabWidgetChanged()));
+      disconnect(AWidget->instance(),SIGNAL(windowDestroyed()),this,SLOT(onTabWidgetDestroyed()));
+      FNewTabAction->setVisible(ui.twtTabs->count()>1);
+      emit widgetRemoved(AWidget);
+      if (ui.twtTabs->count() == 0)
+        close();
+    }
   }
 }
 

@@ -27,7 +27,7 @@ MessageWindow::MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, cons
   ui.wdtInfo->layout()->setMargin(0);
 
   FViewWidget = FMessenger->newViewWidget(AStreamJid,AContactJid);
-  FViewWidget->setShowKind(IViewWidget::SingleMessage);
+  FViewWidget->setShowKind(IViewWidget::NormalMessage);
   FViewWidget->document()->setDefaultFont(FMessenger->defaultMessageFont());
 
   FEditWidget = FMessenger->newEditWidget(AStreamJid,AContactJid);

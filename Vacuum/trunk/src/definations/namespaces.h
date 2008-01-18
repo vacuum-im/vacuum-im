@@ -2,6 +2,7 @@
 #define NAMESPACES_H
 
 #define NS_XMPP_STREAMS                         "urn:ietf:params:xml:ns:xmpp-streams"
+#define NS_XMPP_DELAY                           "urn:xmpp:delay"
 
 #define NS_JABBER_CLIENT                        "jabber:client"
 #define NS_JABBER_STREAMS                       "http://etherx.jabber.org/streams"
@@ -10,6 +11,7 @@
 #define NS_JABBER_PRIVATE                       "jabber:iq:private"
 #define NS_JABBER_VERSION                       "jabber:iq:version"
 #define NS_JABBER_LAST                          "jabber:iq:last"
+#define NS_JABBER_DELAY                         "jabber:x:delay"
 
 #define NS_FEATURE_IQAUTH                       "http://jabber.org/features/iq-auth"
 #define NS_FEATURE_SASL                         "urn:ietf:params:xml:ns:xmpp-sasl"
@@ -20,5 +22,11 @@
 #define NS_FEATURE_STARTTLS                     "urn:ietf:params:xml:ns:xmpp-tls"
 
 #define NS_VCARD_TEMP                           "vcard-temp"
+
+#define NS_MUC                                  "http://jabber.org/protocol/muc"
+#define NS_MUC_USER                             "http://jabber.org/protocol/muc#user"
+#define NS_MUC_ADMIN                            "http://jabber.org/protocol/muc#admin"
+#define NS_MUC_OWNER                            "http://jabber.org/protocol/muc#owner"
+#define NS_MUC_UNIQUE                           "http://jabber.org/protocol/muc#unique"
 
 #endif

@@ -11,6 +11,7 @@ ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   ui.setupUi(this);
 
   FSettings = NULL;
+  FStatusChanger = NULL;
   FSplitterLoaded = false;
 
   FMessenger = AMessenger;
@@ -135,6 +136,12 @@ void ChatWindow::initialize()
       FSettings = settingsPlugin->settingsForPlugin(MESSENGER_UUID);
     }
   }
+
+  plugin = FMessenger->pluginManager()->getPlugins("IStatusChanger").value(0,NULL);
+  if (plugin)
+  {
+    FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
+  }
 }
 
 void ChatWindow::saveWindowState()
@@ -160,7 +167,6 @@ void ChatWindow::loadWindowState()
       ui.sprSplitter->restoreState(FSettings->valueNS(SVN_SPLITTER,valueNameNS).toByteArray());
       FSplitterLoaded = true;
     }
-
   }
   FEditWidget->textEdit()->setFocus();
 }
@@ -212,16 +218,13 @@ void ChatWindow::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVarian
     if (FMessenger->checkOption(IMessenger::ShowStatus))
     {
       QString status = AValue.toString();
-      QString show = FInfoWidget->field(IInfoWidget::ContactShow).toString();
+      QString show = FStatusChanger ? FStatusChanger->nameByShow(FInfoWidget->field(IInfoWidget::ContactShow).toInt()) : "";
       if (FLastStatusShow != status+show)
       {
-        QString dateTime;
-        if (FMessenger->checkOption(IMessenger::ShowDateTime))
-          dateTime = QString("[%1] ").arg(QDateTime::currentDateTime().toString("hh::mm"));
         QString nick = FViewWidget->nickForJid(FContactJid);
-        QString html = QString("<span style='color:green;'>%1*** %2 [%3] %4</span>").arg(dateTime).arg(Qt::escape(nick))
-                                                                                    .arg(Qt::escape(show)).arg(Qt::escape(status));
-        FViewWidget->showCustomHtml(html);
+        QString html = QString("<span style='color:green;'>*** %1 [%2] %3</span>").arg(Qt::escape(nick)).arg(Qt::escape(show))
+                                                                                  .arg(Qt::escape(status));
+        FViewWidget->showCustomMessage(html,QDateTime::currentDateTime());
         FLastStatusShow = status+show;
       }
     }

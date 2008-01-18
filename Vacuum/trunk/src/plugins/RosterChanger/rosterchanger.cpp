@@ -16,6 +16,7 @@ RosterChanger::RosterChanger()
   FMainWindowPlugin = NULL;
   FTrayManager = NULL; 
   FAccountManager = NULL;
+  FMultiUserChatPlugin = NULL;
 
   FAddContactMenu = NULL;
   FSubsDialog = NULL;
@@ -88,6 +89,17 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
   if (plugin)
   {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+  }
+
+  plugin = APluginManager->getPlugins("IMultiUserChatPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
+    if (FMultiUserChatPlugin)
+    {
+      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)),
+        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)));
+    }
   }
 
   return FRosterPlugin!=NULL;
@@ -305,7 +317,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       Action *action = new Action(AMenu);
       action->setText(tr("Add contact..."));
       action->setData(data);
-      action->setIcon(SYSTEM_ICONSETFILE,"psi/addContact");
+      action->setIcon(SYSTEM_ICONSETFILE,IN_ADDCONTACT);
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
       AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER_ADD_CONTACT,true);
     }
@@ -860,6 +872,25 @@ void RosterChanger::onAccountChanged(const QString &AName, const QVariant &AValu
       Action *action = FActions.value(FRosterPlugin->getRoster(account->streamJid()),NULL);
       if (action)
         action->setText(AValue.toString());
+    }
+  }
+}
+
+void RosterChanger::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMultiUser *AUser, Menu *AMenu)
+{
+  if (!AUser->data(MUDR_REALJID).toString().isEmpty())
+  {
+    IRoster *roster = FRosterPlugin->getRoster(AUser->data(MUDR_STREAMJID).toString());
+    if (roster && !roster->item(AUser->data(MUDR_REALJID).toString()))
+    {
+      Action *action = new Action(AMenu);
+      action->setText(tr("Add contact..."));
+      action->setData(Action::DR_StreamJid,AUser->data(MUDR_STREAMJID));
+      action->setData(Action::DR_Parametr1,AUser->data(MUDR_REALJID));
+      action->setData(Action::DR_Parametr2,AUser->data(MUDR_NICK_NAME));
+      action->setIcon(SYSTEM_ICONSETFILE,IN_ADDCONTACT);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
+      AMenu->addAction(action,AG_ROSTERCHANGER_MUCM,true);
     }
   }
 }

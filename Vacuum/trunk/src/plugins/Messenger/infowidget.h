@@ -56,8 +56,8 @@ private:
   int FVisibleFields;
   Jid FStreamJid;
   Jid FContactJid;
+  int FContactShow;
   QString FContactName;
-  QString FContactShow;
 };
 
 #endif // INFOWIDGET_H

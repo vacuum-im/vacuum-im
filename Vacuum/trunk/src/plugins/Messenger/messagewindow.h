@@ -17,7 +17,7 @@ class MessageWindow :
   public IMessageWindow
 {
   Q_OBJECT;
-  Q_INTERFACES(IMessageWindow);
+  Q_INTERFACES(IMessageWindow ITabWidget);
 public:
   MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode);
   ~MessageWindow();

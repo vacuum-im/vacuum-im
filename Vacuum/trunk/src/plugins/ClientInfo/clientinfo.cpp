@@ -17,6 +17,7 @@ ClientInfo::ClientInfo()
   FRostersViewPlugin = NULL;
   FRostersModelPlugin = NULL;
   FSettingsPlugin = NULL;
+  FMultiUserChatPlugin = NULL;
 
   FOptions = 0;
   FSoftwareHandler = 0;
@@ -86,6 +87,17 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsDialogAccepted()));
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsDialogRejected()));
+    }
+  }
+
+  plugin = APluginManager->getPlugins("IMultiUserChatPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
+    if (FMultiUserChatPlugin)
+    {
+      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)),
+        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)));
     }
   }
 
@@ -427,6 +439,19 @@ void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       AMenu->addAction(action,AG_CLIENTINFO_ROSTER,true);
     }
   }
+}
+
+void ClientInfo::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMultiUser *AUser, Menu *AMenu)
+{
+  Action *action = new Action(AMenu);
+  action->setText(tr("Client Info"));
+  action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAMJID));
+  if (!AUser->data(MUDR_REALJID).toString().isEmpty())
+    action->setData(ADR_CONTACT_JID,AUser->data(MUDR_REALJID));
+  else
+    action->setData(ADR_CONTACT_JID,AUser->data(MUDR_CONTACTJID));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onShowClientInfo(bool)));
+  AMenu->addAction(action,AG_CLIENTINFO_MUCM,true);
 }
 
 void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)

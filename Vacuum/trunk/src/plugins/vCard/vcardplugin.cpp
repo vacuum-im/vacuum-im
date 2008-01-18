@@ -19,6 +19,7 @@ VCardPlugin::VCardPlugin()
   FRostersViewPlugin = NULL;
   FStanzaProcessor = NULL;
   FSettingsPlugin = NULL;
+  FMultiUserChatPlugin = NULL;
 }
 
 VCardPlugin::~VCardPlugin()
@@ -59,6 +60,17 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+
+  plugin = APluginManager->getPlugins("IMultiUserChatPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
+    if (FMultiUserChatPlugin)
+    {
+      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)),
+        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)));
+    }
+  }
 
   return true;
 }
@@ -254,6 +266,20 @@ void VCardPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     AMenu->addAction(action,AG_VCARD_ROSTER,true);
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
   }
+}
+
+void VCardPlugin::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMultiUser *AUser, Menu *AMenu)
+{
+  Action *action = new Action(AMenu);
+  action->setText(tr("vCard"));
+  action->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
+  action->setData(ADR_StreamJid,AUser->data(MUDR_STREAMJID));
+  if (!AUser->data(MUDR_REALJID).toString().isEmpty())
+    action->setData(ADR_ContactJid,AUser->data(MUDR_REALJID));
+  else
+    action->setData(ADR_ContactJid,AUser->data(MUDR_CONTACTJID));
+  AMenu->addAction(action,AG_VCARD_MUCM,true);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
 }
 
 void VCardPlugin::onShowVCardDialogByAction(bool)

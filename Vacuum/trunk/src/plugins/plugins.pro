@@ -26,4 +26,5 @@ SUBDIRS = settings \
           skinmanager \
           emoticons \
           clientinfo \
-          vcard
+          vcard \
+          multiuserchat

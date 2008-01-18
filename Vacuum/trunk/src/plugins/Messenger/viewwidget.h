@@ -24,6 +24,8 @@ public:
   virtual ShowKind showKind() const { return FShowKind; }
   virtual void setShowKind(ShowKind AKind);
   virtual void showMessage(const Message &AMessage);
+  virtual void showCustomMessage(const QString &AHtml, const QDateTime &ATime=QDateTime(), 
+    const QString &ANick="", const QColor &ANickColor=Qt::blue);
   virtual void showCustomHtml(const QString &AHtml);
   virtual QColor colorForJid(const Jid &AJid) const { return FJid2Color.value(AJid); }
   virtual void setColorForJid(const Jid &AJid, const QColor &AColor);

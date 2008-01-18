@@ -6,6 +6,11 @@
 InfoWidget::InfoWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
+  ui.lblAvatar->setVisible(false);
+  ui.wdtAccount->setVisible(false);
+  ui.wdtStatus->setVisible(false);
+  ui.wdtEmail->setVisible(false);
+  ui.wdtClient->setVisible(false); 
   ui.lblStatus->setMaximumHeight(QFontMetrics(ui.lblStatus->font()).height()*4+1);
 
   FAccount = NULL;
@@ -84,7 +89,7 @@ void InfoWidget::autoUpdateField(InfoField AField)
       if (FPresence)
       {
         IPresenceItem *presenceItem = FPresence->item(FContactJid);
-        presenceItem != NULL ? setField(ContactShow,showName(presenceItem->show())) : setField(ContactShow,showName(IPresence::Offline));
+        presenceItem != NULL ? setField(ContactShow,presenceItem->show()) : setField(ContactShow,IPresence::Offline);
       }
       break;
     }
@@ -162,7 +167,7 @@ void InfoWidget::setField(InfoField AField, const QVariant &AValue)
     };
   case ContactShow:
     {
-      FContactShow = Qt::escape(AValue.toString());
+      FContactShow = AValue.toInt();
       break;
     }
   case ContactStatus:
@@ -196,8 +201,13 @@ void InfoWidget::setFieldAutoUpdated(IInfoWidget::InfoField AField, bool AAuto)
 {
   if (isFiledAutoUpdated(AField) != AAuto)
   {
-    AAuto ? FAutoFields |= AField : FAutoFields &= ~AField;
-    autoUpdateField(AField);
+    if (AAuto)
+    {
+      FAutoFields |= AField;
+      autoUpdateField(AField);
+    }
+    else
+      FAutoFields &= ~AField;
   }
 }
 
@@ -211,7 +221,7 @@ void InfoWidget::setFieldVisible(IInfoWidget::InfoField AField, bool AVisible)
   if (isFieldVisible(AField) != AVisible)
   {
     AVisible ? FVisibleFields |= AField : FVisibleFields &= ~AField;
-    isFiledAutoUpdated(AField) ? autoUpdateField(AField) : setField(AField,field(AField));
+    setField(AField,field(AField));
   }
 }
 
@@ -346,7 +356,7 @@ void InfoWidget::onPresenceItem(IPresenceItem *APresenceItem)
   if (APresenceItem->jid() == FContactJid)
   {
     if (isFiledAutoUpdated(ContactShow))
-      setField(ContactShow,showName(APresenceItem->show()));
+      setField(ContactShow,APresenceItem->show());
     if (isFiledAutoUpdated(ContactStatus))
       setField(ContactStatus,APresenceItem->status());
   }

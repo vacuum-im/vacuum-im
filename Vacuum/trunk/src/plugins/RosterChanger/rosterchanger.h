@@ -6,6 +6,7 @@
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/multiuserdataroles.h"
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"
@@ -14,6 +15,7 @@
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/itraymanager.h"
 #include "../../interfaces/iaccountmanager.h"
+#include "../../interfaces/imultiuserchat.h"
 #include "../../utils/skin.h"
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
@@ -76,6 +78,7 @@ protected slots:
   void onSubsDialogDestroyed(QObject *AObject);
   void onAddContactDialogDestroyed(QObject *AObject);
   void onAccountChanged(const QString &AName, const QVariant &AValue);
+  void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersModelPlugin *FRostersModelPlugin;
@@ -85,6 +88,7 @@ private:
   IMainWindowPlugin *FMainWindowPlugin;
   ITrayManager *FTrayManager;
   IAccountManager *FAccountManager;
+  IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
   Menu *FAddContactMenu;
   SkinIconset *FSystemIconset;

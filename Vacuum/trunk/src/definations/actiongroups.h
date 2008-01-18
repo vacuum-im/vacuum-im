@@ -11,6 +11,10 @@
 #define AG_SKINMANAGER_MENU                                     700
 #define AG_MAINWINDOW_MMENU_QUIT                                1000
 
+//MainWindow (TopToolBar)
+#define AG_ROSTERSVIEW_MWTTB                                    500
+#define AG_MULTIUSERCHAT_MWTTB                                  600
+
 //RostersView (ContextMenu)
 #define AG_MESSENGER                                            300
 #define AG_STATUSCHANGER_ROSTER                                 400
@@ -19,6 +23,7 @@
 #define AG_STATUSICONS_ROSTER                                   500
 #define AG_CLIENTINFO_ROSTER                                    500
 #define AG_VCARD_ROSTER                                         500
+#define AG_MULTIUSERCHAT_ROSTER                                 500
 #define AG_ROSTERCHANGER_ROSTER_SUBSCRIPTION                    700
 #define AG_ROSTERCHANGER_ROSTER                                 700
 
@@ -27,6 +32,7 @@
 #define AG_ROSTERCHANGER_TRAY                                   500
 #define AG_SETTINGS_TRAY                                        700
 #define AG_SKINMANAGER_TRAY                                     700
+#define AG_MULTIUSERCHAT_TRAY                                   700
 #define AG_TRAYMANAGER_TRAY_QUIT                                1000
 
 //StatusChanger (StatusMenu, StreamMenu)
@@ -35,5 +41,10 @@
 
 //EditWidgetToolbar
 #define AG_EMOTICONS_EDITWIDGET                                 500
+
+//MultiUserContextMenu
+#define AG_ROSTERCHANGER_MUCM                                   500
+#define AG_CLIENTINFO_MUCM                                      500
+#define AG_VCARD_MUCM                                           500
 
 #endif

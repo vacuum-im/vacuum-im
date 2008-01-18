@@ -32,14 +32,14 @@ void EditWidget::setSendMessageKey(int AKey)
   emit sendMessageKeyChanged(AKey);
 }
 
-void EditWidget::setStreamJid( const Jid &AStreamJid )
+void EditWidget::setStreamJid(const Jid &AStreamJid)
 {
   Jid befour = FStreamJid;
   FStreamJid = AStreamJid;
   emit streamJidChanged(befour);
 }
 
-void EditWidget::setContactJid( const Jid &AContactJid )
+void EditWidget::setContactJid(const Jid &AContactJid)
 {
   Jid befour = FContactJid;
   FContactJid = AContactJid;

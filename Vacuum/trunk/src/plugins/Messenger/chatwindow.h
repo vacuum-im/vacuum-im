@@ -4,6 +4,7 @@
 #include "../../definations/messagedataroles.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/ixmppstreams.h"
+#include "../../interfaces/istatuschanger.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/message.h"
 #include "ui_chatwindow.h"
@@ -59,6 +60,7 @@ private:
   Ui::ChatWindowClass ui;
 private:
   IMessenger *FMessenger;
+  IStatusChanger *FStatusChanger;
   ISettings *FSettings;
 private:
   IInfoWidget *FInfoWidget;
