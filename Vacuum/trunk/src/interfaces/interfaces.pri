@@ -20,4 +20,5 @@ HEADERS += ipluginmanager.h \
            iemoticons.h \
            iclientinfo.h \
            ivcard.h \
-           imultiuserchat.h
+           imultiuserchat.h \
+           idataforms.h

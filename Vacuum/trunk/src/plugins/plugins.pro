@@ -27,4 +27,5 @@ SUBDIRS = settings \
           emoticons \
           clientinfo \
           vcard \
-          multiuserchat
+          multiuserchat \
+          dataforms

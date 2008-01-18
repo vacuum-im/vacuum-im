@@ -29,4 +29,7 @@
 #define NS_MUC_OWNER                            "http://jabber.org/protocol/muc#owner"
 #define NS_MUC_UNIQUE                           "http://jabber.org/protocol/muc#unique"
 
+#define NS_JABBER_XDATALAYOUT                   "http://jabber.org/protocol/xdata-layout"
+#define NS_JABBER_XDATAVALIDATE                 "http://jabber.org/protocols/xdata-validate"
+
 #endif
