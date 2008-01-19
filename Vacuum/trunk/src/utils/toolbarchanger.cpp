@@ -147,14 +147,15 @@ bool ToolBarChanger::eventFilter(QObject *AObject, QEvent *AEvent)
 
 void ToolBarChanger::onActionInserted(QAction *ABefour, Action *AAction)
 {
+  QAction *befour = FBarSepByMenuSep.contains(ABefour) ? FBarSepByMenuSep.value(ABefour) : ABefour;
   if (FActionButtons.contains(AAction))
   {
     QToolButton *button = FActionButtons.value(AAction);
-    QAction *action = ABefour != NULL ? FToolBar->insertWidget(ABefour,button) : FToolBar->addWidget(button);
+    QAction *action = befour != NULL ? FToolBar->insertWidget(befour,button) : FToolBar->addWidget(button);
     FWidgetActions.insert(button,action);
   }
   else
-    ABefour != NULL ? FToolBar->insertAction(ABefour,AAction) : FToolBar->addAction(AAction);
+    befour != NULL ? FToolBar->insertAction(befour,AAction) : FToolBar->addAction(AAction);
   emit actionInserted(ABefour,AAction);
   updateVisible();
 }
