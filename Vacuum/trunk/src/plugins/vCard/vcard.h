@@ -23,6 +23,7 @@ public:
   virtual bool isEmpty() const { return !isValid() || !vcardElem().hasChildNodes(); }
   virtual const Jid &contactJid() const { return FContactJid; }
   virtual QDomElement vcardElem() const { return FDoc.documentElement().firstChildElement(VCARD_TAGNAME); }
+  virtual QDateTime loadDateTime() const { return FLoadDateTime; }
   virtual QString value(const QString &AName, const QStringList &ATags = QStringList(),
     const QStringList &ATagList = QStringList()) const;
   virtual QMultiHash<QString,QStringList> values(const QString &AName, const QStringList &ATagList) const;
@@ -60,6 +61,7 @@ private:
 private:
   QImage FPhoto;
   QImage FLogo;
+  QDateTime FLoadDateTime;
 };
 
 #endif // VCARD_H

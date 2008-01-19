@@ -204,8 +204,12 @@ void VCard::loadVCardFile()
   {
     FDoc.clear();
     QDomElement elem = FDoc.appendChild(FDoc.createElement(VCARD_FILE_ROOT_TAGNAME)).toElement();
-    elem.setAttribute("jid",FContactJid.bare());
+    elem.setAttribute("jid",FContactJid.full());
     elem.appendChild(FDoc.createElementNS(NS_VCARD_TEMP,VCARD_TAGNAME));
+  }
+  else
+  {
+    FLoadDateTime = QDateTime::fromString(FDoc.documentElement().attribute("dateTime"),Qt::ISODate);
   }
   if (!isEmpty())
   {
@@ -291,7 +295,7 @@ QDomElement VCard::setTextToElem(QDomElement &AElem, const QString &AText) const
 
 void VCard::onVCardReceived(const Jid &AContactJid)
 {
-  if (FContactJid && AContactJid)
+  if (FContactJid == AContactJid)
     loadVCardFile();
 }
 
@@ -303,7 +307,7 @@ void VCard::onVCardPublished(const Jid &AContactJid)
 
 void VCard::onVCardError(const Jid &AContactJid, const QString &AError)
 {
-  if (FContactJid && AContactJid)
+  if (FContactJid == AContactJid)
     emit vcardError(AError);
 }
 

@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QImage>
+#include <QDateTime>
 #include <QStringList>
 #include <QDomDocument>
 #include "../../utils/jid.h"
@@ -16,6 +17,7 @@ public:
   virtual bool isEmpty() const =0;
   virtual const Jid &contactJid() const =0;
   virtual QDomElement vcardElem() const =0;
+  virtual QDateTime loadDateTime() const =0;
   virtual QString value(const QString &AName, const QStringList &ATags = QStringList(), 
     const QStringList &ATagList = QStringList()) const =0;
   virtual QMultiHash<QString,QStringList> values(const QString &AName, const QStringList &ATagList) const =0;

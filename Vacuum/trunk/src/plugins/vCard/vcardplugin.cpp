@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
-#include <QDateTime>
 #include <QDomDocument>
 
 #define VCARD_DIRNAME             "vcards"
@@ -85,11 +84,6 @@ bool VCardPlugin::initObjects()
   return true;
 }
 
-bool VCardPlugin::startPlugin()
-{
-  return true;
-}
-
 void VCardPlugin::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (FVCardRequestId.contains(AStanza.id()))
@@ -112,7 +106,7 @@ void VCardPlugin::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
     Jid fromJid = FVCardPublishId.take(AStanza.id());
     if (AStanza.type() == "result")
     {
-      VCardItem vcardItem = FVCards.value(fromJid.pBare());
+      VCardItem vcardItem = FVCards.value(fromJid);
       if (vcardItem.vcard)
         saveVCardFile(vcardItem.vcard->vcardElem(),fromJid);
       emit vcardPublished(fromJid);
@@ -141,7 +135,7 @@ void VCardPlugin::iqStanzaTimeOut(const QString &AId)
 
 QString VCardPlugin::vcardFileName(const Jid &AContactJid) const
 {
-  QString fileName = Jid::encode(AContactJid.bare()).toLower()+".xml";
+  QString fileName = Jid::encode(AContactJid.pFull())+".xml";
   QDir dir;
   if (FSettingsPlugin)
     dir.setPath(FSettingsPlugin->homeDir().path());
@@ -159,7 +153,7 @@ bool VCardPlugin::hasVCard(const Jid &AContactJid) const
 
 IVCard *VCardPlugin::vcard(const Jid &AContactJid)
 {
-  VCardItem &vcardItem = FVCards[AContactJid.pBare()];
+  VCardItem &vcardItem = FVCards[AContactJid];
   if (vcardItem.vcard == NULL)
     vcardItem.vcard = new VCard(AContactJid,this);
   vcardItem.locks++;
@@ -170,14 +164,14 @@ bool VCardPlugin::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
 {
   if (FStanzaProcessor)
   {
-    if (FVCardRequestId.key(AContactJid.pBare()).isEmpty())
+    if (FVCardRequestId.key(AContactJid).isEmpty())
     {
       Stanza iq("iq");
-      iq.setTo(AContactJid.eBare()).setType("get").setId(FStanzaProcessor->newId());
+      iq.setTo(AContactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
       iq.addElement(VCARD_TAGNAME,NS_VCARD_TEMP);
       if (FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,VCARD_TIMEOUT))
       {
-        FVCardRequestId.insert(iq.id(),AContactJid.pBare());
+        FVCardRequestId.insert(iq.id(),AContactJid);
         return true;
       };
     }
@@ -210,28 +204,28 @@ bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
 
 void VCardPlugin::showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  if (FVCardDialogs.contains(AContactJid.bare()))
+  if (FVCardDialogs.contains(AContactJid))
   {
-    VCardDialog *dialog = FVCardDialogs.value(AContactJid.bare());
+    VCardDialog *dialog = FVCardDialogs.value(AContactJid);
     dialog->activateWindow();
   }
   else if (AStreamJid.isValid() && AContactJid.isValid())
   {
-    VCardDialog *dialog = new VCardDialog(this,AStreamJid,AContactJid.bare());
+    VCardDialog *dialog = new VCardDialog(this,AStreamJid,AContactJid);
     connect(dialog,SIGNAL(destroyed(QObject *)),SLOT(onVCardDialogDestroyed(QObject *)));
-    FVCardDialogs.insert(dialog->contactJid(),dialog);
+    FVCardDialogs.insert(AContactJid,dialog);
     dialog->show();
   }
 }
 
 void VCardPlugin::unlockVCard(const Jid &AContactJid)
 {
-  VCardItem &vcardItem = FVCards[AContactJid.pBare()];
+  VCardItem &vcardItem = FVCards[AContactJid];
   vcardItem.locks--;
   if (vcardItem.locks == 0)
   {
     VCard *vcardCopy = vcardItem.vcard;   //После remove vcardItem будет недействителен
-    FVCards.remove(AContactJid.pBare());
+    FVCards.remove(AContactJid);
     delete vcardCopy;
   }
 }
@@ -242,7 +236,7 @@ void VCardPlugin::saveVCardFile(const QDomElement &AElem, const Jid &AContactJid
   {
     QDomDocument doc;
     QDomElement elem = doc.appendChild(doc.createElement(VCARD_FILE_ROOT_TAGNAME)).toElement();
-    elem.setAttribute("jid",AContactJid.bare());
+    elem.setAttribute("jid",AContactJid.full());
     elem.setAttribute("dateTime",QDateTime::currentDateTime().toString(Qt::ISODate));
     elem.appendChild(AElem.cloneNode(true));
     QFile vcardFile(vcardFileName(AContactJid));
@@ -262,7 +256,7 @@ void VCardPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     action->setText(tr("vCard"));
     action->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
     action->setData(ADR_StreamJid,AIndex->data(RDR_StreamJid));
-    action->setData(ADR_ContactJid,AIndex->data(RDR_Jid));
+    action->setData(ADR_ContactJid,Jid(AIndex->data(RDR_Jid).toString()).bare());
     AMenu->addAction(action,AG_VCARD_ROSTER,true);
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
   }
@@ -275,7 +269,7 @@ void VCardPlugin::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMu
   action->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
   action->setData(ADR_StreamJid,AUser->data(MUDR_STREAMJID));
   if (!AUser->data(MUDR_REALJID).toString().isEmpty())
-    action->setData(ADR_ContactJid,AUser->data(MUDR_REALJID));
+    action->setData(ADR_ContactJid,Jid(AUser->data(MUDR_REALJID).toString()).bare());
   else
     action->setData(ADR_ContactJid,AUser->data(MUDR_CONTACTJID));
   AMenu->addAction(action,AG_VCARD_MUCM,true);
@@ -296,8 +290,7 @@ void VCardPlugin::onShowVCardDialogByAction(bool)
 void VCardPlugin::onVCardDialogDestroyed(QObject *ADialog)
 {
   VCardDialog *dialog = static_cast<VCardDialog *>(ADialog);
-  Jid contactJid = FVCardDialogs.key(dialog);
-  FVCardDialogs.remove(contactJid);
+  FVCardDialogs.remove(FVCardDialogs.key(dialog));
 }
 
 void VCardPlugin::onXmppStreamRemoved(IXmppStream *AXmppStream)

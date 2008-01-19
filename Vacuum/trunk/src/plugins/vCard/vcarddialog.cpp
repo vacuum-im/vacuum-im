@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include "edititemdialog.h"
 
+#define MAX_VCARD_LOADDATE        14  
 #define IN_VCARD                  "psi/vCard"
 
 VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid)
@@ -19,7 +20,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 
   SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
   setWindowIcon(iconset->iconByName(IN_VCARD));
-  setWindowTitle(tr("vCard - %1").arg(FContactJid.bare()));
+  setWindowTitle(tr("vCard - %1").arg(FContactJid.full()));
 
   ui.pbtPublish->setVisible(FContactJid && FStreamJid);
   ui.pbtClear->setVisible(FContactJid && FStreamJid);
@@ -30,7 +31,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
   connect(FVCard->instance(),SIGNAL(vcardError(const QString &)),SLOT(onVCardError(const QString &)));
   
   updateDialog();
-  if (FVCard->isEmpty())
+  if (FVCard->isEmpty() || FVCard->loadDateTime().daysTo(QDateTime::currentDateTime())>MAX_VCARD_LOADDATE)
     reloadVCard();
 
   connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
@@ -92,7 +93,7 @@ void VCardDialog::updateDialog()
   ui.lneLastName->setReadOnly(readOnly);
   ui.lneNickName->setText(FVCard->value(VVN_NICKNAME));
   ui.lneNickName->setReadOnly(readOnly);
-  ui.lneJabberId->setText(FContactJid.bare());
+  ui.lneJabberId->setText(FContactJid.full());
   ui.lneJabberId->setReadOnly(true);
 
   ui.dedBirthday->setDate(QDate::fromString(FVCard->value(VVN_BIRTHDAY),Qt::ISODate));

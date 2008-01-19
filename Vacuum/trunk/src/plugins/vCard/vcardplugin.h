@@ -36,7 +36,7 @@ public:
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
-  virtual bool startPlugin();
+  virtual bool startPlugin()  { return true; }
   //IIqStanzaOwner
   virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void iqStanzaTimeOut(const QString &AId);
@@ -74,8 +74,8 @@ private:
     VCard *vcard;
     int locks;
   };
-  QHash<QString,VCardItem> FVCards;
-  QHash<QString,QString> FVCardRequestId;
+  QHash<Jid,VCardItem> FVCards;
+  QHash<QString,Jid> FVCardRequestId;
   QHash<QString,QString> FVCardPublishId;
   QHash<Jid,VCardDialog *> FVCardDialogs;
 };
