@@ -53,6 +53,7 @@ protected slots:
 private:
   bool FSeparatorsVisible;
   bool FManageVisibility;
+  bool FVisibleTimerStarted;
   int FChangingIntVisible;
   bool FIntVisible;
   bool FExtVisible;
