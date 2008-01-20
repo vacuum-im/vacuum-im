@@ -1,5 +1,6 @@
-#include <QtDebug>
 #include "rostersviewplugin.h"
+
+#include <QtDebug>
 #include <QTimer>
 #include <QScrollBar>
 
@@ -7,15 +8,14 @@
 #define SVN_SHOW_ONLINE_FIRST             "showOnlineFirst"
 #define SVN_SHOW_FOOTER_TEXT              "showFooterText"
 #define SVN_SHOW_RESOURCE                 "showResource"
-
-#define IN_STATUS_OFFLINE                 "status/offline"
-
 #define SVN_COLLAPSE                      "collapse"
 #define SVN_ACCOUNT                       "account"
 #define SVN_GROUP                         "h%1" 
 #define SVN_COLLAPSE_ACCOUNT              SVN_COLLAPSE ":" SVN_ACCOUNT
 #define SVN_COLLAPSE_ACCOUNT_NS           SVN_COLLAPSE_ACCOUNT "[]"
 #define SVN_COLLAPSE_ACCOUNT_NS_GROUP     SVN_COLLAPSE_ACCOUNT_NS ":" SVN_GROUP
+
+#define IN_STATUS_OFFLINE                 "status/offline"
 
 RostersViewPlugin::RostersViewPlugin()
 {
@@ -150,7 +150,7 @@ bool RostersViewPlugin::initObjects()
     FShowOfflineAction->setToolTip(tr("Show offline contacts"));
     FShowOfflineAction->setCheckable(true);
     connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
-    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction);
+    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction,AG_ROSTERSVIEW_MWTTB,false);
   }
 
   if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
@@ -167,7 +167,7 @@ bool RostersViewPlugin::initObjects()
 QWidget *RostersViewPlugin::optionsWidget(const QString &ANode, int &AOrder)
 {
   AOrder = OO_ROSTER;
-  if (ANode == ON_ROSTER )
+  if (ANode == ON_ROSTER)
   {
     FRosterOptionsWidget = new RosterOptionsWidget(this);
     return FRosterOptionsWidget;
