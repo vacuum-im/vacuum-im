@@ -13,4 +13,6 @@ HEADERS += actiongroups.h \
            stanzahandlerpriority.h \
            messagehandlerorders.h \
            vcardvaluenames.h \
-           multiuserdataroles.h
+           multiuserdataroles.h \
+           discotreeitemsdataroles.h \
+           discofeatureorder.h 

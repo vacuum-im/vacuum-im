@@ -29,6 +29,11 @@
 #define NS_MUC_OWNER                            "http://jabber.org/protocol/muc#owner"
 #define NS_MUC_UNIQUE                           "http://jabber.org/protocol/muc#unique"
 
+#define NS_DISCO                                "http://jabber.org/protocol/disco"
+#define NS_DISCO_INFO                           "http://jabber.org/protocol/disco#info"
+#define NS_DISCO_ITEMS                          "http://jabber.org/protocol/disco#items"
+#define NS_DISCO_PUBLISH                        "http://jabber.org/protocol/disco#publish"
+
 #define NS_JABBER_XDATALAYOUT                   "http://jabber.org/protocol/xdata-layout"
 #define NS_JABBER_XDATAVALIDATE                 "http://jabber.org/protocols/xdata-validate"
 

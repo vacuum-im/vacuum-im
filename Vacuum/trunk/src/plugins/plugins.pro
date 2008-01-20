@@ -28,4 +28,5 @@ SUBDIRS = settings \
           clientinfo \
           vcard \
           multiuserchat \
-          dataforms
+          dataforms \
+          servicediscovery

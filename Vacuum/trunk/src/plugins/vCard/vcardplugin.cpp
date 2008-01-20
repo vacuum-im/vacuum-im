@@ -19,6 +19,7 @@ VCardPlugin::VCardPlugin()
   FStanzaProcessor = NULL;
   FSettingsPlugin = NULL;
   FMultiUserChatPlugin = NULL;
+  FDiscovery = NULL;
 }
 
 VCardPlugin::~VCardPlugin()
@@ -29,7 +30,7 @@ VCardPlugin::~VCardPlugin()
 void VCardPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing vcards");
+  APluginInfo->description = tr("Request and publish vCards");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("VCard manager"); 
   APluginInfo->uid = VCARD_UUID;
@@ -71,6 +72,12 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     }
   }
 
+  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  if (plugin)
+  {
+    FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+  }
+
   return true;
 }
 
@@ -80,6 +87,10 @@ bool VCardPlugin::initObjects()
   {
     FRostersView = FRostersViewPlugin->rostersView();
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+  }
+  if (FDiscovery)
+  {
+    registerDiscoFeatures();
   }
   return true;
 }
@@ -246,6 +257,19 @@ void VCardPlugin::saveVCardFile(const QDomElement &AElem, const Jid &AContactJid
       vcardFile.close();
     }
   }
+}
+
+void VCardPlugin::registerDiscoFeatures()
+{
+  IDiscoFeature dfeature;
+
+  dfeature.active = false;
+  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_VCARD);
+  dfeature.var = NS_VCARD_TEMP;
+  dfeature.name = tr("vCard");
+  dfeature.actionName = tr("vCard");
+  dfeature.description = tr("Request and publish contact vCard");
+  FDiscovery->insertDiscoFeature(dfeature);
 }
 
 void VCardPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)

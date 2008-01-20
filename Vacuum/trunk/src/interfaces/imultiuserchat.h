@@ -107,6 +107,7 @@ public:
     const QString &APassword) =0;
   virtual QList<IMultiUserChatWindow *> multiChatWindows() const =0;
   virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
+  virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 signals:
   virtual void multiUserChatCreated(IMultiUserChat *AMultiChat) =0;
   virtual void multiUserChatDestroyed(IMultiUserChat *AMultiChat) =0;

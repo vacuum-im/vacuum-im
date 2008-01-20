@@ -15,6 +15,7 @@ MultiUserChatPlugin::MultiUserChatPlugin()
   FMainWindowPlugin = NULL;
   FTrayManager = NULL;
   FXmppStreams = NULL;
+  FDiscovery = NULL;
 
   FChatMenu = NULL;
   FJoinAction = NULL;
@@ -76,6 +77,12 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  if (plugin)
+  {
+    FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+  }
+
   return FMessenger!=NULL;
 }
 
@@ -105,7 +112,26 @@ bool MultiUserChatPlugin::initObjects()
   {
     FTrayManager->addAction(FChatMenu->menuAction(),AG_MULTIUSERCHAT_TRAY,true);
   }
+  if (FDiscovery)
+  {
+    registerDiscoFeatures();
+    FDiscovery->insertFeatureHandler(NS_MUC,this,DFO_DEFAULT);
+  }
   return true;
+}
+
+bool MultiUserChatPlugin::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem)
+{
+  if (AFeature==NS_MUC && ADiscoItem.itemJid.resource().isEmpty())
+  {
+    IMultiUserChatWindow *chatWindow = multiChatWindow(AStreamJid,ADiscoItem.itemJid);
+    if (!chatWindow)
+      showJoinMultiChatDialog(AStreamJid,ADiscoItem.itemJid,AStreamJid.node(),"");
+    else
+      chatWindow->showWindow();
+    return true;
+  }
+  return false;
 }
 
 IMultiUserChat *MultiUserChatPlugin::getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, 
@@ -154,6 +180,12 @@ IMultiUserChatWindow *MultiUserChatPlugin::multiChatWindow(const Jid &AStreamJid
   return NULL;
 }
 
+void MultiUserChatPlugin::showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword)
+{
+  JoinMultiChatDialog *dialog = new JoinMultiChatDialog(this,AStreamJid,ARoomJid,ANick,APassword);
+  dialog->show();
+}
+
 void MultiUserChatPlugin::insertChatAction(IMultiUserChatWindow *AWindow)
 {
   Action *action = new Action(FChatMenu);
@@ -168,6 +200,20 @@ void MultiUserChatPlugin::removeChatAction(IMultiUserChatWindow *AWindow)
 {
   if (FChatActions.contains(AWindow))
     FChatMenu->removeAction(FChatActions.take(AWindow));
+}
+
+void MultiUserChatPlugin::registerDiscoFeatures()
+{
+  IDiscoFeature dfeature;
+  QIcon icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_GROUPCHAT);
+
+  dfeature.active = false;
+  dfeature.icon = icon;
+  dfeature.var = NS_MUC;
+  dfeature.name = tr("Multi-user text conferencing");
+  dfeature.actionName = tr("Join groupchat");
+  dfeature.description = tr("Multi-user text conferencing");
+  FDiscovery->insertDiscoFeature(dfeature);
 }
 
 void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
@@ -216,8 +262,7 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
     QString password = action->data(ADR_PASSWORD).toString();
     Jid streamJid = action->data(Action::DR_StreamJid).toString();
     Jid roomJid(room,host,"");
-    JoinMultiChatDialog *dialog = new JoinMultiChatDialog(this,streamJid,roomJid,nick,password);
-    dialog->show();
+    showJoinMultiChatDialog(streamJid,roomJid,nick,password);
   }
 }
 

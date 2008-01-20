@@ -25,7 +25,7 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
   connect(ui.btbButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
 
   initialize();
-  ui.cmbStreamJid->setCurrentIndex(AStreamJid.isValid() ? ui.cmbStreamJid->findText(AStreamJid.full()) : 0);
+  ui.cmbStreamJid->setCurrentIndex(AStreamJid.isValid() ? ui.cmbStreamJid->findText(AStreamJid.full(),Qt::MatchFixedString) : -1);
 
   Jid streamJid = ui.cmbStreamJid->currentText();
   ui.lneHost->setText(ARoomJid.domane().isEmpty() ? QString("conference.%1").arg(streamJid.domane()) : ARoomJid.domane());

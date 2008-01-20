@@ -10,6 +10,7 @@
 #include "../../definations/tooltiporders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/discofeatureorder.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iclientinfo.h"
 #include "../../interfaces/istanzaprocessor.h"
@@ -19,6 +20,7 @@
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/imultiuserchat.h"
+#include "../../interfaces/iservicediscovery.h"
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 #include "../../utils/menu.h"
@@ -32,10 +34,11 @@ class ClientInfo :
   public IStanzaHandler,
   public IIqStanzaOwner,
   public IOptionsHolder,
-  public IRosterIndexDataHolder
+  public IRosterIndexDataHolder,
+  public IDiscoFeatureHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IIqStanzaOwner IOptionsHolder IRosterIndexDataHolder);
+  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IIqStanzaOwner IOptionsHolder IRosterIndexDataHolder IDiscoFeatureHandler);
 public:
   ClientInfo();
   ~ClientInfo();
@@ -61,6 +64,8 @@ public:
   virtual QList<int> types() const;
   virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
   virtual bool setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/) { return false; }
+  //IDiscoFeatureHandler
+  virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem);
   //IClientInfo
   virtual void showClientInfo(const Jid &AContactJid, const Jid &AStreamJid);
   virtual bool checkOption(IClientInfo::Option AOption) const;
@@ -89,6 +94,7 @@ signals:
   virtual void optionsRejected();
 protected:
   void deleteSoftwareDialogs(const Jid &AStreamJid);
+  void registerDiscoFeatures();
 protected slots:
   void onPresenceItem(IPresence *APresence, IPresenceItem *APresenceItem);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
@@ -111,6 +117,7 @@ private:
   IRostersModelPlugin *FRostersModelPlugin;
   ISettingsPlugin *FSettingsPlugin;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
+  IServiceDiscovery *FDiscovery;
 private:
   struct SoftwareItem {
     SoftwareItem() { status = IClientInfo::SoftwareNotLoaded; }

@@ -12,6 +12,7 @@
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/isettings.h"
+#include "../../interfaces/iservicediscovery.h"
 #include "../../utils/stanza.h"
 #include "../../utils/action.h"
 #include "vcard.h"
@@ -54,6 +55,7 @@ signals:
 protected:
   void unlockVCard(const Jid &AContactJid);
   void saveVCardFile(const QDomElement &AElem, const Jid &AContactJid) const;
+  void registerDiscoFeatures();
 protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
@@ -67,6 +69,7 @@ private:
   IStanzaProcessor *FStanzaProcessor;
   ISettingsPlugin *FSettingsPlugin;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
+  IServiceDiscovery *FDiscovery;
 private:
   struct VCardItem 
   {

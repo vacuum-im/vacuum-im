@@ -18,6 +18,7 @@ ClientInfo::ClientInfo()
   FRostersModelPlugin = NULL;
   FSettingsPlugin = NULL;
   FMultiUserChatPlugin = NULL;
+  FDiscovery = NULL;
 
   FOptions = 0;
   FSoftwareHandler = 0;
@@ -101,6 +102,12 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
+  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  if (plugin)
+  {
+    FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+  }
+
   return FStanzaProcessor != NULL;
 }
 
@@ -125,6 +132,13 @@ bool ClientInfo::initObjects()
 
   if (FSettingsPlugin)
     FSettingsPlugin->appendOptionsHolder(this);
+
+  if (FDiscovery)
+  {
+    registerDiscoFeatures();
+    FDiscovery->insertFeatureHandler(NS_JABBER_VERSION,this,DFO_DEFAULT);
+    FDiscovery->insertFeatureHandler(NS_JABBER_LAST,this,DFO_DEFAULT);
+  }
 
   return true;
 }
@@ -252,6 +266,16 @@ QVariant ClientInfo::data(const IRosterIndex *AIndex, int ARole) const
     return hasLastActivity(contactJid) ? lastActivityText(contactJid) : QVariant();
   else
     return QVariant();
+}
+
+bool ClientInfo::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem)
+{
+  if (AFeature == NS_JABBER_VERSION || AFeature == NS_JABBER_LAST)
+  {
+    showClientInfo(ADiscoItem.itemJid,AStreamJid);
+    return true;
+  }
+  return false;
 }
 
 void ClientInfo::showClientInfo(const Jid &AContactJid, const Jid &AStreamJid)
@@ -382,6 +406,27 @@ void ClientInfo::deleteSoftwareDialogs(const Jid &AStreamJid)
   foreach(ClientInfoDialog *dialog, FClientInfoDialogs)
     if (dialog->streamJid() == AStreamJid)
       dialog->deleteLater();
+}
+
+void ClientInfo::registerDiscoFeatures()
+{
+  IDiscoFeature dfeature;
+
+  dfeature.active = true;
+  dfeature.icon = QIcon();
+  dfeature.var = NS_JABBER_VERSION;
+  dfeature.name = tr("Client version");
+  dfeature.actionName = tr("Version");
+  dfeature.description = tr("Request contacts client version");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.active = false;
+  dfeature.icon = QIcon();
+  dfeature.var = NS_JABBER_LAST;
+  dfeature.name = tr("Last activity");
+  dfeature.actionName = tr("Last activity");
+  dfeature.description = tr("Request contacts last activity");
+  FDiscovery->insertDiscoFeature(dfeature);
 }
 
 void ClientInfo::onPresenceItem(IPresence *APresence, IPresenceItem *APresenceItem)
