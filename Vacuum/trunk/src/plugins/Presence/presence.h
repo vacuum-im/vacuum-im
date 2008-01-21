@@ -16,33 +16,29 @@ class Presence :
 {
   Q_OBJECT;
   Q_INTERFACES(IPresence IStanzaHandler);
-
 public:
   Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor);
   ~Presence();
-
   virtual QObject *instance() { return this; }
-
   //IStanzaProcessorHandler
-  virtual bool editStanza(int, const Jid &, Stanza *, bool &) { return false; }
+  virtual bool editStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza * /*AStanza*/, bool &/*AAccept*/) { return false; }
   virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  
   //IPresence
   virtual const Jid &streamJid() const { return FXmppStream->jid(); }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
-  virtual bool setPresence(Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid = Jid());
   virtual Show show() const { return FShow; }
   virtual bool setShow(Show AShow, const Jid &AToJid = Jid());
   virtual const QString &status() const { return FStatus; }
   virtual bool setStatus(const QString &AStatus, const Jid &AToJid = Jid());
   virtual qint8 priority() const { return FPriority; }
   virtual bool setPriority(qint8 APriority, const Jid &AToJid = Jid());
+  virtual bool setPresence(Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid = Jid());
   virtual IPresenceItem *item(const Jid &AItemJid) const;
   virtual QList<IPresenceItem *> items() const;
   virtual QList<IPresenceItem *> items(const Jid &AItemJid) const;
 signals:
   virtual void opened();
-  virtual void selfPresence(IPresence::Show, const QString &, qint8, const Jid &);
+  virtual void selfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
   virtual void presenceItem(IPresenceItem *APresenceItem);
   virtual void closed();
 protected:

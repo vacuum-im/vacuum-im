@@ -72,7 +72,7 @@ protected slots:
   void onMessageSend(Message &AMessage);
   void onMessageSent(const Message &AMessage);
   void onUserDataChanged(int ARole, const QVariant &ABefour, const QVariant &AAfter);
-  void onSelfPresence(IPresence::Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
+  void onSelfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onStreamAboutToClose(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);

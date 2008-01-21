@@ -12,11 +12,9 @@ class PresenceItem :
   Q_OBJECT;
   Q_INTERFACES(IPresenceItem);
   friend class Presence;
-
 public:
-  PresenceItem(const Jid &AItemJid, QObject *parent);
+  PresenceItem(const Jid &AItemJid, QObject *AParent);
   ~PresenceItem();
-
   //IPresenceItem
   virtual QObject *instance() { return this; }
   virtual IPresence *presence() const { return FPresence; }

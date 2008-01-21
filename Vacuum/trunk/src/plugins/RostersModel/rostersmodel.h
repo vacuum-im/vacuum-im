@@ -63,7 +63,7 @@ protected slots:
   void onStreamJidChanged(IXmppStream *AXmppStream,const Jid &ABefour);
   void onRosterItemPush(IRosterItem *ARosterItem);
   void onRosterItemRemoved(IRosterItem *ARosterItem);
-  void onSelfPresence(IPresence::Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
+  void onSelfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
   void onPresenceItem(IPresenceItem *APresenceItem);
   void onIndexDataChanged(IRosterIndex *AIndex, int ARole);
   void onIndexChildAboutToBeInserted(IRosterIndex *AIndex);

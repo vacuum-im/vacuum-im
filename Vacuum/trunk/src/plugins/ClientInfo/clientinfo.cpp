@@ -61,8 +61,8 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance()); 
     if (FPresencePlugin)
     {
-      connect(FPresencePlugin->instance(),SIGNAL(presenceItem(IPresence *, IPresenceItem *)),
-        SLOT(onPresenceItem(IPresence *,IPresenceItem *)));
+      connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),
+        SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
     }
   }
 
@@ -429,42 +429,34 @@ void ClientInfo::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void ClientInfo::onPresenceItem(IPresence *APresence, IPresenceItem *APresenceItem)
+void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
 {
-  Jid contactJid = APresenceItem->jid();
-  QSet<IPresence *> &presences = FContactPresences[contactJid];
-  if (APresenceItem->show() == IPresence::Offline || APresenceItem->show() == IPresence::Error)
+  if (AStateOnline)
   {
-    presences -= APresence;
-    if (presences.isEmpty())
+    if (FActivityItems.contains(AContactJid))
     {
-      if (FSoftwareItems.contains(contactJid))
-      {
-        SoftwareItem &software = FSoftwareItems[contactJid];
-        if (software.status == SoftwareLoading)
-          FSoftwareId.remove(FSoftwareId.key(contactJid));
-        FSoftwareItems.remove(APresenceItem->jid());
-        emit softwareInfoChanged(contactJid);
-      }
-      if (FActivityItems.contains(contactJid))
-      {
-        FActivityItems.remove(contactJid);
-        emit lastActivityChanged(contactJid);
-      }
-      FContactPresences.remove(contactJid);
+      FActivityItems.remove(AContactJid);
+      emit lastActivityChanged(AContactJid);
     }
-  }
-  else 
-  {
-    if (presences.isEmpty() && FActivityItems.contains(contactJid))
-    {
-      FActivityItems.remove(contactJid);
-      emit lastActivityChanged(contactJid);
-    }
-    presences += APresence;
-    SoftwareItem &software = FSoftwareItems[contactJid];
+    SoftwareItem &software = FSoftwareItems[AContactJid];
     if (checkOption(AutoLoadSoftwareInfo) && software.status == SoftwareNotLoaded)
-      requestSoftwareInfo(contactJid,APresence->streamJid());
+      requestSoftwareInfo(AContactJid,AStreamJid);
+  }
+  else
+  {
+    if (FSoftwareItems.contains(AContactJid))
+    {
+      SoftwareItem &software = FSoftwareItems[AContactJid];
+      if (software.status == SoftwareLoading)
+        FSoftwareId.remove(FSoftwareId.key(AContactJid));
+      FSoftwareItems.remove(AContactJid);
+      emit softwareInfoChanged(AContactJid);
+    }
+    if (FActivityItems.contains(AContactJid))
+    {
+      FActivityItems.remove(AContactJid);
+      emit lastActivityChanged(AContactJid);
+    }
   }
 }
 

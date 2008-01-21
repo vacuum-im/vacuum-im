@@ -118,8 +118,8 @@ IRosterIndex *RostersModel::addStream(IRoster *ARoster, IPresence *APresence)
   if (APresence)
   {
     connect(APresence->instance(),SIGNAL(presenceItem(IPresenceItem *)),SLOT(onPresenceItem(IPresenceItem *))); 
-    connect(APresence->instance(),SIGNAL(selfPresence(IPresence::Show , const QString &, qint8 , const Jid &)),
-      SLOT(onSelfPresence(IPresence::Show , const QString &, qint8 , const Jid &)));
+    connect(APresence->instance(),SIGNAL(selfPresence(int, const QString &, qint8 , const Jid &)),
+      SLOT(onSelfPresence(int , const QString &, qint8 , const Jid &)));
     index->setData(RDR_Show, APresence->show());
     index->setData(RDR_Status,APresence->status());
   }
@@ -156,8 +156,8 @@ void RostersModel::removeStream(const QString &AStreamJid)
     {
       disconnect(streamPresence->instance(),SIGNAL(presenceItem(IPresenceItem *)),
         this, SLOT(onPresenceItem(IPresenceItem *))); 
-      disconnect(streamPresence->instance(),SIGNAL(selfPresence(IPresence::Show , const QString &, qint8 , const Jid &)),
-        this, SLOT(onSelfPresence(IPresence::Show , const QString &, qint8 , const Jid &)));
+      disconnect(streamPresence->instance(),SIGNAL(selfPresence(int , const QString &, qint8 , const Jid &)),
+        this, SLOT(onSelfPresence(int, const QString &, qint8 , const Jid &)));
     }
 
     removeRosterIndex(streamRoot);
@@ -555,7 +555,7 @@ void RostersModel::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefo
   }
 }
 
-void RostersModel::onSelfPresence(IPresence::Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid)
+void RostersModel::onSelfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid)
 {
   IPresence *presence = dynamic_cast<IPresence *>(sender());
   QString streamJid = presence->streamJid().pFull();

@@ -80,11 +80,13 @@ void PresencePlugin::onPresenceOpened()
 {
   Presence *presence = qobject_cast<Presence *>(sender());
   if (presence)
+  {
+    emit streamStateChanged(presence->streamJid(),true);
     emit presenceOpened(presence);
+  }
 }
 
-void PresencePlugin::onSelfPresence(IPresence::Show AShow, const QString &AStatus, 
-                                    qint8 APriority, const Jid &AToJid)
+void PresencePlugin::onSelfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid)
 {
   Presence *presence = qobject_cast<Presence *>(sender());
   if (presence)
@@ -95,14 +97,36 @@ void PresencePlugin::onPresenceItem(IPresenceItem *APresenceItem)
 {
   Presence *presence = qobject_cast<Presence *>(sender());
   if (presence)
-    emit presenceItem(presence,APresenceItem); 
+  {
+    if (APresenceItem->show() != IPresence::Offline && APresenceItem->show() != IPresence::Error)
+    {
+      QSet<IPresence *> &presences = FContactPresences[APresenceItem->jid()];
+      if (presences.isEmpty())
+        emit contactStateChanged(presence->streamJid(),APresenceItem->jid(),true);
+      presences += presence;
+    }
+    else if (FContactPresences.contains(APresenceItem->jid()))
+    {
+      QSet<IPresence *> &presences = FContactPresences[APresenceItem->jid()];
+      presences -= presence;
+      if (presences.isEmpty())
+      {
+        FContactPresences.remove(APresenceItem->jid());
+        emit contactStateChanged(presence->streamJid(),APresenceItem->jid(),false);
+      }
+    }
+    emit presenceItem(presence,APresenceItem);
+  }
 }
 
 void PresencePlugin::onPresenceClosed()
 {
   Presence *presence = qobject_cast<Presence *>(sender());
   if (presence)
+  {
+    emit streamStateChanged(presence->streamJid(),false);
     emit presenceClosed(presence);
+  }
 }
 
 void PresencePlugin::onStreamAdded(IXmppStream *AXmppStream)
@@ -110,8 +134,8 @@ void PresencePlugin::onStreamAdded(IXmppStream *AXmppStream)
   IPresence *presence = addPresence(AXmppStream);
   connect(presence->instance(),SIGNAL(opened()),SLOT(onPresenceOpened()));
   connect(presence->instance(),SIGNAL(presenceItem(IPresenceItem *)),SLOT(onPresenceItem(IPresenceItem *)));
-  connect(presence->instance(),SIGNAL(selfPresence(IPresence::Show, const QString &, qint8, const Jid &)),
-    SLOT(onSelfPresence(IPresence::Show, const QString &, qint8, const Jid &)));
+  connect(presence->instance(),SIGNAL(selfPresence(int, const QString &, qint8, const Jid &)),
+    SLOT(onSelfPresence(int, const QString &, qint8, const Jid &)));
   connect(presence->instance(),SIGNAL(closed()),SLOT(onPresenceClosed()));
   emit presenceAdded(presence); 
 }

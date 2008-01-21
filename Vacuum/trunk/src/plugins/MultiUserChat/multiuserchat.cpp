@@ -385,8 +385,8 @@ bool MultiUserChat::initialize(IPluginManager *APluginManager)
       FPresence = presencePlugin->getPresence(FStreamJid);
       if (FPresence)
       {
-        connect(FPresence->instance(),SIGNAL(selfPresence(IPresence::Show, const QString &, qint8, const Jid &)),
-          SLOT(onSelfPresence(IPresence::Show, const QString &, qint8, const Jid &)));
+        connect(FPresence->instance(),SIGNAL(selfPresence(int, const QString &, qint8, const Jid &)),
+          SLOT(onSelfPresence(int, const QString &, qint8, const Jid &)));
       }
     }
   }
@@ -464,7 +464,7 @@ void MultiUserChat::onUserDataChanged(int ARole, const QVariant &ABefour, const 
     emit userDataChanged(user,ARole,ABefour,AAfter);
 }
 
-void MultiUserChat::onSelfPresence(IPresence::Show AShow, const QString &AStatus, qint8 /*APriority*/, const Jid &AToJid)
+void MultiUserChat::onSelfPresence(int AShow, const QString &AStatus, qint8 /*APriority*/, const Jid &AToJid)
 {
   if (FAutoPresence && !AToJid.isValid())
     setPresence(AShow,AStatus);

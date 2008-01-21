@@ -96,7 +96,7 @@ protected:
   void deleteSoftwareDialogs(const Jid &AStreamJid);
   void registerDiscoFeatures();
 protected slots:
-  void onPresenceItem(IPresence *APresence, IPresenceItem *APresenceItem);
+  void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);

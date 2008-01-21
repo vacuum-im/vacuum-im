@@ -26,20 +26,20 @@ public:
   virtual QObject *instance() =0;
   virtual const Jid &streamJid() const =0;
   virtual IXmppStream *xmppStream() const =0;
-  virtual bool setPresence(Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid = Jid()) =0;
   virtual Show show() const =0;
   virtual bool setShow(Show AShow, const Jid &AToJid = Jid()) =0;
   virtual const QString &status() const =0;
   virtual bool setStatus(const QString &AStatus, const Jid &AToJid = Jid()) =0;
   virtual qint8 priority() const =0;
   virtual bool setPriority(qint8 APriority, const Jid &AToJid = Jid()) =0;
+  virtual bool setPresence(Show AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid = Jid()) =0;
   virtual IPresenceItem *item(const Jid &) const =0;
   virtual QList<IPresenceItem *> items() const =0;
   virtual QList<IPresenceItem *> items(const Jid &) const =0;
 signals:
   virtual void opened() =0;
-  virtual void selfPresence(Show , const QString &, qint8 , const Jid &) =0;
-  virtual void presenceItem(IPresenceItem *) =0;
+  virtual void selfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid) =0;
+  virtual void presenceItem(IPresenceItem *APresenceItem) =0;
   virtual void closed() =0;
 };
 
@@ -58,16 +58,21 @@ class IPresencePlugin
 {
 public:
   virtual QObject *instance() =0;
-  virtual IPresence *addPresence(IXmppStream *) =0;
-  virtual IPresence *getPresence(const Jid &) const =0;
-  virtual void removePresence(IXmppStream *) =0;
+  virtual IPresence *addPresence(IXmppStream *AXmppStream) =0;
+  virtual IPresence *getPresence(const Jid &AStreamJid) const =0;
+  virtual bool isContactOnline(const Jid &AContactJid) const =0;
+  virtual QList<Jid> contactsOnline() const =0;
+  virtual QList<IPresence *> contactPresences(const Jid &AContactJid) const =0;
+  virtual void removePresence(IXmppStream *AXmppStream) =0;
 signals:
-  virtual void presenceAdded(IPresence *) =0;
-  virtual void presenceOpened(IPresence *) =0;
-  virtual void selfPresence(IPresence *,IPresence::Show , const QString &, qint8 , const Jid &) =0;
-  virtual void presenceItem(IPresence *, IPresenceItem *) =0;
-  virtual void presenceClosed(IPresence *) =0;
-  virtual void presenceRemoved(IPresence *) =0;
+  virtual void streamStateChanged(const Jid &AStreamJid, bool AStateOnline) =0;
+  virtual void contactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline) =0;
+  virtual void presenceAdded(IPresence *APresence) =0;
+  virtual void presenceOpened(IPresence *APresence) =0;
+  virtual void selfPresence(IPresence *APresence, int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid) =0;
+  virtual void presenceItem(IPresence *APresence, IPresenceItem *APresenceItem) =0;
+  virtual void presenceClosed(IPresence *APresence) =0;
+  virtual void presenceRemoved(IPresence *APresence) =0;
 };
 
 Q_DECLARE_INTERFACE(IPresenceItem,"Vacuum.Plugin.IPresenceItem/1.0")
