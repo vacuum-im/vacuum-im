@@ -4,21 +4,24 @@
 
 Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor) : QObject(AXmppStream->instance())
 {
-  FShow = Offline;
-  FPriority = 0;
-  FPresenceHandler = 0;
   FXmppStream = AXmppStream;
   FStanzaProcessor = AStanzaProcessor;
 
-  connect(AXmppStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *))); 
+  FOpened = false;
+  FShow = Offline;
+  FStatus = tr("Disconnected");
+  FPriority = 0;
+
   connect(AXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
   connect(AXmppStream->instance(),SIGNAL(error(IXmppStream *, const QString &)),
     SLOT(onStreamError(IXmppStream *, const QString &))); 
+
+  FPresenceHandler = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionIn,SHP_DEFAULT,streamJid());   
 }
 
 Presence::~Presence()
 {
-
+  FStanzaProcessor->removeHandler(FPresenceHandler);
 }
 
 bool Presence::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
@@ -171,6 +174,9 @@ bool Presence::setPresence(Show AShow, const QString &AStatus, qint8 APriority, 
     if (!AStatus.isEmpty()) 
       pres.addElement("status").appendChild(pres.createTextNode(AStatus));
 
+    if (!AToJid.isValid() && FOpened && (AShow == Offline || AShow==Error))
+      emit aboutToClose(AShow, AStatus);
+
     if (FStanzaProcessor->sendStanzaOut(FXmppStream->jid(), pres))
     {
       if (!AToJid.isValid())
@@ -178,8 +184,19 @@ bool Presence::setPresence(Show AShow, const QString &AStatus, qint8 APriority, 
         FShow = AShow;
         FStatus = AStatus;
         FPriority = APriority;
+        if (!FOpened && AShow!=Offline && AShow!=Error)
+        {
+          FOpened = true;
+          emit opened();
+        }
       }
       emit selfPresence(FShow,FStatus,FPriority,AToJid);
+      if (FOpened && (AShow==Offline || AShow==Error))
+      {
+        clearItems();
+        FOpened = false;
+        emit closed();
+      }
       return true;
     }
   } 
@@ -190,6 +207,13 @@ bool Presence::setPresence(Show AShow, const QString &AStatus, qint8 APriority, 
       FShow = AShow;
       FStatus = AStatus;
       FPriority = 0;
+      if (FOpened)
+      {
+        emit aboutToClose(AShow,AStatus);
+        clearItems();
+        FOpened = false;
+        emit closed();
+      }
     }
     emit selfPresence(FShow,FStatus,FPriority,AToJid);
     return true;
@@ -203,7 +227,7 @@ void Presence::clearItems()
   {
     PresenceItem *item = FPresenceItems.at(0);
     item->setShow(Offline);
-    item->setStatus("");
+    item->setStatus(tr("Disconnected"));
     item->setPriority(0);
     emit presenceItem(item);
     delete item;
@@ -211,30 +235,10 @@ void Presence::clearItems()
   }
 }
 
-void Presence::setStanzaHandlers()
-{
-  FPresenceHandler = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionIn,SHP_DEFAULT,streamJid());   
-}
-
-void Presence::removeStanzaHandlers()
-{
-  FStanzaProcessor->removeHandler(FPresenceHandler);
-  FPresenceHandler = 0;
-}
-
-void Presence::onStreamOpened(IXmppStream * /*AXmppStream*/)
-{
-  setStanzaHandlers();
-  emit opened();
-}
-
 void Presence::onStreamClosed(IXmppStream * /*AXmppStream*/)
 {
-  if (FShow != Offline && FShow != Error)
+  if (isOpen())
     setPresence(Offline,tr("Disconnected"),0);
-  clearItems();
-  removeStanzaHandlers();
-  emit closed();
 }
 
 void Presence::onStreamError(IXmppStream * /*AXmppStream*/, const QString &AError)

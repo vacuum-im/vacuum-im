@@ -26,6 +26,7 @@ public:
   virtual QObject *instance() =0;
   virtual const Jid &streamJid() const =0;
   virtual IXmppStream *xmppStream() const =0;
+  virtual bool isOpen() const =0;
   virtual Show show() const =0;
   virtual bool setShow(Show AShow, const Jid &AToJid = Jid()) =0;
   virtual const QString &status() const =0;
@@ -40,6 +41,7 @@ signals:
   virtual void opened() =0;
   virtual void selfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid) =0;
   virtual void presenceItem(IPresenceItem *APresenceItem) =0;
+  virtual void aboutToClose(int AShow, const QString &AStatus) =0;
   virtual void closed() =0;
 };
 
@@ -71,6 +73,7 @@ signals:
   virtual void presenceOpened(IPresence *APresence) =0;
   virtual void selfPresence(IPresence *APresence, int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid) =0;
   virtual void presenceItem(IPresence *APresence, IPresenceItem *APresenceItem) =0;
+  virtual void presenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus) =0;
   virtual void presenceClosed(IPresence *APresence) =0;
   virtual void presenceRemoved(IPresence *APresence) =0;
 };

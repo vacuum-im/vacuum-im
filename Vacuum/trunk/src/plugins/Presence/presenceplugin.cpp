@@ -119,6 +119,13 @@ void PresencePlugin::onPresenceItem(IPresenceItem *APresenceItem)
   }
 }
 
+void PresencePlugin::onPresenceAboutToClose(int AShow, const QString &AStatus)
+{
+  Presence *presence = qobject_cast<Presence *>(sender());
+  if (presence)
+    emit presenceAboutToClose(presence,AShow,AStatus);
+}
+
 void PresencePlugin::onPresenceClosed()
 {
   Presence *presence = qobject_cast<Presence *>(sender());
@@ -136,6 +143,8 @@ void PresencePlugin::onStreamAdded(IXmppStream *AXmppStream)
   connect(presence->instance(),SIGNAL(presenceItem(IPresenceItem *)),SLOT(onPresenceItem(IPresenceItem *)));
   connect(presence->instance(),SIGNAL(selfPresence(int, const QString &, qint8, const Jid &)),
     SLOT(onSelfPresence(int, const QString &, qint8, const Jid &)));
+  connect(presence->instance(),SIGNAL(aboutToClose(int,const QString &)),
+    SLOT(onPresenceAboutToClose(int,const QString &)));
   connect(presence->instance(),SIGNAL(closed()),SLOT(onPresenceClosed()));
   emit presenceAdded(presence); 
 }

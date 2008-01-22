@@ -26,6 +26,7 @@ public:
   //IPresence
   virtual const Jid &streamJid() const { return FXmppStream->jid(); }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
+  virtual bool isOpen() const { return FOpened; }
   virtual Show show() const { return FShow; }
   virtual bool setShow(Show AShow, const Jid &AToJid = Jid());
   virtual const QString &status() const { return FStatus; }
@@ -40,19 +41,18 @@ signals:
   virtual void opened();
   virtual void selfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
   virtual void presenceItem(IPresenceItem *APresenceItem);
+  virtual void aboutToClose(int AShow, const QString &AStatus);
   virtual void closed();
 protected:
   void clearItems();
-  void setStanzaHandlers();
-  void removeStanzaHandlers();
 protected slots:
-  void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
   void onStreamError(IXmppStream *AXmppStream, const QString &AError);
 private:
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;
 private:
+  bool FOpened;
   int FPresenceHandler;
   QList<PresenceItem *> FPresenceItems;
   Show FShow;
