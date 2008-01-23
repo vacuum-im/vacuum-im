@@ -84,6 +84,8 @@ ErrorHandler &ErrorHandler::parseElement(const QDomElement &AErrElem, const QStr
   QDomElement elem = AErrElem.firstChildElement("error");
   if (elem.isNull())
     elem = AErrElem;
+  else
+    FText = elem.text();
 
   ErrorItem *item = NULL;
   FCode = elem.attribute("code","0").toInt();
@@ -103,9 +105,6 @@ ErrorHandler &ErrorHandler::parseElement(const QDomElement &AErrElem, const QStr
   elem = elem.firstChildElement();
   while (!elem.isNull() && item == NULL) 
   {
-    if (FText.isEmpty() && elem.isText())
-      FText = elem.text(); 
-
     if (elem.tagName() != "text")
     {
       bool defaultNS = false;
