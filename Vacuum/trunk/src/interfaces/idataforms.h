@@ -100,6 +100,7 @@ public:
   virtual void showPage(int APage) =0;
   virtual void showPrevPage() =0;
   virtual void showNextPage() =0;
+  virtual void setAutoAccept(bool AAuto) =0;
 signals:
   virtual void currentPageChanged(int APage) =0;
 };

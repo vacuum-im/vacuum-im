@@ -133,6 +133,7 @@ bool DataForm::isValid() const
 
 void DataForm::createSubmit(QDomElement &AFormElem) const
 {
+  AFormElem.setAttribute("type",FORM_SUBMIT);
   foreach(IDataField *dataField, FDataFields)
     if (!dataField->isEmpty())
     {

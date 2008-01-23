@@ -1,10 +1,13 @@
 #include "datadialog.h"
 
+#include <QMessageBox>
+
 DataDialog::DataDialog(IDataForm *ADataForm, QWidget *AParent) : IDataDialog(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
 
+  FAutoAccept = true;
   FDataForm = ADataForm;
   ui.wdtForm->setLayout(new QVBoxLayout);
   ui.wdtForm->layout()->addWidget(FDataForm->instance());
@@ -30,6 +33,9 @@ DataDialog::DataDialog(IDataForm *ADataForm, QWidget *AParent) : IDataDialog(APa
   }
   else
     ui.wdtPages->setVisible(false);
+
+  connect(ui.dbbDialogButtons,SIGNAL(accepted()),SLOT(onAcceptClicked()));
+  connect(ui.dbbDialogButtons,SIGNAL(rejected()),SLOT(onRejectClicked()));
 
   updateDialog();
 }
@@ -59,6 +65,11 @@ void DataDialog::showNextPage()
   showPage(FDataForm->currentPage()+1);
 }
 
+void DataDialog::setAutoAccept(bool AAuto)
+{
+  FAutoAccept = AAuto;
+}
+
 void DataDialog::updateDialog()
 {
   QString pageLabel = FDataForm->pageLabel(FDataForm->currentPage());
@@ -75,5 +86,31 @@ void DataDialog::onPrevPageClicked()
 void DataDialog::onNextPageClicked()
 {
   showNextPage();
+}
+
+void DataDialog::onAcceptClicked()
+{
+  if (FAutoAccept)
+  {
+    if (!FDataForm->isValid())
+    {
+      QString message = tr("Current form values are not acceptable:");
+      message += tr("<br>Invalid values in fields:");
+      foreach(IDataField *field, FDataForm->fields())
+        if (!field->isValid())
+          message += tr("<br>- %1").arg(field->label());
+      QMessageBox::StandardButton button = QMessageBox::warning(this,tr("Not Acceptable"),message,QMessageBox::Ok|QMessageBox::Ignore);
+      if (button == QMessageBox::Ignore)
+        accept();
+    }
+    else
+      accept();
+  }
+}
+
+void DataDialog::onRejectClicked()
+{
+  if (FAutoAccept)
+    reject();
 }
 

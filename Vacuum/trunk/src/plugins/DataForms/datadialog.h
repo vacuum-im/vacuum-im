@@ -18,6 +18,7 @@ public:
   virtual void showPage(int APage);
   virtual void showPrevPage();
   virtual void showNextPage();
+  virtual void setAutoAccept(bool AAuto);
 signals:
   virtual void currentPageChanged(int APage);
 protected:
@@ -25,11 +26,14 @@ protected:
 protected slots:
   void onPrevPageClicked();
   void onNextPageClicked();
+  void onAcceptClicked();
+  void onRejectClicked();
 private:
   Ui::DataDialogClass ui;
 private:
   IDataForm *FDataForm;
 private:
+  bool FAutoAccept;
   ToolBarChanger *FToolBarChanger;
 };
 
