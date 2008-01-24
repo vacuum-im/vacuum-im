@@ -220,18 +220,14 @@ void ServiceDiscovery::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza
   if (FInfoRequestsId.contains(AStanza.id()))
   {
     QPair<Jid,QString> jidnode = FInfoRequestsId.take(AStanza.id());
-    IDiscoInfo dinfo = parseDiscoInfo(AStanza);
-    dinfo.contactJid = jidnode.first;
-    dinfo.node = jidnode.second;
+    IDiscoInfo dinfo = parseDiscoInfo(AStanza,jidnode);
     FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
     emit discoInfoReceived(dinfo);
   }
   else if (FItemsRequestsId.contains(AStanza.id()))
   {
     QPair<Jid,QString> jidnode = FItemsRequestsId.take(AStanza.id());
-    IDiscoItems ditems = parseDiscoItems(AStanza);
-    ditems.contactJid = jidnode.first;
-    ditems.node = jidnode.second;
+    IDiscoItems ditems = parseDiscoItems(AStanza,jidnode);
     FDiscoItems[ditems.contactJid].insert(ditems.node,ditems);
     emit discoItemsReceived(ditems);
   }
@@ -607,9 +603,14 @@ bool ServiceDiscovery::publishDiscoItems(const IDiscoPublish &ADiscoPublish)
   return sended;
 }
 
-IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza) const
+IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const
 {
   IDiscoInfo result;
+  result.streamJid = AStanza.to();
+  result.contactJid = AJidNode.first;
+  result.node = AJidNode.second;
+
+  QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
   if (AStanza.type() == "error")
   {
     ErrorHandler err(AStanza.element());
@@ -617,9 +618,15 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza) const
     result.error.condition = err.condition();
     result.error.message = err.message();
   }
+  else if (result.contactJid!=AStanza.from() || query.isNull() || query.attribute("node")!=result.node)
+  {
+    ErrorHandler err(ErrorHandler::ITEM_NOT_FOUND);
+    result.error.code = err.code();
+    result.error.condition = err.condition();
+    result.error.message = err.message();
+  }
   else 
   {
-    QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
     QDomElement elem = query.firstChildElement("identity");
     while (!elem.isNull())
     {
@@ -641,9 +648,14 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza) const
   return result;
 }
 
-IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza) const
+IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const
 {
   IDiscoItems result;
+  result.streamJid = AStanza.to();
+  result.contactJid = AJidNode.first;
+  result.node = AJidNode.second;
+
+  QDomElement query = AStanza.firstElement("query",NS_DISCO_ITEMS);
   if (AStanza.type() == "error")
   {
     ErrorHandler err(AStanza.element());
@@ -651,9 +663,15 @@ IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza) const
     result.error.condition = err.condition();
     result.error.message = err.message();
   }
+  else if (result.contactJid!=AStanza.from() || query.isNull() || query.attribute("node")!=result.node)
+  {
+    ErrorHandler err(ErrorHandler::ITEM_NOT_FOUND);
+    result.error.code = err.code();
+    result.error.condition = err.condition();
+    result.error.message = err.message();
+  }
   else 
   {
-    QDomElement query = AStanza.firstElement("query",NS_DISCO_ITEMS);
     QDomElement elem = query.firstChildElement("item");
     while (!elem.isNull())
     {

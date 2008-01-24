@@ -117,8 +117,8 @@ signals:
   //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
-  IDiscoInfo parseDiscoInfo(const Stanza &AStanza) const;
-  IDiscoItems parseDiscoItems(const Stanza &AStanza) const;
+  IDiscoInfo parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
+  IDiscoItems parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   void registerFeatures();
 protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);

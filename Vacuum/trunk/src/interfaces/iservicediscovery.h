@@ -45,6 +45,7 @@ struct IDiscoError
 
 struct IDiscoInfo
 {
+  Jid streamJid;
   Jid contactJid;
   QString node;
   QList<IDiscoIdentity> identity;
@@ -54,6 +55,7 @@ struct IDiscoInfo
 
 struct IDiscoItems 
 {
+  Jid streamJid;
   Jid contactJid;
   QString node;
   QList<IDiscoItem> items;
