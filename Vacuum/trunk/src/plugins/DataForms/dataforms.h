@@ -3,6 +3,7 @@
 
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/idataforms.h"
+#include "../../interfaces/iservicediscovery.h"
 #include "dataform.h"
 #include "datadialog.h"
 
@@ -20,16 +21,20 @@ public:
   //IPlugin
   virtual QUuid pluginUuid() const { return DATAFORMS_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager * /*APluginManager*/, int &/*AInitOrder*/) { return true; }
-  virtual bool initObjects() { return true; }
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+  virtual bool initObjects();
   virtual bool initSettings() { return true; }
-  virtual bool startPlugin();
+  virtual bool startPlugin() { return true; }
   //IDataForms
   virtual IDataForm *newDataForm(const QDomElement &AFormElement, QWidget *AParent = NULL);
   virtual IDataDialog * newDataDialog(const QDomElement &AFormElement, QWidget *AParent = NULL);
 signals:
   virtual void dataFormCreated(IDataForm *AForm);
   virtual void dataDialogCreated(IDataDialog *ADialog);
+protected:
+  void registerDiscoFeatures();
+private:
+  IServiceDiscovery *FDiscovery;
 };
 
 #endif // DATAFORMS_H

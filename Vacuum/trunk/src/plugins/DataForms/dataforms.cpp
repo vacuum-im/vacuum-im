@@ -2,7 +2,7 @@
 
 DataForms::DataForms()
 {
-
+  FDiscovery = NULL;
 }
 
 DataForms::~DataForms()
@@ -20,16 +20,19 @@ void DataForms::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->version = "0.1";
 }
 
-bool DataForms::startPlugin()
+bool DataForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  //QDomDocument doc;
-  //QFile formFile("form.xml");
-  //formFile.open(QFile::ReadOnly);
-  //doc.setContent(formFile.readAll(),true);
-  //formFile.close();
-  //IDataDialog *dialog = newDataDialog(doc.documentElement().firstChildElement().firstChildElement("x"),NULL);
-  //if (dialog)
-  //  dialog->show();
+  IPlugin *plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  if (plugin)
+  {
+    FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+  }
+  return true;
+}
+
+bool DataForms::initObjects()
+{
+  registerDiscoFeatures();
   return true;
 }
 
@@ -46,6 +49,18 @@ IDataDialog *DataForms::newDataDialog(const QDomElement &AFormElement, QWidget *
   IDataDialog *dialog = new DataDialog(form,AParent);
   emit dataDialogCreated(dialog);
   return dialog;
+}
+
+void DataForms::registerDiscoFeatures()
+{
+  IDiscoFeature dfeature;
+  dfeature.active = true;
+  dfeature.icon = QIcon();
+  dfeature.var = NS_JABBER_DATA;
+  dfeature.name = tr("Data Forms");
+  dfeature.actionName = "";
+  dfeature.description = tr("Implements data forms and generic data description");
+  FDiscovery->insertDiscoFeature(dfeature);
 }
 
 Q_EXPORT_PLUGIN2(DataFormsPlugin, DataForms)
