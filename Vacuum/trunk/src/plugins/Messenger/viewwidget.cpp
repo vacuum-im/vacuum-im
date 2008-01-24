@@ -9,6 +9,7 @@
 ViewWidget::ViewWidget(IMessenger *AMessenger, const Jid &AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
+  ui.tedViewer->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
   FMessenger = AMessenger;
   FStreamJid = AStreamJid;

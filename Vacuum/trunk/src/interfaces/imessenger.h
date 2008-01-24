@@ -102,6 +102,7 @@ public:
   virtual void setSendMessageKey(int AKey) =0;
   virtual void clearEditor() =0;
 signals:
+  virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook) =0;
   virtual void messageAboutToBeSend() =0;
   virtual void messageReady() =0;
   virtual void streamJidChanged(const Jid &ABefour) =0;

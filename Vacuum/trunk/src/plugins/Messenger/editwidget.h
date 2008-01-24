@@ -1,6 +1,7 @@
 #ifndef EDITWIDGET_H
 #define EDITWIDGET_H
 
+#include <QKeyEvent>
 #include "../../interfaces/imessenger.h"
 #include "ui_editwidget.h"
 
@@ -23,6 +24,7 @@ public:
   virtual void setSendMessageKey(int AKey);
   virtual void clearEditor();
 signals:
+  virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
   virtual void messageAboutToBeSend();
   virtual void messageReady();
   virtual void streamJidChanged(const Jid &ABefour);

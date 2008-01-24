@@ -1,18 +1,17 @@
 #include <QDebug>
 #include "editwidget.h"
 
-#include <QKeyEvent>
-
 EditWidget::EditWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
-
-  FSendMessageKey = Qt::Key_Return;
-  ui.tedEditor->installEventFilter(this);
+  ui.tedEditor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
   FMessenger = AMessenger;
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
+
+  FSendMessageKey = Qt::Key_Return;
+  ui.tedEditor->installEventFilter(this);
 }
 
 EditWidget::~EditWidget()
@@ -56,12 +55,15 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
   if (AWatched == ui.tedEditor && AEvent->type() == QEvent::KeyPress)
   {
+    bool hooked = false;
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
-    if (keyEvent->modifiers() + keyEvent->key() == FSendMessageKey)
+    emit keyEventReceived(keyEvent,hooked);
+    if (!hooked && keyEvent->modifiers()+keyEvent->key()==FSendMessageKey)
     {
       sendMessage();
-      return true;
+      hooked = true;
     }
+    return hooked;
   }
   return QWidget::eventFilter(AWatched,AEvent);
 }
