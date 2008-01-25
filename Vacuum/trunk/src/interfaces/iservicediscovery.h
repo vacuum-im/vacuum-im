@@ -112,6 +112,7 @@ public:
   virtual IDiscoInfo selfDiscoInfo() const =0;
   virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
+  virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true) =0;
   virtual QIcon discoInfoIcon(const IDiscoInfo &ADiscoInfo) const =0;
   virtual QIcon discoItemIcon(const IDiscoItem &ADiscoItem) const =0;
   //DiscoHandler

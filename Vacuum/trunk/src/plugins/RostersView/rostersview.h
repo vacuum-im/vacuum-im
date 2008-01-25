@@ -53,10 +53,8 @@ public:
   virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, int AFlags=0);
   virtual void removeNotify(int ANotifyId);
   //--ClickHookers
-  virtual int createClickHooker(IRostersClickHooker *AHooker, int APriority, bool AAutoRemove = false);
-  virtual void insertClickHooker(int AHookerId, IRosterIndex *AIndex);
-  virtual void removeClickHooker(int AHookerId, IRosterIndex *AIndex);
-  virtual void destroyClickHooker(int AHookerId);
+  virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker);
+  virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker);
   //--FooterText
   virtual void insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex);
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
@@ -89,7 +87,6 @@ protected:
   void removeBlinkLabel(int ALabelId);
   QString intId2StringId(int AIntId);
   void removeLabels();
-  void removeClickHookers();
   void setLastModel(QAbstractItemModel *AModel);
 protected:
   //QTreeView
@@ -136,16 +133,7 @@ private:
   QHash<int /*label*/, QList<int> > FNotifyLabelItems;
   QHash<IRosterIndex *, QHash<int /*order*/, int /*labelid*/> > FNotifyIndexOrderLabel;
 private:
-  int FHookerId;
-  struct ClickHookerItem
-  {
-    int hookerId;
-    IRostersClickHooker *hooker;
-    QSet<IRosterIndex *> indexes;
-    int priority;
-    bool autoRemove;
-  };
-  QList<ClickHookerItem *> FClickHookerItems;
+  QMultiMap<int,IRostersClickHooker *> FClickHookers;
 private:
   int FOptions;
   RosterIndexDelegate *FRosterIndexDelegate;

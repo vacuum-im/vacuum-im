@@ -42,7 +42,6 @@ Messenger::Messenger()
   FMessengerOptions = NULL;
   FMessageHandler = NULL;
   FMessageId = 0;
-  FIndexClickHooker = 0;
   FOptions = 0;
 }
 
@@ -129,14 +128,12 @@ bool Messenger::initObjects()
   if (FRostersModelPlugin)
   {
     FRostersModel = FRostersModelPlugin->rostersModel();
-    connect(FRostersModel->instance(),SIGNAL(indexCreated(IRosterIndex *, IRosterIndex *)),
-      SLOT(onRosterIndexCreated(IRosterIndex *, IRosterIndex *)));
   }
 
   if (FRostersViewPlugin)
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    FIndexClickHooker = FRostersView->createClickHooker(this,0);
+    FRostersView->insertClickHooker(RCHO_MESSENGER,this);
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
     connect(FRostersView,SIGNAL(notifyActivated(IRosterIndex *, int)), SLOT(onRosterNotifyActivated(IRosterIndex *, int)));
   }
@@ -158,9 +155,10 @@ bool Messenger::readStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, const 
   return received;
 }
 
-bool Messenger::rosterIndexClicked(IRosterIndex *AIndex, int AHookerId)
+bool Messenger::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)
 {
-  if (AHookerId == FIndexClickHooker)
+  static QList<int> hookerTypes = QList<int>() << RIT_Contact << RIT_MyResource;
+  if (hookerTypes.contains(AIndex->type()))
   {
     QList<int> notifyIds = FRostersView->indexNotifies(AIndex,RLO_MESSAGE);
     if (notifyIds.isEmpty())
@@ -712,15 +710,6 @@ void Messenger::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Activation
 {
   if (AReason == QSystemTrayIcon::DoubleClick && FTrayId2MessageId.contains(ANotifyId))
     showMessage(FTrayId2MessageId.value(ANotifyId));
-}
-
-void Messenger::onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex * /*AParent*/)
-{
-  static QList<int> hookerTypes = QList<int>()
-    << RIT_Contact << RIT_MyResource;
-
-  if (FRostersView && hookerTypes.contains(AIndex->type()))
-    FRostersView->insertClickHooker(FIndexClickHooker,AIndex);
 }
 
 void Messenger::onMessageWindowDestroyed()

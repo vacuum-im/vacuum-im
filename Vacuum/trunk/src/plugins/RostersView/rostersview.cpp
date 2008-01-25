@@ -1,17 +1,15 @@
-#include <QtDebug>
 #include "rostersview.h"
 
+#include <QtDebug>
 #include <QApplication>
 #include <QHeaderView>
 #include <QToolTip>
 #include <QCursor>
 #include <QHelpEvent>
 
-RostersView::RostersView(QWidget *AParent)
-  : QTreeView(AParent)
+RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 {
   FLabelId = 1;
-  FHookerId = 1;
   FNotifyId = 1;
   FOptions = 0;
 
@@ -38,8 +36,6 @@ RostersView::RostersView(QWidget *AParent)
 RostersView::~RostersView()
 {
   removeLabels();
-  while (FClickHookerItems.count()>0)
-    destroyClickHooker(FClickHookerItems.at(0)->hookerId);
 }
 
 void RostersView::setModel(IRostersModel *AModel)
@@ -52,7 +48,6 @@ void RostersView::setModel(IRostersModel *AModel)
     {
       disconnect(FRostersModel,SIGNAL(indexDestroyed(IRosterIndex *)),this,SLOT(onIndexDestroyed(IRosterIndex *)));
       removeLabels();
-      removeClickHookers();
     }
 
     if (AModel)
@@ -409,64 +404,14 @@ void RostersView::removeNotify(int ANotifyId)
   }
 }
 
-int RostersView::createClickHooker(IRostersClickHooker *AHooker, int APriority, bool AAutoRemove)
+void RostersView::insertClickHooker(int AOrder, IRostersClickHooker *AHooker)
 {
-  int i = 0;
-  while (i < FClickHookerItems.count() && FClickHookerItems.at(i)->priority >= APriority)
-    i++;
-  ClickHookerItem *item = new ClickHookerItem;
-  item->hookerId = FHookerId++;
-  item->hooker = AHooker;
-  item->priority = APriority;
-  item->autoRemove = AAutoRemove;
-  FClickHookerItems.insert(i,item);
-  return item->hookerId;
+  FClickHookers.insertMulti(AOrder,AHooker);
 }
 
-void RostersView::insertClickHooker(int AHookerId, IRosterIndex *AIndex)
+void RostersView::removeClickHooker(int AOrder, IRostersClickHooker *AHooker)
 {
-  int i = 0;
-  while (i < FClickHookerItems.count())
-  {
-    ClickHookerItem *item = FClickHookerItems.at(i);
-    if (item->hookerId == AHookerId)
-    {
-      item->indexes += AIndex;
-      break;
-    }
-    i++;
-  }
-}
-
-void RostersView::removeClickHooker(int AHookerId, IRosterIndex *AIndex)
-{
-  int i = 0;
-  while (i < FClickHookerItems.count())
-  {
-    ClickHookerItem *item = FClickHookerItems.at(i);
-    if (item->hookerId == AHookerId)
-    {
-      item->indexes -= AIndex;
-      break;
-    }
-    i++;
-  }
-}
-
-void RostersView::destroyClickHooker(int AHookerId)
-{
-  int i = 0;
-  while (i < FClickHookerItems.count())
-  {
-    ClickHookerItem *item = FClickHookerItems.at(i);
-    if (item->hookerId == AHookerId)
-    {
-      FClickHookerItems.removeAt(i);
-      delete item;
-      break;
-    }
-    i++;
-  }
+  FClickHookers.remove(AOrder,AHooker);
 }
 
 void RostersView::insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex)
@@ -564,16 +509,6 @@ void RostersView::removeLabels()
     QSet<IRosterIndex *> indexes = FIndexLabelIndexes.value(label);
     foreach(IRosterIndex *index, indexes)
       removeIndexLabel(label,index);
-  }
-}
-
-void RostersView::removeClickHookers()
-{
-  foreach(ClickHookerItem *hookerItem, FClickHookerItems)
-  {
-    QSet<IRosterIndex *> indexes = hookerItem->indexes;
-    foreach(IRosterIndex *index, indexes)
-      removeClickHooker(hookerItem->hookerId,index);
   }
 }
 
@@ -684,21 +619,13 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 
       if (!FNotifyLabelItems.contains(labelId))
       {
-        int i = 0;
         emit labelDoubleClicked(index,labelId,accepted);
-        while (!accepted && i<FClickHookerItems.count())
+
+        QMultiMap<int,IRostersClickHooker *>::iterator it = FClickHookers.begin();
+        while (!accepted && it!=FClickHookers.end())
         {
-          ClickHookerItem *item = FClickHookerItems.at(i);
-          if (item->indexes.contains(index) || item->indexes.contains(NULL))
-          {
-            accepted = item->hooker->rosterIndexClicked(index,item->hookerId);
-            if (accepted && item->autoRemove)
-              destroyClickHooker(item->hookerId);
-            else
-              i++;
-          }
-          else
-            i++;
+          accepted = it.value()->rosterIndexClicked(index,it.key());
+          it++;
         }
       }
       else
@@ -786,17 +713,6 @@ void RostersView::onIndexDestroyed(IRosterIndex *AIndex)
     else
       it++;
   }
-
-  int i = 0;
-  while (i<FClickHookerItems.count())
-  {
-    ClickHookerItem *item = FClickHookerItems.at(i);
-    if (item->indexes.contains(AIndex))
-      item->indexes -= AIndex;
-    i++;
-  }
-
-
 }
 
 void RostersView::onBlinkTimer()

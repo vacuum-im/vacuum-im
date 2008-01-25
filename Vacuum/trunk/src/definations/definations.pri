@@ -7,6 +7,7 @@ HEADERS += actiongroups.h \
            rosterlabelorders.h \
            rosterindextyperole.h \
            rosterdataholderorders.h \
+           rosterclickhookerorders.h \
            messagedataroles.h \
            messagewriterorders.h \
            resourceloaderorders.h \
@@ -15,4 +16,4 @@ HEADERS += actiongroups.h \
            vcardvaluenames.h \
            multiuserdataroles.h \
            discotreeitemsdataroles.h \
-           discofeatureorder.h 
+           discofeatureorder.h  

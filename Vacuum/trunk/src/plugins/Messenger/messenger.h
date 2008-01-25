@@ -5,6 +5,7 @@
 #include "../../definations/messagedataroles.h"
 #include "../../definations/messagehandlerorders.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/rosterclickhookerorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/actiongroups.h"
@@ -53,7 +54,7 @@ public:
   virtual bool editStanza(int, const Jid &, Stanza *, bool &) { return false; }
   virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IRostersClickHooker
-  virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AHookerId);
+  virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IMessageWriter
@@ -145,7 +146,6 @@ protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId);
   void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
-  void onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
   void onMessageWindowDestroyed();
   void onChatWindowDestroyed();
   void onTabWindowDestroyed();
@@ -173,7 +173,6 @@ private:
 private:
   int FOptions;
   int FMessageId;
-  int FIndexClickHooker;
   QFont FChatFont;
   QFont FMessageFont;
   MessageHandler *FMessageHandler;

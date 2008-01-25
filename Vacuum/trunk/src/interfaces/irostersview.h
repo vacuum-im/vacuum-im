@@ -11,7 +11,7 @@
 class IRostersClickHooker
 {
 public:
-  virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AHookerId) =0;
+  virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder) =0;
 };
 
 class IRostersView :
@@ -58,10 +58,8 @@ public:
   virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, int AFlags=0) =0;
   virtual void removeNotify(int ANotifyId) =0;
   //--ClickHookers
-  virtual int createClickHooker(IRostersClickHooker *AHooker, int APriority, bool AAutoRemove = false) =0;
-  virtual void insertClickHooker(int AHookerId, IRosterIndex *AIndex) =0;
-  virtual void removeClickHooker(int AHookerId, IRosterIndex *AIndex) =0;
-  virtual void destroyClickHooker(int AHookerId) =0;
+  virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
+  virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
   //--FooterText
   virtual void insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex) =0;
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
