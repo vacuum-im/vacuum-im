@@ -3,10 +3,8 @@
 #include <qendian.h>
 
 #define READ_TIMEOUT              30000
-#define KEEP_ALIVE_TIMEOUT        30000
 
-DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent)
-  : QObject(AParent)
+DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent) : QObject(AParent)
 {
   FPlugin = APlugin;
   FProxyState = ProxyUnconnected;
@@ -21,7 +19,6 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
   connect(&FSocket, SIGNAL(modeChanged(QSslSocket::SslMode)), SIGNAL(modeChanged(QSslSocket::SslMode)));
   
   connect(&FReadTimer,SIGNAL(timeout()),SLOT(onReadTimeout()));
-  connect(&FKeepAliveTimer,SIGNAL(timeout()),SLOT(onKeepAliveTimeout()));
 }
 
 DefaultConnection::~DefaultConnection()
@@ -81,13 +78,11 @@ void DefaultConnection::disconnect()
 
 qint64 DefaultConnection::write(const QByteArray &AData)
 {
-  FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
   return FSocket.write(AData);
 }
 
 QByteArray DefaultConnection::read(qint64 ABytes)
 {
-  FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
   return FSocket.read(ABytes);
 }
 
@@ -281,7 +276,6 @@ void DefaultConnection::proxyReady()
 void DefaultConnection::connectionReady()
 {
   FReadTimer.start(READ_TIMEOUT); 
-  FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT); 
   emit connected();
 }
 
@@ -309,7 +303,6 @@ void DefaultConnection::onSocketReadyRead()
 void DefaultConnection::onSocketDisconnected()
 {
   FReadTimer.stop(); 
-  FKeepAliveTimer.stop(); 
   emit disconnected();
 }
 
@@ -347,11 +340,5 @@ void DefaultConnection::onReadTimeout()
     emit error(tr("Socket timeout"));
     FSocket.disconnectFromHost();
   }
-}
-
-void DefaultConnection::onKeepAliveTimeout()
-{
-  if (isOpen() && option(IDefaultConnection::CO_KeepAlive).toBool())
-    FSocket.write(" "); 
 }
 

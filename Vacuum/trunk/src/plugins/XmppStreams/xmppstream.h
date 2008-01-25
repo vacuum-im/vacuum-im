@@ -1,10 +1,12 @@
 #ifndef XMPPSTREAM_H
 #define XMPPSTREAM_H
 
-#include <QObject>
+#include <QTimer>
 #include <QDomDocument>
-#include "../../utils/versionparser.h"
+#include "../../definations/namespaces.h"
 #include "../../interfaces/ixmppstreams.h"
+#include "../../utils/errorhandler.h"
+#include "../../utils/versionparser.h"
 #include "streamparser.h"
 
 class XmppStream : 
@@ -13,13 +15,11 @@ class XmppStream :
 {
   Q_OBJECT;
   Q_INTERFACES(IXmppStream);
-
 public:
-  XmppStream(const Jid &AJid, QObject *parent = 0);
+  XmppStream(const Jid &AJid, QObject *AParent = NULL);
   ~XmppStream();
-
-  //IXmppStream
   virtual QObject *instance() { return this; }
+  //IXmppStream
   virtual bool isOpen() const { return FOpen; }
   virtual void open();
   virtual void close();
@@ -64,6 +64,8 @@ protected:
   void sortFeature(IStreamFeature *AFeature=0);
   bool hookFeatureData(QByteArray *AData, IStreamFeature::Direction ADirection);
   bool hookFeatureElement(QDomElement *AElem, IStreamFeature::Direction ADirection);
+  qint64 sendData(const QByteArray &AData);
+  QByteArray receiveData(qint64 ABytes);
 protected slots:
   //IStreamConnection
   void onConnectionConnected();
@@ -76,11 +78,14 @@ protected slots:
   void onParserClosed();
   void onParserError(const QString &AErrStr);
   //IStreamFeature
-  void onFeatureFinished(bool needRestart);
+  void onFeatureFinished(bool ARestart);
   void onFeatureError(const QString &AErrStr);
   void onFeatureDestroyed(QObject *AFeature);
+  //KeepAlive
+  void onKeepAliveTimeout();
 private:
   IConnection *FConnection;
+  QTimer FKeepAliveTimer;
   QList<IStreamFeature *>	FFeatures; 
 private:
   bool FOpen;

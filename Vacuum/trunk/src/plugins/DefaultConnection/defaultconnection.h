@@ -12,7 +12,6 @@ class DefaultConnection :
 {
   Q_OBJECT;
   Q_INTERFACES(IConnection IDefaultConnection);
-
 public:
   DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent);
   ~DefaultConnection();
@@ -56,13 +55,11 @@ protected slots:
   void onSocketEncrypted();
   void onSocketSSLErrors(const QList<QSslError> &AErrors);
   void onReadTimeout();
-  void onKeepAliveTimeout();
 private:
   IConnectionPlugin *FPlugin;  
 private:
   QSslSocket FSocket;
   QTimer FReadTimer;
-  QTimer FKeepAliveTimer;
 private:
   enum ProxyState {
     ProxyUnconnected,

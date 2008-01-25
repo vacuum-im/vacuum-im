@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>426</width>
-    <height>212</height>
+    <height>188</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -91,13 +91,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="chbKeepAlive" >
-     <property name="text" >
-      <string>Keep connection alive</string>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="grbProxy" >

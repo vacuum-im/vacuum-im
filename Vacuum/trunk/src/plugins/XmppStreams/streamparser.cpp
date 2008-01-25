@@ -1,8 +1,7 @@
 #include <QtDebug>
 #include "streamparser.h"
 
-StreamParser::StreamParser(QObject *parent)
-: QObject(parent)
+StreamParser::StreamParser(QObject *AParent) : QObject(AParent)
 {
   FReader.setFeature("http://xml.org/sax/features/namespaces", false);
   FReader.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
@@ -14,14 +13,14 @@ StreamParser::~StreamParser()
 
 }
 
-bool StreamParser::parceData(const QString &data)
+bool StreamParser::parceData(const QString &AData)
 {
-  FSource.setData(data); 
+  FSource.setData(AData); 
   if (!FContinue)
   { 
     FContinue = true;
     return FReader.parse(&FSource, true);
-  };
+  }
   return FReader.parseContinue();
 }
 
@@ -33,30 +32,17 @@ void StreamParser::clear()
   FSource.setData(QByteArray()); 
 }
 
-bool StreamParser::startElement(const QString &namespaceURI, 
-                                const QString &localName, 
-                                const QString &qName, 
-                                const QXmlAttributes &atts)
+bool StreamParser::startElement(const QString &/*ANamespaceURI*/, const QString &/*ALocalName*/, 
+                                const QString &AQName, const QXmlAttributes &AAttr)
 {
-  Q_UNUSED(namespaceURI);
-  Q_UNUSED(localName);
+  QString xmlns = FLevel==0 ? "xmlns:stream" : "xmlns";
+  QString nsAttr = AAttr.value(xmlns);
 
-  QString xmlns;
-  if (FLevel == 0)
-    xmlns = "xmlns:stream";
-  else
-    xmlns = "xmlns";
-  QString nsAtt = atts.value(xmlns);
+  QDomElement newElement = nsAttr.isEmpty() ? FDoc.createElement(AQName) : FDoc.createElementNS(nsAttr,AQName);
 
-  QDomElement newElement;
-  if (nsAtt.isEmpty())
-    newElement = FDoc.createElement(qName);
-  else
-    newElement = FDoc.createElementNS(nsAtt,qName);
-
-  for (int i=0; i < atts.count(); i++)
-    if (atts.qName(i) != xmlns) 
-      newElement.setAttribute(atts.qName(i), atts.value(i)); 
+  for (int i=0; i < AAttr.count(); i++)
+    if (AAttr.qName(i) != xmlns) 
+      newElement.setAttribute(AAttr.qName(i), AAttr.value(i)); 
 
   if (FLevel == 0)
   {
@@ -72,19 +58,13 @@ bool StreamParser::startElement(const QString &namespaceURI,
   else
   {
     FElement = FElement.appendChild(newElement).toElement(); 
-  }; 
+  } 
   FLevel++;
   return true;
 }
 
-bool StreamParser::endElement(const QString &namespaceURI, 
-                              const QString &localName, 
-                              const QString &qName)
+bool StreamParser::endElement(const QString &/*ANamespaceURI*/, const QString &/*ALocalName*/, const QString &/*AQName*/)
 {
-  Q_UNUSED(namespaceURI);
-  Q_UNUSED(localName);
-  Q_UNUSED(qName);
-
   FLevel--;
 
   if (FLevel < 0) 
@@ -102,19 +82,19 @@ bool StreamParser::endElement(const QString &namespaceURI,
   else 
   {
     FElement = FElement.parentNode().toElement();
-  };
+  }
 
   return true;
 }
 
-bool StreamParser::characters(const QString &ch)
+bool StreamParser::characters(const QString &AText)
 {
-  FElement.appendChild(FDoc.createTextNode(ch));   
+  FElement.appendChild(FDoc.createTextNode(AText));   
   return true;
 }
 
-bool StreamParser::fatalError(const QXmlParseException &exception)
+bool StreamParser::fatalError(const QXmlParseException &AException)
 {
-  emit error(exception.message());
+  emit error(AException.message());
   return false;
 }

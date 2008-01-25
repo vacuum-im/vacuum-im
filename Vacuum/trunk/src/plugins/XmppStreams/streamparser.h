@@ -9,31 +9,22 @@ class StreamParser :
   public QObject,
   private QXmlDefaultHandler
 {
-  Q_OBJECT
-
+  Q_OBJECT;
 public:
-  StreamParser(QObject *parent);
+  StreamParser(QObject *AParent = NULL);
   ~StreamParser();
-
-  virtual bool parceData(const QString &data);
+  virtual bool parceData(const QString &AData);
   virtual void clear();
 signals:
-  void open(const QDomElement &);
-  void element(const QDomElement &);
-  void error(const QString &);
+  void open(const QDomElement &AElement);
+  void element(const QDomElement &AElement);
+  void error(const QString &AElement);
   void closed();
 private:
-  virtual bool startElement(
-    const QString &namespaceURI,
-    const QString &localName,
-    const QString &qName,
-    const QXmlAttributes &atts);
-  virtual bool endElement(
-    const QString &namespaceURI,
-    const QString &localName,
-    const QString &qName);
-  virtual bool characters(const QString &ch);
-  virtual bool fatalError(const QXmlParseException &exception);
+  virtual bool startElement(const QString &ANamespaceURI, const QString &ALocalName,const QString &AQName, const QXmlAttributes &AAttr);
+  virtual bool endElement(const QString &ANamespaceURI, const QString &ALocalName, const QString &AQName);
+  virtual bool characters(const QString &AText);
+  virtual bool fatalError(const QXmlParseException &AException);
 private:
   bool FContinue;
   int FLevel;

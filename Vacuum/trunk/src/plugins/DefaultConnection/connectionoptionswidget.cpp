@@ -52,16 +52,6 @@ void ConnectionOptionsWidget::setIgnoreSSLError(bool AIgnore)
   ui.chbIgnoreSSLWarnings->setCheckState(AIgnore ? Qt::Checked : Qt::Unchecked);
 }
 
-bool ConnectionOptionsWidget::keepAlive() const
-{
-  return ui.chbKeepAlive->isChecked();
-}
-
-void ConnectionOptionsWidget::setKeepAlive(bool AKeepAlive)
-{
-  ui.chbKeepAlive->setCheckState(AKeepAlive ? Qt::Checked : Qt::Unchecked);
-}
-
 int ConnectionOptionsWidget::proxyType() const
 {
   return ui.cmbProxyType->itemData(ui.cmbProxyType->currentIndex()).toInt();

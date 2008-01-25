@@ -18,13 +18,10 @@ class DefaultConnectionPlugin :
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IConnectionPlugin IDefaultConnectionPlugin);
-
 public:
   DefaultConnectionPlugin();
   ~DefaultConnectionPlugin();
-
   virtual QObject *instance() { return this; }
-
   //IPlugin
   virtual QUuid pluginUuid() const { return DEFAULTCONNECTION_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
@@ -32,7 +29,6 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-
   //IConnectionPlugin
   virtual QString displayName() const;
   virtual IConnection *newConnection(const QString &ASettingsNS, QObject *AParent);
@@ -42,7 +38,6 @@ public:
   virtual void deleteSettingsNS(const QString &ASettingsNS);
   virtual QWidget *optionsWidget(const QString &ASettingsNS);
   virtual void saveOptions(const QString &ASettingsNS);
-
   //IDefaultConnectionPlugin
   virtual QStringList proxyTypeNames() const;
 signals:

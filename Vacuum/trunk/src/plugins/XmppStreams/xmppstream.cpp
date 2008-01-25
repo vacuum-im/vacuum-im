@@ -2,12 +2,10 @@
 #include "xmppstream.h"
 
 #include <QInputDialog>
-#include "../../definations/namespaces.h"
-#include "../../utils/errorhandler.h"
 
-XmppStream::XmppStream(const Jid &AJid, QObject *parent)
-  : QObject(parent), 
-    FParser(this)
+#define KEEP_ALIVE_TIMEOUT          30000
+
+XmppStream::XmppStream(const Jid &AJid, QObject *AParent) : QObject(AParent), FParser(this)
 {
   FOpen = false;
   FJid = AJid;
@@ -19,6 +17,9 @@ XmppStream::XmppStream(const Jid &AJid, QObject *parent)
   connect(&FParser,SIGNAL(element(const QDomElement &)), SLOT(onParserElement(const QDomElement &)));
   connect(&FParser,SIGNAL(error(const QString &)), SLOT(onParserError(const QString &)));
   connect(&FParser,SIGNAL(closed()), SLOT(onParserClosed()));
+
+  FKeepAliveTimer.setSingleShot(false);
+  connect(&FKeepAliveTimer,SIGNAL(timeout()),SLOT(onKeepAliveTimeout()));
 }
 
 XmppStream::~XmppStream()
@@ -98,10 +99,9 @@ qint64 XmppStream::sendStanza(const Stanza &AStanza)
     Stanza stanza(AStanza);
     if (!hookFeatureElement(&stanza.element(),IStreamFeature::DirectionOut))
     {
-      qDebug() << "\nStanza out" << FJid.full()<< ":\n" << stanza.toString(); 
-      QByteArray data = stanza.toByteArray();
-      if (!hookFeatureData(&data,IStreamFeature::DirectionOut))
-        return FConnection->write(data);
+      qDebug() << "\nStanza out" << FJid.full();
+      qDebug() << stanza.toString(2); 
+      return sendData(stanza.toByteArray());
     }
   }
   return 0;
@@ -302,6 +302,23 @@ bool XmppStream::hookFeatureElement(QDomElement *AElem, IStreamFeature::Directio
   return false;
 }
 
+qint64 XmppStream::sendData(const QByteArray &AData)
+{
+  QByteArray data = AData;
+  if (!hookFeatureData(&data,IStreamFeature::DirectionOut))
+  {
+    FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
+    return FConnection->write(data);
+  }
+  return 0;
+}
+
+QByteArray XmppStream::receiveData(qint64 ABytes)
+{
+  FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
+  return FConnection->read(ABytes);
+}
+
 void XmppStream::onConnectionConnected() 
 {
   sortFeature();
@@ -310,10 +327,10 @@ void XmppStream::onConnectionConnected()
 
 void XmppStream::onConnectionReadyRead(qint64 ABytes)
 {
-  QByteArray data = FConnection->read(ABytes);
+  QByteArray data = receiveData(ABytes);
   if (!hookFeatureData(&data,IStreamFeature::DirectionIn))
     if (!data.isEmpty())
-      FParser.parceData(QString::fromUtf8(data.data()));
+      FParser.parceData(QString::fromUtf8(data.data(),data.size()));
 }
 
 void XmppStream::onConnectionDisconnected()
@@ -321,6 +338,7 @@ void XmppStream::onConnectionDisconnected()
   FOpen = false;
   emit closed(this);
   FStreamState = SS_OFFLINE;
+  FKeepAliveTimer.stop();
 
   if (FOfflineJid.isValid())
   {
@@ -344,17 +362,18 @@ void XmppStream::onParserOpen(const QDomElement &AElem)
     FStreamId = AElem.attribute("id");
     FStreamState = SS_FEATURES;
     if (VersionParser(AElem.attribute("version","0.0")) < VersionParser(1,0))
-    {
-      if (!startFeature("auth","http://jabber.org/features/iq-auth"))
+      if (!startFeature("auth",NS_FEATURE_IQAUTH))
         close();
-    }
-  } else close();
+  } 
+  else 
+    close();
 }
 
 void XmppStream::onParserElement(const QDomElement &AElem)
 {
-  qDebug() << "\nStanza in" << FJid.full() << ":\n" << AElem.ownerDocument().toString();   
-  
+  qDebug() << "\nStanza in" << FJid.full();
+  qDebug() << AElem.ownerDocument().toString(2);   
+
   QDomElement elem(AElem);
   if (!hookFeatureElement(&elem,IStreamFeature::DirectionIn))
   {
@@ -362,7 +381,6 @@ void XmppStream::onParserElement(const QDomElement &AElem)
     {
       ErrorHandler err(AElem,NS_XMPP_STREAMS);
       emit error(this, err.message());
-
       FConnection->disconnect();
     } 
     else if (FStreamState == SS_FEATURES && AElem.tagName() == "stream:features")
@@ -370,7 +388,7 @@ void XmppStream::onParserElement(const QDomElement &AElem)
       if (!processFeatures(AElem))
       {
         FStreamState = SS_ONLINE;
-        FOpen = false;
+        FOpen = true;
         emit opened(this);
       }
     } 
@@ -394,9 +412,9 @@ void XmppStream::onParserClosed()
   FConnection->disconnect(); 
 }
 
-void XmppStream::onFeatureFinished(bool needRestart) 
+void XmppStream::onFeatureFinished(bool ARestart) 
 {
-  if (!needRestart)
+  if (!ARestart)
   {
     if (!processFeatures())
     {
@@ -422,5 +440,10 @@ void XmppStream::onFeatureDestroyed(QObject *AFeature)
 {
   IStreamFeature *feature = qobject_cast<IStreamFeature *>(AFeature);
   removeFeature(feature);
+}
+
+void XmppStream::onKeepAliveTimeout()
+{
+  sendData(" ");
 }
 
