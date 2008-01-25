@@ -69,13 +69,11 @@ public:
 
   bool isValid() const;
   bool canReplyError() const;
-  Stanza replyError(const QString &ACondition, 
-    const QString &ANamespace = EHN_DEFAULT,
-    int ACode = ErrorHandler::UNKNOWNCODE, 
-    const QString &AText = "") const;
+  Stanza replyError(const QString &ACondition, const QString &ANamespace = EHN_DEFAULT,
+    int ACode = ErrorHandler::SERVICE_UNAVAILABLE, const QString &AText = "") const;
 
-  QString toString() const { return d->FDoc.toString(); }
-  QByteArray toByteArray() const { return d->FDoc.toByteArray(); }
+  QString toString(int AIndent = 1) const { return d->FDoc.toString(AIndent); }
+  QByteArray toByteArray() const;
 private:
   QSharedDataPointer<StanzaData> d;  
 };

@@ -106,3 +106,10 @@ Stanza Stanza::replyError(const QString &ACondition,
 
   return reply;
 }
+
+QByteArray Stanza::toByteArray() const
+{
+  static QByteArray befour = QString(">\n").toUtf8();
+  static QByteArray after = QString(">").toUtf8();
+  return d->FDoc.toByteArray(0).replace(befour,after);
+}
