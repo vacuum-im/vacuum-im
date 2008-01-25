@@ -56,7 +56,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMessenger *AMessenger, IMultiUserChat 
   action->setText(tr("Exit"));
   action->setToolTip(tr("Exit groupchat"));
   connect(action,SIGNAL(triggered(bool)),SLOT(onExitMultiUserChat(bool)));
-  FToolBarWidget->toolBarChanger()->addToolButton(action,Qt::ToolButtonTextBesideIcon,QToolButton::InstantPopup,AG_MAINWINDOW_MMENU_QUIT);
+  FToolBarWidget->toolBarChanger()->addToolButton(action,AG_MAINWINDOW_MMENU_QUIT,false);
 
   connect(FMultiChat->instance(),SIGNAL(chatOpened()),SLOT(onChatOpened()));
   connect(FMultiChat->instance(),SIGNAL(userPresence(IMultiUser *,int,const QString &)),

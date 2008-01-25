@@ -79,7 +79,8 @@ void MainWindow::createMenus()
   FMainMenu = new Menu(this);
   FMainMenu->setTitle(tr("Menu"));
   FMainMenu->setIcon(SYSTEM_ICONSETFILE,IN_JABBER);
-  FBottomToolBarChanger->addToolButton(FMainMenu->menuAction(),Qt::ToolButtonIconOnly,QToolButton::InstantPopup);
+  QToolButton *button = FBottomToolBarChanger->addToolButton(FMainMenu->menuAction(),AG_DEFAULT,false);
+  button->setPopupMode(QToolButton::InstantPopup);
 }
 
 void MainWindow::onStackedWidgetRemoved(int /*AIndex*/)

@@ -50,13 +50,10 @@ void ToolBarChanger::addAction(Action *AAction, int AGroup, bool ASort)
   FToolBarMenu->addAction(AAction,AGroup,ASort);
 }
 
-QToolButton *ToolBarChanger::addToolButton(Action *AAction, Qt::ToolButtonStyle AStyle, QToolButton::ToolButtonPopupMode AMode, 
-                                           int AGroup , bool ASort)
+QToolButton *ToolBarChanger::addToolButton(Action *AAction, int AGroup , bool ASort)
 {
   QToolButton *button = new QToolButton;
   button->setDefaultAction(AAction);
-  button->setPopupMode(AMode);
-  button->setToolButtonStyle(AStyle);
   FActionButtons.insert(AAction,button);
   FToolBarMenu->addAction(AAction,AGroup,ASort);
   return button;

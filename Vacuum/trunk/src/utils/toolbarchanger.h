@@ -21,7 +21,7 @@ public:
   void setManageVisibility(bool AManageVisibility);
   QToolBar *toolBar() const { return FToolBar; }
   void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
-  QToolButton *addToolButton(Action *AAction, Qt::ToolButtonStyle AStyle, QToolButton::ToolButtonPopupMode AMode, int AGroup = AG_DEFAULT, bool ASort = false);
+  QToolButton *addToolButton(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
   QAction *addWidget(QWidget *AWidget,  int AGroup = AG_DEFAULT);
   int actionGroup(const Action *AAction) const;
   QList<Action *> actions(int AGroup = AG_NULL) const;

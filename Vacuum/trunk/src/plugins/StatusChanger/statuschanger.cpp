@@ -167,8 +167,10 @@ bool StatusChanger::initObjects()
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->bottomToolBarChanger();
-    QToolButton *toolButton = changer->addToolButton(FMainMenu->menuAction(),Qt::ToolButtonTextBesideIcon,QToolButton::InstantPopup);
-    toolButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    QToolButton *button = changer->addToolButton(FMainMenu->menuAction(),AG_DEFAULT,false);
+    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    button->setPopupMode(QToolButton::InstantPopup);
+    button->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
   }
 
   if (FRostersViewPlugin)
