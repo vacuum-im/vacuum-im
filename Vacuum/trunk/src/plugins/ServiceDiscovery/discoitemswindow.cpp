@@ -3,20 +3,20 @@
 #include <QHeaderView>
 #include <QLineEdit>
 
-#define CNAME                 0
-#define CJID                  1
-#define CNODE                 2
+#define CNAME                   0
+#define CJID                    1
+#define CNODE                   2
 
-#define MAX_ITEMS             20
+#define MAX_ITEMS_FOR_REQUEST   20
 
-#define IN_ARROW_LEFT         "psi/arrowLeft"
-#define IN_ARROW_RIGHT        "psi/arrowRight"
-#define IN_DISCOVER           "psi/jabber"
-#define IN_RELOAD             "psi/reload"
-#define IN_DISCO              "psi/disco"
-#define IN_ADDCONTACT         "psi/addContact"
-#define IN_VCARD              "psi/vCard"
-#define IN_INFO               "psi/statusmsg"
+#define IN_ARROW_LEFT           "psi/arrowLeft"
+#define IN_ARROW_RIGHT          "psi/arrowRight"
+#define IN_DISCOVER             "psi/jabber"
+#define IN_RELOAD               "psi/reload"
+#define IN_DISCO                "psi/disco"
+#define IN_ADDCONTACT           "psi/addContact"
+#define IN_VCARD                "psi/vCard"
+#define IN_INFO                 "psi/statusmsg"
 
 DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QWidget *AParent) : QMainWindow(AParent)
 {
@@ -183,15 +183,21 @@ void DiscoItemsWindow::updateDiscoInfo(const IDiscoInfo &ADiscoInfo)
     QString toolTip; 
     if (ADiscoInfo.error.code < 0)
     {
-      toolTip+=tr("<b>Identity:</b>");
-      foreach(IDiscoIdentity identity, ADiscoInfo.identity)
-        toolTip+=tr("<li>%1 (Category: '%2'; Type: '%3')</li>").arg(identity.name).arg(identity.category).arg(identity.type);
-
-      toolTip+=tr("<br><b>Features:</b>");
-      foreach(QString feature, ADiscoInfo.features)
+      if (!ADiscoInfo.identity.isEmpty())
       {
-        IDiscoFeature dfeature = FDiscovery->discoFeature(feature);
-        toolTip+=QString("<li>%1</li>").arg(dfeature.name.isEmpty() ? feature : dfeature.name);
+        toolTip+=tr("<li><b>Identity:</b></li>");
+        foreach(IDiscoIdentity identity, ADiscoInfo.identity)
+          toolTip+=tr("<li>%1 (Category: '%2'; Type: '%3')</li>").arg(identity.name).arg(identity.category).arg(identity.type);
+      }
+      
+      if (!ADiscoInfo.features.isEmpty())
+      {
+        toolTip+=tr("<li><b>Features:</b></li>");
+        foreach(QString feature, ADiscoInfo.features)
+        {
+          IDiscoFeature dfeature = FDiscovery->discoFeature(feature);
+          toolTip+=QString("<li>%1</li>").arg(dfeature.name.isEmpty() ? feature : dfeature.name);
+        }
       }
     }
     else
@@ -222,7 +228,7 @@ void DiscoItemsWindow::updateDiscoItems(const IDiscoItems &ADiscoItems)
         curItem = createTreeItem(ditem,treeItem);
         if (FDiscovery->hasDiscoInfo(ditem.itemJid,ditem.node))
           updateDiscoInfo(FDiscovery->discoInfo(ditem.itemJid,ditem.node));
-        else if (ADiscoItems.items.count() <= MAX_ITEMS)
+        else if (ADiscoItems.items.count() <= MAX_ITEMS_FOR_REQUEST)
           requestDiscoInfo(ditem.itemJid,ditem.node);
         else
           curItem->setIcon(CNAME,FDiscovery->discoItemIcon(ditem));
@@ -346,7 +352,8 @@ void DiscoItemsWindow::updateActionsBar()
         }
         if (!curActions.contains(action))
         {
-          FActionsBarChanger->addAction(action,AG_DIWT_SERVICEDISCOVERY_FEATURE_ACTIONS,true);
+          QToolButton *button = FActionsBarChanger->addToolButton(action,AG_DIWT_SERVICEDISCOVERY_FEATURE_ACTIONS,true);
+          button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
           emit featureActionInserted(feature,action);
         }
         else
@@ -465,6 +472,18 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
       QString itemNode = treeItem->data(0,DDR_NODE).toString();
       requestDiscoInfo(itemJid,itemNode);
       requestDiscoItems(itemJid,itemNode);
+      IDiscoItems ditems = FDiscovery->discoItems(itemJid,itemNode);
+      foreach(IDiscoItem ditem,ditems.items)
+      {
+        IDiscoInfo ditemInfo = FDiscovery->discoInfo(ditem.itemJid,ditem.node);
+        if (ditemInfo.error.code > 0)
+        {
+          if (ditems.items.count() <= MAX_ITEMS_FOR_REQUEST)
+            requestDiscoInfo(ditem.itemJid,ditem.node);
+          else
+            FDiscovery->removeDiscoInfo(ditem.itemJid,ditem.node);
+        }
+      }
     }
   }
   else if (action == FDiscoInfo)

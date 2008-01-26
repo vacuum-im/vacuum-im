@@ -1,5 +1,7 @@
 #include "discoinfowindow.h"
 
+#include <QHeaderView>
+
 #define IN_INFO               "psi/statusmsg"
 
 DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, const Jid &AContactJid,
@@ -30,6 +32,7 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
     updateWindow();
   else
     updateDiscoInfo();
+
 }
 
 DiscoInfoWindow::~DiscoInfoWindow()
@@ -57,9 +60,15 @@ void DiscoInfoWindow::updateWindow()
   {
     IDiscoFeature dfeature = FDiscovery->discoFeature(featureVar);
     dfeature.var = featureVar;
-    QListWidgetItem *listItem = new QListWidgetItem(ui.lwtFearures);
+    QListWidgetItem *listItem = new QListWidgetItem;
     listItem->setIcon(dfeature.icon);
     listItem->setText(dfeature.name.isEmpty() ? dfeature.var : dfeature.name);
+    if (FDiscovery->hasFeatureHandler(featureVar))
+    {
+      QFont font = ui.lwtFearures->font();
+      font.setBold(true);
+      listItem->setData(Qt::FontRole,font);
+    }
     listItem->setData(Qt::UserRole,dfeature.var);
     listItem->setData(Qt::UserRole+1,dfeature.description);
     ui.lwtFearures->addItem(listItem);
@@ -82,6 +91,10 @@ void DiscoInfoWindow::updateWindow()
     ui.lblError->setVisible(false);
   }
  
+  ui.twtIdentity->horizontalHeader()->setResizeMode(0,QHeaderView::ResizeToContents);
+  ui.twtIdentity->horizontalHeader()->setResizeMode(1,QHeaderView::ResizeToContents);
+  ui.twtIdentity->horizontalHeader()->setResizeMode(2,QHeaderView::Stretch);
+
   ui.pbtUpdate->setEnabled(true);
 }
 

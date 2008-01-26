@@ -4,11 +4,14 @@
 #include <QPair>
 #include <QSet>
 #include <QHash>
+#include <QTimer>
+#include <QMultiMap>
 #include "../../definations/namespaces.h"
 #include "../../definations/initorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterdataholderorders.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/rosterclickhookerorders.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/tooltiporders.h"
 #include "../../interfaces/ipluginmanager.h"
@@ -33,10 +36,11 @@ class ServiceDiscovery :
   public IStanzaHandler,
   public IIqStanzaOwner,
   public IDiscoHandler,
-  public IRosterIndexDataHolder
+  public IRosterIndexDataHolder,
+  public IRostersClickHooker
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IIqStanzaOwner IDiscoHandler IRosterIndexDataHolder);
+  Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IIqStanzaOwner IDiscoHandler IRosterIndexDataHolder IRostersClickHooker);
 public:
   ServiceDiscovery();
   ~ServiceDiscovery();
@@ -63,11 +67,14 @@ public:
   virtual QList<int> types() const;
   virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
   virtual bool setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/) { return false; }
+  //IRostersClickHooker
+  virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder);
   //IServiceDiscovery
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
   virtual IDiscoInfo selfDiscoInfo() const;
   virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
+  virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
   virtual QIcon discoInfoIcon(const IDiscoInfo &ADiscoInfo) const;
   virtual QIcon discoItemIcon(const IDiscoItem &ADiscoItem) const;
     //DiscoHandler
@@ -117,13 +124,19 @@ signals:
   //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
+  struct QueuedRequest {
+    Jid streamJid;
+    Jid contactJid;
+    QString node;
+  };
   IDiscoInfo parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   IDiscoItems parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   void registerFeatures();
+  void appendQueuedRequest(const QDateTime &ATimeStart, const QueuedRequest &ARequest);
 protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);
-  void onStreamOpened(IXmppStream *AXmppStream);
-  void onStreamClosed(IXmppStream *AXmppStream);
+  void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
+  void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
@@ -133,6 +146,7 @@ protected slots:
   void onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo);
   void onDiscoInfoWindowDestroyed(QObject *AObject);
   void onDiscoItemsWindowDestroyed(QObject *AObject);
+  void onQueueTimerTimeout();
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -148,6 +162,8 @@ private:
 private:
   Menu *FDiscoMenu;
 private:
+  QTimer FQueueTimer;
+  QMultiMap<QDateTime,QueuedRequest> FQueuedRequests;
   QList<IDiscoHandler *> FDiscoHandlers;
   QHash<QString, QMultiMap<int, IDiscoFeatureHandler *> > FFeatureHandlers;
   QHash<IXmppStream *,int> FInfoStanzaHandlerIds;
