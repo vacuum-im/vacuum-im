@@ -129,10 +129,22 @@ protected:
     Jid contactJid;
     QString node;
   };
+  struct EntityCapabilities
+  {
+    Jid contactJid;
+    QString node;
+    QString ver;
+    QString hash;
+    QString ext;
+  };
   IDiscoInfo parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   IDiscoItems parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   void registerFeatures();
   void appendQueuedRequest(const QDateTime &ATimeStart, const QueuedRequest &ARequest);
+  bool hasEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
+  QString capsFileName(const QString &ANode, const QString &AVer, const QString &AHash) const;
+  IDiscoInfo loadEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
+  bool saveEntityCaps(const IDiscoInfo &AInfo, const EntityCapabilities &ACaps) const;
 protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
@@ -168,11 +180,14 @@ private:
   QHash<QString, QMultiMap<int, IDiscoFeatureHandler *> > FFeatureHandlers;
   QHash<IXmppStream *,int> FInfoStanzaHandlerIds;
   QHash<IXmppStream *,int> FItemsStanzaHandlerIds;
+  QHash<IXmppStream *,int> FCapsStanzaHandlerInIds;
+  QHash<IXmppStream *,int> FCapsStanzaHandlerOutIds;
   QHash<QString, QPair<Jid,QString> > FInfoRequestsId;
   QHash<QString, QPair<Jid,QString> > FItemsRequestsId;
   QHash<QString, IDiscoPublish> FPublishRequestsId;
   QHash<Jid,QHash<QString,IDiscoInfo> > FDiscoInfo;
   QHash<Jid,QHash<QString,IDiscoItems> > FDiscoItems;
+  QHash<Jid, EntityCapabilities> FEntityCaps;
   QHash<QString,IDiscoFeature> FDiscoFeatures;
   QHash<Jid, DiscoInfoWindow *> FDiscoInfoWindows;
   QList<DiscoItemsWindow *> FDiscoItemsWindows;
