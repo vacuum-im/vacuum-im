@@ -53,7 +53,7 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
-  virtual bool editStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza * /*AStanza*/, bool &/*AAccept*/)  { return false; }
+  virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza * AStanza, bool &AAccept);
   virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IIqStanzaOwner
   virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
@@ -145,6 +145,7 @@ protected:
   QString capsFileName(const QString &ANode, const QString &AVer, const QString &AHash) const;
   IDiscoInfo loadEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
   bool saveEntityCaps(const IDiscoInfo &AInfo, const EntityCapabilities &ACaps) const;
+  QByteArray calcCapsHash(const IDiscoInfo &AInfo) const;
 protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
@@ -175,6 +176,7 @@ private:
   Menu *FDiscoMenu;
 private:
   QTimer FQueueTimer;
+  QString FCapsHash;
   QMultiMap<QDateTime,QueuedRequest> FQueuedRequests;
   QList<IDiscoHandler *> FDiscoHandlers;
   QHash<QString, QMultiMap<int, IDiscoFeatureHandler *> > FFeatureHandlers;

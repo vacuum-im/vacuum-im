@@ -1,5 +1,6 @@
 #include "servicediscovery.h"
 
+#include <QDebug>
 #include <QFile>
 #include <QCryptographicHash>
 
@@ -156,6 +157,20 @@ bool ServiceDiscovery::initObjects()
 
   FDiscoMenu->setEnabled(false);
   return true;
+}
+
+bool ServiceDiscovery::editStanza(int AHandlerId, const Jid &/*AStreamJid*/, Stanza * AStanza, bool &/*AAccept*/)
+{
+  if (FCapsStanzaHandlerOutIds.values().contains(AHandlerId))
+  {
+    if (FCapsHash.isEmpty())
+      FCapsHash = calcCapsHash(selfDiscoInfo()).toBase64();
+    QDomElement capsElem = AStanza->addElement("c",NS_CAPS);
+    capsElem.setAttribute("node","http://vacuum/#0.0.0");
+    capsElem.setAttribute("ver",FCapsHash);
+    capsElem.setAttribute("hash","sha-1");
+  }
+  return false;
 }
 
 bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
@@ -516,6 +531,7 @@ void ServiceDiscovery::insertDiscoFeature(const IDiscoFeature &AFeature)
   removeDiscoFeature(AFeature.var);
   if (!AFeature.var.isEmpty())
   {
+    FCapsHash.clear();
     FDiscoFeatures.insert(AFeature.var,AFeature);
     emit discoFeatureInserted(AFeature);
   }
@@ -535,6 +551,7 @@ void ServiceDiscovery::removeDiscoFeature(const QString &AFeatureVar)
 {
   if (FDiscoFeatures.contains(AFeatureVar))
   {
+    FCapsHash.clear();
     IDiscoFeature dfeature = FDiscoFeatures.take(AFeatureVar);
     emit discoFeatureRemoved(dfeature);
   }
@@ -820,7 +837,7 @@ void ServiceDiscovery::appendQueuedRequest(const QDateTime &ATimeStart, const Qu
 
 bool ServiceDiscovery::hasEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const
 {
-  QString fileName = capsFileName(AVer,AHash,ANode);
+  QString fileName = capsFileName(ANode,AVer,AHash);
   return QFile::exists(fileName);
 }
 
@@ -912,6 +929,21 @@ bool ServiceDiscovery::saveEntityCaps(const IDiscoInfo &AInfo, const EntityCapab
     }
   }
   return false;
+}
+
+QByteArray ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo) const
+{
+  QStringList hashList;
+  QStringList sortList;
+  foreach(IDiscoIdentity identity, AInfo.identity)
+    sortList.append(identity.category+"/"+identity.type);
+  qSort(sortList);
+  hashList += sortList;
+  sortList = AInfo.features;
+  qSort(sortList);
+  hashList += sortList;
+  hashList.append("");
+  return QCryptographicHash::hash(hashList.join("<").toUtf8(),QCryptographicHash::Sha1);
 }
 
 void ServiceDiscovery::onStreamAdded(IXmppStream *AXmppStream)
