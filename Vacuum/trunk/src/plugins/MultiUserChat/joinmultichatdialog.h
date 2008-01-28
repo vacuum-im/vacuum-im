@@ -20,8 +20,11 @@ protected:
   void initialize();
 protected slots:
   void onDialogAccepted();
+  void onStreamIndexChanged(int AIndex);
   void onResentIndexChanged(int AIndex);
   void onRecentDeleteClicked();
+  void onResolveNickClicked();
+  void onRoomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
   void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);

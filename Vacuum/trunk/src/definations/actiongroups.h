@@ -49,6 +49,7 @@
 #define AG_ROSTERCHANGER_MUCM                                   AG_DEFAULT
 #define AG_CLIENTINFO_MUCM                                      AG_DEFAULT
 #define AG_VCARD_MUCM                                           AG_DEFAULT
+#define AG_MULTIUSERCHAT_ROOM_UTILS                             800
 
 //DiscoItemsWindow (ToolBar)
 #define AG_DIWT_SERVICEDISCOVERY_NAVIGATE                       100

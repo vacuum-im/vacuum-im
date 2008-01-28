@@ -1,8 +1,10 @@
 #ifndef MULTIUSERCHATWINDOW_H
 #define MULTIUSERCHATWINDOW_H
 
+#include "../../definations/messagedataroles.h"
 #include "../../definations/messagehandlerorders.h"
 #include "../../definations/multiuserdataroles.h"
+#include "../../definations/namespaces.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/irostersview.h"
@@ -11,6 +13,7 @@
 #include "../../interfaces/iaccountmanager.h"
 #include "../../utils/skin.h"
 #include "../../utils/menu.h"
+#include "edituserslistdialog.h"
 #include "ui_multiuserchatwindow.h"
 
 class MultiUserChatWindow : 
@@ -56,8 +59,13 @@ signals:
   virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 protected:
   void initialize();
+  void createMenuBarActions();
+  void updateMenuBarActions();
+  void createRoomUtilsActions();
+  void insertRoomUtilsActions(Menu *AMenu,IMultiUser *AUser);
   void saveWindowState();
   void loadWindowState();
+  bool showStatusCodes(const QString &ANick, const QList<int> &ACodes);
   void showServiceMessage(const QString &AMessage);
   void setViewColorForUser(IMultiUser *AUser);
   void setRoleColorForUser(IMultiUser *AUser);
@@ -78,32 +86,50 @@ protected:
   virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
   void onChatOpened();
+  void onChatNotify(const QString &ANick, const QString &ANotify);
+  void onChatError(const QString &ANick, const QString &AError);
+  void onChatClosed();
+  void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
+  //Occupant
   void onUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
   void onUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefour, const QVariant &AAfter);
   void onUserNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
   void onPresenceChanged(int AShow, const QString &AStatus);
   void onTopicChanged(const QString &ATopic);
+  void onServiceMessageReceived(const Message &AMessage);
   void onMessageReceived(const QString &ANick, const Message &AMessage);
-  void onChatError(const QString &ANick, const QString &AError);
-  void onChatClosed();
+  //Moderator
+  void onUserKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
+  //Administrator
+  void onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser);
+  void onAffiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList);
+  //Owner
+  void onConfigFormReceived(const QDomElement &AForm);
 protected slots:
   void onMessageSend();
+  void onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook);
   void onWindowActivated();
   void onChatMessageSend();
   void onChatWindowActivated();
   void onChatWindowClosed();
   void onChatWindowDestroyed();
 protected slots:
+  void onNickMenuActionTriggered(bool);
+  void onMenuBarActionTriggered(bool);
+  void onRoomUtilsActionTriggered(bool);
+  void onDataFormMessageDialogAccepted();
+  void onAffiliationListDialogAccepted();
+  void onConfigFormDialogAccepted();
+protected slots:
   void onListItemActivated(QListWidgetItem *AItem);
   void onDefaultChatFontChanged(const QFont &AFont);
   void onStatusIconsChanged();
   void onAccountChanged(const QString &AName, const QVariant &AValue);  
-  void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
-  void onExitMultiUserChat(bool);
 private:
   Ui::MultiUserChatWindowClass ui;
 private:
   IMessenger *FMessenger;
+  IDataForms *FDataForms;
   ISettings *FSettings;
   IStatusIcons *FStatusIcons;
   IMultiUserChat *FMultiChat;
@@ -111,6 +137,31 @@ private:
   IViewWidget *FViewWidget;
   IEditWidget *FEditWidget;
   IToolBarWidget *FToolBarWidget;
+private:
+  Menu *FRoomMenu;
+    Action *FChangeNick;
+    Action *FChangeSubject;
+    Action *FClearChat;
+    Action *FQuitRoom;
+  Menu *FToolsMenu;
+    Action *FRequestVoice;
+    Action *FConfigRoom;
+    Action *FBanList;
+    Action *FMembersList;
+    Action *FAdminsList;
+    Action *FOwnersList;
+  Menu *FRoomUtilsMenu;
+    Action *FSetRoleNode;
+    Action *FSetAffilOutcast;
+    Menu *FChangeRole;
+      Action *FSetRoleVisitor;
+      Action *FSetRoleParticipant;
+      Action *FSetRoleModerator;
+    Menu *FChangeAffiliation;
+      Action *FSetAffilNone;
+      Action *FSetAffilMember;
+      Action *FSetAffilAdmin;
+      Action *FSetAffilOwner;
 private:
   bool FSplitterLoaded;
   bool FExitOnChatClosed;
@@ -120,6 +171,7 @@ private:
   QHash<IMultiUser *, QListWidgetItem *> FUsers;
   QList<QColor> FColorQueue;
   QHash<QString,QString> FColorLastOwner;
+  QHash<int, IDataDialog *> FDataFormMessages;
 };
 
 #endif // MULTIUSERCHATWINDOW_H

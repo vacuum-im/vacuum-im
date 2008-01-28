@@ -40,6 +40,7 @@ public:
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem);
   //IMultiUserChatPlugin
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
+  virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);
   virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, 
     const QString &APassword, bool ADedicated = false);
   virtual QList<IMultiUserChat *> multiUserChats() const { return FChats; }
@@ -50,6 +51,7 @@ public:
   virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const;
   virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
 signals:
+  virtual void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
   virtual void multiUserChatCreated(IMultiUserChat *AMultiChat);
   virtual void multiUserChatDestroyed(IMultiUserChat *AMultiChat);
   virtual void multiChatWindowCreated(IMultiUserChatWindow *AWindow);
@@ -67,6 +69,7 @@ protected slots:
   void onJoinActionTriggered(bool);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onChatActionTriggered(bool);
+  void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
 private:
   IPluginManager *FPluginManager;
   IMessenger *FMessenger;

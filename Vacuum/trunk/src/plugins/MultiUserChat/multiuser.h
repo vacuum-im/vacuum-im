@@ -17,6 +17,8 @@ public:
   virtual Jid roomJid() const { return FRoomJid; }
   virtual Jid contactJid() const { return FContactJid; }
   virtual QString nickName() const { return FNickName; }
+  virtual QString role() const { return data(MUDR_ROLE).toString(); }
+  virtual QString affiliation() const { return data(MUDR_AFFILIATION).toString(); }
   virtual QVariant data(int ARole) const;
   virtual void setData(int ARole, const QVariant &AValue);
 public:

@@ -7,6 +7,8 @@
 #define ADR_NICK              Action::DR_Parametr3
 #define ADR_PASSWORD          Action::DR_Parametr4
 
+#define MUC_NODE_ROOM_NICK    "x-roomuser-item"
+
 MultiUserChatPlugin::MultiUserChatPlugin()
 {
   FPluginManager = NULL;
@@ -81,6 +83,11 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+    if (FDiscovery)
+    {
+      connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),
+        SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+    }
   }
 
   return FMessenger!=NULL;
@@ -126,11 +133,18 @@ bool MultiUserChatPlugin::execDiscoFeature(const Jid &AStreamJid, const QString 
   {
     IMultiUserChatWindow *chatWindow = multiChatWindow(AStreamJid,ADiscoItem.itemJid);
     if (!chatWindow)
-      showJoinMultiChatDialog(AStreamJid,ADiscoItem.itemJid,AStreamJid.node(),"");
+      showJoinMultiChatDialog(AStreamJid,ADiscoItem.itemJid,"","");
     else
       chatWindow->showWindow();
     return true;
   }
+  return false;
+}
+
+bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid)
+{
+  if (FDiscovery)
+    return FDiscovery->requestDiscoInfo(AStreamJid,ARoomJid.bare(),MUC_NODE_ROOM_NICK);
   return false;
 }
 
@@ -207,7 +221,7 @@ void MultiUserChatPlugin::registerDiscoFeatures()
   IDiscoFeature dfeature;
   QIcon icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_GROUPCHAT);
 
-  dfeature.active = false;
+  dfeature.active = true;
   dfeature.icon = icon;
   dfeature.var = NS_MUC;
   dfeature.name = tr("Multi-user text conferencing");
@@ -286,6 +300,18 @@ void MultiUserChatPlugin::onChatActionTriggered(bool)
   IMultiUserChatWindow *window = FChatActions.key(action,NULL);
   if (window)
     window->showWindow();
+}
+
+void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
+{
+  if (ADiscoInfo.node == MUC_NODE_ROOM_NICK)
+  {
+    QString nick;
+    for (int i=0; i<ADiscoInfo.identity.count() && nick.isEmpty(); i++)
+      if (ADiscoInfo.identity.at(i).category=="conference" && ADiscoInfo.identity.at(i).type=="text")
+        nick = ADiscoInfo.identity.at(i).name;
+    emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,nick);
+  }
 }
 
 Q_EXPORT_PLUGIN2(MultiUserChatPlugin, MultiUserChatPlugin)
