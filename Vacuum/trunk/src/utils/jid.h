@@ -4,6 +4,7 @@
 #include <QList>
 #include <QHash>
 #include <QString>
+#include <QMetaType>
 #include <QSharedData>
 #include <QTextDocument>
 #include "utilsexport.h"
@@ -99,5 +100,8 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+Q_DECLARE_METATYPE(Jid);
+#define JID_METATYPE_ID qMetaTypeId<Jid>()
 
 #endif // JID_H

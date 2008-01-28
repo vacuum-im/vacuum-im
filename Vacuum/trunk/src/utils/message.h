@@ -111,4 +111,7 @@ private:
   QSharedDataPointer<MessageData> d;  
 };
 
+Q_DECLARE_METATYPE(Message);
+#define MESSAGE_METATYPE_ID qMetaTypeId<Message>()
+
 #endif // MESSAGE_H

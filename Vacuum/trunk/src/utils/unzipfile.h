@@ -3,6 +3,7 @@
 
 #include <QFile>
 #include <QHash>
+#include <QMetaType>
 #include <QByteArray>
 #include <QSharedData>
 #include "utilsexport.h"
@@ -65,5 +66,8 @@ protected:
 private:
   QSharedDataPointer<UnzipFileData> d;
 };
+
+Q_DECLARE_METATYPE(UnzipFile);
+#define UNZIPFILE_METATYPE_ID qMetaTypeId<UnzipFile>()
 
 #endif // UNZIPFILE_H
