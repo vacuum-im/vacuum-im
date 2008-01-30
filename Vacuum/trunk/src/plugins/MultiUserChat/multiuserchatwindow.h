@@ -12,7 +12,6 @@
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../utils/skin.h"
-#include "../../utils/menu.h"
 #include "edituserslistdialog.h"
 #include "ui_multiuserchatwindow.h"
 
@@ -23,7 +22,7 @@ class MultiUserChatWindow :
   Q_OBJECT;
   Q_INTERFACES(IMultiUserChatWindow ITabWidget IMessageHandler);
 public:
-  MultiUserChatWindow(IMessenger *AMessenger, IMultiUserChat *AMultiChat);
+  MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMessenger *AMessenger, IMultiUserChat *AMultiChat);
   ~MultiUserChatWindow();
   //ITabWidget
   virtual QWidget *instance() { return this; }
@@ -43,10 +42,12 @@ public:
   virtual IViewWidget *viewWidget() const { return FViewWidget; }
   virtual IEditWidget *editWidget() const { return FEditWidget; }
   virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
+  virtual Menu *roomMenu() const { return FRoomMenu; }
+  virtual Menu *toolsMenu() const { return FToolsMenu; }
   virtual IMultiUserChat *multiUserChat() const { return FMultiChat; }
   virtual IChatWindow *openChatWindow(const Jid &AContactJid); 
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;
-  virtual void exitMultiUserChat();
+  virtual void exitMultiUserChat(const QString &AStatus);
 signals:
   virtual void windowShow();
   virtual void windowClose();
@@ -71,6 +72,7 @@ protected:
   void setRoleColorForUser(IMultiUser *AUser);
   void setAffilationLineForUser(IMultiUser *AUser);
   void setToolTipForUser(IMultiUser *AUser);
+  bool execShortcutCommand(const QString &AText);
 protected:
   void updateWindow();
   void updateListItem(const Jid &AContactJid);
@@ -95,9 +97,10 @@ protected slots:
   void onUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefour, const QVariant &AAfter);
   void onUserNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
   void onPresenceChanged(int AShow, const QString &AStatus);
-  void onTopicChanged(const QString &ATopic);
+  void onSubjectChanged(const QString &ANick, const QString &ASubject);
   void onServiceMessageReceived(const Message &AMessage);
   void onMessageReceived(const QString &ANick, const Message &AMessage);
+  void onInviteDeclined(const Jid &AContactJid, const QString &AReason);
   //Moderator
   void onUserKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
   //Administrator
@@ -105,8 +108,10 @@ protected slots:
   void onAffiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList);
   //Owner
   void onConfigFormReceived(const QDomElement &AForm);
+  void onRoomDestroyed(const QString &AReason);
 protected slots:
   void onMessageSend();
+  void onMessageAboutToBeSend();
   void onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook);
   void onWindowActivated();
   void onChatMessageSend();
@@ -117,6 +122,7 @@ protected slots:
   void onNickMenuActionTriggered(bool);
   void onMenuBarActionTriggered(bool);
   void onRoomUtilsActionTriggered(bool);
+  void onInviteActionTriggered(bool);
   void onDataFormMessageDialogAccepted();
   void onAffiliationListDialogAccepted();
   void onConfigFormDialogAccepted();
@@ -133,6 +139,7 @@ private:
   ISettings *FSettings;
   IStatusIcons *FStatusIcons;
   IMultiUserChat *FMultiChat;
+  IMultiUserChatPlugin *FChatPlugin;
 private:
   IViewWidget *FViewWidget;
   IEditWidget *FEditWidget;
@@ -144,13 +151,16 @@ private:
     Action *FClearChat;
     Action *FQuitRoom;
   Menu *FToolsMenu;
+    Action *FInviteContact;
     Action *FRequestVoice;
     Action *FConfigRoom;
     Action *FBanList;
     Action *FMembersList;
     Action *FAdminsList;
     Action *FOwnersList;
+    Action *FDestroyRoom;
   Menu *FRoomUtilsMenu;
+    Menu *FInviteMenu;
     Action *FSetRoleNode;
     Action *FSetAffilOutcast;
     Menu *FChangeRole;

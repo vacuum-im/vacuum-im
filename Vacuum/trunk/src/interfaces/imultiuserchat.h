@@ -4,6 +4,7 @@
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/idataforms.h"
 #include "../../utils/jid.h"
+#include "../../utils/menu.h"
 #include "../../utils/message.h"
 
 #define MULTIUSERCHAT_UUID              "{EB960F92-59A9-4322-A646-F9AB4913706C}"
@@ -38,8 +39,27 @@
 
 #define MUC_FT_REQUEST                  "http://jabber.org/protocol/muc#request"
 #define MUC_FT_ROOM_GONFIG              "http://jabber.org/protocol/muc#roomconfig"
-
+#define MUC_FT_ROOM_INFO                "http://jabber.org/protocol/muc#roominfo"
 #define MUC_FV_ROLE                     "muc#role"
+
+#define MUC_NODE_ROOM_NICK              "x-roomuser-item"
+#define MUC_NODE_ROOMS                  "http://jabber.org/protocol/muc#rooms"
+#define MUC_NODE_TRAFFIC                "http://jabber.org/protocol/muc#traffic"
+
+#define MUC_HIDDEN                      "muc_hidden"
+#define MUC_MEMBERSONLY                 "muc_membersonly"
+#define MUC_MODERATED                   "muc_moderated"
+#define MUC_NONANONYMOUS                "muc_nonanonymous"
+#define MUC_OPEN                        "muc_open"
+#define MUC_PASSWORD                    "muc_password"
+#define MUC_PASSWORDPROTECTED           "muc_passwordprotected"
+#define MUC_PERSISTENT                  "muc_persistent"
+#define MUC_PUBLIC                      "muc_public"
+#define MUC_ROOMS                       "muc_rooms"
+#define MUC_SEMIANONYMOUS               "muc_semianonymous"
+#define MUC_TEMPORARY                   "muc_temporary"
+#define MUC_UNMODERATED                 "muc_unmoderated"
+#define MUC_UNSECURED                   "muc_unsecured"
 
 struct IMultiUserListItem {
   Jid userJid;
@@ -86,7 +106,8 @@ public:
   virtual QString status() const =0;
   virtual void setPresence(int AShow, const QString &AStatus) =0;
   virtual bool sendMessage(const Message &AMessage, const QString &AToNick = "") =0;
-  virtual void requestVoice() =0;
+  virtual bool requestVoice() =0;
+  virtual bool inviteContact(const Jid &AContactJid, const QString &AReason) =0;
   //Moderator
   virtual QString subject() const =0;
   virtual void setSubject(const QString &ASubject) =0;
@@ -95,10 +116,11 @@ public:
   virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = "") =0;
   virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = "") =0;
   virtual bool requestAffiliationList(const QString &AAffiliation) =0;
-  virtual bool setAffiliationList(const QList<IMultiUserListItem> &ADeltaList) =0;
+  virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList) =0;
   //Owner
   virtual bool requestConfigForm() =0;
   virtual bool submitConfigForm(IDataForm *AForm) =0;
+  virtual bool destroyRoom(const QString &AReason) =0;
 signals:
   virtual void chatOpened() =0;
   virtual void chatNotify(const QString &ANick, const QString &ANotify) =0;
@@ -116,19 +138,22 @@ signals:
   virtual void messageReceived(const QString &ANick, const Message &AMessage) =0;
   virtual void messageSend(Message &AMessage) =0;
   virtual void messageSent(const Message &AMessage) =0;
+  virtual void inviteDeclined(const Jid &AContactJid, const QString &AReason) =0;
   //Moderator
-  virtual void topicChanged(const QString &ATopic) =0;
+  virtual void subjectChanged(const QString &ANick, const QString &ASubject) =0;
   virtual void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser) =0;
   virtual void dataFormMessageReceived(const Message &AMessage) =0;
   virtual void dataFormMessageSubmited(IDataForm *AForm) =0;
   //Administrator
   virtual void userBanned(const QString &ANick, const QString &AReason, const QString &AByUser) =0;
   virtual void affiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList) =0;
+  virtual void affiliationListChanged(const QList<IMultiUserListItem> &ADeltaList) =0;
   //Owner
   virtual void configFormReceived(const QDomElement &AForm) =0;
   virtual void configFormSubmited(IDataForm *AForm) =0;
   virtual void configFormAccepted() =0;
   virtual void configFormRejected(const QString &AError) =0;
+  virtual void roomDestroyed(const QString &AReason) =0;
 };
 
 class IMultiUserChatWindow : 
@@ -142,10 +167,12 @@ public:
   virtual IViewWidget *viewWidget() const =0;
   virtual IEditWidget *editWidget() const =0;
   virtual IToolBarWidget *toolBarWidget() const =0;
+  virtual Menu *roomMenu() const =0;
+  virtual Menu *toolsMenu() const =0;
   virtual IMultiUserChat *multiUserChat() const =0;
   virtual IChatWindow *openChatWindow(const Jid &AContactJid) =0; 
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const =0;
-  virtual void exitMultiUserChat() =0;
+  virtual void exitMultiUserChat(const QString &AStatus) =0;
 signals:
   virtual void windowActivated() =0;
   virtual void windowClosed() =0;

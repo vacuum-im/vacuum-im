@@ -1,13 +1,15 @@
 #include "multiuserchatplugin.h"
 
-#define IN_GROUPCHAT          "psi/groupChat"
+#include <QInputDialog>
 
+#define IN_GROUPCHAT          "psi/groupChat"
+#define IN_INVITE             "psi/events"
+
+#define ADR_STREAM_JID        Action::DR_StreamJid
 #define ADR_HOST              Action::DR_Parametr1
 #define ADR_ROOM              Action::DR_Parametr2
 #define ADR_NICK              Action::DR_Parametr3
 #define ADR_PASSWORD          Action::DR_Parametr4
-
-#define MUC_NODE_ROOM_NICK    "x-roomuser-item"
 
 MultiUserChatPlugin::MultiUserChatPlugin()
 {
@@ -106,6 +108,10 @@ bool MultiUserChatPlugin::initObjects()
   connect(FJoinAction,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
   FChatMenu->addAction(FJoinAction,AG_DEFAULT+100,true);
 
+  if (FMessenger)
+  {
+    FMessenger->insertMessageHandler(this,MHO_MULTIUSERCHAT_INVITE);
+  }
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
   {
     connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
@@ -139,6 +145,61 @@ bool MultiUserChatPlugin::execDiscoFeature(const Jid &AStreamJid, const QString 
     return true;
   }
   return false;
+}
+
+bool MultiUserChatPlugin::checkMessage(const Message &AMessage)
+{
+  return !AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite").isNull();
+}
+
+bool MultiUserChatPlugin::notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags)
+{
+  QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
+  Jid roomJid = AMessage.from();
+  if (!multiChatWindow(AMessage.to(),roomJid))
+  {
+    AIcon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_INVITE);
+    AToolTip = tr("You are invited to the conference %1").arg(roomJid.bare());
+    AFlags = 0;
+    return true;
+  }
+  return false;
+}
+
+void MultiUserChatPlugin::receiveMessage(int AMessageId)
+{
+  FActiveInvites.append(AMessageId);
+}
+
+void MultiUserChatPlugin::showMessage(int AMessageId)
+{
+  Message message = FMessenger->messageById(AMessageId);
+  QDomElement inviteElem = message.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
+  Jid roomJid = message.from();
+  Jid fromJid = inviteElem.attribute("from");
+  if (roomJid.isValid() && fromJid.isValid())
+  {
+    InviteFields fields;
+    fields.streamJid = message.to();
+    fields.roomJid = roomJid;
+    fields.fromJid  = fromJid;
+    fields.password = inviteElem.firstChildElement("password").text();
+
+    QString reason = inviteElem.firstChildElement("reason").text();
+    QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(roomJid.hBare()).arg(fromJid.hFull()).arg(Qt::escape(reason));
+    msg+="<br><br>";
+    msg+=tr("Do you want to join this conference?");
+
+    QMessageBox *inviteDialog = new QMessageBox(QMessageBox::Question,tr("Invite"),msg,QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore);
+    inviteDialog->setAttribute(Qt::WA_DeleteOnClose,true);
+    inviteDialog->setEscapeButton(QMessageBox::Ignore);
+    inviteDialog->setModal(false);
+    connect(inviteDialog,SIGNAL(finished(int)),SLOT(onInviteDialogFinished(int)));
+    FInviteDialogs.insert(inviteDialog,fields);
+    inviteDialog->show();
+  }
+  FActiveInvites.removeAt(FActiveInvites.indexOf(AMessageId ));
+  FMessenger->removeMessage(AMessageId);
 }
 
 bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid)
@@ -176,7 +237,7 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStream
   if (!chatWindow)
   {
     IMultiUserChat *chat = getMultiUserChat(AStreamJid,ARoomJid,ANick,APassword,false);
-    chatWindow = new MultiUserChatWindow(FMessenger,chat);
+    chatWindow = new MultiUserChatWindow(this,FMessenger,chat);
     connect(chatWindow,SIGNAL(multiUserContextMenu(IMultiUser *, Menu *)),SLOT(onMultiUserContextMenu(IMultiUser *, Menu *)));
     connect(chatWindow,SIGNAL(windowDestroyed()),SLOT(onMultiChatWindowDestroyed()));
     insertChatAction(chatWindow);
@@ -228,6 +289,76 @@ void MultiUserChatPlugin::registerDiscoFeatures()
   dfeature.actionName = tr("Join groupchat");
   dfeature.description = tr("Multi-user text conferencing");
   FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.active = false;
+  dfeature.icon = QIcon();
+  dfeature.actionName = "";
+  dfeature.description = "";
+
+  dfeature.var = MUC_HIDDEN;
+  dfeature.name = tr("Hidden room");
+  dfeature.description = tr("A room that cannot be found by any user through normal means such as searching and service discovery");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_MEMBERSONLY;
+  dfeature.name = tr("Members-only room");
+  dfeature.description = tr("A room that a user cannot enter without being on the member list");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_MODERATED;
+  dfeature.name = tr("Moderated room");
+  dfeature.description = tr("A room in which only those with 'voice' may send messages to all occupants");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_NONANONYMOUS;
+  dfeature.name = tr("Non-anonymous room");
+  dfeature.description = tr("A room in which an occupant's full JID is exposed to all other occupants");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_OPEN;
+  dfeature.name = tr("Open room");
+  dfeature.description = tr("A room that anyone may enter without being on the member list");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_PASSWORD;
+  dfeature.name = tr("Password-protected room");
+  dfeature.description = tr("A room that a user cannot enter without first providing the correct password");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_PASSWORDPROTECTED;
+  dfeature.name = tr("Password-protected room");
+  dfeature.description = tr("A room that a user cannot enter without first providing the correct password");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_PERSISTENT;
+  dfeature.name = tr("Persistent room");
+  dfeature.description = tr("A room that is not destroyed if the last occupant exits");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_PUBLIC;
+  dfeature.name = tr("Public room");
+  dfeature.description = tr("A room that can be found by any user through normal means such as searching and service discovery");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_SEMIANONYMOUS;
+  dfeature.name = tr("Semi-anonymous room");
+  dfeature.description = tr("A room in which an occupant's full JID can be discovered by room admins only");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_TEMPORARY;
+  dfeature.name = tr("Temporary room");
+  dfeature.description = tr("A room that is destroyed if the last occupant exits");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_UNMODERATED;
+  dfeature.name = tr("Unmoderated room");
+  dfeature.description = tr("A room in which any occupant is allowed to send messages to all occupants");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.var = MUC_UNSECURED;
+  dfeature.name = tr("Unsecured room");
+  dfeature.description = tr("A room that anyone is allowed to enter without first providing the correct password");
+  FDiscovery->insertDiscoFeature(dfeature);
 }
 
 void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
@@ -262,7 +393,19 @@ void MultiUserChatPlugin::onStreamRemoved(IXmppStream *AXmppStream)
 {
   foreach(IMultiUserChatWindow *chatWindow,FChatWindows)
     if (chatWindow->streamJid() == AXmppStream->jid())
-      chatWindow->exitMultiUserChat();
+      chatWindow->exitMultiUserChat("");
+
+  QList<QMessageBox *> inviteDialogs = FInviteDialogs.keys();
+  foreach(QMessageBox * inviteDialog,inviteDialogs)
+    if (FInviteDialogs.value(inviteDialog).streamJid == AXmppStream->jid())
+      inviteDialog->done(QMessageBox::Ignore);
+
+  for (int i=0; i<FActiveInvites.count();i++)
+    if (AXmppStream->jid() == FMessenger->messageById(FActiveInvites.at(i)).to())
+    {
+      FMessenger->removeMessage(FActiveInvites.at(i));
+      FActiveInvites.removeAt(i--);
+    }
 }
 
 void MultiUserChatPlugin::onJoinActionTriggered(bool)
@@ -283,14 +426,42 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
 void MultiUserChatPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   int show = AIndex->data(RDR_Show).toInt();
-  if (AIndex->type() == RIT_StreamRoot && show!=IPresence::Offline && show!=IPresence::Error)
+  if (show!=IPresence::Offline && show!=IPresence::Error)
   {
-    Action *action = new Action(AMenu);
-    action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
-    action->setText(tr("Join groupchat"));
-    action->setData(Action::DR_StreamJid,AIndex->data(RDR_Jid));
-    connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
-    AMenu->addAction(action,AG_MULTIUSERCHAT_ROSTER,true);
+    if (AIndex->type() == RIT_StreamRoot)
+    {
+      Action *action = new Action(AMenu);
+      action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+      action->setText(tr("Join groupchat"));
+      action->setData(Action::DR_StreamJid,AIndex->data(RDR_Jid));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
+      AMenu->addAction(action,AG_MULTIUSERCHAT_ROSTER,true);
+    }
+    else if (AIndex->type() == RIT_Contact && !FChatWindows.isEmpty())
+    {
+      if (FDiscovery->checkDiscoFeature(AIndex->data(RDR_Jid).toString(),"",NS_MUC,true))
+      {
+        Jid streamJid = AIndex->data(RDR_StreamJid).toString();
+        Menu *inviteMenu = new Menu(AMenu);
+        inviteMenu->setTitle(tr("Invite to"));
+        inviteMenu->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+        foreach(IMultiUserChatWindow *window,FChatWindows)
+        {
+          if (window->multiUserChat()->isOpen())
+          {
+            Action *action = new Action(inviteMenu);
+            action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+            action->setText(tr("%1 from %2").arg(window->roomJid().full()).arg(window->multiUserChat()->nickName()));
+            action->setData(ADR_STREAM_JID,window->streamJid().full());
+            action->setData(ADR_HOST,AIndex->data(RDR_Jid).toString());
+            action->setData(ADR_ROOM,window->roomJid().full());
+            connect(action,SIGNAL(triggered(bool)),SLOT(onInviteActionTriggered(bool)));
+            inviteMenu->addAction(action,AG_DEFAULT,true);
+          }
+        }
+        inviteMenu->isEmpty() ? delete inviteMenu : AMenu->addAction(inviteMenu->menuAction(),AG_MULTIUSERCHAT_ROSTER,true);
+      }
+    }
   }
 }
 
@@ -311,6 +482,52 @@ void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
       if (ADiscoInfo.identity.at(i).category=="conference" && ADiscoInfo.identity.at(i).type=="text")
         nick = ADiscoInfo.identity.at(i).name;
     emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,nick);
+  }
+}
+
+void MultiUserChatPlugin::onInviteDialogFinished(int AResult)
+{
+  QMessageBox *inviteDialog = qobject_cast<QMessageBox *>(sender());
+  if (inviteDialog)
+  {
+    InviteFields fields = FInviteDialogs.take(inviteDialog);
+    if (AResult == QMessageBox::Yes)
+    {
+      showJoinMultiChatDialog(fields.streamJid,fields.roomJid,"",fields.password);
+    }
+    else if (AResult == QMessageBox::No)
+    {
+      Message decline;
+      decline.setTo(fields.roomJid.eBare());
+      Stanza &mstanza = decline.stanza();
+      QDomElement declElem = mstanza.addElement("x",NS_MUC_USER).appendChild(mstanza.createElement("decline")).toElement();
+      declElem.setAttribute("to",fields.fromJid.eFull());
+      QString reason = tr("I`am too busy right now");
+      reason = QInputDialog::getText(inviteDialog,tr("Decline invite"),tr("Enter a reason"),QLineEdit::Normal,reason);
+      if (!reason.isEmpty())
+        declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));
+      FMessenger->sendMessage(decline,fields.streamJid);
+    }
+  }
+}
+
+void MultiUserChatPlugin::onInviteActionTriggered(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    Jid streamJid = action->data(ADR_STREAM_JID).toString();
+    Jid contactJid = action->data(ADR_HOST).toString();
+    Jid roomJid = action->data(ADR_ROOM).toString();
+    IMultiUserChatWindow *window = multiChatWindow(streamJid,roomJid);
+    if (window && contactJid.isValid())
+    {
+      bool ok;
+      QString reason = tr("You are welcome here");
+      reason = QInputDialog::getText(window,tr("Invite user"),tr("Enter a reason"),QLineEdit::Normal,reason,&ok);
+      if (ok)
+        window->multiUserChat()->inviteContact(contactJid,reason);
+    }
   }
 }
 

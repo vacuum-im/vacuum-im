@@ -1,9 +1,11 @@
 #ifndef MULTIUSERCHATPLUGIN_H
 #define MULTIUSERCHATPLUGIN_H
 
+#include <QMessageBox>
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/discofeatureorder.h"
+#include "../../definations/messagehandlerorders.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ixmppstreams.h"
@@ -12,7 +14,9 @@
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/itraymanager.h"
 #include "../../interfaces/iservicediscovery.h"
+#include "../../utils/message.h"
 #include "../../utils/action.h"
+#include "../../utils/skin.h"
 #include "multiuserchat.h"
 #include "multiuserchatwindow.h"
 #include "joinmultichatdialog.h"
@@ -21,10 +25,11 @@ class MultiUserChatPlugin :
   public QObject,
   public IPlugin,
   public IMultiUserChatPlugin,
-  public IDiscoFeatureHandler
+  public IDiscoFeatureHandler,
+  public IMessageHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMultiUserChatPlugin IDiscoFeatureHandler);
+  Q_INTERFACES(IPlugin IMultiUserChatPlugin IDiscoFeatureHandler IMessageHandler);
 public:
   MultiUserChatPlugin();
   ~MultiUserChatPlugin();
@@ -38,6 +43,13 @@ public:
   virtual bool startPlugin() { return true; }
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem);
+  //IMessageHandler
+  virtual bool openWindow(IRosterIndex * /*AIndex*/) { return false; }
+  virtual bool openWindow(const Jid &/*AStreamJid*/, const Jid &/*AContactJid*/, Message::MessageType /*AType*/) { return false; }
+  virtual bool checkMessage(const Message &AMessage);
+  virtual bool notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags);
+  virtual void receiveMessage(int AMessageId);
+  virtual void showMessage(int AMessageId);
   //IMultiUserChatPlugin
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
   virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);
@@ -70,6 +82,8 @@ protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onChatActionTriggered(bool);
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
+  void onInviteDialogFinished(int AResult);
+  void onInviteActionTriggered(bool);
 private:
   IPluginManager *FPluginManager;
   IMessenger *FMessenger;
@@ -82,9 +96,17 @@ private:
   Menu *FChatMenu;
   Action *FJoinAction;
 private:
+  struct InviteFields {
+    Jid streamJid;
+    Jid roomJid;
+    Jid fromJid;
+    QString password;
+  };
   QList<IMultiUserChat *> FChats;
   QList<IMultiUserChatWindow *> FChatWindows;
   QHash<IMultiUserChatWindow *, Action *> FChatActions;
+  QList<int> FActiveInvites;
+  QHash<QMessageBox *,InviteFields> FInviteDialogs;
 };
 
 #endif // MULTIUSERCHATPLUGIN_H

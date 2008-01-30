@@ -50,19 +50,21 @@ public:
   virtual QString status() const { return FStatus; }
   virtual void setPresence(int AShow, const QString &AStatus);
   virtual bool sendMessage(const Message &AMessage, const QString &AToNick = "");
-  virtual void requestVoice();
+  virtual bool requestVoice();
+  virtual bool inviteContact(const Jid &AContactJid, const QString &AReason);
   //Moderator
-  virtual QString subject() const { return FTopic; }
+  virtual QString subject() const { return FSubject; }
   virtual void setSubject(const QString &ASubject);
   virtual void submitDataFormMessage(IDataForm *AForm);
   //Administrator
   virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = "");
   virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = "");
   virtual bool requestAffiliationList(const QString &AAffiliation);
-  virtual bool setAffiliationList(const QList<IMultiUserListItem> &ADeltaList);
+  virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList);
   //Owner
   virtual bool requestConfigForm();
   virtual bool submitConfigForm(IDataForm *AForm);
+  virtual bool destroyRoom(const QString &AReason);
 signals:
   virtual void chatOpened();
   virtual void chatNotify(const QString &ANick, const QString &ANotify);
@@ -80,19 +82,22 @@ signals:
   virtual void messageReceived(const QString &ANick, const Message &AMessage);
   virtual void messageSend(Message &AMessage);
   virtual void messageSent(const Message &AMessage);
+  virtual void inviteDeclined(const Jid &AContactJid, const QString &AReason);
   //Moderator
-  virtual void topicChanged(const QString &ATopic);
+  virtual void subjectChanged(const QString &ANick, const QString &ASubject);
   virtual void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
   virtual void dataFormMessageReceived(const Message &AMessage);
   virtual void dataFormMessageSubmited(IDataForm *AForm);
   //Administrator
   virtual void userBanned(const QString &ANick, const QString &AReason, const QString &AByUser);
   virtual void affiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList);
+  virtual void affiliationListChanged(const QList<IMultiUserListItem> &ADeltaList);
   //Owner
   virtual void configFormReceived(const QDomElement &AForm);
   virtual void configFormSubmited(IDataForm *AForm);
   virtual void configFormAccepted();
   virtual void configFormRejected(const QString &AError);
+  virtual void roomDestroyed(const QString &AReason);
 protected:
   void prepareMessageForReceive(Message &AMessage);
   bool processMessage(const Stanza &AStanza);
@@ -130,7 +135,7 @@ private:
   Jid FRoomJid;
   int FShow;
   QString FStatus;
-  QString FTopic;
+  QString FSubject;
   QString FNickName;
   QString FPassword;
   MultiUser *FMainUser;

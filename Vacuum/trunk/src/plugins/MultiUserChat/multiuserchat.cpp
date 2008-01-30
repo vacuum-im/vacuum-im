@@ -167,7 +167,7 @@ void MultiUserChat::iqStanzaTimeOut(const QString &AId)
   }
   else if (FAffilListSubmits.contains(AId))
   {
-    QString affiliation = FAffilListRequests.take(AId);
+    QString affiliation = FAffilListSubmits.take(AId);
     ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
     emit chatError("",tr("Changes in list of %1s may not be accepted: %2").arg(affiliation).arg(err.message()));
     FAffilListRequests.remove(AId);
@@ -294,9 +294,9 @@ bool MultiUserChat::sendMessage(const Message &AMessage, const QString &AToNick)
   return false;
 }
 
-void MultiUserChat::requestVoice()
+bool MultiUserChat::requestVoice()
 {
-  if (FStanzaProcessor && isOpen() && FMainUser->data(MUDR_ROLE).toString() == MUC_ROLE_VISITOR)
+  if (isOpen() && FMainUser->data(MUDR_ROLE).toString() == MUC_ROLE_VISITOR)
   {
     Message message;
     message.setTo(FRoomJid.eBare());
@@ -317,10 +317,32 @@ void MultiUserChat::requestVoice()
     fieldElem.appendChild(mstanza.createElement("value")).appendChild(mstanza.createTextNode(MUC_ROLE_PARTICIPANT));
 
     if (FMessenger)
-      FMessenger->sendMessage(message,FStreamJid);
-    else
-      FStanzaProcessor->sendStanzaOut(FStreamJid, message.stanza());
+      return FMessenger->sendMessage(message,FStreamJid);
+    else if (FStanzaProcessor)
+      return FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza);
   }
+  return false;
+}
+
+bool MultiUserChat::inviteContact(const Jid &AContactJid, const QString &AReason)
+{
+  if (isOpen() && AContactJid.isValid())
+  {
+    Message message;
+    message.setTo(FRoomJid.eBare());
+
+    Stanza &mstanza = message.stanza();
+    QDomElement invElem = mstanza.addElement("x",NS_MUC_USER).appendChild(mstanza.createElement("invite")).toElement();
+    invElem.setAttribute("to",AContactJid.eFull());
+    if (!AReason.isEmpty())
+      invElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(AReason));
+    
+    if (FMessenger)
+      return FMessenger->sendMessage(message,FStreamJid);
+    else if (FStanzaProcessor)
+      return FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza);
+  }
+  return false;
 }
 
 void MultiUserChat::setSubject(const QString &ASubject)
@@ -410,7 +432,7 @@ bool MultiUserChat::requestAffiliationList(const QString &AAffiliation)
   return false;
 }
 
-bool MultiUserChat::setAffiliationList(const QList<IMultiUserListItem> &ADeltaList)
+bool MultiUserChat::changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList)
 {
   if (FStanzaProcessor && isOpen() && !ADeltaList.isEmpty())
   {
@@ -427,6 +449,7 @@ bool MultiUserChat::setAffiliationList(const QList<IMultiUserListItem> &ADeltaLi
     }
     if (FStanzaProcessor->sendIqStanza(this,FStreamJid,iq,MUC_LIST_TIMEOUT))
     {
+      emit affiliationListChanged(ADeltaList);
       FAffilListSubmits.insert(iq.id(),ADeltaList.value(0).affiliation);
       return true;
     }
@@ -476,6 +499,25 @@ bool MultiUserChat::submitConfigForm(IDataForm *AForm)
   return false;
 }
 
+bool MultiUserChat::destroyRoom(const QString &AReason)
+{
+  if (FStanzaProcessor && isOpen())
+  {
+    Stanza iq("iq");
+    iq.setTo(FRoomJid.eBare()).setType("set").setId(FStanzaProcessor->newId());
+    QDomElement destroyElem = iq.addElement("query",NS_MUC_OWNER).appendChild(iq.createElement("destroy")).toElement();
+    destroyElem.setAttribute("jid",FRoomJid.eBare());
+    if (!AReason.isEmpty())
+      destroyElem.appendChild(iq.createElement("reason")).appendChild(iq.createTextNode(AReason));
+    if (FStanzaProcessor->sendIqStanza(this,FStreamJid,iq,MUC_IQ_TIMEOUT))
+    {
+      emit chatNotify("",tr("Room destruction request was sent."));
+      return true;
+    }
+  }
+  return false;
+}
+
 void MultiUserChat::prepareMessageForReceive(Message &/*AMessage*/)
 {
 
@@ -507,12 +549,19 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
   }
   else if (message.type() == Message::GroupChat && !message.stanza().firstElement("subject").isNull())
   {
-    FTopic = message.subject();
-    emit topicChanged(FTopic);
+    FSubject = message.subject();
+    emit subjectChanged(fromNick, FSubject);
   }
   else if (fromNick.isEmpty())
   {
-    if (!AStanza.firstElement("x",NS_JABBER_DATA).isNull())
+    if (!AStanza.firstElement("x",NS_MUC_USER).firstChildElement("decline").isNull())
+    {
+      QDomElement declElem = AStanza.firstElement("x",NS_MUC_USER).firstChildElement("decline");
+      Jid contactJid = declElem.attribute("from");
+      QString reason = declElem.firstChildElement("reason").text();
+      emit inviteDeclined(contactJid,reason);
+    }
+    else if (!AStanza.firstElement("x",NS_JABBER_DATA).isNull())
       emit dataFormMessageReceived(message);
     else
       emit serviceMessageReceived(message);
@@ -633,6 +682,11 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
         QString byUser = itemElem.firstChildElement("actor").attribute("jid");
         QString reason = itemElem.firstChildElement("reason").text();
         emit userBanned(fromNick,reason,byUser);
+      }
+      else if (!xelem.firstChildElement("destroy").isNull())
+      {
+        QString reason = xelem.firstChildElement("destroy").firstChildElement("reason").text();
+        emit roomDestroyed(reason);
       }
 
       if (applyPresence)
