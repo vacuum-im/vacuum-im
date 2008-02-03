@@ -6,8 +6,10 @@
 #define SOFTWARE_INFO_TIMEOUT           10000
 #define LAST_ACTIVITY_TIMEOUT           10000
 
-#define ADR_STREAM_JID                  Action::DR_Parametr1
-#define ADR_CONTACT_JID                 Action::DR_Parametr2
+#define ADR_STREAM_JID                  Action::DR_StreamJid
+#define ADR_CONTACT_JID                 Action::DR_Parametr1
+
+#define IN_CLIENTINFO                   "psi/help"
 
 ClientInfo::ClientInfo()
 {
@@ -268,14 +270,42 @@ QVariant ClientInfo::data(const IRosterIndex *AIndex, int ARole) const
     return QVariant();
 }
 
-bool ClientInfo::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem)
+bool ClientInfo::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
 {
   if (AFeature == NS_JABBER_VERSION || AFeature == NS_JABBER_LAST)
   {
-    showClientInfo(ADiscoItem.itemJid,AStreamJid);
+    showClientInfo(ADiscoInfo.contactJid,AStreamJid);
     return true;
   }
   return false;
+}
+
+Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
+{
+  if (AFeature == NS_JABBER_VERSION)
+  {
+    Action *action = new Action(AParent);
+    action->setText(tr("Client version"));
+    action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
+    action->setData(ADR_STREAM_JID,AStreamJid.full());
+    action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
+    connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
+    return action;
+  }
+  else if (AFeature == NS_JABBER_LAST)
+  {
+    if (FPresencePlugin && !FPresencePlugin->isContactOnline(ADiscoInfo.contactJid))
+    {
+      Action *action = new Action(AParent);
+      action->setText(tr("Last activity"));
+      action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
+      action->setData(ADR_STREAM_JID,AStreamJid.full());
+      action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
+      connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
+      return action;
+    }
+  }
+  return NULL;
 }
 
 void ClientInfo::showClientInfo(const Jid &AContactJid, const Jid &AStreamJid)
@@ -413,18 +443,16 @@ void ClientInfo::registerDiscoFeatures()
   IDiscoFeature dfeature;
 
   dfeature.active = true;
-  dfeature.icon = QIcon();
+  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CLIENTINFO);
   dfeature.var = NS_JABBER_VERSION;
   dfeature.name = tr("Client version");
-  dfeature.actionName = tr("Version");
   dfeature.description = tr("Request contacts client version");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = false;
-  dfeature.icon = QIcon();
+  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CLIENTINFO);
   dfeature.var = NS_JABBER_LAST;
   dfeature.name = tr("Last activity");
-  dfeature.actionName = tr("Last activity");
   dfeature.description = tr("Request contacts last activity");
   FDiscovery->insertDiscoFeature(dfeature);
 }
@@ -462,17 +490,18 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
 
 void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent || AIndex->type() == RIT_MyResource)
+  if (AIndex->type() == RIT_Contact || AIndex->type() == RIT_MyResource)
   {
     Jid streamJid = AIndex->data(RDR_StreamJid).toString();
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
-    if (presence && presence->xmppStream()->isOpen())
+    if (presence && presence->xmppStream()->isOpen() && AIndex->data(RDR_Show).toInt() == IPresence::Offline)
     {
       Action *action = new Action(AMenu);
-      action->setText(tr("Client Info"));
+      action->setText(tr("Last activity"));
+      action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
       action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
       action->setData(ADR_CONTACT_JID,AIndex->data(RDR_Jid));
-      connect(action,SIGNAL(triggered(bool)),SLOT(onShowClientInfo(bool)));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
       AMenu->addAction(action,AG_CLIENTINFO_ROSTER,true);
     }
   }
@@ -481,13 +510,14 @@ void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 void ClientInfo::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMultiUser *AUser, Menu *AMenu)
 {
   Action *action = new Action(AMenu);
-  action->setText(tr("Client Info"));
+  action->setText(tr("Client version"));
+  action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
   action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAMJID));
   if (!AUser->data(MUDR_REALJID).toString().isEmpty())
     action->setData(ADR_CONTACT_JID,AUser->data(MUDR_REALJID));
   else
     action->setData(ADR_CONTACT_JID,AUser->data(MUDR_CONTACTJID));
-  connect(action,SIGNAL(triggered(bool)),SLOT(onShowClientInfo(bool)));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
   AMenu->addAction(action,AG_CLIENTINFO_MUCM,true);
 }
 
@@ -505,7 +535,7 @@ void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMult
   }
 }
 
-void ClientInfo::onShowClientInfo(bool)
+void ClientInfo::onClientInfoActionTriggered(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)

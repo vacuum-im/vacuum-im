@@ -133,18 +133,36 @@ bool MultiUserChatPlugin::initObjects()
   return true;
 }
 
-bool MultiUserChatPlugin::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem)
+bool MultiUserChatPlugin::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
 {
-  if (AFeature==NS_MUC && ADiscoItem.itemJid.resource().isEmpty())
+  if (AFeature==NS_MUC && ADiscoInfo.contactJid.resource().isEmpty())
   {
-    IMultiUserChatWindow *chatWindow = multiChatWindow(AStreamJid,ADiscoItem.itemJid);
+    IMultiUserChatWindow *chatWindow = multiChatWindow(AStreamJid,ADiscoInfo.contactJid);
     if (!chatWindow)
-      showJoinMultiChatDialog(AStreamJid,ADiscoItem.itemJid,"","");
+      showJoinMultiChatDialog(AStreamJid,ADiscoInfo.contactJid,"","");
     else
       chatWindow->showWindow();
     return true;
   }
   return false;
+}
+
+Action *MultiUserChatPlugin::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
+{
+  if (AFeature == NS_MUC)
+  {
+    if (ADiscoInfo.identity.value(0).category == "conference")
+    {
+      Action *action = createJoinAction(AStreamJid,ADiscoInfo.contactJid,AParent);
+      return action;
+    }
+    else
+    {
+      Menu *inviteMenu = createInviteMenu(ADiscoInfo.contactJid,AParent);
+      return inviteMenu->isEmpty() ? (delete inviteMenu,NULL) : inviteMenu->menuAction();
+    }
+  }
+  return NULL;
 }
 
 bool MultiUserChatPlugin::checkMessage(const Message &AMessage)
@@ -286,7 +304,7 @@ void MultiUserChatPlugin::registerDiscoFeatures()
   dfeature.icon = icon;
   dfeature.var = NS_MUC;
   dfeature.name = tr("Multi-user text conferencing");
-  dfeature.actionName = tr("Join groupchat");
+  dfeature.actionName = tr("Join conference");
   dfeature.description = tr("Multi-user text conferencing");
   FDiscovery->insertDiscoFeature(dfeature);
 
@@ -361,6 +379,40 @@ void MultiUserChatPlugin::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
+Menu *MultiUserChatPlugin::createInviteMenu(const Jid &AContactJid, QWidget *AParent) const
+{
+  Menu *inviteMenu = new Menu(AParent);
+  inviteMenu->setTitle(tr("Invite to"));
+  inviteMenu->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+  foreach(IMultiUserChatWindow *window,FChatWindows)
+  {
+    if (window->multiUserChat()->isOpen())
+    {
+      Action *action = new Action(inviteMenu);
+      action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+      action->setText(tr("%1 from %2").arg(window->roomJid().full()).arg(window->multiUserChat()->nickName()));
+      action->setData(ADR_STREAM_JID,window->streamJid().full());
+      action->setData(ADR_HOST,AContactJid.full());
+      action->setData(ADR_ROOM,window->roomJid().full());
+      connect(action,SIGNAL(triggered(bool)),SLOT(onInviteActionTriggered(bool)));
+      inviteMenu->addAction(action,AG_DEFAULT,true);
+    }
+  }
+  return inviteMenu;
+}
+
+Action *MultiUserChatPlugin::createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const
+{
+  Action *action = new Action(AParent);
+  action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+  action->setText(tr("Join conference"));
+  action->setData(ADR_STREAM_JID,AStreamJid.full());
+  action->setData(ADR_HOST,ARoomJid.domane());
+  action->setData(ADR_ROOM,ARoomJid.node());
+  connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
+  return action;
+}
+
 void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
 {
   IMultiUserChatWindow *chatWindow = qobject_cast<IMultiUserChatWindow *>(sender());
@@ -430,38 +482,17 @@ void MultiUserChatPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *A
   {
     if (AIndex->type() == RIT_StreamRoot)
     {
-      Action *action = new Action(AMenu);
-      action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
-      action->setText(tr("Join groupchat"));
-      action->setData(Action::DR_StreamJid,AIndex->data(RDR_Jid));
-      connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
+      Action *action = createJoinAction(AIndex->data(RDR_Jid).toString(),Jid(),AMenu);
       AMenu->addAction(action,AG_MULTIUSERCHAT_ROSTER,true);
     }
-    else if (AIndex->type() == RIT_Contact && !FChatWindows.isEmpty())
-    {
-      if (FDiscovery->checkDiscoFeature(AIndex->data(RDR_Jid).toString(),"",NS_MUC,true))
-      {
-        Jid streamJid = AIndex->data(RDR_StreamJid).toString();
-        Menu *inviteMenu = new Menu(AMenu);
-        inviteMenu->setTitle(tr("Invite to"));
-        inviteMenu->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
-        foreach(IMultiUserChatWindow *window,FChatWindows)
-        {
-          if (window->multiUserChat()->isOpen())
-          {
-            Action *action = new Action(inviteMenu);
-            action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
-            action->setText(tr("%1 from %2").arg(window->roomJid().full()).arg(window->multiUserChat()->nickName()));
-            action->setData(ADR_STREAM_JID,window->streamJid().full());
-            action->setData(ADR_HOST,AIndex->data(RDR_Jid).toString());
-            action->setData(ADR_ROOM,window->roomJid().full());
-            connect(action,SIGNAL(triggered(bool)),SLOT(onInviteActionTriggered(bool)));
-            inviteMenu->addAction(action,AG_DEFAULT,true);
-          }
-        }
-        inviteMenu->isEmpty() ? delete inviteMenu : AMenu->addAction(inviteMenu->menuAction(),AG_MULTIUSERCHAT_ROSTER,true);
-      }
-    }
+    //else if (AIndex->type() == RIT_Contact && !FChatWindows.isEmpty())
+    //{
+    //  if (FDiscovery->checkDiscoFeature(AIndex->data(RDR_Jid).toString(),"",NS_MUC,true))
+    //  {
+    //    Menu *inviteMenu = createInviteMenu(AIndex->data(RDR_Jid).toString(),AMenu);
+    //    inviteMenu->isEmpty() ? delete inviteMenu : AMenu->addAction(inviteMenu->menuAction(),AG_MULTIUSERCHAT_ROSTER,true);
+    //  }
+    //}
   }
 }
 

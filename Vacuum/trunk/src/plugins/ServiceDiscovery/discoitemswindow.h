@@ -32,8 +32,6 @@ signals:
   virtual void treeItemSelected(QTreeWidgetItem *ACurrent, QTreeWidgetItem *APrevious);
   virtual void treeItemContextMenu(QTreeWidgetItem *ATreeItem, Menu *AMenu);
   virtual void treeItemDestroyed(QTreeWidgetItem *ATreeItem);
-  virtual void featureActionInserted(const QString &AFeature, Action *AAction);
-  virtual void featureActionRemoved(const QString &AFeature, Action *AAction);
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert);
 public:
   virtual QMenu *createPopupMenu() { return NULL; }
@@ -56,7 +54,6 @@ protected slots:
   void onCurrentTreeItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetItem *APrevious);
   void onToolBarActionTriggered(bool);
   void onComboReturnPressed();
-  void onFeatureActionTriggered();
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAftert);
 private:
   Ui::DiscoItemsWindowClass ui;
@@ -80,7 +77,6 @@ private:
   int FCurrentStep;
   QList< QPair<Jid,QString> > FDiscoverySteps;
   QHash<Jid, QHash<QString,QTreeWidgetItem *> > FTreeItems;
-  QHash<QString,Action *> FFeatureActions;
 };
 
 #endif // DISCOITEMSWINDOW_H

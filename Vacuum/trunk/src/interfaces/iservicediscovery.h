@@ -81,7 +81,8 @@ public:
 class IDiscoFeatureHandler
 {
 public:
-  virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem) =0;
+  virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo) =0;
+  virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent) =0;
 };
 
 class IDiscoItemsWindow
@@ -101,8 +102,6 @@ signals:
   virtual void treeItemSelected(QTreeWidgetItem *ACurrent, QTreeWidgetItem *APrevious) =0;
   virtual void treeItemContextMenu(QTreeWidgetItem *ATreeItem, Menu *AMenu) =0;
   virtual void treeItemDestroyed(QTreeWidgetItem *ATreeItem) =0;
-  virtual void featureActionInserted(const QString &AFeature, Action *AAction) =0;
-  virtual void featureActionRemoved(const QString &AFeature, Action *AAction) =0;
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert) =0;
 };
 
@@ -124,7 +123,8 @@ public:
   //FeatureHandler
   virtual bool hasFeatureHandler(const QString &AFeature) const =0;
   virtual void insertFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler, int AOrder) =0;
-  virtual bool execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem) =0;
+  virtual bool execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo) =0;
+  virtual Action *createFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent) =0;
   virtual void removeFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler) =0;
   //DiscoFeatures
   virtual void insertDiscoFeature(const IDiscoFeature &AFeature) =0;

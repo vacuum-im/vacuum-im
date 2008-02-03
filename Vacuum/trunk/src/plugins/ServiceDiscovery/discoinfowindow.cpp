@@ -127,10 +127,8 @@ void DiscoInfoWindow::onListItemActivated(QListWidgetItem *AItem)
   QString feature = AItem->data(Qt::UserRole).toString();
   if (FDiscovery->hasFeatureHandler(feature))
   {
-    IDiscoItem ditem;
-    ditem.itemJid = FContactJid;
-    ditem.node = FNode;
-    FDiscovery->execFeatureHandler(FStreamJid,feature,ditem);
+    IDiscoInfo dinfo = FDiscovery->discoInfo(FContactJid,FNode);
+    FDiscovery->execFeatureHandler(FStreamJid,feature,dinfo);
   }
 }
 

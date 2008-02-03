@@ -281,13 +281,13 @@ void DiscoItemsWindow::createToolBarActions()
   FMoveBack = new Action(FToolBarChanger);
   FMoveBack->setText(tr("Back"));
   FMoveBack->setIcon(SYSTEM_ICONSETFILE,IN_ARROW_LEFT);
-  FToolBarChanger->addAction(FMoveBack,AG_DIWT_SERVICEDISCOVERY_NAVIGATE,false);
+  FToolBarChanger->addAction(FMoveBack,AG_DIWT_DISCOVERY_NAVIGATE,false);
   connect(FMoveBack,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FMoveForward = new Action(FToolBarChanger);
   FMoveForward->setText(tr("Forward"));
   FMoveForward->setIcon(SYSTEM_ICONSETFILE,IN_ARROW_RIGHT);
-  FToolBarChanger->addAction(FMoveForward,AG_DIWT_SERVICEDISCOVERY_NAVIGATE,false);
+  FToolBarChanger->addAction(FMoveForward,AG_DIWT_DISCOVERY_NAVIGATE,false);
   connect(FMoveForward,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FUseCache = new Action(FToolBarChanger);
@@ -295,37 +295,37 @@ void DiscoItemsWindow::createToolBarActions()
   FUseCache->setIcon(SYSTEM_ICONSETFILE,IN_USE_CACH);
   FUseCache->setCheckable(true);
   FUseCache->setChecked(true);
-  FToolBarChanger->addAction(FUseCache,AG_DIWT_SERVICEDISCOVERY_DEFACTIONS,false);
+  FToolBarChanger->addAction(FUseCache,AG_DIWT_DISCOVERY_DEFACTIONS,false);
   connect(FUseCache,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FDiscoverCurrent = new Action(FToolBarChanger);
   FDiscoverCurrent->setText(tr("Discover"));
   FDiscoverCurrent->setIcon(SYSTEM_ICONSETFILE,IN_DISCOVER);
-  FToolBarChanger->addAction(FDiscoverCurrent,AG_DIWT_SERVICEDISCOVERY_DEFACTIONS,false);
+  FToolBarChanger->addAction(FDiscoverCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
   connect(FDiscoverCurrent,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FReloadCurrent = new Action(FToolBarChanger);
   FReloadCurrent->setText(tr("Reload"));
   FReloadCurrent->setIcon(SYSTEM_ICONSETFILE,IN_RELOAD);
-  FToolBarChanger->addAction(FReloadCurrent,AG_DIWT_SERVICEDISCOVERY_DEFACTIONS,false);
+  FToolBarChanger->addAction(FReloadCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
   connect(FReloadCurrent,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FDiscoInfo = new Action(FToolBarChanger);
   FDiscoInfo->setText(tr("Disco info"));
   FDiscoInfo->setIcon(SYSTEM_ICONSETFILE,IN_INFO);
-  FToolBarChanger->addAction(FDiscoInfo,AG_DIWT_SERVICEDISCOVERY_ACTIONS,false);
+  FToolBarChanger->addAction(FDiscoInfo,AG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FDiscoInfo,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FAddContact = new Action(FToolBarChanger);
   FAddContact->setText(tr("Add Contact"));
   FAddContact->setIcon(SYSTEM_ICONSETFILE,IN_ADDCONTACT);
-  FToolBarChanger->addAction(FAddContact,AG_DIWT_SERVICEDISCOVERY_ACTIONS,false);
+  FToolBarChanger->addAction(FAddContact,AG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FAddContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FShowVCard = new Action(FToolBarChanger);
   FShowVCard->setText(tr("vCard"));
   FShowVCard->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
-  FToolBarChanger->addAction(FShowVCard,AG_DIWT_SERVICEDISCOVERY_ACTIONS,false);
+  FToolBarChanger->addAction(FShowVCard,AG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   
   updateToolBarActions();
@@ -344,40 +344,19 @@ void DiscoItemsWindow::updateToolBarActions()
 
 void DiscoItemsWindow::updateActionsBar()
 {
+  qDeleteAll(FActionsBarChanger->actions(AG_DIWT_DISCOVERY_FEATURE_ACTIONS));
   QTreeWidgetItem *treeItem = ui.trwItems->currentItem();
   if (treeItem)
   {
-    QList<Action *> curActions = FActionsBarChanger->actions(AG_DIWT_SERVICEDISCOVERY_FEATURE_ACTIONS);
     IDiscoInfo dinfo = FDiscovery->discoInfo(treeItem->data(0,DDR_JID).toString(),treeItem->data(0,DDR_NODE).toString());
     foreach(QString feature, dinfo.features)
     {
-      if (FDiscovery->hasFeatureHandler(feature))
+      Action *action = FDiscovery->createFeatureAction(FStreamJid,feature,dinfo,this);
+      if (action)
       {
-        Action *action = FFeatureActions.value(feature,NULL);
-        if (action == NULL)
-        {
-          action = new Action(this);
-          IDiscoFeature dfeature = FDiscovery->discoFeature(feature);
-          action->setIcon(dfeature.icon);
-          action->setText(dfeature.actionName.isEmpty() ? (dfeature.name.isEmpty() ? feature : dfeature.name) : dfeature.actionName);
-          action->setToolTip(dfeature.description);
-          connect(action,SIGNAL(triggered()),SLOT(onFeatureActionTriggered()));
-          FFeatureActions.insert(feature,action);
-        }
-        if (!curActions.contains(action))
-        {
-          QToolButton *button = FActionsBarChanger->addToolButton(action,AG_DIWT_SERVICEDISCOVERY_FEATURE_ACTIONS,true);
-          button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-          emit featureActionInserted(feature,action);
-        }
-        else
-          curActions.removeAt(curActions.indexOf(action));
+        QToolButton *button = FActionsBarChanger->addToolButton(action,AG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
+        button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
       }
-    }
-    foreach(Action *action,curActions)
-    {
-      FActionsBarChanger->removeAction(action);
-      emit featureActionRemoved(FFeatureActions.key(action),action);
     }
   }
 }
@@ -401,16 +380,19 @@ void DiscoItemsWindow::onTreeItemContextMenu(const QPoint &APos)
     Menu *menu = new Menu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose,true);
 
-    menu->addAction(FDiscoverCurrent,AG_DIWT_SERVICEDISCOVERY_DEFACTIONS,false);
-    menu->addAction(FReloadCurrent,AG_DIWT_SERVICEDISCOVERY_DEFACTIONS,false);
-    menu->addAction(FDiscoInfo,AG_DIWT_SERVICEDISCOVERY_ACTIONS,false);
-    menu->addAction(FAddContact,AG_DIWT_SERVICEDISCOVERY_ACTIONS,false);
-    menu->addAction(FShowVCard,AG_DIWT_SERVICEDISCOVERY_ACTIONS,false);
+    menu->addAction(FDiscoverCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
+    menu->addAction(FReloadCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
+    menu->addAction(FDiscoInfo,AG_DIWT_DISCOVERY_ACTIONS,false);
+    menu->addAction(FAddContact,AG_DIWT_DISCOVERY_ACTIONS,false);
+    menu->addAction(FShowVCard,AG_DIWT_DISCOVERY_ACTIONS,false);
     
     IDiscoInfo dinfo = FDiscovery->discoInfo(treeItem->data(0,DDR_JID).toString(),treeItem->data(0,DDR_NODE).toString());
     foreach(QString feature, dinfo.features)
-      if (FFeatureActions.contains(feature))
-        menu->addAction(FFeatureActions.value(feature),AG_DIWT_SERVICEDISCOVERY_FEATURE_ACTIONS,false);
+    {
+      Action *action = FDiscovery->createFeatureAction(FStreamJid,feature,dinfo,menu);
+      if (action)
+        menu->addAction(action,AG_DIWT_DISCOVERY_FEATURE_ACTIONS,false);
+    }
     
     emit treeItemContextMenu(treeItem,menu);
 
@@ -539,24 +521,6 @@ void DiscoItemsWindow::onComboReturnPressed()
   QString itemNode = ui.cmbNode->currentText();
   if (itemJid.isValid() && FDiscoverySteps.value(FCurrentStep) != qMakePair(itemJid,itemNode))
     discover(itemJid,itemNode);
-}
-
-void DiscoItemsWindow::onFeatureActionTriggered()
-{
-  Action *action = qobject_cast<Action *>(sender());
-  QString feature = FFeatureActions.key(action);
-  if (!feature.isEmpty())
-  {
-    QTreeWidgetItem *treeItem = ui.trwItems->currentItem();
-    if (treeItem)
-    {
-      IDiscoItem ditem;
-      ditem.itemJid = treeItem->data(0,DDR_JID).toString();
-      ditem.node = treeItem->data(0,DDR_NODE).toString();
-      ditem.name = treeItem->data(0,DDR_NAME).toString();
-      FDiscovery->execFeatureHandler(FStreamJid,feature,ditem);
-    }
-  }
 }
 
 void DiscoItemsWindow::onStreamJidChanged(const Jid &ABefour, const Jid &AAftert)

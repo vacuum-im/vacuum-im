@@ -18,6 +18,7 @@
 #include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/istanzaprocessor.h"
+#include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
@@ -84,7 +85,8 @@ public:
     //FeatureHandler
   virtual bool hasFeatureHandler(const QString &AFeature) const;
   virtual void insertFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler, int AOrder);
-  virtual bool execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem);
+  virtual bool execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
+  virtual Action *createFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   virtual void removeFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler);
     //DiscoFeatures
   virtual void insertDiscoFeature(const IDiscoFeature &AFeature);
@@ -142,6 +144,7 @@ protected:
   IDiscoItems parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   void registerFeatures();
   void appendQueuedRequest(const QDateTime &ATimeStart, const QueuedRequest &ARequest);
+  void removeQueuedRequest(const QueuedRequest &ARequest);
   bool hasEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
   QString capsFileName(const QString &ANode, const QString &AVer, const QString &AHash) const;
   IDiscoInfo loadEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
@@ -153,12 +156,14 @@ protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
   void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
+  void onRosterItemPush(IRoster *ARoster, IRosterItem *ARosterItem);
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onShowDiscoInfoByAction(bool);
   void onShowDiscoItemsByAction(bool);
+  void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo);
   void onDiscoInfoWindowDestroyed(QObject *AObject);
   void onDiscoItemsWindowDestroyed(QObject *AObject);
@@ -166,6 +171,7 @@ protected slots:
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
+  IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
   IStanzaProcessor *FStanzaProcessor;    
   IRostersView *FRostersView;

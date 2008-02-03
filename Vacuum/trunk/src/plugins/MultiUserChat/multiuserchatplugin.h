@@ -42,7 +42,8 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IDiscoFeatureHandler
-  virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem);
+  virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
+  virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //IMessageHandler
   virtual bool openWindow(IRosterIndex * /*AIndex*/) { return false; }
   virtual bool openWindow(const Jid &/*AStreamJid*/, const Jid &/*AContactJid*/, Message::MessageType /*AType*/) { return false; }
@@ -73,6 +74,8 @@ protected:
   void insertChatAction(IMultiUserChatWindow *AWindow);
   void removeChatAction(IMultiUserChatWindow *AWindow);
   void registerDiscoFeatures();
+  Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
+  Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const;
 protected slots:
   void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
   void onMultiUserChatDestroyed();

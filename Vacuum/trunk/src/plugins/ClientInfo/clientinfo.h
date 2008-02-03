@@ -65,7 +65,8 @@ public:
   virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
   virtual bool setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/) { return false; }
   //IDiscoFeatureHandler
-  virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoItem &ADiscoItem);
+  virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
+  virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //IClientInfo
   virtual void showClientInfo(const Jid &AContactJid, const Jid &AStreamJid);
   virtual bool checkOption(IClientInfo::Option AOption) const;
@@ -100,7 +101,7 @@ protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
-  void onShowClientInfo(bool);
+  void onClientInfoActionTriggered(bool);
   void onClientInfoDialogClosed(const Jid &AContactJid);
   void onSettingsOpened();
   void onSettingsClosed();
