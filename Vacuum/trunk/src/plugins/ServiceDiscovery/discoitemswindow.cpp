@@ -11,6 +11,7 @@
 
 #define IN_ARROW_LEFT           "psi/arrowLeft"
 #define IN_ARROW_RIGHT          "psi/arrowRight"
+#define IN_USE_CACH             "psi/browse"
 #define IN_DISCOVER             "psi/jabber"
 #define IN_RELOAD               "psi/reload"
 #define IN_DISCO                "psi/disco"
@@ -71,6 +72,11 @@ DiscoItemsWindow::~DiscoItemsWindow()
 
 }
 
+void DiscoItemsWindow::setUseCache(bool AUse)
+{
+  FUseCache->setChecked(AUse);
+}
+
 void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
 {
   ui.cmbJid->setEditText(AContactJid.full());
@@ -94,12 +100,12 @@ void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
   ditem.node = ANode;
   QTreeWidgetItem *treeItem = createTreeItem(ditem,NULL);
 
-  if (!FDiscovery->hasDiscoInfo(AContactJid,ANode))
+  if (!useCache() || !FDiscovery->hasDiscoInfo(AContactJid,ANode))
     requestDiscoInfo(AContactJid,ANode);
   else
     updateDiscoInfo(FDiscovery->discoInfo(AContactJid,ANode));
 
-  if (!FDiscovery->hasDiscoItems(AContactJid,ANode))
+  if (!useCache() || !FDiscovery->hasDiscoItems(AContactJid,ANode))
     requestDiscoItems(AContactJid,ANode);
   else
     updateDiscoItems(FDiscovery->discoItems(AContactJid,ANode));
@@ -226,7 +232,7 @@ void DiscoItemsWindow::updateDiscoItems(const IDiscoItems &ADiscoItems)
       if (curItem == NULL)
       {
         curItem = createTreeItem(ditem,treeItem);
-        if (FDiscovery->hasDiscoInfo(ditem.itemJid,ditem.node))
+        if (useCache() && FDiscovery->hasDiscoInfo(ditem.itemJid,ditem.node))
           updateDiscoInfo(FDiscovery->discoInfo(ditem.itemJid,ditem.node));
         else if (ADiscoItems.items.count() <= MAX_ITEMS_FOR_REQUEST)
           requestDiscoInfo(ditem.itemJid,ditem.node);
@@ -283,6 +289,14 @@ void DiscoItemsWindow::createToolBarActions()
   FMoveForward->setIcon(SYSTEM_ICONSETFILE,IN_ARROW_RIGHT);
   FToolBarChanger->addAction(FMoveForward,AG_DIWT_SERVICEDISCOVERY_NAVIGATE,false);
   connect(FMoveForward,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+
+  FUseCache = new Action(FToolBarChanger);
+  FUseCache->setText(tr("Use Cache"));
+  FUseCache->setIcon(SYSTEM_ICONSETFILE,IN_USE_CACH);
+  FUseCache->setCheckable(true);
+  FUseCache->setChecked(true);
+  FToolBarChanger->addAction(FUseCache,AG_DIWT_SERVICEDISCOVERY_DEFACTIONS,false);
+  connect(FUseCache,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FDiscoverCurrent = new Action(FToolBarChanger);
   FDiscoverCurrent->setText(tr("Discover"));
@@ -406,13 +420,15 @@ void DiscoItemsWindow::onTreeItemContextMenu(const QPoint &APos)
 
 void DiscoItemsWindow::onTreeItemExpanded(QTreeWidgetItem *AItem)
 {
-  if (AItem->childCount()==0 && !AItem->data(0,DDR_REQUEST_ITEMS).toBool())
+  if (!AItem->data(0,DDR_REQUEST_ITEMS).toBool())
   {
     Jid itemJid = AItem->data(0,DDR_JID).toString();
     QString itemNode = AItem->data(0,DDR_NODE).toString();
-    if (!FDiscovery->hasDiscoItems(itemJid,itemNode))
+    if (!useCache())
       requestDiscoItems(itemJid,itemNode);
-    else
+    else if(!FDiscovery->hasDiscoItems(itemJid,itemNode))
+      requestDiscoItems(itemJid,itemNode);
+    else if (AItem->childCount()==0)
       updateDiscoItems(FDiscovery->discoItems(itemJid,itemNode));
   }
 }

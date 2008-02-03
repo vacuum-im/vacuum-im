@@ -75,6 +75,7 @@ public:
   virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
   virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
+  virtual QList<IDiscoInfo> findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
   virtual QIcon discoInfoIcon(const IDiscoInfo &ADiscoInfo) const;
   virtual QIcon discoItemIcon(const IDiscoItem &ADiscoItem) const;
     //DiscoHandler
@@ -146,6 +147,8 @@ protected:
   IDiscoInfo loadEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
   bool saveEntityCaps(const IDiscoInfo &AInfo, const EntityCapabilities &ACaps) const;
   QByteArray calcCapsHash(const IDiscoInfo &AInfo) const;
+  bool compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const;
+  bool compareFeatures(const QStringList &AFeatures, const QStringList &AWith) const;
 protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);

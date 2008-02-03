@@ -22,6 +22,8 @@ public:
   virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
   virtual ToolBarChanger *actionsBarChanger() const { return FActionsBarChanger; }
   virtual QTreeWidgetItem *currentTreeItem() const { return ui.trwItems->currentItem(); }
+  virtual bool useCache() const { return FUseCache->isChecked(); }
+  virtual void setUseCache(bool AUse);
   virtual void discover(const Jid AContactJid, const QString &ANode);
 signals:
   virtual void discoverChanged(const Jid AContactJid, const QString &ANode);
@@ -67,6 +69,7 @@ private:
   Action *FMoveForward;
   Action *FDiscoverCurrent;
   Action *FReloadCurrent;
+  Action *FUseCache;
   Action *FDiscoInfo;
   Action *FAddContact;
   Action *FShowVCard;

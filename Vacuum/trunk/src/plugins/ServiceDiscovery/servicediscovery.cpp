@@ -453,6 +453,24 @@ bool ServiceDiscovery::checkDiscoFeature(const Jid &AContactJid, const QString &
   return dinfo.error.code>0 || !dinfo.contactJid.isValid() ? ADefault : dinfo.features.contains(AFeature);
 }
 
+QList<IDiscoInfo> ServiceDiscovery::findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const
+{
+  QList<IDiscoInfo> result;
+  QList<Jid> searchJids = AParent.itemJid.isValid() ? QList<Jid>()<<AParent.itemJid : FDiscoInfo.keys();
+  foreach(Jid itemJid,searchJids)
+  {
+    QHash<QString,IDiscoInfo> itemInfos = FDiscoInfo.value(itemJid);
+    QList<QString> searchNodes = !AParent.node.isEmpty() ? QList<QString>()<<AParent.node : itemInfos.keys();
+    foreach(QString itemNode, searchNodes)
+    {
+      IDiscoInfo itemInfo = itemInfos.value(itemNode);
+      if (compareIdentities(itemInfo.identity,AIdentity)&&compareFeatures(itemInfo.features,AFeatures))
+        result.append(itemInfo);
+    }
+  }
+  return result;
+}
+
 QIcon ServiceDiscovery::discoInfoIcon(const IDiscoInfo &ADiscoInfo) const
 {
   QIcon icon;
@@ -944,6 +962,27 @@ QByteArray ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo) const
   hashList += sortList;
   hashList.append("");
   return QCryptographicHash::hash(hashList.join("<").toUtf8(),QCryptographicHash::Sha1);
+}
+
+bool ServiceDiscovery::compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const
+{
+  foreach(IDiscoIdentity identity,AIdentities)
+    if (
+        (AWith.category.isEmpty() || AWith.category==identity.category) &&
+        (AWith.type.isEmpty() || AWith.type==identity.type) &&
+        (AWith.name.isEmpty() || AWith.name==identity.name)
+       )
+      return true;
+  return false;
+}
+
+bool ServiceDiscovery::compareFeatures(const QStringList &AFeatures, const QStringList &AWith) const
+{
+  if (!AWith.isEmpty())
+    foreach(QString feature, AWith)
+    if (!AFeatures.contains(feature))
+      return false;
+  return true;
 }
 
 void ServiceDiscovery::onStreamAdded(IXmppStream *AXmppStream)

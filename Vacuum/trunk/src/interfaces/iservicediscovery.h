@@ -91,6 +91,8 @@ public:
   virtual ToolBarChanger *toolBarChanger() const =0;
   virtual ToolBarChanger *actionsBarChanger() const =0;
   virtual QTreeWidgetItem *currentTreeItem() const =0;
+  virtual bool useCache() const =0;
+  virtual void setUseCache(bool AUse) =0;
   virtual void discover(const Jid AContactJid, const QString &ANode) =0;
 signals:
   virtual void discoverChanged(const Jid AContactJid, const QString &ANode) =0;
@@ -113,6 +115,7 @@ public:
   virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
   virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true) =0;
+  virtual QList<IDiscoInfo> findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const =0;
   virtual QIcon discoInfoIcon(const IDiscoInfo &ADiscoInfo) const =0;
   virtual QIcon discoItemIcon(const IDiscoItem &ADiscoItem) const =0;
   //DiscoHandler
