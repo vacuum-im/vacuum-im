@@ -1,0 +1,168 @@
+<ui version="4.0" >
+ <class>EditBookmarksDialogClass</class>
+ <widget class="QDialog" name="EditBookmarksDialogClass" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>553</width>
+    <height>311</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Edit bookmarks</string>
+  </property>
+  <layout class="QHBoxLayout" >
+   <property name="leftMargin" >
+    <number>3</number>
+   </property>
+   <property name="topMargin" >
+    <number>3</number>
+   </property>
+   <property name="rightMargin" >
+    <number>3</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>3</number>
+   </property>
+   <item>
+    <widget class="QTableWidget" name="tbwBookmarks" >
+     <property name="editTriggers" >
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors" >
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode" >
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior" >
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="cornerButtonEnabled" >
+      <bool>false</bool>
+     </property>
+     <column>
+      <property name="text" >
+       <string>Name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>JID/URL</string>
+      </property>
+     </column>
+     <column>
+      <property name="text" >
+       <string>Nick</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" >
+     <item>
+      <widget class="QPushButton" name="pbtAdd" >
+       <property name="text" >
+        <string>Add</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtEdit" >
+       <property name="text" >
+        <string>Edit</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtDelete" >
+       <property name="text" >
+        <string>Delete</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>20</width>
+         <height>16</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtMoveUp" >
+       <property name="text" >
+        <string>Up</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtMoveDown" >
+       <property name="text" >
+        <string>Down</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>20</width>
+         <height>16</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="bbxButtons" >
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="standardButtons" >
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Save</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <tabstops>
+  <tabstop>tbwBookmarks</tabstop>
+  <tabstop>pbtAdd</tabstop>
+  <tabstop>pbtEdit</tabstop>
+  <tabstop>pbtDelete</tabstop>
+  <tabstop>pbtMoveUp</tabstop>
+  <tabstop>pbtMoveDown</tabstop>
+  <tabstop>bbxButtons</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>bbxButtons</sender>
+   <signal>rejected()</signal>
+   <receiver>EditBookmarksDialogClass</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>487</x>
+     <y>296</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>469</x>
+     <y>296</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

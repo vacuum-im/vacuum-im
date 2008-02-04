@@ -22,4 +22,5 @@ HEADERS += ipluginmanager.h \
            ivcard.h \
            imultiuserchat.h \
            idataforms.h \
-           iservicediscovery.h 
+           iservicediscovery.h \
+           ibookmarks.h

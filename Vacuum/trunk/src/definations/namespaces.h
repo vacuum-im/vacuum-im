@@ -40,4 +40,6 @@
 
 #define NS_CAPS                                 "http://jabber.org/protocol/caps"
 
+#define NS_STORAGE_BOOKMARKS                    "storage:bookmarks"
+
 #endif
