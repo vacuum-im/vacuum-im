@@ -1,0 +1,203 @@
+#include "registerdialog.h"
+
+#include <QVBoxLayout>
+
+RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid, 
+                               const Jid &AServiceJid, int AOperation, QWidget *AParent) : QDialog(AParent)
+{
+  ui.setupUi(this);
+  setAttribute(Qt::WA_DeleteOnClose,true);
+  setWindowTitle(tr("Registration at %1").arg(AServiceJid.full()));
+  ui.spgDataForm->setLayout(new QVBoxLayout);
+  ui.spgDataForm->layout()->setMargin(0);
+
+  FRegistration = ARegistration;
+  FDataForms = ADataForms;
+  FStreamJid = AStremJid;
+  FServiceJid = AServiceJid;
+  FOperation = AOperation;
+  FSubmit.serviceJid = AServiceJid;
+  FSubmit.dataForm = NULL;
+
+  connect(ARegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
+    SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
+  connect(ARegistration->instance(),SIGNAL(registerSuccessful(const QString &)),
+    SLOT(onRegisterSuccessful(const QString &)));
+  connect(ARegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
+    SLOT(onRegisterError(const QString &, const QString &)));
+  connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonsClicked(QAbstractButton *)));
+
+  doRegisterOperation();
+}
+
+RegisterDialog::~RegisterDialog()
+{
+
+}
+
+void RegisterDialog::resetDialog()
+{
+  ui.stwForm->setEnabled(true);
+  if (FSubmit.dataForm)
+  {
+    ui.spgDataForm->layout()->removeWidget(FSubmit.dataForm->instance());
+    FSubmit.dataForm->instance()->deleteLater();
+    FSubmit.dataForm = NULL;
+  }
+  ui.stwForm->setCurrentWidget(ui.spgDataForm);
+}
+
+void RegisterDialog::doRegisterOperation()
+{
+  if (FOperation == IRegistration::Register)
+    doRegister();
+  else if (FOperation == IRegistration::Unregister)
+    doUnregister();
+  else if (FOperation == IRegistration::ChangePassword)
+    doChangePassword();
+  else
+    reject();
+}
+
+void RegisterDialog::doRegister()
+{
+  resetDialog();
+  FRequestId = FRegistration->sendRegiterRequest(FStreamJid,FServiceJid);
+  if (!FRequestId.isEmpty())
+    ui.lblInstuctions->setText(tr("Waiting for host response ..."));
+  else
+    ui.lblInstuctions->setText(tr("Error: Can`t send request to host."));
+  ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
+}
+
+void RegisterDialog::doUnregister()
+{
+  resetDialog();
+  ui.lblInstuctions->setText(tr("Do you really want to remove registration from %1?").arg(FServiceJid.hFull()));
+  ui.dbbButtons->setStandardButtons(QDialogButtonBox::Yes|QDialogButtonBox::Cancel);
+}
+
+void RegisterDialog::doChangePassword()
+{
+  resetDialog();
+  ui.lneUserName->setVisible(true);
+  ui.lblUserName->setVisible(true);
+  ui.lnePassword->setVisible(true);
+  ui.lblPassword->setVisible(true);
+  ui.lneEMail->setVisible(false);
+  ui.lblEmail->setVisible(false);
+  ui.stwForm->setCurrentWidget(ui.spgForm);
+  ui.lblInstuctions->setText(tr("Enter your username and new password."));
+  ui.dbbButtons->setStandardButtons(QDialogButtonBox::Yes|QDialogButtonBox::Cancel);
+}
+
+void RegisterDialog::onRegisterFields(const QString &AId, const IRegisterFields &AFields)
+{
+  if (FRequestId == AId)
+  {
+    FSubmit.fieldMask = AFields.fieldMask;
+    FSubmit.key = AFields.key;
+    if (!AFields.instructions.isEmpty())
+      ui.lblInstuctions->setText(AFields.instructions);
+    else
+      ui.lblInstuctions->setText(tr("Fill out this form to complete operation."));
+    if (!AFields.dataForm.isNull())
+    {
+      FSubmit.dataForm = FDataForms->newDataForm(AFields.dataForm,ui.spgDataForm);
+      ui.spgDataForm->layout()->addWidget(FSubmit.dataForm->instance());
+      if (!FSubmit.dataForm->title().isEmpty())
+        setWindowTitle(FSubmit.dataForm->title());
+      if (!FSubmit.dataForm->instructions().isEmpty())
+        ui.lblInstuctions->setText(FSubmit.dataForm->instructions().join("<br>"));
+      ui.stwForm->setCurrentWidget(ui.spgDataForm);
+    }
+    else
+    {
+      ui.lneUserName->setText(AFields.username);
+      ui.lnePassword->setText(AFields.password);
+      ui.lneEMail->setText(AFields.email);
+
+      ui.lneUserName->setVisible((AFields.fieldMask & IRegisterFields::Username) > 0);
+      ui.lblUserName->setVisible((AFields.fieldMask & IRegisterFields::Username) > 0);
+      ui.lnePassword->setVisible((AFields.fieldMask & IRegisterFields::Password) > 0);
+      ui.lblPassword->setVisible((AFields.fieldMask & IRegisterFields::Password) > 0);
+      ui.lneEMail->setVisible((AFields.fieldMask & IRegisterFields::Email) > 0);
+      ui.lblEmail->setVisible((AFields.fieldMask & IRegisterFields::Email) > 0);
+
+      ui.stwForm->setCurrentWidget(ui.spgForm);
+    }
+    ui.dbbButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+    ui.stwForm->setEnabled(true);
+  }
+}
+
+void RegisterDialog::onRegisterSuccessful(const QString &AId)
+{
+  if (FRequestId == AId)
+  {
+    resetDialog();
+    if (FOperation == IRegistration::Register)
+      ui.lblInstuctions->setText(tr("You are successfully registered at %1").arg(FSubmit.serviceJid.hFull()));
+    else if (FOperation == IRegistration::Unregister)
+      ui.lblInstuctions->setText(tr("You are successfully unregistered from %1").arg(FSubmit.serviceJid.hFull()));
+    else if (FOperation == IRegistration::ChangePassword)
+      ui.lblInstuctions->setText(tr("Password was successfully changed at %1").arg(FSubmit.serviceJid.hFull()));
+
+    ui.dbbButtons->setStandardButtons(QDialogButtonBox::Close);
+  }
+}
+
+void RegisterDialog::onRegisterError(const QString &AId, const QString &AError)
+{
+  if (FRequestId == AId)
+  {
+    resetDialog();
+    ui.lblInstuctions->setText(tr("Requested operation failed: %1").arg(Qt::escape(AError)));
+    ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Cancel);
+  }
+}
+
+void RegisterDialog::onDialogButtonsClicked(QAbstractButton *AButton)
+{
+  QDialogButtonBox::StandardButton button = ui.dbbButtons->standardButton(AButton);
+  if (button == QDialogButtonBox::Ok)
+  {
+    FSubmit.username = ui.lneUserName->text();
+    FSubmit.password = ui.lnePassword->text();
+    FSubmit.email = ui.lneEMail->text();
+    FRequestId = FRegistration->sendSubmit(FStreamJid,FSubmit);
+    if (!FRequestId.isEmpty())
+      ui.lblInstuctions->setText(tr("Waiting for host response ..."));
+    else
+      ui.lblInstuctions->setText(tr("Error: Can`t send submit to host."));
+    ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
+    ui.stwForm->setEnabled(false);
+  }
+  else if (button == QDialogButtonBox::Yes)
+  {
+    if (FOperation == IRegistration::Unregister)
+      FRequestId = FRegistration->sendUnregiterRequest(FStreamJid,FServiceJid);
+    else if (FOperation == IRegistration::ChangePassword)
+      FRequestId = FRegistration->sendChangePasswordRequest(FStreamJid,FServiceJid,ui.lneUserName->text(),ui.lnePassword->text());
+    if (!FRequestId.isEmpty())
+      ui.lblInstuctions->setText(tr("Waiting for host response ..."));
+    else
+      ui.lblInstuctions->setText(tr("Error: Can`t send request to host."));
+    ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
+  }
+  else if (button == QDialogButtonBox::Retry)
+  {
+    doRegisterOperation();
+  }
+  else if (button == QDialogButtonBox::Cancel)
+  {
+    setResult(QDialogButtonBox::Cancel);
+    close();
+  }
+  else if (button == QDialogButtonBox::Close)
+  {
+    setResult(QDialogButtonBox::Close);
+    close();
+  }
+}
+

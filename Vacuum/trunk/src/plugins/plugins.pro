@@ -30,4 +30,5 @@ SUBDIRS = settings \
           multiuserchat \
           dataforms \
           servicediscovery \
-          bookmarks
+          bookmarks \
+          registration

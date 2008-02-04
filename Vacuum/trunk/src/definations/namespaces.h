@@ -13,6 +13,8 @@
 #define NS_JABBER_LAST                          "jabber:iq:last"
 #define NS_JABBER_DELAY                         "jabber:x:delay"
 #define NS_JABBER_DATA                          "jabber:x:data"
+#define NS_JABBER_REGISTER                      "jabber:iq:register"
+#define NS_JABBER_OOB                           "jabber:x:oob"
 
 #define NS_FEATURE_IQAUTH                       "http://jabber.org/features/iq-auth"
 #define NS_FEATURE_SASL                         "urn:ietf:params:xml:ns:xmpp-sasl"
