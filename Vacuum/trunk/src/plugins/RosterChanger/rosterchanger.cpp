@@ -890,7 +890,7 @@ void RosterChanger::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, I
       action->setData(Action::DR_Parametr2,AUser->data(MUDR_NICK_NAME));
       action->setIcon(SYSTEM_ICONSETFILE,IN_ADDCONTACT);
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
-      AMenu->addAction(action,AG_ROSTERCHANGER_MUCM,true);
+      AMenu->addAction(action,AG_MUCM_ROSTERCHANGER,true);
     }
   }
 }

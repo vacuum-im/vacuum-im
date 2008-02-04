@@ -518,7 +518,7 @@ void ClientInfo::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMul
   else
     action->setData(ADR_CONTACT_JID,AUser->data(MUDR_CONTACTJID));
   connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
-  AMenu->addAction(action,AG_CLIENTINFO_MUCM,true);
+  AMenu->addAction(action,AG_MUCM_CLIENTINFO,true);
 }
 
 void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)

@@ -296,7 +296,7 @@ void VCardPlugin::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMu
     action->setData(ADR_ContactJid,Jid(AUser->data(MUDR_REALJID).toString()).bare());
   else
     action->setData(ADR_ContactJid,AUser->data(MUDR_CONTACTJID));
-  AMenu->addAction(action,AG_VCARD_MUCM,true);
+  AMenu->addAction(action,AG_MUCM_VCARD,true);
   connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
 }
 

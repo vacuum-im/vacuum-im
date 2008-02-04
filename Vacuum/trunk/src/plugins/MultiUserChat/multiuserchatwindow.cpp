@@ -355,30 +355,30 @@ void MultiUserChatWindow::initialize()
 void MultiUserChatWindow::createMenuBarActions()
 {
   FRoomMenu = new Menu(this);
-  FRoomMenu->setTitle(tr("Groupchat"));
+  FRoomMenu->setTitle(tr("Conference"));
   ui.mnbMenuBar->addMenu(FRoomMenu);
 
   FChangeNick = new Action(FRoomMenu);
   FChangeNick->setText(tr("Change room nick"));
   connect(FChangeNick,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FRoomMenu->addAction(FChangeNick,AG_DEFAULT,true);
+  FRoomMenu->addAction(FChangeNick,AG_MURM_MULTIUSERCHAT,true);
 
   FChangeSubject = new Action(FRoomMenu);
   FChangeSubject->setText(tr("Change topic"));
   connect(FChangeSubject,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FRoomMenu->addAction(FChangeSubject,AG_DEFAULT,true);
+  FRoomMenu->addAction(FChangeSubject,AG_MURM_MULTIUSERCHAT,true);
 
   FClearChat = new Action(FRoomMenu);
   FClearChat->setText(tr("Clear chat window"));
   connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FRoomMenu->addAction(FClearChat,AG_DEFAULT,true);
+  FRoomMenu->addAction(FClearChat,AG_MURM_MULTIUSERCHAT,true);
 
   FQuitRoom = new Action(FRoomMenu);
   FQuitRoom->setIcon(SYSTEM_ICONSETFILE,IN_EXIT);
   FQuitRoom->setText(tr("Exit"));
   FQuitRoom->setShortcut(tr("Ctrl+X"));
   connect(FQuitRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FRoomMenu->addAction(FQuitRoom,AG_MAINWINDOW_MMENU_QUIT,true);
+  FRoomMenu->addAction(FQuitRoom,AG_MURM_MULTIUSERCHAT_EXIT,true);
 
 
   FToolsMenu = new Menu(this);
@@ -388,42 +388,42 @@ void MultiUserChatWindow::createMenuBarActions()
   FInviteContact = new Action(FToolsMenu);
   FInviteContact->setText(tr("Invite to this room"));
   connect(FInviteContact,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FToolsMenu->addAction(FInviteContact,AG_DEFAULT,false);
+  FToolsMenu->addAction(FInviteContact,AG_MUTM_MULTIUSERCHAT,false);
 
   FRequestVoice = new Action(FToolsMenu);
   FRequestVoice->setText(tr("Request voice"));
   connect(FRequestVoice,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FToolsMenu->addAction(FRequestVoice,AG_DEFAULT,false);
+  FToolsMenu->addAction(FRequestVoice,AG_MUTM_MULTIUSERCHAT,false);
 
   FBanList = new Action(FToolsMenu);
   FBanList->setText(tr("Edit ban list"));
   connect(FBanList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FToolsMenu->addAction(FBanList,AG_DEFAULT,false);
+  FToolsMenu->addAction(FBanList,AG_MUTM_MULTIUSERCHAT,false);
 
   FMembersList = new Action(FToolsMenu);
   FMembersList->setText(tr("Edit members list"));
   connect(FMembersList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FToolsMenu->addAction(FMembersList,AG_DEFAULT,false);
+  FToolsMenu->addAction(FMembersList,AG_MUTM_MULTIUSERCHAT,false);
 
   FAdminsList = new Action(FToolsMenu);
   FAdminsList->setText(tr("Edit administrators list"));
   connect(FAdminsList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FToolsMenu->addAction(FAdminsList,AG_DEFAULT,false);
+  FToolsMenu->addAction(FAdminsList,AG_MUTM_MULTIUSERCHAT,false);
 
   FOwnersList = new Action(FToolsMenu);
   FOwnersList->setText(tr("Edit owners list"));
   connect(FOwnersList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FToolsMenu->addAction(FOwnersList,AG_DEFAULT,false);
+  FToolsMenu->addAction(FOwnersList,AG_MUTM_MULTIUSERCHAT,false);
 
   FConfigRoom = new Action(FToolsMenu);
   FConfigRoom->setText(tr("Configure room"));
   connect(FConfigRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FToolsMenu->addAction(FConfigRoom,AG_DEFAULT,false);
+  FToolsMenu->addAction(FConfigRoom,AG_MUTM_MULTIUSERCHAT,false);
 
   FDestroyRoom = new Action(FToolsMenu);
   FDestroyRoom->setText(tr("Destroy room"));
   connect(FDestroyRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FToolsMenu->addAction(FDestroyRoom,AG_DEFAULT,false);
+  FToolsMenu->addAction(FDestroyRoom,AG_MUTM_MULTIUSERCHAT_DESTROY,false);
 }
 
 void MultiUserChatWindow::updateMenuBarActions()
