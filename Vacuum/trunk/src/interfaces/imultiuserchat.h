@@ -1,6 +1,7 @@
 #ifndef IMULTIUSERCHAT_H
 #define IMULTIUSERCHAT_H
 
+#include <QMenuBar>
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/idataforms.h"
 #include "../../utils/jid.h"
@@ -166,9 +167,10 @@ public:
   virtual bool isActive() const =0;
   virtual IViewWidget *viewWidget() const =0;
   virtual IEditWidget *editWidget() const =0;
-  virtual IToolBarWidget *toolBarWidget() const =0;
+  virtual QMenuBar *menuBar() const =0;
   virtual Menu *roomMenu() const =0;
   virtual Menu *toolsMenu() const =0;
+  virtual IToolBarWidget *toolBarWidget() const =0;
   virtual IMultiUserChat *multiUserChat() const =0;
   virtual IChatWindow *openChatWindow(const Jid &AContactJid) =0; 
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const =0;

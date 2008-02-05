@@ -41,9 +41,10 @@ public:
   virtual bool isActive() const { return isVisible() && isActiveWindow(); }
   virtual IViewWidget *viewWidget() const { return FViewWidget; }
   virtual IEditWidget *editWidget() const { return FEditWidget; }
-  virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
+  virtual QMenuBar *menuBar() const { return ui.mnbMenuBar; }
   virtual Menu *roomMenu() const { return FRoomMenu; }
   virtual Menu *toolsMenu() const { return FToolsMenu; }
+  virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
   virtual IMultiUserChat *multiUserChat() const { return FMultiChat; }
   virtual IChatWindow *openChatWindow(const Jid &AContactJid); 
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;

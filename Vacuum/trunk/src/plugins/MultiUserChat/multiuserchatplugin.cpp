@@ -99,12 +99,12 @@ bool MultiUserChatPlugin::initObjects()
 {
   FChatMenu = new Menu(NULL);
   FChatMenu->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
-  FChatMenu->setTitle(tr("Groupchats"));
+  FChatMenu->setTitle(tr("Conferences"));
   connect(FChatMenu->menuAction(),SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
 
   FJoinAction = new Action(FChatMenu);
   FJoinAction->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
-  FJoinAction->setText(tr("Join groupchat"));
+  FJoinAction->setText(tr("Join conference"));
   connect(FJoinAction,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
   FChatMenu->addAction(FJoinAction,AG_DEFAULT+100,true);
 
@@ -485,14 +485,6 @@ void MultiUserChatPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *A
       Action *action = createJoinAction(AIndex->data(RDR_Jid).toString(),Jid(),AMenu);
       AMenu->addAction(action,AG_MULTIUSERCHAT_ROSTER,true);
     }
-    //else if (AIndex->type() == RIT_Contact && !FChatWindows.isEmpty())
-    //{
-    //  if (FDiscovery->checkDiscoFeature(AIndex->data(RDR_Jid).toString(),"",NS_MUC,true))
-    //  {
-    //    Menu *inviteMenu = createInviteMenu(AIndex->data(RDR_Jid).toString(),AMenu);
-    //    inviteMenu->isEmpty() ? delete inviteMenu : AMenu->addAction(inviteMenu->menuAction(),AG_MULTIUSERCHAT_ROSTER,true);
-    //  }
-    //}
   }
 }
 
