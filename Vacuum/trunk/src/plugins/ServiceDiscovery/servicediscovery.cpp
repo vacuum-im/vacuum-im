@@ -1248,6 +1248,12 @@ void ServiceDiscovery::onShowDiscoItemsByAction(bool)
     Jid contactJid = action->data(ADR_ContactJid).toString();
     QString node = action->data(ADR_Node).toString();
     showDiscoItems(streamJid,contactJid,node);
+    if (FDiscoMenu->actions(AG_DEFAULT).contains(action) && FDiscoMenu->defaultAction()!=action)
+    {
+      FDiscoMenu->menuAction()->disconnect(SIGNAL(triggered(bool)));
+      connect(FDiscoMenu->menuAction(),SIGNAL(triggered(bool)),action,SLOT(trigger()));
+      FDiscoMenu->setDefaultAction(action);
+    }
   }
 }
 
