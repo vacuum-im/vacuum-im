@@ -8,7 +8,7 @@
 #include "../../interfaces/idataforms.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/iservicediscovery.h"
-#include "../../interfaces/irostersview.h"
+#include "../../interfaces/ipresence.h"
 #include "../../utils/stanza.h"
 #include "registerdialog.h"
 
@@ -56,6 +56,7 @@ private:
   IDataForms *FDataForms;
   IStanzaProcessor *FStanzaProcessor;
   IServiceDiscovery *FDiscovery;
+  IPresencePlugin *FPresencePlugin;
 private:
   QList<QString> FSendRequests;
   QList<QString> FSubmitRequests;

@@ -13,6 +13,7 @@ Registration::Registration()
   FDataForms = NULL;
   FStanzaProcessor = NULL;
   FDiscovery = NULL;
+  FPresencePlugin = NULL;
 }
 
 Registration::~Registration()
@@ -45,6 +46,10 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
   plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+
+  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  if (plugin)
+    FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 
   return FStanzaProcessor!=NULL && FDataForms!=NULL;
 }
@@ -150,7 +155,8 @@ bool Registration::execDiscoFeature(const Jid &AStreamJid, const QString &AFeatu
 
 Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-  if (AFeature == NS_JABBER_REGISTER)
+  IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+  if ( presence && presence->isOpen() && AFeature == NS_JABBER_REGISTER)
   {   
     Menu *regMenu = new Menu(AParent);
     regMenu->setTitle(tr("Registration"));
@@ -258,8 +264,13 @@ QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &A
 
 void Registration::showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent)
 {
-  RegisterDialog *dialog = new RegisterDialog(this,FDataForms,AStreamJid,AServiceJid,AOperation,AParent);
-  dialog->show();
+  IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+  if (presence && presence->isOpen())
+  {
+    RegisterDialog *dialog = new RegisterDialog(this,FDataForms,AStreamJid,AServiceJid,AOperation,AParent);
+    connect(presence->instance(),SIGNAL(closed()),dialog,SLOT(reject()));
+    dialog->show();
+  }
 }
 
 void Registration::registerDiscoFeatures()
