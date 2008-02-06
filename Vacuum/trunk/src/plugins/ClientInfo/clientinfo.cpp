@@ -282,27 +282,31 @@ bool ClientInfo::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature
 
 Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-  if (AFeature == NS_JABBER_VERSION)
+  IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+  if (presence && presence->isOpen())
   {
-    Action *action = new Action(AParent);
-    action->setText(tr("Client version"));
-    action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
-    action->setData(ADR_STREAM_JID,AStreamJid.full());
-    action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
-    connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
-    return action;
-  }
-  else if (AFeature == NS_JABBER_LAST)
-  {
-    if (FPresencePlugin && !FPresencePlugin->isContactOnline(ADiscoInfo.contactJid))
+    if (AFeature == NS_JABBER_VERSION)
     {
       Action *action = new Action(AParent);
-      action->setText(tr("Last activity"));
+      action->setText(tr("Client version"));
       action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
       action->setData(ADR_STREAM_JID,AStreamJid.full());
       action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
       connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
       return action;
+    }
+    else if (AFeature == NS_JABBER_LAST)
+    {
+      if (FPresencePlugin && !FPresencePlugin->isContactOnline(ADiscoInfo.contactJid))
+      {
+        Action *action = new Action(AParent);
+        action->setText(tr("Last activity"));
+        action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
+        action->setData(ADR_STREAM_JID,AStreamJid.full());
+        action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
+        connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
+        return action;
+      }
     }
   }
   return NULL;
