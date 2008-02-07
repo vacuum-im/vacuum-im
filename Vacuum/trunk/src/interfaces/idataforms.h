@@ -30,8 +30,9 @@ class IDataField
 {
 public:
   enum FieldKind {
-    Normal,
-    Result,
+    Edit,
+    View,
+    Value,
     TableHeader,
     TableCell
   };
@@ -60,12 +61,15 @@ class IDataForm
 {
 public:
   virtual QWidget *instance() =0;
-  virtual bool isValid() const =0;
+  virtual bool isValid(int APage = -1) const =0;
+  virtual QString invalidMessage(int APage = -1) const =0;
   virtual QDomElement formElement() const =0;
   virtual void createSubmit(QDomElement &AFormElem) const =0;
   virtual QString type() const =0;
   virtual QString title() const =0;
   virtual QStringList instructions() const =0;
+  virtual void setInstructions(const QString &AInstructions) =0;
+  virtual QWidget *pageControl() const =0;
   virtual int pageCount() const =0;
   virtual QString pageLabel(int APage) const =0;
   virtual int currentPage() const =0;
@@ -86,6 +90,7 @@ signals:
   virtual void focusedFieldChanged(IDataField *AFocusedField) =0;
   virtual void fieldGotFocus(IDataField *AField, Qt::FocusReason AReason) =0;
   virtual void fieldLostFocus(IDataField *AField, Qt::FocusReason AReason) =0;
+  virtual void currentPageChanged(int APage) =0;
 };
 
 class IDataDialog :
@@ -101,8 +106,6 @@ public:
   virtual void showPrevPage() =0;
   virtual void showNextPage() =0;
   virtual void setAutoAccept(bool AAuto) =0;
-signals:
-  virtual void currentPageChanged(int APage) =0;
 };
 
 class IDataForms

@@ -80,7 +80,7 @@ DataField::DataField(const QDomElement &AElem, IDataField::FieldKind AKind, QWid
     FTableItem->setFlags(Qt::ItemIsEnabled);
     setValue(values.value(0));
   }
-  else if (FKind == IDataField::Result)
+  else if (FKind == IDataField::Value)
   {
     if (FType == FIELD_JIDMULTI || FType == FIELD_TEXTMULTI || FType == FIELD_LISTMULTI)
       setValue(values);
@@ -121,6 +121,7 @@ DataField::DataField(const QDomElement &AElem, IDataField::FieldKind AKind, QWid
       FLabelWidget->setBuddy(FTextEdit);
       FWidget->layout()->addWidget(FLabelWidget);
     }
+    FTextEdit->setReadOnly(FKind != IDataField::Edit);
     FTextEdit->setAcceptRichText(false);
     FTextEdit->installEventFilter(this);
     FWidget->layout()->addWidget(FTextEdit);
@@ -143,6 +144,7 @@ DataField::DataField(const QDomElement &AElem, IDataField::FieldKind AKind, QWid
     {
       QCheckBox *checkBox = new QCheckBox(FGroupBox);
       checkBox->setText(Qt::escape(optionLabel));
+      checkBox->setCheckState(Qt::Checked);
       checkBox->installEventFilter(this);
       FGroupBox->layout()->addWidget(checkBox);
       FCheckList.append(checkBox);
@@ -205,7 +207,7 @@ DataField::~DataField()
 
 bool DataField::isValid() const
 {
-  if (FKind != Normal)
+  if (FKind != IDataField::Edit)
   {
     return true;
   }
@@ -272,7 +274,7 @@ QVariant DataField::value() const
   {
     return  FTableItem->text();
   }
-  else if (FKind == IDataField::Result)
+  else if (FKind == IDataField::Value)
   {
     return FStaticValue;
   }
@@ -345,7 +347,7 @@ void DataField::setValue(const QVariant &AValue)
   {
     FTableItem->setText(AValue.toString());
   }
-  else if (FKind == IDataField::Result)
+  else if (FKind == IDataField::Value)
   {
     FStaticValue = AValue;
   }
@@ -472,6 +474,7 @@ QWidget *DataField::createValidatedEditor(QWidget *AParent)
   {
     FDateTimeEdit = new QDateTimeEdit(AParent);
     FDateTimeEdit->setToolTip(Qt::escape(FDesc));
+    FDateTimeEdit->setReadOnly(FKind != IDataField::Edit);
     FDateTimeEdit->setCalendarPopup(true);
     QDateTime min = QDateTime::fromString(FValidate.min,Qt::ISODate);
     QDateTime max = QDateTime::fromString(FValidate.max,Qt::ISODate);
@@ -492,6 +495,7 @@ QWidget *DataField::createValidatedEditor(QWidget *AParent)
   {
     FDateEdit = new QDateEdit(AParent);
     FDateEdit->setToolTip(Qt::escape(FDesc));
+    FDateEdit->setReadOnly(FKind != IDataField::Edit);
     FDateEdit->setCalendarPopup(true);
     QDateTime min = QDateTime::fromString(FValidate.min,Qt::ISODate);
     QDateTime max = QDateTime::fromString(FValidate.max,Qt::ISODate);
@@ -506,6 +510,7 @@ QWidget *DataField::createValidatedEditor(QWidget *AParent)
   {
     FTimeEdit = new QTimeEdit(AParent);
     FTimeEdit->setToolTip(Qt::escape(FDesc));
+    FTimeEdit->setReadOnly(FKind != IDataField::Edit);
     QDateTime min = QDateTime::fromString(FValidate.min,Qt::ISODate);
     QDateTime max = QDateTime::fromString(FValidate.max,Qt::ISODate);
     if (min.isValid())
@@ -519,6 +524,7 @@ QWidget *DataField::createValidatedEditor(QWidget *AParent)
   {
     FLineEdit = new QLineEdit(FWidget);
     FLineEdit->setToolTip(Qt::escape(FDesc));
+    FLineEdit->setReadOnly(FKind != IDataField::Edit);
     if (FType == FIELD_TEXTPRIVATE)
       FLineEdit->setEchoMode(QLineEdit::Password);
     FLineEdit->setValidator(createValidator(FLineEdit));

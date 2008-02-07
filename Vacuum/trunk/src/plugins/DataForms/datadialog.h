@@ -19,13 +19,7 @@ public:
   virtual void showPrevPage();
   virtual void showNextPage();
   virtual void setAutoAccept(bool AAuto);
-signals:
-  virtual void currentPageChanged(int APage);
-protected:
-  void updateDialog();
 protected slots:
-  void onPrevPageClicked();
-  void onNextPageClicked();
   void onAcceptClicked();
   void onRejectClicked();
 private:

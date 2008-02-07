@@ -21,12 +21,15 @@ public:
   ~DataForm();
   //IDataForm
   virtual QWidget *instance() { return this; }
-  virtual bool isValid() const;
+  virtual bool isValid(int APage = -1) const;
+  virtual QString invalidMessage(int APage = -1) const;
   virtual QDomElement formElement() const { return FFormDoc.documentElement().firstChildElement("x"); }
   virtual void createSubmit(QDomElement &AFormElem) const;
   virtual QString type() const { return FType; }
   virtual QString title() const { return FTitle; }
   virtual QStringList instructions() const { return FInstructions; }
+  virtual void setInstructions(const QString &AInstructions);
+  virtual QWidget *pageControl() const { return FPageControl; }
   virtual int pageCount() const { return FStackedWidget->count(); }
   virtual QString pageLabel(int APage) const { return FPageLabels.value(APage); }
   virtual int currentPage() const { return FStackedWidget->currentIndex(); }
@@ -47,8 +50,9 @@ signals:
   virtual void focusedFieldChanged(IDataField *AFocusedField);
   virtual void fieldGotFocus(IDataField *AField, Qt::FocusReason AReason);
   virtual void fieldLostFocus(IDataField *AField, Qt::FocusReason AReason);
+  virtual void currentPageChanged(int APage);
 protected:
-  void insertFields(const QDomElement &AElem, QLayout *ALayout);
+  void insertFields(const QDomElement &AElem, QLayout *ALayout, int APage);
   void setFocusedField(IDataField *AField, Qt::FocusReason AReason);
 protected:
   virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
@@ -57,8 +61,11 @@ protected slots:
   void onFieldLostFocus(Qt::FocusReason AReason);
   void onCellActivated(int ARow, int ACol);
   void onCurrentCellChanged(int ARow, int ACol, int APrevRow, int APrevCol);
+  void onShowPrevPageClicked();
+  void onShowNextPageClicked();
 private:
   QDomDocument FFormDoc;
+  QLabel *FInstructLabel;
   QScrollArea *FScrollArea;
   QStackedWidget *FStackedWidget;
   QList<QWidget *> FInsertedFields;
@@ -68,6 +75,10 @@ private:
   QStringList FInstructions;
   IDataField *FFocusedField;
   QList<IDataField *> FDataFields;
+private:
+  QWidget *FPageControl;
+  QLabel *FPageControlLabel;
+  QHash<int, IDataField *> FPageFields;
 private:
   QList<IDataField *> FColumns;
   QMap<int, QHash<QString,IDataField *> > FRows;

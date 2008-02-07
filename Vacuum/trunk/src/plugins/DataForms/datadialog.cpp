@@ -20,24 +20,15 @@ DataDialog::DataDialog(IDataForm *ADataForm, QWidget *AParent) : IDataDialog(APa
   ui.wdtToolBar->layout()->setMargin(0);
   FToolBarChanger = new ToolBarChanger(toolBar);
 
-  QString instr = FDataForm->instructions().join("\n");
-  if (!instr.isEmpty())
-    ui.lblInsructions->setText(instr);
-  else
-    ui.lblInsructions->setVisible(false);
-
-  if (FDataForm->pageCount() > 1)
+  if (FDataForm->pageControl())
   {
-    connect(ui.tlbPrevPage,SIGNAL(clicked()),SLOT(onPrevPageClicked()));
-    connect(ui.tlbNextPage,SIGNAL(clicked()),SLOT(onNextPageClicked()));
+    ui.wdtPages->setLayout(new QHBoxLayout);
+    ui.wdtPages->layout()->addWidget(FDataForm->pageControl());
+    ui.wdtPages->layout()->setMargin(0);
   }
-  else
-    ui.wdtPages->setVisible(false);
 
   connect(ui.dbbDialogButtons,SIGNAL(accepted()),SLOT(onAcceptClicked()));
   connect(ui.dbbDialogButtons,SIGNAL(rejected()),SLOT(onRejectClicked()));
-
-  updateDialog();
 }
 
 DataDialog::~DataDialog()
@@ -47,12 +38,7 @@ DataDialog::~DataDialog()
 
 void DataDialog::showPage(int APage)
 {
-  if (APage >= 0 && APage < FDataForm->pageCount())
-  {
-    FDataForm->setCurrentPage(APage);
-    updateDialog();
-    emit currentPageChanged(APage);
-  }
+  FDataForm->setCurrentPage(APage);
 }
 
 void DataDialog::showPrevPage()
@@ -70,36 +56,13 @@ void DataDialog::setAutoAccept(bool AAuto)
   FAutoAccept = AAuto;
 }
 
-void DataDialog::updateDialog()
-{
-  QString pageLabel = FDataForm->pageLabel(FDataForm->currentPage());
-  ui.lblPageLabel->setText(pageLabel);
-  ui.lblPageLabel->setVisible(!pageLabel.isEmpty());
-  ui.lblPages->setText(tr("Page %1 of %2").arg(FDataForm->currentPage()+1).arg(FDataForm->pageCount()));
-}
-
-void DataDialog::onPrevPageClicked()
-{
-  showPrevPage();
-}
-
-void DataDialog::onNextPageClicked()
-{
-  showNextPage();
-}
-
 void DataDialog::onAcceptClicked()
 {
   if (FAutoAccept)
   {
     if (!FDataForm->isValid())
     {
-      QString message = tr("Current form values are not acceptable:");
-      message += tr("<br>Invalid values in fields:");
-      foreach(IDataField *field, FDataForm->fields())
-        if (!field->isValid())
-          message += tr("<br>- %1").arg(field->label());
-      QMessageBox::StandardButton button = QMessageBox::warning(this,tr("Not Acceptable"),message,QMessageBox::Ok|QMessageBox::Ignore);
+      QMessageBox::StandardButton button = QMessageBox::warning(this,tr("Not Acceptable"),FDataForm->invalidMessage(),QMessageBox::Ok|QMessageBox::Ignore);
       if (button == QMessageBox::Ignore)
         accept();
     }

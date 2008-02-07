@@ -8,13 +8,19 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
 {
   FFocusedField = NULL;
   FTableWidget = NULL;
+  FPageControl = NULL;
+  FPageControlLabel = NULL;
 
   FStackedWidget = new QStackedWidget;
   FScrollArea = new QScrollArea(this);
   FScrollArea->setWidgetResizable(true);
   FScrollArea->setFrameShape(QFrame::NoFrame);
   FScrollArea->setWidget(FStackedWidget);
+  FInstructLabel = new QLabel(this);
+  FInstructLabel->setWordWrap(true);
+  FInstructLabel->setAlignment(Qt::AlignCenter);
   setLayout(new QVBoxLayout(this));
+  layout()->addWidget(FInstructLabel);
   layout()->addWidget(FScrollArea);
   layout()->setMargin(0);
 
@@ -28,13 +34,14 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
     FInstructions.append(elem.text());
     elem = elem.nextSiblingElement("instructions");
   }
+  setInstructions(FInstructions.join("<br>"));
 
   elem = AElem.firstChildElement("field");
   while(!elem.isNull())
   {
     if (!elem.attribute("var").isEmpty() && field(elem.attribute("var"))==NULL)
     {
-      IDataField *dataField = new DataField(elem,FType == FORM_FORM ? IDataField::Normal : IDataField::Result,this);
+      IDataField *dataField = new DataField(elem,FType==FORM_FORM ? IDataField::Edit : (FType==FORM_SUBMIT ? IDataField::Value : IDataField::View), this);
       connect(dataField->instance(),SIGNAL(fieldGotFocus(Qt::FocusReason)),SLOT(onFieldGotFocus(Qt::FocusReason)));
       connect(dataField->instance(),SIGNAL(fieldLostFocus(Qt::FocusReason)),SLOT(onFieldLostFocus(Qt::FocusReason)));
       FDataFields.append(dataField);
@@ -93,6 +100,10 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
     FTableWidget->setHorizontalHeaderLabels(headerLabels);
     FTableWidget->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
     FTableWidget->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    FTableWidget->setMinimumHeight(FTableWidget->verticalHeader()->length() + FTableWidget->horizontalHeader()->height());
+    FTableWidget->setMinimumWidth(FTableWidget->horizontalHeader()->length() + FTableWidget->verticalHeader()->height());
+    FTableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    FTableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     connect(FTableWidget,SIGNAL(cellActivated(int,int)),SLOT(onCellActivated(int,int)));
     connect(FTableWidget,SIGNAL(currentCellChanged(int,int,int,int)),SLOT(onCurrentCellChanged(int,int,int,int)));
   }
@@ -102,17 +113,44 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
   {
     QWidget *pageWidget = new QWidget(this);
     pageWidget->setLayout(new QVBoxLayout(pageWidget));
-    insertFields(formElement(),pageWidget->layout());
+    pageWidget->layout()->setMargin(0);
+    insertFields(formElement(),pageWidget->layout(),0);
     FStackedWidget->addWidget(pageWidget);
   }
-  else for(int pageIndex = 0; pageIndex < pagesList.count(); pageIndex++)
+  else 
   {
-    QDomElement pageElem = pagesList.at(pageIndex).toElement();
-    FPageLabels.append(pageElem.attribute("label"));
-    QWidget *pageWidget = new QWidget(this);
-    pageWidget->setLayout(new QVBoxLayout(pageWidget));
-    insertFields(pageElem,pageWidget->layout());
-    FStackedWidget->addWidget(pageWidget);
+    FPageControl = new QWidget(this);
+    FPageControl->setLayout(new QHBoxLayout);
+    QToolButton *prev = new QToolButton(FPageControl);
+    prev->setText("<");
+    connect(prev,SIGNAL(clicked()),SLOT(onShowPrevPageClicked()));
+    FPageControlLabel = new QLabel(FPageControl);
+    FPageControlLabel->setAlignment(Qt::AlignCenter);
+    QToolButton *next = new QToolButton(FPageControl);
+    next->setText(">");
+    connect(next,SIGNAL(clicked()),SLOT(onShowNextPageClicked()));
+    FPageControl->layout()->addWidget(prev);
+    FPageControl->layout()->addWidget(FPageControlLabel);
+    FPageControl->layout()->addWidget(next);
+    FPageControl->layout()->setMargin(0);
+    for(int pageIndex = 0; pageIndex < pagesList.count(); pageIndex++)
+    {
+      QDomElement pageElem = pagesList.at(pageIndex).toElement();
+      QWidget *pageWidget = new QWidget(this);
+      pageWidget->setLayout(new QVBoxLayout(pageWidget));
+      pageWidget->layout()->setMargin(0);
+      QString label = pageElem.attribute("label");
+      if (!label.isEmpty())
+      {
+        QLabel *labelWidget = new QLabel(Qt::escape(label),pageWidget);
+        labelWidget->setWordWrap(true);
+        labelWidget->setAlignment(Qt::AlignCenter);
+        pageWidget->layout()->addWidget(labelWidget);
+      }
+      FPageLabels.append(label);
+      insertFields(pageElem,pageWidget->layout(),pageIndex);
+      FStackedWidget->addWidget(pageWidget);
+    }
   }
 
   setCurrentPage(0);
@@ -120,15 +158,33 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
 
 DataForm::~DataForm()
 {
-
+  delete FPageControl;
 }
 
-bool DataForm::isValid() const
+bool DataForm::isValid(int APage) const
 {
-  foreach(IDataField *dataField, FDataFields)
+  QList<IDataField *> dataFields = APage >= 0 ? FPageFields.values(APage) : FDataFields;
+  foreach(IDataField *dataField, dataFields)
     if (!dataField->isValid())
       return false;
   return true;
+}
+
+QString DataForm::invalidMessage(int APage) const
+{
+  QString message = tr("Current form values are not acceptable:");
+  message += tr("<br>Invalid values in fields:");
+  QList<IDataField *> dataFields = APage >= 0 ? FPageFields.values(APage) : FDataFields;
+  foreach(IDataField *field, dataFields)
+    if (!field->isValid())
+      message += tr("<br>- %1").arg(field->label());
+  return message;
+}
+
+void DataForm::setInstructions(const QString &AInstructions)
+{
+  FInstructLabel->setText(AInstructions);
+  FInstructLabel->setVisible(!AInstructions.isEmpty());
 }
 
 void DataForm::createSubmit(QDomElement &AFormElem) const
@@ -154,10 +210,16 @@ void DataForm::createSubmit(QDomElement &AFormElem) const
 
 void DataForm::setCurrentPage(int APage)
 {
-  if (currentPage() != APage && APage >= 0 && APage < pageCount())
+  if (APage >= 0 && APage < pageCount())
   {
-    FStackedWidget->setCurrentIndex(APage);
-    FScrollArea->ensureVisible(0,0);
+    if (FPageControlLabel)
+      FPageControlLabel->setText(tr("Page %1 of %2").arg(APage+1).arg(pageCount()));
+    if (currentPage() != APage)
+    {
+      FStackedWidget->setCurrentIndex(APage);
+      FScrollArea->ensureVisible(0,0);
+      emit currentPageChanged(APage);
+    }
   }
 }
 
@@ -199,7 +261,7 @@ QList<IDataField *> DataForm::notValidFields() const
   return dataFields;
 }
 
-void DataForm::insertFields(const QDomElement &AElem, QLayout *ALayout)
+void DataForm::insertFields(const QDomElement &AElem, QLayout *ALayout, int APage)
 {
   QDomElement elem = AElem.firstChildElement();
   while(!elem.isNull())
@@ -213,6 +275,7 @@ void DataForm::insertFields(const QDomElement &AElem, QLayout *ALayout)
         {
           ALayout->addWidget(dataField->widget());
           FInsertedFields.append(dataField->widget());
+          FPageFields.insert(APage,dataField);
         }
       }
       else if (elem.attribute("type") == FIELD_FIXED)
@@ -248,7 +311,7 @@ void DataForm::insertFields(const QDomElement &AElem, QLayout *ALayout)
       QGroupBox *groupBox = new QGroupBox(elem.attribute("label"));
       groupBox->setLayout(new QVBoxLayout(groupBox));
       ALayout->addWidget(groupBox);
-      insertFields(elem,groupBox->layout());
+      insertFields(elem,groupBox->layout(),APage);
     }
     elem = elem.nextSiblingElement();
   }
@@ -311,5 +374,15 @@ void DataForm::onCurrentCellChanged(int ARow, int ACol, int /*APrevRow*/, int /*
 {
   IDataField *dataField = tableField(ACol,ARow);
   setFocusedField(dataField,Qt::NoFocusReason);
+}
+
+void DataForm::onShowPrevPageClicked()
+{
+  setCurrentPage(currentPage()-1);
+}
+
+void DataForm::onShowNextPageClicked()
+{
+  setCurrentPage(currentPage()+1);
 }
 

@@ -44,6 +44,7 @@ void RegisterDialog::resetDialog()
     FSubmit.dataForm->instance()->deleteLater();
     FSubmit.dataForm = NULL;
   }
+  ui.lblInstuctions->setText("");
   ui.stwForm->setCurrentWidget(ui.spgDataForm);
 }
 
@@ -95,24 +96,30 @@ void RegisterDialog::onRegisterFields(const QString &AId, const IRegisterFields 
 {
   if (FRequestId == AId)
   {
+    resetDialog();
+
     FSubmit.fieldMask = AFields.fieldMask;
     FSubmit.key = AFields.key;
-    if (!AFields.instructions.isEmpty())
-      ui.lblInstuctions->setText(AFields.instructions);
-    else
-      ui.lblInstuctions->setText(tr("Fill out this form to complete operation."));
+    
     if (!AFields.dataForm.isNull())
     {
       FSubmit.dataForm = FDataForms->newDataForm(AFields.dataForm,ui.spgDataForm);
       ui.spgDataForm->layout()->addWidget(FSubmit.dataForm->instance());
       if (!FSubmit.dataForm->title().isEmpty())
         setWindowTitle(FSubmit.dataForm->title());
-      if (!FSubmit.dataForm->instructions().isEmpty())
-        ui.lblInstuctions->setText(FSubmit.dataForm->instructions().join("<br>"));
+      if (FSubmit.dataForm->pageControl())
+      {
+        ui.wdtPages->setLayout(new QHBoxLayout);
+        ui.wdtPages->layout()->addWidget(FSubmit.dataForm->pageControl());
+        ui.wdtPages->layout()->setMargin(0);
+      }
       ui.stwForm->setCurrentWidget(ui.spgDataForm);
     }
     else
     {
+      if (!AFields.instructions.isEmpty())
+        ui.lblInstuctions->setText(AFields.instructions);
+
       ui.lneUserName->setText(AFields.username);
       ui.lnePassword->setText(AFields.password);
       ui.lneEMail->setText(AFields.email);
@@ -127,7 +134,6 @@ void RegisterDialog::onRegisterFields(const QString &AId, const IRegisterFields 
       ui.stwForm->setCurrentWidget(ui.spgForm);
     }
     ui.dbbButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
-    ui.stwForm->setEnabled(true);
   }
 }
 
