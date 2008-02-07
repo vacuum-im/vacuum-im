@@ -751,13 +751,13 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const QPair<J
     result.error.condition = err.condition();
     result.error.message = err.message();
   }
-  else if (query.attribute("node")!=result.node)
-  {
-    ErrorHandler err("item-not-found");
-    result.error.code = err.code();
-    result.error.condition = err.condition();
-    result.error.message = err.message();
-  }
+  //else if (query.attribute("node")!=result.node)
+  //{
+  //  ErrorHandler err("item-not-found");
+  //  result.error.code = err.code();
+  //  result.error.condition = err.condition();
+  //  result.error.message = err.message();
+  //}
   else 
   {
     QDomElement elem = query.firstChildElement("identity");
@@ -796,13 +796,13 @@ IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza, const QPair
     result.error.condition = err.condition();
     result.error.message = err.message();
   }
-  else if (query.attribute("node")!=result.node)
-  {
-    ErrorHandler err("item-not-found");
-    result.error.code = err.code();
-    result.error.condition = err.condition();
-    result.error.message = err.message();
-  }
+  //else if (query.attribute("node")!=result.node)
+  //{
+  //  ErrorHandler err("item-not-found");
+  //  result.error.code = err.code();
+  //  result.error.condition = err.condition();
+  //  result.error.message = err.message();
+  //}
   else 
   {
     QDomElement elem = query.firstChildElement("item");
