@@ -31,4 +31,5 @@ SUBDIRS = settings \
           dataforms \
           servicediscovery \
           bookmarks \
-          registration
+          registration \
+          commands

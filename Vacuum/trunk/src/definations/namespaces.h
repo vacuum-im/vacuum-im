@@ -16,6 +16,9 @@
 #define NS_JABBER_REGISTER                      "jabber:iq:register"
 #define NS_JABBER_OOB                           "jabber:x:oob"
 
+#define NS_VCARD_TEMP                           "vcard-temp"
+#define NS_STORAGE_BOOKMARKS                    "storage:bookmarks"
+
 #define NS_FEATURE_IQAUTH                       "http://jabber.org/features/iq-auth"
 #define NS_FEATURE_SASL                         "urn:ietf:params:xml:ns:xmpp-sasl"
 #define NS_FEATURE_BIND                         "urn:ietf:params:xml:ns:xmpp-bind"
@@ -24,7 +27,6 @@
 #define NS_PROTOCOL_COMPRESS                    "http://jabber.org/protocol/compress"
 #define NS_FEATURE_STARTTLS                     "urn:ietf:params:xml:ns:xmpp-tls"
 
-#define NS_VCARD_TEMP                           "vcard-temp"
 
 #define NS_MUC                                  "http://jabber.org/protocol/muc"
 #define NS_MUC_USER                             "http://jabber.org/protocol/muc#user"
@@ -42,6 +44,6 @@
 
 #define NS_CAPS                                 "http://jabber.org/protocol/caps"
 
-#define NS_STORAGE_BOOKMARKS                    "storage:bookmarks"
+#define NS_COMMANDS                             "http://jabber.org/protocol/commands"
 
 #endif
