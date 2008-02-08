@@ -194,7 +194,8 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
   {
     IDiscoInfo dinfo;
     QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
-    dinfo.contactJid = AStreamJid;
+    dinfo.streamJid = AStreamJid;
+    dinfo.contactJid = AStanza.from();
     dinfo.node = query.attribute("node");
     foreach(IDiscoHandler *AHandler, FDiscoHandlers)
       AHandler->fillDiscoInfo(dinfo);
@@ -211,6 +212,8 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
       Stanza reply("iq");
       reply.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
       QDomElement query = reply.addElement("query",NS_DISCO_INFO);
+      if (!dinfo.node.isEmpty())
+        query.setAttribute("node",dinfo.node);
       foreach(IDiscoIdentity identity, dinfo.identity)
       {
         QDomElement elem = query.appendChild(reply.createElement("identity")).toElement();
@@ -231,7 +234,8 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
   {
     IDiscoItems ditems;
     QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
-    ditems.contactJid = AStreamJid;
+    ditems.streamJid = AStreamJid;
+    ditems.contactJid = AStanza.from();
     ditems.node = query.attribute("node");
     foreach(IDiscoHandler *AHandler, FDiscoHandlers)
       AHandler->fillDiscoItems(ditems);
@@ -248,6 +252,8 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
       Stanza reply("iq");
       reply.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
       QDomElement query = reply.addElement("query",NS_DISCO_ITEMS);
+      if (!ditems.node.isEmpty())
+        query.setAttribute("node",ditems.node);
       foreach(IDiscoItem ditem, ditems.items)
       {
         QDomElement elem = query.appendChild(reply.createElement("item")).toElement();
