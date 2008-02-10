@@ -71,6 +71,7 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
     {
       connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),SLOT(onOptionsAccepted()));
       connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
+      connect(FAccountManager->instance(),SIGNAL(removed(IAccount *)),SLOT(onAccountRemoved(IAccount *)));
     }
   }
 
@@ -380,6 +381,11 @@ void Registration::onRegisterActionTriggered(bool)
 void Registration::onRegisterStreamDestroyed(IStreamFeature *AFeature)
 {
   removeFeature(AFeature->xmppStream());
+}
+
+void Registration::onAccountRemoved(IAccount *AAccount)
+{
+  removeFeature(AAccount->xmppStream());
 }
 
 void Registration::onOptionsAccepted()

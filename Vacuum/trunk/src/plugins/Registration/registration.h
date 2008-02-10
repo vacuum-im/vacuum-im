@@ -74,6 +74,7 @@ protected:
 protected slots:
   void onRegisterActionTriggered(bool);
   void onRegisterStreamDestroyed(IStreamFeature *AFeature);
+  void onAccountRemoved(IAccount *AAccount);
   void onOptionsAccepted();
   void onOptionsRejected();
   void onOptionsDialogClosed();
