@@ -80,7 +80,6 @@ protected slots:
   //IStreamFeature
   void onFeatureFinished(bool ARestart);
   void onFeatureError(const QString &AErrStr);
-  void onFeatureDestroyed(QObject *AFeature);
   //KeepAlive
   void onKeepAliveTimeout();
 private:

@@ -14,6 +14,8 @@ Registration::Registration()
   FStanzaProcessor = NULL;
   FDiscovery = NULL;
   FPresencePlugin = NULL;
+  FSettingsPlugin = NULL;
+  FAccountManager = NULL;
 }
 
 Registration::~Registration()
@@ -51,6 +53,27 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
   if (plugin)
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 
+  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    if (FSettingsPlugin)
+    {
+      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),SLOT(onOptionsDialogClosed()));
+    }
+  }
+
+  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  if (plugin)
+  {
+    FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+    if (FAccountManager)
+    {
+      connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),SLOT(onOptionsAccepted()));
+      connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
+    }
+  }
+
   return FStanzaProcessor!=NULL && FDataForms!=NULL;
 }
 
@@ -60,6 +83,10 @@ bool Registration::initObjects()
   {
     registerDiscoFeatures();
     FDiscovery->insertFeatureHandler(NS_JABBER_REGISTER,this,DFO_DEFAULT);
+  }
+  if (FSettingsPlugin)
+  {
+    FSettingsPlugin->appendOptionsHolder(this);
   }
   return true;
 }
@@ -191,6 +218,60 @@ Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
   return NULL;
 }
 
+IStreamFeature *Registration::addFeature(IXmppStream *AXmppStream)
+{
+  RegisterStream *feature = (RegisterStream *)getFeature(AXmppStream->jid());
+  if (!feature)
+  {
+    feature = new RegisterStream(this,AXmppStream);
+    connect(feature,SIGNAL(destroyed(IStreamFeature *)),SLOT(onRegisterStreamDestroyed(IStreamFeature *)));
+    FStreamFeatures.append(feature);
+    AXmppStream->addFeature(feature);
+    emit featureAdded(feature);
+  }
+  return feature;
+}
+
+IStreamFeature *Registration::getFeature(const Jid &AStreamJid) const
+{
+  foreach(RegisterStream *feature, FStreamFeatures)
+    if (feature->xmppStream()->jid() == AStreamJid)
+      return feature;
+  return NULL;
+}
+
+void Registration::removeFeature(IXmppStream *AXmppStream)
+{
+  RegisterStream *feature = (RegisterStream *)getFeature(AXmppStream->jid());
+  if (feature)
+  {
+    feature->disconnect(this);
+    FStreamFeatures.removeAt(FStreamFeatures.indexOf(feature));
+    AXmppStream->removeFeature(feature);
+    emit featureRemoved(feature);
+    feature->deleteLater();
+  }
+}
+
+QWidget *Registration::optionsWidget(const QString &ANode, int &AOrder)
+{
+  QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
+  if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
+  {
+    AOrder = OO_ACCOUNT_REGISTER;
+    QCheckBox *checkBox = new QCheckBox;
+    checkBox->setText(tr("Register new account on server"));
+
+    QString accountId = nodeTree.at(1);
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
+    if (account)
+      checkBox->setCheckState(getFeature(account->streamJid())!=NULL ? Qt::Checked : Qt::Unchecked);
+    FOptionWidgets.insert(accountId,checkBox);
+    return checkBox;
+  }
+  return NULL;
+}
+
 QString Registration::sendRegiterRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
   Stanza reg("iq");
@@ -294,6 +375,39 @@ void Registration::onRegisterActionTriggered(bool)
     int operation = action->data(ADR_Operation).toInt();
     showRegisterDialog(streamJid,serviceJid,operation,NULL);
   }
+}
+
+void Registration::onRegisterStreamDestroyed(IStreamFeature *AFeature)
+{
+  removeFeature(AFeature->xmppStream());
+}
+
+void Registration::onOptionsAccepted()
+{
+  QList<QString> accounts = FOptionWidgets.keys();
+  foreach(QString accountId, accounts)
+  {
+    IAccount *account = FAccountManager->accountById(accountId);
+    if (account)
+    {
+      QCheckBox *checkBox = FOptionWidgets.value(accountId);
+      if (checkBox->isChecked())
+        addFeature(account->xmppStream());
+      else
+        removeFeature(account->xmppStream());
+    }
+  }
+  emit optionsAccepted();
+}
+
+void Registration::onOptionsRejected()
+{
+  emit optionsRejected();
+}
+
+void Registration::onOptionsDialogClosed()
+{
+  FOptionWidgets.clear();
 }
 
 Q_EXPORT_PLUGIN2(RegistrationPlugin, Registration)
