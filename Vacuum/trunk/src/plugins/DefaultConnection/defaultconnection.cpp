@@ -8,6 +8,7 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
 {
   FPlugin = APlugin;
   FProxyState = ProxyUnconnected;
+  FSocket.setProtocol(QSsl::AnyProtocol);
 
   connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
   connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
