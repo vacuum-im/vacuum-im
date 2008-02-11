@@ -2,12 +2,14 @@
 
 CompressPlugin::CompressPlugin()
 {
-
+  FXmppStreams = NULL;
 }
 
 CompressPlugin::~CompressPlugin()
 {
-
+  QList<IStreamFeature *> features = FFeatures.values();
+  foreach(IStreamFeature *feature, features)
+    destroyStreamFeature(feature);
 }
 
 void CompressPlugin::pluginInfo(PluginInfo *APluginInfo)
@@ -23,13 +25,11 @@ void CompressPlugin::pluginInfo(PluginInfo *APluginInfo)
 
 bool CompressPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *xmppStreams = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
-  if (xmppStreams)
-  {
-    connect(xmppStreams->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
-    connect(xmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
-  }
-  return xmppStreams!=NULL;
+  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  if (plugin)
+    FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+
+  return FXmppStreams!=NULL;
 }
 
 bool CompressPlugin::initObjects()
@@ -38,66 +38,41 @@ bool CompressPlugin::initObjects()
     ErrorHandler::FEATURE_NOT_IMPLEMENTED, tr("Unsupported compression method"),NS_FEATURE_COMPRESS);
 
   ErrorHandler::addErrorItem("setup-failed", ErrorHandler::CANCEL, 
-    ErrorHandler::NOT_ACCEPTABLE, tr("Compression setup faild"), NS_FEATURE_COMPRESS);
+    ErrorHandler::NOT_ACCEPTABLE, tr("Compression setup failed"), NS_FEATURE_COMPRESS);
+
+  if (FXmppStreams)
+  {
+    FXmppStreams->registerFeature(NS_FEATURE_COMPRESS,this);
+  }
 
   return true;
 }
 
-IStreamFeature *CompressPlugin::addFeature(IXmppStream *AXmppStream)
+IStreamFeature *CompressPlugin::getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
-  Compression *compression = (Compression *)getFeature(AXmppStream->jid());
-  if (!compression)
+  if (AFeatureNS == NS_FEATURE_COMPRESS)
   {
-    Compression *compression = new Compression(AXmppStream);
-    connect(compression,SIGNAL(destroyed(QObject *)),SLOT(onFeatureDestroyed(QObject *)));
-    FFeatures.append(compression);
-    FCleanupHandler.add(compression);
-    AXmppStream->addFeature(compression);
+    IStreamFeature *feature = FFeatures.value(AXmppStream);
+    if (!feature)
+    {
+      feature = new Compression(AXmppStream);
+      FFeatures.insert(AXmppStream,feature);
+      emit featureCreated(feature);
+    }
+    return feature;
   }
-  return compression;
-}
-
-IStreamFeature *CompressPlugin::getFeature(const Jid &AStreamJid) const
-{
-  foreach(Compression *feature, FFeatures)
-    if (feature->xmppStream()->jid() == AStreamJid)
-      return feature;
   return NULL;
 }
 
-void CompressPlugin::removeFeature(IXmppStream *AXmppStream)
+void CompressPlugin::destroyStreamFeature(IStreamFeature *AFeature)
 {
-  Compression *compression = (Compression *)getFeature(AXmppStream->jid());
-  if (compression)
+  if (AFeature && FFeatures.value(AFeature->xmppStream()) == AFeature)
   {
-    disconnect(compression,SIGNAL(destroyed(QObject *)),this,SLOT(onFeatureDestroyed(QObject *)));
-    FFeatures.removeAt(FFeatures.indexOf(compression));
-    AXmppStream->removeFeature(compression);
-    delete compression;
+    FFeatures.remove(AFeature->xmppStream());
+    AFeature->xmppStream()->removeFeature(AFeature);
+    emit featureDestroyed(AFeature);
+    AFeature->instance()->deleteLater();
   }
-}
-
-void CompressPlugin::onStreamAdded(IXmppStream *AXmppStream)
-{
-  IStreamFeature *feature = addFeature(AXmppStream); 
-  emit featureAdded(feature);
-}
-
-void CompressPlugin::onStreamRemoved(IXmppStream *AXmppStream)
-{
-  IStreamFeature *feature = getFeature(AXmppStream->jid());
-  if (feature)
-  {
-    emit featureRemoved(feature);
-    removeFeature(AXmppStream);
-  }
-}
-
-void CompressPlugin::onFeatureDestroyed(QObject *AObject)
-{
-  Compression *compression = qobject_cast<Compression *>(AObject);
-  if (FFeatures.contains(compression))
-    FFeatures.removeAt(FFeatures.indexOf(compression));
 }
 
 Q_EXPORT_PLUGIN2(CompressionPlugin, CompressPlugin)

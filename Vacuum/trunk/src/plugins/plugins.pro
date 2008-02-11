@@ -4,8 +4,6 @@ SUBDIRS = settings \
           xmppstreams \
           iqauth \
           saslauth \
-          saslbind \
-          saslsession \
           stanzaprocessor \
           roster \
           presence \

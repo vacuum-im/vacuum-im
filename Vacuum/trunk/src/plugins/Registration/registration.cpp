@@ -20,7 +20,9 @@ Registration::Registration()
 
 Registration::~Registration()
 {
-
+  QList<IStreamFeature *> features = FStreamFeatures.values();
+  foreach(IStreamFeature *feature, features)
+    destroyStreamFeature(feature);
 }
 
 void Registration::pluginInfo(PluginInfo *APluginInfo)
@@ -219,38 +221,30 @@ Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
   return NULL;
 }
 
-IStreamFeature *Registration::addFeature(IXmppStream *AXmppStream)
+IStreamFeature *Registration::getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
-  RegisterStream *feature = (RegisterStream *)getFeature(AXmppStream->jid());
-  if (!feature)
+  if (AFeatureNS == NS_FEATURE_REGISTER)
   {
-    feature = new RegisterStream(this,AXmppStream);
-    connect(feature,SIGNAL(destroyed(IStreamFeature *)),SLOT(onRegisterStreamDestroyed(IStreamFeature *)));
-    FStreamFeatures.append(feature);
-    AXmppStream->addFeature(feature);
-    emit featureAdded(feature);
+    IStreamFeature *feature = FStreamFeatures.value(AXmppStream);
+    if (!feature)
+    {
+      feature = new RegisterStream(this,AXmppStream);
+      FStreamFeatures.insert(AXmppStream,feature);
+      emit featureCreated(feature);
+    }
+    return feature;
   }
-  return feature;
-}
-
-IStreamFeature *Registration::getFeature(const Jid &AStreamJid) const
-{
-  foreach(RegisterStream *feature, FStreamFeatures)
-    if (feature->xmppStream()->jid() == AStreamJid)
-      return feature;
   return NULL;
 }
 
-void Registration::removeFeature(IXmppStream *AXmppStream)
+void Registration::destroyStreamFeature(IStreamFeature *AFeature)
 {
-  RegisterStream *feature = (RegisterStream *)getFeature(AXmppStream->jid());
-  if (feature)
+  if (AFeature && FStreamFeatures.value(AFeature->xmppStream()) == AFeature)
   {
-    feature->disconnect(this);
-    FStreamFeatures.removeAt(FStreamFeatures.indexOf(feature));
-    AXmppStream->removeFeature(feature);
-    emit featureRemoved(feature);
-    feature->deleteLater();
+    FStreamFeatures.remove(AFeature->xmppStream());
+    AFeature->xmppStream()->removeFeature(AFeature);
+    emit featureDestroyed(AFeature);
+    AFeature->instance()->deleteLater();
   }
 }
 
@@ -266,7 +260,7 @@ QWidget *Registration::optionsWidget(const QString &ANode, int &AOrder)
     QString accountId = nodeTree.at(1);
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
     if (account)
-      checkBox->setCheckState(getFeature(account->streamJid())!=NULL ? Qt::Checked : Qt::Unchecked);
+      checkBox->setCheckState(FStreamFeatures.contains(account->xmppStream()) ? Qt::Checked : Qt::Unchecked);
     FOptionWidgets.insert(accountId,checkBox);
     return checkBox;
   }
@@ -378,14 +372,9 @@ void Registration::onRegisterActionTriggered(bool)
   }
 }
 
-void Registration::onRegisterStreamDestroyed(IStreamFeature *AFeature)
-{
-  removeFeature(AFeature->xmppStream());
-}
-
 void Registration::onAccountRemoved(IAccount *AAccount)
 {
-  removeFeature(AAccount->xmppStream());
+  destroyStreamFeature(FStreamFeatures.value(AAccount->xmppStream()));
 }
 
 void Registration::onOptionsAccepted()
@@ -398,9 +387,9 @@ void Registration::onOptionsAccepted()
     {
       QCheckBox *checkBox = FOptionWidgets.value(accountId);
       if (checkBox->isChecked())
-        addFeature(account->xmppStream());
+        account->xmppStream()->addFeature(getStreamFeature(NS_FEATURE_REGISTER,account->xmppStream()));
       else
-        removeFeature(account->xmppStream());
+        destroyStreamFeature(FStreamFeatures.value(account->xmppStream()));
     }
   }
   emit optionsAccepted();

@@ -11,22 +11,19 @@ class Compression :
 {
   Q_OBJECT;
   Q_INTERFACES(IStreamFeature);
-
 public:
   Compression(IXmppStream *AXmppStream);
   ~Compression();
-
   virtual QObject *instance() { return this; }
-  virtual QString name() const { return "compression"; }
-  virtual QString nsURI() const { return NS_FEATURE_COMPRESS; }
+  virtual QString featureNS() const { return NS_FEATURE_COMPRESS; }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction /*ADirection*/) const { return FNeedHook; }
   virtual bool hookData(QByteArray *AData, Direction ADirection);
   virtual bool hookElement(QDomElement *AElem, Direction ADirection);
 signals:
-  virtual void finished(bool ARestart); 
-  virtual void error(const QString &AErrStr);
+  virtual void ready(bool ARestart); 
+  virtual void error(const QString &AError);
 protected:
   bool startZlib();
   void stopZlib();

@@ -1,16 +1,16 @@
-#ifndef COMPRESSPLUGIN_H
-#define COMPRESSPLUGIN_H
+#ifndef SASLPLUGIN_H
+#define SASLPLUGIN_H
 
-#include <QObject>
-#include <QObjectCleanupHandler>
 #include "../../definations/namespaces.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ixmppstreams.h"
-#include "compression.h"
+#include "saslauth.h"
+#include "saslbind.h"
+#include "saslsession.h"
 
-#define COMPRESS_UUID "{061D0687-B954-416d-B690-D1BA7D845D83}"
+#define SASLAUTH_UUID "{E583F155-BE87-4919-8769-5C87088F0F57}"
 
-class CompressPlugin : 
+class SASLPlugin : 
   public QObject,
   public IPlugin,
   public IStreamFeaturePlugin
@@ -18,18 +18,18 @@ class CompressPlugin :
   Q_OBJECT;
   Q_INTERFACES(IPlugin IStreamFeaturePlugin);
 public:
-  CompressPlugin();
-  ~CompressPlugin();
+  SASLPlugin();
+  ~SASLPlugin();
   //IPlugin
   virtual QObject *instance() { return this; }
-  virtual QUuid pluginUuid() const { return COMPRESS_UUID; }
+  virtual QUuid pluginUuid() const { return SASLAUTH_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStreamFeaturePlugin
-  virtual QList<QString> streamFeatures() const { return QList<QString>() << NS_FEATURE_COMPRESS; }
+  virtual QList<QString> streamFeatures() const;
   virtual IStreamFeature *getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
   virtual void destroyStreamFeature(IStreamFeature *AFeature);
 signals:
@@ -38,7 +38,9 @@ signals:
 private:
   IXmppStreams *FXmppStreams;
 private:
-  QHash<IXmppStream *, IStreamFeature *> FFeatures;
+  QHash<IXmppStream *, IStreamFeature *> FAuthFeatures;
+  QHash<IXmppStream *, IStreamFeature *> FBindFeatures;
+  QHash<IXmppStream *, IStreamFeature *> FSessionFeatures;
 };
 
-#endif // COMPRESSPLUGIN_H
+#endif // SASLPLUGIN_H

@@ -1,20 +1,21 @@
 #include "starttlsplugin.h"
 
 StartTLSPlugin::StartTLSPlugin()
-  : QObject()
 {
   FXmppStreams = NULL;
 }
 
 StartTLSPlugin::~StartTLSPlugin()
 {
-
+  QList<IStreamFeature *> features = FFeatures.values();
+  foreach(IStreamFeature *feature, features)
+    destroyStreamFeature(feature);
 }
 
 void StartTLSPlugin::pluginInfo(PluginInfo *APluginInfo)
 {
   APluginInfo->author = tr("Potapov S.A. aka Lion");
-  APluginInfo->description = tr("Implementation of StartTLS (XMPP-Core)");
+  APluginInfo->description = tr("Implementation of StartTLS");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = "StartTLS";
   APluginInfo->uid = STARTTLS_UUID;
@@ -27,72 +28,45 @@ bool StartTLSPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
 {
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
-  {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-    if (FXmppStreams)
-    {
-      connect(FXmppStreams->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
-      connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
-    }
-  }
-  return FXmppStreams != NULL;
+
+  return FXmppStreams!=NULL;
 }
 
-//StartTLS
-IStreamFeature *StartTLSPlugin::addFeature(IXmppStream *AXmppStream)
+bool StartTLSPlugin::initObjects()
 {
-  StartTLS *feature = (StartTLS *)getFeature(AXmppStream->jid());
-  if (!feature)
+  if (FXmppStreams)
   {
-    feature = new StartTLS(AXmppStream);
-    connect(feature,SIGNAL(destroyed(QObject *)),SLOT(onFeatureDestroyed(QObject *)));
-    FFeatures.append(feature);
-    FCleanupHandler.add(feature);
-    AXmppStream->addFeature(feature);
+    FXmppStreams->registerFeature(NS_FEATURE_STARTTLS,this);
   }
-  return feature;
+  return true;
 }
 
-IStreamFeature *StartTLSPlugin::getFeature(const Jid &AStreamJid) const
+IStreamFeature *StartTLSPlugin::getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
-  foreach(StartTLS *feature, FFeatures)
-    if (feature->xmppStream()->jid() == AStreamJid)
-      return feature;
+  if (AFeatureNS == NS_FEATURE_STARTTLS)
+  {
+    IStreamFeature *feature = FFeatures.value(AXmppStream);
+    if (!feature)
+    {
+      feature = new StartTLS(AXmppStream);
+      FFeatures.insert(AXmppStream,feature);
+      emit featureCreated(feature);
+    }
+    return feature;
+  }
   return NULL;
 }
 
-void StartTLSPlugin::removeFeature(IXmppStream *AXmppStream)
+void StartTLSPlugin::destroyStreamFeature(IStreamFeature *AFeature)
 {
-  StartTLS *feature = (StartTLS *)getFeature(AXmppStream->jid());
-  if (feature)
+  if (AFeature && FFeatures.value(AFeature->xmppStream()) == AFeature)
   {
-    disconnect(feature,SIGNAL(destroyed(QObject *)),this,SLOT(onFeatureDestroyed(QObject *)));
-    FFeatures.removeAt(FFeatures.indexOf(feature));
-    AXmppStream->removeFeature(feature);
-    delete feature;
+    FFeatures.remove(AFeature->xmppStream());
+    AFeature->xmppStream()->removeFeature(AFeature);
+    emit featureDestroyed(AFeature);
+    AFeature->instance()->deleteLater();
   }
-}
-
-void StartTLSPlugin::onStreamAdded(IXmppStream *AXmppStream)
-{
-  emit featureAdded(addFeature(AXmppStream));
-}
-
-void StartTLSPlugin::onStreamRemoved(IXmppStream *AXmppStream)
-{
-  IStreamFeature *feature = getFeature(AXmppStream->jid());
-  if (feature)
-  {
-    emit featureRemoved(feature);
-    removeFeature(AXmppStream);
-  }
-}
-
-void StartTLSPlugin::onFeatureDestroyed(QObject *AObject)
-{
-  StartTLS *feature = qobject_cast<StartTLS *>(AObject);
-  if (FFeatures.contains(feature))
-    FFeatures.removeAt(FFeatures.indexOf(feature));
 }
 
 Q_EXPORT_PLUGIN2(StartTLSPlugin, StartTLSPlugin)

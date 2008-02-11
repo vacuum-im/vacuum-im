@@ -1,8 +1,6 @@
 #ifndef STARTTLSPLUGIN_H
 #define STARTTLSPLUGIN_H
 
-#include <QObject>
-#include <QObjectCleanupHandler>
 #include "../../definations/namespaces.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ixmppstreams.h"
@@ -18,36 +16,28 @@ class StartTLSPlugin :
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IStreamFeaturePlugin);
-
 public:
   StartTLSPlugin();
   ~StartTLSPlugin();
-
   //IPlugin
   virtual QObject *instance() { return this; }
   virtual QUuid pluginUuid() const { return STARTTLS_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects() { return true; }
+  virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-
   //IStreamFeaturePlugin
-  virtual IStreamFeature *addFeature(IXmppStream *AXmppStream);
-  virtual IStreamFeature *getFeature(const Jid &AStreamJid) const;
-  virtual void removeFeature(IXmppStream *AXmppStream);
+  virtual QList<QString> streamFeatures() const { return QList<QString>() << NS_FEATURE_STARTTLS; }
+  virtual IStreamFeature *getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
+  virtual void destroyStreamFeature(IStreamFeature *AFeature);
 signals:
-  virtual void featureAdded(IStreamFeature *AStreamFeature);
-  virtual void featureRemoved(IStreamFeature *AStreamFeature);
-protected slots:
-  void onStreamAdded(IXmppStream *AXmppStream);
-  void onStreamRemoved(IXmppStream *AXmppStream);
-  void onFeatureDestroyed(QObject *AObject);
+  virtual void featureCreated(IStreamFeature *AStreamFeature);
+  virtual void featureDestroyed(IStreamFeature *AStreamFeature);
 private:
   IXmppStreams *FXmppStreams;
 private:
-  QList<StartTLS *> FFeatures;
-  QObjectCleanupHandler FCleanupHandler;
+  QHash<IXmppStream *, IStreamFeature *> FFeatures;
 };
 
 #endif // STARTTLSPLUGIN_H

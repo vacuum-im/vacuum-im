@@ -1,9 +1,6 @@
 #include "starttls.h"
 
-#include "../../utils/stanza.h"
-
-StartTLS::StartTLS(IXmppStream *AXmppStream) 
-  : QObject(AXmppStream->instance())
+StartTLS::StartTLS(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
   FConnection = NULL;
   FNeedHook = false;
@@ -32,27 +29,27 @@ bool StartTLS::start(const QDomElement &/*AElem*/)
 
 bool StartTLS::needHook(Direction ADirection) const
 {
-  if (ADirection == DirectionIn)
-    return FNeedHook;
-  return false;
+  return ADirection == DirectionIn ? FNeedHook : false;
 }
 
 bool StartTLS::hookElement(QDomElement *AElem, Direction ADirection)
 {
-  if (ADirection != DirectionIn || AElem->namespaceURI() != NS_FEATURE_STARTTLS)
-    return false;
-
-  FNeedHook = false;
-  if (AElem->tagName() == "proceed")
+  if (ADirection == DirectionIn && AElem->namespaceURI() == NS_FEATURE_STARTTLS)
   {
-    FConnection->startClientEncryption();
-    emit finished(true);
+    FNeedHook = false;
+    if (AElem->tagName() == "proceed")
+    {
+      FConnection->startClientEncryption();
+      emit ready(true);
+    }
+    else if (AElem->tagName() == "failure")
+      emit error(tr("StartTLS negotiation failed.")); 
+    else
+      emit error(tr("Wrong StartTLS negotiation answer.")); 
+
+    return true;
   }
-  else if (AElem->tagName() == "failure")
-    emit error(tr("StartTLS negotiation failed.")); 
-  else
-    emit error(tr("Wrong StartTLS negotiation answer.")); 
-  return true;
+  return false;
 }
 
 void StartTLS::onStreamClosed(IXmppStream * /*AXmppStream*/)

@@ -1,23 +1,22 @@
-#ifndef SASLAUTH_H
-#define SASLAUTH_H
+#ifndef SASLBIND_H
+#define SASLBIND_H
 
 #include "../../definations/namespaces.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
-#include "../../utils/md5.h"
 
-class SASLAuth :
+class SASLBind : 
   public QObject,
   public IStreamFeature
 {
   Q_OBJECT;
   Q_INTERFACES(IStreamFeature);
 public:
-  SASLAuth(IXmppStream *AXmppStream);
-  ~SASLAuth();
+  SASLBind(IXmppStream *AXmppStream);
+  ~SASLBind();
   virtual QObject *instance() { return this; }
-  virtual QString featureNS() const { return NS_FEATURE_SASL; }
+  virtual QString featureNS() const { return NS_FEATURE_BIND; }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction ADirection) const;
@@ -28,13 +27,10 @@ signals:
   virtual void error(const QString &AError);
 protected slots:
   void onStreamClosed(IXmppStream *AXmppStream);
-private: 
+private:
   IXmppStream *FXmppStream;
 private:
   bool FNeedHook;
-  QString FMechanism;
-  qint8 chlNumber;
-  QString realm, nonce, cnonce, qop, uri;
 };
 
-#endif // SASLAUTH_H
+#endif // SASLBIND_H

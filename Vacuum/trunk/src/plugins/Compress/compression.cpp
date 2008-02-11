@@ -105,14 +105,14 @@ bool Compression::hookElement(QDomElement *AElem, Direction ADirection)
   if (AElem->tagName() == "compressed")
   {
     FCompress = true;
-    emit finished(true);
+    emit ready(true);
     return true;
   }
   else if (AElem->tagName() == "failure")
   {
     FNeedHook = false;
     FCompress = false;
-    emit finished(false);
+    emit ready(false);
     return true;
   }
   return false;

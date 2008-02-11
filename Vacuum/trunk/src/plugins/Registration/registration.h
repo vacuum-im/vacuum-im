@@ -47,9 +47,9 @@ public:
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //IStreamFeaturePlugin
-  virtual IStreamFeature *addFeature(IXmppStream *AXmppStream);
-  virtual IStreamFeature *getFeature(const Jid &AStreamJid) const;
-  virtual void removeFeature(IXmppStream *AXmppStream);
+  virtual QList<QString> streamFeatures() const { return QList<QString>() << NS_FEATURE_REGISTER; }
+  virtual IStreamFeature *getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
+  virtual void destroyStreamFeature(IStreamFeature *AFeature);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IRegistration
@@ -60,8 +60,8 @@ public:
   virtual void showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
 signals:
   //IStreamFeaturePlugin
-  virtual void featureAdded(IStreamFeature *AStreamFeature);
-  virtual void featureRemoved(IStreamFeature *AStreamFeature);
+  virtual void featureCreated(IStreamFeature *AStreamFeature);
+  virtual void featureDestroyed(IStreamFeature *AStreamFeature);
   //IOptionsHolder
   virtual void optionsAccepted();
   virtual void optionsRejected();
@@ -73,7 +73,6 @@ protected:
   void registerDiscoFeatures();
 protected slots:
   void onRegisterActionTriggered(bool);
-  void onRegisterStreamDestroyed(IStreamFeature *AFeature);
   void onAccountRemoved(IAccount *AAccount);
   void onOptionsAccepted();
   void onOptionsRejected();
@@ -88,8 +87,8 @@ private:
 private:
   QList<QString> FSendRequests;
   QList<QString> FSubmitRequests;
-  QList<RegisterStream *> FStreamFeatures;
   QHash<QString,QCheckBox *> FOptionWidgets;
+  QHash<IXmppStream *, IStreamFeature *> FStreamFeatures;
 };
 
 #endif // REGISTRATION_H

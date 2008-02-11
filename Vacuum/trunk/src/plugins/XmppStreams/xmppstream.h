@@ -16,7 +16,7 @@ class XmppStream :
   Q_OBJECT;
   Q_INTERFACES(IXmppStream);
 public:
-  XmppStream(const Jid &AJid, QObject *AParent = NULL);
+  XmppStream(IXmppStreams *AXmppStreams, const Jid &AJid);
   ~XmppStream();
   virtual QObject *instance() { return this; }
   //IXmppStream
@@ -36,19 +36,22 @@ public:
   virtual void setXmppVersion(const QString &AXmppVersion) { FXmppVersion = AXmppVersion; }
   virtual IConnection *connection() const;
   virtual void setConnection(IConnection *AConnection);
-  virtual void addFeature(IStreamFeature *AStreamFeature);
-  virtual void removeFeature(IStreamFeature *AStreamFeature);
+  virtual void addFeature(IStreamFeature *AFeature);
   virtual QList<IStreamFeature *> features() const { return FFeatures; }
+  virtual void removeFeature(IStreamFeature *AFeature);
 signals:
   virtual void opened(IXmppStream *AXmppStream);
   virtual void element(IXmppStream *AXmppStream, const QDomElement &elem);
   virtual void aboutToClose(IXmppStream *AXmppStream);
-  virtual void closed(IXmppStream *AXmppStream);
   virtual void error(IXmppStream *AXmppStream, const QString &errStr);
+  virtual void closed(IXmppStream *AXmppStream);
   virtual void jidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
   virtual void jidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   virtual void connectionAdded(IXmppStream *AXmppStream, IConnection *AConnection);
   virtual void connectionRemoved(IXmppStream *AXmppStream, IConnection *AConnection);
+  virtual void featureAdded(IXmppStream *AXmppStream, IStreamFeature *AFeature);
+  virtual void featureRemoved(IXmppStream *AXmppStream, IStreamFeature *AFeature);
+  virtual void destroyed(IXmppStream *AXmppStream);
 protected:
   enum StreamState {
     SS_OFFLINE, 
@@ -58,10 +61,11 @@ protected:
     SS_ONLINE 
   }; 
   void startStream();
+  IStreamFeature *getFeature(const QString &AFeatureNS);
   bool processFeatures(const QDomElement &AFeatures=QDomElement());
-  bool startFeature(const QString &AName, const QString &ANamespace);
+  void sortFeature(IStreamFeature *AFeature = NULL);
   bool startFeature(const QDomElement &AElem);
-  void sortFeature(IStreamFeature *AFeature=0);
+  bool startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem);
   bool hookFeatureData(QByteArray *AData, IStreamFeature::Direction ADirection);
   bool hookFeatureElement(QDomElement *AElem, IStreamFeature::Direction ADirection);
   qint64 sendData(const QByteArray &AData);
@@ -78,13 +82,16 @@ protected slots:
   void onParserClosed();
   void onParserError(const QString &AErrStr);
   //IStreamFeature
-  void onFeatureFinished(bool ARestart);
-  void onFeatureError(const QString &AErrStr);
+  void onFeatureReady(bool ARestart);
+  void onFeatureError(const QString &AError);
   //KeepAlive
   void onKeepAliveTimeout();
 private:
+  IXmppStreams *FXmppStreams;
   IConnection *FConnection;
-  QTimer FKeepAliveTimer;
+private:
+  QDomElement FFeaturesElement;
+  IStreamFeature *FActiveFeature;
   QList<IStreamFeature *>	FFeatures; 
 private:
   bool FOpen;
@@ -98,7 +105,7 @@ private:
   QString FLastError;
   StreamState FStreamState; 
   StreamParser FParser;
-  QDomElement FActiveFeatures;
+  QTimer FKeepAliveTimer;
 };
 
 #endif // XMPPSTREAM_H

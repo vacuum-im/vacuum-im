@@ -10,7 +10,7 @@ RegisterStream::RegisterStream(IStreamFeaturePlugin *AFeaturePlugin, IXmppStream
 
 RegisterStream::~RegisterStream()
 {
-  emit destroyed(this);
+
 }
 
 bool RegisterStream::start(const QDomElement &/*AElem*/)
@@ -64,16 +64,16 @@ bool RegisterStream::hookElement(QDomElement *AElem, Direction ADirection)
       FRegisterFinished = true;
       if (AElem->attribute("type") == "result")
       {
-        emit finished(false);
+        emit ready(false);
       }
       else if (AElem->attribute("type") == "error")
       {
         ErrorHandler err(*AElem);
         emit error(err.message());
       }
-      FFeaturePlugin->removeFeature(FXmppStream);
-      return true;
     }
+    FFeaturePlugin->destroyStreamFeature(this);
+    return true;
   }
   return false;
 }

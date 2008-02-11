@@ -18,17 +18,15 @@ public:
   ~RegisterStream();
   virtual QObject *instance() { return this; }
   //IStreamFeature
-  virtual QString name() const { return "register"; }
-  virtual QString nsURI() const { return NS_FEATURE_REGISTER; }
+  virtual QString featureNS() const { return NS_FEATURE_REGISTER; }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction ADirection) const;
   virtual bool hookData(QByteArray * /*AData*/, Direction /*ADirection*/) { return false; }
   virtual bool hookElement(QDomElement *AElem, Direction ADirection);
 signals:
-  virtual void finished(bool ARestartStream); 
+  virtual void ready(bool ARestart); 
   virtual void error(const QString &AMessage);
-  virtual void destroyed(IStreamFeature *AFeature);
 private:
   IXmppStream *FXmppStream;
   IStreamFeaturePlugin *FFeaturePlugin;
