@@ -7,9 +7,7 @@ StartTLSPlugin::StartTLSPlugin()
 
 StartTLSPlugin::~StartTLSPlugin()
 {
-  QList<IStreamFeature *> features = FFeatures.values();
-  foreach(IStreamFeature *feature, features)
-    destroyStreamFeature(feature);
+
 }
 
 void StartTLSPlugin::pluginInfo(PluginInfo *APluginInfo)

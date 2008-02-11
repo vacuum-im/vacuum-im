@@ -7,17 +7,7 @@ SASLPlugin::SASLPlugin()
 
 SASLPlugin::~SASLPlugin()
 {
-  QList<IStreamFeature *> features = FAuthFeatures.values();
-  foreach(IStreamFeature *feature, features)
-    destroyStreamFeature(feature);
 
-  features = FBindFeatures.values();
-  foreach(IStreamFeature *feature, features)
-    destroyStreamFeature(feature);
-
-  features = FSessionFeatures.values();
-  foreach(IStreamFeature *feature, features)
-    destroyStreamFeature(feature);
 }
 
 void SASLPlugin::pluginInfo(PluginInfo *APluginInfo)

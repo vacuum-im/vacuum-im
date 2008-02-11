@@ -245,13 +245,11 @@ void XmppStreams::onStreamConnectionRemoved(IXmppStream *AXmppStream, IConnectio
 
 void XmppStreams::onStreamFeatureAdded(IXmppStream *AXmppStream, IStreamFeature *AFeature)
 {
-  qDebug() << "Stream feature add" << AXmppStream->jid().full() << AFeature->featureNS();
   emit featureAdded(AXmppStream,AFeature);
 }
 
 void XmppStreams::onStreamFeatureRemoved(IXmppStream *AXmppStream, IStreamFeature *AFeature)
 {
-  qDebug() << "Stream feature removed" << AXmppStream->jid().full() << AFeature->featureNS();
   emit featureRemoved(AXmppStream,AFeature);
 }
 

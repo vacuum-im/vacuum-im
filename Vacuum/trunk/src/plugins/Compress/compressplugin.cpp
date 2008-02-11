@@ -7,9 +7,7 @@ CompressPlugin::CompressPlugin()
 
 CompressPlugin::~CompressPlugin()
 {
-  QList<IStreamFeature *> features = FFeatures.values();
-  foreach(IStreamFeature *feature, features)
-    destroyStreamFeature(feature);
+
 }
 
 void CompressPlugin::pluginInfo(PluginInfo *APluginInfo)

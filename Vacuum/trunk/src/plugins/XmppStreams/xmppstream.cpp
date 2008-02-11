@@ -1,6 +1,6 @@
-#include <QtDebug>
 #include "xmppstream.h"
 
+#include <QtDebug>
 #include <QInputDialog>
 
 #define KEEP_ALIVE_TIMEOUT          30000

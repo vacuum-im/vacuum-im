@@ -20,9 +20,7 @@ Registration::Registration()
 
 Registration::~Registration()
 {
-  QList<IStreamFeature *> features = FStreamFeatures.values();
-  foreach(IStreamFeature *feature, features)
-    destroyStreamFeature(feature);
+
 }
 
 void Registration::pluginInfo(PluginInfo *APluginInfo)

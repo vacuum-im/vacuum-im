@@ -69,9 +69,7 @@ IqAuthPlugin::IqAuthPlugin()
 
 IqAuthPlugin::~IqAuthPlugin()
 {
-  QList<IStreamFeature *> features = FFeatures.values();
-  foreach(IStreamFeature *feature, features)
-    destroyStreamFeature(feature);
+
 }
 
 void IqAuthPlugin::pluginInfo(PluginInfo *APluginInfo)
