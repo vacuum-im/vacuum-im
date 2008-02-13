@@ -25,4 +25,5 @@ HEADERS += ipluginmanager.h \
            iservicediscovery.h \
            ibookmarks.h \
            iregistraton.h \
-           icommands.h
+           icommands.h \
+           ijabbersearch.h

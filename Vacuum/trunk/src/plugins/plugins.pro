@@ -30,4 +30,5 @@ SUBDIRS = settings \
           servicediscovery \
           bookmarks \
           registration \
-          commands
+          commands \
+          jabbersearch
