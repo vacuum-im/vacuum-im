@@ -34,10 +34,7 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
   ui.lneHost->setText(ARoomJid.domane().isEmpty() ? QString("conference.%1").arg(streamJid.domane()) : ARoomJid.domane());
   ui.lneRoom->setText(ARoomJid.node());
   ui.lnePassword->setText(APassword);
-  if (AStreamJid.isValid() && ARoomJid.isValid() && ANick.isEmpty())
-    FChatPlugin->requestRoomNick(AStreamJid,ARoomJid);
-  else
-    ui.lneNick->setText(ANick.isEmpty() ? streamJid.node() : ANick);
+  ui.lneNick->setText(ANick.isEmpty() ? streamJid.node() : ANick);
 }
 
 JoinMultiChatDialog::~JoinMultiChatDialog()
