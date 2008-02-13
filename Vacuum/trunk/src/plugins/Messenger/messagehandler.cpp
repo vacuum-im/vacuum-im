@@ -292,7 +292,7 @@ void MessageHandler::onChatMessageSend()
   if (window)
   {
     Message message;
-    message.setFrom(window->streamJid().eFull()).setTo(window->contactJid().eFull()).setType(Message::Chat);
+    message/*.setFrom(window->streamJid().eFull())*/.setTo(window->contactJid().eFull()).setType(Message::Chat);
     FMessenger->textToMessage(message,window->editWidget()->document());
     if (!message.body().isEmpty() && FMessenger->sendMessage(message,window->streamJid()))
     {
@@ -343,7 +343,7 @@ void MessageHandler::onMessageWindowSend()
   if (window)
   {
     Message message;
-    message.setFrom(window->streamJid().eFull()).setType(Message::Normal);
+    message/*.setFrom(window->streamJid().eFull())*/.setType(Message::Normal);
     message.setSubject(window->subject());
     message.setThreadId(window->threadId());
     FMessenger->textToMessage(message,window->editWidget()->document());
