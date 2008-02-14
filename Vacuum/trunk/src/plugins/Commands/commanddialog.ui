@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>502</width>
-    <height>359</height>
+    <width>500</width>
+    <height>325</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -14,30 +14,17 @@
   </property>
   <layout class="QVBoxLayout" >
    <property name="leftMargin" >
-    <number>3</number>
+    <number>5</number>
    </property>
    <property name="topMargin" >
-    <number>3</number>
+    <number>5</number>
    </property>
    <property name="rightMargin" >
-    <number>3</number>
+    <number>5</number>
    </property>
    <property name="bottomMargin" >
-    <number>3</number>
+    <number>5</number>
    </property>
-   <item>
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>20</width>
-       <height>0</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item>
     <widget class="QLabel" name="lblInfo" >
      <property name="alignment" >
@@ -46,20 +33,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" native="1" name="wdtForm" />
-   </item>
-   <item>
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
+    <widget class="QWidget" native="1" name="wdtForm" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="sizeHint" >
-      <size>
-       <width>20</width>
-       <height>0</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" >

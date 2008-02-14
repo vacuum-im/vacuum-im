@@ -52,7 +52,8 @@ signals:
   virtual void fieldLostFocus(IDataField *AField, Qt::FocusReason AReason);
   virtual void currentPageChanged(int APage);
 protected:
-  void insertFields(const QDomElement &AElem, QLayout *ALayout, int APage);
+  QWidget *createPage(const QDomElement &APageElem,int APage);
+  bool insertFields(const QDomElement &AElem, QLayout *ALayout, int APage, bool AStretch);
   void setFocusedField(IDataField *AField, Qt::FocusReason AReason);
 protected:
   virtual bool eventFilter(QObject *AObject, QEvent *AEvent);

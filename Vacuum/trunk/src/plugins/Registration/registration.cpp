@@ -99,7 +99,7 @@ void Registration::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
     QDomElement dataForm; 
     QDomElement query = AStanza.firstElement("query",NS_JABBER_REGISTER);
     dataForm = query.firstChildElement("x");
-    while (!dataForm.isNull() && dataForm.namespaceURI()!=NS_JABBER_DATA && dataForm.attribute("type")!=FORM_FORM)
+    while (!dataForm.isNull() && (dataForm.namespaceURI()!=NS_JABBER_DATA || dataForm.attribute("type",FORM_FORM)!=FORM_FORM))
       dataForm = dataForm.nextSiblingElement("x");
     
     if (FSubmitRequests.contains(AStanza.id()) && AStanza.type() == "result")

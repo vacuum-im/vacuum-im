@@ -99,11 +99,11 @@ DataField::DataField(const QDomElement &AElem, IDataField::FieldKind AKind, QWid
   }
   else if (FType == FIELD_FIXED)
   {
-    FLabelWidget = new QLabel(Qt::escape(FLabel),AParent);
-    FLabelWidget->setToolTip(Qt::escape(FDesc));
+    FLabelWidget = new QLabel(AParent);
     FLabelWidget->setWordWrap(true);
     FCleanupHandler.add(FLabelWidget);
     FWidget = FLabelWidget;
+    setValue(values.value(0));
   }
   else if (FType == FIELD_HIDDEN)
   {

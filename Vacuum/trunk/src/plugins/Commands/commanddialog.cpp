@@ -2,13 +2,15 @@
 
 #include <QMessageBox>
 
+#define IN_COMMAND    "psi/command"
+
 CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid ACommandJid, 
                              const QString &ANode, QWidget *AParent)  : QDialog(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  setWindowTitle(tr("Executing command '%1' at %2").arg(ANode).arg(ACommandJid.full()));
-  
+  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_COMMAND));
+
   ui.wdtForm->setLayout(new QVBoxLayout);
   ui.wdtForm->layout()->setMargin(0);
 
@@ -23,6 +25,9 @@ CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const
   FPrevButton = new QPushButton(tr("<Back"));
   FNextButton = new QPushButton(tr("Next>"));
   FCompleteButton = new QPushButton(tr("Complete"));
+
+  ui.wdtPages->setLayout(new QHBoxLayout);
+  ui.wdtPages->layout()->setMargin(0);
 
   connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
@@ -46,13 +51,14 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
     if (!AResult.form.isNull())
     {
       FCurrentForm = FDataForms->newDataForm(AResult.form,ui.wdtForm);
-      ui.wdtForm->layout()->addWidget(FCurrentForm->instance());
       if (FCurrentForm->pageControl())
-      {
-        ui.wdtPages->setLayout(new QHBoxLayout);
         ui.wdtPages->layout()->addWidget(FCurrentForm->pageControl());
-        ui.wdtPages->layout()->setMargin(0);
-      }
+      if (!FCurrentForm->title().isEmpty())
+        setWindowTitle(FCurrentForm->title());
+      if (FCurrentForm->tableWidget())
+        FCurrentForm->tableWidget()->setSortingEnabled(true);
+      ui.wdtForm->layout()->addWidget(FCurrentForm->instance());
+      ui.wdtForm->setVisible(true);
     }
 
     if (!AResult.notes.isEmpty())
@@ -103,21 +109,23 @@ bool CommandDialog::receiveCommandError(const ICommandError &AError)
 
 void CommandDialog::executeCommand()
 {
-  resetDialog();
   FSessionId.clear();
   executeAction(COMMAND_ACTION_EXECUTE);
 }
 
 void CommandDialog::resetDialog()
 {
+  setWindowTitle(tr("Executing command '%1' at %2").arg(FNode).arg(FCommandJid.full()));
+  ui.lblInfo->setText("");
   if (FCurrentForm)
   {
     ui.wdtForm->layout()->removeWidget(FCurrentForm->instance());
+    if (FCurrentForm->pageControl())
+      ui.wdtPages->layout()->removeWidget(FCurrentForm->pageControl());
     FCurrentForm->instance()->deleteLater();
     FCurrentForm = NULL;
   }
-  ui.lblInfo->setText("");
-  ui.wdtForm->setEnabled(true);
+  ui.wdtForm->setVisible(false);
 }
 
 QString CommandDialog::sendRequest(const QString &AAction)
@@ -144,12 +152,13 @@ void CommandDialog::executeAction(const QString &AAction)
     if (QMessageBox::warning(this,tr("Not Acceptable"),FCurrentForm->invalidMessage(),QMessageBox::Ok|QMessageBox::Ignore) == QMessageBox::Ok)
       return;
 
-  ui.wdtForm->setEnabled(false);
   ui.dbbButtons->removeButton(FPrevButton);
   ui.dbbButtons->removeButton(FNextButton);
   ui.dbbButtons->removeButton(FCompleteButton);
 
   FRequestId = sendRequest(AAction);
+
+  resetDialog();
   if (!FRequestId.isEmpty())
   {
     ui.lblInfo->setText(tr("Waiting for host response ..."));

@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "../../interfaces/iregistraton.h"
 #include "../../interfaces/idataforms.h"
+#include "../../utils/skin.h"
 #include "ui_registerdialog.h"
 
 class RegisterDialog : 

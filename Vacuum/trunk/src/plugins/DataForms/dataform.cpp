@@ -85,6 +85,7 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
 
     QStringList headerLabels;
     FTableWidget = new QTableWidget(FRows.count(),FColumns.count(),this);
+    FTableWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     for (int col = 0; col < FColumns.count(); col++)
     {
       IDataField *colField = FColumns.at(col);
@@ -100,10 +101,6 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
     FTableWidget->setHorizontalHeaderLabels(headerLabels);
     FTableWidget->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
     FTableWidget->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
-    FTableWidget->setMinimumHeight(FTableWidget->verticalHeader()->length() + FTableWidget->horizontalHeader()->height());
-    FTableWidget->setMinimumWidth(FTableWidget->horizontalHeader()->length() + FTableWidget->verticalHeader()->height());
-    FTableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    FTableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     connect(FTableWidget,SIGNAL(cellActivated(int,int)),SLOT(onCellActivated(int,int)));
     connect(FTableWidget,SIGNAL(currentCellChanged(int,int,int,int)),SLOT(onCurrentCellChanged(int,int,int,int)));
   }
@@ -111,10 +108,7 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
   QDomNodeList pagesList = AElem.elementsByTagNameNS(NS_JABBER_XDATALAYOUT,"page");
   if (pagesList.isEmpty())
   {
-    QWidget *pageWidget = new QWidget(this);
-    pageWidget->setLayout(new QVBoxLayout(pageWidget));
-    pageWidget->layout()->setMargin(0);
-    insertFields(formElement(),pageWidget->layout(),0);
+    QWidget *pageWidget = createPage(formElement(),0);
     FStackedWidget->addWidget(pageWidget);
   }
   else 
@@ -136,19 +130,7 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
     for(int pageIndex = 0; pageIndex < pagesList.count(); pageIndex++)
     {
       QDomElement pageElem = pagesList.at(pageIndex).toElement();
-      QWidget *pageWidget = new QWidget(this);
-      pageWidget->setLayout(new QVBoxLayout(pageWidget));
-      pageWidget->layout()->setMargin(0);
-      QString label = pageElem.attribute("label");
-      if (!label.isEmpty())
-      {
-        QLabel *labelWidget = new QLabel(Qt::escape(label),pageWidget);
-        labelWidget->setWordWrap(true);
-        labelWidget->setAlignment(Qt::AlignCenter);
-        pageWidget->layout()->addWidget(labelWidget);
-      }
-      FPageLabels.append(label);
-      insertFields(pageElem,pageWidget->layout(),pageIndex);
+      QWidget *pageWidget = createPage(pageElem,pageIndex);
       FStackedWidget->addWidget(pageWidget);
     }
   }
@@ -261,8 +243,32 @@ QList<IDataField *> DataForm::notValidFields() const
   return dataFields;
 }
 
-void DataForm::insertFields(const QDomElement &AElem, QLayout *ALayout, int APage)
+QWidget *DataForm::createPage(const QDomElement &APageElem,int APage)
 {
+  QWidget *pageWidget = new QWidget(this);
+  QVBoxLayout *pageLayout = new QVBoxLayout(pageWidget);
+  pageWidget->setLayout(pageLayout);
+  pageLayout->setMargin(0);
+
+  QString label = APageElem.attribute("label");
+  if (!label.isEmpty())
+  {
+    QLabel *labelWidget = new QLabel(Qt::escape(label),pageWidget);
+    labelWidget->setWordWrap(true);
+    labelWidget->setAlignment(Qt::AlignCenter);
+    pageLayout->addWidget(labelWidget);
+  }
+
+  bool insertStretch = insertFields(APageElem,pageLayout,APage,true);
+  if (insertStretch)
+    pageLayout->addStretch();
+
+  return pageWidget;
+}
+
+bool DataForm::insertFields(const QDomElement &AElem, QLayout *ALayout, int APage, bool AStretch)
+{
+  bool stretch = AStretch;
   QDomElement elem = AElem.firstChildElement();
   while(!elem.isNull())
   {
@@ -273,6 +279,8 @@ void DataForm::insertFields(const QDomElement &AElem, QLayout *ALayout, int APag
         IDataField *dataField = field(elem.attribute("var"));
         if (dataField && dataField->widget() && !FInsertedFields.contains(dataField->widget()))
         {
+          if (dataField->type()==FIELD_JIDMULTI || dataField->type()==FIELD_TEXTMULTI)
+            stretch = false;
           ALayout->addWidget(dataField->widget());
           FInsertedFields.append(dataField->widget());
           FPageFields.insert(APage,dataField);
@@ -293,6 +301,7 @@ void DataForm::insertFields(const QDomElement &AElem, QLayout *ALayout, int APag
     {
       if (FTableWidget && !FInsertedFields.contains(FTableWidget))
       {
+        stretch = false;
         ALayout->addWidget(FTableWidget);
         FInsertedFields.append(FTableWidget);
       }
@@ -311,10 +320,11 @@ void DataForm::insertFields(const QDomElement &AElem, QLayout *ALayout, int APag
       QGroupBox *groupBox = new QGroupBox(elem.attribute("label"));
       groupBox->setLayout(new QVBoxLayout(groupBox));
       ALayout->addWidget(groupBox);
-      insertFields(elem,groupBox->layout(),APage);
+      stretch = insertFields(elem,groupBox->layout(),APage,stretch);
     }
     elem = elem.nextSiblingElement();
   }
+  return stretch;
 }
 
 void DataForm::setFocusedField(IDataField *AField, Qt::FocusReason AReason)

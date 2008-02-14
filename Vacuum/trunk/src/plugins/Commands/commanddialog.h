@@ -6,6 +6,7 @@
 #include "../../definations/namespaces.h"
 #include "../../interfaces/icommands.h"
 #include "../../interfaces/idataforms.h"
+#include "../../utils/skin.h"
 #include "ui_commanddialog.h"
 
 class CommandDialog : 

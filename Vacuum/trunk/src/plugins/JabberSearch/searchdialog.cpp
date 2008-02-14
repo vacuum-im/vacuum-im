@@ -1,6 +1,7 @@
 #include "searchdialog.h"
 
 #include <QHeaderView>
+#include <QMessageBox>
 
 #define CJID                    0
 #define CFIRST                  1
@@ -8,6 +9,7 @@
 #define CNICK                   3
 #define CEMAIL                  4
 
+#define IN_SEARCH               "psi/search"
 #define IN_ADDCONTACT           "psi/addContact"
 #define IN_VCARD                "psi/vCard"
 #define IN_INFO                 "psi/statusmsg"
@@ -17,6 +19,7 @@ SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManage
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
+  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SEARCH));
 
   FPluginManager = APluginManager;
   FSearch = ASearch;
@@ -35,6 +38,7 @@ SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManage
   FToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   ui.wdtToolBar->layout()->addWidget(FToolBar);
   FToolBarChanger = new ToolBarChanger(FToolBar);
+  FToolBarChanger->setSeparatorsVisible(false);
 
   ui.pgeForm->setLayout(new QVBoxLayout);
   ui.pgeForm->layout()->setMargin(0);
@@ -124,13 +128,13 @@ void SearchDialog::resetDialog()
   ui.lblEmail->setVisible(false);
   ui.lneEmail->setVisible(false);
   ui.stwWidgets->setCurrentWidget(ui.pgeFields);
-  ui.stwWidgets->setEnabled(true);
 }
 
 void SearchDialog::requestFields()
 {
-  resetDialog();
   FRequestId = FSearch->sendRequest(FStreamJid,FServiceJid);
+
+  resetDialog();
   if (!FRequestId.isEmpty())
   {
     ui.lblInstructions->setText(tr("Waiting for host response ..."));
@@ -149,6 +153,9 @@ void SearchDialog::requestResult()
   submit.serviceJid = FServiceJid;
   if (FCurrentForm)
   {
+    if (FCurrentForm && !FCurrentForm->isValid())
+      if (QMessageBox::warning(this,tr("Not Acceptable"),FCurrentForm->invalidMessage(),QMessageBox::Ok|QMessageBox::Ignore) == QMessageBox::Ok)
+        return;
     QDomDocument doc;
     QDomElement form = doc.appendChild(doc.createElement("command")).appendChild(doc.createElementNS(NS_JABBER_DATA,"x")).toElement();
     FCurrentForm->createSubmit(form);
@@ -164,6 +171,8 @@ void SearchDialog::requestResult()
   }
 
   FRequestId = FSearch->sendSubmit(FStreamJid,submit);
+  
+  resetDialog();
   if (!FRequestId.isEmpty())
   {
     ui.lblInstructions->setText(tr("Waiting for host response ..."));
@@ -181,12 +190,13 @@ bool SearchDialog::setDataForm(const QDomElement &AFormElem)
   if (FDataForms && !AFormElem.isNull())
   {
     FCurrentForm = FDataForms->newDataForm(AFormElem,ui.pgeForm);
-    FCurrentForm->instance()->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     ui.pgeForm->layout()->addWidget(FCurrentForm->instance());
     if (FCurrentForm->pageControl())
       ui.wdtPages->layout()->addWidget(FCurrentForm->pageControl());
     if (!FCurrentForm->title().isEmpty())
       setWindowTitle(FCurrentForm->title());
+    if (FCurrentForm->tableWidget())
+      FCurrentForm->tableWidget()->setSortingEnabled(true);
     ui.stwWidgets->setCurrentWidget(ui.pgeForm);
     return true;
   }
