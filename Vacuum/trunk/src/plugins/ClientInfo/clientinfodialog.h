@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "../../interfaces/iclientinfo.h"
+#include "../../utils/skin.h"
 #include "ui_clientinfodialog.h"
 
 class ClientInfoDialog : 
@@ -10,10 +11,13 @@ class ClientInfoDialog :
 {
   Q_OBJECT;
 public:
-  ClientInfoDialog(const QString &AContactName, const Jid &AContactJid, const Jid &AStreamJid, IClientInfo *AClientInfo, QWidget *AParent = NULL);
+  ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid,
+    const QString &AContactName, int AInfoTypes, QWidget *AParent = NULL);
   ~ClientInfoDialog();
   const Jid &streamJid() const { return FStreamJid; }
   const Jid &contactJid() const { return FContactJid; }
+  int infoTypes() const { return FInfoTypes; }
+  void setInfoTypes(int AInfoTypes);
 signals:
   void clientInfoDialogClosed(const Jid &FContactJid);
 protected:
@@ -23,10 +27,12 @@ protected slots:
 private:
   Ui::ClientInfoDialogClass ui;
 private:
-  QString FContactName;
-  Jid FContactJid;
-  Jid FStreamJid;
   IClientInfo *FClientInfo;
+private:
+  Jid FStreamJid;
+  Jid FContactJid;
+  QString FContactName;
+  int FInfoTypes;
 };
 
 #endif // CLIENTINFODIALOG_H

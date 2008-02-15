@@ -2,6 +2,7 @@
 #define CLIENTINFO_H
 
 #include <QSet>
+#include "../../definations/version.h"
 #include "../../definations/namespaces.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterdataholderorders.h"
@@ -24,6 +25,7 @@
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 #include "../../utils/menu.h"
+#include "../../utils/skin.h"
 #include "clientinfodialog.h"
 #include "optionswidget.h"
 
@@ -68,31 +70,38 @@ public:
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //IClientInfo
-  virtual void showClientInfo(const Jid &AContactJid, const Jid &AStreamJid);
+  virtual void showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes);
   virtual bool checkOption(IClientInfo::Option AOption) const;
   virtual void setOption(IClientInfo::Option AOption, bool AValue);
   //Software Version
   virtual bool hasSoftwareInfo(const Jid &AContactJid) const;
-  virtual bool requestSoftwareInfo(const Jid &AContactJid, const Jid &AStreamJid);
+  virtual bool requestSoftwareInfo( const Jid &AStreamJid, const Jid &AContactJid);
   virtual int softwareStatus(const Jid &AContactJid) const;
   virtual QString softwareName(const Jid &AContactJid) const;
   virtual QString softwareVersion(const Jid &AContactJid) const;
   virtual QString softwareOs(const Jid &AContactJid) const;
   //Last Activity
   virtual bool hasLastActivity(const Jid &AContactJid) const;
-  virtual bool requestLastActivity(const Jid &AContactJid, const Jid &AStreamJid);
-  virtual QDateTime lastActivityRequest(const Jid &AContactJid) const;
+  virtual bool requestLastActivity(const Jid &AStreamJid, const Jid &AContactJid);
   virtual QDateTime lastActivityTime(const Jid &AContactJid) const;
   virtual QString lastActivityText(const Jid &AContactJid) const;
+  //Entity Time
+  virtual bool hasEntityTime(const Jid &AContactJid) const;
+  virtual bool requestEntityTime(const Jid &AStreamJid, const Jid &AContactJid);
+  virtual QDateTime entityTime(const Jid &AContactJid) const;
+  virtual int entityTimeDelta(const Jid &AContactJid) const;
+  virtual int entityTimePing(const Jid &AContactJid) const;
 signals:
-  virtual void optionChanged(IClientInfo::Option AOption, bool AValue);
-  virtual void softwareInfoChanged(const Jid &AContactJid); 
-  virtual void lastActivityChanged(const Jid &AContactJid);
   //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
   //IOptionsHolder
   virtual void optionsAccepted();
   virtual void optionsRejected();
+  //IClientInfo
+  virtual void optionChanged(IClientInfo::Option AOption, bool AValue);
+  virtual void softwareInfoChanged(const Jid &AContactJid); 
+  virtual void lastActivityChanged(const Jid &AContactJid);
+  virtual void entityTimeChanged(const Jid &AContactJid);
 protected:
   void deleteSoftwareDialogs(const Jid &AStreamJid);
   void registerDiscoFeatures();
@@ -108,6 +117,7 @@ protected slots:
   void onRosterRemoved(IRoster *ARoster);
   void onSoftwareInfoChanged(const Jid &AContactJid);
   void onLastActivityChanged(const Jid &AContactJid);
+  void onEntityTimeChanged(const Jid &AContactJid);
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
 private:
@@ -132,16 +142,25 @@ private:
     QDateTime datetime;
     QString text;
   };
+  struct TimeItem {
+    TimeItem() { ping = -1; }
+    int tzoSecs;
+    int utcSecs;
+    int ping;
+  };
 private:
   OptionsWidget *FOptionsWidget;
 private:
   int FOptions;
-  int FSoftwareHandler;
+  int FVersionHandler;
+  int FTimeHandler;
   QHash<Jid, QSet<IPresence *> > FContactPresences;
   QHash<QString, Jid> FSoftwareId;
   QHash<Jid, SoftwareItem> FSoftwareItems;
   QHash<QString, Jid> FActivityId;
   QHash<Jid, ActivityItem> FActivityItems;
+  QHash<QString, Jid> FTimeId;
+  QHash<Jid, TimeItem> FTimeItems;
   QHash<Jid, ClientInfoDialog *> FClientInfoDialogs;
 };
 

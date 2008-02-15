@@ -4,7 +4,7 @@ OptionsWidget::OptionsWidget(IClientInfo *AClientInfo)
 {
   ui.setupUi(this);
   FClientInfo = AClientInfo;
-  ui.chbAutoLoadSoftwareInfo->setCheckState( FClientInfo->checkOption(IClientInfo::AutoLoadSoftwareInfo) ? Qt::Checked : Qt::Unchecked );
+  ui.chbAutoLoadSoftwareInfo->setCheckState( FClientInfo->checkOption(IClientInfo::AutoLoadSoftwareVersion) ? Qt::Checked : Qt::Unchecked );
 }
 
 OptionsWidget::~OptionsWidget()
@@ -14,5 +14,5 @@ OptionsWidget::~OptionsWidget()
 
 void OptionsWidget::apply()
 {
-  FClientInfo->setOption(IClientInfo::AutoLoadSoftwareInfo,ui.chbAutoLoadSoftwareInfo->checkState() == Qt::Checked);
+  FClientInfo->setOption(IClientInfo::AutoLoadSoftwareVersion,ui.chbAutoLoadSoftwareInfo->checkState() == Qt::Checked);
 }

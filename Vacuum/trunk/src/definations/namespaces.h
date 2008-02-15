@@ -3,6 +3,7 @@
 
 #define NS_XMPP_STREAMS                         "urn:ietf:params:xml:ns:xmpp-streams"
 #define NS_XMPP_DELAY                           "urn:xmpp:delay"
+#define NS_XMPP_TIME                            "urn:xmpp:time"
 
 #define NS_JABBER_CLIENT                        "jabber:client"
 #define NS_JABBER_STREAMS                       "http://etherx.jabber.org/streams"

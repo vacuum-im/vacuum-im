@@ -1,13 +1,20 @@
 #include <QDebug>
 #include "clientinfo.h"
 
-#define SHC_SOFTWARE                    "/iq[@type='get']/query[@xmlns='" NS_JABBER_VERSION "']"
+#include <QDateTime>
+
+#define SHC_SOFTWARE_VERSION            "/iq[@type='get']/query[@xmlns='" NS_JABBER_VERSION "']"
+#define SHC_ENTITY_TIME                 "/iq[@type='get']/time[@xmlns='" NS_XMPP_TIME "']"
+
 #define SVN_AUTO_LOAD_SOFTWARE          "autoLoadSoftwareInfo"
+
 #define SOFTWARE_INFO_TIMEOUT           10000
 #define LAST_ACTIVITY_TIMEOUT           10000
+#define ENTITY_TIME_TIMEOUT             10000
 
 #define ADR_STREAM_JID                  Action::DR_StreamJid
 #define ADR_CONTACT_JID                 Action::DR_Parametr1
+#define ADR_INFO_TYPES                  Action::DR_Parametr2
 
 #define IN_CLIENTINFO                   "psi/help"
 
@@ -23,7 +30,8 @@ ClientInfo::ClientInfo()
   FDiscovery = NULL;
 
   FOptions = 0;
-  FSoftwareHandler = 0;
+  FVersionHandler = 0;
+  FTimeHandler = 0;
 }
 
 ClientInfo::~ClientInfo()
@@ -115,7 +123,8 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 
 bool ClientInfo::initObjects()
 {
-  FSoftwareHandler = FStanzaProcessor->insertHandler(this,SHC_SOFTWARE,IStanzaProcessor::DirectionIn);
+  FVersionHandler = FStanzaProcessor->insertHandler(this,SHC_SOFTWARE_VERSION,IStanzaProcessor::DirectionIn);
+  FTimeHandler = FStanzaProcessor->insertHandler(this,SHC_ENTITY_TIME,IStanzaProcessor::DirectionIn);
 
   if (FRostersViewPlugin)
   {
@@ -130,6 +139,7 @@ bool ClientInfo::initObjects()
     FRostersModelPlugin->rostersModel()->insertDefaultDataHolder(this);
     connect(this,SIGNAL(softwareInfoChanged(const Jid &)),SLOT(onSoftwareInfoChanged(const Jid &)));
     connect(this,SIGNAL(lastActivityChanged(const Jid &)),SLOT(onLastActivityChanged(const Jid &)));
+    connect(this,SIGNAL(entityTimeChanged(const Jid &)),SLOT(onEntityTimeChanged(const Jid &)));
   }
 
   if (FSettingsPlugin)
@@ -140,6 +150,7 @@ bool ClientInfo::initObjects()
     registerDiscoFeatures();
     FDiscovery->insertFeatureHandler(NS_JABBER_VERSION,this,DFO_DEFAULT);
     FDiscovery->insertFeatureHandler(NS_JABBER_LAST,this,DFO_DEFAULT);
+    FDiscovery->insertFeatureHandler(NS_XMPP_TIME,this,DFO_DEFAULT);
   }
 
   return true;
@@ -147,14 +158,32 @@ bool ClientInfo::initObjects()
 
 bool ClientInfo::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
-  if (AHandlerId == FSoftwareHandler)
+  if (AHandlerId == FVersionHandler)
   {
     AAccept = true;
     Stanza iq("iq");
     iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
     QDomElement elem = iq.addElement("query",NS_JABBER_VERSION);
-    elem.appendChild(iq.createElement("name")).appendChild(iq.createTextNode("Vacuum"));
-    elem.appendChild(iq.createElement("version")).appendChild(iq.createTextNode("0.0.0"));
+    elem.appendChild(iq.createElement("name")).appendChild(iq.createTextNode(CLIENT_NAME));
+    elem.appendChild(iq.createElement("version")).appendChild(iq.createTextNode(CLIENT_VERSION));
+    FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
+  }
+  else if (AHandlerId == FTimeHandler)
+  {
+    QDateTime lcl = QDateTime::currentDateTime();
+    QDateTime utc = lcl.toUTC();
+    lcl.setTimeSpec(Qt::UTC);
+    int minToUtc = lcl<utc ? lcl.secsTo(utc)/60 : utc.secsTo(lcl)/60;
+    int hourToUtc = minToUtc/60;
+    minToUtc = minToUtc-(hourToUtc*60);
+    QString tzo = QString("%1%2:%3").arg(lcl<utc ? "-" : "+").arg(hourToUtc,2,10,QLatin1Char('0')).arg(minToUtc,2,10,QLatin1Char('0'));
+
+    AAccept = true;
+    Stanza iq("iq");
+    iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
+    QDomElement elem = iq.addElement("time",NS_XMPP_TIME);
+    elem.appendChild(iq.createElement("tzo")).appendChild(iq.createTextNode(tzo));
+    elem.appendChild(iq.createElement("utc")).appendChild(iq.createTextNode(utc.toString(Qt::ISODate)+"Z"));
     FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
   }
   return false;
@@ -162,16 +191,16 @@ bool ClientInfo::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza 
 
 void ClientInfo::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
-  QDomElement elem = AStanza.firstElement("query");
-  if (elem.namespaceURI() == NS_JABBER_VERSION && FSoftwareId.contains(AStanza.id()))
+  if (FSoftwareId.contains(AStanza.id()))
   {
     Jid contactJid = FSoftwareId.take(AStanza.id());
     SoftwareItem &software = FSoftwareItems[contactJid];
     if (AStanza.type() == "result")
     {
-      software.name = elem.firstChildElement("name").text();
-      software.version = elem.firstChildElement("version").text();
-      software.os = elem.firstChildElement("os").text();
+      QDomElement query = AStanza.firstElement("query");
+      software.name = query.firstChildElement("name").text();
+      software.version = query.firstChildElement("version").text();
+      software.os = query.firstChildElement("os").text();
       software.status = SoftwareLoaded;
     }
     else if (AStanza.type() == "error")
@@ -184,24 +213,44 @@ void ClientInfo::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
     }
     emit softwareInfoChanged(contactJid);
   }
-  else if (elem.namespaceURI() == NS_JABBER_LAST && FActivityId.contains(AStanza.id()))
+  else if (FActivityId.contains(AStanza.id()))
   {
     Jid contactJid = FActivityId.take(AStanza.id());
     ActivityItem &activity = FActivityItems[contactJid];
     if (AStanza.type() == "result")
     {
-      activity.requestTime = QDateTime::currentDateTime();
-      activity.datetime = activity.requestTime.addSecs(0-elem.attribute("seconds","0").toInt());
-      activity.text = elem.text();
+      QDomElement query = AStanza.firstElement("query");
+      activity.datetime = QDateTime::currentDateTime().addSecs(0-query.attribute("seconds","0").toInt());
+      activity.text = query.text();
     }
     else if (AStanza.type() == "error")
     {
       ErrorHandler err(AStanza.element());
-      activity.requestTime = QDateTime::currentDateTime();
       activity.datetime = QDateTime();
       activity.text = err.message();
     }
     emit lastActivityChanged(contactJid);
+  }
+  else if (FTimeId.contains(AStanza.id()))
+  {
+    Jid contactJid = FTimeId.take(AStanza.id());
+    QDomElement time = AStanza.firstElement("time");
+    QString tzo = time.firstChildElement("tzo").text();
+    QString utc = time.firstChildElement("utc").text();
+    if (AStanza.type() == "result" && !tzo.isEmpty() && !utc.isEmpty())
+    {
+      TimeItem &tItem = FTimeItems[contactJid];
+      tItem.tzoSecs = tzo.startsWith("-") ? 1 : -1;
+      tzo.remove(0,1);
+      QTime tzoT = QTime::fromString(tzo,"hh:mm");
+      QDateTime utcDT = QDateTime::fromString(utc,Qt::ISODate);
+      tItem.ping = tItem.ping - QTime::currentTime().msecsTo(QTime(0,0,0,0));
+      tItem.tzoSecs =  tItem.tzoSecs * tzoT.secsTo(QTime(0,0,0));
+      tItem.utcSecs = utcDT.secsTo(QDateTime::currentDateTime().toUTC()) - tItem.ping/2000;
+    }
+    else
+      FTimeItems.remove(contactJid);
+    emit entityTimeChanged(contactJid);
   }
 }
 
@@ -221,8 +270,13 @@ void ClientInfo::iqStanzaTimeOut(const QString &AId)
   else if (FActivityId.contains(AId))
   {
     Jid contactJid = FActivityId.take(AId);
-    ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
     emit lastActivityChanged(contactJid);
+  }
+  else if (FTimeId.contains(AId))
+  {
+    Jid contactJid = FTimeId.take(AId);
+    FTimeItems.remove(contactJid);
+    emit entityTimeChanged(contactJid);
   }
 }
 
@@ -266,15 +320,27 @@ QVariant ClientInfo::data(const IRosterIndex *AIndex, int ARole) const
     return hasLastActivity(contactJid) ? lastActivityTime(contactJid) : QVariant();
   else if (ARole == RDR_LAST_ACTIVITY_TEXT)
     return hasLastActivity(contactJid) ? lastActivityText(contactJid) : QVariant();
+  else if (ARole == RDR_ENTITY_TIME)
+    return hasEntityTime(contactJid) ? entityTime(contactJid) : QVariant();
   else
     return QVariant();
 }
 
 bool ClientInfo::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
 {
-  if (AFeature == NS_JABBER_VERSION || AFeature == NS_JABBER_LAST)
+  if (AFeature == NS_JABBER_VERSION)
   {
-    showClientInfo(ADiscoInfo.contactJid,AStreamJid);
+    showClientInfo(AStreamJid,ADiscoInfo.contactJid,IClientInfo::SoftwareVersion);
+    return true;
+  }
+  else if (AFeature == NS_JABBER_LAST)
+  {
+    showClientInfo(AStreamJid,ADiscoInfo.contactJid,IClientInfo::LastActivity);
+    return true;
+  }
+  else if (AFeature == NS_XMPP_TIME)
+  {
+    showClientInfo(AStreamJid,ADiscoInfo.contactJid,IClientInfo::EntityTime);
     return true;
   }
   return false;
@@ -288,10 +354,11 @@ Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QStrin
     if (AFeature == NS_JABBER_VERSION)
     {
       Action *action = new Action(AParent);
-      action->setText(tr("Client version"));
+      action->setText(tr("Software version"));
       action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
       action->setData(ADR_STREAM_JID,AStreamJid.full());
       action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
+      action->setData(ADR_INFO_TYPES,IClientInfo::SoftwareVersion);
       connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
       return action;
     }
@@ -304,17 +371,29 @@ Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QStrin
         action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
         action->setData(ADR_STREAM_JID,AStreamJid.full());
         action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
+        action->setData(ADR_INFO_TYPES,IClientInfo::LastActivity);
         connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
         return action;
       }
+    }
+    else if (AFeature == NS_XMPP_TIME)
+    {
+      Action *action = new Action(AParent);
+      action->setText(tr("Entity time"));
+      action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
+      action->setData(ADR_STREAM_JID,AStreamJid.full());
+      action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
+      action->setData(ADR_INFO_TYPES,IClientInfo::EntityTime);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
+      return action;
     }
   }
   return NULL;
 }
 
-void ClientInfo::showClientInfo(const Jid &AContactJid, const Jid &AStreamJid)
+void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes)
 {
-  if (AContactJid.isValid() && AStreamJid.isValid())
+  if (AInfoTypes>0 && AContactJid.isValid() && AStreamJid.isValid())
   {
     ClientInfoDialog *dialog = FClientInfoDialogs.value(AContactJid,NULL);
     if (!dialog)
@@ -330,13 +409,16 @@ void ClientInfo::showClientInfo(const Jid &AContactJid, const Jid &AStreamJid)
             contactName = item->name();
         }
       }
-      dialog = new ClientInfoDialog(contactName, AContactJid,AStreamJid,this);
-      FClientInfoDialogs.insert(AContactJid,dialog);
+      dialog = new ClientInfoDialog(this,AStreamJid,AContactJid,contactName,AInfoTypes);
       connect(dialog,SIGNAL(clientInfoDialogClosed(const Jid &)),SLOT(onClientInfoDialogClosed(const Jid &)));
+      FClientInfoDialogs.insert(AContactJid,dialog);
       dialog->show();
     }
     else
+    {
+      dialog->setInfoTypes(dialog->infoTypes() | AInfoTypes);
       dialog->activateWindow();
+    }
   }
 }
 
@@ -360,10 +442,10 @@ bool ClientInfo::hasSoftwareInfo(const Jid &AContactJid) const
   return FSoftwareItems.value(AContactJid).status == SoftwareLoaded;
 }
 
-bool ClientInfo::requestSoftwareInfo(const Jid &AContactJid, const Jid &AStreamJid)
+bool ClientInfo::requestSoftwareInfo(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  bool sended = false;
-  if (AStreamJid.isValid() && AContactJid.isValid() && !FSoftwareId.values().contains(AContactJid))
+  bool sended = FSoftwareId.values().contains(AContactJid);
+  if (!sended && AStreamJid.isValid() && AContactJid.isValid())
   {
     Stanza iq("iq");
     iq.addElement("query",NS_JABBER_VERSION);
@@ -403,26 +485,19 @@ bool ClientInfo::hasLastActivity(const Jid &AContactJid) const
   return FActivityItems.value(AContactJid).datetime.isValid();
 }
 
-bool ClientInfo::requestLastActivity(const Jid &AContactJid, const Jid &AStreamJid)
+bool ClientInfo::requestLastActivity(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  bool sended = false;
-  if (AStreamJid.isValid() && AContactJid.isValid() && !FActivityId.values().contains(AContactJid))
+  bool sended = FActivityId.values().contains(AContactJid);
+  if (!sended && AStreamJid.isValid() && AContactJid.isValid())
   {
     Stanza iq("iq");
     iq.addElement("query",NS_JABBER_LAST);
     iq.setTo(AContactJid.eBare()).setId(FStanzaProcessor->newId()).setType("get");
     sended = FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,LAST_ACTIVITY_TIMEOUT);
     if (sended)
-    {
       FActivityId.insert(iq.id(),AContactJid);
-    }
   }
   return sended;
-}
-
-QDateTime ClientInfo::lastActivityRequest(const Jid &AContactJid) const
-{
-  return FActivityItems.value(AContactJid).requestTime;
 }
 
 QDateTime ClientInfo::lastActivityTime(const Jid &AContactJid) const
@@ -433,6 +508,54 @@ QDateTime ClientInfo::lastActivityTime(const Jid &AContactJid) const
 QString ClientInfo::lastActivityText(const Jid &AContactJid) const
 {
   return FActivityItems.value(AContactJid).text;
+}
+
+bool ClientInfo::hasEntityTime(const Jid &AContactJid) const
+{
+  return FTimeItems.value(AContactJid).ping >= 0;
+}
+
+bool ClientInfo::requestEntityTime(const Jid &AStreamJid, const Jid &AContactJid)
+{
+  bool sended = FTimeId.values().contains(AContactJid);
+  if (!sended && AStreamJid.isValid() && AContactJid.isValid())
+  {
+    Stanza iq("iq");
+    iq.addElement("time",NS_XMPP_TIME);
+    iq.setTo(AContactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
+    sended = FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,ENTITY_TIME_TIMEOUT);
+    if (sended)
+    {
+      TimeItem &tItem = FTimeItems[AContactJid];
+      tItem.ping = QTime::currentTime().msecsTo(QTime(0,0,0,0));
+      FTimeId.insert(iq.id(),AContactJid);
+      emit entityTimeChanged(AContactJid);
+    }
+  }
+  return sended;
+}
+
+QDateTime ClientInfo::entityTime(const Jid &AContactJid) const
+{
+  if (hasEntityTime(AContactJid))
+  {
+    TimeItem tItem = FTimeItems.value(AContactJid);
+    QDateTime utc = QDateTime::currentDateTime().toUTC().addSecs(tItem.utcSecs).addSecs(tItem.tzoSecs);
+    return utc;
+  }
+  return QDateTime();
+}
+
+int ClientInfo::entityTimeDelta(const Jid &AContactJid) const
+{
+  if (hasEntityTime(AContactJid))
+    return FTimeItems.value(AContactJid).utcSecs;
+  return 0;
+}
+
+int ClientInfo::entityTimePing(const Jid &AContactJid) const
+{
+  return FTimeItems.value(AContactJid).ping;
 }
 
 void ClientInfo::deleteSoftwareDialogs(const Jid &AStreamJid)
@@ -449,8 +572,8 @@ void ClientInfo::registerDiscoFeatures()
   dfeature.active = true;
   dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CLIENTINFO);
   dfeature.var = NS_JABBER_VERSION;
-  dfeature.name = tr("Client version");
-  dfeature.description = tr("Request contacts client version");
+  dfeature.name = tr("Software version");
+  dfeature.description = tr("Request contacts software version");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = false;
@@ -458,6 +581,13 @@ void ClientInfo::registerDiscoFeatures()
   dfeature.var = NS_JABBER_LAST;
   dfeature.name = tr("Last activity");
   dfeature.description = tr("Request contacts last activity");
+  FDiscovery->insertDiscoFeature(dfeature);
+
+  dfeature.active = true;
+  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CLIENTINFO);
+  dfeature.var = NS_XMPP_TIME;
+  dfeature.name = tr("Entity time");
+  dfeature.description = tr("Request the local time of an entity");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
@@ -471,8 +601,8 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
       emit lastActivityChanged(AContactJid);
     }
     SoftwareItem &software = FSoftwareItems[AContactJid];
-    if (checkOption(AutoLoadSoftwareInfo) && software.status == SoftwareNotLoaded)
-      requestSoftwareInfo(AContactJid,AStreamJid);
+    if (checkOption(AutoLoadSoftwareVersion) && software.status == SoftwareNotLoaded)
+      requestSoftwareInfo(AStreamJid,AContactJid);
   }
   else
   {
@@ -489,12 +619,17 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
       FActivityItems.remove(AContactJid);
       emit lastActivityChanged(AContactJid);
     }
+    if (FTimeItems.contains(AContactJid))
+    {
+      FTimeItems.remove(AContactJid);
+      emit entityTimeChanged(AContactJid);
+    }
   }
 }
 
 void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->type() == RIT_Contact || AIndex->type() == RIT_MyResource)
+  if (AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent || AIndex->type() == RIT_MyResource)
   {
     Jid streamJid = AIndex->data(RDR_StreamJid).toString();
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
@@ -505,6 +640,7 @@ void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
       action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
       action->setData(ADR_CONTACT_JID,AIndex->data(RDR_Jid));
+      action->setData(ADR_INFO_TYPES,IClientInfo::LastActivity);
       connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
       AMenu->addAction(action,AG_CLIENTINFO_ROSTER,true);
     }
@@ -514,13 +650,26 @@ void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 void ClientInfo::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMultiUser *AUser, Menu *AMenu)
 {
   Action *action = new Action(AMenu);
-  action->setText(tr("Client version"));
+  action->setText(tr("Software version"));
   action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
   action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAMJID));
   if (!AUser->data(MUDR_REALJID).toString().isEmpty())
     action->setData(ADR_CONTACT_JID,AUser->data(MUDR_REALJID));
   else
     action->setData(ADR_CONTACT_JID,AUser->data(MUDR_CONTACTJID));
+  action->setData(ADR_INFO_TYPES,IClientInfo::SoftwareVersion);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
+  AMenu->addAction(action,AG_MUCM_CLIENTINFO,true);
+
+  action = new Action(AMenu);
+  action->setText(tr("Entity time"));
+  action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
+  action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAMJID));
+  if (!AUser->data(MUDR_REALJID).toString().isEmpty())
+    action->setData(ADR_CONTACT_JID,AUser->data(MUDR_REALJID));
+  else
+    action->setData(ADR_CONTACT_JID,AUser->data(MUDR_CONTACTJID));
+  action->setData(ADR_INFO_TYPES,IClientInfo::EntityTime);
   connect(action,SIGNAL(triggered(bool)),SLOT(onClientInfoActionTriggered(bool)));
   AMenu->addAction(action,AG_MUCM_CLIENTINFO,true);
 }
@@ -532,10 +681,13 @@ void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMult
     Jid contactJid = AIndex->data(RDR_Jid).toString();
     
     if (hasSoftwareInfo(contactJid))
-      AToolTips.insert(TTO_SOFTWARE_INFO,tr("Client: %1 %2").arg(softwareName(contactJid)).arg(softwareVersion(contactJid)));
+      AToolTips.insert(TTO_SOFTWARE_INFO,tr("Software: %1 %2").arg(softwareName(contactJid)).arg(softwareVersion(contactJid)));
     
     if (hasLastActivity(contactJid) && AIndex->data(RDR_Show).toInt() == IPresence::Offline)
       AToolTips.insert(TTO_LAST_ACTIVITY,tr("Offline since: %1").arg(lastActivityTime(contactJid).toString()));
+    
+    if (hasEntityTime(contactJid))
+      AToolTips.insert(TTO_ENTITY_TIME,tr("Entity time: %1").arg(entityTime(contactJid).time().toString()));
   }
 }
 
@@ -546,8 +698,8 @@ void ClientInfo::onClientInfoActionTriggered(bool)
   {
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-    if (streamJid.isValid() && contactJid.isValid())
-      showClientInfo(contactJid,streamJid);
+    int infoTypes = action->data(ADR_INFO_TYPES).toInt();
+    showClientInfo(streamJid,contactJid,infoTypes);
   }
 }
 
@@ -559,13 +711,13 @@ void ClientInfo::onClientInfoDialogClosed(const Jid &AContactJid)
 void ClientInfo::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(CLIENTINFO_UUID);
-  setOption(AutoLoadSoftwareInfo, settings->value(SVN_AUTO_LOAD_SOFTWARE,true).toBool());
+  setOption(AutoLoadSoftwareVersion, settings->value(SVN_AUTO_LOAD_SOFTWARE,true).toBool());
 }
 
 void ClientInfo::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(CLIENTINFO_UUID);
-  settings->setValue(SVN_AUTO_LOAD_SOFTWARE,checkOption(AutoLoadSoftwareInfo));
+  settings->setValue(SVN_AUTO_LOAD_SOFTWARE,checkOption(AutoLoadSoftwareVersion));
 }
 
 void ClientInfo::onRosterRemoved(IRoster *ARoster)
@@ -602,6 +754,21 @@ void ClientInfo::onLastActivityChanged(const Jid &AContactJid)
     {
       emit dataChanged(index,RDR_LAST_ACTIVITY_TIME);
       emit dataChanged(index,RDR_LAST_ACTIVITY_TEXT);
+    }
+  }
+}
+
+void ClientInfo::onEntityTimeChanged( const Jid &AContactJid )
+{
+  IRosterIndexList indexList;
+  IRostersModel *model = FRostersModelPlugin->rostersModel();
+  QStringList streamJids = model->streams();
+  foreach(QString streamJid, streamJids)
+  {
+    IRosterIndexList indexList = model->getContactIndexList(streamJid,AContactJid);
+    foreach(IRosterIndex *index, indexList)
+    {
+      emit dataChanged(index,RDR_ENTITY_TIME);
     }
   }
 }

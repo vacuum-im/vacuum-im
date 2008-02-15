@@ -16,4 +16,5 @@ HEADERS += actiongroups.h \
            vcardvaluenames.h \
            multiuserdataroles.h \
            discotreeitemsdataroles.h \
-           discofeatureorder.h  
+           discofeatureorder.h  \
+           version.h
