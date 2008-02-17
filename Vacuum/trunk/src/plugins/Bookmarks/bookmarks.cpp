@@ -364,7 +364,7 @@ void BookMarks::onEditBookmarksActionTriggered(bool)
 void BookMarks::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
   IAccount *account = qobject_cast<IAccount *>(sender());
-  if (account && AName == "name" && FStreamMenu.contains(account->streamJid()))
+  if (account && AName == AVN_NAME && FStreamMenu.contains(account->streamJid()))
     FStreamMenu[account->streamJid()]->setTitle(AValue.toString());
 }
 

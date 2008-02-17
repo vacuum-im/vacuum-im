@@ -1,6 +1,7 @@
 #ifndef ROSTERSMODELPLUGIN_H
 #define ROSTERSMODELPLUGIN_H
 
+#include "../../definations/accountvaluenames.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/iaccountmanager.h"

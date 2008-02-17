@@ -864,12 +864,12 @@ void RosterChanger::onAddContactDialogDestroyed(QObject *AObject)
 
 void RosterChanger::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
-  if (AName == "name")
+  if (AName == AVN_NAME)
   {
     IAccount *account = qobject_cast<IAccount *>(sender());
-    if (account)
+    if (account && account->isActive())
     {
-      Action *action = FActions.value(FRosterPlugin->getRoster(account->streamJid()),NULL);
+      Action *action = FActions.value(FRosterPlugin->getRoster(account->xmppStream()->jid()),NULL);
       if (action)
         action->setText(AValue.toString());
     }

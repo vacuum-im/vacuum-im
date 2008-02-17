@@ -7,6 +7,7 @@
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/multiuserdataroles.h"
+#include "../../definations/accountvaluenames.h"
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"

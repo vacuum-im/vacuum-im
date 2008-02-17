@@ -1,13 +1,10 @@
 #include "statuschanger.h"
+
 #include <QTimer>
 #include <QToolButton>
 
 #define MAX_TEMP_STATUS_ID                  -10
 
-#define AVN_LAST_ONLINE_STATUS              "statusChanger:lastOnlineStatus"
-#define AVN_IS_MAIN_STATUS                  "statusChanger:isMainStatus"
-#define AVN_AUTOCONNECT                     "statusChanger:autoConnect"
-#define AVN_AUTORECONNECT                   "statusChanger:autoReconnect"
 #define SVN_LAST_ONLINE_MAIN_STATUS         "lastOnlineMainStatus"
 #define SVN_MAIN_STATUS_ID                  "mainStatus"
 #define SVN_STATUS                          "status[]"
@@ -851,10 +848,9 @@ void StatusChanger::autoReconnect(IPresence *APresence)
   if (account && account->value(AVN_AUTORECONNECT,true).toBool())
   {
     int statusId = FStreamWaitStatus.value(APresence, FStreamStatus.value(APresence));
-
     if (statusItemShow(statusId) != IPresence::Offline)
     {
-      int waitTime = account->value("StatusChanger:ReconnectTime",30).toInt();
+      int waitTime = account->value(AVN_RECONNECT_TIME,30).toInt();
       FStreamWaitReconnect.insert(APresence,QPair<QDateTime,int>(QDateTime::currentDateTime().addSecs(waitTime),statusId));
       QTimer::singleShot(waitTime*1000+100,this,SLOT(onReconnectTimer()));
     }
@@ -1175,7 +1171,7 @@ void StatusChanger::onOptionsDialogClosed()
 
 void StatusChanger::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
-  if (AName == "name")
+  if (AName == AVN_NAME)
   {
     IAccount *account = qobject_cast<IAccount *>(sender());
     if (account)

@@ -341,7 +341,7 @@ QString InfoWidget::showName(IPresence::Show AShow) const
 
 void InfoWidget::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
-  if (isFiledAutoUpdated(AccountName) && AName == "name")
+  if (isFiledAutoUpdated(AccountName) && AName == AVN_NAME)
     setField(AccountName,AValue);
 }
 

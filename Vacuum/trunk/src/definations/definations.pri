@@ -17,4 +17,5 @@ HEADERS += actiongroups.h \
            multiuserdataroles.h \
            discotreeitemsdataroles.h \
            discofeatureorder.h  \
-           version.h
+           version.h \
+           accountvaluenames.h

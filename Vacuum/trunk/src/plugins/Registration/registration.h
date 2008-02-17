@@ -14,6 +14,7 @@
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/iaccountmanager.h"
+#include "../../interfaces/ixmppstreams.h"
 #include "../../utils/stanza.h"
 #include "registerdialog.h"
 #include "registerstream.h"
@@ -73,7 +74,7 @@ protected:
   void registerDiscoFeatures();
 protected slots:
   void onRegisterActionTriggered(bool);
-  void onAccountRemoved(IAccount *AAccount);
+  void onStreamDestroyed(IXmppStream *AXmppStream);
   void onOptionsAccepted();
   void onOptionsRejected();
   void onOptionsDialogClosed();

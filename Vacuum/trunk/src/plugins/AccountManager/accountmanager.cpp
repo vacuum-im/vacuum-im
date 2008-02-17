@@ -5,16 +5,22 @@
 #include <QTime>
 #include <QMessageBox>
 
-#define IN_ACCOUNT "psi/account"
+#define IN_ACCOUNT                  "psi/account"
+
+#define SVN_ACCOUNT                 "account[]"
+#define SVN_ACCOUNT_ACTIVE          SVN_ACCOUNT":"AVN_ACTIVE
+#define SVN_ACCOUNT_STREAM          SVN_ACCOUNT":"AVN_STREAMJID
+
+#define ADR_OPTIONS_NODE            Action::DR_Parametr1
 
 AccountManager::AccountManager()
 {
-  FPluginManager = NULL;
   FSettingsPlugin = NULL;
   FSettings = NULL;
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
   FActionSetup = NULL;
+  FAccountSetup = NULL;
   srand(QTime::currentTime().msec());
 }
 
@@ -38,13 +44,11 @@ void AccountManager::pluginInfo(PluginInfo *APluginInfo)
 
 bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  FPluginManager = APluginManager;
-
-  IPlugin *plugin = FPluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 
-  plugin = FPluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -56,7 +60,8 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsDialogAccepted()));
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsDialogRejected()));
-   }
+      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),SLOT(onOptionsDialogClosed()));
+    }
   }
 
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
@@ -97,145 +102,23 @@ bool AccountManager::initObjects()
   return true;
 }
 
-
-//IAccountManager
-IAccount *AccountManager::addAccount(const QString &AName, const Jid &AStreamJid)
-{
-  IAccount *account = accountByStream(AStreamJid);
-  if (!account)
-  {
-    IXmppStream *stream = FXmppStreams->newStream(AStreamJid);
-    account = new Account(newId(),FSettings,stream,this);
-    account->setName(AName);
-    FAccounts.append((Account *)account);
-    emit added(account);
-    openAccountOptionsNode(account->accountId());
-  }
-  return account;
-}
-
-IAccount *AccountManager::addAccount(const QString &AAccountId, const QString &AName, 
-                                     const Jid &AStreamJid)
-{
-  IAccount *account = accountById(AAccountId);
-  if (!account && !AAccountId.isEmpty())
-  {
-    QString name = AName;
-    if (name.isEmpty())
-      name = FSettings->valueNS("account[]:name",AAccountId,AAccountId).toString();
-
-    Jid streamJid = AStreamJid;
-    if (!streamJid.isValid())
-      streamJid = FSettings->valueNS("account[]:streamJid",AAccountId).toString();
-
-    IXmppStream *stream = FXmppStreams->newStream(streamJid);
-    account = new Account(AAccountId,FSettings,stream,this);
-    account->setName(name);
-    FAccounts.append((Account *)account);
-    emit added(account);
-    openAccountOptionsNode(AAccountId);
-  }
-  return account;
-}
-
-void AccountManager::showAccount(IAccount *AAccount)
-{
-  if (!FXmppStreams->isActive(AAccount->xmppStream()))
-  {
-    FXmppStreams->addStream(AAccount->xmppStream());
-    emit shown(AAccount);
-  }
-}
-
-void AccountManager::hideAccount(IAccount *AAccount)
-{
-  if (FXmppStreams->isActive(AAccount->xmppStream()))
-  {
-    AAccount->xmppStream()->close();
-    FXmppStreams->removeStream(AAccount->xmppStream());
-    emit hidden(AAccount);
-  }
-}
-
-IAccount *AccountManager::accountById(const QString &AAcoountId) const
-{
-  Account *account;
-  foreach(account, FAccounts)
-    if (account->accountId() == AAcoountId)
-      return account;
-  return NULL;
-}
-
-IAccount *AccountManager::accountByName(const QString &AName) const
-{
-  Account *account;
-  foreach(account, FAccounts)
-    if (account->name() == AName)
-      return account;
-  return NULL;
-}
-
-IAccount *AccountManager::accountByStream(const Jid &AStreamJid) const
-{
-  Account *account;
-  foreach(account, FAccounts)
-    if (account->xmppStream()->jid() == AStreamJid)
-      return account;
-  return NULL;
-}
-
-void AccountManager::removeAccount(IAccount *AAccount)
-{
-  Account *account = qobject_cast<Account *>(AAccount->instance());
-  if (account)
-  {
-    closeAccountOptionsNode(account->accountId());
-    hideAccount(account);
-    FAccounts.removeAt(FAccounts.indexOf(account));
-    emit removed(account);
-    FXmppStreams->destroyStream(account->streamJid());
-    delete account;
-  }
-}
-
-void AccountManager::destroyAccount(const QString &AAccountId)
-{
-  IAccount *account = accountById(AAccountId);
-  if (account)
-  {
-    closeAccountOptionsNode(account->accountId());
-    hideAccount(account);
-    FAccounts.removeAt(FAccounts.indexOf((Account *)account));
-    emit removed(account);
-    emit destroyed(account);
-    FXmppStreams->destroyStream(account->streamJid());
-    account->clear();
-    delete qobject_cast<Account *>(account->instance());
-  }
-}
-
-
-//IOptionsHolder
 QWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder)
 {
   AOrder = OO_ACCOUNT_OPTIONS;
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
   if (ANode == ON_ACCOUNTS)
   {
-    if (FAccountManage.isNull())
+    if (FAccountSetup == NULL)
     {
-      FAccountManage = new AccountManage(NULL);
-      connect(FAccountManage,SIGNAL(accountAdded(const QString &)),
+      FAccountSetup = new AccountManage(NULL);
+      connect(FAccountSetup,SIGNAL(accountAdded(const QString &)),
         SLOT(onOptionsAccountAdded(const QString &)));
-      connect(FAccountManage,SIGNAL(accountRemoved(const QString &)),
+      connect(FAccountSetup,SIGNAL(accountRemoved(const QString &)),
         SLOT(onOptionsAccountRemoved(const QString &)));
       foreach(IAccount *account,FAccounts)
-      {
-        FAccountManage->setAccount(account->accountId(),account->name(),
-          account->streamJid().full(),account->isActive());
-      }
+        FAccountSetup->setAccount(account->accountId(),account->name(),account->streamJid().full(),account->isActive());
     }
-    return FAccountManage;
+    return FAccountSetup;
   }
   else if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
   {
@@ -251,147 +134,179 @@ QWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder)
     }
     else
     {
-      options->setOption(AccountOptions::AO_Name,FAccountManage->accountName(accountId));
-   }
+      options->setOption(AccountOptions::AO_Name,FAccountSetup->accountName(accountId));
+    }
     FAccountOptions.insert(accountId,options);
     return options;
   }
   return NULL;
 }
 
+IAccount *AccountManager::insertAccount(const QString &AAccountId)
+{
+  if (!FAccounts.contains(AAccountId))
+  {
+    Account *account = new Account(FXmppStreams,FSettings,AAccountId.isEmpty() ? newId() : AAccountId,this);
+    connect(account,SIGNAL(changed(const QString &, const QVariant &)),SLOT(onAccountChanged(const QString &, const QVariant &)));
+    FAccounts.insert(AAccountId,account);
+    openAccountOptionsNode(AAccountId);
+    emit inserted(account);
+    return account;
+  }
+  return FAccounts.value(AAccountId);
+}
+
+QList<IAccount *> AccountManager::accounts() const
+{
+  QList<IAccount *> accounts;
+  foreach(Account *account, FAccounts)
+    accounts.append(account);
+  return accounts;
+}
+
+IAccount *AccountManager::accountById(const QString &AAcoountId) const
+{
+  return FAccounts.value(AAcoountId);
+}
+
+IAccount *AccountManager::accountByStream(const Jid &AStreamJid) const
+{
+  foreach(Account *account, FAccounts)
+    if (account->streamJid() == AStreamJid)
+      return account;
+  return NULL;
+}
+
+void AccountManager::showAccount(const QString &AAccountId)
+{
+  Account *account = FAccounts.value(AAccountId);
+  if (account)
+    account->setActive(true);
+}
+
+void AccountManager::hideAccount(const QString &AAccountId)
+{
+  Account *account = FAccounts.value(AAccountId);
+  if (account)
+    account->setActive(false);
+}
+
+void AccountManager::removeAccount(const QString &AAccountId)
+{
+  Account *account = FAccounts.value(AAccountId);
+  if (account)
+  {
+    hideAccount(AAccountId);
+    emit removed(account);
+    closeAccountOptionsNode(AAccountId);
+    FAccounts.remove(AAccountId);
+    delete account;
+  }
+}
+
+void AccountManager::destroyAccount(const QString &AAccountId)
+{
+  Account *account = FAccounts.value(AAccountId);
+  if (account)
+  {
+    hideAccount(AAccountId);
+    removeAccount(AAccountId);
+    FSettings->deleteValueNS(SVN_ACCOUNT,AAccountId);
+    emit destroyed(AAccountId);
+  }
+}
+
+
 QString AccountManager::newId() const
 {
   QString id;
-  while (id.isEmpty() || accountById(id))
+  while (id.isEmpty() || FAccounts.contains(id))
     id = QString::number((rand()<<16)+rand(),36);
   return id;
 }
 
 void AccountManager::openAccountOptionsNode(const QString &AAccountId, const QString &AName)
 {
-  QString node = ON_ACCOUNTS+QString("::")+AAccountId;
+  QString node = ON_ACCOUNTS"::"+AAccountId;
   QString name = AName;
-  if (AName.isEmpty())
-  {
-    IAccount *account = accountById(AAccountId);
-    if (account)
-      name = account->name();
-  }
-  if (!FAccountOptions.contains(AAccountId))
-    FAccountOptions.insert(AAccountId,NULL);
+  if (name.isEmpty())
+    name = FAccounts.contains(AAccountId) ? FAccounts.value(AAccountId)->name() : tr("<Empty>");
   FSettingsPlugin->openOptionsNode(node,name,tr("Account details and connection options"),QIcon());
 }
 
 void AccountManager::closeAccountOptionsNode(const QString &AAccountId)
 {
-  QString node = ON_ACCOUNTS+QString("::")+AAccountId;
+  QString node = ON_ACCOUNTS"::"+AAccountId;
   FSettingsPlugin->closeOptionsNode(node);
   if (FAccountOptions.contains(AAccountId))
   {
-    QPointer <AccountOptions> options = FAccountOptions.take(AAccountId);
-    if (!options.isNull())
-      delete options;
+    AccountOptions *options = FAccountOptions.take(AAccountId);
+    delete options;
   }
 }
 
-void AccountManager::showAllActiveAccounts()
+void AccountManager::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
-  IAccount *account;
-  foreach (account, FAccounts)
-    if (account->isActive())
-      showAccount(account);
+  Account *account = qobject_cast<Account *>(sender());
+  if (account)
+  {
+    if (AName == AVN_ACTIVE)
+      AValue.toBool() ? emit shown(account) : emit hidden(account);
+    if (AName == AVN_NAME)
+      openAccountOptionsNode(account->accountId(),account->name());
+  }
 }
 
 void AccountManager::onOptionsAccountAdded(const QString &AName)
 {
   QString id = newId();
-  FAccountManage->setAccount(id,AName,QString(),Qt::Unchecked);
+  FAccountSetup->setAccount(id,AName,"",true);
   openAccountOptionsNode(id,AName);
-  FSettingsPlugin->openOptionsDialog(ON_ACCOUNTS+QString("::")+id);
+  FSettingsPlugin->openOptionsDialog(ON_ACCOUNTS"::"+id);
 }
 
 void AccountManager::onOptionsAccountRemoved(const QString &AAccountId)
 {
-  FAccountManage->removeAccount(AAccountId);
+  FAccountSetup->removeAccount(AAccountId);
   closeAccountOptionsNode(AAccountId);
 }
 
 void AccountManager::onOptionsDialogAccepted()
 {
-  IAccount *account;
-  QSet<QString> curAccounts;
-  foreach(account,FAccounts)
-    curAccounts += account->accountId(); 
-
+  QSet<QString> curAccounts = FAccounts.keys().toSet();
   QSet<QString> allAccounts = FAccountOptions.keys().toSet();
-  QSet<QString> newAccounts = allAccounts - curAccounts;
   QSet<QString> oldAccounts = curAccounts - allAccounts;
 
   foreach(QString id,oldAccounts)
     destroyAccount(id);
 
-  foreach(QString id,allAccounts)
+  foreach(QString id, allAccounts)
   {
     QPointer<AccountOptions> options = FAccountOptions.value(id);
     Jid streamJid = options->option(AccountOptions::AO_StreamJid).toString();
     QString name = options->option(AccountOptions::AO_Name).toString();
     if (name.isEmpty())
-      name= streamJid.hFull();
+      name= streamJid.full();
 
-    bool canApply = true;
-    QString warningMessage = tr("'%1' account changes cannot by applied:<br><br>").arg(name);
-    if (!streamJid.isValid() || streamJid.node().isEmpty())
+    IAccount *account = insertAccount(id);
+    account->setName(name);
+    account->setStreamJid(streamJid);
+    account->setPassword(options->option(AccountOptions::AO_Password).toString());
+    account->setDefaultLang(options->option(AccountOptions::AO_DefLang).toString());
+    account->setActive(FAccountSetup->accountActive(id));
+    if (!account->isValid() && FAccountSetup->accountActive(id))
     {
-      canApply = false;
-      warningMessage += tr(" - jabber ID is not valid<br>");
+      QMessageBox::warning(NULL,tr("Not valid account"),tr("Account %1 is not valid, change its Jabber ID").arg(Qt::escape(name)));
     }
-    account = accountByStream(streamJid);
-    if (account && account->accountId()!=id)
-    {
-      canApply = false;
-      warningMessage += tr(" - jabber ID '%1' already exists<br>").arg(streamJid.hFull());
-    }
-
-    if (canApply)
-    {
-      if (!newAccounts.contains(id))
-      {
-        account = accountById(id);
-        account->setName(name);
-        account->setStreamJid(streamJid);
-      }
-      else
-        account = addAccount(id,name,streamJid);
-      account->setPassword(options->option(AccountOptions::AO_Password).toString());
-      account->setDefaultLang(options->option(AccountOptions::AO_DefLang).toString());
-      account->setActive(FAccountManage->accountActive(id));
-      FAccountManage->setAccount(id,name,streamJid.full(),account->isActive());
-      openAccountOptionsNode(id,name);
-      if (account->isActive())
-        showAccount(account);
-      else
-        hideAccount(account);
-    } 
-    else
-    {
-      if (newAccounts.contains(id))
-      {
-        FAccountManage->removeAccount(id);
-        closeAccountOptionsNode(id);
-      }
-      QMessageBox::warning(NULL,tr("Account options canceled"),warningMessage);
-    }
+    FSettings->setValueNS(SVN_ACCOUNT_ACTIVE,id,account->isActive());
+    FAccountSetup->setAccount(id,name,streamJid.full(),account->isActive());
   }
   emit optionsAccepted();
 }
 
 void AccountManager::onOptionsDialogRejected()
 {
-  IAccount *account;
-  QSet<QString> curAccounts;
-  foreach(account,FAccounts)
-    curAccounts += account->accountId(); 
-
+  QSet<QString> curAccounts = FAccounts.keys().toSet();
   QSet<QString> allAccounts = FAccountOptions.keys().toSet();
   QSet<QString> newAccounts = allAccounts - curAccounts;
   QSet<QString> oldAccounts = curAccounts - allAccounts;
@@ -400,32 +315,44 @@ void AccountManager::onOptionsDialogRejected()
     closeAccountOptionsNode(id);
 
   foreach(QString id,oldAccounts)
-    openAccountOptionsNode(id,"");
+    openAccountOptionsNode(id);
 
   emit optionsRejected();
 }
 
+void AccountManager::onOptionsDialogClosed()
+{
+  FAccountSetup = NULL;
+  FAccountOptions.clear();
+}
+
 void AccountManager::onProfileOpened(const QString &/*AProfile*/)
 {
-  showAllActiveAccounts();
+  QList<QString> acoounts = FAccounts.keys();
+  foreach(QString id, acoounts)
+    if (FSettings->valueNS(SVN_ACCOUNT_ACTIVE,id).toBool())
+      showAccount(id);
 }
 
 void AccountManager::onProfileClosed(const QString &/*AProfile*/)
 {
-  while (FAccounts.count() > 0)
-    removeAccount(FAccounts.at(0));
+  QList<QString> acoounts = FAccounts.keys();
+  foreach(QString id, acoounts)
+    hideAccount(id);
 }
 
 void AccountManager::onSettingsOpened()
 {
-  QList<QString> acoountsId = FSettings->values("account[]").keys();
-  foreach(QString id,acoountsId)
-    addAccount(id);
+  QList<QString> acoounts = FSettings->values(SVN_ACCOUNT).keys();
+  foreach(QString id,acoounts)
+    insertAccount(id);
 }
 
 void AccountManager::onSettingsClosed()
 {
-
+  QList<QString> acoounts = FAccounts.keys();
+  foreach(QString id,acoounts)
+    removeAccount(id);
 }
 
 void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
@@ -436,12 +363,12 @@ void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     IAccount *account = accountByStream(streamJid);
     if (account)
     {
-      Action *modify = new Action(AMenu);
-      modify->setIcon(SYSTEM_ICONSETFILE,"psi/account");
-      modify->setText(tr("Modify account..."));
-      modify->setData(Action::DR_Parametr1,ON_ACCOUNTS+QString("::")+account->accountId());
-      connect(modify,SIGNAL(triggered(bool)),FSettingsPlugin->instance(),SLOT(openOptionsDialogByAction(bool)));
-      AMenu->addAction(modify,AG_ACCOUNTMANAGER_ROSTER,true);
+      Action *action = new Action(AMenu);
+      action->setIcon(SYSTEM_ICONSETFILE,IN_ACCOUNT);
+      action->setText(tr("Modify account"));
+      action->setData(ADR_OPTIONS_NODE,ON_ACCOUNTS"::"+account->accountId());
+      connect(action,SIGNAL(triggered(bool)),FSettingsPlugin->instance(),SLOT(openOptionsDialogByAction(bool)));
+      AMenu->addAction(action,AG_ACCOUNTMANAGER_ROSTER,true);
     }
   }
 }

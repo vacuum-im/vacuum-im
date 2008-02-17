@@ -11,6 +11,7 @@
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/accountvaluenames.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatuschanger.h"
 #include "../../interfaces/ipresence.h"

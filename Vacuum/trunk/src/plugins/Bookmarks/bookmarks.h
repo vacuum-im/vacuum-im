@@ -3,6 +3,7 @@
 
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
+#include "../../definations/accountvaluenames.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ibookmarks.h"
 #include "../../interfaces/iprivatestorage.h"

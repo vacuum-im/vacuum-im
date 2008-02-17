@@ -2,8 +2,6 @@
 
 #include <QVBoxLayout>
 
-#define AVN_CONNECTION_ID          "connectionId"
-
 ConnectionManager::ConnectionManager()
 {
   FAccountManager = NULL;
@@ -47,8 +45,8 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
     if (FAccountManager)
     {
-      connect(FAccountManager->instance(),SIGNAL(added(IAccount *)),SLOT(onAccountAdded(IAccount *)));
-      connect(FAccountManager->instance(),SIGNAL(destroyed(IAccount *)),SLOT(onAccountDestroyed(IAccount *)));
+      connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
+      connect(FAccountManager->instance(),SIGNAL(destroyed(const QString &)),SLOT(onAccountDestroyed(const QString &)));
       connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),SLOT(onOptionsAccepted()));
       connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
     }
@@ -79,13 +77,11 @@ QWidget *ConnectionManager::optionsWidget(const QString &ANode, int &AOrder)
   if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
   {
     AOrder = OO_ACCOUNT_CONNECTION;
-    QUuid pluginId;
+    QUuid pluginId = defaultPlugin()->pluginUuid();
     QString accountId = nodeTree.at(1);
     IAccount *account = FAccountManager->accountById(accountId);
-    if (account && account->xmppStream()->connection())
-      pluginId = account->xmppStream()->connection()->ownerPlugin()->pluginUuid();
-    else
-      pluginId = defaultPlugin()->pluginUuid();
+    if (account)
+      pluginId = account->value(AVN_CONNECTION_ID,pluginId.toString()).toString();
     ConnectionOptionsWidget *widget = new ConnectionOptionsWidget(this,accountId,pluginId);
     FOptionsWidgets.append(widget);
     return widget;
@@ -93,41 +89,52 @@ QWidget *ConnectionManager::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
-IConnectionPlugin *ConnectionManager::pluginById(const QUuid &APluginId)
+IConnectionPlugin *ConnectionManager::pluginById(const QUuid &APluginId) const
 {
-  if (!APluginId.isNull())
+  foreach (IConnectionPlugin *plugin, FConnectionPlugins)
+    if (plugin->pluginUuid() == APluginId)
+      return plugin;
+  return NULL;
+}
+
+IConnectionPlugin *ConnectionManager::defaultPlugin() const
+{
+  IConnectionPlugin *plugin = pluginById(DEFAULTCONNECTION_UUID);
+  return plugin==NULL ? FConnectionPlugins.first() : plugin;
+}
+
+IConnection *ConnectionManager::insertConnection(IAccount *AAccount) const
+{
+  if (AAccount->isActive())
   {
-    foreach (IConnectionPlugin *plugin, FConnectionPlugins)
-      if (plugin->pluginUuid() == APluginId)
-        return plugin;
+    QUuid pluginId = AAccount->value(AVN_CONNECTION_ID).toString();
+    IConnectionPlugin *plugin = pluginById(pluginId);
+    IConnection *connection = AAccount->xmppStream()->connection();
+    if (connection && connection->ownerPlugin()!=plugin)
+    {
+      AAccount->xmppStream()->setConnection(NULL);
+      connection->ownerPlugin()->destroyConnection(connection);
+      connection = NULL;
+    }
+    if (plugin!=NULL && connection==NULL)
+    {
+      connection = plugin->newConnection(AAccount->accountId(),AAccount->xmppStream()->instance());
+      AAccount->xmppStream()->setConnection(connection);
+    }
+    return connection;
   }
   return NULL;
 }
 
-IConnectionPlugin * ConnectionManager::defaultPlugin() const
+void ConnectionManager::onAccountShown(IAccount *AAccount)
 {
-  foreach (IConnectionPlugin *plugin, FConnectionPlugins)
-    if (plugin->pluginUuid() == DEFAULTCONNECTION_UUID)
-      return plugin;
-
-  return FConnectionPlugins.first();
+  insertConnection(AAccount);
 }
 
-void ConnectionManager::onAccountAdded(IAccount *AAccount)
-{
-  QUuid pluginId = AAccount->value(AVN_CONNECTION_ID).toString();
-  IConnectionPlugin *plugin = pluginById(pluginId);
-  if (plugin)
-  {
-    IConnection *connection = plugin->newConnection(AAccount->accountId(),AAccount->xmppStream()->instance());
-    AAccount->xmppStream()->setConnection(connection);
-  }
-}
-
-void ConnectionManager::onAccountDestroyed(IAccount *AAccount)
+void ConnectionManager::onAccountDestroyed(const QString &AAccount)
 {
   foreach (IConnectionPlugin *plugin, FConnectionPlugins)
-    plugin->deleteSettingsNS(AAccount->accountId());
+    plugin->deleteSettingsNS(AAccount);
 }
 
 void ConnectionManager::onOptionsAccepted()
@@ -137,32 +144,15 @@ void ConnectionManager::onOptionsAccepted()
     IAccount *account = FAccountManager->accountById(widget->accountId());
     if (account)
     {
-      IConnection *connection = account->xmppStream()->connection();
+      account->setValue(AVN_CONNECTION_ID,widget->pluginId().toString());
       IConnectionPlugin *plugin = pluginById(widget->pluginId());
       if (plugin)
       {
         plugin->saveOptions(account->accountId());
-        if (!connection || connection->ownerPlugin()->pluginUuid() != widget->pluginId())
-        {
-          if (connection)
-          {
-            account->xmppStream()->setConnection(NULL);
-            connection->ownerPlugin()->destroyConnection(connection);
-          }
-          IConnection *newConnection = plugin->newConnection(account->accountId(),account->xmppStream()->instance());
-          account->xmppStream()->setConnection(newConnection);
-        }
-        else
-        {
+        IConnection *connection = insertConnection(account);
+        if (connection)
           plugin->loadSettings(connection, account->accountId());
-        }
       }
-      else if (connection)
-      {
-        connection->ownerPlugin()->destroyConnection(connection);
-        account->xmppStream()->setConnection(NULL);
-      }
-      account->setValue(AVN_CONNECTION_ID,widget->pluginId().toString());
     }
   }
   emit optionsAccepted();

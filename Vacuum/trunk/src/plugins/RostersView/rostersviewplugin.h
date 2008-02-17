@@ -68,7 +68,9 @@ protected slots:
   void onIndexCollapsed(const QModelIndex &AIndex);
   void onIndexExpanded(const QModelIndex &AIndex);
   void onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
-  void onAccountDestroyed(IAccount *AAccount);
+  void onAccountShown(IAccount *AAccount);
+  void onAccountHidden(IAccount *AAccount);
+  void onAccountDestroyed(const QString &AAccountId);
   void onRestoreExpandState();
   void onSettingsOpened();
   void onSettingsClosed();
@@ -96,9 +98,8 @@ private:
   IndexDataHolder *FIndexDataHolder;
   SortFilterProxyModel *FSortFilterProxyModel;
   QAbstractItemModel *FLastModel;
-  QList<int> FSaveExpandStatusTypes;
   QPointer<RosterOptionsWidget> FRosterOptionsWidget;
+  QHash<Jid,QString> FCollapseNS;
 };
-
 
 #endif // ROSTERSVIEWPLUGIN_H

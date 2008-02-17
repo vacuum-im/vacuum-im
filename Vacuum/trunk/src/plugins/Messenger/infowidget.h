@@ -2,6 +2,7 @@
 #define INFOWIDGET_H
 
 #include <QPicture>
+#include "../../definations/accountvaluenames.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/iroster.h"

@@ -6,6 +6,7 @@
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/accountvaluenames.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"
@@ -25,7 +26,6 @@ class AccountManager :
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IAccountManager IOptionsHolder);
-
 public:
   AccountManager();
   ~AccountManager();
@@ -37,56 +37,55 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IAccountManager
-  virtual IAccount *addAccount(const QString &AName, const Jid &AStreamJid);
-  virtual IAccount *addAccount(const QString &AAccountId, 
-    const QString &AName = QString(), const Jid &AStreamJid= Jid());
-  virtual void showAccount(IAccount *AAccount);
-  virtual void hideAccount(IAccount *AAccount);
-  virtual IAccount *accountById(const QString &AAcoountId) const;
-  virtual IAccount *accountByName(const QString &AName) const;
-  virtual IAccount *accountByStream(const Jid &AStreamJid) const;
-  virtual void removeAccount(IAccount *AAccount);
-  virtual void destroyAccount(const QString &AAccountId);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  //IAccountManager
+  virtual IAccount *insertAccount(const QString &AAccountId = "");
+  virtual QList<IAccount *> accounts() const;
+  virtual IAccount *accountById(const QString &AAcoountId) const;
+  virtual IAccount *accountByStream(const Jid &AStreamJid) const;
+  virtual void showAccount(const QString &AAccountId);
+  virtual void hideAccount(const QString &AAccountId);
+  virtual void removeAccount(const QString &AAccountId);
+  virtual void destroyAccount(const QString &AAccountId);
 signals:
-  virtual void added(IAccount *);
-  virtual void shown(IAccount *);
-  virtual void hidden(IAccount *);
-  virtual void removed(IAccount *);
-  virtual void destroyed(IAccount *);
+  virtual void inserted(IAccount *AAccount);
+  virtual void shown(IAccount *AAccount);
+  virtual void hidden(IAccount *AAccount);
+  virtual void removed(IAccount *AAccount);
+  virtual void destroyed(const QString &AAccountId);
+  //IOptionsHolder
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
   QString newId() const;
-  void openAccountOptionsNode(const QString &AAccountId, const QString &AName = QString());
+  void openAccountOptionsNode(const QString &AAccountId, const QString &AName = "");
   void closeAccountOptionsNode(const QString &AAccountId);
-  void showAllActiveAccounts();
 protected slots:
   void onOptionsAccountAdded(const QString &AName);
   void onOptionsAccountRemoved(const QString &AAccountId);
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
+  void onOptionsDialogClosed();
   void onProfileOpened(const QString &AProfile);
   void onProfileClosed(const QString &AProfile);
   void onSettingsOpened();
   void onSettingsClosed();
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onAccountChanged(const QString &AName, const QVariant &AValue);
 private:
-  IPluginManager *FPluginManager;
-  ISettingsPlugin *FSettingsPlugin;
   ISettings *FSettings;
+  ISettingsPlugin *FSettingsPlugin;
   IXmppStreams *FXmppStreams;
   IMainWindowPlugin *FMainWindowPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
   Action *FActionSetup;
 private:
-  mutable QPointer<AccountManage> FAccountManage;
-  mutable QHash<QString,QPointer<AccountOptions> > FAccountOptions;
+  AccountManage *FAccountSetup;
+  QHash<QString, AccountOptions *> FAccountOptions;
 private:
-  QList<Account *> FAccounts;
+  QHash<QString, Account *> FAccounts;
 };
 
 #endif // ACCOUNTMANAGER_H

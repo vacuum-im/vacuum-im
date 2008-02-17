@@ -121,12 +121,12 @@ void RostersModelPlugin::onPresenceRemoved(IPresence *APresence)
 
 void RostersModelPlugin::onAccountChanged(const QString &AName, const QVariant &/*AValue*/)
 {
-  if (AName == "name")
+  if (AName == AVN_NAME)
   {
     IAccount *account = qobject_cast<IAccount *>(sender());
-    if (account)
+    if (account && account->isActive())
     {
-      IRosterIndex *streamRoot = FRostersModel->getStreamRoot(account->streamJid());
+      IRosterIndex *streamRoot = FRostersModel->getStreamRoot(account->xmppStream()->jid());
       if (streamRoot)
         streamRoot->setData(RDR_Name,account->name());
     }

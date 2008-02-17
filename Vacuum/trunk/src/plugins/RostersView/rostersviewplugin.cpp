@@ -33,14 +33,6 @@ RostersViewPlugin::RostersViewPlugin()
   FOptions = 0;
   FStartRestoreExpandState = false;
 
-  FSaveExpandStatusTypes 
-    << RIT_Group 
-    << RIT_AgentsGroup 
-    << RIT_BlankGroup 
-    << RIT_MyResourcesGroup
-    << RIT_NotInRosterGroup
-    << RIT_StreamRoot;
-
   FRostersView = new RostersView;
   connect(FRostersView,SIGNAL(destroyed(QObject *)), SLOT(onRostersViewDestroyed(QObject *)));
 }
@@ -93,7 +85,9 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
     if (FAccountManager)
     {
-      connect(FAccountManager->instance(),SIGNAL(destroyed(IAccount *)),SLOT(onAccountDestroyed(IAccount *)));
+      connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
+      connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
+      connect(FAccountManager->instance(),SIGNAL(destroyed(const QString &)),SLOT(onAccountDestroyed(const QString &)));
     }
   }
 
@@ -261,7 +255,8 @@ void RostersViewPlugin::loadExpandedState(const QModelIndex &AIndex)
   if (FSettings && !settingsName.isEmpty())
   {
     Jid streamJid(AIndex.data(RDR_StreamJid).toString());
-    bool isCollapsed = FSettings->valueNS(settingsName,streamJid.pFull(),false).toBool();
+    QString ns = FCollapseNS.value(streamJid);
+    bool isCollapsed = FSettings->valueNS(settingsName,ns,false).toBool();
     if (isCollapsed && FRostersView->isExpanded(AIndex))
       FRostersView->collapse(AIndex);
     else if (!isCollapsed && !FRostersView->isExpanded(AIndex))
@@ -275,19 +270,20 @@ void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
   if (FSettings && !settingsName.isEmpty())
   {
     Jid streamJid(AIndex.data(RDR_StreamJid).toString());
+    QString ns = FCollapseNS.value(streamJid);
     if (FRostersView->isExpanded(AIndex))
     {
       if (AIndex.data(RDR_Type).toInt() == RIT_StreamRoot)
-        FSettings->setValueNS(settingsName,streamJid.pFull(),false);
+        FSettings->setValueNS(settingsName,ns,false);
       else
-        FSettings->deleteValueNS(settingsName,streamJid.pFull());
+        FSettings->deleteValueNS(settingsName,ns);
     }
     else
-      FSettings->setValueNS(settingsName,streamJid.pFull(),true);
+      FSettings->setValueNS(settingsName,ns,true);
   }
 }
 
-void RostersViewPlugin::onRostersViewDestroyed(QObject *)
+void RostersViewPlugin::onRostersViewDestroyed(QObject * /*AObject*/)
 {
   FRostersView = NULL;
 }
@@ -367,28 +363,30 @@ void RostersViewPlugin::onIndexExpanded(const QModelIndex &AIndex)
 
 void RostersViewPlugin::onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter)
 {
-  if (FSettings)
+  Jid befour = ARoster->streamJid();
+  if (FSettings && FCollapseNS.contains(befour))
   {
-    Jid befour = ARoster->streamJid();
-    if (befour && AAfter)
-    {
-      QDomElement elem = FSettingsPlugin->pluginNode(ROSTERSVIEW_UUID).firstChildElement(SVN_COLLAPSE).firstChildElement(SVN_ACCOUNT);
-      while(!elem.isNull() && elem.attribute("ns")!=befour.pFull())
-        elem = elem.nextSiblingElement(SVN_ACCOUNT);
-      if (!elem.isNull())
-        elem.setAttribute("ns",AAfter.pFull());
-    }
-    else
-      FSettings->deleteValueNS(SVN_COLLAPSE_ACCOUNT_NS,befour.pFull());
+    QString collapseNS = FCollapseNS.take(befour);
+    if ( !(befour && AAfter) )
+      FSettings->deleteValueNS(SVN_COLLAPSE_ACCOUNT_NS,collapseNS);
+    FCollapseNS.insert(AAfter,collapseNS);
   }
 }
 
-void RostersViewPlugin::onAccountDestroyed(IAccount *AAccount)
+void RostersViewPlugin::onAccountShown(IAccount *AAccount)
+{
+  FCollapseNS.insert(AAccount->streamJid(),AAccount->accountId());
+}
+
+void RostersViewPlugin::onAccountHidden(IAccount *AAccount)
+{
+  FCollapseNS.remove(AAccount->streamJid());
+}
+
+void RostersViewPlugin::onAccountDestroyed(const QString &AAccountId)
 {
   if (FSettings)
-  {
-    FSettings->deleteValueNS(SVN_COLLAPSE_ACCOUNT_NS,AAccount->streamJid().pFull());
-  }
+    FSettings->deleteValueNS(SVN_COLLAPSE_ACCOUNT_NS,AAccountId);
 }
 
 void RostersViewPlugin::onRestoreExpandState()

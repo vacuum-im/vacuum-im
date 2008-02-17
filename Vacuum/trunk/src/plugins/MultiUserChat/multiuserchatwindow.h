@@ -5,6 +5,7 @@
 #include "../../definations/messagehandlerorders.h"
 #include "../../definations/multiuserdataroles.h"
 #include "../../definations/namespaces.h"
+#include "../../definations/accountvaluenames.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/irostersview.h"

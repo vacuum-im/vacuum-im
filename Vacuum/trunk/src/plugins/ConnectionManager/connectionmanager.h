@@ -2,6 +2,7 @@
 #define CONNECTIONMANAGER_H 
 
 #include <QComboBox>
+#include "../../definations/accountvaluenames.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
 #include "../../interfaces/ipluginmanager.h"
@@ -19,13 +20,10 @@ class ConnectionManager :
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IConnectionManager IOptionsHolder);
-
 public:
   ConnectionManager();
   ~ConnectionManager();
-
   virtual QObject *instance() { return this; }
-
   //IPlugin
   virtual QUuid pluginUuid() const { return CONNECTIONMANAGER_UUID; }
   virtual void pluginInfo(PluginInfo *APluginInfo);
@@ -33,13 +31,11 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
-
   //IConnectionManager
   virtual QList<IConnectionPlugin *> pluginList() const { return FConnectionPlugins; }
-  virtual IConnectionPlugin *pluginById(const QUuid &APluginId);
+  virtual IConnectionPlugin *pluginById(const QUuid &APluginId) const;
 signals:
   virtual void connectionCreated(IConnection *AConnection);
   virtual void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
@@ -48,9 +44,10 @@ signals:
   virtual void optionsRejected();
 protected:
   IConnectionPlugin *defaultPlugin() const;
+  IConnection *insertConnection(IAccount *AAccount) const;
 protected slots:
-  void onAccountAdded(IAccount *AAccount);
-  void onAccountDestroyed(IAccount *AAccount);
+  void onAccountShown(IAccount *AAccount);
+  void onAccountDestroyed(const QString &AAccount);
   void onOptionsAccepted();
   void onOptionsRejected();
   void onOptionsDialogClosed();

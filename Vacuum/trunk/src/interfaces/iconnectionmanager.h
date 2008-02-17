@@ -51,7 +51,7 @@ class IConnectionManager
 public:
   virtual QObject *instance() =0;
   virtual QList<IConnectionPlugin *> pluginList() const =0;
-  virtual IConnectionPlugin *pluginById(const QUuid &APluginId) =0;
+  virtual IConnectionPlugin *pluginById(const QUuid &APluginId) const =0;
 signals:
   virtual void connectionCreated(IConnection *AConnection) =0;
   virtual void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS) =0;

@@ -71,7 +71,16 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
     {
       connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),SLOT(onOptionsAccepted()));
       connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
-      connect(FAccountManager->instance(),SIGNAL(removed(IAccount *)),SLOT(onAccountRemoved(IAccount *)));
+    }
+  }
+  
+  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  if (plugin)
+  {
+    IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+    if (xmppStreams)
+    {
+      connect(xmppStreams->instance(),SIGNAL(destroyed(IXmppStream *)),SLOT(onStreamDestroyed(IXmppStream *)));
     }
   }
 
@@ -370,9 +379,9 @@ void Registration::onRegisterActionTriggered(bool)
   }
 }
 
-void Registration::onAccountRemoved(IAccount *AAccount)
+void Registration::onStreamDestroyed(IXmppStream *AXmppStream)
 {
-  destroyStreamFeature(FStreamFeatures.value(AAccount->xmppStream()));
+  destroyStreamFeature(FStreamFeatures.value(AXmppStream));
 }
 
 void Registration::onOptionsAccepted()
@@ -381,7 +390,7 @@ void Registration::onOptionsAccepted()
   foreach(QString accountId, accounts)
   {
     IAccount *account = FAccountManager->accountById(accountId);
-    if (account)
+    if (account && account->isActive())
     {
       QCheckBox *checkBox = FOptionWidgets.value(accountId);
       if (checkBox->isChecked())
