@@ -128,7 +128,6 @@ void XmppStreams::addStream(IXmppStream *AXmppStream)
 {
   if (AXmppStream && !FActiveStreams.contains(AXmppStream))
   {
-    qDebug() << "Stream added" << AXmppStream->jid().full(); 
     connect(AXmppStream->instance(), SIGNAL(opened(IXmppStream *)), 
       SLOT(onStreamOpened(IXmppStream *)));
     connect(AXmppStream->instance(), SIGNAL(element(IXmppStream *, const QDomElement &)), 
@@ -154,6 +153,7 @@ void XmppStreams::addStream(IXmppStream *AXmppStream)
     connect(AXmppStream->instance(), SIGNAL(destroyed(IXmppStream *)), 
       SLOT(onStreamDestroyed(IXmppStream *))); 
     FActiveStreams.append(AXmppStream);
+    qDebug() << "Stream added" << AXmppStream->jid().full(); 
     emit added(AXmppStream);
   }
 }
@@ -162,8 +162,10 @@ void XmppStreams::removeStream(IXmppStream *AXmppStream)
 {
   if (FActiveStreams.contains(AXmppStream))
   {
+    AXmppStream->close();
     AXmppStream->instance()->disconnect(this);
     FActiveStreams.removeAt(FActiveStreams.indexOf(AXmppStream));
+    qDebug() << "Stream removed" << AXmppStream->jid().full(); 
     emit removed(AXmppStream);
   }
 }
