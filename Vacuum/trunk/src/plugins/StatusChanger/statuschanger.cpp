@@ -848,7 +848,8 @@ void StatusChanger::autoReconnect(IPresence *APresence)
   if (account && account->value(AVN_AUTORECONNECT,true).toBool())
   {
     int statusId = FStreamWaitStatus.value(APresence, FStreamStatus.value(APresence));
-    if (statusItemShow(statusId) != IPresence::Offline)
+    int statusShow = statusItemShow(statusId);
+    if (statusShow != IPresence::Offline && statusShow != IPresence::Error)
     {
       int waitTime = account->value(AVN_RECONNECT_TIME,30).toInt();
       FStreamWaitReconnect.insert(APresence,QPair<QDateTime,int>(QDateTime::currentDateTime().addSecs(waitTime),statusId));
