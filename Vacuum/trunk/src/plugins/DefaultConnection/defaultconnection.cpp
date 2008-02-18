@@ -2,7 +2,7 @@
 
 #include <qendian.h>
 
-#define READ_TIMEOUT              30000
+#define READ_TIMEOUT  30000
 
 DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent) : QObject(AParent)
 {
@@ -70,10 +70,9 @@ void DefaultConnection::disconnect()
     FSocket.disconnectFromHost();
     if (FSocket.state() != QAbstractSocket::UnconnectedState)
       if (!FSocket.waitForDisconnected(5000))
-      {
         emit error(tr("Disconnect from host timeout"));
-        onSocketDisconnected();
-      }
+    if (FSocket.isOpen())
+      onSocketDisconnected();
   }
 }
 
@@ -187,11 +186,8 @@ void DefaultConnection::socket5Connection()
   else if (FProxyState == ProxyAuthResult)
   {
     QByteArray buf = read(FSocket.bytesAvailable());
-    if (buf[1]  != '\0')
-    {
-      emit error(tr("Socket5 authentication error"));
-      disconnect();
-    }
+    if (buf[1] != '\0')
+      connectionError(tr("Socket5 authentication error"));
     else
       FProxyState = ProxyConnect;
   }
@@ -219,18 +215,17 @@ void DefaultConnection::socket5Connection()
       QString err;
       switch (buf[1])
       {
-      case 1: err = tr("General SOCKS server failure.");break;
-      case 2: err = tr("Connection not allowed by ruleset.");break;
-      case 3: err = tr("Network unreachable.");break;
-      case 4: err = tr("Host unreachable.");break;
-      case 5: err = tr("Connection refused.");break;
-      case 6: err = tr("TTL expired.");break;
-      case 7: err = tr("Command not supported.");break;
-      case 8: err = tr("Address type not supported.");break;
-      default: err = tr("Unknown socks error.");break;
+        case 1: err = tr("General SOCKS server failure.");break;
+        case 2: err = tr("Connection not allowed by ruleset.");break;
+        case 3: err = tr("Network unreachable.");break;
+        case 4: err = tr("Host unreachable.");break;
+        case 5: err = tr("Connection refused.");break;
+        case 6: err = tr("TTL expired.");break;
+        case 7: err = tr("Command not supported.");break;
+        case 8: err = tr("Address type not supported.");break;
+        default: err = tr("Unknown socks error.");break;
       }
-      emit error(err);
-      disconnect();
+      connectionError(err);
     }
     else
       proxyReady();
@@ -256,10 +251,7 @@ void DefaultConnection::httpsConnection()
   {
     QList<QByteArray> result = read(FSocket.bytesAvailable()).split(' ');
     if (result[1].toInt() != 200)
-    {
-      emit error(result[2]);
-      disconnect();
-    }
+      connectionError(result[2]);
     else
       proxyReady();
   }
@@ -278,6 +270,12 @@ void DefaultConnection::connectionReady()
 {
   FReadTimer.start(READ_TIMEOUT); 
   emit connected();
+}
+
+void DefaultConnection::connectionError(const QString &AError)
+{
+  emit error(AError);
+  disconnect();
 }
 
 void DefaultConnection::onSocketConnected()
@@ -303,13 +301,14 @@ void DefaultConnection::onSocketReadyRead()
 
 void DefaultConnection::onSocketDisconnected()
 {
-  FReadTimer.stop(); 
+  FReadTimer.stop();
+  FSocket.close();
   emit disconnected();
 }
 
 void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 {
-  emit error(FSocket.errorString());
+  connectionError(FSocket.errorString());
 }
 
 void DefaultConnection::onSocketEncrypted()
@@ -327,7 +326,7 @@ void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
     QString errorStr;
     foreach(QSslError error, AErrors)
       errorStr += error.errorString()+"; ";
-    emit error(errorStr);
+    connectionError(errorStr);
   }
   else
     FSocket.ignoreSslErrors();
@@ -335,11 +334,6 @@ void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
 
 void DefaultConnection::onReadTimeout()
 {
-  if (FSocket.isOpen())
-  {
-    FReadTimer.stop(); 
-    emit error(tr("Socket timeout"));
-    FSocket.disconnectFromHost();
-  }
+  connectionError(tr("Connection timeout"));
 }
 

@@ -47,6 +47,7 @@ protected:
   void httpsConnection();
   void proxyReady();
   void connectionReady();
+  void connectionError(const QString &AError);
 protected slots:
   void onSocketConnected();
   void onSocketReadyRead();
