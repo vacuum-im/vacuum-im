@@ -4,6 +4,9 @@
 #include <QFocusEvent>
 #include <QHeaderView>
 
+#define TDR_FORM_ROW          Qt::UserRole+1
+#define TDR_FORM_COLUMN       Qt::UserRole+2
+
 DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent)
 {
   FFocusedField = NULL;
@@ -69,7 +72,7 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
     elem = AElem.firstChildElement("item");
     while(!elem.isNull())
     {
-      QHash<QString,IDataField *> &rowFields = FRows[row++];
+      QHash<QString,IDataField *> &rowFields = FRows[row];
       QDomElement fieldElem = elem.firstChildElement("field");
       while(!fieldElem.isNull())
       {
@@ -77,9 +80,12 @@ DataForm::DataForm(const QDomElement &AElem, QWidget *AParent) : QWidget(AParent
         {
           IDataField *dataField = new DataField(fieldElem,IDataField::TableCell,this);
           rowFields.insert(dataField->var(),dataField);
+          dataField->tableItem()->setData(TDR_FORM_ROW,row);
+          dataField->tableItem()->setData(TDR_FORM_COLUMN,tableVars.indexOf(dataField->var()));
         }
         fieldElem = fieldElem.nextSiblingElement("field");
       }
+      row++;
       elem = elem.nextSiblingElement("item");
     }
 
@@ -207,15 +213,26 @@ void DataForm::setCurrentPage(int APage)
 
 IDataField *DataForm::tableField(int ATableCol, int ATableRow) const
 {
-  IDataField *colField = FColumns.value(ATableCol);
-  if (colField)
-    return FRows.value(ATableRow).value(colField->var());
+  QTableWidgetItem *tableItem = FTableWidget!=NULL ? FTableWidget->item(ATableRow,ATableCol) : NULL;
+  if (tableItem)
+  {
+    int formRow = tableItem->data(TDR_FORM_ROW).toInt();
+    IDataField *colField = FColumns.value(tableItem->data(TDR_FORM_COLUMN).toInt());
+    if (colField)
+      return FRows.value(formRow).value(colField->var());
+  }
   return NULL;
 }
 
 IDataField *DataForm::tableField(const QString &AVar, int ATableRow) const
 {
-  return FRows.value(ATableRow).value(AVar);
+  QTableWidgetItem *tableItem = FTableWidget!=NULL ? FTableWidget->item(ATableRow,0) : NULL;
+  if (tableItem)
+  {
+    int formRow = tableItem->data(TDR_FORM_ROW).toInt();
+    return FRows.value(formRow).value(AVar);
+  }
+  return NULL;
 }
 
 IDataField *DataForm::field(const QString &AVar) const
