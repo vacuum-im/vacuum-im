@@ -29,10 +29,8 @@ bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
   {
-    connect(plugin->instance(), SIGNAL(added(IXmppStream *)),
-      SLOT(onStreamAdded(IXmppStream *))); 
-    connect(plugin->instance(), SIGNAL(removed(IXmppStream *)),
-      SLOT(onStreamRemoved(IXmppStream *))); 
+    connect(plugin->instance(), SIGNAL(added(IXmppStream *)), SLOT(onStreamAdded(IXmppStream *))); 
+    connect(plugin->instance(), SIGNAL(removed(IXmppStream *)), SLOT(onStreamRemoved(IXmppStream *))); 
   }
 
   plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
@@ -86,36 +84,36 @@ void PresencePlugin::onPresenceOpened()
   }
 }
 
-void PresencePlugin::onSelfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid)
+void PresencePlugin::onPresenceChanged(int AShow, const QString &AStatus, int APriority)
 {
   Presence *presence = qobject_cast<Presence *>(sender());
   if (presence)
-    emit selfPresence(presence,AShow,AStatus,APriority,AToJid); 
+    emit presenceChanged(presence,AShow,AStatus,APriority); 
 }
 
-void PresencePlugin::onPresenceItem(IPresenceItem *APresenceItem)
+void PresencePlugin::onPresenceReceived(const IPresenceItem &APresenceItem)
 {
   Presence *presence = qobject_cast<Presence *>(sender());
   if (presence)
   {
-    if (APresenceItem->show() != IPresence::Offline && APresenceItem->show() != IPresence::Error)
+    if (APresenceItem.show != IPresence::Offline && APresenceItem.show != IPresence::Error)
     {
-      QSet<IPresence *> &presences = FContactPresences[APresenceItem->jid()];
+      QSet<IPresence *> &presences = FContactPresences[APresenceItem.itemJid];
       if (presences.isEmpty())
-        emit contactStateChanged(presence->streamJid(),APresenceItem->jid(),true);
+        emit contactStateChanged(presence->streamJid(),APresenceItem.itemJid,true);
       presences += presence;
     }
-    else if (FContactPresences.contains(APresenceItem->jid()))
+    else if (FContactPresences.contains(APresenceItem.itemJid))
     {
-      QSet<IPresence *> &presences = FContactPresences[APresenceItem->jid()];
+      QSet<IPresence *> &presences = FContactPresences[APresenceItem.itemJid];
       presences -= presence;
       if (presences.isEmpty())
       {
-        FContactPresences.remove(APresenceItem->jid());
-        emit contactStateChanged(presence->streamJid(),APresenceItem->jid(),false);
+        FContactPresences.remove(APresenceItem.itemJid);
+        emit contactStateChanged(presence->streamJid(),APresenceItem.itemJid,false);
       }
     }
-    emit presenceItem(presence,APresenceItem);
+    emit presenceReceived(presence,APresenceItem);
   }
 }
 
@@ -136,13 +134,21 @@ void PresencePlugin::onPresenceClosed()
   }
 }
 
+void PresencePlugin::onPresenceDestroyed(QObject *AObject)
+{
+  Presence *presence = qobject_cast<Presence *>(AObject);
+  if (FPresences.contains(presence))
+    FPresences.removeAt(FPresences.indexOf(presence)); 
+}
+
 void PresencePlugin::onStreamAdded(IXmppStream *AXmppStream)
 {
   IPresence *presence = addPresence(AXmppStream);
   connect(presence->instance(),SIGNAL(opened()),SLOT(onPresenceOpened()));
-  connect(presence->instance(),SIGNAL(presenceItem(IPresenceItem *)),SLOT(onPresenceItem(IPresenceItem *)));
-  connect(presence->instance(),SIGNAL(selfPresence(int, const QString &, qint8, const Jid &)),
-    SLOT(onSelfPresence(int, const QString &, qint8, const Jid &)));
+  connect(presence->instance(),SIGNAL(changed(int, const QString &, int)),
+    SLOT(onPresenceChanged(int, const QString &, int)));
+  connect(presence->instance(),SIGNAL(received(const IPresenceItem &)),
+    SLOT(onPresenceReceived(const IPresenceItem &)));
   connect(presence->instance(),SIGNAL(aboutToClose(int,const QString &)),
     SLOT(onPresenceAboutToClose(int,const QString &)));
   connect(presence->instance(),SIGNAL(closed()),SLOT(onPresenceClosed()));
@@ -157,13 +163,6 @@ void PresencePlugin::onStreamRemoved(IXmppStream *AXmppStream)
     emit presenceRemoved(presence);
     removePresence(AXmppStream);
   }
-}
-
-void PresencePlugin::onPresenceDestroyed(QObject *AObject)
-{
-  Presence *presence = qobject_cast<Presence *>(AObject);
-  if (FPresences.contains(presence))
-    FPresences.removeAt(FPresences.indexOf(presence)); 
 }
 
 Q_EXPORT_PLUGIN2(PresencePlugin, PresencePlugin)

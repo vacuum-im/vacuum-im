@@ -37,20 +37,20 @@ signals:
   virtual void contactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
   virtual void presenceAdded(IPresence *APresence);
   virtual void presenceOpened(IPresence *APresence);
-  virtual void selfPresence(IPresence *APresence, int AShow, const QString &AStatus, qint8 APriotity, const Jid &AToJid);
-  virtual void presenceItem(IPresence *APresence, IPresenceItem *APresenceItem);
+  virtual void presenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriotity);
+  virtual void presenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
   virtual void presenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus);
   virtual void presenceClosed(IPresence *APresence);
   virtual void presenceRemoved(IPresence *APresence);
 protected slots:
   void onPresenceOpened();
-  void onSelfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
-  void onPresenceItem(IPresenceItem *APresenceItem);
+  void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
+  void onPresenceReceived(const IPresenceItem &APresenceItem);
   void onPresenceAboutToClose(int AShow, const QString &AStatus);
   void onPresenceClosed();
+  void onPresenceDestroyed(QObject *AObject);
   void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamRemoved(IXmppStream *AXmppStream);
-  void onPresenceDestroyed(QObject *AObject);
 private:
   IStanzaProcessor *FStanzaProcessor;
 private:

@@ -217,22 +217,18 @@ QIcon StatusIcons::iconByJid(const Jid &AStreamJid, const Jid &AJid) const
   int show = IPresence::Offline;
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
   if (presence)
-  {
-    IPresenceItem *presenceItem = presence->item(AJid);
-    if (presenceItem)
-      show = presenceItem->show();
-  }
+    show = presence->presenceItem(AJid).show;
 
   QString subs;
   bool ask = false;
   IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
   if (roster)
   {
-    IRosterItem *rosterItem = roster->item(AJid);
-    if (rosterItem)
+    IRosterItem ritem = roster->rosterItem(AJid);
+    if (ritem.isValid)
     {
-      subs = rosterItem->subscription();
-      ask = !rosterItem->ask().isEmpty();
+      subs = ritem.subscription;
+      ask = !ritem.ask.isEmpty();
     }
   }
 

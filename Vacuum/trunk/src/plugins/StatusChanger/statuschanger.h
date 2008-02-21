@@ -117,7 +117,7 @@ protected:
   void removeAllCustomStatuses();
 protected slots:
   void onPresenceAdded(IPresence *APresence);
-  void onSelfPresence(IPresence *APresence, int AShow, const QString &AStatus, qint8 APriority, const Jid &AJid);
+  void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
   void onPresenceRemoved(IPresence *APresence);
   void onRosterOpened(IRoster *ARoster);
   void onRosterClosed(IRoster *ARoster);

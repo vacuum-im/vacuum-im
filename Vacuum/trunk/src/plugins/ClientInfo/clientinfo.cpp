@@ -47,6 +47,7 @@ void ClientInfo::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = tr("Client Info"); 
   APluginInfo->uid = CLIENTINFO_UUID;
   APluginInfo->version = "0.1";
+  APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
 bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -404,9 +405,9 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
         IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
         if (roster)
         {
-          IRosterItem *item = roster->item(AContactJid);
-          if (item)
-            contactName = item->name();
+          IRosterItem ritem = roster->rosterItem(AContactJid);
+          if (ritem.isValid)
+            contactName = ritem.name;
         }
       }
       dialog = new ClientInfoDialog(this,AStreamJid,AContactJid,contactName,AInfoTypes);

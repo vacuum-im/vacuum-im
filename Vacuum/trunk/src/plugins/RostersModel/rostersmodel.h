@@ -61,10 +61,10 @@ protected:
   void insertDefaultDataHolders(IRosterIndex *AIndex);
 protected slots:
   void onStreamJidChanged(IXmppStream *AXmppStream,const Jid &ABefour);
-  void onRosterItemPush(IRosterItem *ARosterItem);
-  void onRosterItemRemoved(IRosterItem *ARosterItem);
-  void onSelfPresence(int AShow, const QString &AStatus, qint8 APriority, const Jid &AToJid);
-  void onPresenceItem(IPresenceItem *APresenceItem);
+  void onRosterItemReceived(const IRosterItem &ARosterItem);
+  void onRosterItemRemoved(const IRosterItem &ARosterItem);
+  void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
+  void onPresenceReceived(const IPresenceItem &APresenceItem);
   void onIndexDataChanged(IRosterIndex *AIndex, int ARole);
   void onIndexChildAboutToBeInserted(IRosterIndex *AIndex);
   void onIndexChildInserted(IRosterIndex *AIndex);

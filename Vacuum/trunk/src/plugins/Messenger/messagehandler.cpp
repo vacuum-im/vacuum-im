@@ -129,7 +129,8 @@ void MessageHandler::initialize()
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
     if (FPresencePlugin)
     {
-      connect(FPresencePlugin->instance(),SIGNAL(presenceItem(IPresence *, IPresenceItem *)),SLOT(onPresenceItem(IPresence *, IPresenceItem *)));
+      connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),
+        SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
     }
   }
 }
@@ -425,10 +426,10 @@ void MessageHandler::onMessageWindowDestroyed()
   }
 }
 
-void MessageHandler::onPresenceItem(IPresence *APresence, IPresenceItem *APresenceItem)
+void MessageHandler::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
 {
   Jid streamJid = APresence->streamJid();
-  Jid contactJid = APresenceItem->jid();
+  Jid contactJid = APresenceItem.itemJid;
   IChatWindow *chatWindow = findChatWindow(streamJid,contactJid);
   if (!chatWindow && !contactJid.resource().isEmpty())
   {

@@ -68,11 +68,11 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
     if (FPresencePlugin)
     {
-      connect(plugin->instance(),SIGNAL(presenceAdded(IPresence *)),
+      connect(FPresencePlugin->instance(),SIGNAL(presenceAdded(IPresence *)),
         SLOT(onPresenceAdded(IPresence *)));
-      connect(plugin->instance(),SIGNAL(selfPresence(IPresence *, int, const QString &, qint8, const Jid &)),
-        SLOT(onSelfPresence(IPresence *, int, const QString &, qint8, const Jid &)));
-      connect(plugin->instance(),SIGNAL(presenceRemoved(IPresence *)),
+      connect(FPresencePlugin->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),
+        SLOT(onPresenceChanged(IPresence *, int, const QString &, int)));
+      connect(FPresencePlugin->instance(),SIGNAL(presenceRemoved(IPresence *)),
         SLOT(onPresenceRemoved(IPresence *)));
     }
   }
@@ -921,9 +921,9 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
   updateTrayToolTip();
 }
 
-void StatusChanger::onSelfPresence(IPresence *APresence, int AShow, const QString &AText, qint8 APriority, const Jid &AJid)
+void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QString &AText, int APriority)
 {
-  if (!AJid.isValid() && FStreamStatus.contains(APresence))
+  if (FStreamStatus.contains(APresence))
   {
     if (AShow == IPresence::Error)
     {

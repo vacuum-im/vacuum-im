@@ -53,8 +53,7 @@ protected:
 protected slots:
   //Operations on subscription
   void onSendSubscription(bool);
-  void onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid, 
-    IRoster::SubsType AType, const QString &AStatus);
+  void onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid, int ASubsType, const QString &AText);
   //Operations on items
   void onRenameItem(bool);
   void onCopyItemToGroup(bool);
@@ -99,7 +98,7 @@ private:
     int subsId;
     Jid streamJid;
     Jid contactJid;
-    IRoster::SubsType type;
+    int type;
     QString status;
     QDateTime time;
     int trayId;

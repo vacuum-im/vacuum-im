@@ -101,8 +101,8 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance()); 
     if (FRosterPlugin)
     {
-      connect(FRosterPlugin->instance(),SIGNAL(rosterItemPush(IRoster *, IRosterItem *)),
-        SLOT(onRosterItemPush(IRoster *, IRosterItem *)));
+      connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &)),
+        SLOT(onRosterItemReceived(IRoster *, const IRosterItem &)));
     }
   }
 
@@ -1071,14 +1071,14 @@ void ServiceDiscovery::onStreamStateChanged(const Jid &AStreamJid, bool AStateOn
       requestDiscoItems(AStreamJid,AStreamJid.domane());
 
     IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
-    QList<IRosterItem *> rosterItems = roster!=NULL ? roster->items() : QList<IRosterItem *>();
-    foreach(IRosterItem *rosterItem, rosterItems)
+    QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
+    foreach(IRosterItem ritem, ritems)
     {
-      if (rosterItem->jid().node().isEmpty() && !hasDiscoInfo(rosterItem->jid()))
+      if (ritem.itemJid.node().isEmpty() && !hasDiscoInfo(ritem.itemJid))
       {
         QueuedRequest request;
         request.streamJid = AStreamJid;
-        request.contactJid = rosterItem->jid();
+        request.contactJid = ritem.itemJid;
         appendQueuedRequest(QUEUE_REQUEST_START,request);
       }
     }
@@ -1125,13 +1125,13 @@ void ServiceDiscovery::onContactStateChanged(const Jid &AStreamJid, const Jid &A
   }
 }
 
-void ServiceDiscovery::onRosterItemPush(IRoster *ARoster, IRosterItem *ARosterItem)
+void ServiceDiscovery::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem)
 {
-  if (ARosterItem->jid().node().isEmpty() && ARoster->isOpen() && !hasDiscoInfo(ARosterItem->jid()))
+  if (ARosterItem.itemJid.node().isEmpty() && ARoster->isOpen() && !hasDiscoInfo(ARosterItem.itemJid))
   {
     QueuedRequest request;
     request.streamJid = ARoster->streamJid();
-    request.contactJid = ARosterItem->jid();
+    request.contactJid = ARosterItem.itemJid;
     appendQueuedRequest(QUEUE_REQUEST_START,request);
   }
 }

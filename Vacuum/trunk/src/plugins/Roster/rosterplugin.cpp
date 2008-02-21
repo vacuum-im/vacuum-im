@@ -28,10 +28,12 @@ bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitO
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
   {
-    connect(plugin->instance(), SIGNAL(added(IXmppStream *)),
-      SLOT(onStreamAdded(IXmppStream *))); 
-    connect(plugin->instance(), SIGNAL(removed(IXmppStream *)),
-      SLOT(onStreamRemoved(IXmppStream *))); 
+    IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+    if (xmppStreams)
+    {
+      connect(plugin->instance(), SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *))); 
+      connect(plugin->instance(), SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
+    }
   }
 
   plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
@@ -67,11 +69,18 @@ IRoster *RosterPlugin::getRoster(const Jid &AStreamJid) const
   return NULL;    
 }
 
+void RosterPlugin::saveRosterItems(const Jid &AStreamJid)
+{
+  IRoster *roster = getRoster(AStreamJid);
+  if (roster)
+    roster->saveRosterItems(rosterFileName(AStreamJid));
+}
+
 void RosterPlugin::loadRosterItems(const Jid &AStreamJid)
 {
-  Roster *roster = (Roster *)getRoster(AStreamJid);
+  IRoster *roster = getRoster(AStreamJid);
   if (roster)
-    roster->loadRosterItems(rosterFile(AStreamJid));
+    roster->loadRosterItems(rosterFileName(AStreamJid));
 }
 
 void RosterPlugin::removeRoster(IXmppStream *AXmppStream)
@@ -85,7 +94,7 @@ void RosterPlugin::removeRoster(IXmppStream *AXmppStream)
   }
 }
 
-QString RosterPlugin::rosterFile(const Jid &AStreamJid) const
+QString RosterPlugin::rosterFileName(const Jid &AStreamJid) const
 {
   QString fileName = Jid::encode(AStreamJid.bare()).toLower()+".xml";
   QDir dir;
@@ -97,6 +106,13 @@ QString RosterPlugin::rosterFile(const Jid &AStreamJid) const
   return fileName;
 }
 
+void RosterPlugin::onRosterJidAboutToBeChanged(const Jid &AAfter)
+{
+  Roster *roster = qobject_cast<Roster *>(sender());
+  if (roster)
+    emit rosterJidAboutToBeChanged(roster,AAfter);
+}
+
 void RosterPlugin::onRosterOpened()
 {
   Roster *roster = qobject_cast<Roster *>(sender());
@@ -104,32 +120,25 @@ void RosterPlugin::onRosterOpened()
     emit rosterOpened(roster); 
 }
 
-void RosterPlugin::onRosterItemPush(IRosterItem *ARosterItem)
+void RosterPlugin::onRosterItemReceived(const IRosterItem &ARosterItem)
 {
   Roster *roster = qobject_cast<Roster *>(sender());
   if (roster)
-    emit rosterItemPush(roster,ARosterItem); 
+    emit rosterItemReceived(roster,ARosterItem); 
 }
 
-void RosterPlugin::onRosterItemRemoved(IRosterItem *ARosterItem)
+void RosterPlugin::onRosterItemRemoved(const IRosterItem &ARosterItem)
 {
   Roster *roster = qobject_cast<Roster *>(sender());
   if (roster)
     emit rosterItemRemoved(roster,ARosterItem); 
 }
 
-void RosterPlugin::onRosterSubscription(const Jid &AJid, IRoster::SubsType ASType, const QString &AStatus)
+void RosterPlugin::onRosterSubscription(const Jid &AItemJid, int ASubsType, const QString &AText)
 {
   Roster *roster = qobject_cast<Roster *>(sender());
   if (roster)
-    emit rosterSubscription(roster,AJid,ASType,AStatus);
-}
-
-void RosterPlugin::onRosterJidAboutToBeChanged(const Jid &AAfter)
-{
-  Roster *roster = qobject_cast<Roster *>(sender());
-  if (roster)
-    emit rosterJidAboutToBeChanged(roster,AAfter);
+    emit rosterSubscription(roster,AItemJid,ASubsType,AText);
 }
 
 void RosterPlugin::onRosterClosed()
@@ -139,16 +148,22 @@ void RosterPlugin::onRosterClosed()
     emit rosterClosed(roster); 
 }
 
+void RosterPlugin::onRosterDestroyed(QObject *AObject)
+{
+  Roster *roster = qobject_cast<Roster *>(AObject);
+  FRosters.removeAt(FRosters.indexOf(roster)); 
+}
+
 void RosterPlugin::onStreamAdded(IXmppStream *AXmppStream)
 {
   IRoster *roster = addRoster(AXmppStream);
-  connect(roster->instance(),SIGNAL(opened()),SLOT(onRosterOpened()));
-  connect(roster->instance(),SIGNAL(closed()),SLOT(onRosterClosed()));
-  connect(roster->instance(),SIGNAL(itemPush(IRosterItem *)),SLOT(onRosterItemPush(IRosterItem *)));
-  connect(roster->instance(),SIGNAL(itemRemoved(IRosterItem *)),SLOT(onRosterItemRemoved(IRosterItem *)));
-  connect(roster->instance(),SIGNAL(subscription(const Jid &, IRoster::SubsType, const QString &)),
-    SLOT(onRosterSubscription(const Jid &, IRoster::SubsType, const QString &)));
   connect(roster->instance(),SIGNAL(jidAboutToBeChanged(const Jid &)),SLOT(onRosterJidAboutToBeChanged(const Jid &)));
+  connect(roster->instance(),SIGNAL(opened()),SLOT(onRosterOpened()));
+  connect(roster->instance(),SIGNAL(received(const IRosterItem &)),SLOT(onRosterItemReceived(const IRosterItem &)));
+  connect(roster->instance(),SIGNAL(removed(const IRosterItem &)),SLOT(onRosterItemRemoved(const IRosterItem &)));
+  connect(roster->instance(),SIGNAL(subscription(const Jid &, int, const QString &)),
+    SLOT(onRosterSubscription(const Jid &, int, const QString &)));
+  connect(roster->instance(),SIGNAL(closed()),SLOT(onRosterClosed()));
   emit rosterAdded(roster); 
 }
 
@@ -157,17 +172,10 @@ void RosterPlugin::onStreamRemoved(IXmppStream *AXmppStream)
   IRoster *roster = getRoster(AXmppStream->jid());
   if (roster)
   {
-    roster->saveRosterItems(rosterFile(roster->streamJid()));
+    saveRosterItems(roster->streamJid());
     emit rosterRemoved(roster);
     removeRoster(AXmppStream);
   }
-}
-
-void RosterPlugin::onRosterDestroyed(QObject *AObject)
-{
-  Roster *roster = qobject_cast<Roster *>(AObject);
-  if (FRosters.contains(roster))
-    FRosters.removeAt(FRosters.indexOf(roster)); 
 }
 
 Q_EXPORT_PLUGIN2(RosterPlugin, RosterPlugin)

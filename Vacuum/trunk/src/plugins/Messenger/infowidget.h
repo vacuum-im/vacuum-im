@@ -41,8 +41,8 @@ protected:
   QString showName(IPresence::Show AShow) const;
 protected slots:
   void onAccountChanged(const QString &AName, const QVariant &AValue);  
-  void onRosterItemPush(IRosterItem *ARosterItem);
-  void onPresenceItem(IPresenceItem *APresenceItem);
+  void onRosterItemReceived(const IRosterItem &ARosterItem);
+  void onPresenceReceived(const IPresenceItem &APresenceItem);
   void onSoftwareInfoChanged(const Jid &AContactJid);
 private:
   Ui::InfoWidgetClass ui;

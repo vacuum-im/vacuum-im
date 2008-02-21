@@ -176,11 +176,11 @@ void ReceiversWidget::createRosterTree()
   ui.trwReceivers->setIndentation(10);
   ui.trwReceivers->setHeaderLabels(QStringList() << tr("Contact") << tr("Jid"));
   QString groupDelim = FRoster->groupDelimiter();
-  QList<IRosterItem *> rosterItems = FRoster->items();
-  foreach (IRosterItem *rosterItem, rosterItems)
+  QList<IRosterItem> ritems = FRoster->rosterItems();
+  foreach (IRosterItem ritem, ritems)
   {
-    QSet<QString> groups = rosterItem->groups();
-    if (rosterItem->jid().node().isEmpty())
+    QSet<QString> groups = ritem.groups;
+    if (ritem.itemJid.node().isEmpty())
     {
       groups.clear();
       groups.insert(tr("Agents"));
@@ -193,26 +193,26 @@ void ReceiversWidget::createRosterTree()
       QTreeWidgetItem *groupItem = getReceiversGroup(group);
 
       QList<Jid> itemJids;
-      QList<IPresenceItem *> presenceItems = FPresence->items(rosterItem->jid());
-      foreach(IPresenceItem *presenceItem,presenceItems)
-        itemJids.append(presenceItem->jid());
+      QList<IPresenceItem> pitems = FPresence->presenceItems(ritem.itemJid);
+      foreach(IPresenceItem pitem,pitems)
+        itemJids.append(pitem.itemJid);
       if (itemJids.isEmpty())
-        itemJids.append(rosterItem->jid());
+        itemJids.append(ritem.itemJid);
       foreach(Jid itemJid, itemJids)
       {
-        QString name = itemJid.resource().isEmpty() ? rosterItem->name() : rosterItem->name()+"/"+itemJid.resource();
+        QString name = itemJid.resource().isEmpty() ? ritem.name : ritem.name+"/"+itemJid.resource();
         QTreeWidgetItem *contactItem = getReceiver(itemJid,name,groupItem);
         contactItem->setCheckState(0, Qt::Unchecked);
       }
     }
   }
 
-  QList<IPresenceItem *> myResources = FPresence->items(FStreamJid);
-  foreach(IPresenceItem *presenceItem, myResources)
+  QList<IPresenceItem> myResources = FPresence->presenceItems(FStreamJid);
+  foreach(IPresenceItem pitem, myResources)
   {
     QTreeWidgetItem *groupItem = getReceiversGroup(tr("My Resources"));
-    QString name = presenceItem->jid().resource();
-    QTreeWidgetItem *contactItem = getReceiver(presenceItem->jid(),name,groupItem);
+    QString name = pitem.itemJid.resource();
+    QTreeWidgetItem *contactItem = getReceiver(pitem.itemJid,name,groupItem);
     contactItem->setCheckState(0, Qt::Unchecked);
   }
 

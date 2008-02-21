@@ -50,9 +50,8 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     {
       connect(FRosterPlugin->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
       connect(FRosterPlugin->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
-      connect(FRosterPlugin->instance(),
-        SIGNAL(rosterSubscription(IRoster *, const Jid &, IRoster::SubsType, const QString &)),
-        SLOT(onReceiveSubscription(IRoster *, const Jid &, IRoster::SubsType, const QString &)));
+      connect(FRosterPlugin->instance(),SIGNAL(rosterSubscription(IRoster *, const Jid &, int, const QString &)),
+        SLOT(onReceiveSubscription(IRoster *, const Jid &, int, const QString &)));
     }
   }
 
@@ -256,15 +255,10 @@ void RosterChanger::openSubsDialog(int ASubsId)
       emit subscriptionDialogCreated(FSubsDialog);
     }
     
-    QString subs = "none";
+    QString subs = SUBSCRIPTION_NONE;
     IRoster *roster = FRosterPlugin->getRoster(subsItem.streamJid);
-    if (roster && roster->isOpen())
-    {
-      IRosterItem *rosterItem = roster->item(subsItem.contactJid);
-      if (rosterItem)
-        subs = rosterItem->subscription();
-    }
-
+    if (roster)
+      subs = roster->rosterItem(subsItem.contactJid).subscription;
     FSubsDialog->setupDialog(subsItem.streamJid,subsItem.contactJid,subsItem.time,subsItem.type,subsItem.status,subs);
     FSubsDialog->show();
     FSubsDialog->activateWindow();
@@ -308,7 +302,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   if (roster && roster->isOpen())
   {
     int itemType = AIndex->data(RDR_Type).toInt();
-    IRosterItem *rosterItem = roster->item(AIndex->data(RDR_BareJid).toString());
+    IRosterItem ritem = roster->rosterItem(AIndex->data(RDR_BareJid).toString());
     if (itemType == RIT_StreamRoot)
     {
       QHash<int,QVariant> data;
@@ -362,9 +356,9 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
       AMenu->addAction(subsMenu->menuAction(),AG_ROSTERCHANGER_ROSTER_SUBSCRIPTION);
 
-      if (rosterItem)
+      if (ritem.isValid)
       {
-        QSet<QString> exceptGroups = rosterItem->groups();
+        QSet<QString> exceptGroups = ritem.groups;
 
         data.insert(Action::DR_Parametr2,AIndex->data(RDR_Name));
         data.insert(Action::DR_Parametr3,AIndex->data(RDR_Group));
@@ -464,21 +458,21 @@ void RosterChanger::onSendSubscription(bool)
     if (roster && roster->isOpen())
     {
       QString rosterJid = action->data(Action::DR_Parametr1).toString();
-      IRoster::SubsType subsType = (IRoster::SubsType)action->data(Action::DR_Parametr2).toInt();
+      int subsType = action->data(Action::DR_Parametr2).toInt();
       roster->sendSubscription(rosterJid,subsType);
     }
   }
 }
 
 void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid, 
-                                          IRoster::SubsType AType, const QString &AStatus)
+                                          int ASubsType, const QString &AText)
 {
   SubsItem &subsItem = FSubsItems[++FSubsId];
   subsItem.subsId = FSubsId;
   subsItem.streamJid = ARoster->streamJid();
   subsItem.contactJid = AFromJid;
-  subsItem.type = AType;
-  subsItem.status = AStatus;
+  subsItem.type = ASubsType;
+  subsItem.status = AText;
   subsItem.time = QDateTime::currentDateTime();
 
   QIcon icon = FSystemIconset->iconByName(IN_EVENTS);
@@ -606,8 +600,7 @@ void RosterChanger::onRemoveItemFromRoster(bool)
     if (roster && roster->isOpen())
     {
       Jid rosterJid = action->data(Action::DR_Parametr1).toString();
-      IRosterItem *rosterItem = roster->item(rosterJid);
-      if (rosterItem)
+      if (roster->rosterItem(rosterJid).isValid)
       {
         int button = QMessageBox::question(NULL,tr("Remove contact"),
           tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(rosterJid.hBare()),
@@ -744,7 +737,7 @@ void RosterChanger::onAddContact(AddContactDialog *ADialog)
   if (roster && roster->isOpen())
   {
     Jid contactJid = ADialog->contactJid();
-    if (!roster->item(contactJid))
+    if (!roster->rosterItem(contactJid).isValid)
     {
       QSet<QString> grps = ADialog->groups();
       if (contactJid.node().isEmpty())
@@ -881,7 +874,7 @@ void RosterChanger::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, I
   if (!AUser->data(MUDR_REALJID).toString().isEmpty())
   {
     IRoster *roster = FRosterPlugin->getRoster(AUser->data(MUDR_STREAMJID).toString());
-    if (roster && !roster->item(AUser->data(MUDR_REALJID).toString()))
+    if (roster && !roster->rosterItem(AUser->data(MUDR_REALJID).toString()).isValid)
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Add contact..."));

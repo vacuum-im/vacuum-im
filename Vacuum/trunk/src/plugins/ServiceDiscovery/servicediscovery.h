@@ -156,7 +156,7 @@ protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
   void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
-  void onRosterItemPush(IRoster *ARoster, IRosterItem *ARosterItem);
+  void onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);

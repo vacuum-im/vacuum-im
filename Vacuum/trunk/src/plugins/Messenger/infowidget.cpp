@@ -68,15 +68,7 @@ void InfoWidget::autoUpdateField(InfoField AField)
     {
       QString contactName;
       if (!(FStreamJid && FContactJid))
-      {
-        contactName = FContactJid.node();
-        if (FRoster)
-        {
-          IRosterItem *rosterItem = FRoster->item(FContactJid);
-          if (rosterItem)
-            contactName = rosterItem->name();
-        }
-      }
+        contactName = FRoster ? FRoster->rosterItem(FContactJid).name : FContactJid.node();
       else
         contactName = FContactJid.resource();
       if (contactName.isEmpty())
@@ -88,8 +80,7 @@ void InfoWidget::autoUpdateField(InfoField AField)
     {
       if (FPresence)
       {
-        IPresenceItem *presenceItem = FPresence->item(FContactJid);
-        presenceItem != NULL ? setField(ContactShow,presenceItem->show()) : setField(ContactShow,IPresence::Offline);
+        setField(ContactShow,FPresence->presenceItem(FContactJid).show);
       }
       break;
     }
@@ -97,8 +88,7 @@ void InfoWidget::autoUpdateField(InfoField AField)
     {
       if (FPresence)
       {
-        IPresenceItem *presenceItem = FPresence->item(FContactJid);
-        presenceItem != NULL ? setField(ContactStatus,presenceItem->status()) : setField(ContactStatus,QVariant());
+        setField(ContactStatus,FPresence->presenceItem(FContactJid).status);
       }
       break;
     };
@@ -273,14 +263,15 @@ void InfoWidget::initialize()
     {
       if (FRoster)
       {
-        disconnect(FRoster->instance(),SIGNAL(itemPush(IRosterItem *)),
-          this, SLOT(onRosterItemPush(IRosterItem *)));
+        disconnect(FRoster->instance(),SIGNAL(received(const IRosterItem &)),
+          this, SLOT(onRosterItemReceived(const IRosterItem &)));
       }
 
       FRoster = rosterPlugin->getRoster(FStreamJid);
       if (FRoster)
       {
-        connect(FRoster->instance(),SIGNAL(itemPush(IRosterItem *)),SLOT(onRosterItemPush(IRosterItem *)));
+        connect(FRoster->instance(),SIGNAL(received(const IRosterItem &)),
+          SLOT(onRosterItemReceived(const IRosterItem &)));
       }
     }
   }
@@ -293,14 +284,15 @@ void InfoWidget::initialize()
     {
       if (FPresence)
       {
-        disconnect(FPresence->instance(),SIGNAL(presenceItem(IPresenceItem *)),
-          this, SLOT(onPresenceItem(IPresenceItem *)));
+        disconnect(FPresence->instance(),SIGNAL(received(const IPresenceItem &)),
+          this, SLOT(onPresenceReceived(const IPresenceItem &)));
       }
 
       FPresence = presencePlugin->getPresence(FStreamJid);
       if (FPresence)
       {
-        connect(FPresence->instance(),SIGNAL(presenceItem(IPresenceItem *)),SLOT(onPresenceItem(IPresenceItem *)));
+        connect(FPresence->instance(),SIGNAL(received(const IPresenceItem &)),
+          SLOT(onPresenceReceived(const IPresenceItem &)));
       }
     }
   }
@@ -339,26 +331,26 @@ QString InfoWidget::showName(IPresence::Show AShow) const
   }
 }
 
-void InfoWidget::onAccountChanged(const QString &AName, const QVariant &AValue)
+void InfoWidget::onAccountChanged(const QString &AName, const QVariant &/*AValue*/)
 {
   if (isFiledAutoUpdated(AccountName) && AName == AVN_NAME)
-    setField(AccountName,AValue);
+    autoUpdateField(AccountName);
 }
 
-void InfoWidget::onRosterItemPush(IRosterItem *ARosterItem)
+void InfoWidget::onRosterItemReceived(const IRosterItem &ARosterItem)
 {
-  if (isFiledAutoUpdated(ContactName) && (ARosterItem->jid() && FContactJid))
-    setField(ContactName,ARosterItem->name());
+  if (isFiledAutoUpdated(ContactName) && (ARosterItem.itemJid && FContactJid))
+    autoUpdateField(ContactName);
 }
 
-void InfoWidget::onPresenceItem(IPresenceItem *APresenceItem)
+void InfoWidget::onPresenceReceived(const IPresenceItem &APresenceItem)
 {
-  if (APresenceItem->jid() == FContactJid)
+  if (APresenceItem.itemJid == FContactJid)
   {
     if (isFiledAutoUpdated(ContactShow))
-      setField(ContactShow,APresenceItem->show());
+      setField(ContactShow,APresenceItem.show);
     if (isFiledAutoUpdated(ContactStatus))
-      setField(ContactStatus,APresenceItem->status());
+      setField(ContactStatus,APresenceItem.status);
   }
 }
 

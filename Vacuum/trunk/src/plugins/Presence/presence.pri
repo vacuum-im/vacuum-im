@@ -1,7 +1,5 @@
-HEADERS = presenceitem.h \
-          presence.h \
+HEADERS = presence.h \
           presenceplugin.h 
 
-SOURCES = presenceitem.cpp \
-          presence.cpp \
+SOURCES = presence.cpp \
           presenceplugin.cpp

@@ -48,7 +48,7 @@ protected slots:
   void onMessageWindowForward();
   void onMessageWindowShowChat();
   void onMessageWindowDestroyed();
-  void onPresenceItem(IPresence *APresence, IPresenceItem *APresenceItem);
+  void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
   void onStatusIconsChanged();
 private:
   IMessenger *FMessenger;

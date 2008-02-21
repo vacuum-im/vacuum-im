@@ -28,7 +28,7 @@ SubscriptionDialog::~SubscriptionDialog()
 }
 
 void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJid, QDateTime ATime, 
-                                     IRoster::SubsType ASubsType, const QString &AStatus, const QString &ASubs)
+                                     int ASubsType, const QString &AStatus, const QString &ASubs)
 {
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;

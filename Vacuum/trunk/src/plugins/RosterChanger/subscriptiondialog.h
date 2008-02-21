@@ -34,7 +34,7 @@ signals:
   virtual void dialogChanged();
 public:
   void setupDialog(const Jid &AStreamJid, const Jid &AContactJid, QDateTime ATime, 
-    IRoster::SubsType ASubsType, const QString &AStatus, const QString &ASubs);
+    int ASubsType, const QString &AStatus, const QString &ASubs);
   void setNextCount(int ANext);
   Action *dialogAction() const { return FDialogAction; }
 signals:
@@ -50,7 +50,7 @@ private:
   Jid FStreamJid;
   Jid FContactJid;
   QDateTime FDateTime;
-  IRoster::SubsType FSubsType;
+  int FSubsType;
   QString FStatus;
   int FNextCount;
   QString FSubscription;
