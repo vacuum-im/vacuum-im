@@ -3,6 +3,7 @@
 
 #include "../../definations/multiuserdataroles.h"
 #include "../../interfaces/imultiuserchat.h"
+#include "../../interfaces/ipresence.h"
 
 class MultiUser : 
   public QObject,

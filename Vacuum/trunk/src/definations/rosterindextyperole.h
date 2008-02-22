@@ -29,11 +29,8 @@
 #define RDR_Show                                    Qt::UserRole + 9
 #define RDR_Status                                  Qt::UserRole + 10
 #define RDR_Priority                                Qt::UserRole + 11
-#define RDR_Self_Show                               Qt::UserRole + 12
-#define RDR_Self_Status                             Qt::UserRole + 13
-#define RDR_Self_Priority                           Qt::UserRole + 14
-#define RDR_Subscription                            Qt::UserRole + 15
-#define RDR_Ask                                     Qt::UserRole + 16
+#define RDR_Subscription                            Qt::UserRole + 12
+#define RDR_Ask                                     Qt::UserRole + 13
 //Decoration Roles
 #define RDR_HideGroupExpander                       Qt::UserRole + 32
 #define RDR_FontHint                                Qt::UserRole + 33

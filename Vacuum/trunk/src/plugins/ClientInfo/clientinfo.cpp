@@ -24,7 +24,7 @@ ClientInfo::ClientInfo()
   FPresencePlugin = NULL;
   FStanzaProcessor = NULL;
   FRostersViewPlugin = NULL;
-  FRostersModelPlugin = NULL;
+  FRostersModel = NULL;
   FSettingsPlugin = NULL;
   FMultiUserChatPlugin = NULL;
   FDiscovery = NULL;
@@ -83,10 +83,16 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
+  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
   if (plugin)
   {
-    FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
+    FRostersModel = qobject_cast<IRostersModel*>(plugin->instance());
+    if (FRostersModel)
+    {
+      connect(this,SIGNAL(softwareInfoChanged(const Jid &)),SLOT(onSoftwareInfoChanged(const Jid &)));
+      connect(this,SIGNAL(lastActivityChanged(const Jid &)),SLOT(onLastActivityChanged(const Jid &)));
+      connect(this,SIGNAL(entityTimeChanged(const Jid &)),SLOT(onEntityTimeChanged(const Jid &)));
+    }
   }
 
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
@@ -135,12 +141,9 @@ bool ClientInfo::initObjects()
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
 
-  if (FRostersModelPlugin)
+  if (FRostersModel)
   {
-    FRostersModelPlugin->rostersModel()->insertDefaultDataHolder(this);
-    connect(this,SIGNAL(softwareInfoChanged(const Jid &)),SLOT(onSoftwareInfoChanged(const Jid &)));
-    connect(this,SIGNAL(lastActivityChanged(const Jid &)),SLOT(onLastActivityChanged(const Jid &)));
-    connect(this,SIGNAL(entityTimeChanged(const Jid &)),SLOT(onEntityTimeChanged(const Jid &)));
+    FRostersModel->insertDefaultDataHolder(this);
   }
 
   if (FSettingsPlugin)
@@ -729,11 +732,10 @@ void ClientInfo::onRosterRemoved(IRoster *ARoster)
 void ClientInfo::onSoftwareInfoChanged(const Jid &AContactJid)
 {
   IRosterIndexList indexList;
-  IRostersModel *model = FRostersModelPlugin->rostersModel();
-  QStringList streamJids = model->streams();
-  foreach(QString streamJid, streamJids)
+  QList<Jid> streamJids = FRostersModel->streams();
+  foreach(Jid streamJid, streamJids)
   {
-    IRosterIndexList indexList = model->getContactIndexList(streamJid,AContactJid);
+    IRosterIndexList indexList = FRostersModel->getContactIndexList(streamJid,AContactJid);
     foreach(IRosterIndex *index, indexList)
     {
       emit dataChanged(index,RDR_CLIENT_NAME);
@@ -746,11 +748,10 @@ void ClientInfo::onSoftwareInfoChanged(const Jid &AContactJid)
 void ClientInfo::onLastActivityChanged(const Jid &AContactJid)
 {
   IRosterIndexList indexList;
-  IRostersModel *model = FRostersModelPlugin->rostersModel();
-  QStringList streamJids = model->streams();
-  foreach(QString streamJid, streamJids)
+  QList<Jid> streamJids = FRostersModel->streams();
+  foreach(Jid streamJid, streamJids)
   {
-    IRosterIndexList indexList = model->getContactIndexList(streamJid,AContactJid);
+    IRosterIndexList indexList = FRostersModel->getContactIndexList(streamJid,AContactJid);
     foreach(IRosterIndex *index, indexList)
     {
       emit dataChanged(index,RDR_LAST_ACTIVITY_TIME);
@@ -762,11 +763,10 @@ void ClientInfo::onLastActivityChanged(const Jid &AContactJid)
 void ClientInfo::onEntityTimeChanged( const Jid &AContactJid )
 {
   IRosterIndexList indexList;
-  IRostersModel *model = FRostersModelPlugin->rostersModel();
-  QStringList streamJids = model->streams();
-  foreach(QString streamJid, streamJids)
+  QList<Jid> streamJids = FRostersModel->streams();
+  foreach(Jid streamJid, streamJids)
   {
-    IRosterIndexList indexList = model->getContactIndexList(streamJid,AContactJid);
+    IRosterIndexList indexList = FRostersModel->getContactIndexList(streamJid,AContactJid);
     foreach(IRosterIndex *index, indexList)
     {
       emit dataChanged(index,RDR_ENTITY_TIME);

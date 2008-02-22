@@ -40,7 +40,7 @@ ServiceDiscovery::ServiceDiscovery()
   FTrayManager = NULL;
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
-  FRostersModelPlugin = NULL;
+  FRostersModel = NULL;
   FStatusIcons = NULL;
 
   FDiscoMenu = NULL;
@@ -114,9 +114,9 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
   if (plugin) 
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
+  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
   if (plugin)
-    FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
+    FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
   if (plugin) 
@@ -154,9 +154,9 @@ bool ServiceDiscovery::initObjects()
     connect(FRostersView,SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
-  if (FRostersModelPlugin)
+  if (FRostersModel)
   {
-    FRostersModelPlugin->rostersModel()->insertDefaultDataHolder(this);
+    FRostersModel->insertDefaultDataHolder(this);
     connect(this,SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
     connect(this,SIGNAL(discoInfoRemoved(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
   }
@@ -1278,10 +1278,10 @@ void ServiceDiscovery::onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo)
   dataValues.insertMulti(RDR_Type,RIT_Agent);
   dataValues.insertMulti(RDR_Type,RIT_MyResource);
   dataValues.insertMulti(RDR_PJid,ADiscoInfo.contactJid.pFull());
-  IRosterIndexList indexList = FRostersModelPlugin->rostersModel()->rootIndex()->findChild(dataValues,true);
-  foreach(QString streamJid, FRostersModelPlugin->rostersModel()->streams())
-    if (Jid(streamJid).pDomane() == ADiscoInfo.contactJid.pDomane())
-      indexList.append(FRostersModelPlugin->rostersModel()->getStreamRoot(streamJid));
+  IRosterIndexList indexList = FRostersModel->rootIndex()->findChild(dataValues,true);
+  foreach(Jid streamJid, FRostersModel->streams())
+    if (streamJid.pDomane() == ADiscoInfo.contactJid.pDomane())
+      indexList.append(FRostersModel->streamRoot(streamJid));
   foreach(IRosterIndex *index, indexList)
   {
     emit dataChanged(index,RDR_DISCO_IDENT_CATEGORY);

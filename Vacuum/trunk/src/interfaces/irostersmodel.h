@@ -1,12 +1,10 @@
 #ifndef IROSTERMODEL_H
 #define IROSTERMODEL_H
 
+#include <QHash>
 #include <QVariant>
 #include <QAbstractItemModel>
-#include <QAbstractItemDelegate>
-#include <QHash>
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/ipresence.h"
+#include "../../utils/jid.h"
 
 #define ROSTERSMODEL_UUID "{C1A1BBAB-06AF-41c8-BFBE-959F1065D80D}"
 
@@ -63,18 +61,14 @@ signals:
 };
 
 class IRostersModel :
-  public QAbstractItemModel
+  virtual public QAbstractItemModel
 {
 public:
-  IRostersModel(QObject *AParent):QAbstractItemModel(AParent) {};
-public:
   virtual QObject *instance() =0;
-  virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence) =0;
-  virtual QStringList streams() const =0;
-  virtual void removeStream(const QString &AStreamJid) =0;
-  virtual IRoster *getRoster(const QString &AStreamJid) const =0;
-  virtual IPresence *getPresence(const QString &AStreamJid) const =0;
-  virtual IRosterIndex *getStreamRoot(const Jid &AStreamJid) const =0;
+  virtual IRosterIndex *addStream(const Jid &AStreamJid) =0;
+  virtual QList<Jid> streams() const =0;
+  virtual void removeStream(const Jid &AStreamJid) =0;
+  virtual IRosterIndex *streamRoot(const Jid &AStreamJid) const =0;
   virtual IRosterIndex *rootIndex() const =0;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) =0;
   virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, 
@@ -106,20 +100,8 @@ signals:
   virtual void defaultDataHolderRemoved(IRosterIndexDataHolder *ADataHolder) =0;
 };
 
-class IRostersModelPlugin 
-{
-public:
-  virtual QObject *instance() =0;
-  virtual IRostersModel *rostersModel() =0;
-  virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence) =0;
-  virtual void removeStream(const Jid &AStreamJid) =0;
-signals:
-  virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;
-};
-
 Q_DECLARE_INTERFACE(IRosterIndexDataHolder,"Vacuum.Plugin.IRosterIndexDataHolder/1.0");
 Q_DECLARE_INTERFACE(IRosterIndex,"Vacuum.Plugin.IRosterIndex/1.0");
 Q_DECLARE_INTERFACE(IRostersModel,"Vacuum.Plugin.IRostersModel/1.0");
-Q_DECLARE_INTERFACE(IRostersModelPlugin,"Vacuum.Plugin.IRostersModelPlugin/1.0");
 
 #endif

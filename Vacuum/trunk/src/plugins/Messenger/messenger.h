@@ -160,7 +160,6 @@ private:
   IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;
   IRostersModel *FRostersModel;
-  IRostersModelPlugin *FRostersModelPlugin;
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
   ITrayManager *FTrayManager;

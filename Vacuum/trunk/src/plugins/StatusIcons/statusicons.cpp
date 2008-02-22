@@ -14,7 +14,7 @@ StatusIcons::StatusIcons()
 {
   FPresencePlugin = NULL;
   FRosterPlugin = NULL;
-  FRostersModelPlugin = NULL;
+  FRostersModel = NULL;
   FRostersViewPlugin = NULL;
   FSettingsPlugin = NULL;
   FSkinManager = NULL;
@@ -55,10 +55,10 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
+  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
   if (plugin)
   {
-    FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
+    FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
   }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
@@ -103,10 +103,10 @@ bool StatusIcons::initObjects()
   if (!FSkinManager)
     loadIconFilesRules();
 
-  if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
+  if (FRostersModel)
   {
     FDataHolder = new RosterIndexDataHolder(this);
-    FRostersModelPlugin->rostersModel()->insertDefaultDataHolder(FDataHolder);
+    FRostersModel->insertDefaultDataHolder(FDataHolder);
   }
 
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())

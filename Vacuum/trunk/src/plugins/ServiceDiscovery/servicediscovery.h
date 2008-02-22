@@ -176,7 +176,7 @@ private:
   IStanzaProcessor *FStanzaProcessor;    
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
-  IRostersModelPlugin *FRostersModelPlugin;
+  IRostersModel *FRostersModel;
   ITrayManager *FTrayManager;
   IMainWindowPlugin *FMainWindowPlugin;
   IStatusIcons *FStatusIcons;

@@ -1,20 +1,35 @@
 #ifndef ROSTERSMODEL_H
 #define ROSTERSMODEL_H
 
+#include "../../definations/accountvaluenames.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"
+#include "../../interfaces/ixmppstreams.h"
+#include "../../interfaces/iroster.h"
+#include "../../interfaces/ipresence.h"
+#include "../../interfaces/iaccountmanager.h"
 #include "../../utils/jid.h"
 #include "rosterindex.h"
 
 class RostersModel : 
+  virtual public QAbstractItemModel,
+  public IPlugin,
   public IRostersModel
 {
   Q_OBJECT;
-  Q_INTERFACES(IRostersModel);
+  Q_INTERFACES(IPlugin IRostersModel);
 public:
-  RostersModel(QObject *AParent);
+  RostersModel();
   ~RostersModel();
   virtual QObject *instance() { return this; }
+  //IPlugin
+  virtual QUuid pluginUuid() const { return ROSTERSMODEL_UUID; }
+  virtual void pluginInfo(PluginInfo *APluginInfo);
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+  virtual bool initObjects() { return true; }
+  virtual bool initSettings() { return true; }
+  virtual bool startPlugin() { return true; }
   //QAbstractItemModel
   virtual QModelIndex index(int ARow, int AColumn, const QModelIndex &AParent = QModelIndex()) const;
   virtual QModelIndex parent(const QModelIndex &AIndex) const;
@@ -24,13 +39,11 @@ public:
   virtual Qt::ItemFlags flags(const QModelIndex &AIndex) const; 
   virtual QVariant data(const QModelIndex &AIndex, int ARole = Qt::DisplayRole) const;
   //IRostersModel
-  virtual IRosterIndex *addStream(IRoster *ARoster, IPresence *APresence);
-  virtual QStringList streams() const { return FStreams.keys(); }
-  virtual void removeStream(const QString &AStreamJid);
-  virtual IRoster *getRoster(const QString &AStreamJid) const;
-  virtual IPresence *getPresence(const QString &AStreamJid) const;
+  virtual IRosterIndex *addStream(const Jid &AStreamJid);
+  virtual QList<Jid> streams() const { return FStreamsRoot.keys(); }
+  virtual void removeStream(const Jid &AStreamJid);
   virtual IRosterIndex *rootIndex() const { return FRootIndex; }
-  virtual IRosterIndex *getStreamRoot(const Jid &AStreamJid) const;
+  virtual IRosterIndex *streamRoot(const Jid &AStreamJid) const;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent);
   virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent);
   virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);
@@ -60,11 +73,14 @@ protected:
   void emitDelayedDataChanged(IRosterIndex *AIndex);
   void insertDefaultDataHolders(IRosterIndex *AIndex);
 protected slots:
+  void onAccountShown(IAccount *AAccount);
+  void onAccountHidden(IAccount *AAccount);
+  void onAccountChanged(const QString &AName, const QVariant &AValue);
   void onStreamJidChanged(IXmppStream *AXmppStream,const Jid &ABefour);
-  void onRosterItemReceived(const IRosterItem &ARosterItem);
-  void onRosterItemRemoved(const IRosterItem &ARosterItem);
-  void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
-  void onPresenceReceived(const IPresenceItem &APresenceItem);
+  void onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
+  void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
+  void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
+  void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
   void onIndexDataChanged(IRosterIndex *AIndex, int ARole);
   void onIndexChildAboutToBeInserted(IRosterIndex *AIndex);
   void onIndexChildInserted(IRosterIndex *AIndex);
@@ -73,13 +89,12 @@ protected slots:
   void onIndexDestroyed(IRosterIndex *AIndex);
   void onDelayedDataChanged();
 private:
-  struct StreamItem {
-    IRoster *roster;
-    IPresence *presence;
-    IRosterIndex *root;
-  };
+  IRosterPlugin *FRosterPlugin;
+  IPresencePlugin *FPresencePlugin;
+  IAccountManager *FAccountManager;
+private:
   RosterIndex *FRootIndex;
-  QHash<QString,StreamItem> FStreams;
+  QHash<Jid,IRosterIndex *> FStreamsRoot;
   QSet<IRosterIndex *> FChangedIndexes;
   QList<IRosterIndexDataHolder *> FDataHolders;
 };

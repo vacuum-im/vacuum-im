@@ -141,7 +141,6 @@ private:
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
   IRostersModel *FRostersModel;
-  IRostersModelPlugin *FRostersModelPlugin;
   ISettingsPlugin *FSettingsPlugin;
   ITrayManager *FTrayManager;
   IAccountManager *FAccountManager;

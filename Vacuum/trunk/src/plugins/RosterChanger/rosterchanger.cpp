@@ -9,7 +9,7 @@
 RosterChanger::RosterChanger()
 {
   FRosterPlugin = NULL;
-  FRostersModelPlugin = NULL;
+  FRostersModel = NULL;
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
   FRostersView = NULL;
@@ -55,10 +55,10 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
+  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
   if (plugin)
   {
-    FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
+    FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
   }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
@@ -107,11 +107,6 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
 bool RosterChanger::initObjects()
 {
   FSystemIconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-
-  if (FRostersModelPlugin)
-  {
-    FRostersModel = FRostersModelPlugin->rostersModel();
-  }
 
   if (FRostersViewPlugin)
   {
@@ -614,8 +609,8 @@ void RosterChanger::onRemoveItemFromRoster(bool)
         data.insert(RDR_Type,RIT_Contact);
         data.insert(RDR_Type,RIT_Agent);
         data.insert(RDR_BareJid,rosterJid.pBare());
-        IRosterIndex *streamRoot = FRostersModel->getStreamRoot(streamJid);
-        IRosterIndexList indexList = streamRoot->findChild(data,true);
+        IRosterIndex *streamIndex = FRostersModel->streamRoot(streamJid);
+        IRosterIndexList indexList = streamIndex->findChild(data,true);
         foreach(IRosterIndex *index, indexList)
           FRostersModel->removeRosterIndex(index);
       }

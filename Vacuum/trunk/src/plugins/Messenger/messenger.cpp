@@ -35,7 +35,7 @@ Messenger::Messenger()
   FRostersView = NULL;
   FRostersViewPlugin = NULL;
   FRostersModel = NULL;
-  FRostersModelPlugin = NULL;
+  FRostersModel = NULL;
   FTrayManager = NULL;
   FSettingsPlugin = NULL;
 
@@ -83,9 +83,9 @@ bool Messenger::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
+  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
   if (plugin) 
-    FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
+    FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin) 
@@ -124,11 +124,6 @@ bool Messenger::initObjects()
   insertMessageHandler(FMessageHandler,MHO_MESSENGER);
   insertMessageWriter(this,MWO_MESSENGER);
   insertMessageWriter(this,MWO_MESSENGER_ANCHORS);
-
-  if (FRostersModelPlugin)
-  {
-    FRostersModel = FRostersModelPlugin->rostersModel();
-  }
 
   if (FRostersViewPlugin)
   {

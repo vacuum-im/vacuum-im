@@ -77,7 +77,7 @@ protected slots:
 private:
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
-  IRostersModelPlugin *FRostersModelPlugin;
+  IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
   ISettingsPlugin *FSettingsPlugin;
   ISkinManager *FSkinManager;

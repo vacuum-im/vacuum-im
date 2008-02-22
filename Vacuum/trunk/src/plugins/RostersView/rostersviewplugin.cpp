@@ -19,7 +19,7 @@
 
 RostersViewPlugin::RostersViewPlugin()
 {
-  FRostersModelPlugin = NULL;
+  FRostersModel = NULL;
   FMainWindowPlugin = NULL;
   FSettingsPlugin = NULL;
   FSettings = NULL;
@@ -56,10 +56,10 @@ void RostersViewPlugin::pluginInfo(PluginInfo *APluginInfo)
 
 bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
   if (plugin)
   {
-    FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
+    FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
   }
 
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
@@ -104,7 +104,7 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
    }
   }
 
-  return FRostersModelPlugin!=NULL && FMainWindowPlugin!=NULL;
+  return FRostersModel!=NULL && FMainWindowPlugin!=NULL;
 }
 
 bool RostersViewPlugin::initObjects()
@@ -147,9 +147,9 @@ bool RostersViewPlugin::initObjects()
     FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction,AG_ROSTERSVIEW_MWTTB,false);
   }
 
-  if (FRostersModelPlugin && FRostersModelPlugin->rostersModel())
+  if (FRostersModel)
   {
-    FRostersView->setModel(FRostersModelPlugin->rostersModel());
+    FRostersView->setModel(FRostersModel);
     FSortFilterProxyModel = new SortFilterProxyModel(this);
     FSortFilterProxyModel->setDynamicSortFilter(true);
     FRostersView->addProxyModel(FSortFilterProxyModel);

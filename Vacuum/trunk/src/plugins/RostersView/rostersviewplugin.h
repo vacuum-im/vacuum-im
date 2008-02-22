@@ -79,7 +79,7 @@ protected slots:
   void onOptionsRejected();
 private:
   IRosterPlugin *FRosterPlugin;
-  IRostersModelPlugin *FRostersModelPlugin;
+  IRostersModel *FRostersModel;
   IMainWindowPlugin *FMainWindowPlugin;
   ISettings *FSettings;
   ISettingsPlugin *FSettingsPlugin;

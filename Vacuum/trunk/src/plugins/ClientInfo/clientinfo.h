@@ -125,7 +125,7 @@ private:
   IPresencePlugin *FPresencePlugin;
   IStanzaProcessor *FStanzaProcessor;
   IRostersViewPlugin *FRostersViewPlugin;
-  IRostersModelPlugin *FRostersModelPlugin;
+  IRostersModel *FRostersModel;
   ISettingsPlugin *FSettingsPlugin;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
   IServiceDiscovery *FDiscovery;

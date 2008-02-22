@@ -12,6 +12,7 @@
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/iaccountmanager.h"
+#include "../../interfaces/ipresence.h"
 #include "../../utils/skin.h"
 #include "edituserslistdialog.h"
 #include "ui_multiuserchatwindow.h"

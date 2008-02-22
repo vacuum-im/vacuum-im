@@ -27,7 +27,6 @@ StatusChanger::StatusChanger()
   FRostersView = NULL;
   FRostersViewPlugin = NULL;
   FRostersModel = NULL;
-  FRostersModelPlugin = NULL;
   FTrayManager = NULL;
   FSettingsPlugin = NULL;
   FEditStatusAction = NULL;
@@ -96,9 +95,16 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
   
-  plugin = APluginManager->getPlugins("IRostersModelPlugin").value(0,NULL);
+  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
   if (plugin)
-    FRostersModelPlugin = qobject_cast<IRostersModelPlugin *>(plugin->instance());
+  {
+    FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+    if (FRostersModel)
+    {
+      connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
+        SLOT(onStreamJidChanged(const Jid &, const Jid &)));
+    }
+  }
 
   plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
   if (plugin)
@@ -176,13 +182,6 @@ bool StatusChanger::initObjects()
     FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,FRosterIconset->iconByName("connecting"));
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
-  }
-
-  if (FRostersModelPlugin)
-  {
-    FRostersModel = FRostersModelPlugin->rostersModel();
-    connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
-      SLOT(onStreamJidChanged(const Jid &, const Jid &)));
   }
 
   if (FTrayManager)
@@ -593,7 +592,7 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
 
     if (FRostersView && FRostersModel)
     {
-      IRosterIndex *index = FRostersModel->getStreamRoot(APresence->streamJid());
+      IRosterIndex *index = FRostersModel->streamRoot(APresence->streamJid());
       if (index)
       {
         if (APresence->show() == IPresence::Error)
@@ -826,7 +825,7 @@ void StatusChanger::insertConnectingLabel(IPresence *APresence)
 {
   if (FRostersModel && FRostersView)
   {
-    IRosterIndex *index = FRostersModel->getStreamRoot(APresence->xmppStream()->jid());
+    IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->jid());
     if (index)
       FRostersView->insertIndexLabel(FConnectingLabel,index);
   }
@@ -836,7 +835,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 {
   if (FRostersModel && FRostersView)
   {
-    IRosterIndex *index = FRostersModel->getStreamRoot(APresence->xmppStream()->jid());
+    IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->jid());
     if (index)
       FRostersView->removeIndexLabel(FConnectingLabel,index);
   }

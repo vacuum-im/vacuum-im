@@ -81,7 +81,6 @@ protected slots:
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 private:
   IRosterPlugin *FRosterPlugin;
-  IRostersModelPlugin *FRostersModelPlugin;
   IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
   IRostersView *FRostersView;
