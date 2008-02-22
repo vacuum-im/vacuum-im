@@ -53,9 +53,9 @@ void Account::setActive(bool AActive)
   else if (!AActive && FXmppStream!=NULL)
   {
     FXmppStreams->removeStream(FXmppStream);
+    emit changed(AVN_ACTIVE,false);
     FXmppStreams->destroyStream(FXmppStream->jid());
     FXmppStream = NULL;
-    emit changed(AVN_ACTIVE,false);
   }
 }
 
