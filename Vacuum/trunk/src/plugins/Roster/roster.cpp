@@ -35,7 +35,6 @@ bool Roster::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &ASt
       bool removeOld = false;
       if (FOpenId == AStanza.id())
       {
-        FOpenId.clear();
         FOpen = true;
         removeOld = true;
         emit opened();
@@ -82,8 +81,6 @@ void Roster::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
 {
   if (AStanza.id() == FGroupDelimId)
   {
-    FGroupDelimId.clear();
-
     QString groupDelim;
     if (AStanza.type() == "result")
       groupDelim = AStanza.firstElement("query","jabber:iq:private").firstChildElement("roster").text();
@@ -500,8 +497,6 @@ void Roster::onStreamClosed(IXmppStream * /*AXmppStream*/)
     FOpen = false;
     emit closed();
   }
-  FOpenId.clear();
-  FGroupDelimId.clear();
 }
 
 void Roster::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter)
