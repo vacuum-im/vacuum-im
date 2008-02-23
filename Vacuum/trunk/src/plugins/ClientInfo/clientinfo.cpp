@@ -637,7 +637,8 @@ void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   {
     Jid streamJid = AIndex->data(RDR_StreamJid).toString();
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
-    if (presence && presence->xmppStream()->isOpen() && AIndex->data(RDR_Show).toInt() == IPresence::Offline)
+    if (presence && presence->xmppStream()->isOpen() && AIndex->data(RDR_Show).toInt() == IPresence::Offline
+      && !FDiscovery->discoInfo(AIndex->data(RDR_Jid).toString()).features.contains(NS_JABBER_LAST))
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Last activity"));

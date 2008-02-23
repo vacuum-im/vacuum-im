@@ -780,7 +780,9 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const QPair<J
     elem = query.firstChildElement("feature");
     while (!elem.isNull())
     {
-      result.features.append(elem.attribute("var"));
+      QString feature = elem.attribute("var");
+      if (!feature.isEmpty() && !result.features.contains(feature))
+        result.features.append(feature);
       elem = elem.nextSiblingElement("feature");
     }
   }
