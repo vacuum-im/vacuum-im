@@ -31,4 +31,5 @@ SUBDIRS = settings \
           bookmarks \
           registration \
           commands \
-          jabbersearch
+          jabbersearch \
+          gateways

@@ -17,6 +17,7 @@
 #define NS_JABBER_REGISTER                      "jabber:iq:register"
 #define NS_JABBER_OOB                           "jabber:x:oob"
 #define NS_JABBER_SEARCH                        "jabber:iq:search"
+#define NS_JABBER_GATEWAY                       "jabber:iq:gateway"
 
 #define NS_VCARD_TEMP                           "vcard-temp"
 #define NS_STORAGE_BOOKMARKS                    "storage:bookmarks"

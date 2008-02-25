@@ -20,6 +20,7 @@
 //RostersView (ContextMenu)
 #define AG_MESSENGER                                            200
 #define AG_STATUSCHANGER_ROSTER                                 300
+#define AG_GATEWAYS_LOGIN_ROSTER                                350
 #define AG_CLIENTINFO_ROSTER                                    400
 #define AG_DISCOVERY_ROSTER_FEATURES                            400
 #define AG_ROSTERCHANGER_ROSTER_ADD_CONTACT                     500
@@ -28,6 +29,7 @@
 #define AG_VCARD_ROSTER                                         500
 #define AG_DISCOVERY_ROSTER                                     500
 #define AG_MULTIUSERCHAT_ROSTER                                 500
+#define AG_GATEWAYS_RESOLVE_ROSTER                              500
 #define AG_ROSTERCHANGER_ROSTER_SUBSCRIPTION                    700
 #define AG_ROSTERCHANGER_ROSTER                                 700
 
