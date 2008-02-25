@@ -39,6 +39,7 @@ signals:
   virtual void presenceOpened(IPresence *APresence);
   virtual void presenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriotity);
   virtual void presenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
+  virtual void presenceSent(IPresence *APresence, const Jid &AContactJid, int AShow, const QString &AStatus, int APriotity);
   virtual void presenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus);
   virtual void presenceClosed(IPresence *APresence);
   virtual void presenceRemoved(IPresence *APresence);
@@ -46,6 +47,7 @@ protected slots:
   void onPresenceOpened();
   void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
   void onPresenceReceived(const IPresenceItem &APresenceItem);
+  void onPresenceSent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
   void onPresenceAboutToClose(int AShow, const QString &AStatus);
   void onPresenceClosed();
   void onPresenceDestroyed(QObject *AObject);

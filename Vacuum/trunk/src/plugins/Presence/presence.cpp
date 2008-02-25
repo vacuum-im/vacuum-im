@@ -193,6 +193,48 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
   return false; 
 }
 
+bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority)
+{
+  if (FXmppStream->isOpen() && AContactJid.isValid() && AContactJid!=FXmppStream->jid().domane())
+  {
+    QString show;
+    switch (AShow)
+    {
+    case Online: show = ""; break; 
+    case Chat: show = "chat"; break; 
+    case Away: show = "away"; break;
+    case DoNotDistrib: show = "dnd"; break; 
+    case ExtendedAway: show = "xa"; break;
+    case Invisible: show=""; break;
+    case Offline: show=""; break;
+    default: return false;
+    }
+
+    Stanza pres("presence");
+    pres.setTo(AContactJid.eFull());
+    if (AShow == Invisible)
+      pres.setType("invisible");
+    else if (AShow == Offline)
+      pres.setType("unavailable");
+    else
+    {
+      if (!show.isEmpty())
+        pres.addElement("show").appendChild(pres.createTextNode(show));
+      pres.addElement("priority").appendChild(pres.createTextNode(QString::number(APriority)));  
+    } 
+
+    if (!AStatus.isEmpty()) 
+      pres.addElement("status").appendChild(pres.createTextNode(AStatus));
+
+    if (FStanzaProcessor->sendStanzaOut(FXmppStream->jid(), pres))
+    {
+      emit sent(AContactJid,AShow,AStatus,APriority);
+      return true;
+    }
+  }
+  return false;
+}
+
 void Presence::clearItems()
 {
   QList<Jid> items = FItems.keys();

@@ -41,12 +41,14 @@ public:
   virtual int priority() const =0;
   virtual bool setPriority(int APriority) =0;
   virtual bool setPresence(int AShow, const QString &AStatus, int APriority) =0;
+  virtual bool sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority) =0;
   virtual IPresenceItem presenceItem(const Jid &AItemJid) const =0;
   virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid()) const =0;
 signals:
   virtual void opened() =0;
   virtual void changed(int AShow, const QString &AStatus, int APriority) =0;
   virtual void received(const IPresenceItem &APresenceItem) =0;
+  virtual void sent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority) =0;
   virtual void aboutToClose(int AShow, const QString &AStatus) =0;
   virtual void closed() =0;
 };
@@ -68,6 +70,7 @@ signals:
   virtual void presenceOpened(IPresence *APresence) =0;
   virtual void presenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority) =0;
   virtual void presenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem) =0;
+  virtual void presenceSent(IPresence *APresence, const Jid &AContactJid, int AShow, const QString &AStatus, int APriotity) =0;
   virtual void presenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus) =0;
   virtual void presenceClosed(IPresence *APresence) =0;
   virtual void presenceRemoved(IPresence *APresence) =0;
