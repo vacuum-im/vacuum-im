@@ -348,9 +348,9 @@ IRosterIndexList RostersModel::getContactIndexList(const Jid &AStreamJid, const 
     {
       IRosterIndex *group;
       if (type == RIT_MyResource)
-        group = createGroup(myResourcesGroupName(),"",RIT_MyResourcesGroup,streamIndex);
+        group = createGroup(myResourcesGroupName(),"::",RIT_MyResourcesGroup,streamIndex);
       else
-        group = createGroup(notInRosterGroupName(),"",RIT_NotInRosterGroup,streamIndex);
+        group = createGroup(notInRosterGroupName(),"::",RIT_NotInRosterGroup,streamIndex);
       IRosterIndex *index = createRosterIndex(type,AContactJid.pFull(),group);
       index->setData(RDR_Jid,AContactJid.full());
       index->setData(RDR_PJid,AContactJid.pFull());
