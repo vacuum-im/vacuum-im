@@ -1,11 +1,11 @@
 #include <QApplication>
-#include <QTimer>
-#include "PluginManager.h"
+#include "pluginmanager.h"
 
 int main(int argc, char *argv[])
 {
   QApplication app(argc, argv);
   app.setQuitOnLastWindowClosed(false);
+  app.addLibraryPath(app.applicationDirPath());
   PluginManager pm(&app);
   pm.loadPlugins();
   pm.initPlugins();

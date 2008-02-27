@@ -219,25 +219,25 @@ void PluginManager::startPlugins()
 bool PluginManager::unloadPlugin(const QUuid &AUuid)
 {
   PluginItem *pluginItem = getPluginItem(AUuid);
-
-  if (!pluginItem)
-    return false;
-
-  QUuid uuid;
-  QList<QUuid> depends = getDependencesOn(AUuid);
-  foreach(uuid, depends)
+  if (pluginItem)
   {
-    PluginItem *depend = getPluginItem(uuid);
-    if (depend)
+    QUuid uuid;
+    QList<QUuid> depends = getDependencesOn(AUuid);
+    foreach(uuid, depends)
     {
-      qDebug() << "UNLOADING PLUGIN: Depends on unloading plugin" << depend->info()->name;
-      FPluginItems.removeAt(FPluginItems.indexOf(depend));  
-      delete depend;
+      PluginItem *depend = getPluginItem(uuid);
+      if (depend)
+      {
+        qDebug() << "UNLOADING PLUGIN: Depends on unloading plugin" << depend->info()->name;
+        FPluginItems.removeAt(FPluginItems.indexOf(depend));  
+        delete depend;
+      }
     }
+    qDebug() << "Unloading plugin:" << pluginItem->info()->name;
+    FPluginItems.removeAt(FPluginItems.indexOf(pluginItem)); 
+    FPlugins.clear();
+    delete pluginItem;
   }
-  qDebug() << "Unloading plugin:" << pluginItem->info()->name;
-  FPluginItems.removeAt(FPluginItems.indexOf(pluginItem)); 
-  delete pluginItem;
   return true;
 }
 
