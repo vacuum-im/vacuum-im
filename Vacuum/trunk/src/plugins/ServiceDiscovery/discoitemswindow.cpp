@@ -110,8 +110,8 @@ void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
   else
     updateDiscoItems(FDiscovery->discoItems(AContactJid,ANode));
 
-  treeItem->setExpanded(true);
   ui.trwItems->setCurrentItem(treeItem);
+  treeItem->setExpanded(true);
 }
 
 void DiscoItemsWindow::initialize()
@@ -149,7 +149,7 @@ void DiscoItemsWindow::requestDiscoItems(const Jid AContactJid, const QString &A
 
 QTreeWidgetItem *DiscoItemsWindow::createTreeItem(const IDiscoItem &ADiscoItem, QTreeWidgetItem *AParent)
 {
-  QTreeWidgetItem *treeItem = new QTreeWidgetItem();
+  QTreeWidgetItem *treeItem = new QTreeWidgetItem;
   treeItem->setText(CNAME, ADiscoItem.name.isEmpty() ? ADiscoItem.itemJid.full() : ADiscoItem.name);
   treeItem->setText(CJID, ADiscoItem.itemJid.full());
   treeItem->setText(CNODE, ADiscoItem.node);
