@@ -12,6 +12,7 @@ public:
   virtual QObject *instance() =0;
   virtual void resolveNickName(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual void sendLogPresence(const Jid &AStreamJid, const Jid &AServiceJid, bool ALogIn) =0;
+  virtual void setKeepConnection(const Jid &AStreamJid, const Jid &AServiceJid, bool AEnabled) =0;
   virtual QString sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJid) =0;
   virtual QString sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID) =0;
   virtual QDialog *showAddLegacyContactDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL) =0;

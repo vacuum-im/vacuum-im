@@ -1,6 +1,8 @@
 #ifndef GATEWAYS_H
 #define GATEWAYS_H
 
+#include <QSet>
+#include <QTimer>
 #include "../../definations/namespaces.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/discofeatureorder.h"
@@ -14,6 +16,7 @@
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/ivcard.h"
+#include "../../interfaces/iprivatestorage.h"
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 #include "../../utils/action.h"
@@ -48,6 +51,7 @@ public:
   //IGateways
   virtual void resolveNickName(const Jid &AStreamJid, const Jid &AContactJid);
   virtual void sendLogPresence(const Jid &AStreamJid, const Jid &AServiceJid, bool ALogIn);
+  virtual void setKeepConnection(const Jid &AStreamJid, const Jid &AServiceJid, bool AEnabled);
   virtual QString sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJid);
   virtual QString sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID);
   virtual QDialog *showAddLegacyContactDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
@@ -57,13 +61,19 @@ signals:
   virtual void errorReceived(const QString &AId, const QString &AError);
 protected:
   void registerDiscoFeatures();
+  void savePrivateStorageKeep(const Jid &AStreamJid);
 protected slots:
   void onGatewayActionTriggered(bool);
   void onLogActionTriggered(bool);
   void onResolveActionTriggered(bool);
+  void onKeepActionTriggered(bool);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onPresenceOpened(IPresence *APresence);
+  void onPresenceRemoved(IPresence *APresence);
+  void onKeepTimerTimeout();
   void onVCardReceived(const Jid &AContactJid);
   void onVCardError(const Jid &AContactJid, const QString &AError);
+  void onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 private:
   IServiceDiscovery *FDiscovery;
   IStanzaProcessor *FStanzaProcessor;
@@ -72,10 +82,16 @@ private:
   IRosterChanger *FRosterChanger;
   IRostersViewPlugin *FRostersViewPlugin;
   IVCardPlugin *FVCardPlugin;
+  IPrivateStorage *FPrivateStorage;
 private:
+  QTimer FKeepTimer;
+private:
+  QString FKeepRequest;
   QList<QString> FPromptRequests;
   QList<QString> FUserJidRequests;
   QMultiHash<Jid,Jid> FResolveNicks;
+  QMultiHash<IPresence *, Jid> FKeepConnections;
+  QHash<Jid, QSet<Jid> > FPrivateStorageKeep;
 };
 
 #endif // GATEWAYS_H
