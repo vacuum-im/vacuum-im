@@ -88,6 +88,7 @@ public:
 class IDiscoItemsWindow
 {
 public:
+  virtual QWidget *instance() =0;
   virtual Jid streamJid() const =0;
   virtual ToolBarChanger *toolBarChanger() const =0;
   virtual ToolBarChanger *actionsBarChanger() const =0;

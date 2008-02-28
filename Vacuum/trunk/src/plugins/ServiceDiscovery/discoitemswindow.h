@@ -18,6 +18,7 @@ class DiscoItemsWindow :
 public:
   DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QWidget *AParent = NULL);
   ~DiscoItemsWindow();
+  virtual QWidget *instance() { return this; }
   virtual Jid streamJid() const { return FStreamJid; }
   virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
   virtual ToolBarChanger *actionsBarChanger() const { return FActionsBarChanger; }
