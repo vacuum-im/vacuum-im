@@ -7,16 +7,17 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/discofeatureorder.h"
 #include "../../definations/vcardvaluenames.h"
+#include "../../definations/discotreeitemsdataroles.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/igateways.h"
 #include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/ivcard.h"
 #include "../../interfaces/iprivatestorage.h"
+#include "../../interfaces/istatusicons.h"
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 #include "../../utils/action.h"
@@ -51,7 +52,11 @@ public:
   //IGateways
   virtual void resolveNickName(const Jid &AStreamJid, const Jid &AContactJid);
   virtual void sendLogPresence(const Jid &AStreamJid, const Jid &AServiceJid, bool ALogIn);
+  virtual QList<Jid> keepConnections(const Jid &AStreamJid) const;
   virtual void setKeepConnection(const Jid &AStreamJid, const Jid &AServiceJid, bool AEnabled);
+  virtual QList<Jid> streamServices(const Jid &AStreamJid, const IDiscoIdentity &AIdentity = IDiscoIdentity()) const;
+  virtual QList<Jid> serviceContacts(const Jid &AStreamJid, const Jid &AServiceJid) const;
+  virtual bool changeService(const Jid &AStreamJid, const Jid &AServiceFrom, const Jid &AServiceTo, bool ARemove, bool ASubscribe);
   virtual QString sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJid);
   virtual QString sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID);
   virtual QDialog *showAddLegacyContactDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
@@ -67,13 +72,20 @@ protected slots:
   void onLogActionTriggered(bool);
   void onResolveActionTriggered(bool);
   void onKeepActionTriggered(bool);
+  void onChangeActionTriggered(bool);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onPresenceOpened(IPresence *APresence);
+  void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
+  void onPresenceClosed(IPresence *APresence);
   void onPresenceRemoved(IPresence *APresence);
+  void onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText);
+  void onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
   void onKeepTimerTimeout();
   void onVCardReceived(const Jid &AContactJid);
   void onVCardError(const Jid &AContactJid, const QString &AError);
   void onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+  void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
+  void onDiscoItemContextMenu(QTreeWidgetItem *ATreeItem, Menu *AMenu);
 private:
   IServiceDiscovery *FDiscovery;
   IStanzaProcessor *FStanzaProcessor;
@@ -83,14 +95,17 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   IVCardPlugin *FVCardPlugin;
   IPrivateStorage *FPrivateStorage;
+  IStatusIcons *FStatusIcons;
 private:
   QTimer FKeepTimer;
 private:
   QString FKeepRequest;
   QList<QString> FPromptRequests;
   QList<QString> FUserJidRequests;
-  QMultiHash<Jid,Jid> FResolveNicks;
-  QMultiHash<IPresence *, Jid> FKeepConnections;
+  QMultiHash<Jid, Jid> FResolveNicks;
+  QMultiHash<Jid, Jid> FSubscribeServices;
+  QMultiHash<Jid, Jid> FSubscribeContacts;
+  QMultiHash<Jid, Jid> FKeepConnections;
   QHash<Jid, QSet<Jid> > FPrivateStorageKeep;
 };
 
