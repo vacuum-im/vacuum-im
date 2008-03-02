@@ -180,7 +180,7 @@ bool ServiceDiscovery::editStanza(int AHandlerId, const Jid &/*AStreamJid*/, Sta
     if (FCapsHash.isEmpty())
       FCapsHash = calcCapsHash(selfDiscoInfo()).toBase64();
     QDomElement capsElem = AStanza->addElement("c",NS_CAPS);
-    capsElem.setAttribute("node","http://vacuum/#0.0.0");
+    capsElem.setAttribute("node","http://"CLIENT_NAME"/#"CLIENT_VERSION);
     capsElem.setAttribute("ver",FCapsHash);
     capsElem.setAttribute("hash","sha-1");
   }
@@ -1068,9 +1068,12 @@ void ServiceDiscovery::onStreamStateChanged(const Jid &AStreamJid, bool AStateOn
     FDiscoMenu->setEnabled(true);
 
     if (!hasDiscoInfo(AStreamJid.domane()))
-      requestDiscoInfo(AStreamJid,AStreamJid.domane());
-    if (!hasDiscoItems(AStreamJid.domane()))
-      requestDiscoItems(AStreamJid,AStreamJid.domane());
+    {
+      QueuedRequest request;
+      request.streamJid = AStreamJid;
+      request.contactJid = AStreamJid.domane();
+      appendQueuedRequest(QUEUE_REQUEST_START,request);
+    }
 
     IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
     QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
@@ -1267,6 +1270,9 @@ void ServiceDiscovery::onShowDiscoItemsByAction(bool)
 
 void ServiceDiscovery::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
+  if (ADiscoInfo.contactJid==ADiscoInfo.streamJid.domane() && !hasDiscoItems(ADiscoInfo.contactJid))
+    requestDiscoItems(ADiscoInfo.streamJid,ADiscoInfo.contactJid);
+
   QueuedRequest request;
   request.contactJid = ADiscoInfo.contactJid;
   request.node = ADiscoInfo.node;

@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QTimer>
 #include <QMultiMap>
+#include "../../definations/version.h"
 #include "../../definations/namespaces.h"
 #include "../../definations/initorders.h"
 #include "../../definations/rosterindextyperole.h"
