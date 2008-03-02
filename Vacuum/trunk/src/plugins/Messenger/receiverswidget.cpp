@@ -109,9 +109,7 @@ void ReceiversWidget::initialize()
 
   plugin = FMessenger->pluginManager()->getPlugins("IStatusIcons").value(0,NULL);
   if (plugin)
-  {
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
-  }
 
   if (FRoster && FPresence)
     createRosterTree();
@@ -169,24 +167,25 @@ void ReceiversWidget::createRosterTree()
 {
   onSelectNoneClicked();
   disconnect(ui.trwReceivers,SIGNAL(itemChanged(QTreeWidgetItem *,int)),this,SLOT(onReceiversItemChanged(QTreeWidgetItem *,int)));
+  
   ui.trwReceivers->clear();
   FGroupItems.clear();
   FContactItems.clear();
   ui.trwReceivers->setColumnCount(2);
   ui.trwReceivers->setIndentation(10);
   ui.trwReceivers->setHeaderLabels(QStringList() << tr("Contact") << tr("Jid"));
+  
   QString groupDelim = FRoster->groupDelimiter();
   QList<IRosterItem> ritems = FRoster->rosterItems();
   foreach (IRosterItem ritem, ritems)
   {
-    QSet<QString> groups = ritem.groups;
+    QSet<QString> groups;
     if (ritem.itemJid.node().isEmpty())
-    {
-      groups.clear();
       groups.insert(tr("Agents"));
-    }
-    else if (groups.isEmpty())
+    else if (ritem.groups.isEmpty())
       groups.insert(tr("Blank group"));
+    else
+      groups = ritem.groups;
 
     foreach(QString group,groups)
     {
@@ -196,12 +195,15 @@ void ReceiversWidget::createRosterTree()
       QList<IPresenceItem> pitems = FPresence->presenceItems(ritem.itemJid);
       foreach(IPresenceItem pitem,pitems)
         itemJids.append(pitem.itemJid);
+
       if (itemJids.isEmpty())
         itemJids.append(ritem.itemJid);
+
       foreach(Jid itemJid, itemJids)
       {
-        QString name = itemJid.resource().isEmpty() ? ritem.name : ritem.name+"/"+itemJid.resource();
-        QTreeWidgetItem *contactItem = getReceiver(itemJid,name,groupItem);
+        QString bareName = !ritem.name.isEmpty() ? ritem.name : ritem.itemJid.bare();
+        QString fullName = itemJid.resource().isEmpty() ? bareName : bareName+"/"+itemJid.resource();
+        QTreeWidgetItem *contactItem = getReceiver(itemJid,fullName,groupItem);
         contactItem->setCheckState(0, Qt::Unchecked);
       }
     }
@@ -220,6 +222,7 @@ void ReceiversWidget::createRosterTree()
   ui.trwReceivers->sortItems(0,Qt::AscendingOrder);
   ui.trwReceivers->header()->setResizeMode(0,QHeaderView::ResizeToContents);
   ui.trwReceivers->setSelectionMode(QAbstractItemView::NoSelection);
+  ui.trwReceivers->setSelectionBehavior(QAbstractItemView::SelectRows);
   connect(ui.trwReceivers,SIGNAL(itemChanged(QTreeWidgetItem *,int)),SLOT(onReceiversItemChanged(QTreeWidgetItem *,int)));
 }
 

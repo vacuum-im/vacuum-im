@@ -402,14 +402,14 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
     ClientInfoDialog *dialog = FClientInfoDialogs.value(AContactJid,NULL);
     if (!dialog)
     {
-      QString contactName = AContactJid.node();
+      QString contactName = !AContactJid.node().isEmpty() ? AContactJid.node() : FDiscovery->discoInfo(AContactJid).identity.value(0).name;
       if (FRosterPlugin)
       {
         IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
         if (roster)
         {
           IRosterItem ritem = roster->rosterItem(AContactJid);
-          if (ritem.isValid)
+          if (!ritem.name.isEmpty())
             contactName = ritem.name;
         }
       }
