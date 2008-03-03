@@ -48,7 +48,9 @@ public:
   virtual QList<IRosterItem> groupItems(const QString &AGroup) const =0;
   virtual QSet<QString> itemGroups(const Jid &AItemJid) const =0;
   virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups) =0;
+  virtual void setItems(const QList<IRosterItem> &AItems) =0;
   virtual void removeItem(const Jid &AItemJid) =0;
+  virtual void removeItems(const QList<IRosterItem> &AItems) =0;
   virtual void saveRosterItems(const QString &AFileName) const =0;
   virtual void loadRosterItems(const QString &AFileName) =0;
   //Operations  on subscription

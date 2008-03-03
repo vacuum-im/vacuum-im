@@ -35,8 +35,10 @@ public:
   virtual QList<IRosterItem> groupItems(const QString &AGroup) const;
   virtual QSet<QString> itemGroups(const Jid &AItemJid) const;
   virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups);
+  virtual void setItems(const QList<IRosterItem> &AItems);
   virtual void sendSubscription(const Jid &AItemJid, int AType, const QString &AText = QString()); 
   virtual void removeItem(const Jid &AItemJid);
+  virtual void removeItems(const QList<IRosterItem> &AItems);
   virtual void saveRosterItems(const QString &AFileName) const;
   virtual void loadRosterItems(const QString &AFileName);
   //Operations on items
