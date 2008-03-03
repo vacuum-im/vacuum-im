@@ -58,7 +58,8 @@ protected:
     SS_CONNECTING, 
     SS_INITIALIZE, 
     SS_FEATURES, 
-    SS_ONLINE 
+    SS_ONLINE,
+    SS_ERROR
   }; 
   void startStream();
   IStreamFeature *getFeature(const QString &AFeatureNS);
@@ -70,6 +71,8 @@ protected:
   bool hookFeatureElement(QDomElement *AElem, IStreamFeature::Direction ADirection);
   qint64 sendData(const QByteArray &AData);
   QByteArray receiveData(qint64 ABytes);
+  void abortStream(const QString &AError);
+  void showInConsole(const QDomElement &AElem, IStreamFeature::Direction ADirection);
 protected slots:
   //IStreamConnection
   void onConnectionConnected();
@@ -77,7 +80,7 @@ protected slots:
   void onConnectionDisconnected();
   void onConnectionError(const QString &AErrStr);
   //StreamParser
-  void onParserOpen(const QDomElement &AElem);
+  void onParserOpened(const QDomElement &AElem);
   void onParserElement(const QDomElement &AElem);
   void onParserClosed();
   void onParserError(const QString &AErrStr);

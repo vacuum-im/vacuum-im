@@ -4,8 +4,9 @@
 StreamParser::StreamParser(QObject *AParent) : QObject(AParent)
 {
   FReader.setFeature("http://xml.org/sax/features/namespaces", false);
-  FReader.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
+  FReader.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
   FReader.setContentHandler(this);
+  FReader.setErrorHandler(this);
 }
 
 StreamParser::~StreamParser()
@@ -13,23 +14,29 @@ StreamParser::~StreamParser()
 
 }
 
-bool StreamParser::parceData(const QString &AData)
+void StreamParser::parseData(const QByteArray &AData)
 {
-  FSource.setData(AData); 
-  if (!FContinue)
-  { 
-    FContinue = true;
-    return FReader.parse(&FSource, true);
+  FSource.setData(AData);
+  bool parsed = FContinue ? FReader.parseContinue() : FReader.parse(&FSource, true);
+  if (!parsed)
+  {
+    qDebug() << "\nERROR PARSING DATA:" << AData;
+    emit error(FErrorString);
   }
-  return FReader.parseContinue();
 }
 
-void StreamParser::clear() 
+void StreamParser::restart() 
 {
-  FDoc.clear();
+  FContinue = false;
+}
+
+bool StreamParser::startDocument()
+{
   FLevel=0;
-  FContinue=false;
-  FSource.setData(QByteArray()); 
+  FDoc.clear();
+  FContinue = true;
+  FErrorString = tr("Unknown Parser Exception");
+  return true;
 }
 
 bool StreamParser::startElement(const QString &/*ANamespaceURI*/, const QString &/*ALocalName*/, 
@@ -48,7 +55,7 @@ bool StreamParser::startElement(const QString &/*ANamespaceURI*/, const QString 
   {
     FElement = newElement;
     FDoc.appendChild(FElement);
-    emit open(FDoc.documentElement());
+    emit opened(FDoc.documentElement());
   } 
   else if (FLevel == 1)
   { 
@@ -66,35 +73,47 @@ bool StreamParser::startElement(const QString &/*ANamespaceURI*/, const QString 
 bool StreamParser::endElement(const QString &/*ANamespaceURI*/, const QString &/*ALocalName*/, const QString &/*AQName*/)
 {
   FLevel--;
-
-  if (FLevel < 0) 
-    return false;
-
   if (FLevel == 0)
-  {
     emit closed();
-    clear();
-  }
   else if (FLevel == 1)
-  {
     emit element(FDoc.documentElement());
-  }
+  else if (FLevel > 0)
+    FElement = FElement.parentNode().toElement();
   else 
   {
-    FElement = FElement.parentNode().toElement();
+    FErrorString = tr("Unexpected end of element");
+    return false;
   }
-
   return true;
 }
 
 bool StreamParser::characters(const QString &AText)
 {
-  FElement.appendChild(FDoc.createTextNode(AText));   
+  FElement.appendChild(FDoc.createTextNode(AText));
+  return true;
+}
+
+bool StreamParser::endDocument()
+{
+  FContinue = false;
+  return true;
+}
+
+bool StreamParser::error(const QXmlParseException &AException)
+{
+  FErrorString = AException.message();
+  return false;
+}
+
+bool StreamParser::warning(const QXmlParseException &AException)
+{
+  qDebug() << "PARSER WARNING:" << AException.message();
   return true;
 }
 
 bool StreamParser::fatalError(const QXmlParseException &AException)
 {
-  emit error(AException.message());
+  FErrorString = AException.message();
   return false;
 }
+

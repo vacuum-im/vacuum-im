@@ -221,7 +221,6 @@ void XmppStreams::onStreamClosed(IXmppStream *AXmppStream)
 
 void XmppStreams::onStreamError(IXmppStream *AXmppStream, const QString &AErrStr)
 {
-  qDebug() << "Stream error" << AXmppStream->jid().full() << AErrStr; 
   emit error(AXmppStream,AErrStr);
 }
 
