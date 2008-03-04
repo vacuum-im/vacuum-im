@@ -1,13 +1,12 @@
 #ifndef STREAMPARSER_H
 #define STREAMPARSER_H
 
-#include <QObject>
+#include <QStack>
 #include <QDomDocument>
-#include <QXmlSimpleReader>
+#include <QXmlStreamReader>
 
 class StreamParser : 
-  public QObject,
-  public QXmlDefaultHandler
+  public QObject
 {
   Q_OBJECT;
 public:
@@ -21,24 +20,11 @@ signals:
   void error(const QString &AError);
   void closed();
 private:
-  //QXmlContentHandler
-  virtual bool startDocument();
-  virtual bool startElement(const QString &ANamespaceURI, const QString &ALocalName,const QString &AQName, const QXmlAttributes &AAttr);
-  virtual bool endElement(const QString &ANamespaceURI, const QString &ALocalName, const QString &AQName);
-  virtual bool characters(const QString &AText);
-  virtual bool endDocument();
-  //QXmlErrorHandler
-  virtual bool error(const QXmlParseException &AException);
-  virtual bool warning (const QXmlParseException & exception);
-  virtual bool fatalError(const QXmlParseException &AException);
-private:
-  bool FContinue;
   int FLevel;
-  QString FErrorString;
+  QStack<QString> FLevelNS;
   QDomDocument FDoc;
   QDomElement FElement;
-  QXmlSimpleReader FReader;
-  QXmlInputSource FSource;
+  QXmlStreamReader FReader;
 };
 
 #endif // STREAMPARSER_H

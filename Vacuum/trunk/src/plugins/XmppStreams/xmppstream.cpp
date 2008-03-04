@@ -420,12 +420,12 @@ void XmppStream::onParserElement(const QDomElement &AElem)
   QDomElement elem(AElem);
   if (!hookFeatureElement(&elem,IStreamFeature::DirectionIn))
   {
-    if(AElem.tagName() == "stream:error")
+    if(AElem.nodeName() == "stream:error")
     {
       ErrorHandler err(AElem,NS_XMPP_STREAMS);
       abortStream(err.message());
     } 
-    else if (FStreamState == SS_FEATURES && AElem.tagName() == "stream:features")
+    else if (FStreamState == SS_FEATURES && AElem.nodeName() == "stream:features")
     {
       if (!processFeatures(AElem))
       {
