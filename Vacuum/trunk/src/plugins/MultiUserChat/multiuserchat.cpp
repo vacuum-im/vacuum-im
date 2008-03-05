@@ -422,7 +422,6 @@ bool MultiUserChat::requestAffiliationList(const QString &AAffiliation)
     itemElem.setAttribute("affiliation",AAffiliation);
     if (FStanzaProcessor->sendIqStanza(this,FStreamJid,iq,MUC_LIST_TIMEOUT))
     {
-      emit chatNotify("",tr("Request for list of %1s was sent.").arg(AAffiliation));
       FAffilListRequests.insert(iq.id(),AAffiliation);
       return true;
     }
