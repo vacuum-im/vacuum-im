@@ -7,6 +7,7 @@
 #include <QVariant>
 #include "utilsexport.h"
 #include "stanza.h"
+#include "datetime.h"
 
 class MessageData :
   public QSharedData
@@ -37,15 +38,9 @@ protected:
       delayElem = FStanza.firstElement("x","jabber:x:delay");
     if (!delayElem.isNull())
     {
-      QDateTime datetime = QDateTime::fromString(delayElem.attribute("stamp"),"yyyyMMddThh:mm:ss");
-      if (!datetime.isValid())
-        datetime = QDateTime::fromString(delayElem.attribute("stamp"),Qt::ISODate);
-      if (datetime.isValid())
-      {
-        datetime.setTimeSpec(Qt::UTC);
-        datetime = datetime.toTimeSpec(Qt::LocalTime);
-        return datetime;
-      }
+      DateTime dateTime(delayElem.attribute("stamp"));
+      if (dateTime.isValid())
+        return dateTime.toUTCLocal();
     }
     return QDateTime::currentDateTime();
   }

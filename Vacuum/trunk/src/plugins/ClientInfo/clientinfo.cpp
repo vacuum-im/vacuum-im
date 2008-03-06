@@ -174,20 +174,13 @@ bool ClientInfo::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza 
   }
   else if (AHandlerId == FTimeHandler)
   {
-    QDateTime lcl = QDateTime::currentDateTime();
-    QDateTime utc = lcl.toUTC();
-    lcl.setTimeSpec(Qt::UTC);
-    int minToUtc = lcl<utc ? lcl.secsTo(utc)/60 : utc.secsTo(lcl)/60;
-    int hourToUtc = minToUtc/60;
-    minToUtc = minToUtc-(hourToUtc*60);
-    QString tzo = QString("%1%2:%3").arg(lcl<utc ? "-" : "+").arg(hourToUtc,2,10,QLatin1Char('0')).arg(minToUtc,2,10,QLatin1Char('0'));
-
     AAccept = true;
     Stanza iq("iq");
     iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
     QDomElement elem = iq.addElement("time",NS_XMPP_TIME);
-    elem.appendChild(iq.createElement("tzo")).appendChild(iq.createTextNode(tzo));
-    elem.appendChild(iq.createElement("utc")).appendChild(iq.createTextNode(utc.toString(Qt::ISODate)+"Z"));
+    DateTime dateTime(QDateTime::currentDateTime());
+    elem.appendChild(iq.createElement("tzo")).appendChild(iq.createTextNode(dateTime.toX85TZD()));
+    elem.appendChild(iq.createElement("utc")).appendChild(iq.createTextNode(dateTime.toX85Format(true,true,false)));
     FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
   }
   return false;
@@ -241,16 +234,13 @@ void ClientInfo::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
     QDomElement time = AStanza.firstElement("time");
     QString tzo = time.firstChildElement("tzo").text();
     QString utc = time.firstChildElement("utc").text();
+    if (utc.endsWith('Z')) 
+      utc.chop(1);
     if (AStanza.type() == "result" && !tzo.isEmpty() && !utc.isEmpty())
     {
       TimeItem &tItem = FTimeItems[contactJid];
-      tItem.tzoSecs = tzo.startsWith("-") ? 1 : -1;
-      tzo.remove(0,1);
-      QTime tzoT = QTime::fromString(tzo,"hh:mm");
-      QDateTime utcDT = QDateTime::fromString(utc,Qt::ISODate);
       tItem.ping = tItem.ping - QTime::currentTime().msecsTo(QTime(0,0,0,0));
-      tItem.tzoSecs =  tItem.tzoSecs * tzoT.secsTo(QTime(0,0,0));
-      tItem.utcSecs = utcDT.secsTo(QDateTime::currentDateTime().toUTC()) - tItem.ping/2000;
+      tItem.dateTime.setDateTime(utc+tzo);
     }
     else
       FTimeItems.remove(contactJid);
@@ -544,8 +534,7 @@ QDateTime ClientInfo::entityTime(const Jid &AContactJid) const
   if (hasEntityTime(AContactJid))
   {
     TimeItem tItem = FTimeItems.value(AContactJid);
-    QDateTime utc = QDateTime::currentDateTime().toUTC().addSecs(tItem.utcSecs).addSecs(tItem.tzoSecs);
-    return utc;
+    return tItem.dateTime.toLocal();
   }
   return QDateTime();
 }
@@ -553,7 +542,7 @@ QDateTime ClientInfo::entityTime(const Jid &AContactJid) const
 int ClientInfo::entityTimeDelta(const Jid &AContactJid) const
 {
   if (hasEntityTime(AContactJid))
-    return FTimeItems.value(AContactJid).utcSecs;
+    return FTimeItems.value(AContactJid).dateTime.toUTCLocal().secsTo(QDateTime::currentDateTime());
   return 0;
 }
 
@@ -761,7 +750,7 @@ void ClientInfo::onLastActivityChanged(const Jid &AContactJid)
   }
 }
 
-void ClientInfo::onEntityTimeChanged( const Jid &AContactJid )
+void ClientInfo::onEntityTimeChanged(const Jid &AContactJid)
 {
   IRosterIndexList indexList;
   QList<Jid> streamJids = FRostersModel->streams();

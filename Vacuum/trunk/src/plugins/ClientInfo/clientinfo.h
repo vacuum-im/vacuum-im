@@ -26,6 +26,7 @@
 #include "../../utils/stanza.h"
 #include "../../utils/menu.h"
 #include "../../utils/skin.h"
+#include "../../utils/datetime.h"
 #include "clientinfodialog.h"
 #include "optionswidget.h"
 
@@ -144,9 +145,8 @@ private:
   };
   struct TimeItem {
     TimeItem() { ping = -1; }
-    int tzoSecs;
-    int utcSecs;
     int ping;
+    DateTime dateTime;
   };
 private:
   OptionsWidget *FOptionsWidget;

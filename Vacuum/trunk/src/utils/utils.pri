@@ -12,7 +12,8 @@ HEADERS += utilsexport.h \
            skin.h \
            message.h \
            iconsetdelegate.h \
-           toolbarchanger.h
+           toolbarchanger.h \
+           datetime.h
 
 SOURCES += jid.cpp \
            versionparser.cpp \
@@ -27,4 +28,5 @@ SOURCES += jid.cpp \
            skin.cpp \
            message.cpp \
            iconsetdelegate.cpp \
-           toolbarchanger.cpp
+           toolbarchanger.cpp \
+           datetime.cpp
