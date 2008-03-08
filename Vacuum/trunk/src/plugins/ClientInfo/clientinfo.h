@@ -104,6 +104,7 @@ signals:
   virtual void lastActivityChanged(const Jid &AContactJid);
   virtual void entityTimeChanged(const Jid &AContactJid);
 protected:
+  Action *createInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, QObject *AParent) const;
   void deleteSoftwareDialogs(const Jid &AStreamJid);
   void registerDiscoFeatures();
 protected slots:
