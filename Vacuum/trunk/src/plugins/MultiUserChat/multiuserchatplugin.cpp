@@ -100,7 +100,6 @@ bool MultiUserChatPlugin::initObjects()
   FChatMenu = new Menu(NULL);
   FChatMenu->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
   FChatMenu->setTitle(tr("Conferences"));
-  connect(FChatMenu->menuAction(),SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
 
   FJoinAction = new Action(FChatMenu);
   FJoinAction->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
@@ -117,9 +116,11 @@ bool MultiUserChatPlugin::initObjects()
     connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
-  if (FMainWindowPlugin && FMainWindowPlugin->mainWindow())
+  if (FMainWindowPlugin)
   {
-    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FChatMenu->menuAction(),AG_MULTIUSERCHAT_MWTTB);
+    ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
+    QToolButton *button = changer->addToolButton(FChatMenu->menuAction(),AG_MULTIUSERCHAT_MWTTB);
+    button->setPopupMode(QToolButton::InstantPopup);
   }
   if (FTrayManager)
   {

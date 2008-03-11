@@ -107,7 +107,9 @@ bool BookMarks::initObjects()
   }
   if (FMainWindowPlugin)
   {
-    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FBookMarksMenu->menuAction(),AG_BOOKMARKS_MWTTB,false);
+    ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
+    QToolButton *button = changer->addToolButton(FBookMarksMenu->menuAction(),AG_BOOKMARKS_MWTTB,false);
+    button->setPopupMode(QToolButton::InstantPopup);
   }
   return true;
 }

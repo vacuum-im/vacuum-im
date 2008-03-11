@@ -166,7 +166,9 @@ bool ServiceDiscovery::initObjects()
   }
   if (FMainWindowPlugin)
   {
-    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FDiscoMenu->menuAction(),AG_DISCOVERY_MWTTB,false);
+    ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
+    QToolButton *button = changer->addToolButton(FDiscoMenu->menuAction(),AG_DISCOVERY_MWTTB,false);
+    button->setPopupMode(QToolButton::InstantPopup);
   }
 
   FDiscoMenu->setEnabled(false);
@@ -1259,12 +1261,6 @@ void ServiceDiscovery::onShowDiscoItemsByAction(bool)
     Jid contactJid = action->data(ADR_ContactJid).toString();
     QString node = action->data(ADR_Node).toString();
     showDiscoItems(streamJid,contactJid,node);
-    if (FDiscoMenu->actions(AG_DEFAULT).contains(action) && FDiscoMenu->defaultAction()!=action)
-    {
-      FDiscoMenu->menuAction()->disconnect(SIGNAL(triggered(bool)));
-      connect(FDiscoMenu->menuAction(),SIGNAL(triggered(bool)),action,SLOT(trigger()));
-      FDiscoMenu->setDefaultAction(action);
-    }
   }
 }
 
