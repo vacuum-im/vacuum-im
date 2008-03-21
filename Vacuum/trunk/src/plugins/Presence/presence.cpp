@@ -87,7 +87,6 @@ bool Presence::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &A
       emit changed(show,status,priority);
     }
     AAccept = true;
-    return true;
   }
   return false;
 }
