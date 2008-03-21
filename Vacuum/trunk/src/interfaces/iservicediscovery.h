@@ -14,6 +14,7 @@ struct IDiscoIdentity
 {
   QString category;
   QString type;
+  QString lang;
   QString name;
 };
 

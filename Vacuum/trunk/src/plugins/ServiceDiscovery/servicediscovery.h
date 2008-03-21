@@ -53,7 +53,7 @@ public:
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
-  virtual bool startPlugin() { return true; }
+  virtual bool startPlugin();
   //IStanzaHandler
   virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza * AStanza, bool &AAccept);
   virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
@@ -139,7 +139,6 @@ protected:
     QString node;
     QString ver;
     QString hash;
-    QString ext;
   };
   IDiscoInfo parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   IDiscoItems parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
@@ -149,15 +148,16 @@ protected:
   bool hasEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
   QString capsFileName(const QString &ANode, const QString &AVer, const QString &AHash) const;
   IDiscoInfo loadEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
-  bool saveEntityCaps(const IDiscoInfo &AInfo, const EntityCapabilities &ACaps) const;
+  bool saveEntityCaps(const IDiscoInfo &AInfo) const;
   QByteArray calcCapsHash(const IDiscoInfo &AInfo) const;
   bool compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const;
   bool compareFeatures(const QStringList &AFeatures, const QStringList &AWith) const;
 protected slots:
-  void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
   void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
   void onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
+  void onStreamOpened(IXmppStream *AXmppStream);
+  void onStreamClosed(IXmppStream *AXmppStream);
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
@@ -190,10 +190,10 @@ private:
   QMultiMap<QDateTime,QueuedRequest> FQueuedRequests;
   QList<IDiscoHandler *> FDiscoHandlers;
   QHash<QString, QMultiMap<int, IDiscoFeatureHandler *> > FFeatureHandlers;
-  QHash<IXmppStream *,int> FInfoStanzaHandlerIds;
-  QHash<IXmppStream *,int> FItemsStanzaHandlerIds;
-  QHash<IXmppStream *,int> FCapsStanzaHandlerInIds;
-  QHash<IXmppStream *,int> FCapsStanzaHandlerOutIds;
+  QHash<Jid ,int> FSHIInfo;
+  QHash<Jid ,int> FSHIItems;
+  QHash<Jid ,int> FSHIPresenceIn;
+  QHash<Jid ,int> FSHIPresenceOut;
   QHash<QString, QPair<Jid,QString> > FInfoRequestsId;
   QHash<QString, QPair<Jid,QString> > FItemsRequestsId;
   QHash<QString, IDiscoPublish> FPublishRequestsId;
