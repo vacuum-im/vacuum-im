@@ -8,11 +8,11 @@
 #define SHC_DISCO_ITEMS         "/iq[@type='get']/query[@xmlns='" NS_DISCO_ITEMS "']"
 #define SHC_PRESENCE            "/presence"
 
-#define DISCO_TIMEOUT           30000
+#define DISCO_TIMEOUT           60000
 
-#define ADR_StreamJid           Action::DR_StreamJid
-#define ADR_ContactJid          Action::DR_Parametr1
-#define ADR_Node                Action::DR_Parametr2
+#define ADR_STREAMJID           Action::DR_StreamJid
+#define ADR_CONTACTJID          Action::DR_Parametr1
+#define ADR_NODE                Action::DR_Parametr2
 
 #define SVN_ITEMS_GEOMETRY      "itemsGeometry"
 
@@ -21,7 +21,7 @@
 #define IN_INFO                 "psi/statusmsg"
 
 #define QUEUE_TIMER_INTERVAL    2000
-#define QUEUE_REQUEST_WAIT      10000
+#define QUEUE_REQUEST_WAIT      5000
 #define QUEUE_REQUEST_START     QDateTime::currentDateTime().addMSecs(QUEUE_REQUEST_WAIT)
 
 #define CAPS_DIRNAME            "caps"
@@ -278,7 +278,6 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
       Jid contactJid = AStanza.from();
       QDomElement capsElem = AStanza.firstElement("c",NS_CAPS);
       EntityCapabilities newCaps;
-      newCaps.contactJid = contactJid;
       newCaps.node = capsElem.attribute("node");
       newCaps.ver = capsElem.attribute("ver");
       newCaps.hash = capsElem.attribute("hash");
@@ -289,7 +288,7 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
         {
           IDiscoInfo dinfo = loadEntityCaps(newCaps.node,newCaps.ver,newCaps.hash);
           dinfo.streamJid = AStreamJid;
-          dinfo.contactJid = newCaps.contactJid;
+          dinfo.contactJid = contactJid;
           FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
           emit discoInfoReceived(dinfo);
         }
@@ -297,7 +296,7 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
         {
           QueuedRequest request;
           request.streamJid = AStreamJid;
-          request.contactJid = newCaps.contactJid;
+          request.contactJid = contactJid;
           appendQueuedRequest(QUEUE_REQUEST_START,request);
         }
         if (!capsElem.isNull() && !newCaps.node.isEmpty() && !newCaps.ver.isEmpty())
@@ -500,10 +499,7 @@ QIcon ServiceDiscovery::discoInfoIcon(const IDiscoInfo &ADiscoInfo) const
 {
   QIcon icon;
   if (ADiscoInfo.error.code >= 0)
-  {
-    SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-    icon = iconset->iconByName(IN_CANCEL);
-  }
+    icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CANCEL);
   else if (FStatusIcons)
     icon = FStatusIcons->iconByJidStatus(ADiscoInfo.contactJid,IPresence::Online,"both",false);
   return icon;
@@ -922,8 +918,6 @@ QString ServiceDiscovery::capsFileName(const QString &ANode, const QString &AVer
 
 IDiscoInfo ServiceDiscovery::loadEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const
 {
-  IDiscoInfo dinfo;
-  
   QHash<Jid,EntityCapabilities>::const_iterator it = FEntityCaps.constBegin();
   while(it!=FEntityCaps.constEnd())
   {
@@ -932,6 +926,7 @@ IDiscoInfo ServiceDiscovery::loadEntityCaps(const QString &ANode, const QString 
     it++;
   }
 
+  IDiscoInfo dinfo;
   QFile capsFile(capsFileName(ANode,AVer,AHash));
   if (capsFile.exists() && capsFile.open(QIODevice::ReadOnly))
   {
@@ -1043,9 +1038,9 @@ void ServiceDiscovery::onStreamStateChanged(const Jid &AStreamJid, bool AStateOn
     Action *action = new Action(FDiscoMenu);
     action->setText(AStreamJid.domane());
     action->setIcon(SYSTEM_ICONSETFILE,IN_DISCO);
-    action->setData(ADR_StreamJid,AStreamJid.full());
-    action->setData(ADR_ContactJid,AStreamJid.domane());
-    action->setData(ADR_Node,QString(""));
+    action->setData(ADR_STREAMJID,AStreamJid.full());
+    action->setData(ADR_CONTACTJID,AStreamJid.domane());
+    action->setData(ADR_NODE,QString(""));
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoItemsByAction(bool)));
     FDiscoMenu->addAction(action,AG_DEFAULT,true);
     FDiscoMenu->setEnabled(true);
@@ -1072,7 +1067,7 @@ void ServiceDiscovery::onStreamStateChanged(const Jid &AStreamJid, bool AStateOn
   else
   {
     QMultiHash<int,QVariant> data;
-    data.insert(ADR_StreamJid,AStreamJid.full());
+    data.insert(ADR_STREAMJID,AStreamJid.full());
     Action *action = FDiscoMenu->findActions(data).value(0,NULL);
     if (action)
     {
@@ -1162,12 +1157,12 @@ void ServiceDiscovery::onStreamRemoved(IXmppStream *AXmppStream)
 void ServiceDiscovery::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
   QMultiHash<int,QVariant> data;
-  data.insert(ADR_StreamJid,AXmppStream->jid().full());
+  data.insert(ADR_STREAMJID,AXmppStream->jid().full());
   Action *action = FDiscoMenu->findActions(data).value(0,NULL);
   if (action)
   {
-    action->setData(ADR_StreamJid,AXmppStream->jid().full());
-    action->setData(ADR_ContactJid,AXmppStream->jid().domane());
+    action->setData(ADR_STREAMJID,AXmppStream->jid().full());
+    action->setData(ADR_CONTACTJID,AXmppStream->jid().domane());
   }
   emit streamJidChanged(ABefour,AXmppStream->jid());
 }
@@ -1186,9 +1181,9 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
       Action *action = new Action(AMenu);
       action->setText(tr("Discovery Info"));
       action->setIcon(SYSTEM_ICONSETFILE,IN_INFO);
-      action->setData(ADR_StreamJid,streamJid.full());
-      action->setData(ADR_ContactJid,contactJid.full());
-      action->setData(ADR_Node,QString(""));
+      action->setData(ADR_STREAMJID,streamJid.full());
+      action->setData(ADR_CONTACTJID,contactJid.full());
+      action->setData(ADR_NODE,QString(""));
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoInfoByAction(bool)));
       AMenu->addAction(action,AG_DISCOVERY_ROSTER,true);
 
@@ -1197,9 +1192,9 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
         action = new Action(AMenu);
         action->setText(tr("Service Discovery"));
         action->setIcon(SYSTEM_ICONSETFILE,IN_DISCO);
-        action->setData(ADR_StreamJid,streamJid.full());
-        action->setData(ADR_ContactJid,contactJid.full());
-        action->setData(ADR_Node,QString(""));
+        action->setData(ADR_STREAMJID,streamJid.full());
+        action->setData(ADR_CONTACTJID,contactJid.full());
+        action->setData(ADR_NODE,QString(""));
         connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoItemsByAction(bool)));
         AMenu->addAction(action,AG_DISCOVERY_ROSTER,true);
       }
@@ -1235,9 +1230,9 @@ void ServiceDiscovery::onShowDiscoInfoByAction(bool)
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
-    Jid streamJid = action->data(ADR_StreamJid).toString();
-    Jid contactJid = action->data(ADR_ContactJid).toString();
-    QString node = action->data(ADR_Node).toString();
+    Jid streamJid = action->data(ADR_STREAMJID).toString();
+    Jid contactJid = action->data(ADR_CONTACTJID).toString();
+    QString node = action->data(ADR_NODE).toString();
     showDiscoInfo(streamJid,contactJid,node);
   }
 }
@@ -1247,9 +1242,9 @@ void ServiceDiscovery::onShowDiscoItemsByAction(bool)
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
-    Jid streamJid = action->data(ADR_StreamJid).toString();
-    Jid contactJid = action->data(ADR_ContactJid).toString();
-    QString node = action->data(ADR_Node).toString();
+    Jid streamJid = action->data(ADR_STREAMJID).toString();
+    Jid contactJid = action->data(ADR_CONTACTJID).toString();
+    QString node = action->data(ADR_NODE).toString();
     showDiscoItems(streamJid,contactJid,node);
   }
 }

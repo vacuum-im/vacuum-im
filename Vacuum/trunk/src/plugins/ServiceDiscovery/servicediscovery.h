@@ -135,7 +135,6 @@ protected:
   };
   struct EntityCapabilities
   {
-    Jid contactJid;
     QString node;
     QString ver;
     QString hash;
