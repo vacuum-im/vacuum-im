@@ -147,7 +147,7 @@ bool Messenger::readStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, const 
   Message message(AStanza);
   bool received = receiveMessage(message) > 0;
   AAccept = AAccept || received;
-  return received;
+  return false;
 }
 
 bool Messenger::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)
