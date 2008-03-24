@@ -92,13 +92,13 @@ bool AccountManager::initObjects()
     FActionSetup->setIcon(SYSTEM_ICONSETFILE,IN_ACCOUNT);
     FActionSetup->setText(tr("Account setup..."));
     FActionSetup->setData(Action::DR_Parametr1,ON_ACCOUNTS);
-    connect(FActionSetup,SIGNAL(triggered(bool)),FSettingsPlugin->instance(),SLOT(openOptionsDialogByAction(bool)));
+    connect(FActionSetup,SIGNAL(triggered(bool)),SLOT(onOpenOptionsDialogByAction(bool)));
     FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FActionSetup,AG_ACCOUNTMANAGER_MMENU,true);
   }
 
   FSettings = FSettingsPlugin->settingsForPlugin(ACCOUNTMANAGER_UUID);
   FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"), tr("Creating and removing accounts"),QIcon());
-  FSettingsPlugin->appendOptionsHolder(this);
+  FSettingsPlugin->insertOptionsHolder(this);
   return true;
 }
 
@@ -271,6 +271,16 @@ void AccountManager::onOptionsAccountRemoved(const QString &AAccountId)
   closeAccountOptionsNode(AAccountId);
 }
 
+void AccountManager::onOpenOptionsDialogByAction(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (FSettingsPlugin && action)
+  {
+    QString optionsNode = action->data(ADR_OPTIONS_NODE).toString();
+    FSettingsPlugin->openOptionsDialog(optionsNode);
+  }
+}
+
 void AccountManager::onOptionsDialogAccepted()
 {
   QSet<QString> curAccounts = FAccounts.keys().toSet();
@@ -367,7 +377,7 @@ void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setIcon(SYSTEM_ICONSETFILE,IN_ACCOUNT);
       action->setText(tr("Modify account"));
       action->setData(ADR_OPTIONS_NODE,ON_ACCOUNTS"::"+account->accountId());
-      connect(action,SIGNAL(triggered(bool)),FSettingsPlugin->instance(),SLOT(openOptionsDialogByAction(bool)));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onOpenOptionsDialogByAction(bool)));
       AMenu->addAction(action,AG_ACCOUNTMANAGER_ROSTER,true);
     }
   }

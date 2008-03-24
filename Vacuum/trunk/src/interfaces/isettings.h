@@ -44,12 +44,11 @@ public:
 class ISettingsPlugin {
 public:
   virtual QObject *instance() =0;
+  //Profiles
   virtual bool isProfilesValid() const =0;
   virtual bool isProfileOpened() const =0;
   virtual const QDir &homeDir() const =0;
   virtual const QDir &profileDir() const =0;
-  virtual ISettings *settingsForPlugin(const QUuid &APluginId) =0;
-  virtual bool saveSettings() =0;
   virtual bool addProfile(const QString &AProfile) =0;
   virtual QString profile() const =0;
   virtual QStringList profiles() const =0;
@@ -58,27 +57,25 @@ public:
   virtual bool setProfile(const QString &AProfile) =0;
   virtual bool renameProfile(const QString &AProfileFrom, const QString &AProfileTo) =0;
   virtual bool removeProfile(const QString &AProfile) =0;
-  virtual void openOptionsDialog(const QString &ANode = "") =0;
-  virtual void openOptionsNode(const QString &ANode, const QString &AName, 
-    const QString &ADescription, const QIcon &AIcon) =0;
+  //Settings
+  virtual bool saveSettings() =0;
+  virtual ISettings *settingsForPlugin(const QUuid &APluginId) =0;
+  //OptionsDialog
+  virtual void insertOptionsHolder(IOptionsHolder *AOptionsHolder) =0;
+  virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder) =0;
+  virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QIcon &AIcon) =0;
   virtual void closeOptionsNode(const QString &ANode) =0;
-  virtual void appendOptionsHolder(IOptionsHolder *) =0;
-  virtual void removeOptionsHolder(IOptionsHolder *) =0;
-public slots:
-  virtual void openOptionsDialogByAction(bool) =0;
-  virtual void openProfileDialogByAction(bool) =0;
+  virtual QDialog *openOptionsDialog(const QString &ANode = "", QWidget *AParent = NULL) =0;
 signals:
   virtual void profileAdded(const QString &AProfile) =0;
+  virtual void settingsOpened() =0;
   virtual void profileOpened(const QString &AProfile) =0;
   virtual void profileClosed(const QString &AProfile) =0;
+  virtual void settingsClosed() =0;
   virtual void profileRenamed(const QString &AProfileFrom, const QString &AProfileTo) =0;
   virtual void profileRemoved(const QString &AProfile) =0;
-  virtual void settingsOpened() =0;
-  virtual void settingsClosed() =0;
   virtual void optionsNodeOpened(const QString &ANode) =0;
   virtual void optionsNodeClosed(const QString &ANode) =0;
-  virtual void optionsHolderAdded(IOptionsHolder *) =0;
-  virtual void optionsHolderRemoved(IOptionsHolder *) =0;
   virtual void optionsDialogOpened() =0;
   virtual void optionsDialogAccepted() =0;
   virtual void optionsDialogRejected() =0;

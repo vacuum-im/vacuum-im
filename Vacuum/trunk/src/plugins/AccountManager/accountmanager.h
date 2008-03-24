@@ -64,6 +64,7 @@ protected:
 protected slots:
   void onOptionsAccountAdded(const QString &AName);
   void onOptionsAccountRemoved(const QString &AAccountId);
+  void onOpenOptionsDialogByAction(bool);
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
   void onOptionsDialogClosed();

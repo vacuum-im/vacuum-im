@@ -96,7 +96,7 @@ bool Registration::initObjects()
   }
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->appendOptionsHolder(this);
+    FSettingsPlugin->insertOptionsHolder(this);
   }
   return true;
 }

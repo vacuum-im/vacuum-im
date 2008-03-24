@@ -67,7 +67,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
 
 bool ConnectionManager::initObjects()
 {
-  FSettingsPlugin->appendOptionsHolder(this);
+  FSettingsPlugin->insertOptionsHolder(this);
   return true;
 }
 

@@ -24,7 +24,6 @@ class SettingsPlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ISettingsPlugin);
-
 public:
   SettingsPlugin();
   ~SettingsPlugin();
@@ -37,12 +36,11 @@ public:
   virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //ISettings
+    //Profiles
   virtual bool isProfilesValid() const { return !FProfiles.isNull(); }
   virtual bool isProfileOpened() const { return FProfileOpened; }
   virtual const QDir &homeDir() const { return FHomeDir; }
   virtual const QDir &profileDir() const { return FProfileDir; }
-  virtual ISettings *settingsForPlugin(const QUuid &APluginId);
-  virtual bool saveSettings();
   virtual bool addProfile(const QString &AProfile);
   virtual QString profile() const { return FProfile.attribute("name"); }
   virtual QStringList profiles() const;
@@ -51,27 +49,25 @@ public:
   virtual bool setProfile(const QString &AProfile);
   virtual bool renameProfile(const QString &AProfileFrom, const QString &AProfileTo);
   virtual bool removeProfile(const QString &AProfile);
-  virtual void openOptionsDialog(const QString &ANode = "");
-  virtual void openOptionsNode(const QString &ANode, const QString &AName, 
-    const QString &ADescription, const QIcon &AIcon);
-  virtual void closeOptionsNode(const QString &ANode);
-  virtual void appendOptionsHolder(IOptionsHolder *AOptionsHolder);
+    //Settings
+  virtual bool saveSettings();
+  virtual ISettings *settingsForPlugin(const QUuid &APluginId);
+    //OptionsDialog
+  virtual void insertOptionsHolder(IOptionsHolder *AOptionsHolder);
   virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder);
-public slots:
-  virtual void openOptionsDialogByAction(bool);
-  virtual void openProfileDialogByAction(bool);
+  virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QIcon &AIcon);
+  virtual void closeOptionsNode(const QString &ANode);
+  virtual QDialog *openOptionsDialog(const QString &ANode = "", QWidget *AParent = NULL);
 signals:
   virtual void profileAdded(const QString &AProfile);
+  virtual void settingsOpened();
   virtual void profileOpened(const QString &AProfile);
   virtual void profileClosed(const QString &AProfile);
+  virtual void settingsClosed();
   virtual void profileRenamed(const QString &AProfileFrom, const QString &AProfileTo);
   virtual void profileRemoved(const QString &AProfile);
-  virtual void settingsOpened();
-  virtual void settingsClosed();
   virtual void optionsNodeOpened(const QString &ANode);
   virtual void optionsNodeClosed(const QString &ANode);
-  virtual void optionsHolderAdded(IOptionsHolder *);
-  virtual void optionsHolderRemoved(IOptionsHolder *);
   virtual void optionsDialogOpened();
   virtual void optionsDialogAccepted();
   virtual void optionsDialogRejected();
@@ -86,13 +82,14 @@ protected:
   void renameProfileAction(const QString &AProfileFrom, const QString &AProfileTo);
   void removeProfileAction(const QString &AProfile);
 protected slots:
-  void onOptionsDialogOpened();
+  void onOpenProfileDialogByAction(bool);
+  void onOpenOptionsDialogByAction(bool);
+  void onSetProfileByAction(bool);
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
   void onOptionsDialogClosed();
   void onPluginManagerQuit();
   void onSystemIconsetChanged();
-  void onSetProfileByAction(bool);
 private:
   IPluginManager *FPluginManager;
   IMainWindowPlugin *FMainWindowPlugin;
@@ -110,14 +107,13 @@ private:
   QDomDocument FProfiles;
   QDomDocument FSettings;
 private:
-  QHash<QUuid,Settings *> FPluginSettings;
-  struct OptionsNode  
-  {
+  struct OptionsNode {
+    QIcon icon;
     QString name;
     QString desc;
-    QIcon icon;
   };
   QMap<QString, OptionsNode *> FNodes;
+  QHash<QUuid,Settings *> FPluginSettings;
   QList<IOptionsHolder *> FOptionsHolders;
   QPointer<OptionsDialog> FOptionsDialog;
   QPointer<ProfileDialog> FProfileDialog;

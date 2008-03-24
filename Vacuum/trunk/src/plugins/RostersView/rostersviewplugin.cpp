@@ -123,7 +123,7 @@ bool RostersViewPlugin::initObjects()
   {
     FSettings = FSettingsPlugin->settingsForPlugin(ROSTERSVIEW_UUID);
     FSettingsPlugin->openOptionsNode(ON_ROSTER,tr("Roster"),tr("Roster view options"),QIcon());
-    FSettingsPlugin->appendOptionsHolder(this);
+    FSettingsPlugin->insertOptionsHolder(this);
 
     connect(FRostersView,SIGNAL(proxyModelAdded(QAbstractProxyModel *)),
       SLOT(onProxyAdded(QAbstractProxyModel *)));

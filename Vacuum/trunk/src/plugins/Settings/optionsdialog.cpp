@@ -9,22 +9,26 @@
 #include <QHeaderView>
 #include <QTextDocument>
 
-OptionsDialog::OptionsDialog(QWidget *AParent)
-  : QDialog(AParent)
+OptionsDialog::OptionsDialog(QWidget *AParent) : QDialog(AParent)
 {
   setAttribute(Qt::WA_DeleteOnClose,true);
+  setWindowTitle(tr("Options"));
+
   lblInfo = new QLabel("<b>Node name</b><br>Node description");
   lblInfo->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
   lblInfo->setFrameStyle(QFrame::StyledPanel);
+
   scaScroll = new QScrollArea;
-  //scaScroll->setFrameStyle(QFrame::NoFrame);  
   scaScroll->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   scaScroll->setWidgetResizable(true);
+
   stwOptions = new QStackedWidget;
   scaScroll->setWidget(stwOptions);
+  
   QVBoxLayout *vblRight = new QVBoxLayout;
   vblRight->addWidget(lblInfo);
   vblRight->addWidget(scaScroll);
+
   trwNodes = new QTreeWidget;
   trwNodes->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Expanding);
   trwNodes->header()->hide();
@@ -33,34 +37,34 @@ OptionsDialog::OptionsDialog(QWidget *AParent)
   trwNodes->setMaximumWidth(160);
   trwNodes->setSortingEnabled(true);
   trwNodes->sortByColumn(0,Qt::AscendingOrder);
+  trwNodes->setSelectionMode(QAbstractItemView::NoSelection);
   connect(trwNodes,SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
     SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+  
   QHBoxLayout *hblCentral = new QHBoxLayout;
   hblCentral->addWidget(trwNodes);
   hblCentral->addLayout(vblRight);
+  
   dbbButtons = new QDialogButtonBox(Qt::Horizontal);
-  dbbButtons->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
+  dbbButtons->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
   connect(dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
-  QFrame *line = new QFrame; 
-  line->setFrameShape(QFrame::HLine);
-  line->setFrameShadow(QFrame::Sunken);
+  
   QVBoxLayout *vblMain = new QVBoxLayout;
   vblMain->addLayout(hblCentral);
-  vblMain->addWidget(line);
   vblMain->addWidget(dbbButtons);
+  vblMain->setMargin(5);
+  
   setLayout(vblMain);
-  setWindowTitle(tr("Options"));
   resize(600,600);
-  emit opened();
 }
 
 OptionsDialog::~OptionsDialog()
 {
+  emit closed();
   qDeleteAll(FNodes);
 }
 
-void OptionsDialog::openNode(const QString &ANode, const QString &AName,  
-                             const QString &ADescription, const QIcon &AIcon, QWidget *AWidget)
+void OptionsDialog::openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QIcon &AIcon, QWidget *AWidget)
 {
   OptionsNode *node = FNodes.value(ANode,NULL);
   if (!node && !ANode.isEmpty() && !AName.isEmpty())
@@ -81,6 +85,7 @@ void OptionsDialog::openNode(const QString &ANode, const QString &AName,
     {
       int itemIndex = stwOptions->addWidget(AWidget);
       FItemsStackIndex.insert(nodeItem,itemIndex);
+      connect(this,SIGNAL(closed()),AWidget,SLOT(deleteLater()));
     }
   }
 }
@@ -92,13 +97,13 @@ void OptionsDialog::closeNode(const QString &ANode)
   {
     if (it.key().startsWith(ANode))
     {
-      QTreeWidgetItem *nodeItem = FNodesItems.value(it.key());
+      QTreeWidgetItem *nodeItem = FNodeItems.value(it.key());
       FItemsStackIndex.remove(nodeItem);
       
       //Delete parent TreeItems without widgets
-      while (nodeItem->parent() && !FItemsStackIndex.contains(nodeItem->parent()))
+      while (nodeItem->parent() && nodeItem->parent()->childCount()==1 && !FItemsStackIndex.contains(nodeItem->parent()))
       {
-        FNodesItems.remove(nodeItem->data(0,Qt::UserRole).toString());
+        FNodeItems.remove(nodeItem->parent()->data(0,Qt::UserRole).toString());
         nodeItem = nodeItem->parent();
       }
 
@@ -110,11 +115,11 @@ void OptionsDialog::closeNode(const QString &ANode)
         for (;sit != FItemsStackIndex.end();sit++)
           if (sit.value() > widgetIndex)
             sit.value()--;
+        stwOptions->removeWidget(node->widget);
       }
-      stwOptions->removeWidget(node->widget);
       delete node;
 
-      FNodesItems.remove(it.key());
+      FNodeItems.remove(it.key());
       delete nodeItem;
 
       it = FNodes.erase(it);
@@ -126,21 +131,10 @@ void OptionsDialog::closeNode(const QString &ANode)
 
 void OptionsDialog::showNode(const QString &ANode)
 {
-  QTreeWidgetItem *item = FNodesItems.value(ANode, NULL);
+  QTreeWidgetItem *item = FNodeItems.value(ANode, NULL);
   if (item)
     trwNodes->setCurrentItem(item,0);
-}
-
-void OptionsDialog::accept()
-{
-  QDialog::accept();
-  emit closed();
-}
-
-void OptionsDialog::reject()
-{
-  QDialog::reject();
-  emit closed();
+  trwNodes->expandAll();
 }
 
 QTreeWidgetItem *OptionsDialog::createTreeItem(const QString &ANode)
@@ -155,7 +149,8 @@ QTreeWidgetItem *OptionsDialog::createTreeItem(const QString &ANode)
       nodeName = nodeTreeItem;
     else 
       nodeName += "::"+nodeTreeItem;
-    if (!FNodesItems.contains(nodeName))
+    
+    if (!FNodeItems.contains(nodeName))
     {
       if (nodeItem)
         nodeItem = new QTreeWidgetItem(nodeItem);
@@ -163,11 +158,11 @@ QTreeWidgetItem *OptionsDialog::createTreeItem(const QString &ANode)
         nodeItem = new QTreeWidgetItem(trwNodes);
       nodeItem->setData(0,Qt::UserRole,nodeName);
       nodeItem->setText(0,nodeTreeItem);
-      trwNodes->expandItem(nodeItem);
-      FNodesItems.insert(nodeName,nodeItem);
+      nodeItem->setExpanded(true);
+      FNodeItems.insert(nodeName,nodeItem);
     }
     else
-      nodeItem = FNodesItems.value(nodeName);
+      nodeItem = FNodeItems.value(nodeName);
   }
   return nodeItem;
 }
@@ -175,7 +170,7 @@ QTreeWidgetItem *OptionsDialog::createTreeItem(const QString &ANode)
 QString OptionsDialog::nodeFullName(const QString &ANode)
 {
   QString fullName;
-  QTreeWidgetItem *item = FNodesItems.value(ANode);
+  QTreeWidgetItem *item = FNodeItems.value(ANode);
   if (item)
   {
     fullName = item->text(0);
@@ -186,6 +181,36 @@ QString OptionsDialog::nodeFullName(const QString &ANode)
     }
   }
   return fullName;
+}
+
+bool OptionsDialog::canExpandVertically(const QWidget *AWidget) const
+{
+  bool expanding = AWidget->sizePolicy().verticalPolicy() == QSizePolicy::Expanding;
+  if (!expanding)
+  {
+    QObjectList childs = AWidget->children();
+    for (int i=0; !expanding && i<childs.count(); i++)
+      if (childs.at(i)->isWidgetType())
+        expanding = canExpandVertically(qobject_cast<QWidget *>(childs.at(i)));
+  }
+  return expanding;
+}
+
+void OptionsDialog::updateOptionsSize(QWidget *AWidget)
+{
+  if (AWidget)
+  {
+    if (!canExpandVertically(AWidget))
+      stwOptions->setMaximumHeight(AWidget->sizeHint().height());
+    else
+      stwOptions->setMaximumHeight(qMax(AWidget->sizeHint().height(),scaScroll->viewport()->size().height()));
+  }
+}
+
+void OptionsDialog::resizeEvent(QResizeEvent *AEvent)
+{
+  QDialog::resizeEvent(AEvent);
+  updateOptionsSize(stwOptions->currentWidget());
 }
 
 void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
@@ -204,13 +229,17 @@ void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
   }
 }
 
-void OptionsDialog::onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetItem *)
+void OptionsDialog::onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetItem * /*APrevious*/)
 { 
   QTreeWidgetItem *currentItem = ACurrent;
   while (!FItemsStackIndex.contains(currentItem) && currentItem->childCount()>0)
     currentItem = currentItem->child(0);
 
-  if (FItemsStackIndex.contains(currentItem))
+  if (ACurrent!=currentItem)
+  {
+    trwNodes->setCurrentItem(currentItem);
+  }
+  else if (FItemsStackIndex.contains(currentItem))
   {
     QString node = currentItem->data(0,Qt::UserRole).toString();
     OptionsNode *nodeOption = FNodes.value(node,NULL);
@@ -218,8 +247,8 @@ void OptionsDialog::onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetI
     {
       lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(Qt::escape(nodeOption->desc)));
       QWidget *widget = stwOptions->widget(FItemsStackIndex.value(currentItem));
-      stwOptions->setMaximumHeight(widget->sizeHint().height());
       stwOptions->setCurrentWidget(widget);
+      updateOptionsSize(widget);
       scaScroll->ensureVisible(0,0);
     }
   }

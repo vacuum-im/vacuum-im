@@ -165,7 +165,7 @@ bool StatusChanger::initObjects()
   setMainStatusId(STATUS_OFFLINE);
 
   if (FSettingsPlugin)
-    FSettingsPlugin->appendOptionsHolder(this);
+    FSettingsPlugin->insertOptionsHolder(this);
 
   if (FMainWindowPlugin)
   {

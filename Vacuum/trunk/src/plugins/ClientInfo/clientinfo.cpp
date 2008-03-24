@@ -144,7 +144,7 @@ bool ClientInfo::initObjects()
   }
 
   if (FSettingsPlugin)
-    FSettingsPlugin->appendOptionsHolder(this);
+    FSettingsPlugin->insertOptionsHolder(this);
 
   if (FDiscovery)
   {

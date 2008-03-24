@@ -80,7 +80,7 @@ bool Emoticons::initObjects()
   if (FSettingsPlugin != NULL)
   {
     FSettingsPlugin->openOptionsNode(ON_EMOTICONS ,tr("Emoticons"), tr("Select emoticons files"),QIcon());
-    FSettingsPlugin->appendOptionsHolder(this);
+    FSettingsPlugin->insertOptionsHolder(this);
   }
   else
     insertIconset(EMOTICONS_ICONSETFILE);
