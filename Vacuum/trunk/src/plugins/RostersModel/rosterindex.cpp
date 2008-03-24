@@ -30,6 +30,9 @@ void RosterIndex::setParentIndex(IRosterIndex *AIndex)
 
   FBlokedSetParentIndex = true;
 
+  if (!AIndex && FRemoveChildsOnRemoved)
+    removeAllChilds();
+
   if (FParentIndex)
   {
     FParentIndex->removeChild(this);
@@ -45,9 +48,6 @@ void RosterIndex::setParentIndex(IRosterIndex *AIndex)
   else
   {
     FParentIndex = AIndex;
-
-    if (FRemoveChildsOnRemoved)
-      removeAllChilds();
 
     if (FDestroyOnParentRemoved)
       QTimer::singleShot(0,this,SLOT(onDestroyByParentRemoved()));
