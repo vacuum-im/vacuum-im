@@ -100,6 +100,7 @@ public:
   QDomElement findChidByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang) const;
   QDomElement addChildByLang(const QDomElement &AParent, const QString &ATagName, 
     const QString &ALang, const QString &AText);
+  bool operator<(const Message &AOther) const;
 protected:
   QDomElement setTextToElem(QDomElement &AElem, const QString &AText);
 private:

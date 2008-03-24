@@ -174,6 +174,11 @@ QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &A
   return elem;
 }
 
+bool Message::operator<(const Message &AOther) const
+{
+  return dateTime()<AOther.dateTime();
+}
+
 QDomElement Message::setTextToElem(QDomElement &AElem, const QString &AText)
 {
   if (!AElem.isNull())
