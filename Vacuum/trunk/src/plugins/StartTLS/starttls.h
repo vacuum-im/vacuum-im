@@ -27,6 +27,7 @@ signals:
   virtual void ready(bool ARestart); 
   virtual void error(const QString &AMessage);
 protected slots:
+  void onConnectionEncrypted();
   void onStreamClosed(IXmppStream *AXmppStream);
 private: 
   IXmppStream *FXmppStream;

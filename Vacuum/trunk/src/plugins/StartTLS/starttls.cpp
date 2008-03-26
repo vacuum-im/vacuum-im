@@ -18,9 +18,9 @@ bool StartTLS::start(const QDomElement &/*AElem*/)
   FConnection = qobject_cast<IDefaultConnection *>(FXmppStream->connection()->instance());
   if (FConnection)
   {
+    FNeedHook = true;
     Stanza request("starttls");
     request.setAttribute("xmlns",NS_FEATURE_STARTTLS);
-    FNeedHook = true;
     FXmppStream->sendStanza(request);
     return true;
   }
@@ -39,8 +39,8 @@ bool StartTLS::hookElement(QDomElement *AElem, Direction ADirection)
     FNeedHook = false;
     if (AElem->tagName() == "proceed")
     {
+      connect(FConnection->instance(),SIGNAL(encrypted()),SLOT(onConnectionEncrypted()));
       FConnection->startClientEncryption();
-      emit ready(true);
     }
     else if (AElem->tagName() == "failure")
       emit error(tr("StartTLS negotiation failed.")); 
@@ -52,8 +52,18 @@ bool StartTLS::hookElement(QDomElement *AElem, Direction ADirection)
   return false;
 }
 
+void StartTLS::onConnectionEncrypted()
+{
+  emit ready(true);
+}
+
 void StartTLS::onStreamClosed(IXmppStream * /*AXmppStream*/)
 {
-  FConnection = NULL;
+  if (FConnection)
+  {
+    FConnection->instance()->disconnect(this);
+    FConnection = NULL;
+  }
   FNeedHook = false;
 }
+
