@@ -103,7 +103,7 @@ const QString &XmppStream::password() const
 
 qint64 XmppStream::sendStanza(const Stanza &AStanza)
 {
-  if (FStreamState != SS_OFFLINE)
+  if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
   {
     Stanza stanza(AStanza);
     if (!hookFeatureElement(&stanza.element(),IStreamFeature::DirectionOut))
