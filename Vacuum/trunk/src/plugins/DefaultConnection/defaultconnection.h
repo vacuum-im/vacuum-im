@@ -70,6 +70,7 @@ private:
     ProxyConnectResult,
     ProxyReady
   };
+  bool FDisconnectCalled;
   ProxyState FProxyState;
   QHash<int, QVariant> FOptions;
   QString FHost;

@@ -9,6 +9,7 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
   FPlugin = APlugin;
   FProxyState = ProxyUnconnected;
   FSocket.setProtocol(QSsl::AnyProtocol);
+  FDisconnectCalled = true; 
 
   connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
   connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
@@ -46,6 +47,7 @@ void DefaultConnection::connectToHost()
     FProxyUser = option(IDefaultConnection::CO_ProxyUserName).toString();
     FProxyPassword = option(IDefaultConnection::CO_ProxyPassword).toString();
 
+    FDisconnectCalled = false;
     if (FProxyType == 0)
     {
       FProxyState = ProxyReady;
@@ -65,8 +67,9 @@ void DefaultConnection::connectToHost()
 
 void DefaultConnection::disconnect()
 {
-  if (FSocket.isOpen())
+  if (!FDisconnectCalled && FSocket.isOpen())
   {
+    FDisconnectCalled = true;
     FSocket.disconnectFromHost();
     if (FSocket.state() != QAbstractSocket::UnconnectedState)
       if (!FSocket.waitForDisconnected(5000))
@@ -301,6 +304,7 @@ void DefaultConnection::onSocketReadyRead()
 
 void DefaultConnection::onSocketDisconnected()
 {
+  FDisconnectCalled = true;
   FReadTimer.stop();
   FSocket.close();
   emit disconnected();
