@@ -3,8 +3,7 @@
 
 #include <QTimer>
 
-SortFilterProxyModel::SortFilterProxyModel(QObject *parent)
-  : QSortFilterProxyModel(parent)
+SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
   FOptions = 0;
 }
@@ -50,7 +49,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
         return leftShow > rightShow;
     }
     else
-      return QString::localeAwareCompare(ALeft.data().toString(),ARight.data().toString()) >= 0;
+      return QString::localeAwareCompare(ALeft.data().toString(),ARight.data().toString()) > 0;
   }
   else
     return leftType > rightType;
@@ -71,18 +70,12 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
     case RIT_Contact:
     case RIT_Agent:
       {
-        bool hasVisibleLabel = false;
         QList<QVariant> labelFlags = index.data(RDR_LabelFlags).toList();
         foreach(QVariant flag, labelFlags)
-        {
-          if (flag.toInt() & IRostersView::LabelVisible)
-          {
-            hasVisibleLabel = true;
-            break;
-          }
-        }
+          if ((flag.toInt() & IRostersView::LabelVisible) > 0)
+            return true;
         int indexShow = index.data(RDR_Show).toInt();
-        return hasVisibleLabel || (indexShow != IPresence::Offline && indexShow != IPresence::Error);
+        return indexShow != IPresence::Offline && indexShow != IPresence::Error;
       }
     case RIT_Group:
     case RIT_AgentsGroup:

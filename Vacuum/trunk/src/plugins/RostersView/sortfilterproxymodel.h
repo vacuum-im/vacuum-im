@@ -11,9 +11,8 @@ class SortFilterProxyModel :
   public QSortFilterProxyModel
 {
   Q_OBJECT;
-
 public:
-  SortFilterProxyModel(QObject *parent = NULL);
+  SortFilterProxyModel(QObject *AParent = NULL);
   ~SortFilterProxyModel();
   virtual void setSourceModel(QAbstractItemModel *ASourceModel);
   bool checkOption(IRostersView::Option AOption) const;
