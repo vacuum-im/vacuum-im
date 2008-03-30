@@ -6,8 +6,8 @@
 
 #define VCARD_DIRNAME             "vcards"
 #define VCARD_TIMEOUT             60000
-#define ADR_StreamJid             Action::DR_StreamJid
-#define ADR_ContactJid            Action::DR_Parametr1
+#define ADR_STREAM_JID            Action::DR_StreamJid
+#define ADR_CONTACT_JID           Action::DR_Parametr1
 
 #define IN_VCARD                  "psi/vCard"
 
@@ -101,7 +101,7 @@ void VCardPlugin::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
   {
     Jid fromJid = FVCardRequestId.take(AStanza.id());
     QDomElement elem = AStanza.firstElement(VCARD_TAGNAME,NS_VCARD_TEMP);
-    if (!elem.isNull() && AStanza.type()=="result")
+    if (AStanza.type()=="result")
     {
       saveVCardFile(elem,fromJid); 
       emit vcardReceived(fromJid);
@@ -279,8 +279,8 @@ void VCardPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     Action *action = new Action(AMenu);
     action->setText(tr("vCard"));
     action->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
-    action->setData(ADR_StreamJid,AIndex->data(RDR_StreamJid));
-    action->setData(ADR_ContactJid,Jid(AIndex->data(RDR_Jid).toString()).bare());
+    action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
+    action->setData(ADR_CONTACT_JID,Jid(AIndex->data(RDR_Jid).toString()).bare());
     AMenu->addAction(action,AG_VCARD_ROSTER,true);
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
   }
@@ -291,11 +291,11 @@ void VCardPlugin::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMu
   Action *action = new Action(AMenu);
   action->setText(tr("vCard"));
   action->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
-  action->setData(ADR_StreamJid,AUser->data(MUDR_STREAMJID));
+  action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAMJID));
   if (!AUser->data(MUDR_REALJID).toString().isEmpty())
-    action->setData(ADR_ContactJid,Jid(AUser->data(MUDR_REALJID).toString()).bare());
+    action->setData(ADR_CONTACT_JID,Jid(AUser->data(MUDR_REALJID).toString()).bare());
   else
-    action->setData(ADR_ContactJid,AUser->data(MUDR_CONTACTJID));
+    action->setData(ADR_CONTACT_JID,AUser->data(MUDR_CONTACTJID));
   AMenu->addAction(action,AG_MUCM_VCARD,true);
   connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
 }
@@ -305,8 +305,8 @@ void VCardPlugin::onShowVCardDialogByAction(bool)
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
-    Jid streamJid = action->data(ADR_StreamJid).toString();
-    Jid contactJid = action->data(ADR_ContactJid).toString();
+    Jid streamJid = action->data(ADR_STREAM_JID).toString();
+    Jid contactJid = action->data(ADR_CONTACT_JID).toString();
     showVCardDialog(streamJid,contactJid);
   }
 }
