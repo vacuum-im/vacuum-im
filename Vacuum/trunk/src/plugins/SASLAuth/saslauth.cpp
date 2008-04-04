@@ -151,7 +151,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
     }
     else if (AElem->tagName() == "failure")
     {
-      ErrorHandler err(AElem->firstChild().toElement().tagName(),NS_FEATURE_SASL);
+      ErrorHandler err(*AElem,NS_FEATURE_SASL);
       emit error(err.message()); 
     }
     else if (AElem->tagName() == "abort")
