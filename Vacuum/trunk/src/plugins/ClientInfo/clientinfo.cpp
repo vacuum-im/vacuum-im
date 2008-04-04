@@ -177,7 +177,7 @@ bool ClientInfo::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza 
     QDomElement elem = iq.addElement("time",NS_XMPP_TIME);
     DateTime dateTime(QDateTime::currentDateTime());
     elem.appendChild(iq.createElement("tzo")).appendChild(iq.createTextNode(dateTime.toX85TZD()));
-    elem.appendChild(iq.createElement("utc")).appendChild(iq.createTextNode(dateTime.toX85Format(true,true,false)));
+    elem.appendChild(iq.createElement("utc")).appendChild(iq.createTextNode(dateTime.toX85UTC()));
     FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
   }
   return false;
@@ -513,7 +513,7 @@ QDateTime ClientInfo::entityTime(const Jid &AContactJid) const
   if (hasEntityTime(AContactJid))
   {
     TimeItem tItem = FTimeItems.value(AContactJid);
-    return tItem.dateTime.toLocal();
+    return tItem.dateTime.toRemote();
   }
   return QDateTime();
 }
@@ -521,7 +521,7 @@ QDateTime ClientInfo::entityTime(const Jid &AContactJid) const
 int ClientInfo::entityTimeDelta(const Jid &AContactJid) const
 {
   if (hasEntityTime(AContactJid))
-    return FTimeItems.value(AContactJid).dateTime.toUTCLocal().secsTo(QDateTime::currentDateTime());
+    return FTimeItems.value(AContactJid).dateTime.toLocal().secsTo(QDateTime::currentDateTime());
   return 0;
 }
 

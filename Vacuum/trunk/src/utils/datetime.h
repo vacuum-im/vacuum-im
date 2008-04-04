@@ -43,10 +43,12 @@ public:
   
   QDateTime toUTC() const;
   QDateTime toLocal() const;
-  QDateTime toUTCLocal() const;
+  QDateTime toRemote() const;
   QString toX85Date() const;
   QString toX85Time(bool AMSec = false) const;
   QString toX85TZD() const;
+  QString toX85UTC(bool AMSec = false) const;
+  QString toX85Full(bool AMSec = false) const;
   QString toX85Format(bool ADate, bool ATime, bool ATZD, bool AMSec = false) const;
 public:
   static QDateTime utcFromX85(const QString &AX85DateTime);

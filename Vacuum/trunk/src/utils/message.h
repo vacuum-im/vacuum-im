@@ -40,7 +40,7 @@ protected:
     {
       DateTime dateTime(delayElem.attribute("stamp"));
       if (dateTime.isValid())
-        return dateTime.toUTCLocal();
+        return dateTime.toLocal();
     }
     return QDateTime::currentDateTime();
   }

@@ -72,14 +72,14 @@ QDateTime DateTime::toUTC() const
 
 QDateTime DateTime::toLocal() const
 {
+  return d->utc.toLocalTime();
+}
+
+QDateTime DateTime::toRemote() const
+{
   QDateTime dateTime = d->utc;
   dateTime.setTimeSpec(Qt::LocalTime);
   return dateTime.addSecs(d->tzd);
-}
-
-QDateTime DateTime::toUTCLocal() const
-{
-  return d->utc.toLocalTime();
 }
 
 QString DateTime::toX85Date() const
@@ -110,6 +110,16 @@ QString DateTime::toX85TZD() const
     x85 += QTime(0,0,0,0).addSecs(-(d->tzd)).toString("hh:mm");
   }
   return x85;
+}
+
+QString DateTime::toX85UTC(bool AMSec) const
+{
+  return toX85Format(true,true,false,AMSec);
+}
+
+QString DateTime::toX85Full(bool AMSec) const
+{
+  return toX85Format(true,true,true,AMSec);
 }
 
 QString DateTime::toX85Format(bool ADate, bool ATime, bool ATZD, bool AMSec) const
@@ -168,3 +178,4 @@ int DateTime::tzdFromX85(const QString &AX85DateTime)
   }
   return tzd;
 }
+
