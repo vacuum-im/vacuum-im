@@ -71,18 +71,16 @@ public:
   virtual IRosterIndex *streamRoot(const Jid &AStreamJid) const =0;
   virtual IRosterIndex *rootIndex() const =0;
   virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) =0;
-  virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, 
-    int AType, IRosterIndex *AParent) =0;
+  virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) =0;
   virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
   virtual void removeRosterIndex(IRosterIndex *AIndex) =0;
+  virtual IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false) =0;
+  virtual IRosterIndex *findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const =0;
+  virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const =0;
   virtual void insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder) =0;
   virtual void removeDefaultDataHolder(IRosterIndexDataHolder *ADataHolder) =0;
-  virtual IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, 
-    bool ACreate = false) =0;
-  virtual IRosterIndex *findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const =0;
-  virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, 
-    int AType, IRosterIndex *AParent) const =0;
-  virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) =0;
+  virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) const =0;
+  virtual IRosterIndex *rosterIndexByModelIndex(const QModelIndex &AIndex) const =0;
   virtual QString blankGroupName() const =0;
   virtual QString agentsGroupName() const =0;
   virtual QString myResourcesGroupName() const =0;

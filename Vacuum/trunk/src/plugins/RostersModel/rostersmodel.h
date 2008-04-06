@@ -48,12 +48,13 @@ public:
   virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent);
   virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);
   virtual void removeRosterIndex(IRosterIndex *AIndex);
-  virtual void insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder);
-  virtual void removeDefaultDataHolder(IRosterIndexDataHolder *ADataHolder);
   virtual IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false);
   virtual IRosterIndex *findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const;
   virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const;
-  virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex);
+  virtual void insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder);
+  virtual void removeDefaultDataHolder(IRosterIndexDataHolder *ADataHolder);
+  virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) const;
+  virtual IRosterIndex *rosterIndexByModelIndex(const QModelIndex &AIndex) const;
   virtual QString blankGroupName() const { return tr("Blank Group"); }
   virtual QString agentsGroupName() const { return tr("Agents"); }
   virtual QString myResourcesGroupName() const { return tr("My Resources"); }

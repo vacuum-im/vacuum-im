@@ -1,5 +1,6 @@
-#include <QtDebug>
 #include "rostersmodel.h"
+
+#include <QtDebug>
 #include <QTimer>
 
 #define INDEX_CHANGES_FOR_RESET 20
@@ -281,41 +282,7 @@ void RostersModel::insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent
 
 void RostersModel::removeRosterIndex(IRosterIndex *AIndex)
 {
-  AIndex->setParentIndex(0);
-}
-
-void RostersModel::insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder)
-{
-  if (ADataHolder && !FDataHolders.contains(ADataHolder))
-  {
-    QMultiHash<int,QVariant> data;
-    foreach(int type, ADataHolder->types())
-      data.insertMulti(RDR_Type,type);
-    
-    QList<IRosterIndex *> indexes = FRootIndex->findChild(data,true);
-    foreach(IRosterIndex *index,indexes)
-      index->insertDataHolder(ADataHolder);
-    
-    FDataHolders.append(ADataHolder);
-    emit defaultDataHolderInserted(ADataHolder);
-  }
-}
-
-void RostersModel::removeDefaultDataHolder(IRosterIndexDataHolder *ADataHolder)
-{
-  if (ADataHolder && FDataHolders.contains(ADataHolder))
-  {
-    QMultiHash<int,QVariant> data;
-    foreach(int type, ADataHolder->types())
-      data.insertMulti(RDR_Type,type);
-
-    QList<IRosterIndex *> indexes = FRootIndex->findChild(data,true);
-    foreach(IRosterIndex *index,indexes)
-      index->removeDataHolder(ADataHolder);
-
-    FDataHolders.removeAt(FDataHolders.indexOf(ADataHolder));
-    emit defaultDataHolderRemoved(ADataHolder);
-  }
+  AIndex->setParentIndex(NULL);
 }
 
 IRosterIndexList RostersModel::getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate)
@@ -385,9 +352,48 @@ IRosterIndex *RostersModel::findGroup(const QString &AName, const QString &AGrou
   return index;
 }
 
-QModelIndex RostersModel::modelIndexByRosterIndex(IRosterIndex *AIndex)
+void RostersModel::insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder)
+{
+  if (ADataHolder && !FDataHolders.contains(ADataHolder))
+  {
+    QMultiHash<int,QVariant> data;
+    foreach(int type, ADataHolder->types())
+      data.insertMulti(RDR_Type,type);
+
+    QList<IRosterIndex *> indexes = FRootIndex->findChild(data,true);
+    foreach(IRosterIndex *index,indexes)
+      index->insertDataHolder(ADataHolder);
+
+    FDataHolders.append(ADataHolder);
+    emit defaultDataHolderInserted(ADataHolder);
+  }
+}
+
+void RostersModel::removeDefaultDataHolder(IRosterIndexDataHolder *ADataHolder)
+{
+  if (ADataHolder && FDataHolders.contains(ADataHolder))
+  {
+    QMultiHash<int,QVariant> data;
+    foreach(int type, ADataHolder->types())
+      data.insertMulti(RDR_Type,type);
+
+    QList<IRosterIndex *> indexes = FRootIndex->findChild(data,true);
+    foreach(IRosterIndex *index,indexes)
+      index->removeDataHolder(ADataHolder);
+
+    FDataHolders.removeAt(FDataHolders.indexOf(ADataHolder));
+    emit defaultDataHolderRemoved(ADataHolder);
+  }
+}
+
+QModelIndex RostersModel::modelIndexByRosterIndex(IRosterIndex *AIndex) const
 {
   return AIndex!=NULL ? createIndex(AIndex->row(),0,AIndex) : QModelIndex();
+}
+
+IRosterIndex *RostersModel::rosterIndexByModelIndex(const QModelIndex &AIndex) const
+{
+  return static_cast<IRosterIndex *>(AIndex.internalPointer());
 }
 
 void RostersModel::emitDelayedDataChanged(IRosterIndex *AIndex)

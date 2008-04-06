@@ -12,13 +12,10 @@ class RosterIndex :
 {
   Q_OBJECT;
   Q_INTERFACES(IRosterIndex);
-
 public:
   RosterIndex(int AType, const QString &AId);
   ~RosterIndex();
-
   QObject *instance() { return this; }
-
   //IRosterIndex
   virtual int type() const { return data(RDR_Type).toInt(); }
   virtual QString id() const { return data(RDR_Id).toString(); }
@@ -51,10 +48,9 @@ signals:
   virtual void childRemoved(IRosterIndex *AIndex);
   virtual void indexDestroyed(IRosterIndex *AIndex);
 protected slots:
-  virtual void onDataHolderChanged(IRosterIndex *AIndex, int ARole);
-  virtual void onChildIndexDestroyed(QObject *AIndex);
-  virtual void onRemoveByLastChildRemoved();
-  virtual void onDestroyByParentRemoved();
+  void onDataHolderChanged(IRosterIndex *AIndex, int ARole);
+  void onRemoveByLastChildRemoved();
+  void onDestroyByParentRemoved();
 private:
   IRosterIndex *FParentIndex;
   QList<IRosterIndex *> FChilds;

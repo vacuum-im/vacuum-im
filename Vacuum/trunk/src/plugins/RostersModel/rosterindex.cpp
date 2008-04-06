@@ -1,5 +1,6 @@
-#include <QtDebug>
 #include "rosterindex.h"
+
+#include <QtDebug>
 #include <QTimer>
 
 RosterIndex::RosterIndex(int AType, const QString &AId)
@@ -16,8 +17,7 @@ RosterIndex::RosterIndex(int AType, const QString &AId)
 
 RosterIndex::~RosterIndex()
 {
-  if (FChilds.count() > 0)
-    removeAllChilds();
+  removeAllChilds();
   if (FParentIndex)
     FParentIndex->removeChild(this);
   emit indexDestroyed(this);
@@ -30,7 +30,7 @@ void RosterIndex::setParentIndex(IRosterIndex *AIndex)
 
   FBlokedSetParentIndex = true;
 
-  if (!AIndex && FRemoveChildsOnRemoved)
+  if (FRemoveChildsOnRemoved && !AIndex)
     removeAllChilds();
 
   if (FParentIndex)
@@ -47,8 +47,7 @@ void RosterIndex::setParentIndex(IRosterIndex *AIndex)
   } 
   else
   {
-    FParentIndex = AIndex;
-
+    FParentIndex = NULL;
     if (FDestroyOnParentRemoved)
       QTimer::singleShot(0,this,SLOT(onDestroyByParentRemoved()));
   }
@@ -58,10 +57,7 @@ void RosterIndex::setParentIndex(IRosterIndex *AIndex)
 
 int RosterIndex::row() const
 {
-  if (FParentIndex)
-    return FParentIndex->childRow(this);
-
-  return 0;
+  return FParentIndex ? FParentIndex->childRow(this) : 0;
 }
 
 void RosterIndex::appendChild(IRosterIndex *AIndex)
@@ -71,7 +67,6 @@ void RosterIndex::appendChild(IRosterIndex *AIndex)
     FChilds.append(AIndex); 
     AIndex->setParentIndex(this);
     emit childAboutToBeInserted(AIndex);
-    connect(AIndex->instance(),SIGNAL(destroyed(QObject *)),SLOT(onChildIndexDestroyed(QObject *)));
     emit childInserted(AIndex);
   }
 }
@@ -88,7 +83,6 @@ bool RosterIndex::removeChild(IRosterIndex *AIndex)
     emit childAboutToBeRemoved(AIndex);
     FChilds.removeAt(FChilds.indexOf(AIndex));
     AIndex->setParentIndex(0);
-    disconnect(AIndex->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onChildIndexDestroyed(QObject *))); 
     emit childRemoved(AIndex);
 
     if (FRemoveOnLastChildRemoved && FChilds.isEmpty())
@@ -101,8 +95,8 @@ bool RosterIndex::removeChild(IRosterIndex *AIndex)
 
 void RosterIndex::removeAllChilds()
 {
-  foreach(IRosterIndex *index,FChilds)
-    removeChild(index);
+  while (FChilds.count()>0)
+    removeChild(FChilds.value(0));
 }
 
 void RosterIndex::insertDataHolder(IRosterIndexDataHolder *ADataHolder)
@@ -110,7 +104,7 @@ void RosterIndex::insertDataHolder(IRosterIndexDataHolder *ADataHolder)
   connect(ADataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
     SLOT(onDataHolderChanged(IRosterIndex *, int)));
 
-  foreach (int role, ADataHolder->roles())
+  foreach(int role, ADataHolder->roles())
   {
     FDataHolders[role].insert(ADataHolder->order(),ADataHolder);
     dataChanged(this,role);
@@ -123,7 +117,7 @@ void RosterIndex::removeDataHolder(IRosterIndexDataHolder *ADataHolder)
   disconnect(ADataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
     this,SLOT(onDataHolderChanged(IRosterIndex *, int)));
   
-  foreach (int role, ADataHolder->roles())
+  foreach(int role, ADataHolder->roles())
   {
     FDataHolders[role].remove(ADataHolder->order(),ADataHolder);
     if (FDataHolders[role].isEmpty())
@@ -169,24 +163,17 @@ void RosterIndex::setData(int ARole, const QVariant &AData)
 IRosterIndexList RosterIndex::findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds) const
 {
   IRosterIndexList indexes;
-  
-  IRosterIndex *index;
-  foreach (index, FChilds)
+  foreach (IRosterIndex *index, FChilds)
   {
     bool cheked = true;
-    QList<int> dataRoles = AData.keys(); 
-    QList<int>::const_iterator role = dataRoles.constBegin();
-    while (cheked && role!=dataRoles.constEnd())
-    {
-      cheked = AData.values(*role).contains(index->data(*role));
-      role++;
-    }
+    QList<int> dataRoles = AData.keys();
+    for (int i=0; cheked && i<dataRoles.count(); i++)
+      cheked = AData.values(dataRoles.at(i)).contains(index->data(dataRoles.at(i)));
     if (cheked)
       indexes.append(index);
     if (ASearchInChilds)
       indexes += index->findChild(AData,ASearchInChilds); 
   }
-
   return indexes;  
 }
 
@@ -194,17 +181,6 @@ void RosterIndex::onDataHolderChanged(IRosterIndex *AIndex, int ARole)
 {
  if (AIndex == this || AIndex == NULL)
    emit dataChanged(this, ARole);
-}
-
-void RosterIndex::onChildIndexDestroyed(QObject *AIndex)
-{
-  IRosterIndex *index = qobject_cast<IRosterIndex *>(AIndex);
-  if (FChilds.contains(index))
-  {
-    emit childAboutToBeRemoved(index);
-    FChilds.removeAt(FChilds.indexOf(index));  
-    emit childRemoved(index);
-  }
 }
 
 void RosterIndex::onRemoveByLastChildRemoved()
@@ -216,6 +192,9 @@ void RosterIndex::onRemoveByLastChildRemoved()
 void RosterIndex::onDestroyByParentRemoved()
 {
   if (!FParentIndex)
+  {
+    removeAllChilds();
     deleteLater();
+  }
 }
 
