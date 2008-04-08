@@ -128,7 +128,7 @@ QWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder)
     if (account)
     {
       options->setOption(AccountOptions::AO_Name,account->name());
-      options->setOption(AccountOptions::AO_StreamJid,account->streamJid().full());
+      options->setOption(AccountOptions::AO_StreamJid,account->value(AVN_STREAMJID));
       options->setOption(AccountOptions::AO_Password,account->password());
       options->setOption(AccountOptions::AO_DefLang,account->defaultLang());
     }
