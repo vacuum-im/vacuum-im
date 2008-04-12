@@ -28,11 +28,10 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
     SLOT(onCurrentFeatureChanged(QListWidgetItem *, QListWidgetItem *)));
   connect(ui.lwtFearures,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
 
-  if (FDiscovery->hasDiscoInfo(FContactJid,ANode))
-    updateWindow();
+  if (!FDiscovery->hasDiscoInfo(FContactJid,ANode) || FDiscovery->discoInfo(FContactJid,ANode).error.code>0)
+    requestDiscoInfo();
   else
-    updateDiscoInfo();
-
+    updateWindow();
 }
 
 DiscoInfoWindow::~DiscoInfoWindow()
@@ -98,7 +97,7 @@ void DiscoInfoWindow::updateWindow()
   ui.pbtUpdate->setEnabled(true);
 }
 
-void DiscoInfoWindow::updateDiscoInfo()
+void DiscoInfoWindow::requestDiscoInfo()
 {
   if (FDiscovery->requestDiscoInfo(FStreamJid,FContactJid,FNode))
     ui.pbtUpdate->setEnabled(false);
@@ -119,7 +118,7 @@ void DiscoInfoWindow::onCurrentFeatureChanged(QListWidgetItem *ACurrent, QListWi
 
 void DiscoInfoWindow::onUpdateClicked()
 {
-  updateDiscoInfo();
+  requestDiscoInfo();
 }
 
 void DiscoInfoWindow::onListItemActivated(QListWidgetItem *AItem)

@@ -100,12 +100,12 @@ void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
   ditem.node = ANode;
   QTreeWidgetItem *treeItem = createTreeItem(ditem,NULL);
 
-  if (!useCache() || !FDiscovery->hasDiscoInfo(AContactJid,ANode))
+  if (!useCache() || isNeedRequestInfo(AContactJid,ANode))
     requestDiscoInfo(AContactJid,ANode);
   else
     updateDiscoInfo(FDiscovery->discoInfo(AContactJid,ANode));
 
-  if (!useCache() || !FDiscovery->hasDiscoItems(AContactJid,ANode))
+  if (!useCache() || isNeedRequestItems(AContactJid,ANode))
     requestDiscoItems(AContactJid,ANode);
   else
     updateDiscoItems(FDiscovery->discoItems(AContactJid,ANode));
@@ -123,6 +123,16 @@ void DiscoItemsWindow::initialize()
   plugin = FDiscovery->pluginManager()->getPlugins("IVCardPlugin").value(0,NULL);
   if (plugin)
     FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
+}
+
+bool DiscoItemsWindow::isNeedRequestInfo(const Jid AContactJid, const QString &ANode) const
+{
+  return !FDiscovery->hasDiscoInfo(AContactJid,ANode) || FDiscovery->discoInfo(AContactJid,ANode).error.code>0; 
+}
+
+bool DiscoItemsWindow::isNeedRequestItems(const Jid AContactJid, const QString &ANode) const
+{
+  return !FDiscovery->hasDiscoItems(AContactJid,ANode) || FDiscovery->discoItems(AContactJid,ANode).error.code>0; 
 }
 
 void DiscoItemsWindow::requestDiscoInfo(const Jid AContactJid, const QString &ANode)
@@ -232,13 +242,13 @@ void DiscoItemsWindow::updateDiscoItems(const IDiscoItems &ADiscoItems)
       if (curItem == NULL)
       {
         curItem = createTreeItem(ditem,treeItem);
-        if (useCache() && FDiscovery->hasDiscoInfo(ditem.itemJid,ditem.node))
+        if (useCache() && !isNeedRequestInfo(ditem.itemJid,ditem.node))
           updateDiscoInfo(FDiscovery->discoInfo(ditem.itemJid,ditem.node));
         else if (ADiscoItems.items.count() <= MAX_ITEMS_FOR_REQUEST)
           requestDiscoInfo(ditem.itemJid,ditem.node);
         else
           curItem->setIcon(CNAME,FDiscovery->discoItemIcon(ditem));
-        if (FDiscovery->hasDiscoItems(ditem.itemJid,ditem.node))
+        if (!isNeedRequestItems(ditem.itemJid,ditem.node))
           updateDiscoItems(FDiscovery->discoItems(ditem.itemJid,ditem.node));
       }
       else
@@ -255,7 +265,13 @@ void DiscoItemsWindow::updateDiscoItems(const IDiscoItems &ADiscoItems)
         index++;
     }
 
-    treeItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
+    if (ADiscoItems.error.code > 0)
+    {
+      ui.trwItems->collapseItem(treeItem);
+      treeItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+    }
+    else
+      treeItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     emit treeItemChanged(treeItem);
   }
 }
@@ -408,7 +424,7 @@ void DiscoItemsWindow::onTreeItemExpanded(QTreeWidgetItem *AItem)
     QString itemNode = AItem->data(0,DDR_NODE).toString();
     if (!useCache())
       requestDiscoItems(itemJid,itemNode);
-    else if(!FDiscovery->hasDiscoItems(itemJid,itemNode))
+    else if(isNeedRequestItems(itemJid,itemNode))
       requestDiscoItems(itemJid,itemNode);
     else if (AItem->childCount()==0)
       updateDiscoItems(FDiscovery->discoItems(itemJid,itemNode));
@@ -423,7 +439,7 @@ void DiscoItemsWindow::onCurrentTreeItemChanged(QTreeWidgetItem *ACurrent, QTree
     {
       Jid itemJid = ACurrent->data(0,DDR_JID).toString();
       QString itemNode = ACurrent->data(0,DDR_NODE).toString();
-      if (!FDiscovery->hasDiscoInfo(itemJid,itemNode))
+      if (isNeedRequestInfo(itemJid,itemNode))
         requestDiscoInfo(itemJid,itemNode);
     }
     updateToolBarActions();

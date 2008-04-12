@@ -18,7 +18,7 @@ public:
   virtual QString node() const { return FNode; }
 protected:
   void updateWindow();
-  void updateDiscoInfo();
+  void requestDiscoInfo();
 protected slots:
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void onCurrentFeatureChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious);

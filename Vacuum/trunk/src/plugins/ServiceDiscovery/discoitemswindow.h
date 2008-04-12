@@ -38,6 +38,8 @@ public:
   virtual QMenu *createPopupMenu() { return NULL; }
 protected:
   void initialize();
+  bool isNeedRequestInfo(const Jid AContactJid, const QString &ANode) const;
+  bool isNeedRequestItems(const Jid AContactJid, const QString &ANode) const;
   void requestDiscoInfo(const Jid AContactJid, const QString &ANode);
   void requestDiscoItems(const Jid AContactJid, const QString &ANode);
   QTreeWidgetItem *createTreeItem(const IDiscoItem &ADiscoItem, QTreeWidgetItem *AParent);

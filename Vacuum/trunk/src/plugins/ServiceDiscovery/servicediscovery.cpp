@@ -292,7 +292,7 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
           FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
           emit discoInfoReceived(dinfo);
         }
-        else if (!hasDiscoInfo(contactJid))
+        else if (!hasDiscoInfo(contactJid) || discoInfo(contactJid).error.code>0)
         {
           QueuedRequest request;
           request.streamJid = AStreamJid;
@@ -1045,17 +1045,17 @@ void ServiceDiscovery::onStreamStateChanged(const Jid &AStreamJid, bool AStateOn
     FDiscoMenu->addAction(action,AG_DEFAULT,true);
     FDiscoMenu->setEnabled(true);
 
-    if (!hasDiscoInfo(AStreamJid.domane()))
-    {
-      requestDiscoInfo(AStreamJid,AStreamJid.domane());
-      requestDiscoItems(AStreamJid,AStreamJid.domane());
-    }
+    Jid streamDomane = AStreamJid.domane();
+    if (!hasDiscoInfo(streamDomane) || discoInfo(streamDomane).error.code>0)
+      requestDiscoInfo(AStreamJid,streamDomane);
+    if (!hasDiscoItems(streamDomane) || discoItems(streamDomane).error.code>0)
+      requestDiscoItems(AStreamJid,streamDomane);
 
     IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
     QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
     foreach(IRosterItem ritem, ritems)
     {
-      if (ritem.itemJid.node().isEmpty() && !hasDiscoInfo(ritem.itemJid))
+      if (ritem.itemJid.node().isEmpty() && (!hasDiscoInfo(ritem.itemJid) || discoInfo(ritem.itemJid).error.code>0))
       {
         QueuedRequest request;
         request.streamJid = AStreamJid;
