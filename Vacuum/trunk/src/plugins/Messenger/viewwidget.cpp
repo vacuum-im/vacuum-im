@@ -27,13 +27,47 @@ ViewWidget::~ViewWidget()
 
 }
 
+void ViewWidget::setStreamJid(const Jid &AStreamJid)
+{
+  if (AStreamJid != FStreamJid)
+  {
+    Jid befour = FStreamJid;
+    FStreamJid = AStreamJid;
+    if (FShowKind == ChatMessage)
+    {
+      setColorForJid(FStreamJid,colorForJid(befour));
+      setColorForJid(befour,QColor());
+      setNickForJid(FStreamJid,nickForJid(befour));
+      setNickForJid(befour,QString());
+    }
+    emit streamJidChanged(befour);
+  }
+}
+
+void ViewWidget::setContactJid(const Jid &AContactJid)
+{
+  if (AContactJid != FContactJid)
+  {
+    Jid befour = FContactJid;
+    FContactJid = AContactJid;
+    if (FShowKind == ChatMessage)
+    {
+      setColorForJid(FContactJid,colorForJid(befour));
+      setColorForJid(befour,QColor());
+      setNickForJid(FContactJid,nickForJid(befour));
+      setNickForJid(befour,QString());
+    }
+    emit contactJidChanged(AContactJid);
+  }
+}
+
 void ViewWidget::setShowKind(ShowKind AKind)
 {
   FShowKind = AKind;
   if (FShowKind == ChatMessage)
   {
-    setColorForJid(FStreamJid,Qt::red);
-    setColorForJid(FContactJid,Qt::blue);
+    setColorForJid(FStreamJid,FJid2Color.value(FStreamJid,Qt::red));
+    setColorForJid(FContactJid,FJid2Color.value(FContactJid,Qt::blue));
   }
 }
 
@@ -128,46 +162,8 @@ void ViewWidget::setNickForJid(const Jid &AJid, const QString &ANick)
   if (!ANick.isNull())
     FJid2Nick.insert(AJid,ANick);
   else
-    FJid2Nick.remove(ANick);
+    FJid2Nick.remove(AJid);
   emit nickForJidChanged(AJid,ANick);
-}
-
-void ViewWidget::setStreamJid(const Jid &AStreamJid)
-{
-  if (AStreamJid != FStreamJid)
-  {
-    Jid befour = FStreamJid;
-    FStreamJid = AStreamJid;
-
-    if (FShowKind == ChatMessage)
-    {
-      setColorForJid(FStreamJid,colorForJid(befour));
-      setColorForJid(befour,QColor());
-      setNickForJid(FStreamJid,nickForJid(befour));
-      setNickForJid(befour,QString());
-    }
-
-    emit streamJidChanged(befour);
-  }
-}
-
-void ViewWidget::setContactJid(const Jid &AContactJid)
-{
-  if (AContactJid != FContactJid)
-  {
-    Jid befour = FContactJid;
-    FContactJid = AContactJid;
-
-    if (FShowKind == ChatMessage)
-    {
-      setColorForJid(FContactJid,colorForJid(befour));
-      setColorForJid(befour,QColor());
-      setNickForJid(FContactJid,nickForJid(befour));
-      setNickForJid(befour,QString());
-    }
-
-    emit contactJidChanged(AContactJid);
-  }
 }
 
 QString ViewWidget::getHtmlBody(const QString &AHtml)
@@ -203,4 +199,5 @@ bool ViewWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 
   return QWidget::eventFilter(AWatched,AEvent);
 }
+
 

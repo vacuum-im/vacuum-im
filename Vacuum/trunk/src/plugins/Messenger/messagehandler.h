@@ -6,6 +6,7 @@
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/irostersview.h"
+#include "../../interfaces/imessagearchiver.h"
 #include "../../utils/skin.h"
 
 class MessageHandler : 
@@ -34,6 +35,7 @@ protected:
   void updateMessageWindow(IMessageWindow *AWindow);
   IChatWindow *getChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
   IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
+  void showChatHistory(IChatWindow *AWindow);
   void showChatWindow(IChatWindow *AWindow);
   void removeActiveChatMessages(IChatWindow *AWindow);
   void updateChatWindow(IChatWindow *AWindow);
@@ -54,6 +56,7 @@ private:
   IMessenger *FMessenger;
   IStatusIcons *FStatusIcons;
   IPresencePlugin *FPresencePlugin;
+  IMessageArchiver *FMessageArchiver;
 private:
   QList<IMessageWindow *> FMessageWindows;
   QList<IChatWindow *> FChatWindows;

@@ -3,11 +3,14 @@
 #define IN_NORMAL_MESSAGE                     "psi/sendMessage"
 #define IN_CHAT_MESSAGE                       "psi/start-chat"
 
+#define HISTORY_MESSAGES                      10
+
 MessageHandler::MessageHandler(IMessenger *AMessenger, QObject *AParent) : QObject(AParent)
 {
+  FMessenger = AMessenger;
   FStatusIcons = NULL;
   FPresencePlugin = NULL;
-  FMessenger = AMessenger;
+  FMessageArchiver = NULL;
   initialize();
 }
 
@@ -133,6 +136,10 @@ void MessageHandler::initialize()
         SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
     }
   }
+
+  plugin = FMessenger->pluginManager()->getPlugins("IMessageArchiver").value(0,NULL);
+  if (plugin)
+    FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
 }
 
 IMessageWindow *MessageHandler::getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
@@ -233,6 +240,7 @@ IChatWindow *MessageHandler::getChatWindow(const Jid &AStreamJid, const Jid &ACo
         SLOT(onChatInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
       connect(window,SIGNAL(windowDestroyed()),SLOT(onChatWindowDestroyed()));
       FChatWindows.append(window);
+      showChatHistory(window);
       window->infoWidget()->autoUpdateFields();
       updateChatWindow(window);
     }
@@ -248,6 +256,19 @@ IChatWindow *MessageHandler::findChatWindow(const Jid &AStreamJid, const Jid &AC
     if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
       return window;
   return NULL;
+}
+
+void MessageHandler::showChatHistory(IChatWindow *AWindow)
+{
+  if (FMessageArchiver)
+  {
+    IArchiveRequest request;
+    request.with = AWindow->contactJid();
+    request.count = HISTORY_MESSAGES;
+    QList<Message> history = FMessageArchiver->findLocalMessages(AWindow->streamJid(),request);
+    foreach (Message message, history)
+      AWindow->showMessage(message);
+  }
 }
 
 void MessageHandler::showChatWindow(IChatWindow *AWindow)
@@ -458,4 +479,5 @@ void MessageHandler::onStatusIconsChanged()
   foreach(IMessageWindow *window, FMessageWindows)
     updateMessageWindow(window);
 }
+
 
