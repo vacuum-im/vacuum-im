@@ -1178,7 +1178,7 @@ QStringList MessageArchiver::findCollectionFiles(const Jid &AStreamJid, const IA
     {
       dir.cd(dirName);
       QStringList dirFiles = dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files);
-      if (dirList.count()>1 && dirFiles.count()>ARequest.count)
+      if (dirFiles.count()>ARequest.count)
       {
         if (ARequest.order == Qt::AscendingOrder)
           qSort(dirFiles.begin(),dirFiles.end(),qLess<QString>());
