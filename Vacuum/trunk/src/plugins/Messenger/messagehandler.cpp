@@ -240,8 +240,8 @@ IChatWindow *MessageHandler::getChatWindow(const Jid &AStreamJid, const Jid &ACo
         SLOT(onChatInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
       connect(window,SIGNAL(windowDestroyed()),SLOT(onChatWindowDestroyed()));
       FChatWindows.append(window);
-      showChatHistory(window);
       window->infoWidget()->autoUpdateFields();
+      showChatHistory(window);
       updateChatWindow(window);
     }
     else
@@ -265,7 +265,9 @@ void MessageHandler::showChatHistory(IChatWindow *AWindow)
     IArchiveRequest request;
     request.with = AWindow->contactJid();
     request.count = HISTORY_MESSAGES;
+    request.order = Qt::DescendingOrder;
     QList<Message> history = FMessageArchiver->findLocalMessages(AWindow->streamJid(),request);
+    qSort(history);
     foreach (Message message, history)
       AWindow->showMessage(message);
   }
