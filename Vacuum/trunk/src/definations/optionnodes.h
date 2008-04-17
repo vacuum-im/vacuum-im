@@ -6,5 +6,6 @@
 #define ON_ROSTER                                   "Roster"
 #define ON_MESSAGES                                 "Messages"
 #define ON_EMOTICONS                                "Emoticons"
+#define ON_HISTORY                                  "History"
 
 #endif

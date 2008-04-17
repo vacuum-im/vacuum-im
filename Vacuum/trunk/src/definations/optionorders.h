@@ -17,4 +17,7 @@
 //Node = "Emoticons"
 #define OO_EMOTICONS                              500
 
+//Node = "History
+#define OO_HISTORY                                500
+
 #endif

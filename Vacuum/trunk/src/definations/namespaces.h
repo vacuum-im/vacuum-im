@@ -49,4 +49,13 @@
 
 #define NS_COMMANDS                             "http://jabber.org/protocol/commands"
 
+#define NS_ARCHIVE                              "urn:xmpp:tmp:archive"
+#define NS_ARCHIVE_AUTO                         "urn:xmpp:tmp:archive:auto"
+#define NS_ARCHIVE_ENCRYPT                      "urn:xmpp:tmp:archive:encrypt"
+#define NS_ARCHIVE_MANAGE                       "urn:xmpp:tmp:archive:manage"
+#define NS_ARCHIVE_MANUAL                       "urn:xmpp:tmp:archive:manual"
+#define NS_ARCHIVE_PREF                         "urn:xmpp:tmp:archive:pref"
+
+#define NS_RESULTSET                            "http://jabber.org/protocol/rsm"
+
 #endif

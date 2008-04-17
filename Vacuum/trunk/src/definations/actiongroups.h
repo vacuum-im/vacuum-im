@@ -76,4 +76,11 @@
 #define AG_BMM_BOOKMARKS_STREAMS                                600
 #define AG_BBM_BOOKMARKS_TOOLS                                  700
 
+//ArchiveWindow - Groups Tools
+#define AG_AWGT_ARCHIVE_GROUPING                                200
+#define AG_AWGT_ARCHIVE_DEFACTIONS                              300
+#define AG_AWGT_ARCHIVE_ACTIONS                                 500
+//ArchiveWindow - Messages Tools
+#define AG_AWMT_ARCHIVE_ACTIONS                                 500
+
 #endif

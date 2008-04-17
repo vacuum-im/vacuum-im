@@ -32,4 +32,5 @@ SUBDIRS = settings \
           registration \
           commands \
           jabbersearch \
-          gateways
+          gateways \
+          messagearchiver

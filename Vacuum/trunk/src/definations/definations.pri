@@ -18,4 +18,6 @@ HEADERS += actiongroups.h \
            discotreeitemsdataroles.h \
            discofeatureorder.h  \
            version.h \
-           accountvaluenames.h
+           accountvaluenames.h \
+           archivehandlerorders.h \
+           archiveindextyperole.h
