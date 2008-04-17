@@ -1843,8 +1843,11 @@ void MessageArchiver::onPrivateDataError(const QString &AId, const QString &AErr
 void MessageArchiver::onCollectionWriterDestroyed(const Jid &AStreamJid, CollectionWriter *AWriter)
 {
   FCollectionWriters[AStreamJid].remove(AWriter->header().with,AWriter);
-  saveLocalModofication(AStreamJid,AWriter->header(),LOG_ACTION_CREATE);
-  emit localCollectionSaved(AStreamJid,AWriter->header());
+  if (AWriter->recordsCount() > 0)
+  {
+    saveLocalModofication(AStreamJid,AWriter->header(),LOG_ACTION_CREATE);
+    emit localCollectionSaved(AStreamJid,AWriter->header());
+  }
 }
 
 void MessageArchiver::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)

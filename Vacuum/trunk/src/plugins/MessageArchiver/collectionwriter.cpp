@@ -7,7 +7,7 @@ CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileNa
   FXmlFile = NULL;
   FXmlWriter = NULL;
 
-  FCount = 0;
+  FRecsCount = 0;
   FSecsSum = 0;
   FGroupchat = false;
 
@@ -51,7 +51,7 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
     FGroupchat |= AMessage.type()==Message::GroupChat;
     if (!FGroupchat || !contactJid.resource().isEmpty())
     {
-      FCount++;
+      FRecsCount++;
       FCloseTimer.start(CLOSE_TIMEOUT);
 
       FXmlWriter->writeStartElement(ADirectionIn ? "from" : "to");
@@ -85,7 +85,7 @@ bool CollectionWriter::writeNote(const QString &ANote)
 {
   if (isOpened() && ANote.isEmpty())
   {
-    FCount++;
+    FRecsCount++;
     FCloseTimer.start(CLOSE_TIMEOUT);
     FXmlWriter->writeStartElement("note");
     FXmlWriter->writeAttribute("utc",DateTime(QDateTime::currentDateTime()).toX85UTC());
@@ -133,7 +133,7 @@ void CollectionWriter::stopCollection()
     delete FXmlFile;
     FXmlFile = NULL;
   }
-  if (FCount == 0)
+  if (FRecsCount == 0)
   {
     QFile::remove(FFileName);
   }

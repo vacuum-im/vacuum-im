@@ -22,7 +22,7 @@ public:
   const Jid &streamJid() const { return FStreamJid; }
   const QString &fileName() const { return FFileName; }
   const IArchiveHeader &header() const { return FHeader; }
-  int messageCount() const { return FCount; }
+  int recordsCount() const { return FRecsCount; }
   int secondsFromStart() const { return FSecsSum; }
   bool writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn);
   bool writeNote(const QString &ANote);
@@ -38,7 +38,7 @@ private:
   QFile *FXmlFile;
   QXmlStreamWriter *FXmlWriter;
 private:
-  int FCount;
+  int FRecsCount;
   int FSecsSum;
   bool FGroupchat;
   Jid FStreamJid;
