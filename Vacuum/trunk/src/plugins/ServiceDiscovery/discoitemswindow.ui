@@ -113,7 +113,7 @@
        <widget class="QTreeWidget" name="trwItems" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-          <horstretch>5</horstretch>
+          <horstretch>4</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>

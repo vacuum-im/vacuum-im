@@ -50,9 +50,9 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
   connect(ui.cmbNode->lineEdit(),SIGNAL(returnPressed()),SLOT(onComboReturnPressed()));
 
   ui.trwItems->header()->setStretchLastSection(false);
-  ui.trwItems->header()->setResizeMode(CNAME,QHeaderView::Stretch);
-  ui.trwItems->header()->setResizeMode(CJID,QHeaderView::ResizeToContents);
-  ui.trwItems->header()->setResizeMode(CNODE,QHeaderView::ResizeToContents);
+  ui.trwItems->header()->setResizeMode(CNAME,QHeaderView::ResizeToContents);
+  ui.trwItems->header()->setResizeMode(CJID,QHeaderView::Stretch);
+  ui.trwItems->header()->setResizeMode(CNODE,QHeaderView::Stretch);
   ui.trwItems->sortByColumn(CNAME,Qt::AscendingOrder);
   connect(ui.trwItems,SIGNAL(itemExpanded(QTreeWidgetItem *)),SLOT(onTreeItemExpanded(QTreeWidgetItem *)));
   connect(ui.trwItems,SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
