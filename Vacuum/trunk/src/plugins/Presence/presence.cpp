@@ -79,7 +79,7 @@ bool Presence::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &A
       if (show == Offline)
         FItems.remove(fromJid);
     }
-    else if (FShow != show || FStatus != status || FPriority != priority)
+    else if (show!=IPresence::Offline && (FShow != show || FStatus != status || FPriority != priority))
     {
       FShow = show;
       FStatus = status;
@@ -199,14 +199,22 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
     QString show;
     switch (AShow)
     {
-    case Online: show = ""; break; 
-    case Chat: show = "chat"; break; 
-    case Away: show = "away"; break;
-    case DoNotDistrib: show = "dnd"; break; 
-    case ExtendedAway: show = "xa"; break;
-    case Invisible: show=""; break;
-    case Offline: show=""; break;
-    default: return false;
+      case Online: 
+        show = ""; break; 
+      case Chat: 
+        show = "chat"; break; 
+      case Away: 
+        show = "away"; break;
+      case DoNotDistrib: 
+        show = "dnd"; break; 
+      case ExtendedAway: 
+        show = "xa"; break;
+      case Invisible: 
+        show=""; break;
+      case Offline: 
+        show=""; break;
+      default: 
+        return false;
     }
 
     Stanza pres("presence");
