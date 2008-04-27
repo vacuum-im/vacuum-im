@@ -241,6 +241,8 @@ IChatWindow *MessageHandler::getChatWindow(const Jid &AStreamJid, const Jid &ACo
       connect(window,SIGNAL(windowDestroyed()),SLOT(onChatWindowDestroyed()));
       FChatWindows.append(window);
       window->infoWidget()->autoUpdateFields();
+      window->viewWidget()->setNickForJid(AContactJid.bare(),window->viewWidget()->nickForJid(AContactJid));
+      window->viewWidget()->setColorForJid(AContactJid.bare(),window->viewWidget()->colorForJid(AContactJid));
       showChatHistory(window);
       updateChatWindow(window);
     }
