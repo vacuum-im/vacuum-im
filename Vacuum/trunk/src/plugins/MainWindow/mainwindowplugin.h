@@ -2,6 +2,7 @@
 #define MAINWINDOWPLUGIN_H
 
 #include "../../definations/actiongroups.h"
+#include "../../definations/version.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/isettings.h"
@@ -31,17 +32,17 @@ public:
   virtual IMainWindow *mainWindow() const;
 protected:
   void updateTitle();
+  void showMainWindow();
 protected slots:
-  void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
   void onSettingsOpened();
   void onSettingsClosed();
   void onProfileRenamed(const QString &AProfileFrom, const QString &AProfileTo);
+  void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
+  void onShowMainWindow();
 private:
   IPluginManager *FPluginManager;
   ISettingsPlugin *FSettingsPlugin;
   ITrayManager *FTrayManager;
-private:
-  Action *FActionQuit;
 private:
   MainWindow *FMainWindow;
 };

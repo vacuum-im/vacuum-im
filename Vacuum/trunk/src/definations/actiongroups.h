@@ -34,13 +34,14 @@
 #define AG_ROSTERCHANGER_ROSTER                                 700
 
 //TrayManager (TrayMenu)
-#define AG_STATUSCHANGER_TRAY                                   200
+#define AG_MAINWONDOW_SHOW_TRAY                                 200                    
+#define AG_STATUSCHANGER_TRAY                                   300
 #define AG_ROSTERCHANGER_TRAY                                   500
-#define AG_SETTINGS_TRAY                                        700
-#define AG_SKINMANAGER_TRAY                                     700
-#define AG_DISCOVERY_TRAY                                       700
-#define AG_MULTIUSERCHAT_TRAY                                   700
-#define AG_BOOKMARKS_TRAY                                       700
+#define AG_SETTINGS_TRAY                                        500
+#define AG_SKINMANAGER_TRAY                                     500
+#define AG_DISCOVERY_TRAY                                       500
+#define AG_MULTIUSERCHAT_TRAY                                   500
+#define AG_BOOKMARKS_TRAY                                       500
 #define AG_TRAYMANAGER_TRAY_QUIT                                1000
 
 //StatusChanger (StatusMenu, StreamMenu)
