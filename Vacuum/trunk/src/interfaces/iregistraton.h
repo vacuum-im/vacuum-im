@@ -2,7 +2,6 @@
 #define IREGISTRATION_H
 
 #include <QUrl>
-#include <QDomElement>
 #include "../../interfaces/idataforms.h"
 #include "../../utils/jid.h"
 
@@ -24,7 +23,7 @@ struct IRegisterFields {
   QString email;
   QString key;
   QUrl url;
-  QDomElement dataForm;
+  IDataForm form;
 };
 
 struct IRegisterSubmit {
@@ -34,7 +33,7 @@ struct IRegisterSubmit {
   QString password;
   QString email;
   QString key;
-  IDataForm *dataForm;
+  IDataForm form;
 };
 
 class IRegistration {

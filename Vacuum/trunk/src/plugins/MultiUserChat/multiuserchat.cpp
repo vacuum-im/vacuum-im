@@ -10,6 +10,7 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, IMessenger *AMes
                              const QString &ANickName, const QString &APassword, QObject *AParent) : QObject(AParent)
 {
   FPresence = NULL;
+  FDataForms = NULL;
   FXmppStream = NULL;
   FStanzaProcessor = NULL;
   FMainUser = NULL;
@@ -72,7 +73,7 @@ void MultiUserChat::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
       while(formElem.namespaceURI() != NS_JABBER_DATA)
         formElem = formElem.nextSiblingElement("x");
       if (!formElem.isNull())
-        emit configFormReceived(formElem);
+        emit configFormReceived(FDataForms!=NULL ? FDataForms->dataForm(formElem) : IDataForm());
       else
         emit chatNotify("",tr("Room configuration is not available."));
     }
@@ -303,16 +304,16 @@ bool MultiUserChat::requestVoice()
     
     Stanza &mstanza = message.stanza();
     QDomElement formElem = mstanza.addElement("x",NS_JABBER_DATA);
-    formElem.setAttribute("type",FORM_SUBMIT);
+    formElem.setAttribute("type",DATAFORM_TYPE_SUBMIT);
 
     QDomElement fieldElem =  formElem.appendChild(mstanza.createElement("field")).toElement();
     fieldElem.setAttribute("var","FORM_TYPE");
-    fieldElem.setAttribute("type",FIELD_HIDDEN);
+    fieldElem.setAttribute("type",DATAFIELD_TYPE_HIDDEN);
     fieldElem.appendChild(mstanza.createElement("value")).appendChild(mstanza.createTextNode(MUC_FT_REQUEST));
     
     fieldElem = formElem.appendChild(mstanza.createElement("field")).toElement();
     fieldElem.setAttribute("var",MUC_FV_ROLE);
-    fieldElem.setAttribute("type",FIELD_TEXTSINGLE);
+    fieldElem.setAttribute("type",DATAFIELD_TYPE_TEXTSINGLE);
     fieldElem.setAttribute("label","Requested role");
     fieldElem.appendChild(mstanza.createElement("value")).appendChild(mstanza.createTextNode(MUC_ROLE_PARTICIPANT));
 
@@ -355,22 +356,22 @@ void MultiUserChat::setSubject(const QString &ASubject)
   }
 }
 
-void MultiUserChat::submitDataFormMessage(IDataForm *AForm)
+void MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
 {
-  if (FStanzaProcessor && isOpen())
+  if (FDataForms && isOpen())
   {
     Message message;
     message.setTo(FRoomJid.eBare());
     Stanza &mstanza = message.stanza();
-    QDomElement formElem = mstanza.addElement("query",NS_MUC_OWNER).appendChild(mstanza.createElement("x",NS_JABBER_DATA)).toElement();
-    AForm->createSubmit(formElem);
-    bool submited;
+    QDomElement queryElem = mstanza.addElement("query",NS_MUC_OWNER).toElement();
+    FDataForms->xmlForm(AForm,queryElem);
+    bool submited = false;
     if (FMessenger)
       submited = FMessenger->sendMessage(message,FStreamJid);
-    else
+    else if (FStanzaProcessor)
       submited = FStanzaProcessor->sendIqStanza(this,FStreamJid,message.stanza(),0);
     if (submited)
-      emit dataFormMessageSubmited(AForm);
+      emit dataFormMessageSent(AForm);
   }
 }
 
@@ -477,20 +478,22 @@ bool MultiUserChat::requestConfigForm()
   return false;
 }
 
-bool MultiUserChat::submitConfigForm(IDataForm *AForm)
+bool MultiUserChat::sendConfigForm(const IDataForm &AForm)
 {
   if (!FConfigSubmitId.isEmpty())
+  {
     return true;
-  else if (FStanzaProcessor && AForm->isValid())
+  }
+  else if (FStanzaProcessor && FDataForms)
   {
     Stanza iq("iq");
     iq.setTo(FRoomJid.eBare()).setType("set").setId(FStanzaProcessor->newId());
-    QDomElement formElem = iq.addElement("query",NS_MUC_OWNER).appendChild(iq.createElement("x",NS_JABBER_DATA)).toElement();
-    AForm->createSubmit(formElem);
+    QDomElement queryElem = iq.addElement("query",NS_MUC_OWNER).toElement();
+    FDataForms->xmlForm(AForm,queryElem);
     if (FStanzaProcessor->sendIqStanza(this,FStreamJid,iq,MUC_IQ_TIMEOUT))
     {
       FConfigSubmitId = iq.id();
-      emit configFormSubmited(AForm);
+      emit configFormSent(AForm);
       return true;
     }
   }
@@ -779,6 +782,10 @@ bool MultiUserChat::initialize(IPluginManager *APluginManager)
       }
     }
   }
+
+  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  if (plugin)
+    FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
   if (FMessenger)
   {

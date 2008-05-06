@@ -43,7 +43,7 @@
 #define NS_DISCO_PUBLISH                        "http://jabber.org/protocol/disco#publish"
 
 #define NS_JABBER_XDATALAYOUT                   "http://jabber.org/protocol/xdata-layout"
-#define NS_JABBER_XDATAVALIDATE                 "http://jabber.org/protocols/xdata-validate"
+#define NS_JABBER_XDATAVALIDATE                 "http://jabber.org/protocol/xdata-validate"
 
 #define NS_CAPS                                 "http://jabber.org/protocol/caps"
 

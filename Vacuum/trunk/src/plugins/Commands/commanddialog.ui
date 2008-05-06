@@ -43,18 +43,21 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
-     <item>
-      <widget class="QWidget" native="1" name="wdtPages" />
-     </item>
-     <item>
-      <widget class="QDialogButtonBox" name="dbbButtons" >
-       <property name="standardButtons" >
-        <set>QDialogButtonBox::Cancel</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QFrame" name="frame" >
+     <property name="frameShape" >
+      <enum>QFrame::HLine</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="dbbButtons" >
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::Cancel</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

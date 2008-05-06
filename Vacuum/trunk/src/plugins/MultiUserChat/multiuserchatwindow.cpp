@@ -93,7 +93,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMes
     SLOT(onUserBanned(const QString &, const QString &, const QString &)));
   connect(FMultiChat->instance(),SIGNAL(affiliationListReceived(const QString &,const QList<IMultiUserListItem> &)),
     SLOT(onAffiliationListReceived(const QString &,const QList<IMultiUserListItem> &)));
-  connect(FMultiChat->instance(),SIGNAL(configFormReceived(const QDomElement &)), SLOT(onConfigFormReceived(const QDomElement &)));
+  connect(FMultiChat->instance(),SIGNAL(configFormReceived(const IDataForm &)), SLOT(onConfigFormReceived(const IDataForm &)));
   connect(FMultiChat->instance(),SIGNAL(roomDestroyed(const QString &)), SLOT(onRoomDestroyed(const QString &)));
 
   connect(FMessenger->instance(),SIGNAL(defaultChatFontChanged(const QFont &)), SLOT(onDefaultChatFontChanged(const QFont &)));
@@ -225,10 +225,10 @@ void MultiUserChatWindow::receiveMessage(int AMessageId)
   }
   else if (contactJid.resource().isEmpty() && !message.stanza().firstElement("x",NS_JABBER_DATA).isNull())
   {
-    QDomElement formElem = message.stanza().firstElement("x",NS_JABBER_DATA);
-    IDataDialog *dialog = FDataForms->newDataDialog(formElem,this);
-    connect(dialog,SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
-    showServiceMessage(tr("Data form received: %1").arg(dialog->dataForm()->title()));
+    IDataForm form = FDataForms->dataForm(message.stanza().firstElement("x",NS_JABBER_DATA));
+    IDataDialogWidget *dialog = FDataForms->dialogWidget(form,this);
+    connect(dialog->instance(),SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
+    showServiceMessage(tr("Data form received: %1").arg(form.title));
     FDataFormMessages.insert(AMessageId,dialog);
   }
   else if (message.type() == Message::GroupChat)
@@ -262,10 +262,10 @@ void MultiUserChatWindow::showMessage(int AMessageId)
 {
   if (FDataFormMessages.contains(AMessageId))
   {
-    IDataDialog *dialog = FDataFormMessages.take(AMessageId);
+    IDataDialogWidget *dialog = FDataFormMessages.take(AMessageId);
     if(dialog)
     {
-      dialog->show();
+      dialog->instance()->show();
       FMessenger->removeMessage(AMessageId);
     }
   }
@@ -1263,15 +1263,15 @@ void MultiUserChatWindow::onAffiliationListReceived(const QString &AAffiliation,
   dialog->show();
 }
 
-void MultiUserChatWindow::onConfigFormReceived(const QDomElement &AForm)
+void MultiUserChatWindow::onConfigFormReceived(const IDataForm &AForm)
 {
   if (FDataForms)
   {
-    IDataDialog *dialog = FDataForms->newDataDialog(AForm,this);
-    connect(dialog,SIGNAL(accepted()),SLOT(onConfigFormDialogAccepted()));
-    connect(FMultiChat->instance(),SIGNAL(chatClosed()),dialog,SLOT(reject()));
-    connect(FMultiChat->instance(),SIGNAL(configFormReceived(const QDomElement &)),dialog,SLOT(reject()));
-    dialog->show();
+    IDataDialogWidget *dialog = FDataForms->dialogWidget(AForm,this);
+    connect(dialog->instance(),SIGNAL(accepted()),SLOT(onConfigFormDialogAccepted()));
+    connect(FMultiChat->instance(),SIGNAL(chatClosed()),dialog->instance(),SLOT(reject()));
+    connect(FMultiChat->instance(),SIGNAL(configFormReceived(const IDataForm &)),dialog->instance(),SLOT(reject()));
+    dialog->instance()->show();
   }
 }
 
@@ -1531,9 +1531,9 @@ void MultiUserChatWindow::onInviteActionTriggered(bool)
 
 void MultiUserChatWindow::onDataFormMessageDialogAccepted()
 {
-  IDataDialog *dialog = qobject_cast<IDataDialog *>(sender());
+  IDataDialogWidget *dialog = qobject_cast<IDataDialogWidget *>(sender());
   if (dialog)
-    FMultiChat->submitDataFormMessage(dialog->dataForm());
+    FMultiChat->sendDataFormMessage(FDataForms->dataSubmit(dialog->formWidget()->userDataForm()));
 }
 
 void MultiUserChatWindow::onAffiliationListDialogAccepted()
@@ -1545,9 +1545,9 @@ void MultiUserChatWindow::onAffiliationListDialogAccepted()
 
 void MultiUserChatWindow::onConfigFormDialogAccepted()
 {
-  IDataDialog *dialog = qobject_cast<IDataDialog *>(sender());
+  IDataDialogWidget *dialog = qobject_cast<IDataDialogWidget *>(sender());
   if (dialog)
-    FMultiChat->submitConfigForm(dialog->dataForm());
+    FMultiChat->sendConfigForm(FDataForms->dataSubmit(dialog->formWidget()->userDataForm()));
 }
 
 void MultiUserChatWindow::onListItemActivated(QListWidgetItem *AItem)

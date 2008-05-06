@@ -12,6 +12,7 @@ JabberSearch::JabberSearch()
   FStanzaProcessor = NULL;
   FDiscovery = NULL;
   FPresencePlugin = NULL;
+  FDataForms = NULL;
 }
 
 JabberSearch::~JabberSearch()
@@ -46,6 +47,10 @@ bool JabberSearch::initConnections(IPluginManager *APluginManager, int &/*AInitO
   if (plugin)
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
   
+  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  if (plugin)
+    FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+
   return FStanzaProcessor!=NULL;
 }
 
@@ -92,17 +97,20 @@ void JabberSearch::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
         fields.fieldMask += ISearchFields::Email;
         fields.item.email = query.firstChildElement("email").text();
       }
-      fields.dataForm = query.firstChildElement("x");
-      while (!fields.dataForm.isNull() && fields.dataForm.namespaceURI()!=NS_JABBER_DATA)
-        fields.dataForm = fields.dataForm.nextSiblingElement("x");
-      
+
+      if (FDataForms)
+      {
+        QDomElement formElem = query.firstChildElement("x");
+        while (!formElem.isNull() && formElem.namespaceURI()!=NS_JABBER_DATA)
+          formElem = formElem.nextSiblingElement("x");
+        if (!formElem.isNull())
+          fields.form = FDataForms->dataForm(formElem);
+      }
+     
       emit searchFields(AStanza.id(),fields);
     }
     else
-    {
-      ErrorHandler err(AStanza.element());
-      emit searchError(AStanza.id(),err.message());
-    }
+      emit searchError(AStanza.id(),ErrorHandler(AStanza.element()).message());
   }
   else if (FSubmits.contains(AStanza.id()))
   {
@@ -125,17 +133,19 @@ void JabberSearch::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
         result.items.append(item);
       }
 
-      result.dataForm = query.firstChildElement("x");
-      while (!result.dataForm.isNull() && result.dataForm.namespaceURI()!=NS_JABBER_DATA)
-        result.dataForm = result.dataForm.nextSiblingElement("x");
+      if (FDataForms)
+      {
+        QDomElement formElem = query.firstChildElement("x");
+        while (!formElem.isNull() && formElem.namespaceURI()!=NS_JABBER_DATA)
+          formElem = formElem.nextSiblingElement("x");
+        if (!formElem.isNull())
+          result.form = FDataForms->dataForm(formElem);
+      }
 
       emit searchResult(AStanza.id(),result);
     }
     else
-    {
-      ErrorHandler err(AStanza.element());
-      emit searchError(AStanza.id(),err.message());
-    }
+      emit searchError(AStanza.id(),ErrorHandler(AStanza.element()).message());
   }
 }
 
@@ -144,14 +154,12 @@ void JabberSearch::iqStanzaTimeOut(const QString &AId)
   if (FRequests.contains(AId))
   {
     FRequests.removeAt(FRequests.indexOf(AId));
-    ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-    emit searchError(AId,err.message());
+    emit searchError(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
   else if (FSubmits.contains(AId))
   {
     FSubmits.removeAt(FSubmits.indexOf(AId));
-    ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-    emit searchError(AId,err.message());
+    emit searchError(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
 }
 
@@ -199,7 +207,7 @@ QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASu
   submit.setTo(ASubmit.serviceJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
   
   QDomElement query = submit.addElement("query",NS_JABBER_SEARCH);
-  if (ASubmit.dataForm.isNull())
+  if (ASubmit.form.type.isEmpty())
   {
     if (!ASubmit.item.firstName.isEmpty())
       query.appendChild(submit.createElement("first")).appendChild(submit.createTextNode(ASubmit.item.firstName));
@@ -210,8 +218,8 @@ QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASu
     if (!ASubmit.item.email.isEmpty())
       query.appendChild(submit.createElement("email")).appendChild(submit.createTextNode(ASubmit.item.email));
   }
-  else
-    query.appendChild(ASubmit.dataForm.cloneNode(true));
+  else if (FDataForms)
+    FDataForms->xmlForm(ASubmit.form,query);
 
   if (FStanzaProcessor->sendIqStanza(this,AStreamJid,submit,SEARCH_TIMEOUT))
   {

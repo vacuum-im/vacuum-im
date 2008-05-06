@@ -108,9 +108,14 @@ bool Commands::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &A
     request.node = cmdElem.attribute("node");
     request.action = cmdElem.attribute("action",COMMAND_ACTION_EXECUTE);
 
-    request.form = cmdElem.firstChildElement("x");
-    while(!request.form.isNull() && request.form.namespaceURI()!=NS_JABBER_DATA)
-      request.form = request.form.nextSiblingElement("x");
+    if (FDataForms)
+    {
+      QDomElement formElem = cmdElem.firstChildElement("x");
+      while(!formElem.isNull() && formElem.namespaceURI()!=NS_JABBER_DATA)
+        formElem = formElem.nextSiblingElement("x");
+      if (!formElem.isNull())
+        request.form = FDataForms->dataForm(formElem);
+    }
     
     ICommandServer *server = FCommands.value(request.node);
     if (!server || !server->receiveCommandRequest(request))
@@ -159,9 +164,14 @@ void Commands::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
         noteElem = noteElem.nextSiblingElement("note");
       }
 
-      result.form = cmdElem.firstChildElement("x");
-      while(!result.form.isNull() && result.form.namespaceURI()!=NS_JABBER_DATA)
-        result.form = result.form.nextSiblingElement("x");
+      if (FDataForms)
+      {
+        QDomElement formElem = cmdElem.firstChildElement("x");
+        while(!formElem.isNull() && formElem.namespaceURI()!=NS_JABBER_DATA)
+          formElem = formElem.nextSiblingElement("x");
+        if (!formElem.isNull())
+          result.form = FDataForms->dataForm(formElem);
+      }
 
       foreach(ICommandClient *client, FClients)
         if (client->receiveCommandResult(result))
@@ -362,8 +372,8 @@ QString Commands::sendCommandRequest(const ICommandRequest &ARequest)
     cmdElem.setAttribute("sessionid",ARequest.action);
   if (!ARequest.action.isEmpty())
     cmdElem.setAttribute("action",ARequest.action);
-  if (!ARequest.form.isNull())
-    cmdElem.appendChild(ARequest.form.cloneNode(true));
+  if (FDataForms && !ARequest.form.type.isEmpty())
+    FDataForms->xmlForm(ARequest.form,cmdElem);
   if (FStanzaProcessor->sendIqStanza(this,ARequest.streamJid,request,COMMANDS_TIMEOUT))
   {
     FRequests.append(request.id());
@@ -390,8 +400,8 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
       actElem.appendChild(result.createElement(action));
   }
   
-  if (!AResult.form.isNull())
-    cmdElem.appendChild(AResult.form.cloneNode(true));
+  if (FDataForms && !AResult.form.type.isEmpty())
+    FDataForms->xmlForm(AResult.form,cmdElem);
 
   foreach(ICommandNote note,AResult.notes)
   {

@@ -21,10 +21,7 @@ RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataFo
   FServiceJid = AServiceJid;
   FOperation = AOperation;
   FSubmit.serviceJid = AServiceJid;
-  FSubmit.dataForm = NULL;
-
-  ui.wdtPages->setLayout(new QHBoxLayout);
-  ui.wdtPages->layout()->setMargin(0);
+  FCurrentForm = NULL;
 
   connect(ARegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
     SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
@@ -45,13 +42,11 @@ RegisterDialog::~RegisterDialog()
 void RegisterDialog::resetDialog()
 {
   setWindowTitle(tr("Registration at %1").arg(FServiceJid.full()));
-  if (FSubmit.dataForm)
+  if (FCurrentForm)
   {
-    ui.spgDataForm->layout()->removeWidget(FSubmit.dataForm->instance());
-    if (FSubmit.dataForm->pageControl())
-      ui.wdtPages->layout()->removeWidget(FSubmit.dataForm->pageControl());
-    FSubmit.dataForm->instance()->deleteLater();
-    FSubmit.dataForm = NULL;
+    ui.spgDataForm->layout()->removeWidget(FCurrentForm->instance());
+    FCurrentForm->instance()->deleteLater();
+    FCurrentForm = NULL;
   }
   ui.lblInstuctions->setText("");
   ui.lneUserName->setVisible(false);
@@ -114,14 +109,12 @@ void RegisterDialog::onRegisterFields(const QString &AId, const IRegisterFields 
     FSubmit.fieldMask = AFields.fieldMask;
     FSubmit.key = AFields.key;
     
-    if (!AFields.dataForm.isNull())
+    if (!AFields.form.type.isEmpty())
     {
-      FSubmit.dataForm = FDataForms->newDataForm(AFields.dataForm,ui.spgDataForm);
-      if (!FSubmit.dataForm->title().isEmpty())
-        setWindowTitle(FSubmit.dataForm->title());
-      if (FSubmit.dataForm->pageControl())
-        ui.wdtPages->layout()->addWidget(FSubmit.dataForm->pageControl());
-      ui.spgDataForm->layout()->addWidget(FSubmit.dataForm->instance());
+      FCurrentForm = FDataForms->formWidget(AFields.form,ui.spgDataForm);
+      if (!AFields.form.title.isEmpty())
+        setWindowTitle(AFields.form.title);
+      ui.spgDataForm->layout()->addWidget(FCurrentForm->instance());
       ui.stwForm->setCurrentWidget(ui.spgDataForm);
     }
     else
@@ -179,13 +172,14 @@ void RegisterDialog::onDialogButtonsClicked(QAbstractButton *AButton)
   {
     if (FOperation == IRegistration::Register)
     {
-      if (FSubmit.dataForm && !FSubmit.dataForm->isValid())
-        if (QMessageBox::warning(this,tr("Not Acceptable"),FSubmit.dataForm->invalidMessage(),QMessageBox::Ok|QMessageBox::Ignore) == QMessageBox::Ok)
-          return;
-      FSubmit.username = ui.lneUserName->text();
-      FSubmit.password = ui.lnePassword->text();
-      FSubmit.email = ui.lneEMail->text();
-      FRequestId = FRegistration->sendSubmit(FStreamJid,FSubmit);
+      if (!FCurrentForm || FCurrentForm->checkForm(true))
+      {
+        FSubmit.username = ui.lneUserName->text();
+        FSubmit.password = ui.lnePassword->text();
+        FSubmit.email = ui.lneEMail->text();
+        FSubmit.form = FCurrentForm!=NULL ? FDataForms->dataSubmit(FCurrentForm->userDataForm()) : IDataForm();
+        FRequestId = FRegistration->sendSubmit(FStreamJid,FSubmit);
+      }
     }
     else if (FOperation == IRegistration::Unregister)
       FRequestId = FRegistration->sendUnregiterRequest(FStreamJid,FServiceJid);

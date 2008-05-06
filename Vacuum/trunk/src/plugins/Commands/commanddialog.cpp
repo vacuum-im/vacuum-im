@@ -26,9 +26,6 @@ CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const
   FNextButton = new QPushButton(tr("Next>"));
   FCompleteButton = new QPushButton(tr("Complete"));
 
-  ui.wdtPages->setLayout(new QHBoxLayout);
-  ui.wdtPages->layout()->setMargin(0);
-
   connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
   FCommands->insertCommandClient(this);
@@ -48,15 +45,13 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
     FRequestId.clear();
     FSessionId = AResult.sessionId;
 
-    if (!AResult.form.isNull())
+    if (!AResult.form.type.isEmpty())
     {
-      FCurrentForm = FDataForms->newDataForm(AResult.form,ui.wdtForm);
-      if (FCurrentForm->pageControl())
-        ui.wdtPages->layout()->addWidget(FCurrentForm->pageControl());
-      if (!FCurrentForm->title().isEmpty())
-        setWindowTitle(FCurrentForm->title());
+      FCurrentForm = FDataForms->formWidget(AResult.form,ui.wdtForm);
+      if (!AResult.form.title.isEmpty())
+        setWindowTitle(AResult.form.title);
       if (FCurrentForm->tableWidget())
-        FCurrentForm->tableWidget()->setSortingEnabled(true);
+        FCurrentForm->tableWidget()->instance()->setSortingEnabled(true);
       ui.wdtForm->layout()->addWidget(FCurrentForm->instance());
       ui.wdtForm->setVisible(true);
     }
@@ -120,8 +115,6 @@ void CommandDialog::resetDialog()
   if (FCurrentForm)
   {
     ui.wdtForm->layout()->removeWidget(FCurrentForm->instance());
-    if (FCurrentForm->pageControl())
-      ui.wdtPages->layout()->removeWidget(FCurrentForm->pageControl());
     FCurrentForm->instance()->deleteLater();
     FCurrentForm = NULL;
   }
@@ -137,43 +130,37 @@ QString CommandDialog::sendRequest(const QString &AAction)
   request.sessionId = FSessionId;
   request.action = AAction;
   if (FCurrentForm)
-  {
-    QDomDocument doc;
-    QDomElement form = doc.appendChild(doc.createElement("command")).appendChild(doc.createElementNS(NS_JABBER_DATA,"x")).toElement();
-    FCurrentForm->createSubmit(form);
-    request.form = form;
-  }
+    request.form = FDataForms->dataSubmit(FCurrentForm->userDataForm());
   return FCommands->sendCommandRequest(request);
 }
 
 void CommandDialog::executeAction(const QString &AAction)
 {
-  if (AAction != COMMAND_ACTION_CANCEL && FCurrentForm && !FCurrentForm->isValid())
-    if (QMessageBox::warning(this,tr("Not Acceptable"),FCurrentForm->invalidMessage(),QMessageBox::Ok|QMessageBox::Ignore) == QMessageBox::Ok)
-      return;
-
-  ui.dbbButtons->removeButton(FPrevButton);
-  ui.dbbButtons->removeButton(FNextButton);
-  ui.dbbButtons->removeButton(FCompleteButton);
-
-  FRequestId = sendRequest(AAction);
-
-  resetDialog();
-  if (!FRequestId.isEmpty())
+  if (AAction == COMMAND_ACTION_CANCEL || !FCurrentForm || FCurrentForm->checkForm(true))
   {
-    ui.lblInfo->setText(tr("Waiting for host response ..."));
-    if (AAction != COMMAND_ACTION_CANCEL)
-      ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
+    ui.dbbButtons->removeButton(FPrevButton);
+    ui.dbbButtons->removeButton(FNextButton);
+    ui.dbbButtons->removeButton(FCompleteButton);
+
+    FRequestId = sendRequest(AAction);
+
+    resetDialog();
+    if (!FRequestId.isEmpty())
+    {
+      ui.lblInfo->setText(tr("Waiting for host response ..."));
+      if (AAction != COMMAND_ACTION_CANCEL)
+        ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
+      else
+        ui.dbbButtons->setStandardButtons(QDialogButtonBox::Close);
+    }
     else
-      ui.dbbButtons->setStandardButtons(QDialogButtonBox::Close);
-  }
-  else
-  {
-    ui.lblInfo->setText(tr("Error: Can`t send request to host."));
-    if (AAction != COMMAND_ACTION_CANCEL)
-      ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
-    else
-      ui.dbbButtons->setStandardButtons(QDialogButtonBox::Close);
+    {
+      ui.lblInfo->setText(tr("Error: Can`t send request to host."));
+      if (AAction != COMMAND_ACTION_CANCEL)
+        ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
+      else
+        ui.dbbButtons->setStandardButtons(QDialogButtonBox::Close);
+    }
   }
 }
 

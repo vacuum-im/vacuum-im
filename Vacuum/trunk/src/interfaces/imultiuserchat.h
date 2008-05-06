@@ -112,7 +112,7 @@ public:
   //Moderator
   virtual QString subject() const =0;
   virtual void setSubject(const QString &ASubject) =0;
-  virtual void submitDataFormMessage(IDataForm *AForm) =0;
+  virtual void sendDataFormMessage(const IDataForm &AForm) =0;
   //Administrator
   virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = "") =0;
   virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = "") =0;
@@ -120,7 +120,7 @@ public:
   virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList) =0;
   //Owner
   virtual bool requestConfigForm() =0;
-  virtual bool submitConfigForm(IDataForm *AForm) =0;
+  virtual bool sendConfigForm(const IDataForm &AForm) =0;
   virtual bool destroyRoom(const QString &AReason) =0;
 signals:
   virtual void chatOpened() =0;
@@ -144,14 +144,14 @@ signals:
   virtual void subjectChanged(const QString &ANick, const QString &ASubject) =0;
   virtual void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser) =0;
   virtual void dataFormMessageReceived(const Message &AMessage) =0;
-  virtual void dataFormMessageSubmited(IDataForm *AForm) =0;
+  virtual void dataFormMessageSent(const IDataForm &AForm) =0;
   //Administrator
   virtual void userBanned(const QString &ANick, const QString &AReason, const QString &AByUser) =0;
   virtual void affiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList) =0;
   virtual void affiliationListChanged(const QList<IMultiUserListItem> &ADeltaList) =0;
   //Owner
-  virtual void configFormReceived(const QDomElement &AForm) =0;
-  virtual void configFormSubmited(IDataForm *AForm) =0;
+  virtual void configFormReceived(const IDataForm &AForm) =0;
+  virtual void configFormSent(const IDataForm &AForm) =0;
   virtual void configFormAccepted() =0;
   virtual void configFormRejected(const QString &AError) =0;
   virtual void roomDestroyed(const QString &AReason) =0;

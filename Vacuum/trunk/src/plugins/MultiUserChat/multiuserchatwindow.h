@@ -110,7 +110,7 @@ protected slots:
   void onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser);
   void onAffiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList);
   //Owner
-  void onConfigFormReceived(const QDomElement &AForm);
+  void onConfigFormReceived(const IDataForm &AForm);
   void onRoomDestroyed(const QString &AReason);
 protected slots:
   void onMessageSend();
@@ -184,7 +184,7 @@ private:
   QHash<IMultiUser *, QListWidgetItem *> FUsers;
   QList<QColor> FColorQueue;
   QHash<QString,QString> FColorLastOwner;
-  QHash<int, IDataDialog *> FDataFormMessages;
+  QHash<int, IDataDialogWidget *> FDataFormMessages;
 };
 
 #endif // MULTIUSERCHATWINDOW_H

@@ -29,7 +29,7 @@ protected:
   void resetDialog();
   void requestFields();
   void requestResult();
-  bool setDataForm(const QDomElement &AFormElem);
+  bool setDataForm(const IDataForm &AForm);
   void initialize();
   void createToolBarActions();
 protected slots:
@@ -51,14 +51,13 @@ private:
   Action *FDiscoInfo;
   Action *FAddContact;
   Action *FShowVCard;
-  QToolBar *FToolBar;
   ToolBarChanger *FToolBarChanger;
 private:
   Jid FStreamJid;
   Jid FServiceJid;
   QString FFieldsRequestId;
   QString FRequestId;
-  IDataForm *FCurrentForm;
+  IDataFormWidget *FCurrentForm;
 };
 
 #endif // SEARCHDIALOG_H

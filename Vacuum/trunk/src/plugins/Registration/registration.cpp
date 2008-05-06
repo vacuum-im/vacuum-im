@@ -105,17 +105,17 @@ void Registration::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (FSendRequests.contains(AStanza.id()) || FSubmitRequests.contains(AStanza.id()))
   {
-    QDomElement dataForm; 
     QDomElement query = AStanza.firstElement("query",NS_JABBER_REGISTER);
-    dataForm = query.firstChildElement("x");
-    while (!dataForm.isNull() && (dataForm.namespaceURI()!=NS_JABBER_DATA || dataForm.attribute("type",FORM_FORM)!=FORM_FORM))
-      dataForm = dataForm.nextSiblingElement("x");
+
+    QDomElement formElem = query.firstChildElement("x");
+    while (!formElem.isNull() && (formElem.namespaceURI()!=NS_JABBER_DATA || formElem.attribute("type",DATAFORM_TYPE_FORM)!=DATAFORM_TYPE_FORM))
+      formElem = formElem.nextSiblingElement("x");
     
     if (FSubmitRequests.contains(AStanza.id()) && AStanza.type() == "result")
     {
       emit registerSuccessful(AStanza.id());
     }
-    else if (AStanza.type() == "result" || !dataForm.isNull())
+    else if (AStanza.type() == "result" || !formElem.isNull())
     {                                                           
       IRegisterFields fields;
       fields.fieldMask = 0;
@@ -143,7 +143,10 @@ void Registration::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
         fields.email = query.firstChildElement("email").text();
       }
       fields.key = query.firstChildElement("key").text();
-      fields.dataForm = dataForm;
+      
+      if (FDataForms)
+        fields.form = FDataForms->dataForm(formElem);
+
       QDomElement oob = query.firstChildElement("x");
       while (!oob.isNull() && oob.namespaceURI()!=NS_JABBER_OOB)
         oob = oob.nextSiblingElement("x");
@@ -155,10 +158,7 @@ void Registration::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
       emit registerFields(AStanza.id(),fields);
     }
     else
-    {
-      ErrorHandler err(AStanza.element());
-      emit registerError(AStanza.id(),err.message());
-    }
+      emit registerError(AStanza.id(),ErrorHandler(AStanza.element()).message());
     FSendRequests.removeAt(FSendRequests.indexOf(AStanza.id()));
     FSubmitRequests.removeAt(FSubmitRequests.indexOf(AStanza.id()));
   }
@@ -169,14 +169,12 @@ void Registration::iqStanzaTimeOut(const QString &AId)
   if (FSendRequests.contains(AId))
   {
     FSendRequests.removeAt(FSendRequests.indexOf(AId));
-    ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-    emit registerError(AId,err.message());
+    emit registerError(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
   else if (FSubmitRequests.contains(AId))
   {
     FSubmitRequests.removeAt(FSubmitRequests.indexOf(AId));
-    ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-    emit registerError(AId,err.message());
+    emit registerError(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
 }
 
@@ -321,7 +319,7 @@ QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &A
   Stanza submit("iq");
   submit.setTo(ASubmit.serviceJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
   QDomElement query = submit.addElement("query",NS_JABBER_REGISTER);
-  if (ASubmit.dataForm == NULL)
+  if (ASubmit.form.type.isEmpty())
   {
     if (!ASubmit.username.isEmpty())
       query.appendChild(submit.createElement("username")).appendChild(submit.createTextNode(ASubmit.username));
@@ -332,11 +330,9 @@ QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &A
     if (!ASubmit.key.isEmpty())
       query.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(ASubmit.key));
   }
-  else
-  {
-    QDomElement form = query.appendChild(submit.createElement("x",NS_JABBER_DATA)).toElement();
-    ASubmit.dataForm->createSubmit(form);
-  }
+  else if (FDataForms)
+    FDataForms->xmlForm(ASubmit.form,query);
+
   if (FStanzaProcessor->sendIqStanza(this,AStreamJid,submit,REGISTRATION_TIMEOUT))
   {
     FSubmitRequests.append(submit.id());

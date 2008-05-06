@@ -15,8 +15,8 @@ public:
   RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid, 
      const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
   ~RegisterDialog();
-  const Jid &streamJid() const { return FStreamJid; }
-  const Jid &serviceJid() const { return FServiceJid; }
+  virtual const Jid &streamJid() const { return FStreamJid; }
+  virtual const Jid &serviceJid() const { return FServiceJid; }
 protected:
   void resetDialog();
   void doRegisterOperation();
@@ -39,6 +39,7 @@ private:
   int FOperation;
   QString FRequestId;
   IRegisterSubmit FSubmit;
+  IDataFormWidget *FCurrentForm;
 };
 
 #endif // REGISTERDIALOG_H

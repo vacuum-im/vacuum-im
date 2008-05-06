@@ -55,7 +55,7 @@ public:
   //Moderator
   virtual QString subject() const { return FSubject; }
   virtual void setSubject(const QString &ASubject);
-  virtual void submitDataFormMessage(IDataForm *AForm);
+  virtual void sendDataFormMessage(const IDataForm &AForm);
   //Administrator
   virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = "");
   virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = "");
@@ -63,7 +63,7 @@ public:
   virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList);
   //Owner
   virtual bool requestConfigForm();
-  virtual bool submitConfigForm(IDataForm *AForm);
+  virtual bool sendConfigForm(const IDataForm &AForm);
   virtual bool destroyRoom(const QString &AReason);
 signals:
   virtual void chatOpened();
@@ -87,14 +87,14 @@ signals:
   virtual void subjectChanged(const QString &ANick, const QString &ASubject);
   virtual void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
   virtual void dataFormMessageReceived(const Message &AMessage);
-  virtual void dataFormMessageSubmited(IDataForm *AForm);
+  virtual void dataFormMessageSent(const IDataForm &AForm);
   //Administrator
   virtual void userBanned(const QString &ANick, const QString &AReason, const QString &AByUser);
   virtual void affiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList);
   virtual void affiliationListChanged(const QList<IMultiUserListItem> &ADeltaList);
   //Owner
-  virtual void configFormReceived(const QDomElement &AForm);
-  virtual void configFormSubmited(IDataForm *AForm);
+  virtual void configFormReceived(const IDataForm &AForm);
+  virtual void configFormSent(const IDataForm &AForm);
   virtual void configFormAccepted();
   virtual void configFormRejected(const QString &AError);
   virtual void roomDestroyed(const QString &AReason);
@@ -118,6 +118,7 @@ protected slots:
 private:
   IMessenger *FMessenger;
   IPresence *FPresence;
+  IDataForms *FDataForms;
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;
   IMultiUserChatPlugin *FChatPlugin;

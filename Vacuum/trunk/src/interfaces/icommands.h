@@ -2,6 +2,7 @@
 #define ICOMMANDS_H
 
 #include <QDomElement>
+#include "../../interfaces/idataforms.h"
 #include "../../utils/jid.h"
 
 #define COMMANDS_UUID "{6453DC15-3D01-4b60-840F-0EDD75A7D9D2}"
@@ -32,7 +33,7 @@ struct ICommandRequest {
   QString stanzaId;
   QString sessionId;
   QString action;
-  QDomElement form;
+  IDataForm form;
 };
 
 struct ICommandResult {
@@ -45,7 +46,7 @@ struct ICommandResult {
   QString execute;
   QList<QString> actions;
   QList<ICommandNote> notes;
-  QDomElement form;
+  IDataForm form;
 };
 
 struct ICommandError {

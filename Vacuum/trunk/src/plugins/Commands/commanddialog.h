@@ -49,7 +49,7 @@ private:
   QString FNode;
   QString FRequestId;
   QString FSessionId;
-  IDataForm *FCurrentForm;
+  IDataFormWidget *FCurrentForm;
 };
 
 #endif // COMMANDDIALOG_H

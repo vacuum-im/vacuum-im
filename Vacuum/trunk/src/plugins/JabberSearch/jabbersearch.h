@@ -54,6 +54,7 @@ private:
   IStanzaProcessor *FStanzaProcessor;
   IServiceDiscovery *FDiscovery;
   IPresencePlugin *FPresencePlugin;
+  IDataForms *FDataForms;
 private:
   QList<QString> FRequests;
   QList<QString> FSubmits;

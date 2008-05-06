@@ -1,12 +1,12 @@
-FORMS = datadialog.ui
-
-HEADERS = datadialog.h \
-          datafield.h \
-          dataform.h \
+HEADERS = datatablewidget.h \
+          datafieldwidget.h \
+          dataformwidget.h \
+          datadialogwidget.h \
           dataforms.h
 
-SOURCES = datadialog.cpp \
-          datafield.cpp \
-          dataform.cpp \
+SOURCES = datatablewidget.cpp \
+          datafieldwidget.cpp \
+          dataformwidget.cpp \
+          datadialogwidget.cpp \
           dataforms.cpp
 

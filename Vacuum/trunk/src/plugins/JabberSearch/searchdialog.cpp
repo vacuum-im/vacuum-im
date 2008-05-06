@@ -32,18 +32,13 @@ SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManage
   FRosterChanger = NULL;
   FVCardPlugin = NULL;
 
-  ui.wdtToolBar->setLayout(new QVBoxLayout);
-  ui.wdtToolBar->layout()->setMargin(0);
-  FToolBar = new QToolBar(ui.wdtToolBar);
-  FToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  ui.wdtToolBar->layout()->addWidget(FToolBar);
-  FToolBarChanger = new ToolBarChanger(FToolBar);
+  QToolBar *toolBar = new QToolBar(this);
+  FToolBarChanger = new ToolBarChanger(toolBar);
   FToolBarChanger->setSeparatorsVisible(false);
+  layout()->setMenuBar(toolBar);
 
   ui.pgeForm->setLayout(new QVBoxLayout);
   ui.pgeForm->layout()->setMargin(0);
-  ui.wdtPages->setLayout(new QHBoxLayout);
-  ui.wdtPages->layout()->setMargin(0);
 
   connect(FSearch->instance(),SIGNAL(searchFields(const QString &, const ISearchFields &)),
     SLOT(onSearchFields(const QString &, const ISearchFields &)));
@@ -69,28 +64,14 @@ ISearchItem SearchDialog::currentItem() const
   ISearchItem item;
   if (FCurrentForm && FCurrentForm->tableWidget())
   {
-    int row = FCurrentForm->tableWidget()->currentRow();
+    int row = FCurrentForm->tableWidget()->instance()->currentRow();
     if (row >= 0)
     {
-      IDataField *field = FCurrentForm->tableField("jid",row);
-      if (field)
-        item.itemJid = field->value().toString();
-
-      field = FCurrentForm->tableField("first",row);
-      if (field)
-        item.firstName = field->value().toString();
-
-      field = FCurrentForm->tableField("last",row);
-      if (field)
-        item.lastName = field->value().toString();
-
-      field = FCurrentForm->tableField("nick",row);
-      if (field)
-        item.nick = field->value().toString();
-
-      field = FCurrentForm->tableField("email",row);
-      if (field)
-        item.email = field->value().toString();
+      item.itemJid = FCurrentForm->tableWidget()->dataField(row,"jid").value.toString();
+      item.firstName = FCurrentForm->tableWidget()->dataField(row,"first").value.toString();
+      item.lastName = FCurrentForm->tableWidget()->dataField(row,"last").value.toString();
+      item.nick = FCurrentForm->tableWidget()->dataField(row,"nick").value.toString();
+      item.email = FCurrentForm->tableWidget()->dataField(row,"email").value.toString();
     }
   }
   else if (ui.tbwResult->currentRow() >= 0)
@@ -108,12 +89,10 @@ ISearchItem SearchDialog::currentItem() const
 void SearchDialog::resetDialog()
 {
   setWindowTitle(tr("Search in %1").arg(FServiceJid.full()));
-  ui.wdtToolBar->setVisible(false);
+  FToolBarChanger->toolBar()->hide();
   if (FCurrentForm)
   {
     ui.pgeForm->layout()->removeWidget(FCurrentForm->instance());
-    if (FCurrentForm->pageControl())
-      ui.wdtPages->layout()->removeWidget(FCurrentForm->pageControl());
     FCurrentForm->instance()->deleteLater();
     FCurrentForm = NULL;
   }
@@ -149,54 +128,46 @@ void SearchDialog::requestFields()
 
 void SearchDialog::requestResult()
 {
-  ISearchSubmit submit;
-  submit.serviceJid = FServiceJid;
-  if (FCurrentForm)
+  if (!FCurrentForm || FCurrentForm->checkForm(true))
   {
-    if (FCurrentForm && !FCurrentForm->isValid())
-      if (QMessageBox::warning(this,tr("Not Acceptable"),FCurrentForm->invalidMessage(),QMessageBox::Ok|QMessageBox::Ignore) == QMessageBox::Ok)
-        return;
-    QDomDocument doc;
-    QDomElement form = doc.appendChild(doc.createElement("command")).appendChild(doc.createElementNS(NS_JABBER_DATA,"x")).toElement();
-    FCurrentForm->createSubmit(form);
-    submit.dataForm = form;
-  }
-  else
-  {
+    ISearchSubmit submit;
     submit.serviceJid = FServiceJid;
-    submit.item.firstName = ui.lneFirst->text();
-    submit.item.lastName = ui.lneLast->text();
-    submit.item.nick = ui.lneNick->text();
-    submit.item.email = ui.lneEmail->text();
-  }
+    if (!FCurrentForm)
+    {
+      submit.item.firstName = ui.lneFirst->text();
+      submit.item.lastName = ui.lneLast->text();
+      submit.item.nick = ui.lneNick->text();
+      submit.item.email = ui.lneEmail->text();
+    }
+    else
+      submit.form = FDataForms->dataSubmit(FCurrentForm->userDataForm());
 
-  FRequestId = FSearch->sendSubmit(FStreamJid,submit);
-  
-  resetDialog();
-  if (!FRequestId.isEmpty())
-  {
-    ui.lblInstructions->setText(tr("Waiting for host response ..."));
-    ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
-  }
-  else
-  {
-    ui.lblInstructions->setText(tr("Error: Can`t send request to host."));
-    ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
+    FRequestId = FSearch->sendSubmit(FStreamJid,submit);
+    
+    resetDialog();
+    if (!FRequestId.isEmpty())
+    {
+      ui.lblInstructions->setText(tr("Waiting for host response ..."));
+      ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
+    }
+    else
+    {
+      ui.lblInstructions->setText(tr("Error: Can`t send request to host."));
+      ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
+    }
   }
 }
 
-bool SearchDialog::setDataForm(const QDomElement &AFormElem)
+bool SearchDialog::setDataForm(const IDataForm &AForm)
 {
-  if (FDataForms && !AFormElem.isNull())
+  if (FDataForms && !AForm.type.isEmpty())
   {
-    FCurrentForm = FDataForms->newDataForm(AFormElem,ui.pgeForm);
+    FCurrentForm = FDataForms->formWidget(AForm,ui.pgeForm);
     ui.pgeForm->layout()->addWidget(FCurrentForm->instance());
-    if (FCurrentForm->pageControl())
-      ui.wdtPages->layout()->addWidget(FCurrentForm->pageControl());
-    if (!FCurrentForm->title().isEmpty())
-      setWindowTitle(FCurrentForm->title());
+    if (!AForm.title.isEmpty())
+      setWindowTitle(AForm.title);
     if (FCurrentForm->tableWidget())
-      FCurrentForm->tableWidget()->setSortingEnabled(true);
+      FCurrentForm->tableWidget()->instance()->setSortingEnabled(true);
     ui.stwWidgets->setCurrentWidget(ui.pgeForm);
     return true;
   }
@@ -248,7 +219,7 @@ void SearchDialog::onSearchFields(const QString &AId, const ISearchFields &AFiel
   if (FRequestId == AId)
   {
     resetDialog();
-    if (!setDataForm(AFields.dataForm))
+    if (!setDataForm(AFields.form))
     {
       ui.lblInstructions->setText(AFields.instructions);
       ui.lneFirst->setText(AFields.item.firstName);
@@ -278,7 +249,7 @@ void SearchDialog::onSearchResult(const QString &AId, const ISearchResult &AResu
   if (FRequestId == AId)
   {
     resetDialog();
-    if (!setDataForm(AResult.dataForm))
+    if (!setDataForm(AResult.form))
     {
       int row = 0;
       ui.tbwResult->setRowCount(AResult.items.count());
@@ -306,7 +277,7 @@ void SearchDialog::onSearchResult(const QString &AId, const ISearchResult &AResu
       ui.stwWidgets->setCurrentWidget(ui.pgeResult);
     }
     ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
-    ui.wdtToolBar->setVisible(true);
+    FToolBarChanger->toolBar()->show();
   }
 }
 

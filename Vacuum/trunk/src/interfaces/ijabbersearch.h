@@ -3,8 +3,8 @@
 
 #define JABBERSEARCH_UUID   "{F66BCFC9-F6BB-43b2-8101-8CA41EF227AF}"
 
-#include <QDomElement>
-#include "../../utils/jid.h"
+#include "../interfaces/idataforms.h"
+#include "../utils/jid.h"
 
 struct ISearchItem {
   Jid itemJid;
@@ -25,20 +25,20 @@ struct ISearchFields {
   int fieldMask;
   QString instructions;
   ISearchItem item;
-  QDomElement dataForm;
+  IDataForm form;
 };
 
 struct ISearchSubmit {
   Jid serviceJid;
   ISearchItem item;
-  QDomElement dataForm;
+  IDataForm form;
 };
 
 struct ISearchResult
 {
   Jid serviceJid;
   QList<ISearchItem> items;
-  QDomElement dataForm;
+  IDataForm form;
 };
 
 class IJabberSearch {
