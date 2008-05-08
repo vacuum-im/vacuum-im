@@ -272,6 +272,7 @@ void DiscoItemsWindow::updateDiscoItems(const IDiscoItems &ADiscoItems)
     }
     else
       treeItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
+
     emit treeItemChanged(treeItem);
   }
 }
@@ -392,7 +393,7 @@ void DiscoItemsWindow::onTreeItemContextMenu(const QPoint &APos)
   QTreeWidgetItem *treeItem = ui.trwItems->itemAt(APos);
   if (treeItem)
   {
-    ui.trwItems->setCurrentItem(treeItem);
+    ui.trwItems->setCurrentItem(treeItem,ui.trwItems->columnAt(APos.x()));
     Menu *menu = new Menu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose,true);
 

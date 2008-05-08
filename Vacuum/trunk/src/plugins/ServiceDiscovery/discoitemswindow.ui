@@ -22,17 +22,16 @@
    <enum>Qt::ToolButtonTextUnderIcon</enum>
   </property>
   <widget class="QWidget" name="centralWidget" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>12</y>
+     <width>654</width>
+     <height>347</height>
+    </rect>
+   </property>
    <layout class="QVBoxLayout" >
-    <property name="leftMargin" >
-     <number>3</number>
-    </property>
-    <property name="topMargin" >
-     <number>3</number>
-    </property>
-    <property name="rightMargin" >
-     <number>3</number>
-    </property>
-    <property name="bottomMargin" >
+    <property name="margin" >
      <number>3</number>
     </property>
     <item>
@@ -135,9 +134,6 @@
         <property name="sortingEnabled" >
          <bool>true</bool>
         </property>
-        <property name="allColumnsShowFocus" >
-         <bool>true</bool>
-        </property>
         <column>
          <property name="text" >
           <string>Name</string>
@@ -160,6 +156,14 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="tlbToolBar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>654</width>
+     <height>12</height>
+    </rect>
+   </property>
    <property name="windowTitle" >
     <string>toolBar</string>
    </property>

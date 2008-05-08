@@ -1,9 +1,10 @@
 #ifndef ROSTERSVIEW_H
 #define ROSTERSVIEW_H
 
-#include <QContextMenuEvent>
 #include <QPainter>
 #include <QTimer>
+#include <QResizeEvent>
+#include <QContextMenuEvent>
 #include "../../definations/tooltiporders.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
@@ -95,6 +96,7 @@ protected:
   virtual void rowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
   //QAbstractItemView
   virtual bool viewportEvent(QEvent *AEvent);
+  virtual void resizeEvent(QResizeEvent *AEvent);
   //QWidget
   virtual void contextMenuEvent(QContextMenuEvent *AEvent);
   virtual void mouseDoubleClickEvent(QMouseEvent *AEvent);

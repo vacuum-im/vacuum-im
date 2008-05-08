@@ -25,6 +25,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
   connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimer()));
 
   header()->hide();
+  header()->setStretchLastSection(false);
   setIndentation(4);
   setRootIsDecorated(false);
   setSelectionMode(NoSelection);
@@ -456,16 +457,16 @@ QStyleOptionViewItemV2 RostersView::indexOption(const QModelIndex &AIndex) const
   option.rect = visualRect(AIndex);
   
   //Костыль
-  if (isRightToLeft())
-  {
-    QModelIndex pIndex = AIndex.parent();
-    while (pIndex.isValid())
-    {
-      option.rect.setLeft(option.rect.left()-indentation());
-      option.rect.setRight(option.rect.right()-indentation());
-      pIndex = pIndex.parent();
-    }
-  }
+  //if (isRightToLeft())
+  //{
+  //  QModelIndex pIndex = AIndex.parent();
+  //  while (pIndex.isValid())
+  //  {
+  //    option.rect.setLeft(option.rect.left()-indentation());
+  //    option.rect.setRight(option.rect.right()-indentation());
+  //    pIndex = pIndex.parent();
+  //  }
+  //}
 
   option.showDecorationSelected |= selectionBehavior() & SelectRows;
   option.state |= isExpanded(AIndex) ? QStyle::State_Open : QStyle::State_None;
@@ -580,6 +581,12 @@ bool RostersView::viewportEvent(QEvent *AEvent)
   default:
     return QTreeView::viewportEvent(AEvent);
   }
+}
+
+void RostersView::resizeEvent(QResizeEvent *AEvent)
+{
+  header()->resizeSection(0,AEvent->size().width());
+  QTreeView::resizeEvent(AEvent);
 }
 
 void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)

@@ -158,7 +158,6 @@ QTreeWidgetItem *OptionsDialog::createTreeItem(const QString &ANode)
         nodeItem = new QTreeWidgetItem(trwNodes);
       nodeItem->setData(0,Qt::UserRole,nodeName);
       nodeItem->setText(0,nodeTreeItem);
-      nodeItem->setExpanded(true);
       FNodeItems.insert(nodeName,nodeItem);
     }
     else
