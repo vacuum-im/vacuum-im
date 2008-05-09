@@ -237,6 +237,7 @@ IMultiUserChat *MultiUserChatPlugin::getMultiUserChat(const Jid &AStreamJid, con
     chat = new MultiUserChat(this,ADedicated ? NULL: FMessenger,AStreamJid,ARoomJid,ANick,APassword,this);
     connect(chat->instance(),SIGNAL(chatDestroyed()),SLOT(onMultiUserChatDestroyed()));
     FChats.append(chat);
+    emit multiUserChatCreated(chat);
   }
   return chat;
 }
