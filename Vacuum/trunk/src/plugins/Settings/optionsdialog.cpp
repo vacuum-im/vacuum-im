@@ -37,7 +37,6 @@ OptionsDialog::OptionsDialog(QWidget *AParent) : QDialog(AParent)
   trwNodes->setMaximumWidth(160);
   trwNodes->setSortingEnabled(true);
   trwNodes->sortByColumn(0,Qt::AscendingOrder);
-  trwNodes->setSelectionMode(QAbstractItemView::NoSelection);
   connect(trwNodes,SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
     SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
   
