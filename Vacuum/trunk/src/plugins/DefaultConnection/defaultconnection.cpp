@@ -70,7 +70,13 @@ void DefaultConnection::disconnect()
   if (!FDisconnectCalled && FSocket.isOpen())
   {
     FDisconnectCalled = true;
+    FSocket.flush();
     FSocket.disconnectFromHost();
+    if (!FSocket.waitForDisconnected(5000))
+    {
+      connectionError(FSocket.errorString());
+      onSocketDisconnected();
+    }
   }
 }
 
