@@ -1453,7 +1453,7 @@ void MultiUserChatWindow::onMenuBarActionTriggered(bool)
     if (FMultiChat->isOpen())
     {
       bool ok = false;
-      QString reason = QInputDialog::getText(this,tr("Destroying room"),tr("Enter a reason:"),QLineEdit::Normal,reason,&ok);
+      QString reason = QInputDialog::getText(this,tr("Destroying room"),tr("Enter a reason:"),QLineEdit::Normal,"",&ok);
       if (ok)
         FMultiChat->destroyRoom(reason);
     }
