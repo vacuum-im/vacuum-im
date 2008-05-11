@@ -28,4 +28,5 @@ HEADERS += ipluginmanager.h \
            icommands.h \
            ijabbersearch.h \
            igateways.h \
-           imessagearchiver.h
+           imessagearchiver.h \
+           iprivacylists.h

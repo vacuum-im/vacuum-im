@@ -30,6 +30,7 @@
 #define AG_DISCOVERY_ROSTER                                     500
 #define AG_MULTIUSERCHAT_ROSTER                                 500
 #define AG_GATEWAYS_RESOLVE_ROSTER                              500
+#define AG_PRIVACYLISTS_ROSTER                                  500
 #define AG_ROSTERCHANGER_ROSTER_SUBSCRIPTION                    700
 #define AG_ROSTERCHANGER_ROSTER                                 700
 

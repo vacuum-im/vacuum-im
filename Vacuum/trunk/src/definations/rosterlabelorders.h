@@ -19,6 +19,8 @@
 
 #define RLO_RIGHTALIGN                            1000
 
+#define RLO_PRIVACY                               1500
+
 #define RLO_FULL_HEIGHT_LABELS                    10000
 
 #endif

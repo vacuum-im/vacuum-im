@@ -33,4 +33,5 @@ SUBDIRS = settings \
           commands \
           jabbersearch \
           gateways \
-          messagearchiver
+          messagearchiver \
+          privacylists
