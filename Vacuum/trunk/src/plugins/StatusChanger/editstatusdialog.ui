@@ -5,14 +5,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>637</width>
-    <height>560</height>
+    <width>642</width>
+    <height>539</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Edit user statuses</string>
+   <string>Edit presence statuses</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout" >
+   <property name="margin" >
+    <number>5</number>
+   </property>
    <item>
     <widget class="QTableWidget" name="tblStatus" >
      <property name="rowCount" >
@@ -24,7 +27,14 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
+    <widget class="Line" name="line" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" >
      <item>
       <widget class="QPushButton" name="pbtAdd" >
        <property name="text" >
@@ -40,33 +50,13 @@
       </widget>
      </item>
      <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
+      <widget class="QDialogButtonBox" name="dbtDialogButtons" >
+       <property name="standardButtons" >
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
        </property>
-       <property name="sizeHint" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="Line" name="line" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="dbtDialogButtons" >
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

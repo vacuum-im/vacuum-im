@@ -12,8 +12,7 @@
 #define TIR_DELEGATE            Qt::UserRole + 1
 #define TIR_VALUE               Qt::UserRole + 2
 
-Delegate::Delegate(IStatusChanger *AStatusChanger, QObject *AParent /*= NULL*/)
-  : QItemDelegate(AParent)
+Delegate::Delegate(IStatusChanger *AStatusChanger, QObject *AParent) : QItemDelegate(AParent)
 {
   FStatusChanger = AStatusChanger;
 }
@@ -50,7 +49,6 @@ QWidget *Delegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AO
   default: 
       return QItemDelegate::createEditor(AParent,AOption,AIndex);
   }
-  
 }
 
 void Delegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const
@@ -139,8 +137,8 @@ void Delegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem
 //EditStatusDialog
 EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 {
-  setAttribute(Qt::WA_DeleteOnClose,true);
   setupUi(this);
+  setAttribute(Qt::WA_DeleteOnClose,true);
   FStatusChanger = AStatusChanger;
   
   tblStatus->setColumnCount(5);
@@ -169,9 +167,7 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
         status->icon = FStatusChanger->iconByShow(status->show);
       FStatusItems.insert(statusId,status);
 
-      QString sortString = QString("%1-%2-%3").arg(statusId > MAX_STANDART_STATUS_ID ? 0 : 1)
-                                              .arg(status->show!=IPresence::Offline ? status->show : 10,5,10,QChar('0'))
-                                              .arg(128-status->priority,3,10,QChar('0'));
+      QString sortString = QString("%1-%2").arg(status->show!=IPresence::Offline ? status->show : 100,5,10,QChar('0')).arg(status->name);
       statusOrdered.insert(sortString,statusId);
     }
   }
@@ -225,7 +221,7 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
     else
     {
       icon->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-      name->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+      name->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
       show->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
       message->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
       priority->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
@@ -287,7 +283,7 @@ void EditStatusDialog::onAddbutton(bool)
 
       QTableWidgetItem *priority = new QTableWidgetItem;
       priority->setTextAlignment(Qt::AlignCenter);
-      priority->setData(Qt::DisplayRole, 100);
+      priority->setData(Qt::DisplayRole, 30);
       priority->setData(TIR_DELEGATE,Delegate::DelegatePriority);
       priority->setData(TIR_VALUE,100);
       tblStatus->setItem(row,4,priority);

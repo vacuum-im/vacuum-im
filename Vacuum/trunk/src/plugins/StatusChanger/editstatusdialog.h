@@ -47,11 +47,9 @@ class EditStatusDialog :
   public EditStatusDialogClass
 {
   Q_OBJECT;
-
 public:
   EditStatusDialog(IStatusChanger *AStatusChanger);
   ~EditStatusDialog();
-
 protected slots:
   void onAddbutton(bool);
   void onDeleteButton(bool);

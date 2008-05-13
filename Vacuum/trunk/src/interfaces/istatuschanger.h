@@ -45,8 +45,6 @@ public:
   virtual QList<int> statusByShow(int AShow) const =0;
   virtual QIcon iconByShow(int AShow) const =0;
   virtual QString nameByShow(int AShow) const =0;
-public slots:
-  virtual void setStatusByAction(bool) =0;
 signals:
   virtual void statusItemAdded(int AStatusId) =0;
   virtual void statusItemChanged(int AStatusId) =0;

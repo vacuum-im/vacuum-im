@@ -46,8 +46,8 @@
 #define AG_TRAYMANAGER_TRAY_QUIT                                1000
 
 //StatusChanger (StatusMenu, StreamMenu)
+#define AG_STATUSCHANGER_STATUSMENU_ACTIONS                     200
 #define AG_STATUSCHANGER_STATUSMENU_STREAMS                     300
-#define AG_STATUSCHANGER_STATUSMENU_CUSTOM_MENU                 400
 
 //EditWidgetToolbar
 #define AG_EMOTICONS_EDITWIDGET                                 500

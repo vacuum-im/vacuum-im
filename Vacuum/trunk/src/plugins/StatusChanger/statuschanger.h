@@ -82,8 +82,6 @@ public:
   virtual QList<int> statusByShow(int AShow) const;
   virtual QIcon iconByShow(int AShow) const;
   virtual QString nameByShow(int AShow) const;
-public slots:
-  virtual void setStatusByAction(bool);
 signals:
   virtual void statusItemAdded(int AStatusId);
   virtual void statusItemChanged(int AStatusId);
@@ -101,7 +99,6 @@ protected:
   void createStatusActions(int AStatusId);
   void updateStatusActions(int AStatusId);
   void removeStatusActions(int AStatusId);
-  void updateCustomMenu();
   void createStreamMenu(IPresence *APresence);
   void updateStreamMenu(IPresence *APresence);
   void removeStreamMenu(IPresence *APresence);
@@ -116,6 +113,7 @@ protected:
   void resendUpdatedStatus(int AStatusId);
   void removeAllCustomStatuses();
 protected slots:
+  void onSetStatusByAction(bool);
   void onPresenceAdded(IPresence *APresence);
   void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
   void onPresenceRemoved(IPresence *APresence);
@@ -152,11 +150,8 @@ private:
   Action *FEditStatusAction;
   QPointer<EditStatusDialog> FEditStatusDialog;
 private:
-  QToolButton *FMainMenuToolButton;
   Menu *FMainMenu;
-  Menu *FCustomMenu;
   QHash<IPresence *, Menu *> FStreamMenu;
-  QHash<IPresence *, Menu *> FStreamCustomMenu;
   QHash<IPresence *, Action *> FStreamMainStatusAction;
 private:
   IPresence *FSettingStatusToPresence;
