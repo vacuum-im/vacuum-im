@@ -67,16 +67,14 @@ void DefaultConnection::connectToHost()
 
 void DefaultConnection::disconnect()
 {
-  if (!FDisconnectCalled && FSocket.isOpen())
+  if (!FDisconnectCalled)
   {
-    FDisconnectCalled = true;
     FSocket.flush();
     FSocket.disconnectFromHost();
-    if (!FSocket.waitForDisconnected(5000))
-    {
-      connectionError(FSocket.errorString());
+    if (FSocket.state()!=QAbstractSocket::UnconnectedState && !FSocket.waitForDisconnected(5000))
+      emit error(FSocket.errorString());
+    if (!FDisconnectCalled)
       onSocketDisconnected();
-    }
   }
 }
 
