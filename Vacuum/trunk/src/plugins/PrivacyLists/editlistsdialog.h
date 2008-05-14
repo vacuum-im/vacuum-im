@@ -14,7 +14,6 @@ class EditListsDialog :
 public:
   EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster, const Jid &AStreamJid, QWidget *AParent = NULL);
   ~EditListsDialog();
-  const Jid &streamJid() const { return FStreamJid; }
   void apply();
   void reset();
 signals:

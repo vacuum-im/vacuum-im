@@ -1191,7 +1191,6 @@ void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
   if (FEditListsDialogs.contains(AXmppStream->jid()))
     delete FEditListsDialogs.take(AXmppStream->jid());
 
-
   FApplyAutoLists.remove(AXmppStream->jid());
   FOfflinePresences.remove(AXmppStream->jid());
   FActiveLists.remove(AXmppStream->jid());

@@ -14,7 +14,8 @@
 EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
-  setAttribute(Qt::WA_DeleteOnClose,true);
+  //Вызывает ошибку в release билде Qt 4.4.0
+  //setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_PRIVACY));
   setWindowTitle(tr("Edit Privacy Lists - %1").arg(AStreamJid.bare()));
 
