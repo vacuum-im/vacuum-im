@@ -229,26 +229,25 @@ void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
 
 void OptionsDialog::onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetItem * /*APrevious*/)
 { 
-  QTreeWidgetItem *currentItem = ACurrent;
-  while (!FItemsStackIndex.contains(currentItem) && currentItem->childCount()>0)
-    currentItem = currentItem->child(0);
-
-  if (ACurrent!=currentItem)
+  if (FItemsStackIndex.contains(ACurrent))
   {
-    trwNodes->setCurrentItem(currentItem);
-  }
-  else if (FItemsStackIndex.contains(currentItem))
-  {
-    QString node = currentItem->data(0,Qt::UserRole).toString();
+    QString node = ACurrent->data(0,Qt::UserRole).toString();
     OptionsNode *nodeOption = FNodes.value(node,NULL);
     if (nodeOption)
     {
       lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(Qt::escape(nodeOption->desc)));
-      QWidget *widget = stwOptions->widget(FItemsStackIndex.value(currentItem));
+      QWidget *widget = stwOptions->widget(FItemsStackIndex.value(ACurrent));
       stwOptions->setCurrentWidget(widget);
       updateOptionsSize(widget);
       scaScroll->ensureVisible(0,0);
     }
+    stwOptions->setVisible(true);
+  }
+  else
+  {
+    QString node = ACurrent->data(0,Qt::UserRole).toString();
+    lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(tr("No Settings Available")));
+    stwOptions->setVisible(false);
   }
 }
 
