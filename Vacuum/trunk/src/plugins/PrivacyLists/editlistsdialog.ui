@@ -48,6 +48,9 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="sizeAdjustPolicy" >
+           <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+          </property>
          </widget>
         </item>
         <item>
@@ -64,6 +67,9 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="sizeAdjustPolicy" >
+           <enum>QComboBox::AdjustToMinimumContentsLength</enum>
           </property>
          </widget>
         </item>
@@ -141,11 +147,7 @@
          <number>5</number>
         </property>
         <item>
-         <widget class="QListWidget" name="ltwRules" >
-          <property name="wordWrap" >
-           <bool>true</bool>
-          </property>
-         </widget>
+         <widget class="QListWidget" name="ltwRules" />
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout" >
@@ -249,6 +251,9 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="sizeAdjustPolicy" >
+           <enum>QComboBox::AdjustToMinimumContentsLength</enum>
           </property>
          </widget>
         </item>

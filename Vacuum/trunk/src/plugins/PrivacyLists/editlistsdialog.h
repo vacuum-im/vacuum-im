@@ -41,6 +41,7 @@ protected slots:
   void onCurrentListItemChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious);
   void onCurrentRuleItemChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious);
   void onDialogButtonClicked(QAbstractButton *AButton);
+  void onUpdateEnabledState();
 private:
   Ui::EditListsDialogClass ui;
 private:

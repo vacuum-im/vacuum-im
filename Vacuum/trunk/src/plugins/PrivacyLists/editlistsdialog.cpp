@@ -1,5 +1,6 @@
 #include "editlistsdialog.h"
 
+#include <QTimer>
 #include <QLineEdit>
 #include <QInputDialog>
 #include <QMessageBox>
@@ -14,8 +15,7 @@
 EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
-  //Вызывает ошибку в release билде Qt 4.4.0
-  //setAttribute(Qt::WA_DeleteOnClose,true);
+  setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_PRIVACY));
   setWindowTitle(tr("Edit Privacy Lists - %1").arg(AStreamJid.bare()));
 
@@ -167,9 +167,8 @@ void EditListsDialog::apply()
         FRemoveRequests.insert(requestId,oldList.name);
     }
   }
-
   updateListRules();
-  updateEnabledState();
+  QTimer::singleShot(0,this,SLOT(onUpdateEnabledState()));
 }
 
 void EditListsDialog::reset()
@@ -251,10 +250,11 @@ void EditListsDialog::updateRuleCondition()
   if (!listRule.action.isEmpty())
   {
     ui.cmbType->setCurrentIndex(ui.cmbType->findData(listRule.type));
-    if (listRule.type == PRIVACY_TYPE_SUBSCRIPTION)
-      ui.cmbValue->setCurrentIndex(ui.cmbValue->findData(listRule.value));
-    else
-      ui.cmbValue->lineEdit()->setText(listRule.value);
+    int valueIndex = ui.cmbValue->findData(listRule.value);
+    if (valueIndex >= 0)
+      ui.cmbValue->setCurrentIndex(valueIndex);
+    else if (ui.cmbValue->isEditable())
+      ui.cmbValue->setEditText(listRule.value);
     ui.cmbAction->setCurrentIndex(ui.cmbAction->findData(listRule.action));
     ui.chbMessage->setChecked(listRule.stanzas & IPrivacyRule::Messages);
     ui.chbQueries->setChecked(listRule.stanzas & IPrivacyRule::Queries);
@@ -469,10 +469,9 @@ void EditListsDialog::onRuleConditionChanged()
   {
     IPrivacyRule &listRule = FLists[FListName].rules[FRuleIndex];
     listRule.type = ui.cmbType->itemData(ui.cmbType->currentIndex()).toString();
-    if (listRule.type == PRIVACY_TYPE_SUBSCRIPTION)
-      listRule.value = ui.cmbValue->itemData(ui.cmbValue->currentIndex()).toString();
-    else if (listRule.type == PRIVACY_TYPE_ALWAYS)
-      listRule.value = "";
+    int valueIndex = ui.cmbValue->currentIndex();
+    if (valueIndex>=0 && ui.cmbValue->itemText(valueIndex)==ui.cmbValue->currentText())
+      listRule.value = ui.cmbValue->itemData(valueIndex).toString();
     else
       listRule.value = ui.cmbValue->currentText();
     listRule.action = ui.cmbAction->itemData(ui.cmbAction->currentIndex()).toString();
@@ -487,7 +486,8 @@ void EditListsDialog::onRuleConditionChanged()
       listRule.stanzas |= IPrivacyRule::PresencesOut;
     if (listRule.stanzas == IPrivacyRule::EmptyType)
       listRule.stanzas = IPrivacyRule::AnyStanza;
-    ui.ltwRules->item(ui.ltwRules->currentRow())->setText(ruleName(listRule));
+    if (ui.ltwRules->currentRow()>=0)
+      ui.ltwRules->item(ui.ltwRules->currentRow())->setText(ruleName(listRule));
   }
 }
 
@@ -500,21 +500,26 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
   ui.cmbValue->setEnabled(type != PRIVACY_TYPE_ALWAYS);
   if (type == PRIVACY_TYPE_SUBSCRIPTION)
   {
+    ui.cmbValue->setInsertPolicy(QComboBox::InsertAtBottom);
     ui.cmbValue->setEditable(false);
     ui.cmbValue->addItem(tr("None"),SUBSCRIPTION_NONE);
-    ui.cmbValue->addItem(tr("From"),SUBSCRIPTION_FROM);
     ui.cmbValue->addItem(tr("To"),SUBSCRIPTION_TO);
+    ui.cmbValue->addItem(tr("From"),SUBSCRIPTION_FROM);
     ui.cmbValue->addItem(tr("Both"),SUBSCRIPTION_BOTH);
     ui.cmbValue->blockSignals(false);
     ui.cmbValue->setCurrentIndex(0);
   }
   else 
   {
+    ui.cmbValue->setInsertPolicy(QComboBox::InsertAlphabetically);
     if (type == PRIVACY_TYPE_JID)
     {
-      QList<IRosterItem> items = FRoster!=NULL ? FRoster->rosterItems() : QList<IRosterItem>();
-      foreach(IRosterItem item, items)
-        ui.cmbValue->addItem(item.itemJid.full(),item.itemJid.full());
+      QList<IRosterItem> ritems = FRoster!=NULL ? FRoster->rosterItems() : QList<IRosterItem>();
+      foreach(IRosterItem ritem, ritems)
+      {
+        QString itemName = !ritem.name.isEmpty() ? ritem.name + " <"+ritem.itemJid.full()+">" : ritem.itemJid.full();
+        ui.cmbValue->addItem(itemName,ritem.itemJid.full());
+      }
     }
     else if (type == PRIVACY_TYPE_GROUP)
     {
@@ -524,7 +529,7 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
     }
     ui.cmbValue->setEditable(true);
     ui.cmbValue->blockSignals(false);
-    ui.cmbValue->lineEdit()->setText("");
+    ui.cmbValue->setEditText("");
   }
 }
 
@@ -560,3 +565,8 @@ void EditListsDialog::onDialogButtonClicked(QAbstractButton *AButton)
   }
 }
 
+void EditListsDialog::onUpdateEnabledState()
+{
+  //Откладываем выполнение этой функции т.к. нельзя менять набор кнопок из функции обработки клика
+  updateEnabledState();
+}
