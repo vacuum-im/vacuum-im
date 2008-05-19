@@ -255,8 +255,13 @@ void PrivacyLists::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
         emit defaultListChanged(AStreamJid,defaultListName);
       }
 
-      if (lists.isEmpty())
-        setAutoPrivacy(AStreamJid,PRIVACY_LIST_AUTO_VISIBLE);
+      if (FLoadRequests.value(AStanza.id()).isEmpty())
+      {
+        if (lists.isEmpty())
+          setAutoPrivacy(AStreamJid,PRIVACY_LIST_AUTO_VISIBLE);
+        else if (defaultList(AStreamJid)!=activeList(AStreamJid))
+          setActiveList(AStreamJid,defaultList(AStreamJid));
+      }
     }
     else if (AStanza.type() == "error")
     {
