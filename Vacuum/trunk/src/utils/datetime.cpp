@@ -173,7 +173,7 @@ int DateTime::tzdFromX85(const QString &AX85DateTime)
   QRegExp tzdRegExp("[+-](\\d{2}:\\d{2})");
   if (tzdRegExp.indexIn(AX85DateTime) > -1)
   {
-    QTime time = QTime::fromString(tzdRegExp.cap(1),Qt::ISODate);
+    QTime time = QTime::fromString(tzdRegExp.cap(1),"hh:mm");
     tzd = AX85DateTime.contains('+') ? QTime(0,0,0,0).secsTo(time) : time.secsTo(QTime(0,0,0,0)); 
   }
   return tzd;
