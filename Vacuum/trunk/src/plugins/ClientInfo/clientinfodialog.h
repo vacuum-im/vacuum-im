@@ -22,6 +22,7 @@ signals:
   void clientInfoDialogClosed(const Jid &FContactJid);
 protected:
   void updateText();
+  QString secsToString(int ASecs) const;
 protected slots:
   void onClientInfoChanged(const Jid &AConatctJid);
 private:

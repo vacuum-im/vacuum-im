@@ -214,13 +214,13 @@ void ClientInfo::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
     if (AStanza.type() == "result")
     {
       QDomElement query = AStanza.firstElement("query");
-      activity.datetime = QDateTime::currentDateTime().addSecs(0-query.attribute("seconds","0").toInt());
+      activity.dateTime = QDateTime::currentDateTime().addSecs(0-query.attribute("seconds","0").toInt());
       activity.text = query.text();
     }
     else if (AStanza.type() == "error")
     {
       ErrorHandler err(AStanza.element());
-      activity.datetime = QDateTime();
+      activity.dateTime = QDateTime();
       activity.text = err.message();
     }
     emit lastActivityChanged(contactJid);
@@ -236,8 +236,10 @@ void ClientInfo::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
     if (AStanza.type() == "result" && !tzo.isEmpty() && !utc.isEmpty())
     {
       TimeItem &tItem = FTimeItems[contactJid];
+      DateTime dateTime(utc+tzo);
+      tItem.zone = dateTime.timeZone();
+      tItem.delta = QDateTime::currentDateTime().secsTo(dateTime.toLocal());
       tItem.ping = tItem.ping - QTime::currentTime().msecsTo(QTime(0,0,0,0));
-      tItem.dateTime.setDateTime(utc+tzo);
     }
     else
       FTimeItems.remove(contactJid);
@@ -382,7 +384,7 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
             contactName = ritem.name;
         }
       }
-      dialog = new ClientInfoDialog(this,AStreamJid,AContactJid,contactName,AInfoTypes);
+      dialog = new ClientInfoDialog(this,AStreamJid,AContactJid,!contactName.isEmpty() ? contactName : AContactJid.full(),AInfoTypes);
       connect(dialog,SIGNAL(clientInfoDialogClosed(const Jid &)),SLOT(onClientInfoDialogClosed(const Jid &)));
       FClientInfoDialogs.insert(AContactJid,dialog);
       dialog->show();
@@ -455,7 +457,7 @@ QString ClientInfo::softwareOs(const Jid &AContactJid) const
 
 bool ClientInfo::hasLastActivity(const Jid &AContactJid) const
 {
-  return FActivityItems.value(AContactJid).datetime.isValid();
+  return FActivityItems.value(AContactJid).dateTime.isValid();
 }
 
 bool ClientInfo::requestLastActivity(const Jid &AStreamJid, const Jid &AContactJid)
@@ -475,7 +477,7 @@ bool ClientInfo::requestLastActivity(const Jid &AStreamJid, const Jid &AContactJ
 
 QDateTime ClientInfo::lastActivityTime(const Jid &AContactJid) const
 {
-  return FActivityItems.value(AContactJid).datetime;
+  return FActivityItems.value(AContactJid).dateTime;
 }
 
 QString ClientInfo::lastActivityText(const Jid &AContactJid) const
@@ -513,7 +515,9 @@ QDateTime ClientInfo::entityTime(const Jid &AContactJid) const
   if (hasEntityTime(AContactJid))
   {
     TimeItem tItem = FTimeItems.value(AContactJid);
-    return tItem.dateTime.toRemote();
+    QDateTime dateTime = QDateTime::currentDateTime().toUTC();
+    dateTime.setTimeSpec(Qt::LocalTime);
+    return dateTime.addSecs(tItem.zone).addSecs(tItem.delta);
   }
   return QDateTime();
 }
@@ -521,7 +525,7 @@ QDateTime ClientInfo::entityTime(const Jid &AContactJid) const
 int ClientInfo::entityTimeDelta(const Jid &AContactJid) const
 {
   if (hasEntityTime(AContactJid))
-    return FTimeItems.value(AContactJid).dateTime.toLocal().secsTo(QDateTime::currentDateTime());
+    return FTimeItems.value(AContactJid).delta;
   return 0;
 }
 
@@ -530,7 +534,7 @@ int ClientInfo::entityTimePing(const Jid &AContactJid) const
   return FTimeItems.value(AContactJid).ping;
 }
 
-Action * ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, QObject *AParent) const
+Action *ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, QObject *AParent) const
 {
   if (AFeature == NS_JABBER_VERSION)
   {

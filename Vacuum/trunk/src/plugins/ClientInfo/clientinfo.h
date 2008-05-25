@@ -141,13 +141,14 @@ private:
   };
   struct ActivityItem {
     QDateTime requestTime;
-    QDateTime datetime;
+    QDateTime dateTime;
     QString text;
   };
   struct TimeItem {
-    TimeItem() { ping = -1; }
+    TimeItem() { ping = -1; delta = 0; zone = 0; }
     int ping;
-    DateTime dateTime;
+    int delta;
+    int zone;
   };
 private:
   OptionsWidget *FOptionsWidget;

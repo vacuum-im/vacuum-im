@@ -87,7 +87,7 @@ void ClientInfoDialog::updateText()
     if (FClientInfo->hasEntityTime(FContactJid))
     {
       html += itemMask.arg(tr("Time:")).arg(FClientInfo->entityTime(FContactJid).time().toString());
-      html += itemMask.arg(tr("Delta, sec:")).arg(FClientInfo->entityTimeDelta(FContactJid));
+      html += itemMask.arg(tr("Delta:")).arg(secsToString(FClientInfo->entityTimeDelta(FContactJid)));
       html += itemMask.arg(tr("Ping, msec:")).arg(FClientInfo->entityTimePing(FContactJid));
     }
     else if (FClientInfo->entityTimePing(FContactJid) < -1)
@@ -99,6 +99,41 @@ void ClientInfoDialog::updateText()
 
   ui.tedText->setHtml(html);
   this->adjustSize();
+}
+
+QString ClientInfoDialog::secsToString(int ASecs) const
+{
+  const static int secsInMinute = 60;
+  const static int secsInHour = 60*secsInMinute;
+  const static int secsInDay = 24*secsInHour;
+  const static int secsInYear = 365*secsInDay;
+
+  QString time;
+  int secs = ASecs;
+
+  int years = secs / secsInYear;
+  secs -= years * secsInYear;
+
+  int days = secs / secsInDay;
+  secs -= days * secsInDay;
+
+  int hours = secs / secsInHour;
+  secs -= hours * secsInHour;
+
+  int minutes = secs / secsInMinute;
+  secs -= minutes * secsInMinute;
+
+  if (years > 0)
+    time += tr("%1y ").arg(years);
+  if (days > 0)
+    time += tr("%1d ").arg(days);
+  if (hours > 0)
+    time += tr("%1h ").arg(hours);
+  if (minutes > 0)
+    time += tr("%1m ").arg(minutes);
+  time += tr("%1s").arg(secs);
+
+  return time;
 }
 
 void ClientInfoDialog::onClientInfoChanged(const Jid &AConatctJid)
