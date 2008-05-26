@@ -260,38 +260,52 @@ void DataForms::xmlValidate(const IDataValidate &AValidate, QDomElement &AFieldE
   }
 }
 
-void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem) const
+void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, FieldWriteMode AMode) const
 {
   QDomDocument doc = AFormElem.ownerDocument();
   QDomElement fieldElem = AFormElem.appendChild(doc.createElement("field")).toElement();
+ 
   if (!AField.var.isEmpty())
     fieldElem.setAttribute("var",AField.var);
+
   if (!AField.type.isEmpty())
     fieldElem.setAttribute("type",AField.type);
-  if (!AField.label.isEmpty())
-    fieldElem.setAttribute("label",AField.label);
-  if (!AField.validate.type.isEmpty())
-    xmlValidate(AField.validate,fieldElem);
-  if (!AField.desc.isEmpty())
-    fieldElem.appendChild(doc.createElement("desc")).appendChild(doc.createTextNode(AField.desc));
+
   if (AField.value.type()==QVariant::StringList && !AField.value.toStringList().isEmpty())
   {
     foreach(QString value, AField.value.toStringList()) {
       fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(value)); }
   }
-  else if (AField.value.type()==QVariant::String && !AField.value.toString().isEmpty())
+  else if (!AField.value.toString().isEmpty())
   {
     fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(AField.value.toString()));
   }
-  foreach(IDataOption option, AField.options)
+
+  if (AMode != IDataForms::FWM_SUBMIT)
   {
-    QDomElement optionElem = fieldElem.appendChild(doc.createElement("option")).toElement();
-    if (!option.label.isEmpty())
-      optionElem.setAttribute("label",option.label);
-    optionElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(option.value));
+    if (!AField.label.isEmpty())
+      fieldElem.setAttribute("label",AField.label);
   }
-  if (AField.required)
-    fieldElem.appendChild(doc.createElement("required"));
+
+  if (AMode == IDataForms::FWM_FORM)
+  {
+    if (!AField.validate.type.isEmpty())
+      xmlValidate(AField.validate,fieldElem);
+
+    if (!AField.desc.isEmpty())
+      fieldElem.appendChild(doc.createElement("desc")).appendChild(doc.createTextNode(AField.desc));
+
+    foreach(IDataOption option, AField.options)
+    {
+      QDomElement optionElem = fieldElem.appendChild(doc.createElement("option")).toElement();
+      if (!option.label.isEmpty())
+        optionElem.setAttribute("label",option.label);
+      optionElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(option.value));
+    }
+    
+    if (AField.required)
+      fieldElem.appendChild(doc.createElement("required"));
+  }
 }
 
 void DataForms::xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const
@@ -300,7 +314,7 @@ void DataForms::xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const
   QDomElement reportElem = AFormElem.appendChild(doc.createElement("reported")).toElement();
   
   foreach(IDataField column, ATable.columns) {
-    xmlField(column,reportElem); }
+    xmlField(column,reportElem,IDataForms::FWM_TABLE); }
 
   foreach(QStringList rowValues,ATable.rows)
   {
@@ -343,11 +357,19 @@ void DataForms::xmlForm(const IDataForm &AForm, QDomElement &AParentElem) const
   foreach(IDataLayout layout, AForm.pages) {
     xmlPage(layout,AParentElem); }
 
-  if (!AForm.tabel.columns.isEmpty())
-    xmlTable(AForm.tabel,formElem);
+  if (!AForm.tabel.columns.isEmpty()) {
+    xmlTable(AForm.tabel,formElem); }
+
+  IDataForms::FieldWriteMode mode = IDataForms::FWM_FORM;
+  if (AForm.type == DATAFORM_TYPE_SUBMIT)
+    mode = IDataForms::FWM_SUBMIT;
+  else if (AForm.type == DATAFORM_TYPE_RESULT)
+    mode = IDataForms::FWM_RESULT;
+  else if (AForm.type == DATAFORM_TYPE_CANCEL)
+    mode = IDataForms::FWM_SUBMIT;
 
   foreach(IDataField field, AForm.fields) {
-    xmlField(field,formElem); }
+    xmlField(field,formElem,mode); }
 }
 
 bool DataForms::isDataValid(const IDataValidate &AValidate, const QString &AValue) const

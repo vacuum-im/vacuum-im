@@ -154,6 +154,13 @@ signals:
 class IDataForms
 {
 public:
+  enum FieldWriteMode {
+    FWM_FORM,
+    FWM_SUBMIT,
+    FWM_RESULT,
+    FWM_TABLE
+  };
+public:
   virtual QObject *instance() =0;
   //XML2DATA
   virtual IDataValidate dataValidate(const QDomElement &AValidateElem) const =0;
@@ -163,7 +170,7 @@ public:
   virtual IDataForm dataForm(const QDomElement &AFormElem) const =0;
   //DATA2XML
   virtual void xmlValidate(const IDataValidate &AValidate, QDomElement &AFieldElem) const =0;
-  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem) const =0;
+  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, FieldWriteMode AMode = FWM_FORM) const =0;
   virtual void xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const =0;
   virtual void xmlSection(const IDataLayout &ALayout, QDomElement &AParentElem) const =0;
   virtual void xmlPage(const IDataLayout &ALayout, QDomElement &AParentElem) const =0;

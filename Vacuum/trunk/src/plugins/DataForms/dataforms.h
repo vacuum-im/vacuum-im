@@ -36,7 +36,7 @@ public:
   virtual IDataForm dataForm(const QDomElement &AFormElem) const;
   //DATA2XML
   virtual void xmlValidate(const IDataValidate &AValidate, QDomElement &AFieldElem) const;
-  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem) const;
+  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, FieldWriteMode AMode = FWM_FORM) const;
   virtual void xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const;
   virtual void xmlSection(const IDataLayout &ALayout, QDomElement &AParentElem) const;
   virtual void xmlPage(const IDataLayout &ALayout, QDomElement &AParentElem) const;
