@@ -208,8 +208,10 @@ void DiscoItemsWindow::updateDiscoInfo(const IDiscoInfo &ADiscoInfo)
       
       if (!ADiscoInfo.features.isEmpty())
       {
+        QStringList features = ADiscoInfo.features;
+        qSort(features);
         toolTip+=tr("<li><b>Features:</b></li>");
-        foreach(QString feature, ADiscoInfo.features)
+        foreach(QString feature, features)
         {
           IDiscoFeature dfeature = FDiscovery->discoFeature(feature);
           toolTip+=QString("<li>%1</li>").arg(dfeature.name.isEmpty() ? feature : dfeature.name);

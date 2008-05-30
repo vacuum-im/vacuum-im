@@ -42,6 +42,7 @@ DiscoInfoWindow::~DiscoInfoWindow()
 void DiscoInfoWindow::updateWindow()
 {
   IDiscoInfo dinfo = FDiscovery->discoInfo(FContactJid,FNode);
+  qSort(dinfo.features);
   
   int row = 0;
   ui.twtIdentity->clearContents();
