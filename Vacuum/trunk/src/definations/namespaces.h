@@ -4,6 +4,7 @@
 #define NS_XMPP_STREAMS                         "urn:ietf:params:xml:ns:xmpp-streams"
 #define NS_XMPP_DELAY                           "urn:xmpp:delay"
 #define NS_XMPP_TIME                            "urn:xmpp:time"
+#define NS_STANZA_SESSION                       "urn:xmpp:ssn"
 
 #define NS_JABBER_CLIENT                        "jabber:client"
 #define NS_JABBER_STREAMS                       "http://etherx.jabber.org/streams"
@@ -58,5 +59,7 @@
 #define NS_ARCHIVE_PREF                         "urn:xmpp:tmp:archive:pref"
 
 #define NS_RESULTSET                            "http://jabber.org/protocol/rsm"
+
+#define NS_FEATURENEG                           "http://jabber.org/protocol/feature-neg"
 
 #endif

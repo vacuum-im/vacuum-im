@@ -1,4 +1,4 @@
-HEADERS += actiongroups.h \
+HEADERS  = actiongroups.h \
            optionnodes.h \
            optionorders.h \
            initorders.h \
@@ -20,4 +20,5 @@ HEADERS += actiongroups.h \
            version.h \
            accountvaluenames.h \
            archivehandlerorders.h \
-           archiveindextyperole.h
+           archiveindextyperole.h \
+           sessionnegotiatororder.h

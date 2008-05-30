@@ -1,4 +1,4 @@
-HEADERS += ipluginmanager.h \
+HEADERS  = ipluginmanager.h \
            ixmppstreams.h \
            isettings.h \
            istanzaprocessor.h \
@@ -29,4 +29,5 @@ HEADERS += ipluginmanager.h \
            ijabbersearch.h \
            igateways.h \
            imessagearchiver.h \
-           iprivacylists.h
+           iprivacylists.h \
+           isessionnegotiation.h
