@@ -22,6 +22,7 @@ public:
 signals:
   virtual void formWidgetCreated(IDataFormWidget *AForm);
   virtual void formWidgetDestroyed(IDataFormWidget *AForm);
+  virtual void dialogDestroyed(IDataDialogWidget *ADialog);
 protected slots:
   void onDialogButtonClicked(QAbstractButton *AButton);
 private:

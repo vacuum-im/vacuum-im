@@ -36,7 +36,7 @@ DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AFor
 
 DataDialogWidget::~DataDialogWidget()
 {
-
+  emit dialogDestroyed(this);
 }
 
 void DataDialogWidget::setForm(const IDataForm &AForm)
