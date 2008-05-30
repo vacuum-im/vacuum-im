@@ -243,7 +243,7 @@ void OptionsDialog::onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetI
     }
     stwOptions->setVisible(true);
   }
-  else
+  else if (ACurrent)
   {
     QString node = ACurrent->data(0,Qt::UserRole).toString();
     lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(tr("No Settings Available")));
