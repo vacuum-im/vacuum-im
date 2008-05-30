@@ -158,7 +158,7 @@ QVariant DataFieldWidget::value() const
 {
   if (FField.type == DATAFIELD_TYPE_BOOLEAN)
   {
-    return FCheckBox->isChecked() ? "1" : "0";
+    return FCheckBox->isChecked();
   }
   else if (FField.type == DATAFIELD_TYPE_FIXED)
   {
