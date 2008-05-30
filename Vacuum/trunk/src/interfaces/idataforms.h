@@ -149,6 +149,7 @@ public:
 signals:
   virtual void formWidgetCreated(IDataFormWidget *AForm) =0;
   virtual void formWidgetDestroyed(IDataFormWidget *AForm) =0;
+  virtual void dialogDestroyed(IDataDialogWidget *ADialog) =0;
 };
 
 class IDataForms
