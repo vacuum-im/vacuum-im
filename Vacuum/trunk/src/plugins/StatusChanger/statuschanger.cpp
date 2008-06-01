@@ -899,9 +899,13 @@ void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QSt
     }
     else if (FSettingStatusToPresence != APresence)
     {
-      setStreamStatusId(APresence, createTempStatus(APresence,AShow,AText,APriority));
-      updateStreamMenu(APresence);
-      updateMainMenu();
+      StatusItem *item = FStatusItems.value(FStreamStatus.value(APresence),NULL);
+      if (!item || item->show!=AShow || item->priority!=APriority || item->text!=AText)
+      {
+        setStreamStatusId(APresence, createTempStatus(APresence,AShow,AText,APriority));
+        updateStreamMenu(APresence);
+        updateMainMenu();
+      }
     }
     if (FStreamWaitStatus.contains(APresence))
     {
