@@ -100,8 +100,10 @@ bool SettingsPlugin::initObjects()
 
 bool SettingsPlugin::initSettings()
 {
- 
-  FHomeDir = QDir::home();
+  QStringList args = qApp->arguments();
+
+  int homeDirIndex = args.indexOf(CLO_HOME_DIR);
+  FHomeDir = homeDirIndex >0 ? QDir(args.value(homeDirIndex+1)) : QDir::home();
   if (!FHomeDir.exists(DIR_ROOT))
     FHomeDir.mkdir(DIR_ROOT);
 
@@ -129,15 +131,17 @@ bool SettingsPlugin::initSettings()
     }
     profilesFile.close();
 
-    foreach(QString profileName, profiles())
-      addProfileAction(profileName);
+    foreach(QString profileName, profiles()) {
+      addProfileAction(profileName); }
 
-    if (settingsReady)
-    {
-      if (profiles().count() == 0)
-        addProfile(DEFAULT_PROFILE);
+    if (profiles().count() == 0)
+      addProfile(DEFAULT_PROFILE);
+    
+    int profileIndex = args.indexOf(CLO_PROFILE);
+    if (profileIndex>0 && profiles().contains(args.value(profileIndex+1)))
+      setProfile(args.value(profileIndex+1));
+    else
       setProfile(FProfiles.documentElement().attribute("profileName",DEFAULT_PROFILE));
-    }
   }
 
   if (!settingsReady)
@@ -305,7 +309,7 @@ bool SettingsPlugin::removeProfile(const QString &AProfile)
 
     QDir profilesDir = FHomeDir;
     profilesDir.cd(DIR_PROFILES);
-    if (!profilesDir.remove(QFile::encodeName(profileElem.attribute("dir"))))
+    if (!profilesDir.rmdir(QFile::encodeName(profileElem.attribute("dir"))))
       qDebug() << "CANT REMOVE PROFILE DIRECTORY.";
 
     removeProfileAction(AProfile);
@@ -430,8 +434,8 @@ QDialog *SettingsPlugin::openOptionsDialog(const QString &ANode, QWidget *AParen
     }
     emit optionsDialogOpened();
   }
-  FOptionsDialog->showNode(ANode);
   FOptionsDialog->show();
+  FOptionsDialog->showNode(ANode);
   return FOptionsDialog;
 }
 

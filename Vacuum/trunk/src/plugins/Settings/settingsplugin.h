@@ -7,6 +7,7 @@
 #include <QPointer>
 #include <QWidget>
 #include "../../definations/actiongroups.h"
+#include "../../definations/commandline.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/imainwindow.h"

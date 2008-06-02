@@ -21,4 +21,5 @@ HEADERS  = actiongroups.h \
            accountvaluenames.h \
            archivehandlerorders.h \
            archiveindextyperole.h \
-           sessionnegotiatororder.h
+           sessionnegotiatororder.h \
+           commandline.h
