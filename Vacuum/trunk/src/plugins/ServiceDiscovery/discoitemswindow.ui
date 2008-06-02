@@ -25,9 +25,9 @@
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>14</y>
+     <y>12</y>
      <width>654</width>
-     <height>345</height>
+     <height>347</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" >
@@ -128,6 +128,9 @@
         <property name="contextMenuPolicy" >
          <enum>Qt::CustomContextMenu</enum>
         </property>
+        <property name="autoScroll" >
+         <bool>false</bool>
+        </property>
         <property name="editTriggers" >
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
@@ -137,7 +140,7 @@
         <property name="indentation" >
          <number>12</number>
         </property>
-        <property name="sortingEnabled" >
+        <property name="uniformRowHeights" >
          <bool>true</bool>
         </property>
         <property name="allColumnsShowFocus" >
@@ -170,7 +173,7 @@
      <x>0</x>
      <y>0</y>
      <width>654</width>
-     <height>14</height>
+     <height>12</height>
     </rect>
    </property>
    <property name="windowTitle" >

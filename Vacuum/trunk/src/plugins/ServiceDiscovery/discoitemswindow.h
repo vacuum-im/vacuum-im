@@ -1,6 +1,7 @@
 #ifndef DISCOITEMSWINDOW_H
 #define DISCOITEMSWINDOW_H
 
+#include <QHeaderView>
 #include <QMainWindow>
 #include "../../definations/discotreeitemsdataroles.h"
 #include "../../interfaces/iservicediscovery.h"
@@ -58,7 +59,9 @@ protected slots:
   void onToolBarActionTriggered(bool);
   void onComboReturnPressed();
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAftert);
+  void onHeaderSectionClicked(int AColumn);
 private:
+  QHeaderView *FHeader;
   Ui::DiscoItemsWindowClass ui;
 private:
   IVCardPlugin *FVCardPlugin;

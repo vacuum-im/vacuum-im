@@ -1,6 +1,5 @@
 #include "discoitemswindow.h"
 
-#include <QHeaderView>
 #include <QLineEdit>
 
 #define COL_NAME                0
@@ -50,10 +49,15 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
   connect(ui.cmbJid->lineEdit(),SIGNAL(returnPressed()),SLOT(onComboReturnPressed()));
   connect(ui.cmbNode->lineEdit(),SIGNAL(returnPressed()),SLOT(onComboReturnPressed()));
 
-  ui.trwItems->header()->setStretchLastSection(false);
-  ui.trwItems->header()->setResizeMode(COL_NAME,QHeaderView::ResizeToContents);
-  ui.trwItems->header()->setResizeMode(COL_JID,QHeaderView::Stretch);
-  ui.trwItems->header()->setResizeMode(COL_NODE,QHeaderView::Stretch);
+  FHeader = ui.trwItems->header();
+  FHeader->setClickable(true);
+  FHeader->setStretchLastSection(false);
+  FHeader->setResizeMode(COL_NAME,QHeaderView::ResizeToContents);
+  FHeader->setResizeMode(COL_JID,QHeaderView::Stretch);
+  FHeader->setResizeMode(COL_NODE,QHeaderView::Stretch);
+  FHeader->setSortIndicatorShown(true);
+  connect(FHeader,SIGNAL(sectionClicked(int)),SLOT(onHeaderSectionClicked(int)));
+
   ui.trwItems->sortByColumn(COL_NAME,Qt::AscendingOrder);
   connect(ui.trwItems,SIGNAL(itemExpanded(QTreeWidgetItem *)),SLOT(onTreeItemExpanded(QTreeWidgetItem *)));
   connect(ui.trwItems,SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
@@ -238,7 +242,8 @@ void DiscoItemsWindow::updateDiscoItems(const IDiscoItems &ADiscoItems)
       QTreeWidgetItem *curItem = FTreeItems.value(ditem.itemJid).value(ditem.node);
       if (curItem == NULL)
       {
-        newItems.append(createTreeItem(ditem));
+        curItem = createTreeItem(ditem);
+        newItems.append(curItem);
         if (useCache() && !isNeedRequestInfo(ditem.itemJid,ditem.node))
           updateDiscoInfo(FDiscovery->discoInfo(ditem.itemJid,ditem.node));
         else if (ADiscoItems.items.count() <= MAX_ITEMS_FOR_REQUEST)
@@ -264,10 +269,16 @@ void DiscoItemsWindow::updateDiscoItems(const IDiscoItems &ADiscoItems)
       }
     }
 
-    treeItem->addChildren(newItems);
-
-    if (treeItem->childCount() == 0)
-      ui.trwItems->collapseItem(treeItem);
+    if (!newItems.isEmpty())
+    {
+      bool expanded = treeItem->isExpanded(); //Очередные костыли
+      treeItem->setExpanded(false);
+      treeItem->addChildren(newItems);
+      treeItem->sortChildren(FHeader->sortIndicatorSection(),FHeader->sortIndicatorOrder());
+      treeItem->setExpanded(expanded);
+    } 
+    else if (treeItem->childCount() == 0)
+      treeItem->setExpanded(false);
 
     if (ADiscoItems.error.code > 0)
       treeItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
@@ -549,3 +560,7 @@ void DiscoItemsWindow::onStreamJidChanged(const Jid &ABefour, const Jid &AAftert
   emit streamJidChanged(ABefour,AAftert);
 }
 
+void DiscoItemsWindow::onHeaderSectionClicked(int AColumn)
+{
+  ui.trwItems->sortItems(AColumn,FHeader->sortIndicatorOrder());
+}
