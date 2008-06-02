@@ -42,7 +42,7 @@ protected:
   bool isNeedRequestItems(const Jid AContactJid, const QString &ANode) const;
   void requestDiscoInfo(const Jid AContactJid, const QString &ANode);
   void requestDiscoItems(const Jid AContactJid, const QString &ANode);
-  QTreeWidgetItem *createTreeItem(const IDiscoItem &ADiscoItem, QTreeWidgetItem *AParent);
+  QTreeWidgetItem *createTreeItem(const IDiscoItem &ADiscoItem);
   void updateDiscoInfo(const IDiscoInfo &ADiscoInfo);
   void updateDiscoItems(const IDiscoItems &ADiscoItems);
   void destroyTreeItem(QTreeWidgetItem *ATreeItem);

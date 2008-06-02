@@ -54,6 +54,7 @@ void DiscoInfoWindow::updateWindow()
     ui.twtIdentity->setItem(row,2,new QTableWidgetItem(identity.name));
     row++;
   }
+  ui.twtIdentity->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
 
   ui.lwtFearures->clear();
   foreach(QString featureVar, dinfo.features)

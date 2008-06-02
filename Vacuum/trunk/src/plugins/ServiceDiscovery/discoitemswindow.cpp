@@ -3,9 +3,9 @@
 #include <QHeaderView>
 #include <QLineEdit>
 
-#define CNAME                   0
-#define CJID                    1
-#define CNODE                   2
+#define COL_NAME                0
+#define COL_JID                 1
+#define COL_NODE                2
 
 #define MAX_ITEMS_FOR_REQUEST   20
 
@@ -37,6 +37,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 
   FActionsBarChanger = new ToolBarChanger(new QToolBar(this));
   FActionsBarChanger->setManageVisibility(false);
+  FActionsBarChanger->setSeparatorsVisible(false);
   FActionsBarChanger->toolBar()->setIconSize(this->iconSize());
   FActionsBarChanger->toolBar()->setOrientation(Qt::Vertical);
   FActionsBarChanger->toolBar()->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -50,10 +51,10 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
   connect(ui.cmbNode->lineEdit(),SIGNAL(returnPressed()),SLOT(onComboReturnPressed()));
 
   ui.trwItems->header()->setStretchLastSection(false);
-  ui.trwItems->header()->setResizeMode(CNAME,QHeaderView::ResizeToContents);
-  ui.trwItems->header()->setResizeMode(CJID,QHeaderView::Stretch);
-  ui.trwItems->header()->setResizeMode(CNODE,QHeaderView::Stretch);
-  ui.trwItems->sortByColumn(CNAME,Qt::AscendingOrder);
+  ui.trwItems->header()->setResizeMode(COL_NAME,QHeaderView::ResizeToContents);
+  ui.trwItems->header()->setResizeMode(COL_JID,QHeaderView::Stretch);
+  ui.trwItems->header()->setResizeMode(COL_NODE,QHeaderView::Stretch);
+  ui.trwItems->sortByColumn(COL_NAME,Qt::AscendingOrder);
   connect(ui.trwItems,SIGNAL(itemExpanded(QTreeWidgetItem *)),SLOT(onTreeItemExpanded(QTreeWidgetItem *)));
   connect(ui.trwItems,SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
     SLOT(onCurrentTreeItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
@@ -98,7 +99,8 @@ void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
   IDiscoItem ditem;
   ditem.itemJid = AContactJid;
   ditem.node = ANode;
-  QTreeWidgetItem *treeItem = createTreeItem(ditem,NULL);
+  QTreeWidgetItem *treeItem = createTreeItem(ditem);
+  ui.trwItems->addTopLevelItem(treeItem);
 
   if (!useCache() || isNeedRequestInfo(AContactJid,ANode))
     requestDiscoInfo(AContactJid,ANode);
@@ -157,25 +159,20 @@ void DiscoItemsWindow::requestDiscoItems(const Jid AContactJid, const QString &A
   }
 }
 
-QTreeWidgetItem *DiscoItemsWindow::createTreeItem(const IDiscoItem &ADiscoItem, QTreeWidgetItem *AParent)
+QTreeWidgetItem *DiscoItemsWindow::createTreeItem(const IDiscoItem &ADiscoItem)
 {
   QTreeWidgetItem *treeItem = new QTreeWidgetItem;
-  treeItem->setText(CNAME, ADiscoItem.name.isEmpty() ? ADiscoItem.itemJid.full() : ADiscoItem.name);
-  treeItem->setText(CJID, ADiscoItem.itemJid.full());
-  treeItem->setText(CNODE, ADiscoItem.node);
-  treeItem->setToolTip(CNAME,ADiscoItem.name);
-  treeItem->setToolTip(CJID,ADiscoItem.itemJid.hFull());
-  treeItem->setToolTip(CNODE,ADiscoItem.node);
+  treeItem->setText(COL_NAME, ADiscoItem.name.isEmpty() ? ADiscoItem.itemJid.full() : ADiscoItem.name);
+  treeItem->setText(COL_JID, ADiscoItem.itemJid.full());
+  treeItem->setText(COL_NODE, ADiscoItem.node);
+  treeItem->setToolTip(COL_JID,ADiscoItem.itemJid.hFull());
+  treeItem->setToolTip(COL_NODE,ADiscoItem.node);
   treeItem->setData(0,DDR_STREAMJID,FStreamJid.full());
   treeItem->setData(0,DDR_JID,ADiscoItem.itemJid.full());
   treeItem->setData(0,DDR_NODE,ADiscoItem.node);
   treeItem->setData(0,DDR_NAME,ADiscoItem.name);
   treeItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
   FTreeItems[ADiscoItem.itemJid].insert(ADiscoItem.node,treeItem);
-  if (AParent)
-    AParent->addChild(treeItem);
-  else
-    ui.trwItems->addTopLevelItem(treeItem);
   emit treeItemCreated(treeItem);
   return treeItem;
 }
@@ -187,14 +184,11 @@ void DiscoItemsWindow::updateDiscoInfo(const IDiscoInfo &ADiscoInfo)
   if (treeItem)
   {
     treeItem->setData(0,DDR_REQUEST_INFO,false);
-
-    if (treeItem->parent() == NULL && !ADiscoInfo.identity.value(0).name.isEmpty())
-    {
-      treeItem->setText(CNAME, ADiscoInfo.identity.value(0).name);
-      treeItem->setData(0,DDR_NAME,ADiscoInfo.identity.value(0).name);
-    }
-
-    treeItem->setIcon(CNAME,FDiscovery->discoInfoIcon(ADiscoInfo));
+    
+    treeItem->setIcon(COL_NAME,FDiscovery->discoInfoIcon(ADiscoInfo));
+    
+    if (!ADiscoInfo.identity.value(0).name.isEmpty() && treeItem->data(0,DDR_NAME).toString().isEmpty())
+      treeItem->setText(COL_NAME,ADiscoInfo.identity.value(0).name);
 
     QString toolTip; 
     if (ADiscoInfo.error.code < 0)
@@ -221,7 +215,7 @@ void DiscoItemsWindow::updateDiscoInfo(const IDiscoInfo &ADiscoInfo)
     else
       toolTip+=tr("Error %1: %2").arg(ADiscoInfo.error.code).arg(ADiscoInfo.error.message);
 
-    treeItem->setToolTip(CNAME,toolTip);
+    treeItem->setToolTip(COL_NAME,toolTip);
 
     if(treeItem == ui.trwItems->currentItem())
       updateActionsBar();
@@ -238,40 +232,45 @@ void DiscoItemsWindow::updateDiscoItems(const IDiscoItems &ADiscoItems)
     treeItem->setData(0,DDR_REQUEST_ITEMS,false);
 
     QList<QTreeWidgetItem *> curItems;
+    QList<QTreeWidgetItem *> newItems;
     foreach(IDiscoItem ditem, ADiscoItems.items)
     {
       QTreeWidgetItem *curItem = FTreeItems.value(ditem.itemJid).value(ditem.node);
       if (curItem == NULL)
       {
-        curItem = createTreeItem(ditem,treeItem);
+        newItems.append(createTreeItem(ditem));
         if (useCache() && !isNeedRequestInfo(ditem.itemJid,ditem.node))
           updateDiscoInfo(FDiscovery->discoInfo(ditem.itemJid,ditem.node));
         else if (ADiscoItems.items.count() <= MAX_ITEMS_FOR_REQUEST)
           requestDiscoInfo(ditem.itemJid,ditem.node);
         else
-          curItem->setIcon(CNAME,FDiscovery->discoItemIcon(ditem));
+          curItem->setIcon(COL_NAME,FDiscovery->discoItemIcon(ditem));
         if (!isNeedRequestItems(ditem.itemJid,ditem.node))
           updateDiscoItems(FDiscovery->discoItems(ditem.itemJid,ditem.node));
       }
       else
+      {
         curItem->setDisabled(false);
-      curItems.append(curItem);
+        curItems.append(curItem);
+      }
     }
 
-    int index = 0;
-    while (index < treeItem->childCount())
+    for (int index=0; index<treeItem->childCount(); index++)
     {
       if (!curItems.contains(treeItem->child(index)))
+      {
         destroyTreeItem(treeItem->takeChild(index));
-      else
-        index++;
+        index--;
+      }
     }
 
-    if (ADiscoItems.error.code > 0)
-    {
+    treeItem->addChildren(newItems);
+
+    if (treeItem->childCount() == 0)
       ui.trwItems->collapseItem(treeItem);
+
+    if (ADiscoItems.error.code > 0)
       treeItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
-    }
     else
       treeItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
 
@@ -374,7 +373,9 @@ void DiscoItemsWindow::updateActionsBar()
       if (action)
       {
         QToolButton *button = FActionsBarChanger->addToolButton(action,AG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
+        button->setPopupMode(QToolButton::InstantPopup);
         button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        button->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
       }
     }
   }
