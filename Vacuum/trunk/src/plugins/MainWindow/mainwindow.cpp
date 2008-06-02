@@ -19,7 +19,7 @@ MainWindow::~MainWindow()
 
 QMenu *MainWindow::createPopupMenu()
 {
-  return IMainWindow::createPopupMenu();
+  return NULL;
 }
 
 void MainWindow::createLayouts()
