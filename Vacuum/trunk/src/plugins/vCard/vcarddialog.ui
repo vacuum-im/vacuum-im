@@ -5,24 +5,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>459</width>
-    <height>259</height>
+    <width>449</width>
+    <height>250</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>VCardDialog</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="leftMargin" >
-    <number>3</number>
-   </property>
-   <property name="topMargin" >
-    <number>3</number>
-   </property>
-   <property name="rightMargin" >
-    <number>3</number>
-   </property>
-   <property name="bottomMargin" >
+  <layout class="QVBoxLayout" name="verticalLayout" >
+   <property name="margin" >
     <number>3</number>
    </property>
    <item>
@@ -30,24 +21,23 @@
      <property name="currentIndex" >
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tabGeberal" >
+     <widget class="QWidget" name="tabGeneral" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>439</width>
+        <height>186</height>
+       </rect>
+      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>
       <attribute name="title" >
        <string>General</string>
       </attribute>
-      <layout class="QGridLayout" >
-       <property name="leftMargin" >
-        <number>3</number>
-       </property>
-       <property name="topMargin" >
-        <number>3</number>
-       </property>
-       <property name="rightMargin" >
-        <number>3</number>
-       </property>
-       <property name="bottomMargin" >
+      <layout class="QFormLayout" name="lotGeneral" >
+       <property name="margin" >
         <number>3</number>
        </property>
        <item row="0" column="0" >
@@ -131,23 +121,22 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabPersonal" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>439</width>
+        <height>186</height>
+       </rect>
+      </property>
       <property name="autoFillBackground" >
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <attribute name="title" >
        <string>Personal</string>
       </attribute>
-      <layout class="QGridLayout" >
-       <property name="leftMargin" >
-        <number>3</number>
-       </property>
-       <property name="topMargin" >
-        <number>3</number>
-       </property>
-       <property name="rightMargin" >
-        <number>3</number>
-       </property>
-       <property name="bottomMargin" >
+      <layout class="QFormLayout" name="lotPersonal" >
+       <property name="margin" >
         <number>3</number>
        </property>
        <item row="0" column="0" >
@@ -161,53 +150,57 @@
         </widget>
        </item>
        <item row="0" column="1" >
-        <widget class="QDateEdit" name="dedBirthday" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="calendarPopup" >
-          <bool>true</bool>
-         </property>
-         <property name="currentSectionIndex" >
-          <number>0</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2" >
-        <widget class="QLabel" name="lblGender" >
-         <property name="text" >
-          <string>Gender</string>
-         </property>
-         <property name="buddy" >
-          <cstring>cmbGender</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3" >
-        <widget class="QComboBox" name="cmbGender" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="editable" >
-          <bool>true</bool>
-         </property>
+        <layout class="QHBoxLayout" name="lotPersonalBirthday" >
          <item>
-          <property name="text" >
-           <string>Male</string>
-          </property>
+          <widget class="QDateEdit" name="dedBirthday" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="displayFormat" >
+            <string>dd.MMMM.yyyy</string>
+           </property>
+           <property name="calendarPopup" >
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item>
-          <property name="text" >
-           <string>Female</string>
-          </property>
+          <widget class="QLabel" name="lblGender" >
+           <property name="text" >
+            <string>Gender</string>
+           </property>
+           <property name="buddy" >
+            <cstring>cmbGender</cstring>
+           </property>
+          </widget>
          </item>
-        </widget>
+         <item>
+          <widget class="QComboBox" name="cmbGender" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="editable" >
+            <bool>true</bool>
+           </property>
+           <item>
+            <property name="text" >
+             <string>Male</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Female</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="1" column="0" >
         <widget class="QLabel" name="lblMaritial" >
@@ -219,7 +212,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1" colspan="3" >
+       <item row="1" column="1" >
         <widget class="QLineEdit" name="lneMaritial" />
        </item>
        <item row="2" column="0" >
@@ -232,7 +225,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1" colspan="3" >
+       <item row="2" column="1" >
         <widget class="QLineEdit" name="lneTitle" />
        </item>
        <item row="3" column="0" >
@@ -245,7 +238,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1" colspan="3" >
+       <item row="3" column="1" >
         <widget class="QLineEdit" name="lneCompany" />
        </item>
        <item row="4" column="0" >
@@ -258,7 +251,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1" colspan="3" >
+       <item row="4" column="1" >
         <widget class="QLineEdit" name="lneDepartment" />
        </item>
        <item row="5" column="0" >
@@ -271,7 +264,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1" colspan="3" >
+       <item row="5" column="1" >
         <widget class="QLineEdit" name="lneRole" />
        </item>
        <item row="6" column="0" >
@@ -284,29 +277,28 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1" colspan="3" >
+       <item row="6" column="1" >
         <widget class="QLineEdit" name="lneHomePage" />
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabAdress" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>439</width>
+        <height>186</height>
+       </rect>
+      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>
       <attribute name="title" >
        <string>Adress</string>
       </attribute>
-      <layout class="QHBoxLayout" >
-       <property name="leftMargin" >
-        <number>3</number>
-       </property>
-       <property name="topMargin" >
-        <number>3</number>
-       </property>
-       <property name="rightMargin" >
-        <number>3</number>
-       </property>
-       <property name="bottomMargin" >
+      <layout class="QHBoxLayout" name="lotAdress" >
+       <property name="margin" >
         <number>3</number>
        </property>
        <item>
@@ -317,17 +309,8 @@
          <property name="flat" >
           <bool>true</bool>
          </property>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
+         <layout class="QFormLayout" name="lotAdressHome" >
+          <property name="margin" >
            <number>0</number>
           </property>
           <item row="0" column="0" >
@@ -406,17 +389,8 @@
          <property name="flat" >
           <bool>true</bool>
          </property>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
+         <layout class="QFormLayout" name="lotAdressWork" >
+          <property name="margin" >
            <number>0</number>
           </property>
           <item row="0" column="0" >
@@ -490,23 +464,22 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabContacts" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>439</width>
+        <height>186</height>
+       </rect>
+      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>
       <attribute name="title" >
        <string>Contacts</string>
       </attribute>
-      <layout class="QHBoxLayout" >
-       <property name="leftMargin" >
-        <number>3</number>
-       </property>
-       <property name="topMargin" >
-        <number>3</number>
-       </property>
-       <property name="rightMargin" >
-        <number>3</number>
-       </property>
-       <property name="bottomMargin" >
+      <layout class="QHBoxLayout" name="lotContacts" >
+       <property name="margin" >
         <number>3</number>
        </property>
        <item>
@@ -517,26 +490,23 @@
          <property name="flat" >
           <bool>true</bool>
          </property>
-         <layout class="QVBoxLayout" >
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
+         <layout class="QVBoxLayout" name="lotEmail" >
+          <property name="margin" >
            <number>0</number>
           </property>
           <item>
            <widget class="QListWidget" name="ltwEmails" />
           </item>
           <item>
-           <layout class="QHBoxLayout" >
+           <layout class="QHBoxLayout" name="lotEmailButtons" >
             <item>
              <widget class="QToolButton" name="tlbEmailAdd" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Add</string>
               </property>
@@ -544,23 +514,16 @@
             </item>
             <item>
              <widget class="QToolButton" name="tlbEmailDelete" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Delete</string>
               </property>
              </widget>
-            </item>
-            <item>
-             <spacer>
-              <property name="orientation" >
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" >
-               <size>
-                <width>40</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </item>
@@ -575,26 +538,23 @@
          <property name="flat" >
           <bool>true</bool>
          </property>
-         <layout class="QVBoxLayout" >
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
+         <layout class="QVBoxLayout" name="lotPhone" >
+          <property name="margin" >
            <number>0</number>
           </property>
           <item>
            <widget class="QListWidget" name="ltwPhones" />
           </item>
           <item>
-           <layout class="QHBoxLayout" >
+           <layout class="QHBoxLayout" name="lotPhoneButtons" >
             <item>
              <widget class="QToolButton" name="tlbPhoneAdd" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Add</string>
               </property>
@@ -602,23 +562,16 @@
             </item>
             <item>
              <widget class="QToolButton" name="tlbPhoneDelete" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Delete</string>
               </property>
              </widget>
-            </item>
-            <item>
-             <spacer>
-              <property name="orientation" >
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" >
-               <size>
-                <width>20</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </item>
@@ -628,23 +581,22 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabPhoto" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>439</width>
+        <height>186</height>
+       </rect>
+      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>
       <attribute name="title" >
        <string>Photo</string>
       </attribute>
-      <layout class="QHBoxLayout" >
-       <property name="leftMargin" >
-        <number>3</number>
-       </property>
-       <property name="topMargin" >
-        <number>3</number>
-       </property>
-       <property name="rightMargin" >
-        <number>3</number>
-       </property>
-       <property name="bottomMargin" >
+      <layout class="QHBoxLayout" name="lotPhoto" >
+       <property name="margin" >
         <number>3</number>
        </property>
        <item>
@@ -655,17 +607,8 @@
          <property name="flat" >
           <bool>true</bool>
          </property>
-         <layout class="QVBoxLayout" >
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
+         <layout class="QVBoxLayout" name="lotPhotoImage" >
+          <property name="margin" >
            <number>0</number>
           </property>
           <item>
@@ -688,9 +631,15 @@
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" >
+           <layout class="QHBoxLayout" name="lotPhotoButtons" >
             <item>
              <widget class="QToolButton" name="tlbPhotoSave" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Save</string>
               </property>
@@ -698,6 +647,12 @@
             </item>
             <item>
              <widget class="QToolButton" name="tlbPhotoLoad" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Load</string>
               </property>
@@ -705,6 +660,12 @@
             </item>
             <item>
              <widget class="QToolButton" name="tlbPhotoClear" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Clear</string>
               </property>
@@ -723,17 +684,8 @@
          <property name="flat" >
           <bool>true</bool>
          </property>
-         <layout class="QVBoxLayout" >
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
+         <layout class="QVBoxLayout" name="lotLogoImage" >
+          <property name="margin" >
            <number>0</number>
           </property>
           <item>
@@ -756,9 +708,15 @@
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" >
+           <layout class="QHBoxLayout" name="lotLogoButtons" >
             <item>
              <widget class="QToolButton" name="tlbLogoSave" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Save</string>
               </property>
@@ -766,6 +724,12 @@
             </item>
             <item>
              <widget class="QToolButton" name="tlbLogoLoad" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Load</string>
               </property>
@@ -773,6 +737,12 @@
             </item>
             <item>
              <widget class="QToolButton" name="tlbLogoClear" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text" >
                <string>Clear</string>
               </property>
@@ -786,23 +756,22 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabComments" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>439</width>
+        <height>186</height>
+       </rect>
+      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>
       <attribute name="title" >
        <string>Comments</string>
       </attribute>
-      <layout class="QVBoxLayout" >
-       <property name="leftMargin" >
-        <number>3</number>
-       </property>
-       <property name="topMargin" >
-        <number>3</number>
-       </property>
-       <property name="rightMargin" >
-        <number>3</number>
-       </property>
-       <property name="bottomMargin" >
+      <layout class="QVBoxLayout" name="lotComments" >
+       <property name="margin" >
         <number>3</number>
        </property>
        <item>
@@ -813,63 +782,49 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" native="1" name="widget" >
-     <layout class="QHBoxLayout" >
-      <property name="leftMargin" >
-       <number>0</number>
-      </property>
-      <property name="topMargin" >
-       <number>0</number>
-      </property>
-      <property name="rightMargin" >
-       <number>0</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QPushButton" name="pbtUpdate" >
-        <property name="text" >
-         <string>Update</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pbtPublish" >
-        <property name="text" >
-         <string>Publish</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pbtClear" >
-        <property name="text" >
-         <string>Clear</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pbtClose" >
-        <property name="text" >
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+    <layout class="QHBoxLayout" name="lotButtons" >
+     <item>
+      <widget class="QPushButton" name="pbtUpdate" >
+       <property name="text" >
+        <string>Reload</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtPublish" >
+       <property name="text" >
+        <string>Publish</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtClear" >
+       <property name="text" >
+        <string>Clear</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtClose" >
+       <property name="text" >
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -900,8 +855,6 @@
   <tabstop>lneWorkState</tabstop>
   <tabstop>lneWorkZip</tabstop>
   <tabstop>lneWorkCountry</tabstop>
-  <tabstop>pbtUpdate</tabstop>
-  <tabstop>pbtPublish</tabstop>
   <tabstop>pbtClose</tabstop>
  </tabstops>
  <resources/>

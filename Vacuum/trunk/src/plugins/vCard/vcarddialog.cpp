@@ -252,13 +252,13 @@ void VCardDialog::setLogo(const QPixmap &ALogo)
 void VCardDialog::updatePhotoLabel(const QSize &ASize)
 {
   if (!FPhoto.isNull())
-    ui.lblPhoto->setPixmap(FPhoto.scaled(ASize-QSize(3,3),Qt::KeepAspectRatio));
+    ui.lblPhoto->setPixmap(FPhoto.scaled(ASize-QSize(5,5),Qt::KeepAspectRatio));
 }
 
 void VCardDialog::updateLogoLabel(const QSize &ASize)
 {
   if (!FLogo.isNull())
-    ui.lblLogo->setPixmap(FLogo.scaled(ASize-QSize(3,3),Qt::KeepAspectRatio));
+    ui.lblLogo->setPixmap(FLogo.scaled(ASize-QSize(5,5),Qt::KeepAspectRatio));
 }
 
 bool VCardDialog::eventFilter(QObject *AObject, QEvent *AEvent)
@@ -396,13 +396,16 @@ void VCardDialog::onEmailDeleteClicked()
 
 void VCardDialog::onEmailItemActivated(QListWidgetItem *AItem)
 {
-  static QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
-  EditItemDialog dialog(AItem->text(),AItem->data(Qt::UserRole).toStringList(),emailTagList,this);
-  dialog.setLabelText(tr("EMail:"));
-  if (dialog.exec() == QDialog::Accepted)
+  if (FStreamJid && FContactJid)
   {
-    AItem->setText(dialog.value());
-    AItem->setData(Qt::UserRole,dialog.tags());
+    static QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
+    EditItemDialog dialog(AItem->text(),AItem->data(Qt::UserRole).toStringList(),emailTagList,this);
+    dialog.setLabelText(tr("EMail:"));
+    if (dialog.exec() == QDialog::Accepted)
+    {
+      AItem->setText(dialog.value());
+      AItem->setData(Qt::UserRole,dialog.tags());
+    }
   }
 }
 
@@ -428,13 +431,16 @@ void VCardDialog::onPhoneDeleteClicked()
 
 void VCardDialog::onPhoneItemActivated(QListWidgetItem *AItem)
 {
-  static QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
-  EditItemDialog dialog(AItem->text(),AItem->data(Qt::UserRole).toStringList(),phoneTagList,this);
-  dialog.setLabelText(tr("Phone:"));
-  if (dialog.exec() == QDialog::Accepted)
+  if (FStreamJid && FContactJid)
   {
-    AItem->setText(dialog.value());
-    AItem->setData(Qt::UserRole,dialog.tags());
+    static QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
+    EditItemDialog dialog(AItem->text(),AItem->data(Qt::UserRole).toStringList(),phoneTagList,this);
+    dialog.setLabelText(tr("Phone:"));
+    if (dialog.exec() == QDialog::Accepted)
+    {
+      AItem->setText(dialog.value());
+      AItem->setData(Qt::UserRole,dialog.tags());
+    }
   }
 }
 
