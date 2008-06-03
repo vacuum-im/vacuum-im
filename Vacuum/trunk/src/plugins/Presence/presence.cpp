@@ -194,7 +194,7 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 
 bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority)
 {
-  if (FXmppStream->isOpen() && AContactJid.isValid() && AContactJid!=FXmppStream->jid().domane())
+  if (FXmppStream->isOpen() && AContactJid.isValid() && AContactJid!=FXmppStream->jid().domain())
   {
     QString show;
     switch (AShow)

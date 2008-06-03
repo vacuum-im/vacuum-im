@@ -168,7 +168,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
         QMultiHash<QString, QString> params = parseChallenge(chl);
         realm = params.value("realm");
         if (realm.isEmpty())
-          realm = FXmppStream->jid().domane();
+          realm = FXmppStream->jid().domain();
         QByteArray _realm = realm.toUtf8(); 
         QString user = FXmppStream->jid().eNode();
         QString pass = FXmppStream->password();
@@ -179,7 +179,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
         cnonce = randBytes.toBase64();
         QString nc = "00000001";
         qop = params.value("qop");
-        uri = "xmpp/" + FXmppStream->jid().domane();
+        uri = "xmpp/" + FXmppStream->jid().domain();
         QByteArray respValue = getRespValue(realm.toUtf8(),
           user.toUtf8(),
           pass.toUtf8(),

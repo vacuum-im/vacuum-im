@@ -996,7 +996,7 @@ Menu *PrivacyLists::createSetDefaultMenu(const Jid &AStreamJid, const QList<IPri
 
 bool PrivacyLists::isMatchedJid(const Jid &AMask, const Jid &AJid) const
 {
-  return  ( (AMask.pDomane() == AJid.pDomane()) &&
+  return  ( (AMask.pDomain() == AJid.pDomain()) &&
             (AMask.node().isEmpty() || AMask.pNode()==AJid.pNode()) &&
             (AMask.resource().isEmpty() || AMask.resource()==AJid.resource()) );
 }

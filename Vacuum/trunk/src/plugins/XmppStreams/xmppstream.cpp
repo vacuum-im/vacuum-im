@@ -177,7 +177,7 @@ void XmppStream::startStream()
   QDomElement root = doc.createElementNS(NS_JABBER_STREAMS,"stream:stream"); 
   doc.appendChild(root); 
   root.setAttribute("xmlns",NS_JABBER_CLIENT);
-  root.setAttribute("to", FJid.domane());
+  root.setAttribute("to", FJid.domain());
   root.setAttribute("version",xmppVersion()); 
   if (!FDefLang.isEmpty())
     root.setAttribute("xml:lang",FDefLang); 

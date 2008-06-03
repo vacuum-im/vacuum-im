@@ -405,7 +405,7 @@ QList<int> ServiceDiscovery::types() const
 
 QVariant ServiceDiscovery::data(const IRosterIndex *AIndex, int ARole) const
 {
-  Jid contactJid = AIndex->type()==RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domane() : AIndex->data(RDR_Jid).toString();
+  Jid contactJid = AIndex->type()==RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domain() : AIndex->data(RDR_Jid).toString();
   if (hasDiscoInfo(contactJid,""))
   {
     IDiscoInfo dinfo = discoInfo(contactJid,"");
@@ -1036,16 +1036,16 @@ void ServiceDiscovery::onStreamStateChanged(const Jid &AStreamJid, bool AStateOn
   if (AStateOnline)
   {
     Action *action = new Action(FDiscoMenu);
-    action->setText(AStreamJid.domane());
+    action->setText(AStreamJid.domain());
     action->setIcon(SYSTEM_ICONSETFILE,IN_DISCO);
     action->setData(ADR_STREAMJID,AStreamJid.full());
-    action->setData(ADR_CONTACTJID,AStreamJid.domane());
+    action->setData(ADR_CONTACTJID,AStreamJid.domain());
     action->setData(ADR_NODE,QString(""));
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoItemsByAction(bool)));
     FDiscoMenu->addAction(action,AG_DEFAULT,true);
     FDiscoMenu->setEnabled(true);
 
-    Jid streamDomane = AStreamJid.domane();
+    Jid streamDomane = AStreamJid.domain();
     if (!hasDiscoInfo(streamDomane) || discoInfo(streamDomane).error.code>0)
       requestDiscoInfo(AStreamJid,streamDomane);
     if (!hasDiscoItems(streamDomane) || discoItems(streamDomane).error.code>0)
@@ -1162,7 +1162,7 @@ void ServiceDiscovery::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &A
   if (action)
   {
     action->setData(ADR_STREAMJID,AXmppStream->jid().full());
-    action->setData(ADR_CONTACTJID,AXmppStream->jid().domane());
+    action->setData(ADR_CONTACTJID,AXmppStream->jid().domain());
   }
   emit streamJidChanged(ABefour,AXmppStream->jid());
 }
@@ -1173,7 +1173,7 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
   if (itype == RIT_StreamRoot || itype == RIT_Contact || itype == RIT_Agent || itype == RIT_MyResource)
   {
     Jid streamJid = AIndex->data(RDR_StreamJid).toString();
-    Jid contactJid = itype == RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domane() : AIndex->data(RDR_Jid).toString();
+    Jid contactJid = itype == RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domain() : AIndex->data(RDR_Jid).toString();
     
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
     if (presence && presence->isOpen())
@@ -1214,7 +1214,7 @@ void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId,
 {
   if ((ALabelId == RLID_DISPLAY || ALabelId == RLID_FOOTER_TEXT) && types().contains(AIndex->type()))
   {
-    Jid contactJid = AIndex->type()==RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domane() : AIndex->data(RDR_Jid).toString();
+    Jid contactJid = AIndex->type()==RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domain() : AIndex->data(RDR_Jid).toString();
     if (hasDiscoInfo(contactJid,""))
     {
       IDiscoInfo dinfo = discoInfo(contactJid,"");
@@ -1266,7 +1266,7 @@ void ServiceDiscovery::onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo)
   dataValues.insertMulti(RDR_PJid,ADiscoInfo.contactJid.pFull());
   IRosterIndexList indexList = FRostersModel->rootIndex()->findChild(dataValues,true);
   foreach(Jid streamJid, FRostersModel->streams())
-    if (streamJid.pDomane() == ADiscoInfo.contactJid.pDomane())
+    if (streamJid.pDomain() == ADiscoInfo.contactJid.pDomain())
       indexList.append(FRostersModel->streamRoot(streamJid));
   foreach(IRosterIndex *index, indexList)
   {

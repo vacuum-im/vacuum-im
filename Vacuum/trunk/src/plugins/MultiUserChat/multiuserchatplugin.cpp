@@ -409,7 +409,7 @@ Action *MultiUserChatPlugin::createJoinAction(const Jid &AStreamJid, const Jid &
   action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
   action->setText(tr("Join conference"));
   action->setData(ADR_STREAM_JID,AStreamJid.full());
-  action->setData(ADR_HOST,ARoomJid.domane());
+  action->setData(ADR_HOST,ARoomJid.domain());
   action->setData(ADR_ROOM,ARoomJid.node());
   connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
   return action;

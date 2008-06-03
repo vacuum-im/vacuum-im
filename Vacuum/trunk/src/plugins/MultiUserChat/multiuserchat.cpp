@@ -214,7 +214,7 @@ void MultiUserChat::setNickName(const QString &ANick)
   {
     if (userByNick(ANick) == NULL)
     {
-      Jid userJid(FRoomJid.node(),FRoomJid.domane(),ANick);
+      Jid userJid(FRoomJid.node(),FRoomJid.domain(),ANick);
       Stanza presence("presence");
       presence.setTo(userJid.eFull());
       FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
@@ -233,7 +233,7 @@ void MultiUserChat::setPresence(int AShow, const QString &AStatus)
 {
   if (FStanzaProcessor)
   {
-    Jid userJid(FRoomJid.node(),FRoomJid.domane(),FNickName);
+    Jid userJid(FRoomJid.node(),FRoomJid.domain(),FNickName);
 
     Stanza presence("presence");
     presence.setTo(userJid.eFull());

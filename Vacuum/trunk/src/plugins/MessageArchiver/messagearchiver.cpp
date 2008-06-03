@@ -470,7 +470,7 @@ IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const
     QString node = it.key().pNode();
     QString resource = it.key().resource();
     if (
-        (it.key().pDomane() == AContactJid.pDomane()) &&
+        (it.key().pDomain() == AContactJid.pDomain()) &&
         (node.isEmpty() || node == AContactJid.pNode()) &&
         (resource.isEmpty() || resource == AContactJid.resource())
        )
@@ -639,7 +639,7 @@ bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AContactJid, co
 {
   if (isReady(AStreamJid) && AContactJid.isValid() && !ANote.isEmpty())
   {
-    Jid with(AContactJid.node(),AContactJid.domane(),"");
+    Jid with(AContactJid.node(),AContactJid.domain(),"");
     CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AThreadId);
     if (!writer)
     {
@@ -662,7 +662,7 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AContactJid,
   bool directionIn = AContactJid == AMessage.from();
   if (isReady(AStreamJid) && AContactJid.isValid() && !AMessage.body().isEmpty())
   {
-    Jid with(AContactJid.node(),AContactJid.domane(),"");
+    Jid with(AContactJid.node(),AContactJid.domain(),"");
     CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
     if (!writer)
     {
@@ -1280,7 +1280,7 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
       Message message;
       
       QString resource = nodeElem.attribute("name");
-      Jid contactJid(ACollection.header.with.node(),ACollection.header.with.domane(),resource);
+      Jid contactJid(ACollection.header.with.node(),ACollection.header.with.domain(),resource);
       
       nodeElem.tagName()=="to" ? message.setTo(contactJid.eFull()) : message.setFrom(contactJid.eFull());
 
@@ -1434,9 +1434,9 @@ bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, b
   if (contactJid.isEmpty())
   {
     if (ADirectionIn)
-      AMessage.setFrom(AStreamJid.domane());
+      AMessage.setFrom(AStreamJid.domain());
     else
-      AMessage.setTo(AStreamJid.domane());
+      AMessage.setTo(AStreamJid.domain());
   }
     
   QMultiMap<int,IArchiveHandler *>::const_iterator it = FArchiveHandlers.constBegin();

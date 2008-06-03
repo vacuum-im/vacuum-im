@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS += zlib minizip
+SUBDIRS += zlib minizip libidn

@@ -5,6 +5,7 @@ CONFIG += dll
 QT += network xml
 
 LIBS += -l../libs/minizip
+LIBS += -l../libs/idn
 
 DEFINES += UTILS_DLL
 

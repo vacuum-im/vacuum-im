@@ -30,7 +30,7 @@ bool Account::isValid() const
   Jid sJid = streamJid();
   bool valid = sJid.isValid();
   valid = valid && !sJid.node().isEmpty();
-  valid = valid && !sJid.domane().isEmpty();
+  valid = valid && !sJid.domain().isEmpty();
   valid = valid && (FXmppStream==FXmppStreams->getStream(sJid) || FXmppStreams->getStream(sJid)==NULL);
   return valid;
 }

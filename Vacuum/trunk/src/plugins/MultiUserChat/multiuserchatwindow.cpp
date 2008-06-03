@@ -563,7 +563,7 @@ void MultiUserChatWindow::insertRoomUtilsActions(Menu *AMenu, IMultiUser *AUser)
     foreach(IMultiUserChatWindow *window,windows)
     {
       if ( window!=this && window->multiUserChat()->isOpen() &&
-          (!AUser->data(MUDR_REALJID).toString().isEmpty() || window->roomJid().domane()==roomJid().domane()) )
+          (!AUser->data(MUDR_REALJID).toString().isEmpty() || window->roomJid().domain()==roomJid().domain()) )
       {
         Action *action = new Action(FInviteMenu);
         action->setIcon(SYSTEM_ICONSETFILE,IN_MULTICHAT_MESSAGE);
@@ -848,7 +848,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
     QStringList parts = AText.split(" ");
     parts.removeFirst();
     QString roomName = parts.takeFirst();
-    Jid roomJid(roomName,roomJid().domane(),"");
+    Jid roomJid(roomName,roomJid().domain(),"");
     if (roomJid.isValid())
     {
       FChatPlugin->showJoinMultiChatDialog(streamJid(),roomJid,FMultiChat->nickName(),parts.join(" "));

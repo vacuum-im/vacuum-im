@@ -8,27 +8,36 @@
 #include <QSharedData>
 #include <QTextDocument>
 #include "utilsexport.h"
+#include "../thirdparty/libidn/stringprep.h"
 
 class JidData :
   public QSharedData
 {
 public:
-  JidData() {};
+  JidData() {
+    FNodeValid = true;
+    FDomainValid = false;
+    FResourceValid = true;
+  };
   JidData(const JidData &AOther) : QSharedData(AOther)
   {
     FNode = AOther.FNode;
     FEscNode = AOther.FEscNode;
     FPrepNode = AOther.FPrepNode;
-    FDomane = AOther.FDomane;
-    FPrepDomane = AOther.FPrepDomane;
+    FDomain = AOther.FDomain;
+    FPrepDomain = AOther.FPrepDomain;
     FResource = AOther.FResource;
     FPrepResource = AOther.FPrepResource;
+    FNodeValid = AOther.FNodeValid;
+    FDomainValid = AOther.FDomainValid;
+    FResourceValid = AOther.FResourceValid;
   };
   ~JidData() {};
 public:
   QString FNode, FEscNode, FPrepNode;
-  QString FDomane, FPrepDomane;
+  QString FDomain, FPrepDomain;
   QString FResource, FPrepResource;
+  bool FNodeValid, FDomainValid, FResourceValid;
 };
 
 class UTILS_EXPORT Jid
@@ -47,9 +56,9 @@ public:
   QString eNode() const { return d->FEscNode; }
   QString pNode() const { return d->FPrepNode; }
   void setNode(const QString &ANode);
-  QString domane() const { return d->FDomane; }
-  QString pDomane() const { return d->FPrepDomane; }
-  void setDomane(const QString &ADomane);
+  QString domain() const { return d->FDomain; }
+  QString pDomain() const { return d->FPrepDomain; }
+  void setDomain(const QString &ADomain);
   QString resource() const { return d->FResource; }
   QString pResource() const { return d->FPrepResource; }
   void setResource(const QString &AResource);
@@ -80,6 +89,10 @@ public:
   static QString decode822(const QString &AEncJid);
   static QString escape106(const QString &ANode);
   static QString unescape106(const QString &AEscNode);
+  static QString stringPrepare(const Stringprep_profile *AProfile, const QString &AString);
+  static QString nodePrepare(const QString &ANode);
+  static QString domainPrepare(const QString &ADomain);
+  static QString resourcePrepare(const QString &AResource);
 protected:
   Jid &parseString(const QString &AJidStr);
   QString toString(bool AEscaped, bool APrepared, bool AFull) const;
@@ -89,6 +102,7 @@ private:
 private:
   static QList<QChar> escChars;
   static QList<QString> escStrings;
+  static QHash<QString, Jid> FCache;
 };
 
 #ifdef __cplusplus

@@ -1,6 +1,6 @@
 TEMPLATE = lib
 
-CONFIG += dll
+CONFIG += dll warn_off
 CONFIG -= qt
 
 DEFINES += ZLIB_DLL

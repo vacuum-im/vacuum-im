@@ -31,7 +31,7 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
   ui.cmbStreamJid->setCurrentIndex(AStreamJid.isValid() ? ui.cmbStreamJid->findText(AStreamJid.full(),Qt::MatchFixedString) : 0);
 
   Jid streamJid = ui.cmbStreamJid->currentText();
-  ui.lneHost->setText(ARoomJid.domane().isEmpty() ? QString("conference.%1").arg(streamJid.domane()) : ARoomJid.domane());
+  ui.lneHost->setText(ARoomJid.domain().isEmpty() ? QString("conference.%1").arg(streamJid.domain()) : ARoomJid.domain());
   ui.lneRoom->setText(ARoomJid.node());
   ui.lnePassword->setText(APassword);
   ui.lneNick->setText(ANick.isEmpty() ? streamJid.node() : ANick);
@@ -131,7 +131,7 @@ void JoinMultiChatDialog::onResentIndexChanged(int AIndex)
   if (AIndex >= 0)
   {
     Jid roomJid = ui.cmbRecent->itemData(AIndex,JDR_RoomJid).toString();
-    ui.lneHost->setText(roomJid.domane());
+    ui.lneHost->setText(roomJid.domain());
     ui.lneRoom->setText(roomJid.node());
     ui.lneNick->setText(ui.cmbRecent->itemData(AIndex,JDR_NickName).toString());
     ui.lnePassword->setText(ui.cmbRecent->itemData(AIndex,JDR_Password).toString());

@@ -68,7 +68,7 @@ void ReceiversWidget::addReceiver(const Jid &AReceiver)
     {
       QTreeWidgetItem *groupItem = getReceiversGroup(tr("Not in Roster"));
       groupItem->setExpanded(true);
-      QString name = AReceiver.node().isEmpty() ? AReceiver.domane() : AReceiver.node();
+      QString name = AReceiver.node().isEmpty() ? AReceiver.domain() : AReceiver.node();
       contactItem = getReceiver(AReceiver,name,groupItem);
       contactItem->setCheckState(0,Qt::Checked);
     }

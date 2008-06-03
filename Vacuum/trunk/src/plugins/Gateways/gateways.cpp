@@ -299,7 +299,7 @@ QList<Jid> Gateways::serviceContacts(const Jid &AStreamJid, const Jid &AServiceJ
   IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
   QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
   foreach(IRosterItem ritem, ritems)
-    if (!ritem.itemJid.node().isEmpty() && ritem.itemJid.pDomane()==AServiceJid.pDomane())
+    if (!ritem.itemJid.node().isEmpty() && ritem.itemJid.pDomain()==AServiceJid.pDomain())
       contacts.append(ritem.itemJid);
   return contacts;
 }
@@ -308,7 +308,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 {
   IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
-  if (roster && presence && presence->isOpen() && AServiceFrom.isValid() && AServiceTo.isValid() && AServiceFrom.pDomane()!=AServiceTo.pDomane())
+  if (roster && presence && presence->isOpen() && AServiceFrom.isValid() && AServiceTo.isValid() && AServiceFrom.pDomain()!=AServiceTo.pDomain())
   {
     IRosterItem ritemOld = roster->rosterItem(AServiceFrom);
     IRosterItem ritemNew = roster->rosterItem(AServiceTo);
@@ -335,10 +335,10 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
     QList<IRosterItem> ritems = roster->rosterItems();
     foreach(IRosterItem ritem, ritems)
     {
-      if (ritem.itemJid.pDomane() == AServiceFrom.pDomane())
+      if (ritem.itemJid.pDomain() == AServiceFrom.pDomain())
       {
         Jid newItemJid = ritem.itemJid;
-        newItemJid.setDomane(AServiceTo.domane());
+        newItemJid.setDomain(AServiceTo.domain());
         if (!roster->rosterItem(newItemJid).isValid)
         {
           newItems.append(newItemJid);
@@ -548,7 +548,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     Jid streamJid = AIndex->data(RDR_StreamJid).toString();
     Jid contactJid = AIndex->data(RDR_Jid).toString();
     IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
-    if (roster && roster->isOpen() && roster->rosterItem(contactJid).isValid && roster->rosterItem(contactJid.domane()).isValid)
+    if (roster && roster->isOpen() && roster->rosterItem(contactJid).isValid && roster->rosterItem(contactJid.domain()).isValid)
     {
       Action *action = new Action(AMenu);
       action->setText(contactJid.node().isEmpty() ? tr("Resolve nick names") : tr("Resolve nick name"));
@@ -573,7 +573,7 @@ void Gateways::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJ
     IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
     QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
     foreach(IRosterItem ritem, ritems)
-      if (ritem.itemJid.pDomane()==AContactJid.pDomane() && ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO)
+      if (ritem.itemJid.pDomain()==AContactJid.pDomain() && ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO)
         roster->sendSubscription(ritem.itemJid,IRoster::Subscribe);
   }
 }

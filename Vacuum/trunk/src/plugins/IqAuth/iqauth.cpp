@@ -18,7 +18,7 @@ IqAuth::~IqAuth()
 bool IqAuth::start(const QDomElement &/*AElem*/)
 {
   Stanza auth("iq");
-  auth.setType("set").setTo(FXmppStream->jid().domane()).setId("auth"); 
+  auth.setType("set").setTo(FXmppStream->jid().domain()).setId("auth"); 
   QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
   query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->jid().eNode()));
   QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8(); 
