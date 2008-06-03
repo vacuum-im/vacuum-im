@@ -153,6 +153,7 @@ bool RostersViewPlugin::initObjects()
     FSortFilterProxyModel = new SortFilterProxyModel(this);
     FSortFilterProxyModel->setDynamicSortFilter(true);
     FRostersView->addProxyModel(FSortFilterProxyModel);
+    FSortFilterProxyModel->sort(0,Qt::AscendingOrder);
   }
 
   return true;

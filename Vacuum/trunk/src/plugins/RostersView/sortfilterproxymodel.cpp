@@ -1,11 +1,11 @@
-#include <QtDebug>
 #include "sortfilterproxymodel.h"
-
-#include <QTimer>
 
 SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
   FOptions = 0;
+  setSortRole(Qt::DisplayRole);
+  setSortLocaleAware(true);
+  setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
 SortFilterProxyModel::~SortFilterProxyModel()
@@ -39,20 +39,16 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
     int leftShow = ALeft.data(RDR_Show).toInt();
     int rightShow = ARight.data(RDR_Show).toInt();
     bool showOnlineFirst = checkOption(IRostersView::ShowOnlineFirst);
-    if (showOnlineFirst && leftType != RIT_StreamRoot && leftShow != rightShow)
+    if (showOnlineFirst && leftType!=RIT_StreamRoot && leftShow!=rightShow)
     {
-      if (leftShow == IPresence::Offline)
-        return true;
-      else if (rightShow == IPresence::Offline)
-        return  false;
-      else
-        return leftShow > rightShow;
+      const static int showOrders[] = {6,1,2,3,4,5,0,7};
+      return showOrders[leftShow] < showOrders[rightShow];
     }
     else
-      return QString::localeAwareCompare(ALeft.data().toString(),ARight.data().toString()) > 0;
+      return QSortFilterProxyModel::lessThan(ALeft,ARight);
   }
   else
-    return leftType > rightType;
+    return leftType < rightType;
 }
 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
@@ -75,7 +71,7 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
           if ((flag.toInt() & IRostersView::LabelVisible) > 0)
             return true;
         int indexShow = index.data(RDR_Show).toInt();
-        return indexShow != IPresence::Offline && indexShow != IPresence::Error;
+        return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
       }
     case RIT_Group:
     case RIT_AgentsGroup:
@@ -87,10 +83,8 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
             return true;
         return false;
       }
-    default:
-      return true;
     }
   }
-  return false;
+  return true;
 }
 

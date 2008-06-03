@@ -26,10 +26,10 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 
   header()->hide();
   header()->setStretchLastSection(false);
+  setAutoScroll(false);
   setIndentation(4);
   setRootIsDecorated(false);
   setSelectionMode(NoSelection);
-  setSortingEnabled(true);
   setContextMenuPolicy(Qt::DefaultContextMenu);
   setItemDelegate(FRosterIndexDelegate);
 }
