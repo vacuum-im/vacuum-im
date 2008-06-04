@@ -82,7 +82,7 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
     else if (AResult.status == COMMAND_STATUS_COMPLETED)
       ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
     else if (AResult.status == COMMAND_STATUS_CANCELED)
-      ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
+      close();
 
     return true;
   }
@@ -148,18 +148,12 @@ void CommandDialog::executeAction(const QString &AAction)
     if (!FRequestId.isEmpty())
     {
       ui.lblInfo->setText(tr("Waiting for host response ..."));
-      if (AAction != COMMAND_ACTION_CANCEL)
-        ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
-      else
-        ui.dbbButtons->setStandardButtons(QDialogButtonBox::Close);
+      ui.dbbButtons->setStandardButtons(AAction!=COMMAND_ACTION_CANCEL ? QDialogButtonBox::Cancel : QDialogButtonBox::Close);
     }
     else
     {
       ui.lblInfo->setText(tr("Error: Can`t send request to host."));
-      if (AAction != COMMAND_ACTION_CANCEL)
-        ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
-      else
-        ui.dbbButtons->setStandardButtons(QDialogButtonBox::Close);
+      ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
     }
   }
 }
@@ -172,10 +166,10 @@ void CommandDialog::onDialogButtonClicked(QAbstractButton *AButton)
     executeAction(COMMAND_ACTION_NEXT);
   else if (AButton == FCompleteButton)
     executeAction(COMMAND_ACTION_COMPLETE);
-  else if (ui.dbbButtons->standardButton(AButton) == QDialogButtonBox::Cancel)
-    executeAction(COMMAND_ACTION_CANCEL);
   else if (ui.dbbButtons->standardButton(AButton) == QDialogButtonBox::Retry)
     executeCommand();
+  else if (ui.dbbButtons->standardButton(AButton) == QDialogButtonBox::Cancel)
+    executeAction(COMMAND_ACTION_CANCEL);
   else if (ui.dbbButtons->standardButton(AButton) == QDialogButtonBox::Close)
     close();
 }

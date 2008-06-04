@@ -369,7 +369,7 @@ QString Commands::sendCommandRequest(const ICommandRequest &ARequest)
   QDomElement cmdElem = request.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
   cmdElem.setAttribute("node",ARequest.node);
   if (!ARequest.sessionId.isEmpty())
-    cmdElem.setAttribute("sessionid",ARequest.action);
+    cmdElem.setAttribute("sessionid",ARequest.sessionId);
   if (!ARequest.action.isEmpty())
     cmdElem.setAttribute("action",ARequest.action);
   if (FDataForms && !ARequest.form.type.isEmpty())
