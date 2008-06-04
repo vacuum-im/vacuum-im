@@ -2,11 +2,12 @@
 
 #include <QMultiHash>
 #include <QStringList>
+#include <QCryptographicHash>
 
-static QMultiHash<QString, QString> parseChallenge(const QString &chl)
+static QMultiHash<QString, QString> parseChallenge(const QString &AChallenge)
 {
   QMultiHash<QString, QString> hash;
-  QStringList params = chl.split(",",QString::SkipEmptyParts); 
+  QStringList params = AChallenge.split(",",QString::SkipEmptyParts); 
   QStringList param;
   QString value;
   for(int i = 0;i<params.count();i++)
@@ -23,73 +24,22 @@ static QMultiHash<QString, QString> parseChallenge(const QString &chl)
   return hash;
 }
 
-static QByteArray getRespValue(const QByteArray &realm,
-                               const QByteArray &user,
-                               const QByteArray &pass,
-                               const QByteArray &nonce,
-                               const QByteArray &cnonce,
-                               const QByteArray &nc,
-                               const QByteArray &qop,
-                               const QByteArray &uri,
+static QByteArray getRespValue(const QByteArray &realm, const QByteArray &user, const QByteArray &pass,const QByteArray &nonce,
+                               const QByteArray &cnonce, const QByteArray &nc, const QByteArray &qop, const QByteArray &uri,
                                const QByteArray &auth)
 {
-  unsigned char Y[16];
-  unsigned char A1[16];
-  unsigned char A2[16];
-  unsigned char colon = ':';
-  QByteArray buf(32,' ');
-
-  md5_context context;
-  md5_starts(&context);
-  md5_update(&context, (uint8 *) user.data(), user.length());
-  md5_update(&context, &colon, sizeof(colon));
-  md5_update(&context, (uint8 *) realm.data(), realm.length());
-  md5_update(&context, &colon, sizeof(colon));
-  md5_update(&context, (uint8 *) pass.data(), pass.length());
-  md5_finish(&context, Y);
-
-  md5_starts(&context);
-  md5_update(&context, Y, sizeof(Y));
-  md5_update(&context, &colon, sizeof(colon));
-  md5_update(&context, (uint8 *) nonce.data(), nonce.length());
-  md5_update(&context, &colon, sizeof(colon));
-  md5_update(&context, (uint8 *) cnonce.data(), cnonce.length());
-  md5_finish(&context, A1);
-
-  md5_starts(&context);
-  if (!auth.isEmpty())
-    md5_update(&context, (uint8 *) auth.data(), auth.length());
-  md5_update(&context, &colon, sizeof(colon));
-  md5_update(&context, (uint8 *) uri.data(), uri.length());
-  md5_finish(&context, A2);
-
-
-  md5_starts(&context);
-  md5_hex(A1,buf.data());
-  md5_update(&context, (uint8 *) buf.data(), buf.length());
-  md5_update(&context, &colon, sizeof(colon));
-  md5_update(&context, (uint8 *) nonce.data(), nonce.length());
-  md5_update(&context, &colon, sizeof(colon));
-  md5_update(&context, (uint8 *) nc.data(), nc.length());
-  md5_update(&context, &colon, sizeof(colon));
-  md5_update(&context, (uint8 *) cnonce.data(), cnonce.length());
-  md5_update(&context, &colon, sizeof(colon));
-  md5_update(&context, (uint8 *) qop.data(), qop.length());
-  md5_update(&context, &colon, sizeof(colon));
-  md5_hex(A2,buf.data());
-  md5_update(&context, (uint8 *) buf.data(), buf.length());
-  md5_finish(&context, A1);
-
-  md5_hex(A1,buf.data()); 
-
-  return buf;
+  QByteArray yHash =  QCryptographicHash::hash(user+':'+realm+':'+pass,QCryptographicHash::Md5);
+  QByteArray a1Hash = QCryptographicHash::hash(yHash+':'+nonce+':'+cnonce,QCryptographicHash::Md5);
+  QByteArray a2Hash = QCryptographicHash::hash(auth+':'+uri,QCryptographicHash::Md5);
+  QByteArray value =  QCryptographicHash::hash(a1Hash.toHex()+':'+nonce+':'+nc+':'+cnonce+':'+qop+':'+a2Hash.toHex(),QCryptographicHash::Md5);
+  return value.toHex();
 }
-
 
 SASLAuth::SASLAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
+  FAuthorized = false;
   FNeedHook = false;
-  chlNumber = 0;
+  FChallengeStep = 0;
   FXmppStream = AXmppStream;
   connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
 }
@@ -101,37 +51,34 @@ SASLAuth::~SASLAuth()
 
 bool SASLAuth::start(const QDomElement &AElem)
 {
-  FNeedHook = false;
-  FMechanism = "";
-  int i = 0;
-  QString mech;
-  while (i<AElem.childNodes().count())
+  if (!FAuthorized)
   {
-    mech = AElem.childNodes().at(i++).firstChild().toText().data();
-    if (mech == "DIGEST-MD5")
+    QDomElement mechElem = AElem.firstChildElement("mechanism");
+    while (!mechElem.isNull())
     {
-      FMechanism = mech;
-      FNeedHook = true;
-      Stanza auth("auth");
-      auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mech); 
-      FXmppStream->sendStanza(auth);   
-      return true;
+      FMechanism = mechElem.text();
+      if (FMechanism == "DIGEST-MD5")
+      {
+        FNeedHook = true;
+        Stanza auth("auth");
+        auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",FMechanism); 
+        FXmppStream->sendStanza(auth);   
+        return true;
+      }
+      else if (FMechanism == "PLAIN")
+      {
+        FNeedHook = true;
+        QByteArray resp;
+        resp.append('\0').append(FXmppStream->jid().pNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
+        Stanza auth("auth");
+        auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",FMechanism);
+        auth.element().appendChild(auth.createTextNode(resp.toBase64()));    
+        FXmppStream->sendStanza(auth);   
+        return true;
+      }
+      mechElem = mechElem.nextSiblingElement("mechanism");
     }
-    else if (mech == "PLAIN")
-    {
-      FMechanism = mech;
-      FNeedHook = true;
-      QByteArray resp;
-      resp.append('\0')
-        .append(FXmppStream->jid().eNode().toUtf8())
-        .append('\0')
-        .append(FXmppStream->password().toUtf8());
-      Stanza auth("auth");
-      auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mech);
-      auth.element().appendChild(auth.createTextNode(resp.toBase64()));    
-      FXmppStream->sendStanza(auth);   
-      return true;
-    }
+    FMechanism.clear();
   }
   return false;
 }
@@ -147,6 +94,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
   {
     if (AElem->tagName() == "success")
     {
+      FAuthorized = true;
       emit ready(true);
     }
     else if (AElem->tagName() == "failure")
@@ -161,49 +109,39 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
     }
     else if (AElem->tagName() == "challenge")
     {
-      if (chlNumber == 0)
+      if (FChallengeStep == 0)
       {
-        chlNumber++;
+        FChallengeStep++;
         QString chl = QByteArray::fromBase64(AElem->text().toAscii()); 
         QMultiHash<QString, QString> params = parseChallenge(chl);
-        realm = params.value("realm");
+        
+        QString realm = params.value("realm");
         if (realm.isEmpty())
-          realm = FXmppStream->jid().domain();
-        QByteArray _realm = realm.toUtf8(); 
-        QString user = FXmppStream->jid().eNode();
+          realm = FXmppStream->jid().pDomain();
+        QString user = FXmppStream->jid().pNode();
         QString pass = FXmppStream->password();
-        nonce = params.value("nonce");
+        QString nonce = params.value("nonce");
         QByteArray randBytes(32,' ');
         for(int i=0; i<31; i++)
           randBytes[i] = (char) (256.0 * rand() / (RAND_MAX + 1.0));
-        cnonce = randBytes.toBase64();
+        QString cnonce = randBytes.toBase64();
         QString nc = "00000001";
-        qop = params.value("qop");
-        uri = "xmpp/" + FXmppStream->jid().domain();
-        QByteArray respValue = getRespValue(realm.toUtf8(),
-          user.toUtf8(),
-          pass.toUtf8(),
-          nonce.toAscii(), cnonce.toAscii(),
-          nc.toAscii(),	qop.toAscii(), 
-          uri.toAscii(), "AUTHENTICATE");
-        QString resp = "username=\"%1\",realm=\"%2\",nonce=\"%3\",cnonce=\"%4\","
-          "nc=%5,qop=%6,digest-uri=\"%7\",response=%8,charset=utf-8";
-        resp = resp.arg(user.toUtf8().data())
-          .arg(realm)
-          .arg(nonce)
-          .arg(cnonce)
-          .arg(nc)
-          .arg(qop)
-          .arg(uri)
-          .arg(respValue.data());
+        QString qop = params.value("qop");
+        QString uri = "xmpp/" + FXmppStream->jid().pDomain();
+        QByteArray respValue = getRespValue(realm.toUtf8(),user.toUtf8(),pass.toUtf8(),nonce.toAscii(), 
+          cnonce.toAscii(),nc.toAscii(),qop.toAscii(), uri.toAscii(), "AUTHENTICATE");
+        
+        QString resp = "username=\"%1\",realm=\"%2\",nonce=\"%3\",cnonce=\"%4\",nc=%5,qop=%6,digest-uri=\"%7\",response=%8,charset=utf-8";
+        resp = resp.arg(user.toUtf8().data()).arg(realm).arg(nonce).arg(cnonce).arg(nc).arg(qop).arg(uri).arg(respValue.data());
+        
         Stanza response("response");
         response.setAttribute("xmlns",NS_FEATURE_SASL);
         response.element().appendChild(response.createTextNode(resp.toAscii().toBase64())); 
         FXmppStream->sendStanza(response);
       }
-      else if (chlNumber == 1)
+      else if (FChallengeStep == 1)
       {
-        chlNumber--;
+        FChallengeStep--;
         Stanza response("response");
         response.setAttribute("xmlns",NS_FEATURE_SASL);
         FXmppStream->sendStanza(response);   
@@ -212,7 +150,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
     }
     else
     {
-      emit error("unexpected-request"); 
+      emit error(ErrorHandler("bad-request").message()); 
     }
     FNeedHook = false;
     return true;
@@ -222,7 +160,8 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
 
 void SASLAuth::onStreamClosed(IXmppStream * /*AXmppStream*/)
 {
-  FNeedHook = false;
   FMechanism = "";
-  chlNumber = 0;
+  FNeedHook = false;
+  FAuthorized = false;
+  FChallengeStep = 0;
 }

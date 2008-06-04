@@ -5,7 +5,6 @@
 #include "../../interfaces/ixmppstreams.h"
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
-#include "../../utils/md5.h"
 
 class SASLAuth :
   public QObject,
@@ -32,9 +31,9 @@ private:
   IXmppStream *FXmppStream;
 private:
   bool FNeedHook;
+  bool FAuthorized;
+  int FChallengeStep;
   QString FMechanism;
-  qint8 chlNumber;
-  QString realm, nonce, cnonce, qop, uri;
 };
 
 #endif // SASLAUTH_H
