@@ -276,6 +276,10 @@ void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, Field
     foreach(QString value, AField.value.toStringList()) {
       fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(value)); }
   }
+  else if (AField.value.type() == QVariant::Bool)
+  {
+    fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(AField.value.toBool() ? "1" : "0"));
+  }
   else if (!AField.value.toString().isEmpty())
   {
     fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(AField.value.toString()));
