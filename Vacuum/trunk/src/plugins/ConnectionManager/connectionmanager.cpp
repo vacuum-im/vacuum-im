@@ -1,10 +1,12 @@
 #include "connectionmanager.h" 
 
-#include <QVBoxLayout>
+#define IN_ENCRYPTED          "psi/cryptoYes"
 
 ConnectionManager::ConnectionManager()
 {
+  FEncryptedLabelId = -1;
   FAccountManager = NULL;
+  FRostersViewPlugin = NULL;
   FSettingsPlugin = NULL;
 }
 
@@ -52,6 +54,12 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
     }
   }
 
+  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+  }
+
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
@@ -67,7 +75,15 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
 
 bool ConnectionManager::initObjects()
 {
-  FSettingsPlugin->insertOptionsHolder(this);
+  if (FRostersViewPlugin)
+  {
+    QIcon icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_ENCRYPTED);
+    FEncryptedLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_CONNECTION_ENCRYPTED,icon);
+  }
+  if (FSettingsPlugin)
+  {
+    FSettingsPlugin->insertOptionsHolder(this);
+  }
   return true;
 }
 
@@ -120,6 +136,8 @@ IConnection *ConnectionManager::insertConnection(IAccount *AAccount) const
     {
       connection = plugin->newConnection(AAccount->accountId(),AAccount->xmppStream()->instance());
       AAccount->xmppStream()->setConnection(connection);
+      connect(AAccount->xmppStream()->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
+      connect(AAccount->xmppStream()->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
     }
     return connection;
   }
@@ -135,6 +153,29 @@ void ConnectionManager::onAccountDestroyed(const QString &AAccount)
 {
   foreach (IConnectionPlugin *plugin, FConnectionPlugins)
     plugin->deleteSettingsNS(AAccount);
+}
+
+
+void ConnectionManager::onStreamOpened(IXmppStream *AXmppStream)
+{
+  if (FRostersViewPlugin && AXmppStream->connection() && AXmppStream->connection()->isEncrypted())
+  {
+    IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
+    IRosterIndex *index = model!=NULL ? model->streamRoot(AXmppStream->jid()) : NULL;
+    if (index!=NULL)
+      FRostersViewPlugin->rostersView()->insertIndexLabel(FEncryptedLabelId,index);
+  }
+}
+
+void ConnectionManager::onStreamClosed(IXmppStream *AXmppStream)
+{
+  if (FRostersViewPlugin)
+  {
+    IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
+    IRosterIndex *index = model!=NULL ? model->streamRoot(AXmppStream->jid()) : NULL;
+    if (index!=NULL)
+      FRostersViewPlugin->rostersView()->removeIndexLabel(FEncryptedLabelId,index);
+  }
 }
 
 void ConnectionManager::onOptionsAccepted()

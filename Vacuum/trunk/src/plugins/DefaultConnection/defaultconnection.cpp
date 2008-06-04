@@ -33,6 +33,11 @@ bool DefaultConnection::isOpen() const
   return FSocket.state() == QAbstractSocket::ConnectedState;
 }
 
+bool DefaultConnection::isEncrypted() const
+{
+  return FSocket.isEncrypted();
+}
+
 void DefaultConnection::connectToHost()
 {
   if (FSocket.state() == QAbstractSocket::UnconnectedState)
@@ -96,11 +101,6 @@ QVariant DefaultConnection::option(int ARole) const
 void DefaultConnection::setOption(int ARole, const QVariant &AValue)
 {
   FOptions.insert(ARole, AValue);
-}
-
-bool DefaultConnection::isEncrypted() const
-{
-  return FSocket.isEncrypted();
 }
 
 void DefaultConnection::startClientEncryption()

@@ -15,16 +15,18 @@ class DefaultConnection :
 public:
   DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent);
   ~DefaultConnection();
+  //IConnection
   virtual QObject *instance() { return this; }
   virtual IConnectionPlugin *ownerPlugin() const { return FPlugin; }
   virtual bool isOpen() const;
+  virtual bool isEncrypted() const;
   virtual void connectToHost();
   virtual void disconnect();
   virtual qint64 write(const QByteArray &AData);
   virtual QByteArray read(qint64 ABytes);
   virtual QVariant option(int ARole) const;
   virtual void setOption(int ARole, const QVariant &AValue);
-  virtual bool isEncrypted() const;
+  //DefaultConnection
   virtual void startClientEncryption();
   virtual QSsl::SslProtocol protocol() const;
   virtual void setProtocol(QSsl::SslProtocol AProtocol);
@@ -35,10 +37,10 @@ public:
   virtual QList<QSslError> sslErrors() const;
 signals:
   virtual void connected();
+  virtual void encrypted();
   virtual void readyRead(qint64 ABytes);
   virtual void disconnected();
   virtual void error(const QString &AMessage);
-  virtual void encrypted();
   virtual void modeChanged(QSslSocket::SslMode AMode);
   virtual void sslErrors(const QList<QSslError> &AErrors);
 protected:

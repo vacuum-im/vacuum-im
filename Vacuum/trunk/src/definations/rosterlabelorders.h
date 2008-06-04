@@ -20,6 +20,7 @@
 #define RLO_RIGHTALIGN                            1000
 
 #define RLO_PRIVACY                               1500
+#define RLO_CONNECTION_ENCRYPTED                  2000
 
 #define RLO_FULL_HEIGHT_LABELS                    10000
 

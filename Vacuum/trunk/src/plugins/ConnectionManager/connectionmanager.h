@@ -5,11 +5,14 @@
 #include "../../definations/accountvaluenames.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/rosterlabelorders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iconnectionmanager.h"
-#include "../../interfaces/iaccountmanager.h"
-#include "../../interfaces/isettings.h"
 #include "../../interfaces/idefaultconnection.h"
+#include "../../interfaces/iaccountmanager.h"
+#include "../../interfaces/irostersview.h"
+#include "../../interfaces/isettings.h"
+#include "../../utils/skin.h"
 #include "connectionoptionswidget.h"
 
 class ConnectionManager :
@@ -48,13 +51,17 @@ protected:
 protected slots:
   void onAccountShown(IAccount *AAccount);
   void onAccountDestroyed(const QString &AAccount);
+  void onStreamOpened(IXmppStream *AXmppStream);
+  void onStreamClosed(IXmppStream *AXmppStream);
   void onOptionsAccepted();
   void onOptionsRejected();
   void onOptionsDialogClosed();
 private:
   IAccountManager *FAccountManager;
   ISettingsPlugin *FSettingsPlugin;
+  IRostersViewPlugin *FRostersViewPlugin;
 private:
+  int FEncryptedLabelId;
   QList<IConnectionPlugin *> FConnectionPlugins;
   QList<ConnectionOptionsWidget *> FOptionsWidgets;
 };

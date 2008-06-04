@@ -14,6 +14,7 @@ public:
   virtual QObject *instance() =0;
   virtual IConnectionPlugin *ownerPlugin() const =0;
   virtual bool isOpen() const =0;
+  virtual bool isEncrypted() const =0;
   virtual void connectToHost() =0;
   virtual void disconnect() =0;
   virtual qint64 write(const QByteArray &AData) =0;
@@ -22,6 +23,7 @@ public:
   virtual void setOption(int ARole, const QVariant &AValue) =0;
 signals:
   virtual void connected() =0;
+  virtual void encrypted() =0;
   virtual void readyRead(qint64 ABytes) =0;
   virtual void disconnected() =0;
   virtual void error(const QString &AMessage) =0;

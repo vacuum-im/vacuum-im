@@ -21,7 +21,6 @@ public:
     CO_UserOptions = 100
   };
   virtual QObject *instance() =0;
-  virtual bool isEncrypted() const =0;
   virtual void startClientEncryption() =0;
   virtual QSsl::SslProtocol protocol() const =0;
   virtual void setProtocol(QSsl::SslProtocol AProtocol) =0;
@@ -31,7 +30,6 @@ public:
   virtual void ignoreSslErrors() =0;
   virtual QList<QSslError> sslErrors() const =0;
 signals:
-  virtual void encrypted() =0;
   virtual void modeChanged(QSslSocket::SslMode AMode) =0;
   virtual void sslErrors(const QList<QSslError> &AErrors) =0;
 };
