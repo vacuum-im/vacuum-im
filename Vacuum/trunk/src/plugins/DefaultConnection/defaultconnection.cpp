@@ -10,6 +10,7 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
   FProxyState = ProxyUnconnected;
   FSocket.setProtocol(QSsl::AnyProtocol);
   FDisconnectCalled = true; 
+  FDisconnectEmited = true;
 
   connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
   connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
@@ -53,6 +54,7 @@ void DefaultConnection::connectToHost()
     FProxyPassword = option(IDefaultConnection::CO_ProxyPassword).toString();
 
     FDisconnectCalled = false;
+    FDisconnectEmited = false;
     if (FProxyType == 0)
     {
       FProxyState = ProxyReady;
@@ -74,13 +76,14 @@ void DefaultConnection::disconnect()
 {
   if (!FDisconnectCalled)
   {
+    FDisconnectCalled = true;
     FSocket.flush();
     FSocket.disconnectFromHost();
     if (FSocket.state()!=QAbstractSocket::UnconnectedState && !FSocket.waitForDisconnected(5000))
       emit error(FSocket.errorString());
-    if (!FDisconnectCalled)
-      onSocketDisconnected();
   }
+  if (!FDisconnectEmited)
+    onSocketDisconnected();
 }
 
 qint64 DefaultConnection::write(const QByteArray &AData)
@@ -304,6 +307,7 @@ void DefaultConnection::onSocketReadyRead()
 void DefaultConnection::onSocketDisconnected()
 {
   FDisconnectCalled = true;
+  FDisconnectEmited = true;
   FReadTimer.stop();
   FSocket.close();
   emit disconnected();
@@ -311,6 +315,7 @@ void DefaultConnection::onSocketDisconnected()
 
 void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 {
+  FDisconnectCalled = true;
   connectionError(FSocket.errorString());
 }
 
@@ -324,19 +329,13 @@ void DefaultConnection::onSocketEncrypted()
 void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
 {
   if (!FIgnoreSSLErrors)
-  {
     emit sslErrors(AErrors);
-    QString errorStr;
-    foreach(QSslError error, AErrors)
-      errorStr += error.errorString()+"; ";
-    connectionError(errorStr);
-  }
   else
     FSocket.ignoreSslErrors();
 }
 
 void DefaultConnection::onReadTimeout()
 {
-  connectionError(tr("Connection timeout"));
+  connectionError(tr("Connection timed out"));
 }
 
