@@ -4,8 +4,7 @@
 
 #define IN_NORMAL_MESSAGE           "psi/sendMessage"
 
-#define SVN_MESSAGEWINDOWS          "messageWindows:window[]"
-#define SVN_GEOMETRY                SVN_MESSAGEWINDOWS ":geometry"
+#define BDI_MESSAGE_GEOMETRY        "MessageWindowGeometry"
 
 MessageWindow::MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode)
 {
@@ -217,9 +216,9 @@ void MessageWindow::saveWindowState()
 {
   if (FSettings)
   {
-    QString valueNS = FStreamJid.pBare()+" | "+FContactJid.pBare();
+    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
     if (isWindow() && isVisible())
-      FSettings->setValueNS(SVN_GEOMETRY,valueNS,saveGeometry());
+      FSettings->saveBinaryData(BDI_MESSAGE_GEOMETRY+dataId,saveGeometry());
   }
 }
 
@@ -227,9 +226,9 @@ void MessageWindow::loadWindowState()
 {
   if (FSettings)
   {
-    QString valueNS = FStreamJid.pBare()+" | "+FContactJid.pBare();
+    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
     if (isWindow())
-      restoreGeometry(FSettings->valueNS(SVN_GEOMETRY,valueNS).toByteArray());
+      restoreGeometry(FSettings->loadBinaryData(BDI_MESSAGE_GEOMETRY+dataId));
   }
   if (FMode == WriteMode)
     FEditWidget->textEdit()->setFocus();

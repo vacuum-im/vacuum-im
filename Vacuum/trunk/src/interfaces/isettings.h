@@ -1,14 +1,14 @@
 #ifndef ISETTINGS_H
 #define ISETTINGS_H
 
+#include <QDir>
+#include <QUuid>
+#include <QHash>
+#include <QIcon>
+#include <QWidget>
+#include <QVariant>
 #include <QStringList>
 #include <QDomDocument>
-#include <QUuid>
-#include <QVariant>
-#include <QHash>
-#include <QWidget>
-#include <QIcon>
-#include <QDir>
 
 #define SETTINGS_UUID "{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"
 
@@ -27,6 +27,8 @@ public:
   virtual bool isSettingsOpened() const =0;
   virtual QByteArray encript(const QString &AValue, const QByteArray &AKey) const =0;
   virtual QString decript(const QByteArray &AValue, const QByteArray &AKey) const =0;
+  virtual QByteArray loadBinaryData(const QString &ADataId) const =0;
+  virtual bool saveBinaryData(const QString &ADataId, const QByteArray &AData) const =0;
   virtual bool isValueNSExists(const QString &AName, const QString &ANameNS) const =0;
   virtual bool isValueExists(const QString &AName) const =0;
   virtual QVariant valueNS(const QString &AName, const QString &ANameNS, 

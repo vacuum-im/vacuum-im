@@ -2,8 +2,7 @@
 
 #define IN_CLOSETAB                 "psi/closetab"
 
-#define SVN_TABWINDOWS              "tabWindows:window[]"
-#define SVN_GEOMETRY                SVN_TABWINDOWS ":geometry"
+#define BDI_TABWINDOW_GEOMETRY      "TabWindowGeometry"
 
 #define ADR_TABWINDOWID             Action::DR_Parametr1
 
@@ -146,7 +145,7 @@ void TabWindow::saveWindowState()
 {
   if (FSettings)
   {
-    FSettings->setValueNS(SVN_GEOMETRY,QString::number(FWindowId),saveGeometry());
+    FSettings->saveBinaryData(BDI_TABWINDOW_GEOMETRY+QString::number(FWindowId),saveGeometry());
   }
 }
 
@@ -154,7 +153,7 @@ void TabWindow::loadWindowState()
 {
   if (FSettings)
   {
-    restoreGeometry(FSettings->valueNS(SVN_GEOMETRY,QString::number(FWindowId)).toByteArray());
+    restoreGeometry(FSettings->loadBinaryData(BDI_TABWINDOW_GEOMETRY+QString::number(FWindowId)));
   }
 }
 

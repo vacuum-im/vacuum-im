@@ -14,7 +14,7 @@
 #define ADR_CONTACTJID          Action::DR_Parametr1
 #define ADR_NODE                Action::DR_Parametr2
 
-#define SVN_ITEMS_GEOMETRY      "itemsGeometry"
+#define BDI_ITEMS_GEOMETRY      "DiscoItemsWindowGeometry"
 
 #define IN_CANCEL               "psi/cancel"
 #define IN_DISCO                "psi/disco"
@@ -464,7 +464,8 @@ void ServiceDiscovery::showDiscoItems(const Jid &AStreamJid, const Jid &AContact
   if (FSettingsPlugin)
   {
     ISettings *settings = FSettingsPlugin->settingsForPlugin(SERVICEDISCOVERY_UUID);
-    itemsWindow->restoreGeometry(settings->value(SVN_ITEMS_GEOMETRY).toByteArray());
+    QString dataId = BDI_ITEMS_GEOMETRY+itemsWindow->streamJid().pBare();
+    itemsWindow->restoreGeometry(settings->loadBinaryData(dataId));
   }
   emit discoItemsWindowCreated(itemsWindow);
   itemsWindow->discover(AContactJid,ANode);
@@ -1289,7 +1290,8 @@ void ServiceDiscovery::onDiscoItemsWindowDestroyed(QObject *AObject)
   if (itemsWindow && FSettingsPlugin)
   {
     ISettings *settings = FSettingsPlugin->settingsForPlugin(SERVICEDISCOVERY_UUID);
-    settings->setValue(SVN_ITEMS_GEOMETRY,itemsWindow->saveGeometry());
+    QString dataId = BDI_ITEMS_GEOMETRY+itemsWindow->streamJid().pBare();
+    settings->saveBinaryData(dataId,itemsWindow->saveGeometry());
   }
   FDiscoItemsWindows.removeAt(FDiscoItemsWindows.indexOf(itemsWindow));
   emit discoItemsWindowDestroyed(itemsWindow);

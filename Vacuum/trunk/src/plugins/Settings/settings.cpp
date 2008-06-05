@@ -1,8 +1,11 @@
-#include <QtDebug>
 #include "settings.h"
-#include <QStringList>
+
+#include <QFile>
 #include <QRect>
 #include <QPoint>
+#include <QCryptographicHash>
+
+#define DIR_BINARY_DATA       "binary"
 
 Settings::Settings(const QUuid &APluginId, ISettingsPlugin *ASettingsPlugin)
 	: QObject(ASettingsPlugin->instance())
@@ -31,6 +34,49 @@ QString Settings::decript(const QByteArray &AValue, const QByteArray &AKey) cons
   for (int i = 0; i<plain.size(); ++i)
     plain[i] = plain[i] ^ AKey[i % AKey.size()];
   return QString::fromUtf8(plain);
+}
+
+QByteArray Settings::loadBinaryData(const QString &ADataId) const
+{
+  if (isSettingsOpened() && !ADataId.isEmpty())
+  {
+    QDir dir = FSettingsPlugin->profileDir();
+    QString pluginDir = FPluginId.toString();
+    if (dir.cd(DIR_BINARY_DATA) && dir.cd(pluginDir))
+    {
+      QFile file(dir.filePath(QCryptographicHash::hash(ADataId.toUtf8(),QCryptographicHash::Md5).toHex()+".dat"));
+      if (file.open(QFile::ReadOnly))
+      {
+        QByteArray data = file.readAll();
+        file.close();
+        return data;
+      }
+    }
+  }
+  return QByteArray();
+}
+
+bool Settings::saveBinaryData(const QString &ADataId, const QByteArray &AData) const
+{
+  if (isSettingsOpened() && !ADataId.isEmpty())
+  {
+    QDir dir = FSettingsPlugin->profileDir();
+    if ((dir.exists(DIR_BINARY_DATA) || dir.mkdir(DIR_BINARY_DATA)) && dir.cd(DIR_BINARY_DATA))
+    {
+      QString pluginDir = FPluginId.toString();
+      if ((dir.exists(pluginDir) || dir.mkdir(pluginDir)) && dir.cd(pluginDir))
+      {
+        QFile file(dir.filePath(QCryptographicHash::hash(ADataId.toUtf8(),QCryptographicHash::Md5).toHex()+".dat"));
+        if (file.open(QFile::WriteOnly|QFile::Truncate))
+        {
+          file.write(AData);
+          file.close();
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 bool Settings::isValueNSExists(const QString &AName, const QString &ANameNS) const

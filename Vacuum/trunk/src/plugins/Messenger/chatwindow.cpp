@@ -2,9 +2,8 @@
 
 #include <QTextDocumentFragment>
 
-#define SVN_CHATWINDOWS             "chatWindows:window[]"
-#define SVN_GEOMETRY                SVN_CHATWINDOWS ":geometry"
-#define SVN_SPLITTER                SVN_CHATWINDOWS ":splitter"  
+#define BDI_CHAT_GEOMETRY           "ChatWindowGeometry"
+#define BDI_CHAT_SPLITTER           "ChatWindowSplitter"  
 
 ChatWindow::ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid)
 {
@@ -148,10 +147,10 @@ void ChatWindow::saveWindowState()
 {
   if (FSettings)
   {
-    QString valueNameNS = FStreamJid.pBare()+" | "+FContactJid.pBare();
+    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
     if (isWindow() && isVisible())
-      FSettings->setValueNS(SVN_GEOMETRY,valueNameNS,saveGeometry());
-    FSettings->setValueNS(SVN_SPLITTER,valueNameNS,ui.sprSplitter->saveState());
+      FSettings->saveBinaryData(BDI_CHAT_GEOMETRY + dataId,saveGeometry());
+    FSettings->saveBinaryData(BDI_CHAT_SPLITTER + dataId,ui.sprSplitter->saveState());
   }
 }
 
@@ -159,12 +158,12 @@ void ChatWindow::loadWindowState()
 {
   if (FSettings)
   {
-    QString valueNameNS = FStreamJid.pBare()+" | "+FContactJid.pBare();
+    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
     if (isWindow())
-      restoreGeometry(FSettings->valueNS(SVN_GEOMETRY,valueNameNS).toByteArray());
+      restoreGeometry(FSettings->loadBinaryData(BDI_CHAT_GEOMETRY+dataId));
     if (!FSplitterLoaded)
     {
-      ui.sprSplitter->restoreState(FSettings->valueNS(SVN_SPLITTER,valueNameNS).toByteArray());
+      ui.sprSplitter->restoreState(FSettings->loadBinaryData(BDI_CHAT_SPLITTER+dataId));
       FSplitterLoaded = true;
     }
   }

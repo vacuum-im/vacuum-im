@@ -10,9 +10,8 @@
 
 #define ADR_GROUP_KIND        Action::DR_Parametr1
 
-#define SVN_ARCHIVE_WINDOW    "archiveWindow[]"
-#define SVN_GEOMETRY          SVN_ARCHIVE_WINDOW":geometry"
-#define SVN_SPLITTER          SVN_ARCHIVE_WINDOW":splitter"
+#define BIN_SPLITTER_STATE    "ArchiveWindowSplitterState"
+#define BIN_WINDOW_GEOMETRY   "ArchiveWindowGeometry"
 
 #define IN_HISTORY            "psi/history"
 #define IN_GROUP_KIND         ""
@@ -140,8 +139,8 @@ ViewHistoryWindow::~ViewHistoryWindow()
 {
   if (FSettings)
   {
-    FSettings->setValueNS(SVN_GEOMETRY,FStreamJid.pBare(),saveGeometry());
-    FSettings->setValueNS(SVN_SPLITTER,FStreamJid.pBare(),ui.splitter->saveState());
+    FSettings->saveBinaryData(BIN_SPLITTER_STATE+FStreamJid.pBare(),ui.splitter->saveState());
+    FSettings->saveBinaryData(BIN_WINDOW_GEOMETRY+FStreamJid.pBare(),saveGeometry());
   }
   clearModel();
   emit windowDestroyed(this);
@@ -251,8 +250,8 @@ void ViewHistoryWindow::initialize()
     FSettings = qobject_cast<ISettingsPlugin *>(plugin->instance())->settingsForPlugin(MESSAGEARCHIVER_UUID);
     if (FSettings)
     {
-      restoreGeometry(FSettings->valueNS(SVN_GEOMETRY,FStreamJid.pBare()).toByteArray());
-      ui.splitter->restoreState(FSettings->valueNS(SVN_SPLITTER,FStreamJid.pBare()).toByteArray());
+      restoreGeometry(FSettings->loadBinaryData(BIN_WINDOW_GEOMETRY+FStreamJid.pBare()));
+      ui.splitter->restoreState(FSettings->loadBinaryData(BIN_SPLITTER_STATE+FStreamJid.pBare()));
     }
   }
 }

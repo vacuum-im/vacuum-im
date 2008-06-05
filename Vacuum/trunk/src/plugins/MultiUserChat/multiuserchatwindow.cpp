@@ -9,10 +9,9 @@
 #define IN_MULTICHAT_MESSAGE        "psi/groupChat"
 #define IN_DATA_FORM_MESSAGE        "psi/events"
 
-#define SVN_WINDOW                  "windows:window[]"
-#define SVN_WINDOW_GEOMETRY         SVN_WINDOW ":geometry"
-#define SVN_WINDOW_HSPLITTER        SVN_WINDOW ":hsplitter"  
-#define SVN_WINDOW_VSPLITTER        SVN_WINDOW ":vsplitter"  
+#define BDI_WINDOW_GEOMETRY         "MultiChatWindowGeometry"
+#define BDI_WINDOW_HSPLITTER        "MultiChatWindowHSplitterState"  
+#define BDI_WINDOW_VSPLITTER        "MultiChatWindowVSplitterState"  
 
 #define ADR_STREAM_JID              Action::DR_StreamJid
 #define ADR_ROOM_JID                Action::DR_Parametr1
@@ -605,23 +604,23 @@ void MultiUserChatWindow::saveWindowState()
 {
   if (FSettings)
   {
-    QString valueNameNS = roomJid().pBare();
+    QString dataId = roomJid().pBare();
     if (isWindow() && isVisible())
-      FSettings->setValueNS(SVN_WINDOW_GEOMETRY,valueNameNS,saveGeometry());
-    FSettings->setValueNS(SVN_WINDOW_HSPLITTER,valueNameNS,ui.sprHSplitter->saveState());
-    FSettings->setValueNS(SVN_WINDOW_VSPLITTER,valueNameNS,ui.sprVSplitter->saveState());
+      FSettings->saveBinaryData(BDI_WINDOW_GEOMETRY+dataId,saveGeometry());
+    FSettings->saveBinaryData(BDI_WINDOW_HSPLITTER+dataId,ui.sprHSplitter->saveState());
+    FSettings->saveBinaryData(BDI_WINDOW_VSPLITTER+dataId,ui.sprVSplitter->saveState());
   }
 }
 
 void MultiUserChatWindow::loadWindowState()
 {
-  QString valueNameNS = roomJid().pBare();
+  QString dataId = roomJid().pBare();
   if (isWindow())
-    restoreGeometry(FSettings->valueNS(SVN_WINDOW_GEOMETRY,valueNameNS).toByteArray());
+    restoreGeometry(FSettings->loadBinaryData(BDI_WINDOW_GEOMETRY+dataId));
   if (!FSplitterLoaded)
   {
-    ui.sprHSplitter->restoreState(FSettings->valueNS(SVN_WINDOW_HSPLITTER,valueNameNS).toByteArray());
-    ui.sprVSplitter->restoreState(FSettings->valueNS(SVN_WINDOW_VSPLITTER,valueNameNS).toByteArray());
+    ui.sprHSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_HSPLITTER+dataId));
+    ui.sprVSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_VSPLITTER+dataId));
     FSplitterLoaded = true;
   }
   FEditWidget->textEdit()->setFocus();

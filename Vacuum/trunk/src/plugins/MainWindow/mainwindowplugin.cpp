@@ -1,8 +1,8 @@
 #include "mainwindowplugin.h"
 
 #define IN_QUIT               "psi/quit"
-#define SVN_GEOMETRY          "window:geometry"
-#define SVN_SHOW_ON_START     "window:showOnStart"
+#define SVN_SHOW_ON_START     "showOnStart"
+#define BDI_WINDOW_GEOMETRY   "MainWindowGeometry"
 
 MainWindowPlugin::MainWindowPlugin()
 {
@@ -109,15 +109,15 @@ void MainWindowPlugin::showMainWindow()
 void MainWindowPlugin::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
-  FMainWindow->restoreGeometry(settings->value(SVN_GEOMETRY).toByteArray());
+  FMainWindow->restoreGeometry(settings->loadBinaryData(BDI_WINDOW_GEOMETRY));
   updateTitle();
 }
 
 void MainWindowPlugin::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
-  settings->setValue(SVN_GEOMETRY,FMainWindow->saveGeometry());
   settings->setValue(SVN_SHOW_ON_START,FMainWindow->isVisible());
+  settings->saveBinaryData(BDI_WINDOW_GEOMETRY,FMainWindow->saveGeometry());
   updateTitle();
 }
 
