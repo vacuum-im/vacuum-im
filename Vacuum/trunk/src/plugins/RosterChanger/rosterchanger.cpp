@@ -316,12 +316,10 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       data.insert(Action::DR_StreamJid,streamJid);
       data.insert(Action::DR_Parametr1,AIndex->data(RDR_BareJid).toString());
       
-      Action *action;
-
       Menu *subsMenu = new Menu(AMenu);
       subsMenu->setTitle(tr("Subscription"));
 
-      action = new Action(subsMenu);
+      Action *action = new Action(subsMenu);
       action->setText(tr("Send"));
       action->setData(data);
       action->setData(Action::DR_Parametr2,IRoster::Subscribed);
@@ -407,9 +405,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       data.insert(Action::DR_Parametr1,AIndex->data(RDR_Group));
       data.insert(Action::DR_StreamJid,streamJid);
       
-      Action *action;
-
-      action = new Action(AMenu);
+      Action *action = new Action(AMenu);
       action->setText(tr("Add contact..."));
       action->setData(Action::DR_StreamJid,AIndex->data(RDR_StreamJid));
       action->setData(Action::DR_Parametr3,AIndex->data(RDR_Group));
@@ -435,9 +431,15 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       AMenu->addAction(moveGroup->menuAction(),AG_ROSTERCHANGER_ROSTER);
 
       action = new Action(AMenu);
-      action->setText(tr("Remove"));
+      action->setText(tr("Remove group"));
       action->setData(data);
       connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveGroup(bool)));
+      AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER);
+
+      action = new Action(AMenu);
+      action->setText(tr("Remove contacts"));
+      action->setData(data);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveGroupItems(bool)));
       AMenu->addAction(action,AG_ROSTERCHANGER_ROSTER);
     }
   }
@@ -597,11 +599,12 @@ void RosterChanger::onRemoveItemFromRoster(bool)
       Jid rosterJid = action->data(Action::DR_Parametr1).toString();
       if (roster->rosterItem(rosterJid).isValid)
       {
-        int button = QMessageBox::question(NULL,tr("Remove contact"),
+        if (QMessageBox::question(NULL,tr("Remove contact"),
           tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(rosterJid.hBare()),
-          QMessageBox::Yes | QMessageBox::No);
-        if (button == QMessageBox::Yes)
+          QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
           roster->removeItem(rosterJid);
+        }
       }
       else if (FRostersModel)
       {
@@ -721,6 +724,28 @@ void RosterChanger::onRemoveGroup(bool)
     {
       QString groupName = action->data(Action::DR_Parametr1).toString();
       roster->removeGroup(groupName);
+    }
+  }
+}
+
+void RosterChanger::onRemoveGroupItems(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QString streamJid = action->data(Action::DR_StreamJid).toString();
+    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    if (roster && roster->isOpen())
+    {
+      QString groupName = action->data(Action::DR_Parametr1).toString();
+      QList<IRosterItem> ritems = roster->groupItems(groupName);
+      if (ritems.count()>0 && 
+        QMessageBox::question(NULL,tr("Remove contacts"),
+        tr("You are assured that wish to remove %1 contact(s) from roster?").arg(ritems.count()),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+      {
+        roster->removeItems(ritems);
+      }
     }
   }
 }

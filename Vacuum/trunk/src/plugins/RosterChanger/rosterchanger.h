@@ -65,6 +65,7 @@ protected slots:
   void onCopyGroupToGroup(bool);
   void onMoveGroupToGroup(bool);
   void onRemoveGroup(bool);
+  void onRemoveGroupItems(bool);
   //Operations on stream
   void onAddContact(AddContactDialog *ADialog);
 protected slots:
