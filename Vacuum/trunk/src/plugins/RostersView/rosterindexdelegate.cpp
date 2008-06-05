@@ -1,4 +1,3 @@
-#include <QtDebug>
 #include "rosterindexdelegate.h"
 
 #include <QApplication>
@@ -8,8 +7,7 @@
 
 #define BRANCH_WIDTH  10
 
-RosterIndexDelegate::RosterIndexDelegate(QObject *AParent)
-  : QAbstractItemDelegate(AParent)
+RosterIndexDelegate::RosterIndexDelegate(QObject *AParent) : QAbstractItemDelegate(AParent)
 {
   FShowBlinkLabels = true;
   FOptions = 0;
@@ -20,23 +18,19 @@ RosterIndexDelegate::~RosterIndexDelegate()
 
 }
 
-void RosterIndexDelegate::paint(QPainter *APainter, 
-                                const QStyleOptionViewItem &AOption,  
-                                const QModelIndex &AIndex) const
+void RosterIndexDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
   drawIndex(APainter,AOption,AIndex);
 }
 
-QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption,  
-                                    const QModelIndex &AIndex) const
+QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
   QStyleOptionViewItem option(AOption);
   option.rect = QRect(0,0,INT_MAX,INT_MAX);
   return drawIndex(NULL,option,AIndex).value(RLID_SIZE_HINT).size();
 }
 
-int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, 
-                                 const QModelIndex &AIndex) const
+int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
   if (!AOption.rect.contains(APoint))
     return RLID_NULL;
@@ -50,8 +44,7 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
   return RLID_DISPLAY;
 }
 
-QRect RosterIndexDelegate::labelRect(int ALabelId, const QStyleOptionViewItem &AOption, 
-                                     const QModelIndex &AIndex) const
+QRect RosterIndexDelegate::labelRect(int ALabelId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
   return drawIndex(NULL,AOption,AIndex).value(ALabelId);
 }
@@ -255,8 +248,7 @@ void RosterIndexDelegate::drawBackground(QPainter *APainter, const QStyleOptionV
   }
 }
 
-void RosterIndexDelegate::drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption,  
-                                     const QRect &ARect) const 
+void RosterIndexDelegate::drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption, const QRect &ARect) const 
 {
   if ((AOption.state & QStyle::State_HasFocus) && ARect.isValid())
   {
@@ -267,29 +259,27 @@ void RosterIndexDelegate::drawFocus(QPainter *APainter, const QStyleOptionViewIt
     QPalette::ColorGroup cg = (AOption.state & QStyle::State_Enabled) ? QPalette::Normal : QPalette::Disabled;
     QPalette::ColorRole cr = (AOption.state & QStyle::State_Selected) ? QPalette::Highlight : QPalette::Window;
     focusOption.backgroundColor = AOption.palette.color(cg,cr);
-    QApplication::style()->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, APainter);
+    qApp->style()->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, APainter);
   }
 }
 
 LabelsMap RosterIndexDelegate::labelsMap(const QModelIndex &AIndex) const
 {
-  typedef QPair<int,QVariant> pair;
   LabelsMap map;
 
-  map.insert(RLO_DECORATION,pair(RLID_DISPLAY,AIndex.data(Qt::DecorationRole)));
-  map.insert(RLO_DISPLAY,pair(RLID_DISPLAY,AIndex.data(Qt::DisplayRole)));
+  map.insert(RLO_DECORATION,qMakePair(RLID_DISPLAY,AIndex.data(Qt::DecorationRole)));
+  map.insert(RLO_DISPLAY,qMakePair(RLID_DISPLAY,AIndex.data(Qt::DisplayRole)));
 
   QList<QVariant> labelIds = AIndex.data(RDR_LabelIds).toList();
   QList<QVariant> labelOrders = AIndex.data(RDR_LabelOrders).toList();
   QList<QVariant> labelValues = AIndex.data(RDR_LabelValues).toList();
-  for (int ilabel = 0; ilabel < labelOrders.count(); ilabel++)
-    map.insert(labelOrders.at(ilabel).toInt(),pair(labelIds.at(ilabel).toInt(),labelValues.at(ilabel)));
+  for (int i = 0; i < labelOrders.count(); i++)
+    map.insert(labelOrders.at(i).toInt(),qMakePair(labelIds.at(i).toInt(),labelValues.at(i)));
 
   return map;
 }
 
-QStyleOptionViewItem RosterIndexDelegate::setOptions(const QModelIndex &AIndex,
-                                                     const QStyleOptionViewItem &AOption) const
+QStyleOptionViewItem RosterIndexDelegate::setOptions(const QModelIndex &AIndex, const QStyleOptionViewItem &AOption) const
 {
   QStyleOptionViewItem option = AOption;
 
@@ -327,8 +317,7 @@ QStyleOptionViewItem RosterIndexDelegate::setOptions(const QModelIndex &AIndex,
   return option;
 }
 
-QStyleOptionViewItem RosterIndexDelegate::setFooterOptions(const QModelIndex &/*AIndex*/, 
-                                                           const QStyleOptionViewItem &AOption) const
+QStyleOptionViewItem RosterIndexDelegate::setFooterOptions(const QModelIndex &/*AIndex*/, const QStyleOptionViewItem &AOption) const
 {
   QStyleOptionViewItem option = AOption;
 
