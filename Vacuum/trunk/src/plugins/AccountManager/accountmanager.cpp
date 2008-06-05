@@ -19,7 +19,6 @@ AccountManager::AccountManager()
   FSettings = NULL;
   FMainWindowPlugin = NULL;
   FRostersViewPlugin = NULL;
-  FActionSetup = NULL;
   FAccountSetup = NULL;
   srand(QTime::currentTime().msec());
 }
@@ -86,16 +85,6 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool AccountManager::initObjects()
 {
-  if (FMainWindowPlugin)
-  {
-    FActionSetup = new Action(this);
-    FActionSetup->setIcon(SYSTEM_ICONSETFILE,IN_ACCOUNT);
-    FActionSetup->setText(tr("Account setup..."));
-    FActionSetup->setData(Action::DR_Parametr1,ON_ACCOUNTS);
-    connect(FActionSetup,SIGNAL(triggered(bool)),SLOT(onOpenOptionsDialogByAction(bool)));
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FActionSetup,AG_ACCOUNTMANAGER_MMENU,true);
-  }
-
   FSettings = FSettingsPlugin->settingsForPlugin(ACCOUNTMANAGER_UUID);
   FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"), tr("Creating and removing accounts"),QIcon());
   FSettingsPlugin->insertOptionsHolder(this);
@@ -113,6 +102,8 @@ QWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder)
       FAccountSetup = new AccountManage(NULL);
       connect(FAccountSetup,SIGNAL(accountAdded(const QString &)),
         SLOT(onOptionsAccountAdded(const QString &)));
+      connect(FAccountSetup,SIGNAL(accountShow(const QString &)),
+        SLOT(onOptionsAccountShow(const QString &)));
       connect(FAccountSetup,SIGNAL(accountRemoved(const QString &)),
         SLOT(onOptionsAccountRemoved(const QString &)));
       foreach(IAccount *account,FAccounts)
@@ -265,6 +256,12 @@ void AccountManager::onOptionsAccountAdded(const QString &AName)
   FSettingsPlugin->openOptionsDialog(ON_ACCOUNTS"::"+id);
 }
 
+void AccountManager::onOptionsAccountShow(const QString &AAccountId)
+{
+  if (!AAccountId.isEmpty())
+    FSettingsPlugin->openOptionsDialog(ON_ACCOUNTS"::"+AAccountId);
+}
+
 void AccountManager::onOptionsAccountRemoved(const QString &AAccountId)
 {
   FAccountSetup->removeAccount(AAccountId);
@@ -303,8 +300,8 @@ void AccountManager::onOptionsDialogAccepted()
     account->setStreamJid(streamJid);
     account->setPassword(options->option(AccountOptions::AO_Password).toString());
     account->setDefaultLang(options->option(AccountOptions::AO_DefLang).toString());
-    account->setActive(FAccountSetup->accountActive(id));
-    if (!account->isValid() && FAccountSetup->accountActive(id))
+    account->setActive(FAccountSetup->isAccountActive(id));
+    if (!account->isValid() && FAccountSetup->isAccountActive(id))
     {
       QMessageBox::warning(NULL,tr("Not valid account"),tr("Account %1 is not valid, change its Jabber ID").arg(Qt::escape(name)));
     }

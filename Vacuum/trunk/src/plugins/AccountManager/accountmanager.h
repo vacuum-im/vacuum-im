@@ -63,6 +63,7 @@ protected:
   void closeAccountOptionsNode(const QString &AAccountId);
 protected slots:
   void onOptionsAccountAdded(const QString &AName);
+  void onOptionsAccountShow(const QString &AAccountId);
   void onOptionsAccountRemoved(const QString &AAccountId);
   void onOpenOptionsDialogByAction(bool);
   void onOptionsDialogAccepted();
@@ -80,8 +81,6 @@ private:
   IXmppStreams *FXmppStreams;
   IMainWindowPlugin *FMainWindowPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
-private:
-  Action *FActionSetup;
 private:
   AccountManage *FAccountSetup;
   QHash<QString, AccountOptions *> FAccountOptions;

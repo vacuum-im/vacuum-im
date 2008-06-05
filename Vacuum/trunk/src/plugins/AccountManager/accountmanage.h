@@ -11,21 +11,21 @@ class AccountManage :
   public QWidget
 {
   Q_OBJECT;
-
 public:
   AccountManage(QWidget *AParent = NULL);
   ~AccountManage();
-  void setAccount(const QString &AId, const QString &AName, 
-    const QString &AStreamJid, bool AShown);
-  bool accountActive(const QString &AId) const;
+  void setAccount(const QString &AId, const QString &AName, const QString &AStreamJid, bool AShown);
+  bool isAccountActive(const QString &AId) const;
   QString accountName(const QString &AId) const;
   void removeAccount(const QString &AId);
 signals:
   void accountAdded(const QString &AName);
+  void accountShow(const QString &AAccountId);
   void accountRemoved(const QString &AAccountId);
 protected slots:
   void onAccountAdd();
   void onAccountRemove();
+  void onItemActivated(QTreeWidgetItem *AItem, int AColumn);
 private:
   QHash<QString,QTreeWidgetItem *> FAccountItems;
 private:

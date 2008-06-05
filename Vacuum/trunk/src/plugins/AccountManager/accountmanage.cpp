@@ -6,12 +6,12 @@
 
 #define ACCOUNT_ID_ROLE Qt::UserRole+1
 
-AccountManage::AccountManage(QWidget *AParent)
-    : QWidget(AParent)
+AccountManage::AccountManage(QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
   ui.trwAccounts->setHeaderLabels(QStringList() << tr("Name") << tr("Jabber ID"));
   ui.trwAccounts->sortByColumn(0,Qt::AscendingOrder);
+  connect(ui.trwAccounts,SIGNAL(itemActivated(QTreeWidgetItem *,int)),SLOT(onItemActivated(QTreeWidgetItem *,int)));
   connect(ui.pbtAdd,SIGNAL(clicked(bool)),SLOT(onAccountAdd()));
   connect(ui.pbtRemove,SIGNAL(clicked(bool)),SLOT(onAccountRemove()));
 }
@@ -21,8 +21,7 @@ AccountManage::~AccountManage()
 
 }
 
-void AccountManage::setAccount(const QString &AId, const QString &AName, 
-                               const QString &AStreamJid, bool AShown)
+void AccountManage::setAccount(const QString &AId, const QString &AName, const QString &AStreamJid, bool AShown)
 {
   QTreeWidgetItem *item = FAccountItems.value(AId,NULL);
   if (!item)
@@ -36,7 +35,7 @@ void AccountManage::setAccount(const QString &AId, const QString &AName,
   item->setData(0,ACCOUNT_ID_ROLE,AId);
 }
 
-bool AccountManage::accountActive(const QString &AId) const
+bool AccountManage::isAccountActive(const QString &AId) const
 {
   QTreeWidgetItem *item = FAccountItems.value(AId,NULL);
   if (item)
@@ -68,8 +67,7 @@ void AccountManage::removeAccount(const QString &AId)
 
 void AccountManage::onAccountAdd()
 {
-  //bool ok;
-  QString name = QInputDialog::getText(this,tr("Enter account name"),tr("Account name:")); //,QLineEdit::Normal,QString(),ok);
+  QString name = QInputDialog::getText(this,tr("Enter account name"),tr("Account name:")); 
   if (!name.isEmpty())
     emit accountAdded(name);
 }
@@ -89,3 +87,8 @@ void AccountManage::onAccountRemove()
   }
 }
 
+void AccountManage::onItemActivated(QTreeWidgetItem *AItem, int /*AColumn*/)
+{
+  if (AItem)
+    emit accountShow(AItem->data(0,ACCOUNT_ID_ROLE).toString());
+}
