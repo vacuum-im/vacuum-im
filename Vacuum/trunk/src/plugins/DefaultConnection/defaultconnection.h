@@ -52,17 +52,17 @@ protected:
   void connectionError(const QString &AError);
 protected slots:
   void onSocketConnected();
-  void onSocketReadyRead();
-  void onSocketDisconnected();
-  void onSocketError(QAbstractSocket::SocketError AError);
   void onSocketEncrypted();
+  void onSocketReadyRead();
   void onSocketSSLErrors(const QList<QSslError> &AErrors);
-  void onReadTimeout();
+  void onSocketError(QAbstractSocket::SocketError AError);
+  void onSocketDisconnected();
+  void onConnectionTimeout();
 private:
   IConnectionPlugin *FPlugin;  
 private:
   QSslSocket FSocket;
-  QTimer FReadTimer;
+  QTimer FConnectTimer;
 private:
   enum ProxyState {
     ProxyUnconnected,
@@ -72,8 +72,8 @@ private:
     ProxyConnectResult,
     ProxyReady
   };
-  bool FDisconnectEmited;
-  bool FDisconnectCalled;
+  bool FDisconnect;
+  bool FDisconnected;
   ProxyState FProxyState;
   QHash<int, QVariant> FOptions;
   QString FHost;

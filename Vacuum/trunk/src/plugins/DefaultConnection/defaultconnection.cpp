@@ -2,26 +2,27 @@
 
 #include <qendian.h>
 
-#define READ_TIMEOUT  30000
+#define CONNECT_TIMEOUT       30000
+#define DISCONNECT_TIMEOUT    5000
 
 DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent) : QObject(AParent)
 {
   FPlugin = APlugin;
+  FDisconnect = true; 
+  FDisconnected = true;
   FProxyState = ProxyUnconnected;
   FSocket.setProtocol(QSsl::AnyProtocol);
-  FDisconnectCalled = true; 
-  FDisconnectEmited = true;
 
   connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
   connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
-  connect(&FSocket, SIGNAL(error(QAbstractSocket::SocketError)),
-    SLOT(onSocketError(QAbstractSocket::SocketError)));
+  connect(&FSocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onSocketError(QAbstractSocket::SocketError)));
   connect(&FSocket, SIGNAL(disconnected()), SLOT(onSocketDisconnected()));
   connect(&FSocket, SIGNAL(encrypted()), SLOT(onSocketEncrypted()));
   connect(&FSocket, SIGNAL(sslErrors(const QList<QSslError> &)), SLOT(onSocketSSLErrors(const QList<QSslError> &)));
   connect(&FSocket, SIGNAL(modeChanged(QSslSocket::SslMode)), SIGNAL(modeChanged(QSslSocket::SslMode)));
   
-  connect(&FReadTimer,SIGNAL(timeout()),SLOT(onReadTimeout()));
+  FConnectTimer.setSingleShot(true);
+  connect(&FConnectTimer,SIGNAL(timeout()),SLOT(onConnectionTimeout()));
 }
 
 DefaultConnection::~DefaultConnection()
@@ -53,8 +54,8 @@ void DefaultConnection::connectToHost()
     FProxyUser = option(IDefaultConnection::CO_ProxyUserName).toString();
     FProxyPassword = option(IDefaultConnection::CO_ProxyPassword).toString();
 
-    FDisconnectCalled = false;
-    FDisconnectEmited = false;
+    FDisconnect = false;
+    FDisconnected = false;
     if (FProxyType == 0)
     {
       FProxyState = ProxyReady;
@@ -68,22 +69,26 @@ void DefaultConnection::connectToHost()
       FProxyState = ProxyUnconnected;
       FSocket.connectToHost(FProxyHost, FProxyPort);
     }
-    FReadTimer.start(READ_TIMEOUT);
+    FConnectTimer.start(CONNECT_TIMEOUT);
   }
+  else
+    connectionError(tr("Unexpected connection request"));
 }
 
 void DefaultConnection::disconnect()
 {
-  if (!FDisconnectCalled)
+  if (!FDisconnect)
   {
-    FDisconnectCalled = true;
+    FDisconnect = true;
     FSocket.flush();
     FSocket.disconnectFromHost();
-    if (FSocket.state()!=QAbstractSocket::UnconnectedState && !FSocket.waitForDisconnected(5000))
-      emit error(FSocket.errorString());
+    if (FSocket.state()!=QAbstractSocket::UnconnectedState)
+      FSocket.waitForDisconnected(DISCONNECT_TIMEOUT);
   }
-  if (!FDisconnectEmited)
+  if (!FDisconnected)
+  {
     onSocketDisconnected();
+  }
 }
 
 qint64 DefaultConnection::write(const QByteArray &AData)
@@ -167,7 +172,6 @@ void DefaultConnection::socket5Connection()
     else 
       buf += 2;
     FProxyState = ProxyAuthType;
-    FReadTimer.start(READ_TIMEOUT); 
     write(buf); 
   }
   else if (FProxyState == ProxyAuthType)
@@ -182,7 +186,6 @@ void DefaultConnection::socket5Connection()
       buf += (const char)FProxyPassword.toUtf8().size();
       buf += FProxyPassword.toUtf8(); 
       FProxyState = ProxyAuthResult;
-      FReadTimer.start(READ_TIMEOUT); 
       write(buf);
     }
     else
@@ -209,7 +212,6 @@ void DefaultConnection::socket5Connection()
     quint16 port = qToBigEndian<quint16>(FPort);
     buf += QByteArray((const char *)&port,2);
     FProxyState = ProxyConnectResult;
-    FReadTimer.start(READ_TIMEOUT); 
     write(buf);
   }
   else if (FProxyState == ProxyConnectResult)
@@ -221,7 +223,7 @@ void DefaultConnection::socket5Connection()
       switch (buf[1])
       {
         case 1: err = tr("General SOCKS server failure.");break;
-        case 2: err = tr("Connection not allowed by ruleset.");break;
+        case 2: err = tr("Connection not allowed by rule set.");break;
         case 3: err = tr("Network unreachable.");break;
         case 4: err = tr("Host unreachable.");break;
         case 5: err = tr("Connection refused.");break;
@@ -249,7 +251,6 @@ void DefaultConnection::httpsConnection()
     buf += "Host: "+FHost.toAscii()+":"+QString("%1").arg(FPort).toAscii()+"\r\n";  
     buf += "\r\n";
     FProxyState = ProxyConnectResult;
-    FReadTimer.start(READ_TIMEOUT); 
     write(buf);
   }
   else if (FProxyState == ProxyConnectResult)
@@ -273,7 +274,7 @@ void DefaultConnection::proxyReady()
 
 void DefaultConnection::connectionReady()
 {
-  FReadTimer.start(READ_TIMEOUT); 
+  FConnectTimer.stop();
   emit connected();
 }
 
@@ -285,45 +286,25 @@ void DefaultConnection::connectionError(const QString &AError)
 
 void DefaultConnection::onSocketConnected()
 {
-  FReadTimer.stop();
   if (FProxyState != ProxyReady)
-  {
-    FReadTimer.start(READ_TIMEOUT); 
     proxyConnection();
-  }
   else if (!FUseSSL)
+    connectionReady();
+}
+
+void DefaultConnection::onSocketEncrypted()
+{
+  emit encrypted();
+  if (FUseSSL)
     connectionReady();
 }
 
 void DefaultConnection::onSocketReadyRead()
 {
-  FReadTimer.stop();
   if (FProxyState != ProxyReady)
     proxyConnection();
   else
     emit readyRead(FSocket.bytesAvailable()); 
-}
-
-void DefaultConnection::onSocketDisconnected()
-{
-  FDisconnectCalled = true;
-  FDisconnectEmited = true;
-  FReadTimer.stop();
-  FSocket.close();
-  emit disconnected();
-}
-
-void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
-{
-  FDisconnectCalled = true;
-  connectionError(FSocket.errorString());
-}
-
-void DefaultConnection::onSocketEncrypted()
-{
-  if (FUseSSL)
-    connectionReady();
-  emit encrypted();
 }
 
 void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
@@ -334,7 +315,22 @@ void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
     FSocket.ignoreSslErrors();
 }
 
-void DefaultConnection::onReadTimeout()
+void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
+{
+  FDisconnect = true;
+  connectionError(FSocket.errorString());
+}
+
+void DefaultConnection::onSocketDisconnected()
+{
+  FDisconnect = true;
+  FDisconnected = true;
+  FConnectTimer.stop();
+  FSocket.close();
+  emit disconnected();
+}
+
+void DefaultConnection::onConnectionTimeout()
 {
   connectionError(tr("Connection timed out"));
 }
