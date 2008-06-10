@@ -668,7 +668,7 @@ void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
 void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-  if ((ALabelId == RLID_DISPLAY || ALabelId == RLID_FOOTER_TEXT) && types().contains(AIndex->type()))
+  if (ALabelId == RLID_DISPLAY && types().contains(AIndex->type()))
   {
     Jid contactJid = AIndex->data(RDR_Jid).toString();
     
