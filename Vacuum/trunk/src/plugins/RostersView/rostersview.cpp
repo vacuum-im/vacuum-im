@@ -531,7 +531,7 @@ void RostersView::setLastModel(QAbstractItemModel *AModel)
 
 void RostersView::updateStatusText(IRosterIndex *AIndex)
 {
-  const static QList<int> statusTypes = QList<int> << RIT_StreamRoot << RIT_Contact << RIT_Agent;
+  const static QList<int> statusTypes = QList<int>() << RIT_StreamRoot << RIT_Contact << RIT_Agent;
   
   IRosterIndexList indexes;
   if (AIndex == NULL)
