@@ -175,6 +175,7 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
       streamIndex->setData(RDR_StreamJid,AStreamJid.pFull());
       streamIndex->setData(RDR_Jid,AStreamJid.full());
       streamIndex->setData(RDR_PJid,AStreamJid.pFull());
+      streamIndex->setData(RDR_BareJid,AStreamJid.pBare());
 
       if (presence)
       {
