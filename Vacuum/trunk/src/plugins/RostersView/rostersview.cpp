@@ -531,15 +531,17 @@ void RostersView::setLastModel(QAbstractItemModel *AModel)
 
 void RostersView::updateStatusText(IRosterIndex *AIndex)
 {
+  const static QList<int> statusTypes = QList<int> << RIT_StreamRoot << RIT_Contact << RIT_Agent;
+  
   IRosterIndexList indexes;
   if (AIndex == NULL)
   {
     QMultiHash<int,QVariant> findData;
-    findData.insert(RDR_Type,RIT_StreamRoot);
-    findData.insert(RDR_Type,RIT_Contact);
+    foreach(int type, statusTypes)
+      findData.insert(RDR_Type,type);
     indexes = FRostersModel!=NULL ? FRostersModel->rootIndex()->findChild(findData,true) : IRosterIndexList();
   }
-  else
+  else if (statusTypes.contains(AIndex->type()))
     indexes.append(AIndex);
 
   bool show = checkOption(IRostersView::ShowStatusText);

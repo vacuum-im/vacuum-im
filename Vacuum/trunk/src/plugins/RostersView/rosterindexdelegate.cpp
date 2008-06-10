@@ -111,12 +111,12 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
     {
       if (showFooterText)
       {
-        if (labelOrder < RLO_DECORATION || labelOrder >= RLO_FULL_HEIGHT_LABELS)
+        if (labelOrder <= RLO_DECORATION || labelOrder >= RLO_FULL_HEIGHT_LABELS)
         {
           footerRemovedWidth += rect.width()+spacing;
           removeWidth(footerRect,rect.width(),isLeftToRight^(labelOrder>=RLO_RIGHTALIGN));
         }
-        if (labelOrder >= RLO_DECORATION && labelOrder <= RLO_FULL_HEIGHT_LABELS)
+        if (labelOrder > RLO_DECORATION && labelOrder < RLO_FULL_HEIGHT_LABELS)
           footerRect.setTop(qMax(footerRect.top(),rect.bottom()));
       }
       addSize(sizeHintRect,rect,isLeftToRight);
