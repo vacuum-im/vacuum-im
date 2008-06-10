@@ -1213,7 +1213,7 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
 
 void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-  if ((ALabelId == RLID_DISPLAY || ALabelId == RLID_FOOTER_TEXT) && types().contains(AIndex->type()))
+  if (ALabelId == RLID_DISPLAY && types().contains(AIndex->type()))
   {
     Jid contactJid = AIndex->type()==RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domain() : AIndex->data(RDR_Jid).toString();
     if (hasDiscoInfo(contactJid,""))

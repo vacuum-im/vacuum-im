@@ -12,6 +12,7 @@
 #include "../../definations/optionorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/accountvaluenames.h"
+#include "../../definations/rosterfootertextorder.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatuschanger.h"
 #include "../../interfaces/ipresence.h"

@@ -21,8 +21,8 @@ public:
   enum Option {
     ShowOfflineContacts           =1,
     ShowOnlineFirst               =2,
-    ShowFooterText                =4,
-    ShowResource                  =8
+    ShowResource                  =4,
+    ShowStatusText                =8
   };
   enum LabelFlags {
     LabelBlink                    =1,
@@ -61,7 +61,7 @@ public:
   virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
   virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
   //--FooterText
-  virtual void insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex) =0;
+  virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex) =0;
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AIndex) =0;

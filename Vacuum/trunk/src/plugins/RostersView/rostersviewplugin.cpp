@@ -6,8 +6,8 @@
 
 #define SVN_SHOW_OFFLINE_CONTACTS         "showOfflineContacts"
 #define SVN_SHOW_ONLINE_FIRST             "showOnlineFirst"
-#define SVN_SHOW_FOOTER_TEXT              "showFooterText"
 #define SVN_SHOW_RESOURCE                 "showResource"
+#define SVN_SHOW_STATUS                   "showStatusText"
 #define SVN_COLLAPSE                      "collapse"
 #define SVN_ACCOUNT                       "account"
 #define SVN_GROUP                         "h%1" 
@@ -400,16 +400,16 @@ void RostersViewPlugin::onSettingsOpened()
 {
   setOption(IRostersView::ShowOfflineContacts,FSettings->value(SVN_SHOW_OFFLINE_CONTACTS,true).toBool()); 
   setOption(IRostersView::ShowOnlineFirst,FSettings->value(SVN_SHOW_ONLINE_FIRST,true).toBool()); 
-  setOption(IRostersView::ShowFooterText,FSettings->value(SVN_SHOW_FOOTER_TEXT,true).toBool()); 
   setOption(IRostersView::ShowResource,FSettings->value(SVN_SHOW_RESOURCE,true).toBool()); 
+  setOption(IRostersView::ShowStatusText,FSettings->value(SVN_SHOW_STATUS,true).toBool()); 
 }
 
 void RostersViewPlugin::onSettingsClosed()
 {
   FSettings->setValue(SVN_SHOW_OFFLINE_CONTACTS,checkOption(IRostersView::ShowOfflineContacts));
   FSettings->setValue(SVN_SHOW_ONLINE_FIRST,checkOption(IRostersView::ShowOnlineFirst));
-  FSettings->setValue(SVN_SHOW_FOOTER_TEXT,checkOption(IRostersView::ShowFooterText));
   FSettings->setValue(SVN_SHOW_RESOURCE,checkOption(IRostersView::ShowResource));
+  FSettings->setValue(SVN_SHOW_STATUS,checkOption(IRostersView::ShowStatusText));
 }
 
 void RostersViewPlugin::onShowOfflineContactsAction(bool AChecked)

@@ -75,7 +75,7 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
   QRect labelsRect = paintRect;
   QRect footerRect = paintRect;
   int footerRemovedWidth = 0;
-  bool showFooterText = checkOption(IRostersView::ShowFooterText) && AIndex.data(RDR_FooterText).isValid();
+  bool showFooterText = !AIndex.data(RDR_FooterText).isNull();
 
   if (APainter)
   {
@@ -99,27 +99,30 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
   LabelsMap map = labelsMap(AIndex);
   for(LabelsMap::const_iterator it = map.constBegin(); it != map.constEnd(); it++)
   {
-    option.decorationAlignment = labelAlignment(it.key());
+    int labelOrder = it.key();
+    int labelId = it.value().first;
+    QVariant labelValue = it.value().second.type()==QVariant::Int ? AIndex.data(it.value().second.toInt()) : it.value().second;
+    option.decorationAlignment = labelAlignment(labelOrder);
     option.displayAlignment = option.decorationAlignment;
-    bool paintLabel = FShowBlinkLabels || !FBlinkLabels.contains(it.value().first);
-    QRect rect = drawVariant(paintLabel ? APainter : NULL,option,labelsRect,it.value().second);
+    bool paintLabel = FShowBlinkLabels || !FBlinkLabels.contains(labelId);
+    QRect rect = drawVariant(paintLabel ? APainter : NULL,option,labelsRect,labelValue);
 
     if (!rect.isEmpty())
     {
       if (showFooterText)
       {
-        if (it.key() < RLO_DECORATION || it.key() >= RLO_FULL_HEIGHT_LABELS)
+        if (labelOrder < RLO_DECORATION || labelOrder >= RLO_FULL_HEIGHT_LABELS)
         {
           footerRemovedWidth += rect.width()+spacing;
-          removeWidth(footerRect,rect.width(),isLeftToRight^(it.key()>=RLO_RIGHTALIGN));
+          removeWidth(footerRect,rect.width(),isLeftToRight^(labelOrder>=RLO_RIGHTALIGN));
         }
-        if (it.key() >= RLO_DECORATION && it.key() <= RLO_FULL_HEIGHT_LABELS)
+        if (labelOrder >= RLO_DECORATION && labelOrder <= RLO_FULL_HEIGHT_LABELS)
           footerRect.setTop(qMax(footerRect.top(),rect.bottom()));
       }
       addSize(sizeHintRect,rect,isLeftToRight);
-      removeWidth(labelsRect,rect.width(),isLeftToRight^(it.key()>=RLO_RIGHTALIGN));
+      removeWidth(labelsRect,rect.width(),isLeftToRight^(labelOrder>=RLO_RIGHTALIGN));
     }
-    rectHash.insert(it.value().first,rect);
+    rectHash.insert(labelId,rect);
   }
   
   if (showFooterText)
@@ -132,7 +135,9 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
     QMap<QString,QVariant>::const_iterator fit = footerMap.constBegin();
     while (fit != footerMap.constEnd())
     {
-      QRect rect = drawVariant(APainter,option,footerRect,fit.value());
+      QString footerId = fit.key();
+      QVariant footerValue = fit.value().type()==QVariant::Int ? AIndex.data(fit.value().toInt()) : fit.value();
+      QRect rect = drawVariant(APainter,option,footerRect,footerValue);
       if (!rect.isEmpty())
       {
         if (footerMaxWidth < rect.width())

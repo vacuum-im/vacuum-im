@@ -16,8 +16,6 @@
 #define SVN_STATUS_ICONSET                  "status[]:iconset"
 #define SVN_STATUS_ICON_NAME                "status[]:iconName"
 
-#define FTO_STATUS                          100
-
 #define IN_CONNECTING                       "connecting"
 
 StatusChanger::StatusChanger()
@@ -577,7 +575,7 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
     if (FRostersView && FRostersModel)
     {
       IRosterIndex *index = FRostersModel->streamRoot(APresence->streamJid());
-      if (index)
+      if (index && !FRostersViewPlugin->checkOption(IRostersView::ShowStatusText))
       {
         if (APresence->show() == IPresence::Error)
           FRostersView->insertFooterText(FTO_STATUS,APresence->status(),index);

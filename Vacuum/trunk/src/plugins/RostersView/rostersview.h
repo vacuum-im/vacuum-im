@@ -8,11 +8,11 @@
 #include "../../definations/tooltiporders.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/rosterfootertextorder.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
 #include "rosterindexdelegate.h" 
-
 
 class RostersView : 
   virtual public QTreeView,
@@ -20,7 +20,6 @@ class RostersView :
 {
   Q_OBJECT;
   Q_INTERFACES(IRostersView);
-
 public:
   RostersView(QWidget *AParent = NULL);
   ~RostersView();
@@ -57,7 +56,7 @@ public:
   virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker);
   virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker);
   //--FooterText
-  virtual void insertFooterText(int AOrderAndId, const QString &AText, IRosterIndex *AIndex);
+  virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex);
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AModel);
@@ -80,8 +79,8 @@ signals:
   virtual void indexAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
   virtual void indexInserted(const QModelIndex &AParent, int AStart, int AEnd);
 public:
-  bool checkOption(IRostersView::Option AOption) const;
-  void setOption(IRostersView::Option AOption, bool AValue);
+  virtual bool checkOption(IRostersView::Option AOption) const;
+  virtual void setOption(IRostersView::Option AOption, bool AValue);
 protected:
   QStyleOptionViewItemV2 indexOption(const QModelIndex &AIndex) const;
   void appendBlinkLabel(int ALabelId);
@@ -89,6 +88,7 @@ protected:
   QString intId2StringId(int AIntId);
   void removeLabels();
   void setLastModel(QAbstractItemModel *AModel);
+  void updateStatusText(IRosterIndex *AIndex = NULL);
 protected:
   //QTreeView
   virtual void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
@@ -103,6 +103,8 @@ protected:
   virtual void mousePressEvent(QMouseEvent *AEvent);
   virtual void mouseReleaseEvent(QMouseEvent *AEvent);
 protected slots:
+  void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+  void onIndexInserted(IRosterIndex *AIndex);
   void onIndexDestroyed(IRosterIndex *AIndex);
   void onBlinkTimer();
 private:
@@ -110,7 +112,7 @@ private:
 private:
   Menu *FContextMenu;
 private:
-  int FLabelId;
+  int FLabelIdCounter;
   QTimer FBlinkTimer;
   QSet<int> FBlinkLabels;
   bool FBlinkShow;

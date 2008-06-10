@@ -1,7 +1,6 @@
 #include "indexdataholder.h"
 
-IndexDataHolder::IndexDataHolder(QObject *AParent) :
-  QObject(AParent)
+IndexDataHolder::IndexDataHolder(QObject *AParent) : QObject(AParent)
 {
   FOptions = 0;
 }
@@ -17,7 +16,6 @@ QList<int> IndexDataHolder::roles() const
     << Qt::DisplayRole 
     << Qt::BackgroundColorRole 
     << Qt::ForegroundRole
-    << Qt::ToolTipRole
     << RDR_FontWeight;
   return dataRoles;
 }
@@ -55,8 +53,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
       return Qt::white;
     case Qt::BackgroundColorRole:
       return Qt::gray;
-    case Qt::ToolTipRole:
-      return toolTipText(AIndex);
     case RDR_FontWeight:
       return QFont::Bold;
     } 
@@ -91,8 +87,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
           display += "/" + indexJid.resource();
         return display;
       }
-    case Qt::ToolTipRole:
-      return toolTipText(AIndex);
     } 
     break;
   
@@ -109,8 +103,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
         }
         return display;
       }
-    case Qt::ToolTipRole:
-      return toolTipText(AIndex);
     } 
     break;
    
@@ -122,8 +114,6 @@ QVariant IndexDataHolder::data(const IRosterIndex *AIndex, int ARole) const
         Jid indexJid(AIndex->data(RDR_Jid).toString());
         return indexJid.resource();
       }
-    case Qt::ToolTipRole:
-      return toolTipText(AIndex);
     } 
     break;
  }
@@ -138,41 +128,7 @@ bool IndexDataHolder::checkOption(IRostersView::Option AOption) const
 void IndexDataHolder::setOption(IRostersView::Option AOption, bool AValue)
 {
   AValue ? FOptions |= AOption : FOptions &= ~AOption;
-  if (AOption == IRostersView::ShowResource || AOption == IRostersView::ShowFooterText)
+  if (AOption == IRostersView::ShowResource || AOption == IRostersView::ShowStatusText)
     emit dataChanged(NULL,Qt::DisplayRole);
-}
-
-QString IndexDataHolder::toolTipText(const IRosterIndex *AIndex) const
-{
-  QString toolTip;
-  QString valueMast = "%1<br>";
-  QString paramMask = "%1: %2<br>";
-  
-  QString val = AIndex->data(RDR_Name).toString();
-  if (!val.isEmpty())
-    toolTip.append(valueMast.arg(Qt::escape(val)));
-
-  val = AIndex->data(RDR_Jid).toString();
-  if (!val.isEmpty())
-    toolTip.append(valueMast.arg(Qt::escape(val)));
-
-  val = AIndex->data(RDR_Priority).toString();
-  if (!val.isEmpty())
-    toolTip.append(paramMask.arg(tr("Priority")).arg(val));
-
-  val = AIndex->data(RDR_Status).toString();
-  if (!val.isEmpty())
-    toolTip.append(paramMask.arg(tr("Status")).arg(Qt::escape(val)));
-
-  val = AIndex->data(RDR_Subscription).toString();
-  if (!val.isEmpty() && val != "both")
-    toolTip.append(paramMask.arg(tr("Subscription")).arg(val));
-
-  val = AIndex->data(RDR_Ask).toString();
-  if (!val.isEmpty())
-    toolTip.append(paramMask.arg(tr("Ask")).arg(val));
-
-  toolTip.chop(4);
-  return toolTip;
 }
 
