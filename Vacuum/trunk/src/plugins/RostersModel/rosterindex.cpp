@@ -1,6 +1,5 @@
 #include "rosterindex.h"
 
-#include <QtDebug>
 #include <QTimer>
 
 RosterIndex::RosterIndex(int AType, const QString &AId)
@@ -17,9 +16,7 @@ RosterIndex::RosterIndex(int AType, const QString &AId)
 
 RosterIndex::~RosterIndex()
 {
-  removeAllChilds();
-  if (FParentIndex)
-    FParentIndex->removeChild(this);
+  setParentIndex(NULL);
   emit indexDestroyed(this);
 }
 
@@ -30,13 +27,10 @@ void RosterIndex::setParentIndex(IRosterIndex *AIndex)
 
   FBlokedSetParentIndex = true;
 
-  if (FRemoveChildsOnRemoved && !AIndex)
-    removeAllChilds();
-
   if (FParentIndex)
   {
     FParentIndex->removeChild(this);
-    setParent(0);
+    setParent(NULL);
   }
 
   if (AIndex)
@@ -57,7 +51,7 @@ void RosterIndex::setParentIndex(IRosterIndex *AIndex)
 
 int RosterIndex::row() const
 {
-  return FParentIndex ? FParentIndex->childRow(this) : 0;
+  return FParentIndex ? FParentIndex->childRow(this) : -1;
 }
 
 void RosterIndex::appendChild(IRosterIndex *AIndex)
@@ -80,9 +74,12 @@ bool RosterIndex::removeChild(IRosterIndex *AIndex)
 {
   if (FChilds.contains(AIndex))
   {
+    if (AIndex->removeChildsOnRemoved())
+      AIndex->removeAllChilds();
+
     emit childAboutToBeRemoved(AIndex);
     FChilds.removeAt(FChilds.indexOf(AIndex));
-    AIndex->setParentIndex(0);
+    AIndex->setParentIndex(NULL);
     emit childRemoved(AIndex);
 
     if (FRemoveOnLastChildRemoved && FChilds.isEmpty())
@@ -192,9 +189,6 @@ void RosterIndex::onRemoveByLastChildRemoved()
 void RosterIndex::onDestroyByParentRemoved()
 {
   if (!FParentIndex)
-  {
-    removeAllChilds();
     deleteLater();
-  }
 }
 

@@ -35,8 +35,11 @@ public:
   virtual QVariant data(int ARole) const;
   virtual void setData(int ARole, const QVariant &AData);
   virtual IRosterIndexList findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds = false) const;
+  virtual bool removeOnLastChildRemoved() const { return FRemoveOnLastChildRemoved; }
   virtual void setRemoveOnLastChildRemoved(bool ARemove) { FRemoveOnLastChildRemoved = ARemove; }
+  virtual bool removeChildsOnRemoved() const { return FRemoveChildsOnRemoved; }
   virtual void setRemoveChildsOnRemoved(bool ARemove) { FRemoveChildsOnRemoved = ARemove; }
+  virtual bool destroyOnParentRemoved() const { return FDestroyOnParentRemoved; }
   virtual void setDestroyOnParentRemoved(bool ADestroy) {FDestroyOnParentRemoved = ADestroy; }
 signals:
   virtual void dataChanged(IRosterIndex *AIndex, int ARole);
