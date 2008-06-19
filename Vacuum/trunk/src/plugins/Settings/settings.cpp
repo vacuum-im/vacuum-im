@@ -162,7 +162,7 @@ QHash<QString,QVariant> Settings::values(const QString &AName) const
 ISettings &Settings::setValueNS(const QString &AName, const QString &ANameNS, const QVariant &AValue)
 {
   static QList<QVariant::Type> customVariantCasts = QList<QVariant::Type>()
-    << QVariant::Rect << QVariant::Point << QVariant::ByteArray << QVariant::StringList;
+    << QVariant::Rect << QVariant::Point << QVariant::ByteArray << QVariant::StringList << QVariant::Size;
 
   QDomElement elem = getElement(AName,ANameNS,true);
   if (!elem.isNull())
@@ -260,6 +260,11 @@ QString Settings::variantToString(const QVariant &AVariant)
   {
     return AVariant.toStringList().join(" || ");
   }
+  else if (AVariant.type() == QVariant::Size)
+  {
+    QSize size = AVariant.toSize();
+    return QString("%1::%2").arg(size.width()).arg(size.height());
+  }
   else
     return AVariant.toString();
 }
@@ -277,10 +282,7 @@ QVariant Settings::stringToVariant(const QString &AString, QVariant::Type AType,
   else if (AType == QVariant::Point)
   {
     QList<QString> parts = AString.split("::",QString::SkipEmptyParts);
-    if (parts.count() == 2)
-      return QPoint(parts.at(0).toInt(),parts.at(1).toInt()); 
-    else
-      return ADefault;
+    return (parts.count() == 2) ? QPoint(parts.at(0).toInt(),parts.at(1).toInt()) : ADefault;
   }
   else if (AType == QVariant::ByteArray)
   {
@@ -293,6 +295,11 @@ QVariant Settings::stringToVariant(const QString &AString, QVariant::Type AType,
     if (!AString.isEmpty())
       list = AString.split(" || ");
     return list;
+  }
+  else if (AType == QVariant::Size)
+  {
+    QList<QString> parts = AString.split("::",QString::SkipEmptyParts);
+    return (parts.count() == 2) ? QSize(parts.at(0).toInt(),parts.at(1).toInt()) : ADefault;
   }
   else
     return QVariant(AString);
