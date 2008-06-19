@@ -80,6 +80,7 @@ private:
   QHash<Jid,VCardItem> FVCards;
   QHash<QString,Jid> FVCardRequestId;
   QHash<QString,QString> FVCardPublishId;
+  QHash<QString,Stanza> FVCardPublishStanza;
   QHash<Jid,VCardDialog *> FVCardDialogs;
 };
 

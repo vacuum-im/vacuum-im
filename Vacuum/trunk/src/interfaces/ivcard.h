@@ -26,9 +26,9 @@ public:
   virtual void setValueForTags(const QString &AName, const QString &AValue, const QStringList &ATags = QStringList(), 
     const QStringList &ATagList = QStringList()) =0;
   virtual QImage logoImage() const =0;
-  virtual void setLogoImage(const QImage &AImage) =0;
+  virtual void setLogoImage(const QImage &AImage, const QByteArray &AFormat = QByteArray()) =0;
   virtual QImage photoImage() const =0;
-  virtual void setPhotoImage(const QImage &AImage) =0;
+  virtual void setPhotoImage(const QImage &AImage, const QByteArray &AFormat = QByteArray()) =0;
   virtual void clear() = 0;
   virtual bool update(const Jid &AStreamJid) =0;
   virtual bool publish(const Jid &AStreamJid) =0;

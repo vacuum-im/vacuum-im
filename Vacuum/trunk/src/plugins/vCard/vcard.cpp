@@ -1,8 +1,11 @@
 #include "vcard.h"
 #include "vcardplugin.h"
-#include <QDebug>
+
 #include <QFile>
 #include <QBuffer>
+#include <QImageReader>
+
+#define DEFAUL_IMAGE_FORMAT       "jpeg"
 
 VCard::VCard(const Jid &AContactJid, VCardPlugin *APlugin) : QObject(APlugin)
 {
@@ -127,15 +130,16 @@ void VCard::setValueForTags(const QString &AName, const QString &AValue, const Q
   }
 }
 
-void VCard::setLogoImage(const QImage &AImage)
+void VCard::setLogoImage(const QImage &AImage, const QByteArray &AFormat)
 {
   if (!AImage.isNull())
   {
     QByteArray bytes;
     QBuffer buffer(&bytes);
     buffer.open(QIODevice::WriteOnly);
-    AImage.save(&buffer,"JPEG");
-    setValueForTags(VVN_LOGO_TYPE,"image/jpeg");
+    QByteArray format = checkImageFormat(AFormat);
+    AImage.save(&buffer,format);
+    setValueForTags(VVN_LOGO_TYPE,formatToType(format));
     setValueForTags(VVN_LOGO_VALUE,bytes.toBase64());
   }
   else
@@ -146,15 +150,16 @@ void VCard::setLogoImage(const QImage &AImage)
   FLogo = AImage;
 }
 
-void VCard::setPhotoImage(const QImage &AImage)
+void VCard::setPhotoImage(const QImage &AImage, const QByteArray &AFormat)
 {
   if (!AImage.isNull())
   {
     QByteArray bytes;
     QBuffer buffer(&bytes);
     buffer.open(QIODevice::WriteOnly);
-    AImage.save(&buffer,"JPEG");
-    setValueForTags(VVN_PHOTO_TYPE,"image/jpeg");
+    QByteArray format = checkImageFormat(AFormat);
+    AImage.save(&buffer,format);
+    setValueForTags(VVN_PHOTO_TYPE,formatToType(format));
     setValueForTags(VVN_PHOTO_VALUE,bytes.toBase64());
   }
   else
@@ -211,12 +216,28 @@ void VCard::loadVCardFile()
   {
     FLoadDateTime = QDateTime::fromString(FDoc.documentElement().attribute("dateTime"),Qt::ISODate);
   }
-  if (!isEmpty())
-  {
-    FLogo.loadFromData(QByteArray::fromBase64(value(VVN_LOGO_VALUE).toLatin1()));
-    FPhoto.loadFromData(QByteArray::fromBase64(value(VVN_PHOTO_VALUE).toLatin1()));
-  }
+
+  QByteArray imageData = QByteArray::fromBase64(value(VVN_LOGO_VALUE).toAscii());
+  FLogo = !imageData.isEmpty() ? QImage::fromData(imageData) : QImage();
+
+  imageData = QByteArray::fromBase64(value(VVN_PHOTO_VALUE).toAscii());
+  FPhoto = !imageData.isEmpty() ? QImage::fromData(imageData) : QImage();
+
   emit vcardUpdated();
+}
+
+QByteArray VCard::checkImageFormat(const QByteArray &AFormat) const
+{
+  if (QImageReader::supportedImageFormats().contains(AFormat.toLower()))
+    return AFormat.toLower();
+  return DEFAUL_IMAGE_FORMAT;
+}
+
+QString VCard::formatToType(const QByteArray &AFormat) const
+{
+  if (!AFormat.isEmpty())
+    return QString("image/%1").arg(AFormat.toLower().data());
+  return QString();
 }
 
 QDomElement VCard::createElementByName(const QString AName, const QStringList &ATags, 

@@ -1,5 +1,5 @@
 #include "vcardplugin.h"
-#include <QDebug>
+
 #include <QDir>
 #include <QFile>
 #include <QDomDocument>
@@ -115,11 +115,10 @@ void VCardPlugin::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
   else if (FVCardPublishId.contains(AStanza.id()))
   {
     Jid fromJid = FVCardPublishId.take(AStanza.id());
+    Stanza stanza = FVCardPublishStanza.take(AStanza.id());
     if (AStanza.type() == "result")
     {
-      VCardItem vcardItem = FVCards.value(fromJid);
-      if (vcardItem.vcard)
-        saveVCardFile(vcardItem.vcard->vcardElem(),fromJid);
+      saveVCardFile(stanza.element().firstChildElement(VCARD_TAGNAME),fromJid);
       emit vcardPublished(fromJid);
     }
     else if (AStanza.type() == "error")
@@ -139,6 +138,7 @@ void VCardPlugin::iqStanzaTimeOut(const QString &AId)
   }
   else if (FVCardPublishId.contains(AId))
   {
+    FVCardPublishStanza.remove(AId);
     ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
     emit vcardError(FVCardPublishId.take(AId),err.message());
   }
@@ -177,12 +177,12 @@ bool VCardPlugin::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
   {
     if (FVCardRequestId.key(AContactJid).isEmpty())
     {
-      Stanza iq("iq");
-      iq.setTo(AContactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
-      iq.addElement(VCARD_TAGNAME,NS_VCARD_TEMP);
-      if (FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,VCARD_TIMEOUT))
+      Stanza request("iq");
+      request.setTo(AContactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
+      request.addElement(VCARD_TAGNAME,NS_VCARD_TEMP);
+      if (FStanzaProcessor->sendIqStanza(this,AStreamJid,request,VCARD_TIMEOUT))
       {
-        FVCardRequestId.insert(iq.id(),AContactJid);
+        FVCardRequestId.insert(request.id(),AContactJid);
         return true;
       };
     }
@@ -198,12 +198,13 @@ bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
   {
     if (FVCardPublishId.key(AStreamJid.pBare()).isEmpty())
     {
-      Stanza iq("iq");
-      iq.setTo(AStreamJid.eBare()).setType("set").setId(FStanzaProcessor->newId());
-      QDomElement elem = iq.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
-      if (FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,VCARD_TIMEOUT))
+      Stanza publish("iq");
+      publish.setTo(AStreamJid.eBare()).setType("set").setId(FStanzaProcessor->newId());
+      QDomElement elem = publish.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
+      if (FStanzaProcessor->sendIqStanza(this,AStreamJid,publish,VCARD_TIMEOUT))
       {
-        FVCardPublishId.insert(iq.id(),AStreamJid.pBare());
+        FVCardPublishId.insert(publish.id(),AStreamJid.pBare());
+        FVCardPublishStanza.insert(publish.id(),publish);
         return true;
       }
     }

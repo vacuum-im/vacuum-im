@@ -326,7 +326,7 @@ void VCardDialog::onPhotoSaveClicked()
 {
   if (!FPhoto.isNull())
   {
-    QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),"",tr("Image Files (*.png *.jpg *.bmp)"));
+    QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
     if (!filename.isEmpty())
       FPhoto.save(filename);
   }
@@ -334,7 +334,7 @@ void VCardDialog::onPhotoSaveClicked()
 
 void VCardDialog::onPhotoLoadClicked()
 {
-  QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),"",tr("Image Files (*.png *.jpg *.bmp)"));
+  QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
   if (!filename.isEmpty())
   {
     QImage image(filename);

@@ -32,9 +32,9 @@ public:
   virtual void setValueForTags(const QString &AName, const QString &AValue, const QStringList &ATags = QStringList(),
     const QStringList &ATagList = QStringList());
   virtual QImage logoImage() const { return FLogo; }
-  virtual void setLogoImage(const QImage &AImage);
+  virtual void setLogoImage(const QImage &AImage, const QByteArray &AFormat = QByteArray());
   virtual QImage photoImage() const { return FPhoto; }
-  virtual void setPhotoImage(const QImage &AImage);
+  virtual void setPhotoImage(const QImage &AImage, const QByteArray &AFormat = QByteArray());
   virtual void clear();
   virtual bool update(const Jid &AStreamJid);
   virtual bool publish(const Jid &AStreamJid);
@@ -45,6 +45,8 @@ signals:
   virtual void vcardError(const QString &AError);
 protected:
   void loadVCardFile();
+  QByteArray checkImageFormat(const QByteArray &AFormat) const;
+  QString formatToType(const QByteArray &AFormat) const;
   QDomElement createElementByName(const QString AName, const QStringList &ATags, const QStringList &ATagList);
   QDomElement firstElementByName(const QString AName) const;
   QDomElement nextElementByName(const QString AName, const QDomElement APrevElem) const;
