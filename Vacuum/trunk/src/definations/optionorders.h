@@ -13,6 +13,7 @@
 //Node = "Roster"
 #define OO_ROSTER                                 500
 #define OO_CLIENTINFO                             700
+#define OO_AVATARS                                800
 
 //Node = "Emoticons"
 #define OO_EMOTICONS                              500

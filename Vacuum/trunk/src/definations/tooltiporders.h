@@ -2,6 +2,7 @@
 #define TOOLTIPORDERS_H
 
 //Display
+#define TTO_AVATAR_IMAGE                          100
 #define TTO_ROSTERSVIEW_NOTIFY                    200
 #define TTO_CONTACT_NAME                          210
 #define TTO_CONTACT_JID                           220

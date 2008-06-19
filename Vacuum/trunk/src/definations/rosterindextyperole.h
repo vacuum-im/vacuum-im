@@ -55,5 +55,8 @@
 #define RDR_DISCO_IDENT_TYPE                        Qt::UserRole + 50
 #define RDR_DISCO_IDENT_NAME                        Qt::UserRole + 51
 #define RDR_DISCO_FEATURES                          Qt::UserRole + 52
+//Avatars
+#define RDR_AVATAR_HASH                             Qt::UserRole + 53
+#define RDR_AVATAR_IMAGE                            Qt::UserRole + 54
 
 #endif

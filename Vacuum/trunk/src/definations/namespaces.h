@@ -20,8 +20,12 @@
 #define NS_JABBER_SEARCH                        "jabber:iq:search"
 #define NS_JABBER_GATEWAY                       "jabber:iq:gateway"
 #define NS_JABBER_PRIVACY                       "jabber:iq:privacy"
+#define NS_JABBER_X_AVATAR                      "jabber:x:avatar"
+#define NS_JABBER_IQ_AVATAR                     "jabber:iq:avatar"
 
 #define NS_VCARD_TEMP                           "vcard-temp"
+#define NS_VCARD_UPDATE                         "vcard-temp:x:update"
+
 #define NS_STORAGE_BOOKMARKS                    "storage:bookmarks"
 
 #define NS_FEATURE_IQAUTH                       "http://jabber.org/features/iq-auth"

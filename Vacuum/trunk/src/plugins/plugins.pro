@@ -35,4 +35,5 @@ SUBDIRS = settings \
           gateways \
           messagearchiver \
           privacylists \
-          sessionnegotiation
+          sessionnegotiation \
+          avatars
