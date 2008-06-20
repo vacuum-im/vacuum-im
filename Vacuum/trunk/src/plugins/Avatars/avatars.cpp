@@ -7,22 +7,25 @@
 #include <QImageReader>
 #include <QCryptographicHash>
 
-#define DIR_AVATARS           "avatars"
+#define DIR_AVATARS               "avatars"
 
-#define SHC_PRESENCE          "/presence"
-#define SHC_IQ_AVATAR         "/iq[@type='get']/query[@xmlns='" NS_JABBER_IQ_AVATAR "']"
+#define SHC_PRESENCE              "/presence"
+#define SHC_IQ_AVATAR             "/iq[@type='get']/query[@xmlns='" NS_JABBER_IQ_AVATAR "']"
 
-#define ADR_STREAM_JID        Action::DR_StreamJid
-#define ADR_CONTACT_JID       Action::DR_Parametr1
+#define ADR_STREAM_JID            Action::DR_StreamJid
+#define ADR_CONTACT_JID           Action::DR_Parametr1
 
-#define SVN_SHOW_AVATARS      "showAvatar"
-#define SVN_AVATAR_ALIGNLEFT  "avatarAlignLeft"
-#define SVN_AVATAR_SIZE       "avatarSize"
+#define SVN_SHOW_AVATARS          "showAvatar"
+#define SVN_AVATAR_ALIGNLEFT      "avatarAlignLeft"
+#define SVN_AVATAR_SIZE           "avatarSize"
+#define SVN_CUSTOM_AVATARS        "customAvatars"
+#define SVN_CUSTOM_AVATAR_HASH    SVN_CUSTOM_AVATARS":hash[]"
 
-#define IFN_EMPTY_AVATAR      "logo_32.png"
+#define IFN_EMPTY_AVATAR          "logo_32.png"
+#define IN_AVATAR                 "psi/show_self"
 
-#define AVATAR_IMAGE_TYPE     "jpeg"
-#define AVATAR_IQ_TIMEOUT     30000
+#define AVATAR_IMAGE_TYPE         "jpeg"
+#define AVATAR_IQ_TIMEOUT         30000
 
 Avatars::Avatars()
 {
@@ -92,8 +95,7 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
     if (FRostersModel)
     {
-      connect(FRostersModel,SIGNAL(indexCreated(IRosterIndex *, IRosterIndex *)),
-        SLOT(onRosterIndexCreated(IRosterIndex *, IRosterIndex *)));
+      connect(FRostersModel,SIGNAL(indexInserted(IRosterIndex *)), SLOT(onRosterIndexInserted(IRosterIndex *)));
     }
   }
 
@@ -136,17 +138,9 @@ bool Avatars::initObjects()
   {
     FSettingsPlugin->insertOptionsHolder(this);
   }
+
   FCurOptions = 0;
   onUpdateOptions();
-  return true;
-}
-
-bool Avatars::startPlugin()
-{
-  FAvatarsDir = FSettingsPlugin!=NULL ? FSettingsPlugin->homeDir() : QDir::home();
-  if (!FAvatarsDir.exists(DIR_AVATARS))
-    FAvatarsDir.mkdir(DIR_AVATARS);
-  FAvatarsDir.cd(DIR_AVATARS);
   return true;
 }
 
@@ -178,8 +172,8 @@ bool Avatars::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AS
     if (AStanza.firstElement("x",NS_MUC_USER).isNull())
     {
       Jid contactJid = AStanza.from();
-      QDomElement vcardUpdate = AStanza.firstElement("x",NS_VCARD_UPDATE);
       QDomElement iqUpdate = AStanza.firstElement("x",NS_JABBER_X_AVATAR);
+      QDomElement vcardUpdate = AStanza.firstElement("x",NS_VCARD_UPDATE);
       if (!vcardUpdate.isNull())
       {
         QString hash = vcardUpdate.firstChildElement("photo").text().toLower();
@@ -341,9 +335,11 @@ QString Avatars::saveAvatar(const QImage &AImage, const char *AFormat) const
 
 QString Avatars::avatarHash(const Jid &AContactJid) const
 {
-  QString hash = FVCardAvatars.value(AContactJid.bare());
+  QString hash = FCustomPictures.value(AContactJid.bare());
   if (hash.isEmpty())
     hash = FIqAvatars.value(AContactJid);
+  if (hash.isEmpty())
+    hash = FVCardAvatars.value(AContactJid.bare());
   return hash;
 }
 
@@ -364,6 +360,22 @@ QImage Avatars::avatarImage(const Jid &AContactJid) const
   return FAvatarImages.value(hash,FEmptyAvatar);
 }
 
+void Avatars::setAvatarSize(const QSize &ASize)
+{
+  if (FAvatarSize != ASize)
+  {
+    if (ASize.width() > 96 || ASize.height()>96)
+      FAvatarSize = QSize(96,96);
+    else if (ASize.width()<32 || ASize.height()<32)
+      FAvatarSize = QSize(32,32);
+    else
+      FAvatarSize = ASize;
+    //FEmptyAvatar = QImage(FAvatarSize,QImage::Format_RGB32);
+    FAvatarImages.clear();
+    updateDataHolder();
+  }
+}
+
 bool Avatars::setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat)
 {
   bool published = false;
@@ -379,20 +391,30 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QImage &AImage, const char 
   return published;
 }
 
-void Avatars::setAvatarSize(const QSize &ASize)
+QString Avatars::setCustomPictire(const Jid &AContactJid, const QString &AImageFile)
 {
-  if (FAvatarSize != ASize)
+  if (!AImageFile.isEmpty())
   {
-    if (ASize.width() > 96 || ASize.height()>96)
-      FAvatarSize = QSize(96,96);
-    else if (ASize.width()<32 || ASize.height()<32)
-      FAvatarSize = QSize(32,32);
-    else
-      FAvatarSize = ASize;
-    //FEmptyAvatar = QImage(FAvatarSize,QImage::Format_RGB32);
-    FAvatarImages.clear();
-    updateDataHolder();
+    QFile file(AImageFile);
+    if (file.open(QFile::ReadOnly))
+    {
+      QString hash = saveAvatar(file.readAll());
+      if (FCustomPictures.value(AContactJid)!=hash)
+      {
+        FCustomPictures[AContactJid] = hash;
+        updateDataHolder(AContactJid);
+      }
+      file.close();
+      return hash;
+    }
   }
+  else
+  {
+    FCustomPictures.remove(AContactJid);
+    updateDataHolder(AContactJid);
+    return "";
+  }
+  return QString();
 }
 
 bool Avatars::checkOption(IAvatars::Option AOption) const
@@ -454,17 +476,16 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 
 bool Avatars::updateVCardAvatar(const Jid &AContactJid, const QString &AHash)
 {
+  foreach(Jid streamJid, FStreamAvatars.keys())
+  {
+    if ((AContactJid && streamJid) && FStreamAvatars.value(streamJid)!=AHash)
+    {
+      FStreamAvatars[streamJid] = AHash;
+      updatePresence(streamJid);
+    }
+  }
   if (FVCardAvatars.value(AContactJid) != AHash)
   {
-    foreach(Jid streamJid, FStreamAvatars.keys())
-    {
-      if (AContactJid && streamJid)
-      {
-        FStreamAvatars[streamJid] = AHash;
-        updatePresence(streamJid);
-      }
-    }
-
     FVCardAvatars[AContactJid] = AHash;
     if (AHash.isEmpty() || hasAvatar(AHash))
     {
@@ -531,7 +552,6 @@ void Avatars::onStreamOpened(IXmppStream *AXmppStream)
     FSHIIqAvatarIn.insert(AXmppStream->jid(),handlerId);
   }
   FStreamAvatars.insert(AXmppStream->jid(),QString());
-  FVCardAvatars.insert(AXmppStream->jid().bare(),QString());
 
   if (FVCardPlugin)
   {
@@ -552,18 +572,19 @@ void Avatars::onStreamClosed(IXmppStream *AXmppStream)
 
 void Avatars::onVCardChanged(const Jid &AContactJid)
 {
-  if (FVCardAvatars.contains(AContactJid))
-  {
-    QString hash = saveAvatar(loadAvatarFromVCard(AContactJid));
-    updateVCardAvatar(AContactJid,hash);
-  }
+  QString hash = saveAvatar(loadAvatarFromVCard(AContactJid));
+  updateVCardAvatar(AContactJid,hash);
 }
 
-void Avatars::onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex * /*AParent*/)
+void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-  if (FRostersViewPlugin && checkOption(IAvatars::ShowAvatars) && types().contains(AIndex->type()))
+  if (FRostersViewPlugin && types().contains(AIndex->type()))
   {
-    FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, AIndex);
+    Jid contactJid = AIndex->data(RDR_BareJid).toString();
+    if (!FVCardAvatars.contains(contactJid))
+      onVCardChanged(contactJid);
+    if (checkOption(IAvatars::ShowAvatars))
+      FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, AIndex);
   }
 }
 
@@ -573,20 +594,45 @@ void Avatars::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   {
     Menu *avatar = new Menu(AMenu);
     avatar->setTitle(tr("Avatar"));
+    avatar->setIcon(SYSTEM_ICONSETFILE,IN_AVATAR);
 
+    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
     Action *setup = new Action(avatar);
     setup->setText(tr("Set avatar"));
-    setup->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
+    setup->setData(ADR_STREAM_JID,streamJid.full());
     connect(setup,SIGNAL(triggered(bool)),SLOT(onSetAvatarByAction(bool)));
     avatar->addAction(setup,AG_DEFAULT,false);
 
     Action *clear = new Action(avatar);
     clear->setText(tr("Clear avatar"));
-    clear->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
+    clear->setData(ADR_STREAM_JID,streamJid.full());
+    clear->setEnabled(!FStreamAvatars.value(streamJid).isEmpty());
     connect(clear,SIGNAL(triggered(bool)),SLOT(onClearAvatarByAction(bool)));
     avatar->addAction(clear,AG_DEFAULT,false);
 
     AMenu->addAction(avatar->menuAction(),AG_AVATARS_ROSTER,true);
+  }
+  else if (AIndex->type() == RIT_Contact)
+  {
+    Menu *picture = new Menu(AMenu);
+    picture->setTitle(tr("Custom picture"));
+    picture->setIcon(SYSTEM_ICONSETFILE,IN_AVATAR);
+
+    Jid contactJid = AIndex->data(RDR_Jid).toString();
+    Action *setup = new Action(picture);
+    setup->setText(tr("Set custom picture"));
+    setup->setData(ADR_CONTACT_JID,contactJid.bare());
+    connect(setup,SIGNAL(triggered(bool)),SLOT(onSetAvatarByAction(bool)));
+    picture->addAction(setup,AG_DEFAULT,false);
+
+    Action *clear = new Action(picture);
+    clear->setText(tr("Clear custom picture"));
+    clear->setData(ADR_CONTACT_JID,contactJid.bare());
+    clear->setEnabled(FCustomPictures.contains(contactJid.bare()));
+    connect(clear,SIGNAL(triggered(bool)),SLOT(onClearAvatarByAction(bool)));
+    picture->addAction(clear,AG_DEFAULT,false);
+
+    AMenu->addAction(picture->menuAction(),AG_AVATARS_ROSTER,true);
   }
 }
 
@@ -614,8 +660,16 @@ void Avatars::onSetAvatarByAction(bool)
     QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select avatar image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
     if (!fileName.isEmpty())
     {
-      Jid streamJid = action->data(ADR_STREAM_JID).toString();
-      setAvatar(streamJid,QImage(fileName),AVATAR_IMAGE_TYPE);
+      if (!action->data(ADR_STREAM_JID).isNull())
+      {
+        Jid streamJid = action->data(ADR_STREAM_JID).toString();
+        setAvatar(streamJid,QImage(fileName),AVATAR_IMAGE_TYPE);
+      }
+      else if (!action->data(ADR_CONTACT_JID).isNull())
+      {
+        Jid contactJid = action->data(ADR_CONTACT_JID).toString();
+        setCustomPictire(contactJid,fileName);
+      }
     }
   }
 }
@@ -625,17 +679,45 @@ void Avatars::onClearAvatarByAction(bool)
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
-    Jid streamJid = action->data(ADR_STREAM_JID).toString();
-    setAvatar(streamJid,QImage());
+    if (!action->data(ADR_STREAM_JID).isNull())
+    {
+      Jid streamJid = action->data(ADR_STREAM_JID).toString();
+      setAvatar(streamJid,QImage());
+    }
+    else if (!action->data(ADR_CONTACT_JID).isNull())
+    {
+      Jid contactJid = action->data(ADR_CONTACT_JID).toString();
+      setCustomPictire(contactJid,"");
+    }
   }
 }
 
 void Avatars::onSettingsOpened()
 {
+  FCustomPictures.clear();
+  FIqAvatars.clear();
+  FVCardAvatars.clear();
+  FAvatarImages.clear();
+
+  FAvatarsDir = FSettingsPlugin->homeDir();
+  if (!FAvatarsDir.exists(DIR_AVATARS))
+    FAvatarsDir.mkdir(DIR_AVATARS);
+  FAvatarsDir.cd(DIR_AVATARS);
+
   ISettings *settings = FSettingsPlugin->settingsForPlugin(AVATARTS_UUID);
   setOption(IAvatars::ShowAvatars,settings->value(SVN_SHOW_AVATARS,true).toBool()); 
   setOption(IAvatars::AvatarsAlignLeft,settings->value(SVN_AVATAR_ALIGNLEFT,false).toBool()); 
   setAvatarSize(settings->value(SVN_AVATAR_SIZE,QSize(32,32)).toSize());
+
+  QHash<QString,QVariant> customPictires = settings->values(SVN_CUSTOM_AVATAR_HASH);
+  for (QHash<QString,QVariant>::const_iterator it = customPictires.constBegin(); it != customPictires.constEnd(); it++)
+  {
+    if (hasAvatar(it.value().toString()))
+    {
+      Jid contactJid = it.key();
+      FCustomPictures.insert(contactJid,it.value().toString());
+    }
+  }
 }
 
 void Avatars::onSettingsClosed()
@@ -644,6 +726,13 @@ void Avatars::onSettingsClosed()
   settings->setValue(SVN_SHOW_AVATARS,checkOption(IAvatars::ShowAvatars));
   settings->setValue(SVN_AVATAR_ALIGNLEFT,checkOption(IAvatars::AvatarsAlignLeft));
   settings->setValue(SVN_AVATAR_SIZE,FAvatarSize);
+
+  settings->deleteValue(SVN_CUSTOM_AVATARS);
+  QList<Jid> contacts = FCustomPictures.keys();
+  foreach(Jid contactJid, contacts)
+  {
+    settings->setValueNS(SVN_CUSTOM_AVATAR_HASH,contactJid.full(),FCustomPictures.value(contactJid));
+  }
 }
 
 void Avatars::onOptionsAccepted()

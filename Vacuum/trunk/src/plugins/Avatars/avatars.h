@@ -43,7 +43,7 @@ public:
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
-  virtual bool startPlugin();
+  virtual bool startPlugin() { return true; }
   //IStanzaHandler
   virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept);
   virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
@@ -67,9 +67,10 @@ public:
   //Contacts Avatars
   virtual QString avatarHash(const Jid &AContactJid) const;
   virtual QImage avatarImage(const Jid &AContactJid) const;
-  virtual bool setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat = NULL);
   virtual QSize avatarSize() const { return FAvatarSize; }
   virtual void setAvatarSize(const QSize &ASize);
+  virtual bool setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat = NULL);
+  virtual QString setCustomPictire(const Jid &AContactJid, const QString &AImageFile);
   //Options
   virtual bool checkOption(IAvatars::Option AOption) const;
   virtual void setOption(IAvatars::Option AOption, bool AValue);
@@ -90,7 +91,7 @@ protected slots:
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
   void onVCardChanged(const Jid &AContactJid);
-  void onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
+  void onRosterIndexInserted(IRosterIndex *AIndex);
   void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onSetAvatarByAction(bool);
@@ -116,6 +117,8 @@ private:
   QHash<Jid, int> FSHIIqAvatarIn;
   QHash<Jid, QString> FIqAvatars;
   QHash<QString,Jid> FIqAvatarRequests;
+private:
+  QHash<Jid, QString> FCustomPictures;
 private:
   int FOptions;
   int FCurOptions;

@@ -10,7 +10,7 @@ class IAvatars {
 public:
   enum Option {
     ShowAvatars               = 1,
-    AvatarsAlignLeft          = 2
+    AvatarsAlignLeft          = 2,
   };
 public:
   virtual QObject *instance() =0;
@@ -21,9 +21,10 @@ public:
   virtual QString saveAvatar(const QImage &AImage, const char *AFormat = NULL) const =0;
   virtual QString avatarHash(const Jid &AContactJid) const =0;
   virtual QImage avatarImage(const Jid &AContactJid) const =0;
-  virtual bool setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat = NULL) =0;
   virtual QSize avatarSize() const =0;
   virtual void setAvatarSize(const QSize &ASize) =0;
+  virtual bool setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat = NULL) =0;
+  virtual QString setCustomPictire(const Jid &AContactJid, const QString &AImageFile) =0;
   virtual bool checkOption(IAvatars::Option AOption) const =0;
   virtual void setOption(IAvatars::Option AOption, bool AValue) =0;
 signals:
