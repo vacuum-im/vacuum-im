@@ -454,7 +454,6 @@ bool RostersView::checkOption(IRostersView::Option AOption) const
 void RostersView::setOption(IRostersView::Option AOption, bool AValue)
 {
   AValue ? FOptions |= AOption : FOptions &= ~AOption;
-  FRosterIndexDelegate->setOption(AOption,AValue);
   if (AOption == IRostersView::ShowStatusText)
     updateStatusText();
 }
@@ -464,19 +463,6 @@ QStyleOptionViewItemV2 RostersView::indexOption(const QModelIndex &AIndex) const
   QStyleOptionViewItemV2 option = viewOptions();
   option.initFrom(this);
   option.rect = visualRect(AIndex);
-  
-  //Костыль
-  //if (isRightToLeft())
-  //{
-  //  QModelIndex pIndex = AIndex.parent();
-  //  while (pIndex.isValid())
-  //  {
-  //    option.rect.setLeft(option.rect.left()-indentation());
-  //    option.rect.setRight(option.rect.right()-indentation());
-  //    pIndex = pIndex.parent();
-  //  }
-  //}
-
   option.showDecorationSelected |= selectionBehavior() & SelectRows;
   option.state |= isExpanded(AIndex) ? QStyle::State_Open : QStyle::State_None;
   if (hasFocus() && currentIndex() == AIndex)
@@ -493,7 +479,6 @@ QStyleOptionViewItemV2 RostersView::indexOption(const QModelIndex &AIndex) const
 void RostersView::appendBlinkLabel(int ALabelId)
 {
   FBlinkLabels+=ALabelId;
-  FRosterIndexDelegate->appendBlinkLabel(ALabelId);
   if (!FBlinkTimer.isActive())
     FBlinkTimer.start();
 }
@@ -501,7 +486,6 @@ void RostersView::appendBlinkLabel(int ALabelId)
 void RostersView::removeBlinkLabel(int ALabelId)
 {
   FBlinkLabels-=ALabelId;
-  FRosterIndexDelegate->removeBlinkLabel(ALabelId);
   if (FBlinkLabels.isEmpty() && FBlinkTimer.isActive())
     FBlinkTimer.stop();
 }

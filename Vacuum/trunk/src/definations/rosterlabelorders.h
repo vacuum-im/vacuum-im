@@ -1,7 +1,6 @@
 #ifndef ROSTERLABELORDERS_H
 #define ROSTERLABELORDERS_H
 
-#define RLID_SIZE_HINT                            -4
 #define RLID_FOOTER_TEXT                          -3
 #define RLID_INDICATORBRANCH                      -2
 #define RLID_NULL                                 -1
