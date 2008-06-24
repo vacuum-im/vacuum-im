@@ -317,25 +317,32 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption, cons
   case QVariant::Pixmap:
     {
       QPixmap pixmap = qvariant_cast<QPixmap>(AValue);
-      return pixmap.size();
+      if (!pixmap.isNull())
+        return pixmap.size();
     }
   case QVariant::Image:
     {
       QImage image = qvariant_cast<QImage>(AValue);
-      return image.size();
+      if (!image.isNull())
+        return image.size();
     }
   case QVariant::Icon:
     {
-      return AOption.decorationSize;
+      QIcon icon = qvariant_cast<QIcon>(AValue);
+      if (!icon.isNull())
+        return AOption.decorationSize;
     }
   case QVariant::String:
     {
       QString text = AValue.toString();
-      QFontMetrics fontMetrics(AOption.font, NULL);
-      return fontMetrics.size(AOption.direction | Qt::TextSingleLine,text); 
+      if (!text.isEmpty())
+      {
+        QFontMetrics fontMetrics(AOption.font, NULL);
+        return fontMetrics.size(AOption.direction | Qt::TextSingleLine,text); 
+      }
     }
   }
-  return QSize();
+  return QSize(0,0);
 }
 
 QSize RosterIndexDelegate::setLabelsSize(const QStyleOptionViewItem &AOption, QList<LabelItem> &ALabels) const
