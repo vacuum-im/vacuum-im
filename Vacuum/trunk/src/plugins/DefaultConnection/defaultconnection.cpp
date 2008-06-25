@@ -42,6 +42,8 @@ bool DefaultConnection::isEncrypted() const
 
 void DefaultConnection::connectToHost()
 {
+  FDisconnect = false;
+  FDisconnected = false;
   if (FSocket.state() == QAbstractSocket::UnconnectedState)
   {
     FHost = option(IDefaultConnection::CO_Host).toString();
@@ -54,8 +56,6 @@ void DefaultConnection::connectToHost()
     FProxyUser = option(IDefaultConnection::CO_ProxyUserName).toString();
     FProxyPassword = option(IDefaultConnection::CO_ProxyPassword).toString();
 
-    FDisconnect = false;
-    FDisconnected = false;
     if (FProxyType == 0)
     {
       FProxyState = ProxyReady;
@@ -82,7 +82,7 @@ void DefaultConnection::disconnect()
     FDisconnect = true;
     FSocket.flush();
     FSocket.disconnectFromHost();
-    if (FSocket.state()!=QAbstractSocket::UnconnectedState)
+    if (FSocket.state()!=QSslSocket::UnconnectedState)
       FSocket.waitForDisconnected(DISCONNECT_TIMEOUT);
   }
   if (!FDisconnected)
@@ -326,7 +326,7 @@ void DefaultConnection::onSocketDisconnected()
   FDisconnect = true;
   FDisconnected = true;
   FConnectTimer.stop();
-  FSocket.close();
+  FSocket.disconnectFromHost();
   emit disconnected();
 }
 
