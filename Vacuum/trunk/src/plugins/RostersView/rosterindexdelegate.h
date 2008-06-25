@@ -44,12 +44,9 @@ protected:
   QStyleOptionViewItem indexOptions(const QModelIndex &AIndex, const QStyleOptionViewItem &AOption) const;
   QStyleOptionViewItem indexFooterOptions(const QStyleOptionViewItem &AOption) const;
   QList<LabelItem> itemLabels(const QModelIndex &AIndex) const;
-  QList<LabelItem> itemTextLines(const QModelIndex &AIndex) const;
+  QList<LabelItem> itemFooters(const QModelIndex &AIndex) const;
   QSize variantSize(const QStyleOptionViewItem &AOption, const QVariant &AValue) const;
-  QSize setLabelsSize(const QStyleOptionViewItem &AOption, QList<LabelItem> &ALabels) const;
-  QSize setTextLinesSize(const QStyleOptionViewItem &AOption, QList<LabelItem> &ALines) const;
-  QRect setLabelsRect(const QStyleOptionViewItem &AOption, const QRect &ARect, QList<LabelItem> &ALabels) const;
-  QRect setTextLinesRect(const QStyleOptionViewItem &AOption, const QRect &ARect, QList<LabelItem> &ALines) const;
+  void getLabelsSize(const QStyleOptionViewItem &AOption, QList<LabelItem> &ALabels) const;
   void removeWidth(QRect &ARect, int AWidth, bool AIsLeftToRight) const;
 private:
   static const int spacing = 2;

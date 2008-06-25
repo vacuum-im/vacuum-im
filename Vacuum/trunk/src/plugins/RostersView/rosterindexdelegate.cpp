@@ -2,8 +2,6 @@
 
 #include <QApplication>
 #include <QPainter>
-#include <QTextOption>
-#include <QTextLayout>
 
 #define BRANCH_WIDTH  10
 
@@ -24,23 +22,60 @@ void RosterIndexDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &
 
 QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-  QStyleOptionViewItem options = indexOptions(AIndex,AOption);
+  QStyleOptionViewItem option = indexOptions(AIndex,AOption);
   const int hMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin);
   const int vMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameVMargin);
 
-  QList<LabelItem> labels = itemLabels(AIndex);
-  QSize labelsSize = setLabelsSize(options,labels);
+  QSize leftCenter(0,0);
+  QSize middleTop(0,0);
+  QSize middleBottom(0,0);
+  QSize rightCenter(0,0);
 
   if (AIndex.parent().isValid() && AIndex.model()->hasChildren(AIndex))
   {
-    labelsSize.rwidth() += labelsSize.width() + BRANCH_WIDTH + spacing;
-    labelsSize.rheight() = qMax(labelsSize.height(), BRANCH_WIDTH);
+    leftCenter.rwidth() += BRANCH_WIDTH;
+    leftCenter.rheight() += BRANCH_WIDTH;
   }
 
-  QList<LabelItem> lines = itemTextLines(AIndex);
-  QSize linesSize = setTextLinesSize(options,lines);
+  QList<LabelItem> labels = itemLabels(AIndex);
+  getLabelsSize(option,labels);
+  for (QList<LabelItem>::const_iterator it = labels.constBegin(); it!=labels.constEnd(); it++)
+  {
+    if (it->order >= RLAP_LEFT_CENTER && it->order < RLAP_LEFT_TOP)
+    {
+      leftCenter.rwidth() += it->size.width() + spacing;
+      leftCenter.rheight() = qMax(leftCenter.height(),it->size.height());
+    }
+    else if (it->order >= RLAP_LEFT_TOP && it->order < RLAP_RIGHT_CENTER)
+    {
+      middleTop.rwidth() += it->size.width() + spacing;
+      middleTop.rheight() = qMax(leftCenter.height(),it->size.height());
+    }
+    else if (it->order >= RLAP_RIGHT_CENTER)
+    {
+      rightCenter.rwidth() += it->size.width() + spacing;
+      rightCenter.rheight() = qMax(leftCenter.height(),it->size.height());
+    }
+  }
 
-  return QSize(labelsSize.width()+linesSize.width()+hMargin, qMax(labelsSize.height(),linesSize.height())+vMargin);
+  QList<LabelItem> footers = itemFooters(AIndex);
+  getLabelsSize(option,footers);
+  for (QList<LabelItem>::const_iterator it = footers.constBegin(); it!=footers.constEnd(); it++)
+  {
+    middleBottom.rwidth() = qMax(middleBottom.width(),it->size.width());
+    middleBottom.rheight() += it->size.height();
+  }
+
+  QSize hint(0,0);
+  hint.rwidth() += qMax(middleTop.width(),middleBottom.width());
+  hint.rheight() = qMax(hint.height(),middleTop.height()+middleBottom.height());
+  hint.rwidth() += leftCenter.width();
+  hint.rheight() = qMax(hint.height(),leftCenter.height());
+  hint.rwidth() += rightCenter.width();
+  hint.rheight() = qMax(hint.height(),rightCenter.height());
+  hint += QSize(hMargin,vMargin);
+
+  return hint;
 }
 
 int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
@@ -75,6 +110,8 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
   if (APainter)
   {
     APainter->save();
+    APainter->setClipping(true);
+    APainter->setClipRect(option.rect);
     drawBackground(APainter,option,option.rect,AIndex);
   }
 
@@ -90,29 +127,97 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
   }
 
   QList<LabelItem> labels = itemLabels(AIndex);
-  setLabelsSize(option,labels);
-  paintRect = setLabelsRect(option,paintRect,labels);
-
-  QList<LabelItem> lines = itemTextLines(AIndex);
-  setTextLinesSize(option,lines);
-  paintRect = setTextLinesRect(option,paintRect,lines);
-
-  foreach(LabelItem label, labels)
+  QList<LabelItem> footers = itemFooters(AIndex);
+  getLabelsSize(option,labels);
+  getLabelsSize(option,footers);
+  qSort(labels);
+  qSort(footers);
+  
+  int leftIndex =0;
+  for (; leftIndex<labels.count() && labels.at(leftIndex).order<RLAP_LEFT_TOP; leftIndex++)
   {
-    if (APainter && ((label.flags&IRostersView::LabelBlink)==0 || FShowBlinkLabels))
+    LabelItem &label = labels[leftIndex];
+    Qt::Alignment align = Qt::AlignLeft | Qt::AlignVCenter;
+    label.rect = QStyle::alignedRect(option.direction,align,label.size,paintRect).intersected(paintRect);
+    removeWidth(paintRect,label.rect.width(),AOption.direction==Qt::LeftToRight);
+    if (APainter)
       drawLabelItem(APainter,option,label);
     rectHash.insert(label.id,label.rect);
   }
 
-  foreach(LabelItem line, lines)
+  int rightIndex=labels.count()-1;
+  for (; rightIndex>=0 && labels.at(rightIndex).order>=RLAP_RIGHT_CENTER; rightIndex--)
   {
-    if (APainter && ((line.flags&IRostersView::LabelBlink)==0 || FShowBlinkLabels))
-      drawLabelItem(APainter,line.id==RLID_FOOTER_TEXT ? indexFooterOptions(option) : option,line);
-    rectHash.insert(line.id,line.rect);
+    LabelItem &label = labels[rightIndex];
+    Qt::Alignment align = Qt::AlignRight | Qt::AlignVCenter;
+    label.rect = QStyle::alignedRect(option.direction,align,label.size,paintRect).intersected(paintRect);
+    removeWidth(paintRect,label.rect.width(),AOption.direction!=Qt::LeftToRight);
+    if (APainter)
+      drawLabelItem(APainter,option,label);
+    rectHash.insert(label.id,label.rect);
+  }
+
+  int topLabelsWidth = 0;
+  QSize middleTop(paintRect.width(),0);
+  for (int i=leftIndex; i<=rightIndex; i++)
+  {
+    const LabelItem &label = labels.at(i);
+    middleTop.rheight() = qMax(middleTop.height(),label.size.height());
+    if (label.id !=RLID_DISPLAY)
+      topLabelsWidth += label.size.width()+spacing;
+  }
+
+  QSize middleBottom(paintRect.width(),0);
+  for (int i=0; i<footers.count(); i++)
+  {
+    const LabelItem &label = footers.at(i);
+    middleBottom.rheight() += label.size.height();
+  }
+
+  QSize middle(paintRect.width(),middleTop.height()+middleBottom.height());
+  paintRect = QStyle::alignedRect(option.direction,Qt::AlignLeft|Qt::AlignVCenter,middle,paintRect).intersected(paintRect);
+  QRect topRect = QStyle::alignedRect(option.direction,Qt::AlignLeft|Qt::AlignTop,middleTop,paintRect).intersected(paintRect);
+  QRect bottomRect = QStyle::alignedRect(option.direction,Qt::AlignLeft|Qt::AlignBottom,middleBottom,paintRect).intersected(paintRect);
+
+  for (; leftIndex<=rightIndex && labels.at(leftIndex).order<RLAP_RIGHT_TOP; leftIndex++)
+  {
+    LabelItem &label = labels[leftIndex];
+    if (label.id == RLID_DISPLAY)
+      label.size.rwidth() = qMin(label.size.width(),middleTop.width()-topLabelsWidth);
+    Qt::Alignment align = Qt::AlignVCenter | Qt::AlignLeft;
+    label.rect = QStyle::alignedRect(option.direction,align,label.size,topRect).intersected(topRect);
+    removeWidth(topRect,label.rect.width(),option.direction==Qt::LeftToRight);
+    if (APainter)
+      drawLabelItem(APainter,option,label);
+    rectHash.insert(label.id,label.rect);
+  }
+
+  for (; leftIndex<=rightIndex && labels.at(rightIndex).order>=RLAP_RIGHT_TOP;rightIndex--)
+  {
+    LabelItem &label = labels[rightIndex];
+    if (label.id == RLID_DISPLAY)
+      label.size.rwidth() = qMin(label.size.width(),middleTop.width()-topLabelsWidth);
+    Qt::Alignment align = Qt::AlignVCenter | Qt::AlignRight;
+    label.rect = QStyle::alignedRect(option.direction,align,label.size,topRect).intersected(topRect);
+    removeWidth(topRect,label.rect.width(),option.direction!=Qt::LeftToRight);
+    if (APainter)
+      drawLabelItem(APainter,option,label);
+    rectHash.insert(label.id,label.rect);
+  }
+
+  for (int i=0; i<footers.count(); i++)
+  {
+    LabelItem &label = footers[i];
+    label.rect = QStyle::alignedRect(option.direction,Qt::AlignTop|Qt::AlignLeft,label.size,bottomRect).intersected(bottomRect);
+    bottomRect.setTop(label.rect.bottom());
+    if (APainter)
+      drawLabelItem(APainter,indexFooterOptions(option),label);
+    rectHash.insert(label.id,label.rect);
   }
 
   if (APainter)
   {
+    APainter->setClipRect(option.rect);
     drawFocus(APainter,option,option.rect);
     APainter->restore();
   }
@@ -122,8 +227,10 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
 
 void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionViewItem &AOption, const LabelItem &ALabel) const
 {
-  if (ALabel.rect.isEmpty())
+  if (ALabel.rect.isEmpty() || ALabel.value.isNull() || ((ALabel.flags&IRostersView::LabelBlink)>0 && !FShowBlinkLabels))
     return;
+
+  APainter->setClipRect(ALabel.rect);
 
   switch(ALabel.value.type())
   {
@@ -145,25 +252,23 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
     }
   case QVariant::String:
     {
-      if (APainter)
-      {
-        QPalette::ColorGroup cg = AOption.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
-        if (cg == QPalette::Normal && !(AOption.state & QStyle::State_Active))
-          cg = QPalette::Inactive;
+      QPalette::ColorGroup cg = AOption.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
+      if (cg == QPalette::Normal && !(AOption.state & QStyle::State_Active))
+        cg = QPalette::Inactive;
 
-        if (AOption.state & QStyle::State_Selected)
-        {
-          APainter->fillRect(ALabel.rect, AOption.palette.brush(cg, QPalette::Highlight));
-          APainter->setPen(AOption.palette.color(cg, QPalette::HighlightedText));
-        } 
-        else 
-        {
-          APainter->setPen(AOption.palette.color(cg, QPalette::Text));
-        }
-        APainter->setFont(AOption.font);
+      if (AOption.state & QStyle::State_Selected)
+      {
+        APainter->fillRect(ALabel.rect, AOption.palette.brush(cg, QPalette::Highlight));
+        APainter->setPen(AOption.palette.color(cg, QPalette::HighlightedText));
+      } 
+      else 
+      {
+        APainter->setPen(AOption.palette.color(cg, QPalette::Text));
       }
-      QString text = ALabel.value.toString();
+      APainter->setFont(AOption.font);
       int flags = AOption.direction | Qt::TextSingleLine;
+      QFontMetrics fontMetrics(AOption.font,APainter->device());
+      QString text = fontMetrics.elidedText(ALabel.value.toString(),Qt::ElideRight,ALabel.rect.width(),flags);
       APainter->drawText(ALabel.rect,flags,text);
     }
   }
@@ -172,7 +277,8 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
 void RosterIndexDelegate::drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption,  
                                          const QRect &ARect, const QModelIndex &AIndex) const
 {
-  if (AOption.showDecorationSelected && (AOption.state & QStyle::State_Selected)) {
+  if (AOption.showDecorationSelected && (AOption.state & QStyle::State_Selected)) 
+  {
     QPalette::ColorGroup cg = AOption.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
     if (cg == QPalette::Normal && !(AOption.state & QStyle::State_Active))
       cg = QPalette::Inactive;
@@ -274,19 +380,26 @@ QList<LabelItem> RosterIndexDelegate::itemLabels(const QModelIndex &AIndex) cons
     labels.append(label);
   }
 
-  LabelItem decorLabel;
-  decorLabel.id = RLID_DISPLAY;
-  decorLabel.order = RLO_DECORATION;
-  decorLabel.flags = 0;
-  decorLabel.value = AIndex.data(Qt::DecorationRole);
-  labels.append(decorLabel);
+  LabelItem decoration;
+  decoration.id = RLID_DECORATION;
+  decoration.order = RLO_DECORATION;
+  decoration.flags = 0;
+  decoration.value = AIndex.data(Qt::DecorationRole);
+  labels.append(decoration);
+
+  LabelItem display;
+  display.id = RLID_DISPLAY;
+  display.order = RLO_DISPLAY;
+  display.flags = 0;
+  display.value = AIndex.data(Qt::DisplayRole);
+  labels.append(display);
 
   return labels;
 }
 
-QList<LabelItem> RosterIndexDelegate::itemTextLines(const QModelIndex &AIndex) const
+QList<LabelItem> RosterIndexDelegate::itemFooters(const QModelIndex &AIndex) const
 {
-  QList<LabelItem> lines;
+  QList<LabelItem> footers;
   QMap<QString,QVariant> footerMap = AIndex.data(RDR_FooterText).toMap();
   QMap<QString,QVariant>::const_iterator fit = footerMap.constBegin();
   while (fit != footerMap.constEnd())
@@ -296,18 +409,10 @@ QList<LabelItem> RosterIndexDelegate::itemTextLines(const QModelIndex &AIndex) c
     footer.order = fit.key().toInt();
     footer.flags = 0;
     footer.value = fit.value().type()==QVariant::Int ? AIndex.data(fit.value().toInt()) : fit.value();
-    lines.append(footer);
+    footers.append(footer);
     fit++;
   }
-
-  LabelItem display;
-  display.id = RLID_DISPLAY;
-  display.order = RLO_DISPLAY;
-  display.flags = 0;
-  display.value = AIndex.data(Qt::DisplayRole);
-  lines.append(display);
-
-  return lines;
+  return footers;
 }
 
 QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption, const QVariant &AValue) const
@@ -337,7 +442,7 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption, cons
       QString text = AValue.toString();
       if (!text.isEmpty())
       {
-        QFontMetrics fontMetrics(AOption.font, NULL);
+        QFontMetrics fontMetrics(AOption.font);
         return fontMetrics.size(AOption.direction | Qt::TextSingleLine,text); 
       }
     }
@@ -345,70 +450,12 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption, cons
   return QSize(0,0);
 }
 
-QSize RosterIndexDelegate::setLabelsSize(const QStyleOptionViewItem &AOption, QList<LabelItem> &ALabels) const
+void RosterIndexDelegate::getLabelsSize(const QStyleOptionViewItem &AOption, QList<LabelItem> &ALabels) const
 {
-  QSize size(0,0);
   for (QList<LabelItem>::iterator it = ALabels.begin(); it != ALabels.end(); it++)
   {
-    it->size = variantSize(AOption,it->value);
-    size.rwidth() += it->size.width() + spacing;
-    size.rheight() = qMax(size.height(),it->size.height());
-  }
-  return size;
-}
-
-QSize RosterIndexDelegate::setTextLinesSize(const QStyleOptionViewItem &AOption, QList<LabelItem> &ALines) const
-{
-  QSize size(0,0);
-  for (QList<LabelItem>::iterator it = ALines.begin(); it != ALines.end(); it++)
-  {
     it->size = variantSize(it->id==RLID_FOOTER_TEXT ? indexFooterOptions(AOption) : AOption, it->value);
-    size.rwidth() = qMax(size.width(),it->size.width());
-    size.rheight() += it->size.height();
   }
-  return size;
-}
-
-QRect RosterIndexDelegate::setLabelsRect(const QStyleOptionViewItem &AOption, const QRect &ARect, QList<LabelItem> &ALabels) const
-{
-  qSort(ALabels);
-  QRect paintRect = ARect;
-  
-  for (int i =0; i<ALabels.count() && ALabels.at(i).order<RLO_RIGHTALIGN; i++)
-  {
-    LabelItem &label = ALabels[i];
-    label.rect = QStyle::alignedRect(AOption.direction,Qt::AlignVCenter|Qt::AlignLeft,label.size,paintRect).intersected(paintRect);
-    removeWidth(paintRect,label.rect.width(),AOption.direction==Qt::LeftToRight);
-  }
-  
-  for (int i=ALabels.count()-1; i>=0 && ALabels.at(i).order>=RLO_RIGHTALIGN; i--)
-  {
-    LabelItem &label = ALabels[i];
-    label.rect = QStyle::alignedRect(AOption.direction,Qt::AlignVCenter|Qt::AlignRight,label.size,paintRect).intersected(paintRect);
-    removeWidth(paintRect,label.rect.width(),AOption.direction!=Qt::LeftToRight);
-  }
-
-  return paintRect;
-}
-
-QRect RosterIndexDelegate::setTextLinesRect(const QStyleOptionViewItem &AOption, const QRect &ARect, QList<LabelItem> &ALines) const
-{
-  qSort(ALines);
-  QSize textSize(0,0);
-  for (QList<LabelItem>::const_iterator it = ALines.constBegin(); it != ALines.constEnd(); it++)
-  {
-    textSize.rheight() += it->size.height();
-    textSize.rwidth() = qMax(textSize.width(),it->size.width());
-  }
-
-  QRect paintRect = QStyle::alignedRect(AOption.direction,Qt::AlignVCenter|Qt::AlignLeft,textSize,ARect).intersected(ARect);
-  for (QList<LabelItem>::iterator it = ALines.begin(); it != ALines.end() && !paintRect.isEmpty(); it++)
-  {
-    it->rect = QStyle::alignedRect(AOption.direction,Qt::AlignTop | Qt::AlignLeft,it->size,paintRect).intersected(paintRect);
-    paintRect.setTop(it->rect.bottom());
-  }
-
-  return paintRect;
 }
 
 void RosterIndexDelegate::removeWidth(QRect &ARect,int AWidth, bool AIsLeftToRight) const
