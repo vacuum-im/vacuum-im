@@ -33,6 +33,7 @@ StatusChanger::StatusChanger()
   FMainMenu = NULL;
   FSettingStatusToPresence = NULL;
   FAccountManager = NULL;
+  FStatusIcons = NULL;
 }
 
 StatusChanger::~StatusChanger()
@@ -743,7 +744,8 @@ void StatusChanger::updateMainMenu()
   FMainMenu->setIcon(mStatusIcon);
   FMainMenu->setTitle(mStatusName);
 
-  FTrayManager->setMainIcon(mStatusIcon);
+  if (FTrayManager)
+    FTrayManager->setMainIcon(mStatusIcon);
 }
 
 void StatusChanger::updateTrayToolTip()
@@ -758,7 +760,8 @@ void StatusChanger::updateTrayToolTip()
     trayToolTip += tr("%1 - %2").arg(account->name()).arg(it.key()->status());
     it++;
   }
-  FTrayManager->setMainToolTip(trayToolTip);
+  if (FTrayManager)
+    FTrayManager->setMainToolTip(trayToolTip);
 }
 
 void StatusChanger::updateMainStatusActions()

@@ -190,7 +190,8 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
       FStreamsRoot.insert(AStreamJid,streamIndex);
       insertRosterIndex(streamIndex,FRootIndex);
       emit streamAdded(AStreamJid);
-      FRosterPlugin->loadRosterItems(AStreamJid);
+      if (FRosterPlugin)
+        FRosterPlugin->loadRosterItems(AStreamJid);
     }
   }
   return streamIndex;

@@ -32,7 +32,10 @@ bool DataForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 
 bool DataForms::initObjects()
 {
-  registerDiscoFeatures();
+  if (FDiscovery)
+  {
+    registerDiscoFeatures();
+  }
   return true;
 }
 

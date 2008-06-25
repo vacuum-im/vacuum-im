@@ -55,6 +55,7 @@ void Avatars::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = tr("Avatars manager"); 
   APluginInfo->uid = AVATARTS_UUID;
   APluginInfo->version = "0.1";
+  APluginInfo->dependences.append(VCARD_UUID);
 }
 
 bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -737,7 +738,8 @@ void Avatars::onSettingsClosed()
 
 void Avatars::onOptionsAccepted()
 {
-  FOptionsWidget->applyOptions();
+  if (FOptionsWidget)
+    FOptionsWidget->applyOptions();
   emit optionsAccepted();
 }
 

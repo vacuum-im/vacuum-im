@@ -562,7 +562,8 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
 void Gateways::onPresenceOpened(IPresence *APresence)
 {
-  FPrivateStorage->loadData(APresence->streamJid(),PST_GATEWAYS_SERVICES,PSN_GATEWAYS_KEEP);
+  if (FPrivateStorage)
+    FPrivateStorage->loadData(APresence->streamJid(),PST_GATEWAYS_SERVICES,PSN_GATEWAYS_KEEP);
   FKeepTimer.start(KEEP_INTERVAL);
 }
 
