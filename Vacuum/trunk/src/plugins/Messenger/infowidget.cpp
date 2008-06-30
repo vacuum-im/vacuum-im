@@ -17,6 +17,7 @@ InfoWidget::InfoWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   FRoster = NULL;
   FPresence = NULL;
   FClientInfo = NULL;
+  FAvatars = NULL;
 
   FMessenger = AMessenger;
   FStreamJid = AStreamJid;
@@ -61,7 +62,8 @@ void InfoWidget::autoUpdateField(InfoField AField)
     };
   case ContactAvatar:
     {
-      setField(ContactAvatar,QVariant());
+      QImage avatar = FAvatars!=NULL ? FAvatars->avatarImage(FContactJid) : QImage();
+      setField(ContactAvatar,avatar);
       break;
     };
   case ContactName:
@@ -135,17 +137,12 @@ void InfoWidget::setField(InfoField AField, const QVariant &AValue)
     };
   case ContactAvatar:
     {
-      QByteArray data = AValue.toByteArray();
-      if (!data.isEmpty())
-      {
-        QDataStream dataStream(data);
-        QMovie *oldMovie = ui.lblAvatar->movie();
-        QMovie *movie = new QMovie(dataStream.device(),QByteArray(),ui.lblAvatar);
-        movie->start();
-        ui.lblAvatar->setMovie(movie);
-        delete oldMovie;
-      }
-      ui.lblAvatar->setVisible(isFieldVisible(ContactAvatar) && !data.isEmpty());
+      QImage avatar = qvariant_cast<QImage>(AValue);
+      if (!avatar.isNull())
+        ui.lblAvatar->setPixmap(QPixmap::fromImage(avatar));
+      else
+        ui.lblAvatar->clear();
+      ui.lblAvatar->setVisible(isFieldVisible(ContactAvatar) && !avatar.isNull());
       break;
     };
   case ContactName:
@@ -302,7 +299,19 @@ void InfoWidget::initialize()
   {
     FClientInfo = qobject_cast<IClientInfo *>(plugin->instance());
     if (FClientInfo)
+    {
       connect(FClientInfo->instance(),SIGNAL(softwareInfoChanged(const Jid &)),SLOT(onSoftwareInfoChanged(const Jid &)));
+    }
+  }
+
+  plugin = FMessenger->pluginManager()->getPlugins("IAvatars").value(0,NULL);
+  if (plugin)
+  {
+    FAvatars = qobject_cast<IAvatars *>(plugin->instance());
+    if (FAvatars)
+    {
+      connect(FAvatars->instance(),SIGNAL(avatarChanged(const Jid &)),SLOT(onAvatarChanged(const Jid &)));
+    }
   }
 }
 
@@ -360,3 +369,8 @@ void InfoWidget::onSoftwareInfoChanged(const Jid &AContactJid)
     autoUpdateField(ContactClient);
 }
 
+void InfoWidget::onAvatarChanged(const Jid &AContactJid)
+{
+  if (isFiledAutoUpdated(ContactAvatar) && (FContactJid && AContactJid))
+    autoUpdateField(ContactAvatar);
+}

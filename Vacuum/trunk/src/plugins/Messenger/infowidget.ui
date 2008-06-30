@@ -6,23 +6,14 @@
     <x>0</x>
     <y>0</y>
     <width>441</width>
-    <height>94</height>
+    <height>96</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>InfoWidget</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="leftMargin" >
-    <number>2</number>
-   </property>
-   <property name="topMargin" >
-    <number>2</number>
-   </property>
-   <property name="rightMargin" >
-    <number>2</number>
-   </property>
-   <property name="bottomMargin" >
+   <property name="margin" >
     <number>2</number>
    </property>
    <item>
@@ -31,23 +22,11 @@
       <string>Contact info</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="leftMargin" >
-       <number>4</number>
-      </property>
-      <property name="topMargin" >
-       <number>4</number>
-      </property>
-      <property name="rightMargin" >
-       <number>4</number>
-      </property>
-      <property name="bottomMargin" >
+      <property name="margin" >
        <number>4</number>
       </property>
       <item>
        <widget class="QLabel" name="lblAvatar" >
-        <property name="frameShape" >
-         <enum>QFrame::Box</enum>
-        </property>
         <property name="text" >
          <string/>
         </property>
@@ -68,16 +47,7 @@
          <property name="spacing" >
           <number>4</number>
          </property>
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
+         <property name="margin" >
           <number>0</number>
          </property>
          <item>
@@ -85,16 +55,7 @@
            <item>
             <widget class="QWidget" native="1" name="wdtName" >
              <layout class="QHBoxLayout" >
-              <property name="leftMargin" >
-               <number>0</number>
-              </property>
-              <property name="topMargin" >
-               <number>0</number>
-              </property>
-              <property name="rightMargin" >
-               <number>0</number>
-              </property>
-              <property name="bottomMargin" >
+              <property name="margin" >
                <number>0</number>
               </property>
               <item>
@@ -138,16 +99,7 @@
            <item>
             <widget class="QWidget" native="1" name="wdtAccount" >
              <layout class="QHBoxLayout" >
-              <property name="leftMargin" >
-               <number>0</number>
-              </property>
-              <property name="topMargin" >
-               <number>0</number>
-              </property>
-              <property name="rightMargin" >
-               <number>0</number>
-              </property>
-              <property name="bottomMargin" >
+              <property name="margin" >
                <number>0</number>
               </property>
               <item>
@@ -187,16 +139,7 @@
          <item>
           <widget class="QWidget" native="1" name="wdtStatus" >
            <layout class="QHBoxLayout" >
-            <property name="leftMargin" >
-             <number>0</number>
-            </property>
-            <property name="topMargin" >
-             <number>0</number>
-            </property>
-            <property name="rightMargin" >
-             <number>0</number>
-            </property>
-            <property name="bottomMargin" >
+            <property name="margin" >
              <number>0</number>
             </property>
             <item>
@@ -242,16 +185,7 @@
            <item>
             <widget class="QWidget" native="1" name="wdtEmail" >
              <layout class="QHBoxLayout" >
-              <property name="leftMargin" >
-               <number>0</number>
-              </property>
-              <property name="topMargin" >
-               <number>0</number>
-              </property>
-              <property name="rightMargin" >
-               <number>0</number>
-              </property>
-              <property name="bottomMargin" >
+              <property name="margin" >
                <number>0</number>
               </property>
               <item>
@@ -288,7 +222,7 @@
                  <number>1</number>
                 </property>
                 <property name="textInteractionFlags" >
-                 <set>Qt::LinksAccessibleByMouse|Qt::NoTextInteraction|Qt::TextSelectableByMouse</set>
+                 <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
@@ -298,16 +232,7 @@
            <item>
             <widget class="QWidget" native="1" name="wdtClient" >
              <layout class="QHBoxLayout" >
-              <property name="leftMargin" >
-               <number>0</number>
-              </property>
-              <property name="topMargin" >
-               <number>0</number>
-              </property>
-              <property name="rightMargin" >
-               <number>0</number>
-              </property>
-              <property name="bottomMargin" >
+              <property name="margin" >
                <number>0</number>
               </property>
               <item>

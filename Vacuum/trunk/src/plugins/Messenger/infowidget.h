@@ -8,6 +8,7 @@
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/iclientinfo.h"
+#include "../../interfaces/iavatars.h"
 #include "ui_infowidget.h"
 
 class InfoWidget : 
@@ -44,6 +45,7 @@ protected slots:
   void onRosterItemReceived(const IRosterItem &ARosterItem);
   void onPresenceReceived(const IPresenceItem &APresenceItem);
   void onSoftwareInfoChanged(const Jid &AContactJid);
+  void onAvatarChanged(const Jid &AContactJid);
 private:
   Ui::InfoWidgetClass ui;
 private:
@@ -52,6 +54,7 @@ private:
   IRoster *FRoster;
   IPresence *FPresence;
   IClientInfo *FClientInfo;
+  IAvatars *FAvatars;
 private:
   int FAutoFields;
   int FVisibleFields;

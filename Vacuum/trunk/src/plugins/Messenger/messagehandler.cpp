@@ -157,7 +157,7 @@ IMessageWindow *MessageHandler::getMessageWindow(const Jid &AStreamJid, const Ji
       connect(window,SIGNAL(showChatWindow()),SLOT(onMessageWindowShowChat()));
       connect(window,SIGNAL(windowDestroyed()),SLOT(onMessageWindowDestroyed()));
       FMessageWindows.append(window);
-      window->infoWidget()->setFieldVisible(IInfoWidget::ContactStatus,false);
+      //window->infoWidget()->setFieldVisible(IInfoWidget::ContactStatus,false);
       window->infoWidget()->autoUpdateFields();
       loadActiveNormalMessages(window);
       showNextNormalMessage(window);
