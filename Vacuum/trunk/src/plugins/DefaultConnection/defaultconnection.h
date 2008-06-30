@@ -72,6 +72,7 @@ private:
     ProxyConnectResult,
     ProxyReady
   };
+  bool FConnected;
   bool FDisconnect;
   bool FDisconnected;
   ProxyState FProxyState;

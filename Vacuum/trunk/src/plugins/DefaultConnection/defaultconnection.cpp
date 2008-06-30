@@ -8,6 +8,7 @@
 DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent) : QObject(AParent)
 {
   FPlugin = APlugin;
+  FConnected = false;
   FDisconnect = true; 
   FDisconnected = true;
   FProxyState = ProxyUnconnected;
@@ -80,9 +81,10 @@ void DefaultConnection::disconnect()
   if (!FDisconnect)
   {
     FDisconnect = true;
-    FSocket.flush();
+    if (FConnected)
+      FSocket.flush();
     FSocket.disconnectFromHost();
-    if (FSocket.state()!=QSslSocket::UnconnectedState)
+    if (FConnected && FSocket.state()!=QSslSocket::UnconnectedState)
       FSocket.waitForDisconnected(DISCONNECT_TIMEOUT);
   }
   if (!FDisconnected)
@@ -286,6 +288,7 @@ void DefaultConnection::connectionError(const QString &AError)
 
 void DefaultConnection::onSocketConnected()
 {
+  FConnected = true;
   if (FProxyState != ProxyReady)
     proxyConnection();
   else if (!FUseSSL)
@@ -323,6 +326,7 @@ void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 
 void DefaultConnection::onSocketDisconnected()
 {
+  FConnected = false;
   FDisconnect = true;
   FDisconnected = true;
   FConnectTimer.stop();
