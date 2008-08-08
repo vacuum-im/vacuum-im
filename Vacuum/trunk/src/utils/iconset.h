@@ -60,8 +60,8 @@ public:
   ~Iconset();
 
   bool isValid() const;
-  const QString &fileName() const;
-  bool openFile(const QString &AFileName);
+  const QString &iconsetFile() const;
+  bool openIconset(const QString &AFileName);
   QByteArray fileData(const QString &AFileName) const;
   const QDomDocument &iconDef() const;
   const IconsetInfo &info() const;

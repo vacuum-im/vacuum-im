@@ -25,7 +25,7 @@ SessionNegotiation::SessionNegotiation()
   FStanzaProcessor = NULL;
   FDiscovery = NULL;
   FPresencePlugin = NULL;
-  FTrayManager = NULL;
+  FNotifications = NULL;
 }
 
 SessionNegotiation::~SessionNegotiation()
@@ -78,14 +78,13 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*
     }
   }
 
-  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
   if (plugin) 
   {
-    FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
-    if (FTrayManager)
+    FNotifications = qobject_cast<INotifications *>(plugin->instance());
+    if (FNotifications)
     {
-      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int, QSystemTrayIcon::ActivationReason)),
-        SLOT(onTrayNotifyActivated(int, QSystemTrayIcon::ActivationReason)));
+      connect(FNotifications->instance(),SIGNAL(notificationActivated(int)), SLOT(onNotificationActivated(int)));
     }
   }
 
@@ -787,10 +786,17 @@ void SessionNegotiation::showSessionDialog(const IStanzaSession &ASession, const
     else
       dialog->setForm(ARequest);
 
-    if (FTrayManager && !dialog->instance()->isVisible())
+    if (FNotifications && !dialog->instance()->isVisible())
     {
-      QIcon icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SESSION);
-      int notifyId = FTrayManager->appendNotify(icon,tr("Settings for session with %1").arg(ASession.contactJid.full()),true);
+      INotification notify;
+      notify.kinds = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+      notify.data.insert(NDR_ICON,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SESSION));
+      notify.data.insert(NDR_TOOLTIP,tr("Settings for session with %1").arg(ASession.contactJid.full()));
+      notify.data.insert(NDR_WINDOW_CAPTION,tr("Session negotiation"));
+      notify.data.insert(NDR_WINDOW_TITLE,FNotifications->contactName(ASession.streamJid,ASession.contactJid));
+      notify.data.insert(NDR_WINDOW_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
+      notify.data.insert(NDR_WINDOW_TEXT, notify.data.value(NDR_TOOLTIP));
+      int notifyId = FNotifications->appendNotification(notify);
       FDialogByNotify.insert(notifyId,dialog);
     }
     else
@@ -804,11 +810,11 @@ void SessionNegotiation::closeSessionDialog(const IStanzaSession &ASession)
   {
     IDataDialogWidget *dialog = FDialogs[ASession.streamJid].take(ASession.contactJid);
     dialog->instance()->deleteLater();
-    if (FTrayManager)
+    if (FNotifications)
     {
       int notifyId = FDialogByNotify.key(dialog);
       FDialogByNotify.remove(notifyId);
-      FTrayManager->removeNotify(notifyId);
+      FNotifications->removeNotification(notifyId);
     }
   }
 }
@@ -965,14 +971,14 @@ void SessionNegotiation::onStreamClosed(IXmppStream *AXmppStream)
   FSessions.remove(AXmppStream->jid());
 }
 
-void SessionNegotiation::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
+void SessionNegotiation::onNotificationActivated(int ANotifyId)
 {
-  if (AReason == QSystemTrayIcon::DoubleClick)
+  if (FDialogByNotify.contains(ANotifyId))
   {
     IDataDialogWidget *dialog = FDialogByNotify.take(ANotifyId);
     if (dialog)
       dialog->instance()->show();
-    FTrayManager->removeNotify(ANotifyId);
+    FNotifications->removeNotification(ANotifyId);
   }
 }
 

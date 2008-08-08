@@ -1,4 +1,3 @@
-#include <QtDebug>
 #include "iconset.h"
 
 Iconset::Iconset()
@@ -9,7 +8,7 @@ Iconset::Iconset()
 Iconset::Iconset(const QString &AFileName)
 {
   d = new IconsetData;
-  openFile(AFileName);
+  openIconset(AFileName);
 }
 
 Iconset::~Iconset()
@@ -22,12 +21,12 @@ bool Iconset::isValid() const
   return !d->FIconFiles.isEmpty(); 
 }
 
-const QString &Iconset::fileName() const 
+const QString &Iconset::iconsetFile() const 
 { 
   return zipFileName(); 
 }
 
-bool Iconset::openFile(const QString &AFileName)
+bool Iconset::openIconset(const QString &AFileName)
 {
   UnzipFile::openFile(AFileName);
   return loadIconset();
@@ -106,29 +105,29 @@ bool Iconset::loadIconset()
   {
     if (d->FIconDef.setContent(fileData("icondef.xml"),true))
     {
-      QDomElement elem = d->FIconDef.firstChildElement("icondef").firstChildElement("meta");
-      if (!elem.isNull())
+      QDomElement metaElem = d->FIconDef.firstChildElement("icondef").firstChildElement("meta");
+      d->FInfo.name = metaElem.firstChildElement("name").text();
+      d->FInfo.version = metaElem.firstChildElement("version").text();
+      d->FInfo.description = metaElem.firstChildElement("description").text();
+      d->FInfo.homePage = metaElem.firstChildElement("home").text();
+      //d->FInfo.creation = QDateTime::fromString(metaElem.firstChildElement("creation").text());
+      d->FInfo.authors.clear();
+      QDomElement authorElem = metaElem.firstChildElement("author");
+      while (!authorElem.isNull())
       {
-        d->FInfo.name = elem.firstChildElement("name").text();
-        d->FInfo.version = elem.firstChildElement("version").text();
-        d->FInfo.description = elem.firstChildElement("description").text();
-        d->FInfo.homePage = elem.firstChildElement("home").text();
-        //d->FInfo.creation = QDateTime::fromString(elem.firstChildElement("creation").text());
-        for (QDomElement aElem = elem.firstChildElement("author"); !aElem.isNull(); aElem = aElem.nextSiblingElement("author"))
-        {
-          IconsetInfo::Author author;
-          author.name = aElem.text();
-          author.email = aElem.attribute("email");
-          author.jid = aElem.attribute("jid");
-          author.homePage = aElem.attribute("www");
-          d->FInfo.authors.append(author);
-        }
+        IconsetInfo::Author author;
+        author.name = authorElem.text();
+        author.email = authorElem.attribute("email");
+        author.jid = authorElem.attribute("jid");
+        author.homePage = authorElem.attribute("www");
+        d->FInfo.authors.append(author);
+        authorElem = authorElem.nextSiblingElement("author");
       }
 
-      elem = d->FIconDef.firstChildElement("icondef").firstChildElement("icon");
-      while (!elem.isNull())
+      QDomElement iconElem = d->FIconDef.firstChildElement("icondef").firstChildElement("icon");
+      while (!iconElem.isNull())
       {
-        QDomElement objElem = elem.firstChildElement("object");
+        QDomElement objElem = iconElem.firstChildElement("object");
         if (!objElem.isNull())
         {
           QString mime = objElem.attribute("mime");
@@ -142,7 +141,7 @@ bool Iconset::loadIconset()
               QIcon icon(pixmap);
               d->FIconFiles.append(file);
               d->FIconByFile.insert(file,icon);
-              QDomElement tagElem = elem.firstChildElement();
+              QDomElement tagElem = iconElem.firstChildElement();
               while (!tagElem.isNull())
               {
                 QString tagName = tagElem.tagName();
@@ -166,7 +165,7 @@ bool Iconset::loadIconset()
             }
           }
         }
-        elem = elem.nextSiblingElement("icon");
+        iconElem = iconElem.nextSiblingElement("icon");
       }
     }
   }

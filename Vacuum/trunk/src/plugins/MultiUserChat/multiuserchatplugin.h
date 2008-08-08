@@ -48,7 +48,7 @@ public:
   virtual bool openWindow(IRosterIndex * /*AIndex*/) { return false; }
   virtual bool openWindow(const Jid &/*AStreamJid*/, const Jid &/*AContactJid*/, Message::MessageType /*AType*/) { return false; }
   virtual bool checkMessage(const Message &AMessage);
-  virtual bool notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags);
+  virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
   virtual void receiveMessage(int AMessageId);
   virtual void showMessage(int AMessageId);
   //IMultiUserChatPlugin

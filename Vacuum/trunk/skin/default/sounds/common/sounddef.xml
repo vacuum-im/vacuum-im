@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sounddef>
+  <sound>
+    <x xmlns='name'>default</x>
+    <object mime='sound/wav'>default.wav</object>
+  </sound>
+  <sound>
+    <x xmlns='name'>message</x>
+    <object mime='sound/wav'>message.wav</object>
+  </sound>
+  <sound>
+    <x xmlns='name'>online</x>
+    <object mime='sound/wav'>online.wav</object>
+  </sound>
+  <sound>
+    <x xmlns='name'>offline</x>
+    <object mime='sound/wav'>offline.wav</object>
+  </sound>
+</sounddef>

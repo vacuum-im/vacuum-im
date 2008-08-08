@@ -137,7 +137,7 @@ QWidget *StatusIcons::optionsWidget(const QString &ANode, int &AOrder)
 
 void StatusIcons::setDefaultIconFile(const QString &AIconFile)
 {
-  if (FDefaultIconFile != AIconFile && Skin::getIconset(AIconFile).isValid())
+  if (FDefaultIconFile != AIconFile)
   {
     if (FStatusIconset)
       disconnect(FStatusIconset,SIGNAL(iconsetChanged()),this,SLOT(onStatusIconsetChanged()));

@@ -4,6 +4,8 @@
 #include "../../definations/namespaces.h"
 #include "../../definations/sessionnegotiatororder.h"
 #include "../../definations/discofeatureorder.h"
+#include "../../definations/rosterlabelorders.h"
+#include "../../definations/notificationdataroles.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isessionnegotiation.h"
 #include "../../interfaces/istanzaprocessor.h"
@@ -11,7 +13,7 @@
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/ipresence.h"
-#include "../../interfaces/itraymanager.h"
+#include "../../interfaces/inotifications.h"
 
 class SessionNegotiation : 
   public QObject,
@@ -85,7 +87,7 @@ protected slots:
   void onPresenceReceived(IPresence *APresence, const IPresenceItem &AItem);
   void onStreamAboutToClose(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
-  void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
+  void onNotificationActivated(int ANotifyId);
   void onSessionDialogAccepted();
   void onSessionDialogDestroyed(IDataDialogWidget *ADialog);
   void onSessionActionTriggered(bool);
@@ -94,7 +96,7 @@ private:
   IStanzaProcessor *FStanzaProcessor;
   IServiceDiscovery *FDiscovery;
   IPresencePlugin *FPresencePlugin;
-  ITrayManager *FTrayManager;
+  INotifications *FNotifications;
 private:
   QHash<Jid,int> FSHISession;
   QMultiMap<int,ISessionNegotiator *> FNegotiators;

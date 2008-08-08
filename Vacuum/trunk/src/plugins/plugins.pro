@@ -36,4 +36,5 @@ SUBDIRS = settings \
           messagearchiver \
           privacylists \
           sessionnegotiation \
-          avatars
+          avatars \
+          notifications

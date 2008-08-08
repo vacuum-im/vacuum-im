@@ -36,7 +36,7 @@ Messenger::Messenger()
   FRostersViewPlugin = NULL;
   FRostersModel = NULL;
   FRostersModel = NULL;
-  FTrayManager = NULL;
+  FNotifications = NULL;
   FSettingsPlugin = NULL;
 
   FMessengerOptions = NULL;
@@ -89,16 +89,22 @@ bool Messenger::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin) 
+  {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+    if (FRostersViewPlugin)
+    {
+      connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
+        SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    }
+  }
 
-  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
   if (plugin) 
   {
-    FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
-    if (FTrayManager)
+    FNotifications = qobject_cast<INotifications *>(plugin->instance());
+    if (FNotifications)
     {
-      connect(FTrayManager->instance(),SIGNAL(notifyActivated(int,QSystemTrayIcon::ActivationReason)),
-        SLOT(onTrayNotifyActivated(int,QSystemTrayIcon::ActivationReason)));
+      connect(FNotifications->instance(),SIGNAL(notificationActivated(int)), SLOT(onNotificationActivated(int)));
     }
   }
 
@@ -129,8 +135,6 @@ bool Messenger::initObjects()
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FRostersView->insertClickHooker(RCHO_MESSENGER,this);
-    connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
-    connect(FRostersView,SIGNAL(notifyActivated(IRosterIndex *, int)), SLOT(onRosterNotifyActivated(IRosterIndex *, int)));
   }
 
   if (FSettingsPlugin)
@@ -155,18 +159,9 @@ bool Messenger::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)
   static QList<int> hookerTypes = QList<int>() << RIT_Contact << RIT_MyResource;
   if (hookerTypes.contains(AIndex->type()))
   {
-    QList<int> notifyIds = FRostersView->indexNotifies(AIndex,RLO_MESSAGE);
-    if (notifyIds.isEmpty())
-    {
-      foreach(IMessageHandler *handler, FMessageHandlers)
-        if (handler->openWindow(AIndex))
-          return true;
-    }
-    else
-    {
-      showMessage(FRosterId2MessageId.value(notifyIds.first()));
-      return true;
-    }
+    foreach(IMessageHandler *handler, FMessageHandlers)
+      if (handler->openWindow(AIndex))
+        return true;
   }
   return false;
 }
@@ -522,26 +517,18 @@ void Messenger::notifyMessage(int AMessageId)
 {
   if (FMessages.contains(AMessageId))
   {
-    QIcon icon;
-    QString toolTip;
-    int flags = 0;
-    Message &message = FMessages[AMessageId];
-    IMessageHandler *handler = FHandlerForMessage.value(AMessageId);
-    if (handler->notifyOptions(message,icon,toolTip,flags))
+    if (FNotifications)
     {
-      if (FRostersView && FRostersModel && (flags&IRostersView::LabelVisible))
+      Message &message = FMessages[AMessageId];
+      IMessageHandler *handler = FHandlerForMessage.value(AMessageId);
+      INotification notify = handler->notification(FNotifications, message);
+      if (notify.kinds > 0)
       {
-        IRosterIndexList indexList = FRostersModel->getContactIndexList(message.to(),message.from(),true);
-        int rosterId = FRostersView->appendNotify(indexList,RLO_MESSAGE,icon,toolTip,flags);
-        FRosterId2MessageId.insert(rosterId,AMessageId);
+        int notifyId = FNotifications->appendNotification(notify);
+        FNotifyId2MessageId.insert(notifyId,AMessageId);
       }
-      if (FTrayManager)
-      {
-        int trayId = FTrayManager->appendNotify(icon,toolTip,true);
-        FTrayId2MessageId.insert(trayId,AMessageId);
-      }
-      emit messageNotified(AMessageId);
     }
+    emit messageNotified(AMessageId);
   }
 }
 
@@ -549,17 +536,11 @@ void Messenger::unNotifyMessage(int AMessageId)
 {
   if (FMessages.contains(AMessageId))
   {
-    if (FRostersView)
+    if (FNotifications)
     {
-      int rosterId = FRosterId2MessageId.key(AMessageId);
-      FRostersView->removeNotify(rosterId);
-      FRosterId2MessageId.remove(rosterId);
-    }
-    if (FTrayManager)
-    {
-      int trayId = FTrayId2MessageId.key(AMessageId);
-      FTrayManager->removeNotify(trayId);
-      FTrayId2MessageId.remove(trayId);
+      int notifyId = FNotifyId2MessageId.key(AMessageId);
+      FNotifications->removeNotification(notifyId);
+      FNotifyId2MessageId.remove(notifyId);
     }
     emit messageUnNotified(AMessageId);
   }
@@ -671,7 +652,7 @@ void Messenger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Chat"));
-      //action->setIcon(SYSTEM_ICONSETFILE,IN_CHAT_MESSAGE);
+      action->setIcon(SYSTEM_ICONSETFILE,IN_CHAT_MESSAGE);
       action->setData(ADR_StreamJid,streamJid.full());
       action->setData(ADR_ContactJid,contactJid.full());
       action->setData(ADR_WindowType,WT_ChatWindow);
@@ -682,7 +663,7 @@ void Messenger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Message"));
-      //action->setIcon(SYSTEM_ICONSETFILE,IN_NORMAL_MESSAGE);
+      action->setIcon(SYSTEM_ICONSETFILE,IN_NORMAL_MESSAGE);
       action->setData(ADR_StreamJid,streamJid.full());
       if (AIndex->type() == RIT_Group)
         action->setData(ADR_Group,AIndex->data(RDR_Group));
@@ -695,16 +676,10 @@ void Messenger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   }
 }
 
-void Messenger::onRosterNotifyActivated(IRosterIndex * /*AIndex*/, int ANotifyId)
+void Messenger::onNotificationActivated(int ANotifyId)
 {
-  if (FRosterId2MessageId.contains(ANotifyId))
-    showMessage(FRosterId2MessageId.value(ANotifyId));
-}
-
-void Messenger::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
-{
-  if (AReason == QSystemTrayIcon::DoubleClick && FTrayId2MessageId.contains(ANotifyId))
-    showMessage(FTrayId2MessageId.value(ANotifyId));
+  if (FNotifyId2MessageId.contains(ANotifyId))
+    showMessage(FNotifyId2MessageId.value(ANotifyId));
 }
 
 void Messenger::onMessageWindowDestroyed()

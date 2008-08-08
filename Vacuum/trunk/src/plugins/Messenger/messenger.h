@@ -4,7 +4,6 @@
 #include "../../definations/messagewriterorders.h"
 #include "../../definations/messagedataroles.h"
 #include "../../definations/messagehandlerorders.h"
-#include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterclickhookerorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/optionnodes.h"
@@ -15,6 +14,7 @@
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/itraymanager.h"
+#include "../../interfaces/inotifications.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/skin.h"
 #include "messagewindow.h"
@@ -144,8 +144,7 @@ protected slots:
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  void onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId);
-  void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
+  void onNotificationActivated(int ANotifyId);
   void onMessageWindowDestroyed();
   void onChatWindowDestroyed();
   void onTabWindowDestroyed();
@@ -162,7 +161,7 @@ private:
   IRostersModel *FRostersModel;
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
-  ITrayManager *FTrayManager;
+  INotifications *FNotifications;
   ISettingsPlugin *FSettingsPlugin;
 private:
   QHash<int,ITabWindow *> FTabWindows;
@@ -176,8 +175,7 @@ private:
   QFont FMessageFont;
   MessageHandler *FMessageHandler;
   QMap<int,Message> FMessages;
-  QHash<int,int> FTrayId2MessageId;
-  QHash<int,int> FRosterId2MessageId;
+  QHash<int,int> FNotifyId2MessageId;
   QHash<IXmppStream *,int> FStanzaHandlers;
   QHash<int, IMessageHandler *> FHandlerForMessage;
   QMultiMap<int,IMessageHandler *> FMessageHandlers;

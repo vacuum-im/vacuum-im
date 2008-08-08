@@ -8,6 +8,7 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/multiuserdataroles.h"
 #include "../../definations/accountvaluenames.h"
+#include "../../definations/notificationdataroles.h"
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"
@@ -17,9 +18,21 @@
 #include "../../interfaces/itraymanager.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/imultiuserchat.h"
+#include "../../interfaces/inotifications.h"
 #include "../../utils/skin.h"
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
+
+struct SubscriptionItem 
+{
+  int subsId;
+  Jid streamJid;
+  Jid contactJid;
+  int type;
+  QString status;
+  QDateTime time;
+  int notifyId;
+};
 
 class RosterChanger : 
   public QObject,
@@ -46,10 +59,11 @@ signals:
   virtual void subscriptionDialogCreated(ISubscriptionDialog *ADialog);
   virtual void subscriptionDialogDestroyed(ISubscriptionDialog *ADialog);
 protected:
+  QString subscriptionNotify(int ASubsType, const Jid &AContactJid) const;
   Menu *createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
-  void openSubsDialog(int ASubsId);
-  void removeSubsMessage(int ASubsId);
+  void openSubscriptionDialog(int ASubsId);
+  void removeSubscriptionMessage(int ASubsId);
 protected slots:
   //Operations on subscription
   void onSendSubscription(bool);
@@ -73,10 +87,9 @@ protected slots:
   void onRosterOpened(IRoster *ARoster);
   void onRosterClosed(IRoster *ARoster);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  void onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId);
-  void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
-  void onSubsDialogShowNext();
-  void onSubsDialogDestroyed(QObject *AObject);
+  void onNotificationActivated(int ANotifyId);
+  void onSubscriptionDialogShowNext();
+  void onSubscriptionDialogDestroyed(QObject *AObject);
   void onAddContactDialogDestroyed(QObject *AObject);
   void onAccountChanged(const QString &AName, const QVariant &AValue);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
@@ -87,28 +100,17 @@ private:
   IRostersView *FRostersView;
   IMainWindowPlugin *FMainWindowPlugin;
   ITrayManager *FTrayManager;
+  INotifications *FNotifications;
   IAccountManager *FAccountManager;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
   Menu *FAddContactMenu;
-  SkinIconset *FSystemIconset;
 private:
-  struct SubsItem 
-  {
-    int subsId;
-    Jid streamJid;
-    Jid contactJid;
-    int type;
-    QString status;
-    QDateTime time;
-    int trayId;
-    int rosterId;
-  };
   int FSubsId;
-  QHash<int,SubsItem> FSubsItems;
+  SubscriptionDialog *FSubscriptionDialog;
+  QMap<int, SubscriptionItem> FSubsItems;
 private:
   QHash<IRoster *,Action *> FActions;
-  SubscriptionDialog *FSubsDialog;
   QHash<IRoster *, QList<AddContactDialog *> > FAddContactDialogs;
 };
 

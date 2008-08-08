@@ -7,5 +7,6 @@
 #define ON_MESSAGES                                 "Messages"
 #define ON_EMOTICONS                                "Emoticons"
 #define ON_HISTORY                                  "History"
+#define ON_NOTIFY                                   "Notify"
 
 #endif

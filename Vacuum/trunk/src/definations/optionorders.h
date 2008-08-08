@@ -21,4 +21,7 @@
 //Node = "History
 #define OO_HISTORY                                500
 
+//Node = ON_NOTIFY
+#define OO_NOTIFY                                 500
+
 #endif

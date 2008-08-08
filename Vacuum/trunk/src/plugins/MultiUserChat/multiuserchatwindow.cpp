@@ -166,51 +166,55 @@ bool MultiUserChatWindow::checkMessage(const Message &AMessage)
   return (streamJid() == AMessage.to()) && (roomJid() && AMessage.from());
 }
 
-bool MultiUserChatWindow::notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags)
+INotification MultiUserChatWindow::notification(INotifications * /*ANotifications*/, const Message &AMessage)
 {
+  INotification notify;
   Jid contactJid = AMessage.from();
-  if (AMessage.type() == Message::Error)
+  if (AMessage.type() != Message::Error)
   {
-    return false;
-  }
-  else if (!contactJid.resource().isEmpty())
-  {
-    if (AMessage.type() == Message::GroupChat)
+    SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
+    if (!contactJid.resource().isEmpty())
     {
-      if (!isActive())
+      if (AMessage.type() == Message::GroupChat)
       {
-        SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-        AIcon = iconset->iconByName(IN_MULTICHAT_MESSAGE);
-        AToolTip = tr("New groupchat message in: %1").arg(contactJid.node());
-        AFlags = 0;
-        return true;
+        if (!isActive())
+        {
+          notify.kinds = INotification::TrayIcon;
+          notify.data.insert(NDR_ICON,iconset->iconByName(IN_MULTICHAT_MESSAGE));
+          notify.data.insert(NDR_TOOLTIP,tr("New message in conference: %1").arg(contactJid.node()));
+        }
+      }
+      else
+      {
+        IChatWindow *window = findChatWindow(AMessage.from());
+        if (window == NULL || !window->isActive())
+        {
+          notify.kinds = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+          notify.data.insert(NDR_ICON,iconset->iconByName(IN_CHAT_MESSAGE));
+          notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(contactJid.resource()));
+          notify.data.insert(NDR_WINDOW_CAPTION,tr("Private message"));
+          notify.data.insert(NDR_WINDOW_TITLE,FMultiChat->userByNick(contactJid.resource())->nickName());
+          notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
+          notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
+          notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
+        }
       }
     }
     else
     {
-      IChatWindow *window = findChatWindow(AMessage.from());
-      if (window == NULL || !window->isActive())
+      if (!AMessage.stanza().firstElement("x",NS_JABBER_DATA).isNull())
       {
-        SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-        AIcon = iconset->iconByName(IN_CHAT_MESSAGE);
-        AToolTip = tr("New private message from: [%1]").arg(contactJid.resource());
-        AFlags = 0;
-        return true;
+        notify.kinds = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+        notify.data.insert(NDR_ICON,iconset->iconByName(IN_DATA_FORM_MESSAGE));
+        notify.data.insert(NDR_TOOLTIP,tr("Data form received from: %1").arg(contactJid.node()));
+        notify.data.insert(NDR_WINDOW_CAPTION,tr("Data form received"));
+        notify.data.insert(NDR_WINDOW_TITLE,contactJid.full());
+        notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
+        notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
       }
     }
   }
-  else
-  {
-    if (!AMessage.stanza().firstElement("x",NS_JABBER_DATA).isNull())
-    {
-      SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-      AIcon = iconset->iconByName(IN_DATA_FORM_MESSAGE);
-      AToolTip = tr("Data form received from: %1").arg(contactJid.node());
-      AFlags = 0;
-      return true;
-    }
-  }
-  return false;
+  return notify;
 }
 
 void MultiUserChatWindow::receiveMessage(int AMessageId)

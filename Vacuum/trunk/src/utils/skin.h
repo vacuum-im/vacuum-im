@@ -1,60 +1,32 @@
 #ifndef SKIN_H
 #define SKIN_H
 
-#include <QString>
-#include <QHash>
-#include <QPointer>
-#include "utilsexport.h"
+#include <QSet>
 #include "iconset.h"
+#include "soundset.h"
+#include "skiniconset.h"
+#include "skinsoundset.h"
+#include "utilsexport.h"
 
 #define DEFAULT_SKIN_NAME                 "Default"
 
 #define SKIN_TYPE_ICONSET                 "iconset"
+#define SKIN_TYPE_SOUNDS                  "sounds"
 
 #define SYSTEM_ICONSETFILE                "system/common.jisp"
 #define ROSTER_ICONSETFILE                "roster/common.jisp"
 #define STATUS_ICONSETFILE                "status/jabber.jisp"
 #define EMOTICONS_ICONSETFILE             "emoticons/common.jisp"
 
-class UTILS_EXPORT SkinIconset :
-  public QObject
-{
-  Q_OBJECT;
-public:
-  SkinIconset(QObject *AParent = NULL);
-  SkinIconset(const QString &AFileName, QObject *AParent = NULL);
-  ~SkinIconset();
-  bool isValid() const;
-  const QString &fileName() const;
-  bool openFile(const QString &AFileName);
-  QByteArray fileData(const QString &AFileName) const;
-  const IconsetInfo &info() const;
-  QList<QString> iconFiles() const;
-  QList<QString> iconNames() const;
-  QList<QString> tags(const QString &AFileName = "") const;
-  QList<QString> tagValues(const QString &ATagName, const QString &AFileName = "") const;
-  QString fileByIconName(const QString &AIconName) const;
-  QString fileByTagValue(const QString &ATag, const QString &AValue) const;
-  QIcon iconByFile(const QString &AFileName) const;
-  QIcon iconByName(const QString &AIconName) const;
-  QIcon iconByTagValue(const QString &ATag, const QString &AValue) const;
-private:
-  QList<QString> summStringLists(const QList<QString> &AFirst, const QList<QString> &ASecond) const;
-signals:
-  void iconsetChanged();
-private:
-  QString FFileName;
-  Iconset FIconset;
-  Iconset FDefIconset;
-};
-
 class UTILS_EXPORT Skin
 {
-  friend class SkinIconset;
 public:
   static SkinIconset *getSkinIconset(const QString &AFileName);
+  static SkinSoundset *getSkinSoundset(const QString &ADirName);
   static Iconset getIconset(const QString &AFileName);
   static Iconset getDefaultIconset(const QString &AFileName);
+  static Soundset getSoundset(const QString &ADirName);
+  static Soundset getDefaultSoundset(const QString &ADirName);
   static QStringList skins();
   static bool skinFileExists(const QString &ASkinType, const QString &AFileName, const QString &ASubFolder ="", const QString &ASkin = "");
   static QStringList skinFiles(const QString &ASkinType, const QString &ASubFolder, const QString &AFilter = "*.*", const QString &ASkin = "");
@@ -65,15 +37,14 @@ public:
   static const QString &skinsDirectory();
   static void setSkinsDirectory(const QString &ASkinsDirectory);
 protected:
-  static void addSkinIconset(SkinIconset *ASkinIconset);
-  static void removeSkinIconset(SkinIconset *ASkinIconset);
-  static void updateSkinIconsets();
+  static void updateSkin();
 private:
-  static QString FSkinsDirectory;
   static QString FSkin;
+  static QString FSkinsDirectory;
   static QHash<QString,Iconset> FIconsets;
+  static QHash<QString,Soundset> FSoundsets;
   static QHash<QString,SkinIconset *> FSkinIconsets;
-  static QList<SkinIconset *> FAllSkinIconsets;
+  static QHash<QString,SkinSoundset *> FSkinSoundsets;
 };
 
 #endif // SKIN_H

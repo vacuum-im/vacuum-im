@@ -2,6 +2,9 @@
 #define MESSAGEHANDLER_H
 
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/notificationdataroles.h"
+#include "../../definations/rosterlabelorders.h"
+#include "../../definations/soundnames.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/ipresence.h"
@@ -22,7 +25,7 @@ public:
   virtual bool openWindow(IRosterIndex *AIndex);
   virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   virtual bool checkMessage(const Message &AMessage);
-  virtual bool notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags);
+  virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
   virtual void receiveMessage(int AMessageId);
   virtual void showMessage(int AMessageId);
 protected:

@@ -6,6 +6,8 @@
 #include "../../definations/multiuserdataroles.h"
 #include "../../definations/namespaces.h"
 #include "../../definations/accountvaluenames.h"
+#include "../../definations/notificationdataroles.h"
+#include "../../definations/soundnames.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/irostersview.h"
@@ -34,7 +36,7 @@ public:
   virtual bool openWindow(IRosterIndex *AIndex);
   virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   virtual bool checkMessage(const Message &AMessage);
-  virtual bool notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags);
+  virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
   virtual void receiveMessage(int AMessageId);
   virtual void showMessage(int AMessageId);
   //IMultiUserChatWindow

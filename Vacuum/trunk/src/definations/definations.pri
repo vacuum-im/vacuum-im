@@ -22,4 +22,6 @@ HEADERS  = actiongroups.h \
            archivehandlerorders.h \
            archiveindextyperole.h \
            sessionnegotiatororder.h \
-           commandline.h
+           commandline.h \
+           notificationdataroles.h \
+           soundnames.h

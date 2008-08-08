@@ -60,17 +60,27 @@ bool MessageHandler::checkMessage(const Message &AMessage)
   return false;
 }
 
-bool MessageHandler::notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags)
+INotification MessageHandler::notification(INotifications *ANotifications, const Message &AMessage)
 {
-  Jid fromJid = AMessage.from();
   SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-  if (AMessage.type() == Message::Chat)
-    AIcon = iconset->iconByName(IN_CHAT_MESSAGE);
-  else
-    AIcon = iconset->iconByName(IN_NORMAL_MESSAGE);
-  AToolTip = tr("Message from %1%2").arg(fromJid.bare()).arg(!fromJid.resource().isEmpty() ? "/"+fromJid.resource() : "");
-  AFlags = IRostersView::LabelBlink|IRostersView::LabelVisible;
-  return true;
+  QIcon icon =  iconset->iconByName(AMessage.type() == Message::Chat ? IN_CHAT_MESSAGE : IN_NORMAL_MESSAGE);
+  QString name= ANotifications->contactName(AMessage.to(),AMessage.from());
+
+  INotification notify;
+  notify.kinds = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
+  notify.data.insert(NDR_ICON,icon);
+  notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
+  notify.data.insert(NDR_ROSTER_STREAM_JID,AMessage.to());
+  notify.data.insert(NDR_ROSTER_CONTACT_JID,AMessage.from());
+  notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_MESSAGE);
+  notify.data.insert(NDR_WINDOW_IMAGE,ANotifications->contactAvatar(AMessage.from()));
+  notify.data.insert(NDR_WINDOW_CAPTION, tr("Message received"));
+  notify.data.insert(NDR_WINDOW_TITLE,name);
+  notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
+  notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
+  notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
+
+  return notify;
 }
 
 void MessageHandler::receiveMessage(int AMessageId)

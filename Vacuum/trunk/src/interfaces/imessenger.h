@@ -11,6 +11,7 @@
 #include <QMainWindow>
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"
+#include "../../interfaces/inotifications.h"
 #include "../../utils/jid.h"
 #include "../../utils/message.h"
 #include "../../utils/action.h"
@@ -246,7 +247,7 @@ public:
   virtual bool openWindow(IRosterIndex *AIndex) =0;
   virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) =0;
   virtual bool checkMessage(const Message &AMessage) =0;
-  virtual bool notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags) =0;
+  virtual INotification notification(INotifications *ANotifications, const Message &AMessage) =0;
   virtual void receiveMessage(int AMessageId) =0;
   virtual void showMessage(int AMessageId) =0;
 };

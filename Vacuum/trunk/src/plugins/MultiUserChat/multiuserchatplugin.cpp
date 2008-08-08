@@ -171,18 +171,22 @@ bool MultiUserChatPlugin::checkMessage(const Message &AMessage)
   return !AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite").isNull();
 }
 
-bool MultiUserChatPlugin::notifyOptions(const Message &AMessage, QIcon &AIcon, QString &AToolTip, int &AFlags)
+INotification MultiUserChatPlugin::notification(INotifications *ANotifications, const Message &AMessage)
 {
+  INotification notify;
   QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
   Jid roomJid = AMessage.from();
   if (!multiChatWindow(AMessage.to(),roomJid))
   {
-    AIcon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_INVITE);
-    AToolTip = tr("You are invited to the conference %1").arg(roomJid.bare());
-    AFlags = 0;
-    return true;
+    Jid fromJid = inviteElem.attribute("from");
+    notify.kinds = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    notify.data.insert(NDR_ICON,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_INVITE));
+    notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
+    notify.data.insert(NDR_WINDOW_CAPTION,tr("Invitation received"));
+    notify.data.insert(NDR_WINDOW_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
+    notify.data.insert(NDR_WINDOW_TEXT,notify.data.value(NDR_TOOLTIP));
   }
-  return false;
+  return notify;
 }
 
 void MultiUserChatPlugin::receiveMessage(int AMessageId)

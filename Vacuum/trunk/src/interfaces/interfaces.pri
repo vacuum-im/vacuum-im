@@ -31,4 +31,5 @@ HEADERS  = ipluginmanager.h \
            imessagearchiver.h \
            iprivacylists.h \
            isessionnegotiation.h \
-           iavatars.h
+           iavatars.h \
+           inotifications.h

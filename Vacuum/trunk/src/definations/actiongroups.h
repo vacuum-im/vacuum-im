@@ -37,7 +37,8 @@
 
 //TrayManager (TrayMenu)
 #define AG_MAINWONDOW_SHOW_TRAY                                 200                    
-#define AG_STATUSCHANGER_TRAY                                   300
+#define AG_NOTIFICATIONS_TRAY                                   300                    
+#define AG_STATUSCHANGER_TRAY                                   400
 #define AG_ROSTERCHANGER_TRAY                                   500
 #define AG_SETTINGS_TRAY                                        500
 #define AG_SKINMANAGER_TRAY                                     500

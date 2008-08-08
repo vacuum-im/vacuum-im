@@ -1,127 +1,17 @@
 #include "skin.h"
 
-#include <QSet>
-#include <QDir>
-
 QString Skin::FSkinsDirectory = "./skin";
 QString Skin::FSkin = DEFAULT_SKIN_NAME;
 QHash<QString,Iconset> Skin::FIconsets;
+QHash<QString,Soundset> Skin::FSoundsets;
 QHash<QString,SkinIconset *> Skin::FSkinIconsets;
-QList<SkinIconset *> Skin::FAllSkinIconsets;
-
-//--SkinIconset--
-SkinIconset::SkinIconset(QObject *AParent)
-  : QObject(AParent)
-{
-  Skin::addSkinIconset(this);
-}
-
-SkinIconset::SkinIconset(const QString &AFileName, QObject *AParent)
-  : QObject(AParent)
-{
-  Skin::addSkinIconset(this);
-  openFile(AFileName);
-}
-
-SkinIconset::~SkinIconset()
-{
-  Skin::removeSkinIconset(this);
-}
-
-bool SkinIconset::isValid() const
-{
-  return FIconset.isValid() || FDefIconset.isValid();
-}
-
-const QString &SkinIconset::fileName() const
-{
-  return FFileName;
-}
-
-bool SkinIconset::openFile(const QString &AFileName)
-{
-  FFileName = AFileName;
-  FIconset = Skin::getIconset(AFileName);
-  FDefIconset = Skin::getDefaultIconset(AFileName);
-  emit iconsetChanged();
-  return isValid();
-}
-
-QByteArray SkinIconset::fileData(const QString &AFileName) const
-{
-  QByteArray data = FIconset.fileData(AFileName);
-  return data.isEmpty() ? FDefIconset.fileData(AFileName) : data;
-}
-
-const IconsetInfo &SkinIconset::info() const
-{
-  return FIconset.isValid() ? FIconset.info() : FDefIconset.info();
-}
-
-QList<QString> SkinIconset::iconFiles() const
-{
-  return summStringLists(FIconset.iconFiles(),FDefIconset.iconFiles());
-}
-
-QList<QString> SkinIconset::iconNames() const
-{
-  return summStringLists(FIconset.iconNames(),FDefIconset.iconNames());
-}
-
-QList<QString> SkinIconset::tags(const QString &AFileName) const
-{
-  return summStringLists(FIconset.tags(AFileName),FDefIconset.tags(AFileName));
-}
-
-QList<QString> SkinIconset::tagValues(const QString &ATagName, const QString &AFileName) const
-{
-  return summStringLists(FIconset.tagValues(ATagName,AFileName),FDefIconset.tagValues(ATagName,AFileName));
-}
-
-QString SkinIconset::fileByIconName(const QString &AIconName) const
-{
-  QString file = FIconset.fileByIconName(AIconName);
-  return file.isEmpty() ? FDefIconset.fileByIconName(AIconName) : file;
-}
-
-QString SkinIconset::fileByTagValue(const QString &ATag, const QString &AValue) const
-{
-  QString file = FIconset.fileByTagValue(ATag,AValue);
-  return file.isEmpty() ? FDefIconset.fileByTagValue(ATag,AValue) : file;
-}
-
-QIcon SkinIconset::iconByFile(const QString &AFileName) const
-{
-  QIcon icon = FIconset.iconByFile(AFileName);
-  return icon.isNull() ? FDefIconset.iconByFile(AFileName) : icon;  
-}
-
-QIcon SkinIconset::iconByName(const QString &AIconName) const
-{
-  QIcon icon = FIconset.iconByName(AIconName);
-  return icon.isNull() ? FDefIconset.iconByName(AIconName) : icon;  
-}
-
-QIcon SkinIconset::iconByTagValue(const QString &ATag, const QString &AValue) const
-{
-  QIcon icon = FIconset.iconByTagValue(ATag, AValue);
-  return icon.isNull() ? FDefIconset.iconByTagValue(ATag, AValue) : icon;  
-}
-
-QList<QString> SkinIconset::summStringLists(const QList<QString> &AFirst, const QList<QString> &ASecond) const
-{
-  QList<QString> result = AFirst;
-  foreach(QString item, ASecond)
-    if (!result.contains(item))
-      result.append(item);
-  return result;
-}
+QHash<QString,SkinSoundset *> Skin::FSkinSoundsets;
 
 //--Skin--
 SkinIconset *Skin::getSkinIconset(const QString &AFileName)
 {
   SkinIconset *skinIconset = FSkinIconsets.value(AFileName);
-  if (!skinIconset)
+  if (skinIconset == NULL)
   {
     skinIconset = new SkinIconset(AFileName);
     FSkinIconsets.insert(AFileName,skinIconset);
@@ -129,34 +19,67 @@ SkinIconset *Skin::getSkinIconset(const QString &AFileName)
   return skinIconset;
 }
 
+SkinSoundset *Skin::getSkinSoundset(const QString &ADirName)
+{
+  SkinSoundset *skinSoundSet = FSkinSoundsets.value(ADirName);
+  if (skinSoundSet == NULL)
+  {
+    skinSoundSet = new SkinSoundset(ADirName);
+    FSkinSoundsets.insert(ADirName,skinSoundSet);
+  }
+  return skinSoundSet;
+}
+
 Iconset Skin::getIconset(const QString &AFileName)
 {
-  QString skinFileName = FSkin+"/iconset/"+AFileName;
+  QString skinFileName = FSkinsDirectory+"/"+FSkin+"/iconset/"+AFileName;
   if (!FIconsets.contains(skinFileName))
   {
-    QString fullFileName = FSkinsDirectory+"/"+skinFileName;
-    Iconset iconset(fullFileName);
+    Iconset iconset(skinFileName);
     if (iconset.isValid())
       FIconsets.insert(skinFileName,iconset);
     return iconset;
   }
-  else
-    return FIconsets.value(skinFileName);
+  return FIconsets.value(skinFileName);
 }
 
 Iconset Skin::getDefaultIconset(const QString &AFileName)
 {
-  QString skinFileName = QString(DEFAULT_SKIN_NAME)+"/iconset/"+AFileName;
+  QString skinFileName = FSkinsDirectory+"/"DEFAULT_SKIN_NAME"/iconset/"+AFileName;
   if (!FIconsets.contains(skinFileName))
   {
-    QString fullFileName = FSkinsDirectory+"/"+skinFileName;
-    Iconset iconset(fullFileName);
+    Iconset iconset(skinFileName);
     if (iconset.isValid())
       FIconsets.insert(skinFileName,iconset);
     return iconset;
   }
-  else
-    return FIconsets.value(skinFileName);
+  return FIconsets.value(skinFileName);
+}
+
+Soundset Skin::getSoundset(const QString &ADirName)
+{
+  QString skinDirName = FSkinsDirectory+"/"+FSkin+"/sounds/"+ADirName;
+  if (!FSoundsets.contains(skinDirName))
+  {
+    Soundset soundset(skinDirName);
+    if (soundset.isValid())
+      FSoundsets.insert(skinDirName,soundset);
+    return soundset;
+  }
+  return FSoundsets.value(skinDirName);
+}
+
+Soundset Skin::getDefaultSoundset(const QString &ADirName)
+{
+  QString skinDirName = FSkinsDirectory+"/"DEFAULT_SKIN_NAME"/sounds/"+ADirName;
+  if (!FSoundsets.contains(skinDirName))
+  {
+    Soundset soundset(skinDirName);
+    if (soundset.isValid())
+      FSoundsets.insert(skinDirName,soundset);
+    return soundset;
+  }
+  return FSoundsets.value(skinDirName);
 }
 
 QStringList Skin::skins()
@@ -210,7 +133,7 @@ void Skin::setSkin(const QString &ASkin)
   if (FSkin != ASkin)
   {
     FSkin = ASkin;
-    updateSkinIconsets();
+    updateSkin();
   }
 }
 
@@ -224,26 +147,18 @@ void Skin::setSkinsDirectory(const QString &ASkinsDirectory)
   if (FSkinsDirectory!=ASkinsDirectory)
   {
     FSkinsDirectory = ASkinsDirectory;
-    updateSkinIconsets();
+    updateSkin();
   }
 }
 
-void Skin::addSkinIconset(SkinIconset *ASkinIconset)
-{
-  if (!FAllSkinIconsets.contains(ASkinIconset))
-    FAllSkinIconsets.append(ASkinIconset);
-}
-
-void Skin::removeSkinIconset(SkinIconset *ASkinIconset)
-{
-  if (FAllSkinIconsets.contains(ASkinIconset))
-    FAllSkinIconsets.removeAt(FAllSkinIconsets.indexOf(ASkinIconset));
-}
-
-void Skin::updateSkinIconsets()
+void Skin::updateSkin()
 {
   FIconsets.clear();
-  foreach(SkinIconset *skinIconset,FAllSkinIconsets)
-    skinIconset->openFile(skinIconset->fileName());
+  foreach(SkinIconset *skinIconset,FSkinIconsets)
+    skinIconset->openIconset(skinIconset->iconsetFile());
+
+  FSoundsets.clear();
+  foreach(SkinSoundset *soundset, FSkinSoundsets)
+    soundset->openSoundset(soundset->soundsetDir());
 }
 
