@@ -281,9 +281,7 @@ void RosterChanger::removeSubscriptionMessage(int ASubsId)
     if (FSubscriptionDialog)
       FSubscriptionDialog->setNextCount(FSubsItems.count());
     if (FNotifications)
-    {
-      FNotifications->removeNotification(subsItem.subsId);
-    }
+      FNotifications->removeNotification(subsItem.notifyId);
   }
 }
 
