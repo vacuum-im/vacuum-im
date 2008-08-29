@@ -139,6 +139,16 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
+  if (plugin)
+  {
+    FNotifications = qobject_cast<INotifications *>(plugin->instance());
+    if (FNotifications)
+    {
+      connect(FNotifications->instance(),SIGNAL(notificationActivated(int)), SLOT(onNotificationActivated(int)));
+    }
+  }
+
   return FPresencePlugin!=NULL;
 }
 
@@ -573,16 +583,19 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
     if (AStatusId > MAX_TEMP_STATUS_ID)
       removeTempStatus(APresence);
 
-    if (FRostersView && FRostersModel)
+    IRosterIndex *index = FRostersView && FRostersModel ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
+    if (APresence->show() == IPresence::Error)
     {
-      IRosterIndex *index = FRostersModel->streamRoot(APresence->streamJid());
       if (index && !FRostersViewPlugin->checkOption(IRostersView::ShowStatusText))
-      {
-        if (APresence->show() == IPresence::Error)
-          FRostersView->insertFooterText(FTO_STATUS,APresence->status(),index);
-        else
-          FRostersView->removeFooterText(FTO_STATUS,index);
-      }
+        FRostersView->insertFooterText(FTO_STATUS,APresence->status(),index);
+      if (!FStreamNotify.contains(APresence))
+        insertStatusNotification(APresence);
+    }
+    else
+    {
+      if (index && !FRostersViewPlugin->checkOption(IRostersView::ShowStatusText))
+        FRostersView->removeFooterText(FTO_STATUS,index);
+      removeStatusNotification(APresence);
     }
   }
 }
@@ -856,6 +869,33 @@ void StatusChanger::removeAllCustomStatuses()
       removeStatusItem(statusId);
 }
 
+void StatusChanger::insertStatusNotification(IPresence *APresence)
+{
+  if (FNotifications)
+  {
+    removeStatusNotification(APresence);
+    if (FNotifications)
+    {
+      INotification notify;
+      notify.kinds = INotification::PopupWindow|INotification::PlaySound;
+      notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,"","") : QIcon());
+      notify.data.insert(NDR_WINDOW_CAPTION, tr("Connection error"));
+      notify.data.insert(NDR_WINDOW_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());
+      notify.data.insert(NDR_WINDOW_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
+      notify.data.insert(NDR_WINDOW_TEXT,APresence->status());
+      FStreamNotify.insert(APresence,FNotifications->appendNotification(notify));
+    }
+  }
+}
+
+void StatusChanger::removeStatusNotification(IPresence *APresence)
+{
+  if (FNotifications && FStreamNotify.contains(APresence))
+  {
+    FNotifications->removeNotification(FStreamNotify.take(APresence));
+  }
+}
+
 void StatusChanger::onSetStatusByAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
@@ -930,6 +970,7 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
       account->delValue(AVN_LAST_ONLINE_STATUS);
   }
 
+  removeStatusNotification(APresence);
   removeStreamMenu(APresence);
 
   if (FStreamMenu.count() == 1)
@@ -1159,6 +1200,11 @@ void StatusChanger::onAccountChanged(const QString &AName, const QVariant &AValu
         sMenu->setTitle(AValue.toString());
     }
   }
+}
+
+void StatusChanger::onNotificationActivated(int ANotifyId)
+{
+  FNotifications->removeNotification(ANotifyId);
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)

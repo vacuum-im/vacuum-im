@@ -13,6 +13,8 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/accountvaluenames.h"
 #include "../../definations/rosterfootertextorder.h"
+#include "../../definations/notificationdataroles.h"
+#include "../../definations/soundnames.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatuschanger.h"
 #include "../../interfaces/ipresence.h"
@@ -24,6 +26,7 @@
 #include "../../interfaces/itraymanager.h"
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/istatusicons.h"
+#include "../../interfaces/inotifications.h"
 #include "../../utils/skin.h"
 #include "editstatusdialog.h"
 #include "accountoptionswidget.h"
@@ -47,7 +50,6 @@ class StatusChanger :
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder);
-
 public:
   StatusChanger();
   ~StatusChanger();
@@ -113,6 +115,8 @@ protected:
   void removeTempStatus(IPresence *APresence);
   void resendUpdatedStatus(int AStatusId);
   void removeAllCustomStatuses();
+  void insertStatusNotification(IPresence *APresence);
+  void removeStatusNotification(IPresence *APresence);
 protected slots:
   void onSetStatusByAction(bool);
   void onPresenceAdded(IPresence *APresence);
@@ -133,6 +137,7 @@ protected slots:
   void onOptionsRejected();
   void onOptionsDialogClosed();
   void onAccountChanged(const QString &AName, const QVariant &AValue);
+  void onNotificationActivated(int ANotifyId);
 private:
   IPresencePlugin *FPresencePlugin;
   IRosterPlugin *FRosterPlugin;
@@ -144,6 +149,7 @@ private:
   ITrayManager *FTrayManager;
   IAccountManager *FAccountManager;
   IStatusIcons *FStatusIcons;
+  INotifications *FNotifications;
 private:
   int FConnectingLabel;
   SkinIconset *FRosterIconset;
@@ -164,6 +170,7 @@ private:
   QHash<IPresence *,int> FStreamTempStatus;
   QSet<IPresence *> FStreamMainStatus;
   QHash<QString,AccountOptionsWidget *> FAccountOptionsById;
+  QHash<IPresence *,int> FStreamNotify;
 };
 
 #endif // STATUSCHANGER_H
