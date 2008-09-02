@@ -17,6 +17,7 @@
 #include "../../utils/action.h"
 #include "notifywidget.h"
 #include "optionswidget.h"
+#include "notifykindswidget.h"
 
 struct NotifyRecord {
   NotifyRecord() {
@@ -30,6 +31,13 @@ struct NotifyRecord {
   NotifyWidget *widget;
   Action *action;
   INotification notification;
+};
+
+struct Notificator {
+  QString title;
+  uchar kinds;
+  uchar defaults;
+  uchar kindMask;
 };
 
 class Notifications : 
@@ -61,6 +69,11 @@ public:
   virtual void removeNotification(int ANotifyId);
   virtual bool checkOption(INotifications::Option AOption) const;
   virtual void setOption(INotifications::Option AOption, bool AValue);
+  //Kind options for notificators
+  virtual void insertNotificator(const QString &AId, const QString &ATitle, uchar AKindMask, uchar ADefault);
+  virtual uchar notificatorKinds(const QString &AId) const;
+  virtual void setNotificatorKinds(const QString &AId, uchar AKinds);
+  virtual void removeNotificator(const QString &AId);
   //Notification Utilities
   virtual QImage contactAvatar(const Jid &AContactJid) const;
   virtual QIcon contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -101,7 +114,9 @@ private:
   uint FOptions;
   int FNotifyId;
   OptionsWidget *FOptionsWidget;
+  QList<NotifyKindsWidget *> FOptionsWidgets;
   QHash<int,NotifyRecord> FNotifyRecords;
+  mutable QMap<QString,Notificator> FNotificators;
 };
 
 #endif // NOTIFICATIONS_H

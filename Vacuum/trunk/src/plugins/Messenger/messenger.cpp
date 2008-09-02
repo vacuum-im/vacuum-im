@@ -8,9 +8,7 @@
 #define SVN_VIEW                              "view"
 #define SVN_EDIT                              "edit"
 #define SVN_CHAT                              "chat"
-#define SVN_OPEN_CHAT_IN_TABWINDOW            "openChatInTabWindow"
-#define SVN_OPEN_CHAT_WINDOW                  "openChatWindow"
-#define SVN_OPEN_MESSAGE_WINDOW               "openMessageWindow"
+#define SVN_USE_TABWINDOW                     "useTabWindow"
 #define SVN_VIEW_HTML                         SVN_VIEW ":" "showHtml"
 #define SVN_VIEW_DATETIME                     SVN_VIEW ":" "showDateTime"
 #define SVN_CHAT_STATUS                       SVN_CHAT ":" "showStatus"
@@ -171,9 +169,7 @@ QWidget *Messenger::optionsWidget(const QString &ANode, int &/*AOrder*/)
   if (ANode == ON_MESSAGES)
   {
     FMessengerOptions = new MessengerOptions;
-    FMessengerOptions->setOption(OpenChatInTabWindow,checkOption(OpenChatInTabWindow));
-    FMessengerOptions->setOption(OpenMessageWindow,checkOption(OpenMessageWindow));
-    FMessengerOptions->setOption(OpenChatWindow,checkOption(OpenChatWindow));
+    FMessengerOptions->setOption(UseTabWindow,checkOption(UseTabWindow));
     FMessengerOptions->setOption(ShowHTML,checkOption(ShowHTML));
     FMessengerOptions->setOption(ShowDateTime,checkOption(ShowDateTime));
     FMessengerOptions->setOption(ShowStatus,checkOption(ShowStatus));
@@ -715,9 +711,7 @@ void Messenger::onTabWindowDestroyed()
 void Messenger::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSENGER_UUID);
-  setOption(OpenChatInTabWindow, settings->value(SVN_OPEN_CHAT_IN_TABWINDOW,true).toBool());
-  setOption(OpenMessageWindow, settings->value(SVN_OPEN_MESSAGE_WINDOW,false).toBool());
-  setOption(OpenChatWindow, settings->value(SVN_OPEN_CHAT_WINDOW,false).toBool());
+  setOption(UseTabWindow, settings->value(SVN_USE_TABWINDOW,true).toBool());
   setOption(ShowHTML, settings->value(SVN_VIEW_HTML,true).toBool());
   setOption(ShowDateTime, settings->value(SVN_VIEW_DATETIME,true).toBool());
   setOption(ShowStatus, settings->value(SVN_CHAT_STATUS,true).toBool());
@@ -728,9 +722,7 @@ void Messenger::onSettingsOpened()
 void Messenger::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSENGER_UUID);
-  settings->setValue(SVN_OPEN_CHAT_IN_TABWINDOW,checkOption(OpenChatInTabWindow));
-  settings->setValue(SVN_OPEN_MESSAGE_WINDOW,checkOption(OpenMessageWindow));
-  settings->setValue(SVN_OPEN_CHAT_WINDOW,checkOption(OpenChatWindow));
+  settings->setValue(SVN_USE_TABWINDOW,checkOption(UseTabWindow));
   settings->setValue(SVN_VIEW_HTML,checkOption(ShowHTML));
   settings->setValue(SVN_VIEW_DATETIME,checkOption(ShowDateTime));
   settings->setValue(SVN_CHAT_STATUS,checkOption(ShowStatus));
@@ -748,9 +740,7 @@ void Messenger::onSettingsClosed()
 
 void Messenger::onOptionsDialogAccepted()
 {
-  setOption(OpenChatInTabWindow,FMessengerOptions->checkOption(OpenChatInTabWindow));
-  setOption(OpenMessageWindow,FMessengerOptions->checkOption(OpenMessageWindow));
-  setOption(OpenChatWindow,FMessengerOptions->checkOption(OpenChatWindow));
+  setOption(UseTabWindow,FMessengerOptions->checkOption(UseTabWindow));
   setOption(ShowHTML,FMessengerOptions->checkOption(ShowHTML));
   setOption(ShowDateTime,FMessengerOptions->checkOption(ShowDateTime));
   setOption(ShowStatus,FMessengerOptions->checkOption(ShowStatus));

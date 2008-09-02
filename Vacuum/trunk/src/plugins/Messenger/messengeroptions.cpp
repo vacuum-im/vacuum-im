@@ -35,12 +35,8 @@ bool MessengerOptions::checkOption(IMessenger::Option AOption) const
 {
   switch(AOption)
   {
-  case IMessenger::OpenChatInTabWindow:
-    return ui.chbOpenChatInTab->isChecked();
-  case IMessenger::OpenMessageWindow:
-    return ui.chbOpenMessageWindow->isChecked();
-  case IMessenger::OpenChatWindow:
-    return ui.chbOpenChatWindow->isChecked();
+  case IMessenger::UseTabWindow:
+    return ui.chbUseTabWindow->isChecked();
   case IMessenger::ShowHTML:
   	return ui.chbViewShowHtml->isChecked();
   case IMessenger::ShowDateTime:
@@ -56,14 +52,8 @@ void MessengerOptions::setOption(IMessenger::Option AOption, bool AValue)
 {
   switch(AOption)
   {
-  case IMessenger::OpenChatInTabWindow:
-    ui.chbOpenChatInTab->setChecked(AValue);
-    break;
-  case IMessenger::OpenMessageWindow:
-    ui.chbOpenMessageWindow->setChecked(AValue);
-    break;
-  case IMessenger::OpenChatWindow:
-    ui.chbOpenChatWindow->setChecked(AValue);
+  case IMessenger::UseTabWindow:
+    ui.chbUseTabWindow->setChecked(AValue);
     break;
   case IMessenger::ShowHTML:
     ui.chbViewShowHtml->setChecked(AValue);

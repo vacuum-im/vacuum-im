@@ -38,6 +38,10 @@ public:
   virtual void removeNotification(int ANotifyId) =0;
   virtual bool checkOption(INotifications::Option AOption) const =0;
   virtual void setOption(INotifications::Option AOption, bool AValue) =0;
+  virtual void insertNotificator(const QString &AId, const QString &ATitle, uchar AKindMask, uchar ADefault) =0;
+  virtual uchar notificatorKinds(const QString &AId) const =0;
+  virtual void setNotificatorKinds(const QString &AId, uchar AKinds) =0;
+  virtual void removeNotificator(const QString &AId) =0;
   virtual QImage contactAvatar(const Jid &AContactJid) const =0;
   virtual QIcon contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual QString contactName(const Jid &AStreamJId, const Jid &AContactJid) const =0;

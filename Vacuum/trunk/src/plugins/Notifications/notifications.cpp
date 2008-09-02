@@ -1,7 +1,8 @@
 #include "notifications.h"
 
-#define ADR_NOTIFYID      Action::DR_Parametr1
+#define ADR_NOTIFYID                    Action::DR_Parametr1
 
+#define SVN_NOTIFICATORS                "notificators:notificator[]"
 #define SVN_ENABLE_ROSTERICONS          "enableRosterIcons"
 #define SVN_ENABLE_PUPUPWINDOWS         "enablePopupWindows"
 #define SVN_ENABLE_TRAYICONS            "enableTrayIcons"
@@ -112,6 +113,13 @@ QWidget *Notifications::optionsWidget(const QString &ANode, int &AOrder)
   {
     AOrder = OO_NOTIFY;
     FOptionsWidget = new OptionsWidget(this);
+    foreach(QString id, FNotificators.keys())
+    {
+      Notificator notificator = FNotificators.value(id);
+      NotifyKindsWidget *widget = new NotifyKindsWidget(this,id,notificator.title,notificator.kindMask,FOptionsWidget);
+      FOptionsWidget->layout()->addWidget(widget);
+      FOptionsWidgets.append(widget);
+    }
     return FOptionsWidget;
   }
   return NULL;
@@ -232,6 +240,50 @@ void Notifications::setOption(INotifications::Option AOption, bool AValue)
   }
 }
 
+void Notifications::insertNotificator(const QString &AId, const QString &ATitle, uchar AKindMask, uchar ADefault)
+{
+  if (!FNotificators.contains(AId))
+  {
+    Notificator notificator;
+    notificator.title = ATitle;
+    notificator.kinds = 0xFF;
+    notificator.defaults = ADefault;
+    notificator.kindMask = AKindMask;
+    FNotificators.insert(AId,notificator);
+  }
+}
+
+uchar Notifications::notificatorKinds(const QString &AId) const
+{
+  if (FNotificators.contains(AId))
+  {
+    Notificator &notificator = FNotificators[AId];
+    if (notificator.kinds == 0xFF)
+    {
+      ISettings *settings = FSettingsPlugin!=NULL ? FSettingsPlugin->settingsForPlugin(NOTIFICATIONS_UUID) : NULL;
+      notificator.kinds = settings!=NULL ? settings->valueNS(SVN_NOTIFICATORS,AId,notificator.defaults).toUInt() & notificator.kindMask : notificator.defaults;
+    }
+    return notificator.kinds;
+  }
+  return 0xFF;
+}
+
+void Notifications::setNotificatorKinds(const QString &AId, uchar AKinds)
+{
+  if (FNotificators.contains(AId))
+  {
+    Notificator &notificator = FNotificators[AId];
+    notificator.kinds = AKinds & notificator.kindMask;
+    if (FSettingsPlugin)
+      FSettingsPlugin->settingsForPlugin(NOTIFICATIONS_UUID)->setValueNS(SVN_NOTIFICATORS,AId,notificator.kinds);
+  }
+}
+
+void Notifications::removeNotificator(const QString &AId)
+{
+  FNotificators.remove(AId);
+}
+
 QImage Notifications::contactAvatar(const Jid &AContactJid) const
 {
   return FAvatars!=NULL ? FAvatars->avatarImage(AContactJid) : QImage();
@@ -344,7 +396,11 @@ void Notifications::onSettingsClosed()
 void Notifications::onOptionsDialogAccepted()
 {
   if (FOptionsWidget)
+  {
     FOptionsWidget->applyOptions();
+    foreach(NotifyKindsWidget *widget,FOptionsWidgets)
+      widget->applyOptions();
+  }
   emit optionsAccepted();
 }
 
@@ -356,6 +412,7 @@ void Notifications::onOptionsDialogRejected()
 void Notifications::onOptionsDialogClosed()
 {
   FOptionsWidget = NULL;
+  FOptionsWidgets.clear();
 }
 
 Q_EXPORT_PLUGIN2(NotificationsPlugin, Notifications)

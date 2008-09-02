@@ -119,7 +119,7 @@ void MultiUserChatWindow::showWindow()
 {
   if (isWindow() && !isVisible())
   {
-    if (FMessenger->checkOption(IMessenger::OpenChatInTabWindow))
+    if (FMessenger->checkOption(IMessenger::UseTabWindow))
     {
       ITabWindow *tabWindow = FMessenger->openTabWindow();
       tabWindow->addWidget(this);
@@ -166,7 +166,7 @@ bool MultiUserChatWindow::checkMessage(const Message &AMessage)
   return (streamJid() == AMessage.to()) && (roomJid() && AMessage.from());
 }
 
-INotification MultiUserChatWindow::notification(INotifications * /*ANotifications*/, const Message &AMessage)
+INotification MultiUserChatWindow::notification(INotifications *ANotifications, const Message &AMessage)
 {
   INotification notify;
   Jid contactJid = AMessage.from();
@@ -179,9 +179,14 @@ INotification MultiUserChatWindow::notification(INotifications * /*ANotification
       {
         if (!isActive())
         {
-          notify.kinds = INotification::TrayIcon;
+          notify.kinds = ANotifications->notificatorKinds(GROUP_NOTIFICATOR_ID);
           notify.data.insert(NDR_ICON,iconset->iconByName(IN_MULTICHAT_MESSAGE));
           notify.data.insert(NDR_TOOLTIP,tr("New message in conference: %1").arg(contactJid.node()));
+          notify.data.insert(NDR_WINDOW_CAPTION,tr("Conference message"));
+          notify.data.insert(NDR_WINDOW_TITLE,tr("%1 from %2").arg(contactJid.resource()).arg(contactJid.node()));
+          notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
+          notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
+          notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
         }
       }
       else
@@ -189,11 +194,11 @@ INotification MultiUserChatWindow::notification(INotifications * /*ANotification
         IChatWindow *window = findChatWindow(AMessage.from());
         if (window == NULL || !window->isActive())
         {
-          notify.kinds = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+          notify.kinds = ANotifications->notificatorKinds(PRIVATE_NOTIFICATOR_ID);
           notify.data.insert(NDR_ICON,iconset->iconByName(IN_CHAT_MESSAGE));
           notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(contactJid.resource()));
           notify.data.insert(NDR_WINDOW_CAPTION,tr("Private message"));
-          notify.data.insert(NDR_WINDOW_TITLE,FMultiChat->userByNick(contactJid.resource())->nickName());
+          notify.data.insert(NDR_WINDOW_TITLE,contactJid.resource());
           notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
           notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
           notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
@@ -204,11 +209,12 @@ INotification MultiUserChatWindow::notification(INotifications * /*ANotification
     {
       if (!AMessage.stanza().firstElement("x",NS_JABBER_DATA).isNull())
       {
-        notify.kinds = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+        notify.kinds = ANotifications->notificatorKinds(PRIVATE_NOTIFICATOR_ID);;
         notify.data.insert(NDR_ICON,iconset->iconByName(IN_DATA_FORM_MESSAGE));
         notify.data.insert(NDR_TOOLTIP,tr("Data form received from: %1").arg(contactJid.node()));
         notify.data.insert(NDR_WINDOW_CAPTION,tr("Data form received"));
         notify.data.insert(NDR_WINDOW_TITLE,contactJid.full());
+        notify.data.insert(NDR_WINDOW_TEXT,AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text());
         notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
         notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
       }
@@ -990,7 +996,7 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 
 void MultiUserChatWindow::showChatWindow(IChatWindow *AWindow)
 {
-  if (AWindow->isWindow() && FMessenger->checkOption(IMessenger::OpenChatInTabWindow))
+  if (AWindow->isWindow() && FMessenger->checkOption(IMessenger::UseTabWindow))
   {
     ITabWindow *tabWindow = FMessenger->openTabWindow();
     tabWindow->addWidget(AWindow);

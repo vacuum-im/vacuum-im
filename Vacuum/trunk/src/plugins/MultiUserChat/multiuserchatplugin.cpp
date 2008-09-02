@@ -2,14 +2,17 @@
 
 #include <QInputDialog>
 
-#define IN_GROUPCHAT          "psi/groupChat"
-#define IN_INVITE             "psi/events"
+#define IN_GROUPCHAT              "psi/groupChat"
+#define IN_INVITE                 "psi/events"
 
-#define ADR_STREAM_JID        Action::DR_StreamJid
-#define ADR_HOST              Action::DR_Parametr1
-#define ADR_ROOM              Action::DR_Parametr2
-#define ADR_NICK              Action::DR_Parametr3
-#define ADR_PASSWORD          Action::DR_Parametr4
+#define ADR_STREAM_JID            Action::DR_StreamJid
+#define ADR_HOST                  Action::DR_Parametr1
+#define ADR_ROOM                  Action::DR_Parametr2
+#define ADR_NICK                  Action::DR_Parametr3
+#define ADR_PASSWORD              Action::DR_Parametr4
+
+#define INVITE_NOTIFICATOR_ID     "InviteMessages"
+
 
 MultiUserChatPlugin::MultiUserChatPlugin()
 {
@@ -20,6 +23,7 @@ MultiUserChatPlugin::MultiUserChatPlugin()
   FTrayManager = NULL;
   FXmppStreams = NULL;
   FDiscovery = NULL;
+  FNotifications = NULL;
 
   FChatMenu = NULL;
   FJoinAction = NULL;
@@ -92,6 +96,12 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
     }
   }
 
+  plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
+  if (plugin)
+  {
+    FNotifications = qobject_cast<INotifications *>(plugin->instance());
+  }
+
   return FMessenger!=NULL;
 }
 
@@ -130,6 +140,17 @@ bool MultiUserChatPlugin::initObjects()
   {
     registerDiscoFeatures();
     FDiscovery->insertFeatureHandler(NS_MUC,this,DFO_DEFAULT);
+  }
+  if (FNotifications)
+  {
+    uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(INVITE_NOTIFICATOR_ID,tr("Invite chat messages"),kindMask,kindMask);
+    
+    kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(PRIVATE_NOTIFICATOR_ID,tr("Private conference messages"),kindMask,kindMask);
+    
+    kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(GROUP_NOTIFICATOR_ID,tr("Conference messages"),kindMask,INotification::TrayIcon|INotification::PlaySound);
   }
   return true;
 }
@@ -179,11 +200,15 @@ INotification MultiUserChatPlugin::notification(INotifications *ANotifications, 
   if (!multiChatWindow(AMessage.to(),roomJid))
   {
     Jid fromJid = inviteElem.attribute("from");
-    notify.kinds = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    notify.kinds = ANotifications->notificatorKinds(INVITE_NOTIFICATOR_ID);
     notify.data.insert(NDR_ICON,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_INVITE));
     notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
+    notify.data.insert(NDR_ROSTER_STREAM_JID,AMessage.to());
+    notify.data.insert(NDR_ROSTER_CONTACT_JID,fromJid.full());
+    notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_MESSAGE);
     notify.data.insert(NDR_WINDOW_CAPTION,tr("Invitation received"));
     notify.data.insert(NDR_WINDOW_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
+    notify.data.insert(NDR_WINDOW_IMAGE,ANotifications->contactAvatar(fromJid));
     notify.data.insert(NDR_WINDOW_TEXT,notify.data.value(NDR_TOOLTIP));
   }
   return notify;

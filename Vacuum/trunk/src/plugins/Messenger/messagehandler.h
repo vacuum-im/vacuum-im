@@ -5,6 +5,7 @@
 #include "../../definations/notificationdataroles.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/soundnames.h"
+#include "../../interfaces/inotifications.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/ipresence.h"

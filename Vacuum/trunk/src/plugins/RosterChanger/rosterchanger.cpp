@@ -6,6 +6,8 @@
 #define IN_EVENTS           "psi/events"
 #define IN_ADDCONTACT       "psi/addContact"
 
+#define NOTIFICATOR_ID      "RosterChanger"
+
 RosterChanger::RosterChanger()
 {
   FRosterPlugin = NULL;
@@ -122,6 +124,12 @@ bool RosterChanger::initObjects()
   if (FTrayManager && FAddContactMenu)
   {
     FTrayManager->addAction(FAddContactMenu->menuAction(),AG_ROSTERCHANGER_TRAY,true);
+  }
+
+  if (FNotifications)
+  {
+    uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;;
+    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Subscription requests"),kindMask,kindMask);
   }
 
   return true;
@@ -483,7 +491,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AFromJid,
   if (FNotifications)
   {
     INotification notify;
-    notify.kinds = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
     notify.data.insert(NDR_ICON,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_EVENTS));
     notify.data.insert(NDR_TOOLTIP,tr("Subscription message from %1").arg(FNotifications->contactName(ARoster->streamJid(),AFromJid)));
     notify.data.insert(NDR_ROSTER_STREAM_JID,ARoster->streamJid().full());

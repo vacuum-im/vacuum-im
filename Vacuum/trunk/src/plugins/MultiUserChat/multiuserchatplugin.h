@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/rosterlabelorders.h"
 #include "../../definations/discofeatureorder.h"
 #include "../../definations/messagehandlerorders.h"
 #include "../../interfaces/imultiuserchat.h"
@@ -14,6 +15,7 @@
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/itraymanager.h"
 #include "../../interfaces/iservicediscovery.h"
+#include "../../interfaces/inotifications.h"
 #include "../../utils/message.h"
 #include "../../utils/action.h"
 #include "../../utils/skin.h"
@@ -95,6 +97,7 @@ private:
   ITrayManager *FTrayManager;
   IXmppStreams *FXmppStreams;
   IServiceDiscovery *FDiscovery;
+  INotifications *FNotifications;
 private:
   Menu *FChatMenu;
   Action *FJoinAction;

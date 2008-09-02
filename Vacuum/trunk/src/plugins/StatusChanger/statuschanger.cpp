@@ -18,6 +18,8 @@
 
 #define IN_CONNECTING                       "connecting"
 
+#define NOTIFICATOR_ID                      "StatusChanger"
+
 StatusChanger::StatusChanger()
 {
   FConnectingLabel = RLID_NULL;
@@ -197,6 +199,12 @@ bool StatusChanger::initObjects()
   {
     connect(FStatusIcons->instance(),SIGNAL(defaultIconsChanged()),
       SLOT(onDefaultStatusIconsChanged()));
+  }
+
+  if (FNotifications)
+  {
+    uchar kindMask = INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Connection errors"),kindMask,kindMask);
   }
 
   return true;
@@ -877,7 +885,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
     if (FNotifications)
     {
       INotification notify;
-      notify.kinds = INotification::PopupWindow|INotification::PlaySound;
+      notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
       notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,"","") : QIcon());
       notify.data.insert(NDR_WINDOW_CAPTION, tr("Connection error"));
       notify.data.insert(NDR_WINDOW_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());

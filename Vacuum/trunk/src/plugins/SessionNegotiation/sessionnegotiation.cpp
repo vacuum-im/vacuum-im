@@ -19,6 +19,8 @@
 
 #define IN_SESSION                    "psi/smile"
 
+#define NOTIFICATOR_ID                "SessionNegotiation"
+
 SessionNegotiation::SessionNegotiation()
 {
   FDataForms = NULL;
@@ -97,6 +99,11 @@ bool SessionNegotiation::initObjects()
   {
     registerDiscoFeatures();
     //FDiscovery->insertFeatureHandler(NS_STANZA_SESSION,this,DFO_DEFAULT);
+  }
+  if (FNotifications)
+  {
+    uchar kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Negotiate session requests"),kindMask,kindMask);
   }
   insertNegotiator(this,SNO_DEFAULT);
   return true;
@@ -789,7 +796,7 @@ void SessionNegotiation::showSessionDialog(const IStanzaSession &ASession, const
     if (FNotifications && !dialog->instance()->isVisible())
     {
       INotification notify;
-      notify.kinds = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+      notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
       notify.data.insert(NDR_ICON,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SESSION));
       notify.data.insert(NDR_TOOLTIP,tr("Settings for session with %1").arg(ASession.contactJid.full()));
       notify.data.insert(NDR_WINDOW_CAPTION,tr("Session negotiation"));

@@ -19,6 +19,9 @@
 #include "edituserslistdialog.h"
 #include "ui_multiuserchatwindow.h"
 
+#define GROUP_NOTIFICATOR_ID      "GroupChatMessages"
+#define PRIVATE_NOTIFICATOR_ID    "PrivateMessages"
+
 class MultiUserChatWindow : 
   public IMultiUserChatWindow,
   public IMessageHandler

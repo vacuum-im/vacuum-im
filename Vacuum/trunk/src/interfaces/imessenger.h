@@ -269,12 +269,10 @@ class IMessenger
 {
 public:
   enum Option {
-    OpenChatInTabWindow         =1,
-    ShowHTML                    =2,
-    ShowDateTime                =4,
-    ShowStatus                  =16,
-    OpenMessageWindow           =32,
-    OpenChatWindow              =64
+    UseTabWindow                =0x01,
+    ShowHTML                    =0x02,
+    ShowDateTime                =0x04,
+    ShowStatus                  =0x08,
   };
 public:
   virtual QObject *instance() = 0;

@@ -5,6 +5,10 @@
 
 #define HISTORY_MESSAGES                      10
 
+#define CHAT_NOTIFICATOR_ID                   "ChatMessages"
+#define NORMAL_NOTIFICATOR_ID                 "NormalMessages"
+
+
 MessageHandler::MessageHandler(IMessenger *AMessenger, QObject *AParent) : QObject(AParent)
 {
   FMessenger = AMessenger;
@@ -67,7 +71,7 @@ INotification MessageHandler::notification(INotifications *ANotifications, const
   QString name= ANotifications->contactName(AMessage.to(),AMessage.from());
 
   INotification notify;
-  notify.kinds = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
+  notify.kinds = ANotifications->notificatorKinds(AMessage.type()==Message::Normal ? NORMAL_NOTIFICATOR_ID : CHAT_NOTIFICATOR_ID);
   notify.data.insert(NDR_ICON,icon);
   notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
   notify.data.insert(NDR_ROSTER_STREAM_JID,AMessage.to());
@@ -150,6 +154,18 @@ void MessageHandler::initialize()
   plugin = FMessenger->pluginManager()->getPlugins("IMessageArchiver").value(0,NULL);
   if (plugin)
     FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
+
+  plugin = FMessenger->pluginManager()->getPlugins("INotifications").value(0,NULL);
+  if (plugin)
+  {
+    INotifications *notifications = qobject_cast<INotifications *>(plugin->instance());
+    if (notifications)
+    {
+      uchar kindMask = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
+      notifications->insertNotificator(NORMAL_NOTIFICATOR_ID,tr("Single Messages"),kindMask,kindMask);
+      notifications->insertNotificator(CHAT_NOTIFICATOR_ID,tr("Chat Messages"),kindMask,kindMask);
+    }
+  }
 }
 
 IMessageWindow *MessageHandler::getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
@@ -287,7 +303,7 @@ void MessageHandler::showChatHistory(IChatWindow *AWindow)
 
 void MessageHandler::showChatWindow(IChatWindow *AWindow)
 {
-  if (AWindow->isWindow() && FMessenger->checkOption(IMessenger::OpenChatInTabWindow))
+  if (AWindow->isWindow() && FMessenger->checkOption(IMessenger::UseTabWindow))
   {
     ITabWindow *tabWindow = FMessenger->openTabWindow();
     tabWindow->addWidget(AWindow);
