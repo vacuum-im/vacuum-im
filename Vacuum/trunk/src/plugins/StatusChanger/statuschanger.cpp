@@ -1149,15 +1149,16 @@ void StatusChanger::onReconnectTimer()
   {
     if (it.value().first <= QDateTime::currentDateTime()) 
     {
-      if (it.key()->show() == IPresence::Error)
-      {
-        int statusId = FStatusItems.contains(it.value().second) ? it.value().second : STATUS_ONLINE;
-        setStatus(statusId,it.key()->streamJid());
-      }
+      IPresence *presence = it.key();
+      int statusId = FStatusItems.contains(it.value().second) ? it.value().second : STATUS_ONLINE;
       it = FStreamWaitReconnect.erase(it);
+      if (presence->show() == IPresence::Error)
+        setStatus(statusId,presence->streamJid());
     }
     else
+    {
       it++;
+    }
   }
 }
 

@@ -73,7 +73,7 @@ void DefaultConnection::connectToHost()
     FConnectTimer.start(CONNECT_TIMEOUT);
   }
   else
-    connectionError(tr("Unexpected connection request"));
+    connectionError(tr("Socket not ready"));
 }
 
 void DefaultConnection::disconnect()
