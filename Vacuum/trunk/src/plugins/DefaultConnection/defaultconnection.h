@@ -71,11 +71,10 @@ private:
     ProxyConnect,
     ProxyConnectResult,
     ProxyReady
-  };
+  } FProxyState;
   bool FConnected;
   bool FDisconnect;
   bool FDisconnected;
-  ProxyState FProxyState;
   QHash<int, QVariant> FOptions;
   QString FHost;
   quint16 FPort;

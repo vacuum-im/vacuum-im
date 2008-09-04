@@ -330,7 +330,6 @@ void DefaultConnection::onSocketDisconnected()
   FDisconnect = true;
   FDisconnected = true;
   FConnectTimer.stop();
-  FSocket.disconnectFromHost();
   emit disconnected();
 }
 
