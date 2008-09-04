@@ -53,25 +53,16 @@ signals:
   virtual void featureRemoved(IXmppStream *AXmppStream, IStreamFeature *AFeature);
   virtual void destroyed(IXmppStream *AXmppStream);
 protected:
-  enum StreamState {
-    SS_OFFLINE, 
-    SS_CONNECTING, 
-    SS_INITIALIZE, 
-    SS_FEATURES, 
-    SS_ONLINE,
-    SS_ERROR
-  }; 
   void startStream();
+  void abortStream(const QString &AError);
+  void processFeatures();
   IStreamFeature *getFeature(const QString &AFeatureNS);
-  bool processFeatures(const QDomElement &AFeatures=QDomElement());
   void sortFeature(IStreamFeature *AFeature = NULL);
-  bool startFeature(const QDomElement &AElem);
   bool startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem);
   bool hookFeatureData(QByteArray *AData, IStreamFeature::Direction ADirection);
   bool hookFeatureElement(QDomElement *AElem, IStreamFeature::Direction ADirection);
   qint64 sendData(const QByteArray &AData);
   QByteArray receiveData(qint64 ABytes);
-  void abortStream(const QString &AError);
   void showInConsole(const QDomElement &AElem, IStreamFeature::Direction ADirection);
 protected slots:
   //IStreamConnection
@@ -97,6 +88,14 @@ private:
   IStreamFeature *FActiveFeature;
   QList<IStreamFeature *>	FFeatures; 
 private:
+  enum StreamState {
+    SS_OFFLINE, 
+    SS_CONNECTING, 
+    SS_INITIALIZE, 
+    SS_FEATURES, 
+    SS_ONLINE,
+    SS_ERROR
+  } FStreamState; 
   bool FOpen;
   Jid FJid;
   Jid FOfflineJid;
@@ -106,7 +105,6 @@ private:
   QString FDefLang;
   QString FXmppVersion;
   QString FLastError;
-  StreamState FStreamState; 
   StreamParser FParser;
   QTimer FKeepAliveTimer;
 };

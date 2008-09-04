@@ -170,8 +170,8 @@ void XmppStream::removeFeature(IStreamFeature *AFeature)
 
 void XmppStream::startStream()
 {
-  FStreamState = SS_INITIALIZE;
   FParser.restart();
+  FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
 
   QDomDocument doc;
   QDomElement root = doc.createElementNS(NS_JABBER_STREAMS,"stream:stream"); 
@@ -184,10 +184,52 @@ void XmppStream::startStream()
   QByteArray data = QString("<?xml version=\"1.0\"?>").toUtf8()+doc.toByteArray().trimmed();
   data.remove(data.size()-2,1);
 
+  FStreamState = SS_INITIALIZE;
   if (!hookFeatureData(&data,IStreamFeature::DirectionOut))
   {
     showInConsole(doc.documentElement(),IStreamFeature::DirectionOut);
     FConnection->write(data);
+  }
+}
+
+void XmppStream::abortStream(const QString &AError)
+{
+  if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
+  {
+    qDebug() << "\nSTREAM" << FJid.full() << "ERROR:" << AError; 
+    FStreamState = SS_ERROR;
+    FLastError = AError;
+    emit error(this,AError);
+    FConnection->disconnect();
+  }
+}
+
+void XmppStream::processFeatures()
+{
+  bool completed = true;
+  QDomElement elem = FFeaturesElement.firstChildElement();
+  while (!elem.isNull())
+  {
+    QDomElement nextElem = elem.nextSiblingElement();
+    FFeaturesElement.removeChild(elem); 
+    if (startFeature(elem.namespaceURI(),elem))
+    {
+      completed = false;
+      break;
+    }
+    else if (!elem.firstChildElement("required").isNull())
+    {
+      completed = false;
+      abortStream(tr("Required stream feature '%1' not available").arg(elem.tagName()));
+      break;
+    }
+    elem = nextElem;
+  }
+  if (completed)
+  {
+    FOpen = true;
+    FStreamState = SS_ONLINE;
+    emit opened(this);
   }
 }
 
@@ -202,28 +244,6 @@ IStreamFeature *XmppStream::getFeature(const QString &AFeatureNS)
     return plugin->getStreamFeature(AFeatureNS,this);
 
   return NULL;
-}
-
-bool XmppStream::processFeatures(const QDomElement &AFeatures)
-{
-  if (!AFeatures.isNull())
-    FFeaturesElement = AFeatures;
-
-  if (!startFeature(NS_FEATURE_REGISTER,QDomElement()))
-  {
-    QDomElement elem = FFeaturesElement.firstChildElement();
-    while (!elem.isNull())
-    {
-      QDomElement nextElem = elem.nextSiblingElement();
-      FFeaturesElement.removeChild(elem); 
-      if (startFeature(elem))
-        return true;
-      elem = nextElem;
-    }
-  }
-  else
-    return true;
-  return false;
 }
 
 void XmppStream::sortFeature(IStreamFeature *AFeature)
@@ -268,12 +288,6 @@ bool XmppStream::startFeature(const QString &AFeatureNS, const QDomElement &AFea
       removeFeature(feature);
   }
   return false;
-}
-
-bool XmppStream::startFeature(const QDomElement &AElem)
-{
-  QString nsURI = AElem.namespaceURI();
-  return startFeature(nsURI,AElem);
 }
 
 bool XmppStream::hookFeatureData(QByteArray *AData, IStreamFeature::Direction ADirection)
@@ -341,18 +355,6 @@ QByteArray XmppStream::receiveData(qint64 ABytes)
 {
   FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
   return FConnection->read(ABytes);
-}
-
-void XmppStream::abortStream(const QString &AError)
-{
-  if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
-  {
-    qDebug() << "\nSTREAM" << FJid.full() << "ERROR:" << AError; 
-    FStreamState = SS_ERROR;
-    FLastError = AError;
-    emit error(this,AError);
-    FConnection->disconnect();
-  }
 }
 
 void XmppStream::showInConsole(const QDomElement &AElem, IStreamFeature::Direction ADirection)
@@ -427,12 +429,9 @@ void XmppStream::onParserElement(const QDomElement &AElem)
     } 
     else if (FStreamState == SS_FEATURES && AElem.nodeName() == "stream:features")
     {
-      if (!processFeatures(AElem))
-      {
-        FStreamState = SS_ONLINE;
-        FOpen = true;
-        emit opened(this);
-      }
+      FFeaturesElement = AElem;
+      if (!startFeature(NS_FEATURE_REGISTER,QDomElement()))
+        processFeatures();
     } 
     else
     {
@@ -454,14 +453,7 @@ void XmppStream::onParserClosed()
 void XmppStream::onFeatureReady(bool ARestart)
 {
   if (!ARestart)
-  {
-    if (!processFeatures())
-    {
-      FStreamState = SS_ONLINE;
-      FOpen = true;
-      emit opened(this);
-    }
-  }
+    processFeatures();
   else
     startStream();
 }
@@ -474,6 +466,9 @@ void XmppStream::onFeatureError(const QString &AError)
 
 void XmppStream::onKeepAliveTimeout()
 {
-  sendData(" ");
+  if (FStreamState!=SS_ONLINE)
+    abortStream(tr("XMPP connection timed out"));
+  else
+    sendData(" ");
 }
 
