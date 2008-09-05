@@ -8,5 +8,6 @@
 #define ON_EMOTICONS                                "Emoticons"
 #define ON_HISTORY                                  "History"
 #define ON_NOTIFY                                   "Notify"
+#define ON_AUTO_STATUS                              "AutoStatus"
 
 #endif

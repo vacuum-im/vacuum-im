@@ -37,4 +37,5 @@ SUBDIRS = settings \
           privacylists \
           sessionnegotiation \
           avatars \
-          notifications
+          notifications \
+          autostatus
