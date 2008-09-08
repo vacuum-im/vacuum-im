@@ -115,6 +115,7 @@ protected:
   QString loadServerPrefs(const Jid &AStreamJid);
   QString loadStoragePrefs(const Jid &AStreamJid);
   void applyArchivePrefs(const Jid &AStreamJid, const QDomElement &AElem);
+  QString collectionDirName(const Jid &AJid) const;
   QString collectionFileName(const DateTime &AStart) const;
   QString collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const;
   QString collectionFilePath(const Jid &AStreamJid, const Jid &AWith, const DateTime &AStart) const;

@@ -1132,6 +1132,14 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
   }
 }
 
+QString MessageArchiver::collectionDirName(const Jid &AJid) const
+{
+  Jid jid = AJid;
+  if (!jid.node().isEmpty() && FGatewayTypes.contains(jid.domain()))
+    jid.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(jid.domain())));
+  return Jid::encode(jid.pBare());
+}
+
 QString MessageArchiver::collectionFileName(const DateTime &AStart) const
 {
   if (AStart.isValid())
@@ -1145,6 +1153,7 @@ QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWi
 {
   QDir dir;
   bool noError = true;
+
   if (FSettingsPlugin)
     dir.setPath(FSettingsPlugin->homeDir().path());
 
@@ -1154,7 +1163,7 @@ QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWi
 
   if (AStreamJid.isValid())
   {
-    QString streamDir = Jid::encode(AStreamJid.pBare());
+    QString streamDir = collectionDirName(AStreamJid);
     if (!dir.exists(streamDir))
       noError &= dir.mkdir(streamDir);
     noError &= dir.cd(streamDir);
@@ -1167,7 +1176,7 @@ QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWi
     if (!with.node().isEmpty() && FGatewayTypes.contains(with.domain()))
       with.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(with.domain())));
 
-    QString withDir = Jid::encode(with.pBare());
+    QString withDir = collectionDirName(with);
     if (!dir.exists(withDir))
       noError &= dir.mkdir(withDir);
     noError &= dir.cd(withDir);
@@ -1197,7 +1206,7 @@ QStringList MessageArchiver::findCollectionFiles(const Jid &AStreamJid, const IA
     QDir dir(dirPath);
     QStringList dirList;
     if (ARequest.with.isValid())
-      dirList += Jid::encode(ARequest.with.pBare());
+      dirList += collectionDirName(ARequest.with);
     else
       dirList = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 
