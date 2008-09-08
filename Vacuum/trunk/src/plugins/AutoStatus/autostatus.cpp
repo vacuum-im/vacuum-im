@@ -213,6 +213,7 @@ void AutoStatus::onIdleTimerTimeout()
 
 void AutoStatus::onSettingsOpened()
 {
+  FRules.clear();
   ISettings *settings = FSettingsPlugin->settingsForPlugin(AUTOSTATUS_UUID);
   QList<QString> nsList = settings->values(SVN_RULE).keys();
   if (nsList.isEmpty())
