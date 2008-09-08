@@ -40,7 +40,7 @@ public:
   virtual void pluginInfo(PluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin()  { return true; }
   //IStanzaHandler
   virtual bool editStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza * /*AStanza*/, bool &/*AAccept*/) { return false; }
@@ -150,6 +150,7 @@ protected slots:
   void onOptionsDialogRejected();
   void onArchiveHandlerDestroyed(QObject *AHandler);
   void onArchiveWindowDestroyed(IArchiveWindow *AWindow);
+  void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -180,6 +181,7 @@ private:
   QMultiMap<int, IArchiveHandler *> FArchiveHandlers;
   QHash<Jid, Replicator *> FReplicators;
   QHash<Jid, ViewHistoryWindow *> FArchiveWindows;
+  QHash<Jid, QString> FGatewayTypes;
 };
 
 #endif // MESSAGEARCHIVER_H

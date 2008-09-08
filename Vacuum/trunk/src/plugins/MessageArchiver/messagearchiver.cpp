@@ -7,7 +7,10 @@
 #define ARCHIVE_DIRNAME       "archive"
 #define COLLECTION_EXT        ".xml"
 #define LOG_FILE_NAME         "archive.dat"
+#define GATEWAY_FILE_NAME     "gateways.dat"
 #define ARCHIVE_TIMEOUT       30000
+
+#define CATEGORY_GATEWAY      "gateway"
 
 #define LOG_ACTION_CREATE     "C"
 #define LOG_ACTION_MODIFY     "M"
@@ -115,7 +118,13 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 
   plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
   if (plugin)
+  {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+    if (FDiscovery)
+    {
+      connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+    }
+  }
 
   return FStanzaProcessor!=NULL;
 }
@@ -135,6 +144,23 @@ bool MessageArchiver::initObjects()
   {
     registerDiscoFeatures();
   }
+  return true;
+}
+
+bool MessageArchiver::initSettings()
+{
+  QString dirPath = collectionDirPath(Jid(),Jid());
+  QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
+  if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
+  {
+    while (!gateways.atEnd())
+    {
+      QStringList gateway = QString::fromUtf8(gateways.readLine()).split(" ");
+      if (!gateway.value(0).isEmpty() && !gateway.value(1).isEmpty())
+        FGatewayTypes.insert(gateway.value(0),gateway.value(1));
+    }
+  }
+  gateways.close();
   return true;
 }
 
@@ -802,9 +828,9 @@ IArchiveModifications MessageArchiver::loadLocalModifications(const Jid &AStream
   modifs.startTime = AStart.toUTC();
 
   QString dirPath = collectionDirPath(AStreamJid,Jid());
-  if (!dirPath.isEmpty() && AStart.isValid())
+  if (!dirPath.isEmpty() && AStreamJid.isValid() && AStart.isValid())
   {
-    QFile log(dirPath+"/"+LOG_FILE_NAME);
+    QFile log(dirPath+"/"LOG_FILE_NAME);
     if (log.open(QFile::ReadOnly|QIODevice::Text))
     {
       //ѕоиск записи методом делени€ пополам
@@ -1117,34 +1143,37 @@ QString MessageArchiver::collectionFileName(const DateTime &AStart) const
 
 QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const
 {
+  QDir dir;
+  bool noError = true;
+  if (FSettingsPlugin)
+    dir.setPath(FSettingsPlugin->homeDir().path());
+
+  if (!dir.exists(ARCHIVE_DIRNAME))
+    noError &= dir.mkdir(ARCHIVE_DIRNAME);
+  noError &= dir.cd(ARCHIVE_DIRNAME);
+
   if (AStreamJid.isValid())
   {
-    QDir dir;
-    bool noError = true;
-    if (FSettingsPlugin)
-      dir.setPath(FSettingsPlugin->homeDir().path());
-
-    if (!dir.exists(ARCHIVE_DIRNAME))
-      noError &= dir.mkdir(ARCHIVE_DIRNAME);
-    noError &= dir.cd(ARCHIVE_DIRNAME);
-
     QString streamDir = Jid::encode(AStreamJid.pBare());
     if (!dir.exists(streamDir))
       noError &= dir.mkdir(streamDir);
     noError &= dir.cd(streamDir);
-
-    if (AWith.isValid())
-    {
-      QString withDir = Jid::encode(AWith.pBare());
-      if (!dir.exists(withDir))
-        noError &= dir.mkdir(withDir);
-      noError &= dir.cd(withDir);
-    }
-
-    if (noError)
-      return dir.path();
   }
-  return QString();
+
+  if (AWith.isValid())
+  {
+    Jid with = AWith;
+
+    if (!with.node().isEmpty() && FGatewayTypes.contains(with.domain()))
+      with.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(with.domain())));
+
+    QString withDir = Jid::encode(with.pBare());
+    if (!dir.exists(withDir))
+      noError &= dir.mkdir(withDir);
+    noError &= dir.cd(withDir);
+  }
+
+  return noError ? dir.path() : QString();
 }
 
 QString MessageArchiver::collectionFilePath(const Jid &AStreamJid, const Jid &AWith, const DateTime &AStart) const
@@ -1163,7 +1192,7 @@ QStringList MessageArchiver::findCollectionFiles(const Jid &AStreamJid, const IA
 {
   QStringList files;
   QString dirPath = collectionDirPath(AStreamJid,Jid());
-  if (!dirPath.isEmpty())
+  if (AStreamJid.isValid() && !dirPath.isEmpty())
   {
     QDir dir(dirPath);
     QStringList dirList;
@@ -1380,9 +1409,9 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 bool MessageArchiver::saveLocalModofication(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const
 {
   QString dirPath = collectionDirPath(AStreamJid,Jid());
-  if (!dirPath.isEmpty() && AHeader.with.isValid() && AHeader.start.isValid())
+  if (!dirPath.isEmpty() && AStreamJid.isValid() && AHeader.with.isValid() && AHeader.start.isValid())
   {
-    QFile log(dirPath+"/"+LOG_FILE_NAME);
+    QFile log(dirPath+"/"LOG_FILE_NAME);
     if (log.open(QFile::WriteOnly|QFile::Append|QIODevice::Text))
     {
       QStringList logFields;
@@ -1405,7 +1434,7 @@ void MessageArchiver::insertReplicator(const Jid &AStreamJid)
   if (isSupported(AStreamJid) && !FReplicators.contains(AStreamJid))
   {
     QString dirPath = collectionDirPath(AStreamJid,Jid());
-    if (!dirPath.isEmpty())
+    if (AStreamJid.isValid() && !dirPath.isEmpty())
     {
       Replicator *replicator = new Replicator(this,AStreamJid,dirPath,this);
       FReplicators.insert(AStreamJid,replicator);
@@ -1951,6 +1980,33 @@ void MessageArchiver::onArchiveWindowDestroyed(IArchiveWindow *AWindow)
 {
   FArchiveWindows.remove(AWindow->streamJid());
   emit archiveWindowDestroyed(AWindow);
+}
+
+void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
+{
+  if (ADiscoInfo.node.isEmpty() && ADiscoInfo.contactJid.node().isEmpty() &&  ADiscoInfo.contactJid.resource().isEmpty() && 
+    !FGatewayTypes.contains(ADiscoInfo.contactJid))
+  {
+    foreach(IDiscoIdentity identity, ADiscoInfo.identity)
+    {
+      if (identity.category==CATEGORY_GATEWAY && !identity.type.isEmpty())
+      {
+        QString dirPath = collectionDirPath(Jid(),Jid());
+        QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
+        if (!dirPath.isEmpty() && gateways.open(QFile::WriteOnly|QFile::Append|QFile::Text))
+        {
+          QStringList gateway;
+          gateway << ADiscoInfo.contactJid.pDomain();
+          gateway << identity.type;
+          gateway << "\n";
+          gateways.write(gateway.join(" ").toUtf8()); 
+          gateways.close();
+        }
+        FGatewayTypes.insert(ADiscoInfo.contactJid,identity.type);
+        break;
+      }
+    }
+  }
 }
 
 Q_EXPORT_PLUGIN2(MessageArchiverPlugin, MessageArchiver)
