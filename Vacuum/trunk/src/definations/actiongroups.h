@@ -16,6 +16,7 @@
 #define AG_DISCOVERY_MWTTB                                      200
 #define AG_MULTIUSERCHAT_MWTTB                                  300
 #define AG_BOOKMARKS_MWTTB                                      400
+#define AG_ROSTERSEARCH_MWTTB                                   900
 
 //RostersView (ContextMenu)
 #define AG_MESSENGER                                            200

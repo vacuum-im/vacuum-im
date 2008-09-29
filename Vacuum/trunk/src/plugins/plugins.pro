@@ -38,4 +38,5 @@ SUBDIRS = settings \
           sessionnegotiation \
           avatars \
           notifications \
-          autostatus
+          autostatus \
+          rostersearch
