@@ -1,2 +1,2 @@
 cd %1
-qmake -spec $(QTDIR)\mkspecs\win32-msvc2005 QMAKE_INCDIR_QT=$(QTDIR)\include QMAKE_LIBDIR=$(QTDIR)\lib QMAKE_UIC=$(QTDIR)\bin\uic.exe QMAKE_MOC=$(QTDIR)\bin\moc.exe QMAKE_RCC=$(QTDIR)\bin\rcc.exe QMAKE_QMAKE=$(QTDIR)\bin\qmake.exe -tp vc -o %1.vcproj %1.pro 
+qmake -spec $(QTDIR)\mkspecs\win32-msvc2008 QMAKE_INCDIR_QT=$(QTDIR)\include QMAKE_LIBDIR=$(QTDIR)\lib QMAKE_UIC=$(QTDIR)\bin\uic.exe QMAKE_MOC=$(QTDIR)\bin\moc.exe QMAKE_RCC=$(QTDIR)\bin\rcc.exe QMAKE_QMAKE=$(QTDIR)\bin\qmake.exe -tp vc -o %1.vcproj %1.pro 

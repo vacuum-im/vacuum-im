@@ -1,5 +1,5 @@
-HEADERS += pluginmanager.h
+HEADERS = pluginmanager.h
 
-SOURCES += main.cpp \
-           pluginmanager.cpp
+SOURCES = main.cpp \
+          pluginmanager.cpp
 

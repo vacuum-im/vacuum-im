@@ -1,4 +1,4 @@
-HEADERS += utilsexport.h \
+HEADERS  = utilsexport.h \
            jid.h \
            versionparser.h \
            errorhandler.h \
@@ -16,7 +16,7 @@ HEADERS += utilsexport.h \
            soundset.h \
            skinsoundset.h
 
-SOURCES += jid.cpp \
+SOURCES  = jid.cpp \
            versionparser.cpp \
            errorhandler.cpp \
            stanza.cpp \

@@ -1,14 +1,8 @@
-TEMPLATE = lib
-
-CONFIG += dll warn_off
-CONFIG -= qt
-
-DEFINES += ZLIB_DLL
-
-DLLDESTDIR = ../../..
-
-DESTDIR = ../../libs
-
 TARGET = zlib1
-
+TEMPLATE = lib
+CONFIG -= qt
+CONFIG += dll warn_off
+DEFINES += ZLIB_DLL
+DLLDESTDIR = ../../..
+DESTDIR = ../../libs
 include(zlib.pri)

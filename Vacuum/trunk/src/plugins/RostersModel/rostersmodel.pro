@@ -1,9 +1,3 @@
-include(../plugins.inc)	
-	
-QT += network xml 
-
-LIBS += -l../../libs/utils 
-
 TARGET = rostersmodel 
-
-include(rostersmodel.pri) 
+include(rostersmodel.pri)
+include(../plugins.inc)

@@ -1,10 +1,6 @@
-TEMPLATE = lib
-
-CONFIG += staticlib warn_off
-CONFIG -= qt
-
-DESTDIR = ../../libs 
-
 TARGET = idn
-
+TEMPLATE = lib
+CONFIG -= qt
+CONFIG += staticlib warn_off
+DESTDIR = ../../libs 
 include(libidn.pri) 
