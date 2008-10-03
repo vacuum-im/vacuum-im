@@ -37,7 +37,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMes
   FMultiChat->instance()->setParent(this);
 
   FSplitterLoaded = false;
-  FExitOnChatClosed = false;
+  FDestroyOnChatClosed = false;
 
   FViewWidget = FMessenger->newViewWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
   FViewWidget->setShowKind(IViewWidget::GroupChatMessage);
@@ -108,9 +108,13 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMes
 
 MultiUserChatWindow::~MultiUserChatWindow()
 {
-  exitMultiUserChat("");
-  foreach(IChatWindow *window,FChatWindows)
-    window->deleteLater();
+  if (FMultiChat->isOpen())
+    FMultiChat->setPresence(IPresence::Offline,"");
+
+  QList<IChatWindow *> chatWindows = FChatWindows;
+  foreach(IChatWindow *window,chatWindows)
+    delete window->instance();
+
   FMessenger->removeMessageHandler(this,MHO_MULTIUSERCHAT);
   emit windowDestroyed();
 }
@@ -301,17 +305,18 @@ IChatWindow *MultiUserChatWindow::findChatWindow(const Jid &AContactJid) const
   return NULL;
 }
 
-void MultiUserChatWindow::exitMultiUserChat(const QString &AStatus)
+void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 {
+  closeWindow();
+  FDestroyOnChatClosed = true;
+
   if (FMultiChat->isOpen())
-  {
-    FExitOnChatClosed = true;
     FMultiChat->setPresence(IPresence::Offline,AStatus);
-    closeWindow();
-    QTimer::singleShot(5000,this,SLOT(deleteLater()));
-  }
-  else
-    deleteLater();
+
+  if (FMultiChat->isOpen() && AWaitClose>0)
+    QTimer::singleShot(AWaitClose,this,SLOT(deleteLater()));
+  else if (!FMultiChat->isOpen() || AWaitClose==0)
+    delete this;
 }
 
 void MultiUserChatWindow::initialize()
@@ -895,7 +900,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
     parts.removeFirst();
     QString status = parts.join(" ");
     FMultiChat->setPresence(IPresence::Offline,status);
-    exitMultiUserChat(tr("Disconnected"));
+    exitAndDestroy(tr("Disconnected"));
     hasCommand = true;
   }
   else if (AText.startsWith("/topic "))
@@ -1104,7 +1109,7 @@ void MultiUserChatWindow::onChatError(const QString &ANick, const QString &AErro
 
 void MultiUserChatWindow::onChatClosed()
 {
-  FExitOnChatClosed ? deleteLater() : showServiceMessage(tr("Disconnected"));
+  FDestroyOnChatClosed ? deleteLater() : showServiceMessage(tr("Disconnected"));
 }
 
 void MultiUserChatWindow::onStreamJidChanged(const Jid &/*ABefour*/, const Jid &AAfter)
@@ -1418,7 +1423,7 @@ void MultiUserChatWindow::onMenuBarActionTriggered(bool)
   }
   else if (action == FQuitRoom)
   {
-    exitMultiUserChat(tr("Disconnected"));
+    exitAndDestroy(tr("Disconnected"));
   }
   else if (action == FInviteContact)
   {

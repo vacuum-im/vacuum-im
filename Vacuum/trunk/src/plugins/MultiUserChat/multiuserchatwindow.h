@@ -55,7 +55,7 @@ public:
   virtual IMultiUserChat *multiUserChat() const { return FMultiChat; }
   virtual IChatWindow *openChatWindow(const Jid &AContactJid); 
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;
-  virtual void exitMultiUserChat(const QString &AStatus);
+  virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000);
 signals:
   virtual void windowShow();
   virtual void windowClose();
@@ -182,7 +182,7 @@ private:
       Action *FSetAffilOwner;
 private:
   bool FSplitterLoaded;
-  bool FExitOnChatClosed;
+  bool FDestroyOnChatClosed;
   QList<int> FActiveMessages;
   QList<IChatWindow *> FChatWindows;
   QMultiHash<IChatWindow *,int> FActiveChatMessages;

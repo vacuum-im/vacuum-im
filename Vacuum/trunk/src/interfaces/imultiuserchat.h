@@ -174,7 +174,7 @@ public:
   virtual IMultiUserChat *multiUserChat() const =0;
   virtual IChatWindow *openChatWindow(const Jid &AContactJid) =0; 
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const =0;
-  virtual void exitMultiUserChat(const QString &AStatus) =0;
+  virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000) =0;
 signals:
   virtual void windowActivated() =0;
   virtual void windowClosed() =0;

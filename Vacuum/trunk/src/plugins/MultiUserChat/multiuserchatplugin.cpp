@@ -474,9 +474,10 @@ void MultiUserChatPlugin::onMultiChatWindowDestroyed()
 
 void MultiUserChatPlugin::onStreamRemoved(IXmppStream *AXmppStream)
 {
-  foreach(IMultiUserChatWindow *chatWindow,FChatWindows)
+  QList<IMultiUserChatWindow *> chatWindows = FChatWindows;
+  foreach(IMultiUserChatWindow *chatWindow, chatWindows)
     if (chatWindow->streamJid() == AXmppStream->jid())
-      chatWindow->exitMultiUserChat("");
+      chatWindow->exitAndDestroy("",0);
 
   QList<QMessageBox *> inviteDialogs = FInviteDialogs.keys();
   foreach(QMessageBox * inviteDialog,inviteDialogs)
