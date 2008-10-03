@@ -32,7 +32,7 @@ RosterChanger::~RosterChanger()
 }
 
 //IPlugin
-void RosterChanger::pluginInfo(PluginInfo *APluginInfo)
+void RosterChanger::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Manipulating roster items and groups");

@@ -17,7 +17,7 @@ public:
   virtual QObject *instance() {return this;}
   //IPlugin
   virtual QUuid pluginUuid() const { return XMPPSTREAMS_UUID;}
-  virtual void pluginInfo(PluginInfo *APluginInfo);
+  virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager * /*APluginManager*/, int &/*AInitOrder*/) { return true; }
   virtual bool initObjects();
   virtual bool initSettings() { return true; }

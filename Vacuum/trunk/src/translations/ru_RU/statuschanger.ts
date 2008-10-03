@@ -122,92 +122,92 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="165"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="164"/>
         <source>Edit presence statuses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="207"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="206"/>
         <source>Connection errors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="483"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="488"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="509"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="514"/>
         <source>Online</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="487"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="492"/>
         <source>Chat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="489"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="494"/>
         <source>Away</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="491"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="496"/>
         <source>Extended Away</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="536"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="541"/>
         <source>Do not disturb</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="495"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="500"/>
         <source>Invisible</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="572"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="577"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="499"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="504"/>
         <source>Unknown Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="518"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="523"/>
         <source>Free for chat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="527"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="532"/>
         <source>I`am away from my desk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="545"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="550"/>
         <source>Not available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="563"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="568"/>
         <source>Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="781"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="786"/>
         <source>%1 - %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="890"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="895"/>
         <source>Connection error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="1038"/>
+        <location filename="../../plugins/StatusChanger/statuschanger.cpp" line="1028"/>
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>

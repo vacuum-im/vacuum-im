@@ -51,7 +51,7 @@ MessageArchiver::~MessageArchiver()
 
 }
 
-void MessageArchiver::pluginInfo(PluginInfo *APluginInfo)
+void MessageArchiver::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Archiving and retrieval of XMPP messages");

@@ -30,7 +30,7 @@ RostersModel::~RostersModel()
 
 }
 
-void RostersModel::pluginInfo(PluginInfo *APluginInfo)
+void RostersModel::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Creating and handling roster tree");

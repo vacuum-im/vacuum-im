@@ -15,7 +15,7 @@ StanzaProcessor::~StanzaProcessor()
 
 }
 
-void StanzaProcessor::pluginInfo(PluginInfo *APluginInfo)
+void StanzaProcessor::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing stanza handlers");

@@ -27,7 +27,7 @@ VCardPlugin::~VCardPlugin()
 
 }
 
-void VCardPlugin::pluginInfo(PluginInfo *APluginInfo)
+void VCardPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Request and publish vCards");

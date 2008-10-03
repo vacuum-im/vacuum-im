@@ -40,7 +40,7 @@ Gateways::~Gateways()
 
 }
 
-void Gateways::pluginInfo(PluginInfo *APluginInfo)
+void Gateways::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Plugin for interactions between Jabber clients and client proxy gateways to legacy IM services");

@@ -8,17 +8,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/AutoStatus/autostatus.cpp" line="168"/>
+        <location filename="../../plugins/AutoStatus/autostatus.cpp" line="169"/>
         <source>Auto status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/AutoStatus/autostatus.cpp" line="76"/>
+        <location filename="../../plugins/AutoStatus/autostatus.cpp" line="77"/>
         <source>Edit auto status rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/AutoStatus/autostatus.cpp" line="224"/>
+        <location filename="../../plugins/AutoStatus/autostatus.cpp" line="225"/>
         <source>Status changed automatically to &apos;away&apos;</source>
         <translation type="unfinished"></translation>
     </message>

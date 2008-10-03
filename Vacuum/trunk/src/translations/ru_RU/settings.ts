@@ -55,32 +55,22 @@
     <name>ProfileDialogClass</name>
     <message>
         <location filename="../../plugins/Settings/profiledialog.ui" line="13"/>
-        <source>Change profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/Settings/profiledialog.ui" line="22"/>
         <source>Edit profiles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.ui" line="42"/>
+        <location filename="../../plugins/Settings/profiledialog.ui" line="36"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.ui" line="49"/>
+        <location filename="../../plugins/Settings/profiledialog.ui" line="43"/>
         <source>Rename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.ui" line="56"/>
+        <location filename="../../plugins/Settings/profiledialog.ui" line="50"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/Settings/profiledialog.ui" line="85"/>
-        <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

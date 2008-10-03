@@ -11,7 +11,7 @@ RosterPlugin::~RosterPlugin()
 
 }
 
-void RosterPlugin::pluginInfo(PluginInfo *APluginInfo)
+void RosterPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing roster and subscriptions");

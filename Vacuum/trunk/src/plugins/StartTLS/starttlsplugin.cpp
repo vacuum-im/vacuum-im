@@ -10,7 +10,7 @@ StartTLSPlugin::~StartTLSPlugin()
 
 }
 
-void StartTLSPlugin::pluginInfo(PluginInfo *APluginInfo)
+void StartTLSPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Implementation of StartTLS");

@@ -72,7 +72,7 @@ IqAuthPlugin::~IqAuthPlugin()
 
 }
 
-void IqAuthPlugin::pluginInfo(PluginInfo *APluginInfo)
+void IqAuthPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Implementation of Non-SASL Authentication (JEP-0078)");

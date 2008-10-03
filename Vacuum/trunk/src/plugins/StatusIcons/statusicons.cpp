@@ -31,7 +31,7 @@ StatusIcons::~StatusIcons()
   delete FCustomIconMenu;
 }
 
-void StatusIcons::pluginInfo(PluginInfo *APluginInfo)
+void StatusIcons::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Assign status icon to contact depended on users rules");

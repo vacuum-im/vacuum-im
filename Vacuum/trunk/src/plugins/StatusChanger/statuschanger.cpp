@@ -49,7 +49,7 @@ StatusChanger::~StatusChanger()
 }
 
 //IPlugin
-void StatusChanger::pluginInfo(PluginInfo *APluginInfo)
+void StatusChanger::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing and change status");
@@ -113,7 +113,6 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
     if (FAccountManager)
     {
-      connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
       connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),SLOT(onOptionsAccepted()));
       connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
     }
@@ -210,13 +209,19 @@ bool StatusChanger::initObjects()
   return true;
 }
 
-bool StatusChanger::initSettings()
-{
-  return true;
-}
-
 bool StatusChanger::startPlugin()
 {
+  foreach(IPresence *presence, FStreamStatus.keys())
+  {
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(presence->streamJid()) : NULL;
+    if (account!=NULL && account->value(AVN_AUTOCONNECT,false).toBool())
+    {
+      int statusId = FStreamMainStatus.contains(presence) ? MAIN_STATUS_ID : account->value(AVN_LAST_ONLINE_STATUS, STATUS_ONLINE).toInt();
+      if (!FStatusItems.contains(statusId))
+        statusId = STATUS_ONLINE;
+      setStatus(statusId,presence->streamJid());
+    }
+  }
   updateMainMenu();
   return true;
 }
@@ -1000,21 +1005,6 @@ void StatusChanger::onRosterClosed(IRoster *ARoster)
   IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
   if (FStreamWaitStatus.contains(presence))
     setStatus(FStreamWaitStatus.value(presence),presence->streamJid());
-}
-
-void StatusChanger::onAccountShown(IAccount *AAccount)
-{
-  if (AAccount->value(AVN_AUTOCONNECT,false).toBool())
-  {
-    IPresence *presence = FPresencePlugin->getPresence(AAccount->streamJid());
-    if (FStreamMenu.contains(presence))
-    {
-      int statusId = FStreamMainStatus.contains(presence) ? MAIN_STATUS_ID : AAccount->value(AVN_LAST_ONLINE_STATUS, STATUS_ONLINE).toInt();
-      if (!FStatusItems.contains(statusId))
-        statusId = STATUS_ONLINE;
-      setStatus(statusId,presence->streamJid());
-    }
-  }
 }
 
 void StatusChanger::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)

@@ -47,7 +47,7 @@ Avatars::~Avatars()
 
 }
 
-void Avatars::pluginInfo(PluginInfo *APluginInfo)
+void Avatars::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Enable a user to store and retrieve an avatar");

@@ -48,7 +48,7 @@ Messenger::~Messenger()
 
 }
 
-void Messenger::pluginInfo(PluginInfo *APluginInfo)
+void Messenger::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Send and receive messages");

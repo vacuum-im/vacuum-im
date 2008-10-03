@@ -15,7 +15,7 @@ ConnectionManager::~ConnectionManager()
 
 }
 
-void ConnectionManager::pluginInfo(PluginInfo *APluginInfo)
+void ConnectionManager::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Managing TCP connections");
@@ -27,7 +27,7 @@ void ConnectionManager::pluginInfo(PluginInfo *APluginInfo)
 
 bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  PluginList plugins = APluginManager->getPlugins("IConnectionPlugin");
+  QList<IPlugin *> plugins = APluginManager->getPlugins("IConnectionPlugin");
   foreach (IPlugin *plugin, plugins)
   {
     IConnectionPlugin *cplugin = qobject_cast<IConnectionPlugin *>(plugin->instance());

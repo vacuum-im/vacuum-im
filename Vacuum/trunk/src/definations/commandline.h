@@ -7,4 +7,7 @@
 // -h <HomeDir>
 #define CLO_HOME_DIR                "-h"
 
+// -l <Locale>
+#define CLO_LOCALE                  "-l"
+
 #endif

@@ -23,7 +23,7 @@ Registration::~Registration()
 
 }
 
-void Registration::pluginInfo(PluginInfo *APluginInfo)
+void Registration::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("In-band registration with instant messaging servers and associated services");

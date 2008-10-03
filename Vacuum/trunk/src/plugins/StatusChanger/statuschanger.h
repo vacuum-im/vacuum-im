@@ -56,10 +56,10 @@ public:
   virtual QObject *instance() { return this; }
   //IPlugin
   virtual QUuid pluginUuid() const { return STATUSCHANGER_UUID; }
-  virtual void pluginInfo(PluginInfo *APluginInfo);
+  virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings();
+  virtual bool initSettings() { return true; }
   virtual bool startPlugin();
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
@@ -124,7 +124,6 @@ protected slots:
   void onPresenceRemoved(IPresence *APresence);
   void onRosterOpened(IRoster *ARoster);
   void onRosterClosed(IRoster *ARoster);
-  void onAccountShown(IAccount *AAccount);
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onDefaultStatusIconsChanged();

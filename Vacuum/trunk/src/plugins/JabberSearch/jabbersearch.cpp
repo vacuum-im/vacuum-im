@@ -20,7 +20,7 @@ JabberSearch::~JabberSearch()
 
 }
 
-void JabberSearch::pluginInfo(PluginInfo *APluginInfo)
+void JabberSearch::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Search information repositories on the Jabber network.");

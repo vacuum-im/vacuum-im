@@ -40,7 +40,7 @@ RosterSearch::~RosterSearch()
 
 }
 
-void RosterSearch::pluginInfo(PluginInfo *APluginInfo)
+void RosterSearch::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Searching contacts in roster");

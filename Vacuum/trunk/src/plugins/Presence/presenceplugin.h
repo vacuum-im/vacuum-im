@@ -20,7 +20,7 @@ public:
   virtual QObject* instance() { return this; }
   //IPlugin
   virtual QUuid pluginUuid() const { return PRESENCE_UUID; }
-  virtual void pluginInfo(PluginInfo *APluginInfo);
+  virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects() { return true; }
   virtual bool initSettings() { return true; }

@@ -7,8 +7,6 @@ int main(int argc, char *argv[])
   app.setQuitOnLastWindowClosed(false);
   app.addLibraryPath(app.applicationDirPath());
   PluginManager pm(&app);
-  pm.loadPlugins();
-  pm.initPlugins();
-  pm.startPlugins(); 
+  pm.restart();
   return app.exec();
 }

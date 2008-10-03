@@ -22,7 +22,7 @@ public:
   //IPlugin
   virtual QObject *instance() { return this; }
   virtual QUuid pluginUuid() const { return STARTTLS_UUID; }
-  virtual void pluginInfo(PluginInfo *APluginInfo);
+  virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }

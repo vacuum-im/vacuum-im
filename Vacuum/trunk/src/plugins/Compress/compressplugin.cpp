@@ -10,7 +10,7 @@ CompressPlugin::~CompressPlugin()
 
 }
 
-void CompressPlugin::pluginInfo(PluginInfo *APluginInfo)
+void CompressPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Implementation of Stream Compression");

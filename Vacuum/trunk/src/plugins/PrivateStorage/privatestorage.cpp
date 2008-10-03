@@ -15,7 +15,7 @@ PrivateStorage::~PrivateStorage()
 }
 
 //IPlugin
-void PrivateStorage::pluginInfo(PluginInfo *APluginInfo)
+void PrivateStorage::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Store and retrieve custom XML data from server");

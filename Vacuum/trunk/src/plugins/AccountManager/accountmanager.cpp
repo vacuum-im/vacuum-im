@@ -29,7 +29,7 @@ AccountManager::~AccountManager()
 }
 
 //IPlugin
-void AccountManager::pluginInfo(PluginInfo *APluginInfo)
+void AccountManager::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Creating and removing accounts");

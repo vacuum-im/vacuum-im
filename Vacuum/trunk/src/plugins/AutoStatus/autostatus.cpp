@@ -34,7 +34,7 @@ AutoStatus::~AutoStatus()
 
 }
 
-void AutoStatus::pluginInfo(PluginInfo *APluginInfo)
+void AutoStatus::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Changing status depending on user activity");
@@ -42,6 +42,7 @@ void AutoStatus::pluginInfo(PluginInfo *APluginInfo)
   APluginInfo->name = tr("Auto status"); 
   APluginInfo->uid = AUTOSTATUS_UUID;
   APluginInfo->version = "0.1";
+  APluginInfo->dependences.append(STATUSCHANGER_UUID);
 }
 
 bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

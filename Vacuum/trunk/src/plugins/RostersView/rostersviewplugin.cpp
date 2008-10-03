@@ -42,7 +42,7 @@ RostersViewPlugin::~RostersViewPlugin()
   delete FRostersView;
 }
 
-void RostersViewPlugin::pluginInfo(PluginInfo *APluginInfo)
+void RostersViewPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Representing roster to user");

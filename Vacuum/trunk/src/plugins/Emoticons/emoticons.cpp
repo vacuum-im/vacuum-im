@@ -20,7 +20,7 @@ Emoticons::~Emoticons()
 
 }
 
-void Emoticons::pluginInfo(PluginInfo *APluginInfo)
+void Emoticons::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Insert smiley icons in chat windows");

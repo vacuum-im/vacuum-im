@@ -1,15 +1,20 @@
 #include <QtDebug>
 #include "pluginmanager.h"
 
-#include <QTimer>
 #include <QDir>
-#include <QLibrary>
+#include <QTimer>
 #include <QStack>
+#include <QLocale>
+#include <QLibrary>
 #include <QMultiMap>
+
+#define DIR_PLUGINS         "plugins"
+#define DIR_TRANSLATIONS    "translations"
 
 //PluginManager
 PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 {
+  FQtTranslator = NULL;
   connect(AParent,SIGNAL(aboutToQuit()),SLOT(onAboutToQuit()));
 }
 
@@ -18,51 +23,38 @@ PluginManager::~PluginManager()
 
 }
 
-PluginList PluginManager::getPlugins() const
+void PluginManager::restart()
 {
-  QList<IPlugin *> plugins;
-  
-  PluginItem *pluginItem;
-  foreach(pluginItem, FPluginItems)
-    plugins.append(pluginItem->plugin()); 
-  
-  return plugins;
+  onAboutToQuit();
+
+  FPlugins.clear();
+  FPluginItems.clear();
+
+  loadPlugins();
+  initPlugins();
+  startPlugins();
 }
 
-PluginList PluginManager::getPlugins(const QString &AInterface) const
+QList<IPlugin *> PluginManager::getPlugins(const QString &AInterface) const
 {
   QList<IPlugin *> plugins;
   if (!FPlugins.contains(AInterface))
   {
-    foreach(PluginItem *pluginItem, FPluginItems)
-      if (pluginItem->plugin()->instance()->inherits(AInterface.toLatin1().data()))
-        plugins.append(pluginItem->plugin());
-    FPlugins.insert(AInterface,plugins);
+    foreach(PluginItem pluginItem, FPluginItems)
+      if (AInterface.isEmpty() || pluginItem.plugin->instance()->inherits(AInterface.toLatin1().data()))
+        FPlugins.insertMulti(AInterface,pluginItem.plugin);
   }
-  else
-    plugins = FPlugins.value(AInterface);
-
-  return plugins;
+  return FPlugins.values(AInterface);
 }
 
-IPlugin *PluginManager::getPlugin(const QUuid &AUuid) const 
+IPlugin *PluginManager::getPlugin(const QUuid &AUuid) const
 { 
-  PluginItem *pluginItem;
-  foreach (pluginItem, FPluginItems)
-    if (pluginItem->uuid() == AUuid) 
-      return pluginItem->plugin(); 
-
-  return NULL;
+  return FPluginItems.contains(AUuid) ? FPluginItems.value(AUuid).plugin : NULL;
 }
 
-const PluginInfo *PluginManager::getPluginInfo(const QUuid &AUuid) const
+const IPluginInfo *PluginManager::getPluginInfo(const QUuid &AUuid) const
 {
-  PluginItem *pluginItem;
-  foreach (pluginItem, FPluginItems)
-    if (pluginItem->uuid() == AUuid) 
-      return pluginItem->info(); 
-
-  return NULL;
+  return FPluginItems.contains(AUuid) ? FPluginItems.value(AUuid).info : NULL;
 }
 
 QList<QUuid> PluginManager::getDependencesOn(const QUuid &AUuid) const
@@ -71,13 +63,14 @@ QList<QUuid> PluginManager::getDependencesOn(const QUuid &AUuid) const
   deepStack.push(AUuid);
 
   QList<QUuid> plugins;
-  PluginItem *pluginItem;
-  foreach(pluginItem, FPluginItems)
-    if (!deepStack.contains(pluginItem->uuid()) && pluginItem->info()->dependences.contains(AUuid))
+  foreach(PluginItem pluginItem, FPluginItems)
+  {
+    if (!deepStack.contains(pluginItem.uid) && pluginItem.info->dependences.contains(AUuid))
     {
-      plugins += getDependencesOn(pluginItem->uuid());
-      plugins.append(pluginItem->uuid());
+      plugins += getDependencesOn(pluginItem.uid);
+      plugins.append(pluginItem.uid);
     }
+  }
 
   deepStack.pop(); 
   return plugins;
@@ -89,13 +82,11 @@ QList<QUuid> PluginManager::getDependencesFor(const QUuid &AUuid) const
   deepStack.push(AUuid);
 
   QList<QUuid> plugins;
-  PluginItem *pluginItem = getPluginItem(AUuid);
-  if (pluginItem)
+  if (FPluginItems.contains(AUuid))
   { 
-    QUuid depend;
-    foreach(depend, pluginItem->info()->dependences)
+    foreach(QUuid depend, FPluginItems.value(AUuid).info->dependences)
     {
-      if (!deepStack.contains(depend) && getPlugin(depend))
+      if (!deepStack.contains(depend) && FPluginItems.contains(depend))
       {
         plugins.append(depend);
         plugins += getDependencesFor(depend); 
@@ -110,96 +101,137 @@ QList<QUuid> PluginManager::getDependencesFor(const QUuid &AUuid) const
 void PluginManager::loadPlugins()
 {
   QDir dir(QApplication::applicationDirPath());
-  if (!dir.cd("plugins")) 
+  if (dir.cd(DIR_PLUGINS)) 
   {
-    qDebug() << "CANT FIND PLUGINS DIRECTORY";
-    return;
-  }
-
-  QString file;
-  QStringList files = dir.entryList(QDir::Files);
-  foreach (file, files) 
-  {
-    if (QLibrary::isLibrary(file)) 
+    QStringList args = qApp->arguments();
+    QString locale = args.contains(CLO_LOCALE) ? args.value(args.indexOf(CLO_LOCALE)+1) : QLocale::system().name();
+    
+    QString qtTranslator = DIR_TRANSLATIONS"/"+locale+"/qtlib.qm";
+    if (QFile::exists(qtTranslator))
     {
-      QPluginLoader *loader = new QPluginLoader(dir.filePath(file));
-      if (loader->load()) 
+      if (!FQtTranslator)
       {
-        IPlugin *plugin = qobject_cast<IPlugin*>(loader->instance());
-        if (plugin)	
+        FQtTranslator = new QTranslator(this);
+        FQtTranslator->load(qtTranslator);
+        qApp->installTranslator(FQtTranslator);
+      }
+      else
+        FQtTranslator->load(qtTranslator);
+    }
+    else if (FQtTranslator)
+    {
+      qApp->removeTranslator(FQtTranslator);
+      delete FQtTranslator;
+      FQtTranslator = NULL;
+    }
+
+    QStringList files = dir.entryList(QDir::Files);
+    foreach (QString file, files) 
+    {
+      if (QLibrary::isLibrary(file)) 
+      {
+        QPluginLoader *loader = new QPluginLoader(dir.filePath(file),this);
+        if (loader->load()) 
         {
-          QUuid uid = plugin->pluginUuid();
-          if (!getPlugin(uid))
+          IPlugin *plugin = qobject_cast<IPlugin *>(loader->instance());
+          if (plugin)	
           {
-            PluginItem* pluginItem = new PluginItem(uid,loader,this);
-            FPluginItems.append(pluginItem);
-            qDebug() << "Plugin loaded:"  << pluginItem->info()->name;
+            plugin->instance()->setParent(loader);
+            QUuid uid = plugin->pluginUuid();
+            if (!FPluginItems.contains(uid))
+            {
+              PluginItem pluginItem;
+              pluginItem.uid = uid;
+              pluginItem.plugin = plugin;
+              pluginItem.loader = loader;
+              pluginItem.info = new IPluginInfo;
+              pluginItem.translator =  NULL;
+              
+              QString qmFile = DIR_TRANSLATIONS"/"+locale+"/"+file.left(file.lastIndexOf('.'))+".qm";
+              if (QFile::exists(qmFile))
+              {
+                QTranslator *translator = new QTranslator(loader);
+                if (translator->load(qmFile))
+                {
+                  qApp->installTranslator(translator);
+                  pluginItem.translator = translator;
+                }
+                else
+                  delete translator;
+              }
+
+              plugin->pluginInfo(pluginItem.info);
+              FPluginItems.insert(uid,pluginItem);
+              qDebug() << "Plugin loaded:"  << pluginItem.info->name;
+            } 
+            else
+            {
+              qDebug() << "DUBLICATE UUID IN:" << loader->fileName();
+              delete loader;
+            }
           } 
           else
           {
-            qDebug() << "DUBLICATE UUID IN:" << loader->fileName();
+            qDebug() << "WRONG PLUGIN INTERFACE IN:" << loader->fileName();
             delete loader;
           }
         } 
-        else
+        else 
         {
-          qDebug() << "WRONG PLUGIN INTERFACE IN:" << loader->fileName();
+          qDebug() << "WRONG LIBRARY BUILD CONTEXT" << loader->fileName();
           delete loader;
         }
-      } 
-      else 
-      {
-        qDebug() << "WRONG LIBRARY BUILD CONTEXT" << loader->fileName();
-        delete loader;
       }
+    }
+
+    QHash<QUuid,PluginItem>::const_iterator it = FPluginItems.constBegin();
+    while (it!=FPluginItems.constEnd())
+    {
+      if (!checkDependences(it.key()))
+      {
+        qDebug() << "UNLOADING PLUGIN: Dependences not exists" << it.value().info->name;
+        unloadPlugin(it.key());
+        it = FPluginItems.constBegin();
+      }
+      else if (!checkConflicts(it.key()))
+      {
+        foreach(QUuid uid, getConflicts(it.key()))
+        {
+          qDebug() << "UNLOADING PLUGIN: Conflicts with another plugin" << uid;
+          unloadPlugin(uid); 
+        }
+        it = FPluginItems.constBegin();
+      }
+      else 
+        it++;
     }
   }
-
-  int i=0;
-  while (i<FPluginItems.count())
+  else
   {
-    PluginItem *pluginItem = FPluginItems.at(i);
-    if (!checkDependences(pluginItem))
-    {
-      qDebug() << "UNLOADING PLUGIN: Dependences not exists" << pluginItem->info()->name;
-      if (unloadPlugin(pluginItem->uuid())) 
-        i = 0;
-    }
-    else if (!checkConflicts(pluginItem))
-    {
-      QUuid uuid;
-      QList<QUuid> conflicts = getConflicts(pluginItem);
-      foreach(uuid, conflicts)
-      {
-        qDebug() << "UNLOADING PLUGIN: Conflicts with another plugin" << uuid;
-        if (unloadPlugin(uuid)) 
-          i = 0;
-      }
-    }
-    else i++;
+    qDebug() << "CANT FIND PLUGINS DIRECTORY";
+    quit();
   }
 }
 
 void PluginManager::initPlugins()
 {
-  int i =0;
   QMultiMap<int,IPlugin *> pluginOrder;
-  while (i<FPluginItems.count())
+  QHash<QUuid,PluginItem>::const_iterator it = FPluginItems.constBegin();
+  while (it!=FPluginItems.constEnd())
   {
-    PluginItem *pluginItem = FPluginItems.at(i);
     int initOrder = 0;
-    IPlugin *plugin = pluginItem->plugin();
+    IPlugin *plugin = it.value().plugin;
     if(plugin->initConnections(this,initOrder))
     {
-      pluginOrder.insert(initOrder,plugin);
-      i++;
+      pluginOrder.insertMulti(initOrder,plugin);
+      it++;
     }
     else
     {
-      qDebug() << "UNLOADING PLUGIN: Plugin returned false on init" << pluginItem->info()->name;
-      i = 0;
+      qDebug() << "UNLOADING PLUGIN: Plugin returned false on init" << it.value().info->name;
+      unloadPlugin(it.key());
       pluginOrder.clear();
-      unloadPlugin(pluginItem->uuid());
+      it = FPluginItems.constBegin();
     } 
   }
 
@@ -212,99 +244,94 @@ void PluginManager::initPlugins()
 
 void PluginManager::startPlugins()
 {
-  foreach(PluginItem *pluginItem, FPluginItems)
-    pluginItem->plugin()->startPlugin();
+  foreach(PluginItem pluginItem, FPluginItems)
+    pluginItem.plugin->startPlugin();
 }
 
-bool PluginManager::unloadPlugin(const QUuid &AUuid)
+void PluginManager::unloadPlugin(const QUuid &AUuid)
 {
-  PluginItem *pluginItem = getPluginItem(AUuid);
-  if (pluginItem)
+  if (FPluginItems.contains(AUuid))
   {
-    QUuid uuid;
-    QList<QUuid> depends = getDependencesOn(AUuid);
-    foreach(uuid, depends)
+    QList<QUuid> unloadList = getDependencesOn(AUuid);
+    unloadList.append(AUuid);
+    foreach(QUuid uid, unloadList)
     {
-      PluginItem *depend = getPluginItem(uuid);
-      if (depend)
+      if (FPluginItems.contains(uid))
       {
-        qDebug() << "UNLOADING PLUGIN: Depends on unloading plugin" << depend->info()->name;
-        FPluginItems.removeAt(FPluginItems.indexOf(depend));  
-        delete depend;
+        PluginItem pluginItem = FPluginItems.take(uid);
+        qDebug() << "Unloading plugin:" << pluginItem.info->name;
+        if (pluginItem.translator)
+          qApp->removeTranslator(pluginItem.translator);
+        delete pluginItem.translator;
+        delete pluginItem.info;
+        delete pluginItem.loader;
       }
     }
-    qDebug() << "Unloading plugin:" << pluginItem->info()->name;
-    FPluginItems.removeAt(FPluginItems.indexOf(pluginItem)); 
     FPlugins.clear();
-    delete pluginItem;
   }
-  return true;
 }
 
-void PluginManager::quit() 
+void PluginManager::quit()
 {
-  QTimer::singleShot(10,parent(),SLOT(quit())); 
+  QTimer::singleShot(0,qApp,SLOT(quit()));
 }
 
-PluginItem *PluginManager::getPluginItem(const QUuid &AUuid) const
+bool PluginManager::checkDependences(const QUuid AUuid) const
 { 
-  PluginItem *pluginItem;
-  foreach(pluginItem, FPluginItems)
-    if (pluginItem->uuid() == AUuid)
-      return pluginItem;
-
-  return NULL;
-}
-
-bool PluginManager::checkDependences(PluginItem *APluginItem) const
-{ 
-  QUuid depend;
-  foreach(depend, APluginItem->info()->dependences)
+  if (FPluginItems.contains(AUuid))
   {
-    bool cheked = getPlugin(depend);
-    if (!cheked)
+    foreach(QUuid depend, FPluginItems.value(AUuid).info->dependences)
     {
-      int i=0;
-      while (!cheked && i<FPluginItems.count())
-        cheked = FPluginItems.at(i++)->info()->implements.contains(depend);    
+      if (!FPluginItems.contains(depend))
+      {
+        bool found = false;
+        QHash<QUuid,PluginItem>::const_iterator it = FPluginItems.constBegin();
+        while (!found && it!=FPluginItems.constEnd())
+        {
+          found = it.value().info->implements.contains(depend);
+          it++;
+        }
+        if (!found)
+          return false;
+      }
     }
-    if (!cheked)
-      return false;
   }
   return true;
 }
 
-bool PluginManager::checkConflicts(PluginItem *APluginItem) const
+bool PluginManager::checkConflicts(const QUuid AUuid) const
 { 
-  int i=0;
-  bool hasConflict = false;
-  while (!hasConflict && i<APluginItem->info()->conflicts.count()) 
+  if (FPluginItems.contains(AUuid))
   {
-    int j=0;
-    QUuid conflict = APluginItem->info()->conflicts.at(i) ;
-    while (!hasConflict && j<FPluginItems.count())
+    foreach (QUuid conflict, FPluginItems.value(AUuid).info->conflicts)
     {
-      hasConflict = FPluginItems.at(j)->uuid() == conflict  ||
-                    FPluginItems.at(j)->info()->implements.contains(conflict);
-      j++;
-    } 
-    i++;
+      if (!FPluginItems.contains(conflict))
+      {
+        foreach(PluginItem pluginItem, FPluginItems)
+          if (pluginItem.info->implements.contains(conflict))
+            return false;
+      }
+      else
+        return false;
+    }
   }
-  return !hasConflict;
+  return true;
 }
 
-QList<QUuid> PluginManager::getConflicts(PluginItem *APluginItem) const 
+QList<QUuid> PluginManager::getConflicts(const QUuid AUuid) const 
 {
   QSet<QUuid> plugins;
-  QUuid conflict;
-  foreach(conflict, APluginItem->info()->conflicts)
+  if (FPluginItems.contains(AUuid))
   {
-    int i=0;
-    while (i<FPluginItems.count())
+    foreach (QUuid conflict, FPluginItems.value(AUuid).info->conflicts)
     {
-      if (FPluginItems.at(i)->uuid() == conflict || FPluginItems.at(i)->info()->implements.contains(conflict))
-        plugins += FPluginItems.at(i)->uuid(); 
-      i++;
+      QHash<QUuid,PluginItem>::const_iterator it = FPluginItems.constBegin();
+      while (it!=FPluginItems.constEnd())
+      {
+        if (it.key()==conflict || it.value().info->implements.contains(conflict))
+          plugins+=conflict;
+        it++;
+      }
     }
   }
   return plugins.toList(); 
@@ -312,7 +339,8 @@ QList<QUuid> PluginManager::getConflicts(PluginItem *APluginItem) const
 
 void PluginManager::onAboutToQuit()
 {
-  qDebug() << "\n\n<--Quiting application--> \n\n";
   emit aboutToQuit();
+  foreach(QUuid uid,FPluginItems.keys())
+    unloadPlugin(uid);
 }
 

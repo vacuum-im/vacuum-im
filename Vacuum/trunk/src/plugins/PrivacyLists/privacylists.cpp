@@ -46,7 +46,7 @@ PrivacyLists::~PrivacyLists()
 
 }
 
-void PrivacyLists::pluginInfo(PluginInfo *APluginInfo)
+void PrivacyLists::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Enabling or disabling communication with other entities on a network.");

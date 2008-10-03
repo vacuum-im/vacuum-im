@@ -10,7 +10,7 @@ SASLPlugin::~SASLPlugin()
 
 }
 
-void SASLPlugin::pluginInfo(PluginInfo *APluginInfo)
+void SASLPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Implementation of SASL Authentication");

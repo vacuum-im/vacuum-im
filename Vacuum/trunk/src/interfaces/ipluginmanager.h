@@ -1,12 +1,12 @@
 #ifndef IPLUGINMANAGER_H
 #define IPLUGINMANAGER_H
 
-#include <QtPlugin>
-#include <QUuid>
 #include <QUrl>
+#include <QUuid>
 #include <QList>
+#include <QtPlugin>
 
-struct PluginInfo 
+struct IPluginInfo 
 {
   QUuid uid;
   QString name;
@@ -23,25 +23,23 @@ class IPluginManager;
 
 class IPlugin  {
 public:
-  virtual QObject *instance()=0;
-  virtual QUuid pluginUuid() const=0;
-  virtual void pluginInfo(PluginInfo *APluginInfo)=0;
-  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder)=0;
+  virtual QObject *instance() =0;
+  virtual QUuid pluginUuid() const =0;
+  virtual void pluginInfo(IPluginInfo *APluginInfo) =0;
+  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder) =0;
   virtual bool initObjects() =0;
   virtual bool initSettings()=0;
   virtual bool startPlugin() =0;
 };
 
-typedef QList<IPlugin *> PluginList;
-
 class IPluginManager  
 {
 public:
   virtual QObject* instance() =0;
+  virtual void restart() =0;
   virtual IPlugin* getPlugin(const QUuid &AUuid) const =0;
-  virtual PluginList getPlugins() const =0;
-  virtual PluginList getPlugins(const QString &AInterface) const =0;
-  virtual const PluginInfo *getPluginInfo(const QUuid &AUuid) const =0;
+  virtual QList<IPlugin *> getPlugins(const QString &AInterface = "") const =0;
+  virtual const IPluginInfo *getPluginInfo(const QUuid &AUuid) const =0;
   virtual QList<QUuid> getDependencesOn(const QUuid &AUuid) const =0;
   virtual QList<QUuid> getDependencesFor(const QUuid &AUuid) const =0;
 public slots:

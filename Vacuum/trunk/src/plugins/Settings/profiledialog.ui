@@ -5,108 +5,68 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>388</width>
-    <height>245</height>
+    <width>357</width>
+    <height>248</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Change profile</string>
+   <string>Edit profiles</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout" >
    <property name="margin" >
     <number>5</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="grbProfiles" >
-     <property name="title" >
-      <string>Edit profiles</string>
-     </property>
-     <layout class="QVBoxLayout" >
-      <item>
-       <layout class="QHBoxLayout" >
-        <item>
-         <widget class="QListWidget" name="lstProfiles" >
-          <property name="selectionBehavior" >
-           <enum>QAbstractItemView::SelectRows</enum>
-          </property>
-          <property name="sortingEnabled" >
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" >
-          <item>
-           <widget class="QPushButton" name="pbtNew" >
-            <property name="text" >
-             <string>New</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pbtRename" >
-            <property name="text" >
-             <string>Rename</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pbtDelete" >
-            <property name="text" >
-             <string>Delete</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer>
-            <property name="orientation" >
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0" >
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" >
      <item>
-      <widget class="QLabel" name="lblLang" >
-       <property name="text" >
-        <string>Language:</string>
+      <widget class="QListWidget" name="lstProfiles" >
+       <property name="selectionBehavior" >
+        <enum>QAbstractItemView::SelectRows</enum>
        </property>
-       <property name="buddy" >
-        <cstring>cmbLang</cstring>
+       <property name="sortingEnabled" >
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="cmbLang" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" >
+       <item>
+        <widget class="QPushButton" name="pbtNew" >
+         <property name="text" >
+          <string>New</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbtRename" >
+         <property name="text" >
+          <string>Rename</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbtDelete" >
+         <property name="text" >
+          <string>Delete</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="Line" name="line" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="btbButtons" >

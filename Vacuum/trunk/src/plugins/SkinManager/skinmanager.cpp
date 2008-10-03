@@ -24,7 +24,7 @@ SkinManager::~SkinManager()
     delete FSkinMenu;
 }
 
-void SkinManager::pluginInfo(PluginInfo *APluginInfo)
+void SkinManager::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing skins");

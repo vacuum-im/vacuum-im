@@ -37,7 +37,7 @@ ClientInfo::~ClientInfo()
 
 }
 
-void ClientInfo::pluginInfo(PluginInfo *APluginInfo)
+void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Request contacts client information");

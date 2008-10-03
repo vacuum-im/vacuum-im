@@ -32,7 +32,7 @@ BookMarks::~BookMarks()
   delete FBookMarksMenu;
 }
 
-void BookMarks::pluginInfo(PluginInfo *APluginInfo)
+void BookMarks::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Storage of bookmarks to conference rooms and other entities in a Jabber user's account");

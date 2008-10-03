@@ -33,7 +33,7 @@ SettingsPlugin::~SettingsPlugin()
   delete FProfileMenu;
 }
 
-void SettingsPlugin::pluginInfo(PluginInfo *APluginInfo)
+void SettingsPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing profiles and settings");
@@ -95,33 +95,30 @@ bool SettingsPlugin::initObjects()
     FTrayManager->addAction(FOpenOptionsDialogAction,AG_SETTINGS_TRAY,true);
     FTrayManager->addAction(FProfileMenu->menuAction(),AG_SETTINGS_TRAY,true);
   }
-  return true;
-}
 
-bool SettingsPlugin::initSettings()
-{
   QStringList args = qApp->arguments();
-
   int homeDirIndex = args.indexOf(CLO_HOME_DIR);
   FHomeDir = homeDirIndex >0 ? QDir(args.value(homeDirIndex+1)) : QDir::home();
   if (!FHomeDir.exists(DIR_ROOT))
     FHomeDir.mkdir(DIR_ROOT);
 
-  bool settingsReady = FHomeDir.cd(DIR_ROOT);
-  if (settingsReady)
-  {
-    if (!FHomeDir.exists(DIR_PROFILES))
-      FHomeDir.mkdir(DIR_PROFILES);
+  return FHomeDir.cd(DIR_ROOT);
+}
 
-    QFile profilesFile(FHomeDir.filePath(DIR_PROFILES"/profiles.xml"));
-    
-    if (!profilesFile.exists())
-    {
-      profilesFile.open(QIODevice::WriteOnly|QIODevice::Truncate);
-      profilesFile.close();
-    }
-    
-    settingsReady = profilesFile.open(QIODevice::ReadOnly);
+bool SettingsPlugin::initSettings()
+{
+  if (!FHomeDir.exists(DIR_PROFILES))
+    FHomeDir.mkdir(DIR_PROFILES);
+
+  QFile profilesFile(FHomeDir.filePath(DIR_PROFILES"/profiles.xml"));
+  if (!profilesFile.exists())
+  {
+    profilesFile.open(QIODevice::WriteOnly|QIODevice::Truncate);
+    profilesFile.close();
+  }
+  
+  if (profilesFile.open(QIODevice::ReadOnly))
+  {
     if (!FProfiles.setContent(profilesFile.readAll(),true) || FProfiles.firstChildElement().tagName() != "profiles")
     {
       FProfiles.clear();
@@ -136,18 +133,18 @@ bool SettingsPlugin::initSettings()
 
     if (profiles().count() == 0)
       addProfile(DEFAULT_PROFILE);
-    
+
+    QStringList args = qApp->arguments();
     int profileIndex = args.indexOf(CLO_PROFILE);
     if (profileIndex>0 && profiles().contains(args.value(profileIndex+1)))
       setProfile(args.value(profileIndex+1));
     else
       setProfile(FProfiles.documentElement().attribute("profileName",DEFAULT_PROFILE));
   }
-
-  if (!settingsReady)
+  else
     qDebug() << "CANT INITIALIZE SETTINGS";
 
-  return settingsReady;
+  return true;
 }
 
 //ISettingsPlugin

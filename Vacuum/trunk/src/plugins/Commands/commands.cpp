@@ -24,7 +24,7 @@ Commands::~Commands()
 
 }
 
-void Commands::pluginInfo(PluginInfo *APluginInfo)
+void Commands::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Plugin for advertising and executing application-specific commands");

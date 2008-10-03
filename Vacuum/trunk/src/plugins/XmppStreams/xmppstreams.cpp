@@ -93,7 +93,7 @@ bool XmppStreams::initObjects()
   return true;
 }
 
-void XmppStreams::pluginInfo(PluginInfo *APluginInfo)
+void XmppStreams::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing XMPP streams, implementation of XMPP-Core");

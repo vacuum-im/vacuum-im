@@ -27,7 +27,7 @@ Notifications::~Notifications()
 
 }
 
-void Notifications::pluginInfo(PluginInfo *APluginInfo)
+void Notifications::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Notify user about events");

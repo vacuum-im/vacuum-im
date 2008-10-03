@@ -22,7 +22,7 @@ TrayManager::~TrayManager()
   delete FContextMenu;
 }
 
-void TrayManager::pluginInfo(PluginInfo *APluginInfo)
+void TrayManager::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing tray icon");

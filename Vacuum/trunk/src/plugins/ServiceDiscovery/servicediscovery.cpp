@@ -54,7 +54,7 @@ ServiceDiscovery::~ServiceDiscovery()
   delete FDiscoMenu;
 }
 
-void ServiceDiscovery::pluginInfo(PluginInfo *APluginInfo)
+void ServiceDiscovery::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Discovering information about Jabber entities and the items associated with such entities");

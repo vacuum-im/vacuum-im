@@ -12,7 +12,7 @@ PresencePlugin::~PresencePlugin()
 }
 
 //IPlugin
-void PresencePlugin::pluginInfo(PluginInfo *APluginInfo)
+void PresencePlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Managing presences");

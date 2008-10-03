@@ -34,7 +34,7 @@ MultiUserChatPlugin::~MultiUserChatPlugin()
   delete FChatMenu;
 }
 
-void MultiUserChatPlugin::pluginInfo(PluginInfo *APluginInfo)
+void MultiUserChatPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Implements multi-user text conferencing");
