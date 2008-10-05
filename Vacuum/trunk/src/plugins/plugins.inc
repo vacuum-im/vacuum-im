@@ -1,8 +1,9 @@
 TEMPLATE = lib
 CONFIG += plugin
 QT += network xml
+LIBS += -L../../libs
+LIBS += -lutils
 DLLDESTDIR = ../../../plugins
-LIBS += -l../../libs/utils
 
 #Translations
 include(../translations.inc)
