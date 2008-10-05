@@ -878,7 +878,7 @@ void RosterChanger::onAddContactDialogDestroyed(QObject *AObject)
   AddContactDialog *dialog = static_cast<AddContactDialog *>(AObject);
   if (dialog)
   {
-    QHash<IRoster *, QList<AddContactDialog *>>::iterator it = FAddContactDialogs.begin();
+    QHash<IRoster *, QList<AddContactDialog *> >::iterator it = FAddContactDialogs.begin();
     while (it != FAddContactDialogs.end())
     {
       if (it.value().contains(dialog))

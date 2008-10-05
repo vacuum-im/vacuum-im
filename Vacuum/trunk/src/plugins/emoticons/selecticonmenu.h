@@ -9,7 +9,7 @@
 #include "selecticonwidget.h"
 
 class SelectIconMenu : 
-  private Menu
+  public Menu
 {
   Q_OBJECT;
 public:
@@ -39,7 +39,7 @@ private:
   QSize FSizeHint;
   QVBoxLayout *FLayout;    
   QString FIconset;
-  SelectIconWidget * FWidget;
+  SelectIconWidget *FWidget;
 };
 
 #endif // SELECTICONMENU_H

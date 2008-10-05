@@ -4,7 +4,7 @@
 #include <QMenu>
 #include <QMultiMap>
 #include <QPointer>
-#include "../../definations/actiongroups.h"
+#include "../definations/actiongroups.h"
 #include "utilsexport.h"
 #include "action.h"
 #include "skin.h"
@@ -15,11 +15,9 @@ class UTILS_EXPORT Menu :
   public QMenu
 {
   Q_OBJECT;
-
 public:
   Menu(QWidget *AParent = NULL);
   ~Menu();
-
   //QMenu
   Action *menuAction();
   bool isEmpty() const { return FActions.isEmpty(); }

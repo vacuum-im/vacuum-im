@@ -14,7 +14,6 @@ class UTILS_EXPORT Action :
   public QAction
 {
   Q_OBJECT;
-
 public:
   enum DataRoles {
     DR_Parametr1,
@@ -26,7 +25,6 @@ public:
     DR_UserDefined = 64,
     DR_UserDynamic = DR_UserDefined + 1048576 
   }; 
-
 public:
   Action(QObject *AParent = NULL);
   ~Action();
