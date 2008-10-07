@@ -8,7 +8,7 @@
 #include <QSharedData>
 #include <QTextDocument>
 #include "utilsexport.h"
-#include "../thirdparty/libidn/stringprep.h"
+#include "../thirdparty/idn/stringprep.h"
 
 class JidData :
   public QSharedData
