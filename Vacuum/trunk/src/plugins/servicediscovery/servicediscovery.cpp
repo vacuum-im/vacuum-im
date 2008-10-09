@@ -855,6 +855,14 @@ void ServiceDiscovery::registerFeatures()
   dfeature.description = tr("Publish user defined items to server");
   insertDiscoFeature(dfeature);
 
+  dfeature.var = NS_CAPS;
+  dfeature.active = true;
+  dfeature.icon = QIcon();
+  dfeature.name = tr("Entity Capabilities");
+  dfeature.actionName = "";
+  dfeature.description = tr("Enables the capabilities information caching within a session or across sessions");
+  insertDiscoFeature(dfeature);
+
   dfeature.var = "jid\\20escaping";
   dfeature.active = true;
   dfeature.icon = QIcon();
