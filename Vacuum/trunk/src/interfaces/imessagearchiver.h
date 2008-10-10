@@ -48,28 +48,28 @@ struct IArchiveStreamPrefs
 
 struct IArchiveHeader
 {
-  IArchiveHeader() { version = 0; } 
+  IArchiveHeader() { version = 0; }
   Jid with;
   QDateTime start;
   QString subject;
   QString threadId;
   int version;
-  bool operator<(const IArchiveHeader &AOther) const { 
+  bool operator<(const IArchiveHeader &AOther) const {
       return start<AOther.start; }
-  bool operator==(const IArchiveHeader &AOther) const { 
+  bool operator==(const IArchiveHeader &AOther) const {
     return with==AOther.with && start==AOther.start; }
-  bool operator!=(const IArchiveHeader &AOther) const { 
+  bool operator!=(const IArchiveHeader &AOther) const {
     return !operator==(AOther); }
 };
 
-struct IArchiveCollection 
+struct IArchiveCollection
 {
   IArchiveHeader header;
   QList<Message> messages;
   QMultiMap<QDateTime,QString> notes;
-  bool operator<(const IArchiveCollection &AOther) const { 
+  bool operator<(const IArchiveCollection &AOther) const {
     return header<AOther.header; }
-  bool operator==(const IArchiveCollection &AOther) const { 
+  bool operator==(const IArchiveCollection &AOther) const {
     return header==AOther.header; }
 };
 
@@ -84,18 +84,18 @@ struct IArchiveModification
 };
 
 struct IArchiveModifications
-{  
+{
   DateTime startTime;
   DateTime endTime;
   QList<IArchiveModification> items;
 };
 
-struct IArchiveRequest 
+struct IArchiveRequest
 {
   IArchiveRequest() {
     threadId = QString::null;
     count = 0x7FFFFFFF;
-    order = Qt::AscendingOrder; 
+    order = Qt::AscendingOrder;
   }
   Jid with;
   QDateTime start;
@@ -105,7 +105,7 @@ struct IArchiveRequest
   Qt::SortOrder order;
 };
 
-struct IArchiveFilter 
+struct IArchiveFilter
 {
   Jid with;
   QDateTime start;
@@ -114,14 +114,14 @@ struct IArchiveFilter
   QRegExp body;
 };
 
-class IArchiveHandler 
+class IArchiveHandler
 {
 public:
   virtual QObject *instance() =0;
   virtual bool archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn) =0;
 };
 
-class IArchiveWindow 
+class IArchiveWindow
 {
 public:
   enum GroupKind {

@@ -21,7 +21,7 @@ enum HistoryWindowDataRoles {
   HDR_HEADER_SUBJECT,
   HDR_HEADER_THREAD,
   HDR_HEADER_VERSION,
-  HDR_SORT_ROLE       
+  HDR_SORT_ROLE
 };
 
 #endif

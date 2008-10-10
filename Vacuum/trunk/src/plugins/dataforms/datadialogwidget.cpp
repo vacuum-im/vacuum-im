@@ -64,6 +64,8 @@ void DataDialogWidget::onDialogButtonClicked(QAbstractButton *AButton)
   case QDialogButtonBox::Cancel:
     reject();
     break;
+  default:
+    break;
   }
 }
 

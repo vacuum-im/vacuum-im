@@ -8,7 +8,7 @@
 #include "skinsoundset.h"
 #include "utilsexport.h"
 
-#define DEFAULT_SKIN_NAME                 "Default"
+#define DEFAULT_SKIN_NAME                 "default"
 
 #define SKIN_TYPE_ICONSET                 "iconset"
 #define SKIN_TYPE_SOUNDS                  "sounds"

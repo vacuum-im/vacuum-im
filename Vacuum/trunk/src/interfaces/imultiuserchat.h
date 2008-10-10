@@ -69,7 +69,7 @@ struct IMultiUserListItem {
   QString notes;
 };
 
-class IMultiUser 
+class IMultiUser
 {
 public:
   virtual QObject *instance() = 0;
@@ -84,7 +84,7 @@ signals:
   virtual void dataChanged(int ARole, const QVariant &ABefour, const QVariant &AAfter) =0;
 };
 
-class IMultiUserChat 
+class IMultiUserChat
 {
 public:
   virtual QObject *instance() = 0;
@@ -157,7 +157,7 @@ signals:
   virtual void roomDestroyed(const QString &AReason) =0;
 };
 
-class IMultiUserChatWindow : 
+class IMultiUserChatWindow :
   public QMainWindow,
   public ITabWidget
 {
@@ -172,7 +172,7 @@ public:
   virtual Menu *toolsMenu() const =0;
   virtual IToolBarWidget *toolBarWidget() const =0;
   virtual IMultiUserChat *multiUserChat() const =0;
-  virtual IChatWindow *openChatWindow(const Jid &AContactJid) =0; 
+  virtual IChatWindow *openChatWindow(const Jid &AContactJid) =0;
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const =0;
   virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000) =0;
 signals:
@@ -183,17 +183,17 @@ signals:
   virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu) =0;
 };
 
-class IMultiUserChatPlugin 
+class IMultiUserChatPlugin
 {
 public:
   virtual QObject *instance() = 0;
   virtual IPluginManager *pluginManager() const =0;
   virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
-  virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, 
+  virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,
     const QString &APassword, bool ADedicated = false) =0;
   virtual QList<IMultiUserChat *> multiUserChats() const =0;
   virtual IMultiUserChat *multiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
-  virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, 
+  virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,
     const QString &APassword) =0;
   virtual QList<IMultiUserChatWindow *> multiChatWindows() const =0;
   virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;

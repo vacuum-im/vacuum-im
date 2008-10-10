@@ -39,7 +39,7 @@ void MultiUserChatPlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Implements multi-user text conferencing");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("Multi-User Chat"); 
+  APluginInfo->name = tr("Multi-User Chat");
   APluginInfo->uid = MULTIUSERCHAT_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(MESSENGER_UUID);
@@ -145,10 +145,10 @@ bool MultiUserChatPlugin::initObjects()
   {
     uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
     FNotifications->insertNotificator(INVITE_NOTIFICATOR_ID,tr("Invite chat messages"),kindMask,kindMask);
-    
+
     kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
     FNotifications->insertNotificator(PRIVATE_NOTIFICATOR_ID,tr("Private conference messages"),kindMask,kindMask);
-    
+
     kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
     FNotifications->insertNotificator(GROUP_NOTIFICATOR_ID,tr("Conference messages"),kindMask,INotification::TrayIcon|INotification::PlaySound);
   }
@@ -181,7 +181,10 @@ Action *MultiUserChatPlugin::createDiscoFeatureAction(const Jid &AStreamJid, con
     else
     {
       Menu *inviteMenu = createInviteMenu(ADiscoInfo.contactJid,AParent);
-      return inviteMenu->isEmpty() ? (delete inviteMenu,NULL) : inviteMenu->menuAction();
+      if (inviteMenu->isEmpty())
+        delete inviteMenu;
+      else
+        return inviteMenu->menuAction();
     }
   }
   return NULL;
@@ -257,7 +260,7 @@ bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoo
   return false;
 }
 
-IMultiUserChat *MultiUserChatPlugin::getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, 
+IMultiUserChat *MultiUserChatPlugin::getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,
                                                       const QString &APassword, bool ADedicated)
 {
   IMultiUserChat *chat = multiUserChat(AStreamJid,ARoomJid);
@@ -279,7 +282,7 @@ IMultiUserChat *MultiUserChatPlugin::multiUserChat(const Jid &AStreamJid, const 
   return NULL;
 }
 
-IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, 
+IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,
                                                               const QString &APassword)
 {
   IMultiUserChatWindow *chatWindow = multiChatWindow(AStreamJid,ARoomJid);

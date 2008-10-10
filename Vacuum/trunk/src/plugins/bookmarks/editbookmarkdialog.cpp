@@ -6,7 +6,7 @@ EditBookmarkDialog::EditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) :
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  
+
   FBookmark = ABookmark;
   ui.lneName->setText(ABookmark->name);
   if (!ABookmark->conference.isEmpty())

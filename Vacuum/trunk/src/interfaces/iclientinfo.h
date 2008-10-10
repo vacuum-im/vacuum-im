@@ -6,7 +6,7 @@
 
 #define CLIENTINFO_UUID "{3E2A0C1D-B347-43f5-B90B-5E7F87D7D8B0}"
 
-class IClientInfo 
+class IClientInfo
 {
 public:
   enum Option {
@@ -48,7 +48,7 @@ public:
   virtual int entityTimePing(const Jid &AContactJid) const =0;
 signals:
   virtual void optionChanged(IClientInfo::Option AOption, bool AValue) =0;
-  virtual void softwareInfoChanged(const Jid &AContactJid) =0; 
+  virtual void softwareInfoChanged(const Jid &AContactJid) =0;
   virtual void lastActivityChanged(const Jid &AContactJid) =0;
   virtual void entityTimeChanged(const Jid &AContactJid) =0;
 };

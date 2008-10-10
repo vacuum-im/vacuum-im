@@ -10,8 +10,8 @@
 #define IN_DATA_FORM_MESSAGE        "psi/events"
 
 #define BDI_WINDOW_GEOMETRY         "MultiChatWindowGeometry"
-#define BDI_WINDOW_HSPLITTER        "MultiChatWindowHSplitterState"  
-#define BDI_WINDOW_VSPLITTER        "MultiChatWindowVSplitterState"  
+#define BDI_WINDOW_HSPLITTER        "MultiChatWindowHSplitterState"
+#define BDI_WINDOW_VSPLITTER        "MultiChatWindowVSplitterState"
 
 #define ADR_STREAM_JID              Action::DR_StreamJid
 #define ADR_ROOM_JID                Action::DR_Parametr1
@@ -96,7 +96,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMes
   connect(FMultiChat->instance(),SIGNAL(roomDestroyed(const QString &)), SLOT(onRoomDestroyed(const QString &)));
 
   connect(FMessenger->instance(),SIGNAL(defaultChatFontChanged(const QFont &)), SLOT(onDefaultChatFontChanged(const QFont &)));
-  
+
   connect(ui.ltwUsers,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
 
   connect(this,SIGNAL(windowActivated()),SLOT(onWindowActivated()));
@@ -254,7 +254,7 @@ void MultiUserChatWindow::receiveMessage(int AMessageId)
     else
       FMessenger->removeMessage(AMessageId);
   }
-  else 
+  else
   {
     IChatWindow *window = getChatWindow(contactJid);
     if (window)
@@ -536,7 +536,7 @@ void MultiUserChatWindow::createRoomUtilsActions()
     FChangeRole->addAction(FSetRoleModerator,AG_DEFAULT,false);
   }
   FRoomUtilsMenu->addAction(FChangeRole->menuAction(),AG_MULTIUSERCHAT_ROOM_UTILS,false);
-  
+
   FChangeAffiliation = new Menu(FRoomUtilsMenu);
   FChangeAffiliation->setTitle(tr("Change Affiliation"));
   {
@@ -738,7 +738,7 @@ void MultiUserChatWindow::setViewColorForUser(IMultiUser *AUser)
 {
   if (FColorQueue.isEmpty())
   {
-    FColorQueue << Qt::blue << Qt::darkBlue << Qt::darkGreen << Qt::darkCyan << Qt::darkMagenta << Qt::darkYellow 
+    FColorQueue << Qt::blue << Qt::darkBlue << Qt::darkGreen << Qt::darkCyan << Qt::darkMagenta << Qt::darkYellow
                 << Qt::green << Qt::cyan << Qt::magenta << Qt::darkRed;
   }
 
@@ -862,7 +862,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
     QStringList parts = AText.split(" ");
     parts.removeFirst();
     QString roomName = parts.takeFirst();
-    Jid roomJid(roomName,roomJid().domain(),"");
+    Jid roomJid(roomName,FMultiChat->roomJid().domain(),"");
     if (roomJid.isValid())
     {
       FChatPlugin->showJoinMultiChatDialog(streamJid(),roomJid,FMultiChat->nickName(),parts.join(" "));
@@ -1133,7 +1133,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
       setRoleColorForUser(AUser);
       setAffilationLineForUser(AUser);
       updateWindow();
-      
+
       QString message = tr("%1 (%2) has joined the room. %3");
       message = message.arg(AUser->nickName());
       message = message.arg(AUser->data(MUDR_REALJID).toString());
@@ -1516,7 +1516,7 @@ void MultiUserChatWindow::onRoomUtilsActionTriggered(bool)
     FMultiChat->setAffiliation(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_ADMIN);
   }
   else if (action == FSetAffilOwner)
-  { 
+  {
     FMultiChat->setAffiliation(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_OWNER);
   }
 }

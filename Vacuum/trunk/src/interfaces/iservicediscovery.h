@@ -10,7 +10,7 @@
 
 #define SERVICEDISCOVERY_UUID "{CF0D99D1-A2D8-4583-87FD-E584E0915BCC}"
 
-struct IDiscoIdentity 
+struct IDiscoIdentity
 {
   QString category;
   QString type;
@@ -18,7 +18,7 @@ struct IDiscoIdentity
   QString name;
 };
 
-struct IDiscoItem 
+struct IDiscoItem
 {
   Jid itemJid;
   QString node;
@@ -36,7 +36,7 @@ struct IDiscoFeature
   QString description;
 };
 
-struct IDiscoError 
+struct IDiscoError
 {
   IDiscoError() { code = -1; }
   int code;
@@ -54,7 +54,7 @@ struct IDiscoInfo
   IDiscoError error;
 };
 
-struct IDiscoItems 
+struct IDiscoItems
 {
   Jid streamJid;
   Jid contactJid;
@@ -107,7 +107,7 @@ signals:
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert) =0;
 };
 
-class IServiceDiscovery 
+class IServiceDiscovery
 {
 public:
   virtual QObject *instance() =0;

@@ -24,7 +24,7 @@ OptionsDialog::OptionsDialog(QWidget *AParent) : QDialog(AParent)
 
   stwOptions = new QStackedWidget;
   scaScroll->setWidget(stwOptions);
-  
+
   QVBoxLayout *vblRight = new QVBoxLayout;
   vblRight->addWidget(lblInfo);
   vblRight->addWidget(scaScroll);
@@ -39,20 +39,20 @@ OptionsDialog::OptionsDialog(QWidget *AParent) : QDialog(AParent)
   trwNodes->sortByColumn(0,Qt::AscendingOrder);
   connect(trwNodes,SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
     SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
-  
+
   QHBoxLayout *hblCentral = new QHBoxLayout;
   hblCentral->addWidget(trwNodes);
   hblCentral->addLayout(vblRight);
-  
+
   dbbButtons = new QDialogButtonBox(Qt::Horizontal);
   dbbButtons->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
   connect(dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
-  
+
   QVBoxLayout *vblMain = new QVBoxLayout;
   vblMain->addLayout(hblCentral);
   vblMain->addWidget(dbbButtons);
   vblMain->setMargin(5);
-  
+
   setLayout(vblMain);
   resize(600,600);
 }
@@ -74,7 +74,7 @@ void OptionsDialog::openNode(const QString &ANode, const QString &AName, const Q
     node->icon = AIcon;
     node->widget = AWidget;
     FNodes.insert(ANode,node);
-    
+
     QTreeWidgetItem *nodeItem = createTreeItem(ANode);
     nodeItem->setText(0,AName);
     nodeItem->setIcon(0,AIcon);
@@ -98,7 +98,7 @@ void OptionsDialog::closeNode(const QString &ANode)
     {
       QTreeWidgetItem *nodeItem = FNodeItems.value(it.key());
       FItemsStackIndex.remove(nodeItem);
-      
+
       //Delete parent TreeItems without widgets
       while (nodeItem->parent() && nodeItem->parent()->childCount()==1 && !FItemsStackIndex.contains(nodeItem->parent()))
       {
@@ -146,9 +146,9 @@ QTreeWidgetItem *OptionsDialog::createTreeItem(const QString &ANode)
   {
     if (nodeName.isEmpty())
       nodeName = nodeTreeItem;
-    else 
+    else
       nodeName += "::"+nodeTreeItem;
-    
+
     if (!FNodeItems.contains(nodeName))
     {
       if (nodeItem)
@@ -175,7 +175,7 @@ QString OptionsDialog::nodeFullName(const QString &ANode)
     while (item->parent())
     {
       item = item->parent();
-      fullName = item->text(0)+"->"+fullName; 
+      fullName = item->text(0)+"->"+fullName;
     }
   }
   return fullName;
@@ -216,19 +216,21 @@ void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
   switch(dbbButtons->buttonRole(AButton))
   {
   case QDialogButtonBox::AcceptRole:
-    accept(); 
+    accept();
     break;
   case QDialogButtonBox::RejectRole:
-    reject(); 
+    reject();
     break;
   case QDialogButtonBox::ApplyRole:
-    emit accepted(); 
+    emit accepted();
+    break;
+  default:
     break;
   }
 }
 
 void OptionsDialog::onCurrentItemChanged(QTreeWidgetItem *ACurrent, QTreeWidgetItem * /*APrevious*/)
-{ 
+{
   if (FItemsStackIndex.contains(ACurrent))
   {
     QString node = ACurrent->data(0,Qt::UserRole).toString();

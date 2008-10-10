@@ -56,19 +56,21 @@ Message &Message::setType(MessageType AType)
   switch(AType)
   {
   case Normal:
-    d->FStanza.setType("normal"); 
+    d->FStanza.setType("normal");
   	break;
   case Chat:
-    d->FStanza.setType("chat"); 
+    d->FStanza.setType("chat");
   	break;
   case GroupChat:
-    d->FStanza.setType("groupchat"); 
+    d->FStanza.setType("groupchat");
     break;
   case Headline:
-    d->FStanza.setType("headline"); 
+    d->FStanza.setType("headline");
     break;
   case Error:
-    d->FStanza.setType("error"); 
+    d->FStanza.setType("error");
+    break;
+  default:
     break;
   }
   return *this;
@@ -90,7 +92,7 @@ Message &Message::setDateTime(const QDateTime &ADateTime)
   return *this;
 }
 
-QString Message::subject(const QString &ALang) const 
+QString Message::subject(const QString &ALang) const
 {
   return findChidByLang(d->FStanza.element(),"subject",ALang).text();
 }
@@ -146,10 +148,10 @@ QStringList Message::availableLangs(const QDomElement &AParent, const QString &A
   return langs;
 }
 
-QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &ATagName, 
+QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &ATagName,
                                     const QString &ALang) const
 {
-  QString dLang = defLang(); 
+  QString dLang = defLang();
   QString aLang = ALang.isEmpty() ? dLang : ALang;
   QDomElement elem = AParent.firstChildElement(ATagName);
   while(!elem.isNull() && elem.attribute("xml:lang",dLang)!=aLang)
@@ -157,7 +159,7 @@ QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &A
   return elem;
 }
 
-QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &ATagName, 
+QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &ATagName,
                                     const QString &ALang, const QString &AText)
 {
   QDomElement elem = findChidByLang(AParent,ATagName,ALang);

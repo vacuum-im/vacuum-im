@@ -28,7 +28,7 @@ void Registration::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("In-band registration with instant messaging servers and associated services");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("In-Band Registration"); 
+  APluginInfo->name = tr("In-Band Registration");
   APluginInfo->uid = REGISTRATION_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(DATAFORMS_UUID);
@@ -73,7 +73,7 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
       connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
     }
   }
-  
+
   plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
   {
@@ -110,13 +110,13 @@ void Registration::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
     QDomElement formElem = query.firstChildElement("x");
     while (!formElem.isNull() && (formElem.namespaceURI()!=NS_JABBER_DATA || formElem.attribute("type",DATAFORM_TYPE_FORM)!=DATAFORM_TYPE_FORM))
       formElem = formElem.nextSiblingElement("x");
-    
+
     if (FSubmitRequests.contains(AStanza.id()) && AStanza.type() == "result")
     {
       emit registerSuccessful(AStanza.id());
     }
     else if (AStanza.type() == "result" || !formElem.isNull())
-    {                                                           
+    {
       IRegisterFields fields;
       fields.fieldMask = 0;
       fields.registered = !query.firstChildElement("registered").isNull();
@@ -143,7 +143,7 @@ void Registration::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
         fields.email = query.firstChildElement("email").text();
       }
       fields.key = query.firstChildElement("key").text();
-      
+
       if (FDataForms)
         fields.form = FDataForms->dataForm(formElem);
 
@@ -182,7 +182,7 @@ bool Registration::execDiscoFeature(const Jid &AStreamJid, const QString &AFeatu
 {
   if (AFeature == NS_JABBER_REGISTER)
   {
-    showRegisterDialog(AStreamJid,ADiscoInfo.contactJid,NULL);
+    showRegisterDialog(AStreamJid,ADiscoInfo.contactJid,IRegistration::Register,NULL);
     return true;
   }
   return false;
@@ -192,7 +192,7 @@ Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
 {
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
   if ( presence && presence->isOpen() && AFeature == NS_JABBER_REGISTER)
-  {   
+  {
     Menu *regMenu = new Menu(AParent);
     regMenu->setTitle(tr("Registration"));
     regMenu->setIcon(SYSTEM_ICONSETFILE,IN_REGISTER);
@@ -298,7 +298,7 @@ QString Registration::sendUnregiterRequest(const Jid &AStreamJid, const Jid &ASe
   return QString();
 }
 
-QString Registration::sendChangePasswordRequest(const Jid &AStreamJid, const Jid &AServiceJid, 
+QString Registration::sendChangePasswordRequest(const Jid &AStreamJid, const Jid &AServiceJid,
                                                 const QString &AUserName, const QString &APassword)
 {
   Stanza change("iq");

@@ -32,7 +32,7 @@ void MultiUser::setData(int ARole, const QVariant &AValue)
   {
     if (AValue.isValid())
       FData.insert(ARole,AValue);
-    else 
+    else
       FData.remove(ARole);
     emit dataChanged(ARole,befour,AValue);
   }

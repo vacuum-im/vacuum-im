@@ -45,7 +45,7 @@ void Gateways::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Plugin for interactions between Jabber clients and client proxy gateways to legacy IM services");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("Gateway Interaction"); 
+  APluginInfo->name = tr("Gateway Interaction");
   APluginInfo->uid = GATEWAYS_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
@@ -228,7 +228,7 @@ void Gateways::resolveNickName(const Jid &AStreamJid, const Jid &AContactJid)
         roster->renameItem(ritem.itemJid,nick);
       vcard->unlock();
     }
-    else 
+    else
     {
       if (!FResolveNicks.contains(ritem.itemJid))
         FVCardPlugin->requestVCard(AStreamJid,ritem.itemJid);
@@ -280,7 +280,7 @@ QList<Jid> Gateways::streamServices(const Jid &AStreamJid, const IDiscoIdentity 
         foreach(IDiscoIdentity identity, dinfo.identity)
         {
           if ((AIdentity.category.isEmpty() || AIdentity.category == identity.category) &&
-              (AIdentity.type.isEmpty() || AIdentity.type == identity.type)) 
+              (AIdentity.type.isEmpty() || AIdentity.type == identity.type))
           {
             services.append(ritem.itemJid);
             break;
@@ -542,7 +542,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       }
     }
   }
-  
+
   if (FRosterPlugin && FVCardPlugin && (AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent))
   {
     Jid streamJid = AIndex->data(RDR_StreamJid).toString();
@@ -684,7 +684,7 @@ void Gateways::onPrivateStorageLoaded(const QString &/*AId*/, const Jid &AStream
       foreach(Jid service, oldServices)
         setKeepConnection(AStreamJid,service,false);
       FPrivateStorageKeep[AStreamJid] = services;
-      
+
       if (changed)
         savePrivateStorageKeep(AStreamJid);
     }

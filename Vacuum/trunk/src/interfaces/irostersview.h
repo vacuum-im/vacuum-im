@@ -30,7 +30,7 @@ public:
   };
 public:
   virtual QObject *instance() = 0;
-  virtual void setModel(IRostersModel *AModel) =0; 
+  virtual void setModel(IRostersModel *AModel) =0;
   virtual IRostersModel *rostersModel() const =0;
   virtual bool repaintRosterIndex(IRosterIndex *AIndex) =0;
   virtual void expandIndexParents(IRosterIndex *AIndex) =0;

@@ -28,8 +28,10 @@ QVariant AccountOptions::option(const Options &AOption) const
       return streamJid.full();
     }
   case AO_Password:
-    return ui.lnePassword->text(); 
-  }
+    return ui.lnePassword->text();
+  default:
+    return QVariant();
+  };
   return QVariant();
 }
 
@@ -39,7 +41,7 @@ void AccountOptions::setOption(const Options &AOption, const QVariant &AValue)
   {
   case AO_Name:
     {
-      ui.lneName->setText(AValue.toString()); 
+      ui.lneName->setText(AValue.toString());
       break;
     }
   case AO_StreamJid:
@@ -51,9 +53,10 @@ void AccountOptions::setOption(const Options &AOption, const QVariant &AValue)
     }
   case AO_Password:
     {
-      ui.lnePassword->setText(AValue.toString()); 
+      ui.lnePassword->setText(AValue.toString());
       break;
     }
-  }
-
+  default:
+    break;
+  };
 }

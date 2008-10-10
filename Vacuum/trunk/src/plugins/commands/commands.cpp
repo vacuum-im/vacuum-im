@@ -29,7 +29,7 @@ void Commands::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Plugin for advertising and executing application-specific commands");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("Ad-Hoc Commands"); 
+  APluginInfo->name = tr("Ad-Hoc Commands");
   APluginInfo->uid = COMMANDS_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(DATAFORMS_UUID);
@@ -116,7 +116,7 @@ bool Commands::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &A
       if (!formElem.isNull())
         request.form = FDataForms->dataForm(formElem);
     }
-    
+
     ICommandServer *server = FCommands.value(request.node);
     if (!server || !server->receiveCommandRequest(request))
     {
@@ -139,12 +139,12 @@ void Commands::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
       result.streamJid = AStreamJid;
       result.commandJid = AStanza.from();
       result.stanzaId = AStanza.id();
-      
+
       QDomElement cmdElem = AStanza.firstElement(COMMAND_TAG_NAME,NS_COMMANDS);
       result.sessionId = cmdElem.attribute("sessionid");
       result.node = cmdElem.attribute("node");
       result.status = cmdElem.attribute("status");
-      
+
       QDomElement actElem = cmdElem.firstChildElement("actions");
       result.execute = actElem.attribute("execute");
       actElem = actElem.firstChildElement();
@@ -217,7 +217,7 @@ void Commands::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
     identity.type = "command-list";
     identity.name = "Commands";
     ADiscoInfo.identity.append(identity);
-    
+
     if (ADiscoInfo.features.contains(NS_COMMANDS))
       ADiscoInfo.features.append(NS_COMMANDS);
   }
@@ -386,7 +386,7 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
 {
   Stanza result("iq");
   result.setTo(AResult.commandJid.eFull()).setType("result").setId(AResult.stanzaId);
-  
+
   QDomElement cmdElem = result.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
   cmdElem.setAttribute("node",AResult.node);
   cmdElem.setAttribute("sessionid",AResult.sessionId);
@@ -399,7 +399,7 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
     foreach(QString action,AResult.actions)
       actElem.appendChild(result.createElement(action));
   }
-  
+
   if (FDataForms && !AResult.form.type.isEmpty())
     FDataForms->xmlForm(AResult.form,cmdElem);
 

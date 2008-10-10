@@ -37,7 +37,7 @@ void BookMarks::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Storage of bookmarks to conference rooms and other entities in a Jabber user's account");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("Bookmarks"); 
+  APluginInfo->name = tr("Bookmarks");
   APluginInfo->uid = BOOKMARKS_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(PRIVATESTORAGE_UUID);
@@ -48,7 +48,7 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
   IPlugin *plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
-    FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance()); 
+    FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
     if (FPresencePlugin)
     {
       connect(FPresencePlugin->instance(),SIGNAL(streamStateChanged(const Jid &, bool)),
@@ -84,7 +84,7 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     if (FMultiChatPlugin)
     {
       connect(FMultiChatPlugin->instance(),SIGNAL(multiChatWindowCreated(IMultiUserChatWindow *)),
-        SLOT(onMultiChatWindowCreated(IMultiUserChatWindow *)));  
+        SLOT(onMultiChatWindowCreated(IMultiUserChatWindow *)));
     }
   }
 
@@ -229,7 +229,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
       }
       else
         streamMenu->setTitle(AStreamJid.full());
-      
+
       Action *action = new Action(streamMenu);
       action->setIcon(SYSTEM_ICONSETFILE,IN_BOOKMARKS);
       action->setText(tr("Edit bookmarks"));

@@ -35,8 +35,8 @@ public:
   virtual bool sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza);
   virtual bool sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJid, const Stanza &AStanza, int ATimeOut);
   virtual bool hasHandler(int AHandlerId) const { return FHandlerItems.contains(AHandlerId); }
-  virtual int insertHandler(IStanzaHandler *AHandler, const QString &ACondition, 
-    Direction ADirection, int APriority = SHP_DEFAULT, const Jid &AStreamJid = Jid()); 
+  virtual int insertHandler(IStanzaHandler *AHandler, const QString &ACondition,
+    Direction ADirection, int APriority = SHP_DEFAULT, const Jid &AStreamJid = Jid());
   virtual Direction handlerDirection(int AHandlerId) const;
   virtual int handlerPriority(int AHandlerId) const;
   virtual Jid handlerStreamJid(int AHandlerId) const;

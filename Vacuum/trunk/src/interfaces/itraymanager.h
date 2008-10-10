@@ -16,7 +16,7 @@ public:
   virtual void setMainIcon(const QIcon &AIcon) =0;
   virtual QString mainToolTip() const =0;
   virtual void setMainToolTip(const QString &AToolTip) =0;
-  virtual void showMessage(const QString &ATitle, const QString &AMessage, 
+  virtual void showMessage(const QString &ATitle, const QString &AMessage,
     QSystemTrayIcon::MessageIcon AIcon = QSystemTrayIcon::Information, int ATimeout = 10000) =0;
   virtual void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false) =0;
   virtual void removeAction(Action *AAction) =0;

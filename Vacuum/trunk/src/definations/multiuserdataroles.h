@@ -3,11 +3,11 @@
 
 #include <QObject>
 
-enum MultiUserDataRoles 
+enum MultiUserDataRoles
 {
   MUDR_STREAMJID = Qt::UserRole,
   MUDR_CONTACTJID,
-  MUDR_ROOMJID, 
+  MUDR_ROOMJID,
   MUDR_REALJID,
   MUDR_NICK_NAME,
   MUDR_ROLE,

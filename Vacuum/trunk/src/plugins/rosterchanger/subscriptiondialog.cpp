@@ -4,7 +4,7 @@ SubscriptionDialog::SubscriptionDialog(QWidget *AParent) : QDialog(AParent)
 {
   setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  
+
   FToolBar = new QToolBar(this);
   FToolBarChanger = new ToolBarChanger(FToolBar);
   wdtToolBar->setLayout(new QVBoxLayout);
@@ -27,7 +27,7 @@ SubscriptionDialog::~SubscriptionDialog()
 
 }
 
-void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJid, QDateTime ATime, 
+void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJid, QDateTime ATime,
                                      int ASubsType, const QString &AStatus, const QString &ASubs)
 {
   FStreamJid = AStreamJid;
@@ -51,7 +51,7 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
   bool subsFrom = (ASubs == "from" || ASubs == "both");
   QSet<ButtonId> showButtons;
 
-  switch(ASubsType) 
+  switch(ASubsType)
   {
   case IRoster::Subscribe:
     {
@@ -59,11 +59,11 @@ void SubscriptionDialog::setupDialog(const Jid &AStreamJid, const Jid &AContactJ
       if (!AStatus.isEmpty())
         tedMessage->append(AStatus+"<br>");
       tedMessage->append(tr("<b>%1 wants to subscribe to your presence.</b>").arg(AContactJid.hBare()));
-      
+
       showButtons << AuthButton << RejectButton;
       if (!subsTo)
         showButtons << AskButton;
-      
+
       break;
     }
   case IRoster::Subscribed:
@@ -177,7 +177,7 @@ void SubscriptionDialog::onButtonClicked(int AId)
       break;
     }
   case RefuseButton:
-    {                                                         
+    {
       FDialogAction->setData(Action::DR_Parametr2,IRoster::Unsubscribe);
       FDialogAction->trigger();
       break;
@@ -205,7 +205,7 @@ void SubscriptionDialog::onButtonClicked(int AId)
       doAccept = false;
     }
   }
-  
+
   if (doNext)
     emit showNext();
   else if (doAccept)

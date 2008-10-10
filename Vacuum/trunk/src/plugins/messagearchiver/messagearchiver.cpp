@@ -56,7 +56,7 @@ void MessageArchiver::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Archiving and retrieval of XMPP messages");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("Message Archiver"); 
+  APluginInfo->name = tr("Message Archiver");
   APluginInfo->uid = MESSAGEARCHIVER_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
@@ -67,7 +67,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
   FPluginManager = APluginManager;
 
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
-  if (plugin) 
+  if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
     if (FXmppStreams)
@@ -80,7 +80,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
   }
 
   plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
@@ -317,7 +317,7 @@ void MessageArchiver::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
         setElem = setElem.nextSiblingElement("set");
       int count = setElem.firstChildElement("count").text().toInt();
       QString last = setElem.firstChildElement("last").text();
-      
+
       modifs.endTime = last;
       emit serverModificationsLoaded(AStanza.id(),modifs,last,count);
     }
@@ -472,7 +472,7 @@ QString MessageArchiver::saveModeName(const QString &ASaveMode) const
     return tr("Message");
   else if (ASaveMode == ARCHIVE_SAVE_STREAM)
     return tr("Stream");
-  else 
+  else
     return tr("Unknown");
 }
 
@@ -576,7 +576,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
         defElem.setAttribute("expire",newPrefs.defaultPrefs.expire);
     }
 
-    bool methodChanged = oldPrefs.methodAuto   != newPrefs.methodAuto  || 
+    bool methodChanged = oldPrefs.methodAuto   != newPrefs.methodAuto  ||
                          oldPrefs.methodLocal  != newPrefs.methodLocal ||
                          oldPrefs.methodManual != newPrefs.methodManual;
     if (!storage && methodChanged)
@@ -598,7 +598,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
     {
       IArchiveItemPrefs newItemPrefs = newPrefs.itemPrefs.value(itemJid);
       IArchiveItemPrefs oldItemPrefs = oldPrefs.itemPrefs.value(itemJid);
-      bool itemChanged = oldItemPrefs.save   != newItemPrefs.save || 
+      bool itemChanged = oldItemPrefs.save   != newItemPrefs.save ||
                          oldItemPrefs.otr    != newItemPrefs.otr ||
                          oldItemPrefs.expire != newItemPrefs.expire;
       bool itemDefault = newPrefs.defaultPrefs.save   == newItemPrefs.save &&
@@ -1113,7 +1113,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
         oldItemJids -= itemJid;
         itemElem = itemElem.nextSiblingElement("item");
       }
-    
+
       if (FInStoragePrefs.contains(AStreamJid))
       {
         foreach(Jid itemJid, oldItemJids)
@@ -1316,10 +1316,10 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
     if (nodeElem.tagName() == "to" || nodeElem.tagName() == "from")
     {
       Message message;
-      
+
       QString resource = nodeElem.attribute("name");
       Jid contactJid(ACollection.header.with.node(),ACollection.header.with.domain(),resource);
-      
+
       nodeElem.tagName()=="to" ? message.setTo(contactJid.eFull()) : message.setFrom(contactJid.eFull());
 
       if (!resource.isEmpty())
@@ -1357,7 +1357,7 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 
 void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const
 {
-  QDomDocument &ownerDoc = AChatElem.ownerDocument();
+  QDomDocument ownerDoc = AChatElem.ownerDocument();
   AChatElem.setAttribute("with",ACollection.header.with.eFull());
   AChatElem.setAttribute("start",DateTime(ACollection.header.start).toX85UTC());
   AChatElem.setAttribute("version",ACollection.header.version);
@@ -1365,7 +1365,7 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
     AChatElem.setAttribute("subject",ACollection.header.subject);
   if (!ACollection.header.threadId.isEmpty())
     AChatElem.setAttribute("thread",ACollection.header.threadId);
-  
+
   int secSum = 0;
   bool groupChat = false;
   foreach(Message message,ACollection.messages)
@@ -1476,7 +1476,7 @@ bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, b
     else
       AMessage.setTo(AStreamJid.domain());
   }
-    
+
   QMultiMap<int,IArchiveHandler *>::const_iterator it = FArchiveHandlers.constBegin();
   while (it != FArchiveHandlers.constEnd())
   {
@@ -1801,7 +1801,7 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
   {
     int handler = FStanzaProcessor->insertHandler(this,SHC_PREFS,IStanzaProcessor::DirectionIn,SHP_DEFAULT);
     FSHIPrefs.insert(AXmppStream->jid(),handler);
-    
+
     handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionIn,SHP_DEFAULT);
     FSHIMessageIn.insert(AXmppStream->jid(),handler);
 
@@ -1993,7 +1993,7 @@ void MessageArchiver::onArchiveWindowDestroyed(IArchiveWindow *AWindow)
 
 void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
-  if (ADiscoInfo.node.isEmpty() && ADiscoInfo.contactJid.node().isEmpty() &&  ADiscoInfo.contactJid.resource().isEmpty() && 
+  if (ADiscoInfo.node.isEmpty() && ADiscoInfo.contactJid.node().isEmpty() &&  ADiscoInfo.contactJid.resource().isEmpty() &&
     !FGatewayTypes.contains(ADiscoInfo.contactJid))
   {
     foreach(IDiscoIdentity identity, ADiscoInfo.identity)
@@ -2008,7 +2008,7 @@ void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
           gateway << ADiscoInfo.contactJid.pDomain();
           gateway << identity.type;
           gateway << "\n";
-          gateways.write(gateway.join(" ").toUtf8()); 
+          gateways.write(gateway.join(" ").toUtf8());
           gateways.close();
         }
         FGatewayTypes.insert(ADiscoInfo.contactJid,identity.type);

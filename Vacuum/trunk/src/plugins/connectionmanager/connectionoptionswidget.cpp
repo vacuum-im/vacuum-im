@@ -34,7 +34,7 @@ void ConnectionOptionsWidget::setPluginById(const QUuid &APluginId)
       FOptionsWidget = NULL;
       FCurPluginId = QUuid();
     }
-    
+
     IConnectionPlugin *plugin = FManager->pluginById(APluginId);
     if (plugin)
     {

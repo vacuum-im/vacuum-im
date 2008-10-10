@@ -43,7 +43,7 @@ void DiscoInfoWindow::updateWindow()
 {
   IDiscoInfo dinfo = FDiscovery->discoInfo(FContactJid,FNode);
   qSort(dinfo.features);
-  
+
   int row = 0;
   ui.twtIdentity->clearContents();
   foreach(IDiscoIdentity identity, dinfo.identity)
@@ -91,7 +91,7 @@ void DiscoInfoWindow::updateWindow()
     ui.lwtFearures->setEnabled(true);
     ui.lblError->setVisible(false);
   }
- 
+
   ui.twtIdentity->horizontalHeader()->setResizeMode(0,QHeaderView::ResizeToContents);
   ui.twtIdentity->horizontalHeader()->setResizeMode(1,QHeaderView::ResizeToContents);
   ui.twtIdentity->horizontalHeader()->setResizeMode(2,QHeaderView::Stretch);

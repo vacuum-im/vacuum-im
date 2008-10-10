@@ -1,6 +1,6 @@
 #include "addlegacycontactdialog.h"
 
-AddLegacyContactDialog::AddLegacyContactDialog(IGateways *AGateways, IRosterChanger *ARosterChanger, const Jid &AStreamJid, 
+AddLegacyContactDialog::AddLegacyContactDialog(IGateways *AGateways, IRosterChanger *ARosterChanger, const Jid &AStreamJid,
                                                const Jid &AServiceJid, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);

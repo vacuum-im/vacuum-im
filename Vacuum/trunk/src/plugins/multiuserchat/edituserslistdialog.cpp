@@ -4,12 +4,12 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-EditUsersListDialog::EditUsersListDialog(const QString &AAffiliation, const QList<IMultiUserListItem> &AList, 
+EditUsersListDialog::EditUsersListDialog(const QString &AAffiliation, const QList<IMultiUserListItem> &AList,
                                          QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  
+
   FAffiliation = AAffiliation;
 
   int row = 0;

@@ -49,7 +49,7 @@
 #define RDR_CLIENT_OS                               Qt::UserRole + 45
 #define RDR_LAST_ACTIVITY_TIME                      Qt::UserRole + 46
 #define RDR_LAST_ACTIVITY_TEXT                      Qt::UserRole + 47
-#define RDR_ENTITY_TIME                             Qt::UserRole + 48    
+#define RDR_ENTITY_TIME                             Qt::UserRole + 48
 //ServiceDiscovery
 #define RDR_DISCO_IDENT_CATEGORY                    Qt::UserRole + 49
 #define RDR_DISCO_IDENT_TYPE                        Qt::UserRole + 50

@@ -44,7 +44,7 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
         cg = QPalette::Inactive;
       if (AOption.state & QStyle::State_Selected)
         APainter->setPen(AOption.palette.color(cg, QPalette::HighlightedText));
-      else 
+      else
         APainter->setPen(AOption.palette.color(cg, QPalette::Text));
       APainter->drawText(textRect,AOption.displayAlignment,displayText);
 
@@ -139,7 +139,7 @@ bool IconsetDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, co
     return false;
 
 
-  if ((AEvent->type() == QEvent::MouseButtonRelease) || (AEvent->type() == QEvent::MouseButtonDblClick)) 
+  if ((AEvent->type() == QEvent::MouseButtonRelease) || (AEvent->type() == QEvent::MouseButtonDblClick))
   {
     int space = 2;
     QRect drawRect = AOption.rect.adjusted(space,space,-space,-space);
@@ -150,14 +150,14 @@ bool IconsetDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, co
 
     if (AEvent->type() == QEvent::MouseButtonDblClick)
       return true;
-  } 
-  else if (AEvent->type() == QEvent::KeyPress) 
+  }
+  else if (AEvent->type() == QEvent::KeyPress)
   {
     QKeyEvent *keyEvent = static_cast<QKeyEvent*>(AEvent);
     if (keyEvent->key() != Qt::Key_Space && keyEvent->key() != Qt::Key_Select)
       return false;
-  } 
-  else 
+  }
+  else
     return false;
 
   Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);

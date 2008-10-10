@@ -36,7 +36,7 @@ public:
   virtual bool sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJid, const Stanza &AStanza, int ATimeOut) =0;
   virtual bool hasHandler(int AHandlerId) const =0;
   virtual int insertHandler(IStanzaHandler *AHandler, const QString &ACondition,
-    Direction ADirection, int APriority = SHP_DEFAULT, const Jid &AStreamJid = Jid()) =0; 
+    Direction ADirection, int APriority = SHP_DEFAULT, const Jid &AStreamJid = Jid()) =0;
   virtual Direction handlerDirection(int AHandlerId) const =0;
   virtual int handlerPriority(int AHandlerId) const =0;
   virtual Jid handlerStreamJid(int AHandlerId) const =0;

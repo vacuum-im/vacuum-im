@@ -7,7 +7,7 @@
 
 #define GATEWAYS_UUID "{BF34165C-DD9A-43eb-949B-926DD411E1A8}"
 
-class IGateways 
+class IGateways
 {
 public:
   virtual QObject *instance() =0;

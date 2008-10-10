@@ -30,7 +30,7 @@ public:
   virtual QObject *instance() =0;
   virtual int type() const =0;
   virtual QString id() const =0;
-  virtual IRosterIndex *parentIndex() const =0; 
+  virtual IRosterIndex *parentIndex() const =0;
   virtual void setParentIndex(IRosterIndex *AIndex) =0;
   virtual int row() const =0;
   virtual void appendChild(IRosterIndex *AIndex) =0;

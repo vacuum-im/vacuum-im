@@ -27,16 +27,9 @@ extern "C"
 {
 #endif
 
-//#include <stddef.h>   /* size_t */
-//#include <unistd.h>   /* ssize_t */
-//#include <idn-int.h>  /* uint32_t */
-
-#define NULL            0
-typedef unsigned int    uint32_t;
-typedef unsigned short  uint16_t;
-typedef signed short    int16_t;
-typedef unsigned int    size_t;
-typedef signed int      ssize_t;
+#include <stddef.h>   /* size_t */
+#include <unistd.h>   /* ssize_t */
+#include "idn-int.h"  /* uint32_t */
 
 #define STRINGPREP_VERSION "0.5.19"
 

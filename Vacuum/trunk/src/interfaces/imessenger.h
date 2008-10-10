@@ -19,7 +19,7 @@
 
 #define MESSENGER_UUID "{153A4638-B468-496f-B57C-9F30CEDFCC2E}"
 
-class IInfoWidget : 
+class IInfoWidget :
   public QWidget
 {
 public:
@@ -53,7 +53,7 @@ signals:
   virtual void fieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue) =0;
 };
 
-class IViewWidget : 
+class IViewWidget :
   public QWidget
 {
 public:
@@ -72,7 +72,7 @@ public:
   virtual ShowKind showKind() const =0;
   virtual void setShowKind(ShowKind AKind) =0;
   virtual void showMessage(const Message &AMessage) =0;
-  virtual void showCustomMessage(const QString &AHtml, const QDateTime &ATime=QDateTime(), 
+  virtual void showCustomMessage(const QString &AHtml, const QDateTime &ATime=QDateTime(),
     const QString &ANick="", const QColor &ANickColor=Qt::blue) =0;
   virtual void showCustomHtml(const QString &AHtml) =0;
   virtual QColor colorForJid(const Jid &AJid) const =0;
@@ -88,7 +88,7 @@ signals:
   virtual void nickForJidChanged(const Jid &AJid, const QString &ANick) =0;
 };
 
-class IEditWidget : 
+class IEditWidget :
   public QWidget
 {
 public:
@@ -112,7 +112,7 @@ signals:
   virtual void editorCleared() =0;
 };
 
-class IReceiversWidget : 
+class IReceiversWidget :
   public QWidget
 {
 public:
@@ -142,7 +142,7 @@ public:
   virtual IReceiversWidget *receiversWidget() const =0;
 };
 
-class ITabWidget 
+class ITabWidget
 {
 public:
   virtual QWidget *instance() =0;
@@ -155,7 +155,7 @@ signals:
   virtual void windowDestroyed() =0;
 };
 
-class ITabWindow : 
+class ITabWindow :
   public QMainWindow
 {
 public:
@@ -174,7 +174,7 @@ signals:
   virtual void windowDestroyed() =0;
 };
 
-class IChatWindow : 
+class IChatWindow :
   public QMainWindow,
   public ITabWidget
 {
@@ -197,7 +197,7 @@ signals:
   virtual void windowClosed() =0;
 };
 
-class IMessageWindow : 
+class IMessageWindow :
   public QMainWindow,
   public ITabWidget
 {

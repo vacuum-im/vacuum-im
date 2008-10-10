@@ -20,7 +20,7 @@ void PrivateStorage::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Store and retrieve custom XML data from server");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("Private Storage"); 
+  APluginInfo->name = tr("Private Storage");
   APluginInfo->uid = PRIVATESTORAGE_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
@@ -31,12 +31,12 @@ bool PrivateStorage::initConnections(IPluginManager *APluginManager, int &/*AIni
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
   {
-    connect(plugin->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *))); 
-    connect(plugin->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *))); 
+    connect(plugin->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
+    connect(plugin->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
   }
 
   plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
   return FStanzaProcessor!=NULL;
@@ -139,7 +139,7 @@ QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagNam
     {
       QDomElement dataElem = getData(AStreamJid,ATagName,ANamespace);
       if (dataElem.isNull())
-        dataElem = insertElement(AStreamJid,elem); 
+        dataElem = insertElement(AStreamJid,elem);
       FRemoveRequests.insert(stanza.id(),dataElem);
       return stanza.id();
     }

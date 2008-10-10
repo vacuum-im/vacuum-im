@@ -72,7 +72,7 @@ struct IDataField {
 
 struct IDataTable {
   QList<IDataField> columns;
-  QMap<int,QStringList> rows; 
+  QMap<int,QStringList> rows;
 };
 
 struct IDataLayout {

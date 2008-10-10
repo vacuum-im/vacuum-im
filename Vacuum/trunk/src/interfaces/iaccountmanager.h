@@ -28,7 +28,7 @@ public:
   //AccountSettings
   virtual QByteArray encript(const QString &AValue, const QByteArray &AKey) const =0;
   virtual QString decript(const QByteArray &AValue, const QByteArray &AKey) const =0;
-  virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const =0; 
+  virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const =0;
   virtual void setValue(const QString &AName, const QVariant &AValue) =0;
   virtual void delValue(const QString &AName) =0;
 signals:
