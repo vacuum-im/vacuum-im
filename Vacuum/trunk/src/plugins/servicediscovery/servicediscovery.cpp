@@ -69,7 +69,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
   FPluginManager = APluginManager;
 
   IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
-  if (plugin) 
+  if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
     if (FXmppStreams)
@@ -84,7 +84,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
   plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
-    FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance()); 
+    FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
     if (FPresencePlugin)
     {
       connect(FPresencePlugin->instance(),SIGNAL(streamStateChanged(const Jid &, bool)),
@@ -97,7 +97,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
   plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
-    FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance()); 
+    FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
     if (FRosterPlugin)
     {
       connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &)),
@@ -106,11 +106,11 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
   }
 
   plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
@@ -118,7 +118,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
@@ -204,7 +204,7 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
     dinfo.node = query.attribute("node");
     foreach(IDiscoHandler *AHandler, FDiscoHandlers)
       AHandler->fillDiscoInfo(dinfo);
-    
+
     if (dinfo.error.code > 0)
     {
       AAccept = true;
@@ -391,14 +391,14 @@ void ServiceDiscovery::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 QList<int> ServiceDiscovery::roles() const
 {
   static QList<int> indexRoles = QList<int>()
-    << RDR_DISCO_IDENT_CATEGORY << RDR_DISCO_IDENT_TYPE << RDR_DISCO_IDENT_NAME 
+    << RDR_DISCO_IDENT_CATEGORY << RDR_DISCO_IDENT_TYPE << RDR_DISCO_IDENT_NAME
     << RDR_DISCO_FEATURES;
   return indexRoles;
 }
 
 QList<int> ServiceDiscovery::types() const
 {
-  static QList<int> indexTypes =  QList<int>() 
+  static QList<int> indexTypes =  QList<int>()
     << RIT_StreamRoot << RIT_Contact << RIT_Agent << RIT_MyResource;
   return indexTypes;
 }
@@ -459,7 +459,7 @@ void ServiceDiscovery::showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJ
 void ServiceDiscovery::showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent)
 {
   DiscoItemsWindow *itemsWindow = new DiscoItemsWindow(this,AStreamJid,AParent);
-  connect(itemsWindow,SIGNAL(destroyed(QObject *)),SLOT(onDiscoItemsWindowDestroyed(QObject *)));
+  connect(itemsWindow,SIGNAL(windowDestroyed(IDiscoItemsWindow *)),SLOT(onDiscoItemsWindowDestroyed(IDiscoItemsWindow *)));
   FDiscoItemsWindows.append(itemsWindow);
   if (FSettingsPlugin)
   {
@@ -761,7 +761,7 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const QPair<J
     result.error.condition = err.condition();
     result.error.message = err.message();
   }
-  else 
+  else
   {
     QDomElement elem = query.firstChildElement("identity");
     while (!elem.isNull())
@@ -802,7 +802,7 @@ IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza, const QPair
     result.error.condition = err.condition();
     result.error.message = err.message();
   }
-  else 
+  else
   {
     QDomElement elem = query.firstChildElement("item");
     while (!elem.isNull())
@@ -824,7 +824,7 @@ void ServiceDiscovery::registerFeatures()
   IDiscoFeature dfeature;
 
   dfeature.var = NS_DISCO;
-  dfeature.active = false; 
+  dfeature.active = false;
   dfeature.icon = iconset->iconByName(IN_DISCO);
   dfeature.name = tr("Service Discovery");
   dfeature.actionName = "";
@@ -840,7 +840,7 @@ void ServiceDiscovery::registerFeatures()
   insertDiscoFeature(dfeature);
 
   dfeature.var = NS_DISCO_ITEMS;
-  dfeature.active = false; 
+  dfeature.active = false;
   dfeature.icon = iconset->iconByName(IN_DISCO);
   dfeature.name = tr("Discovery items");
   dfeature.actionName = "";
@@ -891,7 +891,7 @@ void ServiceDiscovery::removeQueuedRequest(const QueuedRequest &ARequest)
   QMultiMap<QDateTime,QueuedRequest>::iterator it = FQueuedRequests.begin();
   while (it!=FQueuedRequests.end())
   {
-    if ( 
+    if (
           (ARequest.streamJid.isEmpty() || it.value().streamJid == ARequest.streamJid) &&
           (ARequest.contactJid.isEmpty() || it.value().contactJid == ARequest.contactJid) &&
           (ARequest.node.isEmpty() || it.value().node == ARequest.node)
@@ -1183,7 +1183,7 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
   {
     Jid streamJid = AIndex->data(RDR_StreamJid).toString();
     Jid contactJid = itype == RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domain() : AIndex->data(RDR_Jid).toString();
-    
+
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
     if (presence && presence->isOpen())
     {
@@ -1292,9 +1292,9 @@ void ServiceDiscovery::onDiscoInfoWindowDestroyed(QObject *AObject)
   FDiscoInfoWindows.remove(FDiscoInfoWindows.key(infoWindow));
 }
 
-void ServiceDiscovery::onDiscoItemsWindowDestroyed(QObject *AObject)
+void ServiceDiscovery::onDiscoItemsWindowDestroyed(IDiscoItemsWindow *AWindow)
 {
-  DiscoItemsWindow *itemsWindow = static_cast<DiscoItemsWindow *>(AObject);
+  DiscoItemsWindow *itemsWindow = static_cast<DiscoItemsWindow *>(AWindow->instance());
   if (itemsWindow && FSettingsPlugin)
   {
     ISettings *settings = FSettingsPlugin->settingsForPlugin(SERVICEDISCOVERY_UUID);

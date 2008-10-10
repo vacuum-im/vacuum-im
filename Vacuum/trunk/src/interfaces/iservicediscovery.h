@@ -105,6 +105,7 @@ signals:
   virtual void treeItemContextMenu(QTreeWidgetItem *ATreeItem, Menu *AMenu) =0;
   virtual void treeItemDestroyed(QTreeWidgetItem *ATreeItem) =0;
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert) =0;
+  virtual void windowDestroyed(IDiscoItemsWindow *AWindow) =0;
 };
 
 class IServiceDiscovery

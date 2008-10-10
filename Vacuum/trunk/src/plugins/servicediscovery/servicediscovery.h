@@ -31,7 +31,19 @@
 #include "discoinfowindow.h"
 #include "discoitemswindow.h"
 
-class ServiceDiscovery : 
+struct QueuedRequest {
+  Jid streamJid;
+  Jid contactJid;
+  QString node;
+};
+
+struct EntityCapabilities {
+  QString node;
+  QString ver;
+  QString hash;
+};
+
+class ServiceDiscovery :
   public QObject,
   public IPlugin,
   public IServiceDiscovery,
@@ -128,16 +140,6 @@ signals:
   //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
-  struct QueuedRequest {
-    Jid streamJid;
-    Jid contactJid;
-    QString node;
-  };
-  struct EntityCapabilities {
-    QString node;
-    QString ver;
-    QString hash;
-  };
   IDiscoInfo parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   IDiscoItems parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   void registerFeatures();
@@ -165,14 +167,14 @@ protected slots:
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo);
   void onDiscoInfoWindowDestroyed(QObject *AObject);
-  void onDiscoItemsWindowDestroyed(QObject *AObject);
+  void onDiscoItemsWindowDestroyed(IDiscoItemsWindow *AWindow);
   void onQueueTimerTimeout();
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
-  IStanzaProcessor *FStanzaProcessor;    
+  IStanzaProcessor *FStanzaProcessor;
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
   IRostersModel *FRostersModel;

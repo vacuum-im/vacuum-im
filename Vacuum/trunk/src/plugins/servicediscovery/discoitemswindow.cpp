@@ -74,7 +74,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 
 DiscoItemsWindow::~DiscoItemsWindow()
 {
-
+  emit windowDestroyed(this);
 }
 
 void DiscoItemsWindow::setUseCache(bool AUse)
@@ -133,12 +133,12 @@ void DiscoItemsWindow::initialize()
 
 bool DiscoItemsWindow::isNeedRequestInfo(const Jid AContactJid, const QString &ANode) const
 {
-  return !FDiscovery->hasDiscoInfo(AContactJid,ANode) || FDiscovery->discoInfo(AContactJid,ANode).error.code>0; 
+  return !FDiscovery->hasDiscoInfo(AContactJid,ANode) || FDiscovery->discoInfo(AContactJid,ANode).error.code>0;
 }
 
 bool DiscoItemsWindow::isNeedRequestItems(const Jid AContactJid, const QString &ANode) const
 {
-  return !FDiscovery->hasDiscoItems(AContactJid,ANode) || FDiscovery->discoItems(AContactJid,ANode).error.code>0; 
+  return !FDiscovery->hasDiscoItems(AContactJid,ANode) || FDiscovery->discoItems(AContactJid,ANode).error.code>0;
 }
 
 void DiscoItemsWindow::requestDiscoInfo(const Jid AContactJid, const QString &ANode)
@@ -188,13 +188,13 @@ void DiscoItemsWindow::updateDiscoInfo(const IDiscoInfo &ADiscoInfo)
   if (treeItem)
   {
     treeItem->setData(0,DDR_REQUEST_INFO,false);
-    
+
     treeItem->setIcon(COL_NAME,FDiscovery->discoInfoIcon(ADiscoInfo));
-    
+
     if (!ADiscoInfo.identity.value(0).name.isEmpty() && treeItem->data(0,DDR_NAME).toString().isEmpty())
       treeItem->setText(COL_NAME,ADiscoInfo.identity.value(0).name);
 
-    QString toolTip; 
+    QString toolTip;
     if (ADiscoInfo.error.code < 0)
     {
       if (!ADiscoInfo.identity.isEmpty())
@@ -203,7 +203,7 @@ void DiscoItemsWindow::updateDiscoInfo(const IDiscoInfo &ADiscoInfo)
         foreach(IDiscoIdentity identity, ADiscoInfo.identity)
           toolTip+=tr("<li>%1 (Category: '%2'; Type: '%3')</li>").arg(identity.name).arg(identity.category).arg(identity.type);
       }
-      
+
       if (!ADiscoInfo.features.isEmpty())
       {
         QStringList features = ADiscoInfo.features;
@@ -276,7 +276,7 @@ void DiscoItemsWindow::updateDiscoItems(const IDiscoItems &ADiscoItems)
       treeItem->addChildren(newItems);
       treeItem->sortChildren(FHeader->sortIndicatorSection(),FHeader->sortIndicatorOrder());
       treeItem->setExpanded(expanded);
-    } 
+    }
     else if (treeItem->childCount() == 0)
       treeItem->setExpanded(false);
 
@@ -356,7 +356,7 @@ void DiscoItemsWindow::createToolBarActions()
   FShowVCard->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
   FToolBarChanger->addAction(FShowVCard,AG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-  
+
   updateToolBarActions();
 }
 
@@ -416,7 +416,7 @@ void DiscoItemsWindow::onTreeItemContextMenu(const QPoint &APos)
     menu->addAction(FDiscoInfo,AG_DIWT_DISCOVERY_ACTIONS,false);
     menu->addAction(FAddContact,AG_DIWT_DISCOVERY_ACTIONS,false);
     menu->addAction(FShowVCard,AG_DIWT_DISCOVERY_ACTIONS,false);
-    
+
     IDiscoInfo dinfo = FDiscovery->discoInfo(treeItem->data(0,DDR_JID).toString(),treeItem->data(0,DDR_NODE).toString());
     foreach(QString feature, dinfo.features)
     {
@@ -424,7 +424,7 @@ void DiscoItemsWindow::onTreeItemContextMenu(const QPoint &APos)
       if (action)
         menu->addAction(action,AG_DIWT_DISCOVERY_FEATURE_ACTIONS,false);
     }
-    
+
     emit treeItemContextMenu(treeItem,menu);
 
     menu->popup(ui.trwItems->viewport()->mapToGlobal(APos));

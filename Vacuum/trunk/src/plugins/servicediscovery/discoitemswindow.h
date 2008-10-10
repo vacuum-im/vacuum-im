@@ -10,7 +10,7 @@
 #include "../../utils/action.h"
 #include "ui_discoitemswindow.h"
 
-class DiscoItemsWindow : 
+class DiscoItemsWindow :
   public QMainWindow,
   public IDiscoItemsWindow
 {
@@ -35,6 +35,7 @@ signals:
   virtual void treeItemContextMenu(QTreeWidgetItem *ATreeItem, Menu *AMenu);
   virtual void treeItemDestroyed(QTreeWidgetItem *ATreeItem);
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert);
+  virtual void windowDestroyed(IDiscoItemsWindow *AWindow);
 public:
   virtual QMenu *createPopupMenu() { return NULL; }
 protected:
