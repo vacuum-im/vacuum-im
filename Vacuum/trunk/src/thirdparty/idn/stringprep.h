@@ -28,8 +28,13 @@ extern "C"
 #endif
 
 #include <stddef.h>   /* size_t */
-#include <unistd.h>   /* ssize_t */
-#include "idn-int.h"  /* uint32_t */
+#ifdef _MSC_VER
+#  include "ac-stdint.h"
+#else
+#  include <unistd.h>   /* ssize_t */
+#  include "idn-int.h"  /* uint32_t */
+#endif
+
 
 #define STRINGPREP_VERSION "0.5.19"
 
@@ -199,13 +204,6 @@ extern "C"
   extern char *stringprep_utf8_nfkc_normalize (const char *str, ssize_t len);
   extern uint32_t *stringprep_ucs4_nfkc_normalize (uint32_t * str,
 						   ssize_t len);
-
-  extern const char *stringprep_locale_charset (void);
-  extern char *stringprep_convert (const char *str,
-				   const char *to_codeset,
-				   const char *from_codeset);
-  extern char *stringprep_locale_to_utf8 (const char *str);
-  extern char *stringprep_utf8_to_locale (const char *str);
 
 #ifdef __cplusplus
 }
