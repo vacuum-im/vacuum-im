@@ -33,7 +33,7 @@ struct IPrivacyRule
     AnyStanza     = Messages|Queries|PresencesIn|PresencesOut
   };
   IPrivacyRule() { stanzas = EmptyType; }
-  int order; 
+  int order;
   QString type;
   QString value;
   QString action;

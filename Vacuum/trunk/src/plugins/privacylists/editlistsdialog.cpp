@@ -103,7 +103,7 @@ void EditListsDialog::apply()
       else
         ruleOrders.append(rule.order);
     }
-    
+
     if (!newList.rules.isEmpty())
     {
       int ruleIndex = 0;
@@ -509,7 +509,7 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
     ui.cmbValue->blockSignals(false);
     ui.cmbValue->setCurrentIndex(0);
   }
-  else 
+  else
   {
     ui.cmbValue->setInsertPolicy(QComboBox::InsertAlphabetically);
     if (type == PRIVACY_TYPE_JID)
@@ -561,6 +561,8 @@ void EditListsDialog::onDialogButtonClicked(QAbstractButton *AButton)
     break;
   case QDialogButtonBox::RejectRole:
     reject();
+    break;
+  default:
     break;
   }
 }

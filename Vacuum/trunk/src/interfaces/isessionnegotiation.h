@@ -13,7 +13,7 @@
 #define SESSION_FIELD_TERMINATE       "terminate"
 #define SESSION_FIELD_REASON          "reason"
 
-struct IStanzaSession 
+struct IStanzaSession
 {
   enum Status {
     Empty,
@@ -35,7 +35,7 @@ struct IStanzaSession
   QStringList errorFields;
 };
 
-class ISessionNegotiator 
+class ISessionNegotiator
 {
 public:
   enum Result {
@@ -52,7 +52,7 @@ public:
   virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm) =0;
 };
 
-class ISessionNegotiation 
+class ISessionNegotiation
 {
 public:
   virtual QObject *instance() =0;

@@ -13,11 +13,11 @@
 
 #define IN_PRIVACY          "psi/eye"
 
-QStringList PrivacyLists::FAutoLists = QStringList()  
+QStringList PrivacyLists::FAutoLists = QStringList()
                                     << PRIVACY_LIST_VISIBLE
-                                    << PRIVACY_LIST_CONFERENCES 
-                                    << PRIVACY_LIST_INVISIBLE 
-                                    << PRIVACY_LIST_IGNORE 
+                                    << PRIVACY_LIST_CONFERENCES
+                                    << PRIVACY_LIST_INVISIBLE
+                                    << PRIVACY_LIST_IGNORE
                                     << PRIVACY_LIST_SUBSCRIPTION;
 
 PrivacyLists::PrivacyLists()
@@ -51,7 +51,7 @@ void PrivacyLists::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Enabling or disabling communication with other entities on a network.");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("Privacy Lists"); 
+  APluginInfo->name = tr("Privacy Lists");
   APluginInfo->uid = PRIVACYLISTS_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
@@ -60,18 +60,18 @@ void PrivacyLists::pluginInfo(IPluginInfo *APluginInfo)
 bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   IPlugin *plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin)
   {
-    connect(plugin->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *))); 
-    connect(plugin->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *))); 
+    connect(plugin->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
+    connect(plugin->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
   }
 
   plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
-  if (plugin) 
+  if (plugin)
   {
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
     if (FRostersModel)
@@ -82,19 +82,19 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &/*AInitO
   }
 
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IMultiUserChatPlugin").value(0,NULL);
-  if (plugin) 
+  if (plugin)
   {
     connect(plugin->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),SLOT(onMultiUserChatCreated(IMultiUserChat *)));
   }
@@ -108,7 +108,7 @@ bool PrivacyLists::initObjects()
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FRosterLabelId = FRostersView->createIndexLabel(RLO_PRIVACY,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_PRIVACY));
-    connect(FRostersView,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)), 
+    connect(FRostersView,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
@@ -196,7 +196,7 @@ void PrivacyLists::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
     {
       QHash<QString,IPrivacyList> &lists = FPrivacyLists[AStreamJid];
       QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_PRIVACY);
-      
+
       QDomElement listElem = queryElem.firstChildElement("list");
       while (!listElem.isNull())
       {
@@ -235,10 +235,10 @@ void PrivacyLists::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
           emit listLoaded(AStreamJid,list.name);
         else
           loadPrivacyList(AStreamJid,listName);
-        
+
         listElem = listElem.nextSiblingElement("list");
       }
-      
+
       QDomElement activeElem = queryElem.firstChildElement("active");
       if (!activeElem.isNull())
       {
@@ -334,7 +334,7 @@ void PrivacyLists::iqStanzaTimeOut(const QString &AId)
     FDefaultRequests.remove(AId);
   else if (FRemoveRequests.contains(AId))
     FRemoveRequests.remove(AId);
-  
+
   foreach(Jid streamJid, FStreamRequests.keys())
     FStreamRequests[streamJid].removeAt(FStreamRequests[streamJid].indexOf(AId));
 
@@ -616,7 +616,7 @@ QString PrivacyLists::setActiveList(const Jid &AStreamJid, const QString &AList)
     QDomElement activeElem = queryElem.appendChild(set.createElement("active")).toElement();
     if (!AList.isEmpty())
       activeElem.setAttribute("name",AList);
-    
+
     emit activeListAboutToBeChanged(AStreamJid,AList);
     if (FStanzaProcessor->sendIqStanza(this,AStreamJid,set,PRIVACY_TIMEOUT))
     {
@@ -1067,7 +1067,7 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
     QSet<Jid> denyed = denyedContacts(AStreamJid,privacyList(AStreamJid,activeList(AStreamJid))).keys().toSet();
     QSet<Jid> deny = denyed - FLabeledContacts.value(AStreamJid);
     QSet<Jid> allow = FLabeledContacts.value(AStreamJid) - denyed;
-    
+
     foreach(Jid contactJid, deny) {
       setPrivacyLabel(AStreamJid,contactJid,true); }
 
@@ -1180,7 +1180,7 @@ void PrivacyLists::onStreamOpened(IXmppStream *AXmppStream)
   {
     int handler = FStanzaProcessor->insertHandler(this,SHC_PRIVACY,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
     FSHIPrivacy.insert(AXmppStream->jid(),handler);
-    
+
     handler = FStanzaProcessor->insertHandler(this,SHC_ROSTER,IStanzaProcessor::DirectionIn,SHP_DEFAULT-1,AXmppStream->jid());
     FSHIRosterIn.insert(AXmppStream->jid(),handler);
 
@@ -1242,7 +1242,7 @@ void PrivacyLists::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowEditListsDialog(bool)));
       pmenu->addAction(action,AG_DEFAULT+400,false);
-    } 
+    }
     else if (isAutoPrivacy(streamJid))
     {
       if (AIndex->type()==RIT_Contact || AIndex->type()==RIT_Agent)
