@@ -168,6 +168,7 @@ bool ClientInfo::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza 
     QDomElement elem = iq.addElement("query",NS_JABBER_VERSION);
     elem.appendChild(iq.createElement("name")).appendChild(iq.createTextNode(CLIENT_NAME));
     elem.appendChild(iq.createElement("version")).appendChild(iq.createTextNode(CLIENT_VERSION));
+    elem.appendChild(iq.createElement("os")).appendChild(iq.createTextNode(osVersion()));
     FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
   }
   else if (AHandlerId == FTimeHandler)
@@ -365,6 +366,114 @@ Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QStrin
     }
   }
   return NULL;
+}
+
+QString ClientInfo::osVersion() const
+{
+  static QString osver;
+  if(osver.isEmpty())
+  {
+#if defined(Q_OS_MAC)
+    switch(QSysInfo::MacintoshVersion)
+    {
+    case QSysInfo::MV_LEOPARD:
+      osver = "MacOS 10.5(Leopard)";
+      break;
+    case QSysInfo::MV_TIGER:
+      osver = "MacOS 10.4(Tiger)";
+      break;
+    case QSysInfo::MV_PANTHER:
+      osver = "MacOS 10.3(Panther)";
+      break;
+    case QSysInfo::MV_JAGUAR:
+      osver = "MacOS 10.2(Jaguar)";
+      break;
+    case QSysInfo::MV_PUMA:
+      osver = "MacOS 10.1(Puma)";
+      break;
+    case QSysInfo::MV_CHEETAH:
+      osver = "MacOS 10.0(Cheetah)";
+      break;
+    case QSysInfo::MV_9:
+      osver = "MacOS 9";
+      break;
+    case QSysInfo::MV_Unknown:
+    default:
+      osver = tr("MacOS(unknown)");
+      break;
+    }
+#elif defined(Q_OS_UNIX)
+    utsname buf;
+    if(uname(&buf) != -1)
+    {
+      osver.append(buf.release).append(QLatin1Char(' '));
+      osver.append(buf.sysname).append(QLatin1Char(' '));
+      osver.append(buf.machine).append(QLatin1Char(' '));
+      osver.append(QLatin1String(" (")).append(buf.machine).append(QLatin1Char(')'));
+    }
+    else
+    {
+      osver = QLatin1String("Linux/Unix(unknown)");
+    }
+#elif defined(Q_WS_WIN) || defined(Q_OS_CYGWIN)
+    switch(QSysInfo::WindowsVersion)
+    {
+    case QSysInfo::WV_CE_6:
+      osver = "Windows CE 6.x";
+      break;
+    case QSysInfo::WV_CE_5:
+      osver = "Windows CE 5.x";
+      break;
+    case QSysInfo::WV_CENET:
+      osver = "Windows CE .NET";
+      break;
+    case QSysInfo::WV_CE:
+      osver = "Windows CE";
+      break;
+    case QSysInfo::WV_VISTA:
+      osver = "Windows Vista";
+      break;
+    case QSysInfo::WV_2003:
+      osver = "Windows Server 2003";
+      break;
+    case QSysInfo::WV_XP:
+      osver = "Windows XP";
+      break;
+    case QSysInfo::WV_2000:
+      osver = "Windows 2000";
+      break;
+    case QSysInfo::WV_NT:
+      osver = "Windows NT";
+      break;
+    case QSysInfo::WV_Me:
+      osver = "Windows Me";
+      break;
+    case QSysInfo::WV_98:
+      osver = "Windows 98";
+      break;
+    case QSysInfo::WV_95:
+      osver = "Windows 95";
+      break;
+    case QSysInfo::WV_32s:
+      osver = "Windows 3.1 with Win32s";
+      break;
+    default:
+      osver = "Windows(unknown)";
+      break;
+    }
+
+    if(QSysInfo::WindowsVersion & QSysInfo::WV_CE_based)
+      osver.append(" (CE-based)");
+    else if(QSysInfo::WindowsVersion & QSysInfo::WV_NT_based)
+      osver.append(" (NT-based)");
+    else if(QSysInfo::WindowsVersion & QSysInfo::WV_DOS_based)
+      osver.append(" (MS-DOS-based)");
+
+#else
+    return QLatin1String("Unknown");
+#endif
+  }
+  return osver;
 }
 
 void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes)

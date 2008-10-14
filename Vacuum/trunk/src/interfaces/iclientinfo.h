@@ -25,6 +25,7 @@ public:
   };
 public:
   virtual QObject *instance() =0;
+  virtual QString osVersion() const =0;
   virtual void showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes) =0;
   virtual bool checkOption(IClientInfo::Option AOption) const =0;
   virtual void setOption(IClientInfo::Option AOption, bool AValue) =0;

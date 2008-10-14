@@ -71,6 +71,7 @@ public:
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //IClientInfo
+  virtual QString osVersion() const;
   virtual void showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes);
   virtual bool checkOption(IClientInfo::Option AOption) const;
   virtual void setOption(IClientInfo::Option AOption, bool AValue);
