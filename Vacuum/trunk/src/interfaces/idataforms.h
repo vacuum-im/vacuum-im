@@ -1,6 +1,7 @@
 #ifndef IDATAFORMS_H
 #define IDATAFORMS_H
 
+#include <QUrl>
 #include <QDialog>
 #include <QTableWidget>
 #include <QDialogButtonBox>
@@ -44,6 +45,11 @@
 #define DATAFORM_TYPE_CANCEL            "cancel"
 #define DATAFORM_TYPE_RESULT            "result"
 
+#define MEDIAELEM_TYPE_IMAGE            "image"
+#define MEDIAELEM_TYPE_AUDIO            "audio"
+#define MEDIAELEM_TYPE_VIDEO            "video"
+
+
 struct IDataValidate {
   QString type;
   QString method;
@@ -59,6 +65,19 @@ struct IDataOption {
   QString value;
 };
 
+struct IDataMediaURI {
+  QString type;
+  QString subtype;
+  QString codecs;
+  QUrl url;
+};
+
+struct IDataMedia {
+  int height;
+  int width;
+  QList<IDataMediaURI> uris;
+};
+
 struct IDataField {
   bool required;
   QString var;
@@ -68,6 +87,7 @@ struct IDataField {
   QVariant value;
   QList<IDataOption> options;
   IDataValidate validate;
+  IDataMedia media;
 };
 
 struct IDataTable {
@@ -105,6 +125,17 @@ signals:
   virtual void changed(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn) =0;
 };
 
+class IDataMediaWidget
+{
+public:
+  virtual QWidget *instance() =0;
+  virtual IDataMedia media() const =0;
+  virtual IDataMediaURI mediaUri() const =0;
+signals:
+  virtual void mediaShown() =0;
+  virtual void mediaError(const QString &AError) =0;
+};
+
 class IDataFieldWidget
 {
 public:
@@ -114,6 +145,7 @@ public:
   virtual const IDataField &dataField() const =0;
   virtual QVariant value() const =0;
   virtual void setValue(const QVariant &AValue) =0;
+  virtual IDataMediaWidget *mediaWidget() const =0;
 signals:
   virtual void focusIn(Qt::FocusReason AReason) =0;
   virtual void focusOut(Qt::FocusReason AReason) =0;
@@ -165,12 +197,14 @@ public:
   virtual QObject *instance() =0;
   //XML2DATA
   virtual IDataValidate dataValidate(const QDomElement &AValidateElem) const =0;
+  virtual IDataMedia dataMedia(const QDomElement &AMediaElem) const =0;
   virtual IDataField dataField(const QDomElement &AFieldElem) const =0;
   virtual IDataTable dataTable(const QDomElement &ATableElem) const =0;
   virtual IDataLayout dataLayout(const QDomElement &ALayoutElem) const =0;
   virtual IDataForm dataForm(const QDomElement &AFormElem) const =0;
   //DATA2XML
   virtual void xmlValidate(const IDataValidate &AValidate, QDomElement &AFieldElem) const =0;
+  virtual void xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) const =0;
   virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, FieldWriteMode AMode = FWM_FORM) const =0;
   virtual void xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const =0;
   virtual void xmlSection(const IDataLayout &ALayout, QDomElement &AParentElem) const =0;
@@ -179,28 +213,37 @@ public:
   //Data Checks
   virtual bool isDataValid(const IDataValidate &AValidate, const QString &AValue) const =0;
   virtual bool isOptionValid(const QList<IDataOption> &AOptions, const QString &AValue) const =0;
+  virtual bool isMediaValid(const IDataMedia &AMedia) const =0;
   virtual bool isFieldEmpty(const IDataField &AField) const =0;
   virtual bool isFieldValid(const IDataField &AField) const =0;
   virtual bool isFormValid(const IDataForm &AForm) const =0;
   virtual bool isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) const =0;
+  virtual bool isSupportedUri(const IDataMediaURI &AUri) const =0;
   //Data actions
   virtual int fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const =0;
   virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const =0;
   virtual IDataForm dataSubmit(const IDataForm &AForm) const =0;
+  virtual QByteArray urlData(const QUrl &AUrl) const =0;
+  virtual bool loadUrl(const QUrl &AUrl, bool AEnableCache = true) =0;
   //Data widgets
   virtual QValidator *dataValidator(const IDataValidate &AValidate, QObject *AParent) const =0;
   virtual IDataTableWidget *tableWidget(const IDataTable &ATable, QWidget *AParent) =0;
+  virtual IDataMediaWidget *mediaWidget(const IDataMedia &AMedia, QWidget *AParent) =0;
   virtual IDataFieldWidget *fieldWidget(const IDataField &AField, bool AReadOnly, QWidget *AParent) =0;
   virtual IDataFormWidget *formWidget(const IDataForm &AForm, QWidget *AParent) =0;
   virtual IDataDialogWidget *dialogWidget(const IDataForm &AForm, QWidget *AParent) =0;
 signals:
   virtual void tableWidgetCreated(IDataTableWidget *ATable) =0;
+  virtual void mediaWidgetCreated(IDataMediaWidget *AMedia) =0;
   virtual void fieldWidgetCreated(IDataFieldWidget *AField) =0;
   virtual void formWidgetCreated(IDataFormWidget *AForm) =0;
   virtual void dialogWidgetCreated(IDataDialogWidget *ADialog) =0;
+  virtual void urlLoaded(const QUrl &AUrl, const QByteArray &AData) =0;
+  virtual void urlLoadFailed(const QUrl &AUrl, const QString &AError) =0;
 };
 
 Q_DECLARE_INTERFACE(IDataTableWidget,"Vacuum.Plugin.IDataTableWidget/1.0")
+Q_DECLARE_INTERFACE(IDataMediaWidget,"Vacuum.Plugin.IDataMediaWidget/1.0")
 Q_DECLARE_INTERFACE(IDataFieldWidget,"Vacuum.Plugin.IDataFieldWidget/1.0")
 Q_DECLARE_INTERFACE(IDataFormWidget,"Vacuum.Plugin.IDataFormWidget/1.0")
 Q_DECLARE_INTERFACE(IDataDialogWidget,"Vacuum.Plugin.IDataDialogWidget/1.0")

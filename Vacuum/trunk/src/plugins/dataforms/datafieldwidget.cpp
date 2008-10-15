@@ -8,9 +8,16 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
   FField = AField;
   FReadOnly = AReadOnly;
   FDataForms = ADataForms;
+  FMediaWidget = NULL;
 
   setLayout(new QVBoxLayout(this));
   layout()->setMargin(0);
+
+  if (FDataForms->isMediaValid(AField.media))
+  {
+    FMediaWidget = FDataForms->mediaWidget(AField.media,this);
+    layout()->addWidget(FMediaWidget->instance());
+  }
 
   QString desc = Qt::escape(FField.desc);
   QString label = !FField.label.isEmpty() ? Qt::escape(FField.label) : desc;
@@ -280,6 +287,11 @@ void DataFieldWidget::setValue(const QVariant &AValue)
   }
 }
 
+IDataMediaWidget *DataFieldWidget::mediaWidget() const
+{
+  return FMediaWidget;
+}
+
 void DataFieldWidget::appendLabel(const QString &AText, QWidget *ABuddy)
 {
   if (!AText.isEmpty())
@@ -306,3 +318,4 @@ bool DataFieldWidget::eventFilter(QObject *AObject, QEvent *AEvent)
   }
   return QObject::eventFilter(AObject,AEvent);
 }
+

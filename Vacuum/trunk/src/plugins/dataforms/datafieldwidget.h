@@ -28,6 +28,7 @@ public:
   virtual const IDataField &dataField() const { return FField; }
   virtual QVariant value() const;
   virtual void setValue(const QVariant &AValue);
+  virtual IDataMediaWidget *mediaWidget() const;
 signals:
   virtual void focusIn(Qt::FocusReason AReason);
   virtual void focusOut(Qt::FocusReason AReason);
@@ -37,6 +38,7 @@ protected:
   virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
 private:
   IDataForms *FDataForms;
+  IDataMediaWidget *FMediaWidget;
 private:
   QLabel *FLabel;
   QLineEdit *FLineEdit;

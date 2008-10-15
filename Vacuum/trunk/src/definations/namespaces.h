@@ -50,6 +50,7 @@
 
 #define NS_JABBER_XDATALAYOUT                   "http://jabber.org/protocol/xdata-layout"
 #define NS_JABBER_XDATAVALIDATE                 "http://jabber.org/protocol/xdata-validate"
+#define NS_XMPP_MEDIA_ELEMENT                   "urn:xmpp:media-element"
 
 #define NS_CAPS                                 "http://jabber.org/protocol/caps"
 

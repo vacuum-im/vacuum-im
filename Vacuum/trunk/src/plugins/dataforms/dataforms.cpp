@@ -1,7 +1,10 @@
 #include "dataforms.h"
 
+#include <QImageReader>
+
 DataForms::DataForms()
 {
+  FSettings = NULL;
   FDiscovery = NULL;
 }
 
@@ -27,6 +30,16 @@ bool DataForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
+  
+  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  if (plugin)
+  {
+    ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    if (settingsPlugin)
+    {
+      FSettings = settingsPlugin->settingsForPlugin(DATAFORMS_UUID);
+    }
+  }
   return true;
 }
 
@@ -36,6 +49,11 @@ bool DataForms::initObjects()
   {
     registerDiscoFeatures();
   }
+  return true;
+}
+
+bool DataForms::startPlugin()
+{
   return true;
 }
 
@@ -76,6 +94,43 @@ IDataValidate DataForms::dataValidate(const QDomElement &AValidateElem) const
   return validate;
 }
 
+IDataMedia DataForms::dataMedia(const QDomElement &AMediaElem) const
+{
+  IDataMedia media;
+  if (!AMediaElem.isNull())
+  {
+    media.height = AMediaElem.hasAttribute("height") ? AMediaElem.attribute("height").toInt() : -1;
+    media.width = AMediaElem.hasAttribute("width") ? AMediaElem.attribute("width").toInt() : -1;
+    
+    QDomElement uriElem = AMediaElem.firstChildElement("uri");
+    while (!uriElem.isNull())
+    {
+      IDataMediaURI uri;
+      uri.url = uriElem.text().trimmed();
+      if (!uri.url.isEmpty())
+      {
+        QStringList params = uriElem.attribute("type").split(';',QString::SkipEmptyParts);
+        foreach(QString param, params)
+        {
+          if (param.startsWith("codecs="))
+          {
+            uri.codecs = param.split('=').value(1).trimmed();
+          }
+          else if (param.contains('/'))
+          {
+            QStringList types = param.split('/');
+            uri.type = types.value(0).trimmed();
+            uri.subtype = types.value(1).trimmed();
+          }
+        }
+        media.uris.append(uri);
+      }
+      uriElem = uriElem.nextSiblingElement("uri");
+    }
+  }
+  return media;
+}
+
 IDataField DataForms::dataField(const QDomElement &AFieldElem) const
 {
   IDataField field;
@@ -114,6 +169,12 @@ IDataField DataForms::dataField(const QDomElement &AFieldElem) const
     if (!validateElem.isNull() && validateElem.namespaceURI()==NS_JABBER_XDATAVALIDATE)
     {
       field.validate = dataValidate(validateElem);
+    }
+
+    QDomElement mediaElem = AFieldElem.firstChildElement("media");
+    if (!mediaElem.isNull() && mediaElem.namespaceURI()==NS_XMPP_MEDIA_ELEMENT)
+    {
+      field.media = dataMedia(mediaElem);
     }
 
     field.required = !AFieldElem.firstChildElement("required").isNull();
@@ -263,6 +324,27 @@ void DataForms::xmlValidate(const IDataValidate &AValidate, QDomElement &AFieldE
   }
 }
 
+void DataForms::xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) const
+{
+  QDomDocument doc = AFieldElem.ownerDocument();
+  QDomElement mediaElem = AFieldElem.appendChild(doc.createElementNS(NS_XMPP_MEDIA_ELEMENT,"media")).toElement();
+
+  if (AMedia.height>0)
+    mediaElem.setAttribute("height",AMedia.height);
+  if (AMedia.width>0)
+    mediaElem.setAttribute("width",AMedia.width);
+
+  foreach(IDataMediaURI uri, AMedia.uris)
+  {
+    if (!uri.url.isEmpty())
+    {
+      QDomElement uriElem = mediaElem.appendChild(doc.createElement("uri")).toElement();
+      uriElem.setAttribute("type",uri.type+"/"+uri.subtype);
+      uriElem.appendChild(doc.createTextNode(uri.url.toString()));
+    }
+  }
+}
+
 void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, FieldWriteMode AMode) const
 {
   QDomDocument doc = AFormElem.ownerDocument();
@@ -292,6 +374,9 @@ void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, Field
   {
     if (!AField.label.isEmpty())
       fieldElem.setAttribute("label",AField.label);
+
+    if (!AField.media.uris.isEmpty())
+      xmlMedia(AField.media,fieldElem);
   }
 
   if (AMode == IDataForms::FWM_FORM)
@@ -514,6 +599,14 @@ bool DataForms::isOptionValid(const QList<IDataOption> &AOptions, const QString 
   return valid;
 }
 
+bool DataForms::isMediaValid(const IDataMedia &AMedia) const
+{
+  foreach(IDataMediaURI uri, AMedia.uris)
+    if (!uri.type.isEmpty() && !uri.subtype.isEmpty() && !uri.url.isEmpty())
+      return true;
+  return false;
+}
+
 bool DataForms::isFieldEmpty(const IDataField &AField) const
 {
   return AField.value.type()==QVariant::StringList ? AField.value.toStringList().isEmpty() : AField.value.toString().isEmpty();
@@ -618,6 +711,19 @@ bool DataForms::isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) 
   return valid;
 }
 
+bool DataForms::isSupportedUri(const IDataMediaURI &AUri) const
+{
+  static const QStringList urlSchemes = QStringList() << "http" << "ftp";
+  if (urlSchemes.contains(AUri.url.scheme().toLower()))
+  {
+    if (AUri.type == MEDIAELEM_TYPE_IMAGE)
+    {
+      return QImageReader::supportedImageFormats().contains(AUri.subtype.toLower().toLatin1());
+    }
+  }
+  return false;
+}
+
 int DataForms::fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const
 {
   for(int index=0; index<AFields.count(); index++)
@@ -649,6 +755,43 @@ IDataForm DataForms::dataSubmit(const IDataForm &AForm) const
     }
   }
   return form;
+}
+
+QByteArray DataForms::urlData(const QUrl &AUrl) const
+{
+  return  FSettings!=NULL ? FSettings->loadBinaryData(AUrl.toString()) : QByteArray();
+}
+
+bool DataForms::loadUrl(const QUrl &AUrl, bool AEnableCache)
+{
+  QByteArray cache;
+  if (!AEnableCache || (cache=urlData(AUrl)).isEmpty())
+  {
+    if (!FLoadStates.contains(AUrl))
+    {
+      QString scheme = AUrl.scheme().toLower();
+      if (scheme=="http" || scheme=="ftp")
+      {
+        UrlLoadState state;
+        state.reply = FNetworkManager.get(QNetworkRequest(AUrl));
+        state.reply->setReadBufferSize(0);
+        connect(state.reply,SIGNAL(finished()),SLOT(onNetworkReplyFinished()));
+        connect(state.reply,SIGNAL(error(QNetworkReply::NetworkError)),SLOT(onNetworkReplyError(QNetworkReply::NetworkError)));
+        connect(state.reply,SIGNAL(sslErrors(const QList<QSslError> &)),SLOT(onNetworkReplySSLErrors(const QList<QSslError> &)));
+        FLoadStates.insert(AUrl,state);
+      }
+      else
+      {
+        emit urlLoadFailed(AUrl,tr("Unsupported url scheme"));
+        return false;
+      }
+    }
+  }
+  else
+  {
+    emit urlLoaded(AUrl,cache);
+  }
+  return true;
 }
 
 QValidator *DataForms::dataValidator(const IDataValidate &AValidate, QObject *AParent) const
@@ -705,13 +848,23 @@ QValidator *DataForms::dataValidator(const IDataValidate &AValidate, QObject *AP
 IDataTableWidget *DataForms::tableWidget(const IDataTable &ATable, QWidget *AParent)
 {
   IDataTableWidget *table = new DataTableWidget(this,ATable,AParent);
+  FCleanupHandler.add(table->instance());
   emit tableWidgetCreated(table);
   return table;
+}
+
+IDataMediaWidget *DataForms::mediaWidget(const IDataMedia &AMedia, QWidget *AParent)
+{
+  IDataMediaWidget *media = new DataMediaWidget(this,AMedia,AParent);
+  FCleanupHandler.add(media->instance());
+  emit mediaWidgetCreated(media);
+  return media;
 }
 
 IDataFieldWidget *DataForms::fieldWidget(const IDataField &AField, bool AReadOnly, QWidget *AParent)
 {
   IDataFieldWidget *field = new DataFieldWidget(this,AField,AReadOnly,AParent);
+  FCleanupHandler.add(field->instance());
   emit fieldWidgetCreated(field);
   return field;
 }
@@ -719,6 +872,7 @@ IDataFieldWidget *DataForms::fieldWidget(const IDataField &AField, bool AReadOnl
 IDataFormWidget *DataForms::formWidget(const IDataForm &AForm, QWidget *AParent)
 {
   IDataFormWidget *form = new DataFormWidget(this,AForm,AParent);
+  FCleanupHandler.add(form->instance());
   emit formWidgetCreated(form);
   return form;
 }
@@ -726,6 +880,7 @@ IDataFormWidget *DataForms::formWidget(const IDataForm &AForm, QWidget *AParent)
 IDataDialogWidget *DataForms::dialogWidget(const IDataForm &AForm, QWidget *AParent)
 {
   IDataDialogWidget *dialog = new DataDialogWidget(this,AForm,AParent);
+  FCleanupHandler.add(dialog->instance());
   emit dialogWidgetCreated(dialog);
   return dialog;
 }
@@ -762,6 +917,26 @@ void DataForms::xmlLayout(const IDataLayout &ALayout, QDomElement &ALayoutElem) 
   }
 }
 
+void DataForms::urlLoadSuccess(const QUrl &AUrl, const QByteArray &AData)
+{
+  if (FLoadStates.contains(AUrl))
+  {
+    FLoadStates.remove(AUrl);
+    if (FSettings)
+      FSettings->saveBinaryData(AUrl.toString(),AData);
+    emit urlLoaded(AUrl,AData);
+  }
+}
+
+void DataForms::urlLoadFailure(const QUrl &AUrl, const QString &AError)
+{
+  if (FLoadStates.contains(AUrl))
+  {
+    FLoadStates.remove(AUrl);
+    emit urlLoadFailed(AUrl,AError);
+  }
+}
+
 void DataForms::registerDiscoFeatures()
 {
   IDiscoFeature dfeature;
@@ -790,4 +965,37 @@ void DataForms::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
-Q_EXPORT_PLUGIN2(DataFormsPlugin, DataForms)
+void DataForms::onNetworkReplyFinished()
+{
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+  if (reply && reply->error()==QNetworkReply::NoError)
+  {
+    QByteArray data = reply->readAll();
+    urlLoadSuccess(reply->url(),data);
+    reply->close();
+  }
+}
+
+void DataForms::onNetworkReplyError(QNetworkReply::NetworkError /*ACode*/)
+{
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+  if (reply)
+  {
+    urlLoadFailure(reply->url(),reply->errorString());
+  }
+}
+
+void DataForms::onNetworkReplySSLErrors(const QList<QSslError> &/*AErrors*/)
+{
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+  if (reply)
+    reply->ignoreSslErrors();
+}
+
+Q_EXPORT_PLUGIN2(DataFormsPlugin, DataForms);
+
+uint qHash(const QUrl &key)
+{
+  return qHash(key.toString());
+}
+
