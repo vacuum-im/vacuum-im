@@ -150,7 +150,7 @@ IDataField DataForms::dataField(const QDomElement &AFieldElem) const
       valueElem = valueElem.nextSiblingElement("value");
     }
 
-    if (field.type==DATAFIELD_TYPE_JIDMULTI || field.type==DATAFIELD_TYPE_LISTMULTI || field.type==DATAFIELD_TYPE_TEXTMULTI)
+    if (valueList.count()>1 || field.type==DATAFIELD_TYPE_JIDMULTI || field.type==DATAFIELD_TYPE_LISTMULTI || field.type==DATAFIELD_TYPE_TEXTMULTI)
       field.value = valueList;
     else
       field.value = valueList.value(0);
