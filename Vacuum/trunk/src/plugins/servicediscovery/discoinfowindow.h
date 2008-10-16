@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "../../interfaces/iservicediscovery.h"
+#include "../../utils/menu.h"
 #include "ui_discoinfowindow.h"
 
 class DiscoInfoWindow : 
@@ -17,6 +18,7 @@ public:
   virtual Jid contactJid() const { return FContactJid; }
   virtual QString node() const { return FNode; }
 protected:
+  void initialize();
   void updateWindow();
   void requestDiscoInfo();
 protected slots:
@@ -25,11 +27,14 @@ protected slots:
   void onUpdateClicked();
   void onListItemActivated(QListWidgetItem *AItem);
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
+  void onShowExtensionForm(bool);
 private:
   Ui::DiscoInfoWindowClass ui;
 private:
+  IDataForms *FDataForms;
   IServiceDiscovery *FDiscovery;
 private:
+  Menu *FFormMenu;
   Jid FStreamJid;
   Jid FContactJid;
   QString FNode;

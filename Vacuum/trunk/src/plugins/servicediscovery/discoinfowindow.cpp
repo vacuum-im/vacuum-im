@@ -2,6 +2,7 @@
 
 #include <QHeaderView>
 
+#define ADR_FORM_INDEX        Action::DR_Parametr1
 #define IN_INFO               "psi/statusmsg"
 
 DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, const Jid &AContactJid,
@@ -12,13 +13,17 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
   setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_INFO));
   setWindowTitle(tr("%1 - Discovery Info").arg(AContactJid.full()));
 
+  FDataForms = NULL;
   FDiscovery = ADiscovery;
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
   FNode = ANode;
+  FFormMenu = NULL;
 
+  ui.pbtExtensions->setEnabled(false);
   ui.lblError->setVisible(false);
 
+  initialize();
   connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),
     SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
   connect(FDiscovery->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
@@ -37,6 +42,13 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
 DiscoInfoWindow::~DiscoInfoWindow()
 {
 
+}
+
+void DiscoInfoWindow::initialize()
+{
+  IPlugin *plugin = FDiscovery->pluginManager()->getPlugins("IDataForms").value(0,NULL);
+  if (plugin)
+    FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 }
 
 void DiscoInfoWindow::updateWindow()
@@ -73,6 +85,30 @@ void DiscoInfoWindow::updateWindow()
     listItem->setData(Qt::UserRole,dfeature.var);
     listItem->setData(Qt::UserRole+1,dfeature.description);
     ui.lwtFearures->addItem(listItem);
+  }
+
+  if (FDataForms)
+  {
+    if (FFormMenu)
+    {
+      FFormMenu->deleteLater();
+      FFormMenu = NULL;
+    }
+    if (!dinfo.extensions.isEmpty())
+    {
+      FFormMenu = new Menu(ui.pbtExtensions);
+      for (int index=0; index<dinfo.extensions.count(); index++)
+      {
+        const IDataForm &form = dinfo.extensions.at(index);
+        Action *action = new Action(FFormMenu);
+        action->setData(ADR_FORM_INDEX,index);
+        action->setText(!form.title.isEmpty() ? form.title : FDataForms->fieldValue("FORM_TYPE",form.fields).toString());
+        connect(action,SIGNAL(triggered(bool)),SLOT(onShowExtensionForm(bool)));
+        FFormMenu->addAction(action);
+      }
+    }
+    ui.pbtExtensions->setMenu(FFormMenu);
+    ui.pbtExtensions->setEnabled(FFormMenu!=NULL);
   }
 
   if (ui.lwtFearures->currentItem())
@@ -136,4 +172,23 @@ void DiscoInfoWindow::onListItemActivated(QListWidgetItem *AItem)
 void DiscoInfoWindow::onStreamJidChanged(const Jid &/*ABefour*/, const Jid &AAfter)
 {
   FStreamJid = AAfter;
+}
+
+void DiscoInfoWindow::onShowExtensionForm(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action && FDataForms)
+  {
+    IDiscoInfo dinfo = FDiscovery->discoInfo(FContactJid,FNode);
+    int index = action->data(ADR_FORM_INDEX).toInt();
+    if (index<dinfo.extensions.count())
+    {
+      const IDataForm &form = dinfo.extensions.at(index);
+      IDataDialogWidget *widget = FDataForms->dialogWidget(form,this);
+      widget->dialogButtons()->setStandardButtons(QDialogButtonBox::Ok);
+      widget->instance()->setWindowModality(Qt::WindowModal);
+      widget->instance()->setWindowTitle(action->text());
+      widget->instance()->show();
+    }
+  }
 }

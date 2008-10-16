@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QTreeWidgetItem>
 #include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/idataforms.h"
 #include "../../utils/jid.h"
 #include "../../utils/toolbarchanger.h"
 
@@ -51,6 +52,7 @@ struct IDiscoInfo
   QString node;
   QList<IDiscoIdentity> identity;
   QStringList features;
+  QList<IDataForm> extensions;
   IDiscoError error;
 };
 
@@ -59,15 +61,6 @@ struct IDiscoItems
   Jid streamJid;
   Jid contactJid;
   QString node;
-  QList<IDiscoItem> items;
-  IDiscoError error;
-};
-
-struct IDiscoPublish
-{
-  Jid streamJid;
-  QString node;
-  QString action;
   QList<IDiscoItem> items;
   IDiscoError error;
 };
@@ -148,8 +141,6 @@ public:
   virtual IDiscoItems discoItems(const Jid &AContactJid, const QString &ANode = "") const =0;
   virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "") =0;
   virtual void removeDiscoItems(const Jid &AContactJid, const QString &ANode = "") =0;
-  //DiscoPublish
-  virtual bool publishDiscoItems(const IDiscoPublish &ADiscoPublish) =0;
 signals:
   virtual void discoItemsWindowCreated(IDiscoItemsWindow *AWindow) =0;
   virtual void discoItemsWindowDestroyed(IDiscoItemsWindow *AWindow) =0;
@@ -163,7 +154,6 @@ signals:
   virtual void discoInfoRemoved(const IDiscoInfo &ADiscoInfo) =0;
   virtual void discoItemsReceived(const IDiscoItems &ADiscoItems) =0;
   virtual void discoItemsRemoved(const IDiscoItems &ADiscoItems) =0;
-  virtual void discoItemsPublished(const IDiscoPublish &ADiscoPublish) =0;
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert) =0;
 };
 

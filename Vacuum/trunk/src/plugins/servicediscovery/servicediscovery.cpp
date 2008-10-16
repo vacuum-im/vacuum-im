@@ -27,6 +27,10 @@
 #define CAPS_DIRNAME            "caps"
 #define CAPS_FILE_TAG_NAME      "capabilities"
 
+#define CAPS_HASH_MD5           "md5"
+#define CAPS_HASH_SHA1          "sha-1"
+
+
 ServiceDiscovery::ServiceDiscovery()
 {
   FPluginManager = NULL;
@@ -40,6 +44,7 @@ ServiceDiscovery::ServiceDiscovery()
   FRostersViewPlugin = NULL;
   FRostersModel = NULL;
   FStatusIcons = NULL;
+  FDataForms = NULL;
 
   FDiscoMenu = NULL;
   FQueueTimer.setSingleShot(false);
@@ -133,6 +138,10 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
   if (plugin)
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
 
+  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  if (plugin)
+    FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+
   return true;
 }
 
@@ -176,7 +185,19 @@ bool ServiceDiscovery::initObjects()
 
 bool ServiceDiscovery::startPlugin()
 {
-  FCapsHash = calcCapsHash(selfDiscoInfo()).toBase64();
+  //QFile file("caps.xml");
+  //file.open(QFile::ReadOnly);
+  //QDomDocument doc;
+  //doc.setContent(file.readAll(),true);
+  //file.close();
+  //QPair<Jid,QString> jidnode;
+  //jidnode.first = Jid("benvolio@capulet.lit/230193");
+  //jidnode.second = "http://psi-im.org#q07IKJEyjvHSyhy//CH0CxmKi8w=";
+  //IDiscoInfo dinfo = parseDiscoInfo(Stanza(doc.firstChildElement()),jidnode);
+  //QString hash = calcCapsHash(dinfo).toBase64();
+  FMyCaps.node = CLIENT_HOME_PAGE;
+  FMyCaps.hash = CAPS_HASH_SHA1;
+  FMyCaps.ver = calcCapsHash(selfDiscoInfo(),FMyCaps.hash);
   return true;
 }
 
@@ -185,9 +206,9 @@ bool ServiceDiscovery::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza 
   if (FSHIPresenceOut.value(AStreamJid) ==  AHandlerId)
   {
     QDomElement capsElem = AStanza->addElement("c",NS_CAPS);
-    capsElem.setAttribute("node",CLIENT_HOME_PAGE);
-    capsElem.setAttribute("ver",FCapsHash);
-    capsElem.setAttribute("hash","sha-1");
+    capsElem.setAttribute("node",FMyCaps.node);
+    capsElem.setAttribute("ver",FMyCaps.ver);
+    capsElem.setAttribute("hash",FMyCaps.hash);
   }
   return false;
 }
@@ -219,19 +240,7 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
       QDomElement query = reply.addElement("query",NS_DISCO_INFO);
       if (!dinfo.node.isEmpty())
         query.setAttribute("node",dinfo.node);
-      foreach(IDiscoIdentity identity, dinfo.identity)
-      {
-        QDomElement elem = query.appendChild(reply.createElement("identity")).toElement();
-        elem.setAttribute("category",identity.category);
-        elem.setAttribute("type",identity.type);
-        if (!identity.name.isEmpty())
-          elem.setAttribute("name",identity.name);
-      }
-      foreach(QString feature, dinfo.features)
-      {
-        QDomElement elem = query.appendChild(reply.createElement("feature")).toElement();
-        elem.setAttribute("var",feature);
-      }
+      discoInfoToElem(dinfo,query);
       FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
     }
   }
@@ -297,6 +306,7 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
           QueuedRequest request;
           request.streamJid = AStreamJid;
           request.contactJid = contactJid;
+          request.node = !newCaps.hash.isEmpty() ? newCaps.node+"#"+newCaps.ver : "";
           appendQueuedRequest(QUEUE_REQUEST_START,request);
         }
         if (!capsElem.isNull() && !newCaps.node.isEmpty() && !newCaps.ver.isEmpty())
@@ -313,8 +323,8 @@ void ServiceDiscovery::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza
   {
     QPair<Jid,QString> jidnode = FInfoRequestsId.take(AStanza.id());
     IDiscoInfo dinfo = parseDiscoInfo(AStanza,jidnode);
-    FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
     saveEntityCaps(dinfo);
+    FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
     emit discoInfoReceived(dinfo);
   }
   else if (FItemsRequestsId.contains(AStanza.id()))
@@ -323,18 +333,6 @@ void ServiceDiscovery::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza
     IDiscoItems ditems = parseDiscoItems(AStanza,jidnode);
     FDiscoItems[ditems.contactJid].insert(ditems.node,ditems);
     emit discoItemsReceived(ditems);
-  }
-  else if (FPublishRequestsId.contains(AStanza.id()))
-  {
-    IDiscoPublish dpublish = FPublishRequestsId.take(AStanza.id());
-    if (AStanza.type() == "error")
-    {
-      ErrorHandler err(AStanza.element());
-      dpublish.error.code = err.code();
-      dpublish.error.condition = err.condition();
-      dpublish.error.message = err.message();
-    }
-    emit discoItemsPublished(dpublish);
   }
 }
 
@@ -366,20 +364,11 @@ void ServiceDiscovery::iqStanzaTimeOut(const QString &AId)
     FDiscoItems[ditems.contactJid].insert(ditems.node,ditems);
     emit discoItemsReceived(ditems);
   }
-  else if (FPublishRequestsId.contains(AId))
-  {
-    IDiscoPublish dpublish = FPublishRequestsId.take(AId);
-    ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-    dpublish.error.code = err.code();
-    dpublish.error.condition = err.condition();
-    dpublish.error.message = err.message();
-    emit discoItemsPublished(dpublish);
-  }
 }
 
 void ServiceDiscovery::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 {
-  QString capsNode = QString("%1#%2").arg(CLIENT_HOME_PAGE).arg(FCapsHash);
+  QString capsNode = QString("%1#%2").arg(FMyCaps.node).arg(FMyCaps.ver);
   if (ADiscoInfo.node.isEmpty() || ADiscoInfo.node==capsNode)
   {
     IDiscoInfo dinfo = selfDiscoInfo();
@@ -584,8 +573,8 @@ void ServiceDiscovery::insertDiscoFeature(const IDiscoFeature &AFeature)
   {
     removeDiscoFeature(AFeature.var);
     FDiscoFeatures.insert(AFeature.var,AFeature);
-    if (!FCapsHash.isEmpty())
-      FCapsHash = calcCapsHash(selfDiscoInfo());
+    if (!FMyCaps.ver.isEmpty())
+      FMyCaps.ver = calcCapsHash(selfDiscoInfo(),FMyCaps.hash);
     emit discoFeatureInserted(AFeature);
   }
 }
@@ -605,8 +594,8 @@ void ServiceDiscovery::removeDiscoFeature(const QString &AFeatureVar)
   if (FDiscoFeatures.contains(AFeatureVar))
   {
     IDiscoFeature dfeature = FDiscoFeatures.take(AFeatureVar);
-    if (!FCapsHash.isEmpty())
-      FCapsHash = calcCapsHash(selfDiscoInfo());
+    if (!FMyCaps.ver.isEmpty())
+      FMyCaps.ver = calcCapsHash(selfDiscoInfo(),FMyCaps.hash);
     emit discoFeatureRemoved(dfeature);
   }
 }
@@ -719,31 +708,70 @@ void ServiceDiscovery::removeDiscoItems(const Jid &AContactJid, const QString &A
   }
 }
 
-bool ServiceDiscovery::publishDiscoItems(const IDiscoPublish &ADiscoPublish)
+void ServiceDiscovery::discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AElem) const
 {
-  bool sended = false;
-  if (FStanzaProcessor && ADiscoPublish.streamJid.isValid())
+  QDomDocument doc = AElem.ownerDocument();
+  foreach(IDiscoIdentity identity, AInfo.identity)
   {
-    Stanza iq("iq");
-    iq.setTo(ADiscoPublish.streamJid.eFull()).setId(FStanzaProcessor->newId()).setType("set");
-    QDomElement query = iq.addElement("query",NS_DISCO_ITEMS);
-    if (!ADiscoPublish.node.isEmpty())
-      query.setAttribute("node",ADiscoPublish.node);
-    foreach(IDiscoItem discoItem, ADiscoPublish.items)
-    {
-      QDomElement itemElem = query.appendChild(iq.createElement("item")).toElement();
-      itemElem.setAttribute("action",ADiscoPublish.action);
-      itemElem.setAttribute("jid",discoItem.itemJid.eFull());
-      if (!discoItem.node.isEmpty())
-        itemElem.setAttribute("node",discoItem.node);
-      if (!discoItem.name.isEmpty())
-        itemElem.setAttribute("name",discoItem.name);
-    }
-    sended = FStanzaProcessor->sendIqStanza(this,ADiscoPublish.streamJid,iq,DISCO_TIMEOUT);
-    if (sended)
-      FPublishRequestsId.insert(iq.id(),ADiscoPublish);
+    QDomElement elem = AElem.appendChild(doc.createElement("identity")).toElement();
+    elem.setAttribute("category",identity.category);
+    elem.setAttribute("type",identity.type);
+    if (!identity.name.isEmpty())
+      elem.setAttribute("name",identity.name);
   }
-  return sended;
+  foreach(QString feature, AInfo.features)
+  {
+    QDomElement elem = AElem.appendChild(doc.createElement("feature")).toElement();
+    elem.setAttribute("var",feature);
+  }
+  if (FDataForms)
+  {
+    foreach(IDataForm form, AInfo.extensions)
+    {
+      FDataForms->xmlForm(form,AElem);
+    }
+  }
+}
+
+void ServiceDiscovery::discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &AInfo) const
+{
+  AInfo.identity.clear();
+  QDomElement elem = AElem.firstChildElement("identity");
+  while (!elem.isNull())
+  {
+    IDiscoIdentity identity;
+    identity.category = elem.attribute("category");
+    identity.type = elem.attribute("type");
+    identity.lang = elem.attribute("lang");
+    identity.name = elem.attribute("name");
+    AInfo.identity.append(identity);
+    elem = elem.nextSiblingElement("identity");
+  }
+
+  AInfo.features.clear();
+  elem = AElem.firstChildElement("feature");
+  while (!elem.isNull())
+  {
+    QString feature = elem.attribute("var");
+    if (!feature.isEmpty() && !AInfo.features.contains(feature))
+      AInfo.features.append(feature);
+    elem = elem.nextSiblingElement("feature");
+  }
+
+  if (FDataForms)
+  {
+    AInfo.extensions.clear();
+    elem = AElem.firstChildElement("x");
+    while (!elem.isNull())
+    {
+      if (elem.namespaceURI()==NS_JABBER_DATA)
+      {
+        IDataForm form = FDataForms->dataForm(elem);
+        AInfo.extensions.append(form);
+      }
+      elem = elem.nextSiblingElement("x");
+    }
+  }
 }
 
 IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const
@@ -763,27 +791,9 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const QPair<J
   }
   else
   {
-    QDomElement elem = query.firstChildElement("identity");
-    while (!elem.isNull())
-    {
-      IDiscoIdentity identity;
-      identity.category = elem.attribute("category");
-      identity.type = elem.attribute("type");
-      identity.lang = elem.attribute("xml:lang");
-      identity.name = elem.attribute("name");
-      result.identity.append(identity);
-      elem = elem.nextSiblingElement("identity");
-    }
-
-    elem = query.firstChildElement("feature");
-    while (!elem.isNull())
-    {
-      QString feature = elem.attribute("var");
-      if (!feature.isEmpty() && !result.features.contains(feature))
-        result.features.append(feature);
-      elem = elem.nextSiblingElement("feature");
-    }
+    discoInfoFromElem(query,result);
   }
+
   return result;
 }
 
@@ -904,19 +914,14 @@ void ServiceDiscovery::removeQueuedRequest(const QueuedRequest &ARequest)
 
 bool ServiceDiscovery::hasEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const
 {
-  if (!ANode.isEmpty() && !AVer.isEmpty())
-  {
-    QString fileName = capsFileName(ANode,AVer,AHash);
-    return QFile::exists(fileName);
-  }
-  return false;
+  return QFile::exists(capsFileName(ANode,AVer,AHash));
 }
 
 QString ServiceDiscovery::capsFileName(const QString &ANode, const QString &AVer, const QString &AHash) const
 {
-  QString hashData = AHash.isEmpty() ? ANode+AVer : AVer;
+  QString hashData = AHash.isEmpty() ? ANode+AVer : AVer+AHash;
   QString fileName = QCryptographicHash::hash(hashData.toUtf8(),QCryptographicHash::Md5).toHex().toLower()+".xml";
-  QDir dir;
+  QDir dir(qApp->applicationDirPath());
   if (FSettingsPlugin)
     dir.setPath(FSettingsPlugin->homeDir().path());
   if (!dir.exists(CAPS_DIRNAME))
@@ -930,7 +935,8 @@ IDiscoInfo ServiceDiscovery::loadEntityCaps(const QString &ANode, const QString 
   QHash<Jid,EntityCapabilities>::const_iterator it = FEntityCaps.constBegin();
   while(it!=FEntityCaps.constEnd())
   {
-    if (it.value().ver==AVer && (!it.value().hash.isEmpty() || it.value().node==ANode) && hasDiscoInfo(it.key()))
+    EntityCapabilities caps = it.value();
+    if (caps.ver==AVer && caps.hash==AHash && (!AHash.isEmpty() || caps.node==ANode) && hasDiscoInfo(it.key()))
       return discoInfo(it.key());
     it++;
   }
@@ -940,82 +946,109 @@ IDiscoInfo ServiceDiscovery::loadEntityCaps(const QString &ANode, const QString 
   if (capsFile.exists() && capsFile.open(QIODevice::ReadOnly))
   {
     QDomDocument doc;
-    doc.setContent(capsFile.readAll());
+    doc.setContent(capsFile.readAll(),true);
     capsFile.close();
-
     QDomElement capsElem = doc.documentElement();
-    QDomElement elem = capsElem.firstChildElement("identity");
-    while (!elem.isNull())
-    {
-      IDiscoIdentity identity;
-      identity.category = elem.attribute("category");
-      identity.type = elem.attribute("type");
-      identity.lang = elem.attribute("xml:lang");
-      identity.name = elem.attribute("name");
-      dinfo.identity.append(identity);
-      elem = elem.nextSiblingElement("identity");
-    }
-
-    elem = capsElem.firstChildElement("feature");
-    while (!elem.isNull())
-    {
-      dinfo.features.append(elem.attribute("var"));
-      elem = elem.nextSiblingElement("feature");
-    }
+    discoInfoFromElem(capsElem,dinfo);
   }
   return dinfo;
 }
 
-bool ServiceDiscovery::saveEntityCaps(const IDiscoInfo &AInfo) const
+bool ServiceDiscovery::saveEntityCaps(IDiscoInfo &AInfo) const
 {
   if (AInfo.error.code==-1 && FEntityCaps.contains(AInfo.contactJid))
   {
     EntityCapabilities caps = FEntityCaps.value(AInfo.contactJid);
-    if (!hasEntityCaps(caps.node,caps.ver,caps.hash))
+    QString capsNode = QString("%1#%2").arg(caps.node).arg(caps.ver);
+    if (AInfo.node.isEmpty() || AInfo.node==capsNode)
     {
-      QDomDocument doc;
-      QDomElement capsEelem = doc.appendChild(doc.createElement(CAPS_FILE_TAG_NAME)).toElement();
-      capsEelem.setAttribute("node",caps.node);
-      capsEelem.setAttribute("ver",caps.ver);
-      capsEelem.setAttribute("hash",caps.hash);
-      foreach(IDiscoIdentity identity, AInfo.identity)
+      if (!hasEntityCaps(caps.node,caps.ver,caps.hash))
       {
-        QDomElement elem = capsEelem.appendChild(doc.createElement("identity")).toElement();
-        elem.setAttribute("category",identity.category);
-        elem.setAttribute("type",identity.type);
-        elem.setAttribute("xml:lang",identity.lang);
-        elem.setAttribute("name",identity.name);
+        QString capsVer = calcCapsHash(AInfo,caps.hash);
+        if (capsVer.isNull() || caps.ver==capsVer)
+        {
+          QDomDocument doc;
+          QDomElement capsElem = doc.appendChild(doc.createElement(CAPS_FILE_TAG_NAME)).toElement();
+          capsElem.setAttribute("node",caps.node);
+          capsElem.setAttribute("ver",caps.ver);
+          capsElem.setAttribute("hash",caps.hash);
+          discoInfoToElem(AInfo,capsElem);
+          QFile capsFile(capsFileName(caps.node,caps.ver,caps.hash));
+          if (capsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+          {
+            capsFile.write(doc.toByteArray());
+            capsFile.close();
+          }
+        }
+        else
+        {
+          qDebug() << "Caps check failed" << caps.node << caps.ver << caps.hash;
+        }
       }
-      foreach(QString feature, AInfo.features)
-      {
-        QDomElement elem = capsEelem.appendChild(doc.createElement("feature")).toElement();
-        elem.setAttribute("var",feature);
-      }
-      QFile capsFile(capsFileName(caps.node,caps.ver,caps.hash));
-      if (capsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-      {
-        capsFile.write(doc.toByteArray());
-        capsFile.close();
-        return true;
-      }
+      AInfo.node = "";
+      return true;
     }
   }
   return false;
 }
 
-QByteArray ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo) const
+QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &AHash) const
 {
-  QStringList hashList;
-  QStringList sortList;
-  foreach(IDiscoIdentity identity, AInfo.identity)
-    sortList.append(identity.category+"/"+identity.type+"/"+identity.lang+"/"+identity.name);
-  qSort(sortList);
-  hashList += sortList;
-  sortList = AInfo.features;
-  qSort(sortList);
-  hashList += sortList;
-  hashList.append("");
-  return QCryptographicHash::hash(hashList.join("<").toUtf8(),QCryptographicHash::Sha1);
+  if (AHash==CAPS_HASH_SHA1 || AHash==CAPS_HASH_MD5)
+  {
+    QStringList hashList;
+    QStringList sortList;
+
+    foreach(IDiscoIdentity identity, AInfo.identity)
+      sortList.append(identity.category+"/"+identity.type+"/"+identity.lang+"/"+identity.name);
+    qSort(sortList);
+    hashList += sortList;
+    
+    sortList = AInfo.features;
+    qSort(sortList);
+    hashList += sortList;
+
+    if (FDataForms && !AInfo.extensions.isEmpty())
+    {
+      QMultiMap<QString, int> sortForms;
+      for (int index=0; index<AInfo.extensions.count();index++)
+        sortForms.insertMulti(FDataForms->fieldValue("FORM_TYPE",AInfo.extensions.at(index).fields).toString(),index);
+      
+      QMultiMap<QString, int>::const_iterator iforms = sortForms.constBegin();
+      while (iforms != sortForms.constEnd())
+      {
+        hashList += iforms.key();
+        QMultiMap<QString,QStringList> sortFields;
+        foreach(IDataField field, AInfo.extensions.at(iforms.value()).fields)
+        {
+          if (field.var != "FORM_TYPE")
+          {
+            QStringList values;
+            if (field.value.type() == QVariant::StringList)
+              values = field.value.toStringList();
+            else if (field.value.type() == QVariant::Bool)
+              values +=(field.value.toBool() ? "1" : "0");
+            else
+              values += field.value.toString();
+            qSort(values);
+            sortFields.insertMulti(field.var,values);
+          }
+        }
+        QMultiMap<QString,QStringList>::const_iterator ifields = sortFields.constBegin();
+        while (ifields != sortFields.constEnd())
+        {
+          hashList += ifields.key();
+          hashList += ifields.value();
+          ifields++;
+        }
+        iforms++;
+      }
+    }
+    hashList.append("");
+    QByteArray hashData = hashList.join("<").toUtf8();
+    return QCryptographicHash::hash(hashData, AHash==CAPS_HASH_SHA1 ? QCryptographicHash::Sha1 : QCryptographicHash::Md5).toBase64();
+  }
+  return QString();
 }
 
 bool ServiceDiscovery::compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const

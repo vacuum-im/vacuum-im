@@ -120,8 +120,6 @@ public:
   virtual IDiscoItems discoItems(const Jid &AContactJid, const QString &ANode = "") const;
   virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "");
   virtual void removeDiscoItems(const Jid &AContactJid, const QString &ANode ="");
-    //DiscoPublish
-  virtual bool publishDiscoItems(const IDiscoPublish &ADiscoPublish);
 signals:
   virtual void discoItemsWindowCreated(IDiscoItemsWindow *AWindow);
   virtual void discoItemsWindowDestroyed(IDiscoItemsWindow *AWindow);
@@ -135,11 +133,12 @@ signals:
   virtual void discoInfoRemoved(const IDiscoInfo &ADiscoInfo);
   virtual void discoItemsReceived(const IDiscoItems &ADiscoItems);
   virtual void discoItemsRemoved(const IDiscoItems &ADiscoItems);
-  virtual void discoItemsPublished(const IDiscoPublish &ADiscoPublish);
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert);
   //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
+  void discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AElem) const;
+  void discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &AInfo) const;
   IDiscoInfo parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   IDiscoItems parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   void registerFeatures();
@@ -148,8 +147,8 @@ protected:
   bool hasEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
   QString capsFileName(const QString &ANode, const QString &AVer, const QString &AHash) const;
   IDiscoInfo loadEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
-  bool saveEntityCaps(const IDiscoInfo &AInfo) const;
-  QByteArray calcCapsHash(const IDiscoInfo &AInfo) const;
+  bool saveEntityCaps(IDiscoInfo &AInfo) const;
+  QString calcCapsHash(const IDiscoInfo &AInfo, const QString &AHash) const;
   bool compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const;
   bool compareFeatures(const QStringList &AFeatures, const QStringList &AWith) const;
 protected slots:
@@ -182,11 +181,11 @@ private:
   IMainWindowPlugin *FMainWindowPlugin;
   IStatusIcons *FStatusIcons;
   ISettingsPlugin *FSettingsPlugin;
+  IDataForms *FDataForms;
 private:
   Menu *FDiscoMenu;
-private:
   QTimer FQueueTimer;
-  QString FCapsHash;
+  EntityCapabilities FMyCaps;
   QMultiMap<QDateTime,QueuedRequest> FQueuedRequests;
   QList<IDiscoHandler *> FDiscoHandlers;
   QHash<QString, QMultiMap<int, IDiscoFeatureHandler *> > FFeatureHandlers;
@@ -196,7 +195,6 @@ private:
   QHash<Jid ,int> FSHIPresenceOut;
   QHash<QString, QPair<Jid,QString> > FInfoRequestsId;
   QHash<QString, QPair<Jid,QString> > FItemsRequestsId;
-  QHash<QString, IDiscoPublish> FPublishRequestsId;
   QHash<Jid,QHash<QString,IDiscoInfo> > FDiscoInfo;
   QHash<Jid,QHash<QString,IDiscoItems> > FDiscoItems;
   QHash<Jid, EntityCapabilities> FEntityCaps;
