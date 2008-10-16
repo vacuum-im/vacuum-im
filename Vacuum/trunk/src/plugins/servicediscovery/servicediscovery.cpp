@@ -287,15 +287,16 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
       Jid contactJid = AStanza.from();
       QDomElement capsElem = AStanza.firstElement("c",NS_CAPS);
       EntityCapabilities newCaps;
+      newCaps.entityJid = contactJid;
       newCaps.node = capsElem.attribute("node");
       newCaps.ver = capsElem.attribute("ver");
       newCaps.hash = capsElem.attribute("hash");
       EntityCapabilities oldCaps = FEntityCaps.value(contactJid);
       if (capsElem.isNull() || oldCaps.ver!=newCaps.ver || oldCaps.node!=newCaps.node)
       {
-        if (hasEntityCaps(newCaps.node,newCaps.ver,newCaps.hash))
+        if (hasEntityCaps(newCaps))
         {
-          IDiscoInfo dinfo = loadEntityCaps(newCaps.node,newCaps.ver,newCaps.hash);
+          IDiscoInfo dinfo = loadEntityCaps(newCaps);
           dinfo.streamJid = AStreamJid;
           dinfo.contactJid = contactJid;
           FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
@@ -306,7 +307,7 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
           QueuedRequest request;
           request.streamJid = AStreamJid;
           request.contactJid = contactJid;
-          request.node = !newCaps.hash.isEmpty() ? newCaps.node+"#"+newCaps.ver : "";
+          //request.node = !newCaps.hash.isEmpty() ? newCaps.node+"#"+newCaps.ver : "";
           appendQueuedRequest(QUEUE_REQUEST_START,request);
         }
         if (!capsElem.isNull() && !newCaps.node.isEmpty() && !newCaps.ver.isEmpty())
@@ -915,15 +916,16 @@ void ServiceDiscovery::removeQueuedRequest(const QueuedRequest &ARequest)
   }
 }
 
-bool ServiceDiscovery::hasEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const
+bool ServiceDiscovery::hasEntityCaps(const EntityCapabilities &ACaps) const
 {
-  return QFile::exists(capsFileName(ANode,AVer,AHash));
+  return QFile::exists(capsFileName(ACaps,false)) || QFile::exists(capsFileName(ACaps,true));
 }
 
-QString ServiceDiscovery::capsFileName(const QString &ANode, const QString &AVer, const QString &AHash) const
+QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AForJid) const
 {
-  QString hashData = AHash.isEmpty() ? ANode+AVer : AVer+AHash;
-  QString fileName = QCryptographicHash::hash(hashData.toUtf8(),QCryptographicHash::Md5).toHex().toLower()+".xml";
+  QString hashString = ACaps.hash.isEmpty() ? ACaps.node+ACaps.ver : ACaps.ver+ACaps.hash;
+  hashString += AForJid ? ACaps.entityJid.pBare() : "";
+  QString fileName = QCryptographicHash::hash(hashString.toUtf8(),QCryptographicHash::Md5).toHex().toLower() + ".xml";
   QDir dir(qApp->applicationDirPath());
   if (FSettingsPlugin)
     dir.setPath(FSettingsPlugin->homeDir().path());
@@ -933,19 +935,22 @@ QString ServiceDiscovery::capsFileName(const QString &ANode, const QString &AVer
   return fileName;
 }
 
-IDiscoInfo ServiceDiscovery::loadEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const
+IDiscoInfo ServiceDiscovery::loadEntityCaps(const EntityCapabilities &ACaps) const
 {
   QHash<Jid,EntityCapabilities>::const_iterator it = FEntityCaps.constBegin();
   while(it!=FEntityCaps.constEnd())
   {
     EntityCapabilities caps = it.value();
-    if (caps.ver==AVer && caps.hash==AHash && (!AHash.isEmpty() || caps.node==ANode) && hasDiscoInfo(it.key()))
+    if (caps.ver==ACaps.ver && caps.hash==ACaps.hash && (!ACaps.hash.isEmpty() || caps.node==ACaps.node) && hasDiscoInfo(it.key()))
       return discoInfo(it.key());
     it++;
   }
 
   IDiscoInfo dinfo;
-  QFile capsFile(capsFileName(ANode,AVer,AHash));
+  QString fileName = capsFileName(ACaps,true);
+  if (!QFile::exists(fileName))
+    fileName = capsFileName(ACaps,false);
+  QFile capsFile(fileName);
   if (capsFile.exists() && capsFile.open(QIODevice::ReadOnly))
   {
     QDomDocument doc;
@@ -965,27 +970,22 @@ bool ServiceDiscovery::saveEntityCaps(IDiscoInfo &AInfo) const
     QString capsNode = QString("%1#%2").arg(caps.node).arg(caps.ver);
     if (AInfo.node.isEmpty() || AInfo.node==capsNode)
     {
-      if (!hasEntityCaps(caps.node,caps.ver,caps.hash))
+      if (!hasEntityCaps(caps))
       {
-        QString capsVer = calcCapsHash(AInfo,caps.hash);
-        if (capsVer.isNull() || caps.ver==capsVer)
+        bool checked = (caps.ver==calcCapsHash(AInfo,caps.hash));
+        QDomDocument doc;
+        QDomElement capsElem = doc.appendChild(doc.createElement(CAPS_FILE_TAG_NAME)).toElement();
+        capsElem.setAttribute("node",caps.node);
+        capsElem.setAttribute("ver",caps.ver);
+        capsElem.setAttribute("hash",caps.hash);
+        if (!checked)
+          capsElem.setAttribute("jid",caps.entityJid.pBare());
+        discoInfoToElem(AInfo,capsElem);
+        QFile capsFile(capsFileName(caps,!checked));
+        if (capsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
         {
-          QDomDocument doc;
-          QDomElement capsElem = doc.appendChild(doc.createElement(CAPS_FILE_TAG_NAME)).toElement();
-          capsElem.setAttribute("node",caps.node);
-          capsElem.setAttribute("ver",caps.ver);
-          capsElem.setAttribute("hash",caps.hash);
-          discoInfoToElem(AInfo,capsElem);
-          QFile capsFile(capsFileName(caps.node,caps.ver,caps.hash));
-          if (capsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-          {
-            capsFile.write(doc.toByteArray());
-            capsFile.close();
-          }
-        }
-        else
-        {
-          qDebug() << "Caps check failed" << caps.node << caps.ver << caps.hash;
+          capsFile.write(doc.toByteArray());
+          capsFile.close();
         }
       }
       AInfo.node = "";

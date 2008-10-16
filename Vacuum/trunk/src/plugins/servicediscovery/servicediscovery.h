@@ -38,6 +38,7 @@ struct QueuedRequest {
 };
 
 struct EntityCapabilities {
+  Jid entityJid;
   QString node;
   QString ver;
   QString hash;
@@ -144,9 +145,9 @@ protected:
   void registerFeatures();
   void appendQueuedRequest(const QDateTime &ATimeStart, const QueuedRequest &ARequest);
   void removeQueuedRequest(const QueuedRequest &ARequest);
-  bool hasEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
-  QString capsFileName(const QString &ANode, const QString &AVer, const QString &AHash) const;
-  IDiscoInfo loadEntityCaps(const QString &ANode, const QString &AVer, const QString &AHash) const;
+  bool hasEntityCaps(const EntityCapabilities &ACaps) const;
+  QString capsFileName(const EntityCapabilities &ACaps, bool AForJid) const;
+  IDiscoInfo loadEntityCaps(const EntityCapabilities &ACaps) const;
   bool saveEntityCaps(IDiscoInfo &AInfo) const;
   QString calcCapsHash(const IDiscoInfo &AInfo, const QString &AHash) const;
   bool compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const;
