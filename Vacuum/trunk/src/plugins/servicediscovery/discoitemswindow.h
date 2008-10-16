@@ -65,6 +65,7 @@ private:
   QHeaderView *FHeader;
   Ui::DiscoItemsWindowClass ui;
 private:
+  IDataForms *FDataForms;
   IVCardPlugin *FVCardPlugin;
   IRosterChanger *FRosterChanger;
   IServiceDiscovery *FDiscovery;

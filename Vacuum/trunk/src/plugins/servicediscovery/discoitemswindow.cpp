@@ -25,6 +25,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
   setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_DISCO));
   setWindowTitle(tr("Service Discovery"));
 
+  FDataForms = NULL;
   FVCardPlugin = NULL;
   FRosterChanger = NULL;
 
@@ -129,6 +130,10 @@ void DiscoItemsWindow::initialize()
   plugin = FDiscovery->pluginManager()->getPlugins("IVCardPlugin").value(0,NULL);
   if (plugin)
     FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
+  
+  plugin = FDiscovery->pluginManager()->getPlugins("IDataForms").value(0,NULL);
+  if (plugin)
+    FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 }
 
 bool DiscoItemsWindow::isNeedRequestInfo(const Jid AContactJid, const QString &ANode) const
@@ -213,6 +218,28 @@ void DiscoItemsWindow::updateDiscoInfo(const IDiscoInfo &ADiscoInfo)
         {
           IDiscoFeature dfeature = FDiscovery->discoFeature(feature);
           toolTip+=QString("<li>%1</li>").arg(dfeature.name.isEmpty() ? feature : dfeature.name);
+        }
+      }
+
+      if (FDataForms)
+      {
+        foreach(IDataForm form, ADiscoInfo.extensions)
+        {
+          toolTip += QString("<li><b>%1:</b></li>").arg(!form.title.isEmpty() ? form.title : FDataForms->fieldValue("FORM_TYPE",form.fields).toString());
+          foreach(IDataField field, form.fields)
+          {
+            if (field.var != "FORM_TYPE")
+            {
+              QStringList values;
+              if (field.value.type() == QVariant::StringList)
+                values = field.value.toStringList();
+              else if (field.value.type() == QVariant::Bool)
+                values +=(field.value.toBool() ? tr("true") : tr("false"));
+              else
+                values += field.value.toString();
+              toolTip += QString("<li>%1: %2</li>").arg(!field.label.isEmpty() ? field.label : field.var).arg(values.join("; "));
+            }
+          }
         }
       }
     }

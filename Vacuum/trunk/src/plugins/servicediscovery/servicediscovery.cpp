@@ -945,7 +945,7 @@ IDiscoInfo ServiceDiscovery::loadEntityCaps(const EntityCapabilities &ACaps) con
     {
       IDiscoInfo dinfo = discoInfo(it.key());
       if (caps.ver == calcCapsHash(dinfo,caps.hash))
-        return discoInfo(it.key());
+        return dinfo;
     }
     it++;
   }
