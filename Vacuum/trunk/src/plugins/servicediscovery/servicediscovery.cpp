@@ -718,6 +718,9 @@ void ServiceDiscovery::discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AEl
     elem.setAttribute("type",identity.type);
     if (!identity.name.isEmpty())
       elem.setAttribute("name",identity.name);
+    if (!identity.lang.isEmpty())
+      elem.setAttribute("xml:lang",identity.lang);
+
   }
   foreach(QString feature, AInfo.features)
   {
