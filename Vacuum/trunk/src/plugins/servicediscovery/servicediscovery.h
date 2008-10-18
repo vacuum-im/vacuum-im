@@ -86,7 +86,7 @@ public:
   virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder);
   //IServiceDiscovery
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
-  virtual IDiscoInfo selfDiscoInfo() const;
+  virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = "") const;
   virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
   virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
@@ -169,6 +169,7 @@ protected slots:
   void onDiscoInfoWindowDestroyed(QObject *AObject);
   void onDiscoItemsWindowDestroyed(IDiscoItemsWindow *AWindow);
   void onQueueTimerTimeout();
+  void onCapsTimerTimeout();
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -186,22 +187,24 @@ private:
 private:
   Menu *FDiscoMenu;
   QTimer FQueueTimer;
-  EntityCapabilities FMyCaps;
   QMultiMap<QDateTime,QueuedRequest> FQueuedRequests;
   QList<IDiscoHandler *> FDiscoHandlers;
   QHash<QString, QMultiMap<int, IDiscoFeatureHandler *> > FFeatureHandlers;
   QHash<Jid ,int> FSHIInfo;
   QHash<Jid ,int> FSHIItems;
-  QHash<Jid ,int> FSHIPresenceIn;
-  QHash<Jid ,int> FSHIPresenceOut;
   QHash<QString, QPair<Jid,QString> > FInfoRequestsId;
   QHash<QString, QPair<Jid,QString> > FItemsRequestsId;
   QHash<Jid,QHash<QString,IDiscoInfo> > FDiscoInfo;
   QHash<Jid,QHash<QString,IDiscoItems> > FDiscoItems;
-  QHash<Jid, EntityCapabilities> FEntityCaps;
   QHash<QString,IDiscoFeature> FDiscoFeatures;
   QHash<Jid, DiscoInfoWindow *> FDiscoInfoWindows;
   QList<DiscoItemsWindow *> FDiscoItemsWindows;
+private:
+  QTimer FCapsTimer;
+  QHash<Jid ,int> FSHIPresenceIn;
+  QHash<Jid ,int> FSHIPresenceOut;
+  QHash<Jid, EntityCapabilities> FMyCaps;
+  QHash<Jid, EntityCapabilities> FEntityCaps;
 };
 
 #endif // SERVICEDISCOVERY_H

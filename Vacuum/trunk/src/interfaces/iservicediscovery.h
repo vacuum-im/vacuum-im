@@ -106,7 +106,7 @@ class IServiceDiscovery
 public:
   virtual QObject *instance() =0;
   virtual IPluginManager *pluginManager() const =0;
-  virtual IDiscoInfo selfDiscoInfo() const =0;
+  virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = "") const =0;
   virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
   virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true) =0;
