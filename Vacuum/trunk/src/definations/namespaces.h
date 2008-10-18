@@ -52,6 +52,8 @@
 #define NS_JABBER_XDATAVALIDATE                 "http://jabber.org/protocol/xdata-validate"
 #define NS_XMPP_MEDIA_ELEMENT                   "urn:xmpp:media-element"
 
+#define NS_DATA_FORM_SOFTWAREINFO               "urn:xmpp:dataforms:softwareinfo"
+
 #define NS_CAPS                                 "http://jabber.org/protocol/caps"
 
 #define NS_COMMANDS                             "http://jabber.org/protocol/commands"

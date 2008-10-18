@@ -30,6 +30,25 @@
 #include "clientinfodialog.h"
 #include "optionswidget.h"
 
+struct SoftwareItem {
+  SoftwareItem() { status = IClientInfo::SoftwareNotLoaded; }
+  QString name;
+  QString version;
+  QString os;
+  int status;
+};
+struct ActivityItem {
+  QDateTime requestTime;
+  QDateTime dateTime;
+  QString text;
+};
+struct TimeItem {
+  TimeItem() { ping = -1; delta = 0; zone = 0; }
+  int ping;
+  int delta;
+  int zone;
+};
+
 class ClientInfo : 
   public QObject,
   public IPlugin,
@@ -38,10 +57,11 @@ class ClientInfo :
   public IIqStanzaOwner,
   public IOptionsHolder,
   public IRosterIndexDataHolder,
+  public IDiscoHandler,
   public IDiscoFeatureHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IIqStanzaOwner IOptionsHolder IRosterIndexDataHolder IDiscoFeatureHandler);
+  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IIqStanzaOwner IOptionsHolder IRosterIndexDataHolder IDiscoHandler IDiscoFeatureHandler);
 public:
   ClientInfo();
   ~ClientInfo();
@@ -67,6 +87,9 @@ public:
   virtual QList<int> types() const;
   virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
   virtual bool setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/) { return false; }
+  //IDiscoHandler
+  virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
+  virtual void fillDiscoItems(IDiscoItems &/*ADiscoItems*/) {};
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
@@ -94,16 +117,16 @@ public:
   virtual int entityTimeDelta(const Jid &AContactJid) const;
   virtual int entityTimePing(const Jid &AContactJid) const;
 signals:
-  //IRosterIndexDataHolder
-  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
-  //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
   //IClientInfo
   virtual void optionChanged(IClientInfo::Option AOption, bool AValue);
   virtual void softwareInfoChanged(const Jid &AContactJid); 
   virtual void lastActivityChanged(const Jid &AContactJid);
   virtual void entityTimeChanged(const Jid &AContactJid);
+  //IRosterIndexDataHolder
+  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+  //IOptionsHolder
+  virtual void optionsAccepted();
+  virtual void optionsRejected();
 protected:
   Action *createInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, QObject *AParent) const;
   void deleteSoftwareDialogs(const Jid &AStreamJid);
@@ -121,6 +144,7 @@ protected slots:
   void onSoftwareInfoChanged(const Jid &AContactJid);
   void onLastActivityChanged(const Jid &AContactJid);
   void onEntityTimeChanged(const Jid &AContactJid);
+  void onDiscoInfoReceived(const IDiscoInfo &AInfo);
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
 private:
@@ -132,25 +156,7 @@ private:
   ISettingsPlugin *FSettingsPlugin;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
   IServiceDiscovery *FDiscovery;
-private:
-  struct SoftwareItem {
-    SoftwareItem() { status = IClientInfo::SoftwareNotLoaded; }
-    QString name;
-    QString version;
-    QString os;
-    int status;
-  };
-  struct ActivityItem {
-    QDateTime requestTime;
-    QDateTime dateTime;
-    QString text;
-  };
-  struct TimeItem {
-    TimeItem() { ping = -1; delta = 0; zone = 0; }
-    int ping;
-    int delta;
-    int zone;
-  };
+  IDataForms *FDataForms;
 private:
   OptionsWidget *FOptionsWidget;
 private:

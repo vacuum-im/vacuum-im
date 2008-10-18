@@ -13,6 +13,11 @@
 #define ADR_CONTACT_JID                 Action::DR_Parametr1
 #define ADR_INFO_TYPES                  Action::DR_Parametr2
 
+#define FORM_FIELD_SOFTWARE             "software"
+#define FORM_FIELD_SOFTWARE_VERSION     "software_version"
+#define FORM_FIELD_OS                   "os"
+#define FORM_FIELD_OS_VERSION           "os_version"
+
 #define IN_CLIENTINFO                   "psi/help"
 
 ClientInfo::ClientInfo()
@@ -25,6 +30,7 @@ ClientInfo::ClientInfo()
   FSettingsPlugin = NULL;
   FMultiUserChatPlugin = NULL;
   FDiscovery = NULL;
+  FDataForms = NULL;
 
   FOptions = 0;
   FVersionHandler = 0;
@@ -121,6 +127,16 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+    if (FDiscovery)
+    {
+      connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+    }
+  }
+
+  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  if (plugin)
+  {
+    FDataForms = qobject_cast<IDataForms *>(plugin->instance());
   }
 
   return FStanzaProcessor != NULL;
@@ -150,6 +166,7 @@ bool ClientInfo::initObjects()
   if (FDiscovery)
   {
     registerDiscoFeatures();
+    FDiscovery->insertDiscoHandler(this);
     FDiscovery->insertFeatureHandler(NS_JABBER_VERSION,this,DFO_DEFAULT);
     FDiscovery->insertFeatureHandler(NS_JABBER_LAST,this,DFO_DEFAULT);
     FDiscovery->insertFeatureHandler(NS_XMPP_TIME,this,DFO_DEFAULT);
@@ -319,6 +336,46 @@ QVariant ClientInfo::data(const IRosterIndex *AIndex, int ARole) const
     return hasEntityTime(contactJid) ? entityTime(contactJid) : QVariant();
   else
     return QVariant();
+}
+
+void ClientInfo::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
+{
+  if (ADiscoInfo.node.isEmpty())
+  {
+    IDataForm form;
+    form.type = DATAFORM_TYPE_RESULT;
+    //form.title = "Software Information";
+
+    IDataField ftype;
+    ftype.required = false;
+    ftype.var  = "FORM_TYPE";
+    ftype.type = DATAFIELD_TYPE_HIDDEN;
+    ftype.value = NS_DATA_FORM_SOFTWAREINFO;
+    form.fields.append(ftype);
+
+    IDataField soft;
+    soft.required = false;
+    soft.var   = FORM_FIELD_SOFTWARE;
+    //soft.label = "Software name";
+    soft.value = CLIENT_NAME;
+    form.fields.append(soft);
+
+    IDataField soft_ver;
+    soft_ver.required = false;
+    soft_ver.var   = FORM_FIELD_SOFTWARE_VERSION;
+    //soft_ver.label = "Software version";
+    soft_ver.value = CLIENT_VERSION;
+    form.fields.append(soft_ver);
+
+    IDataField os;
+    soft_ver.required = false;
+    os.var   = FORM_FIELD_OS;
+    //os.label = "OS version";
+    os.value = osVersion();
+    form.fields.append(os);
+
+    ADiscoInfo.extensions.append(form);
+  }
 }
 
 bool ClientInfo::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
@@ -880,6 +937,27 @@ void ClientInfo::onEntityTimeChanged(const Jid &AContactJid)
     foreach(IRosterIndex *index, indexList)
     {
       emit dataChanged(index,RDR_ENTITY_TIME);
+    }
+  }
+}
+
+void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
+{
+  if (FDataForms && AInfo.node.isEmpty() && !hasSoftwareInfo(AInfo.contactJid))
+  {
+    foreach(IDataForm form, AInfo.extensions)
+    {
+      if (FDataForms->fieldValue("FORM_TYPE",form.fields).toString() == NS_DATA_FORM_SOFTWAREINFO)
+      {
+        SoftwareItem &software = FSoftwareItems[AInfo.contactJid];
+        software.name = FDataForms->fieldValue(FORM_FIELD_SOFTWARE,form.fields).toString();
+        software.version = FDataForms->fieldValue(FORM_FIELD_SOFTWARE_VERSION,form.fields).toString();
+        software.os = FDataForms->fieldValue(FORM_FIELD_OS,form.fields).toString() + " ";
+        software.os += FDataForms->fieldValue(FORM_FIELD_OS_VERSION,form.fields).toString();
+        software.status = SoftwareLoaded;
+        emit softwareInfoChanged(AInfo.contactJid);
+        break;
+      }
     }
   }
 }
