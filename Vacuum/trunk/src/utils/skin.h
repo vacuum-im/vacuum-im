@@ -2,6 +2,7 @@
 #define SKIN_H
 
 #include <QSet>
+#include <QApplication>
 #include "iconset.h"
 #include "soundset.h"
 #include "skiniconset.h"

@@ -23,7 +23,7 @@ public:
     FDateTime = delayedDateTime();
     FCreateDateTime = QDateTime::currentDateTime();
   };
-  MessageData(const MessageData &AOther) : FStanza(AOther.FStanza) 
+  MessageData(const MessageData &AOther) : QSharedData(AOther), FStanza(AOther.FStanza)
   {
     FDateTime = AOther.FDateTime;
     FCreateDateTime = AOther.FCreateDateTime;

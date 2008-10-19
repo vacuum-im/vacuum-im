@@ -1,6 +1,7 @@
 #include "skin.h"
+#include <QtDebug>
 
-QString Skin::FSkinsDirectory = "./skin";
+QString Skin::FSkinsDirectory = QApplication::applicationDirPath()+"/skin";
 QString Skin::FSkin = DEFAULT_SKIN_NAME;
 QHash<QString,Iconset> Skin::FIconsets;
 QHash<QString,Soundset> Skin::FSoundsets;
