@@ -1,5 +1,9 @@
 #include "clientinfo.h"
 
+#if defined(Q_OS_UNIX)
+# include <sys/utsname.h>
+#endif
+
 #define SHC_SOFTWARE_VERSION            "/iq[@type='get']/query[@xmlns='" NS_JABBER_VERSION "']"
 #define SHC_ENTITY_TIME                 "/iq[@type='get']/time[@xmlns='" NS_XMPP_TIME "']"
 
@@ -48,7 +52,7 @@ void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Request contacts client information");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("Client Info"); 
+  APluginInfo->name = tr("Client Info");
   APluginInfo->uid = CLIENTINFO_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
@@ -57,13 +61,13 @@ void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
 bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   IPlugin *plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
-  if (plugin) 
+  if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
-    FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance()); 
+    FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
     if (FRosterPlugin)
     {
       connect(FRosterPlugin->instance(),SIGNAL(rosterRemoved(IRoster *)),SLOT(onRosterRemoved(IRoster *)));
@@ -73,7 +77,7 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
   plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
-    FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance()); 
+    FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
     if (FPresencePlugin)
     {
       connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),
@@ -100,7 +104,7 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
   }
 
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
-  if (plugin) 
+  if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
     if (FSettingsPlugin)
@@ -250,7 +254,7 @@ void ClientInfo::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
     QDomElement time = AStanza.firstElement("time");
     QString tzo = time.firstChildElement("tzo").text();
     QString utc = time.firstChildElement("utc").text();
-    if (utc.endsWith('Z')) 
+    if (utc.endsWith('Z'))
       utc.chop(1);
     if (AStanza.type() == "result" && !tzo.isEmpty() && !utc.isEmpty())
     {
@@ -306,7 +310,7 @@ QWidget *ClientInfo::optionsWidget(const QString &ANode, int &AOrder)
 QList<int> ClientInfo::roles() const
 {
   static QList<int> indexRoles = QList<int>()
-    << RDR_CLIENT_NAME << RDR_CLIENT_VERSION << RDR_CLIENT_OS 
+    << RDR_CLIENT_NAME << RDR_CLIENT_VERSION << RDR_CLIENT_OS
     << RDR_LAST_ACTIVITY_TIME << RDR_LAST_ACTIVITY_TEXT
     << RDR_ENTITY_TIME;
   return indexRoles;
@@ -314,7 +318,7 @@ QList<int> ClientInfo::roles() const
 
 QList<int> ClientInfo::types() const
 {
-  static QList<int> indexTypes =  QList<int>() 
+  static QList<int> indexTypes =  QList<int>()
     << RIT_Contact << RIT_Agent << RIT_MyResource;
   return indexTypes;
 }
@@ -838,13 +842,13 @@ void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMult
   if (ALabelId == RLID_DISPLAY && types().contains(AIndex->type()))
   {
     Jid contactJid = AIndex->data(RDR_Jid).toString();
-    
+
     if (hasSoftwareInfo(contactJid))
       AToolTips.insert(TTO_SOFTWARE_INFO,tr("Software: %1 %2").arg(softwareName(contactJid)).arg(softwareVersion(contactJid)));
-    
+
     if (hasLastActivity(contactJid) && AIndex->data(RDR_Show).toInt() == IPresence::Offline)
       AToolTips.insert(TTO_LAST_ACTIVITY,tr("Offline since: %1").arg(lastActivityTime(contactJid).toString()));
-    
+
     if (hasEntityTime(contactJid))
       AToolTips.insert(TTO_ENTITY_TIME,tr("Entity time: %1").arg(entityTime(contactJid).time().toString()));
   }
@@ -853,7 +857,7 @@ void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMult
 void ClientInfo::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMultiUser *AUser, Menu *AMenu)
 {
   Jid streamJid = AUser->data(MUDR_STREAMJID).toString();
-  Jid contactJid = AUser->data(AUser->data(MUDR_REALJID).toString().isEmpty() ? MUDR_CONTACTJID : MUDR_REALJID).toString(); 
+  Jid contactJid = AUser->data(AUser->data(MUDR_REALJID).toString().isEmpty() ? MUDR_CONTACTJID : MUDR_REALJID).toString();
 
   Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_VERSION,AMenu);
   AMenu->addAction(action,AG_MUCM_CLIENTINFO,true);
