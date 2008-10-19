@@ -152,14 +152,14 @@ void SkinManager::updateSkinMenu()
 void SkinManager::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(SKINMANAGER_UUID);
-  setSkinsDirectory(settings->value(SVN_SKINSDIRECTORY,Skin::skinsDirectory()).toString());
+  //setSkinsDirectory(settings->value(SVN_SKINSDIRECTORY,Skin::skinsDirectory()).toString());
   setSkin(settings->value(SVN_SKINNAME,Skin::skin()).toString());
 }
 
 void SkinManager::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(SKINMANAGER_UUID);
-  settings->setValue(SVN_SKINSDIRECTORY,Skin::skinsDirectory());
+  //settings->setValue(SVN_SKINSDIRECTORY,Skin::skinsDirectory());
   settings->setValue(SVN_SKINNAME,Skin::skin());
 }
 
