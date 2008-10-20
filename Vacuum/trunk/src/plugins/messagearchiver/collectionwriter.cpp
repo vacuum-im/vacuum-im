@@ -1,6 +1,9 @@
 #include "collectionwriter.h"
 
-#define CLOSE_TIMEOUT           5*60*1000
+#define LIMIT_FILE_SIZE         7*1024
+#define MAX_FILE_SIZE           10*1024
+#define LIMIT_WAIT_TIME         1*60*100
+#define MAX_WAIT_TIME           5*60*1000
 
 CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent) : QObject(AParent)
 {
@@ -20,7 +23,7 @@ CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileNa
 
   if (!QFile::exists(FFileName))
   {
-    FXmlFile = new QFile(FFileName+OPENED_COLLECTION_EXT,this);
+    FXmlFile = new QFile(FFileName,this);
     if (FXmlFile->open(QIODevice::WriteOnly|QIODevice::Truncate))
     {
       FXmlWriter = new QXmlStreamWriter(FXmlFile);
@@ -52,7 +55,7 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
     if (!FGroupchat || !contactJid.resource().isEmpty())
     {
       FRecsCount++;
-      FCloseTimer.start(CLOSE_TIMEOUT);
+      FCloseTimer.stop();
 
       FXmlWriter->writeStartElement(ADirectionIn ? "from" : "to");
       
@@ -75,6 +78,8 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
       
       FXmlWriter->writeEndElement();
       FXmlFile->flush();
+
+      checkLimits();
       return true;
     }
   }
@@ -86,12 +91,13 @@ bool CollectionWriter::writeNote(const QString &ANote)
   if (isOpened() && ANote.isEmpty())
   {
     FRecsCount++;
-    FCloseTimer.start(CLOSE_TIMEOUT);
+    FCloseTimer.stop();
     FXmlWriter->writeStartElement("note");
     FXmlWriter->writeAttribute("utc",DateTime(QDateTime::currentDateTime()).toX85UTC());
     FXmlWriter->writeCharacters(ANote);
     FXmlWriter->writeEndElement();
     FXmlFile->flush();
+    checkLimits();
     return true;
   }
   return false;
@@ -104,7 +110,7 @@ void CollectionWriter::close()
 
 void CollectionWriter::startCollection()
 {
-  FCloseTimer.start(CLOSE_TIMEOUT);
+  FCloseTimer.stop();
   FXmlWriter->setAutoFormatting(true);
   FXmlWriter->writeStartElement("chat");
   FXmlWriter->writeAttribute("with",FHeader.with.eBare());
@@ -114,6 +120,7 @@ void CollectionWriter::startCollection()
     FXmlWriter->writeAttribute("subject",FHeader.subject);
   if (!FHeader.threadId.isEmpty())
     FXmlWriter->writeAttribute("thread",FHeader.threadId);
+  checkLimits();
 }
 
 void CollectionWriter::stopCollection()
@@ -129,7 +136,6 @@ void CollectionWriter::stopCollection()
   if (FXmlFile)
   {
     FXmlFile->close();
-    FXmlFile->rename(FFileName);
     delete FXmlFile;
     FXmlFile = NULL;
   }
@@ -166,3 +172,12 @@ void CollectionWriter::writeElementChilds(const QDomElement &AElem)
   }
 }
 
+void CollectionWriter::checkLimits()
+{
+  int timeout = MAX_WAIT_TIME;
+  if (FXmlFile->size() > LIMIT_FILE_SIZE)
+    timeout = LIMIT_WAIT_TIME;
+  else if (FXmlFile->size() > MAX_FILE_SIZE)
+    timeout = 0;
+  FCloseTimer.start(timeout);
+}

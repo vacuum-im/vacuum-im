@@ -1,6 +1,7 @@
 #ifndef MESSAGEARCHIVER_H
 #define MESSAGEARCHIVER_H
 
+#include <QObjectCleanupHandler>
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/optionnodes.h"
@@ -57,22 +58,23 @@ public:
   virtual bool isAutoArchiving(const Jid &AStreamJid) const;
   virtual bool isManualArchiving(const Jid &AStreamJid) const;
   virtual bool isLocalArchiving(const Jid &AStreamJid) const;
-  virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AContactJid) const;
+  virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid) const;
   virtual QString methodName(const QString &AMethod) const;
   virtual QString otrModeName(const QString &AOTRMode) const;
   virtual QString saveModeName(const QString &ASaveMode) const;
   virtual QString expireName(int AExpire) const;
   virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
-  virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AContactJid) const;
+  virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const;
   virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool &AAuto);
   virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
+  virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid);
   virtual IArchiveWindow *showArchiveWindow(const Jid &AStreamJid, const IArchiveFilter &AFilter, int AGroupKind, QWidget *AParent = NULL);
   //Archive Handlers
   virtual void insertArchiveHandler(IArchiveHandler *AHandler, int AOrder);
   virtual void removeArchiveHandler(IArchiveHandler *AHandler, int AOrder);
   //Direct Archiving
-  virtual bool saveMessage(const Jid &AStreamJid, const Jid &AContactJid, const Message &AMessage);
-  virtual bool saveNote(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote, const QString &AThreadId = "");
+  virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage);
+  virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = "");
   //Local Archive
   virtual QList<Message> findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const;
   virtual bool hasLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
@@ -93,6 +95,7 @@ signals:
   virtual void archiveAutoSaveChanged(const Jid &AStreamJid, bool AAuto);
   virtual void archivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
   virtual void archiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs);
+  virtual void archiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid);
   virtual void requestCompleted(const QString &AId);
   virtual void requestFailed(const QString &AId, const QString &AError);
   //Local Archive
@@ -147,6 +150,7 @@ protected slots:
   void onSetItemPrefsAction(bool);
   void onShowArchiveWindowAction(bool);
   void onOpenHistoryOptionsAction(bool);
+  void onRemoveItemPrefsAction(bool);
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
   void onArchiveHandlerDestroyed(QObject *AHandler);
@@ -169,6 +173,7 @@ private:
   QList<QString> FPrefsSaveRequests;
   QHash<QString,Jid>  FPrefsLoadRequests;
   QHash<QString,bool> FPrefsAutoRequests;
+  QHash<QString,Jid>  FPrefsRemoveRequests;
 private:
   QHash<QString, IArchiveHeader> FSaveRequests;
   QHash<QString, IArchiveRequest> FListRequests;
@@ -183,6 +188,7 @@ private:
   QHash<Jid, Replicator *> FReplicators;
   QHash<Jid, ViewHistoryWindow *> FArchiveWindows;
   QHash<Jid, QString> FGatewayTypes;
+  QObjectCleanupHandler FCleanupHandler;
 };
 
 #endif // MESSAGEARCHIVER_H

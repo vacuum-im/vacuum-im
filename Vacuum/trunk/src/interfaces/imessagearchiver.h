@@ -163,22 +163,23 @@ public:
   virtual bool isAutoArchiving(const Jid &AStreamJid) const =0;
   virtual bool isManualArchiving(const Jid &AStreamJid) const =0;
   virtual bool isLocalArchiving(const Jid &AStreamJid) const =0;
-  virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AContactJid) const =0;
+  virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid) const =0;
   virtual QString methodName(const QString &AMethod) const =0;
   virtual QString otrModeName(const QString &AOTRMode) const =0;
   virtual QString saveModeName(const QString &ASaveMode) const =0;
   virtual QString expireName(int AExpire) const =0;
   virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
-  virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AContactJid) const =0;
+  virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const =0;
   virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool &AAuto) =0;
   virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
+  virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) =0;
   virtual IArchiveWindow *showArchiveWindow(const Jid &AStreamJid, const IArchiveFilter &AFilter, int AGroupKind, QWidget *AParent = NULL) =0;
   //Archive Handlers
   virtual void insertArchiveHandler(IArchiveHandler *AHandler, int AOrder) =0;
   virtual void removeArchiveHandler(IArchiveHandler *AHandler, int AOrder) =0;
   //Direct Archiving
-  virtual bool saveMessage(const Jid &AStreamJid, const Jid &AContactJid, const Message &AMessage) =0;
-  virtual bool saveNote(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote, const QString &AThreadId = "") =0;
+  virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage) =0;
+  virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = "") =0;
   //Local Archive
   virtual QList<Message> findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const =0;
   virtual bool hasLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const =0;
@@ -199,6 +200,7 @@ signals:
   virtual void archiveAutoSaveChanged(const Jid &AStreamJid, bool AAuto) =0;
   virtual void archivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
   virtual void archiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs) =0;
+  virtual void archiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid) =0;
   virtual void requestCompleted(const QString &AId) =0;
   virtual void requestFailed(const QString &AId, const QString &AError) =0;
   //Local Archive

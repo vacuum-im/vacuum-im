@@ -13,16 +13,7 @@
    <string>ArchiveOptions</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="leftMargin" >
-    <number>0</number>
-   </property>
-   <property name="topMargin" >
-    <number>0</number>
-   </property>
-   <property name="rightMargin" >
-    <number>0</number>
-   </property>
-   <property name="bottomMargin" >
+   <property name="margin" >
     <number>0</number>
    </property>
    <item>
@@ -31,16 +22,7 @@
       <string>Archiving Method</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>5</number>
-      </property>
-      <property name="topMargin" >
-       <number>5</number>
-      </property>
-      <property name="rightMargin" >
-       <number>5</number>
-      </property>
-      <property name="bottomMargin" >
+      <property name="margin" >
        <number>5</number>
       </property>
       <item row="0" column="0" >
@@ -110,16 +92,7 @@
       <string>Default Archiving Preferences</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>5</number>
-      </property>
-      <property name="topMargin" >
-       <number>5</number>
-      </property>
-      <property name="rightMargin" >
-       <number>5</number>
-      </property>
-      <property name="bottomMargin" >
+      <property name="margin" >
        <number>5</number>
       </property>
       <item row="0" column="0" >
@@ -174,23 +147,11 @@
       <string>Individual Archiving Preferences</string>
      </property>
      <layout class="QVBoxLayout" >
-      <property name="leftMargin" >
-       <number>5</number>
-      </property>
-      <property name="topMargin" >
-       <number>5</number>
-      </property>
-      <property name="rightMargin" >
-       <number>5</number>
-      </property>
-      <property name="bottomMargin" >
+      <property name="margin" >
        <number>5</number>
       </property>
       <item>
        <widget class="QTableWidget" name="tbwItemPrefs" >
-        <property name="editTriggers" >
-         <set>QAbstractItemView::NoEditTriggers</set>
-        </property>
         <property name="alternatingRowColors" >
          <bool>true</bool>
         </property>
@@ -227,6 +188,37 @@
          </property>
         </column>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout" >
+        <item>
+         <spacer name="horizontalSpacer" >
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbtAdd" >
+          <property name="text" >
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbtRemove" >
+          <property name="text" >
+           <string>Remove</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

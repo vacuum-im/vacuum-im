@@ -9,8 +9,6 @@
 #include "../../utils/message.h"
 #include "../../utils/datetime.h"
 
-#define OPENED_COLLECTION_EXT     ".tmp"
-
 class CollectionWriter : 
   public QObject
 {
@@ -33,6 +31,7 @@ protected:
   void startCollection();
   void stopCollection();
   void writeElementChilds(const QDomElement &AElem);
+  void checkLimits();
 private:
   QTimer FCloseTimer;
   QFile *FXmlFile;

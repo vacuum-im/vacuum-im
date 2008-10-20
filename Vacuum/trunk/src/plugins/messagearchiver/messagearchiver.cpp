@@ -218,6 +218,16 @@ void MessageArchiver::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
     }
     FPrefsAutoRequests.remove(AStanza.id());
   }
+  else if (FPrefsRemoveRequests.contains(AStanza.id()))
+  {
+    if (AStanza.type()=="result")
+    {
+      Jid itemJid = FPrefsRemoveRequests.value(AStanza.id());
+      FArchivePrefs[AStreamJid].itemPrefs.remove(itemJid);
+      emit archiveItemPrefsRemoved(AStreamJid,itemJid);
+    }
+    FPrefsRemoveRequests.remove(AStanza.id());
+  }
   else if (FSaveRequests.contains(AStanza.id()))
   {
     if (AStanza.type() == "result")
@@ -345,6 +355,10 @@ void MessageArchiver::iqStanzaTimeOut(const QString &AId)
   {
     FPrefsAutoRequests.remove(AId);
   }
+  else if (FPrefsAutoRequests.contains(AId))
+  {
+    FPrefsRemoveRequests.remove(AId);
+  }
   else if (FSaveRequests.contains(AId))
   {
     FSaveRequests.remove(AId);
@@ -422,11 +436,11 @@ bool MessageArchiver::isLocalArchiving(const Jid &AStreamJid) const
   return false;
 }
 
-bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AContactJid) const
+bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid) const
 {
-  if (isReady(AStreamJid) && AContactJid.isValid())
+  if (isReady(AStreamJid) && AItemJid.isValid())
   {
-    IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid,AContactJid);
+    IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid,AItemJid);
     return itemPrefs.save!=ARCHIVE_SAVE_FALSE;
   }
   return false;
@@ -487,7 +501,7 @@ IArchiveStreamPrefs MessageArchiver::archivePrefs(const Jid &AStreamJid) const
   return FArchivePrefs.value(AStreamJid);
 }
 
-IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const Jid &AContactJid) const
+IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const
 {
   IArchiveStreamPrefs prefs = FArchivePrefs.value(AStreamJid);
   QHash<Jid, IArchiveItemPrefs>::const_iterator it = prefs.itemPrefs.constBegin();
@@ -496,9 +510,9 @@ IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const
     QString node = it.key().pNode();
     QString resource = it.key().resource();
     if (
-        (it.key().pDomain() == AContactJid.pDomain()) &&
-        (node.isEmpty() || node == AContactJid.pNode()) &&
-        (resource.isEmpty() || resource == AContactJid.resource())
+        (it.key().pDomain() == AItemJid.pDomain()) &&
+        (node.isEmpty() || node == AItemJid.pNode()) &&
+        (resource.isEmpty() || resource == AItemJid.resource())
        )
     {
       return it.value();
@@ -510,7 +524,7 @@ IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const
 
 QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool &AAuto)
 {
-  if (isReady(AStreamJid) && !FInStoragePrefs.contains(AStreamJid))
+  if (isSupported(AStreamJid))
   {
     Stanza autoSave;
     autoSave.setType("set").setId(FStanzaProcessor->newId());
@@ -551,12 +565,21 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
     if (!APrefs.methodManual.isEmpty())
       newPrefs.methodManual = APrefs.methodManual;
 
-    QList<Jid> itemJids = APrefs.itemPrefs.keys();
-    foreach(Jid itemJid, itemJids)
+   bool itemsChanged = false;
+   foreach(Jid itemJid, APrefs.itemPrefs.keys())
     {
-      newPrefs.itemPrefs.insert(itemJid,APrefs.itemPrefs.value(itemJid));
-      if (newPrefs.itemPrefs.value(itemJid).otr == ARCHIVE_OTR_REQUIRE)
-        newPrefs.itemPrefs[itemJid].save = ARCHIVE_SAVE_FALSE;
+      IArchiveItemPrefs newItemPrefs = APrefs.itemPrefs.value(itemJid);
+      if (!newItemPrefs.save.isEmpty() && !newItemPrefs.otr.isEmpty())
+      {
+        newPrefs.itemPrefs.insert(itemJid,newItemPrefs);
+        if (newPrefs.itemPrefs.value(itemJid).otr == ARCHIVE_OTR_REQUIRE)
+          newPrefs.itemPrefs[itemJid].save = ARCHIVE_SAVE_FALSE;
+      }
+      else
+      {
+        itemsChanged = true;
+        newPrefs.itemPrefs.remove(itemJid);
+      }
     }
 
     Stanza save("iq");
@@ -592,19 +615,14 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
       methodManual.setAttribute("use",newPrefs.methodManual);
     }
 
-    bool itemsChanged = false;
-    itemJids = newPrefs.itemPrefs.keys();
-    foreach(Jid itemJid, itemJids)
+    foreach(Jid itemJid, newPrefs.itemPrefs.keys())
     {
       IArchiveItemPrefs newItemPrefs = newPrefs.itemPrefs.value(itemJid);
       IArchiveItemPrefs oldItemPrefs = oldPrefs.itemPrefs.value(itemJid);
       bool itemChanged = oldItemPrefs.save   != newItemPrefs.save ||
                          oldItemPrefs.otr    != newItemPrefs.otr ||
                          oldItemPrefs.expire != newItemPrefs.expire;
-      bool itemDefault = newPrefs.defaultPrefs.save   == newItemPrefs.save &&
-                         newPrefs.defaultPrefs.otr    == newItemPrefs.otr &&
-                         newPrefs.defaultPrefs.expire == newItemPrefs.expire;
-      if ( (!storage && itemChanged) || (storage && !itemDefault) )
+      if (storage || itemChanged)
       {
         QDomElement itemElem = prefElem.appendChild(save.createElement("item")).toElement();
         itemElem.setAttribute("jid",itemJid.eFull());
@@ -633,6 +651,33 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
   return QString();
 }
 
+QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid)
+{
+  if (isReady(AStreamJid) && archivePrefs(AStreamJid).itemPrefs.contains(AItemJid))
+  {
+    if (isSupported(AStreamJid))
+    {
+      Stanza remove("iq");
+      remove.setType("set").setId(FStanzaProcessor->newId());
+      QDomElement itemElem = remove.addElement("itemremove",NS_ARCHIVE).appendChild(remove.createElement("item")).toElement();
+      itemElem.setAttribute("jid",AItemJid.eFull());
+      if (FStanzaProcessor->sendIqStanza(this,AStreamJid,remove,ARCHIVE_TIMEOUT))
+      {
+        FPrefsRemoveRequests.insert(remove.id(),AItemJid);
+        return remove.id();
+      }
+    }
+    else
+    {
+      IArchiveStreamPrefs prefs;
+      prefs.itemPrefs[AItemJid].otr = "";
+      prefs.itemPrefs[AItemJid].save = "";
+      return setArchivePrefs(AStreamJid,prefs);
+    }
+  }
+  return QString();
+}
+
 IArchiveWindow *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const IArchiveFilter &AFilter, int AGroupKind, QWidget *AParent)
 {
   ViewHistoryWindow *window = FArchiveWindows.value(AStreamJid);
@@ -641,6 +686,7 @@ IArchiveWindow *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const 
     window = new ViewHistoryWindow(this,AStreamJid,AParent);
     connect(window,SIGNAL(windowDestroyed(IArchiveWindow *)),SLOT(onArchiveWindowDestroyed(IArchiveWindow *)));
     FArchiveWindows.insert(AStreamJid,window);
+    FCleanupHandler.add(window);
     emit archiveWindowCreated(window);
   }
   window->setGroupKind(AGroupKind);
@@ -661,11 +707,11 @@ void MessageArchiver::removeArchiveHandler(IArchiveHandler *AHandler, int AOrder
   FArchiveHandlers.remove(AOrder,AHandler);
 }
 
-bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote, const QString &AThreadId)
+bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId)
 {
-  if (isReady(AStreamJid) && AContactJid.isValid() && !ANote.isEmpty())
+  if (isReady(AStreamJid) && AItemJid.isValid() && !ANote.isEmpty())
   {
-    Jid with(AContactJid.node(),AContactJid.domain(),"");
+    Jid with(AItemJid.node(),AItemJid.domain(),"");
     CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AThreadId);
     if (!writer)
     {
@@ -683,12 +729,12 @@ bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AContactJid, co
   return false;
 }
 
-bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AContactJid, const Message &AMessage)
+bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
 {
-  bool directionIn = AContactJid == AMessage.from();
-  if (isReady(AStreamJid) && AContactJid.isValid() && !AMessage.body().isEmpty())
+  bool directionIn = AItemJid == AMessage.from();
+  if (isReady(AStreamJid) && AItemJid.isValid() && !AMessage.body().isEmpty())
   {
-    Jid with(AContactJid.node(),AContactJid.domain(),"");
+    Jid with(AItemJid.node(),AItemJid.domain(),"");
     CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
     if (!writer)
     {
@@ -702,7 +748,7 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AContactJid,
       writer = newCollectionWriter(AStreamJid,header);
     }
     if (writer)
-      return writer->writeMessage(AMessage,archiveItemPrefs(AStreamJid,AContactJid).save,directionIn);
+      return writer->writeMessage(AMessage,archiveItemPrefs(AStreamJid,AItemJid).save,directionIn);
   }
   return false;
 }
@@ -802,8 +848,8 @@ IArchiveCollection MessageArchiver::loadLocalCollection(const Jid &AStreamJid, c
     if (file.open(QFile::ReadOnly))
     {
       QDomDocument doc;
-      if (doc.setContent(file.readAll(),true))
-        elementToCollection(doc.documentElement(),collection);
+      doc.setContent(file.readAll(),true);
+      elementToCollection(doc.documentElement(),collection);
       file.close();
     }
   }
@@ -812,6 +858,7 @@ IArchiveCollection MessageArchiver::loadLocalCollection(const Jid &AStreamJid, c
 
 bool MessageArchiver::removeLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
 {
+  delete findCollectionWriter(AStreamJid,AHeader.with,AHeader.threadId);
   QString fileName = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
   if (QFile::remove(fileName))
   {
@@ -1119,7 +1166,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
         foreach(Jid itemJid, oldItemJids)
         {
           prefs.itemPrefs.remove(itemJid);
-          emit archiveItemPrefsChanged(AStreamJid,itemJid,prefs.defaultPrefs);
+          emit archiveItemPrefsRemoved(AStreamJid,itemJid);
         }
       }
       else if (initPrefs)
@@ -1746,12 +1793,22 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       saveMenu->setEnabled(itemPrefs.otr != ARCHIVE_OTR_REQUIRE);
     menu->addAction(saveMenu->menuAction(),AG_DEFAULT+500,false);
 
+
     if (isStreamMenu)
     {
       action = new Action(menu);
       action->setText(tr("Options..."));
       action->setData(ADR_STREAM_JID,AStreamJid.full());
       connect(action,SIGNAL(triggered(bool)),SLOT(onOpenHistoryOptionsAction(bool)));
+      menu->addAction(action,AG_DEFAULT+500,false);
+    }
+    else if (archivePrefs(AStreamJid).itemPrefs.contains(AContactJid))
+    {
+      action = new Action(menu);
+      action->setText(tr("Restore defaults"));
+      action->setData(ADR_STREAM_JID,AStreamJid.full());
+      action->setData(ADR_CONTACT_JID,AContactJid.full());
+      connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemPrefsAction(bool)));
       menu->addAction(action,AG_DEFAULT+500,false);
     }
   }
@@ -1963,6 +2020,17 @@ void MessageArchiver::onOpenHistoryOptionsAction( bool )
     IAccount *account = FAccountManager->accountByStream(streamJid);
     if (account)
       FSettingsPlugin->openOptionsDialog(ON_HISTORY"::"+account->accountId());
+  }
+}
+
+void MessageArchiver::onRemoveItemPrefsAction( bool )
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    Jid streamJid = action->data(ADR_STREAM_JID).toString();
+    Jid contactJid = action->data(ADR_CONTACT_JID).toString();
+    removeArchiveItemPrefs(streamJid,contactJid);
   }
 }
 
