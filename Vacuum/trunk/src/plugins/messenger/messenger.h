@@ -1,6 +1,7 @@
 #ifndef MESSENGER_H
 #define MESSENGER_H
 
+#include <QObjectCleanupHandler>
 #include "../../definations/messagewriterorders.h"
 #include "../../definations/messagedataroles.h"
 #include "../../definations/messagehandlerorders.h"
@@ -168,6 +169,7 @@ private:
   QList<IChatWindow *> FChatWindows;
   QList<IMessageWindow *> FMessageWindows;
   MessengerOptions *FMessengerOptions;
+  QObjectCleanupHandler FCleanupHandler;
 private:
   int FOptions;
   int FMessageId;

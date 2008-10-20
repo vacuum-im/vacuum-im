@@ -402,6 +402,7 @@ void Messenger::setDefaultMessageFont(const QFont &AFont)
 IInfoWidget *Messenger::newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid)
 {
   IInfoWidget *widget = new InfoWidget(this,AStreamJid,AContactJid);
+  FCleanupHandler.add(widget);
   emit infoWidgetCreated(widget);
   return widget;
 }
@@ -411,6 +412,7 @@ IViewWidget *Messenger::newViewWidget(const Jid &AStreamJid, const Jid &AContact
   IViewWidget *widget = new ViewWidget(this,AStreamJid,AContactJid);
   connect(widget->textBrowser(),SIGNAL(loadCustomResource(int, const QUrl &, QVariant &)),
     SLOT(onTextLoadResource(int, const QUrl &, QVariant &)));
+  FCleanupHandler.add(widget);
   emit viewWidgetCreated(widget);
   return widget;
 }
@@ -420,6 +422,7 @@ IEditWidget *Messenger::newEditWidget(const Jid &AStreamJid, const Jid &AContact
   IEditWidget *widget = new EditWidget(this,AStreamJid,AContactJid);
   connect(widget->textEdit(),SIGNAL(loadCustomResource(int, const QUrl &, QVariant &)),
     SLOT(onTextLoadResource(int, const QUrl &, QVariant &)));
+  FCleanupHandler.add(widget);
   emit editWidgetCreated(widget);
   return widget;
 }
@@ -427,6 +430,7 @@ IEditWidget *Messenger::newEditWidget(const Jid &AStreamJid, const Jid &AContact
 IReceiversWidget *Messenger::newReceiversWidget(const Jid &AStreamJid)
 {
   IReceiversWidget *widget = new ReceiversWidget(this,AStreamJid);
+  FCleanupHandler.add(widget);
   emit receiversWidgetCreated(widget);
   return widget;
 }
@@ -434,6 +438,7 @@ IReceiversWidget *Messenger::newReceiversWidget(const Jid &AStreamJid)
 IToolBarWidget *Messenger::newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
 {
   IToolBarWidget *widget = new ToolBarWidget(AInfo,AView,AEdit,AReceivers);
+  FCleanupHandler.add(widget);
   emit toolBarWidgetCreated(widget);
   return widget;
 }
@@ -446,6 +451,7 @@ IMessageWindow *Messenger::newMessageWindow(const Jid &AStreamJid, const Jid &AC
     window = new MessageWindow(this,AStreamJid,AContactJid,AMode);
     FMessageWindows.append(window);
     connect(window,SIGNAL(windowDestroyed()),SLOT(onMessageWindowDestroyed()));
+    FCleanupHandler.add(window->instance());
     emit messageWindowCreated(window);
     return window;
   }
@@ -468,6 +474,7 @@ IChatWindow *Messenger::newChatWindow(const Jid &AStreamJid, const Jid &AContact
     window = new ChatWindow(this,AStreamJid,AContactJid);
     FChatWindows.append(window);
     connect(window,SIGNAL(windowDestroyed()),SLOT(onChatWindowDestroyed()));
+    FCleanupHandler.add(window->instance());
     emit chatWindowCreated(window);
     return window;
   }
@@ -551,19 +558,21 @@ void Messenger::removeStreamMessages(const Jid &AStreamJid)
 
 void Messenger::deleteStreamWindows(const Jid &AStreamJid)
 {
-  foreach(IChatWindow *window, FChatWindows)
+  QList<IChatWindow *> chatWindows = FChatWindows;
+  foreach(IChatWindow *window, chatWindows)
     if (window->streamJid() == AStreamJid)
     {
       window->close();
-      window->deleteLater();
-    }
+      delete window->instance();
+    };
 
-  foreach(IMessageWindow *window, FMessageWindows)
+  QList<IMessageWindow *> messageWindows = FMessageWindows;
+  foreach(IMessageWindow *window, messageWindows)
     if (window->streamJid() == AStreamJid)
     {
       window->close();
-      window->deleteLater();
-    }
+      delete window->instance();
+    };
 }
 
 QString Messenger::prepareBodyForSend(const QString &AString) const
