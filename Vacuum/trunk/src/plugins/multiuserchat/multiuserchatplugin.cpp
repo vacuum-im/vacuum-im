@@ -24,6 +24,7 @@ MultiUserChatPlugin::MultiUserChatPlugin()
   FXmppStreams = NULL;
   FDiscovery = NULL;
   FNotifications = NULL;
+  FDataForms = NULL;
 
   FChatMenu = NULL;
   FJoinAction = NULL;
@@ -102,6 +103,12 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
     FNotifications = qobject_cast<INotifications *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  if (plugin)
+  {
+    FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+  }
+
   return FMessenger!=NULL;
 }
 
@@ -152,6 +159,13 @@ bool MultiUserChatPlugin::initObjects()
     kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
     FNotifications->insertNotificator(GROUP_NOTIFICATOR_ID,tr("Conference messages"),kindMask,INotification::TrayIcon|INotification::PlaySound);
   }
+  if (FDataForms)
+  {
+    FDataForms->insertLocalizer(this,DATA_FORM_MUC_REGISTER);
+    FDataForms->insertLocalizer(this,DATA_FORM_MUC_ROOMCONFIG);
+    FDataForms->insertLocalizer(this,DATA_FORM_MUC_ROOM_INFO);
+    FDataForms->insertLocalizer(this,DATA_FORM_MUC_REQUEST);
+  }
   return true;
 }
 
@@ -188,6 +202,64 @@ Action *MultiUserChatPlugin::createDiscoFeatureAction(const Jid &AStreamJid, con
     }
   }
   return NULL;
+}
+
+IDataFormLocale MultiUserChatPlugin::dataFormLocale(const QString &AFormType)
+{
+  IDataFormLocale locale;
+  if (AFormType == DATA_FORM_MUC_REGISTER)
+  {
+    locale.title = tr("Register in conference");
+    locale.fields["muc#register_allow"].label = tr("Allow this person to register with the room?");
+    locale.fields["muc#register_first"].label = tr("First Name");
+    locale.fields["muc#register_last"].label = tr("Last Name");
+    locale.fields["muc#register_roomnick"].label = tr("Desired Nickname");
+    locale.fields["muc#register_url"].label = tr("Your URL");
+    locale.fields["muc#register_email"].label = tr("EMail Address");
+    locale.fields["muc#register_faqentry"].label = tr("Rules and Notes");
+  }
+  else if (AFormType == DATA_FORM_MUC_ROOMCONFIG)
+  {
+    locale.title = tr("Configure conference");
+    locale.fields["muc#roomconfig_allowinvites"].label = tr("Allow Occupants to Invite Others?");
+    locale.fields["muc#roomconfig_changesubject"].label = tr("Allow Occupants to Change Subject?");
+    locale.fields["muc#roomconfig_enablelogging"].label = tr("Enable Logging of Room Conversations?");
+    locale.fields["muc#roomconfig_lang"].label = tr("Natural Language for Room Discussions");
+    locale.fields["muc#roomconfig_maxusers"].label = tr("Maximum Number of Room Occupants");
+    locale.fields["muc#roomconfig_membersonly"].label = tr("Make Room Members-Only?");
+    locale.fields["muc#roomconfig_moderatedroom"].label = tr("Make Room Moderated?");
+    locale.fields["muc#roomconfig_passwordprotectedroom"].label = tr("Password is Required to Enter?");
+    locale.fields["muc#roomconfig_persistentroom"].label = tr("Make Room Persistent?");
+    locale.fields["muc#roomconfig_presencebroadcast"].label = tr("Roles for which Presence is Broadcast:");
+    locale.fields["muc#roomconfig_publicroom"].label = tr("Allow Public Searching for Room?");
+    locale.fields["muc#roomconfig_roomadmins"].label = tr("Full List of Room Admins");
+    locale.fields["muc#roomconfig_roomdesc"].label = tr("Description of Room");
+    locale.fields["muc#roomconfig_roomname"].label = tr("Natural-Language Room Name");
+    locale.fields["muc#roomconfig_roomowners"].label = tr("Full List of Room Owners");
+    locale.fields["muc#roomconfig_roomsecret"].label = tr("The Room Password");
+    locale.fields["muc#roomconfig_whois"].label = tr("Affiliations that May Discover Real JIDs of Occupants");
+  }
+  else if (AFormType == DATA_FORM_MUC_ROOM_INFO)
+  {
+    locale.title = tr("Conference information");
+    locale.fields["muc#roominfo_contactjid"].label = tr("Contact JID");
+    locale.fields["muc#roominfo_description"].label = tr("Description of Room");
+    locale.fields["muc#roominfo_lang"].label = tr("Natural Language for Room");
+    locale.fields["muc#roominfo_ldapgroup"].label = tr("LDAP Group");
+    locale.fields["muc#roominfo_logs"].label = tr("URL for Archived Discussion Logs");
+    locale.fields["muc#roominfo_occupants"].label = tr("Current Number of Occupants in Room");
+    locale.fields["muc#roominfo_subject"].label = tr("Current Subject or Discussion Topic in Room");
+    locale.fields["muc#roominfo_subjectmod"].label = tr("The Room Subject Can be Modified by Participants?");
+  }
+  else if (AFormType == DATA_FORM_MUC_REQUEST)
+  {
+    locale.title = tr("Request for voice");
+    locale.fields["muc#role"].label = tr("Requested Role");
+    locale.fields["muc#jid"].label = tr("User ID");
+    locale.fields["muc#roomnick"].label = tr("Room Nickname");
+    locale.fields["muc#request_allow"].label = tr("Grant Voice?");
+  }
+  return locale;
 }
 
 bool MultiUserChatPlugin::checkMessage(const Message &AMessage)

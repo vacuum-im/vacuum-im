@@ -40,6 +40,11 @@
 #define DATAFIELD_TYPE_TEXTPRIVATE      "text-private"
 #define DATAFIELD_TYPE_TEXTSINGLE       "text-single"
 
+#define DATALAYOUT_CHILD_TEXT           "text"
+#define DATALAYOUT_CHILD_SECTION        "section"
+#define DATALAYOUT_CHILD_FIELDREF       "fieldref"
+#define DATALAYOUT_CHILD_REPORTEDREF    "reportedref"
+
 #define DATAFORM_TYPE_FORM              "form"
 #define DATAFORM_TYPE_SUBMIT            "submit"
 #define DATAFORM_TYPE_CANCEL            "cancel"
@@ -110,6 +115,22 @@ struct IDataForm {
   IDataTable tabel;
   QList<IDataField> fields;
   QList<IDataLayout> pages;
+};
+
+struct IDataOptionLocale {
+  QString label;
+};
+
+struct IDataFieldLocale {
+  QString label;
+  QString desc;
+  QHash<QString, IDataOptionLocale> options;
+};
+
+struct IDataFormLocale {
+  QString title;
+  QStringList instructions;
+  QHash<QString, IDataFieldLocale> fields;
 };
 
 class IDataTableWidget
@@ -184,6 +205,11 @@ signals:
   virtual void dialogDestroyed(IDataDialogWidget *ADialog) =0;
 };
 
+class IDataLocalizer {
+public:
+  virtual IDataFormLocale dataFormLocale(const QString &AFormType) =0;
+};
+
 class IDataForms
 {
 public:
@@ -219,6 +245,11 @@ public:
   virtual bool isFormValid(const IDataForm &AForm) const =0;
   virtual bool isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) const =0;
   virtual bool isSupportedUri(const IDataMediaURI &AUri) const =0;
+  //Localization
+  virtual IDataForm localizeForm(const IDataForm &AForm) const =0;
+  virtual IDataLocalizer *dataLocalizer(const QString &AFormType) const =0;
+  virtual void insertLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType) =0;
+  virtual void removeLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType = "") =0;
   //Data actions
   virtual int fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const =0;
   virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const =0;
@@ -247,6 +278,7 @@ Q_DECLARE_INTERFACE(IDataMediaWidget,"Vacuum.Plugin.IDataMediaWidget/1.0")
 Q_DECLARE_INTERFACE(IDataFieldWidget,"Vacuum.Plugin.IDataFieldWidget/1.0")
 Q_DECLARE_INTERFACE(IDataFormWidget,"Vacuum.Plugin.IDataFormWidget/1.0")
 Q_DECLARE_INTERFACE(IDataDialogWidget,"Vacuum.Plugin.IDataDialogWidget/1.0")
+Q_DECLARE_INTERFACE(IDataLocalizer,"Vacuum.Plugin.IDataLocalizer/1.0")
 Q_DECLARE_INTERFACE(IDataForms,"Vacuum.Plugin.IDataForms/1.0")
 
 #endif

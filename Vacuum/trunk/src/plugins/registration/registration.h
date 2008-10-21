@@ -6,6 +6,7 @@
 #include "../../definations/discofeatureorder.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/dataformtypes.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iregistraton.h"
 #include "../../interfaces/idataforms.h"
@@ -26,10 +27,11 @@ class Registration :
   public IIqStanzaOwner,
   public IDiscoFeatureHandler,
   public IStreamFeaturePlugin,
-  public IOptionsHolder
+  public IOptionsHolder,
+  public IDataLocalizer
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IRegistration IIqStanzaOwner IDiscoFeatureHandler IStreamFeaturePlugin IOptionsHolder);
+  Q_INTERFACES(IPlugin IRegistration IIqStanzaOwner IDiscoFeatureHandler IStreamFeaturePlugin IOptionsHolder IDataLocalizer);
 public:
   Registration();
   ~Registration();
@@ -53,6 +55,8 @@ public:
   virtual void destroyStreamFeature(IStreamFeature *AFeature);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  //IDataLocalizer
+  virtual IDataFormLocale dataFormLocale(const QString &AFormType);
   //IRegistration
   virtual QString sendRegiterRequest(const Jid &AStreamJid, const Jid &AServiceJid);
   virtual QString sendUnregiterRequest(const Jid &AStreamJid, const Jid &AServiceJid);

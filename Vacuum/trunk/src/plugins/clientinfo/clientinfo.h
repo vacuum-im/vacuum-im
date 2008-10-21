@@ -4,6 +4,7 @@
 #include <QSet>
 #include "../../definations/version.h"
 #include "../../definations/namespaces.h"
+#include "../../definations/dataformtypes.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterdataholderorders.h"
 #include "../../definations/rosterlabelorders.h"
@@ -57,11 +58,12 @@ class ClientInfo :
   public IIqStanzaOwner,
   public IOptionsHolder,
   public IRosterIndexDataHolder,
+  public IDataLocalizer,
   public IDiscoHandler,
   public IDiscoFeatureHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IIqStanzaOwner IOptionsHolder IRosterIndexDataHolder IDiscoHandler IDiscoFeatureHandler);
+  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IIqStanzaOwner IOptionsHolder IRosterIndexDataHolder IDataLocalizer IDiscoHandler IDiscoFeatureHandler);
 public:
   ClientInfo();
   ~ClientInfo();
@@ -87,6 +89,8 @@ public:
   virtual QList<int> types() const;
   virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
   virtual bool setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/) { return false; }
+  //IDataLocalizer
+  virtual IDataFormLocale dataFormLocale(const QString &AFormType);
   //IDiscoHandler
   virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
   virtual void fillDiscoItems(IDiscoItems &/*ADiscoItems*/) {};

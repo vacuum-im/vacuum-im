@@ -63,6 +63,11 @@ public:
   virtual bool isFormValid(const IDataForm &AForm) const;
   virtual bool isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) const;
   virtual bool isSupportedUri(const IDataMediaURI &AUri) const;
+  //Localization
+  virtual IDataForm localizeForm(const IDataForm &AForm) const;
+  virtual IDataLocalizer *dataLocalizer(const QString &AFormType) const;
+  virtual void insertLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType);
+  virtual void removeLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType = "");
   //Data actions
   virtual int fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const;
   virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const;
@@ -99,6 +104,7 @@ private:
 private:
   QNetworkAccessManager FNetworkManager;
   QHash<QUrl,UrlLoadState> FLoadStates;
+  QHash<QString, IDataLocalizer *> FLocalizers;
   QObjectCleanupHandler FCleanupHandler;
 };
 

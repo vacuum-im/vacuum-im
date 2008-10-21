@@ -2,10 +2,12 @@
 #define SESSIONNEGOTIATION_H
 
 #include "../../definations/namespaces.h"
+#include "../../definations/dataformtypes.h"
 #include "../../definations/sessionnegotiatororder.h"
 #include "../../definations/discofeatureorder.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/notificationdataroles.h"
+#include "../../interfaces/idataforms.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isessionnegotiation.h"
 #include "../../interfaces/istanzaprocessor.h"
@@ -21,10 +23,11 @@ class SessionNegotiation :
   public ISessionNegotiation,
   public IStanzaHandler,
   public IDiscoFeatureHandler,
-  public ISessionNegotiator
+  public ISessionNegotiator,
+  public IDataLocalizer
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin ISessionNegotiation IStanzaHandler IDiscoFeatureHandler ISessionNegotiator);
+  Q_INTERFACES(IPlugin ISessionNegotiation IStanzaHandler IDiscoFeatureHandler ISessionNegotiator IDataLocalizer);
 public:
   SessionNegotiation();
   ~SessionNegotiation();
@@ -42,6 +45,8 @@ public:
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
+  //IDataLocaliser
+  virtual IDataFormLocale dataFormLocale(const QString &AFormType);
   //ISessionNegotiator
   virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest);
   virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit);

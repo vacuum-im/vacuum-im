@@ -99,7 +99,7 @@ void DiscoInfoWindow::updateWindow()
       FFormMenu = new Menu(ui.pbtExtensions);
       for (int index=0; index<dinfo.extensions.count(); index++)
       {
-        const IDataForm &form = dinfo.extensions.at(index);
+        IDataForm form = FDataForms->localizeForm(dinfo.extensions.at(index));
         Action *action = new Action(FFormMenu);
         action->setData(ADR_FORM_INDEX,index);
         action->setText(!form.title.isEmpty() ? form.title : FDataForms->fieldValue("FORM_TYPE",form.fields).toString());
@@ -183,7 +183,7 @@ void DiscoInfoWindow::onShowExtensionForm(bool)
     int index = action->data(ADR_FORM_INDEX).toInt();
     if (index<dinfo.extensions.count())
     {
-      const IDataForm &form = dinfo.extensions.at(index);
+      IDataForm form = FDataForms->localizeForm(dinfo.extensions.at(index));
       IDataDialogWidget *widget = FDataForms->dialogWidget(form,this);
       widget->dialogButtons()->setStandardButtons(QDialogButtonBox::Ok);
       widget->instance()->setWindowModality(Qt::WindowModal);

@@ -176,6 +176,11 @@ bool ClientInfo::initObjects()
     FDiscovery->insertFeatureHandler(NS_XMPP_TIME,this,DFO_DEFAULT);
   }
 
+  if (FDataForms)
+  {
+    FDataForms->insertLocalizer(this,DATA_FORM_SOFTWAREINFO);
+  }
+
   return true;
 }
 
@@ -342,6 +347,20 @@ QVariant ClientInfo::data(const IRosterIndex *AIndex, int ARole) const
     return QVariant();
 }
 
+IDataFormLocale ClientInfo::dataFormLocale(const QString &AFormType)
+{
+  IDataFormLocale locale;
+  if (AFormType == DATA_FORM_SOFTWAREINFO)
+  {
+    locale.title = tr("Software information");
+    locale.fields[FORM_FIELD_SOFTWARE].label = tr("Software");
+    locale.fields[FORM_FIELD_SOFTWARE_VERSION].label = tr("Software Version");
+    locale.fields[FORM_FIELD_OS].label = tr("OS");
+    locale.fields[FORM_FIELD_OS_VERSION].label = tr("OS Version");
+  }
+  return locale;
+}
+
 void ClientInfo::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 {
   if (ADiscoInfo.node.isEmpty())
@@ -354,7 +373,7 @@ void ClientInfo::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
     ftype.required = false;
     ftype.var  = "FORM_TYPE";
     ftype.type = DATAFIELD_TYPE_HIDDEN;
-    ftype.value = NS_DATA_FORM_SOFTWAREINFO;
+    ftype.value = DATA_FORM_SOFTWAREINFO;
     form.fields.append(ftype);
 
     IDataField soft;
@@ -951,7 +970,7 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
   {
     foreach(IDataForm form, AInfo.extensions)
     {
-      if (FDataForms->fieldValue("FORM_TYPE",form.fields).toString() == NS_DATA_FORM_SOFTWAREINFO)
+      if (FDataForms->fieldValue("FORM_TYPE",form.fields).toString() == DATA_FORM_SOFTWAREINFO)
       {
         SoftwareItem &software = FSoftwareItems[AInfo.contactJid];
         software.name = FDataForms->fieldValue(FORM_FIELD_SOFTWARE,form.fields).toString();

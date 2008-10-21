@@ -61,6 +61,10 @@ bool JabberSearch::initObjects()
     registerDiscoFeatures();
     FDiscovery->insertFeatureHandler(NS_JABBER_SEARCH,this,DFO_DEFAULT);
   }
+  if (FDataForms)
+  {
+    FDataForms->insertLocalizer(this,DATA_FORM_SEARCH);
+  }
   return true;
 }
 
@@ -186,6 +190,20 @@ Action *JabberSearch::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
     return action;
   }
   return NULL;
+}
+
+IDataFormLocale JabberSearch::dataFormLocale(const QString &AFormType)
+{
+  IDataFormLocale locale;
+  if (AFormType == DATA_FORM_SEARCH)
+  {
+    locale.title = tr("Jabber Search");
+    locale.fields["first"].label = tr("First Name");
+    locale.fields["last"].label = tr("Last Name");
+    locale.fields["nick"].label = tr("Nickname");
+    locale.fields["email"].label = tr("Email Address");
+  }
+  return locale;
 }
 
 QString JabberSearch::sendRequest(const Jid &AStreamJid, const Jid &AServiceJid)

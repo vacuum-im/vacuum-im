@@ -223,8 +223,9 @@ void DiscoItemsWindow::updateDiscoInfo(const IDiscoInfo &ADiscoInfo)
 
       if (FDataForms)
       {
-        foreach(IDataForm form, ADiscoInfo.extensions)
+        for(int iform=0; iform<ADiscoInfo.extensions.count(); iform++)
         {
+          IDataForm form = FDataForms->localizeForm(ADiscoInfo.extensions.at(iform));
           toolTip += QString("<li><b>%1:</b></li>").arg(!form.title.isEmpty() ? form.title : FDataForms->fieldValue("FORM_TYPE",form.fields).toString());
           foreach(IDataField field, form.fields)
           {

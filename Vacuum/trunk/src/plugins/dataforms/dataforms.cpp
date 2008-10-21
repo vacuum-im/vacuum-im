@@ -233,15 +233,15 @@ IDataLayout DataForms::dataLayout(const QDomElement &ALayoutElem) const
     while (!childElem.isNull())
     {
       QString childName = childElem.tagName();
-      if (childName == "text")
+      if (childName == DATALAYOUT_CHILD_TEXT)
       {
         section.text.append(childElem.text());
       }
-      else if (childName == "section")
+      else if (childName == DATALAYOUT_CHILD_SECTION)
       {
         section.sections.append(dataLayout(childElem));
       }
-      else if (childName == "fieldref")
+      else if (childName == DATALAYOUT_CHILD_FIELDREF)
       {
         section.fieldrefs.append(childElem.attribute("var"));
       }
@@ -724,6 +724,68 @@ bool DataForms::isSupportedUri(const IDataMediaURI &AUri) const
   return false;
 }
 
+IDataLocalizer *DataForms::dataLocalizer(const QString &AFormType) const
+{
+  return FLocalizers.value(AFormType,NULL);
+}
+
+IDataForm DataForms::localizeForm(const IDataForm &AForm) const
+{
+  QString formType = fieldValue("FORM_TYPE",AForm.fields).toString();
+  if (FLocalizers.contains(formType))
+  {
+    IDataForm form = AForm;
+    IDataFormLocale formLocale = FLocalizers.value(formType)->dataFormLocale(formType);
+    if (!formLocale.title.isEmpty())
+      form.title = formLocale.title;
+    if (!formLocale.instructions.isEmpty())
+      form.instructions = formLocale.instructions;
+    for (int ifield=0; ifield<form.fields.count(); ifield++)
+    {
+      IDataField &field = form.fields[ifield];
+      if (formLocale.fields.contains(field.var))
+      {
+        const IDataFieldLocale &fieldLocale = formLocale.fields.value(field.var);
+        if (!fieldLocale.label.isEmpty())
+          field.label = fieldLocale.label;
+        if (!fieldLocale.desc.isEmpty())
+          field.desc = fieldLocale.desc;
+        for (int ioption=0; ioption<field.options.count(); ioption++)
+        {
+          IDataOption &option = field.options[ioption];
+          if (fieldLocale.options.contains(option.value))
+          {
+            const IDataOptionLocale &optionLocale = fieldLocale.options.value(option.value);
+            if (!optionLocale.label.isEmpty())
+              option.label = optionLocale.label;
+          }
+        }
+      }
+    }
+    return form;
+  }
+  return AForm;
+}
+
+void DataForms::insertLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType)
+{
+  if (!AFormType.isEmpty() && !FLoadStates.contains(AFormType))
+  {
+    FLocalizers.insert(AFormType,ALocalizer);
+  }
+}
+
+void DataForms::removeLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType)
+{
+  if (ALocalizer!=NULL && AFormType.isEmpty())
+  {
+    foreach (QString formType, FLocalizers.keys(ALocalizer))
+      FLocalizers.remove(formType);
+  }
+  else if (FLocalizers.value(AFormType)==ALocalizer)
+    FLocalizers.remove(AFormType);
+}
+
 int DataForms::fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const
 {
   for(int index=0; index<AFields.count(); index++)
@@ -896,20 +958,20 @@ void DataForms::xmlLayout(const IDataLayout &ALayout, QDomElement &ALayoutElem) 
   int sectionCounter = 0;
   foreach(QString childName, ALayout.childOrder)
   {
-    if (childName == "text")
+    if (childName == DATALAYOUT_CHILD_TEXT)
     {
       ALayoutElem.appendChild(doc.createElement(childName)).appendChild(doc.createTextNode(ALayout.text.value(textCounter++)));
     }
-    else if (childName == "fieldref")
+    else if (childName == DATALAYOUT_CHILD_FIELDREF)
     {
       QDomElement fieldElem = ALayoutElem.appendChild(doc.createElement(childName)).toElement();
       fieldElem.setAttribute("var",ALayout.fieldrefs.value(fieldCounter++));
     }
-    else if (childName == "reportedref")
+    else if (childName == DATALAYOUT_CHILD_REPORTEDREF)
     {
       ALayoutElem.appendChild(doc.createElement(childName));
     }
-    else if (childName == "section")
+    else if (childName == DATALAYOUT_CHILD_SECTION)
     {
       QDomElement sectionElem = ALayoutElem.appendChild(doc.createElement("section")).toElement();
       xmlSection(ALayout.sections.value(sectionCounter++),sectionElem);

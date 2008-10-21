@@ -3,6 +3,7 @@
 
 #include <QMessageBox>
 #include "../../definations/actiongroups.h"
+#include "../../definations/dataformtypes.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/discofeatureorder.h"
@@ -16,6 +17,7 @@
 #include "../../interfaces/itraymanager.h"
 #include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/inotifications.h"
+#include "../../interfaces/idataforms.h"
 #include "../../utils/message.h"
 #include "../../utils/action.h"
 #include "../../utils/skin.h"
@@ -23,15 +25,23 @@
 #include "multiuserchatwindow.h"
 #include "joinmultichatdialog.h"
 
+struct InviteFields {
+  Jid streamJid;
+  Jid roomJid;
+  Jid fromJid;
+  QString password;
+};
+
 class MultiUserChatPlugin : 
   public QObject,
   public IPlugin,
   public IMultiUserChatPlugin,
   public IDiscoFeatureHandler,
-  public IMessageHandler
+  public IMessageHandler,
+  public IDataLocalizer
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMultiUserChatPlugin IDiscoFeatureHandler IMessageHandler);
+  Q_INTERFACES(IPlugin IMultiUserChatPlugin IDiscoFeatureHandler IMessageHandler IDataLocalizer);
 public:
   MultiUserChatPlugin();
   ~MultiUserChatPlugin();
@@ -46,6 +56,8 @@ public:
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
+  //IDataLocalizer
+  virtual IDataFormLocale dataFormLocale(const QString &AFormType);
   //IMessageHandler
   virtual bool openWindow(IRosterIndex * /*AIndex*/) { return false; }
   virtual bool openWindow(const Jid &/*AStreamJid*/, const Jid &/*AContactJid*/, Message::MessageType /*AType*/) { return false; }
@@ -98,16 +110,11 @@ private:
   IXmppStreams *FXmppStreams;
   IServiceDiscovery *FDiscovery;
   INotifications *FNotifications;
+  IDataForms *FDataForms;
 private:
   Menu *FChatMenu;
   Action *FJoinAction;
 private:
-  struct InviteFields {
-    Jid streamJid;
-    Jid roomJid;
-    Jid fromJid;
-    QString password;
-  };
   QList<IMultiUserChat *> FChats;
   QList<IMultiUserChatWindow *> FChatWindows;
   QHash<IMultiUserChatWindow *, Action *> FChatActions;

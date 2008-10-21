@@ -98,6 +98,10 @@ bool Registration::initObjects()
   {
     FSettingsPlugin->insertOptionsHolder(this);
   }
+  if (FDataForms)
+  {
+    FDataForms->insertLocalizer(this,DATA_FORM_REGISTER);
+  }
   return true;
 }
 
@@ -270,6 +274,29 @@ QWidget *Registration::optionsWidget(const QString &ANode, int &AOrder)
     return checkBox;
   }
   return NULL;
+}
+
+IDataFormLocale Registration::dataFormLocale(const QString &AFormType)
+{
+  IDataFormLocale locale;
+  if (AFormType == DATA_FORM_REGISTER)
+  {
+    locale.title = tr("Registration Form");
+    locale.fields["username"].label = tr("Account Name");
+    locale.fields["nick"].label = tr("Nickname");
+    locale.fields["password"].label = tr("Password");
+    locale.fields["name"].label = tr("Full Name");
+    locale.fields["first"].label = tr("First Name");
+    locale.fields["last"].label = tr("Last Name");
+    locale.fields["email"].label = tr("Email Address");
+    locale.fields["address"].label = tr("Street");
+    locale.fields["city"].label = tr("City");
+    locale.fields["state"].label = tr("Region");
+    locale.fields["zip"].label = tr("Zip Code");
+    locale.fields["phone"].label = tr("Telephone Number");
+    locale.fields["url"].label = tr("Your Web Paqe");
+  }
+  return locale;
 }
 
 QString Registration::sendRegiterRequest(const Jid &AStreamJid, const Jid &AServiceJid)

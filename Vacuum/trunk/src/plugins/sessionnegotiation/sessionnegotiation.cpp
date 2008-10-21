@@ -105,6 +105,10 @@ bool SessionNegotiation::initObjects()
     uchar kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
     FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Negotiate session requests"),kindMask,kindMask);
   }
+  if (FDataForms)
+  {
+    FDataForms->insertLocalizer(this,DATA_FORM_SESSION_NEGOTIATION);
+  }
   insertNegotiator(this,SNO_DEFAULT);
   return true;
 }
@@ -223,6 +227,27 @@ Action *SessionNegotiation::createDiscoFeatureAction(const Jid &AStreamJid, cons
     return action;
   }
   return NULL;
+}
+
+IDataFormLocale SessionNegotiation::dataFormLocale(const QString &AFormType)
+{
+  IDataFormLocale locale;
+  if (AFormType == DATA_FORM_SESSION_NEGOTIATION)
+  {
+    locale.title = tr("Session Negotiation");
+    locale.fields["accept"].label = tr("Accept the Invitation?");
+    locale.fields["continue"].label = tr("Another Resource");
+    locale.fields["disclosure"].label = tr("Disclosure of Content");
+    locale.fields["http://jabber.org/protocol/chatstates"].label = tr("Enable Chat State Notifications?");
+    locale.fields["http://jabber.org/protocol/xhtml-im"].label = tr("Enable XHTML-IM formatting?");
+    locale.fields["language"].label = tr("Primary Written Language of the Chat");
+    locale.fields["logging"].label = tr("Enable Message Loggings?");
+    locale.fields["renegotiate"].label = tr("Renegotiate the Session?");
+    locale.fields["security"].label = tr("Minimum Security Level");
+    locale.fields["terminate"].label = tr("Terminate the Session?");
+    locale.fields["urn:xmpp:receipts"].label = tr("Enable Message Receipts?");
+  }
+  return locale;
 }
 
 int SessionNegotiation::sessionInit(const IStanzaSession &/*ASession*/, IDataForm &ARequest)
@@ -908,7 +933,7 @@ IDataForm SessionNegotiation::defaultForm(const QString &AActionVar) const
   IDataField form_type;
   form_type.var = "FORM_TYPE";
   form_type.type = DATAFIELD_TYPE_HIDDEN;
-  form_type.value = NS_STANZA_SESSION;
+  form_type.value = DATA_FORM_SESSION_NEGOTIATION;
   form_type.required = false;
   IDataField actionField;
   actionField.var = AActionVar;
