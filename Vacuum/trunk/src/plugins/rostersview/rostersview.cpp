@@ -131,7 +131,7 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
       setLastModel(FRostersModel);
     else if (after == NULL)
       setLastModel(befour);
-    else if (befour = NULL)
+    else if (befour == NULL)
       after->setSourceModel(FRostersModel);
     else
       after->setSourceModel(befour);

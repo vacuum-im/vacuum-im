@@ -103,7 +103,7 @@ void TrayManager::updateNotify(int ANotifyId, const QIcon &AIcon, const QString 
     notify->icon = AIcon;
     notify->toolTip = AToolTip;
     notify->blink = ABlink;
-    if (FCurNotifyId = ANotifyId)
+    if (FCurNotifyId == ANotifyId)
       setTrayIcon(AIcon,AToolTip,ABlink);
   }
 }
@@ -115,7 +115,7 @@ void TrayManager::removeNotify(int ANotifyId)
   {
     delete notify;
     FNotifyItems.remove(ANotifyId);
-    if (FCurNotifyId = ANotifyId)
+    if (FCurNotifyId == ANotifyId)
     {
       if (FNotifyItems.isEmpty())
       {

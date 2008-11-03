@@ -371,7 +371,8 @@ void Emoticons::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(EMOTICONS_UUID);
   QStringList smiles =  Skin::skinFiles(SKIN_TYPE_ICONSET,SUBFOLDER_EMOTICONS,"*.jisp");
-  for(int i = 0; i<smiles.count(); smiles[i].prepend(SUBFOLDER_EMOTICONS"/"),i++);
+  for(int i = 0; i<smiles.count(); i++)
+    smiles[i].prepend(SUBFOLDER_EMOTICONS"/");
   setIconsets(settings->valueNS(SVN_ICONSETFILES_NS,Skin::skin(),smiles).toStringList());
 }
 

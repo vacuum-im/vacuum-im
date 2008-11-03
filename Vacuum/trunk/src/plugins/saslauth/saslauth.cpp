@@ -1,5 +1,6 @@
 #include "saslauth.h"
 
+#include <stdlib.h>
 #include <QMultiHash>
 #include <QStringList>
 #include <QCryptographicHash>
@@ -123,7 +124,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
         QString nonce = params.value("nonce");
         QByteArray randBytes(32,' ');
         for(int i=0; i<31; i++)
-          randBytes[i] = (char) (256.0 * rand() / (RAND_MAX + 1.0));
+          randBytes[i] = (char) (256.0 * qrand() / (RAND_MAX + 1.0));
         QString cnonce = randBytes.toBase64();
         QString nc = "00000001";
         QString qop = params.value("qop");

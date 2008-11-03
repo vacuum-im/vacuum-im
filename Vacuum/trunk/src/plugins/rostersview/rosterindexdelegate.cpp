@@ -238,17 +238,20 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
     {
       QPixmap pixmap = qvariant_cast<QPixmap>(ALabel.value);
       APainter->drawPixmap(ALabel.rect.topLeft(),pixmap);
+      break;
     }
   case QVariant::Image:
     {
       QImage image = qvariant_cast<QImage>(ALabel.value);
       APainter->drawImage(ALabel.rect.topLeft(),image);
+      break;
     }
   case QVariant::Icon:
     {
       QIcon icon = qvariant_cast<QIcon>(ALabel.value);
       QPixmap pixmap = icon.pixmap(AOption.decorationSize,getIconMode(AOption.state),getIconState(AOption.state));
       APainter->drawPixmap(ALabel.rect.topLeft(),pixmap);
+      break;
     }
   case QVariant::String:
     {
@@ -270,7 +273,10 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
       QFontMetrics fontMetrics(AOption.font,APainter->device());
       QString text = fontMetrics.elidedText(ALabel.value.toString(),Qt::ElideRight,ALabel.rect.width(),flags);
       APainter->drawText(ALabel.rect,flags,text);
+      break;
     }
+  default:
+    break;   
   }
 }
 
@@ -424,18 +430,21 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption, cons
       QPixmap pixmap = qvariant_cast<QPixmap>(AValue);
       if (!pixmap.isNull())
         return pixmap.size();
+      break;
     }
   case QVariant::Image:
     {
       QImage image = qvariant_cast<QImage>(AValue);
       if (!image.isNull())
         return image.size();
+      break;
     }
   case QVariant::Icon:
     {
       QIcon icon = qvariant_cast<QIcon>(AValue);
       if (!icon.isNull())
         return AOption.decorationSize;
+      break;
     }
   case QVariant::String:
     {
@@ -445,7 +454,10 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption, cons
         QFontMetrics fontMetrics(AOption.font);
         return fontMetrics.size(AOption.direction | Qt::TextSingleLine,text); 
       }
+      break;
     }
+  default:
+    break;
   }
   return QSize(0,0);
 }

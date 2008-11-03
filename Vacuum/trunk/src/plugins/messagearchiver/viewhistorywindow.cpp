@@ -181,7 +181,8 @@ QStandardItem *ViewHistoryWindow::findHeaderItem(const IArchiveHeader &AHeader, 
       if (AHeader.with == with && AHeader.start == start)
         return item;
     }
-    if (item = findHeaderItem(AHeader,item))
+    item = findHeaderItem(AHeader,item);
+    if (item)
       return item;
   }
   return NULL;

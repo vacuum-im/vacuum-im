@@ -132,7 +132,7 @@ bool SessionNegotiation::readStanza(int AHandlerId, const Jid &AStreamJid, const
         IDataForm form = FDataForms->dataForm(formElem);
         bool isAccept = FDataForms->fieldIndex(SESSION_FIELD_ACCEPT, form.fields) >= 0;
         
-        //Переводим сессию на ресурс с которого получен ответ
+        //       
         if (isAccept && form.type==DATAFORM_TYPE_SUBMIT && session.sessionId != sessionId)
         {
           session = currentSession(AStreamJid,contactJid.bare());
@@ -657,7 +657,7 @@ void SessionNegotiation::processAccept(const IStanzaSession &ASession, const IDa
         updateSession(session);
         FSuspended.insert(session.sessionId,ARequest);
       }
-      else if ((result & ISessionNegotiator::Auto|ISessionNegotiator::Manual) > 0)
+      else if ((result & (ISessionNegotiator::Auto|ISessionNegotiator::Manual)) > 0)
       {
         session.status = IStanzaSession::Active;
         sendSessionData(session,submit);
