@@ -17,7 +17,7 @@
 #define PSN_GATEWAYS_KEEP     "vacuum:gateways:keep"
 #define PST_GATEWAYS_SERVICES "services"
 
-#define KEEP_INTERVAL         30000
+#define KEEP_INTERVAL         120000
 
 Gateways::Gateways()
 {
