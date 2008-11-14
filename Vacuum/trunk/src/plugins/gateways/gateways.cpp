@@ -693,20 +693,20 @@ void Gateways::onPrivateStorageLoaded(const QString &/*AId*/, const Jid &AStream
 
 void Gateways::onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow)
 {
-  connect(AWindow->instance(),SIGNAL(treeItemContextMenu(QTreeWidgetItem *, Menu *)),
-    SLOT(onDiscoItemContextMenu(QTreeWidgetItem *, Menu *)));
+  connect(AWindow->instance(),SIGNAL(indexContextMenu(const QModelIndex &, Menu *)),
+    SLOT(onDiscoItemContextMenu(const QModelIndex &, Menu *)));
 }
 
-void Gateways::onDiscoItemContextMenu(QTreeWidgetItem *ATreeItem, Menu *AMenu)
+void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
 {
-  Jid itemJid = ATreeItem->data(0,DDR_JID).toString();
-  QString itemNode = ATreeItem->data(0,DDR_NODE).toString();
+  Jid itemJid = AIndex.data(DDR_JID).toString();
+  QString itemNode = AIndex.data(DDR_NODE).toString();
   if (itemJid.node().isEmpty() && itemNode.isEmpty())
   {
     IDiscoInfo dinfo = FDiscovery->discoInfo(itemJid,itemNode);
     if (dinfo.error.code<0 && !dinfo.identity.isEmpty())
     {
-      Jid streamJid = ATreeItem->data(0,DDR_STREAMJID).toString();
+      Jid streamJid = AIndex.data(DDR_STREAMJID).toString();
       QList<Jid> services = streamServices(streamJid,dinfo.identity.value(0));
       foreach(Jid service, streamServices(streamJid))
         if (!services.contains(service) && FDiscovery->discoInfo(service).identity.isEmpty())

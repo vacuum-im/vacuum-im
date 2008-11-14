@@ -85,7 +85,7 @@ protected slots:
   void onVCardError(const Jid &AContactJid, const QString &AError);
   void onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
   void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
-  void onDiscoItemContextMenu(QTreeWidgetItem *ATreeItem, Menu *AMenu);
+  void onDiscoItemContextMenu(const QModelIndex AIndex, Menu *AMenu);
 private:
   IServiceDiscovery *FDiscovery;
   IStanzaProcessor *FStanzaProcessor;

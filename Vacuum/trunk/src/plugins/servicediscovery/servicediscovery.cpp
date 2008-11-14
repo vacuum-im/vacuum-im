@@ -190,9 +190,6 @@ bool ServiceDiscovery::initObjects()
 
 bool ServiceDiscovery::startPlugin()
 {
-  //FMyCaps.node = CLIENT_HOME_PAGE;
-  //FMyCaps.hash = CAPS_HASH_SHA1;
-  //FMyCaps.ver = calcCapsHash(selfDiscoInfo(),FMyCaps.hash);
   return true;
 }
 
@@ -485,21 +482,25 @@ QList<IDiscoInfo> ServiceDiscovery::findDiscoInfo(const IDiscoIdentity &AIdentit
   return result;
 }
 
-QIcon ServiceDiscovery::discoInfoIcon(const IDiscoInfo &ADiscoInfo) const
-{
-  QIcon icon;
-  if (ADiscoInfo.error.code >= 0)
-    icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CANCEL);
-  else if (FStatusIcons)
-    icon = FStatusIcons->iconByJidStatus(ADiscoInfo.contactJid,IPresence::Online,"both",false);
-  return icon;
-}
-
-QIcon ServiceDiscovery::discoItemIcon(const IDiscoItem &ADiscoItem) const
+QIcon ServiceDiscovery::serviceIcon(const Jid AItemJid, const QString &ANode) const
 {
   QIcon icon;
   if (FStatusIcons)
-    icon = FStatusIcons->iconByJidStatus(ADiscoItem.itemJid,IPresence::Online,"both",false);
+  {
+    if (FInfoRequestsId.values().contains(qMakePair(AItemJid,ANode)))
+    {
+      icon = FStatusIcons->iconByJidStatus(AItemJid,IPresence::DoNotDistrib,"both",false);
+    }
+    else if (hasDiscoInfo(AItemJid,ANode))
+    {
+      IDiscoInfo info = discoInfo(AItemJid,ANode);
+      icon = FStatusIcons->iconByJidStatus(info.contactJid,info.error.code<0 ? IPresence::Online : IPresence::Error,"both",false);
+    }
+    else
+    {
+      icon = FStatusIcons->iconByJidStatus(AItemJid,IPresence::Invisible,"both",false);
+    }
+  }
   return icon;
 }
 
@@ -794,7 +795,6 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const QPair<J
   {
     discoInfoFromElem(query,result);
   }
-
   return result;
 }
 

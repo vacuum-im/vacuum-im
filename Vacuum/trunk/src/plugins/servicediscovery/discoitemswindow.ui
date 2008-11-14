@@ -22,14 +22,6 @@
    <enum>Qt::ToolButtonTextUnderIcon</enum>
   </property>
   <widget class="QWidget" name="centralWidget" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>12</y>
-     <width>654</width>
-     <height>347</height>
-    </rect>
-   </property>
    <layout class="QVBoxLayout" >
     <property name="margin" >
      <number>3</number>
@@ -118,7 +110,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTreeWidget" name="trwItems" >
+       <widget class="QTreeView" name="trvItems" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
           <horstretch>4</horstretch>
@@ -127,9 +119,6 @@
         </property>
         <property name="contextMenuPolicy" >
          <enum>Qt::CustomContextMenu</enum>
-        </property>
-        <property name="autoScroll" >
-         <bool>false</bool>
         </property>
         <property name="editTriggers" >
          <set>QAbstractItemView::NoEditTriggers</set>
@@ -140,27 +129,12 @@
         <property name="indentation" >
          <number>12</number>
         </property>
-        <property name="uniformRowHeights" >
-         <bool>true</bool>
-        </property>
         <property name="allColumnsShowFocus" >
          <bool>true</bool>
         </property>
-        <column>
-         <property name="text" >
-          <string>Name</string>
-         </property>
-        </column>
-        <column>
-         <property name="text" >
-          <string>Jid</string>
-         </property>
-        </column>
-        <column>
-         <property name="text" >
-          <string>Node</string>
-         </property>
-        </column>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -168,14 +142,6 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="tlbToolBar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>654</width>
-     <height>12</height>
-    </rect>
-   </property>
    <property name="windowTitle" >
     <string>toolBar</string>
    </property>

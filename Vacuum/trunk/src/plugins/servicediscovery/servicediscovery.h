@@ -91,8 +91,7 @@ public:
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
   virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
   virtual QList<IDiscoInfo> findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
-  virtual QIcon discoInfoIcon(const IDiscoInfo &ADiscoInfo) const;
-  virtual QIcon discoItemIcon(const IDiscoItem &ADiscoItem) const;
+  virtual QIcon serviceIcon(const Jid AItemJid, const QString &ANode) const;
     //DiscoHandler
   virtual void insertDiscoHandler(IDiscoHandler *AHandler);
   virtual void removeDiscoHandler(IDiscoHandler *AHandler);
