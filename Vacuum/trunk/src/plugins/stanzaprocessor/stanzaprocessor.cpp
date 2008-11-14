@@ -65,7 +65,7 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza
   if (processStanzaOut(AStreamJid,&stanza))
   {
     IXmppStream *stream = FXmppStreams->getStream(AStreamJid);
-    if (stream)
+    if (stream && stream->isOpen())
       sended = stream->sendStanza(stanza) > 0;
   }
   return sended;
