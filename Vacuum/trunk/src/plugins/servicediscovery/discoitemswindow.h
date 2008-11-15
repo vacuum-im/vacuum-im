@@ -19,7 +19,7 @@ public:
   SortFilterProxyModel(QObject *AParent):QSortFilterProxyModel(AParent) {};
   virtual bool hasChildren(const QModelIndex &AParent) const
   {
-    if (sourceModel())
+    if (sourceModel() && sourceModel()->canFetchMore(mapToSource(AParent)))
       return sourceModel()->hasChildren(mapToSource(AParent));
     return QSortFilterProxyModel::hasChildren(AParent);
   }

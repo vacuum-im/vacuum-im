@@ -233,8 +233,7 @@ void DiscoItemsWindow::onCurrentIndexChanged(QModelIndex ACurrent, QModelIndex A
 {
   if (ACurrent.parent()!=APrevious.parent() || ACurrent.row()!=APrevious.row())
   {
-    if (ui.trvItems->model()->canFetchMore(ACurrent))
-      ui.trvItems->model()->fetchMore(ACurrent);
+    FModel->fetchIndex(FProxy->mapToSource(ACurrent),true,false);
     updateToolBarActions();
     updateActionsBar();
     emit currentIndexChanged(ACurrent);
@@ -272,14 +271,7 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
   }
   else if (action == FReloadCurrent)
   {
-    QModelIndex index = ui.trvItems->currentIndex();
-    if (index.isValid())
-    {
-      Jid itemJid = index.data(DDR_JID).toString();
-      QString itemNode = index.data(DDR_NODE).toString();
-      FDiscovery->requestDiscoInfo(FStreamJid,itemJid,itemNode);
-      FDiscovery->requestDiscoItems(FStreamJid,itemJid,itemNode);
-    }
+    FModel->loadIndex(FProxy->mapToSource(ui.trvItems->currentIndex()),true,true);
   }
   else if (action == FDiscoInfo)
   {

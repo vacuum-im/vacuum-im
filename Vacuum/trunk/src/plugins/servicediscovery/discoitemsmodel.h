@@ -58,6 +58,8 @@ public:
   virtual QVariant data(const QModelIndex &AIndex, int ARole = Qt::DisplayRole) const;
   virtual QVariant headerData(int ASection, Qt::Orientation AOrientation, int ARole = Qt::DisplayRole) const;
   //DiscoItemsModel
+  void fetchIndex(const QModelIndex &AIndex, bool AInfo = true, bool AItems = true);
+  void loadIndex(const QModelIndex &AIndex, bool AInfo = true, bool AItems = true);
   bool autoLoadItems() const;
   void setAutoLoadItems(bool ALoad);
   void addTopLevelItem(const Jid &AItemJid, const QString &AItemNode);

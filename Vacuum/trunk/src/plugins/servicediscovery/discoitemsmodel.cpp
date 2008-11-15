@@ -47,31 +47,13 @@ bool DiscoItemsModel::canFetchMore(const QModelIndex &AParent) const
 
 void DiscoItemsModel::fetchMore(const QModelIndex &AParent)
 {
-  if (AParent.isValid())
-  {
-    DiscoItemIndex *index = itemIndex(AParent);
-    if (!index->itemsFetched)
-    {
-      if (FDiscovery->hasDiscoItems(index->itemJid,index->itemNode))
-        onDiscoItemsReceived(FDiscovery->discoItems(index->itemJid,index->itemNode));
-      else if (autoLoadItems())
-        index->itemsFetched &= FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
-    }
-    if (!index->infoFetched)
-    {
-      if (FDiscovery->hasDiscoInfo(index->itemJid,index->itemNode))
-        onDiscoInfoReceived(FDiscovery->discoInfo(index->itemJid,index->itemNode));
-      else if (autoLoadItems())
-        index->infoFetched &= FDiscovery->requestDiscoInfo(FStreamJid,index->itemJid,index->itemNode);
-    }
-    index->icon = FDiscovery->serviceIcon(index->itemJid,index->itemNode);
-  }
+  fetchIndex(AParent);
 }
 
 bool DiscoItemsModel::hasChildren(const QModelIndex &AParent) const
 {
   DiscoItemIndex *index = itemIndex(AParent);
-  return !index->infoFetched || !index->childs.isEmpty() || !FDiscovery->hasDiscoItems(index->itemJid,index->itemNode);
+  return !index->itemsFetched || !index->childs.isEmpty() || !FDiscovery->hasDiscoItems(index->itemJid,index->itemNode);
 }
 
 int DiscoItemsModel::rowCount(const QModelIndex &AParent) const
@@ -146,6 +128,44 @@ QVariant DiscoItemsModel::headerData(int ASection, Qt::Orientation AOrientation,
     }
   }
   return QAbstractItemModel::headerData(ASection,AOrientation,ARole);
+}
+
+void DiscoItemsModel::fetchIndex(const QModelIndex &AIndex, bool AInfo, bool AItems)
+{
+  DiscoItemIndex *index = itemIndex(AIndex);
+  if (index && (AInfo || AItems))
+  {
+    if (AInfo && !index->infoFetched)
+    {
+      if (FDiscovery->hasDiscoInfo(index->itemJid,index->itemNode))
+        onDiscoInfoReceived(FDiscovery->discoInfo(index->itemJid,index->itemNode));
+      else if (autoLoadItems())
+        FDiscovery->requestDiscoInfo(FStreamJid,index->itemJid,index->itemNode);
+    }
+    if (AItems && !index->itemsFetched)
+    {
+      if (FDiscovery->hasDiscoItems(index->itemJid,index->itemNode))
+        onDiscoItemsReceived(FDiscovery->discoItems(index->itemJid,index->itemNode));
+      else if (autoLoadItems())
+        FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
+    }
+    index->icon = FDiscovery->serviceIcon(index->itemJid,index->itemNode);
+    emit dataChanged(AIndex,AIndex);
+  }
+}
+
+void DiscoItemsModel::loadIndex(const QModelIndex &AIndex, bool AInfo, bool AItems)
+{
+  DiscoItemIndex *index = itemIndex(AIndex);
+  if (index)
+  {
+    if (AInfo)
+      FDiscovery->requestDiscoInfo(FStreamJid, index->itemJid,index->itemNode);
+    if (AItems)
+      FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
+    index->icon = FDiscovery->serviceIcon(index->itemJid,index->itemNode);
+    emit dataChanged(AIndex,AIndex);
+  }
 }
 
 bool DiscoItemsModel::autoLoadItems() const
@@ -255,8 +275,12 @@ QString DiscoItemsModel::itemToolTip(const IDiscoInfo &ADiscoInfo) const
 
 void DiscoItemsModel::updateDiscoInfo(DiscoItemIndex *AIndex, const IDiscoInfo &ADiscoInfo)
 {
-  if (AIndex->itemName.isEmpty())
-    AIndex->itemName = ADiscoInfo.identity.value(0).name;
+  for (int i=0; i<ADiscoInfo.identity.count();i++)
+    if (!ADiscoInfo.identity.at(i).name.isEmpty())
+    {
+      AIndex->itemName = ADiscoInfo.identity.at(i).name;
+      break;
+    }
   AIndex->toolTip = itemToolTip(ADiscoInfo);
   AIndex->icon = FDiscovery->serviceIcon(AIndex->itemJid,AIndex->itemNode);
 }
@@ -334,7 +358,7 @@ void DiscoItemsModel::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
   QList<DiscoItemIndex*> indexList = findIndex(ADiscoInfo.contactJid,ADiscoInfo.node);
   foreach(DiscoItemIndex *index, indexList)
   {
-    index->infoFetched  = true;
+    index->infoFetched = true;
     updateDiscoInfo(index,ADiscoInfo);
     emit dataChanged(modelIndex(index,0),modelIndex(index,COL__COUNT-1));
   }
@@ -362,7 +386,7 @@ void DiscoItemsModel::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
       {
         updateList.append(index);
       }
-      if (!item.name.isEmpty())
+      if (!index->infoFetched || index->itemName.isEmpty())
         index->itemName = item.name;
     }
 
