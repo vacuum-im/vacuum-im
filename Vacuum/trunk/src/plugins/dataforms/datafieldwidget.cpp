@@ -34,6 +34,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
     FLabel = new QLabel(this);
     FLabel->setWordWrap(true);
     layout()->addWidget(FLabel);
+    FField.value = FField.label.isEmpty() ? FField.value : FField.label;
   }
   else if (FField.type == DATAFIELD_TYPE_LISTSINGLE)
   {
