@@ -135,19 +135,19 @@ void DiscoItemsModel::fetchIndex(const QModelIndex &AIndex, bool AInfo, bool AIt
   DiscoItemIndex *index = itemIndex(AIndex);
   if (index && (AInfo || AItems))
   {
-    if (AInfo && !index->infoFetched)
-    {
-      if (FDiscovery->hasDiscoInfo(index->itemJid,index->itemNode))
-        onDiscoInfoReceived(FDiscovery->discoInfo(index->itemJid,index->itemNode));
-      else if (autoLoadItems())
-        FDiscovery->requestDiscoInfo(FStreamJid,index->itemJid,index->itemNode);
-    }
     if (AItems && !index->itemsFetched)
     {
       if (FDiscovery->hasDiscoItems(index->itemJid,index->itemNode))
         onDiscoItemsReceived(FDiscovery->discoItems(index->itemJid,index->itemNode));
       else if (autoLoadItems())
         FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
+    }
+    if (AInfo && !index->infoFetched)
+    {
+      if (FDiscovery->hasDiscoInfo(index->itemJid,index->itemNode))
+        onDiscoInfoReceived(FDiscovery->discoInfo(index->itemJid,index->itemNode));
+      else if (autoLoadItems())
+        FDiscovery->requestDiscoInfo(FStreamJid,index->itemJid,index->itemNode);
     }
     index->icon = FDiscovery->serviceIcon(index->itemJid,index->itemNode);
     emit dataChanged(AIndex,AIndex);
@@ -159,10 +159,10 @@ void DiscoItemsModel::loadIndex(const QModelIndex &AIndex, bool AInfo, bool AIte
   DiscoItemIndex *index = itemIndex(AIndex);
   if (index)
   {
-    if (AInfo)
-      FDiscovery->requestDiscoInfo(FStreamJid, index->itemJid,index->itemNode);
     if (AItems)
       FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
+    if (AInfo)
+      FDiscovery->requestDiscoInfo(FStreamJid, index->itemJid,index->itemNode);
     index->icon = FDiscovery->serviceIcon(index->itemJid,index->itemNode);
     emit dataChanged(AIndex,AIndex);
   }
@@ -275,12 +275,17 @@ QString DiscoItemsModel::itemToolTip(const IDiscoInfo &ADiscoInfo) const
 
 void DiscoItemsModel::updateDiscoInfo(DiscoItemIndex *AIndex, const IDiscoInfo &ADiscoInfo)
 {
-  for (int i=0; i<ADiscoInfo.identity.count();i++)
-    if (!ADiscoInfo.identity.at(i).name.isEmpty())
+  if (AIndex->itemName.isEmpty())
+  {
+    for (int i=0; i<ADiscoInfo.identity.count();i++)
     {
-      AIndex->itemName = ADiscoInfo.identity.at(i).name;
-      break;
+      if (!ADiscoInfo.identity.at(i).name.isEmpty())
+      {
+        AIndex->itemName = ADiscoInfo.identity.at(i).name;
+        break;
+      }
     }
+  }
   AIndex->toolTip = itemToolTip(ADiscoInfo);
   AIndex->icon = FDiscovery->serviceIcon(AIndex->itemJid,AIndex->itemNode);
 }
@@ -334,7 +339,11 @@ void DiscoItemsModel::removeChildren(DiscoItemIndex *AParent, QList<DiscoItemInd
         firstRow = rows.takeFirst();
         lastRow = firstRow;
       }
-      if (firstRow>=0 && (rows.isEmpty() || lastRow+1!=rows.first()))
+      if (!rows.isEmpty() && lastRow+1==rows.first())
+      {
+        lastRow = rows.takeFirst();
+      }
+      if (rows.isEmpty() || lastRow+1!=rows.first())
       {
         emit beginRemoveRows(modelIndex(AParent,0),firstRow,lastRow);
         while (lastRow >= firstRow)
@@ -344,10 +353,6 @@ void DiscoItemsModel::removeChildren(DiscoItemIndex *AParent, QList<DiscoItemInd
         }
         emit endRemoveRows();
         firstRow = -1;
-      }
-      else
-      {
-        lastRow = rows.takeFirst();
       }
     }
   }
@@ -386,7 +391,7 @@ void DiscoItemsModel::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
       {
         updateList.append(index);
       }
-      if (!index->infoFetched || index->itemName.isEmpty())
+      if (!item.name.isEmpty())
         index->itemName = item.name;
     }
 
