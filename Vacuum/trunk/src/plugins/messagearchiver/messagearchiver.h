@@ -1,6 +1,7 @@
 #ifndef MESSAGEARCHIVER_H
 #define MESSAGEARCHIVER_H
 
+#include <QMultiMap>
 #include <QObjectCleanupHandler>
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
@@ -65,7 +66,7 @@ public:
   virtual QString expireName(int AExpire) const;
   virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
   virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const;
-  virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool &AAuto);
+  virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto);
   virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
   virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid);
   virtual IArchiveWindow *showArchiveWindow(const Jid &AStreamJid, const IArchiveFilter &AFilter, int AGroupKind, QWidget *AParent = NULL);
@@ -76,6 +77,7 @@ public:
   virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage);
   virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = "");
   //Local Archive
+  virtual Jid gateJid(const Jid &AContactJid) const;
   virtual QList<Message> findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const;
   virtual bool hasLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
   virtual bool saveLocalCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, bool AAppend = true);
@@ -104,10 +106,10 @@ signals:
   virtual void localCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
   //Server Archive
   virtual void serverCollectionSaved(const QString &AId, const IArchiveHeader &AHeader);
-  virtual void serverHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const QString &ALast, int ACount);
-  virtual void serverCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const QString &ALast, int ACount);
+  virtual void serverHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders,  const IArchiveResultSet &AResult);
+  virtual void serverCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection,  const IArchiveResultSet &AResult);
   virtual void serverCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
-  virtual void serverModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const QString &ALast, int ACount);
+  virtual void serverModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs,  const IArchiveResultSet &AResult);
   //ArchiveWindow
   virtual void archiveWindowCreated(IArchiveWindow *AWindow);
   virtual void archiveWindowDestroyed(IArchiveWindow *AWindow);
@@ -122,6 +124,7 @@ protected:
   QString collectionFileName(const DateTime &AStart) const;
   QString collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const;
   QString collectionFilePath(const Jid &AStreamJid, const Jid &AWith, const DateTime &AStart) const;
+  QMultiMap<QString,QString> filterCollectionFiles(const QStringList &AFiles, const IArchiveRequest &ARequest, const QString &APrefix) const;
   QStringList findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const;
   IArchiveHeader loadCollectionHeader(const QString &AFileName) const;
   CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;

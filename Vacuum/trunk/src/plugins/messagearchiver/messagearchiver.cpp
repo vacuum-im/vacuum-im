@@ -1,6 +1,5 @@
 #include "messagearchiver.h"
 
-#include <QtDebug>
 #include <QDir>
 #include <QStack>
 
@@ -176,7 +175,7 @@ bool MessageArchiver::readStanza(int AHandlerId, const Jid &AStreamJid, const St
     Message message(AStanza);
     processMessage(AStreamJid,message,false);
   }
-  else if (FSHIPrefs.value(AStreamJid)==AHandlerId && (AStanza.from().isEmpty() || (AStreamJid && AStanza.from())))
+  else if (FSHIPrefs.value(AStreamJid)==AHandlerId && (AStanza.from().isEmpty() || Jid(AStreamJid.domain())==AStanza.from()))
   {
     QDomElement prefElem = AStanza.firstElement("pref",NS_ARCHIVE);
     applyArchivePrefs(AStreamJid,prefElem);
@@ -246,16 +245,17 @@ void MessageArchiver::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
     if (AStanza.type() == "result")
     {
       IArchiveCollection collection;
-      QDomElement chatElem = AStanza.firstElement("chat",NS_ARCHIVE);
+      QDomElement chatElem = AStanza.firstElement("chat"/*,NS_ARCHIVE*/);
       elementToCollection(chatElem,collection);
-
       QDomElement setElem = chatElem.firstChildElement("set");
       while (!setElem.isNull() && setElem.namespaceURI()!=NS_RESULTSET)
         setElem = setElem.nextSiblingElement("set");
-      int count = setElem.firstChildElement("count").text().toInt();
-      QString last = setElem.firstChildElement("last").text();
-
-      emit serverCollectionLoaded(AStanza.id(),collection,last,count);
+      IArchiveResultSet resultSet;
+      resultSet.count = setElem.firstChildElement("count").text().toInt();
+      resultSet.index = setElem.firstChildElement("first").attribute("index").toInt();
+      resultSet.first = setElem.firstChildElement("first").text();
+      resultSet.last = setElem.firstChildElement("last").text();
+      emit serverCollectionLoaded(AStanza.id(),collection,resultSet);
     }
     FRetrieveRequests.remove(AStanza.id());
   }
@@ -264,7 +264,8 @@ void MessageArchiver::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
     if (AStanza.type() == "result")
     {
       QList<IArchiveHeader> headers;
-      QDomElement chatElem = AStanza.firstElement("chat",NS_ARCHIVE);
+      QDomElement listElem = AStanza.firstElement("list",NS_ARCHIVE);
+      QDomElement chatElem = listElem.firstChildElement("chat");
       while (!chatElem.isNull())
       {
         IArchiveHeader header;
@@ -276,12 +277,15 @@ void MessageArchiver::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
         headers.append(header);
         chatElem = chatElem.nextSiblingElement("chat");
       }
-      QDomElement setElem = chatElem.firstChildElement("set");
+      QDomElement setElem = listElem.firstChildElement("set");
       while (!setElem.isNull() && setElem.namespaceURI()!=NS_RESULTSET)
         setElem = setElem.nextSiblingElement("set");
-      int count = setElem.firstChildElement("count").text().toInt();
-      QString last = setElem.firstChildElement("last").text();
-      emit serverHeadersLoaded(AStanza.id(),headers,last,count);
+      IArchiveResultSet resultSet;
+      resultSet.count = setElem.firstChildElement("count").text().toInt();
+      resultSet.index = setElem.firstChildElement("first").attribute("index").toInt();
+      resultSet.first = setElem.firstChildElement("first").text();
+      resultSet.last = setElem.firstChildElement("last").text();
+      emit serverHeadersLoaded(AStanza.id(),headers,resultSet);
     }
     FListRequests.remove(AStanza.id());
   }
@@ -313,23 +317,26 @@ void MessageArchiver::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
         {
           modif.action =  modif.header.version == 0 ? IArchiveModification::Created : IArchiveModification::Modified;
           modifs.items.append(modif);
+          modifs.endTime = modif.header.start;
         }
         else if (changeElem.tagName() == "removed")
         {
           modif.action = IArchiveModification::Removed;
           modifs.items.append(modif);
+          modifs.endTime = modif.header.start;
         }
         changeElem = changeElem.nextSiblingElement();
       }
 
-      QDomElement setElem = changeElem.firstChildElement("set");
+      QDomElement setElem = modifsElem.firstChildElement("set");
       while (!setElem.isNull() && setElem.namespaceURI()!=NS_RESULTSET)
         setElem = setElem.nextSiblingElement("set");
-      int count = setElem.firstChildElement("count").text().toInt();
-      QString last = setElem.firstChildElement("last").text();
-
-      modifs.endTime = last;
-      emit serverModificationsLoaded(AStanza.id(),modifs,last,count);
+      IArchiveResultSet resultSet;
+      resultSet.count = setElem.firstChildElement("count").text().toInt();
+      resultSet.index = setElem.firstChildElement("first").attribute("index").toInt();
+      resultSet.first = setElem.firstChildElement("first").text();
+      resultSet.last = setElem.firstChildElement("last").text();
+      emit serverModificationsLoaded(AStanza.id(),modifs,resultSet);
     }
     FModifyRequests.remove(AStanza.id());
   }
@@ -522,11 +529,11 @@ IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const
   return prefs.defaultPrefs;
 }
 
-QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool &AAuto)
+QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto)
 {
   if (isSupported(AStreamJid))
   {
-    Stanza autoSave;
+    Stanza autoSave("iq");
     autoSave.setType("set").setId(FStanzaProcessor->newId());
     QDomElement autoElem = autoSave.addElement("auto",NS_ARCHIVE);
     autoElem.setAttribute("save",QVariant(AAuto).toString());
@@ -707,16 +714,38 @@ void MessageArchiver::removeArchiveHandler(IArchiveHandler *AHandler, int AOrder
   FArchiveHandlers.remove(AOrder,AHandler);
 }
 
+bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
+{
+  bool directionIn = AItemJid == AMessage.from();
+  if (isReady(AStreamJid) && AItemJid.isValid() && !AMessage.body().isEmpty())
+  {
+    CollectionWriter *writer = findCollectionWriter(AStreamJid,AItemJid,AMessage.threadId());
+    if (!writer)
+    {
+      QDateTime currentTime = QDateTime::currentDateTime();
+      IArchiveHeader header;
+      header.with = AItemJid;
+      header.start = currentTime.addMSecs(-currentTime.time().msec());
+      header.subject = AMessage.subject();
+      header.threadId = AMessage.threadId();
+      header.version = 0;
+      writer = newCollectionWriter(AStreamJid,header);
+    }
+    if (writer)
+      return writer->writeMessage(AMessage,archiveItemPrefs(AStreamJid,AItemJid).save,directionIn);
+  }
+  return false;
+}
+
 bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId)
 {
   if (isReady(AStreamJid) && AItemJid.isValid() && !ANote.isEmpty())
   {
-    Jid with(AItemJid.node(),AItemJid.domain(),"");
-    CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AThreadId);
+    CollectionWriter *writer = findCollectionWriter(AStreamJid,AItemJid,AThreadId);
     if (!writer)
     {
       IArchiveHeader header;
-      header.with = with;
+      header.with = AItemJid;
       header.start = QDateTime::currentDateTime();
       header.subject = "";
       header.threadId = AThreadId;
@@ -729,28 +758,12 @@ bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const
   return false;
 }
 
-bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
+Jid MessageArchiver::gateJid( const Jid &AContactJid ) const
 {
-  bool directionIn = AItemJid == AMessage.from();
-  if (isReady(AStreamJid) && AItemJid.isValid() && !AMessage.body().isEmpty())
-  {
-    Jid with(AItemJid.node(),AItemJid.domain(),"");
-    CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
-    if (!writer)
-    {
-      QDateTime currentTime = QDateTime::currentDateTime();
-      IArchiveHeader header;
-      header.with = with;
-      header.start = currentTime.addMSecs(-currentTime.time().msec());
-      header.subject = AMessage.subject();
-      header.threadId = AMessage.threadId();
-      header.version = 0;
-      writer = newCollectionWriter(AStreamJid,header);
-    }
-    if (writer)
-      return writer->writeMessage(AMessage,archiveItemPrefs(AStreamJid,AItemJid).save,directionIn);
-  }
-  return false;
+  Jid gate = AContactJid;
+  if (!gate.node().isEmpty() && FGatewayTypes.contains(gate.domain()))
+    gate.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(gate.domain())));
+  return gate;
 }
 
 QList<Message> MessageArchiver::findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const
@@ -830,12 +843,6 @@ QList<IArchiveHeader> MessageArchiver::loadLocalHeaders(const Jid &AStreamJid, c
     if (ARequest.threadId.isNull() || ARequest.threadId == header.threadId)
       headers.append(header);
   }
-
-  if (ARequest.order == Qt::AscendingOrder)
-    qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
-  else
-    qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
-
   return headers;
 }
 
@@ -1123,7 +1130,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
       QDomElement autoElem = AElem.firstChildElement("auto");
       if (!autoElem.isNull())
       {
-        prefs.autoSave = QVariant(autoElem.attribute("save")).toBool();
+        prefs.autoSave = QVariant(autoElem.attribute("save","false")).toBool();
       }
 
       QDomElement defElem = AElem.firstChildElement("default");
@@ -1171,7 +1178,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
       }
       else if (initPrefs)
       {
-        //insertReplicator(AStreamJid);
+        insertReplicator(AStreamJid);
       }
 
       emit archivePrefsChanged(AStreamJid,prefs);
@@ -1181,10 +1188,11 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 
 QString MessageArchiver::collectionDirName(const Jid &AJid) const
 {
-  Jid jid = AJid;
-  if (!jid.node().isEmpty() && FGatewayTypes.contains(jid.domain()))
-    jid.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(jid.domain())));
-  return Jid::encode(jid.pBare());
+  Jid jid = gateJid(AJid);
+  QString dirName = Jid::encode(jid.pBare());
+  if (!jid.resource().isEmpty())
+    dirName += "/"+Jid::encode(jid.pResource());
+  return dirName;
 }
 
 QString MessageArchiver::collectionFileName(const DateTime &AStart) const
@@ -1208,22 +1216,17 @@ QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWi
     noError &= dir.mkdir(ARCHIVE_DIRNAME);
   noError &= dir.cd(ARCHIVE_DIRNAME);
 
-  if (AStreamJid.isValid())
+  if (noError && AStreamJid.isValid())
   {
-    QString streamDir = collectionDirName(AStreamJid);
+    QString streamDir = collectionDirName(AStreamJid.bare());
     if (!dir.exists(streamDir))
       noError &= dir.mkdir(streamDir);
     noError &= dir.cd(streamDir);
   }
 
-  if (AWith.isValid())
+  if (noError && AWith.isValid())
   {
-    Jid with = AWith;
-
-    if (!with.node().isEmpty() && FGatewayTypes.contains(with.domain()))
-      with.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(with.domain())));
-
-    QString withDir = collectionDirName(with);
+    QString withDir = collectionDirName(AWith);
     if (!dir.exists(withDir))
       noError &= dir.mkdir(withDir);
     noError &= dir.cd(withDir);
@@ -1244,50 +1247,66 @@ QString MessageArchiver::collectionFilePath(const Jid &AStreamJid, const Jid &AW
   return QString();
 }
 
-QStringList MessageArchiver::findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const
+QMultiMap<QString,QString> MessageArchiver::filterCollectionFiles(const QStringList &AFiles, const IArchiveRequest &ARequest, 
+                                                                  const QString &APrefix) const
 {
-  QStringList files;
-  QString dirPath = collectionDirPath(AStreamJid,Jid());
-  if (AStreamJid.isValid() && !dirPath.isEmpty())
+  QMultiMap<QString,QString> filesMap;
+  if (!AFiles.isEmpty())
   {
-    QDir dir(dirPath);
-    QStringList dirList;
-    if (ARequest.with.isValid())
-      dirList += collectionDirName(ARequest.with);
-    else
-      dirList = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-
     QString startName = collectionFileName(ARequest.start);
     QString endName = collectionFileName(ARequest.end);
-    foreach(QString dirName, dirList)
+    foreach(QString file, AFiles)
+      if ((startName.isEmpty() || startName<=file) && (endName.isEmpty() || endName>=file))
+        filesMap.insert(file,APrefix);
+  }
+  return filesMap;
+}
+
+QStringList MessageArchiver::findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const
+{
+  QMultiMap<QString,QString> filesMap;
+  QString dirPath = collectionDirPath(AStreamJid,ARequest.with.bare());
+  QDir dir(dirPath);
+  if (AStreamJid.isValid() && dir.exists())
+  {
+    if (ARequest.with.isValid())
+      filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,""));
+    QStringList dirs1 = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach (QString dir1, dirs1)
     {
-      dir.cd(dirName);
-      QStringList dirFiles = dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files);
-      if (dirFiles.count()>ARequest.count)
+      dir.cd(dir1);
+      QString dir1Prefix = dir1+"/";
+      filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,dir1Prefix));
+      if (!ARequest.with.isValid())
       {
-        if (ARequest.order == Qt::AscendingOrder)
-          qSort(dirFiles.begin(),dirFiles.end(),qLess<QString>());
-        else
-          qSort(dirFiles.begin(),dirFiles.end(),qGreater<QString>());
-      }
-      for(int i =0, dirCount=0; i<dirFiles.count() && dirCount<ARequest.count; i++)
-      {
-        const QString &file = dirFiles.at(i);
-        if ( (startName.isEmpty() || startName<=file) && (endName.isEmpty() || file<=endName) )
+        QStringList dirs2 = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        foreach (QString dir2, dirs2)
         {
-          dirCount++;
-          files.append(dir.absoluteFilePath(file));
+          dir.cd(dir2);
+          QString dir2Prefix = dir1Prefix+dir2+"/";
+          filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,dir2Prefix));
+          dir.cdUp();
         }
       }
       dir.cdUp();
     }
-    if (ARequest.order == Qt::AscendingOrder)
-      qSort(files.begin(),files.end(),qLess<QString>());
-    else
-      qSort(files.begin(),files.end(),qGreater<QString>());
-    files = files.mid(0,ARequest.count);
+
+    QStringList files;
+    QMapIterator<QString,QString> it(filesMap);
+    if (ARequest.order == Qt::DescendingOrder)
+      it.toBack();
+    while (files.count()<ARequest.count && (ARequest.order==Qt::AscendingOrder ? it.hasNext() : it.hasPrevious()))
+    {
+      if (ARequest.order == Qt::AscendingOrder)
+        it.next();
+      else
+        it.previous();
+      files.append(dir.absoluteFilePath(it.value()+it.key()));
+    }
+
+    return files;
   }
-  return files;
+  return QStringList();
 }
 
 IArchiveHeader MessageArchiver::loadCollectionHeader(const QString &AFileName) const
@@ -1364,12 +1383,13 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
     {
       Message message;
 
-      QString resource = nodeElem.attribute("name");
-      Jid contactJid(ACollection.header.with.node(),ACollection.header.with.domain(),resource);
+      Jid with = ACollection.header.with;
+      QString nick = nodeElem.attribute("name");
+      Jid contactJid(with.node(),with.domain(),nick.isEmpty() ? with.resource() : nick);
 
       nodeElem.tagName()=="to" ? message.setTo(contactJid.eFull()) : message.setFrom(contactJid.eFull());
 
-      if (!resource.isEmpty())
+      if (!nick.isEmpty())
         message.setType(Message::GroupChat);
 
       QString utc = nodeElem.attribute("utc");

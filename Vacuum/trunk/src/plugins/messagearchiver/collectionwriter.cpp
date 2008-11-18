@@ -113,7 +113,7 @@ void CollectionWriter::startCollection()
   FCloseTimer.stop();
   FXmlWriter->setAutoFormatting(true);
   FXmlWriter->writeStartElement("chat");
-  FXmlWriter->writeAttribute("with",FHeader.with.eBare());
+  FXmlWriter->writeAttribute("with",FHeader.with.eFull());
   FXmlWriter->writeAttribute("start",DateTime(FHeader.start).toX85UTC());
   FXmlWriter->writeAttribute("version",QString::number(FHeader.version));
   if (!FHeader.subject.isEmpty())

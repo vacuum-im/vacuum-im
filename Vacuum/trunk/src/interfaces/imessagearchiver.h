@@ -114,6 +114,13 @@ struct IArchiveFilter
   QRegExp body;
 };
 
+struct IArchiveResultSet {
+  int count;
+  int index;
+  QString first;
+  QString last;
+};
+
 class IArchiveHandler
 {
 public:
@@ -170,7 +177,7 @@ public:
   virtual QString expireName(int AExpire) const =0;
   virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
   virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const =0;
-  virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool &AAuto) =0;
+  virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto) =0;
   virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
   virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) =0;
   virtual IArchiveWindow *showArchiveWindow(const Jid &AStreamJid, const IArchiveFilter &AFilter, int AGroupKind, QWidget *AParent = NULL) =0;
@@ -181,6 +188,7 @@ public:
   virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage) =0;
   virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = "") =0;
   //Local Archive
+  virtual Jid gateJid(const Jid &AContactJid) const =0;
   virtual QList<Message> findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const =0;
   virtual bool hasLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const =0;
   virtual bool saveLocalCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, bool AAppend = true) =0;
@@ -209,10 +217,10 @@ signals:
   virtual void localCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
   //Server Archive
   virtual void serverCollectionSaved(const QString &AId, const IArchiveHeader &Aheader) =0;
-  virtual void serverHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const QString &ALast, int ACount) =0;
-  virtual void serverCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const QString &ALast, int ACount) =0;
+  virtual void serverHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const IArchiveResultSet &AResult) =0;
+  virtual void serverCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection,  const IArchiveResultSet &AResult) =0;
   virtual void serverCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest) =0;
-  virtual void serverModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const QString &ALast, int ACount) =0;
+  virtual void serverModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult) =0;
   //ArchiveWindow
   virtual void archiveWindowCreated(IArchiveWindow *AWindow) =0;
   virtual void archiveWindowDestroyed(IArchiveWindow *AWindow) =0;

@@ -81,8 +81,8 @@ protected:
 protected slots:
   void onLocalCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
   void onLocalCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
-  void onServerHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const QString &ALast, int ACount);
-  void onServerCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const QString &ALast, int ACount);
+  void onServerHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const IArchiveResultSet &AResult);
+  void onServerCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const IArchiveResultSet &AResult);
   void onServerCollectionSaved(const QString &AId, const IArchiveHeader &AHeader);
   void onServerCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
   void onRequestFailed(const QString &AId, const QString &AError);
@@ -116,13 +116,13 @@ private:
   QTimer FInvalidateTimer;
   Jid FStreamJid;
   IArchiveFilter FFilter;
+  IArchiveHeader FCurrentHeader;
+  QList<IArchiveRequest> FRequestList;
   QHash<QString,IArchiveRequest> FHeaderRequests;
-  QHash<QString,IArchiveHeader>FCollectionRequests;
+  QHash<QString,IArchiveHeader> FCollectionRequests;
   QHash<QString,IArchiveHeader> FRenameRequests;
   QHash<QString,IArchiveHeader> FRemoveRequests;
-  QList<IArchiveRequest> FRequestList;
   QMap<IArchiveHeader,IArchiveCollection> FCollections;
-  IArchiveHeader FCurrentHeader;
 };
 
 #endif // VIEWHISTORYWINDOW_H

@@ -14,7 +14,9 @@ public:
   Replicator(IMessageArchiver *AArchiver, const Jid &AStreamJid, const QString &ADirPath, QObject *AParent);
   ~Replicator();
   const Jid &streamJid() const { return FStreamJid; }
-  QDateTime replicationPoint() const { return FServerLast.toLocal(); }
+  bool local2ServerReplication() const { return false; }
+  bool server2localReplication() const { return FServer2Local; }
+  QDateTime replicationPoint() const;
 protected:
   bool loadStatus();
   bool saveStatus();
@@ -23,17 +25,22 @@ protected:
 protected slots:
   void onStartTimerTimeout();
   void onStepTimerTimeout();
-  void onServerCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const QString &ALast, int ACount);
-  void onServerModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const QString &ALast, int ACount);
+  void onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
+  void onServerCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const IArchiveResultSet &AResult);
+  void onServerModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult);
   void onRequestFailed(const QString &AId, const QString &AError);
 private:
   IMessageArchiver *FArchiver;
 private:
+  bool FServer2Local;
+  bool FLocal2Server;
   QTimer FStartTimer;
   QTimer FStepTimer;
 private:
+  QString FReplicationLast;
+  DateTime FReplicationStart;
+  DateTime FReplicationPoint;
   QString FServerRequest;
-  DateTime FServerLast;
   IArchiveModifications FServerModifs;
   IArchiveCollection FServerCollection;
 private:

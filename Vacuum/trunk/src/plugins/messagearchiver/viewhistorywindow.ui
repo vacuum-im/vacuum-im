@@ -23,16 +23,7 @@
   </property>
   <widget class="QWidget" name="centralWidget" >
    <layout class="QVBoxLayout" >
-    <property name="leftMargin" >
-     <number>3</number>
-    </property>
-    <property name="topMargin" >
-     <number>3</number>
-    </property>
-    <property name="rightMargin" >
-     <number>3</number>
-    </property>
-    <property name="bottomMargin" >
+    <property name="margin" >
      <number>3</number>
     </property>
     <item>
@@ -44,16 +35,7 @@
        <bool>true</bool>
       </property>
       <layout class="QVBoxLayout" >
-       <property name="leftMargin" >
-        <number>2</number>
-       </property>
-       <property name="topMargin" >
-        <number>2</number>
-       </property>
-       <property name="rightMargin" >
-        <number>2</number>
-       </property>
-       <property name="bottomMargin" >
+       <property name="margin" >
         <number>2</number>
        </property>
        <item>
@@ -100,9 +82,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="lblWith" >
+          <widget class="QLabel" name="lblContact" >
            <property name="text" >
-            <string>With:</string>
+            <string>Contact:</string>
            </property>
            <property name="buddy" >
             <cstring>cmbContact</cstring>
@@ -170,16 +152,7 @@
         <bool>true</bool>
        </property>
        <layout class="QVBoxLayout" >
-        <property name="leftMargin" >
-         <number>2</number>
-        </property>
-        <property name="topMargin" >
-         <number>2</number>
-        </property>
-        <property name="rightMargin" >
-         <number>2</number>
-        </property>
-        <property name="bottomMargin" >
+        <property name="margin" >
          <number>2</number>
         </property>
         <item>

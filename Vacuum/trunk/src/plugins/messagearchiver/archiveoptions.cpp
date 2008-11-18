@@ -218,11 +218,15 @@ void ArchiveOptions::apply()
     if (!requestId.isEmpty())
       FSaveRequests.append(requestId);
 
-    if (!FSaveRequests.isEmpty())
+    if (prefs.autoSave != ui.chbAutoSave->isChecked())
     {
-      FLastError.clear();
-      updateWidget();
+      requestId = FArchiver->setArchiveAutoSave(FStreamJid,ui.chbAutoSave->isChecked());
+      if (!requestId.isEmpty())
+        FSaveRequests.append(requestId);
     }
+
+    FLastError.clear();
+    updateWidget();
   }
 }
 

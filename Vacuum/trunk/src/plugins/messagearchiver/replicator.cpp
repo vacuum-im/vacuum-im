@@ -1,6 +1,9 @@
 #include "replicator.h"
 
+#include <QtDebug>
 #include <QFile>
+
+#define MAX_MODIFICATIONS         5
 
 #define START_INTERVAL            5*60*1000
 #define STEP_INTERVAL             10*1000
@@ -9,13 +12,13 @@
 #define REPLICATION_TAG           "replication"
 #define SERVER2LOCAL_TAG          "server2local"
 
-#define MAX_MODIFICATIONS         5
-
 Replicator::Replicator(IMessageArchiver *AArchiver, const Jid &AStreamJid, const QString &ADirPath, QObject *AParent) : QObject(AParent)
 {
   FArchiver = AArchiver;
   FStreamJid = AStreamJid;
   FDirPath = ADirPath;
+  FLocal2Server = false;
+  FServer2Local = false;
 
   FStartTimer.setSingleShot(true);
   connect(&FStartTimer,SIGNAL(timeout()),SLOT(onStartTimerTimeout()));
@@ -23,19 +26,30 @@ Replicator::Replicator(IMessageArchiver *AArchiver, const Jid &AStreamJid, const
   FStepTimer.setSingleShot(true);
   connect(&FStepTimer,SIGNAL(timeout()),SLOT(onStepTimerTimeout()));
 
-  connect(FArchiver->instance(),SIGNAL(serverCollectionLoaded(const QString &, const IArchiveCollection &, const QString &, int)),
-    SLOT(onServerCollectionLoaded(const QString &, const IArchiveCollection &, const QString &, int )));
-  connect(FArchiver->instance(),SIGNAL(serverModificationsLoaded(const QString &, const IArchiveModifications &, const QString &, int)),
-    SLOT(onServerModificationsLoaded(const QString &, const IArchiveModifications &, const QString &, int)));
+  connect(FArchiver->instance(),SIGNAL(serverCollectionLoaded(const QString &, const IArchiveCollection &, const IArchiveResultSet &)),
+    SLOT(onServerCollectionLoaded(const QString &, const IArchiveCollection &, const IArchiveResultSet &)));
+  connect(FArchiver->instance(),SIGNAL(serverModificationsLoaded(const QString &, const IArchiveModifications &, const IArchiveResultSet &)),
+    SLOT(onServerModificationsLoaded(const QString &, const IArchiveModifications &, const IArchiveResultSet &)));
   connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
     SLOT(onRequestFailed(const QString &, const QString &)));
 
-  FStartTimer.start(STEP_INTERVAL);
+  if (loadStatus())
+  {
+    FReplicationLast = "";
+    FReplicationStart = FReplicationPoint;
+    connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)),
+      SLOT(onArchivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)));
+  }
 }
 
 Replicator::~Replicator()
 {
 
+}
+
+QDateTime Replicator::replicationPoint() const
+{
+  return FReplicationPoint.isValid() ? FReplicationPoint.toLocal() : QDateTime::currentDateTime();
 }
 
 bool Replicator::loadStatus()
@@ -57,7 +71,7 @@ bool Replicator::loadStatus()
     return false;
 
   QDomElement s2lElem = doc.documentElement().firstChildElement(SERVER2LOCAL_TAG);
-  FServerLast = s2lElem.attribute("last","1970-01-01T00:00:00Z");
+  FReplicationPoint = s2lElem.attribute("point","1970-01-01T00:00:00Z");
   return true;
 }
 
@@ -82,7 +96,7 @@ bool Replicator::saveStatus()
   QDomElement s2lElem = rootElem.firstChildElement(SERVER2LOCAL_TAG);
   if (s2lElem.isNull())
     s2lElem = rootElem.appendChild(doc.createElement(SERVER2LOCAL_TAG)).toElement();
-  s2lElem.setAttribute("last",FServerLast.toX85UTC());
+  s2lElem.setAttribute("point",FReplicationPoint.toX85UTC());
 
   if (file.open(QFile::WriteOnly|QFile::Truncate))
   {
@@ -105,18 +119,15 @@ void Replicator::nextStep()
 
 void Replicator::onStartTimerTimeout()
 {
-  if (loadStatus())
-    FServerRequest = FArchiver->loadServerModifications(FStreamJid,FServerLast.toLocal(),MAX_MODIFICATIONS);
-  else
-    FServerRequest.clear();
+  FServerRequest = FArchiver->loadServerModifications(FStreamJid,FReplicationStart.toLocal(),MAX_MODIFICATIONS,FReplicationLast);
   if (FServerRequest.isEmpty())
     restart();
 }
 
 void Replicator::onStepTimerTimeout()
 {
-  bool accepted = false;
-  while (!accepted && !FServerModifs.items.isEmpty())
+  bool loading = false;
+  while (!loading && !FServerModifs.items.isEmpty())
   {
     IArchiveModification modif = FServerModifs.items.takeFirst();
     if (modif.action != IArchiveModification::Removed)
@@ -124,7 +135,7 @@ void Replicator::onStepTimerTimeout()
       IArchiveHeader header = FArchiver->loadLocalHeader(FStreamJid,modif.header.with,modif.header.start);
       if (header!=modif.header || header.version < modif.header.version)
       {
-        accepted = true;
+        loading = true;
         FServerRequest = FArchiver->loadServerCollection(FStreamJid,modif.header);
         if (!FServerRequest.isEmpty())
         {
@@ -141,24 +152,43 @@ void Replicator::onStepTimerTimeout()
     }
   }
   
-  if (!accepted && FServerModifs.items.isEmpty())
+  if (!loading && FServerModifs.items.isEmpty())
   {
-    FServerLast = FServerModifs.endTime;
     saveStatus();
     restart();
   }
 }
 
-void Replicator::onServerCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const QString &ALast, int /*ACount*/)
+void Replicator::onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
+{
+  if (AStreamJid == FStreamJid)
+  {
+    bool server2Local = APrefs.methodLocal!=ARCHIVE_METHOD_FORBID;
+    if (server2Local != FServer2Local)
+    {
+      if (FServer2Local)
+      {
+        FStartTimer.stop();
+        FStepTimer.stop();
+        FServerRequest.clear();
+      }
+      else
+        FStartTimer.start(STEP_INTERVAL);
+      FServer2Local = server2Local;
+    }
+  }
+}
+
+void Replicator::onServerCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const IArchiveResultSet &AResult)
 {
   if (FServerRequest == AId)
   {
     FServerCollection.header = ACollection.header;
     FServerCollection.messages += ACollection.messages;
     FServerCollection.notes += ACollection.notes;
-    if (!ACollection.messages.isEmpty() || !ACollection.notes.isEmpty())
+    if (!AResult.last.isEmpty() && AResult.index+ACollection.messages.count()+ACollection.notes.count()<AResult.count)
     {
-      FServerRequest = FArchiver->loadServerCollection(FStreamJid,ACollection.header,ALast);
+      FServerRequest = FArchiver->loadServerCollection(FStreamJid,ACollection.header,AResult.last);
       if (FServerRequest.isEmpty())
         restart();
     }
@@ -168,41 +198,28 @@ void Replicator::onServerCollectionLoaded(const QString &AId, const IArchiveColl
       nextStep();
     }
     else
+    {
       nextStep();
+    }
   }
 }
 
-void Replicator::onServerModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const QString &/*ALast*/, int /*ACount*/)
+void Replicator::onServerModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult)
 {
   if (FServerRequest == AId)
   {
-    FServerModifs.startTime = AModifs.startTime;
-    FServerModifs.endTime = AModifs.endTime;
-    FServerModifs.items.clear();
-
-    if (!AModifs.items.isEmpty())
-    {
-      foreach(IArchiveModification modif, AModifs.items)
-      {
-        if (modif.action == IArchiveModification::Created)
-        {
-          FServerModifs.items.append(modif);
-        }
-        else if (modif.action == IArchiveModification::Modified)
-        {
-          FServerModifs.items.append(modif);
-        }
-        else if (modif.action == IArchiveModification::Removed)
-        {
-          FServerModifs.items.append(modif);
-        }
-      }
-    }
-
+    FServerModifs = AModifs;
     if (!FServerModifs.items.isEmpty())
+    {
+      FReplicationLast = AResult.last;
+      FReplicationPoint = AModifs.endTime;
       nextStep();
+    }
     else
+    {
+      FReplicationPoint = QDateTime::currentDateTime();
       restart();
+    }
   }
 }
 
