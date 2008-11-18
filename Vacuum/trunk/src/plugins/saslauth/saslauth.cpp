@@ -119,7 +119,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
         QString realm = params.value("realm");
         if (realm.isEmpty())
           realm = FXmppStream->jid().pDomain();
-        QString user = FXmppStream->jid().pNode();
+        QString user = FXmppStream->jid().eNode();
         QString pass = FXmppStream->password();
         QString nonce = params.value("nonce");
         QByteArray randBytes(32,' ');
