@@ -716,15 +716,15 @@ void MessageArchiver::removeArchiveHandler(IArchiveHandler *AHandler, int AOrder
 
 bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
 {
-  bool directionIn = AItemJid == AMessage.from();
   if (isReady(AStreamJid) && AItemJid.isValid() && !AMessage.body().isEmpty())
   {
-    CollectionWriter *writer = findCollectionWriter(AStreamJid,AItemJid,AMessage.threadId());
+    Jid itemJid = AMessage.type()==Message::GroupChat ? AItemJid.bare() : AItemJid;
+    CollectionWriter *writer = findCollectionWriter(AStreamJid,itemJid,AMessage.threadId());
     if (!writer)
     {
       QDateTime currentTime = QDateTime::currentDateTime();
       IArchiveHeader header;
-      header.with = AItemJid;
+      header.with = itemJid;
       header.start = currentTime.addMSecs(-currentTime.time().msec());
       header.subject = AMessage.subject();
       header.threadId = AMessage.threadId();
@@ -732,7 +732,10 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
       writer = newCollectionWriter(AStreamJid,header);
     }
     if (writer)
-      return writer->writeMessage(AMessage,archiveItemPrefs(AStreamJid,AItemJid).save,directionIn);
+    {
+      bool directionIn = AItemJid == AMessage.from();
+      return writer->writeMessage(AMessage,archiveItemPrefs(AStreamJid,itemJid).save,directionIn);
+    }
   }
   return false;
 }

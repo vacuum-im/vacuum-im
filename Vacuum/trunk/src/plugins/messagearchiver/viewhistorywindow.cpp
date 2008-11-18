@@ -600,7 +600,10 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
       else
       {
         FViewWidget->setShowKind(IViewWidget::ChatMessage);
-        FViewWidget->setNickForJid(ACollection.header.with, FRoster!=NULL ? FRoster->rosterItem(ACollection.header.with).name : QString());
+        if (!ACollection.header.with.pDomain().startsWith("conference."))
+          FViewWidget->setNickForJid(ACollection.header.with, FRoster!=NULL ? FRoster->rosterItem(ACollection.header.with).name : QString());
+        else
+          FViewWidget->setNickForJid(ACollection.header.with, ACollection.header.with.resource());
       }
     }
 
