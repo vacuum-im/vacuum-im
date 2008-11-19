@@ -88,6 +88,8 @@ public:
   virtual IArchiveModifications loadLocalModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const;
   //Server Archive
   virtual QDateTime replicationPoint(const Jid &AStreamJid) const;
+  virtual bool replicationEnabled(const Jid &AStreamJid) const;
+  virtual void setReplicationEnabled(const Jid &AStreamJid, bool AEnabled);
   virtual QString saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);
   virtual QString loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = "");
   virtual QString loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = "");

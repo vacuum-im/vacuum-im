@@ -31,6 +31,8 @@
 #define ADR_FILTER_END        Action::DR_Parametr3
 #define ADR_GROUP_KIND        Action::DR_Parametr4
 
+#define AVN_REPLICATION       "archiveReplication"
+
 #define IN_HISTORY            "psi/history"
 
 MessageArchiver::MessageArchiver()
@@ -957,6 +959,32 @@ QDateTime MessageArchiver::replicationPoint(const Jid &AStreamJid) const
   return QDateTime();
 }
 
+bool MessageArchiver::replicationEnabled(const Jid &AStreamJid) const
+{
+  if (isSupported(AStreamJid))
+  {
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+    if (account)
+      return account->value(AVN_REPLICATION,false).toBool();
+  }
+  return false;
+}
+
+void MessageArchiver::setReplicationEnabled(const Jid &AStreamJid, bool AEnabled)
+{
+  if (isSupported(AStreamJid))
+  {
+    if (AEnabled)
+      insertReplicator(AStreamJid);
+    else
+      removeReplicator(AStreamJid);
+
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+    if (account)  
+      account->setValue(AVN_REPLICATION,AEnabled);
+  }
+}
+
 QString MessageArchiver::saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
 {
   if (FStanzaProcessor && isSupported(AStreamJid) && ACollection.header.with.isValid() && ACollection.header.start.isValid())
@@ -1179,7 +1207,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
           emit archiveItemPrefsRemoved(AStreamJid,itemJid);
         }
       }
-      else if (initPrefs)
+      else if (initPrefs && replicationEnabled(AStreamJid))
       {
         insertReplicator(AStreamJid);
       }

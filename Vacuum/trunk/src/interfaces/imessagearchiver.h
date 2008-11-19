@@ -199,6 +199,8 @@ public:
   virtual IArchiveModifications loadLocalModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const =0;
   //Server Archive
   virtual QDateTime replicationPoint(const Jid &AStreamJid) const =0;
+  virtual bool replicationEnabled(const Jid &AStreamJid) const =0;
+  virtual void setReplicationEnabled(const Jid &AStreamJid, bool AEnabled) =0;
   virtual QString saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection) =0;
   virtual QString loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = "") =0;
   virtual QString loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = "") =0;

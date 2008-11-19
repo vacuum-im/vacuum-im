@@ -13,9 +13,7 @@ class Replicator :
 public:
   Replicator(IMessageArchiver *AArchiver, const Jid &AStreamJid, const QString &ADirPath, QObject *AParent);
   ~Replicator();
-  const Jid &streamJid() const { return FStreamJid; }
-  bool local2ServerReplication() const { return false; }
-  bool server2localReplication() const { return FServer2Local; }
+  Jid streamJid() const;
   QDateTime replicationPoint() const;
 protected:
   bool loadStatus();
@@ -25,15 +23,12 @@ protected:
 protected slots:
   void onStartTimerTimeout();
   void onStepTimerTimeout();
-  void onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
   void onServerCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const IArchiveResultSet &AResult);
   void onServerModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult);
   void onRequestFailed(const QString &AId, const QString &AError);
 private:
   IMessageArchiver *FArchiver;
 private:
-  bool FServer2Local;
-  bool FLocal2Server;
   QTimer FStartTimer;
   QTimer FStepTimer;
 private:

@@ -6,13 +6,13 @@
     <x>0</x>
     <y>0</y>
     <width>415</width>
-    <height>479</height>
+    <height>485</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>ArchiveOptions</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
    <property name="margin" >
     <number>0</number>
    </property>
@@ -21,67 +21,91 @@
      <property name="title" >
       <string>Archiving Method</string>
      </property>
-     <layout class="QGridLayout" >
+     <layout class="QVBoxLayout" name="verticalLayout" >
       <property name="margin" >
        <number>5</number>
       </property>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="lblMethodLocal" >
-        <property name="text" >
-         <string>Local archiving method:</string>
-        </property>
-       </widget>
+      <item>
+       <layout class="QGridLayout" name="gridLayout" >
+        <item row="0" column="0" >
+         <widget class="QLabel" name="lblMethodLocal" >
+          <property name="text" >
+           <string>Local archiving:</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" >
+         <widget class="QLabel" name="lblMethodManual" >
+          <property name="text" >
+           <string>Manual archiving:</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" >
+         <widget class="QLabel" name="lblMethodAuto" >
+          <property name="text" >
+           <string>Auto archiving:</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QComboBox" name="cmbMethodLocal" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" >
+         <widget class="QComboBox" name="cmbMethodManual" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" >
+         <widget class="QComboBox" name="cmbMethodAuto" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
-      <item row="0" column="1" >
-       <widget class="QComboBox" name="cmbMethodLocal" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="lblMethodAuto" >
-        <property name="text" >
-         <string>Auto archiving method:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="cmbMethodAuto" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="lblMethodManual" >
-        <property name="text" >
-         <string>Manual archiving method:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" >
-       <widget class="QComboBox" name="cmbMethodManual" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2" >
-       <widget class="QCheckBox" name="chbAutoSave" >
-        <property name="text" >
-         <string>Enable server-side auto archiving</string>
-        </property>
-       </widget>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2" >
+        <item>
+         <widget class="QCheckBox" name="chbAutoSave" >
+          <property name="text" >
+           <string>Enable auto archiving</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chbReplication" >
+          <property name="text" >
+           <string>Enable replication</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

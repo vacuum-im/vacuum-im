@@ -17,8 +17,6 @@ Replicator::Replicator(IMessageArchiver *AArchiver, const Jid &AStreamJid, const
   FArchiver = AArchiver;
   FStreamJid = AStreamJid;
   FDirPath = ADirPath;
-  FLocal2Server = false;
-  FServer2Local = false;
 
   FStartTimer.setSingleShot(true);
   connect(&FStartTimer,SIGNAL(timeout()),SLOT(onStartTimerTimeout()));
@@ -37,14 +35,18 @@ Replicator::Replicator(IMessageArchiver *AArchiver, const Jid &AStreamJid, const
   {
     FReplicationLast = "";
     FReplicationStart = FReplicationPoint;
-    connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)),
-      SLOT(onArchivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)));
+    FStartTimer.start(STEP_INTERVAL);
   }
 }
 
 Replicator::~Replicator()
 {
 
+}
+
+Jid Replicator::streamJid() const
+{
+  return FStreamJid;
 }
 
 QDateTime Replicator::replicationPoint() const
@@ -156,26 +158,6 @@ void Replicator::onStepTimerTimeout()
   {
     saveStatus();
     restart();
-  }
-}
-
-void Replicator::onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
-{
-  if (AStreamJid == FStreamJid)
-  {
-    bool server2Local = APrefs.methodLocal!=ARCHIVE_METHOD_FORBID;
-    if (server2Local != FServer2Local)
-    {
-      if (FServer2Local)
-      {
-        FStartTimer.stop();
-        FStepTimer.stop();
-        FServerRequest.clear();
-      }
-      else
-        FStartTimer.start(STEP_INTERVAL);
-      FServer2Local = server2Local;
-    }
   }
 }
 
