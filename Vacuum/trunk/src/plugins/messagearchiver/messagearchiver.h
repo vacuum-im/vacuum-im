@@ -134,7 +134,7 @@ protected:
   void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
   void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const;
   bool saveLocalModofication(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const;
-  void insertReplicator(const Jid &AStreamJid);
+  Replicator *insertReplicator(const Jid &AStreamJid);
   void removeReplicator(const Jid &AStreamJid);
   bool prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
   bool processMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);

@@ -15,6 +15,8 @@ public:
   ~Replicator();
   Jid streamJid() const;
   QDateTime replicationPoint() const;
+  bool enabled() const;
+  void setEnabled(bool AEnabled);
 protected:
   bool loadStatus();
   bool saveStatus();
@@ -39,6 +41,7 @@ private:
   IArchiveModifications FServerModifs;
   IArchiveCollection FServerCollection;
 private:
+  bool FEnabled;
   Jid FStreamJid;
   QString FDirPath;
 };

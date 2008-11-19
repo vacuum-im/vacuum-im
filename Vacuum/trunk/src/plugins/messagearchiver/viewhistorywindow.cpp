@@ -10,6 +10,7 @@
 #define MAXIMUM_DATETIME      QDateTime::currentDateTime()
 
 #define ADR_GROUP_KIND        Action::DR_Parametr1
+#define ADR_SOURCE            Action::DR_Parametr1
 
 #define BIN_SPLITTER_STATE    "ArchiveWindowSplitterState"
 #define BIN_WINDOW_GEOMETRY   "ArchiveWindowGeometry"
@@ -84,6 +85,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   FArchiver = AArchiver;
   FStreamJid = AStreamJid;
   FGroupKind = GK_CONTACT;
+  FSource = AS_AUTO;
 
   QToolBar *groupsToolBar = this->addToolBar("Groups Tools");
   FGroupsTools = new ToolBarChanger(groupsToolBar);
@@ -120,6 +122,8 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   FInvalidateTimer.setSingleShot(true);
   connect(&FInvalidateTimer,SIGNAL(timeout()),SLOT(onInvalidateTimeout()));
 
+  connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)),
+    SLOT(onArchivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)));
   connect(FArchiver->instance(),SIGNAL(localCollectionSaved(const Jid &, const IArchiveHeader &)),
     SLOT(onLocalCollectionSaved(const Jid &, const IArchiveHeader &)));
   connect(FArchiver->instance(),SIGNAL(localCollectionRemoved(const Jid &, const IArchiveHeader &)),
@@ -139,6 +143,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   connect(ui.cmbContact->lineEdit(),SIGNAL(returnPressed()),SLOT(onApplyFilterClicked()));
 
   createGroupKindMenu();
+  createSourceMenu();
   createHeaderActions();
   initialize();
 }
@@ -200,11 +205,25 @@ QStandardItem *ViewHistoryWindow::findHeaderItem(const IArchiveHeader &AHeader, 
 
 void ViewHistoryWindow::setGroupKind(int AGroupKind)
 {
+  foreach (Action *action, FGroupKindMenu->actions())
+    action->setChecked(action->data(ADR_GROUP_KIND).toInt() == AGroupKind);
   if (FGroupKind != AGroupKind)
   {
     FGroupKind = AGroupKind;
     rebuildModel();
     emit groupKindChanged(AGroupKind);
+  }
+}
+
+void ViewHistoryWindow::setArchiveSource(int ASource)
+{
+  foreach (Action *action, FSourceMenu->actions())
+    action->setChecked(action->data(ADR_SOURCE).toInt() == ASource);
+  if (FSource != ASource)
+  {
+    FSource = ASource;
+    reload();
+    emit archiveSourceChanged(ASource);
   }
 }
 
@@ -236,7 +255,11 @@ void ViewHistoryWindow::initialize()
   
   IPlugin *plugin = manager->getPlugins("IRosterPlugin").value(0);
   if (plugin)
+  {
     FRoster = qobject_cast<IRosterPlugin *>(plugin->instance())->getRoster(FStreamJid);
+    if (FRoster)
+      connect(FRoster->xmppStream()->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+  }
 
   plugin = manager->getPlugins("IMessenger").value(0);
   if (plugin)
@@ -313,7 +336,20 @@ void ViewHistoryWindow::divideRequests(const QList<IArchiveRequest> &ARequests, 
                                        QList<IArchiveRequest> &AServer) const
 {
   QDateTime replPoint = FArchiver->replicationPoint(FStreamJid);
-  foreach (IArchiveRequest request, ARequests)
+  if (FSource == AS_LOCAL_ARCHIVE || !FArchiver->isSupported(FStreamJid))
+  {
+    ALocal = ARequests;
+  }
+  else if (FSource == AS_SERVER_ARCHIVE)
+  {
+    AServer = ARequests;
+  }
+  else if (!replPoint.isValid())
+  {
+    ALocal = ARequests;
+    AServer = ARequests;
+  }
+  else foreach (IArchiveRequest request, ARequests)
   {
     if (!replPoint.isValid() || request.end <= replPoint)
     {
@@ -553,15 +589,15 @@ void ViewHistoryWindow::processRequests(const QList<IArchiveRequest> &ARequests)
   QList<IArchiveRequest> serverRequests;
   divideRequests(ARequests,localRequests,serverRequests);
 
-  foreach(IArchiveRequest request, serverRequests)
-  {
-    loadServerHeaders(request);
-  }
-
   foreach(IArchiveRequest request, localRequests)
   {
     FRequestList.append(request);
     processHeaders(FArchiver->loadLocalHeaders(FStreamJid,request));
+  }
+
+  foreach(IArchiveRequest request, serverRequests)
+  {
+    loadServerHeaders(request);
   }
 }
 
@@ -666,41 +702,49 @@ void ViewHistoryWindow::createGroupKindMenu()
   FGroupKindMenu->setTitle(tr("Groups"));
 
   Action *action = new Action(FGroupKindMenu);
+  action->setCheckable(true);
   action->setText(tr("No groups"));
   action->setData(ADR_GROUP_KIND,GK_NO_GROUPS);
   connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
   FGroupKindMenu->addAction(action);
 
   action = new Action(FGroupKindMenu);
+  action->setCheckable(true);
   action->setText(tr("Date"));
   action->setData(ADR_GROUP_KIND,GK_DATE);
   connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
   FGroupKindMenu->addAction(action);
 
   action = new Action(FGroupKindMenu);
+  action->setCheckable(true);
+  action->setChecked(true);
   action->setText(tr("Contact"));
   action->setData(ADR_GROUP_KIND,GK_CONTACT);
   connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
   FGroupKindMenu->addAction(action);
 
   action = new Action(FGroupKindMenu);
+  action->setCheckable(true);
   action->setText(tr("Date and Contact"));
   action->setData(ADR_GROUP_KIND,GK_DATE_CONTACT);
   connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
   FGroupKindMenu->addAction(action);
   
   action = new Action(FGroupKindMenu);
+  action->setCheckable(true);
   action->setText(tr("Contact and Date"));
   action->setData(ADR_GROUP_KIND,GK_CONTACT_DATE);
   connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
   FGroupKindMenu->addAction(action);
 
   action = new Action(FGroupKindMenu);
+  action->setCheckable(true);
   action->setText(tr("Expand All"));
   connect(action,SIGNAL(triggered()),ui.trvCollections,SLOT(expandAll()));
   FGroupKindMenu->addAction(action,AG_DEFAULT+100);
 
   action = new Action(FGroupKindMenu);
+  action->setCheckable(true);
   action->setText(tr("Collapse All"));
   connect(action,SIGNAL(triggered()),ui.trvCollections,SLOT(collapseAll()));
   FGroupKindMenu->addAction(action,AG_DEFAULT+100);
@@ -708,6 +752,40 @@ void ViewHistoryWindow::createGroupKindMenu()
   QToolButton *button = FGroupsTools->addToolButton(FGroupKindMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
   button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   button->setPopupMode(QToolButton::InstantPopup);
+}
+
+void ViewHistoryWindow::createSourceMenu()
+{
+  FSourceMenu = new Menu(this);
+  FSourceMenu->setTitle(tr("Source"));
+
+  Action *action = new Action(FSourceMenu);
+  action->setCheckable(true);
+  action->setChecked(true);
+  action->setText(tr("Auto select"));
+  action->setData(ADR_SOURCE,AS_AUTO);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSourceByAction(bool)));
+  FSourceMenu->addAction(action,AG_DEFAULT-1);
+
+  action = new Action(FSourceMenu);
+  action->setCheckable(true);
+  action->setText(tr("Local archive"));
+  action->setData(ADR_SOURCE,AS_LOCAL_ARCHIVE);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSourceByAction(bool)));
+  FSourceMenu->addAction(action);
+
+  action = new Action(FSourceMenu);
+  action->setCheckable(true);
+  action->setText(tr("Server archive"));
+  action->setData(ADR_SOURCE,AS_SERVER_ARCHIVE);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSourceByAction(bool)));
+  FSourceMenu->addAction(action);
+
+  QToolButton *button = FGroupsTools->addToolButton(FSourceMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
+  button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  button->setPopupMode(QToolButton::InstantPopup);
+
+  FSourceMenu->setEnabled(FArchiver->isSupported(FStreamJid));
 }
 
 void ViewHistoryWindow::createHeaderActions()
@@ -952,6 +1030,16 @@ void ViewHistoryWindow::onChangeGroupKindByAction(bool)
   }
 }
 
+void ViewHistoryWindow::onChangeSourceByAction(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    int source = action->data(ADR_SOURCE).toInt();
+    setArchiveSource(source);
+  }
+}
+
 void ViewHistoryWindow::onHeaderActionTriggered(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
@@ -1011,3 +1099,14 @@ void ViewHistoryWindow::onHeaderActionTriggered(bool)
   }
 }
 
+void ViewHistoryWindow::onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &/*APrefs*/)
+{
+  if (AStreamJid == FStreamJid)
+    FSourceMenu->setEnabled(FArchiver->isSupported(FStreamJid));
+}
+
+void ViewHistoryWindow::onStreamClosed(IXmppStream *AXmppStream)
+{
+  if (AXmppStream->jid() == FStreamJid)
+    FSourceMenu->setEnabled(false);
+}

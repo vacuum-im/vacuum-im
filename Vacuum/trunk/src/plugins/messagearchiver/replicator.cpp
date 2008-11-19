@@ -17,6 +17,7 @@ Replicator::Replicator(IMessageArchiver *AArchiver, const Jid &AStreamJid, const
   FArchiver = AArchiver;
   FStreamJid = AStreamJid;
   FDirPath = ADirPath;
+  FEnabled = false;
 
   FStartTimer.setSingleShot(true);
   connect(&FStartTimer,SIGNAL(timeout()),SLOT(onStartTimerTimeout()));
@@ -34,8 +35,8 @@ Replicator::Replicator(IMessageArchiver *AArchiver, const Jid &AStreamJid, const
   if (loadStatus())
   {
     FReplicationLast = "";
-    FReplicationStart = FReplicationPoint;
-    FStartTimer.start(STEP_INTERVAL);
+    FReplicationStart = FReplicationPoint.isValid() ? FReplicationPoint : DateTime("1970-01-01T00:00:00Z");
+    setEnabled(true);
   }
 }
 
@@ -51,7 +52,30 @@ Jid Replicator::streamJid() const
 
 QDateTime Replicator::replicationPoint() const
 {
-  return FReplicationPoint.isValid() ? FReplicationPoint.toLocal() : QDateTime::currentDateTime();
+  return FReplicationPoint.toLocal();
+}
+
+bool Replicator::enabled() const
+{
+  return FEnabled;
+}
+
+void Replicator::setEnabled(bool AEnabled)
+{
+  if (FEnabled != AEnabled)
+  {
+    if (!AEnabled)
+    {
+      FStartTimer.stop();
+      FStepTimer.stop();
+      FServerRequest.clear();
+    }
+    else
+    {
+      FStartTimer.start(START_INTERVAL);
+    }
+    FEnabled = AEnabled;
+  }
 }
 
 bool Replicator::loadStatus()
@@ -73,7 +97,7 @@ bool Replicator::loadStatus()
     return false;
 
   QDomElement s2lElem = doc.documentElement().firstChildElement(SERVER2LOCAL_TAG);
-  FReplicationPoint = s2lElem.attribute("point","1970-01-01T00:00:00Z");
+  FReplicationPoint = s2lElem.attribute("point");
   return true;
 }
 
@@ -95,10 +119,13 @@ bool Replicator::saveStatus()
     rootElem.setAttribute("version","1.0");
   }
 
-  QDomElement s2lElem = rootElem.firstChildElement(SERVER2LOCAL_TAG);
-  if (s2lElem.isNull())
-    s2lElem = rootElem.appendChild(doc.createElement(SERVER2LOCAL_TAG)).toElement();
-  s2lElem.setAttribute("point",FReplicationPoint.toX85UTC());
+  if (FReplicationPoint.isValid())
+  {
+    QDomElement s2lElem = rootElem.firstChildElement(SERVER2LOCAL_TAG);
+    if (s2lElem.isNull())
+      s2lElem = rootElem.appendChild(doc.createElement(SERVER2LOCAL_TAG)).toElement();
+    s2lElem.setAttribute("point",FReplicationPoint.toX85UTC());
+  }
 
   if (file.open(QFile::WriteOnly|QFile::Truncate))
   {

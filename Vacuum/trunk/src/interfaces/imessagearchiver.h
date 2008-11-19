@@ -138,6 +138,11 @@ public:
     GK_DATE_CONTACT,
     GK_CONTACT_DATE
   };
+  enum ArchiveSource {
+    AS_LOCAL_ARCHIVE,
+    AS_SERVER_ARCHIVE,
+    AS_AUTO
+  };
 public :
   virtual QMainWindow *instance() =0;
   virtual const Jid &streamJid() const =0;
@@ -147,11 +152,14 @@ public :
   virtual QStandardItem *findHeaderItem(const IArchiveHeader &AHeader, QStandardItem *AParent = NULL) const =0;
   virtual int groupKind() const =0;
   virtual void setGroupKind(int AGroupKind) =0;
+  virtual int archiveSource() const =0;
+  virtual void setArchiveSource(int ASource) =0;
   virtual const IArchiveFilter &filter() const =0;
   virtual void setFilter(const IArchiveFilter &AFilter) =0;
   virtual void reload() =0;
 signals:
   virtual void groupKindChanged(int AGroupKind) =0;
+  virtual void archiveSourceChanged(int ASource) =0;
   virtual void filterChanged(const IArchiveFilter &AFilter) =0;
   virtual void itemCreated(QStandardItem *AItem) =0;
   virtual void itemContextMenu(QStandardItem *AItem, Menu *AMenu) =0;

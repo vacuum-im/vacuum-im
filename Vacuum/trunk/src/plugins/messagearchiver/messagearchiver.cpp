@@ -951,7 +951,7 @@ QDateTime MessageArchiver::replicationPoint(const Jid &AStreamJid) const
 {
   if (isReady(AStreamJid))
   {
-    if (isSupported(AStreamJid) && FReplicators.contains(AStreamJid))
+    if (FReplicators.contains(AStreamJid))
       return FReplicators.value(AStreamJid)->replicationPoint();
     else
       return QDateTime::currentDateTime();
@@ -972,13 +972,9 @@ bool MessageArchiver::replicationEnabled(const Jid &AStreamJid) const
 
 void MessageArchiver::setReplicationEnabled(const Jid &AStreamJid, bool AEnabled)
 {
-  if (isSupported(AStreamJid))
+  if (FReplicators.contains(AStreamJid))
   {
-    if (AEnabled)
-      insertReplicator(AStreamJid);
-    else
-      removeReplicator(AStreamJid);
-
+    FReplicators.value(AStreamJid)->setEnabled(AEnabled);
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
     if (account)  
       account->setValue(AVN_REPLICATION,AEnabled);
@@ -1207,9 +1203,11 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
           emit archiveItemPrefsRemoved(AStreamJid,itemJid);
         }
       }
-      else if (initPrefs && replicationEnabled(AStreamJid))
+      else if (initPrefs)
       {
-        insertReplicator(AStreamJid);
+        Replicator *replicator = insertReplicator(AStreamJid);
+        if (replicator)
+          replicator->setEnabled(replicationEnabled(AStreamJid));
       }
 
       emit archivePrefsChanged(AStreamJid,prefs);
@@ -1536,7 +1534,7 @@ bool MessageArchiver::saveLocalModofication(const Jid &AStreamJid, const IArchiv
   return false;
 }
 
-void MessageArchiver::insertReplicator(const Jid &AStreamJid)
+Replicator *MessageArchiver::insertReplicator(const Jid &AStreamJid)
 {
   if (isSupported(AStreamJid) && !FReplicators.contains(AStreamJid))
   {
@@ -1545,8 +1543,10 @@ void MessageArchiver::insertReplicator(const Jid &AStreamJid)
     {
       Replicator *replicator = new Replicator(this,AStreamJid,dirPath,this);
       FReplicators.insert(AStreamJid,replicator);
+      return replicator;
     }
   }
+  return NULL;
 }
 
 void MessageArchiver::removeReplicator(const Jid &AStreamJid)

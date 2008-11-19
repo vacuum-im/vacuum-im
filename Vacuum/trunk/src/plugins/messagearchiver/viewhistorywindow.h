@@ -42,11 +42,14 @@ public:
   virtual QStandardItem *findHeaderItem(const IArchiveHeader &AHeader, QStandardItem *AParent = NULL) const;
   virtual int groupKind() const { return FGroupKind; }
   virtual void setGroupKind(int AGroupKind);
+  virtual int archiveSource() const {return FSource; }
+  virtual void setArchiveSource(int ASource);
   virtual const IArchiveFilter &filter() const { return FFilter; }
   virtual void setFilter(const IArchiveFilter &AFilter);
   virtual void reload();
 signals:
   virtual void groupKindChanged(int AGroupKind);
+  virtual void archiveSourceChanged(int ASource);
   virtual void filterChanged(const IArchiveFilter &AFilter);
   virtual void itemCreated(QStandardItem *AItem);
   virtual void itemContextMenu(QStandardItem *AItem, Menu *AMenu);
@@ -76,6 +79,7 @@ protected:
   void clearModel();
   void rebuildModel();
   void createGroupKindMenu();
+  void createSourceMenu();
   void createHeaderActions();
   void updateHeaderActions();
 protected slots:
@@ -91,7 +95,10 @@ protected slots:
   void onApplyFilterClicked();
   void onInvalidateTimeout();
   void onChangeGroupKindByAction(bool);
+  void onChangeSourceByAction(bool);
   void onHeaderActionTriggered(bool);
+  void onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
+  void onStreamClosed(IXmppStream *AXmppStream);
 private:
   Ui::ViewHistoryWindowClass ui;
 private:
@@ -110,9 +117,11 @@ private:
   Action *FRemove;
   Action *FReload;
   Menu *FGroupKindMenu;
+  Menu *FSourceMenu;
   ToolBarChanger *FGroupsTools;
 private:
   int FGroupKind;
+  int FSource;
   QTimer FInvalidateTimer;
   Jid FStreamJid;
   IArchiveFilter FFilter;
