@@ -49,6 +49,7 @@
 #define DATAFORM_TYPE_SUBMIT            "submit"
 #define DATAFORM_TYPE_CANCEL            "cancel"
 #define DATAFORM_TYPE_RESULT            "result"
+#define DATAFORM_TYPE_TABLE             "_tabel_"
 
 #define MEDIAELEM_TYPE_IMAGE            "image"
 #define MEDIAELEM_TYPE_AUDIO            "audio"
@@ -213,13 +214,6 @@ public:
 class IDataForms
 {
 public:
-  enum FieldWriteMode {
-    FWM_FORM,
-    FWM_SUBMIT,
-    FWM_RESULT,
-    FWM_TABLE
-  };
-public:
   virtual QObject *instance() =0;
   //XML2DATA
   virtual IDataValidate dataValidate(const QDomElement &AValidateElem) const =0;
@@ -231,7 +225,7 @@ public:
   //DATA2XML
   virtual void xmlValidate(const IDataValidate &AValidate, QDomElement &AFieldElem) const =0;
   virtual void xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) const =0;
-  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, FieldWriteMode AMode = FWM_FORM) const =0;
+  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, const QString &AFormType = DATAFORM_TYPE_FORM) const =0;
   virtual void xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const =0;
   virtual void xmlSection(const IDataLayout &ALayout, QDomElement &AParentElem) const =0;
   virtual void xmlPage(const IDataLayout &ALayout, QDomElement &AParentElem) const =0;
@@ -241,15 +235,15 @@ public:
   virtual bool isOptionValid(const QList<IDataOption> &AOptions, const QString &AValue) const =0;
   virtual bool isMediaValid(const IDataMedia &AMedia) const =0;
   virtual bool isFieldEmpty(const IDataField &AField) const =0;
-  virtual bool isFieldValid(const IDataField &AField) const =0;
+  virtual bool isFieldValid(const IDataField &AField, const QString &AFormType = DATAFORM_TYPE_FORM) const =0;
   virtual bool isFormValid(const IDataForm &AForm) const =0;
   virtual bool isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) const =0;
   virtual bool isSupportedUri(const IDataMediaURI &AUri) const =0;
   //Localization
   virtual IDataForm localizeForm(const IDataForm &AForm) const =0;
   virtual IDataLocalizer *dataLocalizer(const QString &AFormType) const =0;
-  virtual void insertLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType) =0;
-  virtual void removeLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType = "") =0;
+  virtual void insertLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField) =0;
+  virtual void removeLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField = "") =0;
   //Data actions
   virtual int fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const =0;
   virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const =0;

@@ -49,7 +49,7 @@ public:
   //DATA2XML
   virtual void xmlValidate(const IDataValidate &AValidate, QDomElement &AFieldElem) const;
   virtual void xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) const;
-  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, FieldWriteMode AMode = FWM_FORM) const;
+  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, const QString &AFormType = DATAFORM_TYPE_FORM) const;
   virtual void xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const;
   virtual void xmlSection(const IDataLayout &ALayout, QDomElement &AParentElem) const;
   virtual void xmlPage(const IDataLayout &ALayout, QDomElement &AParentElem) const;
@@ -59,15 +59,15 @@ public:
   virtual bool isOptionValid(const QList<IDataOption> &AOptions, const QString &AValue) const;
   virtual bool isMediaValid(const IDataMedia &AMedia) const;
   virtual bool isFieldEmpty(const IDataField &AField) const;
-  virtual bool isFieldValid(const IDataField &AField) const;
+  virtual bool isFieldValid(const IDataField &AField, const QString &AFormType = DATAFORM_TYPE_FORM) const;
   virtual bool isFormValid(const IDataForm &AForm) const;
   virtual bool isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) const;
   virtual bool isSupportedUri(const IDataMediaURI &AUri) const;
   //Localization
   virtual IDataForm localizeForm(const IDataForm &AForm) const;
   virtual IDataLocalizer *dataLocalizer(const QString &AFormType) const;
-  virtual void insertLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType);
-  virtual void removeLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType = "");
+  virtual void insertLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField);
+  virtual void removeLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField = "");
   //Data actions
   virtual int fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const;
   virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const;

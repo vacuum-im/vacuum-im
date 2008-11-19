@@ -346,7 +346,7 @@ void DataForms::xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) cons
   }
 }
 
-void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, FieldWriteMode AMode) const
+void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, const QString &AFormType) const
 {
   QDomDocument doc = AFormElem.ownerDocument();
   QDomElement fieldElem = AFormElem.appendChild(doc.createElement("field")).toElement();
@@ -371,7 +371,7 @@ void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, Field
     fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(AField.value.toString()));
   }
 
-  if (AMode != IDataForms::FWM_SUBMIT)
+  if (AFormType != DATAFORM_TYPE_SUBMIT)
   {
     if (!AField.label.isEmpty())
       fieldElem.setAttribute("label",AField.label);
@@ -380,7 +380,7 @@ void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, Field
       xmlMedia(AField.media,fieldElem);
   }
 
-  if (AMode == IDataForms::FWM_FORM)
+  if (AFormType.isEmpty() || AFormType==DATAFORM_TYPE_FORM)
   {
     if (!AField.validate.type.isEmpty())
       xmlValidate(AField.validate,fieldElem);
@@ -407,7 +407,7 @@ void DataForms::xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const
   QDomElement reportElem = AFormElem.appendChild(doc.createElement("reported")).toElement();
   
   foreach(IDataField column, ATable.columns) {
-    xmlField(column,reportElem,IDataForms::FWM_TABLE); }
+    xmlField(column,reportElem,DATAFORM_TYPE_TABLE); }
 
   foreach(QStringList rowValues,ATable.rows)
   {
@@ -439,7 +439,7 @@ void DataForms::xmlForm(const IDataForm &AForm, QDomElement &AParentElem) const
 {
   QDomDocument doc = AParentElem.ownerDocument();
   QDomElement formElem = AParentElem.appendChild(doc.createElementNS(NS_JABBER_DATA,"x")).toElement();
-  formElem.setAttribute("type",AForm.type);
+  formElem.setAttribute("type",!AForm.type.isEmpty() ? AForm.type : QString(DATAFORM_TYPE_FORM));
   
   if (!AForm.title.isEmpty())
     formElem.appendChild(doc.createElement("title")).appendChild(doc.createTextNode(AForm.title));
@@ -453,16 +453,8 @@ void DataForms::xmlForm(const IDataForm &AForm, QDomElement &AParentElem) const
   if (!AForm.tabel.columns.isEmpty()) {
     xmlTable(AForm.tabel,formElem); }
 
-  IDataForms::FieldWriteMode mode = IDataForms::FWM_FORM;
-  if (AForm.type == DATAFORM_TYPE_SUBMIT)
-    mode = IDataForms::FWM_SUBMIT;
-  else if (AForm.type == DATAFORM_TYPE_RESULT)
-    mode = IDataForms::FWM_RESULT;
-  else if (AForm.type == DATAFORM_TYPE_CANCEL)
-    mode = IDataForms::FWM_SUBMIT;
-
   foreach(IDataField field, AForm.fields) {
-    xmlField(field,formElem,mode); }
+    xmlField(field,formElem,AForm.type); }
 }
 
 bool DataForms::isDataValid(const IDataValidate &AValidate, const QString &AValue) const
@@ -613,10 +605,10 @@ bool DataForms::isFieldEmpty(const IDataField &AField) const
   return AField.value.type()==QVariant::StringList ? AField.value.toStringList().isEmpty() : AField.value.toString().isEmpty();
 }
 
-bool DataForms::isFieldValid(const IDataField &AField) const
+bool DataForms::isFieldValid(const IDataField &AField, const QString &AFormType) const
 {
   bool valid = !AField.var.isEmpty() || AField.type==DATAFIELD_TYPE_FIXED;
-  valid &= !AField.required || !isFieldEmpty(AField);
+  valid &= AFormType!=DATAFORM_TYPE_SUBMIT || !AField.required || !isFieldEmpty(AField);
   if (AField.type == DATAFIELD_TYPE_BOOLEAN)
   {
     static const QStringList boolValues = QStringList() << "0" << "false" << "1" << "true";
@@ -678,7 +670,7 @@ bool DataForms::isFormValid(const IDataForm &AForm) const
   bool valid = !AForm.type.isEmpty();
 
   for (int i=0; valid && i<AForm.fields.count();i++)
-    valid &= isFieldValid(AForm.fields.at(i));
+    valid &= isFieldValid(AForm.fields.at(i),AForm.type);
 
   return valid;
 }
@@ -768,23 +760,23 @@ IDataForm DataForms::localizeForm(const IDataForm &AForm) const
   return AForm;
 }
 
-void DataForms::insertLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType)
+void DataForms::insertLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField)
 {
-  if (!AFormType.isEmpty() && !FLoadStates.contains(AFormType))
+  if (!ATypeField.isEmpty() && !FLoadStates.contains(ATypeField))
   {
-    FLocalizers.insert(AFormType,ALocalizer);
+    FLocalizers.insert(ATypeField,ALocalizer);
   }
 }
 
-void DataForms::removeLocalizer(IDataLocalizer *ALocalizer, const QString &AFormType)
+void DataForms::removeLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField)
 {
-  if (ALocalizer!=NULL && AFormType.isEmpty())
+  if (ALocalizer!=NULL && ATypeField.isEmpty())
   {
     foreach (QString formType, FLocalizers.keys(ALocalizer))
       FLocalizers.remove(formType);
   }
-  else if (FLocalizers.value(AFormType)==ALocalizer)
-    FLocalizers.remove(AFormType);
+  else if (FLocalizers.value(ATypeField)==ALocalizer)
+    FLocalizers.remove(ATypeField);
 }
 
 int DataForms::fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const
