@@ -1,6 +1,7 @@
 #ifndef DISCOITEMSWINDOW_H
 #define DISCOITEMSWINDOW_H
 
+#include <QTimer>
 #include <QHeaderView>
 #include <QMainWindow>
 #include <QSortFilterProxyModel>
@@ -17,12 +18,8 @@ class SortFilterProxyModel :
 {
 public:
   SortFilterProxyModel(QObject *AParent):QSortFilterProxyModel(AParent) {};
-  virtual bool hasChildren(const QModelIndex &AParent) const
-  {
-    if (sourceModel() && sourceModel()->canFetchMore(mapToSource(AParent)))
-      return sourceModel()->hasChildren(mapToSource(AParent));
-    return QSortFilterProxyModel::hasChildren(AParent);
-  }
+  virtual bool hasChildren(const QModelIndex &AParent) const;
+  virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 };
 
 class DiscoItemsWindow :
@@ -59,6 +56,7 @@ protected slots:
   void onToolBarActionTriggered(bool);
   void onComboReturnPressed();
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAftert);
+  void onSearchTimerTimeout();
 private:
   QHeaderView *FHeader;
   Ui::DiscoItemsWindowClass ui;
@@ -83,6 +81,7 @@ private:
 private:
   Jid FStreamJid;
   int FCurrentStep;
+  QTimer FSearchTimer;
   QList< QPair<Jid,QString> > FDiscoverySteps;
 };
 

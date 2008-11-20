@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>654</width>
-    <height>359</height>
+    <width>656</width>
+    <height>404</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -31,7 +31,7 @@
       <item>
        <widget class="QLabel" name="lblJid" >
         <property name="text" >
-         <string>Jid:</string>
+         <string>Item:</string>
         </property>
         <property name="buddy" >
          <cstring>cmbJid</cstring>
@@ -42,7 +42,7 @@
        <widget class="QComboBox" name="cmbJid" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-          <horstretch>2</horstretch>
+          <horstretch>3</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
@@ -68,7 +68,7 @@
        <widget class="QComboBox" name="cmbNode" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-          <horstretch>1</horstretch>
+          <horstretch>2</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
@@ -77,6 +77,23 @@
         </property>
         <property name="insertPolicy" >
          <enum>QComboBox::NoInsert</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblSearch" >
+        <property name="text" >
+         <string>Search:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lneSearch" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>

@@ -1,5 +1,6 @@
 #include "discoitemswindow.h"
 
+#include <QRegExp>
 #include <QLineEdit>
 
 #define IN_ARROW_LEFT           "psi/arrowLeft"
@@ -10,6 +11,29 @@
 #define IN_ADDCONTACT           "psi/addContact"
 #define IN_VCARD                "psi/vCard"
 #define IN_INFO                 "psi/statusmsg"
+
+bool SortFilterProxyModel::hasChildren( const QModelIndex &AParent ) const
+{
+  if (sourceModel() && sourceModel()->canFetchMore(mapToSource(AParent)))
+    return sourceModel()->hasChildren(mapToSource(AParent));
+  return QSortFilterProxyModel::hasChildren(AParent);
+}
+
+bool SortFilterProxyModel::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
+{
+  bool accept = !AParent.isValid() || filterRegExp().isEmpty();
+  if (!accept)
+  {
+    QModelIndex index = sourceModel()->index(ARow,0,AParent);
+    for (int row=0; !accept && row<sourceModel()->rowCount(index); row++)
+      accept = filterAcceptsRow(row,index);
+
+    accept = accept || index.data(DDR_NAME).toString().contains(filterRegExp());
+    accept = accept || index.data(DDR_JID).toString().contains(filterRegExp());
+    accept = accept || index.data(DDR_NODE).toString().contains(filterRegExp());
+  }
+  return accept;
+}
 
 DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QWidget *AParent) : QMainWindow(AParent)
 {
@@ -46,6 +70,8 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
   FProxy = new SortFilterProxyModel(FModel);
   FProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
   FProxy->setSortLocaleAware(true);
+  FProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+  FProxy->setFilterKeyColumn(DiscoItemsModel::COL_NAME);
   FProxy->setSourceModel(FModel);
   ui.trvItems->setModel(FProxy);
   ui.trvItems->setSortingEnabled(true);
@@ -59,6 +85,12 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
   FHeader->setSortIndicatorShown(true);
   FHeader->setSortIndicator(DiscoItemsModel::COL_NAME,Qt::AscendingOrder);
 
+  FSearchTimer.setSingleShot(true);
+  FSearchTimer.setInterval(1000);
+  connect(&FSearchTimer,SIGNAL(timeout()),SLOT(onSearchTimerTimeout()));
+  connect(ui.lneSearch,SIGNAL(textChanged(const QString &)),&FSearchTimer,SLOT(start()));
+  connect(ui.lneSearch,SIGNAL(editingFinished()),&FSearchTimer,SLOT(stop()));
+  connect(ui.lneSearch,SIGNAL(editingFinished()),SLOT(onSearchTimerTimeout()));
 
   connect(ui.trvItems,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onViewContextMenu(const QPoint &)));
   connect(ui.trvItems->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
@@ -95,6 +127,7 @@ void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
 
   FModel->addTopLevelItem(AContactJid,ANode);
   ui.trvItems->expand(ui.trvItems->model()->index(0,0));
+  ui.trvItems->setCurrentIndex(ui.trvItems->model()->index(0,0));
 
   emit discoverChanged(AContactJid,ANode);
 }
@@ -320,5 +353,10 @@ void DiscoItemsWindow::onStreamJidChanged(const Jid &ABefour, const Jid &AAftert
     setWindowTitle(tr("Service Discovery - %1").arg(FStreamJid.full()));
     emit streamJidChanged(ABefour,AAftert);
   }
+}
+
+void DiscoItemsWindow::onSearchTimerTimeout()
+{
+  FProxy->setFilterRegExp(ui.lneSearch->text());
 }
 
