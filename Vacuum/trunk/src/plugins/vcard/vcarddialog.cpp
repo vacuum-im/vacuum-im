@@ -4,7 +4,6 @@
 #include <QFileDialog>
 #include "edititemdialog.h"
 
-#define MAX_VCARD_LOADDATE        14  
 #define IN_VCARD                  "psi/vCard"
 
 VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid)
@@ -31,7 +30,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
   connect(FVCard->instance(),SIGNAL(vcardError(const QString &)),SLOT(onVCardError(const QString &)));
   
   updateDialog();
-  if (FVCard->isEmpty() || FVCard->loadDateTime().daysTo(QDateTime::currentDateTime())>MAX_VCARD_LOADDATE)
+  if (FVCard->isEmpty())
     reloadVCard();
 
   connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
@@ -96,8 +95,12 @@ void VCardDialog::updateDialog()
   ui.lneJabberId->setText(FContactJid.full());
   ui.lneJabberId->setReadOnly(true);
 
-  ui.dedBirthday->setDate(QDate::fromString(FVCard->value(VVN_BIRTHDAY),Qt::ISODate));
+  QDate birthday = QDate::fromString(FVCard->value(VVN_BIRTHDAY),Qt::ISODate);
+  if (!birthday.isValid())
+    birthday = QDate::fromString(FVCard->value(VVN_BIRTHDAY),Qt::TextDate);
+  ui.dedBirthday->setDate(birthday);
   ui.dedBirthday->setReadOnly(readOnly);
+  ui.dedBirthday->setEnabled(!readOnly || birthday.isValid());
   ui.dedBirthday->setCalendarPopup(!readOnly);
   ui.cmbGender->lineEdit()->setText(FVCard->value(VVN_GENDER));
   ui.cmbGender->setEnabled(!readOnly);
