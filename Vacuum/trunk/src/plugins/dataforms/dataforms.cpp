@@ -586,7 +586,7 @@ bool DataForms::isDataValid(const IDataValidate &AValidate, const QString &AValu
 
 bool DataForms::isOptionValid(const QList<IDataOption> &AOptions, const QString &AValue) const
 {
-  bool valid = AOptions.isEmpty();
+  bool valid = AOptions.isEmpty() || AValue.isEmpty();
   for (int i=0; !valid && i<AOptions.count(); i++)
     valid |= AOptions.at(i).value == AValue;
   return valid;
