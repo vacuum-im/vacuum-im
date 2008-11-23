@@ -152,6 +152,8 @@ IDataField DataForms::dataField(const QDomElement &AFieldElem) const
 
     if (valueList.count()>1 || field.type==DATAFIELD_TYPE_JIDMULTI || field.type==DATAFIELD_TYPE_LISTMULTI || field.type==DATAFIELD_TYPE_TEXTMULTI)
       field.value = valueList;
+    else if (field.type == DATAFIELD_TYPE_BOOLEAN)
+      field.value = QVariant(valueList.value(0)).toBool();
     else
       field.value = valueList.value(0);
 
