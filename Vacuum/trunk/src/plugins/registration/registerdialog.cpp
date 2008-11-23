@@ -109,7 +109,7 @@ void RegisterDialog::onRegisterFields(const QString &AId, const IRegisterFields 
     FSubmit.fieldMask = AFields.fieldMask;
     FSubmit.key = AFields.key;
     
-    if (FDataForms->isFormValid(AFields.form))
+    if (!AFields.form.type.isEmpty())
     {
       FCurrentForm = FDataForms->formWidget(AFields.form,ui.spgDataForm);
       if (!AFields.form.title.isEmpty())
