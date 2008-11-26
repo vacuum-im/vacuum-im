@@ -738,13 +738,11 @@ void ViewHistoryWindow::createGroupKindMenu()
   FGroupKindMenu->addAction(action);
 
   action = new Action(FGroupKindMenu);
-  action->setCheckable(true);
   action->setText(tr("Expand All"));
   connect(action,SIGNAL(triggered()),ui.trvCollections,SLOT(expandAll()));
   FGroupKindMenu->addAction(action,AG_DEFAULT+100);
 
   action = new Action(FGroupKindMenu);
-  action->setCheckable(true);
   action->setText(tr("Collapse All"));
   connect(action,SIGNAL(triggered()),ui.trvCollections,SLOT(collapseAll()));
   FGroupKindMenu->addAction(action,AG_DEFAULT+100);
