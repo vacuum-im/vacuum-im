@@ -36,6 +36,7 @@ public:
   virtual void ignoreSslErrors();
   virtual QList<QSslError> sslErrors() const;
 signals:
+  virtual void aboutToConnect();
   virtual void connected();
   virtual void encrypted();
   virtual void readyRead(qint64 ABytes);

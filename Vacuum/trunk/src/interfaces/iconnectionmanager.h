@@ -22,6 +22,7 @@ public:
   virtual QVariant option(int ARole) const =0;
   virtual void setOption(int ARole, const QVariant &AValue) =0;
 signals:
+  virtual void aboutToConnect() =0;
   virtual void connected() =0;
   virtual void encrypted() =0;
   virtual void readyRead(qint64 ABytes) =0;

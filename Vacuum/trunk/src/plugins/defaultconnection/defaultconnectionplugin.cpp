@@ -14,6 +14,7 @@ DefaultConnectionPlugin::DefaultConnectionPlugin()
 {
   FSettings = NULL;
   FSettingsPlugin = NULL;
+  FXmppStreams = NULL;
 }
 
 DefaultConnectionPlugin::~DefaultConnectionPlugin()
@@ -43,6 +44,11 @@ bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, in
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),SLOT(onOptionsDialogClosed()));
     }
   }
+  
+  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  if (plugin)
+    FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+
   return FSettingsPlugin!=NULL;
 }
 
@@ -61,6 +67,7 @@ QString DefaultConnectionPlugin::displayName() const
 IConnection *DefaultConnectionPlugin::newConnection(const QString &ASettingsNS, QObject *AParent)
 {
   DefaultConnection *connection = new DefaultConnection(this,AParent);
+  connect(connection,SIGNAL(aboutToConnect()),SLOT(onConnectionAboutToConnect()));
   emit connectionCreated(connection);
   loadSettings(connection,ASettingsNS);
   FCleanupHandler.add(connection);
@@ -79,31 +86,31 @@ void DefaultConnectionPlugin::destroyConnection(IConnection *AConnection)
 
 void DefaultConnectionPlugin::loadSettings(IConnection *AConnection, const QString &ASettingsNS)
 {
-  AConnection->setOption(IDefaultConnection::CO_Host,FSettings->valueNS(SVN_CONNECTION_HOST,ASettingsNS,QString()));
-  AConnection->setOption(IDefaultConnection::CO_Port,FSettings->valueNS(SVN_CONNECTION_PORT,ASettingsNS,5222));
-  AConnection->setOption(IDefaultConnection::CO_UseSSL,FSettings->valueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,false));
-  AConnection->setOption(IDefaultConnection::CO_IgnoreSSLErrors,FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,false));
-  AConnection->setOption(IDefaultConnection::CO_ProxyType,FSettings->valueNS(SVN_CONNECTION_PROXY_TYPE,ASettingsNS,0));
-  AConnection->setOption(IDefaultConnection::CO_ProxyHost,FSettings->valueNS(SVN_CONNECTION_PROXY_HOST,ASettingsNS,QString()));
-  AConnection->setOption(IDefaultConnection::CO_ProxyPort,FSettings->valueNS(SVN_CONNECTION_PROXY_PORT,ASettingsNS,0));
-  AConnection->setOption(IDefaultConnection::CO_ProxyUserName,FSettings->valueNS(SVN_CONNECTION_PROXY_USER,ASettingsNS,QString()));
-  AConnection->setOption(IDefaultConnection::CO_ProxyPassword, 
+  AConnection->setOption(IDefaultConnection::CO_HOST,FSettings->valueNS(SVN_CONNECTION_HOST,ASettingsNS,QString()));
+  AConnection->setOption(IDefaultConnection::CO_PORT,FSettings->valueNS(SVN_CONNECTION_PORT,ASettingsNS,5222));
+  AConnection->setOption(IDefaultConnection::CO_USE_SSL,FSettings->valueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,false));
+  AConnection->setOption(IDefaultConnection::CO_IGNORE_SSL_ERRORS,FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,false));
+  AConnection->setOption(IDefaultConnection::CO_PROXY_TYPE,FSettings->valueNS(SVN_CONNECTION_PROXY_TYPE,ASettingsNS,0));
+  AConnection->setOption(IDefaultConnection::CO_PROXY_HOST,FSettings->valueNS(SVN_CONNECTION_PROXY_HOST,ASettingsNS,QString()));
+  AConnection->setOption(IDefaultConnection::CO_PROXY_PORT,FSettings->valueNS(SVN_CONNECTION_PROXY_PORT,ASettingsNS,0));
+  AConnection->setOption(IDefaultConnection::CO_PROXY_USER_NAME,FSettings->valueNS(SVN_CONNECTION_PROXY_USER,ASettingsNS,QString()));
+  AConnection->setOption(IDefaultConnection::CO_PROXY_PASSWORD, 
     FSettings->decript(FSettings->valueNS(SVN_CONNECTION_PROXY_PSWD,ASettingsNS,QString()).toByteArray(),ASettingsNS.toUtf8()));
   emit connectionUpdated(AConnection,ASettingsNS);
 }
 
 void DefaultConnectionPlugin::saveSettings(IConnection *AConnection, const QString &ASettingsNS)
 {
-  FSettings->setValueNS(SVN_CONNECTION_HOST,ASettingsNS,AConnection->option(IDefaultConnection::CO_Host));
-  FSettings->setValueNS(SVN_CONNECTION_PORT,ASettingsNS,AConnection->option(IDefaultConnection::CO_Port));
-  FSettings->setValueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,AConnection->option(IDefaultConnection::CO_UseSSL));
-  FSettings->setValueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,AConnection->option(IDefaultConnection::CO_IgnoreSSLErrors));
-  FSettings->setValueNS(SVN_CONNECTION_PROXY_TYPE,ASettingsNS,AConnection->option(IDefaultConnection::CO_ProxyType));
-  FSettings->setValueNS(SVN_CONNECTION_PROXY_HOST,ASettingsNS,AConnection->option(IDefaultConnection::CO_ProxyHost));
-  FSettings->setValueNS(SVN_CONNECTION_PROXY_PORT,ASettingsNS,AConnection->option(IDefaultConnection::CO_ProxyPort));
-  FSettings->setValueNS(SVN_CONNECTION_PROXY_USER,ASettingsNS,AConnection->option(IDefaultConnection::CO_ProxyUserName));
+  FSettings->setValueNS(SVN_CONNECTION_HOST,ASettingsNS,AConnection->option(IDefaultConnection::CO_HOST));
+  FSettings->setValueNS(SVN_CONNECTION_PORT,ASettingsNS,AConnection->option(IDefaultConnection::CO_PORT));
+  FSettings->setValueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,AConnection->option(IDefaultConnection::CO_USE_SSL));
+  FSettings->setValueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,AConnection->option(IDefaultConnection::CO_IGNORE_SSL_ERRORS));
+  FSettings->setValueNS(SVN_CONNECTION_PROXY_TYPE,ASettingsNS,AConnection->option(IDefaultConnection::CO_PROXY_TYPE));
+  FSettings->setValueNS(SVN_CONNECTION_PROXY_HOST,ASettingsNS,AConnection->option(IDefaultConnection::CO_PROXY_HOST));
+  FSettings->setValueNS(SVN_CONNECTION_PROXY_PORT,ASettingsNS,AConnection->option(IDefaultConnection::CO_PROXY_PORT));
+  FSettings->setValueNS(SVN_CONNECTION_PROXY_USER,ASettingsNS,AConnection->option(IDefaultConnection::CO_PROXY_USER_NAME));
   FSettings->setValueNS(SVN_CONNECTION_PROXY_PSWD,ASettingsNS,
-    FSettings->encript(AConnection->option(IDefaultConnection::CO_ProxyPassword).toString(),ASettingsNS.toUtf8()));
+    FSettings->encript(AConnection->option(IDefaultConnection::CO_PROXY_PASSWORD).toString(),ASettingsNS.toUtf8()));
 }
 
 void DefaultConnectionPlugin::deleteSettingsNS(const QString &ASettingsNS)
@@ -149,6 +156,20 @@ void DefaultConnectionPlugin::saveOptions(const QString &ASettingsNS)
 QStringList DefaultConnectionPlugin::proxyTypeNames() const
 {
   return QStringList() << tr("Direct connection") << tr("Socket5 proxy") << tr("HTTPS proxy");
+}
+
+void DefaultConnectionPlugin::onConnectionAboutToConnect()
+{
+  DefaultConnection *connection = qobject_cast<DefaultConnection*>(sender());
+  if (FXmppStreams && connection && connection->option(IDefaultConnection::CO_HOST).toString().isEmpty())
+  {
+    foreach(IXmppStream *stream, FXmppStreams->getStreams())
+      if (stream->connection() == connection)
+      {
+        connection->setOption(IDefaultConnection::CO_HOST,stream->jid().pDomain());
+        break;
+      }
+  }
 }
 
 void DefaultConnectionPlugin::onOptionsDialogClosed()

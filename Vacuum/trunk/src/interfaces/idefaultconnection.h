@@ -9,16 +9,16 @@ class IDefaultConnection
 {
 public:
   enum Options {
-    CO_Host,
-    CO_Port,
-    CO_UseSSL,
-    CO_IgnoreSSLErrors,
-    CO_ProxyType,
-    CO_ProxyHost,
-    CO_ProxyPort,
-    CO_ProxyUserName,
-    CO_ProxyPassword,
-    CO_UserOptions = 100
+    CO_HOST,
+    CO_PORT,
+    CO_USE_SSL,
+    CO_IGNORE_SSL_ERRORS,
+    CO_PROXY_TYPE,
+    CO_PROXY_HOST,
+    CO_PROXY_PORT,
+    CO_PROXY_USER_NAME,
+    CO_PROXY_PASSWORD,
+    CO_USER_OPTIONS = 100
   };
   virtual QObject *instance() =0;
   virtual void startClientEncryption() =0;

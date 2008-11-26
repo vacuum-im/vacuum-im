@@ -5,6 +5,7 @@
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iconnectionmanager.h"
 #include "../../interfaces/idefaultconnection.h"
+#include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/isettings.h"
 #include "defaultconnection.h"
 #include "connectionoptionswidget.h"
@@ -45,10 +46,12 @@ signals:
   virtual void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
   virtual void connectionDestroyed(IConnection *AConnection);
 protected slots:
+  void onConnectionAboutToConnect();
   void onOptionsDialogClosed();
 private:
   ISettings *FSettings;
   ISettingsPlugin *FSettingsPlugin;  
+  IXmppStreams *FXmppStreams;
 private:
   QObjectCleanupHandler FCleanupHandler;
   QHash<QString, ConnectionOptionsWidget *> FWidgetsByNS;

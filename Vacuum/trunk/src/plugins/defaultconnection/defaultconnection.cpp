@@ -47,15 +47,16 @@ void DefaultConnection::connectToHost()
   FDisconnected = false;
   if (FSocket.state() == QAbstractSocket::UnconnectedState)
   {
-    FHost = option(IDefaultConnection::CO_Host).toString();
-    FPort = option(IDefaultConnection::CO_Port).toInt();
-    FUseSSL = option(IDefaultConnection::CO_UseSSL).toBool();
-    FIgnoreSSLErrors = option(IDefaultConnection::CO_IgnoreSSLErrors).toBool();
-    FProxyType = option(IDefaultConnection::CO_ProxyType).toInt();
-    FProxyHost = option(IDefaultConnection::CO_ProxyHost).toString();
-    FProxyPort = option(IDefaultConnection::CO_ProxyPort).toInt();
-    FProxyUser = option(IDefaultConnection::CO_ProxyUserName).toString();
-    FProxyPassword = option(IDefaultConnection::CO_ProxyPassword).toString();
+    emit aboutToConnect();
+    FHost = option(IDefaultConnection::CO_HOST).toString();
+    FPort = option(IDefaultConnection::CO_PORT).toInt();
+    FUseSSL = option(IDefaultConnection::CO_USE_SSL).toBool();
+    FIgnoreSSLErrors = option(IDefaultConnection::CO_IGNORE_SSL_ERRORS).toBool();
+    FProxyType = option(IDefaultConnection::CO_PROXY_TYPE).toInt();
+    FProxyHost = option(IDefaultConnection::CO_PROXY_HOST).toString();
+    FProxyPort = option(IDefaultConnection::CO_PROXY_PORT).toInt();
+    FProxyUser = option(IDefaultConnection::CO_PROXY_USER_NAME).toString();
+    FProxyPassword = option(IDefaultConnection::CO_PROXY_PASSWORD).toString();
 
     if (FProxyType == 0)
     {
