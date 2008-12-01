@@ -16,6 +16,7 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
   if (FForm.tabel.columns.count()>0)
   {
     FTableWidget = FDataForms->tableWidget(FForm.tabel,this);
+    FTableWidget->instance()->setVisible(false);
     connect(FTableWidget->instance(),SIGNAL(activated(int, int)),SIGNAL(cellActivated(int, int)));
     connect(FTableWidget->instance(),SIGNAL(changed(int,int,int,int)),SIGNAL(cellChanged(int,int,int,int)));
   }
@@ -25,6 +26,7 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
   foreach(IDataField field, FForm.fields)
   {
     IDataFieldWidget *fwidget = FDataForms->fieldWidget(field,!FForm.type.isEmpty() && FForm.type!=DATAFORM_TYPE_FORM,this);
+    fwidget->instance()->setVisible(false);
     connect(fwidget->instance(),SIGNAL(focusIn(Qt::FocusReason)),SLOT(onFieldFocusIn(Qt::FocusReason)));
     connect(fwidget->instance(),SIGNAL(focusOut(Qt::FocusReason)),SLOT(onFieldFocusOut(Qt::FocusReason)));
     FFieldWidgets.append(fwidget);
@@ -60,12 +62,14 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
       {
         stretch &= !isStretch(fwidget);
         widget->layout()->addWidget(fwidget->instance());
+        fwidget->instance()->setVisible(fwidget->dataField().type!=DATAFIELD_TYPE_HIDDEN);
       }
 
       if (FTableWidget)
       {
         stretch = false;
         widget->layout()->addWidget(FTableWidget->instance());
+        FTableWidget->instance()->setVisible(true);
       }
     }
     else
@@ -181,6 +185,7 @@ bool DataFormWidget::insertLayout(const IDataLayout &ALayout, QWidget *AWidget)
       {
         stretch &= !isStretch(fwidget);
         AWidget->layout()->addWidget(fwidget->instance());
+        fwidget->instance()->setVisible(fwidget->dataField().type!=DATAFIELD_TYPE_HIDDEN);
       }
     }
     else if (childName == "reportedref")

@@ -816,8 +816,8 @@ IDataForm DataForms::dataSubmit(const IDataForm &AForm) const
 IDataForm DataForms::dataShowSubmit(const IDataForm &AForm, const IDataForm &ASubmit) const
 {
   IDataForm form = ASubmit;
-  if (form.title.isEmpty())
-    form.title = AForm.title;
+  form.title = AForm.title;
+  form.instructions = AForm.instructions;
   form.pages = AForm.pages;
   for (int sindex=0; sindex<form.fields.count(); sindex++)
   {

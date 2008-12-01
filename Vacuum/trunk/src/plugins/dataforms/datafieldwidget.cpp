@@ -139,8 +139,6 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
     appendLabel(label,FLineEdit);
     if (FField.type == DATAFIELD_TYPE_TEXTPRIVATE)
       FLineEdit->setEchoMode(QLineEdit::Password);
-    else if (FField.type == DATAFIELD_TYPE_HIDDEN)
-      setVisible(false);
     FLineEdit->setToolTip(desc);
     FLineEdit->setReadOnly(FReadOnly);
     FLineEdit->setValidator(FDataForms->dataValidator(FField.validate,FLineEdit));
