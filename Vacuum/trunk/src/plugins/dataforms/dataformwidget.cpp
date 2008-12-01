@@ -24,7 +24,7 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 
   foreach(IDataField field, FForm.fields)
   {
-    IDataFieldWidget *fwidget = FDataForms->fieldWidget(field,FForm.type!=DATAFORM_TYPE_FORM,this);
+    IDataFieldWidget *fwidget = FDataForms->fieldWidget(field,!FForm.type.isEmpty() && FForm.type!=DATAFORM_TYPE_FORM,this);
     connect(fwidget->instance(),SIGNAL(focusIn(Qt::FocusReason)),SLOT(onFieldFocusIn(Qt::FocusReason)));
     connect(fwidget->instance(),SIGNAL(focusOut(Qt::FocusReason)),SLOT(onFieldFocusOut(Qt::FocusReason)));
     FFieldWidgets.append(fwidget);
@@ -105,28 +105,31 @@ DataFormWidget::~DataFormWidget()
 
 bool DataFormWidget::checkForm(bool AAllowInvalid) const
 {
-  QString message;
-  int invalidCount = 0;
-  QList<IDataField> fields = userDataForm().fields;
-  foreach(IDataField field, fields)
+  if (FForm.type.isEmpty() || FForm.type==DATAFORM_TYPE_FORM)
   {
-    if (!field.var.isEmpty() && !FDataForms->isFieldValid(field))
+    QString message;
+    int invalidCount = 0;
+    QList<IDataField> fields = userDataForm().fields;
+    foreach(IDataField field, fields)
     {
-      invalidCount++;
-      message += QString("- <b>%2</b><br>").arg(Qt::escape(!field.label.isEmpty() ? field.label : field.var));
+      if (!field.var.isEmpty() && !FDataForms->isFieldValid(field))
+      {
+        invalidCount++;
+        message += QString("- <b>%2</b><br>").arg(Qt::escape(!field.label.isEmpty() ? field.label : field.var));
+      }
     }
-  }
-  if (invalidCount > 0)
-  {
-    message = tr("The are %1 field(s) with invalid values:<br>").arg(invalidCount) + message;
-    QMessageBox::StandardButtons buttons = QMessageBox::Ok;
-    if (AAllowInvalid)
+    if (invalidCount > 0)
     {
-      message += "<br>";
-      message += tr("Do you want to continue with invalid values?");
-      buttons = QMessageBox::Yes|QMessageBox::No;
+      message = tr("The are %1 field(s) with invalid values:<br>").arg(invalidCount) + message;
+      QMessageBox::StandardButtons buttons = QMessageBox::Ok;
+      if (AAllowInvalid)
+      {
+        message += "<br>";
+        message += tr("Do you want to continue with invalid values?");
+        buttons = QMessageBox::Yes|QMessageBox::No;
+      }
+      return (QMessageBox::warning(NULL,windowTitle(),message,buttons) == QMessageBox::Yes);
     }
-    return (QMessageBox::warning(NULL,windowTitle(),message,buttons) == QMessageBox::Yes);
   }
   return true;
 }

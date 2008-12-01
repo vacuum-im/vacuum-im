@@ -804,11 +804,62 @@ IDataForm DataForms::dataSubmit(const IDataForm &AForm) const
     if (!field.var.isEmpty() && field.type!=DATAFIELD_TYPE_FIXED && !isFieldEmpty(field))
     {
       IDataField submField;
-      submField.type = field.type;
       submField.var = field.var;
       submField.value = field.value;
       submField.required = false;
       form.fields.append(submField);
+    }
+  }
+  return form;
+}
+
+IDataForm DataForms::dataShowSubmit(const IDataForm &AForm, const IDataForm &ASubmit) const
+{
+  IDataForm form = ASubmit;
+  if (form.title.isEmpty())
+    form.title = AForm.title;
+  form.pages = AForm.pages;
+  for (int sindex=0; sindex<form.fields.count(); sindex++)
+  {
+    IDataField &sfield = form.fields[sindex];
+    int findex = fieldIndex(sfield.var,AForm.fields);
+    if (findex >= 0)
+    {
+      const IDataField &ffield = AForm.fields.at(findex);
+      sfield.type = ffield.type;
+      sfield.label = ffield.label;
+      sfield.validate = ffield.validate;
+      
+      foreach(IDataOption option, ffield.options)
+      {
+        if (sfield.value.type()==QVariant::StringList)
+        {
+          QStringList values = sfield.value.toStringList();
+          for (int i=0; i<values.count(); i++)
+          {
+            if (values.at(i)==option.value)
+            {
+              values[i] = option.label;
+              sfield.value = values;
+            }
+          }
+        }
+        else if (sfield.value==option.value)
+        {
+          sfield.value = option.label;
+          break;
+        }
+      }
+
+      if (sfield.type == DATAFIELD_TYPE_BOOLEAN)
+      {
+        sfield.type == DATAFIELD_TYPE_TEXTSINGLE;
+        sfield.value = sfield.value.toBool() ? tr("Yes") : tr("No");
+      }
+      else if (sfield.type == DATAFIELD_TYPE_LISTSINGLE)
+      {
+        sfield.type = DATAFIELD_TYPE_TEXTSINGLE;
+      }
     }
   }
   return form;

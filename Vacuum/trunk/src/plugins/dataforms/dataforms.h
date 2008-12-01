@@ -72,6 +72,7 @@ public:
   virtual int fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const;
   virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const;
   virtual IDataForm dataSubmit(const IDataForm &AForm) const;
+  virtual IDataForm dataShowSubmit(const IDataForm &AForm, const IDataForm &ASubmit) const;
   virtual QByteArray urlData(const QUrl &AUrl) const;
   virtual bool loadUrl(const QUrl &AUrl, bool AEnableCache = true);
   //Data widgets

@@ -21,7 +21,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 
   QString desc = Qt::escape(FField.desc);
   QString label = !FField.label.isEmpty() ? Qt::escape(FField.label) : desc;
-  if (FField.type == DATAFIELD_TYPE_BOOLEAN)
+  if (!FReadOnly && FField.type == DATAFIELD_TYPE_BOOLEAN)
   {
     FCheckBox = new QCheckBox(this);
     FCheckBox->setText(label);
@@ -36,7 +36,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
     layout()->addWidget(FLabel);
     FField.value = FField.label.isEmpty() ? FField.value : FField.label;
   }
-  else if (FField.type == DATAFIELD_TYPE_LISTSINGLE)
+  else if (!FReadOnly && FField.type == DATAFIELD_TYPE_LISTSINGLE)
   {
     FComboBox = new QComboBox(this);
     appendLabel(label,FComboBox);
@@ -164,7 +164,7 @@ IDataField DataFieldWidget::userDataField() const
 
 QVariant DataFieldWidget::value() const
 {
-  if (FField.type == DATAFIELD_TYPE_BOOLEAN)
+  if (!FReadOnly && FField.type == DATAFIELD_TYPE_BOOLEAN)
   {
     return FCheckBox->isChecked();
   }
@@ -183,7 +183,7 @@ QVariant DataFieldWidget::value() const
       values[i] = Jid(values.at(i)).eFull();
     return values;
   }
-  else if (FField.type == DATAFIELD_TYPE_LISTSINGLE)
+  else if (!FReadOnly && FField.type == DATAFIELD_TYPE_LISTSINGLE)
   {
     if (FComboBox->currentIndex()>=0)
       return FComboBox->itemData(FComboBox->currentIndex()).toString();
@@ -229,7 +229,7 @@ QVariant DataFieldWidget::value() const
 
 void DataFieldWidget::setValue(const QVariant &AValue)
 {
-  if (FField.type == DATAFIELD_TYPE_BOOLEAN)
+  if (!FReadOnly && FField.type == DATAFIELD_TYPE_BOOLEAN)
   {
     FCheckBox->setChecked(AValue.toBool());
   }
@@ -247,7 +247,7 @@ void DataFieldWidget::setValue(const QVariant &AValue)
     foreach(QString line, AValue.toStringList())
       FTextEdit->append(Jid(line).full());
   }
-  else if (FField.type == DATAFIELD_TYPE_LISTSINGLE)
+  else if (!FReadOnly && FField.type == DATAFIELD_TYPE_LISTSINGLE)
   {
     int index = FComboBox->findData(AValue.toString());
     if (index>=0)

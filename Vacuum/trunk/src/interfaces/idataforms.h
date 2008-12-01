@@ -248,6 +248,7 @@ public:
   virtual int fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const =0;
   virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const =0;
   virtual IDataForm dataSubmit(const IDataForm &AForm) const =0;
+  virtual IDataForm dataShowSubmit(const IDataForm &AForm, const IDataForm &ASubmit) const =0;
   virtual QByteArray urlData(const QUrl &AUrl) const =0;
   virtual bool loadUrl(const QUrl &AUrl, bool AEnableCache = true) =0;
   //Data widgets
