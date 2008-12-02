@@ -1,8 +1,7 @@
-#include <QtDebug>
 #include "stanzaprocessor.h"
 
-#include <QTime>
 #include <QSet>
+#include <QTime>
 #include <QMultiHash>
 
 StanzaProcessor::StanzaProcessor() 
@@ -23,7 +22,7 @@ void StanzaProcessor::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->name = tr("Stanza Processor"); 
   APluginInfo->uid = STANZAPROCESSOR_UUID;
   APluginInfo->version = "0.1";
-  APluginInfo->dependences.append("{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"); //IXmppStreams  
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
 bool StanzaProcessor::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -66,21 +65,24 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza
   {
     IXmppStream *stream = FXmppStreams->getStream(AStreamJid);
     if (stream && stream->isOpen())
+    {
       sended = stream->sendStanza(stanza) > 0;
+      emit stanzaSended(stanza);
+    }
   }
   return sended;
 }
 
 bool StanzaProcessor::sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJid, const Stanza &AStanza, int ATimeOut)
 {
-  if (AStanza.tagName() != "iq")
-    return false;
-
-  if (sendStanzaOut(AStreamJid,AStanza))
+  if (AStanza.tagName()=="iq" && sendStanzaOut(AStreamJid,AStanza))
   {
     if (AIqOwner && !AStanza.id().isEmpty() && (AStanza.type() == "set" || AStanza.type() == "get"))
     {
       IqStanzaItem iqItem;
+      iqItem.stanzaId = AStanza.id();
+      iqItem.owner = AIqOwner;
+      iqItem.streamJid = AStreamJid;
       if (ATimeOut > 0)
       {
         QTimer *timer = new QTimer(this);
@@ -89,11 +91,6 @@ bool StanzaProcessor::sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJ
         iqItem.timer = timer;
         connect(timer,SIGNAL(timeout()),SLOT(onIqStanzaTimeOut()));
       }
-      else 
-        iqItem.timer = NULL;
-      iqItem.stanzaId = AStanza.id();
-      iqItem.owner = AIqOwner;
-      iqItem.streamJid = AStreamJid;
       FIqStanzaItems.insert(iqItem.stanzaId,iqItem);
       connect(AIqOwner->instance(),SIGNAL(destroyed(QObject *)),SLOT(onIqStanzaOwnerDestroyed(QObject *)));
     }
@@ -102,8 +99,52 @@ bool StanzaProcessor::sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJ
   return false;
 }
 
-int StanzaProcessor::insertHandler(IStanzaHandler *AHandler, const QString &ACondition, 
-                                Direction ADirection, int APriority, const Jid &AStreamJid)
+QList<int> StanzaProcessor::handlers() const
+{
+  return FHandlerItems.keys();
+}
+
+int StanzaProcessor::handlerDirection(int AHandlerId) const
+{
+  return FHandlerItems.value(AHandlerId).direction;
+}
+
+int StanzaProcessor::handlerPriority(int AHandlerId) const
+{
+  return FHandlerItems.value(AHandlerId).priority;
+}
+
+Jid StanzaProcessor::handlerStreamJid(int AHandlerId) const
+{
+  return FHandlerItems.value(AHandlerId).streamJid;
+}
+
+QStringList StanzaProcessor::handlerConditions(int AHandlerId) const
+{
+  if (FHandlerItems.contains(AHandlerId))
+    return FHandlerItems[AHandlerId].conditions;
+  return QStringList();
+}
+
+void StanzaProcessor::appendCondition(int AHandlerId, const QString &ACondition)
+{
+  if (!ACondition.isEmpty() && FHandlerItems.contains(AHandlerId))
+  {
+    FHandlerItems[AHandlerId].conditions.append(ACondition);
+    emit conditionAppended(AHandlerId,ACondition);
+  }
+}
+
+void StanzaProcessor::removeCondition(int AHandlerId, const QString &ACondition)
+{
+  if (FHandlerItems.contains(AHandlerId))
+  {
+    FHandlerItems[AHandlerId].conditions.removeAt(FHandlerItems[AHandlerId].conditions.indexOf(ACondition));
+    emit conditionRemoved(AHandlerId, ACondition);
+  }
+}
+
+int StanzaProcessor::insertHandler(IStanzaHandler *AHandler, const QString &ACondition, int ADirection, int APriority, const Jid &AStreamJid)
 {
   if (!AHandler || ACondition.isEmpty())
     return 0;
@@ -125,66 +166,31 @@ int StanzaProcessor::insertHandler(IStanzaHandler *AHandler, const QString &ACon
   connect(AHandler->instance(),SIGNAL(destroyed(QObject *)),SLOT(onHandlerOwnerDestroyed(QObject *)));
 
   emit handlerInserted(hId,AHandler);
+  emit conditionAppended(hId,ACondition);
 
   return hId;
-}
-
-IStanzaProcessor::Direction StanzaProcessor::handlerDirection(int AHandlerId) const
-{
-  if (FHandlerItems.contains(AHandlerId))
-    return FHandlerItems[AHandlerId].direction;
-  return IStanzaProcessor::DirectionIn;
-}
-
-int StanzaProcessor::handlerPriority(int AHandlerId) const
-{
-  if (FHandlerItems.contains(AHandlerId))
-    return FHandlerItems[AHandlerId].priority;
-  return 0;
-}
-
-Jid StanzaProcessor::handlerStreamJid(int AHandlerId) const
-{
-  if (FHandlerItems.contains(AHandlerId))
-    return FHandlerItems[AHandlerId].streamJid;
-  return Jid();
-}
-
-QStringList StanzaProcessor::handlerConditions(int AHandlerId) const
-{
-  if (FHandlerItems.contains(AHandlerId))
-    return FHandlerItems[AHandlerId].conditions;
-  return QStringList();
-}
-
-void StanzaProcessor::appendCondition(int AHandlerId, const QString &ACondition)
-{
-  if (!ACondition.isEmpty() && FHandlerItems.contains(AHandlerId))
-    FHandlerItems[AHandlerId].conditions.append(ACondition);
-}
-
-void StanzaProcessor::removeCondition(int AHandlerId, const QString &ACondition)
-{
-  if (FHandlerItems.contains(AHandlerId))
-    FHandlerItems[AHandlerId].conditions.removeAt(FHandlerItems[AHandlerId].conditions.lastIndexOf(ACondition));
-
 }
 
 void StanzaProcessor::removeHandler(int AHandlerId)
 {
   if (FHandlerItems.contains(AHandlerId))
   {
+    foreach(QString condition, handlerConditions(AHandlerId))
+      removeCondition(AHandlerId,condition);
     emit handlerRemoved(AHandlerId);
     FHandlerIdsByPriority.remove(FHandlerItems[AHandlerId].priority,AHandlerId);
     FHandlerItems.remove(AHandlerId);
   }
 }
 
-bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &ACondition, const int APos)
+bool StanzaProcessor::checkStanza(const Stanza &AStanza, const QString &ACondition) const
 {
-  static QSet<QChar> delimiters;
-  if (delimiters.isEmpty())
-    delimiters <<' '<<'/'<<'\\'<<'\t'<<'\n'<<'['<<']'<<'='<<'\''<<'"'<<'@';
+  return checkCondition(AStanza.element(),ACondition);
+}
+
+bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &ACondition, const int APos) const
+{
+  static QSet<QChar> delimiters = QSet<QChar>()<<' '<<'/'<<'\\'<<'\t'<<'\n'<<'['<<']'<<'='<<'\''<<'"'<<'@';
   
   QDomElement elem = AElem;
   
@@ -283,7 +289,7 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
   return false;
 }
 
-bool StanzaProcessor::processStanzaIn(const Jid &AStreamJid, Stanza *AStanza)
+bool StanzaProcessor::processStanzaIn(const Jid &AStreamJid, Stanza *AStanza) const
 {
   bool hooked = false;
   bool accepted = false;
@@ -294,7 +300,7 @@ bool StanzaProcessor::processStanzaIn(const Jid &AStreamJid, Stanza *AStanza)
   while(!hooked && it.hasPrevious())
   {
     it.previous();
-    HandlerItem &hItem = FHandlerItems[it.value()];
+    const HandlerItem &hItem = FHandlerItems.value(it.value());
     if (hItem.direction == DirectionIn && (!hItem.streamJid.isValid() || hItem.streamJid == AStreamJid))
     {
       for (int i = 0; i<hItem.conditions.count(); i++)
@@ -312,14 +318,14 @@ bool StanzaProcessor::processStanzaIn(const Jid &AStreamJid, Stanza *AStanza)
   for (int i = 0; !hooked && i<checkedHandlers.count(); i++)
   {
     int hId = checkedHandlers.at(i);
-    HandlerItem &hItem = FHandlerItems[hId];
+    const HandlerItem &hItem = FHandlerItems.value(hId);
     hooked = hItem.handler->readStanza(hId,AStreamJid,*AStanza,accepted);
   } 
 
   return accepted;
 }
 
-bool StanzaProcessor::processStanzaOut(const Jid &AStreamJid, Stanza *AStanza)
+bool StanzaProcessor::processStanzaOut(const Jid &AStreamJid, Stanza *AStanza) const
 {
   bool hooked = false;
   bool accepted = false;
@@ -329,7 +335,7 @@ bool StanzaProcessor::processStanzaOut(const Jid &AStreamJid, Stanza *AStanza)
   while(!hooked && it.hasNext())
   {
     it.next();
-    HandlerItem &hItem = FHandlerItems[it.value()];
+    const HandlerItem &hItem = FHandlerItems.value(it.value());
     if (hItem.direction == DirectionOut && (!hItem.streamJid.isValid() || hItem.streamJid == AStreamJid))
     {
       for (int i = 0; i<hItem.conditions.count(); i++)
@@ -347,7 +353,7 @@ bool StanzaProcessor::processStanzaOut(const Jid &AStreamJid, Stanza *AStanza)
   for (int i = 0; !hooked && i<checkedHandlers.count(); i++)
   {
     int hId = checkedHandlers.at(i);
-    HandlerItem &hItem = FHandlerItems[hId];
+    const HandlerItem &hItem = FHandlerItems.value(hId);
     hooked = hItem.handler->readStanza(hId,AStreamJid,*AStanza,accepted);
   } 
 
@@ -381,9 +387,12 @@ void StanzaProcessor::removeIqStanzaItem(const QString &AStanzaId)
 void StanzaProcessor::onStreamElement(IXmppStream *AXmppStream, const QDomElement &AElem)
 {
   Stanza stanza(AElem);
+
   if (stanza.from().isEmpty())
     stanza.setFrom(AXmppStream->jid().eFull());
   stanza.setTo(AXmppStream->jid().eFull());
+
+  emit stanzaReceived(stanza);
 
   if (!sendStanzaIn(AXmppStream->jid(),stanza))
     if (stanza.canReplyError())

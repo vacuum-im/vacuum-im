@@ -34,19 +34,24 @@ public:
   virtual bool sendStanzaIn(const Jid &AStreamJid, const Stanza &AStanza) =0;
   virtual bool sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza) =0;
   virtual bool sendIqStanza(IIqStanzaOwner *AIqOwner, const Jid &AStreamJid, const Stanza &AStanza, int ATimeOut) =0;
-  virtual bool hasHandler(int AHandlerId) const =0;
-  virtual int insertHandler(IStanzaHandler *AHandler, const QString &ACondition,
-    Direction ADirection, int APriority = SHP_DEFAULT, const Jid &AStreamJid = Jid()) =0;
-  virtual Direction handlerDirection(int AHandlerId) const =0;
+  virtual QList<int> handlers() const =0;
   virtual int handlerPriority(int AHandlerId) const =0;
   virtual Jid handlerStreamJid(int AHandlerId) const =0;
+  virtual int handlerDirection(int AHandlerId) const =0;
   virtual QStringList handlerConditions(int AHandlerId) const =0;
   virtual void appendCondition(int AHandlerId, const QString &ACondition) =0;
   virtual void removeCondition(int AHandlerId, const QString &ACondition) =0;
+  virtual int insertHandler(IStanzaHandler *AHandler, const QString &ACondition, int ADirection, 
+	  int APriority = SHP_DEFAULT, const Jid &AStreamJid = Jid()) =0;
   virtual void removeHandler(int AHandlerId) =0;
+  virtual bool checkStanza(const Stanza &AStanza, const QString &ACondition) const =0;
 signals:
+  virtual void stanzaSended(const Stanza &AStanza) =0;
+  virtual void stanzaReceived(const Stanza &AStanza) =0;
   virtual void handlerInserted(int AHandlerId, IStanzaHandler *AHandler) =0;
   virtual void handlerRemoved(int AHandlerId) =0;
+  virtual void conditionAppended(int AHandlerId, const QString &ACondition) =0;
+  virtual void conditionRemoved(int AHandlerId, const QString &ACondition) =0;
 };
 
 Q_DECLARE_INTERFACE(IStanzaHandler,"Vacuum.Plugin.IStanzaHandler/1.0");
