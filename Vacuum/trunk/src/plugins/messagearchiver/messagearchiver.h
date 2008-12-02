@@ -8,8 +8,10 @@
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/sessionnegotiatororder.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessagearchiver.h"
+#include "../../interfaces/imessenger.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/isettings.h"
@@ -17,11 +19,21 @@
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/iservicediscovery.h"
+#include "../../interfaces/idataforms.h"
+#include "../../interfaces/isessionnegotiation.h"
 #include "../../utils/errorhandler.h"
 #include "collectionwriter.h"
 #include "archiveoptions.h"
 #include "replicator.h"
 #include "viewhistorywindow.h"
+
+struct StanzaSession {
+  QString sessionId;
+  bool defaultPrefs;
+  QString saveMode;
+  QString requestId;
+  QString error;
+};
 
 class MessageArchiver : 
   public QObject,
@@ -29,10 +41,11 @@ class MessageArchiver :
   public IMessageArchiver,
   public IStanzaHandler,
   public IIqStanzaOwner,
-  public IOptionsHolder
+  public IOptionsHolder,
+  public ISessionNegotiator
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMessageArchiver IStanzaHandler IIqStanzaOwner IOptionsHolder);
+  Q_INTERFACES(IPlugin IMessageArchiver IStanzaHandler IIqStanzaOwner IOptionsHolder ISessionNegotiator);
 public:
   MessageArchiver();
   ~MessageArchiver();
@@ -45,13 +58,18 @@ public:
   virtual bool initSettings();
   virtual bool startPlugin()  { return true; }
   //IStanzaHandler
-  virtual bool editStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza * /*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept);
   virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IIqStanzaOwner
   virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void iqStanzaTimeOut(const QString &AId);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  //SessionNegotiator
+  virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest);
+  virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit);
+  virtual int sessionApply(const IStanzaSession &ASession);
+  virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm);
   //IMessageArchiver
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
   virtual bool isReady(const Jid &AStreamJid) const;
@@ -142,6 +160,13 @@ protected:
   void closeHistoryOptionsNode(const Jid &AStreamJid);
   Menu *createContextMenu(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) const;
   void registerDiscoFeatures();
+  void notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const;
+  bool hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
+  bool isOTRStanzaSession(const IStanzaSession &ASession) const;
+  bool isOTRStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
+  void startSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId);
+  void cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const QString &AError);
+  void terminateBrokenStanzaSessions(const Jid &AStreamJid) const;
 protected slots:
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
@@ -161,6 +186,8 @@ protected slots:
   void onArchiveHandlerDestroyed(QObject *AHandler);
   void onArchiveWindowDestroyed(IArchiveWindow *AWindow);
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
+  void onStanzaSessionActivated(const IStanzaSession &ASession);
+  void onStanzaSessionTerminated(const IStanzaSession &ASession);
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -170,12 +197,16 @@ private:
   IAccountManager *FAccountManager;
   IRostersViewPlugin *FRostersViewPlugin;
   IServiceDiscovery *FDiscovery;
+  IDataForms *FDataForms;
+  IMessenger *FMessenger;
+  ISessionNegotiation *FSessionNegotioation;
 private:
   QHash<Jid,int> FSHIPrefs;
   QHash<Jid,int> FSHIMessageIn;
   QHash<Jid,int> FSHIMessageOut;
+  QHash<Jid,int> FSHIMessageBlocks;
 private:
-  QList<QString> FPrefsSaveRequests;
+  QHash<QString, Jid> FPrefsSaveRequests;
   QHash<QString,Jid>  FPrefsLoadRequests;
   QHash<QString,bool> FPrefsAutoRequests;
   QHash<QString,Jid>  FPrefsRemoveRequests;
@@ -193,6 +224,7 @@ private:
   QHash<Jid, Replicator *> FReplicators;
   QHash<Jid, ViewHistoryWindow *> FArchiveWindows;
   QHash<Jid, QString> FGatewayTypes;
+  QHash<Jid, QHash<Jid, StanzaSession> > FSessions;
   QObjectCleanupHandler FCleanupHandler;
 };
 

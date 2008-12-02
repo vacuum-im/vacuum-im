@@ -1,6 +1,5 @@
 #include "sessionnegotiation.h"
 
-#include <QDebug>
 #include <QUuid>
 #include <QCryptographicHash>
 
@@ -67,7 +66,13 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*
 
   plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
   if (plugin) 
+  {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+    if (FDiscovery)
+    {
+      connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoRecieved(const IDiscoInfo &)));
+    }
+  }
 
   plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin) 
@@ -98,7 +103,7 @@ bool SessionNegotiation::initObjects()
   if (FDiscovery)
   {
     registerDiscoFeatures();
-    //FDiscovery->insertFeatureHandler(NS_STANZA_SESSION,this,DFO_DEFAULT);
+    FDiscovery->insertFeatureHandler(NS_STANZA_SESSION,this,DFO_DEFAULT);
   }
   if (FNotifications)
   {
@@ -117,79 +122,92 @@ bool SessionNegotiation::readStanza(int AHandlerId, const Jid &AStreamJid, const
 {
   if (FSHISession.value(AStreamJid) == AHandlerId)
   {
+    Jid contactJid = AStanza.from();
     QString sessionId = AStanza.firstElement("thread").text();
+
     QDomElement featureElem = AStanza.firstElement("feature",NS_FEATURENEG);
     QDomElement formElem = featureElem.firstChildElement("x");
     while (!formElem.isNull() && formElem.namespaceURI()!=NS_JABBER_DATA)
       formElem = formElem.nextSiblingElement("x");
+    
     if (!sessionId.isEmpty() && !formElem.isNull())
     {
-      Jid contactJid = AStanza.from();
-      IStanzaSession session = currentSession(AStreamJid,contactJid);
+      IStanzaSession &session = FSessions[AStreamJid][contactJid];
+      
+      IStanzaSession bareSession = getSession(AStreamJid,contactJid.bare());
+      if (session.sessionId!=sessionId && bareSession.sessionId==sessionId)
+      {
+        session = bareSession;
+        session.contactJid = contactJid;
+        removeSession(bareSession);
+      }
+
+      FSuspended.remove(sessionId);
+      closeAcceptDialog(session);
+
       QString stanzaType = AStanza.type();
       if (stanzaType.isEmpty() || stanzaType=="normal")
       {
         IDataForm form = FDataForms->dataForm(formElem);
         bool isAccept = FDataForms->fieldIndex(SESSION_FIELD_ACCEPT, form.fields) >= 0;
         
-        //       
-        if (isAccept && form.type==DATAFORM_TYPE_SUBMIT && session.sessionId != sessionId)
+        if (isAccept && form.type==DATAFORM_TYPE_FORM)
         {
-          session = currentSession(AStreamJid,contactJid.bare());
-          if (session.sessionId == sessionId)
-          {
-            removeSession(session);
-            session.contactJid = contactJid;
-            updateSession(session);
-          }
+          terminateSession(AStreamJid,contactJid);
+          session.streamJid = AStreamJid;
+          session.contactJid = contactJid;
+          session.sessionId = sessionId;
+          processAccept(session,form);
         }
-
-        if (session.sessionId == sessionId)
+        else if (session.sessionId == sessionId)
         {
           bool isRenegotiate = FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE, form.fields) >= 0;
           bool isContinue = FDataForms->fieldIndex(SESSION_FIELD_CONTINUE, form.fields) >= 0;
           bool isTerminate = FDataForms->fieldIndex(SESSION_FIELD_TERMINATE, form.fields) >= 0;
           if (isAccept && session.status != IStanzaSession::Active)
             processAccept(session,form);
-          else if (isRenegotiate && session.status == IStanzaSession::Active)
+          else if (isRenegotiate && (session.status==IStanzaSession::Active || session.status==IStanzaSession::Renegotiate))
             processRenegotiate(session,form);
-          else if (isContinue && session.status == IStanzaSession::Active)
+          else if (isContinue && session.status==IStanzaSession::Active)
             processContinue(session,form);
           else if (isTerminate)
             processTerminate(session,form);
         }
-        else if (isAccept && form.type==DATAFORM_TYPE_FORM)
+        else if (session.status != IStanzaSession::Empty)
         {
           terminateSession(AStreamJid,contactJid);
-          session.sessionId = sessionId;
-          session.streamJid = AStreamJid;
-          session.contactJid = contactJid;
-          processAccept(session,form);
+        }
+        else
+        {
+          removeSession(session);
         }
       }
-      else if (stanzaType == "error")
+      else if (stanzaType=="error" && session.sessionId==sessionId)
       {
-        QDomElement errorElem = AStanza.firstElement("error");
-        if (!errorElem.isNull() && session.sessionId == sessionId && session.status!=IStanzaSession::Active)
-        {
-          ErrorHandler err(AStanza.element());
-          session.status = IStanzaSession::Error;
-          session.errorCondition = err.condition();
+        session.status = IStanzaSession::Error;
+        
+        ErrorHandler err(AStanza.element());
+        session.errorCondition = err.condition();
 
-          session.errorFields.clear();
-          QDomElement featureElem = errorElem.firstChildElement("feature");
-          while (!featureElem.isNull() && featureElem.namespaceURI()!=NS_FEATURENEG)
-            featureElem = featureElem.nextSiblingElement("feature");
-          QDomElement fieldElem = featureElem.firstChildElement("field");
-          while (!fieldElem.isNull())
-          {
-            if (fieldElem.hasAttribute("var"))
-              session.errorFields.append(fieldElem.attribute("var"));
-            fieldElem = fieldElem.nextSiblingElement("field");
-          }
-          updateSession(session);
-          emit sessionFailed(session);
+        session.errorFields.clear();
+        QDomElement errorElem = AStanza.firstElement("error");
+        QDomElement featureElem = errorElem.firstChildElement("feature");
+        while (!featureElem.isNull() && featureElem.namespaceURI()!=NS_FEATURENEG)
+          featureElem = featureElem.nextSiblingElement("feature");
+        
+        QDomElement fieldElem = featureElem.firstChildElement("field");
+        while (!fieldElem.isNull())
+        {
+          if (fieldElem.hasAttribute("var"))
+            session.errorFields.append(fieldElem.attribute("var"));
+          fieldElem = fieldElem.nextSiblingElement("field");
         }
+
+        emit sessionTerminated(session);
+      }
+      else if (session.status == IStanzaSession::Empty)
+      {
+        removeSession(session);
       }
       AAccept = true;
     }
@@ -212,9 +230,10 @@ Action *SessionNegotiation::createDiscoFeatureAction(const Jid &AStreamJid, cons
     action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
     connect(action,SIGNAL(triggered(bool)),SLOT(onSessionActionTriggered(bool)));
 
-    IStanzaSession session = currentSession(AStreamJid,ADiscoInfo.contactJid);
-    if (session.status!=IStanzaSession::Accept && session.status!=IStanzaSession::Pending && 
-        session.status!=IStanzaSession::Active && session.status!=IStanzaSession::Continue)
+    IStanzaSession session = getSession(AStreamJid,ADiscoInfo.contactJid);
+    if (session.status==IStanzaSession::Empty || 
+        session.status==IStanzaSession::Terminate || 
+        session.status==IStanzaSession::Error)
     {
       action->setData(ADR_SESSION_FIELD,SESSION_FIELD_ACCEPT);
       action->setText(tr("Negotiate Session"));
@@ -250,30 +269,12 @@ IDataFormLocale SessionNegotiation::dataFormLocale(const QString &AFormType)
   return locale;
 }
 
-int SessionNegotiation::sessionInit(const IStanzaSession &/*ASession*/, IDataForm &ARequest)
+int SessionNegotiation::sessionInit(const IStanzaSession &ASession, IDataForm &ARequest)
 {
   int result = ISessionNegotiator::Skip;
 
-  //Disclosure
-  if (FDataForms->fieldIndex(SFP_DISCLOSURE,ARequest.fields)<0)
-  {
-    IDataField disclosure;
-    disclosure.var = SFP_DISCLOSURE;
-    disclosure.type = DATAFIELD_TYPE_LISTSINGLE;
-    disclosure.value = SFV_DISCLOSURE_DISABLED;
-    disclosure.options.append(IDataOption());
-    disclosure.options[0].value = SFV_DISCLOSURE_NEVER;
-    disclosure.options.append(IDataOption());
-    disclosure.options[1].value = SFV_DISCLOSURE_DISABLED;
-    disclosure.options.append(IDataOption());
-    disclosure.options[2].value = SFV_DISCLOSURE_ENABLED;
-    disclosure.required = false;
-    ARequest.fields.append(disclosure);
-    result |= ISessionNegotiator::Auto;
-  }
-
   //MultiSession
-  if (FDataForms->fieldIndex(SFP_MULTISESSION,ARequest.fields)<0)
+  if (ASession.status==IStanzaSession::Init)
   {
     IDataField multisession;
     multisession.var = SFP_MULTISESSION;
@@ -281,7 +282,7 @@ int SessionNegotiation::sessionInit(const IStanzaSession &/*ASession*/, IDataFor
     multisession.value = false;
     multisession.required = false;
     ARequest.fields.append(multisession);
-    result |= ISessionNegotiator::Auto;
+    result = ISessionNegotiator::Auto;
   }
 
   return result;
@@ -291,27 +292,8 @@ int SessionNegotiation::sessionAccept(const IStanzaSession &/*ASession*/, const 
 {
   int result = ISessionNegotiator::Skip;
 
-  //Disclosure
-  int index = FDataForms->fieldIndex(SFP_DISCLOSURE,ARequest.fields);
-  if (index>=0)
-  {
-    if (ARequest.type == DATAFORM_TYPE_FORM)
-    {
-      IDataField disclosure;
-      disclosure.var = SFP_DISCLOSURE;
-      disclosure.type = DATAFIELD_TYPE_LISTSINGLE;
-      disclosure.value = ARequest.fields.at(index).value;
-      ASubmit.fields.append(disclosure);
-      result |= ISessionNegotiator::Auto;
-    }
-    else if (ARequest.type == DATAFORM_TYPE_SUBMIT)
-    {
-      result |= ISessionNegotiator::Auto;
-    }
-  }
-
   //Multisession
-  index = FDataForms->fieldIndex(SFP_MULTISESSION,ARequest.fields);
+  int index = FDataForms->fieldIndex(SFP_MULTISESSION,ARequest.fields);
   if (index>=0)
   {
     if (ARequest.type == DATAFORM_TYPE_FORM)
@@ -320,121 +302,162 @@ int SessionNegotiation::sessionAccept(const IStanzaSession &/*ASession*/, const 
       multisession.var = SFP_MULTISESSION;
       multisession.type = DATAFIELD_TYPE_BOOLEAN;
       multisession.value = false;
+      multisession.required = false;
       ASubmit.fields.append(multisession);
-      result |= ISessionNegotiator::Auto;
+      result = ISessionNegotiator::Auto;
     }
     else if (ARequest.type == DATAFORM_TYPE_SUBMIT)
     {
-      result |= ARequest.fields[index].value.toBool() ? ISessionNegotiator::Cancel : ISessionNegotiator::Auto;
+      result = ARequest.fields[index].value.toBool() ? ISessionNegotiator::Cancel : ISessionNegotiator::Auto;
     }
   }
 
   return result;
 }
 
-int SessionNegotiation::sessionContinue(const IStanzaSession &/*ASession*/, const QString &/*AResource*/)
+int SessionNegotiation::sessionApply(const IStanzaSession &/*ASession*/)
 {
   return ISessionNegotiator::Auto;
 }
 
 void SessionNegotiation::sessionLocalize(const IStanzaSession &/*ASession*/, IDataForm &AForm)
 {
-  //Disclosure
-  int index = FDataForms->fieldIndex(SFP_DISCLOSURE,AForm.fields);
-  if (index>=0)
-  {
-    AForm.fields[index].label = tr("Disclosure");
-    QList<IDataOption> &options = AForm.fields[index].options;
-    for (int i=0;i<options.count();i++)
-    {
-      if (options[i].value == SFV_DISCLOSURE_NEVER)
-        options[i].label = tr("Guarantee disclosure not implemented");
-      else if (options[i].value == SFV_DISCLOSURE_DISABLED)
-        options[i].label = tr("Disable all disclosures");
-      else if (options[i].value == SFV_DISCLOSURE_ENABLED)
-        options[i].label = tr("Allow disclosures");
-    }
-  }
-  
   //Multi-session
-  index = FDataForms->fieldIndex(SFP_MULTISESSION,AForm.fields);
+  int index = FDataForms->fieldIndex(SFP_MULTISESSION,AForm.fields);
   if (index>=0)
   {
     AForm.fields[index].label = tr("Allow multiple sessions?");
   }
 }
 
-IStanzaSession SessionNegotiation::currentSession(const Jid &AStreamJid, const Jid &AContactJid) const
+IStanzaSession SessionNegotiation::getSession(const QString &ASessionId) const
+{
+  foreach (Jid streamJid, FSessions.keys())
+    foreach (IStanzaSession session, FSessions.value(streamJid))
+      if (session.sessionId == ASessionId)
+        return session;
+  return IStanzaSession();
+}
+
+IStanzaSession SessionNegotiation::getSession(const Jid &AStreamJid, const Jid &AContactJid) const
 {
   return FSessions.value(AStreamJid).value(AContactJid);
 }
 
+QList<IStanzaSession> SessionNegotiation::getSessions(const Jid &AStreamJid, int AStatus) const
+{
+  QList<IStanzaSession> sessions;
+  foreach(IStanzaSession session, FSessions.value(AStreamJid).values())
+    if (session.status == AStatus)
+      sessions.append(session);
+  return sessions;
+}
+
 int SessionNegotiation::initSession(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  IStanzaSession session = currentSession(AStreamJid,AContactJid);
-  if (session.status!=IStanzaSession::Accept && 
+  IStanzaSession &session = FSessions[AStreamJid][AContactJid];
+  if (AStreamJid != AContactJid &&
+      session.status!=IStanzaSession::Accept && 
       session.status!=IStanzaSession::Pending && 
+      session.status!=IStanzaSession::Apply &&
+      session.status!=IStanzaSession::Renegotiate &&
       session.status!=IStanzaSession::Continue)
   {
     bool isRenegotiate = session.status==IStanzaSession::Active;
     IDataForm request = defaultForm(isRenegotiate ? SESSION_FIELD_RENEGOTIATE : SESSION_FIELD_ACCEPT);
-    request.type = DATAFORM_TYPE_FORM;
+    request.type.clear();
 
     if (!isRenegotiate)
     {
-      session.sessionId = QUuid::createUuid().toString();
       session.status = IStanzaSession::Init;
+      session.sessionId = QUuid::createUuid().toString();
       session.streamJid = AStreamJid;
       session.contactJid = AContactJid;
       session.form = IDataForm();
       session.errorCondition.clear();
       session.errorFields.clear();
     }
+    else
+    {
+      session.status = IStanzaSession::Renegotiate;
+    }
 
     int result = 0;
     foreach(ISessionNegotiator *negotiator, FNegotiators)
       result = result | negotiator->sessionInit(session,request);
     
-    if ((result & ISessionNegotiator::Cancel) > 0)
+    if (!isRenegotiate && FDiscovery && !FDiscovery->discoInfo(AContactJid).features.contains(NS_STANZA_SESSION))
     {
-      return ISessionNegotiator::Cancel;
+      bool infoRequested = !FDiscovery->hasDiscoInfo(AContactJid) ? FDiscovery->requestDiscoInfo(AStreamJid,AContactJid) : false;
+      if (!infoRequested)
+      {
+        session.status = IStanzaSession::Error;
+        session.errorCondition = ErrorHandler::coditionByCode(ErrorHandler::SERVICE_UNAVAILABLE);
+        emit sessionTerminated(session);
+        return ISessionNegotiator::Cancel;
+      }
+      else
+      {
+        session.status = IStanzaSession::Init;
+        FSuspended.insert(session.sessionId,IDataForm());
+        return ISessionNegotiator::Wait;
+      }
     }
-    else if ((result & ISessionNegotiator::Wait) > 0)
+    else if ((result & ISessionNegotiator::Cancel) > 0)
     {
-      return ISessionNegotiator::Wait;
+      if (!isRenegotiate)
+      {
+        session.status = IStanzaSession::Terminate;
+        emit sessionTerminated(session);
+      }
+      else
+      {
+        terminateSession(AStreamJid,AContactJid);
+      }
+      return ISessionNegotiator::Cancel;
     }
     else if ((result & ISessionNegotiator::Manual) > 0)
     {
-      updateSession(session);
+      if (!isRenegotiate)
+        session.form = clearForm(request);
       localizeSession(session,request);
-      showSessionDialog(session,request);
+      showAcceptDialog(session,request);
       return ISessionNegotiator::Manual;
     }
     else if ((result & ISessionNegotiator::Auto) > 0)
     {
-      updateSession(session);
+      if (!isRenegotiate)
+      {
+        session.form = clearForm(request);
+        session.status = IStanzaSession::Pending;
+      }
+      else
+      {
+        FRenegotiate.insert(session.sessionId,request);
+      }
+      request.type = DATAFORM_TYPE_FORM;
       localizeSession(session,request);
-      if (isRenegotiate ? sendSessionRenegotiate(session,request) : sendSessionInit(session,request))
-        return ISessionNegotiator::Auto;
+      request.title = isRenegotiate ? tr("Session renegotiation") : tr("Session negotiation");
+      sendSessionData(session,request);
+      return ISessionNegotiator::Auto;
     }
   }
-  return ISessionNegotiator::Cancel;
-}
-
-bool SessionNegotiation::isSuspenedSession(const QString &ASessionId) const
-{
-  return FSuspended.contains(ASessionId);
+  return ISessionNegotiator::Skip;
 }
 
 void SessionNegotiation::resumeSession(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  IStanzaSession session = currentSession(AStreamJid,AContactJid);
-  if (FSuspended.contains(session.sessionId))
+  if (FSuspended.contains(FSessions.value(AStreamJid).value(AContactJid).sessionId))
   {
+    IStanzaSession &session = FSessions[AStreamJid][AContactJid];
     IDataForm request = FSuspended.take(session.sessionId);
-    if (session.status == IStanzaSession::Accept)
+    if (session.status == IStanzaSession::Init)
+      initSession(session.streamJid,session.contactJid);
+    else if (session.status == IStanzaSession::Accept)
       processAccept(session,request);
-    else if (session.status == IStanzaSession::Active)
+    else if (session.status == IStanzaSession::Apply)
+      processApply(session,request);
+    else if (session.status == IStanzaSession::Renegotiate)
       processRenegotiate(session,request);
     else if (session.status == IStanzaSession::Continue)
       processContinue(session,request);
@@ -443,7 +466,7 @@ void SessionNegotiation::resumeSession(const Jid &AStreamJid, const Jid &AContac
 
 void SessionNegotiation::terminateSession(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  IStanzaSession session = currentSession(AStreamJid,AContactJid);
+  IStanzaSession &session = FSessions[AStreamJid][AContactJid];
   if (session.status != IStanzaSession::Empty && 
       session.status != IStanzaSession::Init &&
       session.status != IStanzaSession::Terminate && 
@@ -451,12 +474,24 @@ void SessionNegotiation::terminateSession(const Jid &AStreamJid, const Jid &ACon
   {
     IDataForm request = defaultForm(SESSION_FIELD_TERMINATE);
     request.type = DATAFORM_TYPE_SUBMIT;
-    if (sendSessionData(session,request))
-    {
-      session.status = IStanzaSession::Terminate;
-      updateSession(session);
-      emit sessionTerminated(session);
-    }
+    session.status = IStanzaSession::Terminate;
+    sendSessionData(session,request);
+    emit sessionTerminated(session);
+  }
+}
+
+void SessionNegotiation::showSessionParams(const Jid &AStreamJid, const Jid &AContactJid)
+{
+  IStanzaSession session = getSession(AStreamJid,AContactJid);
+  if (FDataForms && !session.form.fields.isEmpty())
+  {
+    IDataForm form = session.form;
+    form.type = DATAFORM_TYPE_RESULT;
+    localizeSession(session,form);
+    form = FDataForms->dataShowSubmit(form,form);
+    IDataDialogWidget *widget = FDataForms->dialogWidget(form,NULL);
+    widget->dialogButtons()->setStandardButtons(QDialogButtonBox::Ok);
+    widget->instance()->show();
   }
 }
 
@@ -472,9 +507,9 @@ void SessionNegotiation::removeNegotiator(ISessionNegotiator *ANegotiator, int A
     FNegotiators.remove(AOrder,ANegotiator);
 }
 
-bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const IDataForm &AForm)
+bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const IDataForm &AForm) const
 {
-  if (FStanzaProcessor && FDataForms)
+  if (FStanzaProcessor && FDataForms && !AForm.fields.isEmpty())
   {
     Stanza data("message");
     data.setType("normal").setTo(ASession.contactJid.eFull());
@@ -486,7 +521,7 @@ bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const I
   return false;
 }
 
-bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession)
+bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const IDataForm &ARequest) const
 {
   if (FStanzaProcessor && FDataForms && !ASession.errorCondition.isEmpty())
   {
@@ -494,7 +529,7 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession)
     data.setType("error").setTo(ASession.contactJid.eFull());
     data.addElement("thread").appendChild(data.createTextNode(ASession.sessionId));
     QDomElement featureElem = data.addElement("feature",NS_FEATURENEG);
-    FDataForms->xmlForm(ASession.form,featureElem);
+    FDataForms->xmlForm(ARequest,featureElem);
     QDomElement errorElem = data.addElement("error");
     errorElem.setAttribute("code",ErrorHandler::codeByCondition(ASession.errorCondition));
     errorElem.setAttribute("type",ErrorHandler::typeToString(ErrorHandler::typeByCondition(ASession.errorCondition)));
@@ -510,68 +545,13 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession)
   return false;
 }
 
-bool SessionNegotiation::sendSessionInit(const IStanzaSession &ASession, const IDataForm &AForm)
-{
-  QVariant actionField = FDataForms!=NULL ? FDataForms->fieldValue(SESSION_FIELD_ACCEPT,AForm.fields) : QVariant();
-  if (!actionField.isNull() && actionField.toBool() && sendSessionData(ASession,AForm))
-  {
-    IStanzaSession session = ASession;
-    session.status = IStanzaSession::Pending;
-    updateFields(AForm,session.form,true,false);
-    updateSession(session);
-    emit sessionInited(session);
-    return true;
-  }
-  else if (ASession.status == IStanzaSession::Init)
-  {
-    removeSession(ASession);
-  }
-  return false;
-}
-
-bool SessionNegotiation::sendSessionAccept(const IStanzaSession &ASession, const IDataForm &AForm)
-{
-  QVariant actionField = FDataForms!=NULL ? FDataForms->fieldValue(SESSION_FIELD_ACCEPT,AForm.fields) : QVariant();
-  if (!actionField.isNull() && sendSessionData(ASession,AForm))
-  {
-    if (actionField.toBool())
-    {
-      IStanzaSession session = ASession;
-      session.status = IStanzaSession::Pending;
-      updateFields(AForm,session.form,false,false);
-      updateSession(session);
-      emit sessionAccepted(session);
-    }
-    return true;
-  }
-  return false;
-}
-
-bool SessionNegotiation::sendSessionRenegotiate(const IStanzaSession &ASession, const IDataForm &AForm)
-{
-  QVariant actionField = FDataForms->fieldValue(SESSION_FIELD_RENEGOTIATE,AForm.fields);
-  if (!actionField.isNull() && (actionField.toBool() || AForm.type==DATAFORM_TYPE_SUBMIT) && sendSessionData(ASession,AForm))
-  {
-    if (AForm.type == DATAFORM_TYPE_SUBMIT && actionField.toBool())
-    {
-      IStanzaSession session = ASession;
-      updateFields(AForm,session.form,false,false);
-      updateSession(session);
-      emit sessionActivated(session);
-    }
-    else if (AForm.type == DATAFORM_TYPE_FORM)
-    {
-      FRenegotiate.insert(ASession.sessionId,AForm);
-    }
-    return true;
-  }
-  return false;
-}
-
-void SessionNegotiation::processAccept(const IStanzaSession &ASession, const IDataForm &ARequest)
+void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm &ARequest)
 {
   if (ARequest.type == DATAFORM_TYPE_FORM)
   {
+    ASession.status = IStanzaSession::Accept;
+    ASession.form = clearForm(ARequest);
+
     IDataForm submit = defaultForm(SESSION_FIELD_ACCEPT);
     submit.type = DATAFORM_TYPE_SUBMIT;
 
@@ -579,52 +559,44 @@ void SessionNegotiation::processAccept(const IStanzaSession &ASession, const IDa
     foreach(ISessionNegotiator *negotiator, FNegotiators)
       result = result | negotiator->sessionAccept(ASession,ARequest,submit);
 
-    IStanzaSession session = ASession;
-    session.form = ARequest;
     if (!FDataForms->isSubmitValid(ARequest,submit))
     {
-      session.status = IStanzaSession::Error;
-      session.errorCondition = "feature-not-implemented";
-      session.errorFields = unsubmitedFields(ARequest,submit,true);
-      sendSessionError(session);
-      updateSession(session);
-      emit sessionFailed(session);
+      ASession.status = IStanzaSession::Error;
+      ASession.errorCondition = ErrorHandler::coditionByCode(ErrorHandler::FEATURE_NOT_IMPLEMENTED);
+      ASession.errorFields = unsubmitedFields(ARequest,submit,true);
+      sendSessionError(ASession,ARequest);
     }
     else if ((result & ISessionNegotiator::Cancel) > 0)
     {
-      session.status = IStanzaSession::Terminate;
+      ASession.status = IStanzaSession::Terminate;
       submit.fields[FDataForms->fieldIndex(SESSION_FIELD_ACCEPT,submit.fields)].value = false;
-      sendSessionData(session,submit);
-      updateSession(session);
-      emit sessionTerminated(session);
+      updateFields(IDataForm(),submit,false,true);
+      sendSessionData(ASession,submit);
     }
     else if ((result & ISessionNegotiator::Wait) > 0)
     {
-      session.status = IStanzaSession::Accept;
-      updateSession(session);
-      FSuspended.insert(session.sessionId,ARequest);
+      FSuspended.insert(ASession.sessionId,ARequest);
     }
     else if ((result & ISessionNegotiator::Manual) > 0)
     {
-      session.status = IStanzaSession::Accept;
-      updateFields(submit,session.form,false,true);
-      localizeSession(session,session.form);
-      updateSession(session);
-      showSessionDialog(session,session.form);
+      updateFields(submit,ASession.form,false,true);
+      IDataForm request = ASession.form;
+      request.pages = submit.pages;
+      localizeSession(ASession,request);
+      showAcceptDialog(ASession,request);
     }
-    else if ((result & ISessionNegotiator::Auto) > 0)
+    else
     {
-      session.status = IStanzaSession::Accept;
-      updateFields(submit,session.form,false,true);
-      localizeSession(session,session.form);
-      updateSession(session);
-      sendSessionAccept(session,submit);
+      updateFields(submit,ASession.form,false,true);
+      processApply(ASession,submit);
     }
   }
   else if (ARequest.type == DATAFORM_TYPE_SUBMIT)
   {
     if (FDataForms->fieldValue(SESSION_FIELD_ACCEPT,ARequest.fields).toBool())
     {
+      ASession.status = IStanzaSession::Accept;
+
       IDataForm submit = defaultForm(SESSION_FIELD_ACCEPT);
       submit.type = DATAFORM_TYPE_RESULT;
 
@@ -632,71 +604,131 @@ void SessionNegotiation::processAccept(const IStanzaSession &ASession, const IDa
       foreach(ISessionNegotiator *negotiator, FNegotiators)
         result = result | negotiator->sessionAccept(ASession,ARequest,submit);
 
-      IStanzaSession session = ASession;
       if (!FDataForms->isSubmitValid(ASession.form,ARequest))
       {
-        session.status = IStanzaSession::Error;
-        session.errorCondition = "not-acceptable";
-        session.errorFields = unsubmitedFields(ARequest,submit,true);
-        sendSessionError(session);
-        updateSession(session);
-        emit sessionFailed(session);
+        ASession.status = IStanzaSession::Error;
+        ASession.errorCondition = ErrorHandler::coditionByCode(ErrorHandler::NOT_ACCEPTABLE);
+        ASession.errorFields = unsubmitedFields(ARequest,submit,true);
+        sendSessionError(ASession,ARequest);
+        emit sessionTerminated(ASession);
       }
       else if ((result & ISessionNegotiator::Cancel) > 0)
       {
-        session.status = IStanzaSession::Terminate;
+        ASession.status = IStanzaSession::Terminate;
         submit.fields[FDataForms->fieldIndex(SESSION_FIELD_ACCEPT,submit.fields)].value = false;
-        sendSessionData(session,submit);
-        updateFields(ARequest,session.form,false,false);
-        updateSession(session);
-        emit sessionTerminated(session);
+        updateFields(IDataForm(),submit,false,true);
+        sendSessionData(ASession,submit);
+        updateFields(ARequest,ASession.form,false,false);
+        updateFields(submit,ASession.form,true,false);
+        emit sessionTerminated(ASession);
       }
       else if ((result & ISessionNegotiator::Wait) > 0)
       {
-        session.status = IStanzaSession::Accept;
-        updateSession(session);
-        FSuspended.insert(session.sessionId,ARequest);
+        FSuspended.insert(ASession.sessionId,ARequest);
       }
-      else if ((result & (ISessionNegotiator::Auto|ISessionNegotiator::Manual)) > 0)
+      else if ((result & ISessionNegotiator::Manual) > 0)
       {
-        session.status = IStanzaSession::Active;
-        sendSessionData(session,submit);
-        updateFields(ARequest,session.form,false,false);
-        updateSession(session);
-        emit sessionActivated(session);
+        updateFields(ARequest,ASession.form,false,false);
+        IDataForm request = ASession.form;
+        request.pages = submit.pages;
+        localizeSession(ASession,request);
+        request = FDataForms->dataShowSubmit(request,ARequest);
+        showAcceptDialog(ASession,request);
+      }
+      else
+      {
+        updateFields(ARequest,ASession.form,false,false);
+        processApply(ASession,submit);
       }
     }
     else
     {
-      IStanzaSession session = ASession;
-      session.status = IStanzaSession::Terminate;
-      updateSession(session);
-      emit sessionTerminated(session);
+      ASession.status = IStanzaSession::Terminate;
+      updateFields(ARequest,ASession.form,true,false);
+      emit sessionTerminated(ASession);
     }
   }
   else if (ARequest.type == DATAFORM_TYPE_RESULT)
   {
     if (FDataForms->fieldValue(SESSION_FIELD_ACCEPT,ARequest.fields).toBool())
     {
-      IStanzaSession session = ASession;
-      session.status = IStanzaSession::Active;
-      updateSession(session);
-      emit sessionActivated(session);
+      ASession.status = IStanzaSession::Active;
+      emit sessionActivated(ASession);
     }
     else
     {
-      IStanzaSession session = ASession;
-      session.status = IStanzaSession::Terminate;
-      updateSession(session);
-      emit sessionTerminated(session);
+      ASession.status = IStanzaSession::Terminate;
+      updateFields(ARequest,ASession.form,true,false);
+      emit sessionTerminated(ASession);
     }
   }
 }
 
-void SessionNegotiation::processRenegotiate(const IStanzaSession &ASession, const IDataForm &ARequest)
+void SessionNegotiation::processApply(IStanzaSession &ASession, const IDataForm &ASubmit)
+{
+  bool isAccept = FDataForms!=NULL ? FDataForms->fieldIndex(SESSION_FIELD_ACCEPT,ASubmit.fields)>=0 : false;
+  bool isRenegotiate = FDataForms!=NULL ? FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE,ASubmit.fields)>=0 : false;
+
+  if (isAccept || isRenegotiate)
+  {
+    ASession.status = IStanzaSession::Apply;
+
+    int result = 0;
+    foreach(ISessionNegotiator *negotiator, FNegotiators)
+      result = result | negotiator->sessionApply(ASession);
+
+    if ((result & ISessionNegotiator::Cancel) > 0)
+    {
+      if (isAccept)
+      {
+        ASession.status = IStanzaSession::Terminate;
+        IDataForm submit = ASubmit;
+        submit.fields[FDataForms->fieldIndex(SESSION_FIELD_ACCEPT,submit.fields)].value = false;
+        sendSessionData(ASession,submit);
+        emit sessionTerminated(ASession);
+      }
+      else if (ASubmit.type == DATAFORM_TYPE_SUBMIT)
+      {
+        ASession.status = IStanzaSession::Active;
+        IDataForm submit = ASubmit;
+        submit.fields[FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE,submit.fields)].value = false;
+        sendSessionData(ASession,submit);
+      }
+      else 
+      {
+        terminateSession(ASession.streamJid,ASession.contactJid);
+      }
+    }
+    else if ((result & ISessionNegotiator::Wait) > 0)
+    {
+      FSuspended.insert(ASession.sessionId,ASubmit);
+    }
+    else
+    {
+      if (isAccept)
+      {
+        ASession.status = ASubmit.type==DATAFORM_TYPE_RESULT ? IStanzaSession::Active : IStanzaSession::Pending;
+        sendSessionData(ASession,ASubmit);
+        if (ASession.status == IStanzaSession::Active)
+          emit sessionActivated(ASession);
+      }
+      else
+      {
+        ASession.status = IStanzaSession::Active;
+        if (ASubmit.type == DATAFORM_TYPE_SUBMIT)
+          sendSessionData(ASession,ASubmit);
+        emit sessionActivated(ASession);
+      }
+    }
+  }
+}
+
+void SessionNegotiation::processRenegotiate(IStanzaSession &ASession, const IDataForm &ARequest)
 {
   if (ARequest.type == DATAFORM_TYPE_FORM)
   {
+    ASession.status = IStanzaSession::Renegotiate;
+
     IDataForm submit = defaultForm(SESSION_FIELD_RENEGOTIATE);
     submit.type = DATAFORM_TYPE_SUBMIT;
 
@@ -704,16 +736,9 @@ void SessionNegotiation::processRenegotiate(const IStanzaSession &ASession, cons
     foreach(ISessionNegotiator *negotiator, FNegotiators)
       result = result | negotiator->sessionAccept(ASession,ARequest,submit);
 
-    if (!FDataForms->isSubmitValid(ARequest,submit))
+    if (!FDataForms->isSubmitValid(ARequest,submit) || (result & ISessionNegotiator::Cancel) > 0)
     {
-      IStanzaSession session = ASession;
-      session.form = ARequest;
-      session.errorCondition = "feature-not-implemented";
-      session.errorFields = unsubmitedFields(ARequest,submit,true);
-      sendSessionError(session);
-    }
-    else if ((result & ISessionNegotiator::Cancel) > 0)
-    {
+      ASession.status = IStanzaSession::Active;
       submit.fields[FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE,submit.fields)].value = false;
       sendSessionData(ASession,submit);
     }
@@ -724,84 +749,86 @@ void SessionNegotiation::processRenegotiate(const IStanzaSession &ASession, cons
     else if ((result & ISessionNegotiator::Manual) > 0)
     {
       IDataForm request = ARequest;
+      request.pages = submit.pages;
       updateFields(submit,request,false,false);
       localizeSession(ASession,request);
-      showSessionDialog(ASession,request);
+      showAcceptDialog(ASession,request);
     }
-    else if ((result & ISessionNegotiator::Auto) > 0)
+    else 
     {
-      sendSessionRenegotiate(ASession,submit);
+      updateFields(submit,ASession.form,false,false);
+      processApply(ASession,submit);
     }
   }
-  else if (ARequest.type == DATAFORM_TYPE_SUBMIT)
+  else if (ARequest.type == DATAFORM_TYPE_SUBMIT && FRenegotiate.contains(ASession.sessionId))
   {
-    if (FRenegotiate.contains(ASession.sessionId))
+    ASession.status = IStanzaSession::Renegotiate;
+
+    IDataForm form = FRenegotiate.take(ASession.sessionId);
+    bool accepted = FDataForms->fieldValue(SESSION_FIELD_RENEGOTIATE,ARequest.fields).toBool();
+    if (accepted && FDataForms->isSubmitValid(form,ARequest))
     {
-      IDataForm form = FRenegotiate.take(ASession.sessionId);
-      bool accepted = FDataForms->fieldValue(SESSION_FIELD_RENEGOTIATE,ARequest.fields).toBool();
-      if (accepted && FDataForms->isSubmitValid(form,ARequest))
-      {
-        IStanzaSession session = ASession;
-        updateFields(ARequest,form,false,true);
-        updateFields(form,session.form,true,false);
-        updateSession(session);
-        emit sessionActivated(session);
-      }
+
+      IDataForm submit = defaultForm(SESSION_FIELD_RENEGOTIATE);
+      submit.type = DATAFORM_TYPE_RESULT;
+
+      updateFields(ARequest,ASession.form,false,false);
+      processApply(ASession,submit);
+    }
+    else
+    {
+      terminateSession(ASession.streamJid,ASession.contactJid);
     }
   }
 }
 
-void SessionNegotiation::processContinue(const IStanzaSession &ASession, const IDataForm &ARequest)
+void SessionNegotiation::processContinue(IStanzaSession &ASession, const IDataForm &ARequest)
 {
   if (ARequest.type == DATAFORM_TYPE_SUBMIT)
   {
     QString resource = FDataForms->fieldValue(SESSION_FIELD_CONTINUE,ARequest.fields).toString();
-    if (ASession.status == IStanzaSession::Active && !resource.isEmpty())
+    if (!resource.isEmpty() && ASession.contactJid.resource()!=resource)
     {
+      ASession.status = IStanzaSession::Continue;
+      emit sessionTerminated(ASession);
+
       int result = 0;
       foreach(ISessionNegotiator *negotiator, FNegotiators)
-        result = result | negotiator->sessionContinue(ASession,resource);
+        result = result | negotiator->sessionApply(ASession);
 
       if ((result & ISessionNegotiator::Cancel) > 0)
       {
-        terminateSession(ASession.streamJid,ASession.contactJid);
+        ASession.status = IStanzaSession::Error;
+        ASession.errorCondition = ErrorHandler::coditionByCode(ErrorHandler::NOT_ACCEPTABLE);
+        sendSessionError(ASession,ARequest);
       }
       else if ((result & ISessionNegotiator::Wait) > 0)
       {
-        IStanzaSession session = ASession;
-        session.status = IStanzaSession::Continue;
-        session.contactJid.setResource(resource);
-        updateSession(session);
-        FSuspended.insert(session.sessionId,ARequest);
+        FSuspended.insert(ASession.sessionId,ARequest);
       }
-      else if ((result & (ISessionNegotiator::Manual|ISessionNegotiator::Auto)) > 0)
+      else
       {
-        IDataForm response = ARequest;
-        response.type == DATAFORM_TYPE_RESULT;
-        sendSessionData(ASession,response);
-
-        IStanzaSession session = ASession;
-        session.status = IStanzaSession::Active;
-        session.contactJid.setResource(resource);
-        updateSession(session);
-        emit sessionActivated(session);
+        IDataForm submit = defaultForm(SESSION_FIELD_CONTINUE,resource);
+        submit.type = DATAFORM_TYPE_RESULT;
+        sendSessionData(ASession,submit);
+        ASession.status = IStanzaSession::Active;
+        ASession.contactJid.setResource(resource);
+        emit sessionActivated(ASession);
       }
     }
   }
 }
 
-void SessionNegotiation::processTerminate(const IStanzaSession &ASession, const IDataForm &ARequest)
+void SessionNegotiation::processTerminate(IStanzaSession &ASession, const IDataForm &ARequest)
 {
   if (ARequest.type == DATAFORM_TYPE_SUBMIT)
   {
-    IStanzaSession session = ASession;
-    session.status = IStanzaSession::Terminate;
-    updateSession(session);
-    emit sessionTerminated(session);
+    ASession.status = IStanzaSession::Terminate;
+    emit sessionTerminated(ASession);
   }
 }
 
-void SessionNegotiation::showSessionDialog(const IStanzaSession &ASession, const IDataForm &ARequest)
+void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const IDataForm &ARequest)
 {
   if (FDataForms)
   {
@@ -810,9 +837,10 @@ void SessionNegotiation::showSessionDialog(const IStanzaSession &ASession, const
     {
       dialog = FDataForms->dialogWidget(ARequest,NULL);
       dialog->instance()->setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SESSION));
-      dialog->dialogButtons()->setStandardButtons(QDialogButtonBox::Ok);
-      connect(dialog->instance(),SIGNAL(accepted()),SLOT(onSessionDialogAccepted()));
-      connect(dialog->instance(),SIGNAL(dialogDestroyed(IDataDialogWidget *)),SLOT(onSessionDialogDestroyed(IDataDialogWidget *)));
+      dialog->dialogButtons()->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+      connect(dialog->instance(),SIGNAL(accepted()),SLOT(onAcceptDialogAccepted()));
+      connect(dialog->instance(),SIGNAL(rejected()),SLOT(onAcceptDialogRejected()));
+      connect(dialog->instance(),SIGNAL(dialogDestroyed(IDataDialogWidget *)),SLOT(onAcceptDialogDestroyed(IDataDialogWidget *)));
       FDialogs[ASession.streamJid].insert(ASession.contactJid,dialog);
     }
     else
@@ -823,7 +851,7 @@ void SessionNegotiation::showSessionDialog(const IStanzaSession &ASession, const
       INotification notify;
       notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
       notify.data.insert(NDR_ICON,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SESSION));
-      notify.data.insert(NDR_TOOLTIP,tr("Settings for session with %1").arg(ASession.contactJid.full()));
+      notify.data.insert(NDR_TOOLTIP,tr("Session negotiation - %1").arg(ASession.contactJid.full()));
       notify.data.insert(NDR_WINDOW_CAPTION,tr("Session negotiation"));
       notify.data.insert(NDR_WINDOW_TITLE,FNotifications->contactName(ASession.streamJid,ASession.contactJid));
       notify.data.insert(NDR_WINDOW_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
@@ -836,24 +864,18 @@ void SessionNegotiation::showSessionDialog(const IStanzaSession &ASession, const
   }
 }
 
-void SessionNegotiation::closeSessionDialog(const IStanzaSession &ASession)
+void SessionNegotiation::closeAcceptDialog(const IStanzaSession &ASession)
 {
-  if (FDialogs.value(ASession.streamJid).contains(ASession.contactJid))
-  {
-    IDataDialogWidget *dialog = FDialogs[ASession.streamJid].take(ASession.contactJid);
+  IDataDialogWidget *dialog = FDialogs.value(ASession.streamJid).value(ASession.contactJid, NULL);
+  if (dialog)
     dialog->instance()->deleteLater();
-    if (FNotifications)
-    {
-      int notifyId = FDialogByNotify.key(dialog);
-      FDialogByNotify.remove(notifyId);
-      FNotifications->removeNotification(notifyId);
-    }
-  }
 }
 
-void SessionNegotiation::localizeSession(const IStanzaSession &ASession, IDataForm &AForm) const
+void SessionNegotiation::localizeSession(IStanzaSession &ASession, IDataForm &AForm) const
 {
-  AForm.title = tr("Settings for session with %1").arg(ASession.contactJid.full());
+  AForm.title = tr("Session negotiation - %1").arg(ASession.contactJid.full());
+  AForm.instructions = QStringList() << (AForm.type==DATAFORM_TYPE_FORM ? tr("Set desirable session settings.") : tr("Do you accept this session settings?"));
+  
   if (FDataForms)
   {
     int index = FDataForms->fieldIndex(SESSION_FIELD_ACCEPT,AForm.fields);
@@ -862,18 +884,11 @@ void SessionNegotiation::localizeSession(const IStanzaSession &ASession, IDataFo
 
     index = FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE,AForm.fields);
     if (index>=0)
-      AForm.fields[index].label = tr("Renegotiate this settings?");
-
-    foreach(ISessionNegotiator *negotiator, FNegotiators)
-      negotiator->sessionLocalize(ASession,AForm);
+      AForm.fields[index].label = tr("Renegotiate this session?");
   }
-}
 
-void SessionNegotiation::updateSession(const IStanzaSession &ASession)
-{
-  FSessions[ASession.streamJid].insert(ASession.contactJid,ASession);
-  FSuspended.remove(ASession.sessionId);
-  closeSessionDialog(ASession);
+  foreach(ISessionNegotiator *negotiator, FNegotiators)
+    negotiator->sessionLocalize(ASession,AForm);
 }
 
 void SessionNegotiation::removeSession(const IStanzaSession &ASession)
@@ -883,7 +898,7 @@ void SessionNegotiation::removeSession(const IStanzaSession &ASession)
     IStanzaSession sesssion = FSessions[ASession.streamJid].take(ASession.contactJid);
     FSuspended.remove(sesssion.sessionId);
     FRenegotiate.remove(sesssion.sessionId);
-    closeSessionDialog(sesssion);
+    closeAcceptDialog(sesssion);
   }
 }
 
@@ -903,7 +918,8 @@ void SessionNegotiation::updateFields(const IDataForm &ASourse, IDataForm &ADest
   if (FDataForms)
   {
     const static QStringList reservedFields = QStringList() 
-      << SESSION_FIELD_ACCEPT << SESSION_FIELD_CONTINUE << SESSION_FIELD_RENEGOTIATE << SESSION_FIELD_TERMINATE;
+      << SESSION_FIELD_ACCEPT << SESSION_FIELD_CONTINUE << SESSION_FIELD_RENEGOTIATE 
+      << SESSION_FIELD_TERMINATE << SESSION_FIELD_REASON << "FORM_TYPE";
 
     QStringList updated;
     foreach(IDataField field, ASourse.fields)
@@ -928,7 +944,7 @@ void SessionNegotiation::updateFields(const IDataForm &ASourse, IDataForm &ADest
   }
 }
 
-IDataForm SessionNegotiation::defaultForm(const QString &AActionVar) const
+IDataForm SessionNegotiation::defaultForm(const QString &AActionVar, const QVariant &AValue) const
 {
   IDataField form_type;
   form_type.var = "FORM_TYPE";
@@ -937,12 +953,35 @@ IDataForm SessionNegotiation::defaultForm(const QString &AActionVar) const
   form_type.required = false;
   IDataField actionField;
   actionField.var = AActionVar;
-  actionField.type = DATAFIELD_TYPE_BOOLEAN;
-  actionField.value = true;
+  actionField.type = AValue.type()==QVariant::Bool ? DATAFIELD_TYPE_BOOLEAN : DATAFIELD_TYPE_TEXTSINGLE;
+  actionField.value = AValue;
   actionField.required = true;
   IDataForm form;
   form.fields.append(form_type);
   form.fields.append(actionField);
+  form.pages.append(IDataLayout());
+  return form;
+}
+
+IDataForm SessionNegotiation::clearForm(const IDataForm &AForm) const
+{
+  IDataForm form;
+  form.type = AForm.type;
+  foreach(IDataField field, AForm.fields)
+  {
+    IDataField clearField;
+    clearField.type = field.type;
+    clearField.var = field.var;
+    clearField.value = field.value;
+    clearField.required = field.required;
+    foreach (IDataOption option, field.options)
+    {
+      IDataOption clearOption;
+      clearOption.value = option.value;
+      clearField.options.append(clearOption);
+    }
+    form.fields.append(clearField);
+  }
   return form;
 }
 
@@ -959,13 +998,12 @@ QStringList SessionNegotiation::unsubmitedFields(const IDataForm &ARequest, cons
   return fields;
 }
 
-IStanzaSession SessionNegotiation::dialogSession(IDataDialogWidget *ADialog) const
+IStanzaSession &SessionNegotiation::dialogSession(IDataDialogWidget *ADialog)
 {
-  QList<Jid> streams = FDialogs.keys();
-  foreach(Jid streamJid, streams)
+  foreach(Jid streamJid, FDialogs.keys())
     if (FDialogs.value(streamJid).values().contains(ADialog))
-      return currentSession(streamJid,FDialogs.value(streamJid).key(ADialog));
-  return IStanzaSession();
+      return FSessions[streamJid][FDialogs.value(streamJid).key(ADialog)];
+  return FSessions[""][""];
 }
 
 void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
@@ -980,7 +1018,10 @@ void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
 void SessionNegotiation::onPresenceReceived(IPresence *APresence, const IPresenceItem &AItem)
 {
   if (AItem.show == IPresence::Offline || AItem.show == IPresence::Error)
+  {
     terminateSession(APresence->streamJid(),AItem.itemJid);
+    removeSession(getSession(APresence->streamJid(),AItem.itemJid));
+  }
 }
 
 void SessionNegotiation::onStreamAboutToClose(IXmppStream *AXmppStream)
@@ -1014,27 +1055,123 @@ void SessionNegotiation::onNotificationActivated(int ANotifyId)
   }
 }
 
-void SessionNegotiation::onSessionDialogAccepted()
+void SessionNegotiation::onAcceptDialogAccepted()
 {
   IDataDialogWidget *dialog = qobject_cast<IDataDialogWidget *>(sender());
   if (dialog)
   {
-    IStanzaSession session = dialogSession(dialog);
+    IStanzaSession &session = dialogSession(dialog);
     if (session.status == IStanzaSession::Init)
-      sendSessionInit(session,dialog->formWidget()->userDataForm());
+    {
+      session.status = IStanzaSession::Pending;
+      IDataForm request = dialog->formWidget()->userDataForm();
+      request.title = tr("Session negotiation");
+      updateFields(request,session.form,false,false);
+      sendSessionData(session,request);
+    }
     else if (session.status == IStanzaSession::Accept)
-      sendSessionAccept(session,FDataForms->dataSubmit(dialog->formWidget()->userDataForm()));
-    else if (session.status == IStanzaSession::Active)
-      sendSessionRenegotiate(session,FDataForms->dataSubmit(dialog->formWidget()->userDataForm()));
-    closeSessionDialog(session);
+    {
+      if (dialog->formWidget()->dataForm().type == DATAFORM_TYPE_FORM)
+      {
+        IDataForm submit = FDataForms->dataSubmit(dialog->formWidget()->userDataForm());
+        updateFields(submit,session.form,false,false);
+        processApply(session,submit);
+      }
+      else
+      {
+        IDataForm result = defaultForm(SESSION_FIELD_ACCEPT);
+        result.type = DATAFORM_TYPE_RESULT;
+        processApply(session,result);
+      }
+    }
+    else if (session.status == IStanzaSession::Renegotiate)
+    {
+      IDataForm request = dialog->formWidget()->dataForm();
+      if (request.type.isEmpty())
+      {
+        IDataForm request = dialog->formWidget()->userDataForm();
+        request.type = DATAFORM_TYPE_FORM;
+        request.title = tr("Session renegotiation");
+        sendSessionData(session,request);
+      }
+      else if (request.type == DATAFORM_TYPE_FORM)
+      {
+        IDataForm submit = FDataForms->dataSubmit(dialog->formWidget()->userDataForm());
+        updateFields(submit,session.form,false,false);
+        processApply(session,submit);
+      }
+      else if (request.type == DATAFORM_TYPE_SUBMIT)
+      {
+        IDataForm submit = defaultForm(SESSION_FIELD_RENEGOTIATE);
+        submit.type = DATAFORM_TYPE_RESULT;
+        processApply(session,submit);
+      }
+    }
   }
 }
 
-void SessionNegotiation::onSessionDialogDestroyed(IDataDialogWidget *ADialog)
+void SessionNegotiation::onAcceptDialogRejected()
 {
-  IStanzaSession session = dialogSession(ADialog);
-  terminateSession(session.streamJid,session.contactJid);
-  closeSessionDialog(session);
+  IDataDialogWidget *dialog = qobject_cast<IDataDialogWidget *>(sender());
+  if (dialog)
+  {
+    IStanzaSession &session = dialogSession(dialog);
+    if (session.status == IStanzaSession::Init)
+    {
+      session.status = IStanzaSession::Terminate;
+      emit sessionTerminated(session);
+    }
+    else if (session.status == IStanzaSession::Accept)
+    {
+      if (dialog->formWidget()->dataForm().type == DATAFORM_TYPE_FORM)
+      {
+        session.status = IStanzaSession::Terminate;
+        IDataForm submit = FDataForms->dataSubmit(dialog->formWidget()->dataForm());
+        submit.fields[FDataForms->fieldIndex(SESSION_FIELD_ACCEPT,submit.fields)].value = false;
+        updateFields(IDataForm(),submit,false,true);
+        sendSessionData(session,submit);
+      }
+      else
+      {
+        session.status = IStanzaSession::Terminate;
+        IDataForm result = defaultForm(SESSION_FIELD_ACCEPT,false);
+        result.type = DATAFORM_TYPE_RESULT;
+        sendSessionData(session,result);
+        emit sessionTerminated(session);
+      }
+    }
+    else if (session.status == IStanzaSession::Renegotiate)
+    {
+      IDataForm request = dialog->formWidget()->dataForm();
+      if (request.type.isEmpty())
+      {
+        terminateSession(session.streamJid,session.contactJid);
+      }
+      else if (request.type == DATAFORM_TYPE_FORM)
+      {
+        IDataForm submit = FDataForms->dataSubmit(request);
+        submit.fields[FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE,submit.fields)].value = false;
+        updateFields(IDataForm(),submit,false,true);
+        sendSessionData(session,submit);
+      }
+      else if (request.type == DATAFORM_TYPE_SUBMIT)
+      {
+        terminateSession(session.streamJid,session.contactJid);
+      }
+    }
+  }
+}
+
+void SessionNegotiation::onAcceptDialogDestroyed(IDataDialogWidget *ADialog)
+{
+  IStanzaSession &session = dialogSession(ADialog);
+  FDialogs[session.streamJid].remove(session.contactJid);
+  if (FNotifications)
+  {
+    int notifyId = FDialogByNotify.key(ADialog);
+    FDialogByNotify.remove(notifyId);
+    FNotifications->removeNotification(notifyId);
+  }
 }
 
 void SessionNegotiation::onSessionActionTriggered(bool)
@@ -1049,6 +1186,16 @@ void SessionNegotiation::onSessionActionTriggered(bool)
       initSession(streamJid,contactJid);
     else if (sessionField == SESSION_FIELD_TERMINATE)
       terminateSession(streamJid,contactJid);
+  }
+}
+
+void SessionNegotiation::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
+{
+  foreach(QString sessionId, FSuspended.keys())
+  {
+    IStanzaSession session = getSession(sessionId);
+    if (session.status==IStanzaSession::Init && session.contactJid==AInfo.contactJid)
+      resumeSession(session.streamJid,session.contactJid);
   }
 }
 
