@@ -1,6 +1,5 @@
 #include "xmppstreams.h"
 
-#include <QtDebug>
 #include <QIcon>
 #include "../../definations/namespaces.h"
 #include "../../utils/errorhandler.h"
@@ -132,6 +131,8 @@ void XmppStreams::addStream(IXmppStream *AXmppStream)
       SLOT(onStreamOpened(IXmppStream *)));
     connect(AXmppStream->instance(), SIGNAL(element(IXmppStream *, const QDomElement &)), 
       SLOT(onStreamElement(IXmppStream *, const QDomElement &))); 
+    connect(AXmppStream->instance(), SIGNAL(consoleElement(IXmppStream *, const QDomElement &, bool)), 
+      SLOT(onStreamConsoleElement(IXmppStream *, const QDomElement &, bool))); 
     connect(AXmppStream->instance(), SIGNAL(aboutToClose(IXmppStream *)), 
       SLOT(onStreamAboutToClose(IXmppStream *))); 
     connect(AXmppStream->instance(), SIGNAL(closed(IXmppStream *)), 
@@ -153,7 +154,6 @@ void XmppStreams::addStream(IXmppStream *AXmppStream)
     connect(AXmppStream->instance(), SIGNAL(destroyed(IXmppStream *)), 
       SLOT(onStreamDestroyed(IXmppStream *))); 
     FActiveStreams.append(AXmppStream);
-    qDebug() << "Stream added" << AXmppStream->jid().full(); 
     emit added(AXmppStream);
   }
 }
@@ -165,7 +165,6 @@ void XmppStreams::removeStream(IXmppStream *AXmppStream)
     AXmppStream->close();
     AXmppStream->instance()->disconnect(this);
     FActiveStreams.removeAt(FActiveStreams.indexOf(AXmppStream));
-    qDebug() << "Stream removed" << AXmppStream->jid().full(); 
     emit removed(AXmppStream);
   }
 }
@@ -177,6 +176,7 @@ void XmppStreams::destroyStream(const Jid &AStreamJid)
   {
     removeStream(stream);
     FStreams.removeAt(FStreams.indexOf(stream));
+    emit destroyed(stream);
     delete stream;
   }
 }
@@ -208,6 +208,11 @@ void XmppStreams::onStreamOpened(IXmppStream *AXmppStream)
 void XmppStreams::onStreamElement(IXmppStream *AXmppStream, const QDomElement &elem)
 {
   emit element(AXmppStream, elem);
+}
+
+void XmppStreams::onStreamConsoleElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended)
+{
+  emit consoleElement(AXmppStream,AElem,ASended);
 }
 
 void XmppStreams::onStreamAboutToClose(IXmppStream *AXmppStream)

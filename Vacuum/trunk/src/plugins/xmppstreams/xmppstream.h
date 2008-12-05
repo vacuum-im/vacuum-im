@@ -42,6 +42,7 @@ public:
 signals:
   virtual void opened(IXmppStream *AXmppStream);
   virtual void element(IXmppStream *AXmppStream, const QDomElement &elem);
+  virtual void consoleElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);
   virtual void aboutToClose(IXmppStream *AXmppStream);
   virtual void error(IXmppStream *AXmppStream, const QString &errStr);
   virtual void closed(IXmppStream *AXmppStream);

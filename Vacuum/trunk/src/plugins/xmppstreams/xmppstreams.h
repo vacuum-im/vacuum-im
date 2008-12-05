@@ -36,7 +36,8 @@ signals:
   virtual void created(IXmppStream *AXmppStream);
   virtual void added(IXmppStream *AXmppStream);
   virtual void opened(IXmppStream *AXmppStream);
-  virtual void element(IXmppStream *AXmppStream, const QDomElement &elem);
+  virtual void element(IXmppStream *AXmppStream, const QDomElement &AElem);
+  virtual void consoleElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);
   virtual void aboutToClose(IXmppStream *AXmppStream);
   virtual void closed(IXmppStream *AXmppStream);
   virtual void error(IXmppStream *AXmppStream, const QString &errStr);
@@ -51,12 +52,13 @@ signals:
   virtual void destroyed(IXmppStream *AXmppStream);
 protected slots:
   void onStreamOpened(IXmppStream *AXmppStream);
-  void onStreamElement(IXmppStream *AXmppStream, const QDomElement &elem);
+  void onStreamElement(IXmppStream *AXmppStream, const QDomElement &AElem);
+  void onStreamConsoleElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);
   void onStreamAboutToClose(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
   void onStreamError(IXmppStream *AXmppStream, const QString &AErrStr);
-  void onStreamJidAboutToBeChanged(IXmppStream *AStream, const Jid &AAfter);
-  void onStreamJidChanged(IXmppStream *AStream, const Jid &ABefour);
+  void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
+  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onStreamConnectionAdded(IXmppStream *AXmppStream, IConnection *AConnection);
   void onStreamConnectionRemoved(IXmppStream *AXmppStream, IConnection *AConnection);
   void onStreamFeatureAdded(IXmppStream *AXmppStream, IStreamFeature *AFeature);

@@ -1,6 +1,5 @@
 #include "xmppstream.h"
 
-#include <QtDebug>
 #include <QInputDialog>
 
 #define KEEP_ALIVE_TIMEOUT          30000
@@ -197,7 +196,6 @@ void XmppStream::abortStream(const QString &AError)
 {
   if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
   {
-    qDebug() << "\nSTREAM" << FJid.full() << "ERROR:" << AError;
     FStreamState = SS_ERROR;
     FLastError = AError;
     emit error(this,AError);
@@ -360,8 +358,7 @@ QByteArray XmppStream::receiveData(qint64 ABytes)
 
 void XmppStream::showInConsole(const QDomElement &AElem, IStreamFeature::Direction ADirection)
 {
-  qDebug() << (ADirection == IStreamFeature::DirectionIn ? "\nStanza in:" : "\nStanza out:") << FJid.full();
-  qDebug() << AElem.ownerDocument().toString(2);
+  emit consoleElement(this,AElem,ADirection==IStreamFeature::DirectionOut);
 }
 
 void XmppStream::onConnectionConnected()
