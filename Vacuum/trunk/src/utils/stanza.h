@@ -17,7 +17,7 @@ public:
   };
   StanzaData(const QDomElement &AElem) 
   {
-    FDoc.appendChild(FDoc.createElement(AElem.tagName()) = AElem);  
+    FDoc.appendChild(FDoc.importNode(AElem,true));  
   };
   StanzaData(const StanzaData &AOther) : QSharedData(AOther)
   {

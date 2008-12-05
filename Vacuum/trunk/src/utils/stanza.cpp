@@ -68,7 +68,7 @@ bool Stanza::canReplyError() const
   if (tagName() != "iq")
     return false;
 
-  if (type() == "error")
+  if (type()!="set" && type()!="get")
     return false;
 
   if (!firstElement("error").isNull())
