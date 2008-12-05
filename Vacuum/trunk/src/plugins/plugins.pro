@@ -39,4 +39,5 @@ SUBDIRS = settings \
           avatars \
           notifications \
           autostatus \
-          rostersearch
+          rostersearch \
+          console

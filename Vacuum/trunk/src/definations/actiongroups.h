@@ -4,11 +4,12 @@
 #define AG_NULL                                                 -1
 #define AG_DEFAULT                                              500
 
-//MainWindow (MainMwenu)
+//MainWindow (MainMenu)
 #define AG_ROSTERCHANGER_MMENU                                  500
 #define AG_SETTINGS_MMENU                                       700
 #define AG_ACCOUNTMANAGER_MMENU                                 700
 #define AG_SKINMANAGER_MENU                                     700
+#define AG_CONSOLE_MMENU                                        700
 #define AG_MAINWINDOW_MMENU_QUIT                                1000
 
 //MainWindow (TopToolBar)
