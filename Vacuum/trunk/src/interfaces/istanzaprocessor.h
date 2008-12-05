@@ -46,8 +46,8 @@ public:
   virtual void removeHandler(int AHandlerId) =0;
   virtual bool checkStanza(const Stanza &AStanza, const QString &ACondition) const =0;
 signals:
-  virtual void stanzaSended(const Stanza &AStanza) =0;
-  virtual void stanzaReceived(const Stanza &AStanza) =0;
+  virtual void stanzaSended(const Jid &AStreamJid, const Stanza &AStanza) =0;
+  virtual void stanzaReceived(const Jid &AStreamJid, const Stanza &AStanza) =0;
   virtual void handlerInserted(int AHandlerId, IStanzaHandler *AHandler) =0;
   virtual void handlerRemoved(int AHandlerId) =0;
   virtual void conditionAppended(int AHandlerId, const QString &ACondition) =0;

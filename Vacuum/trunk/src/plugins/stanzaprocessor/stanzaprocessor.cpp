@@ -51,6 +51,7 @@ QString StanzaProcessor::newId() const
 
 bool StanzaProcessor::sendStanzaIn(const Jid &AStreamJid, const Stanza &AStanza)
 {
+  emit stanzaReceived(AStreamJid, AStanza);
   Stanza stanza(AStanza);
   bool acceptedIn = processStanzaIn(AStreamJid,&stanza);
   bool acceptedIq = processIqStanza(AStreamJid,AStanza);
@@ -67,7 +68,7 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza
     if (stream && stream->isOpen())
     {
       sended = stream->sendStanza(stanza) > 0;
-      emit stanzaSended(stanza);
+      emit stanzaSended(AStreamJid, stanza);
     }
   }
   return sended;
@@ -391,8 +392,6 @@ void StanzaProcessor::onStreamElement(IXmppStream *AXmppStream, const QDomElemen
   if (stanza.from().isEmpty())
     stanza.setFrom(AXmppStream->jid().eFull());
   stanza.setTo(AXmppStream->jid().eFull());
-
-  emit stanzaReceived(stanza);
 
   if (!sendStanzaIn(AXmppStream->jid(),stanza))
     if (stanza.canReplyError())
