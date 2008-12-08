@@ -201,6 +201,7 @@ bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
       Stanza publish("iq");
       publish.setTo(AStreamJid.eBare()).setType("set").setId(FStanzaProcessor->newId());
       QDomElement elem = publish.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
+      removeEmptyChildElements(elem);
       if (FStanzaProcessor->sendIqStanza(this,AStreamJid,publish,VCARD_TIMEOUT))
       {
         FVCardPublishId.insert(publish.id(),AStreamJid.pBare());
@@ -257,6 +258,21 @@ void VCardPlugin::saveVCardFile(const QDomElement &AElem, const Jid &AContactJid
       vcardFile.write(doc.toByteArray());
       vcardFile.close();
     }
+  }
+}
+
+void VCardPlugin::removeEmptyChildElements(QDomElement &AElem) const
+{
+  static const QStringList tagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400" << "CELL" << "MODEM";
+
+  QDomElement curChild = AElem.firstChildElement();
+  while (!curChild.isNull())
+  {
+    removeEmptyChildElements(curChild);
+    QDomElement nextChild = curChild.nextSiblingElement();
+    if (curChild.text().isEmpty() && !tagList.contains(curChild.tagName()))
+      curChild.parentNode().removeChild(curChild);
+    curChild = nextChild;
   }
 }
 

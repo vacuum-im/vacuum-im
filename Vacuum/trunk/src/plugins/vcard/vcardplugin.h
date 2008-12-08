@@ -55,6 +55,7 @@ signals:
 protected:
   void unlockVCard(const Jid &AContactJid);
   void saveVCardFile(const QDomElement &AElem, const Jid &AContactJid) const;
+  void removeEmptyChildElements(QDomElement &AElem) const;
   void registerDiscoFeatures();
 protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);

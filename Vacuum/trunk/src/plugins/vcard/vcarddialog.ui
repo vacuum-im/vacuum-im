@@ -22,14 +22,6 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="tabGeneral" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>439</width>
-        <height>186</height>
-       </rect>
-      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>
@@ -121,14 +113,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabPersonal" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>439</width>
-        <height>186</height>
-       </rect>
-      </property>
       <property name="autoFillBackground" >
        <bool>false</bool>
       </property>
@@ -158,6 +142,26 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="dateTime" >
+            <datetime>
+             <hour>0</hour>
+             <minute>0</minute>
+             <second>0</second>
+             <year>1900</year>
+             <month>1</month>
+             <day>1</day>
+            </datetime>
+           </property>
+           <property name="minimumDateTime" >
+            <datetime>
+             <hour>0</hour>
+             <minute>0</minute>
+             <second>0</second>
+             <year>1900</year>
+             <month>1</month>
+             <day>1</day>
+            </datetime>
            </property>
            <property name="displayFormat" >
             <string>dd.MMMM.yyyy</string>
@@ -283,14 +287,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabAdress" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>439</width>
-        <height>186</height>
-       </rect>
-      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>
@@ -464,14 +460,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabContacts" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>439</width>
-        <height>186</height>
-       </rect>
-      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>
@@ -581,14 +569,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabPhoto" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>439</width>
-        <height>186</height>
-       </rect>
-      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>
@@ -756,14 +736,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabComments" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>439</width>
-        <height>186</height>
-       </rect>
-      </property>
       <property name="autoFillBackground" >
        <bool>true</bool>
       </property>

@@ -98,6 +98,8 @@ void VCardDialog::updateDialog()
   QDate birthday = QDate::fromString(FVCard->value(VVN_BIRTHDAY),Qt::ISODate);
   if (!birthday.isValid())
     birthday = QDate::fromString(FVCard->value(VVN_BIRTHDAY),Qt::TextDate);
+  if (!birthday.isValid() || birthday<ui.dedBirthday->minimumDate())
+    birthday = ui.dedBirthday->minimumDate();
   ui.dedBirthday->setDate(birthday);
   ui.dedBirthday->setReadOnly(readOnly);
   ui.dedBirthday->setEnabled(!readOnly || birthday.isValid());
@@ -117,9 +119,9 @@ void VCardDialog::updateDialog()
   ui.lneHomePage->setText(FVCard->value(VVN_URL));
   ui.lneHomePage->setReadOnly(readOnly);
 
-  static QStringList tagHome = QStringList() << "HOME";
-  static QStringList tagWork = QStringList() << "WORK";
-  static QStringList tagsAdres = tagHome+tagWork;
+  static const QStringList tagHome = QStringList() << "HOME";
+  static const QStringList tagWork = QStringList() << "WORK";
+  static const QStringList tagsAdres = tagHome+tagWork;
   ui.lneHomeStreet->setText(FVCard->value(VVN_ADR_STREET,tagHome,tagsAdres));
   ui.lneHomeStreet->setReadOnly(readOnly);
   ui.lneHomeCity->setText(FVCard->value(VVN_ADR_CITY,tagHome,tagsAdres));
@@ -142,7 +144,7 @@ void VCardDialog::updateDialog()
   ui.lneWorkCountry->setReadOnly(readOnly);
 
   ui.ltwEmails->clear();
-  static QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
+  static const QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
   QHash<QString,QStringList> emails = FVCard->values(VVN_EMAIL,emailTagList);
   foreach(QString email, emails.keys())
   {
@@ -154,7 +156,7 @@ void VCardDialog::updateDialog()
   ui.tlbEmailDelete->setVisible(!readOnly);
 
   ui.ltwPhones->clear();
-  static QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
+  static const QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
   QHash<QString,QStringList> phones = FVCard->values(VVN_TELEPHONE,phoneTagList);
   foreach(QString phone, phones.keys())
   {
@@ -187,7 +189,10 @@ void VCardDialog::updateVCard()
   FVCard->setValueForTags(VVN_FAMILY_NAME,ui.lneLastName->text());
   FVCard->setValueForTags(VVN_NICKNAME,ui.lneNickName->text());
   
-  FVCard->setValueForTags(VVN_BIRTHDAY,ui.dedBirthday->date().toString(Qt::ISODate));
+  if (ui.dedBirthday->date() > ui.dedBirthday->minimumDate())
+    FVCard->setValueForTags(VVN_BIRTHDAY,ui.dedBirthday->date().toString(Qt::ISODate));
+  else
+    FVCard->setValueForTags(VVN_BIRTHDAY,"");
   FVCard->setValueForTags(VVN_GENDER,ui.cmbGender->currentText());
   FVCard->setValueForTags(VVN_MARITALSTATUS,ui.lneMaritial->text());
   FVCard->setValueForTags(VVN_TITLE,ui.lneTitle->text());
@@ -196,9 +201,9 @@ void VCardDialog::updateVCard()
   FVCard->setValueForTags(VVN_ROLE,ui.lneRole->text());
   FVCard->setValueForTags(VVN_URL,ui.lneHomePage->text());
 
-  static QStringList adresTags = QStringList() << "WORK" << "HOME";
-  static QStringList tagHome = QStringList() << "HOME";
-  static QStringList tagWork = QStringList() << "WORK";
+  static const QStringList adresTags = QStringList() << "WORK" << "HOME";
+  static const QStringList tagHome = QStringList() << "HOME";
+  static const QStringList tagWork = QStringList() << "WORK";
   FVCard->setValueForTags(VVN_ADR_STREET,ui.lneHomeStreet->text(),tagHome,adresTags);
   FVCard->setValueForTags(VVN_ADR_CITY,ui.lneHomeCity->text(),tagHome,adresTags);
   FVCard->setValueForTags(VVN_ADR_REGION,ui.lneHomeState->text(),tagHome,adresTags);
@@ -210,14 +215,14 @@ void VCardDialog::updateVCard()
   FVCard->setValueForTags(VVN_ADR_PCODE,ui.lneWorkZip->text(),tagWork,adresTags);
   FVCard->setValueForTags(VVN_ADR_COUNTRY,ui.lneWorkCountry->text(),tagWork,adresTags);
 
-  static QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
+  static const QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
   for (int i = 0; i<ui.ltwEmails->count(); i++)
   {
     QListWidgetItem *listItem = ui.ltwEmails->item(i);
     FVCard->setTagsForValue(VVN_EMAIL,listItem->text(),listItem->data(Qt::UserRole).toStringList(),emailTagList);
   }
 
-  static QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
+  static const QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
   for (int i = 0; i<ui.ltwPhones->count(); i++)
   {
     QListWidgetItem *listItem = ui.ltwPhones->item(i);
