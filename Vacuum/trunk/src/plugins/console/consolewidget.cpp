@@ -94,10 +94,10 @@ void ConsoleWidget::colorXml(QString &AXml) const
   static const struct { const char *regexp ; const char *replace; bool minimal;} changes[] = 
   {
     { "\n",                           "<br>"                                          ,                     false      },
-    { "&lt;([:\\w]+)((\\s|/|&gt))",   "&lt;<span style='color:navy;'>\\1</span>\\2"   ,                     false      },   //open tagName
-    { "&lt;/([\\w:]+)&gt;",           "&lt;/<span style='color:navy;'>\\1</span>&gt;" ,                     false      },   //close tagName
+    { "&lt;([\\w:-]+)((\\s|/|&gt))",  "&lt;<span style='color:navy;'>\\1</span>\\2"   ,                     false      },   //open tagName
+    { "&lt;/([\\w:-]+)&gt;",          "&lt;/<span style='color:navy;'>\\1</span>&gt;" ,                     false      },   //close tagName
     { " xmlns\\s?=\\s?\"(.+)\"",      " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },   //xmlns
-    { " ([\\w:]+\\s?)=\\s?\"",        " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
+    { " ([\\w:-]+\\s?)=\\s?\"",       " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
   }; 
   static const int changesCount = sizeof(changes)/sizeof(changes[0]);
 
