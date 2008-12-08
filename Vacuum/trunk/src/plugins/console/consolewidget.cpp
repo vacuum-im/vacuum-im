@@ -8,6 +8,7 @@
 #define SVN_CONTEXT                   "context[]"
 #define SVN_CONTEXT_STREAM            SVN_CONTEXT":stream"
 #define SVN_CONTEXT_CONDITIONS        SVN_CONTEXT":conditions"
+#define SVN_CONTEXT_COLORXML          SVN_CONTEXT":colorXML"
 #define SBD_CONTEXT_SENDXML           "[%1]:sendXML"
 #define SBD_CONTEXT_GEOMETRY          "[%1]:geometry"
 #define SBD_CONTEXT_HSPLITTER         "[%1]:hsplitter"
@@ -92,11 +93,11 @@ void ConsoleWidget::colorXml(QString &AXml) const
 {
   static const struct { const char *regexp ; const char *replace; bool minimal;} changes[] = 
   {
-    { "\n",                       "<br>"                                          ,                     false      },
-    { "&lt;(\\w+)((\\s|&gt;))",   "&lt;<span style='color:navy;'>\\1</span>\\2"   ,                     false      },
-    { "&lt;/(\\w+)&gt;",          "&lt;/<span style='color:navy;'>\\1</span>&gt;" ,                     false      },
-    { " xmlns\\s?=\\s?\"(.+)\"",  " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },
-    { " (\\w+\\s?)=\\s?\"",       " <span style='color:darkred;'>\\1</span>=\"",                        false      }
+    { "\n",                           "<br>"                                          ,                     false      },
+    { "&lt;([:\\w]+)((\\s|/|&gt))",   "&lt;<span style='color:navy;'>\\1</span>\\2"   ,                     false      },   //open tagName
+    { "&lt;/([\\w:]+)&gt;",           "&lt;/<span style='color:navy;'>\\1</span>&gt;" ,                     false      },   //close tagName
+    { " xmlns\\s?=\\s?\"(.+)\"",      " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },   //xmlns
+    { " ([\\w:]+\\s?)=\\s?\"",        " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
   }; 
   static const int changesCount = sizeof(changes)/sizeof(changes[0]);
 
@@ -144,6 +145,8 @@ void ConsoleWidget::onLoadContextClicked()
       ui.ltwConditions->clear();
       ui.ltwConditions->addItems(conditions);
 
+      ui.chbColoredXML->setCheckState((Qt::CheckState)settings->valueNS(SVN_CONTEXT_COLORXML,ns,Qt::PartiallyChecked).toInt());
+
       ui.tedSendXML->setPlainText(QString::fromUtf8(settings->loadBinaryData(QString(SBD_CONTEXT_SENDXML).arg(ns))));
       this->restoreGeometry(settings->loadBinaryData(QString(SBD_CONTEXT_GEOMETRY).arg(ns)));
       ui.sptHSplitter->restoreState(settings->loadBinaryData(QString(SBD_CONTEXT_HSPLITTER).arg(ns)));
@@ -166,6 +169,8 @@ void ConsoleWidget::onSaveContextClicked()
     for (int i=0; i<ui.ltwConditions->count(); i++)
       conditions.append(ui.ltwConditions->item(i)->text());
     settings->setValueNS(SVN_CONTEXT_CONDITIONS,ns,conditions);
+    
+    settings->setValueNS(SVN_CONTEXT_COLORXML,ns,ui.chbColoredXML->checkState());
 
     settings->saveBinaryData(QString(SBD_CONTEXT_SENDXML).arg(ns),ui.tedSendXML->toPlainText().toUtf8());
     settings->saveBinaryData(QString(SBD_CONTEXT_GEOMETRY).arg(ns),this->saveGeometry());
@@ -211,14 +216,21 @@ void ConsoleWidget::onStreamConsoleElement(IXmppStream *AXmppStream, const QDomE
 
     if (accepted)
     {
-      static QString sended =   Qt::escape(">>>>") + "<b>%1</b>" + Qt::escape(">>>>");
-      static QString received = Qt::escape("<<<<") + "<b>%1</b>" + Qt::escape("<<<<");
+      static QString sended =   Qt::escape(">>>>") + " <b>%1</b> %2 +%3 " + Qt::escape(">>>>");
+      static QString received = Qt::escape("<<<<") + " <b>%1</b> %2 +%3 " + Qt::escape("<<<<");
 
-      QString caption = (ASended ? sended : received).arg(AXmppStream->jid().hFull());
-      QString xml = stanza.toString(2);
-      colorXml(xml);
-
+      int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
+      FTimePoint = QTime::currentTime();
+      QString caption = (ASended ? sended : received).arg(AXmppStream->jid().hFull()).arg(FTimePoint.toString()).arg(delta);
       ui.tedConsole->append(caption);
+
+      QString xml = stanza.toString(2);
+      if (ui.chbColoredXML->checkState() == Qt::Checked)
+        colorXml(xml);
+      else if (ui.chbColoredXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)
+        colorXml(xml);
+      else
+        xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
       ui.tedConsole->append(xml);
     }
   }

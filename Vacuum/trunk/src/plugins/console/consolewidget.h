@@ -40,6 +40,8 @@ private:
   IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;
   ISettingsPlugin *FSettingsPlugin;
+private:
+  QTime FTimePoint;
 };
 
 #endif // CONSOLEWIDGET_H
