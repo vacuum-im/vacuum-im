@@ -515,7 +515,9 @@ bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const I
     data.setType("normal").setTo(ASession.contactJid.eFull());
     data.addElement("thread").appendChild(data.createTextNode(ASession.sessionId));
     QDomElement featureElem = data.addElement("feature",NS_FEATURENEG);
-    FDataForms->xmlForm(AForm,featureElem);
+    IDataForm form = AForm;
+    form.pages.clear();
+    FDataForms->xmlForm(form,featureElem);
     return FStanzaProcessor->sendStanzaOut(ASession.streamJid,data);
   }
   return false;
@@ -529,7 +531,9 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const 
     data.setType("error").setTo(ASession.contactJid.eFull());
     data.addElement("thread").appendChild(data.createTextNode(ASession.sessionId));
     QDomElement featureElem = data.addElement("feature",NS_FEATURENEG);
-    FDataForms->xmlForm(ARequest,featureElem);
+    IDataForm request = ARequest;
+    request.pages.clear();
+    FDataForms->xmlForm(request,featureElem);
     QDomElement errorElem = data.addElement("error");
     errorElem.setAttribute("code",ErrorHandler::codeByCondition(ASession.errorCondition));
     errorElem.setAttribute("type",ErrorHandler::typeToString(ErrorHandler::typeByCondition(ASession.errorCondition)));
