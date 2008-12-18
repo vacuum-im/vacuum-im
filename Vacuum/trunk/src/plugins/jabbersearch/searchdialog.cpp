@@ -303,7 +303,12 @@ void SearchDialog::onToolBarActionTriggered(bool)
     }
     else if (action == FAddContact)
     {
-      FRosterChanger->showAddContactDialog(FStreamJid,item.itemJid,item.nick,"","");
+      IAddContactDialog *dialog = FRosterChanger!=NULL ? FRosterChanger->showAddContactDialog(FStreamJid) : NULL;
+      if (dialog)
+      {
+        dialog->setContactJid(item.itemJid);
+        dialog->setNickName(item.nick);
+      }
     }
     else if (action == FShowVCard)
     {

@@ -82,8 +82,13 @@ void AddLegacyContactDialog::onUserJidReceived(const QString &AId, const Jid &AU
       ui.lblDescription->setText(tr("Jabber ID for %1 is %2").arg(FContactId).arg(AUserJid.full()));
       if (FRosterChanger)
       {
-        FRosterChanger->showAddContactDialog(FStreamJid,AUserJid,FContactId,"","");
-        accept();
+        IAddContactDialog *dialog = FRosterChanger!=NULL ? FRosterChanger->showAddContactDialog(FStreamJid) : NULL;
+        if (dialog)
+        {
+          dialog->setContactJid(AUserJid);
+          dialog->setNickName(FContactId);
+          accept();
+        }
       }
     }
     else

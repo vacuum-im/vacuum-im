@@ -308,17 +308,14 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 {
   IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
-  if (roster && presence && presence->isOpen() && AServiceFrom.isValid() && AServiceTo.isValid() && AServiceFrom.pDomain()!=AServiceTo.pDomain())
+  if (roster && presence && FRosterChanger && presence->isOpen() && AServiceFrom.isValid() && AServiceTo.isValid() && AServiceFrom.pDomain()!=AServiceTo.pDomain())
   {
     IRosterItem ritemOld = roster->rosterItem(AServiceFrom);
     IRosterItem ritemNew = roster->rosterItem(AServiceTo);
 
     //Удаляем подписку у старого транспорта
     if (ritemOld.isValid)
-    {
-      roster->sendSubscription(ritemOld.itemJid,IRoster::Unsubscribe);
-      roster->sendSubscription(ritemOld.itemJid,IRoster::Unsubscribed);
-    }
+      FRosterChanger->unsubscribeContact(AStreamJid,ritemOld.itemJid,"",true);
 
     //Разлогиниваемся на старом транспорте
     if (!presence->presenceItems(AServiceFrom).isEmpty())
@@ -332,8 +329,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 
     //Добавляем контакты нового транспорта и удаляем старые
     QList<Jid> newItems;
-    QList<IRosterItem> ritems = roster->rosterItems();
-    foreach(IRosterItem ritem, ritems)
+    foreach(IRosterItem ritem, roster->rosterItems())
     {
       if (ritem.itemJid.pDomain() == AServiceFrom.pDomain())
       {
@@ -349,13 +345,13 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
       }
     }
 
-    //Запрашиваем подписку у нового транспорта
+    //Запрашиваем подписку у нового транспорта и контактов
     if (ASubscribe)
     {
       FSubscribeServices.insertMulti(AStreamJid,AServiceTo);
+      FRosterChanger->subscribeContact(AStreamJid,AServiceTo,"",true);
       foreach(Jid newItem, newItems)
-        FSubscribeContacts.insertMulti(AStreamJid,newItem);
-      roster->sendSubscription(AServiceTo,IRoster::Subscribe);
+        FRosterChanger->subscribeContact(AStreamJid,newItem,"",true);
     }
 
     return true;
@@ -582,7 +578,6 @@ void Gateways::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJ
 void Gateways::onPresenceClosed(IPresence *APresence)
 {
   FResolveNicks.remove(APresence->streamJid());
-  FSubscribeContacts.remove(APresence->streamJid());
   FSubscribeServices.remove(APresence->streamJid());
 }
 
@@ -598,18 +593,6 @@ void Gateways::onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int A
   {
     if (FSubscribeServices.contains(ARoster->streamJid(),AItemJid))
       sendLogPresence(ARoster->streamJid(),AItemJid,true);
-  }
-  else if(ASubsType == IRoster::Subscribe)
-  {
-    if (FSubscribeContacts.contains(ARoster->streamJid(),AItemJid))
-    {
-      ARoster->sendSubscription(AItemJid,IRoster::Subscribed);
-      QString subscription = ARoster->rosterItem(AItemJid).subscription;
-      if (subscription!=SUBSCRIPTION_BOTH && subscription!=SUBSCRIPTION_TO)
-        ARoster->sendSubscription(AItemJid,IRoster::Subscribe);
-    }
-    else if (FSubscribeServices.contains(ARoster->streamJid(),AItemJid))
-      ARoster->sendSubscription(AItemJid,IRoster::Subscribed);
   }
 }
 

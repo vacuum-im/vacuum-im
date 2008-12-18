@@ -1,59 +1,52 @@
 #ifndef SUBSCRIPTIONDIALOG_H
 #define SUBSCRIPTIONDIALOG_H
 
-#include <QDialog>
-#include "../../interfaces/irosterchanger.h"
+#include "../../definations/actiongroups.h"
 #include "../../interfaces/iroster.h"
-#include "../../utils/action.h"
+#include "../../interfaces/ivcard.h"
+#include "../../interfaces/imessenger.h"
+#include "../../interfaces/irosterchanger.h"
 #include "ui_subscriptiondialog.h"
-
-using namespace Ui;
 
 class SubscriptionDialog : 
   public QDialog, 
-  public SubscriptionDialogClass,
   public ISubscriptionDialog
 {
   Q_OBJECT;
   Q_INTERFACES(ISubscriptionDialog);
 public:
-  SubscriptionDialog(QWidget *AParent = NULL);
+  SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, 
+    const Jid &AContactJid, const QString &ANotify, const QString &AMessage, QWidget *AParent = NULL);
   ~SubscriptionDialog();
   //ISubscriptionDialog
-  virtual QWidget *instance() { return this; }
+  virtual QDialog *instance() { return this; }
   virtual const Jid &streamJid() const { return FStreamJid; }
   virtual const Jid &contactJid() const { return FContactJid; }
-  virtual const QDateTime &dateTime() const { return FDateTime; }
-  virtual int subsType() const { return FSubsType; }
-  virtual const QString &status() const { return FStatus; }
-  virtual const QString &subscription() const { return FSubscription; }
+  virtual QVBoxLayout *actionsLayout() const { return ui.lytActionsLayout; }
   virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
-  virtual QTextEdit *textEditor() const { return tedMessage; }
-  virtual QButtonGroup *buttonGroup() const { return FButtonGroup; }
 signals:
-  virtual void dialogChanged();
-public:
-  void setupDialog(const Jid &AStreamJid, const Jid &AContactJid, QDateTime ATime, 
-    int ASubsType, const QString &AStatus, const QString &ASubs);
-  void setNextCount(int ANext);
-  Action *dialogAction() const { return FDialogAction; }
-signals:
-  void showNext();
+  virtual void dialogDestroyed();
+protected:
+  void initialize(IPluginManager *APluginManager);
 protected slots:
-  void onButtonClicked(int AId);
+  void onDialogAccepted();
+  void onDialogRejected();
+  void onToolBarActionTriggered(bool);
 private:
-  Action *FDialogAction;
-  QToolBar *FToolBar;
-  ToolBarChanger *FToolBarChanger;
-  QButtonGroup *FButtonGroup;
+  Ui::SubscriptionDialogClass ui;
+private:
+  IRoster *FRoster;
+  IMessenger *FMessenger;
+  IVCardPlugin *FVcardPlugin;
+  IRosterChanger *FRosterChanger;
+private:
+  Action *FShowChat;
+  Action *FSendMessage;
+  Action *FShowVCard;
 private:
   Jid FStreamJid;
   Jid FContactJid;
-  QDateTime FDateTime;
-  int FSubsType;
-  QString FStatus;
-  int FNextCount;
-  QString FSubscription;
+  ToolBarChanger *FToolBarChanger;
 };
 
 #endif // SUBSCRIPTIONDIALOG_H

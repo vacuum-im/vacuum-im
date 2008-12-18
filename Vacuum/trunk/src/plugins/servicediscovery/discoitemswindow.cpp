@@ -321,9 +321,12 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
     QModelIndex index = ui.trvItems->currentIndex();
     if (index.isValid())
     {
-      Jid itemJid = index.data(DDR_JID).toString();
-      QString itemName = index.data(DDR_NAME).toString();
-      FRosterChanger->showAddContactDialog(FStreamJid,itemJid,itemName,"","");
+      IAddContactDialog *dialog = FRosterChanger->showAddContactDialog(FStreamJid);
+      if (dialog)
+      {
+        dialog->setContactJid(index.data(DDR_JID).toString());
+        dialog->setNickName(index.data(DDR_NAME).toString());
+      }
     }
   }
   else if (action == FShowVCard)

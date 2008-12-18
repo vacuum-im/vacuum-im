@@ -104,7 +104,6 @@ private:
   QList<QString> FUserJidRequests;
   QMultiHash<Jid, Jid> FResolveNicks;
   QMultiHash<Jid, Jid> FSubscribeServices;
-  QMultiHash<Jid, Jid> FSubscribeContacts;
   QMultiHash<Jid, Jid> FKeepConnections;
   QHash<Jid, QSet<Jid> > FPrivateStorageKeep;
 };

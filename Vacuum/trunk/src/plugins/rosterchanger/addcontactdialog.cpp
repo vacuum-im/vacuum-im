@@ -1,107 +1,219 @@
 #include "addcontactdialog.h"
 
+#include <QSet>
 #include <QMessageBox>
 
-AddContactDialog::AddContactDialog(const Jid &AStreamJid, const QSet<QString> &AGroups, QWidget *AParent) : QDialog(AParent)
+AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {
-  setupUi(this);
+  ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
+  setWindowTitle(tr("Add contact - %1").arg(AStreamJid.bare()));
   
+  FRoster = NULL;
+  FVcardPlugin = NULL;
+  FMessenger = NULL;
+  FResolving = false;
+
+  FRosterChanger = ARosterChanger;
   FStreamJid = AStreamJid;
-  setWindowTitle(tr("Add contact to %1").arg(FStreamJid.bare()));
 
-  QStringList grps = AGroups.toList();
-  grps.sort();
-  cmbGroup->addItems(QStringList()<<tr("<None>")<<grps);
+  QToolBar *toolBar = new QToolBar(this);
+  ui.lytMainLayout->setMenuBar(toolBar);
+  FToolBarChanger = new ToolBarChanger(toolBar);
 
-  setRequestText(tr("Please, authorize me to your presence."));
-  connect(btbButtons,SIGNAL(accepted()),SLOT(onAccepted()));
+  setSubscriptionMessage(tr("Please, authorize me to your presence."));
+
+  initialize(APluginManager);
+
+  connect(ui.dbbButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
+  connect(ui.dbbButtons,SIGNAL(rejected()),SLOT(reject()));
 }
 
 AddContactDialog::~AddContactDialog()
 {
-
+  emit dialogDestroyed();
 }
 
-const Jid &AddContactDialog::streamJid() const
+Jid AddContactDialog::streamJid() const
 {
   return FStreamJid;
 }
 
 Jid AddContactDialog::contactJid() const
 {
-  return lneJabberId->text();
+  return ui.lneContact->text();
 }
 
-void AddContactDialog::setContactJid(const Jid &AJid)
+void AddContactDialog::setContactJid(const Jid &AContactJid)
 {
-  lneJabberId->setText(AJid.hBare());
-  if (nick().isEmpty())
-    setNick(AJid.hNode());
+  ui.lneContact->setText(AContactJid.bare());
 }
 
-QString AddContactDialog::nick() const
+QString AddContactDialog::nickName() const
 {
-  return lneNickName->text();
+  return ui.lneNickName->text();
 }
 
-void AddContactDialog::setNick(const QString &ANick)
+void AddContactDialog::setNickName(const QString &ANick)
 {
-  if (!ANick.isEmpty())
-    lneNickName->setText(ANick);
-  else
-    lneNickName->setText(contactJid().hNode());
+  ui.lneNickName->setText(ANick);
 }
 
-QSet<QString> AddContactDialog::groups() const
+QString AddContactDialog::group() const
 {
-  QSet<QString> grps;
-  int curIndex = cmbGroup->currentIndex();
-  QString curText = cmbGroup->currentText();
-  if (curIndex > 0 || (!curText.isEmpty() && curText!=cmbGroup->itemText(0)))
-    grps.insert(cmbGroup->currentText());
-  return grps;
+  return ui.cmbGroup->currentText();
 }
 
 void AddContactDialog::setGroup(const QString &AGroup)
 {
-  if (!AGroup.isEmpty())
-    cmbGroup->setEditText(AGroup);
-  else
-    cmbGroup->setCurrentIndex(0);
+  ui.cmbGroup->setEditText(AGroup);
 }
 
-QString AddContactDialog::requestText() const
+QString AddContactDialog::subscriptionMessage() const
 {
-  return tedRequest->toPlainText();
+  return ui.tedMessage->toPlainText();
 }
 
-void AddContactDialog::setRequestText(const QString &AText)
+void AddContactDialog::setSubscriptionMessage(const QString &AText)
 {
-  tedRequest->setPlainText(AText);
+  ui.tedMessage->setPlainText(AText);
 }
 
-bool AddContactDialog::requestSubscription() const
+bool AddContactDialog::subscribeContact() const
 {
-  return chbRequestSubscr->checkState() == Qt::Checked;
+  return ui.chbSubscribe->isChecked();
 }
 
-bool AddContactDialog::sendSubscription() const
+void AddContactDialog::setSubscribeContact(bool ASubscribe)
 {
-  return chbSendSubscr->checkState() == Qt::Checked;
+  ui.chbSubscribe->setCheckState(ASubscribe ? Qt::Checked : Qt::Unchecked);
 }
 
-void AddContactDialog::onAccepted()
+ToolBarChanger *AddContactDialog::toolBarChanger() const
 {
-  Jid cJid = contactJid();
-  if (cJid.isValid() && !(FStreamJid && cJid))
+  return FToolBarChanger;
+}
+
+void AddContactDialog::initialize(IPluginManager *APluginManager)
+{
+  IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  if (plugin)
   {
-    emit addContact(this);
-    accept();
+    IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+    FRoster = rosterPlugin!=NULL ? rosterPlugin->getRoster(FStreamJid) : NULL;
+    if (FRoster)
+    {
+      ui.cmbGroup->addItems(FRoster->groups().toList());
+    }
   }
-  else
-    QMessageBox::warning(this,FStreamJid.bare(),
-      tr("Can`t add contact '<b>%1</b>'<br>'<b>%1</b>' is not a valid Jaber ID").arg(cJid.hBare()));
+
+  plugin = APluginManager->getPlugins("IMessenger").value(0,NULL);
+  if (plugin)
+  {
+    FMessenger = qobject_cast<IMessenger *>(plugin->instance());
+    if (FMessenger)
+    {
+      FShowChat = new Action(FToolBarChanger->toolBar());
+      FShowChat->setText(tr("Chat"));
+      FShowChat->setToolTip(tr("Open chat window"));
+      FToolBarChanger->addAction(FShowChat,AG_ACDT_ROSTERCHANGER_ACTIONS);
+      connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+
+      FSendMessage = new Action(FToolBarChanger->toolBar());
+      FSendMessage->setText(tr("Message"));
+      FSendMessage->setToolTip(tr("Send Message"));
+      FToolBarChanger->addAction(FSendMessage,AG_ACDT_ROSTERCHANGER_ACTIONS);
+      connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+    }
+  }
+  
+  plugin = APluginManager->getPlugins("IVCardPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FVcardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
+    if (FVcardPlugin)
+    {
+      FShowVCard = new Action(FToolBarChanger->toolBar());
+      FShowVCard->setText(tr("VCard"));
+      FShowVCard->setToolTip(tr("Show VCard"));
+      FToolBarChanger->addAction(FShowVCard,AG_ACDT_ROSTERCHANGER_ACTIONS);
+      connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+
+      FResolve = new Action(FToolBarChanger->toolBar());
+      FResolve->setText(tr("Nick"));
+      FResolve->setToolTip(tr("Resolve nick name"));
+      FToolBarChanger->addAction(FResolve,AG_ACDT_ROSTERCHANGER_ACTIONS);
+      connect(FResolve,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+
+      connect(FVcardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
+    }
+  }
 }
 
+void AddContactDialog::onDialogAccepted()
+{
+  if (contactJid().isValid())
+  {
+    if (!FRoster->rosterItem(contactJid()).isValid)
+    {
+      QSet<QString> groups;
+      if (!group().isEmpty())
+        groups += group();
+      FRoster->setItem(contactJid().bare(),nickName(),groups);
+      if (subscribeContact())
+        FRosterChanger->subscribeContact(FStreamJid,contactJid(),subscriptionMessage());
+      accept();
+    }
+    else
+    {
+      QMessageBox::information(NULL,FStreamJid.full(),tr("Contact <b>%1</b> already exists.").arg(contactJid().hBare()));
+    }
+  }
+  else if (!contactJid().isEmpty())
+  {
+    QMessageBox::warning(this,FStreamJid.bare(),
+      tr("Can`t add contact '<b>%1</b>' because it is not a valid Jaber ID").arg(contactJid().hBare())); 
+  }
+}
 
+void AddContactDialog::onToolBarActionTriggered(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action!=NULL && contactJid().isValid())
+  {
+    if (action == FShowChat)
+    {
+      FMessenger->openWindow(FStreamJid,contactJid(),Message::Chat);
+    }
+    else if (action == FSendMessage)
+    {
+      FMessenger->openWindow(FStreamJid,contactJid(),Message::Normal);
+    }
+    else if (action == FShowVCard)
+    {
+      FVcardPlugin->showVCardDialog(FStreamJid,contactJid().bare());
+    }
+    else if (action == FResolve)
+    {
+      FResolving = true;
+      if (FVcardPlugin->hasVCard(contactJid().bare()))
+        onVCardReceived(contactJid());
+      else
+        FVcardPlugin->requestVCard(FStreamJid,contactJid());
+    }
+  }
+}
+
+void AddContactDialog::onVCardReceived(const Jid &AContactJid)
+{
+  if (FResolving && (AContactJid && contactJid()))
+  {
+    IVCard *vcard = FVcardPlugin->vcard(AContactJid.bare());
+    if (vcard)
+    {
+      setNickName(vcard->value(VVN_NICKNAME));
+      vcard->unlock();
+    }
+    FResolving = false;
+  }
+}

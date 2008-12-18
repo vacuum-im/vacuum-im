@@ -89,4 +89,10 @@
 //ArchiveWindow - Messages Tools
 #define AG_AWMT_ARCHIVE_ACTIONS                                 500
 
+//AddContactDialog (ToolBar)
+#define AG_ACDT_ROSTERCHANGER_ACTIONS                           500
+
+//SubscriptionRequestDialog (ToolBar)
+#define AG_SRDT_ROSTERCHANGER_ACTIONS                           500
+
 #endif

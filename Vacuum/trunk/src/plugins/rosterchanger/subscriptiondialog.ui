@@ -5,216 +5,117 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>518</width>
-    <height>305</height>
+    <width>369</width>
+    <height>173</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Subscription message</string>
+   <string>Subscription request</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="leftMargin" >
-    <number>5</number>
-   </property>
-   <property name="topMargin" >
-    <number>5</number>
-   </property>
-   <property name="rightMargin" >
-    <number>5</number>
-   </property>
-   <property name="bottomMargin" >
+  <layout class="QVBoxLayout" name="lytMainLayout" >
+   <property name="margin" >
     <number>5</number>
    </property>
    <item>
-    <layout class="QGridLayout" >
-     <item row="0" column="0" >
-      <widget class="QLabel" name="lblFrom" >
-       <property name="text" >
-        <string>From:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1" colspan="3" >
-      <widget class="QLabel" name="lblFromJid" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font" >
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="frameShape" >
-        <enum>QFrame::Panel</enum>
-       </property>
-       <property name="frameShadow" >
-        <enum>QFrame::Sunken</enum>
-       </property>
-       <property name="text" >
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0" >
-      <widget class="QLabel" name="lblTo" >
-       <property name="text" >
-        <string>To:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" >
-      <widget class="QLabel" name="lblAccountJid" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="frameShape" >
-        <enum>QFrame::Panel</enum>
-       </property>
-       <property name="frameShadow" >
-        <enum>QFrame::Sunken</enum>
-       </property>
-       <property name="text" >
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2" >
-      <widget class="QLabel" name="lblReceived" >
-       <property name="text" >
-        <string>Received:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3" >
-      <widget class="QLabel" name="lblDateTime" >
-       <property name="frameShape" >
-        <enum>QFrame::Panel</enum>
-       </property>
-       <property name="frameShadow" >
-        <enum>QFrame::Sunken</enum>
-       </property>
-       <property name="text" >
-        <string>99:99:99</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QWidget" native="1" name="wdtToolBar" />
-   </item>
-   <item>
-    <widget class="QTextEdit" name="tedMessage" >
-     <property name="readOnly" >
+    <widget class="QLabel" name="lblNotify" >
+     <property name="frameShape" >
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Sunken</enum>
+     </property>
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="textFormat" >
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap" >
       <bool>true</bool>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
-     <property name="spacing" >
-      <number>6</number>
+    <widget class="QLabel" name="lblMessage" >
+     <property name="frameShape" >
+      <enum>QFrame::Box</enum>
      </property>
-     <property name="leftMargin" >
-      <number>0</number>
+     <property name="frameShadow" >
+      <enum>QFrame::Sunken</enum>
      </property>
-     <property name="topMargin" >
-      <number>0</number>
+     <property name="textFormat" >
+      <enum>Qt::PlainText</enum>
      </property>
-     <property name="rightMargin" >
-      <number>0</number>
+     <property name="wordWrap" >
+      <bool>true</bool>
      </property>
-     <property name="bottomMargin" >
-      <number>0</number>
+     <property name="textInteractionFlags" >
+      <set>Qt::NoTextInteraction</set>
      </property>
-     <item>
-      <widget class="QPushButton" name="pbtSubscribe" >
-       <property name="toolTip" >
-        <string>Ask subscription</string>
-       </property>
-       <property name="text" >
-        <string>Ask</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbtSubscribed" >
-       <property name="toolTip" >
-        <string>Confirm subscription request</string>
-       </property>
-       <property name="text" >
-        <string>Auth</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbtUnsubscribe" >
-       <property name="toolTip" >
-        <string>Refuse from subscription</string>
-       </property>
-       <property name="text" >
-        <string>Refuse</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbtUnsubscribed" >
-       <property name="toolTip" >
-        <string>Reject subscription</string>
-       </property>
-       <property name="text" >
-        <string>Reject</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbtNext" >
-       <property name="text" >
-        <string>Next</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbtClose" >
-       <property name="text" >
-        <string>Close</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grbActions" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" >
+      <string/>
+     </property>
+     <layout class="QVBoxLayout" name="lytActionsLayout" >
+      <property name="margin" >
+       <number>5</number>
+      </property>
+      <item>
+       <widget class="QRadioButton" name="rbtAddToRoster" >
+        <property name="text" >
+         <string>Add user to contact list</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbtSendAndRequest" >
+        <property name="text" >
+         <string>Authorize presence subscription</string>
+        </property>
+        <property name="checked" >
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbtRemoveAndRefuse" >
+        <property name="text" >
+         <string>Remove presence subscription</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="btbDialogButtons" >
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
    </item>
   </layout>
+  <zorder>lblNotify</zorder>
+  <zorder>btbDialogButtons</zorder>
+  <zorder>lblMessage</zorder>
+  <zorder>grbActions</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11" />
- <tabstops>
-  <tabstop>tedMessage</tabstop>
-  <tabstop>pbtSubscribe</tabstop>
-  <tabstop>pbtSubscribed</tabstop>
-  <tabstop>pbtUnsubscribe</tabstop>
-  <tabstop>pbtUnsubscribed</tabstop>
-  <tabstop>pbtNext</tabstop>
-  <tabstop>pbtClose</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
