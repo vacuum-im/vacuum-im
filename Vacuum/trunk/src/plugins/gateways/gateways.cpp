@@ -14,10 +14,11 @@
 #define IN_KEEP               "psi/advanced"
 #define IN_CHANGE_TRANSPORT   "psi/arrowRight"
 
-#define PSN_GATEWAYS_KEEP     "vacuum:gateways:keep"
-#define PST_GATEWAYS_SERVICES "services"
+#define PSN_GATEWAYS_KEEP         "vacuum:gateways:keep"
+#define PSN_GATEWAYS_SUBSCRIBE    "vacuum:gateways:subscribe"
+#define PST_GATEWAYS_SERVICES     "services"
 
-#define KEEP_INTERVAL         120000
+#define KEEP_INTERVAL             120000
 
 Gateways::Gateways()
 {
@@ -74,6 +75,7 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
     if (FRosterPlugin)
     {
+      connect(FRosterPlugin->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
       connect(FRosterPlugin->instance(),SIGNAL(rosterSubscription(IRoster *, const Jid &, int , const QString &)),
         SLOT(onRosterSubscription(IRoster *, const Jid &, int , const QString &)));
       connect(FRosterPlugin->instance(),SIGNAL(rosterJidAboutToBeChanged(IRoster *, const Jid &)),
@@ -120,6 +122,7 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     FPrivateStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
     if (FPrivateStorage)
     {
+      connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorateOpened(const Jid &)));
       connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
         SLOT(onPrivateStorageLoaded(const QString &, const Jid &, const QDomElement &)));
     }
@@ -314,44 +317,49 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
     IRosterItem ritemNew = roster->rosterItem(AServiceTo);
 
     //Удаляем подписку у старого транспорта
-    if (ritemOld.isValid)
-      FRosterChanger->unsubscribeContact(AStreamJid,ritemOld.itemJid,"",true);
+    if (ritemOld.isValid && !ARemove)
+      FRosterChanger->unsubscribeContact(AStreamJid,AServiceFrom,"",true);
 
     //Разлогиниваемся на старом транспорте
     if (!presence->presenceItems(AServiceFrom).isEmpty())
       sendLogPresence(AStreamJid,AServiceFrom,false);
 
-    //Добавляем новый транспорт в ростер и удаляем старый
-    if (!ritemNew.isValid)
-      roster->setItem(AServiceTo,ritemOld.name,ritemOld.groups);
-    if (ARemove)
-      roster->removeItem(ritemOld.itemJid);
-
     //Добавляем контакты нового транспорта и удаляем старые
-    QList<Jid> newItems;
+    QList<IRosterItem> newItems, oldItems, curItems;
     foreach(IRosterItem ritem, roster->rosterItems())
     {
       if (ritem.itemJid.pDomain() == AServiceFrom.pDomain())
       {
-        Jid newItemJid = ritem.itemJid;
-        newItemJid.setDomain(AServiceTo.domain());
-        if (!roster->rosterItem(newItemJid).isValid)
-        {
-          newItems.append(newItemJid);
-          roster->setItem(newItemJid,ritem.name,ritem.groups);
-        }
+        IRosterItem newItem = ritem;
+        newItem.itemJid.setDomain(AServiceTo.domain());
+        if (!roster->rosterItem(newItem.itemJid).isValid)
+          newItems.append(newItem);
+        else
+          curItems += newItem;
         if (ARemove)
-          roster->removeItem(ritem.itemJid);
+          oldItems.append(ritem);
       }
     }
+    roster->removeItems(oldItems);
+    roster->setItems(newItems);
 
     //Запрашиваем подписку у нового транспорта и контактов
     if (ASubscribe)
     {
-      FSubscribeServices.insertMulti(AStreamJid,AServiceTo);
-      FRosterChanger->subscribeContact(AStreamJid,AServiceTo,"",true);
-      foreach(Jid newItem, newItems)
-        FRosterChanger->subscribeContact(AStreamJid,newItem,"",true);
+      FSubscribeServices.remove(AStreamJid,AServiceFrom.bare());
+      FSubscribeServices.insertMulti(AStreamJid,AServiceTo.bare());
+      savePrivateStorageSubscribe(AStreamJid);
+      
+      curItems+=newItems;
+      foreach(IRosterItem ritem, curItems)
+        FRosterChanger->insertAutoSubscribe(AStreamJid,ritem.itemJid,IRosterChanger::AutoSubscribe,true);
+      FRosterChanger->insertAutoSubscribe(AStreamJid,AServiceTo,IRosterChanger::AutoSubscribe,true);
+      roster->sendSubscription(AServiceTo,IRoster::Subscribe);
+    }
+    else if (FSubscribeServices.contains(AStreamJid,AServiceFrom.bare()))
+    {
+      FSubscribeServices.remove(AStreamJid,AServiceFrom.bare());
+      savePrivateStorageSubscribe(AStreamJid);
     }
 
     return true;
@@ -419,7 +427,20 @@ void Gateways::savePrivateStorageKeep(const Jid &AStreamJid)
     QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_KEEP,PST_GATEWAYS_SERVICES)).toElement();
     QSet<Jid> services = FPrivateStorageKeep.value(AStreamJid);
     foreach(Jid service, services)
-      elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.bare()));
+      elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.eBare()));
+    FPrivateStorage->saveData(AStreamJid,elem);
+  }
+}
+
+void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
+{
+  if (FPrivateStorage && FSubscribeServices.contains(AStreamJid))
+  {
+    QDomDocument doc;
+    doc.appendChild(doc.createElement("services"));
+    QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_SUBSCRIBE,PST_GATEWAYS_SERVICES)).toElement();
+    foreach(Jid service, FSubscribeServices.values(AStreamJid))
+      elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.eBare()));
     FPrivateStorage->saveData(AStreamJid,elem);
   }
 }
@@ -568,10 +589,19 @@ void Gateways::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJ
   if (AStateOnline && FSubscribeServices.contains(AStreamJid,AContactJid.bare()))
   {
     IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
-    QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
-    foreach(IRosterItem ritem, ritems)
-      if (ritem.itemJid.pDomain()==AContactJid.pDomain() && ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO)
-        roster->sendSubscription(ritem.itemJid,IRoster::Subscribe);
+    if (roster)
+    {
+      FSubscribeServices.remove(AStreamJid,AContactJid.bare());
+      savePrivateStorageSubscribe(AStreamJid);
+      foreach(IRosterItem ritem, roster->rosterItems())
+      {
+        if (ritem.itemJid.pDomain()==AContactJid.pDomain())
+        {
+          if (ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO && ritem.ask!=SUBSCRIPTION_SUBSCRIBE)
+            roster->sendSubscription(ritem.itemJid,IRoster::Subscribe);
+        }
+      }
+    }
   }
 }
 
@@ -587,12 +617,64 @@ void Gateways::onPresenceRemoved(IPresence *APresence)
   FPrivateStorageKeep.remove(APresence->streamJid());
 }
 
+void Gateways::onRosterOpened(IRoster *ARoster)
+{
+  if (FRosterChanger)
+  {
+    foreach(Jid serviceJid, FSubscribeServices.values(ARoster->streamJid()))
+      foreach(Jid contactJid, serviceContacts(ARoster->streamJid(),serviceJid))
+        FRosterChanger->insertAutoSubscribe(ARoster->streamJid(),contactJid,IRosterChanger::AutoSubscribe,true);
+  }
+}
+
+void Gateways::onPrivateStorageLoaded(const QString &/*AId*/, const Jid &AStreamJid, const QDomElement &AElement)
+{
+  if (AElement.tagName() == PST_GATEWAYS_SERVICES && AElement.namespaceURI() == PSN_GATEWAYS_KEEP)
+  {
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+    if (roster)
+    {
+      QSet<Jid> services;
+      bool changed = false;
+      QDomElement elem = AElement.firstChildElement("service");
+      while (!elem.isNull())
+      {
+        Jid service = elem.text();
+        if (roster->rosterItem(service).isValid)
+        {
+          services += service;
+          setKeepConnection(AStreamJid,service,true);
+        }
+        else
+          changed = true;
+        elem = elem.nextSiblingElement("service");
+      }
+
+      QSet<Jid> oldServices = FPrivateStorageKeep.value(AStreamJid) - services;
+      foreach(Jid service, oldServices)
+        setKeepConnection(AStreamJid,service,false);
+      FPrivateStorageKeep[AStreamJid] = services;
+
+      if (changed)
+        savePrivateStorageKeep(AStreamJid);
+    }
+  }
+  else if (AElement.tagName() == PST_GATEWAYS_SERVICES && AElement.namespaceURI() == PSN_GATEWAYS_SUBSCRIBE)
+  {
+    QDomElement elem = AElement.firstChildElement("service");
+    while (!elem.isNull())
+    {
+      FSubscribeServices.insertMulti(AStreamJid,elem.text());
+      elem = elem.nextSiblingElement("service");
+    }
+  }
+}
+
 void Gateways::onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &/*AText*/)
 {
-  if (ASubsType == IRoster::Subscribed)
+  if (ASubsType==IRoster::Subscribed && FSubscribeServices.contains(ARoster->streamJid(),AItemJid))
   {
-    if (FSubscribeServices.contains(ARoster->streamJid(),AItemJid))
-      sendLogPresence(ARoster->streamJid(),AItemJid,true);
+    sendLogPresence(ARoster->streamJid(),AItemJid,true);
   }
 }
 
@@ -600,6 +682,11 @@ void Gateways::onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &/*AAfter
 {
   FKeepConnections.remove(ARoster->streamJid());
   FPrivateStorageKeep.remove(ARoster->streamJid());
+}
+
+void Gateways::onPrivateStorateOpened(const Jid &AStreamJid)
+{
+  FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_SUBSCRIBE);
 }
 
 void Gateways::onKeepTimerTimeout()
@@ -638,40 +725,6 @@ void Gateways::onVCardReceived(const Jid &AContactJid)
 void Gateways::onVCardError(const Jid &AContactJid, const QString &/*AError*/)
 {
   FResolveNicks.remove(AContactJid);
-}
-
-void Gateways::onPrivateStorageLoaded(const QString &/*AId*/, const Jid &AStreamJid, const QDomElement &AElement)
-{
-  if (AElement.tagName() == PST_GATEWAYS_SERVICES && AElement.namespaceURI() == PSN_GATEWAYS_KEEP)
-  {
-    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
-    if (roster)
-    {
-      QSet<Jid> services;
-      bool changed = false;
-      QDomElement elem = AElement.firstChildElement("service");
-      while (!elem.isNull())
-      {
-        Jid service = elem.text();
-        if (roster->rosterItem(service).isValid)
-        {
-          services += service;
-          setKeepConnection(AStreamJid,service,true);
-        }
-        else
-          changed = true;
-        elem = elem.nextSiblingElement("service");
-      }
-
-      QSet<Jid> oldServices = FPrivateStorageKeep.value(AStreamJid) - services;
-      foreach(Jid service, oldServices)
-        setKeepConnection(AStreamJid,service,false);
-      FPrivateStorageKeep[AStreamJid] = services;
-
-      if (changed)
-        savePrivateStorageKeep(AStreamJid);
-    }
-  }
 }
 
 void Gateways::onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow)

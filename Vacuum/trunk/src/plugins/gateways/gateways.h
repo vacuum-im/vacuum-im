@@ -67,6 +67,7 @@ signals:
 protected:
   void registerDiscoFeatures();
   void savePrivateStorageKeep(const Jid &AStreamJid);
+  void savePrivateStorageSubscribe(const Jid &AStreamJid);
 protected slots:
   void onGatewayActionTriggered(bool);
   void onLogActionTriggered(bool);
@@ -78,12 +79,14 @@ protected slots:
   void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
   void onPresenceClosed(IPresence *APresence);
   void onPresenceRemoved(IPresence *APresence);
+  void onRosterOpened(IRoster *ARoster);
   void onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText);
   void onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
+  void onPrivateStorateOpened(const Jid &AStreamJid);
+  void onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
   void onKeepTimerTimeout();
   void onVCardReceived(const Jid &AContactJid);
   void onVCardError(const Jid &AContactJid, const QString &AError);
-  void onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
   void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
   void onDiscoItemContextMenu(const QModelIndex AIndex, Menu *AMenu);
 private:
