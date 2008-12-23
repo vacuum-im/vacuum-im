@@ -1,0 +1,199 @@
+<ui version="4.0" >
+ <class>ConnectionOptionsWidgetClass</class>
+ <widget class="QWidget" name="ConnectionOptionsWidgetClass" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>426</width>
+    <height>188</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>ConnectionOptionsWidget</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QLabel" name="label_11" >
+       <property name="text" >
+        <string>Host:</string>
+       </property>
+       <property name="buddy" >
+        <cstring>lneHost</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lneHost" />
+     </item>
+     <item>
+      <widget class="QLabel" name="label_12" >
+       <property name="text" >
+        <string>Port:</string>
+       </property>
+       <property name="buddy" >
+        <cstring>spbPort</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="spbPort" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize" >
+        <size>
+         <width>60</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximum" >
+        <number>65535</number>
+       </property>
+       <property name="value" >
+        <number>5222</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QCheckBox" name="chbUseSSL" >
+       <property name="text" >
+        <string>Use SSL connection</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chbIgnoreSSLWarnings" >
+       <property name="text" >
+        <string>Ignore SSL errors</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grbProxy" >
+     <property name="title" >
+      <string>Proxy</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <item>
+       <layout class="QGridLayout" >
+        <item row="0" column="0" >
+         <widget class="QLabel" name="label_7" >
+          <property name="text" >
+           <string>Type:</string>
+          </property>
+          <property name="buddy" >
+           <cstring>cmbProxyType</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="3" >
+         <widget class="QComboBox" name="cmbProxyType" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QLabel" name="label_8" >
+          <property name="text" >
+           <string>Host:</string>
+          </property>
+          <property name="buddy" >
+           <cstring>lneProxyHost</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" >
+         <widget class="QLineEdit" name="lneProxyHost" />
+        </item>
+        <item row="1" column="2" >
+         <widget class="QLabel" name="label_13" >
+          <property name="text" >
+           <string>Port:</string>
+          </property>
+          <property name="buddy" >
+           <cstring>spbProxyPort</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" >
+         <widget class="QSpinBox" name="spbProxyPort" >
+          <property name="minimumSize" >
+           <size>
+            <width>60</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximum" >
+           <number>65535</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QLabel" name="label_9" >
+          <property name="text" >
+           <string>Username:</string>
+          </property>
+          <property name="buddy" >
+           <cstring>lneProxyUser</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="3" >
+         <widget class="QLineEdit" name="lneProxyUser" />
+        </item>
+        <item row="3" column="0" >
+         <widget class="QLabel" name="label_10" >
+          <property name="text" >
+           <string>Password:</string>
+          </property>
+          <property name="buddy" >
+           <cstring>lneProxyPassword</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="3" >
+         <widget class="QLineEdit" name="lneProxyPassword" >
+          <property name="echoMode" >
+           <enum>QLineEdit::PasswordEchoOnEdit</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <resources/>
+ <connections/>
+</ui>
