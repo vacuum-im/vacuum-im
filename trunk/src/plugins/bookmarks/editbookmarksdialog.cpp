@@ -22,6 +22,8 @@ EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStr
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
+  setWindowTitle(tr("Edit bookmarks - %1").arg(AStreamJid.bare()));
+
   FBookmarks = ABookmarks;
   FStreamJid = AStreamJid;
 
@@ -52,7 +54,7 @@ EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStr
 
 EditBookmarksDialog::~EditBookmarksDialog()
 {
-
+  emit dialogDestroyed();
 }
 
 IBookMark EditBookmarksDialog::getBookmarkFromRow(int ARow) const

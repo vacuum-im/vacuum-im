@@ -15,6 +15,8 @@ public:
   EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStreamJid, const QList<IBookMark> &AList, QWidget *AParent = NULL);
   ~EditBookmarksDialog();
   const Jid  &streamJid() const { return FStreamJid; }
+signals:
+  void dialogDestroyed();
 protected:
   IBookMark getBookmarkFromRow(int ARow) const;
   void setBookmarkToRow(int ARow, const IBookMark &ABookmark);
