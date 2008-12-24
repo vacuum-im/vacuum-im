@@ -39,6 +39,7 @@ public:
   virtual ToolBarChanger *groupsTools() const { return FGroupsTools; }
   virtual ToolBarChanger *messagesTools() const { return FMessagesTools->toolBarChanger(); }
   virtual bool isHeaderAccepted(const IArchiveHeader &AHeader) const;
+  virtual QList<IArchiveHeader> currentHeaders() const;
   virtual QStandardItem *findHeaderItem(const IArchiveHeader &AHeader, QStandardItem *AParent = NULL) const;
   virtual int groupKind() const { return FGroupKind; }
   virtual void setGroupKind(int AGroupKind);
@@ -53,17 +54,19 @@ signals:
   virtual void filterChanged(const IArchiveFilter &AFilter);
   virtual void itemCreated(QStandardItem *AItem);
   virtual void itemContextMenu(QStandardItem *AItem, Menu *AMenu);
-  virtual void itemChanged(QStandardItem *ACurrent, QStandardItem *ABefour);
+  virtual void currentItemChanged(QStandardItem *ACurrent, QStandardItem *ABefour);
   virtual void itemDestroyed(QStandardItem *AItem);
   virtual void windowDestroyed(IArchiveWindow *AWindow);
 protected:
   void initialize();
+  QList<IArchiveHeader> indexHeaders(const QModelIndex &AIndex) const;
   QList<IArchiveRequest> createRequests(const IArchiveFilter &AFilter) const;
   void divideRequests(const QList<IArchiveRequest> &ARequests, QList<IArchiveRequest> &ALocal, QList<IArchiveRequest> &AServer) const;
   bool loadServerHeaders(const IArchiveRequest &ARequest, const QString &AAfter = "");
   bool loadServerCollection(const IArchiveHeader &AHeader, const QString &AAfter = "");
+  QString contactName(const Jid &AContactJid, bool ABare = false) const;
   QStandardItem *findChildItem(int ARole, const QVariant &AValue, QStandardItem *AParent) const;
-  QStandardItem *createSortItem(QStandardItem *AOwner);
+  QStandardItem *createSortItem(const QVariant &ASortData);
   QStandardItem *createCustomItem(int AType, const QVariant &ADiaplay);
   QStandardItem *createDateGroup(const IArchiveHeader &AHeader, QStandardItem *AParent);
   QStandardItem *createContactGroup(const IArchiveHeader &AHeader, QStandardItem *AParent);
@@ -81,7 +84,6 @@ protected:
   void createGroupKindMenu();
   void createSourceMenu();
   void createHeaderActions();
-  void updateHeaderActions();
 protected slots:
   void onLocalCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
   void onLocalCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
@@ -125,7 +127,7 @@ private:
   QTimer FInvalidateTimer;
   Jid FStreamJid;
   IArchiveFilter FFilter;
-  IArchiveHeader FCurrentHeader;
+  QList<IArchiveHeader> FCurrentHeaders;
   QList<IArchiveRequest> FRequestList;
   QHash<QString,IArchiveRequest> FHeaderRequests;
   QHash<QString,IArchiveHeader> FCollectionRequests;

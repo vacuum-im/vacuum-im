@@ -218,6 +218,7 @@ private:
   QHash<QString, DateTime> FModifyRequests;
 private:
   QList<Jid> FInStoragePrefs;
+  QHash<Jid, QString> FNamespaces;
   QHash<Jid,IArchiveStreamPrefs> FArchivePrefs;
   QHash<Jid, QMultiHash<Jid, CollectionWriter *> > FCollectionWriters;
   QMultiMap<int, IArchiveHandler *> FArchiveHandlers;

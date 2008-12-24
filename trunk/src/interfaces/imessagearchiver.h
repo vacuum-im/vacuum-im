@@ -149,6 +149,7 @@ public :
   virtual ToolBarChanger *groupsTools() const =0;
   virtual ToolBarChanger *messagesTools() const =0;
   virtual bool isHeaderAccepted(const IArchiveHeader &AHeader) const =0;
+  virtual QList<IArchiveHeader> currentHeaders() const =0;
   virtual QStandardItem *findHeaderItem(const IArchiveHeader &AHeader, QStandardItem *AParent = NULL) const =0;
   virtual int groupKind() const =0;
   virtual void setGroupKind(int AGroupKind) =0;
@@ -163,7 +164,7 @@ signals:
   virtual void filterChanged(const IArchiveFilter &AFilter) =0;
   virtual void itemCreated(QStandardItem *AItem) =0;
   virtual void itemContextMenu(QStandardItem *AItem, Menu *AMenu) =0;
-  virtual void itemChanged(QStandardItem *ACurrent, QStandardItem *ABefour) =0;
+  virtual void currentItemChanged(QStandardItem *ACurrent, QStandardItem *ABefour) =0;
   virtual void itemDestroyed(QStandardItem *AItem) =0;
   virtual void windowDestroyed(IArchiveWindow *AWindow) =0;
 };
