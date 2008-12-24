@@ -183,6 +183,11 @@ bool ViewHistoryWindow::isHeaderAccepted(const IArchiveHeader &AHeader) const
   return accepted;
 }
 
+QList<IArchiveHeader> ViewHistoryWindow::currentHeaders() const
+{
+  return FCurrentHeaders;
+}
+
 QStandardItem *ViewHistoryWindow::findHeaderItem(const IArchiveHeader &AHeader, QStandardItem *AParent) const
 {
   int rowCount = AParent ? AParent->rowCount() : FModel->rowCount();
@@ -290,6 +295,26 @@ void ViewHistoryWindow::initialize()
   }
 }
 
+QList<IArchiveHeader> ViewHistoryWindow::indexHeaders(const QModelIndex &AIndex) const
+{
+  QList<IArchiveHeader> headers;
+  for (int row=0; row<ui.trvCollections->model()->rowCount(AIndex); row++)
+  {
+    QModelIndex index = ui.trvCollections->model()->index(row,0,AIndex);
+    headers += indexHeaders(index);
+  }
+
+  if (AIndex.data(HDR_ITEM_TYPE).toInt() == HIT_HEADER_JID)
+  {
+    IArchiveHeader header;
+    header.with = AIndex.data(HDR_HEADER_WITH).toString();
+    header.start = AIndex.data(HDR_HEADER_START).toDateTime();
+    headers.append(header);
+  }
+
+  return headers;
+}
+
 QList<IArchiveRequest> ViewHistoryWindow::createRequests(const IArchiveFilter &AFilter) const
 {
   QList<IArchiveRequest> requests;
@@ -393,6 +418,29 @@ bool ViewHistoryWindow::loadServerCollection(const IArchiveHeader &AHeader, cons
   return false;
 }
 
+QString ViewHistoryWindow::contactName(const Jid &AContactJid, bool ABare) const
+{
+  if (FRoster)
+  {
+    IRosterItem ritem = FRoster->rosterItem(AContactJid);
+    if (!ritem.isValid)
+    {
+      QString gateway = FArchiver->gateJid(AContactJid).pDomain();
+      if (AContactJid.pDomain()!=gateway)
+      {
+        foreach (IRosterItem item, FRoster->rosterItems())
+          if (item.itemJid.pNode()==AContactJid.pNode() && FArchiver->gateJid(item.itemJid).pDomain()==gateway)
+            return !item.name.isEmpty() ? item.name : (ABare ? AContactJid.bare() : AContactJid.full());
+      }
+    }
+    else if (!ritem.name.isEmpty())
+    {
+      return ritem.name;
+    }
+  }
+  return ABare ? AContactJid.bare() : AContactJid.full();
+}
+
 QStandardItem *ViewHistoryWindow::findChildItem(int ARole, const QVariant &AValue, QStandardItem *AParent) const
 {
   int rowCount = AParent!=NULL ? AParent->rowCount() : FModel->rowCount();
@@ -405,11 +453,11 @@ QStandardItem *ViewHistoryWindow::findChildItem(int ARole, const QVariant &AValu
   return NULL;
 }
 
-QStandardItem *ViewHistoryWindow::createSortItem(QStandardItem *AOwner)
+QStandardItem *ViewHistoryWindow::createSortItem(const QVariant &ASortData)
 {
   QStandardItem *item = new QStandardItem;
   item->setData(HIT_SORT_ITEM, HDR_ITEM_TYPE);
-  item->setData(AOwner->data(HDR_SORT_ROLE),HDR_SORT_ROLE);
+  item->setData(ASortData,HDR_SORT_ROLE);
   return item;
 }
 
@@ -433,7 +481,7 @@ QStandardItem *ViewHistoryWindow::createDateGroup(const IArchiveHeader &AHeader,
     yearItem->setData(year,HDR_DATE_START);
     yearItem->setData(year.addYears(1).addSecs(-1),HDR_DATE_END);
     yearItem->setData(year,HDR_SORT_ROLE);
-    QList<QStandardItem *> items = QList<QStandardItem *>() << yearItem << createSortItem(yearItem) << createSortItem(yearItem);
+    QList<QStandardItem *> items = QList<QStandardItem *>() << yearItem << createSortItem(year) << createSortItem(year);
     AParent!=NULL ? AParent->appendRow(items) : FModel->appendRow(items);
     emit itemCreated(yearItem);
   }
@@ -446,7 +494,7 @@ QStandardItem *ViewHistoryWindow::createDateGroup(const IArchiveHeader &AHeader,
     monthItem->setData(month,HDR_DATE_START);
     monthItem->setData(month.addMonths(1).addSecs(-1),HDR_DATE_END);
     monthItem->setData(month,HDR_SORT_ROLE);
-    yearItem->appendRow(QList<QStandardItem *>() << monthItem << createSortItem(monthItem) << createSortItem(monthItem));
+    yearItem->appendRow(QList<QStandardItem *>() << monthItem << createSortItem(month) << createSortItem(month));
     emit itemCreated(monthItem);
   }
 
@@ -458,7 +506,7 @@ QStandardItem *ViewHistoryWindow::createDateGroup(const IArchiveHeader &AHeader,
     dayItem->setData(day,HDR_DATE_START);
     dayItem->setData(day.addDays(1).addSecs(-1),HDR_DATE_END);
     dayItem->setData(day,HDR_SORT_ROLE);
-    monthItem->appendRow(QList<QStandardItem *>() << dayItem << createSortItem(dayItem) << createSortItem(dayItem));
+    monthItem->appendRow(QList<QStandardItem *>() << dayItem << createSortItem(day) << createSortItem(day));
     emit itemCreated(dayItem);
   }
 
@@ -468,19 +516,24 @@ QStandardItem *ViewHistoryWindow::createDateGroup(const IArchiveHeader &AHeader,
 QStandardItem *ViewHistoryWindow::createContactGroup(const IArchiveHeader &AHeader, QStandardItem *AParent)
 {
   Jid gateWith = FArchiver->gateJid(AHeader.with);
-  QStandardItem *contactItem = findChildItem(HDR_HEADER_WITH,gateWith.prepared().eBare(),AParent);
-  if (!contactItem)
+  QStandardItem *groupItem = findChildItem(HDR_HEADER_WITH,gateWith.prepared().eBare(),AParent);
+  if (!groupItem)
   {
-    IRosterItem rItem = FRoster->rosterItem(AHeader.with);
-    QString name = rItem.name.isEmpty() ? AHeader.with.bare() : rItem.name;
-    contactItem = createCustomItem(HIT_GROUP_CONTACT,name);
-    contactItem->setData(gateWith.prepared().eBare(),HDR_HEADER_WITH);
-    contactItem->setToolTip(AHeader.with.bare());
-    QList<QStandardItem *> items = QList<QStandardItem *>() << contactItem << createSortItem(contactItem) << createSortItem(contactItem);
+    QString name = contactName(AHeader.with);
+    groupItem = createCustomItem(HIT_GROUP_CONTACT,name);
+    groupItem->setData(gateWith.prepared().eBare(),HDR_HEADER_WITH);
+    groupItem->setToolTip(AHeader.with.bare());
+    QList<QStandardItem *> items = QList<QStandardItem *>() << groupItem << createSortItem(AHeader.start) << createSortItem(name);
     AParent!=NULL ? AParent->appendRow(items) : FModel->appendRow(items);
-    emit itemCreated(contactItem);
+    emit itemCreated(groupItem);
   }
-  return contactItem;
+  else
+  {
+    QStandardItem *sortDateItem = AParent ? AParent->child(groupItem->row(),1) : FModel->item(groupItem->row(),1);
+    if (sortDateItem && sortDateItem->data(HDR_SORT_ROLE).toDateTime()<AHeader.start)
+      sortDateItem->setData(AHeader.start,HDR_SORT_ROLE);
+  }
+  return groupItem;
 }
 
 QStandardItem *ViewHistoryWindow::createHeaderParent(const IArchiveHeader &AHeader, QStandardItem *AParent)
@@ -520,17 +573,7 @@ QStandardItem *ViewHistoryWindow::createHeaderItem(const IArchiveHeader &AHeader
 {
   QStandardItem *parentItem = createHeaderParent(AHeader,NULL);
   
-  QString name;
-  IRosterItem rItem = FRoster->rosterItem(AHeader.with);
-  if (!rItem.name.isEmpty())
-  {
-    name = rItem.name;
-    name += !AHeader.with.resource().isEmpty() ? "/"+AHeader.with.resource() : "";
-  }
-  else
-  {
-    name = AHeader.with.full();
-  }
+  QString name = contactName(AHeader.with);
   QStandardItem *itemJid = createCustomItem(HIT_HEADER_JID,name);
   itemJid->setData(AHeader.with.prepared().eFull(), HDR_HEADER_WITH);
   itemJid->setData(AHeader.start,                   HDR_HEADER_START);
@@ -618,7 +661,7 @@ void ViewHistoryWindow::processHeaders(const QList<IArchiveHeader> &AHeaders)
 
 void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection, bool AAppend)
 {
-  if (FViewWidget && ACollection.header==FCurrentHeader)
+  if (FViewWidget && FCurrentHeaders.contains(ACollection.header))
   {
     if (!AAppend)
     {
@@ -660,15 +703,14 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
 void ViewHistoryWindow::insertFilterWith(const IArchiveHeader &AHeader)
 {
   Jid gateWith = FArchiver->gateJid(AHeader.with);
-  IRosterItem rItem = FRoster!=NULL ? FRoster->rosterItem(AHeader.with) : IRosterItem();
-  QString name = !rItem.name.isEmpty() ? rItem.name + " ("+gateWith.bare()+")" : gateWith.bare();
+  QString name = contactName(AHeader.with,true);
   int index = ui.cmbContact->findData(gateWith.pBare());
   if (index < 0)
   {
     ui.cmbContact->addItem(name, gateWith.pBare());
     updateFilterWidgets();
   }
-  else if (!rItem.name.isEmpty())
+  else
     ui.cmbContact->setItemText(index,name);
   ui.cmbContact->model()->sort(0);
 }
@@ -805,7 +847,6 @@ void ViewHistoryWindow::createHeaderActions()
   FRemove = new Action(FGroupsTools->toolBar());
   FRemove->setText(tr("Remove"));
   FRemove->setIcon(SYSTEM_ICONSETFILE,IN_REMOVE);
-  FRemove->setEnabled(false);
   connect(FRemove,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
   FGroupsTools->addAction(FRemove,AG_AWGT_ARCHIVE_DEFACTIONS,false);
 
@@ -814,14 +855,6 @@ void ViewHistoryWindow::createHeaderActions()
   FReload->setIcon(SYSTEM_ICONSETFILE,IN_RELOAD);
   connect(FReload,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
   FGroupsTools->addAction(FReload,AG_AWGT_ARCHIVE_DEFACTIONS,false);
-}
-
-void ViewHistoryWindow::updateHeaderActions()
-{
-  bool isHeader = FCurrentHeader.with.isValid() && FCurrentHeader.start.isValid();
-  FFilterBy->setEnabled(isHeader && !FFilter.with.isValid());
-  FRename->setEnabled(isHeader);
-  FRemove->setEnabled(isHeader);
 }
 
 void ViewHistoryWindow::onLocalCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader)
@@ -862,10 +895,10 @@ void ViewHistoryWindow::onServerCollectionLoaded(const QString &AId, const IArch
   if (FCollectionRequests.contains(AId))
   {
     IArchiveCollection &collection = FCollections[ACollection.header];
-    collection.messages+=ACollection.messages;
-    collection.notes+=ACollection.notes;
+    collection.messages += ACollection.messages;
+    collection.notes += ACollection.notes;
 
-    if (ACollection.header == FCurrentHeader)
+    if (FCurrentHeaders.contains(ACollection.header))
       processCollection(ACollection,AResult.index>0);
 
     if (!AResult.last.isEmpty() && AResult.index+ACollection.messages.count()+ACollection.notes.count()<AResult.count)
@@ -910,7 +943,7 @@ void ViewHistoryWindow::onRequestFailed(const QString &AId, const QString &AErro
     collection.messages.clear();
     collection.notes.clear();
 
-    if (FCurrentHeader == header)
+    if (FCurrentHeaders.contains(header))
       FViewWidget->showCustomMessage(tr("Message loading failed: %1").arg(AError));
   }
   else if (FRenameRequests.contains(AId))
@@ -925,50 +958,51 @@ void ViewHistoryWindow::onRequestFailed(const QString &AId, const QString &AErro
 
 void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefour)
 {
-  if (FViewWidget)
+  if (ACurrent.parent()!=ABefour.parent() || ACurrent.row()!=ABefour.row())
   {
     QModelIndex index = ACurrent.column()==0 ? ACurrent : ui.trvCollections->model()->index(ACurrent.row(),0,ACurrent.parent());
-    int indexType = index.data(HDR_ITEM_TYPE).toInt();
-    if (indexType == HIT_HEADER_JID)
+    FCurrentHeaders = indexHeaders(index);
+
+    if (FViewWidget)
     {
-      IArchiveHeader header;
-      header.with = index.data(HDR_HEADER_WITH).toString();
-      header.start = index.data(HDR_HEADER_START).toDateTime();
-      if (FCurrentHeader != header)
+      FViewWidget->textBrowser()->clear();
+      if (index.data(HDR_ITEM_TYPE).toInt() == HIT_HEADER_JID)
       {
-        FViewWidget->textBrowser()->clear();
+        const IArchiveHeader &header = FCurrentHeaders.at(0);
         IArchiveCollection collection = FCollections.value(header);
-        FCurrentHeader = collection.header;
         if (collection.messages.isEmpty() && collection.notes.isEmpty())
         {
-          if (FArchiver->hasLocalCollection(FStreamJid,FCurrentHeader))
+          if (FArchiver->hasLocalCollection(FStreamJid,header))
           {
-            collection = FArchiver->loadLocalCollection(FStreamJid,FCurrentHeader);
-            FCollections.insert(FCurrentHeader,collection);
+            collection = FArchiver->loadLocalCollection(FStreamJid,header);
+            FCollections.insert(collection.header,collection);
             processCollection(collection);
           }
-          else if (FCollectionRequests.key(FCurrentHeader).isEmpty())
+          else if (FCollectionRequests.key(header).isEmpty())
           {
-            if (loadServerCollection(FCurrentHeader))
-              FViewWidget->showCustomMessage(tr("Loading messages from server ..."));
+            if (loadServerCollection(header))
+              FViewWidget->showCustomMessage(tr("Loading messages from server..."));
             else
               FViewWidget->showCustomMessage(tr("Messages request failed."));
           }
         }
         else
+        {
           processCollection(collection);
+        }
+        FFilterBy->setEnabled(true);
+        FRename->setEnabled(true);
+      }
+      else
+      {
+        FFilterBy->setEnabled(false);
+        FRename->setEnabled(false);
       }
     }
-    else
-    {
-      FCurrentHeader = IArchiveHeader();
-      FViewWidget->textBrowser()->clear();
-    }
+    QStandardItem *current = FModel->itemFromIndex(FProxyModel->mapToSource(ACurrent));
+    QStandardItem *befour = FModel->itemFromIndex(FProxyModel->mapToSource(ABefour));
+    emit currentItemChanged(current,befour);
   }
-  updateHeaderActions();
-  QStandardItem *current = FModel->itemFromIndex(FProxyModel->mapToSource(ACurrent));
-  QStandardItem *befour = FModel->itemFromIndex(FProxyModel->mapToSource(ABefour));
-  emit itemChanged(current,befour);
 }
 
 void ViewHistoryWindow::onItemContextMenuRequested(const QPoint &APos)
@@ -1044,27 +1078,27 @@ void ViewHistoryWindow::onHeaderActionTriggered(bool)
   if (action == FFilterBy)
   {
     IArchiveFilter filter = FFilter;
-    filter.with = FCurrentHeader.with;
+    filter.with = FCurrentHeaders.at(0).with;
     setFilter(filter);
   }
   else if (action == FRename)
   {
     bool ok;
-    QString subject = QInputDialog::getText(this,tr("Enter new collection subject"),tr("Subject:"),QLineEdit::Normal,FCurrentHeader.subject,&ok);
+    QString subject = QInputDialog::getText(this,tr("Enter new collection subject"),tr("Subject:"),QLineEdit::Normal,FCurrentHeaders.at(0).subject,&ok);
     if (ok)
     {
       if (FArchiver->isSupported(FStreamJid))
       {
         IArchiveCollection collection;
-        collection.header = FCurrentHeader;
+        collection.header = FCurrentHeaders.at(0);
         collection.header.subject = subject;
         QString requestId = FArchiver->saveServerCollection(FStreamJid,collection);
         if (!requestId.isEmpty())
           FRenameRequests.insert(requestId,collection.header);
       }
-      if (FArchiver->hasLocalCollection(FStreamJid,FCurrentHeader))
+      if (FArchiver->hasLocalCollection(FStreamJid,FCurrentHeaders.at(0)))
       {
-        IArchiveCollection collection = FArchiver->loadLocalCollection(FStreamJid,FCurrentHeader);
+        IArchiveCollection collection = FArchiver->loadLocalCollection(FStreamJid,FCurrentHeaders.at(0));
         collection.header.subject = subject;
         collection.header.version++;
         FArchiver->saveLocalCollection(FStreamJid,collection,false);
@@ -1073,22 +1107,32 @@ void ViewHistoryWindow::onHeaderActionTriggered(bool)
   }
   else if (action == FRemove)
   {
-    if (QMessageBox::question(this,tr("Remove collection"), tr("Do you really want to remove this collection with messages?"),
-      QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+    if (!FCurrentHeaders.isEmpty())
     {
-      if (FArchiver->isSupported(FStreamJid))
+      QString title = FCurrentHeaders.count() > 1 ? tr("Remove collection") : tr("Remove collections");
+      QString message = FCurrentHeaders.count() > 1 ? 
+        tr("Do you really want to remove %1 collections with messages?").arg(FCurrentHeaders.count()) 
+        : tr("Do you really want to remove this collection with messages?");
+      if (QMessageBox::question(this,title, message, QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
       {
-        IArchiveRequest request;
-        request.with = FCurrentHeader.with;
-        request.start = FCurrentHeader.start;
-        if (request.with.isValid() && request.start.isValid())
+        QList<IArchiveHeader> headers = FCurrentHeaders;
+        foreach(IArchiveHeader header, headers)
         {
-          QString requestId = FArchiver->removeServerCollections(FStreamJid,request);
-          if (!requestId.isEmpty())
-            FRemoveRequests.insert(requestId,FCurrentHeader);
+          if (FArchiver->isSupported(FStreamJid))
+          {
+            IArchiveRequest request;
+            request.with = header.with;
+            request.start = header.start;
+            if (request.with.isValid() && request.start.isValid())
+            {
+              QString requestId = FArchiver->removeServerCollections(FStreamJid,request);
+              if (!requestId.isEmpty())
+                FRemoveRequests.insert(requestId,header);
+            }
+          }
+          FArchiver->removeLocalCollection(FStreamJid,header);
         }
       }
-      FArchiver->removeLocalCollection(FStreamJid,FCurrentHeader);
     }
   }
   else if (action == FReload)
@@ -1108,3 +1152,4 @@ void ViewHistoryWindow::onStreamClosed(IXmppStream *AXmppStream)
   if (AXmppStream->jid() == FStreamJid)
     FSourceMenu->setEnabled(false);
 }
+
