@@ -2,7 +2,7 @@
 
 #include <QDesktopServices>
 
-#define BOOKMARKS_TAGNAME       "storage"
+#define PST_BOOKMARKS       "storage"
 
 #define IN_BOOKMARKS            "psi/history"
 #define IN_BOOKMARK_CONF        "psi/groupChat"
@@ -129,7 +129,7 @@ QString BookMarks::setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &A
 {
   QDomDocument doc;
   doc.appendChild(doc.createElement("bookmarks"));
-  QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(NS_STORAGE_BOOKMARKS,BOOKMARKS_TAGNAME)).toElement();
+  QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(NS_STORAGE_BOOKMARKS,PST_BOOKMARKS)).toElement();
   foreach(IBookMark bookmark, ABookmarks)
   {
     if (!bookmark.name.isEmpty())
@@ -161,6 +161,21 @@ int BookMarks::execEditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) co
   return dialog->exec();
 }
 
+void BookMarks::showEditBookmarksDialog(const Jid &AStreamJid)
+{
+  if (FBookMarks.contains(AStreamJid))
+  {
+    EditBookmarksDialog *dialog = FDialogs.value(AStreamJid,NULL);
+    if (!dialog)
+    {
+      dialog = new EditBookmarksDialog(this,AStreamJid,bookmarks(AStreamJid),NULL);
+      FDialogs.insert(AStreamJid,dialog);
+      connect(dialog,SIGNAL(dialogDestroyed()),SLOT(onEditBookmarksDialogDestroyed()));
+    }
+    dialog->show();
+  }
+}
+
 void BookMarks::updateBookmarksMenu()
 {
   bool enabled = false;
@@ -168,18 +183,6 @@ void BookMarks::updateBookmarksMenu()
   for (int i=0; !enabled && i<actionList.count(); i++)
     enabled = actionList.at(i)->isVisible();
   FBookMarksMenu->menuAction()->setEnabled(enabled);
-}
-
-void BookMarks::removeStreamMenu(const Jid &AStreamJid)
-{
-  if (FStreamMenu.contains(AStreamJid))
-  {
-    Menu *streamMenu = FStreamMenu.take(AStreamJid);
-    streamMenu->clear();
-    delete streamMenu;
-    FBookMarks.remove(AStreamJid);
-    updateBookmarksMenu();
-  }
 }
 
 void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark, bool AShowWindow)
@@ -204,15 +207,22 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
 
 void BookMarks::onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline)
 {
-  if (AStateOnline)
-    FStorage->loadData(AStreamJid,BOOKMARKS_TAGNAME,NS_STORAGE_BOOKMARKS);
+  if (!AStateOnline)
+  {
+    delete FDialogs.take(AStreamJid);
+    delete FStreamMenu.take(AStreamJid);
+    FBookMarks.remove(AStreamJid);
+    updateBookmarksMenu();
+  }
   else
-    removeStreamMenu(AStreamJid);
+  {
+    FStorage->loadData(AStreamJid,PST_BOOKMARKS,NS_STORAGE_BOOKMARKS);
+  }
 }
 
 void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
-  if (AElement.tagName() == BOOKMARKS_TAGNAME && AElement.namespaceURI() == NS_STORAGE_BOOKMARKS)
+  if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
   {
     QList<IBookMark> &streamBookmarks = FBookMarks[AStreamJid];
     Menu *streamMenu = FStreamMenu.value(AStreamJid,NULL);
@@ -275,8 +285,8 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
         action->setData(ADR_STREAM_JID,AStreamJid.full());
         action->setData(ADR_BOOKMARK_INDEX,streamBookmarks.count()-1);
         connect(action,SIGNAL(triggered(bool)),SLOT(onBookmarkActionTriggered(bool)));
-        streamMenu->addAction(action,AG_DEFAULT,false);
-        FBookMarksMenu->addAction(action,AG_BMM_BOOKMARKS_ITEMS,true);
+        streamMenu->addAction(action,AG_BMM_BOOKMARKS_ITEMS,false);
+        FBookMarksMenu->addAction(action,AG_BMM_BOOKMARKS_ITEMS + qHash(AStreamJid),false);
       }
       elem = elem.nextSiblingElement();
     }
@@ -287,11 +297,11 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
 
 void BookMarks::onStorageDataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
-  if (AElement.tagName() == BOOKMARKS_TAGNAME && AElement.namespaceURI() == NS_STORAGE_BOOKMARKS)
+  if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
   {
     if (FStreamMenu.contains(AStreamJid))
     {
-      qDeleteAll(FStreamMenu[AStreamJid]->actions(AG_DEFAULT));
+      qDeleteAll(FStreamMenu[AStreamJid]->actions(AG_BMM_BOOKMARKS_ITEMS));
       FBookMarks[AStreamJid].clear();
     }
     updateBookmarksMenu();
@@ -355,12 +365,15 @@ void BookMarks::onEditBookmarksActionTriggered(bool)
   if (action)
   {
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
-    if (FBookMarks.contains(streamJid))
-    {
-      EditBookmarksDialog *dialog = new EditBookmarksDialog(this,streamJid,FBookMarks.value(streamJid));
-      dialog->show();
-    }
+    showEditBookmarksDialog(streamJid);
   }
+}
+
+void BookMarks::onEditBookmarksDialogDestroyed()
+{
+  EditBookmarksDialog *dialog = qobject_cast<EditBookmarksDialog *>(sender());
+  if (dialog)
+    FDialogs.remove(dialog->streamJid());
 }
 
 void BookMarks::onAccountChanged(const QString &AName, const QVariant &AValue)

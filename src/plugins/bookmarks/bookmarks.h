@@ -40,12 +40,12 @@ public:
   virtual QString addBookmark(const Jid &AStreamJid, const IBookMark &ABookmark);
   virtual QString setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &ABookmarks);
   virtual int execEditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) const;
+  virtual void showEditBookmarksDialog(const Jid &AStreamJid);
 signals:
   virtual void bookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
   virtual void bookmarksError(const QString &AId, const QString &AError);
 protected:
   void updateBookmarksMenu();
-  void removeStreamMenu(const Jid &AStreamJid);
   void startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark, bool AShowWindow);
 protected slots:
   void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
@@ -56,6 +56,7 @@ protected slots:
   void onBookmarkActionTriggered(bool);
   void onAddBookmarkActionTriggered(bool);
   void onEditBookmarksActionTriggered(bool);
+  void onEditBookmarksDialogDestroyed();
   void onAccountChanged(const QString &AName, const QVariant &AValue);
 private:
   IPrivateStorage *FStorage;
@@ -69,6 +70,7 @@ private:
   QHash<Jid, Menu *> FStreamMenu;
 private:
   QHash<Jid, QList<IBookMark> > FBookMarks;
+  QHash<Jid, EditBookmarksDialog *> FDialogs;
 };
 
 #endif // BOOKMARKS_H

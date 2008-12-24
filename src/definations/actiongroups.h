@@ -78,9 +78,9 @@
 #define AG_DIWT_DISCOVERY_FEATURE_ACTIONS                       700
 
 //BookmarksMenu
-#define AG_BMM_BOOKMARKS_ITEMS                                  500
-#define AG_BMM_BOOKMARKS_STREAMS                                600
-#define AG_BBM_BOOKMARKS_TOOLS                                  700
+#define AG_BMM_BOOKMARKS_STREAMS                                500
+#define AG_BMM_BOOKMARKS_ITEMS                                  700
+#define AG_BBM_BOOKMARKS_TOOLS                                  900
 
 //ArchiveWindow - Groups Tools
 #define AG_AWGT_ARCHIVE_GROUPING                                200
