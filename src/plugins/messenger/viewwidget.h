@@ -40,6 +40,7 @@ signals:
   virtual void nickForJidChanged(const Jid &AJid, const QString &ANick);
 protected:
   QString getHtmlBody(const QString &AHtml);
+  bool processMeCommand(QTextDocument *ADocument, const QString &ANick, const QColor &AColor);
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:

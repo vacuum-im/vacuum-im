@@ -84,14 +84,18 @@ void ViewWidget::showMessage(const Message &AMessage)
   {
     Jid authorJid = AMessage.from().isEmpty() ? FStreamJid : AMessage.from();
     QString authorNick = FJid2Nick.value(authorJid,FShowKind == GroupChatMessage ? authorJid.resource() : authorJid.node());
+    QColor authorColor = colorForJid(authorJid);
 
     QTextDocument messageDoc;
     FMessenger->messageToText(&messageDoc,AMessage);
+    
+    if (processMeCommand(&messageDoc,authorNick,authorColor))
+      authorNick.clear();
 
     if (FMessenger->checkOption(IMessenger::ShowHTML))
-      showCustomMessage(messageDoc.toHtml(),AMessage.dateTime(),authorNick,colorForJid(authorJid));
+      showCustomMessage(messageDoc.toHtml(),AMessage.dateTime(),authorNick,authorColor);
     else
-      showCustomMessage(messageDoc.toPlainText(),AMessage.dateTime(),authorNick,colorForJid(authorJid));
+      showCustomMessage(messageDoc.toPlainText(),AMessage.dateTime(),authorNick,authorColor);
   }
 
   emit messageShown(AMessage);
@@ -180,6 +184,26 @@ QString ViewWidget::getHtmlBody(const QString &AHtml)
   return AHtml;
 }
 
+bool ViewWidget::processMeCommand(QTextDocument *ADocument, const QString &ANick, const QColor &AColor)
+{
+  bool found = false;
+  QRegExp regexp("^/me\\s");
+  for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
+  {
+    QTextCharFormat nickFormat;
+    nickFormat.setForeground(AColor);
+    cursor.insertText("* "+ANick+" ",nickFormat);
+
+    QTextCharFormat lineFormat;
+    lineFormat.setFontItalic(true);
+    cursor.select(QTextCursor::LineUnderCursor);
+    cursor.mergeCharFormat(lineFormat);
+
+    found = true;
+  }
+  return found;
+}
+
 bool ViewWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
   if (AWatched == ui.tedViewer && AEvent->type() == QEvent::Resize)
@@ -199,5 +223,4 @@ bool ViewWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 
   return QWidget::eventFilter(AWatched,AEvent);
 }
-
 
