@@ -25,6 +25,7 @@ MultiUserChatPlugin::MultiUserChatPlugin()
   FDiscovery = NULL;
   FNotifications = NULL;
   FDataForms = NULL;
+  FRegistration = NULL;
 
   FChatMenu = NULL;
   FJoinAction = NULL;
@@ -107,6 +108,19 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
   if (plugin)
   {
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+  }
+
+  plugin = APluginManager->getPlugins("IRegistration").value(0,NULL);
+  if (plugin)
+  {
+    FRegistration = qobject_cast<IRegistration *>(plugin->instance());
+    if (FRegistration)
+    {
+      connect(FRegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
+        SLOT(onRegisterFieldsReceived(const QString &, const IRegisterFields &)));
+      connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
+        SLOT(onRegisterErrorReceived(const QString &, const QString &)));
+    }
   }
 
   return FMessenger!=NULL;
@@ -327,8 +341,19 @@ void MultiUserChatPlugin::showMessage(int AMessageId)
 
 bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid)
 {
-  if (FDiscovery)
+  if (FDataForms && FRegistration)
+  {
+    QString requestId = FRegistration->sendRegiterRequest(AStreamJid,ARoomJid.domain());
+    if (!requestId.isEmpty())
+    {
+      FNickRequests.insert(requestId, qMakePair<Jid,Jid>(AStreamJid,ARoomJid));
+      return true;
+    }
+  }
+  else if (FDiscovery)
+  {
     return FDiscovery->requestDiscoInfo(AStreamJid,ARoomJid.bare(),MUC_NODE_ROOM_NICK);
+  }
   return false;
 }
 
@@ -612,6 +637,25 @@ void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
       if (ADiscoInfo.identity.at(i).category=="conference" && ADiscoInfo.identity.at(i).type=="text")
         nick = ADiscoInfo.identity.at(i).name;
     emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,nick);
+  }
+}
+
+void MultiUserChatPlugin::onRegisterFieldsReceived(const QString &AId, const IRegisterFields &AFields)
+{
+  if (FNickRequests.contains(AId))
+  {
+    QPair<Jid,Jid> params = FNickRequests.take(AId);
+    QString nick = FDataForms!=NULL ? FDataForms->fieldValue("nick",AFields.form.fields).toString() : AFields.username;
+    emit roomNickReceived(params.first,params.second,nick);
+  }
+}
+
+void MultiUserChatPlugin::onRegisterErrorReceived(const QString &AId, const QString &AError)
+{
+  if (FNickRequests.contains(AId))
+  {
+    QPair<Jid,Jid> params = FNickRequests.take(AId);
+    emit roomNickReceived(params.first,params.second,"");
   }
 }
 

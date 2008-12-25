@@ -1,6 +1,7 @@
 #ifndef MULTIUSERCHATPLUGIN_H
 #define MULTIUSERCHATPLUGIN_H
 
+#include <QHash>
 #include <QMessageBox>
 #include "../../definations/actiongroups.h"
 #include "../../definations/dataformtypes.h"
@@ -18,6 +19,7 @@
 #include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/inotifications.h"
 #include "../../interfaces/idataforms.h"
+#include "../../interfaces/iregistraton.h"
 #include "../../utils/message.h"
 #include "../../utils/action.h"
 #include "../../utils/skin.h"
@@ -99,6 +101,8 @@ protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onChatActionTriggered(bool);
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
+  void onRegisterFieldsReceived(const QString &AId, const IRegisterFields &AFields);
+  void onRegisterErrorReceived(const QString &AId, const QString &AError);
   void onInviteDialogFinished(int AResult);
   void onInviteActionTriggered(bool);
 private:
@@ -111,6 +115,7 @@ private:
   IServiceDiscovery *FDiscovery;
   INotifications *FNotifications;
   IDataForms *FDataForms;
+  IRegistration *FRegistration;
 private:
   Menu *FChatMenu;
   Action *FJoinAction;
@@ -120,6 +125,7 @@ private:
   QHash<IMultiUserChatWindow *, Action *> FChatActions;
   QList<int> FActiveInvites;
   QHash<QMessageBox *,InviteFields> FInviteDialogs;
+  QHash<QString, QPair<Jid,Jid> > FNickRequests;
 };
 
 #endif // MULTIUSERCHATPLUGIN_H
