@@ -730,8 +730,20 @@ bool MultiUserChatWindow::showStatusCodes(const QString &ANick, const QList<int>
 
 void MultiUserChatWindow::showServiceMessage(const QString &AMessage)
 {
-  QString html = QString("<span style='color:green;'>*** %1</span>").arg(Qt::escape(AMessage));
-  FViewWidget->showCustomMessage(html,QDateTime::currentDateTime());
+  Message message;
+  message.setBody("*** "+AMessage);
+
+  QTextDocument doc;
+  doc.setDefaultFont(FViewWidget->document()->defaultFont());
+  FMessenger->messageToText(&doc,message);
+
+  QTextCursor cursor(&doc);
+  cursor.select(QTextCursor::Document);
+  QTextCharFormat format;
+  format.setForeground(QBrush(Qt::darkGreen));
+  cursor.mergeCharFormat(format);
+
+  FViewWidget->showCustomMessage(doc.toHtml(),QDateTime::currentDateTime());
 }
 
 void MultiUserChatWindow::setViewColorForUser(IMultiUser *AUser)
@@ -1218,9 +1230,20 @@ void MultiUserChatWindow::onPresenceChanged(int /*AShow*/, const QString &/*ASta
 
 void MultiUserChatWindow::onSubjectChanged(const QString &ANick, const QString &ASubject)
 {
-  QString msg = ANick.isEmpty() ? tr("Subject: %1").arg(ASubject) : tr("%1 has changed the subject to: %2").arg(ANick).arg(ASubject);
-  QString html = QString("<span style='color:gray;'>%1</span>").arg(msg);
-  FViewWidget->showCustomMessage(html,QDateTime::currentDateTime());
+  Message message;
+  message.setBody(ANick.isEmpty() ? tr("Subject: %1").arg(ASubject) : tr("%1 has changed the subject to: %2").arg(ANick).arg(ASubject));
+
+  QTextDocument doc;
+  doc.setDefaultFont(FViewWidget->document()->defaultFont());
+  FMessenger->messageToText(&doc,message);
+
+  QTextCursor cursor(&doc);
+  cursor.select(QTextCursor::Document);
+  QTextCharFormat format;
+  format.setForeground(QBrush(Qt::gray));
+  cursor.mergeCharFormat(format);
+
+  FViewWidget->showCustomMessage(doc.toHtml(),QDateTime::currentDateTime());
 }
 
 void MultiUserChatWindow::onServiceMessageReceived(const Message &AMessage)
