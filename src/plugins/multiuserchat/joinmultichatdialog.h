@@ -18,6 +18,7 @@ public:
   ~JoinMultiChatDialog();
 protected:
   void initialize();
+  void updateResolveNickState();
 protected slots:
   void onDialogAccepted();
   void onStreamIndexChanged(int AIndex);
@@ -26,8 +27,9 @@ protected slots:
   void onResolveNickClicked();
   void onRoomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
   void onStreamAdded(IXmppStream *AXmppStream);
-  void onStreamRemoved(IXmppStream *AXmppStream);
+  void onStreamStateChanged(IXmppStream *AXmppStream);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+  void onStreamRemoved(IXmppStream *AXmppStream);
 private:
   Ui::JoinMultiChatDialogClass ui;
 private:

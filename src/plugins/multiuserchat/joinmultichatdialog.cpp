@@ -35,6 +35,10 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
   ui.lneRoom->setText(ARoomJid.node());
   ui.lnePassword->setText(APassword);
   ui.lneNick->setText(ANick.isEmpty() ? streamJid.node() : ANick);
+
+  updateResolveNickState();
+  if (ANick.isEmpty())
+    onResolveNickClicked();
 }
 
 JoinMultiChatDialog::~JoinMultiChatDialog()
@@ -57,8 +61,10 @@ void JoinMultiChatDialog::initialize()
       ui.cmbStreamJid->model()->sort(0,Qt::AscendingOrder);
       connect(ui.cmbStreamJid,SIGNAL(currentIndexChanged(int)),SLOT(onStreamIndexChanged(int)));
       connect(FXmppStreams->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
-      connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
+      connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamStateChanged(IXmppStream *)));
+      connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamStateChanged(IXmppStream *)));
       connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
+      connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
     }
   }
 
@@ -85,6 +91,12 @@ void JoinMultiChatDialog::initialize()
       connect(ui.cmbRecent,SIGNAL(currentIndexChanged(int)),SLOT(onResentIndexChanged(int)));
     }
   }
+}
+
+void JoinMultiChatDialog::updateResolveNickState()
+{
+  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->getStream(ui.cmbStreamJid->currentText()) : NULL;
+  ui.tlbResolveNick->setEnabled(stream!=NULL && stream->isOpen());
 }
 
 void JoinMultiChatDialog::onDialogAccepted()
@@ -123,7 +135,7 @@ void JoinMultiChatDialog::onDialogAccepted()
 
 void JoinMultiChatDialog::onStreamIndexChanged(int /*AIndex*/)
 {
-  ui.tlbResolveNick->setEnabled(true);
+  updateResolveNickState();
 }
 
 void JoinMultiChatDialog::onResentIndexChanged(int AIndex)
@@ -156,14 +168,15 @@ void JoinMultiChatDialog::onRecentDeleteClicked()
 void JoinMultiChatDialog::onResolveNickClicked()
 {
   Jid roomJid(ui.lneRoom->text(),ui.lneHost->text(),"");
-  Jid streamJid = ui.cmbStreamJid->currentText();
-  if (streamJid.isValid() && roomJid.isValid())
+  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->getStream(ui.cmbStreamJid->currentText()) : NULL;
+  if (stream!=NULL && stream->isOpen() && roomJid.isValid())
   {
-    ui.lneNick->clear();
-    ui.tlbResolveNick->setEnabled(false);
-    FChatPlugin->requestRoomNick(streamJid,roomJid);
+    if (FChatPlugin->requestRoomNick(stream->jid(),roomJid))
+    {
+      ui.lneNick->clear();
+      ui.tlbResolveNick->setEnabled(false);
+    }
   }
-  
 }
 
 void JoinMultiChatDialog::onRoomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick)
@@ -172,9 +185,9 @@ void JoinMultiChatDialog::onRoomNickReceived(const Jid &AStreamJid, const Jid &A
   Jid streamJid = ui.cmbStreamJid->currentText();
   if (AStreamJid == streamJid && ARoomJid == roomJid)
   {
-    ui.tlbResolveNick->setEnabled(true);
     if (ui.lneNick->text().isEmpty())
       ui.lneNick->setText(ANick.isEmpty() ? streamJid.node() : ANick);
+    updateResolveNickState();
   }
 }
 
@@ -183,14 +196,19 @@ void JoinMultiChatDialog::onStreamAdded(IXmppStream *AXmppStream)
   ui.cmbStreamJid->addItem(AXmppStream->jid().full());
 }
 
-void JoinMultiChatDialog::onStreamRemoved( IXmppStream *AXmppStream )
+void JoinMultiChatDialog::onStreamStateChanged(IXmppStream *AXmppStream)
 {
-  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->jid().full()));
+  updateResolveNickState();
 }
 
 void JoinMultiChatDialog::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
   ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(ABefour.full()));
   ui.cmbStreamJid->addItem(AXmppStream->jid().full());
+}
+
+void JoinMultiChatDialog::onStreamRemoved(IXmppStream *AXmppStream)
+{
+  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->jid().full()));
 }
 
