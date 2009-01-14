@@ -23,6 +23,7 @@ public slots:
 signals:
   void notifyActivated();
   void notifyRemoved();
+  void windowDestroyed();
 protected:
   virtual void mouseReleaseEvent(QMouseEvent *AEvent);
 private:

@@ -110,14 +110,17 @@ void NotifyWidget::disappear()
     FWidgets.removeAt(FWidgets.indexOf(this));
     close();
     layoutWidgets();
-    emit notifyRemoved();
+    emit windowDestroyed();
   }
 }
 
-void NotifyWidget::mouseReleaseEvent( QMouseEvent *AEvent )
+void NotifyWidget::mouseReleaseEvent(QMouseEvent *AEvent)
 {
   QWidget::mouseReleaseEvent(AEvent);
-  emit notifyActivated();
+  if (AEvent->button() == Qt::LeftButton)
+    emit notifyActivated();
+  else if (AEvent->button() == Qt::RightButton)
+    emit notifyRemoved();
 }
 
 void NotifyWidget::layoutWidgets()
