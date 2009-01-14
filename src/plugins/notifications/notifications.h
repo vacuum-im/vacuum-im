@@ -90,6 +90,7 @@ protected:
   int notifyIdByTrayId(int ATrayId) const;
   int notifyIdByWidget(NotifyWidget *AWidget) const;
 protected slots:
+  void onTrayActionTriggered(bool);
   void onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId);
   void onRosterNotifyRemoved(IRosterIndex *AIndex, int ANotifyId);
   void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
@@ -110,6 +111,10 @@ private:
   IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
   ISettingsPlugin *FSettingsPlugin;
+private:
+  Action *FActivateAll;
+  Action *FRemoveAll;
+  Menu *FNotifyMenu;
 private:
   uint FOptions;
   int FNotifyId;

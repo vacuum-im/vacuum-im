@@ -20,11 +20,17 @@ Notifications::Notifications()
   FTrayManager = NULL;
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
+
+  FActivateAll = NULL;
+  FRemoveAll = NULL;
+  FNotifyMenu = NULL;
 }
 
 Notifications::~Notifications()
 {
-
+  delete FActivateAll;
+  delete FRemoveAll;
+  delete FNotifyMenu;
 }
 
 void Notifications::pluginInfo(IPluginInfo *APluginInfo)
@@ -104,6 +110,25 @@ bool Notifications::initObjects()
     FSettingsPlugin->openOptionsNode(ON_NOTIFY,tr("Notifications"),tr("Notification options"),QIcon());
     FSettingsPlugin->insertOptionsHolder(this);
   }
+  if (FTrayManager)
+  {
+    FActivateAll = new Action(this);
+    FActivateAll->setVisible(false);
+    FActivateAll->setText(tr("Activate All Notifications"));
+    FTrayManager->addAction(FActivateAll,AG_NOTIFICATIONS_TRAY,false);
+    connect(FActivateAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
+
+    FRemoveAll = new Action(this);
+    FRemoveAll->setVisible(false);
+    FRemoveAll->setText(tr("Remove All Notifications"));
+    FTrayManager->addAction(FRemoveAll,AG_NOTIFICATIONS_TRAY,false);
+    connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
+
+    FNotifyMenu = new Menu;
+    FNotifyMenu->setTitle(tr("Pending Notifications"));
+    FNotifyMenu->menuAction()->setVisible(false);
+    FTrayManager->addAction(FNotifyMenu->menuAction(),AG_NOTIFICATIONS_TRAY,false);
+  }
   return true;
 }
 
@@ -170,12 +195,12 @@ int Notifications::appendNotification(const INotification &ANotification)
     
     if (!toolTip.isEmpty() && checkOption(INotifications::EnableTrayActions) && (ANotification.kinds & INotification::TrayAction)>0)
     {
-      record.action = new Action(this);
+      record.action = new Action(FNotifyMenu);
       record.action->setIcon(icon);
       record.action->setText(toolTip);
       record.action->setData(ADR_NOTIFYID,notifyId);
       connect(record.action,SIGNAL(triggered(bool)),SLOT(onActionNotifyActivated(bool)));
-      FTrayManager->addAction(record.action,AG_NOTIFICATIONS_TRAY,false);
+      FNotifyMenu->addAction(record.action);
     }
   }
 
@@ -186,6 +211,13 @@ int Notifications::appendNotification(const INotification &ANotification)
     if (!dirName.isEmpty())
       Skin::getSkinSoundset(dirName)->playSoundByName(soundName,true);
   }
+
+  if (FNotifyRecords.isEmpty())
+  {
+    FActivateAll->setVisible(true);
+    FRemoveAll->setVisible(true);
+  }
+  FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
 
   FNotifyRecords.insert(notifyId,record);
   emit notificationAppended(notifyId);
@@ -219,9 +251,15 @@ void Notifications::removeNotification(int ANotifyId)
     }
     if (FTrayManager && record.action!=NULL)
     {
-      FTrayManager->removeAction(record.action);
+      FNotifyMenu->removeAction(record.action);
       delete record.action;
     }
+    if (FNotifyRecords.isEmpty())
+    {
+      FActivateAll->setVisible(false);
+      FRemoveAll->setVisible(false);
+    }
+    FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
     emit notificationRemoved(ANotifyId);
   }
 }
@@ -330,6 +368,21 @@ int Notifications::notifyIdByWidget(NotifyWidget *AWidget) const
   return -1;
 }
 
+void Notifications::onTrayActionTriggered(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    foreach(int notifyId, FNotifyRecords.keys())
+    {
+      if (action == FActivateAll)
+        activateNotification(notifyId);
+      else if (action == FRemoveAll)
+        removeNotification(notifyId);
+    }
+  }
+}
+
 void Notifications::onRosterNotifyActivated(IRosterIndex * /*AIndex*/, int ANotifyId)
 {
   activateNotification(notifyIdByRosterId(ANotifyId));
@@ -360,7 +413,7 @@ void Notifications::onWindowNotifyActivated()
 
 void Notifications::onWindowNotifyRemoved()
 {
-
+  removeNotification(notifyIdByWidget(qobject_cast<NotifyWidget*>(sender())));
 }
 
 void Notifications::onActionNotifyActivated(bool)
