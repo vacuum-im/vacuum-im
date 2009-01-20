@@ -15,6 +15,7 @@ MessageHandler::MessageHandler(IMessenger *AMessenger, QObject *AParent) : QObje
   FStatusIcons = NULL;
   FPresencePlugin = NULL;
   FMessageArchiver = NULL;
+  FVCardPlugin = NULL;
   initialize();
 }
 
@@ -166,6 +167,17 @@ void MessageHandler::initialize()
       notifications->insertNotificator(CHAT_NOTIFICATOR_ID,tr("Chat Messages"),kindMask,kindMask);
     }
   }
+
+  plugin = FMessenger->pluginManager()->getPlugins("IVCardPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
+    if (FVCardPlugin)
+    {
+      connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardChanged(const Jid &)));
+      connect(FVCardPlugin->instance(),SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardChanged(const Jid &)));
+    }
+  }
 }
 
 IMessageWindow *MessageHandler::getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
@@ -269,6 +281,19 @@ IChatWindow *MessageHandler::getChatWindow(const Jid &AStreamJid, const Jid &ACo
       window->infoWidget()->autoUpdateFields();
       window->viewWidget()->setNickForJid(AContactJid.bare(),window->viewWidget()->nickForJid(AContactJid));
       window->viewWidget()->setColorForJid(AContactJid.bare(),window->viewWidget()->colorForJid(AContactJid));
+      IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AStreamJid.bare()) : NULL;
+      if (vcard)
+      {
+        QString nickName = vcard->value(VVN_NICKNAME);
+        if (!nickName.isEmpty())
+        {
+          window->viewWidget()->setNickForJid(AStreamJid,nickName);
+          window->viewWidget()->setColorForJid(AStreamJid,window->viewWidget()->colorForJid(AStreamJid));
+          window->viewWidget()->setNickForJid(AStreamJid.bare(),nickName);
+          window->viewWidget()->setColorForJid(AStreamJid.bare(),window->viewWidget()->colorForJid(AStreamJid));
+        }
+        vcard->unlock();
+      }
       showChatHistory(window);
       updateChatWindow(window);
     }
@@ -297,7 +322,14 @@ void MessageHandler::showChatHistory(IChatWindow *AWindow)
     QList<Message> history = FMessageArchiver->findLocalMessages(AWindow->streamJid(),request);
     qSort(history);
     foreach (Message message, history)
+    {
+      if (AWindow->viewWidget()->nickForJid(message.from()).isNull())
+      {
+        AWindow->viewWidget()->setNickForJid(message.from(),FMessageArchiver->gateNick(AWindow->streamJid(),message.from()));
+        AWindow->viewWidget()->setColorForJid(message.from(),AWindow->viewWidget()->colorForJid(AWindow->contactJid()));
+      }
       AWindow->showMessage(message);
+    }
   }
 }
 
@@ -344,7 +376,7 @@ void MessageHandler::onChatMessageSend()
   if (window)
   {
     Message message;
-    message/*.setFrom(window->streamJid().eFull())*/.setTo(window->contactJid().eFull()).setType(Message::Chat);
+    message.setTo(window->contactJid().eFull()).setType(Message::Chat);
     FMessenger->textToMessage(message,window->editWidget()->document());
     if (!message.body().isEmpty() && FMessenger->sendMessage(message,window->streamJid()))
     {
@@ -510,4 +542,21 @@ void MessageHandler::onStatusIconsChanged()
     updateMessageWindow(window);
 }
 
+void MessageHandler::onVCardChanged(const Jid &AContactJid)
+{
+  IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AContactJid.bare()) : NULL;
+  if (vcard)
+  {
+    QString nickName = vcard->value(VVN_NICKNAME);
+    foreach(IChatWindow *window, FMessenger->chatWindows())
+    {
+      if (window->streamJid() && AContactJid)
+      {
+        window->viewWidget()->setNickForJid(window->streamJid(),nickName);
+        window->viewWidget()->setNickForJid(window->streamJid().bare(),nickName);
+      }
+    }
+    vcard->unlock();
+  }
+}
 

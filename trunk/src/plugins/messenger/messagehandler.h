@@ -4,6 +4,7 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/notificationdataroles.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/vcardvaluenames.h"
 #include "../../definations/soundnames.h"
 #include "../../interfaces/inotifications.h"
 #include "../../interfaces/imessenger.h"
@@ -11,6 +12,7 @@
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/imessagearchiver.h"
+#include "../../interfaces/ivcard.h"
 #include "../../utils/skin.h"
 
 class MessageHandler : 
@@ -56,11 +58,13 @@ protected slots:
   void onMessageWindowDestroyed();
   void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
   void onStatusIconsChanged();
+  void onVCardChanged(const Jid &AContactJid);
 private:
   IMessenger *FMessenger;
   IStatusIcons *FStatusIcons;
   IPresencePlugin *FPresencePlugin;
   IMessageArchiver *FMessageArchiver;
+  IVCardPlugin *FVCardPlugin;
 private:
   QList<IMessageWindow *> FMessageWindows;
   QList<IChatWindow *> FChatWindows;

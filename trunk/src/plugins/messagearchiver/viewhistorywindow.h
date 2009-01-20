@@ -3,7 +3,6 @@
 
 #include <QTimer>
 #include <QSortFilterProxyModel>
-#include "ui_viewhistorywindow.h"
 #include "../../definations/archiveindextyperole.h"
 #include "../../definations/actiongroups.h"
 #include "../../interfaces/iroster.h"
@@ -11,6 +10,7 @@
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/imessagearchiver.h"
 #include "../../utils/skin.h"
+#include "ui_viewhistorywindow.h"
 
 class ViewHistoryWindow;
 
