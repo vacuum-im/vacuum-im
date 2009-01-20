@@ -198,6 +198,7 @@ public:
   virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = "") =0;
   //Local Archive
   virtual Jid gateJid(const Jid &AContactJid) const =0;
+  virtual QString gateNick(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual QList<Message> findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const =0;
   virtual bool hasLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const =0;
   virtual bool saveLocalCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, bool AAppend = true) =0;

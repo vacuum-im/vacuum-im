@@ -52,6 +52,7 @@ MessageArchiver::MessageArchiver()
   FDataForms = NULL;
   FMessenger = NULL;
   FSessionNegotioation = NULL;
+  FRosterPlugin = NULL;
 }
 
 MessageArchiver::~MessageArchiver()
@@ -154,6 +155,10 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
         SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
     }
   }
+
+  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  if (plugin)
+    FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 
   return FStanzaProcessor!=NULL;
 }
@@ -1024,12 +1029,25 @@ bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const
   return false;
 }
 
-Jid MessageArchiver::gateJid( const Jid &AContactJid ) const
+Jid MessageArchiver::gateJid(const Jid &AContactJid) const
 {
   Jid gate = AContactJid;
   if (!gate.node().isEmpty() && FGatewayTypes.contains(gate.domain()))
     gate.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(gate.domain())));
   return gate;
+}
+
+QString MessageArchiver::gateNick(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+  IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+  if (roster)
+  {
+    Jid gcontactJid = gateJid(AContactJid.bare());
+    foreach(IRosterItem ritem, roster->rosterItems())
+      if (ritem.itemJid.pNode()==AContactJid.pNode() && gcontactJid==gateJid(ritem.itemJid))
+        return ritem.name.isEmpty() ? (ritem.itemJid.node().isEmpty() ? ritem.itemJid.domain() : ritem.itemJid.node()) : ritem.name;
+  }
+  return AContactJid.node().isEmpty() ? AContactJid.domain() : AContactJid.node();
 }
 
 QList<Message> MessageArchiver::findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const

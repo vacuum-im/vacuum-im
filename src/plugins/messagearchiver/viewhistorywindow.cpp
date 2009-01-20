@@ -420,25 +420,11 @@ bool ViewHistoryWindow::loadServerCollection(const IArchiveHeader &AHeader, cons
 
 QString ViewHistoryWindow::contactName(const Jid &AContactJid, bool ABare) const
 {
-  if (FRoster)
-  {
-    IRosterItem ritem = FRoster->rosterItem(AContactJid);
-    if (!ritem.isValid)
-    {
-      QString gateway = FArchiver->gateJid(AContactJid).pDomain();
-      if (AContactJid.pDomain()!=gateway)
-      {
-        foreach (IRosterItem item, FRoster->rosterItems())
-          if (item.itemJid.pNode()==AContactJid.pNode() && FArchiver->gateJid(item.itemJid).pDomain()==gateway)
-            return !item.name.isEmpty() ? item.name : (ABare ? AContactJid.bare() : AContactJid.full());
-      }
-    }
-    else if (!ritem.name.isEmpty())
-    {
-      return ritem.name;
-    }
-  }
-  return ABare ? AContactJid.bare() : AContactJid.full();
+  QString name = FArchiver->gateNick(FStreamJid,AContactJid);
+  if (name==AContactJid.node() || name==AContactJid.domain())
+    return ABare ? AContactJid.bare() : AContactJid.full();
+  else
+    return !ABare && !AContactJid.resource().isEmpty() ? name+"/"+AContactJid.resource() : name;
 }
 
 QStandardItem *ViewHistoryWindow::findChildItem(int ARole, const QVariant &AValue, QStandardItem *AParent) const
@@ -519,7 +505,7 @@ QStandardItem *ViewHistoryWindow::createContactGroup(const IArchiveHeader &AHead
   QStandardItem *groupItem = findChildItem(HDR_HEADER_WITH,gateWith.prepared().eBare(),AParent);
   if (!groupItem)
   {
-    QString name = contactName(AHeader.with);
+    QString name = contactName(AHeader.with,true);
     groupItem = createCustomItem(HIT_GROUP_CONTACT,name);
     groupItem->setData(gateWith.prepared().eBare(),HDR_HEADER_WITH);
     groupItem->setToolTip(AHeader.with.bare());
@@ -680,7 +666,7 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
       {
         FViewWidget->setShowKind(IViewWidget::ChatMessage);
         if (!ACollection.header.with.pDomain().startsWith("conference."))
-          FViewWidget->setNickForJid(ACollection.header.with, FRoster!=NULL ? FRoster->rosterItem(ACollection.header.with).name : QString());
+          FViewWidget->setNickForJid(ACollection.header.with, FArchiver->gateNick(FStreamJid,ACollection.header.with));
         else
           FViewWidget->setNickForJid(ACollection.header.with, ACollection.header.with.resource());
       }

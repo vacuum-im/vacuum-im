@@ -21,6 +21,7 @@
 #include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/idataforms.h"
 #include "../../interfaces/isessionnegotiation.h"
+#include "../../interfaces/iroster.h"
 #include "../../utils/errorhandler.h"
 #include "collectionwriter.h"
 #include "archiveoptions.h"
@@ -96,6 +97,7 @@ public:
   virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = "");
   //Local Archive
   virtual Jid gateJid(const Jid &AContactJid) const;
+  virtual QString gateNick(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual QList<Message> findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const;
   virtual bool hasLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
   virtual bool saveLocalCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, bool AAppend = true);
@@ -200,6 +202,7 @@ private:
   IDataForms *FDataForms;
   IMessenger *FMessenger;
   ISessionNegotiation *FSessionNegotioation;
+  IRosterPlugin *FRosterPlugin;
 private:
   QHash<Jid,int> FSHIPrefs;
   QHash<Jid,int> FSHIMessageIn;
