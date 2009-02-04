@@ -6,8 +6,10 @@
 #include "../../definations/archiveindextyperole.h"
 #include "../../definations/actiongroups.h"
 #include "../../interfaces/iroster.h"
+#include "../../interfaces/ipresence.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/isettings.h"
+#include "../../interfaces/istatusicons.h"
 #include "../../interfaces/imessagearchiver.h"
 #include "../../utils/skin.h"
 #include "ui_viewhistorywindow.h"
@@ -109,6 +111,7 @@ private:
   IToolBarWidget *FMessagesTools;
   IMessenger *FMessenger;
   ISettings *FSettings;
+  IStatusIcons *FStatusIcons;
   IMessageArchiver *FArchiver;
 private:
   QStandardItemModel *FModel;

@@ -80,6 +80,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   FSettings = NULL;
   FMessenger = NULL;
   FGroupsTools = NULL;
+  FStatusIcons = NULL;
   FMessagesTools = NULL;
 
   FArchiver = AArchiver;
@@ -293,6 +294,10 @@ void ViewHistoryWindow::initialize()
       ui.splitter->restoreState(FSettings->loadBinaryData(BIN_SPLITTER_STATE+FStreamJid.pBare()));
     }
   }
+
+  plugin = manager->getPlugins("IStatusIcons").value(0);
+  if (plugin)
+    FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 }
 
 QList<IArchiveHeader> ViewHistoryWindow::indexHeaders(const QModelIndex &AIndex) const
@@ -509,6 +514,8 @@ QStandardItem *ViewHistoryWindow::createContactGroup(const IArchiveHeader &AHead
     groupItem = createCustomItem(HIT_GROUP_CONTACT,name);
     groupItem->setData(gateWith.prepared().eBare(),HDR_HEADER_WITH);
     groupItem->setToolTip(AHeader.with.bare());
+    if (FStatusIcons)
+      groupItem->setIcon(FStatusIcons->iconByJidStatus(AHeader.with,IPresence::Online,SUBSCRIPTION_BOTH,false));
     QList<QStandardItem *> items = QList<QStandardItem *>() << groupItem << createSortItem(AHeader.start) << createSortItem(name);
     AParent!=NULL ? AParent->appendRow(items) : FModel->appendRow(items);
     emit itemCreated(groupItem);
@@ -567,7 +574,8 @@ QStandardItem *ViewHistoryWindow::createHeaderItem(const IArchiveHeader &AHeader
   itemJid->setData(AHeader.threadId,                HDR_HEADER_THREAD);
   itemJid->setData(AHeader.version,                 HDR_HEADER_VERSION);
   itemJid->setToolTip(AHeader.with.full());
-
+  if (FStatusIcons)
+    itemJid->setIcon(FStatusIcons->iconByJidStatus(AHeader.with,IPresence::Online,SUBSCRIPTION_BOTH,false));
   QStandardItem *itemDate = createCustomItem(HIT_HEADER_DATE,AHeader.start);
   QStandardItem *itemSubject = createCustomItem(HIT_HEADER_SUBJECT,AHeader.subject);
   itemSubject->setToolTip(AHeader.subject);
@@ -693,7 +701,10 @@ void ViewHistoryWindow::insertFilterWith(const IArchiveHeader &AHeader)
   int index = ui.cmbContact->findData(gateWith.pBare());
   if (index < 0)
   {
-    ui.cmbContact->addItem(name, gateWith.pBare());
+    QIcon icon;
+    if (FStatusIcons)
+      icon = FStatusIcons->iconByJidStatus(AHeader.with,IPresence::Online,SUBSCRIPTION_BOTH,false);
+    ui.cmbContact->addItem(icon, name, gateWith.pBare());
     updateFilterWidgets();
   }
   else
@@ -704,7 +715,7 @@ void ViewHistoryWindow::insertFilterWith(const IArchiveHeader &AHeader)
 void ViewHistoryWindow::updateFilterWidgets()
 {
   int index = ui.cmbContact->findData(FFilter.with.pFull());
-  index>=0 ? ui.cmbContact->setCurrentIndex(index) : ui.cmbContact->setEditText(FFilter.with.full());
+  index>=0 ? ui.cmbContact->setCurrentIndex(index) : ui.cmbContact->setCurrentIndex(-1); //->setEditText(FFilter.with.full());
   ui.dedStart->setDate(FFilter.start.isValid() ? FFilter.start.date() : MINIMUM_DATETIME.date());
   ui.dedEnd->setDate(FFilter.end.isValid() ? FFilter.end.date() : MAXIMUM_DATETIME.date());
   ui.lneText->setText(FFilter.body.pattern());
