@@ -6,15 +6,15 @@
     <x>0</x>
     <y>0</y>
     <width>426</width>
-    <height>184</height>
+    <height>208</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>MessengerOptions</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout" >
    <property name="margin" >
-    <number>2</number>
+    <number>0</number>
    </property>
    <item>
     <widget class="QGroupBox" name="grbFonts" >
@@ -121,6 +121,33 @@
       <string>Show status in chat window</string>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" >
+     <item>
+      <widget class="QLabel" name="lblSendKey" >
+       <property name="text" >
+        <string>Send message key sequence:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lneSendKey" />
+     </item>
+     <item>
+      <spacer name="horizontalSpacer" >
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
