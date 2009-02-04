@@ -1,14 +1,15 @@
 #ifndef IMESSENGER_H
 #define IMESSENGER_H
 
-#include <QVariant>
 #include <QFont>
-#include <QTextDocument>
-#include <QVBoxLayout>
 #include <QToolBar>
+#include <QVariant>
 #include <QTextEdit>
-#include <QTextBrowser>
+#include <QVBoxLayout>
 #include <QMainWindow>
+#include <QKeySequence>
+#include <QTextBrowser>
+#include <QTextDocument>
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/inotifications.h"
@@ -99,8 +100,8 @@ public:
   virtual QTextEdit *textEdit() const =0;
   virtual QTextDocument *document() const =0;
   virtual void sendMessage() =0;
-  virtual int sendMessageKey() const =0;
-  virtual void setSendMessageKey(int AKey) =0;
+  virtual QKeySequence sendMessageKey() const =0;
+  virtual void setSendMessageKey(const QKeySequence &AKey) =0;
   virtual void clearEditor() =0;
 signals:
   virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook) =0;
@@ -108,7 +109,7 @@ signals:
   virtual void messageReady() =0;
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
-  virtual void sendMessageKeyChanged(int AKey) =0;
+  virtual void sendMessageKeyChanged(const QKeySequence &AKey) =0;
   virtual void editorCleared() =0;
 };
 
@@ -299,6 +300,8 @@ public:
   virtual void setDefaultChatFont(const QFont &AFont) =0;
   virtual QFont defaultMessageFont() const =0;
   virtual void setDefaultMessageFont(const QFont &AFont) =0;
+  virtual QKeySequence sendMessageKey() const =0;
+  virtual void setSendMessageKey(const QKeySequence &AKey) =0;
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
@@ -333,6 +336,7 @@ signals:
   //MessageWindows
   virtual void defaultChatFontChanged(const QFont &AFont) =0;
   virtual void defaultMessageFontChanged(const QFont &AFont) =0;
+  virtual void sendMessageKeyChanged(const QKeySequence &AKey) =0;
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget) =0;
   virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
   virtual void editWidgetCreated(IEditWidget *AEditWidget) =0;

@@ -1,4 +1,3 @@
-#include <QDebug>
 #include "editwidget.h"
 
 EditWidget::EditWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid)
@@ -10,7 +9,11 @@ EditWidget::EditWidget(IMessenger *AMessenger, const Jid& AStreamJid, const Jid 
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
 
-  FSendMessageKey = Qt::Key_Return;
+  FSendShortcut = new QShortcut(FMessenger->sendMessageKey(),ui.tedEditor);
+  FSendShortcut->setContext(Qt::WidgetShortcut);
+  connect(FSendShortcut,SIGNAL(activated()),SLOT(onShortcutActivated()));
+  connect(FMessenger->instance(),SIGNAL(sendMessageKeyChanged(const QKeySequence &)),
+    SLOT(onSendMessageKeyChanged(const QKeySequence &)));
   ui.tedEditor->installEventFilter(this);
 }
 
@@ -25,9 +28,9 @@ void EditWidget::sendMessage()
   emit messageReady();
 }
 
-void EditWidget::setSendMessageKey(int AKey)
+void EditWidget::setSendMessageKey(const QKeySequence &AKey)
 {
-  FSendMessageKey = AKey;
+  FSendShortcut->setKey(AKey);
   emit sendMessageKeyChanged(AKey);
 }
 
@@ -53,18 +56,30 @@ void EditWidget::clearEditor()
 
 bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
-  if (AWatched == ui.tedEditor && AEvent->type() == QEvent::KeyPress)
+  bool hooked = false;
+  if (AWatched==ui.tedEditor && AEvent->type()==QEvent::KeyPress)
   {
-    bool hooked = false;
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
     emit keyEventReceived(keyEvent,hooked);
-    if (!hooked && keyEvent->modifiers()+keyEvent->key()==FSendMessageKey)
-    {
-      sendMessage();
-      hooked = true;
-    }
-    return hooked;
   }
-  return QWidget::eventFilter(AWatched,AEvent);
+  else if (AWatched==ui.tedEditor && AEvent->type()==QEvent::ShortcutOverride)
+  {
+    hooked = true;
+  }
+  return hooked || QWidget::eventFilter(AWatched,AEvent);
 }
 
+void EditWidget::onShortcutActivated()
+{
+  QShortcut *shortcut = qobject_cast<QShortcut *>(sender());
+  if (shortcut == FSendShortcut)
+  {
+    sendMessage();
+  }
+}
+
+void EditWidget::onSendMessageKeyChanged(const QKeySequence &AKey)
+{
+  if (!FSendShortcut->key().isEmpty() && !AKey.isEmpty())
+    setSendMessageKey(AKey);
+}

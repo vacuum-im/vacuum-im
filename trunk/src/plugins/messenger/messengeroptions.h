@@ -2,6 +2,7 @@
 #define MESSENGEROPTIONS_H
 
 #include <QWidget>
+#include <QShortcut>
 #include "../../interfaces/imessenger.h"
 #include "ui_messengeroptions.h"
 
@@ -10,23 +11,26 @@ class MessengerOptions :
 {
   Q_OBJECT;
 public:
-  MessengerOptions(QWidget *AParent = NULL);
+  MessengerOptions(IMessenger *AMessenger, QWidget *AParent = NULL);
   ~MessengerOptions();
-  QFont chatFont() const { return FChatFont; }
+public slots:
+  void apply();
+signals:
+  void optionsApplied();
+protected:
   void setChatFont(const QFont &AFont);
-  QFont messageFont() const { return FMessageFont; }
   void setMessageFont(const QFont &AFont);
-  bool checkOption(IMessenger::Option AOption) const;
-  void setOption(IMessenger::Option AOption, bool AValue);
+protected:
+  virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
   void onChangeChatFont();
   void onChangeMessageFont();
 private:
   Ui::MessengerOptionsClass ui;
 private:
-  int FOptions;
-  QFont FChatFont;
-  QFont FMessageFont;
+  IMessenger *FMessenger;
+private:
+  QKeySequence FSendKey;
 };
 
 #endif // MESSENGEROPTIONS_H

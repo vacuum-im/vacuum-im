@@ -1,15 +1,38 @@
 #include "messengeroptions.h"
 
+#include <QKeyEvent>
 #include <QFontDialog>
 
-MessengerOptions::MessengerOptions(QWidget *AParent)
-    : QWidget(AParent)
+MessengerOptions::MessengerOptions(IMessenger *AMessenger, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
-  FOptions = 0;
+  FMessenger = AMessenger;
+
+  ui.chbUseTabWindow->setChecked(FMessenger->checkOption(IMessenger::UseTabWindow));
+  ui.chbViewShowHtml->setChecked(FMessenger->checkOption(IMessenger::ShowHTML));
+  ui.chbViewShowDateTime->setChecked(FMessenger->checkOption(IMessenger::ShowDateTime));
+  ui.chbChatShowStatus->setChecked(FMessenger->checkOption(IMessenger::ShowStatus));
+  setChatFont(FMessenger->defaultChatFont());
+  setMessageFont(FMessenger->defaultMessageFont());
 
   connect(ui.pbtChatFont,SIGNAL(clicked()),SLOT(onChangeChatFont()));
   connect(ui.pbtMessageFont,SIGNAL(clicked()),SLOT(onChangeMessageFont()));
+
+  FSendKey = FMessenger->sendMessageKey();
+  ui.lneSendKey->setText(FSendKey.toString());
+  ui.lneSendKey->installEventFilter(this);
+}
+
+void MessengerOptions::apply()
+{
+  FMessenger->setOption(IMessenger::UseTabWindow,ui.chbUseTabWindow->isChecked());
+  FMessenger->setOption(IMessenger::ShowHTML,ui.chbViewShowHtml->isChecked());
+  FMessenger->setOption(IMessenger::ShowDateTime,ui.chbViewShowDateTime->isChecked());
+  FMessenger->setOption(IMessenger::ShowStatus,ui.chbChatShowStatus->isChecked());
+  FMessenger->setDefaultChatFont(ui.lblChatFont->font());
+  FMessenger->setDefaultMessageFont(ui.lblMessageFont->font());
+  FMessenger->setSendMessageKey(FSendKey);
+  emit optionsApplied();
 }
 
 MessengerOptions::~MessengerOptions()
@@ -19,58 +42,37 @@ MessengerOptions::~MessengerOptions()
 
 void MessengerOptions::setChatFont(const QFont &AFont)
 {
-  FChatFont = AFont;
   ui.lblChatFont->setFont(AFont);
   ui.lblChatFont->setText(QString("%1 %2").arg(AFont.family()).arg(AFont.pointSize()));
 }
 
 void MessengerOptions::setMessageFont(const QFont &AFont)
 {
-  FMessageFont = AFont;
   ui.lblMessageFont->setFont(AFont);
   ui.lblMessageFont->setText(QString("%1 %2").arg(AFont.family()).arg(AFont.pointSize()));
 }
 
-bool MessengerOptions::checkOption(IMessenger::Option AOption) const
+bool MessengerOptions::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
-  switch(AOption)
-  {
-  case IMessenger::UseTabWindow:
-    return ui.chbUseTabWindow->isChecked();
-  case IMessenger::ShowHTML:
-  	return ui.chbViewShowHtml->isChecked();
-  case IMessenger::ShowDateTime:
-    return ui.chbViewShowDateTime->isChecked();
-  case IMessenger::ShowStatus:
-    return ui.chbChatShowStatus->isChecked();
-  default:
-    return false;
-  }
-}
+  static const QList<int> controlKeys =  QList<int>() << Qt::Key_unknown << Qt::Key_Control << Qt::Key_Meta << Qt::Key_Alt << Qt::Key_AltGr;
 
-void MessengerOptions::setOption(IMessenger::Option AOption, bool AValue)
-{
-  switch(AOption)
+  if (AWatched==ui.lneSendKey && AEvent->type()==QEvent::KeyPress)
   {
-  case IMessenger::UseTabWindow:
-    ui.chbUseTabWindow->setChecked(AValue);
-    break;
-  case IMessenger::ShowHTML:
-    ui.chbViewShowHtml->setChecked(AValue);
-    break;
-  case IMessenger::ShowDateTime:
-    ui.chbViewShowDateTime->setChecked(AValue);
-    break;
-  case IMessenger::ShowStatus:
-    ui.chbChatShowStatus->setChecked(AValue);
-    break;
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
+    if (!controlKeys.contains(keyEvent->key()))
+    {
+      FSendKey = QKeySequence(keyEvent->modifiers() | keyEvent->key());
+      ui.lneSendKey->setText(FSendKey.toString());
+    }
+    return true;
   }
+  return QWidget::eventFilter(AWatched,AEvent);
 }
 
 void MessengerOptions::onChangeChatFont()
 {
   bool ok = false;
-  QFont font = QFontDialog::getFont(&ok,FChatFont,this,tr("Select font for chat window"));
+  QFont font = QFontDialog::getFont(&ok,ui.lblChatFont->font(),this,tr("Select font for chat window"));
   if (ok)
     setChatFont(font);
 }
@@ -78,7 +80,8 @@ void MessengerOptions::onChangeChatFont()
 void MessengerOptions::onChangeMessageFont()
 {
   bool ok = false;
-  QFont font = QFontDialog::getFont(&ok,FMessageFont,this,tr("Select font for message window"));
+  QFont font = QFontDialog::getFont(&ok,ui.lblMessageFont->font(),this,tr("Select font for message window"));
   if (ok)
     setMessageFont(font);
 }
+
