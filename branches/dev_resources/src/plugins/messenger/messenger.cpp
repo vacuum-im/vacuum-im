@@ -10,6 +10,7 @@
 #define SVN_CHAT_STATUS                       SVN_CHAT ":" "showStatus"
 #define SVN_CHAT_FONT                         "defaultChatFont"
 #define SVN_MESSAGE_FONT                      "defaultMessageFont"
+#define SVN_SEND_MESSAGE_KEY                  "sendMessageKey"
 
 #define SHC_MESSAGE                           "/message"
 
@@ -37,6 +38,7 @@ Messenger::Messenger()
   FMessageHandler = NULL;
   FMessageId = 0;
   FOptions = 0;
+  FSendKey = Qt::Key_Return;
 }
 
 Messenger::~Messenger()
@@ -110,8 +112,6 @@ bool Messenger::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsDialogAccepted()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsDialogRejected()));
     }
   }
 
@@ -164,13 +164,10 @@ QWidget *Messenger::optionsWidget(const QString &ANode, int &/*AOrder*/)
 {
   if (ANode == ON_MESSAGES)
   {
-    FMessengerOptions = new MessengerOptions;
-    FMessengerOptions->setOption(UseTabWindow,checkOption(UseTabWindow));
-    FMessengerOptions->setOption(ShowHTML,checkOption(ShowHTML));
-    FMessengerOptions->setOption(ShowDateTime,checkOption(ShowDateTime));
-    FMessengerOptions->setOption(ShowStatus,checkOption(ShowStatus));
-    FMessengerOptions->setChatFont(FChatFont);
-    FMessengerOptions->setMessageFont(FMessageFont);
+    FMessengerOptions = new MessengerOptions(this);
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),
+      FMessengerOptions,SLOT(apply()));
+    connect(FMessengerOptions,SIGNAL(optionsApplied()),SIGNAL(optionsAccepted()));
     return FMessengerOptions;
   }
   return NULL;
@@ -392,6 +389,20 @@ void Messenger::setDefaultMessageFont(const QFont &AFont)
   {
     FMessageFont = AFont;
     emit defaultMessageFontChanged(FMessageFont);
+  }
+}
+
+QKeySequence Messenger::sendMessageKey() const
+{
+  return FSendKey;
+}
+
+void Messenger::setSendMessageKey(const QKeySequence &AKey)
+{
+  if (FSendKey != AKey)
+  {
+    FSendKey = AKey;
+    emit sendMessageKeyChanged(AKey);
   }
 }
 
@@ -722,6 +733,7 @@ void Messenger::onSettingsOpened()
   setOption(ShowStatus, settings->value(SVN_CHAT_STATUS,true).toBool());
   FChatFont.fromString(settings->value(SVN_CHAT_FONT,QFont().toString()).toString());
   FMessageFont.fromString(settings->value(SVN_MESSAGE_FONT,QFont().toString()).toString());
+  setSendMessageKey(QKeySequence::fromString(settings->value(SVN_SEND_MESSAGE_KEY,FSendKey.toString()).toString()));
 }
 
 void Messenger::onSettingsClosed()
@@ -741,22 +753,8 @@ void Messenger::onSettingsClosed()
     settings->setValue(SVN_MESSAGE_FONT,FMessageFont.toString());
   else
     settings->deleteValue(SVN_MESSAGE_FONT);
-}
 
-void Messenger::onOptionsDialogAccepted()
-{
-  setOption(UseTabWindow,FMessengerOptions->checkOption(UseTabWindow));
-  setOption(ShowHTML,FMessengerOptions->checkOption(ShowHTML));
-  setOption(ShowDateTime,FMessengerOptions->checkOption(ShowDateTime));
-  setOption(ShowStatus,FMessengerOptions->checkOption(ShowStatus));
-  setDefaultChatFont(FMessengerOptions->chatFont());
-  setDefaultMessageFont(FMessengerOptions->messageFont());
-  emit optionsAccepted();
-}
-
-void Messenger::onOptionsDialogRejected()
-{
-  emit optionsRejected();
+  settings->setValue(SVN_SEND_MESSAGE_KEY,FSendKey.toString());
 }
 
 void Messenger::onShowWindowAction(bool)

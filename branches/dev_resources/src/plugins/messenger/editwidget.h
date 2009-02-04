@@ -1,6 +1,7 @@
 #ifndef EDITWIDGET_H
 #define EDITWIDGET_H
 
+#include <QShortcut>
 #include <QKeyEvent>
 #include "../../interfaces/imessenger.h"
 #include "ui_editwidget.h"
@@ -20,8 +21,8 @@ public:
   virtual QTextEdit *textEdit() const { return ui.tedEditor; }
   virtual QTextDocument *document() const { return ui.tedEditor->document(); }
   virtual void sendMessage();
-  virtual int sendMessageKey() const { return FSendMessageKey; }
-  virtual void setSendMessageKey(int AKey);
+  virtual QKeySequence sendMessageKey() const { return FSendShortcut->key(); }
+  virtual void setSendMessageKey(const QKeySequence &AKey);
   virtual void clearEditor();
 signals:
   virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
@@ -29,10 +30,13 @@ signals:
   virtual void messageReady();
   virtual void streamJidChanged(const Jid &ABefour);
   virtual void contactJidChanged(const Jid &ABefour);
-  virtual void sendMessageKeyChanged(int AKey);
+  virtual void sendMessageKeyChanged(const QKeySequence &AKey);
   virtual void editorCleared();
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+protected slots:
+  void onShortcutActivated();
+  void onSendMessageKeyChanged(const QKeySequence &AKey);
 private:
   Ui::EditWidgetClass ui;
 private:
@@ -40,7 +44,7 @@ private:
 private:
   Jid FStreamJid;
   Jid FContactJid;
-  int FSendMessageKey;
+  QShortcut *FSendShortcut;
 };
 
 #endif // EDITWIDGET_H

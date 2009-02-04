@@ -30,7 +30,7 @@ MessageWindow::MessageWindow(IMessenger *AMessenger, const Jid& AStreamJid, cons
   FViewWidget->document()->setDefaultFont(FMessenger->defaultMessageFont());
 
   FEditWidget = FMessenger->newEditWidget(AStreamJid,AContactJid);
-  FEditWidget->setSendMessageKey(-1);
+  FEditWidget->setSendMessageKey(QKeySequence());
   FEditWidget->document()->setDefaultFont(FMessenger->defaultMessageFont());
 
   FReceiversWidget = FMessenger->newReceiversWidget(FStreamJid);

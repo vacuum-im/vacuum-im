@@ -86,6 +86,8 @@ public:
   virtual void setDefaultChatFont(const QFont &AFont);
   virtual QFont defaultMessageFont() const { return FMessageFont; }
   virtual void setDefaultMessageFont(const QFont &AFont);
+  virtual QKeySequence sendMessageKey() const;
+  virtual void setSendMessageKey(const QKeySequence &AKey);
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid);
@@ -120,6 +122,7 @@ signals:
   //MessageWindows
   virtual void defaultChatFontChanged(const QFont &AFont);
   virtual void defaultMessageFontChanged(const QFont &AFont);
+  virtual void sendMessageKeyChanged(const QKeySequence &AKey);
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget);
   virtual void viewWidgetCreated(IViewWidget *AViewWidget);
   virtual void editWidgetCreated(IEditWidget *AEditWidget);
@@ -152,8 +155,6 @@ protected slots:
   void onTabWindowDestroyed();
   void onSettingsOpened();
   void onSettingsClosed();
-  void onOptionsDialogAccepted();
-  void onOptionsDialogRejected();
   void onShowWindowAction(bool);
   void onTextLoadResource(int AType, const QUrl &AName, QVariant &AValue);
 private:
@@ -176,6 +177,7 @@ private:
   int FMessageId;
   QFont FChatFont;
   QFont FMessageFont;
+  QKeySequence FSendKey;
   MessageHandler *FMessageHandler;
   QMap<int,Message> FMessages;
   QHash<int,int> FNotifyId2MessageId;
