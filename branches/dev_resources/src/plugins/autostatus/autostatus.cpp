@@ -74,7 +74,7 @@ bool AutoStatus::initObjects()
 {
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_AUTO_STATUS,tr("Auto status"),tr("Edit auto status rules"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_AUTO_STATUS,tr("Auto status"),tr("Edit auto status rules"),MNI_AUTOSTATUS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
   return true;

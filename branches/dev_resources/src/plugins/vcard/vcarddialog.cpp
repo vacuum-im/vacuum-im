@@ -9,16 +9,16 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  ui.lblPhoto->installEventFilter(this);
-  ui.lblLogo->installEventFilter(this);
+  setWindowTitle(tr("vCard - %1").arg(AContactJid.full()));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_VCARD,0,0,"windowIcon");
   
   FContactJid = AContactJid;
   FStreamJid = AStreamJid;
   FVCardPlugin = AVCardPlugin;
 
-  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_VCARD,0,0,"windowIcon");
-  setWindowTitle(tr("vCard - %1").arg(FContactJid.full()));
-
+  ui.lblPhoto->installEventFilter(this);
+  ui.lblLogo->installEventFilter(this);
+  
   ui.pbtPublish->setVisible(FContactJid && FStreamJid);
   ui.pbtClear->setVisible(FContactJid && FStreamJid);
 

@@ -9,8 +9,8 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SDISCOVERY_DISCOINFO,0,0,"windowIcon");
   setWindowTitle(tr("%1 - Discovery Info").arg(AContactJid.full()));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SDISCOVERY_DISCOINFO,0,0,"windowIcon");
 
   FDataForms = NULL;
   FDiscovery = ADiscovery;

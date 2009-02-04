@@ -84,7 +84,7 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
 bool AccountManager::initObjects()
 {
   FSettings = FSettingsPlugin->settingsForPlugin(ACCOUNTMANAGER_UUID);
-  FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"), tr("Creating and removing accounts"),QIcon());
+  FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"),tr("Creating and removing accounts"),MNI_ACCOUNT_LIST);
   FSettingsPlugin->insertOptionsHolder(this);
   return true;
 }
@@ -220,7 +220,7 @@ void AccountManager::openAccountOptionsNode(const QString &AAccountId, const QSt
   QString name = AName;
   if (name.isEmpty())
     name = FAccounts.contains(AAccountId) ? FAccounts.value(AAccountId)->name() : tr("<Empty>");
-  FSettingsPlugin->openOptionsNode(node,name,tr("Account details and connection options"),QIcon());
+  FSettingsPlugin->openOptionsNode(node,name,tr("Account details and connection options"),MNI_ACCOUNT);
 }
 
 void AccountManager::closeAccountOptionsNode(const QString &AAccountId)

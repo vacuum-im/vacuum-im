@@ -64,7 +64,7 @@ bool Emoticons::initObjects()
 
   if (FSettingsPlugin != NULL)
   {
-    FSettingsPlugin->openOptionsNode(ON_EMOTICONS ,tr("Emoticons"), tr("Select emoticons files"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_EMOTICONS ,tr("Emoticons"),tr("Select emoticons files"),MNI_EMOTICONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
 

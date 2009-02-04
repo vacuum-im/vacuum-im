@@ -8,7 +8,7 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManage
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Add contact - %1").arg(AStreamJid.bare()));
-  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_SUBSCR,0,0,"windowIcon");
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_ADD_CONTACT,0,0,"windowIcon");
   
   FRoster = NULL;
   FVcardPlugin = NULL;
@@ -19,6 +19,7 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManage
   FStreamJid = AStreamJid;
 
   QToolBar *toolBar = new QToolBar(this);
+  toolBar->setIconSize(QSize(16,16));
   ui.lytMainLayout->setMenuBar(toolBar);
   FToolBarChanger = new ToolBarChanger(toolBar);
 

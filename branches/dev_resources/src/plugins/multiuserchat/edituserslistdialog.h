@@ -2,7 +2,10 @@
 #define EDITUSERSLISTDIALOG_H
 
 #include <QDialog>
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/imultiuserchat.h"
+#include "../../utils/iconstorage.h"
 #include "ui_edituserslistdialog.h"
 
 struct UsersListItem 

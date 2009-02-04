@@ -22,6 +22,7 @@ Notifications::Notifications()
   FTrayManager = NULL;
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
+  FSettingsPlugin = NULL;
 
   FActivateAll = NULL;
   FRemoveAll = NULL;
@@ -109,7 +110,7 @@ bool Notifications::initObjects()
 {
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_NOTIFY,tr("Notifications"),tr("Notification options"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_NOTIFY,tr("Notifications"),tr("Notification options"),MNI_NOTIFICATIONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
   if (FTrayManager)
@@ -212,7 +213,7 @@ int Notifications::appendNotification(const INotification &ANotification)
   if (checkOption(INotifications::EnableSounds) && (ANotification.kinds & INotification::PlaySound)>0)
   {
     QString soundName = ANotification.data.value(NDR_SOUND_FILE).toString();
-    QSound::play(FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileName(soundName));
+    QSound::play(FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName));
   }
 
   if (FNotifyRecords.isEmpty())

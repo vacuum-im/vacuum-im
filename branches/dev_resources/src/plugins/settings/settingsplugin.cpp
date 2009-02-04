@@ -369,7 +369,7 @@ void SettingsPlugin::removeOptionsHolder(IOptionsHolder *AOptionsHolder)
     FOptionsHolders.removeAt(FOptionsHolders.indexOf(AOptionsHolder));
 }
 
-void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QIcon &AIcon)
+void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIconKey)
 {
   OptionsNode *node = FNodes.value(ANode,NULL);
   if (!node)
@@ -377,10 +377,10 @@ void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName,
     node = new OptionsNode;
     node->name = AName;
     node->desc = ADescription;
-    node->icon = AIcon;
+    node->icon = AIconKey;
     FNodes.insert(ANode,node);
     if (!FOptionsDialog.isNull())
-      FOptionsDialog->openNode(ANode,AName,ADescription,AIcon,createNodeWidget(ANode));
+      FOptionsDialog->openNode(ANode,AName,ADescription,AIconKey,createNodeWidget(ANode));
     emit optionsNodeOpened(ANode);
   }
   else
@@ -389,8 +389,8 @@ void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName,
       node->name = AName;
     if (!ADescription.isEmpty())
       node->desc = ADescription;
-    if (!AIcon.isNull())
-      node->icon = AIcon;
+    if (!AIconKey.isEmpty())
+      node->icon = AIconKey;
   }
 }
 
@@ -412,7 +412,6 @@ QDialog *SettingsPlugin::openOptionsDialog(const QString &ANode, QWidget *AParen
   if (FOptionsDialog.isNull())
   {
     FOptionsDialog = new OptionsDialog(AParent);
-    IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(FOptionsDialog,MNI_SETTINGS_OPTIONS,0,0,"windowIcon");
     connect(FOptionsDialog, SIGNAL(accepted()),SLOT(onOptionsDialogAccepted()));
     connect(FOptionsDialog, SIGNAL(rejected()),SLOT(onOptionsDialogRejected()));
     connect(FOptionsDialog, SIGNAL(closed()),SLOT(onOptionsDialogClosed()));

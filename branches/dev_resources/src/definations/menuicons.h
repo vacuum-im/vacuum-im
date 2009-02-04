@@ -2,7 +2,12 @@
 #define MENUICONS_H
 
 //AccountManager
+#define MNI_ACCOUNT                     "account"
+#define MNI_ACCOUNT_LIST                "accountList"
 #define MNI_ACCOUNT_CHANGE              "accountChange"
+
+//Autostatus
+#define MNI_AUTOSTATUS                  "autostatus"
 
 //Avatars
 #define MNI_AVATAR_SET                  "avatarSet"
@@ -33,6 +38,7 @@
 #define MNI_CONSOLE                     "console"
 
 //Emoticons
+#define MNI_EMOTICONS                   "emoticons"
 #define MNI_EMOTICONS_ARROW_UP          "emoticonsArrowUp"
 #define MNI_EMOTICONS_ARROW_DOWN        "emoticonsArrowDown"
 
@@ -151,6 +157,7 @@
 #define MNI_ROSTERSEARCH_MENU           "rostersearchMenu"
 
 //RosterView
+#define MNI_ROSTERVIEW_OPTIONS          "rosterviewOptions"
 #define MNI_ROSTERVIEW_SHOW_OFFLINE     "rosterviewShowOffline"
 #define MNI_ROSTERVIEW_HIDE_OFFLINE     "rosterviewHideOffline"
 
@@ -175,6 +182,9 @@
 //StatusChanger
 #define MNI_SCHANGER_EDIT_STATUSES      "schangerEditStatuses"
 #define MNI_SCHANGER_CONNECTING         "schangerConnecting"
+
+//StatusIcons
+#define MNI_STATUSICONS_OPTIONS         "statusiconsOptions"
 
 //TrayManager
 #define MNI_TRAYMANAGER_QUIT            "traymanagerQuit"

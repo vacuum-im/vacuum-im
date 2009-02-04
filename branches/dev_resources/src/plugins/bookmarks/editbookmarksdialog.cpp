@@ -20,6 +20,7 @@ EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStr
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Edit bookmarks - %1").arg(AStreamJid.bare()));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_BOOKMARKS_EDIT,0,0,"windowIcon");
 
   FBookmarks = ABookmarks;
   FStreamJid = AStreamJid;

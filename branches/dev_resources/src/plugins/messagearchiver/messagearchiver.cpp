@@ -180,6 +180,10 @@ bool MessageArchiver::initObjects()
   {
     FSessionNegotioation->insertNegotiator(this,SNO_DEFAULT);
   }
+  if (FSettingsPlugin)
+  {
+    FSettingsPlugin->openOptionsNode(ON_HISTORY,tr("History"),tr("Common history settings"),MNI_HISTORY);
+  }
   return true;
 }
 
@@ -1892,7 +1896,7 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
   if (FSettingsPlugin && account)
   {
     QString node = ON_HISTORY"::"+account->accountId();
-    FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),QIcon());
+    FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),QString());
   }
 }
 

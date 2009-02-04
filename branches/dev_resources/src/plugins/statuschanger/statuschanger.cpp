@@ -34,6 +34,7 @@ StatusChanger::StatusChanger()
   FSettingStatusToPresence = NULL;
   FAccountManager = NULL;
   FStatusIcons = NULL;
+  FNotifications = NULL;
 }
 
 StatusChanger::~StatusChanger()

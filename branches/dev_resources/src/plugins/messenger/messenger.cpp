@@ -133,7 +133,7 @@ bool Messenger::initObjects()
 
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"), tr("Message window options"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"),tr("Message window options"),MNI_MESSENGER_NORMAL);
     FSettingsPlugin->insertOptionsHolder(this);
   }
 

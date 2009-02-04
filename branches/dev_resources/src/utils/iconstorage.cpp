@@ -1,11 +1,11 @@
 #include "iconstorage.h"
 
-#include <QtDebug>
+#include <QFile>
 #include <QImage>
 #include <QVariant>
 #include <QApplication>
 
-QHash<QString,QIcon> IconStorage::FIconCach;
+QHash<QString, QHash<QString,QIcon> > IconStorage::FIconCach;
 QHash<QString, IconStorage*> IconStorage::FStaticStorages;
 QHash<QObject*, IconStorage*> IconStorage::FObjectStorage;
 
@@ -23,14 +23,27 @@ IconStorage::~IconStorage()
 
 QIcon IconStorage::getIcon(const QString AKey, int AIndex) const
 {
+  QIcon icon;
   QString file = fileName(AKey,AIndex);
-  if (!file.isEmpty() && !FIconCach.contains(file))
+  if (!file.isEmpty())
   {
-    QIcon icon(file);
-    FIconCach.insert(file,icon);
-    return icon;
+    icon = FIconCach[subStorage()].value(file);
+    if (icon.isNull())
+    {
+      QString filePath = storageRootDir() + file;
+      if (QFile::exists(filePath))
+      {
+        icon.addFile(filePath);
+        FIconCach[subStorage()].insert(file,icon);
+      }
+    }
   }
-  return FIconCach.value(file);
+  return icon;
+}
+
+void IconStorage::clearIconCach()
+{
+  FIconCach.clear();
 }
 
 IconStorage *IconStorage::staticStorage(const QString &AStorage)
@@ -67,7 +80,7 @@ void IconStorage::insertAutoIcon(QObject *AObject, const QString AKey, int AInde
     params->index = AIndex;
     params->prop = AProperty;
     params->animate = AAnimate;
-    QString file = fileName(AKey,AIndex);
+    QString file = fileFullName(AKey,AIndex);
     if (!file.isEmpty())
       params->size = QImageReader(file).size();
     initAnimation(AObject,params);
@@ -97,7 +110,7 @@ void IconStorage::initAnimation(QObject *AObject, IconUpdateParams *AParams)
     if (AParams->animation == NULL)
     {
       int iconCount = filesCount(AParams->key);
-      QString file = fileName(AParams->key,AParams->index);
+      QString file = fileFullName(AParams->key,AParams->index);
       if (iconCount > 1)
       {
         int interval = AParams->animate > 0 ? AParams->animate : fileOption(AParams->key,OPTION_ANIMATE).toInt();

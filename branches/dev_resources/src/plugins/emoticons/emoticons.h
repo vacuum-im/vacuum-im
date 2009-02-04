@@ -8,6 +8,7 @@
 #include "../../definations/resourceloaderorders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iemoticons.h"
 #include "../../interfaces/imessenger.h"

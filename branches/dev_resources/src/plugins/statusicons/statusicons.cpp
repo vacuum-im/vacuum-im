@@ -99,7 +99,7 @@ bool StatusIcons::initObjects()
 
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_STATUSICONS,tr("Status icons"), tr("Configure status icons"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_STATUSICONS,tr("Status icons"),tr("Configure status icons"),MNI_STATUSICONS_OPTIONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
 

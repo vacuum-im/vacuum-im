@@ -1,9 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <icondef>
+  <!--AccountManager-->
+  <icon>
+    <key>account</key>
+    <object mime="image/png">account.png</object>
+  </icon>
+  <icon>
+    <key>accountList</key>
+    <object mime="image/png">accountlist.png</object>
+  </icon>
   <icon>
     <key>accountChange</key>
     <object mime="image/png">accountchange.png</object>
   </icon>
+  <!--AutoStatus-->
+  <icon>
+    <key>autostatus</key>
+    <object mime="image/png">autostatus.png</object>
+  </icon>
+  <!--Avatars-->
   <icon>
     <key>avatarSet</key>
     <object mime="image/png">avatarset.png</object>
@@ -20,6 +35,7 @@
     <key>avatarCustom</key>
     <object mime="image/png">avatarcustom.png</object>
   </icon>
+  <!--Bookmarks-->
   <icon>
     <key>bookmarks</key>
     <object mime="image/png">bookmarks.png</object>
@@ -40,6 +56,7 @@
     <key>bookmarksEdit</key>
     <object mime="image/png">bookmarksedit.png</object>
   </icon>
+  <!--ClientInfo-->
   <icon>
     <key>clientinfo</key>
     <object mime="image/png">clientinfo.png</object>
@@ -56,6 +73,7 @@
     <key>clientinfoTime</key>
     <object mime="image/png">clientinfotime.png</object>
   </icon>
+  <!--Commands-->
   <icon>
     <key>commands</key>
     <object mime="image/png">commands.png</object>
@@ -64,9 +82,15 @@
     <key>connectionEncrypted</key>
     <object mime="image/png">connectionencrypted.png</object>
   </icon>
+  <!--Console-->
   <icon>
     <key>console</key>
     <object mime="image/png">console.png</object>
+  </icon>
+  <!--Emoticons-->
+  <icon>
+    <key>emoticons</key>
+    <object mime="image/png">emoticons.png</object>
   </icon>
   <icon>
     <key>emoticonsArrowUp</key>
@@ -76,6 +100,7 @@
     <key>emoticonsArrowDown</key>
     <object mime="image/png">arrowdown.png</object>
   </icon>
+  <!--Gateways-->
   <icon>
     <key>gateways</key>
     <object mime="image/png">gateways.png</object>
@@ -104,10 +129,12 @@
     <key>gatewaysResolve</key>
     <object mime="image/png">gatewaysresolve.png</object>
   </icon>
+  <!--JabberSearch-->
   <icon>
     <key>jsearch</key>
     <object mime="image/png">search.png</object>
   </icon>
+  <!--MainWindow-->
   <icon>
     <key>mainwindowQuit</key>
     <object mime="image/png">mainwindowquit.png</object>
@@ -120,6 +147,7 @@
     <key>mainwindowShowRoster</key>
     <object mime="image/png">mainwindowshowroster.png</object>
   </icon>
+  <!--History-->
   <icon>
     <key>history</key>
     <object mime="image/png">history.png</object>
@@ -220,6 +248,7 @@
     <key>historyReload</key>
     <object mime="image/png">historyreload.png</object>
   </icon>
+  <!--MultiUserChat-->
   <icon>
     <key>messengerNormal</key>
     <object mime="image/png">messengernormal.png</object>
@@ -300,6 +329,7 @@
     <key>mucDataMessage</key>
     <object mime="image/png">mucdatamessage.png</object>
   </icon>
+  <!--Notifications-->
   <icon>
     <key>notifications</key>
     <object mime="image/png">notifications.png</object>
@@ -312,6 +342,7 @@
     <key>notificationsRemoveAll</key>
     <object mime="image/png">notificationsremoveall.png</object>
   </icon>
+  <!--PrivacyLists-->
   <icon>
     <key>privacylists</key>
     <object mime="image/png">privacylists.png</object>
@@ -348,6 +379,7 @@
     <key>privacylistsAdvanced</key>
     <object mime="image/png">privacylistsadvanced.png</object>
   </icon>
+  <!--Register-->
   <icon>
     <key>register</key>
     <object mime="image/png">register.png</object>
@@ -360,6 +392,7 @@
     <key>registerChange</key>
     <object mime="image/png">registerchange.png</object>
   </icon>
+  <!--RosterChanger-->
   <icon>
     <key>rchangerNotify</key>
     <object mime="image/png">rchangernotify.png</object>
@@ -440,9 +473,15 @@
     <key>rchangerSubscriptionRefuse</key>
     <object mime="image/png">rchangersubscriptionrefuse.png</object>
   </icon>
+  <!--RosterSearch-->
   <icon>
     <key>rostersearchMenu</key>
     <object mime="image/png">rostersearch.png</object>
+  </icon>
+  <!--RosterView-->
+  <icon>
+    <key>rosterviewoptions</key>
+    <object mime="image/png">rosterviewoptions.png</object>
   </icon>
   <icon>
     <key>rosterviewShowOffline</key>
@@ -452,6 +491,7 @@
     <key>rosterviewHideOffline</key>
     <object mime="image/png">rosterviewhideoffline.png</object>
   </icon>
+  <!--ServiceDiscovery-->
   <icon>
     <key>sdiscoveryArrowLeft</key>
     <object mime="image/png">arrowleft.png</object>
@@ -472,6 +512,7 @@
     <key>sdiscoveryReload</key>
     <object mime="image/png">sdiscoveryreload.png</object>
   </icon>
+  <!--SessionNegotiation-->
   <icon>
     <key>snegotiation</key>
     <object mime="image/png">snegotiation.png</object>
@@ -484,6 +525,7 @@
     <key>snegotiationTerminate</key>
     <object mime="image/png">snegotiationterminate.png</object>
   </icon>
+  <!--Settings-->
   <icon>
     <key>settingsOptions</key>
     <object mime="image/png">settingsoptions.png</object>
@@ -500,6 +542,7 @@
     <key>settingsEditProfiles</key>
     <object mime="image/png">settingseditprofiles.png</object>
   </icon>
+  <!--StatusChanger-->
   <icon>
     <key>schangerEditStatuses</key>
     <object mime="image/png">schangereditstatuses.png</object>
@@ -508,10 +551,17 @@
     <key>schangerConnecting</key>
     <object mime="image/png">schangerconnecting.png</object>
   </icon>
+  <!--StatusIcons-->
+  <icon>
+    <key>statusiconsOptions</key>
+    <object mime="image/png">statusiconsoptions.png</object>
+  </icon>
+  <!--TrayManager-->
   <icon>
     <key>traymanagerQuit</key>
     <object mime="image/png">traymanagerquit.png</object>
   </icon>
+  <!--VCard-->
   <icon>
     <key>VCard</key>
     <object mime="image/png">vcard.png</object>

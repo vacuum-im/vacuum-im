@@ -65,7 +65,7 @@ public:
   //OptionsDialog
   virtual void insertOptionsHolder(IOptionsHolder *AOptionsHolder) =0;
   virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder) =0;
-  virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QIcon &AIcon) =0;
+  virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIconKey) =0;
   virtual void closeOptionsNode(const QString &ANode) =0;
   virtual QDialog *openOptionsDialog(const QString &ANode = "", QWidget *AParent = NULL) =0;
 signals:

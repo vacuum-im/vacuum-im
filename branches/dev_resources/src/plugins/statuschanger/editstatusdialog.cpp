@@ -139,6 +139,8 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 {
   setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SCHANGER_EDIT_STATUSES,0,0,"windowIcon");
+
   FStatusChanger = AStatusChanger;
   
   tblStatus->setColumnCount(5);

@@ -57,7 +57,7 @@ public:
     //OptionsDialog
   virtual void insertOptionsHolder(IOptionsHolder *AOptionsHolder);
   virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder);
-  virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QIcon &AIcon);
+  virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIconKey);
   virtual void closeOptionsNode(const QString &ANode);
   virtual QDialog *openOptionsDialog(const QString &ANode = "", QWidget *AParent = NULL);
 signals:
@@ -108,7 +108,7 @@ private:
   QDomDocument FSettings;
 private:
   struct OptionsNode {
-    QIcon icon;
+    QString icon;
     QString name;
     QString desc;
   };

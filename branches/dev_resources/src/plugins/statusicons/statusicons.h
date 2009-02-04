@@ -8,6 +8,7 @@
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
 #include "../../definations/actiongroups.h"
+#include "../../definations/menuicons.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatusicons.h"

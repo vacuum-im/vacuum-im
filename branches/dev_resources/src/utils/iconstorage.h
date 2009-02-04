@@ -38,6 +38,7 @@ public:
   void insertAutoIcon(QObject *AObject, const QString AKey, int AIndex = 0, int AAnimate = 0, const QString &AProperty = "icon");
   void removeAutoIcon(QObject *AObject);
 public:
+  static void clearIconCach();
   static IconStorage *staticStorage(const QString &AStorage);
 protected:
   void initAnimation(QObject *AObject, IconUpdateParams *AParams);
@@ -52,7 +53,7 @@ private:
   QMultiHash<QTimer*, QObject*> FTimerObjects;
   QHash<QObject*, IconUpdateParams*> FUpdateParams;
 private:
-  static QHash<QString,QIcon> FIconCach;
+  static QHash<QString, QHash<QString,QIcon> > FIconCach;
   static QHash<QString, IconStorage*> FStaticStorages;
   static QHash<QObject*, IconStorage*> FObjectStorage;
 };

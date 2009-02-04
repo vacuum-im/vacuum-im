@@ -61,6 +61,11 @@ void FileStorage::setSubStorage(const QString &ASubStorage)
   }
 }
 
+QString FileStorage::storageRootDir() const
+{
+  return FFilePrefix;
+}
+
 QString FileStorage::option(const QString &AOption) const
 {
   return FOptions.value(AOption);
@@ -99,8 +104,13 @@ int FileStorage::filesCount(const QString AKey) const
 
 QString FileStorage::fileName(const QString AKey, int AIndex) const
 {
-  QString name = FObjects.value(FKey2Object.value(AKey,-1)).fileNames.value(AIndex);
-  return !name.isEmpty() ? FFilePrefix+name : name;
+  return FObjects.value(FKey2Object.value(AKey,-1)).fileNames.value(AIndex);
+}
+
+QString FileStorage::fileFullName(const QString AKey, int AIndex) const
+{
+  QString name = fileName(AKey,AIndex);
+  return !name.isEmpty() ? FFilePrefix + name : name;
 }
 
 QString FileStorage::fileMime(const QString AKey, int AIndex) const

@@ -225,7 +225,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
     if (!streamMenu)
     {
       streamMenu = new Menu(FBookMarksMenu);
-      //streamMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
+      streamMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
       IAccount *account = FAccountManager->accountByStream(AStreamJid);
       if(account)
       {

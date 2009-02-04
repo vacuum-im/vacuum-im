@@ -8,6 +8,8 @@ ProfileDialog::ProfileDialog(ISettingsPlugin *ASettingsPlugin)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose);
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SETTINGS_EDIT_PROFILES,0,0,"windowIcon");
+
   connect(ui.pbtNew,SIGNAL(clicked()),SLOT(onNewProfileClicked()));
   connect(ui.pbtRename,SIGNAL(clicked()),SLOT(onRenameProfileClicked()));
   connect(ui.pbtDelete,SIGNAL(clicked()),SLOT(onRemoveProfileClicked()));
