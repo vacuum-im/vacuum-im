@@ -327,8 +327,8 @@ QString InfoWidget::showName(IPresence::Show AShow) const
     return tr("Away");
   case IPresence::ExtendedAway:
     return tr("Extended Away");
-  case IPresence::DoNotDistrib:
-    return tr("Do not Distrib");
+  case IPresence::DoNotDisturb:
+    return tr("Do not Disturb");
   case IPresence::Invisible:
     return tr("Invisible");
   case IPresence::Error:

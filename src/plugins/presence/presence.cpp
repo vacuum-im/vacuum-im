@@ -9,7 +9,6 @@ Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
 
   FOpened = false;
   FShow = Offline;
-  FStatus = tr("Disconnected");
   FPriority = 0;
 
   connect(AXmppStream->instance(),SIGNAL(error(IXmppStream *, const QString &)),
@@ -41,10 +40,12 @@ bool Presence::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &A
       else if (showText == "away")
         show = Away;
       else if (showText == "dnd")
-        show = DoNotDistrib;
+        show = DoNotDisturb;
       else if (showText == "xa")
         show = ExtendedAway;
-      else show = Error;
+      else 
+        show = Online;    // остыль под кривые клиенты и транспорты
+
       status = AStanza.firstElement("status").text();
       priority = AStanza.firstElement("priority").text().toInt();
     }
@@ -126,21 +127,40 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
     QString show;
     switch (AShow)
     {
-    case Online: show = ""; break; 
-    case Chat: show = "chat"; break; 
-    case Away: show = "away"; break;
-    case DoNotDistrib: show = "dnd"; break; 
-    case ExtendedAway: show = "xa"; break;
-    case Invisible: show=""; break;
-    case Offline: show=""; break;
-    default: return false;
+    case Online: 
+      show = ""; 
+      break; 
+    case Chat: 
+      show = "chat"; 
+      break; 
+    case Away: 
+      show = "away"; 
+      break;
+    case DoNotDisturb: 
+      show = "dnd"; 
+      break; 
+    case ExtendedAway: 
+      show = "xa"; 
+      break;
+    case Invisible: 
+      show=""; 
+      break;
+    case Offline: 
+      show=""; 
+      break;
+    default: 
+      return false;
     }
 
     Stanza pres("presence");
     if (AShow == Invisible)
+    {
       pres.setType("invisible");
+    }
     else if (AShow == Offline)
+    {
       pres.setType("unavailable");
+    }
     else
     {
       if (!show.isEmpty())
@@ -200,19 +220,26 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
     switch (AShow)
     {
       case Online: 
-        show = ""; break; 
+        show = ""; 
+        break; 
       case Chat: 
-        show = "chat"; break; 
+        show = "chat"; 
+        break; 
       case Away: 
-        show = "away"; break;
-      case DoNotDistrib: 
-        show = "dnd"; break; 
+        show = "away"; 
+        break;
+      case DoNotDisturb: 
+        show = "dnd"; 
+        break; 
       case ExtendedAway: 
-        show = "xa"; break;
+        show = "xa"; 
+        break;
       case Invisible: 
-        show=""; break;
+        show=""; 
+        break;
       case Offline: 
-        show=""; break;
+        show=""; 
+        break;
       default: 
         return false;
     }
@@ -220,9 +247,13 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
     Stanza pres("presence");
     pres.setTo(AContactJid.eFull());
     if (AShow == Invisible)
+    {
       pres.setType("invisible");
+    }
     else if (AShow == Offline)
+    {
       pres.setType("unavailable");
+    }
     else
     {
       if (!show.isEmpty())
@@ -250,7 +281,7 @@ void Presence::clearItems()
     IPresenceItem &pitem = FItems[itemJid];
     pitem.show = Offline;
     pitem.priority = 0;
-    pitem.status = tr("Disconnected");
+    pitem.status.clear();
     emit received(pitem);
     FItems.remove(itemJid);
   }
@@ -259,7 +290,7 @@ void Presence::clearItems()
 void Presence::onStreamClosed(IXmppStream * /*AXmppStream*/)
 {
   if (isOpen())
-    setPresence(Offline,tr("Disconnected"),0);
+    setPresence(Offline,"",0);
 }
 
 void Presence::onStreamError(IXmppStream * /*AXmppStream*/, const QString &AError)

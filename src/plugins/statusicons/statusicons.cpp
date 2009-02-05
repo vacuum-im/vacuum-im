@@ -291,7 +291,7 @@ QString StatusIcons::iconKeyByStatus(int AShow, const QString &ASubscription, bo
     return STI_AWAY;
   case IPresence::ExtendedAway: 
     return STI_XAWAY;
-  case IPresence::DoNotDistrib: 
+  case IPresence::DoNotDisturb: 
     return STI_DND;
   case IPresence::Invisible: 
     return STI_INVISIBLE;
