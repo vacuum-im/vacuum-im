@@ -16,6 +16,7 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_JOIN,0,0,"windowIcon");
 
   FXmppStreams = NULL;
   FSettingsPlugin = NULL;
@@ -196,7 +197,7 @@ void JoinMultiChatDialog::onStreamAdded(IXmppStream *AXmppStream)
   ui.cmbStreamJid->addItem(AXmppStream->jid().full());
 }
 
-void JoinMultiChatDialog::onStreamStateChanged(IXmppStream *AXmppStream)
+void JoinMultiChatDialog::onStreamStateChanged(IXmppStream * /*AXmppStream*/)
 {
   updateResolveNickState();
 }

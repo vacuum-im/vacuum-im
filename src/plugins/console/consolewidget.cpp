@@ -18,7 +18,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName("psi/command"));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_CONSOLE,0,0,"windowIcon");
 
   FXmppStreams = NULL;
   FStanzaProcessor = NULL;

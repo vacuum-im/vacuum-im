@@ -1,9 +1,9 @@
 #ifndef SERVICEDISCOVERY_H
 #define SERVICEDISCOVERY_H
 
-#include <QPair>
 #include <QSet>
 #include <QHash>
+#include <QPair>
 #include <QTimer>
 #include <QMultiMap>
 #include "../../definations/version.h"
@@ -15,6 +15,9 @@
 #include "../../definations/rosterclickhookerorders.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/tooltiporders.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
+#include "../../definations/serviceicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/ixmppstreams.h"
@@ -28,6 +31,7 @@
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/errorhandler.h"
+#include "../../utils/iconstorage.h"
 #include "discoinfowindow.h"
 #include "discoitemswindow.h"
 
@@ -91,6 +95,7 @@ public:
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
   virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
   virtual QList<IDiscoInfo> findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
+  virtual QIcon identityIcon(const QString &ACategory, const QString &AType) const;
   virtual QIcon serviceIcon(const Jid AItemJid, const QString &ANode) const;
     //DiscoHandler
   virtual void insertDiscoHandler(IDiscoHandler *AHandler);

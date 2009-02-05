@@ -39,7 +39,7 @@ bool ConsolePlugin::initObjects()
   {
     Action *action = new Action(FMainWindowPlugin->mainWindow()->mainMenu());
     action->setText(tr("XML Console"));
-    action->setIcon(SYSTEM_ICONSETFILE,"psi/command");
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_CONSOLE);
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowXMLConsole(bool)));
     FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_CONSOLE_MMENU,true);
   }

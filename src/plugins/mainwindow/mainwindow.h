@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include "../../interfaces/imainwindow.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 
 class MainWindow : 
   public IMainWindow

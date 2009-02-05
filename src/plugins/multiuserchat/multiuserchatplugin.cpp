@@ -2,9 +2,6 @@
 
 #include <QInputDialog>
 
-#define IN_GROUPCHAT              "psi/groupChat"
-#define IN_INVITE                 "psi/events"
-
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_HOST                  Action::DR_Parametr1
 #define ADR_ROOM                  Action::DR_Parametr2
@@ -12,7 +9,6 @@
 #define ADR_PASSWORD              Action::DR_Parametr4
 
 #define INVITE_NOTIFICATOR_ID     "InviteMessages"
-
 
 MultiUserChatPlugin::MultiUserChatPlugin()
 {
@@ -129,11 +125,11 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 bool MultiUserChatPlugin::initObjects()
 {
   FChatMenu = new Menu(NULL);
-  FChatMenu->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+  FChatMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFERENCE);
   FChatMenu->setTitle(tr("Conferences"));
 
   FJoinAction = new Action(FChatMenu);
-  FJoinAction->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+  FJoinAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
   FJoinAction->setText(tr("Join conference"));
   connect(FJoinAction,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
   FChatMenu->addAction(FJoinAction,AG_DEFAULT+100,true);
@@ -290,7 +286,7 @@ INotification MultiUserChatPlugin::notification(INotifications *ANotifications, 
   {
     Jid fromJid = inviteElem.attribute("from");
     notify.kinds = ANotifications->notificatorKinds(INVITE_NOTIFICATOR_ID);
-    notify.data.insert(NDR_ICON,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_INVITE));
+    notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE));
     notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
     notify.data.insert(NDR_ROSTER_STREAM_JID,AMessage.to());
     notify.data.insert(NDR_ROSTER_CONTACT_JID,fromJid.full());
@@ -299,6 +295,7 @@ INotification MultiUserChatPlugin::notification(INotifications *ANotifications, 
     notify.data.insert(NDR_WINDOW_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
     notify.data.insert(NDR_WINDOW_IMAGE,ANotifications->contactAvatar(fromJid));
     notify.data.insert(NDR_WINDOW_TEXT,notify.data.value(NDR_TOOLTIP));
+    notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
   }
   return notify;
 }
@@ -413,7 +410,7 @@ void MultiUserChatPlugin::showJoinMultiChatDialog(const Jid &AStreamJid, const J
 void MultiUserChatPlugin::insertChatAction(IMultiUserChatWindow *AWindow)
 {
   Action *action = new Action(FChatMenu);
-  action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFERENCE);
   action->setText(tr("%1 as %2").arg(AWindow->multiUserChat()->roomJid().bare()).arg(AWindow->multiUserChat()->nickName()));
   connect(action,SIGNAL(triggered(bool)),SLOT(onChatActionTriggered(bool)));
   FChatMenu->addAction(action,AG_DEFAULT,false);
@@ -429,7 +426,7 @@ void MultiUserChatPlugin::removeChatAction(IMultiUserChatWindow *AWindow)
 void MultiUserChatPlugin::registerDiscoFeatures()
 {
   IDiscoFeature dfeature;
-  QIcon icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_GROUPCHAT);
+  QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_CONFERENCE);
 
   dfeature.active = true;
   dfeature.icon = icon;
@@ -514,13 +511,13 @@ Menu *MultiUserChatPlugin::createInviteMenu(const Jid &AContactJid, QWidget *APa
 {
   Menu *inviteMenu = new Menu(AParent);
   inviteMenu->setTitle(tr("Invite to"));
-  inviteMenu->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+  inviteMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
   foreach(IMultiUserChatWindow *window,FChatWindows)
   {
     if (window->multiUserChat()->isOpen())
     {
       Action *action = new Action(inviteMenu);
-      action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFERENCE);
       action->setText(tr("%1 from %2").arg(window->roomJid().full()).arg(window->multiUserChat()->nickName()));
       action->setData(ADR_STREAM_JID,window->streamJid().full());
       action->setData(ADR_HOST,AContactJid.full());
@@ -535,7 +532,7 @@ Menu *MultiUserChatPlugin::createInviteMenu(const Jid &AContactJid, QWidget *APa
 Action *MultiUserChatPlugin::createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const
 {
   Action *action = new Action(AParent);
-  action->setIcon(SYSTEM_ICONSETFILE,IN_GROUPCHAT);
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
   action->setText(tr("Join conference"));
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_HOST,ARoomJid.domain());
@@ -650,7 +647,7 @@ void MultiUserChatPlugin::onRegisterFieldsReceived(const QString &AId, const IRe
   }
 }
 
-void MultiUserChatPlugin::onRegisterErrorReceived(const QString &AId, const QString &AError)
+void MultiUserChatPlugin::onRegisterErrorReceived(const QString &AId, const QString &/*AError*/)
 {
   if (FNickRequests.contains(AId))
   {

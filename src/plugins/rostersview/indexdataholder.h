@@ -5,7 +5,6 @@
 #include "../../definations/rosterdataholderorders.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/irostersview.h"
-#include "../../utils/skin.h"
 
 class IndexDataHolder : 
   public QObject,

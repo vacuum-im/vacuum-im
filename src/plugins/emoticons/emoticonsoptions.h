@@ -3,8 +3,9 @@
 
 #include <QWidget>
 #include "ui_emoticonsoptions.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/iemoticons.h"
-#include "../../utils/skin.h"
 #include "../../utils/iconsetdelegate.h"
 
 class EmoticonsOptions : 
@@ -20,7 +21,6 @@ protected:
 protected slots:
   void onUpButtonClicked();
   void onDownButtonClicked();
-  void onIconsetsChangedBySkin();
 private:
   Ui::EmoticonsOptionsClass ui;
 private:

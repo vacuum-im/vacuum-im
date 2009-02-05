@@ -2,24 +2,32 @@
 
 #include <QKeyEvent>
 #include <QMouseEvent>
-#include "iconset.h"
-#include "skin.h"
 
-#define DEFAULT_MAX_COLUMNS           15
-#define DEFAULT_MAX_ROWS              1
+#define DEFAULT_ROWS              2
 
-
-IconsetDelegate::IconsetDelegate(QObject *AParent)
-  : QItemDelegate(AParent)
+IconsetDelegate::IconsetDelegate(QObject *AParent) : QItemDelegate(AParent)
 {
 
 }
 
+IconsetDelegate::~IconsetDelegate()
+{
+  foreach(QString name, FStorages.keys()) {
+    qDeleteAll(FStorages[name]); };
+}
+
 void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-  QString iconFile = AIndex.data(Qt::DisplayRole).toString();
-  SkinIconset *iconset = Skin::getSkinIconset(iconFile);
-  if (iconset->isValid())
+  QString name = AIndex.data(IDR_STORAGE_NAME).toString();
+  QString subdir = AIndex.data(IDR_STORAGE_SUBDIR).toString();
+  IconStorage *storage = FStorages.value(name).value(subdir,NULL);
+  if (storage==NULL)
+  {
+    storage = new IconStorage(name,subdir);
+    FStorages[name].insert(subdir,storage);
+  }
+
+  if (storage)
   {
     APainter->save();
     if (hasClipping())
@@ -36,7 +44,8 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
       drawCheck(APainter,AOption,checkRect,static_cast<Qt::CheckState>(AIndex.data(Qt::CheckStateRole).toInt()));
       drawRect.setLeft(checkRect.right()+space);
 
-      QString displayText = !iconset->info().name.isEmpty() ? iconset->info().name : iconFile;
+
+      QString displayText = storage->option(STORAGE_NAME).isEmpty() ? name+"/"+subdir : storage->option(STORAGE_NAME);
       QRect textRect(drawRect.topLeft(),AOption.fontMetrics.size(Qt::TextSingleLine,displayText));
 
       QPalette::ColorGroup cg = AOption.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
@@ -52,18 +61,17 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
       drawRect.setLeft(AOption.rect.left() + space);
     }
 
-    int maxColumn = AIndex.data(IDR_MAX_ICON_COLUMNS).isValid() ? AIndex.data(IDR_MAX_ICON_COLUMNS).toInt() : DEFAULT_MAX_COLUMNS;
-    int maxRows = AIndex.data(IDR_MAX_ICON_ROWS).isValid() ? AIndex.data(IDR_MAX_ICON_ROWS).toInt() : DEFAULT_MAX_ROWS;
+    int maxRows = AIndex.data(IDR_ICON_ROWS).isValid() ? AIndex.data(IDR_ICON_ROWS).toInt() : DEFAULT_ROWS;
 
     int row = 0;
     int column = 0;
     int iconIndex = 0;
     int left = drawRect.left();
     int top = drawRect.top();
-    QList<QString> iconFiles = iconset->iconFiles();
-    while (drawRect.bottom()>top && drawRect.right()>left && iconIndex<iconFiles.count() && row < maxRows)
+    QList<QString> iconKeys = storage->fileFirstKeys();
+    while (drawRect.bottom()>top && drawRect.right()>left && iconIndex<iconKeys.count() && row<maxRows)
     {
-      QIcon icon = iconset->iconByFile(iconFiles.at(iconIndex));
+      QIcon icon = storage->getIcon(iconKeys.at(iconIndex));
       if (!icon.isNull())
       {
         QPixmap pixmap = icon.pixmap(AOption.decorationSize,QIcon::Normal,QIcon::On);
@@ -73,7 +81,7 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
       iconIndex++;
       column++;
 
-      if (left >= drawRect.right() || column>=maxColumn)
+      if (left >= drawRect.right()-AOption.decorationSize.width())
       {
         column = 0;
         left = drawRect.left();
@@ -90,9 +98,16 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
 
 QSize IconsetDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-  QString iconFile = AIndex.data(Qt::DisplayRole).toString();
-  SkinIconset *iconset = Skin::getSkinIconset(iconFile);
-  if (iconset->isValid())
+  QString name = AIndex.data(IDR_STORAGE_NAME).toString();
+  QString subdir = AIndex.data(IDR_STORAGE_SUBDIR).toString();
+  IconStorage *storage = FStorages.value(name).value(subdir,NULL);
+  if (storage==NULL)
+  {
+    storage = new IconStorage(name,subdir);
+    FStorages[name].insert(subdir,storage);
+  }
+
+  if (storage)
   {
     int space = 2;
     QSize size(0,0);
@@ -100,17 +115,15 @@ QSize IconsetDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QMode
     if (!AIndex.data(IDR_HIDE_ICONSET_NAME).toBool())
     {
       QSize checkSize = check(AOption,AOption.rect,AIndex.data(Qt::CheckStateRole)).size();
-      QString displayText = !iconset->info().name.isEmpty() ? iconset->info().name : iconFile;
-      QSize textSize = AOption.fontMetrics.size(Qt::TextSingleLine,iconFile);
+      QString displayText = storage->option(STORAGE_NAME).isEmpty() ? name+"/"+subdir : storage->option(STORAGE_NAME);
+      QSize textSize = AOption.fontMetrics.size(Qt::TextSingleLine,displayText);
       size.setHeight(qMax(checkSize.height(),textSize.height()));
       size.setWidth(checkSize.width()+textSize.width()+space);
     }
 
-    int iconCount = iconset->iconFiles().count();
-    int maxColumn = AIndex.data(IDR_MAX_ICON_COLUMNS).isValid() ? AIndex.data(IDR_MAX_ICON_COLUMNS).toInt() : DEFAULT_MAX_COLUMNS;
-    int maxRow = AIndex.data(IDR_MAX_ICON_ROWS).isValid() ? AIndex.data(IDR_MAX_ICON_ROWS).toInt() : DEFAULT_MAX_ROWS;
-    int iconWidth = (AOption.decorationSize.width()+space)*qMin(maxColumn,iconCount);
-    int iconHeight = (AOption.decorationSize.height()+space)*qMin(maxRow,(iconCount-1)/maxColumn+1);
+    int rows = AIndex.data(IDR_ICON_ROWS).isValid() ? AIndex.data(IDR_ICON_ROWS).toInt() : DEFAULT_ROWS;
+    int iconWidth = qMin(AOption.rect.width(),storage->fileFirstKeys().count()*(AOption.decorationSize.width()+space));
+    int iconHeight = (AOption.decorationSize.height()+space)*rows;
     return QSize(qMax(size.width(),iconWidth)+space,size.height()+iconHeight+space);
   }
   else
@@ -163,3 +176,4 @@ bool IconsetDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, co
   Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
   return AModel->setData(AIndex, state, Qt::CheckStateRole);
 }
+

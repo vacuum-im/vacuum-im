@@ -3,6 +3,8 @@
 
 #include "../../definations/actiongroups.h"
 #include "../../definations/version.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/isettings.h"

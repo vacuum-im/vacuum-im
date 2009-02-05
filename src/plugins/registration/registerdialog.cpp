@@ -3,14 +3,12 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 
-#define IN_REGISTER   "psi/register"
-
 RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid, 
                                const Jid &AServiceJid, int AOperation, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_REGISTER));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_REGISTERATION,0,0,"windowIcon");
 
   ui.spgDataForm->setLayout(new QVBoxLayout);
   ui.spgDataForm->layout()->setMargin(0);

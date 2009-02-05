@@ -3,14 +3,16 @@
 
 #include <QDialog>
 #include <QSet>
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/isettings.h"
+#include "../../utils/iconstorage.h"
 #include "ui_profiledialog.h"
 
 class ProfileDialog : 
   public QDialog
 {
   Q_OBJECT;
-
 public:
   ProfileDialog(ISettingsPlugin *ASettingsPlugin);
   ~ProfileDialog();

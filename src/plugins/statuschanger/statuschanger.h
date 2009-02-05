@@ -14,7 +14,9 @@
 #include "../../definations/accountvaluenames.h"
 #include "../../definations/rosterfootertextorder.h"
 #include "../../definations/notificationdataroles.h"
-#include "../../definations/soundnames.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
+#include "../../definations/soundfiles.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatuschanger.h"
 #include "../../interfaces/ipresence.h"
@@ -27,7 +29,6 @@
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/inotifications.h"
-#include "../../utils/skin.h"
 #include "editstatusdialog.h"
 #include "accountoptionswidget.h"
 
@@ -127,7 +128,6 @@ protected slots:
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onDefaultStatusIconsChanged();
-  void onRosterIconsetChanged();
   void onSettingsOpened();
   void onSettingsClosed();
   void onReconnectTimer();
@@ -151,7 +151,6 @@ private:
   INotifications *FNotifications;
 private:
   int FConnectingLabel;
-  SkinIconset *FRosterIconset;
 private:
   Action *FEditStatusAction;
   QPointer<EditStatusDialog> FEditStatusDialog;

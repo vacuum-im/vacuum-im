@@ -5,18 +5,18 @@
 #include <QLabel>
 #include <QEvent>
 #include <QGridLayout>
-#include "../../utils/skin.h"
+#include "../../utils/iconstorage.h"
 
 class SelectIconWidget : 
   public QWidget
 {
   Q_OBJECT;
 public:
-  SelectIconWidget(const QString &AIconsetFile, QWidget *AParent = NULL);
+  SelectIconWidget(IconStorage *AStorage, QWidget *AParent = NULL);
   ~SelectIconWidget();
-  QString iconsetFile() const { return FIconsetFile; }
+  QString iconset() const { return FStorage->subStorage(); }
 signals:
-  virtual void iconSelected(const QString &AIconsetFile, const QString &AIconfile);
+  void iconSelected(const QString &ASubStorage, const QString &AIconKey);
 protected:
   void createLabels();
 protected:
@@ -24,9 +24,9 @@ protected:
 private:
   QLabel *FCurrent;
   QLabel *FPressed;
-  QString FIconsetFile;
   QGridLayout *FLayout;
-  QHash<QLabel *, QString> FFileByLabel;
+  IconStorage *FStorage;
+  QHash<QLabel *, QString> FKeyByLabel;
 };
 
 #endif // SELECTICONWIDGET_H

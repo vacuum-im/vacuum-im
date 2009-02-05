@@ -15,8 +15,6 @@
 #define SVN_COLLAPSE_ACCOUNT_NS           SVN_COLLAPSE_ACCOUNT "[]"
 #define SVN_COLLAPSE_ACCOUNT_NS_GROUP     SVN_COLLAPSE_ACCOUNT_NS ":" SVN_GROUP
 
-#define IN_STATUS_OFFLINE                 "status/offline"
-
 RostersViewPlugin::RostersViewPlugin()
 {
   FRostersModel = NULL;
@@ -122,7 +120,7 @@ bool RostersViewPlugin::initObjects()
   if (FSettingsPlugin)
   {
     FSettings = FSettingsPlugin->settingsForPlugin(ROSTERSVIEW_UUID);
-    FSettingsPlugin->openOptionsNode(ON_ROSTER,tr("Roster"),tr("Roster view options"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_ROSTER,tr("Roster"),tr("Roster view options"),MNI_ROSTERVIEW_OPTIONS);
     FSettingsPlugin->insertOptionsHolder(this);
 
     connect(FRostersView,SIGNAL(proxyModelAdded(QAbstractProxyModel *)),
@@ -140,9 +138,8 @@ bool RostersViewPlugin::initObjects()
     FMainWindowPlugin->mainWindow()->rostersWidget()->insertWidget(0,FRostersView);
 
     FShowOfflineAction = new Action(this);
-    FShowOfflineAction->setIcon(STATUS_ICONSETFILE,IN_STATUS_OFFLINE);
-    FShowOfflineAction->setToolTip(tr("Show offline contacts"));
-    FShowOfflineAction->setCheckable(true);
+    FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_HIDE_OFFLINE);
+    FShowOfflineAction->setToolTip(tr("Show/Hide offline contacts"));
     connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
     FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction,AG_ROSTERSVIEW_MWTTB,false);
   }
@@ -194,9 +191,9 @@ void RostersViewPlugin::setOption(IRostersView::Option AOption, bool AValue)
       FSortFilterProxyModel->setOption(AOption,AValue);
     if (AOption == IRostersView::ShowOfflineContacts)
     {
-      FShowOfflineAction->setChecked(AValue);
       if (AValue)
         startRestoreExpandState();
+      FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, AValue ? MNI_ROSTERVIEW_SHOW_OFFLINE : MNI_ROSTERVIEW_HIDE_OFFLINE);
     }
     emit optionChanged(AOption,AValue);
   }
@@ -412,9 +409,9 @@ void RostersViewPlugin::onSettingsClosed()
   FSettings->setValue(SVN_SHOW_STATUS,checkOption(IRostersView::ShowStatusText));
 }
 
-void RostersViewPlugin::onShowOfflineContactsAction(bool AChecked)
+void RostersViewPlugin::onShowOfflineContactsAction(bool)
 {
-  setOption(IRostersView::ShowOfflineContacts, AChecked);
+  setOption(IRostersView::ShowOfflineContacts, !checkOption(IRostersView::ShowOfflineContacts));
 }
 
 void RostersViewPlugin::onOptionsAccepted()

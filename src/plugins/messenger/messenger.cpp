@@ -1,8 +1,4 @@
-#include <QtDebug>
 #include "messenger.h"
-
-#define IN_NORMAL_MESSAGE                     "psi/sendMessage"
-#define IN_CHAT_MESSAGE                       "psi/start-chat"
 
 #define SVN_INFO                              "info"
 #define SVN_VIEW                              "view"
@@ -137,7 +133,7 @@ bool Messenger::initObjects()
 
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"), tr("Message window options"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"),tr("Message window options"),MNI_MESSENGER_NORMAL);
     FSettingsPlugin->insertOptionsHolder(this);
   }
 
@@ -668,7 +664,7 @@ void Messenger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Chat"));
-      action->setIcon(SYSTEM_ICONSETFILE,IN_CHAT_MESSAGE);
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_CHAT);
       action->setData(ADR_StreamJid,streamJid.full());
       action->setData(ADR_ContactJid,contactJid.full());
       action->setData(ADR_WindowType,WT_ChatWindow);
@@ -679,7 +675,7 @@ void Messenger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Message"));
-      action->setIcon(SYSTEM_ICONSETFILE,IN_NORMAL_MESSAGE);
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_NORMAL);
       action->setData(ADR_StreamJid,streamJid.full());
       if (AIndex->type() == RIT_Group)
         action->setData(ADR_Group,AIndex->data(RDR_Group));

@@ -2,6 +2,8 @@
 #define SUBSCRIPTIONDIALOG_H
 
 #include "../../definations/actiongroups.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ivcard.h"
 #include "../../interfaces/imessenger.h"

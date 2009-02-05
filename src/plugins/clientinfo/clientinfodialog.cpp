@@ -1,14 +1,12 @@
 #include "clientinfodialog.h"
 
-#define IN_CLIENTINFO                   "psi/help"
-
 ClientInfoDialog::ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid,
                                    const QString &AContactName, int AInfoTypes, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Client info - %1").arg(AContactName));
-  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CLIENTINFO));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_CLIENTINFO,0,0,"windowIcon");
 
   FClientInfo = AClientInfo;
   FStreamJid = AStreamJid;

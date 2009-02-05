@@ -4,11 +4,6 @@
 #include <QInputDialog>
 #include <QContextMenuEvent>
 
-#define IN_EXIT                     "psi/cancel"
-#define IN_CHAT_MESSAGE             "psi/start-chat"
-#define IN_MULTICHAT_MESSAGE        "psi/groupChat"
-#define IN_DATA_FORM_MESSAGE        "psi/events"
-
 #define BDI_WINDOW_GEOMETRY         "MultiChatWindowGeometry"
 #define BDI_WINDOW_HSPLITTER        "MultiChatWindowHSplitterState"
 #define BDI_WINDOW_VSPLITTER        "MultiChatWindowVSplitterState"
@@ -176,7 +171,7 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
   Jid contactJid = AMessage.from();
   if (AMessage.type() != Message::Error)
   {
-    SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
+    IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
     if (!contactJid.resource().isEmpty())
     {
       if (AMessage.type() == Message::GroupChat)
@@ -184,13 +179,12 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
         if (!isActive())
         {
           notify.kinds = ANotifications->notificatorKinds(GROUP_NOTIFICATOR_ID);
-          notify.data.insert(NDR_ICON,iconset->iconByName(IN_MULTICHAT_MESSAGE));
+          notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));
           notify.data.insert(NDR_TOOLTIP,tr("New message in conference: %1").arg(contactJid.node()));
           notify.data.insert(NDR_WINDOW_CAPTION,tr("Conference message"));
           notify.data.insert(NDR_WINDOW_TITLE,tr("%1 from %2").arg(contactJid.resource()).arg(contactJid.node()));
           notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
-          notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
-          notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
+          notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
         }
       }
       else
@@ -199,13 +193,12 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
         if (window == NULL || !window->isActive())
         {
           notify.kinds = ANotifications->notificatorKinds(PRIVATE_NOTIFICATOR_ID);
-          notify.data.insert(NDR_ICON,iconset->iconByName(IN_CHAT_MESSAGE));
+          notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_PRIVATE_MESSAGE));
           notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(contactJid.resource()));
           notify.data.insert(NDR_WINDOW_CAPTION,tr("Private message"));
           notify.data.insert(NDR_WINDOW_TITLE,contactJid.resource());
           notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
-          notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
-          notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
+          notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
         }
       }
     }
@@ -214,13 +207,12 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
       if (!AMessage.stanza().firstElement("x",NS_JABBER_DATA).isNull())
       {
         notify.kinds = ANotifications->notificatorKinds(PRIVATE_NOTIFICATOR_ID);;
-        notify.data.insert(NDR_ICON,iconset->iconByName(IN_DATA_FORM_MESSAGE));
+        notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_DATA_MESSAGE));
         notify.data.insert(NDR_TOOLTIP,tr("Data form received from: %1").arg(contactJid.node()));
         notify.data.insert(NDR_WINDOW_CAPTION,tr("Data form received"));
         notify.data.insert(NDR_WINDOW_TITLE,contactJid.full());
         notify.data.insert(NDR_WINDOW_TEXT,AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text());
-        notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
-        notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
+        notify.data.insert(NDR_SOUND_FILE,SDF_MUC_DATA_MESSAGE);
       }
     }
   }
@@ -374,21 +366,24 @@ void MultiUserChatWindow::createMenuBarActions()
 
   FChangeNick = new Action(FRoomMenu);
   FChangeNick->setText(tr("Change room nick"));
+  FChangeNick->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_NICK);
   connect(FChangeNick,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FRoomMenu->addAction(FChangeNick,AG_MURM_MULTIUSERCHAT,true);
 
   FChangeSubject = new Action(FRoomMenu);
   FChangeSubject->setText(tr("Change topic"));
+  FChangeSubject->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_TOPIC);
   connect(FChangeSubject,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FRoomMenu->addAction(FChangeSubject,AG_MURM_MULTIUSERCHAT,true);
 
   FClearChat = new Action(FRoomMenu);
   FClearChat->setText(tr("Clear chat window"));
+  FClearChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
   connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FRoomMenu->addAction(FClearChat,AG_MURM_MULTIUSERCHAT,true);
 
   FQuitRoom = new Action(FRoomMenu);
-  FQuitRoom->setIcon(SYSTEM_ICONSETFILE,IN_EXIT);
+  FQuitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT);
   FQuitRoom->setText(tr("Exit"));
   FQuitRoom->setShortcut(tr("Ctrl+X"));
   connect(FQuitRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
@@ -401,41 +396,49 @@ void MultiUserChatWindow::createMenuBarActions()
 
   FInviteContact = new Action(FToolsMenu);
   FInviteContact->setText(tr("Invite to this room"));
+  FInviteContact->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
   connect(FInviteContact,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FToolsMenu->addAction(FInviteContact,AG_MUTM_MULTIUSERCHAT,false);
 
   FRequestVoice = new Action(FToolsMenu);
   FRequestVoice->setText(tr("Request voice"));
+  FRequestVoice->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_REQUEST_VOICE);
   connect(FRequestVoice,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FToolsMenu->addAction(FRequestVoice,AG_MUTM_MULTIUSERCHAT,false);
 
   FBanList = new Action(FToolsMenu);
   FBanList->setText(tr("Edit ban list"));
+  FBanList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_BAN_LIST);
   connect(FBanList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FToolsMenu->addAction(FBanList,AG_MUTM_MULTIUSERCHAT,false);
 
   FMembersList = new Action(FToolsMenu);
   FMembersList->setText(tr("Edit members list"));
+  FMembersList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_MEMBERS_LIST);
   connect(FMembersList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FToolsMenu->addAction(FMembersList,AG_MUTM_MULTIUSERCHAT,false);
 
   FAdminsList = new Action(FToolsMenu);
   FAdminsList->setText(tr("Edit administrators list"));
+  FAdminsList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_ADMINS_LIST);
   connect(FAdminsList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FToolsMenu->addAction(FAdminsList,AG_MUTM_MULTIUSERCHAT,false);
 
   FOwnersList = new Action(FToolsMenu);
   FOwnersList->setText(tr("Edit owners list"));
+  FOwnersList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_OWNERS_LIST);
   connect(FOwnersList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FToolsMenu->addAction(FOwnersList,AG_MUTM_MULTIUSERCHAT,false);
 
   FConfigRoom = new Action(FToolsMenu);
   FConfigRoom->setText(tr("Configure room"));
+  FConfigRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFIGURE_ROOM);
   connect(FConfigRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FToolsMenu->addAction(FConfigRoom,AG_MUTM_MULTIUSERCHAT,false);
 
   FDestroyRoom = new Action(FToolsMenu);
   FDestroyRoom->setText(tr("Destroy room"));
+  FDestroyRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_DESTROY_ROOM);
   connect(FDestroyRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FToolsMenu->addAction(FDestroyRoom,AG_MUTM_MULTIUSERCHAT_DESTROY,false);
 }
@@ -501,7 +504,7 @@ void MultiUserChatWindow::createRoomUtilsActions()
 
   FInviteMenu = new Menu(FRoomUtilsMenu);
   FInviteMenu->setTitle(tr("Invite to"));
-  FInviteMenu->setIcon(SYSTEM_ICONSETFILE,IN_MULTICHAT_MESSAGE);
+  FInviteMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_MESSAGE);
   FRoomUtilsMenu->addAction(FInviteMenu->menuAction(),AG_MULTIUSERCHAT_ROOM_UTILS,false);
 
   FSetRoleNode = new Action(FRoomUtilsMenu);
@@ -580,7 +583,7 @@ void MultiUserChatWindow::insertRoomUtilsActions(Menu *AMenu, IMultiUser *AUser)
           (!AUser->data(MUDR_REALJID).toString().isEmpty() || window->roomJid().domain()==roomJid().domain()) )
       {
         Action *action = new Action(FInviteMenu);
-        action->setIcon(SYSTEM_ICONSETFILE,IN_MULTICHAT_MESSAGE);
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_MESSAGE);
         action->setText(tr("%1 from %2").arg(window->roomJid().full()).arg(window->multiUserChat()->nickName()));
         action->setData(ADR_STREAM_JID,window->streamJid().full());
         action->setData(ADR_ROOM_JID,window->roomJid().full());
@@ -941,15 +944,12 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 
 void MultiUserChatWindow::updateWindow()
 {
-  QIcon icon;
-  SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-  if (!FActiveMessages.isEmpty())
-    icon = iconset->iconByName(IN_CHAT_MESSAGE);
+  if (FActiveMessages.isEmpty())
+    IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_CONFERENCE,0,0,"windowIcon");
   else
-    icon = iconset->iconByName(IN_MULTICHAT_MESSAGE);
+    IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_MESSAGE,0,0,"windowIcon");
 
   QString roomName = tr("%1 (%2)").arg(FMultiChat->roomJid().node()).arg(FUsers.count());
-  setWindowIcon(icon);
   setWindowIconText(roomName);
   setWindowTitle(tr("%1 - Groupchat").arg(roomName));
 
@@ -964,10 +964,7 @@ void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
   {
     IChatWindow *window = findChatWindow(AContactJid);
     if (FActiveChatMessages.contains(window))
-    {
-      SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-      listItem->setIcon(iconset->iconByName(IN_CHAT_MESSAGE));
-    }
+      listItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE));
     else if (FStatusIcons)
       listItem->setIcon(FStatusIcons->iconByJidStatus(AContactJid,user->data(MUDR_SHOW).toInt(),"",false));
   }
@@ -1038,10 +1035,7 @@ void MultiUserChatWindow::updateChatWindow(IChatWindow *AWindow)
 {
   QIcon icon;
   if (FActiveChatMessages.contains(AWindow))
-  {
-    SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-    icon = iconset->iconByName(IN_CHAT_MESSAGE);
-  }
+    icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE);
   else if (FStatusIcons)
     icon = FStatusIcons->iconByStatus(AWindow->infoWidget()->field(IInfoWidget::ContactShow).toInt(),"both",false);
 

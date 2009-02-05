@@ -8,6 +8,9 @@
 #include <QScrollArea>
 #include <QStackedWidget>
 #include <QDialogButtonBox>
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
+#include "../../utils/iconstorage.h"
 
 class OptionsDialog : 
   public QDialog
@@ -16,7 +19,7 @@ class OptionsDialog :
 public:
   OptionsDialog(QWidget *AParent = NULL);
   ~OptionsDialog();
-  void openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QIcon &AIcon, QWidget *AWidget);
+  void openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIcon, QWidget *AWidget);
   void closeNode(const QString &ANode);
   void showNode(const QString &ANode);
 signals:
@@ -39,7 +42,7 @@ private:
   QDialogButtonBox *dbbButtons;
 private:
   struct OptionsNode {
-    QIcon icon;
+    QString icon;
     QString name;
     QString desc;
     QWidget *widget;

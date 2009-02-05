@@ -4,6 +4,8 @@
 #include <QMap>
 #include <QTimer>
 #include "../../definations/actiongroups.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/itraymanager.h"
 

@@ -3,8 +3,10 @@
 
 #include <QList>
 #include <QDialog>
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ibookmarks.h"
-#include "../../utils/skin.h"
+#include "../../utils/iconstorage.h"
 #include "ui_editbookmarksdialog.h"
 
 class EditBookmarksDialog : 

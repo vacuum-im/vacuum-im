@@ -1,7 +1,5 @@
 #include "connectionmanager.h" 
 
-#define IN_ENCRYPTED          "psi/cryptoYes"
-
 ConnectionManager::ConnectionManager()
 {
   FEncryptedLabelId = -1;
@@ -77,7 +75,7 @@ bool ConnectionManager::initObjects()
 {
   if (FRostersViewPlugin)
   {
-    QIcon icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_ENCRYPTED);
+    QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
     FEncryptedLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_CONNECTION_ENCRYPTED,icon);
   }
   if (FSettingsPlugin)

@@ -8,6 +8,7 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManage
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Add contact - %1").arg(AStreamJid.bare()));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_ADD_CONTACT,0,0,"windowIcon");
   
   FRoster = NULL;
   FVcardPlugin = NULL;
@@ -18,6 +19,7 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManage
   FStreamJid = AStreamJid;
 
   QToolBar *toolBar = new QToolBar(this);
+  toolBar->setIconSize(QSize(16,16));
   ui.lytMainLayout->setMenuBar(toolBar);
   FToolBarChanger = new ToolBarChanger(toolBar);
 
@@ -116,12 +118,14 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
       FShowChat = new Action(FToolBarChanger->toolBar());
       FShowChat->setText(tr("Chat"));
       FShowChat->setToolTip(tr("Open chat window"));
+      FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_CHAT);
       FToolBarChanger->addAction(FShowChat,AG_ACDT_ROSTERCHANGER_ACTIONS);
       connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
       FSendMessage = new Action(FToolBarChanger->toolBar());
       FSendMessage->setText(tr("Message"));
       FSendMessage->setToolTip(tr("Send Message"));
+      FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_NORMAL);
       FToolBarChanger->addAction(FSendMessage,AG_ACDT_ROSTERCHANGER_ACTIONS);
       connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
     }
@@ -136,12 +140,14 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
       FShowVCard = new Action(FToolBarChanger->toolBar());
       FShowVCard->setText(tr("VCard"));
       FShowVCard->setToolTip(tr("Show VCard"));
+      FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
       FToolBarChanger->addAction(FShowVCard,AG_ACDT_ROSTERCHANGER_ACTIONS);
       connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
       FResolve = new Action(FToolBarChanger->toolBar());
       FResolve->setText(tr("Nick"));
       FResolve->setToolTip(tr("Resolve nick name"));
+      FResolve->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
       FToolBarChanger->addAction(FResolve,AG_ACDT_ROSTERCHANGER_ACTIONS);
       connect(FResolve,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 

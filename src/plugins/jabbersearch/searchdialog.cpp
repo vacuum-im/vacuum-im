@@ -9,17 +9,12 @@
 #define CNICK                   3
 #define CEMAIL                  4
 
-#define IN_SEARCH               "psi/search"
-#define IN_ADDCONTACT           "psi/addContact"
-#define IN_VCARD                "psi/vCard"
-#define IN_INFO                 "psi/statusmsg"
-
 SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManager, const Jid &AStreamJid, 
                            const Jid &AServiceJid, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SEARCH));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_JSEARCH,0,0,"windowIcon");
 
   FPluginManager = APluginManager;
   FSearch = ASearch;
@@ -33,6 +28,7 @@ SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManage
   FVCardPlugin = NULL;
 
   QToolBar *toolBar = new QToolBar(this);
+  toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
   FToolBarChanger = new ToolBarChanger(toolBar);
   FToolBarChanger->setSeparatorsVisible(false);
   layout()->setMenuBar(toolBar);
@@ -195,23 +191,32 @@ void SearchDialog::initialize()
 
 void SearchDialog::createToolBarActions()
 {
-  FDiscoInfo = new Action(FToolBarChanger);
-  FDiscoInfo->setText(tr("Disco info"));
-  FDiscoInfo->setIcon(SYSTEM_ICONSETFILE,IN_INFO);
-  FToolBarChanger->addAction(FDiscoInfo,AG_DEFAULT,false);
-  connect(FDiscoInfo,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+  if (FDiscovery)
+  {
+    FDiscoInfo = new Action(FToolBarChanger);
+    FDiscoInfo->setText(tr("Disco info"));
+    FDiscoInfo->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOINFO);
+    FToolBarChanger->addAction(FDiscoInfo,AG_DEFAULT,false);
+    connect(FDiscoInfo,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+  }
 
-  FAddContact = new Action(FToolBarChanger);
-  FAddContact->setText(tr("Add Contact"));
-  FAddContact->setIcon(SYSTEM_ICONSETFILE,IN_ADDCONTACT);
-  FToolBarChanger->addAction(FAddContact,AG_DEFAULT,false);
-  connect(FAddContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+  if (FRosterChanger)
+  {
+    FAddContact = new Action(FToolBarChanger);
+    FAddContact->setText(tr("Add Contact"));
+    FAddContact->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
+    FToolBarChanger->addAction(FAddContact,AG_DEFAULT,false);
+    connect(FAddContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+  }
 
-  FShowVCard = new Action(FToolBarChanger);
-  FShowVCard->setText(tr("vCard"));
-  FShowVCard->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
-  FToolBarChanger->addAction(FShowVCard,AG_DEFAULT,false);
-  connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+  if (FVCardPlugin)
+  {
+    FShowVCard = new Action(FToolBarChanger);
+    FShowVCard->setText(tr("vCard"));
+    FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
+    FToolBarChanger->addAction(FShowVCard,AG_DEFAULT,false);
+    connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+  }
 }
 
 void SearchDialog::onSearchFields(const QString &AId, const ISearchFields &AFields)

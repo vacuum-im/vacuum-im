@@ -2,10 +2,11 @@
 #define NOTIFICATIONS_H
 
 #include "../../definations/notificationdataroles.h"
-#include "../../definations/soundnames.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/inotifications.h"
 #include "../../interfaces/irostersview.h"

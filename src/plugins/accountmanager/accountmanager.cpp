@@ -5,8 +5,6 @@
 #include <QTime>
 #include <QMessageBox>
 
-#define IN_ACCOUNT                  "psi/account"
-
 #define SVN_ACCOUNT                 "account[]"
 #define SVN_ACCOUNT_ACTIVE          SVN_ACCOUNT":"AVN_ACTIVE
 #define SVN_ACCOUNT_STREAM          SVN_ACCOUNT":"AVN_STREAMJID
@@ -86,7 +84,7 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
 bool AccountManager::initObjects()
 {
   FSettings = FSettingsPlugin->settingsForPlugin(ACCOUNTMANAGER_UUID);
-  FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"), tr("Creating and removing accounts"),QIcon());
+  FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"),tr("Creating and removing accounts"),MNI_ACCOUNT_LIST);
   FSettingsPlugin->insertOptionsHolder(this);
   return true;
 }
@@ -222,7 +220,7 @@ void AccountManager::openAccountOptionsNode(const QString &AAccountId, const QSt
   QString name = AName;
   if (name.isEmpty())
     name = FAccounts.contains(AAccountId) ? FAccounts.value(AAccountId)->name() : tr("<Empty>");
-  FSettingsPlugin->openOptionsNode(node,name,tr("Account details and connection options"),QIcon());
+  FSettingsPlugin->openOptionsNode(node,name,tr("Account details and connection options"),MNI_ACCOUNT);
 }
 
 void AccountManager::closeAccountOptionsNode(const QString &AAccountId)
@@ -371,7 +369,7 @@ void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     if (account)
     {
       Action *action = new Action(AMenu);
-      action->setIcon(SYSTEM_ICONSETFILE,IN_ACCOUNT);
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_ACCOUNT_CHANGE);
       action->setText(tr("Modify account"));
       action->setData(ADR_OPTIONS_NODE,ON_ACCOUNTS"::"+account->accountId());
       connect(action,SIGNAL(triggered(bool)),SLOT(onOpenOptionsDialogByAction(bool)));

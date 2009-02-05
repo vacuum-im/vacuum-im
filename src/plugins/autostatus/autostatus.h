@@ -2,7 +2,9 @@
 #define AUTOSTATUS_H
 
 #include <QTimer>
+#include <QDateTime>
 #include "../../definations/optionnodes.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iautostatus.h"
 #include "../../interfaces/istatuschanger.h"

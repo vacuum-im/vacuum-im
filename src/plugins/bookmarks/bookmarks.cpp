@@ -4,10 +4,6 @@
 
 #define PST_BOOKMARKS       "storage"
 
-#define IN_BOOKMARKS            "psi/history"
-#define IN_BOOKMARK_CONF        "psi/groupChat"
-#define IN_BOOKMARK_URL         "psi/www"
-
 #define ADR_STREAM_JID          Action::DR_StreamJid
 #define ADR_BOOKMARK_INDEX      Action::DR_Parametr1
 #define ADR_ROOMJID             Action::DR_Parametr2
@@ -22,7 +18,7 @@ BookMarks::BookMarks()
   FMultiChatPlugin = NULL;
 
   FBookMarksMenu = new Menu;
-  FBookMarksMenu->setIcon(SYSTEM_ICONSETFILE,IN_BOOKMARKS);
+  FBookMarksMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
   FBookMarksMenu->setTitle(tr("Bookmarks"));
   FBookMarksMenu->menuAction()->setEnabled(false);
 }
@@ -229,7 +225,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
     if (!streamMenu)
     {
       streamMenu = new Menu(FBookMarksMenu);
-      streamMenu->setIcon(SYSTEM_ICONSETFILE,IN_BOOKMARKS);
+      streamMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
       IAccount *account = FAccountManager->accountByStream(AStreamJid);
       if(account)
       {
@@ -241,7 +237,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
         streamMenu->setTitle(AStreamJid.full());
 
       Action *action = new Action(streamMenu);
-      action->setIcon(SYSTEM_ICONSETFILE,IN_BOOKMARKS);
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
       action->setText(tr("Edit bookmarks"));
       action->setData(ADR_STREAM_JID,AStreamJid.full());
       connect(action,SIGNAL(triggered(bool)),SLOT(onEditBookmarksActionTriggered(bool)));
@@ -280,7 +276,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
       if (!bookmark.name.isEmpty())
       {
         Action *action = new Action(streamMenu);
-        action->setIcon(SYSTEM_ICONSETFILE ,bookmark.conference.isEmpty() ? IN_BOOKMARK_URL : IN_BOOKMARK_CONF);
+        action->setIcon(RSR_STORAGE_MENUICONS ,bookmark.conference.isEmpty() ? MNI_BOOKMARKS_URL : MNI_BOOKMARKS_ROOM);
         action->setText(bookmark.name);
         action->setData(ADR_STREAM_JID,AStreamJid.full());
         action->setData(ADR_BOOKMARK_INDEX,streamBookmarks.count()-1);
@@ -318,7 +314,7 @@ void BookMarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 {
   Action *action = new Action(AWindow->roomMenu());
   action->setText(tr("Bookmark this room"));
-  action->setIcon(SYSTEM_ICONSETFILE,IN_BOOKMARKS);
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
   action->setData(ADR_STREAM_JID,AWindow->streamJid().full());
   action->setData(ADR_ROOMJID,AWindow->roomJid().bare());
   connect(action,SIGNAL(triggered(bool)),SLOT(onAddBookmarkActionTriggered(bool)));

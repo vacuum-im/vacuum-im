@@ -1,13 +1,9 @@
-#include <QtDebug>
 #include "selecticonmenu.h"
 
-#define SMILEY_TAG_NAME                         "text"
-
-SelectIconMenu::SelectIconMenu(QWidget *AParent)
-  : Menu(AParent)
+SelectIconMenu::SelectIconMenu(QWidget *AParent) : Menu(AParent)
 {
   FWidget = NULL;
-
+  FStorage = NULL;
   FLayout = new QVBoxLayout(this);
   FLayout->setMargin(0);
   connect(this,SIGNAL(aboutToShow()),SLOT(onAboutToShow()));
@@ -33,22 +29,20 @@ void SelectIconMenu::setTitle(const QString &ATitle)
   Menu::setTitle(ATitle);
 }
 
-void SelectIconMenu::setIconset(const QString &AFileName)
+QString SelectIconMenu::iconset() const
 {
-  if (!FIconset.isEmpty())
+  return FStorage!=NULL ? FStorage->subStorage() : "";
+}
+
+void SelectIconMenu::setIconset(const QString &ASubStorage)
+{
+  if (FStorage==NULL || FStorage->subStorage()!=ASubStorage)
   {
-    SkinIconset *iconset = Skin::getSkinIconset(FIconset);
-    disconnect(iconset,SIGNAL(iconsetChanged()),this,SLOT(onSkinIconsetChanged()));
+    delete FStorage;
+    FStorage = new IconStorage(RSR_STORAGE_EMOTICONS,ASubStorage,this);
+    QString firstKey = FStorage->fileKeys().value(0);
+    FStorage->insertAutoIcon(this,firstKey);
   }
-  FIconset = AFileName;
-  if (!FIconset.isEmpty())
-  {
-    SkinIconset *iconset = Skin::getSkinIconset(FIconset);
-    connect(iconset,SIGNAL(iconsetChanged()),SLOT(onSkinIconsetChanged()));
-    onSkinIconsetChanged();
-  }
-  else
-    setEnabled(false);
 }
 
 QSize SelectIconMenu::sizeHint() const
@@ -59,7 +53,7 @@ QSize SelectIconMenu::sizeHint() const
 void SelectIconMenu::createWidget()
 {
   destroyWidget();
-  FWidget = new SelectIconWidget(FIconset,this);
+  FWidget = new SelectIconWidget(FStorage,this);
   FLayout->addWidget(FWidget);
   FSizeHint = FLayout->sizeHint();
   connect(FWidget,SIGNAL(iconSelected(const QString &, const QString &)),SIGNAL(iconSelected(const QString &, const QString &)));
@@ -67,8 +61,11 @@ void SelectIconMenu::createWidget()
 
 void SelectIconMenu::destroyWidget()
 {
-  delete FWidget;
-  FWidget = NULL;
+  if (FWidget)
+  {
+    FWidget->deleteLater();
+    FWidget = NULL;
+  }
 }
 
 void SelectIconMenu::hideEvent(QHideEvent *AEvent)
@@ -80,13 +77,5 @@ void SelectIconMenu::hideEvent(QHideEvent *AEvent)
 void SelectIconMenu::onAboutToShow()
 {
   createWidget();
-}
-
-void SelectIconMenu::onSkinIconsetChanged()
-{
-  SkinIconset *iconset = Skin::getSkinIconset(FIconset);
-  setTitle(iconset->tags().value(0));
-  setIcon(iconset->iconByFile(iconset->iconFiles().value(0)));
-  setEnabled(iconset->isValid());
 }
 

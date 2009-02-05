@@ -103,6 +103,7 @@ public:
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
   virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true) =0;
   virtual QList<IDiscoInfo> findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const =0;
+  virtual QIcon identityIcon(const QString &ACategory, const QString &AType) const =0;
   virtual QIcon serviceIcon(const Jid AItemJid, const QString &ANode) const =0;
   //DiscoHandler
   virtual void insertDiscoHandler(IDiscoHandler *AHandler) =0;

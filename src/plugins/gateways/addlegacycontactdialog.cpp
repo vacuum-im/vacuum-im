@@ -6,6 +6,7 @@ AddLegacyContactDialog::AddLegacyContactDialog(IGateways *AGateways, IRosterChan
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Add Legacy User to %1").arg(AServiceJid.full()));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_GATEWAYS_ADD_CONTACT,0,0,"windowIcon");
 
   FGateways = AGateways;
   FRosterChanger = ARosterChanger;

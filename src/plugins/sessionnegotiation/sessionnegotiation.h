@@ -7,6 +7,8 @@
 #include "../../definations/discofeatureorder.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/notificationdataroles.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isessionnegotiation.h"
 #include "../../interfaces/idataforms.h"

@@ -3,15 +3,14 @@
 #include <QHeaderView>
 
 #define ADR_FORM_INDEX        Action::DR_Parametr1
-#define IN_INFO               "psi/statusmsg"
 
 DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, const Jid &AContactJid,
                                  const QString &ANode, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_INFO));
   setWindowTitle(tr("%1 - Discovery Info").arg(AContactJid.full()));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SDISCOVERY_DISCOINFO,0,0,"windowIcon");
 
   FDataForms = NULL;
   FDiscovery = ADiscovery;

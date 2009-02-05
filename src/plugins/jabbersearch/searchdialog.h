@@ -4,6 +4,8 @@
 #include <QDialog>
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ijabbersearch.h"
 #include "../../interfaces/idataforms.h"
@@ -11,7 +13,6 @@
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/ivcard.h"
 #include "../../utils/toolbarchanger.h"
-#include "../../utils/skin.h"
 #include "ui_searchdialog.h"
 
 class SearchDialog : 

@@ -4,22 +4,24 @@
 #include <QStringList>
 #include <QItemDelegate>
 #include <QSignalMapper>
+#include "../../definations/resources.h"
 #include "../../interfaces/istatusicons.h"
+#include "../../utils/iconstorage.h"
 #include "../../utils/iconsetdelegate.h"
-#include "../../utils/skin.h"
 #include "ui_iconsoptionswidget.h"
 
 class IconsetSelectableDelegate :
   public IconsetDelegate
 {
 public:
-  IconsetSelectableDelegate(const QStringList &AIconFiles, QObject *AParent = NULL);
+  IconsetSelectableDelegate(const QString &AStorage, const QStringList &ASubStorages, QObject *AParent = NULL);
   virtual QWidget *createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
   virtual void setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const;
   virtual void setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
   virtual void updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 private:
-  QStringList FIconFiles;
+  QString FStorage;
+  QStringList FSubStorages;
 };
 
 
@@ -27,21 +29,21 @@ class IconsOptionsWidget :
   public QWidget
 {
   Q_OBJECT;
-
 public:
   IconsOptionsWidget(IStatusIcons *AStatusIcons);
   void apply();
 protected:
-  void populateRulesTable(QTableWidget *ATable, const QStringList &AIconFiles, IStatusIcons::RuleType ARuleType);
+  void populateRulesTable(QTableWidget *ATable, IStatusIcons::RuleType ARuleType);
 protected slots:
   void onAddUserRule();
   void onDeleteUserRule();
+  void onDefaultListItemChanged(QListWidgetItem *AItem);
 private:
   Ui::IconsOptionsWidgetClass ui;
 private:
   IStatusIcons *FStatusIcons;
 private:
-  QStringList FIconFiles;
+  QStringList FSubStorages;
 };
 
 #endif // ICONSOPTIONSWIDGET_H

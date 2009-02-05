@@ -9,6 +9,8 @@
 #include "../../definations/optionorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/sessionnegotiatororder.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessagearchiver.h"
 #include "../../interfaces/imessenger.h"

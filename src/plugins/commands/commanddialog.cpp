@@ -2,14 +2,12 @@
 
 #include <QMessageBox>
 
-#define IN_COMMAND    "psi/command"
-
 CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid ACommandJid, 
                              const QString &ANode, QWidget *AParent)  : QDialog(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_COMMAND));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_COMMANDS,0,0,"windowIcon");
 
   ui.wdtForm->setLayout(new QVBoxLayout);
   ui.wdtForm->layout()->setMargin(0);

@@ -8,12 +8,13 @@
 #include <QWidget>
 #include "../../definations/actiongroups.h"
 #include "../../definations/commandline.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/imainwindow.h"
 #include "../../interfaces/itraymanager.h"
 #include "../../utils/action.h"
-#include "../../utils/skin.h"
 #include "settings.h"
 #include "optionsdialog.h"
 #include "profiledialog.h"
@@ -56,7 +57,7 @@ public:
     //OptionsDialog
   virtual void insertOptionsHolder(IOptionsHolder *AOptionsHolder);
   virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder);
-  virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QIcon &AIcon);
+  virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIconKey);
   virtual void closeOptionsNode(const QString &ANode);
   virtual QDialog *openOptionsDialog(const QString &ANode = "", QWidget *AParent = NULL);
 signals:
@@ -90,13 +91,11 @@ protected slots:
   void onOptionsDialogRejected();
   void onOptionsDialogClosed();
   void onPluginManagerQuit();
-  void onSystemIconsetChanged();
 private:
   IPluginManager *FPluginManager;
   IMainWindowPlugin *FMainWindowPlugin;
   ITrayManager *FTrayManager;
 private:
-  SkinIconset *FSystemIconset;
   Action *FOpenOptionsDialogAction;
   Action *FOpenProfileDialogAction;
   Menu *FProfileMenu;
@@ -109,7 +108,7 @@ private:
   QDomDocument FSettings;
 private:
   struct OptionsNode {
-    QIcon icon;
+    QString icon;
     QString name;
     QString desc;
   };

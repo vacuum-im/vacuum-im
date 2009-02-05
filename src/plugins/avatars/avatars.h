@@ -11,6 +11,8 @@
 #include "../../definations/tooltiporders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iavatars.h"
 #include "../../interfaces/ixmppstreams.h"

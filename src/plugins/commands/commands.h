@@ -3,6 +3,8 @@
 
 #include "../../definations/namespaces.h"
 #include "../../definations/discofeatureorder.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/icommands.h"
 #include "../../interfaces/idataforms.h"

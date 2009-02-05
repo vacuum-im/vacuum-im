@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include "../../definations/multiuserdataroles.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/isettings.h"

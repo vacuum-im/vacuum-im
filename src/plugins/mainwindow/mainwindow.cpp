@@ -1,7 +1,4 @@
-#include <QtDebug>
 #include "mainwindow.h"
-
-#define IN_JABBER "psi/jabber"
 
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags):IMainWindow(AParent,AFlags)
 {
@@ -78,7 +75,7 @@ void MainWindow::createMenus()
 {
   FMainMenu = new Menu(this);
   FMainMenu->setTitle(tr("Menu"));
-  FMainMenu->setIcon(SYSTEM_ICONSETFILE,IN_JABBER);
+  FMainMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_MENU);
   QToolButton *button = FBottomToolBarChanger->addToolButton(FMainMenu->menuAction(),AG_DEFAULT,false);
   button->setPopupMode(QToolButton::InstantPopup);
 }

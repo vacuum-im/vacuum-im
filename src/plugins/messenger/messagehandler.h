@@ -5,7 +5,9 @@
 #include "../../definations/notificationdataroles.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/vcardvaluenames.h"
-#include "../../definations/soundnames.h"
+#include "../../definations/soundfiles.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/inotifications.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/istatusicons.h"
@@ -13,7 +15,6 @@
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/imessagearchiver.h"
 #include "../../interfaces/ivcard.h"
-#include "../../utils/skin.h"
 
 class MessageHandler : 
   public QObject,
