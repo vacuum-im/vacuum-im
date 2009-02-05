@@ -504,7 +504,7 @@ void MultiUserChatWindow::createRoomUtilsActions()
 
   FInviteMenu = new Menu(FRoomUtilsMenu);
   FInviteMenu->setTitle(tr("Invite to"));
-  FInviteMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_MESSAGE);
+  FInviteMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
   FRoomUtilsMenu->addAction(FInviteMenu->menuAction(),AG_MULTIUSERCHAT_ROOM_UTILS,false);
 
   FSetRoleNode = new Action(FRoomUtilsMenu);

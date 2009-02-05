@@ -47,7 +47,7 @@
 #define MNI_GATEWAYS_ADD_CONTACT        "gatewaysAddContact"
 #define MNI_GATEWAYS_LOG_IN             "gatewaysLogin"
 #define MNI_GATEWAYS_LOG_OUT            "gatewaysLogout"
-#define MNI_GATEWAYS_KEEP_CONNECTION    "gatewaysKeppConnection"
+#define MNI_GATEWAYS_KEEP_CONNECTION    "gatewaysKeepConnection"
 #define MNI_GATEWAYS_CHANGE             "gatewaysChange"
 #define MNI_GATEWAYS_RESOLVE            "gatewaysResolve"
 

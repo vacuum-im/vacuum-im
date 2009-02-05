@@ -118,8 +118,8 @@
     <object mime="image/png">gatewayslogout.png</object>
   </icon>
   <icon>
-    <key>gatewaysKeppConnection</key>
-    <object mime="image/png">gatewayskeppconnection.png</object>
+    <key>gatewaysKeepConnection</key>
+    <object mime="image/png">gatewayskeepconnection.png</object>
   </icon>
   <icon>
     <key>gatewaysChange</key>
@@ -132,7 +132,7 @@
   <!--JabberSearch-->
   <icon>
     <key>jsearch</key>
-    <object mime="image/png">search.png</object>
+    <object mime="image/png">jsearch.png</object>
   </icon>
   <!--MainWindow-->
   <icon>

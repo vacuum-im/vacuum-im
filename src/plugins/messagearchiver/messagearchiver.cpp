@@ -1948,7 +1948,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodAuto == ARCHIVE_METHOD_CONCEDE);
         action->setText(methodName(ARCHIVE_METHOD_CONCEDE));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_CONCEDE);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         autoMenu->addAction(action,AG_DEFAULT,false);
 
@@ -1958,7 +1957,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodAuto == ARCHIVE_METHOD_FORBID);
         action->setText(methodName(ARCHIVE_METHOD_FORBID));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_FORBID);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         autoMenu->addAction(action,AG_DEFAULT,false);
 
@@ -1968,7 +1966,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodAuto == ARCHIVE_METHOD_PREFER);
         action->setText(methodName(ARCHIVE_METHOD_PREFER));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_PREFER);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         autoMenu->addAction(action,AG_DEFAULT,false);
       menu->addAction(autoMenu->menuAction(),AG_DEFAULT+500,false);
@@ -1982,7 +1979,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodManual == ARCHIVE_METHOD_CONCEDE);
         action->setText(methodName(ARCHIVE_METHOD_CONCEDE));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_CONCEDE);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         manualMenu->addAction(action,AG_DEFAULT,false);
 
@@ -1992,7 +1988,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodManual == ARCHIVE_METHOD_FORBID);
         action->setText(methodName(ARCHIVE_METHOD_FORBID));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_FORBID);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         manualMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2002,7 +1997,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodManual == ARCHIVE_METHOD_PREFER);
         action->setText(methodName(ARCHIVE_METHOD_PREFER));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_PREFER);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         manualMenu->addAction(action,AG_DEFAULT,false);
       menu->addAction(manualMenu->menuAction(),AG_DEFAULT+500,false);
@@ -2016,7 +2010,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodLocal == ARCHIVE_METHOD_CONCEDE);
         action->setText(methodName(ARCHIVE_METHOD_CONCEDE));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_CONCEDE);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         localMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2026,7 +2019,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodLocal == ARCHIVE_METHOD_FORBID);
         action->setText(methodName(ARCHIVE_METHOD_FORBID));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_FORBID);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         localMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2036,7 +2028,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodLocal == ARCHIVE_METHOD_PREFER);
         action->setText(methodName(ARCHIVE_METHOD_PREFER));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_PREFER);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         localMenu->addAction(action,AG_DEFAULT,false);
       menu->addAction(localMenu->menuAction(),AG_DEFAULT+500,false);
@@ -2115,7 +2106,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
 
     Menu *saveMenu = new Menu(menu);
     saveMenu->setTitle(tr("Set Save mode"));
-    saveMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_SAVE_MODE);
       action = new Action(saveMenu);
       action->setData(ADR_STREAM_JID,AStreamJid.full());
       action->setData(ADR_CONTACT_JID,AContactJid.full());
