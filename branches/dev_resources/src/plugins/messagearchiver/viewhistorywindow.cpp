@@ -718,8 +718,9 @@ void ViewHistoryWindow::rebuildModel()
 void ViewHistoryWindow::createGroupKindMenu()
 {
   FGroupKindMenu = new Menu(this);
-  FGroupKindMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_GROUPS);
   FGroupKindMenu->setTitle(tr("Groups"));
+  FGroupKindMenu->setToolTip(tr("Grouping type"));
+  FGroupKindMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_GROUPS);
 
   Action *action = new Action(FGroupKindMenu);
   action->setCheckable(true);
@@ -768,7 +769,7 @@ void ViewHistoryWindow::createGroupKindMenu()
   FGroupKindMenu->addAction(action,AG_DEFAULT+100);
 
   QToolButton *button = FGroupsTools->addToolButton(FGroupKindMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
-  button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  //button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   button->setPopupMode(QToolButton::InstantPopup);
 }
 
@@ -776,6 +777,8 @@ void ViewHistoryWindow::createSourceMenu()
 {
   FSourceMenu = new Menu(this);
   FSourceMenu->setTitle(tr("Source"));
+  FSourceMenu->setToolTip(tr("History source"));
+  FSourceMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_SOURCE);
 
   Action *action = new Action(FSourceMenu);
   action->setCheckable(true);
@@ -800,7 +803,7 @@ void ViewHistoryWindow::createSourceMenu()
   FSourceMenu->addAction(action);
 
   QToolButton *button = FGroupsTools->addToolButton(FSourceMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
-  button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  //button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   button->setPopupMode(QToolButton::InstantPopup);
 
   FSourceMenu->setEnabled(FArchiver->isSupported(FStreamJid));

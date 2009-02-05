@@ -185,52 +185,12 @@
     <object mime="image/png">historyview.png</object>
   </icon>
   <icon>
-    <key>historyOTRMode</key>
-    <object mime="image/png">historyotrmode.png</object>
-  </icon>
-  <icon>
-    <key>historyOTRApprove</key>
-    <object mime="image/png">historyapprove.png</object>
-  </icon>
-  <icon>
-    <key>historyOTRConcede</key>
-    <object mime="image/png">historyconcede.png</object>
-  </icon>
-  <icon>
-    <key>historyOTRForbid</key>
-    <object mime="image/png">historyforbid.png</object>
-  </icon>
-  <icon>
-    <key>historyOTROppose</key>
-    <object mime="image/png">historyoppose.png</object>
-  </icon>
-  <icon>
-    <key>historyOTRPrefere</key>
-    <object mime="image/png">historyprefere.png</object>
-  </icon>
-  <icon>
-    <key>historyOTRRequire</key>
-    <object mime="image/png">historyrequire.png</object>
-  </icon>
-  <icon>
-    <key>historySaveMode</key>
-    <object mime="image/png">historysavemode.png</object>
-  </icon>
-  <icon>
-    <key>historySaveFalse</key>
-    <object mime="image/png">historysavefalse.png</object>
-  </icon>
-  <icon>
-    <key>historySaveBody</key>
-    <object mime="image/png">historysavebody.png</object>
-  </icon>
-  <icon>
-    <key>historySaveMessage</key>
-    <object mime="image/png">historysavemessage.png</object>
-  </icon>
-  <icon>
     <key>historyGroups</key>
     <object mime="image/png">historygroups.png</object>
+  </icon>
+  <icon>
+    <key>historySource</key>
+    <object mime="image/png">historysource.png</object>
   </icon>
   <icon>
     <key>historyFilter</key>
@@ -480,7 +440,7 @@
   </icon>
   <!--RosterView-->
   <icon>
-    <key>rosterviewoptions</key>
+    <key>rosterviewOptions</key>
     <object mime="image/png">rosterviewoptions.png</object>
   </icon>
   <icon>

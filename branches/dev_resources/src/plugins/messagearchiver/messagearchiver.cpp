@@ -1896,7 +1896,7 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
   if (FSettingsPlugin && account)
   {
     QString node = ON_HISTORY"::"+account->accountId();
-    FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),QString());
+    FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),MNI_HISTORY);
   }
 }
 
@@ -2044,7 +2044,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
 
     Menu *otrMenu = new Menu(menu);
     otrMenu->setTitle(tr("Set OTR mode"));
-    otrMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_MODE);
       action = new Action(otrMenu);
       action->setData(ADR_STREAM_JID,AStreamJid.full());
       action->setData(ADR_CONTACT_JID,AContactJid.full());
@@ -2053,7 +2052,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       action->setCheckable(true);
       action->setChecked(itemPrefs.otr == ARCHIVE_OTR_APPROVE);
       action->setText(otrModeName(ARCHIVE_OTR_APPROVE));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_APPROVE);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsAction(bool)));
       otrMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2065,7 +2063,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       action->setCheckable(true);
       action->setChecked(itemPrefs.otr == ARCHIVE_OTR_CONCEDE);
       action->setText(otrModeName(ARCHIVE_OTR_CONCEDE));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_CONCEDE);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsAction(bool)));
       otrMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2078,7 +2075,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       action->setChecked(itemPrefs.otr == ARCHIVE_OTR_FORBID);
       action->setEnabled(!isOTRStanzaSession(AStreamJid,AContactJid));
       action->setText(otrModeName(ARCHIVE_OTR_FORBID));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_FORBID);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsAction(bool)));
       otrMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2090,7 +2086,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       action->setCheckable(true);
       action->setChecked(itemPrefs.otr == ARCHIVE_OTR_OPPOSE);
       action->setText(otrModeName(ARCHIVE_OTR_OPPOSE));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_OPPOSE);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsAction(bool)));
       otrMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2102,7 +2097,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       action->setCheckable(true);
       action->setChecked(itemPrefs.otr == ARCHIVE_OTR_PREFER);
       action->setText(otrModeName(ARCHIVE_OTR_PREFER));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_PREFER);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsAction(bool)));
       otrMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2115,7 +2109,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       action->setChecked(itemPrefs.otr == ARCHIVE_OTR_REQUIRE);
       action->setEnabled(!hasStanzaSession(AStreamJid,AContactJid) || isOTRStanzaSession(AStreamJid,AContactJid));
       action->setText(otrModeName(ARCHIVE_OTR_REQUIRE));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_REQUIRE);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsAction(bool)));
       otrMenu->addAction(action,AG_DEFAULT,false);
     menu->addAction(otrMenu->menuAction(),AG_DEFAULT+500,false);
@@ -2131,7 +2124,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       action->setCheckable(true);
       action->setChecked(itemPrefs.save == ARCHIVE_SAVE_FALSE);
       action->setText(saveModeName(ARCHIVE_SAVE_FALSE));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_SAVE_FALSE);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsAction(bool)));
       saveMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2144,7 +2136,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       action->setChecked(itemPrefs.save == ARCHIVE_SAVE_BODY);
       action->setEnabled(!isOTRStanzaSession(AStreamJid,AContactJid));
       action->setText(saveModeName(ARCHIVE_SAVE_BODY));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_SAVE_BODY);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsAction(bool)));
       saveMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2157,7 +2148,6 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       action->setChecked(itemPrefs.save == ARCHIVE_SAVE_MESSAGE);
       action->setEnabled(!isOTRStanzaSession(AStreamJid,AContactJid));
       action->setText(saveModeName(ARCHIVE_SAVE_MESSAGE));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_SAVE_MESSAGE);
       connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsAction(bool)));
       saveMenu->addAction(action,AG_DEFAULT,false);
     saveMenu->setEnabled(itemPrefs.otr!=ARCHIVE_OTR_REQUIRE);
@@ -2492,7 +2482,7 @@ void MessageArchiver::onShowArchiveWindowAction(bool)
   }
 }
 
-void MessageArchiver::onOpenHistoryOptionsAction( bool )
+void MessageArchiver::onOpenHistoryOptionsAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (FSettingsPlugin && FAccountManager && action)
@@ -2504,7 +2494,7 @@ void MessageArchiver::onOpenHistoryOptionsAction( bool )
   }
 }
 
-void MessageArchiver::onRemoveItemPrefsAction( bool )
+void MessageArchiver::onRemoveItemPrefsAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)

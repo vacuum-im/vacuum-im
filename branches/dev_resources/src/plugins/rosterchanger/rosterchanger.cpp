@@ -530,7 +530,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
           Menu *moveItem = createGroupMenu(data,exceptGroups,true,false,SLOT(onMoveItemToGroup(bool)),AMenu);
           moveItem->setTitle(tr("Move to group"));
-          copyItem->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MOVE_GROUP);
+          moveItem->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MOVE_GROUP);
           AMenu->addAction(moveItem->menuAction(),AG_ROSTERCHANGER_ROSTER);
         }
 

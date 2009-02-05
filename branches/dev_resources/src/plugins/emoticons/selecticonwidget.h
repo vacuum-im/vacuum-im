@@ -16,7 +16,7 @@ public:
   ~SelectIconWidget();
   QString iconset() const { return FStorage->subStorage(); }
 signals:
-  virtual void iconSelected(const QString &ASubStorage, const QString &AIconKey);
+  void iconSelected(const QString &ASubStorage, const QString &AIconKey);
 protected:
   void createLabels();
 protected:
