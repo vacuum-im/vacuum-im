@@ -16,8 +16,6 @@
 #define ADR_CONTACT_JID               Action::DR_Parametr2
 #define ADR_SESSION_FIELD             Action::DR_Parametr3
 
-#define IN_SESSION                    "psi/smile"
-
 #define NOTIFICATOR_ID                "SessionNegotiation"
 
 SessionNegotiation::SessionNegotiation()
@@ -225,7 +223,6 @@ Action *SessionNegotiation::createDiscoFeatureAction(const Jid &AStreamJid, cons
   if (AFeature == NS_STANZA_SESSION)
   {
     Action *action = new Action(AParent);
-    action->setIcon(SYSTEM_ICONSETFILE,IN_SESSION);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
     connect(action,SIGNAL(triggered(bool)),SLOT(onSessionActionTriggered(bool)));
@@ -237,11 +234,13 @@ Action *SessionNegotiation::createDiscoFeatureAction(const Jid &AStreamJid, cons
     {
       action->setData(ADR_SESSION_FIELD,SESSION_FIELD_ACCEPT);
       action->setText(tr("Negotiate Session"));
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_SNEGOTIATION_INIT);
     }
     else
     {
       action->setData(ADR_SESSION_FIELD,SESSION_FIELD_TERMINATE);
       action->setText(tr("Terminate Session"));
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_SNEGOTIATION_TERMINATE);
     }
     return action;
   }
@@ -840,7 +839,7 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
     if (!dialog)
     {
       dialog = FDataForms->dialogWidget(ARequest,NULL);
-      dialog->instance()->setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SESSION));
+      IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(dialog->instance(),MNI_SNEGOTIATION,0,0,"windowIcon");
       dialog->dialogButtons()->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
       connect(dialog->instance(),SIGNAL(accepted()),SLOT(onAcceptDialogAccepted()));
       connect(dialog->instance(),SIGNAL(rejected()),SLOT(onAcceptDialogRejected()));
@@ -854,12 +853,13 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
     {
       INotification notify;
       notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
-      notify.data.insert(NDR_ICON,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SESSION));
+      notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SNEGOTIATION));
       notify.data.insert(NDR_TOOLTIP,tr("Session negotiation - %1").arg(ASession.contactJid.full()));
       notify.data.insert(NDR_WINDOW_CAPTION,tr("Session negotiation"));
       notify.data.insert(NDR_WINDOW_TITLE,FNotifications->contactName(ASession.streamJid,ASession.contactJid));
       notify.data.insert(NDR_WINDOW_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
       notify.data.insert(NDR_WINDOW_TEXT, notify.data.value(NDR_TOOLTIP));
+      notify.data.insert(NDR_SOUND_FILE, notify.data.value(NDR_TOOLTIP));
       int notifyId = FNotifications->appendNotification(notify);
       FDialogByNotify.insert(notifyId,dialog);
     }
@@ -910,7 +910,7 @@ void SessionNegotiation::registerDiscoFeatures()
 {
   IDiscoFeature dfeature;
   dfeature.active = true;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SESSION);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SNEGOTIATION);
   dfeature.var = NS_STANZA_SESSION;
   dfeature.name = tr("Session Negotiation");
   dfeature.description = tr("Negotiate the exchange of XML stanzas between two XMPP entities");

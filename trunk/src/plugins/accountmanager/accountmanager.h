@@ -7,6 +7,8 @@
 #include "../../definations/optionorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/accountvaluenames.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"

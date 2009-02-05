@@ -4,7 +4,10 @@
 #include <QPointer>
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/iroster.h"
@@ -12,7 +15,6 @@
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/isettings.h"
-#include "../../utils/skin.h"
 #include "../../utils/action.h"
 #include "rostersview.h"
 #include "indexdataholder.h"

@@ -7,6 +7,8 @@
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
 #include "../../definations/dataformtypes.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iregistraton.h"
 #include "../../interfaces/idataforms.h"

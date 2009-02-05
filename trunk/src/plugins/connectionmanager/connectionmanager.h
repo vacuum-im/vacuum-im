@@ -6,13 +6,14 @@
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iconnectionmanager.h"
 #include "../../interfaces/idefaultconnection.h"
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/isettings.h"
-#include "../../utils/skin.h"
 #include "connectionoptionswidget.h"
 
 class ConnectionManager :

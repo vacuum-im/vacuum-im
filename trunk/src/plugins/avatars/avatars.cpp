@@ -22,7 +22,6 @@
 #define SVN_CUSTOM_AVATAR_HASH    SVN_CUSTOM_AVATARS":hash[]"
 
 #define IFN_EMPTY_AVATAR          "logo_32.png"
-#define IN_AVATAR                 "psi/show_self"
 
 #define AVATAR_IMAGE_TYPE         "jpeg"
 #define AVATAR_IQ_TIMEOUT         30000
@@ -595,17 +594,19 @@ void Avatars::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   {
     Menu *avatar = new Menu(AMenu);
     avatar->setTitle(tr("Avatar"));
-    avatar->setIcon(SYSTEM_ICONSETFILE,IN_AVATAR);
+    avatar->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CHANGE);
 
     Jid streamJid = AIndex->data(RDR_StreamJid).toString();
     Action *setup = new Action(avatar);
     setup->setText(tr("Set avatar"));
+    setup->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_SET);
     setup->setData(ADR_STREAM_JID,streamJid.full());
     connect(setup,SIGNAL(triggered(bool)),SLOT(onSetAvatarByAction(bool)));
     avatar->addAction(setup,AG_DEFAULT,false);
 
     Action *clear = new Action(avatar);
     clear->setText(tr("Clear avatar"));
+    clear->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_REMOVE);
     clear->setData(ADR_STREAM_JID,streamJid.full());
     clear->setEnabled(!FStreamAvatars.value(streamJid).isEmpty());
     connect(clear,SIGNAL(triggered(bool)),SLOT(onClearAvatarByAction(bool)));
@@ -617,17 +618,19 @@ void Avatars::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   {
     Menu *picture = new Menu(AMenu);
     picture->setTitle(tr("Custom picture"));
-    picture->setIcon(SYSTEM_ICONSETFILE,IN_AVATAR);
+    picture->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CHANGE);
 
     Jid contactJid = AIndex->data(RDR_Jid).toString();
     Action *setup = new Action(picture);
     setup->setText(tr("Set custom picture"));
+    setup->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CUSTOM);
     setup->setData(ADR_CONTACT_JID,contactJid.bare());
     connect(setup,SIGNAL(triggered(bool)),SLOT(onSetAvatarByAction(bool)));
     picture->addAction(setup,AG_DEFAULT,false);
 
     Action *clear = new Action(picture);
     clear->setText(tr("Clear custom picture"));
+    clear->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_REMOVE);
     clear->setData(ADR_CONTACT_JID,contactJid.bare());
     clear->setEnabled(FCustomPictures.contains(contactJid.bare()));
     connect(clear,SIGNAL(triggered(bool)),SLOT(onClearAvatarByAction(bool)));

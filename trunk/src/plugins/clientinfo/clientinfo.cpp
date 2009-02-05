@@ -22,8 +22,6 @@
 #define FORM_FIELD_OS                   "os"
 #define FORM_FIELD_OS_VERSION           "os_version"
 
-#define IN_CLIENTINFO                   "psi/help"
-
 ClientInfo::ClientInfo()
 {
   FRosterPlugin = NULL;
@@ -730,7 +728,7 @@ Action *ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJ
   {
     Action *action = new Action(AParent);
     action->setText(tr("Software version"));
-    action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_VERSION);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_CONTACT_JID,AContactJid.full());
     action->setData(ADR_INFO_TYPES,IClientInfo::SoftwareVersion);
@@ -741,7 +739,7 @@ Action *ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJ
   {
     Action *action = new Action(AParent);
     action->setText(tr("Last activity"));
-    action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_ACTIVITY);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_CONTACT_JID,AContactJid.full());
     action->setData(ADR_INFO_TYPES,IClientInfo::LastActivity);
@@ -752,7 +750,7 @@ Action *ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJ
   {
     Action *action = new Action(AParent);
     action->setText(tr("Entity time"));
-    action->setIcon(SYSTEM_ICONSETFILE,IN_CLIENTINFO);
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_TIME);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_CONTACT_JID,AContactJid.full());
     action->setData(ADR_INFO_TYPES,IClientInfo::EntityTime);
@@ -774,21 +772,21 @@ void ClientInfo::registerDiscoFeatures()
   IDiscoFeature dfeature;
 
   dfeature.active = true;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CLIENTINFO);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CLIENTINFO_VERSION);
   dfeature.var = NS_JABBER_VERSION;
   dfeature.name = tr("Software version");
   dfeature.description = tr("Request contacts software version");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = false;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CLIENTINFO);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CLIENTINFO_ACTIVITY);
   dfeature.var = NS_JABBER_LAST;
   dfeature.name = tr("Last activity");
   dfeature.description = tr("Request contacts last activity");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = true;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_CLIENTINFO);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CLIENTINFO_TIME);
   dfeature.var = NS_XMPP_TIME;
   dfeature.name = tr("Entity time");
   dfeature.description = tr("Request the local time of an entity");

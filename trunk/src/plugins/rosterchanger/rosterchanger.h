@@ -11,6 +11,9 @@
 #include "../../definations/notificationdataroles.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
+#include "../../definations/soundfiles.h"
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"
@@ -22,7 +25,6 @@
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/inotifications.h"
 #include "../../interfaces/isettings.h"
-#include "../../utils/skin.h"
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
 #include "subscriptionoptions.h"
@@ -76,7 +78,7 @@ signals:
   virtual void optionsRejected();
 protected:
   QString subscriptionNotify(int ASubsType, const Jid &AContactJid) const;
-  Menu *createGroupMenu(const QHash<int,QVariant> AData, const QSet<QString> &AExceptGroups, 
+  Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups, 
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
   SubscriptionDialog *subscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const;
   SubscriptionDialog *createSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage);

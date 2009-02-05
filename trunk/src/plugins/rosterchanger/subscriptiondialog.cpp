@@ -6,6 +6,7 @@ SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginMa
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Subscription request - %1").arg(AStreamJid.bare()));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_SUBSCR,0,0,"windowIcon");
 
   FRoster = NULL;
   FVcardPlugin = NULL;
@@ -59,12 +60,14 @@ void SubscriptionDialog::initialize(IPluginManager *APluginManager)
       FShowChat = new Action(FToolBarChanger->toolBar());
       FShowChat->setText(tr("Chat"));
       FShowChat->setToolTip(tr("Open chat window"));
+      FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_CHAT);
       FToolBarChanger->addAction(FShowChat,AG_SRDT_ROSTERCHANGER_ACTIONS);
       connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
       FSendMessage = new Action(FToolBarChanger->toolBar());
       FSendMessage->setText(tr("Message"));
       FSendMessage->setToolTip(tr("Send Message"));
+      FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_NORMAL);
       FToolBarChanger->addAction(FSendMessage,AG_SRDT_ROSTERCHANGER_ACTIONS);
       connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
     }
@@ -79,6 +82,7 @@ void SubscriptionDialog::initialize(IPluginManager *APluginManager)
       FShowVCard = new Action(FToolBarChanger->toolBar());
       FShowVCard->setText(tr("VCard"));
       FShowVCard->setToolTip(tr("Show VCard"));
+      FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
       FToolBarChanger->addAction(FShowVCard,AG_SRDT_ROSTERCHANGER_ACTIONS);
       connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
     }

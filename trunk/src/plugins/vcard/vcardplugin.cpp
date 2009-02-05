@@ -9,8 +9,6 @@
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
-#define IN_VCARD                  "psi/vCard"
-
 VCardPlugin::VCardPlugin()
 {
   FXmppStreams = NULL;
@@ -281,7 +279,7 @@ void VCardPlugin::registerDiscoFeatures()
   IDiscoFeature dfeature;
 
   dfeature.active = false;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_VCARD);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_VCARD);
   dfeature.var = NS_VCARD_TEMP;
   dfeature.name = tr("vCard");
   dfeature.actionName = tr("vCard");
@@ -295,7 +293,7 @@ void VCardPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   {
     Action *action = new Action(AMenu);
     action->setText(tr("vCard"));
-    action->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
     action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
     action->setData(ADR_CONTACT_JID,Jid(AIndex->data(RDR_Jid).toString()).bare());
     AMenu->addAction(action,AG_VCARD_ROSTER,true);
@@ -307,7 +305,7 @@ void VCardPlugin::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMu
 {
   Action *action = new Action(AMenu);
   action->setText(tr("vCard"));
-  action->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
   action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAMJID));
   if (!AUser->data(MUDR_REALJID).toString().isEmpty())
     action->setData(ADR_CONTACT_JID,Jid(AUser->data(MUDR_REALJID).toString()).bare());

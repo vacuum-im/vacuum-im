@@ -5,12 +5,14 @@ Menu::Menu(QWidget *AParent)
   : QMenu(AParent)
 {
   FMenuAction = NULL;
-  FIconset = NULL;
+  FIconStorage = NULL;
   setSeparatorsCollapsible(true);
 }
 
 Menu::~Menu()
 {
+  if (FIconStorage)
+    FIconStorage->removeAutoIcon(this);
   emit menuDestroyed(this);
 }
 
@@ -18,7 +20,7 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 {
   QAction *befour = NULL;
   QAction *separator = NULL;
-  ActionList::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
+  QMultiMap<int,Action *>::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
   if (it != FActions.end())
   {
     if (FActions.values(it.key()).count() == 1)
@@ -106,30 +108,23 @@ Action *Menu::menuAction()
 
 void Menu::setIcon(const QIcon &AIcon)
 {
-  if (FIconset)
-  {
-    disconnect(FIconset,SIGNAL(iconsetChanged()),this,SLOT(onIconsetChanged()));
-    FIconName.clear();
-    FIconset = NULL;
-  }
-  QMenu::setIcon(AIcon);
-  
   if (FMenuAction)
     FMenuAction->setIcon(AIcon);
+  QMenu::setIcon(AIcon);
 }
 
-void Menu::setIcon(const QString &AIconsetFile, const QString &AIconName)
+void Menu::setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex)
 {
-  FIconName = AIconName;
-
-  if (FIconset)
-    disconnect(FIconset,SIGNAL(iconsetChanged()),this,SLOT(onIconsetChanged()));
-  FIconset = Skin::getSkinIconset(AIconsetFile);
-  connect(FIconset,SIGNAL(iconsetChanged()),SLOT(onIconsetChanged()));
-  QMenu::setIcon(FIconset->iconByName(AIconName));
-  
-  if (FMenuAction)
-    FMenuAction->setIcon(AIconsetFile,AIconName);
+  if (!AStorageName.isEmpty() && !AIconKey.isEmpty())
+  {
+    FIconStorage = IconStorage::staticStorage(AStorageName);
+    FIconStorage->insertAutoIcon(this,AIconKey,AIconIndex);
+  }
+  else if (FIconStorage)
+  {
+    FIconStorage->removeAutoIcon(this);
+    FIconStorage = NULL;
+  }
 }
 
 void Menu::setTitle(const QString &ATitle)
@@ -141,7 +136,7 @@ void Menu::setTitle(const QString &ATitle)
 
 void Menu::removeAction(Action *AAction)
 {
-  ActionList::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
+  QMultiMap<int,Action *>::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
   if (it != FActions.end())
   {
     disconnect(AAction,SIGNAL(actionDestroyed(Action *)),this,SLOT(onActionDestroyed(Action *)));
@@ -169,7 +164,7 @@ void Menu::removeAction(Action *AAction)
 
 int Menu::actionGroup(const Action *AAction) const
 {
-  ActionList::const_iterator it = qFind(FActions.begin(),FActions.end(),AAction);
+  QMultiMap<int,Action *>::const_iterator it = qFind(FActions.begin(),FActions.end(),AAction);
   if (it != FActions.constEnd())
     return it.key();
   return AG_NULL;
@@ -177,7 +172,7 @@ int Menu::actionGroup(const Action *AAction) const
 
 QAction *Menu::nextGroupSeparator(int AGroup) const
 {
-  ActionList::const_iterator it = FActions.lowerBound(AGroup);
+  QMultiMap<int,Action *>::const_iterator it = FActions.lowerBound(AGroup);
   if (it != FActions.end())
     return FSeparators.value(it.key());
   return NULL;
@@ -220,9 +215,3 @@ void Menu::onActionDestroyed(Action *AAction)
 {
   removeAction(AAction);
 }
-
-void Menu::onIconsetChanged()
-{
-  QMenu::setIcon(FIconset->iconByName(FIconName));
-}
-

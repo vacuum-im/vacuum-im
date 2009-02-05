@@ -1,8 +1,5 @@
 #include "messagehandler.h"
 
-#define IN_NORMAL_MESSAGE                     "psi/sendMessage"
-#define IN_CHAT_MESSAGE                       "psi/start-chat"
-
 #define HISTORY_MESSAGES                      10
 
 #define CHAT_NOTIFICATOR_ID                   "ChatMessages"
@@ -67,8 +64,8 @@ bool MessageHandler::checkMessage(const Message &AMessage)
 
 INotification MessageHandler::notification(INotifications *ANotifications, const Message &AMessage)
 {
-  SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-  QIcon icon =  iconset->iconByName(AMessage.type() == Message::Chat ? IN_CHAT_MESSAGE : IN_NORMAL_MESSAGE);
+  IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
+  QIcon icon =  storage->getIcon(AMessage.type() == Message::Chat ? MNI_MESSENGER_CHAT : MNI_MESSENGER_NORMAL);
   QString name= ANotifications->contactName(AMessage.to(),AMessage.from());
 
   INotification notify;
@@ -82,8 +79,7 @@ INotification MessageHandler::notification(INotifications *ANotifications, const
   notify.data.insert(NDR_WINDOW_CAPTION, tr("Message received"));
   notify.data.insert(NDR_WINDOW_TITLE,name);
   notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
-  notify.data.insert(NDR_SOUNDSET_DIR_NAME,SSD_COMMON);
-  notify.data.insert(NDR_SOUND_NAME,SN_COMMON_MESSAGE);
+  notify.data.insert(NDR_SOUND_FILE,AMessage.type()==Message::Normal ? SDF_MESSENGER_NORMAL : SDF_MESSENGER_CHAT);
 
   return notify;
 }
@@ -250,10 +246,7 @@ void MessageHandler::updateMessageWindow(IMessageWindow *AWindow)
 {
   QIcon icon;
   if (FActiveNormalMessages.contains(AWindow))
-  {
-    SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-    icon = iconset->iconByName(IN_NORMAL_MESSAGE);
-  }
+    icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MESSENGER_NORMAL);
   else if (FStatusIcons)
     icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
   
@@ -359,10 +352,7 @@ void MessageHandler::updateChatWindow(IChatWindow *AWindow)
 {
   QIcon icon;
   if (FActiveChatMessages.contains(AWindow))
-  {
-    SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-    icon = iconset->iconByName(IN_CHAT_MESSAGE);
-  }
+    icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MESSENGER_CHAT);
   else if (FStatusIcons)
     icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
 

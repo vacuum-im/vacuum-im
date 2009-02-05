@@ -2,10 +2,8 @@
 
 #define REGISTRATION_TIMEOUT    30000
 
-#define IN_REGISTER             "psi/register"
-
 #define ADR_StreamJid           Action::DR_StreamJid
-#define ADR_ServiveJid          Action::DR_Parametr1
+#define ADR_ServiceJid          Action::DR_Parametr1
 #define ADR_Operation           Action::DR_Parametr2
 
 Registration::Registration()
@@ -199,28 +197,31 @@ Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
   {
     Menu *regMenu = new Menu(AParent);
     regMenu->setTitle(tr("Registration"));
-    regMenu->setIcon(SYSTEM_ICONSETFILE,IN_REGISTER);
+    regMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTERATION);
 
     Action *action = new Action(regMenu);
     action->setText(tr("Register"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTERATION);
     action->setData(ADR_StreamJid,AStreamJid.full());
-    action->setData(ADR_ServiveJid,ADiscoInfo.contactJid.full());
+    action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
     action->setData(ADR_Operation,IRegistration::Register);
     connect(action,SIGNAL(triggered(bool)),SLOT(onRegisterActionTriggered(bool)));
     regMenu->addAction(action,AG_DEFAULT,false);
 
     action = new Action(regMenu);
     action->setText(tr("Unregister"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTERATION_REMOVE);
     action->setData(ADR_StreamJid,AStreamJid.full());
-    action->setData(ADR_ServiveJid,ADiscoInfo.contactJid.full());
+    action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
     action->setData(ADR_Operation,IRegistration::Unregister);
     connect(action,SIGNAL(triggered(bool)),SLOT(onRegisterActionTriggered(bool)));
     regMenu->addAction(action,AG_DEFAULT,false);
 
     action = new Action(regMenu);
     action->setText(tr("Change password"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTERATION_CHANGE);
     action->setData(ADR_StreamJid,AStreamJid.full());
-    action->setData(ADR_ServiveJid,ADiscoInfo.contactJid.full());
+    action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
     action->setData(ADR_Operation,IRegistration::ChangePassword);
     connect(action,SIGNAL(triggered(bool)),SLOT(onRegisterActionTriggered(bool)));
     regMenu->addAction(action,AG_DEFAULT,false);
@@ -383,7 +384,7 @@ void Registration::registerDiscoFeatures()
 {
   IDiscoFeature dfeature;
   dfeature.active = false;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_REGISTER);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_REGISTERATION);
   dfeature.var = NS_JABBER_REGISTER;
   dfeature.name = tr("In-Band Registration");
   dfeature.description = tr("In-band registration with instant messaging servers and associated services");
@@ -396,7 +397,7 @@ void Registration::onRegisterActionTriggered(bool)
   if (action)
   {
     Jid streamJid = action->data(ADR_StreamJid).toString();
-    Jid serviceJid = action->data(ADR_ServiveJid).toString();
+    Jid serviceJid = action->data(ADR_ServiceJid).toString();
     int operation = action->data(ADR_Operation).toInt();
     showRegisterDialog(streamJid,serviceJid,operation,NULL);
   }

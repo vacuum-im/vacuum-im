@@ -1,9 +1,6 @@
 #ifndef ACTIONGROUPS_H
 #define ACTIONGROUPS_H
 
-#define AG_NULL                                                 -1
-#define AG_DEFAULT                                              500
-
 //MainWindow (MainMenu)
 #define AG_ROSTERCHANGER_MMENU                                  500
 #define AG_SETTINGS_MMENU                                       700
@@ -86,6 +83,7 @@
 #define AG_AWGT_ARCHIVE_GROUPING                                200
 #define AG_AWGT_ARCHIVE_DEFACTIONS                              300
 #define AG_AWGT_ARCHIVE_ACTIONS                                 500
+
 //ArchiveWindow - Messages Tools
 #define AG_AWMT_ARCHIVE_ACTIONS                                 500
 

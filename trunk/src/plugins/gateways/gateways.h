@@ -4,10 +4,13 @@
 #include <QSet>
 #include <QTimer>
 #include "../../definations/namespaces.h"
+#include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/discofeatureorder.h"
 #include "../../definations/vcardvaluenames.h"
 #include "../../definations/discotreeitemsdataroles.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/igateways.h"
 #include "../../interfaces/istanzaprocessor.h"

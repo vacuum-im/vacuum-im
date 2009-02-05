@@ -4,9 +4,10 @@
 #include <QDialog>
 #include <QPushButton>
 #include "../../definations/namespaces.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/icommands.h"
 #include "../../interfaces/idataforms.h"
-#include "../../utils/skin.h"
 #include "ui_commanddialog.h"
 
 class CommandDialog : 

@@ -11,8 +11,6 @@
 #define ADR_GROUP_NAME      Action::DR_Parametr2
 #define ADR_LISTNAME        Action::DR_Parametr3
 
-#define IN_PRIVACY          "psi/eye"
-
 QStringList PrivacyLists::FAutoLists = QStringList()
                                     << PRIVACY_LIST_VISIBLE
                                     << PRIVACY_LIST_CONFERENCES
@@ -107,7 +105,7 @@ bool PrivacyLists::initObjects()
   if (FRostersViewPlugin)
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    FRosterLabelId = FRostersView->createIndexLabel(RLO_PRIVACY,Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_PRIVACY));
+    FRosterLabelId = FRostersView->createIndexLabel(RLO_PRIVACY,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS));
     connect(FRostersView,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
@@ -817,7 +815,7 @@ Menu *PrivacyLists::createPrivacyMenu(Menu *AMenu) const
 {
   Menu *pmenu = new Menu(AMenu);
   pmenu->setTitle(tr("Privacy"));
-  pmenu->setIcon(SYSTEM_ICONSETFILE,IN_PRIVACY);
+  pmenu->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS);
   AMenu->addAction(pmenu->menuAction(),AG_PRIVACYLISTS_ROSTER,true);
   return pmenu;
 }
@@ -827,6 +825,7 @@ void PrivacyLists::createAutoPrivacyStreamActions(const Jid &AStreamJid, Menu *A
   QString activeListName = activeList(AStreamJid);
   Action *action = new Action(AMenu);
   action->setText(tr("Visible Mode"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_VISIBLE);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_LISTNAME,PRIVACY_LIST_AUTO_VISIBLE);
   action->setCheckable(true);
@@ -836,6 +835,7 @@ void PrivacyLists::createAutoPrivacyStreamActions(const Jid &AStreamJid, Menu *A
 
   action = new Action(AMenu);
   action->setText(tr("Invisible Mode"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_INVISIBLE);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_LISTNAME,PRIVACY_LIST_AUTO_INVISIBLE);
   action->setCheckable(true);
@@ -847,6 +847,7 @@ void PrivacyLists::createAutoPrivacyStreamActions(const Jid &AStreamJid, Menu *A
   {
     action = new Action(AMenu);
     action->setText(tr("Disable privacy lists"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_DISABLE);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_LISTNAME,"");
     connect(action,SIGNAL(triggered(bool)),SLOT(onSetAutoPrivacyByAction(bool)));
@@ -857,6 +858,7 @@ void PrivacyLists::createAutoPrivacyStreamActions(const Jid &AStreamJid, Menu *A
   {
     action = new Action(AMenu);
     action->setText(tr("Block off roster contacts"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_BLOCK);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_LISTNAME,PRIVACY_LIST_SUBSCRIPTION);
     action->setCheckable(true);
@@ -870,6 +872,7 @@ void PrivacyLists::createAutoPrivacyContactActions(const Jid &AStreamJid, const 
 {
   Action *action = new Action(AMenu);
   action->setText(tr("Visible to contact"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_VISIBLE);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_CONTACT_JID,AContactJid.prepared().eBare());
   action->setData(ADR_LISTNAME,PRIVACY_LIST_VISIBLE);
@@ -880,6 +883,7 @@ void PrivacyLists::createAutoPrivacyContactActions(const Jid &AStreamJid, const 
 
   action = new Action(AMenu);
   action->setText(tr("Invisible to contact"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_INVISIBLE);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_CONTACT_JID,AContactJid.prepared().eBare());
   action->setData(ADR_LISTNAME,PRIVACY_LIST_INVISIBLE);
@@ -890,6 +894,7 @@ void PrivacyLists::createAutoPrivacyContactActions(const Jid &AStreamJid, const 
 
   action = new Action(AMenu);
   action->setText(tr("Ignore contact"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_IGNORE);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_CONTACT_JID,AContactJid.prepared().eBare());
   action->setData(ADR_LISTNAME,PRIVACY_LIST_IGNORE);
@@ -903,6 +908,7 @@ void PrivacyLists::createAutoPrivacyGroupActions(const Jid &AStreamJid, const QS
 {
   Action *action = new Action(AMenu);
   action->setText(tr("Visible to group"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_VISIBLE);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_GROUP_NAME,AGroup);
   action->setData(ADR_LISTNAME,PRIVACY_LIST_VISIBLE);
@@ -913,6 +919,7 @@ void PrivacyLists::createAutoPrivacyGroupActions(const Jid &AStreamJid, const QS
 
   action = new Action(AMenu);
   action->setText(tr("Invisible to group"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_INVISIBLE);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_GROUP_NAME,AGroup);
   action->setData(ADR_LISTNAME,PRIVACY_LIST_INVISIBLE);
@@ -923,6 +930,7 @@ void PrivacyLists::createAutoPrivacyGroupActions(const Jid &AStreamJid, const QS
 
   action = new Action(AMenu);
   action->setText(tr("Ignore group"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_IGNORE);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_GROUP_NAME,AGroup);
   action->setData(ADR_LISTNAME,PRIVACY_LIST_IGNORE);
@@ -938,6 +946,7 @@ Menu *PrivacyLists::createSetActiveMenu(const Jid &AStreamJid, const QList<IPriv
 
   Menu *amenu = new Menu(AMenu);
   amenu->setTitle(tr("Set Active list"));
+  amenu->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_LIST);
 
   Action *action = new Action(amenu);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
@@ -969,6 +978,7 @@ Menu *PrivacyLists::createSetDefaultMenu(const Jid &AStreamJid, const QList<IPri
 
   Menu *dmenu = new Menu(AMenu);
   dmenu->setTitle(tr("Set Default list"));
+  dmenu->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_LIST);
 
   Action *action = new Action(dmenu);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
@@ -1239,6 +1249,7 @@ void PrivacyLists::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
       Action *action = new Action(AMenu);
       action->setText(tr("Advanced..."));
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_ADVANCED);
       action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowEditListsDialog(bool)));
       pmenu->addAction(action,AG_DEFAULT+400,false);

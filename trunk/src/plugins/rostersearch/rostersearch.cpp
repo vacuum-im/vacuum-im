@@ -1,7 +1,5 @@
 #include "rostersearch.h"
 
-#define IN_SEARCH   "psi/search"
-
 RosterSearch::RosterSearch()
 {
   FRostersView = NULL;
@@ -26,7 +24,7 @@ RosterSearch::RosterSearch()
   FSearchToolBarChanger->setSeparatorsVisible(false);
 
   FFieldsMenu = new Menu(searchToolBar);
-  FFieldsMenu->setIcon(SYSTEM_ICONSETFILE,IN_SEARCH);
+  FFieldsMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
   FSearchToolBarChanger->addAction(FFieldsMenu->menuAction());
 
   FSearchEdit = new QLineEdit(searchToolBar);
@@ -82,7 +80,7 @@ bool RosterSearch::initObjects()
   if (FMainWindow)
   {
     Action *searchAction = new Action(FMainWindow->topToolBarChanger());
-    searchAction->setIcon(SYSTEM_ICONSETFILE,IN_SEARCH);
+    searchAction->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
     searchAction->setToolTip(tr("Show search toolbar"));
     searchAction->setCheckable(true);
     connect(searchAction,SIGNAL(triggered(bool)),SLOT(onSearchActionTriggered(bool)));

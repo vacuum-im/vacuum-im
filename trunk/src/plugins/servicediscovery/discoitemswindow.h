@@ -5,7 +5,10 @@
 #include <QHeaderView>
 #include <QMainWindow>
 #include <QSortFilterProxyModel>
+#include "../../definations/actiongroups.h"
 #include "../../definations/discotreeitemsdataroles.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/ivcard.h"

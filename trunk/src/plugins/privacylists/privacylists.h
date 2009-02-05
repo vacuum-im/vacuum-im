@@ -8,6 +8,8 @@
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/tooltiporders.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iprivacylists.h"
 #include "../../interfaces/istanzaprocessor.h"

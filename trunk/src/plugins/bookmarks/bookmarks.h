@@ -4,6 +4,8 @@
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/accountvaluenames.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ibookmarks.h"
 #include "../../interfaces/iprivatestorage.h"
@@ -13,7 +15,6 @@
 #include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../utils/menu.h"
-#include "../../utils/skin.h"
 #include "editbookmarkdialog.h"
 #include "editbookmarksdialog.h"
 

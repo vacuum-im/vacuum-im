@@ -2,10 +2,8 @@
 
 #define SEARCH_TIMEOUT          30000
 
-#define IN_SEARCH               "psi/search"
-
 #define ADR_StreamJid           Action::DR_StreamJid
-#define ADR_ServiveJid          Action::DR_Parametr1
+#define ADR_ServiceJid          Action::DR_Parametr1
 
 JabberSearch::JabberSearch()
 {
@@ -183,9 +181,9 @@ Action *JabberSearch::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
   {
     Action *action = new Action(AParent);
     action->setText(tr("Search"));
-    action->setIcon(SYSTEM_ICONSETFILE,IN_SEARCH);
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_JSEARCH);
     action->setData(ADR_StreamJid,AStreamJid.full());
-    action->setData(ADR_ServiveJid,ADiscoInfo.contactJid.full());
+    action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
     connect(action,SIGNAL(triggered(bool)),SLOT(onSearchActionTriggered(bool)));
     return action;
   }
@@ -262,7 +260,7 @@ void JabberSearch::registerDiscoFeatures()
 {
   IDiscoFeature dfeature;
   dfeature.active = false;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_SEARCH);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_JSEARCH);
   dfeature.var = NS_JABBER_SEARCH;
   dfeature.name = tr("Jabber Search");
   dfeature.description = tr("Search information repositories on the Jabber network");
@@ -275,7 +273,7 @@ void JabberSearch::onSearchActionTriggered(bool)
   if (action)
   {
     Jid streamJid = action->data(ADR_StreamJid).toString();
-    Jid serviceJid = action->data(ADR_ServiveJid).toString();
+    Jid serviceJid = action->data(ADR_ServiceJid).toString();
     showSearchDialog(streamJid,serviceJid,NULL);
   }
 }

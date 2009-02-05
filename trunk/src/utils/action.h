@@ -1,12 +1,12 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include <QAction>
 #include <QHash>
+#include <QAction>
 #include <QVariant>
 #include "utilsexport.h"
 #include "menu.h"
-#include "skin.h"
+#include "iconstorage.h"
 
 class Menu;
 
@@ -23,32 +23,27 @@ public:
     DR_StreamJid,
     DR_SortString,
     DR_UserDefined = 64,
-    DR_UserDynamic = DR_UserDefined + 1048576 
   }; 
 public:
   Action(QObject *AParent = NULL);
   ~Action();
   //QAction
   Menu *menu() const { return FMenu; }
-  void setIcon(const QIcon &AIcon);
-  void setIcon(const QString &AIconsetFile, const QString &AIconName);
   void setMenu(Menu *AMenu);
+  void setIcon(const QIcon &AIcon);
+  void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);
   //Action
+  QVariant data(int ARole) const;
   void setData(int ARole, const QVariant &AData);
   void setData(const QHash<int,QVariant> &AData);
-  QVariant data(int ARole) const;
-  static int newRole();
 signals:
-  void actionDestroyed(Action *);
+  void actionDestroyed(Action *AAction);
 protected slots:
   void onMenuDestroyed(Menu *AMenu);
-  void onIconsetChanged();
 private:
   Menu *FMenu;
-  SkinIconset *FIconset;
+  IconStorage *FIconStorage;
 private:
-  static int FNewRole;
-  QString FIconName;
   QHash<int,QVariant> FData;
 };
 

@@ -16,10 +16,6 @@
 
 #define BDI_ITEMS_GEOMETRY      "DiscoItemsWindowGeometry"
 
-#define IN_CANCEL               "psi/cancel"
-#define IN_DISCO                "psi/disco"
-#define IN_INFO                 "psi/statusmsg"
-
 #define QUEUE_TIMER_INTERVAL    2000
 #define QUEUE_REQUEST_WAIT      5000
 #define QUEUE_REQUEST_START     QDateTime::currentDateTime().addMSecs(QUEUE_REQUEST_WAIT)
@@ -29,7 +25,6 @@
 
 #define CAPS_HASH_MD5           "md5"
 #define CAPS_HASH_SHA1          "sha-1"
-
 
 ServiceDiscovery::ServiceDiscovery()
 {
@@ -153,7 +148,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 bool ServiceDiscovery::initObjects()
 {
   FDiscoMenu = new Menu;
-  FDiscoMenu->setIcon(SYSTEM_ICONSETFILE,IN_DISCO);
+  FDiscoMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
   FDiscoMenu->setTitle(tr("Service Discovery"));
 
   registerFeatures();
@@ -482,24 +477,29 @@ QList<IDiscoInfo> ServiceDiscovery::findDiscoInfo(const IDiscoIdentity &AIdentit
   return result;
 }
 
+QIcon ServiceDiscovery::identityIcon(const QString &ACategory, const QString &AType) const
+{
+  IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
+  QIcon icon = storage->getIcon(ACategory +"/"+ AType);
+  if (icon.isNull())
+    icon = storage->getIcon(ACategory);
+  if (icon.isNull())
+    icon = storage->getIcon(SRI_SERVICE);
+  return icon;
+}
+
 QIcon ServiceDiscovery::serviceIcon(const Jid AItemJid, const QString &ANode) const
 {
   QIcon icon;
-  if (FStatusIcons)
+  IDiscoInfo info = discoInfo(AItemJid,ANode);
+  if (info.identity.isEmpty())
   {
-    if (FInfoRequestsId.values().contains(qMakePair(AItemJid,ANode)))
-    {
-      icon = FStatusIcons->iconByJidStatus(AItemJid,IPresence::DoNotDistrib,"both",false);
-    }
-    else if (hasDiscoInfo(AItemJid,ANode))
-    {
-      IDiscoInfo info = discoInfo(AItemJid,ANode);
-      icon = FStatusIcons->iconByJidStatus(info.contactJid,info.error.code<0 ? IPresence::Online : IPresence::Error,"both",false);
-    }
-    else
-    {
-      icon = FStatusIcons->iconByJidStatus(AItemJid,IPresence::Invisible,"both",false);
-    }
+    IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
+    icon = storage->getIcon(info.error.code==-1 ? SRI_SERVICE : SRI_SERVICE_ERROR);
+  }
+  else 
+  {
+    icon = identityIcon(info.identity.at(0).category,info.identity.at(0).type);
   }
   return icon;
 }
@@ -831,12 +831,12 @@ IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza, const QPair
 
 void ServiceDiscovery::registerFeatures()
 {
-  SkinIconset *iconset = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
+  IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
   IDiscoFeature dfeature;
 
   dfeature.var = NS_DISCO;
   dfeature.active = false;
-  dfeature.icon = iconset->iconByName(IN_DISCO);
+  dfeature.icon = storage->getIcon(MNI_SDISCOVERY_DISCOINFO);
   dfeature.name = tr("Service Discovery");
   dfeature.actionName = "";
   dfeature.description = tr("Discover information and items associated with a Jabber Entity");
@@ -844,7 +844,7 @@ void ServiceDiscovery::registerFeatures()
 
   dfeature.var = NS_DISCO_INFO;
   dfeature.active = true;
-  dfeature.icon = iconset->iconByName(IN_INFO);
+  dfeature.icon = storage->getIcon(MNI_SDISCOVERY_DISCOINFO);
   dfeature.name = tr("Discovery information");
   dfeature.actionName = "";
   dfeature.description = tr("Discover information about another entity on the network");
@@ -852,7 +852,7 @@ void ServiceDiscovery::registerFeatures()
 
   dfeature.var = NS_DISCO_ITEMS;
   dfeature.active = false;
-  dfeature.icon = iconset->iconByName(IN_DISCO);
+  dfeature.icon = storage->getIcon(MNI_SDISCOVERY_DISCOINFO);
   dfeature.name = tr("Discovery items");
   dfeature.actionName = "";
   dfeature.description = tr("Discover the items associated with a Jabber Entity");
@@ -1083,7 +1083,7 @@ void ServiceDiscovery::onStreamStateChanged(const Jid &AStreamJid, bool AStateOn
   {
     Action *action = new Action(FDiscoMenu);
     action->setText(AStreamJid.domain());
-    action->setIcon(SYSTEM_ICONSETFILE,IN_DISCO);
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
     action->setData(ADR_STREAMJID,AStreamJid.full());
     action->setData(ADR_CONTACTJID,AStreamJid.domain());
     action->setData(ADR_NODE,QString(""));
@@ -1234,7 +1234,7 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Discovery Info"));
-      action->setIcon(SYSTEM_ICONSETFILE,IN_INFO);
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOINFO);
       action->setData(ADR_STREAMJID,streamJid.full());
       action->setData(ADR_CONTACTJID,contactJid.full());
       action->setData(ADR_NODE,QString(""));
@@ -1245,7 +1245,7 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
       {
         action = new Action(AMenu);
         action->setText(tr("Service Discovery"));
-        action->setIcon(SYSTEM_ICONSETFILE,IN_DISCO);
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
         action->setData(ADR_STREAMJID,streamJid.full());
         action->setData(ADR_CONTACTJID,contactJid.full());
         action->setData(ADR_NODE,QString(""));

@@ -1,7 +1,5 @@
 #include "tabwindow.h"
 
-#define IN_CLOSETAB                 "psi/closetab"
-
 #define BDI_TABWINDOW_GEOMETRY      "TabWindowGeometry"
 
 #define ADR_TABWINDOWID             Action::DR_Parametr1
@@ -20,7 +18,7 @@ TabWindow::TabWindow(IMessenger *AMessenger, int AWindowId)
   FCloseButton = new QToolButton(ui.twtTabs);
   ui.twtTabs->setCornerWidget(FCloseButton);
   FCloseAction = new Action(FCloseButton);
-  FCloseAction->setIcon(SYSTEM_ICONSETFILE,IN_CLOSETAB);
+  FCloseAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_CLOSE_TAB);
   FCloseAction->setText(tr("Close tab"));
   FCloseAction->setShortcut(tr("Esc"));
   FCloseButton->setDefaultAction(FCloseAction);

@@ -5,6 +5,8 @@
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/multiuserdataroles.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ivcard.h"
 #include "../../interfaces/ixmppstreams.h"

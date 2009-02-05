@@ -2,17 +2,18 @@
 #define EMOTICONS_H
 
 #include <QPointer>
+#include <QStringList>
 #include "../../definations/actiongroups.h"
 #include "../../definations/messagewriterorders.h"
 #include "../../definations/resourceloaderorders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iemoticons.h"
 #include "../../interfaces/imessenger.h"
-#include "../../interfaces/iskinmanager.h"
 #include "../../interfaces/isettings.h"
-#include "../../utils/skin.h"
+#include "../../utils/iconstorage.h"
 #include "../../utils/menu.h"
 #include "selecticonwidget.h"
 #include "selecticonmenu.h"
@@ -47,50 +48,44 @@ public:
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IEmoticons
-  virtual QStringList iconsets() const { return FIconsets; }
-  virtual void setIconsets(const QStringList &AIconsetFiles);
-  virtual void insertIconset(const QString &AIconsetFile, const QString &ABefour = "");
-  virtual void insertIconset(const QStringList &AIconsetFiles, const QString &ABefour = "");
-  virtual void removeIconset(const QString &AIconsetFile);
-  virtual void removeIconset(const QStringList &AIconsetFiles);
-  virtual QUrl urlByTag(const QString &ATag) const;
-  virtual QString tagByUrl(const QUrl &AUrl) const;
-  virtual QIcon iconByTag(const QString &ATag) const;
+  virtual QStringList iconsets() const { return FStoragesOrder; }
+  virtual void setIconsets(const QStringList &ASubStorages);
+  virtual void insertIconset(const QString &ASubStorage, const QString &ABefour = "");
+  virtual void removeIconset(const QString &ASubStorage);
+  virtual QUrl urlByKey(const QString &AKey) const;
+  virtual QString keyByUrl(const QUrl &AUrl) const;
+  virtual QIcon iconByKey(const QString &AKey) const;
   virtual QIcon iconByUrl(const QUrl &AUrl) const;
 signals:
-  virtual void iconsetInserted(const QString &AIconsetFile, const QString &ABefour);
-  virtual void iconsetRemoved(const QString &AIconsetFile);
-  virtual void iconsetsChangedBySkin();
+  virtual void iconsetInserted(const QString &ASubStorage, const QString &ABefour);
+  virtual void iconsetRemoved(const QString &ASubStorage);
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
   void createIconsetUrls();
-  SelectIconMenu *createSelectIconMenu(const QString &AIconsetFile, QWidget *AParent);
-  void insertSelectIconMenu(const QString &AIconsetFile);
-  void removeSelectIconMenu(const QString &AIconsetFile);
+  SelectIconMenu *createSelectIconMenu(const QString &ASubStorage, QWidget *AParent);
+  void insertSelectIconMenu(const QString &ASubStorage);
+  void removeSelectIconMenu(const QString &ASubStorage);
 protected slots:
   void onToolBarWidgetCreated(IToolBarWidget *AWidget);
   void onToolBarWidgetDestroyed(QObject *AObject);
-  void onIconSelected(const QString &AIconsetFile, const QString &AIconFile);
+  void onIconSelected(const QString &ASubStorage, const QString &AIconKey);
   void onSelectIconMenuDestroyed(QObject *AObject);
-  void onSkinAboutToBeChanged();
-  void onSkinChanged();
   void onSettingsOpened();
   void onSettingsClosed();
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
 private:
   IMessenger *FMessenger;
-  ISkinManager *FSkinManager;
   ISettingsPlugin *FSettingsPlugin;
 private:
   QPointer<EmoticonsOptions> FEmoticonsOptions;
 private:
   QList<IToolBarWidget *> FToolBarsWidgets;
   QHash<SelectIconMenu *, IToolBarWidget *> FToolBarWidgetByMenu;
-  QStringList FIconsets;
-  QHash<QString,QUrl> FUrlByTag;
-  mutable QHash<QString,QIcon> FIconByUrl;
+  QStringList FStoragesOrder;
+  QHash<QString, IconStorage *> FStorages;
+  QHash<QString,QUrl> FUrlByKey;
 };
 
 #endif // EMOTICONS_H

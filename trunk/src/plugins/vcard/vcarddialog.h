@@ -5,8 +5,10 @@
 #include <QEvent>
 #include <QResizeEvent>
 #include "../../definations/vcardvaluenames.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ivcard.h"
-#include "../../utils/skin.h"
+#include "../../utils/iconstorage.h"
 #include "ui_vcarddialog.h"
 
 class VCardDialog : 

@@ -1,20 +1,16 @@
 #include "emoticonsoptions.h"
 
-#define IN_ARROW_UP           "psi/arrowUp"
-#define IN_ARROR_DOWN         "psi/arrowDown"
-
 EmoticonsOptions::EmoticonsOptions(IEmoticons *AEmoticons, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
-  SkinIconset *system = Skin::getSkinIconset(SYSTEM_ICONSETFILE);
-  ui.tbtUp->setIcon(system->iconByName(IN_ARROW_UP));
-  ui.tbtDown->setIcon(system->iconByName(IN_ARROR_DOWN));
+  IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
+  storage->insertAutoIcon(ui.tbtUp,MNI_EMOTICONS_ARROW_UP);
+  storage->insertAutoIcon(ui.tbtDown,MNI_EMOTICONS_ARROW_DOWN);
 
   FEmoticons = AEmoticons;
   ui.lwtEmoticons->setItemDelegate(new IconsetDelegate(ui.lwtEmoticons));
   connect(ui.tbtUp,SIGNAL(clicked()),SLOT(onUpButtonClicked()));
   connect(ui.tbtDown,SIGNAL(clicked()),SLOT(onDownButtonClicked()));
-  connect(FEmoticons->instance(),SIGNAL(iconsetsChangedBySkin()),SLOT(onIconsetsChangedBySkin()));
   init();
 }
 
@@ -28,7 +24,7 @@ void EmoticonsOptions::apply() const
   QStringList newFiles;
   for (int i = 0; i<ui.lwtEmoticons->count(); i++)
     if (ui.lwtEmoticons->item(i)->checkState() == Qt::Checked)
-      newFiles.append(ui.lwtEmoticons->item(i)->data(Qt::DisplayRole).toString());
+      newFiles.append(ui.lwtEmoticons->item(i)->data(IDR_STORAGE_SUBDIR).toString());
 
   if (newFiles != FEmoticons->iconsets())
     FEmoticons->setIconsets(newFiles);
@@ -37,23 +33,26 @@ void EmoticonsOptions::apply() const
 void EmoticonsOptions::init()
 {
   ui.lwtEmoticons->clear();
-  QStringList files = FEmoticons->iconsets();
-  for (int i = 0; i < files.count(); i++)
+  QStringList storages = FEmoticons->iconsets();
+  for (int i = 0; i < storages.count(); i++)
   {
-    QListWidgetItem *item = new QListWidgetItem(files.at(i),ui.lwtEmoticons);
-    item->setData(IDR_MAX_ICON_ROWS,2);
+    QListWidgetItem *item = new QListWidgetItem(RSR_STORAGE_EMOTICONS"/"+storages.at(i),ui.lwtEmoticons);
+    item->setData(IDR_STORAGE_NAME,RSR_STORAGE_EMOTICONS);
+    item->setData(IDR_STORAGE_SUBDIR,storages.at(i));
+    item->setData(IDR_ICON_ROWS,2);
     item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsSelectable|Qt::ItemIsEnabled);
     item->setCheckState(Qt::Checked);
   }
 
-  QStringList allfiles = Skin::skinFilesWithDef(SKIN_TYPE_ICONSET,"emoticons","*.jisp");
-  for (int i = 0; i < allfiles.count(); i++)
+  QStringList allstorages = FileStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
+  for (int i = 0; i < allstorages.count(); i++)
   {
-    allfiles[i].prepend("emoticons/");
-    if (!files.contains(allfiles.at(i)))
+    if (!storages.contains(allstorages.at(i)))
     {
-      QListWidgetItem *item = new QListWidgetItem(allfiles.at(i),ui.lwtEmoticons);
-      item->setData(IDR_MAX_ICON_ROWS,2);
+      QListWidgetItem *item = new QListWidgetItem(allstorages.at(i),ui.lwtEmoticons);
+      item->setData(IDR_STORAGE_NAME,RSR_STORAGE_EMOTICONS);
+      item->setData(IDR_STORAGE_SUBDIR,allstorages.at(i));
+      item->setData(IDR_ICON_ROWS,2);
       item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsSelectable|Qt::ItemIsEnabled);
       item->setCheckState(Qt::Unchecked);
     }
@@ -76,9 +75,4 @@ void EmoticonsOptions::onDownButtonClicked()
     ui.lwtEmoticons->insertItem(ui.lwtEmoticons->currentRow()+1, ui.lwtEmoticons->takeItem(ui.lwtEmoticons->currentRow()));
     ui.lwtEmoticons->setCurrentRow(ui.lwtEmoticons->currentRow()+1);
   }
-}
-
-void EmoticonsOptions::onIconsetsChangedBySkin()
-{
-  init();
 }

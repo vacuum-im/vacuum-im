@@ -1,5 +1,7 @@
 #include "notifications.h"
 
+#include <QSound>
+
 #define ADR_NOTIFYID                    Action::DR_Parametr1
 
 #define SVN_NOTIFICATORS                "notificators:notificator[]"
@@ -20,6 +22,7 @@ Notifications::Notifications()
   FTrayManager = NULL;
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
+  FSettingsPlugin = NULL;
 
   FActivateAll = NULL;
   FRemoveAll = NULL;
@@ -107,7 +110,7 @@ bool Notifications::initObjects()
 {
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_NOTIFY,tr("Notifications"),tr("Notification options"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_NOTIFY,tr("Notifications"),tr("Notification options"),MNI_NOTIFICATIONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
   if (FTrayManager)
@@ -115,17 +118,20 @@ bool Notifications::initObjects()
     FActivateAll = new Action(this);
     FActivateAll->setVisible(false);
     FActivateAll->setText(tr("Activate All Notifications"));
+    FActivateAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_ACTIVATE_ALL);
     FTrayManager->addAction(FActivateAll,AG_NOTIFICATIONS_TRAY,false);
     connect(FActivateAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
     FRemoveAll = new Action(this);
     FRemoveAll->setVisible(false);
     FRemoveAll->setText(tr("Remove All Notifications"));
+    FRemoveAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_REMOVE_ALL);
     FTrayManager->addAction(FRemoveAll,AG_NOTIFICATIONS_TRAY,false);
     connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
     FNotifyMenu = new Menu;
     FNotifyMenu->setTitle(tr("Pending Notifications"));
+    FNotifyMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS);
     FNotifyMenu->menuAction()->setVisible(false);
     FTrayManager->addAction(FNotifyMenu->menuAction(),AG_NOTIFICATIONS_TRAY,false);
   }
@@ -206,10 +212,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 
   if (checkOption(INotifications::EnableSounds) && (ANotification.kinds & INotification::PlaySound)>0)
   {
-    QString soundName = ANotification.data.value(NDR_SOUND_NAME).toString();
-    QString dirName = ANotification.data.value(NDR_SOUNDSET_DIR_NAME,SSD_COMMON).toString();
-    if (!dirName.isEmpty())
-      Skin::getSkinSoundset(dirName)->playSoundByName(soundName,true);
+    QString soundName = ANotification.data.value(NDR_SOUND_FILE).toString();
+    QSound::play(FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName));
   }
 
   if (FNotifyRecords.isEmpty())

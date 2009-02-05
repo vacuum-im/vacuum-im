@@ -5,9 +5,7 @@
 
 #define SHC_COMMANDS                  "/iq[@type='set']/query[@xmlns='" NS_COMMANDS "']"
 
-#define IN_COMMAND                    "psi/command"
-
-#define ADR_STREAMJID                 Action::DR_StreamJid
+#define ADR_STREAM_JID                Action::DR_StreamJid
 #define ADR_COMMAND_JID               Action::DR_Parametr1
 #define ADR_COMMAND_NODE              Action::DR_Parametr2
 
@@ -288,8 +286,8 @@ Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
       {
         Action *action = new Action(AParent);
         action->setText(tr("Execute"));
-        action->setIcon(SYSTEM_ICONSETFILE,IN_COMMAND);
-        action->setData(ADR_STREAMJID,AStreamJid.full());
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_COMMANDS);
+        action->setData(ADR_STREAM_JID,AStreamJid.full());
         action->setData(ADR_COMMAND_JID,ADiscoInfo.contactJid.full());
         action->setData(ADR_COMMAND_NODE,ADiscoInfo.node);
         connect(action,SIGNAL(triggered(bool)),SLOT(onExecuteActionTriggered(bool)));
@@ -300,7 +298,7 @@ Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
     {
       Menu *execMenu = new Menu(AParent);
       execMenu->setTitle(tr("Commands"));
-      execMenu->setIcon(SYSTEM_ICONSETFILE,IN_COMMAND);
+      execMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_COMMANDS);
       IDiscoItems ditems = FDiscovery->discoItems(ADiscoInfo.contactJid,NS_COMMANDS);
       foreach (IDiscoItem ditem,ditems.items)
       {
@@ -308,7 +306,7 @@ Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
         {
           Action *action = new Action(execMenu);
           action->setText(ditem.name.isEmpty() ? ditem.node : ditem.name);
-          action->setData(ADR_STREAMJID,AStreamJid.full());
+          action->setData(ADR_STREAM_JID,AStreamJid.full());
           action->setData(ADR_COMMAND_JID,ditem.itemJid.full());
           action->setData(ADR_COMMAND_NODE,ditem.node);
           connect(action,SIGNAL(triggered(bool)),SLOT(onExecuteActionTriggered(bool)));
@@ -429,7 +427,7 @@ void Commands::registerDiscoFeatures()
 {
   IDiscoFeature dfeature;
   dfeature.active = true;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_COMMAND);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_COMMANDS);
   dfeature.var = NS_COMMANDS;
   dfeature.name = tr("Ad-Hoc Commands");
   dfeature.description = tr("Advertising and executing application-specific commands");
@@ -441,7 +439,7 @@ void Commands::onExecuteActionTriggered(bool)
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
-    Jid streamJid = action->data(ADR_STREAMJID).toString();
+    Jid streamJid = action->data(ADR_STREAM_JID).toString();
     Jid commandJid = action->data(ADR_COMMAND_JID).toString();
     QString node = action->data(ADR_COMMAND_NODE).toString();
     executeCommnad(streamJid,commandJid,node);

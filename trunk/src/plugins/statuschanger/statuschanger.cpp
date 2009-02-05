@@ -16,8 +16,6 @@
 #define SVN_STATUS_ICONSET                  "status[]:iconset"
 #define SVN_STATUS_ICON_NAME                "status[]:iconName"
 
-#define IN_CONNECTING                       "connecting"
-
 #define NOTIFICATOR_ID                      "StatusChanger"
 
 StatusChanger::StatusChanger()
@@ -36,6 +34,7 @@ StatusChanger::StatusChanger()
   FSettingStatusToPresence = NULL;
   FAccountManager = NULL;
   FStatusIcons = NULL;
+  FNotifications = NULL;
 }
 
 StatusChanger::~StatusChanger()
@@ -155,14 +154,11 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 bool StatusChanger::initObjects()
 {
-  FRosterIconset = Skin::getSkinIconset(ROSTER_ICONSETFILE);
-  connect(FRosterIconset, SIGNAL(iconsetChanged()),SLOT(onRosterIconsetChanged()));
-
   FMainMenu = new Menu;
 
   FEditStatusAction = new Action(FMainMenu);
   FEditStatusAction->setText(tr("Edit presence statuses"));
-  FEditStatusAction->setIcon(STATUS_ICONSETFILE,"status/ask");
+  FEditStatusAction->setIcon(RSR_STORAGE_MENUICONS,MNI_SCHANGER_EDIT_STATUSES);
   connect(FEditStatusAction,SIGNAL(triggered(bool)), SLOT(onEditStatusAction(bool)));
   FMainMenu->addAction(FEditStatusAction,AG_STATUSCHANGER_STATUSMENU_ACTIONS,false);
   
@@ -184,7 +180,7 @@ bool StatusChanger::initObjects()
   if (FRostersViewPlugin)
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,FRosterIconset->iconByName(IN_CONNECTING));
+    FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING),IRostersView::LabelBlink);
     connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
@@ -896,6 +892,8 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
       notify.data.insert(NDR_WINDOW_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());
       notify.data.insert(NDR_WINDOW_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
       notify.data.insert(NDR_WINDOW_TEXT,APresence->status());
+      notify.data.insert(NDR_WINDOW_TEXT,APresence->status());
+      notify.data.insert(NDR_SOUND_FILE,SDF_SCHANGER_CONNECTION_ERROR);
       FStreamNotify.insert(APresence,FNotifications->appendNotification(notify));
     }
   }
@@ -1041,12 +1039,6 @@ void StatusChanger::onDefaultStatusIconsChanged()
     updateStreamMenu(presence);
   updateMainStatusActions();
   updateMainMenu();
-}
-
-void StatusChanger::onRosterIconsetChanged()
-{
-  if (FRostersView)
-    FRostersView->updateIndexLabel(FConnectingLabel,FRosterIconset->iconByName(IN_CONNECTING));
 }
 
 void StatusChanger::onSettingsOpened()

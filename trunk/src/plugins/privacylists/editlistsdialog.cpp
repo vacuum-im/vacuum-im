@@ -10,14 +10,12 @@
 
 #define RULE_NONE     "<None>"
 
-#define IN_PRIVACY    "psi/eye"
-
 EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_PRIVACY));
   setWindowTitle(tr("Edit Privacy Lists - %1").arg(AStreamJid.bare()));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_PRIVACYLISTS,0,0,"windowIcon");
 
   FPrivacyLists = APrivacyLists;
   FRoster = ARoster;

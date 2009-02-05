@@ -2,11 +2,13 @@
 #define CONSOLEWIDGET_H
 
 #include <QWidget>
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/isettings.h"
-#include "../../utils/skin.h"
+#include "../../utils/iconstorage.h"
 #include "ui_consolewidget.h"
 
 class ConsoleWidget : 

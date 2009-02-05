@@ -37,8 +37,6 @@
 #define SFV_MAY_LOGGING       "may"
 #define SFV_MUSTNOT_LOGGING   "mustnot"
 
-#define IN_HISTORY            "psi/history"
-
 MessageArchiver::MessageArchiver()
 {
   FPluginManager = NULL;
@@ -181,6 +179,10 @@ bool MessageArchiver::initObjects()
   if (FSessionNegotioation)
   {
     FSessionNegotioation->insertNegotiator(this,SNO_DEFAULT);
+  }
+  if (FSettingsPlugin)
+  {
+    FSettingsPlugin->openOptionsNode(ON_HISTORY,tr("History"),tr("Common history settings"),MNI_HISTORY);
   }
   return true;
 }
@@ -1171,7 +1173,7 @@ IArchiveModifications MessageArchiver::loadLocalModifications(const Jid &AStream
     QFile log(dirPath+"/"LOG_FILE_NAME);
     if (log.open(QFile::ReadOnly|QIODevice::Text))
     {
-      //Поиск записи методом деления пополам
+      //пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
       qint64 sbound = 0;
       qint64 ebound = log.size();
       while (ebound - sbound > 1024)
@@ -1188,7 +1190,7 @@ IArchiveModifications MessageArchiver::loadLocalModifications(const Jid &AStream
       }
       log.seek(sbound);
 
-      //Последовательный перебор записей
+      //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
       while (!log.atEnd() && modifs.items.count()<ACount)
       {
         QString logLine = QString::fromUtf8(log.readLine());
@@ -1414,7 +1416,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
   }
   else
   {
-    //Костыль для jabberd 1.4.3
+    //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ jabberd 1.4.3
     if (!FInStoragePrefs.contains(AStreamJid) && AElem.hasAttribute("j_private_flag"))
       FInStoragePrefs.append(AStreamJid);
 
@@ -1894,7 +1896,7 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
   if (FSettingsPlugin && account)
   {
     QString node = ON_HISTORY"::"+account->accountId();
-    FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),QIcon());
+    FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),MNI_HISTORY);
   }
 }
 
@@ -1914,11 +1916,12 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
   IArchiveItemPrefs itemPrefs = isStreamMenu ? archivePrefs(AStreamJid).defaultPrefs : archiveItemPrefs(AStreamJid,AContactJid);
 
   Menu *menu = new Menu(AParent);
-  menu->setIcon(SYSTEM_ICONSETFILE,IN_HISTORY);
   menu->setTitle(tr("History"));
+  menu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
 
   Action *action = new Action(menu);
   action->setText(tr("View History"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
   action->setData(ADR_STREAM_JID,AStreamJid.full());
   action->setData(ADR_FILTER_START,QDateTime::currentDateTime().addMonths(-1));
   if (!isStreamMenu)
@@ -1938,12 +1941,14 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
       IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
       Menu *autoMenu = new Menu(menu);
       autoMenu->setTitle(tr("Set Auto Method"));
+      autoMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_AUTO);
         action = new Action(autoMenu);
         action->setData(ADR_STREAM_JID,AStreamJid.full());
         action->setData(ADR_METHOD_AUTO,ARCHIVE_METHOD_CONCEDE);
         action->setCheckable(true);
         action->setChecked(prefs.methodAuto == ARCHIVE_METHOD_CONCEDE);
         action->setText(methodName(ARCHIVE_METHOD_CONCEDE));
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_CONCEDE);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         autoMenu->addAction(action,AG_DEFAULT,false);
 
@@ -1953,6 +1958,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodAuto == ARCHIVE_METHOD_FORBID);
         action->setText(methodName(ARCHIVE_METHOD_FORBID));
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_FORBID);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         autoMenu->addAction(action,AG_DEFAULT,false);
 
@@ -1962,18 +1968,21 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodAuto == ARCHIVE_METHOD_PREFER);
         action->setText(methodName(ARCHIVE_METHOD_PREFER));
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_PREFER);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         autoMenu->addAction(action,AG_DEFAULT,false);
       menu->addAction(autoMenu->menuAction(),AG_DEFAULT+500,false);
 
       Menu *manualMenu = new Menu(menu);
       manualMenu->setTitle(tr("Set Manual Method"));
+      manualMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_MANUAL);
         action = new Action(autoMenu);
         action->setData(ADR_STREAM_JID,AStreamJid.full());
         action->setData(ADR_METHOD_MANUAL,ARCHIVE_METHOD_CONCEDE);
         action->setCheckable(true);
         action->setChecked(prefs.methodManual == ARCHIVE_METHOD_CONCEDE);
         action->setText(methodName(ARCHIVE_METHOD_CONCEDE));
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_CONCEDE);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         manualMenu->addAction(action,AG_DEFAULT,false);
 
@@ -1983,6 +1992,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodManual == ARCHIVE_METHOD_FORBID);
         action->setText(methodName(ARCHIVE_METHOD_FORBID));
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_FORBID);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         manualMenu->addAction(action,AG_DEFAULT,false);
 
@@ -1992,18 +2002,21 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodManual == ARCHIVE_METHOD_PREFER);
         action->setText(methodName(ARCHIVE_METHOD_PREFER));
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_PREFER);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         manualMenu->addAction(action,AG_DEFAULT,false);
       menu->addAction(manualMenu->menuAction(),AG_DEFAULT+500,false);
 
       Menu *localMenu = new Menu(menu);
       localMenu->setTitle(tr("Set Local Method"));
+      localMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_LOCAL);
         action = new Action(localMenu);
         action->setData(ADR_STREAM_JID,AStreamJid.full());
         action->setData(ADR_METHOD_LOCAL,ARCHIVE_METHOD_CONCEDE);
         action->setCheckable(true);
         action->setChecked(prefs.methodLocal == ARCHIVE_METHOD_CONCEDE);
         action->setText(methodName(ARCHIVE_METHOD_CONCEDE));
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_CONCEDE);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         localMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2013,6 +2026,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodLocal == ARCHIVE_METHOD_FORBID);
         action->setText(methodName(ARCHIVE_METHOD_FORBID));
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_FORBID);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         localMenu->addAction(action,AG_DEFAULT,false);
 
@@ -2022,6 +2036,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
         action->setCheckable(true);
         action->setChecked(prefs.methodLocal == ARCHIVE_METHOD_PREFER);
         action->setText(methodName(ARCHIVE_METHOD_PREFER));
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OTR_PREFER);
         connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodAction(bool)));
         localMenu->addAction(action,AG_DEFAULT,false);
       menu->addAction(localMenu->menuAction(),AG_DEFAULT+500,false);
@@ -2099,7 +2114,8 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
     menu->addAction(otrMenu->menuAction(),AG_DEFAULT+500,false);
 
     Menu *saveMenu = new Menu(menu);
-      saveMenu->setTitle(tr("Set Save mode"));
+    saveMenu->setTitle(tr("Set Save mode"));
+    saveMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_SAVE_MODE);
       action = new Action(saveMenu);
       action->setData(ADR_STREAM_JID,AStreamJid.full());
       action->setData(ADR_CONTACT_JID,AContactJid.full());
@@ -2141,6 +2157,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
     {
       action = new Action(menu);
       action->setText(tr("Options..."));
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OPTIONS);
       action->setData(ADR_STREAM_JID,AStreamJid.full());
       connect(action,SIGNAL(triggered(bool)),SLOT(onOpenHistoryOptionsAction(bool)));
       menu->addAction(action,AG_DEFAULT+500,false);
@@ -2149,6 +2166,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
     {
       action = new Action(menu);
       action->setText(tr("Restore defaults"));
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_DEFAULTS);
       action->setData(ADR_STREAM_JID,AStreamJid.full());
       action->setData(ADR_CONTACT_JID,AContactJid.full());
       connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemPrefsAction(bool)));
@@ -2163,7 +2181,7 @@ void MessageArchiver::registerDiscoFeatures()
   IDiscoFeature dfeature;
 
   dfeature.active = false;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_HISTORY);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
   dfeature.var = NS_ARCHIVE;
   dfeature.name = tr("Message Archiving");
   dfeature.description = tr("Archiving and retrieval of messages");
@@ -2172,6 +2190,7 @@ void MessageArchiver::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.var = NS_ARCHIVE_AUTO;
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_AUTO);
   dfeature.name = tr("Message Archiving: Auto archiving");
   dfeature.description = tr("Automatically archiving of messages on server");
   FDiscovery->insertDiscoFeature(dfeature);
@@ -2179,6 +2198,7 @@ void MessageArchiver::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.var = NS_ARCHIVE_MANAGE;
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_MANAGE);
   dfeature.name = tr("Message Archiving: Mange messages");
   dfeature.description = tr("Retrieving and removing messages on server");
   FDiscovery->insertDiscoFeature(dfeature);
@@ -2186,6 +2206,7 @@ void MessageArchiver::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.var = NS_ARCHIVE_MANUAL;
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_MANUAL);
   dfeature.name = tr("Message Archiving: Manual archiving");
   dfeature.description = tr("Manually upload messages on server");
   FDiscovery->insertDiscoFeature(dfeature);
@@ -2193,6 +2214,7 @@ void MessageArchiver::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.var = NS_ARCHIVE_PREF;
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_OPTIONS);
   dfeature.name = tr("Message Archiving: Preferences");
   dfeature.description = tr("Storing archive preferences on server");
   FDiscovery->insertDiscoFeature(dfeature);
@@ -2460,7 +2482,7 @@ void MessageArchiver::onShowArchiveWindowAction(bool)
   }
 }
 
-void MessageArchiver::onOpenHistoryOptionsAction( bool )
+void MessageArchiver::onOpenHistoryOptionsAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (FSettingsPlugin && FAccountManager && action)
@@ -2472,7 +2494,7 @@ void MessageArchiver::onOpenHistoryOptionsAction( bool )
   }
 }
 
-void MessageArchiver::onRemoveItemPrefsAction( bool )
+void MessageArchiver::onRemoveItemPrefsAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)

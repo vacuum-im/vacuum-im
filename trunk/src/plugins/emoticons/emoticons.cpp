@@ -2,16 +2,12 @@
 #include "emoticons.h"
 #include <QSet>
 
-#define SMILEY_TAG_NAME                         "text"
-#define SMILEY_BY_ICONSET_SCHEMA                "smiley"
-#define SUBFOLDER_EMOTICONS                     "emoticons"
-
-#define SVN_ICONSETFILES_NS                     "iconsetFiles[]"
+#define SMILEY_BY_ICONSET_SCHEMA        "smiley"
+#define SVN_SUBSTORAGES                 "substorages"
 
 Emoticons::Emoticons()
 {
   FMessenger = NULL;
-  FSkinManager = NULL;
   FSettingsPlugin = NULL;
 }
 
@@ -42,17 +38,6 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     }
   }
 
-  plugin = APluginManager->getPlugins("ISkinManager").value(0,NULL);
-  if (plugin) 
-  {
-    FSkinManager = qobject_cast<ISkinManager *>(plugin->instance());
-    if (FSkinManager)
-    {
-      connect(FSkinManager->instance(),SIGNAL(skinAboutToBeChanged()),SLOT(onSkinAboutToBeChanged()));
-      connect(FSkinManager->instance(),SIGNAL(skinChanged()),SLOT(onSkinChanged()));
-    }
-  }
-
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin) 
   {
@@ -79,11 +64,9 @@ bool Emoticons::initObjects()
 
   if (FSettingsPlugin != NULL)
   {
-    FSettingsPlugin->openOptionsNode(ON_EMOTICONS ,tr("Emoticons"), tr("Select emoticons files"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_EMOTICONS ,tr("Emoticons"),tr("Select emoticons files"),MNI_EMOTICONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
-  else
-    insertIconset(EMOTICONS_ICONSETFILE);
 
   return true;
 }
@@ -113,7 +96,7 @@ void Emoticons::writeText(Message &/*AMessage*/, QTextDocument *ADocument, const
     QRegExp regexp("\\S+");
     for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
     {
-      QUrl url = FUrlByTag.value(cursor.selectedText());
+      QUrl url = FUrlByKey.value(cursor.selectedText());
       if (!url.isEmpty())
         cursor.insertImage(url.toString());
     }
@@ -141,140 +124,106 @@ QWidget *Emoticons::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
-void Emoticons::setIconsets(const QStringList &AIconsetFiles)
+void Emoticons::setIconsets(const QStringList &ASubStorages)
 {
-  foreach (QString iconsetFile, FIconsets)
+  QSet<QString> removeList = FStoragesOrder.toSet() - ASubStorages.toSet();
+  foreach (QString substorage, removeList)
   {
-    removeSelectIconMenu(iconsetFile);
-    emit iconsetRemoved(iconsetFile);
+    removeSelectIconMenu(substorage);
+    FStoragesOrder.removeAt(FStoragesOrder.indexOf(substorage));
+    delete FStorages.take(substorage);
+    emit iconsetRemoved(substorage);
   }
-  FIconsets.clear();
-  foreach (QString iconsetFile, AIconsetFiles)
+
+  foreach (QString substorage, ASubStorages)
   {
-    FIconsets.append(iconsetFile);
-    insertSelectIconMenu(iconsetFile);
-    emit iconsetInserted(iconsetFile,"");
+    if (!FStoragesOrder.contains(substorage))
+    {
+      FStoragesOrder.append(substorage);
+      FStorages.insert(substorage,new IconStorage(RSR_STORAGE_EMOTICONS,substorage,this));
+      insertSelectIconMenu(substorage);
+      emit iconsetInserted(substorage,"");
+    }
   }
+  FStoragesOrder = ASubStorages;
   createIconsetUrls();
 }
 
-void Emoticons::insertIconset(const QString &AIconsetFile, const QString &ABefour)
+void Emoticons::insertIconset(const QString &ASubStorage, const QString &ABefour)
 {
-  if (!FIconsets.contains(AIconsetFile) && Skin::getSkinIconset(AIconsetFile)->isValid())
+  if (!FStoragesOrder.contains(ASubStorage))
   {
-    ABefour.isEmpty() ? FIconsets.append(AIconsetFile) : FIconsets.insert(FIconsets.indexOf(ABefour),AIconsetFile);
+    ABefour.isEmpty() ? FStoragesOrder.append(ASubStorage) : FStoragesOrder.insert(FStoragesOrder.indexOf(ABefour),ASubStorage);
+    FStorages.insert(ASubStorage,new IconStorage(RSR_STORAGE_EMOTICONS,ASubStorage,this));
+    insertSelectIconMenu(ASubStorage);
     createIconsetUrls();
-    insertSelectIconMenu(AIconsetFile);
-    emit iconsetInserted(AIconsetFile,ABefour);
+    emit iconsetInserted(ASubStorage,ABefour);
   }
 }
 
-void Emoticons::insertIconset(const QStringList &AIconsetFiles, const QString &ABefour)
+void Emoticons::removeIconset(const QString &ASubStorage)
 {
-  QList<QString> insertedFiles;
-  foreach(QString iconsetFile, AIconsetFiles)
+  if (FStoragesOrder.contains(ASubStorage))
   {
-    if (!FIconsets.contains(iconsetFile) && Skin::getSkinIconset(iconsetFile)->isValid())
-    {
-      FIconsets.append(iconsetFile);
-      insertedFiles.append(iconsetFile);
-    }
-  }
-  if (!insertedFiles.isEmpty())
+    removeSelectIconMenu(ASubStorage);
+    FStoragesOrder.removeAt(FStoragesOrder.indexOf(ASubStorage));
+    delete FStorages.take(ASubStorage);
     createIconsetUrls();
-  foreach(QString iconsetFile, insertedFiles)
-  {
-    insertSelectIconMenu(iconsetFile);
-    emit iconsetInserted(iconsetFile,ABefour);
-  }
-}
-void Emoticons::removeIconset(const QString &AIconsetFile)
-{
-  if (FIconsets.contains(AIconsetFile))
-  {
-    FIconsets.removeAt(FIconsets.indexOf(AIconsetFile));
-    removeSelectIconMenu(AIconsetFile);
-    createIconsetUrls();
-    emit iconsetRemoved(AIconsetFile);
+    emit iconsetRemoved(ASubStorage);
   }
 }
 
-void Emoticons::removeIconset(const QStringList &AIconsetFiles)
+QUrl Emoticons::urlByKey(const QString &AKey) const
 {
-  foreach(QString iconsetFile, AIconsetFiles)
-  {
-    if (FIconsets.contains(iconsetFile))
-    {
-      FIconsets.removeAt(FIconsets.indexOf(iconsetFile));
-      removeSelectIconMenu(iconsetFile);
-      emit iconsetRemoved(iconsetFile);
-    }
-  }
-  createIconsetUrls();
+  return FUrlByKey.value(AKey);
 }
 
-QUrl Emoticons::urlByTag(const QString &ATag) const
+QString Emoticons::keyByUrl(const QUrl &AUrl) const
 {
-  return FUrlByTag.value(ATag);
+  return FUrlByKey.key(AUrl);
 }
 
-QString Emoticons::tagByUrl(const QUrl &AUrl) const
+QIcon Emoticons::iconByKey(const QString &AKey) const
 {
-  return FUrlByTag.key(AUrl);
-}
-
-QIcon Emoticons::iconByTag(const QString &ATag) const
-{
-  return iconByUrl(urlByTag(ATag));
+  return iconByUrl(urlByKey(AKey));
 }
 
 QIcon Emoticons::iconByUrl(const QUrl &AUrl) const
 {
-  QIcon icon = FIconByUrl.value(AUrl.toString());
-  if (icon.isNull())
+  if (AUrl.scheme() == SMILEY_BY_ICONSET_SCHEMA)
   {
-    if (AUrl.scheme() == SMILEY_BY_ICONSET_SCHEMA)
-    {
-      QString fileName = AUrl.path();
-      QString tagValue = AUrl.fragment();
-      if (!fileName.isEmpty() && !tagValue.isEmpty())
-      {
-        SkinIconset *iconset = Skin::getSkinIconset(fileName);
-        icon = iconset->iconByTagValue(SMILEY_TAG_NAME,tagValue);
-        if (!icon.isNull())
-          FIconByUrl.insert(AUrl.toString(),icon);
-      }
-    }
+    QString key = AUrl.fragment();
+    QString substorage = AUrl.path();
+    if (!key.isEmpty() && FStorages.contains(substorage))
+      return FStorages.value(substorage)->getIcon(key);
   }
-  return icon;
+  return QIcon();
 }
 
 void Emoticons::createIconsetUrls()
 {
-  FUrlByTag.clear();
-  FIconByUrl.clear();
-  foreach(QString iconsetFile, FIconsets)
+  FUrlByKey.clear();
+  foreach(QString substorage, FStoragesOrder)
   {
-    SkinIconset *iconset = Skin::getSkinIconset(iconsetFile);
-    QList<QString> tags = iconset->tagValues(SMILEY_TAG_NAME);
-    foreach(QString tag, tags)
+    IconStorage *storage = FStorages.value(substorage);
+    foreach(QString key, storage->fileKeys())
     {
-      if (!FUrlByTag.contains(tag))
+      if (!FUrlByKey.contains(key))
       {
         QUrl url;
         url.setScheme(SMILEY_BY_ICONSET_SCHEMA);
-        url.setPath(iconsetFile);
-        url.setFragment(tag);
-        FUrlByTag.insert(tag,url);
+        url.setPath(substorage);
+        url.setFragment(key);
+        FUrlByKey.insert(key,url);
       }
     }
   }
 }
 
-SelectIconMenu *Emoticons::createSelectIconMenu(const QString &AIconsetFile, QWidget *AParent)
+SelectIconMenu *Emoticons::createSelectIconMenu(const QString &ASubStorage, QWidget *AParent)
 {
   SelectIconMenu *menu = new SelectIconMenu(AParent);
-  menu->setIconset(AIconsetFile);
+  menu->setIconset(ASubStorage);
   connect(menu->instance(),SIGNAL(iconSelected(const QString &, const QString &)),
     SLOT(onIconSelected(const QString &, const QString &)));
   connect(menu->instance(),SIGNAL(destroyed(QObject *)),SLOT(onSelectIconMenuDestroyed(QObject *)));
@@ -316,7 +265,7 @@ void Emoticons::onToolBarWidgetCreated(IToolBarWidget *AWidget)
   if (AWidget->editWidget() != NULL)
   {
     FToolBarsWidgets.append(AWidget);
-    foreach(QString iconsetFile, FIconsets)
+    foreach(QString iconsetFile, FStoragesOrder)
     {
       SelectIconMenu *menu = createSelectIconMenu(iconsetFile,AWidget);
       FToolBarWidgetByMenu.insert(menu,AWidget);
@@ -334,7 +283,7 @@ void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
   FToolBarsWidgets.removeAt(FToolBarsWidgets.indexOf(widget));
 }
 
-void Emoticons::onIconSelected(const QString &AIconsetFile, const QString &AIconFile)
+void Emoticons::onIconSelected(const QString &/*ASubStorage*/, const QString &AIconKey)
 {
   SelectIconMenu *menu = qobject_cast<SelectIconMenu *>(sender());
   if (FToolBarWidgetByMenu.contains(menu))
@@ -342,10 +291,8 @@ void Emoticons::onIconSelected(const QString &AIconsetFile, const QString &AIcon
     IEditWidget *widget = FToolBarWidgetByMenu.value(menu)->editWidget();
     if (widget)
     {
-      SkinIconset *iconset = Skin::getSkinIconset(AIconsetFile);
-      QString text = iconset->tagValues(SMILEY_TAG_NAME,AIconFile).value(0);
       widget->textEdit()->setFocus();
-      widget->textEdit()->textCursor().insertText(text);
+      widget->textEdit()->textCursor().insertText(AIconKey);
       widget->textEdit()->textCursor().insertText(" ");
     }
   }
@@ -356,31 +303,16 @@ void Emoticons::onSelectIconMenuDestroyed(QObject *AObject)
   FToolBarWidgetByMenu.remove((SelectIconMenu *)AObject);
 }
 
-void Emoticons::onSkinAboutToBeChanged()
-{
-  onSettingsClosed();
-}
-
-void Emoticons::onSkinChanged()
-{
-  onSettingsOpened();
-  emit iconsetsChangedBySkin();
-}
-
 void Emoticons::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(EMOTICONS_UUID);
-  QStringList smiles =  Skin::skinFiles(SKIN_TYPE_ICONSET,SUBFOLDER_EMOTICONS,"*.jisp");
-  for(int i = 0; i<smiles.count(); i++)
-    smiles[i].prepend(SUBFOLDER_EMOTICONS"/");
-  setIconsets(settings->valueNS(SVN_ICONSETFILES_NS,Skin::skin(),smiles).toStringList());
+  setIconsets(settings->value(SVN_SUBSTORAGES,FileStorage::availSubStorages(RSR_STORAGE_EMOTICONS)).toStringList());
 }
 
 void Emoticons::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(EMOTICONS_UUID);
-  settings->setValueNS(SVN_ICONSETFILES_NS,Skin::skin(),FIconsets);
-  removeIconset(FIconsets);
+  settings->setValue(SVN_SUBSTORAGES,FStoragesOrder);
 }
 
 void Emoticons::onOptionsDialogAccepted()

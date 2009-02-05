@@ -1,7 +1,6 @@
 #include "traymanager.h"
-#include <QContextMenuEvent>
 
-#define IN_QUIT         "psi/quit"
+#include <QContextMenuEvent>
 
 TrayManager::TrayManager()
 {
@@ -35,7 +34,7 @@ void TrayManager::pluginInfo(IPluginInfo *APluginInfo)
 bool TrayManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   FQuitAction = new Action(FContextMenu);
-  FQuitAction->setIcon(SYSTEM_ICONSETFILE,IN_QUIT);
+  FQuitAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
   FQuitAction->setText(tr("Quit"));
   connect(FQuitAction,SIGNAL(triggered()),APluginManager->instance(),SLOT(quit()));
   addAction(FQuitAction,AG_TRAYMANAGER_TRAY_QUIT);

@@ -6,6 +6,8 @@
 #include <QSortFilterProxyModel>
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersearch.h"
 #include "../../interfaces/imainwindow.h"

@@ -7,13 +7,6 @@
 #define ADR_NEW_SERVICE_JID   Action::DR_Parametr2
 #define ADR_LOG_IN            Action::DR_Parametr3
 
-#define IN_GATEWAYS           "psi/disco"
-#define IN_ADD_USER           "psi/addContact"
-#define IN_LOG_IN             "status/online"
-#define IN_LOG_OUT            "status/offline"
-#define IN_KEEP               "psi/advanced"
-#define IN_CHANGE_TRANSPORT   "psi/arrowRight"
-
 #define PSN_GATEWAYS_KEEP         "vacuum:gateways:keep"
 #define PSN_GATEWAYS_SUBSCRIBE    "vacuum:gateways:subscribe"
 #define PST_GATEWAYS_SERVICES     "services"
@@ -208,7 +201,7 @@ Action *Gateways::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
   {
     Action *action = new Action(AParent);
     action->setText(tr("Add Legacy User"));
-    action->setIcon(SYSTEM_ICONSETFILE,IN_ADD_USER);
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_ADD_CONTACT);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_SERVICE_JID,ADiscoInfo.contactJid.full());
     connect(action,SIGNAL(triggered(bool)),SLOT(onGatewayActionTriggered(bool)));
@@ -412,7 +405,7 @@ void Gateways::registerDiscoFeatures()
   IDiscoFeature dfeature;
   dfeature.active = false;
   dfeature.var = NS_JABBER_GATEWAY;
-  dfeature.icon = Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_GATEWAYS);
+  dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_GATEWAYS);
   dfeature.name = tr("Gateway Interaction");
   dfeature.description = tr("Enables a client to send a legacy username to the gateway and receive a properly-formatted JID");
   FDiscovery->insertDiscoFeature(dfeature);
@@ -529,7 +522,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Log In"));
-      action->setIcon(STATUS_ICONSETFILE,IN_LOG_IN);
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_IN);
       action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
       action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BareJid));
       action->setData(ADR_LOG_IN,true);
@@ -538,7 +531,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
       action = new Action(AMenu);
       action->setText(tr("Log Out"));
-      action->setIcon(STATUS_ICONSETFILE,IN_LOG_OUT);
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_OUT);
       action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
       action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BareJid));
       action->setData(ADR_LOG_IN,false);
@@ -549,7 +542,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       {
         Action *action = new Action(AMenu);
         action->setText(tr("Keep connection"));
-        action->setIcon(SYSTEM_ICONSETFILE,IN_KEEP);
+        action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_KEEP_CONNECTION);
         action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
         action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BareJid));
         action->setCheckable(true);
@@ -569,6 +562,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     {
       Action *action = new Action(AMenu);
       action->setText(contactJid.node().isEmpty() ? tr("Resolve nick names") : tr("Resolve nick name"));
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
       action->setData(ADR_STREAM_JID,streamJid.full());
       action->setData(ADR_SERVICE_JID,contactJid.full());
       connect(action,SIGNAL(triggered(bool)),SLOT(onResolveActionTriggered(bool)));
@@ -751,7 +745,7 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
       {
         Menu *change = new Menu(AMenu);
         change->setTitle(tr("Use instead of"));
-        change->setIcon(SYSTEM_ICONSETFILE,IN_CHANGE_TRANSPORT);
+        change->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_CHANGE);
         foreach(Jid service, services)
         {
           Action *action = new Action(change);
@@ -759,7 +753,7 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
           if (FStatusIcons!=NULL)
             action->setIcon(FStatusIcons->iconByJid(streamJid,service));
           else
-            action->setIcon(STATUS_ICONSETFILE,IN_LOG_IN);
+            action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_IN);
           action->setData(ADR_STREAM_JID,streamJid.full());
           action->setData(ADR_SERVICE_JID,service.full());
           action->setData(ADR_NEW_SERVICE_JID,itemJid.full());

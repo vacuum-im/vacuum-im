@@ -3,8 +3,12 @@
 
 #include <QRegExp>
 #include <QPointer>
+#include "../../definations/resources.h"
+#include "../../definations/statusicons.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionorders.h"
+#include "../../definations/actiongroups.h"
+#include "../../definations/menuicons.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/istatusicons.h"
@@ -13,9 +17,6 @@
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/isettings.h"
-#include "../../interfaces/iskinmanager.h"
-#include "../../utils/skin.h"
-#include "../../utils/unzipfile.h"
 #include "rosterindexdataholder.h"
 #include "iconsoptionswidget.h"
 
@@ -41,29 +42,29 @@ public:
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IStatusIcons
-  virtual QString defaultIconFile() const { return FDefaultIconFile; }
-  virtual void setDefaultIconFile(const QString &AIconFile);
-  virtual void insertRule(const QString &APattern, const QString &AIconFile, RuleType ARuleType);
+  virtual QString defaultSubStorage() const;
+  virtual void setDefaultSubStorage(const QString &ASubStorage);
+  virtual void insertRule(const QString &APattern, const QString &ASubStorage, RuleType ARuleType);
   virtual QStringList rules(RuleType ARuleType) const;
-  virtual QString ruleIconFile(const QString &APattern, RuleType ARuleType) const;
+  virtual QString ruleSubStorage(const QString &APattern, RuleType ARuleType) const;
   virtual void removeRule(const QString &APattern, RuleType ARuleType);
-  virtual QIcon iconByJid(const Jid &AStreamJid, const Jid &AJid) const;
-  virtual QIcon iconByJidStatus(const Jid &AJid, int AShow, const QString &ASubscription, bool AAsk) const;
-  virtual QString iconFileByJid(const Jid &AJid) const;
-  virtual QString iconNameByStatus(int AShow, const QString &ASubscription, bool AAsk) const;
+  virtual QIcon iconByJid(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual QIcon iconByStatus(int AShow, const QString &ASubscription, bool AAsk) const;
+  virtual QIcon iconByJidStatus(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const;
+  virtual QString subStorageByJid(const Jid &AContactJid) const;
+  virtual QString iconKeyByStatus(int AShow, const QString &ASubscription, bool AAsk) const;
 signals:
-  virtual void defaultIconFileChanged(const QString &AIconFile);
-  virtual void ruleInserted(const QString &APattern, const QString &AIconFile, RuleType ARuleType);
+  virtual void defaultStorageChanged(const QString &ASubStorage);
+  virtual void ruleInserted(const QString &APattern, const QString &ASubStorage, RuleType ARuleType);
   virtual void ruleRemoved(const QString &APattern, RuleType ARuleType);
   virtual void defaultIconsChanged();
   virtual void statusIconsChanged();
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
+  void loadStorages();
+  void clearStorages();
   void startStatusIconsChanged();
-  void loadIconFilesRules();
-  void clearIconFilesRules();
 protected slots:
   void onStatusIconsChangedTimer();
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
@@ -71,30 +72,29 @@ protected slots:
   void onSettingsClosed();
   void onOptionsAccepted();
   void onOptionsRejected();
-  void onStatusIconsetChanged();
+  void onDefaultStorageChanged();
   void onSetCustomIconset(bool);
-  void onSkinChanged();
 private:
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
   IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
   ISettingsPlugin *FSettingsPlugin;
-  ISkinManager *FSkinManager;
 private:
   Menu *FCustomIconMenu;
   Action *FDefaultIconAction;
   QHash<QString,Action *> FCustomIconActions;
-  SkinIconset *FStatusIconset;
+  IconStorage *FDefaultStorage;
   RosterIndexDataHolder *FDataHolder;
   QPointer<IconsOptionsWidget> FIconsOptionWidget;
 private:
   bool FStatusIconsChangedStarted;
-  QString FDefaultIconFile;
+  QString FDefaultSubStorage;
+  QSet<QString> FStatusRules;
   QHash<QString, QString> FUserRules;
   QHash<QString, QString> FDefaultRules;
-  QSet<QString> FIconFilesRules;
-  mutable QHash<QString, QString> FJid2IconFile;
+  QHash<QString, IconStorage *> FStorages;
+  mutable QHash<Jid, QString> FJid2Storage;
 };
 
 #endif // STATUSICONS_H

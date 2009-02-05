@@ -1,14 +1,13 @@
-#include <QDebug>
 #include "statusicons.h"
 
 #include <QTimer>
 
-#define SVN_DEFAULT_ICONFILE              "defaultIconFile"
+#define SVN_DEFAULT_SUBSTORAGE            "defaultSubStorage"
 #define SVN_RULES                         "rules"
 #define SVN_USERRULES                     "rules:user[]"
 
 #define ADR_RULE                          Action::DR_Parametr1
-#define ADR_ICONSETNAME                   Action::DR_Parametr2
+#define ADR_SUBSTORAGE                    Action::DR_Parametr2
 
 StatusIcons::StatusIcons()
 {
@@ -17,9 +16,8 @@ StatusIcons::StatusIcons()
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
   FSettingsPlugin = NULL;
-  FSkinManager = NULL;
 
-  FStatusIconset = NULL;
+  FDefaultStorage = NULL;
   FCustomIconMenu = NULL;
   FDefaultIconAction = NULL;
   FDataHolder = NULL;
@@ -65,6 +63,11 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOr
   if (plugin)
   {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+    if (FRostersViewPlugin)
+    {
+      connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *,Menu*)),
+        SLOT(onRostersViewContextMenu(IRosterIndex *,Menu *)));
+    }
   }
 
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
@@ -80,16 +83,6 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     }
   }
 
-  plugin = APluginManager->getPlugins("ISkinManager").value(0,NULL);
-  if (plugin)
-  {
-    FSkinManager = qobject_cast<ISkinManager *>(plugin->instance());
-    if (FSkinManager)
-    {
-      connect(FSkinManager->instance(),SIGNAL(skinChanged()),SLOT(onSkinChanged()));
-    }
-  }
-
   return true;
 }
 
@@ -98,28 +91,21 @@ bool StatusIcons::initObjects()
   FCustomIconMenu = new Menu;
   FCustomIconMenu->setTitle(tr("Status icon"));
 
-  setDefaultIconFile(STATUS_ICONSETFILE);
-  
-  if (!FSkinManager)
-    loadIconFilesRules();
-
   if (FRostersModel)
   {
     FDataHolder = new RosterIndexDataHolder(this);
     FRostersModel->insertDefaultDataHolder(FDataHolder);
   }
 
-  if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
-  {
-    connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *,Menu*)),
-      SLOT(onRostersViewContextMenu(IRosterIndex *,Menu *)));
-  }
-
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_STATUSICONS,tr("Status icons"), tr("Configure status icons"),QIcon());
+    FSettingsPlugin->openOptionsNode(ON_STATUSICONS,tr("Status icons"),tr("Configure status icons"),MNI_STATUSICONS_OPTIONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
+
+  FDefaultStorage = IconStorage::staticStorage(RSR_STORAGE_STATUSICONS);
+  connect(FDefaultStorage,SIGNAL(storageChanged()),SLOT(onDefaultStorageChanged()));
+  loadStorages();
 
   return true;
 }
@@ -135,39 +121,39 @@ QWidget *StatusIcons::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
-void StatusIcons::setDefaultIconFile(const QString &AIconFile)
+QString StatusIcons::defaultSubStorage() const
 {
-  if (FDefaultIconFile != AIconFile)
+  return FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : STORAGE_SHARED_DIR;
+}
+
+void StatusIcons::setDefaultSubStorage(const QString &ASubStorage)
+{
+  if (FDefaultStorage && FDefaultStorage->subStorage()!=ASubStorage)
   {
-    if (FStatusIconset)
-      disconnect(FStatusIconset,SIGNAL(iconsetChanged()),this,SLOT(onStatusIconsetChanged()));
-    FDefaultIconFile = AIconFile;
-    FStatusIconset = Skin::getSkinIconset(AIconFile);
-    connect(FStatusIconset,SIGNAL(iconsetChanged()),SLOT(onStatusIconsetChanged()));
-    FJid2IconFile.clear();
-    emit defaultIconFileChanged(AIconFile);
-    emit defaultIconsChanged();
-    startStatusIconsChanged();
+    if (IconStorage::availSubStorages(RSR_STORAGE_STATUSICONS).contains(ASubStorage))
+      FDefaultStorage->setSubStorage(ASubStorage);
+    else
+      FDefaultStorage->setSubStorage(STORAGE_SHARED_DIR);
   }
 }
 
-void StatusIcons::insertRule(const QString &APattern, const QString &AIconFile, RuleType ARuleType)
+void StatusIcons::insertRule(const QString &APattern, const QString &ASubStorage, RuleType ARuleType)
 {
-  if (APattern.isEmpty() || AIconFile.isEmpty() || !QRegExp(APattern).isValid())
+  if (APattern.isEmpty() || ASubStorage.isEmpty() || !QRegExp(APattern).isValid())
     return;
 
   switch(ARuleType)
   {
   case UserRule:
-    FUserRules.insert(APattern,AIconFile);
+    FUserRules.insert(APattern,ASubStorage);
     break;
   case DefaultRule:
-    FDefaultRules.insert(APattern,AIconFile);
+    FDefaultRules.insert(APattern,ASubStorage);
     break;
   }
 
-  FJid2IconFile.clear();
-  emit ruleInserted(APattern,AIconFile,ARuleType);
+  FJid2Storage.clear();
+  emit ruleInserted(APattern,ASubStorage,ARuleType);
   startStatusIconsChanged();
 }
 
@@ -183,16 +169,16 @@ QStringList StatusIcons::rules(RuleType ARuleType) const
   return QList<QString>();
 }
 
-QString StatusIcons::ruleIconFile(const QString &APattern, RuleType ARuleType) const
+QString StatusIcons::ruleSubStorage(const QString &APattern, RuleType ARuleType) const
 {
   switch(ARuleType)
   {
   case UserRule:
-    return FUserRules.value(APattern);
+    return FUserRules.value(APattern,STORAGE_SHARED_DIR);
   case DefaultRule:
-    return FDefaultRules.value(APattern);
+    return FDefaultRules.value(APattern,STORAGE_SHARED_DIR);
   }
-  return QString();
+  return FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : STORAGE_SHARED_DIR;
 }
 
 void StatusIcons::removeRule(const QString &APattern, RuleType ARuleType)
@@ -206,113 +192,157 @@ void StatusIcons::removeRule(const QString &APattern, RuleType ARuleType)
     FDefaultRules.remove(APattern);
     break;
   }
-  FJid2IconFile.clear();
+  FJid2Storage.clear();
   emit ruleRemoved(APattern,ARuleType);
   startStatusIconsChanged();
 }
 
-QIcon StatusIcons::iconByJid(const Jid &AStreamJid, const Jid &AJid) const
+QIcon StatusIcons::iconByJid(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-
-  int show = IPresence::Offline;
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
-  if (presence)
-    show = presence->presenceItem(AJid).show;
+  int show = presence!=NULL ? presence->presenceItem(AContactJid).show : IPresence::Offline;
 
-  QString subs;
   bool ask = false;
+  QString subscription = SUBSCRIPTION_NONE;
   IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
   if (roster)
   {
-    IRosterItem ritem = roster->rosterItem(AJid);
+    IRosterItem ritem = roster->rosterItem(AContactJid);
     if (ritem.isValid)
     {
-      subs = ritem.subscription;
+      subscription = ritem.subscription;
       ask = !ritem.ask.isEmpty();
     }
   }
 
-  return iconByJidStatus(AJid,show,subs,ask);
-}
-
-QIcon StatusIcons::iconByJidStatus(const Jid &AJid, int AShow, const QString &ASubscription, bool AAsk) const
-{
-  QString iconFile = iconFileByJid(AJid);
-  QString iconName = iconNameByStatus(AShow,ASubscription,AAsk);
-  SkinIconset *iconset = Skin::getSkinIconset(iconFile);
-  QIcon icon = iconset->iconByName(iconName);
-  return !icon.isNull() ? icon : FStatusIconset->iconByName(iconName);
-}
-
-QString StatusIcons::iconFileByJid(const Jid &AJid) const
-{
-  QString full = AJid.pFull();
-  if (FJid2IconFile.contains(full))
-    return FJid2IconFile.value(full);
-
-  QRegExp regExp;
-  regExp.setCaseSensitivity(Qt::CaseInsensitive);
-
-  QStringList patterns = FUserRules.keys();
-  foreach (QString pattern, patterns)
-  {
-    regExp.setPattern(pattern);
-    if (full.contains(regExp))
-    {
-      QString iconFile = FUserRules.value(pattern);
-      FJid2IconFile.insert(full,iconFile);
-      return iconFile;
-    }
-  }
-
-  patterns = FDefaultRules.keys();
-  foreach (QString pattern, patterns)
-  {
-    regExp.setPattern(pattern);
-    if (full.contains(regExp))
-    {
-      QString iconFile = FDefaultRules.value(pattern);
-      FJid2IconFile.insert(full,iconFile);
-      return iconFile;
-    }
-  }
-
-  FJid2IconFile.insert(full,FDefaultIconFile);  
-  return FDefaultIconFile;
-}
-
-QString StatusIcons::iconNameByStatus(int AShow, const QString &ASubscription, bool AAsk) const
-{
-  switch (AShow)
-  {
-  case IPresence::Offline: 
-    {
-      if (AAsk) 
-        return "status/ask";
-      if (ASubscription == "none") 
-        return "status/noauth";
-      return ("status/offline");
-    }
-  case IPresence::Online: 
-    return ("status/online");
-  case IPresence::Chat: 
-    return ("status/chat");
-  case IPresence::Away: 
-    return ("status/away");
-  case IPresence::ExtendedAway: 
-    return ("status/xa");
-  case IPresence::DoNotDistrib: 
-    return ("status/dnd");
-  case IPresence::Invisible: 
-    return ("status/invisible");
-  default: 
-    return "status/error";
-  }
+  return iconByJidStatus(AContactJid,show,subscription,ask);
 }
 
 QIcon StatusIcons::iconByStatus(int AShow, const QString &ASubscription, bool AAsk) const
 {
-  return FStatusIconset->iconByName(iconNameByStatus(AShow,ASubscription,AAsk));
+  return FDefaultStorage!=NULL ? FDefaultStorage->getIcon(iconKeyByStatus(AShow,ASubscription,AAsk)) : QIcon();
+}
+
+QIcon StatusIcons::iconByJidStatus(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const
+{
+  QString substorage = subStorageByJid(AContactJid);
+  QString iconKey = iconKeyByStatus(AShow,ASubscription,AAsk);
+  IconStorage *storage = FStorages.value(substorage,FDefaultStorage);
+  return storage!=NULL ? storage->getIcon(iconKey) : QIcon();
+}
+
+QString StatusIcons::subStorageByJid(const Jid &AContactJid) const
+{
+  if (!FJid2Storage.contains(AContactJid))
+  {
+    QRegExp regExp;
+    regExp.setCaseSensitivity(Qt::CaseInsensitive);
+
+    QString substorage;
+    foreach (QString pattern, FUserRules.keys())
+    {
+      regExp.setPattern(pattern);
+      if (AContactJid.pFull().contains(regExp))
+      {
+        substorage = FUserRules.value(pattern);
+        break;
+      }
+    }
+
+    if (substorage.isEmpty())
+    {
+      foreach (QString pattern, FDefaultRules.keys())
+      {
+        regExp.setPattern(pattern);
+        if (AContactJid.pFull().contains(regExp))
+        {
+          substorage = FDefaultRules.value(pattern);
+          break;
+        }
+      }
+    }
+
+    if (substorage.isEmpty())
+    {
+      substorage = FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : STORAGE_SHARED_DIR;
+    }
+
+    FJid2Storage.insert(AContactJid,substorage);
+    return substorage;
+  }
+  return FJid2Storage.value(AContactJid);
+}
+
+QString StatusIcons::iconKeyByStatus(int AShow, const QString &ASubscription, bool AAsk) const
+{
+  switch (AShow)
+  {
+  case IPresence::Offline: 
+    if (AAsk) 
+      return STI_ASK;
+    if (ASubscription==SUBSCRIPTION_NONE) 
+      return STI_NOAUTH;
+    return STI_OFFLINE;
+  case IPresence::Online: 
+    return STI_ONLINE;
+  case IPresence::Chat: 
+    return STI_CHAT;
+  case IPresence::Away: 
+    return STI_AWAY;
+  case IPresence::ExtendedAway: 
+    return STI_XAWAY;
+  case IPresence::DoNotDistrib: 
+    return STI_DND;
+  case IPresence::Invisible: 
+    return STI_INVISIBLE;
+  default: 
+    return STI_ERROR;
+  }
+}
+
+void StatusIcons::loadStorages()
+{
+  clearStorages();
+
+  FDefaultIconAction = new Action(FCustomIconMenu);
+  FDefaultIconAction->setText(tr("Default"));
+  FDefaultIconAction->setCheckable(true);
+  connect(FDefaultIconAction,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
+  FCustomIconMenu->addAction(FDefaultIconAction,AG_DEFAULT-1,true);
+
+  QStringList storages = FileStorage::availSubStorages(RSR_STORAGE_STATUSICONS);
+  foreach(QString substorage, storages)
+  {
+    IconStorage *storage = new IconStorage(RSR_STORAGE_STATUSICONS,substorage,this);
+    FStorages.insert(substorage,storage);
+    
+    QString pattern = storage->option(STO_PATTERN);
+    if (!pattern.isEmpty())
+    {
+      insertRule(pattern,substorage,IStatusIcons::DefaultRule);
+      FStatusRules += pattern;
+    }
+
+    QString name = storage->option(STORAGE_NAME);
+    Action *action = new Action(FCustomIconMenu);
+    action->setCheckable(true);
+    action->setIcon(storage->getIcon(iconKeyByStatus(IPresence::Online,"",false)));
+    action->setText(!name.isEmpty() ? name : substorage);
+    action->setData(ADR_SUBSTORAGE,substorage);
+    connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
+    FCustomIconActions.insert(substorage,action);
+    FCustomIconMenu->addAction(action,AG_DEFAULT,true);
+  }
+}
+
+void StatusIcons::clearStorages()
+{
+  FCustomIconMenu->clear();
+  FCustomIconActions.clear();
+  foreach(QString rule, FStatusRules)
+    removeRule(rule,IStatusIcons::DefaultRule);
+  FStatusRules.clear();
+  qDeleteAll(FStorages);
 }
 
 void StatusIcons::startStatusIconsChanged()
@@ -322,60 +352,6 @@ void StatusIcons::startStatusIconsChanged()
     QTimer::singleShot(0,this,SLOT(onStatusIconsChangedTimer()));
     FStatusIconsChangedStarted = true;
   }
-}
-
-void StatusIcons::loadIconFilesRules()
-{
-  clearIconFilesRules();
-
-  FDefaultIconAction = new Action(FCustomIconMenu);
-  FDefaultIconAction->setText(tr(DEFAULT_SKIN_NAME));
-  FDefaultIconAction->setCheckable(true);
-  connect(FDefaultIconAction,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
-  FCustomIconMenu->addAction(FDefaultIconAction,AG_DEFAULT-1,true);
-
-  QStringList iconFiles = Skin::skinFilesWithDef(SKIN_TYPE_ICONSET,"status","*.jisp");
-  for (int i = 0; i < iconFiles.count(); ++i)
-    iconFiles[i].prepend("status/");
-
-  foreach(QString iconFile, iconFiles)
-  {
-    SkinIconset *iconset = Skin::getSkinIconset(iconFile); //(Skin::skinsDirectory()+"/"+Skin::skin()+"/iconset/"+iconFile);
-    if (iconset->isValid())
-    {
-      QDomDocument doc;
-      doc.setContent(iconset->fileData("statusicons.xml"));
-      QDomElement elem = doc.firstChildElement().firstChildElement("rule");
-      while(!elem.isNull())
-      {
-        QString pattern = elem.attribute("pattern");
-        if (!pattern.isEmpty())
-        {
-          insertRule(pattern,iconFile,IStatusIcons::DefaultRule);
-          FIconFilesRules += pattern;
-        }
-        elem = elem.nextSiblingElement("rule");
-      }
-
-      Action *action = new Action(FCustomIconMenu);
-      action->setIcon(iconset->iconByName(iconNameByStatus(IPresence::Online,"",false)));
-      action->setText(iconset->info().name);
-      action->setData(ADR_ICONSETNAME,iconFile);
-      action->setCheckable(true);
-      connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
-      FCustomIconActions.insert(iconFile,action);
-      FCustomIconMenu->addAction(action,AG_DEFAULT,true);
-    }
-  }
-}
-
-void StatusIcons::clearIconFilesRules()
-{
-  FCustomIconMenu->clear();
-  FCustomIconActions.clear();
-  foreach(QString rule, FIconFilesRules)
-    removeRule(rule,IStatusIcons::DefaultRule);
-  FIconFilesRules.clear();
 }
 
 void StatusIcons::onStatusIconsChangedTimer()
@@ -389,15 +365,16 @@ void StatusIcons::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   if (AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent)
   {
     QString rule = AIndex->data(RDR_BareJid).toString();
-    QString iconFile = ruleIconFile(rule,IStatusIcons::UserRule);
-    FDefaultIconAction->setIcon(iconByStatus(IPresence::Online,"",false));
+    QString substorage = ruleSubStorage(rule,IStatusIcons::UserRule);
+    FDefaultIconAction->setIcon(iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false));
     FDefaultIconAction->setData(ADR_RULE,rule);
-    FDefaultIconAction->setChecked(iconFile.isEmpty());
+    FDefaultIconAction->setChecked(FDefaultStorage!=NULL && FDefaultStorage->subStorage()==substorage);
     foreach(Action *action,FCustomIconActions)
     {
       action->setData(ADR_RULE,AIndex->data(RDR_BareJid));
-      action->setChecked(action->data(ADR_ICONSETNAME).toString() == iconFile);
+      action->setChecked(action->data(ADR_SUBSTORAGE).toString() == substorage);
     }
+    FCustomIconMenu->setIcon(iconByJidStatus(AIndex->data(RDR_Jid).toString(),IPresence::Online,SUBSCRIPTION_BOTH,false));
     AMenu->addAction(FCustomIconMenu->menuAction(),AG_STATUSICONS_ROSTER,true);
   }
 }
@@ -405,24 +382,20 @@ void StatusIcons::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 void StatusIcons::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(STATUSICONS_UUID);
-  setDefaultIconFile(settings->value(SVN_DEFAULT_ICONFILE,STATUS_ICONSETFILE).toString());
+  setDefaultSubStorage(settings->value(SVN_DEFAULT_SUBSTORAGE,STORAGE_SHARED_DIR).toString());
 
   QHash<QString,QVariant> rules = settings->values(SVN_USERRULES);
-  QHash<QString,QVariant>::const_iterator it = rules.constBegin();
-  for (; it != rules.constEnd(); it++)
+  for (QHash<QString,QVariant>::const_iterator it = rules.constBegin(); it != rules.constEnd(); it++)
     insertRule(it.key(),it.value().toString(),UserRule);
-
 }
 
 void StatusIcons::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(STATUSICONS_UUID);
-  settings->setValue(SVN_DEFAULT_ICONFILE,defaultIconFile());
+  settings->setValue(SVN_DEFAULT_SUBSTORAGE,defaultSubStorage());
   
-  settings->deleteValue(SVN_RULES);
-  
-  QStringList patterns = FUserRules.keys();
-  foreach(QString pattern, patterns)
+  settings->deleteValue(SVN_RULES);  
+  foreach(QString pattern, FUserRules.keys())
   {
     settings->setValueNS(SVN_USERRULES,pattern,FUserRules.value(pattern));
     removeRule(pattern,UserRule);
@@ -441,10 +414,16 @@ void StatusIcons::onOptionsRejected()
   emit optionsRejected();
 }
 
-void StatusIcons::onStatusIconsetChanged()
+void StatusIcons::onDefaultStorageChanged()
 {
-  emit defaultIconsChanged();
-  startStatusIconsChanged();
+  IconStorage *storage = qobject_cast<IconStorage*>(sender());
+  if (storage)
+  {
+    FJid2Storage.clear();
+    emit defaultStorageChanged(storage->subStorage());
+    emit defaultIconsChanged();
+    startStatusIconsChanged();
+  }
 }
 
 void StatusIcons::onSetCustomIconset(bool)
@@ -453,17 +432,12 @@ void StatusIcons::onSetCustomIconset(bool)
   if (action)
   {
     QString rule = action->data(ADR_RULE).toString();
-    QString iconFile = action->data(ADR_ICONSETNAME).toString();
-    if (iconFile.isEmpty())
+    QString substorage = action->data(ADR_SUBSTORAGE).toString();
+    if (substorage.isEmpty())
       removeRule(rule,IStatusIcons::UserRule);
     else
-      insertRule(rule,iconFile,IStatusIcons::UserRule);
+      insertRule(rule,substorage,IStatusIcons::UserRule);
   }
-}
-
-void StatusIcons::onSkinChanged()
-{
-  loadIconFilesRules();
 }
 
 Q_EXPORT_PLUGIN2(StatusIconsPlugin, StatusIcons)

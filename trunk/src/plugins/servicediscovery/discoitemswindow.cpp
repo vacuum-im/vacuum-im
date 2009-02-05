@@ -3,15 +3,6 @@
 #include <QRegExp>
 #include <QLineEdit>
 
-#define IN_ARROW_LEFT           "psi/arrowLeft"
-#define IN_ARROW_RIGHT          "psi/arrowRight"
-#define IN_DISCOVER             "psi/jabber"
-#define IN_RELOAD               "psi/reload"
-#define IN_DISCO                "psi/disco"
-#define IN_ADDCONTACT           "psi/addContact"
-#define IN_VCARD                "psi/vCard"
-#define IN_INFO                 "psi/statusmsg"
-
 bool SortFilterProxyModel::hasChildren( const QModelIndex &AParent ) const
 {
   if (sourceModel() && sourceModel()->canFetchMore(mapToSource(AParent)))
@@ -39,7 +30,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
-  setWindowIcon(Skin::getSkinIconset(SYSTEM_ICONSETFILE)->iconByName(IN_DISCO));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SDISCOVERY_DISCOVER,0,0,"windowIcon");
 
   FDataForms = NULL;
   FVCardPlugin = NULL;
@@ -151,43 +142,43 @@ void DiscoItemsWindow::createToolBarActions()
 {
   FMoveBack = new Action(FToolBarChanger);
   FMoveBack->setText(tr("Back"));
-  FMoveBack->setIcon(SYSTEM_ICONSETFILE,IN_ARROW_LEFT);
+  FMoveBack->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_ARROW_LEFT);
   FToolBarChanger->addAction(FMoveBack,AG_DIWT_DISCOVERY_NAVIGATE,false);
   connect(FMoveBack,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FMoveForward = new Action(FToolBarChanger);
   FMoveForward->setText(tr("Forward"));
-  FMoveForward->setIcon(SYSTEM_ICONSETFILE,IN_ARROW_RIGHT);
+  FMoveForward->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_ARROW_RIGHT);
   FToolBarChanger->addAction(FMoveForward,AG_DIWT_DISCOVERY_NAVIGATE,false);
   connect(FMoveForward,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FDiscoverCurrent = new Action(FToolBarChanger);
   FDiscoverCurrent->setText(tr("Discover"));
-  FDiscoverCurrent->setIcon(SYSTEM_ICONSETFILE,IN_DISCOVER);
+  FDiscoverCurrent->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
   FToolBarChanger->addAction(FDiscoverCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
   connect(FDiscoverCurrent,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FReloadCurrent = new Action(FToolBarChanger);
   FReloadCurrent->setText(tr("Reload"));
-  FReloadCurrent->setIcon(SYSTEM_ICONSETFILE,IN_RELOAD);
+  FReloadCurrent->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_RELOAD);
   FToolBarChanger->addAction(FReloadCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
   connect(FReloadCurrent,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FDiscoInfo = new Action(FToolBarChanger);
   FDiscoInfo->setText(tr("Disco info"));
-  FDiscoInfo->setIcon(SYSTEM_ICONSETFILE,IN_INFO);
+  FDiscoInfo->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOINFO);
   FToolBarChanger->addAction(FDiscoInfo,AG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FDiscoInfo,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FAddContact = new Action(FToolBarChanger);
   FAddContact->setText(tr("Add Contact"));
-  FAddContact->setIcon(SYSTEM_ICONSETFILE,IN_ADDCONTACT);
+  FAddContact->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
   FToolBarChanger->addAction(FAddContact,AG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FAddContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FShowVCard = new Action(FToolBarChanger);
   FShowVCard->setText(tr("vCard"));
-  FShowVCard->setIcon(SYSTEM_ICONSETFILE,IN_VCARD);
+  FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
   FToolBarChanger->addAction(FShowVCard,AG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 

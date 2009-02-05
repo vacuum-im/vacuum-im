@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QToolButton>
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/imessenger.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/action.h"

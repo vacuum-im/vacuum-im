@@ -1,10 +1,10 @@
 #include "optionsdialog.h"
 
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QLabel>
 #include <QFrame>
 #include <QScrollBar>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QPushButton>
 #include <QHeaderView>
 #include <QTextDocument>
@@ -13,6 +13,7 @@ OptionsDialog::OptionsDialog(QWidget *AParent) : QDialog(AParent)
 {
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Options"));
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SETTINGS_OPTIONS,0,0,"windowIcon");
 
   lblInfo = new QLabel("<b>Node name</b><br>Node description");
   lblInfo->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -63,7 +64,7 @@ OptionsDialog::~OptionsDialog()
   qDeleteAll(FNodes);
 }
 
-void OptionsDialog::openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QIcon &AIcon, QWidget *AWidget)
+void OptionsDialog::openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIcon, QWidget *AWidget)
 {
   OptionsNode *node = FNodes.value(ANode,NULL);
   if (!node && !ANode.isEmpty() && !AName.isEmpty())
@@ -77,8 +78,8 @@ void OptionsDialog::openNode(const QString &ANode, const QString &AName, const Q
 
     QTreeWidgetItem *nodeItem = createTreeItem(ANode);
     nodeItem->setText(0,AName);
-    nodeItem->setIcon(0,AIcon);
     nodeItem->setWhatsThis(0,ADescription);
+    nodeItem->setIcon(0,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(AIcon));
 
     if (AWidget)
     {

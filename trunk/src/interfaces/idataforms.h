@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QDialog>
 #include <QTableWidget>
+#include <QDomDocument>
 #include <QDialogButtonBox>
 #include "../../utils/toolbarchanger.h"
 

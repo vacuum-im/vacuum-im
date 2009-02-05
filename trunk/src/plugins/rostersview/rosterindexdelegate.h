@@ -6,7 +6,6 @@
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/irostersview.h"
-#include "../../utils/skin.h"
 
 struct LabelItem
 {

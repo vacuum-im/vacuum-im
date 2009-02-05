@@ -2,9 +2,11 @@
 #define REGISTERDIALOG_H
 
 #include <QDialog>
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/iregistraton.h"
 #include "../../interfaces/idataforms.h"
-#include "../../utils/skin.h"
+#include "../../utils/iconstorage.h"
 #include "ui_registerdialog.h"
 
 class RegisterDialog : 

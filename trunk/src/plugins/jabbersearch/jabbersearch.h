@@ -4,6 +4,8 @@
 #include "../../definations/namespaces.h"
 #include "../../definations/discofeatureorder.h"
 #include "../../definations/dataformtypes.h"
+#include "../../definations/resources.h"
+#include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ijabbersearch.h"
 #include "../../interfaces/idataforms.h"

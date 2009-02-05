@@ -19,16 +19,7 @@
    <string>IconsOptionsWidget</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="leftMargin" >
-    <number>0</number>
-   </property>
-   <property name="topMargin" >
-    <number>0</number>
-   </property>
-   <property name="rightMargin" >
-    <number>0</number>
-   </property>
-   <property name="bottomMargin" >
+   <property name="margin" >
     <number>0</number>
    </property>
    <item>
@@ -37,12 +28,23 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="tabDefault" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>466</width>
+        <height>280</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Default iconset</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QListWidget" name="lwtDefaultIconset" >
+         <property name="selectionMode" >
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
          <property name="verticalScrollMode" >
           <enum>QAbstractItemView::ScrollPerPixel</enum>
          </property>
@@ -51,6 +53,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabContact" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>466</width>
+        <height>280</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Default rules</string>
       </attribute>
@@ -81,6 +91,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabService" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>466</width>
+        <height>280</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>User rules</string>
       </attribute>
@@ -115,7 +133,7 @@
            <property name="orientation" >
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0" >
             <size>
              <width>40</width>
              <height>20</height>

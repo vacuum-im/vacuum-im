@@ -6,15 +6,13 @@ HEADERS  = utilsexport.h \
            action.h \
            menu.h \
            unzipfile.h \
-           iconset.h \
-           skin.h \
            message.h \
            iconsetdelegate.h \
            toolbarchanger.h \
            datetime.h \
-           skiniconset.h \
-           soundset.h \
-           skinsoundset.h
+           filestorage.h \
+           iconstorage.h
+          
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -23,12 +21,9 @@ SOURCES  = jid.cpp \
            action.cpp \
            menu.cpp \
            unzipfile.cpp \
-           iconset.cpp \
-           skin.cpp \
            message.cpp \
            iconsetdelegate.cpp \
            toolbarchanger.cpp \
            datetime.cpp \
-           skiniconset.cpp \
-           soundset.cpp \
-           skinsoundset.cpp
+           filestorage.cpp \
+           iconstorage.cpp

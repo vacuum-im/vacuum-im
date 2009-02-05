@@ -1,20 +1,21 @@
 #include "selecticonwidget.h"
+
 #include <QSet>
+#include <QCursor>
+#include <QToolTip>
 
-#define SMILEY_TAG_NAME                         "text"
-
-SelectIconWidget::SelectIconWidget(const QString &AIconsetFile, QWidget *AParent)
-  : QWidget(AParent)
+SelectIconWidget::SelectIconWidget(IconStorage *AStorage, QWidget *AParent) : QWidget(AParent)
 {
   FCurrent = NULL;
   FPressed = NULL;
-  FIconsetFile = AIconsetFile;
+  FStorage = AStorage;
 
   FLayout = new QGridLayout(this);
   FLayout->setMargin(2);
   FLayout->setHorizontalSpacing(3);
   FLayout->setVerticalSpacing(3);
 
+  AParent->setAttribute(Qt::WA_AlwaysShowToolTips,true);
   setMouseTracking(true);
   setAutoFillBackground(true);
   createLabels();
@@ -29,32 +30,27 @@ void SelectIconWidget::createLabels()
 {
   int column = 0;
   int row =0;
-  const int columns = 7;
-  
-  SkinIconset *iconset = Skin::getSkinIconset(FIconsetFile);
-  if (iconset->isValid())
+ 
+  QList<QString> keys = FStorage->fileFirstKeys();
+
+  int columns = keys.count()/2;
+  while (columns>1 && columns*columns>keys.count())
+    columns--;
+
+  foreach(QString key, keys)
   {
-    QSet<QString> usedTags;
-    QList<QString> files = iconset->iconFiles();
-    foreach(QString file, files)
-    {
-      QSet<QString> fileTags = iconset->tagValues(SMILEY_TAG_NAME,file).toSet();
-      if ((fileTags & usedTags).isEmpty())
-      {
-        QLabel *label = new QLabel(this);
-        label->setMargin(2);
-        label->setAlignment(Qt::AlignCenter);
-        label->setFrameShape(QFrame::Panel);
-        label->setPixmap(iconset->iconByFile(file).pixmap(QSize(16,16)));
-        label->installEventFilter(this);
-        FFileByLabel.insert(label,file);
-        FLayout->addWidget(label,row,column);
-        column = (column+1) % columns;
-        if(column == 0)
-          row++;
-        usedTags += fileTags;
-      }
-    }
+    QLabel *label = new QLabel(this);
+    label->setMargin(2);
+    label->setAlignment(Qt::AlignCenter);
+    label->setFrameShape(QFrame::Panel);
+    label->setToolTip(key);
+    FStorage->insertAutoIcon(label,key,0,0,"pixmap");
+    label->installEventFilter(this);
+    FKeyByLabel.insert(label,key);
+    FLayout->addWidget(label,row,column);
+    column = (column+1) % columns;
+    if(column == 0)
+      row++;
   }
 }
 
@@ -65,6 +61,7 @@ bool SelectIconWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
   {
     FCurrent = label;
     label->setFrameShadow(QFrame::Sunken);
+    QToolTip::showText(QCursor::pos(),label->toolTip());
   }
   else if (AEvent->type() == QEvent::Leave)
   {
@@ -77,7 +74,7 @@ bool SelectIconWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
   else if (AEvent->type() == QEvent::MouseButtonRelease)
   {
     if (FPressed == label)
-      emit iconSelected(FIconsetFile,FFileByLabel.value(label));
+      emit iconSelected(FStorage->subStorage(),FKeyByLabel.value(label));
     FPressed = NULL;
   }
   return QWidget::eventFilter(AWatched,AEvent);

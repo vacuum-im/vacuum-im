@@ -1,6 +1,5 @@
 #include "mainwindowplugin.h"
 
-#define IN_QUIT               "psi/quit"
 #define SVN_SHOW_ON_START     "showOnStart"
 #define BDI_WINDOW_GEOMETRY   "MainWindowGeometry"
 
@@ -63,8 +62,8 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
 bool MainWindowPlugin::initObjects()
 {
   Action *action = new Action(this);
-  action->setIcon(SYSTEM_ICONSETFILE,IN_QUIT);
   action->setText(tr("Quit"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
   connect(action,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit())); 
   FMainWindow->mainMenu()->addAction(action,AG_MAINWINDOW_MMENU_QUIT,true);
 
@@ -72,6 +71,7 @@ bool MainWindowPlugin::initObjects()
   {
     action = new Action(this);
     action->setText(tr("Show roster"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_SHOW_ROSTER);
     connect(action,SIGNAL(triggered()),SLOT(onShowMainWindow())); 
     FTrayManager->addAction(action,AG_MAINWONDOW_SHOW_TRAY,true);
   }

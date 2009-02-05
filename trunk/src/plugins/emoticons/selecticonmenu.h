@@ -4,8 +4,8 @@
 #include <QShowEvent>
 #include <QHideEvent>
 #include <QVBoxLayout>
+#include "../../definations/resources.h"
 #include "../../utils/menu.h"
-#include "../../utils/skin.h"
 #include "selecticonwidget.h"
 
 class SelectIconMenu : 
@@ -21,10 +21,10 @@ public:
   void setTitle(const QString &ATitle);
   //SelectIconMenu
   QWidget *instance() { return this; }
-  QString iconset() const { return FIconset; }
-  void setIconset(const QString &AFileName);
+  QString iconset() const;
+  void setIconset(const QString &ASubStorage);
 signals:
-  void iconSelected(const QString &AIconsetFile, const QString &AIconFile);
+  void iconSelected(const QString &ASubStorage, const QString &AIconKey);
 public:
   virtual QSize sizeHint() const;
 protected:
@@ -34,11 +34,10 @@ protected:
   virtual void hideEvent(QHideEvent *AEvent);
 protected slots:
   void onAboutToShow();
-  void onSkinIconsetChanged();
 private:
   QSize FSizeHint;
   QVBoxLayout *FLayout;    
-  QString FIconset;
+  IconStorage *FStorage;
   SelectIconWidget *FWidget;
 };
 
