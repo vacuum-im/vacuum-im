@@ -24,7 +24,7 @@ public:
     Online,
     Chat,
     Away,
-    DoNotDistrib,
+    DoNotDisturb,
     ExtendedAway,
     Invisible,
     Error

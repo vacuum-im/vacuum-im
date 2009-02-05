@@ -490,7 +490,7 @@ QString StatusChanger::nameByShow(int AShow) const
     return tr("Away");
   case IPresence::ExtendedAway: 
     return tr("Extended Away");
-  case IPresence::DoNotDistrib: 
+  case IPresence::DoNotDisturb: 
     return tr("Do not disturb");
   case IPresence::Invisible: 
     return tr("Invisible");
@@ -532,8 +532,8 @@ void StatusChanger::createDefaultStatus()
 
   status = new StatusItem;
   status->code = STATUS_DND;
-  status->name = nameByShow(IPresence::DoNotDistrib);
-  status->show = IPresence::DoNotDistrib;
+  status->name = nameByShow(IPresence::DoNotDisturb);
+  status->show = IPresence::DoNotDisturb;
   status->text = tr("Do not disturb");
   status->priority = 15;
   FStatusItems.insert(status->code,status);

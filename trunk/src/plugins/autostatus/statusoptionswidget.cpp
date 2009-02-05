@@ -35,7 +35,7 @@ QWidget *Delegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AO
     {
       QComboBox *comboBox = new QComboBox(AParent);
       comboBox->addItem(FStatusChanger->iconByShow(IPresence::Away),FStatusChanger->nameByShow(IPresence::Away),IPresence::Away);
-      comboBox->addItem(FStatusChanger->iconByShow(IPresence::DoNotDistrib),FStatusChanger->nameByShow(IPresence::DoNotDistrib),IPresence::DoNotDistrib);
+      comboBox->addItem(FStatusChanger->iconByShow(IPresence::DoNotDisturb),FStatusChanger->nameByShow(IPresence::DoNotDisturb),IPresence::DoNotDisturb);
       comboBox->addItem(FStatusChanger->iconByShow(IPresence::ExtendedAway),FStatusChanger->nameByShow(IPresence::ExtendedAway),IPresence::ExtendedAway);
       comboBox->addItem(FStatusChanger->iconByShow(IPresence::Invisible),FStatusChanger->nameByShow(IPresence::Invisible),IPresence::Invisible);
       comboBox->addItem(FStatusChanger->iconByShow(IPresence::Online),FStatusChanger->nameByShow(IPresence::Online),IPresence::Online);

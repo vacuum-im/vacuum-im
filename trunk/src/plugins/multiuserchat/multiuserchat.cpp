@@ -243,7 +243,7 @@ void MultiUserChat::setPresence(int AShow, const QString &AStatus)
     {
     case IPresence::Chat: showText = "chat"; break; 
     case IPresence::Away: showText = "away"; break;
-    case IPresence::DoNotDistrib: showText = "dnd"; break; 
+    case IPresence::DoNotDisturb: showText = "dnd"; break; 
     case IPresence::ExtendedAway: showText = "xa"; break;
     }
     if (AShow == IPresence::Offline || AShow == IPresence::Error || AShow == IPresence::Invisible)
@@ -604,11 +604,11 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
       else if (showText == "away")
         show = IPresence::Away;
       else if (showText == "dnd")
-        show = IPresence::DoNotDistrib;
+        show = IPresence::DoNotDisturb;
       else if (showText == "xa")
         show = IPresence::ExtendedAway;
       else 
-        show = IPresence::Error;
+        show = IPresence::Online;     // остыль под кривые клиенты и транспорты
 
       QString status = AStanza.firstElement("status").text();
       Jid realJid = itemElem.attribute("jid");
