@@ -11,7 +11,7 @@
 //Directories and files
 #define STORAGE_DIR             "resources"
 #define STORAGE_SHARED_DIR      "shared"
-#define STORAGE_DEFFILES_MASK   "*def.xml"
+#define STORAGE_DEFFILES_MASK   "*.def.xml"
 
 //Common storage options
 #define STORAGE_NAME            "name"

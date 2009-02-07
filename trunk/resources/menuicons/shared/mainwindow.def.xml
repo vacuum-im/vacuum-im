@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>mainwindowQuit</key>
+    <object mime="image/png">mainwindowquit.png</object>
+  </icon>
+  <icon>
+    <key>mainwindowMenu</key>
+    <object mime="image/png">mainwindowmenu.png</object>
+  </icon>
+  <icon>
+    <key>mainwindowShowRoster</key>
+    <object mime="image/png">mainwindowshowroster.png</object>
+  </icon>
+</icondef>

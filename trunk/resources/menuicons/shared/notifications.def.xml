@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>notifications</key>
+    <object mime="image/png">notifications.png</object>
+  </icon>
+  <icon>
+    <key>notificationsActivateAll</key>
+    <object mime="image/png">notificationsactivateall.png</object>
+  </icon>
+  <icon>
+    <key>notificationsRemoveAll</key>
+    <object mime="image/png">notificationsremoveall.png</object>
+  </icon>
+</icondef>
