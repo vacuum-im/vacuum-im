@@ -4,7 +4,9 @@
 #include <QDomDocument>
 #include <QApplication>
 
+QList<QString> FileStorage::FMimeTypes;
 QHash<QString, FileStorage *> FileStorage::FStaticStorages;
+
 QList<QString> FileStorage::FObjectTags = QList<QString>() << "file" << "icon";
 QList<QString> FileStorage::FKeyTags    = QList<QString>() << "key"  << "text" << "name";
 QList<QString> FileStorage::FFileTags   = QList<QString>() << "object";
@@ -41,6 +43,7 @@ void FileStorage::setSubStorage(const QString &ASubStorage)
     QDir dir(qApp->applicationDirPath());
     if (dir.cd(STORAGE_DIR) && dir.cd(FStorage))
     {
+      FFilePrefix = dir.absolutePath()+"/";
       if (FSubStorage!=STORAGE_SHARED_DIR && !FSubStorage.isEmpty() && dir.cd(FSubStorage))
       {
         QStringList defFiles = dir.entryList(QStringList() << STORAGE_DEFFILES_MASK);
@@ -55,7 +58,6 @@ void FileStorage::setSubStorage(const QString &ASubStorage)
           loadDefinations(dir.absoluteFilePath(file),STORAGE_SHARED_DIR"/"); }
         dir.cdUp();
       }
-      FFilePrefix = dir.absolutePath()+"/";
     }
     emit storageChanged();
   }
@@ -115,7 +117,7 @@ QString FileStorage::fileFullName(const QString AKey, int AIndex) const
 
 QString FileStorage::fileMime(const QString AKey, int AIndex) const
 {
-  return FObjects.value(FKey2Object.value(AKey)).fileMimes.value(AIndex);
+  return FMimeTypes.at(FObjects.value(FKey2Object.value(AKey)).fileTypes.value(AIndex));
 }
 
 QString FileStorage::fileOption(const QString AKey, const QString &AOption) const
@@ -135,6 +137,7 @@ void FileStorage::loadDefinations(const QString &ADefFile, const QString APrefix
       if (FObjectTags.contains(objElem.tagName()))
       {
         StorageObject object;
+        QList<QString> objKeys; 
         QDomElement keyElem = objElem.firstChildElement();
         while (!keyElem.isNull())
         {
@@ -142,16 +145,20 @@ void FileStorage::loadDefinations(const QString &ADefFile, const QString APrefix
           {
             QString key = keyElem.text();
             if (!FKey2Object.contains(key))
-            {
-              FKeys.append(key);
-              FKey2Object.insert(key,FObjects.count());
-            }
+              objKeys.append(key);
           }
           else if (FFileTags.contains(keyElem.tagName()))
           {
             if (!keyElem.text().isEmpty())
             {
-              object.fileMimes.append(keyElem.attribute("mime"));
+              QString mimeType = keyElem.attribute("mime");
+              int typeIndex = FMimeTypes.indexOf(mimeType);
+              if (typeIndex < 0)
+              {
+                typeIndex = FMimeTypes.count();
+                FMimeTypes.append(mimeType);
+              }
+              object.fileTypes.append(typeIndex);
               object.fileNames.append(APrefix + keyElem.text());
             }
           }
@@ -161,7 +168,21 @@ void FileStorage::loadDefinations(const QString &ADefFile, const QString APrefix
           }
           keyElem = keyElem.nextSiblingElement();
         }
-        FObjects.append(object);
+        if (!objKeys.isEmpty() && !object.fileNames.isEmpty())
+        {
+          bool valid = true;
+          for (int i=0; valid && i<object.fileNames.count(); i++)
+            valid = QFile::exists(FFilePrefix + object.fileNames.at(i));
+          if (valid)
+          {
+            foreach (QString key, objKeys)
+            {
+              FKeys.append(key);
+              FKey2Object.insert(key,FObjects.count());
+            }
+            FObjects.append(object);
+          }
+        }
       }
       else if (objElem.firstChildElement().isNull() && objElem.attributes().count()==0 && !FOptions.contains(objElem.tagName()))
       {

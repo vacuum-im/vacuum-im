@@ -52,8 +52,8 @@ private:
   QString FFilePrefix;
 private:
   struct StorageObject {
+    QList<int> fileTypes;
     QList<QString> fileNames;
-    QList<QString> fileMimes;
     QHash<QString, QString> fileOptions;
   };
   QList<QString> FKeys;
@@ -61,6 +61,7 @@ private:
   QList<StorageObject> FObjects;
   QHash<QString, QString> FOptions;
 private:
+  static QList<QString> FMimeTypes;
   static QHash<QString, FileStorage *> FStaticStorages;
 private:
   static QList<QString> FObjectTags;
