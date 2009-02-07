@@ -176,9 +176,6 @@
 //StatusIcons
 #define MNI_STATUSICONS_OPTIONS         "statusiconsOptions"
 
-//TrayManager
-#define MNI_TRAYMANAGER_QUIT            "traymanagerQuit"
-
 //VCard
 #define MNI_VCARD                       "VCard"
 

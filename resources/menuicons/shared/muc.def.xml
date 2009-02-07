@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>mucConference</key>
+    <object mime="image/png">mucconference.png</object>
+  </icon>
+  <icon>
+    <key>mucJoin</key>
+    <object mime="image/png">mucjoin.png</object>
+  </icon>
+  <icon>
+    <key>mucInvite</key>
+    <object mime="image/png">mucinvite.png</object>
+  </icon>
+  <icon>
+    <key>mucChangeNick</key>
+    <object mime="image/png">mucchangenick.png</object>
+  </icon>
+  <icon>
+    <key>mucChangeTopic</key>
+    <object mime="image/png">mucchangetopic.png</object>
+  </icon>
+  <icon>
+    <key>mucClearChat</key>
+    <object mime="image/png">mucclearchat.png</object>
+  </icon>
+  <icon>
+    <key>mucRequestVoice</key>
+    <object mime="image/png">mucrequestvoice.png</object>
+  </icon>
+  <icon>
+    <key>mucEditBanList</key>
+    <object mime="image/png">muceditbanList.png</object>
+  </icon>
+  <icon>
+    <key>mucEditMembersList</key>
+    <object mime="image/png">muceditmemberslist.png</object>
+  </icon>
+  <icon>
+    <key>mucEditAdminsList</key>
+    <object mime="image/png">muceditadminslist.png</object>
+  </icon>
+  <icon>
+    <key>mucEditOwnersList</key>
+    <object mime="image/png">muceditownerslist.png</object>
+  </icon>
+  <icon>
+    <key>mucConfigureRoom</key>
+    <object mime="image/png">mucconfigureroom.png</object>
+  </icon>
+  <icon>
+    <key>mucDestroyRoom</key>
+    <object mime="image/png">mucdestroyroom.png</object>
+  </icon>
+  <icon>
+    <key>mucExit</key>
+    <object mime="image/png">mucexit.png</object>
+  </icon>
+  <icon>
+    <key>mucMessage</key>
+    <object mime="image/png">mucmessage.png</object>
+  </icon>
+  <icon>
+    <key>mucPrivateMessage</key>
+    <object mime="image/png">mucprivatemessage.png</object>
+  </icon>
+  <icon>
+    <key>mucDataMessage</key>
+    <object mime="image/png">mucdatamessage.png</object>
+  </icon>
+</icondef>
