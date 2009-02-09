@@ -4,8 +4,4 @@
     <key>commands</key>
     <object mime="image/png">commands.png</object>
   </icon>
-  <icon>
-    <key>connectionEncrypted</key>
-    <object mime="image/png">connectionencrypted.png</object>
-  </icon>
 </icondef>
