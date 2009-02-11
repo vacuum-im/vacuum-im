@@ -14,11 +14,11 @@ class UTILS_EXPORT IconStorage :
 {
   Q_OBJECT;
   struct IconAnimateParams {
-    IconAnimateParams() { reader = NULL; }
-    ~IconAnimateParams() { delete reader; }
-    QTimer timer;
+    IconAnimateParams() { timer = new QTimer; reader = NULL; }
+    ~IconAnimateParams() { timer->stop(); timer->deleteLater(); delete reader; }
     int frameIndex;
     int frameCount;
+    QTimer *timer;
     QImageReader *reader;
   };
   struct IconUpdateParams {
@@ -38,11 +38,11 @@ public:
   void insertAutoIcon(QObject *AObject, const QString AKey, int AIndex = 0, int AAnimate = 0, const QString &AProperty = "icon");
   void removeAutoIcon(QObject *AObject);
 public:
-  static void clearIconCach();
+  static void clearIconCache();
   static IconStorage *staticStorage(const QString &AStorage);
 protected:
   void initAnimation(QObject *AObject, IconUpdateParams *AParams);
-  void removeAnimation(QObject *AObject, IconUpdateParams *AParams);
+  void removeAnimation(IconUpdateParams *AParams);
   void updateObject(QObject *AObject);
   void removeObject(QObject *AObject);
 protected slots:
@@ -50,10 +50,10 @@ protected slots:
   void onAnimateTimer();
   void onObjectDestroyed(QObject *AObject);
 private:
-  QMultiHash<QTimer*, QObject*> FTimerObjects;
+  QHash<QTimer*, QObject*> FTimerObject;
   QHash<QObject*, IconUpdateParams*> FUpdateParams;
 private:
-  static QHash<QString, QHash<QString,QIcon> > FIconCach;
+  static QHash<QString, QHash<QString,QIcon> > FIconCache;
   static QHash<QString, IconStorage*> FStaticStorages;
   static QHash<QObject*, IconStorage*> FObjectStorage;
 };
