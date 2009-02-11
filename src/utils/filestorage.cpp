@@ -36,15 +36,16 @@ void FileStorage::setSubStorage(const QString &ASubStorage)
 {
   if (FSubStorage.isNull() || FSubStorage!=ASubStorage)
   {
+    FOptions.clear();
     FObjects.clear();
     FKey2Object.clear();
-    FOptions.clear();
-    FSubStorage = ASubStorage;
+    FSubStorage = !ASubStorage.isEmpty() ? ASubStorage : STORAGE_SHARED_DIR;
+
     QDir dir(qApp->applicationDirPath());
     if (dir.cd(STORAGE_DIR) && dir.cd(FStorage))
     {
       FFilePrefix = dir.absolutePath()+"/";
-      if (FSubStorage!=STORAGE_SHARED_DIR && !FSubStorage.isEmpty() && dir.cd(FSubStorage))
+      if (FSubStorage!=STORAGE_SHARED_DIR && dir.cd(FSubStorage))
       {
         QStringList defFiles = dir.entryList(QStringList() << STORAGE_DEFFILES_MASK);
         foreach(QString file, defFiles) {
@@ -245,12 +246,12 @@ QStringList FileStorage::availSubStorages(const QString &AStorage)
 
 FileStorage *FileStorage::staticStorage(const QString &ASubStorage)
 {
-  FileStorage *storage = FStaticStorages.value(ASubStorage,NULL);
-  if (!storage)
+  FileStorage *fileStorage = FStaticStorages.value(ASubStorage,NULL);
+  if (!fileStorage)
   {
-    storage = new FileStorage(ASubStorage,"",qApp);
-    FStaticStorages.insert(ASubStorage,storage);
+    fileStorage = new FileStorage(ASubStorage,STORAGE_SHARED_DIR,qApp);
+    FStaticStorages.insert(ASubStorage,fileStorage);
   }
-  return storage;
+  return fileStorage;
 }
 

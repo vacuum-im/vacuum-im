@@ -24,7 +24,7 @@ class UTILS_EXPORT FileStorage :
 {
   Q_OBJECT;
 public:
-  FileStorage(const QString &AStorage, const QString &ASubStorage = "", QObject *AParent = NULL);
+  FileStorage(const QString &AStorage, const QString &ASubStorage = STORAGE_SHARED_DIR, QObject *AParent = NULL);
   virtual ~FileStorage();
   QString storage() const;
   QString subStorage() const;
