@@ -1,174 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>XmppStream</name>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstream.cpp" line="46"/>
+        <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="45"/>
         <source>Password request</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос пароля</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstream.cpp" line="46"/>
+        <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="45"/>
         <source>Enter password for &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите запорс для &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstream.cpp" line="56"/>
+        <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="55"/>
         <source>Password not specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль не определен</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstream.cpp" line="59"/>
+        <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="58"/>
         <source>Connection not specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение не определено</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstream.cpp" line="223"/>
+        <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="222"/>
         <source>Required stream feature &apos;%1&apos; not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрошенное свойство &apos;%1&apos; потока не доступно</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstream.cpp" line="415"/>
+        <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="413"/>
         <source>Invalid stream namespace</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимое пространство имён потока</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstream.cpp" line="470"/>
+        <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="468"/>
         <source>XMPP connection timed out</source>
-        <translation type="unfinished"></translation>
+        <translation>XMPP соединение разорвано по времени</translation>
     </message>
 </context>
 <context>
     <name>XmppStreams</name>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="22"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="21"/>
         <source>Bad Request Format</source>
-        <translation type="unfinished"></translation>
+        <translation>Плохой формат запроса</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="25"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="24"/>
         <source>Bad Namespace Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Плохой префикс пространства имён</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="28"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="27"/>
         <source>Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Конфликт</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="31"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="30"/>
         <source>Connection timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Превышено время ожидания соединения</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="34"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="33"/>
         <source>Host Gone</source>
-        <translation type="unfinished"></translation>
+        <translation>Хост умер</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="37"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="36"/>
         <source>Host Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестный хост</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="40"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="39"/>
         <source>Improper Addressing</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильная адресация</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="43"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="42"/>
         <source>Internal Server Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Внутренняя ошибка сервера</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="46"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="45"/>
         <source>Invalid From</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильная форма</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="49"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="48"/>
         <source>Invalid Id</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильный ID</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="52"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="51"/>
         <source>Invalid Namespace</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильное пространство имён</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="55"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="54"/>
         <source>Invalid XML</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильный XML</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="58"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="57"/>
         <source>Not Authorized</source>
-        <translation type="unfinished"></translation>
+        <translation>Не авторизован</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="61"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="60"/>
         <source>Policy Violation</source>
-        <translation type="unfinished"></translation>
+        <translation>Нарушение политики</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="64"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="63"/>
         <source>Remote Connection Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Удаленное соединение не удалось</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="67"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="66"/>
         <source>Resource Constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Ограничение ресурса</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="70"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="69"/>
         <source>Restricted XML</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрещенный XML</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="73"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="72"/>
         <source>See Other Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Смотри другой хост</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="76"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="75"/>
         <source>System Shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Выключение системы</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="79"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="78"/>
         <source>Undefined Condition</source>
-        <translation type="unfinished"></translation>
+        <translation>Неопределённое условие</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="82"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="81"/>
         <source>Unsupported Encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Неподдерживаемая кодировка</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="85"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="84"/>
         <source>Unsupported Stanza Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Неподдерживаемый формат XML-транзакции</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="88"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="87"/>
         <source>Unsupported Version</source>
-        <translation type="unfinished"></translation>
+        <translation>Неподдерживаемая версия</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="91"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="90"/>
         <source>XML Not Well Formed</source>
-        <translation type="unfinished"></translation>
+        <translation>XML сформирован неправильно</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="99"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="98"/>
         <source>Managing XMPP streams, implementation of XMPP-Core</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление потоками XMPP, реализация ядра XMPP</translation>
     </message>
     <message>
-        <location filename="../../plugins/XmppStreams/xmppstreams.cpp" line="101"/>
+        <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="100"/>
         <source>XMPP Streams Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Менеджер потоков XMPP</translation>
     </message>
 </context>
 </TS>

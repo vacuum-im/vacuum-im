@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>IqAuthPlugin</name>
     <message>
-        <location filename="../../plugins/IqAuth/iqauth.cpp" line="77"/>
+        <location filename="../../plugins/iqauth/iqauth.cpp" line="77"/>
         <source>Potapov S.A. aka Lion</source>
-        <translation type="unfinished"></translation>
+        <translation>Potapov S.A. aka Lion</translation>
     </message>
     <message>
-        <location filename="../../plugins/IqAuth/iqauth.cpp" line="78"/>
+        <location filename="../../plugins/iqauth/iqauth.cpp" line="78"/>
         <source>Implementation of Non-SASL Authentication (JEP-0078)</source>
-        <translation type="unfinished"></translation>
+        <translation>Реализация аутентификации без SASL (JEP-0078)</translation>
     </message>
 </context>
 </TS>

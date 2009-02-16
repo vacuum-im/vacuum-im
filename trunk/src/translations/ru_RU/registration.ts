@@ -1,112 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>RegisterDialog</name>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.cpp" line="44"/>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="42"/>
         <source>Registration at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Регистрация на %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.cpp" line="191"/>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="189"/>
         <source>Waiting for host response ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ожидание ответа от хоста...</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.cpp" line="193"/>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="191"/>
         <source>Error: Can`t send request to host.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка: невозможно отправить запрос на хост.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.cpp" line="88"/>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="86"/>
         <source>Do you really want to remove registration from %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы действительно хотите удалить регистрацию на %1?</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.cpp" line="95"/>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="93"/>
         <source>Enter your username and new password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите выше имя пользователя и новый пароль.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.cpp" line="148"/>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="146"/>
         <source>You are successfully registered at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы успешно зарегистрировались на %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.cpp" line="150"/>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="148"/>
         <source>You are successfully unregistered from %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы успешно удалили регистрацию на %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.cpp" line="152"/>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="150"/>
         <source>Password was successfully changed at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль на %1 был успешно изменен</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.cpp" line="163"/>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="161"/>
         <source>Requested operation failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрошенная операция не удалась: %1</translation>
     </message>
 </context>
 <context>
     <name>RegisterDialogClass</name>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.ui" line="13"/>
+        <location filename="../../plugins/registration/registerdialog.ui" line="13"/>
         <source>RegisterDialog</source>
-        <translation type="unfinished"></translation>
+        <translation>RegisterDialog</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.ui" line="73"/>
+        <location filename="../../plugins/registration/registerdialog.ui" line="55"/>
         <source>Username:</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя пользователя:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.ui" line="86"/>
+        <location filename="../../plugins/registration/registerdialog.ui" line="68"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registerdialog.ui" line="103"/>
+        <location filename="../../plugins/registration/registerdialog.ui" line="85"/>
         <source>Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>E-mail:</translation>
     </message>
 </context>
 <context>
     <name>Registration</name>
     <message>
-        <location filename="../../plugins/Registration/registration.cpp" line="362"/>
+        <location filename="../../plugins/registration/registration.cpp" line="390"/>
         <source>In-band registration with instant messaging servers and associated services</source>
-        <translation type="unfinished"></translation>
+        <translation>Регистрация на серверах мгновенных сообщений и связанных серверах</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registration.cpp" line="361"/>
+        <location filename="../../plugins/registration/registration.cpp" line="389"/>
         <source>In-Band Registration</source>
-        <translation type="unfinished"></translation>
+        <translation>Регистрация</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registration.cpp" line="197"/>
+        <location filename="../../plugins/registration/registration.cpp" line="199"/>
         <source>Registration</source>
-        <translation type="unfinished"></translation>
+        <translation>Регистрация</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registration.cpp" line="201"/>
+        <location filename="../../plugins/registration/registration.cpp" line="203"/>
         <source>Register</source>
-        <translation type="unfinished"></translation>
+        <translation>Зарегистрировать</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registration.cpp" line="209"/>
+        <location filename="../../plugins/registration/registration.cpp" line="212"/>
         <source>Unregister</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить регистрацию</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registration.cpp" line="217"/>
+        <location filename="../../plugins/registration/registration.cpp" line="221"/>
         <source>Change password</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить пароль</translation>
     </message>
     <message>
-        <location filename="../../plugins/Registration/registration.cpp" line="263"/>
+        <location filename="../../plugins/registration/registration.cpp" line="268"/>
         <source>Register new account on server</source>
-        <translation type="unfinished"></translation>
+        <translation>Зарегистрировать новый аккаунт на сервере</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="285"/>
+        <source>Registration Form</source>
+        <translation>Форма регистрации</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="286"/>
+        <source>Account Name</source>
+        <translation>Имя Аккаунта</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="287"/>
+        <source>Nickname</source>
+        <translation>Ник</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="288"/>
+        <source>Password</source>
+        <translation>Пароль</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="289"/>
+        <source>Full Name</source>
+        <translation>Полное имя</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="290"/>
+        <source>First Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="291"/>
+        <source>Last Name</source>
+        <translation>Фамилия</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="292"/>
+        <source>Email Address</source>
+        <translation>E-mail</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="293"/>
+        <source>Street</source>
+        <translation>Улица</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="294"/>
+        <source>City</source>
+        <translation>Город</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="295"/>
+        <source>Region</source>
+        <translation>Регион</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="296"/>
+        <source>Zip Code</source>
+        <translation>Почтовый код</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="297"/>
+        <source>Telephone Number</source>
+        <translation>Телефон</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/registration/registration.cpp" line="298"/>
+        <source>Your Web Paqe</source>
+        <translation>Web-страница</translation>
     </message>
 </context>
 </TS>

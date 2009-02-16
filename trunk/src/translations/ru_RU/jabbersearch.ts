@@ -1,117 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>JabberSearch</name>
     <message>
-        <location filename="../../plugins/JabberSearch/jabbersearch.cpp" line="26"/>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="24"/>
         <source>Search information repositories on the Jabber network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск хранилищ информации в Jabber-сети.</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/jabbersearch.cpp" line="249"/>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="265"/>
         <source>Jabber Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Jabber-поиск</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/jabbersearch.cpp" line="181"/>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="183"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/jabbersearch.cpp" line="250"/>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="266"/>
         <source>Search information repositories on the Jabber network</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск хранилищ информации в Jabber-сети</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="199"/>
+        <source>First Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="200"/>
+        <source>Last Name</source>
+        <translation>Фамилия</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="201"/>
+        <source>Nickname</source>
+        <translation>Ник</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="202"/>
+        <source>Email Address</source>
+        <translation>Адрес e-mail</translation>
     </message>
 </context>
 <context>
     <name>SearchDialog</name>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.cpp" line="91"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="87"/>
         <source>Search in %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск в %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.cpp" line="150"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="146"/>
         <source>Waiting for host response ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ожидание ответа хоста ...</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.cpp" line="155"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="151"/>
         <source>Error: Can`t send request to host.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка: невозможно отправить данные на хост.</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.cpp" line="199"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="197"/>
         <source>Disco info</source>
-        <translation type="unfinished"></translation>
+        <translation>Обзорная информация</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.cpp" line="205"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="206"/>
         <source>Add Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.cpp" line="211"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="215"/>
         <source>vCard</source>
-        <translation type="unfinished"></translation>
+        <translation>vCard</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.cpp" line="289"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="294"/>
         <source>Requested operation failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрошенная операция не удалась: %1</translation>
     </message>
 </context>
 <context>
     <name>SearchDialogClass</name>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="13"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="13"/>
         <source>SearchDialog</source>
-        <translation type="unfinished"></translation>
+        <translation>SearchDialog</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="66"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="66"/>
         <source>First:</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя:</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="76"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="76"/>
         <source>Last:</source>
-        <translation type="unfinished"></translation>
+        <translation>Фамилия:</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="86"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="86"/>
         <source>Nick:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ник:</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="96"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="96"/>
         <source>Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>Email:</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="161"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="161"/>
         <source>JID</source>
-        <translation type="unfinished"></translation>
+        <translation>JID</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="166"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="166"/>
         <source>First</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="171"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="171"/>
         <source>Last</source>
-        <translation type="unfinished"></translation>
+        <translation>Фамилия</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="176"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="176"/>
         <source>Nick</source>
-        <translation type="unfinished"></translation>
+        <translation>Ник</translation>
     </message>
     <message>
-        <location filename="../../plugins/JabberSearch/searchdialog.ui" line="181"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="181"/>
         <source>EMail</source>
-        <translation type="unfinished"></translation>
+        <translation>EMail</translation>
     </message>
 </context>
 </TS>

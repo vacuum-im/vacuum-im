@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>RosterPlugin</name>
     <message>
-        <location filename="../../plugins/Roster/rosterplugin.cpp" line="17"/>
+        <location filename="../../plugins/roster/rosterplugin.cpp" line="17"/>
         <source>Managing roster and subscriptions</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление контакт-листом и подписками</translation>
     </message>
     <message>
-        <location filename="../../plugins/Roster/rosterplugin.cpp" line="19"/>
+        <location filename="../../plugins/roster/rosterplugin.cpp" line="19"/>
         <source>Roster and Subscriptions Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Модуль управления контакт-листом и подписками</translation>
     </message>
 </context>
 </TS>

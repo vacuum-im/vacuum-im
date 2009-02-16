@@ -1,74 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>IconsOptionsWidgetClass</name>
     <message>
-        <location filename="../../plugins/StatusIcons/iconsoptionswidget.ui" line="19"/>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="19"/>
         <source>IconsOptionsWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>IconsOptionsWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/iconsoptionswidget.ui" line="41"/>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="40"/>
         <source>Default iconset</source>
-        <translation type="unfinished"></translation>
+        <translation>Набор иконок по умолчанию</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/iconsoptionswidget.ui" line="55"/>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="65"/>
         <source>Default rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Правила по умолчанию</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/iconsoptionswidget.ui" line="101"/>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="119"/>
         <source>RegExp</source>
-        <translation type="unfinished"></translation>
+        <translation>Регулярное выражение</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/iconsoptionswidget.ui" line="106"/>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="124"/>
         <source>Iconset</source>
-        <translation type="unfinished"></translation>
+        <translation>Набор иконок</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/iconsoptionswidget.ui" line="85"/>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="103"/>
         <source>User rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Правила пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/iconsoptionswidget.ui" line="129"/>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="147"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/iconsoptionswidget.ui" line="136"/>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="154"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
 </context>
 <context>
     <name>StatusIcons</name>
     <message>
-        <location filename="../../plugins/StatusIcons/statusicons.cpp" line="37"/>
+        <location filename="../../plugins/statusicons/statusicons.cpp" line="35"/>
         <source>Assign status icon to contact depended on users rules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Задать статус-иконку контакту на основе правил пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/statusicons.cpp" line="39"/>
+        <location filename="../../plugins/statusicons/statusicons.cpp" line="37"/>
         <source>Status Icons Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Менеджер статус-иконок</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/statusicons.cpp" line="99"/>
+        <location filename="../../plugins/statusicons/statusicons.cpp" line="92"/>
         <source>Status icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Статус-иконка</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/statusicons.cpp" line="120"/>
+        <location filename="../../plugins/statusicons/statusicons.cpp" line="102"/>
         <source>Status icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Статус-иконки</translation>
     </message>
     <message>
-        <location filename="../../plugins/StatusIcons/statusicons.cpp" line="120"/>
+        <location filename="../../plugins/statusicons/statusicons.cpp" line="102"/>
         <source>Configure status icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Настроить статус-иконки</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/statusicons/statusicons.cpp" line="308"/>
+        <source>Default</source>
+        <translation>По умолчанию</translation>
     </message>
 </context>
 </TS>

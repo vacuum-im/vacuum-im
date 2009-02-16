@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>StanzaProcessor</name>
     <message>
-        <location filename="../../plugins/StanzaProcessor/stanzaprocessor.cpp" line="21"/>
+        <location filename="../../plugins/stanzaprocessor/stanzaprocessor.cpp" line="20"/>
         <source>Managing stanza handlers</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление дескрипторами XML-транзакций</translation>
     </message>
     <message>
-        <location filename="../../plugins/StanzaProcessor/stanzaprocessor.cpp" line="23"/>
+        <location filename="../../plugins/stanzaprocessor/stanzaprocessor.cpp" line="22"/>
         <source>Stanza Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Процессор XML-транзакций</translation>
     </message>
 </context>
 </TS>

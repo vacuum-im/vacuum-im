@@ -1,105 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../../plugins/Settings/optionsdialog.cpp" line="15"/>
+        <location filename="../../plugins/settings/optionsdialog.cpp" line="15"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/optionsdialog.cpp" line="249"/>
+        <location filename="../../plugins/settings/optionsdialog.cpp" line="252"/>
         <source>No Settings Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет допустимых настроек</translation>
     </message>
 </context>
 <context>
     <name>ProfileDialog</name>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.cpp" line="95"/>
+        <location filename="../../plugins/settings/profiledialog.cpp" line="97"/>
         <source>Creating new profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать новый профиль</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.cpp" line="95"/>
+        <location filename="../../plugins/settings/profiledialog.cpp" line="97"/>
         <source>Enter profile name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите имя профиля:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.cpp" line="122"/>
+        <location filename="../../plugins/settings/profiledialog.cpp" line="124"/>
         <source>Renaming profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать профиль</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.cpp" line="105"/>
+        <location filename="../../plugins/settings/profiledialog.cpp" line="107"/>
         <source>Enter new name for profile:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите новое имя для профиля</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.cpp" line="122"/>
+        <location filename="../../plugins/settings/profiledialog.cpp" line="124"/>
         <source>Profile &lt;b&gt;%1&lt;/b&gt; allready exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Профиль &lt;b&gt;%1&lt;/b&gt; уже существует.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.cpp" line="135"/>
+        <location filename="../../plugins/settings/profiledialog.cpp" line="137"/>
         <source>Removing profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Удаление профиля</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.cpp" line="136"/>
+        <location filename="../../plugins/settings/profiledialog.cpp" line="138"/>
         <source>Are you sure that wish to remove profile &lt;b&gt;%1&lt;/b&gt; with accounts?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что хотите удалить профиль &lt;b&gt;%1&lt;/b&gt; с аккаунтами?</translation>
     </message>
 </context>
 <context>
     <name>ProfileDialogClass</name>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.ui" line="13"/>
+        <location filename="../../plugins/settings/profiledialog.ui" line="13"/>
         <source>Edit profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактирование профилей</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.ui" line="36"/>
+        <location filename="../../plugins/settings/profiledialog.ui" line="36"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.ui" line="43"/>
+        <location filename="../../plugins/settings/profiledialog.ui" line="43"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/profiledialog.ui" line="50"/>
+        <location filename="../../plugins/settings/profiledialog.ui" line="50"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
 </context>
 <context>
     <name>SettingsPlugin</name>
     <message>
-        <location filename="../../plugins/Settings/settingsplugin.cpp" line="39"/>
+        <location filename="../../plugins/settings/settingsplugin.cpp" line="36"/>
         <source>Managing profiles and settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление профилями и сессиями</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/settingsplugin.cpp" line="41"/>
+        <location filename="../../plugins/settings/settingsplugin.cpp" line="38"/>
         <source>Settings Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Менеджер настроек</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/settingsplugin.cpp" line="73"/>
+        <location filename="../../plugins/settings/settingsplugin.cpp" line="67"/>
         <source>Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Профили</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/settingsplugin.cpp" line="78"/>
+        <location filename="../../plugins/settings/settingsplugin.cpp" line="72"/>
         <source>Options...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки...</translation>
     </message>
     <message>
-        <location filename="../../plugins/Settings/settingsplugin.cpp" line="83"/>
+        <location filename="../../plugins/settings/settingsplugin.cpp" line="77"/>
         <source>Edit profiles...</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать профили...</translation>
     </message>
 </context>
 </TS>

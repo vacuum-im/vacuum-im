@@ -1,212 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>EditListsDialog</name>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="20"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="17"/>
         <source>Edit Privacy Lists - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать списки приватности - %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="29"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="27"/>
         <source>Jid</source>
-        <translation type="unfinished"></translation>
+        <translation>JID</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="30"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="28"/>
         <source>Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Группа</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="31"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="29"/>
         <source>Subscription</source>
-        <translation type="unfinished"></translation>
+        <translation>Подписка</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="32"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="30"/>
         <source>&lt;Always&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Всегда&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="214"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="212"/>
         <source> Messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Сообщения</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="216"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="214"/>
         <source> Queries</source>
-        <translation type="unfinished"></translation>
+        <translation>Запросы</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="218"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="216"/>
         <source> Pres-in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="220"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="218"/>
         <source> Pres-out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="223"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="221"/>
         <source> &lt;Any Stanza&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любая XML-транзакция&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="282"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="280"/>
         <source>Privacy List Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка списка приватности</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="361"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="359"/>
         <source>Privacy list &apos;%1&apos; could not be active: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Список приватности &apos;%1&apos; не может быть активным: %2</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="366"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="364"/>
         <source>Privacy list &apos;%1&apos; could not be default: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Список приватности &apos;%1&apos; не может быть по умолчанию: %2</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="371"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="369"/>
         <source>Privacy list &apos;%1&apos; could not be saved: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Список приватности &apos;%1&apos; не может быть сохранен: %2</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="375"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="373"/>
         <source>Privacy list &apos;%1&apos; could not be removed: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Список приватности &apos;%1&apos; не может быть удален: %2</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="384"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="382"/>
         <source>New Privacy List</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый список приватности</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="384"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="382"/>
         <source>Enter list name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите имя списка:</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="403"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="401"/>
         <source>Remove Privacy List</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить список приватности</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="404"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="402"/>
         <source>Are you really want to delete privacy list &apos;%1&apos; with rules?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы действительно хотите удалить список приватности &apos;%1&apos; с правилами?</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="505"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="503"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="506"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="504"/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>К</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="507"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="505"/>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation>От</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.cpp" line="508"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="506"/>
         <source>Both</source>
-        <translation type="unfinished"></translation>
+        <translation>Оба</translation>
     </message>
 </context>
 <context>
     <name>EditListsDialogClass</name>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="13"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="13"/>
         <source>PrivacyLists</source>
-        <translation type="unfinished"></translation>
+        <translation>PrivacyLists</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="28"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="28"/>
         <source>Setup Default and Active Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройка списков по умолчанию и активных списков</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="39"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="39"/>
         <source>Default:</source>
-        <translation type="unfinished"></translation>
+        <translation>По умолчанию:</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="59"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="59"/>
         <source>Active:</source>
-        <translation type="unfinished"></translation>
+        <translation>Активный:</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="92"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="92"/>
         <source>Edit lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать списки</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="163"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="163"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="176"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="176"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="143"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="143"/>
         <source>Edit list rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать правила списка</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="189"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="189"/>
         <source>Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Вверх</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="202"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="202"/>
         <source>Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Вних</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="216"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="216"/>
         <source>Edit rule condition</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать условие правила</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="227"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="227"/>
         <source>IF</source>
-        <translation type="unfinished"></translation>
+        <translation>ЕСЛИ</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="240"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="240"/>
         <source>=</source>
-        <translation type="unfinished"></translation>
+        <translation>=</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="263"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="263"/>
         <source>Then</source>
-        <translation type="unfinished"></translation>
+        <translation>ТОГДА</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="280"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="280"/>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Сообщения</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="287"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="287"/>
         <source>Queries</source>
-        <translation type="unfinished"></translation>
+        <translation>Запросы</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="294"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="294"/>
         <source>Presences In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/editlistsdialog.ui" line="301"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="301"/>
         <source>Presences Out</source>
         <translation type="unfinished"></translation>
     </message>
@@ -214,122 +215,122 @@
 <context>
     <name>PrivacyLists</name>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="52"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="50"/>
         <source>Enabling or disabling communication with other entities on a network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Включает или отключает общение с другими объектами сети.</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="54"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="52"/>
         <source>Privacy Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Списки приватности</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="819"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="817"/>
         <source>Privacy</source>
-        <translation type="unfinished"></translation>
+        <translation>Приватность</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="829"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="827"/>
         <source>Visible Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Видимый режим</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="838"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="837"/>
         <source>Invisible Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Невидимый режим</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="849"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="849"/>
         <source>Disable privacy lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Оключить списки приватности</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="859"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="860"/>
         <source>Block off roster contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Заблокировать контакты вне контакт-листа</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="872"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="874"/>
         <source>Visible to contact</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Видим для контакта</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="882"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="885"/>
         <source>Invisible to contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Невидим для контакта</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="892"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="896"/>
         <source>Ignore contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Игнорировать контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="905"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="910"/>
         <source>Visible to group</source>
-        <translation type="unfinished"></translation>
+        <translation>Видим для группы</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="915"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="921"/>
         <source>Invisible to group</source>
-        <translation type="unfinished"></translation>
+        <translation>Невидим для группы</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="925"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="932"/>
         <source>Ignore group</source>
-        <translation type="unfinished"></translation>
+        <translation>Игнорировать группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="940"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="948"/>
         <source>Set Active list</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить активный список</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="978"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="988"/>
         <source>&lt;None&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Нет&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="971"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="980"/>
         <source>Set Default list</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить список по умолчанию</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="1241"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="1251"/>
         <source>Advanced...</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительно...</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="1295"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="1306"/>
         <source>&lt;b&gt;Privacy settings:&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Настройки приватности:&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="1296"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="1307"/>
         <source>- queries: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>- запросы: %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="1299"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="1310"/>
         <source>&lt;b&gt;denyed&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;запрещено&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="1299"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="1310"/>
         <source>allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>разрешено</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="1297"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="1308"/>
         <source>- messages: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>- сообщения: %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="1298"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="1309"/>
         <source>- presences in: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/PrivacyLists/privacylists.cpp" line="1299"/>
+        <location filename="../../plugins/privacylists/privacylists.cpp" line="1310"/>
         <source>- presences out: %1</source>
         <translation type="unfinished"></translation>
     </message>

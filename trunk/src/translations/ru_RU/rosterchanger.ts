@@ -1,398 +1,372 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>AddContactDialog</name>
     <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.cpp" line="11"/>
-        <source>Add contact to %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.cpp" line="15"/>
-        <source>&lt;None&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.cpp" line="17"/>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="26"/>
         <source>Please, authorize me to your presence.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, авторизуйте меня.</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.cpp" line="104"/>
-        <source>Can`t add contact &apos;&lt;b&gt;%1&lt;/b&gt;&apos;&lt;br&gt;&apos;&lt;b&gt;%1&lt;/b&gt;&apos; is not a valid Jaber ID</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="10"/>
+        <source>Add contact - %1</source>
+        <translation>Добавить конакт - %1</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="119"/>
+        <source>Chat</source>
+        <translation>Чат</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="120"/>
+        <source>Open chat window</source>
+        <translation>Открыть окно чата</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="126"/>
+        <source>Message</source>
+        <translation>Сообщение</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="127"/>
+        <source>Send Message</source>
+        <translation>Послать сообщение</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="141"/>
+        <source>VCard</source>
+        <translation>VCard</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="142"/>
+        <source>Show VCard</source>
+        <translation>Показать VCard</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="148"/>
+        <source>Nick</source>
+        <translation>Ник</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="149"/>
+        <source>Resolve nick name</source>
+        <translation>Определить ник</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="175"/>
+        <source>Contact &lt;b&gt;%1&lt;/b&gt; already exists.</source>
+        <translation>Контакт &lt;b&gt;%1&lt;/b&gt; уже существует.</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="181"/>
+        <source>Can`t add contact &apos;&lt;b&gt;%1&lt;/b&gt;&apos; because it is not a valid Jaber ID</source>
+        <translation>Невозможно добавить контакт &apos;&lt;b&gt;%1&lt;/b&gt;&apos;, т.к. он не является правильным JID</translation>
     </message>
 </context>
 <context>
     <name>AddContactDialogClass</name>
     <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.ui" line="13"/>
-        <source>AddContactDialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.ui" line="40"/>
-        <source>Jabber ID:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.ui" line="60"/>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.ui" line="37"/>
         <source>Nick:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ник:</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.ui" line="70"/>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.ui" line="50"/>
         <source>Group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Група:</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.ui" line="93"/>
-        <source>Request:</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.ui" line="13"/>
+        <source>Add contact</source>
+        <translation>Добавить контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.ui" line="116"/>
-        <source>Request subscription</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.ui" line="24"/>
+        <source>Contact:</source>
+        <translation>Контакт:</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/addcontactdialog.ui" line="126"/>
-        <source>Send Subscription</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.ui" line="72"/>
+        <source>Subscription</source>
+        <translation>Авторизация</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/addcontactdialog.ui" line="81"/>
+        <source>Subscribe to contact presence</source>
+        <translation>Подписаться на рассылку статуса</translation>
     </message>
 </context>
 <context>
     <name>RosterChanger</name>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="38"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="47"/>
         <source>Manipulating roster items and groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление элементами контакт-листа и группами</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="40"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="49"/>
         <source>Roster Changer</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменения контакт-листа</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="119"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="142"/>
         <source>Add contact to</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить контакт в</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="132"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="155"/>
         <source>Subscription requests</source>
-        <translation type="unfinished"></translation>
+        <translation>Запросы авторизации</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="163"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="279"/>
         <source>%1 wants to subscribe to your presence.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 хочет подписаться на рассылку статуса.</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="165"/>
-        <source>You are now authorized for %1 presence.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="167"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="283"/>
         <source>%1 unsubscribed from your presence.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 отписался от рассылки статуса.</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="169"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="285"/>
         <source>You are now unsubscribed from %1 presence.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы отписаны от рассылки статуса %1.</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="206"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="323"/>
         <source>This group</source>
-        <translation type="unfinished"></translation>
+        <translation>Эта группа</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="247"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="367"/>
         <source>Create new...</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать новую...</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="237"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="356"/>
         <source>Root</source>
-        <translation type="unfinished"></translation>
+        <translation>Корень</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="913"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1057"/>
         <source>Add contact...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить контакт...</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="337"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="457"/>
         <source>Subscription</source>
-        <translation type="unfinished"></translation>
+        <translation>Авторизация</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="340"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="477"/>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="347"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="493"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="354"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="485"/>
         <source>Request</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="361"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="501"/>
         <source>Refuse</source>
-        <translation type="unfinished"></translation>
+        <translation>Отказать</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="434"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="579"/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать...</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="443"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="589"/>
         <source>Copy to group</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать в группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="447"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="594"/>
         <source>Move to group</source>
-        <translation type="unfinished"></translation>
+        <translation>Переместить в группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="396"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="540"/>
         <source>Remove from group</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить из группы</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="414"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="559"/>
         <source>Remove from roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить из контакт-листа</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="451"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="599"/>
         <source>Remove group</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="769"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="971"/>
         <source>Remove contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить контакты</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="496"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="657"/>
         <source>Subscription message from %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Сообщение об авторизации от %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="500"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="661"/>
         <source>Subscription message</source>
-        <translation type="unfinished"></translation>
+        <translation>Сообщение об авторизации</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="527"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="729"/>
         <source>Rename contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="527"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="729"/>
         <source>Enter name for: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите имя для: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="725"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="927"/>
         <source>Create new group</source>
-        <translation type="unfinished"></translation>
+        <translation>Согдать новую группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="725"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="927"/>
         <source>Enter group name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите имя группы:</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="628"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="830"/>
         <source>Remove contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="629"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="831"/>
         <source>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что хотите удалить контакт &lt;b&gt;%1&lt;/b&gt; из контакт-листа?</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="664"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="866"/>
         <source>Rename group</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="664"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="866"/>
         <source>Enter new group name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите новое имя группы:</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="770"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="972"/>
         <source>You are assured that wish to remove %1 contact(s) from roster?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что хотите удалить %1 контакт(ов) с контакт-листа?</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/rosterchanger.cpp" line="800"/>
-        <source>Contact &lt;b&gt;%1&lt;/b&gt; already exists.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="281"/>
+        <source>You are now subscribed for %1 presence.</source>
+        <translation>Вы авторизованы у %1.</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="572"/>
+        <source>Add contact</source>
+        <translation>Добавить контакт</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="461"/>
+        <source>Subscribe contact</source>
+        <translation>Авторизовать контакт</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="469"/>
+        <source>Unsubscribe contact</source>
+        <translation>Удалить авторизацию</translation>
     </message>
 </context>
 <context>
     <name>SubscriptionDialog</name>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="58"/>
-        <source>&lt;b&gt;Subscription request&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="8"/>
+        <source>Subscription request - %1</source>
+        <translation>Запрос авторизации - %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="61"/>
-        <source>&lt;b&gt;%1 wants to subscribe to your presence.&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="61"/>
+        <source>Chat</source>
+        <translation>Чат</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="71"/>
-        <source>&lt;b&gt;Subscription approved&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="62"/>
+        <source>Open chat window</source>
+        <translation>Открыть окно чата</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="74"/>
-        <source>&lt;b&gt;You are now authorized for %1 presence.&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="68"/>
+        <source>Message</source>
+        <translation>Сообщение</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="84"/>
-        <source>&lt;b&gt;Subscription refused&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="69"/>
+        <source>Send Message</source>
+        <translation>Послать сообщение</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="87"/>
-        <source>&lt;b&gt;%1 unsubscribed from your presence.&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="83"/>
+        <source>VCard</source>
+        <translation>VCard</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="96"/>
-        <source>&lt;b&gt;Subscription rejected&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="99"/>
-        <source>&lt;b&gt;You are now unsubscribed from %1 presence.&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="113"/>
-        <source>Click &lt;b&gt;Ask&lt;/b&gt; to ask for contact presence subscription.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="121"/>
-        <source>Click &lt;b&gt;Auth&lt;/b&gt; to authorize the subscription.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="129"/>
-        <source>Click &lt;b&gt;Refuse&lt;/b&gt; to refuse from presence subscription.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="137"/>
-        <source>Click &lt;b&gt;Reject&lt;/b&gt; to reject the presence subscription.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="150"/>
-        <source>Next - %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.cpp" line="155"/>
-        <source>Next</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="84"/>
+        <source>Show VCard</source>
+        <translation>Показать VCard</translation>
     </message>
 </context>
 <context>
     <name>SubscriptionDialogClass</name>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="13"/>
-        <source>Subscription message</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.ui" line="13"/>
+        <source>Subscription request</source>
+        <translation>Запрос авторизации</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="33"/>
-        <source>From:</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.ui" line="78"/>
+        <source>Add user to contact list</source>
+        <translation>Добавить пользователя в контакт-лист</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="65"/>
-        <source>To:</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.ui" line="88"/>
+        <source>Authorize presence subscription</source>
+        <translation>Авторизовать</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="91"/>
-        <source>Received:</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.ui" line="98"/>
+        <source>Remove presence subscription</source>
+        <translation>Удалить авторизацию</translation>
+    </message>
+</context>
+<context>
+    <name>SubscriptionOptionsClass</name>
+    <message>
+        <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="13"/>
+        <source>SubscriptionOptions</source>
+        <translation>SubscriptionOptions</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="104"/>
-        <source>99:99:99</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="22"/>
+        <source>Auto accept subscription requests</source>
+        <translation>Автоматически разрешать авторизацию</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="140"/>
-        <source>Ask subscription</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="143"/>
-        <source>Ask</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="150"/>
-        <source>Confirm subscription request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="153"/>
-        <source>Auth</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="160"/>
-        <source>Refuse from subscription</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="163"/>
-        <source>Refuse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="170"/>
-        <source>Reject subscription</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="173"/>
-        <source>Reject</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="193"/>
-        <source>Next</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugins/RosterChanger/subscriptiondialog.ui" line="200"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="29"/>
+        <source>Auto unsubscribe contacts</source>
+        <translation>Автоматически запрещать авторизацию</translation>
     </message>
 </context>
 </TS>
