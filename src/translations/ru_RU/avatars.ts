@@ -1,72 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>Avatars</name>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="53"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="52"/>
         <source>Enable a user to store and retrieve an avatar</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешить пользователю хранить и получать аватары</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="55"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="54"/>
         <source>Avatars manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление аватарами</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="597"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="596"/>
         <source>Avatar</source>
-        <translation type="unfinished"></translation>
+        <translation>Аватар</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="602"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="601"/>
         <source>Set avatar</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить аватар</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="608"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="608"/>
         <source>Clear avatar</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить аватар</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="619"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="620"/>
         <source>Custom picture</source>
-        <translation type="unfinished"></translation>
+        <translation>Картинка пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="624"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="625"/>
         <source>Set custom picture</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить картинку пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="630"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="632"/>
         <source>Clear custom picture</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить картинку пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="661"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="664"/>
         <source>Select avatar image</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать картинку аватара</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/avatars.cpp" line="661"/>
+        <location filename="../../plugins/avatars/avatars.cpp" line="664"/>
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
-        <translation type="unfinished"></translation>
+        <translation>Картинки (*.png *.jpg *.bmp *.gif)</translation>
     </message>
 </context>
 <context>
     <name>RosterOptionsWidgetClass</name>
     <message>
-        <location filename="../../plugins/Avatars/rosteroptionswidget.ui" line="13"/>
+        <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="13"/>
         <source>RosterOptionsWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>RosterOptionsWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/rosteroptionswidget.ui" line="22"/>
+        <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="22"/>
         <source>Show avatars</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать аватары</translation>
     </message>
     <message>
-        <location filename="../../plugins/Avatars/rosteroptionswidget.ui" line="29"/>
+        <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="29"/>
         <source>Show avatars befour contact label</source>
         <translation type="unfinished"></translation>
     </message>

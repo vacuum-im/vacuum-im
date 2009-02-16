@@ -1,46 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>RosterSearch</name>
     <message>
-        <location filename="../../plugins/RosterSearch/rostersearch.cpp" line="21"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="19"/>
         <source>Search toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Панель поиска</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterSearch/rostersearch.cpp" line="33"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="31"/>
         <source>Search by regular expression</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск по регулярному выражению</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterSearch/rostersearch.cpp" line="46"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="44"/>
         <source>Searching contacts in roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск контактов в контакт-листе</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterSearch/rostersearch.cpp" line="48"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="46"/>
         <source>Roster Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск по контакт-листу</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterSearch/rostersearch.cpp" line="86"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="84"/>
         <source>Show search toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать панель поиска</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterSearch/rostersearch.cpp" line="97"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="95"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterSearch/rostersearch.cpp" line="98"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="96"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Статус</translation>
     </message>
     <message>
-        <location filename="../../plugins/RosterSearch/rostersearch.cpp" line="99"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="97"/>
         <source>Jabber ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Jabber ID</translation>
     </message>
 </context>
 </TS>

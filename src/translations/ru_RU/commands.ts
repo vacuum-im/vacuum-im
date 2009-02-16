@@ -1,117 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>CommandDialog</name>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.cpp" line="25"/>
+        <location filename="../../plugins/commands/commanddialog.cpp" line="23"/>
         <source>&lt;Back</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Назад</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.cpp" line="26"/>
+        <location filename="../../plugins/commands/commanddialog.cpp" line="24"/>
         <source>Next&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Вперед&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.cpp" line="27"/>
+        <location filename="../../plugins/commands/commanddialog.cpp" line="25"/>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Завершено</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.cpp" line="67"/>
+        <location filename="../../plugins/commands/commanddialog.cpp" line="65"/>
         <source>Command execution completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выполнение команды завершено.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.cpp" line="69"/>
+        <location filename="../../plugins/commands/commanddialog.cpp" line="67"/>
         <source>Command execution canceled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выполнение команды отменено.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.cpp" line="98"/>
+        <location filename="../../plugins/commands/commanddialog.cpp" line="96"/>
         <source>Requested operation failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрошенная операция не выполнена: %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.cpp" line="113"/>
+        <location filename="../../plugins/commands/commanddialog.cpp" line="111"/>
         <source>Executing command &apos;%1&apos; at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Выполение команды &apos;%1&apos; на %2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.cpp" line="150"/>
+        <location filename="../../plugins/commands/commanddialog.cpp" line="148"/>
         <source>Waiting for host response ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ожидание ответа хоста ...</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.cpp" line="155"/>
+        <location filename="../../plugins/commands/commanddialog.cpp" line="153"/>
         <source>Error: Can`t send request to host.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка: невохможно отправить запрос на хост.</translation>
     </message>
 </context>
 <context>
     <name>CommandDialogClass</name>
     <message>
-        <location filename="../../plugins/Commands/commanddialog.ui" line="13"/>
+        <location filename="../../plugins/commands/commanddialog.ui" line="13"/>
         <source>CommandDialog</source>
-        <translation type="unfinished"></translation>
+        <translation>CommandDialog</translation>
     </message>
 </context>
 <context>
     <name>Commands</name>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="30"/>
+        <location filename="../../plugins/commands/commands.cpp" line="28"/>
         <source>Plugin for advertising and executing application-specific commands</source>
-        <translation type="unfinished"></translation>
+        <translation>Плагин для отправки и выполнения команд приложения</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="434"/>
+        <location filename="../../plugins/commands/commands.cpp" line="432"/>
         <source>Ad-Hoc Commands</source>
-        <translation type="unfinished"></translation>
+        <translation>Ad-Hoc команда</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="76"/>
+        <location filename="../../plugins/commands/commands.cpp" line="74"/>
         <source>Can not understand the specified action</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно понять указанное действие</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="78"/>
+        <location filename="../../plugins/commands/commands.cpp" line="76"/>
         <source>Can not accept the specified action</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно подтвердить указанное действие</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="80"/>
+        <location filename="../../plugins/commands/commands.cpp" line="78"/>
         <source>Can not accept the specified language/locale</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно понять указанный язык/локаль</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="82"/>
+        <location filename="../../plugins/commands/commands.cpp" line="80"/>
         <source>The data form did not provide one or more required fields</source>
-        <translation type="unfinished"></translation>
+        <translation>В форме не заполнено одно или несколько обязательных полей</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="84"/>
+        <location filename="../../plugins/commands/commands.cpp" line="82"/>
         <source>Specified session not present</source>
-        <translation type="unfinished"></translation>
+        <translation>Указанная сессия не существует</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="86"/>
+        <location filename="../../plugins/commands/commands.cpp" line="84"/>
         <source>Specified session is no longer active</source>
-        <translation type="unfinished"></translation>
+        <translation>Указанная сессия более не активна</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="290"/>
+        <location filename="../../plugins/commands/commands.cpp" line="288"/>
         <source>Execute</source>
-        <translation type="unfinished"></translation>
+        <translation>Выполнить</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="302"/>
+        <location filename="../../plugins/commands/commands.cpp" line="300"/>
         <source>Commands</source>
-        <translation type="unfinished"></translation>
+        <translation>Команды</translation>
     </message>
     <message>
-        <location filename="../../plugins/Commands/commands.cpp" line="435"/>
+        <location filename="../../plugins/commands/commands.cpp" line="433"/>
         <source>Advertising and executing application-specific commands</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправка и выполнение команд приложения</translation>
     </message>
 </context>
 </TS>

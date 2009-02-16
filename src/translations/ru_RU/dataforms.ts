@@ -1,59 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>DataFormWidget</name>
     <message>
-        <location filename="../../plugins/DataForms/dataformwidget.cpp" line="89"/>
+        <location filename="../../plugins/dataforms/dataformwidget.cpp" line="93"/>
         <source>Page %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Страница %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/DataForms/dataformwidget.cpp" line="121"/>
+        <location filename="../../plugins/dataforms/dataformwidget.cpp" line="127"/>
         <source>The are %1 field(s) with invalid values:&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Количество полей с ошибками: %1 &lt;br&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/DataForms/dataformwidget.cpp" line="126"/>
+        <location filename="../../plugins/dataforms/dataformwidget.cpp" line="132"/>
         <source>Do you want to continue with invalid values?</source>
-        <translation type="unfinished"></translation>
+        <translation>продолжить с ошибочными значениями?</translation>
     </message>
 </context>
 <context>
     <name>DataForms</name>
     <message>
-        <location filename="../../plugins/DataForms/dataforms.cpp" line="15"/>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="18"/>
         <source>Potapov S.A. aka Lion</source>
-        <translation type="unfinished"></translation>
+        <translation>Potapov S.A. aka Lion</translation>
     </message>
     <message>
-        <location filename="../../plugins/DataForms/dataforms.cpp" line="773"/>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="1056"/>
         <source>Implements data forms and generic data description</source>
-        <translation type="unfinished"></translation>
+        <translation>Реализует обработку форм данных</translation>
     </message>
     <message>
-        <location filename="../../plugins/DataForms/dataforms.cpp" line="771"/>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="1054"/>
         <source>Data Forms</source>
-        <translation type="unfinished"></translation>
+        <translation>Формы данных</translation>
     </message>
     <message>
-        <location filename="../../plugins/DataForms/dataforms.cpp" line="779"/>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="1062"/>
         <source>Data Forms Validation</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка форм данных</translation>
     </message>
     <message>
-        <location filename="../../plugins/DataForms/dataforms.cpp" line="781"/>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="1064"/>
         <source>Enables to specify additional validation guidelines related to a data form</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешает указать дополнительные управляющие проверки, связанные с формой данных</translation>
     </message>
     <message>
-        <location filename="../../plugins/DataForms/dataforms.cpp" line="787"/>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="1070"/>
         <source>Data Forms Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Расположение форм данных</translation>
     </message>
     <message>
-        <location filename="../../plugins/DataForms/dataforms.cpp" line="789"/>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="1072"/>
         <source>Enables to specify form layouts, including the layout of form fields, pages and sections</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешает указать расположение форм, включая расположение полей форм, страниц и секций</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="857"/>
+        <source>Yes</source>
+        <translation>Да</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="857"/>
+        <source>No</source>
+        <translation>Нет</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="893"/>
+        <source>Unsupported url scheme</source>
+        <translation>Неподдерживаемая схема URL</translation>
+    </message>
+</context>
+<context>
+    <name>DataMediaWidget</name>
+    <message>
+        <location filename="../../plugins/dataforms/datamediawidget.cpp" line="21"/>
+        <source>Unsupported media type</source>
+        <translation>Неподдерживаемый тип медиа</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/dataforms/datamediawidget.cpp" line="48"/>
+        <source>Loading data...</source>
+        <translation>Загрузка данных...</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/dataforms/datamediawidget.cpp" line="118"/>
+        <source>Unsupported data format</source>
+        <translation>Неподдерживаемый формат данных</translation>
     </message>
 </context>
 </TS>
