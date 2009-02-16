@@ -15,7 +15,7 @@ class ChatWindow :
   Q_OBJECT;
   Q_INTERFACES(IChatWindow ITabWidget);
 public:
-  ChatWindow(IMessenger *AMessenger, const Jid& AStreamJid, const Jid &AContactJid);
+  ChatWindow(IMessenger *AMessenger, const Jid &AStreamJid, const Jid &AContactJid);
   ~ChatWindow();
   //ITabWidget
   virtual QWidget *instance() { return this; }

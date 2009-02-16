@@ -64,7 +64,8 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMes
   connect(FMultiChat->instance(),SIGNAL(chatError(const QString &, const QString &)),
     SLOT(onChatError(const QString &, const QString &)));
   connect(FMultiChat->instance(),SIGNAL(chatClosed()),SLOT(onChatClosed()));
-  connect(FMultiChat->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),SLOT(onStreamJidChanged(const Jid &, const Jid &)));
+  connect(FMultiChat->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
+    SLOT(onStreamJidChanged(const Jid &, const Jid &)));
   connect(FMultiChat->instance(),SIGNAL(userPresence(IMultiUser *,int,const QString &)),
     SLOT(onUserPresence(IMultiUser *,int,const QString &)));
   connect(FMultiChat->instance(),SIGNAL(userDataChanged(IMultiUser *, int, const QVariant, const QVariant &)),
@@ -116,13 +117,10 @@ MultiUserChatWindow::~MultiUserChatWindow()
 
 void MultiUserChatWindow::showWindow()
 {
-  if (isWindow() && !isVisible())
+  if (isWindow() && !isVisible() && FMessenger->checkOption(IMessenger::UseTabWindow))
   {
-    if (FMessenger->checkOption(IMessenger::UseTabWindow))
-    {
-      ITabWindow *tabWindow = FMessenger->openTabWindow();
-      tabWindow->addWidget(this);
-    }
+    ITabWindow *tabWindow = FMessenger->openTabWindow();
+    tabWindow->addWidget(this);
   }
   if (isWindow())
     isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
@@ -1010,7 +1008,7 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 
 void MultiUserChatWindow::showChatWindow(IChatWindow *AWindow)
 {
-  if (AWindow->isWindow() && FMessenger->checkOption(IMessenger::UseTabWindow))
+  if (AWindow->isWindow() && !AWindow->isVisible() && FMessenger->checkOption(IMessenger::UseTabWindow))
   {
     ITabWindow *tabWindow = FMessenger->openTabWindow();
     tabWindow->addWidget(AWindow);
