@@ -2,11 +2,12 @@
 
 #include <QDesktopServices>
 
-#define PST_BOOKMARKS       "storage"
+#define PST_BOOKMARKS           "storage"
 
 #define ADR_STREAM_JID          Action::DR_StreamJid
 #define ADR_BOOKMARK_INDEX      Action::DR_Parametr1
 #define ADR_ROOMJID             Action::DR_Parametr2
+#define ADR_GROUP_SHIFT         Action::DR_Parametr1
 
 BookMarks::BookMarks()
 {
@@ -16,11 +17,8 @@ BookMarks::BookMarks()
   FMainWindowPlugin = NULL;
   FAccountManager = NULL;
   FMultiChatPlugin = NULL;
-
-  FBookMarksMenu = new Menu;
-  FBookMarksMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
-  FBookMarksMenu->setTitle(tr("Bookmarks"));
-  FBookMarksMenu->menuAction()->setEnabled(false);
+  
+  FBookMarksMenu = NULL;
 }
 
 BookMarks::~BookMarks()
@@ -97,6 +95,12 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 
 bool BookMarks::initObjects()
 {
+  FBookMarksMenu = new Menu;
+  FBookMarksMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
+  FBookMarksMenu->setTitle(tr("Bookmarks"));
+  FBookMarksMenu->menuAction()->setEnabled(false);
+  FBookMarksMenu->menuAction()->setData(ADR_GROUP_SHIFT,1);
+
   if (FTrayManager)
   {
     FTrayManager->addAction(FBookMarksMenu->menuAction(),AG_BOOKMARKS_TRAY,true);
@@ -222,6 +226,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
   {
     QList<IBookMark> &streamBookmarks = FBookMarks[AStreamJid];
     Menu *streamMenu = FStreamMenu.value(AStreamJid,NULL);
+    int groupShift = streamMenu!=NULL ? streamMenu->menuAction()->data(ADR_GROUP_SHIFT).toInt() : FBookMarksMenu->menuAction()->data(ADR_GROUP_SHIFT).toInt();
     if (!streamMenu)
     {
       streamMenu = new Menu(FBookMarksMenu);
@@ -235,6 +240,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
       }
       else
         streamMenu->setTitle(AStreamJid.full());
+      streamMenu->menuAction()->setData(ADR_GROUP_SHIFT,groupShift);
 
       Action *action = new Action(streamMenu);
       action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
@@ -244,11 +250,13 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
       streamMenu->addAction(action,AG_BBM_BOOKMARKS_TOOLS,true);
 
       FStreamMenu.insert(AStreamJid,streamMenu);
-      FBookMarksMenu->addAction(streamMenu->menuAction(),AG_BMM_BOOKMARKS_STREAMS,true);
+      FBookMarksMenu->addAction(streamMenu->menuAction(),AG_BMM_BOOKMARKS_STREAMS,false);
+      FBookMarksMenu->menuAction()->setData(ADR_GROUP_SHIFT,groupShift+1);
     }
     else
     {
-      qDeleteAll(streamMenu->actions(AG_DEFAULT));
+      qDeleteAll(streamMenu->actions(AG_BMM_BOOKMARKS_ITEMS));
+      qDeleteAll(FBookMarksMenu->actions(AG_BMM_BOOKMARKS_ITEMS + groupShift));
       streamBookmarks.clear();
     }
 
@@ -282,7 +290,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
         action->setData(ADR_BOOKMARK_INDEX,streamBookmarks.count()-1);
         connect(action,SIGNAL(triggered(bool)),SLOT(onBookmarkActionTriggered(bool)));
         streamMenu->addAction(action,AG_BMM_BOOKMARKS_ITEMS,false);
-        FBookMarksMenu->addAction(action,AG_BMM_BOOKMARKS_ITEMS + qHash(AStreamJid),false);
+        FBookMarksMenu->addAction(action,AG_BMM_BOOKMARKS_ITEMS + groupShift,false);
       }
       elem = elem.nextSiblingElement();
     }

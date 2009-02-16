@@ -76,7 +76,7 @@ void EditBookmarkDialog::onDialogAccepted()
         accept();
       }
       else
-        QMessageBox::warning(this,tr("Bookmark is not valid"),tr("In URL bookmark field 'URL'should not be empty"));
+        QMessageBox::warning(this,tr("Bookmark is not valid"),tr("In URL bookmark field 'URL' should not be empty"));
     }
   }
   else
