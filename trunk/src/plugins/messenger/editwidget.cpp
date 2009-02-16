@@ -61,7 +61,7 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
   {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
     emit keyEventReceived(keyEvent,hooked);
-    hooked = hooked || (keyEvent->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)) > 0;
+    //hooked = hooked || (keyEvent->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)) > 0;
   }
   else if (AWatched==ui.tedEditor && AEvent->type()==QEvent::ShortcutOverride)
   {
