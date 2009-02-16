@@ -28,7 +28,7 @@ VCardPlugin::~VCardPlugin()
 void VCardPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Request and publish vCards");
+  APluginInfo->description = tr("Request and publish vCard");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("VCard manager"); 
   APluginInfo->uid = VCARD_UUID;
@@ -283,7 +283,7 @@ void VCardPlugin::registerDiscoFeatures()
   dfeature.var = NS_VCARD_TEMP;
   dfeature.name = tr("vCard");
   dfeature.actionName = tr("vCard");
-  dfeature.description = tr("Request and publish contact vCard");
+  dfeature.description = tr("Request and publish vCard");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

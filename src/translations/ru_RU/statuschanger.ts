@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>AccountOptionsWidgetClass</name>
     <message>
         <location filename="../../plugins/statuschanger/accountoptionswidget.ui" line="13"/>
         <source>AccountOptionsWidget</source>
-        <translation>AccountOptionsWidget</translation>
+        <translation type="obsolete">AccountOptionsWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/statuschanger/accountoptionswidget.ui" line="31"/>
+        <location filename="../../plugins/statuschanger/accountoptionswidget.ui" line="19"/>
         <source>Auto connect on startup</source>
-        <translation>Автоподсоединение при старте</translation>
+        <translation>Автоподключение при старте</translation>
     </message>
     <message>
-        <location filename="../../plugins/statuschanger/accountoptionswidget.ui" line="38"/>
+        <location filename="../../plugins/statuschanger/accountoptionswidget.ui" line="26"/>
         <source>Auto reconnect if disconnected</source>
-        <translation>Автопересоединение при отключении</translation>
+        <translation>Автоматически восстанавливать соединение</translation>
     </message>
 </context>
 <context>
@@ -34,7 +33,7 @@
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="147"/>
         <source>Show</source>
-        <translation>Показать</translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="147"/>
@@ -64,7 +63,7 @@
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="296"/>
         <source>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; allready exists</source>
-        <translation>Статус с именем &apos;&lt;b&gt;%1&lt;/b&gt;&apos; уже есть</translation>
+        <translation>Статус с именем &apos;&lt;b&gt;%1&lt;/b&gt;&apos; уже присутствует</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="319"/>
@@ -74,12 +73,12 @@
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="315"/>
         <source>You can not delete standard statuses.</source>
-        <translation>Вы не можете удалять стандартные статусы.</translation>
+        <translation>Вы не можете удалить стандартные статусы.</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="319"/>
         <source>You can not delete active statuses.</source>
-        <translation>Вы не можете удалять активные статусы.</translation>
+        <translation>Вы не можете удалить активные статусы.</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="323"/>
@@ -97,7 +96,7 @@
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.ui" line="13"/>
         <source>Edit presence statuses</source>
-        <translation>Редактировать статусы присутствия</translation>
+        <translation>Редактировать статусы</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.ui" line="41"/>
@@ -120,12 +119,12 @@
     <message>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="56"/>
         <source>Status Changer</source>
-        <translation>Менятель статусов</translation>
+        <translation>Менеджер статусов</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="160"/>
         <source>Edit presence statuses</source>
-        <translation>Редактировать статусы присутствия</translation>
+        <translation>Редактировать статусы</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="202"/>
@@ -145,7 +144,7 @@
     <message>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="488"/>
         <source>Chat</source>
-        <translation>Чат</translation>
+        <translation>Готов общаться</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="490"/>
@@ -180,7 +179,7 @@
     <message>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="519"/>
         <source>Free for chat</source>
-        <translation>Поболтаем</translation>
+        <translation>Поболтаем?</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="528"/>
@@ -195,7 +194,7 @@
     <message>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="564"/>
         <source>Disconnected</source>
-        <translation>Отключился</translation>
+        <translation>Отключен</translation>
     </message>
     <message>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="782"/>

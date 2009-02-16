@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>OptionsDialog</name>
     <message>
@@ -19,7 +18,7 @@
     <message>
         <location filename="../../plugins/settings/profiledialog.cpp" line="97"/>
         <source>Creating new profile</source>
-        <translation>Создать новый профиль</translation>
+        <translation>Создание нового профиля</translation>
     </message>
     <message>
         <location filename="../../plugins/settings/profiledialog.cpp" line="97"/>
@@ -29,12 +28,12 @@
     <message>
         <location filename="../../plugins/settings/profiledialog.cpp" line="124"/>
         <source>Renaming profile</source>
-        <translation>Переименовать профиль</translation>
+        <translation>Переименование профиля</translation>
     </message>
     <message>
         <location filename="../../plugins/settings/profiledialog.cpp" line="107"/>
         <source>Enter new name for profile:</source>
-        <translation>Введите новое имя для профиля</translation>
+        <translation>Введите новое имя для профиля:</translation>
     </message>
     <message>
         <location filename="../../plugins/settings/profiledialog.cpp" line="124"/>
@@ -57,12 +56,12 @@
     <message>
         <location filename="../../plugins/settings/profiledialog.ui" line="13"/>
         <source>Edit profiles</source>
-        <translation>Редактирование профилей</translation>
+        <translation>Редактор профилей</translation>
     </message>
     <message>
         <location filename="../../plugins/settings/profiledialog.ui" line="36"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location filename="../../plugins/settings/profiledialog.ui" line="43"/>
@@ -80,7 +79,7 @@
     <message>
         <location filename="../../plugins/settings/settingsplugin.cpp" line="36"/>
         <source>Managing profiles and settings</source>
-        <translation>Управление профилями и сессиями</translation>
+        <translation>Управление профилями и настройками</translation>
     </message>
     <message>
         <location filename="../../plugins/settings/settingsplugin.cpp" line="38"/>

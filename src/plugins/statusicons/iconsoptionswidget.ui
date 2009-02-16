@@ -15,9 +15,6 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
-   <string>IconsOptionsWidget</string>
-  </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
     <number>0</number>
@@ -28,14 +25,6 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="tabDefault" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>466</width>
-        <height>280</height>
-       </rect>
-      </property>
       <attribute name="title" >
        <string>Default iconset</string>
       </attribute>
@@ -53,14 +42,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabContact" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>466</width>
-        <height>280</height>
-       </rect>
-      </property>
       <attribute name="title" >
        <string>Default rules</string>
       </attribute>
@@ -91,14 +72,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabService" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>466</width>
-        <height>280</height>
-       </rect>
-      </property>
       <attribute name="title" >
        <string>User rules</string>
       </attribute>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>ErrorHandler</name>
     <message>
@@ -16,7 +15,7 @@
     <message>
         <location filename="../../utils/errorhandler.cpp" line="270"/>
         <source>Bad Request</source>
-        <translation>Ошибочный запрос</translation>
+        <translation>Плохой запрос</translation>
     </message>
     <message>
         <location filename="../../utils/errorhandler.cpp" line="271"/>
@@ -66,7 +65,7 @@
     <message>
         <location filename="../../utils/errorhandler.cpp" line="280"/>
         <source>Not Acceptable</source>
-        <translation>Не подтверждено</translation>
+        <translation>Не приемлемо</translation>
     </message>
     <message>
         <location filename="../../utils/errorhandler.cpp" line="281"/>
@@ -81,7 +80,7 @@
     <message>
         <location filename="../../utils/errorhandler.cpp" line="283"/>
         <source>Request Timeout</source>
-        <translation>Истекло ожидание времени запроса</translation>
+        <translation>Истекло время выполнения запроса</translation>
     </message>
     <message>
         <location filename="../../utils/errorhandler.cpp" line="284"/>
@@ -96,7 +95,7 @@
     <message>
         <location filename="../../utils/errorhandler.cpp" line="286"/>
         <source>Resource Constraint</source>
-        <translation type="unfinished">Ресурс напряжен</translation>
+        <translation>Недостаточно ресурсов</translation>
     </message>
     <message>
         <location filename="../../utils/errorhandler.cpp" line="287"/>

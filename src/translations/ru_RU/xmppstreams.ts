@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>XmppStream</name>
     <message>
@@ -11,12 +10,12 @@
     <message>
         <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="45"/>
         <source>Enter password for &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Введите запорс для &lt;b&gt;%1&lt;/b&gt;</translation>
+        <translation>Введите пароль для &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="55"/>
         <source>Password not specified</source>
-        <translation>Пароль не определен</translation>
+        <translation>Пароль не задан</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="58"/>
@@ -26,7 +25,7 @@
     <message>
         <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="222"/>
         <source>Required stream feature &apos;%1&apos; not available</source>
-        <translation>Запрошенное свойство &apos;%1&apos; потока не доступно</translation>
+        <translation>Требуемая функция XMPP-потока &apos;%1&apos; не доступна</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="413"/>
@@ -36,7 +35,7 @@
     <message>
         <location filename="../../plugins/xmppstreams/xmppstream.cpp" line="468"/>
         <source>XMPP connection timed out</source>
-        <translation>XMPP соединение разорвано по времени</translation>
+        <translation>Превышено время установки XMPP соединения</translation>
     </message>
 </context>
 <context>
@@ -44,12 +43,12 @@
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="21"/>
         <source>Bad Request Format</source>
-        <translation>Плохой формат запроса</translation>
+        <translation>Неверный формат запроса</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="24"/>
         <source>Bad Namespace Prefix</source>
-        <translation>Плохой префикс пространства имён</translation>
+        <translation>Неверный префикс пространства имён</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="27"/>
@@ -64,7 +63,7 @@
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="33"/>
         <source>Host Gone</source>
-        <translation>Хост умер</translation>
+        <translation>Хост недоступен</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="36"/>
@@ -84,22 +83,22 @@
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="45"/>
         <source>Invalid From</source>
-        <translation>Неправильная форма</translation>
+        <translation>Недопустимый отправитель</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="48"/>
         <source>Invalid Id</source>
-        <translation>Неправильный ID</translation>
+        <translation>Недопустимый ID</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="51"/>
         <source>Invalid Namespace</source>
-        <translation>Неправильное пространство имён</translation>
+        <translation>Недопустимое пространство имён</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="54"/>
         <source>Invalid XML</source>
-        <translation>Неправильный XML</translation>
+        <translation>Недопустимый XML</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="57"/>
@@ -109,12 +108,12 @@
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="60"/>
         <source>Policy Violation</source>
-        <translation>Нарушение политики</translation>
+        <translation>Нарушение правил</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="63"/>
         <source>Remote Connection Failed</source>
-        <translation>Удаленное соединение не удалось</translation>
+        <translation>Сбой удаленного соединения</translation>
     </message>
     <message>
         <location filename="../../plugins/xmppstreams/xmppstreams.cpp" line="66"/>
