@@ -6,11 +6,8 @@
     <x>0</x>
     <y>0</y>
     <width>449</width>
-    <height>250</height>
+    <height>251</height>
    </rect>
-  </property>
-  <property name="windowTitle" >
-   <string>VCardDialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
    <property name="margin" >

@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>StartTLS</name>
     <message>
         <location filename="../../plugins/starttls/starttls.cpp" line="46"/>
         <source>StartTLS negotiation failed.</source>
-        <translation>Согласование StartTLS не удалось.</translation>
+        <translation>Ошибка при установке TLS соединения.</translation>
     </message>
     <message>
         <location filename="../../plugins/starttls/starttls.cpp" line="48"/>
         <source>Wrong StartTLS negotiation answer.</source>
-        <translation>Неверный ответ согласования StartTLS.</translation>
+        <translation>Неверный ответ при согласовании TLS соединения.</translation>
     </message>
 </context>
 <context>

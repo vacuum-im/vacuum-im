@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>DiscoInfoWindow</name>
     <message>
@@ -17,47 +16,47 @@
 <context>
     <name>DiscoInfoWindowClass</name>
     <message>
-        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="49"/>
+        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="46"/>
         <source>Identities:</source>
         <translation>Элементы:</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="81"/>
+        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="78"/>
         <source>Category</source>
         <translation>Категория</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="86"/>
+        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="83"/>
         <source>Type</source>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="91"/>
+        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="88"/>
         <source>Name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="99"/>
+        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="96"/>
         <source>Features:</source>
-        <translation>Дополнительно:</translation>
+        <translation>Возможности:</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="125"/>
+        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="122"/>
         <source>Description:</source>
         <translation>Описание:</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="174"/>
+        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="171"/>
         <source>Update</source>
-        <translation>Обновление</translation>
+        <translation>Обновить</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="13"/>
         <source>DiscoveryInfo</source>
-        <translation>DiscoveryInfo</translation>
+        <translation type="obsolete">DiscoveryInfo</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="154"/>
+        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="151"/>
         <source>Extensions</source>
         <translation>Расширения</translation>
     </message>
@@ -92,17 +91,17 @@
     <message>
         <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="240"/>
         <source>&lt;li&gt;&lt;b&gt;Features:&lt;/b&gt;&lt;/li&gt;</source>
-        <translation>&lt;li&gt;&lt;b&gt;Дополнительно:&lt;/b&gt;&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;&lt;b&gt;Возможности:&lt;/b&gt;&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="262"/>
         <source>true</source>
-        <translation>true</translation>
+        <translation>Да</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="262"/>
         <source>false</source>
-        <translation>false</translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="272"/>
@@ -145,7 +144,7 @@
     <message>
         <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="180"/>
         <source>vCard</source>
-        <translation>VCard</translation>
+        <translation>vCard</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="347"/>
@@ -158,30 +157,30 @@
     <message>
         <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="13"/>
         <source>DiscoItemsWindow</source>
-        <translation>DiscoItemsWindow</translation>
+        <translation type="obsolete">DiscoItemsWindow</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="60"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="57"/>
         <source>Node:</source>
         <translation>Узел:</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="119"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="116"/>
         <source>Actions</source>
         <translation>Действия</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="163"/>
         <source>toolBar</source>
-        <translation>toolBar</translation>
+        <translation type="obsolete">toolBar</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="34"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="31"/>
         <source>Item:</source>
         <translation>Элемент:</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="86"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="83"/>
         <source>Search:</source>
         <translation>Поиск:</translation>
     </message>

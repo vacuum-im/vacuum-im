@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>SessionNegotiation</name>
     <message>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="38"/>
         <source>Negotiating the exchange of XML stanzas between two XMPP entities.</source>
-        <translation>Согласование обмена XML-транзакцями между двумя XMPP клиентами.</translation>
+        <translation>Согласует обмен XML-транзакцями между двумя XMPP клиентами.</translation>
     </message>
     <message>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="915"/>
@@ -16,7 +15,7 @@
     <message>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="109"/>
         <source>Negotiate session requests</source>
-        <translation>Согласование запросов сессии</translation>
+        <translation>Запросы установки сессии</translation>
     </message>
     <message>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="236"/>
@@ -51,7 +50,7 @@
     <message>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="256"/>
         <source>Accept the Invitation?</source>
-        <translation>Разрешить приглашение?</translation>
+        <translation>Принять приглашение?</translation>
     </message>
     <message>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="257"/>
@@ -66,7 +65,7 @@
     <message>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="259"/>
         <source>Enable Chat State Notifications?</source>
-        <translation>Разрешить уведомления о статусе чата?</translation>
+        <translation>Разрештить уведомления о статусе чата?</translation>
     </message>
     <message>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="260"/>
