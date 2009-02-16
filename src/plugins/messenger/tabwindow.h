@@ -43,7 +43,6 @@ protected:
   virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
   void onTabChanged(int AIndex);
-  void onCloseAction(bool);
   void onTabWidgetShow();
   void onTabWidgetClose();
   void onTabWidgetChanged();
@@ -51,9 +50,7 @@ protected slots:
   void onTabWindowCreated(ITabWindow *AWindow);
   void onTabWindowChanged();
   void onTabWindowDestroyed(ITabWindow *AWindow);
-  void onTabWindowAction(bool);
-  void onNewTabWindowAction(bool);
-  void onDetachWindowAction(bool);
+  void onActionTriggered(bool);
 private:
   Ui::TabWindowClass ui;
 private:
@@ -65,7 +62,8 @@ private:
   Action *FCloseAction;
   Action *FNewTabAction;
   Action *FDetachWindowAction;
-  QHash<int,Action *> FTabActions;
+  Action *FNextTabAction;
+  QHash<int,Action *> FMoveActions;
 private:
   int FWindowId;
 };

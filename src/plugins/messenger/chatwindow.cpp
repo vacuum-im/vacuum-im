@@ -86,9 +86,7 @@ void ChatWindow::showMessage(const Message &AMessage)
 void ChatWindow::showWindow()
 {
   if (isWindow())
-  {
     isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
-  }
   else
     emit windowShow();
 }

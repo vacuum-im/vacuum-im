@@ -107,7 +107,7 @@ void EditUsersListDialog::onAddClicked()
   }
   else
   {
-    QMessageBox::warning(this,tr("Wring item JID"),tr("Entered item JID is not valid or already exists."));
+    QMessageBox::warning(this,tr("Wrong item JID"),tr("Entered item JID is not valid or already exists."));
   }
 }
 

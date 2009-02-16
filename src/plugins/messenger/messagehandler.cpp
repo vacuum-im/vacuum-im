@@ -328,7 +328,7 @@ void MessageHandler::showChatHistory(IChatWindow *AWindow)
 
 void MessageHandler::showChatWindow(IChatWindow *AWindow)
 {
-  if (AWindow->isWindow() && FMessenger->checkOption(IMessenger::UseTabWindow))
+  if (AWindow->isWindow() && !AWindow->isVisible() && FMessenger->checkOption(IMessenger::UseTabWindow))
   {
     ITabWindow *tabWindow = FMessenger->openTabWindow();
     tabWindow->addWidget(AWindow);
