@@ -32,7 +32,7 @@ void AccountManager::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Creating and removing accounts");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = "Account manager";
+  APluginInfo->name = tr("Account manager");
   APluginInfo->uid = ACCOUNTMANAGER_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID); 

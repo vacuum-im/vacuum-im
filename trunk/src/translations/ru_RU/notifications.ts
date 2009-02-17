@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>Notifications</name>
     <message>
@@ -31,7 +30,7 @@
     <message>
         <location filename="../../plugins/notifications/notifications.cpp" line="133"/>
         <source>Pending Notifications</source>
-        <translation>Ожидаемые уведомления</translation>
+        <translation>Ожидающие уведомления</translation>
     </message>
 </context>
 <context>
@@ -39,30 +38,30 @@
     <message>
         <location filename="../../plugins/notifications/notifykindswidget.ui" line="13"/>
         <source>NotifyKindsWidget</source>
-        <translation>NotifyKindsWidget</translation>
+        <translation type="obsolete">NotifyKindsWidget</translation>
     </message>
     <message>
         <location filename="../../plugins/notifications/notifykindswidget.ui" line="25"/>
         <source>GroupBox</source>
-        <translation>GroupBox</translation>
+        <translation type="obsolete">GroupBox</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifykindswidget.ui" line="37"/>
+        <location filename="../../plugins/notifications/notifykindswidget.ui" line="31"/>
         <source>Roster</source>
         <translation>Контакт-лист</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifykindswidget.ui" line="44"/>
+        <location filename="../../plugins/notifications/notifykindswidget.ui" line="38"/>
         <source>Popup</source>
         <translation>Всплыв. окно</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifykindswidget.ui" line="51"/>
+        <location filename="../../plugins/notifications/notifykindswidget.ui" line="45"/>
         <source>Tray</source>
         <translation>Трей</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifykindswidget.ui" line="58"/>
+        <location filename="../../plugins/notifications/notifykindswidget.ui" line="52"/>
         <source>Sound</source>
         <translation>Звук</translation>
     </message>
@@ -80,25 +79,25 @@
     <message>
         <location filename="../../plugins/notifications/notifywidget.ui" line="13"/>
         <source>NotifyWidget</source>
-        <translation>NotifyWidget</translation>
+        <translation type="obsolete">NotifyWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.ui" line="27"/>
+        <location filename="../../plugins/notifications/notifywidget.ui" line="24"/>
         <source>Icon</source>
         <translation>Иконка</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.ui" line="48"/>
+        <location filename="../../plugins/notifications/notifywidget.ui" line="45"/>
         <source>Title</source>
         <translation>Заголовок</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.ui" line="77"/>
+        <location filename="../../plugins/notifications/notifywidget.ui" line="74"/>
         <source>Image</source>
         <translation>Картинка</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.ui" line="99"/>
+        <location filename="../../plugins/notifications/notifywidget.ui" line="96"/>
         <source>Text</source>
         <translation>Текст</translation>
     </message>
@@ -108,30 +107,30 @@
     <message>
         <location filename="../../plugins/notifications/optionswidget.ui" line="13"/>
         <source>OptionsWidget</source>
-        <translation>OptionsWidget</translation>
+        <translation type="obsolete">OptionsWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/optionswidget.ui" line="22"/>
+        <location filename="../../plugins/notifications/optionswidget.ui" line="19"/>
         <source>Common notification options</source>
         <translation>Общие настройки уведомлений</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/optionswidget.ui" line="31"/>
+        <location filename="../../plugins/notifications/optionswidget.ui" line="28"/>
         <source>Roster</source>
         <translation>Контакт-лист</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/optionswidget.ui" line="38"/>
+        <location filename="../../plugins/notifications/optionswidget.ui" line="35"/>
         <source>Popup</source>
         <translation>Всплыв. окно</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/optionswidget.ui" line="45"/>
+        <location filename="../../plugins/notifications/optionswidget.ui" line="42"/>
         <source>Tray</source>
         <translation>Трей</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/optionswidget.ui" line="52"/>
+        <location filename="../../plugins/notifications/optionswidget.ui" line="49"/>
         <source>Sound</source>
         <translation>Звук</translation>
     </message>

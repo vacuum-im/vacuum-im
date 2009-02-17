@@ -9,9 +9,6 @@
     <height>44</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>RosterOptionsWidget</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
    <property name="margin" >
     <number>0</number>
@@ -26,7 +23,7 @@
    <item>
     <widget class="QCheckBox" name="chbAlignLeftAvatars" >
      <property name="text" >
-      <string>Show avatars befour contact label</string>
+      <string>Show avatars left alligned</string>
      </property>
     </widget>
    </item>

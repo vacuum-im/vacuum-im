@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>Avatars</name>
     <message>
         <location filename="../../plugins/avatars/avatars.cpp" line="52"/>
         <source>Enable a user to store and retrieve an avatar</source>
-        <translation>Разрешить пользователю хранить и получать аватары</translation>
+        <translation>Позволяет получать и хранить аватары</translation>
     </message>
     <message>
         <location filename="../../plugins/avatars/avatars.cpp" line="54"/>
@@ -59,17 +58,22 @@
     <message>
         <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="13"/>
         <source>RosterOptionsWidget</source>
-        <translation>RosterOptionsWidget</translation>
+        <translation type="obsolete">RosterOptionsWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="22"/>
+        <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="19"/>
         <source>Show avatars</source>
         <translation>Показывать аватары</translation>
     </message>
     <message>
         <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="29"/>
-        <source>Show avatars befour contact label</source>
-        <translation type="unfinished"></translation>
+        <source>Show avatars before contact label</source>
+        <translation type="obsolete">Показывать аватар слева</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="26"/>
+        <source>Show avatars left alligned</source>
+        <translation>Показывать аватар слева</translation>
     </message>
 </context>
 </TS>

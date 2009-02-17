@@ -1,32 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>RosterOptionsWidgetClass</name>
     <message>
         <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="13"/>
         <source>RosterOptionsWidget</source>
-        <translation>RosterOptionsWidget</translation>
+        <translation type="obsolete">RosterOptionsWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="22"/>
+        <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="19"/>
         <source>Show offline contacts</source>
-        <translation>Показывать оффлайн контакты</translation>
+        <translation>Показывать отключенные контакты</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="29"/>
+        <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="26"/>
         <source>Show online contacts first</source>
-        <translation>Показывать онлайн контакты первыми</translation>
+        <translation>Сортировать контакты по статусу</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="36"/>
+        <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="33"/>
         <source>Show resource in roster</source>
-        <translation>Показывать ресурсы в контакт-листе</translation>
+        <translation>Показывать ресурс контактов</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="43"/>
+        <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="40"/>
         <source>Show status in roster</source>
-        <translation>Показывать статус в контакт-листе</translation>
+        <translation>Показывать статус контактов</translation>
     </message>
 </context>
 <context>
@@ -44,7 +43,7 @@
     <message>
         <location filename="../../plugins/rostersview/rostersview.cpp" line="714"/>
         <source>Subscription: %1 %2</source>
-        <translation>Авторизация:</translation>
+        <translation>Авторизация: %1 %2</translation>
     </message>
 </context>
 <context>
@@ -57,7 +56,7 @@
     <message>
         <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="48"/>
         <source>Rosters View</source>
-        <translation>Вид контакт-листов</translation>
+        <translation>Модуль отображения контакт-листа</translation>
     </message>
     <message>
         <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="123"/>
@@ -67,12 +66,12 @@
     <message>
         <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="123"/>
         <source>Roster view options</source>
-        <translation>Настройки вида контакт-листа</translation>
+        <translation>Настройки отображения контакт-листа</translation>
     </message>
     <message>
         <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="142"/>
         <source>Show/Hide offline contacts</source>
-        <translation>Скрыть/показать оффлайн контакты</translation>
+        <translation>Скрыть/показать отключенные контакты</translation>
     </message>
 </context>
 </TS>

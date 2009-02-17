@@ -9,23 +9,11 @@
     <height>235</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>ReceiversWidget</string>
-  </property>
   <property name="autoFillBackground" >
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="leftMargin" >
-    <number>2</number>
-   </property>
-   <property name="topMargin" >
-    <number>2</number>
-   </property>
-   <property name="rightMargin" >
-    <number>2</number>
-   </property>
-   <property name="bottomMargin" >
+   <property name="margin" >
     <number>2</number>
    </property>
    <item>
@@ -56,7 +44,7 @@
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" >
+       <property name="sizeHint" stdset="0" >
         <size>
          <width>40</width>
          <height>20</height>

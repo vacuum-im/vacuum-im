@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>AccountManage</name>
     <message>
@@ -39,20 +38,20 @@
     <message>
         <location filename="../../plugins/accountmanager/accountmanage.ui" line="13"/>
         <source>AccountManage</source>
-        <translation>AccountManage</translation>
+        <translation type="obsolete">AccountManage</translation>
     </message>
     <message>
         <location filename="../../plugins/accountmanager/accountmanage.ui" line="43"/>
         <source>1</source>
-        <translation>1</translation>
+        <translation type="obsolete">1</translation>
     </message>
     <message>
-        <location filename="../../plugins/accountmanager/accountmanage.ui" line="59"/>
+        <location filename="../../plugins/accountmanager/accountmanage.ui" line="46"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../../plugins/accountmanager/accountmanage.ui" line="66"/>
+        <location filename="../../plugins/accountmanager/accountmanage.ui" line="53"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
@@ -67,7 +66,7 @@
     <message>
         <location filename="../../plugins/accountmanager/accountmanager.cpp" line="87"/>
         <source>Creating and removing accounts</source>
-        <translation>Создание и удаление аккаунтов</translation>
+        <translation>Управление аккаунтами</translation>
     </message>
     <message>
         <location filename="../../plugins/accountmanager/accountmanager.cpp" line="87"/>
@@ -77,7 +76,7 @@
     <message>
         <location filename="../../plugins/accountmanager/accountmanager.cpp" line="222"/>
         <source>&lt;Empty&gt;</source>
-        <translation>&lt;Empty&gt;</translation>
+        <translation>&lt;Пусто&gt;</translation>
     </message>
     <message>
         <location filename="../../plugins/accountmanager/accountmanager.cpp" line="223"/>
@@ -87,7 +86,7 @@
     <message>
         <location filename="../../plugins/accountmanager/accountmanager.cpp" line="304"/>
         <source>Not valid account</source>
-        <translation>Неправильный аккаунт</translation>
+        <translation>Ошибка в аккаунте</translation>
     </message>
     <message>
         <location filename="../../plugins/accountmanager/accountmanager.cpp" line="304"/>
@@ -99,48 +98,53 @@
         <source>Modify account</source>
         <translation>Изменить аккаунт</translation>
     </message>
+    <message>
+        <location filename="../../plugins/accountmanager/accountmanager.cpp" line="35"/>
+        <source>Account manager</source>
+        <translation>Менеджер аккаунтов</translation>
+    </message>
 </context>
 <context>
     <name>AccountOptionsClass</name>
     <message>
         <location filename="../../plugins/accountmanager/accountoptions.ui" line="13"/>
         <source>AccountOptions</source>
-        <translation>AccountOptions</translation>
+        <translation type="obsolete">AccountOptions</translation>
     </message>
     <message>
-        <location filename="../../plugins/accountmanager/accountoptions.ui" line="33"/>
+        <location filename="../../plugins/accountmanager/accountoptions.ui" line="30"/>
         <source>Account Name:</source>
         <translation>Имя аккаунта:</translation>
     </message>
     <message>
-        <location filename="../../plugins/accountmanager/accountoptions.ui" line="54"/>
+        <location filename="../../plugins/accountmanager/accountoptions.ui" line="51"/>
         <source>Account</source>
         <translation>Аккаунт</translation>
     </message>
     <message>
-        <location filename="../../plugins/accountmanager/accountoptions.ui" line="90"/>
+        <location filename="../../plugins/accountmanager/accountoptions.ui" line="87"/>
         <source>Example: romeo@example.net</source>
         <translation>Пример: romeo@example.net</translation>
     </message>
     <message>
-        <location filename="../../plugins/accountmanager/accountoptions.ui" line="97"/>
+        <location filename="../../plugins/accountmanager/accountoptions.ui" line="94"/>
         <source>Jabber ID:</source>
         <translation>Jabber ID:</translation>
     </message>
     <message>
-        <location filename="../../plugins/accountmanager/accountoptions.ui" line="110"/>
+        <location filename="../../plugins/accountmanager/accountoptions.ui" line="107"/>
         <source>Resource:</source>
         <translation>Ресурс:</translation>
     </message>
     <message>
-        <location filename="../../plugins/accountmanager/accountoptions.ui" line="120"/>
+        <location filename="../../plugins/accountmanager/accountoptions.ui" line="117"/>
         <source>Password:</source>
         <translation>Пароль:</translation>
     </message>
     <message>
-        <location filename="../../plugins/accountmanager/accountoptions.ui" line="148"/>
+        <location filename="../../plugins/accountmanager/accountoptions.ui" line="145"/>
         <source>Example: balcony; orchard</source>
-        <translation>Пример:  balcony; orchard</translation>
+        <translation>Пример:  балкон; сад</translation>
     </message>
 </context>
 </TS>

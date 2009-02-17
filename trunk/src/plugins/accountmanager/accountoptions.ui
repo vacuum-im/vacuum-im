@@ -9,9 +9,6 @@
     <height>167</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>AccountOptions</string>
-  </property>
   <layout class="QVBoxLayout" >
    <property name="spacing" >
     <number>3</number>

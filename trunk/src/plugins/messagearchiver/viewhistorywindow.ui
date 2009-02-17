@@ -9,9 +9,6 @@
     <height>504</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>History View</string>
-  </property>
   <property name="iconSize" >
    <size>
     <width>16</width>
@@ -144,9 +141,9 @@
       <property name="childrenCollapsible" >
        <bool>false</bool>
       </property>
-      <widget class="QGroupBox" name="grbGroups" >
+      <widget class="QGroupBox" name="grbArchive" >
        <property name="title" >
-        <string>Groups</string>
+        <string>Archive</string>
        </property>
        <property name="flat" >
         <bool>true</bool>

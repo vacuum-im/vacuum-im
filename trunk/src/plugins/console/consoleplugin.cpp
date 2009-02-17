@@ -16,7 +16,7 @@ void ConsolePlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Allow to view XMPP stanzas.");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = "XML Console";
+  APluginInfo->name = tr("XML Console");
   APluginInfo->uid = CONSOLE_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);

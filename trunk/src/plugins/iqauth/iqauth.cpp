@@ -77,7 +77,7 @@ void IqAuthPlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Implementation of Non-SASL Authentication (JEP-0078)");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = "Non-SASL Authentication";
+  APluginInfo->name = tr("Non-SASL Authentication");
   APluginInfo->uid = IQAUTH_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);  

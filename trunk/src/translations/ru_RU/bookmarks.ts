@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>BookMarks</name>
     <message>
-        <location filename="../../plugins/bookmarks/bookmarks.cpp" line="36"/>
+        <location filename="../../plugins/bookmarks/bookmarks.cpp" line="100"/>
         <source>Bookmarks</source>
         <translation>Закладки</translation>
     </message>
     <message>
-        <location filename="../../plugins/bookmarks/bookmarks.cpp" line="34"/>
+        <location filename="../../plugins/bookmarks/bookmarks.cpp" line="32"/>
         <source>Storage of bookmarks to conference rooms and other entities in a Jabber user&apos;s account</source>
-        <translation>Хранение закладок на конференции и другие события в Jabber-аккаунте пользователя</translation>
+        <translation>Хранение закладок с конференциями и ссылками на jabber сервере</translation>
     </message>
     <message>
-        <location filename="../../plugins/bookmarks/bookmarks.cpp" line="241"/>
+        <location filename="../../plugins/bookmarks/bookmarks.cpp" line="247"/>
         <source>Edit bookmarks</source>
         <translation>Редактировать закладки</translation>
     </message>
     <message>
-        <location filename="../../plugins/bookmarks/bookmarks.cpp" line="316"/>
+        <location filename="../../plugins/bookmarks/bookmarks.cpp" line="324"/>
         <source>Bookmark this room</source>
         <translation>Добавить в закладки</translation>
     </message>
@@ -29,22 +28,27 @@
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="83"/>
         <source>Bookmark is not valid</source>
-        <translation>Неверная закладка</translation>
+        <translation>Ошибка в закладке</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="64"/>
         <source>In conference bookmark fields &apos;Room&apos; and &apos;Nick&apos; should not be empty</source>
-        <translation>Закладки &apos;Комната&apos; и &apos;Ник&apos; в конференции не могут быть пустыми</translation>
+        <translation>В закладке на конференцию поля &apos;Конференция&apos; и &apos;Ник&apos; не могут быть пустыми</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="79"/>
         <source>In URL bookmark field &apos;URL&apos;should not be empty</source>
-        <translation>В URL-закладках поле &apos;URL&apos; не может быть пустым</translation>
+        <translation type="obsolete">В URL-закладках поле &apos;URL&apos; не может быть пустым</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="83"/>
         <source>Field &apos;Name&apos; should not be empty</source>
         <translation>Поле &apos;Имя&apos; не может быть пустым</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="79"/>
+        <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
+        <translation>В закладке на ссылку поле &apos;Ссылка&apos; не может быть пустым</translation>
     </message>
 </context>
 <context>
@@ -52,7 +56,7 @@
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.ui" line="13"/>
         <source>Edit bookmark</source>
-        <translation>Редактировать закладки</translation>
+        <translation>Редактировать закладку</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.ui" line="33"/>
@@ -62,7 +66,7 @@
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.ui" line="45"/>
         <source>Conference bookmark</source>
-        <translation>Закладки на конференции</translation>
+        <translation>Закладка с конференцией</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.ui" line="54"/>
@@ -87,12 +91,12 @@
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.ui" line="98"/>
         <source>URL bookmark</source>
-        <translation>Закладки URL</translation>
+        <translation>Закладка на ссылку</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.ui" line="110"/>
         <source>URL:</source>
-        <translation>URL:</translation>
+        <translation>Ссылка:</translation>
     </message>
 </context>
 <context>
@@ -100,17 +104,17 @@
     <message>
         <location filename="../../plugins/bookmarks/editbookmarksdialog.cpp" line="195"/>
         <source>Bookmarks not saved</source>
-        <translation>Закладка не сохранена</translation>
+        <translation>Закладки не сохранены</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarksdialog.cpp" line="174"/>
         <source>Cant save bookmarks to server</source>
-        <translation>Невозможно сохранить закладки на сервер</translation>
+        <translation>Не удалось сохранить закладки на сервере</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarksdialog.cpp" line="195"/>
         <source>Cant save bookmarks to server. %1</source>
-        <translation>Невозможно сохранить закладки на сервер. %1</translation>
+        <translation>Не удалось сохранить закладки на сервере. %1</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarksdialog.cpp" line="22"/>
@@ -128,7 +132,7 @@
     <message>
         <location filename="../../plugins/bookmarks/editbookmarksdialog.ui" line="47"/>
         <source>Name</source>
-        <translation>Bvz</translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarksdialog.ui" line="52"/>
@@ -148,7 +152,7 @@
     <message>
         <location filename="../../plugins/bookmarks/editbookmarksdialog.ui" line="74"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Изменить</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarksdialog.ui" line="81"/>

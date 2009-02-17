@@ -48,7 +48,7 @@ ClientInfo::~ClientInfo()
 void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Request contacts client information");
+  APluginInfo->description = tr("Request contact client information");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Client Info");
   APluginInfo->uid = CLIENTINFO_UUID;
@@ -775,14 +775,14 @@ void ClientInfo::registerDiscoFeatures()
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CLIENTINFO_VERSION);
   dfeature.var = NS_JABBER_VERSION;
   dfeature.name = tr("Software version");
-  dfeature.description = tr("Request contacts software version");
+  dfeature.description = tr("Request contact software version");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = false;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CLIENTINFO_ACTIVITY);
   dfeature.var = NS_JABBER_LAST;
   dfeature.name = tr("Last activity");
-  dfeature.description = tr("Request contacts last activity");
+  dfeature.description = tr("Request contact last activity");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = true;

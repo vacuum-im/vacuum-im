@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>AddContactDialog</name>
     <message>
@@ -36,12 +35,12 @@
     <message>
         <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="141"/>
         <source>VCard</source>
-        <translation>VCard</translation>
+        <translation>vCard</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="142"/>
         <source>Show VCard</source>
-        <translation>Показать VCard</translation>
+        <translation>Показать vCard</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/addcontactdialog.cpp" line="148"/>
@@ -74,7 +73,7 @@
     <message>
         <location filename="../../plugins/rosterchanger/addcontactdialog.ui" line="50"/>
         <source>Group:</source>
-        <translation>Група:</translation>
+        <translation>Группа:</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/addcontactdialog.ui" line="13"/>
@@ -94,7 +93,7 @@
     <message>
         <location filename="../../plugins/rosterchanger/addcontactdialog.ui" line="81"/>
         <source>Subscribe to contact presence</source>
-        <translation>Подписаться на рассылку статуса</translation>
+        <translation>Запросить авторизацию</translation>
     </message>
 </context>
 <context>
@@ -107,7 +106,7 @@
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="49"/>
         <source>Roster Changer</source>
-        <translation>Изменения контакт-листа</translation>
+        <translation>Модуль управления контакт-листом</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="142"/>
@@ -122,22 +121,22 @@
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="279"/>
         <source>%1 wants to subscribe to your presence.</source>
-        <translation>%1 хочет подписаться на рассылку статуса.</translation>
+        <translation>%1 хочет подписаться на ваш статус.</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="283"/>
         <source>%1 unsubscribed from your presence.</source>
-        <translation>%1 отписался от рассылки статуса.</translation>
+        <translation>%1 отписался от вышего статуса.</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="285"/>
         <source>You are now unsubscribed from %1 presence.</source>
-        <translation>Вы отписаны от рассылки статуса %1.</translation>
+        <translation>%1 удалил вашу авторизацию на получение статуса.</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="323"/>
         <source>This group</source>
-        <translation>Эта группа</translation>
+        <translation>В эту группу</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="367"/>
@@ -147,7 +146,7 @@
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="356"/>
         <source>Root</source>
-        <translation>Корень</translation>
+        <translation>В корень</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1057"/>
@@ -172,12 +171,12 @@
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="485"/>
         <source>Request</source>
-        <translation>Запрос</translation>
+        <translation>Запросить</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="501"/>
         <source>Refuse</source>
-        <translation>Отказать</translation>
+        <translation>Отказаться</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="579"/>
@@ -217,12 +216,12 @@
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="657"/>
         <source>Subscription message from %1</source>
-        <translation>Сообщение об авторизации от %1</translation>
+        <translation>Сообщение авторизации от %1</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="661"/>
         <source>Subscription message</source>
-        <translation>Сообщение об авторизации</translation>
+        <translation>Сообщение авторизации</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="729"/>
@@ -237,7 +236,7 @@
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="927"/>
         <source>Create new group</source>
-        <translation>Согдать новую группу</translation>
+        <translation>Создать новую группу</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="927"/>
@@ -267,12 +266,12 @@
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="972"/>
         <source>You are assured that wish to remove %1 contact(s) from roster?</source>
-        <translation>Вы уверены, что хотите удалить %1 контакт(ов) с контакт-листа?</translation>
+        <translation>Вы уверены, что хотите удалить %1 контакт(ов) из контакт-листа?</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="281"/>
         <source>You are now subscribed for %1 presence.</source>
-        <translation>Вы авторизованы у %1.</translation>
+        <translation>%1 авторизовал вас на получение статуса.</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="572"/>
@@ -320,12 +319,12 @@
     <message>
         <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="83"/>
         <source>VCard</source>
-        <translation>VCard</translation>
+        <translation>vCard</translation>
     </message>
     <message>
         <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="84"/>
         <source>Show VCard</source>
-        <translation>Показать VCard</translation>
+        <translation>Показать vCard</translation>
     </message>
 </context>
 <context>
@@ -356,17 +355,17 @@
     <message>
         <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="13"/>
         <source>SubscriptionOptions</source>
-        <translation>SubscriptionOptions</translation>
+        <translation type="obsolete">SubscriptionOptions</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="22"/>
+        <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="19"/>
         <source>Auto accept subscription requests</source>
-        <translation>Автоматически разрешать авторизацию</translation>
+        <translation>Автоматически принимать запросы на авторизации</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="29"/>
+        <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="26"/>
         <source>Auto unsubscribe contacts</source>
-        <translation>Автоматически запрещать авторизацию</translation>
+        <translation>Автоматически удалять авторизацию</translation>
     </message>
 </context>
 </TS>

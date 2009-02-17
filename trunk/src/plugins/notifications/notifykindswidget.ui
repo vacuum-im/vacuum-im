@@ -9,9 +9,6 @@
     <height>47</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>NotifyKindsWidget</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
    <property name="spacing" >
     <number>0</number>
@@ -21,9 +18,6 @@
    </property>
    <item>
     <widget class="QGroupBox" name="grbKinds" >
-     <property name="title" >
-      <string>GroupBox</string>
-     </property>
      <property name="flat" >
       <bool>false</bool>
      </property>

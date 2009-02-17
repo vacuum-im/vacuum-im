@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>ConnectionManager</name>
     <message>
@@ -13,21 +12,26 @@
         <source>Managing TCP connections</source>
         <translation>Управление TCP-соединениями</translation>
     </message>
+    <message>
+        <location filename="../../plugins/connectionmanager/connectionmanager.cpp" line="21"/>
+        <source>Connection Manager</source>
+        <translation>Менеджер соединений</translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <location filename="../../plugins/connectionmanager/connectionoptionswidget.ui" line="13"/>
         <source>ConnectionOptionsWidget</source>
-        <translation>ConnectionOptionsWidget</translation>
+        <translation type="obsolete">ConnectionOptionsWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/connectionmanager/connectionoptionswidget.ui" line="31"/>
+        <location filename="../../plugins/connectionmanager/connectionoptionswidget.ui" line="19"/>
         <source>Connection</source>
         <translation>Соединение</translation>
     </message>
     <message>
-        <location filename="../../plugins/connectionmanager/connectionoptionswidget.ui" line="54"/>
+        <location filename="../../plugins/connectionmanager/connectionoptionswidget.ui" line="33"/>
         <source>Connection:</source>
         <translation>Соединение:</translation>
     </message>

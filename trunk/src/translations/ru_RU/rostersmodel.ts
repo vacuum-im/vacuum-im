@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>RostersModel</name>
     <message>
@@ -11,12 +10,12 @@
     <message>
         <location filename="../../plugins/rostersmodel/rostersmodel.cpp" line="38"/>
         <source>Rosters Model</source>
-        <translation>Модели контакт-листов</translation>
+        <translation>Модель контакт-листа</translation>
     </message>
     <message>
         <location filename="../../plugins/rostersmodel/rostersmodel.h" line="58"/>
         <source>Blank Group</source>
-        <translation>Пустая группа</translation>
+        <translation>Общая группа</translation>
     </message>
     <message>
         <location filename="../../plugins/rostersmodel/rostersmodel.h" line="59"/>

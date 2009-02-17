@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>DataFormWidget</name>
     <message>
@@ -11,12 +10,12 @@
     <message>
         <location filename="../../plugins/dataforms/dataformwidget.cpp" line="127"/>
         <source>The are %1 field(s) with invalid values:&lt;br&gt;</source>
-        <translation>Количество полей с ошибками: %1 &lt;br&gt;</translation>
+        <translation>Найдено %1 полей с ошибками:&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../plugins/dataforms/dataformwidget.cpp" line="132"/>
         <source>Do you want to continue with invalid values?</source>
-        <translation>продолжить с ошибочными значениями?</translation>
+        <translation>Продолжить с ошибками?</translation>
     </message>
 </context>
 <context>
@@ -29,32 +28,32 @@
     <message>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="1056"/>
         <source>Implements data forms and generic data description</source>
-        <translation>Реализует обработку форм данных</translation>
+        <translation>Поддерживает обработку форм с данными</translation>
     </message>
     <message>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="1054"/>
         <source>Data Forms</source>
-        <translation>Формы данных</translation>
+        <translation>Формы с данными</translation>
     </message>
     <message>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="1062"/>
         <source>Data Forms Validation</source>
-        <translation>Проверка форм данных</translation>
+        <translation>Проверка целостности данных формы</translation>
     </message>
     <message>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="1064"/>
         <source>Enables to specify additional validation guidelines related to a data form</source>
-        <translation>Разрешает указать дополнительные управляющие проверки, связанные с формой данных</translation>
+        <translation>Позволяет указать дополнительные управляющие проверки, связанные с формой данных</translation>
     </message>
     <message>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="1070"/>
         <source>Data Forms Layout</source>
-        <translation>Расположение форм данных</translation>
+        <translation>Управление расположением данных на форме</translation>
     </message>
     <message>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="1072"/>
         <source>Enables to specify form layouts, including the layout of form fields, pages and sections</source>
-        <translation>Разрешает указать расположение форм, включая расположение полей форм, страниц и секций</translation>
+        <translation>Позволяет указать расположение дянных, включая расположение полей форм, страниц и секций</translation>
     </message>
     <message>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="857"/>
@@ -69,7 +68,7 @@
     <message>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="893"/>
         <source>Unsupported url scheme</source>
-        <translation>Неподдерживаемая схема URL</translation>
+        <translation>Неподдерживаемый тип URL</translation>
     </message>
 </context>
 <context>

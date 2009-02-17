@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>CompressPlugin</name>
     <message>
@@ -11,17 +10,22 @@
     <message>
         <location filename="../../plugins/compress/compressplugin.cpp" line="16"/>
         <source>Implementation of Stream Compression</source>
-        <translation>Выполнение Потокового Сжатия</translation>
+        <translation>Поддержка сжатия XMPP потока</translation>
     </message>
     <message>
         <location filename="../../plugins/compress/compressplugin.cpp" line="36"/>
         <source>Unsupported compression method</source>
-        <translation>Неподдерживаемые метожы сжатия</translation>
+        <translation>Неподдерживаемый метод сжатия</translation>
     </message>
     <message>
         <location filename="../../plugins/compress/compressplugin.cpp" line="39"/>
         <source>Compression setup failed</source>
-        <translation>Настройки сжатия невозможна</translation>
+        <translation>Инициализация сжатия завершена с ошибкой</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/compress/compressplugin.cpp" line="18"/>
+        <source>Stream Compression</source>
+        <translation>Сжатие XMPP потока</translation>
     </message>
 </context>
 <context>

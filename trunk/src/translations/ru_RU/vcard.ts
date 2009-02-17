@@ -3,7 +3,7 @@
 <context>
     <name>EditItemDialogClass</name>
     <message>
-        <location filename="../../plugins/vcard/edititemdialog.ui" line="22"/>
+        <location filename="../../plugins/vcard/edititemdialog.ui" line="25"/>
         <source>Edit item</source>
         <translation>Введите значение</translation>
     </message>
@@ -13,12 +13,12 @@
     <message>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="12"/>
         <source>vCard - %1</source>
-        <translation>VCard - %1</translation>
+        <translation>vCard - %1</translation>
     </message>
     <message>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="302"/>
         <source>vCard error</source>
-        <translation>Ошибка VCard</translation>
+        <translation>Ошибка vCard</translation>
     </message>
     <message>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="302"/>
@@ -31,7 +31,7 @@
         <translation>Сохранить изображение</translation>
     </message>
     <message>
-        <location filename="../../plugins/vcard/vcarddialog.cpp" line="343"/>
+        <location filename="../../plugins/vcard/vcarddialog.cpp" line="369"/>
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Картинки (*.png *.jpg *.bmp *.gif)</translation>
     </message>
@@ -43,7 +43,7 @@
     <message>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="369"/>
         <source>Image Files (*.png *.jpg *.bmp)</source>
-        <translation>Картинки (*.png *.jpg *.bmp)</translation>
+        <translation type="obsolete">Картинки (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="409"/>
@@ -131,7 +131,7 @@
     <message>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="209"/>
         <source>Maritial status</source>
-        <translation>Семейный статус</translation>
+        <translation type="obsolete">Супружеский статус</translation>
     </message>
     <message>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="222"/>
@@ -166,7 +166,7 @@
     <message>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="300"/>
         <source>Home</source>
-        <translation>Дом</translation>
+        <translation>Домашний</translation>
     </message>
     <message>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="392"/>
@@ -196,7 +196,7 @@
     <message>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="380"/>
         <source>Work</source>
-        <translation>Работа</translation>
+        <translation>Рабочий</translation>
     </message>
     <message>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="464"/>
@@ -267,6 +267,11 @@
         <location filename="../../plugins/vcard/vcarddialog.ui" line="792"/>
         <source>Close</source>
         <translation>Закрыть</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="209"/>
+        <source>Marital status</source>
+        <translation>Семейное положение</translation>
     </message>
 </context>
 <context>

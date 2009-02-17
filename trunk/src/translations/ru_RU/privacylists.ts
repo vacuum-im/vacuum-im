@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>EditListsDialog</name>
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="17"/>
         <source>Edit Privacy Lists - %1</source>
-        <translation>Редактировать списки приватности - %1</translation>
+        <translation>Редактор списков приватности - %1</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="27"/>
@@ -41,17 +40,17 @@
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="216"/>
         <source> Pres-in</source>
-        <translation type="unfinished"></translation>
+        <translation>Вх.Статус</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="218"/>
         <source> Pres-out</source>
-        <translation type="unfinished"></translation>
+        <translation>Исх.Статус</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="221"/>
         <source> &lt;Any Stanza&gt;</source>
-        <translation>&lt;Любая XML-транзакция&gt;</translation>
+        <translation>&lt;Любой станс&gt;</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="280"/>
@@ -106,17 +105,17 @@
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="504"/>
         <source>To</source>
-        <translation>К</translation>
+        <translation>Получена</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="505"/>
         <source>From</source>
-        <translation>От</translation>
+        <translation>Дана</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.cpp" line="506"/>
         <source>Both</source>
-        <translation>Оба</translation>
+        <translation>Полная</translation>
     </message>
 </context>
 <context>
@@ -124,92 +123,92 @@
     <message>
         <location filename="../../plugins/privacylists/editlistsdialog.ui" line="13"/>
         <source>PrivacyLists</source>
-        <translation>PrivacyLists</translation>
+        <translation type="obsolete">PrivacyLists</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="28"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="25"/>
         <source>Setup Default and Active Lists</source>
-        <translation>Настройка списков по умолчанию и активных списков</translation>
+        <translation>Установка активного списка и списка по умолчанию</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="39"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="36"/>
         <source>Default:</source>
         <translation>По умолчанию:</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="59"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="56"/>
         <source>Active:</source>
         <translation>Активный:</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="92"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="89"/>
         <source>Edit lists</source>
         <translation>Редактировать списки</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="163"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="160"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="176"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="173"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="143"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="140"/>
         <source>Edit list rules</source>
-        <translation>Редактировать правила списка</translation>
+        <translation>Редактировать правила</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="189"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="186"/>
         <source>Up</source>
         <translation>Вверх</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="202"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="199"/>
         <source>Down</source>
-        <translation>Вних</translation>
+        <translation>Вниз</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="216"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="213"/>
         <source>Edit rule condition</source>
-        <translation>Редактировать условие правила</translation>
+        <translation>Редактировать условия</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="227"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="224"/>
         <source>IF</source>
         <translation>ЕСЛИ</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="240"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="237"/>
         <source>=</source>
         <translation>=</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="263"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="260"/>
         <source>Then</source>
         <translation>ТОГДА</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="280"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="277"/>
         <source>Messages</source>
         <translation>Сообщения</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="287"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="284"/>
         <source>Queries</source>
         <translation>Запросы</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="294"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="291"/>
         <source>Presences In</source>
-        <translation type="unfinished"></translation>
+        <translation>Вх. статус</translation>
     </message>
     <message>
-        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="301"/>
+        <location filename="../../plugins/privacylists/editlistsdialog.ui" line="298"/>
         <source>Presences Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Исх. статус</translation>
     </message>
 </context>
 <context>
@@ -252,7 +251,7 @@
     <message>
         <location filename="../../plugins/privacylists/privacylists.cpp" line="874"/>
         <source>Visible to contact</source>
-        <translation type="unfinished">Видим для контакта</translation>
+        <translation>Видим для контакта</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/privacylists.cpp" line="885"/>
@@ -282,7 +281,7 @@
     <message>
         <location filename="../../plugins/privacylists/privacylists.cpp" line="948"/>
         <source>Set Active list</source>
-        <translation>Установить активный список</translation>
+        <translation>Активный список</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/privacylists.cpp" line="988"/>
@@ -292,7 +291,7 @@
     <message>
         <location filename="../../plugins/privacylists/privacylists.cpp" line="980"/>
         <source>Set Default list</source>
-        <translation>Установить список по умолчанию</translation>
+        <translation>Список по умолчанию</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/privacylists.cpp" line="1251"/>
@@ -327,12 +326,12 @@
     <message>
         <location filename="../../plugins/privacylists/privacylists.cpp" line="1309"/>
         <source>- presences in: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>- вх. статус: %1</translation>
     </message>
     <message>
         <location filename="../../plugins/privacylists/privacylists.cpp" line="1310"/>
         <source>- presences out: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>- исх. статус: %1</translation>
     </message>
 </context>
 </TS>
