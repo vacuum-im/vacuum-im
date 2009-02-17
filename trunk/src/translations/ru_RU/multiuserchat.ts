@@ -157,32 +157,32 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="166"/>
         <source>Request for list of %1s is failed: %2</source>
-        <translation>Не удалось получить список %1: %2</translation>
+        <translation>Не удалось получить список &apos;%1s&apos;: %2</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="135"/>
         <source>Changes in list of %1s was not accepted: %2</source>
-        <translation>Изменение в списке %1 не приняты: %2</translation>
+        <translation>Изменение в списке &apos;%1s&apos; не приняты: %2</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="138"/>
         <source>Changes in list of %1s was accepted.</source>
-        <translation>Изменения в списке %1 приняты.</translation>
+        <translation>Изменения в списке &apos;%1s&apos; приняты.</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="173"/>
         <source>Changes in list of %1s may not be accepted: %2</source>
-        <translation>Изменения в списке %1 не могут быть приняты: %2</translation>
+        <translation>Изменения в списке &apos;%1s&apos; не могут быть приняты: %2</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="430"/>
         <source>Failed to send request for list of %1s.</source>
-        <translation>Не удалось отправить запрос списка %1.</translation>
+        <translation>Не удалось отправить запрос списка &apos;%1s&apos;.</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="457"/>
         <source>Failed to send changes in list of %1s</source>
-        <translation>Не удалось отправить изменения в списке %1</translation>
+        <translation>Не удалось отправить изменения в списке &apos;%1s&apos;</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="477"/>
@@ -713,7 +713,7 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="414"/>
         <source>Edit members list</source>
-        <translation> Редактировать список участников</translation>
+        <translation>Редактировать список участников</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="420"/>
@@ -758,12 +758,12 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="519"/>
         <source>Change Role</source>
-        <translation>Изменить тип пользователя</translation>
+        <translation>Изменить тип</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="523"/>
         <source>Visitor</source>
-        <translation>Посетитель</translation>
+        <translation>Гость</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="529"/>
@@ -871,7 +871,7 @@ Check values and try again</source>
         <translation>%1 не является правильным JID комнаты</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1441"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1158"/>
         <source>Disconnected</source>
         <translation>Отключен</translation>
     </message>
@@ -1109,6 +1109,31 @@ Check values and try again</source>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="952"/>
         <source>%1 - Conference</source>
         <translation>%1 - Конференция</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="392"/>
+        <source>Tools</source>
+        <translation>Инструменты</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="546"/>
+        <source>None</source>
+        <translation>Нет</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="552"/>
+        <source>Member</source>
+        <translation>Участник</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="558"/>
+        <source>Administrator</source>
+        <translation>Администратор</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="564"/>
+        <source>Owner</source>
+        <translation>Владелец</translation>
     </message>
 </context>
 <context>
