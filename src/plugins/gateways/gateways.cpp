@@ -685,7 +685,7 @@ void Gateways::onPrivateStorateOpened(const Jid &AStreamJid)
 
 void Gateways::onKeepTimerTimeout()
 {
-  QList<Jid> streamJids = FKeepConnections.keys();
+  QList<Jid> streamJids = FKeepConnections.uniqueKeys();
   foreach(Jid streamJid, streamJids)
   {
     IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
