@@ -66,7 +66,7 @@
     <message>
         <location filename="../../plugins/gateways/gateways.cpp" line="203"/>
         <source>Add Legacy User</source>
-        <translation>Доабвить пользователя через транспорт</translation>
+        <translation>Доабвить пользователя</translation>
     </message>
     <message>
         <location filename="../../plugins/gateways/gateways.cpp" line="533"/>
@@ -91,12 +91,12 @@
     <message>
         <location filename="../../plugins/gateways/gateways.cpp" line="564"/>
         <source>Resolve nick names</source>
-        <translation>Определить имена пользователей</translation>
+        <translation>Определить все ники</translation>
     </message>
     <message>
         <location filename="../../plugins/gateways/gateways.cpp" line="564"/>
         <source>Resolve nick name</source>
-        <translation>Определить имя пользователя</translation>
+        <translation>Определить ник</translation>
     </message>
     <message>
         <location filename="../../plugins/gateways/gateways.cpp" line="747"/>

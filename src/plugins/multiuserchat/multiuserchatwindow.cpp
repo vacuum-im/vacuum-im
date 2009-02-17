@@ -389,7 +389,7 @@ void MultiUserChatWindow::createMenuBarActions()
 
 
   FToolsMenu = new Menu(this);
-  FToolsMenu->setTitle("Tools");
+  FToolsMenu->setTitle(tr("Tools"));
   ui.mnbMenuBar->addMenu(FToolsMenu);
 
   FInviteContact = new Action(FToolsMenu);
@@ -543,25 +543,25 @@ void MultiUserChatWindow::createRoomUtilsActions()
   {
     FSetAffilNone = new Action(FChangeAffiliation);
     FSetAffilNone->setCheckable(true);
-    FSetAffilNone->setText("None");
+    FSetAffilNone->setText(tr("None"));
     connect(FSetAffilNone,SIGNAL(triggered(bool)),SLOT(onRoomUtilsActionTriggered(bool)));
     FChangeAffiliation->addAction(FSetAffilNone,AG_DEFAULT,false);
 
     FSetAffilMember = new Action(FChangeAffiliation);
     FSetAffilMember->setCheckable(true);
-    FSetAffilMember->setText("Member");
+    FSetAffilMember->setText(tr("Member"));
     connect(FSetAffilMember,SIGNAL(triggered(bool)),SLOT(onRoomUtilsActionTriggered(bool)));
     FChangeAffiliation->addAction(FSetAffilMember,AG_DEFAULT,false);
 
     FSetAffilAdmin = new Action(FChangeAffiliation);
     FSetAffilAdmin->setCheckable(true);
-    FSetAffilAdmin->setText("Administrator");
+    FSetAffilAdmin->setText(tr("Administrator"));
     connect(FSetAffilAdmin,SIGNAL(triggered(bool)),SLOT(onRoomUtilsActionTriggered(bool)));
     FChangeAffiliation->addAction(FSetAffilAdmin,AG_DEFAULT,false);
 
     FSetAffilOwner = new Action(FChangeAffiliation);
     FSetAffilOwner->setCheckable(true);
-    FSetAffilOwner->setText("Owner");
+    FSetAffilOwner->setText(tr("Owner"));
     connect(FSetAffilOwner,SIGNAL(triggered(bool)),SLOT(onRoomUtilsActionTriggered(bool)));
     FChangeAffiliation->addAction(FSetAffilOwner,AG_DEFAULT,false);
   }
@@ -1438,7 +1438,7 @@ void MultiUserChatWindow::onMenuBarActionTriggered(bool)
   }
   else if (action == FQuitRoom)
   {
-    exitAndDestroy(tr("Disconnected"));
+    deleteLater();
   }
   else if (action == FInviteContact)
   {

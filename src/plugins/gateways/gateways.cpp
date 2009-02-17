@@ -527,7 +527,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BareJid));
       action->setData(ADR_LOG_IN,true);
       connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
-      AMenu->addAction(action,AG_GATEWAYS_LOGIN_ROSTER,true);
+      AMenu->addAction(action,AG_GATEWAYS_LOGIN_ROSTER,false);
 
       action = new Action(AMenu);
       action->setText(tr("Log Out"));
@@ -536,7 +536,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BareJid));
       action->setData(ADR_LOG_IN,false);
       connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
-      AMenu->addAction(action,AG_GATEWAYS_LOGIN_ROSTER,true);
+      AMenu->addAction(action,AG_GATEWAYS_LOGIN_ROSTER,false);
 
       if (FPrivateStorageKeep.contains(streamJid))
       {
@@ -548,7 +548,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
         action->setCheckable(true);
         action->setChecked(FKeepConnections.contains(streamJid,AIndex->data(RDR_BareJid).toString()));
         connect(action,SIGNAL(triggered(bool)),SLOT(onKeepActionTriggered(bool)));
-        AMenu->addAction(action,AG_GATEWAYS_LOGIN_ROSTER,true);
+        AMenu->addAction(action,AG_GATEWAYS_LOGIN_ROSTER,false);
       }
     }
   }
