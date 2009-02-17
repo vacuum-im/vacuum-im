@@ -1,50 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="13"/>
         <source>ConnectionOptionsWidget</source>
-        <translation>ConnectionOptionsWidget</translation>
+        <translation type="obsolete">ConnectionOptionsWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="126"/>
+        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="114"/>
         <source>Host:</source>
         <translation>Хост:</translation>
     </message>
     <message>
-        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="139"/>
+        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="127"/>
         <source>Port:</source>
         <translation>Порт:</translation>
     </message>
     <message>
-        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="82"/>
+        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="70"/>
         <source>Use SSL connection</source>
         <translation>Использовать SSL-соединение</translation>
     </message>
     <message>
-        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="89"/>
+        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="77"/>
         <source>Ignore SSL errors</source>
         <translation>Игнорировать ошибки SSL</translation>
     </message>
     <message>
-        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="98"/>
+        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="86"/>
         <source>Proxy</source>
         <translation>Прокси</translation>
     </message>
     <message>
-        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="106"/>
+        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="94"/>
         <source>Type:</source>
         <translation>Тип:</translation>
     </message>
     <message>
-        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="162"/>
+        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="150"/>
         <source>Username:</source>
-        <translation>Имя пользователя:</translation>
+        <translation>Пользователь:</translation>
     </message>
     <message>
-        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="175"/>
+        <location filename="../../plugins/defaultconnection/connectionoptionswidget.ui" line="163"/>
         <source>Password:</source>
         <translation>Пароль:</translation>
     </message>
@@ -59,17 +58,17 @@
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnection.cpp" line="201"/>
         <source>Socket5 authentication error</source>
-        <translation>Ошибка аутентификации Socket5</translation>
+        <translation>Ошибка аутентификации socket5</translation>
     </message>
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnection.cpp" line="228"/>
         <source>General SOCKS server failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка SOCKS сервера.</translation>
     </message>
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnection.cpp" line="229"/>
         <source>Connection not allowed by rule set.</source>
-        <translation type="unfinished">Соединение запрещено набором правил.</translation>
+        <translation>Соединение запрещено набором правил.</translation>
     </message>
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnection.cpp" line="230"/>
@@ -89,7 +88,7 @@
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnection.cpp" line="233"/>
         <source>TTL expired.</source>
-        <translation type="unfinished">Закончился TTL пакета.</translation>
+        <translation>Закончился TTL пакета.</translation>
     </message>
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnection.cpp" line="234"/>
@@ -104,7 +103,7 @@
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnection.cpp" line="236"/>
         <source>Unknown socks error.</source>
-        <translation>Неизвестная ошибка socks.</translation>
+        <translation>Неизвестная ошибка сети.</translation>
     </message>
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnection.cpp" line="339"/>
@@ -122,7 +121,7 @@
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnectionplugin.cpp" line="28"/>
         <source>Creating standard connection to jabber server</source>
-        <translation>Создание стандартного соединения е jabber-серверу</translation>
+        <translation>Создание стандартного соединения к jabber-серверу</translation>
     </message>
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnectionplugin.cpp" line="64"/>
@@ -142,7 +141,7 @@
     <message>
         <location filename="../../plugins/defaultconnection/defaultconnectionplugin.cpp" line="158"/>
         <source>HTTPS proxy</source>
-        <translation>HTTPS пркси</translation>
+        <translation>HTTPS прокси</translation>
     </message>
 </context>
 </TS>

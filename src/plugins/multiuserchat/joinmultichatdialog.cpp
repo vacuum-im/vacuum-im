@@ -16,6 +16,7 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
+  setWindowTitle(tr("Join conference"));
   IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_JOIN,0,0,"windowIcon");
 
   FXmppStreams = NULL;

@@ -104,8 +104,8 @@ void VCardDialog::updateDialog()
   ui.dedBirthday->setCalendarPopup(!readOnly);
   ui.cmbGender->lineEdit()->setText(FVCard->value(VVN_GENDER));
   ui.cmbGender->setEnabled(!readOnly);
-  ui.lneMaritial->setText(FVCard->value(VVN_MARITALSTATUS));
-  ui.lneMaritial->setReadOnly(readOnly);
+  ui.lneMarital->setText(FVCard->value(VVN_MARITALSTATUS));
+  ui.lneMarital->setReadOnly(readOnly);
   ui.lneTitle->setText(FVCard->value(VVN_TITLE));
   ui.lneTitle->setReadOnly(readOnly);
   ui.lneDepartment->setText(FVCard->value(VVN_ORG_UNIT));
@@ -192,7 +192,7 @@ void VCardDialog::updateVCard()
   else
     FVCard->setValueForTags(VVN_BIRTHDAY,"");
   FVCard->setValueForTags(VVN_GENDER,ui.cmbGender->currentText());
-  FVCard->setValueForTags(VVN_MARITALSTATUS,ui.lneMaritial->text());
+  FVCard->setValueForTags(VVN_MARITALSTATUS,ui.lneMarital->text());
   FVCard->setValueForTags(VVN_TITLE,ui.lneTitle->text());
   FVCard->setValueForTags(VVN_ORG_UNIT,ui.lneDepartment->text());
   FVCard->setValueForTags(VVN_ORG_NAME,ui.lneCompany->text());
@@ -358,7 +358,7 @@ void VCardDialog::onLogoSaveClicked()
 {
   if (!FLogo.isNull())
   {
-    QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),"",tr("Image Files (*.png *.jpg *.bmp)"));
+    QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
     if (!filename.isEmpty())
       FLogo.save(filename);
   }
@@ -366,7 +366,7 @@ void VCardDialog::onLogoSaveClicked()
 
 void VCardDialog::onLogoLoadClicked()
 {
-  QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),"",tr("Image Files (*.png *.jpg *.bmp)"));
+  QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
   if (!filename.isEmpty())
   {
     QImage image(filename);

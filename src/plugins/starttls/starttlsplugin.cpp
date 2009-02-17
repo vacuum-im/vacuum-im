@@ -15,7 +15,7 @@ void StartTLSPlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Implementation of StartTLS");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = "StartTLS";
+  APluginInfo->name = tr("StartTLS implementation");
   APluginInfo->uid = STARTTLS_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);

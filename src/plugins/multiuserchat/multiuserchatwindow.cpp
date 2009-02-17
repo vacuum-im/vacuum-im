@@ -949,7 +949,7 @@ void MultiUserChatWindow::updateWindow()
 
   QString roomName = tr("%1 (%2)").arg(FMultiChat->roomJid().node()).arg(FUsers.count());
   setWindowIconText(roomName);
-  setWindowTitle(tr("%1 - Groupchat").arg(roomName));
+  setWindowTitle(tr("%1 - Conference").arg(roomName));
 
   emit windowChanged();
 }

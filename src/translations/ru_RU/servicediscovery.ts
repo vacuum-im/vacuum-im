@@ -129,12 +129,12 @@
     <message>
         <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="162"/>
         <source>Reload</source>
-        <translation>Перегрузить</translation>
+        <translation>Обновить</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="168"/>
         <source>Disco info</source>
-        <translation>Обзорная информация</translation>
+        <translation>Информация</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="174"/>

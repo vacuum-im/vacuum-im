@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>ChatWindowClass</name>
     <message>
         <location filename="../../plugins/messenger/chatwindow.ui" line="13"/>
         <source>ChatWindow</source>
-        <translation>ChatWindow</translation>
+        <translation type="obsolete">ChatWindow</translation>
     </message>
 </context>
 <context>
@@ -14,7 +13,7 @@
     <message>
         <location filename="../../plugins/messenger/editwidget.ui" line="13"/>
         <source>EditWidget</source>
-        <translation>EditWidget</translation>
+        <translation type="obsolete">EditWidget</translation>
     </message>
 </context>
 <context>
@@ -70,35 +69,35 @@
     <message>
         <location filename="../../plugins/messenger/infowidget.ui" line="13"/>
         <source>InfoWidget</source>
-        <translation>InfoWidget</translation>
+        <translation type="obsolete">InfoWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/infowidget.ui" line="22"/>
+        <location filename="../../plugins/messenger/infowidget.ui" line="19"/>
         <source>Contact info</source>
         <translation>Информация о контакте</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/infowidget.ui" line="70"/>
+        <location filename="../../plugins/messenger/infowidget.ui" line="67"/>
         <source>Name:</source>
-        <translation>Имя:</translation>
+        <translation>Контакт:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/infowidget.ui" line="114"/>
+        <location filename="../../plugins/messenger/infowidget.ui" line="111"/>
         <source>Account:</source>
         <translation>Аккаунт:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/infowidget.ui" line="154"/>
+        <location filename="../../plugins/messenger/infowidget.ui" line="151"/>
         <source>Status:</source>
         <translation>Статус:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/infowidget.ui" line="200"/>
+        <location filename="../../plugins/messenger/infowidget.ui" line="197"/>
         <source>E-mail:</source>
-        <translation>e-mail:</translation>
+        <translation>E-mail:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/infowidget.ui" line="247"/>
+        <location filename="../../plugins/messenger/infowidget.ui" line="244"/>
         <source>Client:</source>
         <translation>Клиент:</translation>
     </message>
@@ -113,22 +112,22 @@
     <message>
         <location filename="../../plugins/messenger/messagehandler.cpp" line="79"/>
         <source>Message received</source>
-        <translation>Сообщение получено</translation>
+        <translation>Получено сообщение</translation>
     </message>
     <message>
         <location filename="../../plugins/messenger/messagehandler.cpp" line="162"/>
         <source>Single Messages</source>
-        <translation>Одиночное сообщение</translation>
+        <translation>Простое сообщение</translation>
     </message>
     <message>
         <location filename="../../plugins/messenger/messagehandler.cpp" line="163"/>
         <source>Chat Messages</source>
-        <translation>Сообщение чата</translation>
+        <translation>Сообщения в чате</translation>
     </message>
     <message>
         <location filename="../../plugins/messenger/messagehandler.cpp" line="253"/>
         <source>Composing message</source>
-        <translation>Множественное сообщение</translation>
+        <translation>Создание сообщения</translation>
     </message>
     <message>
         <location filename="../../plugins/messenger/messagehandler.cpp" line="255"/>
@@ -143,12 +142,12 @@
     <message>
         <location filename="../../plugins/messenger/messagehandler.cpp" line="460"/>
         <source>Re: </source>
-        <translation>На:</translation>
+        <translation>Re:</translation>
     </message>
     <message>
         <location filename="../../plugins/messenger/messagehandler.cpp" line="473"/>
         <source>Fw: </source>
-        <translation>&gt;&gt;:</translation>
+        <translation>Fw:</translation>
     </message>
 </context>
 <context>
@@ -184,52 +183,52 @@
     <message>
         <location filename="../../plugins/messenger/messagewindow.ui" line="13"/>
         <source>MessageWindow</source>
-        <translation>MessageWindow</translation>
+        <translation type="obsolete">MessageWindow</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="51"/>
+        <location filename="../../plugins/messenger/messagewindow.ui" line="39"/>
         <source>Message</source>
         <translation>Сообщение</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="87"/>
+        <location filename="../../plugins/messenger/messagewindow.ui" line="66"/>
         <source>To:</source>
-        <translation>К:</translation>
+        <translation>Кому:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="136"/>
+        <location filename="../../plugins/messenger/messagewindow.ui" line="115"/>
         <source>Subject:</source>
         <translation>Тема:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="149"/>
+        <location filename="../../plugins/messenger/messagewindow.ui" line="128"/>
         <source>Received:</source>
         <translation>Получено:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="199"/>
+        <location filename="../../plugins/messenger/messagewindow.ui" line="169"/>
         <source>Reply</source>
         <translation>Ответить</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="206"/>
+        <location filename="../../plugins/messenger/messagewindow.ui" line="176"/>
         <source>Forward</source>
         <translation>Переслать</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="213"/>
+        <location filename="../../plugins/messenger/messagewindow.ui" line="183"/>
         <source>Chat</source>
         <translation>Чат</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="233"/>
+        <location filename="../../plugins/messenger/messagewindow.ui" line="203"/>
         <source>Send</source>
         <translation>Отправить</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="240"/>
+        <location filename="../../plugins/messenger/messagewindow.ui" line="210"/>
         <source>Next</source>
-        <translation>Следующий</translation>
+        <translation>Следующее</translation>
     </message>
 </context>
 <context>
@@ -242,7 +241,7 @@
     <message>
         <location filename="../../plugins/messenger/messenger.cpp" line="54"/>
         <source>Messenger</source>
-        <translation>Messenger</translation>
+        <translation>Менеджер сообщений</translation>
     </message>
     <message>
         <location filename="../../plugins/messenger/messenger.cpp" line="136"/>
@@ -252,7 +251,7 @@
     <message>
         <location filename="../../plugins/messenger/messenger.cpp" line="136"/>
         <source>Message window options</source>
-        <translation>Окно настроек сообщения</translation>
+        <translation>Настройки сообщений</translation>
     </message>
     <message>
         <location filename="../../plugins/messenger/messenger.cpp" line="666"/>
@@ -283,50 +282,50 @@
     <message>
         <location filename="../../plugins/messenger/messengeroptions.ui" line="13"/>
         <source>MessengerOptions</source>
-        <translation>MessengerOptions</translation>
+        <translation type="obsolete">MessengerOptions</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="22"/>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="19"/>
         <source>Fonts</source>
         <translation>Шрифты</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="31"/>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="28"/>
         <source>Chat</source>
         <translation>Чат</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="90"/>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="87"/>
         <source>Change</source>
         <translation>Изменить</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="64"/>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="61"/>
         <source>Message</source>
         <translation>Сообщение</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="100"/>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="97"/>
         <source>Use tab window</source>
-        <translation>Отображать в виде вкладок</translation>
+        <translation>Использовать окно со вкладками</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="107"/>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="104"/>
         <source>Show HTML</source>
         <translation>Показывать HTML</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="114"/>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="111"/>
         <source>Show date and time</source>
         <translation>Показывать дату и время</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="121"/>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="118"/>
         <source>Show status in chat window</source>
         <translation>Показывать статус в окне чата</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="130"/>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="127"/>
         <source>Send message key sequence:</source>
         <translation>Комбинация клавиш для отправки сообщения:</translation>
     </message>
@@ -361,7 +360,7 @@
     <message>
         <location filename="../../plugins/messenger/receiverswidget.cpp" line="186"/>
         <source>Blank group</source>
-        <translation>Пустая группа</translation>
+        <translation>Общая группа</translation>
     </message>
     <message>
         <location filename="../../plugins/messenger/receiverswidget.cpp" line="215"/>
@@ -384,50 +383,60 @@
     <message>
         <location filename="../../plugins/messenger/receiverswidget.ui" line="13"/>
         <source>ReceiversWidget</source>
-        <translation>ReceiversWidget</translation>
+        <translation type="obsolete">ReceiversWidget</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/receiverswidget.ui" line="43"/>
+        <location filename="../../plugins/messenger/receiverswidget.ui" line="31"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/receiverswidget.ui" line="50"/>
+        <location filename="../../plugins/messenger/receiverswidget.ui" line="38"/>
         <source>Update</source>
         <translation>Обновить</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/receiverswidget.ui" line="70"/>
+        <location filename="../../plugins/messenger/receiverswidget.ui" line="58"/>
         <source>All</source>
-        <translation>Всё</translation>
+        <translation>Все</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/receiverswidget.ui" line="77"/>
+        <location filename="../../plugins/messenger/receiverswidget.ui" line="65"/>
         <source>None</source>
-        <translation>Ничего</translation>
+        <translation>Никого</translation>
     </message>
 </context>
 <context>
     <name>TabWindow</name>
     <message>
-        <location filename="../../plugins/messenger/tabwindow.cpp" line="22"/>
+        <location filename="../../plugins/messenger/tabwindow.cpp" line="23"/>
         <source>Close tab</source>
         <translation>Закрыть вкладку</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/tabwindow.cpp" line="23"/>
+        <location filename="../../plugins/messenger/tabwindow.cpp" line="24"/>
         <source>Esc</source>
         <translation>Esc</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/tabwindow.cpp" line="33"/>
+        <location filename="../../plugins/messenger/tabwindow.cpp" line="34"/>
         <source>New tab window</source>
         <translation>Новая вкладка</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/tabwindow.cpp" line="38"/>
+        <location filename="../../plugins/messenger/tabwindow.cpp" line="39"/>
         <source>Detach window</source>
         <translation>Отцепить окно</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/messenger/tabwindow.cpp" line="44"/>
+        <source>Next tab</source>
+        <translation>След. вкладка</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/messenger/tabwindow.cpp" line="45"/>
+        <source>Ctrl+Tab</source>
+        <translation>Ctrl+Tab</translation>
     </message>
 </context>
 <context>
@@ -435,10 +444,10 @@
     <message>
         <location filename="../../plugins/messenger/tabwindow.ui" line="13"/>
         <source>TabWindow</source>
-        <translation>TabWindow</translation>
+        <translation type="obsolete">TabWindow</translation>
     </message>
     <message>
-        <location filename="../../plugins/messenger/tabwindow.ui" line="33"/>
+        <location filename="../../plugins/messenger/tabwindow.ui" line="21"/>
         <source>Tab 1</source>
         <translation>Tab 1</translation>
     </message>
@@ -461,7 +470,7 @@
     <message>
         <location filename="../../plugins/messenger/viewwidget.ui" line="13"/>
         <source>ViewWidget</source>
-        <translation>ViewWidget</translation>
+        <translation type="obsolete">ViewWidget</translation>
     </message>
 </context>
 </TS>

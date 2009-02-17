@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>ConsolePlugin</name>
     <message>
@@ -11,7 +10,7 @@
     <message>
         <location filename="../../plugins/console/consoleplugin.cpp" line="17"/>
         <source>Allow to view XMPP stanzas.</source>
-        <translation>Разрешить просматривать XMPP XML-транзакции.</translation>
+        <translation>Позволяет просматривать XMPP поток.</translation>
     </message>
     <message>
         <location filename="../../plugins/console/consoleplugin.cpp" line="41"/>
@@ -24,7 +23,7 @@
     <message>
         <location filename="../../plugins/console/consolewidget.cpp" line="27"/>
         <source>&lt;All Streams&gt;</source>
-        <translation>&lt;Все потоки&gt;</translation>
+        <translation>&lt;Все подключения&gt;</translation>
     </message>
     <message>
         <location filename="../../plugins/console/consolewidget.cpp" line="156"/>
@@ -39,7 +38,7 @@
     <message>
         <location filename="../../plugins/console/consolewidget.cpp" line="264"/>
         <source>&lt;b&gt;Start sending user stanza...&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Начало отправки XML-транзакции...&lt;/b&gt;&lt;br&gt;</translation>
+        <translation>&lt;b&gt;Начинается отправка XML-транзакции...&lt;/b&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../plugins/console/consolewidget.cpp" line="268"/>
@@ -72,7 +71,7 @@
     <message>
         <location filename="../../plugins/console/consolewidget.ui" line="41"/>
         <source>Stream:</source>
-        <translation>Поток:</translation>
+        <translation>Подключение:</translation>
     </message>
     <message>
         <location filename="../../plugins/console/consolewidget.ui" line="58"/>
@@ -97,7 +96,7 @@
     <message>
         <location filename="../../plugins/console/consolewidget.ui" line="128"/>
         <source>Available context:</source>
-        <translation>Допустимый контекст:</translation>
+        <translation>Сохраненный контекст:</translation>
     </message>
     <message>
         <location filename="../../plugins/console/consolewidget.ui" line="153"/>
@@ -122,12 +121,12 @@
     <message>
         <location filename="../../plugins/console/consolewidget.ui" line="241"/>
         <source>Word wrap</source>
-        <translation>Перенос слов</translation>
+        <translation>Переносить по словам</translation>
     </message>
     <message>
         <location filename="../../plugins/console/consolewidget.ui" line="248"/>
         <source>Colored XML</source>
-        <translation>Окраска XML</translation>
+        <translation>Подсветка XML</translation>
     </message>
     <message>
         <location filename="../../plugins/console/consolewidget.ui" line="271"/>

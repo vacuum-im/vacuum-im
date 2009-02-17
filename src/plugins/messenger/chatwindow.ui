@@ -9,9 +9,6 @@
     <height>383</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>ChatWindow</string>
-  </property>
   <property name="autoFillBackground" >
    <bool>true</bool>
   </property>
@@ -20,16 +17,7 @@
     <property name="spacing" >
      <number>0</number>
     </property>
-    <property name="leftMargin" >
-     <number>0</number>
-    </property>
-    <property name="topMargin" >
-     <number>0</number>
-    </property>
-    <property name="rightMargin" >
-     <number>0</number>
-    </property>
-    <property name="bottomMargin" >
+    <property name="margin" >
      <number>0</number>
     </property>
     <item>
@@ -61,7 +49,7 @@
      <x>0</x>
      <y>0</y>
      <width>445</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>

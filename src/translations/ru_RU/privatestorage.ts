@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>PrivateStorage</name>
     <message>
@@ -11,7 +10,7 @@
     <message>
         <location filename="../../plugins/privatestorage/privatestorage.cpp" line="23"/>
         <source>Private Storage</source>
-        <translation>Приватное хранилище</translation>
+        <translation>Личное хранилище на сервере</translation>
     </message>
 </context>
 </TS>

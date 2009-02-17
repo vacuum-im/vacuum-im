@@ -82,7 +82,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
 
   QToolBar *groupsToolBar = this->addToolBar("Groups Tools");
   FGroupsTools = new ToolBarChanger(groupsToolBar);
-  static_cast<QBoxLayout *>(ui.grbGroups->layout())->insertWidget(0,groupsToolBar);
+  static_cast<QBoxLayout *>(ui.grbArchive->layout())->insertWidget(0,groupsToolBar);
 
   QListView *cmbView= new QListView(ui.cmbContact);
   QSortFilterProxyModel *cmbSort = new QSortFilterProxyModel(ui.cmbContact);

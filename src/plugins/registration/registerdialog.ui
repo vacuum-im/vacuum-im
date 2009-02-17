@@ -9,9 +9,6 @@
     <height>325</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>RegisterDialog</string>
-  </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
     <number>5</number>

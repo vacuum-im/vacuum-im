@@ -9,9 +9,6 @@
     <height>414</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>PrivacyLists</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" >
    <property name="margin" >
     <number>5</number>

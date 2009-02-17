@@ -25,5 +25,10 @@
         <source>Implementation of StartTLS</source>
         <translation>Реализация StartTLS</translation>
     </message>
+    <message>
+        <location filename="../../plugins/starttls/starttlsplugin.cpp" line="18"/>
+        <source>StartTLS implementation</source>
+        <translation>Реализация StartTLS</translation>
+    </message>
 </context>
 </TS>

@@ -9,9 +9,6 @@
     <height>382</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>EditUsersListDialog</string>
-  </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
     <number>5</number>

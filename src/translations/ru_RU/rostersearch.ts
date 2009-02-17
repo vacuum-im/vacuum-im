@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>RosterSearch</name>
     <message>
@@ -11,7 +10,7 @@
     <message>
         <location filename="../../plugins/rostersearch/rostersearch.cpp" line="31"/>
         <source>Search by regular expression</source>
-        <translation>Поиск по регулярному выражению</translation>
+        <translation>Поиск контакта по регулярному выражению</translation>
     </message>
     <message>
         <location filename="../../plugins/rostersearch/rostersearch.cpp" line="44"/>

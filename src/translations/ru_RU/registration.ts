@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>RegisterDialog</name>
     <message>
@@ -26,7 +25,7 @@
     <message>
         <location filename="../../plugins/registration/registerdialog.cpp" line="93"/>
         <source>Enter your username and new password.</source>
-        <translation>Введите выше имя пользователя и новый пароль.</translation>
+        <translation>Введите ваше имя пользователя и новый пароль.</translation>
     </message>
     <message>
         <location filename="../../plugins/registration/registerdialog.cpp" line="146"/>
@@ -46,7 +45,7 @@
     <message>
         <location filename="../../plugins/registration/registerdialog.cpp" line="161"/>
         <source>Requested operation failed: %1</source>
-        <translation>Запрошенная операция не удалась: %1</translation>
+        <translation>Запрошенная операция выполнена с ошибкой: %1</translation>
     </message>
 </context>
 <context>
@@ -54,20 +53,20 @@
     <message>
         <location filename="../../plugins/registration/registerdialog.ui" line="13"/>
         <source>RegisterDialog</source>
-        <translation>RegisterDialog</translation>
+        <translation type="obsolete">RegisterDialog</translation>
     </message>
     <message>
-        <location filename="../../plugins/registration/registerdialog.ui" line="55"/>
+        <location filename="../../plugins/registration/registerdialog.ui" line="52"/>
         <source>Username:</source>
         <translation>Имя пользователя:</translation>
     </message>
     <message>
-        <location filename="../../plugins/registration/registerdialog.ui" line="68"/>
+        <location filename="../../plugins/registration/registerdialog.ui" line="65"/>
         <source>Password:</source>
         <translation>Пароль:</translation>
     </message>
     <message>
-        <location filename="../../plugins/registration/registerdialog.ui" line="85"/>
+        <location filename="../../plugins/registration/registerdialog.ui" line="82"/>
         <source>Email:</source>
         <translation>E-mail:</translation>
     </message>
@@ -77,7 +76,7 @@
     <message>
         <location filename="../../plugins/registration/registration.cpp" line="390"/>
         <source>In-band registration with instant messaging servers and associated services</source>
-        <translation>Регистрация на серверах мгновенных сообщений и связанных серверах</translation>
+        <translation>Регистрация на серверах мгновенных сообщений и связанных сервисах</translation>
     </message>
     <message>
         <location filename="../../plugins/registration/registration.cpp" line="389"/>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>CommandDialog</name>
     <message>
@@ -54,7 +53,7 @@
     <message>
         <location filename="../../plugins/commands/commanddialog.ui" line="13"/>
         <source>CommandDialog</source>
-        <translation>CommandDialog</translation>
+        <translation type="obsolete">CommandDialog</translation>
     </message>
 </context>
 <context>
@@ -62,27 +61,27 @@
     <message>
         <location filename="../../plugins/commands/commands.cpp" line="28"/>
         <source>Plugin for advertising and executing application-specific commands</source>
-        <translation>Плагин для отправки и выполнения команд приложения</translation>
+        <translation>Плагин для отображения и выполнения команд приложения</translation>
     </message>
     <message>
         <location filename="../../plugins/commands/commands.cpp" line="432"/>
         <source>Ad-Hoc Commands</source>
-        <translation>Ad-Hoc команда</translation>
+        <translation>Ad-Hoc Команды</translation>
     </message>
     <message>
         <location filename="../../plugins/commands/commands.cpp" line="74"/>
         <source>Can not understand the specified action</source>
-        <translation>Невозможно понять указанное действие</translation>
+        <translation>Не поддерживаемая команда</translation>
     </message>
     <message>
         <location filename="../../plugins/commands/commands.cpp" line="76"/>
         <source>Can not accept the specified action</source>
-        <translation>Невозможно подтвердить указанное действие</translation>
+        <translation>Неприемлимая команда</translation>
     </message>
     <message>
         <location filename="../../plugins/commands/commands.cpp" line="78"/>
         <source>Can not accept the specified language/locale</source>
-        <translation>Невозможно понять указанный язык/локаль</translation>
+        <translation>Неприемлемый язык или локаль</translation>
     </message>
     <message>
         <location filename="../../plugins/commands/commands.cpp" line="80"/>
@@ -112,7 +111,7 @@
     <message>
         <location filename="../../plugins/commands/commands.cpp" line="433"/>
         <source>Advertising and executing application-specific commands</source>
-        <translation>Отправка и выполнение команд приложения</translation>
+        <translation>Отображение и выполнение команд приложения</translation>
     </message>
 </context>
 </TS>

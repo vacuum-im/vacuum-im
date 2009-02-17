@@ -18,7 +18,7 @@ void ConnectionManager::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Managing TCP connections");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = "Connection Manager";
+  APluginInfo->name = tr("Connection Manager");
   APluginInfo->uid = CONNECTIONMANAGER_UUID;
   APluginInfo->version = "0.1";
 }

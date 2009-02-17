@@ -18,7 +18,7 @@ void DataForms::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = tr("Potapov S.A. aka Lion");
   APluginInfo->description = tr("Implements data forms and generic data description");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = "Data Forms";
+  APluginInfo->name = tr("Data Forms");
   APluginInfo->uid = DATAFORMS_UUID;
   APluginInfo->version = "0.1";
 }

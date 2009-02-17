@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<defaultcodec></defaultcodec>
 <context>
     <name>JabberSearch</name>
     <message>
         <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="24"/>
         <source>Search information repositories on the Jabber network.</source>
-        <translation>Поиск хранилищ информации в Jabber-сети.</translation>
+        <translation>Поиск в хранилищах информации jabber-сети.</translation>
     </message>
     <message>
         <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="265"/>
         <source>Jabber Search</source>
-        <translation>Jabber-поиск</translation>
+        <translation>Jabber поиск</translation>
     </message>
     <message>
         <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="183"/>
@@ -21,7 +20,7 @@
     <message>
         <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="266"/>
         <source>Search information repositories on the Jabber network</source>
-        <translation>Поиск хранилищ информации в Jabber-сети</translation>
+        <translation>Поиск в хранилищах информации jabber-сети</translation>
     </message>
     <message>
         <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="199"/>
@@ -79,7 +78,7 @@
     <message>
         <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="294"/>
         <source>Requested operation failed: %1</source>
-        <translation>Запрошенная операция не удалась: %1</translation>
+        <translation>Запрошенная операция завершилась с ошибкой: %1</translation>
     </message>
 </context>
 <context>
@@ -87,52 +86,52 @@
     <message>
         <location filename="../../plugins/jabbersearch/searchdialog.ui" line="13"/>
         <source>SearchDialog</source>
-        <translation>SearchDialog</translation>
+        <translation type="obsolete">SearchDialog</translation>
     </message>
     <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="66"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="45"/>
         <source>First:</source>
         <translation>Имя:</translation>
     </message>
     <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="76"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="55"/>
         <source>Last:</source>
         <translation>Фамилия:</translation>
     </message>
     <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="86"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="65"/>
         <source>Nick:</source>
         <translation>Ник:</translation>
     </message>
     <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="96"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="75"/>
         <source>Email:</source>
-        <translation>Email:</translation>
+        <translation>E-mail:</translation>
     </message>
     <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="161"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="131"/>
         <source>JID</source>
         <translation>JID</translation>
     </message>
     <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="166"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="136"/>
         <source>First</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="171"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="141"/>
         <source>Last</source>
         <translation>Фамилия</translation>
     </message>
     <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="176"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="146"/>
         <source>Nick</source>
         <translation>Ник</translation>
     </message>
     <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="181"/>
+        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="151"/>
         <source>EMail</source>
-        <translation>EMail</translation>
+        <translation>E-mail</translation>
     </message>
 </context>
 </TS>
