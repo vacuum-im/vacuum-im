@@ -218,7 +218,7 @@ Check values and try again</source>
         <translation>Конференции</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="536"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="543"/>
         <source>Join conference</source>
         <translation>Войти в конференцию</translation>
     </message>
@@ -238,192 +238,192 @@ Check values and try again</source>
         <translation>Сообщения в конференции</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="290"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="297"/>
         <source>You are invited to the conference %1</source>
         <translation>Вы приглашены в конференцию %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="294"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="301"/>
         <source>Invitation received</source>
         <translation>Получено приглашение</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="323"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="330"/>
         <source>You are invited to the conference %1 by %2.&lt;br&gt;Reason: %3</source>
         <translation>%1 приглашает вас в конференцию %2. &lt;br&gt;Причина: %3</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="325"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="332"/>
         <source>Do you want to join this conference?</source>
         <translation>Вы хотите присоединиться к этой конференции?</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="327"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="334"/>
         <source>Invite</source>
         <translation>Пригласить</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="414"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="421"/>
         <source>%1 as %2</source>
         <translation>%1 как %2</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="436"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="443"/>
         <source>Multi-user text conferencing</source>
         <translation>Многопользовательская конференция</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="445"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="452"/>
         <source>Hidden room</source>
         <translation>Скрытая комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="446"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="453"/>
         <source>A room that cannot be found by any user through normal means such as searching and service discovery</source>
         <translation>Комната, которая не может быть найдена через поиск и обзор сервисов</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="450"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="457"/>
         <source>Members-only room</source>
         <translation>Комната только для участников</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="451"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="458"/>
         <source>A room that a user cannot enter without being on the member list</source>
-        <translation>Комната, в которую не могут войти те, кто не состоит в списке членов</translation>
+        <translation>Комната, в которую не могут войти те, кто не состоит в списке участников</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="455"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="462"/>
         <source>Moderated room</source>
         <translation>Модерируемая комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="456"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="463"/>
         <source>A room in which only those with &apos;voice&apos; may send messages to all occupants</source>
         <translation>Комната, в которой только те, у кого есть &apos;голос&apos;, могут посылать сообщение всем посетителям</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="460"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="467"/>
         <source>Non-anonymous room</source>
         <translation>Не анонимная комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="461"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="468"/>
         <source>A room in which an occupant&apos;s full JID is exposed to all other occupants</source>
-        <translation>Комната, в которой JID посетителя виден всем остальным посетителям</translation>
+        <translation>Комната, в которой JID пользователей виден всем остальным пользователям</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="465"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="472"/>
         <source>Open room</source>
         <translation>Открытая комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="466"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="473"/>
         <source>A room that anyone may enter without being on the member list</source>
         <translation>Комната, в которую каждый может войти, не будучи в списке участников</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="475"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="482"/>
         <source>Password-protected room</source>
         <translation>Комната, защищенная паролем</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="476"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="483"/>
         <source>A room that a user cannot enter without first providing the correct password</source>
         <translation>Комната, в которую пользователь может войти, только после предъявления правильного пароля</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="480"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="487"/>
         <source>Persistent room</source>
         <translation>Постоянная комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="481"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="488"/>
         <source>A room that is not destroyed if the last occupant exits</source>
-        <translation>Комната, которая не удаляется после выхода последнего посетителя</translation>
+        <translation>Комната, которая не удаляется после выхода последнего пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="485"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="492"/>
         <source>Public room</source>
         <translation>Публичная комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="486"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="493"/>
         <source>A room that can be found by any user through normal means such as searching and service discovery</source>
         <translation>Комната, которая может быть найдена через поиск и обзор сервисов</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="490"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="497"/>
         <source>Semi-anonymous room</source>
         <translation>Полуанонимная комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="491"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="498"/>
         <source>A room in which an occupant&apos;s full JID can be discovered by room admins only</source>
-        <translation>Комната, в которой JID участника видят только аднимистраторы</translation>
+        <translation>Комната, в которой JID пользователей видят только аднимистраторы</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="495"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="502"/>
         <source>Temporary room</source>
         <translation>Временная комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="496"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="503"/>
         <source>A room that is destroyed if the last occupant exits</source>
-        <translation>Комната, которая удаляется после выходя последнего посетителя</translation>
+        <translation>Комната, которая удаляется после выходя последнего пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="500"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="507"/>
         <source>Unmoderated room</source>
         <translation>Немодерируемая комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="501"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="508"/>
         <source>A room in which any occupant is allowed to send messages to all occupants</source>
-        <translation>Комната, в которой любой посетитель может посылать сообщения всем посетителям</translation>
+        <translation>Комната, в которой каждый может посылать сообщения всем пользователям</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="505"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="512"/>
         <source>Unsecured room</source>
-        <translation>Небезопасная комната</translation>
+        <translation>Незащищенная комната</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="506"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="513"/>
         <source>A room that anyone is allowed to enter without first providing the correct password</source>
         <translation>Комната, в которую каждый может войти без предъявления правильного пароля</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="513"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="520"/>
         <source>Invite to</source>
         <translation>Пригласить в</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="521"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="528"/>
         <source>%1 from %2</source>
         <translation>%1 от %2</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="676"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="683"/>
         <source>I`am too busy right now</source>
         <translation>Я слишком занят сейчас</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="677"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="684"/>
         <source>Decline invite</source>
         <translation>Отклонить приглашение</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="698"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="705"/>
         <source>Enter a reason</source>
         <translation>Введите причину</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="697"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="704"/>
         <source>You are welcome here</source>
         <translation>Вас здесь ждут</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="698"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="705"/>
         <source>Invite user</source>
         <translation>Пригласить пользователя</translation>
     </message>
@@ -470,17 +470,17 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="233"/>
         <source>Configure conference</source>
-        <translation>Настроить конференцию</translation>
+        <translation>Настройка конференции</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="234"/>
         <source>Allow Occupants to Invite Others?</source>
-        <translation>Разрешить посетителям приглашать других?</translation>
+        <translation>Разрешить пользователям посылать приглашения?</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="235"/>
         <source>Allow Occupants to Change Subject?</source>
-        <translation>Разрешить посетителям менять тему?</translation>
+        <translation>Разрешить пользователям менять тему?</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="236"/>
@@ -495,12 +495,12 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="238"/>
         <source>Maximum Number of Room Occupants</source>
-        <translation>Максимальное количество участников комнаты</translation>
+        <translation>Максимальное количество пользователей в комнате</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="239"/>
         <source>Make Room Members-Only?</source>
-        <translation>Сделать комнату только для членов?</translation>
+        <translation>Комната только для зерегистрированных участников?</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="240"/>
@@ -510,7 +510,7 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="241"/>
         <source>Password is Required to Enter?</source>
-        <translation>Пароль обязателен для входа?</translation>
+        <translation>Сделать комнату защищенной паролем?</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="242"/>
@@ -520,32 +520,32 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="243"/>
         <source>Roles for which Presence is Broadcast:</source>
-        <translation>Типы пользователей, которым посылается статус:</translation>
+        <translation>Типы пользователей, которым рассылается статус:</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="244"/>
         <source>Allow Public Searching for Room?</source>
-        <translation>Разрешить публичный поиск комнаты?</translation>
+        <translation>Сделать комнату видимой всем?</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="245"/>
         <source>Full List of Room Admins</source>
-        <translation>Полный лист администраторов комнаты</translation>
+        <translation>Полный список администраторов комнаты</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="256"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="263"/>
         <source>Description of Room</source>
         <translation>Описание комнаты</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="247"/>
         <source>Natural-Language Room Name</source>
-        <translation>Наименование комнаты</translation>
+        <translation>Название комнаты</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="248"/>
         <source>Full List of Room Owners</source>
-        <translation>Полный лист владельцев комнаты</translation>
+        <translation>Полный список владельцев комнаты</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="249"/>
@@ -555,72 +555,102 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="250"/>
         <source>Affiliations that May Discover Real JIDs of Occupants</source>
-        <translation>Пользователи, которые могут видель реальный JID</translation>
+        <translation>Сделать реальные JID пользователей видимыми</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="254"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="261"/>
         <source>Conference information</source>
         <translation>Информация о конференции</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="255"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="262"/>
         <source>Contact JID</source>
-        <translation>JID контакта</translation>
+        <translation>Контактный JID</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="257"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="264"/>
         <source>Natural Language for Room</source>
         <translation>Основной язык общения в комнате</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="258"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="265"/>
         <source>LDAP Group</source>
         <translation>Группа LDAP</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="259"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="266"/>
         <source>URL for Archived Discussion Logs</source>
-        <translation>URL для архивов протоколов общения</translation>
+        <translation>URL для архива протоколов общения</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="260"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="267"/>
         <source>Current Number of Occupants in Room</source>
-        <translation>Текущее количество посетителей в комнате</translation>
+        <translation>Текущее количество пользователей в комнате</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="261"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="268"/>
         <source>Current Subject or Discussion Topic in Room</source>
         <translation>Текущая тема в комнате</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="262"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="269"/>
         <source>The Room Subject Can be Modified by Participants?</source>
-        <translation>Тема комнаты может меняться посетителями?</translation>
+        <translation>Тема комнаты может меняться пользователями?</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="266"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="273"/>
         <source>Request for voice</source>
         <translation>Запрос &apos;голоса&apos;</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="267"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="274"/>
         <source>Requested Role</source>
-        <translation>Запрошенный тип пользователя</translation>
+        <translation>Запрошенный тип</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="268"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="275"/>
         <source>User ID</source>
         <translation>ID пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="269"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="276"/>
         <source>Room Nickname</source>
         <translation>Ник в комнате</translation>
     </message>
     <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="270"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="277"/>
         <source>Grant Voice?</source>
         <translation>Предоставить &apos;голос&apos;?</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="252"/>
+        <source>Make participants list public?</source>
+        <translation>Сделать список участников видимым всем?</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="256"/>
+        <source>Allow visitors to send status text in presence updates?</source>
+        <translation>Разрешить гостям вставлять текcт статуса в сообщения о присутствии?</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="257"/>
+        <source>Allow visitors to change nickname?</source>
+        <translation>Разрешить гостям изменять ник?</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="253"/>
+        <source>Default occupants as participants?</source>
+        <translation>Сделать пользователей участниками по умолчанию?</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="254"/>
+        <source>Allow occupants to send private messages?</source>
+        <translation>Разрешить пользователям посылать приватные сообщения?</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="255"/>
+        <source>Allow occupants to query other occupants?</source>
+        <translation>Разрешить пользователям посылать iq-запросы?</translation>
     </message>
 </context>
 <context>
@@ -708,7 +738,7 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="408"/>
         <source>Edit ban list</source>
-        <translation>Редактировать бан-лист</translation>
+        <translation>Редактировать список банов</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="414"/>
@@ -748,12 +778,12 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="509"/>
         <source>Kick user</source>
-        <translation>Выгнать посетителя</translation>
+        <translation>Выгнать</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="514"/>
         <source>Ban user</source>
-        <translation>Забанить посетителя</translation>
+        <translation>Забанить</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="519"/>
@@ -768,7 +798,7 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="529"/>
         <source>Participant</source>
-        <translation>Участник</translation>
+        <translation>Пользователь</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="535"/>
@@ -783,7 +813,7 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="655"/>
         <source>Any occupant is allowed to see the user&apos;s full JID</source>
-        <translation>Каждый участник может смотреть полный JID пользователей</translation>
+        <translation>Каждый может видеть реальный JID пользователей</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="660"/>
@@ -933,7 +963,7 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1042"/>
         <source>%1 - Private chat</source>
-        <translation>%1 - Личный чат</translation>
+        <translation>%1 - Личные сообщения</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1101"/>
@@ -1013,7 +1043,7 @@ Check values and try again</source>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1282"/>
         <source>Edit ban list - %1</source>
-        <translation>Редактировать бан-лист - %1</translation>
+        <translation>Редактировать список банов - %1</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1284"/>
