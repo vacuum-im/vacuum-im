@@ -1296,7 +1296,7 @@ void MultiUserChatWindow::onConfigFormReceived(const IDataForm &AForm)
 {
   if (FDataForms)
   {
-    IDataDialogWidget *dialog = FDataForms->dialogWidget(AForm,this);
+    IDataDialogWidget *dialog = FDataForms->dialogWidget(FDataForms->localizeForm(AForm),this);
     connect(dialog->instance(),SIGNAL(accepted()),SLOT(onConfigFormDialogAccepted()));
     connect(FMultiChat->instance(),SIGNAL(chatClosed()),dialog->instance(),SLOT(reject()));
     connect(FMultiChat->instance(),SIGNAL(configFormReceived(const IDataForm &)),dialog->instance(),SLOT(reject()));

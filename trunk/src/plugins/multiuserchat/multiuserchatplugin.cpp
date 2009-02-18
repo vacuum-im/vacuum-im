@@ -248,6 +248,13 @@ IDataFormLocale MultiUserChatPlugin::dataFormLocale(const QString &AFormType)
     locale.fields["muc#roomconfig_roomowners"].label = tr("Full List of Room Owners");
     locale.fields["muc#roomconfig_roomsecret"].label = tr("The Room Password");
     locale.fields["muc#roomconfig_whois"].label = tr("Affiliations that May Discover Real JIDs of Occupants");
+    //ejabberd muc extension
+    locale.fields["public_list"].label = tr("Make participants list public?");
+    locale.fields["members_by_default"].label = tr("Default occupants as participants?");
+    locale.fields["allow_private_messages"].label = tr("Allow occupants to send private messages?");
+    locale.fields["allow_query_users"].label = tr("Allow occupants to query other occupants?");
+    locale.fields["muc#roomconfig_allowvisitorstatus"].label = tr("Allow visitors to send status text in presence updates?");
+    locale.fields["muc#roomconfig_allowvisitornickchange"].label = tr("Allow visitors to change nickname?");
   }
   else if (AFormType == DATA_FORM_MUC_ROOM_INFO)
   {
