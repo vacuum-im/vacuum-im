@@ -1,0 +1,32 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<icondef>
+	<name>Send Mail</name>
+
+	<description>SMTP Iconset</description>
+
+ 	<version>1.0</version>
+
+ 	<creation>2009-02-19</creation>
+
+ 	<author>Unknown</author>
+
+	<icon>
+		<key>online</key>
+		<object mime='image/png'>online.png</object>
+	</icon>
+
+	<icon>
+		<key>offline</key>
+		<object mime='image/png'>offline.png</object>
+	</icon>
+
+	<icon>
+		<key>ask</key>
+		<object mime='image/png'>ask.png</object>
+	</icon>
+
+	<icon>
+		<key>noauth</key>
+		<object mime='image/png'>noauth.png</object>
+	</icon>
+</icondef>
