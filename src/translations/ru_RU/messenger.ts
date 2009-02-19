@@ -421,7 +421,7 @@
     <message>
         <location filename="../../plugins/messenger/tabwindow.cpp" line="34"/>
         <source>New tab window</source>
-        <translation>Новая вкладка</translation>
+        <translation>Новое окно со вкладками</translation>
     </message>
     <message>
         <location filename="../../plugins/messenger/tabwindow.cpp" line="39"/>
@@ -437,6 +437,16 @@
         <location filename="../../plugins/messenger/tabwindow.cpp" line="45"/>
         <source>Ctrl+Tab</source>
         <translation>Ctrl+Tab</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/messenger/tabwindow.cpp" line="50"/>
+        <source>Prev. tab</source>
+        <translation>Пред. вкладка</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/messenger/tabwindow.cpp" line="51"/>
+        <source>Ctrl+Shift+Tab</source>
+        <translation>Ctrl+Shift+Tab</translation>
     </message>
 </context>
 <context>

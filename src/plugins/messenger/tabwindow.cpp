@@ -34,7 +34,7 @@ TabWindow::TabWindow(IMessenger *AMessenger, int AWindowId)
   FNewTabAction->setText(tr("New tab window"));
   FTabMenu->addAction(FNewTabAction,AG_DEFAULT+1);
   connect(FNewTabAction,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-
+  
   FDetachWindowAction = new Action(FTabMenu);
   FDetachWindowAction->setText(tr("Detach window"));
   FTabMenu->addAction(FDetachWindowAction,AG_DEFAULT+1);
@@ -45,6 +45,12 @@ TabWindow::TabWindow(IMessenger *AMessenger, int AWindowId)
   FNextTabAction->setShortcut(tr("Ctrl+Tab"));
   FTabMenu->addAction(FNextTabAction,AG_DEFAULT-1);
   connect(FNextTabAction,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+
+  FPrevTabAction = new Action(FTabMenu);
+  FPrevTabAction->setText(tr("Prev. tab"));
+  FPrevTabAction->setShortcut(tr("Ctrl+Shift+Tab"));
+  FTabMenu->addAction(FPrevTabAction,AG_DEFAULT-1);
+  connect(FPrevTabAction,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
   ui.twtTabs->widget(0)->deleteLater();
   ui.twtTabs->removeTab(0);
@@ -307,6 +313,10 @@ void TabWindow::onActionTriggered(bool)
   else if (action == FNextTabAction)
   {
     ui.twtTabs->setCurrentIndex((ui.twtTabs->currentIndex()+1) % ui.twtTabs->count());
+  }
+  else if (action == FPrevTabAction)
+  {
+    ui.twtTabs->setCurrentIndex(ui.twtTabs->currentIndex()>0 ? ui.twtTabs->currentIndex()-1 : ui.twtTabs->count()-1);
   }
   else if (FMoveActions.values().contains(action))
   {
