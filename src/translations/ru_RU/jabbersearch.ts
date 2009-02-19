@@ -63,7 +63,7 @@
     <message>
         <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="197"/>
         <source>Disco info</source>
-        <translation>Обзорная информация</translation>
+        <translation>Информация</translation>
     </message>
     <message>
         <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="206"/>

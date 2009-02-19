@@ -28,7 +28,7 @@ SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManage
   FVCardPlugin = NULL;
 
   QToolBar *toolBar = new QToolBar(this);
-  toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  toolBar->setIconSize(QSize(16,16));
   FToolBarChanger = new ToolBarChanger(toolBar);
   FToolBarChanger->setSeparatorsVisible(false);
   layout()->setMenuBar(toolBar);
