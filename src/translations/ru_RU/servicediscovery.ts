@@ -5,7 +5,7 @@
     <message>
         <location filename="../../plugins/servicediscovery/discoinfowindow.cpp" line="12"/>
         <source>%1 - Discovery Info</source>
-        <translation>%1 - Обзорная информация</translation>
+        <translation>%1 -Информация</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoinfowindow.cpp" line="118"/>
@@ -198,72 +198,72 @@
         <translation>Обзор информации и сервисов, связанных с Jabber объектами</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1247"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1251"/>
         <source>Service Discovery</source>
         <translation>Обзор сервисов</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="842"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="846"/>
         <source>Discover information and items associated with a Jabber Entity</source>
         <translation>Обзор информации и сервисов, связанных с Jabber объектами</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="848"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="852"/>
         <source>Discovery information</source>
-        <translation>Обзорная информация</translation>
+        <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="850"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="854"/>
         <source>Discover information about another entity on the network</source>
         <translation>Обзор информации о возможностях Jabber объекта</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="856"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="860"/>
         <source>Discovery items</source>
         <translation>Обзор сервисов</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="858"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="862"/>
         <source>Discover the items associated with a Jabber Entity</source>
         <translation>Обзор сервисов, связанных с Jabber объектом</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="864"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="868"/>
         <source>Publish items</source>
         <translation>Публикация пользовательских данных</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="866"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="870"/>
         <source>Publish user defined items to server</source>
         <translation>Публикация пользовательских данных на сервере</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="880"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="884"/>
         <source>JID Escaping</source>
         <translation>Экранирование JID</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="882"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="886"/>
         <source>Enables the display of Jabber Identifiers with disallowed characters</source>
         <translation>Позволяет использовать идентификаторы Jabber c неразрешенными символами</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1236"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1240"/>
         <source>Discovery Info</source>
-        <translation>Обзорная информация</translation>
+        <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1277"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1281"/>
         <source>Categoty: %1; Type: %2</source>
         <translation>Категория: %1; Тип: %2</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="872"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="876"/>
         <source>Entity Capabilities</source>
         <translation>Кэширование возможностей Jabber объекта</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="874"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="878"/>
         <source>Enables the capabilities information caching within a session or across sessions</source>
         <translation>Позволяет кэшировать информацию о возможностях клиентов</translation>
     </message>

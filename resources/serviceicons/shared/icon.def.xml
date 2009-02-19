@@ -6,6 +6,14 @@
 		<object mime='image/png'>_service_.png</object>
 	</icon>
 	<icon>
+		<key>_empty_</key>
+		<object mime='image/png'>_empty_.png</object>
+	</icon>
+	<icon>
+		<key>_wait_</key>
+		<object mime='image/png'>_wait_.png</object>
+	</icon>
+	<icon>
 		<key>_error_</key>
 		<object mime='image/png'>_error_.png</object>
 	</icon>
@@ -169,11 +177,16 @@
   </icon>
   <icon>
     <key>gateway/xmpp</key>
+    <key>gateway/XMPP</key>
     <object mime='image/png'>gatewayxmpp.png</object>
   </icon>
   <icon>
     <key>gateway/yahoo</key>
     <object mime='image/png'>gatewayyahoo.png</object>
+  </icon>
+  <icon>
+    <key>gateway/mrim</key>
+    <object mime='image/png'>gatewaymrim.png</object>
   </icon>
   <!-- Headline -->
   <icon>

@@ -492,10 +492,14 @@ QIcon ServiceDiscovery::serviceIcon(const Jid AItemJid, const QString &ANode) co
 {
   QIcon icon;
   IDiscoInfo info = discoInfo(AItemJid,ANode);
-  if (info.identity.isEmpty())
+  IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
+  if (FInfoRequestsId.values().contains(qMakePair<Jid,QString>(AItemJid,ANode)))
   {
-    IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
-    icon = storage->getIcon(info.error.code==-1 ? SRI_SERVICE : SRI_SERVICE_ERROR);
+    icon = storage->getIcon(SRI_SERVICE_WAIT);
+  }
+  else if (info.identity.isEmpty())
+  {
+    icon = storage->getIcon(info.error.code==-1 ? SRI_SERVICE_EMPTY : SRI_SERVICE_ERROR);
   }
   else 
   {

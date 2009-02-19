@@ -2,6 +2,8 @@
 #define SERVICEICONS_H
 
 #define SRI_SERVICE                         "_service_"
+#define SRI_SERVICE_EMPTY                   "_empty_"
+#define SRI_SERVICE_WAIT                    "_wait_"
 #define SRI_SERVICE_ERROR                   "_error_"
 
 #define SRI_AUTOMATION                      "automation"
@@ -49,6 +51,7 @@
 #define SRI_GATEWAY_XFIRE                   SRI_GATEWAY"/xfire"
 #define SRI_GATEWAY_XMPP                    SRI_GATEWAY"/xmpp"
 #define SRI_GATEWAY_YAHOO                   SRI_GATEWAY"/yahoo"
+#define SRI_GATEWAY_MRIM                    SRI_GATEWAY"/mrim"
 
 #define SRI_HEADLINE                        "headline"
 #define SRI_HEADLINE_NEWMAIL                SRI_HEADLINE"/newmail"
