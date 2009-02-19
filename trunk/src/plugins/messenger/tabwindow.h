@@ -63,6 +63,7 @@ private:
   Action *FNewTabAction;
   Action *FDetachWindowAction;
   Action *FNextTabAction;
+  Action *FPrevTabAction;
   QHash<int,Action *> FMoveActions;
 private:
   int FWindowId;
