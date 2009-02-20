@@ -21,17 +21,17 @@ EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster,
   FRoster = ARoster;
   FStreamJid = AStreamJid;
 
-  ui.cmbActive->addItem(tr(RULE_NONE),"");
-  ui.cmbDefault->addItem(tr(RULE_NONE),"");
+  ui.cmbActive->addItem(tr("<None>"),"");
+  ui.cmbDefault->addItem(tr("<None>"),"");
 
-  ui.cmbType->addItem(tr("Jid"),PRIVACY_TYPE_JID);
-  ui.cmbType->addItem(tr("Group"),PRIVACY_TYPE_GROUP);
-  ui.cmbType->addItem(tr("Subscription"),PRIVACY_TYPE_SUBSCRIPTION);
-  ui.cmbType->addItem(tr("<Always>"),PRIVACY_TYPE_ALWAYS);
+  ui.cmbType->addItem(tr("jid"),PRIVACY_TYPE_JID);
+  ui.cmbType->addItem(tr("group"),PRIVACY_TYPE_GROUP);
+  ui.cmbType->addItem(tr("subscription"),PRIVACY_TYPE_SUBSCRIPTION);
+  ui.cmbType->addItem(tr("<always>"),PRIVACY_TYPE_ALWAYS);
   onRuleConditionTypeChanged(ui.cmbType->currentIndex());
 
-  ui.cmbAction->addItem("Deny",PRIVACY_ACTION_DENY);
-  ui.cmbAction->addItem("Allow",PRIVACY_ACTION_ALLOW);
+  ui.cmbAction->addItem(tr("deny"),PRIVACY_ACTION_DENY);
+  ui.cmbAction->addItem(tr("allow"),PRIVACY_ACTION_ALLOW);
 
   connect(FPrivacyLists->instance(),SIGNAL(listLoaded(const Jid &, const QString &)),
     SLOT(onListLoaded(const Jid &, const QString &)));
@@ -195,32 +195,39 @@ void EditListsDialog::reset()
 
 QString EditListsDialog::ruleName(const IPrivacyRule &ARule)
 {
-  QString name = QString::number(ARule.order) + ": ";
-  if (ARule.type != PRIVACY_TYPE_ALWAYS)
-  {
-    name += "if ";
-    name += ARule.type;
-    name += " = ";
-    name += "'"+ARule.value+"'";
-    name += " then ";
-  }
-  name += !ARule.action.isEmpty() ? ARule.action : "<action>";
-  name += " [";
-  if (ARule.stanzas>IPrivacyRule::EmptyType && ARule.stanzas<IPrivacyRule::AnyStanza)
+  QString stanzas;
+  if (ARule.stanzas != IPrivacyRule::AnyStanza)
   {
     if (ARule.stanzas & IPrivacyRule::Messages)
-      name += tr(" Messages");
+      stanzas += " "+tr("messages")+",";
     if (ARule.stanzas & IPrivacyRule::Queries)
-      name += tr(" Queries");
+      stanzas += " "+tr("queries")+",";
     if (ARule.stanzas & IPrivacyRule::PresencesIn)
-      name += tr(" Pres-in");
+      stanzas += " "+tr("pres-in")+",";
     if (ARule.stanzas & IPrivacyRule::PresencesOut)
-      name += tr(" Pres-out");
+      stanzas += " "+tr("pres-out")+",";
+    stanzas.chop(1);
   }
   else
-    name += tr(" <Any Stanza>");
-  name += " ]";
-  return name;
+    stanzas += " "+tr("<any stanza>");
+
+  if (ARule.type != PRIVACY_TYPE_ALWAYS)
+  {
+    return tr("%1: if %2 = '%3' then %4 [%5 ]")
+      .arg(ARule.order)
+      .arg(tr(ARule.type.toAscii()))
+      .arg(ARule.value)
+      .arg(!ARule.action.isEmpty() ? tr(ARule.action.toAscii()) : tr("<action>"))
+      .arg(stanzas);
+  }
+  else
+  {
+    return tr("%1: always %2 [%3 ]")
+      .arg(ARule.order)
+      .arg(!ARule.action.isEmpty() ? tr(ARule.action.toAscii()) : tr("<action>"))
+      .arg(stanzas);
+  }
+  return QString::null;
 }
 
 void EditListsDialog::updateListRules()
@@ -230,9 +237,10 @@ void EditListsDialog::updateListRules()
     IPrivacyList list = FLists.value(FListName);
     for (int row = 0; row < list.rules.count(); row++)
     {
-      QListWidgetItem *ruleWidget = row<ui.ltwRules->count() ? ui.ltwRules->item(row) : new QListWidgetItem(ui.ltwRules);
-      ruleWidget->setText(ruleName(list.rules.at(row)));
-      ruleWidget->setData(DR_INDEX,row);
+      QListWidgetItem *ruleItem = row<ui.ltwRules->count() ? ui.ltwRules->item(row) : new QListWidgetItem(ui.ltwRules);
+      ruleItem->setText(ruleName(list.rules.at(row)));
+      ruleItem->setToolTip(ruleItem->text());
+      ruleItem->setData(DR_INDEX,row);
     }
     while(list.rules.count() < ui.ltwRules->count())
       delete ui.ltwRules->takeItem(list.rules.count());
@@ -485,7 +493,11 @@ void EditListsDialog::onRuleConditionChanged()
     if (listRule.stanzas == IPrivacyRule::EmptyType)
       listRule.stanzas = IPrivacyRule::AnyStanza;
     if (ui.ltwRules->currentRow()>=0)
-      ui.ltwRules->item(ui.ltwRules->currentRow())->setText(ruleName(listRule));
+    {
+      QListWidgetItem *ruleItem = ui.ltwRules->item(ui.ltwRules->currentRow());
+      ruleItem->setText(ruleName(listRule));
+      ruleItem->setToolTip(ruleItem->text());
+    }
   }
 }
 
@@ -500,10 +512,10 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
   {
     ui.cmbValue->setInsertPolicy(QComboBox::InsertAtBottom);
     ui.cmbValue->setEditable(false);
-    ui.cmbValue->addItem(tr("None"),SUBSCRIPTION_NONE);
-    ui.cmbValue->addItem(tr("To"),SUBSCRIPTION_TO);
-    ui.cmbValue->addItem(tr("From"),SUBSCRIPTION_FROM);
-    ui.cmbValue->addItem(tr("Both"),SUBSCRIPTION_BOTH);
+    ui.cmbValue->addItem(tr("none","Subscription type"),SUBSCRIPTION_NONE);
+    ui.cmbValue->addItem(tr("to","Subscription type"),SUBSCRIPTION_TO);
+    ui.cmbValue->addItem(tr("from","Subscription type"),SUBSCRIPTION_FROM);
+    ui.cmbValue->addItem(tr("both","Subscription type"),SUBSCRIPTION_BOTH);
     ui.cmbValue->blockSignals(false);
     ui.cmbValue->setCurrentIndex(0);
   }

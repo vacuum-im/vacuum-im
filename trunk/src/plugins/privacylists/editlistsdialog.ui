@@ -221,7 +221,7 @@
         <item>
          <widget class="QLabel" name="lblType" >
           <property name="text" >
-           <string>IF</string>
+           <string>if</string>
           </property>
           <property name="alignment" >
            <set>Qt::AlignCenter</set>
@@ -257,7 +257,7 @@
         <item>
          <widget class="QLabel" name="lblThen" >
           <property name="text" >
-           <string>Then</string>
+           <string>then</string>
           </property>
           <property name="alignment" >
            <set>Qt::AlignCenter</set>
@@ -274,28 +274,28 @@
         <item>
          <widget class="QCheckBox" name="chbMessage" >
           <property name="text" >
-           <string>Messages</string>
+           <string>messages</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="chbQueries" >
           <property name="text" >
-           <string>Queries</string>
+           <string>queries</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="chbPresenceIn" >
           <property name="text" >
-           <string>Presences In</string>
+           <string>pres-in</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="chbPresenceOut" >
           <property name="text" >
-           <string>Presences Out</string>
+           <string>pres-out</string>
           </property>
          </widget>
         </item>
