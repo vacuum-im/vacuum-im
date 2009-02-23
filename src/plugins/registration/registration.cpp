@@ -263,7 +263,7 @@ QWidget *Registration::optionsWidget(const QString &ANode, int &AOrder)
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
   if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
   {
-    AOrder = OO_ACCOUNT_REGISTER;
+    AOrder = OWO_ACCOUNT_REGISTER;
     QCheckBox *checkBox = new QCheckBox;
     checkBox->setText(tr("Register new account on server"));
 

@@ -369,7 +369,7 @@ void SettingsPlugin::removeOptionsHolder(IOptionsHolder *AOptionsHolder)
     FOptionsHolders.removeAt(FOptionsHolders.indexOf(AOptionsHolder));
 }
 
-void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIconKey)
+void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIconKey, int AOrder)
 {
   OptionsNode *node = FNodes.value(ANode,NULL);
   if (!node)
@@ -378,9 +378,10 @@ void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName,
     node->name = AName;
     node->desc = ADescription;
     node->icon = AIconKey;
+    node->order = AOrder;
     FNodes.insert(ANode,node);
     if (!FOptionsDialog.isNull())
-      FOptionsDialog->openNode(ANode,AName,ADescription,AIconKey,createNodeWidget(ANode));
+      FOptionsDialog->openNode(ANode,AName,ADescription,AIconKey,AOrder,createNodeWidget(ANode));
     emit optionsNodeOpened(ANode);
   }
   else
@@ -391,6 +392,7 @@ void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName,
       node->desc = ADescription;
     if (!AIconKey.isEmpty())
       node->icon = AIconKey;
+    node->order = AOrder;
   }
 }
 
@@ -419,7 +421,7 @@ QDialog *SettingsPlugin::openOptionsDialog(const QString &ANode, QWidget *AParen
     QMap<QString, OptionsNode *>::const_iterator it = FNodes.constBegin();
     while (it != FNodes.constEnd())
     {
-      FOptionsDialog->openNode(it.key(),it.value()->name,it.value()->desc,it.value()->icon,createNodeWidget(it.key()));
+      FOptionsDialog->openNode(it.key(),it.value()->name,it.value()->desc,it.value()->icon,it.value()->order,createNodeWidget(it.key()));
       it++;
     }
     emit optionsDialogOpened();

@@ -4,7 +4,8 @@
 #include <QPointer> 
 #include "../../definations/actiongroups.h"
 #include "../../definations/optionnodes.h"
-#include "../../definations/optionorders.h"
+#include "../../definations/optionnodeorders.h"
+#include "../../definations/optionwidgetorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/accountvaluenames.h"
 #include "../../definations/resources.h"

@@ -283,7 +283,7 @@ QWidget *Avatars::optionsWidget(const QString &ANode, int &AOrder)
 {
   if (ANode == ON_ROSTER)
   {
-    AOrder = OO_AVATARS;
+    AOrder = OWO_ROSTER_AVATARS;
     FOptionsWidget = new RosterOptionsWidget(this,NULL);
     return FOptionsWidget;
   }

@@ -90,7 +90,7 @@ QWidget *ConnectionManager::optionsWidget(const QString &ANode, int &AOrder)
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
   if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
   {
-    AOrder = OO_ACCOUNT_CONNECTION;
+    AOrder = OWO_ACCOUNT_CONNECTION;
     QUuid pluginId = defaultPlugin()->pluginUuid();
     QString accountId = nodeTree.at(1);
     IAccount *account = FAccountManager->accountById(accountId);

@@ -228,7 +228,7 @@ QWidget *StatusChanger::optionsWidget(const QString &ANode, int &AOrder)
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
   if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
   {
-    AOrder = OO_ACCOUNT_STATUS;
+    AOrder = OWO_ACCOUNT_STATUS;
     QString accountId = nodeTree.at(1);
     AccountOptionsWidget *widget = new AccountOptionsWidget(accountId);
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
