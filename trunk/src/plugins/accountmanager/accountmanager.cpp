@@ -84,14 +84,14 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
 bool AccountManager::initObjects()
 {
   FSettings = FSettingsPlugin->settingsForPlugin(ACCOUNTMANAGER_UUID);
-  FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"),tr("Creating and removing accounts"),MNI_ACCOUNT_LIST);
+  FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"),tr("Creating and removing accounts"),MNI_ACCOUNT_LIST,ONO_ACCOUNTS);
   FSettingsPlugin->insertOptionsHolder(this);
   return true;
 }
 
 QWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder)
 {
-  AOrder = OO_ACCOUNT_OPTIONS;
+  AOrder = OWO_ACCOUNT_OPTIONS;
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
   if (ANode == ON_ACCOUNTS)
   {
@@ -220,7 +220,7 @@ void AccountManager::openAccountOptionsNode(const QString &AAccountId, const QSt
   QString name = AName;
   if (name.isEmpty())
     name = FAccounts.contains(AAccountId) ? FAccounts.value(AAccountId)->name() : tr("<Empty>");
-  FSettingsPlugin->openOptionsNode(node,name,tr("Account details and connection options"),MNI_ACCOUNT);
+  FSettingsPlugin->openOptionsNode(node,name,tr("Account details and connection options"),MNI_ACCOUNT,ONO_ACCOUNTS);
 }
 
 void AccountManager::closeAccountOptionsNode(const QString &AAccountId)

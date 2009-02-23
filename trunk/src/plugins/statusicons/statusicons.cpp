@@ -99,7 +99,7 @@ bool StatusIcons::initObjects()
 
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_STATUSICONS,tr("Status icons"),tr("Configure status icons"),MNI_STATUSICONS_OPTIONS);
+    FSettingsPlugin->openOptionsNode(ON_STATUSICONS,tr("Status icons"),tr("Configure status icons"),MNI_STATUSICONS_OPTIONS,ONO_STATUSICONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
 
@@ -114,7 +114,7 @@ QWidget *StatusIcons::optionsWidget(const QString &ANode, int &AOrder)
 {
   if (ANode == ON_STATUSICONS)
   {
-    AOrder = OO_STATUSICONS;
+    AOrder = OWO_STATUSICONS;
     FIconsOptionWidget = new IconsOptionsWidget(this);
     return FIconsOptionWidget;
   }

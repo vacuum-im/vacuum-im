@@ -168,7 +168,7 @@ QWidget *RosterChanger::optionsWidget(const QString &ANode, int &AOrder)
 {
   if (ANode == ON_ROSTER)
   {
-    AOrder = OO_ROSTERCHENGER;
+    AOrder = OWO_ROSTER_CHENGER;
     SubscriptionOptions *widget = new SubscriptionOptions(this);
     connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
     connect(widget,SIGNAL(applied()),SIGNAL(optionsAccepted()));

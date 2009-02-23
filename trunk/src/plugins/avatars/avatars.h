@@ -10,7 +10,7 @@
 #include "../../definations/rosterdataholderorders.h"
 #include "../../definations/tooltiporders.h"
 #include "../../definations/optionnodes.h"
-#include "../../definations/optionorders.h"
+#include "../../definations/optionwidgetorders.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"

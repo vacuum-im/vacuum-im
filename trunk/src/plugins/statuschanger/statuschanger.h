@@ -9,7 +9,7 @@
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/optionnodes.h"
-#include "../../definations/optionorders.h"
+#include "../../definations/optionwidgetorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/accountvaluenames.h"
 #include "../../definations/rosterfootertextorder.h"

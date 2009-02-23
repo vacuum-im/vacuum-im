@@ -303,7 +303,7 @@ QWidget *ClientInfo::optionsWidget(const QString &ANode, int &AOrder)
 {
   if (ANode == ON_ROSTER)
   {
-    AOrder = OO_CLIENTINFO;
+    AOrder = OWO_ROSTER_CLIENTINFO;
     FOptionsWidget = new OptionsWidget(this);
     return FOptionsWidget;
   }

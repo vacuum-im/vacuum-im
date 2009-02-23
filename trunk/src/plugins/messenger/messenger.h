@@ -8,6 +8,8 @@
 #include "../../definations/rosterclickhookerorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/optionnodes.h"
+#include "../../definations/optionnodeorders.h"
+#include "../../definations/optionwidgetorders.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/stanzahandlerpriority.h"
 #include "../../definations/resources.h"

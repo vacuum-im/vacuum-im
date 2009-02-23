@@ -182,7 +182,7 @@ bool MessageArchiver::initObjects()
   }
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_HISTORY,tr("History"),tr("Common history settings"),MNI_HISTORY);
+    FSettingsPlugin->openOptionsNode(ON_HISTORY,tr("History"),tr("Common history settings"),MNI_HISTORY,ONO_HISTORY);
   }
   return true;
 }
@@ -457,7 +457,7 @@ void MessageArchiver::iqStanzaTimeOut(const QString &AId)
 
 QWidget *MessageArchiver::optionsWidget(const QString &ANode, int &AOrder)
 {
-  AOrder = OO_HISTORY;
+  AOrder = OWO_HISTORY;
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
   if (nodeTree.count()==2 && nodeTree.at(0)==ON_HISTORY)
   {
@@ -1896,7 +1896,7 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
   if (FSettingsPlugin && account)
   {
     QString node = ON_HISTORY"::"+account->accountId();
-    FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),MNI_HISTORY);
+    FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),MNI_HISTORY,ONO_HISTORY);
   }
 }
 
