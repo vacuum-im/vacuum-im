@@ -24,6 +24,7 @@ Gateways::Gateways()
   FVCardPlugin = NULL;
   FPrivateStorage = NULL;
   FStatusIcons = NULL;
+  FRegistration = NULL;
 
   FKeepTimer.setSingleShot(false);
   connect(&FKeepTimer,SIGNAL(timeout()),SLOT(onKeepTimerTimeout()));
@@ -124,6 +125,19 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
   plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+
+  plugin = APluginManager->getPlugins("IRegistration").value(0,NULL);
+  if (plugin)
+  {
+    FRegistration = qobject_cast<IRegistration *>(plugin->instance());
+    if (FRegistration)
+    {
+      connect(FRegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
+        SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
+      connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
+        SLOT(onRegisterError(const QString &, const QString &)));
+    }
+  }
 
   return FStanzaProcessor!=NULL;
 }
@@ -309,13 +323,17 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
     IRosterItem ritemOld = roster->rosterItem(AServiceFrom);
     IRosterItem ritemNew = roster->rosterItem(AServiceTo);
 
-    //Удаляем подписку у старого транспорта
-    if (ritemOld.isValid && !ARemove)
-      FRosterChanger->unsubscribeContact(AStreamJid,AServiceFrom,"",true);
-
     //Разлогиниваемся на старом транспорте
     if (!presence->presenceItems(AServiceFrom).isEmpty())
       sendLogPresence(AStreamJid,AServiceFrom,false);
+    
+    //Удаляем регистрацию на старом транспорте
+    if (FRegistration && ARemove)
+      FRegistration->sendUnregiterRequest(AStreamJid,AServiceFrom);
+
+    //Удаляем подписку у старого транспорта
+    if (ritemOld.isValid && !ARemove)
+      FRosterChanger->unsubscribeContact(AStreamJid,AServiceFrom,"",true);
 
     //Добавляем контакты нового транспорта и удаляем старые
     QList<IRosterItem> newItems, oldItems, curItems;
@@ -508,7 +526,12 @@ void Gateways::onChangeActionTriggered(bool)
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     Jid serviceFrom = action->data(ADR_SERVICE_JID).toString();
     Jid serviceTo = action->data(ADR_NEW_SERVICE_JID).toString();
-    changeService(streamJid,serviceFrom,serviceTo,true,true);
+    if (changeService(streamJid,serviceFrom,serviceTo,true,true))
+    {
+      QString id = FRegistration!=NULL ?  FRegistration->sendRegiterRequest(streamJid,serviceTo) : QString::null;
+      if (!id.isEmpty())
+        FRegisterRequests.insert(id,streamJid);
+    }
   }
 }
 
@@ -621,6 +644,25 @@ void Gateways::onRosterOpened(IRoster *ARoster)
   }
 }
 
+void Gateways::onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &/*AText*/)
+{
+  if (ASubsType==IRoster::Subscribed && FSubscribeServices.contains(ARoster->streamJid(),AItemJid))
+  {
+    sendLogPresence(ARoster->streamJid(),AItemJid,true);
+  }
+}
+
+void Gateways::onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &/*AAfter*/)
+{
+  FKeepConnections.remove(ARoster->streamJid());
+  FPrivateStorageKeep.remove(ARoster->streamJid());
+}
+
+void Gateways::onPrivateStorateOpened(const Jid &AStreamJid)
+{
+  FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_SUBSCRIBE);
+}
+
 void Gateways::onPrivateStorageLoaded(const QString &/*AId*/, const Jid &AStreamJid, const QDomElement &AElement)
 {
   if (AElement.tagName() == PST_GATEWAYS_SERVICES && AElement.namespaceURI() == PSN_GATEWAYS_KEEP)
@@ -658,29 +700,14 @@ void Gateways::onPrivateStorageLoaded(const QString &/*AId*/, const Jid &AStream
     QDomElement elem = AElement.firstChildElement("service");
     while (!elem.isNull())
     {
-      FSubscribeServices.insertMulti(AStreamJid,elem.text());
+      Jid serviceJid = elem.text();
+      FSubscribeServices.insertMulti(AStreamJid,serviceJid);
+      QString id = FRegistration!=NULL ? FRegistration->sendRegiterRequest(AStreamJid,serviceJid) : QString::null;
+      if (!id.isEmpty())
+        FRegisterRequests.insert(id,AStreamJid);
       elem = elem.nextSiblingElement("service");
     }
   }
-}
-
-void Gateways::onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &/*AText*/)
-{
-  if (ASubsType==IRoster::Subscribed && FSubscribeServices.contains(ARoster->streamJid(),AItemJid))
-  {
-    sendLogPresence(ARoster->streamJid(),AItemJid,true);
-  }
-}
-
-void Gateways::onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &/*AAfter*/)
-{
-  FKeepConnections.remove(ARoster->streamJid());
-  FPrivateStorageKeep.remove(ARoster->streamJid());
-}
-
-void Gateways::onPrivateStorateOpened(const Jid &AStreamJid)
-{
-  FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_SUBSCRIBE);
 }
 
 void Gateways::onKeepTimerTimeout()
@@ -764,6 +791,21 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
       }
     }
   }
+}
+
+void Gateways::onRegisterFields(const QString &AId, const IRegisterFields &AFields)
+{
+  if (FRegisterRequests.contains(AId))
+  {
+    Jid streamJid = FRegisterRequests.take(AId);
+    if (!AFields.registered && FSubscribeServices.contains(streamJid,AFields.serviceJid))
+      FRegistration->showRegisterDialog(streamJid,AFields.serviceJid,IRegistration::Register);
+  }
+}
+
+void Gateways::onRegisterError(const QString &AId, const QString &/*AError*/)
+{
+  FRegisterRequests.remove(AId);
 }
 
 Q_EXPORT_PLUGIN2(GatewaysPlugin, Gateways)

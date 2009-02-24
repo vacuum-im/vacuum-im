@@ -54,54 +54,54 @@
 <context>
     <name>Gateways</name>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="40"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="41"/>
         <source>Plugin for interactions between Jabber clients and client proxy gateways to legacy IM services</source>
         <translation>Плагин для взаимодействия месжду Jabber-клиентами и другими IM-системами посредством транспортов</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="409"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="427"/>
         <source>Gateway Interaction</source>
         <translation>Взаимодействие с транспортами</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="203"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="217"/>
         <source>Add Legacy User</source>
         <translation>Доабвить пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="533"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="556"/>
         <source>Log Out</source>
         <translation>Отключить</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="410"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="428"/>
         <source>Enables a client to send a legacy username to the gateway and receive a properly-formatted JID</source>
         <translation>Позволяет отправить имя пользовате сторонней системы на транспорт и  получить соответствующий Jabber ID</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="524"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="547"/>
         <source>Log In</source>
         <translation>Подключить</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="544"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="567"/>
         <source>Keep connection</source>
         <translation>Поддерживать соединение</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="564"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="587"/>
         <source>Resolve nick names</source>
         <translation>Определить все ники</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="564"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="587"/>
         <source>Resolve nick name</source>
         <translation>Определить ник</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="747"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="774"/>
         <source>Use instead of</source>
-        <translation>Заменить на</translation>
+        <translation>Использовать вместо</translation>
     </message>
 </context>
 </TS>

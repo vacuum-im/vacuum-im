@@ -21,6 +21,7 @@
 #include "../../interfaces/ivcard.h"
 #include "../../interfaces/iprivatestorage.h"
 #include "../../interfaces/istatusicons.h"
+#include "../../interfaces/iregistraton.h"
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 #include "../../utils/action.h"
@@ -92,6 +93,8 @@ protected slots:
   void onVCardError(const Jid &AContactJid, const QString &AError);
   void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
   void onDiscoItemContextMenu(const QModelIndex AIndex, Menu *AMenu);
+  void onRegisterFields(const QString &AId, const IRegisterFields &AFields);
+  void onRegisterError(const QString &AId, const QString &AError);
 private:
   IServiceDiscovery *FDiscovery;
   IStanzaProcessor *FStanzaProcessor;
@@ -102,12 +105,14 @@ private:
   IVCardPlugin *FVCardPlugin;
   IPrivateStorage *FPrivateStorage;
   IStatusIcons *FStatusIcons;
+  IRegistration *FRegistration;
 private:
   QTimer FKeepTimer;
 private:
   QString FKeepRequest;
   QList<QString> FPromptRequests;
   QList<QString> FUserJidRequests;
+  QHash<QString, Jid> FRegisterRequests;
   QMultiHash<Jid, Jid> FResolveNicks;
   QMultiHash<Jid, Jid> FSubscribeServices;
   QMultiHash<Jid, Jid> FKeepConnections;
