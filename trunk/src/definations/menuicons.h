@@ -122,7 +122,6 @@
 #define MNI_REGISTERATION_CHANGE        "registerChange"
 
 //RosterChanger
-#define MNI_RCHANGER_NOTIFY             "rchangerNotify"
 #define MNI_RCHANGER_ADD_CONTACT        "rchangerAddContact"
 #define MNI_RCHANGER_GROUP              "rchangerGroup"
 #define MNI_RCHANGER_ROOT_GROUP         "rchangerRootGroup"
@@ -135,7 +134,7 @@
 #define MNI_RCHANGER_REMOVE_FROM_GROUP  "rchangerRemoveFromGroup"
 #define MNI_RCHANGER_REMOVE_CONTACT     "rchangerRemoveContact"
 #define MNI_RCHANGER_REMOVE_CONTACTS    "rchangerRemoveContacts"
-#define MNI_RCHANGER_SUBSCR             "rchangerSubscription"
+#define MNI_RCHANGER_SUBSCRIBTION       "rchangerSubscription"
 #define MNI_RCHANGER_SUBSCRIBE          "rchangerSubscribe"
 #define MNI_RCHANGER_UNSUBSCRIBE        "rchangerUnsubscribe"
 #define MNI_RCHANGER_SUBSCR_SEND        "rchangerSubscriptionSend"
