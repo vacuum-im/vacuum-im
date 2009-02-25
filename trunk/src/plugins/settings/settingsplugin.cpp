@@ -90,6 +90,9 @@ bool SettingsPlugin::initObjects()
     FTrayManager->addAction(FProfileMenu->menuAction(),AG_SETTINGS_TRAY,true);
   }
 
+  insertOptionsHolder(this);
+  openOptionsNode(ON_MISC,tr("Misc"),tr("Extra options"),MNI_SETTINGS_OPTIONS,ONO_MISC);
+
   QStringList args = qApp->arguments();
   int homeDirIndex = args.indexOf(CLO_HOME_DIR);
   FHomeDir = homeDirIndex >0 ? QDir(args.value(homeDirIndex+1)) : QDir::home();
@@ -139,6 +142,21 @@ bool SettingsPlugin::initSettings()
     qDebug() << "CANT INITIALIZE SETTINGS";
 
   return true;
+}
+
+//IOptionsHolder
+QWidget *SettingsPlugin::optionsWidget(const QString &ANode, int &AOrder)
+{
+  if (ANode == ON_MISC)
+  {
+    AOrder = OWO_MISC;
+    MiscOptionsWidget *widget = new MiscOptionsWidget;
+    connect(this,SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(widget,SIGNAL(applied()),this,SIGNAL(optionsAccepted()));
+    connect(this,SIGNAL(optionsDialogRejected()),this,SIGNAL(optionsRejected()));
+    return widget;
+  }
+  return NULL;
 }
 
 //ISettingsPlugin

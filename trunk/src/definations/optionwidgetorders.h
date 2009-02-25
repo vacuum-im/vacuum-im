@@ -25,4 +25,7 @@
 //Node = ON_NOTIFICATIONS
 #define OWO_NOTIFICATIONS                         500
 
+//Node = ON_MISC
+#define OWO_MISC                                  500
+
 #endif

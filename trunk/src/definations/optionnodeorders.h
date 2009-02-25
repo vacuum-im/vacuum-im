@@ -9,5 +9,6 @@
 #define ONO_EMOTICONS             600
 #define ONO_STATUSICONS           700
 #define ONO_AUTO_STATUS           800
+#define ONO_MISC                  900
 
 #endif

@@ -10,6 +10,9 @@
 #include "../../definations/commandline.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
+#include "../../definations/optionnodes.h"
+#include "../../definations/optionnodeorders.h"
+#include "../../definations/optionwidgetorders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/imainwindow.h"
@@ -18,14 +21,16 @@
 #include "settings.h"
 #include "optionsdialog.h"
 #include "profiledialog.h"
+#include "miscoptionswidget.h"
 
 class SettingsPlugin : 
   public QObject,
   public IPlugin,
-  public ISettingsPlugin
+  public ISettingsPlugin,
+  public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin ISettingsPlugin);
+	Q_INTERFACES(IPlugin ISettingsPlugin IOptionsHolder);
 public:
   SettingsPlugin();
   ~SettingsPlugin();
@@ -37,6 +42,8 @@ public:
   virtual bool initObjects();
   virtual bool initSettings();
   virtual bool startPlugin() { return true; }
+  //IOptionsHolder
+  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //ISettings
     //Profiles
   virtual bool isProfilesValid() const { return !FProfiles.isNull(); }
@@ -74,6 +81,9 @@ signals:
   virtual void optionsDialogAccepted();
   virtual void optionsDialogRejected();
   virtual void optionsDialogClosed();
+signals:
+  virtual void optionsAccepted();
+  virtual void optionsRejected();
 protected:
   QWidget *createNodeWidget(const QString &ANode);
   void setProfileOpened();
