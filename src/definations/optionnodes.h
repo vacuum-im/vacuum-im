@@ -9,5 +9,6 @@
 #define ON_HISTORY            "History"
 #define ON_NOTIFICATIONS      "Notifications"
 #define ON_AUTO_STATUS        "AutoStatus"
+#define ON_MISC               "Misc"
 
 #endif

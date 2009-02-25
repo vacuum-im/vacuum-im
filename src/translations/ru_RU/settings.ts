@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru_RU">
 <context>
+    <name>MiscOptionsWidgetClass</name>
+    <message>
+        <location filename="../../plugins/settings/miscoptionswidget.ui" line="19"/>
+        <source>Autorun on system startup</source>
+        <translation>Автоматически запустать при старте системы</translation>
+    </message>
+</context>
+<context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../../plugins/settings/optionsdialog.cpp" line="15"/>
+        <location filename="../../plugins/settings/optionsdialog.cpp" line="30"/>
         <source>Options</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../../plugins/settings/optionsdialog.cpp" line="252"/>
+        <location filename="../../plugins/settings/optionsdialog.cpp" line="290"/>
         <source>No Settings Available</source>
         <translation>Нет допустимых настроек</translation>
     </message>
@@ -100,6 +108,16 @@
         <location filename="../../plugins/settings/settingsplugin.cpp" line="77"/>
         <source>Edit profiles...</source>
         <translation>Редактировать профили...</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/settings/settingsplugin.cpp" line="94"/>
+        <source>Misc</source>
+        <translation>Разное</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/settings/settingsplugin.cpp" line="94"/>
+        <source>Extra options</source>
+        <translation>Дополнительные настройки</translation>
     </message>
 </context>
 </TS>
