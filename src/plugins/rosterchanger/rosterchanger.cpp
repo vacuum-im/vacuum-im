@@ -455,7 +455,7 @@ void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       
       Menu *subsMenu = new Menu(AMenu);
       subsMenu->setTitle(tr("Subscription"));
-      subsMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_SUBSCR);
+      subsMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_SUBSCRIBTION);
 
       Action *action = new Action(subsMenu);
       action->setText(tr("Subscribe contact"));
@@ -653,7 +653,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
   if (FNotifications)
   {
     notify.kinds = INotifications::EnablePopupWindows;
-    notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RCHANGER_NOTIFY));
+    notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RCHANGER_SUBSCRIBTION));
     notify.data.insert(NDR_TOOLTIP,tr("Subscription message from %1").arg(FNotifications->contactName(ARoster->streamJid(),AContactJid)));
     notify.data.insert(NDR_ROSTER_STREAM_JID,ARoster->streamJid().full());
     notify.data.insert(NDR_ROSTER_CONTACT_JID,AContactJid.full());

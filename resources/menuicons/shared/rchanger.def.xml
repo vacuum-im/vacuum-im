@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <icondef>
   <icon>
-    <key>rchangerNotify</key>
-    <object mime="image/png">rchangernotify.png</object>
-  </icon>
-  <icon>
     <key>rchangerAddContact</key>
     <object mime="image/png">rchangeraddcontact.png</object>
   </icon>
