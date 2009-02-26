@@ -6,6 +6,9 @@
 #define MNI_ACCOUNT_LIST                "accountList"
 #define MNI_ACCOUNT_CHANGE              "accountChange"
 
+//Annotations
+#define MNI_ANNOTATIONS                 "annotations"
+
 //Autostatus
 #define MNI_AUTOSTATUS                  "autostatus"
 
