@@ -219,11 +219,8 @@ void DiscoItemsWindow::updateActionsBar()
 
 void DiscoItemsWindow::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
-  QModelIndex index = ui.trvItems->currentIndex();
-  if (ADiscoInfo.contactJid==index.data(DDR_JID).toString() && ADiscoInfo.node==index.data(DDR_NODE).toString())
-  {
+  if (ADiscoInfo.contactJid == ui.trvItems->currentIndex().data(DDR_JID).toString())
     updateActionsBar();
-  }
 }
 
 void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)

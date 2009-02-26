@@ -64,7 +64,7 @@
         <translation>Плагин для отображения и выполнения команд приложения</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="432"/>
+        <location filename="../../plugins/commands/commands.cpp" line="440"/>
         <source>Ad-Hoc Commands</source>
         <translation>Ad-Hoc Команды</translation>
     </message>
@@ -109,9 +109,14 @@
         <translation>Команды</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="433"/>
+        <location filename="../../plugins/commands/commands.cpp" line="441"/>
         <source>Advertising and executing application-specific commands</source>
         <translation>Отображение и выполнение команд приложения</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/commands/commands.cpp" line="324"/>
+        <source>Request commands</source>
+        <translation>Запросить команды</translation>
     </message>
 </context>
 </TS>

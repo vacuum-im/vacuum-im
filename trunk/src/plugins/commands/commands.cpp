@@ -294,7 +294,7 @@ Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
         return action;
       }
     }
-    else
+    else if (FDiscovery->hasDiscoItems(ADiscoInfo.contactJid,NS_COMMANDS))
     {
       Menu *execMenu = new Menu(AParent);
       execMenu->setTitle(tr("Commands"));
@@ -313,12 +313,20 @@ Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
           execMenu->addAction(action,AG_DEFAULT,false);
         }
       }
-      if (execMenu->isEmpty())
-      {
+      if (!execMenu->isEmpty())
+        return execMenu->menuAction();
+      else
         delete execMenu;
-        return NULL;
-      }
-      return execMenu->menuAction();
+    }
+    else if (ADiscoInfo.features.contains(NS_COMMANDS))
+    {
+      Action *action = new Action(AParent);
+      action->setText(tr("Request commands"));
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_COMMANDS);
+      action->setData(ADR_STREAM_JID,AStreamJid.full());
+      action->setData(ADR_COMMAND_JID,ADiscoInfo.contactJid.full());
+      connect(action,SIGNAL(triggered(bool)),SLOT(onRequestActionTriggered(bool)));
+      return action;
     }
   }
   return NULL;
@@ -446,9 +454,20 @@ void Commands::onExecuteActionTriggered(bool)
   }
 }
 
+void Commands::onRequestActionTriggered(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    Jid streamJid = action->data(ADR_STREAM_JID).toString();
+    Jid commandJid = action->data(ADR_COMMAND_JID).toString();
+    FDiscovery->requestDiscoItems(streamJid,commandJid,NS_COMMANDS);
+  }
+}
+
 void Commands::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
-  if (AInfo.contactJid.node().isEmpty())
+  if (!AInfo.identity.isEmpty() && AInfo.identity.at(0).category!="client")
     if (AInfo.features.contains(NS_COMMANDS) && !FDiscovery->hasDiscoItems(AInfo.contactJid,NS_COMMANDS))
       FDiscovery->requestDiscoItems(AInfo.streamJid,AInfo.contactJid,NS_COMMANDS);
 }

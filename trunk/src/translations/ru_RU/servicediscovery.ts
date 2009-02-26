@@ -147,7 +147,7 @@
         <translation>vCard</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="347"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="344"/>
         <source>Service Discovery - %1</source>
         <translation>Обзор сервисов - %1</translation>
     </message>
