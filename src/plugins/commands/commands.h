@@ -68,6 +68,7 @@ protected:
   void registerDiscoFeatures();
 protected slots:
   void onExecuteActionTriggered(bool);
+  void onRequestActionTriggered(bool);
   void onDiscoInfoReceived(const IDiscoInfo &AInfo);
   void onPresenceAdded(IPresence *APresence);
   void onPresenceRemoved(IPresence *APresence);
