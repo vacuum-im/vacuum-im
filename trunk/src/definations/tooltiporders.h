@@ -13,6 +13,7 @@
 #define TTO_SOFTWARE_INFO                         400
 #define TTO_LAST_ACTIVITY                         500
 #define TTO_ENTITY_TIME                           600
+#define TTO_ANNOTATIONS                           1000
 
 //Privacy label
 #define TTO_PRIVACY                               100

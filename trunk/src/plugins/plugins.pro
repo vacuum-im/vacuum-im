@@ -40,4 +40,5 @@ SUBDIRS = settings \
           notifications \
           autostatus \
           rostersearch \
-          console
+          console \
+          annotations
