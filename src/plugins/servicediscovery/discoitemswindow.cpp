@@ -88,6 +88,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
     SLOT(onCurrentIndexChanged(const QModelIndex &, const QModelIndex &)));
 
   connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+  connect(FDiscovery->instance(),SIGNAL(discoItemsReceived(const IDiscoItems &)),SLOT(onDiscoItemsReceived(const IDiscoItems &)));
   connect(FDiscovery->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),SLOT(onStreamJidChanged(const Jid &, const Jid &)));
 
   initialize();
@@ -220,6 +221,12 @@ void DiscoItemsWindow::updateActionsBar()
 void DiscoItemsWindow::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
   if (ADiscoInfo.contactJid == ui.trvItems->currentIndex().data(DDR_JID).toString())
+    updateActionsBar();
+}
+
+void DiscoItemsWindow::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
+{
+  if (ADiscoItems.contactJid == ui.trvItems->currentIndex().data(DDR_JID).toString())
     updateActionsBar();
 }
 

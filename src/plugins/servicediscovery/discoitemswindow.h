@@ -54,6 +54,7 @@ protected:
   void updateActionsBar();
 protected slots:
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
+  void onDiscoItemsReceived(const IDiscoItems &ADiscoItems);
   void onViewContextMenu(const QPoint &APos);
   void onCurrentIndexChanged(QModelIndex ACurrent, QModelIndex APrevious);
   void onToolBarActionTriggered(bool);

@@ -99,6 +99,10 @@ QVariant DiscoItemsModel::data(const QModelIndex &AIndex, int ARole) const
     {
     case COL_NAME:
       return index->toolTip;
+    case COL_JID:
+      return index->itemJid.full();
+    case COL_NODE:
+      return index->itemNode;
     }
     break;
   case DDR_NAME:
