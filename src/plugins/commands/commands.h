@@ -70,7 +70,9 @@ protected slots:
   void onExecuteActionTriggered(bool);
   void onRequestActionTriggered(bool);
   void onDiscoInfoReceived(const IDiscoInfo &AInfo);
+  void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
   void onPresenceAdded(IPresence *APresence);
+  void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
   void onPresenceRemoved(IPresence *APresence);
 private:
   IDataForms *FDataForms;
