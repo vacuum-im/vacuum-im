@@ -1,4 +1,5 @@
 #include "commands.h"
+#include <QtDebug>
 
 #define COMMAND_TAG_NAME              "command"
 #define COMMANDS_TIMEOUT              60000
@@ -43,6 +44,7 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     if (FDiscovery)
     {
       connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+      connect(FDiscovery->instance(),SIGNAL(discoInfoRemoved(const IDiscoInfo &)),SLOT(onDiscoInfoRemoved(const IDiscoInfo &)));
     }
   }
 
@@ -61,6 +63,8 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     if (FPresencePlugin)
     {
       connect(FPresencePlugin->instance(),SIGNAL(presenceAdded(IPresence *)),SLOT(onPresenceAdded(IPresence *)));
+      connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),
+        SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
       connect(FPresencePlugin->instance(),SIGNAL(presenceRemoved(IPresence *)),SLOT(onPresenceRemoved (IPresence *)));
     }
   }
@@ -467,15 +471,41 @@ void Commands::onRequestActionTriggered(bool)
 
 void Commands::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
-  if (!AInfo.identity.isEmpty() && AInfo.identity.at(0).category!="client")
+  if (AInfo.node.isEmpty() && !AInfo.identity.isEmpty() && AInfo.identity.at(0).category!="client")
     if (AInfo.features.contains(NS_COMMANDS) && !FDiscovery->hasDiscoItems(AInfo.contactJid,NS_COMMANDS))
       FDiscovery->requestDiscoItems(AInfo.streamJid,AInfo.contactJid,NS_COMMANDS);
+}
+
+void Commands::onDiscoInfoRemoved(const IDiscoInfo &AInfo)
+{
+  if (AInfo.node.isEmpty())
+    FDiscovery->removeDiscoItems(AInfo.contactJid,NS_COMMANDS);
 }
 
 void Commands::onPresenceAdded(IPresence *APresence)
 {
   int handler = FStanzaProcessor->insertHandler(this,SHC_COMMANDS,IStanzaProcessor::DirectionIn,SHP_DEFAULT,APresence->streamJid());
   FStanzaHandlers.insert(handler,APresence);
+}
+
+void Commands::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
+{
+  if (FDiscovery)
+  {
+    if (AContactJid.node().isEmpty())
+    {
+      IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+      bool isOnline = AStateOnline || presence==NULL || (presence->show()!=IPresence::Offline && presence->show()!=IPresence::Error);
+      if (isOnline && FDiscovery->discoInfo(AContactJid).features.contains(NS_COMMANDS))
+        FDiscovery->requestDiscoItems(AStreamJid,AContactJid,NS_COMMANDS);
+    }
+    else if (AStateOnline)
+    {
+      IDiscoInfo info = FDiscovery->discoInfo(AContactJid);
+      if (!info.identity.isEmpty() && info.identity.at(0).category!="client" && info.features.contains(NS_COMMANDS))
+        FDiscovery->requestDiscoItems(AStreamJid,AContactJid,NS_COMMANDS);
+    }
+  }
 }
 
 void Commands::onPresenceRemoved(IPresence *APresence)
