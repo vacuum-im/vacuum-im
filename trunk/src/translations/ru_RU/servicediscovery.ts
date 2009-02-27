@@ -64,47 +64,47 @@
 <context>
     <name>DiscoItemsModel</name>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="123"/>
+        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="127"/>
         <source>Name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="125"/>
+        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="129"/>
         <source>Jid</source>
         <translation>JID</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="127"/>
+        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="131"/>
         <source>Node</source>
         <translation>Узел</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="231"/>
+        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="235"/>
         <source>&lt;li&gt;&lt;b&gt;Identity:&lt;/b&gt;&lt;/li&gt;</source>
         <translation>&lt;li&gt;&lt;b&gt;Элемент:&lt;/b&gt;&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="233"/>
+        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="237"/>
         <source>&lt;li&gt;%1 (Category: &apos;%2&apos;; Type: &apos;%3&apos;)&lt;/li&gt;</source>
         <translation>&lt;li&gt;%1 (Категория: &apos;%2&apos;; Тип: &apos;%3&apos;)&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="240"/>
+        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="244"/>
         <source>&lt;li&gt;&lt;b&gt;Features:&lt;/b&gt;&lt;/li&gt;</source>
         <translation>&lt;li&gt;&lt;b&gt;Возможности:&lt;/b&gt;&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="262"/>
+        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="266"/>
         <source>true</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="262"/>
+        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="266"/>
         <source>false</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="272"/>
+        <location filename="../../plugins/servicediscovery/discoitemsmodel.cpp" line="276"/>
         <source>Error %1: %2</source>
         <translation>Ошибка %1: %2</translation>
     </message>
@@ -112,42 +112,42 @@
 <context>
     <name>DiscoItemsWindow</name>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="144"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="145"/>
         <source>Back</source>
         <translation>Назад</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="150"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="151"/>
         <source>Forward</source>
         <translation>Вперед</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="156"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="157"/>
         <source>Discover</source>
         <translation>Обзор</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="162"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="163"/>
         <source>Reload</source>
         <translation>Обновить</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="168"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="169"/>
         <source>Disco info</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="174"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="175"/>
         <source>Add Contact</source>
         <translation>Добавить контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="180"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="181"/>
         <source>vCard</source>
         <translation>vCard</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="344"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="351"/>
         <source>Service Discovery - %1</source>
         <translation>Обзор сервисов - %1</translation>
     </message>
