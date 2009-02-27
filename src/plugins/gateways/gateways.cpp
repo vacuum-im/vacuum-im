@@ -445,7 +445,7 @@ void Gateways::savePrivateStorageKeep(const Jid &AStreamJid)
 
 void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
 {
-  if (FPrivateStorage && FSubscribeServices.contains(AStreamJid))
+  if (FPrivateStorage)
   {
     QDomDocument doc;
     doc.appendChild(doc.createElement("services"));
