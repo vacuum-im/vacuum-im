@@ -8,9 +8,14 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#define TIR_STATUSID            Qt::UserRole
-#define TIR_DELEGATE            Qt::UserRole + 1
-#define TIR_VALUE               Qt::UserRole + 2
+#define TIR_STATUSID    Qt::UserRole
+#define TIR_DELEGATE    Qt::UserRole + 1
+#define TIR_VALUE       Qt::UserRole + 2
+
+#define COL_SHOW        0
+#define COL_NAME        1
+#define COL_MESSAGE     2
+#define COL_PRIORITY    3
 
 Delegate::Delegate(IStatusChanger *AStatusChanger, QObject *AParent) : QItemDelegate(AParent)
 {
@@ -22,10 +27,6 @@ QWidget *Delegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AO
   DelegateType type = (DelegateType)AIndex.data(TIR_DELEGATE).toInt();
   switch(type)
   {
-  case DelegateIcon: 
-    {
-      return NULL;
-    }
   case DelegateShow: 
     {
       QComboBox *comboBox = new QComboBox(AParent);
@@ -143,8 +144,8 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 
   FStatusChanger = AStatusChanger;
   
-  tblStatus->setColumnCount(5);
-  tblStatus->setHorizontalHeaderLabels(QStringList() <<tr("Icon")<<tr("Name")<<tr("Show")<<tr("Message")<<tr("Priority"));
+  tblStatus->setColumnCount(4);
+  tblStatus->setHorizontalHeaderLabels(QStringList() << tr("Show") << tr("Name") << tr("Message") << tr("Priority"));
   tblStatus->setSelectionBehavior(QAbstractItemView::SelectRows);
   tblStatus->setSelectionMode(QAbstractItemView::SingleSelection);
   tblStatus->verticalHeader()->hide();
@@ -156,7 +157,7 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
   QMultiMap<QString,int> statusOrdered;
   foreach (int statusId, statuses)
   {
-    if (statusId > NULL_STATUS_ID)
+    if (statusId > STATUS_NULL_ID)
     {
       RowStatus *status = new RowStatus;
       status->id = statusId;
@@ -164,9 +165,6 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
       status->show = FStatusChanger->statusItemShow(statusId);
       status->priority = FStatusChanger->statusItemPriority(statusId);
       status->text = FStatusChanger->statusItemText(statusId);
-      status->icon = FStatusChanger->statusItemIcon(statusId);
-      if (status->icon.isNull())
-        status->icon = FStatusChanger->iconByShow(status->show);
       FStatusItems.insert(statusId,status);
 
       QString sortString = QString("%1-%2").arg(status->show!=IPresence::Offline ? status->show : 100,5,10,QChar('0')).arg(status->name);
@@ -179,63 +177,55 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 
     RowStatus *status = FStatusItems.value(statusId);
 
-    QTableWidgetItem *icon = new QTableWidgetItem;
-    icon->setData(Qt::DecorationRole, status->icon);
-    icon->setData(TIR_STATUSID,statusId);
-    icon->setData(TIR_DELEGATE,Delegate::DelegateIcon);
-    icon->setData(TIR_VALUE,status->icon);
-    tblStatus->setItem(row,0,icon);
+    QTableWidgetItem *show = new QTableWidgetItem;
+    show->setData(TIR_STATUSID,statusId);
+    show->setData(Qt::DisplayRole, FStatusChanger->nameByShow(status->show));
+    show->setData(Qt::DecorationRole, FStatusChanger->iconByShow(status->show));
+    show->setData(TIR_DELEGATE,Delegate::DelegateShow);
+    show->setData(TIR_VALUE,status->show);
+    tblStatus->setItem(row,COL_SHOW,show);
 
     QTableWidgetItem *name = new QTableWidgetItem;
     name->setData(Qt::DisplayRole, status->name);
     name->setData(TIR_DELEGATE,Delegate::DelegateName);
     name->setData(TIR_VALUE,status->name);
-    tblStatus->setItem(row,1,name);
-
-    QTableWidgetItem *show = new QTableWidgetItem;
-    show->setData(Qt::DisplayRole, FStatusChanger->nameByShow(status->show));
-    show->setData(Qt::DecorationRole, FStatusChanger->iconByShow(status->show));
-    show->setData(TIR_DELEGATE,Delegate::DelegateShow);
-    show->setData(TIR_VALUE,status->show);
-    tblStatus->setItem(row,2,show);
+    tblStatus->setItem(row,COL_NAME,name);
 
     QTableWidgetItem *message = new QTableWidgetItem;
     message->setData(Qt::DisplayRole, status->text);
     message->setData(TIR_DELEGATE,Delegate::DelegateMessage);
     message->setData(TIR_VALUE,status->text);
-    tblStatus->setItem(row,3,message);
+    tblStatus->setItem(row,COL_MESSAGE,message);
 
     QTableWidgetItem *priority = new QTableWidgetItem;
     priority->setTextAlignment(Qt::AlignCenter);
     priority->setData(Qt::DisplayRole, status->priority);
     priority->setData(TIR_DELEGATE,Delegate::DelegatePriority);
     priority->setData(TIR_VALUE,status->priority);
-    tblStatus->setItem(row,4,priority);
+    tblStatus->setItem(row,COL_PRIORITY,priority);
 
-    if (statusId > MAX_STANDART_STATUS_ID)
+    if (statusId > STATUS_MAX_STANDART_ID)
     {
-      icon->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
-      name->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
       show->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+      name->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
       message->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
       priority->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
     }
     else
     {
-      icon->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-      name->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
       show->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+      name->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
       message->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
       priority->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
     }
 
     row++;
   }
-  tblStatus->horizontalHeader()->setResizeMode(0,QHeaderView::ResizeToContents);
-  tblStatus->horizontalHeader()->setResizeMode(1,QHeaderView::ResizeToContents);
-  tblStatus->horizontalHeader()->setResizeMode(2,QHeaderView::ResizeToContents);
-  tblStatus->horizontalHeader()->setResizeMode(3,QHeaderView::Stretch);
-  tblStatus->horizontalHeader()->setResizeMode(4,QHeaderView::ResizeToContents);
+
+  tblStatus->horizontalHeader()->setResizeMode(COL_SHOW,QHeaderView::ResizeToContents);
+  tblStatus->horizontalHeader()->setResizeMode(COL_NAME,QHeaderView::ResizeToContents);
+  tblStatus->horizontalHeader()->setResizeMode(COL_MESSAGE,QHeaderView::Stretch);
+  tblStatus->horizontalHeader()->setResizeMode(COL_PRIORITY,QHeaderView::ResizeToContents);
   
   connect(pbtAdd,SIGNAL(clicked(bool)),SLOT(onAddbutton(bool)));
   connect(pbtDelete,SIGNAL(clicked(bool)),SLOT(onDeleteButton(bool)));
@@ -252,43 +242,37 @@ void EditStatusDialog::onAddbutton(bool)
   QString statusName = QInputDialog::getText(this,tr("Enter status name"),tr("Status name:"));
   if (!statusName.isEmpty())
   {
-    if (FStatusChanger->statusByName(statusName) == NULL_STATUS_ID)
+    if (FStatusChanger->statusByName(statusName) == STATUS_NULL_ID)
     {
       int row = tblStatus->rowCount();
       tblStatus->insertRow(row);
 
-      QTableWidgetItem *icon = new QTableWidgetItem;
-      icon->setData(Qt::DecorationRole, QIcon());
-      icon->setData(TIR_STATUSID,NULL_STATUS_ID);
-      icon->setData(TIR_DELEGATE,Delegate::DelegateIcon);
-      icon->setData(TIR_VALUE,QIcon());
-      tblStatus->setItem(row,0,icon);
+      QTableWidgetItem *show = new QTableWidgetItem;
+      show->setData(TIR_STATUSID,STATUS_NULL_ID);
+      show->setData(Qt::DisplayRole, FStatusChanger->nameByShow(IPresence::Online));
+      show->setData(Qt::DecorationRole, FStatusChanger->iconByShow(IPresence::Online));
+      show->setData(TIR_DELEGATE,Delegate::DelegateShow);
+      show->setData(TIR_VALUE,IPresence::Online);
+      tblStatus->setItem(row,COL_SHOW,show);
 
       QTableWidgetItem *name = new QTableWidgetItem;
       name->setData(Qt::DisplayRole, statusName);
       name->setData(TIR_DELEGATE,Delegate::DelegateName);
       name->setData(TIR_VALUE,statusName);
-      tblStatus->setItem(row,1,name);
-
-      QTableWidgetItem *show = new QTableWidgetItem;
-      show->setData(Qt::DisplayRole, FStatusChanger->nameByShow(IPresence::Online));
-      show->setData(Qt::DecorationRole, FStatusChanger->iconByShow(IPresence::Online));
-      show->setData(TIR_DELEGATE,Delegate::DelegateShow);
-      show->setData(TIR_VALUE,IPresence::Online);
-      tblStatus->setItem(row,2,show);
+      tblStatus->setItem(row,COL_NAME,name);
 
       QTableWidgetItem *message = new QTableWidgetItem;
       message->setData(Qt::DisplayRole, statusName);
       message->setData(TIR_DELEGATE,Delegate::DelegateMessage);
       message->setData(TIR_VALUE,statusName);
-      tblStatus->setItem(row,3,message);
+      tblStatus->setItem(row,COL_MESSAGE,message);
 
       QTableWidgetItem *priority = new QTableWidgetItem;
       priority->setTextAlignment(Qt::AlignCenter);
       priority->setData(Qt::DisplayRole, 30);
       priority->setData(TIR_DELEGATE,Delegate::DelegatePriority);
       priority->setData(TIR_VALUE,100);
-      tblStatus->setItem(row,4,priority);
+      tblStatus->setItem(row,COL_PRIORITY,priority);
 
       tblStatus->editItem(message);
     }
@@ -306,11 +290,11 @@ void EditStatusDialog::onDeleteButton(bool)
     if (tableItem->data(TIR_STATUSID).isValid())
     {
       int statusId = tableItem->data(TIR_STATUSID).toInt();
-      if (statusId == NULL_STATUS_ID)
+      if (statusId == STATUS_NULL_ID)
       {
         tblStatus->removeRow(tableItem->row());
       }
-      else if (statusId <= MAX_STANDART_STATUS_ID)
+      else if (statusId <= STATUS_MAX_STANDART_ID)
       {
         QMessageBox::information(this,tr("Can't delete status"),tr("You can not delete standard statuses."));
       }
@@ -343,10 +327,10 @@ void EditStatusDialog::onDialogButtonsBoxAccepted()
   {
     int statusId = tblStatus->item(i,0)->data(TIR_STATUSID).toInt();
     
-    QString name = tblStatus->item(i,1)->data(TIR_VALUE).toString();
-    int show = tblStatus->item(i,2)->data(TIR_VALUE).toInt();
-    QString text = tblStatus->item(i,3)->data(TIR_VALUE).toString();
-    int priority = tblStatus->item(i,4)->data(TIR_VALUE).toInt();
+    int show = tblStatus->item(i,COL_SHOW)->data(TIR_VALUE).toInt();
+    QString name = tblStatus->item(i,COL_NAME)->data(TIR_VALUE).toString();
+    QString text = tblStatus->item(i,COL_MESSAGE)->data(TIR_VALUE).toString();
+    int priority = tblStatus->item(i,COL_PRIORITY)->data(TIR_VALUE).toInt();
     
     RowStatus *status = FStatusItems.value(statusId,NULL);
     if (!status)

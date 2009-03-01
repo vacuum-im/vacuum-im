@@ -19,7 +19,7 @@ AutoStatus::AutoStatus()
   
   FRuleId = 1;
   FActiveRule = 0;
-  FAutoStatusId = NULL_STATUS_ID;
+  FAutoStatusId = STATUS_NULL_ID;
   FLastStatusId = STATUS_ONLINE;
   FLastCursorPos = QCursor::pos();
   FLastCursorTime = QDateTime::currentDateTime();
@@ -160,7 +160,7 @@ void AutoStatus::setActiveRule(int ARuleId)
     if (ARuleId>0 && FRules.contains(ARuleId))
     {
       IAutoStatusRule rule = FRules.value(ARuleId).rule;
-      if (FAutoStatusId == NULL_STATUS_ID)
+      if (FAutoStatusId == STATUS_NULL_ID)
       {
         FLastStatusId = FStatusChanger->mainStatus();
         FAutoStatusId = FStatusChanger->addStatusItem(tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(FLastStatusId));
@@ -175,7 +175,7 @@ void AutoStatus::setActiveRule(int ARuleId)
     {
       FStatusChanger->setStatus(FLastStatusId);
       FStatusChanger->removeStatusItem(FAutoStatusId);
-      FAutoStatusId = NULL_STATUS_ID;
+      FAutoStatusId = STATUS_NULL_ID;
     }
     FActiveRule = ARuleId;
     emit ruleActivated(ARuleId);
