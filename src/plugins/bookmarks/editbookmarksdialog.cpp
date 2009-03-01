@@ -31,8 +31,8 @@ EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStr
     IBookMark bookmark = AList.at(row);
     setBookmarkToRow(row,bookmark);
   } 
-  ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_NAME,QHeaderView::Stretch);
-  ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_VALUE,QHeaderView::ResizeToContents);
+  ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_NAME,QHeaderView::ResizeToContents);
+  ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_VALUE,QHeaderView::Stretch);
   ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_NICK,QHeaderView::ResizeToContents);
 
   connect(FBookmarks->instance(),SIGNAL(bookmarksUpdated(const QString &, const Jid &, const QDomElement &)),
