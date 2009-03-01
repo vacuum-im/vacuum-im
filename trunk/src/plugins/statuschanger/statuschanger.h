@@ -38,9 +38,6 @@ struct StatusItem {
   int show;
   QString text;
   int priority;
-  QIcon icon;
-  QString iconsetFile;
-  QString iconName;
 };
 
 class StatusChanger : 
@@ -77,9 +74,6 @@ public:
   virtual int statusItemShow(int AStatusId) const;
   virtual QString statusItemText(int AStatusId) const;
   virtual int statusItemPriority(int AStatusId) const;
-  virtual QIcon statusItemIcon(int AStatusId) const;
-  virtual void setStatusItemIcon(int AStatusId, const QIcon &AIcon);
-  virtual void setStatusItemIcon(int AStatusId, const QString &AIconsetFile, const QString &AIconName);
   virtual QList<int> statusItems() const { return FStatusItems.keys(); }
   virtual QList<int> activeStatusItems() const;
   virtual int statusByName(const QString &AName) const;

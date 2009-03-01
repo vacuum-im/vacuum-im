@@ -20,7 +20,6 @@ struct RowStatus {
   int show;
   QString text;
   int priority;
-  QIcon icon;
 };
 
 class Delegate : 
@@ -29,7 +28,6 @@ class Delegate :
   Q_OBJECT;
 public:
   enum DelegateType {
-    DelegateIcon,
     DelegateName,
     DelegateShow,
     DelegateMessage,
