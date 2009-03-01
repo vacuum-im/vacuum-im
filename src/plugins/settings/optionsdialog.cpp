@@ -130,7 +130,7 @@ void OptionsDialog::closeNode(const QString &ANode)
       QStandardItem *nodeItem = FNodeItems.value(it.key());
       FItemsStackIndex.remove(nodeItem);
 
-      //Delete parent TreeItems without widgets
+      //Delete parent items without widgets
       while (nodeItem->parent() && nodeItem->parent()->rowCount()==1 && !FItemsStackIndex.contains(nodeItem->parent()))
       {
         FNodeItems.remove(nodeItem->parent()->data(SIR_NODE).toString());
@@ -150,7 +150,7 @@ void OptionsDialog::closeNode(const QString &ANode)
       delete node;
 
       FNodeItems.remove(it.key());
-      delete nodeItem;
+      nodeItem->parent()->removeRow(nodeItem->row());
 
       it = FNodes.erase(it);
     }
