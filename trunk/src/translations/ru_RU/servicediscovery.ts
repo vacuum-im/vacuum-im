@@ -147,7 +147,7 @@
         <translation>vCard</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="351"/>
+        <location filename="../../plugins/servicediscovery/discoitemswindow.cpp" line="349"/>
         <source>Service Discovery - %1</source>
         <translation>Обзор сервисов - %1</translation>
     </message>
@@ -188,82 +188,82 @@
 <context>
     <name>ServiceDiscovery</name>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="64"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="66"/>
         <source>Potapov S.A. aka Lion</source>
         <translation>Potapov S.A. aka Lion</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="65"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="67"/>
         <source>Discovering information about Jabber entities and the items associated with such entities</source>
         <translation>Обзор информации и сервисов, связанных с Jabber объектами</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1251"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1267"/>
         <source>Service Discovery</source>
         <translation>Обзор сервисов</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="846"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="862"/>
         <source>Discover information and items associated with a Jabber Entity</source>
         <translation>Обзор информации и сервисов, связанных с Jabber объектами</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="852"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="868"/>
         <source>Discovery information</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="854"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="870"/>
         <source>Discover information about another entity on the network</source>
         <translation>Обзор информации о возможностях Jabber объекта</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="860"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="876"/>
         <source>Discovery items</source>
         <translation>Обзор сервисов</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="862"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="878"/>
         <source>Discover the items associated with a Jabber Entity</source>
         <translation>Обзор сервисов, связанных с Jabber объектом</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="868"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="884"/>
         <source>Publish items</source>
         <translation>Публикация пользовательских данных</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="870"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="886"/>
         <source>Publish user defined items to server</source>
         <translation>Публикация пользовательских данных на сервере</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="884"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="900"/>
         <source>JID Escaping</source>
         <translation>Экранирование JID</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="886"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="902"/>
         <source>Enables the display of Jabber Identifiers with disallowed characters</source>
         <translation>Позволяет использовать идентификаторы Jabber c неразрешенными символами</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1240"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1256"/>
         <source>Discovery Info</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1281"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1296"/>
         <source>Categoty: %1; Type: %2</source>
         <translation>Категория: %1; Тип: %2</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="876"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="892"/>
         <source>Entity Capabilities</source>
         <translation>Кэширование возможностей Jabber объекта</translation>
     </message>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="878"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="894"/>
         <source>Enables the capabilities information caching within a session or across sessions</source>
         <translation>Позволяет кэшировать информацию о возможностях клиентов</translation>
     </message>

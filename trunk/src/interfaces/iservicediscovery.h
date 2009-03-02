@@ -103,7 +103,7 @@ public:
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
   virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true) =0;
   virtual QList<IDiscoInfo> findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const =0;
-  virtual QIcon identityIcon(const QString &ACategory, const QString &AType) const =0;
+  virtual QIcon identityIcon(const QList<IDiscoIdentity> &AIdentity) const =0;
   virtual QIcon serviceIcon(const Jid AItemJid, const QString &ANode) const =0;
   //DiscoHandler
   virtual void insertDiscoHandler(IDiscoHandler *AHandler) =0;
@@ -112,7 +112,7 @@ public:
   virtual bool hasFeatureHandler(const QString &AFeature) const =0;
   virtual void insertFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler, int AOrder) =0;
   virtual bool execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo) =0;
-  virtual Action *createFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent) =0;
+  virtual QList<Action *> createFeatureActions(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent) =0;
   virtual void removeFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler) =0;
   //DiscoFeatures
   virtual void insertDiscoFeature(const IDiscoFeature &AFeature) =0;
@@ -126,6 +126,7 @@ public:
   virtual IDiscoInfo discoInfo(const Jid &AContactJid, const QString &ANode = "") const =0;
   virtual bool requestDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "") =0;
   virtual void removeDiscoInfo(const Jid &AContactJid, const QString &ANode = "") =0;
+  virtual int findIdentity(const QList<IDiscoIdentity> &AIdentity, const QString &ACategory, const QString &AType) const =0;
   //DiscoItems
   virtual bool hasDiscoItems(const Jid &AContactJid, const QString &ANode = "") const =0;
   virtual QList<Jid> discoItemsContacts() const =0;

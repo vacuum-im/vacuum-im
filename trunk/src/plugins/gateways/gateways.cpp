@@ -764,10 +764,15 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
     if (dinfo.error.code<0 && !dinfo.identity.isEmpty())
     {
       Jid streamJid = AIndex.data(DDR_STREAMJID).toString();
-      QList<Jid> services = streamServices(streamJid,dinfo.identity.value(0));
+      
+      QList<Jid> services;
+      foreach(IDiscoIdentity ident, dinfo.identity)
+        services += streamServices(streamJid,ident);
+      
       foreach(Jid service, streamServices(streamJid))
         if (!services.contains(service) && FDiscovery->discoInfo(service).identity.isEmpty())
           services.append(service);
+
       if (!services.isEmpty() && !services.contains(itemJid))
       {
         Menu *change = new Menu(AMenu);

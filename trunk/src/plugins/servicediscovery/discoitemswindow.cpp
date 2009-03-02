@@ -206,8 +206,7 @@ void DiscoItemsWindow::updateActionsBar()
     IDiscoInfo dinfo = FDiscovery->discoInfo(index.data(DDR_JID).toString(),index.data(DDR_NODE).toString());
     foreach(QString feature, dinfo.features)
     {
-      Action *action = FDiscovery->createFeatureAction(FStreamJid,feature,dinfo,this);
-      if (action)
+      foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,this))
       {
         QToolButton *button = FActionsBarChanger->addToolButton(action,AG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
         button->setPopupMode(QToolButton::InstantPopup);
@@ -248,9 +247,8 @@ void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)
     IDiscoInfo dinfo = FDiscovery->discoInfo(index.data(DDR_JID).toString(),index.data(DDR_NODE).toString());
     foreach(QString feature, dinfo.features)
     {
-      Action *action = FDiscovery->createFeatureAction(FStreamJid,feature,dinfo,menu);
-      if (action)
-        menu->addAction(action,AG_DIWT_DISCOVERY_FEATURE_ACTIONS,false);
+      foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,menu))
+        menu->addAction(action,AG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
     }
     emit indexContextMenu(index,menu);
     menu->popup(ui.trvItems->viewport()->mapToGlobal(APos));

@@ -10,6 +10,11 @@
 #define ADR_COMMAND_JID               Action::DR_Parametr1
 #define ADR_COMMAND_NODE              Action::DR_Parametr2
 
+#define DIC_CLIENT                    "client"
+#define DIC_AUTOMATION                "automation"
+#define DIT_COMMAND_NODE              "command-node"
+#define DIT_COMMAND_LIST              "command-list"
+
 Commands::Commands()
 {
   FDataForms = NULL;
@@ -215,25 +220,25 @@ void Commands::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
   if (ADiscoInfo.node == NS_COMMANDS)
   {
     IDiscoIdentity identity;
-    identity.category = "automation";
-    identity.type = "command-list";
+    identity.category = DIC_AUTOMATION;
+    identity.type = DIT_COMMAND_LIST;
     identity.name = "Commands";
     ADiscoInfo.identity.append(identity);
 
-    if (ADiscoInfo.features.contains(NS_COMMANDS))
+    if (!ADiscoInfo.features.contains(NS_COMMANDS))
       ADiscoInfo.features.append(NS_COMMANDS);
   }
   else if (FCommands.contains(ADiscoInfo.node))
   {
     IDiscoIdentity identity;
-    identity.category = "automation";
-    identity.type = "command-node";
+    identity.category = DIC_AUTOMATION;
+    identity.type = DIT_COMMAND_NODE;
     identity.name = FCommands.value(ADiscoInfo.node)->commandName(ADiscoInfo.node);
     ADiscoInfo.identity.append(identity);
 
-    if (ADiscoInfo.features.contains(NS_COMMANDS))
+    if (!ADiscoInfo.features.contains(NS_COMMANDS))
       ADiscoInfo.features.append(NS_COMMANDS);
-    if (ADiscoInfo.features.contains(NS_JABBER_DATA))
+    if (!ADiscoInfo.features.contains(NS_JABBER_DATA))
       ADiscoInfo.features.append(NS_JABBER_DATA);
   }
 }
@@ -270,7 +275,7 @@ void Commands::fillDiscoItems(IDiscoItems &ADiscoItems)
 
 bool Commands::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
 {
-  if (AFeature==NS_COMMANDS && !ADiscoInfo.node.isEmpty() && ADiscoInfo.identity.value(0).type == "command-node")
+  if (AFeature==NS_COMMANDS && !ADiscoInfo.node.isEmpty() && FDiscovery->findIdentity(ADiscoInfo.identity,DIC_AUTOMATION,DIT_COMMAND_NODE)>=0)
   {
     executeCommnad(AStreamJid,ADiscoInfo.contactJid,ADiscoInfo.node);
     return true;
@@ -283,8 +288,7 @@ Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
   if (presence && presence->isOpen() && AFeature==NS_COMMANDS)
   {
-    IDiscoIdentity ident = ADiscoInfo.identity.value(0);
-    if (ident.type == "command-node")
+    if (FDiscovery->findIdentity(ADiscoInfo.identity,DIC_AUTOMATION,DIT_COMMAND_NODE)>=0)
     {
       if (!ADiscoInfo.node.isEmpty())
       {
@@ -471,7 +475,7 @@ void Commands::onRequestActionTriggered(bool)
 
 void Commands::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
-  if (AInfo.node.isEmpty() && !AInfo.identity.isEmpty() && AInfo.identity.at(0).category!="client")
+  if (AInfo.node.isEmpty() && FDiscovery->findIdentity(AInfo.identity,DIC_CLIENT,"")<0)
     if (AInfo.features.contains(NS_COMMANDS) && !FDiscovery->hasDiscoItems(AInfo.contactJid,NS_COMMANDS))
       FDiscovery->requestDiscoItems(AInfo.streamJid,AInfo.contactJid,NS_COMMANDS);
 }
@@ -502,7 +506,7 @@ void Commands::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJ
     else if (AStateOnline)
     {
       IDiscoInfo info = FDiscovery->discoInfo(AContactJid);
-      if (!info.identity.isEmpty() && info.identity.at(0).category!="client" && info.features.contains(NS_COMMANDS))
+      if (FDiscovery->findIdentity(info.identity,DIC_CLIENT,"")<0 && info.features.contains(NS_COMMANDS))
         FDiscovery->requestDiscoItems(AStreamJid,AContactJid,NS_COMMANDS);
     }
   }
