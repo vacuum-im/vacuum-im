@@ -59,62 +59,62 @@
 <context>
     <name>Commands</name>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="29"/>
+        <location filename="../../plugins/commands/commands.cpp" line="34"/>
         <source>Plugin for advertising and executing application-specific commands</source>
         <translation>Плагин для отображения и выполнения команд приложения</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="444"/>
+        <location filename="../../plugins/commands/commands.cpp" line="448"/>
         <source>Ad-Hoc Commands</source>
         <translation>Ad-Hoc Команды</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="78"/>
+        <location filename="../../plugins/commands/commands.cpp" line="83"/>
         <source>Can not understand the specified action</source>
         <translation>Не поддерживаемая команда</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="80"/>
+        <location filename="../../plugins/commands/commands.cpp" line="85"/>
         <source>Can not accept the specified action</source>
         <translation>Неприемлимая команда</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="82"/>
+        <location filename="../../plugins/commands/commands.cpp" line="87"/>
         <source>Can not accept the specified language/locale</source>
         <translation>Неприемлемый язык или локаль</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="84"/>
+        <location filename="../../plugins/commands/commands.cpp" line="89"/>
         <source>The data form did not provide one or more required fields</source>
         <translation>В форме не заполнено одно или несколько обязательных полей</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="86"/>
+        <location filename="../../plugins/commands/commands.cpp" line="91"/>
         <source>Specified session not present</source>
         <translation>Указанная сессия не существует</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="88"/>
+        <location filename="../../plugins/commands/commands.cpp" line="93"/>
         <source>Specified session is no longer active</source>
         <translation>Указанная сессия более не активна</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="292"/>
+        <location filename="../../plugins/commands/commands.cpp" line="296"/>
         <source>Execute</source>
         <translation>Выполнить</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="304"/>
+        <location filename="../../plugins/commands/commands.cpp" line="308"/>
         <source>Commands</source>
         <translation>Команды</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="445"/>
+        <location filename="../../plugins/commands/commands.cpp" line="449"/>
         <source>Advertising and executing application-specific commands</source>
         <translation>Отображение и выполнение команд приложения</translation>
     </message>
     <message>
-        <location filename="../../plugins/commands/commands.cpp" line="328"/>
+        <location filename="../../plugins/commands/commands.cpp" line="332"/>
         <source>Request commands</source>
         <translation>Запросить команды</translation>
     </message>

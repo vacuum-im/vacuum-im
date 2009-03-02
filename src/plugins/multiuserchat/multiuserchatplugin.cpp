@@ -8,6 +8,9 @@
 #define ADR_NICK                  Action::DR_Parametr3
 #define ADR_PASSWORD              Action::DR_Parametr4
 
+#define DIC_CONFERENCE            "conference"
+#define DIT_TEXT                  "text"
+
 #define INVITE_NOTIFICATOR_ID     "InviteMessages"
 
 MultiUserChatPlugin::MultiUserChatPlugin()
@@ -197,7 +200,7 @@ Action *MultiUserChatPlugin::createDiscoFeatureAction(const Jid &AStreamJid, con
 {
   if (AFeature == NS_MUC)
   {
-    if (ADiscoInfo.identity.value(0).category == "conference")
+    if (FDiscovery && FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,"")>=0)
     {
       Action *action = createJoinAction(AStreamJid,ADiscoInfo.contactJid,AParent);
       return action;
@@ -636,10 +639,7 @@ void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
   if (ADiscoInfo.node == MUC_NODE_ROOM_NICK)
   {
-    QString nick;
-    for (int i=0; i<ADiscoInfo.identity.count() && nick.isEmpty(); i++)
-      if (ADiscoInfo.identity.at(i).category=="conference" && ADiscoInfo.identity.at(i).type=="text")
-        nick = ADiscoInfo.identity.at(i).name;
+    QString nick = ADiscoInfo.identity.value(FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,DIT_TEXT)).name;
     emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,nick);
   }
 }

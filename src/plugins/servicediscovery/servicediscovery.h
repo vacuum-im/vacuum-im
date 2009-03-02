@@ -95,7 +95,7 @@ public:
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
   virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
   virtual QList<IDiscoInfo> findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
-  virtual QIcon identityIcon(const QString &ACategory, const QString &AType) const;
+  virtual QIcon identityIcon(const QList<IDiscoIdentity> &AIdentity) const;
   virtual QIcon serviceIcon(const Jid AItemJid, const QString &ANode) const;
     //DiscoHandler
   virtual void insertDiscoHandler(IDiscoHandler *AHandler);
@@ -104,7 +104,7 @@ public:
   virtual bool hasFeatureHandler(const QString &AFeature) const;
   virtual void insertFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler, int AOrder);
   virtual bool execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
-  virtual Action *createFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
+  virtual QList<Action *> createFeatureActions(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   virtual void removeFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler);
     //DiscoFeatures
   virtual void insertDiscoFeature(const IDiscoFeature &AFeature);
@@ -118,6 +118,7 @@ public:
   virtual IDiscoInfo discoInfo(const Jid &AContactJid, const QString &ANode = "") const;
   virtual bool requestDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "");
   virtual void removeDiscoInfo(const Jid &AContactJid, const QString &ANode = "");
+  virtual int findIdentity(const QList<IDiscoIdentity> &AIdentity, const QString &ACategory, const QString &AType) const;
     //DiscoItems
   virtual bool hasDiscoItems(const Jid &AContactJid, const QString &ANode = "") const;
   virtual QList<Jid> discoItemsContacts() const;

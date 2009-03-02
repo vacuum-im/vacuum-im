@@ -99,7 +99,7 @@
         <translation>Определить ник</translation>
     </message>
     <message>
-        <location filename="../../plugins/gateways/gateways.cpp" line="774"/>
+        <location filename="../../plugins/gateways/gateways.cpp" line="779"/>
         <source>Use instead of</source>
         <translation>Использовать вместо</translation>
     </message>

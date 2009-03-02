@@ -16,6 +16,8 @@
 
 #define BDI_ITEMS_GEOMETRY      "DiscoItemsWindowGeometry"
 
+#define DIC_CLIENT              "client"
+
 #define QUEUE_TIMER_INTERVAL    2000
 #define QUEUE_REQUEST_WAIT      5000
 #define QUEUE_REQUEST_START     QDateTime::currentDateTime().addMSecs(QUEUE_REQUEST_WAIT)
@@ -477,12 +479,16 @@ QList<IDiscoInfo> ServiceDiscovery::findDiscoInfo(const IDiscoIdentity &AIdentit
   return result;
 }
 
-QIcon ServiceDiscovery::identityIcon(const QString &ACategory, const QString &AType) const
+QIcon ServiceDiscovery::identityIcon(const QList<IDiscoIdentity> &AIdentity) const
 {
+  QIcon icon;
   IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
-  QIcon icon = storage->getIcon(ACategory +"/"+ AType);
-  if (icon.isNull())
-    icon = storage->getIcon(ACategory);
+  for (int i=0; icon.isNull() && i<AIdentity.count(); i++)
+  {
+    icon = storage->getIcon(AIdentity.at(i).category +"/"+ AIdentity.at(i).type);
+    if (icon.isNull())
+      icon = storage->getIcon(AIdentity.at(i).category);
+  }
   if (icon.isNull())
     icon = storage->getIcon(SRI_SERVICE);
   return icon;
@@ -503,7 +509,7 @@ QIcon ServiceDiscovery::serviceIcon(const Jid AItemJid, const QString &ANode) co
   }
   else 
   {
-    icon = identityIcon(info.identity.at(0).category,info.identity.at(0).type);
+    icon = identityIcon(info.identity);
   }
   return icon;
 }
@@ -549,16 +555,17 @@ bool ServiceDiscovery::execFeatureHandler(const Jid &AStreamJid, const QString &
   return false;
 }
 
-Action *ServiceDiscovery::createFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
+QList<Action *> ServiceDiscovery::createFeatureActions(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
+  QList<Action *> actions;
   QList<IDiscoFeatureHandler *> handlers = FFeatureHandlers.value(AFeature).values();
   foreach(IDiscoFeatureHandler *handler, handlers)
   {
     Action *action = handler->createDiscoFeatureAction(AStreamJid,AFeature,ADiscoInfo,AParent);
     if (action)
-      return action;
+      actions.append(action);
   }
-  return NULL;
+  return actions;
 }
 
 void ServiceDiscovery::removeFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler)
@@ -655,6 +662,15 @@ void ServiceDiscovery::removeDiscoInfo(const Jid &AContactJid, const QString &AN
       FDiscoInfo.remove(AContactJid);
     emit discoInfoRemoved(dinfo);
   }
+}
+
+int ServiceDiscovery::findIdentity(const QList<IDiscoIdentity> &AIdentity, const QString &ACategory, const QString &AType) const
+{
+  int index = -1;
+  for (int i=0; index<0 && i<AIdentity.count(); i++)
+    if ((ACategory.isEmpty() || AIdentity.at(i).category == ACategory) && (AType.isEmpty() || AIdentity.at(i).type == AType))
+      index = i;
+  return index;
 }
 
 bool ServiceDiscovery::hasDiscoItems(const Jid &AContactJid, const QString &ANode) const
@@ -1261,8 +1277,7 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
     IDiscoInfo dinfo = discoInfo(contactJid);
     foreach(QString feature, dinfo.features)
     {
-      Action *action = createFeatureAction(presence->streamJid(),feature,dinfo,AMenu);
-      if (action)
+      foreach(Action *action, createFeatureActions(presence->streamJid(),feature,dinfo,AMenu))
         AMenu->addAction(action,AG_DISCOVERY_ROSTER_FEATURES,true);
     }
   }
@@ -1276,8 +1291,8 @@ void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId,
     if (hasDiscoInfo(contactJid,""))
     {
       IDiscoInfo dinfo = discoInfo(contactJid,"");
-      if (dinfo.identity.value(0).category != "client")
-        foreach(IDiscoIdentity identity, dinfo.identity)
+      foreach(IDiscoIdentity identity, dinfo.identity)
+        if (identity.category != DIC_CLIENT)
           AToolTips.insertMulti(TTO_DISCO_IDENTITY,tr("Categoty: %1; Type: %2").arg(identity.category).arg(identity.type));
     }
   }
