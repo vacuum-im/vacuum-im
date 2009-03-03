@@ -1,7 +1,4 @@
-#include <QtDebug>
 #include "accountoptions.h"
-
-#include "../../utils/jid.h"
 
 AccountOptions::AccountOptions(const QString &AAccountId, QWidget *AParent)
   : QWidget(AParent)

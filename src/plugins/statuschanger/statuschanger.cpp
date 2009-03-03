@@ -161,7 +161,7 @@ bool StatusChanger::initObjects()
   FEditStatusAction->setText(tr("Edit presence statuses"));
   FEditStatusAction->setIcon(RSR_STORAGE_MENUICONS,MNI_SCHANGER_EDIT_STATUSES);
   connect(FEditStatusAction,SIGNAL(triggered(bool)), SLOT(onEditStatusAction(bool)));
-  FMainMenu->addAction(FEditStatusAction,AG_STATUSCHANGER_STATUSMENU_ACTIONS,false);
+  FMainMenu->addAction(FEditStatusAction,AG_SCSM_STATUSCHANGER_ACTIONS,false);
   
   createDefaultStatus();
   setMainStatusId(STATUS_OFFLINE);
@@ -188,7 +188,7 @@ bool StatusChanger::initObjects()
 
   if (FTrayManager)
   {
-    FTrayManager->addAction(FMainMenu->menuAction(),AG_STATUSCHANGER_TRAY,true);
+    FTrayManager->addAction(FMainMenu->menuAction(),AG_TMTM_STATUSCHANGER,true);
   }
 
   if (FStatusIcons)
@@ -211,7 +211,7 @@ bool StatusChanger::startPlugin()
   foreach(IPresence *presence, FStreamStatus.keys())
   {
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(presence->streamJid()) : NULL;
-    if (account!=NULL && account->value(AVN_AUTOCONNECT,false).toBool())
+    if (account!=NULL && account->value(AVN_AUTO_CONNECT,false).toBool())
     {
       int statusId = FStreamMainStatus.contains(presence) ? STATUS_MAIN_ID : account->value(AVN_LAST_ONLINE_STATUS, STATUS_ONLINE).toInt();
       if (!FStatusItems.contains(statusId))
@@ -235,8 +235,8 @@ QWidget *StatusChanger::optionsWidget(const QString &ANode, int &AOrder)
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
     if (account)
     {
-      widget->setAutoConnect(account->value(AVN_AUTOCONNECT,false).toBool());
-      widget->setAutoReconnect(account->value(AVN_AUTORECONNECT,true).toBool());
+      widget->setAutoConnect(account->value(AVN_AUTO_CONNECT,false).toBool());
+      widget->setAutoReconnect(account->value(AVN_AUTO_RECONNECT,true).toBool());
     }
     else
     {
@@ -652,10 +652,10 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 
     Action *action = createStatusAction(STATUS_MAIN_ID, streamJid, sMenu);
     action->setData(ADR_STATUS_CODE, STATUS_MAIN_ID);
-    sMenu->addAction(action,AG_STATUSCHANGER_STATUSMENU_STREAMS,true);
+    sMenu->addAction(action,AG_SCSM_STATUSCHANGER_STREAMS,true);
     FStreamMainStatusAction.insert(APresence,action);
 
-    FMainMenu->addAction(sMenu->menuAction(),AG_STATUSCHANGER_STATUSMENU_STREAMS,true);
+    FMainMenu->addAction(sMenu->menuAction(),AG_SCSM_STATUSCHANGER_STREAMS,true);
   }
 }
 
@@ -774,7 +774,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 void StatusChanger::autoReconnect(IPresence *APresence)
 {
   IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
-  if (account && account->value(AVN_AUTORECONNECT,true).toBool())
+  if (account && account->value(AVN_AUTO_RECONNECT,true).toBool())
   {
     int statusId = FStreamWaitStatus.value(APresence, FStreamStatus.value(APresence));
     int statusShow = statusItemShow(statusId);
@@ -926,7 +926,7 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
   {
     bool isMainStatus = FStreamMainStatus.contains(APresence);
     account->setValue(AVN_IS_MAIN_STATUS,isMainStatus);
-    if (!isMainStatus && account->value(AVN_AUTOCONNECT,false).toBool() && FStreamLastStatus.contains(APresence->streamJid()))  
+    if (!isMainStatus && account->value(AVN_AUTO_CONNECT,false).toBool() && FStreamLastStatus.contains(APresence->streamJid()))  
       account->setValue(AVN_LAST_ONLINE_STATUS,FStreamLastStatus.take(APresence->streamJid()));
     else
       account->delValue(AVN_LAST_ONLINE_STATUS);
@@ -967,9 +967,9 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
 
 void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->data(RDR_Type).toInt() == RIT_StreamRoot)
+  if (AIndex->data(RDR_TYPE).toInt() == RIT_STREAM_ROOT)
   {
-    QString streamJid = AIndex->data(RDR_StreamJid).toString();
+    QString streamJid = AIndex->data(RDR_STREAM_JID).toString();
     Menu *menu = FStreamMenu.count() > 1 ? streamMenu(streamJid) : FMainMenu;
     if (menu)
     {
@@ -977,7 +977,7 @@ void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setText(tr("Status"));
       action->setMenu(menu);
       action->setIcon(menu->menuAction()->icon());
-      AMenu->addAction(action,AG_STATUSCHANGER_ROSTER,true);
+      AMenu->addAction(action,AG_RVCM_STATUSCHANGER,true);
     }
   }
 }
@@ -1109,8 +1109,8 @@ void StatusChanger::onOptionsAccepted()
     IAccount *account = FAccountManager->accountById(widget->accountId());
     if (account)
     {
-      account->setValue(AVN_AUTOCONNECT,widget->autoConnect());
-      account->setValue(AVN_AUTORECONNECT, widget->autoReconnect());
+      account->setValue(AVN_AUTO_CONNECT,widget->autoConnect());
+      account->setValue(AVN_AUTO_RECONNECT, widget->autoReconnect());
     }
   }
   emit optionsAccepted();

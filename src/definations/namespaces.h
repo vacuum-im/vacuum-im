@@ -1,5 +1,5 @@
-#ifndef NAMESPACES_H
-#define NAMESPACES_H
+#ifndef DEF_NAMESPACES_H
+#define DEF_NAMESPACES_H
 
 #define NS_XMPP_STREAMS                         "urn:ietf:params:xml:ns:xmpp-streams"
 #define NS_XMPP_DELAY                           "urn:xmpp:delay"

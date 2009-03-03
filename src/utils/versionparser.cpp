@@ -1,6 +1,6 @@
-#include <QtDebug>
-#include <QStringList>
 #include "versionparser.h"
+
+#include <QStringList>
 
 VersionParser::VersionParser(const QString &AVersion)
 {

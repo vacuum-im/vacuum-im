@@ -260,9 +260,9 @@ void RostersView::updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFl
     FIndexLabelFlags[ALabelId] = AFlags;
     foreach (IRosterIndex *index, FIndexLabelIndexes.value(ALabelId))
     {
-      QList<QVariant> ids = index->data(RDR_LabelIds).toList();
-      QList<QVariant> labels = index->data(RDR_LabelValues).toList();
-      QList<QVariant> flags = index->data(RDR_LabelFlags).toList();
+      QList<QVariant> ids = index->data(RDR_LABEL_ID).toList();
+      QList<QVariant> labels = index->data(RDR_LABEL_VALUES).toList();
+      QList<QVariant> flags = index->data(RDR_LABEL_FLAGS).toList();
       int i = 0;
       while (ids.at(i).toInt()!=ALabelId) i++;
       labels[i] = ALabel;
@@ -271,8 +271,8 @@ void RostersView::updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFl
         appendBlinkLabel(ALabelId);
       else
         removeBlinkLabel(ALabelId);
-      index->setData(RDR_LabelValues,labels);
-      index->setData(RDR_LabelFlags,flags);
+      index->setData(RDR_LABEL_VALUES,labels);
+      index->setData(RDR_LABEL_FLAGS,flags);
     }
   }
 }
@@ -281,10 +281,10 @@ void RostersView::insertIndexLabel(int ALabelId, IRosterIndex *AIndex)
 {
   if (AIndex && FIndexLabels.contains(ALabelId) && !FIndexLabelIndexes.value(ALabelId).contains(AIndex))
   {
-    QList<QVariant> ids = AIndex->data(RDR_LabelIds).toList();
-    QList<QVariant> labels = AIndex->data(RDR_LabelValues).toList();
-    QList<QVariant> orders = AIndex->data(RDR_LabelOrders).toList();
-    QList<QVariant> flags = AIndex->data(RDR_LabelFlags).toList();
+    QList<QVariant> ids = AIndex->data(RDR_LABEL_ID).toList();
+    QList<QVariant> labels = AIndex->data(RDR_LABEL_VALUES).toList();
+    QList<QVariant> orders = AIndex->data(RDR_LABEL_ORDERS).toList();
+    QList<QVariant> flags = AIndex->data(RDR_LABEL_FLAGS).toList();
     int i = 0;
     int order = FIndexLabelOrders.value(ALabelId);
     while (i<orders.count() && orders.at(i).toInt() < order) i++;
@@ -295,10 +295,10 @@ void RostersView::insertIndexLabel(int ALabelId, IRosterIndex *AIndex)
     FIndexLabelIndexes[ALabelId] += AIndex;
     if (FIndexLabelFlags.value(ALabelId) && EnsureVisible > 0)
       expandIndexParents(AIndex);
-    AIndex->setData(RDR_LabelIds,ids);
-    AIndex->setData(RDR_LabelValues,labels);
-    AIndex->setData(RDR_LabelFlags,flags);
-    AIndex->setData(RDR_LabelOrders,orders);
+    AIndex->setData(RDR_LABEL_ID,ids);
+    AIndex->setData(RDR_LABEL_VALUES,labels);
+    AIndex->setData(RDR_LABEL_FLAGS,flags);
+    AIndex->setData(RDR_LABEL_ORDERS,orders);
   }
 }
 
@@ -306,10 +306,10 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
 {
   if (AIndex && FIndexLabels.contains(ALabelId) && FIndexLabelIndexes.value(ALabelId).contains(AIndex))
   {
-    QList<QVariant> ids = AIndex->data(RDR_LabelIds).toList();
-    QList<QVariant> labels = AIndex->data(RDR_LabelValues).toList();
-    QList<QVariant> orders = AIndex->data(RDR_LabelOrders).toList();
-    QList<QVariant> flags = AIndex->data(RDR_LabelFlags).toList();
+    QList<QVariant> ids = AIndex->data(RDR_LABEL_ID).toList();
+    QList<QVariant> labels = AIndex->data(RDR_LABEL_VALUES).toList();
+    QList<QVariant> orders = AIndex->data(RDR_LABEL_ORDERS).toList();
+    QList<QVariant> flags = AIndex->data(RDR_LABEL_FLAGS).toList();
     int i = 0;
     while (i<ids.count() && ids.at(i).toInt()!=ALabelId) i++;
     ids.removeAt(i);
@@ -319,10 +319,10 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
     FIndexLabelIndexes[ALabelId] -= AIndex;
     if (FIndexLabelIndexes[ALabelId].isEmpty())
       FIndexLabelIndexes.remove(ALabelId);
-    AIndex->setData(RDR_LabelOrders,orders);
-    AIndex->setData(RDR_LabelFlags,flags);
-    AIndex->setData(RDR_LabelValues,labels);
-    AIndex->setData(RDR_LabelIds,ids);
+    AIndex->setData(RDR_LABEL_ORDERS,orders);
+    AIndex->setData(RDR_LABEL_FLAGS,flags);
+    AIndex->setData(RDR_LABEL_VALUES,labels);
+    AIndex->setData(RDR_LABEL_ID,ids);
   }
 }
 
@@ -454,9 +454,9 @@ void RostersView::insertFooterText(int AOrderAndId, const QVariant &AValue, IRos
   if (!AValue.isNull())
   {
     QString footerId = intId2StringId(AOrderAndId);
-    QMap<QString,QVariant> footerMap = AIndex->data(RDR_FooterText).toMap();
+    QMap<QString,QVariant> footerMap = AIndex->data(RDR_FOOTER_TEXT).toMap();
     footerMap.insert(footerId, AValue);
-    AIndex->setData(RDR_FooterText,footerMap);
+    AIndex->setData(RDR_FOOTER_TEXT,footerMap);
   } 
   else 
     removeFooterText(AOrderAndId,AIndex);
@@ -465,14 +465,14 @@ void RostersView::insertFooterText(int AOrderAndId, const QVariant &AValue, IRos
 void RostersView::removeFooterText(int AOrderAndId, IRosterIndex *AIndex)
 {
   QString footerId = intId2StringId(AOrderAndId);
-  QMap<QString,QVariant> footerMap = AIndex->data(RDR_FooterText).toMap();
+  QMap<QString,QVariant> footerMap = AIndex->data(RDR_FOOTER_TEXT).toMap();
   if (footerMap.contains(footerId))
   {
     footerMap.remove(footerId);
     if (!footerMap.isEmpty())
-      AIndex->setData(RDR_FooterText,footerMap);
+      AIndex->setData(RDR_FOOTER_TEXT,footerMap);
     else
-      AIndex->setData(RDR_FooterText,QVariant());
+      AIndex->setData(RDR_FOOTER_TEXT,QVariant());
   }
 }
 
@@ -545,14 +545,14 @@ void RostersView::setViewModel(QAbstractItemModel *AModel)
 
 void RostersView::updateStatusText(IRosterIndex *AIndex)
 {
-  const static QList<int> statusTypes = QList<int>() << RIT_StreamRoot << RIT_Contact << RIT_Agent;
+  const static QList<int> statusTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT << RIT_AGENT;
   
   IRosterIndexList indexes;
   if (AIndex == NULL)
   {
     QMultiHash<int,QVariant> findData;
     foreach(int type, statusTypes)
-      findData.insert(RDR_Type,type);
+      findData.insert(RDR_TYPE,type);
     indexes = FRostersModel!=NULL ? FRostersModel->rootIndex()->findChild(findData,true) : IRosterIndexList();
   }
   else if (statusTypes.contains(AIndex->type()))
@@ -562,7 +562,7 @@ void RostersView::updateStatusText(IRosterIndex *AIndex)
   foreach(IRosterIndex *index, indexes)
   {
     if (show)
-      insertFooterText(FTO_ROSTERSVIEW_STATUS,RDR_Status,index);
+      insertFooterText(FTO_ROSTERSVIEW_STATUS,RDR_STATUS,index);
     else
       removeFooterText(FTO_ROSTERSVIEW_STATUS,index);
   }
@@ -722,32 +722,32 @@ void RostersView::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMul
 {
   if (ALabelId == RLID_DISPLAY)
   {
-    QString name = AIndex->data(RDR_Name).toString();
+    QString name = AIndex->data(RDR_NAME).toString();
     if (!name.isEmpty())
-      AToolTips.insert(TTO_CONTACT_NAME,name);
+      AToolTips.insert(RTTO_CONTACT_NAME,name);
 
-    QString jid = AIndex->data(RDR_Jid).toString();
+    QString jid = AIndex->data(RDR_JID).toString();
     if (!jid.isEmpty())
-      AToolTips.insert(TTO_CONTACT_JID,jid);
+      AToolTips.insert(RTTO_CONTACT_JID,jid);
 
-    QString status = AIndex->data(RDR_Status).toString();
+    QString status = AIndex->data(RDR_STATUS).toString();
     if (!status.isEmpty())
-      AToolTips.insert(TTO_CONTACT_STATUS,tr("Status: %1").arg(status));
+      AToolTips.insert(RTTO_CONTACT_STATUS,tr("Status: %1").arg(status));
 
-    QString priority = AIndex->data(RDR_Priority).toString();
+    QString priority = AIndex->data(RDR_PRIORITY).toString();
     if (!priority.isEmpty())
-      AToolTips.insert(TTO_CONTACT_PRIORITY,tr("Priority: %1").arg(priority));
+      AToolTips.insert(RTTO_CONTACT_PRIORITY,tr("Priority: %1").arg(priority));
 
-    QString ask = AIndex->data(RDR_Ask).toString();
-    QString subscription = AIndex->data(RDR_Subscription).toString();
+    QString ask = AIndex->data(RDR_ASK).toString();
+    QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
     if (!subscription.isEmpty())
-      AToolTips.insert(TTO_CONTACT_SUBSCRIPTION,tr("Subscription: %1 %2").arg(subscription).arg(ask));
+      AToolTips.insert(RTTO_CONTACT_SUBSCRIPTION,tr("Subscription: %1 %2").arg(subscription).arg(ask));
   }
   else if (FNotifyLabelItems.contains(ALabelId))
   {
     NotifyItem &notifyItem = FNotifyItems[FNotifyLabelItems.value(ALabelId).first()];
     if (!notifyItem.toolTip.isEmpty())
-      AToolTips.insert(TTO_ROSTERSVIEW_NOTIFY,notifyItem.toolTip);
+      AToolTips.insert(RTTO_ROSTERSVIEW_NOTIFY,notifyItem.toolTip);
   }
 }
 

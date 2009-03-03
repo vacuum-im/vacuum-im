@@ -289,14 +289,14 @@ void VCardPlugin::registerDiscoFeatures()
 
 void VCardPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->type() == RIT_StreamRoot || AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent)
+  if (AIndex->type() == RIT_STREAM_ROOT || AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
   {
     Action *action = new Action(AMenu);
     action->setText(tr("vCard"));
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-    action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
-    action->setData(ADR_CONTACT_JID,Jid(AIndex->data(RDR_Jid).toString()).bare());
-    AMenu->addAction(action,AG_VCARD_ROSTER,true);
+    action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
+    action->setData(ADR_CONTACT_JID,Jid(AIndex->data(RDR_JID).toString()).bare());
+    AMenu->addAction(action,AG_RVCM_VCARD,true);
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
   }
 }
@@ -306,11 +306,11 @@ void VCardPlugin::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMu
   Action *action = new Action(AMenu);
   action->setText(tr("vCard"));
   action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-  action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAMJID));
-  if (!AUser->data(MUDR_REALJID).toString().isEmpty())
-    action->setData(ADR_CONTACT_JID,Jid(AUser->data(MUDR_REALJID).toString()).bare());
+  action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAM_JID));
+  if (!AUser->data(MUDR_REAL_JID).toString().isEmpty())
+    action->setData(ADR_CONTACT_JID,Jid(AUser->data(MUDR_REAL_JID).toString()).bare());
   else
-    action->setData(ADR_CONTACT_JID,AUser->data(MUDR_CONTACTJID));
+    action->setData(ADR_CONTACT_JID,AUser->data(MUDR_CONTACT_JID));
   AMenu->addAction(action,AG_MUCM_VCARD,true);
   connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
 }

@@ -61,7 +61,7 @@
     <message>
         <location filename="../../plugins/accountmanager/accountmanager.cpp" line="32"/>
         <source>Potapov S.A. aka Lion</source>
-        <translation>Potapov S.A. aka Lion</translation>
+        <translation type="obsolete">Potapov S.A. aka Lion</translation>
     </message>
     <message>
         <location filename="../../plugins/accountmanager/accountmanager.cpp" line="87"/>

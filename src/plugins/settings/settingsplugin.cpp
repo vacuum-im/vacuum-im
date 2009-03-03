@@ -80,14 +80,14 @@ bool SettingsPlugin::initObjects()
 
   if (FMainWindowPlugin)
   {
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FOpenOptionsDialogAction,AG_SETTINGS_MMENU,true);
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FProfileMenu->menuAction(),AG_SETTINGS_MMENU,true);
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FOpenOptionsDialogAction,AG_MMENU_SETTINGS,true);
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FProfileMenu->menuAction(),AG_MMENU_SETTINGS,true);
   }
 
   if (FTrayManager)
   {
-    FTrayManager->addAction(FOpenOptionsDialogAction,AG_SETTINGS_TRAY,true);
-    FTrayManager->addAction(FProfileMenu->menuAction(),AG_SETTINGS_TRAY,true);
+    FTrayManager->addAction(FOpenOptionsDialogAction,AG_TMTM_SETTINGS,true);
+    FTrayManager->addAction(FProfileMenu->menuAction(),AG_TMTM_SETTINGS,true);
   }
 
   insertOptionsHolder(this);

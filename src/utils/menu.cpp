@@ -1,4 +1,3 @@
-#include <QtDebug>
 #include "menu.h"
 
 Menu::Menu(QWidget *AParent)

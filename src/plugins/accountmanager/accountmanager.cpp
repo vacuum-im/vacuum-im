@@ -7,7 +7,7 @@
 
 #define SVN_ACCOUNT                 "account[]"
 #define SVN_ACCOUNT_ACTIVE          SVN_ACCOUNT":"AVN_ACTIVE
-#define SVN_ACCOUNT_STREAM          SVN_ACCOUNT":"AVN_STREAMJID
+#define SVN_ACCOUNT_STREAM          SVN_ACCOUNT":"AVN_STREAM_JID
 
 #define ADR_OPTIONS_NODE            Action::DR_Parametr1
 
@@ -29,7 +29,7 @@ AccountManager::~AccountManager()
 //IPlugin
 void AccountManager::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Creating and removing accounts");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Account manager");
@@ -117,7 +117,7 @@ QWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder)
     if (account)
     {
       options->setOption(AccountOptions::AO_Name,account->name());
-      options->setOption(AccountOptions::AO_StreamJid,account->value(AVN_STREAMJID));
+      options->setOption(AccountOptions::AO_StreamJid,account->value(AVN_STREAM_JID));
       options->setOption(AccountOptions::AO_Password,account->password());
       options->setOption(AccountOptions::AO_DefLang,account->defaultLang());
     }
@@ -362,9 +362,9 @@ void AccountManager::onSettingsClosed()
 
 void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->data(RDR_Type).toInt() == RIT_StreamRoot)
+  if (AIndex->data(RDR_TYPE).toInt() == RIT_STREAM_ROOT)
   {
-    QString streamJid = AIndex->data(RDR_StreamJid).toString();
+    QString streamJid = AIndex->data(RDR_STREAM_JID).toString();
     IAccount *account = accountByStream(streamJid);
     if (account)
     {
@@ -373,7 +373,7 @@ void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setText(tr("Modify account"));
       action->setData(ADR_OPTIONS_NODE,ON_ACCOUNTS"::"+account->accountId());
       connect(action,SIGNAL(triggered(bool)),SLOT(onOpenOptionsDialogByAction(bool)));
-      AMenu->addAction(action,AG_ACCOUNTMANAGER_ROSTER,true);
+      AMenu->addAction(action,AG_RVCM_ACCOUNTMANAGER,true);
     }
   }
 }

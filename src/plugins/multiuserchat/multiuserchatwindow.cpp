@@ -578,15 +578,15 @@ void MultiUserChatWindow::insertRoomUtilsActions(Menu *AMenu, IMultiUser *AUser)
     foreach(IMultiUserChatWindow *window,windows)
     {
       if ( window!=this && window->multiUserChat()->isOpen() &&
-          (!AUser->data(MUDR_REALJID).toString().isEmpty() || window->roomJid().domain()==roomJid().domain()) )
+          (!AUser->data(MUDR_REAL_JID).toString().isEmpty() || window->roomJid().domain()==roomJid().domain()) )
       {
         Action *action = new Action(FInviteMenu);
         action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_MESSAGE);
         action->setText(tr("%1 from %2").arg(window->roomJid().full()).arg(window->multiUserChat()->nickName()));
         action->setData(ADR_STREAM_JID,window->streamJid().full());
         action->setData(ADR_ROOM_JID,window->roomJid().full());
-        if (!AUser->data(MUDR_REALJID).toString().isEmpty())
-          action->setData(ADR_USER_JID,AUser->data(MUDR_REALJID));
+        if (!AUser->data(MUDR_REAL_JID).toString().isEmpty())
+          action->setData(ADR_USER_JID,AUser->data(MUDR_REAL_JID));
         else
           action->setData(ADR_USER_JID,AUser->contactJid().full());
         connect(action,SIGNAL(triggered(bool)),SLOT(onInviteActionTriggered(bool)));
@@ -825,8 +825,8 @@ void MultiUserChatWindow::setToolTipForUser(IMultiUser *AUser)
   {
     QString toolTip;
     toolTip += AUser->nickName()+"<br>";
-    if (!AUser->data(MUDR_REALJID).toString().isEmpty())
-      toolTip += AUser->data(MUDR_REALJID).toString()+"<br>";
+    if (!AUser->data(MUDR_REAL_JID).toString().isEmpty())
+      toolTip += AUser->data(MUDR_REAL_JID).toString()+"<br>";
     toolTip += tr("Role: %1<br>").arg(AUser->data(MUDR_ROLE).toString());
     toolTip += tr("Affiliation: %1<br>").arg(AUser->data(MUDR_AFFILIATION).toString());
     toolTip += tr("Status: %1").arg(AUser->data(MUDR_STATUS).toString());
@@ -1140,7 +1140,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 
       QString message = tr("%1 (%2) has joined the room. %3");
       message = message.arg(AUser->nickName());
-      message = message.arg(AUser->data(MUDR_REALJID).toString());
+      message = message.arg(AUser->data(MUDR_REAL_JID).toString());
       message = message.arg(AStatus);
       showServiceMessage(message);
     }
@@ -1154,7 +1154,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
     {
       QString message = tr("%1 (%2) has left the room. %3");
       message = message.arg(AUser->nickName());
-      message = message.arg(AUser->data(MUDR_REALJID).toString());
+      message = message.arg(AUser->data(MUDR_REAL_JID).toString());
       message = message.arg(AStatus.isEmpty() ? tr("Disconnected") : AStatus);
       showServiceMessage(message);
     }

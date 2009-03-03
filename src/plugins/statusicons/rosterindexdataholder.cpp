@@ -18,20 +18,20 @@ QList<int> RosterIndexDataHolder::roles() const
 
 QList<int> RosterIndexDataHolder::types() const
 {
-  return QList<int>() << RIT_StreamRoot 
-                      << RIT_Contact 
-                      << RIT_Agent 
-                      << RIT_MyResource;
+  return QList<int>() << RIT_STREAM_ROOT 
+                      << RIT_CONTACT 
+                      << RIT_AGENT 
+                      << RIT_MY_RESOURCE;
 }
 
 QVariant RosterIndexDataHolder::data(const IRosterIndex *AIndex, int /*ARole*/) const
 {
-  Jid contactJid = AIndex->data(RDR_Jid).toString();
+  Jid contactJid = AIndex->data(RDR_JID).toString();
   if (contactJid.isValid())
   {
-    int show = AIndex->data(RDR_Show).toInt();
-    QString subscription = AIndex->data(RDR_Subscription).toString();
-    bool ask = !AIndex->data(RDR_Ask).toString().isEmpty();
+    int show = AIndex->data(RDR_SHOW).toInt();
+    QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
+    bool ask = !AIndex->data(RDR_ASK).toString().isEmpty();
     return FStatusIcons->iconByJidStatus(contactJid,show,subscription,ask);
   }
   return QVariant();

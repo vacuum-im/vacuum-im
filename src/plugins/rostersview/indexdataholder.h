@@ -28,7 +28,7 @@ public:
   bool checkOption(IRostersView::Option AOption) const;
   void setOption(IRostersView::Option AOption, bool AValue);
 signals:
-  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_AnyRole);
+  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
 protected:
   QString toolTipText(const IRosterIndex *AIndex) const;
 private:

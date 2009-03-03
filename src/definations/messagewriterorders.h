@@ -1,5 +1,5 @@
-#ifndef MESSAGEWRITERORDERS_H
-#define MESSAGEWRITERORDERS_H
+#ifndef DEF_MESSAGEWRITERORDERS_H
+#define DEF_MESSAGEWRITERORDERS_H
 
 #define MWO_MESSENGER                         0
 #define MWO_MESSENGER_ANCHORS                 200

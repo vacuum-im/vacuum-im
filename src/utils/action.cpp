@@ -1,4 +1,3 @@
-#include <QtDebug>
 #include "action.h"
 
 Action::Action(QObject *AParent) : QAction(AParent)

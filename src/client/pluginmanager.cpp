@@ -219,7 +219,7 @@ void PluginManager::initPlugins()
   QHash<QUuid,PluginItem>::const_iterator it = FPluginItems.constBegin();
   while (it!=FPluginItems.constEnd())
   {
-    int initOrder = 0;
+    int initOrder = PIO_DEFAULT;
     IPlugin *plugin = it.value().plugin;
     if(plugin->initConnections(this,initOrder))
     {

@@ -1,5 +1,5 @@
-#ifndef DATAFORMTYPES_H
-#define DATAFORMTYPES_H
+#ifndef DEF_DATAFORMTYPES_H
+#define DEF_DATAFORMTYPES_H
 
 //ClientInfo
 #define DATA_FORM_SOFTWAREINFO                "urn:xmpp:dataforms:softwareinfo"

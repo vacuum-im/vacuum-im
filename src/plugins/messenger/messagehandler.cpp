@@ -23,10 +23,10 @@ MessageHandler::~MessageHandler()
 
 bool MessageHandler::openWindow(IRosterIndex *AIndex)
 {
-  if (AIndex->type() == RIT_Contact || AIndex->type() == RIT_MyResource)
+  if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_MY_RESOURCE)
   {
-    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
-    Jid contactJid = AIndex->data(RDR_Jid).toString();
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+    Jid contactJid = AIndex->data(RDR_JID).toString();
     return openWindow(streamJid,contactJid,Message::Chat);
   }
   return false;

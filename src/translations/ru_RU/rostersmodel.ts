@@ -3,12 +3,12 @@
 <context>
     <name>RostersModel</name>
     <message>
-        <location filename="../../plugins/rostersmodel/rostersmodel.cpp" line="36"/>
+        <location filename="../../plugins/rostersmodel/rostersmodel.cpp" line="35"/>
         <source>Creating and handling roster tree</source>
         <translation>Создание и управление контакт-листом</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersmodel/rostersmodel.cpp" line="38"/>
+        <location filename="../../plugins/rostersmodel/rostersmodel.cpp" line="37"/>
         <source>Rosters Model</source>
         <translation>Модель контакт-листа</translation>
     </message>

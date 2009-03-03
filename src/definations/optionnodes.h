@@ -1,5 +1,5 @@
-#ifndef OPTIONNODES_H
-#define OPTIONNODES_H
+#ifndef DEF_OPTIONNODES_H
+#define DEF_OPTIONNODES_H
 
 #define ON_ACCOUNTS           "Accounts"
 #define ON_STATUSICONS        "StatusIcons"

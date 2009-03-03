@@ -816,7 +816,7 @@ Menu *PrivacyLists::createPrivacyMenu(Menu *AMenu) const
   Menu *pmenu = new Menu(AMenu);
   pmenu->setTitle(tr("Privacy"));
   pmenu->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS);
-  AMenu->addAction(pmenu->menuAction(),AG_PRIVACYLISTS_ROSTER,true);
+  AMenu->addAction(pmenu->menuAction(),AG_RVCM_PRIVACYLISTS,true);
   return pmenu;
 }
 
@@ -1085,16 +1085,16 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
       setPrivacyLabel(AStreamJid,contactJid,false); }
 
     IRosterIndex *rootIndex = FRostersModel->streamRoot(AStreamJid);
-    IRosterIndex *groupIndex = FRostersModel->findRosterIndex(RIT_NotInRosterGroup,FRostersModel->notInRosterGroupName(),rootIndex);
+    IRosterIndex *groupIndex = FRostersModel->findRosterIndex(RIT_GROUP_NOT_IN_ROSTER,FRostersModel->notInRosterGroupName(),rootIndex);
     if (groupIndex)
     {
       for (int i=0;i<groupIndex->childCount();i++)
       {
         IRosterIndex *index = groupIndex->child(i);
-        if (index->type() == RIT_Contact || index->type()==RIT_Agent)
+        if (index->type() == RIT_CONTACT || index->type()==RIT_AGENT)
         {
           IRosterItem ritem;
-          ritem.itemJid = index->data(RDR_BareJid).toString();
+          ritem.itemJid = index->data(RDR_BARE_JID).toString();
           if ((denyedStanzas(ritem,privacyList(AStreamJid,activeList(AStreamJid))) & IPrivacyRule::AnyStanza)>0)
             FRostersView->insertIndexLabel(FRosterLabelId,index);
           else
@@ -1225,10 +1225,10 @@ void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
 
 void PrivacyLists::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  Jid streamJid = AIndex->data(RDR_StreamJid).toString();
+  Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
   if (isReady(streamJid))
   {
-    if (AIndex->type() == RIT_StreamRoot)
+    if (AIndex->type() == RIT_STREAM_ROOT)
     {
       Menu *pmenu = createPrivacyMenu(AMenu);
       createAutoPrivacyStreamActions(streamJid,pmenu);
@@ -1250,22 +1250,22 @@ void PrivacyLists::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       Action *action = new Action(AMenu);
       action->setText(tr("Advanced..."));
       action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_ADVANCED);
-      action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
+      action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowEditListsDialog(bool)));
       pmenu->addAction(action,AG_DEFAULT+400,false);
     }
     else if (isAutoPrivacy(streamJid))
     {
-      if (AIndex->type()==RIT_Contact || AIndex->type()==RIT_Agent)
+      if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_AGENT)
       {
         Menu *pmenu = createPrivacyMenu(AMenu);
-        Jid contactJid = AIndex->data(RDR_BareJid).toString();
+        Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
         createAutoPrivacyContactActions(streamJid,contactJid,pmenu);
       }
-      else if (AIndex->type()==RIT_Group)
+      else if (AIndex->type()==RIT_GROUP)
       {
         Menu *pmenu = createPrivacyMenu(AMenu);
-        QString group = AIndex->data(RDR_Group).toString();
+        QString group = AIndex->data(RDR_GROUP).toString();
         createAutoPrivacyGroupActions(streamJid,group,pmenu);
       }
     }
@@ -1274,12 +1274,12 @@ void PrivacyLists::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
 void PrivacyLists::onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex * /*AParent*/)
 {
-  if (FRostersView && (AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent))
+  if (FRostersView && (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT))
   {
-    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     if (!activeList(streamJid).isEmpty())
     {
-      Jid contactJid = AIndex->data(RDR_BareJid).toString();
+      Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
       IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
       IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
       ritem.itemJid = contactJid;
@@ -1297,8 +1297,8 @@ void PrivacyLists::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMu
 {
   if (ALabelId == FRosterLabelId)
   {
-    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
-    Jid contactJid = AIndex->data(RDR_BareJid).toString();
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+    Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
     IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
     ritem.itemJid = contactJid;
@@ -1308,7 +1308,7 @@ void PrivacyLists::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMu
     toolTip += tr("- messages: %1").arg((stanzas & IPrivacyRule::Messages) >0           ? tr("<b>denyed</b>") : tr("allowed")) + "<br>";
     toolTip += tr("- presences in: %1").arg((stanzas & IPrivacyRule::PresencesIn) >0    ? tr("<b>denyed</b>") : tr("allowed")) + "<br>";
     toolTip += tr("- presences out: %1").arg((stanzas & IPrivacyRule::PresencesOut) >0  ? tr("<b>denyed</b>") : tr("allowed"));
-    AToolTips.insertMulti(TTO_PRIVACY,toolTip);
+    AToolTips.insertMulti(RTTO_PRIVACY,toolTip);
   }
 }
 

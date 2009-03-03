@@ -1,4 +1,3 @@
-#include <QtDebug>
 #include "saslbind.h"
 
 SASLBind::SASLBind(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())

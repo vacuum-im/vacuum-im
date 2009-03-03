@@ -3,8 +3,8 @@
 
 #include "../../definations/namespaces.h"
 #include "../../definations/dataformtypes.h"
-#include "../../definations/sessionnegotiatororder.h"
-#include "../../definations/discofeatureorder.h"
+#include "../../definations/sessionnegotiatororders.h"
+#include "../../definations/discofeaturehandlerorders.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/notificationdataroles.h"
 #include "../../definations/resources.h"

@@ -41,7 +41,7 @@ QString ReceiversWidget::receiverName(const Jid &AReceiver) const
 {
   QTreeWidgetItem *contactItem = FContactItems.value(AReceiver,NULL);
   if (contactItem)
-    return contactItem->data(0,RDR_Name).toString();
+    return contactItem->data(0,RDR_NAME).toString();
   return QString();
 }
 
@@ -132,8 +132,8 @@ QTreeWidgetItem *ReceiversWidget::getReceiversGroup(const QString &AGroup)
       groupItem->setCheckState(0,parentGroupItem->checkState(0));
       groupItem->setForeground(0,Qt::blue);
       groupItem->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
-      groupItem->setData(0,RDR_Type,RIT_Group);
-      groupItem->setData(0,RDR_Group,curGroup);
+      groupItem->setData(0,RDR_TYPE,RIT_GROUP);
+      groupItem->setData(0,RDR_GROUP,curGroup);
       FGroupItems.insert(curGroup,groupItem);
     }
     parentGroupItem = groupItem;
@@ -155,9 +155,9 @@ QTreeWidgetItem *ReceiversWidget::getReceiver(const Jid &AReceiver, const QStrin
     contactItem = new QTreeWidgetItem(AParent,columns);
     contactItem->setIcon(0,FStatusIcons->iconByJid(FStreamJid,AReceiver));
     contactItem->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
-    contactItem->setData(0,RDR_Type,RIT_Contact);
-    contactItem->setData(0,RDR_Jid,AReceiver.full());
-    contactItem->setData(0,RDR_Name,AName);
+    contactItem->setData(0,RDR_TYPE,RIT_CONTACT);
+    contactItem->setData(0,RDR_JID,AReceiver.full());
+    contactItem->setData(0,RDR_NAME,AName);
     FContactItems.insert(AReceiver,contactItem);
   }
   return contactItem;
@@ -230,9 +230,9 @@ void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int /*AColu
 {
   static int blockUpdateChilds = 0;
 
-  if (AItem->data(0,RDR_Type).toInt() == RIT_Contact)
+  if (AItem->data(0,RDR_TYPE).toInt() == RIT_CONTACT)
   {
-    Jid contactJid = AItem->data(0,RDR_Jid).toString();
+    Jid contactJid = AItem->data(0,RDR_JID).toString();
     if (AItem->checkState(0) == Qt::Checked && !FReceivers.contains(contactJid))
     {
       FReceivers.append(contactJid);
@@ -248,7 +248,7 @@ void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int /*AColu
     foreach(QTreeWidgetItem *contactItem,contactItems)
       contactItem->setCheckState(0,AItem->checkState(0));
   }
-  else if (blockUpdateChilds == 0 && AItem->data(0,RDR_Type).toInt() == RIT_Group)
+  else if (blockUpdateChilds == 0 && AItem->data(0,RDR_TYPE).toInt() == RIT_GROUP)
   {
     for (int i =0; i< AItem->childCount(); i++)
       AItem->child(i)->setCheckState(0,AItem->checkState(0));

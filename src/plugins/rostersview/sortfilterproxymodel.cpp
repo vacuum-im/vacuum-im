@@ -32,14 +32,14 @@ void SortFilterProxyModel::setOption(IRostersView::Option AOption, bool AValue)
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
-  int leftType = ALeft.data(RDR_Type).toInt();
-  int rightType = ARight.data(RDR_Type).toInt();
+  int leftType = ALeft.data(RDR_TYPE).toInt();
+  int rightType = ARight.data(RDR_TYPE).toInt();
   if (leftType == rightType)
   {
-    int leftShow = ALeft.data(RDR_Show).toInt();
-    int rightShow = ARight.data(RDR_Show).toInt();
+    int leftShow = ALeft.data(RDR_SHOW).toInt();
+    int rightShow = ARight.data(RDR_SHOW).toInt();
     bool showOnlineFirst = checkOption(IRostersView::ShowOnlineFirst);
-    if (showOnlineFirst && leftType!=RIT_StreamRoot && leftShow!=rightShow)
+    if (showOnlineFirst && leftType!=RIT_STREAM_ROOT && leftShow!=rightShow)
     {
       const static int showOrders[] = {6,1,2,3,4,5,0,7};
       return showOrders[leftShow] < showOrders[rightShow];
@@ -60,23 +60,23 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
 
   if (index.isValid())
   {
-    int indexType = index.data(RDR_Type).toInt();
+    int indexType = index.data(RDR_TYPE).toInt();
     switch(indexType)
     {
-    case RIT_Contact:
-    case RIT_Agent:
+    case RIT_CONTACT:
+    case RIT_AGENT:
       {
-        QList<QVariant> labelFlags = index.data(RDR_LabelFlags).toList();
+        QList<QVariant> labelFlags = index.data(RDR_LABEL_FLAGS).toList();
         foreach(QVariant flag, labelFlags)
           if ((flag.toInt() & IRostersView::LabelVisible) > 0)
             return true;
-        int indexShow = index.data(RDR_Show).toInt();
+        int indexShow = index.data(RDR_SHOW).toInt();
         return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
       }
-    case RIT_Group:
-    case RIT_AgentsGroup:
-    case RIT_BlankGroup:
-    case RIT_NotInRosterGroup:
+    case RIT_GROUP:
+    case RIT_GROUP_AGENTS:
+    case RIT_GROUP_BLANK:
+    case RIT_GROUP_NOT_IN_ROSTER:
       {
         for(int childRow = 0; index.child(childRow,0).isValid(); childRow++)
           if (filterAcceptsRow(childRow,index))

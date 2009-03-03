@@ -84,7 +84,7 @@ bool RosterSearch::initObjects()
     searchAction->setToolTip(tr("Show search toolbar"));
     searchAction->setCheckable(true);
     connect(searchAction,SIGNAL(triggered(bool)),SLOT(onSearchActionTriggered(bool)));
-    FMainWindow->topToolBarChanger()->addAction(searchAction,AG_ROSTERSEARCH_MWTTB);
+    FMainWindow->topToolBarChanger()->addAction(searchAction,AG_MWTTB_ROSTERSEARCH);
 
     FMainWindow->addToolBar(FSearchToolBarChanger->toolBar());
     FMainWindow->insertToolBarBreak(FSearchToolBarChanger->toolBar());
@@ -92,9 +92,9 @@ bool RosterSearch::initObjects()
     FSearchToolBarChanger->toolBar()->setVisible(false);
   }
 
-  insertSearchField(RDR_Name,tr("Name"),true);
-  insertSearchField(RDR_Status,tr("Status"),true);
-  insertSearchField(RDR_Jid,tr("Jabber ID"),true);
+  insertSearchField(RDR_NAME,tr("Name"),true);
+  insertSearchField(RDR_STATUS,tr("Status"),true);
+  insertSearchField(RDR_JID,tr("Jabber ID"),true);
 
   return true;
 }
@@ -129,7 +129,7 @@ void RosterSearch::setSearchEnabled(bool AEnabled)
     if (FRostersView)
     {
       if (AEnabled)
-        FRostersView->insertProxyModel(this,RVPO_ROSTERSEARCH_FILTER);
+        FRostersView->insertProxyModel(this,RPO_ROSTERSEARCH_FILTER);
       else
         FRostersView->removeProxyModel(this);
     }
@@ -194,11 +194,11 @@ bool RosterSearch::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
   if (!searchPattern().isEmpty())
   {
     QModelIndex index = sourceModel()!=NULL ? sourceModel()->index(ARow,0,AParent) : QModelIndex();
-    switch (index.data(RDR_Type).toInt())
+    switch (index.data(RDR_TYPE).toInt())
     {
-    case RIT_Contact:
-    case RIT_Agent:
-    case RIT_MyResource:
+    case RIT_CONTACT:
+    case RIT_AGENT:
+    case RIT_MY_RESOURCE:
       {
         bool accept = true;
         foreach(int dataField, FFieldActions.keys())
@@ -212,10 +212,10 @@ bool RosterSearch::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
         }
         return accept;
       }
-    case RIT_Group:
-    case RIT_AgentsGroup:
-    case RIT_BlankGroup:
-    case RIT_NotInRosterGroup:
+    case RIT_GROUP:
+    case RIT_GROUP_AGENTS:
+    case RIT_GROUP_BLANK:
+    case RIT_GROUP_NOT_IN_ROSTER:
       {
         for(int childRow = 0; index.child(childRow,0).isValid(); childRow++)
           if (filterAcceptsRow(childRow,index))

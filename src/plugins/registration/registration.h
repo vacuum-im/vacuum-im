@@ -3,7 +3,7 @@
 
 #include <QCheckBox>
 #include "../../definations/namespaces.h"
-#include "../../definations/discofeatureorder.h"
+#include "../../definations/discofeaturehandlerorders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionwidgetorders.h"
 #include "../../definations/dataformtypes.h"

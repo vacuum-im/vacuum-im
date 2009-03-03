@@ -17,8 +17,8 @@ public:
   ~RosterIndex();
   QObject *instance() { return this; }
   //IRosterIndex
-  virtual int type() const { return data(RDR_Type).toInt(); }
-  virtual QString id() const { return data(RDR_Id).toString(); }
+  virtual int type() const { return data(RDR_TYPE).toInt(); }
+  virtual QString id() const { return data(RDR_INDEX_ID).toString(); }
   virtual IRosterIndex *parentIndex() const { return FParentIndex; } 
   virtual void setParentIndex(IRosterIndex *AIndex);
   virtual int row() const;

@@ -1,5 +1,5 @@
-#ifndef SERVICEICONS_H
-#define SERVICEICONS_H
+#ifndef DEF_SERVICEICONS_H
+#define DEF_SERVICEICONS_H
 
 #define SRI_SERVICE                         "_service_"
 #define SRI_SERVICE_EMPTY                   "_empty_"

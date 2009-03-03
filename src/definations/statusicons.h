@@ -1,5 +1,5 @@
-#ifndef DEFINATION_STATUCICONS_H
-#define DEFINATION_STATUCICONS_H
+#ifndef DEF_STATUCICONS_H
+#define DEF_STATUCICONS_H
 
 //StatusIcons
 #define STO_PATTERN     "pattern"

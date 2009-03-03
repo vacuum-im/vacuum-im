@@ -5,6 +5,7 @@
 #include <QTranslator>
 #include <QApplication>
 #include <QPluginLoader>
+#include "../definations/plugininitorders.h"
 #include "../definations/commandline.h"
 #include "../interfaces/ipluginmanager.h"
 

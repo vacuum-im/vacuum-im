@@ -1,5 +1,5 @@
-#include <QtDebug>
 #include "emoticons.h"
+
 #include <QSet>
 
 #define SMILEY_BY_ICONSET_SCHEMA        "smiley"
@@ -236,7 +236,7 @@ void Emoticons::insertSelectIconMenu(const QString &AIconsetFile)
   {
     SelectIconMenu *menu = createSelectIconMenu(AIconsetFile,widget);
     FToolBarWidgetByMenu.insert(menu,widget);
-    QToolButton *button = widget->toolBarChanger()->addToolButton(menu->menuAction(),AG_EMOTICONS_EDITWIDGET,false);
+    QToolButton *button = widget->toolBarChanger()->addToolButton(menu->menuAction(),AG_EEWT_EMOTICONS,false);
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
     button->setPopupMode(QToolButton::InstantPopup);
   }
@@ -269,7 +269,7 @@ void Emoticons::onToolBarWidgetCreated(IToolBarWidget *AWidget)
     {
       SelectIconMenu *menu = createSelectIconMenu(iconsetFile,AWidget);
       FToolBarWidgetByMenu.insert(menu,AWidget);
-      QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),AG_EMOTICONS_EDITWIDGET);
+      QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),AG_EEWT_EMOTICONS);
       button->setToolButtonStyle(Qt::ToolButtonIconOnly);
       button->setPopupMode(QToolButton::InstantPopup);
     }

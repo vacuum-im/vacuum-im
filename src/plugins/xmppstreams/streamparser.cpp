@@ -1,7 +1,5 @@
 #include "streamparser.h"
 
-#include <QtDebug>
-
 StreamParser::StreamParser(QObject *AParent) : QObject(AParent)
 {
   FReader.setNamespaceProcessing(true);
@@ -78,7 +76,6 @@ void StreamParser::parseData(const QByteArray &AData)
 
   if (FReader.hasError() && FReader.error()!=QXmlStreamReader::PrematureEndOfDocumentError)
   {
-    qDebug() << "PARSER ERROR ON DATA:" << AData;
     emit error(FReader.errorString());
   }
 }
