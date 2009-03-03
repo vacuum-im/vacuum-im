@@ -5,14 +5,18 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterlabelorders.h"
+#include "../../definations/rosterindextyperole.h"
+#include "../../definations/rosterdataholderorders.h"
 #include "../../definations/tooltiporders.h"
 #include "../../definations/menuicons.h"
 #include "../../definations/resources.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iannotations.h"
 #include "../../interfaces/iroster.h"
+#include "../../interfaces/irostersearch.h"
 #include "../../interfaces/iprivatestorage.h"
 #include "../../interfaces/irostersview.h"
+#include "../../interfaces/irostersmodel.h"
 #include "../../utils/datetime.h"
 #include "editnotedialog.h"
 
@@ -25,10 +29,11 @@ struct Annotation {
 class Annotations : 
   public QObject,
   public IPlugin,
-  public IAnnotations
+  public IAnnotations,
+  public IRosterIndexDataHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IAnnotations);
+  Q_INTERFACES(IPlugin IAnnotations IRosterIndexDataHolder);
 public:
   Annotations();
   ~Annotations();
@@ -40,6 +45,12 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
+  //IRosterIndexDataHolder
+  virtual int order() const;
+  virtual QList<int> roles() const;
+  virtual QList<int> types() const;
+  virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
+  virtual bool setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
   //IAnnotations
   virtual bool isEnabled(const Jid &AStreamJid) const;
   virtual QList<Jid> annotations(const Jid &AStreamJid) const;
@@ -54,6 +65,9 @@ signals:
   virtual void annotationsSaved(const Jid &AStreamJid);
   virtual void annotationsError(const Jid &AStreamJid, const QString &AError);
   virtual void annotationModified(const Jid &AStreamJid, const Jid &AContactJid);
+  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+protected:
+  void updateDataHolder(const Jid &AStreamJid, const QList<Jid> &AContactJids);
 protected slots:
   void onPrivateStorageOpened(const Jid &AStreamJid);
   void onPrivateDataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
@@ -67,7 +81,9 @@ protected slots:
   void onEditNoteDialogDestroyed();
 private:
   IPrivateStorage *FPrivateStorage;
+  IRosterSearch *FRosterSearch;
   IRosterPlugin *FRosterPlugin;
+  IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
   QHash<Jid, QString> FLoadRequests;

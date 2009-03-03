@@ -58,5 +58,7 @@
 //Avatars
 #define RDR_AVATAR_HASH                             Qt::UserRole + 53
 #define RDR_AVATAR_IMAGE                            Qt::UserRole + 54
+//Annotations
+#define RDR_ANNOTATIONS                             Qt::UserRole + 55
 
 #endif

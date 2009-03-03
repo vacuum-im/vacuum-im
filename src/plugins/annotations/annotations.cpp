@@ -9,7 +9,9 @@
 Annotations::Annotations()
 {
   FPrivateStorage = NULL;
+  FRosterSearch = NULL;
   FRosterPlugin = NULL;
+  FRostersModel = NULL;
   FRostersViewPlugin = NULL;
 }
 
@@ -59,9 +61,17 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     }
   }
 
+  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  if (plugin)
+    FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+
   plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+
+  plugin = APluginManager->getPlugins("IRosterSearch").value(0,NULL);
+  if (plugin)
+    FRosterSearch = qobject_cast<IRosterSearch *>(plugin->instance());
 
   return FPrivateStorage!=NULL;
 }
@@ -75,7 +85,53 @@ bool Annotations::initObjects()
     connect(rostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
+  if (FRostersModel)
+  {
+    FRostersModel->insertDefaultDataHolder(this);
+  }
+  if (FRosterSearch)
+  {
+    FRosterSearch->insertSearchField(RDR_ANNOTATIONS,tr("Annotation"),true);
+  }
   return true;
+}
+
+int Annotations::order() const
+{
+  return RDHO_DEFAULT;
+}
+
+QList<int> Annotations::roles() const
+{
+  static const QList<int> dataRoles = QList<int>() << RDR_ANNOTATIONS;
+  return dataRoles;
+}
+
+QList<int> Annotations::types() const
+{
+  static const QList<int> dataTypes = QList<int>() << RIT_Contact << RIT_Agent;
+  return dataTypes;
+}
+
+QVariant Annotations::data(const IRosterIndex *AIndex, int ARole) const
+{
+  if (ARole == RDR_ANNOTATIONS)
+  {
+    QString note = annotation(AIndex->data(RDR_StreamJid).toString(),AIndex->data(RDR_BareJid).toString());
+    return !note.isEmpty() ? QVariant(note) : QVariant();
+  }
+  return QVariant();
+}
+
+bool Annotations::setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+{
+  if (types().contains(AIndex->type()) && ARole==RDR_ANNOTATIONS)
+  {
+    setAnnotation(AIndex->data(RDR_StreamJid).toString(),AIndex->data(RDR_BareJid).toString(),AValue.toString());
+    saveAnnotations(AIndex->data(RDR_StreamJid).toString());
+    return true;
+  }
+  return false;
 }
 
 bool Annotations::isEnabled(const Jid &AStreamJid) const
@@ -120,6 +176,7 @@ void Annotations::setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, c
       FAnnotations[AStreamJid].remove(AContactJid.bare());
     }
     emit annotationModified(AStreamJid,AContactJid);
+    updateDataHolder(AStreamJid,QList<Jid>()<<AContactJid);
   }
 }
 
@@ -166,6 +223,19 @@ bool Annotations::saveAnnotations(const Jid &AStreamJid)
   return false;
 }
 
+void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &AContactJids)
+{
+  if (FRostersModel && !AContactJids.isEmpty() && FRostersModel->streamRoot(AStreamJid))
+  {
+    QMultiHash<int,QVariant> findData;
+    foreach(Jid contactJid, AContactJids)
+      findData.insertMulti(RDR_BareJid,contactJid.pBare());
+    IRosterIndexList indexes = FRostersModel->streamRoot(AStreamJid)->findChild(findData,true);
+    foreach (IRosterIndex *index, indexes)
+      emit dataChanged(index,RDR_ANNOTATIONS);
+  }
+}
+
 void Annotations::onPrivateStorageOpened(const Jid &AStreamJid)
 {
   loadAnnotations(AStreamJid);
@@ -204,6 +274,7 @@ void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid,
       elem= elem.nextSiblingElement("note");
     }
     emit annotationsLoaded(AStreamJid);
+    updateDataHolder(AStreamJid,annotations(AStreamJid));
   }
 }
 
@@ -225,10 +296,14 @@ void Annotations::onPrivateDataError(const QString &AId, const QString &AError)
 
 void Annotations::onPrivateStorageClosed(const Jid &AStreamJid)
 {
+  QList<Jid> curAnnotations = annotations(AStreamJid);
+
   qDeleteAll(FEditDialogs.take(AStreamJid));
   FLoadRequests.remove(AStreamJid);
   FSaveRequests.remove(AStreamJid);
   FAnnotations.remove(AStreamJid);
+
+  updateDataHolder(AStreamJid,curAnnotations);
 }
 
 void Annotations::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem)
@@ -247,7 +322,7 @@ void Annotations::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   Jid streamJid = AIndex->data(RDR_StreamJid).toString();
   Jid contactJid = AIndex->data(RDR_BareJid).toString();
-  if (isEnabled(streamJid) && contactJid.isValid())
+  if (types().contains(AIndex->type()) && isEnabled(streamJid) && contactJid.isValid())
   {
     Action *action = new Action(AMenu);
     action->setText(tr("Annotation"));
@@ -261,9 +336,9 @@ void Annotations::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
 void Annotations::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-  if (ALabelId == RLID_DISPLAY)
+  if (ALabelId==RLID_DISPLAY && types().contains(AIndex->type()))
   {
-    QString note = annotation(AIndex->data(RDR_StreamJid).toString(),AIndex->data(RDR_BareJid).toString());
+    QString note = AIndex->data(RDR_ANNOTATIONS).toString();
     if (!note.isEmpty())
     {
       QString toolTip = "<hr>"+Qt::escape(note).trimmed().replace("\n","<br>");
