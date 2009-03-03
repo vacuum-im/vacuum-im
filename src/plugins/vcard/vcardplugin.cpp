@@ -84,7 +84,7 @@ bool VCardPlugin::initObjects()
   if (FRostersViewPlugin)
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
   if (FDiscovery)
   {

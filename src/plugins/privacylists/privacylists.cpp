@@ -106,9 +106,9 @@ bool PrivacyLists::initObjects()
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FRosterLabelId = FRostersView->createIndexLabel(RLO_PRIVACY,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE));
-    connect(FRostersView,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
+    connect(FRostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
-    connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
   return true;
 }

@@ -66,9 +66,9 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
     if (FRostersViewPlugin)
     {
-      connect(FRostersViewPlugin->rostersView(),SIGNAL(notifyActivated(IRosterIndex *, int)),
+      connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyActivated(IRosterIndex *, int)),
         SLOT(onRosterNotifyActivated(IRosterIndex *, int)));
-      connect(FRostersViewPlugin->rostersView(),SIGNAL(notifyRemovedByIndex(IRosterIndex *, int)),
+      connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyRemovedByIndex(IRosterIndex *, int)),
         SLOT(onRosterNotifyRemoved(IRosterIndex *, int)));
     }
   }

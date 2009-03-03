@@ -182,7 +182,7 @@ bool StatusChanger::initObjects()
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING),IRostersView::LabelBlink);
-    connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),
+    connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
 
