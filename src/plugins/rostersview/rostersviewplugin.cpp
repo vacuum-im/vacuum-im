@@ -1,6 +1,5 @@
 #include "rostersviewplugin.h"
 
-#include <QtDebug>
 #include <QTimer>
 #include <QScrollBar>
 
@@ -30,6 +29,9 @@ RostersViewPlugin::RostersViewPlugin()
   FShowOfflineAction = NULL;
   FOptions = 0;
   FStartRestoreExpandState = false;
+  
+  FViewSavedState.sliderPos = 0;
+  FViewSavedState.currentIndex = NULL;
 
   FRostersView = new RostersView;
   connect(FRostersView,SIGNAL(destroyed(QObject *)), SLOT(onRostersViewDestroyed(QObject *)));
@@ -112,10 +114,10 @@ bool RostersViewPlugin::initObjects()
     SLOT(onModelAboutToBeSeted(IRostersModel *)));
   connect(FRostersView,SIGNAL(modelSeted(IRostersModel *)),
     SLOT(onModelSeted(IRostersModel *)));
-  connect(FRostersView,SIGNAL(lastModelAboutToBeChanged(QAbstractItemModel *)),
-    SLOT(onLastModelAboutToBeChanged(QAbstractItemModel *)));
-  connect(FRostersView,SIGNAL(lastModelChanged(QAbstractItemModel *)),
-    SLOT(onLastModelChanged(QAbstractItemModel *)));
+  connect(FRostersView,SIGNAL(viewModelAboutToBeChanged(QAbstractItemModel *)),
+    SLOT(onViewModelAboutToBeChanged(QAbstractItemModel *)));
+  connect(FRostersView,SIGNAL(viewModelChanged(QAbstractItemModel *)),
+    SLOT(onViewModelChanged(QAbstractItemModel *)));
   
   if (FSettingsPlugin)
   {
@@ -146,10 +148,10 @@ bool RostersViewPlugin::initObjects()
 
   if (FRostersModel)
   {
-    FRostersView->setModel(FRostersModel);
+    FRostersView->setRostersModel(FRostersModel);
     FSortFilterProxyModel = new SortFilterProxyModel(this);
     FSortFilterProxyModel->setDynamicSortFilter(true);
-    FRostersView->addProxyModel(FSortFilterProxyModel);
+    FRostersView->insertProxyModel(FSortFilterProxyModel,RVPO_ROSTERSVIEW_SORTFILTER);
     FSortFilterProxyModel->sort(0,Qt::AscendingOrder);
   }
 
@@ -315,7 +317,7 @@ void RostersViewPlugin::onModelReset()
   FRostersView->verticalScrollBar()->setSliderPosition(FViewSavedState.sliderPos);
 }
 
-void RostersViewPlugin::onLastModelAboutToBeChanged(QAbstractItemModel * /*AModel*/)
+void RostersViewPlugin::onViewModelAboutToBeChanged(QAbstractItemModel * /*AModel*/)
 {
   if (FRostersView->rostersModel())
   {
@@ -324,7 +326,7 @@ void RostersViewPlugin::onLastModelAboutToBeChanged(QAbstractItemModel * /*AMode
   }
 }
 
-void RostersViewPlugin::onLastModelChanged(QAbstractItemModel *AModel)
+void RostersViewPlugin::onViewModelChanged(QAbstractItemModel *AModel)
 {
   if (AModel)
   {
@@ -333,7 +335,7 @@ void RostersViewPlugin::onLastModelChanged(QAbstractItemModel *AModel)
   }
 }
 
-void RostersViewPlugin::onProxyAdded(QAbstractProxyModel * AProxyModel)
+void RostersViewPlugin::onProxyAdded(QAbstractProxyModel *AProxyModel)
 {
   connect(AProxyModel,SIGNAL(modelReset()),SLOT(onModelReset()));
   startRestoreExpandState();

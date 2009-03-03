@@ -6,6 +6,7 @@
 #include <QSortFilterProxyModel>
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/rosterproxyorders.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
@@ -53,7 +54,7 @@ signals:
   virtual void searchFieldChanged(int ADataRole);
   virtual void searchFieldRemoved(int ADataRole);
 protected:
-  virtual bool filterAcceptsRow (int ARow, const QModelIndex &AParent) const;
+  virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 protected slots:
   void onFieldActionTriggered(bool);
   void onSearchActionTriggered(bool AChecked);

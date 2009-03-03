@@ -8,11 +8,21 @@
 #include "../../definations/tooltiporders.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterfootertextorder.h"
+#include "../../definations/rosterfootertextorders.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
 #include "rosterindexdelegate.h" 
+
+struct NotifyItem
+{
+  int notifyId;
+  int order;
+  QIcon icon;
+  QString toolTip;
+  int flags;
+  IRosterIndexList indexes;
+};
 
 class RostersView : 
   virtual public QTreeView,
@@ -23,17 +33,16 @@ class RostersView :
 public:
   RostersView(QWidget *AParent = NULL);
   ~RostersView();
-  virtual QObject *instance() { return this; }
+  virtual QTreeView *instance() { return this; }
   //IRostersView
-  virtual void setModel(IRostersModel *AModel); 
   virtual IRostersModel *rostersModel() const { return FRostersModel; }
+  virtual void setRostersModel(IRostersModel *AModel); 
   virtual bool repaintRosterIndex(IRosterIndex *AIndex);
   virtual void expandIndexParents(IRosterIndex *AIndex);
   virtual void expandIndexParents(const QModelIndex &AIndex);
   //--ProxyModels
-  virtual void addProxyModel(QAbstractProxyModel *AProxyModel);
-  virtual QList<QAbstractProxyModel *> proxyModels() const { return FProxyModels; }
-  virtual QAbstractProxyModel *lastProxyModel() const { return FProxyModels.value(FProxyModels.count()-1,NULL); }
+  virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder);
+  virtual QList<QAbstractProxyModel *> proxyModels() const;
   virtual void removeProxyModel(QAbstractProxyModel *AProxyModel);
   virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex) const;
   virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) const;
@@ -61,12 +70,12 @@ public:
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AModel);
   virtual void modelSeted(IRostersModel *AModel);
-  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *AProxyModel);
+  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *AProxyModel, int AOrder);
   virtual void proxyModelAdded(QAbstractProxyModel *AProxyModel);
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel);
   virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel);
-  virtual void lastModelAboutToBeChanged(QAbstractItemModel *AModel);
-  virtual void lastModelChanged(QAbstractItemModel *AModel);
+  virtual void viewModelAboutToBeChanged(QAbstractItemModel *AModel);
+  virtual void viewModelChanged(QAbstractItemModel *AModel);
   virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu);
   virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
@@ -87,7 +96,7 @@ protected:
   void removeBlinkLabel(int ALabelId);
   QString intId2StringId(int AIntId);
   void removeLabels();
-  void setLastModel(QAbstractItemModel *AModel);
+  void setViewModel(QAbstractItemModel *AModel);
   void updateStatusText(IRosterIndex *AIndex = NULL);
 protected:
   //QTreeView
@@ -124,15 +133,6 @@ private:
   QHash<int, QSet<IRosterIndex *> > FIndexLabelIndexes;
 private:
   int FNotifyId;
-  struct NotifyItem
-  {
-    int notifyId;
-    int order;
-    QIcon icon;
-    QString toolTip;
-    int flags;
-    IRosterIndexList indexes;
-  };
   QHash<int /*id*/ ,NotifyItem> FNotifyItems;
   QHash<int /*label*/, QList<int> > FNotifyLabelItems;
   QHash<IRosterIndex *, QHash<int /*order*/, int /*labelid*/> > FNotifyIndexOrderLabel;
@@ -141,7 +141,7 @@ private:
 private:
   int FOptions;
   RosterIndexDelegate *FRosterIndexDelegate;
-  QList<QAbstractProxyModel *> FProxyModels;
+  QMultiMap<int,QAbstractProxyModel *> FProxyModels;
 };
 
 #endif // ROSTERSVIEW_H
