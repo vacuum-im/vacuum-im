@@ -80,7 +80,7 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     if (rostersViewPlugin)
     {
       FRostersView = rostersViewPlugin->rostersView();
-      connect(FRostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+      connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
     }
   }
 

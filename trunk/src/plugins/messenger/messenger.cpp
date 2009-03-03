@@ -89,7 +89,7 @@ bool Messenger::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
     if (FRostersViewPlugin)
     {
-      connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
+      connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
         SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
     }
   }

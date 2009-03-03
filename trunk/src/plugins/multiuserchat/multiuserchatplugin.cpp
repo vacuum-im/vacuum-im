@@ -143,7 +143,7 @@ bool MultiUserChatPlugin::initObjects()
   }
   if (FRostersViewPlugin && FRostersViewPlugin->rostersView())
   {
-    connect(FRostersViewPlugin->rostersView(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
+    connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
       SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
   }
   if (FMainWindowPlugin)

@@ -71,8 +71,8 @@ bool Annotations::initObjects()
   if (FRostersViewPlugin)
   {
     IRostersView *rostersView = FRostersViewPlugin->rostersView();
-    connect(rostersView,SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
-    connect(rostersView,SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
+    connect(rostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(rostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
   return true;

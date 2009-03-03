@@ -25,7 +25,7 @@ struct NotifyItem
 };
 
 class RostersView : 
-  virtual public QTreeView,
+  public QTreeView,
   public IRostersView
 {
   Q_OBJECT;

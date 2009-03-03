@@ -14,8 +14,7 @@ public:
   virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder) =0;
 };
 
-class IRostersView :
-  virtual public QTreeView
+class IRostersView
 {
 public:
   enum Option {
