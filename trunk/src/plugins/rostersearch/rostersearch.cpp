@@ -129,7 +129,7 @@ void RosterSearch::setSearchEnabled(bool AEnabled)
     if (FRostersView)
     {
       if (AEnabled)
-        FRostersView->addProxyModel(this);
+        FRostersView->insertProxyModel(this,RVPO_ROSTERSEARCH_FILTER);
       else
         FRostersView->removeProxyModel(this);
     }

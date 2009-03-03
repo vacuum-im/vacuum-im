@@ -7,6 +7,7 @@
 #include "../../definations/optionwidgetorders.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterindextyperole.h"
+#include "../../definations/rosterproxyorders.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
@@ -63,8 +64,8 @@ protected slots:
   void onModelSeted(IRostersModel *AModel);
   void onModelAboutToBeReset();
   void onModelReset();
-  void onLastModelAboutToBeChanged(QAbstractItemModel *AModel);
-  void onLastModelChanged(QAbstractItemModel *AModel);
+  void onViewModelAboutToBeChanged(QAbstractItemModel *AModel);
+  void onViewModelChanged(QAbstractItemModel *AModel);
   void onProxyAdded(QAbstractProxyModel *AProxyModel);
   void onProxyRemoved(QAbstractProxyModel *AProxyModel);
   void onIndexInserted(const QModelIndex &AParent, int AStart, int AEnd);

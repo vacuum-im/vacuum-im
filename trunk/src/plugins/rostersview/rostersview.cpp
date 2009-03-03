@@ -41,7 +41,7 @@ RostersView::~RostersView()
   removeLabels();
 }
 
-void RostersView::setModel(IRostersModel *AModel)
+void RostersView::setRostersModel(IRostersModel *AModel)
 {
   if (FRostersModel != AModel)
   {
@@ -62,8 +62,8 @@ void RostersView::setModel(IRostersModel *AModel)
 
     FRostersModel = AModel;
     if (!FProxyModels.isEmpty())
-      FProxyModels.first()->setSourceModel(AModel);
-    setLastModel(AModel);
+      FProxyModels.values().first()->setSourceModel(AModel);
+    setViewModel(AModel);
     emit modelSeted(AModel);
   }
 }
@@ -103,40 +103,70 @@ void RostersView::expandIndexParents(const QModelIndex &AIndex)
   }
 }
 
-void RostersView::addProxyModel(QAbstractProxyModel *AProxyModel)
+void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 {
-  if (AProxyModel && !FProxyModels.contains(AProxyModel))
+  if (AProxyModel && !FProxyModels.values().contains(AProxyModel))
   {
-    emit proxyModelAboutToBeAdded(AProxyModel);
-    QAbstractProxyModel *lastProxy = lastProxyModel();
-    FProxyModels.append(AProxyModel);
-    setLastModel(AProxyModel);
-    if (lastProxy)
-      AProxyModel->setSourceModel(lastProxy);
+    emit proxyModelAboutToBeAdded(AProxyModel,AOrder);
+    
+    FProxyModels.insert(AOrder,AProxyModel);
+    QList<QAbstractProxyModel *> proxies = FProxyModels.values();
+    int index = proxies.indexOf(AProxyModel);
+
+    QAbstractProxyModel *befour = proxies.value(index-1,NULL);
+    QAbstractProxyModel *after = proxies.value(index+1,NULL);
+
+    if (befour)
+      AProxyModel->setSourceModel(befour);
     else
       AProxyModel->setSourceModel(FRostersModel);
+    if (after)
+    {
+      after->setSourceModel(NULL);  //костыли для QSortFilterProxyModel, аналогичные в removeProxyModel
+      after->setSourceModel(AProxyModel);
+    }
+    else
+      setViewModel(AProxyModel);
+
     emit proxyModelAdded(AProxyModel); 
   }
 }
 
+QList<QAbstractProxyModel *> RostersView::proxyModels() const
+{
+  return FProxyModels.values();
+}
+
 void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 {
-  int index = FProxyModels.indexOf(AProxyModel);
-  if (index != -1)
+  if (FProxyModels.values().contains(AProxyModel))
   {
     emit proxyModelAboutToBeRemoved(AProxyModel);
-    QAbstractProxyModel *befour = FProxyModels.value(index-1,NULL);
-    QAbstractProxyModel *after = FProxyModels.value(index+1,NULL);
+
+    QList<QAbstractProxyModel *> proxies = FProxyModels.values();
+    int index = proxies.indexOf(AProxyModel);
+
+    QAbstractProxyModel *befour = proxies.value(index-1,NULL);
+    QAbstractProxyModel *after = proxies.value(index+1,NULL);
+
     if (after == NULL && befour == NULL)
-      setLastModel(FRostersModel);
+      setViewModel(FRostersModel);
     else if (after == NULL)
-      setLastModel(befour);
+      setViewModel(befour);
     else if (befour == NULL)
+    {
+      after->setSourceModel(NULL);
       after->setSourceModel(FRostersModel);
+    }
     else
+    {
+      after->setSourceModel(NULL);
       after->setSourceModel(befour);
+    }
     AProxyModel->setSourceModel(NULL);
-    FProxyModels.removeAt(index);
+    
+    FProxyModels.remove(FProxyModels.key(AProxyModel),AProxyModel);
+
     emit proxyModelRemoved(AProxyModel);
   } 
 }
@@ -144,13 +174,13 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 QModelIndex RostersView::mapToModel(const QModelIndex &AProxyIndex) const
 {
   QModelIndex index = AProxyIndex;
-  if (FProxyModels.count() > 0)
+  if (!FProxyModels.isEmpty())
   {
-    QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
+    QMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
     do 
     {
       it--;
-      index = (*it)->mapToSource(index);
+      index = it.value()->mapToSource(index);
     } while(it != FProxyModels.constBegin());
   }
   return index;
@@ -159,12 +189,12 @@ QModelIndex RostersView::mapToModel(const QModelIndex &AProxyIndex) const
 QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex) const
 {
   QModelIndex index = AModelIndex;
-  if (FProxyModels.count() > 0)
+  if (!FProxyModels.isEmpty())
   {
-    QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
+    QMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
     while (it != FProxyModels.constEnd())
     {
-      index = (*it)->mapFromSource(index);
+      index = it.value()->mapFromSource(index);
       it++;
     }
   }
@@ -174,13 +204,13 @@ QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex) const
 QModelIndex RostersView::mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const
 {
   QModelIndex index = AModelIndex;
-  if (FProxyModels.count() > 0)
+  if (!FProxyModels.isEmpty())
   {
-    QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
+    QMap<int,QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
     while (it!=FProxyModels.constEnd())
     {
-      index = (*it)->mapFromSource(index);
-      if ((*it) == AProxyModel)
+      index = it.value()->mapFromSource(index);
+      if (it.value() == AProxyModel)
         return index;
       it++;
     }
@@ -191,17 +221,17 @@ QModelIndex RostersView::mapToProxy(QAbstractProxyModel *AProxyModel, const QMod
 QModelIndex RostersView::mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const
 {
   QModelIndex index = AProxyIndex;
-  if (FProxyModels.count() > 0)
+  if (!FProxyModels.isEmpty())
   {
     bool doMap = false;
-    QList<QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
+    QMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
     do 
     {
       it--;
-      if ((*it) == AProxyModel)
+      if (it.value() == AProxyModel)
         doMap = true;
       if (doMap)
-        index = (*it)->mapToSource(index);
+        index = it.value()->mapToSource(index);
     } while(it != FProxyModels.constBegin());
   }
   return index;
@@ -506,11 +536,11 @@ void RostersView::removeLabels()
   }
 }
 
-void RostersView::setLastModel(QAbstractItemModel *AModel)
+void RostersView::setViewModel(QAbstractItemModel *AModel)
 {
-  emit lastModelAboutToBeChanged(AModel);
+  emit viewModelAboutToBeChanged(AModel);
   QTreeView::setModel(AModel);
-  emit lastModelChanged(AModel);
+  emit viewModelChanged(AModel);
 }
 
 void RostersView::updateStatusText(IRosterIndex *AIndex)
@@ -532,9 +562,9 @@ void RostersView::updateStatusText(IRosterIndex *AIndex)
   foreach(IRosterIndex *index, indexes)
   {
     if (show)
-      insertFooterText(FTO_STATUS,RDR_Status,index);
+      insertFooterText(FTO_ROSTERSVIEW_STATUS,RDR_Status,index);
     else
-      removeFooterText(FTO_STATUS,index);
+      removeFooterText(FTO_ROSTERSVIEW_STATUS,index);
   }
 }
 

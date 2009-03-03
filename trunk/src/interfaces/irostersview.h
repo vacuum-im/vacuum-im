@@ -29,16 +29,16 @@ public:
     LabelVisible                  =2
   };
 public:
-  virtual QObject *instance() = 0;
-  virtual void setModel(IRostersModel *AModel) =0;
+  //--RostersModel
+  virtual QTreeView *instance() = 0;
   virtual IRostersModel *rostersModel() const =0;
+  virtual void setRostersModel(IRostersModel *AModel) =0;
   virtual bool repaintRosterIndex(IRosterIndex *AIndex) =0;
   virtual void expandIndexParents(IRosterIndex *AIndex) =0;
   virtual void expandIndexParents(const QModelIndex &AIndex) =0;
   //--ProxyModels
-  virtual void addProxyModel(QAbstractProxyModel *AProxyModel) =0;
+  virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder) =0;
   virtual QList<QAbstractProxyModel *> proxyModels() const =0;
-  virtual QAbstractProxyModel *lastProxyModel() const =0;
   virtual void removeProxyModel(QAbstractProxyModel *AProxyModel) =0;
   virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex) const=0;
   virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) const=0;
@@ -66,12 +66,12 @@ public:
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AIndex) =0;
   virtual void modelSeted(IRostersModel *AIndex) =0;
-  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *AProxyModel) =0;
+  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *AProxyModel, int AOrder) =0;
   virtual void proxyModelAdded(QAbstractProxyModel *AProxyModel) =0;
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel) =0;
   virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel) =0;
-  virtual void lastModelAboutToBeChanged(QAbstractItemModel *AModel) =0;
-  virtual void lastModelChanged(QAbstractItemModel *AModel) =0;
+  virtual void viewModelAboutToBeChanged(QAbstractItemModel *AModel) =0;
+  virtual void viewModelChanged(QAbstractItemModel *AModel) =0;
   virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu) =0;
   virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu) =0;
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
