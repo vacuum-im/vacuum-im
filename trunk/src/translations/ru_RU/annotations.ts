@@ -3,17 +3,17 @@
 <context>
     <name>Annotations</name>
     <message>
-        <location filename="../../plugins/annotations/annotations.cpp" line="24"/>
+        <location filename="../../plugins/annotations/annotations.cpp" line="26"/>
         <source>Plugin for making annotations about roster items and other entities</source>
         <translation>Плагин для создания комментариев к контактам и другим джаббер эелементам</translation>
     </message>
     <message>
-        <location filename="../../plugins/annotations/annotations.cpp" line="26"/>
+        <location filename="../../plugins/annotations/annotations.cpp" line="28"/>
         <source>Annotations</source>
         <translation>Комментарии</translation>
     </message>
     <message>
-        <location filename="../../plugins/annotations/annotations.cpp" line="253"/>
+        <location filename="../../plugins/annotations/annotations.cpp" line="328"/>
         <source>Annotation</source>
         <translation>Комментарий</translation>
     </message>
