@@ -149,12 +149,12 @@ bool MultiUserChatPlugin::initObjects()
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
-    QToolButton *button = changer->addToolButton(FChatMenu->menuAction(),AG_MULTIUSERCHAT_MWTTB);
+    QToolButton *button = changer->addToolButton(FChatMenu->menuAction(),AG_MWTTB_MULTIUSERCHAT);
     button->setPopupMode(QToolButton::InstantPopup);
   }
   if (FTrayManager)
   {
-    FTrayManager->addAction(FChatMenu->menuAction(),AG_MULTIUSERCHAT_TRAY,true);
+    FTrayManager->addAction(FChatMenu->menuAction(),AG_TMTM_MULTIUSERCHAT,true);
   }
   if (FDiscovery)
   {
@@ -616,13 +616,13 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
 
 void MultiUserChatPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  int show = AIndex->data(RDR_Show).toInt();
+  int show = AIndex->data(RDR_SHOW).toInt();
   if (show!=IPresence::Offline && show!=IPresence::Error)
   {
-    if (AIndex->type() == RIT_StreamRoot)
+    if (AIndex->type() == RIT_STREAM_ROOT)
     {
-      Action *action = createJoinAction(AIndex->data(RDR_Jid).toString(),Jid(),AMenu);
-      AMenu->addAction(action,AG_MULTIUSERCHAT_ROSTER,true);
+      Action *action = createJoinAction(AIndex->data(RDR_JID).toString(),Jid(),AMenu);
+      AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT,true);
     }
   }
 }

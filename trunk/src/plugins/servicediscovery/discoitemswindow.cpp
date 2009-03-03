@@ -19,9 +19,9 @@ bool SortFilterProxyModel::filterAcceptsRow(int ARow, const QModelIndex &AParent
     for (int row=0; !accept && row<sourceModel()->rowCount(index); row++)
       accept = filterAcceptsRow(row,index);
 
-    accept = accept || index.data(DDR_NAME).toString().contains(filterRegExp());
-    accept = accept || index.data(DDR_JID).toString().contains(filterRegExp());
-    accept = accept || index.data(DDR_NODE).toString().contains(filterRegExp());
+    accept = accept || index.data(DIDR_NAME).toString().contains(filterRegExp());
+    accept = accept || index.data(DIDR_JID).toString().contains(filterRegExp());
+    accept = accept || index.data(DIDR_NODE).toString().contains(filterRegExp());
   }
   return accept;
 }
@@ -203,7 +203,7 @@ void DiscoItemsWindow::updateActionsBar()
   QModelIndex index = ui.trvItems->currentIndex();
   if (index.isValid())
   {
-    IDiscoInfo dinfo = FDiscovery->discoInfo(index.data(DDR_JID).toString(),index.data(DDR_NODE).toString());
+    IDiscoInfo dinfo = FDiscovery->discoInfo(index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
     foreach(QString feature, dinfo.features)
     {
       foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,this))
@@ -219,13 +219,13 @@ void DiscoItemsWindow::updateActionsBar()
 
 void DiscoItemsWindow::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
-  if (ADiscoInfo.contactJid == ui.trvItems->currentIndex().data(DDR_JID).toString())
+  if (ADiscoInfo.contactJid == ui.trvItems->currentIndex().data(DIDR_JID).toString())
     updateActionsBar();
 }
 
 void DiscoItemsWindow::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
 {
-  if (ADiscoItems.contactJid == ui.trvItems->currentIndex().data(DDR_JID).toString())
+  if (ADiscoItems.contactJid == ui.trvItems->currentIndex().data(DIDR_JID).toString())
     updateActionsBar();
 }
 
@@ -244,7 +244,7 @@ void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)
     menu->addAction(FAddContact,AG_DIWT_DISCOVERY_ACTIONS,false);
     menu->addAction(FShowVCard,AG_DIWT_DISCOVERY_ACTIONS,false);
 
-    IDiscoInfo dinfo = FDiscovery->discoInfo(index.data(DDR_JID).toString(),index.data(DDR_NODE).toString());
+    IDiscoInfo dinfo = FDiscovery->discoInfo(index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
     foreach(QString feature, dinfo.features)
     {
       foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,menu))
@@ -290,8 +290,8 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
     QModelIndex index = ui.trvItems->currentIndex();
     if (index.isValid() && index.parent().isValid())
     {
-      Jid itemJid = index.data(DDR_JID).toString();
-      QString itemNode = index.data(DDR_NODE).toString();
+      Jid itemJid = index.data(DIDR_JID).toString();
+      QString itemNode = index.data(DIDR_NODE).toString();
       discover(itemJid,itemNode);
     }
   }
@@ -304,8 +304,8 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
     QModelIndex index = ui.trvItems->currentIndex();
     if (index.isValid())
     {
-      Jid itemJid = index.data(DDR_JID).toString();
-      QString itemNode = index.data(DDR_NODE).toString();
+      Jid itemJid = index.data(DIDR_JID).toString();
+      QString itemNode = index.data(DIDR_NODE).toString();
       FDiscovery->showDiscoInfo(FStreamJid,itemJid,itemNode,this);
     }
   }
@@ -317,8 +317,8 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
       IAddContactDialog *dialog = FRosterChanger->showAddContactDialog(FStreamJid);
       if (dialog)
       {
-        dialog->setContactJid(index.data(DDR_JID).toString());
-        dialog->setNickName(index.data(DDR_NAME).toString());
+        dialog->setContactJid(index.data(DIDR_JID).toString());
+        dialog->setNickName(index.data(DIDR_NAME).toString());
       }
     }
   }
@@ -327,7 +327,7 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
     QModelIndex index = ui.trvItems->currentIndex();
     if (index.isValid())
     {
-      Jid itemJid = index.data(DDR_JID).toString();
+      Jid itemJid = index.data(DIDR_JID).toString();
       FVCardPlugin->showVCardDialog(FStreamJid,itemJid);
     }
   }

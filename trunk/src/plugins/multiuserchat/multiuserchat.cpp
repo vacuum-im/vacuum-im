@@ -385,8 +385,8 @@ void MultiUserChat::setRole(const QString &ANick, const QString &ARole, const QS
     QDomElement itemElem = role.addElement("query",NS_MUC_ADMIN).appendChild(role.createElement("item")).toElement();
     itemElem.setAttribute("role",ARole);
     itemElem.setAttribute("nick",ANick);
-    if (!user->data(MUDR_REALJID).toString().isEmpty())
-      itemElem.setAttribute("jid",user->data(MUDR_REALJID).toString());
+    if (!user->data(MUDR_REAL_JID).toString().isEmpty())
+      itemElem.setAttribute("jid",user->data(MUDR_REAL_JID).toString());
     if (!AReason.isEmpty())
       itemElem.appendChild(role.createElement("reason")).appendChild(role.createTextNode(AReason));
     FStanzaProcessor->sendIqStanza(this,FStreamJid,role,0);
@@ -403,8 +403,8 @@ void MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffilia
     QDomElement itemElem = role.addElement("query",NS_MUC_ADMIN).appendChild(role.createElement("item")).toElement();
     itemElem.setAttribute("affiliation",AAffiliation);
     itemElem.setAttribute("nick",ANick);
-    if (!user->data(MUDR_REALJID).toString().isEmpty())
-      itemElem.setAttribute("jid",user->data(MUDR_REALJID).toString());
+    if (!user->data(MUDR_REAL_JID).toString().isEmpty())
+      itemElem.setAttribute("jid",user->data(MUDR_REAL_JID).toString());
     if (!AReason.isEmpty())
       itemElem.appendChild(role.createElement("reason")).appendChild(role.createTextNode(AReason));
     FStanzaProcessor->sendIqStanza(this,FStreamJid,role,0);
@@ -619,14 +619,14 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
       if (!user)
       {
         user = new MultiUser(FRoomJid,fromNick,this);
-        user->setData(MUDR_STREAMJID,FStreamJid.full());
+        user->setData(MUDR_STREAM_JID,FStreamJid.full());
         connect(user->instance(),SIGNAL(dataChanged(int,const QVariant &, const QVariant &)),
           SLOT(onUserDataChanged(int,const QVariant &, const QVariant &)));
         FUsers.insert(fromNick,user);
       }
       user->setData(MUDR_SHOW,show);
       user->setData(MUDR_STATUS,status);
-      user->setData(MUDR_REALJID,realJid.full());
+      user->setData(MUDR_REAL_JID,realJid.full());
       user->setData(MUDR_ROLE,role);
       user->setData(MUDR_AFFILIATION,affiliation);
 
@@ -878,7 +878,7 @@ void MultiUserChat::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABef
 {
   FStreamJid = AXmppStream->jid();
   foreach(MultiUser *user, FUsers)
-    user->setData(MUDR_STREAMJID,FStreamJid.full());
+    user->setData(MUDR_STREAM_JID,FStreamJid.full());
   emit streamJidChanged(ABefour,FStreamJid);
 }
 

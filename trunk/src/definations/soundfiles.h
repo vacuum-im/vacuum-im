@@ -1,5 +1,5 @@
-#ifndef SOUNDFILES_H
-#define SOUNDFILES_H
+#ifndef DEF_SOUNDFILES_H
+#define DEF_SOUNDFILES_H
 
 //Messenger
 #define SDF_MESSENGER_CHAT                "messengerChat"

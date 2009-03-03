@@ -104,7 +104,7 @@ void VCardDialog::updateDialog()
   ui.dedBirthday->setCalendarPopup(!readOnly);
   ui.cmbGender->lineEdit()->setText(FVCard->value(VVN_GENDER));
   ui.cmbGender->setEnabled(!readOnly);
-  ui.lneMarital->setText(FVCard->value(VVN_MARITALSTATUS));
+  ui.lneMarital->setText(FVCard->value(VVN_MARITAL_STATUS));
   ui.lneMarital->setReadOnly(readOnly);
   ui.lneTitle->setText(FVCard->value(VVN_TITLE));
   ui.lneTitle->setReadOnly(readOnly);
@@ -192,7 +192,7 @@ void VCardDialog::updateVCard()
   else
     FVCard->setValueForTags(VVN_BIRTHDAY,"");
   FVCard->setValueForTags(VVN_GENDER,ui.cmbGender->currentText());
-  FVCard->setValueForTags(VVN_MARITALSTATUS,ui.lneMarital->text());
+  FVCard->setValueForTags(VVN_MARITAL_STATUS,ui.lneMarital->text());
   FVCard->setValueForTags(VVN_TITLE,ui.lneTitle->text());
   FVCard->setValueForTags(VVN_ORG_UNIT,ui.lneDepartment->text());
   FVCard->setValueForTags(VVN_ORG_NAME,ui.lneCompany->text());

@@ -2317,7 +2317,7 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
     handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionOut,SHP_DEFAULT);
     FSHIMessageOut.insert(AXmppStream->jid(),handler);
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionOut,SHP_MESSAGEARCHIVER_SESSION);
+    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionOut,SHP_ARCHIVER_SESSION);
     FSHIMessageBlocks.insert(AXmppStream->jid(),handler);
   }
   
@@ -2408,11 +2408,11 @@ void MessageArchiver::onCollectionWriterDestroyed(const Jid &AStreamJid, Collect
 
 void MessageArchiver::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->type()==RIT_StreamRoot || AIndex->type()==RIT_Contact || AIndex->type()==RIT_Agent)
+  if (AIndex->type()==RIT_STREAM_ROOT || AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_AGENT)
   {
-    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
-    Jid contactJid = AIndex->data(RDR_Jid).toString();
-    Menu *menu = createContextMenu(streamJid,AIndex->type()==RIT_StreamRoot ? contactJid : contactJid.bare(),AMenu);
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+    Jid contactJid = AIndex->data(RDR_JID).toString();
+    Menu *menu = createContextMenu(streamJid,AIndex->type()==RIT_STREAM_ROOT ? contactJid : contactJid.bare(),AMenu);
     if (menu)
     {
       AMenu->addAction(menu->menuAction(),AG_DEFAULT,true);

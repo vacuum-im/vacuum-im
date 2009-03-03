@@ -119,21 +119,21 @@ bool Notifications::initObjects()
     FActivateAll->setVisible(false);
     FActivateAll->setText(tr("Activate All Notifications"));
     FActivateAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_ACTIVATE_ALL);
-    FTrayManager->addAction(FActivateAll,AG_NOTIFICATIONS_TRAY,false);
+    FTrayManager->addAction(FActivateAll,AG_TMTM_NOTIFICATIONS,false);
     connect(FActivateAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
     FRemoveAll = new Action(this);
     FRemoveAll->setVisible(false);
     FRemoveAll->setText(tr("Remove All Notifications"));
     FRemoveAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_REMOVE_ALL);
-    FTrayManager->addAction(FRemoveAll,AG_NOTIFICATIONS_TRAY,false);
+    FTrayManager->addAction(FRemoveAll,AG_TMTM_NOTIFICATIONS,false);
     connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
     FNotifyMenu = new Menu;
     FNotifyMenu->setTitle(tr("Pending Notifications"));
     FNotifyMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS);
     FNotifyMenu->menuAction()->setVisible(false);
-    FTrayManager->addAction(FNotifyMenu->menuAction(),AG_NOTIFICATIONS_TRAY,false);
+    FTrayManager->addAction(FNotifyMenu->menuAction(),AG_TMTM_NOTIFICATIONS,false);
   }
   return true;
 }

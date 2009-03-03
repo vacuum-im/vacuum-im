@@ -1,5 +1,5 @@
-#include <QtDebug>
 #include "roster.h"
+
 #include <QSet>
 #include <QFile>
 

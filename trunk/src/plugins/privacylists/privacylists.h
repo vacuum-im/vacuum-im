@@ -7,7 +7,7 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterlabelorders.h"
-#include "../../definations/tooltiporders.h"
+#include "../../definations/rostertooltiporders.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"

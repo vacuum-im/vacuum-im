@@ -2,7 +2,7 @@
 #define COMMANDS_H
 
 #include "../../definations/namespaces.h"
-#include "../../definations/discofeatureorder.h"
+#include "../../definations/discofeaturehandlerorders.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"

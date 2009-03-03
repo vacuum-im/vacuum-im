@@ -12,10 +12,10 @@ SASLPlugin::~SASLPlugin()
 
 void SASLPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Implementation of SASL Authentication");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = "SASL Authentication";
+  APluginInfo->name = tr("SASL Authentication");
   APluginInfo->uid = SASLAUTH_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);

@@ -5,15 +5,15 @@
     <message>
         <location filename="../../plugins/iqauth/iqauth.cpp" line="77"/>
         <source>Potapov S.A. aka Lion</source>
-        <translation>Potapov S.A. aka Lion</translation>
+        <translation type="obsolete">Potapov S.A. aka Lion</translation>
     </message>
     <message>
-        <location filename="../../plugins/iqauth/iqauth.cpp" line="78"/>
+        <location filename="../../plugins/iqauth/iqauth.cpp" line="77"/>
         <source>Implementation of Non-SASL Authentication (JEP-0078)</source>
         <translation>Реализация аутентификации без SASL (JEP-0078)</translation>
     </message>
     <message>
-        <location filename="../../plugins/iqauth/iqauth.cpp" line="80"/>
+        <location filename="../../plugins/iqauth/iqauth.cpp" line="79"/>
         <source>Non-SASL Authentication</source>
         <translation>IQ Авторизация</translation>
     </message>

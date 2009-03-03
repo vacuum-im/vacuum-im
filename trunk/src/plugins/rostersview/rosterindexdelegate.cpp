@@ -333,23 +333,23 @@ QStyleOptionViewItem RosterIndexDelegate::indexOptions(const QModelIndex &AIndex
   if (qVariantCanConvert<QBrush>(data))
     option.palette.setBrush(QPalette::Text, qvariant_cast<QBrush>(data));
 
-  data = AIndex.data(RDR_FontHint);
+  data = AIndex.data(RDR_FONT_HINT);
   if (data.isValid())
     option.font.setStyleHint((QFont::StyleHint)data.toInt());
   
-  data = AIndex.data(RDR_FontSize);
+  data = AIndex.data(RDR_FONT_SIZE);
   if (data.isValid())
     option.font.setPointSize(data.toInt());
 
-  data = AIndex.data(RDR_FontWeight);
+  data = AIndex.data(RDR_FONT_WEIGHT);
   if (data.isValid())
     option.font.setWeight(data.toInt());
 
-  data = AIndex.data(RDR_FontStyle);
+  data = AIndex.data(RDR_FONT_STYLE);
   if (data.isValid())
     option.font.setStyle((QFont::Style)data.toInt());
 
-  data = AIndex.data(RDR_FontUnderline);
+  data = AIndex.data(RDR_FONT_UNDERLINE);
   if (data.isValid())
     option.font.setUnderline(data.toBool());
 
@@ -371,10 +371,10 @@ QList<LabelItem> RosterIndexDelegate::itemLabels(const QModelIndex &AIndex) cons
 {
   QList<LabelItem> labels;
 
-  QList<QVariant> labelIds = AIndex.data(RDR_LabelIds).toList();
-  QList<QVariant> labelOrders = AIndex.data(RDR_LabelOrders).toList();
-  QList<QVariant> labelFlags = AIndex.data(RDR_LabelFlags).toList();
-  QList<QVariant> labelValues = AIndex.data(RDR_LabelValues).toList();
+  QList<QVariant> labelIds = AIndex.data(RDR_LABEL_ID).toList();
+  QList<QVariant> labelOrders = AIndex.data(RDR_LABEL_ORDERS).toList();
+  QList<QVariant> labelFlags = AIndex.data(RDR_LABEL_FLAGS).toList();
+  QList<QVariant> labelValues = AIndex.data(RDR_LABEL_VALUES).toList();
   
   for (int i = 0; i < labelOrders.count(); i++)
   {
@@ -406,7 +406,7 @@ QList<LabelItem> RosterIndexDelegate::itemLabels(const QModelIndex &AIndex) cons
 QList<LabelItem> RosterIndexDelegate::itemFooters(const QModelIndex &AIndex) const
 {
   QList<LabelItem> footers;
-  QMap<QString,QVariant> footerMap = AIndex.data(RDR_FooterText).toMap();
+  QMap<QString,QVariant> footerMap = AIndex.data(RDR_FOOTER_TEXT).toMap();
   QMap<QString,QVariant>::const_iterator fit = footerMap.constBegin();
   while (fit != footerMap.constEnd())
   {

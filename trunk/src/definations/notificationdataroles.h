@@ -1,8 +1,7 @@
-#ifndef NOTIFICATIONDATAROLES_H
-#define NOTIFICATIONDATAROLES_H
+#ifndef DEF_NOTIFICATIONDATAROLES_H
+#define DEF_NOTIFICATIONDATAROLES_H
 
-enum NotificationDataRoles
-{
+enum NotificationDataRoles {
   NDR_ICON,
   NDR_TOOLTIP,
   NDR_ROSTER_STREAM_JID,
@@ -13,8 +12,7 @@ enum NotificationDataRoles
   NDR_WINDOW_TITLE,
   NDR_WINDOW_TEXT,
   NDR_WINDOW_TIMEOUT,
-  NDR_SOUND_FILE,
-  NDR_USER_ROLES            = 100
+  NDR_SOUND_FILE
 };
 
 #endif

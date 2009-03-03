@@ -1,5 +1,4 @@
 #include "commands.h"
-#include <QtDebug>
 
 #define COMMAND_TAG_NAME              "command"
 #define COMMANDS_TIMEOUT              60000

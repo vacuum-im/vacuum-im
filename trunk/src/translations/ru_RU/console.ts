@@ -5,7 +5,7 @@
     <message>
         <location filename="../../plugins/console/consoleplugin.cpp" line="16"/>
         <source>Potapov S.A. aka Lion</source>
-        <translation>Potapov S.A. aka Lion</translation>
+        <translation type="obsolete">Potapov S.A. aka Lion</translation>
     </message>
     <message>
         <location filename="../../plugins/console/consoleplugin.cpp" line="17"/>

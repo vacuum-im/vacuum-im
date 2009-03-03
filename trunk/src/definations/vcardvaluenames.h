@@ -1,5 +1,5 @@
-#ifndef VCARDVALUENAMES_H
-#define VCARDVALUENAMES_H
+#ifndef DEF_VCARDVALUENAMES_H
+#define DEF_VCARDVALUENAMES_H
 
 #define VVN_JABBERID              "JABBERID"
 #define VVN_FULL_NAME             "FN"
@@ -10,7 +10,7 @@
 #define VVN_URL                   "URL"
 #define VVN_BIRTHDAY              "BDAY"
 #define VVN_GENDER                "GENDER"
-#define VVN_MARITALSTATUS         "MARITALSTATUS"
+#define VVN_MARITAL_STATUS        "MARITALSTATUS"
 #define VVN_TITLE                 "TITLE"
 #define VVN_ORG_NAME              "ORG/ORGNAME"
 #define VVN_ORG_UNIT              "ORG/ORGUNIT"

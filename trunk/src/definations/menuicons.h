@@ -1,5 +1,5 @@
-#ifndef MENUICONS_H
-#define MENUICONS_H
+#ifndef DEF_MENUICONS_H
+#define DEF_MENUICONS_H
 
 //AccountManager
 #define MNI_ACCOUNT                     "account"

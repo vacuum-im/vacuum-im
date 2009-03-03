@@ -1,4 +1,3 @@
-#include <QtDebug>
 #include "presenceplugin.h"
 
 PresencePlugin::PresencePlugin()

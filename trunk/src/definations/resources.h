@@ -1,5 +1,5 @@
-#ifndef RESOURCES_H
-#define RESOURCES_H
+#ifndef DEF_RESOURCES_H
+#define DEF_RESOURCES_H
 
 #define RSR_STORAGE_EMOTICONS         "emoticons"
 #define RSR_STORAGE_MENUICONS         "menuicons"

@@ -1,6 +1,5 @@
 #include "datetime.h"
 
-#include <QtDebug>
 #include <QRegExp>
 #include <QStringList>
 

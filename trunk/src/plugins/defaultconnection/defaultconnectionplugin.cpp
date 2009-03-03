@@ -24,7 +24,7 @@ DefaultConnectionPlugin::~DefaultConnectionPlugin()
 
 void DefaultConnectionPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Creating standard connection to jabber server");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Default connection");

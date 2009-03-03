@@ -71,12 +71,12 @@ void Account::setName(const QString &AName)
 
 Jid Account::streamJid() const
 {
-  return FXmppStream == NULL ? value(AVN_STREAMJID).toString() : FXmppStream->jid();
+  return FXmppStream == NULL ? value(AVN_STREAM_JID).toString() : FXmppStream->jid();
 }
 
 void Account::setStreamJid(const Jid &AJid)
 {
-  setValue(AVN_STREAMJID,AJid.full());
+  setValue(AVN_STREAM_JID,AJid.full());
 }
 
 QString Account::password() const
@@ -120,7 +120,7 @@ void Account::setValue(const QString &AName, const QVariant &AValue)
   {
     if (FXmppStream)
     {
-      if (AName == AVN_STREAMJID)
+      if (AName == AVN_STREAM_JID)
         FXmppStream->setJid(AValue.toString());
       else if (AName == AVN_PASSWORD)
         FXmppStream->setPassword(decript(AValue.toByteArray(),FAccountId.toUtf8()));

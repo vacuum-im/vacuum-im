@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <QResizeEvent>
 #include <QContextMenuEvent>
-#include "../../definations/tooltiporders.h"
+#include "../../definations/rostertooltiporders.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterfootertextorders.h"

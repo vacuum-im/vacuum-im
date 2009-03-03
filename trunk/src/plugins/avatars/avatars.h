@@ -8,7 +8,7 @@
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterdataholderorders.h"
-#include "../../definations/tooltiporders.h"
+#include "../../definations/rostertooltiporders.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionwidgetorders.h"
 #include "../../definations/resources.h"

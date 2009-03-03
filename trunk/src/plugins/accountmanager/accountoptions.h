@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QVariant>
+#include "../../utils/jid.h"
 #include "ui_accountoptions.h"
 
 class AccountOptions : 

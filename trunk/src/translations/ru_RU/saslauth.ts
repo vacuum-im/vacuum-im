@@ -5,7 +5,7 @@
     <message>
         <location filename="../../plugins/saslauth/saslplugin.cpp" line="15"/>
         <source>Potapov S.A. aka Lion</source>
-        <translation>Potapov S.A. aka Lion</translation>
+        <translation type="obsolete">Potapov S.A. aka Lion</translation>
     </message>
     <message>
         <location filename="../../plugins/saslauth/saslplugin.cpp" line="16"/>
@@ -46,6 +46,11 @@
         <location filename="../../plugins/saslauth/saslplugin.cpp" line="54"/>
         <source>Temporary Auth Failure</source>
         <translation>Временная авторизация не корректна</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/saslauth/saslplugin.cpp" line="18"/>
+        <source>SASL Authentication</source>
+        <translation>SASL авторизация</translation>
     </message>
 </context>
 </TS>

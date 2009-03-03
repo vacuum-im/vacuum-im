@@ -143,7 +143,7 @@ bool RostersViewPlugin::initObjects()
     FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_HIDE_OFFLINE);
     FShowOfflineAction->setToolTip(tr("Show/Hide offline contacts"));
     connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
-    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction,AG_ROSTERSVIEW_MWTTB,false);
+    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction,AG_MWTTB_ROSTERSVIEW,false);
   }
 
   if (FRostersModel)
@@ -151,7 +151,7 @@ bool RostersViewPlugin::initObjects()
     FRostersView->setRostersModel(FRostersModel);
     FSortFilterProxyModel = new SortFilterProxyModel(this);
     FSortFilterProxyModel->setDynamicSortFilter(true);
-    FRostersView->insertProxyModel(FSortFilterProxyModel,RVPO_ROSTERSVIEW_SORTFILTER);
+    FRostersView->insertProxyModel(FSortFilterProxyModel,RPO_ROSTERSVIEW_SORTFILTER);
     FSortFilterProxyModel->sort(0,Qt::AscendingOrder);
   }
 
@@ -230,13 +230,13 @@ void RostersViewPlugin::startRestoreExpandState()
 QString RostersViewPlugin::getExpandSettingsName(const QModelIndex &AIndex)
 {
   QString valueName;
-  Jid streamJid(AIndex.data(RDR_StreamJid).toString());
+  Jid streamJid(AIndex.data(RDR_STREAM_JID).toString());
   if (streamJid.isValid())
   {
-    int itemType = AIndex.data(RDR_Type).toInt();
-    if (itemType != RIT_StreamRoot)
+    int itemType = AIndex.data(RDR_TYPE).toInt();
+    if (itemType != RIT_STREAM_ROOT)
     {
-      QString groupName = AIndex.data(RDR_Group).toString();
+      QString groupName = AIndex.data(RDR_GROUP).toString();
       if (!groupName.isEmpty())
       {
         QString groupHash = QString::number(qHash(groupName),16);
@@ -254,7 +254,7 @@ void RostersViewPlugin::loadExpandedState(const QModelIndex &AIndex)
   QString settingsName = getExpandSettingsName(AIndex);
   if (FSettings && !settingsName.isEmpty())
   {
-    Jid streamJid(AIndex.data(RDR_StreamJid).toString());
+    Jid streamJid(AIndex.data(RDR_STREAM_JID).toString());
     QString ns = FCollapseNS.value(streamJid);
     bool isCollapsed = FSettings->valueNS(settingsName,ns,false).toBool();
     if (isCollapsed && FRostersView->isExpanded(AIndex))
@@ -269,11 +269,11 @@ void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
   QString settingsName = getExpandSettingsName(AIndex);
   if (FSettings && !settingsName.isEmpty())
   {
-    Jid streamJid(AIndex.data(RDR_StreamJid).toString());
+    Jid streamJid(AIndex.data(RDR_STREAM_JID).toString());
     QString ns = FCollapseNS.value(streamJid);
     if (FRostersView->isExpanded(AIndex))
     {
-      if (AIndex.data(RDR_Type).toInt() == RIT_StreamRoot)
+      if (AIndex.data(RDR_TYPE).toInt() == RIT_STREAM_ROOT)
         FSettings->setValueNS(settingsName,ns,false);
       else
         FSettings->deleteValueNS(settingsName,ns);

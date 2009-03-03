@@ -1,5 +1,5 @@
-#ifndef ARCHIVEINDEXTYPEROLE_H
-#define ARCHIVEINDEXTYPEROLE_H
+#ifndef DEF_ARCHIVEINDEXTYPEROLE_H
+#define DEF_ARCHIVEINDEXTYPEROLE_H
 
 enum HistoryWindowItemTypes {
   HIT_INVALID_TYPE,
@@ -12,7 +12,7 @@ enum HistoryWindowItemTypes {
 };
 
 enum HistoryWindowDataRoles {
-  HDR_ITEM_TYPE          = Qt::UserRole,
+  HDR_ITEM_TYPE          = 32,
   HDR_STREAM_JID,
   HDR_DATE_START,
   HDR_DATE_END,

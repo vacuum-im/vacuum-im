@@ -1,4 +1,3 @@
-#include <QtDebug>
 #include "rosterplugin.h"
 
 RosterPlugin::RosterPlugin()

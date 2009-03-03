@@ -362,20 +362,20 @@ void StatusIcons::onStatusIconsChangedTimer()
 
 void StatusIcons::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent)
+  if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
   {
-    QString rule = AIndex->data(RDR_BareJid).toString();
+    QString rule = AIndex->data(RDR_BARE_JID).toString();
     QString substorage = ruleSubStorage(rule,IStatusIcons::UserRule);
     FDefaultIconAction->setIcon(iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false));
     FDefaultIconAction->setData(ADR_RULE,rule);
     FDefaultIconAction->setChecked(FDefaultStorage!=NULL && FDefaultStorage->subStorage()==substorage);
     foreach(Action *action,FCustomIconActions)
     {
-      action->setData(ADR_RULE,AIndex->data(RDR_BareJid));
+      action->setData(ADR_RULE,AIndex->data(RDR_BARE_JID));
       action->setChecked(action->data(ADR_SUBSTORAGE).toString() == substorage);
     }
-    FCustomIconMenu->setIcon(iconByJidStatus(AIndex->data(RDR_Jid).toString(),IPresence::Online,SUBSCRIPTION_BOTH,false));
-    AMenu->addAction(FCustomIconMenu->menuAction(),AG_STATUSICONS_ROSTER,true);
+    FCustomIconMenu->setIcon(iconByJidStatus(AIndex->data(RDR_JID).toString(),IPresence::Online,SUBSCRIPTION_BOTH,false));
+    AMenu->addAction(FCustomIconMenu->menuAction(),AG_RVCM_STATUSICONS,true);
   }
 }
 

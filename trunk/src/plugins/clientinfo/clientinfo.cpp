@@ -322,13 +322,13 @@ QList<int> ClientInfo::roles() const
 QList<int> ClientInfo::types() const
 {
   static QList<int> indexTypes =  QList<int>()
-    << RIT_Contact << RIT_Agent << RIT_MyResource;
+    << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
   return indexTypes;
 }
 
 QVariant ClientInfo::data(const IRosterIndex *AIndex, int ARole) const
 {
-  Jid contactJid = AIndex->data(RDR_Jid).toString();
+  Jid contactJid = AIndex->data(RDR_JID).toString();
   if (ARole == RDR_CLIENT_NAME)
     return hasSoftwareInfo(contactJid) ? softwareName(contactJid) : QVariant();
   else if (ARole == RDR_CLIENT_VERSION)
@@ -831,24 +831,24 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
 
 void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent || AIndex->type() == RIT_MyResource)
+  if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT || AIndex->type() == RIT_MY_RESOURCE)
   {
-    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
     if (presence && presence->xmppStream()->isOpen())
     {
-      Jid contactJid = AIndex->data(RDR_Jid).toString();
-      int show = AIndex->data(RDR_Show).toInt();
+      Jid contactJid = AIndex->data(RDR_JID).toString();
+      int show = AIndex->data(RDR_SHOW).toInt();
       QStringList features = FDiscovery!=NULL ? FDiscovery->discoInfo(contactJid).features : QStringList();
       if (show != IPresence::Offline && show != IPresence::Error && !features.contains(NS_JABBER_VERSION))
       {
         Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_VERSION,AMenu);
-        AMenu->addAction(action,AG_CLIENTINFO_ROSTER,true);
+        AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
       }
       if (show == IPresence::Offline && !features.contains(NS_JABBER_LAST))
       {
         Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_LAST,AMenu);
-        AMenu->addAction(action,AG_CLIENTINFO_ROSTER,true);
+        AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
       }
     }
   }
@@ -858,23 +858,23 @@ void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMult
 {
   if (ALabelId == RLID_DISPLAY && types().contains(AIndex->type()))
   {
-    Jid contactJid = AIndex->data(RDR_Jid).toString();
+    Jid contactJid = AIndex->data(RDR_JID).toString();
 
     if (hasSoftwareInfo(contactJid))
-      AToolTips.insert(TTO_SOFTWARE_INFO,tr("Software: %1 %2").arg(softwareName(contactJid)).arg(softwareVersion(contactJid)));
+      AToolTips.insert(RTTO_SOFTWARE_INFO,tr("Software: %1 %2").arg(softwareName(contactJid)).arg(softwareVersion(contactJid)));
 
-    if (hasLastActivity(contactJid) && AIndex->data(RDR_Show).toInt() == IPresence::Offline)
-      AToolTips.insert(TTO_LAST_ACTIVITY,tr("Offline since: %1").arg(lastActivityTime(contactJid).toString()));
+    if (hasLastActivity(contactJid) && AIndex->data(RDR_SHOW).toInt() == IPresence::Offline)
+      AToolTips.insert(RTTO_LAST_ACTIVITY,tr("Offline since: %1").arg(lastActivityTime(contactJid).toString()));
 
     if (hasEntityTime(contactJid))
-      AToolTips.insert(TTO_ENTITY_TIME,tr("Entity time: %1").arg(entityTime(contactJid).time().toString()));
+      AToolTips.insert(RTTO_ENTITY_TIME,tr("Entity time: %1").arg(entityTime(contactJid).time().toString()));
   }
 }
 
 void ClientInfo::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMultiUser *AUser, Menu *AMenu)
 {
-  Jid streamJid = AUser->data(MUDR_STREAMJID).toString();
-  Jid contactJid = AUser->data(AUser->data(MUDR_REALJID).toString().isEmpty() ? MUDR_CONTACTJID : MUDR_REALJID).toString();
+  Jid streamJid = AUser->data(MUDR_STREAM_JID).toString();
+  Jid contactJid = AUser->data(AUser->data(MUDR_REAL_JID).toString().isEmpty() ? MUDR_CONTACT_JID : MUDR_REAL_JID).toString();
 
   Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_VERSION,AMenu);
   AMenu->addAction(action,AG_MUCM_CLIENTINFO,true);

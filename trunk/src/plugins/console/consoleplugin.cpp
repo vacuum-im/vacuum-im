@@ -13,7 +13,7 @@ ConsolePlugin::~ConsolePlugin()
 
 void ConsolePlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Allow to view XMPP stanzas.");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("XML Console");
@@ -41,7 +41,7 @@ bool ConsolePlugin::initObjects()
     action->setText(tr("XML Console"));
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_CONSOLE);
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowXMLConsole(bool)));
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_CONSOLE_MMENU,true);
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_CONSOLE,true);
   }
   return true;
 }

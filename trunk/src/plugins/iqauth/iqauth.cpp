@@ -1,6 +1,5 @@
 #include "iqauth.h"
 
-#include <QtDebug>
 #include <QCryptographicHash>
 
 IqAuth::IqAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
@@ -74,7 +73,7 @@ IqAuthPlugin::~IqAuthPlugin()
 
 void IqAuthPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Implementation of Non-SASL Authentication (JEP-0078)");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Non-SASL Authentication");

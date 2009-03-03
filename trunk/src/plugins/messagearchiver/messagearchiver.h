@@ -9,7 +9,7 @@
 #include "../../definations/optionnodeorders.h"
 #include "../../definations/optionwidgetorders.h"
 #include "../../definations/rosterindextyperole.h"
-#include "../../definations/sessionnegotiatororder.h"
+#include "../../definations/sessionnegotiatororders.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"

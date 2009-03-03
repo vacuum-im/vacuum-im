@@ -537,49 +537,49 @@ void Gateways::onChangeActionTriggered(bool)
 
 void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->type() == RIT_Agent)
+  if (AIndex->type() == RIT_AGENT)
   {
-    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
     if (presence && presence->isOpen())
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Log In"));
       action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_IN);
-      action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
-      action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BareJid));
+      action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
+      action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BARE_JID));
       action->setData(ADR_LOG_IN,true);
       connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
-      AMenu->addAction(action,AG_GATEWAYS_LOGIN_ROSTER,false);
+      AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
 
       action = new Action(AMenu);
       action->setText(tr("Log Out"));
       action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_OUT);
-      action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
-      action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BareJid));
+      action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
+      action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BARE_JID));
       action->setData(ADR_LOG_IN,false);
       connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
-      AMenu->addAction(action,AG_GATEWAYS_LOGIN_ROSTER,false);
+      AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
 
       if (FPrivateStorageKeep.contains(streamJid))
       {
         Action *action = new Action(AMenu);
         action->setText(tr("Keep connection"));
         action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_KEEP_CONNECTION);
-        action->setData(ADR_STREAM_JID,AIndex->data(RDR_StreamJid));
-        action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BareJid));
+        action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
+        action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BARE_JID));
         action->setCheckable(true);
-        action->setChecked(FKeepConnections.contains(streamJid,AIndex->data(RDR_BareJid).toString()));
+        action->setChecked(FKeepConnections.contains(streamJid,AIndex->data(RDR_BARE_JID).toString()));
         connect(action,SIGNAL(triggered(bool)),SLOT(onKeepActionTriggered(bool)));
-        AMenu->addAction(action,AG_GATEWAYS_LOGIN_ROSTER,false);
+        AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
       }
     }
   }
 
-  if (FRosterPlugin && FVCardPlugin && (AIndex->type() == RIT_Contact || AIndex->type() == RIT_Agent))
+  if (FRosterPlugin && FVCardPlugin && (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT))
   {
-    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
-    Jid contactJid = AIndex->data(RDR_Jid).toString();
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+    Jid contactJid = AIndex->data(RDR_JID).toString();
     IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen() && roster->rosterItem(contactJid).isValid && roster->rosterItem(contactJid.domain()).isValid)
     {
@@ -589,7 +589,7 @@ void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setData(ADR_STREAM_JID,streamJid.full());
       action->setData(ADR_SERVICE_JID,contactJid.full());
       connect(action,SIGNAL(triggered(bool)),SLOT(onResolveActionTriggered(bool)));
-      AMenu->addAction(action,AG_GATEWAYS_RESOLVE_ROSTER,true);
+      AMenu->addAction(action,AG_RVCM_GATEWAYS_RESOLVE,true);
     }
   }
 }
@@ -756,14 +756,14 @@ void Gateways::onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow)
 
 void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
 {
-  Jid itemJid = AIndex.data(DDR_JID).toString();
-  QString itemNode = AIndex.data(DDR_NODE).toString();
+  Jid itemJid = AIndex.data(DIDR_JID).toString();
+  QString itemNode = AIndex.data(DIDR_NODE).toString();
   if (itemJid.node().isEmpty() && itemNode.isEmpty())
   {
     IDiscoInfo dinfo = FDiscovery->discoInfo(itemJid,itemNode);
     if (dinfo.error.code<0 && !dinfo.identity.isEmpty())
     {
-      Jid streamJid = AIndex.data(DDR_STREAMJID).toString();
+      Jid streamJid = AIndex.data(DIDR_STREAM_JID).toString();
       
       QList<Jid> services;
       foreach(IDiscoIdentity ident, dinfo.identity)

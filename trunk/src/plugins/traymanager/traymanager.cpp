@@ -37,7 +37,7 @@ bool TrayManager::initConnections(IPluginManager *APluginManager, int &/*AInitOr
   FQuitAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
   FQuitAction->setText(tr("Quit"));
   connect(FQuitAction,SIGNAL(triggered()),APluginManager->instance(),SLOT(quit()));
-  addAction(FQuitAction,AG_TRAYMANAGER_TRAY_QUIT);
+  addAction(FQuitAction,AG_TMTM_TRAYMANAGER);
   
   return FTrayIcon.isSystemTrayAvailable();
 }

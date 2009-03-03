@@ -12,7 +12,7 @@ StartTLSPlugin::~StartTLSPlugin()
 
 void StartTLSPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Implementation of StartTLS");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("StartTLS implementation");

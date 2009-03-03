@@ -7,7 +7,7 @@
 #include "../../definations/dataformtypes.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterlabelorders.h"
-#include "../../definations/discofeatureorder.h"
+#include "../../definations/discofeaturehandlerorders.h"
 #include "../../definations/messagehandlerorders.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"

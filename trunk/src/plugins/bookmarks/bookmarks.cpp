@@ -103,12 +103,12 @@ bool BookMarks::initObjects()
 
   if (FTrayManager)
   {
-    FTrayManager->addAction(FBookMarksMenu->menuAction(),AG_BOOKMARKS_TRAY,true);
+    FTrayManager->addAction(FBookMarksMenu->menuAction(),AG_TMTM_BOOKMARKS,true);
   }
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
-    QToolButton *button = changer->addToolButton(FBookMarksMenu->menuAction(),AG_BOOKMARKS_MWTTB,false);
+    QToolButton *button = changer->addToolButton(FBookMarksMenu->menuAction(),AG_MWTTB_BOOKMARKS,false);
     button->setPopupMode(QToolButton::InstantPopup);
   }
   return true;

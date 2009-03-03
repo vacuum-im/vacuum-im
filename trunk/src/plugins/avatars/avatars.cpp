@@ -261,16 +261,16 @@ QList<int> Avatars::roles() const
 
 QList<int> Avatars::types() const
 {
-  static const QList<int> indexTypes = QList<int>() << RIT_StreamRoot << RIT_Contact;
+  static const QList<int> indexTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT;
   return indexTypes;
 }
 
 QVariant Avatars::data(const IRosterIndex *AIndex, int ARole) const
 {
   if (ARole == RDR_AVATAR_IMAGE)
-    return avatarImage(AIndex->data(RDR_Jid).toString());
+    return avatarImage(AIndex->data(RDR_JID).toString());
   else if (ARole == RDR_AVATAR_HASH)
-    return avatarHash(AIndex->data(RDR_Jid).toString());
+    return avatarHash(AIndex->data(RDR_JID).toString());
   return QVariant();
 }
 
@@ -462,9 +462,9 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
   {
     QMultiHash<int,QVariant> findData;
     foreach(int type, types())
-      findData.insert(RDR_Type,type);
+      findData.insert(RDR_TYPE,type);
     if (!AContactJid.isEmpty())
-      findData.insert(RDR_BareJid,AContactJid.pBare());
+      findData.insert(RDR_BARE_JID,AContactJid.pBare());
     IRosterIndexList indexes = FRostersModel->rootIndex()->findChild(findData,true);
     foreach (IRosterIndex *index, indexes)
     {
@@ -580,7 +580,7 @@ void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 {
   if (FRostersViewPlugin && types().contains(AIndex->type()))
   {
-    Jid contactJid = AIndex->data(RDR_BareJid).toString();
+    Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
     if (!FVCardAvatars.contains(contactJid))
       onVCardChanged(contactJid);
     if (checkOption(IAvatars::ShowAvatars))
@@ -590,13 +590,13 @@ void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 
 void Avatars::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->type() == RIT_StreamRoot && FStreamAvatars.contains(AIndex->data(RDR_StreamJid).toString()))
+  if (AIndex->type() == RIT_STREAM_ROOT && FStreamAvatars.contains(AIndex->data(RDR_STREAM_JID).toString()))
   {
     Menu *avatar = new Menu(AMenu);
     avatar->setTitle(tr("Avatar"));
     avatar->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CHANGE);
 
-    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     Action *setup = new Action(avatar);
     setup->setText(tr("Set avatar"));
     setup->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_SET);
@@ -612,15 +612,15 @@ void Avatars::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     connect(clear,SIGNAL(triggered(bool)),SLOT(onClearAvatarByAction(bool)));
     avatar->addAction(clear,AG_DEFAULT,false);
 
-    AMenu->addAction(avatar->menuAction(),AG_AVATARS_ROSTER,true);
+    AMenu->addAction(avatar->menuAction(),AG_RVCM_AVATARS,true);
   }
-  else if (AIndex->type() == RIT_Contact)
+  else if (AIndex->type() == RIT_CONTACT)
   {
     Menu *picture = new Menu(AMenu);
     picture->setTitle(tr("Custom picture"));
     picture->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CHANGE);
 
-    Jid contactJid = AIndex->data(RDR_Jid).toString();
+    Jid contactJid = AIndex->data(RDR_JID).toString();
     Action *setup = new Action(picture);
     setup->setText(tr("Set custom picture"));
     setup->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CUSTOM);
@@ -636,7 +636,7 @@ void Avatars::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     connect(clear,SIGNAL(triggered(bool)),SLOT(onClearAvatarByAction(bool)));
     picture->addAction(clear,AG_DEFAULT,false);
 
-    AMenu->addAction(picture->menuAction(),AG_AVATARS_ROSTER,true);
+    AMenu->addAction(picture->menuAction(),AG_RVCM_AVATARS,true);
   }
 }
 
@@ -651,7 +651,7 @@ void Avatars::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMa
       QSize imageSize = QImageReader(fileName).size();
       imageSize.scale(ALabelId==FRosterLabelId ? QSize(128,128) : QSize(64,64),Qt::KeepAspectRatio);
       QString avatarMask = "<img src='%1' width=%2 height=%3>";
-      AToolTips.insert(TTO_AVATAR_IMAGE,avatarMask.arg(fileName).arg(imageSize.width()).arg(imageSize.height()));
+      AToolTips.insert(RTTO_AVATAR_IMAGE,avatarMask.arg(fileName).arg(imageSize.width()).arg(imageSize.height()));
     }
   }
 }
@@ -763,7 +763,7 @@ void Avatars::onUpdateOptions()
       FRosterLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(labelOrder,RDR_AVATAR_IMAGE);
       QMultiHash<int,QVariant> findData;
       foreach(int type, types())
-        findData.insertMulti(RDR_Type,type);
+        findData.insertMulti(RDR_TYPE,type);
       IRosterIndexList indexes = FRostersModel->rootIndex()->findChild(findData,true);
       foreach (IRosterIndex *index, indexes)
         FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId,index);

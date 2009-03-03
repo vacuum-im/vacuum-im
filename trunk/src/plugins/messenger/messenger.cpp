@@ -150,7 +150,7 @@ bool Messenger::readStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, const 
 
 bool Messenger::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)
 {
-  static QList<int> hookerTypes = QList<int>() << RIT_Contact << RIT_MyResource;
+  static QList<int> hookerTypes = QList<int>() << RIT_CONTACT << RIT_MY_RESOURCE;
   if (hookerTypes.contains(AIndex->type()))
   {
     foreach(IMessageHandler *handler, FMessageHandlers)
@@ -311,7 +311,7 @@ int Messenger::receiveMessage(const Message &AMessage)
   {
     Message message = AMessage;
     messageId = newMessageId();
-    message.setData(MDR_MESSAGEID,messageId);
+    message.setData(MDR_MESSAGE_ID,messageId);
     FMessages.insert(messageId,message);
     FHandlerForMessage.insert(messageId,handler);
 
@@ -652,11 +652,11 @@ void Messenger::onStreamRemoved(IXmppStream *AXmppStream)
 
 void Messenger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  static QList<int> chatActionTypes = QList<int>() << RIT_Contact << RIT_Agent << RIT_MyResource;
-  static QList<int> messageActionTypes = QList<int>() << RIT_StreamRoot << RIT_Group << RIT_Contact << RIT_Agent << RIT_MyResource;
+  static QList<int> chatActionTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+  static QList<int> messageActionTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
 
-  Jid streamJid = AIndex->data(RDR_StreamJid).toString();
-  Jid contactJid = AIndex->data(RDR_Jid).toString();
+  Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+  Jid contactJid = AIndex->data(RDR_JID).toString();
   IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->getStream(streamJid) : NULL;
   if (stream && stream->isOpen())
   {
@@ -668,7 +668,7 @@ void Messenger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setData(ADR_StreamJid,streamJid.full());
       action->setData(ADR_ContactJid,contactJid.full());
       action->setData(ADR_WindowType,WT_ChatWindow);
-      AMenu->addAction(action,AG_MESSENGER,true);
+      AMenu->addAction(action,AG_RVCM_MESSENGER,true);
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
     }
     if (messageActionTypes.contains(AIndex->type()))
@@ -677,12 +677,12 @@ void Messenger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setText(tr("Message"));
       action->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_NORMAL);
       action->setData(ADR_StreamJid,streamJid.full());
-      if (AIndex->type() == RIT_Group)
-        action->setData(ADR_Group,AIndex->data(RDR_Group));
-      else if (AIndex->type() != RIT_StreamRoot)
+      if (AIndex->type() == RIT_GROUP)
+        action->setData(ADR_Group,AIndex->data(RDR_GROUP));
+      else if (AIndex->type() != RIT_STREAM_ROOT)
         action->setData(ADR_ContactJid,contactJid.full());
       action->setData(ADR_WindowType,WT_MessageWindow);
-      AMenu->addAction(action,AG_MESSENGER,true);
+      AMenu->addAction(action,AG_RVCM_MESSENGER,true);
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
     }
   }

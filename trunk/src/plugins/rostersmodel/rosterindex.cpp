@@ -5,8 +5,8 @@
 RosterIndex::RosterIndex(int AType, const QString &AId)
 {
   FParentIndex = NULL;
-  FData.insert(RDR_Type,AType);
-  FData.insert(RDR_Id,AId);
+  FData.insert(RDR_TYPE,AType);
+  FData.insert(RDR_INDEX_ID,AId);
   FFlags = (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
   FRemoveOnLastChildRemoved = true;
   FRemoveChildsOnRemoved = true;

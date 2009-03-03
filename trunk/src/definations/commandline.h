@@ -1,5 +1,5 @@
-#ifndef COMMANDLINE_H
-#define COMMANDLINE_H
+#ifndef DEF_COMMANDLINE_H
+#define DEF_COMMANDLINE_H
 
 // -p <Profile>
 #define CLO_PROFILE                 "-p"

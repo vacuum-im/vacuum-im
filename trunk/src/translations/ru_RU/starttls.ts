@@ -18,7 +18,7 @@
     <message>
         <location filename="../../plugins/starttls/starttlsplugin.cpp" line="15"/>
         <source>Potapov S.A. aka Lion</source>
-        <translation>Potapov S.A. aka Lion</translation>
+        <translation type="obsolete">Potapov S.A. aka Lion</translation>
     </message>
     <message>
         <location filename="../../plugins/starttls/starttlsplugin.cpp" line="16"/>

@@ -63,10 +63,10 @@ ServiceDiscovery::~ServiceDiscovery()
 
 void ServiceDiscovery::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = tr("Potapov S.A. aka Lion");
+  APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Discovering information about Jabber entities and the items associated with such entities");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = "Service Discovery";
+  APluginInfo->name = tr("Service Discovery");
   APluginInfo->uid = SERVICEDISCOVERY_UUID;
   APluginInfo->version = "0.1";
 }
@@ -172,12 +172,12 @@ bool ServiceDiscovery::initObjects()
   }
   if (FTrayManager)
   {
-    FTrayManager->addAction(FDiscoMenu->menuAction(),AG_DISCOVERY_TRAY,true);
+    FTrayManager->addAction(FDiscoMenu->menuAction(),AG_TMTM_DISCOVERY,true);
   }
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
-    QToolButton *button = changer->addToolButton(FDiscoMenu->menuAction(),AG_DISCOVERY_MWTTB,false);
+    QToolButton *button = changer->addToolButton(FDiscoMenu->menuAction(),AG_MWTTB_DISCOVERY,false);
     button->setPopupMode(QToolButton::InstantPopup);
   }
 
@@ -378,13 +378,13 @@ QList<int> ServiceDiscovery::roles() const
 QList<int> ServiceDiscovery::types() const
 {
   static QList<int> indexTypes =  QList<int>()
-    << RIT_StreamRoot << RIT_Contact << RIT_Agent << RIT_MyResource;
+    << RIT_STREAM_ROOT << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
   return indexTypes;
 }
 
 QVariant ServiceDiscovery::data(const IRosterIndex *AIndex, int ARole) const
 {
-  Jid contactJid = AIndex->type()==RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domain() : AIndex->data(RDR_Jid).toString();
+  Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
   if (hasDiscoInfo(contactJid,""))
   {
     IDiscoInfo dinfo = discoInfo(contactJid,"");
@@ -402,11 +402,11 @@ QVariant ServiceDiscovery::data(const IRosterIndex *AIndex, int ARole) const
 
 bool ServiceDiscovery::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)
 {
-  if (AIndex->type() == RIT_Agent)
+  if (AIndex->type() == RIT_AGENT)
   {
-    IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AIndex->data(RDR_StreamJid).toString()) : NULL;
+    IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
     if(presence && presence->isOpen())
-      showDiscoItems(presence->streamJid(),AIndex->data(RDR_Jid).toString(),"");
+      showDiscoItems(presence->streamJid(),AIndex->data(RDR_JID).toString(),"");
   }
   return false;
 }
@@ -1244,10 +1244,10 @@ void ServiceDiscovery::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &A
 void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   int itype = AIndex->type();
-  if (itype == RIT_StreamRoot || itype == RIT_Contact || itype == RIT_Agent || itype == RIT_MyResource)
+  if (itype == RIT_STREAM_ROOT || itype == RIT_CONTACT || itype == RIT_AGENT || itype == RIT_MY_RESOURCE)
   {
-    Jid streamJid = AIndex->data(RDR_StreamJid).toString();
-    Jid contactJid = itype == RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domain() : AIndex->data(RDR_Jid).toString();
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+    Jid contactJid = itype == RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
 
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
     if (presence && presence->isOpen())
@@ -1259,9 +1259,9 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
       action->setData(ADR_CONTACTJID,contactJid.full());
       action->setData(ADR_NODE,QString(""));
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoInfoByAction(bool)));
-      AMenu->addAction(action,AG_DISCOVERY_ROSTER,true);
+      AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
 
-      if (itype == RIT_StreamRoot || itype == RIT_Agent)
+      if (itype == RIT_STREAM_ROOT || itype == RIT_AGENT)
       {
         action = new Action(AMenu);
         action->setText(tr("Service Discovery"));
@@ -1270,7 +1270,7 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
         action->setData(ADR_CONTACTJID,contactJid.full());
         action->setData(ADR_NODE,QString(""));
         connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoItemsByAction(bool)));
-        AMenu->addAction(action,AG_DISCOVERY_ROSTER,true);
+        AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
       }
     }
 
@@ -1278,7 +1278,7 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
     foreach(QString feature, dinfo.features)
     {
       foreach(Action *action, createFeatureActions(presence->streamJid(),feature,dinfo,AMenu))
-        AMenu->addAction(action,AG_DISCOVERY_ROSTER_FEATURES,true);
+        AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
     }
   }
 }
@@ -1287,13 +1287,13 @@ void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId,
 {
   if (ALabelId == RLID_DISPLAY && types().contains(AIndex->type()))
   {
-    Jid contactJid = AIndex->type()==RIT_StreamRoot ? Jid(AIndex->data(RDR_Jid).toString()).domain() : AIndex->data(RDR_Jid).toString();
+    Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
     if (hasDiscoInfo(contactJid,""))
     {
       IDiscoInfo dinfo = discoInfo(contactJid,"");
       foreach(IDiscoIdentity identity, dinfo.identity)
         if (identity.category != DIC_CLIENT)
-          AToolTips.insertMulti(TTO_DISCO_IDENTITY,tr("Categoty: %1; Type: %2").arg(identity.category).arg(identity.type));
+          AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Categoty: %1; Type: %2").arg(identity.category).arg(identity.type));
     }
   }
 }
@@ -1333,10 +1333,10 @@ void ServiceDiscovery::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 void ServiceDiscovery::onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo)
 {
   QMultiHash<int,QVariant> dataValues;
-  dataValues.insertMulti(RDR_Type,RIT_Contact);
-  dataValues.insertMulti(RDR_Type,RIT_Agent);
-  dataValues.insertMulti(RDR_Type,RIT_MyResource);
-  dataValues.insertMulti(RDR_PJid,ADiscoInfo.contactJid.pFull());
+  dataValues.insertMulti(RDR_TYPE,RIT_CONTACT);
+  dataValues.insertMulti(RDR_TYPE,RIT_AGENT);
+  dataValues.insertMulti(RDR_TYPE,RIT_MY_RESOURCE);
+  dataValues.insertMulti(RDR_PJID,ADiscoInfo.contactJid.pFull());
   IRosterIndexList indexList = FRostersModel->rootIndex()->findChild(dataValues,true);
   foreach(Jid streamJid, FRostersModel->streams())
     if (streamJid.pDomain() == ADiscoInfo.contactJid.pDomain())

@@ -109,7 +109,7 @@ QList<int> Annotations::roles() const
 
 QList<int> Annotations::types() const
 {
-  static const QList<int> dataTypes = QList<int>() << RIT_Contact << RIT_Agent;
+  static const QList<int> dataTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
   return dataTypes;
 }
 
@@ -117,7 +117,7 @@ QVariant Annotations::data(const IRosterIndex *AIndex, int ARole) const
 {
   if (ARole == RDR_ANNOTATIONS)
   {
-    QString note = annotation(AIndex->data(RDR_StreamJid).toString(),AIndex->data(RDR_BareJid).toString());
+    QString note = annotation(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_BARE_JID).toString());
     return !note.isEmpty() ? QVariant(note) : QVariant();
   }
   return QVariant();
@@ -127,8 +127,8 @@ bool Annotations::setData(IRosterIndex *AIndex, int ARole, const QVariant &AValu
 {
   if (types().contains(AIndex->type()) && ARole==RDR_ANNOTATIONS)
   {
-    setAnnotation(AIndex->data(RDR_StreamJid).toString(),AIndex->data(RDR_BareJid).toString(),AValue.toString());
-    saveAnnotations(AIndex->data(RDR_StreamJid).toString());
+    setAnnotation(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_BARE_JID).toString(),AValue.toString());
+    saveAnnotations(AIndex->data(RDR_STREAM_JID).toString());
     return true;
   }
   return false;
@@ -229,7 +229,7 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
   {
     QMultiHash<int,QVariant> findData;
     foreach(Jid contactJid, AContactJids)
-      findData.insertMulti(RDR_BareJid,contactJid.pBare());
+      findData.insertMulti(RDR_BARE_JID,contactJid.pBare());
     IRosterIndexList indexes = FRostersModel->streamRoot(AStreamJid)->findChild(findData,true);
     foreach (IRosterIndex *index, indexes)
       emit dataChanged(index,RDR_ANNOTATIONS);
@@ -320,8 +320,8 @@ void Annotations::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARost
 
 void Annotations::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  Jid streamJid = AIndex->data(RDR_StreamJid).toString();
-  Jid contactJid = AIndex->data(RDR_BareJid).toString();
+  Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+  Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
   if (types().contains(AIndex->type()) && isEnabled(streamJid) && contactJid.isValid())
   {
     Action *action = new Action(AMenu);
@@ -330,7 +330,7 @@ void Annotations::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     action->setData(ADR_STREAMJID,streamJid.full());
     action->setData(ADR_CONTACTJID,contactJid.bare());
     connect(action,SIGNAL(triggered(bool)),SLOT(onEditNoteActionTriggered(bool)));
-    AMenu->addAction(action,AG_ANNOTATIONS,true);
+    AMenu->addAction(action,AG_RVCM_ANNOTATIONS,true);
   }
 }
 
@@ -342,7 +342,7 @@ void Annotations::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMul
     if (!note.isEmpty())
     {
       QString toolTip = "<hr>"+Qt::escape(note).trimmed().replace("\n","<br>");
-      AToolTips.insert(TTO_ANNOTATIONS,toolTip);
+      AToolTips.insert(RTTO_ANNOTATIONS,toolTip);
     }
   }
 }

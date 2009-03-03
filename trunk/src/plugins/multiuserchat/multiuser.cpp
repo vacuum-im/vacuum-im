@@ -6,9 +6,9 @@ MultiUser::MultiUser(const Jid &ARoomJid, const QString &ANickName, QObject *APa
   FContactJid = ARoomJid;
   FContactJid.setResource(ANickName);
   FNickName = ANickName;
-  setData(MUDR_ROOMJID,FRoomJid.bare());
+  setData(MUDR_ROOM_JID,FRoomJid.bare());
   setData(MUDR_NICK_NAME,FNickName);
-  setData(MUDR_CONTACTJID,FContactJid.full());
+  setData(MUDR_CONTACT_JID,FContactJid.full());
   setData(MUDR_SHOW,IPresence::Offline);
   setData(MUDR_STATUS,tr("Disconnected"));
   setData(MUDR_ROLE,MUC_ROLE_NONE);
@@ -43,5 +43,5 @@ void MultiUser::setNickName(const QString &ANickName)
   FNickName = ANickName;
   FContactJid.setResource(ANickName);
   setData(MUDR_NICK_NAME,ANickName);
-  setData(MUDR_CONTACTJID,FContactJid.full());
+  setData(MUDR_CONTACT_JID,FContactJid.full());
 }

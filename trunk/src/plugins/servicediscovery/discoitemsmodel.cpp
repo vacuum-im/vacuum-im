@@ -105,13 +105,13 @@ QVariant DiscoItemsModel::data(const QModelIndex &AIndex, int ARole) const
       return index->itemNode;
     }
     break;
-  case DDR_NAME:
+  case DIDR_NAME:
     return index->itemName;
-  case DDR_STREAMJID:
+  case DIDR_STREAM_JID:
     return FStreamJid.full();
-  case DDR_JID:
+  case DIDR_JID:
     return index->itemJid.full();
-  case DDR_NODE:
+  case DIDR_NODE:
     return index->itemNode;
   }
   return QVariant();

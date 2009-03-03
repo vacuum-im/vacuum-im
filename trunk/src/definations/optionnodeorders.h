@@ -1,5 +1,5 @@
-#ifndef OPTIONNODEORDERS_H
-#define OPTIONNODEORDERS_H
+#ifndef DEF_OPTIONNODEORDERS_H
+#define DEF_OPTIONNODEORDERS_H
 
 #define ONO_ACCOUNTS              100
 #define ONO_ROSTER                200

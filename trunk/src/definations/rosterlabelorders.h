@@ -1,5 +1,5 @@
-#ifndef ROSTERLABELORDERS_H
-#define ROSTERLABELORDERS_H
+#ifndef DEF_ROSTERLABELORDERS_H
+#define DEF_ROSTERLABELORDERS_H
 
 //Идентификаторы стандартных лэйблов
 #define RLID_FOOTER_TEXT                          -5

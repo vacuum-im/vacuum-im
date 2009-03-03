@@ -1,6 +1,5 @@
 #include "replicator.h"
 
-#include <QtDebug>
 #include <QFile>
 
 #define MAX_MODIFICATIONS         5
