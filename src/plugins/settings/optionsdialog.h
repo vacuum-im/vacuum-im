@@ -27,7 +27,7 @@ class SortFilterProxyModel :
 {
   Q_OBJECT;
 public:
-  SortFilterProxyModel(QObject *AParent):QSortFilterProxyModel(AParent) {};
+  SortFilterProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent) {};
 protected:
   virtual bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
 };

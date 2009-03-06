@@ -5,7 +5,7 @@
 #define ANIMATE_TIME        500
 #define ANIMATE_STEP_TIME   (ANIMATE_TIME/ANIMATE_STEPS)
 
-QDesktopWidget NotifyWidget::FDesktop;
+QDesktopWidget *NotifyWidget::FDesktop = new QDesktopWidget;
 QList<NotifyWidget *> NotifyWidget::FWidgets;
 
 NotifyWidget::NotifyWidget(const INotification &ANotification)
@@ -69,7 +69,7 @@ void NotifyWidget::appear()
 
 void NotifyWidget::animateTo(int AXPos, int AYPos)
 {
-  QRect display = FDesktop.availableGeometry();
+  QRect display = FDesktop->availableGeometry();
   if (display.contains(AXPos,AYPos))
   {
     if (!isVisible())
@@ -125,7 +125,7 @@ void NotifyWidget::mouseReleaseEvent(QMouseEvent *AEvent)
 
 void NotifyWidget::layoutWidgets()
 {
-  QRect display = FDesktop.availableGeometry();
+  QRect display = FDesktop->availableGeometry();
   int ypos = display.bottom();
   foreach(NotifyWidget *widget, FWidgets)
   {

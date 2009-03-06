@@ -49,23 +49,17 @@ OptionsDialog::OptionsDialog(QWidget *AParent) : QDialog(AParent)
   trvNodes->header()->hide();
   trvNodes->setIndentation(12);
   trvNodes->setMaximumWidth(160);
-  trvNodes->setSortingEnabled(true);
-  trvNodes->sortByColumn(0,Qt::AscendingOrder);
   trvNodes->setEditTriggers(QAbstractItemView::NoEditTriggers);
   trvNodes->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Expanding);
 
   simNodes = new QStandardItemModel(trvNodes);
   simNodes->setColumnCount(1);
 
-  FProxyModel = new SortFilterProxyModel(trvNodes);
+  FProxyModel = new SortFilterProxyModel(simNodes);
+  FProxyModel->setSourceModel(simNodes);
   FProxyModel->setSortLocaleAware(true);
   FProxyModel->setDynamicSortFilter(true);
   FProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-  FProxyModel->setSourceModel(simNodes);
-  
-  trvNodes->setModel(FProxyModel);
-  connect(trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-    SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
 
   QHBoxLayout *hblCentral = new QHBoxLayout;
   hblCentral->addWidget(trvNodes);
@@ -82,6 +76,10 @@ OptionsDialog::OptionsDialog(QWidget *AParent) : QDialog(AParent)
 
   setLayout(vblMain);
   resize(600,600);
+
+  trvNodes->setModel(FProxyModel);
+  connect(trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
+    SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
 }
 
 OptionsDialog::~OptionsDialog()
@@ -117,6 +115,7 @@ void OptionsDialog::openNode(const QString &ANode, const QString &AName, const Q
       FItemsStackIndex.insert(nodeItem,itemIndex);
       connect(this,SIGNAL(closed()),AWidget,SLOT(deleteLater()));
     }
+    FProxyModel->sort(0,Qt::AscendingOrder);
   }
 }
 
@@ -244,6 +243,7 @@ void OptionsDialog::updateOptionsSize(QWidget *AWidget)
 void OptionsDialog::showEvent(QShowEvent *AEvent)
 {
   QDialog::showEvent(AEvent);
+
   trvNodes->setCurrentIndex(FProxyModel->mapFromSource(simNodes->indexFromItem(simNodes->item(0))));
 }
 

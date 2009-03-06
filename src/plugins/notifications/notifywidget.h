@@ -36,7 +36,7 @@ private:
   QTimer FAnimator;
 private:
   static void layoutWidgets();
-  static QDesktopWidget FDesktop;
+  static QDesktopWidget *FDesktop;
   static QList<NotifyWidget *> FWidgets;
 };
 
