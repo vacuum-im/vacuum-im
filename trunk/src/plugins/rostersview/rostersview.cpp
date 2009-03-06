@@ -61,9 +61,15 @@ void RostersView::setRostersModel(IRostersModel *AModel)
     }
 
     FRostersModel = AModel;
-    if (!FProxyModels.isEmpty())
+    if (FProxyModels.isEmpty())
+    {
+      emit viewModelAboutToBeChanged(AModel);
+      QTreeView::setModel(AModel);
+      emit viewModelChanged(AModel);
+    }
+    else
       FProxyModels.values().first()->setSourceModel(AModel);
-    setViewModel(AModel);
+
     emit modelSeted(AModel);
   }
 }
@@ -107,8 +113,13 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 {
   if (AProxyModel && !FProxyModels.values().contains(AProxyModel))
   {
-    emit proxyModelAboutToBeAdded(AProxyModel,AOrder);
+    emit proxyModelAboutToBeInserted(AProxyModel,AOrder);
     
+    bool changeViewModel = FProxyModels.upperBound(AOrder) == FProxyModels.end();
+    
+    if (changeViewModel)
+      emit viewModelAboutToBeChanged(AProxyModel);
+
     FProxyModels.insert(AOrder,AProxyModel);
     QList<QAbstractProxyModel *> proxies = FProxyModels.values();
     int index = proxies.indexOf(AProxyModel);
@@ -117,18 +128,27 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
     QAbstractProxyModel *after = proxies.value(index+1,NULL);
 
     if (befour)
+    {
       AProxyModel->setSourceModel(befour);
+    }
     else
+    {
       AProxyModel->setSourceModel(FRostersModel);
+    }
     if (after)
     {
       after->setSourceModel(NULL);  //костыли для QSortFilterProxyModel, аналогичные в removeProxyModel
       after->setSourceModel(AProxyModel);
     }
     else
-      setViewModel(AProxyModel);
+    {
+      QTreeView::setModel(AProxyModel);
+    }
 
-    emit proxyModelAdded(AProxyModel); 
+    if (changeViewModel)
+      emit viewModelChanged(model());
+
+    emit proxyModelInserted(AProxyModel); 
   }
 }
 
@@ -149,10 +169,25 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
     QAbstractProxyModel *befour = proxies.value(index-1,NULL);
     QAbstractProxyModel *after = proxies.value(index+1,NULL);
 
+    bool changeViewModel = after==NULL;
+    if (changeViewModel)
+    {
+      if (befour!=NULL)
+        emit viewModelAboutToBeChanged(befour);
+      else
+        emit viewModelAboutToBeChanged(FRostersModel);
+    }
+
+    FProxyModels.remove(FProxyModels.key(AProxyModel),AProxyModel);
+
     if (after == NULL && befour == NULL)
-      setViewModel(FRostersModel);
+    {
+      QTreeView::setModel(FRostersModel);
+    }
     else if (after == NULL)
-      setViewModel(befour);
+    {
+      QTreeView::setModel(befour);
+    }
     else if (befour == NULL)
     {
       after->setSourceModel(NULL);
@@ -163,9 +198,11 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
       after->setSourceModel(NULL);
       after->setSourceModel(befour);
     }
+
     AProxyModel->setSourceModel(NULL);
-    
-    FProxyModels.remove(FProxyModels.key(AProxyModel),AProxyModel);
+
+    if (changeViewModel)
+      emit viewModelChanged(model());
 
     emit proxyModelRemoved(AProxyModel);
   } 
@@ -536,13 +573,6 @@ void RostersView::removeLabels()
   }
 }
 
-void RostersView::setViewModel(QAbstractItemModel *AModel)
-{
-  emit viewModelAboutToBeChanged(AModel);
-  QTreeView::setModel(AModel);
-  emit viewModelChanged(AModel);
-}
-
 void RostersView::updateStatusText(IRosterIndex *AIndex)
 {
   const static QList<int> statusTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT << RIT_AGENT;
@@ -571,18 +601,6 @@ void RostersView::updateStatusText(IRosterIndex *AIndex)
 void RostersView::drawBranches(QPainter * /*APainter*/, const QRect &/*ARect*/, const QModelIndex &/*AIndex*/) const
 {
 
-}
-
-void RostersView::rowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd)
-{
-  emit indexAboutToBeRemoved(AParent,AStart,AEnd);
-  QTreeView::rowsAboutToBeRemoved(AParent,AStart,AEnd);
-}
-
-void RostersView::rowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
-{
-  QTreeView::rowsInserted(AParent,AStart,AEnd);
-  emit indexInserted(AParent,AStart,AEnd);
 }
 
 bool RostersView::viewportEvent(QEvent *AEvent)

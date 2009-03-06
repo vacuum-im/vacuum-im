@@ -48,29 +48,25 @@ public:
   virtual IRostersView *rostersView();
   virtual bool checkOption(IRostersView::Option AOption) const;
   virtual void setOption(IRostersView::Option AOption, bool AValue);
+  virtual void startRestoreExpandState();
   virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
 signals:
   virtual void optionChanged(IRostersView::Option AOption, bool AValue);
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
-  void startRestoreExpandState();
   QString getExpandSettingsName(const QModelIndex &AIndex);
   void loadExpandedState(const QModelIndex &AIndex);
   void saveExpandedState(const QModelIndex &AIndex);
 protected slots:
   void onRostersViewDestroyed(QObject *AObject);
-  void onModelAboutToBeSeted(IRostersModel *AModel);
-  void onModelSeted(IRostersModel *AModel);
-  void onModelAboutToBeReset();
-  void onModelReset();
+  void onViewModelAboutToBeReset();
+  void onViewModelReset();
   void onViewModelAboutToBeChanged(QAbstractItemModel *AModel);
   void onViewModelChanged(QAbstractItemModel *AModel);
-  void onProxyAdded(QAbstractProxyModel *AProxyModel);
-  void onProxyRemoved(QAbstractProxyModel *AProxyModel);
-  void onIndexInserted(const QModelIndex &AParent, int AStart, int AEnd);
-  void onIndexCollapsed(const QModelIndex &AIndex);
-  void onIndexExpanded(const QModelIndex &AIndex);
+  void onViewRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
+  void onViewIndexCollapsed(const QModelIndex &AIndex);
+  void onViewIndexExpanded(const QModelIndex &AIndex);
   void onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
   void onAccountShown(IAccount *AAccount);
   void onAccountHidden(IAccount *AAccount);
@@ -91,19 +87,15 @@ private:
 private:
   Action *FShowOfflineAction;
 private:
-  struct  
-  {
-    int sliderPos;
-    IRosterIndex *currentIndex;
-  } FViewSavedState;
-  bool FStartRestoreExpandState;
   int FOptions; 
+  bool FStartRestoreExpandState;
   RostersView *FRostersView; 
   IndexDataHolder *FIndexDataHolder;
   SortFilterProxyModel *FSortFilterProxyModel;
   QAbstractItemModel *FLastModel;
   QPointer<RosterOptionsWidget> FRosterOptionsWidget;
   QHash<Jid,QString> FCollapseNS;
+  struct { int sliderPos; IRosterIndex *currentIndex; } FViewSavedState;
 };
 
 #endif // ROSTERSVIEWPLUGIN_H

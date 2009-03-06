@@ -34,6 +34,10 @@ RostersViewPlugin::RostersViewPlugin()
   FViewSavedState.currentIndex = NULL;
 
   FRostersView = new RostersView;
+  connect(FRostersView,SIGNAL(viewModelAboutToBeChanged(QAbstractItemModel *)),
+    SLOT(onViewModelAboutToBeChanged(QAbstractItemModel *)));
+  connect(FRostersView,SIGNAL(viewModelChanged(QAbstractItemModel *)),
+    SLOT(onViewModelChanged(QAbstractItemModel *)));
   connect(FRostersView,SIGNAL(destroyed(QObject *)), SLOT(onRostersViewDestroyed(QObject *)));
 }
 
@@ -109,50 +113,39 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
 
 bool RostersViewPlugin::initObjects()
 {
-  FIndexDataHolder = new IndexDataHolder(this);
-  connect(FRostersView,SIGNAL(modelAboutToBeSeted(IRostersModel *)),
-    SLOT(onModelAboutToBeSeted(IRostersModel *)));
-  connect(FRostersView,SIGNAL(modelSeted(IRostersModel *)),
-    SLOT(onModelSeted(IRostersModel *)));
-  connect(FRostersView,SIGNAL(viewModelAboutToBeChanged(QAbstractItemModel *)),
-    SLOT(onViewModelAboutToBeChanged(QAbstractItemModel *)));
-  connect(FRostersView,SIGNAL(viewModelChanged(QAbstractItemModel *)),
-    SLOT(onViewModelChanged(QAbstractItemModel *)));
-  
+  FSortFilterProxyModel = new SortFilterProxyModel(this, this);
+  FSortFilterProxyModel->setSortLocaleAware(true);
+  FSortFilterProxyModel->setDynamicSortFilter(true);
+  FSortFilterProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+  FSortFilterProxyModel->sort(0,Qt::AscendingOrder);
+  FRostersView->insertProxyModel(FSortFilterProxyModel,RPO_ROSTERSVIEW_SORTFILTER);
+
   if (FSettingsPlugin)
   {
     FSettings = FSettingsPlugin->settingsForPlugin(ROSTERSVIEW_UUID);
     FSettingsPlugin->openOptionsNode(ON_ROSTER,tr("Roster"),tr("Roster view options"),MNI_ROSTERVIEW_OPTIONS,ONO_ROSTER);
     FSettingsPlugin->insertOptionsHolder(this);
 
-    connect(FRostersView,SIGNAL(proxyModelAdded(QAbstractProxyModel *)),
-      SLOT(onProxyAdded(QAbstractProxyModel *)));
-    connect(FRostersView,SIGNAL(proxyModelRemoved(QAbstractProxyModel *)),
-      SLOT(onProxyRemoved(QAbstractProxyModel *)));
-    connect(FRostersView,SIGNAL(indexInserted(const QModelIndex &, int, int)),
-      SLOT(onIndexInserted(const QModelIndex &, int, int)));
-    connect(FRostersView,SIGNAL(collapsed(const QModelIndex &)),SLOT(onIndexCollapsed(const QModelIndex &)));
-    connect(FRostersView,SIGNAL(expanded(const QModelIndex &)),SLOT(onIndexExpanded(const QModelIndex &)));
+    connect(FRostersView,SIGNAL(collapsed(const QModelIndex &)),SLOT(onViewIndexCollapsed(const QModelIndex &)));
+    connect(FRostersView,SIGNAL(expanded(const QModelIndex &)),SLOT(onViewIndexExpanded(const QModelIndex &)));
   }
  
   if (FMainWindowPlugin)
   {
-    FMainWindowPlugin->mainWindow()->rostersWidget()->insertWidget(0,FRostersView);
-
     FShowOfflineAction = new Action(this);
     FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_HIDE_OFFLINE);
     FShowOfflineAction->setToolTip(tr("Show/Hide offline contacts"));
     connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
     FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction,AG_MWTTB_ROSTERSVIEW,false);
+    
+    FMainWindowPlugin->mainWindow()->rostersWidget()->insertWidget(0,FRostersView);
   }
 
   if (FRostersModel)
   {
+    FIndexDataHolder = new IndexDataHolder(this);
+    FRostersModel->insertDefaultDataHolder(FIndexDataHolder);
     FRostersView->setRostersModel(FRostersModel);
-    FSortFilterProxyModel = new SortFilterProxyModel(this);
-    FSortFilterProxyModel->setDynamicSortFilter(true);
-    FRostersView->insertProxyModel(FSortFilterProxyModel,RPO_ROSTERSVIEW_SORTFILTER);
-    FSortFilterProxyModel->sort(0,Qt::AscendingOrder);
   }
 
   return true;
@@ -192,29 +185,8 @@ void RostersViewPlugin::setOption(IRostersView::Option AOption, bool AValue)
     if (FSortFilterProxyModel)
       FSortFilterProxyModel->setOption(AOption,AValue);
     if (AOption == IRostersView::ShowOfflineContacts)
-    {
-      if (AValue)
-        startRestoreExpandState();
       FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, AValue ? MNI_ROSTERVIEW_SHOW_OFFLINE : MNI_ROSTERVIEW_HIDE_OFFLINE);
-    }
     emit optionChanged(AOption,AValue);
-  }
-}
-
-void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
-{
-  QAbstractItemModel *curModel = FRostersView->model();
-  if (curModel)
-  {
-    if (AParent.isValid())
-      loadExpandedState(AParent);
-    int rows = curModel->rowCount(AParent);
-    for (int i = 0; i<rows; ++i)
-    {
-      QModelIndex index = curModel->index(i,0,AParent);
-      if (curModel->rowCount(index) > 0)
-        restoreExpandState(index);
-    }
   }
 }
 
@@ -227,12 +199,28 @@ void RostersViewPlugin::startRestoreExpandState()
   }
 }
 
+void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
+{
+  QAbstractItemModel *curModel = FRostersView->model();
+  if (curModel)
+  {
+    if (AParent.isValid())
+      loadExpandedState(AParent);
+    int rows = curModel->rowCount(AParent);
+    for (int row = 0; row<rows; row++)
+    {
+      QModelIndex index = curModel->index(row,0,AParent);
+      if (curModel->rowCount(index) > 0)
+        restoreExpandState(index);
+    }
+  }
+}
+
 QString RostersViewPlugin::getExpandSettingsName(const QModelIndex &AIndex)
 {
-  QString valueName;
-  Jid streamJid(AIndex.data(RDR_STREAM_JID).toString());
-  if (streamJid.isValid())
+  if (AIndex.isValid())
   {
+    QString valueName;
     int itemType = AIndex.data(RDR_TYPE).toInt();
     if (itemType != RIT_STREAM_ROOT)
     {
@@ -245,8 +233,9 @@ QString RostersViewPlugin::getExpandSettingsName(const QModelIndex &AIndex)
     }
     else
       valueName = SVN_COLLAPSE_ACCOUNT_NS;
+    return valueName;
   }
-  return valueName;
+  return QString::null;
 }
 
 void RostersViewPlugin::loadExpandedState(const QModelIndex &AIndex)
@@ -254,7 +243,7 @@ void RostersViewPlugin::loadExpandedState(const QModelIndex &AIndex)
   QString settingsName = getExpandSettingsName(AIndex);
   if (FSettings && !settingsName.isEmpty())
   {
-    Jid streamJid(AIndex.data(RDR_STREAM_JID).toString());
+    Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
     QString ns = FCollapseNS.value(streamJid);
     bool isCollapsed = FSettings->valueNS(settingsName,ns,false).toBool();
     if (isCollapsed && FRostersView->isExpanded(AIndex))
@@ -269,7 +258,7 @@ void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
   QString settingsName = getExpandSettingsName(AIndex);
   if (FSettings && !settingsName.isEmpty())
   {
-    Jid streamJid(AIndex.data(RDR_STREAM_JID).toString());
+    Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
     QString ns = FCollapseNS.value(streamJid);
     if (FRostersView->isExpanded(AIndex))
     {
@@ -288,75 +277,60 @@ void RostersViewPlugin::onRostersViewDestroyed(QObject * /*AObject*/)
   FRostersView = NULL;
 }
 
-void RostersViewPlugin::onModelAboutToBeSeted(IRostersModel * /*AModel*/)
+void RostersViewPlugin::onViewModelAboutToBeReset()
 {
-  if (FRostersView->rostersModel())
-    FRostersView->rostersModel()->removeDefaultDataHolder(FIndexDataHolder);
-}
-
-void RostersViewPlugin::onModelSeted(IRostersModel *AModel)
-{
-  AModel->insertDefaultDataHolder(FIndexDataHolder);
-  startRestoreExpandState();
-}
-
-void RostersViewPlugin::onModelAboutToBeReset()
-{
-  FViewSavedState.sliderPos = FRostersView->verticalScrollBar()->sliderPosition();
   if (FRostersView->currentIndex().isValid())
+  {
     FViewSavedState.currentIndex = (IRosterIndex *)FRostersView->mapToModel(FRostersView->currentIndex()).internalPointer();
+    FViewSavedState.sliderPos = FRostersView->verticalScrollBar()->sliderPosition();
+  }
   else
     FViewSavedState.currentIndex = NULL;
 }
 
-void RostersViewPlugin::onModelReset()
+void RostersViewPlugin::onViewModelReset()
 {
   restoreExpandState();
   if (FViewSavedState.currentIndex != NULL)
+  {
     FRostersView->setCurrentIndex(FRostersView->mapFromModel(FRostersView->rostersModel()->modelIndexByRosterIndex(FViewSavedState.currentIndex)));
-  FRostersView->verticalScrollBar()->setSliderPosition(FViewSavedState.sliderPos);
+    FRostersView->verticalScrollBar()->setSliderPosition(FViewSavedState.sliderPos);
+  }
 }
 
 void RostersViewPlugin::onViewModelAboutToBeChanged(QAbstractItemModel * /*AModel*/)
 {
-  if (FRostersView->rostersModel())
+  if (FRostersView->model())
   {
-    disconnect(FRostersView->rostersModel(),SIGNAL(modelAboutToBeReset()),this,SLOT(onModelAboutToBeReset()));
-    disconnect(FRostersView->rostersModel(),SIGNAL(modelReset()),this,SLOT(onModelReset()));
+    disconnect(FRostersView->model(),SIGNAL(modelAboutToBeReset()),this,SLOT(onViewModelAboutToBeReset()));
+    disconnect(FRostersView->model(),SIGNAL(modelReset()),this,SLOT(onViewModelReset()));
+    disconnect(FRostersView->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),this,SLOT(onViewRowsInserted(const QModelIndex &, int , int )));
   }
 }
 
-void RostersViewPlugin::onViewModelChanged(QAbstractItemModel *AModel)
+void RostersViewPlugin::onViewModelChanged(QAbstractItemModel * /*AModel*/)
 {
-  if (AModel)
+  if (FRostersView->model())
   {
-    connect(AModel,SIGNAL(modelAboutToBeReset()),SLOT(onModelAboutToBeReset()));
-    connect(AModel,SIGNAL(modelReset()),this,SLOT(onModelReset()));
+    connect(FRostersView->model(),SIGNAL(modelAboutToBeReset()),SLOT(onViewModelAboutToBeReset()));
+    connect(FRostersView->model(),SIGNAL(modelReset()),SLOT(onViewModelReset()));
+    connect(FRostersView->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),SLOT(onViewRowsInserted(const QModelIndex &, int , int )));
+    startRestoreExpandState();
   }
 }
 
-void RostersViewPlugin::onProxyAdded(QAbstractProxyModel *AProxyModel)
+void RostersViewPlugin::onViewRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
 {
-  connect(AProxyModel,SIGNAL(modelReset()),SLOT(onModelReset()));
-  startRestoreExpandState();
+  for (int row=AStart; row<=AEnd; row++)
+    loadExpandedState(AParent.child(row,0));
 }
 
-void RostersViewPlugin::onProxyRemoved(QAbstractProxyModel * /*AProxyModel*/)
-{
-  startRestoreExpandState();
-}
-
-void RostersViewPlugin::onIndexInserted(const QModelIndex &/*AParent*/, int /*AStart*/, int /*AEnd*/)
-{
-  startRestoreExpandState();
-}
-
-void RostersViewPlugin::onIndexCollapsed(const QModelIndex &AIndex)
+void RostersViewPlugin::onViewIndexCollapsed(const QModelIndex &AIndex)
 {
   saveExpandedState(AIndex);
 }
 
-void RostersViewPlugin::onIndexExpanded(const QModelIndex &AIndex)
+void RostersViewPlugin::onViewIndexExpanded(const QModelIndex &AIndex)
 {
   saveExpandedState(AIndex);
 }

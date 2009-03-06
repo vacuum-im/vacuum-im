@@ -2,7 +2,7 @@
 
 RosterSearch::RosterSearch()
 {
-  FRostersView = NULL;
+  FRostersViewPlugin = NULL;
   FMainWindow = NULL;
 
   FSearchEdit = NULL;
@@ -54,13 +54,7 @@ bool RosterSearch::initConnections(IPluginManager *APluginManager, int &/*AInitO
 {
   IPlugin *plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
   if (plugin)
-  {
-    IRostersViewPlugin *rostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-    if (rostersViewPlugin)
-    {
-      FRostersView = rostersViewPlugin->rostersView();
-    }
-  }
+    FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
@@ -72,7 +66,7 @@ bool RosterSearch::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  return FRostersView!=NULL && FMainWindow!=NULL;
+  return FRostersViewPlugin!=NULL && FMainWindow!=NULL;
 }
 
 bool RosterSearch::initObjects()
@@ -103,6 +97,8 @@ void RosterSearch::startSearch()
 {
   setFilterRegExp(FSearchEdit->text());
   invalidate();
+  if (FRostersViewPlugin)
+    FRostersViewPlugin->restoreExpandState();
   emit searchResultUpdated();
 }
 
@@ -126,12 +122,12 @@ void RosterSearch::setSearchEnabled(bool AEnabled)
 {
   if (isSearchEnabled() != AEnabled)
   {
-    if (FRostersView)
+    if (FRostersViewPlugin)
     {
       if (AEnabled)
-        FRostersView->insertProxyModel(this,RPO_ROSTERSEARCH_FILTER);
+        FRostersViewPlugin->rostersView()->insertProxyModel(this,RPO_ROSTERSEARCH_FILTER);
       else
-        FRostersView->removeProxyModel(this);
+        FRostersViewPlugin->rostersView()->removeProxyModel(this);
     }
     FSearchToolBarChanger->toolBar()->setVisible(AEnabled);
     emit searchStateChanged(AEnabled);
