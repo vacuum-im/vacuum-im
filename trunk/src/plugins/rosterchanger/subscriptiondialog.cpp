@@ -17,6 +17,7 @@ SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginMa
   FContactJid = AContactJid;
 
   QToolBar *toolBar = new QToolBar(this);
+  toolBar->setIconSize(QSize(16,16));
   ui.lytMainLayout->setMenuBar(toolBar);
   FToolBarChanger = new ToolBarChanger(toolBar);
 
