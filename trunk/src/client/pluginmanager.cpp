@@ -11,6 +11,13 @@
 #define DIR_PLUGINS         "plugins"
 #define DIR_TRANSLATIONS    "translations"
 
+#if defined(Q_OS_WIN)
+# define LIB_PREFIX_SIZE    0
+#else
+# define LIB_PREFIX_SIZE    3
+#endif
+
+
 //PluginManager
 PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 {
@@ -147,7 +154,7 @@ void PluginManager::loadPlugins()
               pluginItem.info = new IPluginInfo;
               pluginItem.translator =  NULL;
               
-              QString qmFile = tsDir+"/"+file.left(file.lastIndexOf('.'))+".qm";
+              QString qmFile = tsDir+"/"+file.mid(LIB_PREFIX_SIZE,file.lastIndexOf('.')-LIB_PREFIX_SIZE)+".qm";
               if (QFile::exists(qmFile))
               {
                 QTranslator *translator = new QTranslator(loader);
