@@ -61,7 +61,7 @@ protected slots:
   void onEditTimedOut();
 private:
   IMainWindow *FMainWindow;
-  IRostersView *FRostersView;
+  IRostersViewPlugin *FRostersViewPlugin;
 private:
   Menu *FFieldsMenu;
   QTimer FEditTimeout;

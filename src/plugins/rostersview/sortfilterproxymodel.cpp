@@ -1,21 +1,14 @@
 #include "sortfilterproxymodel.h"
 
-SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
+SortFilterProxyModel::SortFilterProxyModel(IRostersViewPlugin *ARostersViewPlugin, QObject *AParent) : QSortFilterProxyModel(AParent)
 {
   FOptions = 0;
-  setSortRole(Qt::DisplayRole);
-  setSortLocaleAware(true);
-  setSortCaseSensitivity(Qt::CaseInsensitive);
+  FRostersViewPlugin = ARostersViewPlugin;
 }
 
 SortFilterProxyModel::~SortFilterProxyModel()
 {
 
-}
-
-void SortFilterProxyModel::setSourceModel(QAbstractItemModel *ASourceModel)
-{
-  QSortFilterProxyModel::setSourceModel(ASourceModel);
 }
 
 bool SortFilterProxyModel::checkOption(IRostersView::Option AOption) const
@@ -27,7 +20,11 @@ void SortFilterProxyModel::setOption(IRostersView::Option AOption, bool AValue)
 {
   AValue ? FOptions |= AOption : FOptions &= ~AOption;
   if (AOption == IRostersView::ShowOfflineContacts || AOption == IRostersView::ShowOnlineFirst)
+  {
     invalidate();
+    if (AOption == IRostersView::ShowOfflineContacts && AValue)
+      FRostersViewPlugin->restoreExpandState();
+  }
 }
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
@@ -41,7 +38,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
     bool showOnlineFirst = checkOption(IRostersView::ShowOnlineFirst);
     if (showOnlineFirst && leftType!=RIT_STREAM_ROOT && leftShow!=rightShow)
     {
-      const static int showOrders[] = {6,1,2,3,4,5,0,7};
+      const static int showOrders[] = {6,2,1,3,4,5,7,8};
       return showOrders[leftShow] < showOrders[rightShow];
     }
     else

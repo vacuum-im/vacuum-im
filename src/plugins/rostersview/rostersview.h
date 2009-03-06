@@ -70,8 +70,8 @@ public:
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AModel);
   virtual void modelSeted(IRostersModel *AModel);
-  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *AProxyModel, int AOrder);
-  virtual void proxyModelAdded(QAbstractProxyModel *AProxyModel);
+  virtual void proxyModelAboutToBeInserted(QAbstractProxyModel *AProxyModel, int AOrder);
+  virtual void proxyModelInserted(QAbstractProxyModel *AProxyModel);
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel);
   virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel);
   virtual void viewModelAboutToBeChanged(QAbstractItemModel *AModel);
@@ -84,25 +84,19 @@ signals:
   virtual void notifyContextMenu(IRosterIndex *AIndex, int ANotifyId, Menu *AMenu);
   virtual void notifyActivated(IRosterIndex *AIndex, int ANotifyId);
   virtual void notifyRemovedByIndex(IRosterIndex *AIndex, int ANotifyId);
-signals:
-  virtual void indexAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
-  virtual void indexInserted(const QModelIndex &AParent, int AStart, int AEnd);
 public:
-  virtual bool checkOption(IRostersView::Option AOption) const;
-  virtual void setOption(IRostersView::Option AOption, bool AValue);
+  bool checkOption(IRostersView::Option AOption) const;
+  void setOption(IRostersView::Option AOption, bool AValue);
 protected:
   QStyleOptionViewItemV2 indexOption(const QModelIndex &AIndex) const;
   void appendBlinkLabel(int ALabelId);
   void removeBlinkLabel(int ALabelId);
   QString intId2StringId(int AIntId);
   void removeLabels();
-  void setViewModel(QAbstractItemModel *AModel);
   void updateStatusText(IRosterIndex *AIndex = NULL);
 protected:
   //QTreeView
   virtual void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
-  virtual void rowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
-  virtual void rowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
   //QAbstractItemView
   virtual bool viewportEvent(QEvent *AEvent);
   virtual void resizeEvent(QResizeEvent *AEvent);

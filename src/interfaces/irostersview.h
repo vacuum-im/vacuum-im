@@ -65,8 +65,8 @@ public:
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AIndex) =0;
   virtual void modelSeted(IRostersModel *AIndex) =0;
-  virtual void proxyModelAboutToBeAdded(QAbstractProxyModel *AProxyModel, int AOrder) =0;
-  virtual void proxyModelAdded(QAbstractProxyModel *AProxyModel) =0;
+  virtual void proxyModelAboutToBeInserted(QAbstractProxyModel *AProxyModel, int AOrder) =0;
+  virtual void proxyModelInserted(QAbstractProxyModel *AProxyModel) =0;
   virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel) =0;
   virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel) =0;
   virtual void viewModelAboutToBeChanged(QAbstractItemModel *AModel) =0;
@@ -88,6 +88,7 @@ public:
   virtual IRostersView *rostersView() =0;
   virtual bool checkOption(IRostersView::Option AOption) const =0;
   virtual void setOption(IRostersView::Option AOption, bool AValue) =0;
+  virtual void startRestoreExpandState() =0;
   virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
 signals:
   virtual void optionChanged(IRostersView::Option AOption, bool AValue) =0;
