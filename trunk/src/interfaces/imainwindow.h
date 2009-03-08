@@ -10,12 +10,10 @@
 
 #define MAINWINDOW_UUID "{A6F3D775-8464-4599-AB79-97BA1BAA6E96}"
 
-class IMainWindow :
-  public QMainWindow
+class IMainWindow
 {
 public:
-  IMainWindow(QWidget *AParent = NULL, Qt::WindowFlags AFlags = 0) : QMainWindow(AParent,AFlags) {} 
-public:
+  virtual QMainWindow *instance() =0;
   virtual QVBoxLayout *mainLayout() const =0;
   virtual QStackedWidget *upperWidget() const = 0;
   virtual QStackedWidget *rostersWidget() const = 0;
