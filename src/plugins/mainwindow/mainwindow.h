@@ -6,6 +6,7 @@
 #include "../../definations/menuicons.h"
 
 class MainWindow : 
+  public QMainWindow,
   public IMainWindow
 {
   Q_OBJECT;
@@ -14,6 +15,7 @@ public:
   MainWindow(QWidget *AParent = NULL, Qt::WindowFlags AFlags = 0);
   ~MainWindow();
   //IMainWindow
+  virtual QMainWindow *instance() { return this; }
   virtual QVBoxLayout *mainLayout() const { return FMainLayout; }
   virtual QStackedWidget *upperWidget() const { return FUpperWidget; }
   virtual QStackedWidget *rostersWidget() const { return FRostersWidget; }
@@ -36,10 +38,10 @@ private:
   ToolBarChanger *FLeftToolBarChanger;
   ToolBarChanger *FBottomToolBarChanger;
 private:
-  QVBoxLayout     *FMainLayout;
-  QStackedWidget  *FUpperWidget;
-  QStackedWidget  *FRostersWidget;
-  QStackedWidget  *FBottomWidget;
+  QVBoxLayout    *FMainLayout;
+  QStackedWidget *FUpperWidget;
+  QStackedWidget *FRostersWidget;
+  QStackedWidget *FBottomWidget;
 };
 
 #endif // MAINWINDOW_H

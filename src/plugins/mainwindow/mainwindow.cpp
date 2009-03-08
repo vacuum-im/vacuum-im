@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags):IMainWindow(AParent,AFlags)
+MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(AParent,AFlags)
 {
   setAttribute(Qt::WA_DeleteOnClose,false);
   setIconSize(QSize(16,16));

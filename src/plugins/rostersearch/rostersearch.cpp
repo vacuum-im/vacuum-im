@@ -16,7 +16,7 @@ RosterSearch::RosterSearch()
   setDynamicSortFilter(false);
   setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-  QToolBar *searchToolBar = new QToolBar(tr("Search toolbar"),FMainWindow);
+  QToolBar *searchToolBar = new QToolBar(tr("Search toolbar"));
   searchToolBar->setAllowedAreas(Qt::TopToolBarArea);
   searchToolBar->setMovable(false);
   FSearchToolBarChanger = new ToolBarChanger(searchToolBar);
@@ -80,8 +80,8 @@ bool RosterSearch::initObjects()
     connect(searchAction,SIGNAL(triggered(bool)),SLOT(onSearchActionTriggered(bool)));
     FMainWindow->topToolBarChanger()->addAction(searchAction,AG_MWTTB_ROSTERSEARCH);
 
-    FMainWindow->addToolBar(FSearchToolBarChanger->toolBar());
-    FMainWindow->insertToolBarBreak(FSearchToolBarChanger->toolBar());
+    FMainWindow->instance()->addToolBar(FSearchToolBarChanger->toolBar());
+    FMainWindow->instance()->insertToolBarBreak(FSearchToolBarChanger->toolBar());
 
     FSearchToolBarChanger->toolBar()->setVisible(false);
   }
