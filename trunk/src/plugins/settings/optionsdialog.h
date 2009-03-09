@@ -15,11 +15,10 @@
 #include "../../utils/iconstorage.h"
 
 struct OptionsNode {
+  int order;
   QString icon;
   QString name;
   QString desc;
-  int order;
-  QWidget *widget;
 };
 
 class SortFilterProxyModel : 
@@ -48,10 +47,8 @@ protected:
   QStandardItem *createNodeItem(const QString &ANode);
   QString nodeFullName(const QString &ANode);
   bool canExpandVertically(const QWidget *AWidget) const;
-  void updateOptionsSize(QWidget *AWidget);
 protected:
   virtual void showEvent(QShowEvent *AEvent);
-  virtual void resizeEvent(QResizeEvent *AEvent);
 protected slots:
   void onDialogButtonClicked(QAbstractButton *AButton);
   void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious);
@@ -59,14 +56,13 @@ private:
   QLabel *lblInfo;
   QTreeView *trvNodes;
   QScrollArea *scaScroll;
-  QStackedWidget *stwOptions;  
   QDialogButtonBox *dbbButtons;
   QStandardItemModel *simNodes;
   SortFilterProxyModel *FProxyModel;
 private:
   QHash<QString, OptionsNode *> FNodes;
   QHash<QString, QStandardItem *> FNodeItems;
-  QHash<QStandardItem *, int> FItemsStackIndex;
+  QHash<QStandardItem *, QWidget *> FItemWidget;
 };
 
 #endif // OPTIONSDIALOG_H
