@@ -12,7 +12,8 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,false);
-  setWindowFlags(Qt::Tool|Qt::WindowStaysOnTopHint|Qt::MSWindowsFixedSizeDialogHint);
+  setAttribute(Qt::WA_ShowWithoutActivating,true);
+  setWindowFlags(Qt::SplashScreen);
 
   FXPos = -1;
   FYPos = -1;
@@ -25,13 +26,15 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
   QString text = ANotification.data.value(NDR_WINDOW_TEXT).toString();
   FTimeOut = ANotification.data.value(NDR_WINDOW_TIMEOUT,DEFAUTL_TIMEOUT).toInt();
 
-  setWindowTitle(caption);
+  if (!caption.isEmpty())
+    ui.lblCaption->setText(caption);
+  else
+    ui.lblCaption->setVisible(false);
 
   if (!icon.isNull())
     ui.lblIcon->setPixmap(icon.pixmap(QSize(32,32)));
   else
     ui.lblIcon->setVisible(false);
-
   
   if (!title.isEmpty())
     ui.lblTitle->setText(title);
