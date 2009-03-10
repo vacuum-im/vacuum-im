@@ -1,7 +1,8 @@
 #include "mainwindowplugin.h"
 
+#define SVN_SIZE              "size"
+#define SVN_POSITION          "position"
 #define SVN_SHOW_ON_START     "showOnStart"
-#define BDI_WINDOW_GEOMETRY   "MainWindowGeometry"
 
 MainWindowPlugin::MainWindowPlugin()
 {
@@ -10,8 +11,6 @@ MainWindowPlugin::MainWindowPlugin()
   FTrayManager = NULL;
 
   FMainWindow = new MainWindow(NULL,Qt::Tool);
-  FMainWindow->resize(200,500);
-  FMainWindow->move(0,0);
 }
 
 MainWindowPlugin::~MainWindowPlugin()
@@ -109,7 +108,8 @@ void MainWindowPlugin::showMainWindow()
 void MainWindowPlugin::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
-  FMainWindow->restoreGeometry(settings->loadBinaryData(BDI_WINDOW_GEOMETRY));
+  FMainWindow->resize(settings->value(SVN_SIZE,QSize(200,500)).toSize());
+  FMainWindow->move(settings->value(SVN_POSITION,QPoint(0,0)).toPoint());
   updateTitle();
 }
 
@@ -117,7 +117,8 @@ void MainWindowPlugin::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
   settings->setValue(SVN_SHOW_ON_START,FMainWindow->isVisible());
-  settings->saveBinaryData(BDI_WINDOW_GEOMETRY,FMainWindow->saveGeometry());
+  settings->setValue(SVN_SIZE,FMainWindow->size());
+  settings->setValue(SVN_POSITION,FMainWindow->pos());
   updateTitle();
 }
 
@@ -128,7 +129,7 @@ void MainWindowPlugin::onProfileRenamed(const QString &/*AProfileFrom*/, const Q
 
 void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
-  if (ANotifyId == 0 && AReason == QSystemTrayIcon::DoubleClick)
+  if (ANotifyId==0 && AReason==QSystemTrayIcon::DoubleClick)
     showMainWindow();
 }
 
