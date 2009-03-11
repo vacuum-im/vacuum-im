@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QHeaderView>
+#include <QApplication>
 #include <QTextDocument>
 
 enum StandardItemRoles {
@@ -248,12 +249,11 @@ void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QMod
     lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(Qt::escape(curItem->data(SIR_DESC).toString())));
     scaScroll->takeWidget();
     scaScroll->setWidget(FItemWidget.value(curItem));
-    int addWidth = scaScroll->widget()->sizeHint().width()-scaScroll->width()+scaScroll->verticalScrollBar()->sizeHint().width()+scaScroll->lineWidth()*2;
+    int addWidth = scaScroll->widget()->sizeHint().width() - scaScroll->width();
+    addWidth += QApplication::style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+    addWidth += QApplication::style()->pixelMetric(QStyle::PM_DefaultFrameWidth)*2;
     if (addWidth > 0)
-    {
       resize(width()+addWidth,height());
-      move(x()-addWidth/2,y());
-    }
   }
   else if (curItem)
   {
