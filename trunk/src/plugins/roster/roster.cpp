@@ -1,5 +1,7 @@
 #include "roster.h"
 
+#include <QtDebug>
+
 #include <QSet>
 #include <QFile>
 
@@ -417,10 +419,8 @@ void Roster::removeGroup(const QString &AGroup)
   setItems(allGroupItems);
 }
 
-bool Roster::processItemsElement(const QDomElement &AItemsElem, bool ARemoveOld)
+void Roster::processItemsElement(const QDomElement &AItemsElem, bool ARemoveOld)
 {
-  bool processed = false;
-
   QSet<Jid> oldItems; 
   if (ARemoveOld)
     oldItems = FRosterItems.keys().toSet();
@@ -428,44 +428,49 @@ bool Roster::processItemsElement(const QDomElement &AItemsElem, bool ARemoveOld)
   QDomElement itemElem = AItemsElem.firstChildElement("item");
   while (!itemElem.isNull())
   {
-    QString subs = itemElem.attribute("subscription");
-    if (subs == SUBSCRIPTION_BOTH || subs == SUBSCRIPTION_TO || 
-        subs == SUBSCRIPTION_FROM || subs == SUBSCRIPTION_NONE)
+    Jid itemJid = itemElem.attribute("jid");
+    if (itemJid.isValid() && itemJid.resource().isEmpty())
     {
-      Jid itemJid = itemElem.attribute("jid");
-      itemJid.setResource("");
-      IRosterItem &ritem = FRosterItems[itemJid];
-      ritem.isValid = true;
-      ritem.itemJid = itemJid;
-      ritem.name = itemElem.attribute("name");
-      ritem.subscription = subs;   
-      ritem.ask = itemElem.attribute("ask");
-      oldItems -= ritem.itemJid;
-
-      QSet<QString> allItemGroups;
-      QDomElement groupElem = itemElem.firstChildElement("group"); 
-      while (!groupElem.isNull())
+      QString subs = itemElem.attribute("subscription");
+      if (subs==SUBSCRIPTION_BOTH || subs==SUBSCRIPTION_TO || subs==SUBSCRIPTION_FROM || subs==SUBSCRIPTION_NONE)
       {
-        allItemGroups += groupElem.text();
-        groupElem = groupElem.nextSiblingElement("group"); 
-      }
-      ritem.groups = allItemGroups; 
+        IRosterItem &ritem = FRosterItems[itemJid];
+        ritem.isValid = true;
+        ritem.itemJid = itemJid;
+        ritem.name = itemElem.attribute("name");
+        ritem.subscription = subs;   
+        ritem.ask = itemElem.attribute("ask");
+        oldItems -= ritem.itemJid;
 
-      emit received(ritem); 
-      processed = true;
+        QSet<QString> allItemGroups;
+        QDomElement groupElem = itemElem.firstChildElement("group"); 
+        while (!groupElem.isNull())
+        {
+          allItemGroups += groupElem.text();
+          groupElem = groupElem.nextSiblingElement("group"); 
+        }
+        ritem.groups = allItemGroups; 
+
+        emit received(ritem); 
+      }
+      else if (subs == SUBSCRIPTION_REMOVE)
+      {
+        removeRosterItem(itemJid);
+      }
+      else
+      {
+        qDebug() << "IGNORED ROSTER ITEM WITH INVALID SUBSCRIPTION:" << itemJid.full() << subs;
+      }
     }
-    else if (subs == SUBSCRIPTION_REMOVE)
+    else
     {
-      removeRosterItem(itemElem.attribute("jid"));
-      processed = true;
+      qDebug() << "IGNORED ROSTER ITEM WITH INVALID JID:" << itemJid.full();
     }
     itemElem = itemElem.nextSiblingElement("item");  
   }
 
   foreach(Jid itemJid,oldItems)
     removeRosterItem(itemJid);
-
-  return processed;
 }
 
 void Roster::removeRosterItem(const Jid &AItemJid)
