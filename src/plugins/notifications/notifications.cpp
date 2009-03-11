@@ -1,7 +1,5 @@
 #include "notifications.h"
 
-#include <QSound>
-
 #define ADR_NOTIFYID                    Action::DR_Parametr1
 
 #define SVN_NOTIFICATORS                "notificators:notificator[]"
@@ -13,9 +11,6 @@
 
 Notifications::Notifications()
 {
-  FOptions = 0;
-  FNotifyId = 0;
-  FOptionsWidget = NULL;
   FAvatars = NULL;
   FRosterPlugin = NULL;
   FStatusIcons = NULL;
@@ -27,6 +22,11 @@ Notifications::Notifications()
   FActivateAll = NULL;
   FRemoveAll = NULL;
   FNotifyMenu = NULL;
+
+  FOptions = 0;
+  FNotifyId = 0;
+  FSound = NULL;
+  FOptionsWidget = NULL;
 }
 
 Notifications::~Notifications()
@@ -34,6 +34,7 @@ Notifications::~Notifications()
   delete FActivateAll;
   delete FRemoveAll;
   delete FNotifyMenu;
+  delete FSound;
 }
 
 void Notifications::pluginInfo(IPluginInfo *APluginInfo)
@@ -210,10 +211,16 @@ int Notifications::appendNotification(const INotification &ANotification)
     }
   }
 
-  if (checkOption(INotifications::EnableSounds) && (ANotification.kinds & INotification::PlaySound)>0)
+  if (QSound::isAvailable() && checkOption(INotifications::EnableSounds) && (ANotification.kinds & INotification::PlaySound)>0)
   {
     QString soundName = ANotification.data.value(NDR_SOUND_FILE).toString();
-    QSound::play(FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName));
+    QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
+    if (!soundFile.isEmpty() && (FSound==NULL || FSound->isFinished()))
+    {
+      delete FSound;
+      FSound = new QSound(soundFile);
+      FSound->play();
+    }
   }
 
   if (FNotifyRecords.isEmpty())
