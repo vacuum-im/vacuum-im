@@ -111,7 +111,13 @@ void PluginManager::loadPlugins()
   if (dir.cd(DIR_PLUGINS)) 
   {
     QStringList args = qApp->arguments();
-    QString locale = args.contains(CLO_LOCALE) ? args.value(args.indexOf(CLO_LOCALE)+1) : QLocale::system().name();
+    if (args.contains(CLO_LOCALE))
+    {
+      QLocale defLocale(args.value(args.indexOf(CLO_LOCALE)+1));
+      if (defLocale.language() != QLocale::C)
+        QLocale::setDefault(defLocale);
+    }
+    QString locale = QLocale().name();
     QString tsDir = QApplication::applicationDirPath()+"/"DIR_TRANSLATIONS"/"+locale;
     QString qtTranslator = tsDir+"/qtlib.qm";
     if (QFile::exists(qtTranslator))
