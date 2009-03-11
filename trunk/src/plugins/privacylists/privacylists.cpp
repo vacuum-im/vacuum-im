@@ -148,35 +148,38 @@ bool PrivacyLists::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanz
       while (!itemElem.isNull())
       {
         IRosterItem ritem;
-        ritem.isValid = true;
         ritem.itemJid = itemElem.attribute("jid");
-        ritem.subscription = itemElem.attribute("subscription");
-        QDomElement groupElem = itemElem.firstChildElement("group");
-        while (!groupElem.isNull())
+        ritem.isValid = ritem.itemJid.isValid() && ritem.itemJid.resource().isEmpty();
+        if (ritem.isValid)
         {
-          ritem.groups += groupElem.text();
-          groupElem = groupElem.nextSiblingElement("group");
-        }
+          ritem.subscription = itemElem.attribute("subscription");
+          QDomElement groupElem = itemElem.firstChildElement("group");
+          while (!groupElem.isNull())
+          {
+            ritem.groups += groupElem.text();
+            groupElem = groupElem.nextSiblingElement("group");
+          }
 
-        int stanzas = denyedStanzas(ritem,privacyList(AStreamJid,activeList(AStreamJid)));
-        bool denyed = (stanzas & IPrivacyRule::PresencesOut)>0;
-        if (denyed && !FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
-        {
-          presence->sendPresence(ritem.itemJid,IPresence::Offline,"",0);
-          FOfflinePresences[AStreamJid]+=ritem.itemJid;
-        }
-        else if (!denyed && directionIn && FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
-        {
-          if (ritem.subscription==SUBSCRIPTION_BOTH || ritem.subscription==SUBSCRIPTION_FROM)
-            presence->sendPresence(ritem.itemJid,presence->show(),presence->status(),presence->priority());
-          FOfflinePresences[AStreamJid]-=ritem.itemJid;
-        }
+          int stanzas = denyedStanzas(ritem,privacyList(AStreamJid,activeList(AStreamJid)));
+          bool denyed = (stanzas & IPrivacyRule::PresencesOut)>0;
+          if (denyed && !FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
+          {
+            presence->sendPresence(ritem.itemJid,IPresence::Offline,"",0);
+            FOfflinePresences[AStreamJid]+=ritem.itemJid;
+          }
+          else if (!denyed && directionIn && FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
+          {
+            if (ritem.subscription==SUBSCRIPTION_BOTH || ritem.subscription==SUBSCRIPTION_FROM)
+              presence->sendPresence(ritem.itemJid,presence->show(),presence->status(),presence->priority());
+            FOfflinePresences[AStreamJid]-=ritem.itemJid;
+          }
 
-        if (directionIn)
-        {
-          denyed = (stanzas & IPrivacyRule::AnyStanza)>0;
-          if (FLabeledContacts.value(AStreamJid).contains(ritem.itemJid)!=denyed)
-            setPrivacyLabel(AStreamJid,ritem.itemJid,denyed);
+          if (directionIn)
+          {
+            denyed = (stanzas & IPrivacyRule::AnyStanza)>0;
+            if (FLabeledContacts.value(AStreamJid).contains(ritem.itemJid)!=denyed)
+              setPrivacyLabel(AStreamJid,ritem.itemJid,denyed);
+          }
         }
 
         itemElem = itemElem.nextSiblingElement("item");
@@ -1274,12 +1277,12 @@ void PrivacyLists::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
 void PrivacyLists::onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex * /*AParent*/)
 {
-  if (FRostersView && (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT))
+  if (FRostersView && (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_AGENT))
   {
     Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     if (!activeList(streamJid).isEmpty())
     {
-      Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
+      Jid contactJid = AIndex->data(RDR_INDEX_ID).toString();
       IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
       IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
       ritem.itemJid = contactJid;
