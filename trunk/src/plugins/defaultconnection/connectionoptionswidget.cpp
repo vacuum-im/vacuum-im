@@ -118,9 +118,10 @@ void ConnectionOptionsWidget::onUseSSLStateChanged(int AState)
 
 void ConnectionOptionsWidget::onProxyTypeChanged(int AIndex)
 {
-  ui.lneProxyHost->setEnabled(AIndex != 0);
-  ui.spbProxyPort->setEnabled(AIndex != 0);
-  ui.lneProxyUser->setEnabled(AIndex != 0);
-  ui.lneProxyPassword->setEnabled(AIndex != 0);
+  bool enableProxyParams = AIndex > IDefaultConnection::PT_NO_PROXY;
+  ui.lneProxyHost->setEnabled(enableProxyParams);
+  ui.spbProxyPort->setEnabled(enableProxyParams);
+  ui.lneProxyUser->setEnabled(enableProxyParams);
+  ui.lneProxyPassword->setEnabled(enableProxyParams);
 }
 

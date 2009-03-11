@@ -155,7 +155,7 @@ void DefaultConnectionPlugin::saveOptions(const QString &ASettingsNS)
 
 QStringList DefaultConnectionPlugin::proxyTypeNames() const
 {
-  return QStringList() << tr("Direct connection") << tr("Socket5 proxy") << tr("HTTPS proxy");
+  return QStringList() << tr("Default proxy") << tr("Without proxy") << tr("Socket5 proxy") << tr("HTTP proxy");
 }
 
 void DefaultConnectionPlugin::onConnectionAboutToConnect()

@@ -45,10 +45,6 @@ signals:
   virtual void modeChanged(QSslSocket::SslMode AMode);
   virtual void sslErrors(const QList<QSslError> &AErrors);
 protected:
-  void proxyConnection();
-  void socket5Connection();
-  void httpsConnection();
-  void proxyReady();
   void connectionReady();
   void connectionError(const QString &AError);
 protected slots:
@@ -65,27 +61,12 @@ private:
   QSslSocket FSocket;
   QTimer FConnectTimer;
 private:
-  enum ProxyState {
-    ProxyUnconnected,
-    ProxyAuthType,
-    ProxyAuthResult,
-    ProxyConnect,
-    ProxyConnectResult,
-    ProxyReady
-  } FProxyState;
   bool FConnected;
   bool FDisconnect;
   bool FDisconnected;
-  QHash<int, QVariant> FOptions;
-  QString FHost;
-  quint16 FPort;
   bool FUseSSL;
   bool FIgnoreSSLErrors;
-  int FProxyType;
-  QString FProxyHost;
-  qint16  FProxyPort;
-  QString FProxyUser;
-  QString FProxyPassword;
+  QHash<int, QVariant> FOptions;
 };
 
 #endif // DEFAULTCONNECTION_H

@@ -20,6 +20,13 @@ public:
     CO_PROXY_PASSWORD,
     CO_USER_OPTIONS = 100
   };
+  enum ProxyTypes {
+    PT_DEFAULT_PROXY,
+    PT_NO_PROXY,
+    PT_SOCKET5_PROXY,
+    PT_HTTP_PROXY
+  };
+public:
   virtual QObject *instance() =0;
   virtual void startClientEncryption() =0;
   virtual QSsl::SslProtocol protocol() const =0;
