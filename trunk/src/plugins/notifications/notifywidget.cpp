@@ -13,7 +13,7 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,false);
   setAttribute(Qt::WA_ShowWithoutActivating,true);
-  setWindowFlags(Qt::SplashScreen);
+  setWindowFlags(Qt::SplashScreen|Qt::WindowStaysOnTopHint);
 
   FXPos = -1;
   FYPos = -1;

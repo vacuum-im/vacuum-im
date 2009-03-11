@@ -1,6 +1,7 @@
 #ifndef NOTIFICATIONS_H
 #define NOTIFICATIONS_H
 
+#include <QSound>
 #include "../../definations/notificationdataroles.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/optionnodes.h"
@@ -120,6 +121,7 @@ private:
 private:
   uint FOptions;
   int FNotifyId;
+  QSound *FSound;
   OptionsWidget *FOptionsWidget;
   QList<NotifyKindsWidget *> FOptionsWidgets;
   QHash<int,NotifyRecord> FNotifyRecords;
