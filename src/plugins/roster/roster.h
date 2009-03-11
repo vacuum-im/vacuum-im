@@ -59,7 +59,7 @@ signals:
   virtual void subscription(const Jid &AItemJid, int ASubsType, const QString &AText);
   virtual void closed();
 protected:
-  bool processItemsElement(const QDomElement &AItemsElem, bool ARemoveOld = false);
+  void processItemsElement(const QDomElement &AItemsElem, bool ARemoveOld = false);
   void removeRosterItem(const Jid &AItemJid);
   void requestGroupDelimiter();
   void setGroupDelimiter(const QString &ADelimiter);
