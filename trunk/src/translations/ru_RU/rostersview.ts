@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>RosterOptionsWidgetClass</name>
-    <message>
-        <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="13"/>
-        <source>RosterOptionsWidget</source>
-        <translation type="obsolete">RosterOptionsWidget</translation>
-    </message>
     <message>
         <location filename="../../plugins/rostersview/rosteroptionswidget.ui" line="19"/>
         <source>Show offline contacts</source>
@@ -31,17 +27,17 @@
 <context>
     <name>RostersView</name>
     <message>
-        <location filename="../../plugins/rostersview/rostersview.cpp" line="735"/>
+        <location filename="../../plugins/rostersview/rostersview.cpp" line="754"/>
         <source>Status: %1</source>
         <translation>Статус: %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rostersview.cpp" line="739"/>
+        <location filename="../../plugins/rostersview/rostersview.cpp" line="758"/>
         <source>Priority: %1</source>
         <translation>Приоритет: %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rostersview.cpp" line="744"/>
+        <location filename="../../plugins/rostersview/rostersview.cpp" line="763"/>
         <source>Subscription: %1 %2</source>
         <translation>Авторизация: %1 %2</translation>
     </message>
@@ -49,27 +45,27 @@
 <context>
     <name>RostersViewPlugin</name>
     <message>
-        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="48"/>
+        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="52"/>
         <source>Representing roster to user</source>
         <translation>Отображение контакт-листа</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="50"/>
+        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="54"/>
         <source>Rosters View</source>
         <translation>Модуль отображения контакт-листа</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="125"/>
+        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="126"/>
         <source>Roster</source>
         <translation>Контакт-лист</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="125"/>
+        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="126"/>
         <source>Roster view options</source>
         <translation>Настройки отображения контакт-листа</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="144"/>
+        <location filename="../../plugins/rostersview/rostersviewplugin.cpp" line="137"/>
         <source>Show/Hide offline contacts</source>
         <translation>Скрыть/показать отключенные контакты</translation>
     </message>

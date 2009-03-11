@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>IconsOptionsWidgetClass</name>
-    <message>
-        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="19"/>
-        <source>IconsOptionsWidget</source>
-        <translation type="obsolete">IconsOptionsWidget</translation>
-    </message>
     <message>
         <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="29"/>
         <source>Default iconset</source>
@@ -18,11 +14,13 @@
         <translation>Правила по умолчанию</translation>
     </message>
     <message>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="62"/>
         <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="92"/>
         <source>RegExp</source>
         <translation>Условие</translation>
     </message>
     <message>
+        <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="67"/>
         <location filename="../../plugins/statusicons/iconsoptionswidget.ui" line="97"/>
         <source>Iconset</source>
         <translation>Иконки</translation>

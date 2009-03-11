@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>MainWindow</name>
     <message>
@@ -26,22 +27,22 @@
 <context>
     <name>MainWindowPlugin</name>
     <message>
-        <location filename="../../plugins/mainwindow/mainwindowplugin.cpp" line="25"/>
+        <location filename="../../plugins/mainwindow/mainwindowplugin.cpp" line="24"/>
         <source>Main window holder</source>
         <translation>Управление основным окном</translation>
     </message>
     <message>
-        <location filename="../../plugins/mainwindow/mainwindowplugin.cpp" line="27"/>
+        <location filename="../../plugins/mainwindow/mainwindowplugin.cpp" line="26"/>
         <source>Main Window</source>
         <translation>Основное окно</translation>
     </message>
     <message>
-        <location filename="../../plugins/mainwindow/mainwindowplugin.cpp" line="65"/>
+        <location filename="../../plugins/mainwindow/mainwindowplugin.cpp" line="64"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../../plugins/mainwindow/mainwindowplugin.cpp" line="73"/>
+        <location filename="../../plugins/mainwindow/mainwindowplugin.cpp" line="72"/>
         <source>Show roster</source>
         <translation>Показать список контактов</translation>
     </message>

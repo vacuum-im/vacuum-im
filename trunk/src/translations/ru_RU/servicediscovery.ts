@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>DiscoInfoWindow</name>
     <message>
@@ -49,11 +50,6 @@
         <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="171"/>
         <source>Update</source>
         <translation>Обновить</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="13"/>
-        <source>DiscoveryInfo</source>
-        <translation type="obsolete">DiscoveryInfo</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoinfowindow.ui" line="151"/>
@@ -155,11 +151,6 @@
 <context>
     <name>DiscoItemsWindowClass</name>
     <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="13"/>
-        <source>DiscoItemsWindow</source>
-        <translation type="obsolete">DiscoItemsWindow</translation>
-    </message>
-    <message>
         <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="57"/>
         <source>Node:</source>
         <translation>Узел:</translation>
@@ -168,11 +159,6 @@
         <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="116"/>
         <source>Actions</source>
         <translation>Действия</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="163"/>
-        <source>toolBar</source>
-        <translation type="obsolete">toolBar</translation>
     </message>
     <message>
         <location filename="../../plugins/servicediscovery/discoitemswindow.ui" line="31"/>
@@ -188,16 +174,14 @@
 <context>
     <name>ServiceDiscovery</name>
     <message>
-        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="66"/>
-        <source>Potapov S.A. aka Lion</source>
-        <translation type="obsolete">Potapov S.A. aka Lion</translation>
-    </message>
-    <message>
         <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="67"/>
         <source>Discovering information about Jabber entities and the items associated with such entities</source>
         <translation>Обзор информации и сервисов, связанных с Jabber объектами</translation>
     </message>
     <message>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="69"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="154"/>
+        <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="860"/>
         <location filename="../../plugins/servicediscovery/servicediscovery.cpp" line="1267"/>
         <source>Service Discovery</source>
         <translation>Обзор сервисов</translation>

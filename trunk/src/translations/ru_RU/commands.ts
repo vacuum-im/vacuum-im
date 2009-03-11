@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>CommandDialog</name>
     <message>
@@ -49,14 +50,6 @@
     </message>
 </context>
 <context>
-    <name>CommandDialogClass</name>
-    <message>
-        <location filename="../../plugins/commands/commanddialog.ui" line="13"/>
-        <source>CommandDialog</source>
-        <translation type="obsolete">CommandDialog</translation>
-    </message>
-</context>
-<context>
     <name>Commands</name>
     <message>
         <location filename="../../plugins/commands/commands.cpp" line="33"/>
@@ -64,6 +57,7 @@
         <translation>Плагин для отображения и выполнения команд приложения</translation>
     </message>
     <message>
+        <location filename="../../plugins/commands/commands.cpp" line="35"/>
         <location filename="../../plugins/commands/commands.cpp" line="447"/>
         <source>Ad-Hoc Commands</source>
         <translation>Ad-Hoc Команды</translation>

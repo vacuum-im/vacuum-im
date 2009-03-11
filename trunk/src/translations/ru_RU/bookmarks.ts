@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>BookMarks</name>
     <message>
+        <location filename="../../plugins/bookmarks/bookmarks.cpp" line="34"/>
         <location filename="../../plugins/bookmarks/bookmarks.cpp" line="100"/>
         <source>Bookmarks</source>
         <translation>Закладки</translation>
@@ -26,6 +28,8 @@
 <context>
     <name>EditBookmarkDialog</name>
     <message>
+        <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="64"/>
+        <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="79"/>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="83"/>
         <source>Bookmark is not valid</source>
         <translation>Ошибка в закладке</translation>
@@ -34,11 +38,6 @@
         <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="64"/>
         <source>In conference bookmark fields &apos;Room&apos; and &apos;Nick&apos; should not be empty</source>
         <translation>В закладке на конференцию поля &apos;Конференция&apos; и &apos;Ник&apos; не могут быть пустыми</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="79"/>
-        <source>In URL bookmark field &apos;URL&apos;should not be empty</source>
-        <translation type="obsolete">В URL-закладках поле &apos;URL&apos; не может быть пустым</translation>
     </message>
     <message>
         <location filename="../../plugins/bookmarks/editbookmarkdialog.cpp" line="83"/>
@@ -102,6 +101,7 @@
 <context>
     <name>EditBookmarksDialog</name>
     <message>
+        <location filename="../../plugins/bookmarks/editbookmarksdialog.cpp" line="174"/>
         <location filename="../../plugins/bookmarks/editbookmarksdialog.cpp" line="195"/>
         <source>Bookmarks not saved</source>
         <translation>Закладки не сохранены</translation>

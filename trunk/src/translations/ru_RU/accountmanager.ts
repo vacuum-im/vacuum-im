@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>AccountManage</name>
     <message>
@@ -36,16 +37,6 @@
 <context>
     <name>AccountManageClass</name>
     <message>
-        <location filename="../../plugins/accountmanager/accountmanage.ui" line="13"/>
-        <source>AccountManage</source>
-        <translation type="obsolete">AccountManage</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/accountmanager/accountmanage.ui" line="43"/>
-        <source>1</source>
-        <translation type="obsolete">1</translation>
-    </message>
-    <message>
         <location filename="../../plugins/accountmanager/accountmanage.ui" line="46"/>
         <source>Add</source>
         <translation>Добавить</translation>
@@ -59,11 +50,7 @@
 <context>
     <name>AccountManager</name>
     <message>
-        <location filename="../../plugins/accountmanager/accountmanager.cpp" line="32"/>
-        <source>Potapov S.A. aka Lion</source>
-        <translation type="obsolete">Potapov S.A. aka Lion</translation>
-    </message>
-    <message>
+        <location filename="../../plugins/accountmanager/accountmanager.cpp" line="33"/>
         <location filename="../../plugins/accountmanager/accountmanager.cpp" line="87"/>
         <source>Creating and removing accounts</source>
         <translation>Управление аккаунтами</translation>
@@ -106,11 +93,6 @@
 </context>
 <context>
     <name>AccountOptionsClass</name>
-    <message>
-        <location filename="../../plugins/accountmanager/accountoptions.ui" line="13"/>
-        <source>AccountOptions</source>
-        <translation type="obsolete">AccountOptions</translation>
-    </message>
     <message>
         <location filename="../../plugins/accountmanager/accountoptions.ui" line="30"/>
         <source>Account Name:</source>

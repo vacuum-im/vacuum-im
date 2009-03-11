@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>ErrorHandler</name>
     <message>
@@ -8,6 +9,7 @@
         <translation>Неизвестная ошибка</translation>
     </message>
     <message>
+        <location filename="../../utils/errorhandler.cpp" line="268"/>
         <location filename="../../utils/errorhandler.cpp" line="269"/>
         <source>Redirect</source>
         <translation>Перенаправление</translation>

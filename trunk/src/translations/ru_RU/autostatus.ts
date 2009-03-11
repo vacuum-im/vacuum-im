@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>AutoStatus</name>
     <message>
@@ -8,6 +9,9 @@
         <translation>Автоматическое изменение статуса в зависимости от активности пользователя</translation>
     </message>
     <message>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="42"/>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="77"/>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="166"/>
         <location filename="../../plugins/autostatus/autostatus.cpp" line="169"/>
         <source>Auto status</source>
         <translation>Автостатус</translation>
@@ -48,11 +52,6 @@
 </context>
 <context>
     <name>StatusOptionsWidgetClass</name>
-    <message>
-        <location filename="../../plugins/autostatus/statusoptionswidget.ui" line="13"/>
-        <source>StatusOptionsWidget</source>
-        <translation type="obsolete">StatusOptionsWidget</translation>
-    </message>
     <message>
         <location filename="../../plugins/autostatus/statusoptionswidget.ui" line="47"/>
         <source>Add</source>

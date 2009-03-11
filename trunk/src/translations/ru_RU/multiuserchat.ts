@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>EditUsersListDialog</name>
     <message>
@@ -14,11 +15,6 @@
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/edituserslistdialog.cpp" line="110"/>
-        <source>Wring item JID</source>
-        <translation type="obsolete">Неправильный JID</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/multiuserchat/edituserslistdialog.cpp" line="110"/>
         <source>Entered item JID is not valid or already exists.</source>
         <translation>Введенный JID неправильный или уже существует.</translation>
     </message>
@@ -30,11 +26,6 @@
 </context>
 <context>
     <name>EditUsersListDialogClass</name>
-    <message>
-        <location filename="../../plugins/multiuserchat/edituserslistdialog.ui" line="13"/>
-        <source>EditUsersListDialog</source>
-        <translation type="obsolete">EditUsersListDialog</translation>
-    </message>
     <message>
         <location filename="../../plugins/multiuserchat/edituserslistdialog.ui" line="38"/>
         <source>Jid</source>
@@ -59,6 +50,7 @@
 <context>
     <name>JoinMultiChatDialog</name>
     <message>
+        <location filename="../../plugins/multiuserchat/joinmultichatdialog.cpp" line="123"/>
         <location filename="../../plugins/multiuserchat/joinmultichatdialog.cpp" line="163"/>
         <source>%1 as %2</source>
         <translation>%1 как %2</translation>
@@ -78,11 +70,6 @@ Check values and try again</source>
 </context>
 <context>
     <name>JoinMultiChatDialogClass</name>
-    <message>
-        <location filename="../../plugins/multiuserchat/joinmultichatdialog.ui" line="13"/>
-        <source>Join groupchat</source>
-        <translation type="obsolete">Присоединиться к групповому чату</translation>
-    </message>
     <message>
         <location filename="../../plugins/multiuserchat/joinmultichatdialog.ui" line="21"/>
         <source>Identity:</source>
@@ -140,6 +127,9 @@ Check values and try again</source>
 <context>
     <name>MultiUserChat</name>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="37"/>
+        <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="806"/>
+        <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="807"/>
         <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="874"/>
         <source>Disconnected</source>
         <translation>Отключен</translation>
@@ -155,6 +145,7 @@ Check values and try again</source>
         <translation>Настройки комнаты применены.</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="126"/>
         <location filename="../../plugins/multiuserchat/multiuserchat.cpp" line="166"/>
         <source>Request for list of %1s is failed: %2</source>
         <translation>Не удалось получить список &apos;%1s&apos;: %2</translation>
@@ -218,6 +209,8 @@ Check values and try again</source>
         <translation>Конференции</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="136"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="445"/>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="546"/>
         <source>Join conference</source>
         <translation>Войти в конференцию</translation>
@@ -268,6 +261,7 @@ Check values and try again</source>
         <translation>%1 как %2</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="444"/>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="446"/>
         <source>Multi-user text conferencing</source>
         <translation>Многопользовательская конференция</translation>
@@ -323,11 +317,13 @@ Check values and try again</source>
         <translation>Комната, в которую каждый может войти, не будучи в списке участников</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="480"/>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="485"/>
         <source>Password-protected room</source>
         <translation>Комната, защищенная паролем</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="481"/>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="486"/>
         <source>A room that a user cannot enter without first providing the correct password</source>
         <translation>Комната, в которую пользователь может войти, только после предъявления правильного пароля</translation>
@@ -413,6 +409,7 @@ Check values and try again</source>
         <translation>Отклонить приглашение</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="684"/>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="705"/>
         <source>Enter a reason</source>
         <translation>Введите причину</translation>
@@ -533,6 +530,7 @@ Check values and try again</source>
         <translation>Полный список администраторов комнаты</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="249"/>
         <location filename="../../plugins/multiuserchat/multiuserchatplugin.cpp" line="266"/>
         <source>Description of Room</source>
         <translation>Описание комнаты</translation>
@@ -666,6 +664,7 @@ Check values and try again</source>
         <translation>Сообщение в конференции</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="183"/>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="585"/>
         <source>%1 from %2</source>
         <translation>%1 от %2</translation>
@@ -886,6 +885,8 @@ Check values and try again</source>
         <translation>Статус: %1</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="848"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="859"/>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="899"/>
         <source>User %1 is not present in the conference</source>
         <translation>Пользователь %1 не присутствует в конференции</translation>
@@ -901,6 +902,8 @@ Check values and try again</source>
         <translation>%1 не является правильным JID комнаты</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="916"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1116"/>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1158"/>
         <source>Disconnected</source>
         <translation>Отключен</translation>
@@ -954,11 +957,6 @@ Check values and try again</source>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="950"/>
         <source>%1 (%2)</source>
         <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="952"/>
-        <source>%1 - Groupchat</source>
-        <translation type="obsolete">%1 - Конференция</translation>
     </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1042"/>
@@ -1031,6 +1029,7 @@ Check values and try again</source>
         <translation>%1 был выкинут из комнаты %2. %3</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1268"/>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1274"/>
         <source> by %1</source>
         <translation>%1</translation>
@@ -1091,6 +1090,8 @@ Check values and try again</source>
         <translation>Введите новую тему для комнаты %1</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1447"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1451"/>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1546"/>
         <source>Invite user</source>
         <translation>Пригласить пользователя</translation>
@@ -1101,11 +1102,14 @@ Check values and try again</source>
         <translation>Введите JID пользователя:</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1450"/>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1545"/>
         <source>You are welcome here</source>
         <translation>Вас здесь ждут</translation>
     </message>
     <message>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1451"/>
+        <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1485"/>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.cpp" line="1546"/>
         <source>Enter a reason:</source>
         <translation>Введите причину:</translation>
@@ -1168,11 +1172,6 @@ Check values and try again</source>
 </context>
 <context>
     <name>MultiUserChatWindowClass</name>
-    <message>
-        <location filename="../../plugins/multiuserchat/multiuserchatwindow.ui" line="13"/>
-        <source>MultiUserChatWindow</source>
-        <translation type="obsolete">MultiUserChatWindow</translation>
-    </message>
     <message>
         <location filename="../../plugins/multiuserchat/multiuserchatwindow.ui" line="23"/>
         <source>Room Info</source>
