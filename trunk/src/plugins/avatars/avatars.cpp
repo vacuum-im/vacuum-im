@@ -95,7 +95,7 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
     if (FRostersModel)
     {
-      connect(FRostersModel,SIGNAL(indexInserted(IRosterIndex *)), SLOT(onRosterIndexInserted(IRosterIndex *)));
+      connect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)), SLOT(onRosterIndexInserted(IRosterIndex *)));
     }
   }
 
