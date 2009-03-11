@@ -63,11 +63,10 @@ signals:
   virtual void indexDestroyed(IRosterIndex *AIndex) =0;
 };
 
-class IRostersModel :
-  virtual public QAbstractItemModel
+class IRostersModel
 {
 public:
-  virtual QObject *instance() =0;
+  virtual QAbstractItemModel *instance() =0;
   virtual IRosterIndex *addStream(const Jid &AStreamJid) =0;
   virtual QList<Jid> streams() const =0;
   virtual void removeStream(const Jid &AStreamJid) =0;

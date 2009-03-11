@@ -13,7 +13,7 @@
 #include "rosterindex.h"
 
 class RostersModel : 
-  virtual public QAbstractItemModel,
+  public QAbstractItemModel,
   public IPlugin,
   public IRostersModel
 {
@@ -22,7 +22,7 @@ class RostersModel :
 public:
   RostersModel();
   ~RostersModel();
-  virtual QObject *instance() { return this; }
+  virtual QAbstractItemModel *instance() { return this; }
   //IPlugin
   virtual QUuid pluginUuid() const { return ROSTERSMODEL_UUID; }
   virtual void pluginInfo(IPluginInfo *APluginInfo);

@@ -49,28 +49,29 @@ void RostersView::setRostersModel(IRostersModel *AModel)
     
     if (FRostersModel)
     {
-      disconnect(FRostersModel,SIGNAL(indexInserted(IRosterIndex *)),this,SLOT(onIndexInserted(IRosterIndex *)));
-      disconnect(FRostersModel,SIGNAL(indexDestroyed(IRosterIndex *)),this,SLOT(onIndexDestroyed(IRosterIndex *)));
+      disconnect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)),this,SLOT(onIndexInserted(IRosterIndex *)));
+      disconnect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),this,SLOT(onIndexDestroyed(IRosterIndex *)));
       removeLabels();
     }
 
-    if (AModel)
+    FRostersModel = AModel;
+
+    if (FRostersModel)
     {
-      connect(AModel,SIGNAL(indexInserted(IRosterIndex *)),this,SLOT(onIndexInserted(IRosterIndex *)));
-      connect(AModel,SIGNAL(indexDestroyed(IRosterIndex *)), SLOT(onIndexDestroyed(IRosterIndex *)));
+      connect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)),this,SLOT(onIndexInserted(IRosterIndex *)));
+      connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)), SLOT(onIndexDestroyed(IRosterIndex *)));
     }
 
-    FRostersModel = AModel;
     if (FProxyModels.isEmpty())
     {
-      emit viewModelAboutToBeChanged(AModel);
-      QTreeView::setModel(AModel);
-      emit viewModelChanged(AModel);
+      emit viewModelAboutToBeChanged(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
+      QTreeView::setModel(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
+      emit viewModelChanged(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
     }
     else
-      FProxyModels.values().first()->setSourceModel(AModel);
+      FProxyModels.values().first()->setSourceModel(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
 
-    emit modelSeted(AModel);
+    emit modelSeted(FRostersModel);
   }
 }
 
@@ -133,7 +134,7 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
     }
     else
     {
-      AProxyModel->setSourceModel(FRostersModel);
+      AProxyModel->setSourceModel(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
     }
     if (after)
     {
@@ -175,14 +176,14 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
       if (befour!=NULL)
         emit viewModelAboutToBeChanged(befour);
       else
-        emit viewModelAboutToBeChanged(FRostersModel);
+        emit viewModelAboutToBeChanged(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
     }
 
     FProxyModels.remove(FProxyModels.key(AProxyModel),AProxyModel);
 
     if (after == NULL && befour == NULL)
     {
-      QTreeView::setModel(FRostersModel);
+      QTreeView::setModel(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
     }
     else if (after == NULL)
     {
@@ -191,7 +192,7 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
     else if (befour == NULL)
     {
       after->setSourceModel(NULL);
-      after->setSourceModel(FRostersModel);
+      after->setSourceModel(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
     }
     else
     {
