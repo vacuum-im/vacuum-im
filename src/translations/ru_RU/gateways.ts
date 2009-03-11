@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>AddLegacyContactDialog</name>
     <message>
@@ -8,11 +9,13 @@
         <translation>Добавить пользователя через транспорт - %1</translation>
     </message>
     <message>
+        <location filename="../../plugins/gateways/addlegacycontactdialog.cpp" line="43"/>
         <location filename="../../plugins/gateways/addlegacycontactdialog.cpp" line="57"/>
         <source>Waiting for host response ...</source>
         <translation>Ожидание ответа хоста ...</translation>
     </message>
     <message>
+        <location filename="../../plugins/gateways/addlegacycontactdialog.cpp" line="45"/>
         <location filename="../../plugins/gateways/addlegacycontactdialog.cpp" line="59"/>
         <source>Error: Can`t send request to host.</source>
         <translation>Ошибка: Невозможно отправить запрос на хост.</translation>
@@ -41,11 +44,6 @@
 <context>
     <name>AddLegacyContactDialogClass</name>
     <message>
-        <location filename="../../plugins/gateways/addlegacycontactdialog.ui" line="16"/>
-        <source>AddLegacyContactDialog</source>
-        <translation type="obsolete">AddLegacyContactDialog</translation>
-    </message>
-    <message>
         <location filename="../../plugins/gateways/addlegacycontactdialog.ui" line="37"/>
         <source>Contact ID:</source>
         <translation>Контакт:</translation>
@@ -59,6 +57,7 @@
         <translation>Плагин для взаимодействия месжду Jabber-клиентами и другими IM-системами посредством транспортов</translation>
     </message>
     <message>
+        <location filename="../../plugins/gateways/gateways.cpp" line="43"/>
         <location filename="../../plugins/gateways/gateways.cpp" line="427"/>
         <source>Gateway Interaction</source>
         <translation>Взаимодействие с транспортами</translation>
@@ -69,6 +68,7 @@
         <translation>Доабвить пользователя</translation>
     </message>
     <message>
+        <location filename="../../plugins/gateways/gateways.cpp" line="258"/>
         <location filename="../../plugins/gateways/gateways.cpp" line="556"/>
         <source>Log Out</source>
         <translation>Отключить</translation>

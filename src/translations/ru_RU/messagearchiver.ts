@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>ArchiveOptions</name>
     <message>
@@ -66,11 +67,6 @@
 <context>
     <name>ArchiveOptionsClass</name>
     <message>
-        <location filename="../../plugins/messagearchiver/archiveoptions.ui" line="13"/>
-        <source>ArchiveOptions</source>
-        <translation type="obsolete">ArchiveOptions</translation>
-    </message>
-    <message>
         <location filename="../../plugins/messagearchiver/archiveoptions.ui" line="19"/>
         <source>Archiving Method</source>
         <translation>Настройки архива</translation>
@@ -81,19 +77,9 @@
         <translation>Настройки по умолчанию</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/archiveoptions.ui" line="125"/>
-        <source>Off The Record Mode</source>
-        <translation type="obsolete">Режим без записи:</translation>
-    </message>
-    <message>
         <location filename="../../plugins/messagearchiver/archiveoptions.ui" line="132"/>
         <source>Save Mode:</source>
         <translation>Способ записи:</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/messagearchiver/archiveoptions.ui" line="145"/>
-        <source>Expire Time, days</source>
-        <translation type="obsolete">Осталось времени, дней</translation>
     </message>
     <message>
         <location filename="../../plugins/messagearchiver/archiveoptions.ui" line="168"/>
@@ -179,21 +165,26 @@
         <translation>Хранилище сообщений</translation>
     </message>
     <message>
+        <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="729"/>
         <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="749"/>
         <source>Prefer</source>
         <translation>Согласиться</translation>
     </message>
     <message>
+        <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="731"/>
         <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="743"/>
         <source>Concede</source>
         <translation>По умолчанию</translation>
     </message>
     <message>
+        <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="733"/>
         <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="745"/>
         <source>Forbid</source>
         <translation>Запретить</translation>
     </message>
     <message>
+        <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="735"/>
+        <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="753"/>
         <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="767"/>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
@@ -239,6 +230,7 @@
         <translation>Настройки хранения сообщений</translation>
     </message>
     <message>
+        <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="185"/>
         <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="1919"/>
         <source>History</source>
         <translation>История</translation>
@@ -402,6 +394,7 @@
         <translation>Контакт</translation>
     </message>
     <message>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="99"/>
         <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="745"/>
         <source>Date</source>
         <translation>Дата</translation>
@@ -545,11 +538,6 @@
 <context>
     <name>ViewHistoryWindowClass</name>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="13"/>
-        <source>History View</source>
-        <translation type="obsolete">Просмотр истории</translation>
-    </message>
-    <message>
         <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="29"/>
         <source>Filter</source>
         <translation>Фильтр</translation>
@@ -573,11 +561,6 @@
         <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="127"/>
         <source>Apply</source>
         <translation>Применить</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="146"/>
-        <source>Groups</source>
-        <translation type="obsolete">Группы</translation>
     </message>
     <message>
         <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="181"/>

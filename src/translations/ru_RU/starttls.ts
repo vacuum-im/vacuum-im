@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>StartTLS</name>
     <message>
@@ -15,11 +16,6 @@
 </context>
 <context>
     <name>StartTLSPlugin</name>
-    <message>
-        <location filename="../../plugins/starttls/starttlsplugin.cpp" line="15"/>
-        <source>Potapov S.A. aka Lion</source>
-        <translation type="obsolete">Potapov S.A. aka Lion</translation>
-    </message>
     <message>
         <location filename="../../plugins/starttls/starttlsplugin.cpp" line="16"/>
         <source>Implementation of StartTLS</source>

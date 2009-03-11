@@ -1,41 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>ClientInfo</name>
-    <message>
-        <location filename="../../plugins/clientinfo/clientinfo.cpp" line="51"/>
-        <source>Request contacts client information</source>
-        <translation type="obsolete">Получить информацию о контакте</translation>
-    </message>
     <message>
         <location filename="../../plugins/clientinfo/clientinfo.cpp" line="53"/>
         <source>Client Info</source>
         <translation>Информация о клиенте</translation>
     </message>
     <message>
+        <location filename="../../plugins/clientinfo/clientinfo.cpp" line="730"/>
         <location filename="../../plugins/clientinfo/clientinfo.cpp" line="777"/>
         <source>Software version</source>
         <translation>Версия приложения</translation>
     </message>
     <message>
+        <location filename="../../plugins/clientinfo/clientinfo.cpp" line="741"/>
         <location filename="../../plugins/clientinfo/clientinfo.cpp" line="784"/>
         <source>Last activity</source>
         <translation>Последняя активность</translation>
     </message>
     <message>
+        <location filename="../../plugins/clientinfo/clientinfo.cpp" line="752"/>
         <location filename="../../plugins/clientinfo/clientinfo.cpp" line="791"/>
         <source>Entity time</source>
         <translation>Время контакта</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/clientinfo/clientinfo.cpp" line="778"/>
-        <source>Request contacts software version</source>
-        <translation type="obsolete">Запросить версию ПО контакта</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/clientinfo/clientinfo.cpp" line="785"/>
-        <source>Request contacts last activity</source>
-        <translation type="obsolete">Запросить последнюю активность контакта</translation>
     </message>
     <message>
         <location filename="../../plugins/clientinfo/clientinfo.cpp" line="792"/>
@@ -131,16 +120,19 @@
         <translation>ОС:</translation>
     </message>
     <message>
+        <location filename="../../plugins/clientinfo/clientinfodialog.cpp" line="57"/>
         <location filename="../../plugins/clientinfo/clientinfodialog.cpp" line="75"/>
         <source>Error:</source>
         <translation>Ошибка:</translation>
     </message>
     <message>
+        <location filename="../../plugins/clientinfo/clientinfodialog.cpp" line="59"/>
         <location filename="../../plugins/clientinfo/clientinfodialog.cpp" line="77"/>
         <source>Not loaded&lt;br&gt;</source>
         <translation>Не удалось загрузить&lt;br&gt;</translation>
     </message>
     <message>
+        <location filename="../../plugins/clientinfo/clientinfodialog.cpp" line="61"/>
         <location filename="../../plugins/clientinfo/clientinfodialog.cpp" line="92"/>
         <source>Loading ...&lt;br&gt;</source>
         <translation>Загружается...&lt;br&gt;</translation>
@@ -212,20 +204,7 @@
     </message>
 </context>
 <context>
-    <name>ClientInfoDialogClass</name>
-    <message>
-        <location filename="../../plugins/clientinfo/clientinfodialog.ui" line="13"/>
-        <source>ClientInfoDialog</source>
-        <translation type="obsolete">ClientInfoDialog</translation>
-    </message>
-</context>
-<context>
     <name>optionswidgetClass</name>
-    <message>
-        <location filename="../../plugins/clientinfo/optionswidget.ui" line="13"/>
-        <source>optionswidget</source>
-        <translation type="obsolete">optionswidget</translation>
-    </message>
     <message>
         <location filename="../../plugins/clientinfo/optionswidget.ui" line="19"/>
         <source>Auto load client version</source>

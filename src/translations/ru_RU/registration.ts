@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>RegisterDialog</name>
     <message>
@@ -8,11 +9,13 @@
         <translation>Регистрация на %1</translation>
     </message>
     <message>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="77"/>
         <location filename="../../plugins/registration/registerdialog.cpp" line="189"/>
         <source>Waiting for host response ...</source>
         <translation>Ожидание ответа от хоста...</translation>
     </message>
     <message>
+        <location filename="../../plugins/registration/registerdialog.cpp" line="79"/>
         <location filename="../../plugins/registration/registerdialog.cpp" line="191"/>
         <source>Error: Can`t send request to host.</source>
         <translation>Ошибка: невозможно отправить запрос на хост.</translation>
@@ -51,11 +54,6 @@
 <context>
     <name>RegisterDialogClass</name>
     <message>
-        <location filename="../../plugins/registration/registerdialog.ui" line="13"/>
-        <source>RegisterDialog</source>
-        <translation type="obsolete">RegisterDialog</translation>
-    </message>
-    <message>
         <location filename="../../plugins/registration/registerdialog.ui" line="52"/>
         <source>Username:</source>
         <translation>Имя пользователя:</translation>
@@ -74,11 +72,13 @@
 <context>
     <name>Registration</name>
     <message>
+        <location filename="../../plugins/registration/registration.cpp" line="27"/>
         <location filename="../../plugins/registration/registration.cpp" line="390"/>
         <source>In-band registration with instant messaging servers and associated services</source>
         <translation>Регистрация на серверах мгновенных сообщений и связанных сервисах</translation>
     </message>
     <message>
+        <location filename="../../plugins/registration/registration.cpp" line="29"/>
         <location filename="../../plugins/registration/registration.cpp" line="389"/>
         <source>In-Band Registration</source>
         <translation>Регистрация</translation>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>Avatars</name>
     <message>
@@ -56,19 +57,9 @@
 <context>
     <name>RosterOptionsWidgetClass</name>
     <message>
-        <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="13"/>
-        <source>RosterOptionsWidget</source>
-        <translation type="obsolete">RosterOptionsWidget</translation>
-    </message>
-    <message>
         <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="19"/>
         <source>Show avatars</source>
         <translation>Показывать аватары</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="29"/>
-        <source>Show avatars before contact label</source>
-        <translation type="obsolete">Показывать аватар слева</translation>
     </message>
     <message>
         <location filename="../../plugins/avatars/rosteroptionswidget.ui" line="26"/>

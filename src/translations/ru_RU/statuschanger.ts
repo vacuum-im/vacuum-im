@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>AccountOptionsWidgetClass</name>
-    <message>
-        <location filename="../../plugins/statuschanger/accountoptionswidget.ui" line="13"/>
-        <source>AccountOptionsWidget</source>
-        <translation type="obsolete">AccountOptionsWidget</translation>
-    </message>
     <message>
         <location filename="../../plugins/statuschanger/accountoptionswidget.ui" line="19"/>
         <source>Auto connect on startup</source>
@@ -20,11 +16,6 @@
 </context>
 <context>
     <name>EditStatusDialog</name>
-    <message>
-        <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="147"/>
-        <source>Icon</source>
-        <translation type="obsolete">Иконка</translation>
-    </message>
     <message>
         <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="148"/>
         <source>Name</source>
@@ -66,6 +57,7 @@
         <translation>Статус с именем &apos;&lt;b&gt;%1&lt;/b&gt;&apos; уже присутствует</translation>
     </message>
     <message>
+        <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="299"/>
         <location filename="../../plugins/statuschanger/editstatusdialog.cpp" line="303"/>
         <source>Can&apos;t delete status</source>
         <translation>Невозможно удалить статус</translation>
@@ -137,6 +129,7 @@
         <translation>Не в сети</translation>
     </message>
     <message>
+        <location filename="../../plugins/statuschanger/statuschanger.cpp" line="456"/>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="480"/>
         <source>Online</source>
         <translation>В сети</translation>
@@ -157,6 +150,7 @@
         <translation>Ушёл надолго</translation>
     </message>
     <message>
+        <location filename="../../plugins/statuschanger/statuschanger.cpp" line="464"/>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="507"/>
         <source>Do not disturb</source>
         <translation>Не беспокоить</translation>
@@ -167,6 +161,7 @@
         <translation>Невидимый</translation>
     </message>
     <message>
+        <location filename="../../plugins/statuschanger/statuschanger.cpp" line="468"/>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="543"/>
         <source>Error</source>
         <translation>Ошибка</translation>
@@ -192,6 +187,7 @@
         <translation>Не доступен</translation>
     </message>
     <message>
+        <location filename="../../plugins/statuschanger/statuschanger.cpp" line="525"/>
         <location filename="../../plugins/statuschanger/statuschanger.cpp" line="534"/>
         <source>Disconnected</source>
         <translation>Отключен</translation>

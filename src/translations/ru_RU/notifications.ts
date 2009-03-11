@@ -1,50 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>Notifications</name>
     <message>
-        <location filename="../../plugins/notifications/notifications.cpp" line="42"/>
+        <location filename="../../plugins/notifications/notifications.cpp" line="43"/>
         <source>Notify user about events</source>
         <translation>Уведомление пользователя о событиях</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifications.cpp" line="113"/>
+        <location filename="../../plugins/notifications/notifications.cpp" line="45"/>
+        <location filename="../../plugins/notifications/notifications.cpp" line="114"/>
         <source>Notifications</source>
         <translation>Уведомления</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifications.cpp" line="113"/>
+        <location filename="../../plugins/notifications/notifications.cpp" line="114"/>
         <source>Notification options</source>
         <translation>Параметры уведомления</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifications.cpp" line="120"/>
+        <location filename="../../plugins/notifications/notifications.cpp" line="121"/>
         <source>Activate All Notifications</source>
         <translation>Активировать все уведомления</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifications.cpp" line="127"/>
+        <location filename="../../plugins/notifications/notifications.cpp" line="128"/>
         <source>Remove All Notifications</source>
         <translation>Удалить все уведомления</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifications.cpp" line="133"/>
+        <location filename="../../plugins/notifications/notifications.cpp" line="134"/>
         <source>Pending Notifications</source>
         <translation>Ожидающие уведомления</translation>
     </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>
-    <message>
-        <location filename="../../plugins/notifications/notifykindswidget.ui" line="13"/>
-        <source>NotifyKindsWidget</source>
-        <translation type="obsolete">NotifyKindsWidget</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/notifications/notifykindswidget.ui" line="25"/>
-        <source>GroupBox</source>
-        <translation type="obsolete">GroupBox</translation>
-    </message>
     <message>
         <location filename="../../plugins/notifications/notifykindswidget.ui" line="31"/>
         <source>Roster</source>
@@ -69,7 +61,7 @@
 <context>
     <name>NotifyWidget</name>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.cpp" line="23"/>
+        <location filename="../../plugins/notifications/notifywidget.cpp" line="24"/>
         <source>Notification</source>
         <translation>Уведомление</translation>
     </message>
@@ -77,38 +69,33 @@
 <context>
     <name>NotifyWidgetClass</name>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.ui" line="13"/>
-        <source>NotifyWidget</source>
-        <translation type="obsolete">NotifyWidget</translation>
+        <location filename="../../plugins/notifications/notifywidget.ui" line="29"/>
+        <source>Caption</source>
+        <translation>Подпись</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.ui" line="24"/>
+        <location filename="../../plugins/notifications/notifywidget.ui" line="56"/>
         <source>Icon</source>
         <translation>Иконка</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.ui" line="45"/>
+        <location filename="../../plugins/notifications/notifywidget.ui" line="76"/>
         <source>Title</source>
         <translation>Заголовок</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.ui" line="74"/>
+        <location filename="../../plugins/notifications/notifywidget.ui" line="105"/>
         <source>Image</source>
         <translation>Картинка</translation>
     </message>
     <message>
-        <location filename="../../plugins/notifications/notifywidget.ui" line="96"/>
+        <location filename="../../plugins/notifications/notifywidget.ui" line="127"/>
         <source>Text</source>
         <translation>Текст</translation>
     </message>
 </context>
 <context>
     <name>OptionsWidgetClass</name>
-    <message>
-        <location filename="../../plugins/notifications/optionswidget.ui" line="13"/>
-        <source>OptionsWidget</source>
-        <translation type="obsolete">OptionsWidget</translation>
-    </message>
     <message>
         <location filename="../../plugins/notifications/optionswidget.ui" line="19"/>
         <source>Common notification options</source>

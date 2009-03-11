@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>AddContactDialog</name>
     <message>
@@ -139,6 +140,7 @@
         <translation>В эту группу</translation>
     </message>
     <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="333"/>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="366"/>
         <source>Create new...</source>
         <translation>Создать новую...</translation>
@@ -149,6 +151,7 @@
         <translation>В корень</translation>
     </message>
     <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="549"/>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1056"/>
         <source>Add contact...</source>
         <translation>Добавить контакт...</translation>
@@ -179,16 +182,19 @@
         <translation>Отказаться</translation>
     </message>
     <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="517"/>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="578"/>
         <source>Rename...</source>
         <translation>Переименовать...</translation>
     </message>
     <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="526"/>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="588"/>
         <source>Copy to group</source>
         <translation>Копировать в группу</translation>
     </message>
     <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="531"/>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="593"/>
         <source>Move to group</source>
         <translation>Переместить в группу</translation>
@@ -209,6 +215,7 @@
         <translation>Удалить группу</translation>
     </message>
     <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="605"/>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="970"/>
         <source>Remove contacts</source>
         <translation>Удалить контакты</translation>
@@ -234,11 +241,17 @@
         <translation>Введите имя для: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="751"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="784"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="894"/>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="926"/>
         <source>Create new group</source>
         <translation>Создать новую группу</translation>
     </message>
     <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="751"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="784"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="894"/>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="926"/>
         <source>Enter group name:</source>
         <translation>Введите имя группы:</translation>
@@ -274,6 +287,7 @@
         <translation>%1 авторизовал вас на получение статуса.</translation>
     </message>
     <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="443"/>
         <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="571"/>
         <source>Add contact</source>
         <translation>Добавить контакт</translation>
@@ -297,32 +311,32 @@
         <translation>Запрос авторизации - %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="61"/>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="62"/>
         <source>Chat</source>
         <translation>Чат</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="62"/>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="63"/>
         <source>Open chat window</source>
         <translation>Открыть окно чата</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="68"/>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="69"/>
         <source>Message</source>
         <translation>Сообщение</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="69"/>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="70"/>
         <source>Send Message</source>
         <translation>Послать сообщение</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="83"/>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="84"/>
         <source>VCard</source>
         <translation>vCard</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="84"/>
+        <location filename="../../plugins/rosterchanger/subscriptiondialog.cpp" line="85"/>
         <source>Show VCard</source>
         <translation>Показать vCard</translation>
     </message>
@@ -352,11 +366,6 @@
 </context>
 <context>
     <name>SubscriptionOptionsClass</name>
-    <message>
-        <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="13"/>
-        <source>SubscriptionOptions</source>
-        <translation type="obsolete">SubscriptionOptions</translation>
-    </message>
     <message>
         <location filename="../../plugins/rosterchanger/subscriptionoptions.ui" line="19"/>
         <source>Auto accept subscription requests</source>

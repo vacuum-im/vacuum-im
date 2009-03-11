@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>MiscOptionsWidgetClass</name>
     <message>
@@ -11,12 +12,12 @@
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../../plugins/settings/optionsdialog.cpp" line="30"/>
+        <location filename="../../plugins/settings/optionsdialog.cpp" line="31"/>
         <source>Options</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../../plugins/settings/optionsdialog.cpp" line="290"/>
+        <location filename="../../plugins/settings/optionsdialog.cpp" line="261"/>
         <source>No Settings Available</source>
         <translation>Нет допустимых настроек</translation>
     </message>
@@ -34,6 +35,7 @@
         <translation>Введите имя профиля:</translation>
     </message>
     <message>
+        <location filename="../../plugins/settings/profiledialog.cpp" line="107"/>
         <location filename="../../plugins/settings/profiledialog.cpp" line="124"/>
         <source>Renaming profile</source>
         <translation>Переименование профиля</translation>

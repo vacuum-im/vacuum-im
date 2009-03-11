@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>DataFormWidget</name>
     <message>
@@ -21,16 +22,13 @@
 <context>
     <name>DataForms</name>
     <message>
-        <location filename="../../plugins/dataforms/dataforms.cpp" line="18"/>
-        <source>Potapov S.A. aka Lion</source>
-        <translation type="obsolete">Potapov S.A. aka Lion</translation>
-    </message>
-    <message>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="19"/>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="1056"/>
         <source>Implements data forms and generic data description</source>
         <translation>Поддерживает обработку форм с данными</translation>
     </message>
     <message>
+        <location filename="../../plugins/dataforms/dataforms.cpp" line="21"/>
         <location filename="../../plugins/dataforms/dataforms.cpp" line="1054"/>
         <source>Data Forms</source>
         <translation>Формы с данными</translation>

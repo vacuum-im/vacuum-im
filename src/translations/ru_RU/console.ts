@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>ConsolePlugin</name>
-    <message>
-        <location filename="../../plugins/console/consoleplugin.cpp" line="16"/>
-        <source>Potapov S.A. aka Lion</source>
-        <translation type="obsolete">Potapov S.A. aka Lion</translation>
-    </message>
     <message>
         <location filename="../../plugins/console/consoleplugin.cpp" line="17"/>
         <source>Allow to view XMPP stanzas.</source>
         <translation>Позволяет просматривать XMPP поток.</translation>
     </message>
     <message>
+        <location filename="../../plugins/console/consoleplugin.cpp" line="19"/>
         <location filename="../../plugins/console/consoleplugin.cpp" line="41"/>
         <source>XML Console</source>
         <translation>XML Консоль</translation>
@@ -89,6 +86,7 @@
         <translation>Удалить</translation>
     </message>
     <message>
+        <location filename="../../plugins/console/consolewidget.ui" line="112"/>
         <location filename="../../plugins/console/consolewidget.ui" line="278"/>
         <source>Clear</source>
         <translation>Очистить</translation>

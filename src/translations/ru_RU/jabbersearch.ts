@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>JabberSearch</name>
     <message>
@@ -8,6 +9,8 @@
         <translation>Поиск в хранилищах информации jabber-сети.</translation>
     </message>
     <message>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="26"/>
+        <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="198"/>
         <location filename="../../plugins/jabbersearch/jabbersearch.cpp" line="265"/>
         <source>Jabber Search</source>
         <translation>Jabber поиск</translation>
@@ -51,11 +54,13 @@
         <translation>Поиск в %1</translation>
     </message>
     <message>
+        <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="115"/>
         <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="146"/>
         <source>Waiting for host response ...</source>
         <translation>Ожидание ответа хоста ...</translation>
     </message>
     <message>
+        <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="120"/>
         <location filename="../../plugins/jabbersearch/searchdialog.cpp" line="151"/>
         <source>Error: Can`t send request to host.</source>
         <translation>Ошибка: невозможно отправить данные на хост.</translation>
@@ -83,11 +88,6 @@
 </context>
 <context>
     <name>SearchDialogClass</name>
-    <message>
-        <location filename="../../plugins/jabbersearch/searchdialog.ui" line="13"/>
-        <source>SearchDialog</source>
-        <translation type="obsolete">SearchDialog</translation>
-    </message>
     <message>
         <location filename="../../plugins/jabbersearch/searchdialog.ui" line="45"/>
         <source>First:</source>

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>EditItemDialogClass</name>
     <message>
+        <location filename="../../plugins/vcard/edititemdialog.ui" line="16"/>
         <location filename="../../plugins/vcard/edititemdialog.ui" line="25"/>
         <source>Edit item</source>
         <translation>Введите значение</translation>
@@ -26,31 +28,33 @@
         <translation>Запрос или публикация VCard не удалась.&lt;br&gt;%1</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.cpp" line="335"/>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="361"/>
         <source>Save image</source>
         <translation>Сохранить изображение</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.cpp" line="335"/>
+        <location filename="../../plugins/vcard/vcarddialog.cpp" line="343"/>
+        <location filename="../../plugins/vcard/vcarddialog.cpp" line="361"/>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="369"/>
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Картинки (*.png *.jpg *.bmp *.gif)</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.cpp" line="343"/>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="369"/>
         <source>Open image</source>
         <translation>Открыть изображение</translation>
     </message>
     <message>
-        <location filename="../../plugins/vcard/vcarddialog.cpp" line="369"/>
-        <source>Image Files (*.png *.jpg *.bmp)</source>
-        <translation type="obsolete">Картинки (*.png *.jpg *.bmp)</translation>
-    </message>
-    <message>
+        <location filename="../../plugins/vcard/vcarddialog.cpp" line="387"/>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="409"/>
         <source>EMail:</source>
         <translation>E-mail:</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.cpp" line="422"/>
         <location filename="../../plugins/vcard/vcarddialog.cpp" line="444"/>
         <source>Phone:</source>
         <translation>Телефон:</translation>
@@ -58,11 +62,6 @@
 </context>
 <context>
     <name>VCardDialogClass</name>
-    <message>
-        <location filename="../../plugins/vcard/vcarddialog.ui" line="13"/>
-        <source>VCardDialog</source>
-        <translation type="obsolete">VCardDialog</translation>
-    </message>
     <message>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="26"/>
         <source>General</source>
@@ -129,11 +128,6 @@
         <translation>Женский</translation>
     </message>
     <message>
-        <location filename="../../plugins/vcard/vcarddialog.ui" line="209"/>
-        <source>Maritial status</source>
-        <translation type="obsolete">Супружеский статус</translation>
-    </message>
-    <message>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="222"/>
         <source>Occupation</source>
         <translation>Род занятий</translation>
@@ -169,26 +163,31 @@
         <translation>Домашний</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="312"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="392"/>
         <source>Street</source>
         <translation>Улица</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="325"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="405"/>
         <source>City</source>
         <translation>Город</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="338"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="418"/>
         <source>State</source>
         <translation>Штат</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="351"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="431"/>
         <source>Zip code</source>
         <translation>Почтовый код</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="364"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="444"/>
         <source>Country</source>
         <translation>Страна</translation>
@@ -209,11 +208,13 @@
         <translation>E-mail</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="496"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="544"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="509"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="557"/>
         <source>Delete</source>
         <translation>Удалить</translation>
@@ -224,21 +225,26 @@
         <translation>Телефон</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="573"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="582"/>
         <source>Photo</source>
         <translation>Фото</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="621"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="698"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="634"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="711"/>
         <source>Load</source>
         <translation>Загрузить</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="647"/>
+        <location filename="../../plugins/vcard/vcarddialog.ui" line="724"/>
         <location filename="../../plugins/vcard/vcarddialog.ui" line="772"/>
         <source>Clear</source>
         <translation>Очистить</translation>
@@ -277,26 +283,20 @@
 <context>
     <name>VCardPlugin</name>
     <message>
-        <location filename="../../plugins/vcard/vcardplugin.cpp" line="31"/>
-        <source>Request and publish vCards</source>
-        <translation type="obsolete">Запрос и публикация личной информации контактов</translation>
-    </message>
-    <message>
         <location filename="../../plugins/vcard/vcardplugin.cpp" line="33"/>
         <source>VCard manager</source>
         <translation>Менеджер vCard</translation>
     </message>
     <message>
+        <location filename="../../plugins/vcard/vcardplugin.cpp" line="284"/>
+        <location filename="../../plugins/vcard/vcardplugin.cpp" line="285"/>
+        <location filename="../../plugins/vcard/vcardplugin.cpp" line="295"/>
         <location filename="../../plugins/vcard/vcardplugin.cpp" line="307"/>
         <source>vCard</source>
         <translation>vCard</translation>
     </message>
     <message>
-        <location filename="../../plugins/vcard/vcardplugin.cpp" line="286"/>
-        <source>Request and publish contact vCard</source>
-        <translation type="obsolete">Запрос и публикация личной информации контактов</translation>
-    </message>
-    <message>
+        <location filename="../../plugins/vcard/vcardplugin.cpp" line="31"/>
         <location filename="../../plugins/vcard/vcardplugin.cpp" line="286"/>
         <source>Request and publish vCard</source>
         <translation>Запрос и публикация личной информации контактов</translation>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>RosterSearch</name>
     <message>
@@ -23,22 +24,22 @@
         <translation>Поиск по контакт-листу</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="84"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="78"/>
         <source>Show search toolbar</source>
         <translation>Показать панель поиска</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="95"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="89"/>
         <source>Name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="96"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="90"/>
         <source>Status</source>
         <translation>Статус</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="97"/>
+        <location filename="../../plugins/rostersearch/rostersearch.cpp" line="91"/>
         <source>Jabber ID</source>
         <translation>Jabber ID</translation>
     </message>

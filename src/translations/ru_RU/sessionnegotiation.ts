@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>SessionNegotiation</name>
     <message>
@@ -8,6 +9,8 @@
         <translation>Согласует обмен XML-транзакцями между двумя XMPP клиентами.</translation>
     </message>
     <message>
+        <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="40"/>
+        <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="255"/>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="915"/>
         <source>Session Negotiation</source>
         <translation>Согласование сессии</translation>
@@ -33,6 +36,8 @@
         <translation>Разрешить множественные сессии?</translation>
     </message>
     <message>
+        <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="439"/>
+        <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="858"/>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="1072"/>
         <source>Session negotiation</source>
         <translation>Согласование сессии</translation>
@@ -103,11 +108,13 @@
         <translation>Разрешить множественную адресацию?</translation>
     </message>
     <message>
+        <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="439"/>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="1098"/>
         <source>Session renegotiation</source>
         <translation>Пересогласование сессии</translation>
     </message>
     <message>
+        <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="857"/>
         <location filename="../../plugins/sessionnegotiation/sessionnegotiation.cpp" line="880"/>
         <source>Session negotiation - %1</source>
         <translation>Пересогласование сессии - %1</translation>

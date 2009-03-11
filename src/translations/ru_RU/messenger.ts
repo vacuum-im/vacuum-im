@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
-<context>
-    <name>ChatWindowClass</name>
-    <message>
-        <location filename="../../plugins/messenger/chatwindow.ui" line="13"/>
-        <source>ChatWindow</source>
-        <translation type="obsolete">ChatWindow</translation>
-    </message>
-</context>
-<context>
-    <name>EditWidgetClass</name>
-    <message>
-        <location filename="../../plugins/messenger/editwidget.ui" line="13"/>
-        <source>EditWidget</source>
-        <translation type="obsolete">EditWidget</translation>
-    </message>
-</context>
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>InfoWidget</name>
     <message>
@@ -66,11 +51,6 @@
 </context>
 <context>
     <name>InfoWidgetClass</name>
-    <message>
-        <location filename="../../plugins/messenger/infowidget.ui" line="13"/>
-        <source>InfoWidget</source>
-        <translation type="obsolete">InfoWidget</translation>
-    </message>
     <message>
         <location filename="../../plugins/messenger/infowidget.ui" line="19"/>
         <source>Contact info</source>
@@ -181,11 +161,6 @@
 <context>
     <name>MessageWindowClass</name>
     <message>
-        <location filename="../../plugins/messenger/messagewindow.ui" line="13"/>
-        <source>MessageWindow</source>
-        <translation type="obsolete">MessageWindow</translation>
-    </message>
-    <message>
         <location filename="../../plugins/messenger/messagewindow.ui" line="39"/>
         <source>Message</source>
         <translation>Сообщение</translation>
@@ -280,11 +255,6 @@
 <context>
     <name>MessengerOptionsClass</name>
     <message>
-        <location filename="../../plugins/messenger/messengeroptions.ui" line="13"/>
-        <source>MessengerOptions</source>
-        <translation type="obsolete">MessengerOptions</translation>
-    </message>
-    <message>
         <location filename="../../plugins/messenger/messengeroptions.ui" line="19"/>
         <source>Fonts</source>
         <translation>Шрифты</translation>
@@ -295,6 +265,7 @@
         <translation>Чат</translation>
     </message>
     <message>
+        <location filename="../../plugins/messenger/messengeroptions.ui" line="54"/>
         <location filename="../../plugins/messenger/messengeroptions.ui" line="87"/>
         <source>Change</source>
         <translation>Изменить</translation>
@@ -381,11 +352,6 @@
 <context>
     <name>ReceiversWidgetClass</name>
     <message>
-        <location filename="../../plugins/messenger/receiverswidget.ui" line="13"/>
-        <source>ReceiversWidget</source>
-        <translation type="obsolete">ReceiversWidget</translation>
-    </message>
-    <message>
         <location filename="../../plugins/messenger/receiverswidget.ui" line="31"/>
         <source>Add</source>
         <translation>Добавить</translation>
@@ -452,11 +418,6 @@
 <context>
     <name>TabWindowClass</name>
     <message>
-        <location filename="../../plugins/messenger/tabwindow.ui" line="13"/>
-        <source>TabWindow</source>
-        <translation type="obsolete">TabWindow</translation>
-    </message>
-    <message>
         <location filename="../../plugins/messenger/tabwindow.ui" line="21"/>
         <source>Tab 1</source>
         <translation>Tab 1</translation>
@@ -473,14 +434,6 @@
         <location filename="../../plugins/messenger/viewwidget.cpp" line="121"/>
         <source>dd.MM hh:mm</source>
         <translation>dd.MM hh:mm</translation>
-    </message>
-</context>
-<context>
-    <name>ViewWidgetClass</name>
-    <message>
-        <location filename="../../plugins/messenger/viewwidget.ui" line="13"/>
-        <source>ViewWidget</source>
-        <translation type="obsolete">ViewWidget</translation>
     </message>
 </context>
 </TS>
