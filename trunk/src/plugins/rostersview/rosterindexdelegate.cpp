@@ -1,7 +1,7 @@
 #include "rosterindexdelegate.h"
 
-#include <QApplication>
 #include <QPainter>
+#include <QApplication>
 
 #define BRANCH_WIDTH  10
 
@@ -22,9 +22,10 @@ void RosterIndexDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &
 
 QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-  QStyleOptionViewItem option = indexOptions(AIndex,AOption);
-  const int hMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin);
-  const int vMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameVMargin);
+  QStyleOptionViewItemV4 option = indexOptions(AIndex,AOption);
+  QStyle *style = option.widget ? option.widget->style() : QApplication::style();
+  const int hMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin);
+  const int vMargin = style->pixelMetric(QStyle::PM_FocusFrameVMargin);
 
   QSize leftCenter(0,0);
   QSize middleTop(0,0);
@@ -101,9 +102,10 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
 {
   QHash<int,QRect> rectHash;
 
-  QStyleOptionViewItem option = indexOptions(AIndex,AOption);
-  const int hMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) >> 1;
-  const int vMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameVMargin) >> 1;
+  QStyleOptionViewItemV4 option = indexOptions(AIndex,AOption);
+  QStyle *style = option.widget ? option.widget->style() : QApplication::style();
+  const int hMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin) >> 1;
+  const int vMargin = style->pixelMetric(QStyle::PM_FocusFrameVMargin) >> 1;
 
   QRect paintRect(option.rect.adjusted(hMargin,vMargin,-hMargin,-vMargin));
 
@@ -112,7 +114,7 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
     APainter->save();
     APainter->setClipping(true);
     APainter->setClipRect(option.rect);
-    drawBackground(APainter,option,option.rect,AIndex);
+    drawBackground(APainter,option);
   }
 
   if (AIndex.parent().isValid() && AIndex.model()->hasChildren(AIndex))
@@ -121,7 +123,7 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
     brachOption.state |= QStyle::State_Children;
     brachOption.rect = QStyle::alignedRect(option.direction,Qt::AlignVCenter|Qt::AlignLeft,QSize(BRANCH_WIDTH,BRANCH_WIDTH),paintRect);
     if (APainter)
-      qApp->style()->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
+      style->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
     removeWidth(paintRect,BRANCH_WIDTH,AOption.direction==Qt::LeftToRight);
     rectHash.insert(RLID_INDICATORBRANCH,brachOption.rect);
   }
@@ -225,7 +227,7 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
   return rectHash;
 }
 
-void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionViewItem &AOption, const LabelItem &ALabel) const
+void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionViewItemV4 &AOption, const LabelItem &ALabel) const
 {
   if (ALabel.rect.isEmpty() || ALabel.value.isNull() || ((ALabel.flags&IRostersView::LabelBlink)>0 && !FShowBlinkLabels))
     return;
@@ -259,19 +261,18 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
       if (cg == QPalette::Normal && !(AOption.state & QStyle::State_Active))
         cg = QPalette::Inactive;
 
-      if (AOption.state & QStyle::State_Selected)
-      {
-        APainter->fillRect(ALabel.rect, AOption.palette.brush(cg, QPalette::Highlight));
-        APainter->setPen(AOption.palette.color(cg, QPalette::HighlightedText));
-      } 
-      else 
+      //if (AOption.state & QStyle::State_Selected)
+      //{
+      //  APainter->fillRect(ALabel.rect, AOption.palette.brush(cg, QPalette::Highlight));
+      //  APainter->setPen(AOption.palette.color(cg, QPalette::HighlightedText));
+      //} 
+      //else 
       {
         APainter->setPen(AOption.palette.color(cg, QPalette::Text));
       }
       APainter->setFont(AOption.font);
       int flags = AOption.direction | Qt::TextSingleLine;
-      QFontMetrics fontMetrics(AOption.font,APainter->device());
-      QString text = fontMetrics.elidedText(ALabel.value.toString(),Qt::ElideRight,ALabel.rect.width(),flags);
+      QString text = AOption.fontMetrics.elidedText(ALabel.value.toString(),Qt::ElideRight,ALabel.rect.width(),flags);
       APainter->drawText(ALabel.rect,flags,text);
       break;
     }
@@ -280,30 +281,13 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
   }
 }
 
-void RosterIndexDelegate::drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption,  
-                                         const QRect &ARect, const QModelIndex &AIndex) const
+void RosterIndexDelegate::drawBackground(QPainter *APainter, const QStyleOptionViewItemV4 &AOption) const
 {
-  if (AOption.showDecorationSelected && (AOption.state & QStyle::State_Selected)) 
-  {
-    QPalette::ColorGroup cg = AOption.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
-    if (cg == QPalette::Normal && !(AOption.state & QStyle::State_Active))
-      cg = QPalette::Inactive;
-    APainter->fillRect(ARect, AOption.palette.brush(cg, QPalette::Highlight));
-  } 
-  else 
-  {
-    QVariant value = AIndex.data(Qt::BackgroundRole);
-    if (qVariantCanConvert<QBrush>(value)) 
-    {
-      QPointF oldBO = APainter->brushOrigin();
-      APainter->setBrushOrigin(ARect.topLeft());
-      APainter->fillRect(ARect, qvariant_cast<QBrush>(value));
-      APainter->setBrushOrigin(oldBO);
-    }
-  }
+  QStyle *style = AOption.widget ? AOption.widget->style() : QApplication::style();
+  style->drawPrimitive(QStyle::PE_PanelItemViewItem,&AOption,APainter,AOption.widget);
 }
 
-void RosterIndexDelegate::drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption, const QRect &ARect) const 
+void RosterIndexDelegate::drawFocus(QPainter *APainter, const QStyleOptionViewItemV4 &AOption, const QRect &ARect) const 
 {
   if ((AOption.state & QStyle::State_HasFocus) && ARect.isValid())
   {
@@ -314,24 +298,18 @@ void RosterIndexDelegate::drawFocus(QPainter *APainter, const QStyleOptionViewIt
     QPalette::ColorGroup cg = (AOption.state & QStyle::State_Enabled) ? QPalette::Normal : QPalette::Disabled;
     QPalette::ColorRole cr = (AOption.state & QStyle::State_Selected) ? QPalette::Highlight : QPalette::Window;
     focusOption.backgroundColor = AOption.palette.color(cg,cr);
-    qApp->style()->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, APainter);
+    QStyle *style = AOption.widget ? AOption.widget->style() : QApplication::style();
+    style->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, APainter);
   }
 }
 
-QStyleOptionViewItem RosterIndexDelegate::indexOptions(const QModelIndex &AIndex, const QStyleOptionViewItem &AOption) const
+QStyleOptionViewItemV4 RosterIndexDelegate::indexOptions(const QModelIndex &AIndex, const QStyleOptionViewItem &AOption) const
 {
-  QStyleOptionViewItem option = AOption;
+  QStyleOptionViewItemV4 option = AOption;
 
   QVariant data = AIndex.data(Qt::FontRole);
   if (data.isValid())
-  {
     option.font = qvariant_cast<QFont>(data).resolve(option.font);
-    option.fontMetrics = QFontMetrics(option.font);
-  }
-
-  data = AIndex.data(Qt::ForegroundRole);
-  if (qVariantCanConvert<QBrush>(data))
-    option.palette.setBrush(QPalette::Text, qvariant_cast<QBrush>(data));
 
   data = AIndex.data(RDR_FONT_HINT);
   if (data.isValid())
@@ -353,16 +331,29 @@ QStyleOptionViewItem RosterIndexDelegate::indexOptions(const QModelIndex &AIndex
   if (data.isValid())
     option.font.setUnderline(data.toBool());
 
+  data = AIndex.data(Qt::ForegroundRole);
+  if (qVariantCanConvert<QBrush>(data))
+    option.palette.setBrush(QPalette::Text, qvariant_cast<QBrush>(data));
+
+  data = AIndex.data(Qt::BackgroundRole);
+  if (qVariantCanConvert<QBrush>(data))
+    option.backgroundBrush = qvariant_cast<QBrush>(data);
+
+  option.index = AIndex;
+  option.fontMetrics = QFontMetrics(option.font);
+
   return option;
 }
 
-QStyleOptionViewItem RosterIndexDelegate::indexFooterOptions(const QStyleOptionViewItem &AOption) const
+QStyleOptionViewItemV4 RosterIndexDelegate::indexFooterOptions(const QStyleOptionViewItemV4 &AOption) const
 {
-  QStyleOptionViewItem option = AOption;
+  QStyleOptionViewItemV4 option = AOption;
 
   option.font.setPointSize(option.font.pointSize()-1);
   option.font.setBold(false);
   option.font.setItalic(true);
+
+  option.fontMetrics = QFontMetrics(option.font);
 
   return option;
 }
@@ -421,7 +412,7 @@ QList<LabelItem> RosterIndexDelegate::itemFooters(const QModelIndex &AIndex) con
   return footers;
 }
 
-QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption, const QVariant &AValue) const
+QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItemV4 &AOption, const QVariant &AValue) const
 {
   switch(AValue.type())
   {
@@ -450,10 +441,7 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption, cons
     {
       QString text = AValue.toString();
       if (!text.isEmpty())
-      {
-        QFontMetrics fontMetrics(AOption.font);
-        return fontMetrics.size(AOption.direction | Qt::TextSingleLine,text); 
-      }
+        return AOption.fontMetrics.size(AOption.direction | Qt::TextSingleLine,text); 
       break;
     }
   default:
@@ -462,12 +450,10 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItem &AOption, cons
   return QSize(0,0);
 }
 
-void RosterIndexDelegate::getLabelsSize(const QStyleOptionViewItem &AOption, QList<LabelItem> &ALabels) const
+void RosterIndexDelegate::getLabelsSize(const QStyleOptionViewItemV4 &AOption, QList<LabelItem> &ALabels) const
 {
   for (QList<LabelItem>::iterator it = ALabels.begin(); it != ALabels.end(); it++)
-  {
     it->size = variantSize(it->id==RLID_FOOTER_TEXT ? indexFooterOptions(AOption) : AOption, it->value);
-  }
 }
 
 void RosterIndexDelegate::removeWidth(QRect &ARect,int AWidth, bool AIsLeftToRight) const
