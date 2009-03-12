@@ -9,7 +9,7 @@
 
 struct LabelItem
 {
-  LabelItem() { id =-1; order = 0; flags = 0; }
+  LabelItem() { id = -1; order = 0; flags = 0; }
   int id;
   int order;
   int flags;
@@ -37,22 +37,23 @@ public:
   void setShowBlinkLabels(bool AShow) { FShowBlinkLabels = AShow; }
 protected:
   QHash<int,QRect> drawIndex(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-  void drawLabelItem(QPainter *APainter, const QStyleOptionViewItem &AOption, const LabelItem &ALabel) const;
-  void drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, const QRect &ARect, const QModelIndex &AIndex) const;
-  void drawFocus(QPainter *APainter, const QStyleOptionViewItem &AOption, const QRect &ARect) const;
-  QStyleOptionViewItem indexOptions(const QModelIndex &AIndex, const QStyleOptionViewItem &AOption) const;
-  QStyleOptionViewItem indexFooterOptions(const QStyleOptionViewItem &AOption) const;
+  void drawLabelItem(QPainter *APainter, const QStyleOptionViewItemV4 &AOption, const LabelItem &ALabel) const;
+  void drawBackground(QPainter *APainter, const QStyleOptionViewItemV4 &AOption) const;
+  void drawFocus(QPainter *APainter, const QStyleOptionViewItemV4 &AOption, const QRect &ARect) const;
+  QStyleOptionViewItemV4 indexOptions(const QModelIndex &AIndex, const QStyleOptionViewItem &AOption) const;
+  QStyleOptionViewItemV4 indexFooterOptions(const QStyleOptionViewItemV4 &AOption) const;
   QList<LabelItem> itemLabels(const QModelIndex &AIndex) const;
   QList<LabelItem> itemFooters(const QModelIndex &AIndex) const;
-  QSize variantSize(const QStyleOptionViewItem &AOption, const QVariant &AValue) const;
-  void getLabelsSize(const QStyleOptionViewItem &AOption, QList<LabelItem> &ALabels) const;
+  QSize variantSize(const QStyleOptionViewItemV4 &AOption, const QVariant &AValue) const;
+  void getLabelsSize(const QStyleOptionViewItemV4 &AOption, QList<LabelItem> &ALabels) const;
   void removeWidth(QRect &ARect, int AWidth, bool AIsLeftToRight) const;
 private:
-  static const int spacing = 2;
   QIcon::Mode getIconMode(QStyle::State AState) const;
   QIcon::State getIconState(QStyle::State AState) const;
 private:
   bool FShowBlinkLabels;
+private:
+  static const int spacing = 2;
 };
 
 #endif // ROSTERINDEXDELEGATE_H
