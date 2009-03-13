@@ -722,10 +722,14 @@ void Gateways::onKeepTimerTimeout()
       QList<Jid> services = FKeepConnections.values(streamJid);
       foreach(Jid service, services)
       {
-        if (roster->rosterItem(service).subscription!=SUBSCRIPTION_NONE && presence->presenceItems(service).isEmpty())
+        if (roster->rosterItem(service).isValid)
         {
-          presence->sendPresence(service,IPresence::Offline,"",0);
-          presence->sendPresence(service,presence->show(),presence->status(),presence->priority());
+          const QList<IPresenceItem> pitems = presence->presenceItems(service);
+          if (pitems.isEmpty() || pitems.at(0).show==IPresence::Error)
+          {
+            presence->sendPresence(service,IPresence::Offline,"",0);
+            presence->sendPresence(service,presence->show(),presence->status(),presence->priority());
+          }
         }
       }
     }
