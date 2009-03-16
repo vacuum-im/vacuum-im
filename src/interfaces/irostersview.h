@@ -62,6 +62,8 @@ public:
   //--FooterText
   virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex) =0;
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
+  //--ContextMenu
+  virtual void contextMenuForIndex(Menu *AMenu, IRosterIndex *AIndex, int ALabelId) =0;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AIndex) =0;
   virtual void modelSeted(IRostersModel *AIndex) =0;

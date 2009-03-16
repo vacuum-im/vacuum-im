@@ -1,23 +1,21 @@
 #include "rostersview.h"
 
-#include <QApplication>
-#include <QHeaderView>
-#include <QToolTip>
 #include <QCursor>
+#include <QToolTip>
 #include <QHelpEvent>
+#include <QHeaderView>
+#include <QApplication>
 
 RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 {
-  FLabelIdCounter = 1;
   FNotifyId = 1;
   FOptions = 0;
+  FLabelIdCounter = 1;
 
   FRostersModel = NULL;
   FPressedLabel = RLID_DISPLAY;
   FPressedIndex = NULL;
-
   FContextMenu = new Menu(this);
-  FRosterIndexDelegate = new RosterIndexDelegate(this);
 
   FBlinkShow = true;
   FBlinkTimer.setInterval(500);
@@ -25,11 +23,13 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 
   header()->hide();
   header()->setStretchLastSection(false);
-  setAutoScroll(false);
+
   setIndentation(4);
   setRootIsDecorated(false);
   setSelectionMode(NoSelection);
   setContextMenuPolicy(Qt::DefaultContextMenu);
+
+  FRosterIndexDelegate = new RosterIndexDelegate(this);
   setItemDelegate(FRosterIndexDelegate);
 
   connect(this,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
@@ -514,6 +514,19 @@ void RostersView::removeFooterText(int AOrderAndId, IRosterIndex *AIndex)
   }
 }
 
+void RostersView::contextMenuForIndex(Menu *AMenu, IRosterIndex *AIndex, int ALabelId)
+{
+  if (AIndex!=NULL && AMenu!=NULL)
+  {
+    if (FNotifyLabelItems.contains(ALabelId))
+      emit notifyContextMenu(AIndex,FNotifyLabelItems.value(ALabelId).first(),AMenu);
+    else if (ALabelId != RLID_DISPLAY)
+      emit labelContextMenu(AIndex,ALabelId,AMenu);
+    else
+      emit contextMenu(AIndex,AMenu);
+  }
+}
+
 bool RostersView::checkOption(IRostersView::Option AOption) const
 {
   return (FOptions & AOption) > 0;
@@ -606,22 +619,20 @@ void RostersView::drawBranches(QPainter * /*APainter*/, const QRect &/*ARect*/, 
 
 bool RostersView::viewportEvent(QEvent *AEvent)
 {
-  switch(AEvent->type())
+  if (AEvent->type() == QEvent::ToolTip)
   {
-  case QEvent::ToolTip:
+    QHelpEvent *helpEvent = static_cast<QHelpEvent *>(AEvent); 
+    QModelIndex viewIndex = indexAt(helpEvent->pos());
+    if (viewIndex.isValid())
     {
-      QHelpEvent *helpEvent = static_cast<QHelpEvent *>(AEvent); 
-      QModelIndex viewIndex = indexAt(helpEvent->pos());
-      if (viewIndex.isValid())
+      QMultiMap<int,QString> toolTipsMap;
+      const int labelId = labelAt(helpEvent->pos(),viewIndex);
+      
+      QModelIndex modelIndex = mapToModel(viewIndex);
+      IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
+      if (index != NULL)
       {
-        QMultiMap<int,QString> toolTipsMap;
-        const int labelId = labelAt(helpEvent->pos(),viewIndex);
-        
-        QModelIndex modelIndex = mapToModel(viewIndex);
-        IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-
         emit labelToolTips(index,labelId,toolTipsMap);
-
         if (labelId!=RLID_DISPLAY && toolTipsMap.isEmpty())
           emit labelToolTips(index,RLID_DISPLAY,toolTipsMap);
 
@@ -630,14 +641,14 @@ bool RostersView::viewportEvent(QEvent *AEvent)
         return true;
       }
     }
-  default:
-    return QTreeView::viewportEvent(AEvent);
   }
+  return QTreeView::viewportEvent(AEvent);
 }
 
 void RostersView::resizeEvent(QResizeEvent *AEvent)
 {
-  header()->resizeSection(0,AEvent->size().width());
+  if (model() && model()->columnCount()>0)
+    header()->resizeSection(0,AEvent->size().width());
   QTreeView::resizeEvent(AEvent);
 }
 
@@ -650,14 +661,12 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
 
     modelIndex = mapToModel(modelIndex);
     IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-
+    
     FContextMenu->clear();
-    if (FNotifyLabelItems.contains(labelId))
-      emit notifyContextMenu(index,FNotifyLabelItems.value(labelId).first(),FContextMenu);
-    else if (labelId > RLID_DISPLAY)
-      emit labelContextMenu(index,labelId,FContextMenu);
-    if (FContextMenu->isEmpty())
-      emit contextMenu(index,FContextMenu);
+    contextMenuForIndex(FContextMenu,index,labelId);
+    if (labelId!=RLID_DISPLAY && FContextMenu->isEmpty())
+      contextMenuForIndex(FContextMenu,index,RLID_DISPLAY);
+
     if (!FContextMenu->isEmpty())
       FContextMenu->popup(AEvent->globalPos());
   }
@@ -673,22 +682,25 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
     {
       QModelIndex modelIndex = mapToModel(viewIndex);
       IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-      
-      const int labelId = labelAt(AEvent->pos(),viewIndex);
 
-      if (!FNotifyLabelItems.contains(labelId))
+      if (index != NULL)
       {
-        emit labelDoubleClicked(index,labelId,accepted);
+        const int labelId = labelAt(AEvent->pos(),viewIndex);
 
-        QMultiMap<int,IRostersClickHooker *>::iterator it = FClickHookers.begin();
-        while (!accepted && it!=FClickHookers.end())
+        if (!FNotifyLabelItems.contains(labelId))
         {
-          accepted = it.value()->rosterIndexClicked(index,it.key());
-          it++;
+          emit labelDoubleClicked(index,labelId,accepted);
+
+          QMultiMap<int,IRostersClickHooker *>::iterator it = FClickHookers.begin();
+          while (!accepted && it!=FClickHookers.end())
+          {
+            accepted = it.value()->rosterIndexClicked(index,it.key());
+            it++;
+          }
         }
+        else
+          emit notifyActivated(index,FNotifyLabelItems.value(labelId).first());
       }
-      else
-        emit notifyActivated(index,FNotifyLabelItems.value(labelId).first());
     }
   }
   if (!accepted)
