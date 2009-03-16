@@ -323,6 +323,7 @@ void RostersViewPlugin::onViewRowsInserted(const QModelIndex &AParent, int AStar
 {
   for (int row=AStart; row<=AEnd; row++)
     loadExpandedState(AParent.child(row,0));
+  loadExpandedState(AParent);
 }
 
 void RostersViewPlugin::onViewIndexCollapsed(const QModelIndex &AIndex)
