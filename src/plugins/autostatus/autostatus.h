@@ -37,7 +37,7 @@ public:
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
-  virtual bool startPlugin() { return true; }
+  virtual bool startPlugin();
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IAutoStatus
