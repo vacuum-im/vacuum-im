@@ -1,8 +1,8 @@
 #ifndef ROSTERSVIEW_H
 #define ROSTERSVIEW_H
 
-#include <QPainter>
 #include <QTimer>
+#include <QPainter>
 #include <QResizeEvent>
 #include <QContextMenuEvent>
 #include "../../definations/rostertooltiporders.h"
@@ -67,6 +67,8 @@ public:
   //--FooterText
   virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex);
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
+  //--ContextMenu
+  virtual void contextMenuForIndex(Menu *AMenu, IRosterIndex *AIndex, int ALabelId);
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AModel);
   virtual void modelSeted(IRostersModel *AModel);
