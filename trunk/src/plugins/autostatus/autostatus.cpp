@@ -25,7 +25,6 @@ AutoStatus::AutoStatus()
   FLastCursorTime = QDateTime::currentDateTime();
 
   FIdleTimer.setSingleShot(false);
-  FIdleTimer.start(IDLE_TIMER_TIMEOUT);
   connect(&FIdleTimer,SIGNAL(timeout()),SLOT(onIdleTimerTimeout()));
 }
 
@@ -77,6 +76,12 @@ bool AutoStatus::initObjects()
     FSettingsPlugin->openOptionsNode(ON_AUTO_STATUS,tr("Auto status"),tr("Edit auto status rules"),MNI_AUTOSTATUS,ONO_AUTO_STATUS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
+  return true;
+}
+
+bool AutoStatus::startPlugin()
+{
+  FIdleTimer.start(IDLE_TIMER_TIMEOUT);
   return true;
 }
 
@@ -155,7 +160,7 @@ void AutoStatus::removeRule(int ARuleId)
 
 void AutoStatus::setActiveRule(int ARuleId)
 {
-  if (ARuleId!=FActiveRule)
+  if (FStatusChanger && ARuleId!=FActiveRule)
   {
     if (ARuleId>0 && FRules.contains(ARuleId))
     {
@@ -207,9 +212,12 @@ void AutoStatus::onIdleTimerTimeout()
     FLastCursorTime = QDateTime::currentDateTime();
   }
   
-  int show = FStatusChanger->statusItemShow(FStatusChanger->mainStatus());
-  if (FActiveRule>0 || show==IPresence::Online || show==IPresence::Chat)
-    updateActiveRule();
+  if (FStatusChanger)
+  {
+    int show = FStatusChanger->statusItemShow(FStatusChanger->mainStatus());
+    if (FActiveRule>0 || show==IPresence::Online || show==IPresence::Chat)
+      updateActiveRule();
+  }
 }
 
 void AutoStatus::onSettingsOpened()
