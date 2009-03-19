@@ -14,22 +14,22 @@
         <translation>Модель контакт-листа</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersmodel/rostersmodel.h" line="58"/>
+        <location filename="../../plugins/rostersmodel/rostersmodel.h" line="59"/>
         <source>Blank Group</source>
         <translation>Общая группа</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersmodel/rostersmodel.h" line="59"/>
+        <location filename="../../plugins/rostersmodel/rostersmodel.h" line="60"/>
         <source>Agents</source>
         <translation>Агенты</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersmodel/rostersmodel.h" line="60"/>
+        <location filename="../../plugins/rostersmodel/rostersmodel.h" line="61"/>
         <source>My Resources</source>
         <translation>Мои ресурсы</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersmodel/rostersmodel.h" line="61"/>
+        <location filename="../../plugins/rostersmodel/rostersmodel.h" line="62"/>
         <source>Not in Roster</source>
         <translation>Не в контакт-листе</translation>
     </message>

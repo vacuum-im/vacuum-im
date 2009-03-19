@@ -14,6 +14,16 @@ public:
   virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder) =0;
 };
 
+class IRostersDragDropHandler
+{
+public:
+  virtual Qt::DropActions dragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag) =0;
+  virtual bool dragEnter(const QDragEnterEvent *AEvent) =0;
+  virtual bool dragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover) =0;
+  virtual void dragLeave(const QDragLeaveEvent *AEvent) =0;
+  virtual bool dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu) =0;
+};
+
 class IRostersView
 {
 public:
@@ -59,6 +69,9 @@ public:
   //--ClickHookers
   virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
   virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
+  //--DragDrop
+  virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler) =0;
+  virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler) =0;
   //--FooterText
   virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex) =0;
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
@@ -81,6 +94,8 @@ signals:
   virtual void notifyContextMenu(IRosterIndex *AIndex, int ANotifyId, Menu *AMenu) =0;
   virtual void notifyActivated(IRosterIndex *AIndex, int ANotifyId) =0;
   virtual void notifyRemovedByIndex(IRosterIndex *AIndex, int ANotifyId) =0;
+  virtual void dragDropHandlerInserted(IRostersDragDropHandler *AHandler) =0;
+  virtual void dragDropHandlerRemoved(IRostersDragDropHandler *AHandler) =0;
 };
 
 class IRostersViewPlugin
@@ -97,6 +112,7 @@ signals:
 };
 
 Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.0");
+Q_DECLARE_INTERFACE(IRostersDragDropHandler,"Vacuum.Plugin.IRostersDragDropHandler/1.0");
 Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.0");
 Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.0");
 

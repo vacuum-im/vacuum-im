@@ -1,6 +1,7 @@
 #ifndef ROSTERINDEX_H
 #define ROSTERINDEX_H
 
+#include <QMap>
 #include <QHash>
 #include <QMultiHash>
 #include "../../definations/rosterindextyperole.h"
@@ -33,6 +34,7 @@ public:
   virtual void insertDataHolder(IRosterIndexDataHolder *ADataHolder);
   virtual void removeDataHolder(IRosterIndexDataHolder *ADataHolder);
   virtual QVariant data(int ARole) const;
+  virtual QMap<int,QVariant> data() const;
   virtual void setData(int ARole, const QVariant &AData);
   virtual IRosterIndexList findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds = false) const;
   virtual bool removeOnLastChildRemoved() const { return FRemoveOnLastChildRemoved; }
@@ -55,15 +57,15 @@ protected slots:
   void onRemoveByLastChildRemoved();
   void onDestroyByParentRemoved();
 private:
-  IRosterIndex *FParentIndex;
-  QList<IRosterIndex *> FChilds;
-  QHash<int, QMultiMap<int,IRosterIndexDataHolder *> > FDataHolders;
-  QHash<int, QVariant> FData;
-  Qt::ItemFlags FFlags;
-  bool FRemoveOnLastChildRemoved;
+  bool FBlokedSetParentIndex;
   bool FRemoveChildsOnRemoved;
   bool FDestroyOnParentRemoved;
-  bool FBlokedSetParentIndex;
+  bool FRemoveOnLastChildRemoved;
+  Qt::ItemFlags FFlags;
+  IRosterIndex *FParentIndex;
+  QList<IRosterIndex *> FChilds;
+  QMap<int, QVariant> FData;
+  QHash<int, QMultiMap<int,IRosterIndexDataHolder *> > FDataHolders;
 };
 
 #endif // ROSTERINDEX_H

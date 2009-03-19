@@ -127,16 +127,35 @@ void RosterIndex::removeDataHolder(IRosterIndexDataHolder *ADataHolder)
 QVariant RosterIndex::data(int ARole) const
 {
   QVariant data = FData.value(ARole);
-
   if (!data.isValid())
   {
-    int i = 0;
     QList<IRosterIndexDataHolder *> dataHolders = FDataHolders.value(ARole).values();
-    while (i < dataHolders.count() && !data.isValid())
-      data = dataHolders.value(i++)->data(this,ARole);
+    for (int i=0; !data.isValid() && i<dataHolders.count(); i++)
+      data = dataHolders.at(i)->data(this,ARole);
   }
-
   return data;
+}
+
+QMap<int,QVariant> RosterIndex::data() const
+{
+  QMap<int,QVariant> values = FData;
+  foreach(int role, FDataHolders.keys())
+  {
+    if (!values.contains(role))
+    {
+      QList<IRosterIndexDataHolder *> dataHolders = FDataHolders.value(role).values();
+      for (int i=0; i<dataHolders.count(); i++)
+      {
+        QVariant roleData = dataHolders.at(i)->data(this,role);
+        if (roleData.isValid())
+        {
+          values.insert(role,roleData);
+          break;
+        }
+      }
+    }
+  }
+  return values;
 }
 
 void RosterIndex::setData(int ARole, const QVariant &AData)

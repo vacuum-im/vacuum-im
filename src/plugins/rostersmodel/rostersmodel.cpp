@@ -156,6 +156,16 @@ QVariant RostersModel::data(const QModelIndex &AIndex, int ARole) const
   return FRootIndex->data(ARole);
 }
 
+QMap<int, QVariant> RostersModel::itemData(const QModelIndex &AIndex) const
+{
+  if (AIndex.isValid())
+  {
+    IRosterIndex *index = static_cast<IRosterIndex *>(AIndex.internalPointer());
+    return index->data();
+  }
+  return QMap<int, QVariant>();
+}
+
 IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 {
   IRosterIndex *streamIndex = FStreamsRoot.value(AStreamJid);
@@ -494,6 +504,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
     else
     {
       groupType = RIT_GROUP;
+      groupDisplay = blankGroupName();
       itemGroups = ARosterItem.groups;
     }
 
@@ -513,7 +524,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(ARoster->streamJid()) : NULL;
     foreach(QString group,itemGroups)
     {
-      IRosterIndex *groupIndex = createGroup(groupType==RIT_GROUP ? group : groupDisplay,groupDelim,groupType,streamIndex);
+      IRosterIndex *groupIndex = createGroup(!group.isEmpty() ? group : groupDisplay,groupDelim,groupType,streamIndex);
 
       IRosterIndexList groupItemList;
       //Если есть возможность переносим контакты из старой группы в новую
