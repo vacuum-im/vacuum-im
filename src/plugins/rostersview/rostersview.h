@@ -2,9 +2,6 @@
 #define ROSTERSVIEW_H
 
 #include <QTimer>
-#include <QPainter>
-#include <QResizeEvent>
-#include <QContextMenuEvent>
 #include "../../definations/rostertooltiporders.h"
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
