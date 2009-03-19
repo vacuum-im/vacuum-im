@@ -100,205 +100,227 @@
 <context>
     <name>RosterChanger</name>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="46"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="52"/>
         <source>Manipulating roster items and groups</source>
         <translation>Управление элементами контакт-листа и группами</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="48"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="54"/>
         <source>Roster Changer</source>
         <translation>Модуль управления контакт-листом</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="141"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="145"/>
         <source>Add contact to</source>
         <translation>Добавить контакт в</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="154"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="158"/>
         <source>Subscription requests</source>
         <translation>Запросы авторизации</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="278"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="414"/>
         <source>%1 wants to subscribe to your presence.</source>
         <translation>%1 хочет подписаться на ваш статус.</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="282"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="418"/>
         <source>%1 unsubscribed from your presence.</source>
         <translation>%1 отписался от вышего статуса.</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="284"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="420"/>
         <source>You are now unsubscribed from %1 presence.</source>
         <translation>%1 удалил вашу авторизацию на получение статуса.</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="322"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="458"/>
         <source>This group</source>
         <translation>В эту группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="333"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="366"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="469"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="502"/>
         <source>Create new...</source>
         <translation>Создать новую...</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="355"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="491"/>
         <source>Root</source>
         <translation>В корень</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="549"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1056"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="685"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1270"/>
         <source>Add contact...</source>
         <translation>Добавить контакт...</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="456"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="592"/>
         <source>Subscription</source>
         <translation>Авторизация</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="476"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="612"/>
         <source>Send</source>
         <translation>Отправить</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="492"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="628"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="484"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="620"/>
         <source>Request</source>
         <translation>Запросить</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="500"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="258"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="293"/>
+        <source>Copy contact</source>
+        <translation>Копировать контакт</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="263"/>
+        <source>Move contact</source>
+        <translation>Переместить контакт</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="271"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="301"/>
+        <source>Copy group</source>
+        <translation>Копировать группу</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="276"/>
+        <source>Move group</source>
+        <translation>Переместить группу</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="636"/>
         <source>Refuse</source>
         <translation>Отказаться</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="517"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="578"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="653"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="714"/>
         <source>Rename...</source>
         <translation>Переименовать...</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="526"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="588"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="662"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="724"/>
         <source>Copy to group</source>
         <translation>Копировать в группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="531"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="593"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="667"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="729"/>
         <source>Move to group</source>
         <translation>Переместить в группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="539"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="675"/>
         <source>Remove from group</source>
         <translation>Удалить из группы</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="558"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="694"/>
         <source>Remove from roster</source>
         <translation>Удалить из контакт-листа</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="598"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="734"/>
         <source>Remove group</source>
         <translation>Удалить группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="605"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="970"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="741"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1183"/>
         <source>Remove contacts</source>
         <translation>Удалить контакты</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="656"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="792"/>
         <source>Subscription message from %1</source>
         <translation>Сообщение авторизации от %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="660"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="796"/>
         <source>Subscription message</source>
         <translation>Сообщение авторизации</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="728"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="889"/>
         <source>Rename contact</source>
         <translation>Переименовать контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="728"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="889"/>
         <source>Enter name for: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Введите имя для: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="751"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="784"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="894"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="926"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="912"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="945"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1107"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1139"/>
         <source>Create new group</source>
         <translation>Создать новую группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="751"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="784"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="894"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="926"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="912"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="945"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1107"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1139"/>
         <source>Enter group name:</source>
         <translation>Введите имя группы:</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="829"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="990"/>
         <source>Remove contact</source>
         <translation>Удалить контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="830"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="991"/>
         <source>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</source>
         <translation>Вы уверены, что хотите удалить контакт &lt;b&gt;%1&lt;/b&gt; из контакт-листа?</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="865"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1078"/>
         <source>Rename group</source>
         <translation>Переименовать группу</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="865"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1078"/>
         <source>Enter new group name:</source>
         <translation>Введите новое имя группы:</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="971"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="1184"/>
         <source>You are assured that wish to remove %1 contact(s) from roster?</source>
         <translation>Вы уверены, что хотите удалить %1 контакт(ов) из контакт-листа?</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="280"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="416"/>
         <source>You are now subscribed for %1 presence.</source>
         <translation>%1 авторизовал вас на получение статуса.</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="443"/>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="571"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="579"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="707"/>
         <source>Add contact</source>
         <translation>Добавить контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="460"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="596"/>
         <source>Subscribe contact</source>
         <translation>Авторизовать контакт</translation>
     </message>
     <message>
-        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="468"/>
+        <location filename="../../plugins/rosterchanger/rosterchanger.cpp" line="604"/>
         <source>Unsubscribe contact</source>
         <translation>Удалить авторизацию</translation>
     </message>

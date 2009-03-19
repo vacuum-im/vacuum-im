@@ -9,6 +9,7 @@
 #include "../../definations/multiuserdataroles.h"
 #include "../../definations/accountvaluenames.h"
 #include "../../definations/notificationdataroles.h"
+#include "../../definations/rosterdragdropmimetypes.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionwidgetorders.h"
 #include "../../definations/resources.h"
@@ -42,10 +43,11 @@ class RosterChanger :
   public QObject,
   public IPlugin,
   public IRosterChanger,
-  public IOptionsHolder
+  public IOptionsHolder,
+  public IRostersDragDropHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IRosterChanger IOptionsHolder);
+  Q_INTERFACES(IPlugin IRosterChanger IOptionsHolder IRostersDragDropHandler);
 public:
   RosterChanger();
   ~RosterChanger();
@@ -59,6 +61,12 @@ public:
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  //IRostersDragDropHandler
+  virtual Qt::DropActions dragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag);
+  virtual bool dragEnter(const QDragEnterEvent *AEvent);
+  virtual bool dragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
+  virtual void dragLeave(const QDragLeaveEvent *AEvent);
+  virtual bool dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
   //IRosterChanger
   virtual bool isAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual bool isAutoUnsubscribe(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -88,12 +96,14 @@ protected slots:
   void onSendSubscription(bool);
   void onReceiveSubscription(IRoster *ARoster, const Jid &AContactJid, int ASubsType, const QString &AMessage);
   //Operations on items
+  void onAddItemToGroup(bool);
   void onRenameItem(bool);
   void onCopyItemToGroup(bool);
   void onMoveItemToGroup(bool);
   void onRemoveItemFromGroup(bool);
   void onRemoveItemFromRoster(bool);
   //Operations on group
+  void onAddGroupToGroup(bool);
   void onRenameGroup(bool);
   void onCopyGroupToGroup(bool);
   void onMoveGroupToGroup(bool);
