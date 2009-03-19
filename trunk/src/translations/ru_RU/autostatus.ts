@@ -4,25 +4,25 @@
 <context>
     <name>AutoStatus</name>
     <message>
-        <location filename="../../plugins/autostatus/autostatus.cpp" line="40"/>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="39"/>
         <source>Changing status depending on user activity</source>
         <translation>Автоматическое изменение статуса в зависимости от активности пользователя</translation>
     </message>
     <message>
-        <location filename="../../plugins/autostatus/autostatus.cpp" line="42"/>
-        <location filename="../../plugins/autostatus/autostatus.cpp" line="77"/>
-        <location filename="../../plugins/autostatus/autostatus.cpp" line="166"/>
-        <location filename="../../plugins/autostatus/autostatus.cpp" line="169"/>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="41"/>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="76"/>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="171"/>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="174"/>
         <source>Auto status</source>
         <translation>Автостатус</translation>
     </message>
     <message>
-        <location filename="../../plugins/autostatus/autostatus.cpp" line="77"/>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="76"/>
         <source>Edit auto status rules</source>
         <translation>Изменить правила автостатуса</translation>
     </message>
     <message>
-        <location filename="../../plugins/autostatus/autostatus.cpp" line="225"/>
+        <location filename="../../plugins/autostatus/autostatus.cpp" line="233"/>
         <source>Status changed automatically to &apos;away&apos;</source>
         <translation>Статус автоматически зменен на &apos;ушел&apos;</translation>
     </message>
