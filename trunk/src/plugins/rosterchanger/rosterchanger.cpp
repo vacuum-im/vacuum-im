@@ -200,7 +200,8 @@ bool RosterChanger::dragEnter(const QDragEnterEvent *AEvent)
   if (AEvent->mimeData()->hasFormat(DDT_ROSTERSVIEW_INDEX_DATA))
   {
     QMap<int, QVariant> indexData;
-    QDataStream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA)) >> indexData;
+    QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
+    operator>>(stream,indexData);
   
     int indexType = indexData.value(RDR_TYPE).toInt();
     if (indexType==RIT_CONTACT || (indexType==RIT_GROUP && AEvent->source()==FRostersView->instance()))
@@ -236,7 +237,8 @@ bool RosterChanger::dropAction(const QDropEvent *AEvent, const QModelIndex &AInd
     if (roster && roster->isOpen())
     {
       QMap<int, QVariant> indexData;
-      QDataStream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA)) >> indexData;
+      QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
+      operator>>(stream,indexData);
 
       int indexType = indexData.value(RDR_TYPE).toInt();
       Jid indexStreamJid = indexData.value(RDR_STREAM_JID).toString();

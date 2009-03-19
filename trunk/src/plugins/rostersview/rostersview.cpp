@@ -2,13 +2,16 @@
 
 #include <QCursor>
 #include <QToolTip>
+#include <QPainter>
 #include <QDropEvent>
 #include <QHelpEvent>
 #include <QHeaderView>
+#include <QResizeEvent>
 #include <QApplication>
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
+#include <QContextMenuEvent>
 
 RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 {
@@ -38,6 +41,10 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 
   FRosterIndexDelegate = new RosterIndexDelegate(this);
   setItemDelegate(FRosterIndexDelegate);
+
+  setAcceptDrops(true);
+  setDragEnabled(true);
+  setDropIndicatorShown(true);
 
   connect(this,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
     SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
@@ -699,7 +706,8 @@ void RostersView::paintEvent(QPaintEvent *AEvent)
     QStyleOption option;
     option.init(this);
     option.rect = FDropIndicatorRect.adjusted(0,0,-1,-1);
-    style()->drawPrimitive(QStyle::PE_IndicatorItemViewItemDrop, &option, &QPainter(viewport()), this);
+    QPainter painter(viewport());
+    style()->drawPrimitive(QStyle::PE_IndicatorItemViewItemDrop, &option, &painter, this);
   }
 }
 
@@ -792,20 +800,21 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
       QAbstractItemDelegate *itemDeletage = itemDelegate(FPressedIndex);
       if (itemDeletage)
       {
-        QStyleOptionViewItem option = viewOptions();
-        option.state |= QStyle::State_Selected;
-        QSize imageSize(width(),itemDeletage->sizeHint(option,FPressedIndex).height());
-        QImage image(imageSize, QImage::Format_ARGB32_Premultiplied);
-        option.rect = QRect(QPoint(0,0),imageSize);
-        QPainter paiter(&image);
-        itemDeletage->paint(&paiter,option,FPressedIndex);
-        paiter.drawRect(option.rect.adjusted(0,0,-1,-1));
-        drag->setPixmap(QPixmap::fromImage(image));
+        QStyleOptionViewItemV4 option = indexOption(FPressedIndex);
+        QSize shint = itemDeletage->sizeHint(option,FPressedIndex);
+        shint.rwidth() = qMin(width(),shint.width());
+        option.rect = QRect(QPoint(0,0),shint);
+        QPixmap pixmap(shint);
+        QPainter painter(&pixmap);
+        style()->drawPrimitive(QStyle::PE_PanelItemViewItem,&option,&painter,this);
+        itemDeletage->paint(&painter,option,FPressedIndex);
+        painter.drawRect(option.rect.adjusted(0,0,-1,-1));
+        drag->setPixmap(pixmap);
       }
 
       QByteArray data;
       QDataStream stream(&data,QIODevice::WriteOnly);
-      stream << model()->itemData(FPressedIndex);
+      operator<<(stream,model()->itemData(FPressedIndex));
       drag->mimeData()->setData(DDT_ROSTERSVIEW_INDEX_DATA,data);
 
       setState(DraggingState);

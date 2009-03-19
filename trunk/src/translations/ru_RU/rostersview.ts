@@ -27,17 +27,17 @@
 <context>
     <name>RostersView</name>
     <message>
-        <location filename="../../plugins/rostersview/rostersview.cpp" line="940"/>
+        <location filename="../../plugins/rostersview/rostersview.cpp" line="949"/>
         <source>Status: %1</source>
         <translation>Статус: %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rostersview.cpp" line="944"/>
+        <location filename="../../plugins/rostersview/rostersview.cpp" line="953"/>
         <source>Priority: %1</source>
         <translation>Приоритет: %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/rostersview/rostersview.cpp" line="949"/>
+        <location filename="../../plugins/rostersview/rostersview.cpp" line="958"/>
         <source>Subscription: %1 %2</source>
         <translation>Авторизация: %1 %2</translation>
     </message>
