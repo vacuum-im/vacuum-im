@@ -38,7 +38,8 @@ public:
   virtual int columnCount(const QModelIndex &AParent = QModelIndex()) const;
   virtual Qt::ItemFlags flags(const QModelIndex &AIndex) const; 
   virtual QVariant data(const QModelIndex &AIndex, int ARole = Qt::DisplayRole) const;
-  //IRostersModel
+  virtual QMap<int, QVariant> itemData(const QModelIndex &AIndex) const;
+//IRostersModel
   virtual IRosterIndex *addStream(const Jid &AStreamJid);
   virtual QList<Jid> streams() const { return FStreamsRoot.keys(); }
   virtual void removeStream(const Jid &AStreamJid);

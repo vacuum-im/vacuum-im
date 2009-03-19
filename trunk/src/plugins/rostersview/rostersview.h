@@ -9,6 +9,7 @@
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterfootertextorders.h"
+#include "../../definations/rosterdragdropmimetypes.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/isettings.h"
@@ -64,6 +65,9 @@ public:
   //--ClickHookers
   virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker);
   virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker);
+  //--DragDrop
+  virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler);
+  virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler);
   //--FooterText
   virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex);
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
@@ -86,16 +90,19 @@ signals:
   virtual void notifyContextMenu(IRosterIndex *AIndex, int ANotifyId, Menu *AMenu);
   virtual void notifyActivated(IRosterIndex *AIndex, int ANotifyId);
   virtual void notifyRemovedByIndex(IRosterIndex *AIndex, int ANotifyId);
+  virtual void dragDropHandlerInserted(IRostersDragDropHandler *AHandler);
+  virtual void dragDropHandlerRemoved(IRostersDragDropHandler *AHandler);
 public:
   bool checkOption(IRostersView::Option AOption) const;
   void setOption(IRostersView::Option AOption, bool AValue);
 protected:
-  QStyleOptionViewItemV2 indexOption(const QModelIndex &AIndex) const;
+  QStyleOptionViewItemV4 indexOption(const QModelIndex &AIndex) const;
   void appendBlinkLabel(int ALabelId);
   void removeBlinkLabel(int ALabelId);
   QString intId2StringId(int AIntId);
   void removeLabels();
   void updateStatusText(IRosterIndex *AIndex = NULL);
+  void setDropIndicatorRect(const QRect &ARect);
 protected:
   //QTreeView
   virtual void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
@@ -103,10 +110,16 @@ protected:
   virtual bool viewportEvent(QEvent *AEvent);
   virtual void resizeEvent(QResizeEvent *AEvent);
   //QWidget
+  virtual void paintEvent(QPaintEvent *AEvent);
   virtual void contextMenuEvent(QContextMenuEvent *AEvent);
   virtual void mouseDoubleClickEvent(QMouseEvent *AEvent);
   virtual void mousePressEvent(QMouseEvent *AEvent);
+  virtual void mouseMoveEvent (QMouseEvent *AEvent);
   virtual void mouseReleaseEvent(QMouseEvent *AEvent);
+  virtual void dropEvent(QDropEvent *AEvent);
+  virtual void dragEnterEvent(QDragEnterEvent *AEvent);
+  virtual void dragMoveEvent(QDragMoveEvent *AEvent);
+  virtual void dragLeaveEvent(QDragLeaveEvent *AEvent);
 protected slots:
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onIndexInserted(IRosterIndex *AIndex);
@@ -117,12 +130,14 @@ private:
 private:
   Menu *FContextMenu;
 private:
+  int FPressedLabel;
+  QPoint FPressedPos;
+  QModelIndex FPressedIndex;
+private:
+  bool FBlinkShow;
   int FLabelIdCounter;
   QTimer FBlinkTimer;
   QSet<int> FBlinkLabels;
-  bool FBlinkShow;
-  int FPressedLabel;
-  IRosterIndex *FPressedIndex;
   QHash<int, QVariant> FIndexLabels;
   QHash<int, int /*Order*/> FIndexLabelOrders;
   QHash<int, int /*Flags*/> FIndexLabelFlags;
@@ -138,6 +153,11 @@ private:
   int FOptions;
   RosterIndexDelegate *FRosterIndexDelegate;
   QMultiMap<int,QAbstractProxyModel *> FProxyModels;
+private:
+  bool FStartDragFailed;
+  QRect FDropIndicatorRect;
+  QList<IRostersDragDropHandler *> FActiveDragHandlers;
+  QList<IRostersDragDropHandler *> FDragDropHandlers;
 };
 
 #endif // ROSTERSVIEW_H

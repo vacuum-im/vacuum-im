@@ -44,6 +44,7 @@ public:
   virtual void insertDataHolder(IRosterIndexDataHolder *ADataHolder) =0;
   virtual void removeDataHolder(IRosterIndexDataHolder *ADataHolder) =0;
   virtual QVariant data(int ARole) const =0;
+  virtual QMap<int, QVariant> data() const =0;
   virtual void setData(int ARole, const QVariant &) =0;
   virtual IRosterIndexList findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds = false) const =0;
   virtual bool removeOnLastChildRemoved() const=0;

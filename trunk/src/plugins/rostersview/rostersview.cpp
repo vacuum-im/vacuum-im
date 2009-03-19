@@ -2,20 +2,26 @@
 
 #include <QCursor>
 #include <QToolTip>
+#include <QDropEvent>
 #include <QHelpEvent>
 #include <QHeaderView>
 #include <QApplication>
+#include <QDragMoveEvent>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
 
 RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 {
-  FNotifyId = 1;
   FOptions = 0;
+  FNotifyId = 1;
   FLabelIdCounter = 1;
 
   FRostersModel = NULL;
-  FPressedLabel = RLID_DISPLAY;
-  FPressedIndex = NULL;
   FContextMenu = new Menu(this);
+
+  FPressedPos = QPoint();
+  FPressedLabel = RLID_NULL;
+  FPressedIndex = QModelIndex();
 
   FBlinkShow = true;
   FBlinkTimer.setInterval(500);
@@ -25,6 +31,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
   header()->setStretchLastSection(false);
 
   setIndentation(4);
+  setAcceptDrops(true);
   setRootIsDecorated(false);
   setSelectionMode(NoSelection);
   setContextMenuPolicy(Qt::DefaultContextMenu);
@@ -487,6 +494,24 @@ void RostersView::removeClickHooker(int AOrder, IRostersClickHooker *AHooker)
   FClickHookers.remove(AOrder,AHooker);
 }
 
+void RostersView::insertDragDropHandler(IRostersDragDropHandler *AHandler)
+{
+  if (!FDragDropHandlers.contains(AHandler))
+  {
+    FDragDropHandlers.append(AHandler);
+    emit dragDropHandlerInserted(AHandler);
+  }
+}
+
+void RostersView::removeDragDropHandler(IRostersDragDropHandler *AHandler)
+{
+  if (FDragDropHandlers.contains(AHandler))
+  {
+    FDragDropHandlers.removeAt(FDragDropHandlers.indexOf(AHandler));
+    emit dragDropHandlerRemoved(AHandler);
+  }
+}
+
 void RostersView::insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex)
 {
   if (!AValue.isNull())
@@ -539,9 +564,9 @@ void RostersView::setOption(IRostersView::Option AOption, bool AValue)
     updateStatusText();
 }
 
-QStyleOptionViewItemV2 RostersView::indexOption(const QModelIndex &AIndex) const
+QStyleOptionViewItemV4 RostersView::indexOption(const QModelIndex &AIndex) const
 {
-  QStyleOptionViewItemV2 option = viewOptions();
+  QStyleOptionViewItemV4 option = viewOptions();
   option.initFrom(this);
   option.rect = visualRect(AIndex);
   option.showDecorationSelected |= selectionBehavior() & SelectRows;
@@ -554,6 +579,11 @@ QStyleOptionViewItemV2 RostersView::indexOption(const QModelIndex &AIndex) const
     option.state &= ~QStyle::State_Enabled;
   if (indexAt(viewport()->mapFromGlobal(QCursor::pos())) == AIndex)
     option.state |= QStyle::State_MouseOver;
+  if (wordWrap())
+    option.features = QStyleOptionViewItemV2::WrapText;
+  option.locale = locale();
+  option.locale.setNumberOptions(QLocale::OmitGroupSeparator);
+  option.widget = this;
   return option;
 }
 
@@ -584,6 +614,15 @@ void RostersView::removeLabels()
     QSet<IRosterIndex *> indexes = FIndexLabelIndexes.value(label);
     foreach(IRosterIndex *index, indexes)
       removeIndexLabel(label,index);
+  }
+}
+
+void RostersView::setDropIndicatorRect(const QRect &ARect)
+{
+  if (FDropIndicatorRect != ARect)
+  {
+    FDropIndicatorRect = ARect;
+    viewport()->update();
   }
 }
 
@@ -652,6 +691,18 @@ void RostersView::resizeEvent(QResizeEvent *AEvent)
   QTreeView::resizeEvent(AEvent);
 }
 
+void RostersView::paintEvent(QPaintEvent *AEvent)
+{
+  QTreeView::paintEvent(AEvent);
+  if (!FDropIndicatorRect.isNull())
+  {
+    QStyleOption option;
+    option.init(this);
+    option.rect = FDropIndicatorRect.adjusted(0,0,-1,-1);
+    style()->drawPrimitive(QStyle::PE_IndicatorItemViewItemDrop, &option, &QPainter(viewport()), this);
+  }
+}
+
 void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
 {
   QModelIndex modelIndex = indexAt(AEvent->pos());
@@ -709,44 +760,167 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 
 void RostersView::mousePressEvent(QMouseEvent *AEvent)
 {
-  if (AEvent->button()==Qt::LeftButton && viewport()->rect().contains(AEvent->pos()))
+  FStartDragFailed = false;
+  FPressedPos = AEvent->pos();
+  if (viewport()->rect().contains(FPressedPos))
   {
-    QModelIndex viewIndex = indexAt(AEvent->pos());
-    if (viewIndex.isValid())
+    FPressedIndex = indexAt(FPressedPos);
+    if (FPressedIndex.isValid())
     {
-      const int labelId = labelAt(AEvent->pos(),viewIndex);
-      QModelIndex modelIndex = mapToModel(viewIndex);
-      FPressedIndex = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-      FPressedLabel = labelId;
-      if (labelId == RLID_INDICATORBRANCH)
-        setExpanded(viewIndex,!isExpanded(viewIndex));
+      FPressedLabel = labelAt(AEvent->pos(),FPressedIndex);
+      if (AEvent->button()==Qt::LeftButton && FPressedLabel==RLID_INDICATORBRANCH)
+        setExpanded(FPressedIndex,!isExpanded(FPressedIndex));
     }
   }
   QTreeView::mousePressEvent(AEvent);
 }
 
+void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
+{
+  if (!FStartDragFailed && AEvent->buttons()!=Qt::NoButton && FPressedIndex.isValid() && 
+    (AEvent->pos()-FPressedPos).manhattanLength() > QApplication::startDragDistance())
+  {
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(new QMimeData);
+
+    Qt::DropActions actions = Qt::IgnoreAction;
+    foreach(IRostersDragDropHandler *handler, FDragDropHandlers)
+      actions |= handler->dragStart(AEvent,FPressedIndex,drag);
+
+    if (actions != Qt::IgnoreAction)
+    {
+      QAbstractItemDelegate *itemDeletage = itemDelegate(FPressedIndex);
+      if (itemDeletage)
+      {
+        QStyleOptionViewItem option = viewOptions();
+        option.state |= QStyle::State_Selected;
+        QSize imageSize(width(),itemDeletage->sizeHint(option,FPressedIndex).height());
+        QImage image(imageSize, QImage::Format_ARGB32_Premultiplied);
+        option.rect = QRect(QPoint(0,0),imageSize);
+        QPainter paiter(&image);
+        itemDeletage->paint(&paiter,option,FPressedIndex);
+        paiter.drawRect(option.rect.adjusted(0,0,-1,-1));
+        drag->setPixmap(QPixmap::fromImage(image));
+      }
+
+      QByteArray data;
+      QDataStream stream(&data,QIODevice::WriteOnly);
+      stream << model()->itemData(FPressedIndex);
+      drag->mimeData()->setData(DDT_ROSTERSVIEW_INDEX_DATA,data);
+
+      setState(DraggingState);
+      drag->exec(actions);
+      setState(NoState);
+    }
+    else
+    {
+      FStartDragFailed = true;
+    }
+    delete drag;
+  }
+  QTreeView::mouseMoveEvent(AEvent);
+}
+
 void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 {
-  if (AEvent->button()==Qt::LeftButton && viewport()->rect().contains(AEvent->pos()))
+  bool isClick = (FPressedPos-AEvent->pos()).manhattanLength() < QApplication::startDragDistance();
+  if (isClick && AEvent->button()==Qt::LeftButton && viewport()->rect().contains(AEvent->pos()))
   {
     QModelIndex viewIndex = indexAt(AEvent->pos());
-    if (viewIndex.isValid())
+    const int labelId = viewIndex.isValid() ? labelAt(AEvent->pos(),viewIndex) : RLID_NULL;
+    if (FPressedIndex.isValid() && FPressedIndex==viewIndex && FPressedLabel==labelId)
     {
-      const int labelId = labelAt(AEvent->pos(),viewIndex);
-      QModelIndex modelIndex = mapToModel(viewIndex);
-      IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
-      if (FPressedIndex == index && FPressedLabel == labelId)
+      IRosterIndex *index = static_cast<IRosterIndex *>(mapToModel(viewIndex).internalPointer());
+      if (index)
       {
         if (FNotifyLabelItems.contains(labelId))
           emit notifyActivated(index,FNotifyLabelItems.value(labelId).first());
         else
-          emit labelClicked(index,labelId);
+          emit labelClicked(index,labelId!=RLID_NULL ? labelId : RLID_DISPLAY);
       }
     }
   }
-  FPressedLabel = RLID_DISPLAY;
-  FPressedIndex = NULL;
+
+  FPressedPos = QPoint();
+  FPressedLabel = RLID_NULL;
+  FPressedIndex = QModelIndex();
+
   QTreeView::mouseReleaseEvent(AEvent);
+}
+
+void RostersView::dropEvent(QDropEvent *AEvent)
+{
+  QModelIndex index = indexAt(AEvent->pos());
+  Menu *dropMenu = new Menu(this);
+  dropMenu->setAttribute(Qt::WA_DeleteOnClose,true);
+
+  bool accepted = false;
+  foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
+    if (handler->dropAction(AEvent,index,dropMenu))
+      accepted = true;
+
+  if (accepted)
+  {
+    if ((AEvent->mouseButtons() & Qt::RightButton)>0 || dropMenu->defaultAction()==NULL)
+    {
+      dropMenu->popup(mapToGlobal(AEvent->pos()));
+    }
+    else
+    {
+      dropMenu->defaultAction()->trigger();
+      delete dropMenu;
+    }
+    AEvent->accept();
+  }
+  else
+  {
+    AEvent->ignore();
+    delete dropMenu;
+  }
+
+  stopAutoScroll();
+  setDropIndicatorRect(QRect());
+}
+
+void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
+{
+  FActiveDragHandlers.clear();
+  foreach (IRostersDragDropHandler *handler, FDragDropHandlers)
+    if (handler->dragEnter(AEvent))
+      FActiveDragHandlers.append(handler);
+
+  if (!FActiveDragHandlers.isEmpty())
+  {
+    AEvent->accept();
+    startAutoScroll();
+  }
+  else
+    AEvent->ignore();
+}
+
+void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
+{
+  QModelIndex index = indexAt(AEvent->pos());
+  
+  bool accepted = false;
+  foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
+    if (handler->dragMove(AEvent,index))
+      accepted = true;
+
+  if (accepted)
+    AEvent->accept();
+  else
+    AEvent->ignore();
+
+  setDropIndicatorRect(visualRect(index));
+}
+
+void RostersView::dragLeaveEvent(QDragLeaveEvent *AEvent)
+{
+  foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
+    handler->dragLeave(AEvent);
+  stopAutoScroll();
+  setDropIndicatorRect(QRect());
 }
 
 void RostersView::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
