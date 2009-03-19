@@ -1,7 +1,12 @@
 #include "rosterchanger.h"
 
-#include <QInputDialog>
+#include <QMap>
+#include <QDropEvent>
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QDragMoveEvent>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
 
 #define NOTIFICATOR_ID      "RosterChanger"
 
@@ -10,6 +15,7 @@
 
 #define ADR_STREAM_JID      Action::DR_StreamJid
 #define ADR_CONTACT_JID     Action::DR_Parametr1
+#define ADR_FROM_STREAM_JID Action::DR_Parametr2
 #define ADR_SUBSCRIPTION    Action::DR_Parametr2
 #define ADR_NICK            Action::DR_Parametr2
 #define ADR_GROUP           Action::DR_Parametr3
@@ -83,7 +89,6 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-
   plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
   if (plugin)
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
@@ -128,7 +133,6 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-
   return FRosterPlugin!=NULL;
 }
 
@@ -159,6 +163,11 @@ bool RosterChanger::initObjects()
     FSettingsPlugin->insertOptionsHolder(this);
   }
 
+  if (FRostersView)
+  {
+    FRostersView->insertDragDropHandler(this);
+  }
+
   return true;
 }
 
@@ -175,6 +184,133 @@ QWidget *RosterChanger::optionsWidget(const QString &ANode, int &AOrder)
     return widget;
   }
   return NULL;
+}
+
+//IRostersDragDropHandler
+Qt::DropActions RosterChanger::dragStart(const QMouseEvent * /*AEvent*/, const QModelIndex &AIndex, QDrag * /*ADrag*/)
+{
+  int indexType = AIndex.data(RDR_TYPE).toInt();
+  if (indexType==RIT_CONTACT || indexType==RIT_GROUP)
+    return Qt::CopyAction|Qt::MoveAction;
+  return Qt::IgnoreAction;
+}
+
+bool RosterChanger::dragEnter(const QDragEnterEvent *AEvent)
+{
+  if (AEvent->mimeData()->hasFormat(DDT_ROSTERSVIEW_INDEX_DATA))
+  {
+    QMap<int, QVariant> indexData;
+    QDataStream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA)) >> indexData;
+  
+    int indexType = indexData.value(RDR_TYPE).toInt();
+    if (indexType==RIT_CONTACT || (indexType==RIT_GROUP && AEvent->source()==FRostersView->instance()))
+      return true;
+  }
+  return false;
+}
+
+bool RosterChanger::dragMove(const QDragMoveEvent * /*AEvent*/, const QModelIndex &AHover)
+{
+  int indexType = AHover.data(RDR_TYPE).toInt();
+  if (indexType==RIT_GROUP || indexType==RIT_STREAM_ROOT)
+  {
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AHover.data(RDR_STREAM_JID).toString()) : NULL;
+    if (roster && roster->isOpen())
+      return true;
+  }
+  return false;
+}
+
+void RosterChanger::dragLeave(const QDragLeaveEvent * /*AEvent*/)
+{
+
+}
+
+bool RosterChanger::dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
+{
+  int hoverType = AIndex.data(RDR_TYPE).toInt();
+  if (AEvent->dropAction()!=Qt::IgnoreAction && (hoverType==RIT_GROUP || hoverType==RIT_STREAM_ROOT))
+  {
+    Jid hoverStreamJid = AIndex.data(RDR_STREAM_JID).toString();
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(hoverStreamJid) : NULL;
+    if (roster && roster->isOpen())
+    {
+      QMap<int, QVariant> indexData;
+      QDataStream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA)) >> indexData;
+
+      int indexType = indexData.value(RDR_TYPE).toInt();
+      Jid indexStreamJid = indexData.value(RDR_STREAM_JID).toString();
+
+      if (hoverStreamJid && indexStreamJid)
+      {
+        Action *copyAction = new Action(AMenu);
+        copyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
+        copyAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
+        copyAction->setData(ADR_TO_GROUP,hoverType==RIT_GROUP ? AIndex.data(RDR_GROUP) : QVariant(QString("")));
+        
+        Action *moveAction = new Action(AMenu);
+        moveAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MOVE_GROUP);
+        moveAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
+        moveAction->setData(ADR_TO_GROUP,hoverType==RIT_GROUP ? AIndex.data(RDR_GROUP) : QVariant(QString("")));
+
+        if (indexType == RIT_CONTACT)
+        {
+          copyAction->setText(tr("Copy contact"));
+          copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
+          connect(copyAction,SIGNAL(triggered(bool)),SLOT(onCopyItemToGroup(bool)));
+          AMenu->addAction(copyAction,AG_DEFAULT,true);
+
+          moveAction->setText(tr("Move contact"));
+          moveAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
+          moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
+          connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveItemToGroup(bool)));
+          AMenu->addAction(moveAction,AG_DEFAULT,true);
+        }
+        else
+        {
+          copyAction->setText(tr("Copy group"));
+          copyAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
+          connect(copyAction,SIGNAL(triggered(bool)),SLOT(onCopyGroupToGroup(bool)));
+          AMenu->addAction(copyAction,AG_DEFAULT,true);
+
+          moveAction->setText(tr("Move group"));
+          moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
+          connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveGroupToGroup(bool)));
+          AMenu->addAction(moveAction,AG_DEFAULT,true);
+        }
+        AMenu->setDefaultAction(AEvent->dropAction()==Qt::MoveAction ? moveAction : copyAction);
+        return true;
+      }
+      else
+      {
+        Action *copyAction = new Action(AMenu);
+        copyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
+        copyAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
+        copyAction->setData(ADR_TO_GROUP,hoverType==RIT_GROUP ? AIndex.data(RDR_GROUP) : QVariant(QString("")));
+
+        if (indexType == RIT_CONTACT)
+        {
+          copyAction->setText(tr("Copy contact"));
+          copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
+          copyAction->setData(ADR_NICK,indexData.value(RDR_NAME));
+          connect(copyAction,SIGNAL(triggered(bool)),SLOT(onAddItemToGroup(bool)));
+          AMenu->addAction(copyAction,AG_DEFAULT,true);
+        }
+        else
+        {
+          copyAction->setText(tr("Copy group"));
+          copyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
+          copyAction->setData(ADR_FROM_STREAM_JID,indexStreamJid.full());
+          copyAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
+          connect(copyAction,SIGNAL(triggered(bool)),SLOT(onAddGroupToGroup(bool)));
+          AMenu->addAction(copyAction,AG_DEFAULT,true);
+        }
+        AMenu->setDefaultAction(copyAction);
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 //IRosterChanger
@@ -290,7 +426,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
                                      bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent)
 {
   Menu *menu = new Menu(AParent);
-  IRoster *roster = FRosterPlugin->getRoster(AData.value(ADR_STREAM_JID).toString());
+  IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AData.value(ADR_STREAM_JID).toString()) : NULL;
   if (roster)
   {
     QString group;
@@ -432,7 +568,7 @@ void RosterChanger::onShowAddContactDialog(bool)
 void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   QString streamJid = AIndex->data(RDR_STREAM_JID).toString();
-  IRoster *roster = FRosterPlugin->getRoster(streamJid);
+  IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
   if (roster && roster->isOpen())
   {
     int itemType = AIndex->data(RDR_TYPE).toInt();
@@ -617,7 +753,7 @@ void RosterChanger::onContactSubscription(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       QString contactJid = action->data(ADR_CONTACT_JID).toString();
@@ -636,7 +772,7 @@ void RosterChanger::onSendSubscription(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       QString rosterJid = action->data(ADR_CONTACT_JID).toString();
@@ -713,13 +849,38 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
   }
 }
 
+void RosterChanger::onAddItemToGroup(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QString streamJid = action->data(ADR_STREAM_JID).toString();
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
+    if (roster && roster->isOpen())
+    {
+      Jid rosterJid = action->data(ADR_CONTACT_JID).toString();
+      QString groupName = action->data(ADR_TO_GROUP).toString();
+      IRosterItem ritem = roster->rosterItem(rosterJid);
+      if (!ritem.isValid)
+      {
+        QString nick = action->data(ADR_NICK).toString();
+        roster->setItem(rosterJid,nick,QSet<QString>()<<groupName);
+      }
+      else
+      {
+        roster->copyItemToGroup(rosterJid,groupName);
+      }
+    }
+  }
+}
+
 void RosterChanger::onRenameItem(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       Jid rosterJid = action->data(ADR_CONTACT_JID).toString();
@@ -739,7 +900,7 @@ void RosterChanger::onCopyItemToGroup(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       QString groupDelim = roster->groupDelimiter();
@@ -771,7 +932,7 @@ void RosterChanger::onMoveItemToGroup(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       QString groupDelim = roster->groupDelimiter();
@@ -804,7 +965,7 @@ void RosterChanger::onRemoveItemFromGroup(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       QString rosterJid = action->data(ADR_CONTACT_JID).toString();
@@ -820,7 +981,7 @@ void RosterChanger::onRemoveItemFromRoster(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       Jid rosterJid = action->data(ADR_CONTACT_JID).toString();
@@ -848,13 +1009,65 @@ void RosterChanger::onRemoveItemFromRoster(bool)
   }
 }
 
+void RosterChanger::onAddGroupToGroup(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QString toStreamJid = action->data(ADR_STREAM_JID).toString();
+    QString fromStreamJid = action->data(ADR_FROM_STREAM_JID).toString();
+    IRoster *toRoster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(toStreamJid) : NULL;
+    IRoster *fromRoster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(fromStreamJid) : NULL;
+    if (fromRoster && toRoster && toRoster->isOpen())
+    {
+      QString toGroup = action->data(ADR_TO_GROUP).toString();
+      QString fromGroup = action->data(ADR_GROUP).toString();
+      QString fromGroupLast = fromGroup.split(fromRoster->groupDelimiter(),QString::SkipEmptyParts).last();
+      
+      QList<IRosterItem> toItems;
+      QList<IRosterItem> fromItems = fromRoster->groupItems(fromGroup);
+      foreach(IRosterItem fromItem, fromItems)
+      {
+        QSet<QString> newGroups;
+        foreach(QString group, fromItem.groups)
+        {
+          if (group.startsWith(fromGroup))
+          {
+            QString newGroup = group;
+            newGroup.remove(0,fromGroup.size());
+            if (!toGroup.isEmpty())
+              newGroup.prepend(toGroup + toRoster->groupDelimiter() + fromGroupLast);
+            else
+              newGroup.prepend(fromGroupLast);
+            newGroups += newGroup;
+          }
+        }
+        IRosterItem toItem = toRoster->rosterItem(fromItem.itemJid);
+        if (!toItem.isValid)
+        {
+          toItem.isValid = true;
+          toItem.itemJid = fromItem.itemJid;
+          toItem.name = fromItem.name;
+          toItem.groups = newGroups;
+        }
+        else
+        {
+          toItem.groups += newGroups;
+        }
+        toItems.append(toItem);
+      }
+      toRoster->setItems(toItems);
+    }
+  }
+}
+
 void RosterChanger::onRenameGroup(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       bool ok = false;
@@ -882,7 +1095,7 @@ void RosterChanger::onCopyGroupToGroup(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       QString groupDelim = roster->groupDelimiter();
@@ -914,7 +1127,7 @@ void RosterChanger::onMoveGroupToGroup(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       QString groupDelim = roster->groupDelimiter();
@@ -946,7 +1159,7 @@ void RosterChanger::onRemoveGroup(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       QString groupName = action->data(ADR_GROUP).toString();
@@ -961,7 +1174,7 @@ void RosterChanger::onRemoveGroupItems(bool)
   if (action)
   {
     QString streamJid = action->data(ADR_STREAM_JID).toString();
-    IRoster *roster = FRosterPlugin->getRoster(streamJid);
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
     if (roster && roster->isOpen())
     {
       QString groupName = action->data(ADR_GROUP).toString();
@@ -1038,7 +1251,8 @@ void RosterChanger::onAccountChanged(const QString &AName, const QVariant &AValu
     IAccount *account = qobject_cast<IAccount *>(sender());
     if (account && account->isActive())
     {
-      Action *action = FActions.value(FRosterPlugin->getRoster(account->xmppStream()->jid()),NULL);
+      IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(account->xmppStream()->jid()) : NULL;
+      Action *action = FActions.value(roster,NULL);
       if (action)
         action->setText(AValue.toString());
     }
@@ -1049,7 +1263,7 @@ void RosterChanger::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, I
 {
   if (!AUser->data(MUDR_REAL_JID).toString().isEmpty())
   {
-    IRoster *roster = FRosterPlugin->getRoster(AUser->data(MUDR_STREAM_JID).toString());
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AUser->data(MUDR_STREAM_JID).toString()) : NULL;
     if (roster && !roster->rosterItem(AUser->data(MUDR_REAL_JID).toString()).isValid)
     {
       Action *action = new Action(AMenu);
