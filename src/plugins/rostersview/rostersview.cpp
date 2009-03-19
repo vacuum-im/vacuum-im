@@ -806,7 +806,7 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
         option.rect = QRect(QPoint(0,0),shint);
         QPixmap pixmap(shint);
         QPainter painter(&pixmap);
-        style()->drawPrimitive(QStyle::PE_PanelItemViewItem,&option,&painter,this);
+        painter.fillRect(option.rect,style()->standardPalette().color(QPalette::Normal,QPalette::Base));
         itemDeletage->paint(&painter,option,FPressedIndex);
         painter.drawRect(option.rect.adjusted(0,0,-1,-1));
         drag->setPixmap(pixmap);
