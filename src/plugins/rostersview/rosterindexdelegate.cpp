@@ -272,7 +272,7 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
       }
       APainter->setFont(AOption.font);
       int flags = AOption.direction | Qt::TextSingleLine;
-      QString text = AOption.fontMetrics.elidedText(ALabel.value.toString(),Qt::ElideRight,ALabel.rect.width(),flags);
+      QString text = AOption.fontMetrics.elidedText(prepareText(ALabel.value.toString()),Qt::ElideRight,ALabel.rect.width(),flags);
       APainter->drawText(ALabel.rect,flags,text);
       break;
     }
@@ -439,9 +439,9 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItemV4 &AOption, co
     }
   case QVariant::String:
     {
-      QString text = AValue.toString();
+      QString text = prepareText(AValue.toString());
       if (!text.isEmpty())
-        return AOption.fontMetrics.size(AOption.direction | Qt::TextSingleLine,text); 
+        return AOption.fontMetrics.size(AOption.direction|Qt::TextSingleLine,text); 
       break;
     }
   default:
@@ -462,6 +462,13 @@ void RosterIndexDelegate::removeWidth(QRect &ARect,int AWidth, bool AIsLeftToRig
     ARect.setLeft(ARect.left()+AWidth+spacing);
   else
     ARect.setRight(ARect.right()-AWidth-spacing);
+}
+
+QString RosterIndexDelegate::prepareText(const QString &AText) const
+{
+  QString ptext = AText;
+  ptext.replace('\n',' ');
+  return ptext.trimmed();
 }
 
 QIcon::Mode RosterIndexDelegate::getIconMode(QStyle::State AState) const
