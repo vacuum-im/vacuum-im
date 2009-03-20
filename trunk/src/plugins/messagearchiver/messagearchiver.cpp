@@ -770,7 +770,7 @@ QString MessageArchiver::saveModeName(const QString &ASaveMode) const
 QString MessageArchiver::expireName(int AExpire) const
 {
   static const int oneDay = 24*60*60;
-  return QString::number(AExpire / oneDay)+" days";
+  return QString::number(AExpire / oneDay)+" "+tr("days");
 }
 
 IArchiveStreamPrefs MessageArchiver::archivePrefs(const Jid &AStreamJid) const
