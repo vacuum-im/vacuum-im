@@ -225,6 +225,11 @@
         <translation>Поток</translation>
     </message>
     <message>
+        <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="773"/>
+        <source>days</source>
+        <translation>дней</translation>
+    </message>
+    <message>
         <location filename="../../plugins/messagearchiver/messagearchiver.cpp" line="1899"/>
         <source>Message archiving preferences</source>
         <translation>Настройки хранения сообщений</translation>
@@ -440,52 +445,52 @@
         <translation>Свернуть всё</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="826"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="824"/>
         <source>Filter</source>
         <translation>Фильтр</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="833"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="831"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="840"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="838"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="846"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="844"/>
         <source>Reload</source>
         <translation>Обновить</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="939"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="947"/>
         <source>Message loading failed: %1</source>
         <translation>Не удалось загрузить сообщения: %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="978"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="986"/>
         <source>Messages request failed.</source>
         <translation>Не удалось отправить запрос.</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1079"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1087"/>
         <source>Enter new collection subject</source>
         <translation>Введите новую тему</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1079"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1087"/>
         <source>Subject:</source>
         <translation>Тема:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1104"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1112"/>
         <source>Remove collection</source>
         <translation>Удалить сообщения</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1107"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1115"/>
         <source>Do you really want to remove this collection with messages?</source>
         <translation>Вы уверены, что хотите удалить сообщения?</translation>
     </message>
@@ -495,42 +500,42 @@
         <translation>Тип группировки</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="790"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="789"/>
         <source>Source</source>
         <translation>Источник</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="791"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="790"/>
         <source>History source</source>
         <translation>Источник истории</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="797"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="796"/>
         <source>Auto select</source>
         <translation>Автовыбор</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="804"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="803"/>
         <source>Local archive</source>
         <translation>Локальный архив</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="811"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="810"/>
         <source>Server archive</source>
         <translation>Архив на сервере</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="976"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="984"/>
         <source>Loading messages from server...</source>
         <translation>Загрузка сообщений с сервера...</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1104"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1112"/>
         <source>Remove collections</source>
         <translation>Удалить сообщения</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1106"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.cpp" line="1114"/>
         <source>Do you really want to remove %1 collections with messages?</source>
         <translation>Вы уверены, что хотите удалить записи (%1) с сообщениями?</translation>
     </message>
@@ -538,42 +543,42 @@
 <context>
     <name>ViewHistoryWindowClass</name>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="29"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="30"/>
         <source>Filter</source>
         <translation>Фильтр</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="43"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="44"/>
         <source>Start:</source>
         <translation>С:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="60"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="61"/>
         <source>End:</source>
         <translation>По:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="117"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="118"/>
         <source>Text:</source>
         <translation>Текст:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="127"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="128"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="181"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="179"/>
         <source>Messages</source>
         <translation>Сообщения</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="84"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="85"/>
         <source>Contact:</source>
         <translation>Контакт:</translation>
     </message>
     <message>
-        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="146"/>
+        <location filename="../../plugins/messagearchiver/viewhistorywindow.ui" line="147"/>
         <source>Archive</source>
         <translation>Архив</translation>
     </message>

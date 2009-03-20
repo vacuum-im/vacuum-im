@@ -1,10 +1,10 @@
 #include "viewhistorywindow.h"
 
-#include <QScrollBar>
 #include <QListView>
+#include <QScrollBar>
 #include <QHeaderView>
-#include <QInputDialog>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #define MINIMUM_DATETIME      QDateTime(QDate(1,1,1),QTime(0,0,0))
 #define MAXIMUM_DATETIME      QDateTime::currentDateTime()
@@ -19,7 +19,7 @@
 SortFilterProxyModel::SortFilterProxyModel(ViewHistoryWindow *AWindow, QObject *AParent) : QSortFilterProxyModel(AParent)
 {
   FWindow = AWindow;
-  setDynamicSortFilter(false);
+  setDynamicSortFilter(true);
   setSortLocaleAware(true);
   setSortCaseSensitivity(Qt::CaseInsensitive);
 }
@@ -103,10 +103,10 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   FProxyModel->setSortRole(HDR_SORT_ROLE);
 
   ui.trvCollections->setModel(FProxyModel);
+  //ui.trvCollections->sortByColumn(1,Qt::DescendingOrder);
   ui.trvCollections->header()->setResizeMode(0,QHeaderView::ResizeToContents);
   ui.trvCollections->header()->setResizeMode(1,QHeaderView::ResizeToContents);
   ui.trvCollections->header()->setResizeMode(2,QHeaderView::Stretch);
-  ui.trvCollections->sortByColumn(1,Qt::DescendingOrder);
   connect(ui.trvCollections->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
     SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
   connect(ui.trvCollections,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onItemContextMenuRequested(const QPoint &)));
@@ -780,7 +780,6 @@ void ViewHistoryWindow::createGroupKindMenu()
   FGroupKindMenu->addAction(action,AG_DEFAULT+100);
 
   QToolButton *button = FGroupsTools->addToolButton(FGroupKindMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
-  //button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   button->setPopupMode(QToolButton::InstantPopup);
 }
 
@@ -814,7 +813,6 @@ void ViewHistoryWindow::createSourceMenu()
   FSourceMenu->addAction(action);
 
   QToolButton *button = FGroupsTools->addToolButton(FSourceMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
-  //button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   button->setPopupMode(QToolButton::InstantPopup);
 
   FSourceMenu->setEnabled(FArchiver->isSupported(FStreamJid));
@@ -847,6 +845,16 @@ void ViewHistoryWindow::createHeaderActions()
   FReload->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_RELOAD);
   connect(FReload,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
   FGroupsTools->addAction(FReload,AG_AWGT_ARCHIVE_DEFACTIONS,false);
+}
+
+void ViewHistoryWindow::showEvent(QShowEvent *AEvent)
+{
+  QMainWindow::showEvent(AEvent);
+  if (!ui.trvCollections->isSortingEnabled()) // Костыль для QSortFilterProxyModel Qt 4.5.0
+  {
+    ui.trvCollections->setSortingEnabled(true);
+   ui.trvCollections->sortByColumn(1,Qt::DescendingOrder); 
+  }
 }
 
 void ViewHistoryWindow::onLocalCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader)
