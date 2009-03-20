@@ -101,7 +101,7 @@ bool SessionNegotiation::initObjects()
   if (FDiscovery)
   {
     registerDiscoFeatures();
-    FDiscovery->insertFeatureHandler(NS_STANZA_SESSION,this,DFO_DEFAULT);
+    //FDiscovery->insertFeatureHandler(NS_STANZA_SESSION,this,DFO_DEFAULT);
   }
   if (FNotifications)
   {
