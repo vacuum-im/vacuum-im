@@ -47,6 +47,7 @@ protected:
   QSize variantSize(const QStyleOptionViewItemV4 &AOption, const QVariant &AValue) const;
   void getLabelsSize(const QStyleOptionViewItemV4 &AOption, QList<LabelItem> &ALabels) const;
   void removeWidth(QRect &ARect, int AWidth, bool AIsLeftToRight) const;
+  QString prepareText(const QString &AText) const;
 private:
   QIcon::Mode getIconMode(QStyle::State AState) const;
   QIcon::State getIconState(QStyle::State AState) const;
