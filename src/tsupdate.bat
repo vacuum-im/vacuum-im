@@ -1,6 +1,6 @@
 @echo off
 
-set LOPTIONS=-no-obsolete -source-language en
+set LOPTIONS=-no-obsolete -locations none -source-language en
 
 lupdate %LOPTIONS% client/client.pro
 lupdate %LOPTIONS% utils/utils.pro

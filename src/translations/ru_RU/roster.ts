@@ -4,12 +4,10 @@
 <context>
     <name>RosterPlugin</name>
     <message>
-        <location filename="../../plugins/roster/rosterplugin.cpp" line="16"/>
         <source>Managing roster and subscriptions</source>
         <translation>Управление контакт-листом и подписками</translation>
     </message>
     <message>
-        <location filename="../../plugins/roster/rosterplugin.cpp" line="18"/>
         <source>Roster and Subscriptions Manager</source>
         <translation>Модуль управления контакт-листом и подписками</translation>
     </message>

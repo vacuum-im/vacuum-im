@@ -4,12 +4,10 @@
 <context>
     <name>StanzaProcessor</name>
     <message>
-        <location filename="../../plugins/stanzaprocessor/stanzaprocessor.cpp" line="20"/>
         <source>Managing stanza handlers</source>
         <translation>Управление дескрипторами XML-транзакций</translation>
     </message>
     <message>
-        <location filename="../../plugins/stanzaprocessor/stanzaprocessor.cpp" line="22"/>
         <source>Stanza Processor</source>
         <translation>Процессор XML-транзакций</translation>
     </message>

@@ -4,12 +4,10 @@
 <context>
     <name>SkinManager</name>
     <message>
-        <location filename="../../plugins/skinmanager/skinmanager.cpp" line="16"/>
         <source>Managing skins</source>
         <translation>Управление скинами</translation>
     </message>
     <message>
-        <location filename="../../plugins/skinmanager/skinmanager.cpp" line="18"/>
         <source>Skin Manager</source>
         <translation>Менеджер скинов</translation>
     </message>

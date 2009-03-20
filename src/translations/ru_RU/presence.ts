@@ -4,12 +4,10 @@
 <context>
     <name>PresencePlugin</name>
     <message>
-        <location filename="../../plugins/presence/presenceplugin.cpp" line="17"/>
         <source>Managing presences</source>
         <translation>Управление статусами</translation>
     </message>
     <message>
-        <location filename="../../plugins/presence/presenceplugin.cpp" line="19"/>
         <source>Presence Manager</source>
         <translation>Статус-менеджер</translation>
     </message>

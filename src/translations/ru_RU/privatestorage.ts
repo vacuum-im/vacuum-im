@@ -4,12 +4,10 @@
 <context>
     <name>PrivateStorage</name>
     <message>
-        <location filename="../../plugins/privatestorage/privatestorage.cpp" line="21"/>
         <source>Store and retrieve custom XML data from server</source>
         <translation>Хранение и получение XML данных с сервера</translation>
     </message>
     <message>
-        <location filename="../../plugins/privatestorage/privatestorage.cpp" line="23"/>
         <source>Private Storage</source>
         <translation>Личное хранилище на сервере</translation>
     </message>
