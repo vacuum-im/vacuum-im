@@ -112,10 +112,9 @@ void JoinMultiChatDialog::onDialogAccepted()
 
   if (streamJid.isValid() && roomJid.isValid() && !host.isEmpty() && !room.isEmpty() && !nick.isEmpty())
   {
-    IMultiUserChatWindow *chatWindow = FChatPlugin->multiChatWindow(streamJid,roomJid);
-    if (!chatWindow)
+    IMultiUserChatWindow *chatWindow = FChatPlugin->getMultiChatWindow(streamJid,roomJid,nick,password);
+    if (chatWindow)
     {
-      chatWindow = FChatPlugin->getMultiChatWindow(streamJid,roomJid,nick,password);
       chatWindow->multiUserChat()->setAutoPresence(true);
       if (FSettingsPlugin)
       {
@@ -125,8 +124,8 @@ void JoinMultiChatDialog::onDialogAccepted()
         settings->setValueNS(SVN_RESENT_NICK,recent,nick);
         settings->setValueNS(SVN_RESENT_PASSWORD,recent,settings->encript(password,recent.toUtf8()));
       }
+      chatWindow->showWindow();
     }
-    chatWindow->showWindow();
     accept();
   }
   else

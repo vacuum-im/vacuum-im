@@ -2,8 +2,8 @@
 #define IMULTIUSERCHAT_H
 
 #include <QMenuBar>
-#include "../../interfaces/imessenger.h"
 #include "../../interfaces/idataforms.h"
+#include "../../interfaces/imessagewidgets.h"
 #include "../../utils/jid.h"
 #include "../../utils/menu.h"
 #include "../../utils/message.h"
@@ -158,10 +158,10 @@ signals:
 };
 
 class IMultiUserChatWindow :
-  public QMainWindow,
   public ITabWidget
 {
 public:
+  //virtual QMainWindow *instance() =0;
   virtual Jid streamJid() const =0;
   virtual Jid roomJid() const =0;
   virtual bool isActive() const =0;
@@ -189,12 +189,10 @@ public:
   virtual QObject *instance() = 0;
   virtual IPluginManager *pluginManager() const =0;
   virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
-  virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,
-    const QString &APassword, bool ADedicated = false) =0;
+  virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
   virtual QList<IMultiUserChat *> multiUserChats() const =0;
   virtual IMultiUserChat *multiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
-  virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,
-    const QString &APassword) =0;
+  virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
   virtual QList<IMultiUserChatWindow *> multiChatWindows() const =0;
   virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
   virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;

@@ -15,7 +15,9 @@ SUBDIRS = settings \
           accountmanager \
           traymanager \
           privatestorage \
-          messenger \
+          messageprocessor \
+          messagewidgets \
+          messagehandler \
           compress \
           connectionmanager \
           defaultconnection \

@@ -1,13 +1,13 @@
 #include "emoticons.h"
 
 #include <QSet>
-
 #define SMILEY_BY_ICONSET_SCHEMA        "smiley"
 #define SVN_SUBSTORAGES                 "substorages"
 
 Emoticons::Emoticons()
 {
-  FMessenger = NULL;
+  FMessageWidgets = NULL;
+  FMessageProcessor = NULL;
   FSettingsPlugin = NULL;
 }
 
@@ -28,13 +28,19 @@ void Emoticons::pluginInfo(IPluginInfo *APluginInfo)
 
 bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IMessenger").value(0,NULL);
+  IPlugin *plugin = APluginManager->getPlugins("IMessageProcessor").value(0,NULL);
   if (plugin)
   {
-    FMessenger = qobject_cast<IMessenger *>(plugin->instance());
-    if (FMessenger)
+    FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+  }
+
+  plugin = APluginManager->getPlugins("IMessageWidgets").value(0,NULL);
+  if (plugin)
+  {
+    FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
+    if (FMessageWidgets)
     {
-      connect(FMessenger->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
+      connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
     }
   }
 
@@ -56,10 +62,14 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 
 bool Emoticons::initObjects()
 {
-  if (FMessenger)
+  if (FMessageProcessor)
   {
-    FMessenger->insertMessageWriter(this,MWO_EMOTICONS);
-    FMessenger->insertResourceLoader(this,RSLO_EMOTICONS);
+    FMessageProcessor->insertMessageWriter(this,MWO_EMOTICONS);
+  }
+
+  if (FMessageWidgets)
+  {
+    FMessageWidgets->insertResourceLoader(this,RSLO_EMOTICONS);
   }
 
   if (FSettingsPlugin != NULL)
@@ -103,7 +113,7 @@ void Emoticons::writeText(Message &/*AMessage*/, QTextDocument *ADocument, const
   }
 }
 
-void Emoticons::loadResource(int AType, const QUrl &AName, QVariant &AValue)
+void Emoticons::loadTextResource(int AType, const QUrl &AName, QVariant &AValue)
 {
   if (AType == QTextDocument::ImageResource)
   {
@@ -234,7 +244,7 @@ void Emoticons::insertSelectIconMenu(const QString &AIconsetFile)
 {
   foreach(IToolBarWidget *widget, FToolBarsWidgets)
   {
-    SelectIconMenu *menu = createSelectIconMenu(AIconsetFile,widget);
+    SelectIconMenu *menu = createSelectIconMenu(AIconsetFile,widget->instance());
     FToolBarWidgetByMenu.insert(menu,widget);
     QToolButton *button = widget->toolBarChanger()->addToolButton(menu->menuAction(),AG_EEWT_EMOTICONS,false);
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -267,20 +277,19 @@ void Emoticons::onToolBarWidgetCreated(IToolBarWidget *AWidget)
     FToolBarsWidgets.append(AWidget);
     foreach(QString iconsetFile, FStoragesOrder)
     {
-      SelectIconMenu *menu = createSelectIconMenu(iconsetFile,AWidget);
+      SelectIconMenu *menu = createSelectIconMenu(iconsetFile,AWidget->instance());
       FToolBarWidgetByMenu.insert(menu,AWidget);
       QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),AG_EEWT_EMOTICONS);
       button->setToolButtonStyle(Qt::ToolButtonIconOnly);
       button->setPopupMode(QToolButton::InstantPopup);
     }
-    connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
+    connect(AWidget->instance(),SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
   }
 }
 
 void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
 {
-  IToolBarWidget *widget = static_cast<IToolBarWidget *>(AObject);
-  FToolBarsWidgets.removeAt(FToolBarsWidgets.indexOf(widget));
+  FToolBarsWidgets.removeAt(FToolBarsWidgets.indexOf((IToolBarWidget *)AObject));
 }
 
 void Emoticons::onIconSelected(const QString &/*ASubStorage*/, const QString &AIconKey)

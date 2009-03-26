@@ -6,11 +6,11 @@
 #include "../../definations/vcardvaluenames.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
+#include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/imessageprocessor.h"
+#include "../../interfaces/irosterchanger.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ivcard.h"
-#include "../../interfaces/imessenger.h"
-#include "../../interfaces/irosterchanger.h"
-#include "../../interfaces/ipluginmanager.h"
 #include "../../utils/action.h"
 #include "ui_addcontactdialog.h"
 
@@ -49,7 +49,7 @@ private:
   Ui::AddContactDialogClass ui;
 private:
   IRoster *FRoster;
-  IMessenger *FMessenger;
+  IMessageProcessor *FMessageProcessor;
   IVCardPlugin *FVcardPlugin;
   IRosterChanger *FRosterChanger;
 private:

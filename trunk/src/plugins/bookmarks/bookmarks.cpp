@@ -190,14 +190,13 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
   if (!ABookmark.conference.isEmpty())
   {
     Jid roomJid = ABookmark.conference;
-    IMultiUserChatWindow *window = FMultiChatPlugin->multiChatWindow(AStreamJid,roomJid);
-    if (!window)
+    IMultiUserChatWindow *window = FMultiChatPlugin->getMultiChatWindow(AStreamJid,roomJid,ABookmark.nick,ABookmark.password);
+    if (window)
     {
-      window = FMultiChatPlugin->getMultiChatWindow(AStreamJid,roomJid,ABookmark.nick,ABookmark.password);
+      if (AShowWindow)
+        window->showWindow();
       window->multiUserChat()->setAutoPresence(true);
     }
-    if (AShowWindow)
-      window->showWindow();
   }
   else if (!ABookmark.url.isEmpty())
   {
@@ -357,7 +356,7 @@ void BookMarks::onAddBookmarkActionTriggered(bool)
       bookmark.nick = window->multiUserChat()->nickName();
       bookmark.password = window->multiUserChat()->password();
       bookmark.autojoin = false;
-      if (execEditBookmarkDialog(&bookmark,window) == QDialog::Accepted)
+      if (execEditBookmarkDialog(&bookmark,window->instance()) == QDialog::Accepted)
         addBookmark(streamJid,bookmark);
     }
   }

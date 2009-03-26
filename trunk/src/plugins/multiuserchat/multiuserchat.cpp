@@ -6,7 +6,7 @@
 #define MUC_IQ_TIMEOUT      30000
 #define MUC_LIST_TIMEOUT    60000
 
-MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, IMessenger *AMessenger, const Jid &AStreamJid, const Jid &ARoomJid, 
+MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, 
                              const QString &ANickName, const QString &APassword, QObject *AParent) : QObject(AParent)
 {
   FPresence = NULL;
@@ -14,13 +14,13 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, IMessenger *AMes
   FXmppStream = NULL;
   FStanzaProcessor = NULL;
   FMainUser = NULL;
+  FMessageProcessor = NULL;
 
   FChangingState = false;
   FAutoPresence = false;
   FPresenceHandler = -1;
   FMessageHandler = -1;
 
-  FMessenger = AMessenger;
   FChatPlugin = AChatPlugin;
   FRoomJid = ARoomJid;
   FStreamJid = AStreamJid;
@@ -28,7 +28,7 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, IMessenger *AMes
   FPassword = APassword;
   FShow = IPresence::Offline;
 
-  initialize(FChatPlugin->pluginManager());
+  initialize();
 }
 
 MultiUserChat::~MultiUserChat()
@@ -280,7 +280,7 @@ bool MultiUserChat::sendMessage(const Message &AMessage, const QString &AToNick)
     if (AToNick.isEmpty())
       message.setType(Message::GroupChat);
     
-    if (FMessenger == NULL)
+    if (FMessageProcessor == NULL)
     {
       emit messageSend(message);
       if (FStanzaProcessor->sendStanzaOut(FStreamJid, message.stanza()))
@@ -290,7 +290,7 @@ bool MultiUserChat::sendMessage(const Message &AMessage, const QString &AToNick)
       }
     }
     else
-      return FMessenger->sendMessage(message,FStreamJid);
+      return FMessageProcessor->sendMessage(FStreamJid,message);
   }
   return false;
 }
@@ -317,8 +317,8 @@ bool MultiUserChat::requestVoice()
     fieldElem.setAttribute("label","Requested role");
     fieldElem.appendChild(mstanza.createElement("value")).appendChild(mstanza.createTextNode(MUC_ROLE_PARTICIPANT));
 
-    if (FMessenger)
-      return FMessenger->sendMessage(message,FStreamJid);
+    if (FMessageProcessor)
+      return FMessageProcessor->sendMessage(FStreamJid,message);
     else if (FStanzaProcessor)
       return FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza);
   }
@@ -338,8 +338,8 @@ bool MultiUserChat::inviteContact(const Jid &AContactJid, const QString &AReason
     if (!AReason.isEmpty())
       invElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(AReason));
     
-    if (FMessenger)
-      return FMessenger->sendMessage(message,FStreamJid);
+    if (FMessageProcessor)
+      return FMessageProcessor->sendMessage(FStreamJid,message);
     else if (FStanzaProcessor)
       return FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza);
   }
@@ -366,8 +366,8 @@ void MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
     QDomElement queryElem = mstanza.addElement("query",NS_MUC_OWNER).toElement();
     FDataForms->xmlForm(AForm,queryElem);
     bool submited = false;
-    if (FMessenger)
-      submited = FMessenger->sendMessage(message,FStreamJid);
+    if (FMessageProcessor)
+      submited = FMessageProcessor->sendMessage(FStreamJid,message);
     else if (FStanzaProcessor)
       submited = FStanzaProcessor->sendIqStanza(this,FStreamJid,message.stanza(),0);
     if (submited)
@@ -538,7 +538,7 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
   }
 
   Message message(AStanza);
-  if (FMessenger == NULL)
+  if (FMessageProcessor == NULL)
   {
     prepareMessageForReceive(message);
     emit messageReceive(fromNick,message);
@@ -736,21 +736,27 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
   return accepted;
 }
 
-bool MultiUserChat::initialize(IPluginManager *APluginManager)
+void MultiUserChat::initialize()
 {
-  IPlugin *plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  IPlugin *plugin = FChatPlugin->pluginManager()->getPlugins("IMessageProcessor").value(0,NULL);
+  if (plugin)
+  {
+    FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+  }
+
+  plugin = FChatPlugin->pluginManager()->getPlugins("IStanzaProcessor").value(0,NULL);
   if (plugin) 
   {
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
     if (FStanzaProcessor)
     {
       FPresenceHandler = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionIn,SHP_MULTIUSERCHAT,FStreamJid);
-      if (FMessenger == NULL)
+      if (FMessageProcessor == NULL)
         FMessageHandler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE,IStanzaProcessor::DirectionIn,SHP_MULTIUSERCHAT,FStreamJid);
     }
   }
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->getPlugins("IPresencePlugin").value(0,NULL);
   if (plugin) 
   {
     IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -767,7 +773,7 @@ bool MultiUserChat::initialize(IPluginManager *APluginManager)
     }
   }
 
-  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->getPlugins("IXmppStreams").value(0,NULL);
   if (plugin) 
   {
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -783,19 +789,17 @@ bool MultiUserChat::initialize(IPluginManager *APluginManager)
     }
   }
 
-  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->getPlugins("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-  if (FMessenger)
+  if (FMessageProcessor)
   {
-    connect(FMessenger->instance(),SIGNAL(messageReceive(Message &)),SLOT(onMessageReceive(Message &)));
-    connect(FMessenger->instance(),SIGNAL(messageReceived(const Message &)),SLOT(onMessageReceived(const Message &)));
-    connect(FMessenger->instance(),SIGNAL(messageSend(Message &)),SLOT(onMessageSend(Message &)));
-    connect(FMessenger->instance(),SIGNAL(messageSent(const Message &)),SLOT(onMessageSent(const Message &)));
+    connect(FMessageProcessor->instance(),SIGNAL(messageReceive(Message &)),SLOT(onMessageReceive(Message &)));
+    connect(FMessageProcessor->instance(),SIGNAL(messageReceived(const Message &)),SLOT(onMessageReceived(const Message &)));
+    connect(FMessageProcessor->instance(),SIGNAL(messageSend(Message &)),SLOT(onMessageSend(Message &)));
+    connect(FMessageProcessor->instance(),SIGNAL(messageSent(const Message &)),SLOT(onMessageSent(const Message &)));
   }
-  
-  return FStanzaProcessor!=NULL && FXmppStream != NULL;
 }
 
 void MultiUserChat::clearUsers()

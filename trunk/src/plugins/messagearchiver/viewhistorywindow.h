@@ -9,7 +9,7 @@
 #include "../../definations/menuicons.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
-#include "../../interfaces/imessenger.h"
+#include "../../interfaces/imessagewidgets.h"
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/imessagearchiver.h"
@@ -112,7 +112,7 @@ private:
   IRoster *FRoster;
   IViewWidget *FViewWidget;
   IToolBarWidget *FMessagesTools;
-  IMessenger *FMessenger;
+  IMessageWidgets *FMessageWidgets;
   ISettings *FSettings;
   IStatusIcons *FStatusIcons;
   IMessageArchiver *FArchiver;
