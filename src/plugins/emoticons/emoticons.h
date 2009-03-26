@@ -12,7 +12,8 @@
 #include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iemoticons.h"
-#include "../../interfaces/imessenger.h"
+#include "../../interfaces/imessageprocessor.h"
+#include "../../interfaces/imessagewidgets.h"
 #include "../../interfaces/isettings.h"
 #include "../../utils/iconstorage.h"
 #include "../../utils/menu.h"
@@ -25,11 +26,11 @@ class Emoticons :
   public IPlugin,
   public IEmoticons,
   public IMessageWriter,
-  public IResourceLoader,
+  public IMessageResource,
   public IOptionsHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IEmoticons IMessageWriter IResourceLoader IOptionsHolder);
+  Q_INTERFACES(IPlugin IEmoticons IMessageWriter IMessageResource IOptionsHolder);
 public:
   Emoticons();
   ~Emoticons();
@@ -44,8 +45,8 @@ public:
   //IMessageWriter
   virtual void writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
   virtual void writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
-  //IResourceLoader
-  virtual void loadResource(int AType, const QUrl &AName, QVariant &AValue);
+  //IMessageResource
+  virtual void loadTextResource(int AType, const QUrl &AName, QVariant &AValue);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IEmoticons
@@ -77,7 +78,8 @@ protected slots:
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();
 private:
-  IMessenger *FMessenger;
+  IMessageWidgets *FMessageWidgets;
+  IMessageProcessor *FMessageProcessor;
   ISettingsPlugin *FSettingsPlugin;
 private:
   QPointer<EmoticonsOptions> FEmoticonsOptions;

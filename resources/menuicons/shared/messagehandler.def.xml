@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>messagehandlerNormal</key>
+    <object mime="image/png">messagehandlernormal.png</object>
+  </icon>
+  <icon>
+    <key>messagehandlerChat</key>
+    <object mime="image/png">messagehandlerchat.png</object>
+  </icon>
+</icondef>

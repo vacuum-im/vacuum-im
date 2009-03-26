@@ -48,7 +48,7 @@ MessageArchiver::MessageArchiver()
   FRostersViewPlugin = NULL;
   FDiscovery = NULL;
   FDataForms = NULL;
-  FMessenger = NULL;
+  FMessageWidgets = NULL;
   FSessionNegotioation = NULL;
   FRosterPlugin = NULL;
 }
@@ -137,9 +137,9 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IMessenger").value(0,NULL);
+  plugin = APluginManager->getPlugins("IMessageWidgets").value(0,NULL);
   if (plugin)
-    FMessenger = qobject_cast<IMessenger *>(plugin->instance());
+    FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("ISessionNegotiation").value(0,NULL);
   if (plugin)
@@ -2219,7 +2219,7 @@ void MessageArchiver::registerDiscoFeatures()
 
 void MessageArchiver::notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const
 {
-  IChatWindow *window = FMessenger!=NULL ? FMessenger->findChatWindow(AStreamJid,AContactJid) : NULL;
+  IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
   if (window)
   {
     QString html = QString("<span style='color:green;'>*** %1</span>").arg(AMessage);

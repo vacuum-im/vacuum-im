@@ -193,7 +193,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>You are invited to the conference %1 by %2.&lt;br&gt;Reason: %3</source>
-        <translation>%1 приглашает вас в конференцию %2. &lt;br&gt;Причина: %3</translation>
+        <translation>%2 приглашает вас в конференцию %1. &lt;br&gt;Причина: %3</translation>
     </message>
     <message>
         <source>Do you want to join this conference?</source>

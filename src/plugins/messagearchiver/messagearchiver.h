@@ -14,7 +14,7 @@
 #include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessagearchiver.h"
-#include "../../interfaces/imessenger.h"
+#include "../../interfaces/imessagewidgets.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/isettings.h"
@@ -203,7 +203,7 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   IServiceDiscovery *FDiscovery;
   IDataForms *FDataForms;
-  IMessenger *FMessenger;
+  IMessageWidgets *FMessageWidgets;
   ISessionNegotiation *FSessionNegotioation;
   IRosterPlugin *FRosterPlugin;
 private:

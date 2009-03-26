@@ -12,8 +12,10 @@
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../definations/soundfiles.h"
-#include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/imultiuserchat.h"
+#include "../../interfaces/imessagewidgets.h"
+#include "../../interfaces/imessageprocessor.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/ipresence.h"
@@ -63,21 +65,18 @@ public:
   //IDataLocalizer
   virtual IDataFormLocale dataFormLocale(const QString &AFormType);
   //IMessageHandler
-  virtual bool openWindow(IRosterIndex * /*AIndex*/) { return false; }
-  virtual bool openWindow(const Jid &/*AStreamJid*/, const Jid &/*AContactJid*/, Message::MessageType /*AType*/) { return false; }
   virtual bool checkMessage(const Message &AMessage);
-  virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
   virtual void receiveMessage(int AMessageId);
   virtual void showMessage(int AMessageId);
+  virtual bool openWindow(const Jid &/*AStreamJid*/, const Jid &/*AContactJid*/, Message::MessageType /*AType*/) { return false; }
+  virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
   //IMultiUserChatPlugin
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
   virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);
-  virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, 
-    const QString &APassword, bool ADedicated = false);
+  virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,const QString &APassword);
   virtual QList<IMultiUserChat *> multiUserChats() const { return FChats; }
   virtual IMultiUserChat *multiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const;
-  virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, 
-    const QString &APassword);
+  virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
   virtual QList<IMultiUserChatWindow *> multiChatWindows() const { return FChatWindows; }
   virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const;
   virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
@@ -109,7 +108,8 @@ protected slots:
   void onInviteActionTriggered(bool);
 private:
   IPluginManager *FPluginManager;
-  IMessenger *FMessenger;
+  IMessageWidgets *FMessageWidgets;
+  IMessageProcessor *FMessageProcessor;
   IRostersViewPlugin *FRostersViewPlugin;
   IMainWindowPlugin *FMainWindowPlugin;
   ITrayManager *FTrayManager;

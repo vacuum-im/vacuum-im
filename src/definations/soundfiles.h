@@ -1,9 +1,9 @@
 #ifndef DEF_SOUNDFILES_H
 #define DEF_SOUNDFILES_H
 
-//Messenger
-#define SDF_MESSENGER_CHAT                "messengerChat"
-#define SDF_MESSENGER_NORMAL              "messengerNormal"
+//Messagehandler
+#define SDF_MESSAGEHANDLER_CHAT           "messagehandlerChat"
+#define SDF_MESSAGEHANDLER_NORMAL         "messagehandlerNormal"
 
 //MultiUserChat
 #define SDF_MUC_MESSAGE                   "mucMessage"

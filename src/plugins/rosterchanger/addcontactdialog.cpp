@@ -12,7 +12,7 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManage
   
   FRoster = NULL;
   FVcardPlugin = NULL;
-  FMessenger = NULL;
+  FMessageProcessor = NULL;
   FResolving = false;
 
   FRosterChanger = ARosterChanger;
@@ -109,23 +109,23 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
     }
   }
 
-  plugin = APluginManager->getPlugins("IMessenger").value(0,NULL);
+  plugin = APluginManager->getPlugins("IMessageProcessor").value(0,NULL);
   if (plugin)
   {
-    FMessenger = qobject_cast<IMessenger *>(plugin->instance());
-    if (FMessenger)
+    FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+    if (FMessageProcessor)
     {
       FShowChat = new Action(FToolBarChanger->toolBar());
       FShowChat->setText(tr("Chat"));
       FShowChat->setToolTip(tr("Open chat window"));
-      FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_CHAT);
+      FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSAGEHANDLER_CHAT);
       FToolBarChanger->addAction(FShowChat,AG_ACDT_ROSTERCHANGER_ACTIONS);
       connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
       FSendMessage = new Action(FToolBarChanger->toolBar());
       FSendMessage->setText(tr("Message"));
       FSendMessage->setToolTip(tr("Send Message"));
-      FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSENGER_NORMAL);
+      FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSAGEHANDLER_NORMAL);
       FToolBarChanger->addAction(FSendMessage,AG_ACDT_ROSTERCHANGER_ACTIONS);
       connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
     }
@@ -189,11 +189,11 @@ void AddContactDialog::onToolBarActionTriggered(bool)
   {
     if (action == FShowChat)
     {
-      FMessenger->openWindow(FStreamJid,contactJid(),Message::Chat);
+      FMessageProcessor->openWindow(FStreamJid,contactJid(),Message::Chat);
     }
     else if (action == FSendMessage)
     {
-      FMessenger->openWindow(FStreamJid,contactJid(),Message::Normal);
+      FMessageProcessor->openWindow(FStreamJid,contactJid(),Message::Normal);
     }
     else if (action == FShowVCard)
     {

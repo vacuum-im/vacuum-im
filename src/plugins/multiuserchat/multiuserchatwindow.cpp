@@ -16,7 +16,7 @@
 
 #define NICK_MENU_KEY               Qt::ControlModifier+Qt::Key_Space
 
-MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMessenger *AMessenger, IMultiUserChat *AMultiChat)
+MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat)
 {
   ui.setupUi(this);
   ui.lblRoom->setText(AMultiChat->roomJid().hFull());
@@ -25,81 +25,26 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMes
 
   FSettings = NULL;
   FStatusIcons = NULL;
+  FMessageWidgets = NULL;
+  FMessageProcessor = NULL;
 
-  FMessenger = AMessenger;
   FMultiChat = AMultiChat;
   FChatPlugin = AChatPlugin;
   FMultiChat->instance()->setParent(this);
 
+  FViewWidget = NULL;
+  FEditWidget = NULL;
+  FToolBarWidget = NULL;
   FSplitterLoaded = false;
   FDestroyOnChatClosed = false;
 
-  FViewWidget = FMessenger->newViewWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
-  FViewWidget->setShowKind(IViewWidget::GroupChatMessage);
-  FViewWidget->document()->setDefaultFont(FMessenger->defaultChatFont());
-  ui.wdtView->setLayout(new QVBoxLayout);
-  ui.wdtView->layout()->addWidget(FViewWidget);
-  ui.wdtView->layout()->setMargin(0);
-  ui.wdtView->layout()->setSpacing(0);
-
-  FEditWidget = FMessenger->newEditWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
-  FEditWidget->document()->setDefaultFont(FMessenger->defaultChatFont());
-  ui.wdtEdit->setLayout(new QVBoxLayout);
-  ui.wdtEdit->layout()->addWidget(FEditWidget);
-  ui.wdtEdit->layout()->setMargin(0);
-  ui.wdtEdit->layout()->setSpacing(0);
-  connect(FEditWidget,SIGNAL(messageReady()),SLOT(onMessageSend()));
-  connect(FEditWidget,SIGNAL(messageAboutToBeSend()),SLOT(onMessageAboutToBeSend()));
-  connect(FEditWidget,SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onEditWidgetKeyEvent(QKeyEvent *,bool &)));
-
-  FToolBarWidget = FMessenger->newToolBarWidget(NULL,FViewWidget,FEditWidget,NULL);
-  ui.wdtToolBar->setLayout(new QVBoxLayout);
-  ui.wdtToolBar->layout()->addWidget(FToolBarWidget);
-  ui.wdtToolBar->layout()->setMargin(0);
-  ui.wdtToolBar->layout()->setSpacing(0);
-
-  connect(FMultiChat->instance(),SIGNAL(chatOpened()),SLOT(onChatOpened()));
-  connect(FMultiChat->instance(),SIGNAL(chatNotify(const QString &, const QString &)),
-    SLOT(onChatNotify(const QString &, const QString &)));
-  connect(FMultiChat->instance(),SIGNAL(chatError(const QString &, const QString &)),
-    SLOT(onChatError(const QString &, const QString &)));
-  connect(FMultiChat->instance(),SIGNAL(chatClosed()),SLOT(onChatClosed()));
-  connect(FMultiChat->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
-    SLOT(onStreamJidChanged(const Jid &, const Jid &)));
-  connect(FMultiChat->instance(),SIGNAL(userPresence(IMultiUser *,int,const QString &)),
-    SLOT(onUserPresence(IMultiUser *,int,const QString &)));
-  connect(FMultiChat->instance(),SIGNAL(userDataChanged(IMultiUser *, int, const QVariant, const QVariant &)),
-    SLOT(onUserDataChanged(IMultiUser *, int, const QVariant, const QVariant &)));
-  connect(FMultiChat->instance(),SIGNAL(userNickChanged(IMultiUser *, const QString &, const QString &)),
-    SLOT(onUserNickChanged(IMultiUser *, const QString &, const QString &)));
-  connect(FMultiChat->instance(),SIGNAL(presenceChanged(int, const QString &)),
-    SLOT(onPresenceChanged(int, const QString &)));
-  connect(FMultiChat->instance(),SIGNAL(subjectChanged(const QString &, const QString &)),
-    SLOT(onSubjectChanged(const QString &, const QString &)));
-  connect(FMultiChat->instance(),SIGNAL(serviceMessageReceived(const Message &)),
-    SLOT(onServiceMessageReceived(const Message &)));
-  connect(FMultiChat->instance(),SIGNAL(messageReceived(const QString &, const Message &)),
-    SLOT(onMessageReceived(const QString &, const Message &)));
-  connect(FMultiChat->instance(),SIGNAL(inviteDeclined(const Jid &, const QString &)),
-    SLOT(onInviteDeclined(const Jid &, const QString &)));
-  connect(FMultiChat->instance(),SIGNAL(userKicked(const QString &, const QString &, const QString &)),
-    SLOT(onUserKicked(const QString &, const QString &, const QString &)));
-  connect(FMultiChat->instance(),SIGNAL(userBanned(const QString &, const QString &, const QString &)),
-    SLOT(onUserBanned(const QString &, const QString &, const QString &)));
-  connect(FMultiChat->instance(),SIGNAL(affiliationListReceived(const QString &,const QList<IMultiUserListItem> &)),
-    SLOT(onAffiliationListReceived(const QString &,const QList<IMultiUserListItem> &)));
-  connect(FMultiChat->instance(),SIGNAL(configFormReceived(const IDataForm &)), SLOT(onConfigFormReceived(const IDataForm &)));
-  connect(FMultiChat->instance(),SIGNAL(roomDestroyed(const QString &)), SLOT(onRoomDestroyed(const QString &)));
-
-  connect(FMessenger->instance(),SIGNAL(defaultChatFontChanged(const QFont &)), SLOT(onDefaultChatFontChanged(const QFont &)));
-
-  connect(ui.ltwUsers,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
-
-  connect(this,SIGNAL(windowActivated()),SLOT(onWindowActivated()));
-
   initialize();
+  connectMultiChat();
   createMenuBarActions();
   createRoomUtilsActions();
+
+  connect(ui.ltwUsers,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
+  connect(this,SIGNAL(windowActivated()),SLOT(onWindowActivated()));
 }
 
 MultiUserChatWindow::~MultiUserChatWindow()
@@ -111,15 +56,17 @@ MultiUserChatWindow::~MultiUserChatWindow()
   foreach(IChatWindow *window,chatWindows)
     delete window->instance();
 
-  FMessenger->removeMessageHandler(this,MHO_MULTIUSERCHAT);
+  if (FMessageProcessor)
+    FMessageProcessor->removeMessageHandler(this,MHO_MULTIUSERCHAT);
+
   emit windowDestroyed();
 }
 
 void MultiUserChatWindow::showWindow()
 {
-  if (isWindow() && !isVisible() && FMessenger->checkOption(IMessenger::UseTabWindow))
+  if (isWindow() && !isVisible() && FMessageWidgets && FMessageWidgets->checkOption(IMessageWidgets::UseTabWindow))
   {
-    ITabWindow *tabWindow = FMessenger->openTabWindow();
+    ITabWindow *tabWindow = FMessageWidgets->openTabWindow();
     tabWindow->addWidget(this);
   }
   if (isWindow())
@@ -136,9 +83,71 @@ void MultiUserChatWindow::closeWindow()
     emit windowClose();
 }
 
-bool MultiUserChatWindow::openWindow(IRosterIndex * /*AIndex*/)
+bool MultiUserChatWindow::checkMessage(const Message &AMessage)
 {
-  return false;
+  return (streamJid() == AMessage.to()) && (roomJid() && AMessage.from());
+}
+
+void MultiUserChatWindow::receiveMessage(int AMessageId)
+{
+  Message message = FMessageProcessor->messageById(AMessageId);
+  Jid contactJid = message.from();
+
+  if (message.type() == Message::Error)
+  {
+    FMessageProcessor->removeMessage(AMessageId);
+  }
+  else if (contactJid.resource().isEmpty() && !message.stanza().firstElement("x",NS_JABBER_DATA).isNull())
+  {
+    IDataForm form = FDataForms->dataForm(message.stanza().firstElement("x",NS_JABBER_DATA));
+    IDataDialogWidget *dialog = FDataForms->dialogWidget(form,this);
+    connect(dialog->instance(),SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
+    showServiceMessage(tr("Data form received: %1").arg(form.title));
+    FDataFormMessages.insert(AMessageId,dialog);
+  }
+  else if (message.type() == Message::GroupChat)
+  {
+    if (!isActive())
+    {
+      FActiveMessages.append(AMessageId);
+      updateWindow();
+    }
+    else
+      FMessageProcessor->removeMessage(AMessageId);
+  }
+  else
+  {
+    IChatWindow *window = getChatWindow(contactJid);
+    if (window)
+    {
+      if (!window->isActive())
+      {
+        FActiveChatMessages.insertMulti(window, AMessageId);
+        updateChatWindow(window);
+        updateListItem(contactJid);
+      }
+      else
+        FMessageProcessor->removeMessage(AMessageId);
+    }
+  }
+}
+
+void MultiUserChatWindow::showMessage(int AMessageId)
+{
+  if (FDataFormMessages.contains(AMessageId))
+  {
+    IDataDialogWidget *dialog = FDataFormMessages.take(AMessageId);
+    if(dialog)
+    {
+      dialog->instance()->show();
+      FMessageProcessor->removeMessage(AMessageId);
+    }
+  }
+  else
+  {
+    Message message = FMessageProcessor->messageById(AMessageId);
+    openWindow(message.to(),message.from(),message.type());
+  }
 }
 
 bool MultiUserChatWindow::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
@@ -156,11 +165,6 @@ bool MultiUserChatWindow::openWindow(const Jid &AStreamJid, const Jid &AContactJ
     return true;
   }
   return false;
-}
-
-bool MultiUserChatWindow::checkMessage(const Message &AMessage)
-{
-  return (streamJid() == AMessage.to()) && (roomJid() && AMessage.from());
 }
 
 INotification MultiUserChatWindow::notification(INotifications *ANotifications, const Message &AMessage)
@@ -217,68 +221,6 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
   return notify;
 }
 
-void MultiUserChatWindow::receiveMessage(int AMessageId)
-{
-  Message message = FMessenger->messageById(AMessageId);
-  Jid contactJid = message.from();
-
-  if (message.type() == Message::Error)
-  {
-    FMessenger->removeMessage(AMessageId);
-  }
-  else if (contactJid.resource().isEmpty() && !message.stanza().firstElement("x",NS_JABBER_DATA).isNull())
-  {
-    IDataForm form = FDataForms->dataForm(message.stanza().firstElement("x",NS_JABBER_DATA));
-    IDataDialogWidget *dialog = FDataForms->dialogWidget(form,this);
-    connect(dialog->instance(),SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
-    showServiceMessage(tr("Data form received: %1").arg(form.title));
-    FDataFormMessages.insert(AMessageId,dialog);
-  }
-  else if (message.type() == Message::GroupChat)
-  {
-    if (!isActive())
-    {
-      FActiveMessages.append(AMessageId);
-      updateWindow();
-    }
-    else
-      FMessenger->removeMessage(AMessageId);
-  }
-  else
-  {
-    IChatWindow *window = getChatWindow(contactJid);
-    if (window)
-    {
-      if (!window->isActive())
-      {
-        FActiveChatMessages.insertMulti(window, AMessageId);
-        updateChatWindow(window);
-        updateListItem(contactJid);
-      }
-      else
-        FMessenger->removeMessage(AMessageId);
-    }
-  }
-}
-
-void MultiUserChatWindow::showMessage(int AMessageId)
-{
-  if (FDataFormMessages.contains(AMessageId))
-  {
-    IDataDialogWidget *dialog = FDataFormMessages.take(AMessageId);
-    if(dialog)
-    {
-      dialog->instance()->show();
-      FMessenger->removeMessage(AMessageId);
-    }
-  }
-  else
-  {
-    Message message = FMessenger->messageById(AMessageId);
-    openWindow(message.to(),message.from(),message.type());
-  }
-}
-
 IChatWindow *MultiUserChatWindow::openChatWindow(const Jid &AContactJid)
 {
   IChatWindow *window = getChatWindow(AContactJid);
@@ -311,7 +253,7 @@ void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 
 void MultiUserChatWindow::initialize()
 {
-  IPlugin *plugin = FMessenger->pluginManager()->getPlugins("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = FChatPlugin->pluginManager()->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -321,7 +263,7 @@ void MultiUserChatWindow::initialize()
     }
   }
 
-  plugin = FMessenger->pluginManager()->getPlugins("IStatusIcons").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->getPlugins("IStatusIcons").value(0,NULL);
   if (plugin)
   {
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
@@ -331,7 +273,7 @@ void MultiUserChatWindow::initialize()
     }
   }
 
-  plugin = FMessenger->pluginManager()->getPlugins("IAccountManager").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->getPlugins("IAccountManager").value(0,NULL);
   if (plugin)
   {
     IAccountManager *accountManager = qobject_cast<IAccountManager *>(plugin->instance());
@@ -347,13 +289,95 @@ void MultiUserChatWindow::initialize()
     }
   }
 
-  plugin = FMessenger->pluginManager()->getPlugins("IDataForms").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->getPlugins("IDataForms").value(0,NULL);
   if (plugin)
   {
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
   }
 
-  FMessenger->insertMessageHandler(this,MHO_MULTIUSERCHAT);
+  plugin = FChatPlugin->pluginManager()->getPlugins("IMessageWidgets").value(0,NULL);
+  if (plugin)
+  {
+    FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
+    if (FMessageWidgets)
+    {
+      createMessageWidgets();
+      connect(FMessageWidgets->instance(),SIGNAL(defaultChatFontChanged(const QFont &)), SLOT(onDefaultChatFontChanged(const QFont &)));
+    }
+  }
+
+  plugin = FChatPlugin->pluginManager()->getPlugins("IMessageProcessor").value(0,NULL);
+  if (plugin)
+  {
+    FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+    if (FMessageProcessor)
+    {
+      FMessageProcessor->insertMessageHandler(this,MHO_MULTIUSERCHAT);
+    }
+  }
+}
+
+void MultiUserChatWindow::connectMultiChat()
+{
+  connect(FMultiChat->instance(),SIGNAL(chatOpened()),SLOT(onChatOpened()));
+  connect(FMultiChat->instance(),SIGNAL(chatNotify(const QString &, const QString &)),
+    SLOT(onChatNotify(const QString &, const QString &)));
+  connect(FMultiChat->instance(),SIGNAL(chatError(const QString &, const QString &)),
+    SLOT(onChatError(const QString &, const QString &)));
+  connect(FMultiChat->instance(),SIGNAL(chatClosed()),SLOT(onChatClosed()));
+  connect(FMultiChat->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
+    SLOT(onStreamJidChanged(const Jid &, const Jid &)));
+  connect(FMultiChat->instance(),SIGNAL(userPresence(IMultiUser *,int,const QString &)),
+    SLOT(onUserPresence(IMultiUser *,int,const QString &)));
+  connect(FMultiChat->instance(),SIGNAL(userDataChanged(IMultiUser *, int, const QVariant, const QVariant &)),
+    SLOT(onUserDataChanged(IMultiUser *, int, const QVariant, const QVariant &)));
+  connect(FMultiChat->instance(),SIGNAL(userNickChanged(IMultiUser *, const QString &, const QString &)),
+    SLOT(onUserNickChanged(IMultiUser *, const QString &, const QString &)));
+  connect(FMultiChat->instance(),SIGNAL(presenceChanged(int, const QString &)),
+    SLOT(onPresenceChanged(int, const QString &)));
+  connect(FMultiChat->instance(),SIGNAL(subjectChanged(const QString &, const QString &)),
+    SLOT(onSubjectChanged(const QString &, const QString &)));
+  connect(FMultiChat->instance(),SIGNAL(serviceMessageReceived(const Message &)),
+    SLOT(onServiceMessageReceived(const Message &)));
+  connect(FMultiChat->instance(),SIGNAL(messageReceived(const QString &, const Message &)),
+    SLOT(onMessageReceived(const QString &, const Message &)));
+  connect(FMultiChat->instance(),SIGNAL(inviteDeclined(const Jid &, const QString &)),
+    SLOT(onInviteDeclined(const Jid &, const QString &)));
+  connect(FMultiChat->instance(),SIGNAL(userKicked(const QString &, const QString &, const QString &)),
+    SLOT(onUserKicked(const QString &, const QString &, const QString &)));
+  connect(FMultiChat->instance(),SIGNAL(userBanned(const QString &, const QString &, const QString &)),
+    SLOT(onUserBanned(const QString &, const QString &, const QString &)));
+  connect(FMultiChat->instance(),SIGNAL(affiliationListReceived(const QString &,const QList<IMultiUserListItem> &)),
+    SLOT(onAffiliationListReceived(const QString &,const QList<IMultiUserListItem> &)));
+  connect(FMultiChat->instance(),SIGNAL(configFormReceived(const IDataForm &)), SLOT(onConfigFormReceived(const IDataForm &)));
+  connect(FMultiChat->instance(),SIGNAL(roomDestroyed(const QString &)), SLOT(onRoomDestroyed(const QString &)));
+}
+
+void MultiUserChatWindow::createMessageWidgets()
+{
+  FViewWidget = FMessageWidgets->newViewWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
+  FViewWidget->setShowKind(IViewWidget::GroupChatMessage);
+  FViewWidget->document()->setDefaultFont(FMessageWidgets->defaultChatFont());
+  ui.wdtView->setLayout(new QVBoxLayout);
+  ui.wdtView->layout()->addWidget(FViewWidget->instance());
+  ui.wdtView->layout()->setMargin(0);
+  ui.wdtView->layout()->setSpacing(0);
+
+  FEditWidget = FMessageWidgets->newEditWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
+  FEditWidget->document()->setDefaultFont(FMessageWidgets->defaultChatFont());
+  ui.wdtEdit->setLayout(new QVBoxLayout);
+  ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
+  ui.wdtEdit->layout()->setMargin(0);
+  ui.wdtEdit->layout()->setSpacing(0);
+  connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageSend()));
+  connect(FEditWidget->instance(),SIGNAL(messageAboutToBeSend()),SLOT(onMessageAboutToBeSend()));
+  connect(FEditWidget->instance(),SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onEditWidgetKeyEvent(QKeyEvent *,bool &)));
+
+  FToolBarWidget = FMessageWidgets->newToolBarWidget(NULL,FViewWidget,FEditWidget,NULL);
+  ui.wdtToolBar->setLayout(new QVBoxLayout);
+  ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
+  ui.wdtToolBar->layout()->setMargin(0);
+  ui.wdtToolBar->layout()->setSpacing(0);
 }
 
 void MultiUserChatWindow::createMenuBarActions()
@@ -386,7 +410,6 @@ void MultiUserChatWindow::createMenuBarActions()
   FQuitRoom->setShortcut(tr("Ctrl+X"));
   connect(FQuitRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FRoomMenu->addAction(FQuitRoom,AG_MURM_MULTIUSERCHAT_EXIT,true);
-
 
   FToolsMenu = new Menu(this);
   FToolsMenu->setTitle(tr("Tools"));
@@ -618,7 +641,7 @@ void MultiUserChatWindow::insertRoomUtilsActions(Menu *AMenu, IMultiUser *AUser)
 
 void MultiUserChatWindow::saveWindowState()
 {
-  if (FSettings)
+  if (FSettings && FMessageWidgets)
   {
     QString dataId = roomJid().pBare();
     if (isWindow() && isVisible())
@@ -630,16 +653,19 @@ void MultiUserChatWindow::saveWindowState()
 
 void MultiUserChatWindow::loadWindowState()
 {
-  QString dataId = roomJid().pBare();
-  if (isWindow())
-    restoreGeometry(FSettings->loadBinaryData(BDI_WINDOW_GEOMETRY+dataId));
-  if (!FSplitterLoaded)
+  if (FSettings && FMessageWidgets)
   {
-    ui.sprHSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_HSPLITTER+dataId));
-    ui.sprVSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_VSPLITTER+dataId));
-    FSplitterLoaded = true;
+    QString dataId = roomJid().pBare();
+    if (isWindow())
+      restoreGeometry(FSettings->loadBinaryData(BDI_WINDOW_GEOMETRY+dataId));
+    if (!FSplitterLoaded)
+    {
+      ui.sprHSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_HSPLITTER+dataId));
+      ui.sprVSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_VSPLITTER+dataId));
+      FSplitterLoaded = true;
+    }
+    FEditWidget->textEdit()->setFocus();
   }
-  FEditWidget->textEdit()->setFocus();
 }
 
 bool MultiUserChatWindow::showStatusCodes(const QString &ANick, const QList<int> &ACodes)
@@ -736,7 +762,10 @@ void MultiUserChatWindow::showServiceMessage(const QString &AMessage)
 
   QTextDocument doc;
   doc.setDefaultFont(FViewWidget->document()->defaultFont());
-  FMessenger->messageToText(&doc,message);
+  if (FMessageProcessor)
+    FMessageProcessor->messageToText(&doc,message);
+  else
+    doc.setPlainText(AMessage);
 
   QTextCursor cursor(&doc);
   cursor.select(QTextCursor::Document);
@@ -970,8 +999,9 @@ void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
 
 void MultiUserChatWindow::removeActiveMessages()
 {
-  foreach(int messageId, FActiveMessages)
-    FMessenger->removeMessage(messageId);
+  if (FMessageProcessor)
+    foreach(int messageId, FActiveMessages)
+      FMessageProcessor->removeMessage(messageId);
   FActiveMessages.clear();
   updateWindow();
 }
@@ -982,13 +1012,13 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
   IMultiUser *user = FMultiChat->userByNick(AContactJid.resource());
   if (user && user != FMultiChat->mainUser())
   {
-    window = FMessenger->newChatWindow(streamJid(),AContactJid);
+    window = FMessageWidgets!=NULL ? FMessageWidgets->newChatWindow(streamJid(),AContactJid) : NULL;
     if (window)
     {
-      connect(window,SIGNAL(messageReady()),SLOT(onChatMessageSend()));
-      connect(window,SIGNAL(windowActivated()),SLOT(onChatWindowActivated()));
-      connect(window,SIGNAL(windowClosed()),SLOT(onChatWindowClosed()));
-      connect(window,SIGNAL(windowDestroyed()),SLOT(onChatWindowDestroyed()));
+      connect(window->instance(),SIGNAL(messageReady()),SLOT(onChatMessageSend()));
+      connect(window->instance(),SIGNAL(windowActivated()),SLOT(onChatWindowActivated()));
+      connect(window->instance(),SIGNAL(windowClosed()),SLOT(onChatWindowClosed()));
+      connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onChatWindowDestroyed()));
       window->viewWidget()->setNickForJid(user->contactJid(),user->nickName());
       window->viewWidget()->setColorForJid(user->contactJid(),user->data(MUDR_VIEW_COLOR).value<QColor>());
       window->infoWidget()->setFieldAutoUpdated(IInfoWidget::ContactName,false);
@@ -1008,9 +1038,9 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 
 void MultiUserChatWindow::showChatWindow(IChatWindow *AWindow)
 {
-  if (AWindow->isWindow() && !AWindow->isVisible() && FMessenger->checkOption(IMessenger::UseTabWindow))
+  if (AWindow->instance()->isWindow() && !AWindow->instance()->isVisible() && FMessageWidgets->checkOption(IMessageWidgets::UseTabWindow))
   {
-    ITabWindow *tabWindow = FMessenger->openTabWindow();
+    ITabWindow *tabWindow = FMessageWidgets->openTabWindow();
     tabWindow->addWidget(AWindow);
   }
   AWindow->showWindow();
@@ -1021,8 +1051,9 @@ void MultiUserChatWindow::removeActiveChatMessages(IChatWindow *AWindow)
   if (FActiveChatMessages.contains(AWindow))
   {
     QList<int> messageIds = FActiveChatMessages.values(AWindow);
-    foreach(int messageId, messageIds)
-      FMessenger->removeMessage(messageId);
+    if (FMessageProcessor)
+      foreach(int messageId, messageIds)
+        FMessageProcessor->removeMessage(messageId);
     FActiveChatMessages.remove(AWindow);
     updateChatWindow(AWindow);
     updateListItem(AWindow->contactJid());
@@ -1085,7 +1116,7 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
       }
     }
   }
-  return IMultiUserChatWindow::eventFilter(AObject,AEvent);
+  return QMainWindow::eventFilter(AObject,AEvent);
 }
 
 void MultiUserChatWindow::onChatOpened()
@@ -1227,7 +1258,11 @@ void MultiUserChatWindow::onSubjectChanged(const QString &ANick, const QString &
 
   QTextDocument doc;
   doc.setDefaultFont(FViewWidget->document()->defaultFont());
-  FMessenger->messageToText(&doc,message);
+
+  if (FMessageProcessor)
+    FMessageProcessor->messageToText(&doc,message);
+  else
+    doc.setPlainText(ASubject);
 
   QTextCursor cursor(&doc);
   cursor.select(QTextCursor::Document);
@@ -1314,7 +1349,12 @@ void MultiUserChatWindow::onMessageSend()
   if (FMultiChat->isOpen())
   {
     Message message;
-    FMessenger->textToMessage(message,FEditWidget->document());
+
+    if (FMessageProcessor)
+      FMessageProcessor->textToMessage(message,FEditWidget->document());
+    else
+      message.setBody(FEditWidget->document()->toPlainText());
+
     if (!message.body().isEmpty() && FMultiChat->sendMessage(message))
       FEditWidget->clearEditor();
   }
@@ -1367,7 +1407,12 @@ void MultiUserChatWindow::onChatMessageSend()
   {
     Message message;
     message.setType(Message::Chat);
-    FMessenger->textToMessage(message,window->editWidget()->document());
+
+    if (FMessageProcessor)
+      FMessageProcessor->textToMessage(message,window->editWidget()->document());
+    else
+      message.setBody(window->editWidget()->document()->toPlainText());
+
     if (!message.body().isEmpty() && FMultiChat->sendMessage(message,window->contactJid().resource()))
     {
       window->viewWidget()->showMessage(message);
@@ -1387,7 +1432,7 @@ void MultiUserChatWindow::onChatWindowClosed()
 {
   IChatWindow *window = qobject_cast<IChatWindow *>(sender());
   if (FChatWindows.contains(window) && !FMultiChat->userByNick(window->contactJid().resource()))
-    window->deleteLater();
+    window->instance()->deleteLater();
 }
 
 void MultiUserChatWindow::onChatWindowDestroyed()

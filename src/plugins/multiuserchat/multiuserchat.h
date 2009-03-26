@@ -6,8 +6,9 @@
 #include "../../definations/stanzahandlerpriority.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/ixmppstreams.h"
+#include "../../interfaces/imessageprocessor.h"
 #include "../../interfaces/istanzaprocessor.h"
+#include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/ipresence.h"
 #include "multiuser.h"
 
@@ -20,7 +21,7 @@ class MultiUserChat :
   Q_OBJECT;
   Q_INTERFACES(IMultiUserChat IStanzaHandler IIqStanzaOwner);
 public:
-  MultiUserChat(IMultiUserChatPlugin *AChatPlugin, IMessenger *AMessenger, const Jid &AStreamJid, const Jid &ARoomJid, 
+  MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, 
     const QString &ANickName, const QString &APassword, QObject *AParent);
   ~MultiUserChat();
   virtual QObject *instance() { return this; }
@@ -102,7 +103,7 @@ protected:
   void prepareMessageForReceive(Message &AMessage);
   bool processMessage(const Stanza &AStanza);
   bool processPresence(const Stanza &AStanza);
-  bool initialize(IPluginManager *APluginManager);
+  void initialize();
   void clearUsers();
   void closeChat(int AShow, const QString &AStatus);
 protected slots:
@@ -116,7 +117,7 @@ protected slots:
   void onStreamClosed(IXmppStream *AXmppStream);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
 private:
-  IMessenger *FMessenger;
+  IMessageProcessor *FMessageProcessor;
   IPresence *FPresence;
   IDataForms *FDataForms;
   IXmppStream *FXmppStream;

@@ -28,4 +28,7 @@
 //Node = ON_MISC
 #define OWO_MISC                                  500
 
+//Node = ON_MESSAGES
+#define OWO_MESSAGES                              500
+
 #endif

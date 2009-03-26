@@ -70,7 +70,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   FRoster = NULL;
   FViewWidget = NULL;
   FSettings = NULL;
-  FMessenger = NULL;
+  FMessageWidgets = NULL;
   FGroupsTools = NULL;
   FStatusIcons = NULL;
   FMessagesTools = NULL;
@@ -259,19 +259,19 @@ void ViewHistoryWindow::initialize()
       connect(FRoster->xmppStream()->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
   }
 
-  plugin = manager->getPlugins("IMessenger").value(0);
+  plugin = manager->getPlugins("IMessageWidgets").value(0);
   if (plugin)
   {
-    FMessenger = qobject_cast<IMessenger *>(plugin->instance());
-    if (FMessenger)
+    FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
+    if (FMessageWidgets)
     {
-      FViewWidget = FMessenger->newViewWidget(FStreamJid,FStreamJid);
+      FViewWidget = FMessageWidgets->newViewWidget(FStreamJid,FStreamJid);
       FViewWidget->setColorForJid(FStreamJid.bare(),Qt::red);
-      FMessagesTools = FMessenger->newToolBarWidget(NULL,FViewWidget,NULL,NULL);
+      FMessagesTools = FMessageWidgets->newToolBarWidget(NULL,FViewWidget,NULL,NULL);
       QVBoxLayout *layout = new QVBoxLayout(ui.grbMessages);
       layout->setMargin(3);
-      layout->addWidget(FMessagesTools);
-      layout->addWidget(FViewWidget);
+      layout->addWidget(FMessagesTools->instance());
+      layout->addWidget(FViewWidget->instance());
       ui.grbMessages->setLayout(layout);
     }
   }

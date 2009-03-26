@@ -12,6 +12,8 @@
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../interfaces/imultiuserchat.h"
+#include "../../interfaces/imessagewidgets.h"
+#include "../../interfaces/imessageprocessor.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/isettings.h"
@@ -25,25 +27,25 @@
 #define PRIVATE_NOTIFICATOR_ID    "PrivateMessages"
 
 class MultiUserChatWindow : 
+  public QMainWindow,
   public IMultiUserChatWindow,
   public IMessageHandler
 {
   Q_OBJECT;
   Q_INTERFACES(IMultiUserChatWindow ITabWidget IMessageHandler);
 public:
-  MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMessenger *AMessenger, IMultiUserChat *AMultiChat);
+  MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat);
   ~MultiUserChatWindow();
+  virtual QMainWindow *instance() { return this; }
   //ITabWidget
-  virtual QWidget *instance() { return this; }
   virtual void showWindow();
   virtual void closeWindow();
   //IMessageHandler
-  virtual bool openWindow(IRosterIndex *AIndex);
-  virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   virtual bool checkMessage(const Message &AMessage);
-  virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
   virtual void receiveMessage(int AMessageId);
   virtual void showMessage(int AMessageId);
+  virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
+  virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
   //IMultiUserChatWindow
   virtual Jid streamJid() const { return FMultiChat->streamJid(); }
   virtual Jid roomJid() const { return FMultiChat->roomJid(); }
@@ -70,6 +72,8 @@ signals:
   virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 protected:
   void initialize();
+  void connectMultiChat();
+  void createMessageWidgets();
   void createMenuBarActions();
   void updateMenuBarActions();
   void createRoomUtilsActions();
@@ -144,7 +148,8 @@ protected slots:
 private:
   Ui::MultiUserChatWindowClass ui;
 private:
-  IMessenger *FMessenger;
+  IMessageWidgets *FMessageWidgets;
+  IMessageProcessor *FMessageProcessor;
   IDataForms *FDataForms;
   ISettings *FSettings;
   IStatusIcons *FStatusIcons;
