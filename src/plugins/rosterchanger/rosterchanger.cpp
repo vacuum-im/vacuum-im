@@ -242,8 +242,9 @@ bool RosterChanger::dropAction(const QDropEvent *AEvent, const QModelIndex &AInd
 
       int indexType = indexData.value(RDR_TYPE).toInt();
       Jid indexStreamJid = indexData.value(RDR_STREAM_JID).toString();
+      bool isNewContact = indexType==RIT_CONTACT && !roster->rosterItem(indexData.value(RDR_BARE_JID).toString()).isValid;
 
-      if (hoverStreamJid && indexStreamJid)
+      if (!isNewContact && (hoverStreamJid && indexStreamJid))
       {
         Action *copyAction = new Action(AMenu);
         copyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
@@ -292,7 +293,7 @@ bool RosterChanger::dropAction(const QDropEvent *AEvent, const QModelIndex &AInd
 
         if (indexType == RIT_CONTACT)
         {
-          copyAction->setText(tr("Copy contact"));
+          copyAction->setText(isNewContact ? tr("Add contact") : tr("Copy contact"));
           copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
           copyAction->setData(ADR_NICK,indexData.value(RDR_NAME));
           connect(copyAction,SIGNAL(triggered(bool)),SLOT(onAddItemToGroup(bool)));
