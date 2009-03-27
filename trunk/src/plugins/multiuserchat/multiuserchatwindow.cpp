@@ -170,21 +170,21 @@ bool MultiUserChatWindow::openWindow(const Jid &AStreamJid, const Jid &AContactJ
 INotification MultiUserChatWindow::notification(INotifications *ANotifications, const Message &AMessage)
 {
   INotification notify;
-  Jid contactJid = AMessage.from();
   if (AMessage.type() != Message::Error)
   {
+    Jid contactJid = AMessage.from();
     IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
     if (!contactJid.resource().isEmpty())
     {
       if (AMessage.type() == Message::GroupChat)
       {
-        if (!isActive())
+        if (!isActive() && AMessage.dateTime().secsTo(AMessage.createDateTime())<1)
         {
           notify.kinds = ANotifications->notificatorKinds(GROUP_NOTIFICATOR_ID);
           notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));
           notify.data.insert(NDR_TOOLTIP,tr("New message in conference: %1").arg(contactJid.node()));
           notify.data.insert(NDR_WINDOW_CAPTION,tr("Conference message"));
-          notify.data.insert(NDR_WINDOW_TITLE,tr("%1 from %2").arg(contactJid.resource()).arg(contactJid.node()));
+          notify.data.insert(NDR_WINDOW_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.node()));
           notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
           notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
         }
@@ -198,7 +198,7 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
           notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_PRIVATE_MESSAGE));
           notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(contactJid.resource()));
           notify.data.insert(NDR_WINDOW_CAPTION,tr("Private message"));
-          notify.data.insert(NDR_WINDOW_TITLE,contactJid.resource());
+          notify.data.insert(NDR_WINDOW_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.node()));
           notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
           notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
         }
@@ -208,11 +208,12 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
     {
       if (!AMessage.stanza().firstElement("x",NS_JABBER_DATA).isNull())
       {
-        notify.kinds = ANotifications->notificatorKinds(PRIVATE_NOTIFICATOR_ID);;
+        notify.kinds = ANotifications->notificatorKinds(PRIVATE_NOTIFICATOR_ID);
         notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_DATA_MESSAGE));
         notify.data.insert(NDR_TOOLTIP,tr("Data form received from: %1").arg(contactJid.node()));
         notify.data.insert(NDR_WINDOW_CAPTION,tr("Data form received"));
-        notify.data.insert(NDR_WINDOW_TITLE,contactJid.full());
+        notify.data.insert(NDR_WINDOW_TITLE,ANotifications->contactName(FMultiChat->streamJid(),contactJid));
+        notify.data.insert(NDR_WINDOW_IMAGE,ANotifications->contactAvatar(contactJid));
         notify.data.insert(NDR_WINDOW_TEXT,AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text());
         notify.data.insert(NDR_SOUND_FILE,SDF_MUC_DATA_MESSAGE);
       }
@@ -780,8 +781,8 @@ void MultiUserChatWindow::setViewColorForUser(IMultiUser *AUser)
 {
   if (FColorQueue.isEmpty())
   {
-    FColorQueue << Qt::blue << Qt::darkBlue << Qt::darkGreen << Qt::darkCyan << Qt::darkMagenta << Qt::darkYellow
-                << Qt::green << Qt::cyan << Qt::magenta << Qt::darkRed;
+    FColorQueue << Qt::blue << Qt::darkBlue << Qt::darkGreen << Qt::darkCyan << Qt::darkMagenta 
+                << Qt::darkYellow << Qt::green << Qt::cyan << Qt::magenta << Qt::darkRed;
   }
 
   QColor color;

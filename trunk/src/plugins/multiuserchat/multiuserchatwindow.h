@@ -190,13 +190,13 @@ private:
 private:
   bool FSplitterLoaded;
   bool FDestroyOnChatClosed;
-  QList<int> FActiveMessages;
-  QList<IChatWindow *> FChatWindows;
-  QMultiHash<IChatWindow *,int> FActiveChatMessages;
-  QHash<IMultiUser *, QListWidgetItem *> FUsers;
   QList<QColor> FColorQueue;
   QHash<QString,QString> FColorLastOwner;
+  QList<IChatWindow *> FChatWindows;
+  QList<int> FActiveMessages;
+  QMultiHash<IChatWindow *,int> FActiveChatMessages;
   QHash<int, IDataDialogWidget *> FDataFormMessages;
+  QHash<IMultiUser *, QListWidgetItem *> FUsers;
 };
 
 #endif // MULTIUSERCHATWINDOW_H
