@@ -922,6 +922,10 @@ Check values and try again</source>
         <source>Owner</source>
         <translation>Владелец</translation>
     </message>
+    <message>
+        <source>[%1] in conference %2</source>
+        <translation>[%1] в конференции %2</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindowClass</name>
