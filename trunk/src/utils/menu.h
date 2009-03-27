@@ -21,7 +21,7 @@ public:
   ~Menu();
   //QMenu
   Action *menuAction();
-  bool isEmpty() const { return FActions.isEmpty(); }
+  bool isEmpty() const;
   void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
   void removeAction(Action *AAction);
   void clear();

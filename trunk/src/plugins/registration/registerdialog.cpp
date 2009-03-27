@@ -2,6 +2,7 @@
 
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QTextDocument>
 
 RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid, 
                                const Jid &AServiceJid, int AOperation, QWidget *AParent) : QDialog(AParent)

@@ -32,6 +32,11 @@ bool ToolBarChanger::isEmpty() const
   return FToolBarMenu->isEmpty() && FWidgetActions.isEmpty();
 }
 
+bool ToolBarChanger::separatorsVisible() const
+{
+  return FSeparatorsVisible;
+}
+
 void ToolBarChanger::setSeparatorsVisible(bool ASeparatorsVisible)
 {
   FSeparatorsVisible = ASeparatorsVisible;
@@ -43,6 +48,11 @@ void ToolBarChanger::setManageVisibility(bool AManageVisibility)
 {
   FManageVisibility = AManageVisibility;
   updateVisible();
+}
+
+bool ToolBarChanger::manageVisibitily() const
+{
+  return FManageVisibility;
 }
 
 void ToolBarChanger::addAction(Action *AAction, int AGroup, bool ASort)

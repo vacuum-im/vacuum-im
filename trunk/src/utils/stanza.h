@@ -11,23 +11,12 @@ class StanzaData :
   public QSharedData
 {
 public:
-  StanzaData(const QString &ATagName) 
-  {
-    FDoc.appendChild(FDoc.createElement(ATagName));
-  };
-  StanzaData(const QDomElement &AElem) 
-  {
-    FDoc.appendChild(FDoc.importNode(AElem,true));  
-  };
-  StanzaData(const StanzaData &AOther) : QSharedData(AOther)
-  {
-    FDoc = AOther.FDoc.cloneNode(true).toDocument();
-  };
-  ~StanzaData() {};
+  StanzaData(const QString &ATagName);
+  StanzaData(const QDomElement &AElem);
+  StanzaData(const StanzaData &AOther);
 public:
   QDomDocument FDoc;
 };
-
 
 class UTILS_EXPORT Stanza
 {
@@ -35,48 +24,34 @@ public:
   Stanza(const QString &ATagName = "message");
   Stanza(const QDomElement &AElem);
   ~Stanza();
-
-  QDomDocument document() const { return d->FDoc; } 
-  QDomElement element() const { return d->FDoc.documentElement(); }
-
-  QString attribute(const QString &AName) const {
-    return d->FDoc.documentElement().attribute(AName); }
-  Stanza &setAttribute(const QString &AName, const QString &AValue) {
-    d->FDoc.documentElement().setAttribute(AName,AValue); return *this; }
-
-  QString tagName() const { return d->FDoc.documentElement().tagName(); }
-  Stanza &setTagName(const QString &ATagName) { 
-    d->FDoc.documentElement().setTagName(ATagName); return *this; }
-
-  QString type() const { return attribute("type"); }
-  Stanza &setType(const QString &AType) { setAttribute("type",AType); return *this; }
-
-  QString id() const { return attribute("id"); }
-  Stanza &setId(const QString &AId) { setAttribute("id",AId); return *this; }
-
-  QString to() const { return attribute("to"); }
-  Stanza &setTo(const QString &ATo) { setAttribute("to",ATo); return *this; }
-
-  QString from() const { return attribute("from"); }
-  Stanza &setFrom(const QString &AFrom) { setAttribute("from",AFrom); return *this; }
-
-  QString lang() const { return attribute("xml:lang"); }
-  Stanza &setLang(const QString &ALang) { setAttribute("xml:lang",ALang); return *this; }
-
-  QDomElement firstElement(const QString &ATagName = "", const QString ANamespace = "") const;
-  QDomElement addElement(const QString &ATagName, const QString &ANamespace = "");
-  QDomElement createElement(const QString &ATagName, const QString &ANamespace = "");
-  QDomText createTextNode(const QString &AData);
-
   bool isValid() const;
+  QDomDocument document() const; 
+  QDomElement element() const;
+  QString attribute(const QString &AName) const;
+  Stanza &setAttribute(const QString &AName, const QString &AValue);
+  QString tagName() const;
+  Stanza &setTagName(const QString &ATagName);
+  QString type() const;
+  Stanza &setType(const QString &AType);
+  QString id() const;
+  Stanza &setId(const QString &AId);
+  QString to() const;
+  Stanza &setTo(const QString &ATo);
+  QString from() const;
+  Stanza &setFrom(const QString &AFrom);
+  QString lang() const;
+  Stanza &setLang(const QString &ALang);
   bool canReplyError() const;
   Stanza replyError(const QString &ACondition, const QString &ANamespace = EHN_DEFAULT,
-    int ACode = ErrorHandler::SERVICE_UNAVAILABLE, const QString &AText = "") const;
-
-  QString toString(int AIndent = 1) const { return d->FDoc.toString(AIndent); }
+    int ACode = ErrorHandler::SERVICE_UNAVAILABLE, const QString &AText = QString::null) const;
+  QDomElement firstElement(const QString &ATagName = QString::null, const QString ANamespace = QString::null) const;
+  QDomElement addElement(const QString &ATagName, const QString &ANamespace = QString::null);
+  QDomElement createElement(const QString &ATagName, const QString &ANamespace = QString::null);
+  QDomText createTextNode(const QString &AData);
+  QString toString(int AIndent = 1) const;
   QByteArray toByteArray() const;
 private:
-  QSharedDataPointer<StanzaData> d;  
+  QSharedDataPointer<StanzaData> d;
 };
 
 Q_DECLARE_METATYPE(Stanza);

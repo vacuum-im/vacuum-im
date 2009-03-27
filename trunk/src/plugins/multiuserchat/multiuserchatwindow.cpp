@@ -178,7 +178,7 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
     {
       if (AMessage.type() == Message::GroupChat)
       {
-        if (!isActive() && AMessage.dateTime().secsTo(AMessage.createDateTime())<1)
+        if (!isActive() && !AMessage.isDelayed())
         {
           notify.kinds = ANotifications->notificatorKinds(GROUP_NOTIFICATOR_ID);
           notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));

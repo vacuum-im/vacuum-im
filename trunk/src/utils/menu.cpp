@@ -105,6 +105,11 @@ Action *Menu::menuAction()
   return FMenuAction;
 }
 
+bool Menu::isEmpty() const
+{
+  return FActions.isEmpty();
+}
+
 void Menu::setIcon(const QIcon &AIcon)
 {
   if (FMenuAction)

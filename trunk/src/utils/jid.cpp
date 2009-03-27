@@ -1,8 +1,32 @@
 #include "jid.h"
 
+#include <QTextDocument>
+
 QList<QChar> Jid::escChars = QList<QChar>()       << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40; // << 0x5c;
 QList<QString> Jid::escStrings = QList<QString>() <<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40"; //<<"\\5c";
 QHash<QString,Jid> Jid::FCache = QHash<QString,Jid>();
+
+JidData::JidData()
+{
+  FNodeValid = true;
+  FDomainValid = false;
+  FResourceValid = true;
+}
+
+JidData::JidData(const JidData &AOther) : QSharedData(AOther)
+{
+  FNode = AOther.FNode;
+  FEscNode = AOther.FEscNode;
+  FPrepNode = AOther.FPrepNode;
+  FDomain = AOther.FDomain;
+  FPrepDomain = AOther.FPrepDomain;
+  FResource = AOther.FResource;
+  FPrepResource = AOther.FPrepResource;
+  FNodeValid = AOther.FNodeValid;
+  FDomainValid = AOther.FDomainValid;
+  FResourceValid = AOther.FResourceValid;
+}
+
 
 Jid::Jid(const char *AJidStr)
 {
@@ -82,9 +106,89 @@ void Jid::setResource(const QString &AResource)
     d->FResourceValid = true;
 }
 
+QString Jid::node() const
+{
+  return d->FNode;
+}
+
+QString Jid::hNode() const
+{
+  return Qt::escape(d->FEscNode);
+}
+
+QString Jid::eNode() const
+{
+  return d->FEscNode;
+}
+
+QString Jid::pNode() const
+{
+  return d->FPrepNode;
+}
+
+QString Jid::domain() const
+{
+  return d->FDomain;
+}
+
+QString Jid::pDomain() const
+{
+  return d->FPrepDomain;
+}
+
+QString Jid::resource() const
+{
+  return d->FResource;
+}
+
+QString Jid::pResource() const
+{
+  return d->FPrepResource;
+}
+
 Jid Jid::prepared() const
 {
   return Jid(d->FPrepNode,d->FPrepDomain,d->FPrepResource);  
+}
+
+QString Jid::full() const
+{
+  return toString(false,false,true);
+}
+
+QString Jid::bare() const
+{
+  return toString(false,false,false);
+}
+
+QString Jid::hFull() const
+{
+  return Qt::escape(toString(false,false,true));
+}
+
+QString Jid::hBare() const
+{
+  return Qt::escape(toString(false,false,false));
+}
+
+QString Jid::eFull() const
+{
+  return toString(true,false,true);
+}
+
+QString Jid::eBare() const
+{
+  return toString(true,false,false);
+}
+
+QString Jid::pFull() const
+{
+  return toString(false,true,true);
+}
+
+QString Jid::pBare() const
+{
+  return toString(false,true,false);
 }
 
 Jid& Jid::operator=(const QString &AJidStr)
@@ -285,7 +389,7 @@ QString Jid::stringPrepare(const Stringprep_profile *AProfile, const QString &AS
     if (stringprep(buffer.data(),buffer.capacity(),(Stringprep_profile_flags)0, AProfile) == STRINGPREP_OK)
       return QString::fromUtf8(buffer.constData());
   }
-  return QString("");
+  return QString::null;
 }
 
 QString Jid::nodePrepare(const QString &ANode)
@@ -321,9 +425,9 @@ Jid &Jid::parseString(const QString &AJidStr)
     }
     else
     {
-      setNode("");
-      setDomain("");
-      setResource("");
+      setNode(QString::null);
+      setDomain(QString::null);
+      setResource(QString::null);
     }
     FCache.insert(AJidStr,*this);
   }
@@ -361,3 +465,4 @@ uint qHash(const Jid &key)
 {
   return qHash(key.pFull()); 
 }
+

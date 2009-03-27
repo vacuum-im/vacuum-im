@@ -28,7 +28,7 @@ public:
   Action(QObject *AParent = NULL);
   ~Action();
   //QAction
-  Menu *menu() const { return FMenu; }
+  Menu *menu() const;
   void setMenu(Menu *AMenu);
   void setIcon(const QIcon &AIcon);
   void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);

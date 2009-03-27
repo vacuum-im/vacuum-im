@@ -1,5 +1,7 @@
 #include "addlegacycontactdialog.h"
 
+#include <QTextDocument>
+
 AddLegacyContactDialog::AddLegacyContactDialog(IGateways *AGateways, IRosterChanger *ARosterChanger, const Jid &AStreamJid,
                                                const Jid &AServiceJid, QWidget *AParent) : QDialog(AParent)
 {

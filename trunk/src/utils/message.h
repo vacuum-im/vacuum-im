@@ -1,10 +1,11 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include <QSharedData>
+#include <QVariant>
+#include <QMetaType>
 #include <QDateTime>
 #include <QStringList>
-#include <QVariant>
+#include <QSharedData>
 #include "utilsexport.h"
 #include "stanza.h"
 #include "datetime.h"
@@ -13,44 +14,16 @@ class MessageData :
   public QSharedData
 {
 public:
-  MessageData() : FStanza("message") 
-  {
-    FDateTime = delayedDateTime();
-    FCreateDateTime = QDateTime::currentDateTime();
-  };
-  MessageData(const Stanza &AStanza) : FStanza(AStanza) 
-  {
-    FDateTime = delayedDateTime();
-    FCreateDateTime = QDateTime::currentDateTime();
-  };
-  MessageData(const MessageData &AOther) : QSharedData(AOther), FStanza(AOther.FStanza)
-  {
-    FDateTime = AOther.FDateTime;
-    FCreateDateTime = AOther.FCreateDateTime;
-    FData = AOther.FData;
-  };
-  ~MessageData() {};
+  MessageData();
+  MessageData(const Stanza &AStanza);
+  MessageData(const MessageData &AOther);
 protected:
-  QDateTime delayedDateTime() const
-  {
-    QDomElement delayElem = FStanza.firstElement("x","urn:xmpp:delay");
-    if (delayElem.isNull())
-      delayElem = FStanza.firstElement("x","jabber:x:delay");
-    if (!delayElem.isNull())
-    {
-      DateTime dateTime(delayElem.attribute("stamp"));
-      if (dateTime.isValid())
-        return dateTime.toLocal();
-    }
-    return QDateTime::currentDateTime();
-  }
+  void updateDateTime();
 public:
   Stanza FStanza;
   QDateTime FDateTime;
-  QDateTime FCreateDateTime;
   QHash<int, QVariant> FData;
 };
-
 
 class UTILS_EXPORT Message 
 {
@@ -68,43 +41,41 @@ public:
   Message();
   Message(const Stanza &AStanza);
   ~Message();
-
-  Stanza &stanza() { return d->FStanza; }
-  const Stanza &stanza() const { return d->FStanza; }
-  Message &setStanza(const Stanza &AStanza) { d->FStanza = AStanza; return *this; }
-  QVariant data(int ARole) const { return d->FData.value(ARole); }
+  Stanza &stanza();
+  const Stanza &stanza() const;
+  Message &setStanza(const Stanza &AStanza);
+  QVariant data(int ARole) const;
   void setData(int ARole, const QVariant &AData);
   void setData(const QHash<int, QVariant> &AData);
-  QString id() const { return d->FStanza.id(); }
-  Message &setId(const QString &AId) { d->FStanza.setId(AId); return *this; }
-  QString from() const { return d->FStanza.from(); }
-  Message &setFrom(const QString &AFrom) { d->FStanza.setFrom(AFrom); return *this; }
-  QString to() const { return d->FStanza.to(); }
-  Message &setTo(const QString &ATo) { d->FStanza.setTo(ATo); return *this; }
-  QString defLang() const { return d->FStanza.lang(); }
-  Message &setDefLang(const QString &ALang) { d->FStanza.setLang(ALang); return *this; }
+  QString id() const;
+  Message &setId(const QString &AId);
+  QString from() const;
+  Message &setFrom(const QString &AFrom);
+  QString to() const;
+  Message &setTo(const QString &ATo);
+  QString defLang() const;
+  Message &setDefLang(const QString &ALang);
   MessageType type() const;
   Message &setType(MessageType AType);
-  QDateTime createDateTime() const;
+  bool isDelayed() const;
   QDateTime dateTime() const;
-  Message &setDateTime(const QDateTime &ADateTime);
-  QStringList subjectLangs() const { return availableLangs(d->FStanza.element(),"subject"); }
-  QString subject(const QString &ALang = QString()) const;
-  Message &setSubject(const QString &ASubject, const QString &ALang = QString());
-  QStringList bodyLangs() const { return availableLangs(d->FStanza.element(),"body"); }
-  QString body(const QString &ALang = QString()) const;
-  Message &setBody(const QString &ABody, const QString &ALang = QString());
+  Message &setDateTime(const QDateTime &ADateTime, bool ADelayed = false);
+  QStringList subjectLangs() const;
+  QString subject(const QString &ALang = QString::null) const;
+  Message &setSubject(const QString &ASubject, const QString &ALang = QString::null);
+  QStringList bodyLangs() const;
+  QString body(const QString &ALang = QString::null) const;
+  Message &setBody(const QString &ABody, const QString &ALang = QString::null);
   QString threadId() const;
   Message &setThreadId(const QString &AThreadId);
   QStringList availableLangs(const QDomElement &AParent, const QString &ATagName) const;
   QDomElement findChidByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang) const;
-  QDomElement addChildByLang(const QDomElement &AParent, const QString &ATagName, 
-    const QString &ALang, const QString &AText);
+  QDomElement addChildByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang, const QString &AText);
   bool operator<(const Message &AOther) const;
 protected:
-  QDomElement setTextToElem(QDomElement &AElem, const QString &AText);
+  QDomElement setTextToElem(QDomElement &AElem, const QString &AText) const;
 private:
-  QSharedDataPointer<MessageData> d;  
+  QSharedDataPointer<MessageData> d;
 };
 
 Q_DECLARE_METATYPE(Message);

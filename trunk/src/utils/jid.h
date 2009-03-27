@@ -6,7 +6,6 @@
 #include <QString>
 #include <QMetaType>
 #include <QSharedData>
-#include <QTextDocument>
 #include "utilsexport.h"
 #include "../thirdparty/idn/stringprep.h"
 
@@ -14,25 +13,8 @@ class JidData :
   public QSharedData
 {
 public:
-  JidData() {
-    FNodeValid = true;
-    FDomainValid = false;
-    FResourceValid = true;
-  };
-  JidData(const JidData &AOther) : QSharedData(AOther)
-  {
-    FNode = AOther.FNode;
-    FEscNode = AOther.FEscNode;
-    FPrepNode = AOther.FPrepNode;
-    FDomain = AOther.FDomain;
-    FPrepDomain = AOther.FPrepDomain;
-    FResource = AOther.FResource;
-    FPrepResource = AOther.FPrepResource;
-    FNodeValid = AOther.FNodeValid;
-    FDomainValid = AOther.FDomainValid;
-    FResourceValid = AOther.FResourceValid;
-  };
-  ~JidData() {};
+  JidData();
+  JidData(const JidData &AOther);
 public:
   QString FNode, FEscNode, FPrepNode;
   QString FDomain, FPrepDomain;
@@ -44,35 +26,31 @@ class UTILS_EXPORT Jid
 {
 public:
   Jid(const char *AJidStr);
-  Jid(const QString &AJidStr = QString());
+  Jid(const QString &AJidStr = QString::null);
   Jid(const QString &ANode, const QString &ADomane, const QString &AResource);
   ~Jid();
-
-  bool isValid() const;
-  bool isEmpty() const;
-
-  QString node() const { return d->FNode; }
-  QString hNode() const { return Qt::escape(d->FEscNode); }
-  QString eNode() const { return d->FEscNode; }
-  QString pNode() const { return d->FPrepNode; }
+  inline bool isValid() const;
+  inline bool isEmpty() const;
+  inline QString node() const;
+  inline QString hNode() const;
+  inline QString eNode() const;
+  inline QString pNode() const;
   void setNode(const QString &ANode);
-  QString domain() const { return d->FDomain; }
-  QString pDomain() const { return d->FPrepDomain; }
+  inline QString domain() const;
+  inline QString pDomain() const;
   void setDomain(const QString &ADomain);
-  QString resource() const { return d->FResource; }
-  QString pResource() const { return d->FPrepResource; }
+  inline QString resource() const;
+  inline QString pResource() const;
   void setResource(const QString &AResource);
-
   Jid prepared() const;
-  QString full() const { return toString(false,false,true); }
-  QString bare() const { return toString(false,false,false); }
-  QString hFull() const { return Qt::escape(toString(false,false,true)); }
-  QString hBare() const { return Qt::escape(toString(false,false,false)); }
-  QString eFull() const { return toString(true,false,true); }
-  QString eBare() const { return toString(true,false,false); }
-  QString pFull() const { return toString(false,true,true); }
-  QString pBare() const { return toString(false,true,false); }
-
+  QString full() const;
+  QString bare() const;
+  QString hFull() const;
+  QString hBare() const;
+  QString eFull() const;
+  QString eBare() const;
+  QString pFull() const;
+  QString pBare() const;
   Jid& operator =(const QString &AJidStr);
   bool operator ==(const Jid &AJid) const;
   bool operator ==(const QString &AJidStr) const;

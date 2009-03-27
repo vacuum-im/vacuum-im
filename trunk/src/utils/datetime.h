@@ -9,17 +9,8 @@ class DateTimeData :
   public QSharedData
 {
 public:
-  DateTimeData(const QDateTime &AUTC, int ATZD)
-  {
-    tzd = ATZD;
-    utc = AUTC;
-    utc.setTimeSpec(Qt::UTC);
-  }
-  DateTimeData(const DateTimeData &AOther) : QSharedData(AOther)
-  {
-    tzd = AOther.tzd;
-    utc = AOther.utc;
-  }
+  DateTimeData(const QDateTime &AUTC, int ATZD);
+  DateTimeData(const DateTimeData &AOther);
 public:
   int tzd;
   QDateTime utc;
@@ -31,16 +22,13 @@ public:
   DateTime(const QString &AX85DateTime);
   DateTime(const QDateTime &ADateTime=QDateTime(), Qt::TimeSpec ASpec=Qt::LocalTime);
   ~DateTime();
-
   bool isNull() const;
   bool isValid() const;
-
   int timeZone() const;
   void setTimeZone(int ASecs);
   QDateTime utcDateTime() const;
   void setUTCDateTime(const QDateTime &AUTCDateTime);
   void setDateTime(const QString &AX85DateTime);
-  
   QDateTime toUTC() const;
   QDateTime toLocal() const;
   QDateTime toRemote() const;
@@ -54,7 +42,7 @@ public:
   static QDateTime utcFromX85(const QString &AX85DateTime);
   static int tzdFromX85(const QString &AX85DateTime);
 private:
-  QSharedDataPointer<DateTimeData> d;  
+  QSharedDataPointer<DateTimeData> d;
 };
 
 #endif // DATETIME_H

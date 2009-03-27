@@ -1,5 +1,38 @@
 #include "message.h"
 
+MessageData::MessageData() : FStanza("message")
+{
+  FDateTime = QDateTime::currentDateTime();
+}
+
+MessageData::MessageData(const Stanza &AStanza)
+{
+  FStanza = AStanza;
+  updateDateTime();
+}
+
+MessageData::MessageData(const MessageData &AOther) : QSharedData(AOther)
+{
+  FData = AOther.FData;
+  FStanza = AOther.FStanza;
+  FDateTime = AOther.FDateTime;
+}
+
+void MessageData::updateDateTime()
+{
+  FDateTime = QDateTime::currentDateTime();
+
+  QDomElement delayElem = FStanza.firstElement("x","urn:xmpp:delay");
+  if (delayElem.isNull())
+    delayElem = FStanza.firstElement("x","jabber:x:delay");
+  if (!delayElem.isNull())
+  {
+    DateTime dateTime(delayElem.attribute("stamp"));
+    if (dateTime.isValid())
+      FDateTime = dateTime.toLocal();
+  }
+}
+
 Message::Message()
 {
   d = new MessageData;
@@ -13,6 +46,26 @@ Message::Message(const Stanza &AStanza)
 Message::~Message()
 {
 
+}
+
+Stanza & Message::stanza()
+{
+  return d->FStanza;
+}
+
+const Stanza &Message::stanza() const
+{
+  return d->FStanza;
+}
+
+Message & Message::setStanza(const Stanza &AStanza)
+{
+  d->FStanza = AStanza; return *this;
+}
+
+QVariant Message::data(int ARole)  const
+{
+  return d->FData.value(ARole);
 }
 
 void Message::setData(int ARole, const QVariant &AData)
@@ -35,6 +88,49 @@ void Message::setData(const QHash<int, QVariant> &AData)
     setData(it.key(),it.value());
     it++;
   }
+}
+
+QString Message::id() const
+{
+  return d->FStanza.id();
+}
+
+Message &Message::setId(const QString &AId)
+{
+  d->FStanza.setId(AId); return *this;
+}
+
+QString Message::from() const
+{
+  return d->FStanza.from();
+}
+
+Message &Message::setFrom(const QString &AFrom)
+{
+  d->FStanza.setFrom(AFrom); 
+  return *this;
+}
+
+QString Message::to() const
+{
+  return d->FStanza.to();
+}
+
+Message &Message::setTo(const QString &ATo)
+{
+  d->FStanza.setTo(ATo); 
+  return *this;
+}
+
+QString Message::defLang() const
+{
+  return d->FStanza.lang();
+}
+
+Message &Message::setDefLang(const QString &ALang)
+{
+  d->FStanza.setLang(ALang); 
+  return *this;
 }
 
 Message::MessageType Message::type() const
@@ -76,9 +172,9 @@ Message &Message::setType(MessageType AType)
   return *this;
 }
 
-QDateTime Message::createDateTime() const
+bool Message::isDelayed() const
 {
-  return d->FCreateDateTime;
+  return !d->FStanza.firstElement("x","urn:xmpp:delay").isNull() || !d->FStanza.firstElement("x","jabber:x:delay").isNull();
 }
 
 QDateTime Message::dateTime() const
@@ -86,10 +182,24 @@ QDateTime Message::dateTime() const
   return d->FDateTime;
 }
 
-Message &Message::setDateTime(const QDateTime &ADateTime)
+Message &Message::setDateTime(const QDateTime &ADateTime, bool ADelayed)
 {
   d->FDateTime = ADateTime;
+  if (ADelayed)
+  {
+    QDomElement elem = d->FStanza.firstElement("x","urn:xmpp:delay");
+    if (elem.isNull())
+      QDomElement elem = d->FStanza.firstElement("x","jabber:x:delay");
+    if (elem.isNull())
+      elem = d->FStanza.addElement("x","urn:xmpp:delay");
+    elem.setAttribute("stamp",DateTime(ADateTime).toX85UTC());
+  }
   return *this;
+}
+
+QStringList Message::subjectLangs() const
+{
+  return availableLangs(d->FStanza.element(),"subject");
 }
 
 QString Message::subject(const QString &ALang) const
@@ -101,6 +211,11 @@ Message &Message::setSubject(const QString &ASubject, const QString &ALang)
 {
   addChildByLang(d->FStanza.element(),"subject",ALang,ASubject);
   return *this;
+}
+
+QStringList Message::bodyLangs() const
+{
+  return availableLangs(d->FStanza.element(),"body");
 }
 
 QString Message::body(const QString &ALang) const
@@ -181,7 +296,7 @@ bool Message::operator<(const Message &AOther) const
   return dateTime()<AOther.dateTime();
 }
 
-QDomElement Message::setTextToElem(QDomElement &AElem, const QString &AText)
+QDomElement Message::setTextToElem(QDomElement &AElem, const QString &AText) const
 {
   if (!AElem.isNull())
   {
@@ -189,7 +304,7 @@ QDomElement Message::setTextToElem(QDomElement &AElem, const QString &AText)
     while (!node.isNull() && !node.isText())
       node = node.nextSibling();
     if (node.isNull() && !AText.isEmpty())
-      AElem.appendChild(d->FStanza.createTextNode(AText));
+      AElem.appendChild(AElem.ownerDocument().createTextNode(AText));
     else if (!node.isNull() && !AText.isNull())
       node.toText().setData(AText);
     else if (!node.isNull())

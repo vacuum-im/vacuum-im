@@ -1,5 +1,7 @@
 #include "errorhandler.h"
 
+#include <QApplication>
+
 QMultiHash<QString, ErrorHandler::ErrorItem *> ErrorHandler::FItemByNS;
 
 ErrorHandler::ErrorHandler() 

@@ -13,6 +13,11 @@ Action::~Action()
   emit actionDestroyed(this);
 }
 
+Menu *Action::menu() const
+{
+  return FMenu;
+}
+
 void Action::setMenu(Menu *AMenu)
 {
   if (FMenu)

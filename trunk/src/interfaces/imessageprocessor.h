@@ -1,6 +1,7 @@
 #ifndef IMESSAGEPROCESSOR_H
 #define IMESSAGEPROCESSOR_H
 
+#include <QTextDocument>
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/inotifications.h"
 #include "../../utils/jid.h"

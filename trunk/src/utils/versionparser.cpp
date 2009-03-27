@@ -36,6 +36,26 @@ VersionParser::~VersionParser()
 
 }
 
+qint16 VersionParser::major() const
+{
+  return FMajor;
+}
+
+qint16 VersionParser::minor() const
+{
+  return FMinor;
+}
+
+qint16 VersionParser::release() const
+{
+  return FRelease;
+}
+
+qint16 VersionParser::build() const
+{
+  return FBuild;
+}
+
 qint64 VersionParser::version() const
 {
   qint64 ver;
@@ -101,3 +121,4 @@ bool VersionParser::operator >=(const VersionParser &AVersion) const
 {
   return version() >= AVersion.version(); 
 }
+

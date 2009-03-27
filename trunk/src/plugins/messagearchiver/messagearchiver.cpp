@@ -1854,7 +1854,7 @@ bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, b
     return false;
   if (AMessage.type()==Message::GroupChat && !ADirectionIn)
     return false;
-  if (AMessage.type()==Message::GroupChat && AMessage.dateTime()<AMessage.createDateTime())
+  if (AMessage.type()==Message::GroupChat && AMessage.isDelayed())
     return false;
 
   QString contactJid = ADirectionIn ? AMessage.from() : AMessage.to();
