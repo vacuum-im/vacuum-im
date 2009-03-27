@@ -2,8 +2,9 @@
 
 #include <QTimer>
 #include <QLineEdit>
-#include <QInputDialog>
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QTextDocument>
 
 #define DR_NAME       Qt::UserRole
 #define DR_INDEX      Qt::UserRole+1

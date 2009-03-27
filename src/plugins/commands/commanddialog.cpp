@@ -1,6 +1,7 @@
 #include "commanddialog.h"
 
 #include <QMessageBox>
+#include <QTextDocument>
 
 CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid ACommandJid, 
                              const QString &ANode, QWidget *AParent)  : QDialog(AParent)

@@ -2,7 +2,6 @@
 #define ERRORHANDLER_H
 
 #include <QList>
-#include <QApplication>
 #include <QMultiHash>
 #include <QDomDocument>
 #include "utilsexport.h"
@@ -89,8 +88,6 @@ public:
 protected:
   static void init();
 private:
-  static QMultiHash<QString, ErrorHandler::ErrorItem *> FItemByNS;
-private:
   QString   FNsURI;
   ErrorType FType;
   int			  FCode;
@@ -98,6 +95,8 @@ private:
   QString   FMeaning;
   QString   FText;
   QString   FContext;
+private:
+  static QMultiHash<QString, ErrorHandler::ErrorItem *> FItemByNS;
 };
 
 #endif // ERRORHANDLER_H

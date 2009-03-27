@@ -1,5 +1,29 @@
 #include "unzipfile.h"
 
+UnzipFileData::UnzipFileData()
+{
+  FUNZFile = NULL;
+  FFilesReaded = false;
+}
+
+UnzipFileData::UnzipFileData(const UnzipFileData &AOther) : QSharedData(AOther)
+{
+  if (AOther.FUNZFile)
+    FUNZFile = unzOpen(QFile::encodeName(FZipFileName));
+  else
+    FUNZFile = NULL;
+  FFilesReaded = AOther.FFilesReaded;
+  FZipFileName = AOther.FZipFileName;
+  FZippedFiles = AOther.FZippedFiles;
+}
+
+UnzipFileData::~UnzipFileData()
+{
+  if (FUNZFile)
+    unzClose(FUNZFile);
+  qDeleteAll(FZippedFiles);
+}
+
 
 UnzipFile::UnzipFile()
 {
@@ -102,3 +126,4 @@ QByteArray UnzipFile::loadZippedFileData(const QString &AFileName) const
   }
   return QByteArray();
 }
+

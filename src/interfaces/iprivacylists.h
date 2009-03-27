@@ -1,6 +1,7 @@
 #ifndef IPRIVACYLISTS_H
 #define IPRIVACYLISTS_H
 
+#include <QDialog>
 #include "../interfaces/iroster.h"
 #include "../utils/jid.h"
 

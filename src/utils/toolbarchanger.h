@@ -15,9 +15,9 @@ public:
   ToolBarChanger(QToolBar *AToolBar);
   ~ToolBarChanger();
   bool isEmpty() const;
-  bool separatorsVisible() const { return FSeparatorsVisible; }
+  bool separatorsVisible() const;
   void setSeparatorsVisible(bool ASeparatorsVisible);
-  bool manageVisibitily() const { return FManageVisibility; }
+  bool manageVisibitily() const;
   void setManageVisibility(bool AManageVisibility);
   QToolBar *toolBar() const { return FToolBar; }
   void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);

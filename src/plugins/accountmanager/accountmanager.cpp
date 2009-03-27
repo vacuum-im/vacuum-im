@@ -4,6 +4,7 @@
 #include <QIcon>
 #include <QTime>
 #include <QMessageBox>
+#include <QTextDocument>
 
 #define SVN_ACCOUNT                 "account[]"
 #define SVN_ACCOUNT_ACTIVE          SVN_ACCOUNT":"AVN_ACTIVE

@@ -1,12 +1,13 @@
 #include "editstatusdialog.h"
 
-#include <QHeaderView>
-#include <QTableWidgetItem>
-#include <QComboBox>
 #include <QSpinBox>
+#include <QComboBox>
 #include <QLineEdit>
-#include <QInputDialog>
+#include <QHeaderView>
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QTextDocument>
+#include <QTableWidgetItem>
 
 #define TIR_STATUSID    Qt::UserRole
 #define TIR_DELEGATE    Qt::UserRole + 1

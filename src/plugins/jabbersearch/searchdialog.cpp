@@ -2,6 +2,7 @@
 
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QTextDocument>
 
 #define CJID                    0
 #define CFIRST                  1

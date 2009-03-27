@@ -13,33 +13,15 @@ class UnzipFileData :
   public QSharedData
 {
 public:
+  UnzipFileData();
+  UnzipFileData(const UnzipFileData &AOther);
+  ~UnzipFileData();
+public:
   struct ZippedFile {
     QString name;
     unsigned long size;
     QByteArray data;
   };
-public:
-  UnzipFileData()
-  {
-    FUNZFile = NULL;
-    FFilesReaded = false;
-  }
-  UnzipFileData(const UnzipFileData &AOther) : QSharedData(AOther)
-  {
-    if (AOther.FUNZFile)
-      FUNZFile = unzOpen(QFile::encodeName(FZipFileName));
-    else
-      FUNZFile = NULL;
-    FFilesReaded = AOther.FFilesReaded;
-    FZipFileName = AOther.FZipFileName;
-    FZippedFiles = AOther.FZippedFiles;
-  }
-  ~UnzipFileData()
-  { 
-    if (FUNZFile)
-      unzClose(FUNZFile);
-    qDeleteAll(FZippedFiles);
-  }
 public:
   bool FFilesReaded;
   unzFile FUNZFile;    

@@ -3,6 +3,20 @@
 #include <QRegExp>
 #include <QStringList>
 
+DateTimeData::DateTimeData(const QDateTime &AUTC, int ATZD)
+{
+  tzd = ATZD;
+  utc = AUTC;
+  utc.setTimeSpec(Qt::UTC);
+}
+
+DateTimeData::DateTimeData(const DateTimeData &AOther) : QSharedData(AOther)
+{
+  tzd = AOther.tzd;
+  utc = AOther.utc;
+}
+
+
 DateTime::DateTime(const QString &AX85DateTime)
 {
   d = new DateTimeData(utcFromX85(AX85DateTime),tzdFromX85(AX85DateTime));
@@ -177,4 +191,5 @@ int DateTime::tzdFromX85(const QString &AX85DateTime)
   }
   return tzd;
 }
+
 

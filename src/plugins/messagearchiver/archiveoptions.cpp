@@ -1,11 +1,11 @@
 #include "archiveoptions.h"
 
-#include <QDebug>
-#include <QHeaderView>
 #include <QLineEdit>
-#include <QIntValidator>
-#include <QInputDialog>
+#include <QHeaderView>
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QIntValidator>
+#include <QTextDocument>
 
 #define ONE_DAY           (24*60*60)
 #define ONE_MONTH         (ONE_DAY*31)
