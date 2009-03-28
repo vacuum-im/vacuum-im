@@ -63,49 +63,6 @@ bool Jid::isEmpty() const
   return d->FNode.isEmpty() && d->FDomain.isEmpty() && d->FResource.isEmpty();
 }
 
-void Jid::setNode(const QString &ANode)
-{
-  d->FNode = unescape106(ANode);
-  d->FEscNode = escape106(d->FNode);
-  d->FPrepNode = nodePrepare(d->FEscNode);
-
-  if (!d->FEscNode.isEmpty() && d->FPrepNode.isEmpty())
-  {
-    d->FNodeValid = false;
-    d->FPrepNode = d->FEscNode;
-  }
-  else
-    d->FNodeValid = true;
-}
-
-void Jid::setDomain(const QString &ADomain)
-{
-  d->FDomain = ADomain;
-  d->FPrepDomain = domainPrepare(ADomain);
-
-  if (d->FPrepDomain.isEmpty())
-  {
-    d->FDomainValid = false;
-    d->FPrepDomain = d->FDomain;
-  }
-  else
-    d->FDomainValid = true;
-}
-
-void Jid::setResource(const QString &AResource)
-{
-  d->FResource = AResource;
-  d->FPrepResource = resourcePrepare(AResource);
-
-  if (!d->FResource.isEmpty() && d->FPrepResource.isEmpty())
-  {
-    d->FResourceValid = false;
-    d->FPrepResource = d->FResource;
-  }
-  else
-    d->FResourceValid = true;
-}
-
 QString Jid::node() const
 {
   return d->FNode;
@@ -126,6 +83,21 @@ QString Jid::pNode() const
   return d->FPrepNode;
 }
 
+void Jid::setNode(const QString &ANode)
+{
+  d->FNode = unescape106(ANode);
+  d->FEscNode = escape106(d->FNode);
+  d->FPrepNode = nodePrepare(d->FEscNode);
+
+  if (!d->FEscNode.isEmpty() && d->FPrepNode.isEmpty())
+  {
+    d->FNodeValid = false;
+    d->FPrepNode = d->FEscNode;
+  }
+  else
+    d->FNodeValid = true;
+}
+
 QString Jid::domain() const
 {
   return d->FDomain;
@@ -136,6 +108,20 @@ QString Jid::pDomain() const
   return d->FPrepDomain;
 }
 
+void Jid::setDomain(const QString &ADomain)
+{
+  d->FDomain = ADomain;
+  d->FPrepDomain = domainPrepare(ADomain);
+
+  if (d->FPrepDomain.isEmpty())
+  {
+    d->FDomainValid = false;
+    d->FPrepDomain = d->FDomain;
+  }
+  else
+    d->FDomainValid = true;
+}
+
 QString Jid::resource() const
 {
   return d->FResource;
@@ -144,6 +130,20 @@ QString Jid::resource() const
 QString Jid::pResource() const
 {
   return d->FPrepResource;
+}
+
+void Jid::setResource(const QString &AResource)
+{
+  d->FResource = AResource;
+  d->FPrepResource = resourcePrepare(AResource);
+
+  if (!d->FResource.isEmpty() && d->FPrepResource.isEmpty())
+  {
+    d->FResourceValid = false;
+    d->FPrepResource = d->FResource;
+  }
+  else
+    d->FResourceValid = true;
 }
 
 Jid Jid::prepared() const

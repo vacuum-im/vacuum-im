@@ -62,7 +62,6 @@ public:
   ErrorHandler(const QString &ACondition, int ACode, const QString &ANsURI = EHN_DEFAULT);
   ErrorHandler(const QDomElement &AElem, const QString &ANsURI = EHN_DEFAULT);
   ~ErrorHandler();
-
   ErrorType type() const { return FType; }
   int code() const { return FCode; }
   QString condition() const { return FCondition; }
