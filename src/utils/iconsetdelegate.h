@@ -3,8 +3,8 @@
 
 #include <QHash>
 #include <QPainter>
-#include <QItemDelegate>
 #include <QModelIndex>
+#include <QItemDelegate>
 #include "utilsexport.h"
 #include "iconstorage.h"
 
