@@ -1,5 +1,7 @@
-#ifndef MESSAGEHANDLER_H
-#define MESSAGEHANDLER_H
+#ifndef CHATMESSAGEHANDLER_H
+#define CHATMESSAGEHANDLER_H
+
+#define CHATMESSAGEHANDLER_UUID "{b60cc0e4-8006-4909-b926-fcb3cbc506f0}"
 
 #include "../../definations/messagehandlerorders.h"
 #include "../../definations/rosterindextyperole.h"
@@ -11,18 +13,17 @@
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../definations/soundfiles.h"
+#include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessageprocessor.h"
 #include "../../interfaces/imessagewidgets.h"
 #include "../../interfaces/imessagearchiver.h"
 #include "../../interfaces/inotifications.h"
 #include "../../interfaces/istatusicons.h"
-#include "../../interfaces/ipresence.h"
 #include "../../interfaces/irostersview.h"
+#include "../../interfaces/ipresence.h"
 #include "../../interfaces/ivcard.h"
 
-#define MESSAGEHANDLER_UUID "{f118ccf4-8535-4302-8fda-0f6487c6db01}"
-
-class MessageHandler : 
+class ChatMessageHandler : 
   public QObject,
   public IPlugin,
   public IMessageHandler,
@@ -31,11 +32,11 @@ class MessageHandler :
   Q_OBJECT;
   Q_INTERFACES(IPlugin IMessageHandler IRostersClickHooker);
 public:
-  MessageHandler();
-  ~MessageHandler();
+  ChatMessageHandler();
+  ~ChatMessageHandler();
   //IPlugin
   virtual QObject *instance() { return this; }
-  virtual QUuid pluginUuid() const { return MESSAGEHANDLER_UUID; }
+  virtual QUuid pluginUuid() const { return CHATMESSAGEHANDLER_UUID; }
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
@@ -50,12 +51,6 @@ public:
   virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
 protected:
-  IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
-  IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid);
-  void showMessageWindow(IMessageWindow *AWindow);
-  void showNextNormalMessage(IMessageWindow *AWindow);
-  void loadActiveNormalMessages(IMessageWindow *AWindow);
-  void updateMessageWindow(IMessageWindow *AWindow);
   IChatWindow *getChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
   IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
   void showChatHistory(IChatWindow *AWindow);
@@ -67,12 +62,6 @@ protected slots:
   void onChatWindowActivated();
   void onChatInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
   void onChatWindowDestroyed();
-  void onMessageWindowSend();
-  void onMessageWindowShowNext();
-  void onMessageWindowReply();
-  void onMessageWindowForward();
-  void onMessageWindowShowChat();
-  void onMessageWindowDestroyed();
   void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
   void onStatusIconsChanged();
   void onVCardChanged(const Jid &AContactJid);
@@ -88,9 +77,7 @@ private:
   IRostersView *FRostersView;
 private:
   QList<IChatWindow *> FChatWindows;
-  QList<IMessageWindow *> FMessageWindows;
   QMultiHash<IChatWindow *,int> FActiveChatMessages;
-  QMultiHash<IMessageWindow *, int> FActiveNormalMessages;
 };
 
-#endif // MESSAGEHANDLER_H
+#endif // CHATMESSAGEHANDLER_H

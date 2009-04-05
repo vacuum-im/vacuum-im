@@ -17,7 +17,8 @@ SUBDIRS = settings \
           privatestorage \
           messageprocessor \
           messagewidgets \
-          messagehandler \
+          normalmessagehandler \
+          chatmessagehandler \
           compress \
           connectionmanager \
           defaultconnection \

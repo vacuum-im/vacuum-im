@@ -17,7 +17,8 @@
 #define AG_MWTTB_ROSTERSEARCH                                   900
 
 //RostersView - ContextMenu
-#define AG_RVCM_MESSAGEHANDLER                                  200
+#define AG_RVCM_CHATMESSAGEHANDLER                              200
+#define AG_RVCM_NORMALMESSAGEHANDLER                            200
 #define AG_RVCM_STATUSCHANGER                                   300
 #define AG_RVCM_GATEWAYS_LOGIN                                  350
 #define AG_RVCM_CLIENTINFO                                      400

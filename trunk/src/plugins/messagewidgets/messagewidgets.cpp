@@ -72,7 +72,7 @@ bool MessageWidgets::initObjects()
 {
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"),tr("Message window options"),MNI_MESSAGEHANDLER_NORMAL,ONO_MESSAGES);
+    FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"),tr("Message window options"),MNI_NORMAL_MHANDLER_MESSAGE,ONO_MESSAGES);
     FSettingsPlugin->insertOptionsHolder(this);
   }
   return true;

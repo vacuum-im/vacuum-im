@@ -8,8 +8,8 @@
   </file>
 
   <file>
-    <key>messagehandlerChat</key>
-    <key>messagehandlerNormal</key>
+    <key>chatmessagehandlerMessage</key>
+    <key>normalmessagehandlerMessage</key>
     <key>mucMessage</key>
     <key>mucDataMessage</key>
     <key>mucPrivateMessage</key>

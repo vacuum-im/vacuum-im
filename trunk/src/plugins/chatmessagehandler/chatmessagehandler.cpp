@@ -1,16 +1,13 @@
-#include "messagehandler.h"
+#include "chatmessagehandler.h"
 
-#define HISTORY_MESSAGES                      10
+#define HISTORY_MESSAGES          10
 
-#define CHAT_NOTIFICATOR_ID                   "ChatMessages"
-#define NORMAL_NOTIFICATOR_ID                 "NormalMessages"
+#define ADR_STREAM_JID            Action::DR_StreamJid
+#define ADR_CONTACT_JID           Action::DR_Parametr1
 
-#define ADR_STREAM_JID                        Action::DR_StreamJid
-#define ADR_CONTACT_JID                       Action::DR_Parametr1
-#define ADR_WINDOW_TYPE                       Action::DR_Parametr2  
-#define ADR_GROUP                             Action::DR_Parametr3
+#define CHAT_NOTIFICATOR_ID       "ChatMessages"
 
-MessageHandler::MessageHandler()
+ChatMessageHandler::ChatMessageHandler()
 {
   FMessageWidgets = NULL;
   FMessageProcessor = NULL;
@@ -21,25 +18,27 @@ MessageHandler::MessageHandler()
   FRostersView = NULL;
 }
 
-MessageHandler::~MessageHandler()
+ChatMessageHandler::~ChatMessageHandler()
 {
 
 }
 
-void MessageHandler::pluginInfo(IPluginInfo *APluginInfo)
+void ChatMessageHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Default message handling");
+  APluginInfo->description = tr("Chat message handling");
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->name = tr("Default Message Handler"); 
-  APluginInfo->uid = MESSAGEHANDLER_UUID;
+  APluginInfo->name = tr("Chat Message Handler"); 
+  APluginInfo->uid = CHATMESSAGEHANDLER_UUID;
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(MESSAGEWIDGETS_UUID);
   APluginInfo->dependences.append(MESSAGEPROCESSOR_UUID);
-  APluginInfo->conflicts.append("{153A4638-B468-496f-B57C-9F30CEDFCC2E}");
+  APluginInfo->conflicts.append("{153A4638-B468-496f-B57C-9F30CEDFCC2E}");  //Messenger
+  APluginInfo->conflicts.append("{f118ccf4-8535-4302-8fda-0f6487c6db01}");  //MessageHandler
 }
 
-bool MessageHandler::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+
+bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
   IPlugin *plugin = APluginManager->getPlugins("IMessageWidgets").value(0,NULL);
   if (plugin)
@@ -81,7 +80,6 @@ bool MessageHandler::initConnections(IPluginManager *APluginManager, int &/*AIni
     if (notifications)
     {
       uchar kindMask = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
-      notifications->insertNotificator(NORMAL_NOTIFICATOR_ID,tr("Single Messages"),kindMask,kindMask);
       notifications->insertNotificator(CHAT_NOTIFICATOR_ID,tr("Chat Messages"),kindMask,kindMask);
     }
   }
@@ -111,20 +109,20 @@ bool MessageHandler::initConnections(IPluginManager *APluginManager, int &/*AIni
   return FMessageProcessor!=NULL && FMessageWidgets!=NULL;
 }
 
-bool MessageHandler::initObjects()
+bool ChatMessageHandler::initObjects()
 {
   if (FRostersView)
   {
-    FRostersView->insertClickHooker(RCHO_MESSAGEHANDLER,this);
+    FRostersView->insertClickHooker(RCHO_CHATMESSAGEHANDLER,this);
   }
   if (FMessageProcessor)
   {
-    FMessageProcessor->insertMessageHandler(this,MHO_MESSAGEHANDLER);
+    FMessageProcessor->insertMessageHandler(this,MHO_CHATMESSAGEHANDLER);
   }
   return true;
 }
 
-bool MessageHandler::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)
+bool ChatMessageHandler::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)
 {
   if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE)
   {
@@ -135,14 +133,14 @@ bool MessageHandler::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)
   return false;
 }
 
-bool MessageHandler::checkMessage(const Message &AMessage)
+bool ChatMessageHandler::checkMessage(const Message &AMessage)
 {
-  if (!AMessage.body().isEmpty() || !AMessage.subject().isEmpty())
+  if (AMessage.type()==Message::Chat && !AMessage.body().isEmpty())
     return true;
   return false;
 }
 
-void MessageHandler::showMessage(int AMessageId)
+void ChatMessageHandler::showMessage(int AMessageId)
 {
   Message message = FMessageProcessor->messageById(AMessageId);
   Jid streamJid = message.to();
@@ -150,40 +148,24 @@ void MessageHandler::showMessage(int AMessageId)
   openWindow(streamJid,contactJid,message.type());
 }
 
-void MessageHandler::receiveMessage(int AMessageId)
+void ChatMessageHandler::receiveMessage(int AMessageId)
 {
   Message message = FMessageProcessor->messageById(AMessageId);
-  Jid streamJid = message.to();
-  Jid contactJid = message.from();
-  if (message.type() == Message::Chat)
+  IChatWindow *window = getChatWindow(message.to(),message.from());
+  if (window)
   {
-    IChatWindow *window = getChatWindow(streamJid,contactJid);
-    if (window)
+    window->showMessage(message);
+    if (!window->isActive())
     {
-      window->showMessage(message);
-      if (!window->isActive())
-      {
-        FActiveChatMessages.insertMulti(window, AMessageId);
-        updateChatWindow(window);
-      }
-      else
-        FMessageProcessor->removeMessage(AMessageId);
-    }
-  }
-  else
-  {
-    IMessageWindow *window = findMessageWindow(streamJid,contactJid);
-    if (window)
-    {
-      FActiveNormalMessages.insertMulti(window,AMessageId);
-      updateMessageWindow(window);
+      FActiveChatMessages.insertMulti(window, AMessageId);
+      updateChatWindow(window);
     }
     else
-      FActiveNormalMessages.insertMulti(NULL,AMessageId);
+      FMessageProcessor->removeMessage(AMessageId);
   }
 }
 
-bool MessageHandler::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
+bool ChatMessageHandler::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
 {
   if (AType == Message::Chat)
   {
@@ -194,26 +176,17 @@ bool MessageHandler::openWindow(const Jid &AStreamJid, const Jid &AContactJid, M
       return true;
     }
   }
-  else
-  {
-    IMessageWindow *window = getMessageWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
-    if (window)
-    {
-      showMessageWindow(window);
-      return true;
-    }
-  }
   return false;
 }
 
-INotification MessageHandler::notification(INotifications *ANotifications, const Message &AMessage)
+INotification ChatMessageHandler::notification(INotifications *ANotifications, const Message &AMessage)
 {
   IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
-  QIcon icon =  storage->getIcon(AMessage.type() == Message::Chat ? MNI_MESSAGEHANDLER_CHAT : MNI_MESSAGEHANDLER_NORMAL);
+  QIcon icon =  storage->getIcon(MNI_CHAT_MHANDLER_MESSAGE);
   QString name= ANotifications->contactName(AMessage.to(),AMessage.from());
 
   INotification notify;
-  notify.kinds = ANotifications->notificatorKinds(AMessage.type()==Message::Normal ? NORMAL_NOTIFICATOR_ID : CHAT_NOTIFICATOR_ID);
+  notify.kinds = ANotifications->notificatorKinds(CHAT_NOTIFICATOR_ID);
   notify.data.insert(NDR_ICON,icon);
   notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
   notify.data.insert(NDR_ROSTER_STREAM_JID,AMessage.to());
@@ -223,93 +196,12 @@ INotification MessageHandler::notification(INotifications *ANotifications, const
   notify.data.insert(NDR_WINDOW_CAPTION, tr("Message received"));
   notify.data.insert(NDR_WINDOW_TITLE,name);
   notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
-  notify.data.insert(NDR_SOUND_FILE,AMessage.type()==Message::Normal ? SDF_MESSAGEHANDLER_NORMAL : SDF_MESSAGEHANDLER_CHAT);
+  notify.data.insert(NDR_SOUND_FILE,SDF_CHAT_MHANDLER_MESSAGE);
 
   return notify;
 }
 
-IMessageWindow *MessageHandler::getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
-{
-  IMessageWindow *window = NULL;
-  if (AStreamJid.isValid() && (AContactJid.isValid() || AMode == IMessageWindow::WriteMode))
-  {
-    window = FMessageWidgets->newMessageWindow(AStreamJid,AContactJid,AMode);
-    if (window)
-    {
-      connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageWindowSend()));
-      connect(window->instance(),SIGNAL(showNextMessage()),SLOT(onMessageWindowShowNext()));
-      connect(window->instance(),SIGNAL(replyMessage()),SLOT(onMessageWindowReply()));
-      connect(window->instance(),SIGNAL(forwardMessage()),SLOT(onMessageWindowForward()));
-      connect(window->instance(),SIGNAL(showChatWindow()),SLOT(onMessageWindowShowChat()));
-      connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onMessageWindowDestroyed()));
-      FMessageWindows.append(window);
-      //window->infoWidget()->setFieldVisible(IInfoWidget::ContactStatus,false);
-      window->infoWidget()->autoUpdateFields();
-      loadActiveNormalMessages(window);
-      showNextNormalMessage(window);
-    }
-    else
-      window = findMessageWindow(AStreamJid,AContactJid);
-  }
-  return window;
-}
-
-IMessageWindow *MessageHandler::findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid)
-{
-  foreach(IMessageWindow *window,FMessageWindows)
-    if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
-      return window;
-  return NULL;
-}
-
-void MessageHandler::showMessageWindow(IMessageWindow *AWindow)
-{
-  AWindow->showWindow();
-}
-
-void MessageHandler::showNextNormalMessage(IMessageWindow *AWindow)
-{
-  if (FActiveNormalMessages.contains(AWindow))
-  {
-    int messageId = FActiveNormalMessages.value(AWindow);
-    Message message = FMessageProcessor->messageById(messageId);
-    AWindow->showMessage(message);
-    FMessageProcessor->removeMessage(messageId);
-    FActiveNormalMessages.remove(AWindow,messageId);
-  }
-  updateMessageWindow(AWindow);
-}
-
-void MessageHandler::loadActiveNormalMessages(IMessageWindow *AWindow)
-{
-  QList<int> messagesId = FActiveNormalMessages.values(NULL);
-  foreach(int messageId, messagesId)
-  {
-    Message message = FMessageProcessor->messageById(messageId);
-    if (AWindow->streamJid() == message.to() && AWindow->contactJid() == message.from())
-    {
-      FActiveNormalMessages.insertMulti(AWindow,messageId);
-      FActiveNormalMessages.remove(NULL,messageId);
-    }
-  }
-}
-
-void MessageHandler::updateMessageWindow(IMessageWindow *AWindow)
-{
-  QIcon icon;
-  if (FActiveNormalMessages.contains(AWindow))
-    icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MESSAGEHANDLER_NORMAL);
-  else if (FStatusIcons)
-    icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
-  
-  QString title = tr("Composing message");
-  if (AWindow->mode() == IMessageWindow::ReadMode)
-    title = tr("%1 - Message").arg(AWindow->infoWidget()->field(IInfoWidget::ContactName).toString());
-  AWindow->updateWindow(icon,title,title);
-  AWindow->setNextCount(FActiveNormalMessages.count(AWindow));
-}
-
-IChatWindow *MessageHandler::getChatWindow(const Jid &AStreamJid, const Jid &AContactJid)
+IChatWindow *ChatMessageHandler::getChatWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
   IChatWindow *window = NULL;
   if (AStreamJid.isValid() && AContactJid.isValid())
@@ -348,7 +240,7 @@ IChatWindow *MessageHandler::getChatWindow(const Jid &AStreamJid, const Jid &ACo
   return window;
 }
 
-IChatWindow *MessageHandler::findChatWindow(const Jid &AStreamJid, const Jid &AContactJid)
+IChatWindow *ChatMessageHandler::findChatWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
   foreach(IChatWindow *window,FChatWindows)
     if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
@@ -356,7 +248,7 @@ IChatWindow *MessageHandler::findChatWindow(const Jid &AStreamJid, const Jid &AC
   return NULL;
 }
 
-void MessageHandler::showChatHistory(IChatWindow *AWindow)
+void ChatMessageHandler::showChatHistory(IChatWindow *AWindow)
 {
   if (FMessageArchiver)
   {
@@ -378,7 +270,7 @@ void MessageHandler::showChatHistory(IChatWindow *AWindow)
   }
 }
 
-void MessageHandler::showChatWindow(IChatWindow *AWindow)
+void ChatMessageHandler::showChatWindow(IChatWindow *AWindow)
 {
   if (AWindow->instance()->isWindow() && !AWindow->instance()->isVisible() && FMessageWidgets->checkOption(IMessageWidgets::UseTabWindow))
   {
@@ -388,7 +280,7 @@ void MessageHandler::showChatWindow(IChatWindow *AWindow)
   AWindow->showWindow();
 }
 
-void MessageHandler::removeActiveChatMessages(IChatWindow *AWindow)
+void ChatMessageHandler::removeActiveChatMessages(IChatWindow *AWindow)
 {
   if (FActiveChatMessages.contains(AWindow))
   {
@@ -400,11 +292,11 @@ void MessageHandler::removeActiveChatMessages(IChatWindow *AWindow)
   }
 }
 
-void MessageHandler::updateChatWindow(IChatWindow *AWindow)
+void ChatMessageHandler::updateChatWindow(IChatWindow *AWindow)
 {
   QIcon icon;
   if (FActiveChatMessages.contains(AWindow))
-    icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MESSAGEHANDLER_CHAT);
+    icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHAT_MHANDLER_MESSAGE);
   else if (FStatusIcons)
     icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
 
@@ -412,7 +304,7 @@ void MessageHandler::updateChatWindow(IChatWindow *AWindow)
   AWindow->updateWindow(icon,contactName,tr("%1 - Chat").arg(contactName));
 }
 
-void MessageHandler::onChatMessageSend()
+void ChatMessageHandler::onChatMessageSend()
 {
   IChatWindow *window = qobject_cast<IChatWindow *>(sender());
   if (window)
@@ -428,14 +320,14 @@ void MessageHandler::onChatMessageSend()
   }
 }
 
-void MessageHandler::onChatWindowActivated()
+void ChatMessageHandler::onChatWindowActivated()
 {
   IChatWindow *window = qobject_cast<IChatWindow *>(sender());
   if (window)
     removeActiveChatMessages(window);
 }
 
-void MessageHandler::onChatInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue)
+void ChatMessageHandler::onChatInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue)
 {
   if (AField == IInfoWidget::ContactName) 
   {
@@ -453,7 +345,7 @@ void MessageHandler::onChatInfoFieldChanged(IInfoWidget::InfoField AField, const
   }
 }
 
-void MessageHandler::onChatWindowDestroyed()
+void ChatMessageHandler::onChatWindowDestroyed()
 {
   IChatWindow *window = qobject_cast<IChatWindow *>(sender());
   if (FChatWindows.contains(window))
@@ -463,95 +355,7 @@ void MessageHandler::onChatWindowDestroyed()
   }
 }
 
-void MessageHandler::onMessageWindowSend()
-{
-  IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-  if (window)
-  {
-    Message message;
-    message/*.setFrom(window->streamJid().eFull())*/.setType(Message::Normal);
-    message.setSubject(window->subject());
-    message.setThreadId(window->threadId());
-    FMessageProcessor->textToMessage(message,window->editWidget()->document());
-    if (!message.body().isEmpty())
-    {
-      bool sended = false;
-      QList<Jid> receiversList = window->receiversWidget()->receivers();
-      foreach(Jid receiver, receiversList)
-      {
-        message.setTo(receiver.eFull());
-        sended = FMessageProcessor->sendMessage(window->streamJid(),message) ? true : sended;
-      }
-      if (sended)
-      {
-        if (FActiveNormalMessages.contains(window))
-          showNextNormalMessage(window);
-        else
-          window->closeWindow();
-      }
-    }
-  }
-}
-
-void MessageHandler::onMessageWindowShowNext()
-{
-  IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-  if (window)
-  {
-    showNextNormalMessage(window);
-    updateMessageWindow(window);
-  }
-}
-
-void MessageHandler::onMessageWindowReply()
-{
-  IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-  if (window)
-  {
-    window->setMode(IMessageWindow::WriteMode);
-    window->setSubject(tr("Re: ")+window->subject());
-    window->editWidget()->clearEditor();
-    window->editWidget()->instance()->setFocus();
-    updateMessageWindow(window);
-  }
-}
-
-void MessageHandler::onMessageWindowForward()
-{
-  IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-  if (window)
-  {
-    window->setMode(IMessageWindow::WriteMode);
-    window->setSubject(tr("Fw: ")+window->subject());
-    window->setThreadId(window->currentMessage().threadId());
-    FMessageProcessor->messageToText(window->editWidget()->document(),window->currentMessage());
-    window->receiversWidget()->clear();
-    window->setCurrentTabWidget(window->receiversWidget()->instance());
-    updateMessageWindow(window);
-  }
-}
-
-void MessageHandler::onMessageWindowShowChat()
-{
-  IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-  if (window)
-    openWindow(window->streamJid(),window->contactJid(),Message::Chat);
-}
-
-void MessageHandler::onMessageWindowDestroyed()
-{
-  IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-  if (FMessageWindows.contains(window))
-  {
-    QList<int> messagesId = FActiveNormalMessages.values(window);
-    foreach(int messageId, messagesId)
-      FActiveNormalMessages.insertMulti(NULL,messageId);
-    FActiveNormalMessages.remove(window);
-    FMessageWindows.removeAt(FMessageWindows.indexOf(window));
-  }
-}
-
-void MessageHandler::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
+void ChatMessageHandler::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
 {
   Jid streamJid = APresence->streamJid();
   Jid contactJid = APresenceItem.itemJid;
@@ -570,21 +374,15 @@ void MessageHandler::onPresenceReceived(IPresence *APresence, const IPresenceIte
   }
   if (chatWindow)
     updateChatWindow(chatWindow);
-
-  IMessageWindow *messageWindow = findMessageWindow(streamJid,contactJid);
-  if (messageWindow)
-    updateMessageWindow(messageWindow);
 }
 
-void MessageHandler::onStatusIconsChanged()
+void ChatMessageHandler::onStatusIconsChanged()
 {
   foreach(IChatWindow *window, FChatWindows)
     updateChatWindow(window);
-  foreach(IMessageWindow *window, FMessageWindows)
-    updateMessageWindow(window);
 }
 
-void MessageHandler::onVCardChanged(const Jid &AContactJid)
+void ChatMessageHandler::onVCardChanged(const Jid &AContactJid)
 {
   IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AContactJid.bare()) : NULL;
   if (vcard)
@@ -602,10 +400,9 @@ void MessageHandler::onVCardChanged(const Jid &AContactJid)
   }
 }
 
-void MessageHandler::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void ChatMessageHandler::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   static QList<int> chatActionTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-  static QList<int> messageActionTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
 
   Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
@@ -616,53 +413,24 @@ void MessageHandler::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     {
       Action *action = new Action(AMenu);
       action->setText(tr("Chat"));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSAGEHANDLER_CHAT);
+      action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
       action->setData(ADR_STREAM_JID,streamJid.full());
       action->setData(ADR_CONTACT_JID,contactJid.full());
-      action->setData(ADR_WINDOW_TYPE,Message::Chat);
-      AMenu->addAction(action,AG_RVCM_MESSAGEHANDLER,false);
-      connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
-    }
-    if (messageActionTypes.contains(AIndex->type()))
-    {
-      Action *action = new Action(AMenu);
-      action->setText(tr("Message"));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSAGEHANDLER_NORMAL);
-      action->setData(ADR_STREAM_JID,streamJid.full());
-      if (AIndex->type() == RIT_GROUP)
-        action->setData(ADR_GROUP,AIndex->data(RDR_GROUP));
-      else if (AIndex->type() != RIT_STREAM_ROOT)
-        action->setData(ADR_CONTACT_JID,contactJid.full());
-      action->setData(ADR_WINDOW_TYPE,Message::Normal);
-      AMenu->addAction(action,AG_RVCM_MESSAGEHANDLER,false);
+      AMenu->addAction(action,AG_RVCM_CHATMESSAGEHANDLER,true);
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
     }
   }
 }
 
-void MessageHandler::onShowWindowAction( bool )
+void ChatMessageHandler::onShowWindowAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-    if (action->data(ADR_WINDOW_TYPE).toInt() == Message::Normal)
-    {
-      openWindow(streamJid,contactJid,Message::Normal);
-      QString group = action->data(ADR_GROUP).toString();
-      if (!group.isEmpty())
-      {
-        IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
-        if (window)
-          window->receiversWidget()->addReceiversGroup(group);
-      }
-    }
-    else
-    {
-      openWindow(streamJid,contactJid,Message::Chat);
-    }
+    openWindow(streamJid,contactJid,Message::Chat);
   }
 }
 
-Q_EXPORT_PLUGIN2(MessageHandlerPlugin, MessageHandler)
+Q_EXPORT_PLUGIN2(ChatMessageHandlerPlugin, ChatMessageHandler)

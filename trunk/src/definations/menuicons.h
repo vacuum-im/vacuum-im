@@ -79,9 +79,11 @@
 #define MNI_HISTORY_REMOVE              "historyRemove"
 #define MNI_HISTORY_RELOAD              "historyReload"
 
-//MessageHandler
-#define MNI_MESSAGEHANDLER_NORMAL       "messagehandlerNormal"
-#define MNI_MESSAGEHANDLER_CHAT         "messagehandlerChat"
+//ChatMessageHandler
+#define MNI_CHAT_MHANDLER_MESSAGE       "chatmessagehandlerMessage"
+
+//NormalMessageHandler
+#define MNI_NORMAL_MHANDLER_MESSAGE     "normalmessagehandlerMessage"
 
 //MessageWidgets
 #define MNI_MESSAGEWIDGETS_CLOSE_TAB    "messagewidgetsCloseTab"
