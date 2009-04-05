@@ -118,14 +118,14 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
       FShowChat = new Action(FToolBarChanger->toolBar());
       FShowChat->setText(tr("Chat"));
       FShowChat->setToolTip(tr("Open chat window"));
-      FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSAGEHANDLER_CHAT);
+      FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
       FToolBarChanger->addAction(FShowChat,AG_ACDT_ROSTERCHANGER_ACTIONS);
       connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
       FSendMessage = new Action(FToolBarChanger->toolBar());
       FSendMessage->setText(tr("Message"));
       FSendMessage->setToolTip(tr("Send Message"));
-      FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSAGEHANDLER_NORMAL);
+      FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMAL_MHANDLER_MESSAGE);
       FToolBarChanger->addAction(FSendMessage,AG_ACDT_ROSTERCHANGER_ACTIONS);
       connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
     }
