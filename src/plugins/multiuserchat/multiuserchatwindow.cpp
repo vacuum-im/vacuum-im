@@ -642,10 +642,10 @@ void MultiUserChatWindow::insertRoomUtilsActions(Menu *AMenu, IMultiUser *AUser)
 
 void MultiUserChatWindow::saveWindowState()
 {
-  if (FSettings && FMessageWidgets)
+  if (FSettings && isVisible())
   {
     QString dataId = roomJid().pBare();
-    if (isWindow() && isVisible())
+    if (isWindow())
       FSettings->saveBinaryData(BDI_WINDOW_GEOMETRY+dataId,saveGeometry());
     FSettings->saveBinaryData(BDI_WINDOW_HSPLITTER+dataId,ui.sprHSplitter->saveState());
     FSettings->saveBinaryData(BDI_WINDOW_VSPLITTER+dataId,ui.sprVSplitter->saveState());
@@ -654,7 +654,7 @@ void MultiUserChatWindow::saveWindowState()
 
 void MultiUserChatWindow::loadWindowState()
 {
-  if (FSettings && FMessageWidgets)
+  if (FSettings)
   {
     QString dataId = roomJid().pBare();
     if (isWindow())
@@ -665,7 +665,8 @@ void MultiUserChatWindow::loadWindowState()
       ui.sprVSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_VSPLITTER+dataId));
       FSplitterLoaded = true;
     }
-    FEditWidget->textEdit()->setFocus();
+    if (FEditWidget)
+      FEditWidget->textEdit()->setFocus();
   }
 }
 
@@ -1484,7 +1485,7 @@ void MultiUserChatWindow::onMenuBarActionTriggered(bool)
   }
   else if (action == FQuitRoom)
   {
-    deleteLater();
+    exitAndDestroy(tr("Disconnected"));
   }
   else if (action == FInviteContact)
   {
