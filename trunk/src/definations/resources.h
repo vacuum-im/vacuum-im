@@ -6,5 +6,6 @@
 #define RSR_STORAGE_SERVICEICONS      "serviceicons"
 #define RSR_STORAGE_STATUSICONS       "statusicons"
 #define RSR_STORAGE_SOUNDS            "sounds"
+#define RSR_STORAGE_MESSAGESTYLES     "messagestyles"
 
 #endif
