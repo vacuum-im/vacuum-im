@@ -72,7 +72,10 @@ MessageWindow::~MessageWindow()
 void MessageWindow::showWindow()
 {
   if (isWindow())
+  {
     isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
+    raise();
+  }
   else
     emit windowShow();
 }

@@ -68,6 +68,7 @@ TabWindow::~TabWindow()
 void TabWindow::showWindow()
 {
   isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
+  raise();
 }
 
 void TabWindow::addWidget(ITabWidget *AWidget)
