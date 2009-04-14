@@ -70,7 +70,10 @@ void MultiUserChatWindow::showWindow()
     tabWindow->addWidget(this);
   }
   if (isWindow())
+  {
     isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
+    raise();
+  }
   else
     emit windowShow();
 }
