@@ -103,7 +103,8 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   FProxyModel->setSortRole(HDR_SORT_ROLE);
 
   ui.trvCollections->setModel(FProxyModel);
-  //ui.trvCollections->sortByColumn(1,Qt::DescendingOrder);
+  ui.trvCollections->setSortingEnabled(true);
+  ui.trvCollections->sortByColumn(1,Qt::DescendingOrder);
   ui.trvCollections->header()->setResizeMode(0,QHeaderView::ResizeToContents);
   ui.trvCollections->header()->setResizeMode(1,QHeaderView::ResizeToContents);
   ui.trvCollections->header()->setResizeMode(2,QHeaderView::Stretch);
@@ -845,16 +846,6 @@ void ViewHistoryWindow::createHeaderActions()
   FReload->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_RELOAD);
   connect(FReload,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
   FGroupsTools->addAction(FReload,AG_AWGT_ARCHIVE_DEFACTIONS,false);
-}
-
-void ViewHistoryWindow::showEvent(QShowEvent *AEvent)
-{
-  QMainWindow::showEvent(AEvent);
-  if (!ui.trvCollections->isSortingEnabled()) // Костыль для QSortFilterProxyModel Qt 4.5.0
-  {
-    ui.trvCollections->setSortingEnabled(true);
-   ui.trvCollections->sortByColumn(1,Qt::DescendingOrder); 
-  }
 }
 
 void ViewHistoryWindow::onLocalCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader)
