@@ -47,6 +47,8 @@ OptionsDialog::OptionsDialog(QWidget *AParent) : QDialog(AParent)
   trvNodes->header()->hide();
   trvNodes->setIndentation(12);
   trvNodes->setMaximumWidth(160);
+  trvNodes->setSortingEnabled(true);
+  trvNodes->sortByColumn(0,Qt::AscendingOrder);
   trvNodes->setEditTriggers(QAbstractItemView::NoEditTriggers);
   trvNodes->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Expanding);
 
@@ -113,7 +115,6 @@ void OptionsDialog::openNode(const QString &ANode, const QString &AName, const Q
       FItemWidget.insert(nodeItem,AWidget);
       connect(this,SIGNAL(closed()),AWidget,SLOT(deleteLater()));
     }
-    FProxyModel->sort(0,Qt::AscendingOrder);
   }
 }
 

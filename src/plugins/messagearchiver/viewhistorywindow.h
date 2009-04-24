@@ -87,8 +87,6 @@ protected:
   void createGroupKindMenu();
   void createSourceMenu();
   void createHeaderActions();
-protected:
-  virtual void showEvent(QShowEvent *AEvent);
 protected slots:
   void onLocalCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
   void onLocalCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
