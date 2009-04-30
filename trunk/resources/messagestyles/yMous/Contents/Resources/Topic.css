@@ -13,11 +13,11 @@
 	-webkit-transition: background .4s linear;
 }
 
-#topic[title=""]:not(:hover)
-{
-	background: none;
-	-webkit-box-shadow: none;
-}
+//#topic[title=""]:not(:hover)
+//{
+//	background: none;
+//	-webkit-box-shadow: none;
+//}
 
 #topicEdit {
 	display: block;
