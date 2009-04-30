@@ -135,14 +135,6 @@
         <translation>Использовать окно со вкладками</translation>
     </message>
     <message>
-        <source>Show HTML</source>
-        <translation>Показывать HTML</translation>
-    </message>
-    <message>
-        <source>Show date and time</source>
-        <translation>Показывать дату и время</translation>
-    </message>
-    <message>
         <source>Show status in chat window</source>
         <translation>Показывать статус в окне чата</translation>
     </message>
@@ -249,24 +241,6 @@
     <message>
         <source>Tab 1</source>
         <translation>Tab 1</translation>
-    </message>
-</context>
-<context>
-    <name>ViewWidget</name>
-    <message>
-        <source>hh:mm</source>
-        <translation>hh:mm</translation>
-    </message>
-    <message>
-        <source>dd.MM hh:mm</source>
-        <translation>dd.MM hh:mm</translation>
-    </message>
-</context>
-<context>
-    <name>ViewWidgetClass</name>
-    <message>
-        <source>about:blank</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

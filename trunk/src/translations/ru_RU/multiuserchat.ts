@@ -900,7 +900,19 @@ Check values and try again</source>
  /nick &lt;newnick&gt; 
  /leave [comment] 
  /topic &lt;foo&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Список поддерживаемых команд:
+ /ban &lt;ник&gt; [комментарий] 
+ /invite &lt;jid&gt; [комментарий] 
+ /join &lt;комната&gt; [пароль] 
+ /kick &lt;ник&gt; [комментарий] 
+ /msg &lt;ник&gt; &lt;сообщение&gt; 
+ /nick &lt;новый_ник&gt; 
+ /leave [коментарий] 
+ /topic &lt;тема&gt;</translation>
+    </message>
+    <message>
+        <source>%1 changed status to [%2] %3</source>
+        <translation>%1изменил статус на [%2] %3</translation>
     </message>
 </context>
 <context>
