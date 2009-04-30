@@ -32,7 +32,7 @@
 .outgoing:hover .xxxmark,
 .outgoing:hover .xxxmessage
 {
-	color: hsla(120, 42%, 25%, 1) !important;
+//	color: hsla(120, 42%, 25%, 1) !important;
 }
 
 /*----------*/
@@ -51,7 +51,7 @@
 .incoming:hover .xxxmark,
 .incoming:hover .xxxmessage
 {
-	color: hsla(240, 72%, 40%, 1) !important;
+//	color: hsla(240, 72%, 40%, 1) !important;
 }
 
 /*----------*/
@@ -75,6 +75,6 @@
 .event:hover .xxxmark,
 .event:hover .xxxmessage
 {
-	color: hsla(0, 0%, 35%, 1) !important;
+//	color: hsla(0, 0%, 35%, 1) !important;
 }
 
