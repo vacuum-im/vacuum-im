@@ -3,7 +3,6 @@
 #include <QTextDocumentFragment>
 
 #define BDI_CHAT_GEOMETRY           "ChatWindowGeometry"
-#define BDI_CHAT_SPLITTER           "ChatWindowSplitter"  
 
 ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
@@ -11,42 +10,34 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 
   FSettings = NULL;
   FStatusChanger = NULL;
-  FSplitterLoaded = false;
 
-  FMessageWidgets = AMessageWidgets;
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
+  FMessageWidgets = AMessageWidgets;
 
   FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid);
   ui.wdtInfo->setLayout(new QVBoxLayout);
   ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
   ui.wdtInfo->layout()->setMargin(0);
-  connect(FInfoWidget->instance(),SIGNAL(fieldChanged(IInfoWidget::InfoField, const QVariant &)),
-    SLOT(onInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
+  ui.wdtInfo->layout()->setSpacing(0);
 
   FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid);
-  FViewWidget->setShowKind(IViewWidget::ChatMessage);
-  FViewWidget->document()->setDefaultFont(FMessageWidgets->defaultChatFont());
   ui.wdtView->setLayout(new QVBoxLayout);
   ui.wdtView->layout()->addWidget(FViewWidget->instance());
   ui.wdtView->layout()->setMargin(0);
   ui.wdtView->layout()->setSpacing(0);
 
   FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid);
-  FEditWidget->document()->setDefaultFont(FMessageWidgets->defaultChatFont());
   ui.wdtEdit->setLayout(new QVBoxLayout);
   ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
   ui.wdtEdit->layout()->setMargin(0);
   ui.wdtEdit->layout()->setSpacing(0);
+  ui.wdtEdit->layout()->setSizeConstraint(QLayout::SetNoConstraint);
+
   connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 
   FToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL);
   ui.wdtView->layout()->addWidget(FToolBarWidget->instance());
-
-  ui.sprSplitter->setStretchFactor(0,20);
-  ui.sprSplitter->setStretchFactor(1,1);
-
-  connect(FMessageWidgets->instance(),SIGNAL(defaultChatFontChanged(const QFont &)), SLOT(onDefaultChatFontChanged(const QFont &)));
 
   initialize();
 }
@@ -76,11 +67,6 @@ void ChatWindow::setContactJid(const Jid &AContactJid)
 bool ChatWindow::isActive() const
 {
   return isVisible() && isActiveWindow();
-}
-
-void ChatWindow::showMessage(const Message &AMessage)
-{
-  FViewWidget->showMessage(AMessage);
 }
 
 void ChatWindow::showWindow()
@@ -151,7 +137,6 @@ void ChatWindow::saveWindowState()
     QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
     if (isWindow() && isVisible())
       FSettings->saveBinaryData(BDI_CHAT_GEOMETRY + dataId,saveGeometry());
-    FSettings->saveBinaryData(BDI_CHAT_SPLITTER + dataId,ui.sprSplitter->saveState());
   }
 }
 
@@ -162,11 +147,6 @@ void ChatWindow::loadWindowState()
     QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
     if (isWindow())
       restoreGeometry(FSettings->loadBinaryData(BDI_CHAT_GEOMETRY+dataId));
-    if (!FSplitterLoaded)
-    {
-      ui.sprSplitter->restoreState(FSettings->loadBinaryData(BDI_CHAT_SPLITTER+dataId));
-      FSplitterLoaded = true;
-    }
   }
   FEditWidget->textEdit()->setFocus();
 }
@@ -208,32 +188,8 @@ void ChatWindow::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour
     emit streamJidChanged(ABefour);
   }
   else
-    deleteLater();
-}
-
-void ChatWindow::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue)
-{
-  if (AField == IInfoWidget::ContactStatus)
   {
-    if (FMessageWidgets->checkOption(IMessageWidgets::ShowStatus))
-    {
-      QString status = AValue.toString();
-      QString show = FStatusChanger ? FStatusChanger->nameByShow(FInfoWidget->field(IInfoWidget::ContactShow).toInt()) : "";
-      if (FLastStatusShow != status+show)
-      {
-        QString nick = FViewWidget->nickForJid(FContactJid);
-        QString html = QString("<span style='color:green;'>*** %1 [%2] %3</span>").arg(Qt::escape(nick)).arg(Qt::escape(show))
-                                                                                  .arg(Qt::escape(status));
-        FViewWidget->showCustomMessage(html,QDateTime::currentDateTime());
-        FLastStatusShow = status+show;
-      }
-    }
+    deleteLater();
   }
-}
-
-void ChatWindow::onDefaultChatFontChanged(const QFont &AFont)
-{
-  FViewWidget->document()->setDefaultFont(AFont);
-  FEditWidget->document()->setDefaultFont(AFont);
 }
 

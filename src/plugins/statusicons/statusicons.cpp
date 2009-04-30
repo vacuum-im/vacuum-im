@@ -199,28 +199,16 @@ void StatusIcons::removeRule(const QString &APattern, RuleType ARuleType)
 
 QIcon StatusIcons::iconByJid(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
-  int show = presence!=NULL ? presence->presenceItem(AContactJid).show : IPresence::Offline;
-
-  bool ask = false;
-  QString subscription = SUBSCRIPTION_NONE;
-  IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
-  if (roster)
-  {
-    IRosterItem ritem = roster->rosterItem(AContactJid);
-    if (ritem.isValid)
-    {
-      subscription = ritem.subscription;
-      ask = !ritem.ask.isEmpty();
-    }
-  }
-
-  return iconByJidStatus(AContactJid,show,subscription,ask);
+  QString substorage = subStorageByJid(AContactJid);
+  QString iconKey = iconKeyByJid(AStreamJid, AContactJid);
+  IconStorage *storage = FStorages.value(substorage,FDefaultStorage);
+  return storage!=NULL ? storage->getIcon(iconKey) : QIcon();
 }
 
 QIcon StatusIcons::iconByStatus(int AShow, const QString &ASubscription, bool AAsk) const
 {
-  return FDefaultStorage!=NULL ? FDefaultStorage->getIcon(iconKeyByStatus(AShow,ASubscription,AAsk)) : QIcon();
+  QString iconKey = iconKeyByStatus(AShow,ASubscription,AAsk);
+  return FDefaultStorage!=NULL ? FDefaultStorage->getIcon(iconKey) : QIcon();
 }
 
 QIcon StatusIcons::iconByJidStatus(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const
@@ -273,6 +261,26 @@ QString StatusIcons::subStorageByJid(const Jid &AContactJid) const
   return FJid2Storage.value(AContactJid);
 }
 
+QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+  IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+  int show = presence!=NULL ? presence->presenceItem(AContactJid).show : IPresence::Offline;
+
+  bool ask = false;
+  QString subscription = SUBSCRIPTION_NONE;
+  IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+  if (roster)
+  {
+    IRosterItem ritem = roster->rosterItem(AContactJid);
+    if (ritem.isValid)
+    {
+      subscription = ritem.subscription;
+      ask = !ritem.ask.isEmpty();
+    }
+  }
+  return iconKeyByStatus(show,subscription,ask);
+}
+
 QString StatusIcons::iconKeyByStatus(int AShow, const QString &ASubscription, bool AAsk) const
 {
   switch (AShow)
@@ -298,6 +306,12 @@ QString StatusIcons::iconKeyByStatus(int AShow, const QString &ASubscription, bo
   default: 
     return STI_ERROR;
   }
+}
+
+QString StatusIcons::iconFileName(const QString &ASubStorage, const QString &AIconKey) const
+{
+  IconStorage *storage = FStorages.value(ASubStorage,FDefaultStorage);
+  return storage!=NULL ? storage->fileFullName(AIconKey) : QString::null;
 }
 
 void StatusIcons::loadStorages()

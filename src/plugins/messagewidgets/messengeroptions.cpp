@@ -9,8 +9,6 @@ MessengerOptions::MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AP
   FMessageWidgets = AMessageWidgets;
 
   ui.chbUseTabWindow->setChecked(FMessageWidgets->checkOption(IMessageWidgets::UseTabWindow));
-  ui.chbViewShowHtml->setChecked(FMessageWidgets->checkOption(IMessageWidgets::ShowHTML));
-  ui.chbViewShowDateTime->setChecked(FMessageWidgets->checkOption(IMessageWidgets::ShowDateTime));
   ui.chbChatShowStatus->setChecked(FMessageWidgets->checkOption(IMessageWidgets::ShowStatus));
   setChatFont(FMessageWidgets->defaultChatFont());
   setMessageFont(FMessageWidgets->defaultMessageFont());
@@ -26,8 +24,6 @@ MessengerOptions::MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AP
 void MessengerOptions::apply()
 {
   FMessageWidgets->setOption(IMessageWidgets::UseTabWindow,ui.chbUseTabWindow->isChecked());
-  FMessageWidgets->setOption(IMessageWidgets::ShowHTML,ui.chbViewShowHtml->isChecked());
-  FMessageWidgets->setOption(IMessageWidgets::ShowDateTime,ui.chbViewShowDateTime->isChecked());
   FMessageWidgets->setOption(IMessageWidgets::ShowStatus,ui.chbChatShowStatus->isChecked());
   FMessageWidgets->setDefaultChatFont(ui.lblChatFont->font());
   FMessageWidgets->setDefaultMessageFont(ui.lblMessageFont->font());

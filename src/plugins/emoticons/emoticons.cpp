@@ -1,7 +1,7 @@
 #include "emoticons.h"
 
 #include <QSet>
-#define SMILEY_BY_ICONSET_SCHEMA        "smiley"
+
 #define SVN_SUBSTORAGES                 "substorages"
 
 Emoticons::Emoticons()
@@ -67,11 +67,6 @@ bool Emoticons::initObjects()
     FMessageProcessor->insertMessageWriter(this,MWO_EMOTICONS);
   }
 
-  if (FMessageWidgets)
-  {
-    FMessageWidgets->insertResourceLoader(this,RSLO_EMOTICONS);
-  }
-
   if (FSettingsPlugin != NULL)
   {
     FSettingsPlugin->openOptionsNode(ON_EMOTICONS ,tr("Emoticons"),tr("Select emoticons files"),MNI_EMOTICONS,ONO_EMOTICONS);
@@ -88,10 +83,11 @@ void Emoticons::writeMessage(Message &/*AMessage*/, QTextDocument *ADocument, co
   {
     for (QTextCursor cursor = ADocument->find(imageChar); !cursor.isNull();  cursor = ADocument->find(imageChar,cursor))
     {
-      QUrl imageUrl = cursor.charFormat().toImageFormat().name();
-      if (imageUrl.scheme() == SMILEY_BY_ICONSET_SCHEMA)
+      QUrl url = cursor.charFormat().toImageFormat().name();
+      QString key = keyByUrl(url);
+      if (!key.isEmpty())
       {
-        cursor.insertText(imageUrl.fragment());
+        cursor.insertText(key);
         cursor.insertText(" ");
       }
     }
@@ -100,7 +96,6 @@ void Emoticons::writeMessage(Message &/*AMessage*/, QTextDocument *ADocument, co
 
 void Emoticons::writeText(Message &/*AMessage*/, QTextDocument *ADocument, const QString &/*ALang*/, int AOrder)
 {
-  static QChar blankChar = QChar::Nbsp;
   if (AOrder == MWO_EMOTICONS)
   {
     QRegExp regexp("\\S+");
@@ -110,16 +105,6 @@ void Emoticons::writeText(Message &/*AMessage*/, QTextDocument *ADocument, const
       if (!url.isEmpty())
         cursor.insertImage(url.toString());
     }
-  }
-}
-
-void Emoticons::loadTextResource(int AType, const QUrl &AName, QVariant &AValue)
-{
-  if (AType == QTextDocument::ImageResource)
-  {
-    QIcon icon = iconByUrl(AName);
-    if (!icon.isNull())
-      AValue = icon.pixmap(QSize(16,16));
   }
 }
 
@@ -193,23 +178,6 @@ QString Emoticons::keyByUrl(const QUrl &AUrl) const
   return FUrlByKey.key(AUrl);
 }
 
-QIcon Emoticons::iconByKey(const QString &AKey) const
-{
-  return iconByUrl(urlByKey(AKey));
-}
-
-QIcon Emoticons::iconByUrl(const QUrl &AUrl) const
-{
-  if (AUrl.scheme() == SMILEY_BY_ICONSET_SCHEMA)
-  {
-    QString key = AUrl.fragment();
-    QString substorage = AUrl.path();
-    if (!key.isEmpty() && FStorages.contains(substorage))
-      return FStorages.value(substorage)->getIcon(key);
-  }
-  return QIcon();
-}
-
 void Emoticons::createIconsetUrls()
 {
   FUrlByKey.clear();
@@ -219,13 +187,7 @@ void Emoticons::createIconsetUrls()
     foreach(QString key, storage->fileKeys())
     {
       if (!FUrlByKey.contains(key))
-      {
-        QUrl url;
-        url.setScheme(SMILEY_BY_ICONSET_SCHEMA);
-        url.setPath(substorage);
-        url.setFragment(key);
-        FUrlByKey.insert(key,url);
-      }
+        FUrlByKey.insert(key,QUrl::fromLocalFile(storage->fileFullName(key)));
     }
   }
 }
@@ -254,7 +216,7 @@ void Emoticons::insertSelectIconMenu(const QString &AIconsetFile)
 
 void Emoticons::removeSelectIconMenu(const QString &AIconsetFile)
 {
-  QHash<SelectIconMenu *,IToolBarWidget *>::iterator it = FToolBarWidgetByMenu.begin();
+  QMap<SelectIconMenu *,IToolBarWidget *>::iterator it = FToolBarWidgetByMenu.begin();
   while (it != FToolBarWidgetByMenu.end())
   {
     SelectIconMenu *menu = it.key();

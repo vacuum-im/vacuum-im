@@ -1,0 +1,8 @@
+<div class="xxxwrapper %messageClasses% %service% %senderScreenName%">
+	<span class="xxxicon"><img class="xxxiconsmall" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" src="%userIconPath%" /></span>
+	<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('%senderScreenName%'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('%senderScreenName%'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }">%sender%</span>
+	<span class="xxxmark" style="background-color: %senderColor%; color: %senderColor%">&#8227;</span>
+	<span class="xxxmessage" title="%service%&nbsp;&middot;&nbsp;%senderPrefix%%senderScreenName%&nbsp;&middot;&nbsp;%time%">%message%</span>
+	<span class="xxxtime">%time%</span>
+</div>
+<xxxinsert id="insert"></xxxinsert>

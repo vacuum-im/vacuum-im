@@ -1,0 +1,30 @@
+@charset "utf-8";
+
+#topic {
+	position: fixed;
+	top: 0;
+	z-index: 9999;
+	width: 100%;
+	min-height: 16px !important;
+	background:	rgba(208, 208, 208, 1);
+	-webkit-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.4);
+	padding: 2px;
+	padding-top: 3px;
+	-webkit-transition: background .4s linear;
+}
+
+#topic[title=""]:not(:hover)
+{
+	background: none;
+	-webkit-box-shadow: none;
+}
+
+#topicEdit {
+	display: block;
+	line-height: 1.5em;
+	color: rgba(56, 56, 56, 1);
+	text-overflow: ellipsis;
+	overflow: hidden;
+	word-wrap: break-word;
+	word-break: break-word;
+}

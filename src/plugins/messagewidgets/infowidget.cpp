@@ -1,6 +1,8 @@
 #include "infowidget.h"
 
+#include <QMovie>
 #include <QDataStream>
+#include <QImageReader>
 
 InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
@@ -8,21 +10,18 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
   ui.lblAvatar->setVisible(false);
   ui.wdtAccount->setVisible(false);
   ui.wdtStatus->setVisible(false);
-  ui.wdtEmail->setVisible(false);
-  ui.wdtClient->setVisible(false); 
-  ui.lblStatus->setMaximumHeight(QFontMetrics(ui.lblStatus->font()).height()*4+1);
+  ui.lblStatus->setMaximumHeight(ui.lblStatus->fontMetrics().height()*4+1);
 
   FAccount = NULL;
   FRoster = NULL;
   FPresence = NULL;
-  FClientInfo = NULL;
   FAvatars = NULL;
 
   FMessageWidgets = AMessageWidgets;
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
   FAutoFields = 0xFFFFFFFF;
-  FVisibleFields = AccountName|ContactAvatar|ContactName|ContactStatus;
+  FVisibleFields = AccountName|ContactName|ContactStatus|ContactAvatar;
 
   initialize();
 }
@@ -32,22 +31,41 @@ InfoWidget::~InfoWidget()
 
 }
 
+void InfoWidget::setStreamJid(const Jid &AStreamJid)
+{
+  if (FStreamJid != AStreamJid)
+  {
+    Jid befour = FStreamJid;
+    FStreamJid = AStreamJid;
+    initialize();
+    autoUpdateFields();
+    emit streamJidChanged(befour);
+  }
+}
+
+void InfoWidget::setContactJid(const Jid &AContactJid)
+{
+  if (FContactJid != AContactJid)
+  {
+    Jid befour = FContactJid;
+    FContactJid = AContactJid;
+    autoUpdateFields();
+    emit contactJidChanged(AContactJid);
+  }
+}
+
 void InfoWidget::autoUpdateFields()
 {
   if (isFiledAutoUpdated(AccountName))
     autoUpdateField(AccountName);
-  if (isFiledAutoUpdated(ContactAvatar))
-    autoUpdateField(ContactAvatar);
   if (isFiledAutoUpdated(ContactName))
     autoUpdateField(ContactName);
   if (isFiledAutoUpdated(ContactShow))
     autoUpdateField(ContactShow);
   if (isFiledAutoUpdated(ContactStatus))
     autoUpdateField(ContactStatus);
-  if (isFiledAutoUpdated(ContactEmail))
-    autoUpdateField(ContactEmail);
-  if (isFiledAutoUpdated(ContactClient))
-    autoUpdateField(ContactClient);
+  if (isFiledAutoUpdated(ContactAvatar))
+    autoUpdateField(ContactAvatar);
 }
 
 void InfoWidget::autoUpdateField(InfoField AField)
@@ -56,13 +74,7 @@ void InfoWidget::autoUpdateField(InfoField AField)
   {
   case AccountName:
     {
-      FAccount != NULL ? setField(AccountName,FAccount->name()) : setField(AccountName,QVariant());
-      break;
-    };
-  case ContactAvatar:
-    {
-      QImage avatar = FAvatars!=NULL ? FAvatars->avatarImage(FContactJid) : QImage();
-      setField(ContactAvatar,avatar);
+      setField(AField,FAccount!=NULL ? FAccount->name() : QString());
       break;
     };
   case ContactName:
@@ -74,36 +86,22 @@ void InfoWidget::autoUpdateField(InfoField AField)
         contactName = FContactJid.resource();
       if (contactName.isEmpty())
         contactName = FContactJid.bare();
-      setField(ContactName,contactName);
+      setField(AField,contactName);
       break;
     };
   case ContactShow:
     {
-      if (FPresence)
-      {
-        setField(ContactShow,FPresence->presenceItem(FContactJid).show);
-      }
+      setField(AField,FPresence!=NULL ? FPresence->presenceItem(FContactJid).show : IPresence::Offline);
       break;
     }
   case ContactStatus:
     {
-      if (FPresence)
-      {
-        setField(ContactStatus,FPresence->presenceItem(FContactJid).status);
-      }
+      setField(AField,FPresence!=NULL ? FPresence->presenceItem(FContactJid).status : QString());
       break;
     };
-  case ContactEmail:
+  case ContactAvatar:
     {
-      setField(ContactEmail,QVariant());
-      break;
-    };
-  case ContactClient:
-    {
-      if (FClientInfo && FClientInfo->hasSoftwareInfo(FContactJid))
-        setField(ContactClient,FClientInfo->softwareName(FContactJid)+" "+FClientInfo->softwareVersion(FContactJid));
-      else
-        setField(ContactClient,QVariant());
+      setField(AField, FAvatars!=NULL ? FAvatars->avatarFileName(FAvatars->avatarHash(FContactJid)) : QString());
       break;
     };
   }
@@ -111,71 +109,19 @@ void InfoWidget::autoUpdateField(InfoField AField)
 
 QVariant InfoWidget::field(InfoField AField) const
 {
-  switch(AField)
-  {
-  case AccountName:         return ui.lblAccount->text();
-  case ContactAvatar:       return ui.lblAvatar->picture();
-  case ContactName:         return FContactName;
-  case ContactShow:         return FContactShow;
-  case ContactStatus:       return ui.lblStatus->text();
-  case ContactEmail:        return ui.lblEmail->text();
-  case ContactClient:       return ui.lblClient->text();
-  }
-  return QVariant();
+  return FFieldValues.value(AField);
 }
 
 void InfoWidget::setField(InfoField AField, const QVariant &AValue)
 {
-  switch(AField)
-  {
-  case AccountName:
-    {
-      ui.lblAccount->setText(Qt::escape(AValue.toString()));
-      ui.wdtAccount->setVisible(isFieldVisible(AccountName) && !AValue.toString().isEmpty());
-      break;
-    };
-  case ContactAvatar:
-    {
-      QImage avatar = qvariant_cast<QImage>(AValue);
-      if (!avatar.isNull())
-        ui.lblAvatar->setPixmap(QPixmap::fromImage(avatar));
-      else
-        ui.lblAvatar->clear();
-      ui.lblAvatar->setVisible(isFieldVisible(ContactAvatar) && !avatar.isNull());
-      break;
-    };
-  case ContactName:
-    {
-      FContactName = AValue.toString();
-      ui.lblName->setText(QString("<b>%1</b> (%2)").arg(Qt::escape(FContactName)).arg(FContactJid.hFull()));
-      ui.lblName->setVisible(isFieldVisible(ContactName));
-      break;
-    };
-  case ContactShow:
-    {
-      FContactShow = AValue.toInt();
-      break;
-    }
-  case ContactStatus:
-    {
-      ui.lblStatus->setText(Qt::escape(AValue.toString()));
-      ui.wdtStatus->setVisible(isFieldVisible(ContactStatus) && !AValue.toString().isEmpty());
-      break;
-    };
-  case ContactEmail:
-    {
-      ui.lblEmail->setText(Qt::escape(AValue.toString()));
-      ui.wdtEmail->setVisible(isFieldVisible(ContactEmail) && !AValue.toString().isEmpty());
-      break;
-    };
-  case ContactClient:
-    {
-      ui.lblClient->setText(Qt::escape(AValue.toString()));
-      ui.wdtClient->setVisible(isFieldVisible(ContactClient) && !AValue.toString().isEmpty());
-      break;
-    };
-  }
+  FFieldValues.insert(AField,AValue);
+  updateFieldLabel(AField);
   emit fieldChanged(AField,AValue);
+}
+
+int InfoWidget::autoUpdatedFields() const
+{
+  return FAutoFields;
 }
 
 bool InfoWidget::isFiledAutoUpdated(IInfoWidget::InfoField AField) const
@@ -197,6 +143,11 @@ void InfoWidget::setFieldAutoUpdated(IInfoWidget::InfoField AField, bool AAuto)
   }
 }
 
+int InfoWidget::visibleFields() const
+{
+  return FVisibleFields;
+}
+
 bool InfoWidget::isFieldVisible(IInfoWidget::InfoField AField) const
 {
   return (FVisibleFields & AField) >0;
@@ -207,25 +158,8 @@ void InfoWidget::setFieldVisible(IInfoWidget::InfoField AField, bool AVisible)
   if (isFieldVisible(AField) != AVisible)
   {
     AVisible ? FVisibleFields |= AField : FVisibleFields &= ~AField;
-    setField(AField,field(AField));
+    updateFieldLabel(AField);
   }
-}
-
-void InfoWidget::setStreamJid(const Jid &AStreamJid)
-{
-  Jid befour = FStreamJid;
-  FStreamJid = AStreamJid;
-  initialize();
-  autoUpdateFields();
-  emit streamJidChanged(befour);
-}
-
-void InfoWidget::setContactJid(const Jid &AContactJid)
-{
-  Jid befour = FContactJid;
-  FContactJid = AContactJid;
-  autoUpdateFields();
-  emit contactJidChanged(AContactJid);
 }
 
 void InfoWidget::initialize()
@@ -293,16 +227,6 @@ void InfoWidget::initialize()
     }
   }
 
-  plugin = FMessageWidgets->pluginManager()->getPlugins("IClientInfo").value(0,NULL);
-  if (plugin)
-  {
-    FClientInfo = qobject_cast<IClientInfo *>(plugin->instance());
-    if (FClientInfo)
-    {
-      connect(FClientInfo->instance(),SIGNAL(softwareInfoChanged(const Jid &)),SLOT(onSoftwareInfoChanged(const Jid &)));
-    }
-  }
-
   plugin = FMessageWidgets->pluginManager()->getPlugins("IAvatars").value(0,NULL);
   if (plugin)
   {
@@ -314,28 +238,54 @@ void InfoWidget::initialize()
   }
 }
 
-QString InfoWidget::showName(IPresence::Show AShow) const
+void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
 {
-  switch(AShow)
+  switch(AField)
   {
-  case IPresence::Online:
-    return tr("Online");
-  case IPresence::Chat:
-    return tr("Chat");
-  case IPresence::Away:
-    return tr("Away");
-  case IPresence::ExtendedAway:
-    return tr("Extended Away");
-  case IPresence::DoNotDisturb:
-    return tr("Do not Disturb");
-  case IPresence::Invisible:
-    return tr("Invisible");
-  case IPresence::Error:
-    return tr("Error");
-  case IPresence::Offline:
-    return tr("Offline");
-  default:
-    return tr("Unknown status");
+  case AccountName:
+    {
+      QString name = field(AField).toString();
+      ui.lblAccount->setText(Qt::escape(name));
+      ui.wdtAccount->setVisible(isFieldVisible(AField) && !name.isEmpty());
+      break;
+    };
+  case ContactName:
+    {
+      QString name = field(AField).toString();
+      ui.lblName->setText(QString("<b>%1</b> (%2)").arg(Qt::escape(name)).arg(FContactJid.hFull()));
+      ui.lblName->setVisible(isFieldVisible(AField));
+      break;
+    };
+  case ContactStatus:
+    {
+      QString status = field(AField).toString();
+      ui.lblStatus->setText(Qt::escape(status));
+      ui.wdtStatus->setVisible(isFieldVisible(AField) && !status.isEmpty());
+      break;
+    };
+  case ContactAvatar:
+    {
+      if (ui.lblAvatar->movie()!=NULL)
+        ui.lblAvatar->movie()->deleteLater();
+      
+      QString fileName = field(AField).toString();
+      if (!fileName.isEmpty())
+      {
+        QMovie *movie = new QMovie(fileName,QByteArray(),ui.lblAvatar);
+        QSize size = QImageReader(fileName).size();
+        size.scale(QSize(32,32),Qt::KeepAspectRatio);
+        movie->setScaledSize(size);
+        ui.lblAvatar->setMovie(movie);
+        movie->start();
+      }
+      else
+      {
+        ui.lblAvatar->setMovie(NULL);
+      }
+      ui.lblAvatar->setVisible(isFieldVisible(AField) && !fileName.isEmpty());
+
+      break;
+    };
   }
 }
 
@@ -360,12 +310,6 @@ void InfoWidget::onPresenceReceived(const IPresenceItem &APresenceItem)
     if (isFiledAutoUpdated(ContactStatus))
       setField(ContactStatus,APresenceItem.status);
   }
-}
-
-void InfoWidget::onSoftwareInfoChanged(const Jid &AContactJid)
-{
-  if (isFiledAutoUpdated(ContactClient) && AContactJid == FContactJid)
-    autoUpdateField(ContactClient);
 }
 
 void InfoWidget::onAvatarChanged(const Jid &AContactJid)

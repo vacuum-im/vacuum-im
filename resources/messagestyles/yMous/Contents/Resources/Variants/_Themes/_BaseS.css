@@ -1,0 +1,92 @@
+@charset "utf-8";
+
+body 
+{
+	background-color: hsla(0, 0%, 37%, 1);
+}
+
+#Chat
+{
+	border-bottom: 8px solid hsla(0, 0%, 37%, 1) !important;
+	border-top: 8px solid hsla(0, 0%, 37%, 1) !important;
+}
+
+.xxxwrapper:hover,
+.groupchat .xxxhover
+{
+	text-shadow: .0em .1em .2em hsla(0, 0%, 0%, .8);
+}
+
+.xxxwrapper,
+.history .xxxmark,
+.history .xxxmessage
+{
+	background-color: hsla(0, 0%, 12.5%, 1);
+}
+
+.xxxwrapper.history
+{
+	background-color: hsla(0, 0%, 20%, 1);
+}
+
+.xxxwrapper:hover,
+.xxxwrapper:hover > .xxxmark,
+.xxxwrapper:hover > .xxxmessage,
+.groupchat .xxxhover,
+.groupchat .xxxhover .xxxmark,
+.groupchat .xxxhover .xxxmessage
+{
+	background-color: hsla(0, 0%, 25%, 1) !important;
+}
+
+.xxxwrapper.history:hover,
+.xxxwrapper.history:hover > .xxxmark,
+.xxxwrapper.history:hover > .xxxmessage,
+.groupchat .history.xxxhover,
+.groupchat .history.xxxhover .xxxmark,
+.groupchat .history.xxxhover .xxxmessage
+{
+	background-color: hsla(0, 0%, 25%, 1) !important;
+}
+
+.xxxmark
+{
+	border-color: hsla(0, 0%, 37%, 1);
+}
+
+.xxxmessage
+{
+	background-color: hsla(0, 0%, 0%, 1);
+	border-color: hsla(0, 0%, 37%, 1);
+}
+
+/*----------*/
+
+.mention .xxxmark,
+.mention .xxxmessage
+{
+	background-color: hsla(0, 25%, 15%, 1) !important;
+}
+
+.mention:hover .xxxmark,
+.history.mention:hover .xxxmark,
+.mention:hover .xxxmessage,
+.history.mention:hover .xxxmessage
+{
+	background-color: hsla(0, 50%, 15%, 1) !important;
+}
+
+.notification .xxxmark,
+.notification .xxxmessage
+{
+	background-color: hsla(60, 40%, 14%, 1) !important;
+}
+
+.notification:hover .xxxmark,
+.history.notification:hover .xxxmark,
+.notification:hover .xxxmessage,
+.history.notification:hover .xxxmessage
+{
+	background-color: hsla(60, 70%, 15%, 1) !important;
+}
+

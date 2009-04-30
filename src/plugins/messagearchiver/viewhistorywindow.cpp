@@ -71,6 +71,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   FViewWidget = NULL;
   FSettings = NULL;
   FMessageWidgets = NULL;
+  FMessageStyles = NULL;
   FGroupsTools = NULL;
   FStatusIcons = NULL;
   FMessagesTools = NULL;
@@ -248,6 +249,16 @@ void ViewHistoryWindow::reload()
   FInvalidateTimer.start();
 }
 
+void ViewHistoryWindow::showEvent(QShowEvent *AEvent)
+{
+  QMainWindow::showEvent(AEvent);
+  if (!ui.trvCollections->isSortingEnabled()) // Костыль для QSortFilterProxyModel Qt 4.5.0
+  {
+    ui.trvCollections->setSortingEnabled(true);
+    ui.trvCollections->sortByColumn(1,Qt::DescendingOrder); 
+  }
+}
+
 void ViewHistoryWindow::initialize()
 {
   IPluginManager *manager = FArchiver->pluginManager();
@@ -267,7 +278,6 @@ void ViewHistoryWindow::initialize()
     if (FMessageWidgets)
     {
       FViewWidget = FMessageWidgets->newViewWidget(FStreamJid,FStreamJid);
-      FViewWidget->setColorForJid(FStreamJid.bare(),Qt::red);
       FMessagesTools = FMessageWidgets->newToolBarWidget(NULL,FViewWidget,NULL,NULL);
       QVBoxLayout *layout = new QVBoxLayout(ui.grbMessages);
       layout->setMargin(3);
@@ -276,6 +286,10 @@ void ViewHistoryWindow::initialize()
       ui.grbMessages->setLayout(layout);
     }
   }
+
+  plugin = manager->getPlugins("IMessageStyles").value(0,NULL);
+  if (plugin)
+    FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
 
   plugin = manager->getPlugins("ISettingsPlugin").value(0);
   if (plugin)
@@ -613,6 +627,49 @@ void ViewHistoryWindow::removeCustomItem(QStandardItem *AItem)
   }
 }
 
+void ViewHistoryWindow::setViewOptions(const IArchiveCollection &ACollection)
+{
+  FViewOptions.isGroupchat = false;
+  for (int i=0; !FViewOptions.isGroupchat && i<ACollection.messages.count();i++)
+    FViewOptions.isGroupchat = ACollection.messages.at(i).type()==Message::GroupChat;
+
+  if (FMessageStyles && !FViewOptions.isGroupchat)
+  {
+    FViewOptions.selfName = Qt::escape(FMessageStyles->userName(FStreamJid));
+    FViewOptions.selfAvatar = FMessageStyles->userAvatar(FStreamJid);
+    if (!ACollection.header.with.resource().isEmpty() && ACollection.header.with.pDomain().startsWith("conference."))
+      FViewOptions.contactName = Qt::escape(ACollection.header.with.resource());
+    else
+      FViewOptions.contactName = Qt::escape(FArchiver->gateNick(FStreamJid,ACollection.header.with));
+    FViewOptions.contactAvatar = FMessageStyles->userAvatar(ACollection.header.with);
+  }
+  FViewOptions.lastSender = Jid();
+}
+
+void ViewHistoryWindow::setMessageStyle(const IArchiveHeader &AHeader)
+{
+  IMessageStyles::StyleSettings settings = FMessageStyles->styleSettings(FViewOptions.isGroupchat ? Message::GroupChat : Message::Chat);
+  FViewWidget->setContentSettings(settings.content);
+
+  IMessageStyle *style = FMessageStyles!=NULL ? FMessageStyles->styleById(settings.styleId) : NULL;
+  if (style)
+  {
+    IMessageStyle::StyleOptions options;
+    options.variant = settings.variant;
+    options.headerType = IMessageStyle::HeaderNone;
+    options.startTime = AHeader.start;
+    options.selfName = FViewOptions.selfName;
+    options.selfAvatar = FViewOptions.selfAvatar;
+    options.contactName = FViewOptions.contactName;
+    options.contactAvatar = FViewOptions.contactAvatar;
+
+    if (style != FViewWidget->messageStyle())
+      FViewWidget->setMessageStyle(style,options);
+    else if (FViewWidget->messageStyle()!=NULL)
+      FViewWidget->messageStyle()->setStyle(FViewWidget->webBrowser(),options);
+  }
+}
+
 void ViewHistoryWindow::processRequests(const QList<IArchiveRequest> &ARequests)
 {
   QList<IArchiveRequest> localRequests;
@@ -652,38 +709,74 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
   {
     if (!AAppend)
     {
-      bool isGroupchat = false;
-      for (int i=0; !isGroupchat && i<ACollection.messages.count();i++)
-        isGroupchat = ACollection.messages.at(i).type()==Message::GroupChat;
-
-      FViewWidget->textBrowser()->clear();
+      setViewOptions(ACollection);
+      setMessageStyle(ACollection.header);
       FViewWidget->setContactJid(ACollection.header.with);
-      if (isGroupchat)
-      {
-        FViewWidget->setShowKind(IViewWidget::GroupChatMessage);
-        FViewWidget->setNickForJid(ACollection.header.with,ACollection.header.with.node());
-      }
-      else
-      {
-        FViewWidget->setShowKind(IViewWidget::ChatMessage);
-        if (!ACollection.header.with.pDomain().startsWith("conference."))
-          FViewWidget->setNickForJid(ACollection.header.with, FArchiver->gateNick(FStreamJid,ACollection.header.with));
-        else
-          FViewWidget->setNickForJid(ACollection.header.with, ACollection.header.with.resource());
-      }
     }
 
+    IMessageStyle::ContentOptions options;
+    options.replaceLastContent = false;
+    options.willAppendMoreContent = true;
+
+    options.messageClasses.append(MSMC_STATUS);
+    options.senderName = FViewOptions.selfName;
+    options.contentType = IMessageStyle::ContentStatus;
     QMultiMap<QDateTime,QString>::const_iterator it = ACollection.notes.constBegin();
     while (it!=ACollection.notes.constEnd())
     {
-      FViewWidget->showCustomMessage(it.value(),it.key());
+      options.sendTime = it.key();
+      options.sendTimeFormat = FMessageStyles!=NULL ? FMessageStyles->messageTimeFormat(options.sendTime) : QString::null;
+      FViewWidget->appendText(it.value(),options);
       it++;
     }
 
+    options.contentType = IMessageStyle::ContentArchive;
     foreach(Message message, ACollection.messages)
-      FViewWidget->showMessage(message);
+    {
+      options.sendTime = message.dateTime();
+      options.sendTimeFormat = FMessageStyles->messageTimeFormat(options.sendTime);
 
-    FViewWidget->textBrowser()->verticalScrollBar()->setSliderPosition(0);
+      Jid senderJid = !message.from().isEmpty() ? message.from() : FStreamJid;
+      options.isSameSender = FViewOptions.lastSender == senderJid;
+      FViewOptions.lastSender = senderJid;
+
+      options.messageClasses.clear();
+      options.messageClasses.append(MSMC_MESSAGE);
+
+      if (FViewOptions.isGroupchat)
+      {
+        options.isDirectionIn = true;
+        options.messageClasses.append(MSMC_INCOMING);
+        options.messageClasses.append(MSMC_GROUPCHAT);
+        options.senderName = Qt::escape(senderJid.resource());
+        options.senderAvatar = " ";
+      }
+      else if (ACollection.header.with == senderJid)
+      {
+        options.isDirectionIn = true;
+        options.senderColor = "blue";
+        options.messageClasses.append(MSMC_INCOMING);
+        options.senderName = FViewOptions.contactName;
+        if (FViewWidget->contentSettings().showAvatars)
+          options.senderAvatar = FViewOptions.contactAvatar;
+        else
+          options.senderAvatar = " ";
+      }
+      else
+      {
+        options.isDirectionIn = false;
+        options.senderColor = "red";
+        options.messageClasses.append(MSMC_OUTGOING);
+        options.senderName = FViewOptions.selfName;
+        if (FViewWidget->contentSettings().showAvatars)
+          options.senderAvatar = FViewOptions.selfAvatar;
+        else
+          options.senderAvatar = " ";
+      }
+      options.isAlignLTR = options.isDirectionIn;
+
+      FViewWidget->appendMessage(message,options);
+    }
   }
 }
 
@@ -935,7 +1028,7 @@ void ViewHistoryWindow::onRequestFailed(const QString &AId, const QString &AErro
     collection.notes.clear();
 
     if (FCurrentHeaders.contains(header))
-      FViewWidget->showCustomMessage(tr("Message loading failed: %1").arg(AError));
+      FViewWidget->setHtml(Qt::escape(tr("Message loading failed: %1").arg(AError)));
   }
   else if (FRenameRequests.contains(AId))
   {
@@ -956,7 +1049,6 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
 
     if (FViewWidget)
     {
-      FViewWidget->textBrowser()->clear();
       if (index.data(HDR_ITEM_TYPE).toInt() == HIT_HEADER_JID)
       {
         const IArchiveHeader &header = FCurrentHeaders.at(0);
@@ -972,9 +1064,9 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
           else if (FCollectionRequests.key(header).isEmpty())
           {
             if (loadServerCollection(header))
-              FViewWidget->showCustomMessage(tr("Loading messages from server..."));
+              FViewWidget->setHtml(Qt::escape(tr("Loading messages from server...")));
             else
-              FViewWidget->showCustomMessage(tr("Messages request failed."));
+              FViewWidget->setHtml(Qt::escape(tr("Messages request failed.")));
           }
         }
         else
@@ -986,6 +1078,7 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
       }
       else
       {
+        FViewWidget->setHtml("");
         FFilterBy->setEnabled(false);
         FRename->setEnabled(false);
       }

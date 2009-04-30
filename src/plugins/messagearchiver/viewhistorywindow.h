@@ -13,6 +13,7 @@
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/imessagearchiver.h"
+#include "../../interfaces/imessagestyles.h"
 #include "ui_viewhistorywindow.h"
 
 class ViewHistoryWindow;
@@ -26,6 +27,15 @@ protected:
   virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 private:
   ViewHistoryWindow *FWindow;
+};
+
+struct ViewOptions {
+  bool isGroupchat;
+  Jid lastSender;
+  QString selfName;
+  QString selfAvatar;
+  QString contactName;
+  QString contactAvatar;
 };
 
 class ViewHistoryWindow : 
@@ -61,6 +71,8 @@ signals:
   virtual void itemDestroyed(QStandardItem *AItem);
   virtual void windowDestroyed(IArchiveWindow *AWindow);
 protected:
+  virtual void showEvent(QShowEvent *AEvent);
+protected:
   void initialize();
   QList<IArchiveHeader> indexHeaders(const QModelIndex &AIndex) const;
   QList<IArchiveRequest> createRequests(const IArchiveFilter &AFilter) const;
@@ -77,6 +89,8 @@ protected:
   QStandardItem *createHeaderItem(const IArchiveHeader &AHeader);
   void updateHeaderItem(const IArchiveHeader &AHeader);
   void removeCustomItem(QStandardItem *AItem);
+  void setViewOptions(const IArchiveCollection &ACollection);
+  void setMessageStyle(const IArchiveHeader &AHeader);
   void processRequests(const QList<IArchiveRequest> &ARequests);
   void processHeaders(const QList<IArchiveHeader> &AHeaders);
   void processCollection(const IArchiveCollection &ACollection, bool AAppend = false);
@@ -108,12 +122,14 @@ private:
   Ui::ViewHistoryWindowClass ui;
 private:
   IRoster *FRoster;
-  IViewWidget *FViewWidget;
-  IToolBarWidget *FMessagesTools;
   IMessageWidgets *FMessageWidgets;
+  IMessageStyles *FMessageStyles;
   ISettings *FSettings;
   IStatusIcons *FStatusIcons;
   IMessageArchiver *FArchiver;
+private:
+  IViewWidget *FViewWidget;
+  IToolBarWidget *FMessagesTools;
 private:
   QStandardItemModel *FModel;
   SortFilterProxyModel *FProxyModel;
@@ -126,10 +142,11 @@ private:
   Menu *FSourceMenu;
   ToolBarChanger *FGroupsTools;
 private:
-  int FGroupKind;
   int FSource;
-  QTimer FInvalidateTimer;
+  int FGroupKind;
   Jid FStreamJid;
+  ViewOptions FViewOptions;
+  QTimer FInvalidateTimer;
   IArchiveFilter FFilter;
   QList<IArchiveHeader> FCurrentHeaders;
   QList<IArchiveRequest> FRequestList;

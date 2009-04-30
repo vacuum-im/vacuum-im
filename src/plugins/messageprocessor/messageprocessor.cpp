@@ -93,7 +93,7 @@ void MessageProcessor::writeText(Message &AMessage, QTextDocument *ADocument, co
   if (AOrder == MWO_MESSAGEPROCESSOR)
   {
     QTextCursor cursor(ADocument);
-    cursor.insertText(prepareBodyForReceive(AMessage.body(ALang)));
+    cursor.insertHtml(prepareBodyForReceive(AMessage.body(ALang)));
   }
   else if (AOrder == MWO_MESSAGEPROCESSOR_ANCHORS)
   {
@@ -304,15 +304,16 @@ void MessageProcessor::removeStreamMessages(const Jid &AStreamJid)
 
 QString MessageProcessor::prepareBodyForSend(const QString &AString) const
 {
-  QString result = AString.trimmed();
+  QString result = AString;
   result.remove(QChar::ObjectReplacementCharacter);
   return result;
 }
 
 QString MessageProcessor::prepareBodyForReceive(const QString &AString) const
 {
-  QString result = AString.trimmed();
-  result.remove(QChar::ObjectReplacementCharacter);
+  QString result = Qt::escape(AString);
+  result.replace('\n',"<br>");
+  result.replace("  " ,"&nbsp; ");
   return result;
 }
 

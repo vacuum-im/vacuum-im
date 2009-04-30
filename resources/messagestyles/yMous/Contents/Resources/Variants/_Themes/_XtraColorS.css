@@ -1,0 +1,54 @@
+@charset "utf-8";
+
+.outgoing,
+.incoming
+{
+	color: hsla(0, 0%, 75%, .8);
+}
+
+.outgoing:hover,
+.incoming:hover,
+.groupchat .sender.xxxhover
+{
+	color: hsla(0, 0%, 100%, 1);
+}
+
+.status,
+.status .xxxmessage,
+.event,
+.event .xxxmessage
+{
+	color: hsla(0, 0%, 40%, .8);
+}
+
+.status .xxxmark,
+.event .xxxmark
+{
+	background-color: hsla(0, 0%, 12.5%, .8);
+	color: hsla(0, 0%, 12.5%, .8);
+}
+
+.status:hover,
+.status:hover .xxxmark,
+.status:hover .xxxmessage,
+.event:hover,
+.event:hover .xxxmark,
+.event:hover .xxxmessage
+{
+	color: hsla(0, 0%, 75%, .8) !important;
+}
+
+.history.status .xxxmark,
+.history.event .xxxmark
+{
+	background-color: hsla(0, 0%, 20%, 1) !important;
+	color: hsla(0, 0%, 20%, 1) !important;
+}
+
+.status.history:hover .xxxmark,
+.event.history:hover .xxxmark
+{
+	//background-color: hsla(0, 0%, 20%, 1);
+	color: hsla(0, 0%, 55%, 1) !important;
+}
+

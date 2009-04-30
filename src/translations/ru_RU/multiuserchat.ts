@@ -719,42 +719,6 @@ Check values and try again</source>
         <translation>Отключен</translation>
     </message>
     <message>
-        <source>Supported list of commands:</source>
-        <translation>Список поддерживаемых команд:</translation>
-    </message>
-    <message>
-        <source> /ban &lt;roomnick&gt; [comment]</source>
-        <translation>/ban &lt;ник&gt; [комментарий]</translation>
-    </message>
-    <message>
-        <source> /invite &lt;jid&gt; [comment]</source>
-        <translation>/invite &lt;jid&gt; [комментарий]</translation>
-    </message>
-    <message>
-        <source> /join &lt;roomname&gt; [pass]</source>
-        <translation>/join &lt;имя_комнаты&gt; [пароль]</translation>
-    </message>
-    <message>
-        <source> /kick &lt;roomnick&gt; [comment]</source>
-        <translation>/kick &lt;ник&gt; [комментарий]</translation>
-    </message>
-    <message>
-        <source> /msg &lt;roomnick&gt; &lt;foo&gt;</source>
-        <translation>/msg &lt;ник&gt; &lt;сообщение&gt;</translation>
-    </message>
-    <message>
-        <source> /nick &lt;newnick&gt;</source>
-        <translation>/nick &lt;новый_ник&gt;</translation>
-    </message>
-    <message>
-        <source> /leave [comment]</source>
-        <translation>/leave [комментарий]</translation>
-    </message>
-    <message>
-        <source> /topic &lt;foo&gt;</source>
-        <translation>/topic &lt;новая_тема&gt;</translation>
-    </message>
-    <message>
         <source>%1 (%2)</source>
         <translation>%1 (%2)</translation>
     </message>
@@ -844,7 +808,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1: </source>
-        <translation>%1:</translation>
+        <translation>%1: </translation>
     </message>
     <message>
         <source>Change nick name</source>
@@ -925,6 +889,18 @@ Check values and try again</source>
     <message>
         <source>[%1] in conference %2</source>
         <translation>[%1] в конференции %2</translation>
+    </message>
+    <message>
+        <source>Supported list of commands: 
+ /ban &lt;roomnick&gt; [comment] 
+ /invite &lt;jid&gt; [comment] 
+ /join &lt;roomname&gt; [pass] 
+ /kick &lt;roomnick&gt; [comment] 
+ /msg &lt;roomnick&gt; &lt;foo&gt; 
+ /nick &lt;newnick&gt; 
+ /leave [comment] 
+ /topic &lt;foo&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

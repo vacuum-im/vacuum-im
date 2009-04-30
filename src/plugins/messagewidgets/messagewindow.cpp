@@ -9,7 +9,6 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
 
-  FMessageProcessor = NULL;
   FMessageWidgets = AMessageWidgets;
   FSettings = NULL;
 
@@ -25,12 +24,9 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
   ui.wdtInfo->layout()->setMargin(0);
 
   FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid);
-  FViewWidget->setShowKind(IViewWidget::NormalMessage);
-  FViewWidget->document()->setDefaultFont(FMessageWidgets->defaultMessageFont());
 
   FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid);
   FEditWidget->setSendMessageKey(QKeySequence());
-  FEditWidget->document()->setDefaultFont(FMessageWidgets->defaultMessageFont());
 
   FReceiversWidget = FMessageWidgets->newReceiversWidget(FStreamJid);
   connect(FReceiversWidget->instance(),SIGNAL(receiverAdded(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
@@ -50,7 +46,6 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
   connect(ui.pbtForward,SIGNAL(clicked()),SLOT(onForwardButtonClicked()));
   connect(ui.pbtChat,SIGNAL(clicked()),SLOT(onChatButtonClicked()));
   connect(ui.pbtNext,SIGNAL(clicked()),SLOT(onNextButtonClicked()));
-  connect(FMessageWidgets->instance(),SIGNAL(defaultMessageFontChanged(const QFont &)), SLOT(onDefaultMessageFontChanged(const QFont &)));
 
   initialize();
   setCurrentTabWidget(ui.tabMessage);
@@ -185,7 +180,7 @@ void MessageWindow::showMessage(const Message &AMessage)
   if (FMessage.type() == Message::Error)
     showErrorMessage(FMessage);
   else
-    FViewWidget->showMessage(FMessage);
+    FViewWidget->setMessage(FMessage);
 }
 
 void MessageWindow::initialize()
@@ -211,12 +206,6 @@ void MessageWindow::initialize()
     ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
     if (settingsPlugin)
       FSettings = settingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
-  }
-
-  plugin = FMessageWidgets->pluginManager()->getPlugins("IMessageProcessor").value(0,NULL);
-  if (plugin)
-  {
-    FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
   }
 }
 
@@ -253,12 +242,9 @@ void MessageWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, c
 void MessageWindow::showErrorMessage(const Message &AMessage)
 {
   QTextDocument doc;
-  doc.setDefaultFont(FViewWidget->document()->defaultFont());
-  FMessageProcessor->messageToText(&doc,AMessage);
-  ErrorHandler err(AMessage.stanza().element());
-  
   QTextCursor cursor(&doc);
   QTextCharFormat format;
+  ErrorHandler err(AMessage.stanza().element());
   format.setFontWeight(QFont::Bold);
   cursor.insertText(tr("The message with a error code %1 is received.").arg(err.code()),format);
   cursor.insertBlock();
@@ -267,11 +253,12 @@ void MessageWindow::showErrorMessage(const Message &AMessage)
   cursor.insertText(err.message(),format);
   cursor.insertBlock();
   format.setForeground(Qt::black);
-  cursor.insertText("______________");
+  cursor.insertText("______________",format);
   cursor.insertBlock();
+  format.setFontWeight(QFont::Normal);
+  cursor.insertText(AMessage.body(),format);
 
-  FViewWidget->document()->clear();
-  FViewWidget->showCustomHtml(doc.toHtml());
+  FViewWidget->setHtml(doc.toHtml());
 }
 
 void MessageWindow::showEvent(QShowEvent *AEvent)
@@ -336,10 +323,3 @@ void MessageWindow::onReceiversChanged(const Jid &/*AReceiver*/)
     receiversStr += QString("%1; ").arg(FReceiversWidget->receiverName(contactJid));
   ui.lblReceivers->setText(receiversStr);
 }
-
-void MessageWindow::onDefaultMessageFontChanged(const QFont &AFont)
-{
-  FViewWidget->document()->setDefaultFont(AFont);
-  FEditWidget->document()->setDefaultFont(AFont);
-}
-

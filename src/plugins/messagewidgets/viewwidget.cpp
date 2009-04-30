@@ -8,17 +8,17 @@
 ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
-  ui.tedViewer->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
+  FMessageStyle = NULL;
   FMessageProcessor = NULL;
   FMessageWidgets = AMessageWidgets;
+
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
 
-  FSetScrollToMax = false;
-  FShowKind = ChatMessage;
+  ui.mvrViewer->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  connect(ui.mvrViewer->page(),SIGNAL(linkClicked(const QUrl &)),SIGNAL(linkClicked(const QUrl &)));
 
-  ui.tedViewer->installEventFilter(this);
   initialize();
 }
 
@@ -33,13 +33,6 @@ void ViewWidget::setStreamJid(const Jid &AStreamJid)
   {
     Jid befour = FStreamJid;
     FStreamJid = AStreamJid;
-    if (FShowKind == ChatMessage)
-    {
-      setColorForJid(FStreamJid,colorForJid(befour));
-      setColorForJid(befour,QColor());
-      setNickForJid(FStreamJid,nickForJid(befour));
-      setNickForJid(befour,QString());
-    }
     emit streamJidChanged(befour);
   }
 }
@@ -50,139 +43,104 @@ void ViewWidget::setContactJid(const Jid &AContactJid)
   {
     Jid befour = FContactJid;
     FContactJid = AContactJid;
-    if (FShowKind == ChatMessage)
+    emit contactJidChanged(befour);
+  }
+}
+
+QWebView *ViewWidget::webBrowser() const
+{
+  return ui.mvrViewer;
+}
+
+void ViewWidget::setHtml(const QString &AHtml)
+{
+  ui.mvrViewer->setHtml(AHtml);
+}
+
+void ViewWidget::setMessage(const Message &AMessage)
+{
+  QTextDocument messageDoc;
+  if (FMessageProcessor)
+    FMessageProcessor->messageToText(&messageDoc,AMessage);
+  else
+    messageDoc.setPlainText(AMessage.body());
+
+  setHtml(messageDoc.toHtml());
+}
+
+IMessageStyle *ViewWidget::messageStyle() const
+{
+  return FMessageStyle;
+}
+
+void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyle::StyleOptions &AOptions)
+{
+  if (FMessageStyle != AStyle)
+  {
+    IMessageStyle *befour = FMessageStyle;
+    FMessageStyle = AStyle;
+    if (befour)
     {
-      setColorForJid(FContactJid,colorForJid(befour));
-      setColorForJid(befour,QColor());
-      setNickForJid(FContactJid,nickForJid(befour));
-      setNickForJid(befour,QString());
+      disconnect(befour->instance(),SIGNAL(contentAppended(QWebView *, const QString &, const IMessageStyle::ContentOptions &)),
+        this, SLOT(onContentAppended(QWebView *, const QString &, const IMessageStyle::ContentOptions &)));
     }
-    emit contactJidChanged(AContactJid);
-  }
-}
-
-void ViewWidget::setShowKind(ShowKind AKind)
-{
-  FShowKind = AKind;
-  if (FShowKind == ChatMessage)
-  {
-    setColorForJid(FStreamJid,FJid2Color.value(FStreamJid,Qt::red));
-    setColorForJid(FContactJid,FJid2Color.value(FContactJid,Qt::blue));
-  }
-}
-
-void ViewWidget::showMessage(const Message &AMessage)
-{
-  if (FShowKind == NormalMessage)
-  {
-    QTextDocument messageDoc;
-    messageDoc.setDefaultFont(document()->defaultFont());
-    if (FMessageProcessor)
-      FMessageProcessor->messageToText(&messageDoc,AMessage);
-    else
-      messageDoc.setPlainText(AMessage.body());
-    showCustomMessage(FMessageWidgets->checkOption(IMessageWidgets::ShowHTML) ? messageDoc.toHtml() : messageDoc.toPlainText());
-  }
-  else
-  {
-    Jid authorJid = AMessage.from().isEmpty() ? FStreamJid : AMessage.from();
-    QString authorNick = FJid2Nick.value(authorJid,FShowKind == GroupChatMessage ? authorJid.resource() : authorJid.node());
-    QColor authorColor = colorForJid(authorJid);
-
-    QTextDocument messageDoc;
-    if (FMessageProcessor)
-      FMessageProcessor->messageToText(&messageDoc,AMessage);
-    else
-      messageDoc.setPlainText(AMessage.body());
-    
-    if (processMeCommand(&messageDoc,authorNick,authorColor))
-      authorNick.clear();
-
-    if (FMessageWidgets->checkOption(IMessageWidgets::ShowHTML))
-      showCustomMessage(messageDoc.toHtml(),AMessage.dateTime(),authorNick,authorColor);
-    else
-      showCustomMessage(messageDoc.toPlainText(),AMessage.dateTime(),authorNick,authorColor);
-  }
-
-  emit messageShown(AMessage);
-}
-
-void ViewWidget::showCustomMessage(const QString &AHtml, const QDateTime &ATime, const QString &ANick, const QColor &ANickColor)
-{
-  if (FShowKind != NormalMessage)
-  {
-    QTextCursor cursor = document()->rootFrame()->lastCursorPosition();
-    bool scrollAtEnd = textBrowser()->verticalScrollBar()->sliderPosition() == textBrowser()->verticalScrollBar()->maximum();
-
-
-    QTextTableFormat tableFormat;
-    tableFormat.setBorder(0);
-    tableFormat.setBorderStyle(QTextTableFormat::BorderStyle_None);
-    QTextTable *table = cursor.insertTable(1,2,tableFormat);
-
-    if (ATime.isValid() && FMessageWidgets->checkOption(IMessageWidgets::ShowDateTime))
+    if (FMessageStyle)
     {
-      QTextCharFormat timeFormat;
-      timeFormat.setForeground(Qt::gray);
-      QString timeString = QDateTime::currentDateTime().date()==ATime.date() ? tr("hh:mm") : tr("dd.MM hh:mm");
-      table->cellAt(0,0).lastCursorPosition().insertText(QString("[%1]").arg(ATime.toString(timeString)),timeFormat);
+      FMessageStyle->setStyle(ui.mvrViewer,AOptions);
+      connect(FMessageStyle->instance(),SIGNAL(contentAppended(QWebView *, const QString &, const IMessageStyle::ContentOptions &)),
+        SLOT(onContentAppended(QWebView *, const QString &, const IMessageStyle::ContentOptions &)));
     }
+    emit messageStyleChanged(befour,AOptions);
+  }
+}
 
-    if (!ANick.isEmpty())
-    {
-      QTextCharFormat nickFormat;
-      nickFormat.setForeground(ANickColor);
-      table->cellAt(0,0).lastCursorPosition().insertText(QString("[%1]").arg(ANick),nickFormat);
-    }
+const IMessageStyles::ContentSettings &ViewWidget::contentSettings() const
+{
+  return FContentSettings;
+}
 
-    table->cellAt(0,1).lastCursorPosition().insertHtml(getHtmlBody(AHtml.trimmed()));
+void ViewWidget::setContentSettings(const IMessageStyles::ContentSettings &ASettings)
+{
+  FContentSettings = ASettings;
+  emit contentSettingsChanged(FContentSettings);
+}
 
-    if (scrollAtEnd)
-      textBrowser()->verticalScrollBar()->setSliderPosition(textBrowser()->verticalScrollBar()->maximum());
+void ViewWidget::appendHtml(const QString &AHtml, const IMessageStyle::ContentOptions &AOptions)
+{
+  if (FMessageStyle)
+    FMessageStyle->appendContent(ui.mvrViewer,AHtml,AOptions);
+}
+
+void ViewWidget::appendText(const QString &AText, const IMessageStyle::ContentOptions &AOptions)
+{
+  Message message;
+  message.setBody(AText);
+  appendMessage(message,AOptions);
+}
+
+void ViewWidget::appendMessage(const Message &AMessage, const IMessageStyle::ContentOptions &AOptions)
+{
+  QTextDocument messageDoc;
+  if (FMessageProcessor)
+    FMessageProcessor->messageToText(&messageDoc,AMessage);
+  else
+    messageDoc.setPlainText(AMessage.body());
+
+  if (!AOptions.senderName.isEmpty() && processMeCommand(&messageDoc,AOptions))
+  {
+    IMessageStyle::ContentOptions options = AOptions;
+    options.senderName = QString::null;
+    appendHtml(getHtmlBody(messageDoc.toHtml()),options);
   }
   else
-    document()->setHtml(getHtmlBody(AHtml));
-}
-
-void ViewWidget::showCustomHtml(const QString &AHtml)
-{
-  QTextCursor cursor = document()->rootFrame()->lastCursorPosition();
-  bool scrollAtEnd = textBrowser()->verticalScrollBar()->sliderPosition() == textBrowser()->verticalScrollBar()->maximum();
-  
-  cursor.insertHtml(AHtml);
-  cursor.insertBlock();
-
-  if (scrollAtEnd)
-    textBrowser()->verticalScrollBar()->setSliderPosition(textBrowser()->verticalScrollBar()->maximum());
-
-  emit customHtmlShown(AHtml);
-}
-
-void ViewWidget::setColorForJid(const Jid &AJid, const QColor &AColor)
-{
-  if (AColor.isValid())
-    FJid2Color.insert(AJid,AColor);
-  else
-    FJid2Color.remove(AJid);
-  emit colorForJidChanged(AJid,AColor);
-}
-
-void ViewWidget::setNickForJid(const Jid &AJid, const QString &ANick)
-{
-  if (!ANick.isNull())
-    FJid2Nick.insert(AJid,ANick);
-  else
-    FJid2Nick.remove(AJid);
-  emit nickForJidChanged(AJid,ANick);
+    appendHtml(getHtmlBody(messageDoc.toHtml()),AOptions);
 }
 
 void ViewWidget::initialize()
 {
   IPlugin *plugin = FMessageWidgets->pluginManager()->getPlugins("IMessageProcessor").value(0,NULL);
   if (plugin)
-  {
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
-  }
 }
 
 QString ViewWidget::getHtmlBody(const QString &AHtml)
@@ -199,43 +157,19 @@ QString ViewWidget::getHtmlBody(const QString &AHtml)
   return AHtml;
 }
 
-bool ViewWidget::processMeCommand(QTextDocument *ADocument, const QString &ANick, const QColor &AColor)
+bool ViewWidget::processMeCommand(QTextDocument *ADocument, const IMessageStyle::ContentOptions &AOptions)
 {
-  bool found = false;
   QRegExp regexp("^/me\\s");
   for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
   {
-    QTextCharFormat nickFormat;
-    nickFormat.setForeground(AColor);
-    cursor.insertText("* "+ANick+" ",nickFormat);
-
-    QTextCharFormat lineFormat;
-    lineFormat.setFontItalic(true);
-    cursor.select(QTextCursor::LineUnderCursor);
-    cursor.mergeCharFormat(lineFormat);
-
-    found = true;
+    cursor.insertHtml("<i>* "+AOptions.senderName+"&nbsp;</i>");
+    return true;
   }
-  return found;
+  return false;
 }
 
-bool ViewWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
+void ViewWidget::onContentAppended(QWebView *AView, const QString &AMessage, const IMessageStyle::ContentOptions &AOptions)
 {
-  if (AWatched == ui.tedViewer && AEvent->type() == QEvent::Resize)
-  {
-    QScrollBar *scrollBar = ui.tedViewer->verticalScrollBar();
-    FSetScrollToMax = FSetScrollToMax || (scrollBar->sliderPosition() == scrollBar->maximum());
-  }
-  else if (AWatched == ui.tedViewer && AEvent->type() == QEvent::Paint)
-  {
-    if (FSetScrollToMax)
-    {
-      QScrollBar *scrollBar = ui.tedViewer->verticalScrollBar();
-      scrollBar->setSliderPosition(scrollBar->maximum());
-      FSetScrollToMax = false;
-    }
-  }
-
-  return QWidget::eventFilter(AWatched,AEvent);
+  if (AView == ui.mvrViewer)
+    emit contentAppended(AMessage,AOptions);
 }
-

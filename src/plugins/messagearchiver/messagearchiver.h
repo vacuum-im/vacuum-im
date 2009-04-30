@@ -15,6 +15,7 @@
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessagearchiver.h"
 #include "../../interfaces/imessagewidgets.h"
+#include "../../interfaces/imessagestyles.h"
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/isettings.h"

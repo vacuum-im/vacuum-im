@@ -4,6 +4,7 @@
 #include <QTextBrowser>
 #include <QTextDocument>
 #include "../../interfaces/ipluginmanager.h"
+#include "../../interfaces/imessagestyles.h"
 #include "../../utils/jid.h"
 #include "../../utils/action.h"
 #include "../../utils/message.h"
@@ -15,13 +16,11 @@ class IInfoWidget
 {
 public:
   enum InfoField {
-    AccountName       =1,
-    ContactAvatar     =2,
-    ContactName       =4,
-    ContactShow       =8,
-    ContactStatus     =16,
-    ContactEmail      =32,
-    ContactClient     =64
+    AccountName         =1,
+    ContactName         =2,
+    ContactShow         =4,
+    ContactStatus       =8,
+    ContactAvatar       =16
   };
 public:
   virtual QWidget *instance() = 0;
@@ -33,11 +32,11 @@ public:
   virtual void autoUpdateField(InfoField AField) =0;
   virtual QVariant field(InfoField AField) const =0;
   virtual void setField(InfoField AField, const QVariant &AValue) =0;
-  virtual bool isFiledAutoUpdated(IInfoWidget::InfoField AField) const =0;
   virtual int autoUpdatedFields() const =0;
+  virtual bool isFiledAutoUpdated(IInfoWidget::InfoField AField) const =0;
   virtual void setFieldAutoUpdated(IInfoWidget::InfoField AField, bool AAuto) =0;
-  virtual bool isFieldVisible(IInfoWidget::InfoField AField) const =0;
   virtual int visibleFields() const =0;
+  virtual bool isFieldVisible(IInfoWidget::InfoField AField) const =0;
   virtual void setFieldVisible(IInfoWidget::InfoField AField, bool AVisible) =0;
 signals:
   virtual void streamJidChanged(const Jid &ABefour) =0;
@@ -48,36 +47,27 @@ signals:
 class IViewWidget
 {
 public:
-  enum ShowKind {
-    NormalMessage,
-    ChatMessage,
-    GroupChatMessage
-  };
-public:
   virtual QWidget *instance() = 0;
   virtual const Jid &streamJid() const =0;
   virtual void setStreamJid(const Jid &AStreamJid) =0;
   virtual const Jid &contactJid() const =0;
   virtual void setContactJid(const Jid &AContactJid) =0;
-  virtual QTextBrowser *textBrowser() const =0;
-  virtual QTextDocument *document() const =0;
-  virtual ShowKind showKind() const =0;
-  virtual void setShowKind(ShowKind AKind) =0;
-  virtual void showMessage(const Message &AMessage) =0;
-  virtual void showCustomMessage(const QString &AHtml, const QDateTime &ATime=QDateTime(),
-    const QString &ANick="", const QColor &ANickColor=Qt::blue) =0;
-  virtual void showCustomHtml(const QString &AHtml) =0;
-  virtual QColor colorForJid(const Jid &AJid) const =0;
-  virtual void setColorForJid(const Jid &AJid, const QColor &AColor) =0;
-  virtual QString nickForJid(const Jid &AJid) const =0;
-  virtual void setNickForJid(const Jid &AJid, const QString &ANick) =0;
+  virtual QWebView *webBrowser() const =0;
+  virtual void setHtml(const QString &AHtml) =0;
+  virtual void setMessage(const Message &AMessage) =0;
+  virtual IMessageStyle *messageStyle() const =0;
+  virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyle::StyleOptions &AOptions) =0;
+  virtual const IMessageStyles::ContentSettings &contentSettings() const =0;
+  virtual void setContentSettings(const IMessageStyles::ContentSettings &ASettings) =0;
+  virtual void appendHtml(const QString &AHtml, const IMessageStyle::ContentOptions &AOptions) =0;
+  virtual void appendText(const QString &AText, const IMessageStyle::ContentOptions &AOptions) =0;
+  virtual void appendMessage(const Message &AMessage, const IMessageStyle::ContentOptions &AOptions) =0;
 signals:
-  virtual void messageShown(const Message &AMessage) =0;
-  virtual void customHtmlShown(const QString &AHtml) =0;
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
-  virtual void colorForJidChanged(const Jid &AJid, const QColor &AColor) =0;
-  virtual void nickForJidChanged(const Jid &AJid, const QString &ANick) =0;
+  virtual void messageStyleChanged(IMessageStyle *ABefour, const IMessageStyle::StyleOptions &AOptions) =0;
+  virtual void contentSettingsChanged(const IMessageStyles::ContentSettings &ASettings) =0;
+  virtual void contentAppended(const QString &AMessage, const IMessageStyle::ContentOptions &AOptions) =0;
 };
 
 class IEditWidget
@@ -179,7 +169,6 @@ public:
   virtual IEditWidget *editWidget() const =0;
   virtual IToolBarWidget *toolBarWidget() const =0;
   virtual bool isActive() const =0;
-  virtual void showMessage(const Message &AMessage) =0;
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 signals:
   virtual void messageReady() =0;
@@ -233,10 +222,11 @@ signals:
   virtual void windowClosed() =0;
 };
 
-class IMessageResource
+class IUrlHandler 
 {
 public:
-  virtual void loadTextResource(int AType, const QUrl &AName, QVariant &AValue) =0;
+  virtual QObject *instance() = 0;
+  virtual bool executeUrl(IViewWidget *AWidget, const QUrl &AUrl, int AOrder) =0;
 };
 
 class IMessageWidgets 
@@ -244,9 +234,7 @@ class IMessageWidgets
 public:
   enum Option {
     UseTabWindow                =0x01,
-    ShowHTML                    =0x02,
-    ShowDateTime                =0x04,
-    ShowStatus                  =0x08,
+    ShowStatus                  =0x02,
   };
 public:
   virtual QObject *instance() = 0;
@@ -273,8 +261,8 @@ public:
   virtual ITabWindow *findTabWindow(int AWindowId = 0) =0;
   virtual bool checkOption(IMessageWidgets::Option AOption) const =0;
   virtual void setOption(IMessageWidgets::Option AOption, bool AValue) =0;
-  virtual void insertResourceLoader(IMessageResource *ALoader, int AOrder) =0;
-  virtual void removeResourceLoader(IMessageResource *ALoader, int AOrder) =0;
+  virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
+  virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
 signals:
   virtual void defaultChatFontChanged(const QFont &AFont) =0;
   virtual void defaultMessageFontChanged(const QFont &AFont) =0;
@@ -291,8 +279,8 @@ signals:
   virtual void tabWindowCreated(ITabWindow *AWindow) =0;
   virtual void tabWindowDestroyed(ITabWindow *AWindow) =0;
   virtual void optionChanged(IMessageWidgets::Option AOption, bool AValue) =0;
-  virtual void resourceLoaderInserted(IMessageResource *ALoader, int AOrder) =0;
-  virtual void resourceLoaderRemoved(IMessageResource *ALoader, int AOrder) =0;
+  virtual void urlHandlerInserted(IUrlHandler *AHandler, int AOrder) =0;
+  virtual void urlHandlerRemoved(IUrlHandler *AHandler, int AOrder) =0;
 };
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
@@ -304,7 +292,7 @@ Q_DECLARE_INTERFACE(ITabWidget,"Vacuum.Plugin.ITabWidget/1.0")
 Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.0")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.0")
-Q_DECLARE_INTERFACE(IMessageResource,"Vacuum.Plugin.IMessageResource/1.0")
+Q_DECLARE_INTERFACE(IUrlHandler,"Vacuum.Plugin.IUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.0")
 
 #endif

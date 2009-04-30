@@ -50,6 +50,12 @@ public:
   virtual void showMessage(const Message &AMessage);
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
+  //ITabWidget
+  virtual void windowShow();
+  virtual void windowClose();
+  virtual void windowChanged();
+  virtual void windowDestroyed();
+  //IMessageWindow
   virtual void messageReady();
   virtual void showNextMessage();
   virtual void replyMessage();
@@ -58,11 +64,6 @@ signals:
   virtual void streamJidChanged(const Jid &ABefour);
   virtual void contactJidChanged(const Jid &ABefour);
   virtual void windowClosed();
-  //ITabWidget
-  virtual void windowShow();
-  virtual void windowClose();
-  virtual void windowChanged();
-  virtual void windowDestroyed();
 protected:
   void initialize();
   void saveWindowState();
@@ -79,7 +80,6 @@ protected slots:
   void onForwardButtonClicked();
   void onChatButtonClicked();
   void onReceiversChanged(const Jid &AReceiver);
-  void onDefaultMessageFontChanged(const QFont &AFont);
 private:
   Ui::MessageWindowClass ui;
   IInfoWidget *FInfoWidget;
@@ -90,13 +90,12 @@ private:
   IToolBarWidget *FEditToolBarWidget;
 private:
   IMessageWidgets *FMessageWidgets;
-  IMessageProcessor *FMessageProcessor;
   ISettings *FSettings;
 private:
+  Mode FMode;
   int FNextCount;
   Jid FStreamJid;
   Jid FContactJid;
-  Mode FMode;
   Message FMessage;
   QString FCurrentThreadId;
 };

@@ -1,12 +1,12 @@
 #include "messagewidgets.h"
 
+#include <QtDebug>
+
 #define SVN_INFO                              "info"
 #define SVN_VIEW                              "view"
 #define SVN_EDIT                              "edit"
 #define SVN_CHAT                              "chat"
 #define SVN_USE_TABWINDOW                     "useTabWindow"
-#define SVN_VIEW_HTML                         SVN_VIEW ":" "showHtml"
-#define SVN_VIEW_DATETIME                     SVN_VIEW ":" "showDateTime"
 #define SVN_CHAT_STATUS                       SVN_CHAT ":" "showStatus"
 #define SVN_CHAT_FONT                         "defaultChatFont"
 #define SVN_MESSAGE_FONT                      "defaultMessageFont"
@@ -65,6 +65,7 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &/*AIni
       connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
     }
   }
+
   return true;
 }
 
@@ -75,6 +76,7 @@ bool MessageWidgets::initObjects()
     FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"),tr("Message window options"),MNI_NORMAL_MHANDLER_MESSAGE,ONO_MESSAGES);
     FSettingsPlugin->insertOptionsHolder(this);
   }
+  insertUrlHandler(this,UHO_MESSAGEWIDGETS_DEFAULT);
   return true;
 }
 
@@ -89,6 +91,11 @@ QWidget *MessageWidgets::optionsWidget(const QString &ANode, int &AOrder)
     return widget;
   }
   return NULL;
+}
+
+bool MessageWidgets::executeUrl(IViewWidget * /*AWidget*/, const QUrl &AUrl, int /*AOrder*/)
+{
+  return QDesktopServices::openUrl(AUrl);
 }
 
 QFont MessageWidgets::defaultChatFont() const
@@ -144,8 +151,7 @@ IInfoWidget *MessageWidgets::newInfoWidget(const Jid &AStreamJid, const Jid &ACo
 IViewWidget *MessageWidgets::newViewWidget(const Jid &AStreamJid, const Jid &AContactJid)
 {
   IViewWidget *widget = new ViewWidget(this,AStreamJid,AContactJid);
-  connect(widget->textBrowser(),SIGNAL(loadCustomResource(int, const QUrl &, QVariant &)),
-    SLOT(onLoadTextResource(int, const QUrl &, QVariant &)));
+  connect(widget->instance(),SIGNAL(linkClicked(const QUrl &)),SLOT(onViewWidgetLinkClicked(const QUrl &)));
   FCleanupHandler.add(widget->instance());
   emit viewWidgetCreated(widget);
   return widget;
@@ -154,8 +160,6 @@ IViewWidget *MessageWidgets::newViewWidget(const Jid &AStreamJid, const Jid &ACo
 IEditWidget *MessageWidgets::newEditWidget(const Jid &AStreamJid, const Jid &AContactJid)
 {
   IEditWidget *widget = new EditWidget(this,AStreamJid,AContactJid);
-  connect(widget->textEdit(),SIGNAL(loadCustomResource(int, const QUrl &, QVariant &)),
-    SLOT(onLoadTextResource(int, const QUrl &, QVariant &)));
   FCleanupHandler.add(widget->instance());
   emit editWidgetCreated(widget);
   return widget;
@@ -272,21 +276,21 @@ void MessageWidgets::setOption(IMessageWidgets::Option AOption, bool AValue)
   }
 }
 
-void MessageWidgets::insertResourceLoader( IMessageResource *ALoader, int AOrder )
+void MessageWidgets::insertUrlHandler(IUrlHandler *AHandler, int AOrder)
 {
-  if (!FResourceLoaders.values(AOrder).contains(ALoader))  
+  if (!FUrlHandlers.values(AOrder).contains(AHandler))  
   {
-    FResourceLoaders.insert(AOrder,ALoader);
-    emit resourceLoaderInserted(ALoader,AOrder);
+    FUrlHandlers.insert(AOrder,AHandler);
+    emit urlHandlerInserted(AHandler,AOrder);
   }
 }
 
-void MessageWidgets::removeResourceLoader( IMessageResource *ALoader, int AOrder )
+void MessageWidgets::removeUrlHandler(IUrlHandler *AHandler, int AOrder)
 {
-  if (FResourceLoaders.values(AOrder).contains(ALoader))  
+  if (FUrlHandlers.values(AOrder).contains(AHandler))  
   {
-    FResourceLoaders.remove(AOrder,ALoader);
-    emit resourceLoaderRemoved(ALoader,AOrder);
+    FUrlHandlers.remove(AOrder,AHandler);
+    emit urlHandlerRemoved(AHandler,AOrder);
   }
 }
 
@@ -301,6 +305,17 @@ void MessageWidgets::deleteStreamWindows(const Jid &AStreamJid)
   foreach(IMessageWindow *window, messageWindows)
     if (window->streamJid() == AStreamJid)
       delete window->instance();
+}
+
+void MessageWidgets::onViewWidgetLinkClicked(const QUrl &AUrl)
+{
+  IViewWidget *widget = qobject_cast<IViewWidget *>(sender());
+  if (widget)
+  {
+    for (QMap<int,IUrlHandler *>::const_iterator it = FUrlHandlers.constBegin(); it!=FUrlHandlers.constEnd(); it++)
+      if (it.value()->executeUrl(widget,AUrl,it.key()))
+        break;
+  }
 }
 
 void MessageWidgets::onMessageWindowDestroyed()
@@ -348,8 +363,6 @@ void MessageWidgets::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
   setOption(UseTabWindow, settings->value(SVN_USE_TABWINDOW,true).toBool());
-  setOption(ShowHTML, settings->value(SVN_VIEW_HTML,true).toBool());
-  setOption(ShowDateTime, settings->value(SVN_VIEW_DATETIME,true).toBool());
   setOption(ShowStatus, settings->value(SVN_CHAT_STATUS,true).toBool());
   FChatFont.fromString(settings->value(SVN_CHAT_FONT,QFont().toString()).toString());
   FMessageFont.fromString(settings->value(SVN_MESSAGE_FONT,QFont().toString()).toString());
@@ -360,8 +373,6 @@ void MessageWidgets::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
   settings->setValue(SVN_USE_TABWINDOW,checkOption(UseTabWindow));
-  settings->setValue(SVN_VIEW_HTML,checkOption(ShowHTML));
-  settings->setValue(SVN_VIEW_DATETIME,checkOption(ShowDateTime));
   settings->setValue(SVN_CHAT_STATUS,checkOption(ShowStatus));
 
   if (FChatFont != QFont())
@@ -375,16 +386,6 @@ void MessageWidgets::onSettingsClosed()
     settings->deleteValue(SVN_MESSAGE_FONT);
 
   settings->setValue(SVN_SEND_MESSAGE_KEY,FSendKey.toString());
-}
-
-void MessageWidgets::onLoadTextResource(int AType, const QUrl &AName, QVariant &AValue)
-{
-  QMultiMap<int,IMessageResource *>::const_iterator it = FResourceLoaders.constBegin();
-  while(!AValue.isValid() && it!=FResourceLoaders.constEnd())
-  {
-    it.value()->loadTextResource(AType,AName,AValue);
-    it++;
-  }
 }
 
 Q_EXPORT_PLUGIN2(MessageWidgetsPlugin, MessageWidgets)

@@ -5,18 +5,18 @@
 EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
-  ui.tedEditor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+  ui.medEditor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
   FMessageWidgets = AMessageWidgets;
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
 
-  FSendShortcut = new QShortcut(FMessageWidgets->sendMessageKey(),ui.tedEditor);
+  FSendShortcut = new QShortcut(FMessageWidgets->sendMessageKey(),ui.medEditor);
   FSendShortcut->setContext(Qt::WidgetShortcut);
   connect(FSendShortcut,SIGNAL(activated()),SLOT(onShortcutActivated()));
   connect(FMessageWidgets->instance(),SIGNAL(sendMessageKeyChanged(const QKeySequence &)),
     SLOT(onSendMessageKeyChanged(const QKeySequence &)));
-  ui.tedEditor->installEventFilter(this);
+  ui.medEditor->installEventFilter(this);
 }
 
 EditWidget::~EditWidget()
@@ -52,20 +52,19 @@ void EditWidget::setContactJid(const Jid &AContactJid)
 
 void EditWidget::clearEditor()
 {
-  ui.tedEditor->clear();
+  ui.medEditor->clear();
   emit editorCleared();
 }
 
 bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
   bool hooked = false;
-  if (AWatched==ui.tedEditor && AEvent->type()==QEvent::KeyPress)
+  if (AWatched==ui.medEditor && AEvent->type()==QEvent::KeyPress)
   {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
     emit keyEventReceived(keyEvent,hooked);
-    //hooked = hooked || (keyEvent->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)) > 0;
   }
-  else if (AWatched==ui.tedEditor && AEvent->type()==QEvent::ShortcutOverride)
+  else if (AWatched==ui.medEditor && AEvent->type()==QEvent::ShortcutOverride)
   {
     hooked = true;
   }
