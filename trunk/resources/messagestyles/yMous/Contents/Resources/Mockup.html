@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>
+		yMous messagestyle sample
+	</title>
+
+	<style type="text/css" media="screen,print">
+		@import url( "./Variants/Mercurial Xtracolor Neither.css" );
+
+		body
+		{
+			font: 7.5pt "Lucida Grande" !important;
+			border-bottom: 1px solid yellow !important;
+		}
+
+		img.xxxiconsmall
+		{
+			//display: none;
+		}
+
+		.xxxsender
+		{
+			font-size: 7pt !important;
+		}
+
+		.xxxtime
+		{
+			font-size: 6.5pt !important;
+		}
+
+	</style>
+</head>
+
+<body>
+
+<div id="topic" title="Welcome">
+	<style id="mainStyle" type="text/css" media="screen,print">
+	@import url(./Topic.css);
+
+	#topic
+	{
+		//display: none;
+	}
+	</style>
+
+	<span id="topicEdit" contenteditable="">Welcome</span>
+</div>
+
+<div id="Chat" class="">
+
+<div class="xxxwrapper history date_separator event">
+<span><img class="xxxiconsmall" src="%senderStatusIcon%" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="this.className += ' xxxhover'" OnMouseOut="this.className = this.className.replace(' xxxhover', '')">&lt;!&gt;</span>
+<span class="xxxmark">&#8227;</span>
+<span class="xxxmessage" title="date_separator&nbsp;&middot;&nbsp;12:45:48">Wednesday, June 09, 2004</span>
+<span class="xxxtime">12:45:48</span>
+</div>
+
+<div class="xxxwrapper history outgoing message TekJew">
+<span><img class="xxxiconsmall" src="./outgoing_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Evan</span>
+<span class="xxxmark" style="background-color: seagreen; color: seagreen">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;&middot;&nbsp;Evan&nbsp;&middot;&nbsp;12:45:48">So a priest, a rabbi, and a chicken walk into a bar.</span>
+<span class="xxxtime">12:45:48</span>
+</div>
+
+<div class="xxxwrapper history outgoing message TekJew">
+<span><img class="xxxiconsmall" src="./outgoing_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Evan</span>
+<span class="xxxmark" style="background-color: seagreen; color: seagreen">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;·&nbsp;mathuaerknedam&nbsp;·&nbsp;13:45:49 "><font><a onclick="imageSwap(this)" src="file://localhost/Users/mneedham/Desktop/Picture%2013.png?-142752046" class="">Picture 13.png</a></font></span>
+<span class="xxxtime">12:45:48</span>
+</div>
+
+<div class="xxxwrapper history incoming message fetchgreebledonx">
+<span><img class="xxxiconsmall" src="./incoming_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('fetchgreebledonx'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('fetchgreebledonx'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Jeff</span>
+<span class="xxxmark" style="background-color: blue; color: blue">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;&middot;&nbsp;Jeff&nbsp;&middot;&nbsp;12:46:07">I'm pretty sure I've heard this one before.</span>
+<span class="xxxtime">12:46:07</span>
+</div>
+
+<div class="xxxwrapper history consecutive incoming message fetchgreebledonx">
+<span><img class="xxxiconsmall" src="./incoming_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('fetchgreebledonx'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('fetchgreebledonx'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Jeff</span>
+<span class="xxxmark" style="background-color: blue; color: blue">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;&middot;&nbsp;Jeff&nbsp;&middot;&nbsp;12:46:32">So what happens next?</span>
+<span class="xxxtime">12:46:32</span>
+</div>
+
+<div class="xxxwrapper outgoing message TekJew">
+<span><img class="xxxiconsmall" src="./outgoing_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Evan</span>
+<span class="xxxmark" style="background-color: seagreen; color: seagreen">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;&middot;&nbsp;Evan&nbsp;&middot;&nbsp;12:46:50">If I remember correctly, they explode outward at the speed of light.</span>
+<span class="xxxtime">12:46:50</span>
+</div>
+
+<div class="mention xxxwrapper consecutive outgoing message TekJew">
+<span><img class="xxxiconsmall" src="./outgoing_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Evan</span>
+<span class="xxxmark" style="background-color: seagreen; color: seagreen">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;&middot;&nbsp;Evan&nbsp;&middot;&nbsp;12:47:00">But that might be if you cross the streams…</span>
+<span class="xxxtime">12:47:00</span>
+</div>
+
+<div class="xxxwrapper incoming message fetchgreebledonx">
+<span><img class="xxxiconsmall" src="./incoming_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('fetchgreebledonx'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('fetchgreebledonx'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Jeff</span>
+<span class="xxxmark" style="background-color: blue; color: blue">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;&middot;&nbsp;Jeff&nbsp;&middot;&nbsp;12:47:06">…thus negating all existence!</span>
+<span class="xxxtime">12:47:06</span>
+</div>
+
+<div class="xxxwrapper outgoing message TekJew">
+<span><img class="xxxiconsmall" src="./outgoing_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Evan</span>
+<span class="xxxmark" style="background-color: seagreen; color: seagreen">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;&middot;&nbsp;Evan&nbsp;&middot;&nbsp;12:47:51">Precisely! it's a risk one takes whenever one walks into a bar, I'm afraid. Especially if one is a chicken.</span>
+<span class="xxxtime">12:47:51</span>
+</div>
+
+<div class="xxxwrapper status away">
+<span><img class="xxxiconsmall" src="%senderStatusIcon%" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="this.className += ' xxxhover'" OnMouseOut="this.className = this.className.replace(' xxxhover', '')">&lt;!&gt;</span>
+<span class="xxxmark">&#8227;</span>
+<span class="xxxmessage" title="away&nbsp;&middot;&nbsp;12:47:54">Jeff went away</span>
+<span class="xxxtime">12:47:54</span>
+</div>
+
+<div class="xxxwrapper consecutive status away_message">
+<span><img class="xxxiconsmall" src="%senderStatusIcon%" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="this.className += ' xxxhover'" OnMouseOut="this.className = this.className.replace(' xxxhover', '')">&lt;!&gt;</span>
+<span class="xxxmark">&#8227;</span>
+<span class="xxxmessage" title="away_message&nbsp;&middot;&nbsp;12:47:55">Away Message: "Away for the sake of being away."</span>
+<span class="xxxtime">12:47:55</span>
+</div>
+
+<div class="notification xxxwrapper incoming message auto_reply fetchgreebledonx">
+<span><img class="xxxiconsmall" src="./incoming_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('fetchgreebledonx'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('fetchgreebledonx'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Jeff (Autoreply)</span>
+<span class="xxxmark" style="background-color: blue; color: blue">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;&middot;&nbsp;Jeff (Autoreply)&nbsp;&middot;&nbsp;12:47:51">Away for the sake of being away.</span>
+<span class="xxxtime">12:47:51</span>
+</div>
+
+<div class="xxxwrapper outgoing message TekJew">
+<span><img class="xxxiconsmall" src="./outgoing_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Evan</span>
+<span class="xxxmark" style="background-color: seagreen; color: seagreen">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;·&nbsp;mathuaerknedam&nbsp;·&nbsp;13:45:49 "><font><a onclick="imageSwap(this)" src="file://localhost/Users/mneedham/Desktop/Picture%2013.png?-142752046" class="">Picture 13.png</a></font></span>
+<span class="xxxtime">12:48:02</span>
+</div>
+
+<div class="xxxwrapper outgoing message TekJew">
+<span><img class="xxxiconsmall" src="./outgoing_icon.png" onMouseDown="this.className='xxxiconlarge'" onMouseUp="this.className='xxxiconsmall'" /></span>
+<span class="xxxsender" OnMouseOver="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className += ' xxxhover'; }" OnMouseOut="var elms = document.getElementsByClassName('TekJew'); for(var i = 0; i < elms.length; i++) { elms[i].className = elms[i].className.replace(' xxxhover', ''); }" >Evan</span>
+<span class="xxxmark" style="background-color: seagreen; color: seagreen">&#8227;</span>
+<span class="xxxmessage" title="AIM&nbsp;&middot;&nbsp;Evan&nbsp;&middot;&nbsp;12:48:02">Gotta run; catch ya later <a href="foo">;)</a></span>
+<span class="xxxtime">12:48:02</span>
+</div>
+
+<xxxinsert id="insert"></xxxinsert>
+</div>
+</body>
+</html>

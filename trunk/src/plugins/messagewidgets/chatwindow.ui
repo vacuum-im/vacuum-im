@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ChatWindowClass</class>
- <widget class="QMainWindow" name="ChatWindowClass" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="ChatWindowClass">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,42 +10,27 @@
     <height>383</height>
    </rect>
   </property>
-  <property name="autoFillBackground" >
+  <property name="autoFillBackground">
    <bool>true</bool>
   </property>
-  <widget class="QWidget" name="centralWidget" >
-   <layout class="QVBoxLayout" >
-    <property name="spacing" >
-     <number>0</number>
-    </property>
-    <property name="margin" >
-     <number>0</number>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="margin">
+     <number>5</number>
     </property>
     <item>
-     <widget class="QWidget" native="1" name="wdtInfo" />
+     <widget class="QWidget" name="wdtInfo" native="true"/>
     </item>
     <item>
-     <widget class="QSplitter" name="sprSplitter" >
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="childrenCollapsible" >
-       <bool>false</bool>
-      </property>
-      <widget class="QWidget" native="1" name="wdtView" />
-      <widget class="QWidget" native="1" name="wdtEdit" />
-     </widget>
+     <widget class="QWidget" name="wdtView" native="true"/>
+    </item>
+    <item>
+     <widget class="QWidget" name="wdtEdit" native="true"/>
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="mnbMenuBar" >
-   <property name="geometry" >
+  <widget class="QMenuBar" name="mnbMenuBar">
+   <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
@@ -54,7 +40,7 @@
    </property>
   </widget>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

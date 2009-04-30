@@ -2,45 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
-    <name>InfoWidget</name>
-    <message>
-        <source>Online</source>
-        <translation>В сети</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation>Чат</translation>
-    </message>
-    <message>
-        <source>Away</source>
-        <translation>Ушёл</translation>
-    </message>
-    <message>
-        <source>Extended Away</source>
-        <translation>Ушёл надолго</translation>
-    </message>
-    <message>
-        <source>Invisible</source>
-        <translation>Невидимый</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Ошибка</translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation>Не в сети</translation>
-    </message>
-    <message>
-        <source>Unknown status</source>
-        <translation>Неизвестный статус</translation>
-    </message>
-    <message>
-        <source>Do not Disturb</source>
-        <translation>Не беспокоить</translation>
-    </message>
-</context>
-<context>
     <name>InfoWidgetClass</name>
     <message>
         <source>Contact info</source>
@@ -57,14 +18,6 @@
     <message>
         <source>Status:</source>
         <translation>Статус:</translation>
-    </message>
-    <message>
-        <source>E-mail:</source>
-        <translation>E-mail:</translation>
-    </message>
-    <message>
-        <source>Client:</source>
-        <translation>Клиент:</translation>
     </message>
 </context>
 <context>
@@ -307,6 +260,13 @@
     <message>
         <source>dd.MM hh:mm</source>
         <translation>dd.MM hh:mm</translation>
+    </message>
+</context>
+<context>
+    <name>ViewWidgetClass</name>
+    <message>
+        <source>about:blank</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

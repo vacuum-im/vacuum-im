@@ -292,7 +292,7 @@ QWidget *Avatars::optionsWidget(const QString &ANode, int &AOrder)
 
 QString Avatars::avatarFileName(const QString &AHash) const
 {
-  return FAvatarsDir.filePath(AHash.toLower());
+  return !AHash.isEmpty() ? FAvatarsDir.filePath(AHash.toLower()) : QString::null;
 }
 
 bool Avatars::hasAvatar(const QString &AHash) const

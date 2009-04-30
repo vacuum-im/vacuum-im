@@ -31,5 +31,9 @@
         <source>Chat</source>
         <translation>Чат</translation>
     </message>
+    <message>
+        <source>%1 changed status to [%2] %3</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

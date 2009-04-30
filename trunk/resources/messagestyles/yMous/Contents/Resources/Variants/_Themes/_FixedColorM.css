@@ -1,0 +1,80 @@
+@charset "utf-8";
+
+.consecutive .xxxsender
+{
+	//visibility: hidden;
+	color: transparent;
+}
+
+.xxxmark
+{
+	background-color: hsla(0, 0%, 100%, 1) !important;
+}
+
+.history .xxxmark
+{
+	background-color: hsla(0, 0%, 90%, 1) !important;
+}
+
+/*----------*/
+
+.outgoing
+{
+	color: hsla(120, 42%, 40%, .8) !important;
+}
+
+.outgoing .xxxmark
+{
+	color: hsla(120, 42%, 40%, .7) !important;
+}
+
+.outgoing:hover,
+.outgoing:hover .xxxmark,
+.outgoing:hover .xxxmessage
+{
+	color: hsla(120, 42%, 25%, 1) !important;
+}
+
+/*----------*/
+
+.incoming
+{
+	color: hsla(240, 72%, 55%, .8) !important;
+}
+
+.incoming .xxxmark
+{
+	color: hsla(240, 72%, 55%, .7) !important;
+}
+
+.incoming:hover,
+.incoming:hover .xxxmark,
+.incoming:hover .xxxmessage
+{
+	color: hsla(240, 72%, 40%, 1) !important;
+}
+
+/*----------*/
+
+.status,
+.event
+{
+	color: hsla(0, 0%, 60%, .8) !important;
+}
+
+.status .xxxmark,
+.event .xxxmark
+{
+	color: hsla(0, 0%, 60%, .7) !important;
+}
+
+.status:hover,
+.status:hover .xxxmark,
+.status:hover .xxxmessage,
+.event:hover,
+.event:hover .xxxmark,
+.event:hover .xxxmessage
+{
+	color: hsla(0, 0%, 35%, 1) !important;
+}
+

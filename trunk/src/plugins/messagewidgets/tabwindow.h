@@ -43,6 +43,7 @@ protected:
   virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
   void onTabChanged(int AIndex);
+  void onTabCloseRequested(int AIndex);
   void onTabWidgetShow();
   void onTabWidgetClose();
   void onTabWidgetChanged();

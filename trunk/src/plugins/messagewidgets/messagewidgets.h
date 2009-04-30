@@ -1,12 +1,16 @@
 #ifndef MESSAGEWIDGETS_H
 #define MESSAGEWIDGETS_H
 
+#include <QMultiMap>
+#include <QDesktopServices>
 #include <QObjectCleanupHandler>
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionnodeorders.h"
 #include "../../definations/optionwidgetorders.h"
+#include "../../definations/urlhandlerorders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessagewidgets.h"
+#include "../../interfaces/isettings.h"
 #include "infowidget.h"
 #include "editwidget.h"
 #include "viewwidget.h"
@@ -21,10 +25,11 @@ class MessageWidgets :
   public QObject,
   public IPlugin,
   public IMessageWidgets,
-  public IOptionsHolder
+  public IOptionsHolder,
+  public IUrlHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder);
+  Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IUrlHandler);
 public:
   MessageWidgets();
   ~MessageWidgets();
@@ -38,6 +43,8 @@ public:
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  //IUrlHandler
+  virtual bool executeUrl(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
   //IMessageWidgets
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
   virtual QFont defaultChatFont() const;
@@ -62,8 +69,8 @@ public:
   virtual ITabWindow *findTabWindow(int AWindowId = 0);
   virtual bool checkOption(IMessageWidgets::Option AOption) const;
   virtual void setOption(IMessageWidgets::Option AOption, bool AValue);
-  virtual void insertResourceLoader(IMessageResource *ALoader, int AOrder);
-  virtual void removeResourceLoader(IMessageResource *ALoader, int AOrder);
+  virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder);
+  virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder);
 signals:
   virtual void defaultChatFontChanged(const QFont &AFont);
   virtual void defaultMessageFontChanged(const QFont &AFont);
@@ -80,14 +87,15 @@ signals:
   virtual void tabWindowCreated(ITabWindow *AWindow);
   virtual void tabWindowDestroyed(ITabWindow *AWindow);
   virtual void optionChanged(IMessageWidgets::Option AOption, bool AValue);
-  virtual void resourceLoaderInserted(IMessageResource *ALoader, int AOrder);
-  virtual void resourceLoaderRemoved(IMessageResource *ALoader, int AOrder);
+  virtual void urlHandlerInserted(IUrlHandler *AHandler, int AOrder);
+  virtual void urlHandlerRemoved(IUrlHandler *AHandler, int AOrder);
 signals:
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
   void deleteStreamWindows(const Jid &AStreamJid);
 protected slots:
+  void onViewWidgetLinkClicked(const QUrl &AUrl);
   void onMessageWindowDestroyed();
   void onChatWindowDestroyed();
   void onTabWindowDestroyed();
@@ -95,7 +103,6 @@ protected slots:
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onSettingsOpened();
   void onSettingsClosed();
-  void onLoadTextResource(int AType, const QUrl &AName, QVariant &AValue);
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -110,7 +117,7 @@ private:
   QFont FChatFont;
   QFont FMessageFont;
   QKeySequence FSendKey;
-  QMultiMap<int,IMessageResource *> FResourceLoaders;
+  QMultiMap<int,IUrlHandler *> FUrlHandlers;
 };
 
 #endif // MESSAGEWIDGETS_H

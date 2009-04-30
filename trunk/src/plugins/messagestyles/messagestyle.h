@@ -1,7 +1,6 @@
 #ifndef MESSAGESTYLE_H
 #define MESSAGESTYLE_H
 
-#include <QMap>
 #include <QList>
 #include <QWebView>
 #include "../../definations/resources.h"
@@ -20,8 +19,9 @@ public:
   virtual QObject *instance() { return this; }
   virtual bool isValid() const;
   virtual int version() const;
+  virtual QString styleId() const;
   virtual QList<QString> variants() const;
-  virtual QVariant infoValue(const QString &AKey, const QVariant &ADefValue = QVariant()) const;
+  virtual QMap<QString, QVariant> infoValues() const;
   virtual void setStyle(QWebView *AView, const IMessageStyle::StyleOptions &AOptions) const;
   virtual void setVariant(QWebView *AView, const QString  &AVariant) const;
   virtual void appendContent(QWebView *AView, const QString &AMessage, const IMessageStyle::ContentOptions &AOptions) const;
@@ -38,24 +38,29 @@ private:
   QString scriptForAppendContent(const IMessageStyle::ContentOptions &AOptions) const;
   QString loadFileData(const QString &AFileName, const QString &DefValue) const;
   void loadTemplates();
+  void loadSenderColors();
+  void initStyleSettings();
 public:
   static QList<QString> styleVariants(const QString &AStylePath);
   static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
 private:
+  QString FTopicHTML;
   QString FStatusHTML;
   QString FIn_ContentHTML;
   QString FIn_NextContentHTML;
   QString FIn_ContextHTML;
   QString FIn_NextContextHTML;
-  QString FIn_ActionHTML;
   QString FOut_ContentHTML;
   QString FOut_NextContentHTML;
   QString FOut_ContextHTML;
   QString FOut_NextContextHTML;
-  QString FOut_ActionHTML;
+private:
+  bool FCombineConsecutive;
+  bool FAllowCustomBackground;
 private:
   QString FResourcePath;
   QList<QString> FVariants;
+  QList<QString> FSenderColors;
   QMap<QString, QVariant> FInfo;
 };
 

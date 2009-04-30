@@ -55,6 +55,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, int AWindowId)
   ui.twtTabs->widget(0)->deleteLater();
   ui.twtTabs->removeTab(0);
   connect(ui.twtTabs,SIGNAL(currentChanged(int)),SLOT(onTabChanged(int)));
+  connect(ui.twtTabs,SIGNAL(tabCloseRequested(int)),SLOT(onTabCloseRequested(int)));
 
   initialize();
 }
@@ -200,6 +201,11 @@ void TabWindow::onTabChanged(int /*AIndex*/)
 {
   updateWindow();
   emit currentChanged(currentWidget());
+}
+
+void TabWindow::onTabCloseRequested(int AIndex)
+{
+  removeWidget(qobject_cast<ITabWidget *>(ui.twtTabs->widget(AIndex)));
 }
 
 void TabWindow::onTabWidgetShow()

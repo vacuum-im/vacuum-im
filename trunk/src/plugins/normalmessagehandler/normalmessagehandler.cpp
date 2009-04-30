@@ -117,22 +117,22 @@ void NormalMessageHandler::showMessage(int AMessageId)
 void NormalMessageHandler::receiveMessage(int AMessageId)
 {
   Message message = FMessageProcessor->messageById(AMessageId);
-  IMessageWindow *window = findMessageWindow(message.to(),message.from());
+  IMessageWindow *window = findWindow(message.to(),message.from());
   if (window)
   {
-    FActiveNormalMessages.insertMulti(window,AMessageId);
-    updateMessageWindow(window);
+    FActiveMessages.insertMulti(window,AMessageId);
+    updateWindow(window);
   }
   else
-    FActiveNormalMessages.insertMulti(NULL,AMessageId);
+    FActiveMessages.insertMulti(NULL,AMessageId);
 }
 
-bool NormalMessageHandler::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
+bool NormalMessageHandler::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType /*AType*/)
 {
-  IMessageWindow *window = getMessageWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
+  IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
   if (window)
   {
-    showMessageWindow(window);
+    showWindow(window);
     return true;
   }
   return false;
@@ -160,7 +160,7 @@ INotification NormalMessageHandler::notification(INotifications *ANotifications,
   return notify;
 }
 
-IMessageWindow *NormalMessageHandler::getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
+IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
 {
   IMessageWindow *window = NULL;
   if (AStreamJid.isValid() && (AContactJid.isValid() || AMode == IMessageWindow::WriteMode))
@@ -168,68 +168,67 @@ IMessageWindow *NormalMessageHandler::getMessageWindow(const Jid &AStreamJid, co
     window = FMessageWidgets->newMessageWindow(AStreamJid,AContactJid,AMode);
     if (window)
     {
-      connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageWindowSend()));
-      connect(window->instance(),SIGNAL(showNextMessage()),SLOT(onMessageWindowShowNext()));
-      connect(window->instance(),SIGNAL(replyMessage()),SLOT(onMessageWindowReply()));
-      connect(window->instance(),SIGNAL(forwardMessage()),SLOT(onMessageWindowForward()));
-      connect(window->instance(),SIGNAL(showChatWindow()),SLOT(onMessageWindowShowChat()));
-      connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onMessageWindowDestroyed()));
-      FMessageWindows.append(window);
-      //window->infoWidget()->setFieldVisible(IInfoWidget::ContactStatus,false);
       window->infoWidget()->autoUpdateFields();
-      loadActiveNormalMessages(window);
-      showNextNormalMessage(window);
+      connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
+      connect(window->instance(),SIGNAL(showNextMessage()),SLOT(onShowNextMessage()));
+      connect(window->instance(),SIGNAL(replyMessage()),SLOT(onReplyMessage()));
+      connect(window->instance(),SIGNAL(forwardMessage()),SLOT(onForwardMessage()));
+      connect(window->instance(),SIGNAL(showChatWindow()),SLOT(onShowChatWindow()));
+      connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onWindowDestroyed()));
+      FWindows.append(window);
+      loadActiveMessages(window);
+      showNextMessage(window);
     }
     else
-      window = findMessageWindow(AStreamJid,AContactJid);
+      window = findWindow(AStreamJid,AContactJid);
   }
   return window;
 }
 
-IMessageWindow *NormalMessageHandler::findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid)
+IMessageWindow *NormalMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
-  foreach(IMessageWindow *window,FMessageWindows)
+  foreach(IMessageWindow *window,FWindows)
     if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
       return window;
   return NULL;
 }
 
-void NormalMessageHandler::showMessageWindow(IMessageWindow *AWindow)
+void NormalMessageHandler::showWindow(IMessageWindow *AWindow)
 {
   AWindow->showWindow();
 }
 
-void NormalMessageHandler::showNextNormalMessage(IMessageWindow *AWindow)
+void NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
 {
-  if (FActiveNormalMessages.contains(AWindow))
+  if (FActiveMessages.contains(AWindow))
   {
-    int messageId = FActiveNormalMessages.value(AWindow);
+    int messageId = FActiveMessages.value(AWindow);
     Message message = FMessageProcessor->messageById(messageId);
     AWindow->showMessage(message);
     FMessageProcessor->removeMessage(messageId);
-    FActiveNormalMessages.remove(AWindow,messageId);
+    FActiveMessages.remove(AWindow,messageId);
   }
-  updateMessageWindow(AWindow);
+  updateWindow(AWindow);
 }
 
-void NormalMessageHandler::loadActiveNormalMessages(IMessageWindow *AWindow)
+void NormalMessageHandler::loadActiveMessages(IMessageWindow *AWindow)
 {
-  QList<int> messagesId = FActiveNormalMessages.values(NULL);
+  QList<int> messagesId = FActiveMessages.values(NULL);
   foreach(int messageId, messagesId)
   {
     Message message = FMessageProcessor->messageById(messageId);
     if (AWindow->streamJid() == message.to() && AWindow->contactJid() == message.from())
     {
-      FActiveNormalMessages.insertMulti(AWindow,messageId);
-      FActiveNormalMessages.remove(NULL,messageId);
+      FActiveMessages.insertMulti(AWindow,messageId);
+      FActiveMessages.remove(NULL,messageId);
     }
   }
 }
 
-void NormalMessageHandler::updateMessageWindow(IMessageWindow *AWindow)
+void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
 {
   QIcon icon;
-  if (FActiveNormalMessages.contains(AWindow))
+  if (FActiveMessages.contains(AWindow))
     icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMAL_MHANDLER_MESSAGE);
   else if (FStatusIcons)
     icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
@@ -238,16 +237,16 @@ void NormalMessageHandler::updateMessageWindow(IMessageWindow *AWindow)
   if (AWindow->mode() == IMessageWindow::ReadMode)
     title = tr("%1 - Message").arg(AWindow->infoWidget()->field(IInfoWidget::ContactName).toString());
   AWindow->updateWindow(icon,title,title);
-  AWindow->setNextCount(FActiveNormalMessages.count(AWindow));
+  AWindow->setNextCount(FActiveMessages.count(AWindow));
 }
 
-void NormalMessageHandler::onMessageWindowSend()
+void NormalMessageHandler::onMessageReady()
 {
   IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
   if (window)
   {
     Message message;
-    message/*.setFrom(window->streamJid().eFull())*/.setType(Message::Normal);
+    message.setType(Message::Normal);
     message.setSubject(window->subject());
     message.setThreadId(window->threadId());
     FMessageProcessor->textToMessage(message,window->editWidget()->document());
@@ -262,8 +261,8 @@ void NormalMessageHandler::onMessageWindowSend()
       }
       if (sended)
       {
-        if (FActiveNormalMessages.contains(window))
-          showNextNormalMessage(window);
+        if (FActiveMessages.contains(window))
+          showNextMessage(window);
         else
           window->closeWindow();
       }
@@ -271,17 +270,17 @@ void NormalMessageHandler::onMessageWindowSend()
   }
 }
 
-void NormalMessageHandler::onMessageWindowShowNext()
+void NormalMessageHandler::onShowNextMessage()
 {
   IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
   if (window)
   {
-    showNextNormalMessage(window);
-    updateMessageWindow(window);
+    showNextMessage(window);
+    updateWindow(window);
   }
 }
 
-void NormalMessageHandler::onMessageWindowReply()
+void NormalMessageHandler::onReplyMessage()
 {
   IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
   if (window)
@@ -290,11 +289,11 @@ void NormalMessageHandler::onMessageWindowReply()
     window->setSubject(tr("Re: %1").arg(window->subject()));
     window->editWidget()->clearEditor();
     window->editWidget()->instance()->setFocus();
-    updateMessageWindow(window);
+    updateWindow(window);
   }
 }
 
-void NormalMessageHandler::onMessageWindowForward()
+void NormalMessageHandler::onForwardMessage()
 {
   IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
   if (window)
@@ -305,41 +304,53 @@ void NormalMessageHandler::onMessageWindowForward()
     FMessageProcessor->messageToText(window->editWidget()->document(),window->currentMessage());
     window->receiversWidget()->clear();
     window->setCurrentTabWidget(window->receiversWidget()->instance());
-    updateMessageWindow(window);
+    updateWindow(window);
   }
 }
 
-void NormalMessageHandler::onMessageWindowShowChat()
+void NormalMessageHandler::onShowChatWindow()
 {
   IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
   if (FMessageProcessor && window)
     FMessageProcessor->openWindow(window->streamJid(),window->contactJid(),Message::Chat);
 }
 
-void NormalMessageHandler::onMessageWindowDestroyed()
+void NormalMessageHandler::onWindowDestroyed()
 {
   IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-  if (FMessageWindows.contains(window))
+  if (FWindows.contains(window))
   {
-    QList<int> messagesId = FActiveNormalMessages.values(window);
+    QList<int> messagesId = FActiveMessages.values(window);
     foreach(int messageId, messagesId)
-      FActiveNormalMessages.insertMulti(NULL,messageId);
-    FActiveNormalMessages.remove(window);
-    FMessageWindows.removeAt(FMessageWindows.indexOf(window));
+      FActiveMessages.insertMulti(NULL,messageId);
+    FActiveMessages.remove(window);
+    FWindows.removeAt(FWindows.indexOf(window));
   }
-}
-
-void NormalMessageHandler::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
-{
-  IMessageWindow *messageWindow = findMessageWindow(APresence->streamJid(),APresenceItem.itemJid);
-  if (messageWindow)
-    updateMessageWindow(messageWindow);
 }
 
 void NormalMessageHandler::onStatusIconsChanged()
 {
-  foreach(IMessageWindow *window, FMessageWindows)
-    updateMessageWindow(window);
+  foreach(IMessageWindow *window, FWindows)
+    updateWindow(window);
+}
+
+void NormalMessageHandler::onShowWindowAction(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    Jid streamJid = action->data(ADR_STREAM_JID).toString();
+    Jid contactJid = action->data(ADR_CONTACT_JID).toString();
+    openWindow(streamJid,contactJid,Message::Normal);
+
+    QString group = action->data(ADR_GROUP).toString();
+    if (!group.isEmpty())
+    {
+      IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
+      if (window)
+        window->receiversWidget()->addReceiversGroup(group);
+    }
+  }
 }
 
 void NormalMessageHandler::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
@@ -367,23 +378,11 @@ void NormalMessageHandler::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *
   }
 }
 
-void NormalMessageHandler::onShowWindowAction(bool)
+void NormalMessageHandler::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
 {
-  Action *action = qobject_cast<Action *>(sender());
-  if (action)
-  {
-    Jid streamJid = action->data(ADR_STREAM_JID).toString();
-    Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-    openWindow(streamJid,contactJid,Message::Normal);
-
-    QString group = action->data(ADR_GROUP).toString();
-    if (!group.isEmpty())
-    {
-      IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
-      if (window)
-        window->receiversWidget()->addReceiversGroup(group);
-    }
-  }
+  IMessageWindow *messageWindow = findWindow(APresence->streamJid(),APresenceItem.itemJid);
+  if (messageWindow)
+    updateWindow(messageWindow);
 }
 
 Q_EXPORT_PLUGIN2(NormalMessageHandlerPlugin, NormalMessageHandler)

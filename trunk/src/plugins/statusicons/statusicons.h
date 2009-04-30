@@ -53,7 +53,9 @@ public:
   virtual QIcon iconByStatus(int AShow, const QString &ASubscription, bool AAsk) const;
   virtual QIcon iconByJidStatus(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const;
   virtual QString subStorageByJid(const Jid &AContactJid) const;
+  virtual QString iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual QString iconKeyByStatus(int AShow, const QString &ASubscription, bool AAsk) const;
+  virtual QString iconFileName(const QString &ASubStorage, const QString &AIconKey) const;
 signals:
   virtual void defaultStorageChanged(const QString &ASubStorage);
   virtual void ruleInserted(const QString &APattern, const QString &ASubStorage, RuleType ARuleType);

@@ -16,12 +16,22 @@
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessageprocessor.h"
 #include "../../interfaces/imessagewidgets.h"
+#include "../../interfaces/imessagestyles.h"
 #include "../../interfaces/imessagearchiver.h"
 #include "../../interfaces/inotifications.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/ivcard.h"
+#include "../../interfaces/iavatars.h"
+#include "../../interfaces/istatuschanger.h"
+
+struct WindowStatus {
+  int lastContent;
+  QString lastSender;
+  QDateTime lastTime;
+  QString lastStatusShow;
+};
 
 class ChatMessageHandler : 
   public QObject,
@@ -51,33 +61,40 @@ public:
   virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
 protected:
-  IChatWindow *getChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
-  IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
-  void showChatHistory(IChatWindow *AWindow);
-  void showChatWindow(IChatWindow *AWindow);
-  void removeActiveChatMessages(IChatWindow *AWindow);
-  void updateChatWindow(IChatWindow *AWindow);
+  IChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
+  IChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
+  void showWindow(IChatWindow *AWindow);
+  void updateWindow(IChatWindow *AWindow);
+  void removeActiveMessages(IChatWindow *AWindow);
+  void showHistory(IChatWindow *AWindow);
+  void setMessageStyle(IChatWindow *AWindow);
+  void fillContentOptions(IChatWindow *AWindow, IMessageStyle::ContentOptions &AOptions) const;
+  void showStyledStatus(IChatWindow *AWindow, const QString &AMessage, const QString &AStatusKeyword);
+  void showStyledMessage(IChatWindow *AWindow, const Message &AMessage, bool ANoScroll = false);
 protected slots:
-  void onChatMessageSend();
-  void onChatWindowActivated();
-  void onChatInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
-  void onChatWindowDestroyed();
-  void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
+  void onMessageReady();
+  void onWindowActivated();
+  void onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
+  void onMessageStyleSettingsChanged(int AMessageType, const IMessageStyles::StyleSettings &ASettings);
+  void onViewWidgetContentAppended(const QString &AMessage, const IMessageStyle::ContentOptions &AOptions);
+  void onWindowDestroyed();
   void onStatusIconsChanged();
-  void onVCardChanged(const Jid &AContactJid);
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onShowWindowAction(bool);
+  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
 private:
-  IMessageWidgets *FMessageWidgets; 
+  IMessageWidgets *FMessageWidgets;
   IMessageProcessor *FMessageProcessor;
-  IStatusIcons *FStatusIcons;
+  IMessageStyles *FMessageStyles;
   IPresencePlugin *FPresencePlugin;
   IMessageArchiver *FMessageArchiver;
-  IVCardPlugin *FVCardPlugin;
   IRostersView *FRostersView;
+  IStatusIcons *FStatusIcons;
+  IStatusChanger *FStatusChanger;
 private:
-  QList<IChatWindow *> FChatWindows;
-  QMultiHash<IChatWindow *,int> FActiveChatMessages;
+  QList<IChatWindow *> FWindows;
+  QMultiMap<IChatWindow *,int> FActiveMessages;
+  QMap<IViewWidget *, WindowStatus> FWindowStatus;
 };
 
 #endif // CHATMESSAGEHANDLER_H

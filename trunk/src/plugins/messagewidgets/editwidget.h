@@ -19,8 +19,8 @@ public:
   virtual void setStreamJid(const Jid &AStreamJid);
   virtual const Jid &contactJid() const { return FContactJid; }
   virtual void setContactJid(const Jid &AContactJid);
-  virtual QTextEdit *textEdit() const { return ui.tedEditor; }
-  virtual QTextDocument *document() const { return ui.tedEditor->document(); }
+  virtual QTextEdit *textEdit() const { return ui.medEditor; }
+  virtual QTextDocument *document() const { return ui.medEditor->document(); }
   virtual void sendMessage();
   virtual QKeySequence sendMessageKey() const { return FSendShortcut->key(); }
   virtual void setSendMessageKey(const QKeySequence &AKey);

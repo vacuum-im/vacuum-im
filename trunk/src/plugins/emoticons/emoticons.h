@@ -1,6 +1,8 @@
 #ifndef EMOTICONS_H
 #define EMOTICONS_H
 
+#include <QMap>
+#include <QHash>
 #include <QPointer>
 #include <QStringList>
 #include "../../definations/actiongroups.h"
@@ -26,11 +28,10 @@ class Emoticons :
   public IPlugin,
   public IEmoticons,
   public IMessageWriter,
-  public IMessageResource,
   public IOptionsHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IEmoticons IMessageWriter IMessageResource IOptionsHolder);
+  Q_INTERFACES(IPlugin IEmoticons IMessageWriter IOptionsHolder);
 public:
   Emoticons();
   ~Emoticons();
@@ -45,8 +46,6 @@ public:
   //IMessageWriter
   virtual void writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
   virtual void writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
-  //IMessageResource
-  virtual void loadTextResource(int AType, const QUrl &AName, QVariant &AValue);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IEmoticons
@@ -56,8 +55,6 @@ public:
   virtual void removeIconset(const QString &ASubStorage);
   virtual QUrl urlByKey(const QString &AKey) const;
   virtual QString keyByUrl(const QUrl &AUrl) const;
-  virtual QIcon iconByKey(const QString &AKey) const;
-  virtual QIcon iconByUrl(const QUrl &AUrl) const;
 signals:
   virtual void iconsetInserted(const QString &ASubStorage, const QString &ABefour);
   virtual void iconsetRemoved(const QString &ASubStorage);
@@ -84,11 +81,11 @@ private:
 private:
   QPointer<EmoticonsOptions> FEmoticonsOptions;
 private:
-  QList<IToolBarWidget *> FToolBarsWidgets;
-  QHash<SelectIconMenu *, IToolBarWidget *> FToolBarWidgetByMenu;
   QStringList FStoragesOrder;
-  QHash<QString, IconStorage *> FStorages;
-  QHash<QString,QUrl> FUrlByKey;
+  QHash<QString, QUrl> FUrlByKey;
+  QMap<QString, IconStorage *> FStorages;
+  QList<IToolBarWidget *> FToolBarsWidgets;
+  QMap<SelectIconMenu *, IToolBarWidget *> FToolBarWidgetByMenu;
 };
 
 #endif // EMOTICONS_H

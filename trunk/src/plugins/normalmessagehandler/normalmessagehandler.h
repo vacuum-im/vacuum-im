@@ -44,23 +44,23 @@ public:
   virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
 protected:
-  IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
-  IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid);
-  void showMessageWindow(IMessageWindow *AWindow);
-  void showNextNormalMessage(IMessageWindow *AWindow);
-  void loadActiveNormalMessages(IMessageWindow *AWindow);
-  void updateMessageWindow(IMessageWindow *AWindow);
+  IMessageWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
+  IMessageWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
+  void showWindow(IMessageWindow *AWindow);
+  void showNextMessage(IMessageWindow *AWindow);
+  void loadActiveMessages(IMessageWindow *AWindow);
+  void updateWindow(IMessageWindow *AWindow);
 protected slots:
-  void onMessageWindowSend();
-  void onMessageWindowShowNext();
-  void onMessageWindowReply();
-  void onMessageWindowForward();
-  void onMessageWindowShowChat();
-  void onMessageWindowDestroyed();
-  void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
+  void onMessageReady();
+  void onShowNextMessage();
+  void onReplyMessage();
+  void onForwardMessage();
+  void onShowChatWindow();
+  void onWindowDestroyed();
   void onStatusIconsChanged();
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onShowWindowAction(bool);
+  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
 private:
   IMessageWidgets *FMessageWidgets; 
   IMessageProcessor *FMessageProcessor;
@@ -68,8 +68,8 @@ private:
   IPresencePlugin *FPresencePlugin;
   IRostersView *FRostersView;
 private:
-  QList<IMessageWindow *> FMessageWindows;
-  QMultiHash<IMessageWindow *, int> FActiveNormalMessages;
+  QList<IMessageWindow *> FWindows;
+  QMultiHash<IMessageWindow *, int> FActiveMessages;
 };
 
 #endif // NORMALMESSAGEHANDLER_H

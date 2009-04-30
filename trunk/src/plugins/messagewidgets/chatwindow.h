@@ -30,19 +30,19 @@ public:
   virtual IEditWidget *editWidget() const { return FEditWidget; }
   virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
   virtual bool isActive() const;
-  virtual void showMessage(const Message &AMessage);
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
-  virtual void messageReady();
-  virtual void streamJidChanged(const Jid &ABefour);
-  virtual void contactJidChanged(const Jid &ABefour);
-  virtual void windowActivated();
-  virtual void windowClosed();
   //ITabWidget
   virtual void windowShow();
   virtual void windowClose();
   virtual void windowChanged();
   virtual void windowDestroyed();
+  //IChatWindow
+  virtual void messageReady();
+  virtual void streamJidChanged(const Jid &ABefour);
+  virtual void contactJidChanged(const Jid &ABefour);
+  virtual void windowActivated();
+  virtual void windowClosed();
 protected:
   void initialize();
   void saveWindowState();
@@ -54,8 +54,6 @@ protected:
 protected slots:
   void onMessageReady();
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
-  void onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
-  void onDefaultChatFontChanged(const QFont &AFont);
 private:
   Ui::ChatWindowClass ui;
 private:
@@ -68,7 +66,6 @@ private:
   IEditWidget *FEditWidget;
   IToolBarWidget *FToolBarWidget;
 private:
-  bool FSplitterLoaded;
   Jid FStreamJid;
   Jid FContactJid;
   QString FLastStatusShow;

@@ -17,6 +17,7 @@ SUBDIRS = settings \
           privatestorage \
           messageprocessor \
           messagewidgets \
+          messagestyles \
           normalmessagehandler \
           chatmessagehandler \
           compress \
