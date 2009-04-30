@@ -151,10 +151,10 @@ body
 	opacity: .75;
 }
 
-.xxxmessage:hover img.emoticon
-{
-	opacity: 1;
-}
+//.xxxmessage:hover img.emoticon
+//{
+//	opacity: 1;
+//}
 
 .xxxtime
 {
@@ -177,10 +177,10 @@ a
 	border-bottom: 1px dotted;
 }
 
-a:hover
-{
-	border-bottom: 1px solid;
-}
+//a:hover
+//{
+//	border-bottom: 1px solid;
+//}
 
 a:active
 {
@@ -192,10 +192,10 @@ a
 	color: inherit;
 }
 
-a:hover
-{
-	color: inherit;
-}
+//a:hover
+//{
+//	color: inherit;
+//}
 
 img.fullSizeImage
 {
