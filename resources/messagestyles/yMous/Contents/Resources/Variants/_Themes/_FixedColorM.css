@@ -28,12 +28,12 @@
 	color: hsla(120, 42%, 40%, .7) !important;
 }
 
-.outgoing:hover,
-.outgoing:hover .xxxmark,
-.outgoing:hover .xxxmessage
-{
+//.outgoing:hover,
+//.outgoing:hover .xxxmark,
+//.outgoing:hover .xxxmessage
+//{
 //	color: hsla(120, 42%, 25%, 1) !important;
-}
+//}
 
 /*----------*/
 
@@ -47,12 +47,12 @@
 	color: hsla(240, 72%, 55%, .7) !important;
 }
 
-.incoming:hover,
-.incoming:hover .xxxmark,
-.incoming:hover .xxxmessage
-{
+//.incoming:hover,
+//.incoming:hover .xxxmark,
+//.incoming:hover .xxxmessage
+//{
 //	color: hsla(240, 72%, 40%, 1) !important;
-}
+//}
 
 /*----------*/
 
@@ -68,13 +68,13 @@
 	color: hsla(0, 0%, 60%, .7) !important;
 }
 
-.status:hover,
-.status:hover .xxxmark,
-.status:hover .xxxmessage,
-.event:hover,
-.event:hover .xxxmark,
-.event:hover .xxxmessage
-{
+//.status:hover,
+//.status:hover .xxxmark,
+//.status:hover .xxxmessage,
+//.event:hover,
+//.event:hover .xxxmark,
+//.event:hover .xxxmessage
+//{
 //	color: hsla(0, 0%, 35%, 1) !important;
-}
+//}
 
