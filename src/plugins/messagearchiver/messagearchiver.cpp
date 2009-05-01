@@ -1586,30 +1586,33 @@ QMultiMap<QString,QString> MessageArchiver::filterCollectionFiles(const QStringL
 QStringList MessageArchiver::findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const
 {
   QMultiMap<QString,QString> filesMap;
-  QString dirPath = collectionDirPath(AStreamJid,ARequest.with.bare());
+  QString dirPath = collectionDirPath(AStreamJid,ARequest.with);
   QDir dir(dirPath);
   if (AStreamJid.isValid() && dir.exists())
   {
     if (ARequest.with.isValid())
       filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,""));
-    QStringList dirs1 = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-    foreach (QString dir1, dirs1)
+    if (ARequest.with.resource().isEmpty())
     {
-      dir.cd(dir1);
-      QString dir1Prefix = dir1+"/";
-      filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,dir1Prefix));
-      if (!ARequest.with.isValid())
+      QStringList dirs1 = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+      foreach (QString dir1, dirs1)
       {
-        QStringList dirs2 = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-        foreach (QString dir2, dirs2)
+        dir.cd(dir1);
+        QString dir1Prefix = dir1+"/";
+        filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,dir1Prefix));
+        if (!ARequest.with.isValid())
         {
-          dir.cd(dir2);
-          QString dir2Prefix = dir1Prefix+dir2+"/";
-          filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,dir2Prefix));
-          dir.cdUp();
+          QStringList dirs2 = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+          foreach (QString dir2, dirs2)
+          {
+            dir.cd(dir2);
+            QString dir2Prefix = dir1Prefix+dir2+"/";
+            filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,dir2Prefix));
+            dir.cdUp();
+          }
         }
+        dir.cdUp();
       }
-      dir.cdUp();
     }
 
     QStringList files;
