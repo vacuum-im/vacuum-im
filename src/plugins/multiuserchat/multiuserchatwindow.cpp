@@ -1134,7 +1134,6 @@ void MultiUserChatWindow::fillChatContentOptions(IChatWindow *AWindow, IMessageS
       AOptions.senderStatusIcon = FMessageStyles->userIcon(user->contactJid(),user->data(MUDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
   }
 
-  AOptions.senderAvatar = " ";
   if (AOptions.isDirectionIn)
   {
     AOptions.senderColor = "blue";

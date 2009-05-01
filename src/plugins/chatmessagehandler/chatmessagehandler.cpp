@@ -331,8 +331,6 @@ void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageStyle:
       AOptions.senderStatusIcon = FMessageStyles->userIcon(AWindow->streamJid(),AWindow->contactJid());
     if (settings.showAvatars)
       AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->contactJid());
-    else 
-      AOptions.senderAvatar = " ";
   }
   else
   {
@@ -346,8 +344,6 @@ void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageStyle:
       AOptions.senderStatusIcon = FMessageStyles->userIcon(AWindow->streamJid());
     if (settings.showAvatars)
       AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->streamJid());
-    else 
-      AOptions.senderAvatar = " ";
   }
 
   const WindowStatus &wstatus = FWindowStatus.value(AWindow->viewWidget());

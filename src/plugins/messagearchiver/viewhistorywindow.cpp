@@ -749,7 +749,6 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
         options.messageClasses.append(MSMC_INCOMING);
         options.messageClasses.append(MSMC_GROUPCHAT);
         options.senderName = Qt::escape(senderJid.resource());
-        options.senderAvatar = " ";
       }
       else if (ACollection.header.with == senderJid)
       {
@@ -759,8 +758,6 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
         options.senderName = FViewOptions.contactName;
         if (FViewWidget->contentSettings().showAvatars)
           options.senderAvatar = FViewOptions.contactAvatar;
-        else
-          options.senderAvatar = " ";
       }
       else
       {
@@ -770,8 +767,6 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
         options.senderName = FViewOptions.selfName;
         if (FViewWidget->contentSettings().showAvatars)
           options.senderAvatar = FViewOptions.selfAvatar;
-        else
-          options.senderAvatar = " ";
       }
       options.isAlignLTR = options.isDirectionIn;
 
