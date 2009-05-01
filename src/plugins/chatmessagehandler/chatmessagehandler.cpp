@@ -302,7 +302,7 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
   if (FMessageArchiver)
   {
     IArchiveRequest request;
-    request.with = AWindow->contactJid();
+    request.with = AWindow->contactJid().bare();
     request.count = HISTORY_MESSAGES;
     request.order = Qt::DescendingOrder;
     QList<Message> history = FMessageArchiver->findLocalMessages(AWindow->streamJid(),request);
@@ -338,7 +338,10 @@ void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageStyle:
   {
     AOptions.senderColor = "red";
     AOptions.messageClasses.append(MSMC_OUTGOING);
-    AOptions.senderName = Qt::escape(FMessageStyles->userName(AWindow->streamJid()));
+    if (AWindow->streamJid() && AWindow->contactJid())
+      AOptions.senderName = Qt::escape(!AWindow->streamJid().resource().isEmpty() ? AWindow->streamJid().resource() : AWindow->streamJid().node());
+    else
+      AOptions.senderName = Qt::escape(FMessageStyles->userName(AWindow->streamJid()));
     if (settings.showStatusIcons)
       AOptions.senderStatusIcon = FMessageStyles->userIcon(AWindow->streamJid());
     if (settings.showAvatars)
@@ -374,7 +377,7 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
   options.contentType = IMessageStyle::ContentMessage;
   options.sendTime = AMessage.dateTime();
   options.sendTimeFormat = FMessageStyles->messageTimeFormat(options.sendTime);
-  options.isDirectionIn = AWindow->contactJid() != AMessage.to();
+  options.isDirectionIn = AWindow->streamJid() && AWindow->contactJid() ? AWindow->contactJid() != AMessage.to() : !(AWindow->contactJid() && AMessage.to());
   options.willAppendMoreContent = ANoScroll;
 
   if (options.sendTime.secsTo(QDateTime::currentDateTime())>5)
