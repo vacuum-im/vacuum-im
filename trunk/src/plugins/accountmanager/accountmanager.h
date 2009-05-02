@@ -21,7 +21,7 @@
 #include "accountmanage.h"
 #include "accountoptions.h"
 
-class AccountManager : 
+class AccountManager :
   public QObject,
   public IPlugin,
   public IAccountManager,

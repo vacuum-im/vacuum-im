@@ -286,6 +286,8 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
 
       break;
     };
+  default:
+    break;
   }
 }
 

@@ -15,31 +15,33 @@
 #define STYLE_CONTENTS_PATH                 "Contents"
 #define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH"/Resources"
 
-#define APPEND_MESSAGE_WITH_SCROLL		      "checkIfScrollToBottomIsNeeded(); appendMessage(\"%1\"); scrollToBottomIfNeeded();"
+#define APPEND_MESSAGE_WITH_SCROLL          "checkIfScrollToBottomIsNeeded(); appendMessage(\"%1\"); scrollToBottomIfNeeded();"
 #define APPEND_NEXT_MESSAGE_WITH_SCROLL	    "checkIfScrollToBottomIsNeeded(); appendNextMessage(\"%1\"); scrollToBottomIfNeeded();"
-#define APPEND_MESSAGE					            "appendMessage(\"%1\");"
-#define APPEND_NEXT_MESSAGE				          "appendNextMessage(\"%1\");"
-#define APPEND_MESSAGE_NO_SCROLL		        "appendMessageNoScroll(\"%1\");"
-#define	APPEND_NEXT_MESSAGE_NO_SCROLL	      "appendNextMessageNoScroll(\"%1\");"
-#define REPLACE_LAST_MESSAGE			          "replaceLastMessage(\"%1\");"
+#define APPEND_MESSAGE                      "appendMessage(\"%1\");"
+#define APPEND_NEXT_MESSAGE                 "appendNextMessage(\"%1\");"
+#define APPEND_MESSAGE_NO_SCROLL            "appendMessageNoScroll(\"%1\");"
+#define	APPEND_NEXT_MESSAGE_NO_SCROLL       "appendNextMessageNoScroll(\"%1\");"
+#define REPLACE_LAST_MESSAGE                "replaceLastMessage(\"%1\");"
 
-#define TOPIC_MAIN_DIV					            "<div id=\"topic\"></div>"
-#define TOPIC_INDIVIDUAL_WRAPPER		        "<span id=\"topicEdit\" ondblclick=\"this.setAttribute('contentEditable', true); this.focus();\">%1</span>"
+#define TOPIC_MAIN_DIV	                    "<div id=\"topic\"></div>"
+#define TOPIC_INDIVIDUAL_WRAPPER            "<span id=\"topicEdit\" ondblclick=\"this.setAttribute('contentEditable', true); this.focus();\">%1</span>"
 
 
-static char *SenderColors[] = { "aqua", "aquamarine", "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse", "chocolate", 
-                                "coral", "cornflowerblue", "crimson", "cyan", "darkblue", "darkcyan", "darkgoldenrod", "darkgreen", "darkgrey", 
-                                "darkkhaki", "darkmagenta", "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen", 
-                                "darkslateblue", "darkslategrey", "darkturquoise", "darkviolet", "deeppink", "deepskyblue", "dimgrey", "dodgerblue", 
-                                "firebrick", "forestgreen", "fuchsia", "gold", "goldenrod", "green", "greenyellow", "grey", "hotpink", "indianred", 
-                                "indigo", "lawngreen", "lightblue", "lightcoral", "lightgreen", "lightgrey", "lightpink", "lightsalmon", 
-                                "lightseagreen", "lightskyblue", "lightslategrey", "lightsteelblue", "lime", "limegreen", "magenta", "maroon", 
-                                "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen", "mediumslateblue", 
-                                "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "navy", "olive", "olivedrab", "orange", 
-                                "orangered", "orchid", "palegreen", "paleturquoise", "palevioletred", "peru", "pink", "plum", "powderblue", 
-                                "purple", "red", "rosybrown", "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "sienna", "silver", 
-                                "skyblue", "slateblue", "slategrey", "springgreen", "steelblue", "tan", "teal", "thistle", "tomato", "turquoise", 
-                                "violet", "yellowgreen" };
+static const char *SenderColors[] =  {
+   "aqua", "aquamarine", "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse", "chocolate",
+   "coral", "cornflowerblue", "crimson", "cyan", "darkblue", "darkcyan", "darkgoldenrod", "darkgreen", "darkgrey",
+   "darkkhaki", "darkmagenta", "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen",
+   "darkslateblue", "darkslategrey", "darkturquoise", "darkviolet", "deeppink", "deepskyblue", "dimgrey", "dodgerblue",
+   "firebrick", "forestgreen", "fuchsia", "gold", "goldenrod", "green", "greenyellow", "grey", "hotpink", "indianred",
+   "indigo", "lawngreen", "lightblue", "lightcoral", "lightgreen", "lightgrey", "lightpink", "lightsalmon",
+   "lightseagreen", "lightskyblue", "lightslategrey", "lightsteelblue", "lime", "limegreen", "magenta", "maroon",
+   "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen", "mediumslateblue",
+   "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "navy", "olive", "olivedrab", "orange",
+   "orangered", "orchid", "palegreen", "paleturquoise", "palevioletred", "peru", "pink", "plum", "powderblue",
+   "purple", "red", "rosybrown", "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "sienna", "silver",
+   "skyblue", "slateblue", "slategrey", "springgreen", "steelblue", "tan", "teal", "thistle", "tomato", "turquoise",
+   "violet", "yellowgreen"
+};
 
 static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
 
@@ -47,7 +49,7 @@ MessageStyle::MessageStyle(const QString &AStylePath, QObject *AParent) : QObjec
 {
   FInfo = styleInfo(AStylePath);
   FVariants = styleVariants(AStylePath);
-  FResourcePath = AStylePath + "/"STYLE_RESOURCES_PATH;
+  FResourcePath = AStylePath+"/"STYLE_RESOURCES_PATH;
   initStyleSettings();
   loadTemplates();
   loadSenderColors();
@@ -94,7 +96,8 @@ void MessageStyle::setStyle(QWebView *AView, const IMessageStyle::StyleOptions &
 void MessageStyle::setVariant(QWebView *AView, const QString &AVariant) const
 {
   QString variant = QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value("DefaultVariant","../main").toString() : AVariant));
-  QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(variant);
+  QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(FResourcePath+"/"+variant);
+  escapeStringForScript(script);
   AView->page()->mainFrame()->evaluateJavaScript(script);
   emit variantSeted(AView,AVariant);
 }
@@ -138,7 +141,7 @@ QString MessageStyle::makeStyleTemplate(const IMessageStyle::StyleOptions &AOpti
     html.replace(html.indexOf("%@"),2,FResourcePath+"/");
     if (!usingCustomTemplate || version()>=3)
       html.replace(html.indexOf("%@"),2,version()<3 ? "" : "@import url( \"main.css\" );");
-    html.replace(html.indexOf("%@"),2,variant);
+    html.replace(html.indexOf("%@"),2,FResourcePath+"/"+variant);
     html.replace(html.indexOf("%@"),2,headerHTML);
     html.replace(html.indexOf("%@"),2,footerHTML);
   }
@@ -179,8 +182,8 @@ void MessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyle::StyleO
   AHtml.replace("%sourceName%", AOptions.accountName);
   AHtml.replace("%destinationName%", AOptions.chatName);
   AHtml.replace("%destinationDisplayName%", AOptions.chatName);
-  AHtml.replace("%incomingIconPath%", !AOptions.contactAvatar.isEmpty() ? AOptions.contactAvatar : "incoming_icon.png");
-  AHtml.replace("%outgoingIconPath%", !AOptions.selfAvatar.isEmpty() ? AOptions.selfAvatar : "outgoing_icon.png");
+  AHtml.replace("%incomingIconPath%", !AOptions.contactAvatar.isEmpty() ? AOptions.contactAvatar : FResourcePath+"/incoming_icon.png");
+  AHtml.replace("%outgoingIconPath%", !AOptions.selfAvatar.isEmpty() ? AOptions.selfAvatar : FResourcePath+"/outgoing_icon.png");
   AHtml.replace("%timeOpened%", Qt::escape(AOptions.startTime.toString()));
   AHtml.replace("%serviceIconImg%", "");
 
@@ -222,7 +225,7 @@ void MessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyle::Cont
   if (!AOptions.senderAvatar.isEmpty())
     AHtml.replace("%userIconPath%",AOptions.senderAvatar);
   else
-    AHtml.replace("%userIconPath%",AOptions.isDirectionIn ? "Incoming/buddy_icon.png" : "Outgoing/buddy_icon.png");
+    AHtml.replace("%userIconPath%",FResourcePath+(AOptions.isDirectionIn ? "/Incoming/buddy_icon.png" : "/Outgoing/buddy_icon.png"));
 
   QString timeFormat = !AOptions.sendTimeFormat.isEmpty() ? AOptions.sendTimeFormat : tr("hh:mm:ss");
   QString time = Qt::escape(AOptions.sendTime.toString(timeFormat));
