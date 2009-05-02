@@ -102,8 +102,8 @@ void MainWindowPlugin::updateTitle()
 void MainWindowPlugin::showMainWindow()
 {
   FMainWindow->show();
-  FMainWindow->raise();
   FMainWindow->activateWindow();
+  FMainWindow->raise();
 }
 
 void MainWindowPlugin::onSettingsOpened()

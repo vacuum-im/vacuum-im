@@ -409,7 +409,7 @@ void ChatMessageHandler::onWindowActivated()
 
 void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue)
 {
-  if ((AField & IInfoWidget::ContactStatus|IInfoWidget::ContactName)>0) 
+  if ((AField & (IInfoWidget::ContactStatus|IInfoWidget::ContactName))>0)
   {
     IInfoWidget *widget = qobject_cast<IInfoWidget *>(sender());
     IChatWindow *window = widget!=NULL ? findWindow(widget->streamJid(),widget->contactJid()) : NULL;
