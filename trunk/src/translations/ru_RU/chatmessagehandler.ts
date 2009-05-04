@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>%1 changed status to [%2] %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 изменил(а) статус на [%2] %3</translation>
     </message>
 </context>
 </TS>
