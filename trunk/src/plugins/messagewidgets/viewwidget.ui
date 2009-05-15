@@ -11,26 +11,28 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" name="vblLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
    <property name="margin">
     <number>0</number>
    </property>
    <item>
-    <widget class="MessageViewer" name="mvrViewer" native="true"/>
+    <widget class="QFrame" name="wdtViewer">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>MessageViewer</class>
-   <extends>QWidget</extends>
-   <header>messageviewer.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

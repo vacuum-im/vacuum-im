@@ -27,9 +27,6 @@
 #include "../../interfaces/istatuschanger.h"
 
 struct WindowStatus {
-  int lastContent;
-  QString lastSender;
-  QDateTime lastTime;
   QString lastStatusShow;
 };
 
@@ -68,15 +65,13 @@ protected:
   void removeActiveMessages(IChatWindow *AWindow);
   void showHistory(IChatWindow *AWindow);
   void setMessageStyle(IChatWindow *AWindow);
-  void fillContentOptions(IChatWindow *AWindow, IMessageStyle::ContentOptions &AOptions) const;
-  void showStyledStatus(IChatWindow *AWindow, const QString &AMessage, const QString &AStatusKeyword);
-  void showStyledMessage(IChatWindow *AWindow, const Message &AMessage, bool ANoScroll = false);
+  void fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
+  void showStyledStatus(IChatWindow *AWindow, const QString &AMessage);
+  void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
 protected slots:
   void onMessageReady();
   void onWindowActivated();
   void onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
-  void onMessageStyleSettingsChanged(int AMessageType, const IMessageStyles::StyleSettings &ASettings);
-  void onViewWidgetContentAppended(const QString &AMessage, const IMessageStyle::ContentOptions &AOptions);
   void onWindowDestroyed();
   void onStatusIconsChanged();
   void onShowWindowAction(bool);

@@ -1,5 +1,7 @@
 HEADERS = adiummessagestyleplugin.h \
-          adiummessagestyle.h
+          adiummessagestyle.h \
+          styleviewer.h
 
 SOURCES = adiummessagestyleplugin.cpp \
-          adiummessagestyle.cpp
+          adiummessagestyle.cpp \
+          styleviewer.cpp

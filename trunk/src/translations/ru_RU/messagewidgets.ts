@@ -102,34 +102,7 @@
     </message>
 </context>
 <context>
-    <name>MessengerOptions</name>
-    <message>
-        <source>Select font for chat window</source>
-        <translation>Выбрать шрифт для просмотра чата</translation>
-    </message>
-    <message>
-        <source>Select font for message window</source>
-        <translation>Выбрать шрифт для просмотра сообщений</translation>
-    </message>
-</context>
-<context>
     <name>MessengerOptionsClass</name>
-    <message>
-        <source>Fonts</source>
-        <translation>Шрифты</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation>Чат</translation>
-    </message>
-    <message>
-        <source>Change</source>
-        <translation>Изменить</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
-    </message>
     <message>
         <source>Use tab window</source>
         <translation>Использовать окно со вкладками</translation>

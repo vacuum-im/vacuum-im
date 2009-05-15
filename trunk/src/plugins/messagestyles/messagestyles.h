@@ -1,7 +1,6 @@
 #ifndef MESSAGESTYLES_H
 #define MESSAGESTYLES_H
 
-#include "../../definations/resources.h"
 #include "../../definations/vcardvaluenames.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessagestyles.h"
@@ -11,9 +10,8 @@
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/istatusicons.h"
-#include "../../utils/filestorage.h"
 #include "../../utils/message.h"
-#include "messagestyle.h"
+
 
 class MessageStyles : 
   public QObject,
@@ -30,26 +28,24 @@ public:
   virtual QUuid pluginUuid() const { return MESSAGESTYLES_UUID; }
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects();
+  virtual bool initObjects() { return true; }
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IMessageStyles
-  virtual IMessageStyle *styleById(const QString &AStyleId);
-  virtual QList<QString> styles() const;
-  virtual QList<QString> styleVariants(const QString &AStyleId) const;
-  virtual QMap<QString, QVariant> styleInfo(const QString &AStyleId) const;
-  virtual IMessageStyles::StyleSettings styleSettings(int AMessageType) const;
-  virtual void setStyleSettings(int AMessageType, const IMessageStyles::StyleSettings &ASettings);
+  virtual QList<QString> stylePlugins() const;
+  virtual IMessageStylePlugin *stylePluginById(const QString &APluginId) const;
+  virtual IMessageStyle *styleById(const QString &APluginId, const QString &AStyleId) const;
+  virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const;
+  virtual void setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext = QString::null);
+  //Other functions
   virtual QString userAvatar(const Jid &AContactJid) const;
   virtual QString userName(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const;
   virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const;
   virtual QString userIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const;
-  virtual QString messageTimeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const;
+  virtual QString timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const;
 signals:
   virtual void styleCreated(IMessageStyle *AStyle) const;
-  virtual void styleSettingsChanged(int AMessageType, const IMessageStyles::StyleSettings &ASettings) const;
-protected:
-  void updateAvailStyles();
+  virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const;
 protected slots:
   void onVCardChanged(const Jid &AContactJid);
 private:
@@ -59,8 +55,7 @@ private:
   IVCardPlugin *FVCardPlugin;
   IRosterPlugin *FRosterPlugin;
 private:
-  QMap<QString, QString> FStylePaths;
-  QMap<QString, IMessageStyle *> FStyles;
+  QMap<QString, IMessageStylePlugin *> FStylePlugins;
   mutable QHash<Jid, QString> FStreamNames;
 };
 

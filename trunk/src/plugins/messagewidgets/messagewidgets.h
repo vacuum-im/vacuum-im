@@ -47,10 +47,6 @@ public:
   virtual bool executeUrl(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
   //IMessageWidgets
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
-  virtual QFont defaultChatFont() const;
-  virtual void setDefaultChatFont(const QFont &AFont);
-  virtual QFont defaultMessageFont() const;
-  virtual void setDefaultMessageFont(const QFont &AFont);
   virtual QKeySequence sendMessageKey() const;
   virtual void setSendMessageKey(const QKeySequence &AKey);
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid);
@@ -72,8 +68,6 @@ public:
   virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder);
   virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder);
 signals:
-  virtual void defaultChatFontChanged(const QFont &AFont);
-  virtual void defaultMessageFontChanged(const QFont &AFont);
   virtual void sendMessageKeyChanged(const QKeySequence &AKey);
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget);
   virtual void viewWidgetCreated(IViewWidget *AViewWidget);
@@ -95,7 +89,7 @@ signals:
 protected:
   void deleteStreamWindows(const Jid &AStreamJid);
 protected slots:
-  void onViewWidgetLinkClicked(const QUrl &AUrl);
+  void onViewWidgetUrlClicked(const QUrl &AUrl);
   void onMessageWindowDestroyed();
   void onChatWindowDestroyed();
   void onTabWindowDestroyed();

@@ -56,11 +56,6 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
   if (plugin)
   {
     FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
-    if (FMessageStyles)
-    {
-      connect(FMessageStyles->instance(),SIGNAL(styleSettingsChanged(int, const IMessageStyles::StyleSettings &)),
-        SLOT(onMessageStyleSettingsChanged(int, const IMessageStyles::StyleSettings &)));
-    }
   }
 
   plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
@@ -222,8 +217,6 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
       connect(window->instance(),SIGNAL(windowActivated()),SLOT(onWindowActivated()));
       connect(window->infoWidget()->instance(),SIGNAL(fieldChanged(IInfoWidget::InfoField, const QVariant &)),
         SLOT(onInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
-      connect(window->viewWidget()->instance(),SIGNAL(contentAppended(const QString &, const IMessageStyle::ContentOptions &)),
-        SLOT(onViewWidgetContentAppended(const QString &, const IMessageStyle::ContentOptions &)));
       connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onWindowDestroyed()));
       FWindows.append(window);
       setMessageStyle(window);
@@ -278,25 +271,6 @@ void ChatMessageHandler::removeActiveMessages(IChatWindow *AWindow)
   }
 }
 
-void ChatMessageHandler::setMessageStyle(IChatWindow *AWindow)
-{
-  IMessageStyles::StyleSettings settings = FMessageStyles->styleSettings(Message::Chat);
-  AWindow->viewWidget()->setContentSettings(settings.content);
-
-  IMessageStyle *style = FMessageStyles!=NULL ? FMessageStyles->styleById(settings.styleId) : NULL;
-  if (style)
-  {
-    IMessageStyle::StyleOptions options;
-    options.variant = settings.variant;
-    options.bgColor = settings.bgColor;
-    options.bgImageFile = settings.bgImageFile;
-    options.bgImageLayout = settings.bgImageLayout;
-    
-    options.headerType = IMessageStyle::HeaderNone;
-    AWindow->viewWidget()->setMessageStyle(style,options);
-  }
-}
-
 void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 {
   if (FMessageArchiver)
@@ -310,75 +284,68 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
     for (int i=0; i<history.count(); i++)
     {
       Message message = history.at(i);
-      showStyledMessage(AWindow,message,i<history.count()-1);
+      showStyledMessage(AWindow,message);
     }
   }
 }
 
-void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageStyle::ContentOptions &AOptions) const
+void ChatMessageHandler::setMessageStyle(IChatWindow *AWindow)
 {
-  AOptions.replaceLastContent = false;
-  AOptions.isAlignLTR = AOptions.isDirectionIn;
-
-  IMessageStyles::ContentSettings settings = AWindow->viewWidget()->contentSettings();
-
-  if (AOptions.isDirectionIn)
+  if (FMessageStyles)
   {
-    AOptions.senderColor = "blue";
-    AOptions.messageClasses.append(MSMC_INCOMING);
+    IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
+    IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
+    AWindow->viewWidget()->setMessageStyle(style,soptions);
+  }
+}
+
+void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const
+{
+  if (AOptions.direction == IMessageContentOptions::DirectionIn)
+  {
+    AOptions.senderId = AWindow->contactJid().full();
     AOptions.senderName = Qt::escape(FMessageStyles->userName(AWindow->streamJid(),AWindow->contactJid()));
-    if (settings.showStatusIcons)
-      AOptions.senderStatusIcon = FMessageStyles->userIcon(AWindow->streamJid(),AWindow->contactJid());
-    if (settings.showAvatars)
-      AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->contactJid());
+    AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->contactJid());
+    AOptions.senderIcon = FMessageStyles->userIcon(AWindow->streamJid(),AWindow->contactJid());
+    AOptions.senderColor = "blue";
   }
   else
   {
-    AOptions.senderColor = "red";
-    AOptions.messageClasses.append(MSMC_OUTGOING);
+    AOptions.senderId = AWindow->streamJid().full();
     if (AWindow->streamJid() && AWindow->contactJid())
       AOptions.senderName = Qt::escape(!AWindow->streamJid().resource().isEmpty() ? AWindow->streamJid().resource() : AWindow->streamJid().node());
     else
       AOptions.senderName = Qt::escape(FMessageStyles->userName(AWindow->streamJid()));
-    if (settings.showStatusIcons)
-      AOptions.senderStatusIcon = FMessageStyles->userIcon(AWindow->streamJid());
-    if (settings.showAvatars)
-      AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->streamJid());
+    AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->streamJid());
+    AOptions.senderIcon = FMessageStyles->userIcon(AWindow->streamJid());
+    AOptions.senderColor = "red";
   }
-
-  const WindowStatus &wstatus = FWindowStatus.value(AWindow->viewWidget());
-  AOptions.isSameSender = AOptions.senderName==wstatus.lastSender && 
-                          AOptions.contentType==wstatus.lastContent &&
-                          (wstatus.lastTime.secsTo(AOptions.sendTime)<CONSECUTIVE_TIMEOUT);
 }
 
-void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &AMessage, const QString &AStatusKeyword)
+void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &AMessage)
 {
-  IMessageStyle::ContentOptions options;
-  options.contentType = IMessageStyle::ContentStatus;
-  options.sendTime = QDateTime::currentDateTime();
-  options.sendTimeFormat = FMessageStyles->messageTimeFormat(options.sendTime);
-  options.statusKeyword = AStatusKeyword;
-  options.messageClasses.append(MSMC_STATUS);
-  options.isDirectionIn = true;
-  options.willAppendMoreContent = false;
-
+  IMessageContentOptions options;
+  options.kind = IMessageContentOptions::Status;
+  options.time = QDateTime::currentDateTime();
+  options.timeFormat = FMessageStyles->timeFormat(options.time);
+  options.direction = IMessageContentOptions::DirectionIn;
   fillContentOptions(AWindow,options);
   AWindow->viewWidget()->appendText(AMessage,options);
 }
 
-void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &AMessage, bool ANoScroll)
+void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &AMessage)
 {
-  IMessageStyle::ContentOptions options;
-  options.contentType = IMessageStyle::ContentMessage;
-  options.sendTime = AMessage.dateTime();
-  options.sendTimeFormat = FMessageStyles->messageTimeFormat(options.sendTime);
-  options.isDirectionIn = AWindow->streamJid() && AWindow->contactJid() ? AWindow->contactJid() != AMessage.to() : !(AWindow->contactJid() && AMessage.to());
-  options.willAppendMoreContent = ANoScroll;
+  IMessageContentOptions options;
+  options.kind = IMessageContentOptions::Message;
+  options.time = AMessage.dateTime();
+  options.timeFormat = FMessageStyles->timeFormat(options.time);
+  if (AWindow->streamJid() && AWindow->contactJid() ? AWindow->contactJid() != AMessage.to() : !(AWindow->contactJid() && AMessage.to()))
+    options.direction = IMessageContentOptions::DirectionIn;
+  else
+    options.direction = IMessageContentOptions::DirectionOut;
 
-  if (options.sendTime.secsTo(QDateTime::currentDateTime())>5)
-    options.messageClasses.append(MSMC_HISTORY);
-  options.messageClasses.append(MSMC_MESSAGE);
+  if (options.time.secsTo(QDateTime::currentDateTime())>5)
+    options.type |= IMessageContentOptions::History;
   
   fillContentOptions(AWindow,options);
   AWindow->viewWidget()->appendMessage(AMessage,options);
@@ -426,28 +393,12 @@ void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const
         {
           wstatus.lastStatusShow = status+show;
           QString message = tr("%1 changed status to [%2] %3").arg(widget->field(IInfoWidget::ContactName).toString()).arg(show).arg(status);
-          showStyledStatus(window,message,QString::null);
+          showStyledStatus(window,message);
         }
       }
       updateWindow(window);
     }
   }
-}
-
-void ChatMessageHandler::onMessageStyleSettingsChanged(int AMessageType, const IMessageStyles::StyleSettings &ASettings)
-{
-  if (AMessageType == Message::Chat)
-    foreach (IChatWindow *window, FWindows)
-      window->viewWidget()->setContentSettings(ASettings.content);
-}
-
-void ChatMessageHandler::onViewWidgetContentAppended(const QString &/*AMessage*/, const IMessageStyle::ContentOptions &AOptions)
-{
-  IViewWidget *widget = qobject_cast<IViewWidget *>(sender());
-  WindowStatus &wstatus = FWindowStatus[widget];
-  wstatus.lastSender = AOptions.senderName;
-  wstatus.lastTime = AOptions.sendTime;
-  wstatus.lastContent = AOptions.contentType;
 }
 
 void ChatMessageHandler::onWindowDestroyed()
