@@ -2,14 +2,7 @@
 
 #include <QCoreApplication>
 
-#define SVN_SETTINGS                    "styleSettings[]"
-#define SVN_SETTINGS_STYLEID            SVN_SETTINGS ":" "styleId"
-#define SVN_SETTINGS_VARIANT            SVN_SETTINGS ":" "variant"
-#define SVN_SETTINGS_AVATARS            SVN_SETTINGS ":" "showAvarats"
-#define SVN_SETTINGS_STATUS_ICONS       SVN_SETTINGS ":" "showStatusIcons"
-#define SVN_SETTINGS_BG_COLOR           SVN_SETTINGS ":" "bgColor"
-#define SVN_SETTINGS_BG_IMAGE_FILE      SVN_SETTINGS ":" "bgImageFile"
-#define SVN_SETTINGS_BG_IMAGE_LAYOUT    SVN_SETTINGS ":" "bgImageLayout"
+#define SVN_PLUGIN_ID                  "style%1[]:pluginId"
 
 MessageStyles::MessageStyles()
 {
@@ -37,6 +30,16 @@ void MessageStyles::pluginInfo(IPluginInfo *APluginInfo)
 
 bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
+  QList<IPlugin *> plugins = APluginManager->getPlugins("IMessageStylePlugin");
+  foreach (IPlugin *plugin, plugins)
+  {
+    IMessageStylePlugin *stylePlugin = qobject_cast<IMessageStylePlugin *>(plugin->instance());
+    if (stylePlugin)
+    {
+      FStylePlugins.insert(stylePlugin->stylePluginId(),stylePlugin);
+    }
+  }
+
   IPlugin *plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -67,112 +70,46 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
   return true;
 }
 
-bool MessageStyles::initObjects()
+QList<QString> MessageStyles::stylePlugins() const
 {
-  updateAvailStyles();
-  return true;
+  return FStylePlugins.keys();
 }
 
-IMessageStyle *MessageStyles::styleById(const QString &AStyleId)
+IMessageStylePlugin *MessageStyles::stylePluginById(const QString &APluginId) const
 {
-  if (!FStyles.contains(AStyleId))
-  {
-    QString stylePath = FStylePaths.value(AStyleId);
-    if (!stylePath.isEmpty())
-    {
-      IMessageStyle *style = new MessageStyle(stylePath,this);
-      if (style->isValid())
-      {
-        FStyles.insert(AStyleId,style);
-        emit styleCreated(style);
-      }
-      else
-      {
-        delete style;
-      }
-    }
-  }
-  return FStyles.value(AStyleId,NULL);
+  return FStylePlugins.value(APluginId,NULL);
 }
 
-QList<QString> MessageStyles::styles() const
+IMessageStyle *MessageStyles::styleById(const QString &APluginId, const QString &AStyleId) const
 {
-  return FStylePaths.values();
+  IMessageStylePlugin *stylePlugin = stylePluginById(APluginId);
+  return stylePlugin!=NULL ? stylePlugin->styleById(AStyleId) : NULL;
 }
 
-QList<QString> MessageStyles::styleVariants(const QString &AStyleId) const
+IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString &AContext) const
 {
-  if (FStyles.contains(AStyleId))
-    return FStyles.value(AStyleId)->variants();
-  return MessageStyle::styleVariants(FStylePaths.value(AStyleId));
-}
-
-QMap<QString, QVariant> MessageStyles::styleInfo(const QString &AStyleId) const
-{
-  if (FStyles.contains(AStyleId))
-    return FStyles.value(AStyleId)->infoValues();
-  return MessageStyle::styleInfo(FStylePaths.value(AStyleId));
-}
-
-IMessageStyles::StyleSettings MessageStyles::styleSettings(int AMessageType) const
-{
-  IMessageStyles::StyleSettings sSettings;
-  
+  QString pluginId;
   if (FSettingsPlugin)
   {
     ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    QString ns = QString::number(AMessageType);
-    sSettings.styleId = settings->valueNS(SVN_SETTINGS_STYLEID,ns).toString();
-    sSettings.variant = settings->valueNS(SVN_SETTINGS_VARIANT,ns).toString();
-    sSettings.bgColor = settings->valueNS(SVN_SETTINGS_BG_COLOR,ns).toString();
-    sSettings.bgImageFile = settings->valueNS(SVN_SETTINGS_BG_IMAGE_FILE,ns).toString();
-    sSettings.bgImageLayout = settings->valueNS(SVN_SETTINGS_BG_IMAGE_LAYOUT,ns,0).toInt();
-    sSettings.content.showAvatars = settings->valueNS(SVN_SETTINGS_AVATARS,ns,true).toBool();
-    sSettings.content.showStatusIcons = settings->valueNS(SVN_SETTINGS_STATUS_ICONS,ns,true).toBool();
+    pluginId = settings->valueNS(QString(SVN_PLUGIN_ID).arg(AMessageType),AContext).toString();
   }
 
-  if (!FStylePaths.isEmpty() && !FStylePaths.contains(sSettings.styleId))
+  if (!FStylePlugins.contains(pluginId))
   {
-    sSettings.styleId = "yMous";
-    switch (AMessageType)
-    {
-    case Message::GroupChat:
-      sSettings.variant = "Saturnine XtraColor Both";
-      break;
-    default:
-      sSettings.variant = "Saturnine Both";
-    }
-    
-    if (!FStylePaths.contains(sSettings.styleId))  
-      sSettings.styleId = FStylePaths.keys().first();
-
-    QMap<QString,QVariant> info = styleInfo(sSettings.styleId);
-    if (!styleVariants(sSettings.styleId).contains(sSettings.variant))
-      sSettings.variant = info.value(MSIV_DEFAULT_VARIANT).toString();
-    sSettings.bgImageLayout = IMessageStyle::ImageNormal;
-    if (info.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool())
-      sSettings.bgImageFile.clear();
-    sSettings.bgColor.clear();
-    sSettings.content.showStatusIcons = true;
-    sSettings.content.showAvatars = info.value(MSIV_SHOW_USER_ICONS,true).toBool();
+    pluginId = "AdiumMessageStyle";
   }
 
-  return sSettings;
+  IMessageStylePlugin *stylePlugin = stylePluginById(pluginId);
+  return stylePlugin!=NULL ? stylePlugin->styleOptions(AMessageType,AContext) : IMessageStyleOptions();
 }
 
-void MessageStyles::setStyleSettings(int AMessageType, const IMessageStyles::StyleSettings &ASettings)
+void MessageStyles::setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)
 {
-  if (FSettingsPlugin && FStylePaths.contains(ASettings.styleId))
+  IMessageStylePlugin *stylePlugin = stylePluginById(AOptions.pluginId);
+  if (stylePlugin)
   {
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    QString ns = QString::number(AMessageType);
-    settings->setValueNS(SVN_SETTINGS_STYLEID,ns,ASettings.styleId);
-    settings->setValueNS(SVN_SETTINGS_VARIANT,ns,ASettings.variant);
-    settings->setValueNS(SVN_SETTINGS_BG_COLOR,ns,ASettings.bgColor);
-    settings->setValueNS(SVN_SETTINGS_BG_IMAGE_FILE,ns,ASettings.bgImageFile);
-    settings->setValueNS(SVN_SETTINGS_BG_IMAGE_LAYOUT,ns,ASettings.bgImageLayout);
-    settings->setValueNS(SVN_SETTINGS_AVATARS,ns,ASettings.content.showAvatars);
-    settings->setValueNS(SVN_SETTINGS_STATUS_ICONS,ns,ASettings.content.showStatusIcons);
+    stylePlugin->setStyleOptions(AOptions,AMessageType,AContext);
   }
 }
 
@@ -246,7 +183,7 @@ QString MessageStyles::userIcon(const Jid &AContactJid, int AShow, const QString
   return QString::null;
 }
 
-QString MessageStyles::messageTimeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime) const
+QString MessageStyles::timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime) const
 {
   int daysDelta = AMessageTime.daysTo(ACurTime);
   if (daysDelta > 365)
@@ -254,27 +191,6 @@ QString MessageStyles::messageTimeFormat(const QDateTime &AMessageTime, const QD
   else if (daysDelta > 0)
     return tr("d MMM hh:mm");
   return tr("hh:mm:ss");
-}
-
-void MessageStyles::updateAvailStyles()
-{
-  FStylePaths.clear();
-  QDir dir(qApp->applicationDirPath());
-  if (dir.cd(STORAGE_DIR) && dir.cd(RSR_STORAGE_MESSAGESTYLES))
-  {
-    QStringList styleDirs = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
-    styleDirs.removeAt(styleDirs.indexOf(STORAGE_SHARED_DIR));
-    foreach(QString styleDir, styleDirs)
-    {
-      if (dir.cd(styleDir) && QFile::exists(dir.absoluteFilePath("Contents/Resources/Incoming/Content.html")))
-      {
-        QMap<QString, QVariant> info = MessageStyle::styleInfo(dir.absolutePath());
-        if (info.contains(MSIV_NAME))
-          FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
-        dir.cdUp();
-      }
-    }
-  }
 }
 
 void MessageStyles::onVCardChanged(const Jid &AContactJid)

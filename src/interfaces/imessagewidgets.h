@@ -52,22 +52,18 @@ public:
   virtual void setStreamJid(const Jid &AStreamJid) =0;
   virtual const Jid &contactJid() const =0;
   virtual void setContactJid(const Jid &AContactJid) =0;
-  virtual QWebView *webBrowser() const =0;
-  virtual void setHtml(const QString &AHtml) =0;
-  virtual void setMessage(const Message &AMessage) =0;
+  virtual QWidget *styleWidget() const =0;
   virtual IMessageStyle *messageStyle() const =0;
-  virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyle::StyleOptions &AOptions) =0;
-  virtual const IMessageStyles::ContentSettings &contentSettings() const =0;
-  virtual void setContentSettings(const IMessageStyles::ContentSettings &ASettings) =0;
-  virtual void appendHtml(const QString &AHtml, const IMessageStyle::ContentOptions &AOptions) =0;
-  virtual void appendText(const QString &AText, const IMessageStyle::ContentOptions &AOptions) =0;
-  virtual void appendMessage(const Message &AMessage, const IMessageStyle::ContentOptions &AOptions) =0;
+  virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions) =0;
+  virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
+  virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions) =0;
+  virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions) =0;
 signals:
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
-  virtual void messageStyleChanged(IMessageStyle *ABefour, const IMessageStyle::StyleOptions &AOptions) =0;
-  virtual void contentSettingsChanged(const IMessageStyles::ContentSettings &ASettings) =0;
-  virtual void contentAppended(const QString &AMessage, const IMessageStyle::ContentOptions &AOptions) =0;
+  virtual void messageStyleChanged(IMessageStyle *ABefour, const IMessageStyleOptions &AOptions) =0;
+  virtual void contentAppended(const QString &AMessage, const IMessageContentOptions &AOptions) =0;
+  virtual void urlClicked(const QUrl &AUrl) const =0;
 };
 
 class IEditWidget
@@ -239,10 +235,6 @@ public:
 public:
   virtual QObject *instance() = 0;
   virtual IPluginManager *pluginManager() const =0;
-  virtual QFont defaultChatFont() const =0;
-  virtual void setDefaultChatFont(const QFont &AFont) =0;
-  virtual QFont defaultMessageFont() const =0;
-  virtual void setDefaultMessageFont(const QFont &AFont) =0;
   virtual QKeySequence sendMessageKey() const =0;
   virtual void setSendMessageKey(const QKeySequence &AKey) =0;
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
@@ -264,8 +256,6 @@ public:
   virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
   virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
 signals:
-  virtual void defaultChatFontChanged(const QFont &AFont) =0;
-  virtual void defaultMessageFontChanged(const QFont &AFont) =0;
   virtual void sendMessageKeyChanged(const QKeySequence &AKey) =0;
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget) =0;
   virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;

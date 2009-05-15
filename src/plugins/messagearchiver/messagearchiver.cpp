@@ -2226,17 +2226,11 @@ void MessageArchiver::notifyInChatWindow(const Jid &AStreamJid, const Jid &ACont
   IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
   if (window)
   {
-    IMessageStyle::ContentOptions options;
-    options.isAlignLTR = true;
-    options.isSameSender = false;
-    options.isDirectionIn = true;
-    options.replaceLastContent = false;
-    options.willAppendMoreContent = false;
-    options.contentType = IMessageStyle::ContentStatus;
-    options.statusKeyword = MSSK_DATE_SEPARATOR;
-    options.sendTime = QDateTime::currentDateTime();
-    options.messageClasses.append(MSMC_STATUS);
-    options.messageClasses.append(MSMC_NOTIFICATION);
+    IMessageContentOptions options;
+    options.kind = IMessageContentOptions::Status;
+    options.direction = IMessageContentOptions::DirectionIn;
+    options.time = QDateTime::currentDateTime();
+    options.type |= IMessageContentOptions::Notification;
     window->viewWidget()->appendText(AMessage,options);
   }
 }

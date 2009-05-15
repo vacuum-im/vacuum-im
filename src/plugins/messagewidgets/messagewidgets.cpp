@@ -98,34 +98,6 @@ bool MessageWidgets::executeUrl(IViewWidget * /*AWidget*/, const QUrl &AUrl, int
   return QDesktopServices::openUrl(AUrl);
 }
 
-QFont MessageWidgets::defaultChatFont() const
-{
-  return FChatFont;
-}
-
-void MessageWidgets::setDefaultChatFont(const QFont &AFont)
-{
-  if (FChatFont != AFont)
-  {
-    FChatFont = AFont;
-    emit defaultChatFontChanged(FChatFont);
-  }
-}
-
-QFont MessageWidgets::defaultMessageFont() const
-{
-  return FMessageFont;
-}
-
-void MessageWidgets::setDefaultMessageFont(const QFont &AFont)
-{
-  if (FMessageFont != AFont)
-  {
-    FMessageFont = AFont;
-    emit defaultMessageFontChanged(FMessageFont);
-  }
-}
-
 QKeySequence MessageWidgets::sendMessageKey() const
 {
   return FSendKey;
@@ -151,7 +123,7 @@ IInfoWidget *MessageWidgets::newInfoWidget(const Jid &AStreamJid, const Jid &ACo
 IViewWidget *MessageWidgets::newViewWidget(const Jid &AStreamJid, const Jid &AContactJid)
 {
   IViewWidget *widget = new ViewWidget(this,AStreamJid,AContactJid);
-  connect(widget->instance(),SIGNAL(linkClicked(const QUrl &)),SLOT(onViewWidgetLinkClicked(const QUrl &)));
+  connect(widget->instance(),SIGNAL(urlClicked(const QUrl &)),SLOT(onViewWidgetUrlClicked(const QUrl &)));
   FCleanupHandler.add(widget->instance());
   emit viewWidgetCreated(widget);
   return widget;
@@ -307,7 +279,7 @@ void MessageWidgets::deleteStreamWindows(const Jid &AStreamJid)
       delete window->instance();
 }
 
-void MessageWidgets::onViewWidgetLinkClicked(const QUrl &AUrl)
+void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
 {
   IViewWidget *widget = qobject_cast<IViewWidget *>(sender());
   if (widget)

@@ -34,7 +34,11 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
   FReceiversWidget->addReceiver(FContactJid);
 
   FViewToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,FViewWidget,NULL,NULL);
+  FViewToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
+
   FEditToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,NULL,FEditWidget,NULL);
+  FEditToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
+
   ui.wdtToolBar->setLayout(new QVBoxLayout(ui.wdtToolBar));
   ui.wdtToolBar->layout()->setMargin(0);
 
@@ -179,8 +183,8 @@ void MessageWindow::showMessage(const Message &AMessage)
     ui.lblDateTime->setText(FMessage.dateTime().toString(tr("dd MMM hh:mm")));
   if (FMessage.type() == Message::Error)
     showErrorMessage(FMessage);
-  else
-    FViewWidget->setMessage(FMessage);
+  //else
+  //  FViewWidget->setMessage(FMessage);
 }
 
 void MessageWindow::initialize()
@@ -258,7 +262,7 @@ void MessageWindow::showErrorMessage(const Message &AMessage)
   format.setFontWeight(QFont::Normal);
   cursor.insertText(AMessage.body(),format);
 
-  FViewWidget->setHtml(doc.toHtml());
+  //FViewWidget->setHtml(doc.toHtml());
 }
 
 void MessageWindow::showEvent(QShowEvent *AEvent)

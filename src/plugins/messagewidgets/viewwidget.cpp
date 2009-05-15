@@ -3,11 +3,14 @@
 #include <QTextFrame>
 #include <QTextTable>
 #include <QScrollBar>
-#include <QResizeEvent>
+#include <QVBoxLayout>
 
 ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
+
+  QVBoxLayout *layout = new QVBoxLayout(ui.wdtViewer);
+  layout->setMargin(0);
 
   FMessageStyle = NULL;
   FMessageProcessor = NULL;
@@ -15,9 +18,7 @@ ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, 
 
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
-
-  ui.mvrViewer->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-  connect(ui.mvrViewer->page(),SIGNAL(linkClicked(const QUrl &)),SIGNAL(linkClicked(const QUrl &)));
+  FStyleWidget = NULL;
 
   initialize();
 }
@@ -47,25 +48,9 @@ void ViewWidget::setContactJid(const Jid &AContactJid)
   }
 }
 
-QWebView *ViewWidget::webBrowser() const
+QWidget *ViewWidget::styleWidget() const
 {
-  return ui.mvrViewer;
-}
-
-void ViewWidget::setHtml(const QString &AHtml)
-{
-  ui.mvrViewer->setHtml(AHtml);
-}
-
-void ViewWidget::setMessage(const Message &AMessage)
-{
-  QTextDocument messageDoc;
-  if (FMessageProcessor)
-    FMessageProcessor->messageToText(&messageDoc,AMessage);
-  else
-    messageDoc.setPlainText(AMessage.body());
-
-  setHtml(messageDoc.toHtml());
+  return FStyleWidget;
 }
 
 IMessageStyle *ViewWidget::messageStyle() const
@@ -73,7 +58,7 @@ IMessageStyle *ViewWidget::messageStyle() const
   return FMessageStyle;
 }
 
-void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyle::StyleOptions &AOptions)
+void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions)
 {
   if (FMessageStyle != AStyle)
   {
@@ -81,44 +66,39 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyle::Sty
     FMessageStyle = AStyle;
     if (befour)
     {
-      disconnect(befour->instance(),SIGNAL(contentAppended(QWebView *, const QString &, const IMessageStyle::ContentOptions &)),
-        this, SLOT(onContentAppended(QWebView *, const QString &, const IMessageStyle::ContentOptions &)));
+      disconnect(befour->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
+        this, SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
+      disconnect(befour->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),this,SLOT(onUrlClicked(QWidget *, const QUrl &)));
+      ui.wdtViewer->layout()->removeWidget(FStyleWidget);
+      FStyleWidget->deleteLater();
+      FStyleWidget = NULL;
     }
     if (FMessageStyle)
     {
-      FMessageStyle->setStyle(ui.mvrViewer,AOptions);
-      connect(FMessageStyle->instance(),SIGNAL(contentAppended(QWebView *, const QString &, const IMessageStyle::ContentOptions &)),
-        SLOT(onContentAppended(QWebView *, const QString &, const IMessageStyle::ContentOptions &)));
+      FStyleWidget = FMessageStyle->createWidget(AOptions,ui.wdtViewer);
+      connect(FMessageStyle->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
+        SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
+      connect(FMessageStyle->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),SLOT(onUrlClicked(QWidget *, const QUrl &)));
+      ui.wdtViewer->layout()->addWidget(FStyleWidget);
     }
     emit messageStyleChanged(befour,AOptions);
   }
 }
 
-const IMessageStyles::ContentSettings &ViewWidget::contentSettings() const
-{
-  return FContentSettings;
-}
-
-void ViewWidget::setContentSettings(const IMessageStyles::ContentSettings &ASettings)
-{
-  FContentSettings = ASettings;
-  emit contentSettingsChanged(FContentSettings);
-}
-
-void ViewWidget::appendHtml(const QString &AHtml, const IMessageStyle::ContentOptions &AOptions)
+void ViewWidget::appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions)
 {
   if (FMessageStyle)
-    FMessageStyle->appendContent(ui.mvrViewer,AHtml,AOptions);
+    FMessageStyle->appendContent(FStyleWidget,AHtml,AOptions);
 }
 
-void ViewWidget::appendText(const QString &AText, const IMessageStyle::ContentOptions &AOptions)
+void ViewWidget::appendText(const QString &AText, const IMessageContentOptions &AOptions)
 {
   Message message;
   message.setBody(AText);
   appendMessage(message,AOptions);
 }
 
-void ViewWidget::appendMessage(const Message &AMessage, const IMessageStyle::ContentOptions &AOptions)
+void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions)
 {
   QTextDocument messageDoc;
   if (FMessageProcessor)
@@ -128,7 +108,7 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageStyle::Con
 
   if (!AOptions.senderName.isEmpty() && processMeCommand(&messageDoc,AOptions))
   {
-    IMessageStyle::ContentOptions options = AOptions;
+    IMessageContentOptions options = AOptions;
     options.senderName = QString::null;
     appendHtml(getHtmlBody(messageDoc.toHtml()),options);
   }
@@ -157,7 +137,7 @@ QString ViewWidget::getHtmlBody(const QString &AHtml)
   return AHtml;
 }
 
-bool ViewWidget::processMeCommand(QTextDocument *ADocument, const IMessageStyle::ContentOptions &AOptions)
+bool ViewWidget::processMeCommand(QTextDocument *ADocument, const IMessageContentOptions &AOptions)
 {
   QRegExp regexp("^/me\\s");
   for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
@@ -168,8 +148,14 @@ bool ViewWidget::processMeCommand(QTextDocument *ADocument, const IMessageStyle:
   return false;
 }
 
-void ViewWidget::onContentAppended(QWebView *AView, const QString &AMessage, const IMessageStyle::ContentOptions &AOptions)
+void ViewWidget::onContentAppended(QWidget *AWidget, const QString &AMessage, const IMessageContentOptions &AOptions)
 {
-  if (AView == ui.mvrViewer)
+  if (AWidget == FStyleWidget)
     emit contentAppended(AMessage,AOptions);
+}
+
+void ViewWidget::onUrlClicked(QWidget *AWidget, const QUrl &AUrl)
+{
+  if (AWidget == FStyleWidget)
+    emit urlClicked(AUrl);
 }

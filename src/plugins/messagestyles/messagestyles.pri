@@ -1,5 +1,3 @@
-HEADERS = messagestyles.h \
-          messagestyle.h
+HEADERS = messagestyles.h
 
-SOURCES = messagestyles.cpp \
-          messagestyle.cpp
+SOURCES = messagestyles.cpp

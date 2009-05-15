@@ -643,31 +643,29 @@ void ViewHistoryWindow::setViewOptions(const IArchiveCollection &ACollection)
       FViewOptions.contactName = Qt::escape(FArchiver->gateNick(FStreamJid,ACollection.header.with));
     FViewOptions.contactAvatar = FMessageStyles->userAvatar(ACollection.header.with);
   }
-  FViewOptions.lastSender = Jid();
 }
 
-void ViewHistoryWindow::setMessageStyle(const IArchiveHeader &AHeader)
+void ViewHistoryWindow::setMessageStyle()
 {
-  IMessageStyles::StyleSettings settings = FMessageStyles->styleSettings(FViewOptions.isGroupchat ? Message::GroupChat : Message::Chat);
-  FViewWidget->setContentSettings(settings.content);
-
-  IMessageStyle *style = FMessageStyles!=NULL ? FMessageStyles->styleById(settings.styleId) : NULL;
-  if (style)
+  if (FMessageStyles)
   {
-    IMessageStyle::StyleOptions options;
-    options.variant = settings.variant;
-    options.headerType = IMessageStyle::HeaderNone;
-    options.startTime = AHeader.start;
-    options.selfName = FViewOptions.selfName;
-    options.selfAvatar = FViewOptions.selfAvatar;
-    options.contactName = FViewOptions.contactName;
-    options.contactAvatar = FViewOptions.contactAvatar;
-
+    IMessageStyleOptions soptions = FMessageStyles->styleOptions(FViewOptions.isGroupchat ? Message::GroupChat : Message::Chat);
+    IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
     if (style != FViewWidget->messageStyle())
-      FViewWidget->setMessageStyle(style,options);
+      FViewWidget->setMessageStyle(style,soptions);
     else if (FViewWidget->messageStyle()!=NULL)
-      FViewWidget->messageStyle()->setStyle(FViewWidget->webBrowser(),options);
+      FViewWidget->messageStyle()->clearWidget(FViewWidget->styleWidget(),soptions);
   }
+}
+
+void ViewHistoryWindow::showNotification(const QString &AMessage)
+{
+  IMessageContentOptions options;
+  options.kind = IMessageContentOptions::Status;
+  options.direction = IMessageContentOptions::DirectionIn;
+  options.time = QDateTime::currentDateTime();
+  options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
+  FViewWidget->appendText(AMessage,options);
 }
 
 void ViewHistoryWindow::processRequests(const QList<IArchiveRequest> &ARequests)
@@ -710,65 +708,57 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
     if (!AAppend)
     {
       setViewOptions(ACollection);
-      setMessageStyle(ACollection.header);
+      setMessageStyle();
       FViewWidget->setContactJid(ACollection.header.with);
     }
 
-    IMessageStyle::ContentOptions options;
-    options.replaceLastContent = false;
-    options.willAppendMoreContent = true;
+    IMessageContentOptions options;
+    options.kind = IMessageContentOptions::Status;
+    options.direction = IMessageContentOptions::DirectionIn;
+    options.noScroll = true;
 
-    options.messageClasses.append(MSMC_STATUS);
+    options.senderId = FStreamJid.full();
     options.senderName = FViewOptions.selfName;
-    options.contentType = IMessageStyle::ContentStatus;
     QMultiMap<QDateTime,QString>::const_iterator it = ACollection.notes.constBegin();
     while (it!=ACollection.notes.constEnd())
     {
-      options.sendTime = it.key();
-      options.sendTimeFormat = FMessageStyles!=NULL ? FMessageStyles->messageTimeFormat(options.sendTime) : QString::null;
+      options.time = it.key();
+      options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
       FViewWidget->appendText(it.value(),options);
       it++;
     }
 
-    options.contentType = IMessageStyle::ContentArchive;
+    options.kind = IMessageContentOptions::Message;
     foreach(Message message, ACollection.messages)
     {
-      options.sendTime = message.dateTime();
-      options.sendTimeFormat = FMessageStyles->messageTimeFormat(options.sendTime);
-
+      options.type = 0;
+      options.time = message.dateTime();
+      options.timeFormat = FMessageStyles->timeFormat(options.time);
       Jid senderJid = !message.from().isEmpty() ? message.from() : FStreamJid;
-      options.isSameSender = FViewOptions.lastSender == senderJid;
-      FViewOptions.lastSender = senderJid;
-
-      options.messageClasses.clear();
-      options.messageClasses.append(MSMC_MESSAGE);
 
       if (FViewOptions.isGroupchat)
       {
-        options.isDirectionIn = true;
-        options.messageClasses.append(MSMC_INCOMING);
-        options.messageClasses.append(MSMC_GROUPCHAT);
+        options.direction = IMessageContentOptions::DirectionIn;
+        options.type |= IMessageContentOptions::Groupchat;
         options.senderName = Qt::escape(senderJid.resource());
+        options.senderId = options.senderName;
       }
       else if (ACollection.header.with == senderJid)
       {
-        options.isDirectionIn = true;
-        options.senderColor = "blue";
-        options.messageClasses.append(MSMC_INCOMING);
+        options.direction = IMessageContentOptions::DirectionIn;
+        options.senderId = senderJid.full();
         options.senderName = FViewOptions.contactName;
-        if (FViewWidget->contentSettings().showAvatars)
-          options.senderAvatar = FViewOptions.contactAvatar;
+        options.senderAvatar = FViewOptions.contactAvatar;
+        options.senderColor = "blue";
       }
       else
       {
-        options.isDirectionIn = false;
-        options.senderColor = "red";
-        options.messageClasses.append(MSMC_OUTGOING);
+        options.direction = IMessageContentOptions::DirectionOut;
+        options.senderId = senderJid.full();
         options.senderName = FViewOptions.selfName;
-        if (FViewWidget->contentSettings().showAvatars)
-          options.senderAvatar = FViewOptions.selfAvatar;
+        options.senderAvatar = FViewOptions.selfAvatar;
+        options.senderColor = "red";
       }
-      options.isAlignLTR = options.isDirectionIn;
 
       FViewWidget->appendMessage(message,options);
     }
@@ -1023,7 +1013,7 @@ void ViewHistoryWindow::onRequestFailed(const QString &AId, const QString &AErro
     collection.notes.clear();
 
     if (FCurrentHeaders.contains(header))
-      FViewWidget->setHtml(Qt::escape(tr("Message loading failed: %1").arg(AError)));
+      showNotification(tr("Message loading failed: %1").arg(AError));
   }
   else if (FRenameRequests.contains(AId))
   {
@@ -1059,9 +1049,9 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
           else if (FCollectionRequests.key(header).isEmpty())
           {
             if (loadServerCollection(header))
-              FViewWidget->setHtml(Qt::escape(tr("Loading messages from server...")));
+              showNotification(tr("Loading messages from server..."));
             else
-              FViewWidget->setHtml(Qt::escape(tr("Messages request failed.")));
+              showNotification(tr("Messages request failed."));
           }
         }
         else
@@ -1073,7 +1063,7 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
       }
       else
       {
-        FViewWidget->setHtml("");
+        setMessageStyle();
         FFilterBy->setEnabled(false);
         FRename->setEnabled(false);
       }

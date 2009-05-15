@@ -31,7 +31,6 @@ private:
 
 struct ViewOptions {
   bool isGroupchat;
-  Jid lastSender;
   QString selfName;
   QString selfAvatar;
   QString contactName;
@@ -90,7 +89,8 @@ protected:
   void updateHeaderItem(const IArchiveHeader &AHeader);
   void removeCustomItem(QStandardItem *AItem);
   void setViewOptions(const IArchiveCollection &ACollection);
-  void setMessageStyle(const IArchiveHeader &AHeader);
+  void setMessageStyle();
+  void showNotification(const QString &AMessage);
   void processRequests(const QList<IArchiveRequest> &ARequests);
   void processHeaders(const QList<IArchiveHeader> &AHeaders);
   void processCollection(const IArchiveCollection &ACollection, bool AAppend = false);

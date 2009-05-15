@@ -19,24 +19,22 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
   ui.wdtInfo->setLayout(new QVBoxLayout);
   ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
   ui.wdtInfo->layout()->setMargin(0);
-  ui.wdtInfo->layout()->setSpacing(0);
 
   FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid);
   ui.wdtView->setLayout(new QVBoxLayout);
   ui.wdtView->layout()->addWidget(FViewWidget->instance());
   ui.wdtView->layout()->setMargin(0);
-  ui.wdtView->layout()->setSpacing(0);
 
   FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid);
   ui.wdtEdit->setLayout(new QVBoxLayout);
   ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
   ui.wdtEdit->layout()->setMargin(0);
-  ui.wdtEdit->layout()->setSpacing(0);
   ui.wdtEdit->layout()->setSizeConstraint(QLayout::SetNoConstraint);
 
   connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 
   FToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL);
+  FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
   ui.wdtView->layout()->addWidget(FToolBarWidget->instance());
 
   initialize();

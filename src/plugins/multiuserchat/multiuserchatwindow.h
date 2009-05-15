@@ -31,9 +31,6 @@
 #define PRIVATE_NOTIFICATOR_ID    "PrivateMessages"
 
 struct WindowStatus {
-  int lastContent;
-  QString lastSender;
-  QDateTime lastTime;
   QString lastStatusShow;
 };
 
@@ -99,16 +96,16 @@ protected:
 protected:
   void setMessageStyle();
   void showTopic(const QString &ATopic);
-  void showMessage(const QString &AMessage, const QString &AMessageClass, const QString &AStatusKeyword = QString::null);
+  void showMessage(const QString &AMessage, int AContentType=0);
   void showUserMessage(const Message &AMessage, const QString &ANick);
   void updateWindow();
   void updateListItem(const Jid &AContactJid);
   void removeActiveMessages();
 protected:
   void setChatMessageStyle(IChatWindow *AWindow);
-  void fillChatContentOptions(IChatWindow *AWindow, IMessageStyle::ContentOptions &AOptions) const;
+  void fillChatContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
   void showChatStatus(IChatWindow *AWindow, const QString &AMessage);
-  void showChatMessage(IChatWindow *AWindow, const Message &AMessage, bool ANoScroll = false);
+  void showChatMessage(IChatWindow *AWindow, const Message &AMessage);
   void showChatHistory(IChatWindow *AWindow);
   IChatWindow *getChatWindow(const Jid &AContactJid);
   void showChatWindow(IChatWindow *AWindow);
@@ -151,7 +148,6 @@ protected slots:
   void onChatWindowActivated();
   void onChatWindowClosed();
   void onChatWindowDestroyed();
-  void onViewWidgetContentAppended(const QString &AMessage, const IMessageStyle::ContentOptions &AOptions);
 protected slots:
   void onNickMenuActionTriggered(bool);
   void onMenuBarActionTriggered(bool);

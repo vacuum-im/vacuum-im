@@ -17,13 +17,7 @@ public slots:
 signals:
   void optionsApplied();
 protected:
-  void setChatFont(const QFont &AFont);
-  void setMessageFont(const QFont &AFont);
-protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
-protected slots:
-  void onChangeChatFont();
-  void onChangeMessageFont();
 private:
   Ui::MessengerOptionsClass ui;
 private:

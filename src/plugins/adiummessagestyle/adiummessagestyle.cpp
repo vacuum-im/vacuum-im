@@ -11,7 +11,7 @@
 #include <QTextDocument>
 #include <QCoreApplication>
 
-#define SHARED_STYLE_PATH                   STORAGE_DIR"/"RSR_STORAGE_MESSAGESTYLES"/"STORAGE_SHARED_DIR
+#define SHARED_STYLE_PATH                   STORAGE_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
 #define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH"/Resources"
 
@@ -69,48 +69,72 @@ QString AdiumMessageStyle::styleId() const
   return FInfo.value(MSIV_NAME).toString();
 }
 
+QList<QWidget *> AdiumMessageStyle::styleWidgets() const
+{
+  return FWidgetStatus.keys();
+}
+
+QWidget *AdiumMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
+{
+  StyleViewer *view = new StyleViewer(AParent);
+  view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  clearWidget(view,AOptions);
+  return view;
+}
+
+void AdiumMessageStyle::clearWidget(QWidget *AWidget, const IMessageStyleOptions &AOptions)
+{
+  StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+  if (view)
+  {
+    if (!FWidgetStatus.contains(AWidget))
+    {
+      FWidgetStatus[view].lastKind = -1;
+      connect(view,SIGNAL(linkClicked(const QUrl &)),SLOT(onLinkClicked(const QUrl &)));
+      connect(view,SIGNAL(destroyed(QObject *)),SLOT(onStyleWidgetDestroyed(QObject *)));
+      emit widgetAdded(AWidget);
+    }
+    else
+    {
+      FWidgetStatus[view].lastKind = -1;
+    }
+
+    QString html = makeStyleTemplate(AOptions);
+    fillStyleKeywords(html,AOptions);
+    view->setHtml(html);
+
+    emit widgetCleared(AWidget,AOptions);
+  }
+}
+
+void AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
+{
+  StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
+  if (view)
+  {
+    bool sameSender = isSameSender(AWidget,AOptions);
+    QString html = makeContentTemplate(AOptions,sameSender);
+    fillContentKeywords(html,AOptions,sameSender);
+
+    html.replace("%message%",AHtml);
+    if (AOptions.type == IMessageContentOptions::Topic)
+      html.replace("%topic%",QString(TOPIC_INDIVIDUAL_WRAPPER).arg(AHtml));
+
+    escapeStringForScript(html);
+    view->page()->mainFrame()->evaluateJavaScript(scriptForAppendContent(sameSender,AOptions.noScroll).arg(html));
+
+    WidgetStatus &wstatus = FWidgetStatus[AWidget];
+    wstatus.lastKind = AOptions.kind;
+    wstatus.lastId = AOptions.senderId;
+    wstatus.lastTime = AOptions.time;
+
+    emit contentAppended(AWidget,AHtml,AOptions);
+  }
+}
+
 int AdiumMessageStyle::version() const
 {
   return FInfo.value(MSIV_VERSION,0).toInt();
-}
-
-QList<QString> AdiumMessageStyle::variants() const
-{
-  return FVariants;
-}
-
-QWidget *AdiumMessageStyle::styleWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
-{
-  QString html = makeStyleTemplate(AOptions);
-  fillStyleKeywords(html,AOptions);
-  QWebView *widget = new QWebView(AParent);
-  widget->setHtml(html);
-  emit styleSeted(widget,AOptions);
-  return widget;
-}
-
-void AdiumMessageStyle::setVariant(QWebView *AView, const QString &AVariant) const
-{
-  QString variant = QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value("DefaultVariant","../main").toString() : AVariant));
-  QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(FResourcePath+"/"+variant);
-  escapeStringForScript(script);
-  AView->page()->mainFrame()->evaluateJavaScript(script);
-  emit variantSeted(AView,AVariant);
-}
-
-void AdiumMessageStyle::appendContent(QWebView *AView, const QString &AMessage, const IMessageStyle::ContentOptions &AOptions) const
-{
-  QString html = makeContentTemplate(AOptions);
-  fillContentKeywords(html,AOptions);
-
-  html.replace("%message%",AMessage);
-  if (AOptions.contentType == IMessageStyle::ContentTopic)
-    html.replace("%topic%",QString(TOPIC_INDIVIDUAL_WRAPPER).arg(AMessage));
-
-  escapeStringForScript(html);
-  AView->page()->mainFrame()->evaluateJavaScript(scriptForAppendContent(AOptions).arg(html));
-
-  emit contentAppended(AView,AMessage,AOptions);
 }
 
 QMap<QString, QVariant> AdiumMessageStyle::infoValues() const
@@ -118,263 +142,22 @@ QMap<QString, QVariant> AdiumMessageStyle::infoValues() const
   return FInfo;
 }
 
-QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOptions) const
+QList<QString> AdiumMessageStyle::variants() const
 {
-  bool usingCustomTemplate = true;
-  QString htmlFileName = FResourcePath+"/Template.html";
-  if (!QFile::exists(htmlFileName))
-  {
-    usingCustomTemplate = false;
-    htmlFileName = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/Template.html";
-  }
-
-  QString html = loadFileData(htmlFileName,QString::null);
-  if (!html.isEmpty())
-  {
-    IAdiumMessageStyleOptions options;
-    if (AOptions.options)
-      options = *((IAdiumMessageStyleOptions *)AOptions.options);
-
-    QString headerHTML;
-    if (false && options.headerType == IMessageStyle::HeaderTopic)
-      headerHTML = TOPIC_MAIN_DIV;
-    else if (options.headerType == IMessageStyle::HeaderNormal)
-      headerHTML =  loadFileData(FResourcePath+"/Header.html",QString::null);
-    QString footerHTML = loadFileData(FResourcePath+"/Footer.html",QString::null);
-    QString variant = QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AOptions.variant) ? FInfo.value("DefaultVariant","../main").toString() : AOptions.variant));
-
-    html.replace(html.indexOf("%@"),2,FResourcePath+"/");
-    if (!usingCustomTemplate || version()>=3)
-      html.replace(html.indexOf("%@"),2,version()<3 ? "" : "@import url( \"main.css\" );");
-    html.replace(html.indexOf("%@"),2,FResourcePath+"/"+variant);
-    html.replace(html.indexOf("%@"),2,headerHTML);
-    html.replace(html.indexOf("%@"),2,footerHTML);
-  }
-  return html;
+  return FVariants;
 }
 
-QString AdiumMessageStyle::makeContentTemplate(const IMessageStyle::ContentOptions &AOptions) const
+void AdiumMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
 {
-  QString html;
-  if (false && AOptions.contentType == IMessageStyle::ContentTopic && !FTopicHTML.isEmpty())
+  StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
+  if (view)
   {
-    html = FTopicHTML;
+    QString variant = QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value("DefaultVariant","../main").toString() : AVariant));
+    QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(FResourcePath+"/"+variant);
+    escapeStringForScript(script);
+    view->page()->mainFrame()->evaluateJavaScript(script);
+    emit variantChanged(AWidget,AVariant);
   }
-  else if (AOptions.contentType == IMessageStyle::ContentStatus && !FStatusHTML.isEmpty())
-  {
-    html = FStatusHTML;
-  }
-  else if (AOptions.contentType == IMessageStyle::ContentArchive)
-  {
-    if (AOptions.isDirectionIn)
-      html = FCombineConsecutive && AOptions.isSameSender ? FIn_NextContextHTML : FIn_ContextHTML;
-    else
-      html = FCombineConsecutive && AOptions.isSameSender ? FOut_NextContextHTML : FOut_ContextHTML;
-  }
-  else
-  {
-    if (AOptions.isDirectionIn)
-      html = FCombineConsecutive && AOptions.isSameSender ? FIn_NextContentHTML : FIn_ContentHTML;
-    else
-      html = FCombineConsecutive && AOptions.isSameSender ? FOut_NextContentHTML : FOut_ContentHTML;
-  }
-  return html;
-}
-
-void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const
-{
-  IAdiumMessageStyleOptions options;
-  if (AOptions.options)
-    options = *((IAdiumMessageStyleOptions *)AOptions.options);
-
-  AHtml.replace("%chatName%",options.chatName);
-  AHtml.replace("%sourceName%", options.accountName);
-  AHtml.replace("%destinationName%", options.chatName);
-  AHtml.replace("%destinationDisplayName%", options.chatName);
-  AHtml.replace("%incomingIconPath%", !options.contactAvatar.isEmpty() ? options.contactAvatar : FResourcePath+"/incoming_icon.png");
-  AHtml.replace("%outgoingIconPath%", !options.selfAvatar.isEmpty() ? options.selfAvatar : FResourcePath+"/outgoing_icon.png");
-  AHtml.replace("%timeOpened%", Qt::escape(options.startTime.toString()));
-  AHtml.replace("%serviceIconImg%", "");
-
-  QString background;
-  if (FAllowCustomBackground)
-  {
-    if (!options.bgImageFile.isEmpty())
-    {
-      if (options.bgImageLayout == IMessageStyle::ImageNormal)
-        background.append("background-image: url('%1'); background-repeat: no-repeat; background-attachment:fixed;");
-      else if (options.bgImageLayout == IMessageStyle::ImageCenter)
-        background.append("background-image: url('%1'); background-position: center; background-repeat: no-repeat; background-attachment:fixed;");
-      else if (options.bgImageLayout == IMessageStyle::ImageTitle)
-        background.append("background-image: url('%1'); background-repeat: repeat;");
-      else if (options.bgImageLayout == IMessageStyle::ImageTitleCenter)
-        background.append("background-image: url('%1'); background-repeat: repeat; background-position: center;");
-      else if (options.bgImageLayout == IMessageStyle::ImageScale)
-        background.append("background-image: url('%1'); -webkit-background-size: 100% 100%; background-size: 100% 100%; background-attachment: fixed;");
-      background = background.arg(options.bgImageFile);
-    }
-    if (options.bgColor.isValid())
-    {
-      int r,g,b,a;
-      options.bgColor.getRgb(&r,&g,&b,&a);
-      background.append(QString("background-color: rgba(%1, %2, %3, %4);").arg(r).arg(g).arg(b).arg(qreal(a)/255.0));
-    }
-  }
-  AHtml.replace("==bodyBackground==", background);
-}
-
-void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyle::ContentOptions &AOptions) const
-{
-  AHtml.replace("%senderStatusIcon%",AOptions.senderStatusIcon);
-  AHtml.replace("%messageClasses%", (FCombineConsecutive && AOptions.isSameSender ? MSMC_CONSECUTIVE" " : "") + AOptions.messageClasses.join(" "));
-  AHtml.replace("%messageDirection%", AOptions.isAlignLTR ? "ltr" : "rtl" );
-  AHtml.replace("%shortTime%", Qt::escape(AOptions.sendTime.toString(tr("hh:mm"))));
-  AHtml.replace("%service%","");
-
-  if (!AOptions.senderAvatar.isEmpty())
-    AHtml.replace("%userIconPath%",AOptions.senderAvatar);
-  else
-    AHtml.replace("%userIconPath%",FResourcePath+(AOptions.isDirectionIn ? "/Incoming/buddy_icon.png" : "/Outgoing/buddy_icon.png"));
-
-  QString timeFormat = !AOptions.sendTimeFormat.isEmpty() ? AOptions.sendTimeFormat : tr("hh:mm:ss");
-  QString time = Qt::escape(AOptions.sendTime.toString(timeFormat));
-  AHtml.replace("%time%", time);
-  QRegExp timeRegExp("%time\\{([^}]*)\\}%");
-  for (int pos=0; pos!=-1; pos = timeRegExp.indexIn(AHtml, pos))
-    if (!timeRegExp.cap(0).isEmpty())
-      AHtml.replace(pos, timeRegExp.cap(0).length(), time);
-
-  QString sColor = AOptions.senderColor;
-  if (sColor.isEmpty())
-  {
-    if (FSenderColors.isEmpty())
-      sColor = QString(SenderColors[qHash(AOptions.senderName) % SenderColorsCount]);
-    else
-      sColor = FSenderColors.at(qHash(AOptions.senderName) % FSenderColors.count());
-  }
-  AHtml.replace("%senderColor%",sColor);
-  QRegExp scolorRegExp("%senderColor\\{([^}]*)\\}%");
-  for (int pos=0; pos!=-1; pos = scolorRegExp.indexIn(AHtml, pos))
-    if (!scolorRegExp.cap(0).isEmpty())
-      AHtml.replace(pos, scolorRegExp.cap(0).length(), sColor);
-
-  if (AOptions.contentType == IMessageStyle::ContentStatus)
-  {
-    AHtml.replace("%status%",AOptions.statusKeyword);
-    AHtml.replace("%statusSender%",AOptions.senderName);
-  }
-  else
-  {
-    AHtml.replace("%sender%",AOptions.senderName);
-    AHtml.replace("%senderScreenName%",AOptions.senderName);
-    AHtml.replace("%senderDisplayName%",AOptions.senderName);
-    AHtml.replace("%senderPrefix%","");
-
-    QString rgbaColor;
-    QColor bgColor(AOptions.textBGColor);
-    QRegExp colorRegExp("%textbackgroundcolor\\{([^}]*)\\}%");
-    for (int pos=0; pos!=-1; pos = colorRegExp.indexIn(AHtml, pos))
-      if (!colorRegExp.cap(0).isEmpty())
-      {
-        if (bgColor.isValid())
-        {
-          int r,g,b;
-          bool ok = false;
-          qreal a = colorRegExp.cap(1).toDouble(&ok);
-          bgColor.setAlphaF(ok ? a : 1.0);
-          bgColor.getRgb(&r,&g,&b);
-          rgbaColor = QString("rgba(%1, %2, %3, %4)").arg(r).arg(g).arg(b).arg(a);
-        }
-        else if (rgbaColor.isEmpty())
-        {
-          rgbaColor = "inherit";
-        }
-        AHtml.replace(pos, colorRegExp.cap(0).length(), rgbaColor);
-      }
-  }
-}
-
-void AdiumMessageStyle::escapeStringForScript(QString &AText) const
-{
-  AText.replace("\\","\\\\");
-  AText.replace("\"","\\\"");
-  AText.replace("\n","");
-  AText.replace("\r","<br>");
-}
-
-QString AdiumMessageStyle::scriptForAppendContent(const IMessageStyle::ContentOptions &AOptions) const
-{
-  QString script;
-
-  if (version() >= 4) 
-  {
-    if (AOptions.replaceLastContent)
-      script = REPLACE_LAST_MESSAGE;
-    else if (AOptions.willAppendMoreContent) 
-      script = (FCombineConsecutive && AOptions.isSameSender ? APPEND_NEXT_MESSAGE_NO_SCROLL : APPEND_MESSAGE_NO_SCROLL);
-    else 
-      script = (FCombineConsecutive && AOptions.isSameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
-  } 
-  else if (version() >= 3) 
-  {
-    if (AOptions.willAppendMoreContent) 
-      script = (FCombineConsecutive && AOptions.isSameSender ? APPEND_NEXT_MESSAGE_NO_SCROLL : APPEND_MESSAGE_NO_SCROLL);
-    else
-      script = (FCombineConsecutive && AOptions.isSameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
-  } 
-  else if (version() >= 1) 
-  {
-    script = (FCombineConsecutive && AOptions.isSameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
-  } 
-  else 
-  {
-    script = (FCombineConsecutive && AOptions.isSameSender ? APPEND_NEXT_MESSAGE_WITH_SCROLL : APPEND_MESSAGE_WITH_SCROLL);
-  }
-  return script;
-}
-
-QString AdiumMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
-{
-  if (QFile::exists(AFileName))
-  {
-    QFile file(AFileName);
-    if (file.open(QFile::ReadOnly))
-    {
-      QByteArray html = file.readAll();
-      return QString::fromUtf8(html.data(),html.size());
-    }
-  }
-  return DefValue;
-}
-
-void AdiumMessageStyle::loadTemplates()
-{
-  FIn_ContentHTML =      loadFileData(FResourcePath+"/Incoming/Content.html",QString::null);
-  FIn_NextContentHTML =  loadFileData(FResourcePath+"/Incoming/NextContent.html",FIn_ContentHTML);
-  FIn_ContextHTML =      loadFileData(FResourcePath+"/Incoming/Context.html",FIn_ContentHTML);
-  FIn_NextContextHTML =  loadFileData(FResourcePath+"/Incoming/NextContext.html",FIn_ContextHTML);
-
-  FOut_ContentHTML =     loadFileData(FResourcePath+"/Outgoing/Content.html",FIn_ContentHTML);
-  FOut_NextContentHTML = loadFileData(FResourcePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
-  FOut_ContextHTML =     loadFileData(FResourcePath+"/Outgoing/Context.html",FOut_ContentHTML);
-  FOut_NextContextHTML = loadFileData(FResourcePath+"/Outgoing/NextContext.html",FOut_ContextHTML);
-
-  FStatusHTML =          loadFileData(FResourcePath+"/Status.html",FIn_ContentHTML);
-  FTopicHTML =           loadFileData(FResourcePath+"/Topic.html",QString::null);
-}
-
-
-void AdiumMessageStyle::loadSenderColors()
-{
-  QFile colors(FResourcePath + "/Incoming/SenderColors.txt");
-  if (colors.open(QFile::ReadOnly))
-    FSenderColors = QString::fromUtf8(colors.readAll()).split(':',QString::SkipEmptyParts);
-}
-
-void AdiumMessageStyle::initStyleSettings()
-{
-  FCombineConsecutive = !FInfo.value(MSIV_DISABLE_COMBINE_CONSECUTIVE,false).toBool();
-  FAllowCustomBackground = !FInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
 }
 
 QList<QString> AdiumMessageStyle::styleVariants(const QString &AStylePath)
@@ -421,4 +204,319 @@ QMap<QString, QVariant> AdiumMessageStyle::styleInfo(const QString &AStylePath)
     }
   }
   return info;
+}
+
+bool AdiumMessageStyle::isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const
+{
+  const WidgetStatus &wstatus = FWidgetStatus.value(AWidget);
+  if (!FCombineConsecutive)
+    return false;
+  if (wstatus.lastKind != AOptions.kind)
+    return false;
+  if (wstatus.lastId != AOptions.senderId)
+    return false;
+  if (wstatus.lastTime.secsTo(AOptions.time)>2*60)
+    return false;
+  return true;
+}
+
+QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOptions) const
+{
+  bool usingCustomTemplate = true;
+  QString htmlFileName = FResourcePath+"/Template.html";
+  if (!QFile::exists(htmlFileName))
+  {
+    usingCustomTemplate = false;
+    htmlFileName = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/Template.html";
+  }
+
+  QString html = loadFileData(htmlFileName,QString::null);
+  if (!html.isEmpty())
+  {
+    QString headerHTML;
+    if (AOptions.options.value(MSO_HEADER_TYPE).toInt() == AdiumMessageStyle::HeaderTopic)
+      headerHTML = TOPIC_MAIN_DIV;
+    else if (AOptions.options.value(MSO_HEADER_TYPE).toInt() == AdiumMessageStyle::HeaderNormal)
+      headerHTML =  loadFileData(FResourcePath+"/Header.html",QString::null);
+    QString footerHTML = loadFileData(FResourcePath+"/Footer.html",QString::null);
+
+    QString variant = AOptions.options.value(MSO_VARIANT).toString();
+    if (!FVariants.contains(variant))
+      variant = FInfo.value(MSIV_DEFAULT_VARIANT,"../main").toString();
+    variant = QDir::cleanPath(QString("Variants/%1.css").arg(variant));
+
+    html.replace(html.indexOf("%@"),2,FResourcePath+"/");
+    if (!usingCustomTemplate || version()>=3)
+      html.replace(html.indexOf("%@"),2, version()>=3 ? "@import url( \"main.css\" );" : "");
+    html.replace(html.indexOf("%@"),2,FResourcePath+"/"+variant);
+    html.replace(html.indexOf("%@"),2,headerHTML);
+    html.replace(html.indexOf("%@"),2,footerHTML);
+  }
+  return html;
+}
+
+void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const
+{
+  AHtml.replace("%chatName%",AOptions.options.value(MSO_CHAT_NAME).toString());
+  AHtml.replace("%sourceName%",AOptions.options.value(MSO_ACCOUNT_NAME).toString());
+  AHtml.replace("%destinationName%",AOptions.options.value(MSO_CHAT_NAME).toString());
+  AHtml.replace("%destinationDisplayName%",AOptions.options.value(MSO_CHAT_NAME).toString());
+  AHtml.replace("%outgoingIconPath%",AOptions.options.value(MSO_SELF_AVATAR,FResourcePath+"/outgoing_icon.png").toString());
+  AHtml.replace("%incomingIconPath%",AOptions.options.value(MSO_CONTACT_AVATAR,FResourcePath+"/incoming_icon.png").toString());
+  AHtml.replace("%timeOpened%",Qt::escape(AOptions.options.value(MSO_START_TIME).toDateTime().toString()));
+  AHtml.replace("%serviceIconImg%", "");
+
+  QString background;
+  if (FAllowCustomBackground)
+  {
+    if (!AOptions.options.value(MSO_BG_IMAGE_FILE).toString().isEmpty())
+    {
+      int imageLayout = AOptions.options.value(MSO_BG_IMAGE_LAYOUT).toInt();
+      if (imageLayout == ImageNormal)
+        background.append("background-image: url('%1'); background-repeat: no-repeat; background-attachment:fixed;");
+      else if (imageLayout == ImageCenter)
+        background.append("background-image: url('%1'); background-position: center; background-repeat: no-repeat; background-attachment:fixed;");
+      else if (imageLayout == ImageTitle)
+        background.append("background-image: url('%1'); background-repeat: repeat;");
+      else if (imageLayout == ImageTitleCenter)
+        background.append("background-image: url('%1'); background-repeat: repeat; background-position: center;");
+      else if (imageLayout == ImageScale)
+        background.append("background-image: url('%1'); -webkit-background-size: 100% 100%; background-size: 100% 100%; background-attachment: fixed;");
+      background = background.arg(AOptions.options.value(MSO_BG_IMAGE_FILE).toString());
+    }
+    if (!AOptions.options.value(MSO_BG_COLOR).toString().isEmpty())
+    {
+      int r,g,b,a;
+      QColor color(AOptions.options.value(MSO_BG_COLOR).toString());
+      color.getRgb(&r,&g,&b,&a);
+      background.append(QString("background-color: rgba(%1, %2, %3, %4);").arg(r).arg(g).arg(b).arg(qreal(a)/255.0));
+    }
+  }
+  AHtml.replace("==bodyBackground==", background);
+}
+
+QString AdiumMessageStyle::makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const
+{
+  QString html;
+  if (false && AOptions.kind == IMessageContentOptions::Topic && !FTopicHTML.isEmpty())
+  {
+    html = FTopicHTML;
+  }
+  else if (AOptions.kind == IMessageContentOptions::Status && !FStatusHTML.isEmpty())
+  {
+    html = FStatusHTML;
+  }
+  else
+  {
+    if (AOptions.type & IMessageContentOptions::History)
+    {
+      if (AOptions.direction == IMessageContentOptions::DirectionIn)
+        html = ASameSender ? FIn_NextContextHTML : FIn_ContextHTML;
+      else
+        html = ASameSender ? FOut_NextContextHTML : FOut_ContextHTML;
+    }
+    else if (AOptions.direction == IMessageContentOptions::DirectionIn)
+    {
+      html = ASameSender ? FIn_NextContentHTML : FIn_ContentHTML;
+    }
+    else
+    {
+      html = ASameSender ? FOut_NextContentHTML : FOut_ContentHTML;
+    }
+  }
+  return html;
+}
+
+void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const
+{
+  bool isDirectionIn = AOptions.direction == IMessageContentOptions::DirectionIn;
+
+  QStringList messageClasses;
+  if (ASameSender)
+    messageClasses << MSMC_CONSECUTIVE;
+
+  if (AOptions.kind == IMessageContentOptions::Status)
+    messageClasses << MSMC_STATUS;
+  else
+    messageClasses << MSMC_MESSAGE;
+
+  if (AOptions.type & IMessageContentOptions::Groupchat)
+    messageClasses << MSMC_GROUPCHAT;
+  if (AOptions.type & IMessageContentOptions::History)
+    messageClasses << MSMC_HISTORY;
+  if (AOptions.type & IMessageContentOptions::Event)
+    messageClasses << MSMC_EVENT;
+  if (AOptions.type & IMessageContentOptions::Mention)
+    messageClasses << MSMC_MENTION;
+  if (AOptions.type & IMessageContentOptions::Notification)
+    messageClasses << MSMC_NOTIFICATION;
+
+  if (isDirectionIn)
+    messageClasses << MSMC_INCOMING;
+  else
+    messageClasses << MSMC_OUTGOING;
+
+  AHtml.replace("%messageClasses%", messageClasses.join(" "));
+
+  //AHtml.replace("%messageDirection%", AOptions.isAlignLTR ? "ltr" : "rtl" );
+  AHtml.replace("%senderStatusIcon%",AOptions.senderIcon);
+  AHtml.replace("%shortTime%", Qt::escape(AOptions.time.toString(tr("hh:mm"))));
+  AHtml.replace("%service%","");
+
+  if (!AOptions.senderAvatar.isEmpty())
+    AHtml.replace("%userIconPath%",AOptions.senderAvatar);
+  else
+    AHtml.replace("%userIconPath%",FResourcePath+(isDirectionIn ? "/Incoming/buddy_icon.png" : "/Outgoing/buddy_icon.png"));
+
+  QString timeFormat = !AOptions.timeFormat.isEmpty() ? AOptions.timeFormat : tr("hh:mm:ss");
+  QString time = Qt::escape(AOptions.time.toString(timeFormat));
+  AHtml.replace("%time%", time);
+
+  QRegExp timeRegExp("%time\\{([^}]*)\\}%");
+  for (int pos=0; pos!=-1; pos = timeRegExp.indexIn(AHtml, pos))
+    if (!timeRegExp.cap(0).isEmpty())
+      AHtml.replace(pos, timeRegExp.cap(0).length(), time);
+
+  QString sColor = AOptions.senderColor;
+  if (sColor.isEmpty())
+  {
+    if (FSenderColors.isEmpty())
+      sColor = QString(SenderColors[qHash(AOptions.senderName) % SenderColorsCount]);
+    else
+      sColor = FSenderColors.at(qHash(AOptions.senderName) % FSenderColors.count());
+  }
+  AHtml.replace("%senderColor%",sColor);
+
+  QRegExp scolorRegExp("%senderColor\\{([^}]*)\\}%");
+  for (int pos=0; pos!=-1; pos = scolorRegExp.indexIn(AHtml, pos))
+    if (!scolorRegExp.cap(0).isEmpty())
+      AHtml.replace(pos, scolorRegExp.cap(0).length(), sColor);
+
+  if (AOptions.kind == IMessageContentOptions::Status)
+  {
+    AHtml.replace("%status%","");
+    AHtml.replace("%statusSender%",AOptions.senderName);
+  }
+  else
+  {
+    AHtml.replace("%senderScreenName%",AOptions.senderId);
+    AHtml.replace("%sender%",AOptions.senderName);
+    AHtml.replace("%senderDisplayName%",AOptions.senderName);
+    AHtml.replace("%senderPrefix%","");
+
+    QString rgbaColor;
+    QColor bgColor(AOptions.textBGColor);
+    QRegExp colorRegExp("%textbackgroundcolor\\{([^}]*)\\}%");
+    for (int pos=0; pos!=-1; pos = colorRegExp.indexIn(AHtml, pos))
+    {
+      if (!colorRegExp.cap(0).isEmpty())
+      {
+        if (bgColor.isValid())
+        {
+          int r,g,b;
+          bool ok = false;
+          qreal a = colorRegExp.cap(1).toDouble(&ok);
+          bgColor.setAlphaF(ok ? a : 1.0);
+          bgColor.getRgb(&r,&g,&b);
+          rgbaColor = QString("rgba(%1, %2, %3, %4)").arg(r).arg(g).arg(b).arg(a);
+        }
+        else if (rgbaColor.isEmpty())
+        {
+          rgbaColor = "inherit";
+        }
+        AHtml.replace(pos, colorRegExp.cap(0).length(), rgbaColor);
+      }
+    }
+  }
+}
+
+void AdiumMessageStyle::escapeStringForScript(QString &AText) const
+{
+  AText.replace("\\","\\\\");
+  AText.replace("\"","\\\"");
+  AText.replace("\n","");
+  AText.replace("\r","<br>");
+}
+
+QString AdiumMessageStyle::scriptForAppendContent(bool ASameSender, bool ANoScroll) const
+{
+  QString script;
+
+  if (version() >= 4) 
+  {
+    if (ANoScroll) 
+      script = (FCombineConsecutive && ASameSender ? APPEND_NEXT_MESSAGE_NO_SCROLL : APPEND_MESSAGE_NO_SCROLL);
+    else 
+      script = (FCombineConsecutive && ASameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
+  } 
+  else if (version() >= 3) 
+  {
+    if (ANoScroll) 
+      script = (FCombineConsecutive && ASameSender ? APPEND_NEXT_MESSAGE_NO_SCROLL : APPEND_MESSAGE_NO_SCROLL);
+    else
+      script = (FCombineConsecutive && ASameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
+  } 
+  else if (version() >= 1) 
+  {
+    script = (ASameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
+  } 
+  else 
+  {
+    script = (ASameSender ? APPEND_NEXT_MESSAGE_WITH_SCROLL : APPEND_MESSAGE_WITH_SCROLL);
+  }
+  return script;
+}
+
+QString AdiumMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
+{
+  if (QFile::exists(AFileName))
+  {
+    QFile file(AFileName);
+    if (file.open(QFile::ReadOnly))
+    {
+      QByteArray html = file.readAll();
+      return QString::fromUtf8(html.data(),html.size());
+    }
+  }
+  return DefValue;
+}
+
+void AdiumMessageStyle::loadTemplates()
+{
+  FIn_ContentHTML =      loadFileData(FResourcePath+"/Incoming/Content.html",QString::null);
+  FIn_NextContentHTML =  loadFileData(FResourcePath+"/Incoming/NextContent.html",FIn_ContentHTML);
+  FIn_ContextHTML =      loadFileData(FResourcePath+"/Incoming/Context.html",FIn_ContentHTML);
+  FIn_NextContextHTML =  loadFileData(FResourcePath+"/Incoming/NextContext.html",FIn_ContextHTML);
+
+  FOut_ContentHTML =     loadFileData(FResourcePath+"/Outgoing/Content.html",FIn_ContentHTML);
+  FOut_NextContentHTML = loadFileData(FResourcePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
+  FOut_ContextHTML =     loadFileData(FResourcePath+"/Outgoing/Context.html",FOut_ContentHTML);
+  FOut_NextContextHTML = loadFileData(FResourcePath+"/Outgoing/NextContext.html",FOut_ContextHTML);
+
+  FStatusHTML =          loadFileData(FResourcePath+"/Status.html",FIn_ContentHTML);
+  FTopicHTML =           loadFileData(FResourcePath+"/Topic.html",QString::null);
+}
+
+void AdiumMessageStyle::loadSenderColors()
+{
+  QFile colors(FResourcePath + "/Incoming/SenderColors.txt");
+  if (colors.open(QFile::ReadOnly))
+    FSenderColors = QString::fromUtf8(colors.readAll()).split(':',QString::SkipEmptyParts);
+}
+
+void AdiumMessageStyle::initStyleSettings()
+{
+  FCombineConsecutive = !FInfo.value(MSIV_DISABLE_COMBINE_CONSECUTIVE,false).toBool();
+  FAllowCustomBackground = !FInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
+}
+
+void AdiumMessageStyle::onLinkClicked(const QUrl &AUrl)
+{
+  StyleViewer *view = qobject_cast<StyleViewer *>(sender());
+  emit urlClicked(view,AUrl);
+}
+
+void AdiumMessageStyle::onStyleWidgetDestroyed(QObject *AObject)
+{
+  FWidgetStatus.remove((QWidget *)AObject);
 }
