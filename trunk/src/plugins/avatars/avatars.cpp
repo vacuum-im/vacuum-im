@@ -169,11 +169,11 @@ bool Avatars::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AS
 {
   if (FSHIPresenceIn.value(AStreamJid)==AHandlerId && AStanza.type().isEmpty())
   {
-    if (AStanza.firstElement("x",NS_MUC_USER).isNull())
+    Jid contactJid = AStanza.from();
+    if (AStreamJid!=contactJid && AStanza.firstElement("x",NS_MUC_USER).isNull())
     {
-      Jid contactJid = AStanza.from();
-      QDomElement iqUpdate = AStanza.firstElement("x",NS_JABBER_X_AVATAR);
       QDomElement vcardUpdate = AStanza.firstElement("x",NS_VCARD_UPDATE);
+      QDomElement iqUpdate = AStanza.firstElement("x",NS_JABBER_X_AVATAR);
       if (!vcardUpdate.isNull())
       {
         QString hash = vcardUpdate.firstChildElement("photo").text().toLower();
