@@ -41,7 +41,6 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
   FViewWidget = NULL;
   FEditWidget = NULL;
   FToolBarWidget = NULL;
-  FSplitterLoaded = false;
   FDestroyOnChatClosed = false;
 
   initialize();
@@ -50,6 +49,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
   connectMultiChat();
   createMenuBarActions();
   createRoomUtilsActions();
+  loadWindowState();
 
   connect(ui.ltwUsers,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
   connect(this,SIGNAL(windowActivated()),SLOT(onWindowActivated()));
@@ -67,6 +67,7 @@ MultiUserChatWindow::~MultiUserChatWindow()
   if (FMessageProcessor)
     FMessageProcessor->removeMessageHandler(this,MHO_MULTIUSERCHAT);
 
+  saveWindowState();
   emit windowDestroyed();
 }
 
@@ -376,13 +377,11 @@ void MultiUserChatWindow::createMessageWidgets()
     ui.wdtView->setLayout(new QVBoxLayout);
     ui.wdtView->layout()->addWidget(FViewWidget->instance());
     ui.wdtView->layout()->setMargin(0);
-    ui.wdtView->layout()->setSpacing(0);
 
     FEditWidget = FMessageWidgets->newEditWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
     ui.wdtEdit->setLayout(new QVBoxLayout);
     ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
     ui.wdtEdit->layout()->setMargin(0);
-    ui.wdtEdit->layout()->setSpacing(0);
     connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
     connect(FEditWidget->instance(),SIGNAL(messageAboutToBeSend()),SLOT(onMessageAboutToBeSend()));
     connect(FEditWidget->instance(),SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onEditWidgetKeyEvent(QKeyEvent *,bool &)));
@@ -391,7 +390,7 @@ void MultiUserChatWindow::createMessageWidgets()
     ui.wdtToolBar->setLayout(new QVBoxLayout);
     ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
     ui.wdtToolBar->layout()->setMargin(0);
-    ui.wdtToolBar->layout()->setSpacing(0);
+    FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
   }
 }
 
@@ -672,13 +671,7 @@ void MultiUserChatWindow::loadWindowState()
     QString dataId = roomJid().pBare();
     if (isWindow())
       restoreGeometry(FSettings->loadBinaryData(BDI_WINDOW_GEOMETRY+dataId));
-    if (!FSplitterLoaded)
-    {
-      ui.sprHSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_HSPLITTER+dataId));
-      FSplitterLoaded = true;
-    }
-    if (FEditWidget)
-      FEditWidget->textEdit()->setFocus();
+    ui.sprHSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_HSPLITTER+dataId));
   }
 }
 
@@ -935,13 +928,20 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
   return hasCommand;
 }
 
-void MultiUserChatWindow::setMessageStyle()
+void MultiUserChatWindow::setMessageStyle(bool AClear)
 {
   if (FMessageStyles)
   {
     IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::GroupChat);
-    IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
-    FViewWidget->setMessageStyle(style,soptions);
+    if (!AClear)
+    {
+      IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
+      FViewWidget->setMessageStyle(style,soptions);
+    }
+    else if (FViewWidget->messageStyle()!=NULL)
+    {
+      FViewWidget->messageStyle()->clearWidget(FViewWidget->styleWidget(),soptions);
+    }
     FWindowStatus.remove(FViewWidget);
   }
 }
@@ -1204,14 +1204,14 @@ bool MultiUserChatWindow::event(QEvent *AEvent)
 
 void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 {
-  loadWindowState();
+  if (FEditWidget)
+    FEditWidget->textEdit()->setFocus();
   emit windowActivated();
   QMainWindow::showEvent(AEvent);
 }
 
 void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 {
-  saveWindowState();
   emit windowClosed();
   QMainWindow::closeEvent(AEvent);
 }
@@ -1245,6 +1245,7 @@ void MultiUserChatWindow::onChatOpened()
 {
   if (FMultiChat->statusCodes().contains(MUC_SC_ROOM_CREATED))
     FMultiChat->requestConfigForm();
+  setMessageStyle(true);
 }
 
 void MultiUserChatWindow::onChatNotify(const QString &ANick, const QString &ANotify)
@@ -1593,8 +1594,7 @@ void MultiUserChatWindow::onMenuBarActionTriggered(bool)
   }
   else if (action == FClearChat)
   {
-    if (FMessageStyles && FViewWidget->messageStyle())
-      FViewWidget->messageStyle()->clearWidget(FViewWidget->styleWidget(),FMessageStyles->styleOptions(Message::GroupChat));
+    setMessageStyle(true);
   }
   else if (action == FQuitRoom)
   {

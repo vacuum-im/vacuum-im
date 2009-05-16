@@ -94,7 +94,7 @@ protected:
   void setToolTipForUser(IMultiUser *AUser);
   bool execShortcutCommand(const QString &AText);
 protected:
-  void setMessageStyle();
+  void setMessageStyle(bool AClear = false);
   void showTopic(const QString &ATopic);
   void showMessage(const QString &AMessage, int AContentType=0);
   void showUserMessage(const Message &AMessage, const QString &ANick);
@@ -206,7 +206,6 @@ private:
       Action *FSetAffilAdmin;
       Action *FSetAffilOwner;
 private:
-  bool FSplitterLoaded;
   bool FDestroyOnChatClosed;
   QList<QColor> FColorQueue;
   QList<int> FActiveMessages;
