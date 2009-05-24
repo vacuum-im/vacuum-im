@@ -70,8 +70,6 @@ signals:
   virtual void itemDestroyed(QStandardItem *AItem);
   virtual void windowDestroyed(IArchiveWindow *AWindow);
 protected:
-  virtual void showEvent(QShowEvent *AEvent);
-protected:
   void initialize();
   QList<IArchiveHeader> indexHeaders(const QModelIndex &AIndex) const;
   QList<IArchiveRequest> createRequests(const IArchiveFilter &AFilter) const;

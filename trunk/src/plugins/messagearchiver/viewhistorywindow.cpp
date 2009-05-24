@@ -137,10 +137,10 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   connect(ui.lneText,SIGNAL(returnPressed()),SLOT(onApplyFilterClicked()));
   connect(ui.cmbContact->lineEdit(),SIGNAL(returnPressed()),SLOT(onApplyFilterClicked()));
 
+  initialize();
   createGroupKindMenu();
   createSourceMenu();
   createHeaderActions();
-  initialize();
 }
 
 ViewHistoryWindow::~ViewHistoryWindow()
@@ -247,16 +247,6 @@ void ViewHistoryWindow::reload()
   FCollections.clear();
   processRequests(createRequests(FFilter));
   FInvalidateTimer.start();
-}
-
-void ViewHistoryWindow::showEvent(QShowEvent *AEvent)
-{
-  QMainWindow::showEvent(AEvent);
-  if (!ui.trvCollections->isSortingEnabled()) // Костыль для QSortFilterProxyModel Qt 4.5.0
-  {
-    ui.trvCollections->setSortingEnabled(true);
-    ui.trvCollections->sortByColumn(1,Qt::DescendingOrder); 
-  }
 }
 
 void ViewHistoryWindow::initialize()
@@ -653,8 +643,8 @@ void ViewHistoryWindow::setMessageStyle()
     IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
     if (style != FViewWidget->messageStyle())
       FViewWidget->setMessageStyle(style,soptions);
-    else if (FViewWidget->messageStyle()!=NULL)
-      FViewWidget->messageStyle()->clearWidget(FViewWidget->styleWidget(),soptions);
+    else if (style)
+      style->clearWidget(FViewWidget->styleWidget(),soptions);
   }
 }
 
@@ -769,24 +759,33 @@ void ViewHistoryWindow::insertFilterWith(const IArchiveHeader &AHeader)
 {
   Jid gateWith = FArchiver->gateJid(AHeader.with);
   QString name = contactName(AHeader.with,true);
-  int index = ui.cmbContact->findData(gateWith.pBare());
-  if (index < 0)
+  if (!name.isEmpty() && !gateWith.isEmpty())
   {
-    QIcon icon;
-    if (FStatusIcons)
-      icon = FStatusIcons->iconByJidStatus(AHeader.with,IPresence::Online,SUBSCRIPTION_BOTH,false);
-    ui.cmbContact->addItem(icon, name, gateWith.pBare());
-    updateFilterWidgets();
+    int index = ui.cmbContact->findData(gateWith.pBare());
+    if (index < 0)
+    {
+      QIcon icon;
+      if (FStatusIcons)
+        icon = FStatusIcons->iconByJidStatus(AHeader.with,IPresence::Online,SUBSCRIPTION_BOTH,false);
+      ui.cmbContact->addItem(icon, name, gateWith.pBare());
+      updateFilterWidgets();
+    }
+    else
+      ui.cmbContact->setItemText(index,name);
+    ui.cmbContact->model()->sort(0);
   }
-  else
-    ui.cmbContact->setItemText(index,name);
-  ui.cmbContact->model()->sort(0);
 }
 
 void ViewHistoryWindow::updateFilterWidgets()
 {
   int index = ui.cmbContact->findData(FFilter.with.pFull());
-  index>=0 ? ui.cmbContact->setCurrentIndex(index) : ui.cmbContact->setCurrentIndex(-1); //->setEditText(FFilter.with.full());
+  if (index<0)
+  {
+    ui.cmbContact->setCurrentIndex(-1);
+    ui.cmbContact->setEditText(FFilter.with.full());
+  }
+  else
+    ui.cmbContact->setCurrentIndex(index);
   ui.dedStart->setDate(FFilter.start.isValid() ? FFilter.start.date() : MINIMUM_DATETIME.date());
   ui.dedEnd->setDate(FFilter.end.isValid() ? FFilter.end.date() : MAXIMUM_DATETIME.date());
   ui.lneText->setText(FFilter.body.pattern());
@@ -1048,6 +1047,7 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
           }
           else if (FCollectionRequests.key(header).isEmpty())
           {
+            setMessageStyle();
             if (loadServerCollection(header))
               showNotification(tr("Loading messages from server..."));
             else

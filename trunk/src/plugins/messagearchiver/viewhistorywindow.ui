@@ -101,7 +101,7 @@
             <bool>true</bool>
            </property>
            <property name="insertPolicy">
-            <enum>QComboBox::InsertAlphabetically</enum>
+            <enum>QComboBox::NoInsert</enum>
            </property>
            <property name="sizeAdjustPolicy">
             <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
