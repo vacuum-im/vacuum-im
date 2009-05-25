@@ -3,6 +3,7 @@
 
 #define CHATMESSAGEHANDLER_UUID "{b60cc0e4-8006-4909-b926-fcb3cbc506f0}"
 
+#include <QTimer>
 #include "../../definations/messagehandlerorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterlabelorders.h"
@@ -70,8 +71,9 @@ protected:
   void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
 protected slots:
   void onMessageReady();
-  void onWindowActivated();
   void onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
+  void onWindowActivated();
+  void onWindowClosed();
   void onWindowDestroyed();
   void onStatusIconsChanged();
   void onShowWindowAction(bool);
@@ -90,6 +92,7 @@ private:
   QList<IChatWindow *> FWindows;
   QMultiMap<IChatWindow *,int> FActiveMessages;
   QMap<IViewWidget *, WindowStatus> FWindowStatus;
+  QMap<IChatWindow *, QTimer *> FWindowTimers;
 };
 
 #endif // CHATMESSAGEHANDLER_H

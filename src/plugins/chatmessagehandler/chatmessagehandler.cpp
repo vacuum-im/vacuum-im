@@ -2,6 +2,7 @@
 
 #define HISTORY_MESSAGES          10
 
+#define DESTROYWINDOW_TIMEOUT     30*60*1000
 #define CONSECUTIVE_TIMEOUT       2*60
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
@@ -54,9 +55,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
 
   plugin = APluginManager->getPlugins("IMessageStyles").value(0,NULL);
   if (plugin)
-  {
     FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
-  }
 
   plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
   if (plugin)
@@ -214,9 +213,10 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
     {
       window->infoWidget()->autoUpdateFields();
       connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
-      connect(window->instance(),SIGNAL(windowActivated()),SLOT(onWindowActivated()));
       connect(window->infoWidget()->instance(),SIGNAL(fieldChanged(IInfoWidget::InfoField, const QVariant &)),
         SLOT(onInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
+      connect(window->instance(),SIGNAL(windowActivated()),SLOT(onWindowActivated()));
+      connect(window->instance(),SIGNAL(windowClosed()),SLOT(onWindowClosed()));
       connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onWindowDestroyed()));
       FWindows.append(window);
       setMessageStyle(window);
@@ -291,12 +291,9 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 
 void ChatMessageHandler::setMessageStyle(IChatWindow *AWindow)
 {
-  if (FMessageStyles)
-  {
-    IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-    IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
-    AWindow->viewWidget()->setMessageStyle(style,soptions);
-  }
+  IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
+  IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
+  AWindow->viewWidget()->setMessageStyle(style,soptions);
 }
 
 void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const
@@ -367,13 +364,6 @@ void ChatMessageHandler::onMessageReady()
   }
 }
 
-void ChatMessageHandler::onWindowActivated()
-{
-  IChatWindow *window = qobject_cast<IChatWindow *>(sender());
-  if (window)
-    removeActiveMessages(window);
-}
-
 void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue)
 {
   if ((AField & (IInfoWidget::ContactStatus|IInfoWidget::ContactName))>0)
@@ -401,12 +391,41 @@ void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const
   }
 }
 
+void ChatMessageHandler::onWindowActivated()
+{
+  IChatWindow *window = qobject_cast<IChatWindow *>(sender());
+  if (window)
+  {
+    removeActiveMessages(window);
+    if (FWindowTimers.contains(window))
+      delete FWindowTimers.take(window);
+  }
+}
+
+void ChatMessageHandler::onWindowClosed()
+{
+  IChatWindow *window = qobject_cast<IChatWindow *>(sender());
+  if (window)
+  {
+    if (!FWindowTimers.contains(window))
+    {
+      QTimer *timer = new QTimer;
+      timer->setSingleShot(true);
+      connect(timer,SIGNAL(timeout()),window->instance(),SLOT(deleteLater()));
+      FWindowTimers.insert(window,timer);
+    }
+    FWindowTimers[window]->start(DESTROYWINDOW_TIMEOUT);
+  }
+}
+
 void ChatMessageHandler::onWindowDestroyed()
 {
   IChatWindow *window = qobject_cast<IChatWindow *>(sender());
   if (FWindows.contains(window))
   {
     removeActiveMessages(window);
+    if (FWindowTimers.contains(window))
+      delete FWindowTimers.take(window);
     FWindows.removeAt(FWindows.indexOf(window));
     FWindowStatus.remove(window->viewWidget());
   }
