@@ -1,10 +1,10 @@
 #ifndef STYLEVIEWER_H
 #define STYLEVIEWER_H
 
-#include <QTextEdit>
+#include <QTextBrowser>
 
 class StyleViewer : 
-  public QTextEdit
+  public QTextBrowser
 {
   Q_OBJECT;
 public:

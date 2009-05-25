@@ -19,6 +19,7 @@ SUBDIRS = settings \
           messagewidgets \
           messagestyles \
           adiummessagestyle \
+          simplemessagestyle \
           normalmessagehandler \
           chatmessagehandler \
           compress \

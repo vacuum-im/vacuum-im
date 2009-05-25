@@ -1,0 +1,48 @@
+.xxxwrapper 
+{
+  border-style		:none;
+  font-size		:medium;
+}
+
+.xxxsender,
+.xxxtime 
+{
+  white-space		:nowrap;
+}
+
+.xxxtime 
+{
+  font-size             :small;
+  color			:gray;
+}
+
+.status .xxxmessage
+{
+  color			:darkgreen;
+}
+
+.notification .xxxmessage
+{
+  color			:darkred;
+}
+
+.event .xxxmessage
+{
+  color			:darkblue;
+}
+
+.mention .xxxmessage
+{
+  background-color	:lightgray;
+}
+
+.xxxtopic
+{
+  color			:gray;
+  font-size		:large;
+  font-style		:italic;
+  padding-left		:20px;
+  padding-right		:20px;
+  padding-top		:10px;
+  padding-bottom	:10px;
+}

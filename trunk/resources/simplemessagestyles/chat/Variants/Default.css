@@ -1,0 +1,32 @@
+.xxxwrapper 
+{
+  border-style		:none;
+  font-size		:medium;
+}
+
+.xxxsender,
+.xxxtime 
+{
+  white-space		:nowrap;
+}
+
+.xxxtime 
+{
+  font-size             :small;
+  color			:gray;
+}
+
+.status .xxxmessage
+{
+  color			:darkgreen;
+}
+
+.notification .xxxmessage
+{
+  color			:darkred;
+}
+
+.event .xxxmessage
+{
+  color			:darkblue;
+}

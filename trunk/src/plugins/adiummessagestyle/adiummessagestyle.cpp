@@ -61,7 +61,7 @@ AdiumMessageStyle::~AdiumMessageStyle()
 
 bool AdiumMessageStyle::isValid() const
 {
-  return !FIn_ContentHTML.isEmpty();
+  return !FIn_ContentHTML.isEmpty() && !styleId().isEmpty();
 }
 
 QString AdiumMessageStyle::styleId() const
@@ -117,7 +117,7 @@ void AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
     fillContentKeywords(html,AOptions,sameSender);
 
     html.replace("%message%",AHtml);
-    if (AOptions.type == IMessageContentOptions::Topic)
+    if (AOptions.kind == IMessageContentOptions::Topic)
       html.replace("%topic%",QString(TOPIC_INDIVIDUAL_WRAPPER).arg(AHtml));
 
     escapeStringForScript(html);
@@ -152,7 +152,7 @@ void AdiumMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
   StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
   if (view)
   {
-    QString variant = QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value("DefaultVariant","../main").toString() : AVariant));
+    QString variant = QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"../main").toString() : AVariant));
     QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(FResourcePath+"/"+variant);
     escapeStringForScript(script);
     view->page()->mainFrame()->evaluateJavaScript(script);
@@ -332,7 +332,7 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
   bool isDirectionIn = AOptions.direction == IMessageContentOptions::DirectionIn;
 
   QStringList messageClasses;
-  if (ASameSender)
+  if (FCombineConsecutive && ASameSender)
     messageClasses << MSMC_CONSECUTIVE;
 
   if (AOptions.kind == IMessageContentOptions::Status)
@@ -363,10 +363,16 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
   AHtml.replace("%shortTime%", Qt::escape(AOptions.time.toString(tr("hh:mm"))));
   AHtml.replace("%service%","");
 
-  if (!AOptions.senderAvatar.isEmpty())
-    AHtml.replace("%userIconPath%",AOptions.senderAvatar);
-  else
-    AHtml.replace("%userIconPath%",FResourcePath+(isDirectionIn ? "/Incoming/buddy_icon.png" : "/Outgoing/buddy_icon.png"));
+  QString avatar = AOptions.senderAvatar;
+  if (!QFile::exists(avatar))
+  {
+    avatar = FResourcePath+(isDirectionIn ? "/Incoming/buddy_icon.png" : "/Outgoing/buddy_icon.png");
+    if (!isDirectionIn && !QFile::exists(avatar))
+      avatar = FResourcePath+"/Incoming/buddy_icon.png";
+    if (!QFile::exists(avatar))
+      avatar = QString::null;
+  }
+  AHtml.replace("%userIconPath%",avatar);
 
   QString timeFormat = !AOptions.timeFormat.isEmpty() ? AOptions.timeFormat : tr("hh:mm:ss");
   QString time = Qt::escape(AOptions.time.toString(timeFormat));

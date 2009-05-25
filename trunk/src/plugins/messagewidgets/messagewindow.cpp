@@ -143,9 +143,7 @@ void MessageWindow::setMode(Mode AMode)
   }
   ui.wdtReceivers->setVisible(FMode == WriteMode);
   ui.wdtInfo->setVisible(FMode == ReadMode);
-  ui.lneSubject->setReadOnly(FMode == ReadMode);
-  ui.lblReceived->setVisible(FMode == ReadMode);
-  ui.lblDateTime->setVisible(FMode == ReadMode);
+  ui.wdtSubject->setVisible(FMode == WriteMode);
   ui.pbtSend->setVisible(FMode == WriteMode);
   ui.pbtReply->setVisible(FMode == ReadMode);
   ui.pbtForward->setVisible(FMode == ReadMode);
@@ -169,22 +167,6 @@ void MessageWindow::setNextCount(int ACount)
   else
     ui.pbtNext->setText(tr("Close"));
   FNextCount = ACount;
-}
-
-void MessageWindow::showMessage(const Message &AMessage)
-{
-  setMode(IMessageWindow::ReadMode);
-  FMessage = AMessage;
-  setSubject(FMessage.subject());
-  setThreadId(FMessage.threadId());
-  if (QDateTime::currentDateTime().date() == FMessage.dateTime().date())
-    ui.lblDateTime->setText(FMessage.dateTime().toString(tr("hh:mm:ss")));
-  else
-    ui.lblDateTime->setText(FMessage.dateTime().toString(tr("dd MMM hh:mm")));
-  if (FMessage.type() == Message::Error)
-    showErrorMessage(FMessage);
-  //else
-  //  FViewWidget->setMessage(FMessage);
 }
 
 void MessageWindow::initialize()
@@ -241,28 +223,6 @@ void MessageWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, c
   setWindowIconText(AIconText);
   setWindowTitle(ATitle);
   emit windowChanged();
-}
-
-void MessageWindow::showErrorMessage(const Message &AMessage)
-{
-  QTextDocument doc;
-  QTextCursor cursor(&doc);
-  QTextCharFormat format;
-  ErrorHandler err(AMessage.stanza().element());
-  format.setFontWeight(QFont::Bold);
-  cursor.insertText(tr("The message with a error code %1 is received.").arg(err.code()),format);
-  cursor.insertBlock();
-  cursor.insertBlock();
-  format.setForeground(Qt::red);
-  cursor.insertText(err.message(),format);
-  cursor.insertBlock();
-  format.setForeground(Qt::black);
-  cursor.insertText("______________",format);
-  cursor.insertBlock();
-  format.setFontWeight(QFont::Normal);
-  cursor.insertText(AMessage.body(),format);
-
-  //FViewWidget->setHtml(doc.toHtml());
 }
 
 void MessageWindow::showEvent(QShowEvent *AEvent)

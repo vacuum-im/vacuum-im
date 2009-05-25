@@ -71,7 +71,7 @@ class IMessageStylePlugin
 {
 public:
   virtual QObject *instance() = 0;
-  virtual QString &stylePluginId() const =0;
+  virtual QString stylePluginId() const =0;
   virtual QList<QString> styles() const =0;
   virtual IMessageStyle *styleById(const QString &AStyleId) =0;
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const =0;

@@ -30,7 +30,7 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IMessageStylePlugin
-  virtual QString &stylePluginId() const;
+  virtual QString stylePluginId() const;
   virtual QList<QString> styles() const;
   virtual IMessageStyle *styleById(const QString &AStyleId);
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const;
