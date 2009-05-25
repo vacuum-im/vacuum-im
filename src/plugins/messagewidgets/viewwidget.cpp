@@ -125,14 +125,20 @@ void ViewWidget::initialize()
 
 QString ViewWidget::getHtmlBody(const QString &AHtml)
 {
-  QRegExp bodyStart("<body.*>");
-  QRegExp bodyEnd("</body>");
-  int start = AHtml.indexOf(bodyStart);
-  int end = AHtml.lastIndexOf(bodyEnd);
-  if (start >=0 && end > start)
+  QRegExp body("<body.*>(.*)</body>");
+  body.setMinimal(false);
+  body.setCaseSensitivity(Qt::CaseInsensitive);
+  if (AHtml.indexOf(body)>=0)
   {
-    start = AHtml.indexOf(">",start)+1;
-    return AHtml.mid(start,end-start);
+    QString html = body.cap(1).trimmed();
+    if (html.startsWith("<p ") && html.endsWith("</p>"))
+    {
+      html.remove(0,2);
+      html.prepend("<span");
+      html.chop(2);
+      html.append("span>");
+    }
+    return html;
   }
   return AHtml;
 }

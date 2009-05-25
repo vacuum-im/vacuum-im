@@ -1,0 +1,370 @@
+#include "simplemessagestyle.h"
+
+#include <QDir>
+#include <QFile>
+#include <QScrollBar>
+#include <QTextFrame>
+#include <QTextCursor>
+#include <QDomDocument>
+#include <QCoreApplication>
+
+#define SHARED_STYLE_PATH                   STORAGE_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
+
+static const char *SenderColors[] =  {
+  "aqua", "aquamarine", "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse", "chocolate",
+  "coral", "cornflowerblue", "crimson", "cyan", "darkblue", "darkcyan", "darkgoldenrod", "darkgreen", "darkgrey",
+  "darkkhaki", "darkmagenta", "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen",
+  "darkslateblue", "darkslategrey", "darkturquoise", "darkviolet", "deeppink", "deepskyblue", "dimgrey", "dodgerblue",
+  "firebrick", "forestgreen", "fuchsia", "gold", "goldenrod", "green", "greenyellow", "grey", "hotpink", "indianred",
+  "indigo", "lawngreen", "lightblue", "lightcoral", "lightgreen", "lightgrey", "lightpink", "lightsalmon",
+  "lightseagreen", "lightskyblue", "lightslategrey", "lightsteelblue", "lime", "limegreen", "magenta", "maroon",
+  "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen", "mediumslateblue",
+  "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "navy", "olive", "olivedrab", "orange",
+  "orangered", "orchid", "palegreen", "paleturquoise", "palevioletred", "peru", "pink", "plum", "powderblue",
+  "purple", "red", "rosybrown", "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "sienna", "silver",
+  "skyblue", "slateblue", "slategrey", "springgreen", "steelblue", "tan", "teal", "thistle", "tomato", "turquoise",
+  "violet", "yellowgreen"
+};
+
+static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
+
+SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QObject *AParent) : QObject(AParent)
+{
+  FStylePath = AStylePath;
+  FInfo = styleInfo(AStylePath);
+  FVariants = styleVariants(AStylePath);
+  initStyleSettings();
+  loadTemplates();
+}
+
+SimpleMessageStyle::~SimpleMessageStyle()
+{
+
+}
+
+bool SimpleMessageStyle::isValid() const
+{
+  return !FIn_ContentHTML.isEmpty() && !styleId().isEmpty();
+}
+
+QString SimpleMessageStyle::styleId() const
+{
+  return FInfo.value(MSIV_NAME).toString();
+}
+
+QList<QWidget *> SimpleMessageStyle::styleWidgets() const
+{
+  return FWidgetStatus.keys();
+}
+
+QWidget *SimpleMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
+{
+  StyleViewer *view = new StyleViewer(AParent);
+  clearWidget(view,AOptions);
+  return view;
+}
+
+void SimpleMessageStyle::clearWidget(QWidget *AWidget, const IMessageStyleOptions &AOptions)
+{
+  StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+  if (view)
+  {
+    if (!FWidgetStatus.contains(AWidget))
+    {
+      FWidgetStatus[view].lastKind = -1;
+      connect(view,SIGNAL(anchorClicked(const QUrl &)),SLOT(onLinkClicked(const QUrl &)));
+      connect(view,SIGNAL(destroyed(QObject *)),SLOT(onStyleWidgetDestroyed(QObject *)));
+      emit widgetAdded(AWidget);
+    }
+    else
+    {
+      FWidgetStatus[view].lastKind = -1;
+    }
+
+    setVariant(AWidget, AOptions.options.value(MSO_VARIANT).toString());
+
+    QString html = makeStyleTemplate();
+    fillStyleKeywords(html,AOptions);
+    view->setHtml(html);
+
+    emit widgetCleared(AWidget,AOptions);
+  }
+}
+
+void SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
+{
+  StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
+  if (view)
+  {
+    bool sameSender = isSameSender(AWidget,AOptions);
+    QString html = makeContentTemplate(AOptions,sameSender);
+    fillContentKeywords(html,AOptions,sameSender);
+
+    html.replace("%message%",AHtml);
+
+    bool scroll = !AOptions.noScroll && view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum();
+
+    QTextCursor cursor = view->document()->rootFrame()->lastCursorPosition();
+    cursor.insertHtml(html);
+
+    if (scroll)
+      view->verticalScrollBar()->setSliderPosition(view->verticalScrollBar()->maximum());
+
+    WidgetStatus &wstatus = FWidgetStatus[AWidget];
+    wstatus.lastKind = AOptions.kind;
+    wstatus.lastId = AOptions.senderId;
+    wstatus.lastTime = AOptions.time;
+
+    emit contentAppended(AWidget,AHtml,AOptions);
+  }
+}
+
+QMap<QString, QVariant> SimpleMessageStyle::infoValues() const
+{
+  return FInfo;
+}
+
+QList<QString> SimpleMessageStyle::variants() const
+{
+  return FVariants;
+}
+
+void SimpleMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
+{
+  StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
+  if (view)
+  {
+    QString variant = QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant);
+    view->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variant,QString::null));
+    emit variantChanged(AWidget,AVariant);
+  }
+}
+
+QList<QString> SimpleMessageStyle::styleVariants(const QString &AStylePath)
+{
+  QList<QString> files;
+  if (!AStylePath.isEmpty())
+  {
+    QDir dir(AStylePath+"/Variants");
+    files = dir.entryList(QStringList("*.css"),QDir::Files,QDir::Name);
+    for (int i=0; i<files.count();i++)
+      files[i].chop(4);
+  }
+  return files;
+}
+
+QMap<QString, QVariant> SimpleMessageStyle::styleInfo(const QString &AStylePath)
+{
+  QMap<QString, QVariant> info;
+
+  QFile file(AStylePath+"/Info.plist");
+  if (!AStylePath.isEmpty() && file.open(QFile::ReadOnly))
+  {
+    QDomDocument doc;
+    if (doc.setContent(file.readAll(),true))
+    {
+      QDomElement elem = doc.documentElement().firstChildElement("dict").firstChildElement("key");
+      while (!elem.isNull())
+      {
+        QString key = elem.text();
+        if (!key.isEmpty())
+        {
+          elem = elem.nextSiblingElement();
+          if (elem.tagName() == "string")
+            info.insert(key,elem.text());
+          else if (elem.tagName() == "integer")
+            info.insert(key,elem.text().toInt());
+          else if (elem.tagName() == "true")
+            info.insert(key,true);
+          else if (elem.tagName() == "false")
+            info.insert(key,false);
+        }
+        elem = elem.nextSiblingElement("key");
+      }
+    }
+  }
+  return info;
+}
+
+bool SimpleMessageStyle::isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const
+{
+  const WidgetStatus &wstatus = FWidgetStatus.value(AWidget);
+  if (!FCombineConsecutive)
+    return false;
+  if (wstatus.lastKind != AOptions.kind)
+    return false;
+  if (wstatus.lastId != AOptions.senderId)
+    return false;
+  if (wstatus.lastTime.secsTo(AOptions.time)>2*60)
+    return false;
+  return true;
+}
+
+QString SimpleMessageStyle::makeStyleTemplate() const
+{
+  QString htmlFileName = FStylePath+"/Template.html";
+  if (!QFile::exists(htmlFileName))
+    htmlFileName = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/Template.html";
+
+  return loadFileData(htmlFileName,QString::null);
+}
+
+void SimpleMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const
+{
+  QString background;
+  if (FAllowCustomBackground)
+  {
+    if (!AOptions.options.value(MSO_BG_IMAGE_FILE).toString().isEmpty())
+    {
+      background.append("background-image: url('%1');");
+      background = background.arg(AOptions.options.value(MSO_BG_IMAGE_FILE).toString());
+    }
+    if (!AOptions.options.value(MSO_BG_COLOR).toString().isEmpty())
+    {
+      int r,g,b;
+      QColor color(AOptions.options.value(MSO_BG_COLOR).toString());
+      color.getRgb(&r,&g,&b);
+      background.append(QString("background-color: #%1%2%3);").arg(r,2).arg(g,2).arg(b,2));
+    }
+  }
+  AHtml.replace("%bodyBackground%", background);
+}
+
+QString SimpleMessageStyle::makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const
+{
+  QString html;
+  if (AOptions.kind == IMessageContentOptions::Topic && !FTopicHTML.isEmpty())
+  {
+    html = FTopicHTML;
+  }
+  else if (AOptions.kind == IMessageContentOptions::Status && !FStatusHTML.isEmpty())
+  {
+    html = FStatusHTML;
+  }
+  else
+  {
+    if (AOptions.type & IMessageContentOptions::History)
+    {
+      if (AOptions.direction == IMessageContentOptions::DirectionIn)
+        html = ASameSender ? FIn_NextContextHTML : FIn_ContextHTML;
+      else
+        html = ASameSender ? FOut_NextContextHTML : FOut_ContextHTML;
+    }
+    else if (AOptions.direction == IMessageContentOptions::DirectionIn)
+    {
+      html = ASameSender ? FIn_NextContentHTML : FIn_ContentHTML;
+    }
+    else
+    {
+      html = ASameSender ? FOut_NextContentHTML : FOut_ContentHTML;
+    }
+  }
+  return html;
+}
+
+void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const
+{
+  bool isDirectionIn = AOptions.direction == IMessageContentOptions::DirectionIn;
+
+  QStringList messageClasses;
+  if (FCombineConsecutive && ASameSender)
+    messageClasses << MSMC_CONSECUTIVE;
+
+  if (AOptions.kind == IMessageContentOptions::Status)
+    messageClasses << MSMC_STATUS;
+  else
+    messageClasses << MSMC_MESSAGE;
+
+  if (AOptions.type & IMessageContentOptions::Groupchat)
+    messageClasses << MSMC_GROUPCHAT;
+  if (AOptions.type & IMessageContentOptions::History)
+    messageClasses << MSMC_HISTORY;
+  if (AOptions.type & IMessageContentOptions::Event)
+    messageClasses << MSMC_EVENT;
+  if (AOptions.type & IMessageContentOptions::Mention)
+    messageClasses << MSMC_MENTION;
+  if (AOptions.type & IMessageContentOptions::Notification)
+    messageClasses << MSMC_NOTIFICATION;
+
+  if (isDirectionIn)
+    messageClasses << MSMC_INCOMING;
+  else
+    messageClasses << MSMC_OUTGOING;
+
+  AHtml.replace("%messageClasses%", messageClasses.join(" "));
+
+  AHtml.replace("%senderStatusIcon%",AOptions.senderIcon);
+  AHtml.replace("%shortTime%", Qt::escape(AOptions.time.toString(tr("hh:mm"))));
+
+  QString avatar = AOptions.senderAvatar;
+  if (!QFile::exists(avatar))
+  {
+    avatar = FStylePath+(isDirectionIn ? "/Incoming/buddy_icon.png" : "/Outgoing/buddy_icon.png");
+    if (!isDirectionIn && !QFile::exists(avatar))
+      avatar = FStylePath+"/Incoming/buddy_icon.png";
+    if (!QFile::exists(avatar))
+      avatar = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/buddy_icon.png";
+  }
+  AHtml.replace("%userIconPath%",avatar);
+
+  QString timeFormat = !AOptions.timeFormat.isEmpty() ? AOptions.timeFormat : tr("hh:mm:ss");
+  QString time = Qt::escape(AOptions.time.toString(timeFormat));
+  AHtml.replace("%time%", time);
+
+  QString sColor = AOptions.senderColor;
+  if (sColor.isEmpty())
+    sColor = QString(SenderColors[qHash(AOptions.senderName) % SenderColorsCount]);
+  AHtml.replace("%senderColor%",sColor);
+
+  AHtml.replace("%sender%",AOptions.senderName);
+  AHtml.replace("%senderScreenName%",AOptions.senderId);
+  AHtml.replace("%textbackgroundcolor%",!AOptions.textBGColor.isEmpty() ? AOptions.textBGColor : "inherit");
+}
+
+QString SimpleMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
+{
+  if (QFile::exists(AFileName))
+  {
+    QFile file(AFileName);
+    if (file.open(QFile::ReadOnly))
+    {
+      QByteArray html = file.readAll();
+      return QString::fromUtf8(html.data(),html.size());
+    }
+  }
+  return DefValue;
+}
+
+void SimpleMessageStyle::loadTemplates()
+{
+  FIn_ContentHTML =      loadFileData(FStylePath+"/Incoming/Content.html",QString::null);
+  FIn_NextContentHTML =  loadFileData(FStylePath+"/Incoming/NextContent.html",FIn_ContentHTML);
+  FIn_ContextHTML =      loadFileData(FStylePath+"/Incoming/Context.html",FIn_ContentHTML);
+  FIn_NextContextHTML =  loadFileData(FStylePath+"/Incoming/NextContext.html",FIn_ContextHTML);
+
+  FOut_ContentHTML =     loadFileData(FStylePath+"/Outgoing/Content.html",FIn_ContentHTML);
+  FOut_NextContentHTML = loadFileData(FStylePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
+  FOut_ContextHTML =     loadFileData(FStylePath+"/Outgoing/Context.html",FOut_ContentHTML);
+  FOut_NextContextHTML = loadFileData(FStylePath+"/Outgoing/NextContext.html",FOut_ContextHTML);
+
+  FTopicHTML =           loadFileData(FStylePath+"/Topic.html",QString::null);
+  FStatusHTML =          loadFileData(FStylePath+"/Status.html",FIn_ContentHTML);
+}
+
+void SimpleMessageStyle::initStyleSettings()
+{
+  FCombineConsecutive = !FInfo.value(MSIV_DISABLE_COMBINE_CONSECUTIVE,false).toBool();
+  FAllowCustomBackground = !FInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
+}
+
+void SimpleMessageStyle::onLinkClicked(const QUrl &AUrl)
+{
+  StyleViewer *view = qobject_cast<StyleViewer *>(sender());
+  emit urlClicked(view,AUrl);
+}
+
+void SimpleMessageStyle::onStyleWidgetDestroyed(QObject *AObject)
+{
+  FWidgetStatus.remove((QWidget *)AObject);
+}
+

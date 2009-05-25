@@ -1,10 +1,10 @@
 #include "styleviewer.h"
 
-StyleViewer::StyleViewer(QWidget *AParent) : QTextEdit(AParent)
+StyleViewer::StyleViewer(QWidget *AParent) : QTextBrowser(AParent)
 {
-  setReadOnly(true);
-  setLineWrapMode(QTextEdit::WidgetWidth);
-  setWordWrapMode(QTextOption::WordWrap);
+  setFrameShape(QFrame::NoFrame);
+  setOpenExternalLinks(false);
+  setOpenLinks(false);
 }
 
 StyleViewer::~StyleViewer()

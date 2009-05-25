@@ -10,6 +10,7 @@ NormalMessageHandler::NormalMessageHandler()
 {
   FMessageWidgets = NULL;
   FMessageProcessor = NULL;
+  FMessageStyles = NULL;
   FStatusIcons = NULL;
   FPresencePlugin = NULL;
   FRostersView = NULL;
@@ -30,6 +31,7 @@ void NormalMessageHandler::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->version = "0.1";
   APluginInfo->dependences.append(MESSAGEWIDGETS_UUID);
   APluginInfo->dependences.append(MESSAGEPROCESSOR_UUID);
+  APluginInfo->dependences.append(MESSAGESTYLES_UUID);
   APluginInfo->conflicts.append("{153A4638-B468-496f-B57C-9F30CEDFCC2E}");  //Messenger
   APluginInfo->conflicts.append("{f118ccf4-8535-4302-8fda-0f6487c6db01}");  //MessageHandler
 }
@@ -43,6 +45,10 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
   plugin = APluginManager->getPlugins("IMessageProcessor").value(0,NULL);
   if (plugin)
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+
+  plugin = APluginManager->getPlugins("IMessageStyles").value(0,NULL);
+  if (plugin)
+    FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
   if (plugin)
@@ -87,7 +93,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
     }
   }
 
-  return FMessageProcessor!=NULL && FMessageWidgets!=NULL;
+  return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
 }
 
 bool NormalMessageHandler::initObjects()
@@ -204,7 +210,8 @@ void NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
   {
     int messageId = FActiveMessages.value(AWindow);
     Message message = FMessageProcessor->messageById(messageId);
-    AWindow->showMessage(message);
+    showStyledMessage(AWindow,message);
+    FLastMessages.insert(AWindow,message);
     FMessageProcessor->removeMessage(messageId);
     FActiveMessages.remove(AWindow,messageId);
   }
@@ -238,6 +245,56 @@ void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
     title = tr("%1 - Message").arg(AWindow->infoWidget()->field(IInfoWidget::ContactName).toString());
   AWindow->updateWindow(icon,title,title);
   AWindow->setNextCount(FActiveMessages.count(AWindow));
+}
+
+void NormalMessageHandler::setMessageStyle(IMessageWindow *AWindow)
+{
+  IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Normal);
+  IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
+  if (style != AWindow->viewWidget()->messageStyle())
+    AWindow->viewWidget()->setMessageStyle(style,soptions);
+  else if (AWindow->viewWidget()->messageStyle() != NULL)
+    AWindow->viewWidget()->messageStyle()->clearWidget(AWindow->viewWidget()->styleWidget(),soptions);
+}
+
+void NormalMessageHandler::fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const
+{
+  AOptions.senderColor = "blue";
+  AOptions.senderId = AWindow->contactJid().full();
+  AOptions.senderName = Qt::escape(FMessageStyles->userName(AWindow->streamJid(),AWindow->contactJid()));
+  AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->contactJid());
+  AOptions.senderIcon = FMessageStyles->userIcon(AWindow->streamJid(),AWindow->contactJid());
+}
+
+void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Message &AMessage)
+{
+  IMessageContentOptions options;
+  options.time = AMessage.dateTime();
+  options.timeFormat = FMessageStyles->timeFormat(options.time);
+  options.direction = IMessageContentOptions::DirectionIn;
+  options.noScroll = true;
+  fillContentOptions(AWindow,options);
+
+  AWindow->setMode(IMessageWindow::ReadMode);
+  AWindow->setSubject(AMessage.subject());
+  AWindow->setThreadId(AMessage.threadId());
+
+  setMessageStyle(AWindow);
+  
+  if (AMessage.type() == Message::Error)
+  {
+    ErrorHandler err(AMessage.stanza().element());
+    QString html = tr("<b>The message with a error code %1 is received</b>").arg(err.code());
+    html += "<p style='color:red;'>"+Qt::escape(err.message())+"</p>";
+    html += "<hr>";
+    options.kind = IMessageContentOptions::Message;
+    AWindow->viewWidget()->appendHtml(html,options);
+  }
+
+  options.kind = IMessageContentOptions::Topic;
+  AWindow->viewWidget()->appendText(tr("Subject: %1").arg(!AMessage.subject().isEmpty() ? AMessage.subject() : tr("<no subject>")),options);
+  options.kind = IMessageContentOptions::Message;
+  AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 
 void NormalMessageHandler::onMessageReady()
@@ -296,12 +353,13 @@ void NormalMessageHandler::onReplyMessage()
 void NormalMessageHandler::onForwardMessage()
 {
   IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-  if (window)
+  if (FLastMessages.contains(window))
   {
+    Message message = FLastMessages.value(window);
     window->setMode(IMessageWindow::WriteMode);
-    window->setSubject(tr("Fw: %1").arg(window->subject()));
-    window->setThreadId(window->currentMessage().threadId());
-    FMessageProcessor->messageToText(window->editWidget()->document(),window->currentMessage());
+    window->setSubject(tr("Fw: %1").arg(message.subject()));
+    window->setThreadId(message.threadId());
+    FMessageProcessor->messageToText(window->editWidget()->document(),message);
     window->receiversWidget()->clear();
     window->setCurrentTabWidget(window->receiversWidget()->instance());
     updateWindow(window);
@@ -324,6 +382,7 @@ void NormalMessageHandler::onWindowDestroyed()
     foreach(int messageId, messagesId)
       FActiveMessages.insertMulti(NULL,messageId);
     FActiveMessages.remove(window);
+    FLastMessages.remove(window);
     FWindows.removeAt(FWindows.indexOf(window));
   }
 }

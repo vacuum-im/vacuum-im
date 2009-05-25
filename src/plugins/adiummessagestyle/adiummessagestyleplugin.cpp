@@ -44,7 +44,7 @@ bool AdiumMessageStylePlugin::initObjects()
   return true;
 }
 
-QString & AdiumMessageStylePlugin::stylePluginId() const
+QString AdiumMessageStylePlugin::stylePluginId() const
 {
   static QString id = "AdiumMessageStyle";
   return id;
@@ -156,7 +156,7 @@ void AdiumMessageStylePlugin::updateAvailStyles()
         if (valid)
         {
           QMap<QString, QVariant> info = AdiumMessageStyle::styleInfo(dir.absolutePath());
-          if (info.contains(MSIV_NAME))
+          if (!info.value(MSIV_NAME).toString().isEmpty())
             FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
         }
         dir.cdUp();

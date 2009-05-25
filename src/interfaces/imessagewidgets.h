@@ -198,14 +198,12 @@ public:
   virtual IToolBarWidget *editToolBarWidget() const =0;
   virtual Mode mode() const =0;
   virtual void setMode(Mode AMode) =0;
-  virtual Message currentMessage() const =0;
   virtual QString subject() const =0;
   virtual void setSubject(const QString &ASubject) =0;
   virtual QString threadId() const =0;
   virtual void setThreadId(const QString &AThreadId) =0;
   virtual int nextCount() const =0;
   virtual void setNextCount(int ACount) =0;
-  virtual void showMessage(const Message &AMessage) =0;
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 signals:
   virtual void messageReady() =0;

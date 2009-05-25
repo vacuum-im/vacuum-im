@@ -97,7 +97,9 @@ IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString
 
   if (!FStylePlugins.contains(pluginId))
   {
-    pluginId = "AdiumMessageStyle";
+    pluginId = "SimpleMessageStyle";
+    if (!FStylePlugins.contains(pluginId) && !FStylePlugins.isEmpty())
+      pluginId = FStylePlugins.keys().first();
   }
 
   IMessageStylePlugin *stylePlugin = stylePluginById(pluginId);

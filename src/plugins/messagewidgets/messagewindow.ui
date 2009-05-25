@@ -1,93 +1,94 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MessageWindowClass</class>
- <widget class="QMainWindow" name="MessageWindowClass" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MessageWindowClass">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>604</width>
-    <height>410</height>
+    <height>403</height>
    </rect>
   </property>
-  <property name="iconSize" >
+  <property name="iconSize">
    <size>
     <width>16</width>
     <height>16</height>
    </size>
   </property>
-  <property name="dockNestingEnabled" >
+  <property name="dockNestingEnabled">
    <bool>true</bool>
   </property>
-  <widget class="QWidget" name="centralWidget" >
-   <property name="autoFillBackground" >
+  <widget class="QWidget" name="centralWidget">
+   <property name="autoFillBackground">
     <bool>true</bool>
    </property>
-   <layout class="QVBoxLayout" >
-    <property name="margin" >
+   <layout class="QVBoxLayout">
+    <property name="margin">
      <number>2</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="wdtTabs" >
-      <property name="currentIndex" >
+     <widget class="QTabWidget" name="wdtTabs">
+      <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tabMessage" >
-       <property name="autoFillBackground" >
+      <widget class="QWidget" name="tabMessage">
+       <property name="autoFillBackground">
         <bool>true</bool>
        </property>
-       <attribute name="title" >
+       <attribute name="title">
         <string>Message</string>
        </attribute>
-       <layout class="QVBoxLayout" >
-        <property name="margin" >
-         <number>2</number>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="margin">
+         <number>5</number>
         </property>
         <item>
-         <widget class="QWidget" native="1" name="wdtInfo" />
+         <widget class="QWidget" name="wdtInfo" native="true"/>
         </item>
         <item>
-         <widget class="QWidget" native="1" name="wdtReceivers" >
-          <layout class="QHBoxLayout" >
-           <property name="leftMargin" >
+         <widget class="QWidget" name="wdtReceivers" native="true">
+          <layout class="QHBoxLayout">
+           <property name="leftMargin">
             <number>2</number>
            </property>
-           <property name="topMargin" >
+           <property name="topMargin">
             <number>0</number>
            </property>
-           <property name="rightMargin" >
+           <property name="rightMargin">
             <number>2</number>
            </property>
-           <property name="bottomMargin" >
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="lblReceiversLabel" >
-             <property name="text" >
+            <widget class="QLabel" name="lblReceiversLabel">
+             <property name="text">
               <string>To:</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="lblReceivers" >
-             <property name="sizePolicy" >
-              <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+            <widget class="QLabel" name="lblReceivers">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="frameShape" >
+             <property name="frameShape">
               <enum>QFrame::Panel</enum>
              </property>
-             <property name="frameShadow" >
+             <property name="frameShadow">
               <enum>QFrame::Sunken</enum>
              </property>
-             <property name="text" >
+             <property name="text">
               <string/>
              </property>
-             <property name="wordWrap" >
+             <property name="wordWrap">
               <bool>true</bool>
              </property>
-             <property name="margin" >
+             <property name="margin">
               <number>2</number>
              </property>
             </widget>
@@ -96,61 +97,37 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" >
-          <property name="leftMargin" >
-           <number>2</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>2</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="lblSubject" >
-            <property name="text" >
-             <string>Subject:</string>
-            </property>
-            <property name="buddy" >
-             <cstring>lneSubject</cstring>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="lneSubject" />
-          </item>
-          <item>
-           <widget class="QLabel" name="lblReceived" >
-            <property name="text" >
-             <string>Received:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblDateTime" >
-            <property name="frameShape" >
-             <enum>QFrame::Panel</enum>
-            </property>
-            <property name="frameShadow" >
-             <enum>QFrame::Sunken</enum>
-            </property>
-            <property name="text" >
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QWidget" name="wdtSubject" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="lblSubject">
+             <property name="text">
+              <string>Subject:</string>
+             </property>
+             <property name="buddy">
+              <cstring>lneSubject</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lneSubject"/>
+           </item>
+          </layout>
+          <zorder>lneSubject</zorder>
+          <zorder>lneSubject</zorder>
+          <zorder>lblSubject</zorder>
+         </widget>
         </item>
         <item>
-         <widget class="QWidget" native="1" name="wdtToolBar" />
+         <widget class="QWidget" name="wdtToolBar" native="true"/>
         </item>
         <item>
-         <widget class="QWidget" native="1" name="wdtMessage" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+         <widget class="QWidget" name="wdtMessage" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -158,38 +135,38 @@
          </widget>
         </item>
         <item>
-         <widget class="QWidget" native="1" name="wdtButtons" >
-          <layout class="QHBoxLayout" >
-           <property name="margin" >
+         <widget class="QWidget" name="wdtButtons" native="true">
+          <layout class="QHBoxLayout">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
-            <widget class="QPushButton" name="pbtReply" >
-             <property name="text" >
+            <widget class="QPushButton" name="pbtReply">
+             <property name="text">
               <string>Reply</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pbtForward" >
-             <property name="text" >
+            <widget class="QPushButton" name="pbtForward">
+             <property name="text">
               <string>Forward</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pbtChat" >
-             <property name="text" >
+            <widget class="QPushButton" name="pbtChat">
+             <property name="text">
               <string>Chat</string>
              </property>
             </widget>
            </item>
            <item>
             <spacer>
-             <property name="orientation" >
+             <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeHint" stdset="0" >
+             <property name="sizeHint" stdset="0">
               <size>
                <width>40</width>
                <height>20</height>
@@ -198,15 +175,15 @@
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="pbtSend" >
-             <property name="text" >
+            <widget class="QPushButton" name="pbtSend">
+             <property name="text">
               <string>Send</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pbtNext" >
-             <property name="text" >
+            <widget class="QPushButton" name="pbtNext">
+             <property name="text">
               <string>Next</string>
              </property>
             </widget>
@@ -220,18 +197,8 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menuBar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>604</width>
-     <height>19</height>
-    </rect>
-   </property>
-  </widget>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>wdtTabs</tabstop>
   <tabstop>lneSubject</tabstop>

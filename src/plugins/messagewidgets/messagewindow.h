@@ -40,14 +40,12 @@ public:
   virtual IToolBarWidget *editToolBarWidget() const { return FEditToolBarWidget; }
   virtual Mode mode() const { return FMode; }
   virtual void setMode(Mode AMode);
-  virtual Message currentMessage() const { return FMessage; }
   virtual QString subject() const { return ui.lneSubject->text(); }
   virtual void setSubject(const QString &ASubject);
   virtual QString threadId() const { return FCurrentThreadId; }
   virtual void setThreadId(const QString &AThreadId);
   virtual int nextCount() const { return FNextCount; }
   virtual void setNextCount(int ACount);
-  virtual void showMessage(const Message &AMessage);
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
   //ITabWidget
@@ -68,7 +66,6 @@ protected:
   void initialize();
   void saveWindowState();
   void loadWindowState();
-  void showErrorMessage(const Message &AMessage);
 protected:
   virtual void showEvent(QShowEvent *AEvent);
   virtual void closeEvent(QCloseEvent *AEvent);
@@ -96,7 +93,6 @@ private:
   int FNextCount;
   Jid FStreamJid;
   Jid FContactJid;
-  Message FMessage;
   QString FCurrentThreadId;
 };
 

@@ -3,6 +3,7 @@
 
 #define NORMALMESSAGEHANDLER_UUID "{8592e3c3-ef5e-42a9-91c9-faf1ed9a91cc}"
 
+#include <QMultiMap>
 #include "../../definations/messagehandlerorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterlabelorders.h"
@@ -18,6 +19,7 @@
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/ipresence.h"
+#include "../../utils/errorhandler.h"
 
 class NormalMessageHandler : 
   public QObject,
@@ -50,6 +52,9 @@ protected:
   void showNextMessage(IMessageWindow *AWindow);
   void loadActiveMessages(IMessageWindow *AWindow);
   void updateWindow(IMessageWindow *AWindow);
+  void setMessageStyle(IMessageWindow *AWindow);
+  void fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const;
+  void showStyledMessage(IMessageWindow *AWindow, const Message &AMessage);
 protected slots:
   void onMessageReady();
   void onShowNextMessage();
@@ -64,12 +69,14 @@ protected slots:
 private:
   IMessageWidgets *FMessageWidgets; 
   IMessageProcessor *FMessageProcessor;
+  IMessageStyles *FMessageStyles;
   IStatusIcons *FStatusIcons;
   IPresencePlugin *FPresencePlugin;
   IRostersView *FRostersView;
 private:
   QList<IMessageWindow *> FWindows;
-  QMultiHash<IMessageWindow *, int> FActiveMessages;
+  QMap<IMessageWindow *, Message> FLastMessages;
+  QMultiMap<IMessageWindow *, int> FActiveMessages;
 };
 
 #endif // NORMALMESSAGEHANDLER_H
