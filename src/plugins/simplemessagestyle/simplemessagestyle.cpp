@@ -2,6 +2,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QTimer>
 #include <QScrollBar>
 #include <QTextFrame>
 #include <QTextCursor>
@@ -69,9 +70,11 @@ void SimpleMessageStyle::clearWidget(QWidget *AWidget, const IMessageStyleOption
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
   if (view)
   {
-    if (!FWidgetStatus.contains(AWidget))
+    if (!FWidgetStatus.contains(view))
     {
       FWidgetStatus[view].lastKind = -1;
+      FWidgetStatus[view].scrollStarted = false;
+      view->installEventFilter(this);
       connect(view,SIGNAL(anchorClicked(const QUrl &)),SLOT(onLinkClicked(const QUrl &)));
       connect(view,SIGNAL(destroyed(QObject *)),SLOT(onStyleWidgetDestroyed(QObject *)));
       emit widgetAdded(AWidget);
@@ -102,18 +105,19 @@ void SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 
     html.replace("%message%",AHtml);
 
-    bool scroll = !AOptions.noScroll && view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum();
+    bool scrollAtEnd = view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum();
 
     QTextCursor cursor = view->document()->rootFrame()->lastCursorPosition();
     cursor.insertHtml(html);
 
-    if (scroll)
+    if (!AOptions.noScroll && scrollAtEnd)
       view->verticalScrollBar()->setSliderPosition(view->verticalScrollBar()->maximum());
 
     WidgetStatus &wstatus = FWidgetStatus[AWidget];
     wstatus.lastKind = AOptions.kind;
     wstatus.lastId = AOptions.senderId;
     wstatus.lastTime = AOptions.time;
+    wstatus.scrollStarted = AOptions.noScroll;
 
     emit contentAppended(AWidget,AHtml,AOptions);
   }
@@ -357,14 +361,44 @@ void SimpleMessageStyle::initStyleSettings()
   FAllowCustomBackground = !FInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
 }
 
+bool SimpleMessageStyle::eventFilter(QObject *AWatched, QEvent *AEvent)
+{
+  if (AEvent->type()==QEvent::Resize)
+  {
+    StyleViewer *view = qobject_cast<StyleViewer *>(AWatched);
+    if (FWidgetStatus.contains(view))
+    {
+      WidgetStatus &status = FWidgetStatus[view];
+      if (!status.scrollStarted && view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum())
+      {
+        status.scrollStarted = true;
+        QTimer::singleShot(100,this,SLOT(onScrollAfterResize()));
+      }
+    }
+  }
+  return QObject::eventFilter(AWatched,AEvent);
+}
+
 void SimpleMessageStyle::onLinkClicked(const QUrl &AUrl)
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(sender());
   emit urlClicked(view,AUrl);
 }
 
+void SimpleMessageStyle::onScrollAfterResize()
+{
+  for(QMap<QWidget*,WidgetStatus>::iterator it = FWidgetStatus.begin(); it!= FWidgetStatus.end(); it++)
+  {
+    if (it.value().scrollStarted)
+    {
+      QScrollBar *scrollBar = ((StyleViewer *)it.key())->verticalScrollBar();
+      scrollBar->setSliderPosition(scrollBar->maximum());
+      it.value().scrollStarted = false;
+    }
+  }
+}
+
 void SimpleMessageStyle::onStyleWidgetDestroyed(QObject *AObject)
 {
   FWidgetStatus.remove((QWidget *)AObject);
 }
-

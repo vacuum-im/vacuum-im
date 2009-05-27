@@ -49,18 +49,6 @@
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
-    <message>
-        <source>hh:mm:ss</source>
-        <translation>hh:mm:ss</translation>
-    </message>
-    <message>
-        <source>dd MMM hh:mm</source>
-        <translation>dd MMM hh:mm</translation>
-    </message>
-    <message>
-        <source>The message with a error code %1 is received.</source>
-        <translation>Получено сообщение с кодом ошибки %1.</translation>
-    </message>
 </context>
 <context>
     <name>MessageWindowClass</name>
@@ -75,10 +63,6 @@
     <message>
         <source>Subject:</source>
         <translation>Тема:</translation>
-    </message>
-    <message>
-        <source>Received:</source>
-        <translation>Получено:</translation>
     </message>
     <message>
         <source>Reply</source>

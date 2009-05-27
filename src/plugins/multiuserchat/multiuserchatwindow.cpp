@@ -114,7 +114,7 @@ void MultiUserChatWindow::receiveMessage(int AMessageId)
     IDataForm form = FDataForms->dataForm(message.stanza().firstElement("x",NS_JABBER_DATA));
     IDataDialogWidget *dialog = FDataForms->dialogWidget(form,this);
     connect(dialog->instance(),SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
-    showMessage(tr("Data form received: %1").arg(form.title),IMessageContentOptions::Event);
+    showMessage(tr("Data form received: %1").arg(form.title),IMessageContentOptions::Notification);
     FDataFormMessages.insert(AMessageId,dialog);
   }
   else if (message.type() == Message::GroupChat)
@@ -950,7 +950,6 @@ void MultiUserChatWindow::showTopic(const QString &ATopic)
 {
   IMessageContentOptions options;
   options.kind = IMessageContentOptions::Topic;
-  options.type |= IMessageContentOptions::Event;
   options.type |= IMessageContentOptions::Groupchat;
   options.direction = IMessageContentOptions::DirectionIn;
 
@@ -1342,13 +1341,13 @@ void MultiUserChatWindow::onUserDataChanged(IMultiUser *AUser, int ARole, const 
   if (ARole == MUDR_ROLE)
   {
     if (AAfter!=MUC_ROLE_NONE && ABefour!=MUC_ROLE_NONE)
-      showMessage(tr("%1 role changed from %2 to %3").arg(AUser->nickName()).arg(ABefour.toString()).arg(AAfter.toString()),IMessageContentOptions::Notification);
+      showMessage(tr("%1 role changed from %2 to %3").arg(AUser->nickName()).arg(ABefour.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
     setRoleColorForUser(AUser);
   }
   else if (ARole==MUDR_AFFILIATION)
   {
     if (FUsers.contains(AUser))
-      showMessage(tr("%1 affiliation changed from %2 to %3").arg(AUser->nickName()).arg(ABefour.toString()).arg(AAfter.toString()),IMessageContentOptions::Notification);
+      showMessage(tr("%1 affiliation changed from %2 to %3").arg(AUser->nickName()).arg(ABefour.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
     setAffilationLineForUser(AUser);
   }
 }
@@ -1371,7 +1370,7 @@ void MultiUserChatWindow::onUserNickChanged(IMultiUser *AUser, const QString &AO
   }
   if (AUser == FMultiChat->mainUser())
     ui.lblNick->setText(Qt::escape(ANewNick));
-  showMessage(tr("%1 changed nick to %2").arg(AOldNick).arg(ANewNick),IMessageContentOptions::Notification);
+  showMessage(tr("%1 changed nick to %2").arg(AOldNick).arg(ANewNick),IMessageContentOptions::Event);
 }
 
 void MultiUserChatWindow::onPresenceChanged(int /*AShow*/, const QString &/*AStatus*/)
@@ -1455,7 +1454,7 @@ void MultiUserChatWindow::onConfigFormReceived(const IDataForm &AForm)
 
 void MultiUserChatWindow::onRoomDestroyed(const QString &AReason)
 {
-  showMessage(tr("This room was destroyed by owner. %1").arg(AReason),IMessageContentOptions::Notification);
+  showMessage(tr("This room was destroyed by owner. %1").arg(AReason),IMessageContentOptions::Event);
 }
 
 void MultiUserChatWindow::onMessageReady()

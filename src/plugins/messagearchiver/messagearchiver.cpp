@@ -2228,9 +2228,9 @@ void MessageArchiver::notifyInChatWindow(const Jid &AStreamJid, const Jid &ACont
   {
     IMessageContentOptions options;
     options.kind = IMessageContentOptions::Status;
+    options.type |= IMessageContentOptions::Event;
     options.direction = IMessageContentOptions::DirectionIn;
     options.time = QDateTime::currentDateTime();
-    options.type |= IMessageContentOptions::Notification;
     window->viewWidget()->appendText(AMessage,options);
   }
 }
