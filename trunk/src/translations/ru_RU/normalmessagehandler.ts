@@ -43,5 +43,17 @@
         <source>Fw: %1</source>
         <translation>Fw: %1</translation>
     </message>
+    <message>
+        <source>&lt;b&gt;The message with a error code %1 is received&lt;/b&gt;</source>
+        <translation>&lt;b&gt; Получено сообщение с ошибкой № %1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Subject: %1</source>
+        <translation>Тема: %1</translation>
+    </message>
+    <message>
+        <source>&lt;no subject&gt;</source>
+        <translation>&lt;без темы&gt;</translation>
+    </message>
 </context>
 </TS>

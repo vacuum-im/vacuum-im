@@ -46,6 +46,7 @@ public:
     int lastKind;
     QString lastId;
     QDateTime lastTime;
+    bool scrollStarted;
   };
 public:
   SimpleMessageStyle(const QString &AStylePath, QObject *AParent);
@@ -81,8 +82,11 @@ protected:
   QString loadFileData(const QString &AFileName, const QString &DefValue) const;
   void loadTemplates();
   void initStyleSettings();
+protected:
+  virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
   void onLinkClicked(const QUrl &AUrl);
+  void onScrollAfterResize();
   void onStyleWidgetDestroyed(QObject *AObject);
 private:
   bool FCombineConsecutive;

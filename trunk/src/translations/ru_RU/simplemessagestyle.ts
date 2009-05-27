@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
+    <name>SimpleMessageStyle</name>
+    <message>
+        <source>hh:mm</source>
+        <translation>hh:mm</translation>
+    </message>
+    <message>
+        <source>hh:mm:ss</source>
+        <translation>hh:mm:ss</translation>
+    </message>
+</context>
+<context>
     <name>SimpleMessageStylePlugin</name>
     <message>
         <source>Implements basic message styles.</source>
