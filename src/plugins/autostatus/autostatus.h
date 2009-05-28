@@ -63,6 +63,7 @@ protected:
 protected slots:
   void onIdleTimerTimeout();
   void onSettingsOpened();
+  void onProfileClosed(const QString &AProfileName);
   void onSettingsClosed();
   void onOptionsDialogAccepted();
   void onOptionsDialogRejected();

@@ -59,6 +59,7 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     if (FSettingsPlugin)
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
+      connect(FSettingsPlugin->instance(),SIGNAL(profileClosed(const QString &)),SLOT(onProfileClosed(const QString &)));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsDialogAccepted()));
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsDialogRejected()));
@@ -241,6 +242,12 @@ void AutoStatus::onSettingsOpened()
     rule.text = settings->valueNS(SVN_RULE_TEXT,ns).toString();
     setRuleEnabled(insertRule(rule),settings->valueNS(SVN_RULE_ENABLED,ns,true).toBool());
   }
+}
+
+void AutoStatus::onProfileClosed(const QString &AProfileName)
+{
+  setActiveRule(0);
+  FLastCursorTime = QDateTime::currentDateTime();
 }
 
 void AutoStatus::onSettingsClosed()
