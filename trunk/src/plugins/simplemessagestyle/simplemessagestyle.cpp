@@ -61,11 +61,16 @@ QList<QWidget *> SimpleMessageStyle::styleWidgets() const
 QWidget *SimpleMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
 {
   StyleViewer *view = new StyleViewer(AParent);
-  clearWidget(view,AOptions);
+  changeStyleOptions(view,AOptions,true);
   return view;
 }
 
-void SimpleMessageStyle::clearWidget(QWidget *AWidget, const IMessageStyleOptions &AOptions)
+QString SimpleMessageStyle::senderColor(const QString &ASenderId) const
+{
+  return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
+}
+
+void SimpleMessageStyle::changeStyleOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
   if (view)
@@ -83,14 +88,25 @@ void SimpleMessageStyle::clearWidget(QWidget *AWidget, const IMessageStyleOption
     {
       FWidgetStatus[view].lastKind = -1;
     }
+    
+    if (AClean)
+    {
+      setVariant(AWidget, AOptions.extended.value(MSO_VARIANT).toString());
+      QString html = makeStyleTemplate();
+      fillStyleKeywords(html,AOptions);
+      view->setHtml(html);
+    }
 
-    setVariant(AWidget, AOptions.options.value(MSO_VARIANT).toString());
+    QFont font;
+    int fontSize = AOptions.extended.value(MSO_FONT_SIZE).toInt();
+    QString fontFamily = AOptions.extended.value(MSO_FONT_FAMILY).toString();
+    if (fontSize>0)
+      font.setPointSize(fontSize);
+    if (!fontFamily.isEmpty())
+      font.setFamily(fontFamily);
+    view->document()->setDefaultFont(font);
 
-    QString html = makeStyleTemplate();
-    fillStyleKeywords(html,AOptions);
-    view->setHtml(html);
-
-    emit widgetCleared(AWidget,AOptions);
+    emit styleOptionsChanged(AWidget,AOptions,AClean);
   }
 }
 
@@ -131,17 +147,6 @@ QMap<QString, QVariant> SimpleMessageStyle::infoValues() const
 QList<QString> SimpleMessageStyle::variants() const
 {
   return FVariants;
-}
-
-void SimpleMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
-{
-  StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
-  if (view)
-  {
-    QString variant = QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant);
-    view->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variant,QString::null));
-    emit variantChanged(AWidget,AVariant);
-  }
 }
 
 QList<QString> SimpleMessageStyle::styleVariants(const QString &AStylePath)
@@ -192,16 +197,30 @@ QMap<QString, QVariant> SimpleMessageStyle::styleInfo(const QString &AStylePath)
 
 bool SimpleMessageStyle::isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const
 {
-  const WidgetStatus &wstatus = FWidgetStatus.value(AWidget);
   if (!FCombineConsecutive)
     return false;
+  if (AOptions.senderId.isEmpty())
+    return false;
+
+  const WidgetStatus &wstatus = FWidgetStatus.value(AWidget);
   if (wstatus.lastKind != AOptions.kind)
     return false;
   if (wstatus.lastId != AOptions.senderId)
     return false;
   if (wstatus.lastTime.secsTo(AOptions.time)>2*60)
     return false;
+
   return true;
+}
+
+void SimpleMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
+{
+  StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
+  if (view)
+  {
+    QString variant = QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant);
+    view->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variant,QString::null));
+  }
 }
 
 QString SimpleMessageStyle::makeStyleTemplate() const
@@ -218,17 +237,14 @@ void SimpleMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOp
   QString background;
   if (FAllowCustomBackground)
   {
-    if (!AOptions.options.value(MSO_BG_IMAGE_FILE).toString().isEmpty())
+    if (!AOptions.extended.value(MSO_BG_IMAGE_FILE).toString().isEmpty())
     {
-      background.append("background-image: url('%1');");
-      background = background.arg(AOptions.options.value(MSO_BG_IMAGE_FILE).toString());
+      background.append("background-image: url('%1'); ");
+      background = background.arg(QUrl::fromLocalFile(AOptions.extended.value(MSO_BG_IMAGE_FILE).toString()).toString());
     }
-    if (!AOptions.options.value(MSO_BG_COLOR).toString().isEmpty())
+    if (!AOptions.extended.value(MSO_BG_COLOR).toString().isEmpty())
     {
-      int r,g,b;
-      QColor color(AOptions.options.value(MSO_BG_COLOR).toString());
-      color.getRgb(&r,&g,&b);
-      background.append(QString("background-color: #%1%2%3);").arg(r,2).arg(g,2).arg(b,2));
+      background.append(QString("background-color: %1; ").arg(AOptions.extended.value(MSO_BG_COLOR).toString()));
     }
   }
   AHtml.replace("%bodyBackground%", background);
@@ -315,9 +331,7 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConte
   QString time = Qt::escape(AOptions.time.toString(timeFormat));
   AHtml.replace("%time%", time);
 
-  QString sColor = AOptions.senderColor;
-  if (sColor.isEmpty())
-    sColor = QString(SenderColors[qHash(AOptions.senderName) % SenderColorsCount]);
+  QString sColor = !AOptions.senderColor.isEmpty() ? AOptions.senderColor : senderColor(AOptions.senderId);
   AHtml.replace("%senderColor%",sColor);
 
   AHtml.replace("%sender%",AOptions.senderName);

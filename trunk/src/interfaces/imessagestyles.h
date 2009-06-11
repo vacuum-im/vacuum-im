@@ -13,8 +13,7 @@
 struct IMessageStyleOptions 
 {
   QString pluginId;
-  QString styleId;
-  QMap<QString, QVariant> options;
+  QMap<QString, QVariant> extended;
 };
 
 struct IMessageContentOptions 
@@ -50,6 +49,18 @@ struct IMessageContentOptions
   QString textBGColor;
 };
 
+class IMessageStyleSettings
+{
+public:
+  virtual QWidget *instance() =0;
+  virtual int messageType() const =0;
+  virtual QString context() const =0;
+  virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext) const =0;
+  virtual void loadSettings(int AMessageType, const QString &AContext) =0;
+signals:
+  virtual void settingsChanged() =0;
+};
+
 class IMessageStyle
 {
 public:
@@ -58,11 +69,12 @@ public:
   virtual QString styleId() const =0;
   virtual QList<QWidget *> styleWidgets() const =0;
   virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent) =0;
-  virtual void clearWidget(QWidget *AWidget, const IMessageStyleOptions &AOptions) =0;
+  virtual QString senderColor(const QString &ASenderId) const =0;
+  virtual void changeStyleOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true) =0;
   virtual void appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 signals:
   virtual void widgetAdded(QWidget *AWidget) const =0;
-  virtual void widgetCleared(QWidget *AWidget, const IMessageStyleOptions &AOptions) const =0;
+  virtual void styleOptionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const =0;
   virtual void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const =0;
   virtual void urlClicked(QWidget *AWidget, const QUrl &AUrl) const =0;
 };
@@ -73,7 +85,8 @@ public:
   virtual QObject *instance() = 0;
   virtual QString stylePluginId() const =0;
   virtual QList<QString> styles() const =0;
-  virtual IMessageStyle *styleById(const QString &AStyleId) =0;
+  virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions) =0;
+  virtual IMessageStyleSettings *styleSettings(int AMessageType, const QString &AContext, QWidget *AParent = NULL) =0;
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const =0;
   virtual void setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext = QString::null) =0;
 signals:
@@ -87,7 +100,7 @@ public:
   virtual QObject *instance() = 0;
   virtual QList<QString> stylePlugins() const =0;
   virtual IMessageStylePlugin *stylePluginById(const QString &APluginId) const =0;
-  virtual IMessageStyle *styleById(const QString &APluginId, const QString &AStyleId) const =0;
+  virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions) const =0;
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const =0;
   virtual void setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext = QString::null) =0;
   virtual QString userAvatar(const Jid &AContactJid) const =0;
@@ -95,8 +108,11 @@ public:
   virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const =0;
   virtual QString userIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const =0;
   virtual QString timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const =0;
+signals:
+  virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const =0;
 };
 
+Q_DECLARE_INTERFACE(IMessageStyleSettings,"Vacuum.Plugin.IMessageStyleSettings/1.0")
 Q_DECLARE_INTERFACE(IMessageStyle,"Vacuum.Plugin.IMessageStyle/1.0")
 Q_DECLARE_INTERFACE(IMessageStylePlugin,"Vacuum.Plugin.IMessageStylePlugin/1.0")
 Q_DECLARE_INTERFACE(IMessageStyles,"Vacuum.Plugin.IMessageStyles/1.0")

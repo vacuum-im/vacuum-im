@@ -640,11 +640,11 @@ void ViewHistoryWindow::setMessageStyle()
   if (FMessageStyles)
   {
     IMessageStyleOptions soptions = FMessageStyles->styleOptions(FViewOptions.isGroupchat ? Message::GroupChat : Message::Chat);
-    IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
+    IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
     if (style != FViewWidget->messageStyle())
       FViewWidget->setMessageStyle(style,soptions);
     else if (style)
-      style->clearWidget(FViewWidget->styleWidget(),soptions);
+      style->changeStyleOptions(FViewWidget->styleWidget(),soptions);
   }
 }
 

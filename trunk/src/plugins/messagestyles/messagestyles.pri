@@ -1,3 +1,7 @@
-HEADERS = messagestyles.h
+FORMS = styleoptionswidget.ui
 
-SOURCES = messagestyles.cpp
+HEADERS = messagestyles.h \
+          styleoptionswidget.h
+
+SOURCES = messagestyles.cpp \
+          styleoptionswidget.cpp

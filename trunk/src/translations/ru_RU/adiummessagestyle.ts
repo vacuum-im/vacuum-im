@@ -23,4 +23,82 @@
         <translation>Стиль оформления сообщений от Adium</translation>
     </message>
 </context>
+<context>
+    <name>AdiumOptionsWidget</name>
+    <message>
+        <source>Default</source>
+        <translation>По умолчанию</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Обычное</translation>
+    </message>
+    <message>
+        <source>Center</source>
+        <translation>По центру</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation>Мозаика</translation>
+    </message>
+    <message>
+        <source>Title center</source>
+        <translation>Мозаика по середине</translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation>Растянуть</translation>
+    </message>
+    <message>
+        <source>Select font family and size</source>
+        <translation>Сыберите тип шрифта и его размер</translation>
+    </message>
+    <message>
+        <source>Select background image</source>
+        <translation>Выберите фоновую картинку</translation>
+    </message>
+    <message>
+        <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
+        <translation>Файлы изображений (*.png *.jpg *.bmp *.gif)</translation>
+    </message>
+</context>
+<context>
+    <name>AdiumOptionsWidgetClass</name>
+    <message>
+        <source>Message Style:</source>
+        <translation>Стиль:</translation>
+    </message>
+    <message>
+        <source>Variant:</source>
+        <translation>Вариант:</translation>
+    </message>
+    <message>
+        <source>Text Font:</source>
+        <translation>Шрифт:</translation>
+    </message>
+    <message>
+        <source>Set Font...</source>
+        <translation>Шрифт...</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Сбросить</translation>
+    </message>
+    <message>
+        <source>Background:</source>
+        <translation>Фон:</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Цвет:</translation>
+    </message>
+    <message>
+        <source>Set Image...</source>
+        <translation>Изображение...</translation>
+    </message>
+    <message>
+        <source>Layout:</source>
+        <translation>Расположение:</translation>
+    </message>
+</context>
 </TS>

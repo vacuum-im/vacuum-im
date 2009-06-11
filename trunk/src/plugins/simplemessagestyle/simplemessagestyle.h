@@ -7,6 +7,15 @@
 #include "../../utils/filestorage.h"
 #include "styleviewer.h"
 
+//Message Style Info Values
+#define MSIV_NAME                           "Name"
+#define MSIV_DEFAULT_VARIANT                "DefaultVariant"
+#define MSIV_DEFAULT_FONT_FAMILY            "DefaultFontFamily"
+#define MSIV_DEFAULT_FONT_SIZE              "DefaultFontSize"
+#define MSIV_DISABLE_COMBINE_CONSECUTIVE    "DisableCombineConsecutive"
+#define MSIV_DEFAULT_BACKGROUND_COLOR       "DefaultBackgroundColor"
+#define MSIV_DISABLE_CUSTOM_BACKGROUND      "DisableCustomBackground"
+
 //Message Status Message Classes
 #define MSMC_MESSAGE                        "message"
 #define MSMC_EVENT                          "event"
@@ -19,19 +28,11 @@
 #define MSMC_GROUPCHAT                      "groupchat"
 #define MSMC_MENTION                        "mention"
 
-//Message Style Info Values
-#define MSIV_NAME                           "Name"
-#define MSIV_DEFAULT_VARIANT                "DefaultVariant"
-#define MSIV_DEFAULT_FONT_FAMILY            "DefaultFontFamily"
-#define MSIV_DEFAULT_FONT_SIZE              "DefaultFontSize"
-#define MSIV_SHOW_USER_ICONS                "ShowsUserIcons"
-#define MSIV_ALLOW_TEXT_COLORS              "AllowTextColors"
-#define MSIV_DISABLE_COMBINE_CONSECUTIVE    "DisableCombineConsecutive"
-#define MSIV_DEFAULT_BACKGROUND_COLOR       "DefaultBackgroundColor"
-#define MSIV_DISABLE_CUSTOM_BACKGROUND      "DisableCustomBackground"
-
 //Message Style Options
+#define MSO_STYLE_ID                        "styleId"
 #define MSO_VARIANT                         "variant"
+#define MSO_FONT_FAMILY                     "fontFamily"
+#define MSO_FONT_SIZE                       "fontSize"
 #define MSO_BG_COLOR                        "bgColor"
 #define MSO_BG_IMAGE_FILE                   "bgImageFile"
 
@@ -57,24 +58,23 @@ public:
   virtual QString styleId() const;
   virtual QList<QWidget *> styleWidgets() const;
   virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
-  virtual void clearWidget(QWidget *AWidget, const IMessageStyleOptions &AOptions);
+  virtual QString senderColor(const QString &ASenderId) const;
+  virtual void changeStyleOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
   virtual void appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
   //ISimpleMessageStyle
   virtual QMap<QString, QVariant> infoValues() const;
   virtual QList<QString> variants() const;
-  virtual void setVariant(QWidget *AWidget, const QString  &AVariant);
 signals:
   virtual void widgetAdded(QWidget *AWidget) const;
-  virtual void widgetCleared(QWidget *AWidget, const IMessageStyleOptions &AOptions) const;
+  virtual void styleOptionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
   virtual void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const;
   virtual void urlClicked(QWidget *AWidget, const QUrl &AUrl) const;
-  //ISimpleMessageStyle
-  virtual void variantChanged(QWidget *AWidget, const QString  &AVariant) const;
 public:
   static QList<QString> styleVariants(const QString &AStylePath);
   static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
 protected:
   bool isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const;
+  void setVariant(QWidget *AWidget, const QString  &AVariant);
   QString makeStyleTemplate() const;
   void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
   QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;

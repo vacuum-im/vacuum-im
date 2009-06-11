@@ -56,7 +56,10 @@
 #define MSSK_FILETRANSFER_CONPLETE          "fileTransferComplete"
 
 //Message Style Options
+#define MSO_STYLE_ID                        "styleId"
 #define MSO_VARIANT                         "variant"
+#define MSO_FONT_FAMILY                     "fontFamily"
+#define MSO_FONT_SIZE                       "fontSize"
 #define MSO_HEADER_TYPE                     "headerType"
 #define MSO_CHAT_NAME                       "chatName"
 #define MSO_ACCOUNT_NAME                    "accountName"
@@ -102,25 +105,24 @@ public:
   virtual QString styleId() const;
   virtual QList<QWidget *> styleWidgets() const;
   virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
-  virtual void clearWidget(QWidget *AWidget, const IMessageStyleOptions &AOptions);
+  virtual QString senderColor(const QString &ASenderId) const;
+  virtual void changeStyleOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
   virtual void appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
-  //IAdiumMessageStyle
+  //AdiumMessageStyle
   virtual int version() const;
   virtual QMap<QString, QVariant> infoValues() const;
   virtual QList<QString> variants() const;
-  virtual void setVariant(QWidget *AWidget, const QString  &AVariant);
 signals:
   virtual void widgetAdded(QWidget *AWidget) const;
-  virtual void widgetCleared(QWidget *AWidget, const IMessageStyleOptions &AOptions) const;
+  virtual void styleOptionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
   virtual void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const;
   virtual void urlClicked(QWidget *AWidget, const QUrl &AUrl) const;
-  //IAdiumMessageStyle
-  virtual void variantChanged(QWidget *AWidget, const QString  &AVariant) const;
 public:
   static QList<QString> styleVariants(const QString &AStylePath);
   static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
 protected:
   bool isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const;
+  void setVariant(QWidget *AWidget, const QString  &AVariant);
   QString makeStyleTemplate(const IMessageStyleOptions &AOptions) const;
   void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
   QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;

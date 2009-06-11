@@ -2,7 +2,7 @@
 
 #include <QCoreApplication>
 
-#define SVN_PLUGIN_ID                  "style%1[]:pluginId"
+#define SVN_PLUGIN_ID                  "style[]:pluginId"
 
 MessageStyles::MessageStyles()
 {
@@ -35,9 +35,7 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
   {
     IMessageStylePlugin *stylePlugin = qobject_cast<IMessageStylePlugin *>(plugin->instance());
     if (stylePlugin)
-    {
       FStylePlugins.insert(stylePlugin->stylePluginId(),stylePlugin);
-    }
   }
 
   IPlugin *plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
@@ -70,6 +68,30 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
   return true;
 }
 
+bool MessageStyles::initObjects()
+{
+  if (FSettingsPlugin)
+  {
+    FSettingsPlugin->insertOptionsHolder(this);
+    FSettingsPlugin->openOptionsNode(ON_MESSAGE_STYLES,tr("Message Styles"),tr("Styles options for custom messages"),MNI_MESSAGE_STYLES,ONO_MESSAGE_STYLES);
+  }
+  return true;
+}
+
+QWidget *MessageStyles::optionsWidget(const QString &ANode, int &AOrder)
+{
+  if (ANode == ON_MESSAGE_STYLES && !FStylePlugins.isEmpty())
+  {
+    AOrder = OWO_MESSAGE_STYLES;
+    StyleOptionsWidget *widget = new StyleOptionsWidget(this);
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),this,SIGNAL(optionsRejected()));
+    connect(widget,SIGNAL(optionsApplied()),this,SIGNAL(optionsAccepted()));
+    return widget;
+  }
+  return NULL;
+}
+
 QList<QString> MessageStyles::stylePlugins() const
 {
   return FStylePlugins.keys();
@@ -80,10 +102,10 @@ IMessageStylePlugin *MessageStyles::stylePluginById(const QString &APluginId) co
   return FStylePlugins.value(APluginId,NULL);
 }
 
-IMessageStyle *MessageStyles::styleById(const QString &APluginId, const QString &AStyleId) const
+IMessageStyle *MessageStyles::styleForOptions(const IMessageStyleOptions &AOptions) const
 {
-  IMessageStylePlugin *stylePlugin = stylePluginById(APluginId);
-  return stylePlugin!=NULL ? stylePlugin->styleById(AStyleId) : NULL;
+  IMessageStylePlugin *stylePlugin = stylePluginById(AOptions.pluginId);
+  return stylePlugin!=NULL ? stylePlugin->styleForOptions(AOptions) : NULL;
 }
 
 IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString &AContext) const
@@ -91,8 +113,9 @@ IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString
   QString pluginId;
   if (FSettingsPlugin)
   {
+    QString ns = QString::number(AMessageType)+"|"+AContext;
     ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    pluginId = settings->valueNS(QString(SVN_PLUGIN_ID).arg(AMessageType),AContext).toString();
+    pluginId = settings->valueNS(SVN_PLUGIN_ID,ns).toString();
   }
 
   if (!FStylePlugins.contains(pluginId))
@@ -109,10 +132,20 @@ IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString
 void MessageStyles::setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)
 {
   IMessageStylePlugin *stylePlugin = stylePluginById(AOptions.pluginId);
-  if (stylePlugin)
+  if (FSettingsPlugin)
   {
-    stylePlugin->setStyleOptions(AOptions,AMessageType,AContext);
+    QString ns = QString::number(AMessageType)+"|"+AContext;
+    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
+    if (stylePlugin)
+      settings->setValueNS(SVN_PLUGIN_ID,ns,AOptions.pluginId);
+    else
+      settings->deleteNS(ns);
   }
+
+  if (stylePlugin)
+    stylePlugin->setStyleOptions(AOptions,AMessageType,AContext);
+
+  emit styleOptionsChanged(AOptions,AMessageType,AContext);
 }
 
 QString MessageStyles::userAvatar(const Jid &AContactJid) const
