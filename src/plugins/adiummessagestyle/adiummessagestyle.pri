@@ -7,5 +7,5 @@ HEADERS = adiummessagestyleplugin.h \
 
 SOURCES = adiummessagestyleplugin.cpp \
           adiummessagestyle.cpp \
-          adiumoptionswidget.cpp
+          adiumoptionswidget.cpp \
           styleviewer.cpp
