@@ -8,6 +8,7 @@
 #include "../../utils/filestorage.h"
 #include "../../utils/message.h"
 #include "adiummessagestyle.h"
+#include "adiumoptionswidget.h"
 
 #define ADIUMMESSAGESTYLE_UUID    "{703bae73-1905-4840-a186-c70b359d4f21}"
 
@@ -32,9 +33,13 @@ public:
   //IMessageStylePlugin
   virtual QString stylePluginId() const;
   virtual QList<QString> styles() const;
-  virtual IMessageStyle *styleById(const QString &AStyleId);
+  virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions);
+  virtual IMessageStyleSettings *styleSettings(int AMessageType, const QString &AContext, QWidget *AParent = NULL);
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const;
   virtual void setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext = QString::null);
+  //AdiumMessageStylePlugin
+  QList<QString> styleVariants(const QString &AStyleId) const;
+  QMap<QString,QVariant> styleInfo(const QString &AStyleId) const;
 signals:
   virtual void styleCreated(IMessageStyle *AStyle) const;
   virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const;
@@ -44,7 +49,7 @@ private:
   ISettingsPlugin *FSettingsPlugin;
 private:
   QMap<QString, QString> FStylePaths;
-  QMap<QString, IMessageStyle *> FStyles;
+  QMap<QString, AdiumMessageStyle *> FStyles;
 };
 
 #endif // ADIUMMESSAGESTYLEPLUGIN_H

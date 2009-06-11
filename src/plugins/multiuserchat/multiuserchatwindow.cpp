@@ -935,12 +935,12 @@ void MultiUserChatWindow::setMessageStyle(bool AClear)
     IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::GroupChat);
     if (!AClear)
     {
-      IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
+      IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
       FViewWidget->setMessageStyle(style,soptions);
     }
     else if (FViewWidget->messageStyle()!=NULL)
     {
-      FViewWidget->messageStyle()->clearWidget(FViewWidget->styleWidget(),soptions);
+      FViewWidget->messageStyle()->changeStyleOptions(FViewWidget->styleWidget(),soptions);
     }
     FWindowStatus.remove(FViewWidget);
   }
@@ -1053,7 +1053,7 @@ void MultiUserChatWindow::setChatMessageStyle(IChatWindow *AWindow)
   if (FMessageStyles && AWindow)
   {
     IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-    IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
+    IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
     AWindow->viewWidget()->setMessageStyle(style,soptions);
   }
 }

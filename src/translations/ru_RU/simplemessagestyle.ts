@@ -23,4 +23,58 @@
         <translation>Упрощенный стиль сообщений</translation>
     </message>
 </context>
+<context>
+    <name>SimpleOptionsWidget</name>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">По умолчанию</translation>
+    </message>
+    <message>
+        <source>Select font family and size</source>
+        <translation>Выберите тип и размер шрифта</translation>
+    </message>
+    <message>
+        <source>Select background image</source>
+        <translation>Выберите фоновое изображение</translation>
+    </message>
+    <message>
+        <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
+        <translation>Файлы изображений  (*.png *.jpg *.bmp *.gif)</translation>
+    </message>
+</context>
+<context>
+    <name>SimpleOptionsWidgetClass</name>
+    <message>
+        <source>Message Style:</source>
+        <translation>Стиль:</translation>
+    </message>
+    <message>
+        <source>Variant:</source>
+        <translation>Вариант:</translation>
+    </message>
+    <message>
+        <source>Text Font:</source>
+        <translation>Шрифт:</translation>
+    </message>
+    <message>
+        <source>Set Font...</source>
+        <translation>Шрифт...</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Сбросить</translation>
+    </message>
+    <message>
+        <source>Background:</source>
+        <translation>Фон:</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Цвет:</translation>
+    </message>
+    <message>
+        <source>Set Image...</source>
+        <translation>Изображение...</translation>
+    </message>
+</context>
 </TS>

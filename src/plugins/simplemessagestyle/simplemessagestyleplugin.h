@@ -7,6 +7,7 @@
 #include "../../interfaces/isettings.h"
 #include "../../utils/message.h"
 #include "simplemessagestyle.h"
+#include "simpleoptionswidget.h"
 
 #define SIMPLEMESSAGESTYLE_UUID   "{cfad7d10-58d0-4638-9940-dda64c1dd509}"
 
@@ -31,9 +32,13 @@ public:
   //IMessageStylePlugin
   virtual QString stylePluginId() const;
   virtual QList<QString> styles() const;
-  virtual IMessageStyle *styleById(const QString &AStyleId);
+  virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions);
+  virtual IMessageStyleSettings *styleSettings(int AMessageType, const QString &AContext, QWidget *AParent = NULL);
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const;
   virtual void setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext = QString::null);
+  //SimpleMessageStylePlugin
+  QList<QString> styleVariants(const QString &AStyleId) const;
+  QMap<QString,QVariant> styleInfo(const QString &AStyleId) const;
 signals:
   virtual void styleCreated(IMessageStyle *AStyle) const;
   virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const;
@@ -43,7 +48,7 @@ private:
   ISettingsPlugin *FSettingsPlugin;
 private:
   QMap<QString, QString> FStylePaths;
-  QMap<QString, IMessageStyle *> FStyles;
+  QMap<QString, SimpleMessageStyle *> FStyles;
 };
 
 #endif // SIMPLEMESSAGESTYLEPLUGIN_H

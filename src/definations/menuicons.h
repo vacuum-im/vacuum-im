@@ -85,6 +85,9 @@
 //NormalMessageHandler
 #define MNI_NORMAL_MHANDLER_MESSAGE     "normalmessagehandlerMessage"
 
+//MessageStyles
+#define MNI_MESSAGE_STYLES              "messagestyles"
+
 //MessageWidgets
 #define MNI_MESSAGEWIDGETS_CLOSE_TAB    "messagewidgetsCloseTab"
 

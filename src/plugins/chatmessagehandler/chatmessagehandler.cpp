@@ -292,7 +292,7 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 void ChatMessageHandler::setMessageStyle(IChatWindow *AWindow)
 {
   IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-  IMessageStyle *style = FMessageStyles->styleById(soptions.pluginId,soptions.styleId);
+  IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
   AWindow->viewWidget()->setMessageStyle(style,soptions);
 }
 
