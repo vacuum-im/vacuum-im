@@ -644,7 +644,7 @@ void ViewHistoryWindow::setMessageStyle()
     if (style != FViewWidget->messageStyle())
       FViewWidget->setMessageStyle(style,soptions);
     else if (style)
-      style->changeStyleOptions(FViewWidget->styleWidget(),soptions);
+      style->changeOptions(FViewWidget->styleWidget(),soptions);
   }
 }
 

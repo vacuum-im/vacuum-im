@@ -70,11 +70,12 @@ public:
   virtual QList<QWidget *> styleWidgets() const =0;
   virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent) =0;
   virtual QString senderColor(const QString &ASenderId) const =0;
-  virtual void changeStyleOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true) =0;
+  virtual void changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true) =0;
   virtual void appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 signals:
   virtual void widgetAdded(QWidget *AWidget) const =0;
-  virtual void styleOptionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const =0;
+  virtual void widgetRemoved(QWidget *AWidget) const =0;
+  virtual void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const =0;
   virtual void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const =0;
   virtual void urlClicked(QWidget *AWidget, const QUrl &AUrl) const =0;
 };
@@ -91,6 +92,9 @@ public:
   virtual void setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext = QString::null) =0;
 signals:
   virtual void styleCreated(IMessageStyle *AStyle) const =0;
+  virtual void styleDestroyed(IMessageStyle *AStyle) const =0;
+  virtual void styleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget) const =0;
+  virtual void styleWidgetRemoved(IMessageStyle *AStyle, QWidget *AWidget) const =0;
   virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const =0;
 };
 

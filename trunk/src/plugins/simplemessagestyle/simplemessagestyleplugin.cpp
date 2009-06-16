@@ -1,6 +1,7 @@
 #include "simplemessagestyleplugin.h"
 
 #include <QDir>
+#include <QTimer>
 #include <QCoreApplication>
 
 #define SVN_STYLE                     "style[]"
@@ -68,11 +69,13 @@ IMessageStyle *SimpleMessageStylePlugin::styleForOptions(const IMessageStyleOpti
       if (style->isValid())
       {
         FStyles.insert(styleId,style);
+        connect(style,SIGNAL(widgetAdded(QWidget *)),SLOT(onStyleWidgetAdded(QWidget *)));
+        connect(style,SIGNAL(widgetRemoved(QWidget *)),SLOT(onStyleWidgetRemoved(QWidget *)));
         emit styleCreated(style);
       }
       else
       {
-        style->instance()->deleteLater();
+        delete style;
       }
     }
   }
@@ -81,6 +84,7 @@ IMessageStyle *SimpleMessageStylePlugin::styleForOptions(const IMessageStyleOpti
 
 IMessageStyleSettings *SimpleMessageStylePlugin::styleSettings(int AMessageType, const QString &AContext, QWidget *AParent)
 {
+  updateAvailStyles();
   return new SimpleOptionsWidget(this,AMessageType,AContext,AParent);
 }
 
@@ -188,7 +192,6 @@ QMap<QString,QVariant> SimpleMessageStylePlugin::styleInfo(const QString &AStyle
 
 void SimpleMessageStylePlugin::updateAvailStyles()
 {
-  FStylePaths.clear();
   QDir dir(qApp->applicationDirPath());
   if (dir.cd(STORAGE_DIR) && dir.cd(RSR_STORAGE_SIMPLEMESSAGESTYLES))
   {
@@ -198,17 +201,54 @@ void SimpleMessageStylePlugin::updateAvailStyles()
     {
       if (dir.cd(styleDir))
       {
-        bool valid = QFile::exists(dir.absoluteFilePath("Info.plist"));
-        valid = valid &&  QFile::exists(dir.absoluteFilePath("Incoming/Content.html"));
-        if (valid)
+        if (!FStylePaths.values().contains(dir.absolutePath()))
         {
-          QMap<QString, QVariant> info = SimpleMessageStyle::styleInfo(dir.absolutePath());
-          if (!info.value(MSIV_NAME).toString().isEmpty())
-            FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
+          bool valid = QFile::exists(dir.absoluteFilePath("Info.plist"));
+          valid = valid &&  QFile::exists(dir.absoluteFilePath("Incoming/Content.html"));
+          if (valid)
+          {
+            QMap<QString, QVariant> info = SimpleMessageStyle::styleInfo(dir.absolutePath());
+            if (!info.value(MSIV_NAME).toString().isEmpty())
+              FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
+          }
         }
         dir.cdUp();
       }
     }
+  }
+}
+
+void SimpleMessageStylePlugin::onStyleWidgetAdded(QWidget *AWidget)
+{
+  SimpleMessageStyle *style = qobject_cast<SimpleMessageStyle *>(sender());
+  if (style)
+    emit styleWidgetAdded(style,AWidget);
+}
+
+void SimpleMessageStylePlugin::onStyleWidgetRemoved(QWidget *AWidget)
+{
+  SimpleMessageStyle *style = qobject_cast<SimpleMessageStyle *>(sender());
+  if (style)
+  {
+    if (style->styleWidgets().isEmpty())
+      QTimer::singleShot(0,this,SLOT(onClearEmptyStyles()));
+    emit styleWidgetRemoved(style,AWidget);
+  }
+}
+
+void SimpleMessageStylePlugin::onClearEmptyStyles()
+{
+  QMap<QString, SimpleMessageStyle *>::iterator it = FStyles.begin();
+  while (it!=FStyles.end())
+  {
+    if (it.value()->styleWidgets().isEmpty())
+    {
+      it = FStyles.erase(it);
+      emit styleDestroyed(it.value());
+      delete it.value();
+    }
+    else
+      it++;
   }
 }
 
