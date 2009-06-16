@@ -94,7 +94,7 @@ QString AdiumMessageStyle::senderColor(const QString &ASenderId) const
 void AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-  if (view)
+  if (view && AOptions.extended.value(MSO_STYLE_ID).toString()==styleId())
   {
     if (!FWidgetStatus.contains(AWidget))
     {
