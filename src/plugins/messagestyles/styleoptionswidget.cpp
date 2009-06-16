@@ -197,7 +197,7 @@ void StyleOptionsWidget::onStyleSettingsChanged()
   }
   else if (FActiveStyle)
   {
-    FActiveStyle->changeStyleOptions(FActiveView,soptions);
+    FActiveStyle->changeOptions(FActiveView,soptions);
   }
   createViewContent();
 }

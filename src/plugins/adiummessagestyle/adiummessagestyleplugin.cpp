@@ -1,6 +1,7 @@
 #include "adiummessagestyleplugin.h"
 
 #include <QDir>
+#include <QTimer>
 #include <QCoreApplication>
 
 #define SVN_STYLE                     "style[]"
@@ -69,6 +70,8 @@ IMessageStyle *AdiumMessageStylePlugin::styleForOptions(const IMessageStyleOptio
       if (style->isValid())
       {
         FStyles.insert(styleId,style);
+        connect(style,SIGNAL(widgetAdded(QWidget *)),SLOT(onStyleWidgetAdded(QWidget *)));
+        connect(style,SIGNAL(widgetRemoved(QWidget *)),SLOT(onStyleWidgetRemoved(QWidget *)));
         emit styleCreated(style);
       }
       else
@@ -82,6 +85,7 @@ IMessageStyle *AdiumMessageStylePlugin::styleForOptions(const IMessageStyleOptio
 
 IMessageStyleSettings *AdiumMessageStylePlugin::styleSettings(int AMessageType, const QString &AContext, QWidget *AParent)
 {
+  updateAvailStyles();
   return new AdiumOptionsWidget(this,AMessageType,AContext,AParent);
 }
 
@@ -188,7 +192,6 @@ QMap<QString,QVariant> AdiumMessageStylePlugin::styleInfo(const QString &AStyleI
 
 void AdiumMessageStylePlugin::updateAvailStyles()
 {
-  FStylePaths.clear();
   QDir dir(qApp->applicationDirPath());
   if (dir.cd(STORAGE_DIR) && dir.cd(RSR_STORAGE_ADIUMMESSAGESTYLES))
   {
@@ -198,17 +201,54 @@ void AdiumMessageStylePlugin::updateAvailStyles()
     {
       if (dir.cd(styleDir))
       {
-        bool valid = QFile::exists(dir.absoluteFilePath("Contents/Info.plist"));
-        valid = valid &&  QFile::exists(dir.absoluteFilePath("Contents/Resources/Incoming/Content.html"));
-        if (valid)
+        if (!FStylePaths.values().contains(dir.absolutePath()))
         {
-          QMap<QString, QVariant> info = AdiumMessageStyle::styleInfo(dir.absolutePath());
-          if (!info.value(MSIV_NAME).toString().isEmpty())
-            FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
+          bool valid = QFile::exists(dir.absoluteFilePath("Contents/Info.plist"));
+          valid = valid &&  QFile::exists(dir.absoluteFilePath("Contents/Resources/Incoming/Content.html"));
+          if (valid)
+          {
+            QMap<QString, QVariant> info = AdiumMessageStyle::styleInfo(dir.absolutePath());
+            if (!info.value(MSIV_NAME).toString().isEmpty())
+              FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
+          }
         }
         dir.cdUp();
       }
     }
+  }
+}
+
+void AdiumMessageStylePlugin::onStyleWidgetAdded(QWidget *AWidget)
+{
+  AdiumMessageStyle *style = qobject_cast<AdiumMessageStyle *>(sender());
+  if (style)
+    emit styleWidgetAdded(style,AWidget);
+}
+
+void AdiumMessageStylePlugin::onStyleWidgetRemoved(QWidget *AWidget)
+{
+  AdiumMessageStyle *style = qobject_cast<AdiumMessageStyle *>(sender());
+  if (style)
+  {
+    if (style->styleWidgets().isEmpty())
+      QTimer::singleShot(0,this,SLOT(onClearEmptyStyles()));
+    emit styleWidgetRemoved(style,AWidget);
+  }
+}
+
+void AdiumMessageStylePlugin::onClearEmptyStyles()
+{
+  QMap<QString, AdiumMessageStyle *>::iterator it = FStyles.begin();
+  while (it!=FStyles.end())
+  {
+    if (it.value()->styleWidgets().isEmpty())
+    {
+      it = FStyles.erase(it);
+      emit styleDestroyed(it.value());
+      delete it.value();
+    }
+    else
+      it++;
   }
 }
 

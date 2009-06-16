@@ -940,7 +940,7 @@ void MultiUserChatWindow::setMessageStyle(bool AClear)
     }
     else if (FViewWidget->messageStyle()!=NULL)
     {
-      FViewWidget->messageStyle()->changeStyleOptions(FViewWidget->styleWidget(),soptions);
+      FViewWidget->messageStyle()->changeOptions(FViewWidget->styleWidget(),soptions);
     }
     FWindowStatus.remove(FViewWidget);
   }

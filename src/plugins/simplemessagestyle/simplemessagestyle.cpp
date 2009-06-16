@@ -36,6 +36,7 @@ SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QObject *APare
   FVariants = styleVariants(AStylePath);
   initStyleSettings();
   loadTemplates();
+  connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
 }
 
 SimpleMessageStyle::~SimpleMessageStyle()
@@ -61,7 +62,7 @@ QList<QWidget *> SimpleMessageStyle::styleWidgets() const
 QWidget *SimpleMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
 {
   StyleViewer *view = new StyleViewer(AParent);
-  changeStyleOptions(view,AOptions,true);
+  changeOptions(view,AOptions,true);
   return view;
 }
 
@@ -70,7 +71,7 @@ QString SimpleMessageStyle::senderColor(const QString &ASenderId) const
   return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
-void SimpleMessageStyle::changeStyleOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
+void SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
   if (view)
@@ -106,7 +107,7 @@ void SimpleMessageStyle::changeStyleOptions(QWidget *AWidget, const IMessageStyl
       font.setFamily(fontFamily);
     view->document()->setDefaultFont(font);
 
-    emit styleOptionsChanged(AWidget,AOptions,AClean);
+    emit optionsChanged(AWidget,AOptions,AClean);
   }
 }
 
@@ -412,7 +413,17 @@ void SimpleMessageStyle::onScrollAfterResize()
   }
 }
 
+void SimpleMessageStyle::onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget)
+{
+  if (AStyle!=this && FWidgetStatus.contains(AWidget))
+  {
+    FWidgetStatus.remove(AWidget);
+    emit widgetRemoved(AWidget);
+  }
+}
+
 void SimpleMessageStyle::onStyleWidgetDestroyed(QObject *AObject)
 {
   FWidgetStatus.remove((QWidget *)AObject);
+  emit widgetRemoved((QWidget *)AObject);
 }

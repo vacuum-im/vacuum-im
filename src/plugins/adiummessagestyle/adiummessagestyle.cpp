@@ -53,6 +53,7 @@ AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QObject *AParent
   initStyleSettings();
   loadTemplates();
   loadSenderColors();
+  connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
 }
 
 AdiumMessageStyle::~AdiumMessageStyle()
@@ -79,7 +80,7 @@ QWidget *AdiumMessageStyle::createWidget(const IMessageStyleOptions &AOptions, Q
 {
   StyleViewer *view = new StyleViewer(AParent);
   view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-  changeStyleOptions(view,AOptions,true);
+  changeOptions(view,AOptions,true);
   return view;
 }
 
@@ -90,7 +91,7 @@ QString AdiumMessageStyle::senderColor(const QString &ASenderId) const
   return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
-void AdiumMessageStyle::changeStyleOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
+void AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
   if (view)
@@ -123,7 +124,7 @@ void AdiumMessageStyle::changeStyleOptions(QWidget *AWidget, const IMessageStyle
     view->page()->settings()->setFontSize(QWebSettings::DefaultFontSize, fontSize!=0 ? fontSize : QWebSettings::globalSettings()->fontSize(QWebSettings::DefaultFontSize));
     view->page()->settings()->setFontFamily(QWebSettings::StandardFont, !fontFamily.isEmpty() ? fontFamily : QWebSettings::globalSettings()->fontFamily(QWebSettings::StandardFont));
 
-    emit styleOptionsChanged(AWidget,AOptions,AClean);
+    emit optionsChanged(AWidget,AOptions,AClean);
   }
 }
 
@@ -536,7 +537,17 @@ void AdiumMessageStyle::onLinkClicked(const QUrl &AUrl)
   emit urlClicked(view,AUrl);
 }
 
+void AdiumMessageStyle::onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget)
+{
+  if (AStyle!=this && FWidgetStatus.contains(AWidget))
+  {
+    FWidgetStatus.remove(AWidget);
+    emit widgetRemoved(AWidget);
+  }
+}
+
 void AdiumMessageStyle::onStyleWidgetDestroyed(QObject *AObject)
 {
   FWidgetStatus.remove((QWidget *)AObject);
+  emit widgetRemoved((QWidget *)AObject);
 }

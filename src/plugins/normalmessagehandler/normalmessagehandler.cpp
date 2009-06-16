@@ -254,7 +254,7 @@ void NormalMessageHandler::setMessageStyle(IMessageWindow *AWindow)
   if (style != AWindow->viewWidget()->messageStyle())
     AWindow->viewWidget()->setMessageStyle(style,soptions);
   else if (AWindow->viewWidget()->messageStyle() != NULL)
-    AWindow->viewWidget()->messageStyle()->changeStyleOptions(AWindow->viewWidget()->styleWidget(),soptions);
+    AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions);
 }
 
 void NormalMessageHandler::fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const

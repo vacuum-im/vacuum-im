@@ -64,7 +64,7 @@
     </message>
     <message>
         <source>Message body line 1</source>
-        <translation>Тело сообщенияч, строка 1</translation>
+        <translation>Тело сообщения, строка 1</translation>
     </message>
     <message>
         <source>Message body line 2</source>

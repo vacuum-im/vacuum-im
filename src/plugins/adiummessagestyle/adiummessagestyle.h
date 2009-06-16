@@ -106,7 +106,7 @@ public:
   virtual QList<QWidget *> styleWidgets() const;
   virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
   virtual QString senderColor(const QString &ASenderId) const;
-  virtual void changeStyleOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
+  virtual void changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
   virtual void appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
   //AdiumMessageStyle
   virtual int version() const;
@@ -114,7 +114,8 @@ public:
   virtual QList<QString> variants() const;
 signals:
   virtual void widgetAdded(QWidget *AWidget) const;
-  virtual void styleOptionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
+  virtual void widgetRemoved(QWidget *AWidget) const;
+  virtual void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
   virtual void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const;
   virtual void urlClicked(QWidget *AWidget, const QUrl &AUrl) const;
 public:
@@ -135,6 +136,7 @@ protected:
   void initStyleSettings();
 protected slots:
   void onLinkClicked(const QUrl &AUrl);
+  void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
   void onStyleWidgetDestroyed(QObject *AObject);
 private:
   QString FTopicHTML;
