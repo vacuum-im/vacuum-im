@@ -1,5 +1,7 @@
 #include "simplemessagestyleplugin.h"
 
+#include <QtDebug>
+
 #include <QDir>
 #include <QTimer>
 #include <QCoreApplication>
@@ -241,11 +243,12 @@ void SimpleMessageStylePlugin::onClearEmptyStyles()
   QMap<QString, SimpleMessageStyle *>::iterator it = FStyles.begin();
   while (it!=FStyles.end())
   {
-    if (it.value()->styleWidgets().isEmpty())
+    SimpleMessageStyle *style = it.value();
+    if (style->styleWidgets().isEmpty())
     {
       it = FStyles.erase(it);
-      emit styleDestroyed(it.value());
-      delete it.value();
+      emit styleDestroyed(style);
+      delete style;
     }
     else
       it++;

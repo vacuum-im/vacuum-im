@@ -241,11 +241,12 @@ void AdiumMessageStylePlugin::onClearEmptyStyles()
   QMap<QString, AdiumMessageStyle *>::iterator it = FStyles.begin();
   while (it!=FStyles.end())
   {
-    if (it.value()->styleWidgets().isEmpty())
+    AdiumMessageStyle *style = it.value();
+    if (style->styleWidgets().isEmpty())
     {
       it = FStyles.erase(it);
-      emit styleDestroyed(it.value());
-      delete it.value();
+      emit styleDestroyed(style);
+      delete style;
     }
     else
       it++;
