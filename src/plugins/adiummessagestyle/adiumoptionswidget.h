@@ -20,6 +20,8 @@ public:
   virtual QWidget *instance() { return this; }
   virtual int messageType() const;
   virtual QString context() const;
+  virtual bool isModified(int AMessageType, const QString &AContext) const;
+  virtual void setModified(bool AModified, int AMessageType, const QString &AContext);
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext) const;
   virtual void loadSettings(int AMessageType, const QString &AContext);
 signals:
@@ -42,9 +44,11 @@ private:
 private:
   AdiumMessageStylePlugin *FStylePlugin;
 private:
+  bool FModifyEnabled;
   bool FTimerStarted;
   int FActiveType;
   QString FActiveContext;
+  QMap<int, QMap<QString, bool> > FModified;
   QMap<int, QMap<QString, IMessageStyleOptions> > FOptions;
 };
 

@@ -120,7 +120,7 @@ IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString
 
   if (!FStylePlugins.contains(pluginId))
   {
-    pluginId = "SimpleMessageStyle";
+    pluginId = "Simple";
     if (!FStylePlugins.contains(pluginId) && !FStylePlugins.isEmpty())
       pluginId = FStylePlugins.keys().first();
   }

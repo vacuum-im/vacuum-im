@@ -11,6 +11,7 @@ AdiumOptionsWidget::AdiumOptionsWidget(AdiumMessageStylePlugin *APlugin, int AMe
 {
   ui.setupUi(this);
 
+  FModifyEnabled = false;
   FTimerStarted = false;
   FStylePlugin = APlugin;
 
@@ -59,6 +60,16 @@ QString AdiumOptionsWidget::context() const
   return FActiveContext;
 }
 
+bool AdiumOptionsWidget::isModified(int AMessageType, const QString &AContext) const
+{
+  return FModified.value(AMessageType).value(AContext,false);
+}
+
+void AdiumOptionsWidget::setModified(bool AModified, int AMessageType, const QString &AContext)
+{
+  FModified[FActiveType][FActiveContext] = AModified;
+}
+
 IMessageStyleOptions AdiumOptionsWidget::styleOptions(int AMessageType, const QString &AContext) const
 {
   if (FOptions.value(AMessageType).contains(AContext))
@@ -75,12 +86,16 @@ void AdiumOptionsWidget::loadSettings(int AMessageType, const QString &AContext)
   if (soptions.pluginId.isEmpty())
     soptions = FStylePlugin->styleOptions(FActiveType,FActiveContext);
 
+  FModifyEnabled = isModified(AMessageType,AContext);
   disconnect(ui.cmbVariant,SIGNAL(currentIndexChanged(int)),this,SLOT(onVariantChanged(int)));
+
   ui.cmbStyle->setCurrentIndex(ui.cmbStyle->findData(soptions.extended.value(MSO_STYLE_ID)));
   ui.cmbVariant->setCurrentIndex(ui.cmbVariant->findData(soptions.extended.value(MSO_VARIANT)));
   ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(soptions.extended.value(MSO_BG_COLOR)));
   ui.cmbImageLayout->setCurrentIndex(ui.cmbImageLayout->findData(soptions.extended.value(MSO_BG_IMAGE_LAYOUT)));
+
   connect(ui.cmbVariant,SIGNAL(currentIndexChanged(int)),SLOT(onVariantChanged(int)));
+  FModifyEnabled = true;
 
   updateOptionsWidgets();
   startSignalTimer();
@@ -121,10 +136,14 @@ void AdiumOptionsWidget::onStyleChanged(int AIndex)
 
   IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
   soptions.extended.insert(MSO_STYLE_ID,styleId);
+  FModified[FActiveType][FActiveContext] = FModifyEnabled;
 
   QMap<QString, QVariant> info = FStylePlugin->styleInfo(styleId);
   if (info.contains(MSIV_DEFAULT_VARIANT))
-    ui.cmbVariant->setCurrentIndex(ui.cmbVariant->findData(info.value(MSIV_DEFAULT_VARIANT)));
+  {
+    int index = ui.cmbVariant->findData(info.value(MSIV_DEFAULT_VARIANT));
+    ui.cmbVariant->setCurrentIndex(index>=0 ? index : 0);
+  }
 
   if (info.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool())
   {
@@ -149,6 +168,7 @@ void AdiumOptionsWidget::onVariantChanged(int AIndex)
 {
   IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
   soptions.extended.insert(MSO_VARIANT,ui.cmbVariant->itemData(AIndex));
+  FModified[FActiveType][FActiveContext] = FModifyEnabled;
   startSignalTimer();
 }
 
@@ -162,6 +182,7 @@ void AdiumOptionsWidget::onSetFontClicked()
   {
     soptions.extended.insert(MSO_FONT_FAMILY,font.family());
     soptions.extended.insert(MSO_FONT_SIZE,font.pointSize());
+    FModified[FActiveType][FActiveContext] = FModifyEnabled;
     startSignalTimer();
   }
 }
@@ -172,6 +193,7 @@ void AdiumOptionsWidget::onDefaultFontClicked()
   QMap<QString,QVariant> info = FStylePlugin->styleInfo(ui.cmbStyle->itemData(ui.cmbStyle->currentIndex()).toString());
   soptions.extended.insert(MSO_FONT_FAMILY,info.value(MSIV_DEFAULT_FONT_FAMILY));
   soptions.extended.insert(MSO_FONT_SIZE,info.value(MSIV_DEFAULT_FONT_SIZE));
+  FModified[FActiveType][FActiveContext] = FModifyEnabled;
   startSignalTimer();
 }
 
@@ -179,6 +201,7 @@ void AdiumOptionsWidget::onImageLayoutChanged( int AIndex )
 {
   IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
   soptions.extended.insert(MSO_BG_IMAGE_LAYOUT,ui.cmbImageLayout->itemData(AIndex));
+  FModified[FActiveType][FActiveContext] = FModifyEnabled;
   startSignalTimer();
 }
 
@@ -186,6 +209,7 @@ void AdiumOptionsWidget::onBackgroundColorChanged( int AIndex )
 {
   IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
   soptions.extended.insert(MSO_BG_COLOR,ui.cmbBackgoundColor->itemData(AIndex));
+  FModified[FActiveType][FActiveContext] = FModifyEnabled;
   startSignalTimer();
 }
 
@@ -196,6 +220,7 @@ void AdiumOptionsWidget::onSetImageClicked()
   {
     IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
     soptions.extended.insert(MSO_BG_IMAGE_FILE,fileName);
+    FModified[FActiveType][FActiveContext] = FModifyEnabled;
     startSignalTimer();
   }
 }
@@ -210,6 +235,8 @@ void AdiumOptionsWidget::onDefaultImageClicked()
   QMap<QString,QVariant> info = FStylePlugin->styleInfo(ui.cmbStyle->itemData(ui.cmbStyle->currentIndex()).toString());
   soptions.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
   ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(soptions.extended.value(MSO_BG_COLOR)));
+
+  FModified[FActiveType][FActiveContext] = FModifyEnabled;
 
   startSignalTimer();
 }

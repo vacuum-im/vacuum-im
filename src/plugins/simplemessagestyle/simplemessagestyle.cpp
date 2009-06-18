@@ -71,7 +71,7 @@ QString SimpleMessageStyle::senderColor(const QString &ASenderId) const
   return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
-void SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
+bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
   if (view && AOptions.extended.value(MSO_STYLE_ID).toString()==styleId())
@@ -108,10 +108,12 @@ void SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
     view->document()->setDefaultFont(font);
 
     emit optionsChanged(AWidget,AOptions,AClean);
+    return true;
   }
+  return false;
 }
 
-void SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
+bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
 {
   StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
   if (view)
@@ -137,7 +139,9 @@ void SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
     wstatus.scrollStarted = AOptions.noScroll;
 
     emit contentAppended(AWidget,AHtml,AOptions);
+    return true;
   }
+  return false;
 }
 
 QMap<QString, QVariant> SimpleMessageStyle::infoValues() const
