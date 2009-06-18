@@ -65,7 +65,7 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  return true;
+  return !FStylePlugins.isEmpty();
 }
 
 bool MessageStyles::initObjects()
