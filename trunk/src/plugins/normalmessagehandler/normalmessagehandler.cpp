@@ -48,7 +48,14 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
   plugin = APluginManager->getPlugins("IMessageStyles").value(0,NULL);
   if (plugin)
+  {
     FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
+    if (FMessageStyles)
+    {
+      connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
+        SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
+    }
+  }
 
   plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
   if (plugin)
@@ -442,6 +449,20 @@ void NormalMessageHandler::onPresenceReceived(IPresence *APresence, const IPrese
   IMessageWindow *messageWindow = findWindow(APresence->streamJid(),APresenceItem.itemJid);
   if (messageWindow)
     updateWindow(messageWindow);
+}
+
+void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)
+{
+  if (AContext.isEmpty())
+  {
+    foreach (IMessageWindow *window, FWindows)
+    {
+      if (FLastMessages.value(window).type()==AMessageType && window->viewWidget() && window->viewWidget()->messageStyle())
+      {
+        window->viewWidget()->messageStyle()->changeOptions(window->viewWidget()->styleWidget(),AOptions,false);
+      }
+    }
+  }
 }
 
 Q_EXPORT_PLUGIN2(NormalMessageHandlerPlugin, NormalMessageHandler)

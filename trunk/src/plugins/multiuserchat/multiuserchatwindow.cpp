@@ -326,7 +326,14 @@ void MultiUserChatWindow::initialize()
 
   plugin = FChatPlugin->pluginManager()->getPlugins("IMessageStyles").value(0,NULL);
   if (plugin)
+  {
     FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
+    if (FMessageStyles)
+    {
+      connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
+        SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
+    }
+  }
 
   plugin = FChatPlugin->pluginManager()->getPlugins("IMessageArchiver").value(0,NULL);
   if (plugin)
@@ -928,12 +935,12 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
   return hasCommand;
 }
 
-void MultiUserChatWindow::setMessageStyle(bool AClear)
+void MultiUserChatWindow::setMessageStyle(bool AClean)
 {
   if (FMessageStyles)
   {
     IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::GroupChat);
-    if (!AClear)
+    if (!AClean)
     {
       IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
       FViewWidget->setMessageStyle(style,soptions);
@@ -1557,6 +1564,27 @@ void MultiUserChatWindow::onChatWindowDestroyed()
     FChatWindows.removeAt(FChatWindows.indexOf(window));
     FWindowStatus.remove(window->viewWidget());
     emit chatWindowDestroyed(window);
+  }
+}
+
+void MultiUserChatWindow::onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)
+{
+  if (AMessageType==Message::Chat && AContext.isEmpty())
+  {
+    foreach (IChatWindow *window, FChatWindows)
+    {
+      if (window->viewWidget() && window->viewWidget()->messageStyle())
+      {
+        window->viewWidget()->messageStyle()->changeOptions(window->viewWidget()->styleWidget(),AOptions,false);
+      }
+    }
+  }
+  else if (AMessageType==Message::GroupChat && AContext.isEmpty())
+  {
+    if (FViewWidget && FViewWidget->messageStyle())
+    {
+      FViewWidget->messageStyle()->changeOptions(FViewWidget->styleWidget(),AOptions,false);
+    }
   }
 }
 
