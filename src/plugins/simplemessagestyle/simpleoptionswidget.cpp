@@ -59,7 +59,7 @@ bool SimpleOptionsWidget::isModified( int AMessageType, const QString &AContext 
 
 void SimpleOptionsWidget::setModified(bool AModified, int AMessageType, const QString &AContext)
 {
-  FModified[FActiveType][FActiveContext] = AModified;
+  FModified[AMessageType][AContext] = AModified;
 }
 
 IMessageStyleOptions SimpleOptionsWidget::styleOptions(int AMessageType, const QString &AContext) const

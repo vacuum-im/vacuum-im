@@ -67,7 +67,7 @@ bool AdiumOptionsWidget::isModified(int AMessageType, const QString &AContext) c
 
 void AdiumOptionsWidget::setModified(bool AModified, int AMessageType, const QString &AContext)
 {
-  FModified[FActiveType][FActiveContext] = AModified;
+  FModified[AMessageType][AContext] = AModified;
 }
 
 IMessageStyleOptions AdiumOptionsWidget::styleOptions(int AMessageType, const QString &AContext) const
