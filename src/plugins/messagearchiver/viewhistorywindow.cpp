@@ -723,7 +723,7 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
     {
       options.type = 0;
       options.time = message.dateTime();
-      options.timeFormat = FMessageStyles->timeFormat(options.time);
+      options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
       Jid senderJid = !message.from().isEmpty() ? message.from() : FStreamJid;
 
       if (FViewOptions.isGroupchat)
