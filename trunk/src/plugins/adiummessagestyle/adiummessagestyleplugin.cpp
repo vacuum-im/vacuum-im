@@ -49,7 +49,7 @@ bool AdiumMessageStylePlugin::initObjects()
 
 QString AdiumMessageStylePlugin::stylePluginId() const
 {
-  static QString id = "AdiumMessageStyle";
+  static QString id = "Adium";
   return id;
 }
 

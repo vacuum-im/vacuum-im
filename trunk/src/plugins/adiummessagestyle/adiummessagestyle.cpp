@@ -91,7 +91,7 @@ QString AdiumMessageStyle::senderColor(const QString &ASenderId) const
   return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
-void AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
+bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
   if (view && AOptions.extended.value(MSO_STYLE_ID).toString()==styleId())
@@ -125,10 +125,12 @@ void AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
     view->page()->settings()->setFontFamily(QWebSettings::StandardFont, !fontFamily.isEmpty() ? fontFamily : QWebSettings::globalSettings()->fontFamily(QWebSettings::StandardFont));
 
     emit optionsChanged(AWidget,AOptions,AClean);
+    return true;
   }
+  return false;
 }
 
-void AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
+bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
 {
   StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
   if (view)
@@ -150,7 +152,9 @@ void AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
     wstatus.lastTime = AOptions.time;
 
     emit contentAppended(AWidget,AHtml,AOptions);
+    return true;
   }
+  return false;
 }
 
 int AdiumMessageStyle::version() const
@@ -237,9 +241,9 @@ void AdiumMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
   StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
   if (view)
   {
-    QString variant = QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"../main").toString() : AVariant));
-    QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(FResourcePath+"/"+variant);
-    escapeStringForScript(script);
+    QString variant = FResourcePath+"/"+QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"../main").toString() : AVariant));
+    escapeStringForScript(variant);
+    QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(variant);
     view->page()->mainFrame()->evaluateJavaScript(script);
   }
 }
@@ -310,10 +314,15 @@ void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOpt
     }
     if (!AOptions.extended.value(MSO_BG_COLOR).toString().isEmpty())
     {
-      int r,g,b,a;
       QColor color(AOptions.extended.value(MSO_BG_COLOR).toString());
-      color.getRgb(&r,&g,&b,&a);
-      background.append(QString("background-color: rgba(%1, %2, %3, %4);").arg(r).arg(g).arg(b).arg(qreal(a)/255.0));
+      if (!color.isValid())
+        color.setNamedColor("#"+AOptions.extended.value(MSO_BG_COLOR).toString());
+      if (color.isValid())
+      {
+        int r,g,b,a;
+        color.getRgb(&r,&g,&b,&a);
+        background.append(QString("background-color: rgba(%1, %2, %3, %4);").arg(r).arg(g).arg(b).arg(qreal(a)/255.0));
+      }
     }
   }
   AHtml.replace("==bodyBackground==", background);

@@ -59,8 +59,8 @@ public:
   virtual QList<QWidget *> styleWidgets() const;
   virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
   virtual QString senderColor(const QString &ASenderId) const;
-  virtual void changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
-  virtual void appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
+  virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
+  virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
   //ISimpleMessageStyle
   virtual QMap<QString, QVariant> infoValues() const;
   virtual QList<QString> variants() const;

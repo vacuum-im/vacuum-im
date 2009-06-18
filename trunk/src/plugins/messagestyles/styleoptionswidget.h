@@ -16,13 +16,14 @@ public:
   ~StyleOptionsWidget();
 public slots:
   void apply();
+  void startStyleViewUpdate();
 signals:
   void optionsApplied();
 protected:
   void updateActiveSettings();
   void createViewContent();
 protected slots:
-  void onStyleSettingsChanged();
+  void onUpdateStyleView();
   void onMessageTypeChanged(int AIndex);
   void onStyleEngineChanged(int AIndex);
 private:
@@ -30,10 +31,13 @@ private:
 private:
   IMessageStyles *FMessageStyles;
 private:
+  bool FModifyEnabled;
+  bool FUpdateStarted;
   QWidget *FActiveView;
   IMessageStyle *FActiveStyle;
   IMessageStylePlugin *FActivePlugin;
   IMessageStyleSettings *FActiveSettings;
+  QMap<int, bool> FModified;
   QMap<int, QString> FPluginForMessage;
   QMap<IMessageStylePlugin *, IMessageStyleSettings *> FSettings;
 };

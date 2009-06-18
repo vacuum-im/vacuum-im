@@ -1,10 +1,14 @@
 #include "styleoptionswidget.h"
 
+#include <QTimer>
 #include <QVBoxLayout>
 
 StyleOptionsWidget::StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
+
+  FModifyEnabled = false;
+  FUpdateStarted = false;
 
   FActiveView = NULL;
   FActiveStyle = NULL;
@@ -29,6 +33,7 @@ StyleOptionsWidget::StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *
 
   onMessageTypeChanged(ui.cmbMessageType->currentIndex());
   onStyleEngineChanged(ui.cmbStyleEngine->currentIndex());
+  FModifyEnabled = true;
 
   connect(ui.cmbMessageType,SIGNAL(currentIndexChanged(int)),SLOT(onMessageTypeChanged(int)));
   connect(ui.cmbStyleEngine,SIGNAL(currentIndexChanged(int)),SLOT(onStyleEngineChanged(int)));
@@ -45,11 +50,23 @@ void StyleOptionsWidget::apply()
   while (it != FPluginForMessage.constEnd())
   {
     IMessageStyleSettings *settings = FSettings.value(FMessageStyles->stylePluginById(it.value()));
-    if (settings)
+    if (settings && (FModified.value(it.key(),false) || settings->isModified(it.key(),QString::null)))
+    {
       FMessageStyles->setStyleOptions(settings->styleOptions(it.key(),QString::null),it.key());
+      settings->setModified(false,it.key(),QString::null);
+    }
     it++;
   }
   emit optionsApplied();
+}
+
+void StyleOptionsWidget::startStyleViewUpdate()
+{
+  if (!FUpdateStarted)
+  {
+    FUpdateStarted = true;
+    QTimer::singleShot(50,this,SLOT(onUpdateStyleView()));
+  }
 }
 
 void StyleOptionsWidget::updateActiveSettings()
@@ -58,7 +75,7 @@ void StyleOptionsWidget::updateActiveSettings()
   if (FActiveSettings && FActiveSettings->messageType()!=curMessageType)
     FActiveSettings->loadSettings(curMessageType,QString::null);
   else
-    onStyleSettingsChanged();
+    startStyleViewUpdate();
 }
 
 void StyleOptionsWidget::createViewContent()
@@ -175,7 +192,7 @@ void StyleOptionsWidget::createViewContent()
   }
 }
 
-void StyleOptionsWidget::onStyleSettingsChanged()
+void StyleOptionsWidget::onUpdateStyleView()
 {
   IMessageStyleOptions soptions = FActiveSettings!=NULL ? FActiveSettings->styleOptions(FActiveSettings->messageType(),FActiveSettings->context()) : IMessageStyleOptions();
   IMessageStyle *style = FActivePlugin!=NULL ? FActivePlugin->styleForOptions(soptions) : NULL;
@@ -200,6 +217,7 @@ void StyleOptionsWidget::onStyleSettingsChanged()
     FActiveStyle->changeOptions(FActiveView,soptions);
   }
   createViewContent();
+  FUpdateStarted = false;
 }
 
 void StyleOptionsWidget::onMessageTypeChanged(int AIndex)
@@ -217,7 +235,11 @@ void StyleOptionsWidget::onMessageTypeChanged(int AIndex)
     spluginId = FPluginForMessage.value(curMessageType);
 
   if (spluginId != curPluginId)
+  {
+    FModifyEnabled = false;
     ui.cmbStyleEngine->setCurrentIndex(ui.cmbStyleEngine->findData(spluginId));
+    FModifyEnabled = true;
+  }
   else
     updateActiveSettings();
 }
@@ -227,6 +249,7 @@ void StyleOptionsWidget::onStyleEngineChanged(int AIndex)
   QString curPluginId = ui.cmbStyleEngine->itemData(AIndex).toString();
   int curMessageType = ui.cmbMessageType->itemData(ui.cmbMessageType->currentIndex()).toInt();
   FPluginForMessage.insert(curMessageType,curPluginId);
+  FModified[curMessageType] = FModifyEnabled;
 
   FActivePlugin = FMessageStyles->stylePluginById(curPluginId);
 
@@ -234,7 +257,7 @@ void StyleOptionsWidget::onStyleEngineChanged(int AIndex)
   {
     ui.wdtStyleOptions->layout()->removeWidget(FActiveSettings->instance());
     FActiveSettings->instance()->setVisible(false);
-    disconnect(FActiveSettings->instance(),SIGNAL(settingsChanged()),this,SLOT(onStyleSettingsChanged()));
+    disconnect(FActiveSettings->instance(),SIGNAL(settingsChanged()),this,SLOT(startStyleViewUpdate()));
   }
 
   if (FActivePlugin && !FSettings.contains(FActivePlugin))
@@ -249,7 +272,7 @@ void StyleOptionsWidget::onStyleEngineChanged(int AIndex)
   {
     ui.wdtStyleOptions->layout()->addWidget(FActiveSettings->instance());
     FActiveSettings->instance()->setVisible(true);
-    connect(FActiveSettings->instance(),SIGNAL(settingsChanged()),SLOT(onStyleSettingsChanged()));
+    connect(FActiveSettings->instance(),SIGNAL(settingsChanged()),SLOT(startStyleViewUpdate()));
   }
   updateActiveSettings();
 }

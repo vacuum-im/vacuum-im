@@ -50,7 +50,7 @@ bool SimpleMessageStylePlugin::initObjects()
 
 QString SimpleMessageStylePlugin::stylePluginId() const
 {
-  static QString id = "SimpleMessageStyle";
+  static QString id = "Simple";
   return id;
 }
 

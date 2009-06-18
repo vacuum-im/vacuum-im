@@ -55,6 +55,8 @@ public:
   virtual QWidget *instance() =0;
   virtual int messageType() const =0;
   virtual QString context() const =0;
+  virtual bool isModified(int AMessageType, const QString &AContext) const =0;
+  virtual void setModified(bool AModified, int AMessageType, const QString &AContext) =0;
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext) const =0;
   virtual void loadSettings(int AMessageType, const QString &AContext) =0;
 signals:
@@ -70,8 +72,8 @@ public:
   virtual QList<QWidget *> styleWidgets() const =0;
   virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent) =0;
   virtual QString senderColor(const QString &ASenderId) const =0;
-  virtual void changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true) =0;
-  virtual void appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) =0;
+  virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true) =0;
+  virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 signals:
   virtual void widgetAdded(QWidget *AWidget) const =0;
   virtual void widgetRemoved(QWidget *AWidget) const =0;
