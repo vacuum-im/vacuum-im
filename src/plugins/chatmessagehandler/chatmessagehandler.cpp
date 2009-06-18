@@ -55,7 +55,14 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
 
   plugin = APluginManager->getPlugins("IMessageStyles").value(0,NULL);
   if (plugin)
+  {
     FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
+    if (FMessageStyles)
+    {
+      connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
+        SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
+    }
+  }
 
   plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
   if (plugin)
@@ -486,6 +493,20 @@ void ChatMessageHandler::onPresenceReceived(IPresence *APresence, const IPresenc
     IChatWindow *bareWindow = findWindow(streamJid,contactJid.bare());
     if (bareWindow)
       bareWindow->instance()->deleteLater();
+  }
+}
+
+void ChatMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)
+{
+  if (AMessageType==Message::Chat && AContext.isEmpty())
+  {
+    foreach (IChatWindow *window, FWindows)
+    {
+      if (window->viewWidget() && window->viewWidget()->messageStyle())
+      {
+        window->viewWidget()->messageStyle()->changeOptions(window->viewWidget()->styleWidget(),AOptions,false);
+      }
+    }
   }
 }
 

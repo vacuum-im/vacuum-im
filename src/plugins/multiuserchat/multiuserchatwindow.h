@@ -94,7 +94,7 @@ protected:
   void setToolTipForUser(IMultiUser *AUser);
   bool execShortcutCommand(const QString &AText);
 protected:
-  void setMessageStyle(bool AClear = false);
+  void setMessageStyle(bool AClean = false);
   void showTopic(const QString &ATopic);
   void showMessage(const QString &AMessage, int AContentType=0);
   void showUserMessage(const Message &AMessage, const QString &ANick);
@@ -148,6 +148,7 @@ protected slots:
   void onChatWindowActivated();
   void onChatWindowClosed();
   void onChatWindowDestroyed();
+  void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 protected slots:
   void onNickMenuActionTriggered(bool);
   void onMenuBarActionTriggered(bool);
