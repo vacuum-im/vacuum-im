@@ -1,13 +1,20 @@
 #include "clientinfo.h"
 
+#include <QApplication>
+
+#ifdef SVNINFO
+# include "svninfo.h"
+#else
+# define SVN_DATE         ""
+# define SVN_REVISION     0
+#endif
+
 #if defined(Q_OS_UNIX)
 # include <sys/utsname.h>
 #endif
 
 #define SHC_SOFTWARE_VERSION            "/iq[@type='get']/query[@xmlns='" NS_JABBER_VERSION "']"
 #define SHC_ENTITY_TIME                 "/iq[@type='get']/time[@xmlns='" NS_XMPP_TIME "']"
-
-#define SVN_AUTO_LOAD_SOFTWARE          "autoLoadSoftwareInfo"
 
 #define SOFTWARE_INFO_TIMEOUT           10000
 #define LAST_ACTIVITY_TIMEOUT           10000
@@ -29,15 +36,13 @@ ClientInfo::ClientInfo()
   FStanzaProcessor = NULL;
   FRostersViewPlugin = NULL;
   FRostersModel = NULL;
-  FSettingsPlugin = NULL;
   FMultiUserChatPlugin = NULL;
   FDiscovery = NULL;
   FDataForms = NULL;
+  FMainWindowPlugin = NULL;
 
-  FOptions = 0;
   FVersionHandler = 0;
   FTimeHandler = 0;
-  FOptionsWidget = NULL;
 }
 
 ClientInfo::~ClientInfo()
@@ -101,19 +106,6 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-  {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsDialogAccepted()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsDialogRejected()));
-    }
-  }
-
   plugin = APluginManager->getPlugins("IMultiUserChatPlugin").value(0,NULL);
   if (plugin)
   {
@@ -141,6 +133,12 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+  }
+
   return FStanzaProcessor != NULL;
 }
 
@@ -162,9 +160,6 @@ bool ClientInfo::initObjects()
     FRostersModel->insertDefaultDataHolder(this);
   }
 
-  if (FSettingsPlugin)
-    FSettingsPlugin->insertOptionsHolder(this);
-
   if (FDiscovery)
   {
     registerDiscoFeatures();
@@ -177,6 +172,21 @@ bool ClientInfo::initObjects()
   if (FDataForms)
   {
     FDataForms->insertLocalizer(this,DATA_FORM_SOFTWAREINFO);
+  }
+
+  if (FMainWindowPlugin)
+  {
+    Action *aboutQt = new Action(FMainWindowPlugin->mainWindow()->mainMenu());
+    aboutQt->setText(tr("About Qt"));
+    aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_ABOUT_QT);
+    connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_CLIENTINFO);
+
+    Action *about = new Action(FMainWindowPlugin->mainWindow()->mainMenu());
+    about->setText(tr("About the program"));
+    about->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_ABOUT);
+    connect(about,SIGNAL(triggered()),SLOT(onShowAboutBox()));
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_CLIENTINFO);
   }
 
   return true;
@@ -299,17 +309,6 @@ void ClientInfo::iqStanzaTimeOut(const QString &AId)
   }
 }
 
-QWidget *ClientInfo::optionsWidget(const QString &ANode, int &AOrder)
-{
-  if (ANode == ON_ROSTER)
-  {
-    AOrder = OWO_ROSTER_CLIENTINFO;
-    FOptionsWidget = new OptionsWidget(this);
-    return FOptionsWidget;
-  }
-  return NULL;
-}
-
 QList<int> ClientInfo::roles() const
 {
   static QList<int> indexRoles = QList<int>()
@@ -365,7 +364,6 @@ void ClientInfo::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
   {
     IDataForm form;
     form.type = DATAFORM_TYPE_RESULT;
-    //form.title = "Software Information";
 
     IDataField ftype;
     ftype.required = false;
@@ -377,21 +375,18 @@ void ClientInfo::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
     IDataField soft;
     soft.required = false;
     soft.var   = FORM_FIELD_SOFTWARE;
-    //soft.label = "Software name";
     soft.value = CLIENT_NAME;
     form.fields.append(soft);
 
     IDataField soft_ver;
     soft_ver.required = false;
     soft_ver.var   = FORM_FIELD_SOFTWARE_VERSION;
-    //soft_ver.label = "Software version";
     soft_ver.value = CLIENT_VERSION;
     form.fields.append(soft_ver);
 
     IDataField os;
-    soft_ver.required = false;
+    os.required = false;
     os.var   = FORM_FIELD_OS;
-    //os.label = "OS version";
     os.value = osVersion();
     form.fields.append(os);
 
@@ -444,6 +439,21 @@ Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QStrin
     }
   }
   return NULL;
+}
+
+QString ClientInfo::version() const
+{
+  return CLIENT_VERSION;
+}
+
+int ClientInfo::revision() const
+{
+  return SVN_REVISION;
+}
+
+QDateTime ClientInfo::revisionDate() const
+{
+  return QDateTime::fromString(SVN_DATE,"yyyy/MM/dd hh:mm:ss");
 }
 
 QString ClientInfo::osVersion() const
@@ -583,21 +593,6 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
       dialog->raise();
       dialog->activateWindow();
     }
-  }
-}
-
-bool ClientInfo::checkOption(IClientInfo::Option AOption) const
-{
-  return (FOptions & AOption) > 0;
-}
-
-void ClientInfo::setOption(IClientInfo::Option AOption, bool AValue)
-{
-  bool changed = checkOption(AOption) != AValue;
-  if (changed)
-  {
-    AValue ? FOptions |= AOption : FOptions &= ~AOption;
-    emit optionChanged(AOption,AValue);
   }
 }
 
@@ -794,7 +789,7 @@ void ClientInfo::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
+void ClientInfo::onContactStateChanged(const Jid &/*AStreamJid*/, const Jid &AContactJid, bool AStateOnline)
 {
   if (AStateOnline)
   {
@@ -803,9 +798,6 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
       FActivityItems.remove(AContactJid);
       emit lastActivityChanged(AContactJid);
     }
-    SoftwareItem &software = FSoftwareItems[AContactJid];
-    if (checkOption(AutoLoadSoftwareVersion) && software.status == SoftwareNotLoaded)
-      requestSoftwareInfo(AStreamJid,AContactJid);
   }
   else
   {
@@ -901,18 +893,6 @@ void ClientInfo::onClientInfoDialogClosed(const Jid &AContactJid)
   FClientInfoDialogs.remove(AContactJid);
 }
 
-void ClientInfo::onSettingsOpened()
-{
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(CLIENTINFO_UUID);
-  setOption(AutoLoadSoftwareVersion, settings->value(SVN_AUTO_LOAD_SOFTWARE,true).toBool());
-}
-
-void ClientInfo::onSettingsClosed()
-{
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(CLIENTINFO_UUID);
-  settings->setValue(SVN_AUTO_LOAD_SOFTWARE,checkOption(AutoLoadSoftwareVersion));
-}
-
 void ClientInfo::onRosterRemoved(IRoster *ARoster)
 {
   deleteSoftwareDialogs(ARoster->streamJid());
@@ -984,16 +964,15 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
   }
 }
 
-void ClientInfo::onOptionsDialogAccepted()
+void ClientInfo::onShowAboutBox()
 {
-  if (FOptionsWidget)
-    FOptionsWidget->apply();
-  emit optionsAccepted();
-}
-
-void ClientInfo::onOptionsDialogRejected()
-{
-  emit optionsRejected();
+  if (FAboutBox.isNull())
+  {
+    FAboutBox = new AboutBox(this);
+    FAboutBox->show();
+  }
+  else
+    FAboutBox->raise();
 }
 
 Q_EXPORT_PLUGIN2(ClientInfoPlugin, ClientInfo)

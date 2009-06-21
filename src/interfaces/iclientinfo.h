@@ -9,9 +9,6 @@
 class IClientInfo
 {
 public:
-  enum Option {
-    AutoLoadSoftwareVersion     =1
-  };
   enum InfoType {
     SoftwareVersion             =1,
     LastActivity                =2,
@@ -25,10 +22,11 @@ public:
   };
 public:
   virtual QObject *instance() =0;
+  virtual QString version() const =0;
+  virtual int revision() const =0;
+  virtual QDateTime revisionDate() const =0;
   virtual QString osVersion() const =0;
   virtual void showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes) =0;
-  virtual bool checkOption(IClientInfo::Option AOption) const =0;
-  virtual void setOption(IClientInfo::Option AOption, bool AValue) =0;
   //Software Version
   virtual bool hasSoftwareInfo(const Jid &AContactJid) const =0;
   virtual bool requestSoftwareInfo(const Jid &AStreamJid, const Jid &AContactJid) =0;
@@ -48,7 +46,6 @@ public:
   virtual int entityTimeDelta(const Jid &AContactJid) const =0;
   virtual int entityTimePing(const Jid &AContactJid) const =0;
 signals:
-  virtual void optionChanged(IClientInfo::Option AOption, bool AValue) =0;
   virtual void softwareInfoChanged(const Jid &AContactJid) =0;
   virtual void lastActivityChanged(const Jid &AContactJid) =0;
   virtual void entityTimeChanged(const Jid &AContactJid) =0;

@@ -1,10 +1,10 @@
 FORMS = clientinfodialog.ui \
-        optionswidget.ui
+        aboutbox.ui
 
 HEADERS = clientinfo.h \
           clientinfodialog.h \
-          optionswidget.h
+          aboutbox.h
 
 SOURCES = clientinfo.cpp \
           clientinfodialog.cpp \
-          optionswidget.cpp
+          aboutbox.cpp

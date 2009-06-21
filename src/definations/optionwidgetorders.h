@@ -12,7 +12,6 @@
 
 //Node = ON_ROSTER
 #define OWO_ROSTER                                500
-#define OWO_ROSTER_CLIENTINFO                     700
 #define OWO_ROSTER_AVATARS                        800
 #define OWO_ROSTER_CHENGER                        900
 
