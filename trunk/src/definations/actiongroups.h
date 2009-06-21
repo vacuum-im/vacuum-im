@@ -7,6 +7,7 @@
 #define AG_MMENU_ACCOUNTMANAGER                                 700
 #define AG_MMENU_SKINMANAGER                                    700
 #define AG_MMENU_CONSOLE                                        700
+#define AG_MMENU_CLIENTINFO                                     900
 #define AG_MMENU_MAINWINDOW                                     1000
 
 //MainWindow - TopToolBar

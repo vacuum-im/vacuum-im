@@ -2,6 +2,7 @@
 #define CLIENTINFO_H
 
 #include <QSet>
+#include <QPointer>
 #include "../../definations/version.h"
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
@@ -11,8 +12,6 @@
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/multiuserdataroles.h"
 #include "../../definations/rostertooltiporders.h"
-#include "../../definations/optionnodes.h"
-#include "../../definations/optionwidgetorders.h"
 #include "../../definations/discofeaturehandlerorders.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
@@ -23,15 +22,15 @@
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/isettings.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/iservicediscovery.h"
+#include "../../interfaces/imainwindow.h"
 #include "../../utils/errorhandler.h"
 #include "../../utils/stanza.h"
 #include "../../utils/menu.h"
 #include "../../utils/datetime.h"
 #include "clientinfodialog.h"
-#include "optionswidget.h"
+#include "aboutbox.h"
 
 struct SoftwareItem {
   SoftwareItem() { status = IClientInfo::SoftwareNotLoaded; }
@@ -58,14 +57,13 @@ class ClientInfo :
   public IClientInfo,
   public IStanzaHandler,
   public IIqStanzaOwner,
-  public IOptionsHolder,
   public IRosterIndexDataHolder,
   public IDataLocalizer,
   public IDiscoHandler,
   public IDiscoFeatureHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IIqStanzaOwner IOptionsHolder IRosterIndexDataHolder IDataLocalizer IDiscoHandler IDiscoFeatureHandler);
+  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IIqStanzaOwner IRosterIndexDataHolder IDataLocalizer IDiscoHandler IDiscoFeatureHandler);
 public:
   ClientInfo();
   ~ClientInfo();
@@ -83,8 +81,6 @@ public:
   //IIqStanzaOwner
   virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void iqStanzaTimeOut(const QString &AId);
-  //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IRosterIndexDataHolder
   virtual int order() const { return RDHO_DEFAULT; }
   virtual QList<int> roles() const;
@@ -100,10 +96,11 @@ public:
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //IClientInfo
+  virtual QString version() const;
+  virtual int revision() const;
+  virtual QDateTime revisionDate() const;
   virtual QString osVersion() const;
   virtual void showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes);
-  virtual bool checkOption(IClientInfo::Option AOption) const;
-  virtual void setOption(IClientInfo::Option AOption, bool AValue);
   //Software Version
   virtual bool hasSoftwareInfo(const Jid &AContactJid) const;
   virtual bool requestSoftwareInfo( const Jid &AStreamJid, const Jid &AContactJid);
@@ -124,15 +121,11 @@ public:
   virtual int entityTimePing(const Jid &AContactJid) const;
 signals:
   //IClientInfo
-  virtual void optionChanged(IClientInfo::Option AOption, bool AValue);
   virtual void softwareInfoChanged(const Jid &AContactJid); 
   virtual void lastActivityChanged(const Jid &AContactJid);
   virtual void entityTimeChanged(const Jid &AContactJid);
   //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
-  //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
 protected:
   Action *createInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, QObject *AParent) const;
   void deleteSoftwareDialogs(const Jid &AStreamJid);
@@ -144,31 +137,26 @@ protected slots:
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
   void onClientInfoActionTriggered(bool);
   void onClientInfoDialogClosed(const Jid &AContactJid);
-  void onSettingsOpened();
-  void onSettingsClosed();
   void onRosterRemoved(IRoster *ARoster);
   void onSoftwareInfoChanged(const Jid &AContactJid);
   void onLastActivityChanged(const Jid &AContactJid);
   void onEntityTimeChanged(const Jid &AContactJid);
   void onDiscoInfoReceived(const IDiscoInfo &AInfo);
-  void onOptionsDialogAccepted();
-  void onOptionsDialogRejected();
+  void onShowAboutBox();
 private:
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
   IStanzaProcessor *FStanzaProcessor;
   IRostersViewPlugin *FRostersViewPlugin;
   IRostersModel *FRostersModel;
-  ISettingsPlugin *FSettingsPlugin;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
   IServiceDiscovery *FDiscovery;
   IDataForms *FDataForms;
+  IMainWindowPlugin *FMainWindowPlugin;
 private:
-  OptionsWidget *FOptionsWidget;
-private:
-  int FOptions;
-  int FVersionHandler;
   int FTimeHandler;
+  int FVersionHandler;
+  QPointer<AboutBox> FAboutBox;
   QHash<Jid, QSet<IPresence *> > FContactPresences;
   QHash<QString, Jid> FSoftwareId;
   QHash<Jid, SoftwareItem> FSoftwareItems;
