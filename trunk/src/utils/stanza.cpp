@@ -164,26 +164,18 @@ Stanza Stanza::replyError(const QString &ACondition, const QString &ANamespace, 
   if (!condition.isEmpty())
     errElem.appendChild(reply.createElement(condition,ANamespace));
   if (!AText.isEmpty())
-    errElem.appendChild(reply.createElement("text",ANamespace))
-    .appendChild(reply.createTextNode(AText));
+    errElem.appendChild(reply.createElement("text",ANamespace)).appendChild(reply.createTextNode(AText));
 
   return reply;
 }
 
 QDomElement Stanza::firstElement(const QString &ATagName, const QString ANamespace) const
 {
-  if (ATagName.isEmpty())
-  {
-    QDomNode node = d->FDoc.documentElement().firstChild();
-    if (!ANamespace.isEmpty())
-      while (!node.isNull() && (!node.isElement() || node.namespaceURI() != ANamespace))
-        node = node.nextSibling();
-    return node.toElement();
-  }
-  else if (ANamespace.isEmpty())
-    return d->FDoc.documentElement().firstChildElement(ATagName);
-  else
-    return d->FDoc.documentElement().elementsByTagNameNS(ANamespace,ATagName).at(0).toElement();
+  QDomElement elem = d->FDoc.documentElement().firstChildElement(ATagName);
+  if (!ANamespace.isEmpty())
+    while (!elem.isNull() && elem.namespaceURI()!=ANamespace)
+      elem = elem.nextSiblingElement(ATagName);
+  return elem;
 }
 
 QDomElement Stanza::addElement(const QString &ATagName, const QString &ANamespace)
@@ -215,4 +207,3 @@ QByteArray Stanza::toByteArray() const
   static QByteArray after = QString(">").toUtf8();
   return d->FDoc.toByteArray(0).replace(befour,after);
 }
-
