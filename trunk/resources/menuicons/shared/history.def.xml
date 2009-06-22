@@ -5,6 +5,10 @@
     <object mime="image/png">history.png</object>
   </icon>
   <icon>
+    <key>historyDate</key>
+    <object mime="image/png">historydate.png</object>
+  </icon>
+  <icon>
     <key>historyAuto</key>
     <object mime="image/png">historyauto.png</object>
   </icon>
