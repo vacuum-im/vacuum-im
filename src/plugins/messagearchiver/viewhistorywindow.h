@@ -48,7 +48,7 @@ public:
   ~ViewHistoryWindow();
   virtual QMainWindow *instance() { return this; }
   virtual const Jid &streamJid() const { return FStreamJid; }
-  virtual ToolBarChanger *groupsTools() const { return FGroupsTools; }
+  virtual ToolBarChanger *collectionTools() const { return FCollectionTools; }
   virtual ToolBarChanger *messagesTools() const { return FMessagesTools->toolBarChanger(); }
   virtual bool isHeaderAccepted(const IArchiveHeader &AHeader) const;
   virtual QList<IArchiveHeader> currentHeaders() const;
@@ -138,7 +138,7 @@ private:
   Action *FReload;
   Menu *FGroupKindMenu;
   Menu *FSourceMenu;
-  ToolBarChanger *FGroupsTools;
+  ToolBarChanger *FCollectionTools;
 private:
   int FSource;
   int FGroupKind;

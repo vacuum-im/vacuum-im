@@ -2,6 +2,7 @@
 
 #include <QListView>
 #include <QScrollBar>
+#include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QInputDialog>
@@ -12,7 +13,7 @@
 #define ADR_GROUP_KIND        Action::DR_Parametr1
 #define ADR_SOURCE            Action::DR_Parametr1
 
-#define BIN_SPLITTER_STATE    "ArchiveWindowSplitterState"
+#define BIN_WINDOW_STATE      "ArchiveWindowState"
 #define BIN_WINDOW_GEOMETRY   "ArchiveWindowGeometry"
 
 //SortFilterProxyModel
@@ -72,7 +73,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   FSettings = NULL;
   FMessageWidgets = NULL;
   FMessageStyles = NULL;
-  FGroupsTools = NULL;
+  FCollectionTools = NULL;
   FStatusIcons = NULL;
   FMessagesTools = NULL;
 
@@ -82,8 +83,10 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   FSource = AS_AUTO;
 
   QToolBar *groupsToolBar = this->addToolBar("Groups Tools");
-  FGroupsTools = new ToolBarChanger(groupsToolBar);
-  static_cast<QBoxLayout *>(ui.grbArchive->layout())->insertWidget(0,groupsToolBar);
+  FCollectionTools = new ToolBarChanger(groupsToolBar);
+  ui.wdtCollectionTools->setLayout(new QVBoxLayout);
+  ui.wdtCollectionTools->layout()->setMargin(0);
+  ui.wdtCollectionTools->layout()->addWidget(FCollectionTools->toolBar());
 
   QListView *cmbView= new QListView(ui.cmbContact);
   QSortFilterProxyModel *cmbSort = new QSortFilterProxyModel(ui.cmbContact);
@@ -141,14 +144,17 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   createGroupKindMenu();
   createSourceMenu();
   createHeaderActions();
+
+  FViewOptions.isGroupchat = false;
+  setMessageStyle();
 }
 
 ViewHistoryWindow::~ViewHistoryWindow()
 {
   if (FSettings)
   {
-    FSettings->saveBinaryData(BIN_SPLITTER_STATE+FStreamJid.pBare(),ui.splitter->saveState());
     FSettings->saveBinaryData(BIN_WINDOW_GEOMETRY+FStreamJid.pBare(),saveGeometry());
+    FSettings->saveBinaryData(BIN_WINDOW_STATE+FStreamJid.pBare(),saveState());
   }
   clearModel();
   emit windowDestroyed(this);
@@ -269,11 +275,10 @@ void ViewHistoryWindow::initialize()
     {
       FViewWidget = FMessageWidgets->newViewWidget(FStreamJid,FStreamJid);
       FMessagesTools = FMessageWidgets->newToolBarWidget(NULL,FViewWidget,NULL,NULL);
-      QVBoxLayout *layout = new QVBoxLayout(ui.grbMessages);
-      layout->setMargin(3);
-      layout->addWidget(FMessagesTools->instance());
-      layout->addWidget(FViewWidget->instance());
-      ui.grbMessages->setLayout(layout);
+      ui.wdtMessages->setLayout(new QVBoxLayout);
+      ui.wdtMessages->layout()->setMargin(0);
+      ui.wdtMessages->layout()->addWidget(FMessagesTools->instance());
+      ui.wdtMessages->layout()->addWidget(FViewWidget->instance());
     }
   }
 
@@ -288,7 +293,7 @@ void ViewHistoryWindow::initialize()
     if (FSettings)
     {
       restoreGeometry(FSettings->loadBinaryData(BIN_WINDOW_GEOMETRY+FStreamJid.pBare()));
-      ui.splitter->restoreState(FSettings->loadBinaryData(BIN_SPLITTER_STATE+FStreamJid.pBare()));
+      restoreState(FSettings->loadBinaryData(BIN_WINDOW_STATE+FStreamJid.pBare()));
     }
   }
 
@@ -461,6 +466,8 @@ QStandardItem *ViewHistoryWindow::createCustomItem(int AType, const QVariant &AD
 
 QStandardItem *ViewHistoryWindow::createDateGroup(const IArchiveHeader &AHeader, QStandardItem *AParent)
 {
+  IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
+
   QDateTime year(QDate(AHeader.start.date().year(),1,1),QTime(0,0,0));
   QStandardItem *yearItem = findChildItem(HDR_DATE_START,year,AParent);
   if (!yearItem)
@@ -469,6 +476,7 @@ QStandardItem *ViewHistoryWindow::createDateGroup(const IArchiveHeader &AHeader,
     yearItem->setData(year,HDR_DATE_START);
     yearItem->setData(year.addYears(1).addSecs(-1),HDR_DATE_END);
     yearItem->setData(year,HDR_SORT_ROLE);
+    yearItem->setIcon(storage->getIcon(MNI_HISTORY_DATE));
     QList<QStandardItem *> items = QList<QStandardItem *>() << yearItem << createSortItem(year) << createSortItem(year);
     AParent!=NULL ? AParent->appendRow(items) : FModel->appendRow(items);
     emit itemCreated(yearItem);
@@ -482,6 +490,7 @@ QStandardItem *ViewHistoryWindow::createDateGroup(const IArchiveHeader &AHeader,
     monthItem->setData(month,HDR_DATE_START);
     monthItem->setData(month.addMonths(1).addSecs(-1),HDR_DATE_END);
     monthItem->setData(month,HDR_SORT_ROLE);
+    monthItem->setIcon(storage->getIcon(MNI_HISTORY_DATE));
     yearItem->appendRow(QList<QStandardItem *>() << monthItem << createSortItem(month) << createSortItem(month));
     emit itemCreated(monthItem);
   }
@@ -494,6 +503,7 @@ QStandardItem *ViewHistoryWindow::createDateGroup(const IArchiveHeader &AHeader,
     dayItem->setData(day,HDR_DATE_START);
     dayItem->setData(day.addDays(1).addSecs(-1),HDR_DATE_END);
     dayItem->setData(day,HDR_SORT_ROLE);
+    dayItem->setIcon(storage->getIcon(MNI_HISTORY_DATE));
     monthItem->appendRow(QList<QStandardItem *>() << dayItem << createSortItem(day) << createSortItem(day));
     emit itemCreated(dayItem);
   }
@@ -645,6 +655,7 @@ void ViewHistoryWindow::setMessageStyle()
       FViewWidget->setMessageStyle(style,soptions);
     else if (style)
       style->changeOptions(FViewWidget->styleWidget(),soptions);
+    ui.lblCollectionInfo->setText(tr("No conversation selected"));
   }
 }
 
@@ -700,6 +711,10 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
       setViewOptions(ACollection);
       setMessageStyle();
       FViewWidget->setContactJid(ACollection.header.with);
+      QString infoString = tr("Conversation with <b>%1</b> started at %2").arg(Qt::escape(contactName(ACollection.header.with))).arg(ACollection.header.start.toString());
+      if (!ACollection.header.subject.isEmpty())
+        infoString += "<br><i>"+tr("Subject: %1").arg(Qt::escape(ACollection.header.subject))+"</i>";
+      ui.lblCollectionInfo->setText(infoString);
     }
 
     IMessageContentOptions options;
@@ -857,7 +872,7 @@ void ViewHistoryWindow::createGroupKindMenu()
   connect(action,SIGNAL(triggered()),ui.trvCollections,SLOT(collapseAll()));
   FGroupKindMenu->addAction(action,AG_DEFAULT+100);
 
-  QToolButton *button = FGroupsTools->addToolButton(FGroupKindMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
+  QToolButton *button = FCollectionTools->addToolButton(FGroupKindMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
   button->setPopupMode(QToolButton::InstantPopup);
 }
 
@@ -890,7 +905,7 @@ void ViewHistoryWindow::createSourceMenu()
   connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSourceByAction(bool)));
   FSourceMenu->addAction(action);
 
-  QToolButton *button = FGroupsTools->addToolButton(FSourceMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
+  QToolButton *button = FCollectionTools->addToolButton(FSourceMenu->menuAction(),AG_AWGT_ARCHIVE_GROUPING,false);
   button->setPopupMode(QToolButton::InstantPopup);
 
   FSourceMenu->setEnabled(FArchiver->isSupported(FStreamJid));
@@ -898,31 +913,31 @@ void ViewHistoryWindow::createSourceMenu()
 
 void ViewHistoryWindow::createHeaderActions()
 {
-  FFilterBy = new Action(FGroupsTools->toolBar());
+  FFilterBy = new Action(FCollectionTools->toolBar());
   FFilterBy->setText(tr("Filter"));
   FFilterBy->setIcon(RSR_STORAGE_MENUICONS,MNI_HISRORY_FILTER);
   FFilterBy->setEnabled(false);
   connect(FFilterBy,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
-  FGroupsTools->addAction(FFilterBy,AG_AWGT_ARCHIVE_DEFACTIONS,false);
+  FCollectionTools->addAction(FFilterBy,AG_AWGT_ARCHIVE_DEFACTIONS,false);
 
-  FRename = new Action(FGroupsTools->toolBar());
+  FRename = new Action(FCollectionTools->toolBar());
   FRename->setText(tr("Rename"));
   FRename->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_RENAME);
   FRename->setEnabled(false);
   connect(FRename,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
-  FGroupsTools->addAction(FRename,AG_AWGT_ARCHIVE_DEFACTIONS,false);
+  FCollectionTools->addAction(FRename,AG_AWGT_ARCHIVE_DEFACTIONS,false);
 
-  FRemove = new Action(FGroupsTools->toolBar());
+  FRemove = new Action(FCollectionTools->toolBar());
   FRemove->setText(tr("Remove"));
   FRemove->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_REMOVE);
   connect(FRemove,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
-  FGroupsTools->addAction(FRemove,AG_AWGT_ARCHIVE_DEFACTIONS,false);
+  FCollectionTools->addAction(FRemove,AG_AWGT_ARCHIVE_DEFACTIONS,false);
 
-  FReload = new Action(FGroupsTools->toolBar());
+  FReload = new Action(FCollectionTools->toolBar());
   FReload->setText(tr("Reload"));
   FReload->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_RELOAD);
   connect(FReload,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
-  FGroupsTools->addAction(FReload,AG_AWGT_ARCHIVE_DEFACTIONS,false);
+  FCollectionTools->addAction(FReload,AG_AWGT_ARCHIVE_DEFACTIONS,false);
 }
 
 void ViewHistoryWindow::onLocalCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader)

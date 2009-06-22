@@ -428,6 +428,18 @@
         <source>Do you really want to remove %1 collections with messages?</source>
         <translation>Вы уверены, что хотите удалить записи (%1) с сообщениями?</translation>
     </message>
+    <message>
+        <source>No conversation selected</source>
+        <translation>Разговор не выбран</translation>
+    </message>
+    <message>
+        <source>Conversation with &lt;b&gt;%1&lt;/b&gt; started at %2</source>
+        <translation>Разговор с &lt;b&gt;%1&lt;/b&gt; начат в %2</translation>
+    </message>
+    <message>
+        <source>Subject: %1</source>
+        <translation>Тема: %1</translation>
+    </message>
 </context>
 <context>
     <name>ViewHistoryWindowClass</name>
@@ -452,16 +464,12 @@
         <translation>Применить</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Сообщения</translation>
-    </message>
-    <message>
         <source>Contact:</source>
         <translation>Контакт:</translation>
     </message>
     <message>
-        <source>Archive</source>
-        <translation>Архив</translation>
+        <source>Conversations</source>
+        <translation>Разговоры</translation>
     </message>
 </context>
 </TS>

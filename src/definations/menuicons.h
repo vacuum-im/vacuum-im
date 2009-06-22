@@ -66,6 +66,7 @@
 
 //MessageArchiver
 #define MNI_HISTORY                     "history"
+#define MNI_HISTORY_DATE                "historyDate"
 #define MNI_HISTORY_AUTO                "historyAuto"
 #define MNI_HISTORY_MANAGE              "historyManage"
 #define MNI_HISTORY_ENCRYPT             "historyEncrypt"

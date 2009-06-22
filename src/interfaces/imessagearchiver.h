@@ -146,7 +146,7 @@ public:
 public :
   virtual QMainWindow *instance() =0;
   virtual const Jid &streamJid() const =0;
-  virtual ToolBarChanger *groupsTools() const =0;
+  virtual ToolBarChanger *collectionTools() const =0;
   virtual ToolBarChanger *messagesTools() const =0;
   virtual bool isHeaderAccepted(const IArchiveHeader &AHeader) const =0;
   virtual QList<IArchiveHeader> currentHeaders() const =0;
