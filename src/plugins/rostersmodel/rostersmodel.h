@@ -65,8 +65,10 @@ signals:
   virtual void streamRemoved(const Jid &AStreamJid);
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
   virtual void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
+  virtual void indexAboutToBeInserted(IRosterIndex *AIndex);
   virtual void indexInserted(IRosterIndex *AIndex);
   virtual void indexDataChanged(IRosterIndex *AIndex, int ARole);
+  virtual void indexAboutToBeRemoved(IRosterIndex *AIndex);
   virtual void indexRemoved(IRosterIndex *AIndex);
   virtual void indexDestroyed(IRosterIndex *AIndex);
   virtual void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder);

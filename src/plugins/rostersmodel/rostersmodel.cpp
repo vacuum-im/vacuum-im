@@ -757,6 +757,7 @@ void RostersModel::onIndexDataChanged(IRosterIndex *AIndex, int ARole)
 
 void RostersModel::onIndexChildAboutToBeInserted(IRosterIndex *AIndex)
 {
+  emit indexAboutToBeInserted(AIndex);
   beginInsertRows(modelIndexByRosterIndex(AIndex->parentIndex()),AIndex->row(),AIndex->row());
   connect(AIndex->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
     SLOT(onIndexDataChanged(IRosterIndex *, int)));
@@ -779,7 +780,7 @@ void RostersModel::onIndexChildInserted(IRosterIndex *AIndex)
 void RostersModel::onIndexChildAboutToBeRemoved(IRosterIndex *AIndex)
 {
   FChangedIndexes-=AIndex;
-  emit indexRemoved(AIndex);
+  emit indexAboutToBeRemoved(AIndex);
   beginRemoveRows(modelIndexByRosterIndex(AIndex->parentIndex()),AIndex->row(),AIndex->row());
 }
 
@@ -796,6 +797,7 @@ void RostersModel::onIndexChildRemoved(IRosterIndex *AIndex)
   disconnect(AIndex->instance(),SIGNAL(childRemoved(IRosterIndex *)),
     this,SLOT(onIndexChildRemoved(IRosterIndex *)));
   endRemoveRows();
+  emit indexRemoved(AIndex);
 }
 
 void RostersModel::onIndexDestroyed(IRosterIndex *AIndex)
