@@ -120,7 +120,6 @@ private:
   IStanzaProcessor *FStanzaProcessor;
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
-  IMultiUserChatPlugin *FMultiChatPlugin;
 private:
   int FRosterLabelId;
   QTimer FApplyAutoListsTimer;
