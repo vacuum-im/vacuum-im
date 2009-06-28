@@ -18,6 +18,7 @@ ChatMessageHandler::ChatMessageHandler()
   FPresencePlugin = NULL;
   FMessageArchiver = NULL;
   FRostersView = NULL;
+  FRostersModel = NULL;
   FStatusIcons = NULL;
   FStatusChanger = NULL;
 }
@@ -110,6 +111,10 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
       connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
     }
   }
+
+  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  if (plugin)
+    FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
   plugin = APluginManager->getPlugins("IStatusChanger").value(0,NULL);
   if (plugin)
@@ -226,8 +231,14 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
       connect(window->instance(),SIGNAL(windowClosed()),SLOT(onWindowClosed()));
       connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onWindowDestroyed()));
       FWindows.append(window);
-      setMessageStyle(window);
       updateWindow(window);
+
+      if (FRostersView && FRostersModel)
+      {
+        UserContextMenu *menu = new UserContextMenu(FRostersModel,FRostersView,window);
+        window->menuBarWidget()->menuBarChanger()->insertMenu(menu,MBG_CW_USERCONTEXT);
+      }
+      setMessageStyle(window);
       showHistory(window);
     }
     else

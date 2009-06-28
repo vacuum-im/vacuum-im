@@ -14,6 +14,7 @@
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../definations/soundfiles.h"
+#include "../../definations/menubargroups.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessageprocessor.h"
 #include "../../interfaces/imessagewidgets.h"
@@ -22,10 +23,12 @@
 #include "../../interfaces/inotifications.h"
 #include "../../interfaces/istatusicons.h"
 #include "../../interfaces/irostersview.h"
+#include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/ivcard.h"
 #include "../../interfaces/iavatars.h"
 #include "../../interfaces/istatuschanger.h"
+#include "usercontextmenu.h"
 
 struct WindowStatus {
   QString lastStatusShow;
@@ -87,6 +90,7 @@ private:
   IPresencePlugin *FPresencePlugin;
   IMessageArchiver *FMessageArchiver;
   IRostersView *FRostersView;
+  IRostersModel *FRostersModel;
   IStatusIcons *FStatusIcons;
   IStatusChanger *FStatusChanger;
 private:
