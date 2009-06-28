@@ -28,14 +28,6 @@ void Action::setMenu(Menu *AMenu)
   }
   if (AMenu)
   {
-    //в 4.3.0 заменяет icon, text и д.р. параметры Menu на параметры Action
-    if (parent() == AMenu)
-    {
-      setIcon(AMenu->icon());
-      setText(AMenu->title());
-      setToolTip(AMenu->toolTip());
-      setWhatsThis(AMenu->whatsThis());
-    }
     connect(AMenu,SIGNAL(menuDestroyed(Menu *)),SLOT(onMenuDestroyed(Menu *)));
   }
   QAction::setMenu(AMenu);  
@@ -44,6 +36,7 @@ void Action::setMenu(Menu *AMenu)
 
 void Action::setIcon(const QIcon &AIcon)
 {
+  setIcon(QString::null,QString::null,0);
   QAction::setIcon(AIcon);
 }
 
@@ -82,8 +75,6 @@ void Action::setData(const QHash<int,QVariant> &AData)
 void Action::onMenuDestroyed(Menu *AMenu)
 {
   if (AMenu == FMenu)
-  {
     FMenu = NULL;
-  }
+  QAction::setMenu(NULL);
 }
-
