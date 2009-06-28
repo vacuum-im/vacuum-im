@@ -57,15 +57,16 @@ QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> AData, bool AS
   foreach(Action *action,FActions)
   {
     foreach (int key, keys)
+    {
       if (AData.values(key).contains(action->data(key)))
       {
         actionList.append(action);
         break;
       }
+    }
     if (ASearchInSubMenu && action->menu())
       actionList += action->menu()->findActions(AData,ASearchInSubMenu);
   }
-
   return actionList;
 }
 
@@ -143,9 +144,7 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 
 void Menu::addMenuActions(const Menu *AMenu, int AGroup, bool ASort)
 {
-  Action *action;
-  QList<Action *> actionList = AMenu->groupActions(AGroup);
-  foreach(action,actionList)
+  foreach(Action *action,AMenu->groupActions(AGroup))
     addAction(action,AMenu->actionGroup(action),ASort);
 }
 
@@ -186,8 +185,8 @@ void Menu::clear()
 
 void Menu::setIcon(const QIcon &AIcon)
 {
-  if (FMenuAction)
-    FMenuAction->setIcon(AIcon);
+  setIcon(QString::null,QString::null,0);
+  FMenuAction->setIcon(AIcon);
   QMenu::setIcon(AIcon);
 }
 
@@ -207,8 +206,7 @@ void Menu::setIcon(const QString &AStorageName, const QString &AIconKey, int AIc
 
 void Menu::setTitle(const QString &ATitle)
 {
-  if (FMenuAction)
-    FMenuAction->setText(ATitle);
+  FMenuAction->setText(ATitle);
   QMenu::setTitle(ATitle);
 }
 
