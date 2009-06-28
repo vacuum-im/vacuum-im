@@ -13,7 +13,7 @@ HEADERS = messagewidgets.h \
           viewwidget.h \
           editwidget.h \
           receiverswidget.h \
-          menubarwidget .h \
+          menubarwidget.h \
           toolbarwidget.h \
           statusbarwidget.h \
           chatwindow.h \
