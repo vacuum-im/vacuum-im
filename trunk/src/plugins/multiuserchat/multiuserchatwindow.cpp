@@ -250,6 +250,15 @@ IChatWindow *MultiUserChatWindow::findChatWindow(const Jid &AContactJid) const
   return NULL;
 }
 
+void MultiUserChatWindow::contextMenuForUser(IMultiUser *AUser, Menu *AMenu)
+{
+  if (FUsers.contains(AUser) && AUser!=FMultiChat->mainUser())
+  {
+    insertRoomUtilsActions(AMenu,AUser);
+    emit multiUserContextMenu(AUser,AMenu);
+  }
+}
+
 void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 {
   closeWindow();
@@ -1159,11 +1168,15 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
       window->infoWidget()->setFieldAutoUpdated(IInfoWidget::ContactStatus,false);
       window->infoWidget()->setField(IInfoWidget::ContactStatus,user->data(MUDR_STATUS));
       window->infoWidget()->autoUpdateFields();
-      
+
       FChatWindows.append(window);
+      updateChatWindow(window);
+      
+      UserContextMenu *menu = new UserContextMenu(this,window);
+      window->menuBarWidget()->menuBarChanger()->insertMenu(menu,MBG_MUCCW_USERCONTEXT);
+
       setChatMessageStyle(window);
       showChatHistory(window);
-      updateChatWindow(window);
       emit chatWindowCreated(window);
     }
   }
@@ -1237,12 +1250,11 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
       QContextMenuEvent *menuEvent = static_cast<QContextMenuEvent *>(AEvent);
       QListWidgetItem *listItem = ui.ltwUsers->itemAt(menuEvent->pos());
       IMultiUser *user = FUsers.key(listItem,NULL);
-      if (user && user != FMultiChat->mainUser())
+      if (user && user!=FMultiChat->mainUser())
       {
         Menu *menu = new Menu(this);
         menu->setAttribute(Qt::WA_DeleteOnClose,true);
-        insertRoomUtilsActions(menu,user);
-        emit multiUserContextMenu(user,menu);
+        contextMenuForUser(user,menu);
         if (!menu->isEmpty())
           menu->popup(menuEvent->globalPos());
         else
