@@ -93,8 +93,10 @@ signals:
   virtual void streamRemoved(const Jid &AStreamJid) =0;
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;
   virtual void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
+  virtual void indexAboutToBeInserted(IRosterIndex *AIndex) =0;
   virtual void indexInserted(IRosterIndex *AIndex) =0;
   virtual void indexDataChanged(IRosterIndex *AIndex, int ARole) =0;
+  virtual void indexAboutToBeRemoved(IRosterIndex *AIndex) =0;
   virtual void indexRemoved(IRosterIndex *AIndex) =0;
   virtual void indexDestroyed(IRosterIndex *AIndex) =0;
   virtual void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder) =0;
