@@ -199,7 +199,7 @@ void DiscoItemsWindow::updateToolBarActions()
 
 void DiscoItemsWindow::updateActionsBar()
 {
-  qDeleteAll(FActionsBarChanger->actions(AG_DIWT_DISCOVERY_FEATURE_ACTIONS));
+  qDeleteAll(FActionsBarChanger->groupActions(AG_DIWT_DISCOVERY_FEATURE_ACTIONS));
   QModelIndex index = ui.trvItems->currentIndex();
   if (index.isValid())
   {

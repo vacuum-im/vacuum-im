@@ -6,6 +6,7 @@
 #include "../../definations/accountvaluenames.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
+#include "../../definations/menubargroups.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ibookmarks.h"
 #include "../../interfaces/iprivatestorage.h"

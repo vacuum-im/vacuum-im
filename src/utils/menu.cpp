@@ -1,10 +1,12 @@
 #include "menu.h"
 
-Menu::Menu(QWidget *AParent)
-  : QMenu(AParent)
+Menu::Menu(QWidget *AParent) : QMenu(AParent)
 {
-  FMenuAction = NULL;
   FIconStorage = NULL;
+
+  FMenuAction = new Action(this);
+  FMenuAction->setMenu(this);
+
   setSeparatorsCollapsible(true);
 }
 
@@ -13,6 +15,58 @@ Menu::~Menu()
   if (FIconStorage)
     FIconStorage->removeAutoIcon(this);
   emit menuDestroyed(this);
+}
+
+bool Menu::isEmpty() const
+{
+  return FActions.isEmpty();
+}
+
+Action *Menu::menuAction() const
+{
+  return FMenuAction;
+}
+
+int Menu::actionGroup(const Action *AAction) const
+{
+  QMultiMap<int,Action *>::const_iterator it = qFind(FActions.begin(),FActions.end(),AAction);
+  if (it != FActions.constEnd())
+    return it.key();
+  return AG_NULL;
+}
+
+QAction *Menu::nextGroupSeparator(int AGroup) const
+{
+  QMultiMap<int,Action *>::const_iterator it = FActions.lowerBound(AGroup);
+  if (it != FActions.end())
+    return FSeparators.value(it.key());
+  return NULL;
+}
+
+QList<Action *> Menu::groupActions(int AGroup) const
+{
+  if (AGroup == AG_NULL)
+    return FActions.values();
+  return FActions.values(AGroup);
+}
+
+QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu /*= false*/) const
+{
+  QList<Action *> actionList;
+  QList<int> keys = AData.keys();
+  foreach(Action *action,FActions)
+  {
+    foreach (int key, keys)
+      if (AData.values(key).contains(action->data(key)))
+      {
+        actionList.append(action);
+        break;
+      }
+    if (ASearchInSubMenu && action->menu())
+      actionList += action->menu()->findActions(AData,ASearchInSubMenu);
+  }
+
+  return actionList;
 }
 
 void Menu::addAction(Action *AAction, int AGroup, bool ASort)
@@ -41,7 +95,7 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
     if (ASort)
     {
       QList<QAction *> actionList = QMenu::actions();
-      
+
       bool sortRole = true;
       QString sortString = AAction->data(Action::DR_SortString).toString();
       if (sortString.isEmpty())
@@ -49,7 +103,7 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
         sortString = AAction->text();
         sortRole = false;
       }
-      
+
       for (int i = 0; !befour && i<actionList.count(); ++i)
       {
         QAction *qaction = actionList.at(i);
@@ -83,59 +137,16 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 
   FActions.insertMulti(AGroup,AAction);
   connect(AAction,SIGNAL(actionDestroyed(Action *)),SLOT(onActionDestroyed(Action *)));
-  emit actionInserted(befour,AAction);
+  emit actionInserted(befour,AAction,AGroup,ASort);
   if (separator) emit separatorInserted(AAction,separator);
 }
 
 void Menu::addMenuActions(const Menu *AMenu, int AGroup, bool ASort)
 {
   Action *action;
-  QList<Action *> actionList = AMenu->actions(AGroup);
+  QList<Action *> actionList = AMenu->groupActions(AGroup);
   foreach(action,actionList)
     addAction(action,AMenu->actionGroup(action),ASort);
-}
-
-Action *Menu::menuAction()
-{
-  if (!FMenuAction)
-  {
-    FMenuAction = new Action(this);
-    FMenuAction->setMenu(this);
-  }
-  return FMenuAction;
-}
-
-bool Menu::isEmpty() const
-{
-  return FActions.isEmpty();
-}
-
-void Menu::setIcon(const QIcon &AIcon)
-{
-  if (FMenuAction)
-    FMenuAction->setIcon(AIcon);
-  QMenu::setIcon(AIcon);
-}
-
-void Menu::setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex)
-{
-  if (!AStorageName.isEmpty() && !AIconKey.isEmpty())
-  {
-    FIconStorage = IconStorage::staticStorage(AStorageName);
-    FIconStorage->insertAutoIcon(this,AIconKey,AIconIndex);
-  }
-  else if (FIconStorage)
-  {
-    FIconStorage->removeAutoIcon(this);
-    FIconStorage = NULL;
-  }
-}
-
-void Menu::setTitle(const QString &ATitle)
-{
-  if (FMenuAction)
-    FMenuAction->setText(ATitle);
-  QMenu::setTitle(ATitle);
 }
 
 void Menu::removeAction(Action *AAction)
@@ -166,53 +177,39 @@ void Menu::removeAction(Action *AAction)
   }
 }
 
-int Menu::actionGroup(const Action *AAction) const
-{
-  QMultiMap<int,Action *>::const_iterator it = qFind(FActions.begin(),FActions.end(),AAction);
-  if (it != FActions.constEnd())
-    return it.key();
-  return AG_NULL;
-}
-
-QAction *Menu::nextGroupSeparator(int AGroup) const
-{
-  QMultiMap<int,Action *>::const_iterator it = FActions.lowerBound(AGroup);
-  if (it != FActions.end())
-    return FSeparators.value(it.key());
-  return NULL;
-}
-
-QList<Action *> Menu::actions(int AGroup) const
-{
-  if (AGroup == AG_NULL)
-    return FActions.values();
-  return FActions.values(AGroup);
-}
-
-QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu /*= false*/) const
-{
-  QList<Action *> actionList;
-  QList<int> keys = AData.keys();
-  foreach(Action *action,FActions)
-  {
-    foreach (int key, keys)
-      if (AData.values(key).contains(action->data(key)))
-      {
-        actionList.append(action);
-        break;
-      }
-    if (ASearchInSubMenu && action->menu())
-      actionList += action->menu()->findActions(AData,ASearchInSubMenu);
-  }
-
-  return actionList;
-}
-
 void Menu::clear() 
 {
-  foreach(Action *action,FActions)
+  foreach(Action *action,FActions.values())
     removeAction(action);
   QMenu::clear(); 
+}
+
+void Menu::setIcon(const QIcon &AIcon)
+{
+  if (FMenuAction)
+    FMenuAction->setIcon(AIcon);
+  QMenu::setIcon(AIcon);
+}
+
+void Menu::setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex)
+{
+  if (!AStorageName.isEmpty() && !AIconKey.isEmpty())
+  {
+    FIconStorage = IconStorage::staticStorage(AStorageName);
+    FIconStorage->insertAutoIcon(this,AIconKey,AIconIndex);
+  }
+  else if (FIconStorage)
+  {
+    FIconStorage->removeAutoIcon(this);
+    FIconStorage = NULL;
+  }
+}
+
+void Menu::setTitle(const QString &ATitle)
+{
+  if (FMenuAction)
+    FMenuAction->setText(ATitle);
+  QMenu::setTitle(ATitle);
 }
 
 void Menu::onActionDestroyed(Action *AAction)

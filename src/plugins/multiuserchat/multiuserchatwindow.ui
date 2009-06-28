@@ -163,16 +163,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="mnbMenuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>552</width>
-     <height>19</height>
-    </rect>
-   </property>
-  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

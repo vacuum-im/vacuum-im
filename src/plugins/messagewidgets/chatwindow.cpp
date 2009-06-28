@@ -17,25 +17,31 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 
   FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid);
   ui.wdtInfo->setLayout(new QVBoxLayout);
-  ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
   ui.wdtInfo->layout()->setMargin(0);
+  ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
 
   FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid);
   ui.wdtView->setLayout(new QVBoxLayout);
-  ui.wdtView->layout()->addWidget(FViewWidget->instance());
   ui.wdtView->layout()->setMargin(0);
+  ui.wdtView->layout()->addWidget(FViewWidget->instance());
 
   FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid);
   ui.wdtEdit->setLayout(new QVBoxLayout);
-  ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
   ui.wdtEdit->layout()->setMargin(0);
-  ui.wdtEdit->layout()->setSizeConstraint(QLayout::SetNoConstraint);
-
+  ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
   connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
+
+  FMenuBarWidget = FMessageWidgets->newMenuBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL);
+  setMenuBar(FMenuBarWidget->instance());
 
   FToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL);
   FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
-  ui.wdtView->layout()->addWidget(FToolBarWidget->instance());
+  ui.wdtToolBar->setLayout(new QVBoxLayout);
+  ui.wdtToolBar->layout()->setMargin(0);
+  ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
+
+  FStatusBarWidget = FMessageWidgets->newStatusBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL);
+  setStatusBar(FStatusBarWidget->instance());
 
   initialize();
 }
@@ -46,7 +52,9 @@ ChatWindow::~ChatWindow()
   delete FInfoWidget->instance();
   delete FViewWidget->instance();
   delete FEditWidget->instance();
+  delete FMenuBarWidget->instance();
   delete FToolBarWidget->instance();
+  delete FStatusBarWidget->instance();
 }
 
 void ChatWindow::setContactJid(const Jid &AContactJid)
@@ -130,21 +138,19 @@ void ChatWindow::initialize()
 
 void ChatWindow::saveWindowState()
 {
-  if (FSettings)
+  if (FSettings && isWindow() && isVisible())
   {
     QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    if (isWindow() && isVisible())
-      FSettings->saveBinaryData(BDI_CHAT_GEOMETRY + dataId,saveGeometry());
+    FSettings->saveBinaryData(BDI_CHAT_GEOMETRY + dataId,saveGeometry());
   }
 }
 
 void ChatWindow::loadWindowState()
 {
-  if (FSettings)
+  if (FSettings && isWindow())
   {
     QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    if (isWindow())
-      restoreGeometry(FSettings->loadBinaryData(BDI_CHAT_GEOMETRY+dataId));
+    restoreGeometry(FSettings->loadBinaryData(BDI_CHAT_GEOMETRY+dataId));
   }
   FEditWidget->textEdit()->setFocus();
 }

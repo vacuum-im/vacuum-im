@@ -15,7 +15,9 @@
 #include "editwidget.h"
 #include "viewwidget.h"
 #include "receiverswidget.h"
+#include "menubarwidget.h"
 #include "toolbarwidget.h"
+#include "statusbarwidget.h"
 #include "messagewindow.h"
 #include "chatwindow.h"
 #include "tabwindow.h"
@@ -53,7 +55,9 @@ public:
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IReceiversWidget *newReceiversWidget(const Jid &AStreamJid);
+  virtual IMenuBarWidget *newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
   virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
+  virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
   virtual QList<IMessageWindow *> messageWindows() const;
   virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
   virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid);
@@ -73,7 +77,9 @@ signals:
   virtual void viewWidgetCreated(IViewWidget *AViewWidget);
   virtual void editWidgetCreated(IEditWidget *AEditWidget);
   virtual void receiversWidgetCreated(IReceiversWidget *AReceiversWidget);
+  virtual void menuBarWidgetCreated(IMenuBarWidget *AMenuBarWidget);
   virtual void toolBarWidgetCreated(IToolBarWidget *AToolBarWidget);
+  virtual void statusBarWidgetCreated(IStatusBarWidget *AStatusBarWidget);
   virtual void messageWindowCreated(IMessageWindow *AWindow);
   virtual void messageWindowDestroyed(IMessageWindow *AWindow);
   virtual void chatWindowCreated(IChatWindow *AWindow);

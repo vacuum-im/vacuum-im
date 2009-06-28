@@ -8,7 +8,9 @@
 #include "../../utils/jid.h"
 #include "../../utils/action.h"
 #include "../../utils/message.h"
+#include "../../utils/menubarchanger.h"
 #include "../../utils/toolbarchanger.h"
+#include "../../utils/statusbarchanger.h"
 
 #define MESSAGEWIDGETS_UUID "{89de35ee-bd44-49fc-8495-edd2cfebb685}"
 
@@ -109,11 +111,33 @@ signals:
   virtual void receiverRemoved(const Jid &AReceiver) =0;
 };
 
+class IMenuBarWidget
+{
+public:
+  virtual QMenuBar *instance() = 0;
+  virtual MenuBarChanger *menuBarChanger() const =0;
+  virtual IInfoWidget *infoWidget() const =0;
+  virtual IViewWidget *viewWidget() const =0;
+  virtual IEditWidget *editWidget() const =0;
+  virtual IReceiversWidget *receiversWidget() const =0;
+};
+
 class IToolBarWidget
 {
 public:
   virtual QToolBar *instance() = 0;
   virtual ToolBarChanger *toolBarChanger() const =0;
+  virtual IInfoWidget *infoWidget() const =0;
+  virtual IViewWidget *viewWidget() const =0;
+  virtual IEditWidget *editWidget() const =0;
+  virtual IReceiversWidget *receiversWidget() const =0;
+};
+
+class IStatusBarWidget
+{
+public:
+  virtual QStatusBar *instance() = 0;
+  virtual StatusBarChanger *statusBarChanger() const =0;
   virtual IInfoWidget *infoWidget() const =0;
   virtual IViewWidget *viewWidget() const =0;
   virtual IEditWidget *editWidget() const =0;
@@ -156,14 +180,15 @@ class IChatWindow :
   public ITabWidget
 {
 public:
-  //virtual QMainWindow *instance() = 0;
   virtual const Jid &streamJid() const =0;
   virtual const Jid &contactJid() const =0;
   virtual void setContactJid(const Jid &AContactJid) =0;
   virtual IInfoWidget *infoWidget() const =0;
   virtual IViewWidget *viewWidget() const =0;
   virtual IEditWidget *editWidget() const =0;
+  virtual IMenuBarWidget *menuBarWidget() const =0;
   virtual IToolBarWidget *toolBarWidget() const =0;
+  virtual IStatusBarWidget *statusBarWidget() const =0;
   virtual bool isActive() const =0;
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 signals:
@@ -183,7 +208,6 @@ public:
     WriteMode   =2
   };
 public:
-  //virtual QMainWindow *instance() = 0;
   virtual const Jid &streamJid() const =0;
   virtual const Jid &contactJid() const =0;
   virtual void setContactJid(const Jid &AContactJid) =0;
@@ -239,7 +263,9 @@ public:
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IReceiversWidget *newReceiversWidget(const Jid &AStreamJid) =0;
+  virtual IMenuBarWidget *newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers) =0;
   virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers) =0;
+  virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers) =0;
   virtual QList<IMessageWindow *> messageWindows() const =0;
   virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
   virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
@@ -259,7 +285,9 @@ signals:
   virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
   virtual void editWidgetCreated(IEditWidget *AEditWidget) =0;
   virtual void receiversWidgetCreated(IReceiversWidget *AReceiversWidget) =0;
+  virtual void menuBarWidgetCreated(IMenuBarWidget *AMenuBarWidget) =0;
   virtual void toolBarWidgetCreated(IToolBarWidget *AToolBarWidget) =0;
+  virtual void statusBarWidgetCreated(IStatusBarWidget *AStatusBarWidget) =0;
   virtual void messageWindowCreated(IMessageWindow *AWindow) =0;
   virtual void messageWindowDestroyed(IMessageWindow *AWindow) =0;
   virtual void chatWindowCreated(IChatWindow *AWindow) =0;
@@ -275,7 +303,9 @@ Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
 Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.0")
 Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.0")
 Q_DECLARE_INTERFACE(IReceiversWidget,"Vacuum.Plugin.IReceiversWidget/1.0")
+Q_DECLARE_INTERFACE(IMenuBarWidget,"Vacuum.Plugin.IMenuBarWidget/1.0")
 Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")
+Q_DECLARE_INTERFACE(IStatusBarWidget,"Vacuum.Plugin.IStatusBarWidget/1.0")
 Q_DECLARE_INTERFACE(ITabWidget,"Vacuum.Plugin.ITabWidget/1.0")
 Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.0")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")

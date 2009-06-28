@@ -13,7 +13,9 @@ HEADERS = messagewidgets.h \
           viewwidget.h \
           editwidget.h \
           receiverswidget.h \
+          menubarwidget .h \
           toolbarwidget.h \
+          statusbarwidget.h \
           chatwindow.h \
           messagewindow.h \
           tabwindow.h \
@@ -25,7 +27,9 @@ SOURCES = messagewidgets.cpp \
           viewwidget.cpp \
           editwidget.cpp \
           receiverswidget.cpp \
+          menubarwidget.cpp \
           toolbarwidget.cpp \
+          statusbarwidget.cpp \
           chatwindow.cpp \
           messagewindow.cpp \
           tabwindow.cpp \

@@ -211,7 +211,7 @@ QStandardItem *ViewHistoryWindow::findHeaderItem(const IArchiveHeader &AHeader, 
 
 void ViewHistoryWindow::setGroupKind(int AGroupKind)
 {
-  foreach (Action *action, FGroupKindMenu->actions())
+  foreach (Action *action, FGroupKindMenu->groupActions())
     action->setChecked(action->data(ADR_GROUP_KIND).toInt() == AGroupKind);
   if (FGroupKind != AGroupKind)
   {
@@ -223,8 +223,9 @@ void ViewHistoryWindow::setGroupKind(int AGroupKind)
 
 void ViewHistoryWindow::setArchiveSource(int ASource)
 {
-  foreach (Action *action, FSourceMenu->actions())
+  foreach (Action *action, FSourceMenu->groupActions())
     action->setChecked(action->data(ADR_SOURCE).toInt() == ASource);
+
   if (FSource != ASource)
   {
     FSource = ASource;

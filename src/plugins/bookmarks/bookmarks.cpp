@@ -179,7 +179,7 @@ void BookMarks::showEditBookmarksDialog(const Jid &AStreamJid)
 void BookMarks::updateBookmarksMenu()
 {
   bool enabled = false;
-  QList<Action *> actionList = FBookMarksMenu->actions();
+  QList<Action *> actionList = FBookMarksMenu->groupActions();
   for (int i=0; !enabled && i<actionList.count(); i++)
     enabled = actionList.at(i)->isVisible();
   FBookMarksMenu->menuAction()->setEnabled(enabled);
@@ -254,8 +254,8 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
     }
     else
     {
-      qDeleteAll(streamMenu->actions(AG_BMM_BOOKMARKS_ITEMS));
-      qDeleteAll(FBookMarksMenu->actions(AG_BMM_BOOKMARKS_ITEMS + groupShift));
+      qDeleteAll(streamMenu->groupActions(AG_BMM_BOOKMARKS_ITEMS));
+      qDeleteAll(FBookMarksMenu->groupActions(AG_BMM_BOOKMARKS_ITEMS + groupShift));
       streamBookmarks.clear();
     }
 
@@ -304,7 +304,7 @@ void BookMarks::onStorageDataRemoved(const QString &AId, const Jid &AStreamJid, 
   {
     if (FStreamMenu.contains(AStreamJid))
     {
-      qDeleteAll(FStreamMenu[AStreamJid]->actions(AG_BMM_BOOKMARKS_ITEMS));
+      qDeleteAll(FStreamMenu[AStreamJid]->groupActions(AG_BMM_BOOKMARKS_ITEMS));
       FBookMarks[AStreamJid].clear();
     }
     updateBookmarksMenu();
@@ -319,13 +319,17 @@ void BookMarks::onStorageDataError(const QString &AId, const QString &AError)
 
 void BookMarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 {
-  Action *action = new Action(AWindow->roomMenu());
-  action->setText(tr("Bookmark this room"));
-  action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
-  action->setData(ADR_STREAM_JID,AWindow->streamJid().full());
-  action->setData(ADR_ROOMJID,AWindow->roomJid().bare());
-  connect(action,SIGNAL(triggered(bool)),SLOT(onAddBookmarkActionTriggered(bool)));
-  AWindow->roomMenu()->addAction(action,AG_MURM_BOOKMARKS,true);
+  Menu *roomMenu = AWindow->menuBarWidget()->menuBarChanger()->groupMenus(MBG_MUCW_ROOM).value(0,NULL);
+  if (roomMenu)
+  {
+    Action *action = new Action(roomMenu);
+    action->setText(tr("Bookmark this room"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
+    action->setData(ADR_STREAM_JID,AWindow->streamJid().full());
+    action->setData(ADR_ROOMJID,AWindow->roomJid().bare());
+    connect(action,SIGNAL(triggered(bool)),SLOT(onAddBookmarkActionTriggered(bool)));
+    roomMenu->addAction(action,AG_MURM_BOOKMARKS,true);
+  }
 }
 
 void BookMarks::onBookmarkActionTriggered(bool)

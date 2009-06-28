@@ -145,11 +145,27 @@ IReceiversWidget *MessageWidgets::newReceiversWidget(const Jid &AStreamJid)
   return widget;
 }
 
+IMenuBarWidget *MessageWidgets::newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
+{
+  IMenuBarWidget *widget = new MenuBarWidget(AInfo,AView,AEdit,AReceivers);
+  FCleanupHandler.add(widget->instance());
+  emit menuBarWidgetCreated(widget);
+  return widget;
+}
+
 IToolBarWidget *MessageWidgets::newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
 {
   IToolBarWidget *widget = new ToolBarWidget(AInfo,AView,AEdit,AReceivers);
   FCleanupHandler.add(widget->instance());
   emit toolBarWidgetCreated(widget);
+  return widget;
+}
+
+IStatusBarWidget *MessageWidgets::newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
+{
+  IStatusBarWidget *widget = new StatusBarWidget(AInfo,AView,AEdit,AReceivers);
+  FCleanupHandler.add(widget->instance());
+  emit statusBarWidgetCreated(widget);
   return widget;
 }
 
