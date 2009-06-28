@@ -25,7 +25,6 @@ PrivacyLists::PrivacyLists()
   FRostersViewPlugin = NULL;
   FStanzaProcessor = NULL;
   FRosterPlugin = NULL;
-  FMultiChatPlugin = NULL;
 
   FRosterLabelId = -1;
   FApplyAutoListsTimer.setSingleShot(true);
