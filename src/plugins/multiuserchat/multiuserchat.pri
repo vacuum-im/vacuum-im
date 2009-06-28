@@ -7,12 +7,14 @@ HEADERS = multiuser.h \
           multiuserchatplugin.h \
           joinmultichatdialog.h \
           multiuserchatwindow.h \
-          edituserslistdialog.h
+          edituserslistdialog.h \
+          usercontextmenu.h
 
 SOURCES = multiuser.cpp \
           multiuserchat.cpp \
           multiuserchatplugin.cpp \
           joinmultichatdialog.cpp \
           multiuserchatwindow.cpp \
-          edituserslistdialog.cpp
+          edituserslistdialog.cpp \
+          usercontextmenu.cpp
 

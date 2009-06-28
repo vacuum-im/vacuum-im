@@ -26,6 +26,7 @@
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
 #include "edituserslistdialog.h"
+#include "usercontextmenu.h"
 #include "ui_multiuserchatwindow.h"
 
 #define GROUP_NOTIFICATOR_ID      "GroupChatMessages"
@@ -67,6 +68,7 @@ public:
   virtual IMultiUserChat *multiUserChat() const { return FMultiChat; }
   virtual IChatWindow *openChatWindow(const Jid &AContactJid); 
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;
+  virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
   virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000);
 signals:
   virtual void windowShow();
