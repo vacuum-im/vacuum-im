@@ -28,7 +28,9 @@ public:
   virtual IInfoWidget *infoWidget() const { return FInfoWidget; }
   virtual IViewWidget *viewWidget() const { return FViewWidget; }
   virtual IEditWidget *editWidget() const { return FEditWidget; }
+  virtual IMenuBarWidget *menuBarWidget() const { return FMenuBarWidget; }
   virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
+  virtual IStatusBarWidget *statusBarWidget() const { return FStatusBarWidget; }
   virtual bool isActive() const;
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
@@ -64,11 +66,12 @@ private:
   IInfoWidget *FInfoWidget;
   IViewWidget *FViewWidget;
   IEditWidget *FEditWidget;
+  IMenuBarWidget *FMenuBarWidget;
   IToolBarWidget *FToolBarWidget;
+  IStatusBarWidget *FStatusBarWidget;
 private:
   Jid FStreamJid;
   Jid FContactJid;
-  QString FLastStatusShow;
 };
 
 #endif // CHATWINDOW_H

@@ -11,6 +11,7 @@
 #include "../../definations/soundfiles.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
+#include "../../definations/menubargroups.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/imessagewidgets.h"
 #include "../../interfaces/imessageprocessor.h"
@@ -60,10 +61,9 @@ public:
   virtual bool isActive() const { return isVisible() && isActiveWindow(); }
   virtual IViewWidget *viewWidget() const { return FViewWidget; }
   virtual IEditWidget *editWidget() const { return FEditWidget; }
-  virtual QMenuBar *menuBar() const { return ui.mnbMenuBar; }
-  virtual Menu *roomMenu() const { return FRoomMenu; }
-  virtual Menu *toolsMenu() const { return FToolsMenu; }
+  virtual IMenuBarWidget *menuBarWidget() const { return FMenuBarWidget; }
   virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
+  virtual IStatusBarWidget *statusBarWidget() const { return FStatusBarWidget; }
   virtual IMultiUserChat *multiUserChat() const { return FMultiChat; }
   virtual IChatWindow *openChatWindow(const Jid &AContactJid); 
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;
@@ -177,7 +177,9 @@ private:
 private:
   IViewWidget *FViewWidget;
   IEditWidget *FEditWidget;
+  IMenuBarWidget *FMenuBarWidget;
   IToolBarWidget *FToolBarWidget;
+  IStatusBarWidget *FStatusBarWidget;
 private:
   Menu *FRoomMenu;
     Action *FChangeNick;

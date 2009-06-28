@@ -11,7 +11,9 @@ HEADERS  = utilsexport.h \
            toolbarchanger.h \
            datetime.h \
            filestorage.h \
-           iconstorage.h
+           iconstorage.h \
+           menubarchanger.h \
+           statusbarchanger.h
           
 
 SOURCES  = jid.cpp \
@@ -26,4 +28,6 @@ SOURCES  = jid.cpp \
            toolbarchanger.cpp \
            datetime.cpp \
            filestorage.cpp \
-           iconstorage.cpp
+           iconstorage.cpp \
+           menubarchanger.cpp \
+           statusbarchanger.cpp

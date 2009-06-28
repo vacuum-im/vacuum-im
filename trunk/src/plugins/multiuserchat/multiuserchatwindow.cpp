@@ -393,19 +393,25 @@ void MultiUserChatWindow::createMessageWidgets()
     connect(FEditWidget->instance(),SIGNAL(messageAboutToBeSend()),SLOT(onMessageAboutToBeSend()));
     connect(FEditWidget->instance(),SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onEditWidgetKeyEvent(QKeyEvent *,bool &)));
 
+    FMenuBarWidget = FMessageWidgets->newMenuBarWidget(NULL,FViewWidget,FEditWidget,NULL);
+    setMenuBar(FMenuBarWidget->instance());
+
     FToolBarWidget = FMessageWidgets->newToolBarWidget(NULL,FViewWidget,FEditWidget,NULL);
     ui.wdtToolBar->setLayout(new QVBoxLayout);
     ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
     ui.wdtToolBar->layout()->setMargin(0);
     FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
+
+    FStatusBarWidget = FMessageWidgets->newStatusBarWidget(NULL,FViewWidget,FEditWidget,NULL);
+    setStatusBar(FStatusBarWidget->instance());
   }
 }
 
 void MultiUserChatWindow::createMenuBarActions()
 {
-  FRoomMenu = new Menu(this);
+  FRoomMenu = new Menu(FMenuBarWidget->menuBarChanger()->menuBar());
   FRoomMenu->setTitle(tr("Conference"));
-  ui.mnbMenuBar->addMenu(FRoomMenu);
+  FMenuBarWidget->menuBarChanger()->insertMenu(FRoomMenu,MBG_MUCW_ROOM);
 
   FChangeNick = new Action(FRoomMenu);
   FChangeNick->setText(tr("Change room nick"));
@@ -432,9 +438,9 @@ void MultiUserChatWindow::createMenuBarActions()
   connect(FQuitRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FRoomMenu->addAction(FQuitRoom,AG_MURM_MULTIUSERCHAT_EXIT,true);
 
-  FToolsMenu = new Menu(this);
+  FToolsMenu = new Menu(FMenuBarWidget->menuBarChanger()->menuBar());
   FToolsMenu->setTitle(tr("Tools"));
-  ui.mnbMenuBar->addMenu(FToolsMenu);
+  FMenuBarWidget->menuBarChanger()->insertMenu(FToolsMenu,MBG_MUCW_TOOLS);
 
   FInviteContact = new Action(FToolsMenu);
   FInviteContact->setText(tr("Invite to this room"));

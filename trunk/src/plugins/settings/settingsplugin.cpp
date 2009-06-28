@@ -519,7 +519,7 @@ void SettingsPlugin::addProfileAction(const QString &AProfile)
 
 void SettingsPlugin::setActiveProfileAction(const QString &AProfile)
 {
-  foreach(Action *action, FProfileMenu->actions(AG_DEFAULT))
+  foreach(Action *action, FProfileMenu->groupActions(AG_DEFAULT))
   {
     if (action->data(ADR_PROFILE).toString() == AProfile)
       action->setChecked(true);
