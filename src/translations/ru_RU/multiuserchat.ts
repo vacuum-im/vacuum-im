@@ -42,10 +42,6 @@
 <context>
     <name>JoinMultiChatDialog</name>
     <message>
-        <source>%1 as %2</source>
-        <translation>%1 как %2</translation>
-    </message>
-    <message>
         <source>Room parameters is not acceptable.
 Check values and try again</source>
         <translation>Настройки комнаты недопустимы.
@@ -61,14 +57,6 @@ Check values and try again</source>
     <message>
         <source>Identity:</source>
         <translation>Подключение:</translation>
-    </message>
-    <message>
-        <source>Recent:</source>
-        <translation>Недавние:</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Удалить</translation>
     </message>
     <message>
         <source>Room</source>
