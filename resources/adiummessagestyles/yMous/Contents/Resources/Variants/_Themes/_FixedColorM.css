@@ -1,11 +1,5 @@
 @charset "utf-8";
 
-.consecutive .xxxsender
-{
-	//visibility: hidden;
-	color: transparent;
-}
-
 .xxxmark
 {
 	background-color: hsla(0, 0%, 100%, 1) !important;
@@ -18,7 +12,8 @@
 
 /*----------*/
 
-.outgoing
+.outgoing,
+.outgoing.consecutive.message .xxxsender:after
 {
 	color: hsla(120, 42%, 40%, .8) !important;
 }
@@ -28,16 +23,22 @@
 	color: hsla(120, 42%, 40%, .7) !important;
 }
 
-//.outgoing:hover,
-//.outgoing:hover .xxxmark,
-//.outgoing:hover .xxxmessage
-//{
-//	color: hsla(120, 42%, 25%, 1) !important;
-//}
+.outgoing:hover,
+.outgoing:hover .xxxmark,
+.outgoing:hover .xxxmessage,
+.outgoing:hover.consecutive.message .xxxsender:after,
+.outgoing.xxxhover,
+.outgoing.xxxhover .xxxmark,
+.outgoing.xxxhover .xxxmessage,
+.outgoing.xxxhover.consecutive.message .xxxsender:after
+{
+	color: hsla(120, 42%, 25%, 1) !important;
+}
 
 /*----------*/
 
-.incoming
+.incoming,
+.incoming.consecutive.message .xxxsender:after
 {
 	color: hsla(240, 72%, 55%, .8) !important;
 }
@@ -47,12 +48,17 @@
 	color: hsla(240, 72%, 55%, .7) !important;
 }
 
-//.incoming:hover,
-//.incoming:hover .xxxmark,
-//.incoming:hover .xxxmessage
-//{
-//	color: hsla(240, 72%, 40%, 1) !important;
-//}
+.incoming:hover,
+.incoming:hover .xxxmark,
+.incoming:hover .xxxmessage,
+.incoming:hover.consecutive.message .xxxsender:after,
+.incoming.xxxhover,
+.incoming.xxxhover .xxxmark,
+.incoming.xxxhover .xxxmessage,
+.incoming.xxxhover.consecutive.message .xxxsender:after
+{
+	color: hsla(240, 72%, 40%, 1) !important;
+}
 
 /*----------*/
 
@@ -68,13 +74,19 @@
 	color: hsla(0, 0%, 60%, .7) !important;
 }
 
-//.status:hover,
-//.status:hover .xxxmark,
-//.status:hover .xxxmessage,
-//.event:hover,
-//.event:hover .xxxmark,
-//.event:hover .xxxmessage
-//{
-//	color: hsla(0, 0%, 35%, 1) !important;
-//}
+.status:hover,
+.status:hover .xxxmark,
+.status:hover .xxxmessage,
+.event:hover,
+.event:hover .xxxmark,
+.event:hover .xxxmessage,
+.status.xxxhover,
+.status.xxxhover .xxxmark,
+.status.xxxhover .xxxmessage,
+.event.xxxhover,
+.event.xxxhover .xxxmark,
+.event.xxxhover .xxxmessage
+{
+	color: hsla(0, 0%, 35%, 1) !important;
+}
 
