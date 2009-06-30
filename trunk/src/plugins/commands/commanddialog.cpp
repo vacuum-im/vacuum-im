@@ -66,6 +66,8 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
       ui.lblInfo->setText(tr("Command execution completed."));
     else if (AResult.status == COMMAND_STATUS_CANCELED)
       ui.lblInfo->setText(tr("Command execution canceled."));
+    else
+      ui.lblInfo->setVisible(false);
 
     if (!AResult.actions.isEmpty())
     {
@@ -111,6 +113,7 @@ void CommandDialog::resetDialog()
 {
   setWindowTitle(tr("Executing command '%1' at %2").arg(FNode).arg(FCommandJid.full()));
   ui.lblInfo->setText("");
+  ui.lblInfo->setVisible(true);
   if (FCurrentForm)
   {
     ui.wdtForm->layout()->removeWidget(FCurrentForm->instance());
