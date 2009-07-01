@@ -20,7 +20,9 @@ AdiumOptionsWidget::AdiumOptionsWidget(AdiumMessageStylePlugin *APlugin, int AMe
   ui.cmbStyle->setCurrentIndex(-1);
 
   ui.cmbBackgoundColor->addItem(tr("Default"));
-  foreach(QString color, QColor::colorNames())
+  QStringList colors = QColor::colorNames();
+  colors.sort();
+  foreach(QString color, colors)
   {
     ui.cmbBackgoundColor->addItem(color,color);
     ui.cmbBackgoundColor->setItemData(ui.cmbBackgoundColor->count()-1,QColor(color),Qt::DecorationRole);
