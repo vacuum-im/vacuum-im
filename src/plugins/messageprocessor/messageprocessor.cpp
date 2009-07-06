@@ -132,6 +132,7 @@ int MessageProcessor::receiveMessage(const Message &AMessage)
 bool MessageProcessor::sendMessage(const Jid &AStreamJid, const Message &AMessage)
 {
   Message message = AMessage;
+  message.setFrom(AStreamJid.eFull());
 
   emit messageSend(message);
   if (FStanzaProcessor->sendStanzaOut(AStreamJid,message.stanza()))
