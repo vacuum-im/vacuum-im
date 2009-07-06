@@ -2,11 +2,12 @@
 #define ISTANZAPROCESSOR_H
 
 #include <QStringList>
-#include "../../definations/stanzahandlerpriority.h"
 #include "../../utils/jid.h"
 #include "../../utils/stanza.h"
 
 #define STANZAPROCESSOR_UUID "{1175D470-5D4A-4c29-A69E-EDA46C2BC387}"
+
+#define SHP_DEFAULT   0
 
 class IStanzaHandler {
 public:
@@ -42,7 +43,7 @@ public:
   virtual void appendCondition(int AHandlerId, const QString &ACondition) =0;
   virtual void removeCondition(int AHandlerId, const QString &ACondition) =0;
   virtual int insertHandler(IStanzaHandler *AHandler, const QString &ACondition, int ADirection, 
-	  int APriority = SHP_DEFAULT, const Jid &AStreamJid = Jid()) =0;
+    int APriority = SHP_DEFAULT, const Jid &AStreamJid = Jid()) =0;
   virtual void removeHandler(int AHandlerId) =0;
   virtual bool checkStanza(const Stanza &AStanza, const QString &ACondition) const =0;
 signals:
