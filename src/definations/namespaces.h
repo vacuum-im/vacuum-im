@@ -73,4 +73,6 @@
 
 #define NS_FEATURENEG                           "http://jabber.org/protocol/feature-neg"
 
+#define NS_CHATSTATES                           "http://jabber.org/protocol/chatstates"
+
 #endif
