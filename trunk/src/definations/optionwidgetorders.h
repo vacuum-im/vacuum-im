@@ -29,6 +29,7 @@
 
 //Node = ON_MESSAGES
 #define OWO_MESSAGES                              500
+#define OWO_MESSAGES_CHATSTATES                   700
 
 //Node = ON_MESSAGE_STYLES
 #define OWO_MESSAGE_STYLES                        500

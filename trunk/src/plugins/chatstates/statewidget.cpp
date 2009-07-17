@@ -32,7 +32,7 @@ StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow) : QPush
 
   setMenu(FMenu);
   setFlat(true);
-  setToolTip(tr("Chat state"));
+  setToolTip(tr("User chat status"));
 
   connect(FChatStates->instance(),SIGNAL(permitStatusChanged(const Jid &, int)),
     SLOT(onPermitStatusChanged(const Jid &, int)));
@@ -46,6 +46,17 @@ StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow) : QPush
 StateWidget::~StateWidget()
 {
 
+}
+QSize StateWidget::sizeHint() const
+{
+  QSize hint = QPushButton::sizeHint();
+  hint.setHeight(qMax(fontMetrics().size(Qt::TextShowMnemonic,text()).height()+2,iconSize().height()));
+  return hint;
+}
+
+QSize StateWidget::minimumSizeHint() const
+{
+  return sizeHint();
 }
 
 void StateWidget::onStatusActionTriggered(bool)

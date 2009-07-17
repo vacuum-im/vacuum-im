@@ -1,62 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" sourcelanguage="en">
+<TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
     <name>ChatStates</name>
     <message>
-        <source>Chat States</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Communicating the status of a user in a chat session</source>
-        <translation type="unfinished"></translation>
+        <translation>Обмен информацией об активности собеседника в чате</translation>
     </message>
     <message>
-        <source>Chat states</source>
-        <translation type="unfinished"></translation>
+        <source>Chat State Notifications</source>
+        <translation>Уведомления об активности собеседника</translation>
+    </message>
+</context>
+<context>
+    <name>StateOptionsWidgetClass</name>
+    <message>
+        <source>Send chat state notifications</source>
+        <translation>Отправлять уведомления об активности в чате</translation>
     </message>
 </context>
 <context>
     <name>StateWidget</name>
     <message>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>По умолчанию</translation>
     </message>
     <message>
         <source>Always Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Всегда включено</translation>
     </message>
     <message>
         <source>Always Disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Chat state</source>
-        <translation type="unfinished"></translation>
+        <translation>Всегда выключено</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестно</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation>Активен</translation>
     </message>
     <message>
         <source>Composing</source>
-        <translation type="unfinished"></translation>
+        <translation>Печатает</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Отвлёкся</translation>
     </message>
     <message>
         <source>Inactive</source>
-        <translation type="unfinished"></translation>
+        <translation>Не активен</translation>
     </message>
     <message>
         <source>Gone</source>
-        <translation type="unfinished"></translation>
+        <translation>Вышел</translation>
+    </message>
+    <message>
+        <source>User chat status</source>
+        <translation>Активность собеседника в чате</translation>
     </message>
 </context>
 </TS>

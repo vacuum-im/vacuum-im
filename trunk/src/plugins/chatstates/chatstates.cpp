@@ -43,7 +43,7 @@ void ChatStates::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->uid = CHATSTATES_UUID;
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->name = tr("Chat States"); 
+  APluginInfo->name = tr("Chat State Notifications"); 
   APluginInfo->description = tr("Communicating the status of a user in a chat session");
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->version = "0.1";
@@ -118,6 +118,9 @@ bool ChatStates::initObjects()
   //if (FMessageArchiver)
   //  FMessageArchiver->insertArchiveHandler(this,AHO_DEFAULT);
 
+  if (FSettingsPlugin)
+    FSettingsPlugin->insertOptionsHolder(this);
+
   if (FStanzaProcessor)
   {
     FSHIMessagesIn = FStanzaProcessor->insertHandler(this,SHC_STATE_MESSAGES,IStanzaProcessor::DirectionIn,SHP_CHATSTATES);
@@ -143,38 +146,56 @@ bool ChatStates::archiveMessage(int /*AOrder*/, const Jid &/*AStreamJid*/, Messa
   return true;
 }
 
-bool ChatStates::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept)
+QWidget *ChatStates::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (AHandlerId == FSHIMessagesOut)
+  if (ANode == ON_MESSAGES)
   {
+    AOrder = OWO_MESSAGES_CHATSTATES;
+    StateOptionsWidget *widget = new StateOptionsWidget(this);
+    connect(widget,SIGNAL(optionsApplied()),SIGNAL(optionsAccepted()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
+    return widget;
+  }
+  return NULL;
+}
+
+bool ChatStates::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &/*AAccept*/)
+{
+  if (AHandlerId==FSHIMessagesOut && FChatParams.contains(AStreamJid))
+  {
+    bool stateSent = false;
     Jid contactJid = AStanza->to();
     if (isEnabled(contactJid) && isSupported(AStreamJid,contactJid))
     {
       IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid) : NULL;
       if (window)
       {
-        AAccept = true;
+        stateSent = true;
         AStanza->addElement(STATE_ACTIVE,NS_CHATSTATES);
-        setSelfState(AStreamJid,contactJid,IChatStates::StateActive,false);
       }
     }
+    FChatParams[AStreamJid][contactJid].canSendStates = stateSent;
+    setSelfState(AStreamJid,contactJid,IChatStates::StateActive,false);
   }
   return false;
 }
 
 bool ChatStates::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
-  if (AHandlerId == FSHIMessagesIn)
+  if (AHandlerId==FSHIMessagesIn && FChatParams.contains(AStreamJid))
   {
     Jid contactJid = AStanza.from();
     bool hasBody = !AStanza.firstElement("body").isNull();
     QDomElement elem = AStanza.firstElement(QString::null,NS_CHATSTATES);
     if (!elem.isNull())
     {
-      if (hasBody || FChatParams.value(AStreamJid).contains(contactJid))
+      if (hasBody || FChatParams.value(AStreamJid).value(contactJid).canSendStates==true)
       {
         AAccept = true;
         setSupported(AStreamJid,contactJid,true);
+        FChatParams[AStreamJid][contactJid].canSendStates = true;
+        
         int state = IChatStates::StateUnknown;
         if (elem.tagName() == STATE_ACTIVE)
           state = IChatStates::StateActive;
@@ -191,6 +212,8 @@ bool ChatStates::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza 
     }
     else if (hasBody)
     {
+      if (userChatState(AStreamJid,contactJid) != IChatStates::StateUnknown)
+        setUserState(AStreamJid,contactJid,IChatStates::StateUnknown);
       setSupported(AStreamJid,contactJid,false);
     }
     return !hasBody;
@@ -207,6 +230,8 @@ void ChatStates::setEnabled(bool AEnabled)
 {
   if (FEnabled != AEnabled)
   {
+    if (AEnabled)
+      resetSupported();
     FEnabled = AEnabled;
     emit chatStatesEnabled(AEnabled);
   }
@@ -228,6 +253,8 @@ void ChatStates::setPermitStatus(const Jid AContactJid, int AStatus)
   Jid bareJid = AContactJid.bare();
   if (FPermitStatus.value(bareJid,IChatStates::StatusDefault) != AStatus)
   {
+    bool enabled = isEnabled(AContactJid);
+
     if (AStatus==IChatStates::StatusDisable)
     {
       FPermitStatus.insert(bareJid,AStatus);
@@ -241,16 +268,19 @@ void ChatStates::setPermitStatus(const Jid AContactJid, int AStatus)
       FPermitStatus.remove(bareJid);
     }
 
+    if (!enabled && isEnabled(AContactJid))
+      resetSupported(AContactJid);
+
     emit permitStatusChanged(bareJid,AStatus);
   }
 }
 
 bool ChatStates::isSupported(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  bool supported = true;
-  if (FDiscovery && !FChatParams.value(AStreamJid).contains(AContactJid))
+  bool supported = !FNotSupported.value(AStreamJid).contains(AContactJid);
+  if (FDiscovery && supported && userChatState(AStreamJid,AContactJid)==IChatStates::StateUnknown)
     supported = !FDiscovery->hasDiscoInfo(AContactJid) || FDiscovery->discoInfo(AContactJid).features.contains(NS_CHATSTATES);
-  return supported && !FNotSupported.value(AStreamJid).contains(AContactJid);
+  return supported;
 }
 
 int ChatStates::userChatState(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -261,6 +291,45 @@ int ChatStates::userChatState(const Jid &AStreamJid, const Jid &AContactJid) con
 int ChatStates::selfChatState(const Jid &AStreamJid, const Jid &AContactJid) const
 {
   return FChatParams.value(AStreamJid).value(AContactJid).selfState;
+}
+
+bool ChatStates::isSendingPossible(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+  return isEnabled(AContactJid) && isSupported(AStreamJid,AContactJid) && FChatParams.value(AStreamJid).value(AContactJid).canSendStates;
+}
+
+void ChatStates::sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid, int AState) const
+{
+  if (FStanzaProcessor && isSendingPossible(AStreamJid,AContactJid))
+  {
+    QString state;
+    if (AState == IChatStates::StateActive)
+      state = STATE_ACTIVE;
+    else if (AState == IChatStates::StateComposing)
+      state = STATE_COMPOSING;
+    else if (AState == IChatStates::StatePaused)
+      state = STATE_PAUSED;
+    else if (AState == IChatStates::StateInactive)
+      state = STATE_INACTIVE;
+    else if (AState == IChatStates::StateGone)
+      state = STATE_GONE;
+
+    if (!state.isEmpty())
+    {
+      Stanza stanza("message");
+      stanza.setType("chat").setTo(AContactJid.eFull());
+      stanza.addElement(state,NS_CHATSTATES);
+      FStanzaProcessor->sendStanzaOut(AStreamJid,stanza);
+    }
+  }
+}
+
+void ChatStates::resetSupported(const Jid &AContactJid)
+{
+  foreach (Jid streamJid, FNotSupported.keys())
+    foreach (Jid contactJid, FNotSupported.value(streamJid))
+      if (AContactJid.isEmpty() || (AContactJid && contactJid))
+        setSupported(streamJid,contactJid,true);
 }
 
 void ChatStates::setSupported(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported)
@@ -288,16 +357,12 @@ void ChatStates::setUserState(const Jid &AStreamJid, const Jid &AContactJid, int
 {
   if (FChatParams.contains(AStreamJid))
   {
-    if (AState != IChatStates::StateUnknown)
+    ChatParams &params = FChatParams[AStreamJid][AContactJid];
+    if (params.userState != AState)
     {
-      FChatParams[AStreamJid][AContactJid].userState = AState;
+      params.userState = AState;
+      emit userChatStateChanged(AStreamJid,AContactJid,AState);
     }
-    else
-    {
-      setSelfState(AStreamJid,AContactJid,AState,false);
-      FChatParams[AStreamJid].remove(AContactJid);
-    }
-    emit userChatStateChanged(AStreamJid,AContactJid,AState);
   }
 }
 
@@ -317,38 +382,12 @@ void ChatStates::setSelfState(const Jid &AStreamJid, const Jid &AContactJid, int
   }
 }
 
-void ChatStates::sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid, int AState)
-{
-  if (FStanzaProcessor && isEnabled(AContactJid) && isSupported(AStreamJid,AContactJid))
-  {
-    QString state;
-    if (AState == IChatStates::StateActive)
-      state = STATE_ACTIVE;
-    else if (AState == IChatStates::StateComposing)
-      state = STATE_COMPOSING;
-    else if (AState == IChatStates::StatePaused)
-      state = STATE_PAUSED;
-    else if (AState == IChatStates::StateInactive)
-      state = STATE_INACTIVE;
-    else if (AState == IChatStates::StateGone)
-      state = STATE_GONE;
-    
-    if (!state.isEmpty())
-    {
-      Stanza stanza("message");
-      stanza.setType("chat").setTo(AContactJid.eFull());
-      stanza.addElement(state,NS_CHATSTATES);
-      FStanzaProcessor->sendStanzaOut(AStreamJid,stanza);
-    }
-  }
-}
-
 void ChatStates::registerDiscoFeatures()
 {
   IDiscoFeature dfeature;
   dfeature.var = NS_CHATSTATES;
   dfeature.active = true;
-  dfeature.name = tr("Chat states");
+  dfeature.name = tr("Chat State Notifications");
   dfeature.description = tr("Communicating the status of a user in a chat session");
   FDiscovery->insertDiscoFeature(dfeature);
 }
@@ -363,7 +402,7 @@ void ChatStates::onPresenceReceived(IPresence *APresence, const IPresenceItem &A
 {
   if (AItem.show==IPresence::Offline || AItem.show==IPresence::Error)
   {
-    if (FChatParams.value(APresence->streamJid()).contains(AItem.itemJid))
+    if (userChatState(APresence->streamJid(),AItem.itemJid) != IChatStates::StateUnknown)
       setUserState(APresence->streamJid(),AItem.itemJid,IChatStates::StateGone);
   }
 }
@@ -371,8 +410,10 @@ void ChatStates::onPresenceReceived(IPresence *APresence, const IPresenceItem &A
 void ChatStates::onPresenceClosed(IPresence *APresence)
 {
   foreach(Jid contactJid, FChatParams.value(APresence->streamJid()).keys())
+  {
     setUserState(APresence->streamJid(),contactJid,IChatStates::StateUnknown);
-  
+    setSelfState(APresence->streamJid(),contactJid,IChatStates::StateUnknown,false);
+  }
   FNotSupported.remove(APresence->streamJid());
   FChatParams.remove(APresence->streamJid());
 }
@@ -391,40 +432,41 @@ void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
 void ChatStates::onChatWindowActivated()
 {
   IChatWindow *window = qobject_cast<IChatWindow *>(sender());
-  if (window && FChatParams.value(window->streamJid()).contains(window->contactJid()))
+  if (window)
   {
     int state = selfChatState(window->streamJid(),window->contactJid());
-    if (state==IChatStates::StateInactive || state==IChatStates::StateGone)
-      setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive,true);
+    if (state==IChatStates::StateUnknown || state==IChatStates::StateInactive || state==IChatStates::StateGone)
+      setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive);
   }
 }
 
 void ChatStates::onChatWindowTextChanged()
 {
   QTextEdit *editor = qobject_cast<QTextEdit *>(sender());
-  if (editor && !editor->document()->isEmpty())
+  IChatWindow *window = FChatByEditor.value(editor,NULL);
+  if (editor && window)
   {
-    IChatWindow *window = FChatByEditor.value(editor,NULL);
-    if (window && FChatParams.value(window->streamJid()).contains(window->contactJid()))
-      setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateComposing,true);
+    if (!editor->document()->isEmpty())
+      setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateComposing);
+    else
+      setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive);
   }
 }
 
 void ChatStates::onChatWindowClosed()
 {
   IChatWindow *window = qobject_cast<IChatWindow *>(sender());
-  if (window && FChatParams.value(window->streamJid()).contains(window->contactJid()))
+  if (window)
   {
     int state = selfChatState(window->streamJid(),window->contactJid());
     if (state != IChatStates::StateGone)
-      setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive,true);
+      setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive);
   }
 }
 
 void ChatStates::onChatWindowDestroyed(IChatWindow *AWindow)
 {
-  if (FChatParams.value(AWindow->streamJid()).contains(AWindow->contactJid()))
-    setSelfState(AWindow->streamJid(),AWindow->contactJid(),IChatStates::StateGone,true);
+  setSelfState(AWindow->streamJid(),AWindow->contactJid(),IChatStates::StateGone);
   FChatByEditor.remove(AWindow->editWidget()->textEdit());
 }
 
@@ -439,19 +481,19 @@ void ChatStates::onUpdateSelfStates()
       uint timePassed = QDateTime::currentDateTime().toTime_t() - params.selfLastActive;
       if (params.selfState==IChatStates::StateActive && window->isActive())
       {
-        setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive,true);
+        setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive);
       }
       else if (params.selfState==IChatStates::StateComposing && timePassed>PAUSED_TIMEOUT)
       {
-        setSelfState(window->streamJid(),window->contactJid(),IChatStates::StatePaused,true);
+        setSelfState(window->streamJid(),window->contactJid(),IChatStates::StatePaused);
       }
       else if ((params.selfState==IChatStates::StateActive || params.selfState==IChatStates::StatePaused) && timePassed>INACTIVE_TIMEOUT)
       {
-        setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive,true);
+        setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive);
       }
       else if (params.selfState==IChatStates::StateInactive && timePassed>GONE_TIMEOUT)
       {
-        setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateGone,true);
+        setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateGone);
       }
     }
   }

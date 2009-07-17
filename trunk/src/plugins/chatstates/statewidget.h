@@ -14,6 +14,9 @@ class StateWidget :
 public:
   StateWidget(IChatStates *AChatStates, IChatWindow *AWindow);
   ~StateWidget();
+public:
+  QSize sizeHint() const;
+  QSize minimumSizeHint() const;
 protected slots:
   void onStatusActionTriggered(bool);
   void onPermitStatusChanged(const Jid &AContactJid, int AStatus);

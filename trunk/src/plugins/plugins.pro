@@ -47,4 +47,5 @@ SUBDIRS = settings \
           autostatus \
           rostersearch \
           console \
-          annotations
+          annotations \
+          chatstates
