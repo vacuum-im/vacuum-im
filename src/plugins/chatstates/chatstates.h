@@ -7,6 +7,8 @@
 #include "../../definations/stanzahandlerpriority.h"
 #include "../../definations/archivehandlerorders.h"
 #include "../../definations/statusbargroups.h"
+#include "../../definations/optionnodes.h"
+#include "../../definations/optionwidgetorders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ichatstates.h"
 #include "../../interfaces/ipresence.h"
@@ -16,6 +18,7 @@
 #include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/imessagearchiver.h"
 #include "statewidget.h"
+#include "stateoptionswidget.h"
 
 struct ChatParams 
 {
@@ -23,10 +26,12 @@ struct ChatParams
     userState = IChatStates::StateUnknown;
     selfState = IChatStates::StateUnknown;
     selfLastActive = 0;
+    canSendStates = false;
   }
   int userState;
   int selfState;
   uint selfLastActive;
+  bool canSendStates;
 };
 
 class ChatStates : 
@@ -34,10 +39,11 @@ class ChatStates :
   public IPlugin,
   public IChatStates,
   public IStanzaHandler,
-  public IArchiveHandler
+  public IArchiveHandler,
+  public IOptionsHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler);
+  Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler IOptionsHolder);
 public:
   ChatStates();
   ~ChatStates();
@@ -50,7 +56,9 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin();
   //IArchiveHandler
-    virtual bool archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
+  virtual bool archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
+  //IOptionsHolder
+  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IStanzaHandler
   virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept);
   virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
@@ -69,11 +77,16 @@ signals:
   virtual void supportStatusChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported) const;
   virtual void userChatStateChanged(const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
   virtual void selfChatStateChanged(const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
+  //IOptionsHolder
+  virtual void optionsAccepted();
+  virtual void optionsRejected();
 protected:
+  bool isSendingPossible(const Jid &AStreamJid, const Jid &AContactJid) const;
+  void sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
+  void resetSupported(const Jid &AContactJid = Jid());
   void setSupported(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported);
   void setUserState(const Jid &AStreamJid, const Jid &AContactJid, int AState);
-  void setSelfState(const Jid &AStreamJid, const Jid &AContactJid, int AState, bool ASend);
-  void sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid, int AState);
+  void setSelfState(const Jid &AStreamJid, const Jid &AContactJid, int AState, bool ASend = true);
   void registerDiscoFeatures();
 protected slots:
   void onPresenceOpened(IPresence *APresence);
