@@ -1,5 +1,7 @@
 #include "statewidget.h"
 
+#include <QDateTime>
+
 #define ADR_PERMIT_STATUS     Action::DR_Parametr1
 
 StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow) : QPushButton(AWindow->statusBarWidget()->statusBarChanger()->statusBar())
@@ -18,14 +20,14 @@ StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow) : QPush
 
   action = new Action(FMenu);
   action->setCheckable(true);
-  action->setText(tr("Always Enabled"));
+  action->setText(tr("Always send"));
   action->setData(ADR_PERMIT_STATUS, IChatStates::StatusEnable);
   connect(action,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
   FMenu->addAction(action);
 
   action = new Action(FMenu);
   action->setCheckable(true);
-  action->setText(tr("Always Disabled"));
+  action->setText(tr("Never send"));
   action->setData(ADR_PERMIT_STATUS, IChatStates::StatusDisable);
   connect(action,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
   FMenu->addAction(action);
@@ -47,6 +49,7 @@ StateWidget::~StateWidget()
 {
 
 }
+
 QSize StateWidget::sizeHint() const
 {
   QSize hint = QPushButton::sizeHint();
@@ -90,9 +93,10 @@ void StateWidget::onUserChatStateChanged(const Jid &AStreamJid, const Jid &ACont
     else if (AState == IChatStates::StatePaused)
       state = tr("Paused");
     else if (AState == IChatStates::StateInactive)
-      state = tr("Inactive");
+      state = tr("Inactive %1").arg(QDateTime::currentDateTime().toString("hh:mm"));
     else if (AState == IChatStates::StateGone)
-      state = tr("Gone");
+      state = tr("Gone %1").arg(QDateTime::currentDateTime().toString("hh:mm"));
     setText(state);
+    setMinimumWidth(qMax(minimumWidth(),sizeHint().width()));
   }
 }

@@ -9,6 +9,7 @@
 #include "../../definations/statusbargroups.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionwidgetorders.h"
+#include "../../definations/sessionnegotiatororders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ichatstates.h"
 #include "../../interfaces/ipresence.h"
@@ -17,6 +18,8 @@
 #include "../../interfaces/isettings.h"
 #include "../../interfaces/iservicediscovery.h"
 #include "../../interfaces/imessagearchiver.h"
+#include "../../interfaces/idataforms.h"
+#include "../../interfaces/isessionnegotiation.h"
 #include "statewidget.h"
 #include "stateoptionswidget.h"
 
@@ -40,10 +43,11 @@ class ChatStates :
   public IChatStates,
   public IStanzaHandler,
   public IArchiveHandler,
-  public IOptionsHolder
+  public IOptionsHolder,
+  public ISessionNegotiator
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler IOptionsHolder);
+  Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler IOptionsHolder ISessionNegotiator);
 public:
   ChatStates();
   ~ChatStates();
@@ -59,15 +63,20 @@ public:
   virtual bool archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  //ISessionNegotiator
+  virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest);
+  virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit);
+  virtual int sessionApply(const IStanzaSession &ASession);
+  virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm);
   //IStanzaHandler
   virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept);
   virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IChatStates
   virtual bool isEnabled() const;
   virtual void setEnabled(bool AEnabled);
-  virtual bool isEnabled(const Jid &AContactJid) const;
   virtual int permitStatus(const Jid &AContactJid) const;
   virtual void setPermitStatus(const Jid AContactJid, int AStatus);
+  virtual bool isEnabled(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual int userChatState(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual int selfChatState(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -100,6 +109,7 @@ protected slots:
   void onUpdateSelfStates();
   void onSettingsOpened();
   void onSettingsClosed();
+  void onStanzaSessionTerminated(const IStanzaSession &ASession);
 private:
   IPresencePlugin *FPresencePlugin;
   IMessageWidgets *FMessageWidgets;
@@ -107,15 +117,18 @@ private:
   ISettingsPlugin *FSettingsPlugin;
   IServiceDiscovery *FDiscovery;
   IMessageArchiver *FMessageArchiver;
+  IDataForms *FDataForms;
+  ISessionNegotiation *FSessionNegotiation;
 private:
-  int FSHIMessagesIn;
-  int FSHIMessagesOut;
+  QMap<Jid,int> FSHIMessagesIn;
+  QMap<Jid,int> FSHIMessagesOut;
 private:
   bool FEnabled;
   QTimer FUpdateTimer;
   QMap<Jid, int> FPermitStatus;
   QMap<Jid, QList<Jid> > FNotSupported;
   QMap<Jid, QMap<Jid, ChatParams> > FChatParams;
+  QMap<Jid, QMap<Jid, QString> > FStanzaSessions;
   QMap<QTextEdit *, IChatWindow *> FChatByEditor;
 };
 

@@ -15,6 +15,9 @@
 #define STATE_INACTIVE            "inactive"
 #define STATE_GONE                "gone"
 
+#define SFV_MAY_SEND              "may"
+#define SFV_MUSTNOT_SEND          "mustnot"
+
 #define PAUSED_TIMEOUT            30
 #define INACTIVE_TIMEOUT          2*60
 #define GONE_TIMEOUT              10*60
@@ -27,6 +30,8 @@ ChatStates::ChatStates()
   FSettingsPlugin = NULL;
   FDiscovery = NULL;
   FMessageArchiver = NULL;
+  FDataForms = NULL;
+  FSessionNegotiation = NULL;
 
   FEnabled = true;
   FUpdateTimer.setSingleShot(false);
@@ -107,6 +112,21 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  if (plugin)
+    FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+
+  plugin = APluginManager->getPlugins("ISessionNegotiation").value(0,NULL);
+  if (plugin)
+  {
+    FSessionNegotiation = qobject_cast<ISessionNegotiation *>(plugin->instance());
+    if (FSessionNegotiation && FDataForms)
+    {
+      connect(FSessionNegotiation->instance(),SIGNAL(sessionTerminated(const IStanzaSession &)),
+        SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
+    }
+  }
+
   return FMessageWidgets!=NULL && FStanzaProcessor!=NULL;
 }
 
@@ -115,19 +135,14 @@ bool ChatStates::initObjects()
   if (FDiscovery)
     registerDiscoFeatures();
 
-  //if (FMessageArchiver)
-  //  FMessageArchiver->insertArchiveHandler(this,AHO_DEFAULT);
+  if (FMessageArchiver)
+    FMessageArchiver->insertArchiveHandler(this,AHO_DEFAULT);
 
   if (FSettingsPlugin)
     FSettingsPlugin->insertOptionsHolder(this);
 
-  if (FStanzaProcessor)
-  {
-    FSHIMessagesIn = FStanzaProcessor->insertHandler(this,SHC_STATE_MESSAGES,IStanzaProcessor::DirectionIn,SHP_CHATSTATES);
-    FStanzaProcessor->appendCondition(FSHIMessagesIn,SHC_CONTENT_MESSAGES);
-
-    FSHIMessagesOut = FStanzaProcessor->insertHandler(this,SHC_CONTENT_MESSAGES,IStanzaProcessor::DirectionOut,SHP_CHATSTATES);
-  }
+  if (FSessionNegotiation && FDataForms)
+    FSessionNegotiation->insertNegotiator(this,SNO_DEFAULT);
 
   return true;
 }
@@ -140,9 +155,12 @@ bool ChatStates::startPlugin()
 
 bool ChatStates::archiveMessage(int /*AOrder*/, const Jid &/*AStreamJid*/, Message &AMessage, bool /*ADirectionIn*/)
 {
-  QDomElement elem = AMessage.stanza().firstElement(QString::null,NS_CHATSTATES);
-  if (!elem.isNull())
+  if (!AMessage.stanza().firstElement(QString::null,NS_CHATSTATES).isNull())
+  {
+    AMessage.detach();
+    QDomElement elem = AMessage.stanza().firstElement(QString::null,NS_CHATSTATES);
     elem.parentNode().removeChild(elem);
+  }
   return true;
 }
 
@@ -160,13 +178,133 @@ QWidget *ChatStates::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
+int ChatStates::sessionInit(const IStanzaSession &ASession, IDataForm &ARequest)
+{
+  IDataField chatstates;
+  chatstates.var = NS_CHATSTATES;
+  chatstates.type = DATAFIELD_TYPE_LISTSINGLE;
+  chatstates.required = false;
+
+  bool enabled = isEnabled(Jid(),ASession.contactJid);
+  if (enabled)
+  {
+    IDataOption maysend;
+    maysend.value = SFV_MAY_SEND;
+    chatstates.options.append(maysend);
+  }
+  if (permitStatus(ASession.contactJid) != IChatStates::StatusEnable)
+  {
+    IDataOption mustnotsend;
+    mustnotsend.value = SFV_MUSTNOT_SEND;
+    chatstates.options.append(mustnotsend);
+  }
+  chatstates.value = enabled ? SFV_MAY_SEND : SFV_MUSTNOT_SEND;
+  
+  if (ASession.status == IStanzaSession::Init)
+  {
+    ARequest.fields.append(chatstates);
+    return ISessionNegotiator::Auto;
+  }
+  else if (ASession.status == IStanzaSession::Renegotiate)
+  {
+    int index = FDataForms!=NULL ? FDataForms->fieldIndex(NS_CHATSTATES,ASession.form.fields) : -1;
+    if (index<0 || ASession.form.fields.at(index).value!=chatstates.value)
+    {
+      ARequest.fields.append(chatstates);
+      return ISessionNegotiator::Auto;
+    }
+  }
+  return ISessionNegotiator::Skip;
+}
+
+int ChatStates::sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit)
+{
+  int index = FDataForms!=NULL ? FDataForms->fieldIndex(NS_CHATSTATES,ARequest.fields) : -1;
+  if (index>=0)
+  {
+    int result = ISessionNegotiator::Auto;
+    if (ARequest.type == DATAFORM_TYPE_FORM)
+    {
+      IDataField chatstates;
+      chatstates.var = NS_CHATSTATES;
+      chatstates.type = DATAFIELD_TYPE_LISTSINGLE;
+      chatstates.value = ARequest.fields.at(index).value;
+      chatstates.required = false;
+
+      QStringList options;
+      for (int i=0; i<ARequest.fields.at(index).options.count(); i++)
+        options.append(ARequest.fields.at(index).options.at(i).value);
+
+      int status = permitStatus(ASession.contactJid);
+      bool enabled = isEnabled(Jid(),ASession.contactJid);
+      if ((!enabled && !options.contains(SFV_MUSTNOT_SEND)) || (status==IChatStates::StatusEnable && !options.contains(SFV_MAY_SEND)))
+      {
+        ASubmit.pages[0].fieldrefs.append(NS_CHATSTATES);
+        ASubmit.pages[0].childOrder.append(DATALAYOUT_CHILD_FIELDREF);
+        result = ISessionNegotiator::Manual;
+      }
+      ASubmit.fields.append(chatstates);
+    }
+    else if (ARequest.type == DATAFORM_TYPE_SUBMIT)
+    {
+      QString value = ARequest.fields.at(index).value.toString();
+      int status = permitStatus(ASession.contactJid);
+      bool enabled = isEnabled(Jid(),ASession.contactJid);
+      if ((!enabled && value==SFV_MAY_SEND) || (status==IChatStates::StatusEnable && value==SFV_MUSTNOT_SEND))
+      {
+        ASubmit.pages[0].fieldrefs.append(NS_CHATSTATES);
+        ASubmit.pages[0].childOrder.append(DATALAYOUT_CHILD_FIELDREF);
+        result = ISessionNegotiator::Manual;
+      }
+    }
+    return result;
+  }
+  return ISessionNegotiator::Skip;
+}
+
+int ChatStates::sessionApply(const IStanzaSession &ASession)
+{
+  int index = FDataForms!=NULL ? FDataForms->fieldIndex(NS_CHATSTATES,ASession.form.fields) : -1;
+  if (index >= 0)
+  {
+    QString value = ASession.form.fields.at(index).value.toString();
+    FStanzaSessions[ASession.streamJid].insert(ASession.contactJid,value);
+    if (value == SFV_MAY_SEND)
+    {
+      ChatParams &params = FChatParams[ASession.streamJid][ASession.contactJid];
+      params.canSendStates = true;
+      setSupported(ASession.streamJid,ASession.contactJid,true);
+      sendStateMessage(ASession.streamJid,ASession.contactJid,params.selfState);
+    }
+    return ISessionNegotiator::Auto;
+  }
+  return ISessionNegotiator::Skip;
+}
+
+void ChatStates::sessionLocalize(const IStanzaSession &/*ASession*/, IDataForm &AForm)
+{
+  int index = FDataForms!=NULL ? FDataForms->fieldIndex(NS_CHATSTATES,AForm.fields) : -1;
+  if (index >= 0)
+  {
+    AForm.fields[index].label = tr("Chat State Notifications");
+    QList<IDataOption> &options = AForm.fields[index].options;
+    for (int i=0; i<options.count(); i++)
+    {
+      if (options[i].value == SFV_MAY_SEND)
+        options[i].label = tr("Allow Chat State Notifications");
+      else if (options[i].value == SFV_MUSTNOT_SEND)
+        options[i].label = tr("Disallow Chat State Notifications");
+    }
+  }
+}
+
 bool ChatStates::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &/*AAccept*/)
 {
-  if (AHandlerId==FSHIMessagesOut && FChatParams.contains(AStreamJid))
+  if (FSHIMessagesOut.value(AStreamJid)==AHandlerId && FChatParams.contains(AStreamJid))
   {
     bool stateSent = false;
     Jid contactJid = AStanza->to();
-    if (isEnabled(contactJid) && isSupported(AStreamJid,contactJid))
+    if (isSupported(AStreamJid,contactJid))
     {
       IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid) : NULL;
       if (window)
@@ -183,7 +321,7 @@ bool ChatStates::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStan
 
 bool ChatStates::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
-  if (AHandlerId==FSHIMessagesIn && FChatParams.contains(AStreamJid))
+  if (FSHIMessagesIn.value(AStreamJid)==AHandlerId && FChatParams.contains(AStreamJid))
   {
     Jid contactJid = AStanza.from();
     bool hasBody = !AStanza.firstElement("body").isNull();
@@ -237,12 +375,6 @@ void ChatStates::setEnabled(bool AEnabled)
   }
 }
 
-bool ChatStates::isEnabled(const Jid &AContactJid) const
-{
-  int status = permitStatus(AContactJid);
-  return (isEnabled() || status==IChatStates::StatusEnable) && status!=IChatStates::StatusDisable;
-}
-
 int ChatStates::permitStatus(const Jid &AContactJid) const
 {
   return FPermitStatus.value(AContactJid.bare(),IChatStates::StatusDefault);
@@ -250,11 +382,11 @@ int ChatStates::permitStatus(const Jid &AContactJid) const
 
 void ChatStates::setPermitStatus(const Jid AContactJid, int AStatus)
 {
-  Jid bareJid = AContactJid.bare();
-  if (FPermitStatus.value(bareJid,IChatStates::StatusDefault) != AStatus)
+  if (permitStatus(AContactJid) != AStatus)
   {
-    bool enabled = isEnabled(AContactJid);
+    bool oldEnabled = isEnabled(Jid(),AContactJid);
 
+    Jid bareJid = AContactJid.bare();
     if (AStatus==IChatStates::StatusDisable)
     {
       FPermitStatus.insert(bareJid,AStatus);
@@ -268,19 +400,35 @@ void ChatStates::setPermitStatus(const Jid AContactJid, int AStatus)
       FPermitStatus.remove(bareJid);
     }
 
-    if (!enabled && isEnabled(AContactJid))
+    if (!oldEnabled && isEnabled(Jid(),AContactJid))
       resetSupported(AContactJid);
 
     emit permitStatusChanged(bareJid,AStatus);
   }
 }
 
+bool ChatStates::isEnabled(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+  QString svalue = FStanzaSessions.value(AStreamJid).value(AContactJid);
+  if (svalue == SFV_MAY_SEND)
+    return true;
+  else if (svalue == SFV_MUSTNOT_SEND)
+    return false;
+
+  int status = permitStatus(AContactJid);
+  return (isEnabled() || status==IChatStates::StatusEnable) && status!=IChatStates::StatusDisable;
+}
+
 bool ChatStates::isSupported(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  bool supported = !FNotSupported.value(AStreamJid).contains(AContactJid);
-  if (FDiscovery && supported && userChatState(AStreamJid,AContactJid)==IChatStates::StateUnknown)
-    supported = !FDiscovery->hasDiscoInfo(AContactJid) || FDiscovery->discoInfo(AContactJid).features.contains(NS_CHATSTATES);
-  return supported;
+  if (!FStanzaSessions.value(AStreamJid).contains(AContactJid))
+  {
+    bool supported = !FNotSupported.value(AStreamJid).contains(AContactJid);
+    if (FDiscovery && supported && userChatState(AStreamJid,AContactJid)==IChatStates::StateUnknown)
+      supported = !FDiscovery->hasDiscoInfo(AContactJid) || FDiscovery->discoInfo(AContactJid).features.contains(NS_CHATSTATES);
+    return supported;
+  }
+  return true;
 }
 
 int ChatStates::userChatState(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -295,7 +443,7 @@ int ChatStates::selfChatState(const Jid &AStreamJid, const Jid &AContactJid) con
 
 bool ChatStates::isSendingPossible(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  return isEnabled(AContactJid) && isSupported(AStreamJid,AContactJid) && FChatParams.value(AStreamJid).value(AContactJid).canSendStates;
+  return isEnabled(AStreamJid,AContactJid) && isSupported(AStreamJid,AContactJid) && FChatParams.value(AStreamJid).value(AContactJid).canSendStates;
 }
 
 void ChatStates::sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid, int AState) const
@@ -394,6 +542,16 @@ void ChatStates::registerDiscoFeatures()
 
 void ChatStates::onPresenceOpened(IPresence *APresence)
 {
+  if (FStanzaProcessor)
+  {
+    int handler = FStanzaProcessor->insertHandler(this,SHC_STATE_MESSAGES,IStanzaProcessor::DirectionIn,SHP_CHATSTATES,APresence->streamJid());
+    FStanzaProcessor->appendCondition(handler,SHC_CONTENT_MESSAGES);
+    FSHIMessagesIn.insert(APresence->streamJid(),handler);
+
+    handler = FStanzaProcessor->insertHandler(this,SHC_CONTENT_MESSAGES,IStanzaProcessor::DirectionOut,SHP_CHATSTATES,APresence->streamJid());
+    FSHIMessagesOut.insert(APresence->streamJid(),handler);
+  }
+
   FNotSupported[APresence->streamJid()].clear();
   FChatParams[APresence->streamJid()].clear();
 }
@@ -414,8 +572,19 @@ void ChatStates::onPresenceClosed(IPresence *APresence)
     setUserState(APresence->streamJid(),contactJid,IChatStates::StateUnknown);
     setSelfState(APresence->streamJid(),contactJid,IChatStates::StateUnknown,false);
   }
+  
+  if (FStanzaProcessor)
+  {
+    int handler = FSHIMessagesIn.take(APresence->streamJid());
+    FStanzaProcessor->removeHandler(handler);
+
+    handler = FSHIMessagesOut.take(APresence->streamJid());
+    FStanzaProcessor->removeHandler(handler);
+  }
+
   FNotSupported.remove(APresence->streamJid());
   FChatParams.remove(APresence->streamJid());
+  FStanzaSessions.remove(APresence->streamJid());
 }
 
 void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
@@ -538,6 +707,11 @@ void ChatStates::onSettingsClosed()
     foreach(QString ns, oldPermits)
       settings->deleteValueNS(SVN_PERMIT_STATUS,ns);
   }
+}
+
+void ChatStates::onStanzaSessionTerminated(const IStanzaSession &ASession)
+{
+  FStanzaSessions[ASession.streamJid].remove(ASession.contactJid);
 }
 
 Q_EXPORT_PLUGIN2(ChatStatesPlugin, ChatStates)
