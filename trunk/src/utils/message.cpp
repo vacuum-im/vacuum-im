@@ -48,7 +48,13 @@ Message::~Message()
 
 }
 
-Stanza & Message::stanza()
+void Message::detach()
+{
+  d.detach();
+  d->FStanza.detach();
+}
+
+Stanza &Message::stanza()
 {
   return d->FStanza;
 }
@@ -58,7 +64,7 @@ const Stanza &Message::stanza() const
   return d->FStanza;
 }
 
-Message & Message::setStanza(const Stanza &AStanza)
+Message &Message::setStanza(const Stanza &AStanza)
 {
   d->FStanza = AStanza; return *this;
 }
@@ -97,7 +103,8 @@ QString Message::id() const
 
 Message &Message::setId(const QString &AId)
 {
-  d->FStanza.setId(AId); return *this;
+  d->FStanza.setId(AId); 
+  return *this;
 }
 
 QString Message::from() const
@@ -187,6 +194,7 @@ Message &Message::setDateTime(const QDateTime &ADateTime, bool ADelayed)
   d->FDateTime = ADateTime;
   if (ADelayed)
   {
+    d->FStanza.detach();
     QDomElement elem = d->FStanza.firstElement("x","urn:xmpp:delay");
     if (elem.isNull())
       QDomElement elem = d->FStanza.firstElement("x","jabber:x:delay");
@@ -236,6 +244,7 @@ QString Message::threadId() const
 
 Message &Message::setThreadId(const QString &AThreadId)
 {
+  d->FStanza.detach();
   QDomElement elem = d->FStanza.firstElement("thread");
   if (!AThreadId.isEmpty())
   {
@@ -244,7 +253,9 @@ Message &Message::setThreadId(const QString &AThreadId)
     setTextToElem(elem,AThreadId);
   }
   else if (!elem.isNull())
+  {
     d->FStanza.element().removeChild(elem);
+  }
   return *this;
 }
 
@@ -263,8 +274,7 @@ QStringList Message::availableLangs(const QDomElement &AParent, const QString &A
   return langs;
 }
 
-QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &ATagName,
-                                    const QString &ALang) const
+QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang) const
 {
   QString dLang = defLang();
   QString aLang = ALang.isEmpty() ? dLang : ALang;
@@ -274,9 +284,9 @@ QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &A
   return elem;
 }
 
-QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &ATagName,
-                                    const QString &ALang, const QString &AText)
+QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang, const QString &AText)
 {
+  d->FStanza.detach();
   QDomElement elem = findChidByLang(AParent,ATagName,ALang);
   if (elem.isNull() && !AText.isEmpty())
   {
@@ -312,4 +322,3 @@ QDomElement Message::setTextToElem(QDomElement &AElem, const QString &AText) con
   }
   return AElem;
 }
-

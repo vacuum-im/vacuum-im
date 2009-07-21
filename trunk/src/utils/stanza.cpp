@@ -15,7 +15,6 @@ StanzaData::StanzaData(const StanzaData &AOther) : QSharedData(AOther)
   FDoc = AOther.FDoc.cloneNode(true).toDocument();
 }
 
-
 Stanza::Stanza(const QString &ATagName)
 {
   d = new StanzaData(ATagName);
@@ -29,6 +28,11 @@ Stanza::Stanza(const QDomElement &AElem)
 Stanza::~Stanza()
 {
 
+}
+
+void Stanza::detach()
+{
+  d.detach();
 }
 
 bool Stanza::isValid() const

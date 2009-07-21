@@ -24,6 +24,7 @@ public:
   Stanza(const QString &ATagName = "message");
   Stanza(const QDomElement &AElem);
   ~Stanza();
+  void detach();
   bool isValid() const;
   QDomDocument document() const; 
   QDomElement element() const;

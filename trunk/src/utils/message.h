@@ -41,6 +41,7 @@ public:
   Message();
   Message(const Stanza &AStanza);
   ~Message();
+  void detach();
   Stanza &stanza();
   const Stanza &stanza() const;
   Message &setStanza(const Stanza &AStanza);
