@@ -25,9 +25,9 @@ public:
   virtual QObject *instance() =0;
   virtual bool isEnabled() const =0;
   virtual void setEnabled(bool AEnabled) =0;
-  virtual bool isEnabled(const Jid &AContactJid) const =0;
   virtual int permitStatus(const Jid &AContactJid) const =0;
   virtual void setPermitStatus(const Jid AContactJid, int AStatus) =0;
+  virtual bool isEnabled(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual int userChatState(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual int selfChatState(const Jid &AStreamJid, const Jid &AContactJid) const =0;
