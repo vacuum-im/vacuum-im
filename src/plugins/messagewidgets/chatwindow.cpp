@@ -1,7 +1,10 @@
 #include "chatwindow.h"
 
-#include <QTextDocumentFragment>
+#include <QKeyEvent>
+#include <QCoreApplication>
 
+#define SVN_CHATWINDOW              "chatWindow[]"
+#define SVN_CHAT_TABWINDOW_ID       SVN_CHATWINDOW":tabWindowId"
 #define BDI_CHAT_GEOMETRY           "ChatWindowGeometry"
 
 ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
@@ -10,10 +13,11 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 
   FSettings = NULL;
   FStatusChanger = NULL;
+  FMessageWidgets = AMessageWidgets;
 
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
-  FMessageWidgets = AMessageWidgets;
+  FShownDetached = false;
 
   FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid);
   ui.wdtInfo->setLayout(new QVBoxLayout);
@@ -57,24 +61,6 @@ ChatWindow::~ChatWindow()
   delete FStatusBarWidget->instance();
 }
 
-void ChatWindow::setContactJid(const Jid &AContactJid)
-{
-  if (FMessageWidgets->findChatWindow(FStreamJid,AContactJid) == NULL)
-  {
-    Jid befour = FContactJid;
-    FContactJid = AContactJid;
-    FInfoWidget->setContactJid(FContactJid);
-    FViewWidget->setContactJid(FContactJid);
-    FEditWidget->setContactJid(FContactJid);
-    emit contactJidChanged(befour);
-  }
-}
-
-bool ChatWindow::isActive() const
-{
-  return isVisible() && isActiveWindow();
-}
-
 void ChatWindow::showWindow()
 {
   if (isWindow())
@@ -92,6 +78,29 @@ void ChatWindow::closeWindow()
     close();
   else
     emit windowClose();
+}
+
+QString ChatWindow::tabWidgetId() const
+{
+  return "ChatWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
+}
+
+void ChatWindow::setContactJid(const Jid &AContactJid)
+{
+  if (FMessageWidgets->findChatWindow(FStreamJid,AContactJid) == NULL)
+  {
+    Jid befour = FContactJid;
+    FContactJid = AContactJid;
+    FInfoWidget->setContactJid(FContactJid);
+    FViewWidget->setContactJid(FContactJid);
+    FEditWidget->setContactJid(FContactJid);
+    emit contactJidChanged(befour);
+  }
+}
+
+bool ChatWindow::isActive() const
+{
+  return isVisible() && isActiveWindow();
 }
 
 void ChatWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle)
@@ -136,44 +145,61 @@ void ChatWindow::initialize()
   }
 }
 
-void ChatWindow::saveWindowState()
-{
-  if (FSettings && isWindow() && isVisible())
-  {
-    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    FSettings->saveBinaryData(BDI_CHAT_GEOMETRY + dataId,saveGeometry());
-  }
-}
-
-void ChatWindow::loadWindowState()
+void ChatWindow::saveWindowGeometry()
 {
   if (FSettings && isWindow())
   {
     QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    restoreGeometry(FSettings->loadBinaryData(BDI_CHAT_GEOMETRY+dataId));
+    FSettings->saveBinaryData(BDI_CHAT_GEOMETRY"|"+dataId,saveGeometry());
   }
-  FEditWidget->textEdit()->setFocus();
+}
+
+void ChatWindow::loadWindowGeometry()
+{
+  if (FSettings && isWindow())
+  {
+    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
+    restoreGeometry(FSettings->loadBinaryData(BDI_CHAT_GEOMETRY"|"+dataId));
+  }
 }
 
 bool ChatWindow::event(QEvent *AEvent)
 {
-  if (AEvent->type() == QEvent::WindowActivate)
+  if (AEvent->type() == QEvent::KeyPress)
+  {
+    static QKeyEvent *sentEvent = NULL;
+    QKeyEvent *keyEvent = static_cast<QKeyEvent*>(AEvent);
+    if (sentEvent!=keyEvent && !keyEvent->text().isEmpty())
+    {
+      sentEvent = keyEvent;
+      FEditWidget->textEdit()->setFocus();
+      QCoreApplication::sendEvent(FEditWidget->textEdit(),AEvent);
+      sentEvent = NULL;
+    }
+  }
+  else if (AEvent->type() == QEvent::WindowActivate)
+  {
     emit windowActivated();
+  }
   return QMainWindow::event(AEvent);
 }
 
 void ChatWindow::showEvent(QShowEvent *AEvent)
 {
-  loadWindowState();
-  emit windowActivated();
+  if (!FShownDetached && isWindow())
+    loadWindowGeometry();
+  FShownDetached = isWindow();
   QMainWindow::showEvent(AEvent);
+  FEditWidget->textEdit()->setFocus();
+  emit windowActivated();
 }
 
 void ChatWindow::closeEvent(QCloseEvent *AEvent)
 {
-  saveWindowState();
-  emit windowClosed();
+  if (FShownDetached)
+    saveWindowGeometry();
   QMainWindow::closeEvent(AEvent);
+  emit windowClosed();
 }
 
 void ChatWindow::onMessageReady()

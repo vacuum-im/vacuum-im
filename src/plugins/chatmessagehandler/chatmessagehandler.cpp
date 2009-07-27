@@ -257,11 +257,8 @@ IChatWindow *ChatMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AC
 
 void ChatMessageHandler::showWindow(IChatWindow *AWindow)
 {
-  if (AWindow->instance()->isWindow() && !AWindow->instance()->isVisible() && FMessageWidgets->checkOption(IMessageWidgets::UseTabWindow))
-  {
-    ITabWindow *tabWindow = FMessageWidgets->openTabWindow();
-    tabWindow->addWidget(AWindow);
-  }
+  if (FMessageWidgets && AWindow->instance()->isWindow() && !AWindow->instance()->isVisible())
+    FMessageWidgets->assignTabWindow(AWindow);
   AWindow->showWindow();
 }
 

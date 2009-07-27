@@ -1,16 +1,14 @@
 #include "messagewidgets.h"
 
-#include <QtDebug>
+#define SVN_USE_TABWINDOW           "useTabWindow"
+#define SVN_SHOW_STATUS             "showStatus"
+#define SVN_SEND_MESSAGE_KEY        "sendMessageKey"
+#define SVN_DEFAULT_TABWINDOW       "defaultTabWindow"
+#define SVN_TABWINDOW               "tabWindow[]"
+#define SVN_TABWINDOW_NAME          SVN_TABWINDOW":name"
+#define SVN_TABWIDGET               "tabWidget[]"
+#define SVN_TABWIDGET_WINDOWID      SVN_TABWIDGET":windowId"
 
-#define SVN_INFO                              "info"
-#define SVN_VIEW                              "view"
-#define SVN_EDIT                              "edit"
-#define SVN_CHAT                              "chat"
-#define SVN_USE_TABWINDOW                     "useTabWindow"
-#define SVN_CHAT_STATUS                       SVN_CHAT ":" "showStatus"
-#define SVN_CHAT_FONT                         "defaultChatFont"
-#define SVN_MESSAGE_FONT                      "defaultMessageFont"
-#define SVN_SEND_MESSAGE_KEY                  "sendMessageKey"
 
 MessageWidgets::MessageWidgets()
 {
@@ -27,7 +25,7 @@ MessageWidgets::~MessageWidgets()
 
 }
 
-void MessageWidgets::pluginInfo( IPluginInfo *APluginInfo )
+void MessageWidgets::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->description = tr("Manager of the widgets for displaying messages");
@@ -112,6 +110,20 @@ void MessageWidgets::setSendMessageKey(const QKeySequence &AKey)
   }
 }
 
+QUuid MessageWidgets::defaultTabWindow() const
+{
+  return FDefaultTabWindow;
+}
+
+void MessageWidgets::setDefaultTabWindow(const QUuid &AWindowId)
+{
+  if (FDefaultTabWindow!=AWindowId && FAvailTabWindows.contains(AWindowId))
+  {
+    FDefaultTabWindow = AWindowId;
+    emit defaultTabWindowChanged(AWindowId);
+  }
+}
+
 IInfoWidget *MessageWidgets::newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid)
 {
   IInfoWidget *widget = new InfoWidget(this,AStreamJid,AContactJid);
@@ -189,7 +201,7 @@ IMessageWindow *MessageWidgets::newMessageWindow(const Jid &AStreamJid, const Ji
   return NULL;
 }
 
-IMessageWindow *MessageWidgets::findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid)
+IMessageWindow *MessageWidgets::findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const
 {
   foreach(IMessageWindow *window,FMessageWindows)
     if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
@@ -217,7 +229,7 @@ IChatWindow *MessageWidgets::newChatWindow(const Jid &AStreamJid, const Jid &ACo
   return NULL;
 }
 
-IChatWindow *MessageWidgets::findChatWindow(const Jid &AStreamJid, const Jid &AContactJid)
+IChatWindow *MessageWidgets::findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) const
 {
   foreach(IChatWindow *window,FChatWindows)
     if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
@@ -225,18 +237,69 @@ IChatWindow *MessageWidgets::findChatWindow(const Jid &AStreamJid, const Jid &AC
   return NULL;
 }
 
-QList<int> MessageWidgets::tabWindows() const
+QList<QUuid> MessageWidgets::tabWindowList() const
 {
-  return FTabWindows.keys();
+  return FAvailTabWindows.keys();
 }
 
-ITabWindow *MessageWidgets::openTabWindow(int AWindowId)
+QUuid MessageWidgets::appendTabWindow(const QString &AName)
+{
+  QUuid id = QUuid::createUuid();
+  QString name = AName;
+  if (name.isEmpty())
+  {
+    int i = 0;
+    QList<QString> names = FAvailTabWindows.values();
+    do 
+    {
+      i++;
+      name = tr("Tab Window %1").arg(i);
+    } while (names.contains(name));
+  }
+  FAvailTabWindows.insert(id,name);
+  emit tabWindowAppended(id,name);
+  return id;
+}
+
+void MessageWidgets::deleteTabWindow(const QUuid &AWindowId)
+{
+  if (FDefaultTabWindow!=AWindowId && FAvailTabWindows.contains(AWindowId))
+  {
+    ITabWindow *window = findTabWindow(AWindowId);
+    if (window)
+      window->instance()->deleteLater();
+    FAvailTabWindows.remove(AWindowId);
+    emit tabWindowDeleted(AWindowId);
+  }
+}
+
+QString MessageWidgets::tabWindowName(const QUuid &AWindowId) const
+{
+  return FAvailTabWindows.value(AWindowId);
+}
+
+void MessageWidgets::setTabWindowName(const QUuid &AWindowId, const QString &AName)
+{
+  if (!AName.isEmpty() && FAvailTabWindows.contains(AWindowId))
+  {
+    FAvailTabWindows.insert(AWindowId,AName);
+    emit tabWindowNameChanged(AWindowId,AName);
+  }
+}
+
+QList<ITabWindow *> MessageWidgets::tabWindows() const
+{
+  return FTabWindows;
+}
+
+ITabWindow *MessageWidgets::openTabWindow(const QUuid &AWindowId)
 {
   ITabWindow *window = findTabWindow(AWindowId);
   if (!window)
   {
     window = new TabWindow(this,AWindowId);
-    FTabWindows.insert(AWindowId,window);
+    FTabWindows.append(window);
+    connect(window->instance(),SIGNAL(widgetAdded(ITabWidget *)),SLOT(onTabWindowWidgetAdded(ITabWidget *)));
     connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onTabWindowDestroyed()));
     emit tabWindowCreated(window);
   }
@@ -244,9 +307,29 @@ ITabWindow *MessageWidgets::openTabWindow(int AWindowId)
   return window;
 }
 
-ITabWindow *MessageWidgets::findTabWindow(int AWindowId)
+ITabWindow *MessageWidgets::findTabWindow(const QUuid &AWindowId) const
 {
-  return FTabWindows.value(AWindowId,NULL);
+  foreach(ITabWindow *window,FTabWindows)
+    if (window->windowId() == AWindowId)
+      return window;
+  return NULL;
+}
+
+void MessageWidgets::assignTabWindow(ITabWidget *AWidget)
+{
+  if (checkOption(IMessageWidgets::UseTabWindow))
+  {
+    QUuid windowId = FDefaultTabWindow;
+    if (FSettingsPlugin)
+    {
+      ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
+      windowId = settings->valueNS(SVN_TABWIDGET_WINDOWID,AWidget->tabWidgetId(),windowId.toString()).toString();
+    }
+    if (!FAvailTabWindows.contains(windowId))
+      windowId = FDefaultTabWindow;
+    ITabWindow *window = openTabWindow(windowId);
+    window->addWidget(AWidget);
+  }
 }
 
 bool MessageWidgets::checkOption(IMessageWidgets::Option AOption) const
@@ -280,6 +363,12 @@ void MessageWidgets::removeUrlHandler(IUrlHandler *AHandler, int AOrder)
     FUrlHandlers.remove(AOrder,AHandler);
     emit urlHandlerRemoved(AHandler,AOrder);
   }
+}
+
+void MessageWidgets::deleteWindows()
+{
+  foreach(ITabWindow *window, tabWindows())
+    delete window->instance();
 }
 
 void MessageWidgets::deleteStreamWindows(const Jid &AStreamJid)
@@ -326,12 +415,25 @@ void MessageWidgets::onChatWindowDestroyed()
   }
 }
 
+void MessageWidgets::onTabWindowWidgetAdded(ITabWidget *AWidget)
+{
+  ITabWindow *window = qobject_cast<ITabWindow *>(sender());
+  if (FSettingsPlugin && window)
+  {
+    ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
+    if (window->windowId() != FDefaultTabWindow)
+      settings->setValueNS(SVN_TABWIDGET_WINDOWID,AWidget->tabWidgetId(),window->windowId().toString());
+    else
+      settings->deleteNS(AWidget->tabWidgetId());
+  }
+}
+
 void MessageWidgets::onTabWindowDestroyed()
 {
   ITabWindow *window = qobject_cast<ITabWindow *>(sender());
   if (window)
   {
-    FTabWindows.remove(window->windowId());
+    FTabWindows.removeAt(FTabWindows.indexOf(window));
     emit tabWindowDestroyed(window);
   }
 }
@@ -351,29 +453,37 @@ void MessageWidgets::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
   setOption(UseTabWindow, settings->value(SVN_USE_TABWINDOW,true).toBool());
-  setOption(ShowStatus, settings->value(SVN_CHAT_STATUS,true).toBool());
-  FChatFont.fromString(settings->value(SVN_CHAT_FONT,QFont().toString()).toString());
-  FMessageFont.fromString(settings->value(SVN_MESSAGE_FONT,QFont().toString()).toString());
+  setOption(ShowStatus, settings->value(SVN_SHOW_STATUS,true).toBool());
   setSendMessageKey(QKeySequence::fromString(settings->value(SVN_SEND_MESSAGE_KEY,FSendKey.toString()).toString()));
+
+  QHash<QString, QVariant> windows = settings->values(SVN_TABWINDOW_NAME);
+  for (QHash<QString, QVariant>::const_iterator it = windows.constBegin(); it!=windows.constEnd(); it++)
+    FAvailTabWindows.insert(it.key(),it.value().toString());
+
+  FDefaultTabWindow = settings->value(SVN_DEFAULT_TABWINDOW).toString();
+  if (!FAvailTabWindows.contains(FDefaultTabWindow))
+    FDefaultTabWindow = appendTabWindow(tr("Main Tab Window"));
 }
 
 void MessageWidgets::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
   settings->setValue(SVN_USE_TABWINDOW,checkOption(UseTabWindow));
-  settings->setValue(SVN_CHAT_STATUS,checkOption(ShowStatus));
-
-  if (FChatFont != QFont())
-    settings->setValue(SVN_CHAT_FONT,FChatFont.toString());
-  else
-    settings->deleteValue(SVN_CHAT_FONT);
-
-  if (FMessageFont != QFont())
-    settings->setValue(SVN_MESSAGE_FONT,FMessageFont.toString());
-  else
-    settings->deleteValue(SVN_MESSAGE_FONT);
-
+  settings->setValue(SVN_SHOW_STATUS,checkOption(ShowStatus));
   settings->setValue(SVN_SEND_MESSAGE_KEY,FSendKey.toString());
+  settings->setValue(SVN_DEFAULT_TABWINDOW,FDefaultTabWindow.toString());
+
+  QSet<QString> oldTabWindows = settings->values(SVN_TABWINDOW_NAME).keys().toSet();
+  for (QMap<QUuid, QString>::const_iterator it = FAvailTabWindows.constBegin(); it!=FAvailTabWindows.constEnd(); it++)
+  {
+    settings->setValueNS(SVN_TABWINDOW_NAME,it.key(),it.value());
+    oldTabWindows -= it.key().toString();
+  }
+  foreach(QString windowId, oldTabWindows)
+  {
+    settings->deleteNS(windowId);
+  }
+  deleteWindows();
 }
 
 Q_EXPORT_PLUGIN2(MessageWidgetsPlugin, MessageWidgets)

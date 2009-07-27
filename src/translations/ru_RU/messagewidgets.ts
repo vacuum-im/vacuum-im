@@ -38,6 +38,14 @@
         <source>Message window options</source>
         <translation>Настройки сообщений</translation>
     </message>
+    <message>
+        <source>Tab Window %1</source>
+        <translation>Окно  со вкладками %1</translation>
+    </message>
+    <message>
+        <source>Main Tab Window</source>
+        <translation>Основное окно</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>
@@ -161,36 +169,64 @@
 <context>
     <name>TabWindow</name>
     <message>
-        <source>Close tab</source>
-        <translation>Закрыть вкладку</translation>
-    </message>
-    <message>
         <source>Esc</source>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>New tab window</source>
-        <translation>Новое окно со вкладками</translation>
-    </message>
-    <message>
-        <source>Detach window</source>
-        <translation>Отцепить окно</translation>
-    </message>
-    <message>
-        <source>Next tab</source>
-        <translation>След. вкладка</translation>
     </message>
     <message>
         <source>Ctrl+Tab</source>
         <translation>Ctrl+Tab</translation>
     </message>
     <message>
-        <source>Prev. tab</source>
+        <source>Ctrl+Shift+Tab</source>
+        <translation>Ctrl+Shift+Tab</translation>
+    </message>
+    <message>
+        <source>Close Tab</source>
+        <translation>Закрыть вкладку</translation>
+    </message>
+    <message>
+        <source>Next Tab</source>
+        <translation>След. вкладка</translation>
+    </message>
+    <message>
+        <source>Prev. Tab</source>
         <translation>Пред. вкладка</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
+        <source>Tabs Closable</source>
+        <translation>Закрываемые вкладки</translation>
+    </message>
+    <message>
+        <source>Detach to Separate Window</source>
+        <translation>Отцепить в отдельное окно</translation>
+    </message>
+    <message>
+        <source>Join to</source>
+        <translation>Присоединить к</translation>
+    </message>
+    <message>
+        <source>New Tab Window</source>
+        <translation>Новое окно со вкладкми</translation>
+    </message>
+    <message>
+        <source>Use as Default Tab Window</source>
+        <translation>Использовать как окно по умолчанию</translation>
+    </message>
+    <message>
+        <source>Rename Tab Window</source>
+        <translation>Переименовать окно</translation>
+    </message>
+    <message>
+        <source>Delete Tab Window</source>
+        <translation>Удалить окно</translation>
+    </message>
+    <message>
+        <source>Tab window name:</source>
+        <translation>Наименование окна:</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this tab window?</source>
+        <translation>Вы уверены что хотите удалить это окно со вкладками?</translation>
     </message>
 </context>
 <context>

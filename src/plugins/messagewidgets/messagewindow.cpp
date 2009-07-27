@@ -12,10 +12,11 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
   FMessageWidgets = AMessageWidgets;
   FSettings = NULL;
 
+  FMode = AMode;
   FNextCount = 0;
+  FShownDetached = false;
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
-  FMode = AMode;
   FCurrentThreadId = QUuid::createUuid().toString();
 
   FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid);
@@ -52,6 +53,7 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
   connect(ui.pbtNext,SIGNAL(clicked()),SLOT(onNextButtonClicked()));
 
   initialize();
+
   setCurrentTabWidget(ui.tabMessage);
   setMode(FMode);
   setNextCount(FNextCount);
@@ -85,6 +87,11 @@ void MessageWindow::closeWindow()
     close();
   else
     emit windowClose();
+}
+
+QString MessageWindow::tabWidgetId() const
+{
+  return "MessageWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
 }
 
 void MessageWindow::setContactJid(const Jid &AContactJid)
@@ -195,26 +202,22 @@ void MessageWindow::initialize()
   }
 }
 
-void MessageWindow::saveWindowState()
+void MessageWindow::saveWindowGeometry()
 {
-  if (FSettings)
+  if (FSettings && isWindow())
   {
     QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    if (isWindow() && isVisible())
-      FSettings->saveBinaryData(BDI_MESSAGE_GEOMETRY+dataId,saveGeometry());
+    FSettings->saveBinaryData(BDI_MESSAGE_GEOMETRY"|"+dataId,saveGeometry());
   }
 }
 
-void MessageWindow::loadWindowState()
+void MessageWindow::loadWindowGeometry()
 {
-  if (FSettings)
+  if (FSettings && isWindow())
   {
     QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    if (isWindow())
-      restoreGeometry(FSettings->loadBinaryData(BDI_MESSAGE_GEOMETRY+dataId));
+    restoreGeometry(FSettings->loadBinaryData(BDI_MESSAGE_GEOMETRY"|"+dataId));
   }
-  if (FMode == WriteMode)
-    FEditWidget->textEdit()->setFocus();
 }
 
 void MessageWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle)
@@ -225,17 +228,30 @@ void MessageWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, c
   emit windowChanged();
 }
 
+bool MessageWindow::event(QEvent *AEvent)
+{
+  if (AEvent->type() == QEvent::WindowActivate)
+    emit windowActivated();
+  return QMainWindow::event(AEvent);
+}
+
 void MessageWindow::showEvent(QShowEvent *AEvent)
 {
-  loadWindowState();
+  if (!FShownDetached && isWindow())
+    loadWindowGeometry();
+  FShownDetached = isWindow();
   QMainWindow::showEvent(AEvent);
+  if (FMode == WriteMode)
+    FEditWidget->textEdit()->setFocus();
+  emit windowActivated();
 }
 
 void MessageWindow::closeEvent(QCloseEvent *AEvent)
 {
-  saveWindowState();
-  emit windowClosed();
+  if (FShownDetached)
+    saveWindowGeometry();
   QMainWindow::closeEvent(AEvent);
+  emit windowClosed();
 }
 
 void MessageWindow::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)

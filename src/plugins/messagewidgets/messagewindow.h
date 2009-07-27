@@ -25,6 +25,7 @@ public:
   //ITabWidget
   virtual void showWindow();
   virtual void closeWindow();
+  virtual QString tabWidgetId() const;
   //IMessageWindow
   virtual const Jid &streamJid() const { return FStreamJid; }
   virtual const Jid &contactJid() const { return FContactJid; }
@@ -54,19 +55,21 @@ signals:
   virtual void windowChanged();
   virtual void windowDestroyed();
   //IMessageWindow
-  virtual void messageReady();
   virtual void showNextMessage();
   virtual void replyMessage();
   virtual void forwardMessage();
   virtual void showChatWindow();
+  virtual void messageReady();
   virtual void streamJidChanged(const Jid &ABefour);
   virtual void contactJidChanged(const Jid &ABefour);
+  virtual void windowActivated();
   virtual void windowClosed();
 protected:
   void initialize();
-  void saveWindowState();
-  void loadWindowState();
+  void saveWindowGeometry();
+  void loadWindowGeometry();
 protected:
+  virtual bool event(QEvent *AEvent);
   virtual void showEvent(QShowEvent *AEvent);
   virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
@@ -79,6 +82,7 @@ protected slots:
   void onReceiversChanged(const Jid &AReceiver);
 private:
   Ui::MessageWindowClass ui;
+private:
   IInfoWidget *FInfoWidget;
   IViewWidget *FViewWidget;
   IEditWidget *FEditWidget;
@@ -93,6 +97,7 @@ private:
   int FNextCount;
   Jid FStreamJid;
   Jid FContactJid;
+  bool FShownDetached;
   QString FCurrentThreadId;
 };
 

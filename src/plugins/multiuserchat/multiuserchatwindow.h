@@ -50,6 +50,7 @@ public:
   //ITabWidget
   virtual void showWindow();
   virtual void closeWindow();
+  virtual QString tabWidgetId() const;
   //IMessageHandler
   virtual bool checkMessage(const Message &AMessage);
   virtual void receiveMessage(int AMessageId);
@@ -90,6 +91,8 @@ protected:
   void insertRoomUtilsActions(Menu *AMenu, IMultiUser *AUser);
   void saveWindowState();
   void loadWindowState();
+  void saveWindowGeometry();
+  void loadWindowGeometry();
   bool showStatusCodes(const QString &ANick, const QList<int> &ACodes);
   void setRoleColorForUser(IMultiUser *AUser);
   void setAffilationLineForUser(IMultiUser *AUser);
@@ -211,6 +214,7 @@ private:
       Action *FSetAffilAdmin;
       Action *FSetAffilOwner;
 private:
+  bool FShownDetached;
   bool FDestroyOnChatClosed;
   QList<QColor> FColorQueue;
   QList<int> FActiveMessages;

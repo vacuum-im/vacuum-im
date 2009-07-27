@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <icondef>
   <icon>
-    <key>messagewidgetsCloseTab</key>
-    <object mime="image/png">messagewidgetsclosetab.png</object>
+    <key>messagewidgetsTabMenu</key>
+    <object mime="image/png">messagewidgetstabmenu.png</object>
   </icon>
 </icondef>

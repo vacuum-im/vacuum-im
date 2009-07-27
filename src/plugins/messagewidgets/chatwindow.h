@@ -21,6 +21,7 @@ public:
   //ITabWidget
   virtual void showWindow();
   virtual void closeWindow();
+  virtual QString tabWidgetId() const;
   //IChatWindow
   virtual const Jid &streamJid() const { return FStreamJid; }
   virtual const Jid &contactJid() const { return FContactJid; }
@@ -47,8 +48,8 @@ signals:
   virtual void windowClosed();
 protected:
   void initialize();
-  void saveWindowState();
-  void loadWindowState();
+  void saveWindowGeometry();
+  void loadWindowGeometry();
 protected:
   virtual bool event(QEvent *AEvent);
   virtual void showEvent(QShowEvent *AEvent);
@@ -72,6 +73,7 @@ private:
 private:
   Jid FStreamJid;
   Jid FContactJid;
+  bool FShownDetached;
 };
 
 #endif // CHATWINDOW_H

@@ -1,11 +1,13 @@
 #ifndef IMESSAGEWIDGETS_H
 #define IMESSAGEWIDGETS_H
 
+#include <QUuid>
 #include <QTextBrowser>
 #include <QTextDocument>
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/imessagestyles.h"
 #include "../../utils/jid.h"
+#include "../../utils/menu.h"
 #include "../../utils/action.h"
 #include "../../utils/message.h"
 #include "../../utils/menubarchanger.h"
@@ -150,6 +152,7 @@ public:
   virtual QWidget *instance() =0;
   virtual void showWindow() =0;
   virtual void closeWindow() =0;
+  virtual QString tabWidgetId() const =0;
 signals:
   virtual void windowShow() =0;
   virtual void windowClose() =0;
@@ -162,16 +165,20 @@ class ITabWindow
 public:
   virtual QMainWindow *instance() = 0;
   virtual void showWindow() =0;
-  virtual int windowId() const =0;
+  virtual QUuid windowId() const =0;
+  virtual QString windowName() const =0;
+  virtual Menu *windowMenu() const =0;
   virtual void addWidget(ITabWidget *AWidget) =0;
   virtual bool hasWidget(ITabWidget *AWidget) const=0;
   virtual ITabWidget *currentWidget() const =0;
   virtual void setCurrentWidget(ITabWidget *AWidget) =0;
+  virtual void detachWidget(ITabWidget *AWidget) =0;
   virtual void removeWidget(ITabWidget *AWidget) =0;
 signals:
   virtual void widgetAdded(ITabWidget *AWidget) =0;
   virtual void currentChanged(ITabWidget *AWidget) =0;
   virtual void widgetRemoved(ITabWidget *AWidget) =0;
+  virtual void widgetDetached(ITabWidget *AWidget) =0;
   virtual void windowChanged() =0;
   virtual void windowDestroyed() =0;
 };
@@ -230,13 +237,14 @@ public:
   virtual void setNextCount(int ACount) =0;
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 signals:
-  virtual void messageReady() =0;
   virtual void showNextMessage() =0;
   virtual void replyMessage() =0;
   virtual void forwardMessage() =0;
   virtual void showChatWindow() =0;
+  virtual void messageReady() =0;
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
+  virtual void windowActivated() =0;
   virtual void windowClosed() =0;
 };
 
@@ -259,6 +267,8 @@ public:
   virtual IPluginManager *pluginManager() const =0;
   virtual QKeySequence sendMessageKey() const =0;
   virtual void setSendMessageKey(const QKeySequence &AKey) =0;
+  virtual QUuid defaultTabWindow() const =0;
+  virtual void setDefaultTabWindow(const QUuid &AWindowId) =0;
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
@@ -268,19 +278,26 @@ public:
   virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers) =0;
   virtual QList<IMessageWindow *> messageWindows() const =0;
   virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
-  virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
+  virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual QList<IChatWindow *> chatWindows() const =0;
   virtual IChatWindow *newChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
-  virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
-  virtual QList<int> tabWindows() const =0;
-  virtual ITabWindow *openTabWindow(int AWindowId = 0) =0;
-  virtual ITabWindow *findTabWindow(int AWindowId = 0) =0;
+  virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) const =0;
+  virtual QList<QUuid> tabWindowList() const =0;
+  virtual QUuid appendTabWindow(const QString &AName) =0;
+  virtual void deleteTabWindow(const QUuid &AWindowId) =0;
+  virtual QString tabWindowName(const QUuid &AWindowId) const =0;
+  virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName) =0;
+  virtual QList<ITabWindow *> tabWindows() const =0;
+  virtual ITabWindow *openTabWindow(const QUuid &AWindowId) =0;
+  virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const =0;
+  virtual void assignTabWindow(ITabWidget *AWidget) =0;
   virtual bool checkOption(IMessageWidgets::Option AOption) const =0;
   virtual void setOption(IMessageWidgets::Option AOption, bool AValue) =0;
   virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
   virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
 signals:
   virtual void sendMessageKeyChanged(const QKeySequence &AKey) =0;
+  virtual void defaultTabWindowChanged(const QUuid &AWindowId) =0;
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget) =0;
   virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
   virtual void editWidgetCreated(IEditWidget *AEditWidget) =0;
@@ -292,6 +309,9 @@ signals:
   virtual void messageWindowDestroyed(IMessageWindow *AWindow) =0;
   virtual void chatWindowCreated(IChatWindow *AWindow) =0;
   virtual void chatWindowDestroyed(IChatWindow *AWindow) =0;
+  virtual void tabWindowAppended(const QUuid &AWindowId, const QString &AName) =0;
+  virtual void tabWindowNameChanged(const QUuid &AWindowId, const QString &AName) =0;
+  virtual void tabWindowDeleted(const QUuid &AWindowId) =0;
   virtual void tabWindowCreated(ITabWindow *AWindow) =0;
   virtual void tabWindowDestroyed(ITabWindow *AWindow) =0;
   virtual void optionChanged(IMessageWidgets::Option AOption, bool AValue) =0;

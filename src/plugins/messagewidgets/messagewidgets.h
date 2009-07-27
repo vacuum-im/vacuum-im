@@ -51,6 +51,8 @@ public:
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
   virtual QKeySequence sendMessageKey() const;
   virtual void setSendMessageKey(const QKeySequence &AKey);
+  virtual QUuid defaultTabWindow() const;
+  virtual void setDefaultTabWindow(const QUuid &AWindowId);
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid);
@@ -60,19 +62,26 @@ public:
   virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
   virtual QList<IMessageWindow *> messageWindows() const;
   virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
-  virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid);
+  virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual QList<IChatWindow *> chatWindows() const;
   virtual IChatWindow *newChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
-  virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
-  virtual QList<int> tabWindows() const;
-  virtual ITabWindow *openTabWindow(int AWindowId = 0);
-  virtual ITabWindow *findTabWindow(int AWindowId = 0);
+  virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
+  virtual QList<QUuid> tabWindowList() const;
+  virtual QUuid appendTabWindow(const QString &AName);
+  virtual void deleteTabWindow(const QUuid &AWindowId);
+  virtual QString tabWindowName(const QUuid &AWindowId) const;
+  virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName);
+  virtual QList<ITabWindow *> tabWindows() const;
+  virtual ITabWindow *openTabWindow(const QUuid &AWindowId);
+  virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const;
+  virtual void assignTabWindow(ITabWidget *AWidget);
   virtual bool checkOption(IMessageWidgets::Option AOption) const;
   virtual void setOption(IMessageWidgets::Option AOption, bool AValue);
   virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder);
   virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder);
 signals:
   virtual void sendMessageKeyChanged(const QKeySequence &AKey);
+  virtual void defaultTabWindowChanged(const QUuid &AWindowId);
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget);
   virtual void viewWidgetCreated(IViewWidget *AViewWidget);
   virtual void editWidgetCreated(IEditWidget *AEditWidget);
@@ -84,6 +93,9 @@ signals:
   virtual void messageWindowDestroyed(IMessageWindow *AWindow);
   virtual void chatWindowCreated(IChatWindow *AWindow);
   virtual void chatWindowDestroyed(IChatWindow *AWindow);
+  virtual void tabWindowAppended(const QUuid &AWindowId, const QString &AName);
+  virtual void tabWindowNameChanged(const QUuid &AWindowId, const QString &AName);
+  virtual void tabWindowDeleted(const QUuid &AWindowId);
   virtual void tabWindowCreated(ITabWindow *AWindow);
   virtual void tabWindowDestroyed(ITabWindow *AWindow);
   virtual void optionChanged(IMessageWidgets::Option AOption, bool AValue);
@@ -93,11 +105,13 @@ signals:
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
+  void deleteWindows();
   void deleteStreamWindows(const Jid &AStreamJid);
 protected slots:
   void onViewWidgetUrlClicked(const QUrl &AUrl);
   void onMessageWindowDestroyed();
   void onChatWindowDestroyed();
+  void onTabWindowWidgetAdded(ITabWidget *AWidget);
   void onTabWindowDestroyed();
   void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
   void onStreamRemoved(IXmppStream *AXmppStream);
@@ -108,15 +122,15 @@ private:
   IXmppStreams *FXmppStreams;
   ISettingsPlugin *FSettingsPlugin;
 private:
-  QHash<int,ITabWindow *> FTabWindows;
+  QList<ITabWindow *> FTabWindows;
   QList<IChatWindow *> FChatWindows;
   QList<IMessageWindow *> FMessageWindows;
   QObjectCleanupHandler FCleanupHandler;
 private:
   int FOptions;
-  QFont FChatFont;
-  QFont FMessageFont;
   QKeySequence FSendKey;
+  QUuid FDefaultTabWindow;
+  QMap<QUuid, QString> FAvailTabWindows;
   QMultiMap<int,IUrlHandler *> FUrlHandlers;
 };
 
