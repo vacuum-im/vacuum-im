@@ -1,7 +1,9 @@
 #include "multiuserchatwindow.h"
 
 #include <QTimer>
+#include <QKeyEvent>
 #include <QInputDialog>
+#include <QCoreApplication>
 #include <QContextMenuEvent>
 
 #define BDI_WINDOW_GEOMETRY         "MultiChatWindowGeometry"
@@ -40,7 +42,10 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 
   FViewWidget = NULL;
   FEditWidget = NULL;
+  FMenuBarWidget = NULL;
   FToolBarWidget = NULL;
+  FStatusBarWidget = NULL;
+  FShownDetached = false;
   FDestroyOnChatClosed = false;
 
   initialize();
@@ -73,11 +78,9 @@ MultiUserChatWindow::~MultiUserChatWindow()
 
 void MultiUserChatWindow::showWindow()
 {
-  if (isWindow() && !isVisible() && FMessageWidgets && FMessageWidgets->checkOption(IMessageWidgets::UseTabWindow))
-  {
-    ITabWindow *tabWindow = FMessageWidgets->openTabWindow();
-    tabWindow->addWidget(this);
-  }
+  if (FMessageWidgets && isWindow() && !isVisible())
+    FMessageWidgets->assignTabWindow(this);
+
   if (isWindow())
   {
     isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
@@ -93,6 +96,11 @@ void MultiUserChatWindow::closeWindow()
     close();
   else
     emit windowClose();
+}
+
+QString MultiUserChatWindow::tabWidgetId() const
+{
+  return "MessageWindow|"+streamJid().pBare()+"|"+roomJid().pBare();
 }
 
 bool MultiUserChatWindow::checkMessage(const Message &AMessage)
@@ -679,10 +687,8 @@ void MultiUserChatWindow::saveWindowState()
 {
   if (FSettings)
   {
-    QString dataId = roomJid().pBare();
-    if (isWindow())
-      FSettings->saveBinaryData(BDI_WINDOW_GEOMETRY+dataId,saveGeometry());
-    FSettings->saveBinaryData(BDI_WINDOW_HSPLITTER+dataId,ui.sprHSplitter->saveState());
+    QString dataId = streamJid().pBare()+"|"+roomJid().pBare();
+    FSettings->saveBinaryData(BDI_WINDOW_HSPLITTER"|"+dataId,ui.sprHSplitter->saveState());
   }
 }
 
@@ -690,10 +696,26 @@ void MultiUserChatWindow::loadWindowState()
 {
   if (FSettings)
   {
-    QString dataId = roomJid().pBare();
-    if (isWindow())
-      restoreGeometry(FSettings->loadBinaryData(BDI_WINDOW_GEOMETRY+dataId));
-    ui.sprHSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_HSPLITTER+dataId));
+    QString dataId = streamJid().pBare()+"|"+roomJid().pBare();
+    ui.sprHSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_HSPLITTER"|"+dataId));
+  }
+}
+
+void MultiUserChatWindow::saveWindowGeometry()
+{
+  if (FSettings && isWindow())
+  {
+    QString dataId = streamJid().pBare()+"|"+roomJid().pBare();
+    FSettings->saveBinaryData(BDI_WINDOW_GEOMETRY"|"+dataId,saveGeometry());
+  }
+}
+
+void MultiUserChatWindow::loadWindowGeometry()
+{
+  if (FSettings && isWindow())
+  {
+    QString dataId = streamJid().pBare()+"|"+roomJid().pBare();
+    restoreGeometry(FSettings->loadBinaryData(BDI_WINDOW_GEOMETRY"|"+dataId));
   }
 }
 
@@ -1185,11 +1207,8 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 
 void MultiUserChatWindow::showChatWindow(IChatWindow *AWindow)
 {
-  if (AWindow->instance()->isWindow() && !AWindow->instance()->isVisible() && FMessageWidgets->checkOption(IMessageWidgets::UseTabWindow))
-  {
-    ITabWindow *tabWindow = FMessageWidgets->openTabWindow();
-    tabWindow->addWidget(AWindow);
-  }
+  if (FMessageWidgets && AWindow->instance()->isWindow() && !AWindow->instance()->isVisible())
+    FMessageWidgets->assignTabWindow(AWindow);
   AWindow->showWindow();
 }
 
@@ -1197,9 +1216,8 @@ void MultiUserChatWindow::removeActiveChatMessages(IChatWindow *AWindow)
 {
   if (FActiveChatMessages.contains(AWindow))
   {
-    QList<int> messageIds = FActiveChatMessages.values(AWindow);
     if (FMessageProcessor)
-      foreach(int messageId, messageIds)
+      foreach(int messageId, FActiveChatMessages.values(AWindow))
         FMessageProcessor->removeMessage(messageId);
     FActiveChatMessages.remove(AWindow);
     updateChatWindow(AWindow);
@@ -1222,23 +1240,42 @@ void MultiUserChatWindow::updateChatWindow(IChatWindow *AWindow)
 
 bool MultiUserChatWindow::event(QEvent *AEvent)
 {
-  if (AEvent->type() == QEvent::WindowActivate)
+  if (FEditWidget && AEvent->type()==QEvent::KeyPress)
+  {
+    static QKeyEvent *sentEvent = NULL;
+    QKeyEvent *keyEvent = static_cast<QKeyEvent*>(AEvent);
+    if (sentEvent!=keyEvent && !keyEvent->text().isEmpty())
+    {
+      sentEvent = keyEvent;
+      FEditWidget->textEdit()->setFocus();
+      QCoreApplication::sendEvent(FEditWidget->textEdit(),AEvent);
+      sentEvent = NULL;
+    }
+  }
+  else if (AEvent->type() == QEvent::WindowActivate)
+  {
     emit windowActivated();
+  }
   return QMainWindow::event(AEvent);
 }
 
 void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 {
+  if (!FShownDetached && isWindow())
+    loadWindowGeometry();
+  FShownDetached = isWindow();
+  QMainWindow::showEvent(AEvent);
   if (FEditWidget)
     FEditWidget->textEdit()->setFocus();
   emit windowActivated();
-  QMainWindow::showEvent(AEvent);
 }
 
 void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 {
-  emit windowClosed();
+  if (FShownDetached)
+    saveWindowGeometry();
   QMainWindow::closeEvent(AEvent);
+  emit windowClosed();
 }
 
 bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)

@@ -92,7 +92,7 @@
 #define MNI_MESSAGE_STYLES              "messagestyles"
 
 //MessageWidgets
-#define MNI_MESSAGEWIDGETS_CLOSE_TAB    "messagewidgetsCloseTab"
+#define MNI_MESSAGEWIDGETS_TAB_MENU    "messagewidgetsTabMenu"
 
 //MultiUserChat
 #define MNI_MUC_CONFERENCE              "mucConference"
