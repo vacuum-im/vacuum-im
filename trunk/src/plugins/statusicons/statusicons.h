@@ -2,7 +2,6 @@
 #define STATUSICONS_H
 
 #include <QRegExp>
-#include <QPointer>
 #include "../../definations/resources.h"
 #include "../../definations/statusicons.h"
 #include "../../definations/optionnodes.h"
@@ -73,8 +72,6 @@ protected slots:
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onSettingsOpened();
   void onSettingsClosed();
-  void onOptionsAccepted();
-  void onOptionsRejected();
   void onDefaultStorageChanged();
   void onSetCustomIconset(bool);
 private:
@@ -89,7 +86,6 @@ private:
   QHash<QString,Action *> FCustomIconActions;
   IconStorage *FDefaultStorage;
   RosterIndexDataHolder *FDataHolder;
-  QPointer<IconsOptionsWidget> FIconsOptionWidget;
 private:
   bool FStatusIconsChangedStarted;
   QString FDefaultSubStorage;

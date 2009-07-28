@@ -52,8 +52,6 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsDialogAccepted()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsDialogRejected()));
     }
   }
 
@@ -113,8 +111,11 @@ QWidget *Emoticons::optionsWidget(const QString &ANode, int &AOrder)
   if (ANode == ON_EMOTICONS)
   {
     AOrder = OWO_EMOTICONS;
-    FEmoticonsOptions = new EmoticonsOptions(this);
-    return FEmoticonsOptions;
+    EmoticonsOptions *widget = new EmoticonsOptions(this);
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
+    return widget;
   }
   return NULL;
 }
@@ -284,18 +285,6 @@ void Emoticons::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(EMOTICONS_UUID);
   settings->setValue(SVN_SUBSTORAGES,FStoragesOrder);
-}
-
-void Emoticons::onOptionsDialogAccepted()
-{
-  if (!FEmoticonsOptions.isNull())
-    FEmoticonsOptions->apply();
-  emit optionsAccepted();
-}
-
-void Emoticons::onOptionsDialogRejected()
-{
-  emit optionsRejected();
 }
 
 Q_EXPORT_PLUGIN2(EmoticonsPlugin, Emoticons)

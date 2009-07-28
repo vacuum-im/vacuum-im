@@ -1,13 +1,15 @@
 #include "connectionoptionswidget.h"
 
-ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, const QString &AAccountId, const QUuid &APluginId)
+ConnectionOptionsWidget::ConnectionOptionsWidget(ConnectionManager *ACManager, IAccountManager *AAManager, const QUuid &AAccountId)
 {
   ui.setupUi(this);
-  FOptionsWidget = NULL;
-  FManager = AManager;
-  FAccountId = AAccountId;
+  FAccountManager = AAManager;
+  FConnectionManager = ACManager;
 
-  QList<IConnectionPlugin *> plugins = FManager->pluginList();
+  FAccountId = AAccountId;
+  FOptionsWidget = NULL;
+
+  QList<IConnectionPlugin *> plugins = FConnectionManager->pluginList();
   foreach (IConnectionPlugin *plugin, plugins)
     ui.cmbConnections->addItem(plugin->displayName(),plugin->pluginUuid().toString());
   connect(ui.cmbConnections, SIGNAL(currentIndexChanged(int)),SLOT(onComboConnectionsChanged(int)));
@@ -15,7 +17,12 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
   if (plugins.count() < 2)
     ui.wdtSelectConnection->setVisible(false);
 
-  setPluginById(APluginId);
+  QUuid pluginId = FConnectionManager->defaultPlugin()->pluginUuid();
+  IAccount *account = FAccountManager->accountById(FAccountId);
+  if (account != NULL)
+    pluginId = account->value(AVN_CONNECTION_ID,pluginId.toString()).toString();
+
+  setPluginById(pluginId);
 }
 
 ConnectionOptionsWidget::~ConnectionOptionsWidget()
@@ -23,26 +30,44 @@ ConnectionOptionsWidget::~ConnectionOptionsWidget()
 
 }
 
+void ConnectionOptionsWidget::apply()
+{
+  IAccount *account = FAccountManager->accountById(FAccountId);
+  if (account)
+  {
+    account->setValue(AVN_CONNECTION_ID,FPluginId.toString());
+    IConnectionPlugin *plugin = FConnectionManager->pluginById(FPluginId);
+    if (plugin)
+    {
+      plugin->saveOptions(FAccountId.toString());
+      IConnection *connection = FConnectionManager->insertConnection(account);
+      if (connection)
+        plugin->loadSettings(connection, FAccountId.toString());
+    }
+  }
+  emit optionsAccepted();
+}
+
 void ConnectionOptionsWidget::setPluginById(const QUuid &APluginId)
 {
-  if (FCurPluginId != APluginId)
+  if (FPluginId != APluginId)
   {
     if (FOptionsWidget)
     {
       ui.grbOptions->layout()->removeWidget(FOptionsWidget);
       FOptionsWidget->deleteLater();
       FOptionsWidget = NULL;
-      FCurPluginId = QUuid();
+      FPluginId = QUuid();
     }
 
-    IConnectionPlugin *plugin = FManager->pluginById(APluginId);
+    IConnectionPlugin *plugin = FConnectionManager->pluginById(APluginId);
     if (plugin)
     {
-      FOptionsWidget = plugin->optionsWidget(FAccountId);
+      FOptionsWidget = plugin->optionsWidget(FAccountId.toString());
       if (FOptionsWidget)
       {
         ui.grbOptions->layout()->addWidget(FOptionsWidget);
-        FCurPluginId = APluginId;
+        FPluginId = APluginId;
       }
     }
 

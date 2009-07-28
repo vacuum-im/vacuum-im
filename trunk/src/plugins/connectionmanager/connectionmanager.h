@@ -44,19 +44,17 @@ signals:
   virtual void connectionCreated(IConnection *AConnection);
   virtual void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
   virtual void connectionDestroyed(IConnection *AConnection);
+signals:
   virtual void optionsAccepted();
   virtual void optionsRejected();
-protected:
+public:
   IConnectionPlugin *defaultPlugin() const;
   IConnection *insertConnection(IAccount *AAccount) const;
 protected slots:
   void onAccountShown(IAccount *AAccount);
-  void onAccountDestroyed(const QString &AAccount);
+  void onAccountDestroyed(const QUuid &AAccount);
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
-  void onOptionsAccepted();
-  void onOptionsRejected();
-  void onOptionsDialogClosed();
 private:
   IAccountManager *FAccountManager;
   ISettingsPlugin *FSettingsPlugin;
@@ -64,7 +62,6 @@ private:
 private:
   int FEncryptedLabelId;
   QList<IConnectionPlugin *> FConnectionPlugins;
-  QList<ConnectionOptionsWidget *> FOptionsWidgets;
 };
 
 #endif 

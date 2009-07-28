@@ -15,7 +15,7 @@ Account::~Account()
 
 }
 
-const QString &Account::accountId() const
+QUuid Account::accountId() const
 {
   return FAccountId;
 }
@@ -81,12 +81,12 @@ void Account::setStreamJid(const Jid &AJid)
 
 QString Account::password() const
 {
-  return decript(value(AVN_PASSWORD).toByteArray(),FAccountId.toUtf8());
+  return decript(value(AVN_PASSWORD).toByteArray(),FAccountId.toString().toUtf8());
 }
 
 void Account::setPassword(const QString &APassword)
 {
-  setValue(AVN_PASSWORD,encript(APassword,FAccountId.toUtf8()));
+  setValue(AVN_PASSWORD,encript(APassword,FAccountId.toString().toUtf8()));
 }
 
 QString Account::defaultLang() const
@@ -111,7 +111,7 @@ QString Account::decript(const QByteArray &AValue, const QByteArray &AKey) const
 
 QVariant Account::value(const QString &AName, const QVariant &ADefault) const
 {
-  return FSettings->valueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId,ADefault);
+  return FSettings->valueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId.toString(),ADefault);
 }
 
 void Account::setValue(const QString &AName, const QVariant &AValue)
@@ -123,18 +123,17 @@ void Account::setValue(const QString &AName, const QVariant &AValue)
       if (AName == AVN_STREAM_JID)
         FXmppStream->setJid(AValue.toString());
       else if (AName == AVN_PASSWORD)
-        FXmppStream->setPassword(decript(AValue.toByteArray(),FAccountId.toUtf8()));
+        FXmppStream->setPassword(decript(AValue.toByteArray(),FAccountId.toString().toUtf8()));
       else if (AName == AVN_DEFAULT_LANG)
         FXmppStream->setDefaultLang(AValue.toString());
     }
-    FSettings->setValueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId,AValue);
+    FSettings->setValueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId.toString(),AValue);
     emit changed(AName,AValue);
   }
 }
 
 void Account::delValue(const QString &AName)
 {
-  FSettings->deleteValueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId);
+  FSettings->deleteValueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId.toString());
   emit changed(AName,QVariant());
 }
-

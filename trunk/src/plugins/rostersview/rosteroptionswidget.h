@@ -9,11 +9,13 @@ class RosterOptionsWidget :
   public QWidget
 {
   Q_OBJECT;
-
 public:
   RosterOptionsWidget(IRostersViewPlugin *ARosterViewPlugin);
   ~RosterOptionsWidget();
+public slots:
   void apply();
+signals:
+  void optionsAccepted();
 private:
   Ui::RosterOptionsWidgetClass ui;
 private:

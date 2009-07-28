@@ -13,8 +13,9 @@ RosterOptionsWidget::~RosterOptionsWidget()
 
 }
 
-void RosterOptionsWidget::applyOptions()
+void RosterOptionsWidget::apply()
 {
   FAvatars->setOption(IAvatars::ShowAvatars,ui.chbShowAvatars->isChecked());
   FAvatars->setOption(IAvatars::AvatarsAlignLeft,ui.chbAlignLeftAvatars->isChecked());
+  emit optionsAccepted();
 }

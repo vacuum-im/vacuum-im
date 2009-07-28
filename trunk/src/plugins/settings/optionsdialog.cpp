@@ -9,6 +9,7 @@
 #include <QHeaderView>
 #include <QApplication>
 #include <QTextDocument>
+#include "settingsplugin.h"
 
 enum StandardItemRoles {
   SIR_NODE = Qt::UserRole+1,
@@ -25,11 +26,13 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
   return QSortFilterProxyModel::lessThan(ALeft,ARight);
 }
 
-OptionsDialog::OptionsDialog(QWidget *AParent) : QDialog(AParent)
+OptionsDialog::OptionsDialog(SettingsPlugin *ASessingsPlugin, QWidget *AParent) : QDialog(AParent)
 {
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Options"));
   IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SETTINGS_OPTIONS,0,0,"windowIcon");
+
+  FSettingsPlugin = ASessingsPlugin;
 
   lblInfo = new QLabel(this);
   lblInfo->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -88,7 +91,7 @@ OptionsDialog::~OptionsDialog()
   qDeleteAll(FNodes);
 }
 
-void OptionsDialog::openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIcon, int AOrder, QWidget *AWidget)
+void OptionsDialog::openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIcon, int AOrder)
 {
   OptionsNode *node = FNodes.value(ANode);
   if (!node && !ANode.isEmpty() && !AName.isEmpty())
@@ -107,20 +110,12 @@ void OptionsDialog::openNode(const QString &ANode, const QString &AName, const Q
     nodeItem->setData(AName,SIR_NAME);
     nodeItem->setData(ADescription,SIR_DESC);
     nodeItem->setData(AOrder,SIR_ORDER);
-
-    if (AWidget)
-    {
-      if (!canExpandVertically(AWidget))
-        AWidget->setMaximumHeight(AWidget->sizeHint().height());
-      FItemWidget.insert(nodeItem,AWidget);
-      connect(this,SIGNAL(closed()),AWidget,SLOT(deleteLater()));
-    }
   }
 }
 
 void OptionsDialog::closeNode(const QString &ANode)
 {
-  QHash<QString, OptionsNode *>::iterator it = FNodes.begin();
+  QMap<QString, OptionsNode *>::iterator it = FNodes.begin();
   while (it != FNodes.end())
   {
     if (it.key().startsWith(ANode))
@@ -136,7 +131,10 @@ void OptionsDialog::closeNode(const QString &ANode)
       }
 
       FNodeItems.remove(it.key());
-      nodeItem->parent()->removeRow(nodeItem->row());
+      if (nodeItem->parent())
+        nodeItem->parent()->removeRow(nodeItem->row());
+      else
+        simNodes->takeItem(nodeItem->row());
 
       delete it.value();
       it = FNodes.erase(it);
@@ -244,13 +242,24 @@ void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
 void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &/*APrevious*/)
 {
   QStandardItem *curItem = simNodes->itemFromIndex(FProxyModel->mapToSource(ACurrent));
-  if (FItemWidget.contains(curItem))
+
+  if (curItem && !FItemWidget.contains(curItem))
+  {
+    QWidget *widget = FSettingsPlugin->createNodeWidget(curItem->data(SIR_NODE).toString());
+    if (!canExpandVertically(widget))
+      widget->setMaximumHeight(widget->sizeHint().height());
+    FItemWidget.insert(curItem,widget);
+    connect(this,SIGNAL(closed()),widget,SLOT(deleteLater()));
+  }
+
+  QWidget *curWidget = FItemWidget.value(curItem, NULL);
+  if (curWidget)
   {
     QString node = curItem->data(SIR_NODE).toString();
     lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(Qt::escape(curItem->data(SIR_DESC).toString())));
     scaScroll->takeWidget();
-    scaScroll->setWidget(FItemWidget.value(curItem));
-    int addWidth = scaScroll->widget()->sizeHint().width() - scaScroll->width();
+    scaScroll->setWidget(curWidget);
+    int addWidth = curWidget->sizeHint().width() - scaScroll->width();
     addWidth += QApplication::style()->pixelMetric(QStyle::PM_ScrollBarExtent);
     addWidth += QApplication::style()->pixelMetric(QStyle::PM_DefaultFrameWidth)*2;
     if (addWidth > 0)

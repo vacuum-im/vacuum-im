@@ -12,7 +12,9 @@ public:
   RosterOptionsWidget(IAvatars *AAvatars, QWidget *AParent = NULL);
   ~RosterOptionsWidget();
 public slots:
-  void applyOptions();
+  void apply();
+signals:
+  void optionsAccepted();
 private:
   Ui::RosterOptionsWidgetClass ui;
 private:

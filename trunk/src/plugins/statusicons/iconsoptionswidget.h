@@ -31,7 +31,10 @@ class IconsOptionsWidget :
   Q_OBJECT;
 public:
   IconsOptionsWidget(IStatusIcons *AStatusIcons);
+public slots:
   void apply();
+signals:
+  void optionsAccepted();
 protected:
   void populateRulesTable(QTableWidget *ATable, IStatusIcons::RuleType ARuleType);
 protected slots:

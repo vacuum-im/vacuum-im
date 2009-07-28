@@ -3,7 +3,6 @@
 
 #include <QMap>
 #include <QHash>
-#include <QPointer>
 #include <QStringList>
 #include "../../definations/actiongroups.h"
 #include "../../definations/messagewriterorders.h"
@@ -72,14 +71,10 @@ protected slots:
   void onSelectIconMenuDestroyed(QObject *AObject);
   void onSettingsOpened();
   void onSettingsClosed();
-  void onOptionsDialogAccepted();
-  void onOptionsDialogRejected();
 private:
   IMessageWidgets *FMessageWidgets;
   IMessageProcessor *FMessageProcessor;
   ISettingsPlugin *FSettingsPlugin;
-private:
-  QPointer<EmoticonsOptions> FEmoticonsOptions;
 private:
   QStringList FStoragesOrder;
   QHash<QString, QUrl> FUrlByKey;

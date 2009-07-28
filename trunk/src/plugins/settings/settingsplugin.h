@@ -84,8 +84,9 @@ signals:
 signals:
   virtual void optionsAccepted();
   virtual void optionsRejected();
-protected:
+public:
   QWidget *createNodeWidget(const QString &ANode);
+protected:
   void setProfileOpened();
   void setProfileClosed();
   void updateSettings();

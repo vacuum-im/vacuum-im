@@ -91,7 +91,7 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
     {
       connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
       connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
-      connect(FAccountManager->instance(),SIGNAL(destroyed(const QString &)),SLOT(onAccountDestroyed(const QString &)));
+      connect(FAccountManager->instance(),SIGNAL(destroyed(const QUuid &)),SLOT(onAccountDestroyed(const QUuid &)));
     }
   }
 
@@ -103,8 +103,6 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsAccepted()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsRejected()));
    }
   }
 
@@ -153,11 +151,14 @@ bool RostersViewPlugin::initObjects()
 
 QWidget *RostersViewPlugin::optionsWidget(const QString &ANode, int &AOrder)
 {
-  AOrder = OWO_ROSTER;
   if (ANode == ON_ROSTER)
   {
-    FRosterOptionsWidget = new RosterOptionsWidget(this);
-    return FRosterOptionsWidget;
+    AOrder = OWO_ROSTER;
+    RosterOptionsWidget *widget = new RosterOptionsWidget(this);
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
+    return widget;
   }
   return NULL;
 }
@@ -350,7 +351,7 @@ void RostersViewPlugin::onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid 
 
 void RostersViewPlugin::onAccountShown(IAccount *AAccount)
 {
-  FCollapseNS.insert(AAccount->streamJid(),AAccount->accountId());
+  FCollapseNS.insert(AAccount->streamJid(),AAccount->accountId().toString());
 }
 
 void RostersViewPlugin::onAccountHidden(IAccount *AAccount)
@@ -358,10 +359,10 @@ void RostersViewPlugin::onAccountHidden(IAccount *AAccount)
   FCollapseNS.remove(AAccount->streamJid());
 }
 
-void RostersViewPlugin::onAccountDestroyed(const QString &AAccountId)
+void RostersViewPlugin::onAccountDestroyed(const QUuid &AAccountId)
 {
   if (FSettings)
-    FSettings->deleteValueNS(SVN_COLLAPSE_ACCOUNT_NS,AAccountId);
+    FSettings->deleteValueNS(SVN_COLLAPSE_ACCOUNT_NS,AAccountId.toString());
 }
 
 void RostersViewPlugin::onRestoreExpandState()
@@ -389,18 +390,6 @@ void RostersViewPlugin::onSettingsClosed()
 void RostersViewPlugin::onShowOfflineContactsAction(bool)
 {
   setOption(IRostersView::ShowOfflineContacts, !checkOption(IRostersView::ShowOfflineContacts));
-}
-
-void RostersViewPlugin::onOptionsAccepted()
-{
-  if (!FRosterOptionsWidget.isNull())
-    FRosterOptionsWidget->apply();
-  emit optionsAccepted();
-}
-
-void RostersViewPlugin::onOptionsRejected()
-{
-  emit optionsRejected();
 }
 
 Q_EXPORT_PLUGIN2(RostersViewPlugin, RostersViewPlugin)

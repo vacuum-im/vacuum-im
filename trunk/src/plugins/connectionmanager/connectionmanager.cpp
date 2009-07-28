@@ -46,9 +46,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
     if (FAccountManager)
     {
       connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-      connect(FAccountManager->instance(),SIGNAL(destroyed(const QString &)),SLOT(onAccountDestroyed(const QString &)));
-      connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),SLOT(onOptionsAccepted()));
-      connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
+      connect(FAccountManager->instance(),SIGNAL(destroyed(const QUuid &)),SLOT(onAccountDestroyed(const QUuid &)));
     }
   }
 
@@ -62,13 +60,9 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),SLOT(onOptionsDialogClosed()));
-    }
   }
 
-  return !plugins.isEmpty();
+  return !FConnectionPlugins.isEmpty();
 }
 
 bool ConnectionManager::initObjects()
@@ -78,7 +72,7 @@ bool ConnectionManager::initObjects()
     QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
     FEncryptedLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_CONNECTION_ENCRYPTED,icon);
   }
-  if (FSettingsPlugin)
+  if (FAccountManager && FSettingsPlugin)
   {
     FSettingsPlugin->insertOptionsHolder(this);
   }
@@ -91,13 +85,10 @@ QWidget *ConnectionManager::optionsWidget(const QString &ANode, int &AOrder)
   if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
   {
     AOrder = OWO_ACCOUNT_CONNECTION;
-    QUuid pluginId = defaultPlugin()->pluginUuid();
-    QString accountId = nodeTree.at(1);
-    IAccount *account = FAccountManager->accountById(accountId);
-    if (account)
-      pluginId = account->value(AVN_CONNECTION_ID,pluginId.toString()).toString();
-    ConnectionOptionsWidget *widget = new ConnectionOptionsWidget(this,accountId,pluginId);
-    FOptionsWidgets.append(widget);
+    ConnectionOptionsWidget *widget = new ConnectionOptionsWidget(this,FAccountManager,nodeTree.at(1));
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+    connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),widget,SLOT(apply()));
+    connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SIGNAL(optionsRejected()));
     return widget;
   }
   return NULL;
@@ -132,7 +123,7 @@ IConnection *ConnectionManager::insertConnection(IAccount *AAccount) const
     }
     if (plugin!=NULL && connection==NULL)
     {
-      connection = plugin->newConnection(AAccount->accountId(),AAccount->xmppStream()->instance());
+      connection = plugin->newConnection(AAccount->accountId().toString(),AAccount->xmppStream()->instance());
       AAccount->xmppStream()->setConnection(connection);
       connect(AAccount->xmppStream()->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
       connect(AAccount->xmppStream()->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
@@ -147,10 +138,10 @@ void ConnectionManager::onAccountShown(IAccount *AAccount)
   insertConnection(AAccount);
 }
 
-void ConnectionManager::onAccountDestroyed(const QString &AAccount)
+void ConnectionManager::onAccountDestroyed(const QUuid &AAccount)
 {
   foreach (IConnectionPlugin *plugin, FConnectionPlugins)
-    plugin->deleteSettingsNS(AAccount);
+    plugin->deleteSettingsNS(AAccount.toString());
 }
 
 
@@ -174,37 +165,6 @@ void ConnectionManager::onStreamClosed(IXmppStream *AXmppStream)
     if (index!=NULL)
       FRostersViewPlugin->rostersView()->removeIndexLabel(FEncryptedLabelId,index);
   }
-}
-
-void ConnectionManager::onOptionsAccepted()
-{
-  foreach (ConnectionOptionsWidget *widget, FOptionsWidgets)
-  {
-    IAccount *account = FAccountManager->accountById(widget->accountId());
-    if (account)
-    {
-      account->setValue(AVN_CONNECTION_ID,widget->pluginId().toString());
-      IConnectionPlugin *plugin = pluginById(widget->pluginId());
-      if (plugin)
-      {
-        plugin->saveOptions(account->accountId());
-        IConnection *connection = insertConnection(account);
-        if (connection)
-          plugin->loadSettings(connection, account->accountId());
-      }
-    }
-  }
-  emit optionsAccepted();
-}
-
-void ConnectionManager::onOptionsRejected()
-{
-  emit optionsRejected();
-}
-
-void ConnectionManager::onOptionsDialogClosed()
-{
-  FOptionsWidgets.clear();
 }
 
 Q_EXPORT_PLUGIN2(ConnectionManagerPlugin, ConnectionManager)

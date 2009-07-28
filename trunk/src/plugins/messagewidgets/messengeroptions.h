@@ -15,7 +15,7 @@ public:
 public slots:
   void apply();
 signals:
-  void optionsApplied();
+  void optionsAccepted();
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:

@@ -457,12 +457,11 @@ void MessageArchiver::iqStanzaTimeOut(const QString &AId)
 
 QWidget *MessageArchiver::optionsWidget(const QString &ANode, int &AOrder)
 {
-  AOrder = OWO_HISTORY;
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
   if (nodeTree.count()==2 && nodeTree.at(0)==ON_HISTORY)
   {
-    QString accountId = nodeTree.at(1);
-    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
+    AOrder = OWO_HISTORY;
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(nodeTree.at(1)) : NULL;
     if (account && account->isActive() && isReady(account->streamJid()))
     {
       ArchiveOptions *widget = new ArchiveOptions(this,account->streamJid(),NULL);
@@ -1899,7 +1898,7 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
   IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
   if (FSettingsPlugin && account)
   {
-    QString node = ON_HISTORY"::"+account->accountId();
+    QString node = ON_HISTORY"::"+account->accountId().toString();
     FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),MNI_HISTORY,ONO_HISTORY);
   }
 }
@@ -1909,7 +1908,7 @@ void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
   IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
   if (FSettingsPlugin && account)
   {
-    QString node = ON_HISTORY"::"+account->accountId();
+    QString node = ON_HISTORY"::"+account->accountId().toString();
     FSettingsPlugin->closeOptionsNode(node);
   }
 }
@@ -2488,7 +2487,7 @@ void MessageArchiver::onOpenHistoryOptionsAction(bool)
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     IAccount *account = FAccountManager->accountByStream(streamJid);
     if (account)
-      FSettingsPlugin->openOptionsDialog(ON_HISTORY"::"+account->accountId());
+      FSettingsPlugin->openOptionsDialog(ON_HISTORY"::"+account->accountId().toString());
   }
 }
 

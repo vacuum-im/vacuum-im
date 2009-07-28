@@ -3,30 +3,36 @@
 
 #include <QWidget>
 #include "../../interfaces/iconnectionmanager.h"
+#include "../../interfaces/iaccountmanager.h"
 #include "ui_connectionoptionswidget.h"
+#include "connectionmanager.h"
+
+class ConnectionManager;
 
 class ConnectionOptionsWidget :
   public QWidget
 {
   Q_OBJECT;
-
 public:
-  ConnectionOptionsWidget(IConnectionManager *AManager, const QString &AAccountId, const QUuid &APluginId);
+  ConnectionOptionsWidget(ConnectionManager *ACManager, IAccountManager *AAManager, const QUuid &AAccountId);
   ~ConnectionOptionsWidget();
-
-  QString accountId() const { return FAccountId; }
-  QUuid pluginId() const { return FCurPluginId; }
+public slots:
+  void apply();
+signals:
+  void optionsAccepted();
 protected:
   void setPluginById(const QUuid &APluginId);
 protected slots:
   void onComboConnectionsChanged(int AIndex);
 private:
-  IConnectionManager *FManager;
+  IAccountManager *FAccountManager;
+  ConnectionManager *FConnectionManager;
 private:
   Ui::ConnectionOptionsWidgetClass ui;
-  QString FAccountId;
+private:
+  QUuid FPluginId;
+  QUuid FAccountId;
   QWidget *FOptionsWidget;
-  QUuid FCurPluginId;
 };
 
 #endif // CONNECTIONOPTIONSWIDGET_H

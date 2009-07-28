@@ -21,6 +21,8 @@ struct OptionsNode {
   QString desc;
 };
 
+class SettingsPlugin;
+
 class SortFilterProxyModel : 
   public QSortFilterProxyModel
 {
@@ -36,9 +38,9 @@ class OptionsDialog :
 {
   Q_OBJECT;
 public:
-  OptionsDialog(QWidget *AParent = NULL);
+  OptionsDialog(SettingsPlugin *ASessingsPlugin, QWidget *AParent = NULL);
   ~OptionsDialog();
-  void openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIcon, int AOrder, QWidget *AWidget);
+  void openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIcon, int AOrder);
   void closeNode(const QString &ANode);
   void showNode(const QString &ANode);
 signals:
@@ -53,6 +55,8 @@ protected slots:
   void onDialogButtonClicked(QAbstractButton *AButton);
   void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious);
 private:
+  SettingsPlugin *FSettingsPlugin;
+private:
   QLabel *lblInfo;
   QTreeView *trvNodes;
   QScrollArea *scaScroll;
@@ -60,9 +64,9 @@ private:
   QStandardItemModel *simNodes;
   SortFilterProxyModel *FProxyModel;
 private:
-  QHash<QString, OptionsNode *> FNodes;
-  QHash<QString, QStandardItem *> FNodeItems;
-  QHash<QStandardItem *, QWidget *> FItemWidget;
+  QMap<QString, OptionsNode *> FNodes;
+  QMap<QString, QStandardItem *> FNodeItems;
+  QMap<QStandardItem *, QWidget *> FItemWidget;
 };
 
 #endif // OPTIONSDIALOG_H

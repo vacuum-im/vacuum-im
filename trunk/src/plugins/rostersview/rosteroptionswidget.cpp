@@ -22,4 +22,5 @@ void RosterOptionsWidget::apply()
   FRostersViewPlugin->setOption(IRostersView::ShowOnlineFirst,ui.chbShowOnlineFirst->checkState() == Qt::Checked);
   FRostersViewPlugin->setOption(IRostersView::ShowResource,ui.chbShowResource->checkState() == Qt::Checked);
   FRostersViewPlugin->setOption(IRostersView::ShowStatusText,ui.chbShowStatus->checkState() == Qt::Checked);
+  emit optionsAccepted();
 }

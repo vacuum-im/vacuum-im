@@ -1,6 +1,7 @@
 #ifndef IACCOUNTMANAGER_H
 #define IACCOUNTMANAGER_H
 
+#include <QUuid>
 #include <QString>
 #include <QVariant>
 #include "../../interfaces/ixmppstreams.h"
@@ -12,7 +13,7 @@ class IAccount
 {
 public:
   virtual QObject *instance() = 0;
-  virtual const QString &accountId() const =0;
+  virtual QUuid accountId() const =0;
   virtual IXmppStream *xmppStream() const =0;
   virtual bool isValid() const =0;
   virtual bool isActive() const =0;
@@ -39,20 +40,20 @@ class IAccountManager
 {
 public:
   virtual QObject *instance() = 0;
-  virtual IAccount *insertAccount(const QString &AAccountId = "") =0;
   virtual QList<IAccount *> accounts() const =0;
-  virtual IAccount *accountById(const QString &AAcoountId) const =0;
+  virtual IAccount *accountById(const QUuid &AAcoountId) const =0;
   virtual IAccount *accountByStream(const Jid &AStreamJid) const =0;
-  virtual void showAccount(const QString &AAccountId) =0;
-  virtual void hideAccount(const QString &AAccountId) =0;
-  virtual void removeAccount(const QString &AAccountId) =0;
-  virtual void destroyAccount(const QString &AAccountId) =0;
+  virtual IAccount *appendAccount(const QUuid &AAccountId) =0;
+  virtual void showAccount(const QUuid &AAccountId) =0;
+  virtual void hideAccount(const QUuid &AAccountId) =0;
+  virtual void removeAccount(const QUuid &AAccountId) =0;
+  virtual void destroyAccount(const QUuid &AAccountId) =0;
 signals:
-  virtual void inserted(IAccount *AAccount) =0;
+  virtual void appended(IAccount *AAccount) =0;
   virtual void shown(IAccount *AAccount) =0;
   virtual void hidden(IAccount *AAccount) =0;
   virtual void removed(IAccount *AAccount) =0;
-  virtual void destroyed(const QString &AAccountId) =0;
+  virtual void destroyed(const QUuid &AAccountId) =0;
 };
 
 Q_DECLARE_INTERFACE(IAccount,"Vacuum.Plugin.IAccount/1.0")

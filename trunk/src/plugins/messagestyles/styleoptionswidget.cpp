@@ -57,7 +57,7 @@ void StyleOptionsWidget::apply()
     }
     it++;
   }
-  emit optionsApplied();
+  emit optionsAccepted();
 }
 
 void StyleOptionsWidget::startStyleViewUpdate()

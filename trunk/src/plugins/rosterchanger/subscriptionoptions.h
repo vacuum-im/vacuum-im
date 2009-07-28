@@ -15,7 +15,7 @@ public:
 public slots:
   void apply();
 signals:
-  void applied();
+  void optionsAccepted();
 private:
   Ui::SubscriptionOptionsClass ui;
 private:

@@ -399,7 +399,7 @@ void SettingsPlugin::openOptionsNode(const QString &ANode, const QString &AName,
     node->order = AOrder;
     FNodes.insert(ANode,node);
     if (!FOptionsDialog.isNull())
-      FOptionsDialog->openNode(ANode,AName,ADescription,AIconKey,AOrder,createNodeWidget(ANode));
+      FOptionsDialog->openNode(ANode,AName,ADescription,AIconKey,AOrder);
     emit optionsNodeOpened(ANode);
   }
   else
@@ -431,7 +431,7 @@ QDialog *SettingsPlugin::openOptionsDialog(const QString &ANode, QWidget *AParen
 {
   if (FOptionsDialog.isNull())
   {
-    FOptionsDialog = new OptionsDialog(AParent);
+    FOptionsDialog = new OptionsDialog(this,AParent);
     connect(FOptionsDialog, SIGNAL(accepted()),SLOT(onOptionsDialogAccepted()));
     connect(FOptionsDialog, SIGNAL(rejected()),SLOT(onOptionsDialogRejected()));
     connect(FOptionsDialog, SIGNAL(closed()),SLOT(onOptionsDialogClosed()));
@@ -439,7 +439,7 @@ QDialog *SettingsPlugin::openOptionsDialog(const QString &ANode, QWidget *AParen
     QMap<QString, OptionsNode *>::const_iterator it = FNodes.constBegin();
     while (it != FNodes.constEnd())
     {
-      FOptionsDialog->openNode(it.key(),it.value()->name,it.value()->desc,it.value()->icon,it.value()->order,createNodeWidget(it.key()));
+      FOptionsDialog->openNode(it.key(),it.value()->name,it.value()->desc,it.value()->icon,it.value()->order);
       it++;
     }
     emit optionsDialogOpened();

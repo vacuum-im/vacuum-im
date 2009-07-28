@@ -19,7 +19,7 @@ EmoticonsOptions::~EmoticonsOptions()
 
 }
 
-void EmoticonsOptions::apply() const
+void EmoticonsOptions::apply()
 {
   QStringList newFiles;
   for (int i = 0; i<ui.lwtEmoticons->count(); i++)
@@ -28,6 +28,8 @@ void EmoticonsOptions::apply() const
 
   if (newFiles != FEmoticons->iconsets())
     FEmoticons->setIconsets(newFiles);
+
+  emit optionsAccepted();
 }
 
 void EmoticonsOptions::init()

@@ -1,10 +1,23 @@
 #include "accountoptions.h"
 
-AccountOptions::AccountOptions(const QString &AAccountId, QWidget *AParent)
-  : QWidget(AParent)
+AccountOptions::AccountOptions(IAccountManager *AManager, const QUuid &AAccountId, QWidget *AParent) : QWidget(AParent)
 {
-  FAccountId = AAccountId;
   ui.setupUi(this);
+  FAccountId = AAccountId;
+  FManager = AManager;
+
+  IAccount *account = FManager->accountById(FAccountId);
+  if (account)
+  {
+    ui.lneName->setText(account->name());
+    ui.lneJabberId->setText(account->streamJid().bare());
+    ui.lneResource->setText(account->streamJid().resource());
+    ui.lnePassword->setText(account->password());
+  }
+  else
+  {
+    ui.lneResource->setText(CLIENT_NAME);
+  }
 }
 
 AccountOptions::~AccountOptions()
@@ -12,48 +25,31 @@ AccountOptions::~AccountOptions()
 
 }
 
-QVariant AccountOptions::option(const Options &AOption) const
+void AccountOptions::apply()
 {
-  switch(AOption)
+  IAccount *account = FManager->accountById(FAccountId);
+  if (account)
   {
-  case AO_Name:
-    return ui.lneName->text();
-  case AO_StreamJid:
-    {
-      Jid streamJid(ui.lneJabberId->text());
-      streamJid.setResource(ui.lneResource->text());
-      return streamJid.full();
-    }
-  case AO_Password:
-    return ui.lnePassword->text();
-  default:
-    return QVariant();
-  };
-  return QVariant();
+    QString name = ui.lneName->text().trimmed();
+    if (name.isEmpty())
+      name = ui.lneJabberId->text().trimmed();
+    if (name.isEmpty())
+      name = tr("New Account");
+    Jid streamJid = ui.lneJabberId->text();
+    streamJid.setResource(ui.lneResource->text().isEmpty() ? ui.lneResource->text() : QString(CLIENT_NAME));
+
+    account->setName(name);
+    account->setStreamJid(streamJid);
+    account->setPassword(ui.lnePassword->text());
+  }
 }
 
-void AccountOptions::setOption(const Options &AOption, const QVariant &AValue)
+QString AccountOptions::name() const
 {
-  switch(AOption)
-  {
-  case AO_Name:
-    {
-      ui.lneName->setText(AValue.toString());
-      break;
-    }
-  case AO_StreamJid:
-    {
-      Jid streamJid(AValue.toString());
-      ui.lneJabberId->setText(streamJid.bare());
-      ui.lneResource->setText(streamJid.resource());
-      break;
-    }
-  case AO_Password:
-    {
-      ui.lnePassword->setText(AValue.toString());
-      break;
-    }
-  default:
-    break;
-  };
+  return ui.lneName->text();
+}
+
+void AccountOptions::setName(const QString &AName)
+{
+  ui.lneName->setText(AName);
 }
