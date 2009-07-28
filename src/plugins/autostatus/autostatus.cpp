@@ -15,7 +15,6 @@ AutoStatus::AutoStatus()
 {
   FStatusChanger = NULL;
   FSettingsPlugin = NULL;
-  FOptionsWidget = NULL;
   
   FRuleId = 1;
   FActiveRule = 0;
@@ -61,9 +60,6 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(profileClosed(const QString &)),SLOT(onProfileClosed(const QString &)));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsDialogAccepted()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsDialogRejected()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),SLOT(onOptionsDialogClosed()));
     }
   }
 
@@ -90,8 +86,11 @@ QWidget *AutoStatus::optionsWidget(const QString &ANode, int &/*AOrder*/)
 {
   if (ANode == ON_AUTO_STATUS)
   {
-    FOptionsWidget = new StatusOptionsWidget(this,FStatusChanger,NULL);
-    return FOptionsWidget;
+    StatusOptionsWidget *widget = new StatusOptionsWidget(this,FStatusChanger,NULL);
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
+    return widget;
   }
   return NULL;
 }
@@ -244,7 +243,7 @@ void AutoStatus::onSettingsOpened()
   }
 }
 
-void AutoStatus::onProfileClosed(const QString &AProfileName)
+void AutoStatus::onProfileClosed(const QString &/*AProfileName*/)
 {
   setActiveRule(0);
   FLastCursorTime = QDateTime::currentDateTime();
@@ -269,22 +268,6 @@ void AutoStatus::onSettingsClosed()
       settings->setValueNS(SVN_RULE_TEXT,ns,item.rule.text);
     }
   }
-}
-
-void AutoStatus::onOptionsDialogAccepted()
-{
-  FOptionsWidget->applyOptions();
-  emit optionsAccepted();
-}
-
-void AutoStatus::onOptionsDialogRejected()
-{
-  emit optionsRejected();
-}
-
-void AutoStatus::onOptionsDialogClosed()
-{
-  FOptionsWidget = NULL;
 }
 
 Q_EXPORT_PLUGIN2(AutoStatusPlugin, AutoStatus)

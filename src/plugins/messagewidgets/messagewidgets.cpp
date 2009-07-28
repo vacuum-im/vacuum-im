@@ -84,8 +84,9 @@ QWidget *MessageWidgets::optionsWidget(const QString &ANode, int &AOrder)
   {
     AOrder = OWO_MESSAGES;
     MessengerOptions *widget = new MessengerOptions(this);
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
     connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(widget,SIGNAL(optionsApplied()),SIGNAL(optionsAccepted()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
     return widget;
   }
   return NULL;

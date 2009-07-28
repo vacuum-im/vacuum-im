@@ -86,7 +86,7 @@ QWidget *MessageStyles::optionsWidget(const QString &ANode, int &AOrder)
     StyleOptionsWidget *widget = new StyleOptionsWidget(this);
     connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
     connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),this,SIGNAL(optionsRejected()));
-    connect(widget,SIGNAL(optionsApplied()),this,SIGNAL(optionsAccepted()));
+    connect(widget,SIGNAL(optionsAccepted()),this,SIGNAL(optionsAccepted()));
     return widget;
   }
   return NULL;

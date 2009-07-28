@@ -65,14 +65,9 @@ protected slots:
   void onSettingsOpened();
   void onProfileClosed(const QString &AProfileName);
   void onSettingsClosed();
-  void onOptionsDialogAccepted();
-  void onOptionsDialogRejected();
-  void onOptionsDialogClosed();
 private:
   IStatusChanger *FStatusChanger;
   ISettingsPlugin *FSettingsPlugin;
-private:
-  StatusOptionsWidget *FOptionsWidget;
 private:
   int FRuleId;
   int FActiveRule;

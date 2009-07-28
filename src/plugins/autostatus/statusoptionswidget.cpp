@@ -165,7 +165,7 @@ StatusOptionsWidget::~StatusOptionsWidget()
 
 }
 
-void StatusOptionsWidget::applyOptions()
+void StatusOptionsWidget::apply()
 {
   QList<int> oldRules = FAutoStatus->rules();
   for (int i = 0; i<ui.tbwRules->rowCount(); i++)
@@ -196,6 +196,8 @@ void StatusOptionsWidget::applyOptions()
 
   foreach(int ruleId, oldRules)
     FAutoStatus->removeRule(ruleId);
+
+  emit optionsAccepted();
 }
 
 int StatusOptionsWidget::appendTableRow(const IAutoStatusRule &ARule, int ARuleId)

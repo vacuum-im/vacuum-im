@@ -1,7 +1,6 @@
 #ifndef ROSTERCHANGER_H
 #define ROSTERCHANGER_H
 
-#include <QPointer>
 #include <QDateTime>
 #include "../../definations/actiongroups.h"
 #include "../../definations/rosterlabelorders.h"

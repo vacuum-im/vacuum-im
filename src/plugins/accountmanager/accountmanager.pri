@@ -1,13 +1,13 @@
 FORMS = accountoptions.ui \
-        accountmanage.ui
+        accountsoptions.ui
 
 HEADERS = accountoptions.h \
-          accountmanage.h \
+          accountsoptions.h \
           account.h \
           accountmanager.h
 
 SOURCES = accountoptions.cpp \
-          accountmanage.cpp \
+          accountsoptions.cpp \
           account.cpp \
           accountmanager.cpp
 

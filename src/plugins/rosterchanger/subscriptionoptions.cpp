@@ -18,4 +18,5 @@ void SubscriptionOptions::apply()
 {
   FRosterChanger->setOption(IRosterChanger::AutoSubscribe,ui.chbAutoSubscribe->isChecked());
   FRosterChanger->setOption(IRosterChanger::AutoUnsubscribe,ui.chbAutoUnsubscribe->isChecked());
+  emit optionsAccepted();
 }

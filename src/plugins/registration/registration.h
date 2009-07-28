@@ -94,7 +94,7 @@ private:
 private:
   QList<QString> FSendRequests;
   QList<QString> FSubmitRequests;
-  QHash<QString,QCheckBox *> FOptionWidgets;
+  QHash<QUuid, QCheckBox *> FOptionWidgets;
   QHash<IXmppStream *, IStreamFeature *> FStreamFeatures;
 };
 

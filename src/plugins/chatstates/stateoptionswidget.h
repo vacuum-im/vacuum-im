@@ -14,7 +14,7 @@ public:
 public slots:
   void apply();
 signals:
-  void optionsApplied();
+  void optionsAccepted();
 private:
   Ui::StateOptionsWidgetClass ui;
 private:

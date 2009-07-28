@@ -18,7 +18,7 @@ public slots:
   void apply();
   void startStyleViewUpdate();
 signals:
-  void optionsApplied();
+  void optionsAccepted();
 protected:
   void updateActiveSettings();
   void createViewContent();

@@ -37,7 +37,6 @@ Avatars::Avatars()
   FSettingsPlugin = NULL;
   
   FRosterLabelId = -1;
-  FOptionsWidget = NULL;
   FOptions = IAvatars::ShowAvatars;
 }
 
@@ -120,8 +119,6 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsAccepted()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsRejected()));
     }
   }
 
@@ -284,8 +281,11 @@ QWidget *Avatars::optionsWidget(const QString &ANode, int &AOrder)
   if (ANode == ON_ROSTER)
   {
     AOrder = OWO_ROSTER_AVATARS;
-    FOptionsWidget = new RosterOptionsWidget(this,NULL);
-    return FOptionsWidget;
+    RosterOptionsWidget *widget = new RosterOptionsWidget(this,NULL);
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
+    return widget;
   }
   return NULL;
 }
@@ -737,18 +737,6 @@ void Avatars::onSettingsClosed()
   {
     settings->setValueNS(SVN_CUSTOM_AVATAR_HASH,contactJid.full(),FCustomPictures.value(contactJid));
   }
-}
-
-void Avatars::onOptionsAccepted()
-{
-  if (FOptionsWidget)
-    FOptionsWidget->applyOptions();
-  emit optionsAccepted();
-}
-
-void Avatars::onOptionsRejected()
-{
-  emit optionsRejected();
 }
 
 void Avatars::onUpdateOptions()

@@ -267,7 +267,7 @@ QWidget *Registration::optionsWidget(const QString &ANode, int &AOrder)
     QCheckBox *checkBox = new QCheckBox;
     checkBox->setText(tr("Register new account on server"));
 
-    QString accountId = nodeTree.at(1);
+    QUuid accountId = nodeTree.at(1);
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
     if (account)
       checkBox->setCheckState(FStreamFeatures.contains(account->xmppStream()) ? Qt::Checked : Qt::Unchecked);
@@ -410,8 +410,7 @@ void Registration::onStreamDestroyed(IXmppStream *AXmppStream)
 
 void Registration::onOptionsAccepted()
 {
-  QList<QString> accounts = FOptionWidgets.keys();
-  foreach(QString accountId, accounts)
+  foreach(QUuid accountId, FOptionWidgets.keys())
   {
     IAccount *account = FAccountManager->accountById(accountId);
     if (account && account->isActive())

@@ -2,7 +2,9 @@
 #define ACCOUNTOPTIONS_H
 
 #include <QWidget>
-#include <QVariant>
+#include "../../definations/version.h"
+#include "../../definations/optionnodes.h"
+#include "../../interfaces/iaccountmanager.h"
 #include "../../utils/jid.h"
 #include "ui_accountoptions.h"
 
@@ -10,26 +12,20 @@ class AccountOptions :
   public QWidget
 {
   Q_OBJECT;
-
 public:
-  enum Options {
-    AO_Id,
-    AO_Name,
-    AO_StreamJid,
-    AO_Password,
-    AO_DefLang,
-  };
-public:
-  AccountOptions(const QString &AAccountId, QWidget *AParent = NULL);
+  AccountOptions(IAccountManager *AManager, const QUuid &AAccountId, QWidget *AParent = NULL);
   ~AccountOptions();
-
-  const QString &accountId() const { return FAccountId; }
-  QVariant option(const Options &AOption) const;
-  void setOption(const Options &AOption, const QVariant &AValue);
+public:
+  void apply();
+public:
+  QString name() const;
+  void setName(const QString &AName);
 private:
   Ui::AccountOptionsClass ui;
 private:
-  QString FAccountId;
+  IAccountManager *FManager;
+private:
+  QUuid FAccountId;
 };
 
 #endif // ACCOUNTOPTIONS_H

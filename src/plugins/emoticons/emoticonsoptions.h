@@ -15,7 +15,10 @@ class EmoticonsOptions :
 public:
   EmoticonsOptions(IEmoticons *AEmoticons, QWidget *AParent = NULL);
   ~EmoticonsOptions();
-  void apply() const;
+public slots:
+  void apply();
+signals:
+  void optionsAccepted();
 protected:
   void init();
 protected slots:

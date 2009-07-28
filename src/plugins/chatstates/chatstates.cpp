@@ -170,7 +170,7 @@ QWidget *ChatStates::optionsWidget(const QString &ANode, int &AOrder)
   {
     AOrder = OWO_MESSAGES_CHATSTATES;
     StateOptionsWidget *widget = new StateOptionsWidget(this);
-    connect(widget,SIGNAL(optionsApplied()),SIGNAL(optionsAccepted()));
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
     connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
     connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
     return widget;

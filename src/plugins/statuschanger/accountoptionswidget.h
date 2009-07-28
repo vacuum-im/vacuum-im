@@ -2,26 +2,27 @@
 #define ACCOUNTOPTIONSWIDGET_H
 
 #include <QWidget>
+#include "../../definations/accountvaluenames.h"
+#include "../../interfaces/iaccountmanager.h"
 #include "ui_accountoptionswidget.h"
 
 class AccountOptionsWidget : 
   public QWidget
 {
   Q_OBJECT;
-
 public:
-  AccountOptionsWidget(const QString &AAccountId);
+  AccountOptionsWidget(IAccountManager *AAccountManager, const QUuid &AAccountId);
   ~AccountOptionsWidget();
-  
-  QString accountId() const { return FAccountId; }
-  bool autoConnect() const;
-  void setAutoConnect(bool AAutoConnect);
-  bool autoReconnect() const;
-  void setAutoReconnect(bool AAutoReconnect);
+public slots:
+  void apply();
+signals:
+  void optionsAccepted();
 private:
   Ui::AccountOptionsWidgetClass ui;
 private:
-  QString FAccountId;
+  IAccountManager *FAccountManager;
+private:
+  QUuid FAccountId;
 };
 
 #endif // ACCOUNTOPTIONSWIDGET_H

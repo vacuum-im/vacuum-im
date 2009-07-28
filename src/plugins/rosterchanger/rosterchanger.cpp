@@ -178,8 +178,8 @@ QWidget *RosterChanger::optionsWidget(const QString &ANode, int &AOrder)
   {
     AOrder = OWO_ROSTER_CHENGER;
     SubscriptionOptions *widget = new SubscriptionOptions(this);
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
     connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(widget,SIGNAL(applied()),SIGNAL(optionsAccepted()));
     connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
     return widget;
   }

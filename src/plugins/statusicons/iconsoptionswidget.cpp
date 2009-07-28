@@ -104,6 +104,8 @@ void IconsOptionsWidget::apply()
 
   foreach(QString rule,rules)
     FStatusIcons->removeRule(rule,IStatusIcons::UserRule);
+
+  emit optionsAccepted();
 }
 
 void IconsOptionsWidget::populateRulesTable(QTableWidget *ATable, IStatusIcons::RuleType ARuleType)

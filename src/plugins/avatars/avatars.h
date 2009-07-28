@@ -100,8 +100,6 @@ protected slots:
   void onClearAvatarByAction(bool);
   void onSettingsOpened();
   void onSettingsClosed();
-  void onOptionsAccepted();
-  void onOptionsRejected();
   void onUpdateOptions();
 private:
   IXmppStreams *FXmppStreams;
@@ -124,7 +122,6 @@ private:
 private:
   int FOptions;
   int FCurOptions;
-  RosterOptionsWidget *FOptionsWidget;
 private:
   int FRosterLabelId;
   QSize FAvatarSize;

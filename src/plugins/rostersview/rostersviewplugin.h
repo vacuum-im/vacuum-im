@@ -1,7 +1,6 @@
 #ifndef ROSTERSVIEWPLUGIN_H
 #define ROSTERSVIEWPLUGIN_H
 
-#include <QPointer>
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionnodeorders.h"
 #include "../../definations/optionwidgetorders.h"
@@ -70,13 +69,11 @@ protected slots:
   void onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
   void onAccountShown(IAccount *AAccount);
   void onAccountHidden(IAccount *AAccount);
-  void onAccountDestroyed(const QString &AAccountId);
+  void onAccountDestroyed(const QUuid &AAccountId);
   void onRestoreExpandState();
   void onSettingsOpened();
   void onSettingsClosed();
   void onShowOfflineContactsAction(bool AChecked);
-  void onOptionsAccepted();
-  void onOptionsRejected();
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersModel *FRostersModel;
@@ -93,7 +90,6 @@ private:
   IndexDataHolder *FIndexDataHolder;
   SortFilterProxyModel *FSortFilterProxyModel;
   QAbstractItemModel *FLastModel;
-  QPointer<RosterOptionsWidget> FRosterOptionsWidget;
   QHash<Jid,QString> FCollapseNS;
   struct { int sliderPos; IRosterIndex *currentIndex; } FViewSavedState;
 };

@@ -29,8 +29,10 @@ class StatusOptionsWidget :
 public:
   StatusOptionsWidget(IAutoStatus *AAutoStatus, IStatusChanger *AStatusChanger, QWidget *AParent = NULL);
   ~StatusOptionsWidget();
-public:
-  void applyOptions();
+public slots:
+  void apply();
+signals:
+  void optionsAccepted();
 protected:
   int appendTableRow(const IAutoStatusRule &ARule, int ARuleId);
 protected slots:

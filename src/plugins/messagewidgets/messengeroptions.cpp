@@ -20,7 +20,7 @@ void MessengerOptions::apply()
   FMessageWidgets->setOption(IMessageWidgets::UseTabWindow,ui.chbUseTabWindow->isChecked());
   FMessageWidgets->setOption(IMessageWidgets::ShowStatus,ui.chbChatShowStatus->isChecked());
   FMessageWidgets->setSendMessageKey(FSendKey);
-  emit optionsApplied();
+  emit optionsAccepted();
 }
 
 MessengerOptions::~MessengerOptions()

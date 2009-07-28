@@ -1,9 +1,14 @@
 #include "accountoptionswidget.h"
 
-AccountOptionsWidget::AccountOptionsWidget(const QString &AAccountId)
+AccountOptionsWidget::AccountOptionsWidget(IAccountManager *AAccountManager, const QUuid &AAccountId)
 {
   ui.setupUi(this);
   FAccountId = AAccountId;
+  FAccountManager = AAccountManager;
+
+  IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(FAccountId) : NULL;
+  ui.chbAutoConnect->setCheckState(account!=NULL ? (account->value(AVN_AUTO_CONNECT,false).toBool() ? Qt::Checked : Qt::Unchecked) : Qt::Unchecked);
+  ui.chbAutoReconnect->setCheckState(account!=NULL ? (account->value(AVN_AUTO_RECONNECT,true).toBool() ? Qt::Checked : Qt::Unchecked) : Qt::Checked);
 }
 
 AccountOptionsWidget::~AccountOptionsWidget()
@@ -11,23 +16,13 @@ AccountOptionsWidget::~AccountOptionsWidget()
 
 }
 
-bool AccountOptionsWidget::autoConnect() const
+void AccountOptionsWidget::apply()
 {
-  return ui.chbAutoConnect->isChecked();
-}
-
-void AccountOptionsWidget::setAutoConnect(bool AAutoConnect)
-{
-  ui.chbAutoConnect->setCheckState(AAutoConnect ? Qt::Checked : Qt::Unchecked);
-}
-
-bool AccountOptionsWidget::autoReconnect() const
-{
-  return ui.chbAutoReconnect->isChecked();
-
-}
-
-void AccountOptionsWidget::setAutoReconnect(bool AAutoReconnect)
-{
-  ui.chbAutoReconnect->setCheckState(AAutoReconnect ? Qt::Checked : Qt::Unchecked);
+  IAccount *account = FAccountManager->accountById(FAccountId);
+  if (account)
+  {
+    account->setValue(AVN_AUTO_CONNECT,ui.chbAutoConnect->isChecked());
+    account->setValue(AVN_AUTO_RECONNECT,ui.chbAutoReconnect->isChecked());
+  }
+  emit optionsAccepted();
 }

@@ -126,9 +126,6 @@ protected slots:
   void onSettingsClosed();
   void onReconnectTimer();
   void onEditStatusAction(bool);
-  void onOptionsAccepted();
-  void onOptionsRejected();
-  void onOptionsDialogClosed();
   void onAccountChanged(const QString &AName, const QVariant &AValue);
   void onNotificationActivated(int ANotifyId);
 private:
@@ -161,7 +158,6 @@ private:
   QHash<IPresence *,QPair<QDateTime,int> >FStreamWaitReconnect;
   QHash<IPresence *,int> FStreamTempStatus;
   QSet<IPresence *> FStreamMainStatus;
-  QHash<QString,AccountOptionsWidget *> FAccountOptionsById;
   QHash<IPresence *,int> FStreamNotify;
 };
 

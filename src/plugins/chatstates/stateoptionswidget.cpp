@@ -16,5 +16,5 @@ StateOptionsWidget::~StateOptionsWidget()
 void StateOptionsWidget::apply()
 {
   FChatStates->setEnabled(ui.chbEnableChatStates->isChecked());
-  emit optionsApplied();
+  emit optionsAccepted();
 }

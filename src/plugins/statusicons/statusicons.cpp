@@ -78,8 +78,6 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsAccepted()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsRejected()));
     }
   }
 
@@ -115,8 +113,11 @@ QWidget *StatusIcons::optionsWidget(const QString &ANode, int &AOrder)
   if (ANode == ON_STATUSICONS)
   {
     AOrder = OWO_STATUSICONS;
-    FIconsOptionWidget = new IconsOptionsWidget(this);
-    return FIconsOptionWidget;
+    IconsOptionsWidget *widget = new IconsOptionsWidget(this);
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
+    return widget;
   }
   return NULL;
 }
@@ -414,18 +415,6 @@ void StatusIcons::onSettingsClosed()
     settings->setValueNS(SVN_USERRULES,pattern,FUserRules.value(pattern));
     removeRule(pattern,UserRule);
   }
-}
-
-void StatusIcons::onOptionsAccepted()
-{
-  if (!FIconsOptionWidget.isNull())
-    FIconsOptionWidget->apply();
-  emit optionsAccepted();
-}
-
-void StatusIcons::onOptionsRejected()
-{
-  emit optionsRejected();
 }
 
 void StatusIcons::onDefaultStorageChanged()

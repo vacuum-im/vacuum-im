@@ -111,11 +111,6 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
   if (plugin)
   {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
-    if (FAccountManager)
-    {
-      connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),SLOT(onOptionsAccepted()));
-      connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
-    }
   }
 
   plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
@@ -130,7 +125,6 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),SLOT(onOptionsDialogClosed()));
     }
   }
 
@@ -227,23 +221,13 @@ bool StatusChanger::startPlugin()
 QWidget *StatusChanger::optionsWidget(const QString &ANode, int &AOrder)
 {
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
-  if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
+  if (FAccountManager && nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
   {
     AOrder = OWO_ACCOUNT_STATUS;
-    QString accountId = nodeTree.at(1);
-    AccountOptionsWidget *widget = new AccountOptionsWidget(accountId);
-    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
-    if (account)
-    {
-      widget->setAutoConnect(account->value(AVN_AUTO_CONNECT,false).toBool());
-      widget->setAutoReconnect(account->value(AVN_AUTO_RECONNECT,true).toBool());
-    }
-    else
-    {
-      widget->setAutoConnect(false);
-      widget->setAutoReconnect(true);
-    }
-    FAccountOptionsById.insert(accountId,widget);
+    AccountOptionsWidget *widget = new AccountOptionsWidget(FAccountManager,nodeTree.at(1));
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+    connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),widget,SLOT(apply()));
+    connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SIGNAL(optionsRejected()));
     return widget;
   }
   return NULL;
@@ -1100,30 +1084,6 @@ void StatusChanger::onEditStatusAction(bool)
   }
   else
     FEditStatusDialog->show();
-}
-
-void StatusChanger::onOptionsAccepted()
-{
-  foreach (AccountOptionsWidget *widget, FAccountOptionsById)
-  {
-    IAccount *account = FAccountManager->accountById(widget->accountId());
-    if (account)
-    {
-      account->setValue(AVN_AUTO_CONNECT,widget->autoConnect());
-      account->setValue(AVN_AUTO_RECONNECT, widget->autoReconnect());
-    }
-  }
-  emit optionsAccepted();
-}
-
-void StatusChanger::onOptionsRejected()
-{
-  emit optionsRejected();
-}
-
-void StatusChanger::onOptionsDialogClosed()
-{
-  FAccountOptionsById.clear();
 }
 
 void StatusChanger::onAccountChanged(const QString &AName, const QVariant &AValue)

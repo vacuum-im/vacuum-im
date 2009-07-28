@@ -16,7 +16,7 @@ public:
   Account(IXmppStreams *AXmppStreams, ISettings *ASettings, const QString &AAccountId, QObject *AParent);
   ~Account();
   virtual QObject *instance() { return this; }
-  virtual const QString &accountId() const;
+  virtual QUuid accountId() const;
   virtual IXmppStream *xmppStream() const;
   virtual bool isValid() const;
   virtual bool isActive() const;
@@ -42,7 +42,7 @@ private:
   IXmppStream *FXmppStream;
   IXmppStreams *FXmppStreams;
 private:
-  QString FAccountId;
+  QUuid FAccountId;
 };
 
 #endif // ACCOUNT_H
