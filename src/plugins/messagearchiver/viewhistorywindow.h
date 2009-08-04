@@ -148,10 +148,10 @@ private:
   IArchiveFilter FFilter;
   QList<IArchiveHeader> FCurrentHeaders;
   QList<IArchiveRequest> FRequestList;
-  QHash<QString,IArchiveRequest> FHeaderRequests;
-  QHash<QString,IArchiveHeader> FCollectionRequests;
-  QHash<QString,IArchiveHeader> FRenameRequests;
-  QHash<QString,IArchiveHeader> FRemoveRequests;
+  QMap<QString,IArchiveRequest> FHeaderRequests;
+  QMap<QString,IArchiveHeader> FCollectionRequests;
+  QMap<QString,IArchiveHeader> FRenameRequests;
+  QMap<QString,IArchiveHeader> FRemoveRequests;
   QMap<IArchiveHeader,IArchiveCollection> FCollections;
 };
 

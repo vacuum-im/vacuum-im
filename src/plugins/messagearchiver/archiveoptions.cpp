@@ -102,12 +102,13 @@ void ArchiveDelegate::updateComboBox(int AColumn, QComboBox *AComboBox) const
     break;
   case EXPIRE_COLUMN:
     AComboBox->setEditable(true);
+    AComboBox->addItem(FArchiver->expireName(0),0);
     AComboBox->addItem(FArchiver->expireName(ONE_DAY),ONE_DAY);
     AComboBox->addItem(FArchiver->expireName(ONE_MONTH),ONE_MONTH);
     AComboBox->addItem(FArchiver->expireName(ONE_YEAR),ONE_YEAR);
     AComboBox->addItem(FArchiver->expireName(5*ONE_YEAR),5*ONE_YEAR);
     AComboBox->addItem(FArchiver->expireName(10*ONE_YEAR),10*ONE_YEAR);
-    AComboBox->lineEdit()->setValidator(new QIntValidator(1,50*ONE_YEAR,AComboBox->lineEdit()));
+    AComboBox->lineEdit()->setValidator(new QIntValidator(0,50*ONE_YEAR,AComboBox->lineEdit()));
     connect(AComboBox,SIGNAL(currentIndexChanged(int)),SLOT(onExpireIndexChanged(int)));
     break;
   default:
@@ -115,7 +116,7 @@ void ArchiveDelegate::updateComboBox(int AColumn, QComboBox *AComboBox) const
   }
 }
 
-void ArchiveDelegate::onExpireIndexChanged( int AIndex )
+void ArchiveDelegate::onExpireIndexChanged(int AIndex)
 {
   QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
   comboBox->lineEdit()->setText(QString::number(comboBox->itemData(AIndex).toInt()/ONE_DAY));

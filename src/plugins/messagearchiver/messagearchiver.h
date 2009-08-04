@@ -2,7 +2,6 @@
 #define MESSAGEARCHIVER_H
 
 #include <QMultiMap>
-#include <QObjectCleanupHandler>
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
 #include "../../definations/optionnodes.h"
@@ -32,6 +31,7 @@
 #include "archiveoptions.h"
 #include "replicator.h"
 #include "viewhistorywindow.h"
+#include "chatwindowmenu.h"
 
 struct StanzaSession {
   QString sessionId;
@@ -171,9 +171,12 @@ protected:
   bool hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
   bool isOTRStanzaSession(const IStanzaSession &ASession) const;
   bool isOTRStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
+  void saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const;
+  void restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId = QString::null);
+  void removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const;
   void startSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId);
   void cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const QString &AError);
-  void terminateBrokenStanzaSessions(const Jid &AStreamJid) const;
+  void renegotiateStanzaSessions(const Jid &AStreamJid) const;
 protected slots:
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
@@ -195,6 +198,7 @@ protected slots:
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void onStanzaSessionActivated(const IStanzaSession &ASession);
   void onStanzaSessionTerminated(const IStanzaSession &ASession);
+  void onChatWindowCreated(IChatWindow *AWindow);
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -206,35 +210,35 @@ private:
   IServiceDiscovery *FDiscovery;
   IDataForms *FDataForms;
   IMessageWidgets *FMessageWidgets;
-  ISessionNegotiation *FSessionNegotioation;
+  ISessionNegotiation *FSessionNegotiation;
   IRosterPlugin *FRosterPlugin;
 private:
-  QHash<Jid,int> FSHIPrefs;
-  QHash<Jid,int> FSHIMessageIn;
-  QHash<Jid,int> FSHIMessageOut;
-  QHash<Jid,int> FSHIMessageBlocks;
+  QMap<Jid,int> FSHIPrefs;
+  QMap<Jid,int> FSHIMessageIn;
+  QMap<Jid,int> FSHIMessageOut;
+  QMap<Jid,int> FSHIMessageBlocks;
 private:
-  QHash<QString, Jid> FPrefsSaveRequests;
-  QHash<QString,Jid>  FPrefsLoadRequests;
-  QHash<QString,bool> FPrefsAutoRequests;
-  QHash<QString,Jid>  FPrefsRemoveRequests;
+  QMap<QString,Jid> FPrefsSaveRequests;
+  QMap<QString,Jid>  FPrefsLoadRequests;
+  QMap<QString,bool> FPrefsAutoRequests;
+  QMap<QString,Jid>  FPrefsRemoveRequests;
 private:
-  QHash<QString, IArchiveHeader> FSaveRequests;
-  QHash<QString, IArchiveRequest> FListRequests;
-  QHash<QString, IArchiveHeader> FRetrieveRequests;
-  QHash<QString, IArchiveRequest> FRemoveRequests;
-  QHash<QString, DateTime> FModifyRequests;
+  QMap<QString,IArchiveHeader> FSaveRequests;
+  QMap<QString,IArchiveRequest> FListRequests;
+  QMap<QString,IArchiveHeader> FRetrieveRequests;
+  QMap<QString,IArchiveRequest> FRemoveRequests;
+  QMap<QString,DateTime> FModifyRequests;
+  QMap<QString,QString> FRestoreRequests;
 private:
   QList<Jid> FInStoragePrefs;
-  QHash<Jid, QString> FNamespaces;
-  QHash<Jid,IArchiveStreamPrefs> FArchivePrefs;
-  QHash<Jid, QMultiHash<Jid, CollectionWriter *> > FCollectionWriters;
+  QMap<Jid,QString> FNamespaces;
+  QMap<Jid,IArchiveStreamPrefs> FArchivePrefs;
+  QMap<Jid,Replicator *> FReplicators;
+  QMap<Jid,ViewHistoryWindow *> FArchiveWindows;
+  QMap<Jid,QString> FGatewayTypes;
   QMultiMap<int, IArchiveHandler *> FArchiveHandlers;
-  QHash<Jid, Replicator *> FReplicators;
-  QHash<Jid, ViewHistoryWindow *> FArchiveWindows;
-  QHash<Jid, QString> FGatewayTypes;
-  QHash<Jid, QHash<Jid, StanzaSession> > FSessions;
-  QObjectCleanupHandler FCleanupHandler;
+  QMap<Jid,QMap<Jid,StanzaSession> > FSessions;
+  QMap<Jid,QMultiMap<Jid,CollectionWriter *> > FCollectionWriters;
 };
 
 #endif // MESSAGEARCHIVER_H
