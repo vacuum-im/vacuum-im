@@ -247,6 +247,11 @@ void AccountManager::onSettingsOpened()
     {
       accountElem.setAttribute("ns",QUuid::createUuid().toString());
 
+      //Перекодируем пароль
+      QDomElement passElem = accountElem.firstChildElement("password");
+      if (!passElem.isNull())
+        passElem.setAttribute("value",QString(qCompress(FSettings->encript(FSettings->decript(qUncompress(QByteArray::fromBase64(passElem.attribute("value").toLatin1())),oldNS.toUtf8()),accountElem.attribute("ns").toUtf8())).toBase64()));
+
       //Заменим старый идентификатор и в настройках DefaultConnection
       QDomElement conElem = FSettingsPlugin->pluginNode("{68F9B5F2-5898-43f8-9DD1-19F37E9779AC}").firstChildElement("connection");
       while (!conElem.isNull())
