@@ -3,10 +3,11 @@
 #include <QDir>
 #include <QStack>
 
-#define ARCHIVE_DIRNAME       "archive"
+#define ARCHIVE_DIR_NAME      "archive"
 #define COLLECTION_EXT        ".xml"
 #define LOG_FILE_NAME         "archive.dat"
 #define GATEWAY_FILE_NAME     "gateways.dat"
+#define SESSIONS_FILE_NAME    "sessions.xml"
 #define ARCHIVE_TIMEOUT       30000
 
 #define CATEGORY_GATEWAY      "gateway"
@@ -49,7 +50,7 @@ MessageArchiver::MessageArchiver()
   FDiscovery = NULL;
   FDataForms = NULL;
   FMessageWidgets = NULL;
-  FSessionNegotioation = NULL;
+  FSessionNegotiation = NULL;
   FRosterPlugin = NULL;
 }
 
@@ -139,17 +140,23 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 
   plugin = APluginManager->getPlugins("IMessageWidgets").value(0,NULL);
   if (plugin)
+  {
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
+    if (FMessageWidgets)
+    {
+      connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IChatWindow *)),SLOT(onChatWindowCreated(IChatWindow *)));
+    }
+  }
 
   plugin = APluginManager->getPlugins("ISessionNegotiation").value(0,NULL);
   if (plugin)
   {
-    FSessionNegotioation = qobject_cast<ISessionNegotiation *>(plugin->instance());
-    if (FSessionNegotioation)
+    FSessionNegotiation = qobject_cast<ISessionNegotiation *>(plugin->instance());
+    if (FSessionNegotiation)
     {
-      connect(FSessionNegotioation->instance(),SIGNAL(sessionActivated(const IStanzaSession &)),
+      connect(FSessionNegotiation->instance(),SIGNAL(sessionActivated(const IStanzaSession &)),
         SLOT(onStanzaSessionActivated(const IStanzaSession &)));
-      connect(FSessionNegotioation->instance(),SIGNAL(sessionTerminated(const IStanzaSession &)),
+      connect(FSessionNegotiation->instance(),SIGNAL(sessionTerminated(const IStanzaSession &)),
         SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
     }
   }
@@ -176,9 +183,9 @@ bool MessageArchiver::initObjects()
   {
     registerDiscoFeatures();
   }
-  if (FSessionNegotioation)
+  if (FSessionNegotiation)
   {
-    FSessionNegotioation->insertNegotiator(this,SNO_DEFAULT);
+    FSessionNegotiation->insertNegotiator(this,SNO_DEFAULT);
   }
   if (FSettingsPlugin)
   {
@@ -212,11 +219,11 @@ bool MessageArchiver::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *
     IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid,contactJid);
     if (itemPrefs.otr==ARCHIVE_OTR_REQUIRE && !isOTRStanzaSession(AStreamJid,contactJid))
     {
-      int initResult = FSessionNegotioation!=NULL ? FSessionNegotioation->initSession(AStreamJid,contactJid) : ISessionNegotiator::Cancel;
+      int initResult = FSessionNegotiation!=NULL ? FSessionNegotiation->initSession(AStreamJid,contactJid) : ISessionNegotiator::Cancel;
       if (initResult == ISessionNegotiator::Skip)
         notifyInChatWindow(AStreamJid,contactJid, tr("OTR session not ready, please wait..."));
       else if (initResult != ISessionNegotiator::Cancel)
-        notifyInChatWindow(AStreamJid,contactJid, tr("Negotiating OTR session ..."));
+        notifyInChatWindow(AStreamJid,contactJid, tr("Negotiating off the record (OTR) session ..."));
       return true;
     }
   }
@@ -405,6 +412,13 @@ void MessageArchiver::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
     FModifyRequests.remove(AStanza.id());
   }
 
+  if (FRestoreRequests.contains(AStanza.id()))
+  {
+    QString sessionId = FRestoreRequests.take(AStanza.id());
+    if (AStanza.type() == "result")
+      removeStanzaSessionContext(AStreamJid,sessionId);
+  }
+
   if (AStanza.type() == "result")
     emit requestCompleted(AStanza.id());
   else
@@ -452,6 +466,12 @@ void MessageArchiver::iqStanzaTimeOut(const QString &AId)
   {
     FModifyRequests.remove(AId);
   }
+
+  if (FRestoreRequests.contains(AId))
+  {
+    FRestoreRequests.remove(AId);
+  }
+
   emit requestFailed(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
 }
 
@@ -504,7 +524,12 @@ int MessageArchiver::sessionInit(const IStanzaSession &ASession, IDataForm &AReq
       logging.required = true;
     }
 
-    if (ASession.status == IStanzaSession::Renegotiate)
+    if (ASession.status == IStanzaSession::Init)
+    {
+      ARequest.fields.append(logging);
+      result = ISessionNegotiator::Auto;
+    }
+    else if (ASession.status == IStanzaSession::Renegotiate)
     {
       int index = FDataForms->fieldIndex(SFP_LOGGING,ASession.form.fields);
       if (index<0 || ASession.form.fields.at(index).value!=logging.value)
@@ -514,11 +539,6 @@ int MessageArchiver::sessionInit(const IStanzaSession &ASession, IDataForm &AReq
       }
       else
         result = ISessionNegotiator::Skip;
-    }
-    else if (ASession.status == IStanzaSession::Init)
-    {
-      ARequest.fields.append(logging);
-      result = ISessionNegotiator::Auto;
     }
   }
   return result;
@@ -768,8 +788,31 @@ QString MessageArchiver::saveModeName(const QString &ASaveMode) const
 
 QString MessageArchiver::expireName(int AExpire) const
 {
+
   static const int oneDay = 24*60*60;
-  return QString::number(AExpire / oneDay)+" "+tr("days");
+  static const int oneYear = oneDay*365;
+  
+  int years = AExpire/oneYear;
+  int days = (AExpire-years*oneYear)/oneDay;
+  
+  QString name;
+  if (AExpire>0)
+  {
+    if (years>0)
+      name += QString::number(years)+" "+tr("years");
+    if (days>0)
+    {
+      if (!name.isEmpty())
+        name += " ";
+      name += QString::number(days)+" "+tr("days");
+    }
+  }
+  else
+  {
+    name = tr("Forever");
+  }
+
+  return name;
 }
 
 IArchiveStreamPrefs MessageArchiver::archivePrefs(const Jid &AStreamJid) const
@@ -779,22 +822,41 @@ IArchiveStreamPrefs MessageArchiver::archivePrefs(const Jid &AStreamJid) const
 
 IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const
 {
+  IArchiveItemPrefs domainPrefs, barePrefs, fullPrefs;
   IArchiveStreamPrefs prefs = FArchivePrefs.value(AStreamJid);
   QHash<Jid, IArchiveItemPrefs>::const_iterator it = prefs.itemPrefs.constBegin();
   while (it != prefs.itemPrefs.constEnd())
   {
     QString node = it.key().pNode();
-    QString resource = it.key().resource();
-    if (
-        (it.key().pDomain() == AItemJid.pDomain()) &&
-        (node.isEmpty() || node == AItemJid.pNode()) &&
-        (resource.isEmpty() || resource == AItemJid.resource())
-       )
+    QString domain = it.key().pDomain();
+    QString resource = it.key().pResource();
+    if (domain == AItemJid.pDomain())
     {
-      return it.value();
+      if (node == AItemJid.pNode())
+      {
+        if (resource == AItemJid.pResource())
+        {
+          fullPrefs = it.value();
+          break;
+        }
+        else if (resource.isEmpty())
+        {
+          barePrefs = it.value();
+        }
+      }
+      else if (resource.isEmpty() && node.isEmpty())
+      {
+        domainPrefs = it.value();
+      }
     }
     it++;
   }
+  if (!fullPrefs.save.isEmpty())
+    return fullPrefs;
+  else if (!barePrefs.save.isEmpty())
+    return barePrefs;
+  else if (!domainPrefs.save.isEmpty())
+    return domainPrefs;
   return prefs.defaultPrefs;
 }
 
@@ -812,7 +874,7 @@ QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto)
       return autoSave.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
@@ -914,7 +976,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
     {
       QString requestId;
       if (storage)
-        requestId = FPrivateStorage!=NULL ? FPrivateStorage->saveData(AStreamJid,prefElem) : QString();
+        requestId = FPrivateStorage!=NULL ? FPrivateStorage->saveData(AStreamJid,prefElem) : QString::null;
       else if (FStanzaProcessor->sendIqStanza(this,AStreamJid,save,ARCHIVE_TIMEOUT))
         requestId = save.id();
       if (!requestId.isEmpty())
@@ -924,7 +986,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
       }
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid)
@@ -951,7 +1013,7 @@ QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid
       return setArchivePrefs(AStreamJid,prefs);
     }
   }
-  return QString();
+  return QString::null;
 }
 
 IArchiveWindow *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const IArchiveFilter &AFilter, int AGroupKind, QWidget *AParent)
@@ -962,7 +1024,6 @@ IArchiveWindow *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const 
     window = new ViewHistoryWindow(this,AStreamJid,AParent);
     connect(window,SIGNAL(windowDestroyed(IArchiveWindow *)),SLOT(onArchiveWindowDestroyed(IArchiveWindow *)));
     FArchiveWindows.insert(AStreamJid,window);
-    FCleanupHandler.add(window);
     emit archiveWindowCreated(window);
   }
   window->setGroupKind(AGroupKind);
@@ -1276,7 +1337,7 @@ QString MessageArchiver::saveServerCollection(const Jid &AStreamJid, const IArch
       return save.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString MessageArchiver::loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter)
@@ -1302,7 +1363,7 @@ QString MessageArchiver::loadServerHeaders(const Jid AStreamJid, const IArchiveR
       return request.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString MessageArchiver::loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter)
@@ -1324,7 +1385,7 @@ QString MessageArchiver::loadServerCollection(const Jid AStreamJid, const IArchi
       return retrieve.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString MessageArchiver::removeServerCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened)
@@ -1348,7 +1409,7 @@ QString MessageArchiver::removeServerCollections(const Jid &AStreamJid, const IA
       return remove.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString MessageArchiver::loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter)
@@ -1372,7 +1433,7 @@ QString MessageArchiver::loadServerModifications(const Jid &AStreamJid, const QD
       return modify.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
@@ -1388,12 +1449,12 @@ QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
       return load.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString MessageArchiver::loadStoragePrefs(const Jid &AStreamJid)
 {
-  QString requestId = FPrivateStorage!=NULL ? FPrivateStorage->loadData(AStreamJid,"pref",NS_ARCHIVE) : QString();
+  QString requestId = FPrivateStorage!=NULL ? FPrivateStorage->loadData(AStreamJid,"pref",NS_ARCHIVE) : QString::null;
   if (!requestId.isEmpty())
     FPrefsLoadRequests.insert(requestId,AStreamJid);
   return requestId;
@@ -1416,7 +1477,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
   }
   else
   {
-    //������� ��� jabberd 1.4.3
+    //Костыль для jabberd 1.4.3
     if (!FInStoragePrefs.contains(AStreamJid) && AElem.hasAttribute("j_private_flag"))
       FInStoragePrefs.append(AStreamJid);
 
@@ -1430,7 +1491,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
       defPrefs.methodManual = ARCHIVE_METHOD_CONCEDE;
       defPrefs.defaultPrefs.otr = ARCHIVE_OTR_CONCEDE;
       defPrefs.defaultPrefs.save = ARCHIVE_SAVE_BODY;
-      defPrefs.defaultPrefs.expire = 365*24*60*60;
+      defPrefs.defaultPrefs.expire = 5*365*24*60*60;
       FArchivePrefs.insert(AStreamJid,defPrefs);
       openHistoryOptionsNode(AStreamJid);
     }
@@ -1499,7 +1560,10 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
           replicator->setEnabled(replicationEnabled(AStreamJid));
       }
 
-      terminateBrokenStanzaSessions(AStreamJid);
+      if (initPrefs)
+        restoreStanzaSessionContext(AStreamJid);
+      else
+        renegotiateStanzaSessions(AStreamJid);
 
       emit archivePrefsChanged(AStreamJid,prefs);
     }
@@ -1521,7 +1585,7 @@ QString MessageArchiver::collectionFileName(const DateTime &AStart) const
   {
     return AStart.toX85UTC().replace(":","=") + COLLECTION_EXT;
   }
-  return QString();
+  return QString::null;
 }
 
 QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const
@@ -1532,9 +1596,9 @@ QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWi
   if (FSettingsPlugin)
     dir.setPath(FSettingsPlugin->homeDir().path());
 
-  if (!dir.exists(ARCHIVE_DIRNAME))
-    noError &= dir.mkdir(ARCHIVE_DIRNAME);
-  noError &= dir.cd(ARCHIVE_DIRNAME);
+  if (!dir.exists(ARCHIVE_DIR_NAME))
+    noError &= dir.mkdir(ARCHIVE_DIR_NAME);
+  noError &= dir.cd(ARCHIVE_DIR_NAME);
 
   if (noError && AStreamJid.isValid())
   {
@@ -1552,7 +1616,7 @@ QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWi
     noError &= dir.cd(withDir);
   }
 
-  return noError ? dir.path() : QString();
+  return noError ? dir.path() : QString::null;
 }
 
 QString MessageArchiver::collectionFilePath(const Jid &AStreamJid, const Jid &AWith, const DateTime &AStart) const
@@ -1564,7 +1628,7 @@ QString MessageArchiver::collectionFilePath(const Jid &AStreamJid, const Jid &AW
     if (!dirPath.isEmpty() && !fileName.isEmpty())
       return dirPath+"/"+fileName;
   }
-  return QString();
+  return QString::null;
 }
 
 QMultiMap<QString,QString> MessageArchiver::filterCollectionFiles(const QStringList &AFiles, const IArchiveRequest &ARequest, 
@@ -2236,7 +2300,7 @@ void MessageArchiver::notifyInChatWindow(const Jid &AStreamJid, const Jid &ACont
 
 bool MessageArchiver::hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  return FSessionNegotioation!=NULL ? FSessionNegotioation->getSession(AStreamJid,AContactJid).status==IStanzaSession::Active : false;
+  return FSessionNegotiation!=NULL ? FSessionNegotiation->getSession(AStreamJid,AContactJid).status==IStanzaSession::Active : false;
 }
 
 bool MessageArchiver::isOTRStanzaSession(const IStanzaSession &ASession) const
@@ -2252,25 +2316,138 @@ bool MessageArchiver::isOTRStanzaSession(const IStanzaSession &ASession) const
 
 bool MessageArchiver::isOTRStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  if (FSessionNegotioation && FDataForms)
+  if (FSessionNegotiation && FDataForms)
   {
-    IStanzaSession session = FSessionNegotioation->getSession(AStreamJid,AContactJid);
+    IStanzaSession session = FSessionNegotiation->getSession(AStreamJid,AContactJid);
     if (session.status == IStanzaSession::Active)
       return isOTRStanzaSession(session);
   }
   return false;
 }
 
+void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+  QString dirPath = collectionDirPath(AStreamJid,Jid());
+  if (AStreamJid.isValid() && !dirPath.isEmpty())
+  {
+    QDomDocument sessions;
+    QFile file(dirPath+"/"SESSIONS_FILE_NAME);
+    if (file.open(QFile::ReadOnly))
+    {
+      if (!sessions.setContent(&file))
+        sessions.clear();
+      file.close();
+    }
+    if (file.open(QFile::WriteOnly|QFile::Truncate))
+    {
+      if (sessions.isNull())
+        sessions.appendChild(sessions.createElement("stanzaSessions"));
+      const StanzaSession &session = FSessions.value(AStreamJid).value(AContactJid);
+      QDomElement elem = sessions.documentElement().appendChild(sessions.createElement("session")).toElement();
+      elem.setAttribute("id",session.sessionId);
+      elem.appendChild(sessions.createElement("jid")).appendChild(sessions.createTextNode(AContactJid.pFull()));
+      if (!session.defaultPrefs)
+        elem.appendChild(sessions.createElement("saveMode")).appendChild(sessions.createTextNode(session.saveMode));
+      file.write(sessions.toByteArray());
+      file.close();
+    }
+  }
+}
+
+void MessageArchiver::restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId)
+{
+  QString dirPath = collectionDirPath(AStreamJid,Jid());
+  if (AStreamJid.isValid() && !dirPath.isEmpty())
+  {
+    QFile file(dirPath+"/"SESSIONS_FILE_NAME);
+    if (file.open(QFile::ReadOnly))
+    {
+      QDomDocument sessions;
+      sessions.setContent(&file);
+      file.close();
+
+      QDomElement elem = sessions.documentElement().firstChildElement("session");
+      while (!elem.isNull())
+      {
+        if (ASessionId.isEmpty() || elem.attribute("id")==ASessionId)
+        {
+          QString requestId;
+          Jid contactJid = elem.firstChildElement("jid").text();
+          QString saveMode= elem.firstChildElement("saveMode").text();
+
+          if (saveMode.isEmpty() && archivePrefs(AStreamJid).itemPrefs.contains(contactJid))
+          {
+            requestId = removeArchiveItemPrefs(AStreamJid,contactJid);
+          }
+          else if (!saveMode.isEmpty() && archiveItemPrefs(AStreamJid,contactJid).save!=saveMode)
+          {
+            IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
+            prefs.itemPrefs[contactJid].save = saveMode;
+            requestId = setArchivePrefs(AStreamJid,prefs);
+          }
+          else
+          {
+            removeStanzaSessionContext(AStreamJid,elem.attribute("id"));
+          }
+
+          if (!requestId.isEmpty())
+            FRestoreRequests.insert(requestId,elem.attribute("id"));
+        }
+        elem = elem.nextSiblingElement("session");
+      }
+    }
+  }
+}
+
+void MessageArchiver::removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const
+{
+  QString dirPath = collectionDirPath(AStreamJid,Jid());
+  if (AStreamJid.isValid() && !dirPath.isEmpty())
+  {
+    QDomDocument sessions;
+    QFile file(dirPath+"/"SESSIONS_FILE_NAME);
+    if (file.open(QFile::ReadOnly))
+    {
+      if (!sessions.setContent(&file))
+        sessions.clear();
+      file.close();
+    }
+    if (!sessions.isNull())
+    {
+      QDomElement elem = sessions.documentElement().firstChildElement("session");
+      while (!elem.isNull())
+      {
+        if (elem.attribute("id") == ASessionId)
+        {
+          elem.parentNode().removeChild(elem);
+          break;
+        }
+        elem = elem.nextSiblingElement("session");
+      }
+    }
+    if (sessions.documentElement().hasChildNodes() && file.open(QFile::WriteOnly|QFile::Truncate))
+    {
+      file.write(sessions.toByteArray());
+      file.close();
+    }
+    else
+    {
+      file.remove();
+    }
+  }
+}
+
 void MessageArchiver::startSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId)
 {
-  if (FSessionNegotioation)
+  if (FSessionNegotiation)
   {
     foreach(Jid contactJid, FSessions.value(AStreamJid).keys())
     {
-      StanzaSession &session = FSessions[AStreamJid][contactJid];
+      const StanzaSession &session = FSessions.value(AStreamJid).value(contactJid);
       if (session.requestId == ARequestId)
       {
-        FSessionNegotioation->resumeSession(AStreamJid,contactJid);
+        saveStanzaSessionContext(AStreamJid,contactJid);
+        FSessionNegotiation->resumeSession(AStreamJid,contactJid);
         break;
       }
     }
@@ -2279,7 +2456,7 @@ void MessageArchiver::startSuspendedStanzaSession(const Jid &AStreamJid, const Q
 
 void MessageArchiver::cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const QString &AError)
 {
-  if (FSessionNegotioation)
+  if (FSessionNegotiation)
   {
     foreach(Jid contactJid, FSessions.value(AStreamJid).keys())
     {
@@ -2287,26 +2464,27 @@ void MessageArchiver::cancelSuspendedStanzaSession(const Jid &AStreamJid, const 
       if (session.requestId == ARequestId)
       {
         session.error = AError;
-        FSessionNegotioation->resumeSession(AStreamJid,contactJid);
+        FSessionNegotiation->resumeSession(AStreamJid,contactJid);
         break;
       }
     }
   }
 }
 
-void MessageArchiver::terminateBrokenStanzaSessions(const Jid &AStreamJid) const
+void MessageArchiver::renegotiateStanzaSessions(const Jid &AStreamJid) const
 {
-  if (FSessionNegotioation)
+  if (FSessionNegotiation)
   {
-    QList<IStanzaSession> sessions = FSessionNegotioation->getSessions(AStreamJid,IStanzaSession::Active);
+    QList<IStanzaSession> sessions = FSessionNegotiation->getSessions(AStreamJid,IStanzaSession::Active);
     foreach(IStanzaSession session, sessions)
     {
       bool isOTRSession = isOTRStanzaSession(session);
       IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid,session.contactJid);
-      if (isOTRSession && itemPrefs.save!=ARCHIVE_SAVE_FALSE)
-        FSessionNegotioation->initSession(AStreamJid,session.contactJid);
-      else if (!isOTRSession && itemPrefs.otr==ARCHIVE_OTR_REQUIRE)
-        FSessionNegotioation->initSession(AStreamJid,session.contactJid);
+      if ((isOTRSession && itemPrefs.save!=ARCHIVE_SAVE_FALSE) || (!isOTRSession && itemPrefs.otr==ARCHIVE_OTR_REQUIRE))
+      {
+        removeStanzaSessionContext(AStreamJid,session.sessionId);
+        FSessionNegotiation->initSession(AStreamJid,session.contactJid);
+      }
     }
   }
 }
@@ -2356,6 +2534,8 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
   FArchivePrefs.remove(AXmppStream->jid());
   FInStoragePrefs.removeAt(FInStoragePrefs.indexOf(AXmppStream->jid()));
   FSessions.remove(AXmppStream->jid());
+
+  emit archivePrefsChanged(AXmppStream->jid(),IArchiveStreamPrefs());
 }
 
 void MessageArchiver::onAccountHidden(IAccount *AAccount)
@@ -2382,7 +2562,12 @@ void MessageArchiver::onPrivateDataChanged(const QString &AId, const Jid &AStrea
   {
     applyArchivePrefs(AStreamJid,AElement);
     FPrefsSaveRequests.remove(AId);
-    startSuspendedStanzaSession(AStreamJid,AId);
+
+    if (FRestoreRequests.contains(AId))
+      removeStanzaSessionContext(AStreamJid,FRestoreRequests.take(AId));
+    else
+      startSuspendedStanzaSession(AStreamJid,AId);
+    
     emit requestCompleted(AId);
   }
 }
@@ -2398,7 +2583,10 @@ void MessageArchiver::onPrivateDataError(const QString &AId, const QString &AErr
   else if (FPrefsSaveRequests.contains(AId))
   {
     Jid streamJid = FPrefsSaveRequests.take(AId);
-    cancelSuspendedStanzaSession(streamJid,AId,AError);
+    if (FRestoreRequests.contains(AId))
+      FRestoreRequests.remove(AId);
+    else
+      cancelSuspendedStanzaSession(streamJid,AId,AError);
     emit requestFailed(AId,AError);
   }
 }
@@ -2556,35 +2744,31 @@ void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 
 void MessageArchiver::onStanzaSessionActivated(const IStanzaSession &ASession)
 {
-  if (isOTRStanzaSession(ASession))
-  {
-    notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Off the record session established."));
-  }
+  bool isOTR = isOTRStanzaSession(ASession);
+  if (!isOTR && FSessions.value(ASession.streamJid).contains(ASession.contactJid))
+    restoreStanzaSessionContext(ASession.streamJid,ASession.sessionId);
+  notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Session negotiated: message logging %1").arg(isOTR ? tr("disallowed") : tr("allowed")));
 }
 
 void MessageArchiver::onStanzaSessionTerminated(const IStanzaSession &ASession)
 {
-  StanzaSession session = FSessions[ASession.streamJid].take(ASession.contactJid);
-  if (session.sessionId == ASession.sessionId)
+  if (FSessions.value(ASession.streamJid).contains(ASession.contactJid))
   {
-    if (!session.defaultPrefs)
-    {
-      IArchiveStreamPrefs prefs = archivePrefs(ASession.streamJid);
-      prefs.itemPrefs[ASession.contactJid].save = session.saveMode;
-      setArchivePrefs(ASession.streamJid,prefs);
-    }
-    else
-    {
-      removeArchiveItemPrefs(ASession.streamJid,ASession.contactJid);
-    }
+    restoreStanzaSessionContext(ASession.streamJid,ASession.sessionId);
+    FSessions[ASession.streamJid].remove(ASession.contactJid);
   }
-  if (isOTRStanzaSession(ASession) || archiveItemPrefs(ASession.streamJid,ASession.contactJid).otr==ARCHIVE_OTR_REQUIRE)
-  {
-    if (ASession.errorCondition.isEmpty())
-      notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("OTR session terminated."));
-    else
-      notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("OTR session failed: %1").arg(ErrorHandler(ASession.errorCondition).message()));
-  }
+  if (ASession.errorCondition.isEmpty())
+    notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Session terminated"));
+  else
+    notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Session failed: %1").arg(ErrorHandler(ASession.errorCondition).message()));
+}
+
+void MessageArchiver::onChatWindowCreated(IChatWindow *AWindow)
+{
+  ChatWindowMenu *menu = new ChatWindowMenu(this,AWindow);
+  QToolButton *button = AWindow->toolBarWidget()->toolBarChanger()->addToolButton(menu->menuAction(),AG_MWCWTB_ARCHIVE,true);
+  button->setPopupMode(QToolButton::InstantPopup);
+  button->setToolButtonStyle(Qt::ToolButtonIconOnly);
 }
 
 Q_EXPORT_PLUGIN2(MessageArchiverPlugin, MessageArchiver)

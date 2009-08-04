@@ -64,4 +64,20 @@
     <key>historyReload</key>
     <object mime="image/png">historyreload.png</object>
   </icon>
+  <icon>
+    <key>historyEnableLogging</key>
+    <object mime="image/png">historyenablelogging.png</object>
+  </icon>
+  <icon>
+    <key>historyDisableLogging</key>
+    <object mime="image/png">historydisablelogging.png</object>
+  </icon>
+  <icon>
+    <key>historyRequireOTR</key>
+    <object mime="image/png">historyrequireotr.png</object>
+  </icon>
+  <icon>
+    <key>historyTerminateOTR</key>
+    <object mime="image/png">historyterminateotr.png</object>
+  </icon>
 </icondef>

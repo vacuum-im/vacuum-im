@@ -34,6 +34,10 @@ struct IArchiveItemPrefs
   QString save;
   QString otr;
   int expire;
+  bool operator==(const IArchiveItemPrefs &AOther) const {
+    return save==AOther.save && otr==AOther.otr && expire==AOther.expire; }
+  bool operator!=(const IArchiveItemPrefs &AOther) const {
+    return !operator==(AOther); }
 };
 
 struct IArchiveStreamPrefs

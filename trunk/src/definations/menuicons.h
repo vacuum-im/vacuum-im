@@ -81,6 +81,10 @@
 #define MNI_HISTORY_RENAME              "historyRename"
 #define MNI_HISTORY_REMOVE              "historyRemove"
 #define MNI_HISTORY_RELOAD              "historyReload"
+#define MNI_HISTORY_ENABLE_LOGGING      "historyEnableLogging"
+#define MNI_HISTORY_DISABLE_LOGGING     "historyDisableLogging"
+#define MNI_HISTORY_REQUIRE_OTR         "historyRequireOTR"
+#define MNI_HISTORY_TERMINATE_OTR       "historyTerminateOTR"
 
 //ChatMessageHandler
 #define MNI_CHAT_MHANDLER_MESSAGE       "chatmessagehandlerMessage"

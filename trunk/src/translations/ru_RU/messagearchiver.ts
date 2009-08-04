@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>OTR</source>
-        <translation>РБЗ</translation>
+        <translation>ЗСИ</translation>
     </message>
     <message>
         <source>Save</source>
@@ -76,7 +76,7 @@
     </message>
     <message>
         <source>OTR</source>
-        <translation>РБЗ</translation>
+        <translation>ЗСИ</translation>
     </message>
     <message>
         <source>Save</source>
@@ -116,11 +116,42 @@
     </message>
     <message>
         <source>Off The Record Mode:</source>
-        <translation>Режим без записи:</translation>
+        <translation>Запрет сохр. истории:</translation>
     </message>
     <message>
         <source>Expire Time, days:</source>
         <translation>Хранить, дней:</translation>
+    </message>
+</context>
+<context>
+    <name>ChatWindowMenu</name>
+    <message>
+        <source>Enable Message Logging</source>
+        <translation>Включить сохранение истории</translation>
+    </message>
+    <message>
+        <source>Disable Message Logging</source>
+        <translation>Выключить сохранение истории</translation>
+    </message>
+    <message>
+        <source>Require OTR Session</source>
+        <translation>Требовать установки сессии с ЗСИ</translation>
+    </message>
+    <message>
+        <source>Terminate OTR Session</source>
+        <translation>Завершить сессию с ЗСИ</translation>
+    </message>
+    <message>
+        <source>Message logging enabled</source>
+        <translation>Сохранение истории включено</translation>
+    </message>
+    <message>
+        <source>Message logging disabled</source>
+        <translation>Сохранение истории выключено</translation>
+    </message>
+    <message>
+        <source>Changing archive preferences failed: %1</source>
+        <translation>Изменение настроек архива сорвалось из-за ошибки: %1</translation>
     </message>
 </context>
 <context>
@@ -135,11 +166,11 @@
     </message>
     <message>
         <source>Prefer</source>
-        <translation>Согласиться</translation>
+        <translation>Предпочесть</translation>
     </message>
     <message>
         <source>Concede</source>
-        <translation>По умолчанию</translation>
+        <translation>Уступить</translation>
     </message>
     <message>
         <source>Forbid</source>
@@ -207,7 +238,7 @@
     </message>
     <message>
         <source>Set OTR mode</source>
-        <translation>Режим РБС</translation>
+        <translation>Режим ЗСИ</translation>
     </message>
     <message>
         <source>Set Save mode</source>
@@ -271,11 +302,7 @@
     </message>
     <message>
         <source>OTR session not ready, please wait...</source>
-        <translation>Сессия РБЗ не установлена, подождите...</translation>
-    </message>
-    <message>
-        <source>Negotiating OTR session ...</source>
-        <translation>Устанавливается сессия РБЗ...</translation>
+        <translation>Сессия с ЗСИ не установлена, подождите...</translation>
     </message>
     <message>
         <source>Message logging</source>
@@ -283,27 +310,47 @@
     </message>
     <message>
         <source>Allow message logging</source>
-        <translation>Разрешить протоколирование сообщений</translation>
+        <translation>Разрешить сохранение сообщений</translation>
     </message>
     <message>
         <source>Disallow all message logging</source>
-        <translation>Запретить всё протоколирование сообщений</translation>
+        <translation>Запретить сохранение сообщений</translation>
     </message>
     <message>
         <source>Restore defaults</source>
         <translation>Восстановить умолчания</translation>
     </message>
     <message>
-        <source>Off the record session established.</source>
-        <translation>Сессия РБЗ установлена.</translation>
+        <source>Negotiating off the record (OTR) session ...</source>
+        <translation>Устанавливается сессия с запретом сохранения истории (ЗСИ) ...</translation>
     </message>
     <message>
-        <source>OTR session terminated.</source>
-        <translation>Сессия РБЗ завершена.</translation>
+        <source>years</source>
+        <translation>лет</translation>
     </message>
     <message>
-        <source>OTR session failed: %1</source>
-        <translation>Сессия РБЗ завершилась с ошибкой: %1</translation>
+        <source>allowed</source>
+        <translation>разрешено</translation>
+    </message>
+    <message>
+        <source>Session terminated</source>
+        <translation>Сессия завершена</translation>
+    </message>
+    <message>
+        <source>Session failed: %1</source>
+        <translation>Сессия завершена из-за ошибки: %1</translation>
+    </message>
+    <message>
+        <source>disallowed</source>
+        <translation>запрещено</translation>
+    </message>
+    <message>
+        <source>Session negotiated: message logging %1</source>
+        <translation>Сессия согласована: сохранение истории %1</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Вечно</translation>
     </message>
 </context>
 <context>
