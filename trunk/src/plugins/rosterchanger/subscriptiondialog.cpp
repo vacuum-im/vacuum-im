@@ -62,14 +62,14 @@ void SubscriptionDialog::initialize(IPluginManager *APluginManager)
       FShowChat->setText(tr("Chat"));
       FShowChat->setToolTip(tr("Open chat window"));
       FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
-      FToolBarChanger->addAction(FShowChat,AG_SRDT_ROSTERCHANGER_ACTIONS);
+      FToolBarChanger->addAction(FShowChat,TBG_RCSRD_ROSTERCHANGER);
       connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
       FSendMessage = new Action(FToolBarChanger->toolBar());
       FSendMessage->setText(tr("Message"));
       FSendMessage->setToolTip(tr("Send Message"));
       FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMAL_MHANDLER_MESSAGE);
-      FToolBarChanger->addAction(FSendMessage,AG_SRDT_ROSTERCHANGER_ACTIONS);
+      FToolBarChanger->addAction(FSendMessage,TBG_RCSRD_ROSTERCHANGER);
       connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
     }
   }
@@ -84,7 +84,7 @@ void SubscriptionDialog::initialize(IPluginManager *APluginManager)
       FShowVCard->setText(tr("VCard"));
       FShowVCard->setToolTip(tr("Show VCard"));
       FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-      FToolBarChanger->addAction(FShowVCard,AG_SRDT_ROSTERCHANGER_ACTIONS);
+      FToolBarChanger->addAction(FShowVCard,TBG_RCSRD_ROSTERCHANGER);
       connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
     }
   }

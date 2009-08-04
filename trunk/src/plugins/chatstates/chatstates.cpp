@@ -590,7 +590,7 @@ void ChatStates::onPresenceClosed(IPresence *APresence)
 void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
 {
   StateWidget *widget = new StateWidget(this,AWindow);
-  AWindow->statusBarWidget()->statusBarChanger()->insertWidget(widget,SBG_CW_CHATSTATES,true);
+  AWindow->statusBarWidget()->statusBarChanger()->insertWidget(widget,SBG_MWCW_CHATSTATES,true);
 
   FChatByEditor.insert(AWindow->editWidget()->textEdit(),AWindow);
   connect(AWindow->instance(),SIGNAL(windowActivated()),SLOT(onChatWindowActivated()));

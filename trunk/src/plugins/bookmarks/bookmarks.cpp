@@ -108,7 +108,7 @@ bool BookMarks::initObjects()
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
-    QToolButton *button = changer->addToolButton(FBookMarksMenu->menuAction(),AG_MWTTB_BOOKMARKS,false);
+    QToolButton *button = changer->addToolButton(FBookMarksMenu->menuAction(),TBG_MWTTB_BOOKMARKS,false);
     button->setPopupMode(QToolButton::InstantPopup);
   }
   return true;

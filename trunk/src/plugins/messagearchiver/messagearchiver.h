@@ -4,6 +4,7 @@
 #include <QMultiMap>
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/optionnodes.h"
 #include "../../definations/optionnodeorders.h"
 #include "../../definations/optionwidgetorders.h"

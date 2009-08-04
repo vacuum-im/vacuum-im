@@ -1,7 +1,7 @@
 #ifndef SUBSCRIPTIONDIALOG_H
 #define SUBSCRIPTIONDIALOG_H
 
-#include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../interfaces/ipluginmanager.h"

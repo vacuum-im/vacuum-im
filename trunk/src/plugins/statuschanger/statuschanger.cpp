@@ -630,7 +630,7 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
     while (it != FStatusItems.constEnd())
     {
       if (it.key() > STATUS_NULL_ID)
-        sMenu->addAction(createStatusAction(it.key(),streamJid,sMenu),AG_DEFAULT,true);
+        sMenu->addAction(createStatusAction(it.key(),streamJid,sMenu),AG_SCSM_STATUSCHANGER_STATUSES,true);
       it++;
     }
 

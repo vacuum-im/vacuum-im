@@ -78,7 +78,7 @@ bool RosterSearch::initObjects()
     searchAction->setToolTip(tr("Show search toolbar"));
     searchAction->setCheckable(true);
     connect(searchAction,SIGNAL(triggered(bool)),SLOT(onSearchActionTriggered(bool)));
-    FMainWindow->topToolBarChanger()->addAction(searchAction,AG_MWTTB_ROSTERSEARCH);
+    FMainWindow->topToolBarChanger()->addAction(searchAction,TBG_MWTTB_ROSTERSEARCH);
 
     FMainWindow->instance()->addToolBar(FSearchToolBarChanger->toolBar());
     FMainWindow->instance()->insertToolBarBreak(FSearchToolBarChanger->toolBar());

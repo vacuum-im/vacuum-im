@@ -1195,7 +1195,7 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
       updateChatWindow(window);
       
       UserContextMenu *menu = new UserContextMenu(this,window);
-      window->menuBarWidget()->menuBarChanger()->insertMenu(menu,MBG_MUCCW_USERCONTEXT);
+      window->menuBarWidget()->menuBarChanger()->insertMenu(menu,MBG_MWCW_USERCONTEXT);
 
       setChatMessageStyle(window);
       showChatHistory(window);

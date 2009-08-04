@@ -4,6 +4,7 @@
 #include <QHash>
 #include <QMessageBox>
 #include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/dataformtypes.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterlabelorders.h"

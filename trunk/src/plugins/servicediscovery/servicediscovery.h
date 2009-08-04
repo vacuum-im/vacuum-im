@@ -13,6 +13,7 @@
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterclickhookerorders.h"
 #include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/rostertooltiporders.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"

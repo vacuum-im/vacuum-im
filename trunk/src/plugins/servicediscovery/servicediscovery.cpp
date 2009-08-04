@@ -177,7 +177,7 @@ bool ServiceDiscovery::initObjects()
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
-    QToolButton *button = changer->addToolButton(FDiscoMenu->menuAction(),AG_MWTTB_DISCOVERY,false);
+    QToolButton *button = changer->addToolButton(FDiscoMenu->menuAction(),TBG_MWTTB_DISCOVERY,false);
     button->setPopupMode(QToolButton::InstantPopup);
   }
 

@@ -236,7 +236,7 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
       if (FRostersView && FRostersModel)
       {
         UserContextMenu *menu = new UserContextMenu(FRostersModel,FRostersView,window);
-        window->menuBarWidget()->menuBarChanger()->insertMenu(menu,MBG_CW_USERCONTEXT);
+        window->menuBarWidget()->menuBarChanger()->insertMenu(menu,MBG_MWCW_USERCONTEXT);
       }
       setMessageStyle(window);
       showHistory(window);
