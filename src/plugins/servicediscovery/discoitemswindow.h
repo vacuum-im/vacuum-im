@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QSortFilterProxyModel>
 #include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/discoitemdataroles.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"

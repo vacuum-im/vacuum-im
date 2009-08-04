@@ -796,7 +796,7 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
           connect(action,SIGNAL(triggered(bool)),SLOT(onChangeActionTriggered(bool)));
           change->addAction(action,AG_DEFAULT,true);
         }
-        AMenu->addAction(change->menuAction(),AG_DIWT_DISCOVERY_ACTIONS,true);
+        AMenu->addAction(change->menuAction(),TBG_DIWT_DISCOVERY_ACTIONS,true);
       }
     }
   }

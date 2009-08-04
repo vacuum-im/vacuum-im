@@ -5,6 +5,7 @@
 #include <QSortFilterProxyModel>
 #include "../../definations/archiveindextyperole.h"
 #include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"
 #include "../../interfaces/iroster.h"

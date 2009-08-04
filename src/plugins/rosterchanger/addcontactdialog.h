@@ -2,7 +2,7 @@
 #define ADDCONTACTDIALOG_H
 
 #include <QDialog>
-#include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/vcardvaluenames.h"
 #include "../../definations/resources.h"
 #include "../../definations/menuicons.h"

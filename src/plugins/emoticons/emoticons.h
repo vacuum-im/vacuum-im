@@ -5,6 +5,7 @@
 #include <QHash>
 #include <QStringList>
 #include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/messagewriterorders.h"
 #include "../../definations/resourceloaderorders.h"
 #include "../../definations/optionnodes.h"

@@ -144,43 +144,43 @@ void DiscoItemsWindow::createToolBarActions()
   FMoveBack = new Action(FToolBarChanger);
   FMoveBack->setText(tr("Back"));
   FMoveBack->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_ARROW_LEFT);
-  FToolBarChanger->addAction(FMoveBack,AG_DIWT_DISCOVERY_NAVIGATE,false);
+  FToolBarChanger->addAction(FMoveBack,TBG_DIWT_DISCOVERY_NAVIGATE,false);
   connect(FMoveBack,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FMoveForward = new Action(FToolBarChanger);
   FMoveForward->setText(tr("Forward"));
   FMoveForward->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_ARROW_RIGHT);
-  FToolBarChanger->addAction(FMoveForward,AG_DIWT_DISCOVERY_NAVIGATE,false);
+  FToolBarChanger->addAction(FMoveForward,TBG_DIWT_DISCOVERY_NAVIGATE,false);
   connect(FMoveForward,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FDiscoverCurrent = new Action(FToolBarChanger);
   FDiscoverCurrent->setText(tr("Discover"));
   FDiscoverCurrent->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
-  FToolBarChanger->addAction(FDiscoverCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
+  FToolBarChanger->addAction(FDiscoverCurrent,TBG_DIWT_DISCOVERY_DEFACTIONS,false);
   connect(FDiscoverCurrent,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FReloadCurrent = new Action(FToolBarChanger);
   FReloadCurrent->setText(tr("Reload"));
   FReloadCurrent->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_RELOAD);
-  FToolBarChanger->addAction(FReloadCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
+  FToolBarChanger->addAction(FReloadCurrent,TBG_DIWT_DISCOVERY_DEFACTIONS,false);
   connect(FReloadCurrent,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FDiscoInfo = new Action(FToolBarChanger);
   FDiscoInfo->setText(tr("Disco info"));
   FDiscoInfo->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOINFO);
-  FToolBarChanger->addAction(FDiscoInfo,AG_DIWT_DISCOVERY_ACTIONS,false);
+  FToolBarChanger->addAction(FDiscoInfo,TBG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FDiscoInfo,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FAddContact = new Action(FToolBarChanger);
   FAddContact->setText(tr("Add Contact"));
   FAddContact->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
-  FToolBarChanger->addAction(FAddContact,AG_DIWT_DISCOVERY_ACTIONS,false);
+  FToolBarChanger->addAction(FAddContact,TBG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FAddContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   FShowVCard = new Action(FToolBarChanger);
   FShowVCard->setText(tr("vCard"));
   FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-  FToolBarChanger->addAction(FShowVCard,AG_DIWT_DISCOVERY_ACTIONS,false);
+  FToolBarChanger->addAction(FShowVCard,TBG_DIWT_DISCOVERY_ACTIONS,false);
   connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
   updateToolBarActions();
@@ -199,7 +199,7 @@ void DiscoItemsWindow::updateToolBarActions()
 
 void DiscoItemsWindow::updateActionsBar()
 {
-  qDeleteAll(FActionsBarChanger->groupActions(AG_DIWT_DISCOVERY_FEATURE_ACTIONS));
+  qDeleteAll(FActionsBarChanger->groupActions(TBG_DIWT_DISCOVERY_FEATURE_ACTIONS));
   QModelIndex index = ui.trvItems->currentIndex();
   if (index.isValid())
   {
@@ -208,7 +208,7 @@ void DiscoItemsWindow::updateActionsBar()
     {
       foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,this))
       {
-        QToolButton *button = FActionsBarChanger->addToolButton(action,AG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
+        QToolButton *button = FActionsBarChanger->addToolButton(action,TBG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
         button->setPopupMode(QToolButton::InstantPopup);
         button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         button->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -238,17 +238,17 @@ void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)
     Menu *menu = new Menu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose,true);
 
-    menu->addAction(FDiscoverCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
-    menu->addAction(FReloadCurrent,AG_DIWT_DISCOVERY_DEFACTIONS,false);
-    menu->addAction(FDiscoInfo,AG_DIWT_DISCOVERY_ACTIONS,false);
-    menu->addAction(FAddContact,AG_DIWT_DISCOVERY_ACTIONS,false);
-    menu->addAction(FShowVCard,AG_DIWT_DISCOVERY_ACTIONS,false);
+    menu->addAction(FDiscoverCurrent,TBG_DIWT_DISCOVERY_DEFACTIONS,false);
+    menu->addAction(FReloadCurrent,TBG_DIWT_DISCOVERY_DEFACTIONS,false);
+    menu->addAction(FDiscoInfo,TBG_DIWT_DISCOVERY_ACTIONS,false);
+    menu->addAction(FAddContact,TBG_DIWT_DISCOVERY_ACTIONS,false);
+    menu->addAction(FShowVCard,TBG_DIWT_DISCOVERY_ACTIONS,false);
 
     IDiscoInfo dinfo = FDiscovery->discoInfo(index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
     foreach(QString feature, dinfo.features)
     {
       foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,menu))
-        menu->addAction(action,AG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
+        menu->addAction(action,TBG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
     }
     emit indexContextMenu(index,menu);
     menu->popup(ui.trvItems->viewport()->mapToGlobal(APos));

@@ -119,14 +119,14 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
       FShowChat->setText(tr("Chat"));
       FShowChat->setToolTip(tr("Open chat window"));
       FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
-      FToolBarChanger->addAction(FShowChat,AG_ACDT_ROSTERCHANGER_ACTIONS);
+      FToolBarChanger->addAction(FShowChat,TBG_RCACD_ROSTERCHANGER);
       connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
       FSendMessage = new Action(FToolBarChanger->toolBar());
       FSendMessage->setText(tr("Message"));
       FSendMessage->setToolTip(tr("Send Message"));
       FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMAL_MHANDLER_MESSAGE);
-      FToolBarChanger->addAction(FSendMessage,AG_ACDT_ROSTERCHANGER_ACTIONS);
+      FToolBarChanger->addAction(FSendMessage,TBG_RCACD_ROSTERCHANGER);
       connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
     }
   }
@@ -141,14 +141,14 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
       FShowVCard->setText(tr("VCard"));
       FShowVCard->setToolTip(tr("Show VCard"));
       FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-      FToolBarChanger->addAction(FShowVCard,AG_ACDT_ROSTERCHANGER_ACTIONS);
+      FToolBarChanger->addAction(FShowVCard,TBG_RCACD_ROSTERCHANGER);
       connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
       FResolve = new Action(FToolBarChanger->toolBar());
       FResolve->setText(tr("Nick"));
       FResolve->setToolTip(tr("Resolve nick name"));
       FResolve->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
-      FToolBarChanger->addAction(FResolve,AG_ACDT_ROSTERCHANGER_ACTIONS);
+      FToolBarChanger->addAction(FResolve,TBG_RCACD_ROSTERCHANGER);
       connect(FResolve,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
       connect(FVcardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));

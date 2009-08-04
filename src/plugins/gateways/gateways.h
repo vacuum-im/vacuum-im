@@ -5,6 +5,7 @@
 #include <QTimer>
 #include "../../definations/namespaces.h"
 #include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/discofeaturehandlerorders.h"
 #include "../../definations/vcardvaluenames.h"

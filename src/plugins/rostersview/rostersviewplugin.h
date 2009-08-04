@@ -5,6 +5,7 @@
 #include "../../definations/optionnodeorders.h"
 #include "../../definations/optionwidgetorders.h"
 #include "../../definations/actiongroups.h"
+#include "../../definations/toolbargroups.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/rosterproxyorders.h"
 #include "../../definations/resources.h"

@@ -2766,7 +2766,7 @@ void MessageArchiver::onStanzaSessionTerminated(const IStanzaSession &ASession)
 void MessageArchiver::onChatWindowCreated(IChatWindow *AWindow)
 {
   ChatWindowMenu *menu = new ChatWindowMenu(this,AWindow);
-  QToolButton *button = AWindow->toolBarWidget()->toolBarChanger()->addToolButton(menu->menuAction(),AG_MWCWTB_ARCHIVE,true);
+  QToolButton *button = AWindow->toolBarWidget()->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWCW_ARCHIVE,true);
   button->setPopupMode(QToolButton::InstantPopup);
   button->setToolButtonStyle(Qt::ToolButtonIconOnly);
 }

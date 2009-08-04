@@ -10,13 +10,6 @@
 #define AG_MMENU_CLIENTINFO                                     900
 #define AG_MMENU_MAINWINDOW                                     1000
 
-//MainWindow - TopToolBar
-#define AG_MWTTB_ROSTERSVIEW                                    100
-#define AG_MWTTB_DISCOVERY                                      200
-#define AG_MWTTB_MULTIUSERCHAT                                  300
-#define AG_MWTTB_BOOKMARKS                                      400
-#define AG_MWTTB_ROSTERSEARCH                                   900
-
 //RostersView - ContextMenu
 #define AG_RVCM_CHATMESSAGEHANDLER                              200
 #define AG_RVCM_NORMALMESSAGEHANDLER                            200
@@ -52,16 +45,11 @@
 //StatusChanger - StatusMenu, StreamMenu
 #define AG_SCSM_STATUSCHANGER_ACTIONS                           200
 #define AG_SCSM_STATUSCHANGER_STREAMS                           300
+#define AG_SCSM_STATUSCHANGER_STATUSES                          500
 
-//Emoticons - EditWidgetToolbar
-#define AG_EEWT_EMOTICONS                                       500
-
-//MessageWidgets - TabWindow
+//MessageWidgets - TabWindowMenu
 #define AG_MWTW_MWIDGETS_TAB_ACTIONS                            500
 #define AG_MWTW_MWIDGETS_WINDOW_OPTIONS                         800
-
-//MessageWidgets - ChatWindowToolBar
-#define AG_MWCWTB_ARCHIVE                                       900
 
 //MultiuserChat - MultiUserContextMenu
 #define AG_MUCM_ROSTERCHANGER                                   500
@@ -78,29 +66,9 @@
 #define AG_MUTM_MULTIUSERCHAT                                   500
 #define AG_MUTM_MULTIUSERCHAT_DESTROY                           700
 
-//SeriveDiscovery - DiscoItemsWindow ToolBar
-#define AG_DIWT_DISCOVERY_NAVIGATE                              100
-#define AG_DIWT_DISCOVERY_DEFACTIONS                            300
-#define AG_DIWT_DISCOVERY_ACTIONS                               500
-#define AG_DIWT_DISCOVERY_FEATURE_ACTIONS                       700
-
 //Bookmarks - BookmarksMenu
 #define AG_BMM_BOOKMARKS_STREAMS                                500
 #define AG_BMM_BOOKMARKS_ITEMS                                  700
 #define AG_BBM_BOOKMARKS_TOOLS                                  900
-
-//ArchiveWindow - Groups Tools
-#define AG_AWGT_ARCHIVE_GROUPING                                200
-#define AG_AWGT_ARCHIVE_DEFACTIONS                              300
-#define AG_AWGT_ARCHIVE_ACTIONS                                 500
-
-//ArchiveWindow - Messages Tools
-#define AG_AWMT_ARCHIVE_ACTIONS                                 500
-
-//RosterChanger - AddContactDialog (ToolBar)
-#define AG_ACDT_ROSTERCHANGER_ACTIONS                           500
-
-//RosterChanger - SubscriptionRequestDialog (ToolBar)
-#define AG_SRDT_ROSTERCHANGER_ACTIONS                           500
 
 #endif

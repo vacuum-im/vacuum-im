@@ -177,7 +177,7 @@ bool MultiUserChatPlugin::initObjects()
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
-    QToolButton *button = changer->addToolButton(FChatMenu->menuAction(),AG_MWTTB_MULTIUSERCHAT);
+    QToolButton *button = changer->addToolButton(FChatMenu->menuAction(),TBG_MWTTB_MULTIUSERCHAT);
     button->setPopupMode(QToolButton::InstantPopup);
   }
 

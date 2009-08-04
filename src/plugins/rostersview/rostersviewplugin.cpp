@@ -134,7 +134,7 @@ bool RostersViewPlugin::initObjects()
     FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_HIDE_OFFLINE);
     FShowOfflineAction->setToolTip(tr("Show/Hide offline contacts"));
     connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
-    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction,AG_MWTTB_ROSTERSVIEW,false);
+    FMainWindowPlugin->mainWindow()->topToolBarChanger()->addAction(FShowOfflineAction,TBG_MWTTB_ROSTERSVIEW,false);
     
     FMainWindowPlugin->mainWindow()->rostersWidget()->insertWidget(0,FRostersView);
   }
