@@ -2493,16 +2493,16 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor)
   {
-    int handler = FStanzaProcessor->insertHandler(this,SHC_PREFS,IStanzaProcessor::DirectionIn,SHP_DEFAULT);
+    int handler = FStanzaProcessor->insertHandler(this,SHC_PREFS,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
     FSHIPrefs.insert(AXmppStream->jid(),handler);
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionIn,SHP_DEFAULT);
+    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
     FSHIMessageIn.insert(AXmppStream->jid(),handler);
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionOut,SHP_DEFAULT);
+    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionOut,SHP_DEFAULT,AXmppStream->jid());
     FSHIMessageOut.insert(AXmppStream->jid(),handler);
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionOut,SHP_ARCHIVER_SESSION);
+    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionOut,SHP_ARCHIVER_SESSION,AXmppStream->jid());
     FSHIMessageBlocks.insert(AXmppStream->jid(),handler);
   }
   
