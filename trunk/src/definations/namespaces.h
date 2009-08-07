@@ -75,4 +75,6 @@
 
 #define NS_CHATSTATES                           "http://jabber.org/protocol/chatstates"
 
+#define NS_STREAM_INITIATION                    "http://jabber.org/protocol/si"
+
 #endif

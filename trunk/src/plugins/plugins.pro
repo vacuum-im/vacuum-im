@@ -48,4 +48,5 @@ SUBDIRS = settings \
           rostersearch \
           console \
           annotations \
-          chatstates
+          chatstates \
+          datastreamsmanager
