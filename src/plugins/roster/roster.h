@@ -27,7 +27,7 @@ public:
   //IRoster
   virtual const Jid &streamJid() const { return FXmppStream->jid(); }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
-  virtual bool isOpen() const { return FOpen; }
+  virtual bool isOpen() const { return FOpened; }
   virtual QString groupDelimiter() const { return FGroupDelim; }
   virtual IRosterItem rosterItem(const Jid &AItemJid) const;
   virtual QList<IRosterItem> rosterItems() const;
@@ -52,14 +52,15 @@ public:
   virtual void moveGroupToGroup(const QString &AGroup, const QString &AGroupTo);
   virtual void removeGroup(const QString &AGroup);
 signals:
-  virtual void jidAboutToBeChanged(const Jid &AAfter);
   virtual void opened();
   virtual void received(const IRosterItem &ARosterItem);
   virtual void removed(const IRosterItem &ARosterItem);
   virtual void subscription(const Jid &AItemJid, int ASubsType, const QString &AText);
   virtual void closed();
+  virtual void streamJidAboutToBeChanged(const Jid &AAfter);
+  virtual void streamJidChanged(const Jid &ABefore);
 protected:
-  void processItemsElement(const QDomElement &AItemsElem, bool ARemoveOld = false);
+  void processItemsElement(const QDomElement &AItemsElem, bool ACompleteRoster);
   void removeRosterItem(const Jid &AItemJid);
   void requestGroupDelimiter();
   void setGroupDelimiter(const QString &ADelimiter);
@@ -71,16 +72,18 @@ protected slots:
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
   void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
+  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 private:
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;
 private:
-  bool FOpen;
-  int FRosterHandler;
-  int FSubscrHandler;
-  QString FOpenId;
-  QString FGroupDelimId;
+  bool FOpened;
+  int FSHIRosterPush;
+  int FSHISubscription;
+  QString FOpenRequestId;
+  QString FDelimRequestId;
   QString FGroupDelim;
+  QString FRosterVer;
   QHash<Jid, IRosterItem> FRosterItems;
 };
 

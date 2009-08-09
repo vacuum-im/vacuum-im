@@ -41,18 +41,7 @@ void RostersModel::pluginInfo(IPluginInfo *APluginInfo)
 
 bool RostersModel::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
-  if (plugin)
-  {
-    IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-    if (xmppStreams)
-    {
-      connect(xmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),
-        SLOT(onStreamJidChanged(IXmppStream *, const Jid &))); 
-    }
-  }
-
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -62,6 +51,8 @@ bool RostersModel::initConnections(IPluginManager *APluginManager, int &/*AInitO
         SLOT(onRosterItemReceived(IRoster *, const IRosterItem &))); 
       connect(FRosterPlugin->instance(),SIGNAL(rosterItemRemoved(IRoster *, const IRosterItem &)),
         SLOT(onRosterItemRemoved(IRoster *, const IRosterItem &)));
+      connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),
+        SLOT(onRosterStreamJidChanged(IRoster *, const Jid &))); 
     }
   }
 
@@ -199,8 +190,12 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
       FStreamsRoot.insert(AStreamJid,streamIndex);
       insertRosterIndex(streamIndex,FRootIndex);
       emit streamAdded(AStreamJid);
-      if (FRosterPlugin)
-        FRosterPlugin->loadRosterItems(AStreamJid);
+
+      if (roster)
+      {
+        foreach(IRosterItem item, roster->rosterItems())
+          onRosterItemReceived(roster,item);
+      }
     }
   }
   return streamIndex;
@@ -455,30 +450,6 @@ void RostersModel::onAccountChanged(const QString &AName, const QVariant &AValue
   }
 }
 
-void RostersModel::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
-{
-  IRosterIndex *streamIndex = FStreamsRoot.value(ABefour);
-  if (streamIndex)
-  {
-    Jid after = AXmppStream->jid();
-
-    QHash<int,QVariant> data;
-    data.insert(RDR_STREAM_JID,ABefour.pFull());
-    IRosterIndexList itemList = FRootIndex->findChild(data,true);
-    foreach(IRosterIndex *index, itemList)
-      index->setData(RDR_STREAM_JID,after.pFull());
-
-    streamIndex->setData(RDR_INDEX_ID,after.pFull());
-    streamIndex->setData(RDR_JID,after.full());
-    streamIndex->setData(RDR_PJID,after.pFull());
-    
-    FStreamsRoot.remove(ABefour);
-    FStreamsRoot.insert(after,streamIndex);
-
-    emit streamJidChanged(ABefour,after);
-  }
-}
-
 void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem)
 {
   IRosterIndex *streamIndex = FStreamsRoot.value(ARoster->streamJid());
@@ -613,6 +584,30 @@ void RostersModel::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARos
     IRosterIndexList itemList = streamIndex->findChild(data,true);
     foreach(IRosterIndex *index, itemList)
       removeRosterIndex(index);    
+  }
+}
+
+void RostersModel::onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore)
+{
+  IRosterIndex *streamIndex = FStreamsRoot.value(ABefore);
+  if (streamIndex)
+  {
+    Jid after = ARoster->streamJid();
+
+    QHash<int,QVariant> data;
+    data.insert(RDR_STREAM_JID,ABefore.pFull());
+    IRosterIndexList itemList = FRootIndex->findChild(data,true);
+    foreach(IRosterIndex *index, itemList)
+      index->setData(RDR_STREAM_JID,after.pFull());
+
+    streamIndex->setData(RDR_INDEX_ID,after.pFull());
+    streamIndex->setData(RDR_JID,after.full());
+    streamIndex->setData(RDR_PJID,after.pFull());
+
+    FStreamsRoot.remove(ABefore);
+    FStreamsRoot.insert(after,streamIndex);
+
+    emit streamJidChanged(ABefore,after);
   }
 }
 

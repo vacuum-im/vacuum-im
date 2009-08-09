@@ -1,8 +1,8 @@
 #ifndef IROSTER_H
 #define IROSTER_H
 
-#include <QList>
 #include <QSet>
+#include <QList>
 #include "../../interfaces/ixmppstreams.h"
 #include "../../utils/jid.h"
 
@@ -66,12 +66,13 @@ public:
   virtual void moveGroupToGroup(const QString &AGroup, const QString &AGroupTo) =0;
   virtual void removeGroup(const QString &AGroup) =0;
 signals:
-  virtual void jidAboutToBeChanged(const Jid &AAfter) =0;
   virtual void opened() =0;
   virtual void received(const IRosterItem &ARosterItem) =0;
   virtual void removed(const IRosterItem &ARosterItem) =0;
   virtual void subscription(const Jid &AItemJid, int ASubsType, const QString &AText) =0; 
   virtual void closed() =0;
+  virtual void streamJidAboutToBeChanged(const Jid &AAfter) =0;
+  virtual void streamJidChanged(const Jid &ABefore) =0;
 };
 
 class IRosterPlugin {
@@ -79,17 +80,17 @@ public:
   virtual QObject *instance() =0;
   virtual IRoster *addRoster(IXmppStream *AXmppStream) =0;
   virtual IRoster *getRoster(const Jid &AStreamJid) const =0;
-  virtual void saveRosterItems(const Jid &AStreamJid) =0;
-  virtual void loadRosterItems(const Jid &AStreamJid) =0;
+  virtual QString rosterFileName(const Jid &AStreamJid) const =0;
   virtual void removeRoster(IXmppStream *AXmppStream) =0;
 signals:
   virtual void rosterAdded(IRoster *ARoster) =0;
-  virtual void rosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter) =0;
   virtual void rosterOpened(IRoster *ARoster) =0;
   virtual void rosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem) =0;
   virtual void rosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem) =0;
   virtual void rosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText) =0;
   virtual void rosterClosed(IRoster *ARoster) =0;
+  virtual void rosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter) =0;
+  virtual void rosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore) =0;
   virtual void rosterRemoved(IRoster *ARoster) =0;
 };
 

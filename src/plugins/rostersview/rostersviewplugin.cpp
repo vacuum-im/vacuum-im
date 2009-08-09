@@ -78,8 +78,8 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
     if (FRosterPlugin)
     {
-      connect(FRosterPlugin->instance(),SIGNAL(rosterJidAboutToBeChanged(IRoster *, const Jid &)),
-        SLOT(onRosterJidAboutToBeChanged(IRoster *, const Jid &)));
+      connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidAboutToBeChanged(IRoster *, const Jid &)),
+        SLOT(onRosterStreamJidAboutToBeChanged(IRoster *, const Jid &)));
     }
   }
 
@@ -337,7 +337,7 @@ void RostersViewPlugin::onViewIndexExpanded(const QModelIndex &AIndex)
   saveExpandedState(AIndex);
 }
 
-void RostersViewPlugin::onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter)
+void RostersViewPlugin::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter)
 {
   Jid befour = ARoster->streamJid();
   if (FSettings && FCollapseNS.contains(befour))

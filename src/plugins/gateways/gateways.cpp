@@ -72,8 +72,8 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
       connect(FRosterPlugin->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
       connect(FRosterPlugin->instance(),SIGNAL(rosterSubscription(IRoster *, const Jid &, int , const QString &)),
         SLOT(onRosterSubscription(IRoster *, const Jid &, int , const QString &)));
-      connect(FRosterPlugin->instance(),SIGNAL(rosterJidAboutToBeChanged(IRoster *, const Jid &)),
-        SLOT(onRosterJidAboutToBeChanged(IRoster *, const Jid &)));
+      connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidAboutToBeChanged(IRoster *, const Jid &)),
+        SLOT(onRosterStreamJidAboutToBeChanged(IRoster *, const Jid &)));
     }
   }
 
@@ -652,7 +652,7 @@ void Gateways::onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int A
   }
 }
 
-void Gateways::onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &/*AAfter*/)
+void Gateways::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &/*AAfter*/)
 {
   FKeepConnections.remove(ARoster->streamJid());
   FPrivateStorageKeep.remove(ARoster->streamJid());
