@@ -86,7 +86,7 @@ protected slots:
   void onPresenceRemoved(IPresence *APresence);
   void onRosterOpened(IRoster *ARoster);
   void onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText);
-  void onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
+  void onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
   void onPrivateStorateOpened(const Jid &AStreamJid);
   void onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
   void onKeepTimerTimeout();

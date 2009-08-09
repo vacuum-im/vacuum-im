@@ -67,7 +67,7 @@ protected slots:
   void onViewRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
   void onViewIndexCollapsed(const QModelIndex &AIndex);
   void onViewIndexExpanded(const QModelIndex &AIndex);
-  void onRosterJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
+  void onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
   void onAccountShown(IAccount *AAccount);
   void onAccountHidden(IAccount *AAccount);
   void onAccountDestroyed(const QUuid &AAccountId);

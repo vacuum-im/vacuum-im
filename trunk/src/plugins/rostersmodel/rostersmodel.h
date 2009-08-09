@@ -5,7 +5,6 @@
 #include "../../definations/rosterindextyperole.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/iroster.h"
 #include "../../interfaces/ipresence.h"
 #include "../../interfaces/iaccountmanager.h"
@@ -80,9 +79,9 @@ protected slots:
   void onAccountShown(IAccount *AAccount);
   void onAccountHidden(IAccount *AAccount);
   void onAccountChanged(const QString &AName, const QVariant &AValue);
-  void onStreamJidChanged(IXmppStream *AXmppStream,const Jid &ABefour);
   void onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
+  void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
   void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
   void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
   void onIndexDataChanged(IRosterIndex *AIndex, int ARole);
