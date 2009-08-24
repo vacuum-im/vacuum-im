@@ -76,5 +76,6 @@
 #define NS_CHATSTATES                           "http://jabber.org/protocol/chatstates"
 
 #define NS_STREAM_INITIATION                    "http://jabber.org/protocol/si"
+#define NS_SI_FILETRANSFER                      "http://jabber.org/protocol/si/profile/file-transfer"
 
 #endif

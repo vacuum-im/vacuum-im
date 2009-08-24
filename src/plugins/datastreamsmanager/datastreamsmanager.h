@@ -8,6 +8,7 @@
 #include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/iservicediscovery.h"
+#include "../../utils/jid.h"
 #include "../../utils/stanza.h"
 #include "../../utils/errorhandler.h"
 
@@ -55,9 +56,9 @@ public:
   virtual IDataStreamProfile *profile(const QString &AProfileNS);
   virtual void insertProfile(IDataStreamProfile *AProfile, const QString &AProfileNS);
   virtual void removeProfile(IDataStreamProfile *AProfile, const QString &AProfileNS);
-  virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfile, 
+  virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS, 
     const QList<QString> &AMethods, int ATimeout =0);
-  virtual bool acceptStream(const QString &AStreamId, const QString &AMethod);
+  virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS);
   virtual bool rejectStream(const QString &AStreamId, const QString &AError);
 signals:
   virtual void methodInserted(IDataStreamMethod *AMethod, const QString &AMethodNS);

@@ -4,6 +4,11 @@
 //ChatMessagehandler
 #define SDF_CHAT_MHANDLER_MESSAGE         "chatmessagehandlerMessage"
 
+//FileTransfer
+#define SDF_FILETRANSFER_INCOMING         "filetransferIncoming"
+#define SDF_FILETRANSFER_COMPLETE         "filetransferComplete"
+#define SDF_FILETRANSFER_CANCELED         "filetransferCanceled"
+
 //NormalMessagehandler
 #define SDF_NORMAL_MHANDLER_MESSAGE       "normalmessagehandlerMessage"
 

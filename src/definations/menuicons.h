@@ -47,6 +47,13 @@
 #define MNI_EMOTICONS_ARROW_UP          "emoticonsArrowUp"
 #define MNI_EMOTICONS_ARROW_DOWN        "emoticonsArrowDown"
 
+//FileStreamsManager
+#define MNI_FILESTREAMSMANAGER          "filestreamsmanager"
+
+//FileTransfer
+#define MNI_FILETRANSFER_SEND           "filetransferSend"
+#define MNI_FILETRANSFER_RECEIVE        "filetransferReceive"
+
 //Gateways
 #define MNI_GATEWAYS                    "gateways"
 #define MNI_GATEWAYS_ADD_CONTACT        "gatewaysAddContact"
