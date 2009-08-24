@@ -49,4 +49,6 @@ SUBDIRS = settings \
           console \
           annotations \
           chatstates \
-          datastreamsmanager
+          datastreamsmanager \
+          filestreamsmanager \
+          filetransfer
