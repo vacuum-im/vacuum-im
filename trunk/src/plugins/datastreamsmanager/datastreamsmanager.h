@@ -50,21 +50,21 @@ public:
   //IDataStreamInitiator
   virtual QList<QString> methods() const;
   virtual IDataStreamMethod *method(const QString &AMethodNS) const;
-  virtual void insertMethod(IDataStreamMethod *AMethod, const QString &AMethodNS);
-  virtual void removeMethod(IDataStreamMethod *AMethod, const QString &AMethodNS);
+  virtual void insertMethod(IDataStreamMethod *AMethod);
+  virtual void removeMethod(IDataStreamMethod *AMethod);
   virtual QList<QString> profiles() const;
   virtual IDataStreamProfile *profile(const QString &AProfileNS);
-  virtual void insertProfile(IDataStreamProfile *AProfile, const QString &AProfileNS);
-  virtual void removeProfile(IDataStreamProfile *AProfile, const QString &AProfileNS);
+  virtual void insertProfile(IDataStreamProfile *AProfile);
+  virtual void removeProfile(IDataStreamProfile *AProfile);
   virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS, 
     const QList<QString> &AMethods, int ATimeout =0);
   virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS);
   virtual bool rejectStream(const QString &AStreamId, const QString &AError);
 signals:
-  virtual void methodInserted(IDataStreamMethod *AMethod, const QString &AMethodNS);
-  virtual void methodRemoved(IDataStreamMethod *AMethod, const QString &AMethodNS);
-  virtual void profileInserted(IDataStreamProfile *AProfile, const QString &AProfileNS);
-  virtual void profileRemoved(IDataStreamProfile *AProfile, const QString &AProfileNS);
+  virtual void methodInserted(IDataStreamMethod *AMethod);
+  virtual void methodRemoved(IDataStreamMethod *AMethod);
+  virtual void profileInserted(IDataStreamProfile *AProfile);
+  virtual void profileRemoved(IDataStreamProfile *AProfile);
 protected:
   virtual Stanza errorStanza(const Jid &AContactJid, const QString &ARequestId, const QString &ACondition, 
     const QString &AErrNS=EHN_DEFAULT, const QString &AText=QString::null) const;

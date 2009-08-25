@@ -155,12 +155,7 @@ bool FileTransfer::fileStreamResponce(const QString &AStreamId, const Stanza &AR
       if (rangeElem.hasAttribute("length"))
         stream->setRangeLength(rangeElem.attribute("length").toInt());
     }
-    IDataStreamMethod *method = FDataManager!=NULL ? FDataManager->method(AMethodNS) : NULL;
-    if (method)
-    {
-      IDataStreamOptions options = method->dataStreamOptions(AMethodNS);
-      return stream->startStream(options);
-    }
+    return stream->startStream(AMethodNS,QString::null);
   }
   return false;
 }

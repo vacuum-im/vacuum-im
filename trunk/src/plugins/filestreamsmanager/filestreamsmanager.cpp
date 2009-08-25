@@ -38,9 +38,14 @@ bool FileStreamsManager::initObjects()
 {
   if (FDataManager)
   {
-    FDataManager->insertProfile(this,NS_SI_FILETRANSFER);
+    FDataManager->insertProfile(this);
   }
   return true;
+}
+
+QString FileStreamsManager::profileNS() const
+{
+  return NS_SI_FILETRANSFER;
 }
 
 bool FileStreamsManager::requestDataStream(const QString &AStreamId, Stanza &ARequest) const
