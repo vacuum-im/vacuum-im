@@ -221,21 +221,21 @@ IDataStreamMethod *DataStreamsManger::method(const QString &AMethodNS) const
   return FMethods.value(AMethodNS,NULL);
 }
 
-void DataStreamsManger::insertMethod(IDataStreamMethod *AMethod, const QString &AMethodNS)
+void DataStreamsManger::insertMethod(IDataStreamMethod *AMethod)
 {
-  if (AMethod!=NULL && !AMethodNS.isEmpty() && !FMethods.contains(AMethodNS))
+  if (AMethod!=NULL && !FMethods.contains(AMethod->methodNS()) && !FMethods.values().contains(AMethod))
   {
-    FMethods.insert(AMethodNS,AMethod);
-    emit methodInserted(AMethod,AMethodNS);
+    FMethods.insert(AMethod->methodNS(),AMethod);
+    emit methodInserted(AMethod);
   }
 }
 
-void DataStreamsManger::removeMethod(IDataStreamMethod *AMethod, const QString &AMethodNS)
+void DataStreamsManger::removeMethod(IDataStreamMethod *AMethod)
 {
-  if (FMethods.value(AMethodNS) == AMethod)
+  if (FMethods.values().contains(AMethod))
   {
-    FMethods.remove(AMethodNS);
-    emit methodRemoved(AMethod,AMethodNS);
+    FMethods.remove(FMethods.key(AMethod));
+    emit methodRemoved(AMethod);
   }
 }
 
@@ -249,21 +249,21 @@ IDataStreamProfile *DataStreamsManger::profile(const QString &AProfileNS)
   return FProfiles.value(AProfileNS,NULL);
 }
 
-void DataStreamsManger::insertProfile(IDataStreamProfile *AProfile, const QString &AProfileNS)
+void DataStreamsManger::insertProfile(IDataStreamProfile *AProfile)
 {
-  if (!AProfileNS.isEmpty() && AProfile!=NULL && !FProfiles.contains(AProfileNS))
+  if (AProfile!=NULL && !FProfiles.contains(AProfile->profileNS()) && !FProfiles.values().contains(AProfile))
   {
-    FProfiles.insert(AProfileNS,AProfile);
-    emit profileInserted(AProfile,AProfileNS);
+    FProfiles.insert(AProfile->profileNS(),AProfile);
+    emit profileInserted(AProfile);
   }
 }
 
-void DataStreamsManger::removeProfile(IDataStreamProfile *AProfile, const QString &AProfileNS)
+void DataStreamsManger::removeProfile(IDataStreamProfile *AProfile)
 {
-  if (FProfiles.value(AProfileNS) == AProfile)
+  if (FProfiles.values().contains(AProfile))
   {
-    FProfiles.remove(AProfileNS);
-    emit profileRemoved(AProfile,AProfileNS);
+    FProfiles.remove(FProfiles.key(AProfile));
+    emit profileRemoved(AProfile);
   }
 }
 

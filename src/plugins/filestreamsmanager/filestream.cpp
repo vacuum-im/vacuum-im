@@ -255,35 +255,21 @@ bool FileStream::initStream(const QList<QString> &AMethods)
   return false;
 }
 
-bool FileStream::startStream(const IDataStreamOptions &AOptions)
+bool FileStream::startStream(const QString &AMethodNS, const QString &ASettingsNS)
 {
-  if (FStreamKind==SendFile && FStreamState==Negotiating)
+  if ( (FStreamKind==SendFile && FStreamState==Negotiating) || (FStreamKind==ReceiveFile && FStreamState==Creating) )
   {
     if (openFile())
     {
-      IDataStreamMethod *dataMethod = FDataManager->method(AOptions.methodNS);
-      FSocket = dataMethod!=NULL ? dataMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,AOptions,this) : NULL;
+      IDataStreamMethod *stremMethod = FDataManager->method(AMethodNS);
+      IDataStreamSocket::StreamKind kind = FStreamKind==SendFile ? IDataStreamSocket::Initiator : IDataStreamSocket::Target;
+      FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,kind,this) : NULL;
       if (FSocket)
       {
+        stremMethod->loadSettings(FSocket,ASettingsNS);
         setStreamState(Connecting,tr("Connecting"));
         connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
-        FSocket->open(IDataStreamSocket::Initiator,QIODevice::WriteOnly);
-        return true;
-      }
-      FFile.close();
-    }
-  }
-  else if (FStreamKind==ReceiveFile && FStreamState==Creating)
-  {
-    if (openFile())
-    {
-      IDataStreamMethod *dataMethod = FDataManager->method(AOptions.methodNS);
-      FSocket = dataMethod!=NULL ? dataMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,AOptions,this) : NULL;
-      if (FSocket)
-      {
-        setStreamState(Connecting,tr("Connecting"));
-        connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
-        FSocket->open(IDataStreamSocket::Target,QIODevice::ReadOnly);
+        FSocket->open(FStreamKind==SendFile ? QIODevice::WriteOnly : QIODevice::ReadOnly);
         return true;
       }
       FFile.close();

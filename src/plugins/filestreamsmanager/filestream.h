@@ -48,7 +48,7 @@ public:
   virtual QString fileDescription() const;
   virtual void setFileDescription(const QString &AFileDesc);
   virtual bool initStream(const QList<QString> &AMethods);
-  virtual bool startStream(const IDataStreamOptions &AOptions);
+  virtual bool startStream(const QString &AMethodNS, const QString &ASettingsNS);
   virtual void cancelStream(const QString &AError);
 signals:
   virtual void stateChanged();

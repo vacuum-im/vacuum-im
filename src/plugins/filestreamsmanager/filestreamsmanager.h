@@ -33,6 +33,7 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IDataStreamProfile
+  virtual QString profileNS() const;
   virtual bool requestDataStream(const QString &AStreamId, Stanza &ARequest) const;
   virtual bool responceDataStream(const QString &AStreamId, Stanza &AResponce) const;
   virtual bool dataStreamRequest(const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);

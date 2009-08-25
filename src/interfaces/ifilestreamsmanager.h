@@ -6,7 +6,6 @@
 
 class Jid;
 class Stanza;
-struct IDataStreamOptions;
 
 #define FILESTREAMSMANAGER_UUID       "{ea9ea27a-5ad7-40e3-82b3-db8ac3bdc288}"
 
@@ -54,7 +53,7 @@ public:
   virtual QString fileDescription() const =0;
   virtual void setFileDescription(const QString &AFileDesc) =0;
   virtual bool initStream(const QList<QString> &AMethods) =0;
-  virtual bool startStream(const IDataStreamOptions &AOptions) =0;
+  virtual bool startStream(const QString &AMethodNS, const QString &ASettingsNS) =0;
   virtual void cancelStream(const QString &AError) =0;
 signals:
   virtual void stateChanged() =0;

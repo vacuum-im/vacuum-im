@@ -67,11 +67,11 @@ void StreamDialog::setSelectableMethods(const QList<QString> &AMethods)
   FMethodButtons.clear();
   foreach(QString methodNS, AMethods)
   {
-    IDataStreamMethod *method = FDataManager->method(methodNS);
-    if (method)
+    IDataStreamMethod *stremMethod = FDataManager->method(methodNS);
+    if (stremMethod)
     {
-      QCheckBox *button = new QCheckBox(method->methodName(methodNS),ui.grbConnections);
-      button->setToolTip(method->methodDescription(methodNS));
+      QCheckBox *button = new QCheckBox(stremMethod->methodName(),ui.grbConnections);
+      button->setToolTip(stremMethod->methodDescription());
       button->setAutoExclusive(FFileStream->streamKind() == IFileStream::ReceiveFile);
       button->setChecked(FFileStream->streamKind()==IFileStream::SendFile || FFileManager->defaultStreamMethod()==methodNS);
       ui.grbConnections->layout()->addWidget(button);
@@ -258,13 +258,12 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
       }
       else
       {
-        IDataStreamMethod *method = FDataManager->method(methods.first());
-        if (method)
+        IDataStreamMethod *streamMethod = FDataManager->method(methods.first());
+        if (streamMethod)
         {
-          IDataStreamOptions options = method->dataStreamOptions(methods.first());
           FFileStream->setFileName(ui.lneFile->text());
           FFileStream->setFileDescription(ui.pteDescription->toPlainText());
-          if (!FFileStream->startStream(options))
+          if (!FFileStream->startStream(methods.first(),QString::null))
             QMessageBox::warning(this,tr("Warning"),tr("Unable to start the file transfer, check settings and try again!"));
         }
         else
