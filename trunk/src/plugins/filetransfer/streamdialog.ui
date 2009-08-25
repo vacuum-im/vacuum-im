@@ -159,7 +159,7 @@
    <item>
     <widget class="QGroupBox" name="grbConnections">
      <property name="title">
-      <string>Connection options:</string>
+      <string>Connection methods:</string>
      </property>
     </widget>
    </item>

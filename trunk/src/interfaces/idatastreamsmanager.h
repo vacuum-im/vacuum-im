@@ -47,7 +47,7 @@ class IDataStreamMethod
 {
 public:
   virtual QString methodName(const QString &AMethodNS) const =0;
-  virtual QString methodDescription(const QString &AMeyhodNS) const =0;
+  virtual QString methodDescription(const QString &AMethodNS) const =0;
   virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, 
     const Jid &AContactJid, const IDataStreamOptions &AOptions, QObject *AParent =NULL) =0;
   virtual IDataStreamOptions dataStreamOptions(const QString &AMethodNS, const QString &AOptionsNS = QString::null) =0;

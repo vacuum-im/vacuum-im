@@ -31,5 +31,9 @@
         <source>Data Streams Initiation</source>
         <translation>Инициализация потоков данных</translation>
     </message>
+    <message>
+        <source>Stream with same ID already exists</source>
+        <translation>Поток с таким же ID уже существует</translation>
+    </message>
 </context>
 </TS>
