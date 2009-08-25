@@ -78,4 +78,6 @@
 #define NS_STREAM_INITIATION                    "http://jabber.org/protocol/si"
 #define NS_SI_FILETRANSFER                      "http://jabber.org/protocol/si/profile/file-transfer"
 
+#define NS_INBAND_BYTESTREAMS                   "http://jabber.org/protocol/ibb"
+
 #endif
