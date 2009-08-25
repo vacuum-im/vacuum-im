@@ -180,8 +180,6 @@ bool FileTransfer::isSupported(const Jid &AStreamJid, const Jid &AContactJid) co
     IDiscoInfo info = FDiscovery->discoInfo(AContactJid);
     if (!info.features.contains(NS_SI_FILETRANSFER))
       return false;
-    if (info.features.toSet().intersect(FFileManager->streamMethods().toSet()).isEmpty())
-      return false;
   }
 
   return true;
@@ -219,33 +217,33 @@ void FileTransfer::notifyStream(IFileStream *AStream)
 {
   if (FNotifications)
   {
-    QString file = AStream->fileName().split("/").value(0);
+    QString file = !AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString::null;
 
     INotification notify;
     notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
     notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(AStream->streamKind()==IFileStream::SendFile ? MNI_FILETRANSFER_SEND : MNI_FILETRANSFER_RECEIVE));
     notify.data.insert(NDR_WINDOW_TITLE,FNotifications->contactName(AStream->streamJid(),AStream->contactJid()));
     notify.data.insert(NDR_WINDOW_IMAGE,FNotifications->contactAvatar(AStream->contactJid()));
-    notify.data.insert(NDR_WINDOW_TEXT, file);
+    notify.data.insert(NDR_WINDOW_CAPTION, file);
 
     switch (AStream->streamState())
     {
     case IFileStream::Creating:
       if (AStream->streamKind() == IFileStream::ReceiveFile)
       {
-        notify.data.insert(NDR_TOOLTIP,tr("Received request to send file %1").arg(file));
-        notify.data.insert(NDR_WINDOW_CAPTION, tr("Send file request"));
+        notify.data.insert(NDR_TOOLTIP,tr("Requested file transfer: %1").arg(file));
+        notify.data.insert(NDR_WINDOW_TEXT, tr("You received a request to transfer the file"));
         notify.data.insert(NDR_SOUND_FILE,SDF_FILETRANSFER_INCOMING);
       }
       break;
     case IFileStream::Finished:
-      notify.data.insert(NDR_TOOLTIP,tr("Completed transferring file %1").arg(file));
-      notify.data.insert(NDR_WINDOW_CAPTION, tr("File transfer completed"));
+      notify.data.insert(NDR_TOOLTIP,tr("Completed transferring file: %1").arg(file));
+      notify.data.insert(NDR_WINDOW_TEXT, tr("File transfer completed"));
       notify.data.insert(NDR_SOUND_FILE,SDF_FILETRANSFER_COMPLETE);
       break;
     case IFileStream::Canceled:
-      notify.data.insert(NDR_TOOLTIP,tr("Canceled transferring file %1").arg(file));
-      notify.data.insert(NDR_WINDOW_CAPTION, tr("File transfer canceled"));
+      notify.data.insert(NDR_TOOLTIP,tr("Canceled transferring file: %1").arg(file));
+      notify.data.insert(NDR_WINDOW_TEXT, tr("File transfer canceled: %1").arg(Qt::escape(AStream->errorString())));
       notify.data.insert(NDR_SOUND_FILE,SDF_FILETRANSFER_CANCELED);
       break;
     default:

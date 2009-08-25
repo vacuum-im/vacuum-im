@@ -126,19 +126,25 @@ bool DataStreamsManger::readStanza(int AHandlerId, const Jid &AStreamJid, const 
       if (!smethods.isEmpty())
       {
         QString sid = siElem.attribute("id");
-
-        StreamParams params;
-        params.streamJid = AStreamJid;
-        params.contactJid = AStanza.from();
-        params.requestId = AStanza.id();
-        params.profile = siElem.attribute("profile");
-        params.features = form;
-        FStreams.insert(sid,params);
-
-        if (sid.isEmpty() || !sprofile->dataStreamRequest(sid,AStanza,smethods))
+        if (!FStreams.contains(sid))
         {
-          FStreams.remove(sid);
-          Stanza error = errorStanza(AStanza.from(),AStanza.id(),"bad-request",EHN_DEFAULT,tr("Invalid profile settings"));
+          StreamParams params;
+          params.streamJid = AStreamJid;
+          params.contactJid = AStanza.from();
+          params.requestId = AStanza.id();
+          params.profile = siElem.attribute("profile");
+          params.features = form;
+          FStreams.insert(sid,params);
+          if (sid.isEmpty() || !sprofile->dataStreamRequest(sid,AStanza,smethods))
+          {
+            FStreams.remove(sid);
+            Stanza error = errorStanza(AStanza.from(),AStanza.id(),"bad-request",EHN_DEFAULT,tr("Invalid profile settings"));
+            FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+          }
+        }
+        else
+        {
+          Stanza error = errorStanza(AStanza.from(),AStanza.id(),"bad-request",EHN_DEFAULT,tr("Stream with same ID already exists"));
           FStanzaProcessor->sendStanzaOut(AStreamJid,error);
         }
       }

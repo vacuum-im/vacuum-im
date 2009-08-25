@@ -16,32 +16,32 @@
         <translation>Отправить файл</translation>
     </message>
     <message>
-        <source>Received request to send file %1</source>
-        <translation>Получен запрос на передачу файла %1</translation>
-    </message>
-    <message>
-        <source>Send file request</source>
-        <translation>Запрос на передачу файла</translation>
-    </message>
-    <message>
-        <source>Completed transferring file %1</source>
-        <translation>Завершена передача файла %1</translation>
-    </message>
-    <message>
         <source>File transfer completed</source>
         <translation>Передача файла завершена</translation>
     </message>
     <message>
-        <source>Canceled transferring file %1</source>
-        <translation>Отменена передача файла %1</translation>
-    </message>
-    <message>
-        <source>File transfer canceled</source>
-        <translation>Передача файла отменена</translation>
-    </message>
-    <message>
         <source>Files Transfer</source>
         <translation>Передача файлов</translation>
+    </message>
+    <message>
+        <source>Requested file transfer: %1</source>
+        <translation>Запрошена передача файла: %1</translation>
+    </message>
+    <message>
+        <source>You received a request to transfer the file</source>
+        <translation>Вы получили запрос на передачу файла</translation>
+    </message>
+    <message>
+        <source>Completed transferring file: %1</source>
+        <translation>Завершена передача файла : %1</translation>
+    </message>
+    <message>
+        <source>Canceled transferring file: %1</source>
+        <translation>Отменена передача файла: %1</translation>
+    </message>
+    <message>
+        <source>File transfer canceled: %1</source>
+        <translation>Передача файла отменена: %1</translation>
     </message>
 </context>
 <context>
@@ -170,8 +170,8 @@
         <translation>Статус:</translation>
     </message>
     <message>
-        <source>Connection options:</source>
-        <translation>Параметры подключения:</translation>
+        <source>Connection methods:</source>
+        <translation>Способы подключения:</translation>
     </message>
 </context>
 </TS>

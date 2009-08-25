@@ -128,7 +128,7 @@ void StreamDialog::onStreamStateChanged()
     ui.tlbFile->setEnabled(true);
     ui.lneFile->setReadOnly(FFileStream->streamKind()==IFileStream::SendFile);
     ui.pteDescription->setReadOnly(false);
-    ui.grbConnections->setVisible(!FMethodButtons.isEmpty());
+    ui.grbConnections->setVisible(true);
     if (FFileStream->streamKind()==IFileStream::SendFile)
       ui.bbxButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Close);
     else
@@ -154,6 +154,7 @@ void StreamDialog::onStreamStateChanged()
     break;
   }
   ui.lblStatus->setText(FFileStream->stateString());
+  resize(width(),minimumSizeHint().height());
 }
 
 void StreamDialog::onStreamSpeedUpdated()
