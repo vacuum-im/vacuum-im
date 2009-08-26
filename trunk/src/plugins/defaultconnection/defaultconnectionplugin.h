@@ -10,7 +10,6 @@
 #include "defaultconnection.h"
 #include "connectionoptionswidget.h"
 
-
 class DefaultConnectionPlugin : 
   public QObject,
   public IPlugin,
