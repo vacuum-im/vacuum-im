@@ -32,11 +32,11 @@ class Gateways :
   public QObject,
   public IPlugin,
   public IGateways,
-  public IIqStanzaOwner,
+  public IStanzaRequestOwner,
   public IDiscoFeatureHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IGateways IIqStanzaOwner IDiscoFeatureHandler);
+  Q_INTERFACES(IPlugin IGateways IStanzaRequestOwner IDiscoFeatureHandler);
 public:
   Gateways();
   ~Gateways();
@@ -48,9 +48,9 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);

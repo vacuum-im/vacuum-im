@@ -41,8 +41,8 @@ ClientInfo::ClientInfo()
   FDataForms = NULL;
   FMainWindowPlugin = NULL;
 
-  FVersionHandler = 0;
-  FTimeHandler = 0;
+  FVersionHandle = 0;
+  FTimeHandle = 0;
 }
 
 ClientInfo::~ClientInfo()
@@ -144,8 +144,20 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 
 bool ClientInfo::initObjects()
 {
-  FVersionHandler = FStanzaProcessor->insertHandler(this,SHC_SOFTWARE_VERSION,IStanzaProcessor::DirectionIn);
-  FTimeHandler = FStanzaProcessor->insertHandler(this,SHC_ENTITY_TIME,IStanzaProcessor::DirectionIn);
+  if (FStanzaProcessor)
+  {
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    
+    shandle.conditions.append(SHC_SOFTWARE_VERSION);
+    FVersionHandle = FStanzaProcessor->insertStanzaHandle(shandle);
+
+    shandle.conditions.clear();
+    shandle.conditions.append(SHC_ENTITY_TIME);
+    FTimeHandle = FStanzaProcessor->insertStanzaHandle(shandle);
+  }
 
   if (FRostersViewPlugin)
   {
@@ -192,9 +204,9 @@ bool ClientInfo::initObjects()
   return true;
 }
 
-bool ClientInfo::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool ClientInfo::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
-  if (AHandlerId == FVersionHandler)
+  if (AHandlerId == FVersionHandle)
   {
     AAccept = true;
     Stanza iq("iq");
@@ -205,7 +217,7 @@ bool ClientInfo::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza 
     elem.appendChild(iq.createElement("os")).appendChild(iq.createTextNode(osVersion()));
     FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
   }
-  else if (AHandlerId == FTimeHandler)
+  else if (AHandlerId == FTimeHandle)
   {
     AAccept = true;
     Stanza iq("iq");
@@ -219,7 +231,7 @@ bool ClientInfo::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza 
   return false;
 }
 
-void ClientInfo::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void ClientInfo::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (FSoftwareId.contains(AStanza.id()))
   {
@@ -283,11 +295,12 @@ void ClientInfo::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
   }
 }
 
-void ClientInfo::iqStanzaTimeOut(const QString &AId)
+void ClientInfo::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FSoftwareId.contains(AId))
+  Q_UNUSED(AStreamJid);
+  if (FSoftwareId.contains(AStanzaId))
   {
-    Jid contactJid = FSoftwareId.take(AId);
+    Jid contactJid = FSoftwareId.take(AStanzaId);
     SoftwareItem &software = FSoftwareItems[contactJid];
     ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
     software.name = err.message();
@@ -296,14 +309,14 @@ void ClientInfo::iqStanzaTimeOut(const QString &AId)
     software.status = SoftwareError;
     emit softwareInfoChanged(contactJid);
   }
-  else if (FActivityId.contains(AId))
+  else if (FActivityId.contains(AStanzaId))
   {
-    Jid contactJid = FActivityId.take(AId);
+    Jid contactJid = FActivityId.take(AStanzaId);
     emit lastActivityChanged(contactJid);
   }
-  else if (FTimeId.contains(AId))
+  else if (FTimeId.contains(AStanzaId))
   {
-    Jid contactJid = FTimeId.take(AId);
+    Jid contactJid = FTimeId.take(AStanzaId);
     FTimeItems.remove(contactJid);
     emit entityTimeChanged(contactJid);
   }
@@ -609,7 +622,7 @@ bool ClientInfo::requestSoftwareInfo(const Jid &AStreamJid, const Jid &AContactJ
     Stanza iq("iq");
     iq.addElement("query",NS_JABBER_VERSION);
     iq.setTo(AContactJid.eFull()).setId(FStanzaProcessor->newId()).setType("get");
-    sended = FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,SOFTWARE_INFO_TIMEOUT);
+    sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,SOFTWARE_INFO_TIMEOUT);
     if (sended)
     {
       FSoftwareId.insert(iq.id(),AContactJid);
@@ -652,7 +665,7 @@ bool ClientInfo::requestLastActivity(const Jid &AStreamJid, const Jid &AContactJ
     Stanza iq("iq");
     iq.addElement("query",NS_JABBER_LAST);
     iq.setTo(AContactJid.eBare()).setId(FStanzaProcessor->newId()).setType("get");
-    sended = FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,LAST_ACTIVITY_TIMEOUT);
+    sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,LAST_ACTIVITY_TIMEOUT);
     if (sended)
       FActivityId.insert(iq.id(),AContactJid);
   }
@@ -682,7 +695,7 @@ bool ClientInfo::requestEntityTime(const Jid &AStreamJid, const Jid &AContactJid
     Stanza iq("iq");
     iq.addElement("time",NS_XMPP_TIME);
     iq.setTo(AContactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
-    sended = FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,ENTITY_TIME_TIMEOUT);
+    sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,ENTITY_TIME_TIMEOUT);
     if (sended)
     {
       TimeItem &tItem = FTimeItems[AContactJid];

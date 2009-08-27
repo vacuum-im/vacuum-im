@@ -47,11 +47,11 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
     if (FStanzaProcessor)
     {
-      foreach(int handlerId, FStanzaProcessor->handlers()) {
-        foreach(QString condition, FStanzaProcessor->handlerConditions(handlerId)) {
-          onConditionAppended(handlerId,condition); } }
+      foreach(int shandleId, FStanzaProcessor->stanzaHandles()) {
+        onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId)); }
       ui.cmbCondition->clearEditText();
-      connect(FStanzaProcessor->instance(),SIGNAL(conditionAppended(int, const QString &)),SLOT(onConditionAppended(int, const QString &)));
+      connect(FStanzaProcessor->instance(),SIGNAL(stanzaHandleInserted(int, const IStanzaHandle &)),
+        SLOT(onStanzaHandleInserted(int, const IStanzaHandle &)));
     }
   }
 
@@ -125,6 +125,31 @@ void ConsoleWidget::onRemoveConditionClicked()
 {
   if (ui.ltwConditions->currentRow()>=0)
     delete ui.ltwConditions->takeItem(ui.ltwConditions->currentRow());
+}
+
+void ConsoleWidget::onSendXMLClicked()
+{
+  QDomDocument doc;
+  if (FXmppStreams!=NULL && doc.setContent(ui.tedSendXML->toPlainText(),true))
+  {
+    Stanza stanza(doc.documentElement());
+    if (stanza.isValid())
+    {
+      ui.tedConsole->append(tr("<b>Start sending user stanza...</b><br>"));
+      foreach(IXmppStream *stream, FXmppStreams->getStreams())
+        if (ui.cmbStreamJid->currentIndex()==0 || stream->jid()==ui.cmbStreamJid->currentText())
+          stream->sendStanza(stanza);
+      ui.tedConsole->append(tr("<b>User stanza sended.</b><br>"));
+    }
+    else
+    {
+      ui.tedConsole->append(tr("<b>Stanza is not well formed.</b><br>"));
+    }
+  }
+  else
+  {
+    ui.tedConsole->append(tr("<b>XML is not well formed.</b><br>"));
+  }
 }
 
 void ConsoleWidget::onLoadContextClicked()
@@ -247,35 +272,12 @@ void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
   ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->jid().full()));
 }
 
-void ConsoleWidget::onConditionAppended(int /*AHandlerId*/, const QString &ACondition)
+void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle)
 {
-  if (ui.cmbCondition->findText(ACondition)<0)
-    ui.cmbCondition->addItem(ACondition);
-}
-
-void ConsoleWidget::onSendXMLClicked()
-{
-  QDomDocument doc;
-  if (FXmppStreams!=NULL && doc.setContent(ui.tedSendXML->toPlainText(),true))
-  {
-    Stanza stanza(doc.documentElement());
-    if (stanza.isValid())
-    {
-      ui.tedConsole->append(tr("<b>Start sending user stanza...</b><br>"));
-      foreach(IXmppStream *stream, FXmppStreams->getStreams())
-        if (ui.cmbStreamJid->currentIndex()==0 || stream->jid()==ui.cmbStreamJid->currentText())
-          stream->sendStanza(stanza);
-      ui.tedConsole->append(tr("<b>User stanza sended.</b><br>"));
-    }
-    else
-    {
-      ui.tedConsole->append(tr("<b>Stanza is not well formed.</b><br>"));
-    }
-  }
-  else
-  {
-    ui.tedConsole->append(tr("<b>XML is not well formed.</b><br>"));
-  }
+  Q_UNUSED(AHandleId);
+  foreach(QString condition, AHandle.conditions)
+    if (ui.cmbCondition->findText(condition) < 0)
+      ui.cmbCondition->addItem(condition);
 }
 
 void ConsoleWidget::onSettingsOpened()

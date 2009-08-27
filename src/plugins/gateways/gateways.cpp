@@ -157,7 +157,7 @@ bool Gateways::initObjects()
   return true;
 }
 
-void Gateways::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void Gateways::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (FPromptRequests.contains(AStanza.id()))
   {
@@ -190,14 +190,15 @@ void Gateways::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
   }
 }
 
-void Gateways::iqStanzaTimeOut(const QString &AId)
+void Gateways::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FPromptRequests.contains(AId) || FUserJidRequests.contains(AId))
+  Q_UNUSED(AStreamJid);
+  if (FPromptRequests.contains(AStanzaId) || FUserJidRequests.contains(AStanzaId))
   {
     ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-    emit errorReceived(AId,err.message());
-    FPromptRequests.removeAt(FPromptRequests.indexOf(AId));
-    FUserJidRequests.removeAt(FUserJidRequests.indexOf(AId));
+    emit errorReceived(AStanzaId,err.message());
+    FPromptRequests.removeAt(FPromptRequests.indexOf(AStanzaId));
+    FUserJidRequests.removeAt(FUserJidRequests.indexOf(AStanzaId));
   }
 }
 
@@ -383,7 +384,7 @@ QString Gateways::sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJi
   Stanza request("iq");
   request.setType("get").setTo(AServiceJid.eFull()).setId(FStanzaProcessor->newId());
   request.addElement("query",NS_JABBER_GATEWAY);
-  if (FStanzaProcessor->sendIqStanza(this,AStreamJid,request,GATEWAY_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,GATEWAY_TIMEOUT))
   {
     FPromptRequests.append(request.id());
     return request.id();
@@ -397,7 +398,7 @@ QString Gateways::sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJ
   request.setType("set").setTo(AServiceJid.eFull()).setId(FStanzaProcessor->newId());
   QDomElement elem = request.addElement("query",NS_JABBER_GATEWAY);
   elem.appendChild(request.createElement("prompt")).appendChild(request.createTextNode(AContactID));
-  if (FStanzaProcessor->sendIqStanza(this,AStreamJid,request,GATEWAY_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,GATEWAY_TIMEOUT))
   {
     FUserJidRequests.append(request.id());
     return request.id();

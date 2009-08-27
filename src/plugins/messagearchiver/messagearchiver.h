@@ -47,12 +47,12 @@ class MessageArchiver :
   public IPlugin,
   public IMessageArchiver,
   public IStanzaHandler,
-  public IIqStanzaOwner,
+  public IStanzaRequestOwner,
   public IOptionsHolder,
   public ISessionNegotiator
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMessageArchiver IStanzaHandler IIqStanzaOwner IOptionsHolder ISessionNegotiator);
+  Q_INTERFACES(IPlugin IMessageArchiver IStanzaHandler IStanzaRequestOwner IOptionsHolder ISessionNegotiator);
 public:
   MessageArchiver();
   ~MessageArchiver();
@@ -65,11 +65,11 @@ public:
   virtual bool initSettings();
   virtual bool startPlugin()  { return true; }
   //IStanzaHandler
-  virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept);
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //SessionNegotiator
@@ -220,9 +220,9 @@ private:
   QMap<Jid,int> FSHIMessageBlocks;
 private:
   QMap<QString,Jid> FPrefsSaveRequests;
-  QMap<QString,Jid>  FPrefsLoadRequests;
+  QMap<QString,Jid> FPrefsLoadRequests;
   QMap<QString,bool> FPrefsAutoRequests;
-  QMap<QString,Jid>  FPrefsRemoveRequests;
+  QMap<QString,Jid> FPrefsRemoveRequests;
 private:
   QMap<QString,IArchiveHeader> FSaveRequests;
   QMap<QString,IArchiveRequest> FListRequests;

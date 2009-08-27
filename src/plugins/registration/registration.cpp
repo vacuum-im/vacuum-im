@@ -103,7 +103,7 @@ bool Registration::initObjects()
   return true;
 }
 
-void Registration::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void Registration::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (FSendRequests.contains(AStanza.id()) || FSubmitRequests.contains(AStanza.id()))
   {
@@ -166,17 +166,18 @@ void Registration::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
   }
 }
 
-void Registration::iqStanzaTimeOut(const QString &AId)
+void Registration::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FSendRequests.contains(AId))
+  Q_UNUSED(AStreamJid);
+  if (FSendRequests.contains(AStanzaId))
   {
-    FSendRequests.removeAt(FSendRequests.indexOf(AId));
-    emit registerError(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
+    FSendRequests.removeAt(FSendRequests.indexOf(AStanzaId));
+    emit registerError(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
-  else if (FSubmitRequests.contains(AId))
+  else if (FSubmitRequests.contains(AStanzaId))
   {
-    FSubmitRequests.removeAt(FSubmitRequests.indexOf(AId));
-    emit registerError(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
+    FSubmitRequests.removeAt(FSubmitRequests.indexOf(AStanzaId));
+    emit registerError(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
 }
 
@@ -305,7 +306,7 @@ QString Registration::sendRegiterRequest(const Jid &AStreamJid, const Jid &AServ
   Stanza reg("iq");
   reg.setTo(AServiceJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
   reg.addElement("query",NS_JABBER_REGISTER);
-  if (FStanzaProcessor->sendIqStanza(this,AStreamJid,reg,REGISTRATION_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,reg,REGISTRATION_TIMEOUT))
   {
     FSendRequests.append(reg.id());
     return reg.id();
@@ -318,7 +319,7 @@ QString Registration::sendUnregiterRequest(const Jid &AStreamJid, const Jid &ASe
   Stanza unreg("iq");
   unreg.setTo(AServiceJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
   unreg.addElement("query",NS_JABBER_REGISTER).appendChild(unreg.createElement("remove"));
-  if (FStanzaProcessor->sendIqStanza(this,AStreamJid,unreg,REGISTRATION_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,unreg,REGISTRATION_TIMEOUT))
   {
     FSubmitRequests.append(unreg.id());
     return unreg.id();
@@ -334,7 +335,7 @@ QString Registration::sendChangePasswordRequest(const Jid &AStreamJid, const Jid
   QDomElement elem = change.addElement("query",NS_JABBER_REGISTER);
   elem.appendChild(change.createElement("username")).appendChild(change.createTextNode(AUserName));
   elem.appendChild(change.createElement("password")).appendChild(change.createTextNode(APassword));
-  if (FStanzaProcessor->sendIqStanza(this,AStreamJid,change,REGISTRATION_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,change,REGISTRATION_TIMEOUT))
   {
     FSubmitRequests.append(change.id());
     return change.id();
@@ -361,7 +362,7 @@ QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &A
   else if (FDataForms)
     FDataForms->xmlForm(ASubmit.form,query);
 
-  if (FStanzaProcessor->sendIqStanza(this,AStreamJid,submit,REGISTRATION_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,submit,REGISTRATION_TIMEOUT))
   {
     FSubmitRequests.append(submit.id());
     return submit.id();

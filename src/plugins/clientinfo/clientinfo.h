@@ -56,14 +56,14 @@ class ClientInfo :
   public IPlugin,
   public IClientInfo,
   public IStanzaHandler,
-  public IIqStanzaOwner,
+  public IStanzaRequestOwner,
   public IRosterIndexDataHolder,
   public IDataLocalizer,
   public IDiscoHandler,
   public IDiscoFeatureHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IIqStanzaOwner IRosterIndexDataHolder IDataLocalizer IDiscoHandler IDiscoFeatureHandler);
+  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IStanzaRequestOwner IRosterIndexDataHolder IDataLocalizer IDiscoHandler IDiscoFeatureHandler);
 public:
   ClientInfo();
   ~ClientInfo();
@@ -76,11 +76,11 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
-  virtual bool editStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza * /*AStanza*/, bool &/*AAccept*/) { return false; }
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza &/*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IRosterIndexDataHolder
   virtual int order() const { return RDHO_DEFAULT; }
   virtual QList<int> roles() const;
@@ -154,8 +154,8 @@ private:
   IDataForms *FDataForms;
   IMainWindowPlugin *FMainWindowPlugin;
 private:
-  int FTimeHandler;
-  int FVersionHandler;
+  int FTimeHandle;
+  int FVersionHandle;
   QPointer<AboutBox> FAboutBox;
   QHash<Jid, QSet<IPresence *> > FContactPresences;
   QHash<QString, Jid> FSoftwareId;

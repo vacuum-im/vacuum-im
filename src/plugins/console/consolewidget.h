@@ -33,7 +33,7 @@ protected slots:
   void onStreamConsoleElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onStreamDestroyed(IXmppStream *AXmppStream);
-  void onConditionAppended(int AHandlerId, const QString &ACondition);
+  void onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle);
   void onSettingsOpened();
   void onSettingsClosed();
 private:

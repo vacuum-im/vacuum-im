@@ -69,7 +69,7 @@ bool MessageProcessor::initObjects()
   return true;
 }
 
-bool MessageProcessor::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool MessageProcessor::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   if (FSHIMessages.value(AStreamJid) == AHandlerId)
   {
@@ -322,8 +322,13 @@ void MessageProcessor::onStreamOpened(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && !FSHIMessages.contains(AXmppStream->jid()))
   {
-    int handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
-    FSHIMessages.insert(AXmppStream->jid(),handler);
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.streamJid = AXmppStream->jid();
+    shandle.conditions.append(SHC_MESSAGE);
+    FSHIMessages.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
 }
 
@@ -361,7 +366,7 @@ void MessageProcessor::onStreamClosed(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && FSHIMessages.contains(AXmppStream->jid()))
   {
-    FStanzaProcessor->removeHandler(FSHIMessages.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIMessages.take(AXmppStream->jid()));
   }
 }
 

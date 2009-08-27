@@ -69,8 +69,8 @@ public:
   virtual int sessionApply(const IStanzaSession &ASession);
   virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm);
   //IStanzaHandler
-  virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept);
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IChatStates
   virtual bool isEnabled() const;
   virtual void setEnabled(bool AEnabled);

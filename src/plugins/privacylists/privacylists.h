@@ -24,10 +24,10 @@ class PrivacyLists :
   public IPlugin,
   public IPrivacyLists,
   public IStanzaHandler,
-  public IIqStanzaOwner
+  public IStanzaRequestOwner
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IPrivacyLists IStanzaHandler IIqStanzaOwner);
+  Q_INTERFACES(IPlugin IPrivacyLists IStanzaHandler IStanzaRequestOwner);
 public:
   PrivacyLists();
   ~PrivacyLists();
@@ -40,11 +40,11 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
-  virtual bool editStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza * /*AStanza*/, bool &/*AAccept*/) { return false; }
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza & /*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IPrivacyLists
   virtual bool isReady(const Jid &AStreamJid) const;
   virtual IPrivacyRule autoListRule(const Jid &AContactJid, const QString &AAutoList) const;

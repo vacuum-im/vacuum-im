@@ -20,12 +20,12 @@ class Commands :
   public IPlugin,
   public ICommands,
   public IStanzaHandler,
-  public IIqStanzaOwner,
+  public IStanzaRequestOwner,
   public IDiscoHandler,
   public IDiscoFeatureHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin ICommands IStanzaHandler IIqStanzaOwner IDiscoHandler IDiscoFeatureHandler);
+  Q_INTERFACES(IPlugin ICommands IStanzaHandler IStanzaRequestOwner IDiscoHandler IDiscoFeatureHandler);
 public:
   Commands();
   ~Commands();
@@ -38,11 +38,11 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
-  virtual bool editStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza * /*AStanza*/, bool &/*AAccept*/) { return false; }
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza & /*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IDiscoHandler
   virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
   virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
@@ -81,7 +81,7 @@ private:
   IPresencePlugin *FPresencePlugin;
 private:
   QList<QString> FRequests;
-  QHash<int,IPresence*> FStanzaHandlers;
+  QHash<int,IPresence*> FSHICommands;
   QList<ICommandClient *> FClients;
   QHash<QString,ICommandServer *> FCommands;
 };

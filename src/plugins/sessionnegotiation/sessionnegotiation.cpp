@@ -116,7 +116,7 @@ bool SessionNegotiation::initObjects()
   return true;
 }
 
-bool SessionNegotiation::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool SessionNegotiation::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   if (FSHISession.value(AStreamJid) == AHandlerId)
   {
@@ -1014,8 +1014,13 @@ void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && FDataForms)
   {
-    int handler = FStanzaProcessor->insertHandler(this,SHC_STANZA_SESSION,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
-    FSHISession.insert(AXmppStream->jid(),handler);
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.streamJid = AXmppStream->jid();
+    shandle.conditions.append(SHC_STANZA_SESSION);
+    FSHISession.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
 }
 
@@ -1042,7 +1047,7 @@ void SessionNegotiation::onStreamClosed(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && FDataForms)
   {
-    FStanzaProcessor->removeHandler(FSHISession.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHISession.take(AXmppStream->jid()));
   }
   FDialogs.remove(AXmppStream->jid());
   FSessions.remove(AXmppStream->jid());
