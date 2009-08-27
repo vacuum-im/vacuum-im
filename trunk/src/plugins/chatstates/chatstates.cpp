@@ -298,19 +298,19 @@ void ChatStates::sessionLocalize(const IStanzaSession &/*ASession*/, IDataForm &
   }
 }
 
-bool ChatStates::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &/*AAccept*/)
+bool ChatStates::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &/*AAccept*/)
 {
   if (FSHIMessagesOut.value(AStreamJid)==AHandlerId && FChatParams.contains(AStreamJid))
   {
     bool stateSent = false;
-    Jid contactJid = AStanza->to();
+    Jid contactJid = AStanza.to();
     if (isSupported(AStreamJid,contactJid))
     {
       IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid) : NULL;
       if (window)
       {
         stateSent = true;
-        AStanza->addElement(STATE_ACTIVE,NS_CHATSTATES);
+        AStanza.addElement(STATE_ACTIVE,NS_CHATSTATES);
       }
     }
     FChatParams[AStreamJid][contactJid].canSendStates = stateSent;
@@ -319,7 +319,7 @@ bool ChatStates::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStan
   return false;
 }
 
-bool ChatStates::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool ChatStates::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   if (FSHIMessagesIn.value(AStreamJid)==AHandlerId && FChatParams.contains(AStreamJid))
   {
@@ -544,12 +544,18 @@ void ChatStates::onPresenceOpened(IPresence *APresence)
 {
   if (FStanzaProcessor)
   {
-    int handler = FStanzaProcessor->insertHandler(this,SHC_STATE_MESSAGES,IStanzaProcessor::DirectionIn,SHP_CHATSTATES,APresence->streamJid());
-    FStanzaProcessor->appendCondition(handler,SHC_CONTENT_MESSAGES);
-    FSHIMessagesIn.insert(APresence->streamJid(),handler);
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.priority = SHP_CHATSTATES;
+    shandle.streamJid = APresence->streamJid();
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_CONTENT_MESSAGES,IStanzaProcessor::DirectionOut,SHP_CHATSTATES,APresence->streamJid());
-    FSHIMessagesOut.insert(APresence->streamJid(),handler);
+    shandle.direction = IStanzaHandle::DirectionOut;
+    shandle.conditions.append(SHC_CONTENT_MESSAGES);
+    FSHIMessagesOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
+
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.conditions.append(SHC_STATE_MESSAGES);
+    FSHIMessagesIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
 
   FNotSupported[APresence->streamJid()].clear();
@@ -575,11 +581,8 @@ void ChatStates::onPresenceClosed(IPresence *APresence)
   
   if (FStanzaProcessor)
   {
-    int handler = FSHIMessagesIn.take(APresence->streamJid());
-    FStanzaProcessor->removeHandler(handler);
-
-    handler = FSHIMessagesOut.take(APresence->streamJid());
-    FStanzaProcessor->removeHandler(handler);
+    FStanzaProcessor->removeStanzaHandle(FSHIMessagesIn.take(APresence->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIMessagesOut.take(APresence->streamJid()));
   }
 
   FNotSupported.remove(APresence->streamJid());

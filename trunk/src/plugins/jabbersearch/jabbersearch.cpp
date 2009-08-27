@@ -66,7 +66,7 @@ bool JabberSearch::initObjects()
   return true;
 }
 
-void JabberSearch::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void JabberSearch::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (FRequests.contains(AStanza.id()))
   {
@@ -151,17 +151,18 @@ void JabberSearch::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
   }
 }
 
-void JabberSearch::iqStanzaTimeOut(const QString &AId)
+void JabberSearch::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FRequests.contains(AId))
+  Q_UNUSED(AStreamJid);
+  if (FRequests.contains(AStanzaId))
   {
-    FRequests.removeAt(FRequests.indexOf(AId));
-    emit searchError(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
+    FRequests.removeAt(FRequests.indexOf(AStanzaId));
+    emit searchError(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
-  else if (FSubmits.contains(AId))
+  else if (FSubmits.contains(AStanzaId))
   {
-    FSubmits.removeAt(FSubmits.indexOf(AId));
-    emit searchError(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
+    FSubmits.removeAt(FSubmits.indexOf(AStanzaId));
+    emit searchError(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
 }
 
@@ -209,7 +210,7 @@ QString JabberSearch::sendRequest(const Jid &AStreamJid, const Jid &AServiceJid)
   Stanza request("iq");
   request.setTo(AServiceJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
   request.addElement("query",NS_JABBER_SEARCH);
-  if (FStanzaProcessor->sendIqStanza(this,AStreamJid,request,SEARCH_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,SEARCH_TIMEOUT))
   {
     FRequests.append(request.id());
     return request.id();
@@ -237,7 +238,7 @@ QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASu
   else if (FDataForms)
     FDataForms->xmlForm(ASubmit.form,query);
 
-  if (FStanzaProcessor->sendIqStanza(this,AStreamJid,submit,SEARCH_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,submit,SEARCH_TIMEOUT))
   {
     FSubmits.append(submit.id());
     return submit.id();

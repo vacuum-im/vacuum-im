@@ -112,7 +112,7 @@ bool PrivacyLists::initObjects()
   return true;
 }
 
-bool PrivacyLists::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool PrivacyLists::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   if (FSHIPrivacy.value(AStreamJid)==AHandlerId && (AStanza.from().isEmpty() || (AStreamJid && AStanza.from())))
   {
@@ -188,7 +188,7 @@ bool PrivacyLists::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanz
   return false;
 }
 
-void PrivacyLists::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
+void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
   if (FLoadRequests.contains(AStanza.id()))
   {
@@ -322,23 +322,22 @@ void PrivacyLists::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
     emit requestFailed(AStanza.id(),ErrorHandler(AStanza.element()).message());
 }
 
-void PrivacyLists::iqStanzaTimeOut(const QString &AId)
+void PrivacyLists::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FLoadRequests.contains(AId))
-    FLoadRequests.remove(AId);
-  else if (FSaveRequests.contains(AId))
-    FSaveRequests.remove(AId);
-  else if (FActiveRequests.contains(AId))
-    FActiveRequests.remove(AId);
-  else if (FDefaultRequests.contains(AId))
-    FDefaultRequests.remove(AId);
-  else if (FRemoveRequests.contains(AId))
-    FRemoveRequests.remove(AId);
+  if (FLoadRequests.contains(AStanzaId))
+    FLoadRequests.remove(AStanzaId);
+  else if (FSaveRequests.contains(AStanzaId))
+    FSaveRequests.remove(AStanzaId);
+  else if (FActiveRequests.contains(AStanzaId))
+    FActiveRequests.remove(AStanzaId);
+  else if (FDefaultRequests.contains(AStanzaId))
+    FDefaultRequests.remove(AStanzaId);
+  else if (FRemoveRequests.contains(AStanzaId))
+    FRemoveRequests.remove(AStanzaId);
 
-  foreach(Jid streamJid, FStreamRequests.keys())
-    FStreamRequests[streamJid].removeAt(FStreamRequests[streamJid].indexOf(AId));
+  FStreamRequests[AStreamJid].removeAt(FStreamRequests[AStreamJid].indexOf(AStanzaId));
 
-  emit requestFailed(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
+  emit requestFailed(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
 }
 
 bool PrivacyLists::isReady(const Jid &AStreamJid) const
@@ -618,7 +617,7 @@ QString PrivacyLists::setActiveList(const Jid &AStreamJid, const QString &AList)
       activeElem.setAttribute("name",AList);
 
     emit activeListAboutToBeChanged(AStreamJid,AList);
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,set,PRIVACY_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,set,PRIVACY_TIMEOUT))
     {
       FStreamRequests[AStreamJid].prepend(set.id());
       FActiveRequests.insert(set.id(),AList);
@@ -651,7 +650,7 @@ QString PrivacyLists::setDefaultList(const Jid &AStreamJid, const QString &AList
     QDomElement defaultElem = queryElem.appendChild(set.createElement("default")).toElement();
     if (!AList.isEmpty())
       defaultElem.setAttribute("name",AList);
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,set,PRIVACY_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,set,PRIVACY_TIMEOUT))
     {
       FStreamRequests[AStreamJid].prepend(set.id());
       FDefaultRequests.insert(set.id(),AList);
@@ -705,7 +704,7 @@ QString PrivacyLists::loadPrivacyList(const Jid &AStreamJid, const QString &ALis
     load.setType("get").setId(FStanzaProcessor->newId());
     QDomElement elem = load.addElement("query",NS_JABBER_PRIVACY);
     elem.appendChild(load.createElement("list")).toElement().setAttribute("name",AList);
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,load,PRIVACY_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,PRIVACY_TIMEOUT))
     {
       FStreamRequests[AStreamJid].prepend(load.id());
       FLoadRequests.insert(load.id(),AList);
@@ -750,7 +749,7 @@ QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList 
       }
 
       emit listAboutToBeChanged(AStreamJid,AList);
-      if (FStanzaProcessor->sendIqStanza(this,AStreamJid,save,PRIVACY_TIMEOUT))
+      if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,PRIVACY_TIMEOUT))
       {
         FStreamRequests[AStreamJid].prepend(save.id());
         FSaveRequests.insert(save.id(),AList);
@@ -771,7 +770,7 @@ QString PrivacyLists::removePrivacyList(const Jid &AStreamJid, const QString &AL
     remove.setType("set").setId(FStanzaProcessor->newId());
     QDomElement queryElem = remove.addElement("query",NS_JABBER_PRIVACY);
     queryElem.appendChild(remove.createElement("list")).toElement().setAttribute("name",AList);
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,remove,PRIVACY_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,PRIVACY_TIMEOUT))
     {
       FStreamRequests[AStreamJid].prepend(remove.id());
       FRemoveRequests.insert(remove.id(),AList);
@@ -804,7 +803,7 @@ QString PrivacyLists::loadPrivacyLists(const Jid &AStreamJid)
     Stanza load("iq");
     load.setType("get").setId(FStanzaProcessor->newId());
     load.addElement("query",NS_JABBER_PRIVACY);
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,load,PRIVACY_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,PRIVACY_TIMEOUT))
     {
       FLoadRequests.insert(load.id(),"");
       return load.id();
@@ -1190,14 +1189,22 @@ void PrivacyLists::onStreamOpened(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor)
   {
-    int handler = FStanzaProcessor->insertHandler(this,SHC_PRIVACY,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
-    FSHIPrivacy.insert(AXmppStream->jid(),handler);
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.streamJid = AXmppStream->jid();
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_ROSTER,IStanzaProcessor::DirectionIn,SHP_DEFAULT-1,AXmppStream->jid());
-    FSHIRosterIn.insert(AXmppStream->jid(),handler);
+    shandle.conditions.append(SHC_PRIVACY);
+    FSHIPrivacy.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_ROSTER,IStanzaProcessor::DirectionOut,SHP_DEFAULT-1,AXmppStream->jid());
-    FSHIRosterOut.insert(AXmppStream->jid(),handler);
+    shandle.priority = SHP_DEFAULT-1;
+    shandle.conditions.clear();
+    shandle.conditions.append(SHC_ROSTER);
+    FSHIRosterIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
+
+    shandle.direction = IStanzaHandle::DirectionOut;
+    FSHIRosterOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
     loadPrivacyLists(AXmppStream->jid());
   }
@@ -1219,9 +1226,9 @@ void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
 
   if (FStanzaProcessor)
   {
-    FStanzaProcessor->removeHandler(FSHIPrivacy.take(AXmppStream->jid()));
-    FStanzaProcessor->removeHandler(FSHIRosterIn.take(AXmppStream->jid()));
-    FStanzaProcessor->removeHandler(FSHIRosterOut.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPrivacy.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIRosterIn.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIRosterOut.take(AXmppStream->jid()));
   }
 }
 

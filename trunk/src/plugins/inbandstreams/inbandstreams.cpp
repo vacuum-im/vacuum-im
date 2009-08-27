@@ -74,12 +74,14 @@ IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &ASocketId, con
 
 void InBandStreams::loadSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS)
 {
-
+  Q_UNUSED(ASocket);
+  Q_UNUSED(ASettingsNS);
 }
 
 void InBandStreams::saveSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS)
 {
-
+  Q_UNUSED(ASocket);
+  Q_UNUSED(ASettingsNS);
 }
 
 Q_EXPORT_PLUGIN2(InBandStreamsPlugin, InBandStreams);

@@ -190,11 +190,11 @@ bool ServiceDiscovery::startPlugin()
   return true;
 }
 
-bool ServiceDiscovery::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &/*AAccept*/)
+bool ServiceDiscovery::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &/*AAccept*/)
 {
   if (FSHIPresenceOut.value(AStreamJid)==AHandlerId && !FMyCaps.value(AStreamJid).ver.isEmpty())
   {
-    QDomElement capsElem = AStanza->addElement("c",NS_CAPS);
+    QDomElement capsElem = AStanza.addElement("c",NS_CAPS);
     capsElem.setAttribute("node",FMyCaps.value(AStreamJid).node);
     capsElem.setAttribute("ver",FMyCaps.value(AStreamJid).ver);
     capsElem.setAttribute("hash",FMyCaps.value(AStreamJid).hash);
@@ -202,7 +202,7 @@ bool ServiceDiscovery::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza 
   return false;
 }
 
-bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   bool hooked = false;
   if (FSHIInfo.value(AStreamJid) == AHandlerId)
@@ -302,7 +302,7 @@ bool ServiceDiscovery::readStanza(int AHandlerId, const Jid &AStreamJid, const S
   return hooked;
 }
 
-void ServiceDiscovery::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void ServiceDiscovery::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (FInfoRequestsId.contains(AStanza.id()))
   {
@@ -321,12 +321,13 @@ void ServiceDiscovery::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza
   }
 }
 
-void ServiceDiscovery::iqStanzaTimeOut(const QString &AId)
+void ServiceDiscovery::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FInfoRequestsId.contains(AId))
+  Q_UNUSED(AStreamJid);
+  if (FInfoRequestsId.contains(AStanzaId))
   {
     IDiscoInfo dinfo;
-    QPair<Jid,QString> jidnode = FInfoRequestsId.take(AId);
+    QPair<Jid,QString> jidnode = FInfoRequestsId.take(AStanzaId);
     ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
     dinfo.contactJid = jidnode.first;
     dinfo.node = jidnode.second;
@@ -336,10 +337,10 @@ void ServiceDiscovery::iqStanzaTimeOut(const QString &AId)
     FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
     emit discoInfoReceived(dinfo);
   }
-  else if (FItemsRequestsId.contains(AId))
+  else if (FItemsRequestsId.contains(AStanzaId))
   {
     IDiscoItems ditems;
-    QPair<Jid,QString> jidnode = FItemsRequestsId.take(AId);
+    QPair<Jid,QString> jidnode = FItemsRequestsId.take(AStanzaId);
     ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
     ditems.contactJid = jidnode.first;
     ditems.node = jidnode.second;
@@ -645,7 +646,7 @@ bool ServiceDiscovery::requestDiscoInfo(const Jid &AStreamJid, const Jid &AConta
     QDomElement query =  iq.addElement("query",NS_DISCO_INFO);
     if (!ANode.isEmpty())
       query.setAttribute("node",ANode);
-    sended = FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,DISCO_TIMEOUT);
+    sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,DISCO_TIMEOUT);
     if (sended)
       FInfoRequestsId.insert(iq.id(),jidnode);
   }
@@ -708,7 +709,7 @@ bool ServiceDiscovery::requestDiscoItems(const Jid &AStreamJid, const Jid &ACont
     QDomElement query =  iq.addElement("query",NS_DISCO_ITEMS);
     if (!ANode.isEmpty())
       query.setAttribute("node",ANode);
-    sended = FStanzaProcessor->sendIqStanza(this,AStreamJid,iq,DISCO_TIMEOUT);
+    sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,DISCO_TIMEOUT);
     if (sended)
       FItemsRequestsId.insert(iq.id(),jidnode);
   }
@@ -1183,17 +1184,25 @@ void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
 
   if (FStanzaProcessor)
   {
-    int handler = FStanzaProcessor->insertHandler(this,SHC_DISCO_INFO,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
-    FSHIInfo.insert(AXmppStream->jid(),handler);
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.streamJid = AXmppStream->jid();
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_DISCO_ITEMS,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
-    FSHIItems.insert(AXmppStream->jid(),handler);
+    shandle.conditions.append(SHC_DISCO_INFO);
+    FSHIInfo.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
-    FSHIPresenceIn.insert(AXmppStream->jid(),handler);
+    shandle.conditions.clear();
+    shandle.conditions.append(SHC_DISCO_ITEMS);
+    FSHIItems.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionOut,SHP_DEFAULT,AXmppStream->jid());
-    FSHIPresenceOut.insert(AXmppStream->jid(),handler);
+    shandle.conditions.clear();
+    shandle.conditions.append(SHC_PRESENCE);
+    FSHIPresenceIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
+
+    shandle.direction = IStanzaHandle::DirectionOut;
+    FSHIPresenceOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
 }
 
@@ -1203,17 +1212,10 @@ void ServiceDiscovery::onStreamClosed(IXmppStream *AXmppStream)
 
   if (FStanzaProcessor)
   {
-    int handler = FSHIInfo.take(AXmppStream->jid());
-    FStanzaProcessor->removeHandler(handler);
-
-    handler = FSHIItems.take(AXmppStream->jid());
-    FStanzaProcessor->removeHandler(handler);
-
-    handler = FSHIPresenceIn.take(AXmppStream->jid());
-    FStanzaProcessor->removeHandler(handler);
-
-    handler = FSHIPresenceOut.take(AXmppStream->jid());
-    FStanzaProcessor->removeHandler(handler);
+    FStanzaProcessor->removeStanzaHandle(FSHIInfo.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIItems.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPresenceIn.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPresenceOut.take(AXmppStream->jid()));
   }
 }
 

@@ -29,12 +29,12 @@ class Avatars :
   public IPlugin,
   public IAvatars,
   public IStanzaHandler,
-  public IIqStanzaOwner,
+  public IStanzaRequestOwner,
   public IRosterIndexDataHolder,
   public IOptionsHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterIndexDataHolder IIqStanzaOwner IOptionsHolder);
+  Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterIndexDataHolder IStanzaRequestOwner IOptionsHolder);
 public:
   Avatars();
   ~Avatars();
@@ -47,11 +47,11 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
-  virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept);
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AId);
   //IRosterIndexDataHolder
   virtual int order() const;
   virtual QList<int> roles() const;

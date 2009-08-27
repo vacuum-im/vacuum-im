@@ -4,12 +4,12 @@
 <context>
     <name>StanzaProcessor</name>
     <message>
-        <source>Managing stanza handlers</source>
-        <translation>Управление дескрипторами XML-транзакций</translation>
-    </message>
-    <message>
         <source>Stanza Processor</source>
         <translation>Процессор XML-транзакций</translation>
+    </message>
+    <message>
+        <source>Managing XMPP stanzas</source>
+        <translation>Управляет XMPP станзами</translation>
     </message>
 </context>
 </TS>

@@ -12,10 +12,10 @@ class PrivateStorage :
   public QObject,
   public IPlugin,
   public IPrivateStorage,
-  public IIqStanzaOwner
+  public IStanzaRequestOwner
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IPrivateStorage IIqStanzaOwner);
+  Q_INTERFACES(IPlugin IPrivateStorage IStanzaRequestOwner);
 public:
   PrivateStorage();
   ~PrivateStorage();
@@ -27,9 +27,9 @@ public:
   virtual bool initObjects() { return true; }
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IPrivateStorage
   virtual bool hasData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) const;
   virtual QDomElement getData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) const;

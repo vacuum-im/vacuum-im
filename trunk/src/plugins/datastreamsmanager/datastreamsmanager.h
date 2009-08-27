@@ -26,10 +26,10 @@ class DataStreamsManger :
   public IPlugin,
   public IDataStreamsManager,
   public IStanzaHandler,
-  public IIqStanzaOwner
+  public IStanzaRequestOwner
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IDataStreamsManager IStanzaHandler IIqStanzaOwner);
+  Q_INTERFACES(IPlugin IDataStreamsManager IStanzaHandler IStanzaRequestOwner);
 public:
   DataStreamsManger();
   ~DataStreamsManger();
@@ -42,11 +42,11 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
-  virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept);
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStreamId);
   //IDataStreamInitiator
   virtual QList<QString> methods() const;
   virtual IDataStreamMethod *method(const QString &AMethodNS) const;

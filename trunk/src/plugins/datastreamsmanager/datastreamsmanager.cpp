@@ -69,7 +69,12 @@ bool DataStreamsManger::initObjects()
 {
   if (FStanzaProcessor)
   {
-    FSHIInitStream = FStanzaProcessor->insertHandler(this,SHC_INIT_STREAM,IStanzaProcessor::DirectionIn,SHP_DEFAULT);
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.conditions.append(SHC_INIT_STREAM);
+    FSHIInitStream = FStanzaProcessor->insertStanzaHandle(shandle);
   }
 
   if (FDiscovery)
@@ -90,7 +95,7 @@ bool DataStreamsManger::initObjects()
   return true;
 }
 
-bool DataStreamsManger::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &AAccept)
+bool DataStreamsManger::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
   Q_UNUSED(AHandlerId);
   Q_UNUSED(AStreamJid);
@@ -99,7 +104,7 @@ bool DataStreamsManger::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza
   return false;
 }
 
-bool DataStreamsManger::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool DataStreamsManger::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   if (FDataForms && AHandlerId==FSHIInitStream)
   {
@@ -163,7 +168,7 @@ bool DataStreamsManger::readStanza(int AHandlerId, const Jid &AStreamJid, const 
   return false;
 }
 
-void DataStreamsManger::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
+void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 { 
   Q_UNUSED(AStreamJid);
   QString sid = streamIdByRequestId(AStanza.id());
@@ -199,9 +204,10 @@ void DataStreamsManger::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
   }
 }
 
-void DataStreamsManger::iqStanzaTimeOut(const QString &AId)
+void DataStreamsManger::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  QString sid = streamIdByRequestId(AId);
+  Q_UNUSED(AStreamJid);
+  QString sid = streamIdByRequestId(AStanzaId);
   if (FDataForms && FStreams.contains(sid))
   {
     FStreams.remove(sid);
@@ -300,7 +306,7 @@ bool DataStreamsManger::initStream(const Jid &AStreamJid, const Jid &AContactJid
         form.fields.append(field);
         QDomElement negElem = siElem.appendChild(request.createElement("feature",NS_FEATURENEG)).toElement();
         FDataForms->xmlForm(form,negElem);
-        if (FStanzaProcessor->sendIqStanza(this,AStreamJid,request,ATimeout))
+        if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,ATimeout))
         {
           StreamParams params;
           params.streamJid = AStreamJid;

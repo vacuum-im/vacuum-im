@@ -20,8 +20,8 @@ public:
   ~Presence();
   virtual QObject *instance() { return this; }
   //IStanzaProcessorHandler
-  virtual bool editStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza * /*AStanza*/, bool &/*AAccept*/) { return false; }
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza & /*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IPresence
   virtual const Jid &streamJid() const { return FXmppStream->jid(); }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
@@ -53,7 +53,7 @@ private:
   IStanzaProcessor *FStanzaProcessor;
 private:
   bool FOpened;
-  int FPresenceHandler;
+  int FSHIPresence;
   int FShow;
   int FPriority;
   QString FStatus;

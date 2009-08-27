@@ -211,11 +211,11 @@ bool MessageArchiver::initSettings()
   return true;
 }
 
-bool MessageArchiver::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &/*AAccept*/)
+bool MessageArchiver::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &/*AAccept*/)
 {
   if (FSHIMessageBlocks.value(AStreamJid) == AHandlerId)
   {
-    Jid contactJid = AStanza->to();
+    Jid contactJid = AStanza.to();
     IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid,contactJid);
     if (itemPrefs.otr==ARCHIVE_OTR_REQUIRE && !isOTRStanzaSession(AStreamJid,contactJid))
     {
@@ -230,7 +230,7 @@ bool MessageArchiver::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *
   return false;
 }
 
-bool MessageArchiver::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool MessageArchiver::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   if (FSHIMessageIn.value(AStreamJid) == AHandlerId)
   {
@@ -255,7 +255,7 @@ bool MessageArchiver::readStanza(int AHandlerId, const Jid &AStreamJid, const St
   return false;
 }
 
-void MessageArchiver::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
+void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
   if (FPrefsLoadRequests.contains(AStanza.id()))
   {
@@ -425,54 +425,53 @@ void MessageArchiver::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
     emit requestFailed(AStanza.id(),ErrorHandler(AStanza.element()).message());
 }
 
-void MessageArchiver::iqStanzaTimeOut(const QString &AId)
+void MessageArchiver::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FPrefsLoadRequests.contains(AId))
+  if (FPrefsLoadRequests.contains(AStanzaId))
   {
-    Jid streamJid = FPrefsLoadRequests.take(AId);
-    applyArchivePrefs(streamJid,QDomElement());
+    FPrefsLoadRequests.remove(AStanzaId);
+    applyArchivePrefs(AStreamJid,QDomElement());
   }
-  else if (FPrefsSaveRequests.contains(AId))
+  else if (FPrefsSaveRequests.contains(AStanzaId))
   {
-    Jid streamJid = FPrefsSaveRequests.take(AId);
-    FPrefsSaveRequests.remove(AId);
-    cancelSuspendedStanzaSession(streamJid,AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
+    FPrefsSaveRequests.remove(AStanzaId);
+    cancelSuspendedStanzaSession(AStreamJid,AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
-  else if (FPrefsAutoRequests.contains(AId))
+  else if (FPrefsAutoRequests.contains(AStanzaId))
   {
-    FPrefsAutoRequests.remove(AId);
+    FPrefsAutoRequests.remove(AStanzaId);
   }
-  else if (FPrefsAutoRequests.contains(AId))
+  else if (FPrefsAutoRequests.contains(AStanzaId))
   {
-    FPrefsRemoveRequests.remove(AId);
+    FPrefsRemoveRequests.remove(AStanzaId);
   }
-  else if (FSaveRequests.contains(AId))
+  else if (FSaveRequests.contains(AStanzaId))
   {
-    FSaveRequests.remove(AId);
+    FSaveRequests.remove(AStanzaId);
   }
-  else if (FRetrieveRequests.contains(AId))
+  else if (FRetrieveRequests.contains(AStanzaId))
   {
-    FRetrieveRequests.remove(AId);
+    FRetrieveRequests.remove(AStanzaId);
   }
-  else if (FListRequests.contains(AId))
+  else if (FListRequests.contains(AStanzaId))
   {
-    FListRequests.remove(AId);
+    FListRequests.remove(AStanzaId);
   }
-  else if (FRemoveRequests.contains(AId))
+  else if (FRemoveRequests.contains(AStanzaId))
   {
-    FRemoveRequests.remove(AId);
+    FRemoveRequests.remove(AStanzaId);
   }
-  else if (FModifyRequests.contains(AId))
+  else if (FModifyRequests.contains(AStanzaId))
   {
-    FModifyRequests.remove(AId);
-  }
-
-  if (FRestoreRequests.contains(AId))
-  {
-    FRestoreRequests.remove(AId);
+    FModifyRequests.remove(AStanzaId);
   }
 
-  emit requestFailed(AId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
+  if (FRestoreRequests.contains(AStanzaId))
+  {
+    FRestoreRequests.remove(AStanzaId);
+  }
+
+  emit requestFailed(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
 }
 
 QWidget *MessageArchiver::optionsWidget(const QString &ANode, int &AOrder)
@@ -868,7 +867,7 @@ QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto)
     autoSave.setType("set").setId(FStanzaProcessor->newId());
     QDomElement autoElem = autoSave.addElement("auto",FNamespaces.value(AStreamJid));
     autoElem.setAttribute("save",QVariant(AAuto).toString());
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,autoSave,ARCHIVE_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,autoSave,ARCHIVE_TIMEOUT))
     {
       FPrefsAutoRequests.insert(autoSave.id(),AAuto);
       return autoSave.id();
@@ -977,7 +976,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
       QString requestId;
       if (storage)
         requestId = FPrivateStorage!=NULL ? FPrivateStorage->saveData(AStreamJid,prefElem) : QString::null;
-      else if (FStanzaProcessor->sendIqStanza(this,AStreamJid,save,ARCHIVE_TIMEOUT))
+      else if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,ARCHIVE_TIMEOUT))
         requestId = save.id();
       if (!requestId.isEmpty())
       {
@@ -999,7 +998,7 @@ QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid
       remove.setType("set").setId(FStanzaProcessor->newId());
       QDomElement itemElem = remove.addElement("itemremove",FNamespaces.value(AStreamJid)).appendChild(remove.createElement("item")).toElement();
       itemElem.setAttribute("jid",AItemJid.eFull());
-      if (FStanzaProcessor->sendIqStanza(this,AStreamJid,remove,ARCHIVE_TIMEOUT))
+      if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,ARCHIVE_TIMEOUT))
       {
         FPrefsRemoveRequests.insert(remove.id(),AItemJid);
         return remove.id();
@@ -1331,7 +1330,7 @@ QString MessageArchiver::saveServerCollection(const Jid &AStreamJid, const IArch
     save.setType("set").setId(FStanzaProcessor->newId());
     QDomElement chatElem = save.addElement("save",FNamespaces.value(AStreamJid)).appendChild(save.createElement("chat")).toElement();
     collectionToElement(ACollection, chatElem, archiveItemPrefs(AStreamJid,ACollection.header.with).save);
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,save,ARCHIVE_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,ARCHIVE_TIMEOUT))
     {
       FSaveRequests.insert(save.id(),ACollection.header);
       return save.id();
@@ -1357,7 +1356,7 @@ QString MessageArchiver::loadServerHeaders(const Jid AStreamJid, const IArchiveR
     setElem.appendChild(request.createElement("max")).appendChild(request.createTextNode(QString::number(RESULTSET_MAX)));
     if (!AAfter.isEmpty())
       setElem.appendChild(request.createElement("after")).appendChild(request.createTextNode(AAfter));
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,request,ARCHIVE_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,ARCHIVE_TIMEOUT))
     {
       FListRequests.insert(request.id(),ARequest);
       return request.id();
@@ -1379,7 +1378,7 @@ QString MessageArchiver::loadServerCollection(const Jid AStreamJid, const IArchi
     setElem.appendChild(retrieve.createElement("max")).appendChild(retrieve.createTextNode(QString::number(RESULTSET_MAX)));
     if (!AAfter.isEmpty())
       setElem.appendChild(retrieve.createElement("after")).appendChild(retrieve.createTextNode(AAfter));
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,retrieve,ARCHIVE_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,retrieve,ARCHIVE_TIMEOUT))
     {
       FRetrieveRequests.insert(retrieve.id(),AHeader);
       return retrieve.id();
@@ -1403,7 +1402,7 @@ QString MessageArchiver::removeServerCollections(const Jid &AStreamJid, const IA
       removeElem.setAttribute("end",DateTime(ARequest.end).toX85UTC());
     if (AOpened)
       removeElem.setAttribute("open",QVariant(AOpened).toString());
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,remove,ARCHIVE_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,ARCHIVE_TIMEOUT))
     {
       FRemoveRequests.insert(remove.id(),ARequest);
       return remove.id();
@@ -1424,7 +1423,7 @@ QString MessageArchiver::loadServerModifications(const Jid &AStreamJid, const QD
     setElem.appendChild(modify.createElement("max")).appendChild(modify.createTextNode(QString::number(ACount)));
     if (!AAfter.isEmpty())
       setElem.appendChild(modify.createElement("after")).appendChild(modify.createTextNode(AAfter));
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,modify,ARCHIVE_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,modify,ARCHIVE_TIMEOUT))
     {
       if (AAfter.isEmpty())
         FModifyRequests.insert(modify.id(),AStart.toUTC());
@@ -1443,7 +1442,7 @@ QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
     Stanza load("iq");
     load.setType("get").setId(FStanzaProcessor->newId());
     load.addElement("pref",FNamespaces.value(AStreamJid));
-    if (FStanzaProcessor->sendIqStanza(this,AStreamJid,load,ARCHIVE_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,ARCHIVE_TIMEOUT))
     {
       FPrefsLoadRequests.insert(load.id(),AStreamJid);
       return load.id();
@@ -2493,17 +2492,24 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor)
   {
-    int handler = FStanzaProcessor->insertHandler(this,SHC_PREFS,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
-    FSHIPrefs.insert(AXmppStream->jid(),handler);
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.streamJid = AXmppStream->jid();
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
-    FSHIMessageIn.insert(AXmppStream->jid(),handler);
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.conditions.append(SHC_PREFS);
+    FSHIPrefs.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionOut,SHP_DEFAULT,AXmppStream->jid());
-    FSHIMessageOut.insert(AXmppStream->jid(),handler);
+    shandle.conditions.clear();
+    shandle.conditions.append(SHC_MESSAGE_BODY);
+    FSHIMessageIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    handler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE_BODY,IStanzaProcessor::DirectionOut,SHP_ARCHIVER_SESSION,AXmppStream->jid());
-    FSHIMessageBlocks.insert(AXmppStream->jid(),handler);
+    shandle.direction = IStanzaHandle::DirectionOut;
+    FSHIMessageOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
+
+    shandle.priority = SHP_ARCHIVER_SESSION;
+    FSHIMessageBlocks.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
   
   FNamespaces.insert(AXmppStream->jid(),NS_ARCHIVE);
@@ -2518,14 +2524,9 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 
   if (FStanzaProcessor)
   {
-    int handler = FSHIPrefs.take(AXmppStream->jid());
-    FStanzaProcessor->removeHandler(handler);
-
-    handler = FSHIMessageIn.take(AXmppStream->jid());
-    FStanzaProcessor->removeHandler(handler);
-
-    handler = FSHIMessageOut.take(AXmppStream->jid());
-    FStanzaProcessor->removeHandler(handler);
+    FStanzaProcessor->removeStanzaHandle(FSHIPrefs.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIMessageIn.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIMessageOut.take(AXmppStream->jid()));
   }
 
   removeReplicator(AXmppStream->jid());

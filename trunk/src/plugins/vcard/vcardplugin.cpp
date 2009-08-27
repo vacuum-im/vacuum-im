@@ -93,7 +93,7 @@ bool VCardPlugin::initObjects()
   return true;
 }
 
-void VCardPlugin::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void VCardPlugin::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (FVCardRequestId.contains(AStanza.id()))
   {
@@ -127,18 +127,19 @@ void VCardPlugin::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
   }
 }
 
-void VCardPlugin::iqStanzaTimeOut(const QString &AId)
+void VCardPlugin::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FVCardRequestId.contains(AId))
+  Q_UNUSED(AStreamJid);
+  if (FVCardRequestId.contains(AStanzaId))
   {
     ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-    emit vcardError(FVCardRequestId.take(AId),err.message());
+    emit vcardError(FVCardRequestId.take(AStanzaId),err.message());
   }
-  else if (FVCardPublishId.contains(AId))
+  else if (FVCardPublishId.contains(AStanzaId))
   {
-    FVCardPublishStanza.remove(AId);
+    FVCardPublishStanza.remove(AStanzaId);
     ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-    emit vcardError(FVCardPublishId.take(AId),err.message());
+    emit vcardError(FVCardPublishId.take(AStanzaId),err.message());
   }
 }
 
@@ -178,7 +179,7 @@ bool VCardPlugin::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
       Stanza request("iq");
       request.setTo(AContactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
       request.addElement(VCARD_TAGNAME,NS_VCARD_TEMP);
-      if (FStanzaProcessor->sendIqStanza(this,AStreamJid,request,VCARD_TIMEOUT))
+      if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,VCARD_TIMEOUT))
       {
         FVCardRequestId.insert(request.id(),AContactJid);
         return true;
@@ -200,7 +201,7 @@ bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
       publish.setTo(AStreamJid.eBare()).setType("set").setId(FStanzaProcessor->newId());
       QDomElement elem = publish.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
       removeEmptyChildElements(elem);
-      if (FStanzaProcessor->sendIqStanza(this,AStreamJid,publish,VCARD_TIMEOUT))
+      if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,publish,VCARD_TIMEOUT))
       {
         FVCardPublishId.insert(publish.id(),AStreamJid.pBare());
         FVCardPublishStanza.insert(publish.id(),publish);

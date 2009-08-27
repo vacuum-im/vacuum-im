@@ -18,12 +18,12 @@ class JabberSearch :
   public QObject,
   public IPlugin,
   public IJabberSearch,
-  public IIqStanzaOwner,
+  public IStanzaRequestOwner,
   public IDiscoFeatureHandler,
   public IDataLocalizer
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IJabberSearch IIqStanzaOwner IDiscoFeatureHandler IDataLocalizer);
+  Q_INTERFACES(IPlugin IJabberSearch IStanzaRequestOwner IDiscoFeatureHandler IDataLocalizer);
 public:
   JabberSearch();
   ~JabberSearch();
@@ -35,9 +35,9 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);

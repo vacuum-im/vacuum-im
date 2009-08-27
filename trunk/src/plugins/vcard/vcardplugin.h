@@ -24,10 +24,10 @@ class VCardPlugin :
   public QObject,
   public IPlugin,
   public IVCardPlugin,
-  public IIqStanzaOwner
+  public IStanzaRequestOwner
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IVCardPlugin IIqStanzaOwner);
+  Q_INTERFACES(IPlugin IVCardPlugin IStanzaRequestOwner);
   friend class VCard;
 public:
   VCardPlugin();
@@ -40,9 +40,9 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin()  { return true; }
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IVCardPlugin
   virtual QString vcardFileName(const Jid &AContactJid) const;
   virtual bool hasVCard(const Jid &AContactJid) const;

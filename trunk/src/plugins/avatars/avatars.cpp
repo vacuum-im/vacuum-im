@@ -141,28 +141,28 @@ bool Avatars::initObjects()
   return true;
 }
 
-bool Avatars::editStanza(int AHandlerId, const Jid &AStreamJid, Stanza *AStanza, bool &/*AAccept*/)
+bool Avatars::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &/*AAccept*/)
 {
   if (FSHIPresenceOut.value(AStreamJid) == AHandlerId)
   {
-    QDomElement vcardUpdate = AStanza->addElement("x",NS_VCARD_UPDATE);
+    QDomElement vcardUpdate = AStanza.addElement("x",NS_VCARD_UPDATE);
     if (!FStreamAvatars.value(AStreamJid).isNull())
     {
-      QDomElement photoElem = vcardUpdate.appendChild(AStanza->createElement("photo")).toElement();
-      photoElem.appendChild(AStanza->createTextNode(FStreamAvatars.value(AStreamJid)));
+      QDomElement photoElem = vcardUpdate.appendChild(AStanza.createElement("photo")).toElement();
+      photoElem.appendChild(AStanza.createTextNode(FStreamAvatars.value(AStreamJid)));
     }
 
     if (!FStreamAvatars.value(AStreamJid).isEmpty())
     {
-      QDomElement iqUpdate = AStanza->addElement("x",NS_JABBER_X_AVATAR);
-      QDomElement hashElem = iqUpdate.appendChild(AStanza->createElement("hash")).toElement();
-      hashElem.appendChild(AStanza->createTextNode(FStreamAvatars.value(AStreamJid)));
+      QDomElement iqUpdate = AStanza.addElement("x",NS_JABBER_X_AVATAR);
+      QDomElement hashElem = iqUpdate.appendChild(AStanza.createElement("hash")).toElement();
+      hashElem.appendChild(AStanza.createTextNode(FStreamAvatars.value(AStreamJid)));
     }
   }
   return false;
 }
 
-bool Avatars::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool Avatars::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   if (FSHIPresenceIn.value(AStreamJid)==AHandlerId && AStanza.type().isEmpty())
   {
@@ -185,7 +185,7 @@ bool Avatars::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AS
           Stanza query("iq");
           query.setTo(contactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
           query.addElement("query",NS_JABBER_IQ_AVATAR);
-          if (FStanzaProcessor->sendIqStanza(this,AStreamJid,query,AVATAR_IQ_TIMEOUT))
+          if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,query,AVATAR_IQ_TIMEOUT))
             FIqAvatarRequests.insert(query.id(),contactJid);
           else
             FIqAvatars.remove(contactJid);
@@ -214,7 +214,7 @@ bool Avatars::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AS
   return false;
 }
 
-void Avatars::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void Avatars::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (FIqAvatarRequests.contains(AStanza.id()))
   {
@@ -236,11 +236,12 @@ void Avatars::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
   }
 }
 
-void Avatars::iqStanzaTimeOut(const QString &AId)
+void Avatars::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FIqAvatarRequests.contains(AId))
+  Q_UNUSED(AStreamJid);
+  if (FIqAvatarRequests.contains(AStanzaId))
   {
-    Jid contactJid = FIqAvatars.take(AId);
+    Jid contactJid = FIqAvatars.take(AStanzaId);
     FIqAvatars.remove(contactJid);
   }
 }
@@ -542,16 +543,26 @@ void Avatars::onStreamOpened(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && FVCardPlugin)
   {
-    int handlerId = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionIn,SHP_AVATARS_PRESENCE,AXmppStream->jid());
-    FSHIPresenceIn.insert(AXmppStream->jid(),handlerId);
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.streamJid = AXmppStream->jid();
+    
+    shandle.priority = SHP_AVATARS_PRESENCE;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.conditions.append(SHC_PRESENCE);
+    FSHIPresenceIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    handlerId = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionOut,SHP_DEFAULT,AXmppStream->jid());
-    FSHIPresenceOut.insert(AXmppStream->jid(),handlerId);
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionOut;
+    FSHIPresenceOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    handlerId = FStanzaProcessor->insertHandler(this,SHC_IQ_AVATAR,IStanzaProcessor::DirectionIn,SHP_DEFAULT,AXmppStream->jid());
-    FSHIIqAvatarIn.insert(AXmppStream->jid(),handlerId);
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.conditions.clear();
+    shandle.conditions.append(SHC_IQ_AVATAR);
+    FSHIIqAvatarIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
-  FStreamAvatars.insert(AXmppStream->jid(),QString());
+  FStreamAvatars.insert(AXmppStream->jid(),QString::null);
 
   if (FVCardPlugin)
   {
@@ -563,9 +574,9 @@ void Avatars::onStreamClosed(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && FVCardPlugin)
   {
-    FStanzaProcessor->removeHandler(FSHIPresenceIn.take(AXmppStream->jid()));
-    FStanzaProcessor->removeHandler(FSHIPresenceOut.take(AXmppStream->jid()));
-    FStanzaProcessor->removeHandler(FSHIIqAvatarIn.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPresenceIn.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPresenceOut.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIIqAvatarIn.take(AXmppStream->jid()));
   }
   FStreamAvatars.remove(AXmppStream->jid());
 }

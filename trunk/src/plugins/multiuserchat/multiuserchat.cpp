@@ -18,8 +18,8 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 
   FChangingState = false;
   FAutoPresence = false;
-  FPresenceHandler = -1;
-  FMessageHandler = -1;
+  FSHIPresence = -1;
+  FSHIMessage = -1;
 
   FChatPlugin = AChatPlugin;
   FRoomJid = ARoomJid;
@@ -38,24 +38,24 @@ MultiUserChat::~MultiUserChat()
   
   if (FStanzaProcessor)
   {
-    FStanzaProcessor->removeHandler(FPresenceHandler);
-    FStanzaProcessor->removeHandler(FMessageHandler);
+    FStanzaProcessor->removeStanzaHandle(FSHIPresence);
+    FStanzaProcessor->removeStanzaHandle(FSHIMessage);
   }
   emit chatDestroyed();
 }
 
-bool MultiUserChat::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool MultiUserChat::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   Jid fromJid = AStanza.from();
   Jid toJid = AStanza.to();
   if ( (fromJid && FRoomJid) && (AStreamJid == FStreamJid) )
   {
     AAccept = true;
-    if (AHandlerId == FPresenceHandler)
+    if (AHandlerId == FSHIPresence)
     {
       return processPresence(AStanza);
     }
-    else if (AHandlerId == FMessageHandler)
+    else if (AHandlerId == FSHIMessage)
     {
       return processMessage(AStanza);
     }
@@ -63,7 +63,7 @@ bool MultiUserChat::readStanza(int AHandlerId, const Jid &AStreamJid, const Stan
   return false;
 }
 
-void MultiUserChat::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void MultiUserChat::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
 {
   if (AStanza.id()==FConfigRequestId && FRoomJid==AStanza.from())
   {
@@ -145,33 +145,34 @@ void MultiUserChat::iqStanza(const Jid &/*AStreamJid*/, const Stanza &AStanza)
   }
 }
 
-void MultiUserChat::iqStanzaTimeOut(const QString &AId)
+void MultiUserChat::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (AId == FConfigRequestId)
+  Q_UNUSED(AStreamJid);
+  if (AStanzaId == FConfigRequestId)
   {
     ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
     emit chatError("",err.message());
     FConfigRequestId.clear();
   }
-  else if (AId == FConfigSubmitId)
+  else if (AStanzaId == FConfigSubmitId)
   {
     ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
     emit chatError("",err.message());
     FConfigRequestId.clear();
   }
-  else if (FAffilListRequests.contains(AId))
+  else if (FAffilListRequests.contains(AStanzaId))
   {
-    QString affiliation = FAffilListRequests.take(AId);
+    QString affiliation = FAffilListRequests.take(AStanzaId);
     ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
     emit chatError("",tr("Request for list of %1s is failed: %2").arg(affiliation).arg(err.message()));
-    FAffilListRequests.remove(AId);
+    FAffilListRequests.remove(AStanzaId);
   }
-  else if (FAffilListSubmits.contains(AId))
+  else if (FAffilListSubmits.contains(AStanzaId))
   {
-    QString affiliation = FAffilListSubmits.take(AId);
+    QString affiliation = FAffilListSubmits.take(AStanzaId);
     ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
     emit chatError("",tr("Changes in list of %1s may not be accepted: %2").arg(affiliation).arg(err.message()));
-    FAffilListRequests.remove(AId);
+    FAffilListRequests.remove(AStanzaId);
   }
 }
 
@@ -369,7 +370,7 @@ void MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
     if (FMessageProcessor)
       submited = FMessageProcessor->sendMessage(FStreamJid,message);
     else if (FStanzaProcessor)
-      submited = FStanzaProcessor->sendIqStanza(this,FStreamJid,message.stanza(),0);
+      submited = FStanzaProcessor->sendStanzaRequest(this,FStreamJid,message.stanza(),0);
     if (submited)
       emit dataFormMessageSent(AForm);
   }
@@ -389,7 +390,7 @@ void MultiUserChat::setRole(const QString &ANick, const QString &ARole, const QS
       itemElem.setAttribute("jid",user->data(MUDR_REAL_JID).toString());
     if (!AReason.isEmpty())
       itemElem.appendChild(role.createElement("reason")).appendChild(role.createTextNode(AReason));
-    FStanzaProcessor->sendIqStanza(this,FStreamJid,role,0);
+    FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
   }
 }
 
@@ -407,7 +408,7 @@ void MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffilia
       itemElem.setAttribute("jid",user->data(MUDR_REAL_JID).toString());
     if (!AReason.isEmpty())
       itemElem.appendChild(role.createElement("reason")).appendChild(role.createTextNode(AReason));
-    FStanzaProcessor->sendIqStanza(this,FStreamJid,role,0);
+    FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
   }
 }
 
@@ -421,7 +422,7 @@ bool MultiUserChat::requestAffiliationList(const QString &AAffiliation)
     iq.setTo(FRoomJid.eBare()).setType("get").setId(FStanzaProcessor->newId());
     QDomElement itemElem = iq.addElement("query",NS_MUC_ADMIN).appendChild(iq.createElement("item")).toElement();
     itemElem.setAttribute("affiliation",AAffiliation);
-    if (FStanzaProcessor->sendIqStanza(this,FStreamJid,iq,MUC_LIST_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,iq,MUC_LIST_TIMEOUT))
     {
       FAffilListRequests.insert(iq.id(),AAffiliation);
       return true;
@@ -447,7 +448,7 @@ bool MultiUserChat::changeAffiliationList(const QList<IMultiUserListItem> &ADelt
       if (!listItem.notes.isEmpty())
         itemElem.appendChild(iq.createElement("reason")).appendChild(iq.createTextNode(listItem.notes));
     }
-    if (FStanzaProcessor->sendIqStanza(this,FStreamJid,iq,MUC_LIST_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,iq,MUC_LIST_TIMEOUT))
     {
       emit affiliationListChanged(ADeltaList);
       FAffilListSubmits.insert(iq.id(),ADeltaList.value(0).affiliation);
@@ -468,7 +469,7 @@ bool MultiUserChat::requestConfigForm()
     Stanza iq("iq");
     iq.setTo(FRoomJid.eBare()).setType("get").setId(FStanzaProcessor->newId());
     iq.addElement("query",NS_MUC_OWNER);
-    if (FStanzaProcessor->sendIqStanza(this,FStreamJid,iq,MUC_IQ_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,iq,MUC_IQ_TIMEOUT))
     {
       FConfigRequestId = iq.id();
       return true;
@@ -490,7 +491,7 @@ bool MultiUserChat::sendConfigForm(const IDataForm &AForm)
     iq.setTo(FRoomJid.eBare()).setType("set").setId(FStanzaProcessor->newId());
     QDomElement queryElem = iq.addElement("query",NS_MUC_OWNER).toElement();
     FDataForms->xmlForm(AForm,queryElem);
-    if (FStanzaProcessor->sendIqStanza(this,FStreamJid,iq,MUC_IQ_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,iq,MUC_IQ_TIMEOUT))
     {
       FConfigSubmitId = iq.id();
       emit configFormSent(AForm);
@@ -511,7 +512,7 @@ bool MultiUserChat::destroyRoom(const QString &AReason)
     destroyElem.setAttribute("jid",FRoomJid.eBare());
     if (!AReason.isEmpty())
       destroyElem.appendChild(iq.createElement("reason")).appendChild(iq.createTextNode(AReason));
-    if (FStanzaProcessor->sendIqStanza(this,FStreamJid,iq,MUC_IQ_TIMEOUT))
+    if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,iq,MUC_IQ_TIMEOUT))
     {
       emit chatNotify("",tr("Room destruction request was sent."));
       return true;
@@ -750,9 +751,20 @@ void MultiUserChat::initialize()
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
     if (FStanzaProcessor)
     {
-      FPresenceHandler = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionIn,SHP_MULTIUSERCHAT,FStreamJid);
+      IStanzaHandle shandle;
+      shandle.handler = this;
+      shandle.priority = SHP_MULTIUSERCHAT;
+      shandle.direction = IStanzaHandle::DirectionIn;
+      shandle.streamJid = FStreamJid;
+      shandle.conditions.append(SHC_PRESENCE);
+      FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
+
       if (FMessageProcessor == NULL)
-        FMessageHandler = FStanzaProcessor->insertHandler(this,SHC_MESSAGE,IStanzaProcessor::DirectionIn,SHP_MULTIUSERCHAT,FStreamJid);
+      {
+        shandle.conditions.clear();
+        shandle.conditions.append(SHC_MESSAGE);
+        FSHIMessage = FStanzaProcessor->insertStanzaHandle(shandle);
+      }
     }
   }
 

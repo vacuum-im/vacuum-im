@@ -100,9 +100,9 @@ bool Commands::initObjects()
   return true;
 }
 
-bool Commands::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
-  if (FStanzaHandlers.contains(AHandlerId))
+  if (FSHICommands.contains(AHandlerId))
   {
     ICommandRequest request;
     request.streamJid = AStreamJid;
@@ -134,7 +134,7 @@ bool Commands::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &A
   return false;
 }
 
-void Commands::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
+void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
   if (FRequests.contains(AStanza.id()))
   {
@@ -198,12 +198,13 @@ void Commands::iqStanza(const Jid &AStreamJid, const Stanza &AStanza)
   }
 }
 
-void Commands::iqStanzaTimeOut(const QString &AId)
+void Commands::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
 {
-  if (FRequests.contains(AId))
+  Q_UNUSED(AStreamJid);
+  if (FRequests.contains(AStanzaId))
   {
     ICommandError error;
-    error.stanzaId = AId;
+    error.stanzaId = AStanzaId;
     ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
     error.code = err.code();
     error.condition = err.condition();
@@ -387,7 +388,7 @@ QString Commands::sendCommandRequest(const ICommandRequest &ARequest)
     cmdElem.setAttribute("action",ARequest.action);
   if (FDataForms && !ARequest.form.type.isEmpty())
     FDataForms->xmlForm(ARequest.form,cmdElem);
-  if (FStanzaProcessor->sendIqStanza(this,ARequest.streamJid,request,COMMANDS_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,ARequest.streamJid,request,COMMANDS_TIMEOUT))
   {
     FRequests.append(request.id());
     return request.id();
@@ -487,8 +488,16 @@ void Commands::onDiscoInfoRemoved(const IDiscoInfo &AInfo)
 
 void Commands::onPresenceAdded(IPresence *APresence)
 {
-  int handler = FStanzaProcessor->insertHandler(this,SHC_COMMANDS,IStanzaProcessor::DirectionIn,SHP_DEFAULT,APresence->streamJid());
-  FStanzaHandlers.insert(handler,APresence);
+  if (FStanzaProcessor)
+  {
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.priority = SHP_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.streamJid = APresence->streamJid();
+    shandle.conditions.append(SHC_COMMANDS);
+    FSHICommands.insert(FStanzaProcessor->insertStanzaHandle(shandle),APresence);
+  }
 }
 
 void Commands::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
@@ -513,9 +522,12 @@ void Commands::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJ
 
 void Commands::onPresenceRemoved(IPresence *APresence)
 {
-  int handler = FStanzaHandlers.key(APresence);
-  FStanzaHandlers.remove(handler);
-  FStanzaProcessor->removeHandler(handler);
+  if (FStanzaProcessor)
+  {
+    int handle = FSHICommands.key(APresence);
+    FSHICommands.remove(handle);
+    FStanzaProcessor->removeStanzaHandle(handle);
+  }
 }
 
 Q_EXPORT_PLUGIN2(CommandsPlugin, Commands)

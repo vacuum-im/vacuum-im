@@ -11,21 +11,27 @@ Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
   FShow = Offline;
   FPriority = 0;
 
+  IStanzaHandle shandle;
+  shandle.handler = this;
+  shandle.priority = SHP_DEFAULT;
+  shandle.direction = IStanzaHandle::DirectionIn;
+  shandle.streamJid = FXmppStream->jid();
+  shandle.conditions.append(SHC_PRESENCE);
+  FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
+
   connect(AXmppStream->instance(),SIGNAL(error(IXmppStream *, const QString &)),
     SLOT(onStreamError(IXmppStream *, const QString &))); 
   connect(AXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
-
-  FPresenceHandler = FStanzaProcessor->insertHandler(this,SHC_PRESENCE,IStanzaProcessor::DirectionIn,SHP_DEFAULT,streamJid());   
 }
 
 Presence::~Presence()
 {
-  FStanzaProcessor->removeHandler(FPresenceHandler);
+  FStanzaProcessor->removeStanzaHandle(FSHIPresence);
 }
 
-bool Presence::readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool Presence::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
-  if (AHandlerId == FPresenceHandler)
+  if (AHandlerId == FSHIPresence)
   {
     int show;
     int priority;

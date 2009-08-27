@@ -16,21 +16,21 @@ class MultiUserChat :
   public QObject,
   public IMultiUserChat,
   public IStanzaHandler,
-  public IIqStanzaOwner
+  public IStanzaRequestOwner
 {
   Q_OBJECT;
-  Q_INTERFACES(IMultiUserChat IStanzaHandler IIqStanzaOwner);
+  Q_INTERFACES(IMultiUserChat IStanzaHandler IStanzaRequestOwner);
 public:
   MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, 
     const QString &ANickName, const QString &APassword, QObject *AParent);
   ~MultiUserChat();
   virtual QObject *instance() { return this; }
   //IStanzaHandler
-  virtual bool editStanza(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza * /*AStanza*/, bool &/*AAccept*/) { return false; }
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza & /*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IIqStanzaOwnner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IMultiUserChar
   virtual Jid streamJid() const { return FStreamJid; }
   virtual Jid roomJid() const { return FRoomJid; }
@@ -129,8 +129,8 @@ private:
   QHash<QString /*Id*/,QString /*Affil*/> FAffilListRequests;
   QHash<QString /*Id*/,QString /*Affil*/> FAffilListSubmits;
 private:
-  int FPresenceHandler;
-  int FMessageHandler;
+  int FSHIPresence;
+  int FSHIMessage;
   bool FAutoPresence;
   bool FChangingState;
   Jid FStreamJid;

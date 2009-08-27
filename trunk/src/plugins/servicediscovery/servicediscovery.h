@@ -53,13 +53,13 @@ class ServiceDiscovery :
   public IPlugin,
   public IServiceDiscovery,
   public IStanzaHandler,
-  public IIqStanzaOwner,
+  public IStanzaRequestOwner,
   public IDiscoHandler,
   public IRosterIndexDataHolder,
   public IRostersClickHooker
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IIqStanzaOwner IDiscoHandler IRosterIndexDataHolder IRostersClickHooker);
+  Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IStanzaRequestOwner IDiscoHandler IRosterIndexDataHolder IRostersClickHooker);
 public:
   ServiceDiscovery();
   ~ServiceDiscovery();
@@ -72,11 +72,11 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin();
   //IStanzaHandler
-  virtual bool editStanza(int AHandlerId, const Jid &AStreamJid, Stanza * AStanza, bool &AAccept);
-  virtual bool readStanza(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  //IIqStanzaOwner
-  virtual void iqStanza(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void iqStanzaTimeOut(const QString &AId);
+  virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
+  virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IDiscoHandler
   virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
   virtual void fillDiscoItems(IDiscoItems &/*ADiscoItems*/) {}
