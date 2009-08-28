@@ -6,7 +6,7 @@ IqAuth::IqAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
   FNeedHook = false;
   FXmppStream = AXmppStream;
-  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+  connect(FXmppStream->instance(),SIGNAL(closed()), SLOT(onStreamClosed()));
 }
 
 IqAuth::~IqAuth()
@@ -17,13 +17,13 @@ IqAuth::~IqAuth()
 bool IqAuth::start(const QDomElement &/*AElem*/)
 {
   Stanza auth("iq");
-  auth.setType("set").setTo(FXmppStream->jid().domain()).setId("auth"); 
+  auth.setType("set").setTo(FXmppStream->streamJid().domain()).setId("auth"); 
   QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
-  query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->jid().eNode()));
+  query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().eNode()));
   QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8(); 
   QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
   query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
-  query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->jid().resource()));
+  query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
   
   FNeedHook = true;
   FXmppStream->sendStanza(auth);
@@ -35,18 +35,18 @@ bool IqAuth::needHook(Direction ADirection) const
   return ADirection == DirectionIn ? FNeedHook : false;
 }
 
-bool IqAuth::hookElement(QDomElement *AElem, Direction ADirection)
+bool IqAuth::hookElement(QDomElement &AElem, Direction ADirection)
 {
-  if (ADirection == DirectionIn && AElem->attribute("id") == "auth")
+  if (ADirection == DirectionIn && AElem.attribute("id") == "auth")
   {
     FNeedHook = false;
-    if (AElem->attribute("type") == "result")
+    if (AElem.attribute("type") == "result")
     {
       emit ready(false);
     }
-    else if (AElem->attribute("type") == "error")
+    else if (AElem.attribute("type") == "error")
     {
-      ErrorHandler err(*AElem);
+      ErrorHandler err(AElem);
       emit error(err.message());
     }
     return true;
@@ -54,7 +54,7 @@ bool IqAuth::hookElement(QDomElement *AElem, Direction ADirection)
   return false;
 }
 
-void IqAuth::onStreamClosed(IXmppStream * /*AXmppStream*/)
+void IqAuth::onStreamClosed()
 {
   FNeedHook = false;
 }
@@ -100,7 +100,7 @@ bool IqAuthPlugin::initObjects()
   return true;
 }
 
-IStreamFeature *IqAuthPlugin::getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
+IStreamFeature *IqAuthPlugin::newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
   if (AFeatureNS == NS_FEATURE_IQAUTH)
   {

@@ -40,7 +40,7 @@ bool StartTLSPlugin::initObjects()
   return true;
 }
 
-IStreamFeature *StartTLSPlugin::getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
+IStreamFeature *StartTLSPlugin::newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
   if (AFeatureNS == NS_FEATURE_STARTTLS)
   {

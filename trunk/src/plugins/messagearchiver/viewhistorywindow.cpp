@@ -265,7 +265,7 @@ void ViewHistoryWindow::initialize()
   {
     FRoster = qobject_cast<IRosterPlugin *>(plugin->instance())->getRoster(FStreamJid);
     if (FRoster)
-      connect(FRoster->xmppStream()->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+      connect(FRoster->xmppStream()->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
   }
 
   plugin = manager->getPlugins("IMessageWidgets").value(0);
@@ -1232,9 +1232,9 @@ void ViewHistoryWindow::onArchivePrefsChanged(const Jid &AStreamJid, const IArch
     FSourceMenu->setEnabled(FArchiver->isSupported(FStreamJid));
 }
 
-void ViewHistoryWindow::onStreamClosed(IXmppStream *AXmppStream)
+void ViewHistoryWindow::onStreamClosed()
 {
-  if (AXmppStream->jid() == FStreamJid)
+  IXmppStream *xmppStream = qobject_cast<IXmppStream *>(sender());
+  if (xmppStream && xmppStream->streamJid()==FStreamJid)
     FSourceMenu->setEnabled(false);
 }
-

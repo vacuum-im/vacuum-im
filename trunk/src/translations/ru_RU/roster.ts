@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
+    <name>Roster</name>
+    <message>
+        <source>Roster request failed</source>
+        <translation>Не удалось получить ростер</translation>
+    </message>
+</context>
+<context>
     <name>RosterPlugin</name>
     <message>
         <source>Managing roster and subscriptions</source>

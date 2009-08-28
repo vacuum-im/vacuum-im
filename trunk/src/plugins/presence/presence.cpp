@@ -15,13 +15,12 @@ Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
   shandle.handler = this;
   shandle.priority = SHP_DEFAULT;
   shandle.direction = IStanzaHandle::DirectionIn;
-  shandle.streamJid = FXmppStream->jid();
+  shandle.streamJid = FXmppStream->streamJid();
   shandle.conditions.append(SHC_PRESENCE);
   FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
 
-  connect(AXmppStream->instance(),SIGNAL(error(IXmppStream *, const QString &)),
-    SLOT(onStreamError(IXmppStream *, const QString &))); 
-  connect(AXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
+  connect(AXmppStream->instance(),SIGNAL(error(const QString &)),SLOT(onStreamError(const QString &))); 
+  connect(AXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed())); 
 }
 
 Presence::~Presence()
@@ -180,7 +179,7 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
     if (FOpened && AShow==Offline)
       emit aboutToClose(AShow, AStatus);
 
-    if (FStanzaProcessor->sendStanzaOut(FXmppStream->jid(), pres))
+    if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(), pres))
     {
       FShow = AShow;
       FStatus = AStatus;
@@ -220,7 +219,7 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 
 bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority)
 {
-  if (FXmppStream->isOpen() && AContactJid.isValid() && AContactJid!=FXmppStream->jid().domain())
+  if (FXmppStream->isOpen() && AContactJid.isValid() && AContactJid!=FXmppStream->streamJid().domain())
   {
     QString show;
     switch (AShow)
@@ -270,7 +269,7 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
     if (!AStatus.isEmpty()) 
       pres.addElement("status").appendChild(pres.createTextNode(AStatus));
 
-    if (FStanzaProcessor->sendStanzaOut(FXmppStream->jid(), pres))
+    if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(), pres))
     {
       emit sent(AContactJid,AShow,AStatus,APriority);
       return true;
@@ -293,14 +292,13 @@ void Presence::clearItems()
   }
 }
 
-void Presence::onStreamClosed(IXmppStream * /*AXmppStream*/)
+void Presence::onStreamClosed()
 {
   if (isOpen())
     setPresence(Offline,"",0);
 }
 
-void Presence::onStreamError(IXmppStream * /*AXmppStream*/, const QString &AError)
+void Presence::onStreamError(const QString &AError)
 {
   setPresence(Error,AError,0);
 }
-

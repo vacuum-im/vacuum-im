@@ -392,7 +392,7 @@ void DataStreamsManger::onXmppStreamClosed(IXmppStream *AXmppStream)
   QMap<QString, StreamParams>::iterator it = FStreams.begin();
   while(it!=FStreams.end())
   {
-    if (it->streamJid == AXmppStream->jid())
+    if (it->streamJid == AXmppStream->streamJid())
     {
       IDataStreamProfile *sprofile = FProfiles.value(it->profile,NULL);
       if (sprofile)

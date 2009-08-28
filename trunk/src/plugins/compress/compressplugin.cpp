@@ -46,7 +46,7 @@ bool CompressPlugin::initObjects()
   return true;
 }
 
-IStreamFeature *CompressPlugin::getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
+IStreamFeature *CompressPlugin::newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
   if (AFeatureNS == NS_FEATURE_COMPRESS)
   {

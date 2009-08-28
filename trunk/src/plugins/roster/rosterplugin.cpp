@@ -50,12 +50,12 @@ bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitO
 //IRosterPlugin
 IRoster *RosterPlugin::addRoster(IXmppStream *AXmppStream)
 {
-  Roster *roster = (Roster *)getRoster(AXmppStream->jid());
+  IRoster *roster = getRoster(AXmppStream->streamJid());
   if (!roster)
   {
     roster = new Roster(AXmppStream, FStanzaProcessor);
-    connect(roster,SIGNAL(destroyed(QObject *)),SLOT(onRosterDestroyed(QObject *)));
-    FCleanupHandler.add(roster); 
+    connect(roster->instance(),SIGNAL(destroyed(QObject *)),SLOT(onRosterDestroyed(QObject *)));
+    FCleanupHandler.add(roster->instance()); 
     FRosters.append(roster); 
   }
   return roster;
@@ -63,7 +63,7 @@ IRoster *RosterPlugin::addRoster(IXmppStream *AXmppStream)
 
 IRoster *RosterPlugin::getRoster(const Jid &AStreamJid) const
 {
-  foreach(Roster *roster, FRosters)
+  foreach(IRoster *roster, FRosters)
     if (roster->streamJid() == AStreamJid)
       return roster;
   return NULL;
@@ -83,12 +83,12 @@ QString RosterPlugin::rosterFileName(const Jid &AStreamJid) const
 
 void RosterPlugin::removeRoster(IXmppStream *AXmppStream)
 {
-  Roster *roster = (Roster *)getRoster(AXmppStream->jid());
+  IRoster *roster = getRoster(AXmppStream->streamJid());
   if (roster)
   {
-    disconnect(roster,SIGNAL(destroyed(QObject *)),this,SLOT(onRosterDestroyed(QObject *)));
+    disconnect(roster->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onRosterDestroyed(QObject *)));
     FRosters.removeAt(FRosters.indexOf(roster));  
-    delete roster;
+    delete roster->instance();
   }
 }
 
@@ -151,7 +151,7 @@ void RosterPlugin::onRosterStreamJidChanged(const Jid &ABefour)
 
 void RosterPlugin::onRosterDestroyed(QObject *AObject)
 {
-  Roster *roster = qobject_cast<Roster *>(AObject);
+  IRoster *roster = qobject_cast<IRoster *>(AObject);
   FRosters.removeAt(FRosters.indexOf(roster)); 
 }
 
@@ -172,7 +172,7 @@ void RosterPlugin::onStreamAdded(IXmppStream *AXmppStream)
 
 void RosterPlugin::onStreamRemoved(IXmppStream *AXmppStream)
 {
-  IRoster *roster = getRoster(AXmppStream->jid());
+  IRoster *roster = getRoster(AXmppStream->streamJid());
   if (roster)
   {
     roster->saveRosterItems(rosterFileName(roster->streamJid()));

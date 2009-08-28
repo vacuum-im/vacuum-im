@@ -67,7 +67,7 @@ QList<QString> SASLPlugin::streamFeatures() const
   return QList<QString>() << NS_FEATURE_SASL << NS_FEATURE_BIND << NS_FEATURE_SESSION;
 }
 
-IStreamFeature *SASLPlugin::getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
+IStreamFeature *SASLPlugin::newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
   if (AFeatureNS == NS_FEATURE_SASL)
   {

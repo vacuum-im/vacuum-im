@@ -15,7 +15,7 @@ RegisterStream::~RegisterStream()
 
 bool RegisterStream::start(const QDomElement &/*AElem*/)
 {
-  if (!FRegisterFinished && !FXmppStream->jid().node().isEmpty() && !FXmppStream->password().isEmpty())
+  if (!FRegisterFinished && !FXmppStream->streamJid().node().isEmpty() && !FXmppStream->password().isEmpty())
   {
     Stanza reg("iq");
     reg.setType("get").setId("getReg");
@@ -34,41 +34,41 @@ bool RegisterStream::needHook(Direction ADirection) const
   return ADirection==IStreamFeature::DirectionIn ? FNeedHook : false;
 }
 
-bool RegisterStream::hookElement(QDomElement *AElem, Direction ADirection)
+bool RegisterStream::hookElement(QDomElement &AElem, Direction ADirection)
 {
   if (ADirection == IStreamFeature::DirectionIn)
   {
-    if (AElem->attribute("id") == "getReg")
+    if (AElem.attribute("id") == "getReg")
     {
-      if (AElem->attribute("type") == "result")
+      if (AElem.attribute("type") == "result")
       {
         Stanza submit("iq");
         submit.setType("set").setId("setReg");
         QDomElement query = submit.addElement("query",NS_JABBER_REGISTER);
-        query.appendChild(submit.createElement("username")).appendChild(submit.createTextNode(FXmppStream->jid().eNode()));
+        query.appendChild(submit.createElement("username")).appendChild(submit.createTextNode(FXmppStream->streamJid().eNode()));
         query.appendChild(submit.createElement("password")).appendChild(submit.createTextNode(FXmppStream->password()));
-        query.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(AElem->firstChildElement("query").attribute("key")));
+        query.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(AElem.firstChildElement("query").attribute("key")));
         FXmppStream->sendStanza(submit);
         return true;
       }
-      else if (AElem->attribute("type") == "error")
+      else if (AElem.attribute("type") == "error")
       {
         FNeedHook = false;
-        ErrorHandler err(*AElem);
+        ErrorHandler err(AElem);
         emit error(err.message());
       }
     }
-    else if (AElem->attribute("id") == "setReg")
+    else if (AElem.attribute("id") == "setReg")
     {
       FNeedHook = false;
       FRegisterFinished = true;
-      if (AElem->attribute("type") == "result")
+      if (AElem.attribute("type") == "result")
       {
         emit ready(false);
       }
-      else if (AElem->attribute("type") == "error")
+      else if (AElem.attribute("type") == "error")
       {
-        ErrorHandler err(*AElem);
+        ErrorHandler err(AElem);
         emit error(err.message());
       }
     }

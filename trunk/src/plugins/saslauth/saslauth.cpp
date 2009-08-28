@@ -42,7 +42,7 @@ SASLAuth::SASLAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
   FNeedHook = false;
   FChallengeStep = 0;
   FXmppStream = AXmppStream;
-  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+  connect(FXmppStream->instance(),SIGNAL(closed()), SLOT(onStreamClosed()));
 }
 
 SASLAuth::~SASLAuth()
@@ -70,7 +70,7 @@ bool SASLAuth::start(const QDomElement &AElem)
       {
         FNeedHook = true;
         QByteArray resp;
-        resp.append('\0').append(FXmppStream->jid().pNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
+        resp.append('\0').append(FXmppStream->streamJid().pNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
         Stanza auth("auth");
         auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",FMechanism);
         auth.element().appendChild(auth.createTextNode(resp.toBase64()));    
@@ -89,37 +89,37 @@ bool SASLAuth::needHook(Direction ADirection) const
   return ADirection == DirectionIn ? FNeedHook : false;
 }
 
-bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
+bool SASLAuth::hookElement(QDomElement &AElem, Direction ADirection)
 {
-  if (ADirection == DirectionIn && AElem->namespaceURI() == NS_FEATURE_SASL)
+  if (ADirection == DirectionIn && AElem.namespaceURI() == NS_FEATURE_SASL)
   {
-    if (AElem->tagName() == "success")
+    if (AElem.tagName() == "success")
     {
       FAuthorized = true;
       emit ready(true);
     }
-    else if (AElem->tagName() == "failure")
+    else if (AElem.tagName() == "failure")
     {
-      ErrorHandler err(*AElem,NS_FEATURE_SASL);
+      ErrorHandler err(AElem,NS_FEATURE_SASL);
       emit error(err.message()); 
     }
-    else if (AElem->tagName() == "abort")
+    else if (AElem.tagName() == "abort")
     {
       ErrorHandler err("aborted",NS_FEATURE_SASL);
       emit error(err.message()); 
     }
-    else if (AElem->tagName() == "challenge")
+    else if (AElem.tagName() == "challenge")
     {
       if (FChallengeStep == 0)
       {
         FChallengeStep++;
-        QString chl = QByteArray::fromBase64(AElem->text().toAscii()); 
+        QString chl = QByteArray::fromBase64(AElem.text().toAscii()); 
         QMultiHash<QString, QString> params = parseChallenge(chl);
         
         QString realm = params.value("realm");
         if (realm.isEmpty())
-          realm = FXmppStream->jid().pDomain();
-        QString user = FXmppStream->jid().eNode();
+          realm = FXmppStream->streamJid().pDomain();
+        QString user = FXmppStream->streamJid().eNode();
         QString pass = FXmppStream->password();
         QString nonce = params.value("nonce");
         QByteArray randBytes(32,' ');
@@ -128,7 +128,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
         QString cnonce = randBytes.toBase64();
         QString nc = "00000001";
         QString qop = params.value("qop");
-        QString uri = "xmpp/" + FXmppStream->jid().pDomain();
+        QString uri = "xmpp/" + FXmppStream->streamJid().pDomain();
         QByteArray respValue = getRespValue(realm.toUtf8(),user.toUtf8(),pass.toUtf8(),nonce.toAscii(), 
           cnonce.toAscii(),nc.toAscii(),qop.toAscii(), uri.toAscii(), "AUTHENTICATE");
         
@@ -159,7 +159,7 @@ bool SASLAuth::hookElement(QDomElement *AElem, Direction ADirection)
   return false;
 }
 
-void SASLAuth::onStreamClosed(IXmppStream * /*AXmppStream*/)
+void SASLAuth::onStreamClosed()
 {
   FMechanism = "";
   FNeedHook = false;

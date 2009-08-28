@@ -184,11 +184,10 @@ void MessageWindow::initialize()
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
     if (xmppStreams)
     {
-      IXmppStream *xmppStream = xmppStreams->getStream(FStreamJid);
+      IXmppStream *xmppStream = xmppStreams->xmppStream(FStreamJid);
       if (xmppStream)
       {
-        connect(xmppStream->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),
-          SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
+        connect(xmppStream->instance(),SIGNAL(jidChanged(const Jid &)), SLOT(onStreamJidChanged(const Jid &)));
       }
     }
   }
@@ -254,18 +253,24 @@ void MessageWindow::closeEvent(QCloseEvent *AEvent)
   emit windowClosed();
 }
 
-void MessageWindow::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
+void MessageWindow::onStreamJidChanged(const Jid &ABefour)
 {
-  if (FStreamJid && AXmppStream->jid())
+  IXmppStream *xmppStream = qobject_cast<IXmppStream *>(sender());
+  if (xmppStream)
   {
-    FStreamJid = AXmppStream->jid();
-    FInfoWidget->setStreamJid(FStreamJid);
-    FViewWidget->setStreamJid(FStreamJid);
-    FEditWidget->setStreamJid(FStreamJid);
-    emit streamJidChanged(ABefour);
+    if (FStreamJid && xmppStream->streamJid())
+    {
+      FStreamJid = xmppStream->streamJid();
+      FInfoWidget->setStreamJid(FStreamJid);
+      FViewWidget->setStreamJid(FStreamJid);
+      FEditWidget->setStreamJid(FStreamJid);
+      emit streamJidChanged(ABefour);
+    }
+    else
+    {
+      deleteLater();
+    }
   }
-  else
-    deleteLater();
 }
 
 void MessageWindow::onSendButtonClicked()

@@ -29,7 +29,7 @@ public:
   virtual bool startPlugin() { return true; }
   //IStreamFeaturePlugin
   virtual QList<QString> streamFeatures() const { return QList<QString>() << NS_FEATURE_STARTTLS; }
-  virtual IStreamFeature *getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
+  virtual IStreamFeature *newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
   virtual void destroyStreamFeature(IStreamFeature *AFeature);
 signals:
   virtual void featureCreated(IStreamFeature *AStreamFeature);

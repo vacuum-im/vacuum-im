@@ -10,7 +10,7 @@ Compression::Compression(IXmppStream *AXmppStream)
   FCompress = false;
   FZlibInited = false;
   FXmppStream = AXmppStream;
-  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+  connect(FXmppStream->instance(),SIGNAL(closed()), SLOT(onStreamClosed()));
 }
 
 Compression::~Compression()
@@ -43,9 +43,9 @@ bool Compression::start(const QDomElement &AElem)
   return false;
 }
 
-bool Compression::hookData(QByteArray *AData, Direction ADirection)
+bool Compression::hookData(QByteArray &AData, Direction ADirection)
 {
-  if (FCompress && AData->size()>0)
+  if (FCompress && AData.size()>0)
   {
     z_streamp zstream;
     int (*zfunc) OF((z_streamp strm, int flush));
@@ -62,8 +62,8 @@ bool Compression::hookData(QByteArray *AData, Direction ADirection)
 
     int ret;
     int dataPosOut = 0;
-    zstream->avail_in = AData->size();
-    zstream->next_in = (Bytef *)(AData->constData());
+    zstream->avail_in = AData.size();
+    zstream->next_in = (Bytef *)(AData.constData());
     do 
     {
       zstream->avail_out = FOutBuffer.capacity() - dataPosOut;
@@ -90,25 +90,25 @@ bool Compression::hookData(QByteArray *AData, Direction ADirection)
         break;
       }
     } while(ret == Z_OK && zstream->avail_out == 0);
-    AData->resize(dataPosOut);
-    memcpy(AData->data(),FOutBuffer.constData(),dataPosOut);
+    AData.resize(dataPosOut);
+    memcpy(AData.data(),FOutBuffer.constData(),dataPosOut);
   }
   return false;
 }
 
-bool Compression::hookElement(QDomElement *AElem, Direction ADirection)
+bool Compression::hookElement(QDomElement &AElem, Direction ADirection)
 {
-  if (!FRequest || ADirection != DirectionIn || AElem->namespaceURI() != NS_PROTOCOL_COMPRESS)
+  if (!FRequest || ADirection != DirectionIn || AElem.namespaceURI() != NS_PROTOCOL_COMPRESS)
     return false;
 
   FRequest = false;
-  if (AElem->tagName() == "compressed")
+  if (AElem.tagName() == "compressed")
   {
     FCompress = true;
     emit ready(true);
     return true;
   }
-  else if (AElem->tagName() == "failure")
+  else if (AElem.tagName() == "failure")
   {
     FNeedHook = false;
     FCompress = false;
@@ -161,7 +161,7 @@ void Compression::stopZlib()
   }
 }
 
-void Compression::onStreamClosed(IXmppStream * /*AXmppStream*/)
+void Compression::onStreamClosed()
 {
   FNeedHook = false;
   FCompress = false;

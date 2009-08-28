@@ -43,12 +43,12 @@ bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
 //IPresencePlugin
 IPresence *PresencePlugin::addPresence(IXmppStream *AXmppStream)
 {
-  Presence *presence = (Presence *)getPresence(AXmppStream->jid());
+  IPresence *presence = getPresence(AXmppStream->streamJid());
   if (!presence)
   {
     presence = new Presence(AXmppStream,FStanzaProcessor);
-    connect(presence,SIGNAL(destroyed(QObject *)),SLOT(onPresenceDestroyed(QObject *)));
-    FCleanupHandler.add(presence); 
+    connect(presence->instance(),SIGNAL(destroyed(QObject *)),SLOT(onPresenceDestroyed(QObject *)));
+    FCleanupHandler.add(presence->instance()); 
     FPresences.append(presence); 
   }
   return presence;
@@ -56,7 +56,7 @@ IPresence *PresencePlugin::addPresence(IXmppStream *AXmppStream)
 
 IPresence *PresencePlugin::getPresence(const Jid &AStreamJid) const
 {
-  foreach(Presence *presence, FPresences)
+  foreach(IPresence *presence, FPresences)
     if (presence->streamJid() == AStreamJid)
       return presence;
   return NULL;
@@ -64,12 +64,12 @@ IPresence *PresencePlugin::getPresence(const Jid &AStreamJid) const
 
 void PresencePlugin::removePresence(IXmppStream *AXmppStream)
 {
-  Presence *presence = (Presence *)getPresence(AXmppStream->jid());
+  IPresence *presence = getPresence(AXmppStream->streamJid());
   if (presence)
   {
-    disconnect(presence,SIGNAL(destroyed(QObject *)),this,SLOT(onPresenceDestroyed(QObject *)));
+    disconnect(presence->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onPresenceDestroyed(QObject *)));
     FPresences.removeAt(FPresences.indexOf(presence));
-    delete presence;
+    delete presence->instance();
   }
 }
 
@@ -142,9 +142,8 @@ void PresencePlugin::onPresenceClosed()
 
 void PresencePlugin::onPresenceDestroyed(QObject *AObject)
 {
-  Presence *presence = qobject_cast<Presence *>(AObject);
-  if (FPresences.contains(presence))
-    FPresences.removeAt(FPresences.indexOf(presence)); 
+  IPresence *presence = qobject_cast<IPresence *>(AObject);
+  FPresences.removeAt(FPresences.indexOf(presence)); 
 }
 
 void PresencePlugin::onStreamAdded(IXmppStream *AXmppStream)
@@ -165,7 +164,7 @@ void PresencePlugin::onStreamAdded(IXmppStream *AXmppStream)
 
 void PresencePlugin::onStreamRemoved(IXmppStream *AXmppStream)
 {
-  IPresence *presence = getPresence(AXmppStream->jid());
+  IPresence *presence = getPresence(AXmppStream->streamJid());
   if (presence)
   {
     emit presenceRemoved(presence);

@@ -7,7 +7,7 @@ SASLSession::SASLSession(IXmppStream *AXmppStream) : QObject(AXmppStream->instan
 {
   FNeedHook = false;
   FXmppStream = AXmppStream;
-  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+  connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
 }
 
 SASLSession::~SASLSession()
@@ -30,18 +30,18 @@ bool SASLSession::needHook(Direction ADirection) const
   return ADirection == DirectionIn ? FNeedHook : false;
 }
 
-bool SASLSession::hookElement(QDomElement *AElem, Direction ADirection)
+bool SASLSession::hookElement(QDomElement &AElem, Direction ADirection)
 {
-  if (ADirection == DirectionIn && AElem->attribute("id") == "session")
+  if (ADirection == DirectionIn && AElem.attribute("id") == "session")
   {
     FNeedHook = false;
-    if (AElem->attribute("type") == "result")
+    if (AElem.attribute("type") == "result")
     {
       emit ready(false);
     }
     else
     {
-      ErrorHandler err(*AElem);
+      ErrorHandler err(AElem);
       emit error(err.message());
     }
     return true;
@@ -49,7 +49,7 @@ bool SASLSession::hookElement(QDomElement *AElem, Direction ADirection)
   return false;
 }
 
-void SASLSession::onStreamClosed(IXmppStream * /*AXmppStream*/)
+void SASLSession::onStreamClosed()
 {
   FNeedHook = false;
 }

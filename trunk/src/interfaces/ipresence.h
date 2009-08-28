@@ -31,12 +31,12 @@ public:
   };
 public:
   virtual QObject *instance() =0;
-  virtual const Jid &streamJid() const =0;
+  virtual Jid streamJid() const =0;
   virtual IXmppStream *xmppStream() const =0;
   virtual bool isOpen() const =0;
   virtual int show() const =0;
   virtual bool setShow(int AShow) =0;
-  virtual const QString &status() const =0;
+  virtual QString status() const =0;
   virtual bool setStatus(const QString &AStatus) =0;
   virtual int priority() const =0;
   virtual bool setPriority(int APriority) =0;

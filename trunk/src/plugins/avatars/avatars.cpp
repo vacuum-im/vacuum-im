@@ -545,7 +545,7 @@ void Avatars::onStreamOpened(IXmppStream *AXmppStream)
   {
     IStanzaHandle shandle;
     shandle.handler = this;
-    shandle.streamJid = AXmppStream->jid();
+    shandle.streamJid = AXmppStream->streamJid();
     
     shandle.priority = SHP_AVATARS_PRESENCE;
     shandle.direction = IStanzaHandle::DirectionIn;
@@ -562,11 +562,11 @@ void Avatars::onStreamOpened(IXmppStream *AXmppStream)
     shandle.conditions.append(SHC_IQ_AVATAR);
     FSHIIqAvatarIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
-  FStreamAvatars.insert(AXmppStream->jid(),QString::null);
+  FStreamAvatars.insert(AXmppStream->streamJid(),QString::null);
 
   if (FVCardPlugin)
   {
-    FVCardPlugin->requestVCard(AXmppStream->jid(),AXmppStream->jid().bare());
+    FVCardPlugin->requestVCard(AXmppStream->streamJid(),AXmppStream->streamJid().bare());
   }
 }
 
@@ -574,11 +574,11 @@ void Avatars::onStreamClosed(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && FVCardPlugin)
   {
-    FStanzaProcessor->removeStanzaHandle(FSHIPresenceIn.take(AXmppStream->jid()));
-    FStanzaProcessor->removeStanzaHandle(FSHIPresenceOut.take(AXmppStream->jid()));
-    FStanzaProcessor->removeStanzaHandle(FSHIIqAvatarIn.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPresenceIn.take(AXmppStream->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPresenceOut.take(AXmppStream->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIIqAvatarIn.take(AXmppStream->streamJid()));
   }
-  FStreamAvatars.remove(AXmppStream->jid());
+  FStreamAvatars.remove(AXmppStream->streamJid());
 }
 
 void Avatars::onVCardChanged(const Jid &AContactJid)

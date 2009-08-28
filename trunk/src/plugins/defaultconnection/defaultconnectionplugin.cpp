@@ -173,10 +173,10 @@ void DefaultConnectionPlugin::onConnectionAboutToConnect()
   DefaultConnection *connection = qobject_cast<DefaultConnection*>(sender());
   if (FXmppStreams && connection && connection->option(IDefaultConnection::CO_HOST).toString().isEmpty())
   {
-    foreach(IXmppStream *stream, FXmppStreams->getStreams())
+    foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
       if (stream->connection() == connection)
       {
-        connection->setOption(IDefaultConnection::CO_HOST,stream->jid().pDomain());
+        connection->setOption(IDefaultConnection::CO_HOST,stream->streamJid().pDomain());
         break;
       }
   }

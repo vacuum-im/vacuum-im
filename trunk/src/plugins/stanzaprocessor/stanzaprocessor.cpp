@@ -64,7 +64,7 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza
   Stanza stanza(AStanza);
   if (processStanzaOut(AStreamJid,stanza))
   {
-    IXmppStream *stream = FXmppStreams->getStream(AStreamJid);
+    IXmppStream *stream = FXmppStreams->xmppStream(AStreamJid);
     if (stream && stream->sendStanza(stanza)>0)
     {
       emit stanzaSent(AStreamJid, stanza);
@@ -333,19 +333,19 @@ void StanzaProcessor::onStreamElement(IXmppStream *AXmppStream, const QDomElemen
   Stanza stanza(AElem);
 
   if (stanza.from().isEmpty())
-    stanza.setFrom(AXmppStream->jid().eFull());
-  stanza.setTo(AXmppStream->jid().eFull());
+    stanza.setFrom(AXmppStream->streamJid().eFull());
+  stanza.setTo(AXmppStream->streamJid().eFull());
 
-  if (!sendStanzaIn(AXmppStream->jid(),stanza))
+  if (!sendStanzaIn(AXmppStream->streamJid(),stanza))
     if (stanza.canReplyError())
-      sendStanzaOut(AXmppStream->jid(), stanza.replyError("service-unavailable")); 
+      sendStanzaOut(AXmppStream->streamJid(), stanza.replyError("service-unavailable")); 
 }
 
 void StanzaProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
   foreach(int shandleId, FHandles.keys())
     if (FHandles.value(shandleId).streamJid == ABefour)
-      FHandles[shandleId].streamJid = AXmppStream->jid();
+      FHandles[shandleId].streamJid = AXmppStream->streamJid();
 }
 
 void StanzaProcessor::onStreamClosed(IXmppStream *AStream)
@@ -353,7 +353,7 @@ void StanzaProcessor::onStreamClosed(IXmppStream *AStream)
   foreach(QString stanzaId, FRequests.keys())
   {
     const StanzaRequest &request = FRequests.value(stanzaId);
-    if (request.streamJid == AStream->jid())
+    if (request.streamJid == AStream->streamJid())
     {
       request.owner->stanzaRequestTimeout(request.streamJid, stanzaId);
       removeStanzaRequest(stanzaId);

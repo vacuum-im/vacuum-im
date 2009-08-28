@@ -114,8 +114,8 @@ protected slots:
   void onUserDataChanged(int ARole, const QVariant &ABefour, const QVariant &AAfter);
   void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
   void onPresenceAboutToClose(int AShow, const QString &AStatus);
-  void onStreamClosed(IXmppStream *AXmppStream);
-  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+  void onStreamClosed();
+  void onStreamJidChanged(const Jid &ABefour);
 private:
   IMessageProcessor *FMessageProcessor;
   IPresence *FPresence;

@@ -56,7 +56,7 @@ protected slots:
 private:
   IStanzaProcessor *FStanzaProcessor;
 private:
-  QList<Presence *> FPresences;
+  QList<IPresence *> FPresences;
   QObjectCleanupHandler FCleanupHandler;
   QHash<Jid, QSet<IPresence *> > FContactPresences;
 };

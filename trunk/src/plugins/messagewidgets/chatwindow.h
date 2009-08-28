@@ -56,7 +56,7 @@ protected:
   virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
   void onMessageReady();
-  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+  void onStreamJidChanged(const Jid &ABefour);
 private:
   Ui::ChatWindowClass ui;
 private:

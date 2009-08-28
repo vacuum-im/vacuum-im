@@ -338,7 +338,7 @@ void VCardPlugin::onVCardDialogDestroyed(QObject *ADialog)
 void VCardPlugin::onXmppStreamRemoved(IXmppStream *AXmppStream)
 {
   foreach(VCardDialog *dialog, FVCardDialogs.values())
-    if (dialog->streamJid() == AXmppStream->jid())
+    if (dialog->streamJid() == AXmppStream->streamJid())
       delete dialog;
 }
 
