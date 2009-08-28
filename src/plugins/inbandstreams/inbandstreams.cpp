@@ -4,6 +4,7 @@ InBandStreams::InBandStreams()
 {
   FFileManager = NULL;
   FDataManager = NULL;
+  FStanzaProcessor = NULL;
 }
 
 InBandStreams::~InBandStreams()
@@ -19,6 +20,7 @@ void InBandStreams::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->name = tr("In-Band Bytestreams");
   APluginInfo->uid = INBANDSTREAMS_UUID;
   APluginInfo->version = "0.1";
+  APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
 bool InBandStreams::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -33,6 +35,12 @@ bool InBandStreams::initConnections(IPluginManager *APluginManager, int &/*AInit
   if (plugin)
   {
     FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
+  }
+
+  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  if (plugin)
+  {
+    FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
   }
 
   return true;
@@ -69,6 +77,11 @@ QString InBandStreams::methodDescription() const
 IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, 
                                                    IDataStreamSocket::StreamKind AKind, QObject *AParent)
 {
+  if (FStanzaProcessor)
+  {
+    InBandStream *stream = new InBandStream(FStanzaProcessor,ASocketId,AStreamJid,AContactJid,AKind,AParent);
+    return stream;
+  }
   return NULL;
 }
 

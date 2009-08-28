@@ -6,6 +6,8 @@
 #include "../../interfaces/iinbandstreams.h"
 #include "../../interfaces/ifilestreamsmanager.h"
 #include "../../interfaces/idatastreamsmanager.h"
+#include "../../interfaces/istanzaprocessor.h"
+#include "inbandstream.h"
 
 class InBandStreams : 
   public QObject,
@@ -37,6 +39,7 @@ public:
 private:
   IFileStreamsManager *FFileManager;
   IDataStreamsManager *FDataManager;
+  IStanzaProcessor *FStanzaProcessor;
 };
 
 #endif // INBANDSTREAMS_H
