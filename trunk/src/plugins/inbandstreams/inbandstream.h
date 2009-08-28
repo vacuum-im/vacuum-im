@@ -4,18 +4,28 @@
 #include "../../definations/namespaces.h"
 #include "../../interfaces/iinbandstreams.h"
 #include "../../interfaces/idatastreamsmanager.h"
+#include "../../interfaces/istanzaprocessor.h"
+#include "../../utils/ringbuffer.h"
 #include "../../utils/jid.h"
 
 class InBandStream : 
   public QIODevice,
-  public IInBandStream
+  public IDataStreamSocket,
+  public IStanzaHandler,
+  public IStanzaRequestOwner
 {
   Q_OBJECT;
-  Q_INTERFACES(IInBandStream);
+  Q_INTERFACES(IStanzaHandler IStanzaRequestOwner IDataStreamSocket);
 public:
-  InBandStream(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, int AKind, QObject *AParent=NULL);
+  InBandStream(IStanzaProcessor *AProcessor, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, int AKind, QObject *AParent=NULL);
   ~InBandStream();
   virtual QIODevice *instance() { return this; }
+  //IStanzaHandler
+  virtual bool stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
+  virtual bool stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+  //IStanzaRequestOwner
+  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //QIODevice
   virtual bool isSequential() const;
   virtual qint64 bytesAvailable() const;
@@ -34,16 +44,22 @@ public:
   virtual bool flush();
   virtual void close();
 signals:
-  virtual void stateChanged(int AState) =0;
+  virtual void stateChanged(int AState);
 protected:
   virtual qint64 readData(char *AData, qint64 AMaxSize);
   virtual qint64 writeData(const char *AData, qint64 AMaxSize);
+private:
+  IStanzaProcessor *FStanzaProcessor;
 private:
   Jid FStreamJid;
   Jid FContactJid;
   int FStreamKind;
   int FStreamState;
   QString FStreamId;
+private:
+  int FSeqNumber;
+  RingBuffer readBuffer;
+  RingBuffer writeBuffer;
 };
 
 #endif // INBANDSTREAM_H
