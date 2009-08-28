@@ -20,13 +20,13 @@ public:
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction ADirection) const;
-  virtual bool hookData(QByteArray * /*AData*/, Direction /*ADirection*/) { return false; }
-  virtual bool hookElement(QDomElement *AElem, Direction ADirection);
+  virtual bool hookData(QByteArray &/*AData*/, Direction /*ADirection*/) { return false; }
+  virtual bool hookElement(QDomElement &AElem, Direction ADirection);
 signals:
   virtual void ready(bool ARestart); 
   virtual void error(const QString &AError);
 protected slots:
-  void onStreamClosed(IXmppStream *AXmppStream);
+  void onStreamClosed();
 private: 
   IXmppStream *FXmppStream;
 private:

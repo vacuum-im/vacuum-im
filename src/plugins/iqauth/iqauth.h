@@ -26,13 +26,13 @@ public:
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction ADirection) const;
-  virtual bool hookData(QByteArray *,Direction) { return false; }
-  virtual bool hookElement(QDomElement *AElem, Direction ADirection);
+  virtual bool hookData(QByteArray &/*AData*/, Direction /*ADirection*/) { return false; }
+  virtual bool hookElement(QDomElement &AElem, Direction ADirection);
 signals:
   virtual void ready(bool ARestart); 
   virtual void error(const QString &AError);
 protected slots:
-  virtual void onStreamClosed(IXmppStream *AXmppStream);
+  virtual void onStreamClosed();
 private:
   IXmppStream *FXmppStream;
 private:
@@ -59,7 +59,7 @@ public:
   virtual bool startPlugin() { return true; }
   //IStreamFeaturePlugin
   virtual QList<QString> streamFeatures() const { return QList<QString>() << NS_FEATURE_IQAUTH; }
-  virtual IStreamFeature *getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
+  virtual IStreamFeature *newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
   virtual void destroyStreamFeature(IStreamFeature *AFeature);
 signals:
   virtual void featureCreated(IStreamFeature *AStreamFeature);

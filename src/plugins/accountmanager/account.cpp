@@ -31,7 +31,7 @@ bool Account::isValid() const
   bool valid = sJid.isValid();
   valid = valid && !sJid.node().isEmpty();
   valid = valid && !sJid.domain().isEmpty();
-  valid = valid && (FXmppStream==FXmppStreams->getStream(sJid) || FXmppStreams->getStream(sJid)==NULL);
+  valid = valid && (FXmppStream==FXmppStreams->xmppStream(sJid) || FXmppStreams->xmppStream(sJid)==NULL);
   return valid;
 }
 
@@ -44,17 +44,17 @@ void Account::setActive(bool AActive)
 {
   if (AActive && FXmppStream==NULL && isValid())
   {
-    FXmppStream = FXmppStreams->newStream(streamJid());
+    FXmppStream = FXmppStreams->newXmppStream(streamJid());
     FXmppStream->setPassword(password());
     FXmppStream->setDefaultLang(defaultLang()); 
-    FXmppStreams->addStream(FXmppStream);
+    FXmppStreams->addXmppStream(FXmppStream);
     emit changed(AVN_ACTIVE,true);
   }
   else if (!AActive && FXmppStream!=NULL)
   {
-    FXmppStreams->removeStream(FXmppStream);
+    FXmppStreams->removeXmppStream(FXmppStream);
     emit changed(AVN_ACTIVE,false);
-    FXmppStreams->destroyStream(FXmppStream->jid());
+    FXmppStreams->destroyXmppStream(FXmppStream->streamJid());
     FXmppStream = NULL;
   }
 }
@@ -71,7 +71,7 @@ void Account::setName(const QString &AName)
 
 Jid Account::streamJid() const
 {
-  return FXmppStream == NULL ? value(AVN_STREAM_JID).toString() : FXmppStream->jid();
+  return FXmppStream == NULL ? value(AVN_STREAM_JID).toString() : FXmppStream->streamJid();
 }
 
 void Account::setStreamJid(const Jid &AJid)
@@ -121,7 +121,7 @@ void Account::setValue(const QString &AName, const QVariant &AValue)
     if (FXmppStream)
     {
       if (AName == AVN_STREAM_JID)
-        FXmppStream->setJid(AValue.toString());
+        FXmppStream->setStreamJid(AValue.toString());
       else if (AName == AVN_PASSWORD)
         FXmppStream->setPassword(decript(AValue.toByteArray(),FAccountId.toString().toUtf8()));
       else if (AName == AVN_DEFAULT_LANG)

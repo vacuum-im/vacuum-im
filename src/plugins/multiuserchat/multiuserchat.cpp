@@ -791,12 +791,11 @@ void MultiUserChat::initialize()
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
     if (xmppStreams)
     {
-      FXmppStream = xmppStreams->getStream(FStreamJid);
+      FXmppStream = xmppStreams->xmppStream(FStreamJid);
       if (FXmppStream)
       {
-        connect(FXmppStream->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),
-          SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
-        connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+        connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onStreamJidChanged(const Jid &)));
+        connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
       }
     }
   }
@@ -884,17 +883,21 @@ void MultiUserChat::onPresenceAboutToClose(int AShow, const QString &AStatus)
     setPresence(AShow,AStatus);
 }
 
-void MultiUserChat::onStreamClosed(IXmppStream * /*AXmppStream*/)
+void MultiUserChat::onStreamClosed()
 {
   if (isOpen() || isChangingState())
     closeChat(IPresence::Offline,tr("Disconnected"));
 }
 
-void MultiUserChat::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
+void MultiUserChat::onStreamJidChanged(const Jid &ABefour)
 {
-  FStreamJid = AXmppStream->jid();
-  foreach(MultiUser *user, FUsers)
-    user->setData(MUDR_STREAM_JID,FStreamJid.full());
-  emit streamJidChanged(ABefour,FStreamJid);
+  IXmppStream *xmppStream = qobject_cast<IXmppStream *>(sender());
+  if (xmppStream)
+  {
+    FStreamJid = xmppStream->streamJid();
+    foreach(MultiUser *user, FUsers)
+      user->setData(MUDR_STREAM_JID,FStreamJid.full());
+    emit streamJidChanged(ABefour,FStreamJid);
+  }
 }
 

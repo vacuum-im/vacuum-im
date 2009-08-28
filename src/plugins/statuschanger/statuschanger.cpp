@@ -739,7 +739,7 @@ void StatusChanger::insertConnectingLabel(IPresence *APresence)
 {
   if (FRostersModel && FRostersView)
   {
-    IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->jid());
+    IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
     if (index)
       FRostersView->insertIndexLabel(FConnectingLabel,index);
   }
@@ -749,7 +749,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 {
   if (FRostersModel && FRostersView)
   {
-    IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->jid());
+    IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
     if (index)
       FRostersView->removeIndexLabel(FConnectingLabel,index);
   }

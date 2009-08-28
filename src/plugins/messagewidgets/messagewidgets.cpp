@@ -441,13 +441,13 @@ void MessageWidgets::onTabWindowDestroyed()
 
 void MessageWidgets::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter)
 {
-  if (!(AAfter && AXmppStream->jid()))
-    deleteStreamWindows(AXmppStream->jid());
+  if (!(AAfter && AXmppStream->streamJid()))
+    deleteStreamWindows(AXmppStream->streamJid());
 }
 
 void MessageWidgets::onStreamRemoved(IXmppStream *AXmppStream)
 {
-  deleteStreamWindows(AXmppStream->jid());
+  deleteStreamWindows(AXmppStream->streamJid());
 }
 
 void MessageWidgets::onSettingsOpened()

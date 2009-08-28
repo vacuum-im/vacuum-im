@@ -25,7 +25,7 @@ public:
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IRoster
-  virtual const Jid &streamJid() const { return FXmppStream->jid(); }
+  virtual Jid streamJid() const { return FXmppStream->streamJid(); }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool isOpen() const { return FOpened; }
   virtual QString groupDelimiter() const { return FGroupDelim; }
@@ -69,10 +69,10 @@ protected:
   void setStanzaHandlers();
   void removeStanzaHandlers();
 protected slots:
-  void onStreamOpened(IXmppStream *AXmppStream);
-  void onStreamClosed(IXmppStream *AXmppStream);
-  void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
-  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
+  void onStreamOpened();
+  void onStreamClosed();
+  void onStreamJidAboutToBeChanged(const Jid &AAfter);
+  void onStreamJidChanged(const Jid &ABefore);
 private:
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;

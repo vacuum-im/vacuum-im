@@ -53,7 +53,7 @@ public:
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //IStreamFeaturePlugin
   virtual QList<QString> streamFeatures() const { return QList<QString>() << NS_FEATURE_REGISTER; }
-  virtual IStreamFeature *getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
+  virtual IStreamFeature *newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
   virtual void destroyStreamFeature(IStreamFeature *AFeature);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);

@@ -1254,7 +1254,7 @@ void RosterChanger::onAccountChanged(const QString &AName, const QVariant &AValu
     IAccount *account = qobject_cast<IAccount *>(sender());
     if (account && account->isActive())
     {
-      IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(account->xmppStream()->jid()) : NULL;
+      IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(account->xmppStream()->streamJid()) : NULL;
       Action *action = FActions.value(roster,NULL);
       if (action)
         action->setText(AValue.toString());

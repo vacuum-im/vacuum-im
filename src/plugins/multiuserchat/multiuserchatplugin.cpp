@@ -605,16 +605,16 @@ void MultiUserChatPlugin::onStreamRemoved(IXmppStream *AXmppStream)
 {
   QList<IMultiUserChatWindow *> chatWindows = FChatWindows;
   foreach(IMultiUserChatWindow *chatWindow, chatWindows)
-    if (chatWindow->streamJid() == AXmppStream->jid())
+    if (chatWindow->streamJid() == AXmppStream->streamJid())
       chatWindow->exitAndDestroy("",0);
 
   QList<QMessageBox *> inviteDialogs = FInviteDialogs.keys();
   foreach(QMessageBox * inviteDialog,inviteDialogs)
-    if (FInviteDialogs.value(inviteDialog).streamJid == AXmppStream->jid())
+    if (FInviteDialogs.value(inviteDialog).streamJid == AXmppStream->streamJid())
       inviteDialog->done(QMessageBox::Ignore);
 
   for (int i=0; i<FActiveInvites.count();i++)
-    if (AXmppStream->jid() == FMessageProcessor->messageById(FActiveInvites.at(i)).to())
+    if (AXmppStream->streamJid() == FMessageProcessor->messageById(FActiveInvites.at(i)).to())
     {
       FMessageProcessor->removeMessage(FActiveInvites.at(i));
       FActiveInvites.removeAt(i--);

@@ -32,9 +32,11 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
     if (FXmppStreams)
     {
-      foreach(IXmppStream *stream, FXmppStreams->getStreams())
+      foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
         onStreamCreated(stream);
       connect(FXmppStreams->instance(), SIGNAL(created(IXmppStream *)), SLOT(onStreamCreated(IXmppStream *)));
+      connect(FXmppStreams->instance(), SIGNAL(consoleElement(IXmppStream *,const QDomElement &, bool)), 
+        SLOT(onStreamConsoleElement(IXmppStream *, const QDomElement &, bool))); 
       connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), 
         SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
       connect(FXmppStreams->instance(), SIGNAL(destroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
@@ -136,8 +138,8 @@ void ConsoleWidget::onSendXMLClicked()
     if (stanza.isValid())
     {
       ui.tedConsole->append(tr("<b>Start sending user stanza...</b><br>"));
-      foreach(IXmppStream *stream, FXmppStreams->getStreams())
-        if (ui.cmbStreamJid->currentIndex()==0 || stream->jid()==ui.cmbStreamJid->currentText())
+      foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+        if (ui.cmbStreamJid->currentIndex()==0 || stream->streamJid()==ui.cmbStreamJid->currentText())
           stream->sendStanza(stanza);
       ui.tedConsole->append(tr("<b>User stanza sended.</b><br>"));
     }
@@ -224,15 +226,13 @@ void ConsoleWidget::onWordWrapStateChanged( int AState )
 
 void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)
 {
-  connect(AXmppStream->instance(), SIGNAL(consoleElement(IXmppStream *, const QDomElement &, bool)), 
-    SLOT(onStreamConsoleElement(IXmppStream *, const QDomElement &, bool))); 
-  ui.cmbStreamJid->addItem(AXmppStream->jid().full());
+  ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
 }
 
 void ConsoleWidget::onStreamConsoleElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended)
 {
   Jid streamJid = ui.cmbStreamJid->currentIndex() > 0 ? ui.cmbStreamJid->itemText(ui.cmbStreamJid->currentIndex()) : "";
-  if (streamJid.isEmpty() || streamJid==AXmppStream->jid())
+  if (streamJid.isEmpty() || streamJid==AXmppStream->streamJid())
   {
     Stanza stanza(AElem);
     bool accepted = FStanzaProcessor==NULL || ui.ltwConditions->count()==0;
@@ -246,7 +246,7 @@ void ConsoleWidget::onStreamConsoleElement(IXmppStream *AXmppStream, const QDomE
 
       int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
       FTimePoint = QTime::currentTime();
-      QString caption = (ASended ? sended : received).arg(AXmppStream->jid().hFull()).arg(FTimePoint.toString()).arg(delta);
+      QString caption = (ASended ? sended : received).arg(AXmppStream->streamJid().hFull()).arg(FTimePoint.toString()).arg(delta);
       ui.tedConsole->append(caption);
 
       QString xml = stanza.toString(2);
@@ -263,13 +263,17 @@ void ConsoleWidget::onStreamConsoleElement(IXmppStream *AXmppStream, const QDomE
 
 void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
-  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(ABefour.full()));
-  ui.cmbStreamJid->addItem(AXmppStream->jid().full());
+  int index = ui.cmbStreamJid->findText(ABefour.full());
+  if (index >= 0)
+  {
+    ui.cmbStreamJid->removeItem(index);
+    ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
+  }
 }
 
 void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
 {
-  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->jid().full()));
+  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->streamJid().full()));
 }
 
 void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle)

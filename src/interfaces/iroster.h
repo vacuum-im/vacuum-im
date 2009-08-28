@@ -38,7 +38,7 @@ public:
   };
 public:
   virtual QObject *instance() =0;
-  virtual const Jid &streamJid() const =0;
+  virtual Jid streamJid() const =0;
   virtual IXmppStream *xmppStream() const =0;
   virtual bool isOpen() const =0;
   virtual QString groupDelimiter() const =0;

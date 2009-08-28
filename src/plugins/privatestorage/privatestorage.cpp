@@ -178,13 +178,13 @@ void PrivateStorage::removeElement(const Jid &AStreamJid, const QString &ATagNam
 
 void PrivateStorage::onStreamOpened(IXmppStream *AXmppStream)
 {
-  emit storageOpened(AXmppStream->jid());
+  emit storageOpened(AXmppStream->streamJid());
 }
 
 void PrivateStorage::onStreamClosed(IXmppStream *AXmppStream)
 {
-  emit storageClosed(AXmppStream->jid());
-  removeStreamElement(AXmppStream->jid());
+  emit storageClosed(AXmppStream->streamJid());
+  removeStreamElement(AXmppStream->streamJid());
 }
 
 Q_EXPORT_PLUGIN2(PrivateStoragePlugin, PrivateStorage)

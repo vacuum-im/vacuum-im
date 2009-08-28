@@ -1018,7 +1018,7 @@ void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
     shandle.handler = this;
     shandle.priority = SHP_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
-    shandle.streamJid = AXmppStream->jid();
+    shandle.streamJid = AXmppStream->streamJid();
     shandle.conditions.append(SHC_STANZA_SESSION);
     FSHISession.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
@@ -1035,7 +1035,7 @@ void SessionNegotiation::onPresenceReceived(IPresence *APresence, const IPresenc
 
 void SessionNegotiation::onStreamAboutToClose(IXmppStream *AXmppStream)
 {
-  QList<IStanzaSession> sessions = FSessions.value(AXmppStream->jid()).values();
+  QList<IStanzaSession> sessions = FSessions.value(AXmppStream->streamJid()).values();
   foreach(IStanzaSession session, sessions)
   {
     terminateSession(session.streamJid,session.contactJid);
@@ -1047,10 +1047,10 @@ void SessionNegotiation::onStreamClosed(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor && FDataForms)
   {
-    FStanzaProcessor->removeStanzaHandle(FSHISession.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHISession.take(AXmppStream->streamJid()));
   }
-  FDialogs.remove(AXmppStream->jid());
-  FSessions.remove(AXmppStream->jid());
+  FDialogs.remove(AXmppStream->streamJid());
+  FSessions.remove(AXmppStream->streamJid());
 }
 
 void SessionNegotiation::onNotificationActivated(int ANotifyId)

@@ -116,7 +116,7 @@ protected slots:
   void onChangeSourceByAction(bool);
   void onHeaderActionTriggered(bool);
   void onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
-  void onStreamClosed(IXmppStream *AXmppStream);
+  void onStreamClosed();
 private:
   Ui::ViewHistoryWindowClass ui;
 private:

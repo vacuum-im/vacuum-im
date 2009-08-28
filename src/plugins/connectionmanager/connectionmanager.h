@@ -12,6 +12,7 @@
 #include "../../interfaces/iconnectionmanager.h"
 #include "../../interfaces/idefaultconnection.h"
 #include "../../interfaces/iaccountmanager.h"
+#include "../../interfaces/ixmppstreams.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/isettings.h"
 #include "connectionoptionswidget.h"

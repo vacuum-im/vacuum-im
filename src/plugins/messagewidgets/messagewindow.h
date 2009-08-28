@@ -73,7 +73,7 @@ protected:
   virtual void showEvent(QShowEvent *AEvent);
   virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
-  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+  void onStreamJidChanged(const Jid &ABefour);
   void onSendButtonClicked();
   void onNextButtonClicked();
   void onReplyButtonClicked();

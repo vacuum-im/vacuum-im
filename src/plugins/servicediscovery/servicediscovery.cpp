@@ -1176,8 +1176,8 @@ void ServiceDiscovery::onRosterItemReceived(IRoster *ARoster, const IRosterItem 
 
 void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
 {
-  EntityCapabilities &myCaps = FMyCaps[AXmppStream->jid()];
-  myCaps.entityJid = AXmppStream->jid();
+  EntityCapabilities &myCaps = FMyCaps[AXmppStream->streamJid()];
+  myCaps.entityJid = AXmppStream->streamJid();
   myCaps.node = CLIENT_HOME_PAGE;
   myCaps.hash = CAPS_HASH_SHA1;
   myCaps.ver = calcCapsHash(selfDiscoInfo(myCaps.entityJid),myCaps.hash);
@@ -1188,7 +1188,7 @@ void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
     shandle.handler = this;
     shandle.priority = SHP_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
-    shandle.streamJid = AXmppStream->jid();
+    shandle.streamJid = AXmppStream->streamJid();
 
     shandle.conditions.append(SHC_DISCO_INFO);
     FSHIInfo.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
@@ -1208,39 +1208,39 @@ void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
 
 void ServiceDiscovery::onStreamClosed(IXmppStream *AXmppStream)
 {
-  FMyCaps.remove(AXmppStream->jid());
+  FMyCaps.remove(AXmppStream->streamJid());
 
   if (FStanzaProcessor)
   {
-    FStanzaProcessor->removeStanzaHandle(FSHIInfo.take(AXmppStream->jid()));
-    FStanzaProcessor->removeStanzaHandle(FSHIItems.take(AXmppStream->jid()));
-    FStanzaProcessor->removeStanzaHandle(FSHIPresenceIn.take(AXmppStream->jid()));
-    FStanzaProcessor->removeStanzaHandle(FSHIPresenceOut.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIInfo.take(AXmppStream->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIItems.take(AXmppStream->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPresenceIn.take(AXmppStream->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPresenceOut.take(AXmppStream->streamJid()));
   }
 }
 
 void ServiceDiscovery::onStreamRemoved(IXmppStream *AXmppStream)
 {
   foreach(DiscoInfoWindow *infoWindow, FDiscoInfoWindows)
-    if (infoWindow->streamJid() == AXmppStream->jid())
+    if (infoWindow->streamJid() == AXmppStream->streamJid())
       infoWindow->deleteLater();
 
   foreach(DiscoItemsWindow *itemsWindow, FDiscoItemsWindows)
-    if (itemsWindow->streamJid() == AXmppStream->jid())
+    if (itemsWindow->streamJid() == AXmppStream->streamJid())
       itemsWindow->deleteLater();
 }
 
 void ServiceDiscovery::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
   QMultiHash<int,QVariant> data;
-  data.insert(ADR_STREAMJID,AXmppStream->jid().full());
+  data.insert(ADR_STREAMJID,AXmppStream->streamJid().full());
   Action *action = FDiscoMenu->findActions(data).value(0,NULL);
   if (action)
   {
-    action->setData(ADR_STREAMJID,AXmppStream->jid().full());
-    action->setData(ADR_CONTACTJID,AXmppStream->jid().domain());
+    action->setData(ADR_STREAMJID,AXmppStream->streamJid().full());
+    action->setData(ADR_CONTACTJID,AXmppStream->streamJid().domain());
   }
-  emit streamJidChanged(ABefour,AXmppStream->jid());
+  emit streamJidChanged(ABefour,AXmppStream->streamJid());
 }
 
 void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)

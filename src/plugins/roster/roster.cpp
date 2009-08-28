@@ -20,12 +20,12 @@ Roster::Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor) : Q
   FOpened = false;
   setStanzaHandlers();
 
-  connect(FXmppStream->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *))); 
-  connect(FXmppStream->instance(),SIGNAL(jidAboutToBeChanged(IXmppStream *, const Jid &)),
-    SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &)));
-  connect(FXmppStream->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),
-    SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
+  connect(FXmppStream->instance(),SIGNAL(opened()),SLOT(onStreamOpened()));
+  connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed())); 
+  connect(FXmppStream->instance(),SIGNAL(jidAboutToBeChanged(const Jid &)),
+    SLOT(onStreamJidAboutToBeChanged(const Jid &)));
+  connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),
+    SLOT(onStreamJidChanged(const Jid &)));
 }
 
 Roster::~Roster()
@@ -105,7 +105,7 @@ void Roster::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
       emit opened();
     }
     else
-      FXmppStream->close();
+      FXmppStream->abort(tr("Roster request failed"));
   }
 }
 
@@ -113,7 +113,7 @@ void Roster::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaI
 {
   Q_UNUSED(AStreamJid);
   if (AStanzaId==FDelimRequestId || AStanzaId == FOpenRequestId)
-    FXmppStream->close();
+    FXmppStream->abort(tr("Roster request failed"));
 }
 
 IRosterItem Roster::rosterItem(const Jid &AItemJid) const
@@ -173,7 +173,7 @@ void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QStri
   foreach (QString groupName,AGroups)
     if (!groupName.isEmpty())
       itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(groupName));
-  FStanzaProcessor->sendStanzaOut(FXmppStream->jid(),query);
+  FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),query);
 }
 
 void Roster::setItems(const QList<IRosterItem> &AItems)
@@ -193,7 +193,7 @@ void Roster::setItems(const QList<IRosterItem> &AItems)
         if (!groupName.isEmpty())
           itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(groupName));
     }
-    FStanzaProcessor->sendStanzaOut(FXmppStream->jid(),query);
+    FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),query);
   }
 }
 
@@ -214,7 +214,7 @@ void Roster::sendSubscription(const Jid &AItemJid, int ASubsType, const QString 
   subscr.setTo(AItemJid.eBare()).setType(type);
   if (!AText.isEmpty())
     subscr.addElement("status").appendChild(subscr.createTextNode(AText));
-  FStanzaProcessor->sendStanzaOut(FXmppStream->jid(),subscr);  
+  FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),subscr);  
 }
 
 void Roster::removeItem(const Jid &AItemJid)
@@ -224,7 +224,7 @@ void Roster::removeItem(const Jid &AItemJid)
   QDomElement itemElem = query.addElement("query",NS_JABBER_ROSTER).appendChild(query.createElement("item")).toElement();
   itemElem.setAttribute("jid", AItemJid.eBare());
   itemElem.setAttribute("subscription",SUBSCRIPTION_REMOVE); 
-  FStanzaProcessor->sendStanzaOut(FXmppStream->jid(),query);
+  FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),query);
 }
 
 void Roster::removeItems(const QList<IRosterItem> &AItems)
@@ -240,7 +240,7 @@ void Roster::removeItems(const QList<IRosterItem> &AItems)
       itemElem.setAttribute("jid", ritem.itemJid.eBare());
       itemElem.setAttribute("subscription",SUBSCRIPTION_REMOVE); 
     }
-    FStanzaProcessor->sendStanzaOut(FXmppStream->jid(),query);
+    FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),query);
   }
 }
 
@@ -509,7 +509,7 @@ void Roster::requestGroupDelimiter()
   Stanza query("iq");
   query.setType("get").setId(FStanzaProcessor->newId());
   query.addElement("query",NS_JABBER_PRIVATE).appendChild(query.createElement("roster",NS_GROUP_DELIMITER));
-  if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->jid(),query,REQUEST_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,REQUEST_TIMEOUT))
     FDelimRequestId = query.id();
 }
 
@@ -525,7 +525,7 @@ void Roster::requestRosterItems()
   Stanza query("iq");
   query.setType("get").setId(FStanzaProcessor->newId());
   query.addElement("query",NS_JABBER_ROSTER).setAttribute("ver",FRosterVer); 
-  if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->jid(),query,REQUEST_TIMEOUT))
+  if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,REQUEST_TIMEOUT))
     FOpenRequestId = query.id();
 }
 
@@ -535,7 +535,7 @@ void Roster::setStanzaHandlers()
   shandle.handler = this;
   shandle.priority = SHP_DEFAULT;
   shandle.direction = IStanzaHandle::DirectionIn;
-  shandle.streamJid = FXmppStream->jid();
+  shandle.streamJid = FXmppStream->streamJid();
 
   shandle.conditions.append(SHC_ROSTER);
   FSHIRosterPush = FStanzaProcessor->insertStanzaHandle(shandle); 
@@ -551,12 +551,12 @@ void Roster::removeStanzaHandlers()
   FStanzaProcessor->removeStanzaHandle(FSHISubscription); 
 }
 
-void Roster::onStreamOpened(IXmppStream * /*AXmppStream*/)
+void Roster::onStreamOpened()
 {
   requestGroupDelimiter();
 }
 
-void Roster::onStreamClosed(IXmppStream * /*AXmppStream*/)
+void Roster::onStreamClosed()
 {
   if (isOpen())
   {
@@ -565,14 +565,14 @@ void Roster::onStreamClosed(IXmppStream * /*AXmppStream*/)
   }
 }
 
-void Roster::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter)
+void Roster::onStreamJidAboutToBeChanged(const Jid &AAfter)
 {
   emit streamJidAboutToBeChanged(AAfter);
-  if (!(AXmppStream->jid() && AAfter))
+  if (!(FXmppStream->streamJid() && AAfter))
     clearItems();
 }
 
-void Roster::onStreamJidChanged(IXmppStream * /*AXmppStream*/, const Jid &ABefore)
+void Roster::onStreamJidChanged(const Jid &ABefore)
 {
   emit streamJidChanged(ABefore);
 }

@@ -320,13 +320,13 @@ QString MessageProcessor::prepareBodyForReceive(const QString &AString) const
 
 void MessageProcessor::onStreamOpened(IXmppStream *AXmppStream)
 {
-  if (FStanzaProcessor && !FSHIMessages.contains(AXmppStream->jid()))
+  if (FStanzaProcessor && !FSHIMessages.contains(AXmppStream->streamJid()))
   {
     IStanzaHandle shandle;
     shandle.handler = this;
     shandle.priority = SHP_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
-    shandle.streamJid = AXmppStream->jid();
+    shandle.streamJid = AXmppStream->streamJid();
     shandle.conditions.append(SHC_MESSAGE);
     FSHIMessages.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
@@ -334,12 +334,12 @@ void MessageProcessor::onStreamOpened(IXmppStream *AXmppStream)
 
 void MessageProcessor::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter)
 {
-  if (AAfter && AXmppStream->jid())
+  if (AAfter && AXmppStream->streamJid())
   {
     QMap<int,Message>::iterator it = FMessages.begin();
     while (it != FMessages.end())
     {
-      if (AXmppStream->jid() == it.value().to())
+      if (AXmppStream->streamJid() == it.value().to())
       {
         unNotifyMessage(it.key());
         it.value().setTo(AAfter.eFull());
@@ -348,7 +348,7 @@ void MessageProcessor::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, con
     }
   }
   else
-    removeStreamMessages(AXmppStream->jid());
+    removeStreamMessages(AXmppStream->streamJid());
 }
 
 void MessageProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &/*ABefour*/)
@@ -356,7 +356,7 @@ void MessageProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &/
   QMap<int,Message>::iterator it = FMessages.begin();
   while (it != FMessages.end())
   {
-    if (AXmppStream->jid() == it.value().to())
+    if (AXmppStream->streamJid() == it.value().to())
       notifyMessage(it.key());
     it++;
   }
@@ -364,15 +364,15 @@ void MessageProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &/
 
 void MessageProcessor::onStreamClosed(IXmppStream *AXmppStream)
 {
-  if (FStanzaProcessor && FSHIMessages.contains(AXmppStream->jid()))
+  if (FStanzaProcessor && FSHIMessages.contains(AXmppStream->streamJid()))
   {
-    FStanzaProcessor->removeStanzaHandle(FSHIMessages.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIMessages.take(AXmppStream->streamJid()));
   }
 }
 
 void MessageProcessor::onStreamRemoved(IXmppStream *AXmppStream)
 {
-  removeStreamMessages(AXmppStream->jid());
+  removeStreamMessages(AXmppStream->streamJid());
 }
 
 void MessageProcessor::onNotificationActivated(int ANotifyId)

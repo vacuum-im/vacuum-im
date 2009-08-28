@@ -23,13 +23,13 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IXmppStreams
-  virtual IXmppStream *newStream(const Jid &AStreamJid);
-  virtual void addStream(IXmppStream *AXmppStream);
-  virtual bool isActive(IXmppStream *AXmppStream) const { return FActiveStreams.contains(AXmppStream); }
-  virtual IXmppStream *getStream(const Jid &AStreamJid) const;
-  virtual QList<IXmppStream *> getStreams() const { return FStreams; }
-  virtual void removeStream(IXmppStream *AXmppStream);
-  virtual void destroyStream(const Jid &AJid);
+  virtual QList<IXmppStream *> xmppStreams() const;
+  virtual IXmppStream *xmppStream(const Jid &AStreamJid) const;
+  virtual IXmppStream *newXmppStream(const Jid &AStreamJid);
+  virtual bool isActive(IXmppStream *AXmppStream) const;
+  virtual void addXmppStream(IXmppStream *AXmppStream);
+  virtual void removeXmppStream(IXmppStream *AXmppStream);
+  virtual void destroyXmppStream(const Jid &AJid);
   virtual IStreamFeaturePlugin *featurePlugin(const QString &AFeatureNS) const;
   virtual void registerFeature(const QString &AFeatureNS, IStreamFeaturePlugin *AFeaturePlugin);
 signals:
@@ -40,30 +40,30 @@ signals:
   virtual void consoleElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);
   virtual void aboutToClose(IXmppStream *AXmppStream);
   virtual void closed(IXmppStream *AXmppStream);
-  virtual void error(IXmppStream *AXmppStream, const QString &errStr);
+  virtual void error(IXmppStream *AXmppStream, const QString &AError);
   virtual void jidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
   virtual void jidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   virtual void connectionAdded(IXmppStream *AXmppStream, IConnection *AConnection);
   virtual void connectionRemoved(IXmppStream *AXmppStream, IConnection *AConnection);
-  virtual void featureRegistered(const QString &AFeatureNS, IStreamFeaturePlugin *AFeaturePlugin);
   virtual void featureAdded(IXmppStream *AXmppStream, IStreamFeature *AFeature);
   virtual void featureRemoved(IXmppStream *AXmppStream, IStreamFeature *AFeature);
   virtual void removed(IXmppStream *AXmppStream);
   virtual void destroyed(IXmppStream *AXmppStream);
+  virtual void featureRegistered(const QString &AFeatureNS, IStreamFeaturePlugin *AFeaturePlugin);
 protected slots:
-  void onStreamOpened(IXmppStream *AXmppStream);
-  void onStreamElement(IXmppStream *AXmppStream, const QDomElement &AElem);
-  void onStreamConsoleElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);
-  void onStreamAboutToClose(IXmppStream *AXmppStream);
-  void onStreamClosed(IXmppStream *AXmppStream);
-  void onStreamError(IXmppStream *AXmppStream, const QString &AErrStr);
-  void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
-  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
-  void onStreamConnectionAdded(IXmppStream *AXmppStream, IConnection *AConnection);
-  void onStreamConnectionRemoved(IXmppStream *AXmppStream, IConnection *AConnection);
-  void onStreamFeatureAdded(IXmppStream *AXmppStream, IStreamFeature *AFeature);
-  void onStreamFeatureRemoved(IXmppStream *AXmppStream, IStreamFeature *AFeature);
-  void onStreamDestroyed(IXmppStream *AXmppStream);
+  void onStreamOpened();
+  void onStreamElement(const QDomElement &AElem);
+  void onStreamConsoleElement(const QDomElement &AElem, bool ASended);
+  void onStreamAboutToClose();
+  void onStreamClosed();
+  void onStreamError(const QString &AError);
+  void onStreamJidAboutToBeChanged(const Jid &AAfter);
+  void onStreamJidChanged(const Jid &ABefour);
+  void onStreamConnectionAdded(IConnection *AConnection);
+  void onStreamConnectionRemoved(IConnection *AConnection);
+  void onStreamFeatureAdded(IStreamFeature *AFeature);
+  void onStreamFeatureRemoved(IStreamFeature *AFeature);
+  void onStreamDestroyed();
 private:
   QList<IXmppStream *> FStreams;
   QList<IXmppStream *> FActiveStreams;

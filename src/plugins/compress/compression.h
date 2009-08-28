@@ -19,8 +19,8 @@ public:
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
   virtual bool needHook(Direction /*ADirection*/) const { return FNeedHook; }
-  virtual bool hookData(QByteArray *AData, Direction ADirection);
-  virtual bool hookElement(QDomElement *AElem, Direction ADirection);
+  virtual bool hookData(QByteArray &AData, Direction ADirection);
+  virtual bool hookElement(QDomElement &AElem, Direction ADirection);
 signals:
   virtual void ready(bool ARestart); 
   virtual void error(const QString &AError);
@@ -28,7 +28,7 @@ protected:
   bool startZlib();
   void stopZlib();
 protected slots:
-  void onStreamClosed(IXmppStream *AXmppStream);
+  void onStreamClosed();
 private: 
   IXmppStream *FXmppStream;
 private:

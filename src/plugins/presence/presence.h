@@ -23,12 +23,12 @@ public:
   virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza & /*AStanza*/, bool &/*AAccept*/) { return false; }
   virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IPresence
-  virtual const Jid &streamJid() const { return FXmppStream->jid(); }
+  virtual Jid streamJid() const { return FXmppStream->streamJid(); }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool isOpen() const { return FOpened; }
   virtual int show() const { return FShow; }
   virtual bool setShow(int AShow);
-  virtual const QString &status() const { return FStatus; }
+  virtual QString status() const { return FStatus; }
   virtual bool setStatus(const QString &AStatus);
   virtual int priority() const { return FPriority; }
   virtual bool setPriority(int APriority);
@@ -46,8 +46,8 @@ signals:
 protected:
   void clearItems();
 protected slots:
-  void onStreamError(IXmppStream *AXmppStream, const QString &AError);
-  void onStreamClosed(IXmppStream *AXmppStream);
+  void onStreamError(const QString &AError);
+  void onStreamClosed();
 private:
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;

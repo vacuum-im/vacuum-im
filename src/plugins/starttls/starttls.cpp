@@ -5,7 +5,7 @@ StartTLS::StartTLS(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
   FConnection = NULL;
   FNeedHook = false;
   FXmppStream = AXmppStream;
-  connect(FXmppStream->instance(),SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+  connect(FXmppStream->instance(),SIGNAL(closed()), SLOT(onStreamClosed()));
 }
 
 StartTLS::~StartTLS()
@@ -32,17 +32,17 @@ bool StartTLS::needHook(Direction ADirection) const
   return ADirection == DirectionIn ? FNeedHook : false;
 }
 
-bool StartTLS::hookElement(QDomElement *AElem, Direction ADirection)
+bool StartTLS::hookElement(QDomElement &AElem, Direction ADirection)
 {
-  if (ADirection == DirectionIn && AElem->namespaceURI() == NS_FEATURE_STARTTLS)
+  if (ADirection == DirectionIn && AElem.namespaceURI() == NS_FEATURE_STARTTLS)
   {
     FNeedHook = false;
-    if (AElem->tagName() == "proceed")
+    if (AElem.tagName() == "proceed")
     {
       connect(FConnection->instance(),SIGNAL(encrypted()),SLOT(onConnectionEncrypted()));
       FConnection->startClientEncryption();
     }
-    else if (AElem->tagName() == "failure")
+    else if (AElem.tagName() == "failure")
       emit error(tr("StartTLS negotiation failed.")); 
     else
       emit error(tr("Wrong StartTLS negotiation answer.")); 
@@ -57,7 +57,7 @@ void StartTLS::onConnectionEncrypted()
   emit ready(true);
 }
 
-void StartTLS::onStreamClosed(IXmppStream * /*AXmppStream*/)
+void StartTLS::onStreamClosed()
 {
   if (FConnection)
   {

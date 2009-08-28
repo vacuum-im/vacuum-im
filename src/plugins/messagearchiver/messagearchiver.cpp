@@ -2494,7 +2494,7 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
   {
     IStanzaHandle shandle;
     shandle.handler = this;
-    shandle.streamJid = AXmppStream->jid();
+    shandle.streamJid = AXmppStream->streamJid();
 
     shandle.priority = SHP_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
@@ -2512,31 +2512,31 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
     FSHIMessageBlocks.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
   
-  FNamespaces.insert(AXmppStream->jid(),NS_ARCHIVE);
-  loadServerPrefs(AXmppStream->jid());
+  FNamespaces.insert(AXmppStream->streamJid(),NS_ARCHIVE);
+  loadServerPrefs(AXmppStream->streamJid());
 }
 
 void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 {
-  QList<CollectionWriter *> writers = FCollectionWriters.value(AXmppStream->jid()).values();
+  QList<CollectionWriter *> writers = FCollectionWriters.value(AXmppStream->streamJid()).values();
   qDeleteAll(writers);
-  FCollectionWriters.remove(AXmppStream->jid());
+  FCollectionWriters.remove(AXmppStream->streamJid());
 
   if (FStanzaProcessor)
   {
-    FStanzaProcessor->removeStanzaHandle(FSHIPrefs.take(AXmppStream->jid()));
-    FStanzaProcessor->removeStanzaHandle(FSHIMessageIn.take(AXmppStream->jid()));
-    FStanzaProcessor->removeStanzaHandle(FSHIMessageOut.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPrefs.take(AXmppStream->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIMessageIn.take(AXmppStream->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIMessageOut.take(AXmppStream->streamJid()));
   }
 
-  removeReplicator(AXmppStream->jid());
-  closeHistoryOptionsNode(AXmppStream->jid());
-  FNamespaces.remove(AXmppStream->jid());
-  FArchivePrefs.remove(AXmppStream->jid());
-  FInStoragePrefs.removeAt(FInStoragePrefs.indexOf(AXmppStream->jid()));
-  FSessions.remove(AXmppStream->jid());
+  removeReplicator(AXmppStream->streamJid());
+  closeHistoryOptionsNode(AXmppStream->streamJid());
+  FNamespaces.remove(AXmppStream->streamJid());
+  FArchivePrefs.remove(AXmppStream->streamJid());
+  FInStoragePrefs.removeAt(FInStoragePrefs.indexOf(AXmppStream->streamJid()));
+  FSessions.remove(AXmppStream->streamJid());
 
-  emit archivePrefsChanged(AXmppStream->jid(),IArchiveStreamPrefs());
+  emit archivePrefsChanged(AXmppStream->streamJid(),IArchiveStreamPrefs());
 }
 
 void MessageArchiver::onAccountHidden(IAccount *AAccount)

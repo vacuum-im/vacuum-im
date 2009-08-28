@@ -1193,7 +1193,7 @@ void PrivacyLists::onStreamOpened(IXmppStream *AXmppStream)
     shandle.handler = this;
     shandle.priority = SHP_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
-    shandle.streamJid = AXmppStream->jid();
+    shandle.streamJid = AXmppStream->streamJid();
 
     shandle.conditions.append(SHC_PRIVACY);
     FSHIPrivacy.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
@@ -1206,29 +1206,29 @@ void PrivacyLists::onStreamOpened(IXmppStream *AXmppStream)
     shandle.direction = IStanzaHandle::DirectionOut;
     FSHIRosterOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    loadPrivacyLists(AXmppStream->jid());
+    loadPrivacyLists(AXmppStream->streamJid());
   }
 }
 
 void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
 {
-  if (FEditListsDialogs.contains(AXmppStream->jid()))
-    delete FEditListsDialogs.take(AXmppStream->jid());
+  if (FEditListsDialogs.contains(AXmppStream->streamJid()))
+    delete FEditListsDialogs.take(AXmppStream->streamJid());
 
-  FApplyAutoLists.remove(AXmppStream->jid());
-  FOfflinePresences.remove(AXmppStream->jid());
-  FActiveLists.remove(AXmppStream->jid());
-  FDefaultLists.remove(AXmppStream->jid());
-  FPrivacyLists.remove(AXmppStream->jid());
-  FStreamRequests.remove(AXmppStream->jid());
+  FApplyAutoLists.remove(AXmppStream->streamJid());
+  FOfflinePresences.remove(AXmppStream->streamJid());
+  FActiveLists.remove(AXmppStream->streamJid());
+  FDefaultLists.remove(AXmppStream->streamJid());
+  FPrivacyLists.remove(AXmppStream->streamJid());
+  FStreamRequests.remove(AXmppStream->streamJid());
 
-  updatePrivacyLabels(AXmppStream->jid());
+  updatePrivacyLabels(AXmppStream->streamJid());
 
   if (FStanzaProcessor)
   {
-    FStanzaProcessor->removeStanzaHandle(FSHIPrivacy.take(AXmppStream->jid()));
-    FStanzaProcessor->removeStanzaHandle(FSHIRosterIn.take(AXmppStream->jid()));
-    FStanzaProcessor->removeStanzaHandle(FSHIRosterOut.take(AXmppStream->jid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIPrivacy.take(AXmppStream->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIRosterIn.take(AXmppStream->streamJid()));
+    FStanzaProcessor->removeStanzaHandle(FSHIRosterOut.take(AXmppStream->streamJid()));
   }
 }
 

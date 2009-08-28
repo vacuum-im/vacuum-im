@@ -45,10 +45,10 @@ void JoinMultiChatDialog::initialize()
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
     if (FXmppStreams)
     {
-      QList<IXmppStream *> xmppStreams = FXmppStreams->getStreams();
+      QList<IXmppStream *> xmppStreams = FXmppStreams->xmppStreams();
       foreach(IXmppStream *xmppStream, xmppStreams)
         if (FXmppStreams->isActive(xmppStream))
-          ui.cmbStreamJid->addItem(xmppStream->jid().full());
+          ui.cmbStreamJid->addItem(xmppStream->streamJid().full());
       ui.cmbStreamJid->model()->sort(0,Qt::AscendingOrder);
       connect(ui.cmbStreamJid,SIGNAL(currentIndexChanged(int)),SLOT(onStreamIndexChanged(int)));
       connect(FXmppStreams->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
@@ -62,7 +62,7 @@ void JoinMultiChatDialog::initialize()
 
 void JoinMultiChatDialog::updateResolveNickState()
 {
-  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->getStream(ui.cmbStreamJid->currentText()) : NULL;
+  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(ui.cmbStreamJid->currentText()) : NULL;
   ui.tlbResolveNick->setEnabled(stream!=NULL && stream->isOpen());
 }
 
@@ -99,10 +99,10 @@ void JoinMultiChatDialog::onStreamIndexChanged(int /*AIndex*/)
 void JoinMultiChatDialog::onResolveNickClicked()
 {
   Jid roomJid(ui.lneRoom->text(),ui.lneHost->text(),"");
-  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->getStream(ui.cmbStreamJid->currentText()) : NULL;
+  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(ui.cmbStreamJid->currentText()) : NULL;
   if (stream!=NULL && stream->isOpen() && roomJid.isValid())
   {
-    if (FChatPlugin->requestRoomNick(stream->jid(),roomJid))
+    if (FChatPlugin->requestRoomNick(stream->streamJid(),roomJid))
     {
       ui.lneNick->clear();
       ui.tlbResolveNick->setEnabled(false);
@@ -124,7 +124,7 @@ void JoinMultiChatDialog::onRoomNickReceived(const Jid &AStreamJid, const Jid &A
 
 void JoinMultiChatDialog::onStreamAdded(IXmppStream *AXmppStream)
 {
-  ui.cmbStreamJid->addItem(AXmppStream->jid().full());
+  ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
 }
 
 void JoinMultiChatDialog::onStreamStateChanged(IXmppStream * /*AXmppStream*/)
@@ -135,10 +135,10 @@ void JoinMultiChatDialog::onStreamStateChanged(IXmppStream * /*AXmppStream*/)
 void JoinMultiChatDialog::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
   ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(ABefour.full()));
-  ui.cmbStreamJid->addItem(AXmppStream->jid().full());
+  ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
 }
 
 void JoinMultiChatDialog::onStreamRemoved(IXmppStream *AXmppStream)
 {
-  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->jid().full()));
+  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->streamJid().full()));
 }

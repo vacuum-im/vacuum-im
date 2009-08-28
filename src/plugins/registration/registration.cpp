@@ -232,7 +232,7 @@ Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
   return NULL;
 }
 
-IStreamFeature *Registration::getStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
+IStreamFeature *Registration::newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
   if (AFeatureNS == NS_FEATURE_REGISTER)
   {
@@ -418,7 +418,7 @@ void Registration::onOptionsAccepted()
     {
       QCheckBox *checkBox = FOptionWidgets.value(accountId);
       if (checkBox->isChecked())
-        account->xmppStream()->addFeature(getStreamFeature(NS_FEATURE_REGISTER,account->xmppStream()));
+        account->xmppStream()->insertFeature(newStreamFeature(NS_FEATURE_REGISTER,account->xmppStream()));
       else
         destroyStreamFeature(FStreamFeatures.value(account->xmppStream()));
     }

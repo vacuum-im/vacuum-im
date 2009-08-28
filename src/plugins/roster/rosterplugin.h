@@ -40,7 +40,6 @@ signals:
   virtual void rosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
   virtual void rosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
   virtual void rosterRemoved(IRoster *ARoster);
-protected:
 protected slots:
   void onRosterOpened();
   void onRosterItemReceived(const IRosterItem &ARosterItem);
@@ -56,7 +55,7 @@ private:
   IStanzaProcessor *FStanzaProcessor;
   ISettingsPlugin *FSettingsPlugin;
 private:
-  QList<Roster *> FRosters;
+  QList<IRoster *> FRosters;
   QObjectCleanupHandler FCleanupHandler;
 };
 
