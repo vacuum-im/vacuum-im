@@ -115,7 +115,7 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
 {
   if (AOrder==FSHO_FILETRANSFER)
   {
-    QDomElement fileElem = ARequest.firstElement("si",NS_SI_FILETRANSFER).firstChildElement("file");
+    QDomElement fileElem = ARequest.firstElement("si",NS_STREAM_INITIATION).firstChildElement("file");
     while (!fileElem.isNull() && fileElem.namespaceURI()!=NS_SI_FILETRANSFER)
       fileElem = fileElem.nextSiblingElement("file");
 
@@ -236,7 +236,7 @@ void FileTransfer::notifyStream(IFileStream *AStream)
       notify.data.insert(NDR_WINDOW_TEXT, tr("File transfer completed"));
       notify.data.insert(NDR_SOUND_FILE,SDF_FILETRANSFER_COMPLETE);
       break;
-    case IFileStream::Canceled:
+    case IFileStream::Aborted:
       notify.data.insert(NDR_TOOLTIP,tr("Canceled transferring file: %1").arg(file));
       notify.data.insert(NDR_WINDOW_TEXT, tr("File transfer canceled: %1").arg(Qt::escape(AStream->errorString())));
       notify.data.insert(NDR_SOUND_FILE,SDF_FILETRANSFER_CANCELED);
@@ -266,6 +266,7 @@ StreamDialog *FileTransfer::createStreamDialog(IFileStream *AStream)
     else
       IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(dialog,MNI_FILETRANSFER_RECEIVE,0,0,"windowIcon");
     connect(dialog,SIGNAL(dialogDestroyed()),SLOT(onStreamDialogDestroyed()));
+    FStreamDialog.insert(AStream->streamId(),dialog);
   }
   return dialog;
 }

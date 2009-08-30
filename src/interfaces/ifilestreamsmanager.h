@@ -23,7 +23,7 @@ public:
     Transfering,
     Disconnecting,
     Finished,
-    Canceled
+    Aborted
   };
 public:
   virtual QObject *instance() =0;
@@ -54,7 +54,7 @@ public:
   virtual void setFileDescription(const QString &AFileDesc) =0;
   virtual bool initStream(const QList<QString> &AMethods) =0;
   virtual bool startStream(const QString &AMethodNS, const QString &ASettingsNS) =0;
-  virtual void cancelStream(const QString &AError) =0;
+  virtual void abortStream(const QString &AError) =0;
 signals:
   virtual void stateChanged() =0;
   virtual void speedUpdated() =0;

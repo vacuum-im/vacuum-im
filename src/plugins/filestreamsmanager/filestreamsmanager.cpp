@@ -131,7 +131,7 @@ bool FileStreamsManager::dataStreamError(const QString &AStreamId, const QString
   IFileStream *stream = streamById(AStreamId);
   if (stream)
   {
-    stream->cancelStream(AError);
+    stream->abortStream(AError);
     return true;
   }
   return false;

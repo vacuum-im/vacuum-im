@@ -49,7 +49,7 @@ public:
   virtual void setFileDescription(const QString &AFileDesc);
   virtual bool initStream(const QList<QString> &AMethods);
   virtual bool startStream(const QString &AMethodNS, const QString &ASettingsNS);
-  virtual void cancelStream(const QString &AError);
+  virtual void abortStream(const QString &AError);
 signals:
   virtual void stateChanged();
   virtual void speedUpdated();

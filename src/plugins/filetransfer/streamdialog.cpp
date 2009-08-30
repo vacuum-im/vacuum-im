@@ -145,7 +145,7 @@ void StreamDialog::onStreamStateChanged()
     break;
   case IFileStream::Disconnecting:
   case IFileStream::Finished:
-  case IFileStream::Canceled:
+  case IFileStream::Aborted:
     ui.tlbFile->setEnabled(false);
     ui.lneFile->setReadOnly(true);
     ui.pteDescription->setReadOnly(true);
@@ -278,12 +278,12 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
     if (QMessageBox::question(this,tr("Cancel file transfer"),tr("Are you sure you want to cancel a file transfer?"),
       QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
     {
-      FFileStream->cancelStream(tr("File transfer terminated by user"));
+      FFileStream->abortStream(tr("File transfer terminated by user"));
     }
   }
   else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Close)
   {
-    if (FFileStream->streamState()==IFileStream::Finished || FFileStream->streamState()==IFileStream::Canceled)
+    if (FFileStream->streamState()==IFileStream::Finished || FFileStream->streamState()==IFileStream::Aborted)
       delete FFileStream->instance();
     else if (FFileStream->streamKind()==IFileStream::SendFile && FFileStream->streamState()==IFileStream::Creating)
       delete FFileStream->instance();
