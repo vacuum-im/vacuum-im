@@ -257,20 +257,39 @@ bool FileStream::initStream(const QList<QString> &AMethods)
 
 bool FileStream::startStream(const QString &AMethodNS, const QString &ASettingsNS)
 {
-  if ( (FStreamKind==SendFile && FStreamState==Negotiating) || (FStreamKind==ReceiveFile && FStreamState==Creating) )
+  if (FStreamKind==SendFile && FStreamState==Negotiating)
   {
     if (openFile())
     {
       IDataStreamMethod *stremMethod = FDataManager->method(AMethodNS);
-      IDataStreamSocket::StreamKind kind = FStreamKind==SendFile ? IDataStreamSocket::Initiator : IDataStreamSocket::Target;
-      FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,kind,this) : NULL;
+      FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Initiator,this) : NULL;
       if (FSocket)
       {
         stremMethod->loadSettings(FSocket,ASettingsNS);
         setStreamState(Connecting,tr("Connecting"));
         connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
-        FSocket->open(FStreamKind==SendFile ? QIODevice::WriteOnly : QIODevice::ReadOnly);
-        return true;
+        if (FSocket->open(QIODevice::WriteOnly))
+          return true;
+      }
+      FFile.close();
+    }
+  }
+  else if (FStreamKind==ReceiveFile && FStreamState==Creating)
+  {
+    if (openFile())
+    {
+      if (FDataManager->acceptStream(FStreamId,AMethodNS))
+      {
+        IDataStreamMethod *stremMethod = FDataManager->method(AMethodNS);
+        FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Target,this) : NULL;
+        if (FSocket)
+        {
+          stremMethod->loadSettings(FSocket,ASettingsNS);
+          setStreamState(Connecting,tr("Connecting"));
+          connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
+          if (FSocket->open(QIODevice::ReadOnly))
+            return true;
+        }
       }
       FFile.close();
     }
@@ -278,9 +297,9 @@ bool FileStream::startStream(const QString &AMethodNS, const QString &ASettingsN
   return false;
 }
 
-void FileStream::cancelStream(const QString &AError)
+void FileStream::abortStream(const QString &AError)
 {
-  if (FStreamState!=Canceled)
+  if (FStreamState!=Aborted)
   {
     if (!FCanceled)
     {
@@ -291,7 +310,7 @@ void FileStream::cancelStream(const QString &AError)
     {
       FThread->abort();
     }
-    else if (FSocket && FSocket->isOpen())
+    else if (FSocket && FSocket->streamState()!=IDataStreamSocket::Closed)
     {
       FSocket->close();
     }
@@ -299,7 +318,7 @@ void FileStream::cancelStream(const QString &AError)
     {
       if (FStreamKind==ReceiveFile && FStreamState==Creating)
         FDataManager->rejectStream(FStreamId,AError);
-      setStreamState(Canceled,FErrorString);
+      setStreamState(Aborted,FErrorString);
     }
   }
 }
@@ -366,20 +385,20 @@ void FileStream::onSocketStateChanged(int AState)
       }
       else if (FFile.error() != QFile::NoError)
       {
-        cancelStream(FFile.errorString());
+        abortStream(FFile.errorString());
       }
       else if (!FSocket->instance()->errorString().isEmpty())
       {
-        cancelStream(FSocket->instance()->errorString());
+        abortStream(FSocket->instance()->errorString());
       }
       else
       {
-        cancelStream(tr("File stream terminated"));
+        abortStream(tr("File stream terminated"));
       }
     }
     else
     {
-      cancelStream(FErrorString);
+      abortStream(FErrorString);
     }
     delete FSocket->instance();
     FSocket = NULL;

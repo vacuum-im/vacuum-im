@@ -4,6 +4,7 @@
 #define MAX_WRITE_BUFFER_SIZE     8192
 
 #define OPEN_TIMEOUT              60000
+#define CLOSE_TIMEOUT             5000
 
 #define SHC_INBAND_OPEN           "/iq[@type='set']/open[@xmlns='" NS_INBAND_BYTESTREAMS "']"
 #define SHC_INBAND_CLOSE          "/iq[@type='set']/close[@xmlns='" NS_INBAND_BYTESTREAMS "']"
@@ -276,8 +277,8 @@ void InBandStream::close()
   {
     Stanza closeRequest("iq");
     closeRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.eFull());
-    closeRequest.addElement("open",NS_INBAND_BYTESTREAMS);
-    if (FStanzaProcessor && FStanzaProcessor->sendStanzaOut(FStreamJid,closeRequest))
+    closeRequest.addElement("close",NS_INBAND_BYTESTREAMS);
+    if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,FStreamJid,closeRequest,CLOSE_TIMEOUT))
     {
       FCloseRequestId = closeRequest.id();
       setStreamState(IDataStreamSocket::Closing);
