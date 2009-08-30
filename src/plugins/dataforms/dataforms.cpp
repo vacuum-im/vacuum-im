@@ -689,7 +689,7 @@ bool DataForms::isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) 
       if (sumbIndex>=0)
       {
         IDataField submField = ASubmit.fields.at(sumbIndex);
-        if (!isFieldEmpty(formField))
+        if (!isFieldEmpty(submField))
         {
           submField.type = formField.type;
           submField.options = formField.options;
