@@ -141,6 +141,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     if (FNotifications)
     {
       connect(FNotifications->instance(),SIGNAL(notificationActivated(int)), SLOT(onNotificationActivated(int)));
+      connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)), SLOT(onNotificationRemoved(int)));
     }
   }
 
@@ -838,7 +839,7 @@ void StatusChanger::removeStatusNotification(IPresence *APresence)
 {
   if (FNotifications && FStreamNotify.contains(APresence))
   {
-    FNotifications->removeNotification(FStreamNotify.take(APresence));
+    FNotifications->removeNotification(FStreamNotify.value(APresence));
   }
 }
 
@@ -1102,7 +1103,16 @@ void StatusChanger::onAccountChanged(const QString &AName, const QVariant &AValu
 
 void StatusChanger::onNotificationActivated(int ANotifyId)
 {
-  FNotifications->removeNotification(ANotifyId);
+  IPresence *presence = FStreamNotify.key(ANotifyId,NULL);
+  if (presence!=NULL)
+  {
+    removeStatusNotification(presence);
+  }
+}
+
+void StatusChanger::onNotificationRemoved(int ANotifyId)
+{
+  FStreamNotify.remove(FStreamNotify.key(ANotifyId));
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)
