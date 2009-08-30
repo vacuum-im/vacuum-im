@@ -34,6 +34,7 @@ public:
   virtual bool isOpen() const =0;
   virtual bool open(QIODevice::OpenMode AMode) =0;
   virtual bool flush() =0;
+  virtual void abort(const QString &AError) =0;
   virtual void close() =0;
 signals:
   virtual void stateChanged(int AState) =0;

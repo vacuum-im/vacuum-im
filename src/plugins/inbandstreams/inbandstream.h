@@ -5,6 +5,7 @@
 #include "../../interfaces/iinbandstreams.h"
 #include "../../interfaces/idatastreamsmanager.h"
 #include "../../interfaces/istanzaprocessor.h"
+#include "../../utils/errorhandler.h"
 #include "../../utils/ringbuffer.h"
 #include "../../utils/jid.h"
 
@@ -42,12 +43,18 @@ public:
   virtual bool isOpen() const;
   virtual bool open(QIODevice::OpenMode AMode);
   virtual bool flush();
+  virtual void abort(const QString &AError);
   virtual void close();
 signals:
   virtual void stateChanged(int AState);
 protected:
   virtual qint64 readData(char *AData, qint64 AMaxSize);
   virtual qint64 writeData(const char *AData, qint64 AMaxSize);
+  void setErrorString(const QString &AError);
+protected:
+  void setStreamState(int AState);
+  int insertStanzaHandle(const QString &ACondition);
+  void removeStanzaHandle(int &AHandleId);
 private:
   IStanzaProcessor *FStanzaProcessor;
 private:
@@ -57,9 +64,18 @@ private:
   int FStreamState;
   QString FStreamId;
 private:
+  int FSHIOpen;
+  int FSHIClose;
+  int FSHIData;
+  QString FOpenRequestId;
+  QString FCloseRequestId;
+private:
   int FSeqNumber;
-  RingBuffer readBuffer;
-  RingBuffer writeBuffer;
+  int FBlockSize;
+  int FMaxBlockSize;
+  QString FStanza;
+  RingBuffer FReadBuffer;
+  RingBuffer FWriteBuffer;
 };
 
 #endif // INBANDSTREAM_H
