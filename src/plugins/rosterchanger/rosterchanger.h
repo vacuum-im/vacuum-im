@@ -116,6 +116,7 @@ protected slots:
   void onRosterClosed(IRoster *ARoster);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onNotificationActivated(int ANotifyId);
+  void onNotificationRemoved(int ANotifyId);
   void onSubscriptionDialogDestroyed();
   void onAccountChanged(const QString &AName, const QVariant &AValue);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);

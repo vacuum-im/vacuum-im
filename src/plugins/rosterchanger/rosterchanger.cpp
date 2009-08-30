@@ -104,6 +104,7 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     if (FNotifications)
     {
       connect(FNotifications->instance(),SIGNAL(notificationActivated(int)), SLOT(onNotificationActivated(int)));
+      connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)), SLOT(onNotificationRemoved(int)));
     }
   }
 
@@ -1233,8 +1234,17 @@ void RosterChanger::onNotificationActivated(int ANotifyId)
 {
   SubscriptionDialog *dialog = FSubscrDialogs.key(ANotifyId);
   if (dialog)
+  {
     dialog->show();
-  FNotifications->removeNotification(ANotifyId);
+    FNotifications->removeNotification(ANotifyId);
+  }
+}
+
+void RosterChanger::onNotificationRemoved(int ANotifyId)
+{
+  SubscriptionDialog *dialog = FSubscrDialogs.key(ANotifyId);
+  if (dialog)
+    dialog->reject();
 }
 
 void RosterChanger::onSubscriptionDialogDestroyed()
