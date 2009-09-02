@@ -69,11 +69,13 @@ private:
   int FSHIData;
   QString FOpenRequestId;
   QString FCloseRequestId;
+  QString FDataRequestId;
 private:
-  int FSeqNumber;
   int FBlockSize;
   int FMaxBlockSize;
-  QString FStanza;
+  quint16 FSeqIn;
+  quint16 FSeqOut;
+  QString FStanzaTag;
   RingBuffer FReadBuffer;
   RingBuffer FWriteBuffer;
 };

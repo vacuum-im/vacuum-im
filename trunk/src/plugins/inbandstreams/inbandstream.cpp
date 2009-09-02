@@ -1,5 +1,7 @@
 #include "inbandstream.h"
 
+#include <QTime>
+
 #define BUFFER_INCREMENT_SIZE     1024
 #define MAX_WRITE_BUFFER_SIZE     8192
 
@@ -46,7 +48,42 @@ bool InBandStream::stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &ASta
 
 bool InBandStream::stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
-  if (AHandleId==FSHIOpen && AStanza.firstElement("open").attribute("sid")==FStreamId)
+  QDomElement elem = AStanza.firstElement(QString::null,NS_INBAND_BYTESTREAMS);
+  if (AHandleId==FSHIData && elem.attribute("sid")==FStreamId)
+  {
+    if (AStanza.type()=="result" || FStanzaTag=="message")
+    {
+      QByteArray data =  QByteArray::fromBase64(elem.text().toUtf8());
+      if (FSeqIn==elem.attribute("seq").toInt() && data.size()>0 && data.size()<=FBlockSize)
+      {
+        if (AStanza.tagName() == "iq")
+        {
+          Stanza result("iq");
+          result.setType("result").setId(AStanza.id()).setTo(AStanza.from());
+          FStanzaProcessor->sendStanzaOut(AStreamJid,result);
+        }
+        FSeqIn = FSeqIn<65535 ? FSeqIn+1 : 0;
+        FReadBuffer.write(data);
+        emit readyRead();
+      }
+      else
+      {
+        setErrorString(tr("Malformed data packet"));
+        Stanza error = AStanza.replyError("bad-request",EHN_DEFAULT,ErrorHandler::BAD_REQUEST,errorString());
+        error.detach();
+        QDomElement dataElem = error.firstElement("data",NS_INBAND_BYTESTREAMS);
+        dataElem.removeChild(dataElem.firstChild());
+        FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+        close();
+      }
+    }
+    else
+    {
+      setErrorString(ErrorHandler(AStanza.element()).message());
+      setStreamState(IDataStreamSocket::Closed);
+    }
+  }
+  else if (AHandleId==FSHIOpen && elem.attribute("sid")==FStreamId)
   {
     AAccept = true;
     removeStanzaHandle(FSHIOpen);
@@ -56,8 +93,8 @@ bool InBandStream::stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza
       FBlockSize = openElem.attribute("block-size").toInt();
       if (FBlockSize>0 && FBlockSize<=FMaxBlockSize)
       {
-        FStanza = openElem.attribute("stanza");
-        FSHIData = insertStanzaHandle(FStanza=="message" ? SHC_INBAND_DATA_MESSAGE : SHC_INBAND_DATA_IQ);
+        FStanzaTag = openElem.attribute("stanza");
+        FSHIData = insertStanzaHandle(FStanzaTag=="message" ? SHC_INBAND_DATA_MESSAGE : SHC_INBAND_DATA_IQ);
         FSHIClose = insertStanzaHandle(SHC_INBAND_CLOSE);
         if (FSHIData>0 && FSHIClose>0)
         {
@@ -95,7 +132,7 @@ bool InBandStream::stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza
       FStanzaProcessor->sendStanzaOut(AStreamJid,error);
     }
   }
-  else if (AHandleId==FSHIClose && AStanza.firstElement("close").attribute("sid")==FStreamId)
+  else if (AHandleId==FSHIClose && elem.attribute("sid")==FStreamId)
   {
     AAccept = true;
     Stanza reply("iq");
@@ -108,11 +145,24 @@ bool InBandStream::stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza
 
 void InBandStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
-  if (AStanza.id() == FOpenRequestId)
+  Q_UNUSED(AStreamJid);
+  if (AStanza.id() == FDataRequestId)
   {
     if (AStanza.type() == "result")
     {
-      FSHIData = insertStanzaHandle(FStanza=="message" ? SHC_INBAND_DATA_MESSAGE : SHC_INBAND_DATA_IQ);
+
+    }
+    else
+    {
+      setErrorString(ErrorHandler(AStanza.element()).message());
+      setStreamState(IDataStreamSocket::Closed);
+    }
+  }
+  else if (AStanza.id() == FOpenRequestId)
+  {
+    if (AStanza.type() == "result")
+    {
+      FSHIData = insertStanzaHandle(FStanzaTag=="message" ? SHC_INBAND_DATA_MESSAGE : SHC_INBAND_DATA_IQ);
       FSHIClose = insertStanzaHandle(SHC_INBAND_CLOSE);
       if (FSHIData>0 && FSHIClose>0)
       {
@@ -126,8 +176,7 @@ void InBandStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
     }
     else
     {
-      ErrorHandler err(AStanza.element());
-      setErrorString(err.message());
+      setErrorString(ErrorHandler(AStanza.element()).message());
       setStreamState(IDataStreamSocket::Closed);
     }
   }
@@ -173,7 +222,16 @@ bool InBandStream::waitForBytesWritten(int AMsecs)
 
 bool InBandStream::waitForReadyRead(int AMsecs)
 {
-  return false;
+  QTime time;
+  time.start();
+  while (FReadBuffer.size()==0)
+  {
+    if (AMsecs>=0 && time.elapsed()>AMsecs)
+      return false;
+    if (FStreamState == IDataStreamSocket::Closed)
+      return false;
+  }
+  return true;
 }
 
 QString InBandStream::methodNS() const
@@ -215,7 +273,7 @@ bool InBandStream::open(QIODevice::OpenMode AMode)
 {
   if (FStanzaProcessor && FStreamState == IDataStreamSocket::Closed)
   {
-    FStanza = "iq";
+    FStanzaTag = "iq";
     FBlockSize = 4096;
     FMaxBlockSize = 10240;
     if (FStreamKind == IDataStreamSocket::Initiator)
@@ -225,7 +283,7 @@ bool InBandStream::open(QIODevice::OpenMode AMode)
       QDomElement elem = openRequest.addElement("open",NS_INBAND_BYTESTREAMS);
       elem.setAttribute("sid",FStreamId);
       elem.setAttribute("block-size",FBlockSize);
-      elem.setAttribute("stanza",FStanza);
+      elem.setAttribute("stanza",FStanzaTag);
       if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,openRequest,OPEN_TIMEOUT))
       {
         FOpenRequestId = openRequest.id();
@@ -275,6 +333,7 @@ void InBandStream::close()
 {
   if (FStreamState==IDataStreamSocket::Opened || FStreamState==IDataStreamSocket::Opening)
   {
+    emit aboutToClose();
     Stanza closeRequest("iq");
     closeRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.eFull());
     closeRequest.addElement("close",NS_INBAND_BYTESTREAMS);
@@ -315,14 +374,20 @@ void InBandStream::setStreamState(int AState)
     {
       setErrorString(QString::null);
     }
-    if (AState == IDataStreamSocket::Closed)
+    else if (AState == IDataStreamSocket::Opened)
     {
-      FReadBuffer.clear();
-      FWriteBuffer.clear();
-      QIODevice::close();
+      FSeqIn = 0;
+      FSeqOut = 0;
+    }
+    else if (AState == IDataStreamSocket::Closed)
+    {
       removeStanzaHandle(FSHIOpen);
       removeStanzaHandle(FSHIClose);
       removeStanzaHandle(FSHIData);
+      emit readChannelFinished();
+      QIODevice::close();
+      FReadBuffer.clear();
+      FWriteBuffer.clear();
     }
     FStreamState = AState;
     emit stateChanged(AState);
