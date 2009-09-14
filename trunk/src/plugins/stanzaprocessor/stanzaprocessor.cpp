@@ -382,14 +382,14 @@ void StanzaProcessor::onStanzaRequestTimeout()
 void StanzaProcessor::onStanzaRequestOwnerDestroyed(QObject *AOwner)
 {
   foreach(QString stanzaId, FRequests.keys())
-    if ((QObject *)FRequests.value(stanzaId).owner == AOwner)
+    if (FRequests.value(stanzaId).owner->instance() == AOwner)
       removeStanzaRequest(stanzaId);
 }
 
 void StanzaProcessor::onStanzaHandlerDestroyed(QObject *AHandler)
 {
   foreach (int shandleId, FHandles.keys())
-    if ((QObject *)FHandles.value(shandleId).handler == AHandler)
+    if (FHandles.value(shandleId).handler->instance() == AHandler)
       removeStanzaHandle(shandleId);
 }
 
