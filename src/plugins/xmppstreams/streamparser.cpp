@@ -67,7 +67,7 @@ void StreamParser::parseData(const QByteArray &AData)
       if (FLevel == 0)
         emit closed();
       else if (FLevel == 1)
-        emit element(FDoc.documentElement());
+       emit element(FDoc.documentElement());
       else if (FLevel > 1)
         FElement = FElement.parentNode().toElement();
       FLevelNS.pop();

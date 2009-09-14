@@ -15,8 +15,8 @@ public:
   void parseData(const QByteArray &AData);
   void restart();
 signals:
-  void opened(QDomElement &AElement);
-  void element(QDomElement &AElement);
+  void opened(QDomElement AElem);
+  void element(QDomElement AElem);
   void error(const QString &AError);
   void closed();
 private:
