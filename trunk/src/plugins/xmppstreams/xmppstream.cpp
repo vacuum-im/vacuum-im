@@ -14,8 +14,8 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
   FActiveFeature = NULL;
   FStreamState = SS_OFFLINE;
 
-  connect(&FParser,SIGNAL(opened(QDomElement &)), SLOT(onParserOpened(QDomElement &)));
-  connect(&FParser,SIGNAL(element(QDomElement &)), SLOT(onParserElement(QDomElement &)));
+  connect(&FParser,SIGNAL(opened(QDomElement)), SLOT(onParserOpened(QDomElement)));
+  connect(&FParser,SIGNAL(element(QDomElement)), SLOT(onParserElement(QDomElement)));
   connect(&FParser,SIGNAL(error(const QString &)), SLOT(onParserError(const QString &)));
   connect(&FParser,SIGNAL(closed()), SLOT(onParserClosed()));
 
@@ -433,7 +433,7 @@ void XmppStream::onConnectionError(const QString &AError)
   abort(AError);
 }
 
-void XmppStream::onParserOpened(QDomElement &AElem)
+void XmppStream::onParserOpened(QDomElement AElem)
 {
   showInConsole(AElem,IStreamFeature::DirectionIn);
 
@@ -452,7 +452,7 @@ void XmppStream::onParserOpened(QDomElement &AElem)
     abort(tr("Invalid stream namespace"));
 }
 
-void XmppStream::onParserElement(QDomElement &AElem)
+void XmppStream::onParserElement(QDomElement AElem)
 {
   showInConsole(AElem,IStreamFeature::DirectionIn);
 

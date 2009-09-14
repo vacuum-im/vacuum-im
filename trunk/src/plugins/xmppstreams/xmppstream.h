@@ -71,8 +71,8 @@ protected slots:
   void onConnectionDisconnected();
   void onConnectionError(const QString &AError);
   //StreamParser
-  void onParserOpened(QDomElement &AElem);
-  void onParserElement(QDomElement &AElem);
+  void onParserOpened(QDomElement AElem);
+  void onParserElement(QDomElement AElem);
   void onParserError(const QString &AError);
   void onParserClosed();
   //IStreamFeature
