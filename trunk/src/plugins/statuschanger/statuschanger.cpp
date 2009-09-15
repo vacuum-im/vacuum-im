@@ -141,7 +141,6 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     if (FNotifications)
     {
       connect(FNotifications->instance(),SIGNAL(notificationActivated(int)), SLOT(onNotificationActivated(int)));
-      connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)), SLOT(onNotificationRemoved(int)));
     }
   }
 
@@ -265,7 +264,7 @@ void StatusChanger::setStatus(int AStatusId, const Jid &AStreamJid)
         statusAboutToBeSeted(status->code,presence->streamJid());
         
         FSettingStatusToPresence = presence;
-        if (!presence->setPresence((IPresence::Show)status->show,status->text,status->priority))
+        if (!presence->setPresence(status->show,status->text,status->priority))
         {
           FSettingStatusToPresence = NULL;
           if (status->show != IPresence::Offline && !presence->xmppStream()->isOpen())
@@ -839,7 +838,7 @@ void StatusChanger::removeStatusNotification(IPresence *APresence)
 {
   if (FNotifications && FStreamNotify.contains(APresence))
   {
-    FNotifications->removeNotification(FStreamNotify.value(APresence));
+    FNotifications->removeNotification(FStreamNotify.take(APresence));
   }
 }
 
@@ -1103,16 +1102,8 @@ void StatusChanger::onAccountChanged(const QString &AName, const QVariant &AValu
 
 void StatusChanger::onNotificationActivated(int ANotifyId)
 {
-  IPresence *presence = FStreamNotify.key(ANotifyId,NULL);
-  if (presence!=NULL)
-  {
-    removeStatusNotification(presence);
-  }
-}
-
-void StatusChanger::onNotificationRemoved(int ANotifyId)
-{
-  FStreamNotify.remove(FStreamNotify.key(ANotifyId));
+  if (FStreamNotify.values().contains(ANotifyId))
+     FNotifications->removeNotification(ANotifyId);
 }
 
 Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)
