@@ -128,7 +128,6 @@ protected slots:
   void onEditStatusAction(bool);
   void onAccountChanged(const QString &AName, const QVariant &AValue);
   void onNotificationActivated(int ANotifyId);
-  void onNotificationRemoved(int ANotifyId);
 private:
   IPresencePlugin *FPresencePlugin;
   IRosterPlugin *FRosterPlugin;
