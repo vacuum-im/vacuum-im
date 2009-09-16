@@ -35,7 +35,6 @@ public:
   virtual qint64 speed() const =0;
   virtual qint64 progress() const =0;
   virtual QString stateString() const =0;
-  virtual QString errorString() const =0;
   virtual bool isRangeSupported() const =0;
   virtual void setRangeSupported(bool ASupported) =0;
   virtual qint64 rangeOffset() const =0;

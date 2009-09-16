@@ -4,28 +4,28 @@
 <context>
     <name>FileStream</name>
     <message>
-        <source>Waiting for a response to a request</source>
-        <translation>Ожидание ответа на запрос</translation>
-    </message>
-    <message>
         <source>Connecting</source>
         <translation>Подключение</translation>
     </message>
     <message>
-        <source>Data Transmission</source>
+        <source>Disconnecting</source>
+        <translation>Отключение</translation>
+    </message>
+    <message>
+        <source>Waiting for a response to send a file request</source>
+        <translation>Ожидание ответа на запрос отправки файла</translation>
+    </message>
+    <message>
+        <source>Data transmission</source>
         <translation>Передача данных</translation>
     </message>
     <message>
-        <source>File stream finished</source>
-        <translation>Файловый поток завершен</translation>
+        <source>Data transmission finished</source>
+        <translation>Передача данных завершена</translation>
     </message>
     <message>
-        <source>File stream terminated</source>
-        <translation>Файловый поток прерван</translation>
-    </message>
-    <message>
-        <source>Disconnecting</source>
-        <translation>Отключение</translation>
+        <source>Data transmission terminated by user</source>
+        <translation>Передача данных прервана пользователем</translation>
     </message>
 </context>
 <context>

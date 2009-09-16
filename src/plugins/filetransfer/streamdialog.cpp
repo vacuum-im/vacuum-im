@@ -80,6 +80,61 @@ void StreamDialog::setSelectableMethods(const QList<QString> &AMethods)
   }
 }
 
+
+bool StreamDialog::acceptFileName(const QString AFile)
+{
+  QFileInfo fileInfo(AFile);
+  if (fileInfo.exists() && FFileStream->streamKind()==IFileStream::ReceiveFile)
+  {
+    if (FFileStream->isRangeSupported() && fileInfo.size()<FFileStream->fileSize())
+    {
+      QMessageBox::StandardButton button = QMessageBox::question(this,tr("Continue file transfer"),
+        tr("A file with this name, but a smaller size already exists. Do you want to continue file transfer?"),
+        QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+      if (button == QMessageBox::Yes)
+      {
+        FFileStream->setRangeOffset(fileInfo.size());
+      }
+      else if (button == QMessageBox::No)
+      {
+        if (!QFile::remove(fileInfo.absoluteFilePath()))
+        {
+          QMessageBox::warning(this,tr("Warning"),tr("Can not delete existing file"));
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+    else
+    {
+      QMessageBox::StandardButton button = QMessageBox::question(this,tr("Remove file"),
+        tr("A file with this name already exists. Do you want to remove existing file?"),
+        QMessageBox::Yes|QMessageBox::No);
+      if (button == QMessageBox::Yes)
+      {
+        if (!QFile::remove(AFile))
+        {
+          QMessageBox::warning(this,tr("Warning"),tr("Can not delete existing file"));
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+  }
+  else if (!fileInfo.exists() && FFileStream->streamKind()==IFileStream::SendFile)
+  {
+    QMessageBox::warning(this,tr("Warning"),tr("Selected file does not exists"));
+    return false;
+  }
+  return !AFile.isEmpty();
+}
+
 QString StreamDialog::sizeName(qint64 ABytes) const
 {
   int precision = 0;
@@ -102,10 +157,10 @@ QString StreamDialog::sizeName(qint64 ABytes) const
     units = tr("GB","Gigabyte");
   }
 
-  if (value < 100)
-    precision = 1;
-  else if (value < 10)
+  if (value < 10)
     precision = 2;
+  else if (value < 100)
+    precision = 1;
 
   return QString::number(value,'f',precision)+units;
 }
@@ -182,63 +237,13 @@ void StreamDialog::onFileButtonClicked(bool)
   if (FFileStream->streamState() == IFileStream::Creating)
   {
     QString file;
-    if (FFileStream->streamKind()==IFileStream::ReceiveFile) 
-    {
-      file = QFileDialog::getSaveFileName(this,tr("Select file for receive"),QString::null,QString::null,NULL,QFileDialog::DontConfirmOverwrite);
-      QFileInfo fileInfo(file);
-      if (fileInfo.exists())
-      {
-        if (FFileStream->isRangeSupported() && fileInfo.size()<FFileStream->fileSize())
-        {
-          QMessageBox::StandardButton button = QMessageBox::question(this,tr("Continue file transfer"),
-            tr("A file with this name, but a smaller size already exists. Do you want to continue file transfer?"),
-            QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
-          if (button == QMessageBox::Yes)
-          {
-            FFileStream->setRangeOffset(fileInfo.size());
-          }
-          else if (button == QMessageBox::No)
-          {
-            if (!QFile::remove(file))
-            {
-              QMessageBox::warning(this,tr("Warning"),tr("Can not delete existing file"));
-              file.clear();
-            }
-          }
-          else
-          {
-            file.clear();
-          }
-        }
-        else
-        {
-          QMessageBox::StandardButton button = QMessageBox::question(this,tr("Remove existing file"),
-            tr("A file with this name already exists. Do you want to remove existing file?"),
-            QMessageBox::Yes|QMessageBox::No);
-          if (button == QMessageBox::Yes)
-          {
-            if (!QFile::remove(file))
-            {
-              QMessageBox::warning(this,tr("Warning"),tr("Can not delete existing file"));
-              file.clear();
-            }
-          }
-          else
-          {
-            file.clear();
-          }
-        }
-      }
-    }
-    else
-    {
-      file = QFileDialog::getOpenFileName(this,tr("Select file to send"));
-    }
 
-    if (!file.isEmpty())
-    {
-      FFileStream->setFileName(file);
-    }
+    if (FFileStream->streamKind() == IFileStream::ReceiveFile) 
+      file = QFileDialog::getSaveFileName(this,tr("Select file for receive"),QString::null,QString::null,NULL,QFileDialog::DontConfirmOverwrite);
+    else
+      file = QFileDialog::getOpenFileName(this,tr("Select file to send"));
+
+    FFileStream->setFileName(file);
   }
 }
 
@@ -249,25 +254,29 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
     QList<QString> methods = selectedMethods();
     if (!methods.isEmpty())
     {
-      if (FFileStream->streamKind() == IFileStream::SendFile)
+      if (acceptFileName(ui.lneFile->text()))
       {
-        FFileStream->setFileName(ui.lneFile->text());
-        FFileStream->setFileDescription(ui.pteDescription->toPlainText());
-        if (!FFileStream->initStream(methods))
-          QMessageBox::warning(this,tr("Warning"),tr("Unable to send request for file transfer, check settings and try again!"));
-      }
-      else
-      {
-        IDataStreamMethod *streamMethod = FDataManager->method(methods.first());
-        if (streamMethod)
+        if (FFileStream->streamKind() == IFileStream::SendFile)
         {
           FFileStream->setFileName(ui.lneFile->text());
           FFileStream->setFileDescription(ui.pteDescription->toPlainText());
-          if (!FFileStream->startStream(methods.first(),QString::null))
-            QMessageBox::warning(this,tr("Warning"),tr("Unable to start the file transfer, check settings and try again!"));
+          if (!FFileStream->initStream(methods))
+            QMessageBox::warning(this,tr("Warning"),tr("Unable to send request for file transfer, check settings and try again!"));
         }
         else
-          QMessageBox::warning(this,tr("Warning"),tr("Selected way to connect is not available"));
+        {
+          IDataStreamMethod *streamMethod = FDataManager->method(methods.first());
+          if (streamMethod)
+          {
+            QString file = ui.lneFile->text();
+            FFileStream->setFileName(ui.lneFile->text());
+            FFileStream->setFileDescription(ui.pteDescription->toPlainText());
+            if (!FFileStream->startStream(methods.first(),QString::null))
+              QMessageBox::warning(this,tr("Warning"),tr("Unable to start the file transfer, check settings and try again!"));
+          }
+          else
+            QMessageBox::warning(this,tr("Warning"),tr("Selected way to connect is not available"));
+        }
       }
     }
     else

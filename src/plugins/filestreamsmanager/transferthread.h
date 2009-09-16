@@ -21,7 +21,7 @@ protected:
 private:
   bool FAbort;
   int FKind;
-  qint64 FBytes;
+  qint64 FBytesToTransfer;
   QFile *FFile;
   IDataStreamSocket *FSocket;
 };

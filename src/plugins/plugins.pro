@@ -51,4 +51,5 @@ SUBDIRS = settings \
           chatstates \
           datastreamsmanager \
           filestreamsmanager \
-          filetransfer
+          filetransfer \
+          inbandstreams

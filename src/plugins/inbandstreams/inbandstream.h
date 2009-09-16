@@ -1,6 +1,9 @@
 #ifndef INBANDSTREAM_H
 #define INBANDSTREAM_H
 
+#include <QTimer>
+#include <QReadWriteLock>
+#include <QWaitCondition>
 #include "../../definations/namespaces.h"
 #include "../../interfaces/iinbandstreams.h"
 #include "../../interfaces/idatastreamsmanager.h"
@@ -11,12 +14,12 @@
 
 class InBandStream : 
   public QIODevice,
-  public IDataStreamSocket,
+  public IInBandStream,
   public IStanzaHandler,
   public IStanzaRequestOwner
 {
   Q_OBJECT;
-  Q_INTERFACES(IStanzaHandler IStanzaRequestOwner IDataStreamSocket);
+  Q_INTERFACES(IInBandStream IDataStreamSocket IStanzaHandler IStanzaRequestOwner);
 public:
   InBandStream(IStanzaProcessor *AProcessor, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, int AKind, QObject *AParent=NULL);
   ~InBandStream();
@@ -43,16 +46,31 @@ public:
   virtual bool isOpen() const;
   virtual bool open(QIODevice::OpenMode AMode);
   virtual bool flush();
-  virtual void abort(const QString &AError);
   virtual void close();
+  virtual void abort(const QString &AError, int ACode = UnknownError);
+  virtual int errorCode() const;
+  virtual QString errorString() const;
+  //IInBandStream
+  virtual int blockSize() const;
+  virtual void setBlockSize(int ASize);
+  virtual int maximumBlockSize();
+  virtual void setMaximumBlockSize(int ASize);
+  virtual int dataStanzaType() const;
+  virtual void setDataStanzaType(int AType);
 signals:
   virtual void stateChanged(int AState);
+  virtual void propertiesChanged();
 protected:
   virtual qint64 readData(char *AData, qint64 AMaxSize);
   virtual qint64 writeData(const char *AData, qint64 AMaxSize);
-  void setErrorString(const QString &AError);
+  void setOpenMode(OpenMode AMode);
 protected:
+  virtual bool event(QEvent *AEvent);
+protected:
+  bool isReadyToSend() const;
+  bool sendNextPaket(bool AFlush = false);
   void setStreamState(int AState);
+  void setStreamError(const QString &AError, int ACode);
   int insertStanzaHandle(const QString &ACondition);
   void removeStanzaHandle(int &AHandleId);
 private:
@@ -78,6 +96,11 @@ private:
   QString FStanzaTag;
   RingBuffer FReadBuffer;
   RingBuffer FWriteBuffer;
+private:
+  int FErrorCode;
+  mutable QReadWriteLock FThreadLock;
+  QWaitCondition FReadyReadCondition;
+  QWaitCondition FBytesWrittenCondition;
 };
 
 #endif // INBANDSTREAM_H
