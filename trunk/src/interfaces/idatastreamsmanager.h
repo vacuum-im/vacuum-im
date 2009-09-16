@@ -23,6 +23,10 @@ public:
     Opened,
     Closing
   };
+  enum StreamError {
+    NoError         = -1,
+    UnknownError    = 0
+  };
 public:
   virtual QIODevice *instance() =0;
   virtual QString methodNS() const =0;
@@ -34,8 +38,10 @@ public:
   virtual bool isOpen() const =0;
   virtual bool open(QIODevice::OpenMode AMode) =0;
   virtual bool flush() =0;
-  virtual void abort(const QString &AError) =0;
   virtual void close() =0;
+  virtual void abort(const QString &AError, int ACode = UnknownError) =0;
+  virtual int errorCode() const =0;
+  virtual QString errorString() const =0;
 signals:
   virtual void stateChanged(int AState) =0;
 };
@@ -47,7 +53,7 @@ public:
   virtual QString methodName() const =0;
   virtual QString methodDescription() const =0;
   virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, 
-    const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent=NULL) =0;
+    const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent = NULL) =0;
   virtual void loadSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS) =0;
   virtual void saveSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS) =0;
 };

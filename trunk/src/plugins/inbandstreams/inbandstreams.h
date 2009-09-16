@@ -12,8 +12,7 @@
 class InBandStreams : 
   public QObject,
   public IPlugin,
-  public IInBandStreams,
-  public IDataStreamMethod
+  public IInBandStreams
 {
   Q_OBJECT;
   Q_INTERFACES(IPlugin IInBandStreams IDataStreamMethod);

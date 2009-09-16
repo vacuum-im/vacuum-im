@@ -99,10 +99,6 @@
         <translation>Предупреждение</translation>
     </message>
     <message>
-        <source>Remove existing file</source>
-        <translation>Удалить существующий файл</translation>
-    </message>
-    <message>
         <source>A file with this name already exists. Do you want to remove existing file?</source>
         <translation>Файл с таким именем уже существует. Хотите удалить существующий файл?</translation>
     </message>
@@ -141,6 +137,14 @@
     <message>
         <source>Can not delete existing file</source>
         <translation>Не могу удалить существующий файл</translation>
+    </message>
+    <message>
+        <source>Remove file</source>
+        <translation>Удалить файл</translation>
+    </message>
+    <message>
+        <source>Selected file does not exists</source>
+        <translation>Выбранный файл не существует</translation>
     </message>
 </context>
 <context>

@@ -15,7 +15,7 @@ FileStream::FileStream(IDataStreamsManager *ADataManager, const QString &AStream
   FThread = NULL;
   FSocket = NULL;
 
-  FCanceled = false;
+  FAborted = false;
   FProgress = 0;
   FFileSize = -1;
   FRangeOffset = -1;
@@ -28,12 +28,15 @@ FileStream::~FileStream()
 {
   if (FSocket)
   {
-    FSocket->close();
+    delete FSocket;
+    FSocket = NULL;
   }
   if (FThread)
   {
     FThread->abort();
     FThread->wait();
+    delete FThread;
+    FThread = NULL;
   }
   emit streamDestroyed();
 }
@@ -85,11 +88,6 @@ qint64 FileStream::progress() const
 QString FileStream::stateString() const
 {
   return FStateString;
-}
-
-QString FileStream::errorString() const
-{
-  return FErrorString;
 }
 
 bool FileStream::isRangeSupported() const
@@ -247,7 +245,7 @@ bool FileStream::initStream(const QList<QString> &AMethods)
     {
       if (FDataManager->initStream(FStreamJid,FContactJid,FStreamId,NS_SI_FILETRANSFER,AMethods))
       {
-        setStreamState(Negotiating,tr("Waiting for a response to a request"));
+        setStreamState(Negotiating,tr("Waiting for a response to send a file request"));
         return true;
       }
     }
@@ -299,14 +297,14 @@ bool FileStream::startStream(const QString &AMethodNS, const QString &ASettingsN
 
 void FileStream::abortStream(const QString &AError)
 {
-  if (FStreamState!=Aborted)
+  if (FStreamState != Aborted)
   {
-    if (!FCanceled)
+    if (!FAborted)
     {
-      FCanceled = true;
-      FErrorString = AError;
+      FAborted = true;
+      FAbortString = AError;
     }
-    if (FThread)
+    if (FThread && FThread->isRunning())
     {
       FThread->abort();
     }
@@ -318,7 +316,7 @@ void FileStream::abortStream(const QString &AError)
     {
       if (FStreamKind==ReceiveFile && FStreamState==Creating)
         FDataManager->rejectStream(FStreamId,AError);
-      setStreamState(Aborted,FErrorString);
+      setStreamState(Aborted,AError);
     }
   }
 }
@@ -368,37 +366,40 @@ void FileStream::onSocketStateChanged(int AState)
       FThread = new TransferThread(FSocket,&FFile,FStreamKind,bytes,this);
       connect(FThread,SIGNAL(transferProgress(qint64)),SLOT(onTransferThreadProgress(qint64)));
       connect(FThread,SIGNAL(finished()),SLOT(onTransferThreadFinished()));
-      setStreamState(Transfering,tr("Data Transmission"));
+      setStreamState(Transfering,tr("Data transmission"));
       FThread->start();
     }
   }
   else if (AState == IDataStreamSocket::Closed)
   {
-    if (!FCanceled)
+    if (FThread)
+    {
+      FThread->abort();
+      FThread->wait();
+    }
+    if (!FAborted)
     {
       qint64 finish = (FRangeLength>0 ? FRangeLength : FFileSize) - (FRangeOffset>0 ? FRangeOffset : 0);
-      if (FProgress == finish)
-      {
-        if (FThread)
-          FThread->wait();
-        setStreamState(Finished,tr("File stream finished"));
-      }
-      else if (FFile.error() != QFile::NoError)
+      if (FFile.error() != QFile::NoError)
       {
         abortStream(FFile.errorString());
       }
-      else if (!FSocket->instance()->errorString().isEmpty())
+      else if (FSocket->errorCode() != IDataStreamSocket::NoError)
       {
-        abortStream(FSocket->instance()->errorString());
+        abortStream(FSocket->errorString());
+      }
+      else if (FProgress == finish)
+      {
+        setStreamState(Finished,tr("Data transmission finished"));
       }
       else
       {
-        abortStream(tr("File stream terminated"));
+        abortStream(tr("Data transmission terminated by user"));
       }
     }
     else
     {
-      abortStream(FErrorString);
+      abortStream(FAbortString);
     }
     delete FSocket->instance();
     FSocket = NULL;

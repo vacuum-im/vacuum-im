@@ -22,6 +22,7 @@ public:
 signals:
   void dialogDestroyed();
 protected:
+  bool acceptFileName(const QString AFile);
   QString sizeName(qint64 ABytes) const;
   inline qint64 curPosition() const;
   inline qint64 maxPosition() const;

@@ -30,7 +30,6 @@ public:
   virtual qint64 speed() const;
   virtual qint64 progress() const;
   virtual QString stateString() const;
-  virtual QString errorString() const;
   virtual bool isRangeSupported() const;
   virtual void setRangeSupported(bool ASupported);
   virtual qint64 rangeOffset() const;
@@ -75,9 +74,9 @@ private:
   int FSpeedIndex;
   qint64 FSpeed[SPEED_POINTS];
   qint64 FProgress;
-  bool FCanceled;
+  bool FAborted;
+  QString FAbortString;
   QString FStateString;
-  QString FErrorString;
 private:
   bool FRangeSupported;
   qint64 FRangeOffset;
