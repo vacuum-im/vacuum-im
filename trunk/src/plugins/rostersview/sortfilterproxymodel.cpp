@@ -60,8 +60,9 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
     int indexType = index.data(RDR_TYPE).toInt();
     switch(indexType)
     {
-    case RIT_CONTACT:
     case RIT_AGENT:
+      return true;
+    case RIT_CONTACT:
       {
         QList<QVariant> labelFlags = index.data(RDR_LABEL_FLAGS).toList();
         foreach(QVariant flag, labelFlags)
