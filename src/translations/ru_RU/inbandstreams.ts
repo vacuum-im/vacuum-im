@@ -20,10 +20,6 @@
         <translation>Не приемлемый размер блока данных</translation>
     </message>
     <message>
-        <source>Failed to initiate stream</source>
-        <translation>Не удалось инициализировать подключение</translation>
-    </message>
-    <message>
         <source>Failed to send data</source>
         <translation>Не удалось отправить данные</translation>
     </message>
@@ -32,15 +28,19 @@
     <name>InBandStreams</name>
     <message>
         <source>Enables any two entities to establish a one-to-one in-band bytestream</source>
-        <translation>Позволяет двум сущностям устанавливать внутренний поток данных типа точка-точка</translation>
+        <translation>Позволяет двум сущностям устанавливать внутриканальный поток данных типа точка-точка</translation>
     </message>
     <message>
         <source>In-Band Bytestreams</source>
-        <translation>Внутренние потоки данный</translation>
+        <translation>Внутриканальные потоки данных</translation>
     </message>
     <message>
         <source>Data is broken down into smaller chunks and transported in-band over XMPP</source>
-        <translation>Данные разбиваются на маленькие пакеты и передаются через XMPP</translation>
+        <translation>Данные разбиваются на маленькие пакеты и передаются через XMPP канал</translation>
+    </message>
+    <message>
+        <source>In-Band Bytestream</source>
+        <translation>Внутриканальный поток данных</translation>
     </message>
 </context>
 </TS>

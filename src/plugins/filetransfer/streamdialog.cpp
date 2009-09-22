@@ -20,12 +20,12 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
   if (FFileStream->streamKind() == IFileStream::SendFile)
   {
     setWindowTitle(tr("Send File - %1").arg(FFileStream->streamJid().full()));
-    ui.lblContactLabel->setText("To:");
+    ui.lblContactLabel->setText(tr("To:"));
   }
   else
   {
     setWindowTitle(tr("Receive File - %1").arg(FFileStream->streamJid().full()));
-    ui.lblContactLabel->setText("From:");
+    ui.lblContactLabel->setText(tr("From:"));
   }
   ui.lblContact->setText(FFileStream->contactJid().hFull());
 
@@ -214,9 +214,22 @@ void StreamDialog::onStreamStateChanged()
 
 void StreamDialog::onStreamSpeedUpdated()
 {
-  ui.pgbPrgress->setValue(curPosition());
-  ui.lblProgress->setText(tr("Transfered %1 of %2. Speed %3")
-    .arg(sizeName(curPosition())).arg(sizeName(maxPosition())).arg(sizeName(FFileStream->speed())+tr("/sec")));
+  if (FFileStream->streamState() == IFileStream::Transfering)
+  {
+    ui.pgbPrgress->setValue(curPosition());
+    ui.lblProgress->setText(tr("Transfered %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition())) 
+      + tr("Speed %1.").arg(sizeName(FFileStream->speed())+tr("/sec")));
+  }
+  else if (curPosition() > 0)
+  {
+    ui.pgbPrgress->setValue(curPosition());
+    ui.lblProgress->setText(tr("Transfered %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition())));
+  }
+  else
+  {
+    ui.pgbPrgress->setValue(0);
+    ui.lblProgress->setText(QString::null);
+  }
 }
 
 void StreamDialog::onStreamPropertiesChanged()

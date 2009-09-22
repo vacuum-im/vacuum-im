@@ -1,7 +1,6 @@
 #ifndef INBANDSTREAM_H
 #define INBANDSTREAM_H
 
-#include <QTimer>
 #include <QReadWriteLock>
 #include <QWaitCondition>
 #include "../../definations/namespaces.h"
@@ -67,7 +66,6 @@ protected:
 protected:
   virtual bool event(QEvent *AEvent);
 protected:
-  bool isReadyToSend() const;
   bool sendNextPaket(bool AFlush = false);
   void setStreamState(int AState);
   void setStreamError(const QString &AError, int ACode);
@@ -87,13 +85,13 @@ private:
   int FSHIData;
   QString FOpenRequestId;
   QString FCloseRequestId;
-  QString FDataRequestId;
+  QString FDataIqRequestId;
 private:
   int FBlockSize;
   int FMaxBlockSize;
+  int FStanzaType;
   quint16 FSeqIn;
   quint16 FSeqOut;
-  QString FStanzaTag;
   RingBuffer FReadBuffer;
   RingBuffer FWriteBuffer;
 private:
