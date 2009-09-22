@@ -4,7 +4,7 @@
 #include <QFileInfo>
 
 FileStream::FileStream(IDataStreamsManager *ADataManager, const QString &AStreamId, const Jid &AStreamJid, 
-                                         const Jid &AContactJid, int AKind, QObject *AParent) : QObject(AParent)
+                       const Jid &AContactJid, int AKind, QObject *AParent) : QObject(AParent)
 {
   FStreamId = AStreamId;
   FStreamJid = AStreamJid;
@@ -17,9 +17,9 @@ FileStream::FileStream(IDataStreamsManager *ADataManager, const QString &AStream
 
   FAborted = false;
   FProgress = 0;
-  FFileSize = -1;
-  FRangeOffset = -1;
-  FRangeLength = -1;
+  FFileSize = 0;
+  FRangeOffset = 0;
+  FRangeLength = 0;
   FRangeSupported = AKind==IFileStream::SendFile;
   FStreamState = IFileStream::Creating;
 }
@@ -116,7 +116,7 @@ void FileStream::setRangeOffset(qint64 AOffset)
 {
   if (FStreamState==Creating || FStreamState==Negotiating)
   {
-    if (FRangeOffset != AOffset)
+    if (AOffset>=0 && FRangeOffset!=AOffset)
     {
       FRangeOffset = AOffset;
       emit propertiesChanged();
@@ -133,7 +133,7 @@ void FileStream::setRangeLength(qint64 ALength)
 {
   if (FStreamState==Creating || FStreamState==Negotiating)
   {
-    if (FRangeLength != ALength)
+    if (ALength>=0 && FRangeLength!=ALength)
     {
       FRangeLength = ALength;
       emit propertiesChanged();
@@ -328,7 +328,7 @@ bool FileStream::openFile()
     FFile.setFileName(FFileName);
     if (FFile.open(FStreamKind==IFileStream::SendFile ? QIODevice::ReadOnly : QIODevice::WriteOnly))
     {
-      if (FRangeOffset<=0 || FFile.seek(FRangeOffset))
+      if (FRangeOffset==0 || FFile.seek(FRangeOffset))
         return true;
       if (FStreamKind == IFileStream::ReceiveFile)
         FFile.remove();
@@ -360,8 +360,8 @@ void FileStream::onSocketStateChanged(int AState)
   {
     if (FThread == NULL)
     {
-      qint64 bytes = FRangeLength<=0 ? (FRangeOffset<0 ? FFileSize : FFileSize-FRangeOffset) : FRangeLength;
-      FThread = new TransferThread(FSocket,&FFile,FStreamKind,bytes,this);
+      qint64 bytesForTransfer = FRangeLength>0 ? FRangeLength : FFileSize-FRangeOffset;
+      FThread = new TransferThread(FSocket,&FFile,FStreamKind,bytesForTransfer,this);
       connect(FThread,SIGNAL(transferProgress(qint64)),SLOT(onTransferThreadProgress(qint64)));
       connect(FThread,SIGNAL(finished()),SLOT(onTransferThreadFinished()));
       setStreamState(Transfering,tr("Data transmission"));
@@ -377,7 +377,7 @@ void FileStream::onSocketStateChanged(int AState)
     }
     if (!FAborted)
     {
-      qint64 finish = (FRangeLength>0 ? FRangeLength : FFileSize) - (FRangeOffset>0 ? FRangeOffset : 0);
+      qint64 bytesForTransfer = FRangeLength>0 ? FRangeLength : FFileSize-FRangeOffset;
       if (FFile.error() != QFile::NoError)
       {
         abortStream(FFile.errorString());
@@ -386,7 +386,7 @@ void FileStream::onSocketStateChanged(int AState)
       {
         abortStream(FSocket->errorString());
       }
-      else if (FProgress == finish)
+      else if (FProgress == bytesForTransfer)
       {
         setStreamState(Finished,tr("Data transmission finished"));
       }
