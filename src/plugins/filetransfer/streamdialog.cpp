@@ -167,12 +167,12 @@ QString StreamDialog::sizeName(qint64 ABytes) const
 
 qint64 StreamDialog::curPosition() const
 {
-  return FFileStream->rangeOffset()>0 ? FFileStream->rangeOffset()+FFileStream->progress() : FFileStream->progress();
+  return FFileStream->rangeOffset() + FFileStream->progress();
 }
 
 qint64 StreamDialog::maxPosition() const
 {
-  return FFileStream->rangeLength() >0 ? (FFileStream->rangeOffset()>0 ? FFileStream->rangeOffset()+FFileStream->rangeLength() : FFileStream->rangeLength()) : FFileStream->fileSize();
+  return FFileStream->rangeLength()>0 ? FFileStream->rangeOffset()+FFileStream->rangeLength() : FFileStream->fileSize();
 }
 
 void StreamDialog::onStreamStateChanged()
@@ -218,9 +218,9 @@ void StreamDialog::onStreamSpeedUpdated()
   {
     ui.pgbPrgress->setValue(curPosition());
     ui.lblProgress->setText(tr("Transfered %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition())) 
-      + tr("Speed %1.").arg(sizeName(FFileStream->speed())+tr("/sec")));
+      + " " + tr("Speed %1.").arg(sizeName(FFileStream->speed())+tr("/sec")));
   }
-  else if (curPosition() > 0)
+  else if (FFileStream->fileSize() > 0)
   {
     ui.pgbPrgress->setValue(curPosition());
     ui.lblProgress->setText(tr("Transfered %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition())));
@@ -228,6 +228,7 @@ void StreamDialog::onStreamSpeedUpdated()
   else
   {
     ui.pgbPrgress->setValue(0);
+    ui.pgbPrgress->setMaximum(100);
     ui.lblProgress->setText(QString::null);
   }
 }
@@ -249,14 +250,15 @@ void StreamDialog::onFileButtonClicked(bool)
 {
   if (FFileStream->streamState() == IFileStream::Creating)
   {
-    QString file;
+    QString file = QDir::home().absoluteFilePath(FFileStream->fileName());
 
     if (FFileStream->streamKind() == IFileStream::ReceiveFile) 
-      file = QFileDialog::getSaveFileName(this,tr("Select file for receive"),QString::null,QString::null,NULL,QFileDialog::DontConfirmOverwrite);
+      file = QFileDialog::getSaveFileName(this,tr("Select file for receive"),file,QString::null,NULL,QFileDialog::DontConfirmOverwrite);
     else
-      file = QFileDialog::getOpenFileName(this,tr("Select file to send"));
+      file = QFileDialog::getOpenFileName(this,tr("Select file to send"),file);
 
-    FFileStream->setFileName(file);
+    if (!file.isEmpty())
+      FFileStream->setFileName(file);
   }
 }
 
