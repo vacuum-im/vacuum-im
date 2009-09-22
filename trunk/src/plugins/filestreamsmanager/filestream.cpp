@@ -328,10 +328,8 @@ bool FileStream::openFile()
     FFile.setFileName(FFileName);
     if (FFile.open(FStreamKind==IFileStream::SendFile ? QIODevice::ReadOnly : QIODevice::WriteOnly))
     {
-      if (FRangeOffset<0 || FFile.seek(FRangeOffset))
-      {
+      if (FRangeOffset<=0 || FFile.seek(FRangeOffset))
         return true;
-      }
       if (FStreamKind == IFileStream::ReceiveFile)
         FFile.remove();
       FFile.close();

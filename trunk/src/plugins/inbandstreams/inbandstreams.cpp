@@ -66,7 +66,7 @@ QString InBandStreams::methodNS() const
 
 QString InBandStreams::methodName() const
 {
-  return tr("In-Band Bytestreams");
+  return tr("In-Band Bytestream");
 }
 
 QString InBandStreams::methodDescription() const

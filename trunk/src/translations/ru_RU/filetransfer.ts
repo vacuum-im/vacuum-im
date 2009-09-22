@@ -52,7 +52,7 @@
     </message>
     <message>
         <source>Receive File - %1</source>
-        <translation>Получить пайл - %1</translation>
+        <translation>Получить файл - %1</translation>
     </message>
     <message>
         <source>B</source>
@@ -73,10 +73,6 @@
         <source>GB</source>
         <comment>Gigabyte</comment>
         <translation>ГБ</translation>
-    </message>
-    <message>
-        <source>Transfered %1 of %2. Speed %3</source>
-        <translation>Передано %1 из %2. Скорость %3</translation>
     </message>
     <message>
         <source>/sec</source>
@@ -145,6 +141,22 @@
     <message>
         <source>Selected file does not exists</source>
         <translation>Выбранный файл не существует</translation>
+    </message>
+    <message>
+        <source>To:</source>
+        <translation>Кому:</translation>
+    </message>
+    <message>
+        <source>From:</source>
+        <translation>От:</translation>
+    </message>
+    <message>
+        <source>Transfered %1 of %2.</source>
+        <translation>Передано %1 из %2.</translation>
+    </message>
+    <message>
+        <source>Speed %1.</source>
+        <translation>Скорость %1.</translation>
     </message>
 </context>
 <context>
