@@ -47,9 +47,10 @@ public:
   //IFileTransferHandler
   virtual bool fileStreamRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);
   virtual bool fileStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS);
+  virtual bool fileStreamShowDialog(const QString &AStreamId);
   //IFileTransfer
   virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
-  virtual IFileStream *showSendFileDialog(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName = QString::null);
+  virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName = QString::null);
 protected:
   void registerDiscoFeatures();
   void notifyStream(IFileStream *AStream);

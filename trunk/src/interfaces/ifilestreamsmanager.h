@@ -67,6 +67,7 @@ class IFileStreamsHandler
 public:
   virtual bool fileStreamRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods) =0;
   virtual bool fileStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS) =0;
+  virtual bool fileStreamShowDialog(const QString &AStreamId) =0;
 };
 
 class IFileStreamsManager
