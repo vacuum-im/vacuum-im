@@ -51,7 +51,7 @@ public:
   virtual void abortStream(const QString &AError);
 signals:
   virtual void stateChanged();
-  virtual void speedUpdated();
+  virtual void speedChanged();
   virtual void progressChanged();
   virtual void propertiesChanged();
   virtual void streamDestroyed();

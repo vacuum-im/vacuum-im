@@ -5,6 +5,8 @@
 FileStreamsManager::FileStreamsManager()
 {
   FDataManager = NULL;
+  FSettingsPlugin = NULL;
+  FMainWindowPlugin = NULL;
 }
 
 FileStreamsManager::~FileStreamsManager()
@@ -31,6 +33,22 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &/*
     FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+  }
+
+  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    if (FSettingsPlugin)
+    {
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+    }
+  }
+
   return FDataManager!=NULL;
 }
 
@@ -39,6 +57,14 @@ bool FileStreamsManager::initObjects()
   if (FDataManager)
   {
     FDataManager->insertProfile(this);
+  }
+  if (FMainWindowPlugin)
+  {
+    Action *action = new Action(FMainWindowPlugin->mainWindow()->mainMenu());
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILESTREAMSMANAGER);
+    action->setText(tr("File Transfers"));
+    connect(action,SIGNAL(triggered(bool)),SLOT(onShowFileStreamsWindow(bool)));
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_FILESTREAMSMANAGER,true);
   }
   return true;
 }
@@ -214,6 +240,21 @@ void FileStreamsManager::onStreamDestroyed()
     FStreamHandler.remove(stream->streamId());
     emit streamDestroyed(stream);
   }
+}
+
+void FileStreamsManager::onShowFileStreamsWindow(bool)
+{
+  if (FFileStreamsWindow.isNull())
+    FFileStreamsWindow = new FileStreamsWindow(this, FSettingsPlugin!=NULL ? FSettingsPlugin->settingsForPlugin(pluginUuid()) : NULL, NULL);
+  FFileStreamsWindow->show();
+  FFileStreamsWindow->activateWindow();
+  FFileStreamsWindow->raise();
+}
+
+void FileStreamsManager::onSettingsClosed()
+{
+  if (!FFileStreamsWindow.isNull())
+    delete FFileStreamsWindow;
 }
 
 Q_EXPORT_PLUGIN2(FileStreamsManagerPlugin, FileStreamsManager);

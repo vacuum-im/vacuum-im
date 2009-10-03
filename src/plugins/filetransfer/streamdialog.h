@@ -28,7 +28,7 @@ protected:
   inline qint64 maxPosition() const;
 protected slots:
   void onStreamStateChanged();
-  void onStreamSpeedUpdated();
+  void onStreamSpeedChanged();
   void onStreamPropertiesChanged();
   void onStreamDestroyed();
   void onFileButtonClicked(bool);

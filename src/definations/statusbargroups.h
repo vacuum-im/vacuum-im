@@ -4,4 +4,9 @@
 //MessageWidgets - ChatWindow
 #define SBG_MWCW_CHATSTATES                 200
 
+//FileStreamsManager - FileStreamsWindow
+#define SBG_FSMW_STREAMS_COUNT              200
+#define SBG_FSMW_STREAMS_SPPED_IN           300
+#define SBG_FSMW_STREAMS_SPEED_OUT          400
+
 #endif
