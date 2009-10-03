@@ -1,17 +1,22 @@
 #ifndef FILETSTREAMSMANAGER_H
 #define FILETSTREAMSMANAGER_H
 
+#include <QPointer>
 #include "../../definations/namespaces.h"
 #include "../../definations/menuicons.h"
 #include "../../definations/resources.h"
+#include "../../definations/actiongroups.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/ifilestreamsmanager.h"
 #include "../../interfaces/idatastreamsmanager.h"
+#include "../../interfaces/imainwindow.h"
+#include "../../interfaces/isettings.h"
 #include "../../utils/jid.h"
 #include "../../utils/stanza.h"
 #include "../../utils/datetime.h"
 #include "../../utils/iconstorage.h"
 #include "filestream.h"
+#include "filestreamswindow.h"
 
 class FileStreamsManager : 
   public QObject,
@@ -57,14 +62,20 @@ signals:
   virtual void streamDestroyed(IFileStream *AStream);
 protected slots:
   void onStreamDestroyed();
+  void onShowFileStreamsWindow(bool);
+  void onSettingsClosed();
 private:
   IDataStreamsManager *FDataManager;
+  ISettingsPlugin *FSettingsPlugin;
+  IMainWindowPlugin *FMainWindowPlugin;
 private:
   QString FDefaultMethod;
   QList<QString> FMethods;
   QMap<QString, IFileStream *> FStreams;
   QMultiMap<int, IFileStreamsHandler *> FHandlers;
   QMap<QString, IFileStreamsHandler *> FStreamHandler;
+private:
+  QPointer<FileStreamsWindow> FFileStreamsWindow;
 };
 
 #endif // FILETSTREAMSMANAGER_H

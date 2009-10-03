@@ -30,7 +30,7 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
   ui.lblContact->setText(FFileStream->contactJid().hFull());
 
   connect(FFileStream->instance(),SIGNAL(stateChanged()),SLOT(onStreamStateChanged()));
-  connect(FFileStream->instance(),SIGNAL(speedUpdated()),SLOT(onStreamSpeedUpdated()));
+  connect(FFileStream->instance(),SIGNAL(speedChanged()),SLOT(onStreamSpeedChanged()));
   connect(FFileStream->instance(),SIGNAL(propertiesChanged()),SLOT(onStreamPropertiesChanged()));
   connect(FFileStream->instance(),SIGNAL(streamDestroyed()),SLOT(onStreamDestroyed()));
 
@@ -39,7 +39,7 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 
   onStreamPropertiesChanged();
   onStreamStateChanged();
-  onStreamSpeedUpdated();
+  onStreamSpeedChanged();
 }
 
 StreamDialog::~StreamDialog()
@@ -137,7 +137,7 @@ bool StreamDialog::acceptFileName(const QString AFile)
 
 QString StreamDialog::sizeName(qint64 ABytes) const
 {
-  int precision = 0;
+  static int md[] = {1, 10, 100};
   QString units = tr("B","Byte");
   qreal value = ABytes;
 
@@ -157,12 +157,18 @@ QString StreamDialog::sizeName(qint64 ABytes) const
     units = tr("GB","Gigabyte");
   }
 
+  int prec = 0;
   if (value < 10)
-    precision = 2;
+    prec = 2;
   else if (value < 100)
-    precision = 1;
+    prec = 1;
 
-  return QString::number(value,'f',precision)+units;
+  while (prec>0 && (qreal)qRound64(value*md[prec-1])/md[prec-1]==(qreal)qRound64(value*md[prec])/md[prec])
+    prec--;
+
+  value = (qreal)qRound64(value*md[prec])/md[prec];
+
+  return QString::number(value,'f',prec)+units;
 }
 
 qint64 StreamDialog::curPosition() const
@@ -212,7 +218,7 @@ void StreamDialog::onStreamStateChanged()
   resize(width(),minimumSizeHint().height());
 }
 
-void StreamDialog::onStreamSpeedUpdated()
+void StreamDialog::onStreamSpeedChanged()
 {
   if (FFileStream->streamState() == IFileStream::Transfering)
   {
@@ -238,7 +244,7 @@ void StreamDialog::onStreamPropertiesChanged()
   ui.lneFile->setText(FFileStream->fileName());
   ui.pteDescription->setPlainText(FFileStream->fileDescription());
   ui.pgbPrgress->setMaximum(maxPosition());
-  onStreamSpeedUpdated();
+  onStreamSpeedChanged();
 }
 
 void StreamDialog::onStreamDestroyed()

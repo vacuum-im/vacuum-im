@@ -428,5 +428,5 @@ void FileStream::onIncrementSpeedIndex()
     QTimer::singleShot(SPEED_INTERVAL,this,SLOT(onIncrementSpeedIndex()));
   FSpeedIndex = (FSpeedIndex+1) % SPEED_POINTS;
   FSpeed[FSpeedIndex] = 0;
-  emit speedUpdated();
+  emit speedChanged();
 }
