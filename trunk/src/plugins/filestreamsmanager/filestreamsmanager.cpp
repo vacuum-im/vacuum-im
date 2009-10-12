@@ -14,7 +14,7 @@ FileStreamsManager::FileStreamsManager()
   FTrayManager = NULL;
   FMainWindowPlugin = NULL;
 
-  FSeparateDirectories = true;
+  FSeparateDirectories = false;
   FDefaultDirectory = QDir::homePath()+"/"+tr("Downloads");
 }
 
@@ -238,7 +238,7 @@ QString FileStreamsManager::defaultDirectory(const Jid &AContactJid) const
 {
   QString dir = FDefaultDirectory;
   if (FSeparateDirectories && !AContactJid.domain().isEmpty())
-    dir += "/" + AContactJid.encode(AContactJid.pFull());
+    dir += "/" + AContactJid.encode(AContactJid.pBare());
   return dir;
 }
 
@@ -324,7 +324,7 @@ void FileStreamsManager::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(FILESTREAMSMANAGER_UUID);
   FDefaultDirectory = settings->value(SVN_DEFAULT_DIRECTORY, FSettingsPlugin->homeDir().path()+"/"+tr("Downloads")).toString();
-  FSeparateDirectories = settings->value(SVN_SEPARATE_DIRECTORIES, true).toBool();
+  FSeparateDirectories = settings->value(SVN_SEPARATE_DIRECTORIES, false).toBool();
   setDefaultStreamMethod(settings->value(SVN_DEFAULT_STREAM_METHOD).toString());
 }
 

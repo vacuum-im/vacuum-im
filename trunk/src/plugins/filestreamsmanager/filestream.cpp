@@ -1,5 +1,6 @@
 #include "filestream.h"
 
+#include <QDir>
 #include <QTimer>
 #include <QFileInfo>
 
@@ -325,14 +326,18 @@ bool FileStream::openFile()
 {
   if (!FFileName.isEmpty() && FFileSize>0)
   {
-    FFile.setFileName(FFileName);
-    if (FFile.open(FStreamKind==IFileStream::SendFile ? QIODevice::ReadOnly : QIODevice::WriteOnly))
+    QFileInfo finfo(FFileName);
+    if (FStreamKind==IFileStream::ReceiveFile ? QDir::root().mkpath(finfo.absolutePath()) : true)
     {
-      if (FRangeOffset==0 || FFile.seek(FRangeOffset))
-        return true;
-      if (FStreamKind == IFileStream::ReceiveFile)
-        FFile.remove();
-      FFile.close();
+      FFile.setFileName(FFileName);
+      if (FFile.open(FStreamKind==IFileStream::SendFile ? QIODevice::ReadOnly : QIODevice::WriteOnly))
+      {
+        if (FRangeOffset==0 || FFile.seek(FRangeOffset))
+          return true;
+        if (FStreamKind == IFileStream::ReceiveFile)
+          FFile.remove();
+        FFile.close();
+      }
     }
   }
   return false;
