@@ -11,4 +11,5 @@ unix:{
 }
 
 #Translations
+TRANS_SOURCE_ROOT = ../..
 include(../translations.inc)
