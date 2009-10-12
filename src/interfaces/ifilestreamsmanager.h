@@ -78,6 +78,11 @@ public:
   virtual IFileStream *streamById(const QString &AStreamId) const =0;
   virtual IFileStream *createStream(IFileStreamsHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, 
     const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL) =0;
+  virtual QString defaultDirectory() const =0;
+  virtual QString defaultDirectory(const Jid &AContactJid) const =0;
+  virtual void setDefaultDirectory(const QString &ADirectory) =0;
+  virtual bool separateDirectories() const =0;
+  virtual void setSeparateDirectories(bool ASeparate) =0;
   virtual QString defaultStreamMethod() const =0;
   virtual void setDefaultStreamMethod(const QString &AMethodNS) =0;
   virtual QList<QString> streamMethods() const =0;

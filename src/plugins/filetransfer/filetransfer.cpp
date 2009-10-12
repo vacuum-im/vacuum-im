@@ -126,7 +126,7 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
       IFileStream *stream = createStream(AStreamId,ARequest.to(),ARequest.from(),IFileStream::ReceiveFile);
       if (stream)
       {
-        stream->setFileName(QDir::home().absoluteFilePath(fileName));
+        stream->setFileName(QDir(FFileManager->defaultDirectory(stream->contactJid())).absoluteFilePath(fileName));
         stream->setFileSize(fileSize);
         stream->setFileHash(fileElem.attribute("hash"));
         stream->setFileDate(DateTime(fileElem.attribute("date")).toLocal());

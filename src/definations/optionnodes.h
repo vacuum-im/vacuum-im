@@ -11,5 +11,6 @@
 #define ON_AUTO_STATUS        "AutoStatus"
 #define ON_MISC               "Misc"
 #define ON_MESSAGE_STYLES     "MessageStyles"
+#define ON_FILETRANSFER       "FileTransfer"
 
 #endif

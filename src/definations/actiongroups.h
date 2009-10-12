@@ -41,6 +41,7 @@
 #define AG_TMTM_DISCOVERY                                       500
 #define AG_TMTM_MULTIUSERCHAT                                   500
 #define AG_TMTM_BOOKMARKS                                       500
+#define AG_TMTM_FILESTREAMSMANAGER                              500
 #define AG_TMTM_TRAYMANAGER                                     1000
 
 //StatusChanger - StatusMenu, StreamMenu

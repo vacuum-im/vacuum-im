@@ -44,41 +44,41 @@
     </message>
     <message>
         <source>Downloads</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузки</translation>
     </message>
     <message>
         <source>File Transfer</source>
-        <translation type="unfinished"></translation>
+        <translation>Передача файлов</translation>
     </message>
     <message>
         <source>Common options for file transfer</source>
-        <translation type="unfinished"></translation>
+        <translation>Общие настройки передачи файлов</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsOptions</name>
     <message>
         <source>Select default directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите директорию по умолчанию</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsOptionsClass</name>
     <message>
-        <source>Default Directory:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default Method:</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <source>Separate directories for contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Разделять директории для контактов</translation>
+    </message>
+    <message>
+        <source>Default Connection Method:</source>
+        <translation>Метод подключения по умолчанию:</translation>
+    </message>
+    <message>
+        <source>Default Downloads Directory:</source>
+        <translation>Директория загрузок по умолчанию:</translation>
     </message>
 </context>
 <context>
