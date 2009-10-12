@@ -42,6 +42,44 @@
         <source>File Transfers</source>
         <translation>Передачи файлов</translation>
     </message>
+    <message>
+        <source>Downloads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Transfer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Common options for file transfer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FileStreamsOptions</name>
+    <message>
+        <source>Select default directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FileStreamsOptionsClass</name>
+    <message>
+        <source>Default Directory:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Method:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separate directories for contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsWindow</name>

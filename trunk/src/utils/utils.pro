@@ -10,4 +10,5 @@ DLLDESTDIR     = ../..
 include(utils.pri)
 
 #Translations
+TRANS_SOURCE_ROOT = ..
 include(../translations.inc)
