@@ -6,6 +6,7 @@
 #define ONO_MESSAGES              300
 #define ONO_MESSAGE_STYLES        350
 #define ONO_HISTORY               400
+#define ONO_FILETRANSFER          450
 #define ONO_NOTIFICATIONS         500
 #define ONO_EMOTICONS             600
 #define ONO_STATUSICONS           700

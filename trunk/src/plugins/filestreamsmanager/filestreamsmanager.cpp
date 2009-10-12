@@ -1,12 +1,21 @@
 #include "filestreamsmanager.h"
 
 #include <QSet>
+#include <QDir>
+
+#define SVN_DEFAULT_DIRECTORY           "defaultDirectory"
+#define SVN_SEPARATE_DIRECTORIES        "separateDirectories"
+#define SVN_DEFAULT_STREAM_METHOD       "defaultStreamMethod"
 
 FileStreamsManager::FileStreamsManager()
 {
   FDataManager = NULL;
   FSettingsPlugin = NULL;
+  FTrayManager = NULL;
   FMainWindowPlugin = NULL;
+
+  FSeparateDirectories = true;
+  FDefaultDirectory = QDir::homePath()+"/"+tr("Downloads");
 }
 
 FileStreamsManager::~FileStreamsManager()
@@ -39,12 +48,19 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &/*
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  if (plugin)
+  {
+     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
+  }
+
   plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
     if (FSettingsPlugin)
     {
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
     }
   }
@@ -58,15 +74,40 @@ bool FileStreamsManager::initObjects()
   {
     FDataManager->insertProfile(this);
   }
-  if (FMainWindowPlugin)
+  if (FTrayManager || FMainWindowPlugin)
   {
-    Action *action = new Action(FMainWindowPlugin->mainWindow()->mainMenu());
+    Action *action = new Action;
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILESTREAMSMANAGER);
     action->setText(tr("File Transfers"));
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowFileStreamsWindow(bool)));
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_FILESTREAMSMANAGER,true);
+    if (FMainWindowPlugin)
+      FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_FILESTREAMSMANAGER,true);
+    if (FTrayManager)
+      FTrayManager->addAction(action, AG_TMTM_FILESTREAMSMANAGER, true);
+  }
+  if (FSettingsPlugin)
+  {
+    FSettingsPlugin->insertOptionsHolder(this);
+    FSettingsPlugin->openOptionsNode(ON_FILETRANSFER,tr("File Transfer"),tr("Common options for file transfer"),MNI_FILESTREAMSMANAGER,ONO_FILETRANSFER);
   }
   return true;
+}
+
+QWidget *FileStreamsManager::optionsWidget(const QString &ANode, int &AOrder)
+{
+  if (ANode == ON_FILETRANSFER)
+  {
+    AOrder = OWO_FILESTREAMSMANAGER;
+    if (FDataManager)
+    {
+      FileStreamsOptions *widget = new FileStreamsOptions(FDataManager, this);
+      connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
+      return widget;
+    }
+  }
+  return NULL;
 }
 
 QString FileStreamsManager::profileNS() const
@@ -174,7 +215,7 @@ IFileStream *FileStreamsManager::streamById(const QString &AStreamId) const
 }
 
 IFileStream *FileStreamsManager::createStream(IFileStreamsHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, 
-                                                  const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent)
+                                              const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent)
 {
   if (FDataManager && AHandler && !AStreamId.isEmpty() && !FStreams.contains(AStreamId))
   {
@@ -186,6 +227,34 @@ IFileStream *FileStreamsManager::createStream(IFileStreamsHandler *AHandler, con
     return stream;
   }
   return NULL;
+}
+
+QString FileStreamsManager::defaultDirectory() const
+{
+  return FDefaultDirectory;
+}
+
+QString FileStreamsManager::defaultDirectory(const Jid &AContactJid) const
+{
+  QString dir = FDefaultDirectory;
+  if (FSeparateDirectories && !AContactJid.domain().isEmpty())
+    dir += "/" + AContactJid.encode(AContactJid.pFull());
+  return dir;
+}
+
+void FileStreamsManager::setDefaultDirectory(const QString &ADirectory)
+{
+  FDefaultDirectory = ADirectory;
+}
+
+bool FileStreamsManager::separateDirectories() const
+{
+  return FSeparateDirectories;
+}
+
+void FileStreamsManager::setSeparateDirectories(bool ASeparate)
+{
+  FSeparateDirectories = ASeparate;
 }
 
 QString FileStreamsManager::defaultStreamMethod() const
@@ -251,10 +320,23 @@ void FileStreamsManager::onShowFileStreamsWindow(bool)
   FFileStreamsWindow->raise();
 }
 
+void FileStreamsManager::onSettingsOpened()
+{
+  ISettings *settings = FSettingsPlugin->settingsForPlugin(FILESTREAMSMANAGER_UUID);
+  FDefaultDirectory = settings->value(SVN_DEFAULT_DIRECTORY, FSettingsPlugin->homeDir().path()+"/"+tr("Downloads")).toString();
+  FSeparateDirectories = settings->value(SVN_SEPARATE_DIRECTORIES, true).toBool();
+  setDefaultStreamMethod(settings->value(SVN_DEFAULT_STREAM_METHOD).toString());
+}
+
 void FileStreamsManager::onSettingsClosed()
 {
   if (!FFileStreamsWindow.isNull())
     delete FFileStreamsWindow;
+
+  ISettings *settings = FSettingsPlugin->settingsForPlugin(FILESTREAMSMANAGER_UUID);
+  settings->setValue(SVN_DEFAULT_DIRECTORY, FDefaultDirectory);
+  settings->setValue(SVN_SEPARATE_DIRECTORIES, FSeparateDirectories);
+  settings->setValue(SVN_DEFAULT_STREAM_METHOD, FDefaultMethod);
 }
 
 Q_EXPORT_PLUGIN2(FileStreamsManagerPlugin, FileStreamsManager);
