@@ -35,5 +35,13 @@
         <source>Stream with same ID already exists</source>
         <translation>Поток с таким же ID уже существует</translation>
     </message>
+    <message>
+        <source>Data Streams</source>
+        <translation>Потоки данных</translation>
+    </message>
+    <message>
+        <source>Common data streams settings</source>
+        <translation>Общие настройки потоков данных</translation>
+    </message>
 </context>
 </TS>

@@ -13,6 +13,7 @@ DataStreamsManger::DataStreamsManger()
   FDiscovery = NULL;
   FXmppStreams = NULL;
   FStanzaProcessor = NULL;
+  FSettingsPlugin = NULL;
 }
 
 DataStreamsManger::~DataStreamsManger()
@@ -62,6 +63,12 @@ bool DataStreamsManger::initConnections(IPluginManager *APluginManager, int &/*A
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+  }
+
   return FStanzaProcessor!=NULL && FDataForms!=NULL;
 }
 
@@ -85,6 +92,11 @@ bool DataStreamsManger::initObjects()
     dfeature.name = tr("Data Streams Initiation");
     dfeature.description = tr("Initiate a data stream between any two XMPP entities");
     FDiscovery->insertDiscoFeature(dfeature);
+  }
+
+  if (FSettingsPlugin)
+  {
+    FSettingsPlugin->openOptionsNode(ON_DATASTREAMS,tr("Data Streams"),tr("Common data streams settings"),MNI_DATASTREAMSMANAGER,ONO_DATASTREAMS);
   }
 
   ErrorHandler::addErrorItem(ERC_NO_VALID_STREAMS,ErrorHandler::CANCEL,ErrorHandler::BAD_REQUEST,

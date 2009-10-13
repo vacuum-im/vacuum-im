@@ -42,6 +42,9 @@
 //Console
 #define MNI_CONSOLE                     "console"
 
+//DataStreamsManager
+#define MNI_DATASTREAMSMANAGER          "dataStreamsManager"
+
 //Emoticons
 #define MNI_EMOTICONS                   "emoticons"
 #define MNI_EMOTICONS_ARROW_UP          "emoticonsArrowUp"
