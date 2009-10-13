@@ -1,6 +1,7 @@
 #ifndef DEF_OPTIONNODES_H
 #define DEF_OPTIONNODES_H
 
+// ROOT
 #define ON_ACCOUNTS           "Accounts"
 #define ON_STATUSICONS        "StatusIcons"
 #define ON_ROSTER             "Roster"
@@ -11,6 +12,9 @@
 #define ON_AUTO_STATUS        "AutoStatus"
 #define ON_MISC               "Misc"
 #define ON_MESSAGE_STYLES     "MessageStyles"
-#define ON_FILETRANSFER       "FileTransfer"
+#define ON_DATASTREAMS        "DataStreams"
+
+// ON_DATASTREAMS
+#define ON_FILETRANSFER       ON_DATASTREAMS "::" "FileTransfer"
 
 #endif
