@@ -31,7 +31,7 @@ class FileStreamsManager :
   public IOptionsHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IOptionsHolder IFileStreamsManager IDataStreamProfile );
+  Q_INTERFACES(IPlugin IOptionsHolder IFileStreamsManager IDataStreamProfile);
 public:
   FileStreamsManager();
   ~FileStreamsManager();

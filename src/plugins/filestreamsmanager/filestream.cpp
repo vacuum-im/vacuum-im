@@ -27,17 +27,15 @@ FileStream::FileStream(IDataStreamsManager *ADataManager, const QString &AStream
 
 FileStream::~FileStream()
 {
-  if (FSocket)
-  {
-    delete FSocket;
-    FSocket = NULL;
-  }
   if (FThread)
   {
     FThread->abort();
     FThread->wait();
     delete FThread;
-    FThread = NULL;
+  }
+  if (FSocket)
+  {
+    delete FSocket->instance();
   }
   emit streamDestroyed();
 }
@@ -404,7 +402,7 @@ void FileStream::onSocketStateChanged(int AState)
     {
       abortStream(FAbortString);
     }
-    delete FSocket->instance();
+    FSocket->instance()->deleteLater();
     FSocket = NULL;
   }
 }
@@ -423,7 +421,7 @@ void FileStream::onTransferThreadFinished()
     setStreamState(Disconnecting,tr("Disconnecting"));
     FSocket->close();
   }
-  delete FThread;
+  FThread->deleteLater();
   FThread = NULL;
 }
 
