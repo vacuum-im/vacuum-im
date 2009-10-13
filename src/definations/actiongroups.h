@@ -2,12 +2,11 @@
 #define DEF_ACTIONGROUPS_H
 
 //MainWindow  - MainMenu
-#define AG_MMENU_ROSTERCHANGER                                  500
-#define AG_MMENU_SETTINGS                                       700
-#define AG_MMENU_ACCOUNTMANAGER                                 700
-#define AG_MMENU_SKINMANAGER                                    700
-#define AG_MMENU_CONSOLE                                        700
-#define AG_MMENU_FILESTREAMSMANAGER                             700
+#define AG_MMENU_SETTINGS                                       500
+#define AG_MMENU_ACCOUNTMANAGER                                 500
+#define AG_MMENU_SKINMANAGER                                    500
+#define AG_MMENU_CONSOLE                                        500
+#define AG_MMENU_FILESTREAMSMANAGER                             500
 #define AG_MMENU_CLIENTINFO                                     900
 #define AG_MMENU_MAINWINDOW                                     1000
 
@@ -35,7 +34,6 @@
 #define AG_TMTM_MAINWINDOW                                      200                    
 #define AG_TMTM_NOTIFICATIONS                                   300                    
 #define AG_TMTM_STATUSCHANGER                                   400
-#define AG_TMTM_ROSTERCHANGER                                   500
 #define AG_TMTM_SETTINGS                                        500
 #define AG_TMTM_SKINMANAGER                                     500
 #define AG_TMTM_DISCOVERY                                       500

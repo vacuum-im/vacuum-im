@@ -6,7 +6,6 @@
 #include "../../definations/rosterlabelorders.h"
 #include "../../definations/rosterindextyperole.h"
 #include "../../definations/multiuserdataroles.h"
-#include "../../definations/accountvaluenames.h"
 #include "../../definations/notificationdataroles.h"
 #include "../../definations/rosterdragdropmimetypes.h"
 #include "../../definations/optionnodes.h"
@@ -19,9 +18,6 @@
 #include "../../interfaces/irostersmodel.h"
 #include "../../interfaces/irostersview.h"
 #include "../../interfaces/iroster.h"
-#include "../../interfaces/imainwindow.h"
-#include "../../interfaces/itraymanager.h"
-#include "../../interfaces/iaccountmanager.h"
 #include "../../interfaces/imultiuserchat.h"
 #include "../../interfaces/inotifications.h"
 #include "../../interfaces/isettings.h"
@@ -112,31 +108,24 @@ protected slots:
   void onSettingsOpened();
   void onSettingsClosed();
   void onShowAddContactDialog(bool);
-  void onRosterOpened(IRoster *ARoster);
   void onRosterClosed(IRoster *ARoster);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onNotificationActivated(int ANotifyId);
   void onNotificationRemoved(int ANotifyId);
   void onSubscriptionDialogDestroyed();
-  void onAccountChanged(const QString &AName, const QVariant &AValue);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 private:
   IPluginManager *FPluginManager;
   IRosterPlugin *FRosterPlugin;
   IRostersModel *FRostersModel;
   IRostersView *FRostersView;
-  IMainWindowPlugin *FMainWindowPlugin;
-  ITrayManager *FTrayManager;
   INotifications *FNotifications;
-  IAccountManager *FAccountManager;
-  IMultiUserChatPlugin *FMultiUserChatPlugin;
   ISettingsPlugin *FSettingsPlugin;
+  IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
   int FOptions;
-  Menu *FAddContactMenu;
-  QHash<IRoster *,Action *> FActions;
-  QHash<SubscriptionDialog *,int> FSubscrDialogs;
-  QHash<Jid, QHash<Jid, AutoSubscription> > FAutoSubscriptions;
+  QMap<int, SubscriptionDialog *> FNotifyDialog;
+  QMap<Jid, QMap<Jid, AutoSubscription> > FAutoSubscriptions;
 };
 
 #endif // ROSTERCHANGER_H

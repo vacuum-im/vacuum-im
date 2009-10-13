@@ -51,6 +51,10 @@
         <source>Can`t add contact &apos;&lt;b&gt;%1&lt;/b&gt;&apos; because it is not a valid Jaber ID</source>
         <translation>Невозможно добавить контакт &apos;&lt;b&gt;%1&lt;/b&gt;&apos;, т.к. он не является правильным JID</translation>
     </message>
+    <message>
+        <source>* nested group delimiter - &apos;%1&apos;</source>
+        <translation>* разделитель вложенных групп - &apos;%1&apos;</translation>
+    </message>
 </context>
 <context>
     <name>AddContactDialogClass</name>
@@ -61,10 +65,6 @@
     <message>
         <source>Group:</source>
         <translation>Группа:</translation>
-    </message>
-    <message>
-        <source>Add contact</source>
-        <translation>Добавить контакт</translation>
     </message>
     <message>
         <source>Contact:</source>
@@ -88,10 +88,6 @@
     <message>
         <source>Roster Changer</source>
         <translation>Модуль управления контакт-листом</translation>
-    </message>
-    <message>
-        <source>Add contact to</source>
-        <translation>Добавить контакт в</translation>
     </message>
     <message>
         <source>Subscription requests</source>
@@ -120,10 +116,6 @@
     <message>
         <source>Root</source>
         <translation>В корень</translation>
-    </message>
-    <message>
-        <source>Add contact...</source>
-        <translation>Добавить контакт...</translation>
     </message>
     <message>
         <source>Subscription</source>
@@ -283,10 +275,6 @@
 </context>
 <context>
     <name>SubscriptionDialogClass</name>
-    <message>
-        <source>Subscription request</source>
-        <translation>Запрос авторизации</translation>
-    </message>
     <message>
         <source>Add user to contact list</source>
         <translation>Добавить пользователя в контакт-лист</translation>

@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>AddContactDialogClass</class>
- <widget class="QDialog" name="AddContactDialogClass" >
-  <property name="geometry" >
+ <widget class="QDialog" name="AddContactDialogClass">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,91 +10,95 @@
     <height>291</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>Add contact</string>
-  </property>
-  <layout class="QVBoxLayout" name="lytMainLayout" >
-   <property name="margin" >
+  <layout class="QVBoxLayout" name="lytMainLayout">
+   <property name="margin">
     <number>5</number>
    </property>
    <item>
-    <layout class="QFormLayout" name="formLayout" >
-     <item row="0" column="0" >
-      <widget class="QLabel" name="lblContact" >
-       <property name="text" >
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="lblContact">
+       <property name="text">
         <string>Contact:</string>
        </property>
-       <property name="buddy" >
+       <property name="buddy">
         <cstring>lneContact</cstring>
        </property>
       </widget>
      </item>
-     <item row="0" column="1" >
-      <widget class="QLineEdit" name="lneContact" />
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="lneContact"/>
      </item>
-     <item row="1" column="0" >
-      <widget class="QLabel" name="lblNickName" >
-       <property name="text" >
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblNickName">
+       <property name="text">
         <string>Nick:</string>
        </property>
-       <property name="buddy" >
+       <property name="buddy">
         <cstring>lneNickName</cstring>
        </property>
       </widget>
      </item>
-     <item row="1" column="1" >
-      <widget class="QLineEdit" name="lneNickName" />
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="lneNickName"/>
      </item>
-     <item row="2" column="0" >
-      <widget class="QLabel" name="lblGroup" >
-       <property name="text" >
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblGroup">
+       <property name="text">
         <string>Group:</string>
        </property>
-       <property name="buddy" >
+       <property name="buddy">
         <cstring>cmbGroup</cstring>
        </property>
       </widget>
      </item>
-     <item row="2" column="1" >
-      <widget class="QComboBox" name="cmbGroup" >
-       <property name="editable" >
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cmbGroup">
+       <property name="editable">
         <bool>true</bool>
        </property>
-       <property name="duplicatesEnabled" >
+       <property name="duplicatesEnabled">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="lblGroupDelim">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="grbSubscription" >
-     <property name="title" >
+    <widget class="QGroupBox" name="grbSubscription">
+     <property name="title">
       <string>Subscription</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" >
-      <property name="margin" >
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="margin">
        <number>5</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="chbSubscribe" >
-        <property name="text" >
+       <widget class="QCheckBox" name="chbSubscribe">
+        <property name="text">
          <string>Subscribe to contact presence</string>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QTextEdit" name="tedMessage" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <widget class="QTextEdit" name="tedMessage">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="acceptRichText" >
+        <property name="acceptRichText">
          <bool>false</bool>
         </property>
        </widget>
@@ -102,18 +107,18 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="dbbButtons" >
-     <property name="orientation" >
+    <widget class="QDialogButtonBox" name="dbbButtons">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
+     <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>lneContact</tabstop>
   <tabstop>lneNickName</tabstop>
@@ -130,11 +135,11 @@
    <receiver>tedMessage</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>311</x>
      <y>124</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>299</x>
      <y>134</y>
     </hint>
