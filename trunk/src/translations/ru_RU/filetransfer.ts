@@ -43,6 +43,37 @@
         <source>File transfer canceled: %1</source>
         <translation>Передача файла отменена: %1</translation>
     </message>
+    <message>
+        <source>Auto sending file: %1</source>
+        <translation>Автоматическая отправка файла: %1</translation>
+    </message>
+    <message>
+        <source>File sending is started automatically</source>
+        <translation>Отправка файла запущена автоматически</translation>
+    </message>
+    <message>
+        <source>Auto receiving file: %1</source>
+        <translation>Автоматическое получение файла: %1</translation>
+    </message>
+    <message>
+        <source>File receiving is started automatically</source>
+        <translation>Получение файла запущено автоматически</translation>
+    </message>
+</context>
+<context>
+    <name>FileTransferOptionsClass</name>
+    <message>
+        <source>Automatically receive files from contacts in roster</source>
+        <translation>Автоматически принимать файлы от контактов в ростере</translation>
+    </message>
+    <message>
+        <source>Hide dialog after transfer started</source>
+        <translation>Прятать диалог после начала передачи</translation>
+    </message>
+    <message>
+        <source>Automatically remove finished transfers</source>
+        <translation>Автоматически удалять завершенные передачи</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>
