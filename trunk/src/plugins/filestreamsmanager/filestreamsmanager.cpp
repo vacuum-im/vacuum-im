@@ -333,6 +333,9 @@ void FileStreamsManager::onSettingsClosed()
   if (!FFileStreamsWindow.isNull())
     delete FFileStreamsWindow;
 
+  foreach(IFileStream *stream, FStreams.values())
+    delete stream->instance();
+
   ISettings *settings = FSettingsPlugin->settingsForPlugin(FILESTREAMSMANAGER_UUID);
   settings->setValue(SVN_DEFAULT_DIRECTORY, FDefaultDirectory);
   settings->setValue(SVN_SEPARATE_DIRECTORIES, FSeparateDirectories);
