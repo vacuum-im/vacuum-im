@@ -106,6 +106,9 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
     if (FRoster)
     {
       ui.cmbGroup->addItems(FRoster->groups().toList());
+      ui.cmbGroup->model()->sort(0,Qt::AscendingOrder);
+      ui.cmbGroup->setCurrentIndex(-1);
+      ui.lblGroupDelim->setText(tr("* nested group delimiter - '%1'").arg(Qt::escape(FRoster->groupDelimiter())));
     }
   }
 
