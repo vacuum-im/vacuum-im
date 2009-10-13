@@ -36,5 +36,6 @@
 
 // Node = ON_FILETRANSFER
 #define OWO_FILESTREAMSMANAGER                    500
+#define OWO_FILETRANSFER                          600
 
 #endif

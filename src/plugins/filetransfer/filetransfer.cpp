@@ -1,19 +1,32 @@
 #include "filetransfer.h"
 
 #include <QDir>
+#include <QTimer>
 
-#define ADR_STREAM_JID          Action::DR_StreamJid
-#define ADR_CONTACT_JID         Action::DR_Parametr1
-#define ADR_FILE_NAME           Action::DR_Parametr2
+#define ADR_STREAM_JID                Action::DR_StreamJid
+#define ADR_CONTACT_JID               Action::DR_Parametr1
+#define ADR_FILE_NAME                 Action::DR_Parametr2
 
-#define NOTIFICATOR_ID          "FileTransfer"
+#define SVN_AUTO_RECEIVE              "autoReceive"
+#define SVN_HIDE_DIALOG_STARTED       "hideDialogWhenStarted"
+#define SVN_REMOVE_TRANSFER_FINISHED  "removeTransferWhenFinished"
+
+#define NOTIFICATOR_ID                "FileTransfer"
+
+#define REMOVE_FINISHED_TIMEOUT       10000
 
 FileTransfer::FileTransfer()
 {
+  FRosterPlugin = NULL;
   FDiscovery = NULL;
   FNotifications = NULL;
   FFileManager = NULL;
   FDataManager = NULL;
+  FSettingsPlugin = NULL;
+
+  FAutoReceive = false;
+  FHideDialogWhenStarted = false;
+  FRemoveTransferWhenFinished = false;
 }
 
 FileTransfer::~FileTransfer()
@@ -53,6 +66,12 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitO
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
 
+  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+  }
+
   plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
   if (plugin)
   {
@@ -61,6 +80,17 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitO
     {
       connect(FNotifications->instance(),SIGNAL(notificationActivated(int)),SLOT(onNotificationActivated(int)));
       connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)),SLOT(onNotificationRemoved(int)));
+    }
+  }
+
+  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    if (FSettingsPlugin)
+    {
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
+      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
     }
   }
 
@@ -83,7 +113,25 @@ bool FileTransfer::initObjects()
   {
     FFileManager->insertStreamsHandler(this,FSHO_FILETRANSFER);
   }
+  if (FSettingsPlugin)
+  {
+    FSettingsPlugin->insertOptionsHolder(this);
+  }
   return true;
+}
+
+QWidget *FileTransfer::optionsWidget(const QString &ANode, int &AOrder)
+{
+  if (ANode == ON_FILETRANSFER)
+  {
+    AOrder = OWO_FILETRANSFER;
+    FileTransferOptions *widget = new FileTransferOptions(this);
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
+    return widget;
+  }
+  return NULL;
 }
 
 bool FileTransfer::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
@@ -132,9 +180,14 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
         stream->setFileDate(DateTime(fileElem.attribute("date")).toLocal());
         stream->setFileDescription(fileElem.firstChildElement("desc").text());
         stream->setRangeSupported(!fileElem.firstChildElement("range").isNull());
+
         StreamDialog *dialog = createStreamDialog(stream);
         dialog->setSelectableMethods(AMethods);
-        notifyStream(stream);
+
+        if (AMethods.contains(FFileManager->defaultStreamMethod()))
+          autoStartStream(stream);
+
+        notifyStream(stream, true);
         return true;
       }
     }
@@ -172,6 +225,36 @@ bool FileTransfer::fileStreamShowDialog(const QString &AStreamId)
     return true;
   }
   return false;
+}
+
+bool FileTransfer::autoReceive() const
+{
+  return FAutoReceive;
+}
+
+void FileTransfer::setAutoReceive(bool AAuto)
+{
+  FAutoReceive = AAuto;
+}
+
+bool FileTransfer::hideDialogWhenStarted() const
+{
+  return FHideDialogWhenStarted;
+}
+
+void FileTransfer::setHideDialogWhenStarted(bool AHide)
+{
+  FHideDialogWhenStarted = AHide;
+}
+
+bool FileTransfer::removeTransferWhenFinished() const
+{
+  return FRemoveTransferWhenFinished;
+}
+
+void FileTransfer::setRemoveTransferWhenFinished(bool ARemove)
+{
+  FRemoveTransferWhenFinished = ARemove;
 }
 
 bool FileTransfer::isSupported(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -222,7 +305,7 @@ void FileTransfer::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void FileTransfer::notifyStream(IFileStream *AStream)
+void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 {
   if (FNotifications)
   {
@@ -248,6 +331,29 @@ void FileTransfer::notifyStream(IFileStream *AStream)
           notify.data.insert(NDR_SOUND_FILE,SDF_FILETRANSFER_INCOMING);
         }
         break;
+      case IFileStream::Negotiating:
+      case IFileStream::Connecting:
+      case IFileStream::Transfering:
+        if (ANewStream)
+        {
+          notify.kinds &= ~INotification::TrayIcon;
+          if (AStream->streamKind() == IFileStream::SendFile)
+          {
+            notify.data.insert(NDR_TOOLTIP,tr("Auto sending file: %1").arg(file));
+            notify.data.insert(NDR_WINDOW_TEXT, tr("File sending is started automatically"));
+          }
+          else
+          {
+            notify.data.insert(NDR_TOOLTIP,tr("Auto receiving file: %1").arg(file));
+            notify.data.insert(NDR_WINDOW_TEXT, tr("File receiving is started automatically"));
+          }
+          notify.data.insert(NDR_SOUND_FILE,SDF_FILETRANSFER_INCOMING);
+        }
+        else
+        {
+          notify.kinds = 0;
+        }
+        break;
       case IFileStream::Finished:
         notify.data.insert(NDR_TOOLTIP,tr("Completed transferring file: %1").arg(file));
         notify.data.insert(NDR_WINDOW_TEXT, tr("File transfer completed"));
@@ -269,6 +375,19 @@ void FileTransfer::notifyStream(IFileStream *AStream)
         int notifyId = FNotifications->appendNotification(notify);
         FStreamNotify.insert(AStream->streamId(),notifyId);
       }
+    }
+  }
+}
+
+void FileTransfer::autoStartStream(IFileStream *AStream)
+{
+  if (FAutoReceive && AStream->streamKind()==IFileStream::ReceiveFile)
+  {
+    if (!QFile::exists(AStream->fileName()))
+    {
+      IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStream->streamJid()) : NULL;
+      if (roster && roster->rosterItem(AStream->contactJid()).isValid)
+        AStream->startStream(FFileManager->defaultStreamMethod(), QString::null);
     }
   }
 }
@@ -304,7 +423,19 @@ void FileTransfer::onStreamStateChanged()
 {
   IFileStream *stream = qobject_cast<IFileStream *>(sender());
   if (stream)
+  {
+    if (stream->streamState() == IFileStream::Transfering)
+    {
+      if (FHideDialogWhenStarted && FStreamDialog.contains(stream->streamId()))
+        FStreamDialog.value(stream->streamId())->close();
+    }
+    else if (stream->streamState() == IFileStream::Finished)
+    {
+      if (FRemoveTransferWhenFinished)
+        QTimer::singleShot(REMOVE_FINISHED_TIMEOUT, stream->instance(), SLOT(deleteLater()));
+    }
     notifyStream(stream);
+  }
 }
 
 void FileTransfer::onStreamDestroyed()
@@ -346,5 +477,22 @@ void FileTransfer::onNotificationRemoved(int ANotifyId)
 {
   FStreamNotify.remove(FStreamNotify.key(ANotifyId));
 }
+
+void FileTransfer::onSettingsOpened()
+{
+  ISettings *settings = FSettingsPlugin->settingsForPlugin(FILETRANSFER_UUID);
+  FAutoReceive = settings->value(SVN_AUTO_RECEIVE, false).toBool();
+  FHideDialogWhenStarted = settings->value(SVN_HIDE_DIALOG_STARTED, false).toBool();
+  FRemoveTransferWhenFinished = settings->value(SVN_REMOVE_TRANSFER_FINISHED, false).toBool();
+}
+
+void FileTransfer::onSettingsClosed()
+{
+  ISettings *settings = FSettingsPlugin->settingsForPlugin(FILETRANSFER_UUID);
+  settings->setValue(SVN_AUTO_RECEIVE,FAutoReceive);
+  settings->setValue(SVN_HIDE_DIALOG_STARTED,FHideDialogWhenStarted);
+  settings->setValue(SVN_REMOVE_TRANSFER_FINISHED,FRemoveTransferWhenFinished);
+}
+
 
 Q_EXPORT_PLUGIN2(FileTransferPlugin, FileTransfer);
