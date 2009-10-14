@@ -25,6 +25,14 @@
 #define MNI_BOOKMARKS_URL               "bookmarksURL"
 #define MNI_BOOKMARKS_EDIT              "bookmarksEdit"
 
+// ChatStates
+#define MNI_CHATSTATES_UNKNOWN          "chatstatesUnknown"
+#define MNI_CHATSTATES_ACTIVE           "chatstatesActive"
+#define MNI_CHATSTATES_COMPOSING        "chatstatesComposing"
+#define MNI_CHATSTATES_PAUSED           "chatstatesPaused"
+#define MNI_CHATSTATES_INACTIVE         "chatstatesInactive"
+#define MNI_CHATSTATES_GONE             "chatstatesGone"
+
 //ClientInfo
 #define MNI_CLIENTINFO                  "clientinfo"
 #define MNI_CLIENTINFO_VERSION          "clientinfoVersion"
