@@ -54,8 +54,15 @@ public:
   virtual QString methodDescription() const =0;
   virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, 
     const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent = NULL) =0;
-  virtual void loadSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS) =0;
-  virtual void saveSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS) =0;
+  virtual QWidget *settingsWidget(IDataStreamSocket *ASocket, bool AReadOnly) =0;
+  virtual QWidget *settingsWidget(const QString &ASettingsNS, bool AReadOnly)=0;
+  virtual void loadSettings(IDataStreamSocket *ASocket, QWidget *AWidget) const=0;
+  virtual void loadSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS) const=0;
+  virtual void saveSettings(const QString &ASettingsNS, QWidget *AWidget) =0;
+  virtual void saveSettings(const QString &ASettingsNS, IDataStreamSocket *ASocket) =0;
+  virtual void deleteSettings(const QString &ASettingsNS) =0;
+signals:
+  virtual void socketCreated(IDataStreamSocket *ASocket) =0;
 };
 
 class IDataStreamProfile

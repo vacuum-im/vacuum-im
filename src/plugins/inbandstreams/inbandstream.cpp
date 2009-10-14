@@ -18,8 +18,6 @@
 #define SHC_INBAND_DATA_IQ        "/iq[@type='set']/data[@xmlns='" NS_INBAND_BYTESTREAMS "']"
 #define SHC_INBAND_DATA_MESSAGE   "/message/data[@xmlns='" NS_INBAND_BYTESTREAMS "']"
 
-#define MINIMUM_BLOCK_SIZE        128
-
 class SendDataEvent : 
   public QEvent
 {
@@ -49,9 +47,9 @@ InBandStream::InBandStream(IStanzaProcessor *AProcessor, const QString &AStreamI
   FSHIClose = -1;
   FSHIData = -1;
 
-  FBlockSize = 4096;
-  FMaxBlockSize = 10240;
-  FStanzaType = StanzaIq;
+  FBlockSize = DEFAULT_BLOCK_SIZE;
+  FMaxBlockSize = DEFAULT_MAX_BLOCK_SIZE;
+  FStanzaType = DEFAULT_DATA_STANZA_TYPE;
   FStreamState = IDataStreamSocket::Closed;
 }
 
