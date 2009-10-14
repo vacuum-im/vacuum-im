@@ -11,6 +11,12 @@
 #include "../../utils/ringbuffer.h"
 #include "../../utils/jid.h"
 
+#define MINIMUM_BLOCK_SIZE        128
+
+#define DEFAULT_BLOCK_SIZE        4096
+#define DEFAULT_MAX_BLOCK_SIZE    10240
+#define DEFAULT_DATA_STANZA_TYPE  IInBandStream::StanzaIq
+
 class InBandStream : 
   public QIODevice,
   public IInBandStream,

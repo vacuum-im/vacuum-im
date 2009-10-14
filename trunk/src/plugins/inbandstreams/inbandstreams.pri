@@ -1,5 +1,9 @@
-HEADERS = inbandstream.h \
+FORMS   = inbandoptions.ui
+
+HEADERS = inbandoptions.h \
+          inbandstream.h \
           inbandstreams.h
 
-SOURCES = inbandstream.cpp \
+SOURCES = inbandoptions.cpp \
+          inbandstream.cpp \
           inbandstreams.cpp

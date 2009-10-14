@@ -31,6 +31,12 @@ class IInBandStreams:
 {
 public:
   virtual QObject *instance() =0;
+  virtual int blockSize(const QString &ASettingsNS) const =0;
+  virtual void setBlockSize(const QString &ASettingsNS, int ASize) =0;
+  virtual int maximumBlockSize(const QString &ASettingsNS) =0;
+  virtual void setMaximumBlockSize(const QString &ASettingsNS, int AMaxSize) =0;
+  virtual int dataStanzaType(const QString &ASettingsNS) const =0;
+  virtual void setDataStanzaType(const QString &ASettingsNS, int AType) =0;
 };
 
 Q_DECLARE_INTERFACE(IInBandStream,"Vacuum.Plugin.IInBandStream/1.0")
