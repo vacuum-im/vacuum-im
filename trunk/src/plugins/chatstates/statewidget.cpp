@@ -34,6 +34,7 @@ StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow) : QPush
 
   setMenu(FMenu);
   setFlat(true);
+  setIconSize(QSize(12,12));
   setToolTip(tr("User chat status"));
 
   connect(FChatStates->instance(),SIGNAL(permitStatusChanged(const Jid &, int)),
@@ -85,18 +86,43 @@ void StateWidget::onUserChatStateChanged(const Jid &AStreamJid, const Jid &ACont
 {
   if (FWindow->streamJid()==AStreamJid && FWindow->contactJid()==AContactJid)
   {
-    QString state = tr("Unknown");
+    QString state;
+    QString iconKey;
+    
     if (AState == IChatStates::StateActive)
+    {
       state = tr("Active");
+      iconKey = MNI_CHATSTATES_ACTIVE;
+    }
     else if (AState == IChatStates::StateComposing)
+    {
       state = tr("Composing");
+      iconKey = MNI_CHATSTATES_COMPOSING;
+    }
     else if (AState == IChatStates::StatePaused)
+    {
       state = tr("Paused");
+      iconKey = MNI_CHATSTATES_PAUSED;
+    }
     else if (AState == IChatStates::StateInactive)
+    {
       state = tr("Inactive %1").arg(QDateTime::currentDateTime().toString("hh:mm"));
+      iconKey = MNI_CHATSTATES_INACTIVE;
+    }
     else if (AState == IChatStates::StateGone)
+    {
       state = tr("Gone %1").arg(QDateTime::currentDateTime().toString("hh:mm"));
+      iconKey = MNI_CHATSTATES_GONE;
+    }
+    else
+    {
+      state = tr("Unknown");
+      iconKey = MNI_CHATSTATES_UNKNOWN;
+    }
+
     setText(state);
+    IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,iconKey);
+
     setMinimumWidth(qMax(minimumWidth(),sizeHint().width()));
   }
 }
