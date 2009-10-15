@@ -208,7 +208,7 @@ bool FileTransfer::fileStreamResponce(const QString &AStreamId, const Stanza &AR
       if (rangeElem.hasAttribute("length"))
         stream->setRangeLength(rangeElem.attribute("length").toInt());
     }
-    return stream->startStream(AMethodNS,QString::null);
+    return stream->startStream(AMethodNS);
   }
   return false;
 }
@@ -387,7 +387,7 @@ void FileTransfer::autoStartStream(IFileStream *AStream)
     {
       IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStream->streamJid()) : NULL;
       if (roster && roster->rosterItem(AStream->contactJid()).isValid)
-        AStream->startStream(FFileManager->defaultStreamMethod(), QString::null);
+        AStream->startStream(FFileManager->defaultStreamMethod());
     }
   }
 }

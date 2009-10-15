@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>410</width>
-    <height>258</height>
+    <height>320</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -157,10 +157,36 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="grbConnections">
+    <widget class="QGroupBox" name="grbMethods">
      <property name="title">
-      <string>Connection methods:</string>
+      <string>Select data stream and settings profile</string>
      </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="lblMethodSettings">
+          <property name="text">
+           <string>Profile:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cmbMethodSettings">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QWidget" name="wdtMethods" native="true"/>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

@@ -27,6 +27,7 @@ public:
   virtual Jid contactJid() const;
   virtual int streamKind() const;
   virtual int streamState() const;
+  virtual QString methodNS() const;
   virtual qint64 speed() const;
   virtual qint64 progress() const;
   virtual QString stateString() const;
@@ -46,8 +47,10 @@ public:
   virtual void setFileDate(const QDateTime &ADate);
   virtual QString fileDescription() const;
   virtual void setFileDescription(const QString &AFileDesc);
+  virtual QString methodSettings() const;
+  virtual void setMethodSettings(const QString &ASettingsNS);
   virtual bool initStream(const QList<QString> &AMethods);
-  virtual bool startStream(const QString &AMethodNS, const QString &ASettingsNS);
+  virtual bool startStream(const QString &AMethodNS);
   virtual void abortStream(const QString &AError);
 signals:
   virtual void stateChanged();
@@ -75,8 +78,10 @@ private:
   qint64 FSpeed[SPEED_POINTS];
   qint64 FProgress;
   bool FAborted;
+  QString FMethodNS;
   QString FAbortString;
   QString FStateString;
+  QString FMethodSettings;
 private:
   bool FRangeSupported;
   qint64 FRangeOffset;
