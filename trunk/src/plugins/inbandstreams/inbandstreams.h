@@ -2,8 +2,6 @@
 #define INBANDSTREAMS_H
 
 #include "../../definations/namespaces.h"
-#include "../../definations/optionnodes.h"
-#include "../../definations/optionwidgetorders.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iinbandstreams.h"
 #include "../../interfaces/ifilestreamsmanager.h"
@@ -16,11 +14,10 @@
 class InBandStreams : 
   public QObject,
   public IPlugin,
-  public IInBandStreams,
-  public IOptionsHolder
+  public IInBandStreams
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IInBandStreams IDataStreamMethod IOptionsHolder);
+  Q_INTERFACES(IPlugin IInBandStreams IDataStreamMethod);
 public:
   InBandStreams();
   ~InBandStreams();
@@ -32,8 +29,6 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IDataStreamMethod
   virtual QString methodNS() const;
   virtual QString methodName() const;
@@ -56,9 +51,6 @@ public:
   virtual void setDataStanzaType(const QString &ASettingsNS, int AType);
 signals:
   virtual void socketCreated(IDataStreamSocket *ASocket);
-  //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
 protected slots:
   void onSettingsOpened();
   void onSettingsClosed();

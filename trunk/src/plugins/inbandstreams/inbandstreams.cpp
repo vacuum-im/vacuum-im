@@ -77,25 +77,7 @@ bool InBandStreams::initObjects()
   {
     FFileManager->insertStreamMethod(NS_INBAND_BYTESTREAMS);
   }
-  if (FSettingsPlugin)
-  {
-    FSettingsPlugin->insertOptionsHolder(this);
-  }
   return true;
-}
-
-QWidget *InBandStreams::optionsWidget(const QString &ANode, int &AOrder)
-{
-  if (ANode == ON_DATASTREAMS)
-  {
-    AOrder = OWO_INBANDSTREAMS;
-    InBandOptions *widget = new InBandOptions(this,QString::null,false);
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
-  }
-  return NULL;
 }
 
 QString InBandStreams::methodNS() const
