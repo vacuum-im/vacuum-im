@@ -1,3 +1,7 @@
-HEADERS = datastreamsmanager.h
+FORMS = datastreamsoptions.ui
 
-SOURCES = datastreamsmanager.cpp
+HEADERS = datastreamsoptions.h \
+          datastreamsmanager.h
+
+SOURCES = datastreamsoptions.cpp \
+          datastreamsmanager.cpp

@@ -43,5 +43,47 @@
         <source>Common data streams settings</source>
         <translation>Общие настройки потоков данных</translation>
     </message>
+    <message>
+        <source>&lt;Default Profile&gt;</source>
+        <translation>&lt;Основной профиль&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>DataStreamsOptions</name>
+    <message>
+        <source>Add Profile</source>
+        <translation>Добавить профиль</translation>
+    </message>
+    <message>
+        <source>Enter profile name:</source>
+        <translation>Введите имя профиля:</translation>
+    </message>
+    <message>
+        <source>Delete Profile</source>
+        <translation>Удалить провиль</translation>
+    </message>
+    <message>
+        <source>Do you really want to delete a current data streams profile?</source>
+        <translation>Вы дейстительно ходите удалить текущий профиль потоков данных?</translation>
+    </message>
+</context>
+<context>
+    <name>DataStreamsOptionsClass</name>
+    <message>
+        <source>Data Streams Profiles</source>
+        <translation>Профили потоков данных</translation>
+    </message>
+    <message>
+        <source>Profile:</source>
+        <translation>Профиль:</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
 </context>
 </TS>

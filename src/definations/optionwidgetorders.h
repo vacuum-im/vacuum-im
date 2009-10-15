@@ -35,7 +35,7 @@
 #define OWO_MESSAGE_STYLES                        500
 
 //Node = ON_DATASTREAMS
-#define OWO_INBANDSTREAMS                         500
+#define OWO_DATASTREAMS                           500
 
 //Node = ON_FILETRANSFER
 #define OWO_FILESTREAMSMANAGER                    500

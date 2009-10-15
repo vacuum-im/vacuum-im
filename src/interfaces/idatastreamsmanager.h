@@ -84,6 +84,10 @@ public:
   virtual IDataStreamMethod *method(const QString &AMethodNS) const =0;
   virtual void insertMethod(IDataStreamMethod *AMethod) =0;
   virtual void removeMethod(IDataStreamMethod *AMethod) =0;
+  virtual QList<QString> methodSettings() const =0;
+  virtual QString methodSettingsName(const QString &ASettingsNS) const =0;
+  virtual void insertMethodSettings(const QString &ASettingsNS, const QString &ASettingsName) =0;
+  virtual void removeMethodSettings(const QString &ASettingsNS) =0;
   virtual QList<QString> profiles() const =0;
   virtual IDataStreamProfile *profile(const QString &AProfileNS) =0;
   virtual void insertProfile(IDataStreamProfile *AProfile) =0;
@@ -95,6 +99,8 @@ public:
 signals:
   virtual void methodInserted(IDataStreamMethod *AMethod) =0;
   virtual void methodRemoved(IDataStreamMethod *AMethod) =0;
+  virtual void methodSettingsInserted(const QString &ASettingsNS, const QString &ASettingsName) =0;
+  virtual void methodSettingsRemoved(const QString &ASettingsNS) =0;
   virtual void profileInserted(IDataStreamProfile *AProfile) =0;
   virtual void profileRemoved(IDataStreamProfile *AProfile) =0;
 };

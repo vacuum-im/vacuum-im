@@ -13,8 +13,6 @@
 #define ON_MISC               "Misc"
 #define ON_MESSAGE_STYLES     "MessageStyles"
 #define ON_DATASTREAMS        "DataStreams"
-
-// ON_DATASTREAMS
-#define ON_FILETRANSFER       ON_DATASTREAMS "::" "FileTransfer"
+#define ON_FILETRANSFER       "FileTransfer"
 
 #endif
