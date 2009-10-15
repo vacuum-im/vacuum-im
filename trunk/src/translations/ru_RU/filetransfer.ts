@@ -142,14 +142,6 @@
         <translation>Не удалось запустить передачу файла, проверте настройки и попробуйте еще раз!</translation>
     </message>
     <message>
-        <source>Selected way to connect is not available</source>
-        <translation>Выбранный способ подключения недоступен</translation>
-    </message>
-    <message>
-        <source>Please select at least one way to connect</source>
-        <translation>Пожалуйста, выберите хотябы один способ подключения</translation>
-    </message>
-    <message>
         <source>Are you sure you want to cancel a file transfer?</source>
         <translation>Вы уверешы, что хотите отменить передачу файла?</translation>
     </message>
@@ -189,6 +181,14 @@
         <source>Speed %1.</source>
         <translation>Скорость %1.</translation>
     </message>
+    <message>
+        <source>Selected data stream is not available</source>
+        <translation>Выбранный поток данных не доступен</translation>
+    </message>
+    <message>
+        <source>Please select at least one data stream</source>
+        <translation>Пожалуйста, выберите хотя бы один поток данных</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialogClass</name>
@@ -217,8 +217,12 @@
         <translation>Статус:</translation>
     </message>
     <message>
-        <source>Connection methods:</source>
-        <translation>Способы подключения:</translation>
+        <source>Profile:</source>
+        <translation>Профиль:</translation>
+    </message>
+    <message>
+        <source>Select data stream and settings profile</source>
+        <translation>Выберите поток данных и профиль настроек</translation>
     </message>
 </context>
 </TS>

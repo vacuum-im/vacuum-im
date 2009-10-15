@@ -65,6 +65,11 @@ int FileStream::streamState() const
   return FStreamState;
 }
 
+QString FileStream::methodNS() const
+{
+  return FMethodNS;
+}
+
 qint64 FileStream::speed() const
 {
   if (FStreamState == Transfering)
@@ -236,6 +241,23 @@ void FileStream::setFileDescription(const QString &AFileDesc)
   }
 }
 
+QString FileStream::methodSettings() const
+{
+  return FMethodSettings;
+}
+
+void FileStream::setMethodSettings(const QString &ASettingsNS)
+{
+  if (FStreamState == Creating)
+  {
+    if (FMethodSettings != ASettingsNS)
+    {
+      FMethodSettings = ASettingsNS;
+      emit propertiesChanged();
+    }
+  }
+}
+
 bool FileStream::initStream(const QList<QString> &AMethods)
 {
   if (FStreamState==Creating && FStreamKind==SendFile)
@@ -252,7 +274,7 @@ bool FileStream::initStream(const QList<QString> &AMethods)
   return false;
 }
 
-bool FileStream::startStream(const QString &AMethodNS, const QString &ASettingsNS)
+bool FileStream::startStream(const QString &AMethodNS)
 {
   if (FStreamKind==SendFile && FStreamState==Negotiating)
   {
@@ -262,11 +284,14 @@ bool FileStream::startStream(const QString &AMethodNS, const QString &ASettingsN
       FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Initiator,this) : NULL;
       if (FSocket)
       {
-        stremMethod->loadSettings(FSocket,ASettingsNS);
+        stremMethod->loadSettings(FSocket,FMethodSettings);
         setStreamState(Connecting,tr("Connecting"));
         connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
         if (FSocket->open(QIODevice::WriteOnly))
+        {
+          FMethodNS = AMethodNS;
           return true;
+        }
       }
       FFile.close();
     }
@@ -281,11 +306,14 @@ bool FileStream::startStream(const QString &AMethodNS, const QString &ASettingsN
         FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Target,this) : NULL;
         if (FSocket)
         {
-          stremMethod->loadSettings(FSocket,ASettingsNS);
+          stremMethod->loadSettings(FSocket,FMethodSettings);
           setStreamState(Connecting,tr("Connecting"));
           connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
           if (FSocket->open(QIODevice::ReadOnly))
+          {
+            FMethodNS = AMethodNS;
             return true;
+          }
         }
       }
       FFile.close();
@@ -433,3 +461,4 @@ void FileStream::onIncrementSpeedIndex()
   FSpeed[FSpeedIndex] = 0;
   emit speedChanged();
 }
+

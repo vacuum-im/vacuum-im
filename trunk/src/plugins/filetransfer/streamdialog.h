@@ -33,6 +33,9 @@ protected slots:
   void onStreamDestroyed();
   void onFileButtonClicked(bool);
   void onDialogButtonClicked(QAbstractButton *AButton);
+  void onMethodSettingsChanged(int AIndex);
+  void onMethodSettingsInserted(const QString &ASettingsNS, const QString &ASettingsName);
+  void onMethodSettingsRemoved(const QString &ASettingsNS);
 private:
   Ui::StreamDialogClass ui;
 private:

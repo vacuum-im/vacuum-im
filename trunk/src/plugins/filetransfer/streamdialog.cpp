@@ -10,8 +10,10 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
                            IFileStream *AFileStream, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
-  ui.grbConnections->setLayout(new QVBoxLayout);
   setAttribute(Qt::WA_DeleteOnClose,true);
+
+  ui.wdtMethods->setLayout(new QVBoxLayout);
+  ui.wdtMethods->layout()->setMargin(0);
 
   FFileStream = AFileStream;
   FFileManager = AFileManager;
@@ -27,7 +29,21 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
     setWindowTitle(tr("Receive File - %1").arg(FFileStream->streamJid().full()));
     ui.lblContactLabel->setText(tr("From:"));
   }
+
   ui.lblContact->setText(FFileStream->contactJid().hFull());
+
+  if (AFileStream->streamState() == IFileStream::Creating)
+  {
+    foreach(QString settingsNS, FDataManager->methodSettings())
+      ui.cmbMethodSettings->addItem(FDataManager->methodSettingsName(settingsNS), settingsNS);
+    ui.cmbMethodSettings->model()->sort(0, Qt::AscendingOrder);
+    ui.cmbMethodSettings->insertItem(0,FDataManager->methodSettingsName(QString::null), QVariant(QString::null));
+    ui.cmbMethodSettings->setCurrentIndex(0);
+    connect(ui.cmbMethodSettings, SIGNAL(currentIndexChanged(int)), SLOT(onMethodSettingsChanged(int)));
+    connect(FDataManager->instance(),SIGNAL(methodSettingsInserted(const QString &, const QString &)),
+      SLOT(onMethodSettingsInserted(const QString &, const QString &)));
+    connect(FDataManager->instance(),SIGNAL(methodSettingsRemoved(const QString &)), SLOT(onMethodSettingsRemoved(const QString &)));
+  }
 
   connect(FFileStream->instance(),SIGNAL(stateChanged()),SLOT(onStreamStateChanged()));
   connect(FFileStream->instance(),SIGNAL(speedChanged()),SLOT(onStreamSpeedChanged()));
@@ -70,11 +86,11 @@ void StreamDialog::setSelectableMethods(const QList<QString> &AMethods)
     IDataStreamMethod *stremMethod = FDataManager->method(methodNS);
     if (stremMethod)
     {
-      QCheckBox *button = new QCheckBox(stremMethod->methodName(),ui.grbConnections);
+      QCheckBox *button = new QCheckBox(stremMethod->methodName(),ui.grbMethods);
       button->setToolTip(stremMethod->methodDescription());
       button->setAutoExclusive(FFileStream->streamKind() == IFileStream::ReceiveFile);
       button->setChecked(FFileStream->streamKind()==IFileStream::SendFile || FFileManager->defaultStreamMethod()==methodNS);
-      ui.grbConnections->layout()->addWidget(button);
+      ui.wdtMethods->layout()->addWidget(button);
       FMethodButtons.insert(button,methodNS);
     }
   }
@@ -189,7 +205,7 @@ void StreamDialog::onStreamStateChanged()
     ui.tlbFile->setEnabled(true);
     ui.lneFile->setReadOnly(FFileStream->streamKind()==IFileStream::SendFile);
     ui.pteDescription->setReadOnly(false);
-    ui.grbConnections->setVisible(true);
+    ui.grbMethods->setVisible(true);
     if (FFileStream->streamKind()==IFileStream::SendFile)
       ui.bbxButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Close);
     else
@@ -201,7 +217,7 @@ void StreamDialog::onStreamStateChanged()
     ui.tlbFile->setEnabled(false);
     ui.lneFile->setReadOnly(true);
     ui.pteDescription->setReadOnly(true);
-    ui.grbConnections->setVisible(false);
+    ui.grbMethods->setVisible(false);
     ui.bbxButtons->setStandardButtons(QDialogButtonBox::Abort|QDialogButtonBox::Close);
     break;
   case IFileStream::Disconnecting:
@@ -210,7 +226,7 @@ void StreamDialog::onStreamStateChanged()
     ui.tlbFile->setEnabled(false);
     ui.lneFile->setReadOnly(true);
     ui.pteDescription->setReadOnly(true);
-    ui.grbConnections->setVisible(false);
+    ui.grbMethods->setVisible(false);
     ui.bbxButtons->setStandardButtons(QDialogButtonBox::Close);
     break;
   }
@@ -292,16 +308,16 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
             QString file = ui.lneFile->text();
             FFileStream->setFileName(ui.lneFile->text());
             FFileStream->setFileDescription(ui.pteDescription->toPlainText());
-            if (!FFileStream->startStream(methods.first(),QString::null))
+            if (!FFileStream->startStream(methods.first()))
               QMessageBox::warning(this,tr("Warning"),tr("Unable to start the file transfer, check settings and try again!"));
           }
           else
-            QMessageBox::warning(this,tr("Warning"),tr("Selected way to connect is not available"));
+            QMessageBox::warning(this,tr("Warning"),tr("Selected data stream is not available"));
         }
       }
     }
     else
-      QMessageBox::warning(this,tr("Warning"),tr("Please select at least one way to connect"));
+      QMessageBox::warning(this,tr("Warning"),tr("Please select at least one data stream"));
   }
   else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Abort)
   {
@@ -320,4 +336,23 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
     else
       close();
   }
+}
+
+void StreamDialog::onMethodSettingsChanged(int AIndex)
+{
+  FFileStream->setMethodSettings(ui.cmbMethodSettings->itemData(AIndex).toString());
+}
+
+void StreamDialog::onMethodSettingsInserted(const QString &ASettingsNS, const QString &ASettingsName)
+{
+  int index = ui.cmbMethodSettings->findData(ASettingsNS);
+  if (index >= 0)
+    ui.cmbMethodSettings->setItemText(index, ASettingsName);
+  else
+    ui.cmbMethodSettings->addItem(ASettingsName, ASettingsNS);
+}
+
+void StreamDialog::onMethodSettingsRemoved(const QString &ASettingsNS)
+{
+  ui.cmbMethodSettings->removeItem(ui.cmbMethodSettings->findData(ASettingsNS));
 }
