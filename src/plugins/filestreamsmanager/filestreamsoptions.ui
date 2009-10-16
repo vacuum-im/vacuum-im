@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>444</width>
-    <height>117</height>
+    <height>137</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -46,9 +46,16 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="chbSeparateDirectories">
+     <property name="text">
+      <string>Separate directories for contacts</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="lblMethod">
      <property name="text">
-      <string>Default Connection Method:</string>
+      <string>Default Data Stream:</string>
      </property>
     </widget>
    </item>
@@ -63,9 +70,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="chbSeparateDirectories">
-     <property name="text">
-      <string>Separate directories for contacts</string>
+    <widget class="QGroupBox" name="grbMethods">
+     <property name="title">
+      <string>Acceptable Data Streams</string>
      </property>
     </widget>
    </item>

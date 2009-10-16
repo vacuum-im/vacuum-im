@@ -2,6 +2,7 @@
 #define FILESTREAMSOPTIONS_H
 
 #include <QWidget>
+#include <QCheckbox>
 #include "ui_filestreamsoptions.h"
 #include "../../interfaces/ifilestreamsmanager.h"
 #include "../../interfaces/idatastreamsmanager.h"
@@ -19,11 +20,14 @@ signals:
   void optionsAccepted();
 protected slots:
   void onDirectoryButtonClicked();
+  void onMethodButtonToggled(bool ACkecked);
 private:
   Ui::FileStreamsOptionsClass ui;
 private:
   IDataStreamsManager *FDataManager;
   IFileStreamsManager *FFileManager;
+private:
+  QMap<QCheckBox *, QString> FMethods;
 };
 
 #endif // FILESTREAMSOPTIONS_H

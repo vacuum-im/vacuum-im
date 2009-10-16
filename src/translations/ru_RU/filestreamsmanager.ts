@@ -73,12 +73,16 @@
         <translation>Разделять директории для контактов</translation>
     </message>
     <message>
-        <source>Default Connection Method:</source>
-        <translation>Метод подключения по умолчанию:</translation>
-    </message>
-    <message>
         <source>Default Downloads Directory:</source>
         <translation>Директория загрузок по умолчанию:</translation>
+    </message>
+    <message>
+        <source>Default Data Stream:</source>
+        <translation>Поток данных по умолчанию:</translation>
+    </message>
+    <message>
+        <source>Acceptable Data Streams</source>
+        <translation>Разрешенные потоки данных</translation>
     </message>
 </context>
 <context>

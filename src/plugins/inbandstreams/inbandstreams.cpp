@@ -6,7 +6,6 @@
 
 InBandStreams::InBandStreams()
 {
-  FFileManager = NULL;
   FDataManager = NULL;
   FStanzaProcessor = NULL;
   FSettings = NULL;
@@ -35,13 +34,7 @@ void InBandStreams::pluginInfo(IPluginInfo *APluginInfo)
 
 bool InBandStreams::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IFileStreamsManager").value(0,NULL);
-  if (plugin)
-  {
-    FFileManager = qobject_cast<IFileStreamsManager *>(plugin->instance());
-  }
-
-  plugin = APluginManager->getPlugins("IDataStreamsManager").value(0,NULL);
+  IPlugin *plugin = APluginManager->getPlugins("IDataStreamsManager").value(0,NULL);
   if (plugin)
   {
     FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
@@ -72,10 +65,6 @@ bool InBandStreams::initObjects()
   if (FDataManager)
   {
     FDataManager->insertMethod(this);
-  }
-  if (FFileManager)
-  {
-    FFileManager->insertStreamMethod(NS_INBAND_BYTESTREAMS);
   }
   return true;
 }
