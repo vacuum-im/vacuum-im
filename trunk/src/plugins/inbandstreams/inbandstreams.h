@@ -4,7 +4,6 @@
 #include "../../definations/namespaces.h"
 #include "../../interfaces/ipluginmanager.h"
 #include "../../interfaces/iinbandstreams.h"
-#include "../../interfaces/ifilestreamsmanager.h"
 #include "../../interfaces/idatastreamsmanager.h"
 #include "../../interfaces/istanzaprocessor.h"
 #include "../../interfaces/isettings.h"
@@ -55,7 +54,6 @@ protected slots:
   void onSettingsOpened();
   void onSettingsClosed();
 private:
-  IFileStreamsManager *FFileManager;
   IDataStreamsManager *FDataManager;
   IStanzaProcessor *FStanzaProcessor;
   ISettings *FSettings;

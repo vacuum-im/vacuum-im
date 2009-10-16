@@ -292,6 +292,8 @@ bool FileStream::startStream(const QString &AMethodNS)
           FMethodNS = AMethodNS;
           return true;
         }
+        delete FSocket->instance();
+        FSocket = NULL;
       }
       FFile.close();
     }
@@ -314,6 +316,8 @@ bool FileStream::startStream(const QString &AMethodNS)
             FMethodNS = AMethodNS;
             return true;
           }
+          delete FSocket->instance();
+          FSocket = NULL;
         }
       }
       FFile.close();

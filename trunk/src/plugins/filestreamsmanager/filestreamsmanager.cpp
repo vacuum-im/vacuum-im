@@ -6,6 +6,7 @@
 #define SVN_DEFAULT_DIRECTORY           "defaultDirectory"
 #define SVN_SEPARATE_DIRECTORIES        "separateDirectories"
 #define SVN_DEFAULT_STREAM_METHOD       "defaultStreamMethod"
+#define SVN_ACCEPTABLE_STREAM_METHODS   "acceptableStreamMethods"
 
 FileStreamsManager::FileStreamsManager()
 {
@@ -266,6 +267,8 @@ void FileStreamsManager::setDefaultStreamMethod(const QString &AMethodNS)
 {
   if (FMethods.contains(AMethodNS))
     FDefaultMethod = AMethodNS;
+  else if (FMethods.isEmpty())
+    FDefaultMethod = QString::null;
 }
 
 QList<QString> FileStreamsManager::streamMethods() const
@@ -281,6 +284,8 @@ void FileStreamsManager::insertStreamMethod(const QString &AMethodNS)
 
 void FileStreamsManager::removeStreamMethod(const QString &AMethodNS)
 {
+  if (FDefaultMethod == AMethodNS)
+    FDefaultMethod = QString::null;
   FMethods.removeAt(FMethods.indexOf(AMethodNS));
 }
 
@@ -325,6 +330,8 @@ void FileStreamsManager::onSettingsOpened()
   ISettings *settings = FSettingsPlugin->settingsForPlugin(FILESTREAMSMANAGER_UUID);
   FDefaultDirectory = settings->value(SVN_DEFAULT_DIRECTORY, FSettingsPlugin->homeDir().path()+"/"+tr("Downloads")).toString();
   FSeparateDirectories = settings->value(SVN_SEPARATE_DIRECTORIES, false).toBool();
+  QString allMethods = FDataManager!=NULL ? QStringList(FDataManager->methods()).join("||") : QString::null;
+  FMethods = settings->value(SVN_ACCEPTABLE_STREAM_METHODS,allMethods).toString().split("||",QString::SkipEmptyParts);
   setDefaultStreamMethod(settings->value(SVN_DEFAULT_STREAM_METHOD).toString());
 }
 
@@ -340,6 +347,7 @@ void FileStreamsManager::onSettingsClosed()
   settings->setValue(SVN_DEFAULT_DIRECTORY, FDefaultDirectory);
   settings->setValue(SVN_SEPARATE_DIRECTORIES, FSeparateDirectories);
   settings->setValue(SVN_DEFAULT_STREAM_METHOD, FDefaultMethod);
+  settings->setValue(SVN_ACCEPTABLE_STREAM_METHODS, QStringList(FMethods).join("||"));
 }
 
 Q_EXPORT_PLUGIN2(FileStreamsManagerPlugin, FileStreamsManager);
