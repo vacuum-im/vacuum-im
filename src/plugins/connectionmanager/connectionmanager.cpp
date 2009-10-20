@@ -15,12 +15,11 @@ ConnectionManager::~ConnectionManager()
 
 void ConnectionManager::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing TCP connections");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Connection Manager");
-  APluginInfo->uid = CONNECTIONMANAGER_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Managing TCP connections");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

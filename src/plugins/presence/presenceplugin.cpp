@@ -13,12 +13,11 @@ PresencePlugin::~PresencePlugin()
 //IPlugin
 void PresencePlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing presences");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Presence Manager"); 
-  APluginInfo->uid = PRESENCE_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Managing presences");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }

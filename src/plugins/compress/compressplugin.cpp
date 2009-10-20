@@ -12,12 +12,11 @@ CompressPlugin::~CompressPlugin()
 
 void CompressPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Implementation of Stream Compression");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Stream Compression");
-  APluginInfo->uid = COMPRESS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Implementation of Stream Compression");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 

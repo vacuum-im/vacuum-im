@@ -18,12 +18,11 @@ MessageProcessor::~MessageProcessor()
 
 void MessageProcessor::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing message stanzas");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Message Processor"); 
-  APluginInfo->uid = MESSAGEPROCESSOR_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Managing message stanzas");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->conflicts.append("{153A4638-B468-496f-B57C-9F30CEDFCC2E}");
 }
 

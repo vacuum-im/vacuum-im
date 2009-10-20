@@ -34,12 +34,11 @@ SessionNegotiation::~SessionNegotiation()
 
 void SessionNegotiation::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Negotiating the exchange of XML stanzas between two XMPP entities.");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Session Negotiation"); 
-  APluginInfo->uid = SESSIONNEGOTIATION_UUID;
-  APluginInfo ->version = "0.1";
+  APluginInfo->description = tr("Negotiating the exchange of XML stanzas between two XMPP entities.");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(DATAFORMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }

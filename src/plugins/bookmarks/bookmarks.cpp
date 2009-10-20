@@ -28,12 +28,11 @@ BookMarks::~BookMarks()
 
 void BookMarks::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Storage of bookmarks to conference rooms and other entities in a Jabber user's account");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Bookmarks");
-  APluginInfo->uid = BOOKMARKS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Storage of bookmarks to conference rooms and other entities in a Jabber user's account");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(PRIVATESTORAGE_UUID);
 }
 

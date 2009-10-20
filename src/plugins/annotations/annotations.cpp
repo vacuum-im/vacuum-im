@@ -22,12 +22,11 @@ Annotations::~Annotations()
 
 void Annotations::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Plugin for making annotations about roster items and other entities");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Annotations"); 
-  APluginInfo->uid = ANNOTATIONS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Plugin for making annotations about roster items and other entities");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(PRIVATESTORAGE_UUID);
 }
 

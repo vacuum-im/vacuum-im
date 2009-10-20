@@ -23,12 +23,11 @@ Registration::~Registration()
 
 void Registration::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("In-band registration with instant messaging servers and associated services");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("In-Band Registration");
-  APluginInfo->uid = REGISTRATION_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("In-band registration with instant messaging servers and associated services");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(DATAFORMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }

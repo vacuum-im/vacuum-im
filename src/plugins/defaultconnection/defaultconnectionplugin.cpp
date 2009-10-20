@@ -24,12 +24,11 @@ DefaultConnectionPlugin::~DefaultConnectionPlugin()
 
 void DefaultConnectionPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Creating standard connection to jabber server");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Default connection");
-  APluginInfo->uid = DEFAULTCONNECTION_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Creating standard connection to jabber server");
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->version = "1.0";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(SETTINGS_UUID);
 }
 

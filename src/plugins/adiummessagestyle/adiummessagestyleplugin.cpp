@@ -25,12 +25,11 @@ AdiumMessageStylePlugin::~AdiumMessageStylePlugin()
 
 void AdiumMessageStylePlugin::pluginInfo( IPluginInfo *APluginInfo )
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Implements support for Adium message styles");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Adiun Message Style"); 
-  APluginInfo->uid = ADIUMMESSAGESTYLE_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Implements support for Adium message styles");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool AdiumMessageStylePlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

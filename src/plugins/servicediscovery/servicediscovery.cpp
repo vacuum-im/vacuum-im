@@ -63,12 +63,11 @@ ServiceDiscovery::~ServiceDiscovery()
 
 void ServiceDiscovery::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Discovering information about Jabber entities and the items associated with such entities");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Service Discovery");
-  APluginInfo->uid = SERVICEDISCOVERY_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Discovering information about Jabber entities and the items associated with such entities");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

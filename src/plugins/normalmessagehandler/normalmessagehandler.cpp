@@ -23,17 +23,14 @@ NormalMessageHandler::~NormalMessageHandler()
 
 void NormalMessageHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Normal message handling");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Normal Message Handler"); 
-  APluginInfo->uid = NORMALMESSAGEHANDLER_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Normal message handling");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(MESSAGEWIDGETS_UUID);
   APluginInfo->dependences.append(MESSAGEPROCESSOR_UUID);
   APluginInfo->dependences.append(MESSAGESTYLES_UUID);
-  APluginInfo->conflicts.append("{153A4638-B468-496f-B57C-9F30CEDFCC2E}");  //Messenger
-  APluginInfo->conflicts.append("{f118ccf4-8535-4302-8fda-0f6487c6db01}");  //MessageHandler
 }
 
 bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

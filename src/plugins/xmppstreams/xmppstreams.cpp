@@ -1,6 +1,5 @@
 #include "xmppstreams.h"
 
-#include <QIcon>
 #include "../../definations/namespaces.h"
 #include "../../utils/errorhandler.h"
 #include "xmppstream.h"
@@ -17,12 +16,11 @@ XmppStreams::~XmppStreams()
 
 void XmppStreams::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing XMPP streams, implementation of XMPP-Core");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("XMPP Streams Manager"); 
-  APluginInfo->uid = XMPPSTREAMS_UUID;
-  APluginInfo ->version = "0.1";
+  APluginInfo->description = tr("Managing XMPP streams, implementation of XMPP-Core");
+  APluginInfo ->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool XmppStreams::initObjects()

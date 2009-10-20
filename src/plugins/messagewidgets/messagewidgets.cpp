@@ -27,13 +27,11 @@ MessageWidgets::~MessageWidgets()
 
 void MessageWidgets::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Manager of the widgets for displaying messages");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Message Widgets"); 
-  APluginInfo->uid = MESSAGEWIDGETS_UUID;
-  APluginInfo->version = "0.1";
-  APluginInfo->conflicts.append("{153A4638-B468-496f-B57C-9F30CEDFCC2E}");
+  APluginInfo->description = tr("Manager of the widgets for displaying messages");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

@@ -26,12 +26,11 @@ SimpleMessageStylePlugin::~SimpleMessageStylePlugin()
 
 void SimpleMessageStylePlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Implements basic message styles.");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Simple Message Style"); 
-  APluginInfo->uid = SIMPLEMESSAGESTYLE_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Implements basic message styles.");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool SimpleMessageStylePlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

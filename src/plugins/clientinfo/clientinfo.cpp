@@ -52,12 +52,11 @@ ClientInfo::~ClientInfo()
 
 void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Request contact client information");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Client Info");
-  APluginInfo->uid = CLIENTINFO_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Request contact client information");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 

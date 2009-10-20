@@ -15,12 +15,11 @@ DataForms::~DataForms()
 
 void DataForms::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Implements data forms and generic data description");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Data Forms");
-  APluginInfo->uid = DATAFORMS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Implements data forms and generic data description");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool DataForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

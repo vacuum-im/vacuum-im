@@ -6,22 +6,22 @@
 #include <QList>
 #include <QtPlugin>
 
+class IPluginManager;
+
 struct IPluginInfo 
 {
-  QUuid uid;
   QString name;
   QString description;
   QString version;
   QString author;
+  QUrl homePage;
   QList<QUuid> implements;
   QList<QUuid> dependences;
   QList<QUuid> conflicts;
-  QUrl homePage;
 };
 
-class IPluginManager;
-
-class IPlugin  {
+class IPlugin
+{
 public:
   virtual QObject *instance() =0;
   virtual QUuid pluginUuid() const =0;
@@ -32,18 +32,18 @@ public:
   virtual bool startPlugin() =0;
 };
 
-class IPluginManager  
+class IPluginManager
 {
 public:
   virtual QObject* instance() =0;
-  virtual void restart() =0;
   virtual IPlugin* getPlugin(const QUuid &AUuid) const =0;
-  virtual QList<IPlugin *> getPlugins(const QString &AInterface = "") const =0;
+  virtual QList<IPlugin *> getPlugins(const QString &AInterface = QString::null) const =0;
   virtual const IPluginInfo *getPluginInfo(const QUuid &AUuid) const =0;
   virtual QList<QUuid> getDependencesOn(const QUuid &AUuid) const =0;
   virtual QList<QUuid> getDependencesFor(const QUuid &AUuid) const =0;
 public slots:
   virtual void quit() =0;
+  virtual void restart() =0;
 signals:
   virtual void aboutToQuit() =0;
 };

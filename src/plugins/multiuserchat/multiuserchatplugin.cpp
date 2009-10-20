@@ -38,12 +38,11 @@ MultiUserChatPlugin::~MultiUserChatPlugin()
 
 void MultiUserChatPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Implements multi-user text conferencing");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Multi-User Chat");
-  APluginInfo->uid = MULTIUSERCHAT_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Implements multi-user text conferencing");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 

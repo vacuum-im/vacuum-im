@@ -30,18 +30,6 @@ PluginManager::~PluginManager()
 
 }
 
-void PluginManager::restart()
-{
-  onAboutToQuit();
-
-  FPlugins.clear();
-  FPluginItems.clear();
-
-  loadPlugins();
-  initPlugins();
-  startPlugins();
-}
-
 QList<IPlugin *> PluginManager::getPlugins(const QString &AInterface) const
 {
   QList<IPlugin *> plugins;
@@ -70,13 +58,15 @@ QList<QUuid> PluginManager::getDependencesOn(const QUuid &AUuid) const
   deepStack.push(AUuid);
 
   QList<QUuid> plugins;
-  foreach(PluginItem pluginItem, FPluginItems)
+  QHash<QUuid, PluginItem>::const_iterator it = FPluginItems.constBegin();
+  while (it != FPluginItems.constEnd())
   {
-    if (!deepStack.contains(pluginItem.uid) && pluginItem.info->dependences.contains(AUuid))
+    if (!deepStack.contains(it.key()) && it.value().info->dependences.contains(AUuid))
     {
-      plugins += getDependencesOn(pluginItem.uid);
-      plugins.append(pluginItem.uid);
+      plugins += getDependencesOn(it.key());
+      plugins.append(it.key());
     }
+    it++;
   }
 
   deepStack.pop(); 
@@ -103,6 +93,23 @@ QList<QUuid> PluginManager::getDependencesFor(const QUuid &AUuid) const
 
   deepStack.pop(); 
   return plugins;
+}
+
+void PluginManager::quit()
+{
+  QTimer::singleShot(0,qApp,SLOT(quit()));
+}
+
+void PluginManager::restart()
+{
+  onAboutToQuit();
+
+  FPlugins.clear();
+  FPluginItems.clear();
+
+  loadPlugins();
+  initPlugins();
+  startPlugins();
 }
 
 void PluginManager::loadPlugins()
@@ -150,7 +157,6 @@ void PluginManager::loadPlugins()
             if (!FPluginItems.contains(uid))
             {
               PluginItem pluginItem;
-              pluginItem.uid = uid;
               pluginItem.plugin = plugin;
               pluginItem.loader = loader;
               pluginItem.info = new IPluginInfo;
@@ -280,11 +286,6 @@ void PluginManager::unloadPlugin(const QUuid &AUuid)
   }
 }
 
-void PluginManager::quit()
-{
-  QTimer::singleShot(0,qApp,SLOT(quit()));
-}
-
 bool PluginManager::checkDependences(const QUuid AUuid) const
 { 
   if (FPluginItems.contains(AUuid))
@@ -352,4 +353,3 @@ void PluginManager::onAboutToQuit()
   foreach(QUuid uid,FPluginItems.keys())
     unloadPlugin(uid);
 }
-

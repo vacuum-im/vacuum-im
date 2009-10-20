@@ -26,12 +26,11 @@ FileStreamsManager::~FileStreamsManager()
 
 void FileStreamsManager::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing custom file streams");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("File Streams Manager");
-  APluginInfo->uid = FILESTREAMSMANAGER_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Managing custom file streams");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(DATASTREAMSMANAGER_UUID);
 }
 
