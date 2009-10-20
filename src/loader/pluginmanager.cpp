@@ -21,8 +21,10 @@
 //PluginManager
 PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 {
-  FQtTranslator = NULL;
-  connect(AParent,SIGNAL(aboutToQuit()),SLOT(onAboutToQuit()));
+  FQtTranslator = new QTranslator(this);
+  FUtilsTranslator = new QTranslator(this);
+  FLoaderTranslator = new QTranslator(this);
+  connect(AParent,SIGNAL(aboutToQuit()),SLOT(onApplicationAboutToQuit()));
 }
 
 PluginManager::~PluginManager()
@@ -102,11 +104,7 @@ void PluginManager::quit()
 
 void PluginManager::restart()
 {
-  onAboutToQuit();
-
-  FPlugins.clear();
-  FPluginItems.clear();
-
+  onApplicationAboutToQuit();
   loadPlugins();
   initPlugins();
   startPlugins();
@@ -124,22 +122,9 @@ void PluginManager::loadPlugins()
       if (defLocale.language() != QLocale::C)
         QLocale::setDefault(defLocale);
     }
-    QString locale = QLocale().name();
-    QString tsDir = QApplication::applicationDirPath()+"/"DIR_TRANSLATIONS"/"+locale;
-    
-    if (!FQtTranslator)
-      FQtTranslator = new QTranslator(this);
 
-    if (FQtTranslator->load("qt_"+locale,tsDir))
-    {
-      qApp->installTranslator(FQtTranslator);
-    }
-    else
-    {
-      qApp->removeTranslator(FQtTranslator);
-      delete FQtTranslator;
-      FQtTranslator = NULL;
-    }
+    QString tsDir = QApplication::applicationDirPath()+ "/" DIR_TRANSLATIONS "/" +QLocale().name();
+    loadCoreTranslations(tsDir);
 
     QStringList files = dir.entryList(QDir::Files);
     foreach (QString file, files) 
@@ -162,18 +147,15 @@ void PluginManager::loadPlugins()
               pluginItem.info = new IPluginInfo;
               pluginItem.translator =  NULL;
               
-              QString qmFile = tsDir+"/"+file.mid(LIB_PREFIX_SIZE,file.lastIndexOf('.')-LIB_PREFIX_SIZE)+".qm";
-              if (QFile::exists(qmFile))
+              QString qmFile = file.mid(LIB_PREFIX_SIZE,file.lastIndexOf('.')-LIB_PREFIX_SIZE);
+              QTranslator *translator = new QTranslator(loader);
+              if (translator->load(qmFile,tsDir))
               {
-                QTranslator *translator = new QTranslator(loader);
-                if (translator->load(qmFile))
-                {
-                  qApp->installTranslator(translator);
-                  pluginItem.translator = translator;
-                }
-                else
-                  delete translator;
+                qApp->installTranslator(translator);
+                pluginItem.translator = translator;
               }
+              else
+                delete translator;
 
               plugin->pluginInfo(pluginItem.info);
               FPluginItems.insert(uid,pluginItem);
@@ -347,9 +329,30 @@ QList<QUuid> PluginManager::getConflicts(const QUuid AUuid) const
   return plugins.toList(); 
 }
 
-void PluginManager::onAboutToQuit()
+void PluginManager::loadCoreTranslations(const QString &ADir)
+{
+  if (FQtTranslator->load("qt_"+QLocale().name(),ADir))
+    qApp->installTranslator(FQtTranslator);
+  else
+    qApp->removeTranslator(FQtTranslator);
+
+  if (FUtilsTranslator->load("utils",ADir))
+    qApp->installTranslator(FUtilsTranslator);
+  else
+    qApp->removeTranslator(FUtilsTranslator);
+
+  if (FLoaderTranslator->load("vacuum",ADir))
+    qApp->installTranslator(FLoaderTranslator);
+  else
+    qApp->removeTranslator(FLoaderTranslator);
+}
+
+void PluginManager::onApplicationAboutToQuit()
 {
   emit aboutToQuit();
-  foreach(QUuid uid,FPluginItems.keys())
+
+  foreach(QUuid uid, FPluginItems.keys())
+  {
     unloadPlugin(uid);
+  }
 }
