@@ -1,2 +1,2 @@
 TEMPLATE  = subdirs
-SUBDIRS   = thirdparty utils client plugins
+SUBDIRS   = thirdparty utils loader plugins

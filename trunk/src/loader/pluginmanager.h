@@ -45,10 +45,13 @@ protected:
   bool checkDependences(const QUuid AUuid) const;
   bool checkConflicts(const QUuid AUuid) const;
   QList<QUuid> getConflicts(const QUuid AUuid) const;
+  void loadCoreTranslations(const QString &ADir);
 protected slots:
-  void onAboutToQuit();
+  void onApplicationAboutToQuit();
 private:
   QTranslator *FQtTranslator;
+  QTranslator *FUtilsTranslator;
+  QTranslator *FLoaderTranslator;
   QHash<QUuid, PluginItem> FPluginItems;
   mutable QMultiHash<QString, IPlugin *> FPlugins;
 };
