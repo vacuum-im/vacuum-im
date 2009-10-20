@@ -119,19 +119,15 @@ void PluginManager::loadPlugins()
     }
     QString locale = QLocale().name();
     QString tsDir = QApplication::applicationDirPath()+"/"DIR_TRANSLATIONS"/"+locale;
-    QString qtTranslator = tsDir+"/qtlib.qm";
-    if (QFile::exists(qtTranslator))
+    
+    if (!FQtTranslator)
+      FQtTranslator = new QTranslator(this);
+
+    if (FQtTranslator->load("qt_"+locale,tsDir))
     {
-      if (!FQtTranslator)
-      {
-        FQtTranslator = new QTranslator(this);
-        FQtTranslator->load(qtTranslator);
-        qApp->installTranslator(FQtTranslator);
-      }
-      else
-        FQtTranslator->load(qtTranslator);
+      qApp->installTranslator(FQtTranslator);
     }
-    else if (FQtTranslator)
+    else
     {
       qApp->removeTranslator(FQtTranslator);
       delete FQtTranslator;
