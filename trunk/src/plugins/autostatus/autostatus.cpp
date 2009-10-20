@@ -34,12 +34,11 @@ AutoStatus::~AutoStatus()
 
 void AutoStatus::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Changing status depending on user activity");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Auto status"); 
-  APluginInfo->uid = AUTOSTATUS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Changing status depending on user activity");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(STATUSCHANGER_UUID);
 }
 

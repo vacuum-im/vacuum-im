@@ -37,12 +37,11 @@ Gateways::~Gateways()
 
 void Gateways::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Plugin for interactions between Jabber clients and client proxy gateways to legacy IM services");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Gateway Interaction");
-  APluginInfo->uid = GATEWAYS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Plugin for interactions between Jabber clients and client proxy gateways to legacy IM services");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 

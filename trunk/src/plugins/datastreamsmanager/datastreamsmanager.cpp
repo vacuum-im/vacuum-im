@@ -25,12 +25,11 @@ DataStreamsManger::~DataStreamsManger()
 
 void DataStreamsManger::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Initiate a data stream between any two XMPP entities");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Data Streams Manager");
-  APluginInfo->uid = DATASTREAMSMANAGER_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Initiate a data stream between any two XMPP entities");
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->version = "1.0";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(DATAFORMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }

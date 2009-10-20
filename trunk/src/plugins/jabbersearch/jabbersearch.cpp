@@ -20,12 +20,11 @@ JabberSearch::~JabberSearch()
 
 void JabberSearch::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Search information repositories on the Jabber network.");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Jabber Search"); 
-  APluginInfo->uid = JABBERSEARCH_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Search information repositories on the Jabber network.");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 

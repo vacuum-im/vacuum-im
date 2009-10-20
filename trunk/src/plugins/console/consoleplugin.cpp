@@ -13,12 +13,11 @@ ConsolePlugin::~ConsolePlugin()
 
 void ConsolePlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Allow to view XMPP stanzas.");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("XML Console");
-  APluginInfo->uid = CONSOLE_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Allow to view XMPP stanzas.");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 

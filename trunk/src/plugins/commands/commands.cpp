@@ -29,12 +29,11 @@ Commands::~Commands()
 
 void Commands::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Plugin for advertising and executing application-specific commands");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Ad-Hoc Commands");
-  APluginInfo->uid = COMMANDS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Plugin for advertising and executing application-specific commands");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(DATAFORMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }

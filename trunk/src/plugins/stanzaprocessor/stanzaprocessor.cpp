@@ -15,12 +15,11 @@ StanzaProcessor::~StanzaProcessor()
 
 void StanzaProcessor::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing XMPP stanzas");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Stanza Processor"); 
-  APluginInfo->uid = STANZAPROCESSOR_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Managing XMPP stanzas");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 

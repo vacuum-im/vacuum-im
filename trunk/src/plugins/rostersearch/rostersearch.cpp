@@ -40,12 +40,11 @@ RosterSearch::~RosterSearch()
 
 void RosterSearch::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Searching contacts in roster");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Roster Search"); 
-  APluginInfo->uid = ROSTERSEARCH_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Searching contacts in roster");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(ROSTERSVIEW_UUID);
   APluginInfo->dependences.append(MAINWINDOW_UUID);
 }

@@ -12,12 +12,11 @@ StartTLSPlugin::~StartTLSPlugin()
 
 void StartTLSPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Implementation of StartTLS");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("StartTLS implementation");
-  APluginInfo->uid = STARTTLS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Implementation of StartTLS");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);
   APluginInfo->dependences.append(DEFAULTCONNECTION_UUID);
 }

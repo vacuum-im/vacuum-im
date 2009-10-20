@@ -36,12 +36,11 @@ FileTransfer::~FileTransfer()
 
 void FileTransfer::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Transfer files between two XMPP entities");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Files Transfer");
-  APluginInfo->uid = FILETRANSFER_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Transfer files between two XMPP entities");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(FILESTREAMSMANAGER_UUID);
   APluginInfo->dependences.append(DATASTREAMSMANAGER_UUID);
 }

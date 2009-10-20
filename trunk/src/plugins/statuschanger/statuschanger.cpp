@@ -51,12 +51,11 @@ StatusChanger::~StatusChanger()
 //IPlugin
 void StatusChanger::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing and change status");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Status Changer"); 
-  APluginInfo->uid = STATUSCHANGER_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Managing and change status");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(PRESENCE_UUID);
 }
 

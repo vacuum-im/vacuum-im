@@ -39,12 +39,11 @@ Notifications::~Notifications()
 
 void Notifications::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Notify user about events");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Notifications"); 
-  APluginInfo->uid = NOTIFICATIONS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Notify user about events");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

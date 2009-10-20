@@ -23,12 +23,11 @@ TrayManager::~TrayManager()
 
 void TrayManager::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing tray icon");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Tray manager"); 
-  APluginInfo->uid = TRAYMANAGER_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Managing tray icon");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool TrayManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

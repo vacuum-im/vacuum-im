@@ -17,12 +17,11 @@ PrivateStorage::~PrivateStorage()
 //IPlugin
 void PrivateStorage::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Store and retrieve custom XML data from server");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Private Storage");
-  APluginInfo->uid = PRIVATESTORAGE_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Store and retrieve custom XML data from server");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 

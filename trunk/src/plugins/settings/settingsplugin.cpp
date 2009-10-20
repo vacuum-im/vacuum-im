@@ -32,12 +32,11 @@ SettingsPlugin::~SettingsPlugin()
 
 void SettingsPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing profiles and settings");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Settings Manager"); 
-  APluginInfo->uid = SETTINGS_UUID;
-  APluginInfo ->version = "0.1";
+  APluginInfo->description = tr("Managing profiles and settings");
+  APluginInfo ->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool SettingsPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

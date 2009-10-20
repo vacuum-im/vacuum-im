@@ -18,12 +18,11 @@ Emoticons::~Emoticons()
 
 void Emoticons::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Insert smiley icons in chat windows");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Emoticons"); 
-  APluginInfo->uid = EMOTICONS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Insert smiley icons in chat windows");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

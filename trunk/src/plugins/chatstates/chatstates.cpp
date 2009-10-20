@@ -46,12 +46,11 @@ ChatStates::~ChatStates()
 
 void ChatStates::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->uid = CHATSTATES_UUID;
-  APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->name = tr("Chat State Notifications"); 
   APluginInfo->description = tr("Communicating the status of a user in a chat session");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->version = "0.1";
   APluginInfo->dependences.append(PRESENCE_UUID);
   APluginInfo->dependences.append(MESSAGEWIDGETS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);

@@ -44,12 +44,11 @@ RosterChanger::~RosterChanger()
 //IPlugin
 void RosterChanger::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Manipulating roster items and groups");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Roster Changer"); 
-  APluginInfo->uid = ROSTERCHANGER_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Manipulating roster items and groups");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(ROSTER_UUID); 
 }
 

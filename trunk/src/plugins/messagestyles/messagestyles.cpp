@@ -20,12 +20,11 @@ MessageStyles::~MessageStyles()
 
 void MessageStyles::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Managing message styles");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Message Styles"); 
-  APluginInfo->uid = MESSAGESTYLES_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Managing message styles");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

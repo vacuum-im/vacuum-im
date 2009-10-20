@@ -27,12 +27,11 @@ VCardPlugin::~VCardPlugin()
 
 void VCardPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Request and publish vCard");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("VCard manager"); 
-  APluginInfo->uid = VCARD_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Request and publish vCard");
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->version = "1.0";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

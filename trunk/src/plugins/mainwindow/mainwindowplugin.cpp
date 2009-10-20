@@ -20,12 +20,11 @@ MainWindowPlugin::~MainWindowPlugin()
 
 void MainWindowPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Main window holder");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Main Window"); 
-  APluginInfo->uid = MAINWINDOW_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Main window holder");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

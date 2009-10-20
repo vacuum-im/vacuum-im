@@ -31,12 +31,11 @@ StatusIcons::~StatusIcons()
 
 void StatusIcons::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->description = tr("Assign status icon to contact depended on users rules");
-  APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->name = tr("Status Icons Manager"); 
-  APluginInfo->uid = STATUSICONS_UUID;
-  APluginInfo->version = "0.1";
+  APluginInfo->description = tr("Assign status icon to contact depended on users rules");
+  APluginInfo->version = "1.0";
+  APluginInfo->author = "Potapov S.A. aka Lion";
+  APluginInfo->homePage = "http://jrudevels.org";
 }
 
 bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
