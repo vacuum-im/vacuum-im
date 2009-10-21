@@ -1,15 +1,15 @@
 #ifndef MESSAGEWINDOW_H
 #define MESSAGEWINDOW_H
 
-#include "../../definations/messagedataroles.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/imessageprocessor.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/istatusicons.h"
-#include "../../interfaces/isettings.h"
-#include "../../utils/errorhandler.h"
+#include <definations/messagedataroles.h>
+#include <definations/rosterindextyperole.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/imessageprocessor.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/istatusicons.h>
+#include <interfaces/isettings.h>
+#include <utils/errorhandler.h>
 #include "ui_messagewindow.h"
 
 class MessageWindow : 

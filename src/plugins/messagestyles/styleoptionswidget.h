@@ -2,10 +2,10 @@
 #define STYLEOPTIONSWIDGET_H
 
 #include "ui_styleoptionswidget.h"
-#include "../../interfaces/imessagestyles.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/iroster.h"
-#include "../../utils/message.h"
+#include <interfaces/imessagestyles.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/iroster.h>
+#include <utils/message.h>
 
 class StyleOptionsWidget : 
   public QWidget

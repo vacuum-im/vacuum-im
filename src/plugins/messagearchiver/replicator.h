@@ -3,8 +3,8 @@
 
 #include <QQueue>
 #include <QTimer>
-#include "../../interfaces/imessagearchiver.h"
-#include "../../utils/datetime.h"
+#include <interfaces/imessagearchiver.h>
+#include <utils/datetime.h>
 
 class Replicator : 
   public QObject

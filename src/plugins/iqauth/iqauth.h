@@ -2,12 +2,12 @@
 #define IQAUTH_H
 
 #include <QDomDocument>
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../utils/errorhandler.h"
-#include "../../utils/stanza.h"
-#include "../../utils/jid.h"
+#include <definations/namespaces.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/ixmppstreams.h>
+#include <utils/errorhandler.h>
+#include <utils/stanza.h>
+#include <utils/jid.h>
 
 #define IQAUTH_UUID "{1E3645BC-313F-49e9-BD00-4CC062EE76A7}"
 

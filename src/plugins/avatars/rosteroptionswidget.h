@@ -1,7 +1,7 @@
 #ifndef ROSTEROPTIONSWIDGET_H
 #define ROSTEROPTIONSWIDGET_H
 
-#include "../../interfaces/iavatars.h"
+#include <interfaces/iavatars.h>
 #include "ui_rosteroptionswidget.h"
 
 class RosterOptionsWidget : 

@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QIcon>
-#include "../../utils/jid.h"
+#include <utils/jid.h>
 
 #define STATUSICONS_UUID "{E477B0F3-5683-4a4f-883D-7E7D1ADF25FE}"
 

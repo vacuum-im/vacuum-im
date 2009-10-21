@@ -2,26 +2,26 @@
 #define AVATARS_H
 
 #include <QDir>
-#include "../../definations/namespaces.h"
-#include "../../definations/actiongroups.h"
-#include "../../definations/stanzahandlerpriority.h"
-#include "../../definations/rosterlabelorders.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterdataholderorders.h"
-#include "../../definations/rostertooltiporders.h"
-#include "../../definations/optionnodes.h"
-#include "../../definations/optionwidgetorders.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/iavatars.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/ivcard.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/isettings.h"
+#include <definations/namespaces.h>
+#include <definations/actiongroups.h>
+#include <definations/stanzahandlerpriority.h>
+#include <definations/rosterlabelorders.h>
+#include <definations/rosterindextyperole.h>
+#include <definations/rosterdataholderorders.h>
+#include <definations/rostertooltiporders.h>
+#include <definations/optionnodes.h>
+#include <definations/optionwidgetorders.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/iavatars.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/ivcard.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/irostersmodel.h>
+#include <interfaces/isettings.h>
 #include "rosteroptionswidget.h"
 
 class Avatars : 

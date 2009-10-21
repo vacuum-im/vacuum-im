@@ -1,20 +1,20 @@
 #ifndef MESSAGESTYLES_H
 #define MESSAGESTYLES_H
 
-#include "../../definations/optionnodes.h"
-#include "../../definations/optionnodeorders.h"
-#include "../../definations/optionwidgetorders.h"
-#include "../../definations/vcardvaluenames.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessagestyles.h"
-#include "../../interfaces/isettings.h"
-#include "../../interfaces/iavatars.h"
-#include "../../interfaces/ivcard.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/istatusicons.h"
-#include "../../utils/message.h"
+#include <definations/optionnodes.h>
+#include <definations/optionnodeorders.h>
+#include <definations/optionwidgetorders.h>
+#include <definations/vcardvaluenames.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessagestyles.h>
+#include <interfaces/isettings.h>
+#include <interfaces/iavatars.h>
+#include <interfaces/ivcard.h>
+#include <interfaces/iroster.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/istatusicons.h>
+#include <utils/message.h>
 #include "styleoptionswidget.h"
 
 class MessageStyles : 

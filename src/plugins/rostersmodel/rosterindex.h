@@ -4,8 +4,8 @@
 #include <QMap>
 #include <QHash>
 #include <QMultiHash>
-#include "../../definations/rosterindextyperole.h"
-#include "../../interfaces/irostersmodel.h"
+#include <definations/rosterindextyperole.h>
+#include <interfaces/irostersmodel.h>
 
 class RosterIndex : 
   public QObject,

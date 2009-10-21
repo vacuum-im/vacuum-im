@@ -1,15 +1,15 @@
 #ifndef CHATWINDOWMENU_H
 #define CHATWINDOWMENU_H
 
-#include "../../definations/namespaces.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/imessagearchiver.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/idataforms.h"
-#include "../../interfaces/isessionnegotiation.h"
-#include "../../interfaces/iservicediscovery.h"
-#include "../../utils/menu.h"
+#include <definations/namespaces.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/imessagearchiver.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/idataforms.h>
+#include <interfaces/isessionnegotiation.h>
+#include <interfaces/iservicediscovery.h>
+#include <utils/menu.h>
 
 class ChatWindowMenu : 
   public Menu

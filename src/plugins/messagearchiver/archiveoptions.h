@@ -2,7 +2,7 @@
 #define ARCHIVEOPTIONS_H
 
 #include <QItemDelegate>
-#include "../../interfaces/imessagearchiver.h"
+#include <interfaces/imessagearchiver.h>
 #include "ui_archiveoptions.h"
 
 class ArchiveDelegate : 

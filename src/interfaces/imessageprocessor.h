@@ -2,10 +2,10 @@
 #define IMESSAGEPROCESSOR_H
 
 #include <QTextDocument>
-#include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/inotifications.h"
-#include "../../utils/jid.h"
-#include "../../utils/message.h"
+#include <interfaces/irostersmodel.h>
+#include <interfaces/inotifications.h>
+#include <utils/jid.h>
+#include <utils/message.h>
 
 #define MESSAGEPROCESSOR_UUID "{1282bedb-f58f-48e8-96f6-62abb15dc6e1}"
 

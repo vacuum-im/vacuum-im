@@ -2,7 +2,7 @@
 #define ICLIENTINFO_H
 
 #include <QDateTime>
-#include "../../utils/jid.h"
+#include <utils/jid.h>
 
 #define CLIENTINFO_UUID "{3E2A0C1D-B347-43f5-B90B-5E7F87D7D8B0}"
 

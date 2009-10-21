@@ -1,15 +1,15 @@
 #ifndef MULTIUSERCHAT_H
 #define MULTIUSERCHAT_H
 
-#include "../../definations/multiuserdataroles.h"
-#include "../../definations/namespaces.h"
-#include "../../definations/stanzahandlerpriority.h"
-#include "../../interfaces/imultiuserchat.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessageprocessor.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/ipresence.h"
+#include <definations/multiuserdataroles.h>
+#include <definations/namespaces.h>
+#include <definations/stanzahandlerpriority.h>
+#include <interfaces/imultiuserchat.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessageprocessor.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/ipresence.h>
 #include "multiuser.h"
 
 class MultiUserChat : 

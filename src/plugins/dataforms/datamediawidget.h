@@ -3,7 +3,7 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
-#include "../../interfaces/idataforms.h"
+#include <interfaces/idataforms.h>
 
 class DataMediaWidget : 
   public QLabel,

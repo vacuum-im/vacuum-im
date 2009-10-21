@@ -2,7 +2,7 @@
 #define STATUSBARWIDGET_H
 
 #include <QStatusBar>
-#include "../../interfaces/imessagewidgets.h"
+#include <interfaces/imessagewidgets.h>
 
 class StatusBarWidget : 
   public QStatusBar,

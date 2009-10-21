@@ -1,22 +1,22 @@
 #ifndef SESSIONNEGOTIATION_H
 #define SESSIONNEGOTIATION_H
 
-#include "../../definations/namespaces.h"
-#include "../../definations/dataformtypes.h"
-#include "../../definations/sessionnegotiatororders.h"
-#include "../../definations/discofeaturehandlerorders.h"
-#include "../../definations/rosterlabelorders.h"
-#include "../../definations/notificationdataroles.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/isessionnegotiation.h"
-#include "../../interfaces/idataforms.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/iservicediscovery.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/inotifications.h"
+#include <definations/namespaces.h>
+#include <definations/dataformtypes.h>
+#include <definations/sessionnegotiatororders.h>
+#include <definations/discofeaturehandlerorders.h>
+#include <definations/rosterlabelorders.h>
+#include <definations/notificationdataroles.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/isessionnegotiation.h>
+#include <interfaces/idataforms.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/iservicediscovery.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/inotifications.h>
 
 class SessionNegotiation : 
   public QObject,

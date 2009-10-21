@@ -2,7 +2,7 @@
 #define MISCOPTIONSWIDGET_H
 
 #include <QWidget>
-#include "../../definations/version.h"
+#include <definations/version.h>
 #include "ui_miscoptionswidget.h"
 
 class MiscOptionsWidget :

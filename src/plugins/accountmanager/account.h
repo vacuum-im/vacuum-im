@@ -1,10 +1,10 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
-#include "../../definations/accountvaluenames.h"
-#include "../../interfaces/iaccountmanager.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/isettings.h"
+#include <definations/accountvaluenames.h>
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/isettings.h>
 
 class Account : 
   public QObject,

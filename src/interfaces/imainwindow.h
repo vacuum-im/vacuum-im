@@ -1,12 +1,12 @@
 #ifndef IMAINWINDOW_H
 #define IMAINWINDOW_H
 
-#include <QMainWindow>
-#include <QVBoxLayout>
-#include <QStackedWidget>
 #include <QToolBar>
-#include "../../utils/menu.h"
-#include "../../utils/toolbarchanger.h"
+#include <QVBoxLayout>
+#include <QMainWindow>
+#include <QStackedWidget>
+#include <utils/menu.h>
+#include <utils/toolbarchanger.h>
 
 #define MAINWINDOW_UUID "{A6F3D775-8464-4599-AB79-97BA1BAA6E96}"
 

@@ -2,11 +2,11 @@
 #define STARTTLS_H
 
 #include <QObject>
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/iconnectionmanager.h"
-#include "../../interfaces/idefaultconnection.h"
-#include "../../utils/stanza.h"
+#include <definations/namespaces.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/iconnectionmanager.h>
+#include <interfaces/idefaultconnection.h>
+#include <utils/stanza.h>
 
 class StartTLS : 
   public QObject,

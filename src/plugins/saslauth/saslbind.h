@@ -1,10 +1,10 @@
 #ifndef SASLBIND_H
 #define SASLBIND_H
 
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../utils/errorhandler.h"
-#include "../../utils/stanza.h"
+#include <definations/namespaces.h>
+#include <interfaces/ixmppstreams.h>
+#include <utils/errorhandler.h>
+#include <utils/stanza.h>
 
 class SASLBind : 
   public QObject,

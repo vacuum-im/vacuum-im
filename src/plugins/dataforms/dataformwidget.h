@@ -1,7 +1,7 @@
 #ifndef DATAFORMWIDGET_H
 #define DATAFORMWIDGET_H
 
-#include "../../interfaces/idataforms.h"
+#include <interfaces/idataforms.h>
 
 class DataFormWidget : 
   public QWidget,

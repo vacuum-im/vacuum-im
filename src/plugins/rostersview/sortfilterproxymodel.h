@@ -2,9 +2,9 @@
 #define SORTFILTERPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include "../../definations/rosterindextyperole.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/ipresence.h"
+#include <definations/rosterindextyperole.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/ipresence.h>
 
 class SortFilterProxyModel : 
   public QSortFilterProxyModel

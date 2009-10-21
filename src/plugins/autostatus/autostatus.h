@@ -3,14 +3,14 @@
 
 #include <QTimer>
 #include <QDateTime>
-#include "../../definations/optionnodes.h"
-#include "../../definations/optionnodeorders.h"
-#include "../../definations/optionwidgetorders.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/iautostatus.h"
-#include "../../interfaces/istatuschanger.h"
-#include "../../interfaces/isettings.h"
+#include <definations/optionnodes.h>
+#include <definations/optionnodeorders.h>
+#include <definations/optionwidgetorders.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/iautostatus.h>
+#include <interfaces/istatuschanger.h>
+#include <interfaces/isettings.h>
 #include "statusoptionswidget.h"
 
 struct StatusRuleItem {

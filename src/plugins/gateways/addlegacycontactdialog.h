@@ -1,11 +1,11 @@
 #ifndef ADDLEGACYCONTACTDIALOG_H
 #define ADDLEGACYCONTACTDIALOG_H
 
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/igateways.h"
-#include "../../interfaces/irosterchanger.h"
-#include "../../utils/iconstorage.h"
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/igateways.h>
+#include <interfaces/irosterchanger.h>
+#include <utils/iconstorage.h>
 #include "ui_addlegacycontactdialog.h"
 
 class AddLegacyContactDialog : 

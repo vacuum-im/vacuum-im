@@ -3,12 +3,12 @@
 
 #include <QLabel>
 #include <QPushButton>
-#include "../../definations/menuicons.h"
-#include "../../definations/resources.h"
-#include "../../interfaces/ichatstates.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../utils/menu.h"
-#include "../../utils/iconstorage.h"
+#include <definations/menuicons.h>
+#include <definations/resources.h>
+#include <interfaces/ichatstates.h>
+#include <interfaces/imessagewidgets.h>
+#include <utils/menu.h>
+#include <utils/iconstorage.h>
 
 class StateWidget : 
   public QPushButton

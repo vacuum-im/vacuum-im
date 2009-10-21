@@ -1,7 +1,7 @@
 #ifndef DATADIALOGWIDGET_H
 #define DATADIALOGWIDGET_H
 
-#include "../../interfaces/idataforms.h"
+#include <interfaces/idataforms.h>
 
 class DataDialogWidget : 
   public QDialog,

@@ -2,11 +2,11 @@
 #define DEFAULTCONNECTIONPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/iconnectionmanager.h"
-#include "../../interfaces/idefaultconnection.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/isettings.h"
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/iconnectionmanager.h>
+#include <interfaces/idefaultconnection.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/isettings.h>
 #include "defaultconnection.h"
 #include "connectionoptionswidget.h"
 

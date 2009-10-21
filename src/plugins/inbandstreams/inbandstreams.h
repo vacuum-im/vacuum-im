@@ -1,12 +1,12 @@
 #ifndef INBANDSTREAMS_H
 #define INBANDSTREAMS_H
 
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/iinbandstreams.h"
-#include "../../interfaces/idatastreamsmanager.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/isettings.h"
+#include <definations/namespaces.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/iinbandstreams.h>
+#include <interfaces/idatastreamsmanager.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/isettings.h>
 #include "inbandstream.h"
 #include "inbandoptions.h"
 

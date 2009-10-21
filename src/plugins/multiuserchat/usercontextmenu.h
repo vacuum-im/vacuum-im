@@ -1,10 +1,10 @@
 #ifndef USERCONTEXTMENU_H
 #define USERCONTEXTMENU_H
 
-#include "../../definations/multiuserdataroles.h"
-#include "../../interfaces/imultiuserchat.h"
-#include "../../interfaces/ipresence.h"
-#include "../../utils/menu.h"
+#include <definations/multiuserdataroles.h>
+#include <interfaces/imultiuserchat.h>
+#include <interfaces/ipresence.h>
+#include <utils/menu.h>
 
 class UserContextMenu : 
   public Menu

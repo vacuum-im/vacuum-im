@@ -4,10 +4,10 @@
 #include <QStringList>
 #include <QItemDelegate>
 #include <QSignalMapper>
-#include "../../definations/resources.h"
-#include "../../interfaces/istatusicons.h"
-#include "../../utils/iconstorage.h"
-#include "../../utils/iconsetdelegate.h"
+#include <definations/resources.h>
+#include <interfaces/istatusicons.h>
+#include <utils/iconstorage.h>
+#include <utils/iconsetdelegate.h>
 #include "ui_iconsoptionswidget.h"
 
 class IconsetSelectableDelegate :

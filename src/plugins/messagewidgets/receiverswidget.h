@@ -1,11 +1,11 @@
 #ifndef RECEIVERSWIDGET_H
 #define RECEIVERSWIDGET_H
 
-#include "../../definations/rosterindextyperole.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/istatusicons.h"
+#include <definations/rosterindextyperole.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/iroster.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/istatusicons.h>
 #include "ui_receiverswidget.h"
 
 class ReceiversWidget : 

@@ -2,8 +2,8 @@
 #define IREGISTRATION_H
 
 #include <QUrl>
-#include "../../interfaces/idataforms.h"
-#include "../../utils/jid.h"
+#include <interfaces/idataforms.h>
+#include <utils/jid.h>
 
 #define REGISTRATION_UUID         "{441F0DD4-C2DF-4417-B2F7-1D180C125EE3}"
 

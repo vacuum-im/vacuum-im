@@ -2,8 +2,8 @@
 #define CONNECTIONOPTIONSWIDGET_H
 
 #include <QWidget>
-#include "../../interfaces/iconnectionmanager.h"
-#include "../../interfaces/iaccountmanager.h"
+#include <interfaces/iconnectionmanager.h>
+#include <interfaces/iaccountmanager.h>
 #include "ui_connectionoptionswidget.h"
 #include "connectionmanager.h"
 

@@ -2,7 +2,7 @@
 #define SIMPLEOPTIONSWIDGET_H
 
 #include <QWidget>
-#include "../../interfaces/imessagestyles.h"
+#include <interfaces/imessagestyles.h>
 #include "simplemessagestyleplugin.h"
 #include "ui_simpleoptionswidget.h"
 

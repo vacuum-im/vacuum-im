@@ -1,14 +1,14 @@
 #ifndef ROSTERSMODEL_H
 #define ROSTERSMODEL_H
 
-#include "../../definations/accountvaluenames.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/iaccountmanager.h"
-#include "../../utils/jid.h"
+#include <definations/accountvaluenames.h>
+#include <definations/rosterindextyperole.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/irostersmodel.h>
+#include <interfaces/iroster.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/iaccountmanager.h>
+#include <utils/jid.h>
 #include "rosterindex.h"
 
 class RostersModel : 

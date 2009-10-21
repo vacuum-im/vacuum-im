@@ -2,8 +2,8 @@
 #define IPRESENCE_H
 
 #include <QList>
-#include "../../interfaces/ixmppstreams.h"
-#include "../../utils/jid.h"
+#include <interfaces/ixmppstreams.h>
+#include <utils/jid.h>
 
 #define PRESENCE_UUID "{511A07C4-FFA4-43ce-93B0-8C50409AFC0E}"
 

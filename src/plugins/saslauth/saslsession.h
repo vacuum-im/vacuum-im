@@ -1,11 +1,11 @@
 #ifndef SASLSESSION_H
 #define SASLSESSION_H
 
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/ixmppstreams.h"
-
-#define SASLSESSION_UUID "{625B644B-E940-42b7-9DBF-C5B16B4B0616}"
+#include <definations/namespaces.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/ixmppstreams.h>
+#include <utils/errorhandler.h>
+#include <utils/stanza.h>
 
 class SASLSession : 
   public QObject,

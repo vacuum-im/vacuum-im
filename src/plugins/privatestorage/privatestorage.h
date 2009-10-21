@@ -1,12 +1,12 @@
 #ifndef PRIVATESTORAGE_H
 #define PRIVATESTORAGE_H
 
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/iprivatestorage.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../utils/stanza.h"
+#include <definations/namespaces.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/iprivatestorage.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/ixmppstreams.h>
+#include <utils/stanza.h>
 
 class PrivateStorage :
   public QObject,

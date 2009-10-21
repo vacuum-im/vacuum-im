@@ -2,7 +2,7 @@
 #define ADIUMOPTIONSWIDGET_H
 
 #include <QWidget>
-#include "../../interfaces/imessagestyles.h"
+#include <interfaces/imessagestyles.h>
 #include "adiummessagestyleplugin.h"
 #include "ui_adiumoptionswidget.h"
 

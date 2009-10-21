@@ -2,7 +2,7 @@
 #define EDITBOOKMARKDIALOG_H
 
 #include <QDialog>
-#include "../../interfaces/ibookmarks.h"
+#include <interfaces/ibookmarks.h>
 #include "ui_editbookmarkdialog.h"
 
 class EditBookmarkDialog : 

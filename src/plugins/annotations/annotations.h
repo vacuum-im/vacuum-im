@@ -2,22 +2,22 @@
 #define ANNOTATIONS_H
 
 #include <QDomDocument>
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/actiongroups.h"
-#include "../../definations/rosterlabelorders.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterdataholderorders.h"
-#include "../../definations/rostertooltiporders.h"
-#include "../../definations/menuicons.h"
-#include "../../definations/resources.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/iannotations.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/irostersearch.h"
-#include "../../interfaces/iprivatestorage.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/irostersmodel.h"
-#include "../../utils/datetime.h"
+#include <definations/rosterindextyperole.h>
+#include <definations/actiongroups.h>
+#include <definations/rosterlabelorders.h>
+#include <definations/rosterindextyperole.h>
+#include <definations/rosterdataholderorders.h>
+#include <definations/rostertooltiporders.h>
+#include <definations/menuicons.h>
+#include <definations/resources.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/iannotations.h>
+#include <interfaces/iroster.h>
+#include <interfaces/irostersearch.h>
+#include <interfaces/iprivatestorage.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/irostersmodel.h>
+#include <utils/datetime.h>
 #include "editnotedialog.h"
 
 struct Annotation {

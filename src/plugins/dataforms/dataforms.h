@@ -5,11 +5,11 @@
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QObjectCleanupHandler>
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/idataforms.h"
-#include "../../interfaces/isettings.h"
-#include "../../interfaces/iservicediscovery.h"
+#include <definations/namespaces.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/idataforms.h>
+#include <interfaces/isettings.h>
+#include <interfaces/iservicediscovery.h>
 #include "datatablewidget.h"
 #include "datamediawidget.h"
 #include "datafieldwidget.h"

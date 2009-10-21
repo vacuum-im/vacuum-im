@@ -4,9 +4,9 @@
 #include <QTimer>
 #include <QMultiMap>
 #include <QDomDocument>
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/ixmppstreams.h"
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/ixmppstreams.h>
 
 struct StanzaRequest {
   StanzaRequest() { timer=NULL; owner=NULL; }

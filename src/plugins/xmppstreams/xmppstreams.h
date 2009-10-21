@@ -1,8 +1,12 @@
 #ifndef XMPPSTREAMS_H
 #define XMPPSTREAMS_H
 
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/ixmppstreams.h"
+#include <definations/namespaces.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/ixmppstreams.h>
+#include <utils/errorhandler.h>
+#include "xmppstream.h"
+
 
 class XmppStreams :
   public QObject,

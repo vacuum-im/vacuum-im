@@ -2,10 +2,10 @@
 #define JOINMULTICHATDIALOG_H
 
 #include <QDialog>
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/imultiuserchat.h"
-#include "../../interfaces/ixmppstreams.h"
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/imultiuserchat.h>
+#include <interfaces/ixmppstreams.h>
 #include "ui_joinmultichatdialog.h"
 
 class JoinMultiChatDialog : 

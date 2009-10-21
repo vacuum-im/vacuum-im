@@ -2,7 +2,7 @@
 #define FILETRANSFEROPTIONS_H
 
 #include <QWidget>
-#include "../../interfaces/ifiletransfer.h"
+#include <interfaces/ifiletransfer.h>
 #include "ui_filetransferoptions.h"
 
 class FileTransferOptions : 

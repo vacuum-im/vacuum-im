@@ -3,11 +3,11 @@
 
 #include <QMainWindow>
 #include <QPushButton>
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../definations/actiongroups.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/isettings.h"
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <definations/actiongroups.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/isettings.h>
 #include "ui_tabwindow.h"
 
 class TabWindow : 

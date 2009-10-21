@@ -4,8 +4,8 @@
 #include <QTimer>
 #include <QMouseEvent>
 #include <QDesktopWidget>
-#include "../../definations/notificationdataroles.h"
-#include "../../interfaces/inotifications.h"
+#include <definations/notificationdataroles.h>
+#include <interfaces/inotifications.h>
 #include "ui_notifywidget.h"
 
 class NotifyWidget : 

@@ -10,9 +10,9 @@
 #include <QDialogButtonBox>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../utils/iconstorage.h"
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <utils/iconstorage.h>
 
 struct OptionsNode {
   int order;

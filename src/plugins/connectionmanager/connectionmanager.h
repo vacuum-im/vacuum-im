@@ -2,19 +2,19 @@
 #define CONNECTIONMANAGER_H 
 
 #include <QComboBox>
-#include "../../definations/accountvaluenames.h"
-#include "../../definations/optionnodes.h"
-#include "../../definations/optionwidgetorders.h"
-#include "../../definations/rosterlabelorders.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/iconnectionmanager.h"
-#include "../../interfaces/idefaultconnection.h"
-#include "../../interfaces/iaccountmanager.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/isettings.h"
+#include <definations/accountvaluenames.h>
+#include <definations/optionnodes.h>
+#include <definations/optionwidgetorders.h>
+#include <definations/rosterlabelorders.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/iconnectionmanager.h>
+#include <interfaces/idefaultconnection.h>
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/isettings.h>
 #include "connectionoptionswidget.h"
 
 class ConnectionManager :

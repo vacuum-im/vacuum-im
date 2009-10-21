@@ -3,13 +3,13 @@
 
 #include <QReadWriteLock>
 #include <QWaitCondition>
-#include "../../definations/namespaces.h"
-#include "../../interfaces/iinbandstreams.h"
-#include "../../interfaces/idatastreamsmanager.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../utils/errorhandler.h"
-#include "../../utils/ringbuffer.h"
-#include "../../utils/jid.h"
+#include <definations/namespaces.h>
+#include <interfaces/iinbandstreams.h>
+#include <interfaces/idatastreamsmanager.h>
+#include <interfaces/istanzaprocessor.h>
+#include <utils/errorhandler.h>
+#include <utils/ringbuffer.h>
+#include <utils/jid.h>
 
 #define MINIMUM_BLOCK_SIZE        128
 

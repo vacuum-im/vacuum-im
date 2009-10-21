@@ -1,15 +1,15 @@
 #ifndef MAINWINDOWPLUGIN_H
 #define MAINWINDOWPLUGIN_H
 
-#include "../../definations/actiongroups.h"
-#include "../../definations/version.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imainwindow.h"
-#include "../../interfaces/isettings.h"
-#include "../../interfaces/itraymanager.h"
-#include "../../utils/action.h"
+#include <definations/actiongroups.h>
+#include <definations/version.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imainwindow.h>
+#include <interfaces/isettings.h>
+#include <interfaces/itraymanager.h>
+#include <utils/action.h>
 #include "mainwindow.h"
 
 class MainWindowPlugin :

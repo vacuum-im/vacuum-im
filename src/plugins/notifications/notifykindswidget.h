@@ -2,7 +2,7 @@
 #define NOTIFYKINDSWIDGET_H
 
 #include <QWidget>
-#include "../../interfaces/inotifications.h"
+#include <interfaces/inotifications.h>
 #include "ui_notifykindswidget.h"
 
 class NotifyKindsWidget : 

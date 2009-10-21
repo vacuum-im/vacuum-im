@@ -1,10 +1,10 @@
 #ifndef SASLAUTH_H
 #define SASLAUTH_H
 
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../utils/errorhandler.h"
-#include "../../utils/stanza.h"
+#include <definations/namespaces.h>
+#include <interfaces/ixmppstreams.h>
+#include <utils/errorhandler.h>
+#include <utils/stanza.h>
 
 class SASLAuth :
   public QObject,

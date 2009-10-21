@@ -1,8 +1,8 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
 
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ixmppstreams.h"
+#include <definations/namespaces.h>
+#include <interfaces/ixmppstreams.h>
 #include "../../thirdparty/zlib/zlib.h"
 
 class Compression : 

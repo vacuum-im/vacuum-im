@@ -1,8 +1,8 @@
 #ifndef VIEWWIDGET_H
 #define VIEWWIDGET_H
 
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/imessageprocessor.h"
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/imessageprocessor.h>
 #include "ui_viewwidget.h"
 
 class ViewWidget : 

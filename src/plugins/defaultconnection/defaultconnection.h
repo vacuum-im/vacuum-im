@@ -2,8 +2,8 @@
 #define DEFAULTCONNECTION_H
 
 #include <QTimer>
-#include "../../interfaces/iconnectionmanager.h"
-#include "../../interfaces/idefaultconnection.h"
+#include <interfaces/iconnectionmanager.h>
+#include <interfaces/idefaultconnection.h>
 
 class DefaultConnection : 
   public QObject,

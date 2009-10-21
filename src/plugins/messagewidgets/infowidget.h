@@ -2,12 +2,12 @@
 #define INFOWIDGET_H
 
 #include <QPicture>
-#include "../../definations/accountvaluenames.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/iaccountmanager.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/iavatars.h"
+#include <definations/accountvaluenames.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/iroster.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/iavatars.h>
 #include "ui_infowidget.h"
 
 class InfoWidget : 

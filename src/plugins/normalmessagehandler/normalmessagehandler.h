@@ -4,22 +4,22 @@
 #define NORMALMESSAGEHANDLER_UUID "{8592e3c3-ef5e-42a9-91c9-faf1ed9a91cc}"
 
 #include <QMultiMap>
-#include "../../definations/messagehandlerorders.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterlabelorders.h"
-#include "../../definations/notificationdataroles.h"
-#include "../../definations/actiongroups.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../definations/soundfiles.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessageprocessor.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/inotifications.h"
-#include "../../interfaces/istatusicons.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/ipresence.h"
-#include "../../utils/errorhandler.h"
+#include <definations/messagehandlerorders.h>
+#include <definations/rosterindextyperole.h>
+#include <definations/rosterlabelorders.h>
+#include <definations/notificationdataroles.h>
+#include <definations/actiongroups.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <definations/soundfiles.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessageprocessor.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/inotifications.h>
+#include <interfaces/istatusicons.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/ipresence.h>
+#include <utils/errorhandler.h>
 
 class NormalMessageHandler : 
   public QObject,

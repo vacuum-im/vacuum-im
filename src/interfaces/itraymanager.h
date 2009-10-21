@@ -2,7 +2,7 @@
 #define ITRAYMANAGER_H
 
 #include <QSystemTrayIcon>
-#include "../../utils/menu.h"
+#include <utils/menu.h>
 
 #define TRAYMANAGER_UUID "{DF738BB8-B22B-4307-9EF8-F5833D7D2204}"
 

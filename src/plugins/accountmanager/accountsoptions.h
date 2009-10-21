@@ -3,8 +3,8 @@
 
 #include <QMap>
 #include <QWidget>
-#include "../../interfaces/iaccountmanager.h"
-#include "../../interfaces/isettings.h"
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/isettings.h>
 #include "ui_accountsoptions.h"
 #include "accountoptions.h"
 #include "accountmanager.h"

@@ -1,12 +1,12 @@
 #ifndef ADIUMMESSAGESTYLEPLUGIN_H
 #define ADIUMMESSAGESTYLEPLUGIN_H
 
-#include "../../definations/resources.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessagestyles.h"
-#include "../../interfaces/isettings.h"
-#include "../../utils/filestorage.h"
-#include "../../utils/message.h"
+#include <definations/resources.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessagestyles.h>
+#include <interfaces/isettings.h>
+#include <utils/filestorage.h>
+#include <utils/message.h>
 #include "adiummessagestyle.h"
 #include "adiumoptionswidget.h"
 
