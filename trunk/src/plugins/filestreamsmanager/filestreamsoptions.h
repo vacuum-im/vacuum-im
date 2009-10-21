@@ -4,8 +4,8 @@
 #include <QWidget>
 #include <QCheckbox>
 #include "ui_filestreamsoptions.h"
-#include "../../interfaces/ifilestreamsmanager.h"
-#include "../../interfaces/idatastreamsmanager.h"
+#include <interfaces/ifilestreamsmanager.h>
+#include <interfaces/idatastreamsmanager.h>
 
 class FileStreamsOptions : 
   public QWidget

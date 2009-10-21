@@ -1,12 +1,12 @@
 #ifndef USERCONTEXTMENU_H
 #define USERCONTEXTMENU_H
 
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterlabelorders.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../utils/menu.h"
+#include <definations/rosterindextyperole.h>
+#include <definations/rosterlabelorders.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/irostersmodel.h>
+#include <interfaces/imessagewidgets.h>
+#include <utils/menu.h>
 
 class UserContextMenu : 
   public Menu

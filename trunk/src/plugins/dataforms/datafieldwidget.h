@@ -10,8 +10,8 @@
 #include <QTimeEdit>
 #include <QListWidget>
 #include <QDateTimeEdit>
-#include "../../interfaces/idataforms.h"
-#include "../../utils/jid.h"
+#include <interfaces/idataforms.h>
+#include <utils/jid.h>
 
 class DataFieldWidget : 
   public QWidget,

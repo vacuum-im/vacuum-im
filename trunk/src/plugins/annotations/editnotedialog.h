@@ -2,10 +2,10 @@
 #define EDITNOTEDIALOG_H
 
 #include <QDialog>
-#include "../../definations/menuicons.h"
-#include "../../definations/resources.h"
-#include "../../interfaces/iannotations.h"
-#include "../../utils/iconstorage.h"
+#include <definations/menuicons.h>
+#include <definations/resources.h>
+#include <interfaces/iannotations.h>
+#include <utils/iconstorage.h>
 #include "ui_editnotedialog.h"
 
 class EditNoteDialog : 

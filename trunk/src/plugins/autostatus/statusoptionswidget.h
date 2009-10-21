@@ -3,9 +3,9 @@
 
 #include <QWidget>
 #include <QItemDelegate>
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/iautostatus.h"
-#include "../../interfaces/istatuschanger.h"
+#include <interfaces/ipresence.h>
+#include <interfaces/iautostatus.h>
+#include <interfaces/istatuschanger.h>
 #include "ui_statusoptionswidget.h"
 
 class Delegate : 

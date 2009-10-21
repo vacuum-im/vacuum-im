@@ -2,8 +2,8 @@
 #define ACCOUNTOPTIONSWIDGET_H
 
 #include <QWidget>
-#include "../../definations/accountvaluenames.h"
-#include "../../interfaces/iaccountmanager.h"
+#include <definations/accountvaluenames.h>
+#include <interfaces/iaccountmanager.h>
 #include "ui_accountoptionswidget.h"
 
 class AccountOptionsWidget : 

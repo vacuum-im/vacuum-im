@@ -2,7 +2,7 @@
 #define MENUBARWIDGET_H
 
 #include <QMenuBar>
-#include "../../interfaces/imessagewidgets.h"
+#include <interfaces/imessagewidgets.h>
 
 class MenuBarWidget : 
   public QMenuBar,

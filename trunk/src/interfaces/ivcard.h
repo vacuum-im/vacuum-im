@@ -6,7 +6,7 @@
 #include <QDateTime>
 #include <QStringList>
 #include <QDomDocument>
-#include "../../utils/jid.h"
+#include <utils/jid.h>
 
 #define VCARD_UUID "{8AD31549-AD09-4e84-BD6F-41928B3BDA7E}"
 

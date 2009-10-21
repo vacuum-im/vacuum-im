@@ -1,9 +1,5 @@
 #include "xmppstreams.h"
 
-#include "../../definations/namespaces.h"
-#include "../../utils/errorhandler.h"
-#include "xmppstream.h"
-
 XmppStreams::XmppStreams()
 {
 

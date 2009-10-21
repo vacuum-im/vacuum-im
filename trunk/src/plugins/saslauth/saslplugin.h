@@ -1,9 +1,9 @@
 #ifndef SASLPLUGIN_H
 #define SASLPLUGIN_H
 
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/ixmppstreams.h"
+#include <definations/namespaces.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/ixmppstreams.h>
 #include "saslauth.h"
 #include "saslbind.h"
 #include "saslsession.h"

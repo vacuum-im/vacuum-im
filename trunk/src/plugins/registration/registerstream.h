@@ -1,11 +1,11 @@
 #ifndef REGISTERSTREAM_H
 #define REGISTERSTREAM_H
 
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/iregistraton.h"
-#include "../../utils/errorhandler.h"
-#include "../../utils/stanza.h"
+#include <definations/namespaces.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/iregistraton.h>
+#include <utils/errorhandler.h>
+#include <utils/stanza.h>
 
 class RegisterStream : 
   public QObject,

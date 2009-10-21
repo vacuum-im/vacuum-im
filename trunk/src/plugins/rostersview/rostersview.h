@@ -2,14 +2,14 @@
 #define ROSTERSVIEW_H
 
 #include <QTimer>
-#include "../../definations/rostertooltiporders.h"
-#include "../../definations/rosterlabelorders.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterfootertextorders.h"
-#include "../../definations/rosterdragdropmimetypes.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/isettings.h"
+#include <definations/rostertooltiporders.h>
+#include <definations/rosterlabelorders.h>
+#include <definations/rosterindextyperole.h>
+#include <definations/rosterfootertextorders.h>
+#include <definations/rosterdragdropmimetypes.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/irostersmodel.h>
+#include <interfaces/isettings.h>
 #include "rosterindexdelegate.h" 
 
 struct NotifyItem

@@ -2,9 +2,9 @@
 #define ROSTERPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/isettings.h"
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/isettings.h>
 #include "roster.h"
 
 class RosterPlugin : 

@@ -2,8 +2,8 @@
 #define IGATEWAYS_H
 
 #include <QDialog>
-#include "../../utils/jid.h"
-#include "../../interfaces/iservicediscovery.h"
+#include <utils/jid.h>
+#include <interfaces/iservicediscovery.h>
 
 #define GATEWAYS_UUID "{BF34165C-DD9A-43eb-949B-926DD411E1A8}"
 

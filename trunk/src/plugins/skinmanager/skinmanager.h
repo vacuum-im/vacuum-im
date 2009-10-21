@@ -1,9 +1,9 @@
 #ifndef SKINMANAGER_H
 #define SKINMANAGER_H
 
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/iskinmanager.h"
-#include "../../interfaces/isettings.h"
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/iskinmanager.h>
+#include <interfaces/isettings.h>
 
 class SkinManager : 
   public QObject,

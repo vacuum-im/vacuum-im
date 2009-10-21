@@ -2,16 +2,16 @@
 #define ADDCONTACTDIALOG_H
 
 #include <QDialog>
-#include "../../definations/toolbargroups.h"
-#include "../../definations/vcardvaluenames.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessageprocessor.h"
-#include "../../interfaces/irosterchanger.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/ivcard.h"
-#include "../../utils/action.h"
+#include <definations/toolbargroups.h>
+#include <definations/vcardvaluenames.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessageprocessor.h>
+#include <interfaces/irosterchanger.h>
+#include <interfaces/iroster.h>
+#include <interfaces/ivcard.h>
+#include <utils/action.h>
 #include "ui_addcontactdialog.h"
 
 class AddContactDialog : 

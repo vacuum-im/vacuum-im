@@ -4,8 +4,8 @@
 #include <QShowEvent>
 #include <QHideEvent>
 #include <QVBoxLayout>
-#include "../../definations/resources.h"
-#include "../../utils/menu.h"
+#include <definations/resources.h>
+#include <utils/menu.h>
 #include "selecticonwidget.h"
 
 class SelectIconMenu : 

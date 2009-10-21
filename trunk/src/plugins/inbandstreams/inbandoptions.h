@@ -2,7 +2,7 @@
 #define INBANDOPTIONS_H
 
 #include <QWidget>
-#include "../../interfaces/iinbandstreams.h"
+#include <interfaces/iinbandstreams.h>
 #include "ui_inbandoptions.h"
 
 class InBandOptions : 

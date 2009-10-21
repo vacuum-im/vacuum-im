@@ -1,10 +1,10 @@
 #ifndef INDEXDATAHOLDER_H
 #define INDEXDATAHOLDER_H
 
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterdataholderorders.h"
-#include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/irostersview.h"
+#include <definations/rosterindextyperole.h>
+#include <definations/rosterdataholderorders.h>
+#include <interfaces/irostersmodel.h>
+#include <interfaces/irostersview.h>
 
 class IndexDataHolder : 
   public QObject,

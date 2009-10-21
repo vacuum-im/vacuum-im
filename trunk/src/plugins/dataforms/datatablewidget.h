@@ -1,7 +1,7 @@
 #ifndef DATATABLEWIDGET_H
 #define DATATABLEWIDGET_H
 
-#include "../../interfaces/idataforms.h"
+#include <interfaces/idataforms.h>
 
 class DataTableWidget : 
   public QTableWidget,

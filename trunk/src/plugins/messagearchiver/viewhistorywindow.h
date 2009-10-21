@@ -3,18 +3,18 @@
 
 #include <QTimer>
 #include <QSortFilterProxyModel>
-#include "../../definations/archiveindextyperole.h"
-#include "../../definations/actiongroups.h"
-#include "../../definations/toolbargroups.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/isettings.h"
-#include "../../interfaces/istatusicons.h"
-#include "../../interfaces/imessagearchiver.h"
-#include "../../interfaces/imessagestyles.h"
+#include <definations/archiveindextyperole.h>
+#include <definations/actiongroups.h>
+#include <definations/toolbargroups.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/iroster.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/isettings.h>
+#include <interfaces/istatusicons.h>
+#include <interfaces/imessagearchiver.h>
+#include <interfaces/imessagestyles.h>
 #include "ui_viewhistorywindow.h"
 
 class ViewHistoryWindow;

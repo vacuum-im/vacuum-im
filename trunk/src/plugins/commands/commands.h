@@ -1,18 +1,18 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include "../../definations/namespaces.h"
-#include "../../definations/discofeaturehandlerorders.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/icommands.h"
-#include "../../interfaces/idataforms.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/iservicediscovery.h"
-#include "../../interfaces/ipresence.h"
-#include "../../utils/errorhandler.h"
-#include "../../utils/menu.h"
+#include <definations/namespaces.h>
+#include <definations/discofeaturehandlerorders.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/icommands.h>
+#include <interfaces/idataforms.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/iservicediscovery.h>
+#include <interfaces/ipresence.h>
+#include <utils/errorhandler.h>
+#include <utils/menu.h>
 #include "commanddialog.h"
 
 class Commands : 

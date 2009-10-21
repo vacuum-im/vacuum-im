@@ -1,7 +1,7 @@
 #ifndef STATEOPTIONSWIDGET_H
 #define STATEOPTIONSWIDGET_H
 
-#include "../../interfaces/ichatstates.h"
+#include <interfaces/ichatstates.h>
 #include "ui_stateoptionswidget.h"
 
 class StateOptionsWidget : 

@@ -4,18 +4,18 @@
 #include <QTimer>
 #include <QLineEdit>
 #include <QSortFilterProxyModel>
-#include "../../definations/actiongroups.h"
-#include "../../definations/toolbargroups.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterproxyorders.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/irostersearch.h"
-#include "../../interfaces/imainwindow.h"
-#include "../../interfaces/irostersview.h"
-#include "../../utils/action.h"
-#include "../../utils/toolbarchanger.h"
+#include <definations/actiongroups.h>
+#include <definations/toolbargroups.h>
+#include <definations/rosterindextyperole.h>
+#include <definations/rosterproxyorders.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/irostersearch.h>
+#include <interfaces/imainwindow.h>
+#include <interfaces/irostersview.h>
+#include <utils/action.h>
+#include <utils/toolbarchanger.h>
 
 class RosterSearch : 
   public QSortFilterProxyModel,

@@ -3,9 +3,9 @@
 
 #include <QObject>
 #include <QObjectCleanupHandler>
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/ixmppstreams.h"
+#include <definations/namespaces.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/ixmppstreams.h>
 #include "compression.h"
 
 #define COMPRESS_UUID "{061D0687-B954-416d-B690-D1BA7D845D83}"

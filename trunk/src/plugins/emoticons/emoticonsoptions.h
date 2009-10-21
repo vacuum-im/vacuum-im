@@ -2,11 +2,11 @@
 #define EMOTICONSOPTIONS_H
 
 #include <QWidget>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/iemoticons.h>
+#include <utils/iconsetdelegate.h>
 #include "ui_emoticonsoptions.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/iemoticons.h"
-#include "../../utils/iconsetdelegate.h"
 
 class EmoticonsOptions : 
   public QWidget

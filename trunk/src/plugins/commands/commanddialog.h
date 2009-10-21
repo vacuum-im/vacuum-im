@@ -3,11 +3,11 @@
 
 #include <QDialog>
 #include <QPushButton>
-#include "../../definations/namespaces.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/icommands.h"
-#include "../../interfaces/idataforms.h"
+#include <definations/namespaces.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/icommands.h>
+#include <interfaces/idataforms.h>
 #include "ui_commanddialog.h"
 
 class CommandDialog : 

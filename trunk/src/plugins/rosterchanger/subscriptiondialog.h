@@ -1,14 +1,14 @@
 #ifndef SUBSCRIPTIONDIALOG_H
 #define SUBSCRIPTIONDIALOG_H
 
-#include "../../definations/toolbargroups.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessageprocessor.h"
-#include "../../interfaces/irosterchanger.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/ivcard.h"
+#include <definations/toolbargroups.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessageprocessor.h>
+#include <interfaces/irosterchanger.h>
+#include <interfaces/iroster.h>
+#include <interfaces/ivcard.h>
 #include "ui_subscriptiondialog.h"
 
 class SubscriptionDialog : 

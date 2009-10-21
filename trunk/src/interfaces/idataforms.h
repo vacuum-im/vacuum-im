@@ -6,7 +6,7 @@
 #include <QTableWidget>
 #include <QDomDocument>
 #include <QDialogButtonBox>
-#include "../../utils/toolbarchanger.h"
+#include <utils/toolbarchanger.h>
 
 #define DATAFORMS_UUID                  "{2B8F89D0-EAA7-46eb-B2FD-AE30DF60E440}"
 

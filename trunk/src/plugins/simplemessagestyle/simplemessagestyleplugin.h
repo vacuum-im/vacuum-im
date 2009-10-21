@@ -1,11 +1,11 @@
 #ifndef SIMPLEMESSAGESTYLEPLUGIN_H
 #define SIMPLEMESSAGESTYLEPLUGIN_H
 
-#include "../../definations/resources.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessagestyles.h"
-#include "../../interfaces/isettings.h"
-#include "../../utils/message.h"
+#include <definations/resources.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessagestyles.h>
+#include <interfaces/isettings.h>
+#include <utils/message.h>
 #include "simplemessagestyle.h"
 #include "simpleoptionswidget.h"
 

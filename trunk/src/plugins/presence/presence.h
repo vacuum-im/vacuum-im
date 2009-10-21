@@ -2,11 +2,11 @@
 #define PRESENCE_H
 
 #include <QObject>
-#include "../../definations/stanzahandlerpriority.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../utils/errorhandler.h"
+#include <definations/stanzahandlerpriority.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/ixmppstreams.h>
+#include <utils/errorhandler.h>
 
 class Presence : 
   public QObject,

@@ -1,17 +1,17 @@
 #ifndef JABBERSEARCH_H
 #define JABBERSEARCH_H
 
-#include "../../definations/namespaces.h"
-#include "../../definations/discofeaturehandlerorders.h"
-#include "../../definations/dataformtypes.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/ijabbersearch.h"
-#include "../../interfaces/idataforms.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/iservicediscovery.h"
-#include "../../interfaces/ipresence.h"
+#include <definations/namespaces.h>
+#include <definations/discofeaturehandlerorders.h>
+#include <definations/dataformtypes.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/ijabbersearch.h>
+#include <interfaces/idataforms.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/iservicediscovery.h>
+#include <interfaces/ipresence.h>
 #include "searchdialog.h"
 
 class JabberSearch : 

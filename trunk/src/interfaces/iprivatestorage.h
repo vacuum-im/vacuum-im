@@ -4,7 +4,7 @@
 #define PRIVATESTORAGE_UUID "{E601766D-8867-47c5-B639-92DDEC224B33}"
 
 #include <QDomElement>
-#include "../../utils/jid.h"
+#include <utils/jid.h>
 
 class IPrivateStorage
 {

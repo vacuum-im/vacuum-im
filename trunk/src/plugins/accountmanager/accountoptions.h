@@ -2,10 +2,10 @@
 #define ACCOUNTOPTIONS_H
 
 #include <QWidget>
-#include "../../definations/version.h"
-#include "../../definations/optionnodes.h"
-#include "../../interfaces/iaccountmanager.h"
-#include "../../utils/jid.h"
+#include <definations/version.h>
+#include <definations/optionnodes.h>
+#include <interfaces/iaccountmanager.h>
+#include <utils/jid.h>
 #include "ui_accountoptions.h"
 
 class AccountOptions : 

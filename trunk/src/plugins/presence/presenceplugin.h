@@ -3,8 +3,8 @@
 
 #include <QSet>
 #include <QObjectCleanupHandler>
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/ipresence.h"
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/ipresence.h>
 #include "presence.h"
 
 class PresencePlugin : 

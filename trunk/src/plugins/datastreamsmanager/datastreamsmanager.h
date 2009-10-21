@@ -1,21 +1,21 @@
 #ifndef DATASTREAMSMANAGER_H
 #define DATASTREAMSMANAGER_H
 
-#include "../../definations/namespaces.h"
-#include "../../definations/optionnodes.h"
-#include "../../definations/optionnodeorders.h"
-#include "../../definations/optionwidgetorders.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/idatastreamsmanager.h"
-#include "../../interfaces/idataforms.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/iservicediscovery.h"
-#include "../../interfaces/isettings.h"
-#include "../../utils/jid.h"
-#include "../../utils/stanza.h"
-#include "../../utils/errorhandler.h"
+#include <definations/namespaces.h>
+#include <definations/optionnodes.h>
+#include <definations/optionnodeorders.h>
+#include <definations/optionwidgetorders.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/idatastreamsmanager.h>
+#include <interfaces/idataforms.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/iservicediscovery.h>
+#include <interfaces/isettings.h>
+#include <utils/jid.h>
+#include <utils/stanza.h>
+#include <utils/errorhandler.h>
 #include "datastreamsoptions.h"
 
 struct StreamParams 

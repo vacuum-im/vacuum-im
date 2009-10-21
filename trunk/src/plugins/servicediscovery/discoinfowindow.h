@@ -2,10 +2,10 @@
 #define DISCOINFOWINDOW_H
 
 #include <QDialog>
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/iservicediscovery.h"
-#include "../../utils/menu.h"
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/iservicediscovery.h>
+#include <utils/menu.h>
 #include "ui_discoinfowindow.h"
 
 class DiscoInfoWindow : 

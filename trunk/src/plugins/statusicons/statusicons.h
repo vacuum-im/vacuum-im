@@ -2,21 +2,21 @@
 #define STATUSICONS_H
 
 #include <QRegExp>
-#include "../../definations/resources.h"
-#include "../../definations/statusicons.h"
-#include "../../definations/optionnodes.h"
-#include "../../definations/optionnodeorders.h"
-#include "../../definations/optionwidgetorders.h"
-#include "../../definations/actiongroups.h"
-#include "../../definations/menuicons.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/istatusicons.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/isettings.h"
+#include <definations/resources.h>
+#include <definations/statusicons.h>
+#include <definations/optionnodes.h>
+#include <definations/optionnodeorders.h>
+#include <definations/optionwidgetorders.h>
+#include <definations/actiongroups.h>
+#include <definations/menuicons.h>
+#include <definations/rosterindextyperole.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/istatusicons.h>
+#include <interfaces/iroster.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/irostersmodel.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/isettings.h>
 #include "rosterindexdataholder.h"
 #include "iconsoptionswidget.h"
 

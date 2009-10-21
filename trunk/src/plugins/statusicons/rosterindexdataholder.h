@@ -1,10 +1,10 @@
 #ifndef ROSTERINDEXDATAHOLDER_H
 #define ROSTERINDEXDATAHOLDER_H
 
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterdataholderorders.h"
-#include "../../interfaces/istatusicons.h"
-#include "../../interfaces/irostersmodel.h"
+#include <definations/rosterindextyperole.h>
+#include <definations/rosterdataholderorders.h>
+#include <interfaces/istatusicons.h>
+#include <interfaces/irostersmodel.h>
 
 class RosterIndexDataHolder : 
   public QObject,

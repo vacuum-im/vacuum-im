@@ -2,7 +2,7 @@
 #define ROSTEROPTIONSWIDGET_H
 
 #include <QWidget>
-#include "../../interfaces/irostersview.h"
+#include <interfaces/irostersview.h>
 #include "ui_rosteroptionswidget.h"
 
 class RosterOptionsWidget : 

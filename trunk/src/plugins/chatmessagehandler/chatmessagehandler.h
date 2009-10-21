@@ -4,30 +4,30 @@
 #define CHATMESSAGEHANDLER_UUID "{b60cc0e4-8006-4909-b926-fcb3cbc506f0}"
 
 #include <QTimer>
-#include "../../definations/messagehandlerorders.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/rosterlabelorders.h"
-#include "../../definations/rosterclickhookerorders.h"
-#include "../../definations/notificationdataroles.h"
-#include "../../definations/vcardvaluenames.h"
-#include "../../definations/actiongroups.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../definations/soundfiles.h"
-#include "../../definations/menubargroups.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessageprocessor.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/imessagestyles.h"
-#include "../../interfaces/imessagearchiver.h"
-#include "../../interfaces/inotifications.h"
-#include "../../interfaces/istatusicons.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/irostersmodel.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/ivcard.h"
-#include "../../interfaces/iavatars.h"
-#include "../../interfaces/istatuschanger.h"
+#include <definations/messagehandlerorders.h>
+#include <definations/rosterindextyperole.h>
+#include <definations/rosterlabelorders.h>
+#include <definations/rosterclickhookerorders.h>
+#include <definations/notificationdataroles.h>
+#include <definations/vcardvaluenames.h>
+#include <definations/actiongroups.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <definations/soundfiles.h>
+#include <definations/menubargroups.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessageprocessor.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/imessagestyles.h>
+#include <interfaces/imessagearchiver.h>
+#include <interfaces/inotifications.h>
+#include <interfaces/istatusicons.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/irostersmodel.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/ivcard.h>
+#include <interfaces/iavatars.h>
+#include <interfaces/istatuschanger.h>
 #include "usercontextmenu.h"
 
 struct WindowStatus {

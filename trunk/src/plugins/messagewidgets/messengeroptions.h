@@ -2,7 +2,7 @@
 #define MESSENGEROPTIONS_H
 
 #include <QShortcut>
-#include "../../interfaces/imessagewidgets.h"
+#include <interfaces/imessagewidgets.h>
 #include "ui_messengeroptions.h"
 
 class MessengerOptions : 

@@ -1,11 +1,11 @@
 #ifndef CHATWINDOW_H
 #define CHATWINDOW_H
 
-#include "../../definations/messagedataroles.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/istatuschanger.h"
-#include "../../interfaces/isettings.h"
+#include <definations/messagedataroles.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/istatuschanger.h>
+#include <interfaces/isettings.h>
 #include "ui_chatwindow.h"
 
 class ChatWindow : 

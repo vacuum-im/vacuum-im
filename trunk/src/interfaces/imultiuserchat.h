@@ -2,12 +2,12 @@
 #define IMULTIUSERCHAT_H
 
 #include <QMenuBar>
-#include "../../interfaces/idataforms.h"
-#include "../../interfaces/imessagewidgets.h"
-#include "../../utils/jid.h"
-#include "../../utils/menu.h"
-#include "../../utils/message.h"
-#include "../../utils/menubarchanger.h"
+#include <interfaces/idataforms.h>
+#include <interfaces/imessagewidgets.h>
+#include <utils/jid.h>
+#include <utils/menu.h>
+#include <utils/message.h>
+#include <utils/menubarchanger.h>
 
 #define MULTIUSERCHAT_UUID              "{EB960F92-59A9-4322-A646-F9AB4913706C}"
 

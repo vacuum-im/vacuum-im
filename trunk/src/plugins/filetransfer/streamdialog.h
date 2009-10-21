@@ -3,10 +3,10 @@
 
 #include <QDialog>
 #include <QCheckBox>
-#include "../../interfaces/ifilestreamsmanager.h"
-#include "../../interfaces/idatastreamsmanager.h"
-#include "../../utils/jid.h"
-#include "../../utils/iconstorage.h"
+#include <interfaces/ifilestreamsmanager.h>
+#include <interfaces/idatastreamsmanager.h>
+#include <utils/jid.h>
+#include <utils/iconstorage.h>
 #include "ui_streamdialog.h"
 
 class StreamDialog : 

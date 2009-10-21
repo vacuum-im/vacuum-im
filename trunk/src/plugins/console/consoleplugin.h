@@ -1,14 +1,14 @@
 #ifndef CONSOLEPLUGIN_H
 #define CONSOLEPLUGIN_H
 
-#include "../../definations/actiongroups.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/imainwindow.h"
-#include "../../utils/iconstorage.h"
-#include "../../utils/action.h"
+#include <definations/actiongroups.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/imainwindow.h>
+#include <utils/iconstorage.h>
+#include <utils/action.h>
 #include "consolewidget.h"
 
 #define CONSOLE_UUID  "{2572D474-5F3E-8d24-B10A-BAA57C2BC693}"

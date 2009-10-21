@@ -1,7 +1,7 @@
 #ifndef OPTIONSWIDGET_H
 #define OPTIONSWIDGET_H
 
-#include "../../interfaces/inotifications.h"
+#include <interfaces/inotifications.h>
 #include "ui_optionswidget.h"
 
 class OptionsWidget : 

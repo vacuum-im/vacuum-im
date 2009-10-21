@@ -5,7 +5,7 @@
 #include <QLabel>
 #include <QEvent>
 #include <QGridLayout>
-#include "../../utils/iconstorage.h"
+#include <utils/iconstorage.h>
 
 class SelectIconWidget : 
   public QWidget

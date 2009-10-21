@@ -1,7 +1,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include "../../interfaces/isettings.h"
+#include <interfaces/isettings.h>
 
 class Settings : 
   public QObject,

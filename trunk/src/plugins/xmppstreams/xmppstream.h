@@ -3,11 +3,11 @@
 
 #include <QTimer>
 #include <QDomDocument>
-#include "../../definations/namespaces.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/iconnectionmanager.h"
-#include "../../utils/errorhandler.h"
-#include "../../utils/versionparser.h"
+#include <definations/namespaces.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/iconnectionmanager.h>
+#include <utils/errorhandler.h>
+#include <utils/versionparser.h>
 #include "streamparser.h"
 
 class XmppStream : 

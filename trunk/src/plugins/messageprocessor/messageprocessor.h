@@ -1,14 +1,14 @@
 #ifndef MESSAGEPROCESSOR_H
 #define MESSAGEPROCESSOR_H
 
-#include "../../definations/messagedataroles.h"
-#include "../../definations/messagewriterorders.h"
-#include "../../definations/stanzahandlerpriority.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessageprocessor.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/inotifications.h"
-#include "../../interfaces/istanzaprocessor.h"
+#include <definations/messagedataroles.h>
+#include <definations/messagewriterorders.h>
+#include <definations/stanzahandlerpriority.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessageprocessor.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/inotifications.h>
+#include <interfaces/istanzaprocessor.h>
 
 class MessageProcessor : 
   public QObject,

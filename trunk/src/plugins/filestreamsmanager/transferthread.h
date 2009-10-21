@@ -3,8 +3,8 @@
 
 #include <QFile>
 #include <QThread>
-#include "../../interfaces/ifilestreamsmanager.h"
-#include "../../interfaces/idatastreamsmanager.h"
+#include <interfaces/ifilestreamsmanager.h>
+#include <interfaces/idatastreamsmanager.h>
 
 class TransferThread : 
   public QThread

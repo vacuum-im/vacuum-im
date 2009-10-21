@@ -4,15 +4,15 @@
 #include <QUuid>
 #include <QTextBrowser>
 #include <QTextDocument>
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/imessagestyles.h"
-#include "../../utils/jid.h"
-#include "../../utils/menu.h"
-#include "../../utils/action.h"
-#include "../../utils/message.h"
-#include "../../utils/menubarchanger.h"
-#include "../../utils/toolbarchanger.h"
-#include "../../utils/statusbarchanger.h"
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessagestyles.h>
+#include <utils/jid.h>
+#include <utils/menu.h>
+#include <utils/action.h>
+#include <utils/message.h>
+#include <utils/menubarchanger.h>
+#include <utils/toolbarchanger.h>
+#include <utils/statusbarchanger.h>
 
 #define MESSAGEWIDGETS_UUID "{89de35ee-bd44-49fc-8495-edd2cfebb685}"
 

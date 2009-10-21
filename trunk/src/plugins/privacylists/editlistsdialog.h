@@ -2,11 +2,11 @@
 #define EDITLISTSDIALOG_H
 
 #include <QDialog>
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/iroster.h"
-#include "../../interfaces/iprivacylists.h"
-#include "../../utils/iconstorage.h"
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/iroster.h>
+#include <interfaces/iprivacylists.h>
+#include <utils/iconstorage.h>
 #include "ui_editlistsdialog.h"
 
 class EditListsDialog : 

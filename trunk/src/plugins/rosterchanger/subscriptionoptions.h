@@ -2,7 +2,7 @@
 #define SUBSCRIPTIONOPTIONS_H
 
 #include <QWidget>
-#include "../../interfaces/irosterchanger.h"
+#include <interfaces/irosterchanger.h>
 #include "ui_subscriptionoptions.h"
 
 class SubscriptionOptions : 

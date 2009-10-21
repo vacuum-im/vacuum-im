@@ -2,9 +2,9 @@
 #define SIMPLEMESSAGESTYLE_H
 
 #include <QList>
-#include "../../definations/resources.h"
-#include "../../interfaces/imessagestyles.h"
-#include "../../utils/filestorage.h"
+#include <definations/resources.h>
+#include <interfaces/imessagestyles.h>
+#include <utils/filestorage.h>
 #include "styleviewer.h"
 
 //Message Style Info Values

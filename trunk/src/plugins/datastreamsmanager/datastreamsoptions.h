@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
-#include "../../interfaces/idatastreamsmanager.h"
+#include <interfaces/idatastreamsmanager.h>
 #include "ui_datastreamsoptions.h"
 
 class DataStreamsOptions : 

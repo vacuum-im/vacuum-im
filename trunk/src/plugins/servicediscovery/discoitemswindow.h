@@ -5,15 +5,15 @@
 #include <QHeaderView>
 #include <QMainWindow>
 #include <QSortFilterProxyModel>
-#include "../../definations/actiongroups.h"
-#include "../../definations/toolbargroups.h"
-#include "../../definations/discoitemdataroles.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/iservicediscovery.h"
-#include "../../interfaces/irosterchanger.h"
-#include "../../interfaces/ivcard.h"
-#include "../../utils/action.h"
+#include <definations/actiongroups.h>
+#include <definations/toolbargroups.h>
+#include <definations/discoitemdataroles.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/iservicediscovery.h>
+#include <interfaces/irosterchanger.h>
+#include <interfaces/ivcard.h>
+#include <utils/action.h>
 #include "discoitemsmodel.h"
 #include "ui_discoitemswindow.h"
 

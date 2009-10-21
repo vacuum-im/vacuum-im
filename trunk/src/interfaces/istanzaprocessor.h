@@ -2,8 +2,8 @@
 #define ISTANZAPROCESSOR_H
 
 #include <QList>
-#include "../../utils/jid.h"
-#include "../../utils/stanza.h"
+#include <utils/jid.h>
+#include <utils/stanza.h>
 
 #define STANZAPROCESSOR_UUID  "{1175D470-5D4A-4c29-A69E-EDA46C2BC387}"
 

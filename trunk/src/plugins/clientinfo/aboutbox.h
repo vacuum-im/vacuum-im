@@ -2,8 +2,8 @@
 #define ABOUTBOX_H
 
 #include <QDialog>
-#include "../../definations/version.h"
-#include "../../interfaces/iclientinfo.h"
+#include <definations/version.h>
+#include <interfaces/iclientinfo.h>
 #include "ui_aboutbox.h"
 
 class AboutBox : 

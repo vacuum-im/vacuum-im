@@ -1,8 +1,5 @@
 #include "saslsession.h"
 
-#include "../../utils/errorhandler.h"
-#include "../../utils/stanza.h"
-
 SASLSession::SASLSession(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
   FNeedHook = false;

@@ -4,10 +4,10 @@
 #include <QIcon>
 #include <QStringList>
 #include <QTreeWidgetItem>
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/idataforms.h"
-#include "../../utils/jid.h"
-#include "../../utils/toolbarchanger.h"
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/idataforms.h>
+#include <utils/jid.h>
+#include <utils/toolbarchanger.h>
 
 #define SERVICEDISCOVERY_UUID "{CF0D99D1-A2D8-4583-87FD-E584E0915BCC}"
 

@@ -2,20 +2,20 @@
 #define ACCOUNTMANAGER_H
 
 #include <QPointer> 
-#include "../../definations/actiongroups.h"
-#include "../../definations/optionnodes.h"
-#include "../../definations/optionnodeorders.h"
-#include "../../definations/optionwidgetorders.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/accountvaluenames.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/iaccountmanager.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/isettings.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/irostersview.h"
-#include "../../utils/action.h"
+#include <definations/actiongroups.h>
+#include <definations/optionnodes.h>
+#include <definations/optionnodeorders.h>
+#include <definations/optionwidgetorders.h>
+#include <definations/rosterindextyperole.h>
+#include <definations/accountvaluenames.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/isettings.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/irostersview.h>
+#include <utils/action.h>
 #include "account.h"
 #include "accountsoptions.h"
 

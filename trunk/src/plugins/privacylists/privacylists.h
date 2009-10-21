@@ -2,21 +2,21 @@
 #define PRIVACYLISTS_H
 
 #include <QTimer>
-#include "../../definations/namespaces.h"
-#include "../../definations/stanzahandlerpriority.h"
-#include "../../definations/rosterindextyperole.h"
-#include "../../definations/actiongroups.h"
-#include "../../definations/rosterlabelorders.h"
-#include "../../definations/rostertooltiporders.h"
-#include "../../definations/resources.h"
-#include "../../definations/menuicons.h"
-#include "../../interfaces/ipluginmanager.h"
-#include "../../interfaces/iprivacylists.h"
-#include "../../interfaces/istanzaprocessor.h"
-#include "../../interfaces/ixmppstreams.h"
-#include "../../interfaces/ipresence.h"
-#include "../../interfaces/irostersview.h"
-#include "../../interfaces/imultiuserchat.h"
+#include <definations/namespaces.h>
+#include <definations/stanzahandlerpriority.h>
+#include <definations/rosterindextyperole.h>
+#include <definations/actiongroups.h>
+#include <definations/rosterlabelorders.h>
+#include <definations/rostertooltiporders.h>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/iprivacylists.h>
+#include <interfaces/istanzaprocessor.h>
+#include <interfaces/ixmppstreams.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/irostersview.h>
+#include <interfaces/imultiuserchat.h>
 #include "editlistsdialog.h"
 
 class PrivacyLists : 
