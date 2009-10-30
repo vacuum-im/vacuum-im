@@ -2495,7 +2495,7 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
     shandle.handler = this;
     shandle.streamJid = AXmppStream->streamJid();
 
-    shandle.priority = SHP_DEFAULT;
+    shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
     shandle.conditions.append(SHC_PREFS);
     FSHIPrefs.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
@@ -2507,7 +2507,7 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
     shandle.direction = IStanzaHandle::DirectionOut;
     FSHIMessageOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    shandle.priority = SHP_ARCHIVER_SESSION;
+    shandle.order = SHO_MO_ARCHIVER;
     FSHIMessageBlocks.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
   

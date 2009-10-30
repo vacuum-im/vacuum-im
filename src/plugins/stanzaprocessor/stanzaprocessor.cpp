@@ -114,7 +114,7 @@ int StanzaProcessor::insertStanzaHandle(const IStanzaHandle &AHandle)
     int handleId = (qrand()<<16) + qrand();
     for (; handleId==0 || FHandles.contains(handleId); handleId++);
     FHandles.insert(handleId,AHandle);
-    FHandleIdByPriority.insertMulti(AHandle.priority,handleId);
+    FHandleIdByOrder.insertMulti(AHandle.order,handleId);
     connect(AHandle.handler->instance(),SIGNAL(destroyed(QObject *)),SLOT(onStanzaHandlerDestroyed(QObject *)));
     emit stanzaHandleInserted(handleId,AHandle);
     return handleId;
@@ -127,7 +127,7 @@ void StanzaProcessor::removeStanzaHandle(int AHandleId)
   if (FHandles.contains(AHandleId))
   {
     IStanzaHandle shandle = FHandles.take(AHandleId);
-    FHandleIdByPriority.remove(shandle.priority,AHandleId);
+    FHandleIdByOrder.remove(shandle.order,AHandleId);
     emit stanzaHandleRemoved(AHandleId, shandle);
   }
 }
@@ -244,13 +244,12 @@ bool StanzaProcessor::processStanzaIn(const Jid &AStreamJid, Stanza &AStanza) co
   bool accepted = false;
   QList<int> checkedHandles;
 
-  QMapIterator<int,int> it(FHandleIdByPriority);
-  it.toBack();
-  while(!hooked && it.hasPrevious())
+  QMapIterator<int, int> it(FHandleIdByOrder);
+  while(!hooked && it.hasNext())
   {
-    it.previous();
+    it.next();
     const IStanzaHandle &shandle = FHandles.value(it.value());
-    if (shandle.direction == IStanzaHandle::DirectionIn && (shandle.streamJid.isEmpty() || shandle.streamJid==AStreamJid))
+    if (shandle.direction==IStanzaHandle::DirectionIn && (shandle.streamJid.isEmpty() || shandle.streamJid==AStreamJid))
     {
       for (int i = 0; i<shandle.conditions.count(); i++)
       {
@@ -280,12 +279,12 @@ bool StanzaProcessor::processStanzaOut(const Jid &AStreamJid, Stanza &AStanza) c
   bool accepted = false;
   QList<int> checkedHandlers;
 
-  QMapIterator<int,int> it(FHandleIdByPriority);
+  QMapIterator<int, int> it(FHandleIdByOrder);
   while(!hooked && it.hasNext())
   {
     it.next();
     const IStanzaHandle &shandle = FHandles.value(it.value());
-    if (shandle.direction == IStanzaHandle::DirectionOut && (shandle.streamJid.isEmpty() || shandle.streamJid==AStreamJid))
+    if (shandle.direction==IStanzaHandle::DirectionOut && (shandle.streamJid.isEmpty() || shandle.streamJid==AStreamJid))
     {
       for (int i = 0; i<shandle.conditions.count(); i++)
       {

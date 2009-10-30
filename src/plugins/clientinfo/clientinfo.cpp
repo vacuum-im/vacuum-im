@@ -147,7 +147,7 @@ bool ClientInfo::initObjects()
   {
     IStanzaHandle shandle;
     shandle.handler = this;
-    shandle.priority = SHP_DEFAULT;
+    shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
     
     shandle.conditions.append(SHC_SOFTWARE_VERSION);

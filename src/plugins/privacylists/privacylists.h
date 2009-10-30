@@ -3,7 +3,6 @@
 
 #include <QTimer>
 #include <definations/namespaces.h>
-#include <definations/stanzahandlerpriority.h>
 #include <definations/rosterindextyperole.h>
 #include <definations/actiongroups.h>
 #include <definations/rosterlabelorders.h>

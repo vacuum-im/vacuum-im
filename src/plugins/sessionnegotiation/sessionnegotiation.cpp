@@ -1015,7 +1015,7 @@ void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
   {
     IStanzaHandle shandle;
     shandle.handler = this;
-    shandle.priority = SHP_DEFAULT;
+    shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
     shandle.streamJid = AXmppStream->streamJid();
     shandle.conditions.append(SHC_STANZA_SESSION);

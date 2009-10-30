@@ -85,7 +85,7 @@ bool DataStreamsManger::initObjects()
   {
     IStanzaHandle shandle;
     shandle.handler = this;
-    shandle.priority = SHP_DEFAULT;
+    shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
     shandle.conditions.append(SHC_INIT_STREAM);
     FSHIInitStream = FStanzaProcessor->insertStanzaHandle(shandle);

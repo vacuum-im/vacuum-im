@@ -9,7 +9,7 @@
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
 #include <definations/rosterindextyperole.h>
-#include <definations/stanzahandlerpriority.h>
+#include <definations/stanzahandlerorders.h>
 #include <definations/sessionnegotiatororders.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>

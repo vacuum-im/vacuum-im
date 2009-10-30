@@ -8,7 +8,8 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
 
-struct StanzaRequest {
+struct StanzaRequest 
+{
   StanzaRequest() { timer=NULL; owner=NULL; }
   Jid streamJid;
   QTimer *timer;
@@ -66,7 +67,7 @@ private:
 private:
   QMap<int, IStanzaHandle> FHandles;
   QMap<QString, StanzaRequest> FRequests;
-  QMultiMap<int,int> FHandleIdByPriority;
+  QMultiMap<int, int> FHandleIdByOrder;
 };
 
 #endif

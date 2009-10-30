@@ -3,7 +3,7 @@
 
 #include <definations/multiuserdataroles.h>
 #include <definations/namespaces.h>
-#include <definations/stanzahandlerpriority.h>
+#include <definations/stanzahandlerorders.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>

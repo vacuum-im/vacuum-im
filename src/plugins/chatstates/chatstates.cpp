@@ -545,14 +545,15 @@ void ChatStates::onPresenceOpened(IPresence *APresence)
   {
     IStanzaHandle shandle;
     shandle.handler = this;
-    shandle.priority = SHP_CHATSTATES;
     shandle.streamJid = APresence->streamJid();
 
     shandle.direction = IStanzaHandle::DirectionOut;
+    shandle.order = SHO_MO_CHATSTATES;
     shandle.conditions.append(SHC_CONTENT_MESSAGES);
     FSHIMessagesOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
     shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.order = SHO_MI_CHATSTATES;
     shandle.conditions.append(SHC_STATE_MESSAGES);
     FSHIMessagesIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }

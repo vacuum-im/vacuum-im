@@ -537,7 +537,7 @@ int SocksStream::insertStanzaHandle(const QString &ACondition)
 {
   IStanzaHandle shandle;
   shandle.handler = this;
-  shandle.priority = SHP_DEFAULT;
+  shandle.order = SHO_DEFAULT;
   shandle.direction = IStanzaHandle::DirectionIn;
   shandle.streamJid = FStreamJid;
   shandle.conditions.append(ACondition);

@@ -1190,14 +1190,14 @@ void PrivacyLists::onStreamOpened(IXmppStream *AXmppStream)
   {
     IStanzaHandle shandle;
     shandle.handler = this;
-    shandle.priority = SHP_DEFAULT;
+    shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
     shandle.streamJid = AXmppStream->streamJid();
 
     shandle.conditions.append(SHC_PRIVACY);
     FSHIPrivacy.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    shandle.priority = SHP_DEFAULT-1;
+    shandle.order = SHO_DEFAULT-1;
     shandle.conditions.clear();
     shandle.conditions.append(SHC_ROSTER);
     FSHIRosterIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
