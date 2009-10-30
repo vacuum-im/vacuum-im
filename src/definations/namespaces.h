@@ -79,5 +79,6 @@
 #define NS_SI_FILETRANSFER                      "http://jabber.org/protocol/si/profile/file-transfer"
 
 #define NS_INBAND_BYTESTREAMS                   "http://jabber.org/protocol/ibb"
+#define NS_SOCKS5_BYTESTREAMS                   "http://jabber.org/protocol/bytestreams"
 
 #endif
