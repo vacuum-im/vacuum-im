@@ -2,7 +2,7 @@
 
 #include <QByteArray>
 
-#define TRANSFER_BUFFER_SIZE      4096
+#define TRANSFER_BUFFER_SIZE      51200
 
 TransferThread::TransferThread(IDataStreamSocket *ASocket, QFile *AFile, int AKind, qint64 ABytes, QObject *AParent) : QThread(AParent)
 {
@@ -33,10 +33,6 @@ void TransferThread::run()
   QIODevice *inDevice = FKind==IFileStream::SendFile ? FFile : FSocket->instance();
   QIODevice *outDevice =  FKind==IFileStream::SendFile ? FSocket->instance() : FFile;
   
-  // QFile в Qt 4.5.1 не генерирует сигнала byteswritten(), приходится лепить костыль
-  if (FKind == IFileStream::SendFile)
-    connect(outDevice,SIGNAL(bytesWritten(qint64)),this,SIGNAL(transferProgress(qint64)));
-
   while (!FAbort && transferedBytes<FBytesToTransfer)
   {
     qint64 writtenBytes = 0;
@@ -50,8 +46,7 @@ void TransferThread::run()
         {
           transferedBytes += bytes;
           writtenBytes += bytes;
-          if (FKind == IFileStream::ReceiveFile)
-            emit transferProgress(bytes);
+          emit transferProgress(bytes);
         }
         else if (bytes == 0)
         {
@@ -73,21 +68,10 @@ void TransferThread::run()
     {
       break;
     }
-
   }
 
-  if (FKind == IFileStream::SendFile)
-  {
-    while (!FAbort && outDevice->isOpen() && outDevice->bytesToWrite()>0)
-    {
-      FSocket->flush();
-      outDevice->waitForBytesWritten(100);
-    }
-  }
-  else 
-  {
-    FFile->flush();
-  }
+  while (FKind==IFileStream::SendFile && !FAbort && FSocket->flush())
+    outDevice->waitForBytesWritten(100);
 
   FFile->close();
 }

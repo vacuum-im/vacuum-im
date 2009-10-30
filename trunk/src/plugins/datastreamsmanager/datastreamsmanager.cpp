@@ -233,7 +233,7 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
     }
     else if (sprofile)
     {
-      sprofile->dataStreamError(sid,ErrorHandler(AStanza.element()).message());
+      sprofile->dataStreamError(sid,ErrorHandler(AStanza.element(), NS_STREAM_INITIATION).message());
     }
   }
 }
@@ -434,7 +434,7 @@ Stanza DataStreamsManger::errorStanza(const Jid &AContactJid, const QString &ARe
   error.setTo(AContactJid.eFull()).setType("error").setId(ARequestId);
   QDomElement errElem = error.addElement("error");
   errElem.setAttribute("code",ErrorHandler::codeByCondition(ACondition,AErrNS));
-  errElem.setAttribute("type",ErrorHandler::typeByCondition(ACondition,AErrNS));
+  errElem.setAttribute("type",ErrorHandler::typeToString(ErrorHandler::typeByCondition(ACondition,AErrNS)));
   errElem.appendChild(error.createElement(ACondition,AErrNS));
   if (AErrNS != EHN_DEFAULT)
     errElem.appendChild(error.createElement("bad-request",EHN_DEFAULT));

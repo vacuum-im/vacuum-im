@@ -7,7 +7,7 @@
 #include <QCoreApplication>
 
 #define BUFFER_INCREMENT_SIZE     1024
-#define MAX_WRITE_BUFFER_SIZE     8192
+#define MAX_BUFFER_SIZE     8192
 
 #define DATA_TIMEOUT              60000
 #define OPEN_TIMEOUT              30000
@@ -18,23 +18,23 @@
 #define SHC_INBAND_DATA_IQ        "/iq[@type='set']/data[@xmlns='" NS_INBAND_BYTESTREAMS "']"
 #define SHC_INBAND_DATA_MESSAGE   "/message/data[@xmlns='" NS_INBAND_BYTESTREAMS "']"
 
-class SendDataEvent : 
+class DataEvent : 
   public QEvent
 {
 public:
-  SendDataEvent(bool AFlush) : QEvent(FEventType) { FFlush = AFlush; }
-  inline bool flush() { return FFlush; }
+  DataEvent(bool AFlush) : QEvent(FEventType) { FFlush = AFlush; }
+  inline bool isFlush() { return FFlush; }
   static int registeredType() { return FEventType; }
 private:
   bool FFlush;
   static QEvent::Type FEventType;
 };
 
-QEvent::Type SendDataEvent::FEventType = static_cast<QEvent::Type>(QEvent::registerEventType());
+QEvent::Type DataEvent::FEventType = static_cast<QEvent::Type>(QEvent::registerEventType());
 
 
 InBandStream::InBandStream(IStanzaProcessor *AProcessor, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, int AKind, QObject *AParent) 
-  : QIODevice(AParent), FReadBuffer(BUFFER_INCREMENT_SIZE), FWriteBuffer(BUFFER_INCREMENT_SIZE,MAX_WRITE_BUFFER_SIZE)
+  : QIODevice(AParent), FReadBuffer(BUFFER_INCREMENT_SIZE), FWriteBuffer(BUFFER_INCREMENT_SIZE,MAX_BUFFER_SIZE)
 {
   FStanzaProcessor = AProcessor;
 
@@ -329,9 +329,9 @@ bool InBandStream::open(QIODevice::OpenMode AMode)
 
 bool InBandStream::flush()
 {
-  if (bytesToWrite() > 0)
+  if (isOpen() && bytesToWrite()>0)
   {
-    SendDataEvent *dataEvent = new SendDataEvent(true);
+    DataEvent *dataEvent = new DataEvent(true);
     QCoreApplication::postEvent(this,dataEvent);
     return true;
   }
@@ -431,7 +431,7 @@ qint64 InBandStream::readData(char *AData, qint64 AMaxSize)
 
 qint64 InBandStream::writeData(const char *AData, qint64 AMaxSize)
 {
-  SendDataEvent *dataEvent = new SendDataEvent(false);
+  DataEvent *dataEvent = new DataEvent(false);
   QCoreApplication::postEvent(this,dataEvent);
   QWriteLocker locker(&FThreadLock);
   return FWriteBuffer.write(AData,AMaxSize);
@@ -445,10 +445,10 @@ void InBandStream::setOpenMode(OpenMode AMode)
 
 bool InBandStream::event(QEvent *AEvent)
 {
-  if (AEvent->type() == SendDataEvent::registeredType())
+  if (AEvent->type() == DataEvent::registeredType())
   {
-    SendDataEvent *dataEvent = static_cast<SendDataEvent *>(AEvent);
-    sendNextPaket(dataEvent->flush());
+    DataEvent *dataEvent = static_cast<DataEvent *>(AEvent);
+    sendNextPaket(dataEvent->isFlush());
     return true;
   }
   return QIODevice::event(AEvent);
@@ -462,6 +462,7 @@ bool InBandStream::sendNextPaket(bool AFlush)
     FThreadLock.lockForWrite();
     QByteArray data = FWriteBuffer.read(FBlockSize);
     FThreadLock.unlock();
+
     if (!data.isEmpty())
     {
       Stanza paket(FStanzaType==StanzaMessage ? "message" : "iq");
@@ -483,7 +484,7 @@ bool InBandStream::sendNextPaket(bool AFlush)
         ruleElem.setAttribute("value","exact");
         ruleElem.setAttribute("action","error");
 
-        SendDataEvent *dataEvent = new SendDataEvent(AFlush);
+        DataEvent *dataEvent = new DataEvent(AFlush);
         QCoreApplication::postEvent(this, dataEvent);
 
         sent = FStanzaProcessor && FStanzaProcessor->sendStanzaOut(FStreamJid,paket);

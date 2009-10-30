@@ -146,10 +146,6 @@
         <translation>Вы уверешы, что хотите отменить передачу файла?</translation>
     </message>
     <message>
-        <source>File transfer terminated by user</source>
-        <translation>Передача файла прервана пользователем</translation>
-    </message>
-    <message>
         <source>Cancel file transfer</source>
         <translation>Отмена передачи файла</translation>
     </message>
@@ -188,6 +184,10 @@
     <message>
         <source>Please select at least one data stream</source>
         <translation>Пожалуйста, выберите хотя бы один поток данных</translation>
+    </message>
+    <message>
+        <source>Data transmission terminated</source>
+        <translation>Передача данных прервана</translation>
     </message>
 </context>
 <context>

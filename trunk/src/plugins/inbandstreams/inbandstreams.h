@@ -44,7 +44,7 @@ public:
   //InBandStreams
   virtual int blockSize(const QString &ASettingsNS) const;
   virtual void setBlockSize(const QString &ASettingsNS, int ASize);
-  virtual int maximumBlockSize(const QString &ASettingsNS);
+  virtual int maximumBlockSize(const QString &ASettingsNS) const;
   virtual void setMaximumBlockSize(const QString &ASettingsNS, int AMaxSize);
   virtual int dataStanzaType(const QString &ASettingsNS) const;
   virtual void setDataStanzaType(const QString &ASettingsNS, int AType);

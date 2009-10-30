@@ -32,6 +32,7 @@ FileStream::~FileStream()
     FThread->abort();
     FThread->wait();
     delete FThread;
+    FThread = NULL;
   }
   if (FSocket)
   {
@@ -427,7 +428,7 @@ void FileStream::onSocketStateChanged(int AState)
       }
       else
       {
-        abortStream(tr("Data transmission terminated by user"));
+        abortStream(tr("Data transmission terminated by remote user"));
       }
     }
     else

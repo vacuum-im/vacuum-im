@@ -1,8 +1,8 @@
 #include "inbandstreams.h"
 
-#define SVN_BLOCK_SIZE          "stream[]:blockSize"
-#define SVN_MAX_BLOCK_SIZE      "stream[]:maxBlockSize"
-#define SVN_DATA_STANZA_TYPE    "stream[]:dataStanzaType"
+#define SVN_BLOCK_SIZE          "settings[]:blockSize"
+#define SVN_MAX_BLOCK_SIZE      "settings[]:maxBlockSize"
+#define SVN_DATA_STANZA_TYPE    "settings[]:dataStanzaType"
 
 InBandStreams::InBandStreams()
 {
@@ -95,7 +95,7 @@ IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &ASocketId, con
   return NULL;
 }
 
-QWidget * InBandStreams::settingsWidget(IDataStreamSocket *ASocket, bool AReadOnly)
+QWidget *InBandStreams::settingsWidget(IDataStreamSocket *ASocket, bool AReadOnly)
 {
   IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
   return stream!=NULL ? new InBandOptions(this,stream,AReadOnly,NULL) : NULL;
@@ -119,18 +119,9 @@ void InBandStreams::loadSettings(IDataStreamSocket *ASocket, const QString &ASet
   IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
   if (stream)
   {
-    if (FSettings && !ASettingsNS.isEmpty())
-    {
-      stream->setMaximumBlockSize(FSettings->valueNS(SVN_MAX_BLOCK_SIZE, ASettingsNS, FMaxBlockSize).toInt());
-      stream->setBlockSize(FSettings->valueNS(SVN_BLOCK_SIZE, ASettingsNS, FBlockSize).toInt());
-      stream->setDataStanzaType(FSettings->valueNS(SVN_DATA_STANZA_TYPE, ASettingsNS, FStatnzaType).toInt());
-    }
-    else
-    {
-      stream->setMaximumBlockSize(FMaxBlockSize);
-      stream->setBlockSize(FBlockSize);
-      stream->setDataStanzaType(FStatnzaType);
-    }
+    stream->setMaximumBlockSize(maximumBlockSize(ASettingsNS));
+    stream->setBlockSize(blockSize(ASettingsNS));
+    stream->setDataStanzaType(dataStanzaType(ASettingsNS));
   }
 }
 
@@ -143,15 +134,12 @@ void InBandStreams::saveSettings(const QString &ASettingsNS, QWidget *AWidget)
 
 void InBandStreams::saveSettings(const QString &ASettingsNS, IDataStreamSocket *ASocket)
 {
-  if (FSettings)
+  IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
+  if (stream)
   {
-    IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
-    if (stream)
-    {
-      setMaximumBlockSize(ASettingsNS, stream->maximumBlockSize());
-      setBlockSize(ASettingsNS, stream->blockSize());
-      setDataStanzaType(ASettingsNS, stream->dataStanzaType());
-    }
+    setMaximumBlockSize(ASettingsNS, stream->maximumBlockSize());
+    setBlockSize(ASettingsNS, stream->blockSize());
+    setDataStanzaType(ASettingsNS, stream->dataStanzaType());
   }
 }
 
@@ -182,12 +170,14 @@ void InBandStreams::setBlockSize(const QString &ASettingsNS, int ASize)
   {
     if (ASettingsNS.isEmpty())
       FBlockSize = ASize;
+    else if (FSettings && FBlockSize == ASize)
+      FSettings->deleteValueNS(SVN_BLOCK_SIZE, ASettingsNS);
     else if (FSettings)
       FSettings->setValueNS(SVN_BLOCK_SIZE, ASettingsNS, ASize);
   }
 }
 
-int InBandStreams::maximumBlockSize(const QString &ASettingsNS)
+int InBandStreams::maximumBlockSize(const QString &ASettingsNS) const
 {
   if (FSettings && !ASettingsNS.isEmpty())
     return FSettings->valueNS(SVN_MAX_BLOCK_SIZE,ASettingsNS,FMaxBlockSize).toInt();
@@ -200,6 +190,8 @@ void InBandStreams::setMaximumBlockSize(const QString &ASettingsNS, int AMaxSize
   {
     if (ASettingsNS.isEmpty())
       FMaxBlockSize = AMaxSize;
+    else if (FSettings && FMaxBlockSize == AMaxSize)
+      FSettings->deleteValueNS(SVN_MAX_BLOCK_SIZE, ASettingsNS);
     else if (FSettings)
       FSettings->setValueNS(SVN_MAX_BLOCK_SIZE, ASettingsNS, AMaxSize);
   }
@@ -216,6 +208,8 @@ void InBandStreams::setDataStanzaType(const QString &ASettingsNS, int AType)
 {
   if (ASettingsNS.isEmpty())
     FStatnzaType = AType;
+  else if (FSettings && FStatnzaType == AType)
+    FSettings->deleteValueNS(SVN_DATA_STANZA_TYPE, ASettingsNS);
   else if (FSettings)
     FSettings->setValueNS(SVN_DATA_STANZA_TYPE, ASettingsNS, AType);
 }
