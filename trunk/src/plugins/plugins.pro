@@ -52,4 +52,5 @@ SUBDIRS = settings \
           datastreamsmanager \
           filestreamsmanager \
           filetransfer \
-          inbandstreams
+          inbandstreams \
+          socksstreams
