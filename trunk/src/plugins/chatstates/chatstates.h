@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QTimer>
 #include <definations/namespaces.h>
-#include <definations/stanzahandlerpriority.h>
+#include <definations/stanzahandlerorders.h>
 #include <definations/archivehandlerorders.h>
 #include <definations/statusbargroups.h>
 #include <definations/optionnodes.h>

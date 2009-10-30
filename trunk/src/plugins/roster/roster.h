@@ -1,7 +1,6 @@
 #ifndef ROSTER_H
 #define ROSTER_H
 
-#include <definations/stanzahandlerpriority.h>
 #include <definations/namespaces.h>
 #include <interfaces/iroster.h>
 #include <interfaces/istanzaprocessor.h>

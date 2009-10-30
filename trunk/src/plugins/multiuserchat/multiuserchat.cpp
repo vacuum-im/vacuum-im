@@ -753,7 +753,7 @@ void MultiUserChat::initialize()
     {
       IStanzaHandle shandle;
       shandle.handler = this;
-      shandle.priority = SHP_MULTIUSERCHAT;
+      shandle.order = SHO_PI_MULTIUSERCHAT;
       shandle.direction = IStanzaHandle::DirectionIn;
       shandle.streamJid = FStreamJid;
       shandle.conditions.append(SHC_PRESENCE);
@@ -762,6 +762,7 @@ void MultiUserChat::initialize()
       if (FMessageProcessor == NULL)
       {
         shandle.conditions.clear();
+        shandle.order = SHO_MI_MULTIUSERCHAT;
         shandle.conditions.append(SHC_MESSAGE);
         FSHIMessage = FStanzaProcessor->insertStanzaHandle(shandle);
       }

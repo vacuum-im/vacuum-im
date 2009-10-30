@@ -491,7 +491,7 @@ void Commands::onPresenceAdded(IPresence *APresence)
   {
     IStanzaHandle shandle;
     shandle.handler = this;
-    shandle.priority = SHP_DEFAULT;
+    shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
     shandle.streamJid = APresence->streamJid();
     shandle.conditions.append(SHC_COMMANDS);

@@ -546,16 +546,16 @@ void Avatars::onStreamOpened(IXmppStream *AXmppStream)
     shandle.handler = this;
     shandle.streamJid = AXmppStream->streamJid();
     
-    shandle.priority = SHP_AVATARS_PRESENCE;
+    shandle.order = SHO_PI_AVATARS;
     shandle.direction = IStanzaHandle::DirectionIn;
     shandle.conditions.append(SHC_PRESENCE);
     FSHIPresenceIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    shandle.priority = SHP_DEFAULT;
+    shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionOut;
     FSHIPresenceOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
-    shandle.priority = SHP_DEFAULT;
+    shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
     shandle.conditions.clear();
     shandle.conditions.append(SHC_IQ_AVATAR);

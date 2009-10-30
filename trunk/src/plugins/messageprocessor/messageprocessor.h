@@ -3,7 +3,6 @@
 
 #include <definations/messagedataroles.h>
 #include <definations/messagewriterorders.h>
-#include <definations/stanzahandlerpriority.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/ixmppstreams.h>

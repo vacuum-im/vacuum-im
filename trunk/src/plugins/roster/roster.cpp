@@ -533,7 +533,7 @@ void Roster::setStanzaHandlers()
 {
   IStanzaHandle shandle;
   shandle.handler = this;
-  shandle.priority = SHP_DEFAULT;
+  shandle.order = SHO_DEFAULT;
   shandle.direction = IStanzaHandle::DirectionIn;
   shandle.streamJid = FXmppStream->streamJid();
 

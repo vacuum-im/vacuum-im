@@ -4,7 +4,7 @@
 #include <QDir>
 #include <definations/namespaces.h>
 #include <definations/actiongroups.h>
-#include <definations/stanzahandlerpriority.h>
+#include <definations/stanzahandlerorders.h>
 #include <definations/rosterlabelorders.h>
 #include <definations/rosterindextyperole.h>
 #include <definations/rosterdataholderorders.h>
