@@ -24,8 +24,8 @@
         <translation>Передача данных завершена</translation>
     </message>
     <message>
-        <source>Data transmission terminated by user</source>
-        <translation>Передача данных прервана пользователем</translation>
+        <source>Data transmission terminated by remote user</source>
+        <translation>Передача данных прервана удаленным пользователем</translation>
     </message>
 </context>
 <context>

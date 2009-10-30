@@ -19,6 +19,9 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
   FFileManager = AFileManager;
   FDataManager = ADataManager;
 
+  ui.pgbPrgress->setMinimum(0);
+  ui.pgbPrgress->setMaximum(100);
+
   if (FFileStream->streamKind() == IFileStream::SendFile)
   {
     setWindowTitle(tr("Send File - %1").arg(FFileStream->streamJid().full()));
@@ -187,14 +190,26 @@ QString StreamDialog::sizeName(qint64 ABytes) const
   return QString::number(value,'f',prec)+units;
 }
 
-qint64 StreamDialog::curPosition() const
+qint64 StreamDialog::minPosition() const
 {
-  return FFileStream->rangeOffset() + FFileStream->progress();
+  return FFileStream->rangeLength()>0 ? FFileStream->rangeOffset() : 0;
 }
 
 qint64 StreamDialog::maxPosition() const
 {
   return FFileStream->rangeLength()>0 ? FFileStream->rangeOffset()+FFileStream->rangeLength() : FFileStream->fileSize();
+}
+
+qint64 StreamDialog::curPosition() const
+{
+  return minPosition() + FFileStream->progress();
+}
+
+int StreamDialog::curPercentPosition() const
+{
+  qint64 minPos = minPosition();
+  qint64 maxPos = maxPosition();
+  return maxPos>minPos ? (FFileStream->progress()*100 + minPos)/(maxPos-minPos) : 0;
 }
 
 void StreamDialog::onStreamStateChanged()
@@ -204,7 +219,7 @@ void StreamDialog::onStreamStateChanged()
   case IFileStream::Creating:
     ui.tlbFile->setEnabled(true);
     ui.lneFile->setReadOnly(FFileStream->streamKind()==IFileStream::SendFile);
-    ui.pteDescription->setReadOnly(false);
+    ui.pteDescription->setReadOnly(FFileStream->streamKind()!=IFileStream::SendFile);
     ui.grbMethods->setVisible(true);
     if (FFileStream->streamKind()==IFileStream::SendFile)
       ui.bbxButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Close);
@@ -238,19 +253,18 @@ void StreamDialog::onStreamSpeedChanged()
 {
   if (FFileStream->streamState() == IFileStream::Transfering)
   {
-    ui.pgbPrgress->setValue(curPosition());
+    ui.pgbPrgress->setValue(curPercentPosition());
     ui.lblProgress->setText(tr("Transfered %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition())) 
       + " " + tr("Speed %1.").arg(sizeName(FFileStream->speed())+tr("/sec")));
   }
   else if (FFileStream->fileSize() > 0)
   {
-    ui.pgbPrgress->setValue(curPosition());
+    ui.pgbPrgress->setValue(curPercentPosition());
     ui.lblProgress->setText(tr("Transfered %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition())));
   }
   else
   {
     ui.pgbPrgress->setValue(0);
-    ui.pgbPrgress->setMaximum(100);
     ui.lblProgress->setText(QString::null);
   }
 }
@@ -259,7 +273,6 @@ void StreamDialog::onStreamPropertiesChanged()
 {
   ui.lneFile->setText(FFileStream->fileName());
   ui.pteDescription->setPlainText(FFileStream->fileDescription());
-  ui.pgbPrgress->setMaximum(maxPosition());
   onStreamSpeedChanged();
 }
 
@@ -324,7 +337,7 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
     if (QMessageBox::question(this,tr("Cancel file transfer"),tr("Are you sure you want to cancel a file transfer?"),
       QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
     {
-      FFileStream->abortStream(tr("File transfer terminated by user"));
+      FFileStream->abortStream(tr("Data transmission terminated"));
     }
   }
   else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Close)

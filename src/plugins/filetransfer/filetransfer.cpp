@@ -167,7 +167,7 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
       fileElem = fileElem.nextSiblingElement("file");
 
     QString fileName = fileElem.attribute("name");
-    qint64 fileSize = fileElem.attribute("size").toInt();
+    qint64 fileSize = fileElem.attribute("size").toLongLong();
     if (!fileName.isEmpty() && fileSize>0)
     {
       IFileStream *stream = createStream(AStreamId,ARequest.to(),ARequest.from(),IFileStream::ReceiveFile);
@@ -203,9 +203,9 @@ bool FileTransfer::fileStreamResponce(const QString &AStreamId, const Stanza &AR
     if (!rangeElem.isNull())
     {
       if (rangeElem.hasAttribute("offset"))
-        stream->setRangeOffset(rangeElem.attribute("offset").toInt());
+        stream->setRangeOffset(rangeElem.attribute("offset").toLongLong());
       if (rangeElem.hasAttribute("length"))
-        stream->setRangeLength(rangeElem.attribute("length").toInt());
+        stream->setRangeLength(rangeElem.attribute("length").toLongLong());
     }
     return stream->startStream(AMethodNS);
   }

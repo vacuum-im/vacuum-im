@@ -69,7 +69,6 @@ protected:
   virtual qint64 readData(char *AData, qint64 AMaxSize);
   virtual qint64 writeData(const char *AData, qint64 AMaxSize);
   void setOpenMode(OpenMode AMode);
-protected:
   virtual bool event(QEvent *AEvent);
 protected:
   bool sendNextPaket(bool AFlush = false);
@@ -80,6 +79,7 @@ protected:
 private:
   IStanzaProcessor *FStanzaProcessor;
 private:
+  int FErrorCode;
   Jid FStreamJid;
   Jid FContactJid;
   int FStreamKind;
@@ -98,10 +98,9 @@ private:
   int FStanzaType;
   quint16 FSeqIn;
   quint16 FSeqOut;
+private:
   RingBuffer FReadBuffer;
   RingBuffer FWriteBuffer;
-private:
-  int FErrorCode;
   mutable QReadWriteLock FThreadLock;
   QWaitCondition FReadyReadCondition;
   QWaitCondition FBytesWrittenCondition;

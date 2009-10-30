@@ -169,9 +169,9 @@ void FileStreamsWindow::updateStreamProgress(IFileStream *AStream)
   QList<QStandardItem *> columns = streamColumns(AStream->streamId());
   if (!columns.isEmpty())
   {
-    int startPos = AStream->rangeLength()>0 ? AStream->rangeOffset() : 0;
-    int stopPos = AStream->rangeLength()>0 ? AStream->rangeLength()+AStream->rangeOffset() : AStream->fileSize();
-    int percent = startPos!=stopPos ? ((AStream->progress()+startPos)*100)/(stopPos-startPos) : 0;
+    qint64 minPos = AStream->rangeLength()>0 ? AStream->rangeOffset() : 0;
+    qint64 maxPos = AStream->rangeLength()>0 ? AStream->rangeLength()+AStream->rangeOffset() : AStream->fileSize();
+    qint64 percent = maxPos>minPos ? (AStream->progress()*100 + minPos)/(maxPos-minPos) : 0;
     columns[CMN_PROGRESS]->setText(QString::number(percent)+"%");
     columns[CMN_PROGRESS]->setData(percent, IDR_VALUE);
   }
