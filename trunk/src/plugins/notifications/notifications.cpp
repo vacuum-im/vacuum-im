@@ -48,7 +48,7 @@ void Notifications::pluginInfo(IPluginInfo *APluginInfo)
 
 bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
   if (plugin)
   {
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
@@ -60,7 +60,7 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
   {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
@@ -73,23 +73,23 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
   if (plugin)
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IAvatars").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
   if (plugin)
     FAvatars = qobject_cast<IAvatars *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

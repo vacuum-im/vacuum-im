@@ -66,6 +66,7 @@ protected slots:
   void onVCardDialogDestroyed(QObject *ADialog);
   void onXmppStreamRemoved(IXmppStream *AXmppStream);
 private:
+  IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;

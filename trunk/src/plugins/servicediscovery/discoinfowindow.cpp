@@ -45,7 +45,7 @@ DiscoInfoWindow::~DiscoInfoWindow()
 
 void DiscoInfoWindow::initialize()
 {
-  IPlugin *plugin = FDiscovery->pluginManager()->getPlugins("IDataForms").value(0,NULL);
+  IPlugin *plugin = FDiscovery->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 }

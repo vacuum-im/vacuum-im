@@ -98,7 +98,7 @@ ToolBarChanger *AddContactDialog::toolBarChanger() const
 
 void AddContactDialog::initialize(IPluginManager *APluginManager)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -112,7 +112,7 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
     }
   }
 
-  plugin = APluginManager->getPlugins("IMessageProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
   if (plugin)
   {
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
@@ -134,7 +134,7 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
     }
   }
   
-  plugin = APluginManager->getPlugins("IVCardPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
   if (plugin)
   {
     FVcardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());

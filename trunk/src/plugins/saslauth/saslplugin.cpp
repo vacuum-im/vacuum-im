@@ -22,7 +22,7 @@ void SASLPlugin::pluginInfo(IPluginInfo *APluginInfo)
 
 bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 

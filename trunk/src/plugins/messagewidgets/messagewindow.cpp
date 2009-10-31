@@ -178,7 +178,7 @@ void MessageWindow::setNextCount(int ACount)
 
 void MessageWindow::initialize()
 {
-  IPlugin *plugin = FMessageWidgets->pluginManager()->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -192,7 +192,7 @@ void MessageWindow::initialize()
     }
   }
 
-  plugin = FMessageWidgets->pluginManager()->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = FMessageWidgets->pluginManager()->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

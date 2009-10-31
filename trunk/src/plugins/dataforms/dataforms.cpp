@@ -24,13 +24,13 @@ void DataForms::pluginInfo(IPluginInfo *APluginInfo)
 
 bool DataForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
   
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QUuid>
 #include <QList>
+#include <QLocale>
 #include <QtPlugin>
 
 class IPluginManager;
@@ -35,12 +36,15 @@ public:
 class IPluginManager
 {
 public:
-  virtual QObject* instance() =0;
-  virtual IPlugin* getPlugin(const QUuid &AUuid) const =0;
-  virtual QList<IPlugin *> getPlugins(const QString &AInterface = QString::null) const =0;
-  virtual const IPluginInfo *getPluginInfo(const QUuid &AUuid) const =0;
-  virtual QList<QUuid> getDependencesOn(const QUuid &AUuid) const =0;
-  virtual QList<QUuid> getDependencesFor(const QUuid &AUuid) const =0;
+  virtual QObject *instance() =0;
+  virtual QString homePath() const =0;
+  virtual void setHomePath(const QString &APath) =0;
+  virtual void setLocale(QLocale::Language ALanguage, QLocale::Country ACountry) =0;
+  virtual IPlugin *pluginInstance(const QUuid &AUuid) const =0;
+  virtual QList<IPlugin *> pluginInterface(const QString &AInterface = QString::null) const =0;
+  virtual const IPluginInfo *pluginInfo(const QUuid &AUuid) const =0;
+  virtual QList<QUuid> pluginDependencesOn(const QUuid &AUuid) const =0;
+  virtual QList<QUuid> pluginDependencesFor(const QUuid &AUuid) const =0;
 public slots:
   virtual void quit() =0;
   virtual void restart() =0;

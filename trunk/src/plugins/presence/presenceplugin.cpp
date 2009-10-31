@@ -24,14 +24,14 @@ void PresencePlugin::pluginInfo(IPluginInfo *APluginInfo)
 
 bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     connect(plugin->instance(), SIGNAL(added(IXmppStream *)), SLOT(onStreamAdded(IXmppStream *))); 
     connect(plugin->instance(), SIGNAL(removed(IXmppStream *)), SLOT(onStreamRemoved(IXmppStream *))); 
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 

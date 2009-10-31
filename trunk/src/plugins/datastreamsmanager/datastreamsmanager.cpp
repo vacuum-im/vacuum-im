@@ -36,19 +36,19 @@ void DataStreamsManger::pluginInfo(IPluginInfo *APluginInfo)
 
 bool DataStreamsManger::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
   {
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
   }
   
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
   {
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -58,13 +58,13 @@ bool DataStreamsManger::initConnections(IPluginManager *APluginManager, int &/*A
     }
   }
 
-  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

@@ -50,13 +50,13 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 {
   FPluginManager = APluginManager;
 
-  IPlugin *plugin = APluginManager->getPlugins("IMessageProcessor").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
   if (plugin)
   {
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -66,19 +66,19 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
     }
   }
 
-  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
   {
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IMessageWidgets").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
   if (plugin)
   {
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
   }
   
-  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
@@ -91,31 +91,31 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 
   if (FMessageWidgets)
   {
-    plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+    plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
     if (plugin)
     {
       FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
     }
 
-    plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+    plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
     if (plugin)
     {
       FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
     }
 
-    plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+    plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
     if (plugin)
     {
       FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
     }
 
-    plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
+    plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
     if (plugin)
     {
       FNotifications = qobject_cast<INotifications *>(plugin->instance());
     }
 
-    plugin = APluginManager->getPlugins("IRegistration").value(0,NULL);
+    plugin = APluginManager->pluginInterface("IRegistration").value(0,NULL);
     if (plugin)
     {
       FRegistration = qobject_cast<IRegistration *>(plugin->instance());

@@ -32,7 +32,7 @@ void Annotations::pluginInfo(IPluginInfo *APluginInfo)
 
 bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IPrivateStorage").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IPrivateStorage").value(0,NULL);
   if (plugin)
   {
     FPrivateStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
@@ -49,7 +49,7 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     }
   }
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -60,15 +60,15 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
   if (plugin)
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRosterSearch").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterSearch").value(0,NULL);
   if (plugin)
     FRosterSearch = qobject_cast<IRosterSearch *>(plugin->instance());
 

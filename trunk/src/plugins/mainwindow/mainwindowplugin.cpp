@@ -31,7 +31,7 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
 {
   FPluginManager = APluginManager;
 
-  IPlugin *plugin = FPluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = FPluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -44,7 +44,7 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
     }
   }
 
-  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
   if (plugin)
   {
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());

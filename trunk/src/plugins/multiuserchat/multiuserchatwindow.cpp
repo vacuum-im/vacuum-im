@@ -283,7 +283,7 @@ void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 
 void MultiUserChatWindow::initialize()
 {
-  IPlugin *plugin = FChatPlugin->pluginManager()->getPlugins("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -293,7 +293,7 @@ void MultiUserChatWindow::initialize()
     }
   }
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IStatusIcons").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
   {
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
@@ -303,11 +303,11 @@ void MultiUserChatWindow::initialize()
     }
   }
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IStatusChanger").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IStatusChanger").value(0,NULL);
   if (plugin)
     FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IAccountManager").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IAccountManager").value(0,NULL);
   if (plugin)
   {
     IAccountManager *accountManager = qobject_cast<IAccountManager *>(plugin->instance());
@@ -323,15 +323,15 @@ void MultiUserChatWindow::initialize()
     }
   }
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IDataForms").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IMessageWidgets").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageWidgets").value(0,NULL);
   if (plugin)
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IMessageProcessor").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
   if (plugin)
   {
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
@@ -341,7 +341,7 @@ void MultiUserChatWindow::initialize()
     }
   }
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IMessageStyles").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageStyles").value(0,NULL);
   if (plugin)
   {
     FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
@@ -352,7 +352,7 @@ void MultiUserChatWindow::initialize()
     }
   }
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IMessageArchiver").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageArchiver").value(0,NULL);
   if (plugin)
     FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
 }

@@ -43,15 +43,15 @@ void ChatMessageHandler::pluginInfo(IPluginInfo *APluginInfo)
 
 bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IMessageWidgets").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
   if (plugin)
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IMessageProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
   if (plugin)
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IMessageStyles").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMessageStyles").value(0,NULL);
   if (plugin)
   {
     FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
@@ -62,7 +62,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
     }
   }
 
-  plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
   {
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
@@ -72,7 +72,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
     }
   }
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -83,11 +83,11 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
     }
   }
 
-  plugin = APluginManager->getPlugins("IMessageArchiver").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMessageArchiver").value(0,NULL);
   if (plugin)
     FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
+  plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
   if (plugin)
   {
     INotifications *notifications = qobject_cast<INotifications *>(plugin->instance());
@@ -98,7 +98,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin) 
   {
     IRostersViewPlugin *rostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
@@ -109,11 +109,11 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
   if (plugin)
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IStatusChanger").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
   if (plugin)
     FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 

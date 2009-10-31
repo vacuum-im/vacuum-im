@@ -23,11 +23,11 @@ ChatWindowMenu::~ChatWindowMenu()
 
 void ChatWindowMenu::initialize()
 {
-  IPlugin *plugin = FArchiver->pluginManager()->getPlugins("IDataForms").value(0,NULL);
+  IPlugin *plugin = FArchiver->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-  plugin = FArchiver->pluginManager()->getPlugins("ISessionNegotiation").value(0,NULL);
+  plugin = FArchiver->pluginManager()->pluginInterface("ISessionNegotiation").value(0,NULL);
   if (plugin && FDataForms)
   {
     FSessionNegotiation = qobject_cast<ISessionNegotiation *>(plugin->instance());
@@ -40,7 +40,7 @@ void ChatWindowMenu::initialize()
     }
   }
 
-  plugin = FArchiver->pluginManager()->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = FArchiver->pluginManager()->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin && FSessionNegotiation)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());

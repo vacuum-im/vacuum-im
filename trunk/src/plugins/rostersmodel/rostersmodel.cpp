@@ -40,7 +40,7 @@ void RostersModel::pluginInfo(IPluginInfo *APluginInfo)
 
 bool RostersModel::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -55,7 +55,7 @@ bool RostersModel::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -68,7 +68,7 @@ bool RostersModel::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
   if (plugin)
   {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());

@@ -29,7 +29,7 @@ void MessageStyles::pluginInfo(IPluginInfo *APluginInfo)
 
 bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  QList<IPlugin *> plugins = APluginManager->getPlugins("IMessageStylePlugin");
+  QList<IPlugin *> plugins = APluginManager->pluginInterface("IMessageStylePlugin");
   foreach (IPlugin *plugin, plugins)
   {
     IMessageStylePlugin *stylePlugin = qobject_cast<IMessageStylePlugin *>(plugin->instance());
@@ -37,23 +37,23 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
       FStylePlugins.insert(stylePlugin->stylePluginId(),stylePlugin);
   }
 
-  IPlugin *plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IAvatars").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
   if (plugin)
     FAvatars = qobject_cast<IAvatars *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IVCardPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
   if (plugin)
   {
     FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());

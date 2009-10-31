@@ -173,19 +173,19 @@ bool SearchDialog::setDataForm(const IDataForm &AForm)
 
 void SearchDialog::initialize()
 {
-  IPlugin *plugin = FPluginManager->getPlugins("IDataForms").value(0,NULL);
+  IPlugin *plugin = FPluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-  plugin = FPluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = FPluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 
-  plugin = FPluginManager->getPlugins("IRosterChanger").value(0,NULL);
+  plugin = FPluginManager->pluginInterface("IRosterChanger").value(0,NULL);
   if (plugin)
     FRosterChanger = qobject_cast<IRosterChanger *>(plugin->instance());
 
-  plugin = FPluginManager->getPlugins("IVCardPlugin").value(0,NULL);
+  plugin = FPluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
   if (plugin)
     FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
 }

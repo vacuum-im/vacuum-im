@@ -40,25 +40,25 @@ void StatusIcons::pluginInfo(IPluginInfo *APluginInfo)
 
 bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
   if (plugin)
   {
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
   {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
@@ -69,7 +69,7 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

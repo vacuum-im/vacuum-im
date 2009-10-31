@@ -26,7 +26,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 
   ui.cmbStreamJid->addItem(tr("<All Streams>"));
 
-  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -43,7 +43,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
     }
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
   {
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
@@ -57,7 +57,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

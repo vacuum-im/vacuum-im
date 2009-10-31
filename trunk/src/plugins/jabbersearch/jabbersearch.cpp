@@ -32,19 +32,19 @@ bool JabberSearch::initConnections(IPluginManager *APluginManager, int &/*AInitO
 {
   FPluginManager = APluginManager;
 
-  IPlugin *plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
   
-  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 

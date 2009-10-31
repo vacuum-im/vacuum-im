@@ -34,23 +34,23 @@ void Registration::pluginInfo(IPluginInfo *APluginInfo)
 
 bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -60,7 +60,7 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
   if (plugin)
   {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
@@ -71,7 +71,7 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());

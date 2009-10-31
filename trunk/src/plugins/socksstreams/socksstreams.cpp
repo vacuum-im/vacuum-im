@@ -47,7 +47,7 @@ void SocksStreams::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("SOCKS5 Bytestreams");
   APluginInfo->description = tr("Enables any two entities to establish an SOCKS5 out-of-band bytestream");
-  APluginInfo->version = "0.1";
+  APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
@@ -55,19 +55,19 @@ void SocksStreams::pluginInfo(IPluginInfo *APluginInfo)
 
 bool SocksStreams::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IDataStreamsManager").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
   if (plugin)
   {
     FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
   {
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -78,7 +78,7 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
@@ -88,7 +88,7 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

@@ -2,10 +2,8 @@
 #define SETTINGSPLUGIN_H
 
 #include <QMap>
-#include <QHash>
 #include <QFile>
 #include <QPointer>
-#include <QWidget>
 #include <definations/actiongroups.h>
 #include <definations/commandline.h>
 #include <definations/resources.h>
@@ -46,12 +44,11 @@ public:
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //ISettings
     //Profiles
-  virtual bool isProfilesValid() const { return !FProfiles.isNull(); }
-  virtual bool isProfileOpened() const { return FProfileOpened; }
-  virtual const QDir &homeDir() const { return FHomeDir; }
-  virtual const QDir &profileDir() const { return FProfileDir; }
+  virtual bool isProfilesValid() const;
+  virtual bool isProfileOpened() const;
+  virtual QDir profileDir() const;
   virtual bool addProfile(const QString &AProfile);
-  virtual QString profile() const { return FProfile.attribute("name"); }
+  virtual QString profile() const;
   virtual QStringList profiles() const;
   virtual QDomElement profileNode(const QString &AProfile);
   virtual QDomElement pluginNode(const QUuid &APluginId);
@@ -66,7 +63,7 @@ public:
   virtual void removeOptionsHolder(IOptionsHolder *AOptionsHolder);
   virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIconKey, int AOrder);
   virtual void closeOptionsNode(const QString &ANode);
-  virtual QDialog *openOptionsDialog(const QString &ANode = "", QWidget *AParent = NULL);
+  virtual QDialog *openOptionsDialog(const QString &ANode = QString::null, QWidget *AParent = NULL);
 signals:
   virtual void profileAdded(const QString &AProfile);
   virtual void settingsOpened();
@@ -112,14 +109,13 @@ private:
   Menu *FProfileMenu;
 private:
   bool FProfileOpened;
-  QDir FHomeDir;
   QDir FProfileDir;
   QDomElement FProfile;
   QDomDocument FProfiles;
   QDomDocument FSettings;
 private:
   QMap<QString, OptionsNode *> FNodes;
-  QHash<QUuid,Settings *> FPluginSettings;
+  QHash<QUuid, Settings *> FPluginSettings;
   QList<IOptionsHolder *> FOptionsHolders;
   QPointer<OptionsDialog> FOptionsDialog;
   QPointer<ProfileDialog> FProfileDialog;

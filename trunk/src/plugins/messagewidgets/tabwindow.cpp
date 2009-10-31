@@ -145,7 +145,7 @@ void TabWindow::clear()
 
 void TabWindow::initialize()
 {
-  IPlugin *plugin = FMessageWidgets->pluginManager()->getPlugins("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

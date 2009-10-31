@@ -27,13 +27,13 @@ void Emoticons::pluginInfo(IPluginInfo *APluginInfo)
 
 bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IMessageProcessor").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
   if (plugin)
   {
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IMessageWidgets").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
   if (plugin)
   {
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
@@ -43,7 +43,7 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin) 
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

@@ -113,7 +113,7 @@ void ChatWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, cons
 
 void ChatWindow::initialize()
 {
-  IPlugin *plugin = FMessageWidgets->pluginManager()->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -127,7 +127,7 @@ void ChatWindow::initialize()
     }
   }
 
-  plugin = FMessageWidgets->pluginManager()->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = FMessageWidgets->pluginManager()->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -137,7 +137,7 @@ void ChatWindow::initialize()
     }
   }
 
-  plugin = FMessageWidgets->pluginManager()->getPlugins("IStatusChanger").value(0,NULL);
+  plugin = FMessageWidgets->pluginManager()->pluginInterface("IStatusChanger").value(0,NULL);
   if (plugin)
   {
     FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());

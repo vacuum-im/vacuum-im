@@ -28,6 +28,7 @@
 
 Avatars::Avatars()
 {
+  FPluginManager = NULL;
   FXmppStreams = NULL;
   FStanzaProcessor = NULL;
   FVCardPlugin = NULL;
@@ -57,7 +58,9 @@ void Avatars::pluginInfo(IPluginInfo *APluginInfo)
 
 bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  FPluginManager = APluginManager;
+
+  IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -68,11 +71,11 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     }
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IVCardPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
   if (plugin)
   {
     FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
@@ -83,11 +86,11 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     }
   }
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
   if (plugin)
   {
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
@@ -97,7 +100,7 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
   {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
@@ -110,7 +113,7 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -134,6 +137,11 @@ bool Avatars::initObjects()
   {
     FSettingsPlugin->insertOptionsHolder(this);
   }
+
+  FAvatarsDir.setPath(FPluginManager->homePath());
+  if (!FAvatarsDir.exists(DIR_AVATARS))
+    FAvatarsDir.mkdir(DIR_AVATARS);
+  FAvatarsDir.cd(DIR_AVATARS);
 
   FCurOptions = 0;
   onUpdateOptions();
@@ -712,11 +720,6 @@ void Avatars::onSettingsOpened()
   FIqAvatars.clear();
   FVCardAvatars.clear();
   FAvatarImages.clear();
-
-  FAvatarsDir = FSettingsPlugin->homeDir();
-  if (!FAvatarsDir.exists(DIR_AVATARS))
-    FAvatarsDir.mkdir(DIR_AVATARS);
-  FAvatarsDir.cd(DIR_AVATARS);
 
   ISettings *settings = FSettingsPlugin->settingsForPlugin(AVATARTS_UUID);
   setOption(IAvatars::ShowAvatars,settings->value(SVN_SHOW_AVATARS,true).toBool()); 

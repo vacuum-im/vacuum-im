@@ -52,6 +52,7 @@ protected slots:
   void onStreamAdded(IXmppStream *AStream);
   void onStreamRemoved(IXmppStream *AStream);
 private:
+  IPluginManager *FPluginManager;
   IStanzaProcessor *FStanzaProcessor;
   ISettingsPlugin *FSettingsPlugin;
 private:

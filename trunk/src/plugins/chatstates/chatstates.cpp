@@ -58,7 +58,7 @@ void ChatStates::pluginInfo(IPluginInfo *APluginInfo)
 
 bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IMessageWidgets").value(0);
+  IPlugin *plugin = APluginManager->pluginInterface("IMessageWidgets").value(0);
   if (plugin)
   {
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
@@ -69,13 +69,13 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0);
   if (plugin)
   {
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0);
   if (plugin)
   {
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -88,7 +88,7 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -99,23 +99,23 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0);
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IMessageArchiver").value(0);
+  plugin = APluginManager->pluginInterface("IMessageArchiver").value(0);
   if (plugin)
   {
     FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("ISessionNegotiation").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISessionNegotiation").value(0,NULL);
   if (plugin)
   {
     FSessionNegotiation = qobject_cast<ISessionNegotiation *>(plugin->instance());
