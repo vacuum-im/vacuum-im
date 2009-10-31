@@ -1,5 +1,9 @@
-HEADERS = pluginmanager.h
+FORMS   = setuppluginsdialog.ui
+
+HEADERS = pluginmanager.h \
+          setuppluginsdialog.h
 
 SOURCES = main.cpp \
-          pluginmanager.cpp
+          pluginmanager.cpp \
+          setuppluginsdialog.cpp
 

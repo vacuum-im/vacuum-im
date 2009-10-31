@@ -25,7 +25,7 @@
 #define MNI_BOOKMARKS_URL               "bookmarksURL"
 #define MNI_BOOKMARKS_EDIT              "bookmarksEdit"
 
-// ChatStates
+//ChatStates
 #define MNI_CHATSTATES_UNKNOWN          "chatstatesUnknown"
 #define MNI_CHATSTATES_ACTIVE           "chatstatesActive"
 #define MNI_CHATSTATES_COMPOSING        "chatstatesComposing"
@@ -150,6 +150,9 @@
 #define MNI_PRIVACYLISTS_DISABLE        "privacylistsDisable"
 #define MNI_PRIVACYLISTS_BLOCK          "privacylistsBlock"
 #define MNI_PRIVACYLISTS_ADVANCED       "privacylistsAdvanced"
+
+//PluginManager
+#define MNI_PLUGINMANAGER_SETUP         "pluginmanagerSetup"
 
 //Registration
 #define MNI_REGISTERATION               "register"

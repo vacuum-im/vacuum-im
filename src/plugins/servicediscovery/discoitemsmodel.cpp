@@ -9,7 +9,7 @@ DiscoItemsModel::DiscoItemsModel(IServiceDiscovery *ADiscovery, const Jid &AStre
   FRootIndex->infoFetched = true;
   FRootIndex->itemsFetched = true;
 
-  IPlugin *plugin = FDiscovery->pluginManager()->getPlugins("IDataForms").value(0,NULL);
+  IPlugin *plugin = FDiscovery->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 

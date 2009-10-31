@@ -62,11 +62,11 @@ void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
 
 bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -76,7 +76,7 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -87,13 +87,13 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
   {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
   if (plugin)
   {
     FRostersModel = qobject_cast<IRostersModel*>(plugin->instance());
@@ -105,7 +105,7 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->getPlugins("IMultiUserChatPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
   if (plugin)
   {
     FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
@@ -116,7 +116,7 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
@@ -126,13 +126,13 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
   {
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
   if (plugin)
   {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());

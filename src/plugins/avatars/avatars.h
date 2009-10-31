@@ -102,6 +102,7 @@ protected slots:
   void onSettingsClosed();
   void onUpdateOptions();
 private:
+  IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;
   IVCardPlugin *FVCardPlugin;

@@ -39,7 +39,7 @@ JoinMultiChatDialog::~JoinMultiChatDialog()
 
 void JoinMultiChatDialog::initialize()
 {
-  IPlugin *plugin = FChatPlugin->pluginManager()->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());

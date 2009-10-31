@@ -28,7 +28,7 @@ void MessageProcessor::pluginInfo(IPluginInfo *APluginInfo)
 
 bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin) 
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -44,11 +44,11 @@ bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &/*AI
     }
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
+  plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
   if (plugin) 
   {
     FNotifications = qobject_cast<INotifications *>(plugin->instance());

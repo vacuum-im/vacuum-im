@@ -118,7 +118,7 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOpt
 
 void ViewWidget::initialize()
 {
-  IPlugin *plugin = FMessageWidgets->pluginManager()->getPlugins("IMessageProcessor").value(0,NULL);
+  IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
   if (plugin)
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
 }

@@ -126,15 +126,15 @@ void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
 
 void DiscoItemsWindow::initialize()
 {
-  IPlugin *plugin = FDiscovery->pluginManager()->getPlugins("IRosterChanger").value(0,NULL);
+  IPlugin *plugin = FDiscovery->pluginManager()->pluginInterface("IRosterChanger").value(0,NULL);
   if (plugin)
     FRosterChanger = qobject_cast<IRosterChanger *>(plugin->instance());
 
-  plugin = FDiscovery->pluginManager()->getPlugins("IVCardPlugin").value(0,NULL);
+  plugin = FDiscovery->pluginManager()->pluginInterface("IVCardPlugin").value(0,NULL);
   if (plugin)
     FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
   
-  plugin = FDiscovery->pluginManager()->getPlugins("IDataForms").value(0,NULL);
+  plugin = FDiscovery->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 }

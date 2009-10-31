@@ -34,7 +34,7 @@ void DefaultConnectionPlugin::pluginInfo(IPluginInfo *APluginInfo)
 
 bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -44,7 +44,7 @@ bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, in
     }
   }
   
-  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 

@@ -56,7 +56,7 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
 {
   FPluginManager = APluginManager;
 
-  IPlugin *plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -68,11 +68,11 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
   if (plugin)
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
   {
     IRostersViewPlugin *rostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
@@ -83,7 +83,7 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
+  plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
   if (plugin)
   {
     FNotifications = qobject_cast<INotifications *>(plugin->instance());
@@ -94,7 +94,7 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  plugin = APluginManager->getPlugins("IMultiUserChatPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
   if (plugin)
   {
     FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
@@ -105,7 +105,7 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

@@ -739,13 +739,13 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 
 void MultiUserChat::initialize()
 {
-  IPlugin *plugin = FChatPlugin->pluginManager()->getPlugins("IMessageProcessor").value(0,NULL);
+  IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
   if (plugin)
   {
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
   }
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin) 
   {
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
@@ -769,7 +769,7 @@ void MultiUserChat::initialize()
     }
   }
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin) 
   {
     IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -786,7 +786,7 @@ void MultiUserChat::initialize()
     }
   }
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin) 
   {
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -801,7 +801,7 @@ void MultiUserChat::initialize()
     }
   }
 
-  plugin = FChatPlugin->pluginManager()->getPlugins("IDataForms").value(0,NULL);
+  plugin = FChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 

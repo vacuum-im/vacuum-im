@@ -45,15 +45,15 @@ void SessionNegotiation::pluginInfo(IPluginInfo *APluginInfo)
 
 bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin) 
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     connect(plugin->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *))); 
@@ -61,7 +61,7 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*
     connect(plugin->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *))); 
   }
 
-  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin) 
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
@@ -71,7 +71,7 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*
     }
   }
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin) 
   {
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -82,7 +82,7 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*
     }
   }
 
-  plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
+  plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
   if (plugin) 
   {
     FNotifications = qobject_cast<INotifications *>(plugin->instance());

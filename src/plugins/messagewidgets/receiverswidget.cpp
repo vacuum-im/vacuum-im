@@ -91,7 +91,7 @@ void ReceiversWidget::clear()
 
 void ReceiversWidget::initialize()
 {
-  IPlugin *plugin = FMessageWidgets->pluginManager()->getPlugins("IPresencePlugin").value(0,NULL);
+  IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
     IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -99,7 +99,7 @@ void ReceiversWidget::initialize()
       FPresence = presencePlugin->getPresence(FStreamJid);
   }
 
-  plugin = FMessageWidgets->pluginManager()->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = FMessageWidgets->pluginManager()->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -107,7 +107,7 @@ void ReceiversWidget::initialize()
       FRoster = rosterPlugin->getRoster(FStreamJid);
   }
 
-  plugin = FMessageWidgets->pluginManager()->getPlugins("IStatusIcons").value(0,NULL);
+  plugin = FMessageWidgets->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 

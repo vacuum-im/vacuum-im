@@ -44,13 +44,13 @@ void AutoStatus::pluginInfo(IPluginInfo *APluginInfo)
 
 bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IStatusChanger").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
   if (plugin)
   {
     FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

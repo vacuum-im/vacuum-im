@@ -49,21 +49,21 @@ void MainWindow::createLayouts()
 
 void MainWindow::createToolBars()
 {
-  QToolBar *toolbar = addToolBar(tr("Top toolbar"));
+  QToolBar *toolbar = new QToolBar(tr("Top toolbar"), this);
   toolbar->setFloatable(false);
   toolbar->setMovable(false);
   addToolBar(Qt::TopToolBarArea,toolbar);
   FTopToolBarChanger = new ToolBarChanger(toolbar);
   FTopToolBarChanger->setSeparatorsVisible(false);
 
-  toolbar = addToolBar(tr("Left toolbar"));
+  toolbar = new QToolBar(tr("Left toolbar"), this);
   toolbar->setFloatable(false);
   toolbar->setMovable(false);
   addToolBar(Qt::LeftToolBarArea,toolbar);
   FLeftToolBarChanger = new ToolBarChanger(toolbar);
   FLeftToolBarChanger->setSeparatorsVisible(false);
 
-  toolbar = addToolBar(tr("Bottom toolbar"));
+  toolbar =  new QToolBar(tr("Bottom toolbar"), this);
   toolbar->setFloatable(false);
   toolbar->setMovable(false); 
   addToolBar(Qt::BottomToolBarArea,toolbar);

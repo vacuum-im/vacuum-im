@@ -11,6 +11,7 @@
 
 VCardPlugin::VCardPlugin()
 {
+  FPluginManager = NULL;
   FXmppStreams = NULL;
   FRostersView = NULL; 
   FRostersViewPlugin = NULL;
@@ -36,11 +37,13 @@ void VCardPlugin::pluginInfo(IPluginInfo *APluginInfo)
 
 bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  FPluginManager = APluginManager;
+
+  IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -50,15 +53,15 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IMultiUserChatPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
   if (plugin)
   {
     FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
@@ -69,7 +72,7 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     }
   }
 
-  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
@@ -144,14 +147,11 @@ void VCardPlugin::stanzaRequestTimeout(const Jid &AStreamJid, const QString &ASt
 
 QString VCardPlugin::vcardFileName(const Jid &AContactJid) const
 {
-  QString fileName = Jid::encode(AContactJid.pFull())+".xml";
-  QDir dir;
-  if (FSettingsPlugin)
-    dir.setPath(FSettingsPlugin->homeDir().path());
+  QDir dir(FPluginManager->homePath());
   if (!dir.exists(VCARD_DIRNAME))
     dir.mkdir(VCARD_DIRNAME);
-  fileName = dir.path()+"/"VCARD_DIRNAME"/"+fileName;
-  return fileName;
+  dir.cd(VCARD_DIRNAME);
+  return dir.absoluteFilePath(Jid::encode(AContactJid.pFull())+".xml");
 }
 
 bool VCardPlugin::hasVCard(const Jid &AContactJid) const

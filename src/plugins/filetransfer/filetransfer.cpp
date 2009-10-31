@@ -47,31 +47,31 @@ void FileTransfer::pluginInfo(IPluginInfo *APluginInfo)
 
 bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IFileStreamsManager").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IFileStreamsManager").value(0,NULL);
   if (plugin)
   {
     FFileManager = qobject_cast<IFileStreamsManager *>(plugin->instance());
   }
   
-  plugin = APluginManager->getPlugins("IDataStreamsManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
   if (plugin)
   {
     FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("INotifications").value(0,NULL);
+  plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
   if (plugin)
   {
     FNotifications = qobject_cast<INotifications *>(plugin->instance());
@@ -82,7 +82,7 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

@@ -82,6 +82,7 @@ protected slots:
   void onSettingsOpened();
   void onSettingsClosed();
 private:
+  IPluginManager *FPluginManager;
   IDataStreamsManager *FDataManager;
   ISettingsPlugin *FSettingsPlugin;
   ITrayManager *FTrayManager;

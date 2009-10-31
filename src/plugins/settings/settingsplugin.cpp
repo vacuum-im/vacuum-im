@@ -15,10 +15,13 @@
 
 SettingsPlugin::SettingsPlugin()
 {
+  FPluginManager = NULL;
+  FTrayManager = NULL;
+  FMainWindowPlugin = NULL;
+
+  FProfileMenu = NULL;
   FOpenOptionsDialogAction = NULL;
   FOpenProfileDialogAction = NULL;
-  FTrayManager = NULL;
-  FProfileMenu = NULL;
   FProfileOpened = false;
 }
 
@@ -44,13 +47,13 @@ bool SettingsPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
   FPluginManager = APluginManager;
   connect(FPluginManager->instance(),SIGNAL(aboutToQuit()),SLOT(onPluginManagerQuit()));
   
-  IPlugin *plugin = FPluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+  IPlugin *plugin = FPluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
   if (plugin)
   {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
   if (plugin)
   {
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
@@ -92,21 +95,17 @@ bool SettingsPlugin::initObjects()
   insertOptionsHolder(this);
   openOptionsNode(ON_MISC,tr("Misc"),tr("Extra options"),MNI_SETTINGS_OPTIONS,ONO_MISC);
 
-  QStringList args = qApp->arguments();
-  int homeDirIndex = args.indexOf(CLO_HOME_DIR);
-  FHomeDir = homeDirIndex >0 ? QDir(args.value(homeDirIndex+1)) : QDir::home();
-  if (!FHomeDir.exists(DIR_ROOT))
-    FHomeDir.mkdir(DIR_ROOT);
-
-  return FHomeDir.cd(DIR_ROOT);
+  return true;
 }
 
 bool SettingsPlugin::initSettings()
 {
-  if (!FHomeDir.exists(DIR_PROFILES))
-    FHomeDir.mkdir(DIR_PROFILES);
+  FProfileDir.setPath(FPluginManager->homePath());
+  if (!FProfileDir.exists(DIR_PROFILES))
+    FProfileDir.mkdir(DIR_PROFILES);
+  FProfileDir.cd(DIR_PROFILES);
 
-  QFile profilesFile(FHomeDir.filePath(DIR_PROFILES"/profiles.xml"));
+  QFile profilesFile(FProfileDir.filePath("profiles.xml"));
   if (!profilesFile.exists())
   {
     profilesFile.open(QIODevice::WriteOnly|QIODevice::Truncate);
@@ -159,6 +158,21 @@ QWidget *SettingsPlugin::optionsWidget(const QString &ANode, int &AOrder)
 }
 
 //ISettingsPlugin
+bool SettingsPlugin::isProfilesValid() const
+{
+  return !FProfiles.isNull();
+}
+
+bool SettingsPlugin::isProfileOpened() const
+{
+  return FProfileOpened;
+}
+
+QDir SettingsPlugin::profileDir() const
+{
+  return FProfileDir;
+}
+
 bool SettingsPlugin::addProfile(const QString &AProfile)
 {
   if (isProfilesValid())
@@ -166,7 +180,7 @@ bool SettingsPlugin::addProfile(const QString &AProfile)
     if (!profiles().contains(AProfile))
     {
       QByteArray profileDirName = QFile::encodeName(AProfile);
-      QDir profileDir = FHomeDir;
+      QDir profileDir(FPluginManager->homePath());
       profileDir.cd(DIR_PROFILES);
       if (!profileDir.exists(profileDirName))
       {
@@ -189,6 +203,11 @@ bool SettingsPlugin::addProfile(const QString &AProfile)
       qDebug() << "PROFILE NOT CREATED: Profile already exists.";
   }
   return false;
+}
+
+QString SettingsPlugin::profile() const
+{
+  return FProfile.attribute("name");
 }
 
 QStringList SettingsPlugin::profiles() const
@@ -239,8 +258,8 @@ bool SettingsPlugin::setProfile(const QString &AProfile)
     QDomElement profileElem = profileNode(AProfile);
 
     QByteArray profileDirName = QFile::encodeName(profileElem.attribute("dir",AProfile));
-    FProfileDir = FHomeDir;
-    if (FProfileDir.cd(DIR_PROFILES"/"+profileDirName))
+    FProfileDir.setPath(FPluginManager->homePath());
+    if (FProfileDir.cd(DIR_PROFILES "/" + profileDirName))
     {
       QFile settingsFile(FProfileDir.filePath("settings.xml"));
       if (!settingsFile.exists())
@@ -287,7 +306,7 @@ bool SettingsPlugin::renameProfile(const QString &AProfileFrom, const QString &A
 
     profileElem.setAttribute("name",AProfileTo);
 
-    QDir profilesDir = FHomeDir;
+    QDir profilesDir(FPluginManager->homePath());
     profilesDir.cd(DIR_PROFILES);
     if (profilesDir.rename(QFile::encodeName(profileElem.attribute("dir")),QFile::encodeName(AProfileTo)))
       profileElem.setAttribute("dir",AProfileTo);
@@ -315,7 +334,7 @@ bool SettingsPlugin::removeProfile(const QString &AProfile)
     }
     FProfiles.documentElement().removeChild(profileElem);
 
-    QDir profilesDir = FHomeDir;
+    QDir profilesDir(FPluginManager->homePath());
     profilesDir.cd(DIR_PROFILES);
     if (!profilesDir.rmdir(QFile::encodeName(profileElem.attribute("dir"))))
       qDebug() << "CANT REMOVE PROFILE DIRECTORY.";
@@ -332,7 +351,10 @@ bool SettingsPlugin::saveSettings()
   bool saved = false;
   if (isProfilesValid())
   {
-    QFile profilesFile(FHomeDir.filePath(DIR_PROFILES"/profiles.xml"));
+    QDir profilesDir(FPluginManager->homePath());
+    profilesDir.cd(DIR_PROFILES);
+
+    QFile profilesFile(profilesDir.filePath("profiles.xml"));
     if (profilesFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
       profilesFile.write(FProfiles.toByteArray());
@@ -344,11 +366,9 @@ bool SettingsPlugin::saveSettings()
 
     if (isProfileOpened())
     {
-      QDir settingsDir = FHomeDir;
-      settingsDir.cd(DIR_PROFILES);
-      settingsDir.cd(QFile::encodeName(FProfile.attribute("dir")));
+      profilesDir.cd(QFile::encodeName(FProfile.attribute("dir")));
 
-      QFile settingsFile(settingsDir.filePath("settings.xml"));
+      QFile settingsFile(profilesDir.filePath("settings.xml"));
       if (settingsFile.exists() && settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
       {
         settingsFile.write(FSettings.toByteArray());

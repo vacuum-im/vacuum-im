@@ -24,7 +24,7 @@ void ConnectionManager::pluginInfo(IPluginInfo *APluginInfo)
 
 bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  QList<IPlugin *> plugins = APluginManager->getPlugins("IConnectionPlugin");
+  QList<IPlugin *> plugins = APluginManager->pluginInterface("IConnectionPlugin");
   foreach (IPlugin *plugin, plugins)
   {
     IConnectionPlugin *cplugin = qobject_cast<IConnectionPlugin *>(plugin->instance());
@@ -38,7 +38,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
     }
   }
 
-  IPlugin *plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
   if (plugin)
   {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
@@ -49,13 +49,13 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
   {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -66,7 +66,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
     }
   }
   
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

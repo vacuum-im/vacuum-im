@@ -10,6 +10,7 @@
 
 FileStreamsManager::FileStreamsManager()
 {
+  FPluginManager = NULL;
   FDataManager = NULL;
   FSettingsPlugin = NULL;
   FTrayManager = NULL;
@@ -36,25 +37,27 @@ void FileStreamsManager::pluginInfo(IPluginInfo *APluginInfo)
 
 bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IDataStreamsManager").value(0,NULL);
+  FPluginManager = APluginManager;
+
+  IPlugin *plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
   if (plugin)
   {
     FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
   if (plugin)
   {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
   if (plugin)
   {
      FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
@@ -327,7 +330,7 @@ void FileStreamsManager::onShowFileStreamsWindow(bool)
 void FileStreamsManager::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(FILESTREAMSMANAGER_UUID);
-  FDefaultDirectory = settings->value(SVN_DEFAULT_DIRECTORY, FSettingsPlugin->homeDir().path()+"/"+tr("Downloads")).toString();
+  FDefaultDirectory = settings->value(SVN_DEFAULT_DIRECTORY, FPluginManager->homePath()+"/"+tr("Downloads")).toString();
   FSeparateDirectories = settings->value(SVN_SEPARATE_DIRECTORIES, false).toBool();
   QString allMethods = FDataManager!=NULL ? QStringList(FDataManager->methods()).join("||") : QString::null;
   FMethods = settings->value(SVN_ACCEPTABLE_STREAM_METHODS,allMethods).toString().split("||",QString::SkipEmptyParts);

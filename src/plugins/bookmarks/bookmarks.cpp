@@ -38,7 +38,7 @@ void BookMarks::pluginInfo(IPluginInfo *APluginInfo)
 
 bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -49,7 +49,7 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     }
   }
 
-  plugin = APluginManager->getPlugins("IPrivateStorage").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPrivateStorage").value(0,NULL);
   if (plugin)
   {
     FStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
@@ -66,11 +66,11 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     }
   }
 
-  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
   if (plugin)
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IMultiUserChatPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
   if (plugin)
   {
     FMultiChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
@@ -81,11 +81,11 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     }
   }
 
-  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
   if (plugin)
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
   if (plugin)
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 

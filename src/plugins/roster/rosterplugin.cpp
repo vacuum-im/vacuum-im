@@ -2,6 +2,7 @@
 
 RosterPlugin::RosterPlugin()
 {
+  FPluginManager = NULL;
   FStanzaProcessor = NULL;
   FSettingsPlugin = NULL;
 }
@@ -24,7 +25,9 @@ void RosterPlugin::pluginInfo(IPluginInfo *APluginInfo)
 
 bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  FPluginManager = APluginManager;
+
+  IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -35,11 +38,11 @@ bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin) 
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
   
@@ -70,14 +73,12 @@ IRoster *RosterPlugin::getRoster(const Jid &AStreamJid) const
 
 QString RosterPlugin::rosterFileName(const Jid &AStreamJid) const
 {
-  QString fileName = Jid::encode(AStreamJid.bare()).toLower()+".xml";
-  QDir dir;
-  if (FSettingsPlugin)
-    dir.setPath(FSettingsPlugin->homeDir().path());
+  QDir dir(FPluginManager->homePath());
   if (!dir.exists("rosters"))
     dir.mkdir("rosters");
-  fileName = dir.path()+"/rosters/"+fileName;
-  return fileName;
+  dir.cd("rosters");
+
+  return dir.absoluteFilePath(Jid::encode(AStreamJid.bare()).toLower()+".xml");
 }
 
 void RosterPlugin::removeRoster(IXmppStream *AXmppStream)

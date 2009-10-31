@@ -74,7 +74,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 {
   FPluginManager = APluginManager;
 
-  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -87,7 +87,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
     }
   }
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -100,7 +100,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
     }
   }
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -111,35 +111,35 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
     }
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
   if (plugin)
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("ITrayManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
   if (plugin)
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
   if (plugin)
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
@@ -943,13 +943,13 @@ QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AFo
   QString hashString = ACaps.hash.isEmpty() ? ACaps.node+ACaps.ver : ACaps.ver+ACaps.hash;
   hashString += AForJid ? ACaps.entityJid.pBare() : "";
   QString fileName = QCryptographicHash::hash(hashString.toUtf8(),QCryptographicHash::Md5).toHex().toLower() + ".xml";
-  QDir dir(qApp->applicationDirPath());
-  if (FSettingsPlugin)
-    dir.setPath(FSettingsPlugin->homeDir().path());
+
+  QDir dir(FPluginManager->homePath());
   if (!dir.exists(CAPS_DIRNAME))
     dir.mkdir(CAPS_DIRNAME);
-  fileName = dir.path()+"/"CAPS_DIRNAME"/"+fileName;
-  return fileName;
+  dir.cd(CAPS_DIRNAME);
+
+  return dir.absoluteFilePath(fileName);
 }
 
 IDiscoInfo ServiceDiscovery::loadEntityCaps(const EntityCapabilities &ACaps) const

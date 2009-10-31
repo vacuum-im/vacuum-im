@@ -260,7 +260,7 @@ void ViewHistoryWindow::initialize()
 {
   IPluginManager *manager = FArchiver->pluginManager();
   
-  IPlugin *plugin = manager->getPlugins("IRosterPlugin").value(0);
+  IPlugin *plugin = manager->pluginInterface("IRosterPlugin").value(0);
   if (plugin)
   {
     FRoster = qobject_cast<IRosterPlugin *>(plugin->instance())->getRoster(FStreamJid);
@@ -268,7 +268,7 @@ void ViewHistoryWindow::initialize()
       connect(FRoster->xmppStream()->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
   }
 
-  plugin = manager->getPlugins("IMessageWidgets").value(0);
+  plugin = manager->pluginInterface("IMessageWidgets").value(0);
   if (plugin)
   {
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
@@ -283,11 +283,11 @@ void ViewHistoryWindow::initialize()
     }
   }
 
-  plugin = manager->getPlugins("IMessageStyles").value(0,NULL);
+  plugin = manager->pluginInterface("IMessageStyles").value(0,NULL);
   if (plugin)
     FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
 
-  plugin = manager->getPlugins("ISettingsPlugin").value(0);
+  plugin = manager->pluginInterface("ISettingsPlugin").value(0);
   if (plugin)
   {
     FSettings = qobject_cast<ISettingsPlugin *>(plugin->instance())->settingsForPlugin(MESSAGEARCHIVER_UUID);
@@ -298,7 +298,7 @@ void ViewHistoryWindow::initialize()
     }
   }
 
-  plugin = manager->getPlugins("IStatusIcons").value(0);
+  plugin = manager->pluginInterface("IStatusIcons").value(0);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 }

@@ -25,7 +25,7 @@ bool ConsolePlugin::initConnections(IPluginManager *APluginManager, int &/*AInit
 {
   FPluginManager = APluginManager;
 
-  IPlugin *plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
   if (plugin)
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 

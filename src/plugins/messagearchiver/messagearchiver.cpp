@@ -73,7 +73,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 {
   FPluginManager = APluginManager;
 
-  IPlugin *plugin = APluginManager->getPlugins("IXmppStreams").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -86,15 +86,15 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     }
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IPrivateStorage").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPrivateStorage").value(0,NULL);
   if (plugin)
   {
     FPrivateStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
@@ -109,7 +109,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     }
   }
 
-  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
   if (plugin)
   {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
@@ -119,11 +119,11 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     }
   }
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
@@ -133,11 +133,11 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     }
   }
 
-  plugin = APluginManager->getPlugins("IDataForms").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IMessageWidgets").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
   if (plugin)
   {
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
@@ -147,7 +147,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     }
   }
 
-  plugin = APluginManager->getPlugins("ISessionNegotiation").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISessionNegotiation").value(0,NULL);
   if (plugin)
   {
     FSessionNegotiation = qobject_cast<ISessionNegotiation *>(plugin->instance());
@@ -160,7 +160,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     }
   }
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 
@@ -1588,12 +1588,9 @@ QString MessageArchiver::collectionFileName(const DateTime &AStart) const
 
 QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const
 {
-  QDir dir;
   bool noError = true;
 
-  if (FSettingsPlugin)
-    dir.setPath(FSettingsPlugin->homeDir().path());
-
+  QDir dir(FPluginManager->homePath());
   if (!dir.exists(ARCHIVE_DIR_NAME))
     noError &= dir.mkdir(ARCHIVE_DIR_NAME);
   noError &= dir.cd(ARCHIVE_DIR_NAME);

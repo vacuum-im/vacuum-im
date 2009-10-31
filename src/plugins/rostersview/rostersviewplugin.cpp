@@ -59,19 +59,19 @@ void RostersViewPlugin::pluginInfo(IPluginInfo *APluginInfo)
 
 bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IRostersModel").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
   if (plugin)
   {
     FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IMainWindowPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
   if (plugin)
   {
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -82,7 +82,7 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
     }
   }
 
-  plugin = APluginManager->getPlugins("IAccountManager").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
   if (plugin)
   {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
@@ -94,7 +94,7 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
     }
   }
 
-  plugin = APluginManager->getPlugins("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());

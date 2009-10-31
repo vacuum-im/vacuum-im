@@ -47,7 +47,7 @@ void Gateways::pluginInfo(IPluginInfo *APluginInfo)
 
 bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->getPlugins("IServiceDiscovery").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
@@ -58,11 +58,11 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     }
   }
 
-  plugin = APluginManager->getPlugins("IStanzaProcessor").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -76,7 +76,7 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     }
   }
 
-  plugin = APluginManager->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -90,15 +90,15 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     }
   }
 
-  plugin = APluginManager->getPlugins("IRosterChanger").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRosterChanger").value(0,NULL);
   if (plugin)
     FRosterChanger = qobject_cast<IRosterChanger *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRostersViewPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IVCardPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
   if (plugin)
   {
     FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
@@ -109,7 +109,7 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     }
   }
 
-  plugin = APluginManager->getPlugins("IPrivateStorage").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IPrivateStorage").value(0,NULL);
   if (plugin)
   {
     FPrivateStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
@@ -121,11 +121,11 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     }
   }
 
-  plugin = APluginManager->getPlugins("IStatusIcons").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 
-  plugin = APluginManager->getPlugins("IRegistration").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IRegistration").value(0,NULL);
   if (plugin)
   {
     FRegistration = qobject_cast<IRegistration *>(plugin->instance());

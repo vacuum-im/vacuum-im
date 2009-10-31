@@ -164,7 +164,7 @@ void InfoWidget::setFieldVisible(IInfoWidget::InfoField AField, bool AVisible)
 
 void InfoWidget::initialize()
 {
-  IPlugin *plugin = FMessageWidgets->pluginManager()->getPlugins("IAccountManager").value(0,NULL);
+  IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IAccountManager").value(0,NULL);
   if (plugin)
   {
     IAccountManager *accountManager = qobject_cast<IAccountManager *>(plugin->instance());
@@ -185,7 +185,7 @@ void InfoWidget::initialize()
     }
   }
 
-  plugin = FMessageWidgets->pluginManager()->getPlugins("IRosterPlugin").value(0,NULL);
+  plugin = FMessageWidgets->pluginManager()->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
@@ -206,7 +206,7 @@ void InfoWidget::initialize()
     }
   }
 
-  plugin = FMessageWidgets->pluginManager()->getPlugins("IPresencePlugin").value(0,NULL);
+  plugin = FMessageWidgets->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
   {
     IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
@@ -227,7 +227,7 @@ void InfoWidget::initialize()
     }
   }
 
-  plugin = FMessageWidgets->pluginManager()->getPlugins("IAvatars").value(0,NULL);
+  plugin = FMessageWidgets->pluginManager()->pluginInterface("IAvatars").value(0,NULL);
   if (plugin)
   {
     FAvatars = qobject_cast<IAvatars *>(plugin->instance());
