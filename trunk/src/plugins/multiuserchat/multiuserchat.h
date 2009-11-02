@@ -39,6 +39,7 @@ public:
   virtual bool autoPresence() const { return FAutoPresence; }
   virtual void setAutoPresence(bool AAuto);
   virtual QList<int> statusCodes() const { return FStatusCodes; }
+  virtual bool isUserPresent(const Jid &AContactJid) const;
   virtual IMultiUser *mainUser() const { return FMainUser; }
   virtual IMultiUser *userByNick(const QString &ANick) const;
   virtual QList<IMultiUser *> allUsers() const;
@@ -117,17 +118,17 @@ protected slots:
   void onStreamClosed();
   void onStreamJidChanged(const Jid &ABefour);
 private:
-  IMessageProcessor *FMessageProcessor;
   IPresence *FPresence;
   IDataForms *FDataForms;
   IXmppStream *FXmppStream;
   IStanzaProcessor *FStanzaProcessor;
   IMultiUserChatPlugin *FChatPlugin;
+  IMessageProcessor *FMessageProcessor;
 private:
   QString FConfigRequestId;
   QString FConfigSubmitId;
-  QHash<QString /*Id*/,QString /*Affil*/> FAffilListRequests;
-  QHash<QString /*Id*/,QString /*Affil*/> FAffilListSubmits;
+  QMap<QString, QString> FAffilListRequests;
+  QMap<QString, QString> FAffilListSubmits;
 private:
   int FSHIPresence;
   int FSHIMessage;
@@ -142,7 +143,7 @@ private:
   QString FPassword;
   MultiUser *FMainUser;
   QList<int> FStatusCodes;
-  QHash<QString, MultiUser *> FUsers;
+  QMap<QString, MultiUser *> FUsers;
 };
 
 #endif // MULTIUSERCHAT_H

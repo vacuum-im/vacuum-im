@@ -13,15 +13,15 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
   FDataForms = NULL;
   FXmppStream = NULL;
   FStanzaProcessor = NULL;
-  FMainUser = NULL;
   FMessageProcessor = NULL;
+  FChatPlugin = AChatPlugin;
 
+  FMainUser = NULL;
   FChangingState = false;
   FAutoPresence = false;
   FSHIPresence = -1;
   FSHIMessage = -1;
 
-  FChatPlugin = AChatPlugin;
   FRoomJid = ARoomJid;
   FStreamJid = AStreamJid;
   FNickName = ANickName;
@@ -194,6 +194,18 @@ void MultiUserChat::setAutoPresence(bool AAuto)
     if (FPresence && FAutoPresence)
       setPresence(FPresence->show(),FPresence->status());
   }
+}
+
+bool MultiUserChat::isUserPresent(const Jid &AContactJid) const
+{
+  if (FUsers.contains(AContactJid.resource()) && AContactJid.pBare()==FRoomJid.pBare())
+    return true;
+
+  foreach (MultiUser *user, FUsers)
+    if (AContactJid == user->data(MUDR_REAL_JID).toString())
+      return true;
+
+  return false;
 }
 
 IMultiUser *MultiUserChat::userByNick(const QString &ANick) const

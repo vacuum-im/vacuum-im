@@ -1,7 +1,6 @@
 #ifndef JOINMULTICHATDIALOG_H
 #define JOINMULTICHATDIALOG_H
 
-#include <QDialog>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <interfaces/imultiuserchat.h>
@@ -31,9 +30,10 @@ protected slots:
 private:
   Ui::JoinMultiChatDialogClass ui;
 private:
+  IXmppStreams *FXmppStreams;
   IMultiUserChatPlugin *FChatPlugin;
 private:
-  IXmppStreams *FXmppStreams;
+  Jid FStreamJid;
 };
 
 #endif // JOINMULTICHATDIALOG_H

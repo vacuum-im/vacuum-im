@@ -1,7 +1,6 @@
 #ifndef MULTIUSERCHATPLUGIN_H
 #define MULTIUSERCHATPLUGIN_H
 
-#include <QHash>
 #include <QMessageBox>
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
@@ -69,7 +68,7 @@ public:
   virtual bool checkMessage(const Message &AMessage);
   virtual void receiveMessage(int AMessageId);
   virtual void showMessage(int AMessageId);
-  virtual bool openWindow(const Jid &/*AStreamJid*/, const Jid &/*AContactJid*/, Message::MessageType /*AType*/) { return false; }
+  virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
   //IMultiUserChatPlugin
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
@@ -123,12 +122,12 @@ private:
   Menu *FChatMenu;
   Action *FJoinAction;
 private:
+  QList<int> FActiveInvites;
   QList<IMultiUserChat *> FChats;
   QList<IMultiUserChatWindow *> FChatWindows;
-  QHash<IMultiUserChatWindow *, Action *> FChatActions;
-  QList<int> FActiveInvites;
-  QHash<QMessageBox *,InviteFields> FInviteDialogs;
-  QHash<QString, QPair<Jid,Jid> > FNickRequests;
+  QMap<IMultiUserChatWindow *, Action *> FChatActions;
+  QMap<QMessageBox *,InviteFields> FInviteDialogs;
+  QMap<QString, QPair<Jid,Jid> > FNickRequests;
 };
 
 #endif // MULTIUSERCHATPLUGIN_H

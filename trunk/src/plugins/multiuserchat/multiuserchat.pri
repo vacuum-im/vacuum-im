@@ -1,6 +1,7 @@
 FORMS = joinmultichatdialog.ui \
         multiuserchatwindow.ui \
-        edituserslistdialog.ui
+        edituserslistdialog.ui \
+        inputtextdialog.ui
         
 HEADERS = multiuser.h \
           multiuserchat.h \
@@ -8,7 +9,8 @@ HEADERS = multiuser.h \
           joinmultichatdialog.h \
           multiuserchatwindow.h \
           edituserslistdialog.h \
-          usercontextmenu.h
+          usercontextmenu.h \
+          inputtextdialog.h
 
 SOURCES = multiuser.cpp \
           multiuserchat.cpp \
@@ -16,5 +18,6 @@ SOURCES = multiuser.cpp \
           joinmultichatdialog.cpp \
           multiuserchatwindow.cpp \
           edituserslistdialog.cpp \
-          usercontextmenu.cpp
+          usercontextmenu.cpp \
+          inputtextdialog.cpp
 

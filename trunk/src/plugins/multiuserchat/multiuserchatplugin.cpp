@@ -341,6 +341,12 @@ void MultiUserChatPlugin::showMessage(int AMessageId)
   FMessageProcessor->removeMessage(AMessageId);
 }
 
+bool MultiUserChatPlugin::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
+{
+  Q_UNUSED(AStreamJid); Q_UNUSED(AContactJid); Q_UNUSED(AType);
+  return false;
+}
+
 INotification MultiUserChatPlugin::notification(INotifications *ANotifications, const Message &AMessage)
 {
   INotification notify;
@@ -382,8 +388,7 @@ bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoo
   return false;
 }
 
-IMultiUserChat *MultiUserChatPlugin::getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, 
-                                                      const QString &ANick, const QString &APassword)
+IMultiUserChat *MultiUserChatPlugin::getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword)
 {
   IMultiUserChat *chat = multiUserChat(AStreamJid,ARoomJid);
   if (!chat)
@@ -404,8 +409,7 @@ IMultiUserChat *MultiUserChatPlugin::multiUserChat(const Jid &AStreamJid, const 
   return NULL;
 }
 
-IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, 
-                                                              const QString &ANick, const QString &APassword)
+IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword)
 {
   IMultiUserChatWindow *chatWindow = multiChatWindow(AStreamJid,ARoomJid);
   if (!chatWindow && FMessageWidgets)
@@ -543,9 +547,10 @@ Menu *MultiUserChatPlugin::createInviteMenu(const Jid &AContactJid, QWidget *APa
   Menu *inviteMenu = new Menu(AParent);
   inviteMenu->setTitle(tr("Invite to"));
   inviteMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
-  foreach(IMultiUserChatWindow *window,FChatWindows)
+  foreach(IMultiUserChatWindow *window, FChatWindows)
   {
-    if (window->multiUserChat()->isOpen())
+    IMultiUserChat *mchat = window->multiUserChat();
+    if (mchat->isOpen() && mchat->mainUser()->role()!=MUC_ROLE_VISITOR && !mchat->isUserPresent(AContactJid))
     {
       Action *action = new Action(inviteMenu);
       action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFERENCE);
@@ -576,7 +581,18 @@ void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
 {
   IMultiUserChatWindow *chatWindow = qobject_cast<IMultiUserChatWindow *>(sender());
   if (chatWindow)
+  {
+    if (FDiscovery && FDiscovery->hasDiscoInfo(AUser->contactJid()))
+    {
+      IDiscoInfo info = FDiscovery->discoInfo(AUser->contactJid());
+      foreach(QString feature, info.features)
+      {
+        foreach(Action *action, FDiscovery->createFeatureActions(chatWindow->streamJid(),feature,info,AMenu))
+          AMenu->addAction(action, AG_MUCM_DISCOVERY_FEATURES, true);
+      }
+    }
     emit multiUserContextMenu(chatWindow,AUser,AMenu);
+  }
 }
 
 void MultiUserChatPlugin::onMultiUserChatDestroyed()
@@ -584,7 +600,7 @@ void MultiUserChatPlugin::onMultiUserChatDestroyed()
   IMultiUserChat *chat = qobject_cast<IMultiUserChat *>(sender());
   if (FChats.contains(chat))
   {
-    FChats.removeAt(FChats.indexOf(chat));
+    FChats.removeAll(chat);
     emit multiUserChatDestroyed(chat);
   }
 }
@@ -595,7 +611,7 @@ void MultiUserChatPlugin::onMultiChatWindowDestroyed()
   if (chatWindow)
   {
     removeChatAction(chatWindow);
-    FChatWindows.removeAt(FChatWindows.indexOf(chatWindow));
+    FChatWindows.removeAll(chatWindow);
     emit multiChatWindowCreated(chatWindow);
   }
 }

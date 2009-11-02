@@ -96,6 +96,7 @@ public:
   virtual bool autoPresence() const =0;
   virtual void setAutoPresence(bool AAuto) =0;
   virtual QList<int> statusCodes() const =0;
+  virtual bool isUserPresent(const Jid &AContactJid) const =0;
   virtual IMultiUser *mainUser() const =0;
   virtual IMultiUser *userByNick(const QString &ANick) const =0;
   virtual QList<IMultiUser *> allUsers() const =0;

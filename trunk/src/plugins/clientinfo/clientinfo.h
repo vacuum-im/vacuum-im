@@ -10,7 +10,6 @@
 #include <definations/rosterindextyperole.h>
 #include <definations/rosterdataholderorders.h>
 #include <definations/rosterlabelorders.h>
-#include <definations/multiuserdataroles.h>
 #include <definations/rostertooltiporders.h>
 #include <definations/discofeaturehandlerorders.h>
 #include <definations/resources.h>
@@ -22,7 +21,6 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
-#include <interfaces/imultiuserchat.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imainwindow.h>
 #include <utils/errorhandler.h>
@@ -134,7 +132,6 @@ protected slots:
   void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
-  void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
   void onClientInfoActionTriggered(bool);
   void onClientInfoDialogClosed(const Jid &AContactJid);
   void onRosterRemoved(IRoster *ARoster);
@@ -149,7 +146,6 @@ private:
   IStanzaProcessor *FStanzaProcessor;
   IRostersViewPlugin *FRostersViewPlugin;
   IRostersModel *FRostersModel;
-  IMultiUserChatPlugin *FMultiUserChatPlugin;
   IServiceDiscovery *FDiscovery;
   IDataForms *FDataForms;
   IMainWindowPlugin *FMainWindowPlugin;
