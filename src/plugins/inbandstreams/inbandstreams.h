@@ -6,6 +6,7 @@
 #include <interfaces/iinbandstreams.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/istanzaprocessor.h>
+#include <interfaces/iservicediscovery.h>
 #include <interfaces/isettings.h>
 #include "inbandstream.h"
 #include "inbandoptions.h"
@@ -58,6 +59,7 @@ private:
   IStanzaProcessor *FStanzaProcessor;
   ISettings *FSettings;
   ISettingsPlugin *FSettingsPlugin;
+  IServiceDiscovery *FDiscovery;
 private:
   int FBlockSize;
   int FMaxBlockSize;

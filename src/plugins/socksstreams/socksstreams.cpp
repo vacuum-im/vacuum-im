@@ -108,6 +108,15 @@ bool SocksStreams::initObjects()
   {
     FDataManager->insertMethod(this);
   }
+  if (FDiscovery)
+  {
+    IDiscoFeature feature;
+    feature.var = NS_SOCKS5_BYTESTREAMS;
+    feature.active = true;
+    feature.name = tr("SOCKS5 Bytestreams");
+    feature.description = tr("Enables any two entities to establish an SOCKS5 out-of-band bytestream");
+    FDiscovery->insertDiscoFeature(feature);
+  }
   return true;
 }
 
