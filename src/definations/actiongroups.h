@@ -57,7 +57,8 @@
 #define AG_MUCM_ROSTERCHANGER                                   500
 #define AG_MUCM_CLIENTINFO                                      500
 #define AG_MUCM_VCARD                                           500
-#define AG_MULTIUSERCHAT_ROOM_UTILS                             800
+#define AG_MUCM_DISCOVERY_FEATURES                              600
+#define AG_MUCM_MULTIUSERCHAT_UTILS                             800
 
 //MultiuserChat - MultiUserRoomMenu
 #define AG_MURM_MULTIUSERCHAT                                   500

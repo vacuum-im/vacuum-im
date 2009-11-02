@@ -11,6 +11,7 @@
 
 //Presence In
 #define SHO_PI_AVATARS                400
-#define SHO_PI_MULTIUSERCHAT          500
+#define SHO_PI_SERVICEDISCOVERY       800
+#define SHO_PI_MULTIUSERCHAT          900
 
 #endif

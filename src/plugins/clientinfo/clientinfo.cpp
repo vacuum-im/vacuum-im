@@ -36,7 +36,6 @@ ClientInfo::ClientInfo()
   FStanzaProcessor = NULL;
   FRostersViewPlugin = NULL;
   FRostersModel = NULL;
-  FMultiUserChatPlugin = NULL;
   FDiscovery = NULL;
   FDataForms = NULL;
   FMainWindowPlugin = NULL;
@@ -102,17 +101,6 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
       connect(this,SIGNAL(softwareInfoChanged(const Jid &)),SLOT(onSoftwareInfoChanged(const Jid &)));
       connect(this,SIGNAL(lastActivityChanged(const Jid &)),SLOT(onLastActivityChanged(const Jid &)));
       connect(this,SIGNAL(entityTimeChanged(const Jid &)),SLOT(onEntityTimeChanged(const Jid &)));
-    }
-  }
-
-  plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
-  if (plugin)
-  {
-    FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
-    if (FMultiUserChatPlugin)
-    {
-      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)),
-        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)));
     }
   }
 
@@ -874,18 +862,6 @@ void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMult
     if (hasEntityTime(contactJid))
       AToolTips.insert(RTTO_ENTITY_TIME,tr("Entity time: %1").arg(entityTime(contactJid).time().toString()));
   }
-}
-
-void ClientInfo::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMultiUser *AUser, Menu *AMenu)
-{
-  Jid streamJid = AUser->data(MUDR_STREAM_JID).toString();
-  Jid contactJid = AUser->data(AUser->data(MUDR_REAL_JID).toString().isEmpty() ? MUDR_CONTACT_JID : MUDR_REAL_JID).toString();
-
-  Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_VERSION,AMenu);
-  AMenu->addAction(action,AG_MUCM_CLIENTINFO,true);
-
-  action = createInfoAction(streamJid,contactJid,NS_XMPP_TIME,AMenu);
-  AMenu->addAction(action,AG_MUCM_CLIENTINFO,true);
 }
 
 void ClientInfo::onClientInfoActionTriggered(bool)

@@ -18,6 +18,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/serviceicons.h>
+#include <definations/stanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ixmppstreams.h>
@@ -153,7 +154,7 @@ protected:
   bool hasEntityCaps(const EntityCapabilities &ACaps) const;
   QString capsFileName(const EntityCapabilities &ACaps, bool AForJid) const;
   IDiscoInfo loadEntityCaps(const EntityCapabilities &ACaps) const;
-  bool saveEntityCaps(IDiscoInfo &AInfo) const;
+  bool saveEntityCaps(const IDiscoInfo &AInfo) const;
   QString calcCapsHash(const IDiscoInfo &AInfo, const QString &AHash) const;
   bool compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const;
   bool compareFeatures(const QStringList &AFeatures, const QStringList &AWith) const;

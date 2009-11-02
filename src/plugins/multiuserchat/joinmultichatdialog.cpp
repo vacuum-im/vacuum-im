@@ -11,25 +11,32 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
   IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_JOIN,0,0,"windowIcon");
 
   FXmppStreams = NULL;
-
   FChatPlugin = AChatPlugin;
+  initialize();
+
+  if (FXmppStreams)
+  {
+    foreach(IXmppStream *xmppStream, FXmppStreams->xmppStreams())
+      if (FXmppStreams->isActive(xmppStream))
+        onStreamAdded(xmppStream);
+    ui.cmbStreamJid->model()->sort(0,Qt::AscendingOrder);
+    ui.cmbStreamJid->setCurrentIndex(AStreamJid.isValid() ? ui.cmbStreamJid->findData(AStreamJid.pFull()) : 0);
+    connect(ui.cmbStreamJid,SIGNAL(currentIndexChanged(int)),SLOT(onStreamIndexChanged(int)));
+  }
+  onStreamIndexChanged(ui.cmbStreamJid->currentIndex());
+
+  ui.lneHost->setText(ARoomJid.domain().isEmpty() ? QString("conference.%1").arg(FStreamJid.domain()) : ARoomJid.domain());
+  ui.lneRoom->setText(ARoomJid.node());
+  ui.lnePassword->setText(APassword);
+  ui.lneNick->setText(ANick.isEmpty() ? FStreamJid.node() : ANick);
+
+  if (ANick.isEmpty())
+    onResolveNickClicked();
+
   connect(FChatPlugin->instance(),SIGNAL(roomNickReceived(const Jid &, const Jid &, const QString &)),
     SLOT(onRoomNickReceived(const Jid &, const Jid &, const QString &)));
   connect(ui.tlbResolveNick,SIGNAL(clicked()),SLOT(onResolveNickClicked()));
   connect(ui.btbButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
-
-  initialize();
-  ui.cmbStreamJid->setCurrentIndex(AStreamJid.isValid() ? ui.cmbStreamJid->findText(AStreamJid.full(),Qt::MatchFixedString) : 0);
-
-  Jid streamJid = ui.cmbStreamJid->currentText();
-  ui.lneHost->setText(ARoomJid.domain().isEmpty() ? QString("conference.%1").arg(streamJid.domain()) : ARoomJid.domain());
-  ui.lneRoom->setText(ARoomJid.node());
-  ui.lnePassword->setText(APassword);
-  ui.lneNick->setText(ANick.isEmpty() ? streamJid.node() : ANick);
-
-  updateResolveNickState();
-  if (ANick.isEmpty())
-    onResolveNickClicked();
 }
 
 JoinMultiChatDialog::~JoinMultiChatDialog()
@@ -45,12 +52,6 @@ void JoinMultiChatDialog::initialize()
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
     if (FXmppStreams)
     {
-      QList<IXmppStream *> xmppStreams = FXmppStreams->xmppStreams();
-      foreach(IXmppStream *xmppStream, xmppStreams)
-        if (FXmppStreams->isActive(xmppStream))
-          ui.cmbStreamJid->addItem(xmppStream->streamJid().full());
-      ui.cmbStreamJid->model()->sort(0,Qt::AscendingOrder);
-      connect(ui.cmbStreamJid,SIGNAL(currentIndexChanged(int)),SLOT(onStreamIndexChanged(int)));
       connect(FXmppStreams->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
       connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamStateChanged(IXmppStream *)));
       connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamStateChanged(IXmppStream *)));
@@ -62,7 +63,7 @@ void JoinMultiChatDialog::initialize()
 
 void JoinMultiChatDialog::updateResolveNickState()
 {
-  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(ui.cmbStreamJid->currentText()) : NULL;
+  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(FStreamJid) : NULL;
   ui.tlbResolveNick->setEnabled(stream!=NULL && stream->isOpen());
 }
 
@@ -72,12 +73,11 @@ void JoinMultiChatDialog::onDialogAccepted()
   QString room = ui.lneRoom->text();
   QString nick = ui.lneNick->text();
   QString password = ui.lnePassword->text();
-  Jid streamJid = ui.cmbStreamJid->currentText();
-  Jid roomJid(room,host,"");
 
-  if (streamJid.isValid() && roomJid.isValid() && !host.isEmpty() && !room.isEmpty() && !nick.isEmpty())
+  Jid roomJid(room,host,"");
+  if (FStreamJid.isValid() && roomJid.isValid() && !host.isEmpty() && !room.isEmpty() && !nick.isEmpty())
   {
-    IMultiUserChatWindow *chatWindow = FChatPlugin->getMultiChatWindow(streamJid,roomJid,nick,password);
+    IMultiUserChatWindow *chatWindow = FChatPlugin->getMultiChatWindow(FStreamJid,roomJid,nick,password);
     if (chatWindow)
     {
       chatWindow->multiUserChat()->setAutoPresence(true);
@@ -91,18 +91,19 @@ void JoinMultiChatDialog::onDialogAccepted()
   }
 }
 
-void JoinMultiChatDialog::onStreamIndexChanged(int /*AIndex*/)
+void JoinMultiChatDialog::onStreamIndexChanged(int AIndex)
 {
+  FStreamJid = ui.cmbStreamJid->itemText(AIndex);
   updateResolveNickState();
 }
 
 void JoinMultiChatDialog::onResolveNickClicked()
 {
   Jid roomJid(ui.lneRoom->text(),ui.lneHost->text(),"");
-  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(ui.cmbStreamJid->currentText()) : NULL;
+  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(FStreamJid) : NULL;
   if (stream!=NULL && stream->isOpen() && roomJid.isValid())
   {
-    if (FChatPlugin->requestRoomNick(stream->streamJid(),roomJid))
+    if (FChatPlugin->requestRoomNick(FStreamJid,roomJid))
     {
       ui.lneNick->clear();
       ui.tlbResolveNick->setEnabled(false);
@@ -113,32 +114,32 @@ void JoinMultiChatDialog::onResolveNickClicked()
 void JoinMultiChatDialog::onRoomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick)
 {
   Jid roomJid(ui.lneRoom->text(),ui.lneHost->text(),"");
-  Jid streamJid = ui.cmbStreamJid->currentText();
-  if (AStreamJid == streamJid && ARoomJid == roomJid)
+  if (AStreamJid == FStreamJid && ARoomJid == roomJid)
   {
     if (ui.lneNick->text().isEmpty())
-      ui.lneNick->setText(ANick.isEmpty() ? streamJid.node() : ANick);
+      ui.lneNick->setText(ANick.isEmpty() ? FStreamJid.node() : ANick);
     updateResolveNickState();
   }
 }
 
 void JoinMultiChatDialog::onStreamAdded(IXmppStream *AXmppStream)
 {
-  ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
+  ui.cmbStreamJid->addItem(AXmppStream->streamJid().full(), AXmppStream->streamJid().pFull());
 }
 
-void JoinMultiChatDialog::onStreamStateChanged(IXmppStream * /*AXmppStream*/)
+void JoinMultiChatDialog::onStreamStateChanged(IXmppStream * AXmppStream)
 {
-  updateResolveNickState();
+  if (AXmppStream->streamJid() == FStreamJid)
+    updateResolveNickState();
 }
 
 void JoinMultiChatDialog::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
-  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(ABefour.full()));
-  ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
+  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(ABefour.pFull()));
+  onStreamAdded(AXmppStream);
 }
 
 void JoinMultiChatDialog::onStreamRemoved(IXmppStream *AXmppStream)
 {
-  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->streamJid().full()));
+  ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(AXmppStream->streamJid().pFull()));
 }

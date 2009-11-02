@@ -307,8 +307,8 @@ void ServiceDiscovery::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stan
   {
     QPair<Jid,QString> jidnode = FInfoRequestsId.take(AStanza.id());
     IDiscoInfo dinfo = parseDiscoInfo(AStanza,jidnode);
-    saveEntityCaps(dinfo);
     FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
+    saveEntityCaps(dinfo);
     emit discoInfoReceived(dinfo);
   }
   else if (FItemsRequestsId.contains(AStanza.id()))
@@ -940,15 +940,19 @@ bool ServiceDiscovery::hasEntityCaps(const EntityCapabilities &ACaps) const
 
 QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AForJid) const
 {
+  static bool entered = false;
+  static QDir dir(FPluginManager->homePath());
+  if (!entered)
+  {
+    entered = true;
+    if (!dir.exists(CAPS_DIRNAME))
+      dir.mkdir(CAPS_DIRNAME);
+    dir.cd(CAPS_DIRNAME);
+  }
+
   QString hashString = ACaps.hash.isEmpty() ? ACaps.node+ACaps.ver : ACaps.ver+ACaps.hash;
-  hashString += AForJid ? ACaps.entityJid.pBare() : "";
+  hashString += AForJid ? ACaps.entityJid.pFull() : "";
   QString fileName = QCryptographicHash::hash(hashString.toUtf8(),QCryptographicHash::Md5).toHex().toLower() + ".xml";
-
-  QDir dir(FPluginManager->homePath());
-  if (!dir.exists(CAPS_DIRNAME))
-    dir.mkdir(CAPS_DIRNAME);
-  dir.cd(CAPS_DIRNAME);
-
   return dir.absoluteFilePath(fileName);
 }
 
@@ -983,7 +987,7 @@ IDiscoInfo ServiceDiscovery::loadEntityCaps(const EntityCapabilities &ACaps) con
   return dinfo;
 }
 
-bool ServiceDiscovery::saveEntityCaps(IDiscoInfo &AInfo) const
+bool ServiceDiscovery::saveEntityCaps(const IDiscoInfo &AInfo) const
 {
   if (AInfo.error.code==-1 && FEntityCaps.contains(AInfo.contactJid))
   {
@@ -1000,7 +1004,7 @@ bool ServiceDiscovery::saveEntityCaps(IDiscoInfo &AInfo) const
         capsElem.setAttribute("ver",caps.ver);
         capsElem.setAttribute("hash",caps.hash);
         if (!checked)
-          capsElem.setAttribute("jid",caps.entityJid.pBare());
+          capsElem.setAttribute("jid",caps.entityJid.pFull());
         discoInfoToElem(AInfo,capsElem);
         QFile capsFile(capsFileName(caps,!checked));
         if (capsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -1009,7 +1013,6 @@ bool ServiceDiscovery::saveEntityCaps(IDiscoInfo &AInfo) const
           capsFile.close();
         }
       }
-      AInfo.node = "";
       return true;
     }
   }
@@ -1072,7 +1075,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
     QByteArray hashData = hashList.join("<").toUtf8();
     return QCryptographicHash::hash(hashData, AHash==CAPS_HASH_SHA1 ? QCryptographicHash::Sha1 : QCryptographicHash::Md5).toBase64();
   }
-  return QString();
+  return QString::null;
 }
 
 bool ServiceDiscovery::compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const
@@ -1198,10 +1201,12 @@ void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
 
     shandle.conditions.clear();
     shandle.conditions.append(SHC_PRESENCE);
-    FSHIPresenceIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
-
     shandle.direction = IStanzaHandle::DirectionOut;
     FSHIPresenceOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
+
+    shandle.order = SHO_PI_SERVICEDISCOVERY;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    FSHIPresenceIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
 }
 

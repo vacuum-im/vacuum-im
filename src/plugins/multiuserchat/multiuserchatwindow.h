@@ -27,6 +27,7 @@
 #include <interfaces/ipresence.h>
 #include "edituserslistdialog.h"
 #include "usercontextmenu.h"
+#include "inputtextdialog.h"
 #include "ui_multiuserchatwindow.h"
 
 #define GROUP_NOTIFICATOR_ID      "GroupChatMessages"
@@ -158,7 +159,6 @@ protected slots:
   void onNickMenuActionTriggered(bool);
   void onMenuBarActionTriggered(bool);
   void onRoomUtilsActionTriggered(bool);
-  void onInviteActionTriggered(bool);
   void onDataFormMessageDialogAccepted();
   void onAffiliationListDialogAccepted();
   void onConfigFormDialogAccepted();
@@ -201,9 +201,8 @@ private:
     Action *FOwnersList;
     Action *FDestroyRoom;
   Menu *FRoomUtilsMenu;
-    Menu *FInviteMenu;
-      Action *FSetRoleNode;
-      Action *FSetAffilOutcast;
+    Action *FSetRoleNode;
+    Action *FSetAffilOutcast;
     Menu *FChangeRole;
       Action *FSetRoleVisitor;
       Action *FSetRoleParticipant;
