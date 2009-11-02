@@ -27,6 +27,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
+#include <interfaces/imultiuserchat.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
 #include <interfaces/istatusicons.h>
@@ -36,7 +37,7 @@
 #include "discoinfowindow.h"
 #include "discoitemswindow.h"
 
-struct QueuedRequest {
+struct QueuedInfoRequest {
   Jid streamJid;
   Jid contactJid;
   QString node;
@@ -149,8 +150,8 @@ protected:
   IDiscoInfo parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   IDiscoItems parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
   void registerFeatures();
-  void appendQueuedRequest(const QDateTime &ATimeStart, const QueuedRequest &ARequest);
-  void removeQueuedRequest(const QueuedRequest &ARequest);
+  void appendQueuedRequest(const QDateTime &ATimeStart, const QueuedInfoRequest &ARequest);
+  void removeQueuedRequest(const QueuedInfoRequest &ARequest);
   bool hasEntityCaps(const EntityCapabilities &ACaps) const;
   QString capsFileName(const EntityCapabilities &ACaps, bool AForJid) const;
   IDiscoInfo loadEntityCaps(const EntityCapabilities &ACaps) const;
@@ -161,6 +162,8 @@ protected:
 protected slots:
   void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
   void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
+  void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
+  void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
   void onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
@@ -175,7 +178,7 @@ protected slots:
   void onDiscoInfoWindowDestroyed(QObject *AObject);
   void onDiscoItemsWindowDestroyed(IDiscoItemsWindow *AWindow);
   void onQueueTimerTimeout();
-  void onCapsTimerTimeout();
+  void onSelfCapsChanged();
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -185,32 +188,33 @@ private:
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
   IRostersModel *FRostersModel;
+  IMultiUserChatPlugin *FMultiUserChatPlugin;
   ITrayManager *FTrayManager;
   IMainWindowPlugin *FMainWindowPlugin;
   IStatusIcons *FStatusIcons;
   ISettingsPlugin *FSettingsPlugin;
   IDataForms *FDataForms;
 private:
-  Menu *FDiscoMenu;
   QTimer FQueueTimer;
-  QMultiMap<QDateTime,QueuedRequest> FQueuedRequests;
-  QList<IDiscoHandler *> FDiscoHandlers;
-  QHash<QString, QMultiMap<int, IDiscoFeatureHandler *> > FFeatureHandlers;
-  QHash<Jid ,int> FSHIInfo;
-  QHash<Jid ,int> FSHIItems;
-  QHash<QString, QPair<Jid,QString> > FInfoRequestsId;
-  QHash<QString, QPair<Jid,QString> > FItemsRequestsId;
-  QHash<Jid,QHash<QString,IDiscoInfo> > FDiscoInfo;
-  QHash<Jid,QHash<QString,IDiscoItems> > FDiscoItems;
-  QHash<QString,IDiscoFeature> FDiscoFeatures;
-  QHash<Jid, DiscoInfoWindow *> FDiscoInfoWindows;
-  QList<DiscoItemsWindow *> FDiscoItemsWindows;
+  QMap<Jid ,int> FSHIInfo;
+  QMap<Jid ,int> FSHIItems;
+  QMap<Jid, int> FSHIPresenceIn;
+  QMap<Jid, int> FSHIPresenceOut;
+  QMap<QString, QPair<Jid,QString> > FInfoRequestsId;
+  QMap<QString, QPair<Jid,QString> > FItemsRequestsId;
+  QMultiMap<QDateTime, QueuedInfoRequest> FQueuedRequests;
 private:
-  QTimer FCapsTimer;
-  QHash<Jid ,int> FSHIPresenceIn;
-  QHash<Jid ,int> FSHIPresenceOut;
-  QHash<Jid, EntityCapabilities> FMyCaps;
-  QHash<Jid, EntityCapabilities> FEntityCaps;
+  QMap<Jid, EntityCapabilities> FSelfCaps;
+  QMap<Jid, EntityCapabilities> FEntityCaps;
+  QHash<Jid, QMap<QString, IDiscoInfo> > FDiscoInfo;
+  QHash<Jid, QMap<QString, IDiscoItems> > FDiscoItems;
+private:
+  Menu *FDiscoMenu;
+  QList<IDiscoHandler *> FDiscoHandlers;
+  QMap<QString, IDiscoFeature> FDiscoFeatures;
+  QList<DiscoItemsWindow *> FDiscoItemsWindows;
+  QMap<Jid, DiscoInfoWindow *> FDiscoInfoWindows;
+  QMap<QString, QMultiMap<int, IDiscoFeatureHandler *> > FFeatureHandlers;
 };
 
 #endif // SERVICEDISCOVERY_H
