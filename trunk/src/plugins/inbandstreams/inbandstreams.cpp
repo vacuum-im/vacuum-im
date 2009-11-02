@@ -10,6 +10,7 @@ InBandStreams::InBandStreams()
   FStanzaProcessor = NULL;
   FSettings = NULL;
   FSettingsPlugin = NULL;
+  FDiscovery = NULL;
 
   FMaxBlockSize = DEFAULT_MAX_BLOCK_SIZE;
   FBlockSize = DEFAULT_BLOCK_SIZE;
@@ -56,7 +57,13 @@ bool InBandStreams::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  return true;
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
+  if (plugin)
+  {
+    FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+  }
+
+  return FStanzaProcessor!=NULL;
 }
 
 bool InBandStreams::initObjects()
@@ -64,6 +71,15 @@ bool InBandStreams::initObjects()
   if (FDataManager)
   {
     FDataManager->insertMethod(this);
+  }
+  if (FDiscovery)
+  {
+    IDiscoFeature feature;
+    feature.var = NS_INBAND_BYTESTREAMS;
+    feature.active = true;
+    feature.name = tr("In-Band Bytestreams");
+    feature.description = tr("Enables any two entities to establish a one-to-one in-band bytestream");
+    FDiscovery->insertDiscoFeature(feature);
   }
   return true;
 }

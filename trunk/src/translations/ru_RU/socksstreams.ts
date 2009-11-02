@@ -138,7 +138,7 @@
     </message>
     <message>
         <source>Enables any two entities to establish an SOCKS5 out-of-band bytestream</source>
-        <translation>Позволяет любым двум пользователям устанавливить отдельное SOCKS5 соединение</translation>
+        <translation>Позволяет любым двум сущностям устанавливить отдельный SOCKS5 поток данных</translation>
     </message>
     <message>
         <source>SOCKS5 Bytestream</source>

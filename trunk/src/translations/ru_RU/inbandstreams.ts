@@ -58,7 +58,7 @@
     <name>InBandStreams</name>
     <message>
         <source>Enables any two entities to establish a one-to-one in-band bytestream</source>
-        <translation>Позволяет двум сущностям устанавливать внутриканальный поток данных типа точка-точка</translation>
+        <translation>Позволяет любым двум сущностям устанавливать внутриканальный поток данных типа точка-точка</translation>
     </message>
     <message>
         <source>In-Band Bytestreams</source>
