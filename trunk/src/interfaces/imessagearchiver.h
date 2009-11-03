@@ -183,7 +183,7 @@ public:
   virtual bool isAutoArchiving(const Jid &AStreamJid) const =0;
   virtual bool isManualArchiving(const Jid &AStreamJid) const =0;
   virtual bool isLocalArchiving(const Jid &AStreamJid) const =0;
-  virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid) const =0;
+  virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, int AMessageType) const =0;
   virtual QString methodName(const QString &AMethod) const =0;
   virtual QString otrModeName(const QString &AOTRMode) const =0;
   virtual QString saveModeName(const QString &ASaveMode) const =0;

@@ -5,6 +5,7 @@
 #include <definations/namespaces.h>
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
+#include <definations/menubargroups.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -23,6 +24,7 @@
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/irostersview.h>
+#include <interfaces/imultiuserchat.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/isessionnegotiation.h>
@@ -84,7 +86,7 @@ public:
   virtual bool isAutoArchiving(const Jid &AStreamJid) const;
   virtual bool isManualArchiving(const Jid &AStreamJid) const;
   virtual bool isLocalArchiving(const Jid &AStreamJid) const;
-  virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid) const;
+  virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, int AMessageType) const;
   virtual QString methodName(const QString &AMethod) const;
   virtual QString otrModeName(const QString &AOTRMode) const;
   virtual QString saveModeName(const QString &ASaveMode) const;
@@ -187,6 +189,8 @@ protected slots:
   void onPrivateDataError(const QString &AId, const QString &AError);
   void onCollectionWriterDestroyed(const Jid &AStreamJid,  CollectionWriter *AWriter);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
+  void onMultiChatWindowMenuAboutToShow();
   void onSetMethodAction(bool);
   void onSetItemPrefsAction(bool);
   void onShowArchiveWindowAction(bool);
@@ -200,6 +204,7 @@ protected slots:
   void onStanzaSessionActivated(const IStanzaSession &ASession);
   void onStanzaSessionTerminated(const IStanzaSession &ASession);
   void onChatWindowCreated(IChatWindow *AWindow);
+  void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -213,6 +218,7 @@ private:
   IMessageWidgets *FMessageWidgets;
   ISessionNegotiation *FSessionNegotiation;
   IRosterPlugin *FRosterPlugin;
+  IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
   QMap<Jid,int> FSHIPrefs;
   QMap<Jid,int> FSHIMessageIn;
