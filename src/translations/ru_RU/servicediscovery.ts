@@ -4,12 +4,12 @@
 <context>
     <name>DiscoInfoWindow</name>
     <message>
-        <source>%1 - Discovery Info</source>
-        <translation>%1 -Информация</translation>
-    </message>
-    <message>
         <source>Error %1: %2</source>
         <translation>Ошибка %1: %2</translation>
+    </message>
+    <message>
+        <source>Discovery Info - %1</source>
+        <translation>Информация - %1</translation>
     </message>
 </context>
 <context>
