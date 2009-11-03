@@ -15,6 +15,7 @@ StatusIcons::StatusIcons()
   FRosterPlugin = NULL;
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
+  FMultiUserChatPlugin = NULL;
   FSettingsPlugin = NULL;
 
   FDefaultStorage = NULL;
@@ -77,6 +78,17 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+    }
+  }
+
+  plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
+    if (FMultiUserChatPlugin)
+    {
+      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
+        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
     }
   }
 
@@ -368,6 +380,19 @@ void StatusIcons::startStatusIconsChanged()
   }
 }
 
+void StatusIcons::updateCustomIconMenu(const QString &APattern)
+{
+  QString substorage = ruleSubStorage(APattern,IStatusIcons::UserRule);
+  FDefaultIconAction->setData(ADR_RULE,APattern);
+  FDefaultIconAction->setIcon(iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false));
+  FDefaultIconAction->setChecked(FDefaultStorage!=NULL && FDefaultStorage->subStorage()==substorage);
+  foreach(Action *action, FCustomIconActions)
+  {
+    action->setData(ADR_RULE, APattern);
+    action->setChecked(action->data(ADR_SUBSTORAGE).toString() == substorage);
+  }
+}
+
 void StatusIcons::onStatusIconsChangedTimer()
 {
   emit statusIconsChanged();
@@ -378,19 +403,19 @@ void StatusIcons::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
   {
-    QString rule = AIndex->data(RDR_BARE_JID).toString();
-    QString substorage = ruleSubStorage(rule,IStatusIcons::UserRule);
-    FDefaultIconAction->setIcon(iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false));
-    FDefaultIconAction->setData(ADR_RULE,rule);
-    FDefaultIconAction->setChecked(FDefaultStorage!=NULL && FDefaultStorage->subStorage()==substorage);
-    foreach(Action *action,FCustomIconActions)
-    {
-      action->setData(ADR_RULE,AIndex->data(RDR_BARE_JID));
-      action->setChecked(action->data(ADR_SUBSTORAGE).toString() == substorage);
-    }
+    updateCustomIconMenu(QRegExp::escape(AIndex->data(RDR_BARE_JID).toString()));
     FCustomIconMenu->setIcon(iconByJidStatus(AIndex->data(RDR_JID).toString(),IPresence::Online,SUBSCRIPTION_BOTH,false));
     AMenu->addAction(FCustomIconMenu->menuAction(),AG_RVCM_STATUSICONS,true);
   }
+}
+
+void StatusIcons::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
+{
+  Q_UNUSED(AWindow);
+  QString rule = QString(".*@%1/%2").arg(QRegExp::escape(AUser->contactJid().domain())).arg(QRegExp::escape(AUser->nickName()));
+  updateCustomIconMenu(rule);
+  FCustomIconMenu->setIcon(iconByJidStatus(AUser->contactJid(),IPresence::Online,SUBSCRIPTION_BOTH,false));
+  AMenu->addAction(FCustomIconMenu->menuAction(),AG_MUCM_STATUSICONS,true);
 }
 
 void StatusIcons::onSettingsOpened()

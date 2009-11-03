@@ -57,6 +57,7 @@
 #define AG_MUCM_ROSTERCHANGER                                   500
 #define AG_MUCM_CLIENTINFO                                      500
 #define AG_MUCM_VCARD                                           500
+#define AG_MUCM_STATUSICONS                                     500
 #define AG_MUCM_DISCOVERY_FEATURES                              600
 #define AG_MUCM_MULTIUSERCHAT_UTILS                             800
 

@@ -16,6 +16,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
+#include <interfaces/imultiuserchat.h>
 #include <interfaces/isettings.h>
 #include "rosterindexdataholder.h"
 #include "iconsoptionswidget.h"
@@ -67,9 +68,11 @@ protected:
   void loadStorages();
   void clearStorages();
   void startStatusIconsChanged();
+  void updateCustomIconMenu(const QString &APattern);
 protected slots:
   void onStatusIconsChangedTimer();
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
   void onSettingsOpened();
   void onSettingsClosed();
   void onDefaultStorageChanged();
@@ -79,6 +82,7 @@ private:
   IPresencePlugin *FPresencePlugin;
   IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
+  IMultiUserChatPlugin *FMultiUserChatPlugin;
   ISettingsPlugin *FSettingsPlugin;
 private:
   Menu *FCustomIconMenu;
@@ -90,9 +94,9 @@ private:
   bool FStatusIconsChangedStarted;
   QString FDefaultSubStorage;
   QSet<QString> FStatusRules;
-  QHash<QString, QString> FUserRules;
-  QHash<QString, QString> FDefaultRules;
-  QHash<QString, IconStorage *> FStorages;
+  QMap<QString, QString> FUserRules;
+  QMap<QString, QString> FDefaultRules;
+  QMap<QString, IconStorage *> FStorages;
   mutable QHash<Jid, QString> FJid2Storage;
 };
 
