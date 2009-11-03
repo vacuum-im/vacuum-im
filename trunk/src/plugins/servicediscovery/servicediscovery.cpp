@@ -113,6 +113,8 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
     FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
     if (FMultiUserChatPlugin)
     {
+      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
+        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
       connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),SLOT(onMultiUserChatCreated(IMultiUserChat *)));
     }
   }
@@ -1106,6 +1108,30 @@ bool ServiceDiscovery::compareFeatures(const QStringList &AFeatures, const QStri
   return true;
 }
 
+Action *ServiceDiscovery::createDiscoInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QObject *AParent) const
+{
+  Action *action = new Action(AParent);
+  action->setText(tr("Discovery Info"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOINFO);
+  action->setData(ADR_STREAMJID,AStreamJid.full());
+  action->setData(ADR_CONTACTJID,AContactJid.full());
+  action->setData(ADR_NODE,ANode);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoInfoByAction(bool)));
+  return action;
+}
+
+Action *ServiceDiscovery::createDiscoItemsAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QObject *AParent) const
+{
+  Action *action = new Action(AParent);
+  action->setText(tr("Service Discovery"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
+  action->setData(ADR_STREAMJID,AStreamJid.full());
+  action->setData(ADR_CONTACTJID,AContactJid.full());
+  action->setData(ADR_NODE,ANode);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoItemsByAction(bool)));
+  return action;
+}
+
 void ServiceDiscovery::onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline)
 {
   if (AStateOnline)
@@ -1295,24 +1321,12 @@ void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMen
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
     if (presence && presence->isOpen())
     {
-      Action *action = new Action(AMenu);
-      action->setText(tr("Discovery Info"));
-      action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOINFO);
-      action->setData(ADR_STREAMJID,streamJid.full());
-      action->setData(ADR_CONTACTJID,contactJid.full());
-      action->setData(ADR_NODE,QString(""));
-      connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoInfoByAction(bool)));
+      Action *action = createDiscoInfoAction(streamJid, contactJid, QString::null, AMenu);
       AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
 
       if (itype == RIT_STREAM_ROOT || itype == RIT_AGENT)
       {
-        action = new Action(AMenu);
-        action->setText(tr("Service Discovery"));
-        action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
-        action->setData(ADR_STREAMJID,streamJid.full());
-        action->setData(ADR_CONTACTJID,contactJid.full());
-        action->setData(ADR_NODE,QString(""));
-        connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoItemsByAction(bool)));
+        action = createDiscoItemsAction(streamJid, contactJid, QString::null, AMenu);
         AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
       }
     }
@@ -1339,6 +1353,12 @@ void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId,
           AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Categoty: %1; Type: %2").arg(identity.category).arg(identity.type));
     }
   }
+}
+
+void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
+{
+  Action *action = createDiscoInfoAction(AWindow->streamJid(), AUser->contactJid(), QString::null, AMenu);
+  AMenu->addAction(action, AG_MUCM_DISCOVERY, true);
 }
 
 void ServiceDiscovery::onShowDiscoInfoByAction(bool)

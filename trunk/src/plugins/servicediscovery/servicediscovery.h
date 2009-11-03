@@ -159,6 +159,8 @@ protected:
   QString calcCapsHash(const IDiscoInfo &AInfo, const QString &AHash) const;
   bool compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const;
   bool compareFeatures(const QStringList &AFeatures, const QStringList &AWith) const;
+  Action *createDiscoInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QObject *AParent) const;
+  Action *createDiscoItemsAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QObject *AParent) const;
 protected slots:
   void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
   void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
@@ -171,6 +173,7 @@ protected slots:
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+  void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
   void onShowDiscoInfoByAction(bool);
   void onShowDiscoItemsByAction(bool);
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
