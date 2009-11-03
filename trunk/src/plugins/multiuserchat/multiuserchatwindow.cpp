@@ -1199,8 +1199,8 @@ void MultiUserChatWindow::updateChatWindow(IChatWindow *AWindow)
   if (FActiveChatMessages.contains(AWindow))
     icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE);
   else if (FStatusIcons)
-    icon = FStatusIcons->iconByStatus(AWindow->infoWidget()->field(IInfoWidget::ContactShow).toInt(),"both",false);
-
+    icon = FStatusIcons->iconByJidStatus(AWindow->contactJid(),AWindow->infoWidget()->field(IInfoWidget::ContactShow).toInt(),"",false);
+    
   QString contactName = AWindow->infoWidget()->field(IInfoWidget::ContactName).toString();
   QString tabTitle = QString("[%1]").arg(contactName);
   AWindow->updateWindow(icon,tabTitle,tr("%1 - Private chat").arg(tabTitle));
@@ -1775,10 +1775,10 @@ void MultiUserChatWindow::onListItemActivated(QListWidgetItem *AItem)
 
 void MultiUserChatWindow::onStatusIconsChanged()
 {
-  foreach(IChatWindow *window,FChatWindows)
-    updateChatWindow(window);
-  foreach(IMultiUser *user, FUsers.keys())
-    updateListItem(user->contactJid());
+  foreach(IChatWindow *window, FChatWindows) {
+    updateChatWindow(window); }
+  foreach(IMultiUser *user, FUsers.keys()) {
+    updateListItem(user->contactJid()); }
   updateWindow();
 }
 

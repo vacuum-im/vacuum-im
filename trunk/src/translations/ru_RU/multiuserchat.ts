@@ -515,10 +515,6 @@ Check values and try again</source>
         <translation>Сообщение в конференции</translation>
     </message>
     <message>
-        <source>%1 from %2</source>
-        <translation>%1 от %2</translation>
-    </message>
-    <message>
         <source>Private message from: [%1]</source>
         <translation>Личное сообщение от: [%1]</translation>
     </message>
@@ -597,10 +593,6 @@ Check values and try again</source>
     <message>
         <source>Room Utilities</source>
         <translation>Утилиты комнаты</translation>
-    </message>
-    <message>
-        <source>Invite to</source>
-        <translation>Пригласить в</translation>
     </message>
     <message>
         <source>Kick user</source>
