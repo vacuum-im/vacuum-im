@@ -3,6 +3,7 @@ CONFIG        += plugin
 QT            += network xml
 LIBS          += -L../../libs
 LIBS          += -lutils
+DEPENDPATH    += ../..
 INCLUDEPATH   += ../..
 win32:{
   DLLDESTDIR   = ../../../plugins

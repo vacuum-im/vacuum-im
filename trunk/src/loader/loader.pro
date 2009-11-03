@@ -3,7 +3,8 @@ TEMPLATE     = app
 QT          += xml
 LIBS        += -L../libs
 LIBS        += -lutils
-INCLUDEPATH  = ..
+DEPENDPATH  += ..
+INCLUDEPATH += ..
 DESTDIR      = ../..
 include(loader.pri)
 
