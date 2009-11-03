@@ -52,6 +52,7 @@ MessageArchiver::MessageArchiver()
   FMessageWidgets = NULL;
   FSessionNegotiation = NULL;
   FRosterPlugin = NULL;
+  FMultiUserChatPlugin = NULL;
 }
 
 MessageArchiver::~MessageArchiver()
@@ -163,6 +164,19 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
   plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+
+  plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
+    if (FMultiUserChatPlugin)
+    {
+      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
+        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
+      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiChatWindowCreated(IMultiUserChatWindow *)),
+        SLOT(onMultiChatWindowCreated(IMultiUserChatWindow *)));
+    }
+  }
 
   return FStanzaProcessor!=NULL;
 }
@@ -730,11 +744,11 @@ bool MessageArchiver::isLocalArchiving(const Jid &AStreamJid) const
   return false;
 }
 
-bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid) const
+bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, int AMessageType) const
 {
   if (isReady(AStreamJid) && AItemJid.isValid())
   {
-    IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid,AItemJid);
+    IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid, AMessageType!=Message::GroupChat ? AItemJid : AItemJid.bare());
     return itemPrefs.save!=ARCHIVE_SAVE_FALSE;
   }
   return false;
@@ -1946,7 +1960,7 @@ bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, b
 bool MessageArchiver::processMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
 {
   Jid contactJid = ADirectionIn ? AMessage.from() : AMessage.to();
-  if (isArchivingAllowed(AStreamJid,contactJid) && (isLocalArchiving(AStreamJid) || isManualArchiving(AStreamJid)))
+  if (isArchivingAllowed(AStreamJid,contactJid,AMessage.type()) && (isLocalArchiving(AStreamJid) || isManualArchiving(AStreamJid)))
     if (prepareMessage(AStreamJid,AMessage,ADirectionIn))
       return saveMessage(AStreamJid,contactJid,AMessage);
   return false;
@@ -2606,8 +2620,34 @@ void MessageArchiver::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu
     Jid contactJid = AIndex->data(RDR_JID).toString();
     Menu *menu = createContextMenu(streamJid,AIndex->type()==RIT_STREAM_ROOT ? contactJid : contactJid.bare(),AMenu);
     if (menu)
+      AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
+  }
+}
+
+void MessageArchiver::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
+{
+  Menu *menu = createContextMenu(AWindow->streamJid(),AUser->contactJid(),AMenu);
+  if (menu)
+    AMenu->addAction(menu->menuAction(),AG_MUCM_ARCHIVER,true);
+}
+
+void MessageArchiver::onMultiChatWindowMenuAboutToShow()
+{
+  Menu *roomMenu = qobject_cast<Menu *>(sender());
+  if (roomMenu)
+  {
+    QObject *object = roomMenu->parent();
+    IMultiUserChatWindow *mchatWindow = NULL;
+    while (object!=NULL && mchatWindow==NULL)
     {
-      AMenu->addAction(menu->menuAction(),AG_DEFAULT,true);
+      mchatWindow = qobject_cast<IMultiUserChatWindow *>(object);
+      object = object->parent();
+    }
+    if (mchatWindow)
+    {
+      Menu *menu = createContextMenu(mchatWindow->streamJid(),mchatWindow->roomJid(),roomMenu);
+      roomMenu->addAction(menu->menuAction(),AG_MURM_ARCHIVER, true);
+      connect(roomMenu,SIGNAL(aboutToHide()),menu,SLOT(deleteLater()));
     }
   }
 }
@@ -2766,6 +2806,19 @@ void MessageArchiver::onChatWindowCreated(IChatWindow *AWindow)
   QToolButton *button = AWindow->toolBarWidget()->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWCW_ARCHIVE,true);
   button->setPopupMode(QToolButton::InstantPopup);
   button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+}
+
+void MessageArchiver::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
+{
+  Menu *roomMenu = AWindow->menuBarWidget()->menuBarChanger()->groupMenus(MBG_MUCW_ROOM).value(0,NULL);
+  if (roomMenu)
+  {
+    //Menu *menu = new Menu(roomMenu);
+    //menu->setTitle(tr("History"));
+    //menu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
+    //roomMenu->addAction(menu->menuAction(),AG_MURM_ARCHIVER,true);
+    connect(roomMenu,SIGNAL(aboutToShow()),SLOT(onMultiChatWindowMenuAboutToShow()));
+  }
 }
 
 Q_EXPORT_PLUGIN2(MessageArchiverPlugin, MessageArchiver)

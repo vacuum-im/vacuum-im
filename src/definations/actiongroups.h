@@ -28,6 +28,7 @@
 #define AG_RVCM_PRIVACYLISTS                                    500
 #define AG_RVCM_AVATARS                                         500
 #define AG_RVCM_ANNOTATIONS                                     500
+#define AG_RVCM_ARCHIVER                                        500
 #define AG_RVCM_ROSTERCHANGER_SUBSCRIPTION                      700
 #define AG_RVCM_ROSTERCHANGER                                   700
 
@@ -58,12 +59,14 @@
 #define AG_MUCM_CLIENTINFO                                      500
 #define AG_MUCM_VCARD                                           500
 #define AG_MUCM_STATUSICONS                                     500
+#define AG_MUCM_ARCHIVER                                        500
 #define AG_MUCM_DISCOVERY_FEATURES                              600
 #define AG_MUCM_MULTIUSERCHAT_UTILS                             800
 
 //MultiuserChat - MultiUserRoomMenu
 #define AG_MURM_MULTIUSERCHAT                                   500
 #define AG_MURM_BOOKMARKS                                       700
+#define AG_MURM_ARCHIVER                                        700
 #define AG_MURM_MULTIUSERCHAT_EXIT                              1000
 
 //MultiUserChat - MultiUserToolsMenu
