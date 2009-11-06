@@ -73,8 +73,9 @@ bool Emoticons::initObjects()
   return true;
 }
 
-void Emoticons::writeMessage(Message &/*AMessage*/, QTextDocument *ADocument, const QString &/*ALang*/, int AOrder)
+void Emoticons::writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
 {
+  Q_UNUSED(AMessage); Q_UNUSED(ALang);
   static QChar imageChar = QChar::ObjectReplacementCharacter;
   if (AOrder == MWO_EMOTICONS)
   {
@@ -91,8 +92,9 @@ void Emoticons::writeMessage(Message &/*AMessage*/, QTextDocument *ADocument, co
   }
 }
 
-void Emoticons::writeText(Message &/*AMessage*/, QTextDocument *ADocument, const QString &/*ALang*/, int AOrder)
+void Emoticons::writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
 {
+  Q_UNUSED(AMessage); Q_UNUSED(ALang);
   if (AOrder == MWO_EMOTICONS)
   {
     QRegExp regexp("\\S+");
@@ -121,34 +123,37 @@ QWidget *Emoticons::optionsWidget(const QString &ANode, int &AOrder)
 
 void Emoticons::setIconsets(const QStringList &ASubStorages)
 {
-  QSet<QString> removeList = FStoragesOrder.toSet() - ASubStorages.toSet();
-  foreach (QString substorage, removeList)
+  QList<QString> oldStorages = FStorageOrder;
+
+  foreach (QString substorage, ASubStorages)
+  {
+    if (!FStorageOrder.contains(substorage))
+    {
+      FStorageOrder.append(substorage);
+      FStorages.insert(substorage,new IconStorage(RSR_STORAGE_EMOTICONS,substorage,this));
+      insertSelectIconMenu(substorage);
+      emit iconsetInserted(substorage,QString::null);
+    }
+    oldStorages.removeAll(substorage);
+  }
+
+  foreach (QString substorage, oldStorages)
   {
     removeSelectIconMenu(substorage);
-    FStoragesOrder.removeAt(FStoragesOrder.indexOf(substorage));
+    FStorageOrder.removeAll(substorage);
     delete FStorages.take(substorage);
     emit iconsetRemoved(substorage);
   }
 
-  foreach (QString substorage, ASubStorages)
-  {
-    if (!FStoragesOrder.contains(substorage))
-    {
-      FStoragesOrder.append(substorage);
-      FStorages.insert(substorage,new IconStorage(RSR_STORAGE_EMOTICONS,substorage,this));
-      insertSelectIconMenu(substorage);
-      emit iconsetInserted(substorage,"");
-    }
-  }
-  FStoragesOrder = ASubStorages;
+  FStorageOrder = ASubStorages;
   createIconsetUrls();
 }
 
 void Emoticons::insertIconset(const QString &ASubStorage, const QString &ABefour)
 {
-  if (!FStoragesOrder.contains(ASubStorage))
+  if (!FStorageOrder.contains(ASubStorage))
   {
-    ABefour.isEmpty() ? FStoragesOrder.append(ASubStorage) : FStoragesOrder.insert(FStoragesOrder.indexOf(ABefour),ASubStorage);
+    ABefour.isEmpty() ? FStorageOrder.append(ASubStorage) : FStorageOrder.insert(FStorageOrder.indexOf(ABefour),ASubStorage);
     FStorages.insert(ASubStorage,new IconStorage(RSR_STORAGE_EMOTICONS,ASubStorage,this));
     insertSelectIconMenu(ASubStorage);
     createIconsetUrls();
@@ -158,10 +163,10 @@ void Emoticons::insertIconset(const QString &ASubStorage, const QString &ABefour
 
 void Emoticons::removeIconset(const QString &ASubStorage)
 {
-  if (FStoragesOrder.contains(ASubStorage))
+  if (FStorageOrder.contains(ASubStorage))
   {
     removeSelectIconMenu(ASubStorage);
-    FStoragesOrder.removeAt(FStoragesOrder.indexOf(ASubStorage));
+    FStorageOrder.removeAll(ASubStorage);
     delete FStorages.take(ASubStorage);
     createIconsetUrls();
     emit iconsetRemoved(ASubStorage);
@@ -181,7 +186,7 @@ QString Emoticons::keyByUrl(const QUrl &AUrl) const
 void Emoticons::createIconsetUrls()
 {
   FUrlByKey.clear();
-  foreach(QString substorage, FStoragesOrder)
+  foreach(QString substorage, FStorageOrder)
   {
     IconStorage *storage = FStorages.value(substorage);
     foreach(QString key, storage->fileKeys())
@@ -202,11 +207,11 @@ SelectIconMenu *Emoticons::createSelectIconMenu(const QString &ASubStorage, QWid
   return menu;
 }
 
-void Emoticons::insertSelectIconMenu(const QString &AIconsetFile)
+void Emoticons::insertSelectIconMenu(const QString &ASubStorage)
 {
   foreach(IToolBarWidget *widget, FToolBarsWidgets)
   {
-    SelectIconMenu *menu = createSelectIconMenu(AIconsetFile,widget->instance());
+    SelectIconMenu *menu = createSelectIconMenu(ASubStorage,widget->instance());
     FToolBarWidgetByMenu.insert(menu,widget);
     QToolButton *button = widget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWCW_EMOTICONS,false);
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -214,14 +219,14 @@ void Emoticons::insertSelectIconMenu(const QString &AIconsetFile)
   }
 }
 
-void Emoticons::removeSelectIconMenu(const QString &AIconsetFile)
+void Emoticons::removeSelectIconMenu(const QString &ASubStorage)
 {
   QMap<SelectIconMenu *,IToolBarWidget *>::iterator it = FToolBarWidgetByMenu.begin();
   while (it != FToolBarWidgetByMenu.end())
   {
     SelectIconMenu *menu = it.key();
     IToolBarWidget *widget = it.value();
-    if (menu->iconset() == AIconsetFile)
+    if (menu->iconset() == ASubStorage)
     {
       widget->toolBarChanger()->removeAction(menu->menuAction());
       it = FToolBarWidgetByMenu.erase(it);
@@ -237,9 +242,9 @@ void Emoticons::onToolBarWidgetCreated(IToolBarWidget *AWidget)
   if (AWidget->editWidget() != NULL)
   {
     FToolBarsWidgets.append(AWidget);
-    foreach(QString iconsetFile, FStoragesOrder)
+    foreach(QString substorage, FStorageOrder)
     {
-      SelectIconMenu *menu = createSelectIconMenu(iconsetFile,AWidget->instance());
+      SelectIconMenu *menu = createSelectIconMenu(substorage,AWidget->instance());
       FToolBarWidgetByMenu.insert(menu,AWidget);
       QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWCW_EMOTICONS);
       button->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -251,11 +256,19 @@ void Emoticons::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 
 void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
 {
-  FToolBarsWidgets.removeAt(FToolBarsWidgets.indexOf((IToolBarWidget *)AObject));
+  QList<IToolBarWidget *>::iterator it = FToolBarsWidgets.begin();
+  while (it != FToolBarsWidgets.end())
+  {
+    if (qobject_cast<QObject *>((*it)->instance()) == AObject)
+      it = FToolBarsWidgets.erase(it);
+    else
+      it++;
+  }
 }
 
-void Emoticons::onIconSelected(const QString &/*ASubStorage*/, const QString &AIconKey)
+void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconKey)
 {
+  Q_UNUSED(ASubStorage);
   SelectIconMenu *menu = qobject_cast<SelectIconMenu *>(sender());
   if (FToolBarWidgetByMenu.contains(menu))
   {
@@ -271,7 +284,9 @@ void Emoticons::onIconSelected(const QString &/*ASubStorage*/, const QString &AI
 
 void Emoticons::onSelectIconMenuDestroyed(QObject *AObject)
 {
-  FToolBarWidgetByMenu.remove((SelectIconMenu *)AObject);
+  foreach(SelectIconMenu *menu, FToolBarWidgetByMenu.keys())
+    if (qobject_cast<QObject *>(menu) == AObject)
+      FToolBarWidgetByMenu.remove(menu);
 }
 
 void Emoticons::onSettingsOpened()
@@ -283,7 +298,7 @@ void Emoticons::onSettingsOpened()
 void Emoticons::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(EMOTICONS_UUID);
-  settings->setValue(SVN_SUBSTORAGES,FStoragesOrder);
+  settings->setValue(SVN_SUBSTORAGES,FStorageOrder);
 }
 
 Q_EXPORT_PLUGIN2(EmoticonsPlugin, Emoticons)
