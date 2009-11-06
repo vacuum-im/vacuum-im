@@ -124,15 +124,12 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
     if (APainter)
       style->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
     removeWidth(paintRect,BRANCH_WIDTH,AOption.direction==Qt::LeftToRight);
+    removeWidth(option.rect,BRANCH_WIDTH,AOption.direction==Qt::LeftToRight);
     rectHash.insert(RLID_INDICATORBRANCH,brachOption.rect);
   }
 
   if (APainter)
-  {
-    QStyleOptionViewItemV4 backgroundOption(option);
-    backgroundOption.rect = paintRect;
-    drawBackground(APainter,backgroundOption);
-  }
+    drawBackground(APainter,option);
 
   QList<LabelItem> labels = itemLabels(AIndex);
   QList<LabelItem> footers = itemFooters(AIndex);
