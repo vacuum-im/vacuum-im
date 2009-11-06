@@ -259,17 +259,16 @@ void StatusChanger::setStatus(int AStatusId, const Jid &AStreamJid)
         else if (!changeMainStatus)
           FStreamMainStatus -= presence;
 
-        statusAboutToBeSeted(status->code,presence->streamJid());
+        emit statusAboutToBeSeted(status->code,presence->streamJid());
         
         FSettingStatusToPresence = presence;
         if (!presence->setPresence(status->show,status->text,status->priority))
         {
           FSettingStatusToPresence = NULL;
-          if (status->show != IPresence::Offline && !presence->xmppStream()->isOpen())
+          if (status->show != IPresence::Offline && !presence->xmppStream()->isOpen() && presence->xmppStream()->open())
           {
             insertConnectingLabel(presence);
             FStreamWaitStatus.insert(presence,FStreamMainStatus.contains(presence) ? STATUS_MAIN_ID : status->code);
-            presence->xmppStream()->open();
           }
         }
         else

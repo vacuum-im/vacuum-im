@@ -10,6 +10,15 @@
 #include <utils/versionparser.h>
 #include "streamparser.h"
 
+enum StreamState {
+  SS_OFFLINE, 
+  SS_CONNECTING, 
+  SS_INITIALIZE, 
+  SS_FEATURES, 
+  SS_ONLINE,
+  SS_ERROR
+}; 
+
 class XmppStream : 
   public QObject,
   public IXmppStream
@@ -22,7 +31,7 @@ public:
   virtual QObject *instance() { return this; }
   //IXmppStream
   virtual bool isOpen() const;
-  virtual void open();
+  virtual bool open();
   virtual void close();
   virtual void abort(const QString &AError);
   virtual QString streamId() const;
@@ -68,8 +77,8 @@ protected slots:
   //IStreamConnection
   void onConnectionConnected();
   void onConnectionReadyRead(qint64 ABytes);
-  void onConnectionDisconnected();
   void onConnectionError(const QString &AError);
+  void onConnectionDisconnected();
   //StreamParser
   void onParserOpened(QDomElement AElem);
   void onParserElement(QDomElement AElem);
@@ -88,14 +97,6 @@ private:
   IStreamFeature *FActiveFeature;
   QList<IStreamFeature *>	FFeatures; 
 private:
-  enum StreamState {
-    SS_OFFLINE, 
-    SS_CONNECTING, 
-    SS_INITIALIZE, 
-    SS_FEATURES, 
-    SS_ONLINE,
-    SS_ERROR
-  } FStreamState; 
   bool FOpen;
   Jid FStreamJid;
   Jid FOfflineJid;
@@ -106,6 +107,7 @@ private:
   QString FErrorString;
   StreamParser FParser;
   QTimer FKeepAliveTimer;
+  StreamState FStreamState;
 };
 
 #endif // XMPPSTREAM_H

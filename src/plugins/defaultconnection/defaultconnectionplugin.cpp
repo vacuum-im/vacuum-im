@@ -132,7 +132,7 @@ QWidget *DefaultConnectionPlugin::optionsWidget(const QString &ASettingsNS)
     widget->setHost(FSettings->valueNS(SVN_CONNECTION_HOST,ASettingsNS,QString()).toString());
     widget->setPort(FSettings->valueNS(SVN_CONNECTION_PORT,ASettingsNS,5222).toInt());
     widget->setUseSSL(FSettings->valueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,false).toBool());
-    widget->setIgnoreSSLError(FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,false).toBool());
+    widget->setIgnoreSSLError(FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,true).toBool());
     widget->setProxyTypes(proxyTypeNames());
     widget->setProxyType(FSettings->valueNS(SVN_CONNECTION_PROXY_TYPE,ASettingsNS,0).toInt());
     widget->setProxyHost(FSettings->valueNS(SVN_CONNECTION_PROXY_HOST,ASettingsNS,QString()).toString());

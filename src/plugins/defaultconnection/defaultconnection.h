@@ -1,7 +1,6 @@
 #ifndef DEFAULTCONNECTION_H
 #define DEFAULTCONNECTION_H
 
-#include <QTimer>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
 
@@ -20,8 +19,8 @@ public:
   virtual IConnectionPlugin *ownerPlugin() const { return FPlugin; }
   virtual bool isOpen() const;
   virtual bool isEncrypted() const;
-  virtual void connectToHost();
-  virtual void disconnect();
+  virtual bool connectToHost();
+  virtual void disconnectFromHost();
   virtual qint64 write(const QByteArray &AData);
   virtual QByteArray read(qint64 ABytes);
   virtual QVariant option(int ARole) const;
@@ -40,13 +39,11 @@ signals:
   virtual void connected();
   virtual void encrypted();
   virtual void readyRead(qint64 ABytes);
-  virtual void disconnected();
-  virtual void error(const QString &AMessage);
-  virtual void modeChanged(QSslSocket::SslMode AMode);
   virtual void sslErrors(const QList<QSslError> &AErrors);
-protected:
-  void connectionReady();
-  void connectionError(const QString &AError);
+  virtual void error(const QString &AMessage);
+  virtual void aboutToDisconnect();
+  virtual void disconnected();
+  virtual void modeChanged(QSslSocket::SslMode AMode);
 protected slots:
   void onSocketConnected();
   void onSocketEncrypted();
@@ -54,18 +51,13 @@ protected slots:
   void onSocketSSLErrors(const QList<QSslError> &AErrors);
   void onSocketError(QAbstractSocket::SocketError AError);
   void onSocketDisconnected();
-  void onConnectionTimeout();
 private:
   IConnectionPlugin *FPlugin;  
 private:
-  QSslSocket FSocket;
-  QTimer FConnectTimer;
-private:
-  bool FConnected;
-  bool FDisconnect;
-  bool FDisconnected;
-  bool FUseSSL;
+  bool FSSLError;
+  bool FSSLConnection;
   bool FIgnoreSSLErrors;
+  QSslSocket FSocket;
   QHash<int, QVariant> FOptions;
 };
 

@@ -4,6 +4,7 @@
 
 #define KEEP_ALIVE_TIMEOUT          30000
 
+
 XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObject(AXmppStreams->instance())
 {
   FXmppStreams = AXmppStreams;
@@ -39,9 +40,9 @@ bool XmppStream::isOpen() const
   return FOpen;
 }
 
-void XmppStream::open()
+bool XmppStream::open()
 {
-  if (FConnection && FStreamState == SS_OFFLINE)
+  if (FConnection && FStreamState==SS_OFFLINE)
   {
     bool hasPassword = !FPassword.isEmpty() || !FSessionPassword.isEmpty();
     if (!hasPassword)
@@ -52,32 +53,37 @@ void XmppStream::open()
 
     if (hasPassword)
     {
-      FStreamState = SS_CONNECTING;
-      FConnection->connectToHost();
+      if (FConnection->connectToHost())
+      {
+        FStreamState = SS_CONNECTING;
+        return true;
+      }
     }
-    else
-      emit error(tr("Password not specified"));
   }
   else if (!FConnection)
-   emit error(tr("Connection not specified"));
+  {
+    emit error(tr("Connection not specified"));
+  }
+  return false;
 }
 
 void XmppStream::close()
 {
-  if (FStreamState == SS_ONLINE)
-    emit aboutToClose();
-
-  if (FConnection)
+  if (FConnection && FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
   {
     if (FConnection->isOpen())
     {
+      emit aboutToClose();
       QByteArray data = "</stream:stream>";
       if (!hookFeatureData(data,IStreamFeature::DirectionOut))
         FConnection->write(data);
     }
-    FConnection->disconnect();
+    FConnection->disconnectFromHost();
   }
-  FStreamState = SS_OFFLINE;
+  else
+  {
+    FStreamState = SS_OFFLINE;
+  }
 }
 
 void XmppStream::abort(const QString &AError)
@@ -87,7 +93,7 @@ void XmppStream::abort(const QString &AError)
     FStreamState = SS_ERROR;
     FErrorString = AError;
     emit error(AError);
-    FConnection->disconnect();
+    FConnection->disconnectFromHost();
   }
 }
 
@@ -165,8 +171,8 @@ void XmppStream::setConnection(IConnection *AConnection)
     {
       connect(FConnection->instance(),SIGNAL(connected()),SLOT(onConnectionConnected()));
       connect(FConnection->instance(),SIGNAL(readyRead(qint64)),SLOT(onConnectionReadyRead(qint64)));
-      connect(FConnection->instance(),SIGNAL(disconnected()),SLOT(onConnectionDisconnected()));
       connect(FConnection->instance(),SIGNAL(error(const QString &)),SLOT(onConnectionError(const QString &)));
+      connect(FConnection->instance(),SIGNAL(disconnected()),SLOT(onConnectionDisconnected()));
       emit connectionAdded(FConnection);
     }
   }
@@ -414,23 +420,23 @@ void XmppStream::onConnectionReadyRead(qint64 ABytes)
       FParser.parseData(data);
 }
 
+void XmppStream::onConnectionError(const QString &AError)
+{
+  abort(AError);
+}
+
 void XmppStream::onConnectionDisconnected()
 {
   FOpen = false;
-  emit closed();
-  FStreamState = SS_OFFLINE;
   FKeepAliveTimer.stop();
+  FStreamState = SS_OFFLINE;
+  emit closed();
 
   if (FOfflineJid.isValid())
   {
     setStreamJid(FOfflineJid);
     FOfflineJid = Jid();
   }
-}
-
-void XmppStream::onConnectionError(const QString &AError)
-{
-  abort(AError);
 }
 
 void XmppStream::onParserOpened(QDomElement AElem)
@@ -483,7 +489,7 @@ void XmppStream::onParserError(const QString &AError)
 
 void XmppStream::onParserClosed()
 {
-  FConnection->disconnect();
+  FConnection->disconnectFromHost();
 }
 
 void XmppStream::onFeatureReady(bool ARestart)
