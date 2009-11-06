@@ -71,7 +71,7 @@ protected slots:
   void onProfileClosed(const QString &AProfile);
   void onSettingsOpened();
   void onSettingsClosed();
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 private:
   ISettings *FSettings;
   ISettingsPlugin *FSettingsPlugin;

@@ -148,8 +148,8 @@ bool ClientInfo::initObjects()
 
   if (FRostersViewPlugin)
   {
-    connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(contextMenu(IRosterIndex *,Menu*)),
-      SLOT(onRostersViewContextMenu(IRosterIndex *,Menu *)));
+    connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *,Menu*)),
+      SLOT(onRosterIndexContextMenu(IRosterIndex *,Menu *)));
     connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
@@ -822,7 +822,7 @@ void ClientInfo::onContactStateChanged(const Jid &/*AStreamJid*/, const Jid &ACo
   }
 }
 
-void ClientInfo::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void ClientInfo::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT || AIndex->type() == RIT_MY_RESOURCE)
   {

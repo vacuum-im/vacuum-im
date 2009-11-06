@@ -114,7 +114,6 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
     APainter->save();
     APainter->setClipping(true);
     APainter->setClipRect(option.rect);
-    drawBackground(APainter,option);
   }
 
   if (AIndex.parent().isValid() && AIndex.model()->hasChildren(AIndex))
@@ -126,6 +125,13 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
       style->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
     removeWidth(paintRect,BRANCH_WIDTH,AOption.direction==Qt::LeftToRight);
     rectHash.insert(RLID_INDICATORBRANCH,brachOption.rect);
+  }
+
+  if (APainter)
+  {
+    QStyleOptionViewItemV4 backgroundOption(option);
+    backgroundOption.rect = paintRect;
+    drawBackground(APainter,backgroundOption);
   }
 
   QList<LabelItem> labels = itemLabels(AIndex);
@@ -218,11 +224,7 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
   }
 
   if (APainter)
-  {
-    APainter->setClipRect(option.rect);
-    drawFocus(APainter,option,option.rect);
     APainter->restore();
-  }
 
   return rectHash;
 }
@@ -260,16 +262,10 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
       QPalette::ColorGroup cg = AOption.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
       if (cg == QPalette::Normal && !(AOption.state & QStyle::State_Active))
         cg = QPalette::Inactive;
-
-      //if (AOption.state & QStyle::State_Selected)
-      //{
-      //  APainter->fillRect(ALabel.rect, AOption.palette.brush(cg, QPalette::Highlight));
-      //  APainter->setPen(AOption.palette.color(cg, QPalette::HighlightedText));
-      //} 
-      //else 
-      {
+      if (AOption.state & QStyle::State_Selected)
+        APainter->setPen(AOption.palette.color(cg, QPalette::HighlightedText));
+      else 
         APainter->setPen(AOption.palette.color(cg, QPalette::Text));
-      }
       APainter->setFont(AOption.font);
       int flags = AOption.direction | Qt::TextSingleLine;
       QString text = AOption.fontMetrics.elidedText(prepareText(ALabel.value.toString()),Qt::ElideRight,ALabel.rect.width(),flags);
@@ -473,8 +469,10 @@ QString RosterIndexDelegate::prepareText(const QString &AText) const
 
 QIcon::Mode RosterIndexDelegate::getIconMode(QStyle::State AState) const
 {
-  if (!(AState & QStyle::State_Enabled)) return QIcon::Disabled;
-  if (AState & QStyle::State_Selected) return QIcon::Selected;
+  if (!(AState & QStyle::State_Enabled)) 
+    return QIcon::Disabled;
+  if (AState & QStyle::State_Selected) 
+    return QIcon::Selected;
   return QIcon::Normal;
 }
 
@@ -482,4 +480,3 @@ QIcon::State RosterIndexDelegate::getIconState(QStyle::State AState) const
 {
   return AState & QStyle::State_Open ? QIcon::On : QIcon::Off;
 }
-

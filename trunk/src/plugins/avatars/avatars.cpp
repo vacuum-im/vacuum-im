@@ -106,7 +106,7 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
     if (FRostersViewPlugin)
     {
-      connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
+      connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
         SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
       connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
         SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));

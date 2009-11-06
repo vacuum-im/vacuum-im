@@ -79,7 +79,7 @@ protected slots:
   void onResolveActionTriggered(bool);
   void onKeepActionTriggered(bool);
   void onChangeActionTriggered(bool);
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onPresenceOpened(IPresence *APresence);
   void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
   void onPresenceClosed(IPresence *APresence);

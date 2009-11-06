@@ -99,7 +99,7 @@ protected slots:
   void onMultiChatWindowDestroyed();
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onJoinActionTriggered(bool);
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onChatActionTriggered(bool);
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void onRegisterFieldsReceived(const QString &AId, const IRegisterFields &AFields);

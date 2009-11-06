@@ -79,7 +79,7 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     if (rostersViewPlugin)
     {
       FRostersView = rostersViewPlugin->rostersView();
-      connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+      connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)), SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
     }
   }
 
@@ -537,7 +537,7 @@ void RosterChanger::onShowAddContactDialog(bool)
   }
 }
 
-void RosterChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   QString streamJid = AIndex->data(RDR_STREAM_JID).toString();
   IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;

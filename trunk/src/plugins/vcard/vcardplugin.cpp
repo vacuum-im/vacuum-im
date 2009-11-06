@@ -86,7 +86,7 @@ bool VCardPlugin::initObjects()
   if (FRostersViewPlugin)
   {
     FRostersView = FRostersViewPlugin->rostersView();
-    connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
   }
   if (FDiscovery)
   {
@@ -289,7 +289,7 @@ void VCardPlugin::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void VCardPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void VCardPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   if (AIndex->type() == RIT_STREAM_ROOT || AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
   {

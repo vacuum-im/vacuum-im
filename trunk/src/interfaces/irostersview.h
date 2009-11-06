@@ -76,7 +76,7 @@ public:
   virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex) =0;
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
   //--ContextMenu
-  virtual void contextMenuForIndex(Menu *AMenu, IRosterIndex *AIndex, int ALabelId) =0;
+  virtual void contextMenuForIndex(IRosterIndex *AIndex, int ALabelId, Menu *AMenu) =0;
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AIndex) =0;
   virtual void modelSeted(IRostersModel *AIndex) =0;
@@ -86,7 +86,7 @@ signals:
   virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel) =0;
   virtual void viewModelAboutToBeChanged(QAbstractItemModel *AModel) =0;
   virtual void viewModelChanged(QAbstractItemModel *AModel) =0;
-  virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu) =0;
+  virtual void indexContextMenu(IRosterIndex *AIndex, Menu *AMenu) =0;
   virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu) =0;
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
   virtual void labelClicked(IRosterIndex *AIndex, int ALabelId) =0;

@@ -171,7 +171,7 @@ protected slots:
   void onStreamClosed(IXmppStream *AXmppStream);
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
   void onShowDiscoInfoByAction(bool);

@@ -175,8 +175,7 @@ bool StatusChanger::initObjects()
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING),IRostersView::LabelBlink);
-    connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
-      SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)), SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
   }
 
   if (FTrayManager)
@@ -948,7 +947,7 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
     action->setData(ADR_STREAMJID,AAfter.full());
 }
 
-void StatusChanger::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void StatusChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   if (AIndex->data(RDR_TYPE).toInt() == RIT_STREAM_ROOT)
   {

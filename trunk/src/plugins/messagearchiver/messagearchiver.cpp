@@ -189,8 +189,8 @@ bool MessageArchiver::initObjects()
   }
   if (FRostersViewPlugin)
   {
-    connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
-      SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
+      SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
   }
   if (FDiscovery)
   {
@@ -2612,7 +2612,7 @@ void MessageArchiver::onCollectionWriterDestroyed(const Jid &AStreamJid, Collect
   }
 }
 
-void MessageArchiver::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void MessageArchiver::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   if (AIndex->type()==RIT_STREAM_ROOT || AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_AGENT)
   {

@@ -130,7 +130,7 @@ protected:
   void registerDiscoFeatures();
 protected slots:
   void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onClientInfoActionTriggered(bool);
   void onClientInfoDialogClosed(const Jid &AContactJid);
