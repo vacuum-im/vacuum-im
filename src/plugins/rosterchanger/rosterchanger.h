@@ -109,7 +109,7 @@ protected slots:
   void onSettingsClosed();
   void onShowAddContactDialog(bool);
   void onRosterClosed(IRoster *ARoster);
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onNotificationActivated(int ANotifyId);
   void onNotificationRemoved(int ANotifyId);
   void onSubscriptionDialogDestroyed();

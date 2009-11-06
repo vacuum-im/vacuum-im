@@ -93,7 +93,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
     if (rostersViewPlugin)
     {
       FRostersView = rostersViewPlugin->rostersView();
-      connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+      connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
     }
   }
 
@@ -416,7 +416,7 @@ void NormalMessageHandler::onShowWindowAction(bool)
   }
 }
 
-void NormalMessageHandler::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void NormalMessageHandler::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   static QList<int> messageActionTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
 

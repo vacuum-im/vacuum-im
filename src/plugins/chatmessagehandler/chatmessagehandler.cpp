@@ -105,7 +105,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
     if (rostersViewPlugin)
     {
       FRostersView = rostersViewPlugin->rostersView();
-      connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+      connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
     }
   }
 
@@ -460,7 +460,7 @@ void ChatMessageHandler::onShowWindowAction(bool)
   }
 }
 
-void ChatMessageHandler::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void ChatMessageHandler::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   static QList<int> chatActionTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
 

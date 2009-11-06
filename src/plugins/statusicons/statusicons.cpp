@@ -65,8 +65,8 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
     if (FRostersViewPlugin)
     {
-      connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(contextMenu(IRosterIndex *,Menu*)),
-        SLOT(onRostersViewContextMenu(IRosterIndex *,Menu *)));
+      connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *,Menu*)),
+        SLOT(onRosterIndexContextMenu(IRosterIndex *,Menu *)));
     }
   }
 
@@ -399,7 +399,7 @@ void StatusIcons::onStatusIconsChangedTimer()
   FStatusIconsChangedStarted = false;
 }
 
-void StatusIcons::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void StatusIcons::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
   {

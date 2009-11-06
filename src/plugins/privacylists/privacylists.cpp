@@ -106,7 +106,7 @@ bool PrivacyLists::initObjects()
     FRosterLabelId = FRostersView->createIndexLabel(RLO_PRIVACY,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE));
     connect(FRostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
-    connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)), SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)), SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
   }
   return true;
 }
@@ -1231,7 +1231,7 @@ void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
   }
 }
 
-void PrivacyLists::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void PrivacyLists::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
   if (isReady(streamJid))

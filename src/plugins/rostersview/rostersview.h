@@ -16,9 +16,9 @@ struct NotifyItem
 {
   int notifyId;
   int order;
+  int flags;
   QIcon icon;
   QString toolTip;
-  int flags;
   IRosterIndexList indexes;
 };
 
@@ -69,7 +69,7 @@ public:
   virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex);
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
   //--ContextMenu
-  virtual void contextMenuForIndex(Menu *AMenu, IRosterIndex *AIndex, int ALabelId);
+  virtual void contextMenuForIndex(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
 signals:
   virtual void modelAboutToBeSeted(IRostersModel *AModel);
   virtual void modelSeted(IRostersModel *AModel);
@@ -79,7 +79,7 @@ signals:
   virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel);
   virtual void viewModelAboutToBeChanged(QAbstractItemModel *AModel);
   virtual void viewModelChanged(QAbstractItemModel *AModel);
-  virtual void contextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  virtual void indexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
   virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   virtual void labelClicked(IRosterIndex *AIndex, int ALabelId);
@@ -122,10 +122,9 @@ protected slots:
   void onIndexInserted(IRosterIndex *AIndex);
   void onIndexDestroyed(IRosterIndex *AIndex);
   void onBlinkTimer();
+  void onDragExpandTimer();
 private:
   IRostersModel *FRostersModel;
-private:
-  Menu *FContextMenu;
 private:
   int FPressedLabel;
   QPoint FPressedPos;
@@ -136,25 +135,26 @@ private:
   QTimer FBlinkTimer;
   QSet<int> FBlinkLabels;
   QHash<int, QVariant> FIndexLabels;
-  QHash<int, int /*Order*/> FIndexLabelOrders;
-  QHash<int, int /*Flags*/> FIndexLabelFlags;
+  QHash<int, int> FIndexLabelOrders;
+  QHash<int, int> FIndexLabelFlags;
   QHash<int, QSet<IRosterIndex *> > FIndexLabelIndexes;
 private:
   int FNotifyId;
-  QHash<int /*id*/ ,NotifyItem> FNotifyItems;
-  QHash<int /*label*/, QList<int> > FNotifyLabelItems;
-  QHash<IRosterIndex *, QHash<int /*order*/, int /*labelid*/> > FNotifyIndexOrderLabel;
+  QHash<int, NotifyItem> FNotifyItems;
+  QHash<int, QList<int> > FNotifyLabelItems;
+  QHash<IRosterIndex *, QHash<int, int> > FNotifyIndexOrderLabel;
 private:
-  QMultiMap<int,IRostersClickHooker *> FClickHookers;
+  QMultiMap<int, IRostersClickHooker *> FClickHookers;
 private:
   int FOptions;
   RosterIndexDelegate *FRosterIndexDelegate;
-  QMultiMap<int,QAbstractProxyModel *> FProxyModels;
+  QMultiMap<int, QAbstractProxyModel *> FProxyModels;
 private:
   bool FStartDragFailed;
+  QTimer FDragExpandTimer;
   QRect FDropIndicatorRect;
-  QList<IRostersDragDropHandler *> FActiveDragHandlers;
   QList<IRostersDragDropHandler *> FDragDropHandlers;
+  QList<IRostersDragDropHandler *> FActiveDragHandlers;
 };
 
 #endif // ROSTERSVIEW_H

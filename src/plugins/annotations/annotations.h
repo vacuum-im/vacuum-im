@@ -75,7 +75,7 @@ protected slots:
   void onPrivateDataError(const QString &AId, const QString &AError);
   void onPrivateStorageClosed(const Jid &AStreamJid);
   void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
-  void onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onEditNoteActionTriggered(bool);
   void onEditNoteDialogDestroyed();

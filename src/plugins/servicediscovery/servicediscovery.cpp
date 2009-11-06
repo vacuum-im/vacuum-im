@@ -167,7 +167,7 @@ bool ServiceDiscovery::initObjects()
   {
     FRostersView = FRostersViewPlugin->rostersView();
     FRostersView->insertClickHooker(RCHO_SERVICEDISCOVERY,this);
-    connect(FRostersView->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
     connect(FRostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
@@ -1310,7 +1310,7 @@ void ServiceDiscovery::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &A
   emit streamJidChanged(ABefour,AXmppStream->streamJid());
 }
 
-void ServiceDiscovery::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void ServiceDiscovery::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   int itype = AIndex->type();
   if (itype == RIT_STREAM_ROOT || itype == RIT_CONTACT || itype == RIT_AGENT || itype == RIT_MY_RESOURCE)

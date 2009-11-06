@@ -20,7 +20,6 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
   FLabelIdCounter = 1;
 
   FRostersModel = NULL;
-  FContextMenu = new Menu(this);
 
   FPressedPos = QPoint();
   FPressedLabel = RLID_NULL;
@@ -34,13 +33,18 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
   header()->setStretchLastSection(false);
 
   setIndentation(4);
+  setAutoScroll(true);
   setAcceptDrops(true);
   setRootIsDecorated(false);
-  setSelectionMode(NoSelection);
+  setSelectionMode(SingleSelection);
   setContextMenuPolicy(Qt::DefaultContextMenu);
 
   FRosterIndexDelegate = new RosterIndexDelegate(this);
   setItemDelegate(FRosterIndexDelegate);
+
+  FDragExpandTimer.setSingleShot(true);
+  FDragExpandTimer.setInterval(500);
+  connect(&FDragExpandTimer,SIGNAL(timeout()),SLOT(onDragExpandTimer()));
 
   setAcceptDrops(true);
   setDragEnabled(true);
@@ -546,7 +550,7 @@ void RostersView::removeFooterText(int AOrderAndId, IRosterIndex *AIndex)
   }
 }
 
-void RostersView::contextMenuForIndex(Menu *AMenu, IRosterIndex *AIndex, int ALabelId)
+void RostersView::contextMenuForIndex(IRosterIndex *AIndex, int ALabelId, Menu *AMenu)
 {
   if (AIndex!=NULL && AMenu!=NULL)
   {
@@ -555,7 +559,7 @@ void RostersView::contextMenuForIndex(Menu *AMenu, IRosterIndex *AIndex, int ALa
     else if (ALabelId != RLID_DISPLAY)
       emit labelContextMenu(AIndex,ALabelId,AMenu);
     else
-      emit contextMenu(AIndex,AMenu);
+      emit indexContextMenu(AIndex,AMenu);
   }
 }
 
@@ -658,9 +662,11 @@ void RostersView::updateStatusText(IRosterIndex *AIndex)
   }
 }
 
-void RostersView::drawBranches(QPainter * /*APainter*/, const QRect &/*ARect*/, const QModelIndex &/*AIndex*/) const
+void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
 {
-
+  Q_UNUSED(APainter);
+  Q_UNUSED(ARect);
+  Q_UNUSED(AIndex);
 }
 
 bool RostersView::viewportEvent(QEvent *AEvent)
@@ -721,13 +727,17 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
     modelIndex = mapToModel(modelIndex);
     IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
     
-    FContextMenu->clear();
-    contextMenuForIndex(FContextMenu,index,labelId);
-    if (labelId!=RLID_DISPLAY && FContextMenu->isEmpty())
-      contextMenuForIndex(FContextMenu,index,RLID_DISPLAY);
+    Menu *menu = new Menu(this);
+    menu->setAttribute(Qt::WA_DeleteOnClose, true);
+    
+    contextMenuForIndex(index,labelId,menu);
+    if (labelId!=RLID_DISPLAY && menu->isEmpty())
+      contextMenuForIndex(index,RLID_DISPLAY,menu);
 
-    if (!FContextMenu->isEmpty())
-      FContextMenu->popup(AEvent->globalPos());
+    if (!menu->isEmpty())
+      menu->popup(AEvent->globalPos());
+    else
+      delete menu;
   }
 }
 
@@ -801,15 +811,15 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
       if (itemDeletage)
       {
         QStyleOptionViewItemV4 option = indexOption(FPressedIndex);
-        QSize shint = itemDeletage->sizeHint(option,FPressedIndex);
-        shint.rwidth() = qMin(width(),shint.width());
-        option.rect = QRect(QPoint(0,0),shint);
-        QPixmap pixmap(shint);
+        QPoint indexPos = option.rect.topLeft();
+        option.state &= ~QStyle::State_Selected;
+        option.rect = QRect(QPoint(0,0),option.rect.size());
+        QPixmap pixmap(option.rect.size());
         QPainter painter(&pixmap);
-        painter.fillRect(option.rect,style()->standardPalette().color(QPalette::Normal,QPalette::Base));
         itemDeletage->paint(&painter,option,FPressedIndex);
         painter.drawRect(option.rect.adjusted(0,0,-1,-1));
         drag->setPixmap(pixmap);
+        drag->setHotSpot(FPressedPos - indexPos);
       }
 
       QByteArray data;
@@ -900,8 +910,9 @@ void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
 
   if (!FActiveDragHandlers.isEmpty())
   {
+    if (hasAutoScroll())
+      startAutoScroll();
     AEvent->accept();
-    startAutoScroll();
   }
   else
     AEvent->ignore();
@@ -920,6 +931,11 @@ void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
     AEvent->accept();
   else
     AEvent->ignore();
+
+  if (!isExpanded(index))
+    FDragExpandTimer.start();
+  else
+    FDragExpandTimer.stop();
 
   setDropIndicatorRect(visualRect(index));
 }
@@ -1016,3 +1032,8 @@ void RostersView::onBlinkTimer()
       repaintRosterIndex(index);
 }
 
+void RostersView::onDragExpandTimer()
+{
+  QModelIndex index = indexAt(FDropIndicatorRect.center());
+  setExpanded(index,true);
+}

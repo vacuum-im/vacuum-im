@@ -55,8 +55,8 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
     if (FRostersViewPlugin)
     {
-      connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
-        SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+      connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
+        SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
     }
   }
 
@@ -276,7 +276,7 @@ void AccountManager::onSettingsClosed()
     removeAccount(id);
 }
 
-void AccountManager::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void AccountManager::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   if (AIndex->data(RDR_TYPE).toInt() == RIT_STREAM_ROOT)
   {

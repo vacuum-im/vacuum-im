@@ -62,7 +62,7 @@ void UserContextMenu::updateMenu()
 void UserContextMenu::onAboutToShow()
 {
   if (FRosterIndex)
-    FRostersView->contextMenuForIndex(this,FRosterIndex,RLID_DISPLAY);
+    FRostersView->contextMenuForIndex(FRosterIndex,RLID_DISPLAY,this);
 }
 
 void UserContextMenu::onAboutToHide()

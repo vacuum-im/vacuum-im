@@ -169,8 +169,8 @@ bool MultiUserChatPlugin::initObjects()
 
   if (FRostersViewPlugin)
   {
-    connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
-      SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
+      SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
   }
 
   if (FMainWindowPlugin)
@@ -651,7 +651,7 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
   }
 }
 
-void MultiUserChatPlugin::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void MultiUserChatPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   int show = AIndex->data(RDR_SHOW).toInt();
   if (show!=IPresence::Offline && show!=IPresence::Error)

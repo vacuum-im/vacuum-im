@@ -150,8 +150,8 @@ bool Gateways::initObjects()
   }
   if (FRostersViewPlugin)
   {
-    connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(contextMenu(IRosterIndex *, Menu *)),
-      SLOT(onRostersViewContextMenu(IRosterIndex *, Menu *)));
+    connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
+      SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
   }
   return true;
 }
@@ -535,7 +535,7 @@ void Gateways::onChangeActionTriggered(bool)
   }
 }
 
-void Gateways::onRostersViewContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   if (AIndex->type() == RIT_AGENT)
   {
