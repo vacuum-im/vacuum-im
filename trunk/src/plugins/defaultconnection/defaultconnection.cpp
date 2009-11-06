@@ -1,34 +1,26 @@
 #include "defaultconnection.h"
 
-#include <qendian.h>
 #include <QNetworkProxy>
 
-#define CONNECT_TIMEOUT       30000
 #define DISCONNECT_TIMEOUT    5000
 
 DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent) : QObject(AParent)
 {
   FPlugin = APlugin;
-  FConnected = false;
-  FDisconnect = true; 
-  FDisconnected = true;
   FSocket.setProtocol(QSsl::AnyProtocol);
 
   connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
-  connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
-  connect(&FSocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onSocketError(QAbstractSocket::SocketError)));
-  connect(&FSocket, SIGNAL(disconnected()), SLOT(onSocketDisconnected()));
   connect(&FSocket, SIGNAL(encrypted()), SLOT(onSocketEncrypted()));
-  connect(&FSocket, SIGNAL(sslErrors(const QList<QSslError> &)), SLOT(onSocketSSLErrors(const QList<QSslError> &)));
+  connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
   connect(&FSocket, SIGNAL(modeChanged(QSslSocket::SslMode)), SIGNAL(modeChanged(QSslSocket::SslMode)));
-  
-  FConnectTimer.setSingleShot(true);
-  connect(&FConnectTimer,SIGNAL(timeout()),SLOT(onConnectionTimeout()));
+  connect(&FSocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onSocketError(QAbstractSocket::SocketError)));
+  connect(&FSocket, SIGNAL(sslErrors(const QList<QSslError> &)), SLOT(onSocketSSLErrors(const QList<QSslError> &)));
+  connect(&FSocket, SIGNAL(disconnected()), SLOT(onSocketDisconnected()));
 }
 
 DefaultConnection::~DefaultConnection()
 {
-  disconnect();
+  disconnectFromHost();
 }
 
 bool DefaultConnection::isOpen() const
@@ -41,17 +33,16 @@ bool DefaultConnection::isEncrypted() const
   return FSocket.isEncrypted();
 }
 
-void DefaultConnection::connectToHost()
+bool DefaultConnection::connectToHost()
 {
-  FDisconnect = false;
-  FDisconnected = false;
   if (FSocket.state() == QAbstractSocket::UnconnectedState)
   {
     emit aboutToConnect();
 
+    FSSLError = false;
     QString host  = option(IDefaultConnection::CO_HOST).toString();
     quint16 port = option(IDefaultConnection::CO_PORT).toInt();
-    FUseSSL = option(IDefaultConnection::CO_USE_SSL).toBool();
+    FSSLConnection = option(IDefaultConnection::CO_USE_SSL).toBool();
     FIgnoreSSLErrors = option(IDefaultConnection::CO_IGNORE_SSL_ERRORS).toBool();
 
     QNetworkProxy proxy;
@@ -75,31 +66,37 @@ void DefaultConnection::connectToHost()
     proxy.setPassword(option(IDefaultConnection::CO_PROXY_PASSWORD).toString());
     FSocket.setProxy(proxy);
 
-    if (FUseSSL)
+    if (FSSLConnection)
       FSocket.connectToHostEncrypted(host,port);
     else
       FSocket.connectToHost(host, port);
-
-    FConnectTimer.start(CONNECT_TIMEOUT);
+    
+    return true;
   }
-  else
-    connectionError(tr("Socket not ready"));
+  return false;
 }
 
-void DefaultConnection::disconnect()
+void DefaultConnection::disconnectFromHost()
 {
-  if (!FDisconnect)
+  if (FSocket.state() != QSslSocket::UnconnectedState)
   {
-    FDisconnect = true;
-    if (FConnected)
+    if (FSocket.state() == QSslSocket::ConnectedState)
+    {
+      emit aboutToDisconnect();
       FSocket.flush();
-    FSocket.disconnectFromHost();
-    if (FConnected && FSocket.state()!=QSslSocket::UnconnectedState)
-      FSocket.waitForDisconnected(DISCONNECT_TIMEOUT);
+      FSocket.disconnectFromHost();
+    }
+    else
+    {
+      FSocket.abort();
+      emit disconnected();
+    }
   }
-  if (!FDisconnected)
+
+  if (FSocket.state()!=QSslSocket::UnconnectedState && !FSocket.waitForDisconnected(DISCONNECT_TIMEOUT))
   {
-    onSocketDisconnected();
+    emit error(tr("Disconnection timed out"));
+    emit disconnected();
   }
 }
 
@@ -155,6 +152,7 @@ QSslCertificate DefaultConnection::peerCertificate() const
 
 void DefaultConnection::ignoreSslErrors()
 {
+  FSSLError = false;
   FSocket.ignoreSslErrors();
 }
 
@@ -163,30 +161,17 @@ QList<QSslError> DefaultConnection::sslErrors() const
   return FSocket.sslErrors();
 }
 
-void DefaultConnection::connectionReady()
-{
-  FConnectTimer.stop();
-  emit connected();
-}
-
-void DefaultConnection::connectionError(const QString &AError)
-{
-  emit error(AError);
-  disconnect();
-}
-
 void DefaultConnection::onSocketConnected()
 {
-  FConnected = true;
-  if (!FUseSSL)
-    connectionReady();
+  if (!FSSLConnection)
+    emit connected();
 }
 
 void DefaultConnection::onSocketEncrypted()
 {
   emit encrypted();
-  if (FUseSSL)
-    connectionReady();
+  if (FSSLConnection)
+    emit connected();
 }
 
 void DefaultConnection::onSocketReadyRead()
@@ -196,29 +181,25 @@ void DefaultConnection::onSocketReadyRead()
 
 void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
 {
+  FSSLError = true;
   if (!FIgnoreSSLErrors)
     emit sslErrors(AErrors);
   else
-    FSocket.ignoreSslErrors();
+    ignoreSslErrors();
 }
 
 void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 {
-  FDisconnect = true;
-  connectionError(FSocket.errorString());
+  if (FSocket.state()!=QSslSocket::ConnectedState || FSSLError)
+  {
+    emit error(FSocket.errorString());
+    emit disconnected();
+  }
+  else
+    emit error(FSocket.errorString());
 }
 
 void DefaultConnection::onSocketDisconnected()
 {
-  FConnected = false;
-  FDisconnect = true;
-  FDisconnected = true;
-  FConnectTimer.stop();
   emit disconnected();
 }
-
-void DefaultConnection::onConnectionTimeout()
-{
-  connectionError(tr("Connection timed out"));
-}
-
