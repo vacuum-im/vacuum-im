@@ -813,6 +813,7 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
         QStyleOptionViewItemV4 option = indexOption(FPressedIndex);
         QPoint indexPos = option.rect.topLeft();
         option.state &= ~QStyle::State_Selected;
+        option.state &= ~QStyle::State_MouseOver;
         option.rect = QRect(QPoint(0,0),option.rect.size());
         QPixmap pixmap(option.rect.size());
         QPainter painter(&pixmap);
