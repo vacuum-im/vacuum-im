@@ -2,6 +2,7 @@
 
 #include <QPainter>
 #include <QApplication>
+#include <QWindowsVistaStyle>
 
 #define BRANCH_WIDTH  10
 
@@ -98,12 +99,23 @@ QRect RosterIndexDelegate::labelRect(int ALabelId, const QStyleOptionViewItem &A
   return drawIndex(NULL,AOption,AIndex).value(ALabelId);
 }
 
+void RosterIndexDelegate::setShowBlinkLabels(bool AShow)
+{
+  FShowBlinkLabels = AShow;
+}
+
 QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
   QHash<int,QRect> rectHash;
 
   QStyleOptionViewItemV4 option = indexOptions(AIndex,AOption);
   QStyle *style = option.widget ? option.widget->style() : QApplication::style();
+  if (APainter && qobject_cast<QWindowsVistaStyle *>(style))
+  {
+    option.palette.setColor(QPalette::All, QPalette::HighlightedText, option.palette.color(QPalette::Active, QPalette::Text));
+    option.palette.setColor(QPalette::All, QPalette::Highlight, option.palette.base().color().darker(108));
+  }
+
   const int hMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin) >> 1;
   const int vMargin = style->pixelMetric(QStyle::PM_FocusFrameVMargin) >> 1;
 
@@ -232,13 +244,14 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
     return;
 
   APainter->setClipRect(ALabel.rect);
+  QStyle *style = AOption.widget ? AOption.widget->style() : QApplication::style();
 
   switch(ALabel.value.type())
   {
   case QVariant::Pixmap:
     {
       QPixmap pixmap = qvariant_cast<QPixmap>(ALabel.value);
-      APainter->drawPixmap(ALabel.rect.topLeft(),pixmap);
+      style->drawItemPixmap(APainter,ALabel.rect,Qt::AlignHCenter|Qt::AlignVCenter,pixmap);
       break;
     }
   case QVariant::Image:
@@ -250,27 +263,21 @@ void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionVi
   case QVariant::Icon:
     {
       QIcon icon = qvariant_cast<QIcon>(ALabel.value);
-      QPixmap pixmap = icon.pixmap(AOption.decorationSize,getIconMode(AOption.state),getIconState(AOption.state));
-      APainter->drawPixmap(ALabel.rect.topLeft(),pixmap);
+      QPixmap pixmap = style->generatedIconPixmap(getIconMode(AOption.state),icon.pixmap(AOption.decorationSize),&AOption);
+      style->drawItemPixmap(APainter,ALabel.rect,Qt::AlignHCenter|Qt::AlignVCenter,pixmap);
       break;
     }
   case QVariant::String:
     {
-      QPalette::ColorGroup cg = AOption.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
-      if (cg == QPalette::Normal && !(AOption.state & QStyle::State_Active))
-        cg = QPalette::Inactive;
-      if (AOption.state & QStyle::State_Selected)
-        APainter->setPen(AOption.palette.color(cg, QPalette::HighlightedText));
-      else 
-        APainter->setPen(AOption.palette.color(cg, QPalette::Text));
       APainter->setFont(AOption.font);
       int flags = AOption.direction | Qt::TextSingleLine;
+      QPalette::ColorRole role = AOption.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text;
       QString text = AOption.fontMetrics.elidedText(prepareText(ALabel.value.toString()),Qt::ElideRight,ALabel.rect.width(),flags);
-      APainter->drawText(ALabel.rect,flags,text);
+      style->drawItemText(APainter,ALabel.rect,flags,AOption.palette,(AOption.state &  QStyle::State_Enabled)>0,text,role);
       break;
     }
   default:
-    break;   
+    break;
   }
 }
 
