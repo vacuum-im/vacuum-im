@@ -110,11 +110,14 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
 
   QStyleOptionViewItemV4 option = indexOptions(AIndex,AOption);
   QStyle *style = option.widget ? option.widget->style() : QApplication::style();
+  
+#ifdef Q_OS_WIN32
   if (APainter && qobject_cast<QWindowsVistaStyle *>(style))
   {
     option.palette.setColor(QPalette::All, QPalette::HighlightedText, option.palette.color(QPalette::Active, QPalette::Text));
     option.palette.setColor(QPalette::All, QPalette::Highlight, option.palette.base().color().darker(108));
   }
+#endif
 
   const int hMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin) >> 1;
   const int vMargin = style->pixelMetric(QStyle::PM_FocusFrameVMargin) >> 1;
@@ -126,6 +129,7 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
     APainter->save();
     APainter->setClipping(true);
     APainter->setClipRect(option.rect);
+    drawBackground(APainter,option);
   }
 
   if (AIndex.parent().isValid() && AIndex.model()->hasChildren(AIndex))
@@ -136,12 +140,8 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
     if (APainter)
       style->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
     removeWidth(paintRect,BRANCH_WIDTH,AOption.direction==Qt::LeftToRight);
-    removeWidth(option.rect,BRANCH_WIDTH,AOption.direction==Qt::LeftToRight);
     rectHash.insert(RLID_INDICATORBRANCH,brachOption.rect);
   }
-
-  if (APainter)
-    drawBackground(APainter,option);
 
   QList<LabelItem> labels = itemLabels(AIndex);
   QList<LabelItem> footers = itemFooters(AIndex);
