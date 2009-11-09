@@ -203,7 +203,7 @@ protected slots:
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void onStanzaSessionActivated(const IStanzaSession &ASession);
   void onStanzaSessionTerminated(const IStanzaSession &ASession);
-  void onChatWindowCreated(IChatWindow *AWindow);
+  void onToolbarWidgetCreated(IToolBarWidget *AWidget);
   void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
 private:
   IPluginManager *FPluginManager;
