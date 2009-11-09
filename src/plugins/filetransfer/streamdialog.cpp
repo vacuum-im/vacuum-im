@@ -6,7 +6,7 @@
 #include <QFileDialog>
 #include <QVBoxLayout>
 
-StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, 
+StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer, 
                            IFileStream *AFileStream, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
@@ -16,6 +16,7 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
   ui.wdtMethods->layout()->setMargin(0);
 
   FFileStream = AFileStream;
+  FFileTransfer = AFileTransfer;
   FFileManager = AFileManager;
   FDataManager = ADataManager;
 
@@ -63,6 +64,13 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 
 StreamDialog::~StreamDialog()
 {
+  if (FFileStream)
+  {
+    if (FFileStream->streamState()==IFileStream::Finished || FFileStream->streamState()==IFileStream::Aborted)
+      FFileStream->instance()->deleteLater();
+    else if (FFileStream->streamKind()==IFileStream::SendFile && FFileStream->streamState()==IFileStream::Creating)
+      FFileStream->instance()->deleteLater();
+  }
   emit dialogDestroyed();
 }
 
@@ -222,7 +230,7 @@ void StreamDialog::onStreamStateChanged()
     ui.pteDescription->setReadOnly(FFileStream->streamKind()!=IFileStream::SendFile);
     ui.grbMethods->setVisible(true);
     if (FFileStream->streamKind()==IFileStream::SendFile)
-      ui.bbxButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Close);
+      ui.bbxButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
     else
       ui.bbxButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Abort);
     break;
@@ -242,7 +250,10 @@ void StreamDialog::onStreamStateChanged()
     ui.lneFile->setReadOnly(true);
     ui.pteDescription->setReadOnly(true);
     ui.grbMethods->setVisible(false);
-    ui.bbxButtons->setStandardButtons(QDialogButtonBox::Close);
+    if (FFileStream->streamKind()==IFileStream::SendFile && FFileStream->streamState()==IFileStream::Aborted)
+      ui.bbxButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
+    else
+      ui.bbxButtons->setStandardButtons(QDialogButtonBox::Close);
     break;
   }
   ui.lblStatus->setText(FFileStream->stateString());
@@ -278,6 +289,7 @@ void StreamDialog::onStreamPropertiesChanged()
 
 void StreamDialog::onStreamDestroyed()
 {
+  FFileStream = NULL;
   close();
 }
 
@@ -340,14 +352,18 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
       FFileStream->abortStream(tr("Data transmission terminated"));
     }
   }
+  else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Retry)
+  {
+    FFileTransfer->sendFile(FFileStream->streamJid(), FFileStream->contactJid(), FFileStream->fileName(), FFileStream->fileDescription());
+    close();
+  }
   else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Close)
   {
-    if (FFileStream->streamState()==IFileStream::Finished || FFileStream->streamState()==IFileStream::Aborted)
-      delete FFileStream->instance();
-    else if (FFileStream->streamKind()==IFileStream::SendFile && FFileStream->streamState()==IFileStream::Creating)
-      delete FFileStream->instance();
-    else
-      close();
+    close();
+  }
+  else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Cancel)
+  {
+    close();
   }
 }
 

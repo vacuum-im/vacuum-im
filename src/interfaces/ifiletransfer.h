@@ -19,7 +19,7 @@ public:
   virtual bool removeTransferWhenFinished() const =0;
   virtual void setRemoveTransferWhenFinished(bool ARemove) =0;
   virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const =0;
-  virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName = QString::null) =0;
+  virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName = QString::null, const QString &AFileDesc = QString::null) =0;
 };
 
 Q_DECLARE_INTERFACE(IFileTransfer,"Vacuum.Plugin.IFileTransfer/1.0")

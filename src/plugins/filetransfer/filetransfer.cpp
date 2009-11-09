@@ -6,6 +6,7 @@
 #define ADR_STREAM_JID                Action::DR_StreamJid
 #define ADR_CONTACT_JID               Action::DR_Parametr1
 #define ADR_FILE_NAME                 Action::DR_Parametr2
+#define ADR_FILE_DESC                 Action::DR_Parametr3
 
 #define SVN_AUTO_RECEIVE              "autoReceive"
 #define SVN_HIDE_DIALOG_STARTED       "hideDialogWhenStarted"
@@ -285,7 +286,7 @@ bool FileTransfer::isSupported(const Jid &AStreamJid, const Jid &AContactJid) co
   return FDiscovery==NULL || FDiscovery->discoInfo(AContactJid).features.contains(NS_SI_FILETRANSFER);
 }
 
-IFileStream *FileTransfer::sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName)
+IFileStream *FileTransfer::sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName, const QString &AFileDesc)
 {
   if (isSupported(AStreamJid,AContactJid))
   {
@@ -293,6 +294,7 @@ IFileStream *FileTransfer::sendFile(const Jid &AStreamJid, const Jid &AContactJi
     if (stream)
     {
       stream->setFileName(AFileName);
+      stream->setFileDescription(AFileDesc);
       StreamDialog *dialog = createStreamDialog(stream);
       dialog->setSelectableMethods(FFileManager->streamMethods());
       dialog->show();
@@ -443,7 +445,7 @@ StreamDialog *FileTransfer::createStreamDialog(IFileStream *AStream)
   StreamDialog *dialog = FStreamDialog.value(AStream->streamId());
   if (dialog == NULL)
   {
-    dialog = new StreamDialog(FDataManager,FFileManager,AStream,NULL);
+    dialog = new StreamDialog(FDataManager,FFileManager,this,AStream,NULL);
     if (AStream->streamKind() == IFileStream::SendFile)
       IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(dialog,MNI_FILETRANSFER_SEND,0,0,"windowIcon");
     else
@@ -512,7 +514,8 @@ void FileTransfer::onShowSendFileDialogByAction(bool)
       Jid streamJid = action->data(ADR_STREAM_JID).toString();
       Jid contactJid = action->data(ADR_CONTACT_JID).toString();
       QString file = action->data(ADR_FILE_NAME).toString();
-      sendFile(streamJid,contactJid,file);
+      QString desc = action->data(ADR_FILE_DESC).toString();
+      sendFile(streamJid,contactJid,file,desc);
     }
     else if (widget->editWidget() != NULL)
       sendFile(widget->editWidget()->streamJid(), widget->editWidget()->contactJid());
