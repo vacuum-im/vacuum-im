@@ -2805,7 +2805,7 @@ void MessageArchiver::onToolbarWidgetCreated(IToolBarWidget *AWidget)
   if (AWidget->editWidget() != NULL)
   {
     ChatWindowMenu *menu = new ChatWindowMenu(this,AWidget, AWidget->toolBarChanger()->toolBar());
-    QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWCW_ARCHIVE,true);
+    QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWTBW_ARCHIVE,true);
     button->setPopupMode(QToolButton::InstantPopup);
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
   }

@@ -213,7 +213,7 @@ void Emoticons::insertSelectIconMenu(const QString &ASubStorage)
   {
     SelectIconMenu *menu = createSelectIconMenu(ASubStorage,widget->instance());
     FToolBarWidgetByMenu.insert(menu,widget);
-    QToolButton *button = widget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWCW_EMOTICONS,false);
+    QToolButton *button = widget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWTBW_EMOTICONS,false);
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
     button->setPopupMode(QToolButton::InstantPopup);
   }
@@ -246,7 +246,7 @@ void Emoticons::onToolBarWidgetCreated(IToolBarWidget *AWidget)
     {
       SelectIconMenu *menu = createSelectIconMenu(substorage,AWidget->instance());
       FToolBarWidgetByMenu.insert(menu,AWidget);
-      QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWCW_EMOTICONS);
+      QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWTBW_EMOTICONS);
       button->setToolButtonStyle(Qt::ToolButtonIconOnly);
       button->setPopupMode(QToolButton::InstantPopup);
     }
