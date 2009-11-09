@@ -67,7 +67,7 @@ public:
   virtual bool removeTransferWhenFinished() const;
   virtual void setRemoveTransferWhenFinished(bool ARemove);
   virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
-  virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName = QString::null);
+  virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName = QString::null, const QString &AFileDesc = QString::null);
 signals:
   //IOptionsHolder
   virtual void optionsAccepted();

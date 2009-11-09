@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QCheckBox>
+#include <interfaces/ifiletransfer.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <utils/jid.h>
@@ -14,7 +15,8 @@ class StreamDialog :
 {
   Q_OBJECT;
 public:
-  StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileStream *AFileStream, QWidget *AParent = NULL);
+  StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer, 
+    IFileStream *AFileStream, QWidget *AParent = NULL);
   ~StreamDialog();
   inline IFileStream *stream() const;
   QList<QString> selectedMethods() const;
@@ -42,6 +44,7 @@ private:
   Ui::StreamDialogClass ui;
 private:
   IFileStream *FFileStream;
+  IFileTransfer *FFileTransfer;
   IFileStreamsManager *FFileManager;
   IDataStreamsManager *FDataManager;
 private:
