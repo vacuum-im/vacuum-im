@@ -8,6 +8,7 @@
 #include <definations/menuicons.h>
 #include <definations/soundfiles.h>
 #include <definations/resources.h>
+#include <definations/toolbargroups.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -18,6 +19,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/iroster.h>
 #include <interfaces/inotifications.h>
+#include <interfaces/imessagewidgets.h>
 #include <interfaces/isettings.h>
 #include <utils/jid.h>
 #include <utils/action.h>
@@ -74,6 +76,9 @@ protected:
   void registerDiscoFeatures();
   void notifyStream(IFileStream *AStream, bool ANewStream = false);
   void autoStartStream(IFileStream *AStream);
+  void insertToolBarAction(IToolBarWidget *AWidget);
+  void removeToolBarAction(IToolBarWidget *AWidget);
+  QList<IToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
   StreamDialog *createStreamDialog(IFileStream *ASession);
   IFileStream *createStream(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AStreamKind);
 protected slots:
@@ -83,6 +88,11 @@ protected slots:
   void onShowSendFileDialogByAction(bool);
   void onNotificationActivated(int ANotifyId);
   void onNotificationRemoved(int ANotifyId);
+  void onDiscoInfoReceived(const IDiscoInfo &AInfo);
+  void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
+  void onToolBarWidgetCreated(IToolBarWidget *AWidget);
+  void onEditWidgetContactJidChanged(const Jid &ABefour);
+  void onToolBarWidgetDestroyed(QObject *AObject);
   void onSettingsOpened();
   void onSettingsClosed();
 private:
@@ -91,6 +101,7 @@ private:
   INotifications *FNotifications;
   IDataStreamsManager *FDataManager;
   IFileStreamsManager *FFileManager;
+  IMessageWidgets *FMessageWidgets;
   ISettingsPlugin *FSettingsPlugin;
 private:
   bool FAutoReceive;
@@ -98,6 +109,7 @@ private:
   bool FRemoveTransferWhenFinished;
   QMap<QString, int> FStreamNotify;
   QMap<QString, StreamDialog *> FStreamDialog;
+  QMap<IToolBarWidget *, Action *> FToolBarActions;
 };
 
 #endif // FILETRANSFER_H

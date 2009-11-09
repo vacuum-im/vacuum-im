@@ -22,6 +22,7 @@ FileTransfer::FileTransfer()
   FNotifications = NULL;
   FFileManager = NULL;
   FDataManager = NULL;
+  FMessageWidgets = NULL;
   FSettingsPlugin = NULL;
 
   FAutoReceive = false;
@@ -59,16 +60,21 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitO
     FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
   }
 
-  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
-  if (plugin)
-  {
-    FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
-  }
-
   plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
   if (plugin)
   {
     FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+  }
+
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
+  if (plugin)
+  {
+    FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+    if (FDiscovery)
+    {
+      connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+      connect(FDiscovery->instance(),SIGNAL(discoInfoRemoved(const IDiscoInfo &)),SLOT(onDiscoInfoRemoved(const IDiscoInfo &)));
+    }
   }
 
   plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
@@ -90,6 +96,16 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitO
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+    }
+  }
+
+  plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
+  if (plugin)
+  {
+    FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
+    if (FMessageWidgets)
+    {
+      connect(FMessageWidgets->instance(), SIGNAL(toolBarWidgetCreated(IToolBarWidget *)), SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
     }
   }
 
@@ -266,14 +282,7 @@ bool FileTransfer::isSupported(const Jid &AStreamJid, const Jid &AContactJid) co
   if (FFileManager->streamMethods().isEmpty())
     return false;
 
-  if (FDiscovery && FDiscovery->hasDiscoInfo(AContactJid))
-  {
-    IDiscoInfo info = FDiscovery->discoInfo(AContactJid);
-    if (!info.features.contains(NS_SI_FILETRANSFER))
-      return false;
-  }
-
-  return true;
+  return FDiscovery==NULL || FDiscovery->discoInfo(AContactJid).features.contains(NS_SI_FILETRANSFER);
 }
 
 IFileStream *FileTransfer::sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName)
@@ -391,6 +400,44 @@ void FileTransfer::autoStartStream(IFileStream *AStream)
   }
 }
 
+void FileTransfer::insertToolBarAction(IToolBarWidget *AWidget)
+{
+  if (FToolBarActions.value(AWidget) == NULL)
+  {
+    Action *action = NULL;
+    if (isSupported(AWidget->editWidget()->streamJid(),AWidget->editWidget()->contactJid()))
+    {
+      action = new Action(AWidget->toolBarChanger()->toolBar());
+      action->setIcon(RSR_STORAGE_MENUICONS, MNI_FILETRANSFER_SEND);
+      action->setText(tr("Send File"));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
+      AWidget->toolBarChanger()->addAction(action,TBG_MWTBW_FILETRANSFER);
+    }
+    FToolBarActions.insert(AWidget, action);
+  }
+  else
+  {
+    FToolBarActions.value(AWidget)->setEnabled(true);
+  }
+}
+
+void FileTransfer::removeToolBarAction(IToolBarWidget *AWidget)
+{
+  if (FToolBarActions.value(AWidget)!=NULL)
+  {
+    FToolBarActions.value(AWidget)->setEnabled(false);
+  }
+}
+
+QList<IToolBarWidget *> FileTransfer::findToolBarWidgets(const Jid &AContactJid) const
+{
+  QList<IToolBarWidget *> toolBars;
+  foreach (IToolBarWidget *widget, FToolBarActions.keys())
+    if (widget->editWidget()->contactJid()==AContactJid)
+      toolBars.append(widget);
+  return toolBars;
+}
+
 StreamDialog *FileTransfer::createStreamDialog(IFileStream *AStream)
 {
   StreamDialog *dialog = FStreamDialog.value(AStream->streamId());
@@ -459,10 +506,16 @@ void FileTransfer::onShowSendFileDialogByAction(bool)
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
-    Jid streamJid = action->data(ADR_STREAM_JID).toString();
-    Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-    QString file = action->data(ADR_FILE_NAME).toString();
-    sendFile(streamJid,contactJid,file);
+    IToolBarWidget *widget = FToolBarActions.key(action);
+    if (!widget)
+    {
+      Jid streamJid = action->data(ADR_STREAM_JID).toString();
+      Jid contactJid = action->data(ADR_CONTACT_JID).toString();
+      QString file = action->data(ADR_FILE_NAME).toString();
+      sendFile(streamJid,contactJid,file);
+    }
+    else if (widget->editWidget() != NULL)
+      sendFile(widget->editWidget()->streamJid(), widget->editWidget()->contactJid());
   }
 }
 
@@ -475,6 +528,56 @@ void FileTransfer::onNotificationActivated(int ANotifyId)
 void FileTransfer::onNotificationRemoved(int ANotifyId)
 {
   FStreamNotify.remove(FStreamNotify.key(ANotifyId));
+}
+
+void FileTransfer::onDiscoInfoReceived(const IDiscoInfo &AInfo)
+{
+  foreach(IToolBarWidget *widget, findToolBarWidgets(AInfo.contactJid))
+  {
+    if (isSupported(widget->editWidget()->streamJid(),widget->editWidget()->contactJid()))
+      insertToolBarAction(widget);
+    else
+      removeToolBarAction(widget);
+  }
+}
+
+void FileTransfer::onDiscoInfoRemoved(const IDiscoInfo &AInfo)
+{
+  foreach(IToolBarWidget *widget, findToolBarWidgets(AInfo.contactJid))
+    removeToolBarAction(widget);
+}
+
+void FileTransfer::onToolBarWidgetCreated(IToolBarWidget *AWidget)
+{
+  if (AWidget->editWidget() != NULL)
+  {
+    insertToolBarAction(AWidget);
+    connect(AWidget->instance(),SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
+    connect(AWidget->editWidget()->instance(),SIGNAL(contactJidChanged(const Jid &)), SLOT(onEditWidgetContactJidChanged(const Jid &)));
+  }
+}
+
+void FileTransfer::onEditWidgetContactJidChanged(const Jid &ABefour)
+{
+  Q_UNUSED(ABefour);
+  IEditWidget *editWidget = qobject_cast<IEditWidget *>(sender());
+  if (editWidget)
+  {
+    foreach(IToolBarWidget *widget, findToolBarWidgets(editWidget->contactJid()))
+    {
+      if (isSupported(widget->editWidget()->streamJid(),widget->editWidget()->contactJid()))
+        insertToolBarAction(widget);
+      else
+        removeToolBarAction(widget);
+    }
+  }
+}
+
+void FileTransfer::onToolBarWidgetDestroyed(QObject *AObject)
+{
+  foreach(IToolBarWidget *widget, FToolBarActions.keys())
+    if (qobject_cast<QObject *>(widget->instance()) == AObject)
+      FToolBarActions.remove(widget);
 }
 
 void FileTransfer::onSettingsOpened()
@@ -492,6 +595,5 @@ void FileTransfer::onSettingsClosed()
   settings->setValue(SVN_HIDE_DIALOG_STARTED,FHideDialogWhenStarted);
   settings->setValue(SVN_REMOVE_TRANSFER_FINISHED,FRemoveTransferWhenFinished);
 }
-
 
 Q_EXPORT_PLUGIN2(FileTransferPlugin, FileTransfer);
