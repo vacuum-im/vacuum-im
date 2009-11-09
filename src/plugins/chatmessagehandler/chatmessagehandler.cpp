@@ -1,12 +1,14 @@
 #include "chatmessagehandler.h"
 
 #define HISTORY_MESSAGES          10
+#define HISTORY_TIME_PAST         5
 
 #define DESTROYWINDOW_TIMEOUT     30*60*1000
 #define CONSECUTIVE_TIMEOUT       2*60
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
+
 
 #define CHAT_NOTIFICATOR_ID       "ChatMessages"
 
@@ -291,8 +293,16 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
     request.with = AWindow->contactJid().bare();
     request.count = HISTORY_MESSAGES;
     request.order = Qt::DescendingOrder;
-    QList<Message> history = FMessageArchiver->findLocalMessages(AWindow->streamJid(),request);
-    qSort(history);
+    request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
+    
+    QList<Message> history;
+    QList<IArchiveHeader> headers = FMessageArchiver->loadLocalHeaders(AWindow->streamJid(), request);
+    for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
+    {
+      IArchiveCollection collection = FMessageArchiver->loadLocalCollection(AWindow->streamJid(), headers.at(i));
+      history = collection.messages + history;
+    }
+
     for (int i=0; i<history.count(); i++)
     {
       Message message = history.at(i);
@@ -353,7 +363,7 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
   else
     options.direction = IMessageContentOptions::DirectionOut;
 
-  if (options.time.secsTo(QDateTime::currentDateTime())>5)
+  if (options.time.secsTo(QDateTime::currentDateTime())>HISTORY_TIME_PAST)
     options.type |= IMessageContentOptions::History;
   
   fillContentOptions(AWindow,options);

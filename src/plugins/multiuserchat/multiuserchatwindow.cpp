@@ -20,6 +20,7 @@
 #define CONSECUTIVE_TIMEOUT         2*60
 
 #define HISTORY_MESSAGES            10
+#define HISTORY_TIME_PAST           5
 
 MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat)
 {
@@ -1112,7 +1113,7 @@ void MultiUserChatWindow::showChatMessage(IChatWindow *AWindow, const Message &A
   
   options.direction = AWindow->contactJid()!=AMessage.to() ? IMessageContentOptions::DirectionIn : IMessageContentOptions::DirectionOut;
 
-  if (options.time.secsTo(QDateTime::currentDateTime())>5)
+  if (options.time.secsTo(QDateTime::currentDateTime())>HISTORY_TIME_PAST)
     options.type |= IMessageContentOptions::History;
 
   fillChatContentOptions(AWindow,options);
@@ -1127,8 +1128,16 @@ void MultiUserChatWindow::showChatHistory(IChatWindow *AWindow)
     request.with = AWindow->contactJid();
     request.count = HISTORY_MESSAGES;
     request.order = Qt::DescendingOrder;
-    QList<Message> history = FMessageArchiver->findLocalMessages(AWindow->streamJid(),request);
-    qSort(history);
+    request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
+
+    QList<Message> history;
+    QList<IArchiveHeader> headers = FMessageArchiver->loadLocalHeaders(AWindow->streamJid(), request);
+    for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
+    {
+      IArchiveCollection collection = FMessageArchiver->loadLocalCollection(AWindow->streamJid(), headers.at(i));
+      history = collection.messages + history;
+    }
+
     for (int i=0; i<history.count(); i++)
     {
       Message message = history.at(i);
