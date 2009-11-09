@@ -144,7 +144,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
     if (FMessageWidgets)
     {
-      connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IChatWindow *)),SLOT(onChatWindowCreated(IChatWindow *)));
+      connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolbarWidgetCreated(IToolBarWidget *)));
     }
   }
 
@@ -2800,25 +2800,22 @@ void MessageArchiver::onStanzaSessionTerminated(const IStanzaSession &ASession)
     notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Session failed: %1").arg(ErrorHandler(ASession.errorCondition).message()));
 }
 
-void MessageArchiver::onChatWindowCreated(IChatWindow *AWindow)
+void MessageArchiver::onToolbarWidgetCreated(IToolBarWidget *AWidget)
 {
-  ChatWindowMenu *menu = new ChatWindowMenu(this,AWindow);
-  QToolButton *button = AWindow->toolBarWidget()->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWCW_ARCHIVE,true);
-  button->setPopupMode(QToolButton::InstantPopup);
-  button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  if (AWidget->editWidget() != NULL)
+  {
+    ChatWindowMenu *menu = new ChatWindowMenu(this,AWidget, AWidget->toolBarChanger()->toolBar());
+    QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWCW_ARCHIVE,true);
+    button->setPopupMode(QToolButton::InstantPopup);
+    button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  }
 }
 
 void MessageArchiver::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 {
   Menu *roomMenu = AWindow->menuBarWidget()->menuBarChanger()->groupMenus(MBG_MUCW_ROOM).value(0,NULL);
   if (roomMenu)
-  {
-    //Menu *menu = new Menu(roomMenu);
-    //menu->setTitle(tr("History"));
-    //menu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
-    //roomMenu->addAction(menu->menuAction(),AG_MURM_ARCHIVER,true);
     connect(roomMenu,SIGNAL(aboutToShow()),SLOT(onMultiChatWindowMenuAboutToShow()));
-  }
 }
 
 Q_EXPORT_PLUGIN2(MessageArchiverPlugin, MessageArchiver)
