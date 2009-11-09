@@ -10,6 +10,7 @@
 
 //MessageWidgets - ToolBarWidget
 #define TBG_MWTBW_EMOTICONS                                     500
+#define TBG_MWTBW_FILETRANSFER                                  600
 #define TBG_MWTBW_ARCHIVE                                       900
 
 //SeriveDiscovery - DiscoItemsWindow
