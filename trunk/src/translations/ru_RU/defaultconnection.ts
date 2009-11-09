@@ -39,12 +39,8 @@
 <context>
     <name>DefaultConnection</name>
     <message>
-        <source>Socket not ready</source>
-        <translation>Сокет не готов</translation>
-    </message>
-    <message>
-        <source>Connection timed out</source>
-        <translation>Соединение прервано по таймауту</translation>
+        <source>Disconnection timed out</source>
+        <translation>Превышено время отключения</translation>
     </message>
 </context>
 <context>

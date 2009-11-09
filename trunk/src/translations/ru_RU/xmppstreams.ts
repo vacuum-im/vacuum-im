@@ -12,10 +12,6 @@
         <translation>Введите пароль для &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>Password not specified</source>
-        <translation>Пароль не задан</translation>
-    </message>
-    <message>
         <source>Connection not specified</source>
         <translation>Соединение не определено</translation>
     </message>
