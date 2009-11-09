@@ -8,9 +8,9 @@
 #define TBG_MWTTB_BOOKMARKS                                     400
 #define TBG_MWTTB_ROSTERSEARCH                                  900
 
-//MessageWidgets - ChatWindow
-#define TBG_MWCW_EMOTICONS                                      500
-#define TBG_MWCW_ARCHIVE                                        900
+//MessageWidgets - ToolBarWidget
+#define TBG_MWTBW_EMOTICONS                                     500
+#define TBG_MWTBW_ARCHIVE                                       900
 
 //SeriveDiscovery - DiscoItemsWindow
 #define TBG_DIWT_DISCOVERY_NAVIGATE                             100
