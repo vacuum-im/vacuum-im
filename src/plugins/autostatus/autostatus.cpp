@@ -173,11 +173,11 @@ void AutoStatus::setActiveRule(int ARuleId)
         FStatusChanger->updateStatusItem(FAutoStatusId,tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(FLastStatusId));
       
       if (FAutoStatusId!=FStatusChanger->mainStatus())
-        FStatusChanger->setStatus(FAutoStatusId);
+        FStatusChanger->setMainStatus(FAutoStatusId);
     }
     else
     {
-      FStatusChanger->setStatus(FLastStatusId);
+      FStatusChanger->setMainStatus(FLastStatusId);
       FStatusChanger->removeStatusItem(FAutoStatusId);
       FAutoStatusId = STATUS_NULL_ID;
     }

@@ -70,16 +70,35 @@
 <context>
     <name>EditStatusDialogClass</name>
     <message>
-        <source>Edit presence statuses</source>
-        <translation>Редактировать статусы</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
         <source>Delete</source>
         <translation>Удалить</translation>
+    </message>
+    <message>
+        <source>Edit statuses</source>
+        <translation>Редактировать статусы</translation>
+    </message>
+</context>
+<context>
+    <name>ModifyStatusDialogClass</name>
+    <message>
+        <source>Modify Status</source>
+        <translation>Изменить статус</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Статус</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Приоритет</translation>
     </message>
 </context>
 <context>
@@ -91,10 +110,6 @@
     <message>
         <source>Status Changer</source>
         <translation>Менеджер статусов</translation>
-    </message>
-    <message>
-        <source>Edit presence statuses</source>
-        <translation>Редактировать статусы</translation>
     </message>
     <message>
         <source>Connection errors</source>
@@ -138,7 +153,7 @@
     </message>
     <message>
         <source>Free for chat</source>
-        <translation>Поболтаем?</translation>
+        <translation>Поболтать</translation>
     </message>
     <message>
         <source>I`am away from my desk</source>
@@ -163,6 +178,14 @@
     <message>
         <source>Status</source>
         <translation>Статус</translation>
+    </message>
+    <message>
+        <source>Modify status</source>
+        <translation>Изменять статус</translation>
+    </message>
+    <message>
+        <source>Edit statuses</source>
+        <translation>Редактировать статусы</translation>
     </message>
 </context>
 </TS>

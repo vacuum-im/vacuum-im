@@ -207,6 +207,7 @@
 #define MNI_SETTINGS_EDIT_PROFILES      "settingsEditProfiles"
 
 //StatusChanger
+#define MNI_SCHANGER_MODIFY_STATUS      "schangerModifyStatus"
 #define MNI_SCHANGER_EDIT_STATUSES      "schangerEditStatuses"
 #define MNI_SCHANGER_CONNECTING         "schangerConnecting"
 

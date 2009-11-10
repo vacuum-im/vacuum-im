@@ -272,7 +272,7 @@ void EditStatusDialog::onAddbutton(bool)
       priority->setTextAlignment(Qt::AlignCenter);
       priority->setData(Qt::DisplayRole, 30);
       priority->setData(TIR_DELEGATE,Delegate::DelegatePriority);
-      priority->setData(TIR_VALUE,100);
+      priority->setData(TIR_VALUE,30);
       tblStatus->setItem(row,COL_PRIORITY,priority);
 
       tblStatus->editItem(message);

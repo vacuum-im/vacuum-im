@@ -1,9 +1,8 @@
 #ifndef EDITSTATUSDIALOG_H
 #define EDITSTATUSDIALOG_H
 
-#include <QDialog>
 #include <QIcon>
-#include <QMultiHash>
+#include <QDialog>
 #include <QItemDelegate>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
@@ -58,8 +57,8 @@ protected slots:
 private:
   IStatusChanger *FStatusChanger;
 private:
-  QHash<int,RowStatus *> FStatusItems;
   QList<int> FDeletedStatuses;
+  QMap<int, RowStatus *> FStatusItems;
 };
 
 #endif // EDITSTATUSDIALOG_H
