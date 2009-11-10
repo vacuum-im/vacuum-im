@@ -2,10 +2,9 @@
 #define STATUSCHANGER_H
 
 #include <QSet>
-#include <QHash>
 #include <QPair>
-#include <QDateTime>
 #include <QPointer>
+#include <QDateTime>
 #include <definations/actiongroups.h>
 #include <definations/rosterlabelorders.h>
 #include <definations/optionnodes.h>
@@ -31,6 +30,7 @@
 #include <interfaces/inotifications.h>
 #include "editstatusdialog.h"
 #include "accountoptionswidget.h"
+#include "modifystatusdialog.h"
 
 struct StatusItem {
   int code;
@@ -62,30 +62,32 @@ public:
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IStatusChanger
-  virtual int mainStatus() const { return FStatusItems.value(-1)->code; }
-  virtual void setStatus(int AStatusId, const Jid &AStreamJid = Jid());
-  virtual int streamStatus(const Jid &AStreamJid) const;
-  virtual Menu *statusMenu() const { return FMainMenu; }
+  virtual Menu *statusMenu() const;
   virtual Menu *streamMenu(const Jid &AStreamJid) const;
-  virtual int addStatusItem(const QString &AName, int AShow, const QString &AText, int APriority);
-  virtual void updateStatusItem(int AStatusId, const QString &AName, int AShow, const QString &AText, int APriority);
-  virtual void removeStatusItem(int AStatusId);
+  virtual int mainStatus() const;
+  virtual void setMainStatus(int AStatusId);
+  virtual int streamStatus(const Jid &AStreamJid) const;
+  virtual void setStreamStatus(const Jid &AStreamJid, int AStatusId);
   virtual QString statusItemName(int AStatusId) const;
   virtual int statusItemShow(int AStatusId) const;
   virtual QString statusItemText(int AStatusId) const;
   virtual int statusItemPriority(int AStatusId) const;
-  virtual QList<int> statusItems() const { return FStatusItems.keys(); }
+  virtual QList<int> statusItems() const;
   virtual QList<int> activeStatusItems() const;
-  virtual int statusByName(const QString &AName) const;
   virtual QList<int> statusByShow(int AShow) const;
+  virtual int statusByName(const QString &AName) const;
+  virtual int addStatusItem(const QString &AName, int AShow, const QString &AText, int APriority);
+  virtual void updateStatusItem(int AStatusId, const QString &AName, int AShow, const QString &AText, int APriority);
+  virtual void removeStatusItem(int AStatusId);
   virtual QIcon iconByShow(int AShow) const;
   virtual QString nameByShow(int AShow) const;
 signals:
+  virtual void statusAboutToBeChanged(const Jid &AStreamJid, int AStatusId);
+  virtual void statusChanged(const Jid &AStreamJid, int AStatusId);
   virtual void statusItemAdded(int AStatusId);
   virtual void statusItemChanged(int AStatusId);
   virtual void statusItemRemoved(int AStatusId);
-  virtual void statusAboutToBeSeted(int AStatusId, const Jid &AStreamJid);
-  virtual void statusSeted(int AStatusId, const Jid &AStreamJid);
+  //IOptionsHolder
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
@@ -141,24 +143,23 @@ private:
   IStatusIcons *FStatusIcons;
   INotifications *FNotifications;
 private:
-  int FConnectingLabel;
-private:
-  Action *FEditStatusAction;
-  QPointer<EditStatusDialog> FEditStatusDialog;
-private:
   Menu *FMainMenu;
-  QHash<IPresence *, Menu *> FStreamMenu;
-  QHash<IPresence *, Action *> FStreamMainStatusAction;
+  Action *FModifyStatus;
+  QMap<IPresence *, Menu *> FStreamMenu;
+  QMap<IPresence *, Action *> FStreamMainStatusAction;
 private:
+  int FConnectingLabel;
   IPresence *FSettingStatusToPresence;
-  QHash<int, StatusItem *> FStatusItems;
-  QHash<IPresence *, int> FStreamStatus;
-  QHash<IPresence *, int> FStreamWaitStatus;
-  QHash<Jid, int> FStreamLastStatus;
-  QHash<IPresence *,QPair<QDateTime,int> >FStreamWaitReconnect;
-  QHash<IPresence *,int> FStreamTempStatus;
+  QMap<int, StatusItem *> FStatusItems;
+  QMap<Jid, int> FStreamLastStatus;
   QSet<IPresence *> FStreamMainStatus;
-  QHash<IPresence *,int> FStreamNotify;
+  QMap<IPresence *, int> FStreamStatus;
+  QMap<IPresence *, int> FStreamWaitStatus;
+  QMap<IPresence *, int> FStreamTempStatus;
+  QMap<IPresence *, int> FStreamNotify;
+  QMap<IPresence *, QPair<QDateTime,int> > FStreamWaitReconnect;
+  QPointer<EditStatusDialog> FEditStatusDialog;
+  QPointer<ModifyStatusDialog> FModifyStatusDialog;
 };
 
 #endif // STATUSCHANGER_H
