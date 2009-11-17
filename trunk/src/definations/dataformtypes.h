@@ -1,6 +1,9 @@
 #ifndef DEF_DATAFORMTYPES_H
 #define DEF_DATAFORMTYPES_H
 
+//CaptchaForms
+#define DATA_FORM_CAPTCHAFORMS                "urn:xmpp:captcha"
+
 //ClientInfo
 #define DATA_FORM_SOFTWAREINFO                "urn:xmpp:dataforms:softwareinfo"
 

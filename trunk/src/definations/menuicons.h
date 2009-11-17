@@ -25,6 +25,9 @@
 #define MNI_BOOKMARKS_URL               "bookmarksURL"
 #define MNI_BOOKMARKS_EDIT              "bookmarksEdit"
 
+//CaptchaForms
+#define MNI_CAPTCHAFORMS                "captchaforms"
+
 //ChatStates
 #define MNI_CHATSTATES_UNKNOWN          "chatstatesUnknown"
 #define MNI_CHATSTATES_ACTIVE           "chatstatesActive"
