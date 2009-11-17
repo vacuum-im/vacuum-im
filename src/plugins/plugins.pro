@@ -53,4 +53,5 @@ SUBDIRS = settings \
           filestreamsmanager \
           filetransfer \
           inbandstreams \
-          socksstreams
+          socksstreams \
+          captchaforms

@@ -5,6 +5,7 @@
 #define NS_XMPP_DELAY                           "urn:xmpp:delay"
 #define NS_XMPP_TIME                            "urn:xmpp:time"
 #define NS_STANZA_SESSION                       "urn:xmpp:ssn"
+#define NS_CAPTCHA_FORMS                        "urn:xmpp:captcha"
 
 #define NS_JABBER_CLIENT                        "jabber:client"
 #define NS_JABBER_STREAMS                       "http://etherx.jabber.org/streams"
