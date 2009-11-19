@@ -2,10 +2,10 @@
 #define FILESTREAMSOPTIONS_H
 
 #include <QWidget>
-#include <QCheckbox>
-#include "ui_filestreamsoptions.h"
+#include <QCheckBox>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
+#include "ui_filestreamsoptions.h"
 
 class FileStreamsOptions : 
   public QWidget
