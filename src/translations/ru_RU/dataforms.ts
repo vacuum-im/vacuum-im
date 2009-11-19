@@ -54,6 +54,10 @@
         <source>Unsupported url scheme</source>
         <translation>Неподдерживаемый тип URL</translation>
     </message>
+    <message>
+        <source>Url load failed</source>
+        <translation>Загрузка URL завершилась с ошибкой</translation>
+    </message>
 </context>
 <context>
     <name>DataMediaWidget</name>

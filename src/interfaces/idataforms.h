@@ -92,9 +92,9 @@ struct IDataField {
   QString label;
   QString desc;
   QVariant value;
-  QList<IDataOption> options;
-  IDataValidate validate;
   IDataMedia media;
+  IDataValidate validate;
+  QList<IDataOption> options;
 };
 
 struct IDataTable {
@@ -104,17 +104,17 @@ struct IDataTable {
 
 struct IDataLayout {
   QString label;
-  QStringList text;
-  QStringList fieldrefs;
+  QList<QString> text;
+  QList<QString> fieldrefs;
   QList<IDataLayout> sections;
-  QStringList childOrder;
+  QList<QString> childOrder;
 };
 
 struct IDataForm {
   QString type;
   QString title;
-  QStringList instructions;
   IDataTable tabel;
+  QList<QString> instructions;
   QList<IDataField> fields;
   QList<IDataLayout> pages;
 };
@@ -126,13 +126,13 @@ struct IDataOptionLocale {
 struct IDataFieldLocale {
   QString label;
   QString desc;
-  QHash<QString, IDataOptionLocale> options;
+  QMap<QString, IDataOptionLocale> options;
 };
 
 struct IDataFormLocale {
   QString title;
   QStringList instructions;
-  QHash<QString, IDataFieldLocale> fields;
+  QMap<QString, IDataFieldLocale> fields;
 };
 
 class IDataTableWidget
@@ -226,7 +226,7 @@ public:
   //DATA2XML
   virtual void xmlValidate(const IDataValidate &AValidate, QDomElement &AFieldElem) const =0;
   virtual void xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) const =0;
-  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, const QString &AFormType = DATAFORM_TYPE_FORM) const =0;
+  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, const QString &AFormType) const =0;
   virtual void xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const =0;
   virtual void xmlSection(const IDataLayout &ALayout, QDomElement &AParentElem) const =0;
   virtual void xmlPage(const IDataLayout &ALayout, QDomElement &AParentElem) const =0;
@@ -236,7 +236,7 @@ public:
   virtual bool isOptionValid(const QList<IDataOption> &AOptions, const QString &AValue) const =0;
   virtual bool isMediaValid(const IDataMedia &AMedia) const =0;
   virtual bool isFieldEmpty(const IDataField &AField) const =0;
-  virtual bool isFieldValid(const IDataField &AField, const QString &AFormType = DATAFORM_TYPE_FORM) const =0;
+  virtual bool isFieldValid(const IDataField &AField, const QString &AFormType) const =0;
   virtual bool isFormValid(const IDataForm &AForm) const =0;
   virtual bool isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) const =0;
   virtual bool isSupportedUri(const IDataMediaURI &AUri) const =0;
@@ -250,8 +250,7 @@ public:
   virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const =0;
   virtual IDataForm dataSubmit(const IDataForm &AForm) const =0;
   virtual IDataForm dataShowSubmit(const IDataForm &AForm, const IDataForm &ASubmit) const =0;
-  virtual QByteArray urlData(const QUrl &AUrl) const =0;
-  virtual bool loadUrl(const QUrl &AUrl, bool AEnableCache = true) =0;
+  virtual bool loadUrl(const QUrl &AUrl) =0;
   //Data widgets
   virtual QValidator *dataValidator(const IDataValidate &AValidate, QObject *AParent) const =0;
   virtual IDataTableWidget *tableWidget(const IDataTable &ATable, QWidget *AParent) =0;

@@ -4,7 +4,7 @@
 
 DataForms::DataForms()
 {
-  FSettings = NULL;
+  FBitsOfBinary = NULL;
   FDiscovery = NULL;
 }
 
@@ -30,15 +30,12 @@ bool DataForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
   
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IBitsOfBinary").value(0,NULL);
   if (plugin)
   {
-    ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (settingsPlugin)
-    {
-      FSettings = settingsPlugin->settingsForPlugin(DATAFORMS_UUID);
-    }
+    FBitsOfBinary = qobject_cast<IBitsOfBinary *>(plugin->instance());
   }
+
   return true;
 }
 
@@ -48,11 +45,6 @@ bool DataForms::initObjects()
   {
     registerDiscoFeatures();
   }
-  return true;
-}
-
-bool DataForms::startPlugin()
-{
   return true;
 }
 
@@ -693,7 +685,7 @@ bool DataForms::isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) 
           submField.type = formField.type;
           submField.options = formField.options;
           submField.validate = formField.validate;
-          valid &= isFieldValid(submField);
+          valid &= isFieldValid(submField,DATAFORM_TYPE_SUBMIT);
         }
         else
           valid &= !formField.required;
@@ -707,15 +699,20 @@ bool DataForms::isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) 
 
 bool DataForms::isSupportedUri(const IDataMediaURI &AUri) const
 {
-  static const QStringList urlSchemes = QStringList() << "http" << "ftp";
-  if (urlSchemes.contains(AUri.url.scheme().toLower()))
-  {
-    if (AUri.type == MEDIAELEM_TYPE_IMAGE)
-    {
-      return QImageReader::supportedImageFormats().contains(AUri.subtype.toLower().toLatin1());
-    }
-  }
-  return false;
+  bool supportedType = false;
+  bool supportedScheme = false;
+  QString scheme = AUri.url.scheme().toLower();
+
+  if (scheme=="http" || scheme=="shttp" || scheme=="ftp")
+    supportedScheme = true;
+
+  if (FBitsOfBinary && scheme=="cid" && FBitsOfBinary->hasBinary(AUri.url.toString().remove(0,4)))
+    supportedScheme = true;
+
+  if (AUri.type == MEDIAELEM_TYPE_IMAGE)
+    supportedType = QImageReader::supportedImageFormats().contains(AUri.subtype.toLower().toLatin1());
+
+  return supportedScheme && supportedType;
 }
 
 IDataLocalizer *DataForms::dataLocalizer(const QString &AFormType) const
@@ -763,7 +760,7 @@ IDataForm DataForms::localizeForm(const IDataForm &AForm) const
 
 void DataForms::insertLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField)
 {
-  if (!ATypeField.isEmpty() && !FLoadStates.contains(ATypeField))
+  if (!ATypeField.isEmpty() && !FLocalizers.contains(ATypeField))
   {
     FLocalizers.insert(ATypeField,ALocalizer);
   }
@@ -864,39 +861,40 @@ IDataForm DataForms::dataShowSubmit(const IDataForm &AForm, const IDataForm &ASu
   return form;
 }
 
-QByteArray DataForms::urlData(const QUrl &AUrl) const
+bool DataForms::loadUrl(const QUrl &AUrl)
 {
-  return  FSettings!=NULL ? FSettings->loadBinaryData(AUrl.toString()) : QByteArray();
-}
-
-bool DataForms::loadUrl(const QUrl &AUrl, bool AEnableCache)
-{
-  QByteArray cache;
-  if (!AEnableCache || (cache=urlData(AUrl)).isEmpty())
+  if (!FUrlRequests.contains(AUrl))
   {
-    if (!FLoadStates.contains(AUrl))
+    QString scheme = AUrl.scheme().toLower();
+    if (scheme=="http" || scheme=="shttp" || scheme=="ftp")
     {
-      QString scheme = AUrl.scheme().toLower();
-      if (scheme=="http" || scheme=="ftp")
+      UrlRequest state;
+      state.reply = FNetworkManager.get(QNetworkRequest(AUrl));
+      state.reply->setReadBufferSize(0);
+      connect(state.reply,SIGNAL(finished()),SLOT(onNetworkReplyFinished()));
+      connect(state.reply,SIGNAL(error(QNetworkReply::NetworkError)),SLOT(onNetworkReplyError(QNetworkReply::NetworkError)));
+      connect(state.reply,SIGNAL(sslErrors(const QList<QSslError> &)),SLOT(onNetworkReplySSLErrors(const QList<QSslError> &)));
+      FUrlRequests.insert(AUrl,state);
+    }
+    else if (FBitsOfBinary && scheme=="cid")
+    {
+      QString cid = AUrl.toString().remove(0,4);
+      QString type; QByteArray data; quint64 maxAge;
+      if (FBitsOfBinary->loadBinary(cid,type,data,maxAge))
       {
-        UrlLoadState state;
-        state.reply = FNetworkManager.get(QNetworkRequest(AUrl));
-        state.reply->setReadBufferSize(0);
-        connect(state.reply,SIGNAL(finished()),SLOT(onNetworkReplyFinished()));
-        connect(state.reply,SIGNAL(error(QNetworkReply::NetworkError)),SLOT(onNetworkReplyError(QNetworkReply::NetworkError)));
-        connect(state.reply,SIGNAL(sslErrors(const QList<QSslError> &)),SLOT(onNetworkReplySSLErrors(const QList<QSslError> &)));
-        FLoadStates.insert(AUrl,state);
+        urlLoadSuccess(AUrl, data);
       }
       else
       {
-        emit urlLoadFailed(AUrl,tr("Unsupported url scheme"));
+        urlLoadFailure(AUrl,tr("Url load failed"));
         return false;
       }
     }
-  }
-  else
-  {
-    emit urlLoaded(AUrl,cache);
+    else
+    {
+      urlLoadFailure(AUrl,tr("Unsupported url scheme"));
+      return false;
+    }
   }
   return true;
 }
@@ -1026,22 +1024,14 @@ void DataForms::xmlLayout(const IDataLayout &ALayout, QDomElement &ALayoutElem) 
 
 void DataForms::urlLoadSuccess(const QUrl &AUrl, const QByteArray &AData)
 {
-  if (FLoadStates.contains(AUrl))
-  {
-    FLoadStates.remove(AUrl);
-    if (FSettings)
-      FSettings->saveBinaryData(AUrl.toString(),AData);
-    emit urlLoaded(AUrl,AData);
-  }
+  FUrlRequests.remove(AUrl);
+  emit urlLoaded(AUrl,AData);
 }
 
 void DataForms::urlLoadFailure(const QUrl &AUrl, const QString &AError)
 {
-  if (FLoadStates.contains(AUrl))
-  {
-    FLoadStates.remove(AUrl);
-    emit urlLoadFailed(AUrl,AError);
-  }
+  FUrlRequests.remove(AUrl);
+  emit urlLoadFailed(AUrl,AError);
 }
 
 void DataForms::registerDiscoFeatures()
@@ -1080,6 +1070,7 @@ void DataForms::onNetworkReplyFinished()
     QByteArray data = reply->readAll();
     urlLoadSuccess(reply->url(),data);
     reply->close();
+    reply->deleteLater();
   }
 }
 
@@ -1089,6 +1080,8 @@ void DataForms::onNetworkReplyError(QNetworkReply::NetworkError /*ACode*/)
   if (reply)
   {
     urlLoadFailure(reply->url(),reply->errorString());
+    reply->close();
+    reply->deleteLater();
   }
 }
 
@@ -1099,10 +1092,9 @@ void DataForms::onNetworkReplySSLErrors(const QList<QSslError> &/*AErrors*/)
     reply->ignoreSslErrors();
 }
 
-Q_EXPORT_PLUGIN2(DataFormsPlugin, DataForms);
-
 uint qHash(const QUrl &key)
 {
   return qHash(key.toString());
 }
 
+Q_EXPORT_PLUGIN2(DataFormsPlugin, DataForms);
