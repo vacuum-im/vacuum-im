@@ -8,7 +8,7 @@
 #include <definations/namespaces.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idataforms.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ibitsofbinary.h>
 #include <interfaces/iservicediscovery.h>
 #include "datatablewidget.h"
 #include "datamediawidget.h"
@@ -16,7 +16,7 @@
 #include "dataformwidget.h"
 #include "datadialogwidget.h"
 
-struct UrlLoadState
+struct UrlRequest
 {
   QNetworkReply *reply;
 };
@@ -38,7 +38,7 @@ public:
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
-  virtual bool startPlugin();
+  virtual bool startPlugin() { return true; }
   //XML2DATA
   virtual IDataValidate dataValidate(const QDomElement &AValidateElem) const;
   virtual IDataMedia dataMedia(const QDomElement &AMediaElem) const;
@@ -49,7 +49,7 @@ public:
   //DATA2XML
   virtual void xmlValidate(const IDataValidate &AValidate, QDomElement &AFieldElem) const;
   virtual void xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) const;
-  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, const QString &AFormType = DATAFORM_TYPE_FORM) const;
+  virtual void xmlField(const IDataField &AField, QDomElement &AFormElem, const QString &AFormType) const;
   virtual void xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const;
   virtual void xmlSection(const IDataLayout &ALayout, QDomElement &AParentElem) const;
   virtual void xmlPage(const IDataLayout &ALayout, QDomElement &AParentElem) const;
@@ -59,7 +59,7 @@ public:
   virtual bool isOptionValid(const QList<IDataOption> &AOptions, const QString &AValue) const;
   virtual bool isMediaValid(const IDataMedia &AMedia) const;
   virtual bool isFieldEmpty(const IDataField &AField) const;
-  virtual bool isFieldValid(const IDataField &AField, const QString &AFormType = DATAFORM_TYPE_FORM) const;
+  virtual bool isFieldValid(const IDataField &AField, const QString &AFormType) const;
   virtual bool isFormValid(const IDataForm &AForm) const;
   virtual bool isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) const;
   virtual bool isSupportedUri(const IDataMediaURI &AUri) const;
@@ -73,8 +73,7 @@ public:
   virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const;
   virtual IDataForm dataSubmit(const IDataForm &AForm) const;
   virtual IDataForm dataShowSubmit(const IDataForm &AForm, const IDataForm &ASubmit) const;
-  virtual QByteArray urlData(const QUrl &AUrl) const;
-  virtual bool loadUrl(const QUrl &AUrl, bool AEnableCache = true);
+  virtual bool loadUrl(const QUrl &AUrl);
   //Data widgets
   virtual QValidator *dataValidator(const IDataValidate &AValidate, QObject *AParent) const;
   virtual IDataTableWidget *tableWidget(const IDataTable &ATable, QWidget *AParent);
@@ -100,12 +99,12 @@ protected slots:
   void onNetworkReplyError(QNetworkReply::NetworkError ACode);
   void onNetworkReplySSLErrors(const QList<QSslError> &AErrors);
 private:
-  ISettings *FSettings;
+  IBitsOfBinary *FBitsOfBinary;
   IServiceDiscovery *FDiscovery;
 private:
+  QMap<QUrl, UrlRequest> FUrlRequests;
+  QMap<QString, IDataLocalizer *> FLocalizers;
   QNetworkAccessManager FNetworkManager;
-  QHash<QUrl,UrlLoadState> FLoadStates;
-  QHash<QString, IDataLocalizer *> FLocalizers;
   QObjectCleanupHandler FCleanupHandler;
 };
 

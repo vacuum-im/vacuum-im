@@ -116,7 +116,7 @@ bool DataFormWidget::checkForm(bool AAllowInvalid) const
     QList<IDataField> fields = userDataForm().fields;
     foreach(IDataField field, fields)
     {
-      if (!field.var.isEmpty() && !FDataForms->isFieldValid(field))
+      if (!field.var.isEmpty() && !FDataForms->isFieldValid(field,DATAFORM_TYPE_SUBMIT))
       {
         invalidCount++;
         message += QString("- <b>%2</b><br>").arg(Qt::escape(!field.label.isEmpty() ? field.label : field.var));
