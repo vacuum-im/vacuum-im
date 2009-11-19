@@ -175,7 +175,8 @@ bool CaptchaForms::submitChallenge(const QString &AChallengeId, const IDataForm 
     accept.setType("set");
     accept.setId(FStanzaProcessor->newId());
     accept.setTo(item.challenger.eFull());
-    FDataForms->xmlForm(ASubmit, accept.addElement("captcha",NS_CAPTCHA_FORMS));
+    QDomElement captchaElem = accept.addElement("captcha",NS_CAPTCHA_FORMS);
+    FDataForms->xmlForm(ASubmit, captchaElem);
     if (FStanzaProcessor->sendStanzaRequest(this,item.streamJid,accept,ACCEPT_CHALLENGE_TIMEOUT))
     {
       FChallengeRequest.insert(accept.id(),AChallengeId);
