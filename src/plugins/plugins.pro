@@ -54,4 +54,5 @@ SUBDIRS = settings \
           filetransfer \
           inbandstreams \
           socksstreams \
-          captchaforms
+          captchaforms \
+          bitsofbinary
