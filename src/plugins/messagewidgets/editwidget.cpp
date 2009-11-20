@@ -12,12 +12,18 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
 
-  FSendShortcut = new QShortcut(FMessageWidgets->sendMessageKey(),ui.medEditor);
+  FSendShortcut = new QShortcut(ui.medEditor);
   FSendShortcut->setContext(Qt::WidgetShortcut);
   connect(FSendShortcut,SIGNAL(activated()),SLOT(onShortcutActivated()));
-  connect(FMessageWidgets->instance(),SIGNAL(sendMessageKeyChanged(const QKeySequence &)),
-    SLOT(onSendMessageKeyChanged(const QKeySequence &)));
   ui.medEditor->installEventFilter(this);
+
+  setAutoResize(FMessageWidgets->editorAutoResize());
+  setMinimumLines(FMessageWidgets->editorMinimumLines());
+  setSendKey(FMessageWidgets->editorSendKey());
+
+  connect(FMessageWidgets->instance(),SIGNAL(editorAutoResizeChanged(bool)), SLOT(onEditorAutoResizeChanged(bool)));
+  connect(FMessageWidgets->instance(),SIGNAL(editorMinimumLinesChanged(int)), SLOT(onEditorMinimumLinesChanged(int)));
+  connect(FMessageWidgets->instance(),SIGNAL(editorSendKeyChanged(const QKeySequence &)), SLOT(onEditorSendKeyChanged(const QKeySequence &)));
 }
 
 EditWidget::~EditWidget()
@@ -25,16 +31,9 @@ EditWidget::~EditWidget()
 
 }
 
-void EditWidget::sendMessage()
+const Jid &EditWidget::streamJid() const
 {
-  emit messageAboutToBeSend();
-  emit messageReady();
-}
-
-void EditWidget::setSendMessageKey(const QKeySequence &AKey)
-{
-  FSendShortcut->setKey(AKey);
-  emit sendMessageKeyChanged(AKey);
+  return FStreamJid;
 }
 
 void EditWidget::setStreamJid(const Jid &AStreamJid)
@@ -44,6 +43,11 @@ void EditWidget::setStreamJid(const Jid &AStreamJid)
   emit streamJidChanged(befour);
 }
 
+const Jid & EditWidget::contactJid() const
+{
+   return FContactJid;
+}
+
 void EditWidget::setContactJid(const Jid &AContactJid)
 {
   Jid befour = FContactJid;
@@ -51,10 +55,59 @@ void EditWidget::setContactJid(const Jid &AContactJid)
   emit contactJidChanged(AContactJid);
 }
 
+QTextEdit *EditWidget::textEdit() const
+{
+  return ui.medEditor;
+}
+
+QTextDocument *EditWidget::document() const
+{
+  return ui.medEditor->document();
+}
+
+void EditWidget::sendMessage()
+{
+  emit messageAboutToBeSend();
+  emit messageReady();
+}
+
 void EditWidget::clearEditor()
 {
   ui.medEditor->clear();
   emit editorCleared();
+}
+
+bool EditWidget::autoResize() const
+{
+  return ui.medEditor->autoResize();
+}
+
+void EditWidget::setAutoResize(bool AResize)
+{
+  ui.medEditor->setAutoResize(AResize);
+  emit autoResizeChanged(ui.medEditor->autoResize());
+}
+
+int EditWidget::minimumLines() const
+{
+  return ui.medEditor->minimumLines();
+}
+
+void EditWidget::setMinimumLines(int ALines)
+{
+  ui.medEditor->setMinimumLines(ALines);
+  emit minimumLinesChanged(ui.medEditor->minimumLines());
+}
+
+QKeySequence EditWidget::sendKey() const
+{
+  return FSendShortcut->key();
+}
+
+void EditWidget::setSendKey(const QKeySequence &AKey)
+{
+  FSendShortcut->setKey(AKey);
+  emit sendKeyChanged(AKey);
 }
 
 bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
@@ -81,8 +134,17 @@ void EditWidget::onShortcutActivated()
   }
 }
 
-void EditWidget::onSendMessageKeyChanged(const QKeySequence &AKey)
+void EditWidget::onEditorAutoResizeChanged(bool AResize)
 {
-  if (!FSendShortcut->key().isEmpty() && !AKey.isEmpty())
-    setSendMessageKey(AKey);
+  setAutoResize(AResize);
+}
+
+void EditWidget::onEditorMinimumLinesChanged(int ALines)
+{
+  setMinimumLines(ALines);
+}
+
+void EditWidget::onEditorSendKeyChanged(const QKeySequence &AKey)
+{
+  setSendKey(AKey);
 }

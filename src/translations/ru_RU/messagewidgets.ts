@@ -96,16 +96,24 @@
 <context>
     <name>MessengerOptionsClass</name>
     <message>
-        <source>Use tab window</source>
-        <translation>Использовать окно со вкладками</translation>
-    </message>
-    <message>
         <source>Show status in chat window</source>
         <translation>Показывать статус в окне чата</translation>
     </message>
     <message>
         <source>Send message key sequence:</source>
         <translation>Комбинация клавиш для отправки сообщения:</translation>
+    </message>
+    <message>
+        <source>Enable tab windows</source>
+        <translation>Использовать окна со вкладками</translation>
+    </message>
+    <message>
+        <source>Auto resize input field</source>
+        <translation>Автоматически изменять размер поля ввода</translation>
+    </message>
+    <message>
+        <source>Minimum input field lines:</source>
+        <translation>Минимальное число строк в поле воода:</translation>
     </message>
 </context>
 <context>
