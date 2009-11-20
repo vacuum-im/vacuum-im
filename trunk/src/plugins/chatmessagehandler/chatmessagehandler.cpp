@@ -396,7 +396,7 @@ void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const
     {
       Jid streamJid = window->streamJid();
       Jid contactJid = window->contactJid();
-      if (AField == IInfoWidget::ContactStatus && FMessageWidgets->checkOption(IMessageWidgets::ShowStatus))
+      if (AField == IInfoWidget::ContactStatus && FMessageWidgets->chatWindowShowStatus())
       {
         QString status = AValue.toString();
         QString show = FStatusChanger ? FStatusChanger->nameByShow(widget->field(IInfoWidget::ContactShow).toInt()) : QString::null;

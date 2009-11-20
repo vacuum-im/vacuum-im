@@ -15,29 +15,37 @@ public:
   EditWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid);
   ~EditWidget();
   virtual QWidget *instance() { return this; }
-  virtual const Jid &streamJid() const { return FStreamJid; }
+  virtual const Jid &streamJid() const;
   virtual void setStreamJid(const Jid &AStreamJid);
-  virtual const Jid &contactJid() const { return FContactJid; }
+  virtual const Jid &contactJid() const;
   virtual void setContactJid(const Jid &AContactJid);
-  virtual QTextEdit *textEdit() const { return ui.medEditor; }
-  virtual QTextDocument *document() const { return ui.medEditor->document(); }
+  virtual QTextEdit *textEdit() const;
+  virtual QTextDocument *document() const;
   virtual void sendMessage();
-  virtual QKeySequence sendMessageKey() const { return FSendShortcut->key(); }
-  virtual void setSendMessageKey(const QKeySequence &AKey);
   virtual void clearEditor();
+  virtual bool autoResize() const;
+  virtual void setAutoResize(bool AResize);
+  virtual int minimumLines() const;
+  virtual void setMinimumLines(int ALines);
+  virtual QKeySequence sendKey() const;
+  virtual void setSendKey(const QKeySequence &AKey);
 signals:
   virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
   virtual void messageAboutToBeSend();
   virtual void messageReady();
+  virtual void editorCleared();
   virtual void streamJidChanged(const Jid &ABefour);
   virtual void contactJidChanged(const Jid &ABefour);
-  virtual void sendMessageKeyChanged(const QKeySequence &AKey);
-  virtual void editorCleared();
+  virtual void autoResizeChanged(bool AResize);
+  virtual void minimumLinesChanged(int ALines);
+  virtual void sendKeyChanged(const QKeySequence &AKey);
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
   void onShortcutActivated();
-  void onSendMessageKeyChanged(const QKeySequence &AKey);
+  void onEditorAutoResizeChanged(bool AResize);
+  void onEditorMinimumLinesChanged(int ALines);
+  void onEditorSendKeyChanged(const QKeySequence &AKey);
 private:
   Ui::EditWidgetClass ui;
 private:

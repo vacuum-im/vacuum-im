@@ -81,17 +81,23 @@ public:
   virtual QTextEdit *textEdit() const =0;
   virtual QTextDocument *document() const =0;
   virtual void sendMessage() =0;
-  virtual QKeySequence sendMessageKey() const =0;
-  virtual void setSendMessageKey(const QKeySequence &AKey) =0;
   virtual void clearEditor() =0;
+  virtual bool autoResize() const =0;
+  virtual void setAutoResize(bool AResize) =0;
+  virtual int minimumLines() const =0;
+  virtual void setMinimumLines(int ALines) =0;
+  virtual QKeySequence sendKey() const =0;
+  virtual void setSendKey(const QKeySequence &AKey) =0;
 signals:
   virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook) =0;
   virtual void messageAboutToBeSend() =0;
   virtual void messageReady() =0;
+  virtual void editorCleared() =0;
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
-  virtual void sendMessageKeyChanged(const QKeySequence &AKey) =0;
-  virtual void editorCleared() =0;
+  virtual void autoResizeChanged(bool AResize) =0;
+  virtual void minimumLinesChanged(int ALines) =0;
+  virtual void sendKeyChanged(const QKeySequence &AKey) =0;
 };
 
 class IReceiversWidget
@@ -258,17 +264,8 @@ public:
 class IMessageWidgets 
 {
 public:
-  enum Option {
-    UseTabWindow                =0x01,
-    ShowStatus                  =0x02,
-  };
-public:
   virtual QObject *instance() = 0;
   virtual IPluginManager *pluginManager() const =0;
-  virtual QKeySequence sendMessageKey() const =0;
-  virtual void setSendMessageKey(const QKeySequence &AKey) =0;
-  virtual QUuid defaultTabWindow() const =0;
-  virtual void setDefaultTabWindow(const QUuid &AWindowId) =0;
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid) =0;
@@ -291,13 +288,21 @@ public:
   virtual ITabWindow *openTabWindow(const QUuid &AWindowId) =0;
   virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const =0;
   virtual void assignTabWindow(ITabWidget *AWidget) =0;
-  virtual bool checkOption(IMessageWidgets::Option AOption) const =0;
-  virtual void setOption(IMessageWidgets::Option AOption, bool AValue) =0;
+  virtual bool tabWindowsEnabled() const =0;
+  virtual void setTabWindowsEnabled(bool AEnabled) =0;
+  virtual QUuid defaultTabWindow() const =0;
+  virtual void setDefaultTabWindow(const QUuid &AWindowId) =0;
+  virtual bool chatWindowShowStatus() const =0;
+  virtual void setChatWindowShowStatus(bool AShow) =0;
+  virtual bool editorAutoResize() const =0;
+  virtual void setEditorAutoResize(bool AResize) =0;
+  virtual int editorMinimumLines() const =0;
+  virtual void setEditorMinimumLines(int ALines) =0;
+  virtual QKeySequence editorSendKey() const =0;
+  virtual void setEditorSendKey(const QKeySequence &AKey) =0;
   virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
   virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
 signals:
-  virtual void sendMessageKeyChanged(const QKeySequence &AKey) =0;
-  virtual void defaultTabWindowChanged(const QUuid &AWindowId) =0;
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget) =0;
   virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
   virtual void editWidgetCreated(IEditWidget *AEditWidget) =0;
@@ -314,7 +319,12 @@ signals:
   virtual void tabWindowDeleted(const QUuid &AWindowId) =0;
   virtual void tabWindowCreated(ITabWindow *AWindow) =0;
   virtual void tabWindowDestroyed(ITabWindow *AWindow) =0;
-  virtual void optionChanged(IMessageWidgets::Option AOption, bool AValue) =0;
+  virtual void tabWindowsEnabledChanged(bool AEnabled) =0;
+  virtual void defaultTabWindowChanged(const QUuid &AWindowId) =0;
+  virtual void chatWindowShowStatusChanged(bool AShow) =0;
+  virtual void editorAutoResizeChanged(bool AResize) =0;
+  virtual void editorMinimumLinesChanged(int ALines) =0;
+  virtual void editorSendKeyChanged(const QKeySequence &AKey) =0;
   virtual void urlHandlerInserted(IUrlHandler *AHandler, int AOrder) =0;
   virtual void urlHandlerRemoved(IUrlHandler *AHandler, int AOrder) =0;
 };

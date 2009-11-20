@@ -49,10 +49,6 @@ public:
   virtual bool executeUrl(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
   //IMessageWidgets
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
-  virtual QKeySequence sendMessageKey() const;
-  virtual void setSendMessageKey(const QKeySequence &AKey);
-  virtual QUuid defaultTabWindow() const;
-  virtual void setDefaultTabWindow(const QUuid &AWindowId);
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid);
   virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid);
@@ -75,13 +71,21 @@ public:
   virtual ITabWindow *openTabWindow(const QUuid &AWindowId);
   virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const;
   virtual void assignTabWindow(ITabWidget *AWidget);
-  virtual bool checkOption(IMessageWidgets::Option AOption) const;
-  virtual void setOption(IMessageWidgets::Option AOption, bool AValue);
+  virtual bool tabWindowsEnabled() const;
+  virtual void setTabWindowsEnabled(bool AEnabled);
+  virtual QUuid defaultTabWindow() const;
+  virtual void setDefaultTabWindow(const QUuid &AWindowId);
+  virtual bool chatWindowShowStatus() const;
+  virtual void setChatWindowShowStatus(bool AShow);
+  virtual bool editorAutoResize() const;
+  virtual void setEditorAutoResize(bool AResize);
+  virtual int editorMinimumLines() const;
+  virtual void setEditorMinimumLines(int ALines);
+  virtual QKeySequence editorSendKey() const;
+  virtual void setEditorSendKey(const QKeySequence &AKey);
   virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder);
   virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder);
 signals:
-  virtual void sendMessageKeyChanged(const QKeySequence &AKey);
-  virtual void defaultTabWindowChanged(const QUuid &AWindowId);
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget);
   virtual void viewWidgetCreated(IViewWidget *AViewWidget);
   virtual void editWidgetCreated(IEditWidget *AEditWidget);
@@ -98,7 +102,12 @@ signals:
   virtual void tabWindowDeleted(const QUuid &AWindowId);
   virtual void tabWindowCreated(ITabWindow *AWindow);
   virtual void tabWindowDestroyed(ITabWindow *AWindow);
-  virtual void optionChanged(IMessageWidgets::Option AOption, bool AValue);
+  virtual void tabWindowsEnabledChanged(bool AEnabled);
+  virtual void defaultTabWindowChanged(const QUuid &AWindowId);
+  virtual void chatWindowShowStatusChanged(bool AShow);
+  virtual void editorAutoResizeChanged(bool AResize);
+  virtual void editorMinimumLinesChanged(int ALines);
+  virtual void editorSendKeyChanged(const QKeySequence &AKey);
   virtual void urlHandlerInserted(IUrlHandler *AHandler, int AOrder);
   virtual void urlHandlerRemoved(IUrlHandler *AHandler, int AOrder);
 signals:
@@ -127,9 +136,13 @@ private:
   QList<IMessageWindow *> FMessageWindows;
   QObjectCleanupHandler FCleanupHandler;
 private:
-  int FOptions;
-  QKeySequence FSendKey;
   QUuid FDefaultTabWindow;
+  bool FTabWindowsEnabled;
+  bool FChatWindowShowStatus;
+  bool FEditorAutoResize;
+  int FEditorMinimumLines;
+  QKeySequence FEditorSendKey;
+private:
   QMap<QUuid, QString> FAvailTabWindows;
   QMultiMap<int,IUrlHandler *> FUrlHandlers;
 };
