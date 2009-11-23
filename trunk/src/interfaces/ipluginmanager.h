@@ -6,6 +6,7 @@
 #include <QList>
 #include <QLocale>
 #include <QtPlugin>
+#include <QDateTime>
 
 class IPluginManager;
 
@@ -37,6 +38,9 @@ class IPluginManager
 {
 public:
   virtual QObject *instance() =0;
+  virtual QString version() const =0;
+  virtual int revision() const =0;
+  virtual QDateTime revisionDate() const =0;
   virtual QString homePath() const =0;
   virtual void setHomePath(const QString &APath) =0;
   virtual void setLocale(QLocale::Language ALanguage, QLocale::Country ACountry) =0;

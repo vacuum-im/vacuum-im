@@ -2,6 +2,24 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
+    <name>AboutBox</name>
+    <message>
+        <source>Revision date: %1</source>
+        <translation>Дата ревизии: %1</translation>
+    </message>
+    <message>
+        <source>Version: %1.%2</source>
+        <translation>Версия: %1.%2</translation>
+    </message>
+</context>
+<context>
+    <name>AboutBoxClass</name>
+    <message>
+        <source>About the programm</source>
+        <translation>О Программе</translation>
+    </message>
+</context>
+<context>
     <name>PluginManager</name>
     <message>
         <source>Duplicate plugin uuid</source>
@@ -30,6 +48,14 @@
     <message>
         <source>Setup plugins</source>
         <translation>Настроить плагины</translation>
+    </message>
+    <message>
+        <source>About Qt</source>
+        <translation>О Qt</translation>
+    </message>
+    <message>
+        <source>About the program</source>
+        <translation>О Программе</translation>
     </message>
 </context>
 <context>
@@ -79,7 +105,7 @@
     </message>
     <message>
         <source>Error Message:</source>
-        <translation type="unfinished">Сообщение об ошибке:</translation>
+        <translation>Сообщение об ошибке:</translation>
     </message>
     <message>
         <source>Common Settings</source>

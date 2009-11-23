@@ -7,8 +7,8 @@
 #define AG_MMENU_SKINMANAGER                                    500
 #define AG_MMENU_CONSOLE                                        500
 #define AG_MMENU_FILESTREAMSMANAGER                             500
-#define AG_MMENU_PLUGINMANAGER                                  800
-#define AG_MMENU_CLIENTINFO                                     900
+#define AG_MMENU_PLUGINMANAGER_SETUP                            800
+#define AG_MMENU_PLUGINMANAGER_ABOUT                            900
 #define AG_MMENU_MAINWINDOW                                     1000
 
 //RostersView - ContextMenu

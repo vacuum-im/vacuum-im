@@ -41,8 +41,6 @@
 #define MNI_CLIENTINFO_VERSION          "clientinfoVersion"
 #define MNI_CLIENTINFO_ACTIVITY         "clientinfoActivity"
 #define MNI_CLIENTINFO_TIME             "clientinfoTime"
-#define MNI_CLIENTINFO_ABOUT            "clientinfoAbout"
-#define MNI_CLIENTINFO_ABOUT_QT         "clientinfoAboutQt"
 
 //Commands
 #define MNI_COMMANDS                    "commands"
@@ -156,6 +154,8 @@
 
 //PluginManager
 #define MNI_PLUGINMANAGER_SETUP         "pluginmanagerSetup"
+#define MNI_PLUGINMANAGER_ABOUT         "pluginmanagerAbout"
+#define MNI_PLUGINMANAGER_ABOUT_QT      "pluginmanagerAboutQt"
 
 //Registration
 #define MNI_REGISTERATION               "register"

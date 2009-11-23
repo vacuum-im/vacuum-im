@@ -22,9 +22,6 @@ public:
   };
 public:
   virtual QObject *instance() =0;
-  virtual QString version() const =0;
-  virtual int revision() const =0;
-  virtual QDateTime revisionDate() const =0;
   virtual QString osVersion() const =0;
   virtual void showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes) =0;
   //Software Version

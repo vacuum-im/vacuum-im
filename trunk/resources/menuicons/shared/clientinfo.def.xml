@@ -16,12 +16,4 @@
     <key>clientinfoTime</key>
     <object mime="image/png">clientinfotime.png</object>
   </icon>
-  <icon>
-    <key>clientinfoAbout</key>
-    <object mime="image/png">clientinfoabout.png</object>
-  </icon>
-  <icon>
-    <key>clientinfoAboutQt</key>
-    <object mime="image/png">clientinfoaboutqt.png</object>
-  </icon>
 </icondef>
