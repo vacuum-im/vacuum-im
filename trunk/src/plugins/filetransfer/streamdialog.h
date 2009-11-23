@@ -21,6 +21,7 @@ public:
   inline IFileStream *stream() const;
   QList<QString> selectedMethods() const;
   void setSelectableMethods(const QList<QString> &AMethods);
+  void setContactName(const QString &AName);
 signals:
   void dialogDestroyed();
 protected:
