@@ -12,11 +12,13 @@
 #include <definations/actiongroups.h>
 #include <definations/menuicons.h>
 #include <definations/resources.h>
+#include <definations/version.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
 #include <utils/action.h>
 #include "setuppluginsdialog.h"
+#include "aboutbox.h"
 
 struct PluginItem 
 {
@@ -36,6 +38,9 @@ public:
   PluginManager(QApplication *AParent);
   ~PluginManager();
   virtual QObject *instance() { return this; }
+  virtual QString version() const;
+  virtual int revision() const;
+  virtual QDateTime revisionDate() const;
   virtual QString homePath() const;
   virtual void setHomePath(const QString &APath);
   virtual void setLocale(QLocale::Language ALanguage, QLocale::Country ACountry);
@@ -71,14 +76,16 @@ protected:
 protected slots:
   void onApplicationAboutToQuit();
   void onShowSetupPluginsDialog(bool);
+  void onShowAboutBoxDialog();
+private:
+  QPointer<AboutBox> FAboutDialog;
+  QPointer<SetupPluginsDialog> FPluginsDialog;
 private:
   QString FHomePath;
-  Action *FShowDialog;
   QDomDocument FPluginsSetup;
   QTranslator *FQtTranslator;
   QTranslator *FUtilsTranslator;
   QTranslator *FLoaderTranslator;
-  QPointer<SetupPluginsDialog> FDialog;
   QHash<QUuid, PluginItem> FPluginItems;
   mutable QMultiHash<QString, IPlugin *> FPlugins;
 };

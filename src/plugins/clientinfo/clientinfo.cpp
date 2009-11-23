@@ -1,14 +1,5 @@
 #include "clientinfo.h"
 
-#include <QApplication>
-
-#ifdef SVNINFO
-# include "svninfo.h"
-#else
-# define SVN_DATE         ""
-# define SVN_REVISION     0
-#endif
-
 #if defined(Q_OS_UNIX)
 # include <sys/utsname.h>
 #endif
@@ -38,7 +29,6 @@ ClientInfo::ClientInfo()
   FRostersModel = NULL;
   FDiscovery = NULL;
   FDataForms = NULL;
-  FMainWindowPlugin = NULL;
 
   FVersionHandle = 0;
   FTimeHandle = 0;
@@ -120,12 +110,6 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
   }
 
-  plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
-  if (plugin)
-  {
-    FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-  }
-
   return FStanzaProcessor != NULL;
 }
 
@@ -171,21 +155,6 @@ bool ClientInfo::initObjects()
   if (FDataForms)
   {
     FDataForms->insertLocalizer(this,DATA_FORM_SOFTWAREINFO);
-  }
-
-  if (FMainWindowPlugin)
-  {
-    Action *aboutQt = new Action(FMainWindowPlugin->mainWindow()->mainMenu());
-    aboutQt->setText(tr("About Qt"));
-    aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_ABOUT_QT);
-    connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_CLIENTINFO);
-
-    Action *about = new Action(FMainWindowPlugin->mainWindow()->mainMenu());
-    about->setText(tr("About the program"));
-    about->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_ABOUT);
-    connect(about,SIGNAL(triggered()),SLOT(onShowAboutBox()));
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_CLIENTINFO);
   }
 
   return true;
@@ -439,21 +408,6 @@ Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QStrin
     }
   }
   return NULL;
-}
-
-QString ClientInfo::version() const
-{
-  return CLIENT_VERSION;
-}
-
-int ClientInfo::revision() const
-{
-  return SVN_REVISION;
-}
-
-QDateTime ClientInfo::revisionDate() const
-{
-  return QDateTime::fromString(SVN_DATE,"yyyy/MM/dd hh:mm:ss");
 }
 
 QString ClientInfo::osVersion() const
@@ -950,17 +904,6 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
       }
     }
   }
-}
-
-void ClientInfo::onShowAboutBox()
-{
-  if (FAboutBox.isNull())
-  {
-    FAboutBox = new AboutBox(this);
-    FAboutBox->show();
-  }
-  else
-    FAboutBox->raise();
 }
 
 Q_EXPORT_PLUGIN2(ClientInfoPlugin, ClientInfo)

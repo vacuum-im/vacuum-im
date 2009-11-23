@@ -2,24 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
-    <name>AboutBox</name>
-    <message>
-        <source>Version: %1 Revision: %2</source>
-        <translation>Версия: %1 Ревизия: %2</translation>
-    </message>
-    <message>
-        <source>Revision date: %1</source>
-        <translation>Дата ревизии: %1</translation>
-    </message>
-</context>
-<context>
-    <name>AboutBoxClass</name>
-    <message>
-        <source>About the programm</source>
-        <translation>О программе</translation>
-    </message>
-</context>
-<context>
     <name>ClientInfo</name>
     <message>
         <source>Client Info</source>
@@ -88,14 +70,6 @@
     <message>
         <source>Request contact last activity</source>
         <translation>Последняя активность контакта</translation>
-    </message>
-    <message>
-        <source>About Qt</source>
-        <translation>О Qt</translation>
-    </message>
-    <message>
-        <source>About the program</source>
-        <translation>О программе</translation>
     </message>
 </context>
 <context>

@@ -9,6 +9,13 @@
 #include <QFileInfo>
 #include <QSettings>
 
+#ifdef SVNINFO
+# include "svninfo.h"
+#else
+# define SVN_DATE         ""
+# define SVN_REVISION     0
+#endif
+
 #define DIR_HOME                    ".vacuum"
 #define DIR_PLUGINS                 "plugins"
 #define DIR_TRANSLATIONS            "translations"
@@ -30,7 +37,6 @@
 
 PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 {
-  FShowDialog = NULL;
   FQtTranslator = new QTranslator(this);
   FUtilsTranslator = new QTranslator(this);
   FLoaderTranslator = new QTranslator(this);
@@ -40,6 +46,21 @@ PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 PluginManager::~PluginManager()
 {
 
+}
+
+QString PluginManager::version() const
+{
+  return CLIENT_VERSION;
+}
+
+int PluginManager::revision() const
+{
+  return SVN_REVISION;
+}
+
+QDateTime PluginManager::revisionDate() const
+{
+  return QDateTime::fromString(SVN_DATE,"yyyy/MM/dd hh:mm:ss");
 }
 
 QString PluginManager::homePath() const
@@ -532,18 +553,30 @@ void PluginManager::createMenuActions()
 
   if (mainWindowPligin || trayManager)
   {
-    if (FShowDialog == NULL)
-    {
-      FShowDialog = new Action(this);
-      FShowDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
-      connect(FShowDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
-    }
-    FShowDialog->setText(tr("Setup plugins"));
+    Action *pluginsDialog = new Action(mainWindowPligin!=NULL ? mainWindowPligin->instance() : trayManager->instance());
+    pluginsDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
+    connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
+    pluginsDialog->setText(tr("Setup plugins"));
 
     if (mainWindowPligin)
-      mainWindowPligin->mainWindow()->mainMenu()->addAction(FShowDialog,AG_MMENU_PLUGINMANAGER,true);
+    {
+      Action *aboutQt = new Action(mainWindowPligin->mainWindow()->mainMenu());
+      aboutQt->setText(tr("About Qt"));
+      aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT_QT);
+      connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
+      mainWindowPligin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
+
+      Action *about = new Action(mainWindowPligin->mainWindow()->mainMenu());
+      about->setText(tr("About the program"));
+      about->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT);
+      connect(about,SIGNAL(triggered()),SLOT(onShowAboutBoxDialog()));
+      mainWindowPligin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
+
+      mainWindowPligin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
+    }
+
     if (trayManager)
-      trayManager->addAction(FShowDialog,AG_TMTM_PLUGINMANAGER,true);
+      trayManager->addAction(pluginsDialog,AG_TMTM_PLUGINMANAGER,true);
   }
   else
     onShowSetupPluginsDialog(false);
@@ -551,8 +584,11 @@ void PluginManager::createMenuActions()
 
 void PluginManager::onApplicationAboutToQuit()
 {
-  if (!FDialog.isNull())
-    FDialog->reject();
+  if (!FPluginsDialog.isNull())
+    FPluginsDialog->reject();
+
+  if (!FAboutDialog.isNull())
+    FAboutDialog->reject();
 
   emit aboutToQuit();
 
@@ -568,9 +604,20 @@ void PluginManager::onApplicationAboutToQuit()
 
 void PluginManager::onShowSetupPluginsDialog(bool)
 {
-  if (FDialog.isNull())
-    FDialog = new SetupPluginsDialog(this,FPluginsSetup,NULL);
-  FDialog->show();
-  FDialog->raise();
-  FDialog->activateWindow();
+  if (FPluginsDialog.isNull())
+    FPluginsDialog = new SetupPluginsDialog(this,FPluginsSetup,NULL);
+  FPluginsDialog->show();
+  FPluginsDialog->raise();
+  FPluginsDialog->activateWindow();
+}
+
+void PluginManager::onShowAboutBoxDialog()
+{
+  if (FAboutDialog.isNull())
+  {
+    FAboutDialog = new AboutBox(this);
+    FAboutDialog->show();
+  }
+  else
+    FAboutDialog->raise();
 }

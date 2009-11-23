@@ -28,7 +28,6 @@
 #include <utils/menu.h>
 #include <utils/datetime.h>
 #include "clientinfodialog.h"
-#include "aboutbox.h"
 
 struct SoftwareItem {
   SoftwareItem() { status = IClientInfo::SoftwareNotLoaded; }
@@ -94,9 +93,6 @@ public:
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //IClientInfo
-  virtual QString version() const;
-  virtual int revision() const;
-  virtual QDateTime revisionDate() const;
   virtual QString osVersion() const;
   virtual void showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes);
   //Software Version
@@ -139,7 +135,6 @@ protected slots:
   void onLastActivityChanged(const Jid &AContactJid);
   void onEntityTimeChanged(const Jid &AContactJid);
   void onDiscoInfoReceived(const IDiscoInfo &AInfo);
-  void onShowAboutBox();
 private:
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
@@ -148,11 +143,9 @@ private:
   IRostersModel *FRostersModel;
   IServiceDiscovery *FDiscovery;
   IDataForms *FDataForms;
-  IMainWindowPlugin *FMainWindowPlugin;
 private:
   int FTimeHandle;
   int FVersionHandle;
-  QPointer<AboutBox> FAboutBox;
   QHash<Jid, QSet<IPresence *> > FContactPresences;
   QHash<QString, Jid> FSoftwareId;
   QHash<Jid, SoftwareItem> FSoftwareItems;
