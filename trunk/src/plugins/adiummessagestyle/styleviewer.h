@@ -12,6 +12,8 @@ public:
   ~StyleViewer();
 public:
   virtual QSize sizeHint() const;
+protected slots:
+  void onShortcutActivated();
 };
 
 #endif // STYLEVIEWER_H
