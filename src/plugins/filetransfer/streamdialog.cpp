@@ -107,6 +107,10 @@ void StreamDialog::setSelectableMethods(const QList<QString> &AMethods)
   }
 }
 
+void StreamDialog::setContactName(const QString &AName)
+{
+  ui.lblContact->setText(AName);
+}
 
 bool StreamDialog::acceptFileName(const QString AFile)
 {

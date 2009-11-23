@@ -450,6 +450,13 @@ StreamDialog *FileTransfer::createStreamDialog(IFileStream *AStream)
       IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(dialog,MNI_FILETRANSFER_SEND,0,0,"windowIcon");
     else
       IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(dialog,MNI_FILETRANSFER_RECEIVE,0,0,"windowIcon");
+    if (FNotifications)
+    {
+      QString name = "<b>"+ Qt::escape(FNotifications->contactName(AStream->streamJid(), AStream->contactJid())) +"</b>";
+      if (!AStream->contactJid().resource().isEmpty())
+        name += Qt::escape("/" + AStream->contactJid().resource());
+      dialog->setContactName(name);
+    }
     connect(dialog,SIGNAL(dialogDestroyed()),SLOT(onStreamDialogDestroyed()));
     FStreamDialog.insert(AStream->streamId(),dialog);
   }
