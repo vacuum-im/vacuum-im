@@ -55,29 +55,6 @@
     </message>
 </context>
 <context>
-    <name>NotifyWidgetClass</name>
-    <message>
-        <source>Caption</source>
-        <translation>Подпись</translation>
-    </message>
-    <message>
-        <source>Icon</source>
-        <translation>Иконка</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation>Заголовок</translation>
-    </message>
-    <message>
-        <source>Image</source>
-        <translation>Картинка</translation>
-    </message>
-    <message>
-        <source>Text</source>
-        <translation>Текст</translation>
-    </message>
-</context>
-<context>
     <name>OptionsWidgetClass</name>
     <message>
         <source>Common notification options</source>

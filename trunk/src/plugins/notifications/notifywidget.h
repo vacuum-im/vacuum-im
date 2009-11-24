@@ -1,7 +1,6 @@
 #ifndef NOTIFYWIDGET_H
 #define NOTIFYWIDGET_H
 
-#include <QTimer>
 #include <QMouseEvent>
 #include <QDesktopWidget>
 #include <definations/notificationdataroles.h>
@@ -16,24 +15,21 @@ public:
   NotifyWidget(const INotification &ANotification);
   ~NotifyWidget();
   void appear();
-  void animateTo(int AXPos, int AYPos);
-public slots:
-  void animateStep();
-  void disappear();
+  void animateTo(int AYPos);
 signals:
   void notifyActivated();
   void notifyRemoved();
   void windowDestroyed();
 protected:
   virtual void mouseReleaseEvent(QMouseEvent *AEvent);
+protected slots:
+  void onAnimateStep();
 private:
   Ui::NotifyWidgetClass ui;
 private:
-  int FTimeOut;
-  int FXPos;
   int FYPos;
+  int FTimeOut;
   int FAnimateStep;
-  QTimer FAnimator;
 private:
   static void layoutWidgets();
   static QDesktopWidget *FDesktop;

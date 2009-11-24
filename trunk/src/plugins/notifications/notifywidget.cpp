@@ -1,23 +1,31 @@
 #include "notifywidget.h"
 
-#define DEFAUTL_TIMEOUT     8000
-#define ANIMATE_STEPS       10
-#define ANIMATE_TIME        500
-#define ANIMATE_STEP_TIME   (ANIMATE_TIME/ANIMATE_STEPS)
+#include <QTimer>
 
-QDesktopWidget *NotifyWidget::FDesktop = new QDesktopWidget;
+#define DEFAUTL_TIMEOUT           8000
+#define ANIMATE_STEPS             17
+#define ANIMATE_TIME              700
+#define ANIMATE_STEP_TIME         (ANIMATE_TIME/ANIMATE_STEPS)
+#define ANIMATE_OPACITY_START     0.0
+#define ANIMATE_OPACITY_END       0.9
+#define ANIMATE_OPACITY_STEP      (ANIMATE_OPACITY_END - ANIMATE_OPACITY_START)/ANIMATE_STEPS
+
 QList<NotifyWidget *> NotifyWidget::FWidgets;
+QDesktopWidget *NotifyWidget::FDesktop = new QDesktopWidget;
 
 NotifyWidget::NotifyWidget(const INotification &ANotification)
 {
   ui.setupUi(this);
-  setAttribute(Qt::WA_DeleteOnClose,false);
+  setAttribute(Qt::WA_DeleteOnClose,true);
   setAttribute(Qt::WA_ShowWithoutActivating,true);
   setWindowFlags(Qt::SplashScreen|Qt::WindowStaysOnTopHint);
+  
+  QPalette pallete = ui.frmWindowFrame->palette();
+  pallete.setColor(QPalette::Window, pallete.color(QPalette::Base));
+  ui.frmWindowFrame->setPalette(pallete);
 
-  FXPos = -1;
   FYPos = -1;
-  FAnimateStep=0;
+  FAnimateStep = -1;
 
   QIcon icon = qvariant_cast<QIcon>(ANotification.data.value(NDR_ICON));
   QImage image = qvariant_cast<QImage>(ANotification.data.value(NDR_WINDOW_IMAGE));
@@ -58,62 +66,37 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
 
 NotifyWidget::~NotifyWidget()
 {
-  disappear();
+  FWidgets.removeAll(this);
+  layoutWidgets();
+  emit windowDestroyed();
 }
 
 void NotifyWidget::appear()
 {
   if (!FWidgets.contains(this))
   {
-    FWidgets.append(this);
+    QTimer *timer = new QTimer(this);
+    timer->setSingleShot(false);
+    timer->setInterval(ANIMATE_STEP_TIME);
+    timer->start();
+    connect(timer,SIGNAL(timeout()),SLOT(onAnimateStep()));
+
+    if (FTimeOut > 0)
+      QTimer::singleShot(FTimeOut,this,SLOT(deleteLater()));
+
+    setWindowOpacity(ANIMATE_OPACITY_START);
+
+    FWidgets.prepend(this);
     layoutWidgets();
   }
 }
 
-void NotifyWidget::animateTo(int AXPos, int AYPos)
+void NotifyWidget::animateTo(int AYPos)
 {
-  QRect display = FDesktop->availableGeometry();
-  if (display.contains(AXPos,AYPos))
+  if (FYPos != AYPos)
   {
-    if (!isVisible())
-    {
-      if (FTimeOut>0)
-        QTimer::singleShot(FTimeOut,this,SLOT(disappear()));
-      move(display.right(),AYPos);
-      show();
-    }
-    if (FXPos!= AXPos || FYPos!=AYPos)
-    {
-      FXPos = AXPos;
-      FYPos = AYPos;
-      FAnimateStep = ANIMATE_STEPS;
-      QTimer::singleShot(ANIMATE_STEP_TIME,this,SLOT(animateStep()));
-    }
-  }
-}
-
-void NotifyWidget::animateStep()
-{
-  if (FAnimateStep>0)
-  {
-    QTimer::singleShot(ANIMATE_STEP_TIME,this,SLOT(animateStep()));
-    int xpos = x()+qRound((FXPos-x())/(FAnimateStep+1));
-    int ypos = y()+qRound((FYPos-y())/(FAnimateStep+1));
-    move(xpos,ypos);
-    FAnimateStep--;
-  }
-  else
-    move(FXPos,FYPos);
-}
-
-void NotifyWidget::disappear()
-{
-  if (FWidgets.contains(this))
-  {
-    FWidgets.removeAt(FWidgets.indexOf(this));
-    close();
-    layoutWidgets();
-    emit windowDestroyed();
+    FYPos = AYPos;
+    FAnimateStep = ANIMATE_STEPS;
   }
 }
 
@@ -126,16 +109,37 @@ void NotifyWidget::mouseReleaseEvent(QMouseEvent *AEvent)
     emit notifyRemoved();
 }
 
+void NotifyWidget::onAnimateStep()
+{
+  if (FAnimateStep > 0)
+  {
+    int ypos = y()+(FYPos-y())/(FAnimateStep);
+    setWindowOpacity(qMin(windowOpacity()+ANIMATE_OPACITY_STEP, ANIMATE_OPACITY_END));
+    move(x(),ypos);
+    FAnimateStep--;
+  }
+  else if (FAnimateStep == 0)
+  {
+    move(x(),FYPos);
+    setWindowOpacity(ANIMATE_OPACITY_END);
+    FAnimateStep--;
+  }
+}
+
 void NotifyWidget::layoutWidgets()
 {
   QRect display = FDesktop->availableGeometry();
   int ypos = display.bottom();
-  foreach(NotifyWidget *widget, FWidgets)
+  for (int i=0; ypos>0 && i<FWidgets.count(); i++)
   {
-    QSize size = widget->frameGeometry().size();
-    ypos -= size.height();
-    int xpos = display.right() - size.width();
-    widget->animateTo(xpos,ypos);
+    NotifyWidget *widget = FWidgets.at(i);
+    if (!widget->isVisible())
+    {
+      widget->show();
+      widget->raise();
+      widget->move(display.right() - widget->frameGeometry().width(), display.bottom());
+    }
+    ypos -=  widget->frameGeometry().height();
+    widget->animateTo(ypos);
   }
 }
-
