@@ -25,7 +25,7 @@ NotifyKindsWidget::~NotifyKindsWidget()
 
 }
 
-void NotifyKindsWidget::applyOptions()
+void NotifyKindsWidget::apply()
 {
   uchar kinds = 0;
   if (ui.chbRoster->isChecked())

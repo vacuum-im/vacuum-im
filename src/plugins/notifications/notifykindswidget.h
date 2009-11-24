@@ -12,9 +12,8 @@ class NotifyKindsWidget :
 public:
   NotifyKindsWidget(INotifications *ANotifications, const QString &AId, const QString &ATitle, uchar AKindMask, QWidget *AParent = NULL);
   ~NotifyKindsWidget();
-  void applyOptions();
-protected:
-  void updateWidget();
+public slots:
+  void apply();
 private:
   Ui::NotifyKindsWidgetClass ui;
 private:

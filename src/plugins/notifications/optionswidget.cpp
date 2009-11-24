@@ -4,7 +4,11 @@ OptionsWidget::OptionsWidget(INotifications *ANotifications, QWidget *AParent) :
 {
   ui.setupUi(this);
   FNotifications = ANotifications;
-  updateWidget();
+
+  ui.chbEnableRosterIcons->setChecked(FNotifications->checkOption(INotifications::EnableRosterIcons));
+  ui.chbEnablePopupWindows->setChecked(FNotifications->checkOption(INotifications::EnablePopupWindows));
+  ui.chbEnableTrayIcons->setChecked(FNotifications->checkOption(INotifications::EnableTrayIcons));
+  ui.chbEnableSounds->setChecked(FNotifications->checkOption(INotifications::EnableSounds));
 }
 
 OptionsWidget::~OptionsWidget()
@@ -12,20 +16,22 @@ OptionsWidget::~OptionsWidget()
 
 }
 
-void OptionsWidget::applyOptions()
+void OptionsWidget::appendKindsWidget(NotifyKindsWidget *AWidget)
 {
+  layout()->addWidget(AWidget);
+  FKindsWidgets.append(AWidget);
+}
+
+void OptionsWidget::apply()
+{
+  foreach(NotifyKindsWidget *widget, FKindsWidgets)
+    widget->apply();
+
   FNotifications->setOption(INotifications::EnableRosterIcons,ui.chbEnableRosterIcons->isChecked());
   FNotifications->setOption(INotifications::EnablePopupWindows,ui.chbEnablePopupWindows->isChecked());
   FNotifications->setOption(INotifications::EnableTrayIcons,ui.chbEnableTrayIcons->isChecked());
-  //FNotifications->setOption(INotifications::EnableTrayActions,ui.chbEnableTrayActions->isChecked());
   FNotifications->setOption(INotifications::EnableSounds,ui.chbEnableSounds->isChecked());
+
+  emit optionsAccepted();
 }
 
-void OptionsWidget::updateWidget()
-{
-  ui.chbEnableRosterIcons->setChecked(FNotifications->checkOption(INotifications::EnableRosterIcons));
-  ui.chbEnablePopupWindows->setChecked(FNotifications->checkOption(INotifications::EnablePopupWindows));
-  ui.chbEnableTrayIcons->setChecked(FNotifications->checkOption(INotifications::EnableTrayIcons));
-  //ui.chbEnableTrayActions->setChecked(FNotifications->checkOption(INotifications::EnableTrayActions));
-  ui.chbEnableSounds->setChecked(FNotifications->checkOption(INotifications::EnableSounds));
-}

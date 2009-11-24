@@ -24,15 +24,15 @@
 
 struct NotifyRecord {
   NotifyRecord() {
-    rosterId=0; 
     trayId=0; 
+    rosterId=0; 
     widget=NULL; 
     action=NULL;
   }
-  int rosterId;
   int trayId;
-  NotifyWidget *widget;
+  int rosterId;
   Action *action;
+  NotifyWidget *widget;
   INotification notification;
 };
 
@@ -86,6 +86,7 @@ signals:
   virtual void notificationActivated(int ANotifyId);
   virtual void notificationRemoved(int ANotifyId);
   virtual void optionChanged(INotifications::Option AOption, bool AValue);
+  //IOptionsHolder
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
@@ -100,12 +101,10 @@ protected slots:
   void onTrayNotifyRemoved(int ANotifyId);
   void onWindowNotifyActivated();
   void onWindowNotifyRemoved();
+  void onWindowNotifyDestroyed();
   void onActionNotifyActivated(bool);
   void onSettingsOpened();
   void onSettingsClosed();
-  void onOptionsDialogAccepted();
-  void onOptionsDialogRejected();
-  void onOptionsDialogClosed();
 private:
   IAvatars *FAvatars;
   IRosterPlugin *FRosterPlugin;
@@ -122,10 +121,8 @@ private:
   uint FOptions;
   int FNotifyId;
   QSound *FSound;
-  OptionsWidget *FOptionsWidget;
-  QList<NotifyKindsWidget *> FOptionsWidgets;
-  QHash<int,NotifyRecord> FNotifyRecords;
-  mutable QMap<QString,Notificator> FNotificators;
+  QMap<int, NotifyRecord> FNotifyRecords;
+  mutable QMap<QString, Notificator> FNotificators;
 };
 
 #endif // NOTIFICATIONS_H

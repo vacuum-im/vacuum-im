@@ -26,7 +26,6 @@ Notifications::Notifications()
   FOptions = 0;
   FNotifyId = 0;
   FSound = NULL;
-  FOptionsWidget = NULL;
 }
 
 Notifications::~Notifications()
@@ -97,9 +96,6 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
     {
       connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
       connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),SLOT(onOptionsDialogAccepted()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SLOT(onOptionsDialogRejected()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),SLOT(onOptionsDialogClosed()));
     }
   }
 
@@ -143,15 +139,16 @@ QWidget *Notifications::optionsWidget(const QString &ANode, int &AOrder)
   if (ANode == ON_NOTIFICATIONS)
   {
     AOrder = OWO_NOTIFICATIONS;
-    FOptionsWidget = new OptionsWidget(this);
+    OptionsWidget *widget = new OptionsWidget(this);
     foreach(QString id, FNotificators.keys())
     {
       Notificator notificator = FNotificators.value(id);
-      NotifyKindsWidget *widget = new NotifyKindsWidget(this,id,notificator.title,notificator.kindMask,FOptionsWidget);
-      FOptionsWidget->layout()->addWidget(widget);
-      FOptionsWidgets.append(widget);
+      widget->appendKindsWidget(new NotifyKindsWidget(this,id,notificator.title,notificator.kindMask,widget));
     }
-    return FOptionsWidget;
+    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
+    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
+    return widget;
   }
   return NULL;
 }
@@ -191,6 +188,7 @@ int Notifications::appendNotification(const INotification &ANotification)
     record.widget = new NotifyWidget(ANotification);
     connect(record.widget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
     connect(record.widget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
+    connect(record.widget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
     record.widget->appear();
   }
 
@@ -255,11 +253,11 @@ void Notifications::removeNotification(int ANotifyId)
     {
       FTrayManager->removeNotify(record.trayId);
     }
-    if (record.widget!=NULL)
+    if (record.widget != NULL)
     {
       record.widget->deleteLater();
     }
-    if (FTrayManager && record.action!=NULL)
+    if (record.action != NULL)
     {
       FNotifyMenu->removeAction(record.action);
       delete record.action;
@@ -353,7 +351,7 @@ QString Notifications::contactName(const Jid &AStreamJId, const Jid &AContactJid
 
 int Notifications::notifyIdByRosterId(int ARosterId) const
 {
-  QHash<int,NotifyRecord>::const_iterator it = FNotifyRecords.constBegin();
+  QMap<int,NotifyRecord>::const_iterator it = FNotifyRecords.constBegin();
   for (; it!=FNotifyRecords.constEnd(); it++)
     if (it.value().rosterId == ARosterId)
       return it.key();
@@ -362,7 +360,7 @@ int Notifications::notifyIdByRosterId(int ARosterId) const
 
 int Notifications::notifyIdByTrayId(int ATrayId) const
 {
-  QHash<int,NotifyRecord>::const_iterator it = FNotifyRecords.constBegin();
+  QMap<int,NotifyRecord>::const_iterator it = FNotifyRecords.constBegin();
   for (; it!=FNotifyRecords.constEnd(); it++)
     if (it.value().trayId == ATrayId)
       return it.key();
@@ -371,7 +369,7 @@ int Notifications::notifyIdByTrayId(int ATrayId) const
 
 int Notifications::notifyIdByWidget(NotifyWidget *AWidget) const
 {
-  QHash<int,NotifyRecord>::const_iterator it = FNotifyRecords.constBegin();
+  QMap<int,NotifyRecord>::const_iterator it = FNotifyRecords.constBegin();
   for (; it!=FNotifyRecords.constEnd(); it++)
     if (it.value().widget == AWidget)
       return it.key();
@@ -426,6 +424,13 @@ void Notifications::onWindowNotifyRemoved()
   removeNotification(notifyIdByWidget(qobject_cast<NotifyWidget*>(sender())));
 }
 
+void Notifications::onWindowNotifyDestroyed()
+{
+  int notifyId = notifyIdByWidget(qobject_cast<NotifyWidget*>(sender()));
+  if (FNotifyRecords.contains(notifyId))
+    FNotifyRecords[notifyId].widget = NULL;
+}
+
 void Notifications::onActionNotifyActivated(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
@@ -454,28 +459,6 @@ void Notifications::onSettingsClosed()
   settings->setValue(SVN_ENABLE_TRAYICONS,checkOption(EnableTrayIcons));
   settings->setValue(SVN_ENABLE_TRAYACTIONS,checkOption(EnableTrayActions));
   settings->setValue(SVN_ENABLE_SOUNDS,checkOption(EnableSounds));
-}
-
-void Notifications::onOptionsDialogAccepted()
-{
-  if (FOptionsWidget)
-  {
-    FOptionsWidget->applyOptions();
-    foreach(NotifyKindsWidget *widget,FOptionsWidgets)
-      widget->applyOptions();
-  }
-  emit optionsAccepted();
-}
-
-void Notifications::onOptionsDialogRejected()
-{
-  emit optionsRejected();
-}
-
-void Notifications::onOptionsDialogClosed()
-{
-  FOptionsWidget = NULL;
-  FOptionsWidgets.clear();
 }
 
 Q_EXPORT_PLUGIN2(NotificationsPlugin, Notifications)
