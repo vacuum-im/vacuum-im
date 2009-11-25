@@ -23,16 +23,16 @@
 <context>
     <name>RostersView</name>
     <message>
-        <source>Status: %1</source>
-        <translation>Статус: %1</translation>
-    </message>
-    <message>
         <source>Priority: %1</source>
         <translation>Приоритет: %1</translation>
     </message>
     <message>
         <source>Subscription: %1 %2</source>
         <translation>Авторизация: %1 %2</translation>
+    </message>
+    <message>
+        <source>Status:</source>
+        <translation>Статус:</translation>
     </message>
 </context>
 <context>

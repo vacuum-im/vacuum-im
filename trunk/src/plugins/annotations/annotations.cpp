@@ -339,10 +339,7 @@ void Annotations::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMul
   {
     QString note = AIndex->data(RDR_ANNOTATIONS).toString();
     if (!note.isEmpty())
-    {
-      QString toolTip = "<hr>"+Qt::escape(note).trimmed().replace("\n","<br>");
-      AToolTips.insert(RTTO_ANNOTATIONS,toolTip);
-    }
+      AToolTips.insert(RTTO_ANNOTATIONS,QString("%1 <div style='margin-left:10px;'>%2</div>").arg(tr("Annotation:")).arg(Qt::escape(note).replace("\n","<br>")));
   }
 }
 

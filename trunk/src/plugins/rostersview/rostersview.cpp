@@ -8,6 +8,7 @@
 #include <QHeaderView>
 #include <QResizeEvent>
 #include <QApplication>
+#include <QTextDocument>
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
@@ -688,8 +689,9 @@ bool RostersView::viewportEvent(QEvent *AEvent)
         if (labelId!=RLID_DISPLAY && toolTipsMap.isEmpty())
           emit labelToolTips(index,RLID_DISPLAY,toolTipsMap);
 
-        QStringList toolTips = toolTipsMap.values();
-        QToolTip::showText(helpEvent->globalPos(),toolTips.join("<br>"),this);
+        if (!toolTipsMap.isEmpty())
+          QToolTip::showText(helpEvent->globalPos(),"<span>"+QStringList(toolTipsMap.values()).join("<p/>")+"</span>",this);
+
         return true;
       }
     }
@@ -956,30 +958,30 @@ void RostersView::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMul
   {
     QString name = AIndex->data(RDR_NAME).toString();
     if (!name.isEmpty())
-      AToolTips.insert(RTTO_CONTACT_NAME,name);
+      AToolTips.insert(RTTO_CONTACT_NAME, Qt::escape(name));
 
     QString jid = AIndex->data(RDR_JID).toString();
     if (!jid.isEmpty())
-      AToolTips.insert(RTTO_CONTACT_JID,jid);
-
-    QString status = AIndex->data(RDR_STATUS).toString();
-    if (!status.isEmpty())
-      AToolTips.insert(RTTO_CONTACT_STATUS,tr("Status: %1").arg(status));
+      AToolTips.insert(RTTO_CONTACT_JID, Qt::escape(jid));
 
     QString priority = AIndex->data(RDR_PRIORITY).toString();
     if (!priority.isEmpty())
-      AToolTips.insert(RTTO_CONTACT_PRIORITY,tr("Priority: %1").arg(priority));
+      AToolTips.insert(RTTO_CONTACT_PRIORITY, tr("Priority: %1").arg(priority.toInt()));
 
     QString ask = AIndex->data(RDR_ASK).toString();
     QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
     if (!subscription.isEmpty())
-      AToolTips.insert(RTTO_CONTACT_SUBSCRIPTION,tr("Subscription: %1 %2").arg(subscription).arg(ask));
+      AToolTips.insert(RTTO_CONTACT_SUBSCRIPTION, tr("Subscription: %1 %2").arg(Qt::escape(subscription)).arg(Qt::escape(ask)));
+    
+    QString status = AIndex->data(RDR_STATUS).toString();
+    if (!status.isEmpty())
+      AToolTips.insert(RTTO_CONTACT_STATUS, QString("%1 <div style='margin-left:10px;'>%2</div>").arg(tr("Status:")).arg(Qt::escape(status).replace("\n","<br>")));
   }
   else if (FNotifyLabelItems.contains(ALabelId))
   {
     NotifyItem &notifyItem = FNotifyItems[FNotifyLabelItems.value(ALabelId).first()];
     if (!notifyItem.toolTip.isEmpty())
-      AToolTips.insert(RTTO_ROSTERSVIEW_NOTIFY,notifyItem.toolTip);
+      AToolTips.insert(RTTO_CONTACT_NOTIFY, notifyItem.toolTip);
   }
 }
 
