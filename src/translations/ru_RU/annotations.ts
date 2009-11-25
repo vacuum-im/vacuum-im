@@ -15,6 +15,10 @@
         <source>Annotation</source>
         <translation>Комментарий</translation>
     </message>
+    <message>
+        <source>Annotation:</source>
+        <translation>Комментарий:</translation>
+    </message>
 </context>
 <context>
     <name>EditNoteDialog</name>

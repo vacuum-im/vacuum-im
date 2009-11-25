@@ -28,7 +28,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
   setAttribute(Qt::WA_DeleteOnClose, false);
 
   ui.lblRoom->setText(AMultiChat->roomJid().hFull());
-  ui.lblNick->setText(AMultiChat->nickName());
+  ui.lblNick->setText(Qt::escape(AMultiChat->nickName()));
   ui.ltwUsers->installEventFilter(this);
 
   FSettings = NULL;
@@ -315,7 +315,7 @@ void MultiUserChatWindow::initialize()
       IAccount *account = accountManager->accountByStream(streamJid());
       if (account)
       {
-        ui.lblAccount->setText(account->name());
+        ui.lblAccount->setText(Qt::escape(account->name()));
         connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),
           SLOT(onAccountChanged(const QString &, const QVariant &)));
       }
@@ -824,14 +824,26 @@ void MultiUserChatWindow::setToolTipForUser(IMultiUser *AUser)
   QListWidgetItem *listItem = FUsers.value(AUser);
   if (listItem)
   {
-    QString toolTip;
-    toolTip += AUser->nickName()+"<br>";
-    if (!AUser->data(MUDR_REAL_JID).toString().isEmpty())
-      toolTip += AUser->data(MUDR_REAL_JID).toString()+"<br>";
-    toolTip += tr("Role: %1<br>").arg(AUser->data(MUDR_ROLE).toString());
-    toolTip += tr("Affiliation: %1<br>").arg(AUser->data(MUDR_AFFILIATION).toString());
-    toolTip += tr("Status: %1").arg(AUser->data(MUDR_STATUS).toString());
-    listItem->setToolTip(toolTip);
+    QStringList toolTips;
+    toolTips.append(Qt::escape(AUser->nickName()));
+
+    QString realJid = AUser->data(MUDR_REAL_JID).toString();
+    if (!realJid.isEmpty())
+      toolTips.append(Qt::escape(realJid));
+    
+    QString role = AUser->data(MUDR_ROLE).toString();
+    if (!role.isEmpty())
+      toolTips.append(tr("Role: %1").arg(Qt::escape(role)));
+
+    QString affiliation = AUser->data(MUDR_AFFILIATION).toString();
+    if (!affiliation.isEmpty())
+      toolTips.append(tr("Affiliation: %1").arg(Qt::escape(affiliation)));
+
+    QString status = AUser->data(MUDR_STATUS).toString();
+    if (!status.isEmpty())
+      toolTips.append(QString("%1 <div style='margin-left:10px;'>%2</div>").arg(tr("Status:")).arg(Qt::escape(status).replace("\n","<br>")));
+
+    listItem->setToolTip("<span>"+toolTips.join("<p/>")+"</span>");
   }
 }
 
@@ -1412,8 +1424,10 @@ void MultiUserChatWindow::onUserNickChanged(IMultiUser *AUser, const QString &AO
   showMessage(tr("%1 changed nick to %2").arg(AOldNick).arg(ANewNick),IMessageContentOptions::Event);
 }
 
-void MultiUserChatWindow::onPresenceChanged(int /*AShow*/, const QString &/*AStatus*/)
+void MultiUserChatWindow::onPresenceChanged(int AShow, const QString &AStatus)
 {
+  Q_UNUSED(AShow);
+  Q_UNUSED(AStatus);
   updateMenuBarActions();
 }
 

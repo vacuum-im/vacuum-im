@@ -671,18 +671,6 @@ Check values and try again</source>
         <translation>%1 был удален из комнаты из-за выключения системы</translation>
     </message>
     <message>
-        <source>Role: %1&lt;br&gt;</source>
-        <translation>Тип пользователя: %1&lt;br&gt;</translation>
-    </message>
-    <message>
-        <source>Affiliation: %1&lt;br&gt;</source>
-        <translation>Членство: %1 &lt;br&gt;</translation>
-    </message>
-    <message>
-        <source>Status: %1</source>
-        <translation>Статус: %1</translation>
-    </message>
-    <message>
         <source>User %1 is not present in the conference</source>
         <translation>Пользователь %1 не присутствует в конференции</translation>
     </message>
@@ -893,6 +881,18 @@ Check values and try again</source>
     <message>
         <source>%1 changed status to [%2] %3</source>
         <translation>%1изменил статус на [%2] %3</translation>
+    </message>
+    <message>
+        <source>Role: %1</source>
+        <translation>Тип: %1</translation>
+    </message>
+    <message>
+        <source>Affiliation: %1</source>
+        <translation>Членство: %1</translation>
+    </message>
+    <message>
+        <source>Status:</source>
+        <translation>Статус:</translation>
     </message>
 </context>
 <context>
