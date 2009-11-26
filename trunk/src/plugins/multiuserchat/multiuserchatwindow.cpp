@@ -84,7 +84,7 @@ void MultiUserChatWindow::showWindow()
   if (isWindow())
   {
     isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
-    raise();
+    WidgetManager::raiseWidget(this);
   }
   else
     emit windowShow();

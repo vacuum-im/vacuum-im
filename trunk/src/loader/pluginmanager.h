@@ -16,6 +16,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
+#include <utils/widgetmanager.h>
 #include <utils/action.h>
 #include "setuppluginsdialog.h"
 #include "aboutbox.h"

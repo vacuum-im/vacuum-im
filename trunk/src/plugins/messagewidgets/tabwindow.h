@@ -8,6 +8,7 @@
 #include <definations/actiongroups.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/isettings.h>
+#include <utils/widgetmanager.h>
 #include "ui_tabwindow.h"
 
 class TabWindow : 

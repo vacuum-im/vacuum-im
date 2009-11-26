@@ -10,7 +10,7 @@ MainWindowPlugin::MainWindowPlugin()
   FSettingsPlugin = NULL;
   FTrayManager = NULL;
 
-  FMainWindow = new MainWindow(NULL,Qt::Tool);
+  FMainWindow = new MainWindow(NULL, Qt::Tool);
 }
 
 MainWindowPlugin::~MainWindowPlugin()
@@ -70,7 +70,7 @@ bool MainWindowPlugin::initObjects()
     action = new Action(this);
     action->setText(tr("Show roster"));
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_SHOW_ROSTER);
-    connect(action,SIGNAL(triggered()),SLOT(onShowMainWindow())); 
+    connect(action,SIGNAL(triggered(bool)),SLOT(onShowMainWindowByAction(bool))); 
     FTrayManager->addAction(action,AG_TMTM_MAINWINDOW,true);
   }
 
@@ -81,7 +81,8 @@ bool MainWindowPlugin::startPlugin()
 {
   updateTitle();
   ISettings *settings = FSettingsPlugin!=NULL ? FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID) : NULL;
-  FMainWindow->setVisible(settings!=NULL ? settings->value(SVN_SHOW_ON_START,true).toBool() : true);
+  if (settings!=NULL ? settings->value(SVN_SHOW_ON_START,true).toBool() : true)
+    showMainWindow();
   return true;
 }
 
@@ -101,8 +102,8 @@ void MainWindowPlugin::updateTitle()
 void MainWindowPlugin::showMainWindow()
 {
   FMainWindow->show();
+  WidgetManager::raiseWidget(FMainWindow);
   FMainWindow->activateWindow();
-  FMainWindow->raise();
 }
 
 void MainWindowPlugin::onSettingsOpened()
@@ -122,8 +123,10 @@ void MainWindowPlugin::onSettingsClosed()
   updateTitle();
 }
 
-void MainWindowPlugin::onProfileRenamed(const QString &/*AProfileFrom*/, const QString &/*AProfileTo*/)
+void MainWindowPlugin::onProfileRenamed(const QString &AProfileFrom, const QString &AProfileTo)
 {
+  Q_UNUSED(AProfileFrom);
+  Q_UNUSED(AProfileTo);
   updateTitle();
 }
 
@@ -133,7 +136,7 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
     showMainWindow();
 }
 
-void MainWindowPlugin::onShowMainWindow()
+void MainWindowPlugin::onShowMainWindowByAction(bool)
 {
   showMainWindow();
 }

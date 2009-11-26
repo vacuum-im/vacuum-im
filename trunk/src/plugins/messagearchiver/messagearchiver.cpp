@@ -1041,7 +1041,7 @@ IArchiveWindow *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const 
   window->setGroupKind(AGroupKind);
   window->setFilter(AFilter);
   window->show();
-  window->raise();
+  WidgetManager::raiseWidget(window);
   window->activateWindow();
   return window;
 }

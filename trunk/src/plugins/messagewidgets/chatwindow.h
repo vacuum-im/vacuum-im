@@ -6,6 +6,7 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/isettings.h>
+#include <utils/widgetmanager.h>
 #include "ui_chatwindow.h"
 
 class ChatWindow : 

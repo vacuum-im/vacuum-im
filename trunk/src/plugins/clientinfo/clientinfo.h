@@ -27,6 +27,7 @@
 #include <utils/stanza.h>
 #include <utils/menu.h>
 #include <utils/datetime.h>
+#include <utils/widgetmanager.h>
 #include "clientinfodialog.h"
 
 struct SoftwareItem {

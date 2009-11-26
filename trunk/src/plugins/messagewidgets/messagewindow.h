@@ -10,6 +10,7 @@
 #include <interfaces/istatusicons.h>
 #include <interfaces/isettings.h>
 #include <utils/errorhandler.h>
+#include <utils/widgetmanager.h>
 #include "ui_messagewindow.h"
 
 class MessageWindow : 

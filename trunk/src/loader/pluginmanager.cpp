@@ -607,7 +607,7 @@ void PluginManager::onShowSetupPluginsDialog(bool)
   if (FPluginsDialog.isNull())
     FPluginsDialog = new SetupPluginsDialog(this,FPluginsSetup,NULL);
   FPluginsDialog->show();
-  FPluginsDialog->raise();
+  WidgetManager::raiseWidget(FPluginsDialog);
   FPluginsDialog->activateWindow();
 }
 
