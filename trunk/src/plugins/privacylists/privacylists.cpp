@@ -1409,4 +1409,4 @@ void PrivacyLists::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
   setAutoListed(AMultiChat->streamJid(),AMultiChat->roomJid(),PRIVACY_LIST_CONFERENCES,true);
 }
 
-Q_EXPORT_PLUGIN2(PrivacyListsPlugin, PrivacyLists)
+Q_EXPORT_PLUGIN2(plg_privacylists, PrivacyLists)

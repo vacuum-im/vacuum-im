@@ -529,4 +529,4 @@ void Commands::onPresenceRemoved(IPresence *APresence)
   }
 }
 
-Q_EXPORT_PLUGIN2(CommandsPlugin, Commands)
+Q_EXPORT_PLUGIN2(plg_commands, Commands)

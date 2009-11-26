@@ -826,4 +826,4 @@ void RostersModel::onDelayedDataChanged()
   FChangedIndexes.clear();
 }
 
-Q_EXPORT_PLUGIN2(RostersModelPlugin, RostersModel)
+Q_EXPORT_PLUGIN2(plg_rostersmodel, RostersModel)

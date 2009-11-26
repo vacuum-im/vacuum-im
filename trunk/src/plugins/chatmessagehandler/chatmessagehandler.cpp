@@ -525,4 +525,4 @@ void ChatMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOpti
   }
 }
 
-Q_EXPORT_PLUGIN2(ChatMessageHandlerPlugin, ChatMessageHandler)
+Q_EXPORT_PLUGIN2(plg_chatmessagehandler, ChatMessageHandler)

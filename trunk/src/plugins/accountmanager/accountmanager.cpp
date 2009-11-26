@@ -4,7 +4,7 @@
 #define SVN_ACCOUNT_ACTIVE          SVN_ACCOUNT":"AVN_ACTIVE
 #define SVN_ACCOUNT_STREAM          SVN_ACCOUNT":"AVN_STREAM_JID
 
-#define ADR_ACCOUNT_ID            Action::DR_Parametr1
+#define ADR_ACCOUNT_ID              Action::DR_Parametr1
 
 AccountManager::AccountManager()
 {
@@ -294,4 +294,4 @@ void AccountManager::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   }
 }
 
-Q_EXPORT_PLUGIN2(AccountManagerPlugin, AccountManager)
+Q_EXPORT_PLUGIN2(plg_accountmanager, AccountManager)

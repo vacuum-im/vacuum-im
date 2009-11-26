@@ -615,4 +615,4 @@ void SettingsPlugin::onPluginManagerQuit()
   setProfileClosed();
 }
 
-Q_EXPORT_PLUGIN2(SettingsPlugin, SettingsPlugin)
+Q_EXPORT_PLUGIN2(plg_settings, SettingsPlugin)

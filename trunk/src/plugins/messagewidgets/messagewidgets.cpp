@@ -535,4 +535,4 @@ void MessageWidgets::onSettingsClosed()
   deleteWindows();
 }
 
-Q_EXPORT_PLUGIN2(MessageWidgetsPlugin, MessageWidgets)
+Q_EXPORT_PLUGIN2(plg_messagewidgets, MessageWidgets)

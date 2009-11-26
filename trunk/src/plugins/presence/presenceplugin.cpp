@@ -171,4 +171,4 @@ void PresencePlugin::onStreamRemoved(IXmppStream *AXmppStream)
   }
 }
 
-Q_EXPORT_PLUGIN2(PresencePlugin, PresencePlugin)
+Q_EXPORT_PLUGIN2(plg_presence, PresencePlugin)

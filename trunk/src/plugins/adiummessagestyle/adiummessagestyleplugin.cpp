@@ -252,4 +252,4 @@ void AdiumMessageStylePlugin::onClearEmptyStyles()
   }
 }
 
-Q_EXPORT_PLUGIN2(AdiumMessageStylePlugin, AdiumMessageStylePlugin)
+Q_EXPORT_PLUGIN2(plg_adiummessagestyle, AdiumMessageStylePlugin)

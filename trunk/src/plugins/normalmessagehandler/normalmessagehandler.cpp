@@ -462,4 +462,4 @@ void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOp
   }
 }
 
-Q_EXPORT_PLUGIN2(NormalMessageHandlerPlugin, NormalMessageHandler)
+Q_EXPORT_PLUGIN2(plg_normalmessagehandler, NormalMessageHandler)

@@ -278,4 +278,4 @@ void JabberSearch::onSearchActionTriggered(bool)
   }
 }
 
-Q_EXPORT_PLUGIN2(JabberSearchPlugin, JabberSearch)
+Q_EXPORT_PLUGIN2(plg_jabbersearch, JabberSearch)

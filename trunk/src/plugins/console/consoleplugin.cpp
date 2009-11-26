@@ -51,4 +51,4 @@ void ConsolePlugin::onShowXMLConsole(bool)
   widget->show();
 }
 
-Q_EXPORT_PLUGIN2(ConsolePlugin, ConsolePlugin)
+Q_EXPORT_PLUGIN2(plg_console, ConsolePlugin)

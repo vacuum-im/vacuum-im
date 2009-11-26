@@ -461,4 +461,4 @@ void Notifications::onSettingsClosed()
   settings->setValue(SVN_ENABLE_SOUNDS,checkOption(EnableSounds));
 }
 
-Q_EXPORT_PLUGIN2(NotificationsPlugin, Notifications)
+Q_EXPORT_PLUGIN2(plg_notifications, Notifications)

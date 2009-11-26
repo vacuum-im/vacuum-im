@@ -290,4 +290,4 @@ QString BitsOfBinary::contentFileName(const QString &AContentId) const
   return FDataDir.absoluteFilePath(QCryptographicHash::hash(AContentId.toUtf8(),QCryptographicHash::Sha1).toHex());
 }
 
-Q_EXPORT_PLUGIN2(BitsOfBinaryPlugin, BitsOfBinary)
+Q_EXPORT_PLUGIN2(plg_bitsofbinary, BitsOfBinary)

@@ -269,4 +269,4 @@ void AutoStatus::onSettingsClosed()
   }
 }
 
-Q_EXPORT_PLUGIN2(AutoStatusPlugin, AutoStatus)
+Q_EXPORT_PLUGIN2(plg_autostatus, AutoStatus)

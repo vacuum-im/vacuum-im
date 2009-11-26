@@ -1219,5 +1219,5 @@ void RosterChanger::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, I
   }
 }
 
-Q_EXPORT_PLUGIN2(RosterChangerPlugin, RosterChanger)
+Q_EXPORT_PLUGIN2(plg_rosterchanger, RosterChanger)
 

@@ -817,4 +817,4 @@ void Gateways::onRegisterError(const QString &AId, const QString &/*AError*/)
   FRegisterRequests.remove(AId);
 }
 
-Q_EXPORT_PLUGIN2(GatewaysPlugin, Gateways)
+Q_EXPORT_PLUGIN2(plg_gateways, Gateways)

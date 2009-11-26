@@ -157,4 +157,4 @@ void TrayManager::onBlinkTimer()
   FBlinkShow = !FBlinkShow;
 }
 
-Q_EXPORT_PLUGIN2(TrayManagerPlugin, TrayManager)
+Q_EXPORT_PLUGIN2(plg_traymanager, TrayManager)

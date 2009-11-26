@@ -368,4 +368,4 @@ void Annotations::onEditNoteDialogDestroyed()
     FEditDialogs[dialog->streamJid()].remove(dialog->contactJid());
 }
 
-Q_EXPORT_PLUGIN2(AnnotationsPlugin, Annotations)
+Q_EXPORT_PLUGIN2(plg_annotations, Annotations)

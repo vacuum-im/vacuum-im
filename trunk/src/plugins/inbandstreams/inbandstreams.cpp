@@ -246,4 +246,4 @@ void InBandStreams::onSettingsClosed()
   FSettings = NULL;
 }
 
-Q_EXPORT_PLUGIN2(InBandStreamsPlugin, InBandStreams);
+Q_EXPORT_PLUGIN2(plg_inbandstreams, InBandStreams);

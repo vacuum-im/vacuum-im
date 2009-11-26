@@ -1207,4 +1207,4 @@ void SessionNegotiation::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
   }
 }
 
-Q_EXPORT_PLUGIN2(SessionNegotiationPlugin, SessionNegotiation)
+Q_EXPORT_PLUGIN2(plg_sessionnegotiation, SessionNegotiation)

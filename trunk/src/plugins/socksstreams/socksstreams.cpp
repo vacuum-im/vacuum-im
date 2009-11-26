@@ -569,4 +569,4 @@ void SocksStreams::onServerConnectionDisconnected()
     tcpsocket->deleteLater();
 }
 
-Q_EXPORT_PLUGIN2(SocksStreamsPlugin, SocksStreams);
+Q_EXPORT_PLUGIN2(plg_socksstreams, SocksStreams);

@@ -240,4 +240,4 @@ void MessageStyles::onVCardChanged(const Jid &AContactJid)
   }
 }
 
-Q_EXPORT_PLUGIN2(MessageStylesPlugin, MessageStyles)
+Q_EXPORT_PLUGIN2(plg_messagestyles, MessageStyles)

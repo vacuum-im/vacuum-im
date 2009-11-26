@@ -254,4 +254,4 @@ void SimpleMessageStylePlugin::onClearEmptyStyles()
   }
 }
 
-Q_EXPORT_PLUGIN2(SimpleMessageStylePlugin, SimpleMessageStylePlugin)
+Q_EXPORT_PLUGIN2(plg_simplemessagestyle, SimpleMessageStylePlugin)

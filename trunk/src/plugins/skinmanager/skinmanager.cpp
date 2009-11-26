@@ -56,4 +56,4 @@ void SkinManager::onSettingsClosed()
 
 }
 
-Q_EXPORT_PLUGIN2(SkinManagerPlugin, SkinManager)
+Q_EXPORT_PLUGIN2(plg_skinmanager, SkinManager)

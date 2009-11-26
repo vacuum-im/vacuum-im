@@ -280,4 +280,4 @@ void XmppStreams::onStreamDestroyed()
   }
 }
 
-Q_EXPORT_PLUGIN2(XmppStreamsPlugin, XmppStreams)
+Q_EXPORT_PLUGIN2(plg_xmppstreams, XmppStreams)

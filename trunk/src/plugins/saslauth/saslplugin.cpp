@@ -132,4 +132,4 @@ void SASLPlugin::destroyStreamFeature(IStreamFeature *AFeature)
   }
 }
 
-Q_EXPORT_PLUGIN2(SASLPlugin, SASLPlugin)
+Q_EXPORT_PLUGIN2(plg_sasl, SASLPlugin)

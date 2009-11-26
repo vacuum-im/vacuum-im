@@ -126,4 +126,4 @@ void IqAuthPlugin::destroyStreamFeature(IStreamFeature *AFeature)
   }
 }
 
-Q_EXPORT_PLUGIN2(IqAuthPlugin, IqAuthPlugin)
+Q_EXPORT_PLUGIN2(plg_iqauth, IqAuthPlugin)
