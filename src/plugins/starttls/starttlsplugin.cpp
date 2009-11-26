@@ -66,4 +66,4 @@ void StartTLSPlugin::destroyStreamFeature(IStreamFeature *AFeature)
   }
 }
 
-Q_EXPORT_PLUGIN2(StartTLSPlugin, StartTLSPlugin)
+Q_EXPORT_PLUGIN2(plg_starttls, StartTLSPlugin)

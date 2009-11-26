@@ -391,4 +391,4 @@ void RostersViewPlugin::onShowOfflineContactsAction(bool)
   setOption(IRostersView::ShowOfflineContacts, !checkOption(IRostersView::ShowOfflineContacts));
 }
 
-Q_EXPORT_PLUGIN2(RostersViewPlugin, RostersViewPlugin)
+Q_EXPORT_PLUGIN2(plg_rostersview, RostersViewPlugin)

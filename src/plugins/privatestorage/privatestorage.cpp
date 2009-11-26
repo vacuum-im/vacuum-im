@@ -186,4 +186,4 @@ void PrivateStorage::onStreamClosed(IXmppStream *AXmppStream)
   removeStreamElement(AXmppStream->streamJid());
 }
 
-Q_EXPORT_PLUGIN2(PrivateStoragePlugin, PrivateStorage)
+Q_EXPORT_PLUGIN2(plg_privatestorage, PrivateStorage)

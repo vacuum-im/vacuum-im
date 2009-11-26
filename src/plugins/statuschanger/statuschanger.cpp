@@ -1139,4 +1139,4 @@ void StatusChanger::onNotificationActivated(int ANotifyId)
      FNotifications->removeNotification(ANotifyId);
 }
 
-Q_EXPORT_PLUGIN2(StatusChangerPlugin, StatusChanger)
+Q_EXPORT_PLUGIN2(plg_statuschanger, StatusChanger)

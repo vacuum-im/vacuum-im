@@ -177,4 +177,4 @@ void ConnectionManager::onStreamClosed(IXmppStream *AXmppStream)
   }
 }
 
-Q_EXPORT_PLUGIN2(ConnectionManagerPlugin, ConnectionManager)
+Q_EXPORT_PLUGIN2(plg_connectionmanager, ConnectionManager)

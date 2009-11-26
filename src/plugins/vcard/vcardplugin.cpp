@@ -341,4 +341,4 @@ void VCardPlugin::onXmppStreamRemoved(IXmppStream *AXmppStream)
       delete dialog;
 }
 
-Q_EXPORT_PLUGIN2(VCardPlugin, VCardPlugin)
+Q_EXPORT_PLUGIN2(plg_vcard, VCardPlugin)

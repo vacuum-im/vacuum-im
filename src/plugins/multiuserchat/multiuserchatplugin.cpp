@@ -746,4 +746,4 @@ void MultiUserChatPlugin::onInviteActionTriggered(bool)
   }
 }
 
-Q_EXPORT_PLUGIN2(MultiUserChatPlugin, MultiUserChatPlugin)
+Q_EXPORT_PLUGIN2(plg_multiuserchat, MultiUserChatPlugin)

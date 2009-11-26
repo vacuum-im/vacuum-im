@@ -2818,4 +2818,4 @@ void MessageArchiver::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
     connect(roomMenu,SIGNAL(aboutToShow()),SLOT(onMultiChatWindowMenuAboutToShow()));
 }
 
-Q_EXPORT_PLUGIN2(MessageArchiverPlugin, MessageArchiver)
+Q_EXPORT_PLUGIN2(plg_messagearchiver, MessageArchiver)

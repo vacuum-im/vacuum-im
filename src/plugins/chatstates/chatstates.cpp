@@ -717,4 +717,4 @@ void ChatStates::onStanzaSessionTerminated(const IStanzaSession &ASession)
   FStanzaSessions[ASession.streamJid].remove(ASession.contactJid);
 }
 
-Q_EXPORT_PLUGIN2(ChatStatesPlugin, ChatStates)
+Q_EXPORT_PLUGIN2(plg_chatstates, ChatStates)

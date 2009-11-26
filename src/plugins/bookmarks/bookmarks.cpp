@@ -389,4 +389,4 @@ void BookMarks::onAccountChanged(const QString &AName, const QVariant &AValue)
     FStreamMenu[account->streamJid()]->setTitle(AValue.toString());
 }
 
-Q_EXPORT_PLUGIN2(BookMarksPlugin, BookMarks)
+Q_EXPORT_PLUGIN2(plg_bookmarks, BookMarks)

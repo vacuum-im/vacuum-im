@@ -606,4 +606,4 @@ void FileTransfer::onSettingsClosed()
   settings->setValue(SVN_REMOVE_TRANSFER_FINISHED,FRemoveTransferWhenFinished);
 }
 
-Q_EXPORT_PLUGIN2(FileTransferPlugin, FileTransfer);
+Q_EXPORT_PLUGIN2(plg_filetransfer, FileTransfer);

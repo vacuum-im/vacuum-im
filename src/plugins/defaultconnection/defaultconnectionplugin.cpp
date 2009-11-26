@@ -186,4 +186,4 @@ void DefaultConnectionPlugin::onOptionsDialogClosed()
   FWidgetsByNS.clear();
 }
 
-Q_EXPORT_PLUGIN2(DefaultConnectionPlugin, DefaultConnectionPlugin)
+Q_EXPORT_PLUGIN2(plg_defaultconnection, DefaultConnectionPlugin)

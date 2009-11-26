@@ -380,4 +380,4 @@ void MessageProcessor::onNotificationActivated(int ANotifyId)
     showMessage(FNotifyId2MessageId.value(ANotifyId));
 }
 
-Q_EXPORT_PLUGIN2(MessageProcessorPlugin, MessageProcessor)
+Q_EXPORT_PLUGIN2(plg_messageprocessor, MessageProcessor)

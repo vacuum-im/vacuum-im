@@ -352,4 +352,4 @@ void FileStreamsManager::onSettingsClosed()
   settings->setValue(SVN_ACCEPTABLE_STREAM_METHODS, QStringList(FMethods).join("||"));
 }
 
-Q_EXPORT_PLUGIN2(FileStreamsManagerPlugin, FileStreamsManager);
+Q_EXPORT_PLUGIN2(plg_filestreamsmanager, FileStreamsManager);

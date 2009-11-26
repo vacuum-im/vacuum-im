@@ -301,4 +301,4 @@ void Emoticons::onSettingsClosed()
   settings->setValue(SVN_SUBSTORAGES,FStorageOrder);
 }
 
-Q_EXPORT_PLUGIN2(EmoticonsPlugin, Emoticons)
+Q_EXPORT_PLUGIN2(plg_emoticons, Emoticons)

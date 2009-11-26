@@ -906,4 +906,4 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
   }
 }
 
-Q_EXPORT_PLUGIN2(ClientInfoPlugin, ClientInfo)
+Q_EXPORT_PLUGIN2(plg_clientinfo, ClientInfo)

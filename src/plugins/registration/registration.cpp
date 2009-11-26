@@ -435,4 +435,4 @@ void Registration::onOptionsDialogClosed()
   FOptionWidgets.clear();
 }
 
-Q_EXPORT_PLUGIN2(RegistrationPlugin, Registration)
+Q_EXPORT_PLUGIN2(plg_registration, Registration)

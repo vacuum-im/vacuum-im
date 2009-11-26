@@ -138,4 +138,4 @@ void MainWindowPlugin::onShowMainWindow()
   showMainWindow();
 }
 
-Q_EXPORT_PLUGIN2(MainWindowPlugin, MainWindowPlugin)
+Q_EXPORT_PLUGIN2(plg_mainwindow, MainWindowPlugin)

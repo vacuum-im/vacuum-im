@@ -1464,4 +1464,4 @@ void ServiceDiscovery::onSelfCapsChanged()
   }
 }
 
-Q_EXPORT_PLUGIN2(ServiceDiscoveryPlugin, ServiceDiscovery)
+Q_EXPORT_PLUGIN2(plg_servicediscovery, ServiceDiscovery)

@@ -238,4 +238,4 @@ void RosterSearch::onEditTimedOut()
   startSearch();
 }
 
-Q_EXPORT_PLUGIN2(RosterSearchPlugin, RosterSearch)
+Q_EXPORT_PLUGIN2(plg_rostersearch, RosterSearch)

@@ -72,4 +72,4 @@ void CompressPlugin::destroyStreamFeature(IStreamFeature *AFeature)
   }
 }
 
-Q_EXPORT_PLUGIN2(CompressionPlugin, CompressPlugin)
+Q_EXPORT_PLUGIN2(plg_compress, CompressPlugin)

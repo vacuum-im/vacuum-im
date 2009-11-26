@@ -1097,4 +1097,4 @@ uint qHash(const QUrl &key)
   return qHash(key.toString());
 }
 
-Q_EXPORT_PLUGIN2(DataFormsPlugin, DataForms);
+Q_EXPORT_PLUGIN2(plg_dataforms, DataForms);

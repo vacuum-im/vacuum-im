@@ -492,4 +492,4 @@ void DataStreamsManger::onSettingsClosed()
     settings->deleteNS(oldSettingsNS);
 }
 
-Q_EXPORT_PLUGIN2(DataStreamsManagerPlugin, DataStreamsManger);
+Q_EXPORT_PLUGIN2(plg_datastreamsmanager, DataStreamsManger);
