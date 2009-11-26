@@ -14,7 +14,8 @@ HEADERS  = utilsexport.h \
            iconstorage.h \
            menubarchanger.h \
            statusbarchanger.h \
-           ringbuffer.h
+           ringbuffer.h \
+           widgetmanager.h
           
 
 SOURCES  = jid.cpp \
@@ -32,4 +33,5 @@ SOURCES  = jid.cpp \
            iconstorage.cpp \
            menubarchanger.cpp \
            statusbarchanger.cpp \
-           ringbuffer.cpp
+           ringbuffer.cpp \
+           widgetmanager.cpp

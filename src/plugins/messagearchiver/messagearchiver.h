@@ -30,6 +30,7 @@
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/iroster.h>
 #include <utils/errorhandler.h>
+#include <utils/widgetmanager.h>
 #include "collectionwriter.h"
 #include "archiveoptions.h"
 #include "replicator.h"

@@ -136,7 +136,7 @@ void NotifyWidget::layoutWidgets()
     if (!widget->isVisible())
     {
       widget->show();
-      widget->raise();
+      WidgetManager::raiseWidget(widget);
       widget->move(display.right() - widget->frameGeometry().width(), display.bottom());
     }
     ypos -=  widget->frameGeometry().height();

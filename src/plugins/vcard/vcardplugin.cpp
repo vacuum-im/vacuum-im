@@ -219,7 +219,7 @@ void VCardPlugin::showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid)
   {
     VCardDialog *dialog = FVCardDialogs.value(AContactJid);
     dialog->show();
-    dialog->raise();
+    WidgetManager::raiseWidget(dialog);
     dialog->activateWindow();
   }
   else if (AStreamJid.isValid() && AContactJid.isValid())

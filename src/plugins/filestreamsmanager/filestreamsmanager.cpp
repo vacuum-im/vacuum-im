@@ -323,8 +323,8 @@ void FileStreamsManager::onShowFileStreamsWindow(bool)
   if (FFileStreamsWindow.isNull())
     FFileStreamsWindow = new FileStreamsWindow(this, FSettingsPlugin!=NULL ? FSettingsPlugin->settingsForPlugin(pluginUuid()) : NULL, NULL);
   FFileStreamsWindow->show();
+  WidgetManager::raiseWidget(FFileStreamsWindow);
   FFileStreamsWindow->activateWindow();
-  FFileStreamsWindow->raise();
 }
 
 void FileStreamsManager::onSettingsOpened()

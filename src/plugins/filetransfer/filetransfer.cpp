@@ -236,8 +236,8 @@ bool FileTransfer::fileStreamShowDialog(const QString &AStreamId)
   {
     StreamDialog *dialog = createStreamDialog(stream);
     dialog->show();
+    WidgetManager::raiseWidget(dialog);
     dialog->activateWindow();
-    dialog->raise();
     return true;
   }
   return false;

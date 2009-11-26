@@ -15,6 +15,7 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/isettings.h>
 #include <interfaces/iservicediscovery.h>
+#include <utils/widgetmanager.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
 #include "vcard.h"

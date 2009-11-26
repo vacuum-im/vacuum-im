@@ -26,6 +26,7 @@
 #include <utils/stanza.h>
 #include <utils/datetime.h>
 #include <utils/iconstorage.h>
+#include <utils/widgetmanager.h>
 #include "streamdialog.h"
 #include "filetransferoptions.h"
 

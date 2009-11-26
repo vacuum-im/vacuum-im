@@ -5,6 +5,7 @@
 #include <QDesktopWidget>
 #include <definations/notificationdataroles.h>
 #include <interfaces/inotifications.h>
+#include <utils/widgetmanager.h>
 #include "ui_notifywidget.h"
 
 class NotifyWidget : 

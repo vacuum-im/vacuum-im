@@ -19,6 +19,7 @@
 #include <utils/stanza.h>
 #include <utils/datetime.h>
 #include <utils/iconstorage.h>
+#include <utils/widgetmanager.h>
 #include "filestream.h"
 #include "filestreamswindow.h"
 #include "filestreamsoptions.h"

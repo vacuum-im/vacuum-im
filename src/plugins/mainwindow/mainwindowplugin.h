@@ -9,6 +9,7 @@
 #include <interfaces/imainwindow.h>
 #include <interfaces/isettings.h>
 #include <interfaces/itraymanager.h>
+#include <utils/widgetmanager.h>
 #include <utils/action.h>
 #include "mainwindow.h"
 
@@ -40,7 +41,7 @@ protected slots:
   void onSettingsClosed();
   void onProfileRenamed(const QString &AProfileFrom, const QString &AProfileTo);
   void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
-  void onShowMainWindow();
+  void onShowMainWindowByAction(bool);
 private:
   IPluginManager *FPluginManager;
   ISettingsPlugin *FSettingsPlugin;
