@@ -229,7 +229,9 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
       connect(window->instance(),SIGNAL(windowActivated()),SLOT(onWindowActivated()));
       connect(window->instance(),SIGNAL(windowClosed()),SLOT(onWindowClosed()));
       connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onWindowDestroyed()));
+
       FWindows.append(window);
+      FWindowStatus[window->viewWidget()].createTime = QDateTime::currentDateTime();
       updateWindow(window);
 
       if (FRostersView && FRostersModel)
@@ -291,10 +293,20 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
   {
     IArchiveRequest request;
     request.with = AWindow->contactJid().bare();
-    request.count = HISTORY_MESSAGES;
     request.order = Qt::DescendingOrder;
-    request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
-    
+
+    WindowStatus &wstatus = FWindowStatus[AWindow->viewWidget()];
+    if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) < HISTORY_TIME_PAST)
+    {
+      request.count = HISTORY_MESSAGES;
+      request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
+    }
+    else
+    {
+      request.start = wstatus.startTime.isValid() ? wstatus.startTime : wstatus.createTime;
+      request.end = QDateTime::currentDateTime();
+    }
+
     QList<Message> history;
     QList<IArchiveHeader> headers = FMessageArchiver->loadLocalHeaders(AWindow->streamJid(), request);
     for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
@@ -308,6 +320,8 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
       Message message = history.at(i);
       showStyledMessage(AWindow,message);
     }
+
+    wstatus.startTime = history.value(0).dateTime();
   }
 }
 
@@ -363,7 +377,7 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
   else
     options.direction = IMessageContentOptions::DirectionOut;
 
-  if (options.time.secsTo(QDateTime::currentDateTime())>HISTORY_TIME_PAST)
+  if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_PAST)
     options.type |= IMessageContentOptions::History;
   
   fillContentOptions(AWindow,options);
@@ -517,9 +531,11 @@ void ChatMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOpti
   {
     foreach (IChatWindow *window, FWindows)
     {
-      if (window->viewWidget() && window->viewWidget()->messageStyle())
+      IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
+      if (style==NULL || !style->changeOptions(window->viewWidget()->styleWidget(),AOptions,false))
       {
-        window->viewWidget()->messageStyle()->changeOptions(window->viewWidget()->styleWidget(),AOptions,false);
+        setMessageStyle(window);
+        showHistory(window);
       }
     }
   }

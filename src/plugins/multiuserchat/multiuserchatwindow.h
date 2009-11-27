@@ -34,7 +34,10 @@
 #define GROUP_NOTIFICATOR_ID      "GroupChatMessages"
 #define PRIVATE_NOTIFICATOR_ID    "PrivateMessages"
 
-struct WindowStatus {
+struct WindowStatus 
+{
+  QDateTime startTime;
+  QDateTime createTime;
   QString lastStatusShow;
 };
 
@@ -101,10 +104,11 @@ protected:
   void setToolTipForUser(IMultiUser *AUser);
   bool execShortcutCommand(const QString &AText);
 protected:
-  void setMessageStyle(bool AClean = false);
+  void setMessageStyle();
   void showTopic(const QString &ATopic);
   void showMessage(const QString &AMessage, int AContentType=0);
   void showUserMessage(const Message &AMessage, const QString &ANick);
+  void showHistory();
   void updateWindow();
   void updateListItem(const Jid &AContactJid);
   void removeActiveMessages();
@@ -222,7 +226,7 @@ private:
   QMultiMap<IChatWindow *,int> FActiveChatMessages;
   QMap<int, IDataDialogWidget *> FDataFormMessages;
   QMap<IMultiUser *, QListWidgetItem *> FUsers;
-  QMap<IViewWidget *,WindowStatus> FWindowStatus;
+  QMap<IViewWidget *, WindowStatus> FWindowStatus;
 };
 
 #endif // MULTIUSERCHATWINDOW_H
