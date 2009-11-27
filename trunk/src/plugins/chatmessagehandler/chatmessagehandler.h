@@ -30,7 +30,10 @@
 #include <interfaces/istatuschanger.h>
 #include "usercontextmenu.h"
 
-struct WindowStatus {
+struct WindowStatus 
+{
+  QDateTime startTime;
+  QDateTime createTime;
   QString lastStatusShow;
 };
 

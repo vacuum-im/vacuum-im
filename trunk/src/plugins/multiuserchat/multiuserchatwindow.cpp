@@ -400,6 +400,7 @@ void MultiUserChatWindow::createMessageWidgets()
     ui.wdtView->setLayout(new QVBoxLayout);
     ui.wdtView->layout()->addWidget(FViewWidget->instance());
     ui.wdtView->layout()->setMargin(0);
+    FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
     FEditWidget = FMessageWidgets->newEditWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
     ui.wdtEdit->setLayout(new QVBoxLayout);
@@ -953,21 +954,16 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
   return hasCommand;
 }
 
-void MultiUserChatWindow::setMessageStyle(bool AClean)
+void MultiUserChatWindow::setMessageStyle()
 {
   if (FMessageStyles)
   {
     IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::GroupChat);
-    if (!AClean)
+    if (FViewWidget->messageStyle()==NULL || !FViewWidget->messageStyle()->changeOptions(FViewWidget->styleWidget(),soptions,true))
     {
       IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
       FViewWidget->setMessageStyle(style,soptions);
     }
-    else if (FViewWidget->messageStyle()!=NULL)
-    {
-      FViewWidget->messageStyle()->changeOptions(FViewWidget->styleWidget(),soptions);
-    }
-    FWindowStatus.remove(FViewWidget);
   }
 }
 
@@ -1034,6 +1030,33 @@ void MultiUserChatWindow::showUserMessage(const Message &AMessage, const QString
   }
 
   FViewWidget->appendMessage(AMessage,options);
+}
+
+void MultiUserChatWindow::showHistory()
+{
+  if (FMessageArchiver)
+  {
+    IArchiveRequest request;
+    request.with = FMultiChat->roomJid();
+    request.order = Qt::DescendingOrder;
+    request.start = FWindowStatus.value(FViewWidget).createTime;
+    request.end = QDateTime::currentDateTime();
+
+    QList<Message> history;
+    QList<IArchiveHeader> headers = FMessageArchiver->loadLocalHeaders(FMultiChat->streamJid(), request);
+    for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
+    {
+      IArchiveCollection collection = FMessageArchiver->loadLocalCollection(FMultiChat->streamJid(), headers.at(i));
+      history = collection.messages + history;
+    }
+
+    showTopic(FMultiChat->subject());
+    for (int i=0; i<history.count(); i++)
+    {
+      Message message = history.at(i);
+      showUserMessage(message, Jid(message.from()).resource());
+    }
+  }
 }
 
 void MultiUserChatWindow::updateWindow()
@@ -1125,7 +1148,7 @@ void MultiUserChatWindow::showChatMessage(IChatWindow *AWindow, const Message &A
   
   options.direction = AWindow->contactJid()!=AMessage.to() ? IMessageContentOptions::DirectionIn : IMessageContentOptions::DirectionOut;
 
-  if (options.time.secsTo(QDateTime::currentDateTime())>HISTORY_TIME_PAST)
+  if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_PAST)
     options.type |= IMessageContentOptions::History;
 
   fillChatContentOptions(AWindow,options);
@@ -1138,9 +1161,19 @@ void MultiUserChatWindow::showChatHistory(IChatWindow *AWindow)
   {
     IArchiveRequest request;
     request.with = AWindow->contactJid();
-    request.count = HISTORY_MESSAGES;
     request.order = Qt::DescendingOrder;
-    request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
+
+    WindowStatus &wstatus = FWindowStatus[AWindow->viewWidget()];
+    if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) < HISTORY_TIME_PAST)
+    {
+      request.count = HISTORY_MESSAGES;
+      request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
+    }
+    else
+    {
+      request.start = wstatus.startTime.isValid() ? wstatus.startTime : wstatus.createTime;
+      request.end = QDateTime::currentDateTime();
+    }
 
     QList<Message> history;
     QList<IArchiveHeader> headers = FMessageArchiver->loadLocalHeaders(AWindow->streamJid(), request);
@@ -1155,6 +1188,8 @@ void MultiUserChatWindow::showChatHistory(IChatWindow *AWindow)
       Message message = history.at(i);
       showChatMessage(AWindow,message);
     }
+
+    wstatus.startTime = history.value(0).dateTime();
   }
 }
 
@@ -1181,6 +1216,7 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
       window->infoWidget()->autoUpdateFields();
 
       FChatWindows.append(window);
+      FWindowStatus[window->viewWidget()].createTime = QDateTime::currentDateTime();
       updateChatWindow(window);
       
       UserContextMenu *menu = new UserContextMenu(this,window);
@@ -1295,7 +1331,7 @@ void MultiUserChatWindow::onChatOpened()
 {
   if (FMultiChat->statusCodes().contains(MUC_SC_ROOM_CREATED))
     FMultiChat->requestConfigForm();
-  setMessageStyle(true);
+  setMessageStyle();
 }
 
 void MultiUserChatWindow::onChatNotify(const QString &ANick, const QString &ANotify)
@@ -1317,7 +1353,6 @@ void MultiUserChatWindow::onChatError(const QString &ANick, const QString &AErro
 void MultiUserChatWindow::onChatClosed()
 {
   FDestroyOnChatClosed ? deleteLater() : showMessage(tr("Disconnected"));
-  FWindowStatus.remove(FViewWidget);
 }
 
 void MultiUserChatWindow::onStreamJidChanged(const Jid &/*ABefour*/, const Jid &AAfter)
@@ -1619,17 +1654,21 @@ void MultiUserChatWindow::onStyleOptionsChanged(const IMessageStyleOptions &AOpt
   {
     foreach (IChatWindow *window, FChatWindows)
     {
-      if (window->viewWidget() && window->viewWidget()->messageStyle())
+      IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
+      if (style==NULL || !style->changeOptions(window->viewWidget()->styleWidget(),AOptions,false))
       {
-        window->viewWidget()->messageStyle()->changeOptions(window->viewWidget()->styleWidget(),AOptions,false);
+        setChatMessageStyle(window);
+        showChatHistory(window);
       }
     }
   }
   else if (AMessageType==Message::GroupChat && AContext.isEmpty())
   {
-    if (FViewWidget && FViewWidget->messageStyle())
+    IMessageStyle *style = FViewWidget!=NULL ? FViewWidget->messageStyle() : NULL;
+    if (style==NULL || !style->changeOptions(FViewWidget->styleWidget(),AOptions,false))
     {
-      FViewWidget->messageStyle()->changeOptions(FViewWidget->styleWidget(),AOptions,false);
+      setMessageStyle();
+      showHistory();
     }
   }
 }
@@ -1666,7 +1705,7 @@ void MultiUserChatWindow::onMenuBarActionTriggered(bool)
   }
   else if (action == FClearChat)
   {
-    setMessageStyle(true);
+    setMessageStyle();
   }
   else if (action == FQuitRoom)
   {
