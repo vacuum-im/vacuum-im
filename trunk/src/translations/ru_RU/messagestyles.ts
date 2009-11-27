@@ -35,18 +35,6 @@
         <translation>Чат</translation>
     </message>
     <message>
-        <source>Single</source>
-        <translation>Одиночное</translation>
-    </message>
-    <message>
-        <source>Headline</source>
-        <translation>Новость</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Ошибка</translation>
-    </message>
-    <message>
         <source>Conference</source>
         <translation>Конференция</translation>
     </message>

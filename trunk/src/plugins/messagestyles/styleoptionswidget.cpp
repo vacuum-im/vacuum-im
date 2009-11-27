@@ -17,10 +17,10 @@ StyleOptionsWidget::StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *
   FMessageStyles = AMessageStyles;
 
   ui.cmbMessageType->addItem(tr("Chat"),Message::Chat);
-  ui.cmbMessageType->addItem(tr("Single"),Message::Normal);
   ui.cmbMessageType->addItem(tr("Conference"),Message::GroupChat);
-  ui.cmbMessageType->addItem(tr("Headline"),Message::Headline);
-  ui.cmbMessageType->addItem(tr("Error"),Message::Error);
+  //ui.cmbMessageType->addItem(tr("Single"),Message::Normal);
+  //ui.cmbMessageType->addItem(tr("Headline"),Message::Headline);
+  //ui.cmbMessageType->addItem(tr("Error"),Message::Error);
 
   foreach(QString spluginId, FMessageStyles->stylePlugins())
     ui.cmbStyleEngine->addItem(spluginId,spluginId);
