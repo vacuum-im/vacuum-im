@@ -1,8 +1,14 @@
 #include "mainwindow.h"
 
+#include <QApplication>
+
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(AParent,AFlags)
 {
   setAttribute(Qt::WA_DeleteOnClose,false);
+
+  QIcon icon(qApp->applicationDirPath()+"/vacuum.ico");
+  setWindowIcon(icon);
+
   setIconSize(QSize(16,16));
   createLayouts();
   createToolBars();
