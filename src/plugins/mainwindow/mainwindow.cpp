@@ -6,7 +6,15 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 {
   setAttribute(Qt::WA_DeleteOnClose,false);
 
-  QIcon icon(qApp->applicationDirPath()+"/vacuum.ico");
+  QIcon icon;
+  IconStorage *iconStorage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
+  icon.addFile(iconStorage->fileFullName(MNI_MAINWINDOW_LOGO16), QSize(16,16));
+  icon.addFile(iconStorage->fileFullName(MNI_MAINWINDOW_LOGO24), QSize(24,24));
+  icon.addFile(iconStorage->fileFullName(MNI_MAINWINDOW_LOGO32), QSize(32,32));
+  icon.addFile(iconStorage->fileFullName(MNI_MAINWINDOW_LOGO48), QSize(48,48));
+  icon.addFile(iconStorage->fileFullName(MNI_MAINWINDOW_LOGO64), QSize(64,64));
+  icon.addFile(iconStorage->fileFullName(MNI_MAINWINDOW_LOGO96), QSize(96,96));
+  icon.addFile(iconStorage->fileFullName(MNI_MAINWINDOW_LOGO128), QSize(128,128));
   setWindowIcon(icon);
 
   setIconSize(QSize(16,16));
