@@ -10,7 +10,7 @@ MainWindowPlugin::MainWindowPlugin()
   FSettingsPlugin = NULL;
   FTrayManager = NULL;
 
-  FMainWindow = new MainWindow(NULL, Qt::Tool);
+  FMainWindow = new MainWindow(new QWidget, Qt::Window|Qt::CustomizeWindowHint|Qt::WindowTitleHint|Qt::WindowCloseButtonHint);
 }
 
 MainWindowPlugin::~MainWindowPlugin()

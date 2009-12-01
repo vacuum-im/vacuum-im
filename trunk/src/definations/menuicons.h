@@ -79,6 +79,13 @@
 #define MNI_JSEARCH                     "jsearch"
 
 //MainWindow
+#define MNI_MAINWINDOW_LOGO16           "mainwindowLogo16"
+#define MNI_MAINWINDOW_LOGO24           "mainwindowLogo24"
+#define MNI_MAINWINDOW_LOGO32           "mainwindowLogo32"
+#define MNI_MAINWINDOW_LOGO48           "mainwindowLogo48"
+#define MNI_MAINWINDOW_LOGO64           "mainwindowLogo64"
+#define MNI_MAINWINDOW_LOGO96           "mainwindowLogo96"
+#define MNI_MAINWINDOW_LOGO128          "mainwindowLogo128"
 #define MNI_MAINWINDOW_QUIT             "mainwindowQuit"
 #define MNI_MAINWINDOW_MENU             "mainwindowMenu" 
 #define MNI_MAINWINDOW_SHOW_ROSTER      "mainwindowShowRoster" 

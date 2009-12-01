@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <icondef>
   <icon>
+    <key>mainwindowLogo16</key>
+    <object mime="image/png">mainwindowlogo16.png</object>
+  </icon>
+  <icon>
+    <key>mainwindowLogo24</key>
+    <object mime="image/png">mainwindowlogo24.png</object>
+  </icon>
+  <icon>
+    <key>mainwindowLogo32</key>
+    <object mime="image/png">mainwindowlogo32.png</object>
+  </icon>
+  <icon>
+    <key>mainwindowLogo48</key>
+    <object mime="image/png">mainwindowlogo48.png</object>
+  </icon>
+  <icon>
+    <key>mainwindowLogo64</key>
+    <object mime="image/png">mainwindowlogo64.png</object>
+  </icon>
+  <icon>
+    <key>mainwindowLogo96</key>
+    <object mime="image/png">mainwindowlogo96.png</object>
+  </icon>
+  <icon>
+    <key>mainwindowLogo128</key>
+    <object mime="image/png">mainwindowlogo128.png</object>
+  </icon>
+  <icon>
     <key>mainwindowQuit</key>
     <object mime="image/png">mainwindowquit.png</object>
   </icon>
