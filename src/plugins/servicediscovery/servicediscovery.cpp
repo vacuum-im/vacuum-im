@@ -43,6 +43,7 @@ ServiceDiscovery::ServiceDiscovery()
   FRostersModel = NULL;
   FStatusIcons = NULL;
   FDataForms = NULL;
+  FXmppUriQueries = NULL;
 
   FDiscoMenu = NULL;
   FQueueTimer.setSingleShot(false);
@@ -151,6 +152,10 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
+  plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
+  if (plugin)
+    FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+
   return true;
 }
 
@@ -186,6 +191,10 @@ bool ServiceDiscovery::initObjects()
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
     QToolButton *button = changer->addToolButton(FDiscoMenu->menuAction(),TBG_MWTTB_DISCOVERY,false);
     button->setPopupMode(QToolButton::InstantPopup);
+  }
+  if (FXmppUriQueries)
+  {
+    FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
   }
 
   FDiscoMenu->setEnabled(false);
@@ -357,6 +366,26 @@ void ServiceDiscovery::stanzaRequestTimeout(const Jid &AStreamJid, const QString
     FDiscoItems[ditems.contactJid].insert(ditems.node,ditems);
     emit discoItemsReceived(ditems);
   }
+}
+
+bool ServiceDiscovery::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+{
+  if (AAction == "disco")
+  {
+    QString node = AParams.value("node");
+    QString request = AParams.value("request");
+    QString type = AParams.value("type");
+    if (request=="info" && type=="get")
+    {
+      showDiscoInfo(AStreamJid, AContactJid, node);
+    }
+    else if (request=="items" && type=="get")
+    {
+      showDiscoItems(AStreamJid, AContactJid, node);
+    }
+    return true;
+  }
+  return false;
 }
 
 void ServiceDiscovery::fillDiscoInfo(IDiscoInfo &ADiscoInfo)

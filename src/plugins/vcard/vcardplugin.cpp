@@ -19,6 +19,7 @@ VCardPlugin::VCardPlugin()
   FSettingsPlugin = NULL;
   FMultiUserChatPlugin = NULL;
   FDiscovery = NULL;
+  FXmppUriQueries = NULL;
 }
 
 VCardPlugin::~VCardPlugin()
@@ -78,6 +79,12 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
 
+  plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
+  if (plugin)
+  {
+    FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+  }
+
   return true;
 }
 
@@ -92,11 +99,16 @@ bool VCardPlugin::initObjects()
   {
     registerDiscoFeatures();
   }
+  if (FXmppUriQueries)
+  {
+    FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
+  }
   return true;
 }
 
-void VCardPlugin::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
+  Q_UNUSED(AStreamJid);
   if (FVCardRequestId.contains(AStanza.id()))
   {
     Jid fromJid = FVCardRequestId.take(AStanza.id());
@@ -143,6 +155,17 @@ void VCardPlugin::stanzaRequestTimeout(const Jid &AStreamJid, const QString &ASt
     ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
     emit vcardError(FVCardPublishId.take(AStanzaId),err.message());
   }
+}
+
+bool VCardPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+{
+  Q_UNUSED(AParams);
+  if (AAction == "vcard")
+  {
+    showVCardDialog(AStreamJid, AContactJid);
+    return true;
+  }
+  return false;
 }
 
 QString VCardPlugin::vcardFileName(const Jid &AContactJid) const

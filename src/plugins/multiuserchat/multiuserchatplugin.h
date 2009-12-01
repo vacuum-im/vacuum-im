@@ -12,6 +12,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/soundfiles.h>
+#include <definations/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imessagewidgets.h>
@@ -25,6 +26,7 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/iregistraton.h>
+#include <interfaces/ixmppuriqueries.h>
 #include <utils/message.h>
 #include <utils/action.h>
 #include "multiuserchat.h"
@@ -42,12 +44,13 @@ class MultiUserChatPlugin :
   public QObject,
   public IPlugin,
   public IMultiUserChatPlugin,
+  public IXmppUriHandler,
   public IDiscoFeatureHandler,
   public IMessageHandler,
   public IDataLocalizer
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMultiUserChatPlugin IDiscoFeatureHandler IMessageHandler IDataLocalizer);
+  Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer);
 public:
   MultiUserChatPlugin();
   ~MultiUserChatPlugin();
@@ -59,6 +62,8 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
+  //IXmppUriHandler
+  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
@@ -118,6 +123,7 @@ private:
   INotifications *FNotifications;
   IDataForms *FDataForms;
   IRegistration *FRegistration;
+  IXmppUriQueries *FXmppUriQueries;
 private:
   Menu *FChatMenu;
   Action *FJoinAction;

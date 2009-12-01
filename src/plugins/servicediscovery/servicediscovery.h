@@ -19,6 +19,7 @@
 #include <definations/menuicons.h>
 #include <definations/serviceicons.h>
 #include <definations/stanzahandlerorders.h>
+#include <definations/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ixmppstreams.h>
@@ -32,6 +33,7 @@
 #include <interfaces/itraymanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/isettings.h>
+#include <interfaces/ixmppuriqueries.h>
 #include <utils/errorhandler.h>
 #include <utils/iconstorage.h>
 #include "discoinfowindow.h"
@@ -56,12 +58,13 @@ class ServiceDiscovery :
   public IServiceDiscovery,
   public IStanzaHandler,
   public IStanzaRequestOwner,
+  public IXmppUriHandler,
   public IDiscoHandler,
   public IRosterIndexDataHolder,
   public IRostersClickHooker
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IStanzaRequestOwner IDiscoHandler IRosterIndexDataHolder IRostersClickHooker);
+  Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IStanzaRequestOwner IXmppUriHandler IDiscoHandler IRosterIndexDataHolder IRostersClickHooker);
 public:
   ServiceDiscovery();
   ~ServiceDiscovery();
@@ -79,6 +82,8 @@ public:
   //IStanzaRequestOwner
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
+  //IXmppUriHandler
+  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IDiscoHandler
   virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
   virtual void fillDiscoItems(IDiscoItems &/*ADiscoItems*/) {}
@@ -197,6 +202,7 @@ private:
   IStatusIcons *FStatusIcons;
   ISettingsPlugin *FSettingsPlugin;
   IDataForms *FDataForms;
+  IXmppUriQueries *FXmppUriQueries;
 private:
   QTimer FQueueTimer;
   QMap<Jid ,int> FSHIInfo;

@@ -23,6 +23,7 @@ ChatMessageHandler::ChatMessageHandler()
   FRostersModel = NULL;
   FStatusIcons = NULL;
   FStatusChanger = NULL;
+  FXmppUriQueries = NULL;
 }
 
 ChatMessageHandler::~ChatMessageHandler()
@@ -119,6 +120,10 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
   if (plugin)
     FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 
+  plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
+  if (plugin)
+    FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+
   return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
 }
 
@@ -132,7 +137,27 @@ bool ChatMessageHandler::initObjects()
   {
     FMessageProcessor->insertMessageHandler(this,MHO_CHATMESSAGEHANDLER);
   }
+  if (FXmppUriQueries)
+  {
+    FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
+  }
   return true;
+}
+
+bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+{
+  if (AAction == "message")
+  {
+    QString type = AParams.value("type");
+    if (type == "chat")
+    {
+      IChatWindow *window = getWindow(AStreamJid, AContactJid);
+      window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
+      showWindow(window);
+      return true;
+    }
+  }
+  return false;
 }
 
 bool ChatMessageHandler::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)

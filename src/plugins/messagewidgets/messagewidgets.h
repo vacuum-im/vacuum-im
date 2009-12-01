@@ -7,7 +7,7 @@
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
-#include <definations/urlhandlerorders.h>
+#include <definations/widgeturlhandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/isettings.h>
@@ -28,10 +28,10 @@ class MessageWidgets :
   public IPlugin,
   public IMessageWidgets,
   public IOptionsHolder,
-  public IUrlHandler
+  public IWidgetUrlHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IUrlHandler);
+  Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IWidgetUrlHandler);
 public:
   MessageWidgets();
   ~MessageWidgets();
@@ -45,8 +45,8 @@ public:
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
-  //IUrlHandler
-  virtual bool executeUrl(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
+  //IWidgetUrlHandler
+  virtual bool widgetUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
   //IMessageWidgets
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid);
@@ -83,8 +83,8 @@ public:
   virtual void setEditorMinimumLines(int ALines);
   virtual QKeySequence editorSendKey() const;
   virtual void setEditorSendKey(const QKeySequence &AKey);
-  virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder);
-  virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder);
+  virtual void insertUrlHandler(IWidgetUrlHandler *AHandler, int AOrder);
+  virtual void removeUrlHandler(IWidgetUrlHandler *AHandler, int AOrder);
 signals:
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget);
   virtual void viewWidgetCreated(IViewWidget *AViewWidget);
@@ -108,8 +108,8 @@ signals:
   virtual void editorAutoResizeChanged(bool AResize);
   virtual void editorMinimumLinesChanged(int ALines);
   virtual void editorSendKeyChanged(const QKeySequence &AKey);
-  virtual void urlHandlerInserted(IUrlHandler *AHandler, int AOrder);
-  virtual void urlHandlerRemoved(IUrlHandler *AHandler, int AOrder);
+  virtual void urlHandlerInserted(IWidgetUrlHandler *AHandler, int AOrder);
+  virtual void urlHandlerRemoved(IWidgetUrlHandler *AHandler, int AOrder);
 signals:
   virtual void optionsAccepted();
   virtual void optionsRejected();
@@ -144,7 +144,7 @@ private:
   QKeySequence FEditorSendKey;
 private:
   QMap<QUuid, QString> FAvailTabWindows;
-  QMultiMap<int,IUrlHandler *> FUrlHandlers;
+  QMultiMap<int,IWidgetUrlHandler *> FUrlHandlers;
 };
 
 #endif // MESSAGEWIDGETS_H

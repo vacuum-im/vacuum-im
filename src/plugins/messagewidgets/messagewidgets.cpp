@@ -77,7 +77,7 @@ bool MessageWidgets::initObjects()
     FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"),tr("Message window options"),MNI_NORMAL_MHANDLER_MESSAGE,ONO_MESSAGES);
     FSettingsPlugin->insertOptionsHolder(this);
   }
-  insertUrlHandler(this,UHO_MESSAGEWIDGETS_DEFAULT);
+  insertUrlHandler(this,WUHO_MESSAGEWIDGETS_DEFAULT);
   return true;
 }
 
@@ -95,7 +95,7 @@ QWidget *MessageWidgets::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
-bool MessageWidgets::executeUrl(IViewWidget * /*AWidget*/, const QUrl &AUrl, int /*AOrder*/)
+bool MessageWidgets::widgetUrlOpen(IViewWidget * /*AWidget*/, const QUrl &AUrl, int /*AOrder*/)
 {
   return QDesktopServices::openUrl(AUrl);
 }
@@ -392,7 +392,7 @@ void MessageWidgets::setEditorSendKey(const QKeySequence &AKey)
   }
 }
 
-void MessageWidgets::insertUrlHandler(IUrlHandler *AHandler, int AOrder)
+void MessageWidgets::insertUrlHandler(IWidgetUrlHandler *AHandler, int AOrder)
 {
   if (!FUrlHandlers.values(AOrder).contains(AHandler))  
   {
@@ -401,7 +401,7 @@ void MessageWidgets::insertUrlHandler(IUrlHandler *AHandler, int AOrder)
   }
 }
 
-void MessageWidgets::removeUrlHandler(IUrlHandler *AHandler, int AOrder)
+void MessageWidgets::removeUrlHandler(IWidgetUrlHandler *AHandler, int AOrder)
 {
   if (FUrlHandlers.values(AOrder).contains(AHandler))  
   {
@@ -434,8 +434,8 @@ void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
   IViewWidget *widget = qobject_cast<IViewWidget *>(sender());
   if (widget)
   {
-    for (QMap<int,IUrlHandler *>::const_iterator it = FUrlHandlers.constBegin(); it!=FUrlHandlers.constEnd(); it++)
-      if (it.value()->executeUrl(widget,AUrl,it.key()))
+    for (QMap<int,IWidgetUrlHandler *>::const_iterator it = FUrlHandlers.constBegin(); it!=FUrlHandlers.constEnd(); it++)
+      if (it.value()->widgetUrlOpen(widget,AUrl,it.key()))
         break;
   }
 }

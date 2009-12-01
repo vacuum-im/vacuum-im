@@ -26,6 +26,7 @@ MultiUserChatPlugin::MultiUserChatPlugin()
   FNotifications = NULL;
   FDataForms = NULL;
   FRegistration = NULL;
+  FXmppUriQueries = NULL;
 
   FChatMenu = NULL;
   FJoinAction = NULL;
@@ -87,6 +88,12 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
       connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),
         SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
     }
+  }
+
+  plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
+  if (plugin)
+  {
+    FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
   }
 
   if (FMessageWidgets)
@@ -197,7 +204,32 @@ bool MultiUserChatPlugin::initObjects()
     FNotifications->insertNotificator(GROUP_NOTIFICATOR_ID,tr("Conference messages"),kindMask,INotification::TrayIcon|INotification::PlaySound);
   }
 
+  if (FXmppUriQueries)
+  {
+    FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
+  }
+
   return true;
+}
+
+bool MultiUserChatPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+{
+  if (AAction == "join")
+  {
+    showJoinMultiChatDialog(AStreamJid, AContactJid, QString::null, AParams.value("password"));
+    return true;
+  }
+  else if (AAction == "invite")
+  {
+    IMultiUserChat *mchat = multiUserChat(AStreamJid, AContactJid);
+    if (mchat != NULL)
+    {
+      foreach(QString userJid, AParams.values("jid"))
+        mchat->inviteContact(userJid, QString::null);
+    }
+    return true;
+  }
+  return false;
 }
 
 bool MultiUserChatPlugin::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
@@ -206,7 +238,7 @@ bool MultiUserChatPlugin::execDiscoFeature(const Jid &AStreamJid, const QString 
   {
     IMultiUserChatWindow *chatWindow = multiChatWindow(AStreamJid,ADiscoInfo.contactJid);
     if (!chatWindow)
-      showJoinMultiChatDialog(AStreamJid,ADiscoInfo.contactJid,"","");
+      showJoinMultiChatDialog(AStreamJid,ADiscoInfo.contactJid,QString::null,QString::null);
     else
       chatWindow->showWindow();
     return true;

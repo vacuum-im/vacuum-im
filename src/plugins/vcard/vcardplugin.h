@@ -7,6 +7,7 @@
 #include <definations/multiuserdataroles.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
+#include <definations/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ivcard.h>
 #include <interfaces/ixmppstreams.h>
@@ -15,20 +16,29 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/isettings.h>
 #include <interfaces/iservicediscovery.h>
+#include <interfaces/ixmppuriqueries.h>
 #include <utils/widgetmanager.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
 #include "vcard.h"
 #include "vcarddialog.h"
 
+struct VCardItem 
+{
+  VCardItem() { vcard = NULL; locks = 0; }
+  VCard *vcard;
+  int locks;
+};
+
 class VCardPlugin : 
   public QObject,
   public IPlugin,
   public IVCardPlugin,
-  public IStanzaRequestOwner
+  public IStanzaRequestOwner,
+  public IXmppUriHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IVCardPlugin IStanzaRequestOwner);
+  Q_INTERFACES(IPlugin IVCardPlugin IStanzaRequestOwner IXmppUriHandler);
   friend class VCard;
 public:
   VCardPlugin();
@@ -44,11 +54,13 @@ public:
   //IStanzaRequestOwner
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
+  //IXmppUriHandler
+  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IVCardPlugin
   virtual QString vcardFileName(const Jid &AContactJid) const;
   virtual bool hasVCard(const Jid &AContactJid) const;
   virtual IVCard *vcard(const Jid &AContactJid);
-  virtual bool requestVCard(const Jid &AStreamJid,const Jid &AContactJid);
+  virtual bool requestVCard(const Jid &AStreamJid, const Jid &AContactJid);
   virtual bool publishVCard(IVCard *AVCard, const Jid &AStreamJid);
   virtual void showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid);
 signals:
@@ -75,18 +87,13 @@ private:
   ISettingsPlugin *FSettingsPlugin;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
   IServiceDiscovery *FDiscovery;
+  IXmppUriQueries *FXmppUriQueries;
 private:
-  struct VCardItem 
-  {
-    VCardItem() { vcard = NULL; locks = 0; }
-    VCard *vcard;
-    int locks;
-  };
-  QHash<Jid,VCardItem> FVCards;
-  QHash<QString,Jid> FVCardRequestId;
-  QHash<QString,QString> FVCardPublishId;
-  QHash<QString,Stanza> FVCardPublishStanza;
-  QHash<Jid,VCardDialog *> FVCardDialogs;
+  QMap<Jid, VCardItem> FVCards;
+  QMap<QString, Jid> FVCardRequestId;
+  QMap<QString, QString> FVCardPublishId;
+  QMap<QString, Stanza> FVCardPublishStanza;
+  QMap<Jid, VCardDialog *> FVCardDialogs;
 };
 
 #endif // VCARDPLUGIN_H

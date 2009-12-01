@@ -55,4 +55,5 @@ SUBDIRS = settings \
           inbandstreams \
           socksstreams \
           captchaforms \
-          bitsofbinary
+          bitsofbinary \
+          xmppuriqueries

@@ -15,6 +15,7 @@
 #include <definations/menuicons.h>
 #include <definations/soundfiles.h>
 #include <definations/menubargroups.h>
+#include <definations/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>
@@ -28,6 +29,7 @@
 #include <interfaces/ivcard.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/istatuschanger.h>
+#include <interfaces/ixmppuriqueries.h>
 #include "usercontextmenu.h"
 
 struct WindowStatus 
@@ -41,10 +43,11 @@ class ChatMessageHandler :
   public QObject,
   public IPlugin,
   public IMessageHandler,
+  public IXmppUriHandler,
   public IRostersClickHooker
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMessageHandler IRostersClickHooker);
+  Q_INTERFACES(IPlugin IMessageHandler IRostersClickHooker IXmppUriHandler);
 public:
   ChatMessageHandler();
   ~ChatMessageHandler();
@@ -56,6 +59,8 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
+  //IXmppUriHandler
+  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IRostersClickHooker
   virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder);
   //IMessageHandler
@@ -96,6 +101,7 @@ private:
   IRostersModel *FRostersModel;
   IStatusIcons *FStatusIcons;
   IStatusChanger *FStatusChanger;
+  IXmppUriQueries *FXmppUriQueries;
 private:
   QList<IChatWindow *> FWindows;
   QMultiMap<IChatWindow *,int> FActiveMessages;
