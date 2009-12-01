@@ -12,6 +12,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/soundfiles.h>
+#include <definations/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>
@@ -19,15 +20,17 @@
 #include <interfaces/istatusicons.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
+#include <interfaces/ixmppuriqueries.h>
 #include <utils/errorhandler.h>
 
 class NormalMessageHandler : 
   public QObject,
   public IPlugin,
-  public IMessageHandler
+  public IMessageHandler,
+  public IXmppUriHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMessageHandler);
+  Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler);
 public:
   NormalMessageHandler();
   ~NormalMessageHandler();
@@ -39,6 +42,8 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
+  //IXmppUriHandler
+  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IMessageHandler
   virtual bool checkMessage(const Message &AMessage);
   virtual void showMessage(int AMessageId);
@@ -74,6 +79,7 @@ private:
   IStatusIcons *FStatusIcons;
   IPresencePlugin *FPresencePlugin;
   IRostersView *FRostersView;
+  IXmppUriQueries *FXmppUriQueries;
 private:
   QList<IMessageWindow *> FWindows;
   QMap<IMessageWindow *, Message> FLastMessages;

@@ -85,7 +85,7 @@ public:
   virtual void removeCommandClient(ICommandClient *AClient) =0;
   virtual QString sendCommandRequest(const ICommandRequest &ARequest) =0;
   virtual bool sendCommandResult(const ICommandResult &AResult) =0;
-  virtual void executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode) =0;
+  virtual bool executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode) =0;
 signals:
   virtual void commandInserted(const QString &ANode, ICommandServer *AServer) =0;
   virtual void commandRemoved(const QString &ANode) =0;

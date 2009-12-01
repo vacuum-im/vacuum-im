@@ -31,6 +31,7 @@ RosterChanger::RosterChanger()
   FRostersView = NULL;
   FNotifications = NULL;
   FSettingsPlugin = NULL;
+  FXmppUriQueries = NULL;
   FMultiUserChatPlugin = NULL;
 
   FOptions = 0;
@@ -116,6 +117,10 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
+  plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
+  if (plugin)
+    FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+
   return FRosterPlugin!=NULL;
 }
 
@@ -126,17 +131,18 @@ bool RosterChanger::initObjects()
     uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;;
     FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Subscription requests"),kindMask,kindMask);
   }
-
   if (FSettingsPlugin)
   {
     FSettingsPlugin->insertOptionsHolder(this);
   }
-
   if (FRostersView)
   {
     FRostersView->insertDragDropHandler(this);
   }
-
+  if (FXmppUriQueries)
+  {
+    FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
+  }
   return true;
 }
 
@@ -285,6 +291,71 @@ bool RosterChanger::dropAction(const QDropEvent *AEvent, const QModelIndex &AInd
   return false;
 }
 
+bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+{
+  if (AAction == "roster")
+  {
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+    if (roster && roster->isOpen() && !roster->rosterItem(AContactJid).isValid)
+    {
+      IAddContactDialog *dialog = showAddContactDialog(AStreamJid);
+      if (dialog)
+      {
+        dialog->setContactJid(AContactJid);
+        dialog->setNickName(AParams.contains("name") ? AParams.value("name") : AContactJid.node());
+        dialog->setGroup(AParams.contains("group") ? AParams.value("group") : QString::null);
+        dialog->instance()->show();
+      }
+    }
+    return true;
+  }
+  else if (AAction == "remove")
+  {
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+    if (roster && roster->isOpen() && roster->rosterItem(AContactJid).isValid)
+    {
+      if (QMessageBox::question(NULL, tr("Remove contact"), 
+        tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(AContactJid.hBare()),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+      {
+        roster->removeItem(AContactJid);
+      }
+    }
+    return true;
+  }
+  else if (AAction == "subscribe")
+  {
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+    const IRosterItem &ritem = roster!=NULL ? roster->rosterItem(AContactJid) : IRosterItem();
+    if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO)
+    {
+      if (QMessageBox::question(NULL, tr("Subscribe for contact presence"), 
+        tr("You are assured that wish to subscribe for a contact <b>%1</b> presence?").arg(AContactJid.hBare()),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+      {
+        roster->sendSubscription(AContactJid, IRoster::Subscribe);
+      }
+    }
+    return true;
+  }
+  else if (AAction == "unsubscribe")
+  {
+    IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+    const IRosterItem &ritem = roster!=NULL ? roster->rosterItem(AContactJid) : IRosterItem();
+    if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_NONE && ritem.subscription!=SUBSCRIPTION_FROM)
+    {
+      if (QMessageBox::question(NULL, tr("Unsubscribe from contact presence"), 
+        tr("You are assured that wish to unsubscribe from a contact <b>%1</b> presence?").arg(AContactJid.hBare()),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+      {
+        roster->sendSubscription(AContactJid, IRoster::Unsubscribe);
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
 //IRosterChanger
 bool RosterChanger::isAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid) const
 {
@@ -391,7 +462,7 @@ QString RosterChanger::subscriptionNotify(int ASubsType, const Jid &AContactJid)
   case IRoster::Unsubscribed:
     return tr("You are now unsubscribed from %1 presence.").arg(AContactJid.hBare());
   }
-  return QString();
+  return QString::null;
 }
 
 Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups, 
@@ -482,7 +553,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
   return menu;
 }
 
-SubscriptionDialog *RosterChanger::subscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const
+SubscriptionDialog *RosterChanger::findSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const
 {
   foreach (SubscriptionDialog *dialog, FNotifyDialog)
     if (dialog && dialog->streamJid()==AStreamJid && dialog->contactJid()==AContactJid)
@@ -492,7 +563,7 @@ SubscriptionDialog *RosterChanger::subscriptionDialog(const Jid &AStreamJid, con
 
 SubscriptionDialog *RosterChanger::createSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage)
 {
-  SubscriptionDialog *dialog = subscriptionDialog(AStreamJid,AContactJid);
+  SubscriptionDialog *dialog = findSubscriptionDialog(AStreamJid,AContactJid);
   if (dialog == NULL)
   {
     IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;

@@ -99,7 +99,7 @@
     </message>
     <message>
         <source>%1 unsubscribed from your presence.</source>
-        <translation>%1 отписался от вышего статуса.</translation>
+        <translation>%1 отписался от вашего статуса.</translation>
     </message>
     <message>
         <source>You are now unsubscribed from %1 presence.</source>
@@ -240,6 +240,22 @@
     <message>
         <source>Unsubscribe contact</source>
         <translation>Удалить авторизацию</translation>
+    </message>
+    <message>
+        <source>Subscribe for contact presence</source>
+        <translation>Подписаться на получение статуса контакта</translation>
+    </message>
+    <message>
+        <source>You are assured that wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
+        <translation>Вы уверены, что хотите подписаться на получение статуса контакта &lt;b&gt;%1&lt;/b&gt;?</translation>
+    </message>
+    <message>
+        <source>Unsubscribe from contact presence</source>
+        <translation>Отписаться от получения статуса контакта</translation>
+    </message>
+    <message>
+        <source>You are assured that wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
+        <translation>Вы уверены, что хотите отписаться от получения статуса контакта &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
 </context>
 <context>

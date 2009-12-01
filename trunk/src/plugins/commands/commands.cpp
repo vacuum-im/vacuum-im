@@ -20,6 +20,7 @@ Commands::Commands()
   FStanzaProcessor = NULL;
   FDiscovery = NULL;
   FPresencePlugin = NULL;
+  FXmppUriQueries = NULL;
 }
 
 Commands::~Commands()
@@ -72,6 +73,10 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     }
   }
 
+  plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
+  if (plugin)
+    FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+
   return FStanzaProcessor!=NULL && FDataForms!=NULL;
 }
 
@@ -96,7 +101,20 @@ bool Commands::initObjects()
     FDiscovery->insertDiscoHandler(this);
     FDiscovery->insertFeatureHandler(NS_COMMANDS,this,DFO_DEFAULT);
   }
+  if (FXmppUriQueries)
+  {
+    FXmppUriQueries->insertUriHandler(this,XUHO_DEFAULT);
+  }
   return true;
+}
+
+bool Commands::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+  Q_UNUSED(AHandlerId);
+  Q_UNUSED(AStreamJid);
+  Q_UNUSED(AStanza);
+  Q_UNUSED(AAccept);
+  return false;
 }
 
 bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
@@ -129,6 +147,24 @@ bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &A
       FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
     }
     AAccept = true;
+  }
+  return false;
+}
+
+bool Commands::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+{
+  if (AAction == "command")
+  {
+    QString node = AParams.value("node");
+    if (!node.isEmpty())
+    {
+      QString action = AParams.value("action","execute");
+      if (action == "execute")
+      {
+        executeCommnad(AStreamJid, AContactJid, node);
+      }
+    }
+    return true;
   }
   return false;
 }
@@ -348,6 +384,16 @@ void Commands::insertCommand(const QString &ANode, ICommandServer *AServer)
   }
 }
 
+QList<QString> Commands::commandNodes() const
+{
+  return FCommands.keys();
+}
+
+ICommandServer *Commands::commandServer(const QString &ANode) const
+{
+  return FCommands.value(ANode);
+}
+
 void Commands::removeCommand(const QString &ANode)
 {
   if (FCommands.contains(ANode))
@@ -426,7 +472,7 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
   return FStanzaProcessor->sendStanzaOut(AResult.streamJid,result);
 }
 
-void Commands::executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode)
+bool Commands::executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode)
 {
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
   if (presence && presence->isOpen())
@@ -435,7 +481,9 @@ void Commands::executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, con
     connect(presence->instance(),SIGNAL(closed()),dialog,SLOT(reject()));
     dialog->executeCommand();
     dialog->show();
+    return true;
   }
+  return false;
 }
 
 void Commands::registerDiscoFeatures()

@@ -14,6 +14,7 @@ Registration::Registration()
   FPresencePlugin = NULL;
   FSettingsPlugin = NULL;
   FAccountManager = NULL;
+  FXmppUriQueries = NULL;
 }
 
 Registration::~Registration()
@@ -49,6 +50,10 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
   plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
   if (plugin)
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+
+  plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
+  if (plugin)
+    FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 
   plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
@@ -98,6 +103,10 @@ bool Registration::initObjects()
   if (FDataForms)
   {
     FDataForms->insertLocalizer(this,DATA_FORM_REGISTER);
+  }
+  if (FXmppUriQueries)
+  {
+    FXmppUriQueries->insertUriHandler(this,XUHO_DEFAULT);
   }
   return true;
 }
@@ -178,6 +187,22 @@ void Registration::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AS
     FSubmitRequests.removeAt(FSubmitRequests.indexOf(AStanzaId));
     emit registerError(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
   }
+}
+
+bool Registration::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+{
+  Q_UNUSED(AParams);
+  if (AAction == "register")
+  {
+    showRegisterDialog(AStreamJid,AContactJid,IRegistration::Register,NULL);
+    return true;
+  }
+  else if (AAction == "unregister")
+  {
+    showRegisterDialog(AStreamJid,AContactJid,IRegistration::Unregister,NULL);
+    return true;
+  }
+  return false;
 }
 
 bool Registration::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
@@ -369,7 +394,7 @@ QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &A
   return QString();
 }
 
-void Registration::showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent)
+bool Registration::showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent)
 {
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
   if (presence && presence->isOpen())
@@ -377,7 +402,9 @@ void Registration::showRegisterDialog(const Jid &AStreamJid, const Jid &AService
     RegisterDialog *dialog = new RegisterDialog(this,FDataForms,AStreamJid,AServiceJid,AOperation,AParent);
     connect(presence->instance(),SIGNAL(closed()),dialog,SLOT(reject()));
     dialog->show();
+    return true;
   }
+  return false;
 }
 
 void Registration::registerDiscoFeatures()

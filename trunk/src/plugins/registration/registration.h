@@ -9,6 +9,7 @@
 #include <definations/dataformtypes.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
+#include <definations/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/idataforms.h>
@@ -18,6 +19,7 @@
 #include <interfaces/isettings.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppuriqueries.h>
 #include <utils/stanza.h>
 #include "registerdialog.h"
 #include "registerstream.h"
@@ -27,13 +29,14 @@ class Registration :
   public IPlugin,
   public IRegistration,
   public IStanzaRequestOwner,
+  public IXmppUriHandler,
   public IDiscoFeatureHandler,
   public IStreamFeaturePlugin,
   public IOptionsHolder,
   public IDataLocalizer
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IDiscoFeatureHandler IStreamFeaturePlugin IOptionsHolder IDataLocalizer);
+  Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IStreamFeaturePlugin IOptionsHolder IDataLocalizer);
 public:
   Registration();
   ~Registration();
@@ -48,6 +51,8 @@ public:
   //IStanzaRequestOwner
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
+  //IXmppUriHandler
+  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
@@ -64,7 +69,7 @@ public:
   virtual QString sendUnregiterRequest(const Jid &AStreamJid, const Jid &AServiceJid);
   virtual QString sendChangePasswordRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AUserName, const QString &APassword);
   virtual QString sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit);
-  virtual void showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
+  virtual bool showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
 signals:
   //IStreamFeaturePlugin
   virtual void featureCreated(IStreamFeature *AStreamFeature);
@@ -91,6 +96,7 @@ private:
   IPresencePlugin *FPresencePlugin;
   ISettingsPlugin *FSettingsPlugin;
   IAccountManager *FAccountManager;
+  IXmppUriQueries *FXmppUriQueries;
 private:
   QList<QString> FSendRequests;
   QList<QString> FSubmitRequests;

@@ -13,6 +13,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/soundfiles.h>
+#include <definations/xmppurihandlerorders.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersmodel.h>
@@ -21,6 +22,7 @@
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/isettings.h>
+#include <interfaces/ixmppuriqueries.h>
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
 #include "subscriptionoptions.h"
@@ -39,10 +41,11 @@ class RosterChanger :
   public IPlugin,
   public IRosterChanger,
   public IOptionsHolder,
-  public IRostersDragDropHandler
+  public IRostersDragDropHandler,
+  public IXmppUriHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IRosterChanger IOptionsHolder IRostersDragDropHandler);
+  Q_INTERFACES(IPlugin IRosterChanger IOptionsHolder IRostersDragDropHandler IXmppUriHandler);
 public:
   RosterChanger();
   ~RosterChanger();
@@ -62,6 +65,8 @@ public:
   virtual bool dragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
   virtual void dragLeave(const QDragLeaveEvent *AEvent);
   virtual bool dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
+  //IXmppUriHandler
+  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IRosterChanger
   virtual bool isAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual bool isAutoUnsubscribe(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -83,7 +88,7 @@ protected:
   QString subscriptionNotify(int ASubsType, const Jid &AContactJid) const;
   Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups, 
     bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
-  SubscriptionDialog *subscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const;
+  SubscriptionDialog *findSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const;
   SubscriptionDialog *createSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage);
 protected slots:
   //Operations on subscription
@@ -121,6 +126,7 @@ private:
   IRostersView *FRostersView;
   INotifications *FNotifications;
   ISettingsPlugin *FSettingsPlugin;
+  IXmppUriQueries *FXmppUriQueries;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
   int FOptions;

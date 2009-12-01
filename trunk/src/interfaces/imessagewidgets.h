@@ -254,11 +254,10 @@ signals:
   virtual void windowClosed() =0;
 };
 
-class IUrlHandler 
+class IWidgetUrlHandler 
 {
 public:
-  virtual QObject *instance() = 0;
-  virtual bool executeUrl(IViewWidget *AWidget, const QUrl &AUrl, int AOrder) =0;
+  virtual bool widgetUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder) =0;
 };
 
 class IMessageWidgets 
@@ -300,8 +299,8 @@ public:
   virtual void setEditorMinimumLines(int ALines) =0;
   virtual QKeySequence editorSendKey() const =0;
   virtual void setEditorSendKey(const QKeySequence &AKey) =0;
-  virtual void insertUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
-  virtual void removeUrlHandler(IUrlHandler *AHandler, int AOrder) =0;
+  virtual void insertUrlHandler(IWidgetUrlHandler *AHandler, int AOrder) =0;
+  virtual void removeUrlHandler(IWidgetUrlHandler *AHandler, int AOrder) =0;
 signals:
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget) =0;
   virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
@@ -325,8 +324,8 @@ signals:
   virtual void editorAutoResizeChanged(bool AResize) =0;
   virtual void editorMinimumLinesChanged(int ALines) =0;
   virtual void editorSendKeyChanged(const QKeySequence &AKey) =0;
-  virtual void urlHandlerInserted(IUrlHandler *AHandler, int AOrder) =0;
-  virtual void urlHandlerRemoved(IUrlHandler *AHandler, int AOrder) =0;
+  virtual void urlHandlerInserted(IWidgetUrlHandler *AHandler, int AOrder) =0;
+  virtual void urlHandlerRemoved(IWidgetUrlHandler *AHandler, int AOrder) =0;
 };
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
@@ -340,7 +339,7 @@ Q_DECLARE_INTERFACE(ITabWidget,"Vacuum.Plugin.ITabWidget/1.0")
 Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.0")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.0")
-Q_DECLARE_INTERFACE(IUrlHandler,"Vacuum.Plugin.IUrlHandler/1.0")
+Q_DECLARE_INTERFACE(IWidgetUrlHandler,"Vacuum.Plugin.IWidgetUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.0")
 
 #endif
