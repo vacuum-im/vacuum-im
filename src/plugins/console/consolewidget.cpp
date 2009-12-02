@@ -39,7 +39,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
         SLOT(onStreamConsoleElement(IXmppStream *, const QDomElement &, bool))); 
       connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), 
         SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
-      connect(FXmppStreams->instance(), SIGNAL(destroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
+      connect(FXmppStreams->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
     }
   }
 

@@ -115,7 +115,7 @@ IXmppStream *XmppStreams::newXmppStream(const Jid &AStreamJid)
   if (!stream)
   {
     stream = new XmppStream(this, AStreamJid);
-    connect(stream->instance(), SIGNAL(destroyed()), SLOT(onStreamDestroyed())); 
+    connect(stream->instance(), SIGNAL(streamDestroyed()), SLOT(onStreamDestroyed())); 
     FStreams.append(stream);
     emit created(stream);
   }
@@ -154,7 +154,7 @@ void XmppStreams::removeXmppStream(IXmppStream *AXmppStream)
   {
     AXmppStream->close();
     AXmppStream->instance()->disconnect(this);
-    connect(AXmppStream->instance(), SIGNAL(destroyed()),SLOT(onStreamDestroyed())); 
+    connect(AXmppStream->instance(), SIGNAL(streamDestroyed()),SLOT(onStreamDestroyed())); 
     FActiveStreams.removeAt(FActiveStreams.indexOf(AXmppStream));
     emit removed(AXmppStream);
   }
@@ -276,7 +276,7 @@ void XmppStreams::onStreamDestroyed()
   {
     removeXmppStream(stream);
     FStreams.removeAt(FStreams.indexOf(stream));
-    emit destroyed(stream);
+    emit streamDestroyed(stream);
   }
 }
 

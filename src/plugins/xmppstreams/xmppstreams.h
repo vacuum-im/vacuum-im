@@ -52,7 +52,7 @@ signals:
   virtual void featureAdded(IXmppStream *AXmppStream, IStreamFeature *AFeature);
   virtual void featureRemoved(IXmppStream *AXmppStream, IStreamFeature *AFeature);
   virtual void removed(IXmppStream *AXmppStream);
-  virtual void destroyed(IXmppStream *AXmppStream);
+  virtual void streamDestroyed(IXmppStream *AXmppStream);
   virtual void featureRegistered(const QString &AFeatureNS, IStreamFeaturePlugin *AFeaturePlugin);
 protected slots:
   void onStreamOpened();

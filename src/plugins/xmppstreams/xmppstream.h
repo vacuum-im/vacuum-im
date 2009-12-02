@@ -61,7 +61,7 @@ signals:
   virtual void connectionRemoved(IConnection *AConnection);
   virtual void featureAdded(IStreamFeature *AFeature);
   virtual void featureRemoved(IStreamFeature *AFeature);
-  virtual void destroyed();
+  virtual void streamDestroyed();
 protected:
   void startStream();
   void processFeatures();
