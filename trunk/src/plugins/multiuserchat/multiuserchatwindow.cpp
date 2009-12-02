@@ -15,7 +15,7 @@
 #define ADR_USER_REAL_JID           Action::DR_Parametr3
 #define ADR_USER_NICK               Action::DR_Parametr4
 
-#define NICK_MENU_KEY               Qt::ControlModifier+Qt::Key_Space
+#define NICK_MENU_KEY               Qt::Key_Tab
 
 #define CONSECUTIVE_TIMEOUT         2*60
 
@@ -269,11 +269,12 @@ void MultiUserChatWindow::contextMenuForUser(IMultiUser *AUser, Menu *AMenu)
 
 void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 {
+  closeWindow();
+
   FDestroyOnChatClosed = true;
   if (FMultiChat->isOpen())
     FMultiChat->setPresence(IPresence::Offline,AStatus);
 
-  closeWindow();
   if (AWaitClose>0)
     QTimer::singleShot(FMultiChat->isOpen() ? AWaitClose : 0, this, SLOT(deleteLater()));
   else
@@ -1600,32 +1601,45 @@ void MultiUserChatWindow::onMessageAboutToBeSend()
     FEditWidget->clearEditor();
 }
 
-void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook)
+void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked)
 {
   if (FMultiChat->isOpen() && AKeyEvent->modifiers()+AKeyEvent->key() == NICK_MENU_KEY)
   {
-    Menu *nickMenu = new Menu(this);
-    nickMenu->setAttribute(Qt::WA_DeleteOnClose,true);
-    foreach(QListWidgetItem *listItem, FUsers)
+    QTextEdit *textEdit = FEditWidget->textEdit();
+    QTextCursor cursor = textEdit->textCursor();
+    cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
+
+    QList<QString> nicks;
+    QString nickStarts = cursor.selectedText().toLower();
+
+    foreach(IMultiUser *user, FUsers.keys())
     {
-      if (listItem->text() != FMultiChat->mainUser()->nickName())
+      if (user != FMultiChat->mainUser())
+        if (nickStarts.isEmpty() || user->nickName().toLower().startsWith(nickStarts))
+          nicks.append(user->nickName());
+    }
+
+    if (nicks.count() > 1)
+    {
+      Menu *nickMenu = new Menu(this);
+      nickMenu->setAttribute(Qt::WA_DeleteOnClose,true);
+      foreach(QString nick, nicks)
       {
         Action *action = new Action(nickMenu);
-        action->setText(listItem->text());
-        action->setIcon(listItem->icon());
-        action->setData(ADR_USER_NICK,listItem->text());
+        action->setText(nick);
+        action->setIcon(FUsers.value(FMultiChat->userByNick(nick))->icon());
+        action->setData(ADR_USER_NICK,nick);
         connect(action,SIGNAL(triggered(bool)),SLOT(onNickMenuActionTriggered(bool)));
         nickMenu->addAction(action,AG_DEFAULT,true);
       }
-    }
-    if (!nickMenu->isEmpty())
-    {
-      QTextEdit *textEdit = FEditWidget->textEdit();
       nickMenu->popup(textEdit->viewport()->mapToGlobal(textEdit->cursorRect().topLeft()));
     }
-    else
-      delete nickMenu;
-    AHook = true;
+    else if (!nicks.isEmpty())
+    {
+      cursor.insertText(tr("%1: ").arg(nicks.first()));
+    }
+
+    AHooked = true;
   }
 }
 
@@ -1712,7 +1726,9 @@ void MultiUserChatWindow::onNickMenuActionTriggered(bool)
   if (action)
   {
     QString nick = action->data(ADR_USER_NICK).toString();
-    FEditWidget->textEdit()->textCursor().insertText(tr("%1: ").arg(nick));
+    QTextCursor cursor = FEditWidget->textEdit()->textCursor();
+    cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
+    cursor.insertText(tr("%1: ").arg(nick));
   }
 }
 
