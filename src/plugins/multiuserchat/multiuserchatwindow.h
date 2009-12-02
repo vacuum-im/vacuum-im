@@ -153,7 +153,7 @@ protected slots:
 protected slots:
   void onMessageReady();
   void onMessageAboutToBeSend();
-  void onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook);
+  void onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
   void onWindowActivated();
   void onChatMessageReady();
   void onChatWindowActivated();
