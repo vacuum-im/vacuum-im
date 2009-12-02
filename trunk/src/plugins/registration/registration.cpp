@@ -82,7 +82,7 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
     IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
     if (xmppStreams)
     {
-      connect(xmppStreams->instance(),SIGNAL(destroyed(IXmppStream *)),SLOT(onStreamDestroyed(IXmppStream *)));
+      connect(xmppStreams->instance(),SIGNAL(streamDestroyed(IXmppStream *)),SLOT(onStreamDestroyed(IXmppStream *)));
     }
   }
 

@@ -79,7 +79,7 @@ signals:
   virtual void connectionRemoved(IConnection *AConnection) =0;
   virtual void featureAdded(IStreamFeature *AFeature) =0;
   virtual void featureRemoved(IStreamFeature *AFeature) =0;
-  virtual void destroyed() =0;
+  virtual void streamDestroyed() =0;
 };
 
 class IXmppStreams 
@@ -111,7 +111,7 @@ signals:
   virtual void featureAdded(IXmppStream *AXmppStream, IStreamFeature *AFeature) =0;
   virtual void featureRemoved(IXmppStream *AXmppStream, IStreamFeature *AFeature) =0;
   virtual void removed(IXmppStream *AXmppStream) =0;
-  virtual void destroyed(IXmppStream *AXmppStream) =0;
+  virtual void streamDestroyed(IXmppStream *AXmppStream) =0;
   virtual void featureRegistered(const QString &AFeatureNS, IStreamFeaturePlugin *AFeaturePlugin) =0;
 };
 

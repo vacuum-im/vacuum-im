@@ -32,7 +32,7 @@ XmppStream::~XmppStream()
   foreach(IStreamFeature *feature, features)
     removeFeature(feature);
 
-  emit destroyed();
+  emit streamDestroyed();
 }
 
 bool XmppStream::isOpen() const
