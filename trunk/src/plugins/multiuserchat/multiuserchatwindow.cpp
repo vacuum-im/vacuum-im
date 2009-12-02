@@ -56,7 +56,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
   setMessageStyle();
   connectMultiChat();
   createMenuBarActions();
-  createRoomUtilsActions();
+  createModeratorUtilsActions();
   loadWindowState();
 
   connect(ui.ltwUsers,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
@@ -262,7 +262,7 @@ void MultiUserChatWindow::contextMenuForUser(IMultiUser *AUser, Menu *AMenu)
 {
   if (FUsers.contains(AUser) && AUser!=FMultiChat->mainUser())
   {
-    insertRoomUtilsActions(AMenu,AUser);
+    insertModeratorUtilsActions(AMenu,AUser);
     emit multiUserContextMenu(AUser,AMenu);
   }
 }
@@ -448,12 +448,19 @@ void MultiUserChatWindow::createMenuBarActions()
   connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
   FRoomMenu->addAction(FClearChat,AG_MURM_MULTIUSERCHAT,true);
 
-  FQuitRoom = new Action(FRoomMenu);
-  FQuitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT);
-  FQuitRoom->setText(tr("Exit"));
-  FQuitRoom->setShortcut(tr("Ctrl+X"));
-  connect(FQuitRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FRoomMenu->addAction(FQuitRoom,AG_MURM_MULTIUSERCHAT_EXIT,true);
+  FEnterRoom = new Action(FRoomMenu);
+  FEnterRoom->setText(tr("Enter room"));
+  FEnterRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
+  connect(FEnterRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  FRoomMenu->addAction(FEnterRoom,AG_MURM_MULTIUSERCHAT_EXIT,false);
+
+
+  FExitRoom = new Action(FRoomMenu);
+  FExitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
+  FExitRoom->setText(tr("Exit room"));
+  FExitRoom->setShortcut(tr("Ctrl+F4"));
+  connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  FRoomMenu->addAction(FExitRoom,AG_MURM_MULTIUSERCHAT_EXIT,false);
 
   FToolsMenu = new Menu(FMenuBarWidget->menuBarChanger()->menuBar());
   FToolsMenu->setTitle(tr("Tools"));
@@ -560,24 +567,25 @@ void MultiUserChatWindow::updateMenuBarActions()
     FConfigRoom->setVisible(false);
     FDestroyRoom->setVisible(false);
   }
+  FEnterRoom->setVisible(!FMultiChat->isOpen());
 }
 
-void MultiUserChatWindow::createRoomUtilsActions()
+void MultiUserChatWindow::createModeratorUtilsActions()
 {
-  FRoomUtilsMenu = new Menu(this);
-  FRoomUtilsMenu->setTitle(tr("Room Utilities"));
+  FModeratorUtilsMenu = new Menu(this);
+  FModeratorUtilsMenu->setTitle(tr("Room Utilities"));
 
-  FSetRoleNode = new Action(FRoomUtilsMenu);
+  FSetRoleNode = new Action(FModeratorUtilsMenu);
   FSetRoleNode->setText(tr("Kick user"));
   connect(FSetRoleNode,SIGNAL(triggered(bool)),SLOT(onRoomUtilsActionTriggered(bool)));
-  FRoomUtilsMenu->addAction(FSetRoleNode,AG_MUCM_MULTIUSERCHAT_UTILS,false);
+  FModeratorUtilsMenu->addAction(FSetRoleNode,AG_MUCM_MULTIUSERCHAT_UTILS,false);
 
-  FSetAffilOutcast = new Action(FRoomUtilsMenu);
+  FSetAffilOutcast = new Action(FModeratorUtilsMenu);
   FSetAffilOutcast->setText(tr("Ban user"));
   connect(FSetAffilOutcast,SIGNAL(triggered(bool)),SLOT(onRoomUtilsActionTriggered(bool)));
-  FRoomUtilsMenu->addAction(FSetAffilOutcast,AG_MUCM_MULTIUSERCHAT_UTILS,false);
+  FModeratorUtilsMenu->addAction(FSetAffilOutcast,AG_MUCM_MULTIUSERCHAT_UTILS,false);
 
-  FChangeRole = new Menu(FRoomUtilsMenu);
+  FChangeRole = new Menu(FModeratorUtilsMenu);
   FChangeRole->setTitle(tr("Change Role"));
   {
     FSetRoleVisitor = new Action(FChangeRole);
@@ -598,9 +606,9 @@ void MultiUserChatWindow::createRoomUtilsActions()
     connect(FSetRoleModerator,SIGNAL(triggered(bool)),SLOT(onRoomUtilsActionTriggered(bool)));
     FChangeRole->addAction(FSetRoleModerator,AG_DEFAULT,false);
   }
-  FRoomUtilsMenu->addAction(FChangeRole->menuAction(),AG_MUCM_MULTIUSERCHAT_UTILS,false);
+  FModeratorUtilsMenu->addAction(FChangeRole->menuAction(),AG_MUCM_MULTIUSERCHAT_UTILS,false);
 
-  FChangeAffiliation = new Menu(FRoomUtilsMenu);
+  FChangeAffiliation = new Menu(FModeratorUtilsMenu);
   FChangeAffiliation->setTitle(tr("Change Affiliation"));
   {
     FSetAffilNone = new Action(FChangeAffiliation);
@@ -627,15 +635,15 @@ void MultiUserChatWindow::createRoomUtilsActions()
     connect(FSetAffilOwner,SIGNAL(triggered(bool)),SLOT(onRoomUtilsActionTriggered(bool)));
     FChangeAffiliation->addAction(FSetAffilOwner,AG_DEFAULT,false);
   }
-  FRoomUtilsMenu->addAction(FChangeAffiliation->menuAction(),AG_MUCM_MULTIUSERCHAT_UTILS,false);
+  FModeratorUtilsMenu->addAction(FChangeAffiliation->menuAction(),AG_MUCM_MULTIUSERCHAT_UTILS,false);
 }
 
-void MultiUserChatWindow::insertRoomUtilsActions(Menu *AMenu, IMultiUser *AUser)
+void MultiUserChatWindow::insertModeratorUtilsActions(Menu *AMenu, IMultiUser *AUser)
 {
   IMultiUser *muser = FMultiChat->mainUser();
   if (muser && muser->role() == MUC_ROLE_MODERATOR)
   {
-    FRoomUtilsMenu->menuAction()->setData(ADR_USER_NICK,AUser->nickName());
+    FModeratorUtilsMenu->menuAction()->setData(ADR_USER_NICK,AUser->nickName());
 
     FSetRoleVisitor->setChecked(AUser->role() == MUC_ROLE_VISITOR);
     FSetRoleParticipant->setChecked(AUser->role() == MUC_ROLE_PARTICIPANT);
@@ -776,25 +784,35 @@ bool MultiUserChatWindow::showStatusCodes(const QString &ANick, const QList<int>
   return shown;
 }
 
-void MultiUserChatWindow::setRoleColorForUser(IMultiUser *AUser)
+void MultiUserChatWindow::highlightUserRole(IMultiUser *AUser)
 {
   QListWidgetItem *listItem = FUsers.value(AUser);
   if (listItem)
   {
-    QColor color;
+    QColor itemColor;
+    QFont itemFont = listItem->font();
     QString role = AUser->data(MUDR_ROLE).toString();
-    if (role == MUC_ROLE_PARTICIPANT)
-      color = Qt::black;
-    else if (role == MUC_ROLE_MODERATOR)
-      color = Qt::darkRed;
+    if (role == MUC_ROLE_MODERATOR)
+    {
+      itemFont.setBold(true);
+      itemColor = ui.ltwUsers->palette().color(QPalette::Active, QPalette::Text);
+    }
+    else if (role == MUC_ROLE_PARTICIPANT)
+    {
+      itemFont.setBold(false);
+      itemColor = ui.ltwUsers->palette().color(QPalette::Active, QPalette::Text);
+    }
     else
-      color = Qt::gray;
-    listItem->setForeground(color);
-    AUser->setData(MUDR_ROLE_COLOR,color);
+    {
+      itemFont.setBold(false);
+      itemColor = ui.ltwUsers->palette().color(QPalette::Disabled, QPalette::Text);
+    }
+    listItem->setFont(itemFont);
+    listItem->setForeground(itemColor);
   }
 }
 
-void MultiUserChatWindow::setAffilationLineForUser(IMultiUser *AUser)
+void MultiUserChatWindow::highlightUserAffiliation(IMultiUser *AUser)
 {
   QListWidgetItem *listItem = FUsers.value(AUser);
   if (listItem)
@@ -805,16 +823,31 @@ void MultiUserChatWindow::setAffilationLineForUser(IMultiUser *AUser)
     {
       itemFont.setStrikeOut(false);
       itemFont.setUnderline(true);
+      itemFont.setItalic(false);
+    }
+    else if (affilation == MUC_AFFIL_ADMIN)
+    {
+      itemFont.setStrikeOut(false);
+      itemFont.setUnderline(false);
+      itemFont.setItalic(false);
+    }
+    else if (affilation == MUC_AFFIL_MEMBER)
+    {
+      itemFont.setStrikeOut(false);
+      itemFont.setUnderline(false);
+      itemFont.setItalic(false);
     }
     else if (affilation == MUC_AFFIL_OUTCAST)
     {
       itemFont.setStrikeOut(true);
       itemFont.setUnderline(false);
+      itemFont.setItalic(false);
     }
     else
     {
       itemFont.setStrikeOut(false);
       itemFont.setUnderline(false);
+      itemFont.setItalic(true);
     }
     listItem->setFont(itemFont);
   }
@@ -1372,8 +1405,8 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
       listItem->setText(AUser->nickName());
       ui.ltwUsers->addItem(listItem);
       FUsers.insert(AUser,listItem);
-      setRoleColorForUser(AUser);
-      setAffilationLineForUser(AUser);
+      highlightUserRole(AUser);
+      highlightUserAffiliation(AUser);
       updateWindow();
 
       QString message = tr("%1 (%2) has joined the room. %3");
@@ -1428,13 +1461,13 @@ void MultiUserChatWindow::onUserDataChanged(IMultiUser *AUser, int ARole, const 
   {
     if (AAfter!=MUC_ROLE_NONE && ABefour!=MUC_ROLE_NONE)
       showMessage(tr("%1 role changed from %2 to %3").arg(AUser->nickName()).arg(ABefour.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
-    setRoleColorForUser(AUser);
+    highlightUserRole(AUser);
   }
   else if (ARole==MUDR_AFFILIATION)
   {
     if (FUsers.contains(AUser))
       showMessage(tr("%1 affiliation changed from %2 to %3").arg(AUser->nickName()).arg(ABefour.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
-    setAffilationLineForUser(AUser);
+    highlightUserAffiliation(AUser);
   }
 }
 
@@ -1707,7 +1740,12 @@ void MultiUserChatWindow::onMenuBarActionTriggered(bool)
   {
     setMessageStyle();
   }
-  else if (action == FQuitRoom)
+  else if (action == FEnterRoom)
+  {
+    FMultiChat->setAutoPresence(false);
+    FMultiChat->setAutoPresence(true);
+  }
+  else if (action == FExitRoom)
   {
     exitAndDestroy(tr("Disconnected"));
   }
@@ -1768,42 +1806,42 @@ void MultiUserChatWindow::onRoomUtilsActionTriggered(bool)
     bool ok;
     QString reason = QInputDialog::getText(this,tr("Kick reason"),tr("Enter reason for kick"),QLineEdit::Normal,"",&ok);
     if (ok)
-      FMultiChat->setRole(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_ROLE_NONE,reason);
+      FMultiChat->setRole(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_ROLE_NONE,reason);
   }
   else if (action == FSetRoleVisitor)
   {
-    FMultiChat->setRole(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_ROLE_VISITOR);
+    FMultiChat->setRole(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_ROLE_VISITOR);
   }
   else if (action == FSetRoleParticipant)
   {
-    FMultiChat->setRole(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_ROLE_PARTICIPANT);
+    FMultiChat->setRole(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_ROLE_PARTICIPANT);
   }
   else if (action == FSetRoleModerator)
   {
-    FMultiChat->setRole(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_ROLE_MODERATOR);
+    FMultiChat->setRole(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_ROLE_MODERATOR);
   }
   else if (action == FSetAffilNone)
   {
-    FMultiChat->setAffiliation(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_NONE);
+    FMultiChat->setAffiliation(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_NONE);
   }
   else if (action == FSetAffilOutcast)
   {
     bool ok;
     QString reason = QInputDialog::getText(this,tr("Ban reason"),tr("Enter reason for ban"),QLineEdit::Normal,"",&ok);
     if (ok)
-      FMultiChat->setAffiliation(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_OUTCAST,reason);
+      FMultiChat->setAffiliation(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_OUTCAST,reason);
   }
   else if (action == FSetAffilMember)
   {
-    FMultiChat->setAffiliation(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_MEMBER);
+    FMultiChat->setAffiliation(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_MEMBER);
   }
   else if (action == FSetAffilAdmin)
   {
-    FMultiChat->setAffiliation(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_ADMIN);
+    FMultiChat->setAffiliation(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_ADMIN);
   }
   else if (action == FSetAffilOwner)
   {
-    FMultiChat->setAffiliation(FRoomUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_OWNER);
+    FMultiChat->setAffiliation(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_OWNER);
   }
 }
 

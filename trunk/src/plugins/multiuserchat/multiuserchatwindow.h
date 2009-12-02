@@ -92,15 +92,15 @@ protected:
   void createMessageWidgets();
   void createMenuBarActions();
   void updateMenuBarActions();
-  void createRoomUtilsActions();
-  void insertRoomUtilsActions(Menu *AMenu, IMultiUser *AUser);
+  void createModeratorUtilsActions();
+  void insertModeratorUtilsActions(Menu *AMenu, IMultiUser *AUser);
   void saveWindowState();
   void loadWindowState();
   void saveWindowGeometry();
   void loadWindowGeometry();
   bool showStatusCodes(const QString &ANick, const QList<int> &ACodes);
-  void setRoleColorForUser(IMultiUser *AUser);
-  void setAffilationLineForUser(IMultiUser *AUser);
+  void highlightUserRole(IMultiUser *AUser);
+  void highlightUserAffiliation(IMultiUser *AUser);
   void setToolTipForUser(IMultiUser *AUser);
   bool execShortcutCommand(const QString &AText);
 protected:
@@ -195,7 +195,8 @@ private:
     Action *FChangeNick;
     Action *FChangeSubject;
     Action *FClearChat;
-    Action *FQuitRoom;
+    Action *FEnterRoom;
+    Action *FExitRoom;
   Menu *FToolsMenu;
     Action *FInviteContact;
     Action *FRequestVoice;
@@ -205,7 +206,7 @@ private:
     Action *FAdminsList;
     Action *FOwnersList;
     Action *FDestroyRoom;
-  Menu *FRoomUtilsMenu;
+  Menu *FModeratorUtilsMenu;
     Action *FSetRoleNode;
     Action *FSetAffilOutcast;
     Menu *FChangeRole;
@@ -220,7 +221,6 @@ private:
 private:
   bool FShownDetached;
   bool FDestroyOnChatClosed;
-  QList<QColor> FColorQueue;
   QList<int> FActiveMessages;
   QList<IChatWindow *> FChatWindows;
   QMultiMap<IChatWindow *,int> FActiveChatMessages;

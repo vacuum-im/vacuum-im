@@ -25,6 +25,14 @@
     <object mime="image/png">mucclearchat.png</object>
   </icon>
   <icon>
+    <key>mucEnterRoom</key>
+    <object mime="image/png">mucenterroom.png</object>
+  </icon>
+  <icon>
+    <key>mucExitRoom</key>
+    <object mime="image/png">mucexitroom.png</object>
+  </icon>
+  <icon>
     <key>mucRequestVoice</key>
     <object mime="image/png">mucrequestvoice.png</object>
   </icon>
@@ -51,10 +59,6 @@
   <icon>
     <key>mucDestroyRoom</key>
     <object mime="image/png">mucdestroyroom.png</object>
-  </icon>
-  <icon>
-    <key>mucExit</key>
-    <object mime="image/png">mucexit.png</object>
   </icon>
   <icon>
     <key>mucMessage</key>

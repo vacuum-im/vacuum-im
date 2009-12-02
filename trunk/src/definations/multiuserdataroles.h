@@ -10,8 +10,7 @@ enum MultiUserDataRoles {
   MUDR_ROLE,
   MUDR_AFFILIATION,
   MUDR_SHOW,
-  MUDR_STATUS,
-  MUDR_ROLE_COLOR
+  MUDR_STATUS
 };
 
 #endif
