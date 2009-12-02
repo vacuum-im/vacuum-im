@@ -41,6 +41,11 @@ signals:
   virtual void sendKeyChanged(const QKeySequence &AKey);
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+protected:
+  void appendMessageToBuffer();
+  void showBufferedMessage();
+  void showNextBufferedMessage();
+  void showPrevBufferedMessage();
 protected slots:
   void onShortcutActivated();
   void onEditorAutoResizeChanged(bool AResize);
@@ -51,9 +56,11 @@ private:
 private:
   IMessageWidgets *FMessageWidgets;
 private:
+  int FBufferPos;
   Jid FStreamJid;
   Jid FContactJid;
   QShortcut *FSendShortcut;
+  QList<QString> FBuffer;
 };
 
 #endif // EDITWIDGET_H

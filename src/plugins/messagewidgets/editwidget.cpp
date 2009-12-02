@@ -2,6 +2,8 @@
 
 #include <QKeyEvent>
 
+#define MAX_BUFFERED_MESSAGES     10
+
 EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
@@ -11,6 +13,7 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
   FMessageWidgets = AMessageWidgets;
   FStreamJid = AStreamJid;
   FContactJid = AContactJid;
+  FBufferPos = -1;
 
   FSendShortcut = new QShortcut(ui.medEditor);
   FSendShortcut->setContext(Qt::WidgetShortcut);
@@ -68,6 +71,7 @@ QTextDocument *EditWidget::document() const
 void EditWidget::sendMessage()
 {
   emit messageAboutToBeSend();
+  appendMessageToBuffer();
   emit messageReady();
 }
 
@@ -117,12 +121,61 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
   {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
     emit keyEventReceived(keyEvent,hooked);
+
+    if (!hooked && keyEvent->key() == Qt::Key_Up)
+    {
+      hooked = true;
+      showNextBufferedMessage();
+    }
+    else if (!hooked && keyEvent->key() == Qt::Key_Down)
+    {
+      hooked = true;
+      showPrevBufferedMessage();
+    }
   }
   else if (AWatched==ui.medEditor && AEvent->type()==QEvent::ShortcutOverride)
   {
     hooked = true;
   }
   return hooked || QWidget::eventFilter(AWatched,AEvent);
+}
+
+void EditWidget::appendMessageToBuffer()
+{
+  QString message = ui.medEditor->toPlainText();
+  if (!message.isEmpty())
+  {
+    FBufferPos = -1;
+    int index = FBuffer.indexOf(message);
+    if (index >= 0)
+      FBuffer.removeAt(index);
+    FBuffer.prepend(message);
+    if (FBuffer.count() > MAX_BUFFERED_MESSAGES)
+      FBuffer.removeLast();
+  }
+}
+
+void EditWidget::showBufferedMessage()
+{
+  ui.medEditor->setPlainText(FBuffer.value(FBufferPos));
+}
+
+void EditWidget::showNextBufferedMessage()
+{
+  if (FBufferPos < FBuffer.count()-1)
+  {
+    FBufferPos++;
+    showBufferedMessage();
+  }
+}
+
+void EditWidget::showPrevBufferedMessage()
+{
+  if (FBufferPos > 0)
+  {
+    FBufferPos--;
+    showBufferedMessage();
+  }
 }
 
 void EditWidget::onShortcutActivated()
@@ -148,3 +201,4 @@ void EditWidget::onEditorSendKeyChanged(const QKeySequence &AKey)
 {
   setSendKey(AKey);
 }
+
