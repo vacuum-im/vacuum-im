@@ -551,14 +551,6 @@ Check values and try again</source>
         <translation>Очистить окно чата</translation>
     </message>
     <message>
-        <source>Exit</source>
-        <translation>Выход</translation>
-    </message>
-    <message>
-        <source>Ctrl+X</source>
-        <translation>Ctrl+X</translation>
-    </message>
-    <message>
         <source>Invite to this room</source>
         <translation>Пригласить в эту комнату</translation>
     </message>
@@ -893,6 +885,18 @@ Check values and try again</source>
     <message>
         <source>Status:</source>
         <translation>Статус:</translation>
+    </message>
+    <message>
+        <source>Enter room</source>
+        <translation>Войти в комнату</translation>
+    </message>
+    <message>
+        <source>Exit room</source>
+        <translation>Выйти из комнаты</translation>
+    </message>
+    <message>
+        <source>Ctrl+F4</source>
+        <translation>Ctrl+F4</translation>
     </message>
 </context>
 <context>
