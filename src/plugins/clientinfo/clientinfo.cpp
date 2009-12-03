@@ -418,6 +418,9 @@ QString ClientInfo::osVersion() const
 #if defined(Q_OS_MAC)
     switch(QSysInfo::MacintoshVersion)
     {
+    case QSysInfo::MV_SNOWLEOPARD:
+      osver = "MacOS 10.6(SnowLeopard)";
+      break;
     case QSysInfo::MV_LEOPARD:
       osver = "MacOS 10.5(Leopard)";
       break;
@@ -441,7 +444,7 @@ QString ClientInfo::osVersion() const
       break;
     case QSysInfo::MV_Unknown:
     default:
-      osver = tr("MacOS(unknown)");
+      osver = "MacOS (unknown)";
       break;
     }
 #elif defined(Q_OS_UNIX)
@@ -472,6 +475,9 @@ QString ClientInfo::osVersion() const
     case QSysInfo::WV_CE:
       osver = "Windows CE";
       break;
+    case QSysInfo::WV_WINDOWS7:
+      osver = "Windows 7";
+      break;
     case QSysInfo::WV_VISTA:
       osver = "Windows Vista";
       break;
@@ -500,7 +506,7 @@ QString ClientInfo::osVersion() const
       osver = "Windows 3.1 with Win32s";
       break;
     default:
-      osver = "Windows(unknown)";
+      osver = "Windows (unknown)";
       break;
     }
 
@@ -512,7 +518,7 @@ QString ClientInfo::osVersion() const
       osver.append(" (MS-DOS-based)");
 
 #else
-    return QLatin1String("Unknown");
+    osver = "Unknown";
 #endif
   }
   return osver;

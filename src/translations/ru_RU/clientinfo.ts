@@ -56,10 +56,6 @@
         <translation>Версия ОС</translation>
     </message>
     <message>
-        <source>MacOS(unknown)</source>
-        <translation>MacOS (неизвестная)</translation>
-    </message>
-    <message>
         <source>Request contact client information</source>
         <translation>Запрашивает информацию о версии приложения, последней активности и локальном времени контакта</translation>
     </message>
