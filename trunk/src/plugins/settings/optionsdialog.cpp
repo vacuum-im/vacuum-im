@@ -36,7 +36,8 @@ OptionsDialog::OptionsDialog(SettingsPlugin *ASessingsPlugin, QWidget *AParent) 
 
   lblInfo = new QLabel(this);
   lblInfo->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-  lblInfo->setFrameStyle(QFrame::StyledPanel);
+  lblInfo->setFrameStyle(QFrame::Box);
+  lblInfo->setFrameShadow(QFrame::Sunken);
 
   scaScroll = new QScrollArea(this);
   scaScroll->setWidgetResizable(true);
@@ -75,7 +76,7 @@ OptionsDialog::OptionsDialog(SettingsPlugin *ASessingsPlugin, QWidget *AParent) 
   QVBoxLayout *vblMain = new QVBoxLayout;
   vblMain->addLayout(hblCentral);
   vblMain->addWidget(dbbButtons);
-  vblMain->setMargin(5);
+  vblMain->setMargin(3);
 
   setLayout(vblMain);
   resize(600,600);
