@@ -4,14 +4,16 @@
 #include <QByteArray>
 #include <QVBoxLayout>
 
-#define DIR_ROOT                ".vacuum"
-#define DIR_PROFILES            "profiles"
+#define DIR_ROOT                        ".vacuum"
+#define DIR_PROFILES                    "profiles"
 
-#define PROFILE_VERSION         "1.0"
-#define SETTINGS_VERSION        "1.0"
-#define DEFAULT_PROFILE         "Default"
+#define PROFILE_VERSION                 "1.0"
+#define SETTINGS_VERSION                "1.0"
+#define DEFAULT_PROFILE                 "Default"
 
-#define ADR_PROFILE             Action::DR_Parametr1
+#define ADR_PROFILE                     Action::DR_Parametr1
+
+#define BDI_OPTIONS_DIALOG_GEOMETRY     "Settings::OptionsDialogGeometry"
 
 SettingsPlugin::SettingsPlugin()
 {
@@ -455,6 +457,9 @@ QDialog *SettingsPlugin::openOptionsDialog(const QString &ANode, QWidget *AParen
     connect(FOptionsDialog, SIGNAL(rejected()),SLOT(onOptionsDialogRejected()));
     connect(FOptionsDialog, SIGNAL(closed()),SLOT(onOptionsDialogClosed()));
 
+    ISettings *settings = settingsForPlugin(SETTINGS_UUID);
+    FOptionsDialog->restoreGeometry(settings->loadBinaryData(BDI_OPTIONS_DIALOG_GEOMETRY));
+
     QMap<QString, OptionsNode *>::const_iterator it = FNodes.constBegin();
     while (it != FNodes.constEnd())
     {
@@ -607,6 +612,8 @@ void SettingsPlugin::onOptionsDialogRejected()
 
 void SettingsPlugin::onOptionsDialogClosed()
 {
+  ISettings *settings = settingsForPlugin(SETTINGS_UUID);
+  settings->saveBinaryData(BDI_OPTIONS_DIALOG_GEOMETRY, FOptionsDialog->saveGeometry());
   emit optionsDialogClosed();
 }
 
