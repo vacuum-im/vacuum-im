@@ -12,7 +12,7 @@
 #include <QTextDocument>
 #include <QCoreApplication>
 
-#define SHARED_STYLE_PATH                   STORAGE_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
+#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
 #define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH"/Resources"
 

@@ -9,7 +9,7 @@
 #include <QDomDocument>
 #include <QCoreApplication>
 
-#define SHARED_STYLE_PATH                   STORAGE_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
+#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
 
 static const char *SenderColors[] =  {
   "aqua", "aquamarine", "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse", "chocolate",

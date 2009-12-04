@@ -9,7 +9,6 @@
 #include "utilsexport.h"
 
 //Directories and files
-#define STORAGE_DIR             "resources"
 #define STORAGE_SHARED_DIR      "shared"
 #define STORAGE_DEFFILES_MASK   "*def.xml"
 

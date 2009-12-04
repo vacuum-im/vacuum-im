@@ -1,3 +1,5 @@
+include(../../config.inc)
+
 TARGET     = idn
 TEMPLATE   = lib
 CONFIG    -= qt

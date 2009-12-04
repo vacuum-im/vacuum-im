@@ -194,7 +194,7 @@ QMap<QString,QVariant> SimpleMessageStylePlugin::styleInfo(const QString &AStyle
 void SimpleMessageStylePlugin::updateAvailStyles()
 {
   QDir dir(qApp->applicationDirPath());
-  if (dir.cd(STORAGE_DIR) && dir.cd(RSR_STORAGE_SIMPLEMESSAGESTYLES))
+  if (dir.cd(RESOURCES_DIR) && dir.cd(RSR_STORAGE_SIMPLEMESSAGESTYLES))
   {
     QStringList styleDirs = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
     styleDirs.removeAt(styleDirs.indexOf(STORAGE_SHARED_DIR));
