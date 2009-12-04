@@ -1,3 +1,5 @@
+include(../../config.inc)
+
 TARGET     = zlib
 TEMPLATE   = lib
 CONFIG    -= qt

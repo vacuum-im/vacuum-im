@@ -1,3 +1,5 @@
+include(../../config.inc)
+
 TARGET         = minizip
 TEMPLATE       = lib
 CONFIG        -= qt

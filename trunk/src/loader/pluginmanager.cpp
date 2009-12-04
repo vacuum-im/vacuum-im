@@ -16,9 +16,7 @@
 # define SVN_REVISION     0
 #endif
 
-#define DIR_HOME                    ".vacuum"
-#define DIR_PLUGINS                 "plugins"
-#define DIR_TRANSLATIONS            "translations"
+#define DIR_APP_DATA                ".vacuum"
 
 #define FILE_PLUGINS_SETTINGS       "plugins.xml"
 
@@ -28,7 +26,7 @@
 #define SVN_HOME_PATH               "HomePath"
 #define SVN_LOCALE_NAME             "Locale"
 
-#if defined(Q_OS_WIN)
+#if defined(Q_WS_WIN)
 # define LIB_PREFIX_SIZE            0
 #else
 # define LIB_PREFIX_SIZE            3
@@ -188,19 +186,19 @@ void PluginManager::loadSettings()
   if (args.contains(CLO_HOME_DIR))
   {
     QDir dir(args.value(args.indexOf(CLO_HOME_DIR)+1));
-    if (dir.exists() && (dir.exists(DIR_HOME) || dir.mkpath(DIR_HOME)) && dir.cd(DIR_HOME))
+    if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
       FHomePath = dir.absolutePath();
   }
   if (FHomePath.isNull() && !settings.value(SVN_HOME_PATH).toString().isEmpty())
   {
     QDir dir(settings.value(SVN_HOME_PATH).toString());
-    if (dir.exists() && (dir.exists(DIR_HOME) || dir.mkpath(DIR_HOME)) && dir.cd(DIR_HOME))
+    if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
       FHomePath = dir.absolutePath();
   }
   if (FHomePath.isNull())
   {
     QDir dir = QDir::home();
-    if (dir.exists() && (dir.exists(DIR_HOME) || dir.mkpath(DIR_HOME)) && dir.cd(DIR_HOME))
+    if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
       FHomePath = dir.absolutePath();
   }
 
@@ -231,9 +229,9 @@ void PluginManager::saveSettings()
 void PluginManager::loadPlugins()
 {
   QDir dir(QApplication::applicationDirPath());
-  if (dir.cd(DIR_PLUGINS)) 
+  if (dir.cd(PLUGINS_DIR)) 
   {
-    QString tsDir = QApplication::applicationDirPath()+ "/" DIR_TRANSLATIONS "/" + QLocale().name();
+    QString tsDir = QDir::cleanPath(dir.absoluteFilePath("../" TRANSLATIONS_DIR "/" + QLocale().name()));
     loadCoreTranslations(tsDir);
 
     QStringList files = dir.entryList(QDir::Files);

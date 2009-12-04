@@ -192,7 +192,7 @@ QMap<QString,QVariant> AdiumMessageStylePlugin::styleInfo(const QString &AStyleI
 void AdiumMessageStylePlugin::updateAvailStyles()
 {
   QDir dir(qApp->applicationDirPath());
-  if (dir.cd(STORAGE_DIR) && dir.cd(RSR_STORAGE_ADIUMMESSAGESTYLES))
+  if (dir.cd(RESOURCES_DIR) && dir.cd(RSR_STORAGE_ADIUMMESSAGESTYLES))
   {
     QStringList styleDirs = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
     styleDirs.removeAt(styleDirs.indexOf(STORAGE_SHARED_DIR));

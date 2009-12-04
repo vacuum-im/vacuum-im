@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QDomDocument>
 #include <QApplication>
+#include <definations/config.h>
 
 QList<QString> FileStorage::FMimeTypes;
 QHash<QString, FileStorage *> FileStorage::FStaticStorages;
@@ -42,7 +43,7 @@ void FileStorage::setSubStorage(const QString &ASubStorage)
     FSubStorage = !ASubStorage.isEmpty() ? ASubStorage : STORAGE_SHARED_DIR;
 
     QDir dir(qApp->applicationDirPath());
-    if (dir.cd(STORAGE_DIR) && dir.cd(FStorage))
+    if (dir.cd(RESOURCES_DIR) && dir.cd(FStorage))
     {
       FFilePrefix = dir.absolutePath()+"/";
       if (FSubStorage!=STORAGE_SHARED_DIR && dir.cd(FSubStorage))
@@ -199,7 +200,7 @@ QStringList FileStorage::availStorages()
 {
   QStringList storages;
   QDir dir(qApp->applicationDirPath());
-  if (dir.cd(STORAGE_DIR))
+  if (dir.cd(RESOURCES_DIR))
   {
     storages = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
     storages.removeAt(storages.indexOf(STORAGE_SHARED_DIR));
@@ -222,7 +223,7 @@ QStringList FileStorage::availSubStorages(const QString &AStorage)
 {
   QStringList storages;
   QDir dir(qApp->applicationDirPath());
-  if (dir.cd(STORAGE_DIR) && dir.cd(AStorage))
+  if (dir.cd(RESOURCES_DIR) && dir.cd(AStorage))
   {
     storages = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
     storages.removeAt(storages.indexOf(STORAGE_SHARED_DIR));
