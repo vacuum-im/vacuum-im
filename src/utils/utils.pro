@@ -19,5 +19,5 @@ include(../translations.inc)
 
 #Install
 include(../install.inc)
-target.path        = $$INSTALL_BINS
+target.path        = $$INSTALL_LIBS
 INSTALLS           = target
