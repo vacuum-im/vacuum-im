@@ -13,8 +13,16 @@ include(loader.pri)
 #Appication icon
 win32:RC_FILE      = loader.rc
 
-#About Info
-win32:system(subwcrev ../../. svninfo.tmpl svninfo.h > nul) {
+#SVN Info
+SVN_REVISION=$$system(svnversion -n)
+exists(svninfo.h) {
+  win32 {
+    system(del svninfo.h)
+  } else {
+    system(rm svninfo.h)
+  }
+}
+!isEmpty(SVN_REVISION):system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
   DEFINES         += SVNINFO
 }
 

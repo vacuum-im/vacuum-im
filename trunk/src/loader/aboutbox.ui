@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>379</width>
-    <height>168</height>
+    <height>149</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,7 +70,7 @@
         </font>
        </property>
        <property name="text">
-        <string notr="true">Vacuum Jabber IM</string>
+        <string notr="true">Vacuum IM</string>
        </property>
       </widget>
      </item>
@@ -86,7 +86,7 @@
    <item>
     <widget class="QLabel" name="lblVersion">
      <property name="text">
-      <string notr="true">Version: 1.0 Revision: 0000</string>
+      <string notr="true">Version: 1.0.0.0 Revision: 0000</string>
      </property>
     </widget>
    </item>
@@ -100,7 +100,7 @@
    <item>
     <widget class="QLabel" name="lblCopyright">
      <property name="text">
-      <string notr="true">Copyright 2006-2009 Sergey Potapov. This software is released under the terms of the GNU General Public License.</string>
+      <string notr="true">Copyright 2006-2009 Sergey Potapov. This software is released under the terms of the GNU General Public License version 3.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

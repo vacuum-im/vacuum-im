@@ -11,9 +11,10 @@
 
 #ifdef SVNINFO
 # include "svninfo.h"
+# define SVN_DATE                   ""
 #else
-# define SVN_DATE         ""
-# define SVN_REVISION     0
+# define SVN_DATE                   ""
+# define SVN_REVISION               "0"
 #endif
 
 #define DIR_APP_DATA                ".vacuum"
@@ -51,7 +52,7 @@ QString PluginManager::version() const
   return CLIENT_VERSION;
 }
 
-int PluginManager::revision() const
+QString PluginManager::revision() const
 {
   return SVN_REVISION;
 }
@@ -455,7 +456,6 @@ void PluginManager::loadCoreTranslations(const QString &ADir)
 
   if (FQtTranslator->load("qt_"+QLocale().name(),ADir))
     qApp->installTranslator(FQtTranslator);
-
 }
 
 bool PluginManager::isPluginEnabled(const QString &AFile) const

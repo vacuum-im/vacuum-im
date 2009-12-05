@@ -22,6 +22,7 @@
 
 ClientInfo::ClientInfo()
 {
+  FPluginManager = NULL;
   FRosterPlugin = NULL;
   FPresencePlugin = NULL;
   FStanzaProcessor = NULL;
@@ -51,6 +52,8 @@ void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
 
 bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
+  FPluginManager = APluginManager;
+
   IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
@@ -169,7 +172,7 @@ bool ClientInfo::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza 
     iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
     QDomElement elem = iq.addElement("query",NS_JABBER_VERSION);
     elem.appendChild(iq.createElement("name")).appendChild(iq.createTextNode(CLIENT_NAME));
-    elem.appendChild(iq.createElement("version")).appendChild(iq.createTextNode(CLIENT_VERSION));
+    elem.appendChild(iq.createElement("version")).appendChild(iq.createTextNode(QString("%1.%2 %3").arg(FPluginManager->version()).arg(FPluginManager->revision()).arg(CLIENT_VERSION_SUFIX).trimmed()));
     elem.appendChild(iq.createElement("os")).appendChild(iq.createTextNode(osVersion()));
     FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
   }
@@ -187,8 +190,9 @@ bool ClientInfo::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza 
   return false;
 }
 
-void ClientInfo::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
+  Q_UNUSED(AStreamJid);
   if (FSoftwareId.contains(AStanza.id()))
   {
     Jid contactJid = FSoftwareId.take(AStanza.id());
@@ -749,8 +753,9 @@ void ClientInfo::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void ClientInfo::onContactStateChanged(const Jid &/*AStreamJid*/, const Jid &AContactJid, bool AStateOnline)
+void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
 {
+  Q_UNUSED(AStreamJid);
   if (AStateOnline)
   {
     if (FActivityItems.contains(AContactJid))
