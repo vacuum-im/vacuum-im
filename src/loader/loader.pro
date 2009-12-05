@@ -15,15 +15,16 @@ win32:RC_FILE      = loader.rc
 
 #SVN Info
 SVN_REVISION=$$system(svnversion -n)
-exists(svninfo.h) {
-  win32 {
-    system(del svninfo.h)
-  } else {
-    system(rm svninfo.h)
+win32 {
+  exists(svninfo.h):system(del svninfo.h)
+  !isEmpty(SVN_REVISION):system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
+    DEFINES       += SVNINFO
   }
-}
-!isEmpty(SVN_REVISION):system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
-  DEFINES         += SVNINFO
+} else {
+  exists(svninfo.h):system(rm svninfo.h)
+  !isEmpty(SVN_REVISION):system(echo \\$${LITERAL_HASH}define SVN_REVISION \\\"$${SVN_REVISION}\\\" >> svninfo.h) {
+    DEFINES       += SVNINFO
+  }
 }
 
 #Translation
