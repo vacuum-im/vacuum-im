@@ -41,7 +41,7 @@ public:
   ~PluginManager();
   virtual QObject *instance() { return this; }
   virtual QString version() const;
-  virtual int revision() const;
+  virtual QString revision() const;
   virtual QDateTime revisionDate() const;
   virtual QString homePath() const;
   virtual void setHomePath(const QString &APath);

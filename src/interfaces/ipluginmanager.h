@@ -39,7 +39,7 @@ class IPluginManager
 public:
   virtual QObject *instance() =0;
   virtual QString version() const =0;
-  virtual int revision() const =0;
+  virtual QString revision() const =0;
   virtual QDateTime revisionDate() const =0;
   virtual QString homePath() const =0;
   virtual void setHomePath(const QString &APath) =0;

@@ -137,6 +137,7 @@ protected slots:
   void onEntityTimeChanged(const Jid &AContactJid);
   void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 private:
+  IPluginManager *FPluginManager;
   IRosterPlugin *FRosterPlugin;
   IPresencePlugin *FPresencePlugin;
   IStanzaProcessor *FStanzaProcessor;
