@@ -1,7 +1,11 @@
 #ifndef DEF_CONFIG_H
 #define DEF_CONFIG_H
 
-#if defined Q_WS_WIN
+#if defined QT_DEBUG
+#  define PLUGINS_DIR           "./plugins"
+#  define RESOURCES_DIR         "./resources"
+#  define TRANSLATIONS_DIR      "./translations"
+#elif defined Q_WS_WIN
 #  define PLUGINS_DIR           "./plugins"
 #  define RESOURCES_DIR         "./resources"
 #  define TRANSLATIONS_DIR      "./translations"
