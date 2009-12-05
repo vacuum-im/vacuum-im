@@ -1,6 +1,6 @@
 include(../config.inc)
 
-TARGET             = utils
+TARGET             = vacuumutils
 TEMPLATE           = lib
 CONFIG            += dll
 QT                += xml
