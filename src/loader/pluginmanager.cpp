@@ -231,7 +231,7 @@ void PluginManager::loadPlugins()
   QDir dir(QApplication::applicationDirPath());
   if (dir.cd(PLUGINS_DIR)) 
   {
-    QString tsDir = QDir::cleanPath(dir.absoluteFilePath("../" TRANSLATIONS_DIR "/" + QLocale().name()));
+    QString tsDir = QDir::cleanPath(QDir(QApplication::applicationDirPath()).absoluteFilePath(TRANSLATIONS_DIR "/" + QLocale().name()));
     loadCoreTranslations(tsDir);
 
     QStringList files = dir.entryList(QDir::Files);
