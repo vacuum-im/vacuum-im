@@ -451,7 +451,7 @@ void PluginManager::loadCoreTranslations(const QString &ADir)
   if (FLoaderTranslator->load("vacuum",ADir))
     qApp->installTranslator(FLoaderTranslator);
 
-  if (FUtilsTranslator->load("utils",ADir))
+  if (FUtilsTranslator->load("vacuumutils",ADir))
     qApp->installTranslator(FUtilsTranslator);
 
   if (FQtTranslator->load("qt_"+QLocale().name(),ADir))
