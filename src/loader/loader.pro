@@ -1,6 +1,6 @@
 include(../config.inc)
 
-TARGET             = vacuum
+TARGET             = $$TARGET_LOADER
 TEMPLATE           = app
 QT                += xml
 LIBS              += -L../libs
@@ -39,3 +39,10 @@ translations.files = ../../translations/*
 resources.path     = $$INSTALL_RESOURCES
 resources.files    = ../../resources/*
 INSTALLS           = target translations resources
+
+#MaxOS Changes
+macx {
+  name_tool.path   = $$INSTALL_BINS
+  name_tool.extra  = install_name_tool -change lib$${TARGET_UTILS}.1.dylib @executable_path/../Frameworks/lib$${TARGET_UTILS}.1.dylib $$INSTALL_BINS/$$INSTALL_DIR/Contents/MacOS/$$TARGET_LOADER
+  INSTALLS        += name_tool
+}

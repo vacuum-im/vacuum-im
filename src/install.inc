@@ -15,7 +15,7 @@ unix {
 }
 
 macx {
-  INSTALL_BINS          = $$INSTALL_PREFIX/$$INSTALL_DIR/Contents/MacOS
+  INSTALL_BINS          = $$INSTALL_PREFIX
   INSTALL_LIBS          = $$INSTALL_PREFIX/$$INSTALL_DIR/Contents/Frameworks
   INSTALL_PLUGINS       = $$INSTALL_PREFIX/$$INSTALL_DIR/Contents/Frameworks/plugins
   INSTALL_RESOURCES     = $$INSTALL_PREFIX/$$INSTALL_DIR/Contents/Resources

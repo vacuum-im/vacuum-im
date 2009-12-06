@@ -1,3 +1,6 @@
+TARGET_LOADER            = vacuum
+TARGET_UTILS             = vacuumutils
+
 macx:CONFIG             += x86
 
 isEmpty(INSTALL_PREFIX) {
