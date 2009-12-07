@@ -5,7 +5,7 @@ macx:CONFIG             += x86
 
 isEmpty(INSTALL_PREFIX) {
   win32:INSTALL_PREFIX   = "c:"
-  unix:INSTALL_PREFIX    = /usr
+  unix:INSTALL_PREFIX    = /usr/local
   macx:INSTALL_PREFIX    = /Applications
 }
 
