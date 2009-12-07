@@ -19,5 +19,6 @@ include(../translations.inc)
 
 #Install
 include(../install.inc)
-target.path        = $$INSTALL_LIBS
+!macx:target.path  = $$INSTALL_LIBS
+macx:target.path   = ../libs/$$TARGET_UTILS    #Install in loader.pro
 INSTALLS           = target
