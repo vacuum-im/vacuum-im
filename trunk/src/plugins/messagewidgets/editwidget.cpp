@@ -122,12 +122,12 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
     emit keyEventReceived(keyEvent,hooked);
 
-    if (!hooked && keyEvent->key() == Qt::Key_Up)
+    if (!hooked && keyEvent->modifiers()==Qt::CTRL && keyEvent->key()==Qt::Key_Up)
     {
       hooked = true;
       showNextBufferedMessage();
     }
-    else if (!hooked && keyEvent->key() == Qt::Key_Down)
+    else if (!hooked && keyEvent->modifiers()==Qt::CTRL && keyEvent->key() == Qt::Key_Down)
     {
       hooked = true;
       showPrevBufferedMessage();
@@ -164,6 +164,11 @@ void EditWidget::showNextBufferedMessage()
 {
   if (FBufferPos < FBuffer.count()-1)
   {
+    if (FBufferPos<0 && !ui.medEditor->toPlainText().isEmpty())
+    {
+      appendMessageToBuffer();
+      FBufferPos++;
+    }
     FBufferPos++;
     showBufferedMessage();
   }
