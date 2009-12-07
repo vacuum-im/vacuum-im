@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QTextDocument>
+#include <QDesktopServices>
 
 enum TableColumns 
 {
@@ -33,6 +34,7 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
   connect(ui.twtPlugins,SIGNAL(currentItemChanged(QTableWidgetItem *, QTableWidgetItem *)),SLOT(onCurrentPluginChanged(QTableWidgetItem *, QTableWidgetItem *)));
 
   connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
+  connect(ui.lblHomePage, SIGNAL(linkActivated(const QString &)),SLOT(onHomePageLinkActivated(const QString &)));
 }
 
 SetupPluginsDialog::~SetupPluginsDialog()
@@ -105,6 +107,14 @@ void SetupPluginsDialog::saveSettings()
   FPluginManager->setLocale((QLocale::Language)ui.cmbLanguage->itemData(ui.cmbLanguage->currentIndex()).toInt(), (QLocale::Country)ui.cmbCountry->itemData(ui.cmbCountry->currentIndex()).toInt());
 }
 
+QDomElement SetupPluginsDialog::getPluginElement(const QUuid &AUuid) const
+{
+  QDomElement pluginElem = FPluginsSetup.documentElement().firstChildElement();
+  while (!pluginElem.isNull() && AUuid!=pluginElem.attribute("uuid"))
+    pluginElem = pluginElem.nextSiblingElement();
+  return pluginElem;
+}
+
 void SetupPluginsDialog::onCurrentLanguageChanged(int AIndex)
 {
   ui.cmbCountry->clear();
@@ -131,17 +141,44 @@ void SetupPluginsDialog::onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTab
   {
     QDomElement pluginElem = FItemElement.value(nameItem);
 
-    ui.lblName->setText(QString("<b>%1</b>").arg(Qt::escape(pluginElem.firstChildElement("name").text())));
+    ui.lblName->setText(QString("<b>%1</b> %2").arg(Qt::escape(pluginElem.firstChildElement("name").text())).arg(Qt::escape(pluginElem.firstChildElement("version").text())));
     ui.lblDescription->setText(Qt::escape(pluginElem.firstChildElement("desc").text()));
-    ui.lblVersion->setText(Qt::escape(pluginElem.firstChildElement("version").text()));
     ui.lblError->setText(Qt::escape(pluginElem.firstChildElement("error").text()));
+    ui.lblError->setVisible(!ui.lblError->text().isEmpty());
+    ui.lblLabelError->setVisible(ui.lblError->isVisible());
+
+    ui.ltwDepends->clear();
+    QDomElement dependsElem = pluginElem.firstChildElement("depends").firstChildElement("uuid");
+    while (!dependsElem.isNull())
+    {
+      QDomElement dpluginElem = getPluginElement(dependsElem.text());
+      QListWidgetItem *dItem = new QListWidgetItem(!dpluginElem.isNull() ? dpluginElem.firstChildElement("name").text() : dependsElem.text());
+      QPalette::ColorGroup cg = FPluginManager->pluginInstance(dependsElem.text())!=NULL ? QPalette::Active : QPalette::Disabled;
+      dItem->setForeground(ui.ltwDepends->palette().color(cg, QPalette::Text));
+      ui.ltwDepends->addItem(dItem);
+      dependsElem = dependsElem.nextSiblingElement("uuid");
+    }
+
+    ui.ltwDepend->clear();
+    QDomElement dpluginElem = FPluginsSetup.documentElement().firstChildElement();
+    while (!dpluginElem.isNull())
+    {
+      QDomElement dependsElem = dpluginElem.firstChildElement("depends").firstChildElement("uuid");
+      while (!dependsElem.isNull())
+      {
+        if (pluginElem.attribute("uuid") == dependsElem.text())
+        {
+          ui.ltwDepend->addItem(dpluginElem.firstChildElement("name").text());
+          break;
+        }
+        dependsElem = dependsElem.firstChildElement("uuid");
+      }
+      dpluginElem = dpluginElem.nextSiblingElement();
+    }
 
     const IPluginInfo *info = FPluginManager->pluginInfo(pluginElem.attribute("uuid"));
     if (info)
-    {
-      ui.lblAuthor->setText(Qt::escape(info->author));
       ui.lblHomePage->setText(QString("<a href='%1'>%1</a>").arg(Qt::escape(info->homePage.toString())));
-    }
   }
 }
 
@@ -162,4 +199,9 @@ void SetupPluginsDialog::onDialogButtonClicked(QAbstractButton *AButton)
   default:
     reject();
   }
+}
+
+void SetupPluginsDialog::onHomePageLinkActivated(const QString &ALink)
+{
+  QDesktopServices::openUrl(ALink);
 }

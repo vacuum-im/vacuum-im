@@ -20,10 +20,12 @@ protected:
   void updateLanguage();
   void updatePlugins();
   void saveSettings();
+  QDomElement getPluginElement(const QUuid &AUuid) const;
 protected slots:
   void onCurrentLanguageChanged(int AIndex);
   void onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTableWidgetItem *APrevious);
   void onDialogButtonClicked(QAbstractButton *AButton);
+  void onHomePageLinkActivated(const QString &ALink);
 private:
   Ui::SetupPluginsDialogClass ui;
 private:

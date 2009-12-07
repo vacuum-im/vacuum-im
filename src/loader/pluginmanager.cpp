@@ -496,6 +496,14 @@ QDomElement PluginManager::savePluginInfo(const QString &AFile, const IPluginInf
   else
     versionElem.firstChild().toCharacterData().setData(AInfo->version);
 
+  pluginElem.removeChild(pluginElem.firstChildElement("depends"));
+  if (!AInfo->dependences.isEmpty())
+  {
+    QDomElement dependsElem = pluginElem.appendChild(FPluginsSetup.createElement("depends")).toElement();
+    foreach(QUuid uid, AInfo->dependences)
+      dependsElem.appendChild(FPluginsSetup.createElement("uuid")).appendChild(FPluginsSetup.createTextNode(uid.toString()));
+  }
+
   pluginElem.removeChild(pluginElem.firstChildElement("error"));
 
   return pluginElem;
