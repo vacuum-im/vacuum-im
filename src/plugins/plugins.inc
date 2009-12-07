@@ -4,7 +4,7 @@ TEMPLATE          = lib
 CONFIG           += plugin
 QT               += network xml
 LIBS             += -L../../libs
-LIBS             += -lvacuumutils
+LIBS             += -l$$TARGET_UTILS
 DEPENDPATH       += ../..
 INCLUDEPATH      += ../..
 win32:DLLDESTDIR  = ../../../plugins
@@ -19,7 +19,7 @@ include(../install.inc)
 target.path       = $$INSTALL_PLUGINS
 INSTALLS          = target
 
-#MaxOS Changes
+#MaxOS Install
 macx {
   name_tool.path  = $$INSTALL_PLUGINS
   name_tool.extra = install_name_tool -change lib$${TARGET_UTILS}.1.dylib @executable_path/../Frameworks/lib$${TARGET_UTILS}.1.dylib $$INSTALL_PLUGINS/lib$${TARGET}.dylib

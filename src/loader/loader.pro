@@ -4,7 +4,7 @@ TARGET             = $$TARGET_LOADER
 TEMPLATE           = app
 QT                += xml
 LIBS              += -L../libs
-LIBS              += -lvacuumutils
+LIBS              += -l$$TARGET_UTILS
 DEPENDPATH        += ..
 INCLUDEPATH       += ..
 DESTDIR            = ../..
@@ -12,6 +12,7 @@ include(loader.pri)
 
 #Appication icon
 win32:RC_FILE      = loader.rc
+macx:ICON          = ../../vacuum.icns
 
 #SVN Info
 SVN_REVISION=$$system(svnversion -n)
@@ -40,8 +41,12 @@ resources.path     = $$INSTALL_RESOURCES
 resources.files    = ../../resources/*
 INSTALLS           = target translations resources
 
-#MaxOS Changes
+#MaxOS Install
 macx {
+  lib_utils.path   = $$INSTALL_LIBS
+  lib_utils.files  = ../libs/$$TARGET_UTILS/*
+  INSTALLS        += lib_utils
+
   name_tool.path   = $$INSTALL_BINS
   name_tool.extra  = install_name_tool -change lib$${TARGET_UTILS}.1.dylib @executable_path/../Frameworks/lib$${TARGET_UTILS}.1.dylib $$INSTALL_BINS/$$INSTALL_DIR/Contents/MacOS/$$TARGET_LOADER
   INSTALLS        += name_tool
