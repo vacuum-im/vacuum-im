@@ -92,18 +92,6 @@
         <translation>Настроить плагины</translation>
     </message>
     <message>
-        <source>Version:</source>
-        <translation>Версия:</translation>
-    </message>
-    <message>
-        <source>Author:</source>
-        <translation>Автор:</translation>
-    </message>
-    <message>
-        <source>Home Page:</source>
-        <translation>Домашняя страница:</translation>
-    </message>
-    <message>
         <source>Error Message:</source>
         <translation>Сообщение об ошибке:</translation>
     </message>
@@ -118,6 +106,18 @@
     <message>
         <source>Country:</source>
         <translation>Страна:</translation>
+    </message>
+    <message>
+        <source>Home page:</source>
+        <translation>Домашняя страница:</translation>
+    </message>
+    <message>
+        <source>Depends</source>
+        <translation>Зависит</translation>
+    </message>
+    <message>
+        <source>Depend</source>
+        <translation>Зависят</translation>
     </message>
 </context>
 </TS>
