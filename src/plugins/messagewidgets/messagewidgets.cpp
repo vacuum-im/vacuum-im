@@ -3,6 +3,7 @@
 #define SVN_TAB_WINDOWS_ENABLED     "tabWindowsEnabled"
 #define SVN_CHATWINDOW_SHOW_STATUS  "chatWindowShowStatus"
 #define SVN_EDITOR_AUTO_RESIZE      "editorAutoResize"
+#define SVN_SHOW_INFO_WIDGET        "showInfoWidget"
 #define SVN_EDITOR_MINIMUM_LINES    "editorMinimumLines"
 #define SVN_EDITOR_SEND_KEY         "editorSendKey"
 #define SVN_DEFAULT_TABWINDOW       "defaultTabWindow"
@@ -21,6 +22,7 @@ MessageWidgets::MessageWidgets()
   FTabWindowsEnabled = true;
   FChatWindowShowStatus = true;
   FEditorAutoResize = true;
+  FShowInfoWidgetInChatWindow = true;
   FEditorMinimumLines = 1;
   FEditorSendKey = Qt::Key_Return;
 }
@@ -364,6 +366,20 @@ void MessageWidgets::setEditorAutoResize(bool AResize)
   }
 }
 
+bool MessageWidgets::showInfoWidgetInChatWindow() const
+{
+  return FShowInfoWidgetInChatWindow;
+}
+
+void MessageWidgets::setShowInfoWidgetInChatWindow(bool AShow)
+{
+  if (FShowInfoWidgetInChatWindow != AShow)
+  {
+    FShowInfoWidgetInChatWindow = AShow;
+    emit showInfoWidgetInChatWindowChanged(AShow);
+  }
+}
+
 int MessageWidgets::editorMinimumLines() const
 {
   return FEditorMinimumLines;
@@ -500,6 +516,7 @@ void MessageWidgets::onSettingsOpened()
   setTabWindowsEnabled(settings->value(SVN_TAB_WINDOWS_ENABLED,true).toBool());
   setChatWindowShowStatus(settings->value(SVN_CHATWINDOW_SHOW_STATUS,true).toBool());
   setEditorAutoResize(settings->value(SVN_EDITOR_AUTO_RESIZE,true).toBool());
+  setShowInfoWidgetInChatWindow(settings->value(SVN_SHOW_INFO_WIDGET,true).toBool());
   setEditorMinimumLines(settings->value(SVN_EDITOR_MINIMUM_LINES,1).toInt());
   setEditorSendKey(QKeySequence::fromString(settings->value(SVN_EDITOR_SEND_KEY,FEditorSendKey.toString()).toString()));
 
@@ -519,6 +536,7 @@ void MessageWidgets::onSettingsClosed()
   settings->setValue(SVN_DEFAULT_TABWINDOW,FDefaultTabWindow.toString());
   settings->setValue(SVN_CHATWINDOW_SHOW_STATUS,chatWindowShowStatus());
   settings->setValue(SVN_EDITOR_AUTO_RESIZE,editorAutoResize());
+  settings->setValue(SVN_SHOW_INFO_WIDGET,showInfoWidgetInChatWindow());
   settings->setValue(SVN_EDITOR_MINIMUM_LINES,editorMinimumLines());
   settings->setValue(SVN_EDITOR_SEND_KEY,FEditorSendKey.toString());
 

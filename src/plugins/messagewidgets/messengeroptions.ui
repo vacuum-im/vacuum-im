@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>339</width>
-    <height>123</height>
+    <height>148</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -32,6 +32,13 @@
     <widget class="QCheckBox" name="chbEditorAutoResize">
      <property name="text">
       <string>Auto resize input field</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbShowInfoWidget">
+     <property name="text">
+      <string>Show contact information in chat window</string>
      </property>
     </widget>
    </item>

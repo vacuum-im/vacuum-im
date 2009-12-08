@@ -58,6 +58,7 @@ protected:
 protected slots:
   void onMessageReady();
   void onStreamJidChanged(const Jid &ABefour);
+  void onShowInfoWidgetChanged(bool AShow);
 private:
   Ui::ChatWindowClass ui;
 private:

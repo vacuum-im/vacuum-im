@@ -23,6 +23,8 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
   ui.wdtInfo->setLayout(new QVBoxLayout);
   ui.wdtInfo->layout()->setMargin(0);
   ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
+  onShowInfoWidgetChanged(FMessageWidgets->showInfoWidgetInChatWindow());
+  connect(FMessageWidgets->instance(),SIGNAL(showInfoWidgetInChatWindowChanged(bool)),SLOT(onShowInfoWidgetChanged(bool)));
 
   FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid);
   ui.wdtView->setLayout(new QVBoxLayout);
@@ -226,3 +228,7 @@ void ChatWindow::onStreamJidChanged(const Jid &ABefour)
   }
 }
 
+void ChatWindow::onShowInfoWidgetChanged(bool AShow)
+{
+  FInfoWidget->instance()->setVisible(AShow);
+}
