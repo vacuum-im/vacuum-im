@@ -1,10 +1,12 @@
 #include "streamdialog.h"
 
+#include <QUrl>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QVBoxLayout>
+#include <QDesktopServices>
 
 StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer, 
                            IFileStream *AFileStream, QWidget *AParent) : QDialog(AParent)
@@ -256,6 +258,8 @@ void StreamDialog::onStreamStateChanged()
     ui.grbMethods->setVisible(false);
     if (FFileStream->streamKind()==IFileStream::SendFile && FFileStream->streamState()==IFileStream::Aborted)
       ui.bbxButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
+    else if (FFileStream->streamKind()==IFileStream::ReceiveFile && FFileStream->streamState()==IFileStream::Finished)
+      ui.bbxButtons->setStandardButtons(QDialogButtonBox::Open|QDialogButtonBox::Close);
     else
       ui.bbxButtons->setStandardButtons(QDialogButtonBox::Close);
     break;
@@ -360,6 +364,10 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
   {
     FFileTransfer->sendFile(FFileStream->streamJid(), FFileStream->contactJid(), FFileStream->fileName(), FFileStream->fileDescription());
     close();
+  }
+  else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Open)
+  {
+    QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(FFileStream->fileName()).absolutePath()));
   }
   else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Close)
   {
