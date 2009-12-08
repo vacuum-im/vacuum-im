@@ -42,12 +42,16 @@ resources.files    = ../../resources/*
 INSTALLS           = target translations resources
 
 #MaxOS Install
-macx {
+#macx {
+  UTILS_LIB_NAME   = lib$${TARGET_UTILS}.1.0.0.dylib
+  UTILS_LIB_LINK   = lib$${TARGET_UTILS}.1.dylib
+
   lib_utils.path   = $$INSTALL_LIBS
-  lib_utils.files  = ../libs/$$TARGET_UTILS/*
+  lib_utils.extra  = cp -f ../libs/$$TARGET_UTILS/$$UTILS_LIB_NAME $$INSTALL_LIBS/$$UTILS_LIB_NAME && \
+                     ln -sf $$UTILS_LIB_NAME $$INSTALL_LIBS/$$UTILS_LIB_LINK
   INSTALLS        += lib_utils
 
   name_tool.path   = $$INSTALL_BINS
-  name_tool.extra  = install_name_tool -change lib$${TARGET_UTILS}.1.dylib @executable_path/../Frameworks/lib$${TARGET_UTILS}.1.dylib $$INSTALL_BINS/$$INSTALL_DIR/Contents/MacOS/$$TARGET_LOADER
+  name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $$INSTALL_BINS/$$INSTALL_DIR/Contents/MacOS/$$TARGET_LOADER
   INSTALLS        += name_tool
-}
+#}
