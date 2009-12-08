@@ -295,6 +295,8 @@ public:
   virtual void setChatWindowShowStatus(bool AShow) =0;
   virtual bool editorAutoResize() const =0;
   virtual void setEditorAutoResize(bool AResize) =0;
+  virtual bool showInfoWidgetInChatWindow() const =0;
+  virtual void setShowInfoWidgetInChatWindow(bool AShow) =0;
   virtual int editorMinimumLines() const =0;
   virtual void setEditorMinimumLines(int ALines) =0;
   virtual QKeySequence editorSendKey() const =0;
@@ -322,6 +324,7 @@ signals:
   virtual void defaultTabWindowChanged(const QUuid &AWindowId) =0;
   virtual void chatWindowShowStatusChanged(bool AShow) =0;
   virtual void editorAutoResizeChanged(bool AResize) =0;
+  virtual void showInfoWidgetInChatWindowChanged(bool AShow) =0;
   virtual void editorMinimumLinesChanged(int ALines) =0;
   virtual void editorSendKeyChanged(const QKeySequence &AKey) =0;
   virtual void urlHandlerInserted(IWidgetUrlHandler *AHandler, int AOrder) =0;

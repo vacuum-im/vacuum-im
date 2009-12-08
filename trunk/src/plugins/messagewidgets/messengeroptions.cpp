@@ -11,6 +11,7 @@ MessengerOptions::MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AP
   ui.chbTabWindowsEnabled->setChecked(FMessageWidgets->tabWindowsEnabled());
   ui.chbChatWindowShowStatus->setChecked(FMessageWidgets->chatWindowShowStatus());
   ui.chbEditorAutoResize->setChecked(FMessageWidgets->editorAutoResize());
+  ui.chbShowInfoWidget->setChecked(FMessageWidgets->showInfoWidgetInChatWindow());
   ui.spbEditorMinimumLines->setValue(FMessageWidgets->editorMinimumLines());
   FSendKey = FMessageWidgets->editorSendKey();
   ui.lneEditorSendKey->setText(FSendKey.toString());
@@ -27,6 +28,7 @@ void MessengerOptions::apply()
   FMessageWidgets->setTabWindowsEnabled(ui.chbTabWindowsEnabled->isChecked());
   FMessageWidgets->setChatWindowShowStatus(ui.chbChatWindowShowStatus->isChecked());
   FMessageWidgets->setEditorAutoResize(ui.chbEditorAutoResize->isChecked());
+  FMessageWidgets->setShowInfoWidgetInChatWindow(ui.chbShowInfoWidget->isChecked());
   FMessageWidgets->setEditorMinimumLines(ui.spbEditorMinimumLines->value());
   FMessageWidgets->setEditorSendKey(FSendKey);
   emit optionsAccepted();

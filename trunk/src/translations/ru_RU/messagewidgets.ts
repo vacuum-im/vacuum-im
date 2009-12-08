@@ -115,6 +115,10 @@
         <source>Minimum input field lines:</source>
         <translation>Минимальное число строк в поле воода:</translation>
     </message>
+    <message>
+        <source>Show contact information in chat window</source>
+        <translation>Показывать информацию о контакте в окне чата</translation>
+    </message>
 </context>
 <context>
     <name>ReceiversWidget</name>

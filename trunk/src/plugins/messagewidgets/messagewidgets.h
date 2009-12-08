@@ -79,6 +79,8 @@ public:
   virtual void setChatWindowShowStatus(bool AShow);
   virtual bool editorAutoResize() const;
   virtual void setEditorAutoResize(bool AResize);
+  virtual bool showInfoWidgetInChatWindow() const;
+  virtual void setShowInfoWidgetInChatWindow(bool AShow);
   virtual int editorMinimumLines() const;
   virtual void setEditorMinimumLines(int ALines);
   virtual QKeySequence editorSendKey() const;
@@ -106,6 +108,7 @@ signals:
   virtual void defaultTabWindowChanged(const QUuid &AWindowId);
   virtual void chatWindowShowStatusChanged(bool AShow);
   virtual void editorAutoResizeChanged(bool AResize);
+  virtual void showInfoWidgetInChatWindowChanged(bool AShow);
   virtual void editorMinimumLinesChanged(int ALines);
   virtual void editorSendKeyChanged(const QKeySequence &AKey);
   virtual void urlHandlerInserted(IWidgetUrlHandler *AHandler, int AOrder);
@@ -140,6 +143,7 @@ private:
   bool FTabWindowsEnabled;
   bool FChatWindowShowStatus;
   bool FEditorAutoResize;
+  bool FShowInfoWidgetInChatWindow;
   int FEditorMinimumLines;
   QKeySequence FEditorSendKey;
 private:
