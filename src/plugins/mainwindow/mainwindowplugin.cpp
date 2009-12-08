@@ -132,8 +132,13 @@ void MainWindowPlugin::onProfileRenamed(const QString &AProfileFrom, const QStri
 
 void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
-  if (ANotifyId==0 && AReason==QSystemTrayIcon::DoubleClick)
-    showMainWindow();
+  if (ANotifyId==0 && AReason==QSystemTrayIcon::Trigger)
+  {
+    if (!FMainWindow->isVisible())
+      showMainWindow();
+    else
+      FMainWindow->close();
+  }
 }
 
 void MainWindowPlugin::onShowMainWindowByAction(bool)
