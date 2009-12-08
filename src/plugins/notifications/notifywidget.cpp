@@ -18,7 +18,7 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
   setAttribute(Qt::WA_ShowWithoutActivating,true);
-  setWindowFlags(Qt::SplashScreen|Qt::WindowStaysOnTopHint);
+  setWindowFlags(Qt::ToolTip|Qt::WindowStaysOnTopHint);
   
   QPalette pallete = ui.frmWindowFrame->palette();
   pallete.setColor(QPalette::Window, pallete.color(QPalette::Base));
