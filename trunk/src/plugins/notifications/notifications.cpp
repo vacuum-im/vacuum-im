@@ -403,7 +403,7 @@ void Notifications::onRosterNotifyRemoved(IRosterIndex * /*AIndex*/, int ANotify
 
 void Notifications::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
-  if (AReason == QSystemTrayIcon::DoubleClick)
+  if (AReason == QSystemTrayIcon::Trigger)
   {
     activateNotification(notifyIdByTrayId(ANotifyId));
   }
