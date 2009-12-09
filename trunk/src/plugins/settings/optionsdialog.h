@@ -1,25 +1,12 @@
 #ifndef OPTIONSDIALOG_H
 #define OPTIONSDIALOG_H
 
-#include <QHash>
-#include <QLabel>
-#include <QDialog>
-#include <QTreeView>
-#include <QScrollArea>
-#include <QStackedWidget>
-#include <QDialogButtonBox>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <utils/iconstorage.h>
-
-struct OptionsNode {
-  int order;
-  QString icon;
-  QString name;
-  QString desc;
-};
+#include "ui_optionsdialog.h"
 
 class SettingsPlugin;
 
@@ -55,16 +42,13 @@ protected slots:
   void onDialogButtonClicked(QAbstractButton *AButton);
   void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious);
 private:
+  Ui::OptionsDialogClass ui;
+private:
   SettingsPlugin *FSettingsPlugin;
 private:
-  QLabel *lblInfo;
-  QTreeView *trvNodes;
-  QScrollArea *scaScroll;
-  QDialogButtonBox *dbbButtons;
-  QStandardItemModel *simNodes;
+  QStandardItemModel *FNodesModel;
   SortFilterProxyModel *FProxyModel;
 private:
-  QMap<QString, OptionsNode *> FNodes;
   QMap<QString, QStandardItem *> FNodeItems;
   QMap<QStandardItem *, QWidget *> FItemWidget;
 };

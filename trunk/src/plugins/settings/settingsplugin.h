@@ -21,6 +21,13 @@
 #include "profiledialog.h"
 #include "miscoptionswidget.h"
 
+struct OptionsNode {
+  int order;
+  QString icon;
+  QString name;
+  QString desc;
+};
+
 class SettingsPlugin : 
   public QObject,
   public IPlugin,

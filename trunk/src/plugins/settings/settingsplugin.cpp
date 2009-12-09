@@ -13,8 +13,6 @@
 
 #define ADR_PROFILE                     Action::DR_Parametr1
 
-#define BDI_OPTIONS_DIALOG_GEOMETRY     "Settings::OptionsDialogGeometry"
-
 SettingsPlugin::SettingsPlugin()
 {
   FPluginManager = NULL;
@@ -457,9 +455,6 @@ QDialog *SettingsPlugin::openOptionsDialog(const QString &ANode, QWidget *AParen
     connect(FOptionsDialog, SIGNAL(rejected()),SLOT(onOptionsDialogRejected()));
     connect(FOptionsDialog, SIGNAL(closed()),SLOT(onOptionsDialogClosed()));
 
-    ISettings *settings = settingsForPlugin(SETTINGS_UUID);
-    FOptionsDialog->restoreGeometry(settings->loadBinaryData(BDI_OPTIONS_DIALOG_GEOMETRY));
-
     QMap<QString, OptionsNode *>::const_iterator it = FNodes.constBegin();
     while (it != FNodes.constEnd())
     {
@@ -513,7 +508,7 @@ void SettingsPlugin::setProfileClosed()
   if (FProfileOpened)
   {
     if (!FOptionsDialog.isNull())
-      FOptionsDialog->reject();
+      delete FOptionsDialog;
     emit profileClosed(profile());
     emit settingsClosed();
     saveSettings();
@@ -612,8 +607,6 @@ void SettingsPlugin::onOptionsDialogRejected()
 
 void SettingsPlugin::onOptionsDialogClosed()
 {
-  ISettings *settings = settingsForPlugin(SETTINGS_UUID);
-  settings->saveBinaryData(BDI_OPTIONS_DIALOG_GEOMETRY, FOptionsDialog->saveGeometry());
   emit optionsDialogClosed();
 }
 
