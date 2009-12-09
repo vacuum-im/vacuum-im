@@ -19,17 +19,13 @@ VersionParser::VersionParser(const QString &AVersion)
     FBuild = parts[3].toInt();
 }
 
-VersionParser::VersionParser(qint16 AMajor, 
-                             qint16 AMinor, 
-                             qint16 ARelease, 
-                             qint16 ABuild)
+VersionParser::VersionParser(qint16 AMajor, qint16 AMinor, qint16 ARelease, qint16 ABuild)
 {
   FMajor = AMajor;
   FMinor = AMinor;
   FRelease = ARelease;
   FBuild = ABuild;
 }
-
 
 VersionParser::~VersionParser()
 {
@@ -68,16 +64,16 @@ qint64 VersionParser::version() const
 
 QString VersionParser::toString(Part toPart) const 
 {
-  if (toPart == MAJOR)
+  if (toPart == VPP_MAJOR)
     return QString("%1").arg(FMajor);
 
-  if (toPart == MINOR)
+  if (toPart == VPP_MINOR)
     return QString("%1.%2").arg(FMajor).arg(FMinor); 
 
-  if (toPart == RELEASE)
+  if (toPart == VPP_RELEASE)
     return QString("%1.%2.%3").arg(FMajor).arg(FMinor).arg(FRelease); 
 
-  if (toPart == BUILD)
+  if (toPart == VPP_BUILD)
     return QString("%1.%2.%3.%4").arg(FMajor).arg(FMinor).arg(FRelease).arg(FBuild);
 
   return QString();
@@ -121,4 +117,3 @@ bool VersionParser::operator >=(const VersionParser &AVersion) const
 {
   return version() >= AVersion.version(); 
 }
-
