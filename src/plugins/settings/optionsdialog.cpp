@@ -1,15 +1,11 @@
 #include "optionsdialog.h"
 
-#include <QLabel>
-#include <QFrame>
-#include <QScrollBar>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
 #include <QHeaderView>
-#include <QApplication>
 #include <QTextDocument>
 #include "settingsplugin.h"
+
+#define BDI_OPTIONS_DIALOG_GEOMETRY     "Settings::OptionsDialogGeometry"
+#define BDI_OPTIONS_DIALOG_SPLITTER     "Settings::OptionsDialogSplitter"
 
 enum StandardItemRoles {
   SIR_NODE = Qt::UserRole+1,
@@ -28,82 +24,48 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 
 OptionsDialog::OptionsDialog(SettingsPlugin *ASessingsPlugin, QWidget *AParent) : QDialog(AParent)
 {
+  ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Options"));
   IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SETTINGS_OPTIONS,0,0,"windowIcon");
+  
+  delete ui.scaScroll->takeWidget();
+  ui.trvNodes->sortByColumn(0,Qt::AscendingOrder);
 
   FSettingsPlugin = ASessingsPlugin;
+  ISettings *settings = FSettingsPlugin->settingsForPlugin(SETTINGS_UUID);
+  restoreGeometry(settings->loadBinaryData(BDI_OPTIONS_DIALOG_GEOMETRY));
+  if (!ui.sprSplitter->restoreState(settings->loadBinaryData(BDI_OPTIONS_DIALOG_SPLITTER)))
+    ui.trvNodes->setMaximumWidth(150);
 
-  lblInfo = new QLabel(this);
-  lblInfo->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-  lblInfo->setFrameStyle(QFrame::Box);
-  lblInfo->setFrameShadow(QFrame::Sunken);
+  FNodesModel = new QStandardItemModel(ui.trvNodes);
+  FNodesModel->setColumnCount(1);
 
-  scaScroll = new QScrollArea(this);
-  scaScroll->setWidgetResizable(true);
-  scaScroll->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-  QVBoxLayout *vblRight = new QVBoxLayout;
-  vblRight->addWidget(lblInfo);
-  vblRight->addWidget(scaScroll);
-
-  trvNodes = new QTreeView(this);
-  trvNodes->header()->hide();
-  trvNodes->setIndentation(12);
-  trvNodes->setMaximumWidth(160);
-  trvNodes->setSortingEnabled(true);
-  trvNodes->sortByColumn(0,Qt::AscendingOrder);
-  trvNodes->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  trvNodes->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Expanding);
-
-  simNodes = new QStandardItemModel(trvNodes);
-  simNodes->setColumnCount(1);
-
-  FProxyModel = new SortFilterProxyModel(simNodes);
-  FProxyModel->setSourceModel(simNodes);
+  FProxyModel = new SortFilterProxyModel(FNodesModel);
+  FProxyModel->setSourceModel(FNodesModel);
   FProxyModel->setSortLocaleAware(true);
   FProxyModel->setDynamicSortFilter(true);
   FProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 
-  QHBoxLayout *hblCentral = new QHBoxLayout;
-  hblCentral->addWidget(trvNodes);
-  hblCentral->addLayout(vblRight);
-
-  dbbButtons = new QDialogButtonBox(Qt::Horizontal,this);
-  dbbButtons->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
-  connect(dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
-
-  QVBoxLayout *vblMain = new QVBoxLayout;
-  vblMain->addLayout(hblCentral);
-  vblMain->addWidget(dbbButtons);
-  vblMain->setMargin(3);
-
-  setLayout(vblMain);
-  resize(600,600);
-
-  trvNodes->setModel(FProxyModel);
-  connect(trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
+  ui.trvNodes->setModel(FProxyModel);
+  connect(ui.trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
     SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
+  connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 }
 
 OptionsDialog::~OptionsDialog()
 {
+  ISettings *settings = FSettingsPlugin->settingsForPlugin(SETTINGS_UUID);
+  settings->saveBinaryData(BDI_OPTIONS_DIALOG_GEOMETRY, saveGeometry());
+  settings->saveBinaryData(BDI_OPTIONS_DIALOG_SPLITTER,ui.sprSplitter->saveState());
+
   emit closed();
-  qDeleteAll(FNodes);
 }
 
 void OptionsDialog::openNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIcon, int AOrder)
 {
-  OptionsNode *node = FNodes.value(ANode);
-  if (!node && !ANode.isEmpty() && !AName.isEmpty())
+  if (!FNodeItems.contains(ANode) && !ANode.isEmpty() && !AName.isEmpty())
   {
-    node = new OptionsNode;
-    node->name = AName;
-    node->desc = ADescription;
-    node->icon = AIcon;
-    node->order = AOrder;
-    FNodes.insert(ANode,node);
-
     QStandardItem *nodeItem = createNodeItem(ANode);
     nodeItem->setText(AName);
     nodeItem->setWhatsThis(ADescription);
@@ -116,32 +78,19 @@ void OptionsDialog::openNode(const QString &ANode, const QString &AName, const Q
 
 void OptionsDialog::closeNode(const QString &ANode)
 {
-  QMap<QString, OptionsNode *>::iterator it = FNodes.begin();
-  while (it != FNodes.end())
+  foreach(QString node, FNodeItems.keys())
   {
-    if (it.key().startsWith(ANode))
+    if (node.startsWith(ANode))
     {
-      QStandardItem *nodeItem = FNodeItems.value(it.key());
-      FItemWidget.remove(nodeItem);
-
-      //Delete parent items without widgets
-      while (nodeItem->parent() && nodeItem->parent()->rowCount()==1 && !FItemWidget.contains(nodeItem->parent()))
-      {
-        FNodeItems.remove(nodeItem->parent()->data(SIR_NODE).toString());
-        nodeItem = nodeItem->parent();
-      }
-
-      FNodeItems.remove(it.key());
+      QStandardItem *nodeItem = FNodeItems.value(node);
       if (nodeItem->parent())
         nodeItem->parent()->removeRow(nodeItem->row());
       else
-        simNodes->takeItem(nodeItem->row());
+        delete FNodesModel->takeItem(nodeItem->row());
 
-      delete it.value();
-      it = FNodes.erase(it);
+      FItemWidget.remove(nodeItem);
+      FNodeItems.remove(node);
     }
-    else
-      it++;
   }
 }
 
@@ -149,8 +98,8 @@ void OptionsDialog::showNode(const QString &ANode)
 {
   QStandardItem *item = FNodeItems.value(ANode, NULL);
   if (item)
-    trvNodes->setCurrentIndex(FProxyModel->mapFromSource(simNodes->indexFromItem(item)));
-  trvNodes->expandAll();
+    ui.trvNodes->setCurrentIndex(FProxyModel->mapFromSource(FNodesModel->indexFromItem(item)));
+  ui.trvNodes->expandAll();
 }
 
 QStandardItem *OptionsDialog::createNodeItem(const QString &ANode)
@@ -158,7 +107,7 @@ QStandardItem *OptionsDialog::createNodeItem(const QString &ANode)
   QString nodeName;
   QStandardItem *nodeItem = NULL;
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
-  foreach(QString nodeTreeItem,nodeTree)
+  foreach(QString nodeTreeItem, nodeTree)
   {
     if (nodeName.isEmpty())
       nodeName = nodeTreeItem;
@@ -176,7 +125,7 @@ QStandardItem *OptionsDialog::createNodeItem(const QString &ANode)
       else
       {
         nodeItem = new QStandardItem(nodeTreeItem);
-        simNodes->appendRow(nodeItem);
+        FNodesModel->appendRow(nodeItem);
       }
       nodeItem->setData(nodeName,SIR_NODE);
       FNodeItems.insert(nodeName,nodeItem);
@@ -219,12 +168,12 @@ bool OptionsDialog::canExpandVertically(const QWidget *AWidget) const
 void OptionsDialog::showEvent(QShowEvent *AEvent)
 {
   QDialog::showEvent(AEvent);
-  trvNodes->setCurrentIndex(FProxyModel->mapFromSource(simNodes->indexFromItem(simNodes->item(0))));
+  ui.trvNodes->setCurrentIndex(FProxyModel->mapFromSource(FNodesModel->indexFromItem(FNodesModel->item(0))));
 }
 
 void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
 {
-  switch(dbbButtons->buttonRole(AButton))
+  switch(ui.dbbButtons->buttonRole(AButton))
   {
   case QDialogButtonBox::AcceptRole:
     accept();
@@ -240,9 +189,10 @@ void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
   }
 }
 
-void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &/*APrevious*/)
+void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious)
 {
-  QStandardItem *curItem = simNodes->itemFromIndex(FProxyModel->mapToSource(ACurrent));
+  Q_UNUSED(APrevious);
+  QStandardItem *curItem = FNodesModel->itemFromIndex(FProxyModel->mapToSource(ACurrent));
 
   if (curItem && !FItemWidget.contains(curItem))
   {
@@ -257,19 +207,14 @@ void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QMod
   if (curWidget)
   {
     QString node = curItem->data(SIR_NODE).toString();
-    lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(Qt::escape(curItem->data(SIR_DESC).toString())));
-    scaScroll->takeWidget();
-    scaScroll->setWidget(curWidget);
-    int addWidth = curWidget->sizeHint().width() - scaScroll->width();
-    addWidth += QApplication::style()->pixelMetric(QStyle::PM_ScrollBarExtent);
-    addWidth += QApplication::style()->pixelMetric(QStyle::PM_DefaultFrameWidth)*2;
-    if (addWidth > 0)
-      resize(width()+addWidth,height());
+    ui.lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(Qt::escape(curItem->data(SIR_DESC).toString())));
+    ui.scaScroll->takeWidget();
+    ui.scaScroll->setWidget(curWidget);
   }
   else if (curItem)
   {
     QString node = curItem->data(SIR_NODE).toString();
-    lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(tr("No Settings Available")));
-    scaScroll->takeWidget();
+    ui.lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(node))).arg(tr("No Settings Available")));
+    ui.scaScroll->takeWidget();
   }
 }

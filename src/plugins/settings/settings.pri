@@ -1,4 +1,5 @@
-FORMS = profiledialog.ui \
+FORMS = optionsdialog.ui \
+        profiledialog.ui \
         miscoptionswidget.ui
 
 HEADERS = settings.h \
