@@ -82,9 +82,10 @@ public:
   virtual QIcon contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual QString contactName(const Jid &AStreamJId, const Jid &AContactJid) const;
 signals:
-  virtual void notificationAppended(int ANotifyId);
   virtual void notificationActivated(int ANotifyId);
   virtual void notificationRemoved(int ANotifyId);
+  virtual void notificationAppend(int ANotifyId, INotification &ANotification);
+  virtual void notificationAppended(int ANotifyId, const INotification &ANotification);
   virtual void optionChanged(INotifications::Option AOption, bool AValue);
   //IOptionsHolder
   virtual void optionsAccepted();
