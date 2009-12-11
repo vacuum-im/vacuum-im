@@ -41,6 +41,18 @@ resources.path     = $$INSTALL_RESOURCES
 resources.files    = ../../resources/*
 INSTALLS           = target translations resources
 
+#Unix Install
+unix {
+  LD_CONFIG_PATH   = /etc/ld.so.conf.d
+  LD_CONFIG_FILE   = $${LD_CONFIG_PATH}/$${INSTALL_DIR}.conf
+
+  ld_config.path   = $$LD_CONFIG_PATH
+  ld_config.extra  = rm -f $$LD_CONFIG_FILE && \
+                     echo $${INSTALL_LIBS} >> $$LD_CONFIG_FILE && \
+                     ldconfig
+  INSTALLS        += ld_config
+}
+
 #MaxOS Install
 macx {
   UTILS_LIB_NAME   = lib$${TARGET_UTILS}.1.0.0.dylib

@@ -8,7 +8,7 @@ win32 {
 
 unix {
   INSTALL_BINS          = $$INSTALL_PREFIX/bin
-  INSTALL_LIBS          = $$INSTALL_PREFIX/lib
+  INSTALL_LIBS          = $$INSTALL_PREFIX/lib/$$INSTALL_DIR
   INSTALL_PLUGINS       = $$INSTALL_PREFIX/lib/$$INSTALL_DIR/plugins
   INSTALL_RESOURCES     = $$INSTALL_PREFIX/share/$$INSTALL_DIR/resources
   INSTALL_TRANSLATIONS  = $$INSTALL_PREFIX/share/$$INSTALL_DIR/translations
