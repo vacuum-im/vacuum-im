@@ -16,7 +16,7 @@ class ChatWindowMenu :
 {
   Q_OBJECT;
 public:
-  ChatWindowMenu(IMessageArchiver *AArchiver, IToolBarWidget *AToolBarWidget, QWidget *AParent);
+  ChatWindowMenu(IMessageArchiver *AArchiver, IStatusBarWidget *AStatusBarWidget, QWidget *AParent);
   ~ChatWindowMenu();
 protected:
   void initialize();
@@ -32,7 +32,7 @@ protected slots:
   void onEditWidgetContactJidChanged(const Jid &ABefour);
 private:
   IEditWidget *FEditWidget;
-  IToolBarWidget *FToolBarWidget;
+  IStatusBarWidget *FStatusBarWidget;
   IDataForms *FDataForms;
   IMessageArchiver *FArchiver;
   IServiceDiscovery *FDiscovery;

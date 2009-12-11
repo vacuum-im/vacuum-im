@@ -38,7 +38,7 @@ CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileNa
 CollectionWriter::~CollectionWriter()
 {
   stopCollection();
-  emit destroyed(FStreamJid, this);
+  emit writerDestroyed(this);
 }
 
 bool CollectionWriter::isOpened() const
@@ -103,11 +103,6 @@ bool CollectionWriter::writeNote(const QString &ANote)
   return false;
 }
 
-void CollectionWriter::close()
-{
-  stopCollection();
-}
-
 void CollectionWriter::startCollection()
 {
   FCloseTimer.stop();
@@ -143,7 +138,6 @@ void CollectionWriter::stopCollection()
   {
     QFile::remove(FFileName);
   }
-  deleteLater();
 }
 
 void CollectionWriter::writeElementChilds(const QDomElement &AElem)
