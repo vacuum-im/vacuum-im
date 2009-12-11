@@ -7,16 +7,22 @@
 class UTILS_EXPORT VersionParser 
 {
 public:
-  enum Part {VPP_MAJOR, VPP_MINOR, VPP_RELEASE, VPP_BUILD};
+  enum Part {
+    MajorVersion, 
+    MinorVersion, 
+    ReleaseNumber, 
+    BuildNumber
+  };
+public:
   VersionParser(const QString &AVersion);
   VersionParser(qint16 AMajor=0, qint16 AMinor=0, qint16 ARelease=0, qint16 ABuild=0);
   ~VersionParser();
-  qint16 major() const;
-  qint16 minor() const;
-  qint16 release() const;
-  qint16 build() const;
-  qint64 version() const;
-  QString toString(Part toPart = VPP_MINOR) const;
+  qint16 majorVersion() const;
+  qint16 minorVersion() const;
+  qint16 releaseNumber() const;
+  qint16 buildNumber() const;
+  qint64 versionNumber() const;
+  QString toString(Part toPart = MinorVersion) const;
   VersionParser& operator=(const VersionParser &AVersion);
   bool operator ==(const VersionParser &AVersion) const;
   bool operator !=(const VersionParser &AVersion) const;

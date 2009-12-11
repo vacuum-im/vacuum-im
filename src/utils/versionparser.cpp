@@ -32,27 +32,27 @@ VersionParser::~VersionParser()
 
 }
 
-qint16 VersionParser::major() const
+qint16 VersionParser::majorVersion() const
 {
   return FMajor;
 }
 
-qint16 VersionParser::minor() const
+qint16 VersionParser::minorVersion() const
 {
   return FMinor;
 }
 
-qint16 VersionParser::release() const
+qint16 VersionParser::releaseNumber() const
 {
   return FRelease;
 }
 
-qint16 VersionParser::build() const
+qint16 VersionParser::buildNumber() const
 {
   return FBuild;
 }
 
-qint64 VersionParser::version() const
+qint64 VersionParser::versionNumber() const
 {
   qint64 ver;
   ver = FMajor;
@@ -64,16 +64,16 @@ qint64 VersionParser::version() const
 
 QString VersionParser::toString(Part toPart) const 
 {
-  if (toPart == VPP_MAJOR)
+  if (toPart == MajorVersion)
     return QString("%1").arg(FMajor);
 
-  if (toPart == VPP_MINOR)
+  if (toPart == MinorVersion)
     return QString("%1.%2").arg(FMajor).arg(FMinor); 
 
-  if (toPart == VPP_RELEASE)
+  if (toPart == ReleaseNumber)
     return QString("%1.%2.%3").arg(FMajor).arg(FMinor).arg(FRelease); 
 
-  if (toPart == VPP_BUILD)
+  if (toPart == BuildNumber)
     return QString("%1.%2.%3.%4").arg(FMajor).arg(FMinor).arg(FRelease).arg(FBuild);
 
   return QString();
@@ -81,39 +81,39 @@ QString VersionParser::toString(Part toPart) const
 
 VersionParser& VersionParser::operator =(const VersionParser &AVersion)
 {
-  FMajor = AVersion.major();
-  FMinor = AVersion.minor();
-  FRelease = AVersion.release();
-  FBuild = AVersion.build(); 
+  FMajor = AVersion.majorVersion();
+  FMinor = AVersion.minorVersion();
+  FRelease = AVersion.releaseNumber();
+  FBuild = AVersion.buildNumber(); 
   return *this;
 }
 
 bool VersionParser::operator ==(const VersionParser &AVersion) const
 {
-  return version() == AVersion.version(); 
+  return versionNumber() == AVersion.versionNumber(); 
 }
 
 bool VersionParser::operator !=(const VersionParser &AVersion) const
 {
-  return version() != AVersion.version(); 
+  return versionNumber() != AVersion.versionNumber(); 
 }
 
 bool VersionParser::operator <(const VersionParser &AVersion) const
 {
-  return version() < AVersion.version(); 
+  return versionNumber() < AVersion.versionNumber(); 
 }
 
 bool VersionParser::operator <=(const VersionParser &AVersion) const
 {
-  return version() <= AVersion.version(); 
+  return versionNumber() <= AVersion.versionNumber(); 
 }
 
 bool VersionParser::operator >(const VersionParser &AVersion) const
 {
-  return version() > AVersion.version(); 
+  return versionNumber() > AVersion.versionNumber(); 
 }
 
 bool VersionParser::operator >=(const VersionParser &AVersion) const
 {
-  return version() >= AVersion.version(); 
+  return versionNumber() >= AVersion.versionNumber(); 
 }
