@@ -168,24 +168,25 @@ int Notifications::appendNotification(const INotification &ANotification)
   NotifyRecord record;
   int notifyId = ++FNotifyId;
   record.notification = ANotification;
+  emit notificationAppend(notifyId, record.notification);
 
-  QIcon icon = qvariant_cast<QIcon>(ANotification.data.value(NDR_ICON));
-  QString toolTip = ANotification.data.value(NDR_TOOLTIP).toString();
+  QIcon icon = qvariant_cast<QIcon>(record.notification.data.value(NDR_ICON));
+  QString toolTip = record.notification.data.value(NDR_TOOLTIP).toString();
   
   if (FRostersModel && FRostersViewPlugin && checkOption(INotifications::EnableRosterIcons) && 
-    (ANotification.kinds & INotification::RosterIcon)>0)
+    (record.notification.kinds & INotification::RosterIcon)>0)
   {
-    Jid streamJid = ANotification.data.value(NDR_ROSTER_STREAM_JID).toString();
-    Jid contactJid = ANotification.data.value(NDR_ROSTER_CONTACT_JID).toString();
-    int order = ANotification.data.value(NDR_ROSTER_NOTIFY_ORDER).toInt();
+    Jid streamJid = record.notification.data.value(NDR_ROSTER_STREAM_JID).toString();
+    Jid contactJid = record.notification.data.value(NDR_ROSTER_CONTACT_JID).toString();
+    int order = record.notification.data.value(NDR_ROSTER_NOTIFY_ORDER).toInt();
     int flags = IRostersView::LabelBlink|IRostersView::LabelVisible;
     IRosterIndexList indexes = FRostersModel->getContactIndexList(streamJid,contactJid,true);
     record.rosterId = FRostersViewPlugin->rostersView()->appendNotify(indexes,order,icon,toolTip,flags);
   }
   
-  if (checkOption(INotifications::EnablePopupWindows) && (ANotification.kinds & INotification::PopupWindow)>0)
+  if (checkOption(INotifications::EnablePopupWindows) && (record.notification.kinds & INotification::PopupWindow)>0)
   {
-    record.widget = new NotifyWidget(ANotification);
+    record.widget = new NotifyWidget(record.notification);
     connect(record.widget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
     connect(record.widget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
     connect(record.widget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
@@ -194,10 +195,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 
   if (FTrayManager)
   {
-    if (checkOption(INotifications::EnableTrayIcons) && (ANotification.kinds & INotification::TrayIcon)>0)
+    if (checkOption(INotifications::EnableTrayIcons) && (record.notification.kinds & INotification::TrayIcon)>0)
       record.trayId = FTrayManager->appendNotify(icon,toolTip,true);
     
-    if (!toolTip.isEmpty() && checkOption(INotifications::EnableTrayActions) && (ANotification.kinds & INotification::TrayAction)>0)
+    if (!toolTip.isEmpty() && checkOption(INotifications::EnableTrayActions) && (record.notification.kinds & INotification::TrayAction)>0)
     {
       record.action = new Action(FNotifyMenu);
       record.action->setIcon(icon);
@@ -208,9 +209,9 @@ int Notifications::appendNotification(const INotification &ANotification)
     }
   }
 
-  if (QSound::isAvailable() && checkOption(INotifications::EnableSounds) && (ANotification.kinds & INotification::PlaySound)>0)
+  if (QSound::isAvailable() && checkOption(INotifications::EnableSounds) && (record.notification.kinds & INotification::PlaySound)>0)
   {
-    QString soundName = ANotification.data.value(NDR_SOUND_FILE).toString();
+    QString soundName = record.notification.data.value(NDR_SOUND_FILE).toString();
     QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
     if (!soundFile.isEmpty() && (FSound==NULL || FSound->isFinished()))
     {
@@ -228,7 +229,7 @@ int Notifications::appendNotification(const INotification &ANotification)
   FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
 
   FNotifyRecords.insert(notifyId,record);
-  emit notificationAppended(notifyId);
+  emit notificationAppended(notifyId, record.notification);
   return notifyId;
 }
 
