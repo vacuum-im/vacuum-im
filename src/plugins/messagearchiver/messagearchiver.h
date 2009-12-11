@@ -6,6 +6,7 @@
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
 #include <definations/menubargroups.h>
+#include <definations/statusbargroups.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -188,13 +189,14 @@ protected slots:
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onPrivateDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
   void onPrivateDataError(const QString &AId, const QString &AError);
-  void onCollectionWriterDestroyed(const Jid &AStreamJid,  CollectionWriter *AWriter);
+  void onCollectionWriterDestroyed(CollectionWriter *AWriter);
   void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
   void onMultiChatWindowMenuAboutToShow();
   void onSetMethodAction(bool);
   void onSetItemPrefsAction(bool);
   void onShowArchiveWindowAction(bool);
+  void onShowArchiveWindowToolBarAction(bool);
   void onOpenHistoryOptionsAction(bool);
   void onRemoveItemPrefsAction(bool);
   void onOptionsDialogAccepted();
@@ -204,7 +206,8 @@ protected slots:
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void onStanzaSessionActivated(const IStanzaSession &ASession);
   void onStanzaSessionTerminated(const IStanzaSession &ASession);
-  void onToolbarWidgetCreated(IToolBarWidget *AWidget);
+  void onToolBarWidgetCreated(IToolBarWidget *AWidget);
+  void onStatusBarWidgetCreated(IStatusBarWidget *AWidget);
   void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
 private:
   IPluginManager *FPluginManager;
@@ -244,7 +247,7 @@ private:
   QMap<Jid,Replicator *> FReplicators;
   QMap<Jid,ViewHistoryWindow *> FArchiveWindows;
   QMap<Jid,QString> FGatewayTypes;
-  QMultiMap<int, IArchiveHandler *> FArchiveHandlers;
+  QMultiMap<int,IArchiveHandler *> FArchiveHandlers;
   QMap<Jid,QMap<Jid,StanzaSession> > FSessions;
   QMap<Jid,QMultiMap<Jid,CollectionWriter *> > FCollectionWriters;
 };

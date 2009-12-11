@@ -144,7 +144,8 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
     if (FMessageWidgets)
     {
-      connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolbarWidgetCreated(IToolBarWidget *)));
+      connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
+      connect(FMessageWidgets->instance(),SIGNAL(statusBarWidgetCreated(IStatusBarWidget *)),SLOT(onStatusBarWidgetCreated(IStatusBarWidget *)));
     }
   }
 
@@ -1750,7 +1751,7 @@ CollectionWriter *MessageArchiver::newCollectionWriter(const Jid &AStreamJid, co
     if (writer->isOpened())
     {
       FCollectionWriters[AStreamJid].insert(AHeader.with,writer);
-      connect(writer,SIGNAL(destroyed(const Jid &, CollectionWriter *)),SLOT(onCollectionWriterDestroyed(const Jid &, CollectionWriter *)));
+      connect(writer,SIGNAL(writerDestroyed(CollectionWriter *)),SLOT(onCollectionWriterDestroyed(CollectionWriter *)));
       emit localCollectionOpened(AStreamJid,AHeader);
     }
     else
@@ -2528,10 +2529,6 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
 
 void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 {
-  QList<CollectionWriter *> writers = FCollectionWriters.value(AXmppStream->streamJid()).values();
-  qDeleteAll(writers);
-  FCollectionWriters.remove(AXmppStream->streamJid());
-
   if (FStanzaProcessor)
   {
     FStanzaProcessor->removeStanzaHandle(FSHIPrefs.take(AXmppStream->streamJid()));
@@ -2541,6 +2538,7 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 
   removeReplicator(AXmppStream->streamJid());
   closeHistoryOptionsNode(AXmppStream->streamJid());
+  qDeleteAll(FCollectionWriters.take(AXmppStream->streamJid()));
   FNamespaces.remove(AXmppStream->streamJid());
   FArchivePrefs.remove(AXmppStream->streamJid());
   FInStoragePrefs.removeAt(FInStoragePrefs.indexOf(AXmppStream->streamJid()));
@@ -2602,13 +2600,13 @@ void MessageArchiver::onPrivateDataError(const QString &AId, const QString &AErr
   }
 }
 
-void MessageArchiver::onCollectionWriterDestroyed(const Jid &AStreamJid, CollectionWriter *AWriter)
+void MessageArchiver::onCollectionWriterDestroyed(CollectionWriter *AWriter)
 {
-  FCollectionWriters[AStreamJid].remove(AWriter->header().with,AWriter);
+  FCollectionWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
   if (AWriter->recordsCount() > 0)
   {
-    saveLocalModofication(AStreamJid,AWriter->header(),LOG_ACTION_CREATE);
-    emit localCollectionSaved(AStreamJid,AWriter->header());
+    saveLocalModofication(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
+    emit localCollectionSaved(AWriter->streamJid(),AWriter->header());
   }
 }
 
@@ -2701,6 +2699,22 @@ void MessageArchiver::onShowArchiveWindowAction(bool)
     int groupKind = action->data(ADR_GROUP_KIND).toInt();
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     showArchiveWindow(streamJid,filter,groupKind);
+  }
+}
+
+void MessageArchiver::onShowArchiveWindowToolBarAction(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    IToolBarWidget *toolBarWidget = qobject_cast<IToolBarWidget *>(action->parent());
+    if (toolBarWidget && toolBarWidget->editWidget())
+    {
+      IArchiveFilter filter;
+      filter.with = toolBarWidget->editWidget()->contactJid();
+      filter.start = QDateTime::currentDateTime().addMonths(-1);
+      showArchiveWindow(toolBarWidget->editWidget()->streamJid(),filter,IArchiveWindow::GK_NO_GROUPS);
+    }
   }
 }
 
@@ -2800,14 +2814,28 @@ void MessageArchiver::onStanzaSessionTerminated(const IStanzaSession &ASession)
     notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Session failed: %1").arg(ErrorHandler(ASession.errorCondition).message()));
 }
 
-void MessageArchiver::onToolbarWidgetCreated(IToolBarWidget *AWidget)
+void MessageArchiver::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 {
   if (AWidget->editWidget() != NULL)
   {
-    ChatWindowMenu *menu = new ChatWindowMenu(this,AWidget, AWidget->toolBarChanger()->toolBar());
-    QToolButton *button = AWidget->toolBarChanger()->addToolButton(menu->menuAction(),TBG_MWTBW_ARCHIVE,true);
+    Action *action = new Action(AWidget->instance());
+    action->setText(tr("View History"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
+    connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowToolBarAction(bool)));
+    AWidget->toolBarChanger()->addAction(action,TBG_MWTBW_ARCHIVE_VIEW,false);
+  }
+}
+
+void MessageArchiver::onStatusBarWidgetCreated(IStatusBarWidget *AWidget)
+{
+  if (AWidget->editWidget() != NULL)
+  {
+    ChatWindowMenu *menu = new ChatWindowMenu(this,AWidget,AWidget->statusBarChanger()->statusBar());
+    QToolButton *button = new QToolButton(menu); 
+    button->setDefaultAction(menu->menuAction());
     button->setPopupMode(QToolButton::InstantPopup);
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    AWidget->statusBarChanger()->insertWidget(button, SBG_MWCW_ARCHIVE_SETTINGS, true);
   }
 }
 

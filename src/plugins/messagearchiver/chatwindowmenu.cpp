@@ -3,10 +3,10 @@
 #define SFP_LOGGING           "logging"
 #define SFV_MUSTNOT_LOGGING   "mustnot"
 
-ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IToolBarWidget *AToolBarWidget, QWidget *AParent) : Menu(AParent)
+ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IStatusBarWidget *AStatusBarWidget, QWidget *AParent) : Menu(AParent)
 {
-  FToolBarWidget = AToolBarWidget;
-  FEditWidget = AToolBarWidget->editWidget();
+  FStatusBarWidget = AStatusBarWidget;
+  FEditWidget = AStatusBarWidget->editWidget();
   FArchiver = AArchiver;
   FDataForms = NULL;
   FDiscovery = NULL;
@@ -231,14 +231,14 @@ void ChatWindowMenu::onRequestFailed(const QString &AId, const QString &AError)
 {
   if (FSaveRequest==AId || FSessionRequest==AId)
   {
-    if (FToolBarWidget->viewWidget() != NULL)
+    if (FStatusBarWidget->viewWidget() != NULL)
     {
       IMessageContentOptions options;
       options.kind = IMessageContentOptions::Status;
       options.type |= IMessageContentOptions::Event;
       options.direction = IMessageContentOptions::DirectionIn;
       options.time = QDateTime::currentDateTime();
-      FToolBarWidget->viewWidget()->appendText(tr("Changing archive preferences failed: %1").arg(AError),options);
+      FStatusBarWidget->viewWidget()->appendText(tr("Changing archive preferences failed: %1").arg(AError),options);
     }
     if (FSessionRequest == AId)
       FSessionRequest.clear();

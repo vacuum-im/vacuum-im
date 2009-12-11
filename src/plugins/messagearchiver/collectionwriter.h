@@ -24,9 +24,8 @@ public:
   int secondsFromStart() const { return FSecsSum; }
   bool writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn);
   bool writeNote(const QString &ANote);
-  void close();
 signals:
-  void destroyed(const Jid &AStreamJid, CollectionWriter *AWriter);
+  void writerDestroyed(CollectionWriter *AWriter);
 protected:
   void startCollection();
   void stopCollection();
