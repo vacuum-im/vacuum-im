@@ -12,6 +12,7 @@
 #define TBG_MWTBW_EMOTICONS                                     200
 #define TBG_MWTBW_FILETRANSFER                                  500
 #define TBG_MWTBW_ARCHIVE_VIEW                                  700
+#define TBG_MWTBW_VCARD_VIEW                                    900
 
 //SeriveDiscovery - DiscoItemsWindow
 #define TBG_DIWT_DISCOVERY_NAVIGATE                             100
