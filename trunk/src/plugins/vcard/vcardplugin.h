@@ -8,6 +8,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/xmppurihandlerorders.h>
+#include <definations/toolbargroups.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ivcard.h>
 #include <interfaces/ixmppstreams.h>
@@ -17,6 +18,7 @@
 #include <interfaces/isettings.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <interfaces/imessagewidgets.h>
 #include <utils/widgetmanager.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
@@ -76,8 +78,10 @@ protected slots:
   void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
   void onShowVCardDialogByAction(bool);
+  void onShowVCardDialogByChatWindowAction(bool);
   void onVCardDialogDestroyed(QObject *ADialog);
   void onXmppStreamRemoved(IXmppStream *AXmppStream);
+  void onChatWindowCreated(IChatWindow *AWindow);
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -88,6 +92,7 @@ private:
   IMultiUserChatPlugin *FMultiUserChatPlugin;
   IServiceDiscovery *FDiscovery;
   IXmppUriQueries *FXmppUriQueries;
+  IMessageWidgets *FMessageWidgets;
 private:
   QMap<Jid, VCardItem> FVCards;
   QMap<QString, Jid> FVCardRequestId;

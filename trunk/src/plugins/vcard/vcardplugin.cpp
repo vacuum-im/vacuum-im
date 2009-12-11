@@ -20,6 +20,7 @@ VCardPlugin::VCardPlugin()
   FMultiUserChatPlugin = NULL;
   FDiscovery = NULL;
   FXmppUriQueries = NULL;
+  FMessageWidgets = NULL;
 }
 
 VCardPlugin::~VCardPlugin()
@@ -83,6 +84,16 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
   if (plugin)
   {
     FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+  }
+
+  plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
+  if (plugin)
+  {
+    FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
+    if (FMessageWidgets)
+    {
+      connect(FMessageWidgets->instance(), SIGNAL(chatWindowCreated(IChatWindow *)),SLOT(onChatWindowCreated(IChatWindow *)));
+    }
   }
 
   return true;
@@ -351,6 +362,19 @@ void VCardPlugin::onShowVCardDialogByAction(bool)
   }
 }
 
+void VCardPlugin::onShowVCardDialogByChatWindowAction(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    IToolBarWidget *toolBarWidget = qobject_cast<IToolBarWidget *>(action->parent());
+    if (toolBarWidget && toolBarWidget->viewWidget())
+    {
+      showVCardDialog(toolBarWidget->viewWidget()->streamJid(), toolBarWidget->viewWidget()->contactJid());
+    }
+  }
+}
+
 void VCardPlugin::onVCardDialogDestroyed(QObject *ADialog)
 {
   VCardDialog *dialog = static_cast<VCardDialog *>(ADialog);
@@ -362,6 +386,18 @@ void VCardPlugin::onXmppStreamRemoved(IXmppStream *AXmppStream)
   foreach(VCardDialog *dialog, FVCardDialogs.values())
     if (dialog->streamJid() == AXmppStream->streamJid())
       delete dialog;
+}
+
+void VCardPlugin::onChatWindowCreated(IChatWindow *AWindow)
+{
+  if (AWindow->toolBarWidget() && AWindow->toolBarWidget()->viewWidget())
+  {
+    Action *action = new Action(AWindow->toolBarWidget()->instance());
+    action->setText(tr("vCard"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
+    connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByChatWindowAction(bool)));
+    AWindow->toolBarWidget()->toolBarChanger()->addAction(action,TBG_MWTBW_VCARD_VIEW,false);
+  }
 }
 
 Q_EXPORT_PLUGIN2(plg_vcard, VCardPlugin)
