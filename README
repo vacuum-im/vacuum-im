@@ -1,0 +1,15 @@
+Vacuum-IM Preview
+-----------------
+Jabber conference:
+  vacuum@conference.jabber.ru
+
+Forum:
+  http://forum.jrudevels.org
+
+Source:
+  http://code.google.com/p/vacuum-im
+
+
+Known Issues
+------------
+  - on MaxOS popup window captures input focus

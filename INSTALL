@@ -1,0 +1,35 @@
+[Requirements]
+  - Qt 4.5.x
+  - OpenSSL 0.9.8k
+
+[Common]
+  ==qmake parametrs==
+    INSTALL_DIR    - directory for application
+    INSTALL_PREFIX - installation prefix
+
+
+[Windows]
+  * Default install directory c:\vacuum
+  ==Visual Studio==
+    qmake CONFIG-=debug_and_release CONFIG-=debug -recursive vacuum.pro
+    nmake
+    nmake install
+
+  ==MinGW==
+    qmake CONFIG-=debug_and_release CONFIG-=debug -recursive vacuum.pro
+    mingw32-make.exe
+    mingw32-make.exe install
+
+
+[Linux/Unix]
+  * Default install prefix /usr/local
+  qmake -recursive vacuum.pro
+  make
+  make install
+
+
+[MacOS X]
+  * Default install directory /Applications/vacuum.app
+  qmake -recursive vacuum.pro
+  make
+  make install
