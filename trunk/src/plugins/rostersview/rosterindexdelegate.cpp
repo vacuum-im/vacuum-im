@@ -111,7 +111,7 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
   QStyleOptionViewItemV4 option = indexOptions(AIndex,AOption);
   QStyle *style = option.widget ? option.widget->style() : QApplication::style();
   
-#if defined(QT_WS_WIND) && !defined(QT_NO_STYLE_WINDOWSVISTA)
+#if defined(Q_WS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
   if (APainter && qobject_cast<QWindowsVistaStyle *>(style))
   {
     option.palette.setColor(QPalette::All, QPalette::HighlightedText, option.palette.color(QPalette::Active, QPalette::Text));
