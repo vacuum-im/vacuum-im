@@ -4,8 +4,10 @@
 
 [Common]
   ==qmake parametrs==
-    INSTALL_DIR    - directory for application
-    INSTALL_PREFIX - installation prefix
+    INSTALL_PREFIX  - installation prefix
+    INSTALL_APP_DIR - directory name for application
+    INSTALL_LIB_DIR - directory name for libraries
+    INSTALL_RES_DIR - directory name for resources
 
 
 [Windows]
@@ -23,6 +25,9 @@
 
 [Linux/Unix]
   * Default install prefix /usr/local
+  * By default libvacuumutils.so is copied to /usr/local/lib. On some distributives
+  * you may receive message that libvacuumutils.so is not found. In this case configure
+  * your system to search libraries in /usr/local/lib.
   qmake -recursive vacuum.pro
   make
   make install

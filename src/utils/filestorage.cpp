@@ -3,7 +3,6 @@
 #include <QDir>
 #include <QDomDocument>
 #include <QApplication>
-#include <definations/config.h>
 
 QList<QString> FileStorage::FMimeTypes;
 QHash<QString, FileStorage *> FileStorage::FStaticStorages;

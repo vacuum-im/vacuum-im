@@ -22,7 +22,7 @@ win32 {
     DEFINES       += SVNINFO
   }
 } else {
-  exists(svninfo.h):system(rm svninfo.h)
+  exists(svninfo.h):system(rm -f svninfo.h)
   !isEmpty(SVN_REVISION):system(echo \\$${LITERAL_HASH}define SVN_REVISION \\\"$${SVN_REVISION}\\\" >> svninfo.h) {
     DEFINES       += SVNINFO
   }
@@ -41,18 +41,6 @@ resources.path     = $$INSTALL_RESOURCES
 resources.files    = ../../resources/*
 INSTALLS           = target translations resources
 
-#Unix Install
-unix {
-  LD_CONFIG_PATH   = /etc/ld.so.conf.d
-  LD_CONFIG_FILE   = $${LD_CONFIG_PATH}/$${INSTALL_DIR}.conf
-
-  ld_config.path   = $$LD_CONFIG_PATH
-  ld_config.extra  = rm -f $$LD_CONFIG_FILE && \
-                     echo $${INSTALL_LIBS} >> $$LD_CONFIG_FILE && \
-                     ldconfig
-  INSTALLS        += ld_config
-}
-
 #MaxOS Install
 macx {
   UTILS_LIB_NAME   = lib$${TARGET_UTILS}.1.0.0.dylib
@@ -64,6 +52,6 @@ macx {
   INSTALLS        += lib_utils
 
   name_tool.path   = $$INSTALL_BINS
-  name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $$INSTALL_BINS/$$INSTALL_DIR/Contents/MacOS/$$TARGET_LOADER
+  name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$TARGET_LOADER
   INSTALLS        += name_tool
 }
