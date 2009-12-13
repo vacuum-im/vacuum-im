@@ -7,7 +7,6 @@
 #include <QDomDocument>
 #include <QApplication>
 #include <QPluginLoader>
-#include <definations/config.h>
 #include <definations/plugininitorders.h>
 #include <definations/commandline.h>
 #include <definations/actiongroups.h>

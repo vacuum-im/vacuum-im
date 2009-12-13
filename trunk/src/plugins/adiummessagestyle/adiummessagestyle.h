@@ -3,7 +3,6 @@
 
 #include <QList>
 #include <QWebView>
-#include <definations/config.h>
 #include <definations/resources.h>
 #include <interfaces/imessagestyles.h>
 #include <utils/filestorage.h>
