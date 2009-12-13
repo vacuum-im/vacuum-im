@@ -10,6 +10,34 @@ Source:
   http://code.google.com/p/vacuum-im
 
 
+The minimum list of plug-ins necessary for work 
+-----------------------------------------------
+  01. accountmanager
+  02. chatmessagehandler
+  03. connectionmanager
+  04. defaultconnection
+  05. mainnwindow
+  06. messageprocessor
+  07. messagestyles
+  08. messagewidgets
+  09. normalmessagehandler
+  10. notifications
+  11. presence
+  12. roster
+  13. rosterchanger
+  14. rostersmodel
+  15. rostersview
+  16. saslauth
+  17. settings
+  18. simplemessagestyle
+  19. stanzaprocessor
+  20. starttls
+  21. statuschanger
+  22. statusicons
+  23. traymanager
+  24. xmppstreams
+
+
 Known Issues
 ------------
   - on MaxOS popup window captures input focus
