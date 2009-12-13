@@ -18,7 +18,7 @@ isEmpty(INSTALL_APP_DIR) {
 
 isEmpty(INSTALL_LIB_DIR) {
   win32:INSTALL_LIB_DIR  = .
-  unix {
+  unix:!macx {
     UNAME                = $$system(uname -m)
     contains( UNAME, x86_64 ): LIB_SUFFIX = 64
     INSTALL_LIB_DIR      = lib$${LIB_SUFIX}
@@ -42,7 +42,7 @@ CONFIG(debug, debug|release) {
   DEFINES               += PLUGINS_DIR='\\\"./$${INSTALL_LIB_DIR}/plugins\\\"'
   DEFINES               += RESOURCES_DIR='\\\"./$${INSTALL_RES_DIR}/resources\\\"'
   DEFINES               += TRANSLATIONS_DIR='\\\"./$${INSTALL_RES_DIR}/translations\\\"'
-} else:unix {
+} else:unix:!macx {
   DEFINES               += PLUGINS_DIR='\\\"../$${INSTALL_LIB_DIR}/$${INSTALL_APP_DIR}/plugins\\\"'
   DEFINES               += RESOURCES_DIR='\\\"../$${INSTALL_RES_DIR}/$${INSTALL_APP_DIR}/resources\\\"'
   DEFINES               += TRANSLATIONS_DIR='\\\"../$${INSTALL_RES_DIR}/$${INSTALL_APP_DIR}/translations\\\"'
