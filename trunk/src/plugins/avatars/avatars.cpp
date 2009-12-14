@@ -1,7 +1,6 @@
 #include "avatars.h"
 
 #include <QFile>
-#include <QTimer>
 #include <QBuffer>
 #include <QFileDialog>
 #include <QImageReader>
@@ -16,12 +15,8 @@
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
 #define SVN_SHOW_AVATARS          "showAvatar"
-#define SVN_AVATAR_ALIGNLEFT      "avatarAlignLeft"
-#define SVN_AVATAR_SIZE           "avatarSize"
 #define SVN_CUSTOM_AVATARS        "customAvatars"
-#define SVN_CUSTOM_AVATAR_HASH    SVN_CUSTOM_AVATARS":hash[]"
-
-#define IFN_EMPTY_AVATAR          "logo_32.png"
+#define SVN_CUSTOM_AVATAR_HASH    SVN_CUSTOM_AVATARS ":hash[]"
 
 #define AVATAR_IMAGE_TYPE         "jpeg"
 #define AVATAR_IQ_TIMEOUT         30000
@@ -38,7 +33,8 @@ Avatars::Avatars()
   FSettingsPlugin = NULL;
   
   FRosterLabelId = -1;
-  FOptions = IAvatars::ShowAvatars;
+  FAvatarsVisible = false;
+  FAvatarSize = QSize(32,32);
 }
 
 Avatars::~Avatars()
@@ -129,6 +125,14 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
 
 bool Avatars::initObjects()
 {
+  FAvatarsDir.setPath(FPluginManager->homePath());
+  if (!FAvatarsDir.exists(DIR_AVATARS))
+    FAvatarsDir.mkdir(DIR_AVATARS);
+  FAvatarsDir.cd(DIR_AVATARS);
+
+  onIconStorageChanged();
+  connect(IconStorage::staticStorage(RSR_STORAGE_MENUICONS), SIGNAL(storageChanged()), SLOT(onIconStorageChanged()));
+
   if (FRostersModel)
   {
     FRostersModel->insertDefaultDataHolder(this);
@@ -138,13 +142,6 @@ bool Avatars::initObjects()
     FSettingsPlugin->insertOptionsHolder(this);
   }
 
-  FAvatarsDir.setPath(FPluginManager->homePath());
-  if (!FAvatarsDir.exists(DIR_AVATARS))
-    FAvatarsDir.mkdir(DIR_AVATARS);
-  FAvatarsDir.cd(DIR_AVATARS);
-
-  FCurOptions = 0;
-  onUpdateOptions();
   return true;
 }
 
@@ -221,8 +218,9 @@ bool Avatars::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AS
   return false;
 }
 
-void Avatars::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void Avatars::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
+  Q_UNUSED(AStreamJid);
   if (FIqAvatarRequests.contains(AStanza.id()))
   {
     Jid contactJid = FIqAvatarRequests.take(AStanza.id());
@@ -273,14 +271,20 @@ QList<int> Avatars::types() const
 QVariant Avatars::data(const IRosterIndex *AIndex, int ARole) const
 {
   if (ARole == RDR_AVATAR_IMAGE)
-    return avatarImage(AIndex->data(RDR_JID).toString());
+  {
+    QImage avatar = avatarImage(AIndex->data(RDR_JID).toString());
+    return !avatar.isNull() ? avatar : FEmptyAvatar;
+  }
   else if (ARole == RDR_AVATAR_HASH)
+  {
     return avatarHash(AIndex->data(RDR_JID).toString());
+  }
   return QVariant();
 }
 
-bool Avatars::setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/)
+bool Avatars::setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
 {
+  Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
   return false;
 }
 
@@ -365,23 +369,7 @@ QImage Avatars::avatarImage(const Jid &AContactJid) const
       return image;
     }
   }
-  return FAvatarImages.value(hash,FEmptyAvatar);
-}
-
-void Avatars::setAvatarSize(const QSize &ASize)
-{
-  if (FAvatarSize != ASize)
-  {
-    if (ASize.width() > 96 || ASize.height()>96)
-      FAvatarSize = QSize(96,96);
-    else if (ASize.width()<32 || ASize.height()<32)
-      FAvatarSize = QSize(32,32);
-    else
-      FAvatarSize = ASize;
-    //FEmptyAvatar = QImage(FAvatarSize,QImage::Format_RGB32);
-    FAvatarImages.clear();
-    updateDataHolder();
-  }
+  return FAvatarImages.value(hash);
 }
 
 bool Avatars::setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat)
@@ -420,24 +408,42 @@ QString Avatars::setCustomPictire(const Jid &AContactJid, const QString &AImageF
   {
     FCustomPictures.remove(AContactJid);
     updateDataHolder(AContactJid);
-    return "";
+    return QString::null;
   }
-  return QString();
+  return QString::null;
 }
 
-bool Avatars::checkOption(IAvatars::Option AOption) const
+bool Avatars::avatarsVisible() const
 {
-  return (FOptions & AOption) > 0;
+  return FAvatarsVisible;
 }
 
-void Avatars::setOption(IAvatars::Option AOption, bool AValue)
+void Avatars::setAvatarsVisible(bool AVisible)
 {
-  bool changed = checkOption(AOption) != AValue;
-  if (changed)
+  if (FAvatarsVisible != AVisible)
   {
-    AValue ? FOptions |= AOption : FOptions &= ~AOption;
-    QTimer::singleShot(0,this,SLOT(onUpdateOptions()));
-    emit optionChanged(AOption,AValue);
+    FAvatarsVisible = AVisible;
+    if (FRostersViewPlugin && FRostersModel)
+    {
+      if (AVisible)
+      {
+        QMultiHash<int,QVariant> findData;
+        foreach(int type, types())
+          findData.insertMulti(RDR_TYPE,type);
+        IRosterIndexList indexes = FRostersModel->rootIndex()->findChild(findData, true);
+        
+        FRosterLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_AVATAR_IMAGE, RDR_AVATAR_IMAGE);
+        foreach (IRosterIndex *index, indexes)
+          FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, index);
+      }
+      else
+      {
+        FRostersViewPlugin->rostersView()->destroyIndexLabel(FRosterLabelId);
+        FRosterLabelId = -1;
+        FAvatarImages.clear();
+      }
+    }
+    emit avatarsVisibleChanged(AVisible);
   }
 }
 
@@ -543,7 +549,7 @@ QImage Avatars::convertToGray(const QImage &AImage) const
     }
     return image;
   }
-  return QImage();
+  return AImage;
 }
 
 void Avatars::onStreamOpened(IXmppStream *AXmppStream)
@@ -601,7 +607,7 @@ void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
     Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
     if (!FVCardAvatars.contains(contactJid))
       onVCardChanged(contactJid);
-    if (checkOption(IAvatars::ShowAvatars))
+    if (avatarsVisible())
       FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, AIndex);
   }
 }
@@ -667,7 +673,7 @@ void Avatars::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMa
     {
       QString fileName = avatarFileName(hash);
       QSize imageSize = QImageReader(fileName).size();
-      imageSize.scale(ALabelId==FRosterLabelId ? QSize(128,128) : QSize(64,64),Qt::KeepAspectRatio);
+      imageSize.scale(ALabelId==FRosterLabelId ? QSize(128,128) : QSize(64,64), Qt::KeepAspectRatio);
       QString avatarMask = "<img src='%1' width=%2 height=%3>";
       AToolTips.insert(RTTO_AVATAR_IMAGE,avatarMask.arg(fileName).arg(imageSize.width()).arg(imageSize.height()));
     }
@@ -722,9 +728,7 @@ void Avatars::onSettingsOpened()
   FAvatarImages.clear();
 
   ISettings *settings = FSettingsPlugin->settingsForPlugin(AVATARTS_UUID);
-  setOption(IAvatars::ShowAvatars,settings->value(SVN_SHOW_AVATARS,true).toBool()); 
-  setOption(IAvatars::AvatarsAlignLeft,settings->value(SVN_AVATAR_ALIGNLEFT,false).toBool()); 
-  setAvatarSize(settings->value(SVN_AVATAR_SIZE,QSize(32,32)).toSize());
+  setAvatarsVisible(settings->value(SVN_SHOW_AVATARS,true).toBool()); 
 
   QHash<QString,QVariant> customPictires = settings->values(SVN_CUSTOM_AVATAR_HASH);
   for (QHash<QString,QVariant>::const_iterator it = customPictires.constBegin(); it != customPictires.constEnd(); it++)
@@ -740,9 +744,7 @@ void Avatars::onSettingsOpened()
 void Avatars::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(AVATARTS_UUID);
-  settings->setValue(SVN_SHOW_AVATARS,checkOption(IAvatars::ShowAvatars));
-  settings->setValue(SVN_AVATAR_ALIGNLEFT,checkOption(IAvatars::AvatarsAlignLeft));
-  settings->setValue(SVN_AVATAR_SIZE,FAvatarSize);
+  settings->setValue(SVN_SHOW_AVATARS,avatarsVisible());
 
   settings->deleteValue(SVN_CUSTOM_AVATARS);
   QList<Jid> contacts = FCustomPictures.keys();
@@ -752,25 +754,9 @@ void Avatars::onSettingsClosed()
   }
 }
 
-void Avatars::onUpdateOptions()
+void Avatars::onIconStorageChanged()
 {
-  if (FRostersViewPlugin && FRostersModel && FOptions != FCurOptions)
-  {
-    FRostersViewPlugin->rostersView()->destroyIndexLabel(FRosterLabelId);
-    FRosterLabelId = -1;
-    if (checkOption(IAvatars::ShowAvatars))
-    {
-      int labelOrder = checkOption(IAvatars::AvatarsAlignLeft) ? RLO_AVATAR_IMAGE_LEFT : RLO_AVATAR_IMAGE_RIGHT;
-      FRosterLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(labelOrder,RDR_AVATAR_IMAGE);
-      QMultiHash<int,QVariant> findData;
-      foreach(int type, types())
-        findData.insertMulti(RDR_TYPE,type);
-      IRosterIndexList indexes = FRostersModel->rootIndex()->findChild(findData,true);
-      foreach (IRosterIndex *index, indexes)
-        FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId,index);
-    }
-    FCurOptions = FOptions;
-  }
+  FEmptyAvatar = QImage(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->fileFullName(MNI_AVATAR_EMPTY)).scaled(FAvatarSize,Qt::KeepAspectRatio,Qt::FastTransformation);
 }
 
 Q_EXPORT_PLUGIN2(plg_avatars, Avatars)

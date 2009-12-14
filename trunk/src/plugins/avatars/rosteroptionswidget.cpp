@@ -4,8 +4,7 @@ RosterOptionsWidget::RosterOptionsWidget(IAvatars *AAvatars, QWidget *AParent) :
 {
   ui.setupUi(this);
   FAvatars = AAvatars;
-  ui.chbShowAvatars->setChecked(FAvatars->checkOption(IAvatars::ShowAvatars));
-  ui.chbAlignLeftAvatars->setChecked(FAvatars->checkOption(IAvatars::AvatarsAlignLeft));
+  ui.chbShowAvatars->setChecked(FAvatars->avatarsVisible());
 }
 
 RosterOptionsWidget::~RosterOptionsWidget()
@@ -15,7 +14,6 @@ RosterOptionsWidget::~RosterOptionsWidget()
 
 void RosterOptionsWidget::apply()
 {
-  FAvatars->setOption(IAvatars::ShowAvatars,ui.chbShowAvatars->isChecked());
-  FAvatars->setOption(IAvatars::AvatarsAlignLeft,ui.chbAlignLeftAvatars->isChecked());
+  FAvatars->setAvatarsVisible(ui.chbShowAvatars->isChecked());
   emit optionsAccepted();
 }

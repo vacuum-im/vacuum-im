@@ -22,6 +22,7 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/isettings.h>
+#include <utils/iconstorage.h>
 #include "rosteroptionswidget.h"
 
 class Avatars : 
@@ -66,20 +67,18 @@ public:
   virtual QImage loadAvatar(const QString &AHash) const;
   virtual QString saveAvatar(const QByteArray &AImageData) const;
   virtual QString saveAvatar(const QImage &AImage, const char *AFormat = NULL) const;
-  //Contacts Avatars
   virtual QString avatarHash(const Jid &AContactJid) const;
   virtual QImage avatarImage(const Jid &AContactJid) const;
-  virtual QSize avatarSize() const { return FAvatarSize; }
-  virtual void setAvatarSize(const QSize &ASize);
   virtual bool setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat = NULL);
   virtual QString setCustomPictire(const Jid &AContactJid, const QString &AImageFile);
-  //Options
-  virtual bool checkOption(IAvatars::Option AOption) const;
-  virtual void setOption(IAvatars::Option AOption, bool AValue);
+  virtual bool avatarsVisible() const;
+  virtual void setAvatarsVisible(bool AVisible);
 signals:
-  virtual void optionChanged(IAvatars::Option AOption, bool AValue);
   virtual void avatarChanged(const Jid &AContactJid);
+  virtual bool avatarsVisibleChanged(bool AVisible);
+  //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+  //IOptionsHolder
   virtual void optionsAccepted();
   virtual void optionsRejected();
 protected:
@@ -100,7 +99,7 @@ protected slots:
   void onClearAvatarByAction(bool);
   void onSettingsOpened();
   void onSettingsClosed();
-  void onUpdateOptions();
+  void onIconStorageChanged();
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -111,24 +110,23 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   ISettingsPlugin *FSettingsPlugin;
 private:
-  QHash<Jid, int> FSHIPresenceIn;
-  QHash<Jid, int> FSHIPresenceOut;
-  QHash<Jid, QString> FVCardAvatars;
+  QMap<Jid, int> FSHIPresenceIn;
+  QMap<Jid, int> FSHIPresenceOut;
+  QMap<Jid, QString> FVCardAvatars;
 private:
-  QHash<Jid, int> FSHIIqAvatarIn;
-  QHash<Jid, QString> FIqAvatars;
-  QHash<QString,Jid> FIqAvatarRequests;
+  QMap<Jid, int> FSHIIqAvatarIn;
+  QMap<Jid, QString> FIqAvatars;
+  QMap<QString,Jid> FIqAvatarRequests;
 private:
-  QHash<Jid, QString> FCustomPictures;
+  QMap<Jid, QString> FCustomPictures;
 private:
-  int FOptions;
-  int FCurOptions;
+  QSize FAvatarSize;
+  bool FAvatarsVisible;
 private:
   int FRosterLabelId;
-  QSize FAvatarSize;
   QDir FAvatarsDir;
   QImage FEmptyAvatar;
-  QHash<Jid, QString> FStreamAvatars;
+  QMap<Jid, QString> FStreamAvatars;
   mutable QHash<QString, QImage> FAvatarImages;
 };
 
