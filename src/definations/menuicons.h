@@ -17,6 +17,7 @@
 #define MNI_AVATAR_REMOVE               "avatarRemove"
 #define MNI_AVATAR_CHANGE               "avatarChange"
 #define MNI_AVATAR_CUSTOM               "avatarCustom"
+#define MNI_AVATAR_EMPTY                "avatarEmpty"
 
 //Bookmarks
 #define MNI_BOOKMARKS                   "bookmarks"

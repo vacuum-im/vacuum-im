@@ -16,4 +16,8 @@
     <key>avatarCustom</key>
     <object mime="image/png">avatarcustom.png</object>
   </icon>
+  <icon>
+    <key>avatarEmpty</key>
+    <object mime="image/png">avatarempty.png</object>
+  </icon>
 </icondef>
