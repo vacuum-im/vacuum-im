@@ -51,8 +51,8 @@
         <translation>Показывать аватары</translation>
     </message>
     <message>
-        <source>Show avatars left alligned</source>
-        <translation>Показывать аватар слева</translation>
+        <source>Show empty avatar image</source>
+        <translation>Показывать изображение пустого аватара</translation>
     </message>
 </context>
 </TS>
