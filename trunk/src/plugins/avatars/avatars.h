@@ -73,9 +73,12 @@ public:
   virtual QString setCustomPictire(const Jid &AContactJid, const QString &AImageFile);
   virtual bool avatarsVisible() const;
   virtual void setAvatarsVisible(bool AVisible);
+  virtual bool showEmptyAvatars() const;
+  virtual void setShowEmptyAvatars(bool AShow);
 signals:
   virtual void avatarChanged(const Jid &AContactJid);
-  virtual bool avatarsVisibleChanged(bool AVisible);
+  virtual void avatarsVisibleChanged(bool AVisible);
+  virtual void showEmptyAvatarsChanged(bool AShow);
   //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
   //IOptionsHolder
@@ -87,7 +90,6 @@ protected:
   void updateDataHolder(const Jid &AContactJid = Jid());
   bool updateVCardAvatar(const Jid &AContactJid, const QString &AHash);
   bool updateIqAvatar(const Jid &AContactJid, const QString &AHash);
-  QImage convertToGray(const QImage &AImage) const;
 protected slots:
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
@@ -116,12 +118,13 @@ private:
 private:
   QMap<Jid, int> FSHIIqAvatarIn;
   QMap<Jid, QString> FIqAvatars;
-  QMap<QString,Jid> FIqAvatarRequests;
+  QMap<QString, Jid> FIqAvatarRequests;
 private:
   QMap<Jid, QString> FCustomPictures;
 private:
   QSize FAvatarSize;
   bool FAvatarsVisible;
+  bool FShowEmptyAvatars;
 private:
   int FRosterLabelId;
   QDir FAvatarsDir;
