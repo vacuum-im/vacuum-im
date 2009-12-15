@@ -228,12 +228,12 @@ bool Jid::operator&&(const QString &AJidStr) const
 
 bool Jid::operator<(const Jid &AJid) const
 {
-  return d->FPrepNode < AJid.pNode() || d->FPrepDomain < AJid.pDomain() || d->FResource < AJid.pResource();
+  return pFull() < AJid.pFull();
 }
 
 bool Jid::operator>(const Jid &AJid) const
 {
-  return d->FPrepNode > AJid.pNode() || d->FPrepDomain > AJid.pDomain() || d->FResource > AJid.pResource();
+  return pFull() > AJid.pFull();
 }
 
 QString Jid::encode(const QString &AJidStr)
