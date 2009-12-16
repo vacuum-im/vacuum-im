@@ -60,11 +60,11 @@ public:
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IRostersDragDropHandler
-  virtual Qt::DropActions dragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag);
-  virtual bool dragEnter(const QDragEnterEvent *AEvent);
-  virtual bool dragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
-  virtual void dragLeave(const QDragLeaveEvent *AEvent);
-  virtual bool dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
+  virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag);
+  virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
+  virtual bool rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
+  virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
+  virtual bool rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
   //IXmppUriHandler
   virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IRosterChanger

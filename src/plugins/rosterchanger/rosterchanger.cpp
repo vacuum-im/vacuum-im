@@ -162,7 +162,7 @@ QWidget *RosterChanger::optionsWidget(const QString &ANode, int &AOrder)
 }
 
 //IRostersDragDropHandler
-Qt::DropActions RosterChanger::dragStart(const QMouseEvent * /*AEvent*/, const QModelIndex &AIndex, QDrag * /*ADrag*/)
+Qt::DropActions RosterChanger::rosterDragStart(const QMouseEvent * /*AEvent*/, const QModelIndex &AIndex, QDrag * /*ADrag*/)
 {
   int indexType = AIndex.data(RDR_TYPE).toInt();
   if (indexType==RIT_CONTACT || indexType==RIT_GROUP)
@@ -170,7 +170,7 @@ Qt::DropActions RosterChanger::dragStart(const QMouseEvent * /*AEvent*/, const Q
   return Qt::IgnoreAction;
 }
 
-bool RosterChanger::dragEnter(const QDragEnterEvent *AEvent)
+bool RosterChanger::rosterDragEnter(const QDragEnterEvent *AEvent)
 {
   if (AEvent->mimeData()->hasFormat(DDT_ROSTERSVIEW_INDEX_DATA))
   {
@@ -185,7 +185,7 @@ bool RosterChanger::dragEnter(const QDragEnterEvent *AEvent)
   return false;
 }
 
-bool RosterChanger::dragMove(const QDragMoveEvent * /*AEvent*/, const QModelIndex &AHover)
+bool RosterChanger::rosterDragMove(const QDragMoveEvent * /*AEvent*/, const QModelIndex &AHover)
 {
   int indexType = AHover.data(RDR_TYPE).toInt();
   if (indexType==RIT_GROUP || indexType==RIT_STREAM_ROOT)
@@ -197,12 +197,12 @@ bool RosterChanger::dragMove(const QDragMoveEvent * /*AEvent*/, const QModelInde
   return false;
 }
 
-void RosterChanger::dragLeave(const QDragLeaveEvent * /*AEvent*/)
+void RosterChanger::rosterDragLeave(const QDragLeaveEvent * /*AEvent*/)
 {
 
 }
 
-bool RosterChanger::dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
+bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
 {
   int hoverType = AIndex.data(RDR_TYPE).toInt();
   if (AEvent->dropAction()!=Qt::IgnoreAction && (hoverType==RIT_GROUP || hoverType==RIT_STREAM_ROOT))

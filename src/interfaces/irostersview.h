@@ -17,11 +17,11 @@ public:
 class IRostersDragDropHandler
 {
 public:
-  virtual Qt::DropActions dragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag) =0;
-  virtual bool dragEnter(const QDragEnterEvent *AEvent) =0;
-  virtual bool dragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover) =0;
-  virtual void dragLeave(const QDragLeaveEvent *AEvent) =0;
-  virtual bool dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu) =0;
+  virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag) =0;
+  virtual bool rosterDragEnter(const QDragEnterEvent *AEvent) =0;
+  virtual bool rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover) =0;
+  virtual void rosterDragLeave(const QDragLeaveEvent *AEvent) =0;
+  virtual bool rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu) =0;
 };
 
 class IRostersView
