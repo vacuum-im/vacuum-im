@@ -3,6 +3,7 @@
 
 #include <definations/namespaces.h>
 #include <definations/fshandlerorders.h>
+#include <definations/rosterindextyperole.h>
 #include <definations/discofeaturehandlerorders.h>
 #include <definations/notificationdataroles.h>
 #include <definations/menuicons.h>
@@ -20,6 +21,7 @@
 #include <interfaces/iroster.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/imessagewidgets.h>
+#include <interfaces/irostersview.h>
 #include <interfaces/isettings.h>
 #include <utils/jid.h>
 #include <utils/action.h>
@@ -34,12 +36,13 @@ class FileTransfer :
   public QObject,
   public IPlugin,
   public IFileTransfer,
-  public IFileStreamsHandler,
+  public IOptionsHolder,
   public IDiscoFeatureHandler,
-  public IOptionsHolder
+  public IRostersDragDropHandler,
+  public IFileStreamsHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IFileTransfer IFileStreamsHandler IDiscoFeatureHandler IOptionsHolder);
+  Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IFileStreamsHandler);
 public:
   FileTransfer();
   ~FileTransfer();
@@ -56,6 +59,12 @@ public:
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
+  //IRostersDragDropHandler
+  virtual Qt::DropActions dragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag);
+  virtual bool dragEnter(const QDragEnterEvent *AEvent);
+  virtual bool dragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
+  virtual void dragLeave(const QDragLeaveEvent *AEvent);
+  virtual bool dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
   //IFileTransferHandler
   virtual bool fileStreamRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);
   virtual bool fileStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS);
@@ -104,6 +113,7 @@ private:
   IFileStreamsManager *FFileManager;
   IMessageWidgets *FMessageWidgets;
   ISettingsPlugin *FSettingsPlugin;
+  IRostersViewPlugin *FRostersViewPlugin;
 private:
   bool FAutoReceive;
   bool FHideDialogWhenStarted;
