@@ -56,16 +56,19 @@ bool XmppUriQueries::openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const
     QUrl url =  QUrl::fromEncoded(AUrl.toEncoded().replace(';','&'), QUrl::StrictMode);
     Jid contactJid = url.path();
     QList< QPair<QString, QString> > keyValues = url.queryItems();
-    QString action = keyValues.takeAt(0).first;
-    if (contactJid.isValid() && !action.isEmpty())
+    if (keyValues.count() > 0)
     {
-      QMultiMap<QString, QString> params;
-      for (int i=0; i<keyValues.count(); i++)
-        params.insertMulti(keyValues.at(i).first, keyValues.at(i).second);
+      QString action = keyValues.takeAt(0).first;
+      if (contactJid.isValid() && !action.isEmpty())
+      {
+        QMultiMap<QString, QString> params;
+        for (int i=0; i<keyValues.count(); i++)
+          params.insertMulti(keyValues.at(i).first, keyValues.at(i).second);
 
-      foreach (IXmppUriHandler *handler, FHandlers)
-        if (handler->xmppUriOpen(AStreamJid, contactJid, action, params))
-          return true;
+        foreach (IXmppUriHandler *handler, FHandlers)
+          if (handler->xmppUriOpen(AStreamJid, contactJid, action, params))
+            return true;
+      }
     }
   }
   return false;
