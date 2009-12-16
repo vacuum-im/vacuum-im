@@ -2,6 +2,8 @@
 
 #include <QSet>
 
+#define DEFAULT_ICONSET                 "kolobok_dark"
+
 #define SVN_SUBSTORAGES                 "substorages"
 
 Emoticons::Emoticons()
@@ -123,29 +125,32 @@ QWidget *Emoticons::optionsWidget(const QString &ANode, int &AOrder)
 
 void Emoticons::setIconsets(const QStringList &ASubStorages)
 {
-  QList<QString> oldStorages = FStorageOrder;
+  QStringList oldStorages = FStorageOrder;
+  QStringList availStorages = IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
 
+  FStorageOrder.clear();
   foreach (QString substorage, ASubStorages)
   {
-    if (!FStorageOrder.contains(substorage))
+    if (availStorages.contains(substorage))
     {
+      if (!FStorages.contains(substorage))
+      {
+        FStorages.insert(substorage, new IconStorage(RSR_STORAGE_EMOTICONS,substorage,this));
+        insertSelectIconMenu(substorage);
+        emit iconsetInserted(substorage,QString::null);
+      }
       FStorageOrder.append(substorage);
-      FStorages.insert(substorage,new IconStorage(RSR_STORAGE_EMOTICONS,substorage,this));
-      insertSelectIconMenu(substorage);
-      emit iconsetInserted(substorage,QString::null);
+      oldStorages.removeAll(substorage);
     }
-    oldStorages.removeAll(substorage);
   }
 
   foreach (QString substorage, oldStorages)
   {
     removeSelectIconMenu(substorage);
-    FStorageOrder.removeAll(substorage);
     delete FStorages.take(substorage);
     emit iconsetRemoved(substorage);
   }
 
-  FStorageOrder = ASubStorages;
   createIconsetUrls();
 }
 
@@ -292,7 +297,7 @@ void Emoticons::onSelectIconMenuDestroyed(QObject *AObject)
 void Emoticons::onSettingsOpened()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(EMOTICONS_UUID);
-  setIconsets(settings->value(SVN_SUBSTORAGES,FileStorage::availSubStorages(RSR_STORAGE_EMOTICONS)).toStringList());
+  setIconsets(settings->value(SVN_SUBSTORAGES, QStringList() << DEFAULT_ICONSET).toStringList());
 }
 
 void Emoticons::onSettingsClosed()
