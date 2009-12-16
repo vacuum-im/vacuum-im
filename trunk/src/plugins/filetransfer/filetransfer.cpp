@@ -2,6 +2,11 @@
 
 #include <QDir>
 #include <QTimer>
+#include <QDropEvent>
+#include <QDragMoveEvent>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+
 
 #define ADR_STREAM_JID                Action::DR_StreamJid
 #define ADR_CONTACT_JID               Action::DR_Parametr1
@@ -25,6 +30,7 @@ FileTransfer::FileTransfer()
   FDataManager = NULL;
   FMessageWidgets = NULL;
   FSettingsPlugin = NULL;
+  FRostersViewPlugin = NULL;
 
   FAutoReceive = false;
   FHideDialogWhenStarted = false;
@@ -110,6 +116,12 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
+  plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
+  if (plugin)
+  {
+    FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+  }
+
   return FFileManager!=NULL && FDataManager!=NULL;
 }
 
@@ -132,6 +144,10 @@ bool FileTransfer::initObjects()
   if (FSettingsPlugin)
   {
     FSettingsPlugin->insertOptionsHolder(this);
+  }
+  if (FRostersViewPlugin)
+  {
+    FRostersViewPlugin->rostersView()->insertDragDropHandler(this);
   }
   return true;
 }
@@ -173,6 +189,52 @@ Action *FileTransfer::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
     }
   }
   return NULL;
+}
+
+Qt::DropActions FileTransfer::dragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag)
+{
+  Q_UNUSED(AEvent); Q_UNUSED(AIndex); Q_UNUSED(ADrag);
+  return Qt::IgnoreAction;
+}
+
+bool FileTransfer::dragEnter(const QDragEnterEvent *AEvent)
+{
+  if (AEvent->mimeData()->hasUrls())
+  {
+    QList<QUrl> urlList = AEvent->mimeData()->urls();
+    if (urlList.count()==1 && QFile::exists(urlList.first().toLocalFile()))
+      return true;
+  }
+  return false;
+}
+
+bool FileTransfer::dragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
+{
+  Q_UNUSED(AEvent);
+  return AHover.data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && isSupported(AHover.data(RDR_STREAM_JID).toString(), AHover.data(RDR_JID).toString());
+}
+
+void FileTransfer::dragLeave(const QDragLeaveEvent *AEvent)
+{
+  Q_UNUSED(AEvent);
+}
+
+bool FileTransfer::dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
+{
+  if (AEvent->dropAction() != Qt::IgnoreAction)
+  {
+    Action *action = new Action(AMenu);
+    action->setText(tr("Send File"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILETRANSFER_SEND);
+    action->setData(ADR_STREAM_JID,AIndex.data(RDR_STREAM_JID).toString());
+    action->setData(ADR_CONTACT_JID,AIndex.data(RDR_JID).toString());
+    action->setData(ADR_FILE_NAME, AEvent->mimeData()->urls().first().toLocalFile());
+    connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
+    AMenu->addAction(action, AG_DEFAULT, true);
+    AMenu->setDefaultAction(action);
+    return true;
+  }
+  return false;
 }
 
 bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods)
