@@ -191,13 +191,13 @@ Action *FileTransfer::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
   return NULL;
 }
 
-Qt::DropActions FileTransfer::dragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag)
+Qt::DropActions FileTransfer::rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag)
 {
   Q_UNUSED(AEvent); Q_UNUSED(AIndex); Q_UNUSED(ADrag);
   return Qt::IgnoreAction;
 }
 
-bool FileTransfer::dragEnter(const QDragEnterEvent *AEvent)
+bool FileTransfer::rosterDragEnter(const QDragEnterEvent *AEvent)
 {
   if (AEvent->mimeData()->hasUrls())
   {
@@ -208,18 +208,18 @@ bool FileTransfer::dragEnter(const QDragEnterEvent *AEvent)
   return false;
 }
 
-bool FileTransfer::dragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
+bool FileTransfer::rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
 {
   Q_UNUSED(AEvent);
   return AHover.data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && isSupported(AHover.data(RDR_STREAM_JID).toString(), AHover.data(RDR_JID).toString());
 }
 
-void FileTransfer::dragLeave(const QDragLeaveEvent *AEvent)
+void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
 {
   Q_UNUSED(AEvent);
 }
 
-bool FileTransfer::dropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
+bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
 {
   if (AEvent->dropAction() != Qt::IgnoreAction)
   {

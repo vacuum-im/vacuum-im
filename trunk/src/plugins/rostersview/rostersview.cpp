@@ -805,7 +805,7 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 
     Qt::DropActions actions = Qt::IgnoreAction;
     foreach(IRostersDragDropHandler *handler, FDragDropHandlers)
-      actions |= handler->dragStart(AEvent,FPressedIndex,drag);
+      actions |= handler->rosterDragStart(AEvent,FPressedIndex,drag);
 
     if (actions != Qt::IgnoreAction)
     {
@@ -879,7 +879,7 @@ void RostersView::dropEvent(QDropEvent *AEvent)
 
   bool accepted = false;
   foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
-    if (handler->dropAction(AEvent,index,dropMenu))
+    if (handler->rosterDropAction(AEvent,index,dropMenu))
       accepted = true;
 
   if (accepted)
@@ -909,7 +909,7 @@ void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
 {
   FActiveDragHandlers.clear();
   foreach (IRostersDragDropHandler *handler, FDragDropHandlers)
-    if (handler->dragEnter(AEvent))
+    if (handler->rosterDragEnter(AEvent))
       FActiveDragHandlers.append(handler);
 
   if (!FActiveDragHandlers.isEmpty())
@@ -928,7 +928,7 @@ void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
   
   bool accepted = false;
   foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
-    if (handler->dragMove(AEvent,index))
+    if (handler->rosterDragMove(AEvent,index))
       accepted = true;
 
   if (accepted)
@@ -947,7 +947,7 @@ void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
 void RostersView::dragLeaveEvent(QDragLeaveEvent *AEvent)
 {
   foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
-    handler->dragLeave(AEvent);
+    handler->rosterDragLeave(AEvent);
   stopAutoScroll();
   setDropIndicatorRect(QRect());
 }
