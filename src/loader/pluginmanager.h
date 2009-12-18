@@ -82,7 +82,7 @@ private:
   QPointer<AboutBox> FAboutDialog;
   QPointer<SetupPluginsDialog> FPluginsDialog;
 private:
-  QString FHomePath;
+  QString FDataPath;
   QDomDocument FPluginsSetup;
   QTranslator *FQtTranslator;
   QTranslator *FUtilsTranslator;
