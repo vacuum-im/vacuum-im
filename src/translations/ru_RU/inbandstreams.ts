@@ -72,5 +72,13 @@
         <source>In-Band Bytestream</source>
         <translation>Внутриканальный поток данных</translation>
     </message>
+    <message>
+        <source>In-Band Data Stream</source>
+        <translation>Внутриканальный поток данных</translation>
+    </message>
+    <message>
+        <source>Allows to initiate in-band stream of data between two Jabber entities</source>
+        <translation>Позволяет инициировать внутриканальный поток данных между двумя XMPP сущностями</translation>
+    </message>
 </context>
 </TS>

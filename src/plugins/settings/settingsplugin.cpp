@@ -36,7 +36,7 @@ SettingsPlugin::~SettingsPlugin()
 void SettingsPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Settings Manager"); 
-  APluginInfo->description = tr("Managing profiles and settings");
+  APluginInfo->description = tr("Allows other modules to store user preferences");
   APluginInfo ->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

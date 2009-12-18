@@ -46,8 +46,8 @@ Avatars::~Avatars()
 
 void Avatars::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Avatars manager"); 
-  APluginInfo->description = tr("Enable a user to store and retrieve an avatar");
+  APluginInfo->name = tr("Avatars"); 
+  APluginInfo->description = tr("Allows to set and display avatars");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

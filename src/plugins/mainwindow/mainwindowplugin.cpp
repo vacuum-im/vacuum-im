@@ -21,7 +21,7 @@ MainWindowPlugin::~MainWindowPlugin()
 void MainWindowPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Main Window"); 
-  APluginInfo->description = tr("Main window holder");
+  APluginInfo->description = tr("Allows other modules to place their widgets in the main window");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

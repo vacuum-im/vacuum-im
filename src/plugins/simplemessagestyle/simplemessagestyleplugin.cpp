@@ -27,7 +27,7 @@ SimpleMessageStylePlugin::~SimpleMessageStylePlugin()
 void SimpleMessageStylePlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Simple Message Style"); 
-  APluginInfo->description = tr("Implements basic message styles.");
+  APluginInfo->description = tr("Allows to use a simplified style in message design");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

@@ -143,10 +143,6 @@
 <context>
     <name>ServiceDiscovery</name>
     <message>
-        <source>Discovering information about Jabber entities and the items associated with such entities</source>
-        <translation>Обзор информации и сервисов, связанных с Jabber объектами</translation>
-    </message>
-    <message>
         <source>Service Discovery</source>
         <translation>Обзор сервисов</translation>
     </message>
@@ -201,6 +197,10 @@
     <message>
         <source>Enables the capabilities information caching within a session or across sessions</source>
         <translation>Позволяет кэшировать информацию о возможностях клиентов</translation>
+    </message>
+    <message>
+        <source>Allows to receive information about Jabber entities</source>
+        <translation>Позволяет получать информацию о джаббер сущностях</translation>
     </message>
 </context>
 </TS>

@@ -16,7 +16,7 @@ ConnectionManager::~ConnectionManager()
 void ConnectionManager::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Connection Manager");
-  APluginInfo->description = tr("Managing TCP connections");
+  APluginInfo->description = tr("Allows to use different types of connections to a Jabber server");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

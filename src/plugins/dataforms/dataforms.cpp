@@ -15,8 +15,8 @@ DataForms::~DataForms()
 
 void DataForms::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Data Forms");
-  APluginInfo->description = tr("Implements data forms and generic data description");
+  APluginInfo->name = tr("Data Forms Manager");
+  APluginInfo->description = tr("Allows other modules to process and display the form with the data intended for user");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

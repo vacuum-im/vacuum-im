@@ -45,8 +45,8 @@ SocksStreams::~SocksStreams()
 
 void SocksStreams::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("SOCKS5 Bytestreams");
-  APluginInfo->description = tr("Enables any two entities to establish an SOCKS5 out-of-band bytestream");
+  APluginInfo->name = tr("SOCKS5 Data Stream");
+  APluginInfo->description = tr("Allows to initiate SOCKS5 stream of data between two Jabber entities");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

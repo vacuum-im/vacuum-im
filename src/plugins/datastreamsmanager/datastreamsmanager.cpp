@@ -26,7 +26,7 @@ DataStreamsManger::~DataStreamsManger()
 void DataStreamsManger::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Data Streams Manager");
-  APluginInfo->description = tr("Initiate a data stream between any two XMPP entities");
+  APluginInfo->description = tr("Allows to initiate a custom stream of data between two XMPP entities");
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->version = "1.0";
   APluginInfo->homePage = "http://jrudevels.org";

@@ -4,12 +4,12 @@
 <context>
     <name>ConnectionManager</name>
     <message>
-        <source>Managing TCP connections</source>
-        <translation>Управление TCP-соединениями</translation>
+        <source>Connection Manager</source>
+        <translation>Диспетчер соединений</translation>
     </message>
     <message>
-        <source>Connection Manager</source>
-        <translation>Менеджер соединений</translation>
+        <source>Allows to use different types of connections to a Jabber server</source>
+        <translation>Позволяет использовать различные типы подключений к джаббер серверу</translation>
     </message>
 </context>
 <context>

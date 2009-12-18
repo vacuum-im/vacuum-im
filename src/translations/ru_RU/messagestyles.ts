@@ -4,10 +4,6 @@
 <context>
     <name>MessageStyles</name>
     <message>
-        <source>Managing message styles</source>
-        <translation>Управление стилями сообщений</translation>
-    </message>
-    <message>
         <source>Message Styles</source>
         <translation>Стили сообщений</translation>
     </message>
@@ -26,6 +22,14 @@
     <message>
         <source>Styles options for custom messages</source>
         <translation>Настройки стилей сообщений</translation>
+    </message>
+    <message>
+        <source>Message Styles Manager</source>
+        <translation>Диспетчер стилей сообщений</translation>
+    </message>
+    <message>
+        <source>Allows to use different styles to display messages</source>
+        <translation>Позволяет использовать различные стили для отображения сообщений</translation>
     </message>
 </context>
 <context>

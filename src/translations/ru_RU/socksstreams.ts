@@ -148,5 +148,13 @@
         <source>Data is transfered out-band over TCP or UDP connection</source>
         <translation>Данные передаются по отдельному TCP или UDP подключению</translation>
     </message>
+    <message>
+        <source>SOCKS5 Data Stream</source>
+        <translation>SOCKS5 поток данных</translation>
+    </message>
+    <message>
+        <source>Allows to initiate SOCKS5 stream of data between two Jabber entities</source>
+        <translation>Позволяет инициировать SOCKS5 поток данных между двумя джаббер сущностями</translation>
+    </message>
 </context>
 </TS>

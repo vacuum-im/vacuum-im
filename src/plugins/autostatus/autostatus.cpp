@@ -34,8 +34,8 @@ AutoStatus::~AutoStatus()
 
 void AutoStatus::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Auto status"); 
-  APluginInfo->description = tr("Changing status depending on user activity");
+  APluginInfo->name = tr("Auto Status"); 
+  APluginInfo->description = tr("Allows to change the status in accordance with the time of inactivity");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

@@ -4,10 +4,6 @@
 <context>
     <name>AutoStatus</name>
     <message>
-        <source>Changing status depending on user activity</source>
-        <translation>Автоматическое изменение статуса в зависимости от активности пользователя</translation>
-    </message>
-    <message>
         <source>Auto status</source>
         <translation>Автостатус</translation>
     </message>
@@ -18,6 +14,14 @@
     <message>
         <source>Status changed automatically to &apos;away&apos;</source>
         <translation>Статус автоматически зменен на &apos;ушел&apos;</translation>
+    </message>
+    <message>
+        <source>Auto Status</source>
+        <translation>Авто статус</translation>
+    </message>
+    <message>
+        <source>Allows to change the status in accordance with the time of inactivity</source>
+        <translation>Позволяет менять статус в зависимости от времени бездействия</translation>
     </message>
 </context>
 <context>

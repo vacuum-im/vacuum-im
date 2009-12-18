@@ -4,10 +4,6 @@
 <context>
     <name>Annotations</name>
     <message>
-        <source>Plugin for making annotations about roster items and other entities</source>
-        <translation>Плагин для создания комментариев к контактам и другим джаббер эелементам</translation>
-    </message>
-    <message>
         <source>Annotations</source>
         <translation>Комментарии</translation>
     </message>
@@ -18,6 +14,10 @@
     <message>
         <source>Annotation:</source>
         <translation>Комментарий:</translation>
+    </message>
+    <message>
+        <source>Allows to add comments to the contacts in the roster</source>
+        <translation>Позволяет добавлять коментарии к контактам в ростере</translation>
     </message>
 </context>
 <context>

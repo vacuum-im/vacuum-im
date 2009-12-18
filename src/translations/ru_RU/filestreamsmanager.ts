@@ -31,12 +31,8 @@
 <context>
     <name>FileStreamsManager</name>
     <message>
-        <source>Managing custom file streams</source>
-        <translation>Управляет произвольными файловыми потоками</translation>
-    </message>
-    <message>
         <source>File Streams Manager</source>
-        <translation>Менеджер файловый потоков</translation>
+        <translation>Диспетчер файловых потоков</translation>
     </message>
     <message>
         <source>File Transfers</source>
@@ -53,6 +49,10 @@
     <message>
         <source>Common options for file transfer</source>
         <translation>Общие настройки передачи файлов</translation>
+    </message>
+    <message>
+        <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
+        <translation>Позволяет инициировать поток для передачи файлов между двумя XMPP сущностями</translation>
     </message>
 </context>
 <context>

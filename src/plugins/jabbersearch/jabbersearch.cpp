@@ -21,7 +21,7 @@ JabberSearch::~JabberSearch()
 void JabberSearch::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Jabber Search"); 
-  APluginInfo->description = tr("Search information repositories on the Jabber network.");
+  APluginInfo->description = tr("Allows to search in the Jabber network");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

@@ -4,10 +4,6 @@
 <context>
     <name>SessionNegotiation</name>
     <message>
-        <source>Negotiating the exchange of XML stanzas between two XMPP entities.</source>
-        <translation>Согласует обмен XML-транзакцями между двумя XMPP клиентами.</translation>
-    </message>
-    <message>
         <source>Session Negotiation</source>
         <translation>Согласование сессии</translation>
     </message>
@@ -102,6 +98,14 @@
     <message>
         <source>Renegotiate this session?</source>
         <translation>Пересогласовать сессию?</translation>
+    </message>
+    <message>
+        <source>Jabber Session Manager</source>
+        <translation>Диспетчер джаббер сессий</translation>
+    </message>
+    <message>
+        <source>Allows to set the session between two entities, which explains the rules of the exchange of XMPP stanzas</source>
+        <translation>Позволяет устанавливать сессию между двумя сущностями, которая определяет правила обмена XMPP строфами</translation>
     </message>
 </context>
 </TS>

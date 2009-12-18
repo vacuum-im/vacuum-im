@@ -13,7 +13,7 @@ SkinManager::~SkinManager()
 void SkinManager::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Skin Manager"); 
-  APluginInfo->description = tr("Managing skins");
+  APluginInfo->description = tr("Allows to change the look and feel of the application");
   APluginInfo ->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

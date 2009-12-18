@@ -4,10 +4,6 @@
 <context>
     <name>ClientInfo</name>
     <message>
-        <source>Client Info</source>
-        <translation>Информация о клиенте</translation>
-    </message>
-    <message>
         <source>Software version</source>
         <translation>Версия приложения</translation>
     </message>
@@ -56,16 +52,20 @@
         <translation>Версия ОС</translation>
     </message>
     <message>
-        <source>Request contact client information</source>
-        <translation>Запрашивает информацию о версии приложения, последней активности и локальном времени контакта</translation>
-    </message>
-    <message>
         <source>Request contact software version</source>
         <translation>Версия приложения контакта</translation>
     </message>
     <message>
         <source>Request contact last activity</source>
         <translation>Последняя активность контакта</translation>
+    </message>
+    <message>
+        <source>Client Information</source>
+        <translation>Клиентская информация</translation>
+    </message>
+    <message>
+        <source>Allows to send and receive information about the version of the application, the local time and the last activity of contact</source>
+        <translation>Позволяет отправлять и получать информацию о версии приложения, локальном времени и последней активности контакта</translation>
     </message>
 </context>
 <context>

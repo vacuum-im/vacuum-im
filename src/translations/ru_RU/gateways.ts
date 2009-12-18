@@ -42,10 +42,6 @@
 <context>
     <name>Gateways</name>
     <message>
-        <source>Plugin for interactions between Jabber clients and client proxy gateways to legacy IM services</source>
-        <translation>Плагин для взаимодействия месжду Jabber-клиентами и другими IM-системами посредством транспортов</translation>
-    </message>
-    <message>
         <source>Gateway Interaction</source>
         <translation>Взаимодействие с транспортами</translation>
     </message>
@@ -80,6 +76,10 @@
     <message>
         <source>Use instead of</source>
         <translation>Использовать вместо</translation>
+    </message>
+    <message>
+        <source>Allows to simplify the interaction with transports to other IM systems</source>
+        <translation>Позволяет упростить взаимодействие с транспортами в другие IM системы</translation>
     </message>
 </context>
 </TS>

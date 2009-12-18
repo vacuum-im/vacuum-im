@@ -15,12 +15,12 @@
 <context>
     <name>AdiumMessageStylePlugin</name>
     <message>
-        <source>Implements support for Adium message styles</source>
-        <translation>Реализует поддержку стилей оформления сообщений как в Adium</translation>
+        <source>Adium Message Style</source>
+        <translation>Adium cтиль сообщений</translation>
     </message>
     <message>
-        <source>Adiun Message Style</source>
-        <translation>Стиль оформления сообщений от Adium</translation>
+        <source>Allows to use a Adium style in message design</source>
+        <translation>Позволяет использовать Adium стиль оформления сообщений</translation>
     </message>
 </context>
 <context>

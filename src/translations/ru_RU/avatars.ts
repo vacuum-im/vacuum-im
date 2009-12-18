@@ -4,14 +4,6 @@
 <context>
     <name>Avatars</name>
     <message>
-        <source>Enable a user to store and retrieve an avatar</source>
-        <translation>Позволяет получать и хранить аватары</translation>
-    </message>
-    <message>
-        <source>Avatars manager</source>
-        <translation>Управление аватарами</translation>
-    </message>
-    <message>
         <source>Avatar</source>
         <translation>Аватар</translation>
     </message>
@@ -42,6 +34,14 @@
     <message>
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Картинки (*.png *.jpg *.bmp *.gif)</translation>
+    </message>
+    <message>
+        <source>Avatars</source>
+        <translation>Аватары</translation>
+    </message>
+    <message>
+        <source>Allows to set and display avatars</source>
+        <translation>Позволяет устанавливать и отображать аватары</translation>
     </message>
 </context>
 <context>

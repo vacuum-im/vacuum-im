@@ -25,8 +25,8 @@ AdiumMessageStylePlugin::~AdiumMessageStylePlugin()
 
 void AdiumMessageStylePlugin::pluginInfo( IPluginInfo *APluginInfo )
 {
-  APluginInfo->name = tr("Adiun Message Style"); 
-  APluginInfo->description = tr("Implements support for Adium message styles");
+  APluginInfo->name = tr("Adium Message Style"); 
+  APluginInfo->description = tr("Allows to use a Adium style in message design");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

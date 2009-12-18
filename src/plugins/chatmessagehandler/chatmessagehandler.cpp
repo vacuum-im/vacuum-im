@@ -33,8 +33,8 @@ ChatMessageHandler::~ChatMessageHandler()
 
 void ChatMessageHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Chat Message Handler"); 
-  APluginInfo->description = tr("Chat message handling");
+  APluginInfo->name = tr("Chat Messages");
+  APluginInfo->description = tr("Allows to exchange chat messages");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

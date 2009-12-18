@@ -8,10 +8,6 @@
         <translation>CAPTCHA Формы</translation>
     </message>
     <message>
-        <source>Allows to discover whether the sender of an XML stanza is a human user or a robot</source>
-        <translation>Позволяет определить является ли отправитель XML строфы человеком или роботом</translation>
-    </message>
-    <message>
         <source>CAPTCHA Challenges</source>
         <translation>CAPTCHA запросы</translation>
     </message>
@@ -58,6 +54,10 @@
     <message>
         <source>You have received the CAPTCHA challenge</source>
         <translation>Вы получили CAPTCHA запрос</translation>
+    </message>
+    <message>
+        <source>Allows to undergo tests on humanity without the use of browser</source>
+        <translation>Позволяет проходить тесты на человечность без использования браузера</translation>
     </message>
 </context>
 </TS>

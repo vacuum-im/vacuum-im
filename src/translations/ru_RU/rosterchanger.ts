@@ -82,14 +82,6 @@
 <context>
     <name>RosterChanger</name>
     <message>
-        <source>Manipulating roster items and groups</source>
-        <translation>Управление элементами контакт-листа и группами</translation>
-    </message>
-    <message>
-        <source>Roster Changer</source>
-        <translation>Модуль управления контакт-листом</translation>
-    </message>
-    <message>
         <source>Subscription requests</source>
         <translation>Запросы авторизации</translation>
     </message>
@@ -256,6 +248,14 @@
     <message>
         <source>You are assured that wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
         <translation>Вы уверены, что хотите отписаться от получения статуса контакта &lt;b&gt;%1&lt;/b&gt;?</translation>
+    </message>
+    <message>
+        <source>Roster Editor</source>
+        <translation>Редактор ростера</translation>
+    </message>
+    <message>
+        <source>Allows to edit roster</source>
+        <translation>Позволяет редактировать ростер</translation>
     </message>
 </context>
 <context>

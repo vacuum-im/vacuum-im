@@ -39,8 +39,8 @@ MultiUserChatPlugin::~MultiUserChatPlugin()
 
 void MultiUserChatPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Multi-User Chat");
-  APluginInfo->description = tr("Implements multi-user text conferencing");
+  APluginInfo->name = tr("Multi-User Conferences");
+  APluginInfo->description = tr("Allows to use Jabber multi-user conferences");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

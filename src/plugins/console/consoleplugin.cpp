@@ -13,8 +13,8 @@ ConsolePlugin::~ConsolePlugin()
 
 void ConsolePlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("XML Console");
-  APluginInfo->description = tr("Allow to view XMPP stanzas.");
+  APluginInfo->name = tr("Console");
+  APluginInfo->description = tr("Allows to view XML stream between the client and server");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

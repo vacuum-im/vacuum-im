@@ -157,14 +157,6 @@
 <context>
     <name>MessageArchiver</name>
     <message>
-        <source>Archiving and retrieval of XMPP messages</source>
-        <translation>Хранение и получение XMPP сообщений</translation>
-    </message>
-    <message>
-        <source>Message Archiver</source>
-        <translation>Хранилище сообщений</translation>
-    </message>
-    <message>
         <source>Prefer</source>
         <translation>Предпочесть</translation>
     </message>
@@ -351,6 +343,10 @@
     <message>
         <source>Forever</source>
         <translation>Вечно</translation>
+    </message>
+    <message>
+        <source>Allows to save the history of communications both locally and on the server</source>
+        <translation>Позволяет сохранять историю сообщений как локально так и на сервере</translation>
     </message>
 </context>
 <context>

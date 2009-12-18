@@ -21,8 +21,8 @@ AccountManager::~AccountManager()
 //IPlugin
 void AccountManager::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Account manager");
-  APluginInfo->description = tr("Creating and removing accounts");
+  APluginInfo->name = tr("Account Manager");
+  APluginInfo->description = tr("Allows to create and manage Jabber accounts");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

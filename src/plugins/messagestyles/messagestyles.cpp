@@ -20,8 +20,8 @@ MessageStyles::~MessageStyles()
 
 void MessageStyles::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Message Styles"); 
-  APluginInfo->description = tr("Managing message styles");
+  APluginInfo->name = tr("Message Styles Manager"); 
+  APluginInfo->description = tr("Allows to use different styles to display messages");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

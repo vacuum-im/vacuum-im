@@ -4,16 +4,16 @@
 <context>
     <name>Emoticons</name>
     <message>
-        <source>Insert smiley icons in chat windows</source>
-        <translation>Поддержка смайликов в окне чата</translation>
-    </message>
-    <message>
         <source>Emoticons</source>
         <translation>Смайлики</translation>
     </message>
     <message>
         <source>Select emoticons files</source>
         <translation>Выберите набор смайликов</translation>
+    </message>
+    <message>
+        <source>Allows to use your smiley images in messages</source>
+        <translation>Позволяет использовать изображения смайликов в сообщениях</translation>
     </message>
 </context>
 </TS>

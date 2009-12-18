@@ -52,8 +52,8 @@ StatusChanger::~StatusChanger()
 //IPlugin
 void StatusChanger::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Status Changer"); 
-  APluginInfo->description = tr("Managing and change status");
+  APluginInfo->name = tr("Status Manager"); 
+  APluginInfo->description = tr("Allows to change the status in Jabber network");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

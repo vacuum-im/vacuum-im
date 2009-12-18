@@ -38,7 +38,7 @@ Gateways::~Gateways()
 void Gateways::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Gateway Interaction");
-  APluginInfo->description = tr("Plugin for interactions between Jabber clients and client proxy gateways to legacy IM services");
+  APluginInfo->description = tr("Allows to simplify the interaction with transports to other IM systems");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

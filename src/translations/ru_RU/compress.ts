@@ -4,10 +4,6 @@
 <context>
     <name>CompressPlugin</name>
     <message>
-        <source>Implementation of Stream Compression</source>
-        <translation>Поддержка сжатия XMPP потока</translation>
-    </message>
-    <message>
         <source>Unsupported compression method</source>
         <translation>Неподдерживаемый метод сжатия</translation>
     </message>
@@ -18,6 +14,10 @@
     <message>
         <source>Stream Compression</source>
         <translation>Сжатие XMPP потока</translation>
+    </message>
+    <message>
+        <source>Allows to compress a stream of messages sent and received from the server</source>
+        <translation>Позволяет сжимать поток сообщений отправляемый и получаемый от сервера</translation>
     </message>
 </context>
 <context>

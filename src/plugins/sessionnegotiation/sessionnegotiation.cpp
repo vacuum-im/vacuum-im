@@ -34,8 +34,8 @@ SessionNegotiation::~SessionNegotiation()
 
 void SessionNegotiation::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Session Negotiation"); 
-  APluginInfo->description = tr("Negotiating the exchange of XML stanzas between two XMPP entities.");
+  APluginInfo->name = tr("Jabber Session Manager"); 
+  APluginInfo->description = tr("Allows to set the session between two entities, which explains the rules of the exchange of XMPP stanzas");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

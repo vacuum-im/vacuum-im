@@ -35,12 +35,8 @@
 <context>
     <name>StatusIcons</name>
     <message>
-        <source>Assign status icon to contact depended on users rules</source>
-        <translation>Позволяет задать статус-иконку контакту на основе правил пользователя</translation>
-    </message>
-    <message>
         <source>Status Icons Manager</source>
-        <translation>Менеджер статус-иконок</translation>
+        <translation>Диспетчер статус-иконок</translation>
     </message>
     <message>
         <source>Status icon</source>
@@ -57,6 +53,10 @@
     <message>
         <source>Default</source>
         <translation>По умолчанию</translation>
+    </message>
+    <message>
+        <source>Allows to set the status icons for contacts on the basis of standard rules or user-defined</source>
+        <translation>Позволяет устанавливать статус иконки контактам на основе стандартных правил или определенных пользователем</translation>
     </message>
 </context>
 </TS>

@@ -38,14 +38,6 @@
 <context>
     <name>RostersViewPlugin</name>
     <message>
-        <source>Representing roster to user</source>
-        <translation>Отображение контакт-листа</translation>
-    </message>
-    <message>
-        <source>Rosters View</source>
-        <translation>Модуль отображения контакт-листа</translation>
-    </message>
-    <message>
         <source>Roster</source>
         <translation>Контакт-лист</translation>
     </message>
@@ -56,6 +48,14 @@
     <message>
         <source>Show/Hide offline contacts</source>
         <translation>Скрыть/показать отключенные контакты</translation>
+    </message>
+    <message>
+        <source>Roster View</source>
+        <translation>Отображение ростера</translation>
+    </message>
+    <message>
+        <source>Displays a hierarchical roster&apos;s model</source>
+        <translation>Отображает иерархическую модель ростера</translation>
     </message>
 </context>
 </TS>

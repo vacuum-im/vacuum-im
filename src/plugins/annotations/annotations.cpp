@@ -23,7 +23,7 @@ Annotations::~Annotations()
 void Annotations::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Annotations"); 
-  APluginInfo->description = tr("Plugin for making annotations about roster items and other entities");
+  APluginInfo->description = tr("Allows to add comments to the contacts in the roster");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

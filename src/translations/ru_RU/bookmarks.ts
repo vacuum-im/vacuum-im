@@ -8,16 +8,16 @@
         <translation>Закладки</translation>
     </message>
     <message>
-        <source>Storage of bookmarks to conference rooms and other entities in a Jabber user&apos;s account</source>
-        <translation>Хранение закладок с конференциями и ссылками на jabber сервере</translation>
-    </message>
-    <message>
         <source>Edit bookmarks</source>
         <translation>Редактировать закладки</translation>
     </message>
     <message>
         <source>Bookmark this room</source>
         <translation>Добавить в закладки</translation>
+    </message>
+    <message>
+        <source>Allows to create bookmarks at the jabber conference and web pages</source>
+        <translation>Позволяет создавать закладки на джаббер конференции и веб-станицы</translation>
     </message>
 </context>
 <context>

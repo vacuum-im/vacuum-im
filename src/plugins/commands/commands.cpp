@@ -31,7 +31,7 @@ Commands::~Commands()
 void Commands::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Ad-Hoc Commands");
-  APluginInfo->description = tr("Plugin for advertising and executing application-specific commands");
+  APluginInfo->description = tr("Allows to perform special commands provided by various services");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

@@ -61,7 +61,7 @@ ServiceDiscovery::~ServiceDiscovery()
 void ServiceDiscovery::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Service Discovery");
-  APluginInfo->description = tr("Discovering information about Jabber entities and the items associated with such entities");
+  APluginInfo->description = tr("Allows to receive information about Jabber entities");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

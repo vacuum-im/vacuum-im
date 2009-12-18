@@ -15,7 +15,7 @@ XmppUriQueries::~XmppUriQueries()
 void XmppUriQueries::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("XMPP URI Queries");
-  APluginInfo->description = tr("Managing XMPP URI queries");
+  APluginInfo->description = tr("Allows other plugins to handle XMPP URI queries");
   APluginInfo ->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

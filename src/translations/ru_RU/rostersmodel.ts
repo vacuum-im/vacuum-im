@@ -4,14 +4,6 @@
 <context>
     <name>RostersModel</name>
     <message>
-        <source>Creating and handling roster tree</source>
-        <translation>Создание и управление контакт-листом</translation>
-    </message>
-    <message>
-        <source>Rosters Model</source>
-        <translation>Модель контакт-листа</translation>
-    </message>
-    <message>
         <source>Blank Group</source>
         <translation>Общая группа</translation>
     </message>
@@ -26,6 +18,14 @@
     <message>
         <source>Not in Roster</source>
         <translation>Не в контакт-листе</translation>
+    </message>
+    <message>
+        <source>Roster Model</source>
+        <translation>Модель ростера</translation>
+    </message>
+    <message>
+        <source>Creates a hierarchical model for display roster</source>
+        <translation>Создает иерархическую модель для отображения ростера</translation>
     </message>
 </context>
 </TS>

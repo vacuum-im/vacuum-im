@@ -44,8 +44,8 @@ FileTransfer::~FileTransfer()
 
 void FileTransfer::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Files Transfer");
-  APluginInfo->description = tr("Transfer files between two XMPP entities");
+  APluginInfo->name = tr("File Transfer");
+  APluginInfo->description = tr("Allows to send a file to another contact");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

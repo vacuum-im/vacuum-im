@@ -73,8 +73,8 @@ IqAuthPlugin::~IqAuthPlugin()
 
 void IqAuthPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Non-SASL Authentication");
-  APluginInfo->description = tr("Implementation of Non-SASL Authentication (JEP-0078)");
+  APluginInfo->name = tr("Query Authentication");
+  APluginInfo->description = tr("Allow you to log on the Jabber server without support SASL authentication");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

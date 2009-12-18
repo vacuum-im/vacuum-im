@@ -14,8 +14,8 @@ RosterPlugin::~RosterPlugin()
 
 void RosterPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Roster and Subscriptions Manager"); 
-  APluginInfo->description = tr("Managing roster and subscriptions");
+  APluginInfo->name = tr("Roster Manager"); 
+  APluginInfo->description = tr("Allows other modules to get information about contacts in the roster");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

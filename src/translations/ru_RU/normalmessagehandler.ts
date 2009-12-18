@@ -4,14 +4,6 @@
 <context>
     <name>NormalMessageHandler</name>
     <message>
-        <source>Normal message handling</source>
-        <translation>Управление обычными сообщениями</translation>
-    </message>
-    <message>
-        <source>Normal Message Handler</source>
-        <translation>Менеджер обычных сообщений</translation>
-    </message>
-    <message>
         <source>Single Messages</source>
         <translation>Отдельные сообщения</translation>
     </message>
@@ -54,6 +46,14 @@
     <message>
         <source>&lt;no subject&gt;</source>
         <translation>&lt;без темы&gt;</translation>
+    </message>
+    <message>
+        <source>Normal Messages</source>
+        <translation>Обычные сообщения</translation>
+    </message>
+    <message>
+        <source>Allows to exchange normal messages</source>
+        <translation>Позволяет обмениваться обычными сообщениями</translation>
     </message>
 </context>
 </TS>

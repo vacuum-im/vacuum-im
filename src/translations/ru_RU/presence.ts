@@ -4,12 +4,12 @@
 <context>
     <name>PresencePlugin</name>
     <message>
-        <source>Managing presences</source>
-        <translation>Управление статусами</translation>
+        <source>Presence Manager</source>
+        <translation>Диспетчер присутствия</translation>
     </message>
     <message>
-        <source>Presence Manager</source>
-        <translation>Статус-менеджер</translation>
+        <source>Allows other modules to obtain information about the status of contacts in the roster</source>
+        <translation>Позволяет другим модулям получать информацию о статусе контактов в ростере</translation>
     </message>
 </context>
 </TS>

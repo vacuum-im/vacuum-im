@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Data Streams Manager</source>
-        <translation>Менеджер потоков данных</translation>
+        <translation>Диспетчер потоков данных</translation>
     </message>
     <message>
         <source>None of the available streams are acceptable</source>
@@ -46,6 +46,10 @@
     <message>
         <source>&lt;Default Profile&gt;</source>
         <translation>&lt;Основной профиль&gt;</translation>
+    </message>
+    <message>
+        <source>Allows to initiate a custom stream of data between two XMPP entities</source>
+        <translation>Позволяет инициировать произвольный поток данных между двумя XMPP сущностями</translation>
     </message>
 </context>
 <context>

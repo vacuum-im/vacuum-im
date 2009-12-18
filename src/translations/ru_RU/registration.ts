@@ -141,5 +141,9 @@
         <source>Your Web Paqe</source>
         <translation>Web-страница</translation>
     </message>
+    <message>
+        <source>Allows to register on the Jabber servers and services</source>
+        <translation>Позволяет регистрироваться на джаббер серверах и сервисах</translation>
+    </message>
 </context>
 </TS>

@@ -30,8 +30,8 @@ VCardPlugin::~VCardPlugin()
 
 void VCardPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("VCard manager"); 
-  APluginInfo->description = tr("Request and publish vCard");
+  APluginInfo->name = tr("vCard Manager"); 
+  APluginInfo->description = tr("Allows to obtain personal contact information");
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->version = "1.0";
   APluginInfo->homePage = "http://jrudevels.org";

@@ -28,7 +28,7 @@ FileStreamsManager::~FileStreamsManager()
 void FileStreamsManager::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("File Streams Manager");
-  APluginInfo->description = tr("Managing custom file streams");
+  APluginInfo->description = tr("Allows to initiate a thread for transferring files between two XMPP entities");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
