@@ -21,7 +21,7 @@ Emoticons::~Emoticons()
 void Emoticons::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Emoticons"); 
-  APluginInfo->description = tr("Insert smiley icons in chat windows");
+  APluginInfo->description = tr("Allows to use your smiley images in messages");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

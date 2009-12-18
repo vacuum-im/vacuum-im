@@ -15,8 +15,8 @@ StanzaProcessor::~StanzaProcessor()
 
 void StanzaProcessor::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Stanza Processor"); 
-  APluginInfo->description = tr("Managing XMPP stanzas");
+  APluginInfo->name = tr("Stanza Manager"); 
+  APluginInfo->description = tr("Allows other modules to send and receive XMPP stanzas");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

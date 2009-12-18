@@ -16,12 +16,16 @@
         <translation>Изменить аккаунт</translation>
     </message>
     <message>
-        <source>Account manager</source>
-        <translation>Менеджер аккаунтов</translation>
-    </message>
-    <message>
         <source>Account options</source>
         <translation>Настройки аккаунта</translation>
+    </message>
+    <message>
+        <source>Account Manager</source>
+        <translation>Диспетчер аккаунтов</translation>
+    </message>
+    <message>
+        <source>Allows to create and manage Jabber accounts</source>
+        <translation>Позволяет создавать и управлять джаббер аккаунтами</translation>
     </message>
 </context>
 <context>

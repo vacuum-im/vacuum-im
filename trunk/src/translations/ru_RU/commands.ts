@@ -43,10 +43,6 @@
 <context>
     <name>Commands</name>
     <message>
-        <source>Plugin for advertising and executing application-specific commands</source>
-        <translation>Плагин для отображения и выполнения команд приложения</translation>
-    </message>
-    <message>
         <source>Ad-Hoc Commands</source>
         <translation>Ad-Hoc Команды</translation>
     </message>
@@ -89,6 +85,10 @@
     <message>
         <source>Request commands</source>
         <translation>Запросить команды</translation>
+    </message>
+    <message>
+        <source>Allows to perform special commands provided by various services</source>
+        <translation>Позволяет выполнять специальные команды предоставляемые различными сервисами</translation>
     </message>
 </context>
 </TS>

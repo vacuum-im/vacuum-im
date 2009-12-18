@@ -24,8 +24,8 @@ InBandStreams::~InBandStreams()
 
 void InBandStreams::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("In-Band Bytestreams");
-  APluginInfo->description = tr("Enables any two entities to establish a one-to-one in-band bytestream");
+  APluginInfo->name = tr("In-Band Data Stream");
+  APluginInfo->description = tr("Allows to initiate in-band stream of data between two Jabber entities");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

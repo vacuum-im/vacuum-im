@@ -46,7 +46,7 @@ PrivacyLists::~PrivacyLists()
 void PrivacyLists::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Privacy Lists");
-  APluginInfo->description = tr("Enabling or disabling communication with other entities on a network.");
+  APluginInfo->description = tr("Allows to block unwanted contacts");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

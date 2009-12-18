@@ -20,10 +20,6 @@
         <translation>Передача файла завершена</translation>
     </message>
     <message>
-        <source>Files Transfer</source>
-        <translation>Передача файлов</translation>
-    </message>
-    <message>
         <source>Requested file transfer: %1</source>
         <translation>Запрошена передача файла: %1</translation>
     </message>
@@ -58,6 +54,10 @@
     <message>
         <source>File receiving is started automatically</source>
         <translation>Получение файла запущено автоматически</translation>
+    </message>
+    <message>
+        <source>Allows to send a file to another contact</source>
+        <translation>Позволяет передать файл другому контакту</translation>
     </message>
 </context>
 <context>

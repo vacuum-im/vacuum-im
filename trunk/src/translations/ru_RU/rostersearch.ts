@@ -12,10 +12,6 @@
         <translation>Поиск контакта по регулярному выражению</translation>
     </message>
     <message>
-        <source>Searching contacts in roster</source>
-        <translation>Поиск контактов в контакт-листе</translation>
-    </message>
-    <message>
         <source>Roster Search</source>
         <translation>Поиск по контакт-листу</translation>
     </message>
@@ -34,6 +30,10 @@
     <message>
         <source>Jabber ID</source>
         <translation>Jabber ID</translation>
+    </message>
+    <message>
+        <source>Allows to search for contacts in the roster</source>
+        <translation>Позволяет искать контакты в ростере</translation>
     </message>
 </context>
 </TS>

@@ -29,7 +29,7 @@ BookMarks::~BookMarks()
 void BookMarks::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Bookmarks");
-  APluginInfo->description = tr("Storage of bookmarks to conference rooms and other entities in a Jabber user's account");
+  APluginInfo->description = tr("Allows to create bookmarks at the jabber conference and web pages");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

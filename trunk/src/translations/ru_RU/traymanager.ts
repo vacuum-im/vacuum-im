@@ -4,16 +4,16 @@
 <context>
     <name>TrayManager</name>
     <message>
-        <source>Managing tray icon</source>
-        <translation>Управление иконкой в трее</translation>
-    </message>
-    <message>
-        <source>Tray manager</source>
-        <translation>Менеджер трея</translation>
-    </message>
-    <message>
         <source>Quit</source>
         <translation>Выход</translation>
+    </message>
+    <message>
+        <source>Tray Icon</source>
+        <translation>Инонка трея</translation>
+    </message>
+    <message>
+        <source>Allows other modules to access the icon and context menu in the tray</source>
+        <translation>Позволяет другим модулям получать доступ к иконке и контекстному меню в трее</translation>
     </message>
 </context>
 </TS>

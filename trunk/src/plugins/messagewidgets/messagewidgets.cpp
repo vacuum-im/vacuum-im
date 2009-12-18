@@ -34,8 +34,8 @@ MessageWidgets::~MessageWidgets()
 
 void MessageWidgets::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Message Widgets"); 
-  APluginInfo->description = tr("Manager of the widgets for displaying messages");
+  APluginInfo->name = tr("Message Widgets Manager"); 
+  APluginInfo->description = tr("Allows other modules to use standard widgets for messaging");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

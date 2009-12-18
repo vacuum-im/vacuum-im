@@ -45,8 +45,8 @@ RosterChanger::~RosterChanger()
 //IPlugin
 void RosterChanger::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Roster Changer"); 
-  APluginInfo->description = tr("Manipulating roster items and groups");
+  APluginInfo->name = tr("Roster Editor"); 
+  APluginInfo->description = tr("Allows to edit roster");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

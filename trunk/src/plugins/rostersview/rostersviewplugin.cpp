@@ -48,8 +48,8 @@ RostersViewPlugin::~RostersViewPlugin()
 
 void RostersViewPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Rosters View"); 
-  APluginInfo->description = tr("Representing roster to user");
+  APluginInfo->name = tr("Roster View"); 
+  APluginInfo->description = tr("Displays a hierarchical roster's model");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

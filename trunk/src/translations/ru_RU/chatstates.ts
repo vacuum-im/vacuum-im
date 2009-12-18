@@ -19,6 +19,10 @@
         <source>Disallow Chat State Notifications</source>
         <translation>Запретить отправку уведомлений об активности в чате</translation>
     </message>
+    <message>
+        <source>Allows to share information about the user&apos;s activity in the chat</source>
+        <translation>Позволяет обмениваться информацией об активности пользователя в чате</translation>
+    </message>
 </context>
 <context>
     <name>StateOptionsWidgetClass</name>

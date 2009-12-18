@@ -198,10 +198,6 @@
 <context>
     <name>PrivacyLists</name>
     <message>
-        <source>Enabling or disabling communication with other entities on a network.</source>
-        <translation>Включает или отключает общение с другими объектами сети.</translation>
-    </message>
-    <message>
         <source>Privacy Lists</source>
         <translation>Списки приватности</translation>
     </message>
@@ -292,6 +288,10 @@
     <message>
         <source>- presences out: %1</source>
         <translation>- исх. статус: %1</translation>
+    </message>
+    <message>
+        <source>Allows to block unwanted contacts</source>
+        <translation>Позволяет блокировать нежелательные контакты</translation>
     </message>
 </context>
 </TS>

@@ -4,12 +4,12 @@
 <context>
     <name>SkinManager</name>
     <message>
-        <source>Managing skins</source>
-        <translation>Управление скинами</translation>
+        <source>Skin Manager</source>
+        <translation>Диспетчер скинов</translation>
     </message>
     <message>
-        <source>Skin Manager</source>
-        <translation>Менеджер скинов</translation>
+        <source>Allows to change the look and feel of the application</source>
+        <translation>Позволяет изменять внешнее оформление приложения</translation>
     </message>
 </context>
 </TS>

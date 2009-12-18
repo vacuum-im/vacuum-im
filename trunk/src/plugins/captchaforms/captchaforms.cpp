@@ -21,7 +21,7 @@ CaptchaForms::~CaptchaForms()
 void CaptchaForms::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("CAPTCHA Forms");
-  APluginInfo->description = tr("Allows to discover whether the sender of an XML stanza is a human user or a robot");
+  APluginInfo->description = tr("Allows to undergo tests on humanity without the use of browser");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

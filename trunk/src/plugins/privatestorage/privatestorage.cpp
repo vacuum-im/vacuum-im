@@ -18,7 +18,7 @@ PrivateStorage::~PrivateStorage()
 void PrivateStorage::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Private Storage");
-  APluginInfo->description = tr("Store and retrieve custom XML data from server");
+  APluginInfo->description = tr("Allows other modules to store arbitrary data on a server");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

@@ -12,8 +12,8 @@ StartTLSPlugin::~StartTLSPlugin()
 
 void StartTLSPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("StartTLS implementation");
-  APluginInfo->description = tr("Implementation of StartTLS");
+  APluginInfo->name = tr("StartTLS");
+  APluginInfo->description = tr("Allows to establish a secure connection to the server after connecting");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

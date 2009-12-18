@@ -15,12 +15,12 @@
 <context>
     <name>StartTLSPlugin</name>
     <message>
-        <source>Implementation of StartTLS</source>
-        <translation>Реализация StartTLS</translation>
+        <source>StartTLS</source>
+        <translation>StartTLS</translation>
     </message>
     <message>
-        <source>StartTLS implementation</source>
-        <translation>Реализация StartTLS</translation>
+        <source>Allows to establish a secure connection to the server after connecting</source>
+        <translation>Позволяет устанавливать защищенное соединение с сервером после подключения</translation>
     </message>
 </context>
 </TS>

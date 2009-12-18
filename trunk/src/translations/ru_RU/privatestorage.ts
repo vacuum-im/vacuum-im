@@ -4,12 +4,12 @@
 <context>
     <name>PrivateStorage</name>
     <message>
-        <source>Store and retrieve custom XML data from server</source>
-        <translation>Хранение и получение XML данных с сервера</translation>
+        <source>Private Storage</source>
+        <translation>Приватное хранилище</translation>
     </message>
     <message>
-        <source>Private Storage</source>
-        <translation>Личное хранилище на сервере</translation>
+        <source>Allows other modules to store arbitrary data on a server</source>
+        <translation>Позволяет другим модулям сохранять произвольные данные на сервере</translation>
     </message>
 </context>
 </TS>

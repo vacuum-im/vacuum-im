@@ -72,12 +72,8 @@
 <context>
     <name>SettingsPlugin</name>
     <message>
-        <source>Managing profiles and settings</source>
-        <translation>Управление профилями и настройками</translation>
-    </message>
-    <message>
         <source>Settings Manager</source>
-        <translation>Менеджер настроек</translation>
+        <translation>Диспетчер настроек</translation>
     </message>
     <message>
         <source>Profiles</source>
@@ -98,6 +94,10 @@
     <message>
         <source>Extra options</source>
         <translation>Дополнительные настройки</translation>
+    </message>
+    <message>
+        <source>Allows other modules to store user preferences</source>
+        <translation>Позволяет другим модулям сохранять настройки пользователя</translation>
     </message>
 </context>
 </TS>

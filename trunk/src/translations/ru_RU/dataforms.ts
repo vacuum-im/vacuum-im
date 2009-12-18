@@ -58,6 +58,14 @@
         <source>Url load failed</source>
         <translation>Загрузка URL завершилась с ошибкой</translation>
     </message>
+    <message>
+        <source>Data Forms Manager</source>
+        <translation>Диспетчер форм данных</translation>
+    </message>
+    <message>
+        <source>Allows other modules to process and display the form with the data intended for user</source>
+        <translation>Позволяет другим модулям обрабатывать и отображать формы с данными предназначенные пользователю</translation>
+    </message>
 </context>
 <context>
     <name>DataMediaWidget</name>

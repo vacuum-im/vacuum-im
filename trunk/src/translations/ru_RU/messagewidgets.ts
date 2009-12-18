@@ -23,14 +23,6 @@
 <context>
     <name>MessageWidgets</name>
     <message>
-        <source>Manager of the widgets for displaying messages</source>
-        <translation>Менеджер виджетов для отображения сообщений</translation>
-    </message>
-    <message>
-        <source>Message Widgets</source>
-        <translation>Виджеты для сообщений</translation>
-    </message>
-    <message>
         <source>Messages</source>
         <translation>Сообщения</translation>
     </message>
@@ -45,6 +37,14 @@
     <message>
         <source>Main Tab Window</source>
         <translation>Основное окно</translation>
+    </message>
+    <message>
+        <source>Message Widgets Manager</source>
+        <translation>Диспетчер виджетов сообщений</translation>
+    </message>
+    <message>
+        <source>Allows other modules to use standard widgets for messaging</source>
+        <translation>Позволяет другим модулям использовать стандартные виджеты для обмена сообщениями</translation>
     </message>
 </context>
 <context>

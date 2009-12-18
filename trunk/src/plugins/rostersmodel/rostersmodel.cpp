@@ -31,8 +31,8 @@ RostersModel::~RostersModel()
 
 void RostersModel::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Rosters Model"); 
-  APluginInfo->description = tr("Creating and handling roster tree");
+  APluginInfo->name = tr("Roster Model"); 
+  APluginInfo->description = tr("Creates a hierarchical model for display roster");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

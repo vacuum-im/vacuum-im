@@ -4,12 +4,12 @@
 <context>
     <name>MessageProcessor</name>
     <message>
-        <source>Managing message stanzas</source>
-        <translation>Управляет обработкой сообщений</translation>
+        <source>Message Manager</source>
+        <translation>Диспетчер сообщений</translation>
     </message>
     <message>
-        <source>Message Processor</source>
-        <translation>Модуль управления сообщениями</translation>
+        <source>Allows other modules to send and receive messages</source>
+        <translation>Позволяет другим модулям отправлять и получать сообщения</translation>
     </message>
 </context>
 </TS>

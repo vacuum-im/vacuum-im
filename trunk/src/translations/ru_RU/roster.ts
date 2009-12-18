@@ -11,12 +11,12 @@
 <context>
     <name>RosterPlugin</name>
     <message>
-        <source>Managing roster and subscriptions</source>
-        <translation>Управление контакт-листом и подписками</translation>
+        <source>Roster Manager</source>
+        <translation>Диспетчер  ростера</translation>
     </message>
     <message>
-        <source>Roster and Subscriptions Manager</source>
-        <translation>Модуль управления контакт-листом и подписками</translation>
+        <source>Allows other modules to get information about contacts in the roster</source>
+        <translation>Позволяет другим модулям получать информацию о контактах в ростере</translation>
     </message>
 </context>
 </TS>

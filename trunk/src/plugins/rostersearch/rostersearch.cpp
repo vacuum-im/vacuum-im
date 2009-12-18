@@ -41,7 +41,7 @@ RosterSearch::~RosterSearch()
 void RosterSearch::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("Roster Search"); 
-  APluginInfo->description = tr("Searching contacts in roster");
+  APluginInfo->description = tr("Allows to search for contacts in the roster");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

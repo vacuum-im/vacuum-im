@@ -42,8 +42,8 @@ ClientInfo::~ClientInfo()
 
 void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Client Info");
-  APluginInfo->description = tr("Request contact client information");
+  APluginInfo->name = tr("Client Information");
+  APluginInfo->description = tr("Allows to send and receive information about the version of the application, the local time and the last activity of contact");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

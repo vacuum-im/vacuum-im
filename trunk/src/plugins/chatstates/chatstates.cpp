@@ -46,8 +46,8 @@ ChatStates::~ChatStates()
 
 void ChatStates::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Chat State Notifications"); 
-  APluginInfo->description = tr("Communicating the status of a user in a chat session");
+  APluginInfo->name = tr("Chat State Notifications");
+  APluginInfo->description = tr("Allows to share information about the user's activity in the chat");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

@@ -23,8 +23,8 @@ TrayManager::~TrayManager()
 
 void TrayManager::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Tray manager"); 
-  APluginInfo->description = tr("Managing tray icon");
+  APluginInfo->name = tr("Tray Icon"); 
+  APluginInfo->description = tr("Allows other modules to access the icon and context menu in the tray");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

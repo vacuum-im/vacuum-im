@@ -15,19 +15,19 @@
 <context>
     <name>SimpleMessageStylePlugin</name>
     <message>
-        <source>Implements basic message styles.</source>
-        <translation>Реализует основной стиль оформления сообщений.</translation>
-    </message>
-    <message>
         <source>Simple Message Style</source>
         <translation>Упрощенный стиль сообщений</translation>
+    </message>
+    <message>
+        <source>Allows to use a simplified style in message design</source>
+        <translation>Позволяет использовать упрощенный стиль оформления сообщений</translation>
     </message>
 </context>
 <context>
     <name>SimpleOptionsWidget</name>
     <message>
         <source>Default</source>
-        <translation type="unfinished">По умолчанию</translation>
+        <translation>По умолчанию</translation>
     </message>
     <message>
         <source>Select font family and size</source>

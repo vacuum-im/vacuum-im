@@ -4,12 +4,16 @@
 <context>
     <name>ConsolePlugin</name>
     <message>
-        <source>Allow to view XMPP stanzas.</source>
-        <translation>Позволяет просматривать XMPP поток.</translation>
-    </message>
-    <message>
         <source>XML Console</source>
         <translation>XML Консоль</translation>
+    </message>
+    <message>
+        <source>Console</source>
+        <translation>Консоль</translation>
+    </message>
+    <message>
+        <source>Allows to view XML stream between the client and server</source>
+        <translation>Позволяет просматривать XML поток чежду клиентом и сервером</translation>
     </message>
 </context>
 <context>

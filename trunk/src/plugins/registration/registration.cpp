@@ -24,8 +24,8 @@ Registration::~Registration()
 
 void Registration::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("In-Band Registration");
-  APluginInfo->description = tr("In-band registration with instant messaging servers and associated services");
+  APluginInfo->name = tr("Registration");
+  APluginInfo->description = tr("Allows to register on the Jabber servers and services");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

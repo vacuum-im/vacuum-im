@@ -13,7 +13,7 @@ SASLPlugin::~SASLPlugin()
 void SASLPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("SASL Authentication");
-  APluginInfo->description = tr("Implementation of SASL Authentication");
+  APluginInfo->description = tr("Allows to log in to Jabber server using SASL authentication");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

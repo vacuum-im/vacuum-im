@@ -4,10 +4,6 @@
 <context>
     <name>JabberSearch</name>
     <message>
-        <source>Search information repositories on the Jabber network.</source>
-        <translation>Поиск в хранилищах информации jabber-сети.</translation>
-    </message>
-    <message>
         <source>Jabber Search</source>
         <translation>Jabber поиск</translation>
     </message>
@@ -34,6 +30,10 @@
     <message>
         <source>Email Address</source>
         <translation>Адрес e-mail</translation>
+    </message>
+    <message>
+        <source>Allows to search in the Jabber network</source>
+        <translation>Позволяет выполнять поиск в джаббер сети</translation>
     </message>
 </context>
 <context>

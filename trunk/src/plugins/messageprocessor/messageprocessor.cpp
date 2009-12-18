@@ -18,8 +18,8 @@ MessageProcessor::~MessageProcessor()
 
 void MessageProcessor::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Message Processor"); 
-  APluginInfo->description = tr("Managing message stanzas");
+  APluginInfo->name = tr("Message Manager"); 
+  APluginInfo->description = tr("Allows other modules to send and receive messages");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

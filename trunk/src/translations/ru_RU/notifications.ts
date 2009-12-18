@@ -4,10 +4,6 @@
 <context>
     <name>Notifications</name>
     <message>
-        <source>Notify user about events</source>
-        <translation>Уведомление пользователя о событиях</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Уведомления</translation>
     </message>
@@ -26,6 +22,14 @@
     <message>
         <source>Pending Notifications</source>
         <translation>Ожидающие уведомления</translation>
+    </message>
+    <message>
+        <source>Notifications Manager</source>
+        <translation>Диспетчер уведомлений</translation>
+    </message>
+    <message>
+        <source>Allows other modules to notify the user of the events</source>
+        <translation>Позволяет другим модулям уведомлять пользователя о случившихся событиях</translation>
     </message>
 </context>
 <context>

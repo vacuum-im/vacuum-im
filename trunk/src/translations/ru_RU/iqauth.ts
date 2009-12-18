@@ -4,12 +4,12 @@
 <context>
     <name>IqAuthPlugin</name>
     <message>
-        <source>Implementation of Non-SASL Authentication (JEP-0078)</source>
-        <translation>Реализация аутентификации без SASL (JEP-0078)</translation>
+        <source>Query Authentication</source>
+        <translation>Авторизация через запрос</translation>
     </message>
     <message>
-        <source>Non-SASL Authentication</source>
-        <translation>IQ Авторизация</translation>
+        <source>Allow you to log on the Jabber server without support SASL authentication</source>
+        <translation>Позволяет авторизоваться на джаббер сервере без поддержки SASL авторизации</translation>
     </message>
 </context>
 </TS>

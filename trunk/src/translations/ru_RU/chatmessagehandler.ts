@@ -4,14 +4,6 @@
 <context>
     <name>ChatMessageHandler</name>
     <message>
-        <source>Chat message handling</source>
-        <translation>Обработка чат сообщений</translation>
-    </message>
-    <message>
-        <source>Chat Message Handler</source>
-        <translation>Менеджер чат сообщений</translation>
-    </message>
-    <message>
         <source>Chat Messages</source>
         <translation>Чат сообщения</translation>
     </message>
@@ -34,6 +26,10 @@
     <message>
         <source>%1 changed status to [%2] %3</source>
         <translation>%1 изменил(а) статус на [%2] %3</translation>
+    </message>
+    <message>
+        <source>Allows to exchange chat messages</source>
+        <translation>Позволяет обмениваться чат сообщениями</translation>
     </message>
 </context>
 </TS>

@@ -4,12 +4,12 @@
 <context>
     <name>XmppUriQueries</name>
     <message>
-        <source>Managing XMPP URI queries</source>
-        <translation>Управление XMPP URI запросами</translation>
-    </message>
-    <message>
         <source>XMPP URI Queries</source>
         <translation>XMPP URI запросы</translation>
+    </message>
+    <message>
+        <source>Allows other plugins to handle XMPP URI queries</source>
+        <translation>Позволяет другим модулям обрабатывать XMPP URI запросы</translation>
     </message>
 </context>
 </TS>

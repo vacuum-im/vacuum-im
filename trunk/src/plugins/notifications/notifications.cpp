@@ -38,8 +38,8 @@ Notifications::~Notifications()
 
 void Notifications::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Notifications"); 
-  APluginInfo->description = tr("Notify user about events");
+  APluginInfo->name = tr("Notifications Manager"); 
+  APluginInfo->description = tr("Allows other modules to notify the user of the events");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

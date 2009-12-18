@@ -24,8 +24,8 @@ NormalMessageHandler::~NormalMessageHandler()
 
 void NormalMessageHandler::pluginInfo(IPluginInfo *APluginInfo)
 {
-  APluginInfo->name = tr("Normal Message Handler"); 
-  APluginInfo->description = tr("Normal message handling");
+  APluginInfo->name = tr("Normal Messages"); 
+  APluginInfo->description = tr("Allows to exchange normal messages");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";

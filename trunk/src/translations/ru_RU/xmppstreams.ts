@@ -127,12 +127,12 @@
         <translation>XML сформирован неправильно</translation>
     </message>
     <message>
-        <source>Managing XMPP streams, implementation of XMPP-Core</source>
-        <translation>Управление потоками XMPP, реализация ядра XMPP</translation>
+        <source>XMPP Streams Manager</source>
+        <translation>Диспетчер XMPP потоков</translation>
     </message>
     <message>
-        <source>XMPP Streams Manager</source>
-        <translation>Менеджер потоков XMPP</translation>
+        <source>Allows other modules to create XMPP streams and get access to them</source>
+        <translation>Позволяет другим модулям создавать XMPP потоки и получать доступ к ним</translation>
     </message>
 </context>
 </TS>

@@ -144,14 +144,6 @@ Check values and try again</source>
 <context>
     <name>MultiUserChatPlugin</name>
     <message>
-        <source>Implements multi-user text conferencing</source>
-        <translation>Реализация многопользовательских конференций</translation>
-    </message>
-    <message>
-        <source>Multi-User Chat</source>
-        <translation>Многопользовательский чат</translation>
-    </message>
-    <message>
         <source>Conferences</source>
         <translation>Конференции</translation>
     </message>
@@ -502,6 +494,14 @@ Check values and try again</source>
     <message>
         <source>Allow occupants to query other occupants?</source>
         <translation>Разрешить пользователям посылать iq-запросы?</translation>
+    </message>
+    <message>
+        <source>Multi-User Conferences</source>
+        <translation>Многопользовательские конференции</translation>
+    </message>
+    <message>
+        <source>Allows to use Jabber multi-user conferences</source>
+        <translation>Позволяет использовать многопользовательские джаббер конференции</translation>
     </message>
 </context>
 <context>

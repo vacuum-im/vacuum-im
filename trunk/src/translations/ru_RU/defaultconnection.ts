@@ -46,12 +46,8 @@
 <context>
     <name>DefaultConnectionPlugin</name>
     <message>
-        <source>Creating standard connection to jabber server</source>
-        <translation>Создание стандартного соединения к jabber-серверу</translation>
-    </message>
-    <message>
         <source>Default connection</source>
-        <translation>Соединение по умолчанию</translation>
+        <translation>Стандартное соединение</translation>
     </message>
     <message>
         <source>Default proxy</source>
@@ -68,6 +64,10 @@
     <message>
         <source>Socket5 proxy</source>
         <translation>Socket5 прокси</translation>
+    </message>
+    <message>
+        <source>Allows to set a standard TCP connection to Jabber server</source>
+        <translation>Позволяет установить стандартное TCP подключение к серверу</translation>
     </message>
 </context>
 </TS>

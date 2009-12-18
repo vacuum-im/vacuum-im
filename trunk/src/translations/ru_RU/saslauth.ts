@@ -4,10 +4,6 @@
 <context>
     <name>SASLPlugin</name>
     <message>
-        <source>Implementation of SASL Authentication</source>
-        <translation>Реализация SASL авторизации</translation>
-    </message>
-    <message>
         <source>Authorization Aborted</source>
         <translation>Авторизация отменена</translation>
     </message>
@@ -38,6 +34,10 @@
     <message>
         <source>SASL Authentication</source>
         <translation>SASL авторизация</translation>
+    </message>
+    <message>
+        <source>Allows to log in to Jabber server using SASL authentication</source>
+        <translation>Позволяет авторизоваться на сервере используя SASL авторизацию</translation>
     </message>
 </context>
 </TS>

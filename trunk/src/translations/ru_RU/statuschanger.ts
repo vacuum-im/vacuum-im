@@ -104,14 +104,6 @@
 <context>
     <name>StatusChanger</name>
     <message>
-        <source>Managing and change status</source>
-        <translation>Управление и изменение статусов</translation>
-    </message>
-    <message>
-        <source>Status Changer</source>
-        <translation>Менеджер статусов</translation>
-    </message>
-    <message>
         <source>Connection errors</source>
         <translation>Ошибки подключения</translation>
     </message>
@@ -186,6 +178,14 @@
     <message>
         <source>Edit statuses</source>
         <translation>Редактировать статусы</translation>
+    </message>
+    <message>
+        <source>Status Manager</source>
+        <translation>Диспетчер статусов</translation>
+    </message>
+    <message>
+        <source>Allows to change the status in Jabber network</source>
+        <translation>Позволяет изменять статус в джаббер сети</translation>
     </message>
 </context>
 </TS>
