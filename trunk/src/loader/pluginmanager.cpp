@@ -5,32 +5,42 @@
 #include <QDir>
 #include <QTimer>
 #include <QStack>
+#include <QProcess>
 #include <QLibrary>
 #include <QFileInfo>
 #include <QSettings>
 
-#ifdef SVNINFO
-# include "svninfo.h"
-# define SVN_DATE                   ""
-#else
-# define SVN_DATE                   ""
-# define SVN_REVISION               "0"
-#endif
-
-#define DIR_APP_DATA                ".vacuum"
+#define ORGANIZATION_NAME           "JRuDevels"
+#define APPLICATION_NAME            "VacuumIM"
 
 #define FILE_PLUGINS_SETTINGS       "plugins.xml"
 
-#define ORGANIZATION_NAME           "JRuDevels"
-#define APPLICATION_NAME            "Vacuum IM"
-
-#define SVN_HOME_PATH               "HomePath"
+#define SVN_DATA_PATH               "DataPath"
 #define SVN_LOCALE_NAME             "Locale"
 
-#if defined(Q_WS_WIN)
-# define LIB_PREFIX_SIZE            0
+#ifdef SVNINFO
+#  include "svninfo.h"
+#  define SVN_DATE                  ""
 #else
-# define LIB_PREFIX_SIZE            3
+#  define SVN_DATE                  ""
+#  define SVN_REVISION              "0"
+#endif
+
+#if defined(Q_WS_WIN) 
+#  define ENV_APP_DATA              "APPDATA"
+#  define DIR_APP_DATA              ORGANIZATION_NAME"/"APPLICATION_NAME
+#elif defined(Q_WS_X11)
+#  define ENV_APP_DATA              "HOME"
+#  define DIR_APP_DATA              ".vacuum"
+#elif defined(Q_WS_MAC)
+#  define ENV_APP_DATA              "HOME"
+#  define DIR_APP_DATA              "Library/Application Support/"APPLICATION_NAME
+#endif
+
+#if defined(Q_WS_WIN)
+#  define LIB_PREFIX_SIZE           0
+#else
+#  define LIB_PREFIX_SIZE           3
 #endif
 
 
@@ -64,13 +74,13 @@ QDateTime PluginManager::revisionDate() const
 
 QString PluginManager::homePath() const
 {
-  return FHomePath;
+  return FDataPath;
 }
 
 void PluginManager::setHomePath(const QString &APath)
 {
   QSettings settings(QSettings::IniFormat, QSettings::UserScope, ORGANIZATION_NAME, APPLICATION_NAME);
-  settings.setValue(SVN_HOME_PATH, APath);
+  settings.setValue(SVN_DATA_PATH, APath);
 }
 
 void PluginManager::setLocale(QLocale::Language ALanguage, QLocale::Country ACountry)
@@ -183,28 +193,37 @@ void PluginManager::loadSettings()
   }
   QLocale::setDefault(locale);
 
-  FHomePath = QString::null;
-  if (args.contains(CLO_HOME_DIR))
+  FDataPath = QString::null;
+  if (args.contains(CLO_APP_DATA_DIR))
   {
-    QDir dir(args.value(args.indexOf(CLO_HOME_DIR)+1));
+    QDir dir(args.value(args.indexOf(CLO_APP_DATA_DIR)+1));
     if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
-      FHomePath = dir.absolutePath();
+      FDataPath = dir.absolutePath();
   }
-  if (FHomePath.isNull() && !settings.value(SVN_HOME_PATH).toString().isEmpty())
+  if (FDataPath.isNull() && !settings.value(SVN_DATA_PATH).toString().isEmpty())
   {
-    QDir dir(settings.value(SVN_HOME_PATH).toString());
+    QDir dir(settings.value(SVN_DATA_PATH).toString());
     if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
-      FHomePath = dir.absolutePath();
+      FDataPath = dir.absolutePath();
   }
-  if (FHomePath.isNull())
+  foreach(QString env, QProcess::systemEnvironment())
   {
-    QDir dir = QDir::home();
+    if (env.startsWith(ENV_APP_DATA"="))
+    {
+      QDir dir(env.split("=").value(1));
+      if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
+        FDataPath = dir.absolutePath();
+    }
+  }
+  if (FDataPath.isNull())
+  {
+    QDir dir(QDir::homePath());
     if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
-      FHomePath = dir.absolutePath();
+      FDataPath = dir.absolutePath();
   }
 
   FPluginsSetup.clear();
-  QDir homeDir(FHomePath);
+  QDir homeDir(FDataPath);
   QFile file(homeDir.absoluteFilePath(FILE_PLUGINS_SETTINGS));
   if (file.exists() && file.open(QFile::ReadOnly))
   {
@@ -220,7 +239,7 @@ void PluginManager::saveSettings()
 {
   if (!FPluginsSetup.isNull())
   {
-    QDir homeDir(FHomePath);
+    QDir homeDir(FDataPath);
     QFile file(homeDir.absoluteFilePath(FILE_PLUGINS_SETTINGS));
     if (file.open(QFile::WriteOnly|QFile::Truncate))
       file.write(FPluginsSetup.toString(3).toUtf8());
@@ -529,8 +548,6 @@ void PluginManager::savePluginError(const QString &AFile, const QString &AError)
   {
     errorElem.firstChild().toCharacterData().setData(AError);
   }
-
-  qDebug() << QString("%1: %2").arg(AFile).arg(AError);
 }
 
 void PluginManager::removePluginsInfo(const QStringList &ACurFiles)

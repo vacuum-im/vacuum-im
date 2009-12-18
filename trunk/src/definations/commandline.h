@@ -4,8 +4,8 @@
 // -p <Profile>
 #define CLO_PROFILE                 "-p"
 
-// -h <HomeDir>
-#define CLO_HOME_DIR                "-h"
+// -h <AppDataDir>
+#define CLO_APP_DATA_DIR            "-h"
 
 // -l <Locale>
 #define CLO_LOCALE                  "-l"
