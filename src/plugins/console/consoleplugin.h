@@ -5,7 +5,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <interfaces/ipluginmanager.h>
-#include <interfaces/istanzaprocessor.h>
+#include <interfaces/ixmppstreams.h>
 #include <interfaces/imainwindow.h>
 #include <utils/iconstorage.h>
 #include <utils/action.h>

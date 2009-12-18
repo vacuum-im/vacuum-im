@@ -3,6 +3,7 @@
 RosterPlugin::RosterPlugin()
 {
   FPluginManager = NULL;
+  FXmppStreams = NULL;
   FStanzaProcessor = NULL;
   FSettingsPlugin = NULL;
 }
@@ -30,8 +31,8 @@ bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitO
   IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
-    IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-    if (xmppStreams)
+    FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+    if (FXmppStreams)
     {
       connect(plugin->instance(), SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *))); 
       connect(plugin->instance(), SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
@@ -46,7 +47,7 @@ bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitO
   if (plugin) 
     FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
   
-  return FStanzaProcessor!=NULL;
+  return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
 
 //IRosterPlugin

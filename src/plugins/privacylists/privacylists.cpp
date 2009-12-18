@@ -20,6 +20,7 @@ QStringList PrivacyLists::FAutoLists = QStringList()
 
 PrivacyLists::PrivacyLists()
 {
+  FXmppStreams = NULL;
   FRostersModel = NULL;
   FRostersView = NULL;
   FRostersViewPlugin = NULL;
@@ -50,6 +51,7 @@ void PrivacyLists::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
@@ -62,8 +64,12 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &/*AInitO
   plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
-    connect(plugin->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
-    connect(plugin->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+    FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+    if (FXmppStreams)
+    {
+      connect(FXmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
+      connect(FXmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+    }
   }
 
   plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
@@ -95,7 +101,7 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &/*AInitO
     connect(plugin->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),SLOT(onMultiUserChatCreated(IMultiUserChat *)));
   }
 
-  return FStanzaProcessor!=NULL;
+  return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool PrivacyLists::initObjects()

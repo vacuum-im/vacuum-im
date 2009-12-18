@@ -29,7 +29,6 @@ void DefaultConnectionPlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->version = "1.0";
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->dependences.append(SETTINGS_UUID);
 }
 
 bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -48,7 +47,7 @@ bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, in
   if (plugin)
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 
-  return FSettingsPlugin!=NULL;
+  return true;
 }
 
 bool DefaultConnectionPlugin::initObjects()

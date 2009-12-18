@@ -23,7 +23,8 @@ void MessageProcessor::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->conflicts.append("{153A4638-B468-496f-B57C-9F30CEDFCC2E}");
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID);
+  APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
 bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -58,7 +59,7 @@ bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &/*AI
     }
   }
 
-  return true;
+  return FStanzaProcessor!=NULL && FXmppStreams!=NULL;
 }
 
 bool MessageProcessor::initObjects()
@@ -134,7 +135,7 @@ bool MessageProcessor::sendMessage(const Jid &AStreamJid, const Message &AMessag
   message.setFrom(AStreamJid.eFull());
 
   emit messageSend(message);
-  if (FStanzaProcessor->sendStanzaOut(AStreamJid,message.stanza()))
+  if (FStanzaProcessor && FStanzaProcessor->sendStanzaOut(AStreamJid,message.stanza()))
   {
     emit messageSent(message);
     return true;
@@ -319,7 +320,7 @@ QString MessageProcessor::prepareBodyForReceive(const QString &AString) const
 
 void MessageProcessor::onStreamOpened(IXmppStream *AXmppStream)
 {
-  if (FStanzaProcessor && !FSHIMessages.contains(AXmppStream->streamJid()))
+  if (FStanzaProcessor)
   {
     IStanzaHandle shandle;
     shandle.handler = this;
@@ -363,7 +364,7 @@ void MessageProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &/
 
 void MessageProcessor::onStreamClosed(IXmppStream *AXmppStream)
 {
-  if (FStanzaProcessor && FSHIMessages.contains(AXmppStream->streamJid()))
+  if (FStanzaProcessor)
   {
     FStanzaProcessor->removeStanzaHandle(FSHIMessages.take(AXmppStream->streamJid()));
   }

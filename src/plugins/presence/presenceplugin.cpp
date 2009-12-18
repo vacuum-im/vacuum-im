@@ -2,6 +2,7 @@
 
 PresencePlugin::PresencePlugin()
 {
+  FXmppStreams = NULL;
   FStanzaProcessor = NULL;
 }
 
@@ -27,15 +28,19 @@ bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
   IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
-    connect(plugin->instance(), SIGNAL(added(IXmppStream *)), SLOT(onStreamAdded(IXmppStream *))); 
-    connect(plugin->instance(), SIGNAL(removed(IXmppStream *)), SLOT(onStreamRemoved(IXmppStream *))); 
+    FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+    if (FXmppStreams)
+    {
+      connect(FXmppStreams->instance(), SIGNAL(added(IXmppStream *)), SLOT(onStreamAdded(IXmppStream *))); 
+      connect(FXmppStreams->instance(), SIGNAL(removed(IXmppStream *)), SLOT(onStreamRemoved(IXmppStream *))); 
+    }
   }
 
   plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin) 
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-  return FStanzaProcessor!=NULL;
+  return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
 
 

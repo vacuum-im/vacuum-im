@@ -54,6 +54,7 @@ protected slots:
   void onStreamAdded(IXmppStream *AXmppStream);
   void onStreamRemoved(IXmppStream *AXmppStream);
 private:
+  IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;
 private:
   QList<IPresence *> FPresences;

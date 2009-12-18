@@ -101,13 +101,13 @@ QString PrivateStorage::saveData(const Jid &AStreamJid, const QDomElement &AElem
     stanza.setType("set").setId(FStanzaProcessor->newId());
     QDomElement elem = stanza.addElement("query",NS_JABBER_PRIVATE);
     elem.appendChild(AElement.cloneNode(true));
-    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
+    if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
     {
       FSaveRequests.insert(stanza.id(),insertElement(AStreamJid,AElement));
       return stanza.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString PrivateStorage::loadData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
@@ -118,13 +118,13 @@ QString PrivateStorage::loadData(const Jid &AStreamJid, const QString &ATagName,
     stanza.setType("get").setId(FStanzaProcessor->newId());
     QDomElement elem = stanza.addElement("query",NS_JABBER_PRIVATE);
     QDomElement dataElem = elem.appendChild(stanza.createElement(ATagName,ANamespace)).toElement();
-    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
+    if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
     {
       FLoadRequests.insert(stanza.id(),dataElem);
       return stanza.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
@@ -135,7 +135,7 @@ QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagNam
     stanza.setType("set").setId(FStanzaProcessor->newId());
     QDomElement elem = stanza.addElement("query",NS_JABBER_PRIVATE);
     elem = elem.appendChild(stanza.createElement(ATagName,ANamespace)).toElement();
-    if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
+    if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
     {
       QDomElement dataElem = getData(AStreamJid,ATagName,ANamespace);
       if (dataElem.isNull())
@@ -144,7 +144,7 @@ QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagNam
       return stanza.id();
     }
   }
-  return QString();
+  return QString::null;
 }
 
 QDomElement PrivateStorage::getStreamElement(const Jid &AStreamJid)

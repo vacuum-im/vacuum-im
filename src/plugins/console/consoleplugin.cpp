@@ -18,7 +18,8 @@ void ConsolePlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
-  APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID);
+  APluginInfo->dependences.append(MAINWINDOW_UUID);
 }
 
 bool ConsolePlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -29,7 +30,7 @@ bool ConsolePlugin::initConnections(IPluginManager *APluginManager, int &/*AInit
   if (plugin)
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 
-  return true;
+  return FMainWindowPlugin!=NULL;
 }
 
 bool ConsolePlugin::initObjects()
