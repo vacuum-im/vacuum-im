@@ -113,6 +113,7 @@ protected slots:
   void onEditListsDialogDestroyed(const Jid AStreamJid);
   void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 private:
+  IXmppStreams *FXmppStreams;
   IRostersModel *FRostersModel;
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;

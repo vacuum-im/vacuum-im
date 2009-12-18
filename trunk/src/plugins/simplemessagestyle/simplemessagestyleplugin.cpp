@@ -1,7 +1,5 @@
 #include "simplemessagestyleplugin.h"
 
-#include <QtDebug>
-
 #include <QDir>
 #include <QTimer>
 #include <QCoreApplication>

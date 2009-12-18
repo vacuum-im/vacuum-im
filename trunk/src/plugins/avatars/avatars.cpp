@@ -122,7 +122,7 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     }
   }
 
-  return true;
+  return FVCardPlugin!=NULL;
 }
 
 bool Avatars::initObjects()

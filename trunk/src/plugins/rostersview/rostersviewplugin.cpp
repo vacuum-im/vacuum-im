@@ -54,7 +54,6 @@ void RostersViewPlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(ROSTERSMODEL_UUID);
-  APluginInfo->dependences.append(MAINWINDOW_UUID);
 }
 
 bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -105,7 +104,7 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
    }
   }
 
-  return FRostersModel!=NULL && FMainWindowPlugin!=NULL;
+  return FRostersModel!=NULL;
 }
 
 bool RostersViewPlugin::initObjects()

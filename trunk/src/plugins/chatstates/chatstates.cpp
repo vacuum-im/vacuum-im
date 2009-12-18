@@ -126,7 +126,7 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  return FMessageWidgets!=NULL && FStanzaProcessor!=NULL;
+  return FPresencePlugin!=NULL && FMessageWidgets!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool ChatStates::initObjects()
