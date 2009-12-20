@@ -225,8 +225,8 @@ private:
   QList<IChatWindow *> FChatWindows;
   QMultiMap<IChatWindow *,int> FActiveChatMessages;
   QMap<int, IDataDialogWidget *> FDataFormMessages;
-  QMap<IMultiUser *, QListWidgetItem *> FUsers;
   QMap<IViewWidget *, WindowStatus> FWindowStatus;
+  QHash<IMultiUser *, QListWidgetItem *> FUsers;
 };
 
 #endif // MULTIUSERCHATWINDOW_H

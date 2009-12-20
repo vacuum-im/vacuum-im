@@ -84,18 +84,7 @@ Check values and try again</source>
     </message>
 </context>
 <context>
-    <name>MultiUser</name>
-    <message>
-        <source>Disconnected</source>
-        <translation>Отключен</translation>
-    </message>
-</context>
-<context>
     <name>MultiUserChat</name>
-    <message>
-        <source>Disconnected</source>
-        <translation>Отключен</translation>
-    </message>
     <message>
         <source>Room configuration is not available.</source>
         <translation>Настройка комнаты недоступна.</translation>
