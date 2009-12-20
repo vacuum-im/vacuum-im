@@ -10,7 +10,6 @@ MultiUser::MultiUser(const Jid &ARoomJid, const QString &ANickName, QObject *APa
   setData(MUDR_NICK_NAME,FNickName);
   setData(MUDR_CONTACT_JID,FContactJid.full());
   setData(MUDR_SHOW,IPresence::Offline);
-  setData(MUDR_STATUS,tr("Disconnected"));
   setData(MUDR_ROLE,MUC_ROLE_NONE);
   setData(MUDR_AFFILIATION,MUC_AFFIL_NONE);
 }

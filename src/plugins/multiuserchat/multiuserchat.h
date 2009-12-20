@@ -26,7 +26,7 @@ public:
   ~MultiUserChat();
   virtual QObject *instance() { return this; }
   //IStanzaHandler
-  virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza & /*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
   virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IIqStanzaOwnner
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
@@ -35,7 +35,6 @@ public:
   virtual Jid streamJid() const { return FStreamJid; }
   virtual Jid roomJid() const { return FRoomJid; }
   virtual bool isOpen() const;
-  virtual bool isChangingState() const;
   virtual bool autoPresence() const { return FAutoPresence; }
   virtual void setAutoPresence(bool AAuto);
   virtual QList<int> statusCodes() const { return FStatusCodes; }
@@ -105,7 +104,6 @@ protected:
   bool processMessage(const Stanza &AStanza);
   bool processPresence(const Stanza &AStanza);
   void initialize();
-  void clearUsers();
   void closeChat(int AShow, const QString &AStatus);
 protected slots:
   void onMessageReceive(Message &AMessage);
@@ -133,7 +131,6 @@ private:
   int FSHIPresence;
   int FSHIMessage;
   bool FAutoPresence;
-  bool FChangingState;
   Jid FStreamJid;
   Jid FRoomJid;
   int FShow;
@@ -143,7 +140,7 @@ private:
   QString FPassword;
   MultiUser *FMainUser;
   QList<int> FStatusCodes;
-  QMap<QString, MultiUser *> FUsers;
+  QHash<QString, MultiUser *> FUsers;
 };
 
 #endif // MULTIUSERCHAT_H

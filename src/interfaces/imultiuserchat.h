@@ -92,7 +92,6 @@ public:
   virtual Jid streamJid() const =0;
   virtual Jid roomJid() const =0;
   virtual bool isOpen() const =0;
-  virtual bool isChangingState() const =0;
   virtual bool autoPresence() const =0;
   virtual void setAutoPresence(bool AAuto) =0;
   virtual QList<int> statusCodes() const =0;

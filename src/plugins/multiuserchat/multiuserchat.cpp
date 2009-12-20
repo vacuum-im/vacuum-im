@@ -17,7 +17,6 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
   FChatPlugin = AChatPlugin;
 
   FMainUser = NULL;
-  FChangingState = false;
   FAutoPresence = false;
   FSHIPresence = -1;
   FSHIMessage = -1;
@@ -33,8 +32,8 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 
 MultiUserChat::~MultiUserChat()
 {
-  if (isOpen() || isChangingState())
-    closeChat(IPresence::Offline, tr("Disconnected"));
+  if (!FUsers.isEmpty())
+    closeChat(IPresence::Offline, QString::null);
   
   if (FStanzaProcessor)
   {
@@ -42,6 +41,12 @@ MultiUserChat::~MultiUserChat()
     FStanzaProcessor->removeStanzaHandle(FSHIMessage);
   }
   emit chatDestroyed();
+}
+
+bool MultiUserChat::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+  Q_UNUSED(AHandlerId); Q_UNUSED(AStreamJid); Q_UNUSED(AStanza); Q_UNUSED(AAccept);
+  return false;
 }
 
 bool MultiUserChat::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
@@ -63,8 +68,9 @@ bool MultiUserChat::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stan
   return false;
 }
 
-void MultiUserChat::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
+  Q_UNUSED(AStreamJid);
   if (AStanza.id()==FConfigRequestId && FRoomJid==AStanza.from())
   {
     if (AStanza.type() == "result")
@@ -181,11 +187,6 @@ bool MultiUserChat::isOpen() const
   return FMainUser!=NULL;
 }
 
-bool MultiUserChat::isChangingState() const
-{
-  return FChangingState;
-}
-
 void MultiUserChat::setAutoPresence(bool AAuto) 
 {
   if (FAutoPresence != AAuto)
@@ -273,12 +274,7 @@ void MultiUserChat::setPresence(int AShow, const QString &AStatus)
         xelem.appendChild(presence.createElement("password")).appendChild(presence.createTextNode(FPassword));
     }
 
-    if (FStanzaProcessor->sendStanzaOut(FStreamJid,presence))
-    {
-      static QList<int> offlineShows = QList<int>() << IPresence::Offline << IPresence::Error << IPresence::Invisible;
-      if (offlineShows.contains(FShow) != offlineShows.contains(AShow))
-        FChangingState = true;
-    }
+    FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
   }
 }
 
@@ -533,9 +529,9 @@ bool MultiUserChat::destroyRoom(const QString &AReason)
   return false;
 }
 
-void MultiUserChat::prepareMessageForReceive(Message &/*AMessage*/)
+void MultiUserChat::prepareMessageForReceive(Message &AMessage)
 {
-
+  Q_UNUSED(AMessage);
 }
 
 bool MultiUserChat::processMessage(const Stanza &AStanza)
@@ -633,19 +629,23 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
       {
         user = new MultiUser(FRoomJid,fromNick,this);
         user->setData(MUDR_STREAM_JID,FStreamJid.full());
-        connect(user->instance(),SIGNAL(dataChanged(int,const QVariant &, const QVariant &)),
-          SLOT(onUserDataChanged(int,const QVariant &, const QVariant &)));
-        FUsers.insert(fromNick,user);
       }
+
       user->setData(MUDR_SHOW,show);
       user->setData(MUDR_STATUS,status);
       user->setData(MUDR_REAL_JID,realJid.full());
       user->setData(MUDR_ROLE,role);
       user->setData(MUDR_AFFILIATION,affiliation);
+      
+      if (!FUsers.contains(fromNick))
+      {
+        connect(user->instance(),SIGNAL(dataChanged(int,const QVariant &, const QVariant &)),
+          SLOT(onUserDataChanged(int,const QVariant &, const QVariant &)));
+        FUsers.insert(fromNick,user);
+      }
 
       if (!isOpen() && (fromNick == FNickName || FStatusCodes.contains(MUC_SC_ROOM_ENTER)))
       {
-        FChangingState = false;
         FNickName = fromNick;
         FMainUser = user;
         emit chatOpened();
@@ -657,6 +657,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
         FStatus = status;
         emit presenceChanged(FShow,FStatus);
       }
+
       emit userPresence(user,show,status);
       accepted = true;
     }
@@ -711,11 +712,14 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
         user->setData(MUDR_ROLE,role);
         user->setData(MUDR_AFFILIATION,affiliation);
         emit userPresence(user,show,status);
-        FUsers.remove(fromNick);
-        if (user == FMainUser)
-          closeChat(show,status);
-        else
+        
+        if (user != FMainUser)
+        {
+          FUsers.remove(fromNick);
           delete user;
+        }
+        else
+          closeChat(show,status);
       }
       accepted = true;
     }
@@ -730,18 +734,16 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
       user->setData(MUDR_STATUS,err.message());
       emit userPresence(user,IPresence::Error,err.message());
     }
-
     emit chatError(fromNick,err.message());
     
-    if (fromNick == FNickName)
-    {
-      closeChat(IPresence::Error,err.message());
-    }
-    else
+    if (fromNick != FNickName)
     {
       FUsers.remove(fromNick);
       delete user;
     }
+    else
+      closeChat(IPresence::Error,err.message());
+
     accepted = true;
   }
 
@@ -826,26 +828,31 @@ void MultiUserChat::initialize()
   }
 }
 
-void MultiUserChat::clearUsers()
+void MultiUserChat::closeChat(int AShow, const QString &AStatus)
 {
+  if (FMainUser)
+  {
+    FMainUser->setData(MUDR_SHOW,AShow);
+    FMainUser->setData(MUDR_STATUS,AStatus);
+    emit userPresence(FMainUser,IPresence::Offline,QString::null);
+    delete FMainUser;
+  }
+  FMainUser = NULL;
+  FUsers.remove(FNickName);
+  
   foreach(MultiUser *user, FUsers)
   {
     user->setData(MUDR_SHOW,IPresence::Offline);
-    user->setData(MUDR_STATUS,tr("Disconnected"));
-    emit userPresence(user,IPresence::Offline,tr("Disconnected"));
-    delete user;
+    user->setData(MUDR_STATUS,QString());
+    emit userPresence(user,IPresence::Offline,QString::null);
   }
-  FMainUser = NULL;
+  qDeleteAll(FUsers);
   FUsers.clear();
-}
 
-void MultiUserChat::closeChat(int AShow, const QString &AStatus)
-{
-  FChangingState = false;
-  clearUsers();
   FShow = AShow;
   FStatus = AStatus;
   emit presenceChanged(FShow,FStatus);
+
   emit chatClosed();
 }
 
@@ -884,8 +891,9 @@ void MultiUserChat::onUserDataChanged(int ARole, const QVariant &ABefour, const 
     emit userDataChanged(user,ARole,ABefour,AAfter);
 }
 
-void MultiUserChat::onPresenceChanged(int AShow, const QString &AStatus, int /*APriority*/)
+void MultiUserChat::onPresenceChanged(int AShow, const QString &AStatus, int APriority)
 {
+  Q_UNUSED(APriority);
   if (FAutoPresence)
     setPresence(AShow,AStatus);
 }
@@ -898,8 +906,8 @@ void MultiUserChat::onPresenceAboutToClose(int AShow, const QString &AStatus)
 
 void MultiUserChat::onStreamClosed()
 {
-  if (isOpen() || isChangingState())
-    closeChat(IPresence::Offline,tr("Disconnected"));
+  if (!FUsers.isEmpty())
+    closeChat(IPresence::Offline,QString::null);
 }
 
 void MultiUserChat::onStreamJidChanged(const Jid &ABefour)
@@ -913,4 +921,3 @@ void MultiUserChat::onStreamJidChanged(const Jid &ABefour)
     emit streamJidChanged(ABefour,FStreamJid);
   }
 }
-
