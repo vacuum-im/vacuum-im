@@ -2250,47 +2250,47 @@ void MessageArchiver::registerDiscoFeatures()
   dfeature.active = false;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
   dfeature.var = NS_ARCHIVE;
-  dfeature.name = tr("Message Archiving");
-  dfeature.description = tr("Archiving and retrieval of messages");
+  dfeature.name = tr("Messages Archiving");
+  dfeature.description = tr("Supports the archiving of the messages");
   FDiscovery->insertDiscoFeature(dfeature);
   dfeature.var = NS_ARCHIVE_OLD;
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.var = NS_ARCHIVE_AUTO;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_AUTO);
-  dfeature.name = tr("Message Archiving: Auto archiving");
-  dfeature.description = tr("Automatically archiving of messages on server");
+  dfeature.name = tr("Automatic Messages Archiving");
+  dfeature.description = tr("Supports the automatic archiving of the messages");
   FDiscovery->insertDiscoFeature(dfeature);
   dfeature.var = NS_ARCHIVE_OLD_AUTO;
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.var = NS_ARCHIVE_MANAGE;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_MANAGE);
-  dfeature.name = tr("Message Archiving: Mange messages");
-  dfeature.description = tr("Retrieving and removing messages on server");
+  dfeature.name = tr("Managing Archived Messages");
+  dfeature.description = tr("Supports the managing of the archived messages");
   FDiscovery->insertDiscoFeature(dfeature);
   dfeature.var = NS_ARCHIVE_OLD_MANAGE;
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.var = NS_ARCHIVE_MANUAL;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_MANUAL);
-  dfeature.name = tr("Message Archiving: Manual archiving");
-  dfeature.description = tr("Manually upload messages on server");
+  dfeature.name = tr("Manual Messages Archiving");
+  dfeature.description = tr("Supports the manual archiving of the messages");
   FDiscovery->insertDiscoFeature(dfeature);
   dfeature.var = NS_ARCHIVE_OLD_MANUAL;
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.var = NS_ARCHIVE_PREF;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_OPTIONS);
-  dfeature.name = tr("Message Archiving: Preferences");
-  dfeature.description = tr("Storing archive preferences on server");
+  dfeature.name = tr("Messages Archive Preferences");
+  dfeature.description = tr("Supports the storing of the archive preferences");
   FDiscovery->insertDiscoFeature(dfeature);
   dfeature.var = NS_ARCHIVE_OLD_PREF;
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.var = NS_ARCHIVE_ENCRYPT;
-  dfeature.name = tr("Message Archiving: Encrypted messages");
-  dfeature.description = tr("Archiving of encrypted messages on server");
+  dfeature.name = tr("Encrypted Messages Archiving");
+  dfeature.description = tr("Supports the archiving of the encrypted messages");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

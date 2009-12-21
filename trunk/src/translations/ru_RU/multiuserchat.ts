@@ -177,10 +177,6 @@ Check values and try again</source>
         <translation>%1 как %2</translation>
     </message>
     <message>
-        <source>Multi-user text conferencing</source>
-        <translation>Многопользовательская конференция</translation>
-    </message>
-    <message>
         <source>Hidden room</source>
         <translation>Скрытая комната</translation>
     </message>
@@ -491,6 +487,10 @@ Check values and try again</source>
     <message>
         <source>Allows to use Jabber multi-user conferences</source>
         <translation>Позволяет использовать многопользовательские джаббер конференции</translation>
+    </message>
+    <message>
+        <source>Supports the multi-user conferences</source>
+        <translation>Поддерживает многопользовательские конференции</translation>
     </message>
 </context>
 <context>

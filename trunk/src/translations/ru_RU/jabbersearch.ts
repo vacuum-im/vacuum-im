@@ -12,10 +12,6 @@
         <translation>Поиск</translation>
     </message>
     <message>
-        <source>Search information repositories on the Jabber network</source>
-        <translation>Поиск в хранилищах информации jabber-сети</translation>
-    </message>
-    <message>
         <source>First Name</source>
         <translation>Имя</translation>
     </message>
@@ -34,6 +30,10 @@
     <message>
         <source>Allows to search in the Jabber network</source>
         <translation>Позволяет выполнять поиск в джаббер сети</translation>
+    </message>
+    <message>
+        <source>Supports the searching of the information</source>
+        <translation>Поддерживает поиск информации</translation>
     </message>
 </context>
 <context>

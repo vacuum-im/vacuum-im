@@ -373,7 +373,7 @@ void FileTransfer::registerDiscoFeatures()
   dfeature.active = true;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_FILETRANSFER_SEND);
   dfeature.name = tr("File Transfer");
-  dfeature.description = tr("Transfer files between two XMPP entities");
+  dfeature.description = tr("Supports the sending of the file to another contact");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

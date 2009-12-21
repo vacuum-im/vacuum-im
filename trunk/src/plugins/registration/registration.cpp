@@ -413,8 +413,8 @@ void Registration::registerDiscoFeatures()
   dfeature.active = false;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_REGISTERATION);
   dfeature.var = NS_JABBER_REGISTER;
-  dfeature.name = tr("In-Band Registration");
-  dfeature.description = tr("In-band registration with instant messaging servers and associated services");
+  dfeature.name = tr("Registration");
+  dfeature.description = tr("Supports the registration");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

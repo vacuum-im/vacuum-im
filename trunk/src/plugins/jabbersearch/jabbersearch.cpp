@@ -263,7 +263,7 @@ void JabberSearch::registerDiscoFeatures()
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_JSEARCH);
   dfeature.var = NS_JABBER_SEARCH;
   dfeature.name = tr("Jabber Search");
-  dfeature.description = tr("Search information repositories on the Jabber network");
+  dfeature.description = tr("Supports the searching of the information");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

@@ -58,14 +58,6 @@
 <context>
     <name>Registration</name>
     <message>
-        <source>In-band registration with instant messaging servers and associated services</source>
-        <translation>Регистрация на серверах мгновенных сообщений и связанных сервисах</translation>
-    </message>
-    <message>
-        <source>In-Band Registration</source>
-        <translation>Регистрация</translation>
-    </message>
-    <message>
         <source>Registration</source>
         <translation>Регистрация</translation>
     </message>
@@ -144,6 +136,10 @@
     <message>
         <source>Allows to register on the Jabber servers and services</source>
         <translation>Позволяет регистрироваться на джаббер серверах и сервисах</translation>
+    </message>
+    <message>
+        <source>Supports the registration</source>
+        <translation>Поддерживает регистрацию</translation>
     </message>
 </context>
 </TS>

@@ -54,10 +54,6 @@
         <translation>Отключить</translation>
     </message>
     <message>
-        <source>Enables a client to send a legacy username to the gateway and receive a properly-formatted JID</source>
-        <translation>Позволяет отправить имя пользовате сторонней системы на транспорт и  получить соответствующий Jabber ID</translation>
-    </message>
-    <message>
         <source>Log In</source>
         <translation>Подключить</translation>
     </message>
@@ -80,6 +76,10 @@
     <message>
         <source>Allows to simplify the interaction with transports to other IM systems</source>
         <translation>Позволяет упростить взаимодействие с транспортами в другие IM системы</translation>
+    </message>
+    <message>
+        <source>Supports the adding of the contact by the username of the legacy system</source>
+        <translation>Поддерживает добавление контакта по имени пользователя другой системы</translation>
     </message>
 </context>
 </TS>

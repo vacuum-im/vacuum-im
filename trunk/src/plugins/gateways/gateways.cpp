@@ -425,7 +425,7 @@ void Gateways::registerDiscoFeatures()
   dfeature.var = NS_JABBER_GATEWAY;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_GATEWAYS);
   dfeature.name = tr("Gateway Interaction");
-  dfeature.description = tr("Enables a client to send a legacy username to the gateway and receive a properly-formatted JID");
+  dfeature.description = tr("Supports the adding of the contact by the username of the legacy system");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

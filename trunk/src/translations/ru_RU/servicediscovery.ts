@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Discovery Info - %1</source>
-        <translation>Информация - %1</translation>
+        <translation>Обзорная информация - %1</translation>
     </message>
 </context>
 <context>
@@ -147,44 +147,12 @@
         <translation>Обзор сервисов</translation>
     </message>
     <message>
-        <source>Discover information and items associated with a Jabber Entity</source>
-        <translation>Обзор информации и сервисов, связанных с Jabber объектами</translation>
-    </message>
-    <message>
-        <source>Discovery information</source>
-        <translation>Информация</translation>
-    </message>
-    <message>
-        <source>Discover information about another entity on the network</source>
-        <translation>Обзор информации о возможностях Jabber объекта</translation>
-    </message>
-    <message>
-        <source>Discovery items</source>
-        <translation>Обзор сервисов</translation>
-    </message>
-    <message>
-        <source>Discover the items associated with a Jabber Entity</source>
-        <translation>Обзор сервисов, связанных с Jabber объектом</translation>
-    </message>
-    <message>
-        <source>Publish items</source>
-        <translation>Публикация пользовательских данных</translation>
-    </message>
-    <message>
-        <source>Publish user defined items to server</source>
-        <translation>Публикация пользовательских данных на сервере</translation>
-    </message>
-    <message>
         <source>JID Escaping</source>
         <translation>Экранирование JID</translation>
     </message>
     <message>
-        <source>Enables the display of Jabber Identifiers with disallowed characters</source>
-        <translation>Позволяет использовать идентификаторы Jabber c неразрешенными символами</translation>
-    </message>
-    <message>
         <source>Discovery Info</source>
-        <translation>Информация</translation>
+        <translation>Обзорная информация</translation>
     </message>
     <message>
         <source>Categoty: %1; Type: %2</source>
@@ -192,15 +160,47 @@
     </message>
     <message>
         <source>Entity Capabilities</source>
-        <translation>Кэширование возможностей Jabber объекта</translation>
-    </message>
-    <message>
-        <source>Enables the capabilities information caching within a session or across sessions</source>
-        <translation>Позволяет кэшировать информацию о возможностях клиентов</translation>
+        <translation>Возможности объекта</translation>
     </message>
     <message>
         <source>Allows to receive information about Jabber entities</source>
         <translation>Позволяет получать информацию о джаббер сущностях</translation>
+    </message>
+    <message>
+        <source>Supports the exchange of the discovery information and items</source>
+        <translation>Поддерживает обмен обзорной информацией и элементами</translation>
+    </message>
+    <message>
+        <source>Discovery Information</source>
+        <translation>Обзорная информация</translation>
+    </message>
+    <message>
+        <source>Supports the exchange of the discovery information</source>
+        <translation>Поддерживает обмен обзорной информацией</translation>
+    </message>
+    <message>
+        <source>Discovery Items</source>
+        <translation>Обзорные элементы</translation>
+    </message>
+    <message>
+        <source>Supports the exchange of the discovery items</source>
+        <translation>Поддерживает обмен обзорными элементами</translation>
+    </message>
+    <message>
+        <source>Publish Items</source>
+        <translation>Публикация элементов</translation>
+    </message>
+    <message>
+        <source>Supports the publishing of the discovery items</source>
+        <translation>Поддерживает публикацию обзорных элементов</translation>
+    </message>
+    <message>
+        <source>Supports the caching of the discovery information</source>
+        <translation>Поддерживает кэширование обзорной информации</translation>
+    </message>
+    <message>
+        <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
+        <translation>Поддерживает отобрадение джаббер идентификаторов с запрещенными символами</translation>
     </message>
 </context>
 </TS>

@@ -57,28 +57,20 @@
 <context>
     <name>InBandStreams</name>
     <message>
-        <source>Enables any two entities to establish a one-to-one in-band bytestream</source>
-        <translation>Позволяет любым двум сущностям устанавливать внутриканальный поток данных типа точка-точка</translation>
-    </message>
-    <message>
-        <source>In-Band Bytestreams</source>
-        <translation>Внутриканальные потоки данных</translation>
-    </message>
-    <message>
         <source>Data is broken down into smaller chunks and transported in-band over XMPP</source>
         <translation>Данные разбиваются на маленькие пакеты и передаются через XMPP канал</translation>
-    </message>
-    <message>
-        <source>In-Band Bytestream</source>
-        <translation>Внутриканальный поток данных</translation>
     </message>
     <message>
         <source>In-Band Data Stream</source>
         <translation>Внутриканальный поток данных</translation>
     </message>
     <message>
-        <source>Allows to initiate in-band stream of data between two Jabber entities</source>
+        <source>Allows to initiate in-band stream of data between two XMPP entities</source>
         <translation>Позволяет инициировать внутриканальный поток данных между двумя XMPP сущностями</translation>
+    </message>
+    <message>
+        <source>Supports the initiating of the in-band stream of data between two XMPP entities</source>
+        <translation>Поддерживает инициализацию внутриканального потока данных между двумя XMPP сущностями</translation>
     </message>
 </context>
 </TS>

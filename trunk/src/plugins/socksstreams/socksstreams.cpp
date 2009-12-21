@@ -46,7 +46,7 @@ SocksStreams::~SocksStreams()
 void SocksStreams::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("SOCKS5 Data Stream");
-  APluginInfo->description = tr("Allows to initiate SOCKS5 stream of data between two Jabber entities");
+  APluginInfo->description = tr("Allows to initiate SOCKS5 stream of data between two XMPP entities");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
@@ -113,8 +113,8 @@ bool SocksStreams::initObjects()
     IDiscoFeature feature;
     feature.var = NS_SOCKS5_BYTESTREAMS;
     feature.active = true;
-    feature.name = tr("SOCKS5 Bytestreams");
-    feature.description = tr("Enables any two entities to establish an SOCKS5 out-of-band bytestream");
+    feature.name = tr("SOCKS5 Data Stream");
+    feature.description = tr("Supports the initiating of the SOCKS5 stream of data between two XMPP entities");
     FDiscovery->insertDiscoFeature(feature);
   }
   return true;
@@ -127,7 +127,7 @@ QString SocksStreams::methodNS() const
 
 QString SocksStreams::methodName() const
 {
-  return tr("SOCKS5 Bytestream");
+  return tr("SOCKS5 Data Stream");
 }
 
 QString SocksStreams::methodDescription() const

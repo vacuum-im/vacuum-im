@@ -217,16 +217,16 @@
         <translation>vCard</translation>
     </message>
     <message>
-        <source>Request and publish vCard</source>
-        <translation>Запрос и публикация личной информации контактов</translation>
-    </message>
-    <message>
         <source>vCard Manager</source>
         <translation>Диспетчер vCard</translation>
     </message>
     <message>
         <source>Allows to obtain personal contact information</source>
         <translation>Позволяет получать личную информацию о контакте</translation>
+    </message>
+    <message>
+        <source>Supports the requesting of the personal contact information</source>
+        <translation>Поддерживает запросы личной информации о контакте</translation>
     </message>
 </context>
 </TS>

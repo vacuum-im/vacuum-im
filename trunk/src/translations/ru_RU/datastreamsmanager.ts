@@ -4,10 +4,6 @@
 <context>
     <name>DataStreamsManger</name>
     <message>
-        <source>Initiate a data stream between any two XMPP entities</source>
-        <translation>Инициализирует поток данных между двумя XMPP клиентами</translation>
-    </message>
-    <message>
         <source>Data Streams Manager</source>
         <translation>Диспетчер потоков данных</translation>
     </message>
@@ -50,6 +46,10 @@
     <message>
         <source>Allows to initiate a custom stream of data between two XMPP entities</source>
         <translation>Позволяет инициировать произвольный поток данных между двумя XMPP сущностями</translation>
+    </message>
+    <message>
+        <source>Supports the initiating of the custom stream of data between two XMPP entities</source>
+        <translation>Поддерживает инициализацию произвольного потока данных между двумя XMPP сущностями</translation>
     </message>
 </context>
 <context>

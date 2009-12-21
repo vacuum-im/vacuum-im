@@ -33,7 +33,6 @@ struct IDiscoFeature
   QIcon icon;
   QString var;
   QString name;
-  QString actionName;
   QString description;
 };
 

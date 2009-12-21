@@ -32,10 +32,6 @@
         <translation>Разрешить сессию?</translation>
     </message>
     <message>
-        <source>Negotiate the exchange of XML stanzas between two XMPP entities</source>
-        <translation>Согласование обмена XML-транзакцями между двумя XMPP клиентами</translation>
-    </message>
-    <message>
         <source>Accept the Invitation?</source>
         <translation>Принять приглашение?</translation>
     </message>
@@ -106,6 +102,10 @@
     <message>
         <source>Allows to set the session between two entities, which explains the rules of the exchange of XMPP stanzas</source>
         <translation>Позволяет устанавливать сессию между двумя сущностями, которая определяет правила обмена XMPP строфами</translation>
+    </message>
+    <message>
+        <source>Supports the negotiating of the stanza session between two XMPP entities</source>
+        <translation>Поддерживает инициализацию сессии строф между двумя XMPP сущностями</translation>
     </message>
 </context>
 </TS>

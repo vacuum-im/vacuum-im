@@ -912,7 +912,7 @@ void SessionNegotiation::registerDiscoFeatures()
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SNEGOTIATION);
   dfeature.var = NS_STANZA_SESSION;
   dfeature.name = tr("Session Negotiation");
-  dfeature.description = tr("Negotiate the exchange of XML stanzas between two XMPP entities");
+  dfeature.description = tr("Supports the negotiating of the stanza session between two XMPP entities");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

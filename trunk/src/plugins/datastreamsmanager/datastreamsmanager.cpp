@@ -97,7 +97,7 @@ bool DataStreamsManger::initObjects()
     dfeature.var = NS_STREAM_INITIATION;
     dfeature.active = true;
     dfeature.name = tr("Data Streams Initiation");
-    dfeature.description = tr("Initiate a data stream between any two XMPP entities");
+    dfeature.description = tr("Supports the initiating of the custom stream of data between two XMPP entities");
     FDiscovery->insertDiscoFeature(dfeature);
   }
 

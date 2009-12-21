@@ -734,22 +734,22 @@ void ClientInfo::registerDiscoFeatures()
   dfeature.active = true;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CLIENTINFO_VERSION);
   dfeature.var = NS_JABBER_VERSION;
-  dfeature.name = tr("Software version");
-  dfeature.description = tr("Request contact software version");
+  dfeature.name = tr("Software Version");
+  dfeature.description = tr("Supports the exchanging of the information about the application version");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = false;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CLIENTINFO_ACTIVITY);
   dfeature.var = NS_JABBER_LAST;
-  dfeature.name = tr("Last activity");
-  dfeature.description = tr("Request contact last activity");
+  dfeature.name = tr("Last Activity");
+  dfeature.description = tr("Supports the exchanging of the information about the user last activity");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = true;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CLIENTINFO_TIME);
   dfeature.var = NS_XMPP_TIME;
-  dfeature.name = tr("Entity time");
-  dfeature.description = tr("Request the local time of an entity");
+  dfeature.name = tr("Entity Time");
+  dfeature.description = tr("Supports the exchanging of the information about the user local time");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
