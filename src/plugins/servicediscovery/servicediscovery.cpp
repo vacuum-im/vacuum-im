@@ -897,48 +897,42 @@ void ServiceDiscovery::registerFeatures()
   dfeature.active = false;
   dfeature.icon = storage->getIcon(MNI_SDISCOVERY_DISCOINFO);
   dfeature.name = tr("Service Discovery");
-  dfeature.actionName = "";
-  dfeature.description = tr("Discover information and items associated with a Jabber Entity");
+  dfeature.description = tr("Supports the exchange of the discovery information and items");
   insertDiscoFeature(dfeature);
 
   dfeature.var = NS_DISCO_INFO;
   dfeature.active = true;
   dfeature.icon = storage->getIcon(MNI_SDISCOVERY_DISCOINFO);
-  dfeature.name = tr("Discovery information");
-  dfeature.actionName = "";
-  dfeature.description = tr("Discover information about another entity on the network");
+  dfeature.name = tr("Discovery Information");
+  dfeature.description = tr("Supports the exchange of the discovery information");
   insertDiscoFeature(dfeature);
 
   dfeature.var = NS_DISCO_ITEMS;
   dfeature.active = false;
   dfeature.icon = storage->getIcon(MNI_SDISCOVERY_DISCOINFO);
-  dfeature.name = tr("Discovery items");
-  dfeature.actionName = "";
-  dfeature.description = tr("Discover the items associated with a Jabber Entity");
+  dfeature.name = tr("Discovery Items");
+  dfeature.description = tr("Supports the exchange of the discovery items");
   insertDiscoFeature(dfeature);
 
   dfeature.var = NS_DISCO_PUBLISH;
   dfeature.active = false;
   dfeature.icon = QIcon();
-  dfeature.name = tr("Publish items");
-  dfeature.actionName = "";
-  dfeature.description = tr("Publish user defined items to server");
+  dfeature.name = tr("Publish Items");
+  dfeature.description = tr("Supports the publishing of the discovery items");
   insertDiscoFeature(dfeature);
 
   dfeature.var = NS_CAPS;
   dfeature.active = true;
   dfeature.icon = QIcon();
   dfeature.name = tr("Entity Capabilities");
-  dfeature.actionName = "";
-  dfeature.description = tr("Enables the capabilities information caching within a session or across sessions");
+  dfeature.description = tr("Supports the caching of the discovery information");
   insertDiscoFeature(dfeature);
 
-  dfeature.var = "jid\\20escaping";
+  dfeature.var = "Jid\\20Escaping";
   dfeature.active = true;
   dfeature.icon = QIcon();
   dfeature.name = tr("JID Escaping");
-  dfeature.actionName = "";
-  dfeature.description = tr("Enables the display of Jabber Identifiers with disallowed characters");
+  dfeature.description = tr("Supports the displaying of the jabber identifiers with disallowed characters");
   insertDiscoFeature(dfeature);
 }
 

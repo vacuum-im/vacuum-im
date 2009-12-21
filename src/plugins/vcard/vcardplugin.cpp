@@ -318,8 +318,7 @@ void VCardPlugin::registerDiscoFeatures()
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_VCARD);
   dfeature.var = NS_VCARD_TEMP;
   dfeature.name = tr("vCard");
-  dfeature.actionName = tr("vCard");
-  dfeature.description = tr("Request and publish vCard");
+  dfeature.description = tr("Supports the requesting of the personal contact information");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

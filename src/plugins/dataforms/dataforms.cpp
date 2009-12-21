@@ -1037,28 +1037,23 @@ void DataForms::urlLoadFailure(const QUrl &AUrl, const QString &AError)
 void DataForms::registerDiscoFeatures()
 {
   IDiscoFeature dfeature;
+
   dfeature.active = true;
-  dfeature.icon = QIcon();
   dfeature.var = NS_JABBER_DATA;
   dfeature.name = tr("Data Forms");
-  dfeature.actionName = "";
-  dfeature.description = tr("Implements data forms and generic data description");
+  dfeature.description = tr("Supports the processing and displaying of the forms with the data");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = true;
-  dfeature.icon = QIcon();
   dfeature.var = NS_JABBER_XDATAVALIDATE;
   dfeature.name = tr("Data Forms Validation");
-  dfeature.actionName = "";
-  dfeature.description = tr("Enables to specify additional validation guidelines related to a data form");
+  dfeature.description = tr("Supports the validating of the data entered in the form");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = true;
-  dfeature.icon = QIcon();
   dfeature.var = NS_JABBER_XDATALAYOUT;
   dfeature.name = tr("Data Forms Layout");
-  dfeature.actionName = "";
-  dfeature.description = tr("Enables to specify form layouts, including the layout of form fields, pages and sections");
+  dfeature.description = tr("Supports the layouting of the form, including the layout of form fields, pages and sections");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

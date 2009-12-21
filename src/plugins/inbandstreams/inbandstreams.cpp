@@ -25,7 +25,7 @@ InBandStreams::~InBandStreams()
 void InBandStreams::pluginInfo(IPluginInfo *APluginInfo)
 {
   APluginInfo->name = tr("In-Band Data Stream");
-  APluginInfo->description = tr("Allows to initiate in-band stream of data between two Jabber entities");
+  APluginInfo->description = tr("Allows to initiate in-band stream of data between two XMPP entities");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
@@ -77,8 +77,8 @@ bool InBandStreams::initObjects()
     IDiscoFeature feature;
     feature.var = NS_INBAND_BYTESTREAMS;
     feature.active = true;
-    feature.name = tr("In-Band Bytestreams");
-    feature.description = tr("Enables any two entities to establish a one-to-one in-band bytestream");
+    feature.name = tr("In-Band Data Stream");
+    feature.description = tr("Supports the initiating of the in-band stream of data between two XMPP entities");
     FDiscovery->insertDiscoFeature(feature);
   }
   return true;
@@ -91,7 +91,7 @@ QString InBandStreams::methodNS() const
 
 QString InBandStreams::methodName() const
 {
-  return tr("In-Band Bytestream");
+  return tr("In-Band Data Stream");
 }
 
 QString InBandStreams::methodDescription() const

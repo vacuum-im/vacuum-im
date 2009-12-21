@@ -133,18 +133,6 @@
 <context>
     <name>SocksStreams</name>
     <message>
-        <source>SOCKS5 Bytestreams</source>
-        <translation>SOCKS5 потоки данных</translation>
-    </message>
-    <message>
-        <source>Enables any two entities to establish an SOCKS5 out-of-band bytestream</source>
-        <translation>Позволяет любым двум сущностям устанавливить отдельный SOCKS5 поток данных</translation>
-    </message>
-    <message>
-        <source>SOCKS5 Bytestream</source>
-        <translation>SOCKS5 поток данных</translation>
-    </message>
-    <message>
         <source>Data is transfered out-band over TCP or UDP connection</source>
         <translation>Данные передаются по отдельному TCP или UDP подключению</translation>
     </message>
@@ -153,8 +141,12 @@
         <translation>SOCKS5 поток данных</translation>
     </message>
     <message>
-        <source>Allows to initiate SOCKS5 stream of data between two Jabber entities</source>
-        <translation>Позволяет инициировать SOCKS5 поток данных между двумя джаббер сущностями</translation>
+        <source>Allows to initiate SOCKS5 stream of data between two XMPP entities</source>
+        <translation>Позволяет инициировать SOCKS5 поток данных между двумя XMPP сущностями</translation>
+    </message>
+    <message>
+        <source>Supports the initiating of the SOCKS5 stream of data between two XMPP entities</source>
+        <translation>Поддерживает инициализацию SOCKS5 потока данных между двумя XMPP сущностями</translation>
     </message>
 </context>
 </TS>

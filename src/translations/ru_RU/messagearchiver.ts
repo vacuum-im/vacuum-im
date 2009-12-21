@@ -241,54 +241,6 @@
         <translation>Настройки...</translation>
     </message>
     <message>
-        <source>Message Archiving</source>
-        <translation>Архив сообщений</translation>
-    </message>
-    <message>
-        <source>Archiving and retrieval of messages</source>
-        <translation>Хранение и получение сообщений с сервера</translation>
-    </message>
-    <message>
-        <source>Message Archiving: Auto archiving</source>
-        <translation>Архив сообщений: Автоматический режим</translation>
-    </message>
-    <message>
-        <source>Automatically archiving of messages on server</source>
-        <translation>Автоматическое сохранение сообщений на сервере</translation>
-    </message>
-    <message>
-        <source>Message Archiving: Encrypted messages</source>
-        <translation>Архив сообщений: Зашифрованные сообщения</translation>
-    </message>
-    <message>
-        <source>Archiving of encrypted messages on server</source>
-        <translation>Хранение зашифрованных сообщений на сервере</translation>
-    </message>
-    <message>
-        <source>Message Archiving: Mange messages</source>
-        <translation>Архив сообщений: Управление сообщениями</translation>
-    </message>
-    <message>
-        <source>Retrieving and removing messages on server</source>
-        <translation>Получение и удаление сообщений на сервере</translation>
-    </message>
-    <message>
-        <source>Message Archiving: Manual archiving</source>
-        <translation>Архив сообщений: Ручной режим</translation>
-    </message>
-    <message>
-        <source>Manually upload messages on server</source>
-        <translation>Загрузка локального архива на сервер</translation>
-    </message>
-    <message>
-        <source>Message Archiving: Preferences</source>
-        <translation>Архив сообщений: Настройки</translation>
-    </message>
-    <message>
-        <source>Storing archive preferences on server</source>
-        <translation>Хранение настроек архива  на сервере</translation>
-    </message>
-    <message>
         <source>Common history settings</source>
         <translation>Общие настройки архива</translation>
     </message>
@@ -347,6 +299,54 @@
     <message>
         <source>Allows to save the history of communications both locally and on the server</source>
         <translation>Позволяет сохранять историю сообщений как локально так и на сервере</translation>
+    </message>
+    <message>
+        <source>Messages Archiving</source>
+        <translation>Архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>Supports the archiving of the messages</source>
+        <translation>Поддерживает архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>Automatic Messages Archiving</source>
+        <translation>Автоматическое архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>Supports the automatic archiving of the messages</source>
+        <translation>Поддерживает автоматическое архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>Managing Archived Messages</source>
+        <translation>Управление архивированными сообщениями</translation>
+    </message>
+    <message>
+        <source>Supports the managing of the archived messages</source>
+        <translation>Поддерживает управление архивированными сообщениями</translation>
+    </message>
+    <message>
+        <source>Manual Messages Archiving</source>
+        <translation>Ручное архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>Supports the manual archiving of the messages</source>
+        <translation>Поддерживает ручное архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>Supports the storing of the archive preferences</source>
+        <translation>Поддерживает хранение настроек архива сообщений</translation>
+    </message>
+    <message>
+        <source>Encrypted Messages Archiving</source>
+        <translation>Архивирование зашифрованных сообщений</translation>
+    </message>
+    <message>
+        <source>Supports the archiving of the encrypted messages</source>
+        <translation>Поддерживает архивирование зашифрованных сообщений</translation>
+    </message>
+    <message>
+        <source>Messages Archive Preferences</source>
+        <translation>Настройки архива сообщений</translation>
     </message>
 </context>
 <context>

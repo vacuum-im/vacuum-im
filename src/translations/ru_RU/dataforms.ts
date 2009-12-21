@@ -19,10 +19,6 @@
 <context>
     <name>DataForms</name>
     <message>
-        <source>Implements data forms and generic data description</source>
-        <translation>Поддерживает обработку форм с данными</translation>
-    </message>
-    <message>
         <source>Data Forms</source>
         <translation>Формы с данными</translation>
     </message>
@@ -31,16 +27,8 @@
         <translation>Проверка целостности данных формы</translation>
     </message>
     <message>
-        <source>Enables to specify additional validation guidelines related to a data form</source>
-        <translation>Позволяет указать дополнительные управляющие проверки, связанные с формой данных</translation>
-    </message>
-    <message>
         <source>Data Forms Layout</source>
         <translation>Управление расположением данных на форме</translation>
-    </message>
-    <message>
-        <source>Enables to specify form layouts, including the layout of form fields, pages and sections</source>
-        <translation>Позволяет указать расположение дянных, включая расположение полей форм, страниц и секций</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -65,6 +53,18 @@
     <message>
         <source>Allows other modules to process and display the form with the data intended for user</source>
         <translation>Позволяет другим модулям обрабатывать и отображать формы с данными предназначенные пользователю</translation>
+    </message>
+    <message>
+        <source>Supports the processing and displaying of the forms with the data</source>
+        <translation>Поддерживает обработку и отображение форм с данными</translation>
+    </message>
+    <message>
+        <source>Supports the validating of the data entered in the form</source>
+        <translation>Поддерживает проверку данных введённых в форму</translation>
+    </message>
+    <message>
+        <source>Supports the layouting of the form, including the layout of form fields, pages and sections</source>
+        <translation>Поддерживает форматирование форм, включая форматирование полей, страниц и секций форм</translation>
     </message>
 </context>
 <context>

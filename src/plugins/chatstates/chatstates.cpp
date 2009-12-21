@@ -535,7 +535,7 @@ void ChatStates::registerDiscoFeatures()
   dfeature.var = NS_CHATSTATES;
   dfeature.active = true;
   dfeature.name = tr("Chat State Notifications");
-  dfeature.description = tr("Communicating the status of a user in a chat session");
+  dfeature.description = tr("Supports the exchanging of the information about the user's activity in the chat");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

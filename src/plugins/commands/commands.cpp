@@ -493,7 +493,7 @@ void Commands::registerDiscoFeatures()
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_COMMANDS);
   dfeature.var = NS_COMMANDS;
   dfeature.name = tr("Ad-Hoc Commands");
-  dfeature.description = tr("Advertising and executing application-specific commands");
+  dfeature.description = tr("Supports the running or performing of the special services commands");
   FDiscovery->insertDiscoFeature(dfeature);
 }
 

@@ -498,15 +498,12 @@ void MultiUserChatPlugin::registerDiscoFeatures()
   dfeature.active = true;
   dfeature.icon = icon;
   dfeature.var = NS_MUC;
-  dfeature.name = tr("Multi-user text conferencing");
-  dfeature.actionName = tr("Join conference");
-  dfeature.description = tr("Multi-user text conferencing");
+  dfeature.name = tr("Multi-User Conferences");
+  dfeature.description = tr("Supports the multi-user conferences");
   FDiscovery->insertDiscoFeature(dfeature);
 
   dfeature.active = false;
   dfeature.icon = QIcon();
-  dfeature.actionName = "";
-  dfeature.description = "";
 
   dfeature.var = MUC_HIDDEN;
   dfeature.name = tr("Hidden room");

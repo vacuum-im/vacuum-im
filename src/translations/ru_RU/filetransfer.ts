@@ -4,10 +4,6 @@
 <context>
     <name>FileTransfer</name>
     <message>
-        <source>Transfer files between two XMPP entities</source>
-        <translation>Передает файлы между двумя XMPP клиентами</translation>
-    </message>
-    <message>
         <source>File Transfer</source>
         <translation>Передача файла</translation>
     </message>
@@ -58,6 +54,10 @@
     <message>
         <source>Allows to send a file to another contact</source>
         <translation>Позволяет передать файл другому контакту</translation>
+    </message>
+    <message>
+        <source>Supports the sending of the file to another contact</source>
+        <translation>Поддерживает передачу файла другому контакту</translation>
     </message>
 </context>
 <context>
