@@ -53,7 +53,6 @@ void DiscoInfoWindow::initialize()
 void DiscoInfoWindow::updateWindow()
 {
   IDiscoInfo dinfo = FDiscovery->discoInfo(FContactJid,FNode);
-  qSort(dinfo.features);
 
   int row = 0;
   ui.twtIdentity->clearContents();
@@ -67,6 +66,7 @@ void DiscoInfoWindow::updateWindow()
   }
   ui.twtIdentity->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
 
+  qSort(dinfo.features);
   ui.lwtFearures->clear();
   foreach(QString featureVar, dinfo.features)
   {
@@ -85,6 +85,7 @@ void DiscoInfoWindow::updateWindow()
     listItem->setData(Qt::UserRole+1,dfeature.description);
     ui.lwtFearures->addItem(listItem);
   }
+  onCurrentFeatureChanged(ui.lwtFearures->currentItem(), NULL);
 
   if (FDataForms)
   {
@@ -109,9 +110,6 @@ void DiscoInfoWindow::updateWindow()
     ui.pbtExtensions->setMenu(FFormMenu);
     ui.pbtExtensions->setEnabled(FFormMenu!=NULL);
   }
-
-  if (ui.lwtFearures->currentItem())
-    ui.lblFeatureDesc->setText(ui.lwtFearures->currentItem()->data(Qt::UserRole).toString());
 
   if (dinfo.error.code > 0)
   {
@@ -140,17 +138,20 @@ void DiscoInfoWindow::requestDiscoInfo()
     ui.pbtUpdate->setEnabled(false);
 }
 
-void DiscoInfoWindow::onDiscoInfoReceived(const IDiscoInfo &/*ADiscoInfo*/)
+void DiscoInfoWindow::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
-  updateWindow();
+  if (ADiscoInfo.contactJid == FContactJid)
+    updateWindow();
 }
 
-void DiscoInfoWindow::onCurrentFeatureChanged(QListWidgetItem *ACurrent, QListWidgetItem * /*APrevious*/)
+void DiscoInfoWindow::onCurrentFeatureChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious)
 {
+  Q_UNUSED(APrevious);
   if (ACurrent)
     ui.lblFeatureDesc->setText(ACurrent->data(Qt::UserRole+1).toString());
   else
     ui.lblFeatureDesc->setText("");
+  ui.lblFeatureDesc->setMinimumHeight(ui.lblFeatureDesc->height());
 }
 
 void DiscoInfoWindow::onUpdateClicked()
@@ -168,8 +169,9 @@ void DiscoInfoWindow::onListItemActivated(QListWidgetItem *AItem)
   }
 }
 
-void DiscoInfoWindow::onStreamJidChanged(const Jid &/*ABefour*/, const Jid &AAfter)
+void DiscoInfoWindow::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
 {
+  Q_UNUSED(ABefour);
   FStreamJid = AAfter;
 }
 
