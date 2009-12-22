@@ -10,6 +10,8 @@ class StyleViewer :
 public:
   StyleViewer(QWidget *AParent);
   ~StyleViewer();
+public:
+  bool event(QEvent *AEvent);
 };
 
 #endif // STYLEVIEWER_H

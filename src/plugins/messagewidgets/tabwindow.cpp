@@ -1,5 +1,6 @@
 #include "tabwindow.h"
 
+#include <QMouseEvent>
 #include <QMessageBox>
 #include <QInputDialog>
 
@@ -258,6 +259,14 @@ void TabWindow::updateTab(int AIndex)
     ui.twtTabs->setTabIcon(AIndex,widget->windowIcon());
     ui.twtTabs->setTabText(AIndex,widget->windowIconText());
   }
+}
+
+void TabWindow::mousePressEvent(QMouseEvent *AEvent)
+{
+  if (AEvent->buttons() == Qt::MidButton)
+    removeWidget(currentWidget());
+  else
+    QMainWindow::mousePressEvent(AEvent);
 }
 
 void TabWindow::onTabChanged(int /*AIndex*/)
