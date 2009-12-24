@@ -70,7 +70,7 @@ public:
   virtual QList<ITabWindow *> tabWindows() const;
   virtual ITabWindow *openTabWindow(const QUuid &AWindowId);
   virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const;
-  virtual void assignTabWindow(ITabWidget *AWidget);
+  virtual void assignTabWindowPage(ITabWindowPage *APage);
   virtual bool tabWindowsEnabled() const;
   virtual void setTabWindowsEnabled(bool AEnabled);
   virtual QUuid defaultTabWindow() const;
@@ -123,7 +123,7 @@ protected slots:
   void onViewWidgetUrlClicked(const QUrl &AUrl);
   void onMessageWindowDestroyed();
   void onChatWindowDestroyed();
-  void onTabWindowWidgetAdded(ITabWidget *AWidget);
+  void onTabWindowPageAdded(ITabWindowPage *APage);
   void onTabWindowDestroyed();
   void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
   void onStreamRemoved(IXmppStream *AXmppStream);

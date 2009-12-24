@@ -14,15 +14,15 @@ class ChatWindow :
   public IChatWindow
 {
   Q_OBJECT;
-  Q_INTERFACES(IChatWindow ITabWidget);
+  Q_INTERFACES(IChatWindow ITabWindowPage);
 public:
   ChatWindow(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid);
   virtual ~ChatWindow();
   virtual QMainWindow *instance() { return this; }
-  //ITabWidget
+  //ITabWindowPage
+  virtual QString tabPageId() const;
   virtual void showWindow();
   virtual void closeWindow();
-  virtual QString tabWidgetId() const;
   //IChatWindow
   virtual const Jid &streamJid() const { return FStreamJid; }
   virtual const Jid &contactJid() const { return FContactJid; }
@@ -36,7 +36,7 @@ public:
   virtual bool isActive() const;
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
-  //ITabWidget
+  //ITabWindowPage
   virtual void windowShow();
   virtual void windowClose();
   virtual void windowChanged();

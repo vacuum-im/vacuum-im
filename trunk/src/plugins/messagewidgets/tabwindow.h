@@ -25,18 +25,18 @@ public:
   virtual QUuid windowId() const;
   virtual QString windowName() const;
   virtual Menu *windowMenu() const;
-  virtual void addWidget(ITabWidget *AWidget);
-  virtual bool hasWidget(ITabWidget *AWidget) const;
-  virtual ITabWidget *currentWidget() const;
-  virtual void setCurrentWidget(ITabWidget *AWidget);
-  virtual void detachWidget(ITabWidget *AWidget);
-  virtual void removeWidget(ITabWidget *AWidget);
+  virtual void addPage(ITabWindowPage *APage);
+  virtual bool hasPage(ITabWindowPage *APage) const;
+  virtual ITabWindowPage *currentPage() const;
+  virtual void setCurrentPage(ITabWindowPage *APage);
+  virtual void detachPage(ITabWindowPage *APage);
+  virtual void removePage(ITabWindowPage *APage);
   virtual void clear();
 signals:
-  virtual void widgetAdded(ITabWidget *AWidget);
-  virtual void currentChanged(ITabWidget *AWidget);
-  virtual void widgetRemoved(ITabWidget *AWidget);
-  virtual void widgetDetached(ITabWidget *AWidget);
+  virtual void pageAdded(ITabWindowPage *APage);
+  virtual void currentPageChanged(ITabWindowPage *APage);
+  virtual void pageRemoved(ITabWindowPage *APage);
+  virtual void pageDetached(ITabWindowPage *APage);
   virtual void windowChanged();
   virtual void windowDestroyed();
 protected:
@@ -49,10 +49,10 @@ protected:
 protected slots:
   void onTabChanged(int AIndex);
   void onTabCloseRequested(int AIndex);
-  void onTabWidgetShow();
-  void onTabWidgetClose();
-  void onTabWidgetChanged();
-  void onTabWidgetDestroyed();
+  void onTabPageShow();
+  void onTabPageClose();
+  void onTabPageChanged();
+  void onTabPageDestroyed();
   void onTabWindowAppended(const QUuid &AWindowId, const QString &AName);
   void onTabWindowNameChanged(const QUuid &AWindowId, const QString &AName);
   void onDefaultTabWindowChanged(const QUuid &AWindowId);

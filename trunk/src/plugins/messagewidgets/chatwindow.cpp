@@ -63,6 +63,11 @@ ChatWindow::~ChatWindow()
   delete FStatusBarWidget->instance();
 }
 
+QString ChatWindow::tabPageId() const
+{
+  return "ChatWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
+}
+
 void ChatWindow::showWindow()
 {
   if (isWindow())
@@ -80,11 +85,6 @@ void ChatWindow::closeWindow()
     close();
   else
     emit windowClose();
-}
-
-QString ChatWindow::tabWidgetId() const
-{
-  return "ChatWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
 }
 
 void ChatWindow::setContactJid(const Jid &AContactJid)
