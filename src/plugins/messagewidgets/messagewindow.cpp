@@ -70,6 +70,11 @@ MessageWindow::~MessageWindow()
   delete FEditToolBarWidget->instance();
 }
 
+QString MessageWindow::tabPageId() const
+{
+  return "MessageWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
+}
+
 void MessageWindow::showWindow()
 {
   if (isWindow())
@@ -87,11 +92,6 @@ void MessageWindow::closeWindow()
     close();
   else
     emit windowClose();
-}
-
-QString MessageWindow::tabWidgetId() const
-{
-  return "MessageWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
 }
 
 void MessageWindow::setContactJid(const Jid &AContactJid)

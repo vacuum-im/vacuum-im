@@ -159,7 +159,7 @@ signals:
 };
 
 class IMultiUserChatWindow :
-  public ITabWidget
+  public ITabWindowPage
 {
 public:
   //virtual QMainWindow *instance() =0;

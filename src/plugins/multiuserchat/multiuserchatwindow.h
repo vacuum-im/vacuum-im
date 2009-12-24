@@ -47,15 +47,15 @@ class MultiUserChatWindow :
   public IMessageHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IMultiUserChatWindow ITabWidget IMessageHandler);
+  Q_INTERFACES(IMultiUserChatWindow ITabWindowPage IMessageHandler);
 public:
   MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat);
   ~MultiUserChatWindow();
   virtual QMainWindow *instance() { return this; }
-  //ITabWidget
+  //ITabWindowPage
+  virtual QString tabPageId() const;
   virtual void showWindow();
   virtual void closeWindow();
-  virtual QString tabWidgetId() const;
   //IMessageHandler
   virtual bool checkMessage(const Message &AMessage);
   virtual void receiveMessage(int AMessageId);

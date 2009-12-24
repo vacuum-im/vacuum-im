@@ -9,8 +9,8 @@
 #define SVN_DEFAULT_TABWINDOW       "defaultTabWindow"
 #define SVN_TABWINDOW               "tabWindow[]"
 #define SVN_TABWINDOW_NAME          SVN_TABWINDOW":name"
-#define SVN_TABWIDGET               "tabWidget[]"
-#define SVN_TABWIDGET_WINDOWID      SVN_TABWIDGET":windowId"
+#define SVN_TABPAGE                 "tabPage[]"
+#define SVN_TABPAGE_PAGEID          SVN_TABPAGE":pageId"
 
 
 MessageWidgets::MessageWidgets()
@@ -97,7 +97,7 @@ QWidget *MessageWidgets::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
-bool MessageWidgets::widgetUrlOpen(IViewWidget * /*AWidget*/, const QUrl &AUrl, int /*AOrder*/)
+bool MessageWidgets::widgetUrlOpen(IViewWidget * /*APage*/, const QUrl &AUrl, int /*AOrder*/)
 {
   return QDesktopServices::openUrl(AUrl);
 }
@@ -277,7 +277,7 @@ ITabWindow *MessageWidgets::openTabWindow(const QUuid &AWindowId)
   {
     window = new TabWindow(this,AWindowId);
     FTabWindows.append(window);
-    connect(window->instance(),SIGNAL(widgetAdded(ITabWidget *)),SLOT(onTabWindowWidgetAdded(ITabWidget *)));
+    connect(window->instance(),SIGNAL(pageAdded(ITabWindowPage *)),SLOT(onTabWindowPageAdded(ITabWindowPage *)));
     connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onTabWindowDestroyed()));
     emit tabWindowCreated(window);
   }
@@ -293,7 +293,7 @@ ITabWindow *MessageWidgets::findTabWindow(const QUuid &AWindowId) const
   return NULL;
 }
 
-void MessageWidgets::assignTabWindow(ITabWidget *AWidget)
+void MessageWidgets::assignTabWindowPage(ITabWindowPage *APage)
 {
   if (tabWindowsEnabled())
   {
@@ -301,12 +301,12 @@ void MessageWidgets::assignTabWindow(ITabWidget *AWidget)
     if (FSettingsPlugin)
     {
       ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
-      windowId = settings->valueNS(SVN_TABWIDGET_WINDOWID,AWidget->tabWidgetId(),windowId.toString()).toString();
+      windowId = settings->valueNS(SVN_TABPAGE_PAGEID,APage->tabPageId(),windowId.toString()).toString();
     }
     if (!FAvailTabWindows.contains(windowId))
       windowId = FDefaultTabWindow;
     ITabWindow *window = openTabWindow(windowId);
-    window->addWidget(AWidget);
+    window->addPage(APage);
   }
 }
 
@@ -476,16 +476,16 @@ void MessageWidgets::onChatWindowDestroyed()
   }
 }
 
-void MessageWidgets::onTabWindowWidgetAdded(ITabWidget *AWidget)
+void MessageWidgets::onTabWindowPageAdded(ITabWindowPage *APage)
 {
   ITabWindow *window = qobject_cast<ITabWindow *>(sender());
   if (FSettingsPlugin && window)
   {
     ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
     if (window->windowId() != FDefaultTabWindow)
-      settings->setValueNS(SVN_TABWIDGET_WINDOWID,AWidget->tabWidgetId(),window->windowId().toString());
+      settings->setValueNS(SVN_TABPAGE_PAGEID,APage->tabPageId(),window->windowId().toString());
     else
-      settings->deleteNS(AWidget->tabWidgetId());
+      settings->deleteNS(APage->tabPageId());
   }
 }
 

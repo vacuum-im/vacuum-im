@@ -76,10 +76,15 @@ MultiUserChatWindow::~MultiUserChatWindow()
   emit windowDestroyed();
 }
 
+QString MultiUserChatWindow::tabPageId() const
+{
+  return "MessageWindow|"+streamJid().pBare()+"|"+roomJid().pBare();
+}
+
 void MultiUserChatWindow::showWindow()
 {
   if (FMessageWidgets && isWindow() && !isVisible())
-    FMessageWidgets->assignTabWindow(this);
+    FMessageWidgets->assignTabWindowPage(this);
 
   if (isWindow())
   {
@@ -96,11 +101,6 @@ void MultiUserChatWindow::closeWindow()
     close();
   else
     emit windowClose();
-}
-
-QString MultiUserChatWindow::tabWidgetId() const
-{
-  return "MessageWindow|"+streamJid().pBare()+"|"+roomJid().pBare();
 }
 
 bool MultiUserChatWindow::checkMessage(const Message &AMessage)
@@ -1265,7 +1265,7 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 void MultiUserChatWindow::showChatWindow(IChatWindow *AWindow)
 {
   if (FMessageWidgets && AWindow->instance()->isWindow() && !AWindow->instance()->isVisible())
-    FMessageWidgets->assignTabWindow(AWindow);
+    FMessageWidgets->assignTabWindowPage(AWindow);
   AWindow->showWindow();
 }
 
