@@ -18,6 +18,7 @@ HEADERS = messagewidgets.h \
           statusbarwidget.h \
           chatwindow.h \
           messagewindow.h \
+          tabwidget.h \
           tabwindow.h \
 	  messengeroptions.h
 
@@ -32,5 +33,6 @@ SOURCES = messagewidgets.cpp \
           statusbarwidget.cpp \
           chatwindow.cpp \
           messagewindow.cpp \
+          tabwidget.cpp \
           tabwindow.cpp \
           messengeroptions.cpp

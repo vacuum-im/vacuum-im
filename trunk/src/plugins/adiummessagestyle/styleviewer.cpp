@@ -1,8 +1,6 @@
 #include "styleviewer.h"
 
-#include <QEvent>
 #include <QShortcut>
-#include <QMouseEvent>
 
 StyleViewer::StyleViewer(QWidget *AParent) : QWebView(AParent)
 {
@@ -15,17 +13,6 @@ StyleViewer::StyleViewer(QWidget *AParent) : QWebView(AParent)
 StyleViewer::~StyleViewer()
 {
 
-}
-
-bool StyleViewer::event(QEvent *AEvent)
-{
-  if (AEvent->type() == QEvent::MouseButtonPress)
-  {
-    QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(AEvent);
-    if (mouseEvent && mouseEvent->buttons()==Qt::MidButton)
-      return false;
-  }
-  return QWebView::event(AEvent);
 }
 
 QSize StyleViewer::sizeHint() const
