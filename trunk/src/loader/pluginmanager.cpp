@@ -28,13 +28,16 @@
 
 #if defined(Q_WS_WIN) 
 #  define ENV_APP_DATA              "APPDATA"
-#  define DIR_APP_DATA              ORGANIZATION_NAME"/"APPLICATION_NAME
+#  define DIR_APP_DATA              APPLICATION_NAME
+#  define PATH_APP_DATA             ORGANIZATION_NAME"/"DIR_APP_DATA
 #elif defined(Q_WS_X11)
 #  define ENV_APP_DATA              "HOME"
 #  define DIR_APP_DATA              ".vacuum"
+#  define PATH_APP_DATA             DIR_APP_DATA
 #elif defined(Q_WS_MAC)
 #  define ENV_APP_DATA              "HOME"
-#  define DIR_APP_DATA              "Library/Application Support/"APPLICATION_NAME
+#  define DIR_APP_DATA              APPLICATION_NAME
+#  define PATH_APP_DATA             "Library/Application Support/"DIR_APP_DATA
 #endif
 
 #if defined(Q_WS_WIN)
@@ -206,13 +209,16 @@ void PluginManager::loadSettings()
     if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
       FDataPath = dir.absolutePath();
   }
-  foreach(QString env, QProcess::systemEnvironment())
+  if (FDataPath.isNull())
   {
-    if (env.startsWith(ENV_APP_DATA"="))
+    foreach(QString env, QProcess::systemEnvironment())
     {
-      QDir dir(env.split("=").value(1));
-      if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
-        FDataPath = dir.absolutePath();
+      if (env.startsWith(ENV_APP_DATA"="))
+      {
+        QDir dir(env.split("=").value(1));
+        if (dir.exists() && (dir.exists(PATH_APP_DATA) || dir.mkpath(PATH_APP_DATA)) && dir.cd(PATH_APP_DATA))
+          FDataPath = dir.absolutePath();
+      }
     }
   }
   if (FDataPath.isNull())
