@@ -11,7 +11,6 @@ public:
   StyleViewer(QWidget *AParent);
   ~StyleViewer();
 public:
-  bool event(QEvent *AEvent);
   virtual QSize sizeHint() const;
 protected slots:
   void onShortcutActivated();

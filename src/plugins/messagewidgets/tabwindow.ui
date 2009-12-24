@@ -16,7 +16,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="twtTabs">
+     <widget class="TabWidget" name="twtTabs">
       <widget class="QWidget" name="tab">
        <attribute name="title">
         <string>Tab 1</string>
@@ -28,6 +28,14 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>TabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>tabwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -46,8 +46,6 @@ protected:
   void loadWindowState();
   void updateWindow();
   void updateTab(int AIndex);
-protected:
-  virtual void mousePressEvent(QMouseEvent *AEvent);
 protected slots:
   void onTabChanged(int AIndex);
   void onTabCloseRequested(int AIndex);
