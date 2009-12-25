@@ -117,7 +117,7 @@ void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
   if (ui.cmbNode->findText(ui.cmbNode->currentText()) < 0)
     ui.cmbNode->addItem(ui.cmbNode->currentText());
 
-  FModel->addTopLevelItem(AContactJid,ANode);
+  FModel->appendTopLevelItem(AContactJid,ANode);
   ui.trvItems->expand(ui.trvItems->model()->index(0,0));
   ui.trvItems->setCurrentIndex(ui.trvItems->model()->index(0,0));
 

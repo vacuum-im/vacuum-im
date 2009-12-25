@@ -4,7 +4,7 @@ DiscoItemsModel::DiscoItemsModel(IServiceDiscovery *ADiscovery, const Jid &AStre
 {
   FDiscovery = ADiscovery;
   FStreamJid = AStreamJid;
-  FAutoLoadItems = true;
+  FEnableDiscoCache = false;
   FRootIndex = new DiscoItemIndex;
   FRootIndex->infoFetched = true;
   FRootIndex->itemsFetched = true;
@@ -53,7 +53,7 @@ void DiscoItemsModel::fetchMore(const QModelIndex &AParent)
 bool DiscoItemsModel::hasChildren(const QModelIndex &AParent) const
 {
   DiscoItemIndex *index = itemIndex(AParent);
-  return !index->itemsFetched || !index->childs.isEmpty() || !FDiscovery->hasDiscoItems(index->itemJid,index->itemNode);
+  return !index->itemsFetched || !index->childs.isEmpty();
 }
 
 int DiscoItemsModel::rowCount(const QModelIndex &AParent) const
@@ -61,13 +61,15 @@ int DiscoItemsModel::rowCount(const QModelIndex &AParent) const
   return itemIndex(AParent)->childs.count();
 }
 
-int DiscoItemsModel::columnCount(const QModelIndex &/*AParent*/) const
+int DiscoItemsModel::columnCount(const QModelIndex &AParent) const
 {
+  Q_UNUSED(AParent);
   return COL__COUNT;
 }
 
-Qt::ItemFlags DiscoItemsModel::flags(const QModelIndex &/*AIndex*/) const
+Qt::ItemFlags DiscoItemsModel::flags(const QModelIndex &AIndex) const
 {
+  Q_UNUSED(AIndex);
   return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
 }
 
@@ -141,16 +143,16 @@ void DiscoItemsModel::fetchIndex(const QModelIndex &AIndex, bool AInfo, bool AIt
   {
     if (AItems && !index->itemsFetched)
     {
-      if (FDiscovery->hasDiscoItems(index->itemJid,index->itemNode))
+      if (isDiscoCacheEnabled() && FDiscovery->hasDiscoItems(index->itemJid,index->itemNode))
         onDiscoItemsReceived(FDiscovery->discoItems(index->itemJid,index->itemNode));
-      else if (autoLoadItems())
+      else
         FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
     }
     if (AInfo && !index->infoFetched)
     {
-      if (FDiscovery->hasDiscoInfo(index->itemJid,index->itemNode))
+      if (isDiscoCacheEnabled() && FDiscovery->hasDiscoInfo(index->itemJid,index->itemNode))
         onDiscoInfoReceived(FDiscovery->discoInfo(index->itemJid,index->itemNode));
-      else if (autoLoadItems())
+      else
         FDiscovery->requestDiscoInfo(FStreamJid,index->itemJid,index->itemNode);
     }
     index->icon = FDiscovery->serviceIcon(index->itemJid,index->itemNode);
@@ -172,17 +174,17 @@ void DiscoItemsModel::loadIndex(const QModelIndex &AIndex, bool AInfo, bool AIte
   }
 }
 
-bool DiscoItemsModel::autoLoadItems() const
+bool DiscoItemsModel::isDiscoCacheEnabled() const
 {
-  return FAutoLoadItems;
+  return FEnableDiscoCache;
 }
 
-void DiscoItemsModel::setAutoLoadItems(bool ALoad)
+void DiscoItemsModel::setDiscoCacheEnabled(bool AEnabled)
 {
-  FAutoLoadItems = ALoad;
+  FEnableDiscoCache = AEnabled;
 }
 
-void DiscoItemsModel::addTopLevelItem(const Jid &AItemJid, const QString &AItemNode)
+void DiscoItemsModel::appendTopLevelItem(const Jid &AItemJid, const QString &AItemNode)
 {
   if (findIndex(AItemJid,AItemNode,FRootIndex,false).isEmpty())
   {
@@ -294,11 +296,11 @@ void DiscoItemsModel::updateDiscoInfo(DiscoItemIndex *AIndex, const IDiscoInfo &
   AIndex->icon = FDiscovery->serviceIcon(AIndex->itemJid,AIndex->itemNode);
 }
 
-void DiscoItemsModel::appendChildren(DiscoItemIndex *AParent, QList<DiscoItemIndex*> AChilds)
+void DiscoItemsModel::appendChildren(DiscoItemIndex *AParent, QList<DiscoItemIndex *> AChilds)
 {
   if (AParent && !AChilds.isEmpty())
   {
-    QList<DiscoItemIndex*> childs;
+    QList<DiscoItemIndex *> childs;
     foreach(DiscoItemIndex *index, AChilds)
     {
       QList<DiscoItemIndex*> indexList = findIndex(index->itemJid,index->itemNode,AParent,false);
@@ -364,7 +366,7 @@ void DiscoItemsModel::removeChildren(DiscoItemIndex *AParent, QList<DiscoItemInd
 
 void DiscoItemsModel::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
-  QList<DiscoItemIndex*> indexList = findIndex(ADiscoInfo.contactJid,ADiscoInfo.node);
+  QList<DiscoItemIndex *> indexList = findIndex(ADiscoInfo.contactJid,ADiscoInfo.node);
   foreach(DiscoItemIndex *index, indexList)
   {
     index->infoFetched = true;
@@ -375,7 +377,7 @@ void DiscoItemsModel::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 
 void DiscoItemsModel::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
 {
-  QList<DiscoItemIndex*> indexList = findIndex(ADiscoItems.contactJid,ADiscoItems.node);
+  QList<DiscoItemIndex *> indexList = findIndex(ADiscoItems.contactJid,ADiscoItems.node);
   foreach(DiscoItemIndex *parentIndex, indexList)
   {
     parentIndex->itemsFetched = true;
@@ -396,30 +398,27 @@ void DiscoItemsModel::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
         updateList.append(index);
       }
       if (!item.name.isEmpty())
+      {
         index->itemName = item.name;
+      }
     }
 
-    QList<DiscoItemIndex*> removeList = (parentIndex->childs.toSet()-appendList.toSet()-updateList.toSet()).toList();
+    QList<DiscoItemIndex *> removeList = (parentIndex->childs.toSet()-appendList.toSet()-updateList.toSet()).toList();
     removeChildren(parentIndex,removeList);
 
-    QList<DiscoItemIndex*> loadList;
+    QList<DiscoItemIndex *> loadList;
     foreach(DiscoItemIndex *newIndex, appendList)
     {
-      if (FDiscovery->hasDiscoInfo(newIndex->itemJid,newIndex->itemNode))
-      {
-        IDiscoInfo info = FDiscovery->discoInfo(newIndex->itemJid,newIndex->itemName);
-        updateDiscoInfo(newIndex,info);
-      }
+      if (isDiscoCacheEnabled() && FDiscovery->hasDiscoInfo(newIndex->itemJid,newIndex->itemNode))
+        updateDiscoInfo(newIndex,FDiscovery->discoInfo(newIndex->itemJid,newIndex->itemName));
       else
-      {
         loadList.append(newIndex);
-      }
     }
     appendChildren(parentIndex,appendList);
 
     foreach (DiscoItemIndex *index,loadList)
     {
-      if (autoLoadItems() && loadList.count()<=MAX_ITEMS_FOR_REQUEST)
+      if (loadList.count()<=MAX_ITEMS_FOR_REQUEST)
         FDiscovery->requestDiscoInfo(FStreamJid,index->itemJid,index->itemNode);
       index->icon = FDiscovery->serviceIcon(index->itemJid,index->itemNode);
     }
@@ -435,4 +434,3 @@ void DiscoItemsModel::onStreamJidChanged(const Jid &ABefour, const Jid &AAftert)
   if (ABefour == FStreamJid)
     FStreamJid = AAftert;
 }
-
