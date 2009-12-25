@@ -60,9 +60,9 @@ public:
   //DiscoItemsModel
   void fetchIndex(const QModelIndex &AIndex, bool AInfo = true, bool AItems = true);
   void loadIndex(const QModelIndex &AIndex, bool AInfo = true, bool AItems = true);
-  bool autoLoadItems() const;
-  void setAutoLoadItems(bool ALoad);
-  void addTopLevelItem(const Jid &AItemJid, const QString &AItemNode);
+  bool isDiscoCacheEnabled() const;
+  void setDiscoCacheEnabled(bool AEnabled);
+  void appendTopLevelItem(const Jid &AItemJid, const QString &AItemNode);
   void removeTopLevelItem(int AIndex);
 protected:
   DiscoItemIndex *itemIndex(const QModelIndex &AIndex) const;
@@ -81,7 +81,7 @@ private:
   IServiceDiscovery *FDiscovery;
 private:
   Jid FStreamJid;
-  bool FAutoLoadItems;
+  bool FEnableDiscoCache;
   DiscoItemIndex *FRootIndex;
 };
 
