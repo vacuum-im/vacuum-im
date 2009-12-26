@@ -49,6 +49,7 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     {
       connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
       connect(FDiscovery->instance(),SIGNAL(discoInfoRemoved(const IDiscoInfo &)),SLOT(onDiscoInfoRemoved(const IDiscoInfo &)));
+      connect(FDiscovery->instance(),SIGNAL(discoItemsReceived(const IDiscoItems &)),SLOT(onDiscoItemsReceived(const IDiscoItems &)));
     }
   }
 
@@ -66,10 +67,8 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
     if (FPresencePlugin)
     {
-      connect(FPresencePlugin->instance(),SIGNAL(presenceAdded(IPresence *)),SLOT(onPresenceAdded(IPresence *)));
-      connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),
-        SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
-      connect(FPresencePlugin->instance(),SIGNAL(presenceRemoved(IPresence *)),SLOT(onPresenceRemoved (IPresence *)));
+      connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
+      connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed (IPresence *)));
     }
   }
 
@@ -140,7 +139,7 @@ bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &A
         request.form = FDataForms->dataForm(formElem);
     }
 
-    ICommandServer *server = FCommands.value(request.node);
+    ICommandServer *server = FServers.value(request.node);
     if (!server || !server->receiveCommandRequest(request))
     {
       Stanza reply = AStanza.replyError("malformed-action",NS_COMMANDS,ErrorHandler::BAD_REQUEST);
@@ -263,12 +262,12 @@ void Commands::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
     if (!ADiscoInfo.features.contains(NS_COMMANDS))
       ADiscoInfo.features.append(NS_COMMANDS);
   }
-  else if (FCommands.contains(ADiscoInfo.node))
+  else if (FServers.contains(ADiscoInfo.node))
   {
     IDiscoIdentity identity;
     identity.category = DIC_AUTOMATION;
     identity.type = DIT_COMMAND_NODE;
-    identity.name = FCommands.value(ADiscoInfo.node)->commandName(ADiscoInfo.node);
+    identity.name = FServers.value(ADiscoInfo.node)->commandName(ADiscoInfo.node);
     ADiscoInfo.identity.append(identity);
 
     if (!ADiscoInfo.features.contains(NS_COMMANDS))
@@ -280,14 +279,14 @@ void Commands::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 
 void Commands::fillDiscoItems(IDiscoItems &ADiscoItems)
 {
-  if (!FCommands.isEmpty())
+  if (!FServers.isEmpty())
   {
     if (ADiscoItems.node == NS_COMMANDS)
     {
-      QList<QString> nodes = FCommands.keys();
+      QList<QString> nodes = FServers.keys();
       foreach(QString node, nodes)
       {
-        QString name = FCommands.value(node)->commandName(node);
+        QString name = FServers.value(node)->commandName(node);
         if (!name.isEmpty())
         {
           IDiscoItem ditem;
@@ -337,29 +336,26 @@ Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
         return action;
       }
     }
-    else if (FDiscovery->hasDiscoItems(ADiscoInfo.contactJid,NS_COMMANDS))
+    else if (FCommands.value(AStreamJid).contains(ADiscoInfo.contactJid))
     {
-      Menu *execMenu = new Menu(AParent);
-      execMenu->setTitle(tr("Commands"));
-      execMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_COMMANDS);
-      IDiscoItems ditems = FDiscovery->discoItems(ADiscoInfo.contactJid,NS_COMMANDS);
-      foreach (IDiscoItem ditem,ditems.items)
+      QList<ICommand> commands = FCommands.value(AStreamJid).value(ADiscoInfo.contactJid);
+      if (!commands.isEmpty())
       {
-        if (!ditem.node.isEmpty())
+        Menu *execMenu = new Menu(AParent);
+        execMenu->setTitle(tr("Commands"));
+        execMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_COMMANDS);
+        foreach (ICommand command, commands)
         {
           Action *action = new Action(execMenu);
-          action->setText(ditem.name.isEmpty() ? ditem.node : ditem.name);
+          action->setText(command.name);
           action->setData(ADR_STREAM_JID,AStreamJid.full());
-          action->setData(ADR_COMMAND_JID,ditem.itemJid.full());
-          action->setData(ADR_COMMAND_NODE,ditem.node);
+          action->setData(ADR_COMMAND_JID,command.itemJid.full());
+          action->setData(ADR_COMMAND_NODE,command.node);
           connect(action,SIGNAL(triggered(bool)),SLOT(onExecuteActionTriggered(bool)));
           execMenu->addAction(action,AG_DEFAULT,false);
         }
-      }
-      if (!execMenu->isEmpty())
         return execMenu->menuAction();
-      else
-        delete execMenu;
+      }
     }
     else if (ADiscoInfo.features.contains(NS_COMMANDS))
     {
@@ -375,35 +371,35 @@ Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
   return NULL;
 }
 
-void Commands::insertCommand(const QString &ANode, ICommandServer *AServer)
-{
-  if (AServer && !FCommands.contains(ANode))
-  {
-    FCommands.insert(ANode,AServer);
-    emit commandInserted(ANode, AServer);
-  }
-}
-
 QList<QString> Commands::commandNodes() const
 {
-  return FCommands.keys();
+  return FServers.keys();
 }
 
 ICommandServer *Commands::commandServer(const QString &ANode) const
 {
-  return FCommands.value(ANode);
+  return FServers.value(ANode);
 }
 
-void Commands::removeCommand(const QString &ANode)
+void Commands::insertServer(const QString &ANode, ICommandServer *AServer)
 {
-  if (FCommands.contains(ANode))
+  if (AServer && !FServers.contains(ANode))
   {
-    FCommands.remove(ANode);
-    emit commandRemoved(ANode);
+    FServers.insert(ANode,AServer);
+    emit serverInserted(ANode, AServer);
   }
 }
 
-void Commands::insertCommandClient(ICommandClient *AClient)
+void Commands::removeServer(const QString &ANode)
+{
+  if (FServers.contains(ANode))
+  {
+    FServers.remove(ANode);
+    emit serverRemoved(ANode);
+  }
+}
+
+void Commands::insertClient(ICommandClient *AClient)
 {
   if (AClient && !FClients.contains(AClient))
   {
@@ -412,7 +408,7 @@ void Commands::insertCommandClient(ICommandClient *AClient)
   }
 }
 
-void Commands::removeCommandClient(ICommandClient *AClient)
+void Commands::removeClient(ICommandClient *AClient)
 {
   if (FClients.contains(AClient))
   {
@@ -472,6 +468,11 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
   return FStanzaProcessor->sendStanzaOut(AResult.streamJid,result);
 }
 
+QList<ICommand> Commands::contactCommands(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+  return FCommands.value(AStreamJid).value(AContactJid);
+}
+
 bool Commands::executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode)
 {
   IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
@@ -497,6 +498,64 @@ void Commands::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
+void Commands::onPresenceOpened(IPresence *APresence)
+{
+  if (FStanzaProcessor)
+  {
+    IStanzaHandle shandle;
+    shandle.handler = this;
+    shandle.order = SHO_DEFAULT;
+    shandle.direction = IStanzaHandle::DirectionIn;
+    shandle.streamJid = APresence->streamJid();
+    shandle.conditions.append(SHC_COMMANDS);
+    FSHICommands.insert(FStanzaProcessor->insertStanzaHandle(shandle),APresence);
+  }
+}
+
+void Commands::onPresenceClosed(IPresence *APresence)
+{
+  if (FStanzaProcessor)
+  {
+    int handle = FSHICommands.key(APresence);
+    FSHICommands.remove(handle);
+    FStanzaProcessor->removeStanzaHandle(handle);
+  }
+  FCommands.remove(APresence->streamJid());
+}
+
+void Commands::onDiscoInfoReceived(const IDiscoInfo &AInfo)
+{
+  if (AInfo.node.isEmpty() && FDiscovery->findIdentity(AInfo.identity,DIC_CLIENT,QString::null)<0)
+    if (AInfo.features.contains(NS_COMMANDS) && !FCommands.value(AInfo.streamJid).contains(AInfo.contactJid))
+      FDiscovery->requestDiscoItems(AInfo.streamJid,AInfo.contactJid,NS_COMMANDS);
+}
+
+void Commands::onDiscoInfoRemoved(const IDiscoInfo &AInfo)
+{
+  FCommands[AInfo.streamJid].remove(AInfo.contactJid);
+}
+
+void Commands::onDiscoItemsReceived(const IDiscoItems &AItems)
+{
+  if (AItems.node == NS_COMMANDS)
+  {
+    QList<ICommand> &commands = FCommands[AItems.streamJid][AItems.contactJid];
+    commands.clear();
+    foreach(IDiscoItem ditem, AItems.items)
+    {
+      if (!ditem.node.isEmpty() && ditem.itemJid.isValid())
+      {
+        ICommand command;
+        command.node = ditem.node;
+        command.name = !ditem.name.isEmpty() ? ditem.name : ditem.node;
+        command.itemJid = ditem.itemJid;
+        commands.append(command);
+      }
+    }
+    emit commandsUpdated(AItems.streamJid,AItems.contactJid,commands);
+  }
+}
+
 void Commands::onExecuteActionTriggered(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
@@ -517,63 +576,6 @@ void Commands::onRequestActionTriggered(bool)
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     Jid commandJid = action->data(ADR_COMMAND_JID).toString();
     FDiscovery->requestDiscoItems(streamJid,commandJid,NS_COMMANDS);
-  }
-}
-
-void Commands::onDiscoInfoReceived(const IDiscoInfo &AInfo)
-{
-  if (AInfo.node.isEmpty() && FDiscovery->findIdentity(AInfo.identity,DIC_CLIENT,"")<0)
-    if (AInfo.features.contains(NS_COMMANDS) && !FDiscovery->hasDiscoItems(AInfo.contactJid,NS_COMMANDS))
-      FDiscovery->requestDiscoItems(AInfo.streamJid,AInfo.contactJid,NS_COMMANDS);
-}
-
-void Commands::onDiscoInfoRemoved(const IDiscoInfo &AInfo)
-{
-  if (AInfo.node.isEmpty())
-    FDiscovery->removeDiscoItems(AInfo.contactJid,NS_COMMANDS);
-}
-
-void Commands::onPresenceAdded(IPresence *APresence)
-{
-  if (FStanzaProcessor)
-  {
-    IStanzaHandle shandle;
-    shandle.handler = this;
-    shandle.order = SHO_DEFAULT;
-    shandle.direction = IStanzaHandle::DirectionIn;
-    shandle.streamJid = APresence->streamJid();
-    shandle.conditions.append(SHC_COMMANDS);
-    FSHICommands.insert(FStanzaProcessor->insertStanzaHandle(shandle),APresence);
-  }
-}
-
-void Commands::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
-{
-  if (FDiscovery)
-  {
-    if (AContactJid.node().isEmpty())
-    {
-      IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
-      bool isOnline = AStateOnline || presence==NULL || (presence->show()!=IPresence::Offline && presence->show()!=IPresence::Error);
-      if (isOnline && FDiscovery->discoInfo(AContactJid).features.contains(NS_COMMANDS))
-        FDiscovery->requestDiscoItems(AStreamJid,AContactJid,NS_COMMANDS);
-    }
-    else if (AStateOnline)
-    {
-      IDiscoInfo info = FDiscovery->discoInfo(AContactJid);
-      if (FDiscovery->findIdentity(info.identity,DIC_CLIENT,"")<0 && info.features.contains(NS_COMMANDS))
-        FDiscovery->requestDiscoItems(AStreamJid,AContactJid,NS_COMMANDS);
-    }
-  }
-}
-
-void Commands::onPresenceRemoved(IPresence *APresence)
-{
-  if (FStanzaProcessor)
-  {
-    int handle = FSHICommands.key(APresence);
-    FSHICommands.remove(handle);
-    FStanzaProcessor->removeStanzaHandle(handle);
   }
 }
 

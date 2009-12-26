@@ -120,19 +120,12 @@ public:
   virtual void removeDiscoFeature(const QString &AFeatureVar) =0;
   //DiscoInfo
   virtual bool hasDiscoInfo(const Jid &AContactJid, const QString &ANode = "") const =0;
-  virtual QList<Jid> discoInfoContacts() const =0;
-  virtual QList<QString> dicoInfoContactNodes(const Jid &AContactJid) const =0;
   virtual IDiscoInfo discoInfo(const Jid &AContactJid, const QString &ANode = "") const =0;
   virtual bool requestDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "") =0;
   virtual void removeDiscoInfo(const Jid &AContactJid, const QString &ANode = "") =0;
   virtual int findIdentity(const QList<IDiscoIdentity> &AIdentity, const QString &ACategory, const QString &AType) const =0;
   //DiscoItems
-  virtual bool hasDiscoItems(const Jid &AContactJid, const QString &ANode = "") const =0;
-  virtual QList<Jid> discoItemsContacts() const =0;
-  virtual QList<QString> dicoItemsContactNodes(const Jid &AContactJid) const =0;
-  virtual IDiscoItems discoItems(const Jid &AContactJid, const QString &ANode = "") const =0;
   virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "") =0;
-  virtual void removeDiscoItems(const Jid &AContactJid, const QString &ANode = "") =0;
 signals:
   virtual void discoItemsWindowCreated(IDiscoItemsWindow *AWindow) =0;
   virtual void discoItemsWindowDestroyed(IDiscoItemsWindow *AWindow) =0;
@@ -145,7 +138,6 @@ signals:
   virtual void discoInfoReceived(const IDiscoInfo &ADiscoInfo) =0;
   virtual void discoInfoRemoved(const IDiscoInfo &ADiscoInfo) =0;
   virtual void discoItemsReceived(const IDiscoItems &ADiscoItems) =0;
-  virtual void discoItemsRemoved(const IDiscoItems &ADiscoItems) =0;
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert) =0;
 };
 

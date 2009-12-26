@@ -55,30 +55,32 @@ public:
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //ICommands
-  virtual void insertCommand(const QString &ANode, ICommandServer *AServer);
   virtual QList<QString> commandNodes() const;
   virtual ICommandServer *commandServer(const QString &ANode) const;
-  virtual void removeCommand(const QString &ANode);
-  virtual void insertCommandClient(ICommandClient *AClient);
-  virtual void removeCommandClient(ICommandClient *AClient);
+  virtual void insertServer(const QString &ANode, ICommandServer *AServer);
+  virtual void removeServer(const QString &ANode);
+  virtual void insertClient(ICommandClient *AClient);
+  virtual void removeClient(ICommandClient *AClient);
   virtual QString sendCommandRequest(const ICommandRequest &ARequest);
   virtual bool sendCommandResult(const ICommandResult &AResult);
+  virtual QList<ICommand> contactCommands(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual bool executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode);
 signals:
-  virtual void commandInserted(const QString &ANode, ICommandServer *AServer);
-  virtual void commandRemoved(const QString &ANode);
+  virtual void serverInserted(const QString &ANode, ICommandServer *AServer);
+  virtual void serverRemoved(const QString &ANode);
   virtual void clientInserted(ICommandClient *AClient);
   virtual void clientRemoved(ICommandClient *AClient);
+  virtual void commandsUpdated(const Jid &AstreamJid, const Jid &AContactJid, const QList<ICommand> &ACommands);
 protected:
   void registerDiscoFeatures();
 protected slots:
-  void onExecuteActionTriggered(bool);
-  void onRequestActionTriggered(bool);
+  void onPresenceOpened(IPresence *APresence);
+  void onPresenceClosed(IPresence *APresence);
   void onDiscoInfoReceived(const IDiscoInfo &AInfo);
   void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
-  void onPresenceAdded(IPresence *APresence);
-  void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
-  void onPresenceRemoved(IPresence *APresence);
+  void onDiscoItemsReceived(const IDiscoItems &AItems);
+  void onExecuteActionTriggered(bool);
+  void onRequestActionTriggered(bool);
 private:
   IDataForms *FDataForms;
   IStanzaProcessor *FStanzaProcessor;
@@ -87,9 +89,12 @@ private:
   IXmppUriQueries *FXmppUriQueries;
 private:
   QList<QString> FRequests;
-  QHash<int,IPresence*> FSHICommands;
+  QMap<int, IPresence*> FSHICommands;
+private:
   QList<ICommandClient *> FClients;
-  QHash<QString,ICommandServer *> FCommands;
+  QMap<QString, ICommandServer *> FServers;
+private:
+  QMap<Jid, QMap<Jid, QList<ICommand> > > FCommands;
 };
 
 #endif // COMMANDS_H

@@ -21,12 +21,21 @@
 #define COMMAND_NOTE_WARNING            "warn"
 #define COMMAND_NOTE_ERROR              "error"
 
-struct ICommandNote {
+struct ICommand 
+{
+  QString node;
+  QString name;
+  Jid itemJid;
+};
+
+struct ICommandNote 
+{
   QString type;
   QString message;
 };
 
-struct ICommandRequest {
+struct ICommandRequest 
+{
   Jid streamJid;
   Jid commandJid;
   QString node;
@@ -36,7 +45,8 @@ struct ICommandRequest {
   IDataForm form;
 };
 
-struct ICommandResult {
+struct ICommandResult 
+{
   Jid streamJid;
   Jid commandJid;
   QString node;
@@ -49,21 +59,24 @@ struct ICommandResult {
   IDataForm form;
 };
 
-struct ICommandError {
-  QString stanzaId;
+struct ICommandError 
+{
   int code;
+  QString stanzaId;
   QString condition;
   QString message;
 };
 
-class ICommandServer {
+class ICommandServer 
+{
 public:
   virtual QString commandName(const QString &ANode) const = 0;
   virtual bool receiveCommandRequest(const ICommandRequest &ARequest) =0;
   virtual bool receiveCommandError(const ICommandError &AError) =0;
 };
 
-class ICommandClient {
+class ICommandClient 
+{
 public:
   virtual Jid streamJid() const =0;
   virtual Jid commandJid() const =0;
@@ -77,20 +90,22 @@ class ICommands
 {
 public:
   virtual QObject *instance() =0;
-  virtual void insertCommand(const QString &ANode, ICommandServer *AServer) =0;
   virtual QList<QString> commandNodes() const =0;
   virtual ICommandServer *commandServer(const QString &ANode) const =0;
-  virtual void removeCommand(const QString &ANode) =0;
-  virtual void insertCommandClient(ICommandClient *AClient) =0;
-  virtual void removeCommandClient(ICommandClient *AClient) =0;
+  virtual void insertServer(const QString &ANode, ICommandServer *AServer) =0;
+  virtual void removeServer(const QString &ANode) =0;
+  virtual void insertClient(ICommandClient *AClient) =0;
+  virtual void removeClient(ICommandClient *AClient) =0;
   virtual QString sendCommandRequest(const ICommandRequest &ARequest) =0;
   virtual bool sendCommandResult(const ICommandResult &AResult) =0;
+  virtual QList<ICommand> contactCommands(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual bool executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode) =0;
 signals:
-  virtual void commandInserted(const QString &ANode, ICommandServer *AServer) =0;
-  virtual void commandRemoved(const QString &ANode) =0;
+  virtual void serverInserted(const QString &ANode, ICommandServer *AServer) =0;
+  virtual void serverRemoved(const QString &ANode) =0;
   virtual void clientInserted(ICommandClient *AClient) =0;
   virtual void clientRemoved(ICommandClient *AClient) =0;
+  virtual void commandsUpdated(const Jid &AstreamJid, const Jid &AContactJid, const QList<ICommand> &ACommands) =0;
 };
 
 Q_DECLARE_INTERFACE(ICommandServer,"Vacuum.Plugin.ICommandServer/1.0")
