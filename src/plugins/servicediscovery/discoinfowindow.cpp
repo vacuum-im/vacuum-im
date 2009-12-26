@@ -25,14 +25,12 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
   initialize();
   connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),
     SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
-  connect(FDiscovery->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
-    SLOT(onStreamJidChanged(const Jid &, const Jid &)));
   connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
   connect(ui.lwtFearures,SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
     SLOT(onCurrentFeatureChanged(QListWidgetItem *, QListWidgetItem *)));
   connect(ui.lwtFearures,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
 
-  if (!FDiscovery->hasDiscoInfo(FContactJid,ANode) || FDiscovery->discoInfo(FContactJid,ANode).error.code>0)
+  if (!FDiscovery->hasDiscoInfo(FStreamJid,FContactJid,ANode) || FDiscovery->discoInfo(FStreamJid,FContactJid,ANode).error.code>0)
     requestDiscoInfo();
   else
     updateWindow();
@@ -52,7 +50,7 @@ void DiscoInfoWindow::initialize()
 
 void DiscoInfoWindow::updateWindow()
 {
-  IDiscoInfo dinfo = FDiscovery->discoInfo(FContactJid,FNode);
+  IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,FContactJid,FNode);
 
   int row = 0;
   ui.twtIdentity->clearContents();
@@ -164,15 +162,9 @@ void DiscoInfoWindow::onListItemActivated(QListWidgetItem *AItem)
   QString feature = AItem->data(Qt::UserRole).toString();
   if (FDiscovery->hasFeatureHandler(feature))
   {
-    IDiscoInfo dinfo = FDiscovery->discoInfo(FContactJid,FNode);
+    IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,FContactJid,FNode);
     FDiscovery->execFeatureHandler(FStreamJid,feature,dinfo);
   }
-}
-
-void DiscoInfoWindow::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
-{
-  Q_UNUSED(ABefour);
-  FStreamJid = AAfter;
 }
 
 void DiscoInfoWindow::onShowExtensionForm(bool)
@@ -180,7 +172,7 @@ void DiscoInfoWindow::onShowExtensionForm(bool)
   Action *action = qobject_cast<Action *>(sender());
   if (action && FDataForms)
   {
-    IDiscoInfo dinfo = FDiscovery->discoInfo(FContactJid,FNode);
+    IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,FContactJid,FNode);
     int index = action->data(ADR_FORM_INDEX).toInt();
     if (index<dinfo.extensions.count())
     {

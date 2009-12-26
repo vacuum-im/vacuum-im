@@ -81,8 +81,6 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
     {
       connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
       connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
-      connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
-      connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
     }
   }
 
@@ -92,10 +90,8 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
     if (FPresencePlugin)
     {
-      connect(FPresencePlugin->instance(),SIGNAL(streamStateChanged(const Jid &, bool)),
-        SLOT(onStreamStateChanged(const Jid &, bool)));
-      connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),
-        SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
+      connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),
+        SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
     }
   }
 
@@ -116,9 +112,10 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
     FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
     if (FMultiUserChatPlugin)
     {
+      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),
+        SLOT(onMultiUserChatCreated(IMultiUserChat *)));
       connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
         SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
-      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),SLOT(onMultiUserChatCreated(IMultiUserChat *)));
     }
   }
 
@@ -166,6 +163,7 @@ bool ServiceDiscovery::initObjects()
   FDiscoMenu = new Menu;
   FDiscoMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
   FDiscoMenu->setTitle(tr("Service Discovery"));
+  FDiscoMenu->setEnabled(false);
 
   registerFeatures();
   insertDiscoHandler(this);
@@ -198,8 +196,6 @@ bool ServiceDiscovery::initObjects()
   {
     FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
   }
-
-  FDiscoMenu->setEnabled(false);
   return true;
 }
 
@@ -228,7 +224,7 @@ bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
     QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
     IDiscoInfo dinfo = selfDiscoInfo(AStreamJid,query.attribute("node"));
 
-    if (dinfo.error.code > 0)
+    if (dinfo.error.code >= 0)
     {
       AAccept = true;
       Stanza reply = AStanza.replyError(dinfo.error.condition,EHN_DEFAULT,dinfo.error.code,dinfo.error.message);
@@ -248,15 +244,16 @@ bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
   }
   else if (FSHIItems.value(AStreamJid) == AHandlerId)
   {
-    IDiscoItems ditems;
     QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
+
+    IDiscoItems ditems;
     ditems.streamJid = AStreamJid;
     ditems.contactJid = AStanza.from();
     ditems.node = query.attribute("node");
     foreach(IDiscoHandler *AHandler, FDiscoHandlers)
       AHandler->fillDiscoItems(ditems);
 
-    if (ditems.error.code > 0)
+    if (ditems.error.code >= 0)
     {
       AAccept = true;
       Stanza reply = AStanza.replyError(ditems.error.condition,EHN_DEFAULT,ditems.error.code,ditems.error.message);
@@ -288,12 +285,15 @@ bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
     {
       Jid contactJid = AStanza.from();
       QDomElement capsElem = AStanza.firstElement("c",NS_CAPS);
+
       EntityCapabilities newCaps;
+      newCaps.streamJid = AStreamJid;
       newCaps.entityJid = contactJid;
       newCaps.node = capsElem.attribute("node");
       newCaps.ver = capsElem.attribute("ver");
       newCaps.hash = capsElem.attribute("hash");
-      EntityCapabilities oldCaps = FEntityCaps.value(contactJid);
+
+      EntityCapabilities oldCaps = FEntityCaps.value(AStreamJid).value(contactJid);
       if (capsElem.isNull() || oldCaps.ver!=newCaps.ver || oldCaps.node!=newCaps.node)
       {
         if (hasEntityCaps(newCaps))
@@ -301,12 +301,12 @@ bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
           IDiscoInfo dinfo = loadEntityCaps(newCaps);
           dinfo.streamJid = AStreamJid;
           dinfo.contactJid = contactJid;
-          FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
+          FDiscoInfo[dinfo.streamJid][dinfo.contactJid].insert(dinfo.node,dinfo);
           emit discoInfoReceived(dinfo);
         }
-        else if (!hasDiscoInfo(contactJid) || discoInfo(contactJid).error.code>0)
+        else if (!hasDiscoInfo(AStreamJid,contactJid))
         {
-          QueuedInfoRequest request;
+          DiscoveryRequest request;
           request.streamJid = AStreamJid;
           request.contactJid = contactJid;
           //request.node = !newCaps.hash.isEmpty() ? newCaps.node+"#"+newCaps.ver : "";
@@ -314,7 +314,7 @@ bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
         }
         if (!capsElem.isNull() && !newCaps.node.isEmpty() && !newCaps.ver.isEmpty())
         {
-          FEntityCaps.insert(contactJid,newCaps);
+          FEntityCaps[AStreamJid].insert(contactJid,newCaps);
         }
       }
     }
@@ -327,16 +327,16 @@ void ServiceDiscovery::stanzaRequestResult(const Jid &AStreamJid, const Stanza &
   Q_UNUSED(AStreamJid);
   if (FInfoRequestsId.contains(AStanza.id()))
   {
-    QPair<Jid,QString> jidnode = FInfoRequestsId.take(AStanza.id());
-    IDiscoInfo dinfo = parseDiscoInfo(AStanza,jidnode);
-    FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
+    DiscoveryRequest drequest = FInfoRequestsId.take(AStanza.id());
+    IDiscoInfo dinfo = parseDiscoInfo(AStanza,drequest);
+    FDiscoInfo[dinfo.streamJid][dinfo.contactJid].insert(dinfo.node,dinfo);
     saveEntityCaps(dinfo);
     emit discoInfoReceived(dinfo);
   }
   else if (FItemsRequestsId.contains(AStanza.id()))
   {
-    QPair<Jid,QString> jidnode = FItemsRequestsId.take(AStanza.id());
-    IDiscoItems ditems = parseDiscoItems(AStanza,jidnode);
+    DiscoveryRequest drequest = FItemsRequestsId.take(AStanza.id());
+    IDiscoItems ditems = parseDiscoItems(AStanza,drequest);
     emit discoItemsReceived(ditems);
   }
 }
@@ -347,23 +347,25 @@ void ServiceDiscovery::stanzaRequestTimeout(const Jid &AStreamJid, const QString
   if (FInfoRequestsId.contains(AStanzaId))
   {
     IDiscoInfo dinfo;
-    QPair<Jid,QString> jidnode = FInfoRequestsId.take(AStanzaId);
+    DiscoveryRequest drequest = FInfoRequestsId.take(AStanzaId);
     ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-    dinfo.contactJid = jidnode.first;
-    dinfo.node = jidnode.second;
+    dinfo.streamJid = drequest.streamJid;
+    dinfo.contactJid = drequest.contactJid;
+    dinfo.node = drequest.node;
     dinfo.error.code = err.code();
     dinfo.error.condition = err.condition();
     dinfo.error.message = err.message();
-    FDiscoInfo[dinfo.contactJid].insert(dinfo.node,dinfo);
+    FDiscoInfo[dinfo.streamJid][dinfo.contactJid].insert(dinfo.node,dinfo);
     emit discoInfoReceived(dinfo);
   }
   else if (FItemsRequestsId.contains(AStanzaId))
   {
     IDiscoItems ditems;
-    QPair<Jid,QString> jidnode = FItemsRequestsId.take(AStanzaId);
+    DiscoveryRequest drequest = FItemsRequestsId.take(AStanzaId);
     ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-    ditems.contactJid = jidnode.first;
-    ditems.node = jidnode.second;
+    ditems.streamJid = drequest.streamJid;
+    ditems.contactJid = drequest.contactJid;
+    ditems.node = drequest.node;
     ditems.error.code = err.code();
     ditems.error.condition = err.condition();
     ditems.error.message = err.message();
@@ -424,10 +426,11 @@ QList<int> ServiceDiscovery::types() const
 
 QVariant ServiceDiscovery::data(const IRosterIndex *AIndex, int ARole) const
 {
+  Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
   Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
-  if (hasDiscoInfo(contactJid,""))
+  if (hasDiscoInfo(streamJid,contactJid))
   {
-    IDiscoInfo dinfo = discoInfo(contactJid,"");
+    IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
     if (ARole == RDR_DISCO_IDENT_CATEGORY)
       return dinfo.identity.value(0).category;
     else if (ARole == RDR_DISCO_IDENT_TYPE)
@@ -443,11 +446,10 @@ QVariant ServiceDiscovery::data(const IRosterIndex *AIndex, int ARole) const
 bool ServiceDiscovery::rosterIndexClicked(IRosterIndex *AIndex, int AOrder)
 {
   Q_UNUSED(AOrder);
-  if (AIndex->type() == RIT_AGENT)
+  Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+  if (AIndex->type()==RIT_AGENT && FSelfCaps.contains(streamJid))
   {
-    IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
-    if(presence && presence->isOpen())
-      showDiscoItems(presence->streamJid(),AIndex->data(RDR_JID).toString(),"");
+    showDiscoItems(streamJid,AIndex->data(RDR_JID).toString(),QString::null);
   }
   return false;
 }
@@ -472,43 +474,49 @@ IDiscoInfo ServiceDiscovery::selfDiscoInfo(const Jid &AStreamJid, const QString 
 
 void ServiceDiscovery::showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent)
 {
-  if (FDiscoInfoWindows.contains(AContactJid))
-    FDiscoInfoWindows.take(AContactJid)->close();
-  DiscoInfoWindow *infoWindow = new DiscoInfoWindow(this,AStreamJid,AContactJid,ANode,AParent);
-  connect(infoWindow,SIGNAL(destroyed(QObject *)),SLOT(onDiscoInfoWindowDestroyed(QObject *)));
-  FDiscoInfoWindows.insert(AContactJid,infoWindow);
-  infoWindow->show();
+  if (FSelfCaps.contains(AStreamJid))
+  {
+    if (FDiscoInfoWindows.contains(AContactJid))
+      FDiscoInfoWindows.take(AContactJid)->close();
+    DiscoInfoWindow *infoWindow = new DiscoInfoWindow(this,AStreamJid,AContactJid,ANode,AParent);
+    connect(infoWindow,SIGNAL(destroyed(QObject *)),SLOT(onDiscoInfoWindowDestroyed(QObject *)));
+    FDiscoInfoWindows.insert(AContactJid,infoWindow);
+    infoWindow->show();
+  }
 }
 
 void ServiceDiscovery::showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent)
 {
-  DiscoItemsWindow *itemsWindow = new DiscoItemsWindow(this,AStreamJid,AParent);
-  connect(itemsWindow,SIGNAL(windowDestroyed(IDiscoItemsWindow *)),SLOT(onDiscoItemsWindowDestroyed(IDiscoItemsWindow *)));
-  FDiscoItemsWindows.append(itemsWindow);
-  if (FSettingsPlugin)
+  if (FSelfCaps.contains(AStreamJid))
   {
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(SERVICEDISCOVERY_UUID);
-    QString dataId = BDI_ITEMS_GEOMETRY+itemsWindow->streamJid().pBare();
-    itemsWindow->restoreGeometry(settings->loadBinaryData(dataId));
+    DiscoItemsWindow *itemsWindow = new DiscoItemsWindow(this,AStreamJid,AParent);
+    connect(itemsWindow,SIGNAL(windowDestroyed(IDiscoItemsWindow *)),SLOT(onDiscoItemsWindowDestroyed(IDiscoItemsWindow *)));
+    FDiscoItemsWindows.append(itemsWindow);
+    if (FSettingsPlugin)
+    {
+      ISettings *settings = FSettingsPlugin->settingsForPlugin(SERVICEDISCOVERY_UUID);
+      QString dataId = BDI_ITEMS_GEOMETRY+itemsWindow->streamJid().pBare();
+      itemsWindow->restoreGeometry(settings->loadBinaryData(dataId));
+    }
+    emit discoItemsWindowCreated(itemsWindow);
+    itemsWindow->discover(AContactJid,ANode);
+    itemsWindow->show();
   }
-  emit discoItemsWindowCreated(itemsWindow);
-  itemsWindow->discover(AContactJid,ANode);
-  itemsWindow->show();
 }
 
-bool ServiceDiscovery::checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault)
+bool ServiceDiscovery::checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault)
 {
-  IDiscoInfo dinfo = discoInfo(AContactJid,ANode);
-  return dinfo.error.code>0 || !dinfo.contactJid.isValid() ? ADefault : dinfo.features.contains(AFeature);
+  IDiscoInfo dinfo = discoInfo(AStreamJid,AContactJid,ANode);
+  return dinfo.error.code>=0 || !dinfo.contactJid.isValid() ? ADefault : dinfo.features.contains(AFeature);
 }
 
-QList<IDiscoInfo> ServiceDiscovery::findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const
+QList<IDiscoInfo> ServiceDiscovery::findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const
 {
   QList<IDiscoInfo> result;
-  QList<Jid> searchJids = AParent.itemJid.isValid() ? QList<Jid>()<<AParent.itemJid : FDiscoInfo.keys();
-  foreach(Jid itemJid,searchJids)
+  QList<Jid> searchJids = AParent.itemJid.isValid() ? QList<Jid>()<<AParent.itemJid : FDiscoInfo.value(AStreamJid).keys();
+  foreach(Jid itemJid, searchJids)
   {
-    QMap<QString,IDiscoInfo> itemInfos = FDiscoInfo.value(itemJid);
+    QMap<QString, IDiscoInfo> itemInfos = FDiscoInfo.value(AStreamJid).value(itemJid);
     QList<QString> searchNodes = !AParent.node.isEmpty() ? QList<QString>()<<AParent.node : itemInfos.keys();
     foreach(QString itemNode, searchNodes)
     {
@@ -535,12 +543,16 @@ QIcon ServiceDiscovery::identityIcon(const QList<IDiscoIdentity> &AIdentity) con
   return icon;
 }
 
-QIcon ServiceDiscovery::serviceIcon(const Jid AItemJid, const QString &ANode) const
+QIcon ServiceDiscovery::serviceIcon(const Jid &AStreamJid, const Jid AItemJid, const QString &ANode) const
 {
   QIcon icon;
-  IDiscoInfo info = discoInfo(AItemJid,ANode);
+  IDiscoInfo info = discoInfo(AStreamJid,AItemJid,ANode);
   IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
-  if (FInfoRequestsId.values().contains(qMakePair<Jid,QString>(AItemJid,ANode)))
+  DiscoveryRequest drequest;
+  drequest.streamJid = AStreamJid;
+  drequest.contactJid = AItemJid;
+  drequest.node = ANode;
+  if (FInfoRequestsId.values().contains(drequest))
   {
     icon = storage->getIcon(SRI_SERVICE_WAIT);
   }
@@ -651,21 +663,25 @@ void ServiceDiscovery::removeDiscoFeature(const QString &AFeatureVar)
   }
 }
 
-bool ServiceDiscovery::hasDiscoInfo(const Jid &AContactJid, const QString &ANode) const
+bool ServiceDiscovery::hasDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode) const
 {
-  return FDiscoInfo.value(AContactJid).contains(ANode);
+  return FDiscoInfo.value(AStreamJid).value(AContactJid).contains(ANode);
 }
 
-IDiscoInfo ServiceDiscovery::discoInfo(const Jid &AContactJid, const QString &ANode) const
+IDiscoInfo ServiceDiscovery::discoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode) const
 {
-  return FDiscoInfo.value(AContactJid).value(ANode);
+  return FDiscoInfo.value(AStreamJid).value(AContactJid).value(ANode);
 }
 
 bool ServiceDiscovery::requestDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode)
 {
   bool sended = false;
-  QPair<Jid,QString> jidnode(AContactJid,ANode);
-  if (FInfoRequestsId.values().contains(jidnode))
+
+  DiscoveryRequest drequest;
+  drequest.streamJid = AStreamJid;
+  drequest.contactJid = AContactJid;
+  drequest.node = ANode;
+  if (FInfoRequestsId.values().contains(drequest))
   {
     sended = true;
   }
@@ -678,16 +694,16 @@ bool ServiceDiscovery::requestDiscoInfo(const Jid &AStreamJid, const Jid &AConta
       query.setAttribute("node",ANode);
     sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,DISCO_TIMEOUT);
     if (sended)
-      FInfoRequestsId.insert(iq.id(),jidnode);
+      FInfoRequestsId.insert(iq.id(),drequest);
   }
   return sended;
 }
 
-void ServiceDiscovery::removeDiscoInfo(const Jid &AContactJid, const QString &ANode)
+void ServiceDiscovery::removeDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode)
 {
-  if (hasDiscoInfo(AContactJid,ANode))
+  if (hasDiscoInfo(AStreamJid,AContactJid,ANode))
   {
-    QMap<QString,IDiscoInfo> &dnodeInfo = FDiscoInfo[AContactJid];
+    QMap<QString, IDiscoInfo> &dnodeInfo = FDiscoInfo[AStreamJid][AContactJid];
     IDiscoInfo dinfo = dnodeInfo.take(ANode);
     if (dnodeInfo.isEmpty())
       FDiscoInfo.remove(AContactJid);
@@ -707,8 +723,12 @@ int ServiceDiscovery::findIdentity(const QList<IDiscoIdentity> &AIdentity, const
 bool ServiceDiscovery::requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode)
 {
   bool sended = false;
-  QPair<Jid,QString> jidnode(AContactJid,ANode);
-  if (FItemsRequestsId.values().contains(jidnode))
+
+  DiscoveryRequest drequest;
+  drequest.streamJid = AStreamJid;
+  drequest.contactJid = AContactJid;
+  drequest.node = ANode;
+  if (FItemsRequestsId.values().contains(drequest))
   {
     sended = true;
   }
@@ -721,7 +741,7 @@ bool ServiceDiscovery::requestDiscoItems(const Jid &AStreamJid, const Jid &ACont
       query.setAttribute("node",ANode);
     sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,DISCO_TIMEOUT);
     if (sended)
-      FItemsRequestsId.insert(iq.id(),jidnode);
+      FItemsRequestsId.insert(iq.id(),drequest);
   }
   return sended;
 }
@@ -795,12 +815,12 @@ void ServiceDiscovery::discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &A
   }
 }
 
-IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const
+IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const DiscoveryRequest &ADiscoRequest) const
 {
   IDiscoInfo result;
-  result.streamJid = AStanza.to();
-  result.contactJid = AJidNode.first;
-  result.node = AJidNode.second;
+  result.streamJid = ADiscoRequest.streamJid;
+  result.contactJid = ADiscoRequest.contactJid;
+  result.node = ADiscoRequest.node;
 
   QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
   if (AStanza.type() == "error")
@@ -817,12 +837,12 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const QPair<J
   return result;
 }
 
-IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const
+IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza, const DiscoveryRequest &ADiscoRequest) const
 {
   IDiscoItems result;
-  result.streamJid = AStanza.to();
-  result.contactJid = AJidNode.first;
-  result.node = AJidNode.second;
+  result.streamJid = ADiscoRequest.streamJid;
+  result.contactJid = ADiscoRequest.contactJid;
+  result.node = ADiscoRequest.node;
 
   QDomElement query = AStanza.firstElement("query",NS_DISCO_ITEMS);
   if (AStanza.type() == "error")
@@ -896,10 +916,10 @@ void ServiceDiscovery::registerFeatures()
   insertDiscoFeature(dfeature);
 }
 
-void ServiceDiscovery::appendQueuedRequest(const QDateTime &ATimeStart, const QueuedInfoRequest &ARequest)
+void ServiceDiscovery::appendQueuedRequest(const QDateTime &ATimeStart, const DiscoveryRequest &ARequest)
 {
-  QMultiMap<QDateTime,QueuedInfoRequest>::const_iterator it = FQueuedRequests.constBegin();
-  while (it!=FQueuedRequests.constEnd())
+  QMultiMap<QDateTime,DiscoveryRequest>::const_iterator it = FQueuedRequests.constBegin();
+  while (it != FQueuedRequests.constEnd())
   {
     if (it.value().contactJid==ARequest.contactJid && it.value().node==ARequest.node)
       return;
@@ -910,9 +930,9 @@ void ServiceDiscovery::appendQueuedRequest(const QDateTime &ATimeStart, const Qu
     FQueueTimer.start();
 }
 
-void ServiceDiscovery::removeQueuedRequest(const QueuedInfoRequest &ARequest)
+void ServiceDiscovery::removeQueuedRequest(const DiscoveryRequest &ARequest)
 {
-  QMultiMap<QDateTime,QueuedInfoRequest>::iterator it = FQueuedRequests.begin();
+  QMultiMap<QDateTime,DiscoveryRequest>::iterator it = FQueuedRequests.begin();
   while (it!=FQueuedRequests.end())
   {
     if (
@@ -951,13 +971,14 @@ QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AFo
 
 IDiscoInfo ServiceDiscovery::loadEntityCaps(const EntityCapabilities &ACaps) const
 {
-  QMap<Jid,EntityCapabilities>::const_iterator it = FEntityCaps.constBegin();
-  while(it!=FEntityCaps.constEnd())
+  QHash<Jid, EntityCapabilities> streamEntityCaps = FEntityCaps.value(ACaps.streamJid);
+  QHash<Jid, EntityCapabilities>::const_iterator it = streamEntityCaps.constBegin();
+  while(it != streamEntityCaps.constEnd())
   {
     EntityCapabilities caps = it.value();
-    if ((!ACaps.hash.isEmpty() || caps.node==ACaps.node) && caps.ver==ACaps.ver && caps.hash==ACaps.hash && hasDiscoInfo(it.key()))
+    if ((!ACaps.hash.isEmpty() || caps.node==ACaps.node) && caps.ver==ACaps.ver && caps.hash==ACaps.hash && hasDiscoInfo(caps.streamJid, caps.entityJid))
     {
-      IDiscoInfo dinfo = discoInfo(it.key());
+      IDiscoInfo dinfo = discoInfo(caps.streamJid,caps.entityJid);
       if (caps.ver == calcCapsHash(dinfo,caps.hash))
         return dinfo;
     }
@@ -982,9 +1003,9 @@ IDiscoInfo ServiceDiscovery::loadEntityCaps(const EntityCapabilities &ACaps) con
 
 bool ServiceDiscovery::saveEntityCaps(const IDiscoInfo &AInfo) const
 {
-  if (AInfo.error.code==-1 && FEntityCaps.contains(AInfo.contactJid))
+  if (AInfo.error.code==-1 && FEntityCaps.value(AInfo.streamJid).contains(AInfo.contactJid))
   {
-    EntityCapabilities caps = FEntityCaps.value(AInfo.contactJid);
+    EntityCapabilities caps = FEntityCaps.value(AInfo.streamJid).value(AInfo.contactJid);
     QString capsNode = QString("%1#%2").arg(caps.node).arg(caps.ver);
     if (AInfo.node.isEmpty() || AInfo.node==capsNode)
     {
@@ -1093,6 +1114,31 @@ bool ServiceDiscovery::compareFeatures(const QStringList &AFeatures, const QStri
   return true;
 }
 
+void ServiceDiscovery::insertStreamMenu(const Jid &AStreamJid)
+{
+  Action *action = new Action(FDiscoMenu);
+  action->setText(AStreamJid.full());
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
+  action->setData(ADR_STREAMJID,AStreamJid.full());
+  action->setData(ADR_CONTACTJID,AStreamJid.domain());
+  action->setData(ADR_NODE,QString(""));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoItemsByAction(bool)));
+  FDiscoMenu->addAction(action,AG_DEFAULT,true);
+  FDiscoMenu->setEnabled(true);
+}
+
+void ServiceDiscovery::removeStreamMenu(const Jid &AStreamJid)
+{
+  QMultiHash<int,QVariant> data;
+  data.insert(ADR_STREAMJID,AStreamJid.full());
+  Action *action = FDiscoMenu->findActions(data).value(0,NULL);
+  if (action)
+  {
+    FDiscoMenu->removeAction(action);
+    FDiscoMenu->setEnabled(!FDiscoMenu->isEmpty());
+  }
+}
+
 Action *ServiceDiscovery::createDiscoInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QObject *AParent) const
 {
   Action *action = new Action(AParent);
@@ -1117,120 +1163,8 @@ Action *ServiceDiscovery::createDiscoItemsAction(const Jid &AStreamJid, const Ji
   return action;
 }
 
-void ServiceDiscovery::onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline)
-{
-  if (AStateOnline)
-  {
-    Action *action = new Action(FDiscoMenu);
-    action->setText(AStreamJid.domain());
-    action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
-    action->setData(ADR_STREAMJID,AStreamJid.full());
-    action->setData(ADR_CONTACTJID,AStreamJid.domain());
-    action->setData(ADR_NODE,QString(""));
-    connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoItemsByAction(bool)));
-    FDiscoMenu->addAction(action,AG_DEFAULT,true);
-    FDiscoMenu->setEnabled(true);
-
-    Jid streamDomane = AStreamJid.domain();
-    requestDiscoInfo(AStreamJid,streamDomane);
-    requestDiscoItems(AStreamJid,streamDomane);
-
-    IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
-    QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
-    foreach(IRosterItem ritem, ritems)
-    {
-      if (ritem.itemJid.node().isEmpty() && (!hasDiscoInfo(ritem.itemJid) || discoInfo(ritem.itemJid).error.code>0))
-      {
-        QueuedInfoRequest request;
-        request.streamJid = AStreamJid;
-        request.contactJid = ritem.itemJid;
-        appendQueuedRequest(QUEUE_REQUEST_START,request);
-      }
-    }
-  }
-  else
-  {
-    QMultiHash<int,QVariant> data;
-    data.insert(ADR_STREAMJID,AStreamJid.full());
-    Action *action = FDiscoMenu->findActions(data).value(0,NULL);
-    if (action)
-    {
-      FDiscoMenu->removeAction(action);
-      FDiscoMenu->setEnabled(!FDiscoMenu->isEmpty());
-    }
-
-    QueuedInfoRequest request;
-    request.streamJid = AStreamJid;
-    removeQueuedRequest(request);
-  }
-}
-
-void ServiceDiscovery::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
-{
-  Q_UNUSED(AStreamJid);
-  if (!AStateOnline)
-  {
-    if (!AContactJid.node().isEmpty())
-    {
-      QueuedInfoRequest request;
-      request.contactJid = AContactJid;
-      removeQueuedRequest(request);
-      removeDiscoInfo(AContactJid);
-    }
-    FEntityCaps.remove(AContactJid);
-  }
-}
-
-void ServiceDiscovery::onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus)
-{
-  Q_UNUSED(AStatus);
-  if (AShow==IPresence::Offline || AShow==IPresence::Error)
-  {
-    bool isSingleUser = true;
-    foreach(IMultiUserChat *mchat, FMultiUserChatPlugin->multiUserChats())
-    {
-      IMultiUser *muser = mchat->userByNick(AUser->nickName());
-      if (muser!=NULL && muser!=AUser && mchat->roomJid()==AUser->roomJid())
-      {
-        isSingleUser = false;
-        break;
-      }
-    }
-    if (isSingleUser)
-    {
-      QueuedInfoRequest request;
-      request.contactJid = AUser->contactJid();
-      removeQueuedRequest(request);
-      removeDiscoInfo(AUser->contactJid());
-      FEntityCaps.remove(AUser->contactJid());
-    }
-  }
-}
-
-void ServiceDiscovery::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
-{
-  connect(AMultiChat->instance(), SIGNAL(userPresence(IMultiUser *, int, const QString &)), SLOT(onMultiUserPresence(IMultiUser *, int, const QString &)));
-}
-
-void ServiceDiscovery::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem)
-{
-  if (ARosterItem.itemJid.node().isEmpty() && ARoster->isOpen() && !hasDiscoInfo(ARosterItem.itemJid))
-  {
-    QueuedInfoRequest request;
-    request.streamJid = ARoster->streamJid();
-    request.contactJid = ARosterItem.itemJid;
-    appendQueuedRequest(QUEUE_REQUEST_START,request);
-  }
-}
-
 void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
 {
-  EntityCapabilities &myCaps = FSelfCaps[AXmppStream->streamJid()];
-  myCaps.entityJid = AXmppStream->streamJid();
-  myCaps.node = CLIENT_HOME_PAGE;
-  myCaps.hash = CAPS_HASH_SHA1;
-  myCaps.ver = calcCapsHash(selfDiscoInfo(myCaps.entityJid),myCaps.hash);
-
   if (FStanzaProcessor)
   {
     IStanzaHandle shandle;
@@ -1255,12 +1189,36 @@ void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
     shandle.direction = IStanzaHandle::DirectionIn;
     FSHIPresenceIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
   }
+
+  insertStreamMenu(AXmppStream->streamJid());
+
+  EntityCapabilities &myCaps = FSelfCaps[AXmppStream->streamJid()];
+  myCaps.streamJid = AXmppStream->streamJid();
+  myCaps.entityJid = AXmppStream->streamJid();
+  myCaps.node = CLIENT_HOME_PAGE;
+  myCaps.hash = CAPS_HASH_SHA1;
+  myCaps.ver = calcCapsHash(selfDiscoInfo(myCaps.entityJid),myCaps.hash);
+
+  Jid streamDomane = AXmppStream->streamJid().domain();
+  requestDiscoInfo(AXmppStream->streamJid(),streamDomane);
+  requestDiscoItems(AXmppStream->streamJid(),streamDomane);
+
+  IRoster *roster = FRosterPlugin->getRoster(AXmppStream->streamJid());
+  QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
+  foreach(IRosterItem ritem, ritems)
+  {
+    if (ritem.itemJid.node().isEmpty())
+    {
+      DiscoveryRequest request;
+      request.streamJid = AXmppStream->streamJid();
+      request.contactJid = ritem.itemJid;
+      appendQueuedRequest(QUEUE_REQUEST_START,request);
+    }
+  }
 }
 
 void ServiceDiscovery::onStreamClosed(IXmppStream *AXmppStream)
 {
-  FSelfCaps.remove(AXmppStream->streamJid());
-
   if (FStanzaProcessor)
   {
     FStanzaProcessor->removeStanzaHandle(FSHIInfo.take(AXmppStream->streamJid()));
@@ -1268,10 +1226,11 @@ void ServiceDiscovery::onStreamClosed(IXmppStream *AXmppStream)
     FStanzaProcessor->removeStanzaHandle(FSHIPresenceIn.take(AXmppStream->streamJid()));
     FStanzaProcessor->removeStanzaHandle(FSHIPresenceOut.take(AXmppStream->streamJid()));
   }
-}
 
-void ServiceDiscovery::onStreamRemoved(IXmppStream *AXmppStream)
-{
+  DiscoveryRequest request;
+  request.streamJid = AXmppStream->streamJid();
+  removeQueuedRequest(request);
+
   foreach(DiscoInfoWindow *infoWindow, FDiscoInfoWindows)
     if (infoWindow->streamJid() == AXmppStream->streamJid())
       infoWindow->deleteLater();
@@ -1279,19 +1238,111 @@ void ServiceDiscovery::onStreamRemoved(IXmppStream *AXmppStream)
   foreach(DiscoItemsWindow *itemsWindow, FDiscoItemsWindows)
     if (itemsWindow->streamJid() == AXmppStream->streamJid())
       itemsWindow->deleteLater();
+
+  removeStreamMenu(AXmppStream->streamJid());
+
+  foreach(Jid contactJid, FDiscoInfo.value(AXmppStream->streamJid()).keys()) {
+    foreach(QString node, FDiscoInfo.value(AXmppStream->streamJid()).value(contactJid).keys()) {
+      removeDiscoInfo(AXmppStream->streamJid(),contactJid,node); }; };
+
+  FSelfCaps.remove(AXmppStream->streamJid());
+  FEntityCaps.remove(AXmppStream->streamJid());
+  FDiscoInfo.remove(AXmppStream->streamJid());
 }
 
-void ServiceDiscovery::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
+void ServiceDiscovery::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
 {
-  QMultiHash<int,QVariant> data;
-  data.insert(ADR_STREAMJID,AXmppStream->streamJid().full());
-  Action *action = FDiscoMenu->findActions(data).value(0,NULL);
-  if (action)
+  if (APresenceItem.show==IPresence::Offline || APresenceItem.show==IPresence::Error)
   {
-    action->setData(ADR_STREAMJID,AXmppStream->streamJid().full());
-    action->setData(ADR_CONTACTJID,AXmppStream->streamJid().domain());
+    if (!APresenceItem.itemJid.node().isEmpty())
+    {
+      DiscoveryRequest request;
+      request.streamJid = APresence->streamJid();
+      request.contactJid = APresenceItem.itemJid;
+      removeQueuedRequest(request);
+      removeDiscoInfo(APresence->streamJid(),APresenceItem.itemJid);
+    }
+    FEntityCaps[APresence->streamJid()].remove(APresenceItem.itemJid);
   }
-  emit streamJidChanged(ABefour,AXmppStream->streamJid());
+}
+
+void ServiceDiscovery::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem)
+{
+  if (ARosterItem.itemJid.node().isEmpty() && ARoster->isOpen() && !hasDiscoInfo(ARoster->streamJid(), ARosterItem.itemJid))
+  {
+    DiscoveryRequest request;
+    request.streamJid = ARoster->streamJid();
+    request.contactJid = ARosterItem.itemJid;
+    appendQueuedRequest(QUEUE_REQUEST_START,request);
+  }
+}
+
+void ServiceDiscovery::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
+{
+  DiscoveryRequest request;
+  request.streamJid = ADiscoInfo.streamJid;
+  request.contactJid = ADiscoInfo.contactJid;
+  request.node = ADiscoInfo.node;
+  removeQueuedRequest(request);
+}
+
+void ServiceDiscovery::onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo)
+{
+  QMultiHash<int,QVariant> dataValues;
+  dataValues.insertMulti(RDR_TYPE,RIT_CONTACT);
+  dataValues.insertMulti(RDR_TYPE,RIT_AGENT);
+  dataValues.insertMulti(RDR_TYPE,RIT_MY_RESOURCE);
+  dataValues.insertMulti(RDR_PJID,ADiscoInfo.contactJid.pFull());
+  IRosterIndexList indexList = FRostersModel->rootIndex()->findChild(dataValues,true);
+  foreach(Jid streamJid, FRostersModel->streams())
+    if (streamJid.pDomain() == ADiscoInfo.contactJid.pDomain())
+      indexList.append(FRostersModel->streamRoot(streamJid));
+  foreach(IRosterIndex *index, indexList)
+  {
+    emit dataChanged(index,RDR_DISCO_IDENT_CATEGORY);
+    emit dataChanged(index,RDR_DISCO_IDENT_TYPE);
+    emit dataChanged(index,RDR_DISCO_IDENT_NAME);
+    emit dataChanged(index,RDR_DISCO_FEATURES);
+  }
+}
+
+void ServiceDiscovery::onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus)
+{
+  Q_UNUSED(AStatus);
+  if (AShow==IPresence::Offline || AShow==IPresence::Error)
+  {
+    bool isSingleUser = true;
+    Jid userStreamJid = AUser->data(MUDR_STREAM_JID).toString();
+    foreach(IMultiUserChat *mchat, FMultiUserChatPlugin->multiUserChats())
+    {
+      IMultiUser *muser = mchat->userByNick(AUser->nickName());
+      if (muser!=NULL && muser!=AUser && mchat->roomJid()==AUser->roomJid() && mchat->streamJid()==userStreamJid)
+      {
+        isSingleUser = false;
+        break;
+      }
+    }
+    if (isSingleUser)
+    {
+      DiscoveryRequest request;
+      request.streamJid = userStreamJid;
+      request.contactJid = AUser->contactJid();
+      removeQueuedRequest(request);
+      removeDiscoInfo(userStreamJid,AUser->contactJid());
+      FEntityCaps[userStreamJid].remove(AUser->contactJid());
+    }
+  }
+}
+
+void ServiceDiscovery::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
+{
+  connect(AMultiChat->instance(), SIGNAL(userPresence(IMultiUser *, int, const QString &)), SLOT(onMultiUserPresence(IMultiUser *, int, const QString &)));
+}
+
+void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
+{
+  Action *action = createDiscoInfoAction(AWindow->streamJid(), AUser->contactJid(), QString::null, AMenu);
+  AMenu->addAction(action, AG_MUCM_DISCOVERY, true);
 }
 
 void ServiceDiscovery::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
@@ -1302,8 +1353,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMen
     Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     Jid contactJid = itype == RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
 
-    IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
-    if (presence && presence->isOpen())
+    if (FSelfCaps.contains(streamJid))
     {
       Action *action = createDiscoInfoAction(streamJid, contactJid, QString::null, AMenu);
       AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
@@ -1315,10 +1365,10 @@ void ServiceDiscovery::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMen
       }
     }
 
-    IDiscoInfo dinfo = discoInfo(contactJid);
+    IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
     foreach(QString feature, dinfo.features)
     {
-      foreach(Action *action, createFeatureActions(presence->streamJid(),feature,dinfo,AMenu))
+      foreach(Action *action, createFeatureActions(streamJid,feature,dinfo,AMenu))
         AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
     }
   }
@@ -1328,21 +1378,16 @@ void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId,
 {
   if (ALabelId == RLID_DISPLAY && types().contains(AIndex->type()))
   {
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
-    if (hasDiscoInfo(contactJid,""))
+    if (hasDiscoInfo(streamJid,contactJid))
     {
-      IDiscoInfo dinfo = discoInfo(contactJid,"");
+      IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
       foreach(IDiscoIdentity identity, dinfo.identity)
         if (identity.category != DIC_CLIENT)
           AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Categoty: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
     }
   }
-}
-
-void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
-{
-  Action *action = createDiscoInfoAction(AWindow->streamJid(), AUser->contactJid(), QString::null, AMenu);
-  AMenu->addAction(action, AG_MUCM_DISCOVERY, true);
 }
 
 void ServiceDiscovery::onShowDiscoInfoByAction(bool)
@@ -1369,34 +1414,6 @@ void ServiceDiscovery::onShowDiscoItemsByAction(bool)
   }
 }
 
-void ServiceDiscovery::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
-{
-  QueuedInfoRequest request;
-  request.contactJid = ADiscoInfo.contactJid;
-  request.node = ADiscoInfo.node;
-  removeQueuedRequest(request);
-}
-
-void ServiceDiscovery::onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo)
-{
-  QMultiHash<int,QVariant> dataValues;
-  dataValues.insertMulti(RDR_TYPE,RIT_CONTACT);
-  dataValues.insertMulti(RDR_TYPE,RIT_AGENT);
-  dataValues.insertMulti(RDR_TYPE,RIT_MY_RESOURCE);
-  dataValues.insertMulti(RDR_PJID,ADiscoInfo.contactJid.pFull());
-  IRosterIndexList indexList = FRostersModel->rootIndex()->findChild(dataValues,true);
-  foreach(Jid streamJid, FRostersModel->streams())
-    if (streamJid.pDomain() == ADiscoInfo.contactJid.pDomain())
-      indexList.append(FRostersModel->streamRoot(streamJid));
-  foreach(IRosterIndex *index, indexList)
-  {
-    emit dataChanged(index,RDR_DISCO_IDENT_CATEGORY);
-    emit dataChanged(index,RDR_DISCO_IDENT_TYPE);
-    emit dataChanged(index,RDR_DISCO_IDENT_NAME);
-    emit dataChanged(index,RDR_DISCO_FEATURES);
-  }
-}
-
 void ServiceDiscovery::onDiscoInfoWindowDestroyed(QObject *AObject)
 {
   DiscoInfoWindow *infoWindow = static_cast<DiscoInfoWindow *>(AObject);
@@ -1419,17 +1436,18 @@ void ServiceDiscovery::onDiscoItemsWindowDestroyed(IDiscoItemsWindow *AWindow)
 void ServiceDiscovery::onQueueTimerTimeout()
 {
   bool sended = false;
-  QMultiMap<QDateTime,QueuedInfoRequest>::iterator it = FQueuedRequests.begin();
+  QMultiMap<QDateTime,DiscoveryRequest>::iterator it = FQueuedRequests.begin();
   while (!sended && it!=FQueuedRequests.end() && it.key()<QDateTime::currentDateTime())
   {
-    QueuedInfoRequest request = it.value();
-    if (!hasDiscoInfo(request.contactJid,request.node))
-      sended = requestDiscoInfo(request.streamJid,request.contactJid,request.node);
+    DiscoveryRequest request = it.value();
+    sended = requestDiscoInfo(request.streamJid,request.contactJid,request.node);
     it = FQueuedRequests.erase(it);
   }
 
   if (FQueuedRequests.isEmpty())
+  {
     FQueueTimer.stop();
+  }
 }
 
 void ServiceDiscovery::onSelfCapsChanged()

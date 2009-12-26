@@ -384,9 +384,9 @@ int SessionNegotiation::initSession(const Jid &AStreamJid, const Jid &AContactJi
     foreach(ISessionNegotiator *negotiator, FNegotiators)
       result = result | negotiator->sessionInit(session,request);
     
-    if (!isRenegotiate && FDiscovery && !FDiscovery->discoInfo(AContactJid).features.contains(NS_STANZA_SESSION))
+    if (!isRenegotiate && FDiscovery && !FDiscovery->discoInfo(AStreamJid,AContactJid).features.contains(NS_STANZA_SESSION))
     {
-      bool infoRequested = !FDiscovery->hasDiscoInfo(AContactJid) ? FDiscovery->requestDiscoInfo(AStreamJid,AContactJid) : false;
+      bool infoRequested = !FDiscovery->hasDiscoInfo(AStreamJid,AContactJid) ? FDiscovery->requestDiscoInfo(AStreamJid,AContactJid) : false;
       if (!infoRequested)
       {
         session.status = IStanzaSession::Error;

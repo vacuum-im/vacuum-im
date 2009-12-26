@@ -286,11 +286,10 @@ QList<Jid> Gateways::streamServices(const Jid &AStreamJid, const IDiscoIdentity 
     {
       if (FDiscovery && (!AIdentity.category.isEmpty() || !AIdentity.type.isEmpty()))
       {
-        IDiscoInfo dinfo = FDiscovery->discoInfo(ritem.itemJid);
+        IDiscoInfo dinfo = FDiscovery->discoInfo(AStreamJid, ritem.itemJid);
         foreach(IDiscoIdentity identity, dinfo.identity)
         {
-          if ((AIdentity.category.isEmpty() || AIdentity.category == identity.category) &&
-              (AIdentity.type.isEmpty() || AIdentity.type == identity.type))
+          if ((AIdentity.category.isEmpty() || AIdentity.category == identity.category) && (AIdentity.type.isEmpty() || AIdentity.type == identity.type))
           {
             services.append(ritem.itemJid);
             break;
@@ -764,17 +763,16 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
   QString itemNode = AIndex.data(DIDR_NODE).toString();
   if (itemJid.node().isEmpty() && itemNode.isEmpty())
   {
-    IDiscoInfo dinfo = FDiscovery->discoInfo(itemJid,itemNode);
+    Jid streamJid = AIndex.data(DIDR_STREAM_JID).toString();
+    IDiscoInfo dinfo = FDiscovery->discoInfo(streamJid,itemJid,itemNode);
     if (dinfo.error.code<0 && !dinfo.identity.isEmpty())
     {
-      Jid streamJid = AIndex.data(DIDR_STREAM_JID).toString();
-      
       QList<Jid> services;
       foreach(IDiscoIdentity ident, dinfo.identity)
         services += streamServices(streamJid,ident);
       
       foreach(Jid service, streamServices(streamJid))
-        if (!services.contains(service) && FDiscovery->discoInfo(service).identity.isEmpty())
+        if (!services.contains(service) && FDiscovery->discoInfo(streamJid,service).identity.isEmpty())
           services.append(service);
 
       if (!services.isEmpty() && !services.contains(itemJid))

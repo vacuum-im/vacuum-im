@@ -75,7 +75,6 @@ protected:
 protected slots:
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void onDiscoItemsReceived(const IDiscoItems &ADiscoItems);
-  void onStreamJidChanged(const Jid &ABefour, const Jid &AAftert);
 private:
   IDataForms *FDataForms;
   IServiceDiscovery *FDiscovery;
