@@ -345,7 +345,7 @@ bool FileTransfer::isSupported(const Jid &AStreamJid, const Jid &AContactJid) co
   if (FFileManager->streamMethods().isEmpty())
     return false;
 
-  return FDiscovery==NULL || FDiscovery->discoInfo(AContactJid).features.contains(NS_SI_FILETRANSFER);
+  return FDiscovery==NULL || FDiscovery->discoInfo(AStreamJid,AContactJid).features.contains(NS_SI_FILETRANSFER);
 }
 
 IFileStream *FileTransfer::sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName, const QString &AFileDesc)

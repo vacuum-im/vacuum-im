@@ -28,7 +28,6 @@ protected slots:
   void onCurrentFeatureChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious);
   void onUpdateClicked();
   void onListItemActivated(QListWidgetItem *AItem);
-  void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
   void onShowExtensionForm(bool);
 private:
   Ui::DiscoInfoWindowClass ui;

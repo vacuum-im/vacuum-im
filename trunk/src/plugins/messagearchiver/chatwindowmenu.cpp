@@ -290,11 +290,10 @@ void ChatWindowMenu::onStanzaSessionTerminated(const IStanzaSession &ASession)
 
 void ChatWindowMenu::onEditWidgetContactJidChanged(const Jid &ABefour)
 {
-
   if (FDiscovery)
   {
-    if (FDiscovery->hasDiscoInfo(FEditWidget->contactJid()))
-      onDiscoInfoReceived(FDiscovery->discoInfo(FEditWidget->contactJid()));
+    if (FDiscovery->hasDiscoInfo(FEditWidget->streamJid(), FEditWidget->contactJid()))
+      onDiscoInfoReceived(FDiscovery->discoInfo(FEditWidget->streamJid(), FEditWidget->contactJid()));
     else
       FDiscovery->requestDiscoInfo(FEditWidget->streamJid(),FEditWidget->contactJid());
   }

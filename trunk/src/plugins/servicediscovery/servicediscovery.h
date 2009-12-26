@@ -12,6 +12,7 @@
 #include <definations/rosterdataholderorders.h>
 #include <definations/rosterlabelorders.h>
 #include <definations/rosterclickhookerorders.h>
+#include <definations/multiuserdataroles.h>
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
 #include <definations/rostertooltiporders.h>
@@ -39,13 +40,16 @@
 #include "discoinfowindow.h"
 #include "discoitemswindow.h"
 
-struct QueuedInfoRequest {
+struct DiscoveryRequest {
   Jid streamJid;
   Jid contactJid;
   QString node;
+  bool operator==(const DiscoveryRequest &AOther) const {
+    return streamJid==AOther.streamJid && contactJid==AOther.contactJid && node==AOther.node; }
 };
 
 struct EntityCapabilities {
+  Jid streamJid;
   Jid entityJid;
   QString node;
   QString ver;
@@ -100,10 +104,10 @@ public:
   virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = "") const;
   virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
   virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
-  virtual bool checkDiscoFeature(const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
-  virtual QList<IDiscoInfo> findDiscoInfo(const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
+  virtual bool checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
+  virtual QList<IDiscoInfo> findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
   virtual QIcon identityIcon(const QList<IDiscoIdentity> &AIdentity) const;
-  virtual QIcon serviceIcon(const Jid AItemJid, const QString &ANode) const;
+  virtual QIcon serviceIcon(const Jid &AStreamJid, const Jid AItemJid, const QString &ANode) const;
     //DiscoHandler
   virtual void insertDiscoHandler(IDiscoHandler *AHandler);
   virtual void removeDiscoHandler(IDiscoHandler *AHandler);
@@ -119,10 +123,10 @@ public:
   virtual IDiscoFeature discoFeature(const QString &AFeatureVar) const;
   virtual void removeDiscoFeature(const QString &AFeatureVar);
     //DiscoInfo
-  virtual bool hasDiscoInfo(const Jid &AContactJid, const QString &ANode = "") const;
-  virtual IDiscoInfo discoInfo(const Jid &AContactJid, const QString &ANode = "") const;
+  virtual bool hasDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "") const;
+  virtual IDiscoInfo discoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "") const;
   virtual bool requestDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "");
-  virtual void removeDiscoInfo(const Jid &AContactJid, const QString &ANode = "");
+  virtual void removeDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "");
   virtual int findIdentity(const QList<IDiscoIdentity> &AIdentity, const QString &ACategory, const QString &AType) const;
     //DiscoItems
   virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "");
@@ -138,17 +142,16 @@ signals:
   virtual void discoInfoReceived(const IDiscoInfo &ADiscoInfo);
   virtual void discoInfoRemoved(const IDiscoInfo &ADiscoInfo);
   virtual void discoItemsReceived(const IDiscoItems &ADiscoItems);
-  virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert);
   //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
   void discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AElem) const;
   void discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &AInfo) const;
-  IDiscoInfo parseDiscoInfo(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
-  IDiscoItems parseDiscoItems(const Stanza &AStanza, const QPair<Jid,QString> &AJidNode) const;
+  IDiscoInfo parseDiscoInfo(const Stanza &AStanza, const DiscoveryRequest &ADiscoRequest) const;
+  IDiscoItems parseDiscoItems(const Stanza &AStanza, const DiscoveryRequest &ADiscoRequest) const;
   void registerFeatures();
-  void appendQueuedRequest(const QDateTime &ATimeStart, const QueuedInfoRequest &ARequest);
-  void removeQueuedRequest(const QueuedInfoRequest &ARequest);
+  void appendQueuedRequest(const QDateTime &ATimeStart, const DiscoveryRequest &ARequest);
+  void removeQueuedRequest(const DiscoveryRequest &ARequest);
   bool hasEntityCaps(const EntityCapabilities &ACaps) const;
   QString capsFileName(const EntityCapabilities &ACaps, bool AForJid) const;
   IDiscoInfo loadEntityCaps(const EntityCapabilities &ACaps) const;
@@ -156,25 +159,24 @@ protected:
   QString calcCapsHash(const IDiscoInfo &AInfo, const QString &AHash) const;
   bool compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const;
   bool compareFeatures(const QStringList &AFeatures, const QStringList &AWith) const;
+  void insertStreamMenu(const Jid &AStreamJid);
+  void removeStreamMenu(const Jid &AStreamJid);
   Action *createDiscoInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QObject *AParent) const;
   Action *createDiscoItemsAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QObject *AParent) const;
 protected slots:
-  void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
-  void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
-  void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
-  void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
-  void onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
-  void onStreamRemoved(IXmppStream *AXmppStream);
-  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
-  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
-  void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
-  void onShowDiscoInfoByAction(bool);
-  void onShowDiscoItemsByAction(bool);
+  void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
+  void onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo);
+  void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
+  void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
+  void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
+  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+  void onShowDiscoInfoByAction(bool);
+  void onShowDiscoItemsByAction(bool);
   void onDiscoInfoWindowDestroyed(QObject *AObject);
   void onDiscoItemsWindowDestroyed(IDiscoItemsWindow *AWindow);
   void onQueueTimerTimeout();
@@ -201,13 +203,13 @@ private:
   QMap<Jid ,int> FSHIItems;
   QMap<Jid, int> FSHIPresenceIn;
   QMap<Jid, int> FSHIPresenceOut;
-  QMap<QString, QPair<Jid,QString> > FInfoRequestsId;
-  QMap<QString, QPair<Jid,QString> > FItemsRequestsId;
-  QMultiMap<QDateTime, QueuedInfoRequest> FQueuedRequests;
+  QMap<QString, DiscoveryRequest > FInfoRequestsId;
+  QMap<QString, DiscoveryRequest > FItemsRequestsId;
+  QMultiMap<QDateTime, DiscoveryRequest> FQueuedRequests;
 private:
   QMap<Jid, EntityCapabilities> FSelfCaps;
-  QMap<Jid, EntityCapabilities> FEntityCaps;
-  QHash<Jid, QMap<QString, IDiscoInfo> > FDiscoInfo;
+  QMap<Jid, QHash<Jid, EntityCapabilities> > FEntityCaps;
+  QMap<Jid, QHash<Jid, QMap<QString, IDiscoInfo> > > FDiscoInfo;
 private:
   Menu *FDiscoMenu;
   QList<IDiscoHandler *> FDiscoHandlers;

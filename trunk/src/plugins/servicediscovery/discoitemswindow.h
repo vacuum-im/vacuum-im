@@ -46,7 +46,6 @@ signals:
   virtual void discoverChanged(const Jid AContactJid, const QString &ANode);
   virtual void currentIndexChanged(const QModelIndex &AIndex);
   virtual void indexContextMenu(const QModelIndex &AIndex, Menu *AMenu);
-  virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert);
   virtual void windowDestroyed(IDiscoItemsWindow *AWindow);
 protected:
   void initialize();
@@ -60,7 +59,6 @@ protected slots:
   void onCurrentIndexChanged(QModelIndex ACurrent, QModelIndex APrevious);
   void onToolBarActionTriggered(bool);
   void onComboReturnPressed();
-  void onStreamJidChanged(const Jid &ABefour, const Jid &AAftert);
   void onSearchTimerTimeout();
 private:
   QHeaderView *FHeader;

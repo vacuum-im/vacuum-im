@@ -535,7 +535,7 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
     ClientInfoDialog *dialog = FClientInfoDialogs.value(AContactJid,NULL);
     if (!dialog)
     {
-      QString contactName = !AContactJid.node().isEmpty() ? AContactJid.node() : FDiscovery!=NULL ? FDiscovery->discoInfo(AContactJid).identity.value(0).name : AContactJid.domain();
+      QString contactName = !AContactJid.node().isEmpty() ? AContactJid.node() : FDiscovery!=NULL ? FDiscovery->discoInfo(AStreamJid,AContactJid).identity.value(0).name : AContactJid.domain();
       if (FRosterPlugin)
       {
         IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
@@ -797,7 +797,7 @@ void ClientInfo::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     {
       Jid contactJid = AIndex->data(RDR_JID).toString();
       int show = AIndex->data(RDR_SHOW).toInt();
-      QStringList features = FDiscovery!=NULL ? FDiscovery->discoInfo(contactJid).features : QStringList();
+      QStringList features = FDiscovery!=NULL ? FDiscovery->discoInfo(streamJid,contactJid).features : QStringList();
       if (show != IPresence::Offline && show != IPresence::Error && !features.contains(NS_JABBER_VERSION))
       {
         Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_VERSION,AMenu);

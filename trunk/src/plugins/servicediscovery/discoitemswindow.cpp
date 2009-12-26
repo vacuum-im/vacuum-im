@@ -30,6 +30,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
+  setWindowTitle(tr("Service Discovery - %1").arg(AStreamJid.full()));
   IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SDISCOVERY_DISCOVER,0,0,"windowIcon");
 
   FDataForms = NULL;
@@ -38,7 +39,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 
   FDiscovery = ADiscovery;
   FCurrentStep = -1;
-  onStreamJidChanged(FStreamJid,AStreamJid);
+  FStreamJid = AStreamJid;
 
   FToolBarChanger = new ToolBarChanger(ui.tlbToolBar);
 
@@ -89,7 +90,6 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 
   connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
   connect(FDiscovery->instance(),SIGNAL(discoItemsReceived(const IDiscoItems &)),SLOT(onDiscoItemsReceived(const IDiscoItems &)));
-  connect(FDiscovery->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),SLOT(onStreamJidChanged(const Jid &, const Jid &)));
 
   initialize();
   createToolBarActions();
@@ -203,7 +203,7 @@ void DiscoItemsWindow::updateActionsBar()
   QModelIndex index = ui.trvItems->currentIndex();
   if (index.isValid())
   {
-    IDiscoInfo dinfo = FDiscovery->discoInfo(index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
+    IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
     foreach(QString feature, dinfo.features)
     {
       foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,this))
@@ -219,13 +219,13 @@ void DiscoItemsWindow::updateActionsBar()
 
 void DiscoItemsWindow::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
-  if (ADiscoInfo.contactJid == ui.trvItems->currentIndex().data(DIDR_JID).toString())
+  if (ADiscoInfo.streamJid==FStreamJid && ADiscoInfo.contactJid==ui.trvItems->currentIndex().data(DIDR_JID).toString())
     updateActionsBar();
 }
 
 void DiscoItemsWindow::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
 {
-  if (ADiscoItems.contactJid == ui.trvItems->currentIndex().data(DIDR_JID).toString())
+  if (ADiscoItems.streamJid==FStreamJid && ADiscoItems.contactJid==ui.trvItems->currentIndex().data(DIDR_JID).toString())
     updateActionsBar();
 }
 
@@ -244,7 +244,7 @@ void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)
     menu->addAction(FAddContact,TBG_DIWT_DISCOVERY_ACTIONS,false);
     menu->addAction(FShowVCard,TBG_DIWT_DISCOVERY_ACTIONS,false);
 
-    IDiscoInfo dinfo = FDiscovery->discoInfo(index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
+    IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
     foreach(QString feature, dinfo.features)
     {
       foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,menu))
@@ -339,16 +339,6 @@ void DiscoItemsWindow::onComboReturnPressed()
   QString itemNode = ui.cmbNode->currentText();
   if (itemJid.isValid() && FDiscoverySteps.value(FCurrentStep) != qMakePair(itemJid,itemNode))
     discover(itemJid,itemNode);
-}
-
-void DiscoItemsWindow::onStreamJidChanged(const Jid &ABefour, const Jid &AAftert)
-{
-  if (ABefour == FStreamJid)
-  {
-    FStreamJid = AAftert;
-    setWindowTitle(tr("Service Discovery - %1").arg(FStreamJid.full()));
-    emit streamJidChanged(ABefour,AAftert);
-  }
 }
 
 void DiscoItemsWindow::onSearchTimerTimeout()
