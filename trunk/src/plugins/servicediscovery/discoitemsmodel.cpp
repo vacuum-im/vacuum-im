@@ -141,19 +141,16 @@ void DiscoItemsModel::fetchIndex(const QModelIndex &AIndex, bool AInfo, bool AIt
   DiscoItemIndex *index = itemIndex(AIndex);
   if (index && (AInfo || AItems))
   {
-    if (AItems && !index->itemsFetched)
-    {
-      if (isDiscoCacheEnabled() && FDiscovery->hasDiscoItems(index->itemJid,index->itemNode))
-        onDiscoItemsReceived(FDiscovery->discoItems(index->itemJid,index->itemNode));
-      else
-        FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
-    }
     if (AInfo && !index->infoFetched)
     {
       if (isDiscoCacheEnabled() && FDiscovery->hasDiscoInfo(index->itemJid,index->itemNode))
         onDiscoInfoReceived(FDiscovery->discoInfo(index->itemJid,index->itemNode));
       else
         FDiscovery->requestDiscoInfo(FStreamJid,index->itemJid,index->itemNode);
+    }
+    if (AItems && !index->itemsFetched)
+    {
+      FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
     }
     index->icon = FDiscovery->serviceIcon(index->itemJid,index->itemNode);
     emit dataChanged(AIndex,AIndex);
@@ -165,10 +162,10 @@ void DiscoItemsModel::loadIndex(const QModelIndex &AIndex, bool AInfo, bool AIte
   DiscoItemIndex *index = itemIndex(AIndex);
   if (index)
   {
-    if (AItems)
-      FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
     if (AInfo)
       FDiscovery->requestDiscoInfo(FStreamJid, index->itemJid,index->itemNode);
+    if (AItems)
+      FDiscovery->requestDiscoItems(FStreamJid,index->itemJid,index->itemNode);
     index->icon = FDiscovery->serviceIcon(index->itemJid,index->itemNode);
     emit dataChanged(AIndex,AIndex);
   }

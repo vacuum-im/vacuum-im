@@ -120,19 +120,12 @@ public:
   virtual void removeDiscoFeature(const QString &AFeatureVar);
     //DiscoInfo
   virtual bool hasDiscoInfo(const Jid &AContactJid, const QString &ANode = "") const;
-  virtual QList<Jid> discoInfoContacts() const;
-  virtual QList<QString> dicoInfoContactNodes(const Jid &AContactJid) const;
   virtual IDiscoInfo discoInfo(const Jid &AContactJid, const QString &ANode = "") const;
   virtual bool requestDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "");
   virtual void removeDiscoInfo(const Jid &AContactJid, const QString &ANode = "");
   virtual int findIdentity(const QList<IDiscoIdentity> &AIdentity, const QString &ACategory, const QString &AType) const;
     //DiscoItems
-  virtual bool hasDiscoItems(const Jid &AContactJid, const QString &ANode = "") const;
-  virtual QList<Jid> discoItemsContacts() const;
-  virtual QList<QString> dicoItemsContactNodes(const Jid &AContactJid) const;
-  virtual IDiscoItems discoItems(const Jid &AContactJid, const QString &ANode = "") const;
   virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "");
-  virtual void removeDiscoItems(const Jid &AContactJid, const QString &ANode ="");
 signals:
   virtual void discoItemsWindowCreated(IDiscoItemsWindow *AWindow);
   virtual void discoItemsWindowDestroyed(IDiscoItemsWindow *AWindow);
@@ -145,7 +138,6 @@ signals:
   virtual void discoInfoReceived(const IDiscoInfo &ADiscoInfo);
   virtual void discoInfoRemoved(const IDiscoInfo &ADiscoInfo);
   virtual void discoItemsReceived(const IDiscoItems &ADiscoItems);
-  virtual void discoItemsRemoved(const IDiscoItems &ADiscoItems);
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAftert);
   //IRosterIndexDataHolder
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
@@ -216,7 +208,6 @@ private:
   QMap<Jid, EntityCapabilities> FSelfCaps;
   QMap<Jid, EntityCapabilities> FEntityCaps;
   QHash<Jid, QMap<QString, IDiscoInfo> > FDiscoInfo;
-  QHash<Jid, QMap<QString, IDiscoItems> > FDiscoItems;
 private:
   Menu *FDiscoMenu;
   QList<IDiscoHandler *> FDiscoHandlers;

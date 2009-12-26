@@ -27,12 +27,12 @@ CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const
 
   connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
-  FCommands->insertCommandClient(this);
+  FCommands->insertClient(this);
 }
 
 CommandDialog::~CommandDialog()
 {
-  FCommands->removeCommandClient(this);
+  FCommands->removeClient(this);
 }
 
 bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
