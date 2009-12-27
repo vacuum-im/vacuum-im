@@ -17,6 +17,7 @@
 Commands::Commands()
 {
   FDataForms = NULL;
+  FXmppStreams = NULL;
   FStanzaProcessor = NULL;
   FDiscovery = NULL;
   FPresencePlugin = NULL;
@@ -36,6 +37,7 @@ void Commands::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://jrudevels.org";
   APluginInfo->dependences.append(DATAFORMS_UUID);
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
@@ -53,6 +55,17 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     }
   }
 
+  plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+  if (plugin)
+  {
+    FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+    if (FXmppStreams)
+    {
+      connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
+      connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+    }
+  }
+
   plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
@@ -67,8 +80,7 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
     FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
     if (FPresencePlugin)
     {
-      connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
-      connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed (IPresence *)));
+      connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
     }
   }
 
@@ -76,7 +88,7 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder
   if (plugin)
     FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 
-  return FStanzaProcessor!=NULL && FDataForms!=NULL;
+  return FXmppStreams!=NULL && FStanzaProcessor!=NULL && FDataForms!=NULL;
 }
 
 bool Commands::initObjects()
@@ -118,7 +130,7 @@ bool Commands::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza
 
 bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
-  if (FSHICommands.contains(AHandlerId))
+  if (FSHICommands.value(AStreamJid) == AHandlerId)
   {
     ICommandRequest request;
     request.streamJid = AStreamJid;
@@ -146,24 +158,6 @@ bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &A
       FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
     }
     AAccept = true;
-  }
-  return false;
-}
-
-bool Commands::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
-{
-  if (AAction == "command")
-  {
-    QString node = AParams.value("node");
-    if (!node.isEmpty())
-    {
-      QString action = AParams.value("action","execute");
-      if (action == "execute")
-      {
-        executeCommnad(AStreamJid, AContactJid, node);
-      }
-    }
-    return true;
   }
   return false;
 }
@@ -249,6 +243,24 @@ void Commands::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanz
   }
 }
 
+bool Commands::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+{
+  if (AAction == "command")
+  {
+    QString node = AParams.value("node");
+    if (!node.isEmpty())
+    {
+      QString action = AParams.value("action","execute");
+      if (action == "execute")
+      {
+        executeCommnad(AStreamJid, AContactJid, node);
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
 void Commands::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 {
   if (ADiscoInfo.node == NS_COMMANDS)
@@ -319,8 +331,7 @@ bool Commands::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, 
 
 Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-  IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
-  if (presence && presence->isOpen() && AFeature==NS_COMMANDS)
+  if (FSHICommands.contains(AStreamJid) && AFeature==NS_COMMANDS)
   {
     if (FDiscovery->findIdentity(ADiscoInfo.identity,DIC_AUTOMATION,DIT_COMMAND_NODE)>=0)
     {
@@ -419,53 +430,60 @@ void Commands::removeClient(ICommandClient *AClient)
 
 QString Commands::sendCommandRequest(const ICommandRequest &ARequest)
 {
-  Stanza request("iq");
-  request.setTo(ARequest.commandJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
-  QDomElement cmdElem = request.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
-  cmdElem.setAttribute("node",ARequest.node);
-  if (!ARequest.sessionId.isEmpty())
-    cmdElem.setAttribute("sessionid",ARequest.sessionId);
-  if (!ARequest.action.isEmpty())
-    cmdElem.setAttribute("action",ARequest.action);
-  if (FDataForms && !ARequest.form.type.isEmpty())
-    FDataForms->xmlForm(ARequest.form,cmdElem);
-  if (FStanzaProcessor->sendStanzaRequest(this,ARequest.streamJid,request,COMMANDS_TIMEOUT))
+  if (FStanzaProcessor)
   {
-    FRequests.append(request.id());
-    return request.id();
+    Stanza request("iq");
+    request.setTo(ARequest.commandJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
+    QDomElement cmdElem = request.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
+    cmdElem.setAttribute("node",ARequest.node);
+    if (!ARequest.sessionId.isEmpty())
+      cmdElem.setAttribute("sessionid",ARequest.sessionId);
+    if (!ARequest.action.isEmpty())
+      cmdElem.setAttribute("action",ARequest.action);
+    if (FDataForms && !ARequest.form.type.isEmpty())
+      FDataForms->xmlForm(ARequest.form,cmdElem);
+    if (FStanzaProcessor->sendStanzaRequest(this,ARequest.streamJid,request,COMMANDS_TIMEOUT))
+    {
+      FRequests.append(request.id());
+      return request.id();
+    }
   }
-  return QString();
+  return QString::null;
 }
 
 bool Commands::sendCommandResult(const ICommandResult &AResult)
 {
-  Stanza result("iq");
-  result.setTo(AResult.commandJid.eFull()).setType("result").setId(AResult.stanzaId);
-
-  QDomElement cmdElem = result.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
-  cmdElem.setAttribute("node",AResult.node);
-  cmdElem.setAttribute("sessionid",AResult.sessionId);
-  cmdElem.setAttribute("status",AResult.status);
-
-  if (!AResult.actions.isEmpty())
+  if (FStanzaProcessor)
   {
-    QDomElement actElem = cmdElem.appendChild(result.createElement("actions")).toElement();
-    actElem.setAttribute("execute",AResult.execute);
-    foreach(QString action,AResult.actions)
-      actElem.appendChild(result.createElement(action));
+    Stanza result("iq");
+    result.setTo(AResult.commandJid.eFull()).setType("result").setId(AResult.stanzaId);
+
+    QDomElement cmdElem = result.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
+    cmdElem.setAttribute("node",AResult.node);
+    cmdElem.setAttribute("sessionid",AResult.sessionId);
+    cmdElem.setAttribute("status",AResult.status);
+
+    if (!AResult.actions.isEmpty())
+    {
+      QDomElement actElem = cmdElem.appendChild(result.createElement("actions")).toElement();
+      actElem.setAttribute("execute",AResult.execute);
+      foreach(QString action,AResult.actions)
+        actElem.appendChild(result.createElement(action));
+    }
+
+    if (FDataForms && !AResult.form.type.isEmpty())
+      FDataForms->xmlForm(AResult.form,cmdElem);
+
+    foreach(ICommandNote note,AResult.notes)
+    {
+      QDomElement noteElem = cmdElem.appendChild(result.createElement("note")).toElement();
+      noteElem.setAttribute("type",note.type);
+      noteElem.appendChild(result.createTextNode(note.message));
+    }
+
+    return FStanzaProcessor->sendStanzaOut(AResult.streamJid,result);
   }
-
-  if (FDataForms && !AResult.form.type.isEmpty())
-    FDataForms->xmlForm(AResult.form,cmdElem);
-
-  foreach(ICommandNote note,AResult.notes)
-  {
-    QDomElement noteElem = cmdElem.appendChild(result.createElement("note")).toElement();
-    noteElem.setAttribute("type",note.type);
-    noteElem.appendChild(result.createTextNode(note.message));
-  }
-
-  return FStanzaProcessor->sendStanzaOut(AResult.streamJid,result);
+  return false;
 }
 
 QList<ICommand> Commands::contactCommands(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -475,11 +493,11 @@ QList<ICommand> Commands::contactCommands(const Jid &AStreamJid, const Jid &ACon
 
 bool Commands::executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode)
 {
-  IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
-  if (presence && presence->isOpen())
+  IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
+  if (FDataForms && stream && stream->isOpen())
   {
     CommandDialog *dialog = new CommandDialog(this,FDataForms,AStreamJid,ACommandJid,ANode,NULL);
-    connect(presence->instance(),SIGNAL(closed()),dialog,SLOT(reject()));
+    connect(stream->instance(),SIGNAL(closed()),dialog,SLOT(reject()));
     dialog->executeCommand();
     dialog->show();
     return true;
@@ -498,7 +516,7 @@ void Commands::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void Commands::onPresenceOpened(IPresence *APresence)
+void Commands::onStreamOpened(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor)
   {
@@ -506,21 +524,20 @@ void Commands::onPresenceOpened(IPresence *APresence)
     shandle.handler = this;
     shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
-    shandle.streamJid = APresence->streamJid();
+    shandle.streamJid = AXmppStream->streamJid();
     shandle.conditions.append(SHC_COMMANDS);
-    FSHICommands.insert(FStanzaProcessor->insertStanzaHandle(shandle),APresence);
+    FSHICommands.insert(AXmppStream->streamJid(), FStanzaProcessor->insertStanzaHandle(shandle));
   }
 }
 
-void Commands::onPresenceClosed(IPresence *APresence)
+void Commands::onStreamClosed(IXmppStream *AXmppStream)
 {
   if (FStanzaProcessor)
   {
-    int handle = FSHICommands.key(APresence);
-    FSHICommands.remove(handle);
-    FStanzaProcessor->removeStanzaHandle(handle);
+    FStanzaProcessor->removeStanzaHandle(FSHICommands.take(AXmppStream->streamJid()));
   }
-  FCommands.remove(APresence->streamJid());
+  FCommands.remove(AXmppStream->streamJid());
+  FOnlineAgents.remove(AXmppStream->streamJid());
 }
 
 void Commands::onDiscoInfoReceived(const IDiscoInfo &AInfo)
@@ -532,7 +549,8 @@ void Commands::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 
 void Commands::onDiscoInfoRemoved(const IDiscoInfo &AInfo)
 {
-  FCommands[AInfo.streamJid].remove(AInfo.contactJid);
+  if (AInfo.node.isEmpty())
+    FCommands[AInfo.streamJid].remove(AInfo.contactJid);
 }
 
 void Commands::onDiscoItemsReceived(const IDiscoItems &AItems)
@@ -556,6 +574,33 @@ void Commands::onDiscoItemsReceived(const IDiscoItems &AItems)
   }
 }
 
+void Commands::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
+{
+  if (FDiscovery && APresence->isOpen() && APresenceItem.itemJid.node().isEmpty())
+  {
+    if (FDiscovery->discoInfo(APresence->streamJid(),APresenceItem.itemJid).features.contains(NS_COMMANDS))
+    {
+      QList<Jid> &online = FOnlineAgents[APresence->streamJid()];
+      if (APresenceItem.show==IPresence::Offline || APresenceItem.show==IPresence::Error)
+      {
+        if (online.contains(APresenceItem.itemJid))
+        {
+          online.removeAll(APresenceItem.itemJid);
+          FDiscovery->requestDiscoItems(APresence->streamJid(),APresenceItem.itemJid,NS_COMMANDS);
+        }
+      }
+      else 
+      {
+        if (!online.contains(APresenceItem.itemJid))
+        {
+          online.append(APresenceItem.itemJid);
+          FDiscovery->requestDiscoItems(APresence->streamJid(),APresenceItem.itemJid,NS_COMMANDS);
+        }
+      }
+    }
+  }
+}
+
 void Commands::onExecuteActionTriggered(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
@@ -571,7 +616,7 @@ void Commands::onExecuteActionTriggered(bool)
 void Commands::onRequestActionTriggered(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
-  if (action)
+  if (FDiscovery && action)
   {
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     Jid commandJid = action->data(ADR_COMMAND_JID).toString();
