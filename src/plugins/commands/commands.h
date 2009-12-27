@@ -9,6 +9,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icommands.h>
 #include <interfaces/idataforms.h>
+#include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
@@ -43,11 +44,11 @@ public:
   //IStanzaHandler
   virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
   virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  //IXmppUriHandler
-  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IStanzaRequestOwner
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
+  //IXmppUriHandler
+  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IDiscoHandler
   virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
   virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
@@ -74,26 +75,29 @@ signals:
 protected:
   void registerDiscoFeatures();
 protected slots:
-  void onPresenceOpened(IPresence *APresence);
-  void onPresenceClosed(IPresence *APresence);
+  void onStreamOpened(IXmppStream *AXmppStream);
+  void onStreamClosed(IXmppStream *AXmppStream);
   void onDiscoInfoReceived(const IDiscoInfo &AInfo);
   void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
   void onDiscoItemsReceived(const IDiscoItems &AItems);
+  void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
   void onExecuteActionTriggered(bool);
   void onRequestActionTriggered(bool);
 private:
   IDataForms *FDataForms;
+  IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;
   IServiceDiscovery *FDiscovery;
   IPresencePlugin *FPresencePlugin;
   IXmppUriQueries *FXmppUriQueries;
 private:
   QList<QString> FRequests;
-  QMap<int, IPresence*> FSHICommands;
+  QMap<Jid, int> FSHICommands;
 private:
   QList<ICommandClient *> FClients;
   QMap<QString, ICommandServer *> FServers;
 private:
+  QMap<Jid, QList<Jid> > FOnlineAgents;
   QMap<Jid, QMap<Jid, QList<ICommand> > > FCommands;
 };
 
