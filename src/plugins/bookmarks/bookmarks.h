@@ -16,6 +16,7 @@
 #include <interfaces/imainwindow.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/imultiuserchat.h>
+#include <interfaces/ixmppuriqueries.h>
 #include <utils/menu.h>
 #include "editbookmarkdialog.h"
 #include "editbookmarksdialog.h"
@@ -68,12 +69,13 @@ private:
   IMainWindowPlugin *FMainWindowPlugin;
   IAccountManager *FAccountManager;
   IMultiUserChatPlugin *FMultiChatPlugin;
+  IXmppUriQueries *FXmppUriQueries;
 private:
   Menu *FBookMarksMenu;
-  QHash<Jid, Menu *> FStreamMenu;
+  QMap<Jid, Menu *> FStreamMenu;
 private:
-  QHash<Jid, QList<IBookMark> > FBookMarks;
-  QHash<Jid, EditBookmarksDialog *> FDialogs;
+  QMap<Jid, QList<IBookMark> > FBookMarks;
+  QMap<Jid, EditBookmarksDialog *> FDialogs;
 };
 
 #endif // BOOKMARKS_H

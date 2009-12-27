@@ -17,6 +17,7 @@ BookMarks::BookMarks()
   FMainWindowPlugin = NULL;
   FAccountManager = NULL;
   FMultiChatPlugin = NULL;
+  FXmppUriQueries = NULL;
   
   FBookMarksMenu = NULL;
 }
@@ -89,6 +90,10 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
   if (plugin)
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 
+  plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
+  if (plugin)
+    FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+
   return FStorage!=NULL;
 }
 
@@ -121,7 +126,7 @@ QString BookMarks::addBookmark(const Jid &AStreamJid, const IBookMark &ABookmark
     bookmarkList.append(ABookmark);
     return setBookmarks(AStreamJid,bookmarkList);
   }
-  return QString();
+  return QString::null;
 }
 
 QString BookMarks::setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &ABookmarks)
@@ -199,7 +204,10 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
   }
   else if (!ABookmark.url.isEmpty())
   {
-    QDesktopServices::openUrl(ABookmark.url);
+    if (FXmppUriQueries && ABookmark.url.startsWith("xmpp:",Qt::CaseInsensitive))
+      FXmppUriQueries->openXmppUri(AStreamJid, ABookmark.url);
+    else
+      QDesktopServices::openUrl(ABookmark.url);
   }
 }
 
