@@ -56,7 +56,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
   }
   else if (FField.type == DATAFIELD_TYPE_LISTMULTI)
   {
-    FListWidget = new QListWidget(this);
+    FListWidget = new ListWidget(this);
     appendLabel(label,FListWidget);
     foreach(IDataOption option, FField.options)
     {
@@ -72,7 +72,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
   }
   else if (FField.type == DATAFIELD_TYPE_JIDMULTI || FField.type == DATAFIELD_TYPE_TEXTMULTI)
   {
-    FTextEdit = new QTextEdit(this);
+    FTextEdit = new TextEdit(this);
     appendLabel(label,FTextEdit);
     FTextEdit->setToolTip(desc);
     FTextEdit->setReadOnly(FReadOnly);
