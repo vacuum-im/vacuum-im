@@ -12,12 +12,12 @@
         <translation>Редактировать закладки</translation>
     </message>
     <message>
-        <source>Bookmark this room</source>
-        <translation>Добавить в закладки</translation>
-    </message>
-    <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
         <translation>Позволяет создавать закладки на джаббер конференции и веб-станицы</translation>
+    </message>
+    <message>
+        <source>Append to bookmarks</source>
+        <translation>Добавить в закладки</translation>
     </message>
 </context>
 <context>

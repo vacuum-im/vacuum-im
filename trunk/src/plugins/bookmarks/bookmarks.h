@@ -8,6 +8,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/menubargroups.h>
+#include <definations/discoitemdataroles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibookmarks.h>
 #include <interfaces/iprivatestorage.h>
@@ -17,6 +18,7 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <interfaces/iservicediscovery.h>
 #include <utils/menu.h>
 #include "editbookmarkdialog.h"
 #include "editbookmarksdialog.h"
@@ -57,8 +59,11 @@ protected slots:
   void onStorageDataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
   void onStorageDataError(const QString &AId, const QString &AError);
   void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
+  void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
+  void onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu);
   void onBookmarkActionTriggered(bool);
-  void onAddBookmarkActionTriggered(bool);
+  void onAddRoomBookmarkActionTriggered(bool);
+  void onAddDiscoBookmarkActionTriggered(bool);
   void onEditBookmarksActionTriggered(bool);
   void onEditBookmarksDialogDestroyed();
   void onAccountChanged(const QString &AName, const QVariant &AValue);
@@ -70,6 +75,7 @@ private:
   IAccountManager *FAccountManager;
   IMultiUserChatPlugin *FMultiChatPlugin;
   IXmppUriQueries *FXmppUriQueries;
+  IServiceDiscovery *FDiscovery;
 private:
   Menu *FBookMarksMenu;
   QMap<Jid, Menu *> FStreamMenu;

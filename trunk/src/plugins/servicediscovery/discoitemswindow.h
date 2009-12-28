@@ -40,13 +40,13 @@ public:
   virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
   virtual ToolBarChanger *actionsBarChanger() const { return FActionsBarChanger; }
   virtual void discover(const Jid AContactJid, const QString &ANode);
-public:
-  virtual QMenu *createPopupMenu() { return NULL; }
 signals:
   virtual void discoverChanged(const Jid AContactJid, const QString &ANode);
   virtual void currentIndexChanged(const QModelIndex &AIndex);
   virtual void indexContextMenu(const QModelIndex &AIndex, Menu *AMenu);
   virtual void windowDestroyed(IDiscoItemsWindow *AWindow);
+public:
+  virtual QMenu *createPopupMenu() { return NULL; }
 protected:
   void initialize();
   void createToolBarActions();

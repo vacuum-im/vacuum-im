@@ -6,7 +6,10 @@
 
 #define ADR_STREAM_JID          Action::DR_StreamJid
 #define ADR_BOOKMARK_INDEX      Action::DR_Parametr1
-#define ADR_ROOMJID             Action::DR_Parametr2
+#define ADR_ROOM_JID            Action::DR_Parametr2
+#define ADR_DISCO_JID           Action::DR_Parametr2
+#define ADR_DISCO_NODE          Action::DR_Parametr3
+#define ADR_DISCO_NAME          Action::DR_Parametr4
 #define ADR_GROUP_SHIFT         Action::DR_Parametr1
 
 BookMarks::BookMarks()
@@ -18,6 +21,7 @@ BookMarks::BookMarks()
   FAccountManager = NULL;
   FMultiChatPlugin = NULL;
   FXmppUriQueries = NULL;
+  FDiscovery = NULL;
   
   FBookMarksMenu = NULL;
 }
@@ -93,6 +97,16 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
   plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
   if (plugin)
     FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+
+  plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
+  if (plugin)
+  {
+    FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+    if (FDiscovery)
+    {
+      connect(FDiscovery->instance(), SIGNAL(discoItemsWindowCreated(IDiscoItemsWindow *)),SLOT(onDiscoItemsWindowCreated(IDiscoItemsWindow *)));
+    }
+  }
 
   return FStorage!=NULL;
 }
@@ -330,13 +344,31 @@ void BookMarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
   if (roomMenu)
   {
     Action *action = new Action(roomMenu);
-    action->setText(tr("Bookmark this room"));
+    action->setText(tr("Append to bookmarks"));
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
     action->setData(ADR_STREAM_JID,AWindow->streamJid().full());
-    action->setData(ADR_ROOMJID,AWindow->roomJid().bare());
-    connect(action,SIGNAL(triggered(bool)),SLOT(onAddBookmarkActionTriggered(bool)));
+    action->setData(ADR_ROOM_JID,AWindow->roomJid().bare());
+    connect(action,SIGNAL(triggered(bool)),SLOT(onAddRoomBookmarkActionTriggered(bool)));
     roomMenu->addAction(action,AG_MURM_BOOKMARKS,true);
   }
+}
+
+void BookMarks::onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow)
+{
+  connect(AWindow->instance(),SIGNAL(indexContextMenu(const QModelIndex &, Menu *)),SLOT(onDiscoIndexContextMenu(const QModelIndex &, Menu *)));
+}
+
+void BookMarks::onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu)
+{
+  Action *action = new Action(AMenu);
+  action->setText(tr("Append to bookmarks"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
+  action->setData(ADR_STREAM_JID,AIndex.data(DIDR_STREAM_JID));
+  action->setData(ADR_DISCO_JID,AIndex.data(DIDR_JID));
+  action->setData(ADR_DISCO_NODE,AIndex.data(DIDR_NODE));
+  action->setData(ADR_DISCO_NAME,AIndex.data(DIDR_NAME));
+  connect(action,SIGNAL(triggered(bool)),SLOT(onAddDiscoBookmarkActionTriggered(bool)));
+  AMenu->addAction(action, TBG_DIWT_DISCOVERY_ACTIONS, true);
 }
 
 void BookMarks::onBookmarkActionTriggered(bool)
@@ -351,13 +383,13 @@ void BookMarks::onBookmarkActionTriggered(bool)
   }
 }
 
-void BookMarks::onAddBookmarkActionTriggered(bool)
+void BookMarks::onAddRoomBookmarkActionTriggered(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
-    Jid roomJid = action->data(ADR_ROOMJID).toString();
+    Jid roomJid = action->data(ADR_ROOM_JID).toString();
     IMultiUserChatWindow *window = FMultiChatPlugin->multiChatWindow(streamJid,roomJid);
     if (window)
     {
@@ -368,6 +400,40 @@ void BookMarks::onAddBookmarkActionTriggered(bool)
       bookmark.password = window->multiUserChat()->password();
       bookmark.autojoin = false;
       if (execEditBookmarkDialog(&bookmark,window->instance()) == QDialog::Accepted)
+        addBookmark(streamJid,bookmark);
+    }
+  }
+}
+
+void BookMarks::onAddDiscoBookmarkActionTriggered(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    Jid streamJid = action->data(ADR_STREAM_JID).toString();
+    QString discoJid = action->data(ADR_DISCO_JID).toString();
+    QString discoNode = action->data(ADR_DISCO_NODE).toString();
+    QString discoName = action->data(ADR_DISCO_NAME).toString();
+    if (streamJid.isValid() && !discoJid.isEmpty())
+    {
+      QUrl url;
+      url.setScheme("xmpp");
+      url.setQueryDelimiters('=',';');
+      url.setPath(discoJid);
+
+      QList< QPair<QString, QString> > queryItems;
+      queryItems << qMakePair(QString("disco"),QString()) << qMakePair(QString("type"),QString("get")) << qMakePair(QString("request"),QString("items"));
+      if (!discoNode.isEmpty())
+        queryItems << qMakePair(QString("node"),discoNode);
+      url.setQueryItems(queryItems);
+
+      IBookMark bookmark;
+      bookmark.name = "XMPP: ";
+      bookmark.name += !discoName.isEmpty() ? discoName + " | " : "";
+      bookmark.name += discoJid;
+      bookmark.name += !discoNode.isEmpty() ? " | " + discoNode : "";
+      bookmark.url = url.toString().replace("?disco=;","?disco;");
+      if (execEditBookmarkDialog(&bookmark,NULL) == QDialog::Accepted)
         addBookmark(streamJid,bookmark);
     }
   }
