@@ -13,6 +13,28 @@
 #include <interfaces/idataforms.h>
 #include <utils/jid.h>
 
+class TextEdit : 
+  public QTextEdit
+{
+  Q_OBJECT;
+public:
+  TextEdit(QWidget *AParent) : QTextEdit(AParent) {}
+  ~TextEdit() {}
+  virtual QSize sizeHint() const { return minimumSizeHint(); }
+  virtual QSize minimumSizeHint() const { return QSize(100, fontMetrics().lineSpacing()*5); }
+};
+
+class ListWidget : 
+  public QListWidget
+{
+  Q_OBJECT;
+public:
+  ListWidget(QWidget *AParent) : QListWidget(AParent) {};
+  ~ListWidget() {};
+  virtual QSize sizeHint() const { return minimumSizeHint(); }
+  virtual QSize minimumSizeHint() const { return QSize(100, fontMetrics().lineSpacing()*5); }
+};
+
 class DataFieldWidget : 
   public QWidget,
   public IDataFieldWidget
@@ -44,11 +66,12 @@ private:
   QLineEdit *FLineEdit;
   QComboBox *FComboBox;
   QCheckBox *FCheckBox;
-  QTextEdit *FTextEdit;
   QDateEdit *FDateEdit;
   QTimeEdit *FTimeEdit;
-  QListWidget *FListWidget;
   QDateTimeEdit *FDateTimeEdit;
+private:
+  TextEdit *FTextEdit;
+  ListWidget *FListWidget;
 private:
   bool FReadOnly;
   IDataField FField;    
