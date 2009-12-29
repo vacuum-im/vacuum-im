@@ -1078,8 +1078,11 @@ void MultiUserChatWindow::showHistory()
     QList<IArchiveHeader> headers = FMessageArchiver->loadLocalHeaders(FMultiChat->streamJid(), request);
     for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
     {
-      IArchiveCollection collection = FMessageArchiver->loadLocalCollection(FMultiChat->streamJid(), headers.at(i));
-      history = collection.messages + history;
+      if (headers.at(i).with.resource().isEmpty())
+      {
+        IArchiveCollection collection = FMessageArchiver->loadLocalCollection(FMultiChat->streamJid(), headers.at(i));
+        history = collection.messages + history;
+      }
     }
 
     showTopic(FMultiChat->subject());
