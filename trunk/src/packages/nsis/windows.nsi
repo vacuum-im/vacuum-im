@@ -1,28 +1,28 @@
-; vacuum-im.nsi
+; windows.nsi
 ;
-; This script creates vacuum-im installer for windows
+; This script creates Vacuum-IM installer for windows
 ;--------------------------------
 
-; Install Folder
-!define PROGRAM_FOLDER      "Vacuum IM"
+; Program Version
+!define PROGRAM_VERSION     "0.0.0.Preview"
 
-; Install Start Menu Folder
-!define PROGRAM_SM_FOLDER   "Vacuum IM"
+; Install Folder
+!define PROGRAM_FOLDER      "VacuumIM"
 
 ; Registry Key
 !define PROGRAM_REG_KEY     "VacuumIM"
 
+; Install Start Menu Folder
+!define PROGRAM_SM_FOLDER   "Vacuum-IM"
+
 ; Program binaries
 !define PROGRAM_BIN_FOLDER  "..\..\.."
 
-; Qt folder
-!define QT_BIN_FOLDER       "$%QTDIR%"
-
 ; The name of the installer
-Name "Vacuum IM"
+Name "Vacuum-IM"
 
 ; The file to write
-OutFile "vacuum_setup.exe"
+OutFile "VacuumIM-${PROGRAM_VERSION}-windows-installer.exe"
 
 ; License file name
 LicenseData "${PROGRAM_BIN_FOLDER}\COPYING"
@@ -62,6 +62,7 @@ Section "VacuumIM (required)"
 
   ; Info files
   File "${PROGRAM_BIN_FOLDER}\README"
+  File "${PROGRAM_BIN_FOLDER}\COPYING"
 	
   ; Binaries
   File "${PROGRAM_BIN_FOLDER}\vacuum.exe"
@@ -69,41 +70,36 @@ Section "VacuumIM (required)"
 
   ; OpenSSL libraries
   File "${PROGRAM_BIN_FOLDER}\libeay32.dll"
-  File "${PROGRAM_BIN_FOLDER}\libssl32.dll"
+  File "${PROGRAM_BIN_FOLDER}\ssleay32.dll"
 	
-	; Visual Studio redistribute files
+  ; Visual Studio redistribute files
   File "${PROGRAM_BIN_FOLDER}\msvcr90.dll"
 	
-	; MinGW redistribute files
+  ; MinGW redistribute files
   ;File "${PROGRAM_BIN_FOLDER}\libgcc_s_dw2-1.dll"
   ;File "${PROGRAM_BIN_FOLDER}\mingwm10.dll"
 
   ; Qt modules
-  File "${QT_BIN_FOLDER}\bin\QtCore4.dll"
-  File "${QT_BIN_FOLDER}\bin\QtGui4.dll"
-  File "${QT_BIN_FOLDER}\bin\QtNetwork4.dll"
-  File "${QT_BIN_FOLDER}\bin\QtXml4.dll"
-  File "${QT_BIN_FOLDER}\bin\QtWebkit4.dll"
+  File "${PROGRAM_BIN_FOLDER}\QtCore4.dll"
+  File "${PROGRAM_BIN_FOLDER}\QtGui4.dll"
+  File "${PROGRAM_BIN_FOLDER}\QtNetwork4.dll"
+  File "${PROGRAM_BIN_FOLDER}\QtXml4.dll"
+  File "${PROGRAM_BIN_FOLDER}\QtWebkit4.dll"
 
-	; Qt plugins
-	SetOutPath $INSTDIR\imageformats
-  File "${QT_BIN_FOLDER}\plugins\imageformats\qgif4.dll"
-  File "${QT_BIN_FOLDER}\plugins\imageformats\qico4.dll"
-  File "${QT_BIN_FOLDER}\plugins\imageformats\qjpeg4.dll"
-  File "${QT_BIN_FOLDER}\plugins\imageformats\qmng4.dll"
-  File "${QT_BIN_FOLDER}\plugins\imageformats\qsvg4.dll"
-  File "${QT_BIN_FOLDER}\plugins\imageformats\qtiff4.dll"
+  ; Qt plugins
+  SetOutPath $INSTDIR\imageformats
+  File /r /x .svn "${PROGRAM_BIN_FOLDER}\imageformats\*.*"
 
   ; Plugins
-	SetOutPath $INSTDIR\plugins
+  SetOutPath $INSTDIR\plugins
   File /r /x .svn "${PROGRAM_BIN_FOLDER}\plugins\*.*"
 	
-	; Resources
-	SetOutPath $INSTDIR\resources
+  ; Resources
+  SetOutPath $INSTDIR\resources
   File /r /x .svn "${PROGRAM_BIN_FOLDER}\resources\*.*"
 	
-	; Translations
-	SetOutPath $INSTDIR\translations
+  ; Translations
+  SetOutPath $INSTDIR\translations
   File /r /x .svn "${PROGRAM_BIN_FOLDER}\translations\*.*"
 	
   ; Write the installation path into the registry
@@ -122,13 +118,13 @@ Section "Start Menu Shortcuts"
 
   CreateDirectory "$SMPROGRAMS\${PROGRAM_SM_FOLDER}"
   CreateShortCut "$SMPROGRAMS\${PROGRAM_SM_FOLDER}\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  CreateShortCut "$SMPROGRAMS\${PROGRAM_SM_FOLDER}\Vacuum IM.lnk" "$INSTDIR\vacuum.exe" "" "$INSTDIR\vacuum.exe" 0
+  CreateShortCut "$SMPROGRAMS\${PROGRAM_SM_FOLDER}\Vacuum-IM.lnk" "$INSTDIR\vacuum.exe" "" "$INSTDIR\vacuum.exe" 0
   
 SectionEnd
 
 Section "Desktop Shortcuts"
 
-  CreateShortCut "$DESKTOP\Vacuum IM.lnk" "$INSTDIR\vacuum.exe" "" "$INSTDIR\vacuum.exe" 0
+  CreateShortCut "$DESKTOP\Vacuum-IM.lnk" "$INSTDIR\vacuum.exe" "" "$INSTDIR\vacuum.exe" 0
   
 SectionEnd
 
@@ -143,7 +139,7 @@ Section "Uninstall"
   DeleteRegKey HKLM "SOFTWARE\${PROGRAM_REG_KEY}"
 
   ; Remove desktop icon
-  Delete "$DESKTOP\Vacuum IM.lnk"
+  Delete "$DESKTOP\Vacuum-IM.lnk"
 	
   ; Remove directories used
   RMDir /r "$SMPROGRAMS\${PROGRAM_SM_FOLDER}"
