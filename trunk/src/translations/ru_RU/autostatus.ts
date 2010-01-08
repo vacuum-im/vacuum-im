@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Status changed automatically to &apos;away&apos;</source>
-        <translation>Статус автоматически зменен на &apos;ушел&apos;</translation>
+        <translation>Статус автоматически изменен на &apos;ушел&apos;</translation>
     </message>
     <message>
         <source>Auto Status</source>
