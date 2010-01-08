@@ -1,6 +1,5 @@
 #include "servicediscovery.h"
 
-#include <QDebug>
 #include <QFile>
 #include <QCryptographicHash>
 
@@ -706,7 +705,7 @@ void ServiceDiscovery::removeDiscoInfo(const Jid &AStreamJid, const Jid &AContac
     QMap<QString, IDiscoInfo> &dnodeInfo = FDiscoInfo[AStreamJid][AContactJid];
     IDiscoInfo dinfo = dnodeInfo.take(ANode);
     if (dnodeInfo.isEmpty())
-      FDiscoInfo.remove(AContactJid);
+      FDiscoInfo[AStreamJid].remove(AContactJid);
     emit discoInfoRemoved(dinfo);
   }
 }
