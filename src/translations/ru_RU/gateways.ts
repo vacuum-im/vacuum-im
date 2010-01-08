@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>Add Legacy User</source>
-        <translation>Доабвить пользователя</translation>
+        <translation>Добавить пользователя</translation>
     </message>
     <message>
         <source>Log Out</source>
