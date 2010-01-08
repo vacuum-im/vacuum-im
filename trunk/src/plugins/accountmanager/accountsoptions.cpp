@@ -1,11 +1,12 @@
 #include "accountsoptions.h"
 
+#include <QHeaderView>
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QTextDocument>
 
 #define COL_NAME                0
-#define COL_ID                  1
+#define COL_JID                 1
 
 AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : QWidget(AParent)
 {
@@ -16,11 +17,14 @@ AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : Q
   {
     QTreeWidgetItem *item = appendAccount(account->accountId(),account->name());
     item->setCheckState(COL_NAME,account->isActive() ? Qt::Checked : Qt::Unchecked);
-    item->setText(COL_ID,account->streamJid().full());
+    item->setText(COL_JID,account->streamJid().full());
   }
 
   ui.trwAccounts->setHeaderLabels(QStringList() << tr("Name") << tr("Jabber ID"));
   ui.trwAccounts->sortByColumn(COL_NAME,Qt::AscendingOrder);
+
+  ui.trwAccounts->header()->setResizeMode(COL_NAME, QHeaderView::ResizeToContents);
+  ui.trwAccounts->header()->setResizeMode(COL_JID, QHeaderView::Stretch);
 
   connect(ui.pbtAdd,SIGNAL(clicked(bool)),SLOT(onAccountAdd()));
   connect(ui.pbtRemove,SIGNAL(clicked(bool)),SLOT(onAccountRemove()));
@@ -60,7 +64,7 @@ void AccountsOptions::apply()
           QMessageBox::warning(NULL,tr("Not valid account"),tr("Account %1 is not valid, change its Jabber ID").arg(Qt::escape(account->name())));
       }
       it.value()->setText(COL_NAME,account->name());
-      it.value()->setText(COL_ID,account->streamJid().full());
+      it.value()->setText(COL_JID,account->streamJid().full());
       account->setActive(it.value()->checkState(COL_NAME) == Qt::Checked);
       it.value()->setCheckState(COL_NAME, account->isActive() ? Qt::Checked : Qt::Unchecked);
       curAccounts.append(account);
