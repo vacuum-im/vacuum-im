@@ -1,7 +1,6 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
-#include <QPicture>
 #include <definations/accountvaluenames.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iaccountmanager.h>
@@ -20,9 +19,9 @@ public:
   InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid);
   ~InfoWidget();
   virtual QWidget *instance() { return this; }
-  virtual const Jid &streamJid() const { return FStreamJid; }
+  virtual const Jid &streamJid() const;
   virtual void setStreamJid(const Jid &AStreamJid);
-  virtual const Jid &contactJid() const { return FContactJid; }
+  virtual const Jid &contactJid() const;
   virtual void setContactJid(const Jid &AContactJid);
   virtual void autoUpdateFields();
   virtual void autoUpdateField(InfoField AField);

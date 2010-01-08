@@ -1,16 +1,11 @@
 #include "infowidget.h"
 
 #include <QMovie>
-#include <QDataStream>
 #include <QImageReader>
 
 InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
-  ui.lblAvatar->setVisible(false);
-  ui.wdtAccount->setVisible(false);
-  ui.wdtStatus->setVisible(false);
-  ui.lblStatus->setMaximumHeight(ui.lblStatus->fontMetrics().height()*4+1);
 
   FAccount = NULL;
   FRoster = NULL;
@@ -31,6 +26,11 @@ InfoWidget::~InfoWidget()
 
 }
 
+const Jid &InfoWidget::streamJid() const
+{
+  return FStreamJid;
+}
+
 void InfoWidget::setStreamJid(const Jid &AStreamJid)
 {
   if (FStreamJid != AStreamJid)
@@ -41,6 +41,11 @@ void InfoWidget::setStreamJid(const Jid &AStreamJid)
     autoUpdateFields();
     emit streamJidChanged(befour);
   }
+}
+
+const Jid &InfoWidget::contactJid() const
+{
+  return FContactJid;
 }
 
 void InfoWidget::setContactJid(const Jid &AContactJid)
@@ -74,21 +79,22 @@ void InfoWidget::autoUpdateField(InfoField AField)
   {
   case AccountName:
     {
-      setField(AField,FAccount!=NULL ? FAccount->name() : QString());
+      setField(AField, FAccount!=NULL ? FAccount->name() : FStreamJid.full());
       break;
-    };
+    }
   case ContactName:
     {
-      QString contactName;
+      QString name;
       if (!(FStreamJid && FContactJid))
-        contactName = FRoster ? FRoster->rosterItem(FContactJid).name : FContactJid.node();
+      {
+        IRosterItem ritem = FRoster ? FRoster->rosterItem(FContactJid) : IRosterItem();
+        name = ritem.isValid && !ritem.name.isEmpty() ? ritem.name : (!FContactJid.node().isEmpty() ? FContactJid.node() : FContactJid.bare());
+      }
       else
-        contactName = FContactJid.resource();
-      if (contactName.isEmpty())
-        contactName = FContactJid.bare();
-      setField(AField,contactName);
+        name = FContactJid.resource();
+      setField(AField,name);
       break;
-    };
+    }
   case ContactShow:
     {
       setField(AField,FPresence!=NULL ? FPresence->presenceItem(FContactJid).show : IPresence::Offline);
@@ -96,14 +102,14 @@ void InfoWidget::autoUpdateField(InfoField AField)
     }
   case ContactStatus:
     {
-      setField(AField,FPresence!=NULL ? FPresence->presenceItem(FContactJid).status : QString());
+      setField(AField,FPresence!=NULL ? FPresence->presenceItem(FContactJid).status : QString::null);
       break;
-    };
+    }
   case ContactAvatar:
     {
-      setField(AField, FAvatars!=NULL ? FAvatars->avatarFileName(FAvatars->avatarHash(FContactJid)) : QString());
+      setField(AField, FAvatars!=NULL ? FAvatars->avatarFileName(FAvatars->avatarHash(FContactJid)) : QString::null);
       break;
-    };
+    }
   }
 }
 
@@ -172,15 +178,13 @@ void InfoWidget::initialize()
     {
       if (FAccount)
       {
-        disconnect(FAccount->instance(),SIGNAL(changed(const QString &, const QVariant &)),
-          this, SLOT(onAccountChanged(const QString &, const QVariant &)));
+        disconnect(FAccount->instance(),SIGNAL(changed(const QString &, const QVariant &)), this, SLOT(onAccountChanged(const QString &, const QVariant &)));
       }
 
       FAccount = accountManager->accountByStream(FStreamJid);
       if (FAccount)
       {
-        connect(FAccount->instance(),SIGNAL(changed(const QString &, const QVariant &)),
-          SLOT(onAccountChanged(const QString &, const QVariant &)));
+        connect(FAccount->instance(),SIGNAL(changed(const QString &, const QVariant &)),SLOT(onAccountChanged(const QString &, const QVariant &)));
       }
     }
   }
@@ -193,15 +197,13 @@ void InfoWidget::initialize()
     {
       if (FRoster)
       {
-        disconnect(FRoster->instance(),SIGNAL(received(const IRosterItem &)),
-          this, SLOT(onRosterItemReceived(const IRosterItem &)));
+        disconnect(FRoster->instance(),SIGNAL(received(const IRosterItem &)), this, SLOT(onRosterItemReceived(const IRosterItem &)));
       }
 
       FRoster = rosterPlugin->getRoster(FStreamJid);
       if (FRoster)
       {
-        connect(FRoster->instance(),SIGNAL(received(const IRosterItem &)),
-          SLOT(onRosterItemReceived(const IRosterItem &)));
+        connect(FRoster->instance(),SIGNAL(received(const IRosterItem &)), SLOT(onRosterItemReceived(const IRosterItem &)));
       }
     }
   }
@@ -214,15 +216,13 @@ void InfoWidget::initialize()
     {
       if (FPresence)
       {
-        disconnect(FPresence->instance(),SIGNAL(received(const IPresenceItem &)),
-          this, SLOT(onPresenceReceived(const IPresenceItem &)));
+        disconnect(FPresence->instance(),SIGNAL(received(const IPresenceItem &)), this, SLOT(onPresenceReceived(const IPresenceItem &)));
       }
 
       FPresence = presencePlugin->getPresence(FStreamJid);
       if (FPresence)
       {
-        connect(FPresence->instance(),SIGNAL(received(const IPresenceItem &)),
-          SLOT(onPresenceReceived(const IPresenceItem &)));
+        connect(FPresence->instance(),SIGNAL(received(const IPresenceItem &)), SLOT(onPresenceReceived(const IPresenceItem &)));
       }
     }
   }
@@ -246,23 +246,32 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
     {
       QString name = field(AField).toString();
       ui.lblAccount->setText(Qt::escape(name));
-      ui.wdtAccount->setVisible(isFieldVisible(AField) && !name.isEmpty());
+      ui.lblAccount->setVisible(isFieldVisible(AField) && !name.isEmpty());
+      ui.lblLabelAccount->setVisible(isFieldVisible(AField) && !name.isEmpty());
       break;
-    };
+    }
   case ContactName:
     {
       QString name = field(AField).toString();
-      ui.lblName->setText(QString("<b>%1</b> (%2)").arg(Qt::escape(name)).arg(FContactJid.hFull()));
+
+      IRosterItem ritem = FRoster ? FRoster->rosterItem(FContactJid) : IRosterItem();
+      if (isFiledAutoUpdated(AField) && ritem.name.isEmpty())
+        ui.lblName->setText(FContactJid.hFull());
+      else
+        ui.lblName->setText(QString("<b>%1</b> - %2").arg(Qt::escape(name)).arg(FContactJid.hFull()));
+
       ui.lblName->setVisible(isFieldVisible(AField));
+      ui.lblLabelName->setVisible(isFieldVisible(AField));
       break;
-    };
+    }
   case ContactStatus:
     {
       QString status = field(AField).toString();
       ui.lblStatus->setText(Qt::escape(status));
-      ui.wdtStatus->setVisible(isFieldVisible(AField) && !status.isEmpty());
+      ui.lblStatus->setVisible(isFieldVisible(AField) && !status.isEmpty());
+      ui.lblLabelStatus->setVisible(isFieldVisible(AField) && !status.isEmpty());
       break;
-    };
+    }
   case ContactAvatar:
     {
       if (ui.lblAvatar->movie()!=NULL)
@@ -285,14 +294,15 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
       ui.lblAvatar->setVisible(isFieldVisible(AField) && !fileName.isEmpty());
 
       break;
-    };
+    }
   default:
     break;
   }
 }
 
-void InfoWidget::onAccountChanged(const QString &AName, const QVariant &/*AValue*/)
+void InfoWidget::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
+  Q_UNUSED(AValue);
   if (isFiledAutoUpdated(AccountName) && AName == AVN_NAME)
     autoUpdateField(AccountName);
 }
