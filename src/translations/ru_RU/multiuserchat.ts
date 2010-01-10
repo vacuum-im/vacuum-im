@@ -725,15 +725,15 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1 has been kicked from the room%2. %3</source>
-        <translation>%1 был выкинут из комнаты %2. %3</translation>
+        <translation>%1 был выкинут из комнаты%2. %3</translation>
     </message>
     <message>
         <source> by %1</source>
-        <translation>%1</translation>
+        <translation> модератором %1</translation>
     </message>
     <message>
         <source>%1 has been banned from the room%2. %3</source>
-        <translation>%1 был забанен в комнате %2. %3</translation>
+        <translation>%1 был забанен в комнате%2. %3</translation>
     </message>
     <message>
         <source>Edit ban list - %1</source>
@@ -861,7 +861,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1 changed status to [%2] %3</source>
-        <translation>%1изменил статус на [%2] %3</translation>
+        <translation>%1 изменил статус на [%2] %3</translation>
     </message>
     <message>
         <source>Role: %1</source>
