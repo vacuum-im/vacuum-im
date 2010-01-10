@@ -82,6 +82,7 @@ protected:
   void fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const;
   QString loadFileData(const QString &AFileName, const QString &DefValue) const;
   void loadTemplates();
+  void loadSenderColors();
   void initStyleSettings();
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
@@ -107,6 +108,7 @@ private:
 private:
   QString FStylePath;
   QList<QString> FVariants;
+  QList<QString> FSenderColors;
   QMap<QString, QVariant> FInfo;
   QMap<QWidget *, WidgetStatus> FWidgetStatus;
 };

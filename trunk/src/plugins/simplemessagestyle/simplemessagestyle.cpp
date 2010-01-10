@@ -36,6 +36,7 @@ SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QObject *APare
   FVariants = styleVariants(AStylePath);
   initStyleSettings();
   loadTemplates();
+  loadSenderColors();
   connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
 }
 
@@ -68,6 +69,8 @@ QWidget *SimpleMessageStyle::createWidget(const IMessageStyleOptions &AOptions, 
 
 QString SimpleMessageStyle::senderColor(const QString &ASenderId) const
 {
+  if (!FSenderColors.isEmpty())
+    return FSenderColors.at(qHash(ASenderId) % FSenderColors.count());
   return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
@@ -372,6 +375,13 @@ void SimpleMessageStyle::loadTemplates()
 
   FTopicHTML =           loadFileData(FStylePath+"/Topic.html",QString::null);
   FStatusHTML =          loadFileData(FStylePath+"/Status.html",FIn_ContentHTML);
+}
+
+void SimpleMessageStyle::loadSenderColors()
+{
+  QFile colors(FStylePath+"/Incoming/SenderColors.txt");
+  if (colors.open(QFile::ReadOnly))
+    FSenderColors = QString::fromUtf8(colors.readAll()).split(':',QString::SkipEmptyParts);
 }
 
 void SimpleMessageStyle::initStyleSettings()
