@@ -2,6 +2,7 @@
     <shortName>VacuumIM</shortName>
     <fullName>Vacuum-IM</fullName>
     <version>0.0.0.Preview</version>
+    <installerFilename></installerFilename>
     <readmeFile>../../../README</readmeFile>
     <licenseFile>../../../COPYING</licenseFile>
     <logoImage>../../../resources/menuicons/shared/mainwindowlogo48.png</logoImage>
@@ -113,7 +114,7 @@
                     <platforms>linux</platforms>
                     <distributionFileList>
                         <distributionDirectory>
-                            <origin>../../translations</origin>
+                            <origin>../../../translations</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
