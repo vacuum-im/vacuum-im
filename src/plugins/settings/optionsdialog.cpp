@@ -36,7 +36,7 @@ OptionsDialog::OptionsDialog(SettingsPlugin *ASessingsPlugin, QWidget *AParent) 
   ISettings *settings = FSettingsPlugin->settingsForPlugin(SETTINGS_UUID);
   restoreGeometry(settings->loadBinaryData(BDI_OPTIONS_DIALOG_GEOMETRY));
   if (!ui.sprSplitter->restoreState(settings->loadBinaryData(BDI_OPTIONS_DIALOG_SPLITTER)))
-    ui.trvNodes->setMaximumWidth(150);
+    ui.sprSplitter->setSizes(QList<int>() << 150 << 450);
 
   FNodesModel = new QStandardItemModel(ui.trvNodes);
   FNodesModel->setColumnCount(1);
