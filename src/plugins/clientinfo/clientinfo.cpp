@@ -1,5 +1,10 @@
 #include "clientinfo.h"
 
+#include <QDir>
+#include <QProcess>
+#include <QFileInfo>
+#include <QTextStream>
+
 #if defined(Q_OS_UNIX)
 # include <sys/utsname.h>
 #endif
@@ -419,7 +424,7 @@ QString ClientInfo::osVersion() const
   static QString osver;
   if(osver.isEmpty())
   {
-#if defined(Q_OS_MAC)
+#if defined(Q_WS_MAC)
     switch(QSysInfo::MacintoshVersion)
     {
     case QSysInfo::MV_SNOWLEOPARD:
@@ -451,18 +456,52 @@ QString ClientInfo::osVersion() const
       osver = "MacOS (unknown)";
       break;
     }
-#elif defined(Q_OS_UNIX)
-    utsname buf;
-    if(uname(&buf) != -1)
+#elif defined(Q_WS_X11)
+    QStringList path;
+    foreach(QString env, QProcess::systemEnvironment())
+      if (env.startsWith("PATH="))
+        path = env.split('=').value(1).split(':');
+        
+    QString found;
+    foreach(QString dirname, path) 
     {
-      osver.append(buf.release).append(QLatin1Char(' '));
-      osver.append(buf.sysname).append(QLatin1Char(' '));
-      osver.append(buf.machine).append(QLatin1Char(' '));
-      osver.append(QLatin1String(" (")).append(buf.machine).append(QLatin1Char(')'));
+      QDir dir(dirname);
+      QFileInfo cand(dir.filePath("lsb_release"));
+      if (cand.isExecutable()) 
+      {
+        found = cand.absoluteFilePath();
+        break;
+      }
     }
-    else
+
+    if (!found.isEmpty())
     {
-      osver = QLatin1String("Linux/Unix(unknown)");
+      QProcess process;
+      process.start(found, QStringList()<<"--description"<<"--short", QIODevice::ReadOnly);
+      if(process.waitForStarted())
+      {
+        QTextStream stream(&process);
+        while(process.waitForReadyRead())
+          osver += stream.readAll();
+        process.close();
+        osver = osver.trimmed();
+      }
+    }
+    
+    if (osver.isEmpty())
+    {
+      utsname buf;
+      if(uname(&buf) != -1)
+      {
+        osver.append(buf.release).append(QLatin1Char(' '));
+        osver.append(buf.sysname).append(QLatin1Char(' '));
+        osver.append(buf.machine).append(QLatin1Char(' '));
+        osver.append(QLatin1String(" (")).append(buf.machine).append(QLatin1Char(')'));
+      }
+      else
+      {
+        osver = QLatin1String("Linux/Unix (unknown)");
+      }
     }
 #elif defined(Q_WS_WIN) || defined(Q_OS_CYGWIN)
     switch(QSysInfo::WindowsVersion)
@@ -513,14 +552,6 @@ QString ClientInfo::osVersion() const
       osver = "Windows (unknown)";
       break;
     }
-
-    if(QSysInfo::WindowsVersion & QSysInfo::WV_CE_based)
-      osver.append(" (CE-based)");
-    else if(QSysInfo::WindowsVersion & QSysInfo::WV_NT_based)
-      osver.append(" (NT-based)");
-    else if(QSysInfo::WindowsVersion & QSysInfo::WV_DOS_based)
-      osver.append(" (MS-DOS-based)");
-
 #else
     osver = "Unknown";
 #endif
