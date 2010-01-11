@@ -203,6 +203,12 @@ void PluginManager::loadSettings()
     if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
       FDataPath = dir.absolutePath();
   }
+  if (FDataPath.isNull())
+  {
+    QDir dir(qApp->applicationDirPath());
+    if (dir.exists(DIR_APP_DATA) && dir.cd(DIR_APP_DATA))
+      FDataPath = dir.absolutePath();
+  }
   if (FDataPath.isNull() && !settings.value(SVN_DATA_PATH).toString().isEmpty())
   {
     QDir dir(settings.value(SVN_DATA_PATH).toString());
