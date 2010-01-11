@@ -1414,10 +1414,12 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 
       if (FMultiChat->isOpen())
       {
-        QString message = tr("%1 (%2) has joined the room. %3");
-        message = message.arg(AUser->nickName());
-        message = message.arg(AUser->data(MUDR_REAL_JID).toString());
-        message = message.arg(AStatus);
+        QString message;
+        QString realJid = AUser->data(MUDR_REAL_JID).toString();
+        if (!realJid.isEmpty())
+          message = tr("%1 <%2> has joined the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
+        else
+          message = tr("%1 has joined the room. %2").arg(AUser->nickName()).arg(AStatus);
         showMessage(message);
       }
     }
@@ -1429,10 +1431,12 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
   {
     if (!showStatusCodes(AUser->nickName(),FMultiChat->statusCodes()) && FMultiChat->isOpen())
     {
-      QString message = tr("%1 (%2) has left the room. %3");
-      message = message.arg(AUser->nickName());
-      message = message.arg(AUser->data(MUDR_REAL_JID).toString());
-      message = message.arg(AStatus);
+      QString message;
+      QString realJid = AUser->data(MUDR_REAL_JID).toString();
+      if (!realJid.isEmpty())
+        message = tr("%1 <%2> has left the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
+      else
+        message = tr("%1 has left the room. %2").arg(AUser->nickName()).arg(AStatus);
       showMessage(message);
     }
     FUsers.remove(AUser);

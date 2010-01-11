@@ -692,14 +692,6 @@ Check values and try again</source>
         <translation>Ошибка от %1: %2</translation>
     </message>
     <message>
-        <source>%1 (%2) has joined the room. %3</source>
-        <translation>%1 (%2) присоединился к комнате. %3</translation>
-    </message>
-    <message>
-        <source>%1 (%2) has left the room. %3</source>
-        <translation>%1 (%2) вышел из комнаты. %3</translation>
-    </message>
-    <message>
         <source>%1 role changed from %2 to %3</source>
         <translation>Тип пользователя %1 был изменен с %2 на %3</translation>
     </message>
@@ -886,6 +878,22 @@ Check values and try again</source>
     <message>
         <source>Ctrl+F4</source>
         <translation>Ctrl+F4</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has joined the room. %3</source>
+        <translation>%1 &lt;%2&gt; присоединился к комнате. %3</translation>
+    </message>
+    <message>
+        <source>%1 has joined the room. %2</source>
+        <translation>%1 присоединился к комнате. %2</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has left the room. %3</source>
+        <translation>%1 &lt;%2&gt; вышел из комнаты. %3</translation>
+    </message>
+    <message>
+        <source>%1 has left the room. %2</source>
+        <translation>%1 вышел из комнаты. %2</translation>
     </message>
 </context>
 <context>
