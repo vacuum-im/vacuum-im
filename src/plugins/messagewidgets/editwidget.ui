@@ -18,11 +18,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="MessageEditor" name="medEditor">
-     <property name="undoRedoEnabled">
-      <bool>false</bool>
-     </property>
-    </widget>
+    <widget class="MessageEditor" name="medEditor"/>
    </item>
   </layout>
  </widget>
