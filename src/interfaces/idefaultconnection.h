@@ -11,6 +11,7 @@ public:
   enum Options {
     CO_HOST,
     CO_PORT,
+    CO_DOMAINE,
     CO_USE_SSL,
     CO_IGNORE_SSL_ERRORS,
     CO_PROXY_TYPE,
