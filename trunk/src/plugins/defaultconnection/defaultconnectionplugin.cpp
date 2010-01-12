@@ -169,12 +169,12 @@ QStringList DefaultConnectionPlugin::proxyTypeNames() const
 void DefaultConnectionPlugin::onConnectionAboutToConnect()
 {
   DefaultConnection *connection = qobject_cast<DefaultConnection*>(sender());
-  if (FXmppStreams && connection && connection->option(IDefaultConnection::CO_HOST).toString().isEmpty())
+  if (FXmppStreams && connection)
   {
     foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
       if (stream->connection() == connection)
       {
-        connection->setOption(IDefaultConnection::CO_HOST,stream->streamJid().pDomain());
+        connection->setOption(IDefaultConnection::CO_DOMAINE,stream->streamJid().pDomain());
         break;
       }
   }
