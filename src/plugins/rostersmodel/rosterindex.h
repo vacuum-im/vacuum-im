@@ -44,14 +44,14 @@ public:
   virtual bool destroyOnParentRemoved() const { return FDestroyOnParentRemoved; }
   virtual void setDestroyOnParentRemoved(bool ADestroy) {FDestroyOnParentRemoved = ADestroy; }
 signals:
-  virtual void dataChanged(IRosterIndex *AIndex, int ARole);
-  virtual void dataHolderInserted(IRosterIndexDataHolder *ADataHolder);
-  virtual void dataHolderRemoved(IRosterIndexDataHolder *ADataHolder);
-  virtual void childAboutToBeInserted(IRosterIndex *AIndex);
-  virtual void childInserted(IRosterIndex *AIndex);
-  virtual void childAboutToBeRemoved(IRosterIndex *AIndex);
-  virtual void childRemoved(IRosterIndex *AIndex);
-  virtual void indexDestroyed(IRosterIndex *AIndex);
+  void dataChanged(IRosterIndex *AIndex, int ARole);
+  void dataHolderInserted(IRosterIndexDataHolder *ADataHolder);
+  void dataHolderRemoved(IRosterIndexDataHolder *ADataHolder);
+  void childAboutToBeInserted(IRosterIndex *AIndex);
+  void childInserted(IRosterIndex *AIndex);
+  void childAboutToBeRemoved(IRosterIndex *AIndex);
+  void childRemoved(IRosterIndex *AIndex);
+  void indexDestroyed(IRosterIndex *AIndex);
 protected slots:
   void onDataHolderChanged(IRosterIndex *AIndex, int ARole);
   void onRemoveByLastChildRemoved();

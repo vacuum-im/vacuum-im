@@ -51,20 +51,20 @@ public:
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
   //ITabWindowPage
-  virtual void windowShow();
-  virtual void windowClose();
-  virtual void windowChanged();
-  virtual void windowDestroyed();
+  void windowShow();
+  void windowClose();
+  void windowChanged();
+  void windowDestroyed();
   //IMessageWindow
-  virtual void showNextMessage();
-  virtual void replyMessage();
-  virtual void forwardMessage();
-  virtual void showChatWindow();
-  virtual void messageReady();
-  virtual void streamJidChanged(const Jid &ABefour);
-  virtual void contactJidChanged(const Jid &ABefour);
-  virtual void windowActivated();
-  virtual void windowClosed();
+  void showNextMessage();
+  void replyMessage();
+  void forwardMessage();
+  void showChatWindow();
+  void messageReady();
+  void streamJidChanged(const Jid &ABefour);
+  void contactJidChanged(const Jid &ABefour);
+  void windowActivated();
+  void windowClosed();
 protected:
   void initialize();
   void saveWindowGeometry();

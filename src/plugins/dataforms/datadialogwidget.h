@@ -20,9 +20,9 @@ public:
   virtual bool allowInvalid() const { return FAllowInvalid; }
   virtual void setAllowInvalid(bool AAllowInvalid) { FAllowInvalid = AAllowInvalid; }
 signals:
-  virtual void formWidgetCreated(IDataFormWidget *AForm);
-  virtual void formWidgetDestroyed(IDataFormWidget *AForm);
-  virtual void dialogDestroyed(IDataDialogWidget *ADialog);
+  void formWidgetCreated(IDataFormWidget *AForm);
+  void formWidgetDestroyed(IDataFormWidget *AForm);
+  void dialogDestroyed(IDataDialogWidget *ADialog);
 protected slots:
   void onDialogButtonClicked(QAbstractButton *AButton);
 private:

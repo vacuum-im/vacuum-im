@@ -37,7 +37,7 @@ public:
   virtual QSslCertificate peerCertificate() const =0;
   virtual void ignoreSslErrors() =0;
   virtual QList<QSslError> sslErrors() const =0;
-signals:
+protected:
   virtual void modeChanged(QSslSocket::SslMode AMode) =0;
   virtual void sslErrors(const QList<QSslError> &AErrors) =0;
 };

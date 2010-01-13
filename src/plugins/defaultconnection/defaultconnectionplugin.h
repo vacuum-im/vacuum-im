@@ -41,9 +41,9 @@ public:
   //IDefaultConnectionPlugin
   virtual QStringList proxyTypeNames() const;
 signals:
-  virtual void connectionCreated(IConnection *AConnection);
-  virtual void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
-  virtual void connectionDestroyed(IConnection *AConnection);
+  void connectionCreated(IConnection *AConnection);
+  void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
+  void connectionDestroyed(IConnection *AConnection);
 protected slots:
   void onConnectionAboutToConnect();
   void onOptionsDialogClosed();

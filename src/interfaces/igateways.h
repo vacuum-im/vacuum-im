@@ -21,7 +21,7 @@ public:
   virtual QString sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJid) =0;
   virtual QString sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID) =0;
   virtual QDialog *showAddLegacyContactDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL) =0;
-signals:
+protected:
   virtual void promptReceived(const QString &AId, const QString &ADesc, const QString &APrompt) =0;
   virtual void userJidReceived(const QString &AId, const Jid &AUserJid) =0;
   virtual void errorReceived(const QString &AId, const QString &AError) =0;

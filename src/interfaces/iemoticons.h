@@ -18,7 +18,7 @@ public:
   virtual void removeIconset(const QString &ASubStorages) =0;
   virtual QUrl urlByKey(const QString &AKey) const =0;
   virtual QString keyByUrl(const QUrl &AUrl) const =0;
-signals:
+protected:
   virtual void iconsetInserted(const QString &ASubStorage, const QString &ABefour) =0;
   virtual void iconsetRemoved(const QString &ASubStorage) =0;
 };

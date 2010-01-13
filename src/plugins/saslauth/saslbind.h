@@ -23,8 +23,8 @@ public:
   virtual bool hookData(QByteArray &/*AData*/, Direction /*ADirection*/) { return false; }
   virtual bool hookElement(QDomElement &AElem, Direction ADirection);
 signals:
-  virtual void ready(bool ARestart); 
-  virtual void error(const QString &AError);
+  void ready(bool ARestart); 
+  void error(const QString &AError);
 protected slots:
   void onStreamClosed();
 private:

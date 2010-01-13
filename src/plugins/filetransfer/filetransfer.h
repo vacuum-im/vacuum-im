@@ -80,8 +80,8 @@ public:
   virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName = QString::null, const QString &AFileDesc = QString::null);
 signals:
   //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   void registerDiscoFeatures();
   void notifyStream(IFileStream *AStream, bool ANewStream = false);

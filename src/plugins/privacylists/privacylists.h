@@ -70,14 +70,14 @@ public:
   virtual QString removePrivacyList(const Jid &AStreamJid, const QString &AList);
   virtual QDialog *showEditListsDialog(const Jid &AStreamJid, QWidget *AParent = NULL);
 signals:
-  virtual void listAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList);
-  virtual void listLoaded(const Jid &AStreamJid, const QString &AList);
-  virtual void listRemoved(const Jid &AStreamJid, const QString &AList);
-  virtual void activeListAboutToBeChanged(const Jid &AStreamJid, const QString &AList);
-  virtual void activeListChanged(const Jid &AStreamJid, const QString &AList);
-  virtual void defaultListChanged(const Jid &AStreamJid, const QString &AList);
-  virtual void requestCompleted(const QString &AId);
-  virtual void requestFailed(const QString &AId, const QString &AError);
+  void listAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList);
+  void listLoaded(const Jid &AStreamJid, const QString &AList);
+  void listRemoved(const Jid &AStreamJid, const QString &AList);
+  void activeListAboutToBeChanged(const Jid &AStreamJid, const QString &AList);
+  void activeListChanged(const Jid &AStreamJid, const QString &AList);
+  void defaultListChanged(const Jid &AStreamJid, const QString &AList);
+  void requestCompleted(const QString &AId);
+  void requestFailed(const QString &AId, const QString &AError);
 protected:
   QString loadPrivacyLists(const Jid &AStreamJid);
   Menu *createPrivacyMenu(Menu *AMenu) const;

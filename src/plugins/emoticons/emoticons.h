@@ -56,11 +56,11 @@ public:
   virtual QUrl urlByKey(const QString &AKey) const;
   virtual QString keyByUrl(const QUrl &AUrl) const;
 signals:
-  virtual void iconsetInserted(const QString &ASubStorage, const QString &ABefour);
-  virtual void iconsetRemoved(const QString &ASubStorage);
+  void iconsetInserted(const QString &ASubStorage, const QString &ABefour);
+  void iconsetRemoved(const QString &ASubStorage);
   //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   void createIconsetUrls();
   SelectIconMenu *createSelectIconMenu(const QString &ASubStorage, QWidget *AParent);

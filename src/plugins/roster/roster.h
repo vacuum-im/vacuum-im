@@ -51,13 +51,13 @@ public:
   virtual void moveGroupToGroup(const QString &AGroup, const QString &AGroupTo);
   virtual void removeGroup(const QString &AGroup);
 signals:
-  virtual void opened();
-  virtual void received(const IRosterItem &ARosterItem);
-  virtual void removed(const IRosterItem &ARosterItem);
-  virtual void subscription(const Jid &AItemJid, int ASubsType, const QString &AText);
-  virtual void closed();
-  virtual void streamJidAboutToBeChanged(const Jid &AAfter);
-  virtual void streamJidChanged(const Jid &ABefore);
+  void opened();
+  void received(const IRosterItem &ARosterItem);
+  void removed(const IRosterItem &ARosterItem);
+  void subscription(const Jid &AItemJid, int ASubsType, const QString &AText);
+  void closed();
+  void streamJidAboutToBeChanged(const Jid &AAfter);
+  void streamJidChanged(const Jid &ABefore);
 protected:
   void processItemsElement(const QDomElement &AItemsElem, bool ACompleteRoster);
   void removeRosterItem(const Jid &AItemJid);

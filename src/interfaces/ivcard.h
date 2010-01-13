@@ -33,7 +33,7 @@ public:
   virtual bool update(const Jid &AStreamJid) =0;
   virtual bool publish(const Jid &AStreamJid) =0;
   virtual void unlock() =0;
-signals:
+protected:
   virtual void vcardUpdated() =0;
   virtual void vcardPublished() =0;
   virtual void vcardError(const QString &AError) =0;
@@ -48,7 +48,7 @@ public:
   virtual IVCard *vcard(const Jid &AContactJid) =0;
   virtual bool publishVCard(IVCard *AVCard, const Jid &AStreamJid) =0;
   virtual void showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid) =0;
-signals:
+protected:
   virtual void vcardReceived(const Jid &AContactJid) =0;
   virtual void vcardPublished(const Jid &AContactJid) =0;
   virtual void vcardError(const Jid &AContactJid, const QString &AError) =0;

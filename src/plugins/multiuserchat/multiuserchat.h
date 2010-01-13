@@ -67,38 +67,38 @@ public:
   virtual bool sendConfigForm(const IDataForm &AForm);
   virtual bool destroyRoom(const QString &AReason);
 signals:
-  virtual void chatOpened();
-  virtual void chatNotify(const QString &ANick, const QString &ANotify);
-  virtual void chatError(const QString &ANick, const QString &AError);
-  virtual void chatClosed();
-  virtual void chatDestroyed();
-  virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
+  void chatOpened();
+  void chatNotify(const QString &ANick, const QString &ANotify);
+  void chatError(const QString &ANick, const QString &AError);
+  void chatClosed();
+  void chatDestroyed();
+  void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
   //Occupant
-  virtual void userPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
-  virtual void userDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefour, const QVariant &AAfter);
-  virtual void userNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
-  virtual void presenceChanged(int AShow, const QString &AStatus);
-  virtual void serviceMessageReceived(const Message &AMessage);
-  virtual void messageReceive(const QString &ANick, Message &AMessage);
-  virtual void messageReceived(const QString &ANick, const Message &AMessage);
-  virtual void messageSend(Message &AMessage);
-  virtual void messageSent(const Message &AMessage);
-  virtual void inviteDeclined(const Jid &AContactJid, const QString &AReason);
+  void userPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
+  void userDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefour, const QVariant &AAfter);
+  void userNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
+  void presenceChanged(int AShow, const QString &AStatus);
+  void serviceMessageReceived(const Message &AMessage);
+  void messageReceive(const QString &ANick, Message &AMessage);
+  void messageReceived(const QString &ANick, const Message &AMessage);
+  void messageSend(Message &AMessage);
+  void messageSent(const Message &AMessage);
+  void inviteDeclined(const Jid &AContactJid, const QString &AReason);
   //Moderator
-  virtual void subjectChanged(const QString &ANick, const QString &ASubject);
-  virtual void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
-  virtual void dataFormMessageReceived(const Message &AMessage);
-  virtual void dataFormMessageSent(const IDataForm &AForm);
+  void subjectChanged(const QString &ANick, const QString &ASubject);
+  void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
+  void dataFormMessageReceived(const Message &AMessage);
+  void dataFormMessageSent(const IDataForm &AForm);
   //Administrator
-  virtual void userBanned(const QString &ANick, const QString &AReason, const QString &AByUser);
-  virtual void affiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList);
-  virtual void affiliationListChanged(const QList<IMultiUserListItem> &ADeltaList);
+  void userBanned(const QString &ANick, const QString &AReason, const QString &AByUser);
+  void affiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList);
+  void affiliationListChanged(const QList<IMultiUserListItem> &ADeltaList);
   //Owner
-  virtual void configFormReceived(const IDataForm &AForm);
-  virtual void configFormSent(const IDataForm &AForm);
-  virtual void configFormAccepted();
-  virtual void configFormRejected(const QString &AError);
-  virtual void roomDestroyed(const QString &AReason);
+  void configFormReceived(const IDataForm &AForm);
+  void configFormSent(const IDataForm &AForm);
+  void configFormAccepted();
+  void configFormRejected(const QString &AError);
+  void roomDestroyed(const QString &AReason);
 protected:
   void prepareMessageForReceive(Message &AMessage);
   bool processMessage(const Stanza &AStanza);

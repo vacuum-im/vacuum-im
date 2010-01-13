@@ -15,7 +15,7 @@ public:
   virtual QString saveData(const Jid &AStreamJid, const QDomElement &AElement) =0;
   virtual QString loadData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) =0;
   virtual QString removeData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) =0;
-signals:
+protected:
   virtual void storageOpened(const Jid &AStreamJid) =0;
   virtual void dataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement) =0;
   virtual void dataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement) =0;

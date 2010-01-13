@@ -143,7 +143,7 @@ public:
   virtual IDataField currentField() const =0;
   virtual IDataField dataField(int ARow, int AColumn) const =0;
   virtual IDataField dataField(int ARow, const QString &AVar) const =0;
-signals:
+protected:
   virtual void activated(int ARow, int AColumn) =0;
   virtual void changed(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn) =0;
 };
@@ -154,7 +154,7 @@ public:
   virtual QWidget *instance() =0;
   virtual IDataMedia media() const =0;
   virtual IDataMediaURI mediaUri() const =0;
-signals:
+protected:
   virtual void mediaShown() =0;
   virtual void mediaError(const QString &AError) =0;
 };
@@ -169,7 +169,7 @@ public:
   virtual QVariant value() const =0;
   virtual void setValue(const QVariant &AValue) =0;
   virtual IDataMediaWidget *mediaWidget() const =0;
-signals:
+protected:
   virtual void focusIn(Qt::FocusReason AReason) =0;
   virtual void focusOut(Qt::FocusReason AReason) =0;
 };
@@ -184,7 +184,7 @@ public:
   virtual IDataFieldWidget *fieldWidget(const QString &AVar) const =0;
   virtual IDataForm userDataForm() const =0;
   virtual const IDataForm &dataForm() const =0;
-signals:
+protected:
   virtual void cellActivated(int ARow, int AColumn) =0;
   virtual void cellChanged(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn) =0;
   virtual void fieldFocusIn(IDataFieldWidget *AField, Qt::FocusReason AReason) =0;
@@ -201,7 +201,7 @@ public:
   virtual void setForm(const IDataForm &AForm) =0;
   virtual bool allowInvalid() const =0;
   virtual void setAllowInvalid(bool AAllowInvalid) =0;
-signals:
+protected:
   virtual void formWidgetCreated(IDataFormWidget *AForm) =0;
   virtual void formWidgetDestroyed(IDataFormWidget *AForm) =0;
   virtual void dialogDestroyed(IDataDialogWidget *ADialog) =0;
@@ -258,7 +258,7 @@ public:
   virtual IDataFieldWidget *fieldWidget(const IDataField &AField, bool AReadOnly, QWidget *AParent) =0;
   virtual IDataFormWidget *formWidget(const IDataForm &AForm, QWidget *AParent) =0;
   virtual IDataDialogWidget *dialogWidget(const IDataForm &AForm, QWidget *AParent) =0;
-signals:
+protected:
   virtual void tableWidgetCreated(IDataTableWidget *ATable) =0;
   virtual void mediaWidgetCreated(IDataMediaWidget *AMedia) =0;
   virtual void fieldWidgetCreated(IDataFieldWidget *AField) =0;

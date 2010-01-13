@@ -61,11 +61,11 @@ public:
   virtual bool loadAnnotations(const Jid &AStreamJid);
   virtual bool saveAnnotations(const Jid &AStreamJid);
 signals:
-  virtual void annotationsLoaded(const Jid &AStreamJid);
-  virtual void annotationsSaved(const Jid &AStreamJid);
-  virtual void annotationsError(const Jid &AStreamJid, const QString &AError);
-  virtual void annotationModified(const Jid &AStreamJid, const Jid &AContactJid);
-  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+  void annotationsLoaded(const Jid &AStreamJid);
+  void annotationsSaved(const Jid &AStreamJid);
+  void annotationsError(const Jid &AStreamJid, const QString &AError);
+  void annotationModified(const Jid &AStreamJid, const Jid &AContactJid);
+  void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
   void updateDataHolder(const Jid &AStreamJid, const QList<Jid> &AContactJids);
 protected slots:

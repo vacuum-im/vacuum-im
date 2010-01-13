@@ -30,15 +30,15 @@ public:
   virtual QKeySequence sendKey() const;
   virtual void setSendKey(const QKeySequence &AKey);
 signals:
-  virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
-  virtual void messageAboutToBeSend();
-  virtual void messageReady();
-  virtual void editorCleared();
-  virtual void streamJidChanged(const Jid &ABefour);
-  virtual void contactJidChanged(const Jid &ABefour);
-  virtual void autoResizeChanged(bool AResize);
-  virtual void minimumLinesChanged(int ALines);
-  virtual void sendKeyChanged(const QKeySequence &AKey);
+  void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
+  void messageAboutToBeSend();
+  void messageReady();
+  void editorCleared();
+  void streamJidChanged(const Jid &ABefour);
+  void contactJidChanged(const Jid &ABefour);
+  void autoResizeChanged(bool AResize);
+  void minimumLinesChanged(int ALines);
+  void sendKeyChanged(const QKeySequence &AKey);
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected:

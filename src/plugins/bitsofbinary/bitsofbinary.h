@@ -46,9 +46,9 @@ public:
   virtual bool saveBinary(const QString &AContentId, const QString &AType, const QByteArray &AData, quint64 AMaxAge, Stanza &AStanza);
   virtual bool removeBinary(const QString &AContentId);
 signals:
-  virtual void binaryCached(const QString &AContentId, const QString &AType, const QByteArray &AData, quint64 AMaxAge);
-  virtual void binaryError(const QString &AContentId, const QString &AError);
-  virtual void binaryRemoved(const QString &AContentId);
+  void binaryCached(const QString &AContentId, const QString &AType, const QByteArray &AData, quint64 AMaxAge);
+  void binaryError(const QString &AContentId, const QString &AError);
+  void binaryRemoved(const QString &AContentId);
 protected:
   QString contentFileName(const QString &AContentId) const;
 private:

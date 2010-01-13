@@ -50,17 +50,17 @@ public:
   virtual void insertMessageWriter(IMessageWriter *AWriter, int AOrder);
   virtual void removeMessageWriter(IMessageWriter *AWriter, int AOrder);
 signals:
-  virtual void messageReceive(Message &AMessage);
-  virtual void messageReceived(const Message &AMessage);
-  virtual void messageSend(Message &AMessage);
-  virtual void messageSent(const Message &AMessage);
-  virtual void messageNotified(int AMessageId);
-  virtual void messageUnNotified(int AMessageId);
-  virtual void messageRemoved(const Message &AMessage);
-  virtual void messageHandlerInserted(IMessageHandler *AHandler, int AOrder);
-  virtual void messageHandlerRemoved(IMessageHandler *AHandler, int AOrder);
-  virtual void messageWriterInserted(IMessageWriter *AWriter, int AOrder);
-  virtual void messageWriterRemoved(IMessageWriter *AWriter, int AOrder);
+  void messageReceive(Message &AMessage);
+  void messageReceived(const Message &AMessage);
+  void messageSend(Message &AMessage);
+  void messageSent(const Message &AMessage);
+  void messageNotified(int AMessageId);
+  void messageUnNotified(int AMessageId);
+  void messageRemoved(const Message &AMessage);
+  void messageHandlerInserted(IMessageHandler *AHandler, int AOrder);
+  void messageHandlerRemoved(IMessageHandler *AHandler, int AOrder);
+  void messageWriterInserted(IMessageWriter *AWriter, int AOrder);
+  void messageWriterRemoved(IMessageWriter *AWriter, int AOrder);
 protected:
   int newMessageId();
   IMessageHandler *getMessageHandler(const Message &AMessage);

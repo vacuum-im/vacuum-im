@@ -51,9 +51,9 @@ public:
   virtual void startRestoreExpandState();
   virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
 signals:
-  virtual void optionChanged(IRostersView::Option AOption, bool AValue);
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionChanged(IRostersView::Option AOption, bool AValue);
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   QString getExpandSettingsName(const QModelIndex &AIndex);
   void loadExpandedState(const QModelIndex &AIndex);

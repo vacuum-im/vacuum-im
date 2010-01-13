@@ -33,16 +33,16 @@ public:
   virtual QList<IPresence *> contactPresences(const Jid &AContactJid) const { return FContactPresences.value(AContactJid).toList(); }
   virtual void removePresence(IXmppStream *AXmppStream);
 signals:
-  virtual void streamStateChanged(const Jid &AStreamJid, bool AStateOnline);
-  virtual void contactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
-  virtual void presenceAdded(IPresence *APresence);
-  virtual void presenceOpened(IPresence *APresence);
-  virtual void presenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriotity);
-  virtual void presenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
-  virtual void presenceSent(IPresence *APresence, const Jid &AContactJid, int AShow, const QString &AStatus, int APriotity);
-  virtual void presenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus);
-  virtual void presenceClosed(IPresence *APresence);
-  virtual void presenceRemoved(IPresence *APresence);
+  void streamStateChanged(const Jid &AStreamJid, bool AStateOnline);
+  void contactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
+  void presenceAdded(IPresence *APresence);
+  void presenceOpened(IPresence *APresence);
+  void presenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriotity);
+  void presenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
+  void presenceSent(IPresence *APresence, const Jid &AContactJid, int AShow, const QString &AStatus, int APriotity);
+  void presenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus);
+  void presenceClosed(IPresence *APresence);
+  void presenceRemoved(IPresence *APresence);
 protected slots:
   void onPresenceOpened();
   void onPresenceChanged(int AShow, const QString &AStatus, int APriority);

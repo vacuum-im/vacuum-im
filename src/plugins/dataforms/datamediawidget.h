@@ -18,8 +18,8 @@ public:
   virtual IDataMedia media() const;
   virtual IDataMediaURI mediaUri() const;
 signals:
-  virtual void mediaShown();
-  virtual void mediaError(const QString &AError);
+  void mediaShown();
+  void mediaError(const QString &AError);
 protected:
   void loadUri();
   bool updateWidget(const IDataMediaURI &AUri, const QByteArray &AData);

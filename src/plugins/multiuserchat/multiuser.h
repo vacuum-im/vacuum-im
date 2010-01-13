@@ -25,7 +25,7 @@ public:
 public:
   void setNickName(const QString &ANickName);
 signals:
-  virtual void dataChanged(int ARole, const QVariant &ABefour, const QVariant &AAfter);
+  void dataChanged(int ARole, const QVariant &ABefour, const QVariant &AAfter);
 private:
   Jid FRoomJid;
   Jid FContactJid;

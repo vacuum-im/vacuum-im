@@ -51,12 +51,12 @@ public:
   virtual void updateRule(int ARuleId, const IAutoStatusRule &ARule);
   virtual void removeRule(int ARuleId);
 signals:
-  virtual void ruleInserted(int ARuleId);
-  virtual void ruleChanged(int ARuleId);
-  virtual void ruleRemoved(int ARuleId);
-  virtual void ruleActivated(int ARuleId);
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void ruleInserted(int ARuleId);
+  void ruleChanged(int ARuleId);
+  void ruleRemoved(int ARuleId);
+  void ruleActivated(int ARuleId);
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   void setActiveRule(int ARuleId);
   void updateActiveRule();

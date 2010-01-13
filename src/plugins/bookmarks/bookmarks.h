@@ -48,8 +48,8 @@ public:
   virtual int execEditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) const;
   virtual void showEditBookmarksDialog(const Jid &AStreamJid);
 signals:
-  virtual void bookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
-  virtual void bookmarksError(const QString &AId, const QString &AError);
+  void bookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+  void bookmarksError(const QString &AId, const QString &AError);
 protected:
   void updateBookmarksMenu();
   void startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark, bool AShowWindow);

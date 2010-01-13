@@ -45,7 +45,7 @@ public:
   virtual QImage contactAvatar(const Jid &AContactJid) const =0;
   virtual QIcon contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual QString contactName(const Jid &AStreamJId, const Jid &AContactJid) const =0;
-signals:
+protected:
   virtual void notificationActivated(int ANotifyId) =0;
   virtual void notificationRemoved(int ANotifyId) =0;
   virtual void notificationAppend(int ANotifyId, INotification &ANotification) =0;

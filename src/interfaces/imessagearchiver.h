@@ -162,7 +162,7 @@ public :
   virtual const IArchiveFilter &filter() const =0;
   virtual void setFilter(const IArchiveFilter &AFilter) =0;
   virtual void reload() =0;
-signals:
+protected:
   virtual void groupKindChanged(int AGroupKind) =0;
   virtual void archiveSourceChanged(int ASource) =0;
   virtual void filterChanged(const IArchiveFilter &AFilter) =0;
@@ -220,7 +220,7 @@ public:
   virtual QString loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = "") =0;
   virtual QString removeServerCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false) =0;
   virtual QString loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = "") =0;
-signals:
+protected:
   virtual void archiveAutoSaveChanged(const Jid &AStreamJid, bool AAuto) =0;
   virtual void archivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
   virtual void archiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs) =0;

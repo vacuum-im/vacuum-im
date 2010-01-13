@@ -50,7 +50,7 @@ public:
   virtual int dataStanzaType(const QString &ASettingsNS) const;
   virtual void setDataStanzaType(const QString &ASettingsNS, int AType);
 signals:
-  virtual void socketCreated(IDataStreamSocket *ASocket);
+  void socketCreated(IDataStreamSocket *ASocket);
 protected slots:
   void onSettingsOpened();
   void onSettingsClosed();

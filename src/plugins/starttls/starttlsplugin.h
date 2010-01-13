@@ -32,8 +32,8 @@ public:
   virtual IStreamFeature *newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
   virtual void destroyStreamFeature(IStreamFeature *AFeature);
 signals:
-  virtual void featureCreated(IStreamFeature *AStreamFeature);
-  virtual void featureDestroyed(IStreamFeature *AStreamFeature);
+  void featureCreated(IStreamFeature *AStreamFeature);
+  void featureDestroyed(IStreamFeature *AStreamFeature);
 private:
   IXmppStreams *FXmppStreams;
 private:

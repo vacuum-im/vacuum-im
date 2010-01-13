@@ -18,8 +18,8 @@ class DataTableWidget :
   virtual IDataField dataField(int ARow, int AColumn) const;
   virtual IDataField dataField(int ARow, const QString &AVar) const;
 signals:
-  virtual void activated(int ARow, int AColumn);
-  virtual void changed(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn);
+  void activated(int ARow, int AColumn);
+  void changed(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn);
 private:
   IDataForms *FDataForms;
 private:

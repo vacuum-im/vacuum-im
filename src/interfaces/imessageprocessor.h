@@ -43,7 +43,7 @@ public:
   virtual void removeMessageHandler(IMessageHandler *AHandler, int AOrder) =0;
   virtual void insertMessageWriter(IMessageWriter *AWriter, int AOrder) =0;
   virtual void removeMessageWriter(IMessageWriter *AWriter, int AOrder) =0;
-signals:
+protected:
   virtual void messageReceive(Message &AMessage) =0;
   virtual void messageReceived(const Message &AMessage) =0;
   virtual void messageSend(Message &AMessage) =0;

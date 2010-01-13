@@ -25,7 +25,7 @@ public:
   virtual QString setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &ABookmarks) =0;
   virtual int execEditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) const =0;
   virtual void showEditBookmarksDialog(const Jid &AStreamJid) =0;
-signals:
+protected:
   virtual void bookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement) =0;
   virtual void bookmarksError(const QString &AId, const QString &AError) =0;
 };

@@ -66,9 +66,9 @@ public:
   virtual QString sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID);
   virtual QDialog *showAddLegacyContactDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
 signals:
-  virtual void promptReceived(const QString &AId, const QString &ADesc, const QString &APrompt);
-  virtual void userJidReceived(const QString &AId, const Jid &AUserJid);
-  virtual void errorReceived(const QString &AId, const QString &AError);
+  void promptReceived(const QString &AId, const QString &ADesc, const QString &APrompt);
+  void userJidReceived(const QString &AId, const Jid &AUserJid);
+  void errorReceived(const QString &AId, const QString &AError);
 protected:
   void registerDiscoFeatures();
   void savePrivateStorageKeep(const Jid &AStreamJid);

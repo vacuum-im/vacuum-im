@@ -67,11 +67,11 @@ public:
   virtual QList<ICommand> contactCommands(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual bool executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode);
 signals:
-  virtual void serverInserted(const QString &ANode, ICommandServer *AServer);
-  virtual void serverRemoved(const QString &ANode);
-  virtual void clientInserted(ICommandClient *AClient);
-  virtual void clientRemoved(ICommandClient *AClient);
-  virtual void commandsUpdated(const Jid &AstreamJid, const Jid &AContactJid, const QList<ICommand> &ACommands);
+  void serverInserted(const QString &ANode, ICommandServer *AServer);
+  void serverRemoved(const QString &ANode);
+  void clientInserted(ICommandClient *AClient);
+  void clientRemoved(ICommandClient *AClient);
+  void commandsUpdated(const Jid &AstreamJid, const Jid &AContactJid, const QList<ICommand> &ACommands);
 protected:
   void registerDiscoFeatures();
 protected slots:

@@ -59,7 +59,7 @@ public:
   virtual void setModified(bool AModified, int AMessageType, const QString &AContext) =0;
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext) const =0;
   virtual void loadSettings(int AMessageType, const QString &AContext) =0;
-signals:
+protected:
   virtual void settingsChanged() =0;
 };
 
@@ -74,7 +74,7 @@ public:
   virtual QString senderColor(const QString &ASenderId) const =0;
   virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true) =0;
   virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) =0;
-signals:
+protected:
   virtual void widgetAdded(QWidget *AWidget) const =0;
   virtual void widgetRemoved(QWidget *AWidget) const =0;
   virtual void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const =0;
@@ -92,7 +92,7 @@ public:
   virtual IMessageStyleSettings *styleSettings(int AMessageType, const QString &AContext, QWidget *AParent = NULL) =0;
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const =0;
   virtual void setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext = QString::null) =0;
-signals:
+protected:
   virtual void styleCreated(IMessageStyle *AStyle) const =0;
   virtual void styleDestroyed(IMessageStyle *AStyle) const =0;
   virtual void styleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget) const =0;
@@ -114,7 +114,7 @@ public:
   virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const =0;
   virtual QString userIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const =0;
   virtual QString timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const =0;
-signals:
+protected:
   virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const =0;
 };
 

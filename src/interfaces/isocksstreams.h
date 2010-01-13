@@ -22,7 +22,7 @@ public:
   virtual void setNetworkProxy(const QNetworkProxy &AProxy) =0;
   virtual QList<QString> proxyList() const =0;
   virtual void setProxyList(const QList<QString> &AProxyList) =0;
-signals:
+protected:
   virtual void propertiesChanged() =0;
 };
 
@@ -51,7 +51,7 @@ public:
   virtual QString connectionKey(const QString &ASessionId, const Jid &AInitiator, const Jid &ATarget) const =0;
   virtual bool appendLocalConnection(const QString &AKey) =0;
   virtual void removeLocalConnection(const QString &AKey) =0;
-signals:
+protected:
   virtual void localConnectionAccepted(const QString &AKey, QTcpSocket *ATcpSocket) =0;
 };
 

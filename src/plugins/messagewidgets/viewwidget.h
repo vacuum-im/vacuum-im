@@ -26,11 +26,11 @@ public:
   virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions);
   virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
 signals:
-  virtual void streamJidChanged(const Jid &ABefour);
-  virtual void contactJidChanged(const Jid &ABefour);
-  virtual void messageStyleChanged(IMessageStyle *ABefour, const IMessageStyleOptions &AOptions);
-  virtual void contentAppended(const QString &AMessage, const IMessageContentOptions &AOptions);
-  virtual void urlClicked(const QUrl &AUrl) const;
+  void streamJidChanged(const Jid &ABefour);
+  void contactJidChanged(const Jid &ABefour);
+  void messageStyleChanged(IMessageStyle *ABefour, const IMessageStyleOptions &AOptions);
+  void contentAppended(const QString &AMessage, const IMessageContentOptions &AOptions);
+  void urlClicked(const QUrl &AUrl) const;
 protected:
   void initialize();
   QString getHtmlBody(const QString &AHtml);

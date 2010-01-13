@@ -23,7 +23,7 @@ public:
   virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink) =0;
   virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, bool ABlink) =0;
   virtual void removeNotify(int ANotifyId) =0;
-signals:
+protected:
   virtual void messageClicked() =0;
   virtual void messageShown(const QString &ATitle, const QString &AMessage,QSystemTrayIcon::MessageIcon AIcon, int ATimeout) =0;
   virtual void notifyAdded(int ANotifyId) =0;

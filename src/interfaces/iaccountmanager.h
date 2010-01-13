@@ -32,7 +32,7 @@ public:
   virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const =0;
   virtual void setValue(const QString &AName, const QVariant &AValue) =0;
   virtual void delValue(const QString &AName) =0;
-signals:
+protected:
   virtual void changed(const QString &AName, const QVariant &AValue) =0;
 };
 
@@ -48,7 +48,7 @@ public:
   virtual void hideAccount(const QUuid &AAccountId) =0;
   virtual void removeAccount(const QUuid &AAccountId) =0;
   virtual void destroyAccount(const QUuid &AAccountId) =0;
-signals:
+protected:
   virtual void appended(IAccount *AAccount) =0;
   virtual void shown(IAccount *AAccount) =0;
   virtual void hidden(IAccount *AAccount) =0;

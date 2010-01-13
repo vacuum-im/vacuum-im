@@ -31,7 +31,7 @@ public:
   virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual int userChatState(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual int selfChatState(const Jid &AStreamJid, const Jid &AContactJid) const =0;
-signals:
+protected:
   virtual void chatStatesEnabled(bool AEnabled) const =0;
   virtual void permitStatusChanged(const Jid &AContactJid, int AStatus) const =0;
   virtual void supportStatusChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported) const =0;

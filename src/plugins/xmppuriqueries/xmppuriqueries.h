@@ -32,8 +32,8 @@ public:
   virtual void insertUriHandler(IXmppUriHandler *AHandler, int AOrder);
   virtual void removeUriHandler(IXmppUriHandler *AHandler, int AOrder);
 signals:
-  virtual void uriHandlerInserted(IXmppUriHandler *AHandler, int AOrder);
-  virtual void uriHandlerRemoved(IXmppUriHandler *AHandler, int AOrder);
+  void uriHandlerInserted(IXmppUriHandler *AHandler, int AOrder);
+  void uriHandlerRemoved(IXmppUriHandler *AHandler, int AOrder);
 private:
   IMessageWidgets *FMessageWidgets;
 private:

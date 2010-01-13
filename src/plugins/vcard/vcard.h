@@ -40,9 +40,9 @@ public:
   virtual bool publish(const Jid &AStreamJid);
   virtual void unlock();
 signals:
-  virtual void vcardUpdated();
-  virtual void vcardPublished();
-  virtual void vcardError(const QString &AError);
+  void vcardUpdated();
+  void vcardPublished();
+  void vcardError(const QString &AError);
 protected:
   void loadVCardFile();
   QByteArray checkImageFormat(const QByteArray &AFormat) const;

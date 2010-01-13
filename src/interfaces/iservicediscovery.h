@@ -86,7 +86,7 @@ public:
   virtual ToolBarChanger *toolBarChanger() const =0;
   virtual ToolBarChanger *actionsBarChanger() const =0;
   virtual void discover(const Jid AContactJid, const QString &ANode) =0;
-signals:
+protected:
   virtual void discoverChanged(const Jid AContactJid, const QString &ANode) =0;
   virtual void currentIndexChanged(const QModelIndex &AIndex) =0;
   virtual void indexContextMenu(const QModelIndex &AIndex, Menu *AMenu) =0;
@@ -127,7 +127,7 @@ public:
   virtual int findIdentity(const QList<IDiscoIdentity> &AIdentity, const QString &ACategory, const QString &AType) const =0;
   //DiscoItems
   virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "") =0;
-signals:
+protected:
   virtual void discoItemsWindowCreated(IDiscoItemsWindow *AWindow) =0;
   virtual void discoItemsWindowDestroyed(IDiscoItemsWindow *AWindow) =0;
   virtual void discoHandlerInserted(IDiscoHandler *AHandler) =0;

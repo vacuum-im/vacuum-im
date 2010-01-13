@@ -52,8 +52,8 @@ public:
   virtual void setValue(const QVariant &AValue);
   virtual IDataMediaWidget *mediaWidget() const;
 signals:
-  virtual void focusIn(Qt::FocusReason AReason);
-  virtual void focusOut(Qt::FocusReason AReason);
+  void focusIn(Qt::FocusReason AReason);
+  void focusOut(Qt::FocusReason AReason);
 protected:
   void appendLabel(const QString &AText, QWidget *ABuddy);
 protected:

@@ -47,11 +47,11 @@ public:
   virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, bool ABlink);
   virtual void removeNotify(int ANotifyId);
 signals:
-  virtual void messageClicked();
-  virtual void messageShown(const QString &ATitle, const QString &AMessage,QSystemTrayIcon::MessageIcon AIcon, int ATimeout);
-  virtual void notifyAdded(int ANotifyId);
-  virtual void notifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
-  virtual void notifyRemoved(int ANotifyId);
+  void messageClicked();
+  void messageShown(const QString &ATitle, const QString &AMessage,QSystemTrayIcon::MessageIcon AIcon, int ATimeout);
+  void notifyAdded(int ANotifyId);
+  void notifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
+  void notifyRemoved(int ANotifyId);
 protected:
   void setTrayIcon(const QIcon &AIcon, const QString &AToolTip, bool ABlink);
 protected slots:

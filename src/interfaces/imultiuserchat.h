@@ -81,7 +81,7 @@ public:
   virtual QString affiliation() const =0;
   virtual QVariant data(int ARole) const =0;
   virtual void setData(int ARole, const QVariant &AValue) =0;
-signals:
+protected:
   virtual void dataChanged(int ARole, const QVariant &ABefour, const QVariant &AAfter) =0;
 };
 
@@ -123,7 +123,7 @@ public:
   virtual bool requestConfigForm() =0;
   virtual bool sendConfigForm(const IDataForm &AForm) =0;
   virtual bool destroyRoom(const QString &AReason) =0;
-signals:
+protected:
   virtual void chatOpened() =0;
   virtual void chatNotify(const QString &ANick, const QString &ANotify) =0;
   virtual void chatError(const QString &ANick, const QString &AError) =0;
@@ -176,7 +176,7 @@ public:
   virtual IChatWindow *findChatWindow(const Jid &AContactJid) const =0;
   virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
   virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000) =0;
-signals:
+protected:
   virtual void windowActivated() =0;
   virtual void windowClosed() =0;
   virtual void chatWindowCreated(IChatWindow *AWindow) =0;
@@ -197,7 +197,7 @@ public:
   virtual QList<IMultiUserChatWindow *> multiChatWindows() const =0;
   virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
   virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
-signals:
+protected:
   virtual void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick) =0;
   virtual void multiUserChatCreated(IMultiUserChat *AMultiChat) =0;
   virtual void multiUserChatDestroyed(IMultiUserChat *AMultiChat) =0;

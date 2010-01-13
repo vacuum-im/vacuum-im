@@ -15,7 +15,7 @@ public:
 public slots:
   void apply();
 signals:
-    void optionsAccepted();
+  void optionsAccepted();
 private:
   Ui::FileTransferOptionsClass ui;
 private:

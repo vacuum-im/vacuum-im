@@ -68,8 +68,8 @@ public:
   virtual QList<QString> proxyList() const;
   virtual void setProxyList(const QList<QString> &AProxyList);
 signals:
-  virtual void stateChanged(int AState);
-  virtual void propertiesChanged();
+  void stateChanged(int AState);
+  void propertiesChanged();
 protected:
   virtual qint64 readData(char *AData, qint64 AMaxSize);
   virtual qint64 writeData(const char *AData, qint64 AMaxSize);

@@ -82,14 +82,14 @@ public:
   virtual QIcon iconByShow(int AShow) const;
   virtual QString nameByShow(int AShow) const;
 signals:
-  virtual void statusAboutToBeChanged(const Jid &AStreamJid, int AStatusId);
-  virtual void statusChanged(const Jid &AStreamJid, int AStatusId);
-  virtual void statusItemAdded(int AStatusId);
-  virtual void statusItemChanged(int AStatusId);
-  virtual void statusItemRemoved(int AStatusId);
+  void statusAboutToBeChanged(const Jid &AStreamJid, int AStatusId);
+  void statusChanged(const Jid &AStreamJid, int AStatusId);
+  void statusItemAdded(int AStatusId);
+  void statusItemChanged(int AStatusId);
+  void statusItemRemoved(int AStatusId);
   //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   void createDefaultStatus();
   void setMainStatusId(int AStatusId);

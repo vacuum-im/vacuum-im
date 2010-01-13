@@ -37,12 +37,12 @@ public:
   virtual QString loadData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
   virtual QString removeData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 signals:
-  virtual void storageOpened(const Jid &AStreamJid);
-  virtual void dataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
-  virtual void dataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
-  virtual void dataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
-  virtual void dataError(const QString &AId, const QString &AError);
-  virtual void storageClosed(const Jid &AStreamJid);
+  void storageOpened(const Jid &AStreamJid);
+  void dataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+  void dataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+  void dataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+  void dataError(const QString &AId, const QString &AError);
+  void storageClosed(const Jid &AStreamJid);
 protected:
   QDomElement getStreamElement(const Jid &AStreamJid);
   void removeStreamElement(const Jid &AStreamJid);

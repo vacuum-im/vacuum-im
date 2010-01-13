@@ -22,7 +22,7 @@ public:
   virtual void setMaximumBlockSize(int ASize) =0;
   virtual int dataStanzaType() const =0;
   virtual void setDataStanzaType(int AType) =0;
-signals:
+protected:
   virtual void propertiesChanged() =0;
 };
 

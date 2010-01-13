@@ -71,24 +71,24 @@ public:
   //--ContextMenu
   virtual void contextMenuForIndex(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
 signals:
-  virtual void modelAboutToBeSeted(IRostersModel *AModel);
-  virtual void modelSeted(IRostersModel *AModel);
-  virtual void proxyModelAboutToBeInserted(QAbstractProxyModel *AProxyModel, int AOrder);
-  virtual void proxyModelInserted(QAbstractProxyModel *AProxyModel);
-  virtual void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel);
-  virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel);
-  virtual void viewModelAboutToBeChanged(QAbstractItemModel *AModel);
-  virtual void viewModelChanged(QAbstractItemModel *AModel);
-  virtual void indexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
-  virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
-  virtual void labelClicked(IRosterIndex *AIndex, int ALabelId);
-  virtual void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
-  virtual void notifyContextMenu(IRosterIndex *AIndex, int ANotifyId, Menu *AMenu);
-  virtual void notifyActivated(IRosterIndex *AIndex, int ANotifyId);
-  virtual void notifyRemovedByIndex(IRosterIndex *AIndex, int ANotifyId);
-  virtual void dragDropHandlerInserted(IRostersDragDropHandler *AHandler);
-  virtual void dragDropHandlerRemoved(IRostersDragDropHandler *AHandler);
+  void modelAboutToBeSeted(IRostersModel *AModel);
+  void modelSeted(IRostersModel *AModel);
+  void proxyModelAboutToBeInserted(QAbstractProxyModel *AProxyModel, int AOrder);
+  void proxyModelInserted(QAbstractProxyModel *AProxyModel);
+  void proxyModelAboutToBeRemoved(QAbstractProxyModel *AProxyModel);
+  void proxyModelRemoved(QAbstractProxyModel *AProxyModel);
+  void viewModelAboutToBeChanged(QAbstractItemModel *AModel);
+  void viewModelChanged(QAbstractItemModel *AModel);
+  void indexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
+  void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+  void labelClicked(IRosterIndex *AIndex, int ALabelId);
+  void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
+  void notifyContextMenu(IRosterIndex *AIndex, int ANotifyId, Menu *AMenu);
+  void notifyActivated(IRosterIndex *AIndex, int ANotifyId);
+  void notifyRemovedByIndex(IRosterIndex *AIndex, int ANotifyId);
+  void dragDropHandlerInserted(IRostersDragDropHandler *AHandler);
+  void dragDropHandlerRemoved(IRostersDragDropHandler *AHandler);
 public:
   bool checkOption(IRostersView::Option AOption) const;
   void setOption(IRostersView::Option AOption, bool AValue);

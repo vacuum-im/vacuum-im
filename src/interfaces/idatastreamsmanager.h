@@ -42,7 +42,7 @@ public:
   virtual void abort(const QString &AError, int ACode = UnknownError) =0;
   virtual int errorCode() const =0;
   virtual QString errorString() const =0;
-signals:
+protected:
   virtual void stateChanged(int AState) =0;
 };
 
@@ -61,7 +61,7 @@ public:
   virtual void saveSettings(const QString &ASettingsNS, QWidget *AWidget) =0;
   virtual void saveSettings(const QString &ASettingsNS, IDataStreamSocket *ASocket) =0;
   virtual void deleteSettings(const QString &ASettingsNS) =0;
-signals:
+protected:
   virtual void socketCreated(IDataStreamSocket *ASocket) =0;
 };
 
@@ -96,7 +96,7 @@ public:
     const QList<QString> &AMethods, int ATimeout =0) =0;
   virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS) =0;
   virtual bool rejectStream(const QString &AStreamId, const QString &AError) =0;
-signals:
+protected:
   virtual void methodInserted(IDataStreamMethod *AMethod) =0;
   virtual void methodRemoved(IDataStreamMethod *AMethod) =0;
   virtual void methodSettingsInserted(const QString &ASettingsNS, const QString &ASettingsName) =0;

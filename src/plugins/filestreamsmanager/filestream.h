@@ -53,11 +53,11 @@ public:
   virtual bool startStream(const QString &AMethodNS);
   virtual void abortStream(const QString &AError);
 signals:
-  virtual void stateChanged();
-  virtual void speedChanged();
-  virtual void progressChanged();
-  virtual void propertiesChanged();
-  virtual void streamDestroyed();
+  void stateChanged();
+  void speedChanged();
+  void progressChanged();
+  void propertiesChanged();
+  void streamDestroyed();
 protected:
   bool openFile();
   void setStreamState(int AState, const QString &AMessage);

@@ -77,15 +77,15 @@ public:
   virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
   virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000);
 signals:
-  virtual void windowShow();
-  virtual void windowClose();
-  virtual void windowActivated();
-  virtual void windowChanged();
-  virtual void windowClosed();
-  virtual void windowDestroyed();
-  virtual void chatWindowCreated(IChatWindow *AWindow);
-  virtual void chatWindowDestroyed(IChatWindow *AWindow);
-  virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
+  void windowShow();
+  void windowClose();
+  void windowActivated();
+  void windowChanged();
+  void windowClosed();
+  void windowDestroyed();
+  void chatWindowCreated(IChatWindow *AWindow);
+  void chatWindowDestroyed(IChatWindow *AWindow);
+  void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 protected:
   void initialize();
   void connectMultiChat();
