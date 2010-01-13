@@ -25,7 +25,7 @@ public:
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext) const;
   virtual void loadSettings(int AMessageType, const QString &AContext);
 signals:
-  virtual void settingsChanged();
+  void settingsChanged();
 protected:
   void startSignalTimer();
   void updateOptionsWidgets();

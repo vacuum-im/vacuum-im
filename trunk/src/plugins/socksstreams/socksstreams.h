@@ -68,9 +68,9 @@ public:
   virtual bool appendLocalConnection(const QString &AKey);
   virtual void removeLocalConnection(const QString &AKey);
 signals:
-  virtual void localConnectionAccepted(const QString &AKey, QTcpSocket *ATcpSocket);
+  void localConnectionAccepted(const QString &AKey, QTcpSocket *ATcpSocket);
   //IDataStreamMethod
-  virtual void socketCreated(IDataStreamSocket *ASocket);
+  void socketCreated(IDataStreamSocket *ASocket);
 protected slots:
   void onSettingsOpened();
   void onSettingsClosed();

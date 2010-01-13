@@ -36,15 +36,15 @@ public:
   virtual void ignoreSslErrors();
   virtual QList<QSslError> sslErrors() const;
 signals:
-  virtual void aboutToConnect();
-  virtual void connected();
-  virtual void encrypted();
-  virtual void readyRead(qint64 ABytes);
-  virtual void sslErrors(const QList<QSslError> &AErrors);
-  virtual void error(const QString &AMessage);
-  virtual void aboutToDisconnect();
-  virtual void disconnected();
-  virtual void modeChanged(QSslSocket::SslMode AMode);
+  void aboutToConnect();
+  void connected();
+  void encrypted();
+  void readyRead(qint64 ABytes);
+  void sslErrors(const QList<QSslError> &AErrors);
+  void error(const QString &AMessage);
+  void aboutToDisconnect();
+  void disconnected();
+  void modeChanged(QSslSocket::SslMode AMode);
 protected:
   void connectToNextHost();
 protected slots:

@@ -21,7 +21,7 @@ public:
   virtual QByteArray read(qint64 ABytes) =0;
   virtual QVariant option(int ARole) const =0;
   virtual void setOption(int ARole, const QVariant &AValue) =0;
-signals:
+protected:
   virtual void aboutToConnect() =0;
   virtual void connected() =0;
   virtual void encrypted() =0;
@@ -44,7 +44,7 @@ public:
   virtual void deleteSettingsNS(const QString &ASettingsNS) =0;
   virtual QWidget *optionsWidget(const QString &ASettingsNS) =0;
   virtual void saveOptions(const QString &ASettingsNS) =0;
-signals:
+protected:
   virtual void connectionCreated(IConnection *AConnection) =0;
   virtual void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS) =0;
   virtual void connectionDestroyed(IConnection *AConnection) =0;
@@ -56,7 +56,7 @@ public:
   virtual QObject *instance() =0;
   virtual QList<IConnectionPlugin *> pluginList() const =0;
   virtual IConnectionPlugin *pluginById(const QUuid &APluginId) const =0;
-signals:
+protected:
   virtual void connectionCreated(IConnection *AConnection) =0;
   virtual void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS) =0;
   virtual void connectionDestroyed(IConnection *AConnection) =0;

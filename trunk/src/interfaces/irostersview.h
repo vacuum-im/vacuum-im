@@ -77,7 +77,7 @@ public:
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
   //--ContextMenu
   virtual void contextMenuForIndex(IRosterIndex *AIndex, int ALabelId, Menu *AMenu) =0;
-signals:
+protected:
   virtual void modelAboutToBeSeted(IRostersModel *AIndex) =0;
   virtual void modelSeted(IRostersModel *AIndex) =0;
   virtual void proxyModelAboutToBeInserted(QAbstractProxyModel *AProxyModel, int AOrder) =0;
@@ -107,7 +107,7 @@ public:
   virtual void setOption(IRostersView::Option AOption, bool AValue) =0;
   virtual void startRestoreExpandState() =0;
   virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
-signals:
+protected:
   virtual void optionChanged(IRostersView::Option AOption, bool AValue) =0;
 };
 

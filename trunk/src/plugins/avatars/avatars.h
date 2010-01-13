@@ -76,14 +76,14 @@ public:
   virtual bool showEmptyAvatars() const;
   virtual void setShowEmptyAvatars(bool AShow);
 signals:
-  virtual void avatarChanged(const Jid &AContactJid);
-  virtual void avatarsVisibleChanged(bool AVisible);
-  virtual void showEmptyAvatarsChanged(bool AShow);
+  void avatarChanged(const Jid &AContactJid);
+  void avatarsVisibleChanged(bool AVisible);
+  void showEmptyAvatarsChanged(bool AShow);
   //IRosterIndexDataHolder
-  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+  void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
   //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   QByteArray loadAvatarFromVCard(const Jid &AContactJid) const;
   void updatePresence(const Jid &AStreamJid) const;

@@ -20,10 +20,10 @@ public:
   virtual IDataForm userDataForm() const;
   virtual const IDataForm &dataForm() const { return FForm; }
 signals:
-  virtual void cellActivated(int ARow, int AColumn);
-  virtual void cellChanged(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn);
-  virtual void fieldFocusIn(IDataFieldWidget *AField, Qt::FocusReason AReason);
-  virtual void fieldFocusOut(IDataFieldWidget *AField, Qt::FocusReason AReason);
+  void cellActivated(int ARow, int AColumn);
+  void cellChanged(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn);
+  void fieldFocusIn(IDataFieldWidget *AField, Qt::FocusReason AReason);
+  void fieldFocusOut(IDataFieldWidget *AField, Qt::FocusReason AReason);
 protected:
   bool isStretch(IDataFieldWidget *AWidget) const;
   bool insertLayout(const IDataLayout &ALayout, QWidget *AWidget);

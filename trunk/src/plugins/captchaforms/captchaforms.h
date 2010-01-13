@@ -56,11 +56,11 @@ public:
   virtual bool submitChallenge(const QString &AChallengeId, const IDataForm &ASubmit);
   virtual bool cancelChallenge(const QString &AChallengeId);
 signals:
-  virtual void challengeReceived(const QString &AChallengeId, const IDataForm &AForm);
-  virtual void challengeSubmited(const QString &AChallengeId, const IDataForm &ASubmit);
-  virtual void challengeAccepted(const QString &AChallengeId);
-  virtual void challengeRejected(const QString &AChallengeId, const QString &AError);
-  virtual void challengeCanceled(const QString &AChallengeId);
+  void challengeReceived(const QString &AChallengeId, const IDataForm &AForm);
+  void challengeSubmited(const QString &AChallengeId, const IDataForm &ASubmit);
+  void challengeAccepted(const QString &AChallengeId);
+  void challengeRejected(const QString &AChallengeId, const QString &AError);
+  void challengeCanceled(const QString &AChallengeId);
 protected:
   bool isSupportedChallenge(IDataForm &AForm) const;
   bool isValidChallenge(const Jid &AStreamJid, const Stanza &AStanza, IDataForm &AForm) const;

@@ -41,11 +41,11 @@ public:
   QList<QString> styleVariants(const QString &AStyleId) const;
   QMap<QString,QVariant> styleInfo(const QString &AStyleId) const;
 signals:
-  virtual void styleCreated(IMessageStyle *AStyle) const;
-  virtual void styleDestroyed(IMessageStyle *AStyle) const;
-  virtual void styleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget) const;
-  virtual void styleWidgetRemoved(IMessageStyle *AStyle, QWidget *AWidget) const;
-  virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const;
+  void styleCreated(IMessageStyle *AStyle) const;
+  void styleDestroyed(IMessageStyle *AStyle) const;
+  void styleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget) const;
+  void styleWidgetRemoved(IMessageStyle *AStyle, QWidget *AWidget) const;
+  void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const;
 protected:
   void updateAvailStyles();
 protected slots:

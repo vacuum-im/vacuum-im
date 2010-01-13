@@ -72,22 +72,22 @@ public:
   virtual void closeOptionsNode(const QString &ANode);
   virtual QDialog *openOptionsDialog(const QString &ANode = QString::null, QWidget *AParent = NULL);
 signals:
-  virtual void profileAdded(const QString &AProfile);
-  virtual void settingsOpened();
-  virtual void profileOpened(const QString &AProfile);
-  virtual void profileClosed(const QString &AProfile);
-  virtual void settingsClosed();
-  virtual void profileRenamed(const QString &AProfileFrom, const QString &AProfileTo);
-  virtual void profileRemoved(const QString &AProfile);
-  virtual void optionsNodeOpened(const QString &ANode);
-  virtual void optionsNodeClosed(const QString &ANode);
-  virtual void optionsDialogOpened();
-  virtual void optionsDialogAccepted();
-  virtual void optionsDialogRejected();
-  virtual void optionsDialogClosed();
+  void profileAdded(const QString &AProfile);
+  void settingsOpened();
+  void profileOpened(const QString &AProfile);
+  void profileClosed(const QString &AProfile);
+  void settingsClosed();
+  void profileRenamed(const QString &AProfileFrom, const QString &AProfileTo);
+  void profileRemoved(const QString &AProfile);
+  void optionsNodeOpened(const QString &ANode);
+  void optionsNodeClosed(const QString &ANode);
+  void optionsDialogOpened();
+  void optionsDialogAccepted();
+  void optionsDialogRejected();
+  void optionsDialogClosed();
 signals:
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 public:
   QWidget *createNodeWidget(const QString &ANode);
 protected:

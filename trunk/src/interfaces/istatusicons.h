@@ -29,7 +29,7 @@ public:
   virtual QString iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual QString iconKeyByStatus(int AShow, const QString &ASubscription, bool AAsk) const =0;
   virtual QString iconFileName(const QString &ASubStorage, const QString &AIconKey) const =0;
-signals:
+protected:
   virtual void defaultStorageChanged(const QString &ASubStorage) =0;
   virtual void ruleInserted(const QString &APattern, const QString &ASubStorage, RuleType ARuleType) =0;
   virtual void ruleRemoved(const QString &APattern, RuleType ARuleType) =0;

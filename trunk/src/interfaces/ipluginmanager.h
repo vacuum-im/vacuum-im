@@ -52,7 +52,7 @@ public:
 public slots:
   virtual void quit() =0;
   virtual void restart() =0;
-signals:
+protected:
   virtual void aboutToQuit() =0;
 };
 

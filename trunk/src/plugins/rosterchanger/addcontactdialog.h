@@ -38,7 +38,7 @@ public:
   virtual void setSubscriptionMessage(const QString &AMessage);
   virtual ToolBarChanger *toolBarChanger() const;
 signals:
-  virtual void dialogDestroyed();
+  void dialogDestroyed();
 protected:
   void initialize(IPluginManager *APluginManager);
 protected slots:

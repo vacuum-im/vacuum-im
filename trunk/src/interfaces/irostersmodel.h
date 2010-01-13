@@ -20,7 +20,7 @@ public:
   virtual QList<int> types() const =0;
   virtual QVariant data(const IRosterIndex *AIndex, int ARole) const =0;
   virtual bool setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue) =0;
-signals:
+protected:
   virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0) =0;
 };
 
@@ -53,7 +53,7 @@ public:
   virtual void setRemoveChildsOnRemoved(bool ARemove) =0;
   virtual bool destroyOnParentRemoved() const =0;
   virtual void setDestroyOnParentRemoved(bool ADestroy) =0;
-signals:
+protected:
   virtual void dataChanged(IRosterIndex *AIndex, int ARole = 0) =0;
   virtual void dataHolderInserted(IRosterIndexDataHolder *ADataHolder) =0;
   virtual void dataHolderRemoved(IRosterIndexDataHolder *ADataHolder) =0;
@@ -88,7 +88,7 @@ public:
   virtual QString agentsGroupName() const =0;
   virtual QString myResourcesGroupName() const =0;
   virtual QString notInRosterGroupName() const =0;
-signals:
+protected:
   virtual void streamAdded(const Jid &AStreamJid) =0;
   virtual void streamRemoved(const Jid &AStreamJid) =0;
   virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;

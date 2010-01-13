@@ -28,7 +28,7 @@ public:
   virtual QVBoxLayout *actionsLayout() const { return ui.lytActionsLayout; }
   virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
 signals:
-  virtual void dialogDestroyed();
+  void dialogDestroyed();
 protected:
   void initialize(IPluginManager *APluginManager);
 protected slots:

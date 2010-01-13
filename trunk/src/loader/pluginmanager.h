@@ -54,7 +54,7 @@ public slots:
   virtual void quit();
   virtual void restart();
 signals:
-  virtual void aboutToQuit();
+  void aboutToQuit();
 protected:
   void loadSettings();
   void saveSettings();

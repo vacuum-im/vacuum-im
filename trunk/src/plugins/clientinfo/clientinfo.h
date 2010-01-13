@@ -116,11 +116,11 @@ public:
   virtual int entityTimePing(const Jid &AContactJid) const;
 signals:
   //IClientInfo
-  virtual void softwareInfoChanged(const Jid &AContactJid); 
-  virtual void lastActivityChanged(const Jid &AContactJid);
-  virtual void entityTimeChanged(const Jid &AContactJid);
+  void softwareInfoChanged(const Jid &AContactJid); 
+  void lastActivityChanged(const Jid &AContactJid);
+  void entityTimeChanged(const Jid &AContactJid);
   //IRosterIndexDataHolder
-  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+  void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
   Action *createInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, QObject *AParent) const;
   void deleteSoftwareDialogs(const Jid &AStreamJid);

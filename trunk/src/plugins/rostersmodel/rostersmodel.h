@@ -60,18 +60,18 @@ public:
   virtual QString myResourcesGroupName() const { return tr("My Resources"); }
   virtual QString notInRosterGroupName() const { return tr("Not in Roster"); }
 signals:
-  virtual void streamAdded(const Jid &AStreamJid);
-  virtual void streamRemoved(const Jid &AStreamJid);
-  virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
-  virtual void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
-  virtual void indexAboutToBeInserted(IRosterIndex *AIndex);
-  virtual void indexInserted(IRosterIndex *AIndex);
-  virtual void indexDataChanged(IRosterIndex *AIndex, int ARole);
-  virtual void indexAboutToBeRemoved(IRosterIndex *AIndex);
-  virtual void indexRemoved(IRosterIndex *AIndex);
-  virtual void indexDestroyed(IRosterIndex *AIndex);
-  virtual void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder);
-  virtual void defaultDataHolderRemoved(IRosterIndexDataHolder *ADataHolder);
+  void streamAdded(const Jid &AStreamJid);
+  void streamRemoved(const Jid &AStreamJid);
+  void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
+  void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
+  void indexAboutToBeInserted(IRosterIndex *AIndex);
+  void indexInserted(IRosterIndex *AIndex);
+  void indexDataChanged(IRosterIndex *AIndex, int ARole);
+  void indexAboutToBeRemoved(IRosterIndex *AIndex);
+  void indexRemoved(IRosterIndex *AIndex);
+  void indexDestroyed(IRosterIndex *AIndex);
+  void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder);
+  void defaultDataHolderRemoved(IRosterIndexDataHolder *ADataHolder);
 protected:
   void emitDelayedDataChanged(IRosterIndex *AIndex);
   void insertDefaultDataHolders(IRosterIndex *AIndex);

@@ -83,7 +83,7 @@ public:
   virtual QString savePrivacyList(const Jid &AStreamJid, const IPrivacyList &AList) =0;
   virtual QString removePrivacyList(const Jid &AStreamJid, const QString &AList) =0;
   virtual QDialog *showEditListsDialog(const Jid &AStreamJid, QWidget *AParent = NULL) =0;
-signals:
+protected:
   virtual void listAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList) =0;
   virtual void listLoaded(const Jid &AStreamJid, const QString &AList) =0;
   virtual void listRemoved(const Jid &AStreamJid, const QString &AList) =0;

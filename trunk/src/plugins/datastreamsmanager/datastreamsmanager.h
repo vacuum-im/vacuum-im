@@ -74,15 +74,15 @@ public:
   virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS);
   virtual bool rejectStream(const QString &AStreamId, const QString &AError);
 signals:
-  virtual void methodInserted(IDataStreamMethod *AMethod);
-  virtual void methodRemoved(IDataStreamMethod *AMethod);
-  virtual void methodSettingsInserted(const QString &ASettingsNS, const QString &ASettingsName);
-  virtual void methodSettingsRemoved(const QString &ASettingsNS);
-  virtual void profileInserted(IDataStreamProfile *AProfile);
-  virtual void profileRemoved(IDataStreamProfile *AProfile);
+  void methodInserted(IDataStreamMethod *AMethod);
+  void methodRemoved(IDataStreamMethod *AMethod);
+  void methodSettingsInserted(const QString &ASettingsNS, const QString &ASettingsName);
+  void methodSettingsRemoved(const QString &ASettingsNS);
+  void profileInserted(IDataStreamProfile *AProfile);
+  void profileRemoved(IDataStreamProfile *AProfile);
   //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   virtual Stanza errorStanza(const Jid &AContactJid, const QString &ARequestId, const QString &ACondition, 
     const QString &AErrNS=EHN_DEFAULT, const QString &AText=QString::null) const;

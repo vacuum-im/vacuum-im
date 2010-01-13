@@ -82,13 +82,13 @@ public:
   virtual IDataFormWidget *formWidget(const IDataForm &AForm, QWidget *AParent);
   virtual IDataDialogWidget *dialogWidget(const IDataForm &AForm, QWidget *AParent);
 signals:
-  virtual void tableWidgetCreated(IDataTableWidget *ATable);
-  virtual void mediaWidgetCreated(IDataMediaWidget *AMedia);
-  virtual void fieldWidgetCreated(IDataFieldWidget *AField);
-  virtual void formWidgetCreated(IDataFormWidget *AForm);
-  virtual void dialogWidgetCreated(IDataDialogWidget *ADialog);
-  virtual void urlLoaded(const QUrl &AUrl, const QByteArray &AData);
-  virtual void urlLoadFailed(const QUrl &AUrl, const QString &AError);
+  void tableWidgetCreated(IDataTableWidget *ATable);
+  void mediaWidgetCreated(IDataMediaWidget *AMedia);
+  void fieldWidgetCreated(IDataFieldWidget *AField);
+  void formWidgetCreated(IDataFormWidget *AForm);
+  void dialogWidgetCreated(IDataDialogWidget *ADialog);
+  void urlLoaded(const QUrl &AUrl, const QByteArray &AData);
+  void urlLoadFailed(const QUrl &AUrl, const QString &AError);
 protected:
   void xmlLayout(const IDataLayout &ALayout, QDomElement &ALayoutElem) const;
   void urlLoadSuccess(const QUrl &AUrl, const QByteArray &AData);

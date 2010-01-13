@@ -42,7 +42,7 @@ public:
   virtual void removeStatusItem(int AStatusId) =0;
   virtual QIcon iconByShow(int AShow) const =0;
   virtual QString nameByShow(int AShow) const =0;
-signals:
+protected:
   virtual void statusAboutToBeChanged(const Jid &AStreamJid, int AStatusId) =0;
   virtual void statusChanged(const Jid &AStreamJid, int AStatusId) =0;
   virtual void statusItemAdded(int AStatusId) =0;

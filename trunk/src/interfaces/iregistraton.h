@@ -50,7 +50,7 @@ public:
   virtual QString sendChangePasswordRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AUserName, const QString &APassword) =0;
   virtual QString sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit) =0;
   virtual bool showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL) =0;
-signals:
+protected:
   virtual void registerFields(const QString &AId, const IRegisterFields &AFields) =0;
   virtual void registerSuccessful(const QString &AId) =0;
   virtual void registerError(const QString &AId, const QString &AError) =0;

@@ -65,11 +65,11 @@ public:
   virtual QMap<QString, QVariant> infoValues() const;
   virtual QList<QString> variants() const;
 signals:
-  virtual void widgetAdded(QWidget *AWidget) const;
-  virtual void widgetRemoved(QWidget *AWidget) const;
-  virtual void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
-  virtual void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const;
-  virtual void urlClicked(QWidget *AWidget, const QUrl &AUrl) const;
+  void widgetAdded(QWidget *AWidget) const;
+  void widgetRemoved(QWidget *AWidget) const;
+  void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
+  void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const;
+  void urlClicked(QWidget *AWidget, const QUrl &AUrl) const;
 public:
   static QList<QString> styleVariants(const QString &AStylePath);
   static QMap<QString, QVariant> styleInfo(const QString &AStylePath);

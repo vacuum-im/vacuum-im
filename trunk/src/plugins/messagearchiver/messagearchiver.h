@@ -126,28 +126,28 @@ public:
   virtual QString removeServerCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false);
   virtual QString loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = "");
 signals:
-  virtual void archiveAutoSaveChanged(const Jid &AStreamJid, bool AAuto);
-  virtual void archivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
-  virtual void archiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs);
-  virtual void archiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid);
-  virtual void requestCompleted(const QString &AId);
-  virtual void requestFailed(const QString &AId, const QString &AError);
+  void archiveAutoSaveChanged(const Jid &AStreamJid, bool AAuto);
+  void archivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
+  void archiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs);
+  void archiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid);
+  void requestCompleted(const QString &AId);
+  void requestFailed(const QString &AId, const QString &AError);
   //Local Archive
-  virtual void localCollectionOpened(const Jid &AStreamJid, const IArchiveHeader &AHeader);
-  virtual void localCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
-  virtual void localCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+  void localCollectionOpened(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+  void localCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+  void localCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
   //Server Archive
-  virtual void serverCollectionSaved(const QString &AId, const IArchiveHeader &AHeader);
-  virtual void serverHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders,  const IArchiveResultSet &AResult);
-  virtual void serverCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection,  const IArchiveResultSet &AResult);
-  virtual void serverCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
-  virtual void serverModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs,  const IArchiveResultSet &AResult);
+  void serverCollectionSaved(const QString &AId, const IArchiveHeader &AHeader);
+  void serverHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders,  const IArchiveResultSet &AResult);
+  void serverCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection,  const IArchiveResultSet &AResult);
+  void serverCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
+  void serverModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs,  const IArchiveResultSet &AResult);
   //ArchiveWindow
-  virtual void archiveWindowCreated(IArchiveWindow *AWindow);
-  virtual void archiveWindowDestroyed(IArchiveWindow *AWindow);
+  void archiveWindowCreated(IArchiveWindow *AWindow);
+  void archiveWindowDestroyed(IArchiveWindow *AWindow);
   //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   QString loadServerPrefs(const Jid &AStreamJid);
   QString loadStoragePrefs(const Jid &AStreamJid);

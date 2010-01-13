@@ -86,12 +86,12 @@ public:
   virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const;
   virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
 signals:
-  virtual void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
-  virtual void multiUserChatCreated(IMultiUserChat *AMultiChat);
-  virtual void multiUserChatDestroyed(IMultiUserChat *AMultiChat);
-  virtual void multiChatWindowCreated(IMultiUserChatWindow *AWindow);
-  virtual void multiChatWindowDestroyed(IMultiUserChatWindow *AWindow);
-  virtual void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
+  void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
+  void multiUserChatCreated(IMultiUserChat *AMultiChat);
+  void multiUserChatDestroyed(IMultiUserChat *AMultiChat);
+  void multiChatWindowCreated(IMultiUserChatWindow *AWindow);
+  void multiChatWindowDestroyed(IMultiUserChatWindow *AWindow);
+  void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 protected:
   void insertChatAction(IMultiUserChatWindow *AWindow);
   void removeChatAction(IMultiUserChatWindow *AWindow);

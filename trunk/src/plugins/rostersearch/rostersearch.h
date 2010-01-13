@@ -48,12 +48,12 @@ public:
   virtual void setSearchFieldEnabled(int ADataRole, bool AEnabled);
   virtual void removeSearchField(int ADataRole);
 signals:
-  virtual void searchResultUpdated();
-  virtual void searchStateChanged(bool AEnabled);
-  virtual void searchPatternChanged(const QString &APattern);
-  virtual void searchFieldInserted(int ADataRole, const QString &AName);
-  virtual void searchFieldChanged(int ADataRole);
-  virtual void searchFieldRemoved(int ADataRole);
+  void searchResultUpdated();
+  void searchStateChanged(bool AEnabled);
+  void searchPatternChanged(const QString &APattern);
+  void searchFieldInserted(int ADataRole, const QString &AName);
+  void searchFieldChanged(int ADataRole);
+  void searchFieldRemoved(int ADataRole);
 protected:
   virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 protected slots:

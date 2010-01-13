@@ -72,15 +72,15 @@ public:
   virtual bool showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
 signals:
   //IStreamFeaturePlugin
-  virtual void featureCreated(IStreamFeature *AStreamFeature);
-  virtual void featureDestroyed(IStreamFeature *AStreamFeature);
+  void featureCreated(IStreamFeature *AStreamFeature);
+  void featureDestroyed(IStreamFeature *AStreamFeature);
   //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
   //IRegistration
-  virtual void registerFields(const QString &AId, const IRegisterFields &AFields);
-  virtual void registerSuccessful(const QString &AId);
-  virtual void registerError(const QString &AId, const QString &AError);
+  void registerFields(const QString &AId, const IRegisterFields &AFields);
+  void registerSuccessful(const QString &AId);
+  void registerError(const QString &AId, const QString &AError);
 protected:
   void registerDiscoFeatures();
 protected slots:

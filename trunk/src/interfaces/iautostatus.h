@@ -21,7 +21,7 @@ public:
   virtual void setRuleEnabled(int ARuleId, bool AEnabled) =0;
   virtual void updateRule(int ARuleId, const IAutoStatusRule &ARule) =0;
   virtual void removeRule(int ARuleId) =0;
-signals:
+protected:
   virtual void ruleInserted(int ARuleId) =0;
   virtual void ruleChanged(int ARuleId) =0;
   virtual void ruleRemoved(int ARuleId) =0;

@@ -72,11 +72,11 @@ public:
   virtual void insertStreamsHandler(IFileStreamsHandler *AHandler, int AOrder);
   virtual void removeStreamsHandler(IFileStreamsHandler *AHandler, int AOrder);
 signals:
-  virtual void streamCreated(IFileStream *AStream);
-  virtual void streamDestroyed(IFileStream *AStream);
+  void streamCreated(IFileStream *AStream);
+  void streamDestroyed(IFileStream *AStream);
   // IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 protected slots:
   void onStreamDestroyed();
   void onShowFileStreamsWindow(bool);

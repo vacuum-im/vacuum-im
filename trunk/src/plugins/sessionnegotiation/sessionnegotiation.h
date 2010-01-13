@@ -64,8 +64,8 @@ public:
   virtual void insertNegotiator(ISessionNegotiator *ANegotiator, int AOrder);
   virtual void removeNegotiator(ISessionNegotiator *ANegotiator, int AOrder);
 signals:
-  virtual void sessionActivated(const IStanzaSession &ASession);
-  virtual void sessionTerminated(const IStanzaSession &ASession);
+  void sessionActivated(const IStanzaSession &ASession);
+  void sessionTerminated(const IStanzaSession &ASession);
 protected:
   bool sendSessionData(const IStanzaSession &ASession, const IDataForm &AForm) const;
   bool sendSessionError(const IStanzaSession &ASession, const IDataForm &ARequest) const;

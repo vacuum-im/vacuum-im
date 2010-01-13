@@ -33,12 +33,12 @@ public:
   virtual void removePage(ITabWindowPage *APage);
   virtual void clear();
 signals:
-  virtual void pageAdded(ITabWindowPage *APage);
-  virtual void currentPageChanged(ITabWindowPage *APage);
-  virtual void pageRemoved(ITabWindowPage *APage);
-  virtual void pageDetached(ITabWindowPage *APage);
-  virtual void windowChanged();
-  virtual void windowDestroyed();
+  void pageAdded(ITabWindowPage *APage);
+  void currentPageChanged(ITabWindowPage *APage);
+  void pageRemoved(ITabWindowPage *APage);
+  void pageDetached(ITabWindowPage *APage);
+  void windowChanged();
+  void windowDestroyed();
 protected:
   void initialize();
   void createActions();

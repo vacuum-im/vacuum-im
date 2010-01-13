@@ -42,12 +42,12 @@ public:
   virtual QList<IConnectionPlugin *> pluginList() const { return FConnectionPlugins; }
   virtual IConnectionPlugin *pluginById(const QUuid &APluginId) const;
 signals:
-  virtual void connectionCreated(IConnection *AConnection);
-  virtual void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
-  virtual void connectionDestroyed(IConnection *AConnection);
+  void connectionCreated(IConnection *AConnection);
+  void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
+  void connectionDestroyed(IConnection *AConnection);
 signals:
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 public:
   IConnectionPlugin *defaultPlugin() const;
   IConnection *insertConnection(IAccount *AAccount) const;

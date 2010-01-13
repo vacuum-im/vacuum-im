@@ -52,14 +52,14 @@ public:
   virtual void removeAccount(const QUuid &AAccountId);
   virtual void destroyAccount(const QUuid &AAccountId);
 signals:
-  virtual void appended(IAccount *AAccount);
-  virtual void shown(IAccount *AAccount);
-  virtual void hidden(IAccount *AAccount);
-  virtual void removed(IAccount *AAccount);
-  virtual void destroyed(const QUuid &AAccountId);
+  void appended(IAccount *AAccount);
+  void shown(IAccount *AAccount);
+  void hidden(IAccount *AAccount);
+  void removed(IAccount *AAccount);
+  void destroyed(const QUuid &AAccountId);
   //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 public:
   void openAccountOptionsDialog(const QUuid &AAccountId);
   void openAccountOptionsNode(const QUuid &AAccountId, const QString &AName);

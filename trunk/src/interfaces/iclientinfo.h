@@ -42,7 +42,7 @@ public:
   virtual QDateTime entityTime(const Jid &AContactJid) const =0;
   virtual int entityTimeDelta(const Jid &AContactJid) const =0;
   virtual int entityTimePing(const Jid &AContactJid) const =0;
-signals:
+protected:
   virtual void softwareInfoChanged(const Jid &AContactJid) =0;
   virtual void lastActivityChanged(const Jid &AContactJid) =0;
   virtual void entityTimeChanged(const Jid &AContactJid) =0;

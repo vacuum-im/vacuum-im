@@ -81,14 +81,14 @@ public:
   virtual int userChatState(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual int selfChatState(const Jid &AStreamJid, const Jid &AContactJid) const;
 signals:
-  virtual void chatStatesEnabled(bool AEnabled) const;
-  virtual void permitStatusChanged(const Jid &AContactJid, int AStatus) const;
-  virtual void supportStatusChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported) const;
-  virtual void userChatStateChanged(const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
-  virtual void selfChatStateChanged(const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
+  void chatStatesEnabled(bool AEnabled) const;
+  void permitStatusChanged(const Jid &AContactJid, int AStatus) const;
+  void supportStatusChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported) const;
+  void userChatStateChanged(const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
+  void selfChatStateChanged(const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
   //IOptionsHolder
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   bool isSendingPossible(const Jid &AStreamJid, const Jid &AContactJid) const;
   void sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid, int AState) const;

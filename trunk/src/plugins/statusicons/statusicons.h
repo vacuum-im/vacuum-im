@@ -57,13 +57,13 @@ public:
   virtual QString iconKeyByStatus(int AShow, const QString &ASubscription, bool AAsk) const;
   virtual QString iconFileName(const QString &ASubStorage, const QString &AIconKey) const;
 signals:
-  virtual void defaultStorageChanged(const QString &ASubStorage);
-  virtual void ruleInserted(const QString &APattern, const QString &ASubStorage, RuleType ARuleType);
-  virtual void ruleRemoved(const QString &APattern, RuleType ARuleType);
-  virtual void defaultIconsChanged();
-  virtual void statusIconsChanged();
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void defaultStorageChanged(const QString &ASubStorage);
+  void ruleInserted(const QString &APattern, const QString &ASubStorage, RuleType ARuleType);
+  void ruleRemoved(const QString &APattern, RuleType ARuleType);
+  void defaultIconsChanged();
+  void statusIconsChanged();
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   void loadStorages();
   void clearStorages();

@@ -45,10 +45,10 @@ public:
   virtual void removeStanzaHandle(int AHandleId);
   virtual bool checkStanza(const Stanza &AStanza, const QString &ACondition) const;
 signals:
-  virtual void stanzaSent(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void stanzaReceived(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void stanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle);
-  virtual void stanzaHandleRemoved(int AHandleId, const IStanzaHandle &AHandle);
+  void stanzaSent(const Jid &AStreamJid, const Stanza &AStanza);
+  void stanzaReceived(const Jid &AStreamJid, const Stanza &AStanza);
+  void stanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle);
+  void stanzaHandleRemoved(int AHandleId, const IStanzaHandle &AHandle);
 protected:
   virtual bool checkCondition(const QDomElement &AElem, const QString &ACondition, const int APos = 0) const;
   virtual bool processStanzaIn(const Jid &AStreamJid, Stanza &AStanza) const;

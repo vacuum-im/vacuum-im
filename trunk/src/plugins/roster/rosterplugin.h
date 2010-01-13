@@ -31,15 +31,15 @@ public:
   virtual QString rosterFileName(const Jid &AStreamJid) const;
   virtual void removeRoster(IXmppStream *AXmppStream);
 signals:
-  virtual void rosterAdded(IRoster *ARoster);
-  virtual void rosterOpened(IRoster *ARoster);
-  virtual void rosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
-  virtual void rosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
-  virtual void rosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText);
-  virtual void rosterClosed(IRoster *ARoster);
-  virtual void rosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
-  virtual void rosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
-  virtual void rosterRemoved(IRoster *ARoster);
+  void rosterAdded(IRoster *ARoster);
+  void rosterOpened(IRoster *ARoster);
+  void rosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
+  void rosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
+  void rosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText);
+  void rosterClosed(IRoster *ARoster);
+  void rosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
+  void rosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
+  void rosterRemoved(IRoster *ARoster);
 protected slots:
   void onRosterOpened();
   void onRosterItemReceived(const IRosterItem &ARosterItem);

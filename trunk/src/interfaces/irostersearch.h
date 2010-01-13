@@ -19,7 +19,7 @@ public:
   virtual bool isSearchFieldEnabled(int ADataRole) const =0;
   virtual void setSearchFieldEnabled(int ADataRole, bool AEnabled) =0;
   virtual void removeSearchField(int ADataRole) =0;
-signals:
+protected:
   virtual void searchResultUpdated() =0;
   virtual void searchStateChanged(bool AEnabled) =0;
   virtual void searchPatternChanged(const QString &APattern) =0;

@@ -28,9 +28,9 @@ public:
   virtual void removeReceiver(const Jid &AReceiver);
   virtual void clear();
 signals:
-  virtual void streamJidChanged(const Jid &ABefour);
-  virtual void receiverAdded(const Jid &AReceiver);
-  virtual void receiverRemoved(const Jid &AReceiver);
+  void streamJidChanged(const Jid &ABefour);
+  void receiverAdded(const Jid &AReceiver);
+  void receiverRemoved(const Jid &AReceiver);
 protected:
   void initialize();
   QTreeWidgetItem *getReceiversGroup(const QString &AGroup);

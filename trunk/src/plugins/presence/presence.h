@@ -36,12 +36,12 @@ public:
   virtual IPresenceItem presenceItem(const Jid &AItemJid) const { return FItems.value(AItemJid); }
   virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid()) const;
 signals:
-  virtual void opened();
-  virtual void changed(int AShow, const QString &AStatus, int APriority);
-  virtual void received(const IPresenceItem &APresenceItem);
-  virtual void sent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
-  virtual void aboutToClose(int AShow, const QString &AStatus);
-  virtual void closed();
+  void opened();
+  void changed(int AShow, const QString &AStatus, int APriority);
+  void received(const IPresenceItem &APresenceItem);
+  void sent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
+  void aboutToClose(int AShow, const QString &AStatus);
+  void closed();
 protected:
   void clearItems();
 protected slots:

@@ -27,7 +27,7 @@ public:
   virtual bool needHook(Direction ADirection) const =0;
   virtual bool hookData(QByteArray &AData, Direction ADirection) =0;
   virtual bool hookElement(QDomElement &AElem, Direction ADirection) =0;
-signals:
+protected:
   virtual void ready(bool ARestart) =0;
   virtual void error(const QString &AError) =0;
 };
@@ -39,7 +39,7 @@ public:
   virtual QList<QString> streamFeatures() const =0;
   virtual IStreamFeature *newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream) =0;
   virtual void destroyStreamFeature(IStreamFeature *AFeature) =0;
-signals:
+protected:
   virtual void featureCreated(IStreamFeature *AStreamFeature) =0;
   virtual void featureDestroyed(IStreamFeature *AStreamFeature) =0;
 };
@@ -66,7 +66,7 @@ public:
   virtual void insertFeature(IStreamFeature *AFeature) =0;
   virtual void removeFeature(IStreamFeature *AFeature) =0;
   virtual qint64 sendStanza(const Stanza &AStanza) =0;
-signals:
+protected:
   virtual void opened() =0;
   virtual void element(const QDomElement &AElem) =0;
   virtual void consoleElement(const QDomElement &AElem, bool ADirectionOut) =0;
@@ -95,7 +95,7 @@ public:
   virtual void destroyXmppStream(const Jid &AStreamJid) =0;
   virtual IStreamFeaturePlugin *featurePlugin(const QString &AFeatureNS) const =0;
   virtual void registerFeature(const QString &AFeatureNS, IStreamFeaturePlugin *AFeaturePlugin) =0;
-signals:
+protected:
   virtual void created(IXmppStream *AXmppStream) =0;
   virtual void added(IXmppStream *AXmppStream) =0;
   virtual void opened(IXmppStream *AXmppStream) =0;

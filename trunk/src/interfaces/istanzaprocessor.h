@@ -52,7 +52,7 @@ public:
   virtual int insertStanzaHandle(const IStanzaHandle &AHandle) =0;
   virtual void removeStanzaHandle(int AHandleId) =0;
   virtual bool checkStanza(const Stanza &AStanza, const QString &ACondition) const =0;
-signals:
+protected:
   virtual void stanzaSent(const Jid &AStreamJid, const Stanza &AStanza) =0;
   virtual void stanzaReceived(const Jid &AStreamJid, const Stanza &AStanza) =0;
   virtual void stanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle) =0;

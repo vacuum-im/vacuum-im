@@ -100,7 +100,7 @@ public:
   virtual bool sendCommandResult(const ICommandResult &AResult) =0;
   virtual QList<ICommand> contactCommands(const Jid &AStreamJid, const Jid &AContactJid) const =0;
   virtual bool executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode) =0;
-signals:
+protected:
   virtual void serverInserted(const QString &ANode, ICommandServer *AServer) =0;
   virtual void serverRemoved(const QString &ANode) =0;
   virtual void clientInserted(ICommandClient *AClient) =0;

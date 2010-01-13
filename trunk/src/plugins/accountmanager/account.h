@@ -36,7 +36,7 @@ public:
   virtual void setValue(const QString &AName, const QVariant &AValue);
   virtual void delValue(const QString &AName);
 signals:
-  virtual void changed(const QString &AName, const QVariant &AValue);
+  void changed(const QString &AName, const QVariant &AValue);
 private:
   ISettings *FSettings;
   IXmppStream *FXmppStream;

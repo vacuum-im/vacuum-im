@@ -131,19 +131,19 @@ public:
     //DiscoItems
   virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = "");
 signals:
-  virtual void discoItemsWindowCreated(IDiscoItemsWindow *AWindow);
-  virtual void discoItemsWindowDestroyed(IDiscoItemsWindow *AWindow);
-  virtual void discoHandlerInserted(IDiscoHandler *AHandler);
-  virtual void discoHandlerRemoved(IDiscoHandler *AHandler);
-  virtual void featureHandlerInserted(const QString &AFeature, IDiscoFeatureHandler *AHandler);
-  virtual void featureHandlerRemoved(const QString &AFeature, IDiscoFeatureHandler *AHandler);
-  virtual void discoFeatureInserted(const IDiscoFeature &AFeature);
-  virtual void discoFeatureRemoved(const IDiscoFeature &AFeature);
-  virtual void discoInfoReceived(const IDiscoInfo &ADiscoInfo);
-  virtual void discoInfoRemoved(const IDiscoInfo &ADiscoInfo);
-  virtual void discoItemsReceived(const IDiscoItems &ADiscoItems);
+  void discoItemsWindowCreated(IDiscoItemsWindow *AWindow);
+  void discoItemsWindowDestroyed(IDiscoItemsWindow *AWindow);
+  void discoHandlerInserted(IDiscoHandler *AHandler);
+  void discoHandlerRemoved(IDiscoHandler *AHandler);
+  void featureHandlerInserted(const QString &AFeature, IDiscoFeatureHandler *AHandler);
+  void featureHandlerRemoved(const QString &AFeature, IDiscoFeatureHandler *AHandler);
+  void discoFeatureInserted(const IDiscoFeature &AFeature);
+  void discoFeatureRemoved(const IDiscoFeature &AFeature);
+  void discoInfoReceived(const IDiscoInfo &ADiscoInfo);
+  void discoInfoRemoved(const IDiscoInfo &ADiscoInfo);
+  void discoItemsReceived(const IDiscoItems &ADiscoItems);
   //IRosterIndexDataHolder
-  virtual void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+  void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
   void discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AElem) const;
   void discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &AInfo) const;

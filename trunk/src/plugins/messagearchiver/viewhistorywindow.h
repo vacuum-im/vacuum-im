@@ -62,14 +62,14 @@ public:
   virtual void setFilter(const IArchiveFilter &AFilter);
   virtual void reload();
 signals:
-  virtual void groupKindChanged(int AGroupKind);
-  virtual void archiveSourceChanged(int ASource);
-  virtual void filterChanged(const IArchiveFilter &AFilter);
-  virtual void itemCreated(QStandardItem *AItem);
-  virtual void itemContextMenu(QStandardItem *AItem, Menu *AMenu);
-  virtual void currentItemChanged(QStandardItem *ACurrent, QStandardItem *ABefour);
-  virtual void itemDestroyed(QStandardItem *AItem);
-  virtual void windowDestroyed(IArchiveWindow *AWindow);
+  void groupKindChanged(int AGroupKind);
+  void archiveSourceChanged(int ASource);
+  void filterChanged(const IArchiveFilter &AFilter);
+  void itemCreated(QStandardItem *AItem);
+  void itemContextMenu(QStandardItem *AItem, Menu *AMenu);
+  void currentItemChanged(QStandardItem *ACurrent, QStandardItem *ABefour);
+  void itemDestroyed(QStandardItem *AItem);
+  void windowDestroyed(IArchiveWindow *AWindow);
 protected:
   void initialize();
   QList<IArchiveHeader> indexHeaders(const QModelIndex &AIndex) const;

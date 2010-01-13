@@ -65,7 +65,7 @@ public:
   virtual void copyGroupToGroup(const QString &AGroup, const QString &AGroupTo) =0;
   virtual void moveGroupToGroup(const QString &AGroup, const QString &AGroupTo) =0;
   virtual void removeGroup(const QString &AGroup) =0;
-signals:
+protected:
   virtual void opened() =0;
   virtual void received(const IRosterItem &ARosterItem) =0;
   virtual void removed(const IRosterItem &ARosterItem) =0;
@@ -82,7 +82,7 @@ public:
   virtual IRoster *getRoster(const Jid &AStreamJid) const =0;
   virtual QString rosterFileName(const Jid &AStreamJid) const =0;
   virtual void removeRoster(IXmppStream *AXmppStream) =0;
-signals:
+protected:
   virtual void rosterAdded(IRoster *ARoster) =0;
   virtual void rosterOpened(IRoster *ARoster) =0;
   virtual void rosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem) =0;

@@ -23,7 +23,7 @@ public:
   virtual QString subscriptionMessage() const =0;
   virtual void setSubscriptionMessage(const QString &AMessage) =0;
   virtual ToolBarChanger *toolBarChanger() const =0;
-signals:
+protected:
   virtual void dialogDestroyed() =0;
 };
 
@@ -35,7 +35,7 @@ public:
   virtual const Jid &contactJid() const =0;
   virtual QVBoxLayout *actionsLayout() const =0;
   virtual ToolBarChanger *toolBarChanger() const =0;
-signals:
+protected:
   virtual void dialogDestroyed() =0;
 };
 
@@ -58,7 +58,7 @@ public:
   virtual bool checkOption(IRosterChanger::Option AOption) const =0;
   virtual void setOption(IRosterChanger::Option AOption, bool AValue) =0;
   virtual IAddContactDialog *showAddContactDialog(const Jid &AStreamJid) =0;
-signals:
+protected:
   virtual void addContactDialogCreated(IAddContactDialog *ADialog) =0;
   virtual void subscriptionDialogCreated(ISubscriptionDialog *ADialog) =0;
   virtual void optionChanged(IRosterChanger::Option AOption, bool AValue) =0;

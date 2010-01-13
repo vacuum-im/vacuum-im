@@ -17,7 +17,7 @@ public:
   virtual void setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote) =0;
   virtual bool loadAnnotations(const Jid &AStreamJid) =0;
   virtual bool saveAnnotations(const Jid &AStreamJid) =0;
-signals:
+protected:
   virtual void annotationsLoaded(const Jid &AStreamJid) =0;
   virtual void annotationsSaved(const Jid &AStreamJid) =0;
   virtual void annotationsError(const Jid &AStreamJid, const QString &AError) =0;

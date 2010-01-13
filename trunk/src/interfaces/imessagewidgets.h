@@ -42,7 +42,7 @@ public:
   virtual int visibleFields() const =0;
   virtual bool isFieldVisible(IInfoWidget::InfoField AField) const =0;
   virtual void setFieldVisible(IInfoWidget::InfoField AField, bool AVisible) =0;
-signals:
+protected:
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
   virtual void fieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue) =0;
@@ -62,7 +62,7 @@ public:
   virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
   virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions) =0;
   virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions) =0;
-signals:
+protected:
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
   virtual void messageStyleChanged(IMessageStyle *ABefour, const IMessageStyleOptions &AOptions) =0;
@@ -88,7 +88,7 @@ public:
   virtual void setMinimumLines(int ALines) =0;
   virtual QKeySequence sendKey() const =0;
   virtual void setSendKey(const QKeySequence &AKey) =0;
-signals:
+protected:
   virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook) =0;
   virtual void messageAboutToBeSend() =0;
   virtual void messageReady() =0;
@@ -113,7 +113,7 @@ public:
   virtual void addReceiver(const Jid &AReceiver) =0;
   virtual void removeReceiver(const Jid &AReceiver) =0;
   virtual void clear() =0;
-signals:
+protected:
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void receiverAdded(const Jid &AReceiver) =0;
   virtual void receiverRemoved(const Jid &AReceiver) =0;
@@ -159,7 +159,7 @@ public:
   virtual QString tabPageId() const =0;
   virtual void showWindow() =0;
   virtual void closeWindow() =0;
-signals:
+protected:
   virtual void windowShow() =0;
   virtual void windowClose() =0;
   virtual void windowChanged() =0;
@@ -180,7 +180,7 @@ public:
   virtual void setCurrentPage(ITabWindowPage *APage) =0;
   virtual void detachPage(ITabWindowPage *APage) =0;
   virtual void removePage(ITabWindowPage *APage) =0;
-signals:
+protected:
   virtual void pageAdded(ITabWindowPage *APage) =0;
   virtual void currentPageChanged(ITabWindowPage *APage) =0;
   virtual void pageRemoved(ITabWindowPage *APage) =0;
@@ -204,7 +204,7 @@ public:
   virtual IStatusBarWidget *statusBarWidget() const =0;
   virtual bool isActive() const =0;
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
-signals:
+protected:
   virtual void messageReady() =0;
   virtual void streamJidChanged(const Jid &ABefour) =0;
   virtual void contactJidChanged(const Jid &ABefour) =0;
@@ -242,7 +242,7 @@ public:
   virtual int nextCount() const =0;
   virtual void setNextCount(int ACount) =0;
   virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
-signals:
+protected:
   virtual void showNextMessage() =0;
   virtual void replyMessage() =0;
   virtual void forwardMessage() =0;
@@ -303,7 +303,7 @@ public:
   virtual void setEditorSendKey(const QKeySequence &AKey) =0;
   virtual void insertUrlHandler(IWidgetUrlHandler *AHandler, int AOrder) =0;
   virtual void removeUrlHandler(IWidgetUrlHandler *AHandler, int AOrder) =0;
-signals:
+protected:
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget) =0;
   virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
   virtual void editWidgetCreated(IEditWidget *AEditWidget) =0;

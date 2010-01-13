@@ -57,7 +57,7 @@ public:
   virtual bool initStream(const QList<QString> &AMethods) =0;
   virtual bool startStream(const QString &AMethodNS) =0;
   virtual void abortStream(const QString &AError) =0;
-signals:
+protected:
   virtual void stateChanged() =0;
   virtual void speedChanged() =0;
   virtual void progressChanged() =0;
@@ -94,7 +94,7 @@ public:
   virtual IFileStreamsHandler *streamHandler(const QString &AStreamId) const =0;
   virtual void insertStreamsHandler(IFileStreamsHandler *AHandler, int AOrder) =0;
   virtual void removeStreamsHandler(IFileStreamsHandler *AHandler, int AOrder) =0;
-signals:
+protected:
   virtual void streamCreated(IFileStream *AStream) =0;
   virtual void streamDestroyed(IFileStream *AStream) =0;
 };

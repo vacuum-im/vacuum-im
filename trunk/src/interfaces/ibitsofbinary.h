@@ -20,7 +20,7 @@ public:
   virtual bool saveBinary(const QString &AContentId, const QString &AType, const QByteArray &AData, quint64 AMaxAge) =0;
   virtual bool saveBinary(const QString &AContentId, const QString &AType, const QByteArray &AData, quint64 AMaxAge, Stanza &AStanza) =0;
   virtual bool removeBinary(const QString &AContentId) =0;
-signals:
+protected:
   virtual void binaryCached(const QString &AContentId, const QString &AType, const QByteArray &AData, quint64 AMaxAge) =0;
   virtual void binaryError(const QString &AContentId, const QString &AError) =0;
   virtual void binaryRemoved(const QString &AContentId) =0;

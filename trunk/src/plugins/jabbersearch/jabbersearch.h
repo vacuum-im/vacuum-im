@@ -48,9 +48,9 @@ public:
   virtual QString sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASubmit);
   virtual void showSearchDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
 signals:
-  virtual void searchFields(const QString &AId, const ISearchFields &AFields);
-  virtual void searchResult(const QString &AId, const ISearchResult &AResult);
-  virtual void searchError(const QString &AId, const QString &AError);
+  void searchFields(const QString &AId, const ISearchFields &AFields);
+  void searchResult(const QString &AId, const ISearchResult &AResult);
+  void searchError(const QString &AId, const QString &AError);
 protected:
   void registerDiscoFeatures();
 protected slots:

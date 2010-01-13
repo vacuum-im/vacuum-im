@@ -17,7 +17,7 @@ class IOptionsHolder
 public:
   virtual QObject *instance() =0;
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder) =0;
-signals:
+protected:
   virtual void optionsAccepted() =0;
   virtual void optionsRejected() =0;
 };
@@ -68,7 +68,7 @@ public:
   virtual void openOptionsNode(const QString &ANode, const QString &AName, const QString &ADescription, const QString &AIconKey, int AOrder) =0;
   virtual void closeOptionsNode(const QString &ANode) =0;
   virtual QDialog *openOptionsDialog(const QString &ANode = QString::null, QWidget *AParent = NULL) =0;
-signals:
+protected:
   virtual void profileAdded(const QString &AProfile) =0;
   virtual void settingsOpened() =0;
   virtual void profileOpened(const QString &AProfile) =0;

@@ -47,7 +47,7 @@ public:
   virtual QString sendRequest(const Jid &AStreamJid, const Jid &AServiceJid) =0;
   virtual QString sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASubmit) =0;
   virtual void showSearchDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL) =0;
-signals:
+protected:
   virtual void searchFields(const QString &AId, const ISearchFields &AFields) =0;
   virtual void searchResult(const QString &AId, const ISearchResult &AResult) =0;
   virtual void searchError(const QString &AId, const QString &AError) =0;

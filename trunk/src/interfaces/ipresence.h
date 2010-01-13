@@ -44,7 +44,7 @@ public:
   virtual bool sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority) =0;
   virtual IPresenceItem presenceItem(const Jid &AItemJid) const =0;
   virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid()) const =0;
-signals:
+protected:
   virtual void opened() =0;
   virtual void changed(int AShow, const QString &AStatus, int APriority) =0;
   virtual void received(const IPresenceItem &APresenceItem) =0;
@@ -63,7 +63,7 @@ public:
   virtual QList<Jid> contactsOnline() const =0;
   virtual QList<IPresence *> contactPresences(const Jid &AContactJid) const =0;
   virtual void removePresence(IXmppStream *AXmppStream) =0;
-signals:
+protected:
   virtual void streamStateChanged(const Jid &AStreamJid, bool AStateOnline) =0;
   virtual void contactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline) =0;
   virtual void presenceAdded(IPresence *APresence) =0;

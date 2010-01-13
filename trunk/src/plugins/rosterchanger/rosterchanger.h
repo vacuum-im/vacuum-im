@@ -79,11 +79,11 @@ public:
   virtual void setOption(IRosterChanger::Option AOption, bool AValue);
   virtual IAddContactDialog *showAddContactDialog(const Jid &AStreamJid);
 signals:
-  virtual void addContactDialogCreated(IAddContactDialog *ADialog);
-  virtual void subscriptionDialogCreated(ISubscriptionDialog *ADialog);
-  virtual void optionChanged(IRosterChanger::Option AOption, bool AValue);
-  virtual void optionsAccepted();
-  virtual void optionsRejected();
+  void addContactDialogCreated(IAddContactDialog *ADialog);
+  void subscriptionDialogCreated(ISubscriptionDialog *ADialog);
+  void optionChanged(IRosterChanger::Option AOption, bool AValue);
+  void optionsAccepted();
+  void optionsRejected();
 protected:
   QString subscriptionNotify(int ASubsType, const Jid &AContactJid) const;
   Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups, 

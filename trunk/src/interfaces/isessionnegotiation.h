@@ -67,7 +67,7 @@ public:
   virtual void showSessionParams(const Jid &AStreamJid, const Jid &AContactJid) =0;
   virtual void insertNegotiator(ISessionNegotiator *ANegotiator, int AOrder) =0;
   virtual void removeNegotiator(ISessionNegotiator *ANegotiator, int AOrder) =0;
-signals:
+protected:
   virtual void sessionActivated(const IStanzaSession &ASession) =0;
   virtual void sessionTerminated(const IStanzaSession &ASession) =0;
 };

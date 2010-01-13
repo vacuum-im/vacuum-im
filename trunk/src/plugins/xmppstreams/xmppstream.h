@@ -49,19 +49,19 @@ public:
   virtual void removeFeature(IStreamFeature *AFeature);
   virtual qint64 sendStanza(const Stanza &AStanza);
 signals:
-  virtual void opened();
-  virtual void element(const QDomElement &elem);
-  virtual void consoleElement(const QDomElement &AElem, bool ADirectionOut);
-  virtual void aboutToClose();
-  virtual void closed();
-  virtual void error(const QString &AError);
-  virtual void jidAboutToBeChanged(const Jid &AAfter);
-  virtual void jidChanged(const Jid &ABefour);
-  virtual void connectionAdded(IConnection *AConnection);
-  virtual void connectionRemoved(IConnection *AConnection);
-  virtual void featureAdded(IStreamFeature *AFeature);
-  virtual void featureRemoved(IStreamFeature *AFeature);
-  virtual void streamDestroyed();
+  void opened();
+  void element(const QDomElement &elem);
+  void consoleElement(const QDomElement &AElem, bool ADirectionOut);
+  void aboutToClose();
+  void closed();
+  void error(const QString &AError);
+  void jidAboutToBeChanged(const Jid &AAfter);
+  void jidChanged(const Jid &ABefour);
+  void connectionAdded(IConnection *AConnection);
+  void connectionRemoved(IConnection *AConnection);
+  void featureAdded(IStreamFeature *AFeature);
+  void featureRemoved(IStreamFeature *AFeature);
+  void streamDestroyed();
 protected:
   void startStream();
   void processFeatures();
