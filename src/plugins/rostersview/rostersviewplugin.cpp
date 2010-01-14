@@ -349,12 +349,14 @@ void RostersViewPlugin::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, cons
 
 void RostersViewPlugin::onAccountShown(IAccount *AAccount)
 {
-  FCollapseNS.insert(AAccount->streamJid(),AAccount->accountId().toString());
+  if (AAccount->isActive())
+    FCollapseNS.insert(AAccount->xmppStream()->streamJid(),AAccount->accountId().toString());
 }
 
 void RostersViewPlugin::onAccountHidden(IAccount *AAccount)
 {
-  FCollapseNS.remove(AAccount->streamJid());
+  if (AAccount->isActive())
+    FCollapseNS.remove(AAccount->xmppStream()->streamJid());
 }
 
 void RostersViewPlugin::onAccountDestroyed(const QUuid &AAccountId)

@@ -115,8 +115,12 @@ IAccount *AccountManager::accountById(const QUuid &AAcoountId) const
 IAccount *AccountManager::accountByStream(const Jid &AStreamJid) const
 {
   foreach(IAccount *account, FAccounts)
-    if (account->streamJid() == AStreamJid)
+  {
+    if (account->xmppStream() && account->xmppStream()->streamJid()==AStreamJid)
       return account;
+    else if (account->streamJid() == AStreamJid)
+      return account;
+  }
   return NULL;
 }
 

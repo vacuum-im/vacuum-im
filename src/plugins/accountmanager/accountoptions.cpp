@@ -36,7 +36,7 @@ void AccountOptions::apply()
     if (name.isEmpty())
       name = tr("New Account");
     Jid streamJid = ui.lneJabberId->text();
-    streamJid.setResource(!ui.lneResource->text().isEmpty() ? ui.lneResource->text() : QString(CLIENT_NAME));
+    streamJid.setResource(ui.lneResource->text());
 
     account->setName(name);
     account->setStreamJid(streamJid);
