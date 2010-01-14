@@ -345,7 +345,7 @@ bool MessageWidgets::chatWindowShowStatus() const
 
 void MessageWidgets::setChatWindowShowStatus(bool AShow)
 {
-  if (FChatWindowShowStatus == AShow)
+  if (FChatWindowShowStatus != AShow)
   {
     FChatWindowShowStatus = AShow;
     emit chatWindowShowStatusChanged(AShow);
