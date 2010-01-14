@@ -427,12 +427,14 @@ void RostersModel::insertDefaultDataHolders(IRosterIndex *AIndex)
 
 void RostersModel::onAccountShown(IAccount *AAccount)
 {
-  addStream(AAccount->streamJid());
+  if (AAccount->isActive())
+    addStream(AAccount->xmppStream()->streamJid());
 }
 
 void RostersModel::onAccountHidden(IAccount *AAccount)
 {
-  removeStream(AAccount->streamJid());
+  if (AAccount->isActive())
+    removeStream(AAccount->xmppStream()->streamJid());
 }
 
 void RostersModel::onAccountChanged(const QString &AName, const QVariant &AValue)
@@ -440,9 +442,9 @@ void RostersModel::onAccountChanged(const QString &AName, const QVariant &AValue
   if (AName == AVN_NAME)
   {
     IAccount *account = qobject_cast<IAccount *>(sender());
-    if (account)
+    if (account && account->isActive())
     {
-      IRosterIndex *streamIndex = FStreamsRoot.value(account->streamJid());
+      IRosterIndex *streamIndex = FStreamsRoot.value(account->xmppStream()->streamJid());
       if (streamIndex)
         streamIndex->setData(RDR_NAME,AValue.toString());
     }

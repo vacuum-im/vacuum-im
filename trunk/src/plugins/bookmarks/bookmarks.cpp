@@ -459,8 +459,8 @@ void BookMarks::onEditBookmarksDialogDestroyed()
 void BookMarks::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
   IAccount *account = qobject_cast<IAccount *>(sender());
-  if (account && AName == AVN_NAME && FStreamMenu.contains(account->streamJid()))
-    FStreamMenu[account->streamJid()]->setTitle(AValue.toString());
+  if (account && account->isActive() && AName == AVN_NAME && FStreamMenu.contains(account->xmppStream()->streamJid()))
+    FStreamMenu[account->xmppStream()->streamJid()]->setTitle(AValue.toString());
 }
 
 Q_EXPORT_PLUGIN2(plg_bookmarks, BookMarks)

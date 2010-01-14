@@ -495,9 +495,9 @@ QWidget *MessageArchiver::optionsWidget(const QString &ANode, int &AOrder)
   {
     AOrder = OWO_HISTORY;
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(nodeTree.at(1)) : NULL;
-    if (account && account->isActive() && isReady(account->streamJid()))
+    if (account && account->isActive() && isReady(account->xmppStream()->streamJid()))
     {
-      ArchiveOptions *widget = new ArchiveOptions(this,account->streamJid(),NULL);
+      ArchiveOptions *widget = new ArchiveOptions(this,account->xmppStream()->streamJid(),NULL);
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
       connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),widget,SLOT(reset()));
       return widget;
@@ -2549,8 +2549,8 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 
 void MessageArchiver::onAccountHidden(IAccount *AAccount)
 {
-  if (FArchiveWindows.contains(AAccount->streamJid()))
-    delete FArchiveWindows.take(AAccount->streamJid());
+  if (AAccount->isActive() && FArchiveWindows.contains(AAccount->xmppStream()->streamJid()))
+    delete FArchiveWindows.take(AAccount->xmppStream()->streamJid());
 }
 
 void MessageArchiver::onStreamJidChanged(IXmppStream * /*AXmppStream*/, const Jid &ABefour)

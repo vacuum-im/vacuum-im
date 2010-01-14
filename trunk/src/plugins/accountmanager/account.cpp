@@ -71,7 +71,7 @@ void Account::setName(const QString &AName)
 
 Jid Account::streamJid() const
 {
-  return FXmppStream == NULL ? value(AVN_STREAM_JID).toString() : FXmppStream->streamJid();
+  return value(AVN_STREAM_JID).toString();
 }
 
 void Account::setStreamJid(const Jid &AJid)
