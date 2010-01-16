@@ -194,6 +194,10 @@ void DefaultConnection::connectToNextHost()
   if (!FRecords.isEmpty())
   {
     QJDns::Record record = FRecords.takeFirst();
+
+    while (record.name.endsWith('.'))
+      record.name.chop(1);
+
     if (FSSLConnection)
       FSocket.connectToHostEncrypted(record.name, record.port);
     else
