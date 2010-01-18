@@ -10,7 +10,7 @@
 
 echo "
 Usage:
-sh src/packages/deb/make_deb.sh
+sh src/packages/linux/make_deb.sh
 
 Build requirements: subversion build-essential devscripts fakeroot debhelper libqt4-dev
 
@@ -28,7 +28,7 @@ VERSION="${VER}${svn_version}"
 
 # Folders
 sourcedir="${PWD}"
-debdir="${sourcedir}/src/packages/deb/debian"
+debdir="${sourcedir}/src/packages/linux/debian"
 pkgdir="${sourcedir}/debian"
 
 
