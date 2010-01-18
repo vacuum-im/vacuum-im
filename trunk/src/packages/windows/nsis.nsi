@@ -1,4 +1,4 @@
-; windows.nsi
+; nsis.nsi
 ;
 ; This script creates Vacuum-IM installer for windows
 ;--------------------------------
