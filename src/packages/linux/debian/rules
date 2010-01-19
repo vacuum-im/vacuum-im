@@ -53,7 +53,7 @@ install: build
 
 	# Add here commands to install the package into debian/vacuum-im.
 	$(MAKE) INSTALL_ROOT=$(CURDIR)/debian/vacuum-im install
-	install -Dm644 $(CURDIR)/src/packages/deb/vacuum.desktop $(CURDIR)/debian/vacuum-im/usr/share/applications/vacuum.desktop
+	install -Dm644 $(CURDIR)/src/packages/linux/vacuum.desktop $(CURDIR)/debian/vacuum-im/usr/share/applications/vacuum.desktop
 	for size in 16 24 32 48 64 96 128 ; do \
 	    install -Dm644 $(CURDIR)/resources/menuicons/shared/mainwindowlogo$${size}.png $(CURDIR)/debian/vacuum-im/usr/share/icons/hicolor/$${size}x$${size}/apps/vacuum.png ; \
 	done
