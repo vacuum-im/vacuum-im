@@ -1,8 +1,7 @@
 <project>
     <shortName>VacuumIM</shortName>
     <fullName>Vacuum-IM</fullName>
-    <version>0.0.0.Preview</version>
-    <installerFilename></installerFilename>
+    <version>0.0.0</version>
     <readmeFile>../../../README</readmeFile>
     <licenseFile>../../../COPYING</licenseFile>
     <logoImage>../../../resources/menuicons/shared/mainwindowlogo48.png</logoImage>
@@ -64,9 +63,6 @@
                             <origin>../../../ssleay32.dll</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>../../../msvcr90.dll</origin>
-                        </distributionFile>
-                        <distributionFile>
                             <origin>../../../QtCore4.dll</origin>
                         </distributionFile>
                         <distributionFile>
@@ -84,6 +80,12 @@
                         <distributionDirectory>
                             <origin>../../../imageformats</origin>
                         </distributionDirectory>
+                        <distributionFile>
+                            <origin>../../../msvcr90.dll</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../../../msvcp90.dll</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>

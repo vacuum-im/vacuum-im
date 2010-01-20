@@ -4,7 +4,7 @@
 ;--------------------------------
 
 ; Program Version
-!define PROGRAM_VERSION     "0.0.0.Preview"
+!define PROGRAM_VERSION     "0.0.0"
 
 ; Install Folder
 !define PROGRAM_FOLDER      "VacuumIM"
@@ -74,6 +74,7 @@ Section "VacuumIM (required)"
 	
   ; Visual Studio redistribute files
   File "${PROGRAM_BIN_FOLDER}\msvcr90.dll"
+  File "${PROGRAM_BIN_FOLDER}\msvcp90.dll"
 	
   ; MinGW redistribute files
   ;File "${PROGRAM_BIN_FOLDER}\libgcc_s_dw2-1.dll"
