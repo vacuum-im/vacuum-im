@@ -292,8 +292,7 @@ bool RostersViewPlugin::checkOption(IRostersView::Option AOption) const
 
 void RostersViewPlugin::setOption(IRostersView::Option AOption, bool AValue)
 {
-  bool changed = checkOption(AOption) != AValue;
-  if (changed)
+  if (checkOption(AOption) != AValue)
   {
     AValue ? FOptions |= AOption : FOptions &= ~AOption;
     if (FRostersView)
@@ -302,6 +301,8 @@ void RostersViewPlugin::setOption(IRostersView::Option AOption, bool AValue)
       FSortFilterProxyModel->setOption(AOption,AValue);
     if (AOption == IRostersView::ShowOfflineContacts)
       FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, AValue ? MNI_ROSTERVIEW_SHOW_OFFLINE : MNI_ROSTERVIEW_HIDE_OFFLINE);
+    if (AOption==IRostersView::ShowResource || AOption==IRostersView::ShowStatusText)
+      emit rosterDataChanged(NULL, Qt::DisplayRole);
     emit optionChanged(AOption,AValue);
   }
 }
