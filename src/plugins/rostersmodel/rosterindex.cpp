@@ -96,27 +96,26 @@ void RosterIndex::removeAllChilds()
     removeChild(FChilds.value(0));
 }
 
-void RosterIndex::insertDataHolder(IRosterIndexDataHolder *ADataHolder)
+void RosterIndex::insertDataHolder(IRosterDataHolder *ADataHolder)
 {
-  connect(ADataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
-    SLOT(onDataHolderChanged(IRosterIndex *, int)));
+  connect(ADataHolder->instance(),SIGNAL(rosterDataChanged(IRosterIndex *, int)), SLOT(onDataHolderChanged(IRosterIndex *, int)));
 
-  foreach(int role, ADataHolder->roles())
+  foreach(int role, ADataHolder->rosterDataRoles())
   {
-    FDataHolders[role].insert(ADataHolder->order(),ADataHolder);
-    dataChanged(this,role);
+    FDataHolders[role].insert(ADataHolder->rosterDataOrder(),ADataHolder);
+    emit dataChanged(this,role);
   }
   emit dataHolderInserted(ADataHolder);
 }
 
-void RosterIndex::removeDataHolder(IRosterIndexDataHolder *ADataHolder)
+void RosterIndex::removeDataHolder(IRosterDataHolder *ADataHolder)
 {
   disconnect(ADataHolder->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),
     this,SLOT(onDataHolderChanged(IRosterIndex *, int)));
   
-  foreach(int role, ADataHolder->roles())
+  foreach(int role, ADataHolder->rosterDataRoles())
   {
-    FDataHolders[role].remove(ADataHolder->order(),ADataHolder);
+    FDataHolders[role].remove(ADataHolder->rosterDataOrder(),ADataHolder);
     if (FDataHolders[role].isEmpty())
       FDataHolders.remove(role);
     dataChanged(this,role);
@@ -129,9 +128,9 @@ QVariant RosterIndex::data(int ARole) const
   QVariant data = FData.value(ARole);
   if (!data.isValid())
   {
-    QList<IRosterIndexDataHolder *> dataHolders = FDataHolders.value(ARole).values();
+    QList<IRosterDataHolder *> dataHolders = FDataHolders.value(ARole).values();
     for (int i=0; !data.isValid() && i<dataHolders.count(); i++)
-      data = dataHolders.at(i)->data(this,ARole);
+      data = dataHolders.at(i)->rosterData(this,ARole);
   }
   return data;
 }
@@ -143,10 +142,10 @@ QMap<int,QVariant> RosterIndex::data() const
   {
     if (!values.contains(role))
     {
-      QList<IRosterIndexDataHolder *> dataHolders = FDataHolders.value(role).values();
+      QList<IRosterDataHolder *> dataHolders = FDataHolders.value(role).values();
       for (int i=0; i<dataHolders.count(); i++)
       {
-        QVariant roleData = dataHolders.at(i)->data(this,role);
+        QVariant roleData = dataHolders.at(i)->rosterData(this,role);
         if (roleData.isValid())
         {
           values.insert(role,roleData);
@@ -162,9 +161,9 @@ void RosterIndex::setData(int ARole, const QVariant &AData)
 {
   int i = 0;
   bool dataSeted = false;
-  QList<IRosterIndexDataHolder *> dataHolders = FDataHolders.value(ARole).values();
+  QList<IRosterDataHolder *> dataHolders = FDataHolders.value(ARole).values();
   while (i < dataHolders.count() && !dataSeted)
-    dataSeted = dataHolders.value(i++)->setData(this,ARole,AData);
+    dataSeted = dataHolders.value(i++)->setRosterData(this,ARole,AData);
   
   if (!dataSeted)
   {
@@ -176,9 +175,9 @@ void RosterIndex::setData(int ARole, const QVariant &AData)
   }
 }
 
-IRosterIndexList RosterIndex::findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds) const
+QList<IRosterIndex *> RosterIndex::findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds) const
 {
-  IRosterIndexList indexes;
+  QList<IRosterIndex *> indexes;
   foreach (IRosterIndex *index, FChilds)
   {
     bool cheked = true;

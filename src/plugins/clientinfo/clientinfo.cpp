@@ -32,7 +32,6 @@ ClientInfo::ClientInfo()
   FPresencePlugin = NULL;
   FStanzaProcessor = NULL;
   FRostersViewPlugin = NULL;
-  FRostersModel = NULL;
   FDiscovery = NULL;
   FDataForms = NULL;
 
@@ -90,18 +89,6 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
   }
 
-  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
-  if (plugin)
-  {
-    FRostersModel = qobject_cast<IRostersModel*>(plugin->instance());
-    if (FRostersModel)
-    {
-      connect(this,SIGNAL(softwareInfoChanged(const Jid &)),SLOT(onSoftwareInfoChanged(const Jid &)));
-      connect(this,SIGNAL(lastActivityChanged(const Jid &)),SLOT(onLastActivityChanged(const Jid &)));
-      connect(this,SIGNAL(entityTimeChanged(const Jid &)),SLOT(onEntityTimeChanged(const Jid &)));
-    }
-  }
-
   plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
@@ -146,11 +133,6 @@ bool ClientInfo::initObjects()
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
 
-  if (FRostersModel)
-  {
-    FRostersModel->insertDefaultDataHolder(this);
-  }
-
   if (FDiscovery)
   {
     registerDiscoFeatures();
@@ -166,6 +148,12 @@ bool ClientInfo::initObjects()
   }
 
   return true;
+}
+
+bool ClientInfo::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+  Q_UNUSED(AHandlerId); Q_UNUSED(AStreamJid); Q_UNUSED(AStanza); Q_UNUSED(AAccept);
+  return false;
 }
 
 bool ClientInfo::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
@@ -287,41 +275,6 @@ void ClientInfo::stanzaRequestTimeout(const Jid &AStreamJid, const QString &ASta
   }
 }
 
-QList<int> ClientInfo::roles() const
-{
-  static QList<int> indexRoles = QList<int>()
-    << RDR_CLIENT_NAME << RDR_CLIENT_VERSION << RDR_CLIENT_OS
-    << RDR_LAST_ACTIVITY_TIME << RDR_LAST_ACTIVITY_TEXT
-    << RDR_ENTITY_TIME;
-  return indexRoles;
-}
-
-QList<int> ClientInfo::types() const
-{
-  static QList<int> indexTypes =  QList<int>()
-    << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-  return indexTypes;
-}
-
-QVariant ClientInfo::data(const IRosterIndex *AIndex, int ARole) const
-{
-  Jid contactJid = AIndex->data(RDR_JID).toString();
-  if (ARole == RDR_CLIENT_NAME)
-    return hasSoftwareInfo(contactJid) ? softwareName(contactJid) : QVariant();
-  else if (ARole == RDR_CLIENT_VERSION)
-    return hasSoftwareInfo(contactJid) ? softwareVersion(contactJid) : QVariant();
-  else if (ARole == RDR_CLIENT_OS)
-    return hasSoftwareInfo(contactJid) ? softwareOs(contactJid) : QVariant();
-  else if (ARole == RDR_LAST_ACTIVITY_TIME)
-    return hasLastActivity(contactJid) ? lastActivityTime(contactJid) : QVariant();
-  else if (ARole == RDR_LAST_ACTIVITY_TEXT)
-    return hasLastActivity(contactJid) ? lastActivityText(contactJid) : QVariant();
-  else if (ARole == RDR_ENTITY_TIME)
-    return hasEntityTime(contactJid) ? entityTime(contactJid) : QVariant();
-  else
-    return QVariant();
-}
-
 IDataFormLocale ClientInfo::dataFormLocale(const QString &AFormType)
 {
   IDataFormLocale locale;
@@ -334,6 +287,11 @@ IDataFormLocale ClientInfo::dataFormLocale(const QString &AFormType)
     locale.fields[FORM_FIELD_OS_VERSION].label = tr("OS Version");
   }
   return locale;
+}
+
+void ClientInfo::fillDiscoItems(IDiscoItems &ADiscoItems)
+{
+  Q_UNUSED(ADiscoItems);
 }
 
 void ClientInfo::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
@@ -845,7 +803,7 @@ void ClientInfo::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
 void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-  if (ALabelId == RLID_DISPLAY && types().contains(AIndex->type()))
+  if (ALabelId == RLID_DISPLAY)
   {
     Jid contactJid = AIndex->data(RDR_JID).toString();
 
@@ -880,51 +838,6 @@ void ClientInfo::onClientInfoDialogClosed(const Jid &AContactJid)
 void ClientInfo::onRosterRemoved(IRoster *ARoster)
 {
   deleteSoftwareDialogs(ARoster->streamJid());
-}
-
-void ClientInfo::onSoftwareInfoChanged(const Jid &AContactJid)
-{
-  IRosterIndexList indexList;
-  QList<Jid> streamJids = FRostersModel->streams();
-  foreach(Jid streamJid, streamJids)
-  {
-    IRosterIndexList indexList = FRostersModel->getContactIndexList(streamJid,AContactJid);
-    foreach(IRosterIndex *index, indexList)
-    {
-      emit dataChanged(index,RDR_CLIENT_NAME);
-      emit dataChanged(index,RDR_CLIENT_VERSION);
-      emit dataChanged(index,RDR_CLIENT_OS);
-    }
-  }
-}
-
-void ClientInfo::onLastActivityChanged(const Jid &AContactJid)
-{
-  IRosterIndexList indexList;
-  QList<Jid> streamJids = FRostersModel->streams();
-  foreach(Jid streamJid, streamJids)
-  {
-    IRosterIndexList indexList = FRostersModel->getContactIndexList(streamJid,AContactJid);
-    foreach(IRosterIndex *index, indexList)
-    {
-      emit dataChanged(index,RDR_LAST_ACTIVITY_TIME);
-      emit dataChanged(index,RDR_LAST_ACTIVITY_TEXT);
-    }
-  }
-}
-
-void ClientInfo::onEntityTimeChanged(const Jid &AContactJid)
-{
-  IRosterIndexList indexList;
-  QList<Jid> streamJids = FRostersModel->streams();
-  foreach(Jid streamJid, streamJids)
-  {
-    IRosterIndexList indexList = FRostersModel->getContactIndexList(streamJid,AContactJid);
-    foreach(IRosterIndex *index, indexList)
-    {
-      emit dataChanged(index,RDR_ENTITY_TIME);
-    }
-  }
 }
 
 void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)

@@ -38,7 +38,7 @@ public:
   virtual Qt::ItemFlags flags(const QModelIndex &AIndex) const; 
   virtual QVariant data(const QModelIndex &AIndex, int ARole = Qt::DisplayRole) const;
   virtual QMap<int, QVariant> itemData(const QModelIndex &AIndex) const;
-//IRostersModel
+  //IRostersModel
   virtual IRosterIndex *addStream(const Jid &AStreamJid);
   virtual QList<Jid> streams() const { return FStreamsRoot.keys(); }
   virtual void removeStream(const Jid &AStreamJid);
@@ -48,11 +48,11 @@ public:
   virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent);
   virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);
   virtual void removeRosterIndex(IRosterIndex *AIndex);
-  virtual IRosterIndexList getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false);
+  virtual QList<IRosterIndex *> getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false);
   virtual IRosterIndex *findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const;
   virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const;
-  virtual void insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder);
-  virtual void removeDefaultDataHolder(IRosterIndexDataHolder *ADataHolder);
+  virtual void insertDefaultDataHolder(IRosterDataHolder *ADataHolder);
+  virtual void removeDefaultDataHolder(IRosterDataHolder *ADataHolder);
   virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) const;
   virtual IRosterIndex *rosterIndexByModelIndex(const QModelIndex &AIndex) const;
   virtual QString blankGroupName() const { return tr("Blank Group"); }
@@ -70,8 +70,8 @@ signals:
   void indexAboutToBeRemoved(IRosterIndex *AIndex);
   void indexRemoved(IRosterIndex *AIndex);
   void indexDestroyed(IRosterIndex *AIndex);
-  void defaultDataHolderInserted(IRosterIndexDataHolder *ADataHolder);
-  void defaultDataHolderRemoved(IRosterIndexDataHolder *ADataHolder);
+  void defaultDataHolderInserted(IRosterDataHolder *ADataHolder);
+  void defaultDataHolderRemoved(IRosterDataHolder *ADataHolder);
 protected:
   void emitDelayedDataChanged(IRosterIndex *AIndex);
   void insertDefaultDataHolders(IRosterIndex *AIndex);
@@ -99,7 +99,7 @@ private:
   RosterIndex *FRootIndex;
   QHash<Jid,IRosterIndex *> FStreamsRoot;
   QSet<IRosterIndex *> FChangedIndexes;
-  QList<IRosterIndexDataHolder *> FDataHolders;
+  QList<IRosterDataHolder *> FDataHolders;
 };
 
 #endif // ROSTERSMODEL_H

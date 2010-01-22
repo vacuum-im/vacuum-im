@@ -8,7 +8,6 @@
 #include <definations/actiongroups.h>
 #include <definations/dataformtypes.h>
 #include <definations/rosterindextyperole.h>
-#include <definations/rosterdataholderorders.h>
 #include <definations/rosterlabelorders.h>
 #include <definations/rostertooltiporders.h>
 #include <definations/discofeaturehandlerorders.h>
@@ -20,7 +19,6 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/irostersmodel.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imainwindow.h>
 #include <utils/errorhandler.h>
@@ -55,13 +53,12 @@ class ClientInfo :
   public IClientInfo,
   public IStanzaHandler,
   public IStanzaRequestOwner,
-  public IRosterIndexDataHolder,
   public IDataLocalizer,
   public IDiscoHandler,
   public IDiscoFeatureHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IStanzaRequestOwner IRosterIndexDataHolder IDataLocalizer IDiscoHandler IDiscoFeatureHandler);
+  Q_INTERFACES(IPlugin IClientInfo IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoHandler IDiscoFeatureHandler);
 public:
   ClientInfo();
   ~ClientInfo();
@@ -74,22 +71,16 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
-  virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza &/*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
   virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IStanzaRequestOwner
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
-  //IRosterIndexDataHolder
-  virtual int order() const { return RDHO_DEFAULT; }
-  virtual QList<int> roles() const;
-  virtual QList<int> types() const;
-  virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
-  virtual bool setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/) { return false; }
   //IDataLocalizer
   virtual IDataFormLocale dataFormLocale(const QString &AFormType);
   //IDiscoHandler
   virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
-  virtual void fillDiscoItems(IDiscoItems &/*ADiscoItems*/) {};
+  virtual void fillDiscoItems(IDiscoItems &ADiscoItems);;
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
@@ -119,8 +110,6 @@ signals:
   void softwareInfoChanged(const Jid &AContactJid); 
   void lastActivityChanged(const Jid &AContactJid);
   void entityTimeChanged(const Jid &AContactJid);
-  //IRosterIndexDataHolder
-  void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
   Action *createInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, QObject *AParent) const;
   void deleteSoftwareDialogs(const Jid &AStreamJid);
@@ -132,9 +121,6 @@ protected slots:
   void onClientInfoActionTriggered(bool);
   void onClientInfoDialogClosed(const Jid &AContactJid);
   void onRosterRemoved(IRoster *ARoster);
-  void onSoftwareInfoChanged(const Jid &AContactJid);
-  void onLastActivityChanged(const Jid &AContactJid);
-  void onEntityTimeChanged(const Jid &AContactJid);
   void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 private:
   IPluginManager *FPluginManager;
@@ -142,20 +128,18 @@ private:
   IPresencePlugin *FPresencePlugin;
   IStanzaProcessor *FStanzaProcessor;
   IRostersViewPlugin *FRostersViewPlugin;
-  IRostersModel *FRostersModel;
   IServiceDiscovery *FDiscovery;
   IDataForms *FDataForms;
 private:
   int FTimeHandle;
   int FVersionHandle;
-  QHash<Jid, QSet<IPresence *> > FContactPresences;
-  QHash<QString, Jid> FSoftwareId;
-  QHash<Jid, SoftwareItem> FSoftwareItems;
-  QHash<QString, Jid> FActivityId;
-  QHash<Jid, ActivityItem> FActivityItems;
-  QHash<QString, Jid> FTimeId;
-  QHash<Jid, TimeItem> FTimeItems;
-  QHash<Jid, ClientInfoDialog *> FClientInfoDialogs;
+  QMap<QString, Jid> FSoftwareId;
+  QMap<Jid, SoftwareItem> FSoftwareItems;
+  QMap<QString, Jid> FActivityId;
+  QMap<Jid, ActivityItem> FActivityItems;
+  QMap<QString, Jid> FTimeId;
+  QMap<Jid, TimeItem> FTimeItems;
+  QMap<Jid, ClientInfoDialog *> FClientInfoDialogs;
 };
 
 #endif // CLIENTINFO_H

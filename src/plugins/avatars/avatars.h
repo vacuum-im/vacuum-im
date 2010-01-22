@@ -31,11 +31,11 @@ class Avatars :
   public IAvatars,
   public IStanzaHandler,
   public IStanzaRequestOwner,
-  public IRosterIndexDataHolder,
+  public IRosterDataHolder,
   public IOptionsHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterIndexDataHolder IStanzaRequestOwner IOptionsHolder);
+  Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IStanzaRequestOwner IOptionsHolder);
 public:
   Avatars();
   ~Avatars();
@@ -53,12 +53,12 @@ public:
   //IStanzaRequestOwner
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AId);
-  //IRosterIndexDataHolder
-  virtual int order() const;
-  virtual QList<int> roles() const;
-  virtual QList<int> types() const;
-  virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
-  virtual bool setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+  //IRosterDataHolder
+  virtual int rosterDataOrder() const;
+  virtual QList<int> rosterDataRoles() const;
+  virtual QList<int> rosterDataTypes() const;
+  virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
+  virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IAvatars
@@ -79,8 +79,8 @@ signals:
   void avatarChanged(const Jid &AContactJid);
   void avatarsVisibleChanged(bool AVisible);
   void showEmptyAvatarsChanged(bool AShow);
-  //IRosterIndexDataHolder
-  void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+  //IRosterDataHolder
+  void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
   //IOptionsHolder
   void optionsAccepted();
   void optionsRejected();

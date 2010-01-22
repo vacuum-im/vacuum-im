@@ -10,6 +10,7 @@
 #include <definations/actiongroups.h>
 #include <definations/menuicons.h>
 #include <definations/rosterindextyperole.h>
+#include <definations/rosterdataholderorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/iroster.h>
@@ -18,17 +19,17 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/isettings.h>
-#include "rosterindexdataholder.h"
 #include "iconsoptionswidget.h"
 
 class StatusIcons : 
   public QObject,
   public IPlugin,
   public IStatusIcons,
-  public IOptionsHolder
+  public IOptionsHolder,
+  public IRosterDataHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IStatusIcons IOptionsHolder);
+  Q_INTERFACES(IPlugin IStatusIcons IOptionsHolder IRosterDataHolder);
 public:
   StatusIcons();
   ~StatusIcons();
@@ -42,6 +43,12 @@ public:
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  //IRosterDataHolder
+  virtual int rosterDataOrder() const;
+  virtual QList<int> rosterDataRoles() const;
+  virtual QList<int> rosterDataTypes() const;
+  virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
+  virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
   //IStatusIcons
   virtual QString defaultSubStorage() const;
   virtual void setDefaultSubStorage(const QString &ASubStorage);
@@ -62,8 +69,11 @@ signals:
   void ruleRemoved(const QString &APattern, RuleType ARuleType);
   void defaultIconsChanged();
   void statusIconsChanged();
+  //IOptionsHolder
   void optionsAccepted();
   void optionsRejected();
+  //IRosterDataHolder
+  void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
 protected:
   void loadStorages();
   void clearStorages();
@@ -89,7 +99,6 @@ private:
   Action *FDefaultIconAction;
   QHash<QString,Action *> FCustomIconActions;
   IconStorage *FDefaultStorage;
-  RosterIndexDataHolder *FDataHolder;
 private:
   bool FStatusIconsChangedStarted;
   QString FDefaultSubStorage;

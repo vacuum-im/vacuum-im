@@ -9,7 +9,6 @@
 #include <definations/version.h>
 #include <definations/namespaces.h>
 #include <definations/rosterindextyperole.h>
-#include <definations/rosterdataholderorders.h>
 #include <definations/rosterlabelorders.h>
 #include <definations/rosterclickhookerorders.h>
 #include <definations/multiuserdataroles.h>
@@ -28,7 +27,6 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/irostersmodel.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
@@ -64,11 +62,10 @@ class ServiceDiscovery :
   public IStanzaRequestOwner,
   public IXmppUriHandler,
   public IDiscoHandler,
-  public IRosterIndexDataHolder,
   public IRostersClickHooker
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IStanzaRequestOwner IXmppUriHandler IDiscoHandler IRosterIndexDataHolder IRostersClickHooker);
+  Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IStanzaRequestOwner IXmppUriHandler IDiscoHandler IRostersClickHooker);
 public:
   ServiceDiscovery();
   ~ServiceDiscovery();
@@ -90,13 +87,7 @@ public:
   virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
   //IDiscoHandler
   virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
-  virtual void fillDiscoItems(IDiscoItems &/*ADiscoItems*/) {}
-  //IRosterIndexDataHolder
-  virtual int order() const { return RDHO_DEFAULT; }
-  virtual QList<int> roles() const;
-  virtual QList<int> types() const;
-  virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
-  virtual bool setData(IRosterIndex * /*AIndex*/, int /*ARole*/, const QVariant &/*AValue*/) { return false; }
+  virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
   //IRostersClickHooker
   virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder);
   //IServiceDiscovery
@@ -142,8 +133,6 @@ signals:
   void discoInfoReceived(const IDiscoInfo &ADiscoInfo);
   void discoInfoRemoved(const IDiscoInfo &ADiscoInfo);
   void discoItemsReceived(const IDiscoItems &ADiscoItems);
-  //IRosterIndexDataHolder
-  void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
   void discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AElem) const;
   void discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &AInfo) const;
@@ -169,7 +158,6 @@ protected slots:
   void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
   void onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
-  void onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo);
   void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
   void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
@@ -189,7 +177,6 @@ private:
   IStanzaProcessor *FStanzaProcessor;
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
-  IRostersModel *FRostersModel;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
   ITrayManager *FTrayManager;
   IMainWindowPlugin *FMainWindowPlugin;

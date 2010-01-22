@@ -8,6 +8,7 @@
 #include <definations/toolbargroups.h>
 #include <definations/rosterindextyperole.h>
 #include <definations/rosterproxyorders.h>
+#include <definations/rosterdataholderorders.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <interfaces/ipluginmanager.h>
@@ -19,7 +20,6 @@
 #include <interfaces/isettings.h>
 #include <utils/action.h>
 #include "rostersview.h"
-#include "indexdataholder.h"
 #include "sortfilterproxymodel.h"
 #include "rosteroptionswidget.h"
 
@@ -27,10 +27,11 @@ class RostersViewPlugin :
   public QObject,
   public IPlugin,
   public IRostersViewPlugin,
-  public IOptionsHolder
+  public IOptionsHolder,
+  public IRosterDataHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsHolder);
+  Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsHolder IRosterDataHolder);
 public:
   RostersViewPlugin();
   ~RostersViewPlugin();
@@ -42,8 +43,14 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IoptionHolder
+  //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  //IRosterDataHolder
+  virtual int rosterDataOrder() const;
+  virtual QList<int> rosterDataRoles() const;
+  virtual QList<int> rosterDataTypes() const;
+  virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
+  virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
   //IRostersViewPlugin
   virtual IRostersView *rostersView();
   virtual bool checkOption(IRostersView::Option AOption) const;
@@ -52,8 +59,11 @@ public:
   virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
 signals:
   void optionChanged(IRostersView::Option AOption, bool AValue);
+  //IOptionsHolder
   void optionsAccepted();
   void optionsRejected();
+  //IRosterDataHolder
+  void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
 protected:
   QString getExpandSettingsName(const QModelIndex &AIndex);
   void loadExpandedState(const QModelIndex &AIndex);
@@ -88,7 +98,6 @@ private:
   int FOptions; 
   bool FStartRestoreExpandState;
   RostersView *FRostersView; 
-  IndexDataHolder *FIndexDataHolder;
   SortFilterProxyModel *FSortFilterProxyModel;
   QAbstractItemModel *FLastModel;
   QHash<Jid,QString> FCollapseNS;

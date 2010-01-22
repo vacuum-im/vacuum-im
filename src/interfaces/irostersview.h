@@ -62,7 +62,7 @@ public:
   virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
   virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const =0;
   //--IndexNotify
-  virtual int appendNotify(IRosterIndexList AIndexes, int AOrder, const QIcon &AIcon, const QString &AToolTip, int AFlags=0) =0;
+  virtual int appendNotify(QList<IRosterIndex *> AIndexes, int AOrder, const QIcon &AIcon, const QString &AToolTip, int AFlags=0) =0;
   virtual QList<int> indexNotifies(IRosterIndex *Index, int AOrder) const =0;
   virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, int AFlags=0) =0;
   virtual void removeNotify(int ANotifyId) =0;
