@@ -58,9 +58,9 @@ void RosterIndex::appendChild(IRosterIndex *AIndex)
 {
   if (AIndex && !FChilds.contains(AIndex))
   {
+    emit childAboutToBeInserted(AIndex);
     FChilds.append(AIndex); 
     AIndex->setParentIndex(this);
-    emit childAboutToBeInserted(AIndex);
     emit childInserted(AIndex);
   }
 }

@@ -415,8 +415,9 @@ void RostersViewPlugin::onViewModelReset()
   }
 }
 
-void RostersViewPlugin::onViewModelAboutToBeChanged(QAbstractItemModel * /*AModel*/)
+void RostersViewPlugin::onViewModelAboutToBeChanged(QAbstractItemModel *AModel)
 {
+  Q_UNUSED(AModel);
   if (FRostersView->model())
   {
     disconnect(FRostersView->model(),SIGNAL(modelAboutToBeReset()),this,SLOT(onViewModelAboutToBeReset()));
@@ -425,8 +426,9 @@ void RostersViewPlugin::onViewModelAboutToBeChanged(QAbstractItemModel * /*AMode
   }
 }
 
-void RostersViewPlugin::onViewModelChanged(QAbstractItemModel * /*AModel*/)
+void RostersViewPlugin::onViewModelChanged(QAbstractItemModel *AModel)
 {
+  Q_UNUSED(AModel);
   if (FRostersView->model())
   {
     connect(FRostersView->model(),SIGNAL(modelAboutToBeReset()),SLOT(onViewModelAboutToBeReset()));
@@ -438,9 +440,9 @@ void RostersViewPlugin::onViewModelChanged(QAbstractItemModel * /*AModel*/)
 
 void RostersViewPlugin::onViewRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
 {
-  for (int row=AStart; row<=AEnd; row++)
-    loadExpandedState(AParent.child(row,0));
-  loadExpandedState(AParent);
+  Q_UNUSED(AEnd);
+  if (AStart == 0)
+    loadExpandedState(AParent);
 }
 
 void RostersViewPlugin::onViewIndexCollapsed(const QModelIndex &AIndex)
