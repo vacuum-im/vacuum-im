@@ -2,7 +2,6 @@
 #define ANNOTATIONS_H
 
 #include <QDomDocument>
-#include <definations/rosterindextyperole.h>
 #include <definations/actiongroups.h>
 #include <definations/rosterlabelorders.h>
 #include <definations/rosterindextyperole.h>
@@ -30,10 +29,10 @@ class Annotations :
   public QObject,
   public IPlugin,
   public IAnnotations,
-  public IRosterIndexDataHolder
+  public IRosterDataHolder
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IAnnotations IRosterIndexDataHolder);
+  Q_INTERFACES(IPlugin IAnnotations IRosterDataHolder);
 public:
   Annotations();
   ~Annotations();
@@ -45,12 +44,12 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IRosterIndexDataHolder
-  virtual int order() const;
-  virtual QList<int> roles() const;
-  virtual QList<int> types() const;
-  virtual QVariant data(const IRosterIndex *AIndex, int ARole) const;
-  virtual bool setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+  //IRosterDataHolder
+  virtual int rosterDataOrder() const;
+  virtual QList<int> rosterDataRoles() const;
+  virtual QList<int> rosterDataTypes() const;
+  virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
+  virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
   //IAnnotations
   virtual bool isEnabled(const Jid &AStreamJid) const;
   virtual QList<Jid> annotations(const Jid &AStreamJid) const;
@@ -65,7 +64,7 @@ signals:
   void annotationsSaved(const Jid &AStreamJid);
   void annotationsError(const Jid &AStreamJid, const QString &AError);
   void annotationModified(const Jid &AStreamJid, const Jid &AContactJid);
-  void dataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+  void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
   void updateDataHolder(const Jid &AStreamJid, const QList<Jid> &AContactJids);
 protected slots:
@@ -86,10 +85,10 @@ private:
   IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
-  QHash<Jid, QString> FLoadRequests;
-  QHash<Jid, QString> FSaveRequests;
-  QHash<Jid, QHash<Jid, Annotation> > FAnnotations;
-  QHash<Jid, QHash<Jid, EditNoteDialog *> > FEditDialogs;
+  QMap<Jid, QString> FLoadRequests;
+  QMap<Jid, QString> FSaveRequests;
+  QMap<Jid, QMap<Jid, Annotation> > FAnnotations;
+  QMap<Jid, QMap<Jid, EditNoteDialog *> > FEditDialogs;
 };
 
 #endif // ANNOTATIONS_H

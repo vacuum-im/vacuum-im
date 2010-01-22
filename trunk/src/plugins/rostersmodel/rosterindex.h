@@ -31,12 +31,12 @@ public:
   virtual void removeAllChilds();
   virtual Qt::ItemFlags flags() const { return FFlags; }
   virtual void setFlags(const Qt::ItemFlags &AFlags) { FFlags = AFlags; } 
-  virtual void insertDataHolder(IRosterIndexDataHolder *ADataHolder);
-  virtual void removeDataHolder(IRosterIndexDataHolder *ADataHolder);
+  virtual void insertDataHolder(IRosterDataHolder *ADataHolder);
+  virtual void removeDataHolder(IRosterDataHolder *ADataHolder);
   virtual QVariant data(int ARole) const;
   virtual QMap<int,QVariant> data() const;
   virtual void setData(int ARole, const QVariant &AData);
-  virtual IRosterIndexList findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds = false) const;
+  virtual QList<IRosterIndex *> findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds = false) const;
   virtual bool removeOnLastChildRemoved() const { return FRemoveOnLastChildRemoved; }
   virtual void setRemoveOnLastChildRemoved(bool ARemove) { FRemoveOnLastChildRemoved = ARemove; }
   virtual bool removeChildsOnRemoved() const { return FRemoveChildsOnRemoved; }
@@ -45,8 +45,8 @@ public:
   virtual void setDestroyOnParentRemoved(bool ADestroy) {FDestroyOnParentRemoved = ADestroy; }
 signals:
   void dataChanged(IRosterIndex *AIndex, int ARole);
-  void dataHolderInserted(IRosterIndexDataHolder *ADataHolder);
-  void dataHolderRemoved(IRosterIndexDataHolder *ADataHolder);
+  void dataHolderInserted(IRosterDataHolder *ADataHolder);
+  void dataHolderRemoved(IRosterDataHolder *ADataHolder);
   void childAboutToBeInserted(IRosterIndex *AIndex);
   void childInserted(IRosterIndex *AIndex);
   void childAboutToBeRemoved(IRosterIndex *AIndex);
@@ -65,7 +65,7 @@ private:
   IRosterIndex *FParentIndex;
   QList<IRosterIndex *> FChilds;
   QMap<int, QVariant> FData;
-  QHash<int, QMultiMap<int,IRosterIndexDataHolder *> > FDataHolders;
+  QHash<int, QMultiMap<int,IRosterDataHolder *> > FDataHolders;
 };
 
 #endif // ROSTERINDEX_H

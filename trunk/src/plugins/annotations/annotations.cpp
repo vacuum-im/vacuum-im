@@ -95,24 +95,24 @@ bool Annotations::initObjects()
   return true;
 }
 
-int Annotations::order() const
+int Annotations::rosterDataOrder() const
 {
   return RDHO_DEFAULT;
 }
 
-QList<int> Annotations::roles() const
+QList<int> Annotations::rosterDataRoles() const
 {
   static const QList<int> dataRoles = QList<int>() << RDR_ANNOTATIONS;
   return dataRoles;
 }
 
-QList<int> Annotations::types() const
+QList<int> Annotations::rosterDataTypes() const
 {
   static const QList<int> dataTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
   return dataTypes;
 }
 
-QVariant Annotations::data(const IRosterIndex *AIndex, int ARole) const
+QVariant Annotations::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
   if (ARole == RDR_ANNOTATIONS)
   {
@@ -122,9 +122,9 @@ QVariant Annotations::data(const IRosterIndex *AIndex, int ARole) const
   return QVariant();
 }
 
-bool Annotations::setData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+bool Annotations::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
 {
-  if (types().contains(AIndex->type()) && ARole==RDR_ANNOTATIONS)
+  if (rosterDataTypes().contains(AIndex->type()) && ARole==RDR_ANNOTATIONS)
   {
     setAnnotation(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_BARE_JID).toString(),AValue.toString());
     saveAnnotations(AIndex->data(RDR_STREAM_JID).toString());
@@ -200,8 +200,8 @@ bool Annotations::saveAnnotations(const Jid &AStreamJid)
     QDomDocument doc;
     QDomElement storage = doc.appendChild(doc.createElementNS(PSN_ANNOTATIONS,PST_ANNOTATIONS)).toElement();
 
-    const QHash<Jid, Annotation> &items = FAnnotations.value(AStreamJid);
-    QHash<Jid, Annotation>::const_iterator it = items.constBegin();
+    const QMap<Jid, Annotation> &items = FAnnotations.value(AStreamJid);
+    QMap<Jid, Annotation>::const_iterator it = items.constBegin();
     while (it != items.constEnd())
     {
       QDomElement elem = storage.appendChild(doc.createElement("note")).toElement();
@@ -229,9 +229,9 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
     QMultiHash<int,QVariant> findData;
     foreach(Jid contactJid, AContactJids)
       findData.insertMulti(RDR_BARE_JID,contactJid.pBare());
-    IRosterIndexList indexes = FRostersModel->streamRoot(AStreamJid)->findChild(findData,true);
+    QList<IRosterIndex *> indexes = FRostersModel->streamRoot(AStreamJid)->findChild(findData,true);
     foreach (IRosterIndex *index, indexes)
-      emit dataChanged(index,RDR_ANNOTATIONS);
+      emit rosterDataChanged(index,RDR_ANNOTATIONS);
   }
 }
 
@@ -255,7 +255,7 @@ void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid,
   {
     FLoadRequests.remove(AStreamJid);
 
-    QHash<Jid, Annotation> &items = FAnnotations[AStreamJid];
+    QMap<Jid, Annotation> &items = FAnnotations[AStreamJid];
     items.clear();
 
     QDomElement elem = AElement.firstChildElement("note");
@@ -321,7 +321,7 @@ void Annotations::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
   Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
   Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
-  if (types().contains(AIndex->type()) && isEnabled(streamJid) && contactJid.isValid())
+  if (rosterDataTypes().contains(AIndex->type()) && isEnabled(streamJid) && contactJid.isValid())
   {
     Action *action = new Action(AMenu);
     action->setText(tr("Annotation"));
@@ -335,7 +335,7 @@ void Annotations::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
 void Annotations::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-  if (ALabelId==RLID_DISPLAY && types().contains(AIndex->type()))
+  if (ALabelId==RLID_DISPLAY && rosterDataTypes().contains(AIndex->type()))
   {
     QString note = AIndex->data(RDR_ANNOTATIONS).toString();
     if (!note.isEmpty())

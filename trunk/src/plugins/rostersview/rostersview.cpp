@@ -413,7 +413,7 @@ QRect RostersView::labelRect(int ALabeld, const QModelIndex &AIndex) const
   return FRosterIndexDelegate->labelRect(ALabeld,indexOption(AIndex),AIndex);
 }
 
-int RostersView::appendNotify(IRosterIndexList AIndexes, int AOrder, const QIcon &AIcon, const QString &AToolTip, int AFlags)
+int RostersView::appendNotify(QList<IRosterIndex *> AIndexes, int AOrder, const QIcon &AIcon, const QString &AToolTip, int AFlags)
 {
   if (!AIndexes.isEmpty() && !AIcon.isNull())
   {
@@ -642,13 +642,13 @@ void RostersView::updateStatusText(IRosterIndex *AIndex)
 {
   const static QList<int> statusTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT << RIT_AGENT;
   
-  IRosterIndexList indexes;
+  QList<IRosterIndex *> indexes;
   if (AIndex == NULL)
   {
     QMultiHash<int,QVariant> findData;
     foreach(int type, statusTypes)
       findData.insert(RDR_TYPE,type);
-    indexes = FRostersModel!=NULL ? FRostersModel->rootIndex()->findChild(findData,true) : IRosterIndexList();
+    indexes = FRostersModel!=NULL ? FRostersModel->rootIndex()->findChild(findData,true) : QList<IRosterIndex *>();
   }
   else if (statusTypes.contains(AIndex->type()))
     indexes.append(AIndex);

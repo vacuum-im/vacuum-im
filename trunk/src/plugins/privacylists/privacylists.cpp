@@ -1059,7 +1059,7 @@ void PrivacyLists::setPrivacyLabel(const Jid &AStreamJid, const Jid &AContactJid
 {
   if (FRostersModel)
   {
-    IRosterIndexList indexList = FRostersModel->getContactIndexList(AStreamJid,AContactJid);
+    QList<IRosterIndex *> indexList = FRostersModel->getContactIndexList(AStreamJid,AContactJid);
     foreach(IRosterIndex *index, indexList)
     {
       if (AVisible)

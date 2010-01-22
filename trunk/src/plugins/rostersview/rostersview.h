@@ -19,7 +19,7 @@ struct NotifyItem
   int flags;
   QIcon icon;
   QString toolTip;
-  IRosterIndexList indexes;
+  QList<IRosterIndex *> indexes;
 };
 
 class RostersView : 
@@ -55,7 +55,7 @@ public:
   virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const;
   virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const;
   //--IndexNotify
-  virtual int appendNotify(IRosterIndexList AIndexes, int AOrder, const QIcon &AIcon, const QString &AToolTip, int AFlags=0);
+  virtual int appendNotify(QList<IRosterIndex *> AIndexes, int AOrder, const QIcon &AIcon, const QString &AToolTip, int AFlags=0);
   virtual QList<int> indexNotifies(IRosterIndex *Index, int AOrder) const;
   virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, int AFlags=0);
   virtual void removeNotify(int ANotifyId);

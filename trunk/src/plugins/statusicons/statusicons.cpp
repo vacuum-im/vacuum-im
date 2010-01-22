@@ -21,7 +21,6 @@ StatusIcons::StatusIcons()
   FDefaultStorage = NULL;
   FCustomIconMenu = NULL;
   FDefaultIconAction = NULL;
-  FDataHolder = NULL;
   FStatusIconsChangedStarted = false;
 }
 
@@ -102,8 +101,7 @@ bool StatusIcons::initObjects()
 
   if (FRostersModel)
   {
-    FDataHolder = new RosterIndexDataHolder(this);
-    FRostersModel->insertDefaultDataHolder(FDataHolder);
+    FRostersModel->insertDefaultDataHolder(this);
   }
 
   if (FSettingsPlugin)
@@ -131,6 +129,50 @@ QWidget *StatusIcons::optionsWidget(const QString &ANode, int &AOrder)
     return widget;
   }
   return NULL;
+}
+
+int StatusIcons::rosterDataOrder() const
+{
+  return RDHO_DEFAULT;
+}
+
+QList<int> StatusIcons::rosterDataRoles() const
+{
+  static QList<int> dataRoles = QList<int>() 
+    << Qt::DecorationRole;
+  return dataRoles;
+}
+
+QList<int> StatusIcons::rosterDataTypes() const
+{
+  static QList<int> indexTypes = QList<int>()
+    << RIT_STREAM_ROOT 
+    << RIT_CONTACT 
+    << RIT_AGENT 
+    << RIT_MY_RESOURCE;
+  return indexTypes;
+}
+
+QVariant StatusIcons::rosterData(const IRosterIndex *AIndex, int ARole) const
+{
+  if (ARole == Qt::DecorationRole)
+  {
+    Jid contactJid = AIndex->data(RDR_JID).toString();
+    if (contactJid.isValid())
+    {
+      int show = AIndex->data(RDR_SHOW).toInt();
+      QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
+      bool ask = !AIndex->data(RDR_ASK).toString().isEmpty();
+      return iconByJidStatus(contactJid,show,subscription,ask);
+    }
+  }
+  return QVariant();
+}
+
+bool StatusIcons::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+{
+  Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
+  return false;
 }
 
 QString StatusIcons::defaultSubStorage() const
@@ -396,6 +438,7 @@ void StatusIcons::updateCustomIconMenu(const QString &APattern)
 void StatusIcons::onStatusIconsChangedTimer()
 {
   emit statusIconsChanged();
+  emit rosterDataChanged(NULL,Qt::DecorationRole);
   FStatusIconsChangedStarted = false;
 }
 

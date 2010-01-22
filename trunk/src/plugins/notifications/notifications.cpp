@@ -180,7 +180,7 @@ int Notifications::appendNotification(const INotification &ANotification)
     Jid contactJid = record.notification.data.value(NDR_ROSTER_CONTACT_JID).toString();
     int order = record.notification.data.value(NDR_ROSTER_NOTIFY_ORDER).toInt();
     int flags = IRostersView::LabelBlink|IRostersView::LabelVisible;
-    IRosterIndexList indexes = FRostersModel->getContactIndexList(streamJid,contactJid,true);
+    QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,true);
     record.rosterId = FRostersViewPlugin->rostersView()->appendNotify(indexes,order,icon,toolTip,flags);
   }
   

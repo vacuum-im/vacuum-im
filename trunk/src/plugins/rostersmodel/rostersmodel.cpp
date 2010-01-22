@@ -270,6 +270,7 @@ IRosterIndex *RostersModel::createGroup(const QString &AName, const QString &AGr
     {
       newIndex = createRosterIndex(AType,groupTree.at(i),index);
       newIndex->setData(RDR_GROUP,group);
+      newIndex->setData(RDR_NAME,groupTree.at(i));
       insertRosterIndex(newIndex,index);
       index = newIndex;
       group += AGroupDelim + groupTree.value(++i);
@@ -288,9 +289,9 @@ void RostersModel::removeRosterIndex(IRosterIndex *AIndex)
   AIndex->setParentIndex(NULL);
 }
 
-IRosterIndexList RostersModel::getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate)
+QList<IRosterIndex *> RostersModel::getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate)
 {
-  IRosterIndexList indexList;
+  QList<IRosterIndex *> indexList;
   IRosterIndex *streamIndex = FStreamsRoot.value(AStreamJid);
   if (streamIndex)
   {
@@ -355,12 +356,12 @@ IRosterIndex *RostersModel::findGroup(const QString &AName, const QString &AGrou
   return index;
 }
 
-void RostersModel::insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder)
+void RostersModel::insertDefaultDataHolder(IRosterDataHolder *ADataHolder)
 {
   if (ADataHolder && !FDataHolders.contains(ADataHolder))
   {
     QMultiHash<int,QVariant> data;
-    foreach(int type, ADataHolder->types())
+    foreach(int type, ADataHolder->rosterDataTypes())
       data.insertMulti(RDR_TYPE,type);
 
     QList<IRosterIndex *> indexes = FRootIndex->findChild(data,true);
@@ -372,12 +373,12 @@ void RostersModel::insertDefaultDataHolder(IRosterIndexDataHolder *ADataHolder)
   }
 }
 
-void RostersModel::removeDefaultDataHolder(IRosterIndexDataHolder *ADataHolder)
+void RostersModel::removeDefaultDataHolder(IRosterDataHolder *ADataHolder)
 {
   if (ADataHolder && FDataHolders.contains(ADataHolder))
   {
     QMultiHash<int,QVariant> data;
-    foreach(int type, ADataHolder->types())
+    foreach(int type, ADataHolder->rosterDataTypes())
       data.insertMulti(RDR_TYPE,type);
 
     QList<IRosterIndex *> indexes = FRootIndex->findChild(data,true);
@@ -409,7 +410,7 @@ void RostersModel::emitDelayedDataChanged(IRosterIndex *AIndex)
     emit dataChanged(modelIndex,modelIndex);
   }
 
-  IRosterIndexList childs;
+  QList<IRosterIndex *> childs;
   foreach(IRosterIndex *index, FChangedIndexes)
     if (index->parentIndex() == AIndex)
       childs.append(index);
@@ -420,8 +421,8 @@ void RostersModel::emitDelayedDataChanged(IRosterIndex *AIndex)
 
 void RostersModel::insertDefaultDataHolders(IRosterIndex *AIndex)
 {
-  foreach(IRosterIndexDataHolder *dataHolder, FDataHolders)
-    if (dataHolder->types().contains(AIndex->type()))
+  foreach(IRosterDataHolder *dataHolder, FDataHolders)
+    if (dataHolder->rosterDataTypes().contains(AIndex->type()))
       AIndex->insertDataHolder(dataHolder);
 }
 
@@ -483,7 +484,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
     QHash<int,QVariant> findData;
     findData.insert(RDR_TYPE,itemType);
     findData.insert(RDR_BARE_JID,ARosterItem.itemJid.pBare());     
-    IRosterIndexList curItemList = streamIndex->findChild(findData,true);
+    QList<IRosterIndex *> curItemList = streamIndex->findChild(findData,true);
 
     QSet<QString> curGroups;
     foreach(IRosterIndex *index, curItemList)
@@ -491,14 +492,14 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
     QSet<QString> newGroups = itemGroups - curGroups;
     QSet<QString> oldGroups = curGroups - itemGroups; 
 
-    IRosterIndexList itemList; 
+    QList<IRosterIndex *> itemList; 
     QString groupDelim = ARoster->groupDelimiter();
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(ARoster->streamJid()) : NULL;
     foreach(QString group,itemGroups)
     {
       IRosterIndex *groupIndex = createGroup(!group.isEmpty() ? group : groupDisplay,groupDelim,groupType,streamIndex);
 
-      IRosterIndexList groupItemList;
+      QList<IRosterIndex *> groupItemList;
       //Если есть возможность переносим контакты из старой группы в новую
       if (newGroups.contains(group) && !oldGroups.isEmpty())
       {
@@ -582,7 +583,7 @@ void RostersModel::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARos
     data.insert(RDR_TYPE,RIT_CONTACT);     
     data.insert(RDR_TYPE,RIT_AGENT);     
     data.insert(RDR_BARE_JID,ARosterItem.itemJid.pBare());     
-    IRosterIndexList itemList = streamIndex->findChild(data,true);
+    QList<IRosterIndex *> itemList = streamIndex->findChild(data,true);
     foreach(IRosterIndex *index, itemList)
       removeRosterIndex(index);    
   }
@@ -597,7 +598,7 @@ void RostersModel::onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore
 
     QHash<int,QVariant> data;
     data.insert(RDR_STREAM_JID,ABefore.pFull());
-    IRosterIndexList itemList = FRootIndex->findChild(data,true);
+    QList<IRosterIndex *> itemList = FRootIndex->findChild(data,true);
     foreach(IRosterIndex *index, itemList)
       index->setData(RDR_STREAM_JID,after.pFull());
 
@@ -642,7 +643,7 @@ void RostersModel::onPresenceReceived(IPresence *APresence, const IPresenceItem 
       QHash<int,QVariant> findData;
       findData.insert(RDR_TYPE,itemType);
       findData.insert(RDR_PJID,APresenceItem.itemJid.pFull());
-      IRosterIndexList itemList = streamIndex->findChild(findData,true);
+      QList<IRosterIndex *> itemList = streamIndex->findChild(findData,true);
       int pitemsCount = APresence->presenceItems(APresenceItem.itemJid).count();
       foreach (IRosterIndex *index,itemList)
       {
@@ -666,7 +667,7 @@ void RostersModel::onPresenceReceived(IPresence *APresence, const IPresenceItem 
       QHash<int,QVariant> findData;
       findData.insert(RDR_TYPE,itemType);
       findData.insert(RDR_BARE_JID,APresenceItem.itemJid.pBare());
-      IRosterIndexList itemList = streamIndex->findChild(findData,true);
+      QList<IRosterIndex *> itemList = streamIndex->findChild(findData,true);
       foreach(IRosterIndex *index,itemList)
       {
         index->setData(RDR_SHOW,APresenceItem.show);
@@ -679,7 +680,7 @@ void RostersModel::onPresenceReceived(IPresence *APresence, const IPresenceItem 
       QHash<int,QVariant> findData;
       findData.insert(RDR_TYPE,itemType);
       findData.insert(RDR_PJID,APresenceItem.itemJid.pFull());
-      IRosterIndexList itemList = streamIndex->findChild(findData,true);
+      QList<IRosterIndex *> itemList = streamIndex->findChild(findData,true);
       if (itemList.isEmpty())
       {
         IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(APresence->streamJid()) : NULL;

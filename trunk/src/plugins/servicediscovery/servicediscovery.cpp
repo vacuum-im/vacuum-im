@@ -39,7 +39,6 @@ ServiceDiscovery::ServiceDiscovery()
   FMultiUserChatPlugin = NULL;
   FTrayManager = NULL;
   FMainWindowPlugin = NULL;
-  FRostersModel = NULL;
   FStatusIcons = NULL;
   FDataForms = NULL;
   FXmppUriQueries = NULL;
@@ -126,10 +125,6 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 
-  plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
-  if (plugin)
-    FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
-
   plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
@@ -175,26 +170,24 @@ bool ServiceDiscovery::initObjects()
     connect(FRostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
-  if (FRostersModel)
-  {
-    FRostersModel->insertDefaultDataHolder(this);
-    connect(this,SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
-    connect(this,SIGNAL(discoInfoRemoved(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
-  }
+
   if (FTrayManager)
   {
     FTrayManager->addAction(FDiscoMenu->menuAction(),AG_TMTM_DISCOVERY,true);
   }
+
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
     QToolButton *button = changer->addToolButton(FDiscoMenu->menuAction(),TBG_MWTTB_DISCOVERY,false);
     button->setPopupMode(QToolButton::InstantPopup);
   }
+
   if (FXmppUriQueries)
   {
     FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
   }
+
   return true;
 }
 
@@ -408,38 +401,9 @@ void ServiceDiscovery::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
   }
 }
 
-QList<int> ServiceDiscovery::roles() const
+void ServiceDiscovery::fillDiscoItems(IDiscoItems &ADiscoItems)
 {
-  static QList<int> indexRoles = QList<int>()
-    << RDR_DISCO_IDENT_CATEGORY << RDR_DISCO_IDENT_TYPE << RDR_DISCO_IDENT_NAME
-    << RDR_DISCO_FEATURES;
-  return indexRoles;
-}
-
-QList<int> ServiceDiscovery::types() const
-{
-  static QList<int> indexTypes =  QList<int>()
-    << RIT_STREAM_ROOT << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-  return indexTypes;
-}
-
-QVariant ServiceDiscovery::data(const IRosterIndex *AIndex, int ARole) const
-{
-  Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-  Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
-  if (hasDiscoInfo(streamJid,contactJid))
-  {
-    IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
-    if (ARole == RDR_DISCO_IDENT_CATEGORY)
-      return dinfo.identity.value(0).category;
-    else if (ARole == RDR_DISCO_IDENT_TYPE)
-      return dinfo.identity.value(0).type;
-    else if (ARole == RDR_DISCO_IDENT_NAME)
-      return dinfo.identity.value(0).name;
-    else if (ARole == RDR_DISCO_FEATURES)
-      return dinfo.features;
-  }
-  return QVariant();
+  Q_UNUSED(ADiscoItems);
 }
 
 bool ServiceDiscovery::rosterIndexClicked(IRosterIndex *AIndex, int AOrder)
@@ -1285,26 +1249,6 @@ void ServiceDiscovery::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
   removeQueuedRequest(request);
 }
 
-void ServiceDiscovery::onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo)
-{
-  QMultiHash<int,QVariant> dataValues;
-  dataValues.insertMulti(RDR_TYPE,RIT_CONTACT);
-  dataValues.insertMulti(RDR_TYPE,RIT_AGENT);
-  dataValues.insertMulti(RDR_TYPE,RIT_MY_RESOURCE);
-  dataValues.insertMulti(RDR_PJID,ADiscoInfo.contactJid.pFull());
-  IRosterIndexList indexList = FRostersModel->rootIndex()->findChild(dataValues,true);
-  foreach(Jid streamJid, FRostersModel->streams())
-    if (streamJid.pDomain() == ADiscoInfo.contactJid.pDomain())
-      indexList.append(FRostersModel->streamRoot(streamJid));
-  foreach(IRosterIndex *index, indexList)
-  {
-    emit dataChanged(index,RDR_DISCO_IDENT_CATEGORY);
-    emit dataChanged(index,RDR_DISCO_IDENT_TYPE);
-    emit dataChanged(index,RDR_DISCO_IDENT_NAME);
-    emit dataChanged(index,RDR_DISCO_FEATURES);
-  }
-}
-
 void ServiceDiscovery::onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus)
 {
   Q_UNUSED(AStatus);
@@ -1375,7 +1319,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMen
 
 void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-  if (ALabelId == RLID_DISPLAY && types().contains(AIndex->type()))
+  if (ALabelId == RLID_DISPLAY)
   {
     Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();

@@ -23,7 +23,6 @@ RostersViewPlugin::RostersViewPlugin()
   FRosterPlugin = NULL;
   FAccountManager = NULL;
 
-  FIndexDataHolder = NULL;
   FSortFilterProxyModel = NULL;
   FLastModel = NULL;
   FShowOfflineAction = NULL;
@@ -139,8 +138,7 @@ bool RostersViewPlugin::initObjects()
 
   if (FRostersModel)
   {
-    FIndexDataHolder = new IndexDataHolder(this);
-    FRostersModel->insertDefaultDataHolder(FIndexDataHolder);
+    FRostersModel->insertDefaultDataHolder(this);
     FRostersView->setRostersModel(FRostersModel);
   }
 
@@ -161,6 +159,127 @@ QWidget *RostersViewPlugin::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
+int RostersViewPlugin::rosterDataOrder() const
+{
+  return RDHO_DEFAULT;
+}
+
+QList<int> RostersViewPlugin::rosterDataRoles() const
+{
+  static QList<int> dataRoles  = QList<int>() 
+    << Qt::DisplayRole 
+    << Qt::BackgroundColorRole 
+    << Qt::ForegroundRole
+    << RDR_FONT_WEIGHT;
+  return dataRoles;
+}
+
+QList<int> RostersViewPlugin::rosterDataTypes() const
+{
+  static QList<int> indexTypes  = QList<int>()  
+    << RIT_STREAM_ROOT 
+    << RIT_GROUP
+    << RIT_GROUP_BLANK
+    << RIT_GROUP_AGENTS
+    << RIT_GROUP_MY_RESOURCES
+    << RIT_GROUP_NOT_IN_ROSTER
+    << RIT_CONTACT
+    << RIT_AGENT
+    << RIT_MY_RESOURCE;
+  return indexTypes;
+}
+
+QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) const
+{
+  switch (AIndex->type())
+  {
+  case RIT_STREAM_ROOT:
+    switch (ARole)
+    {
+    case Qt::DisplayRole:  
+      {
+        QString display = AIndex->data(RDR_NAME).toString();
+        if (display.isEmpty())
+          display = AIndex->data(RDR_JID).toString();
+        return display;
+      }
+    case Qt::ForegroundRole:
+      return Qt::white;
+    case Qt::BackgroundColorRole:
+      return Qt::gray;
+    case RDR_FONT_WEIGHT:
+      return QFont::Bold;
+    } 
+    break;
+
+  case RIT_GROUP:
+  case RIT_GROUP_BLANK:
+  case RIT_GROUP_AGENTS:
+  case RIT_GROUP_MY_RESOURCES:
+  case RIT_GROUP_NOT_IN_ROSTER:
+    switch (ARole)
+    {
+    case Qt::DisplayRole:  
+      return AIndex->data(RDR_NAME);
+    case Qt::ForegroundRole:
+      return Qt::blue;
+    case RDR_FONT_WEIGHT:
+      return QFont::DemiBold;
+    } 
+    break;
+
+  case RIT_CONTACT:
+    switch (ARole)
+    {
+    case Qt::DisplayRole: 
+      {
+        Jid indexJid = AIndex->data(RDR_JID).toString();
+        QString display = AIndex->data(RDR_NAME).toString();
+        if (display.isEmpty())
+          display = indexJid.bare();
+        if (checkOption(IRostersView::ShowResource) && !indexJid.resource().isEmpty())
+          display += "/" + indexJid.resource();
+        return display;
+      }
+    } 
+    break;
+
+  case RIT_AGENT:
+    switch (ARole)
+    {
+    case Qt::DisplayRole:
+      {
+        QString display = AIndex->data(RDR_NAME).toString();
+        if (display.isEmpty())
+        {
+          Jid indexJid = AIndex->data(RDR_JID).toString();
+          display = indexJid.bare();
+        }
+        return display;
+      }
+    } 
+    break;
+
+  case RIT_MY_RESOURCE:
+    switch (ARole)
+    {
+    case Qt::DisplayRole:
+      {
+        Jid indexJid = AIndex->data(RDR_JID).toString();
+        return indexJid.resource();
+      }
+    } 
+    break;
+  }
+  return QVariant();
+}
+
+bool RostersViewPlugin::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+{
+  Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
+  return false;
+}
+
 IRostersView *RostersViewPlugin::rostersView()
 {
   return FRostersView;
@@ -179,8 +298,6 @@ void RostersViewPlugin::setOption(IRostersView::Option AOption, bool AValue)
     AValue ? FOptions |= AOption : FOptions &= ~AOption;
     if (FRostersView)
       FRostersView->setOption(AOption,AValue);
-    if (FIndexDataHolder)
-      FIndexDataHolder->setOption(AOption,AValue);
     if (FSortFilterProxyModel)
       FSortFilterProxyModel->setOption(AOption,AValue);
     if (AOption == IRostersView::ShowOfflineContacts)
