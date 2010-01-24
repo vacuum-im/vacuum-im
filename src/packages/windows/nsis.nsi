@@ -7,13 +7,13 @@
 !define PROGRAM_VERSION     "0.0.0"
 
 ; Install Folder
-!define PROGRAM_FOLDER      "VacuumIM"
-
-; Registry Key
-!define PROGRAM_REG_KEY     "VacuumIM"
+!define PROGRAM_FOLDER      "Vacuum-IM"
 
 ; Install Start Menu Folder
 !define PROGRAM_SM_FOLDER   "Vacuum-IM"
+
+; Registry Key
+!define PROGRAM_REG_KEY     "VacuumIM"
 
 ; Program binaries
 !define PROGRAM_BIN_FOLDER  "..\..\.."
@@ -22,7 +22,7 @@
 Name "Vacuum-IM"
 
 ; The file to write
-OutFile "VacuumIM-${PROGRAM_VERSION}-windows-installer.exe"
+OutFile "vacuum_${PROGRAM_VERSION}_windows-installer.exe"
 
 ; License file name
 LicenseData "${PROGRAM_BIN_FOLDER}\COPYING"
