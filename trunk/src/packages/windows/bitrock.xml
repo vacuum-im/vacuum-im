@@ -1,7 +1,8 @@
 <project>
-    <shortName>VacuumIM</shortName>
+    <shortName>vacuum</shortName>
     <fullName>Vacuum-IM</fullName>
     <version>0.0.0</version>
+    <installerFilename>${product_shortname}_${product_version}_${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <readmeFile>../../../README</readmeFile>
     <licenseFile>../../../COPYING</licenseFile>
     <logoImage>../../../resources/menuicons/shared/mainwindowlogo48.png</logoImage>
@@ -159,7 +160,7 @@
             <description>Installer.Parameter.installdir.description</description>
             <explanation>Installer.Parameter.installdir.explanation</explanation>
             <value></value>
-            <default>${platform_install_prefix}/${product_shortname}</default>
+            <default>${platform_install_prefix}/${product_fullname}</default>
             <allowEmptyValue>0</allowEmptyValue>
             <cliOptionName>prefix</cliOptionName>
             <mustBeWritable>1</mustBeWritable>
