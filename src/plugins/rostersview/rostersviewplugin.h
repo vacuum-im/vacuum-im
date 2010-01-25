@@ -66,8 +66,8 @@ signals:
   void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
 protected:
   QString getExpandSettingsName(const QModelIndex &AIndex);
-  void loadExpandedState(const QModelIndex &AIndex);
-  void saveExpandedState(const QModelIndex &AIndex);
+  void loadExpandState(const QModelIndex &AIndex);
+  void saveExpandState(const QModelIndex &AIndex);
 protected slots:
   void onRostersViewDestroyed(QObject *AObject);
   void onViewModelAboutToBeReset();
