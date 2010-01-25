@@ -321,17 +321,13 @@ void RostersViewPlugin::startRestoreExpandState()
 void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 {
   QAbstractItemModel *curModel = FRostersView->model();
-  if (curModel)
+  int rows = curModel!=NULL ? curModel->rowCount(AParent) : -1;
+  if (rows > 0)
   {
     if (AParent.isValid())
       loadExpandState(AParent);
-    int rows = curModel->rowCount(AParent);
     for (int row = 0; row<rows; row++)
-    {
-      QModelIndex index = curModel->index(row,0,AParent);
-      if (curModel->rowCount(index) > 0)
-        restoreExpandState(index);
-    }
+      restoreExpandState(curModel->index(row,0,AParent));
   }
 }
 
