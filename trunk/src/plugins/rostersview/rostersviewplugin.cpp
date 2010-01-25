@@ -1,5 +1,7 @@
 #include "rostersviewplugin.h"
 
+#include <QtDebug>
+
 #include <QTimer>
 #include <QScrollBar>
 
@@ -322,7 +324,7 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
   if (curModel)
   {
     if (AParent.isValid())
-      loadExpandedState(AParent);
+      loadExpandState(AParent);
     int rows = curModel->rowCount(AParent);
     for (int row = 0; row<rows; row++)
     {
@@ -355,7 +357,7 @@ QString RostersViewPlugin::getExpandSettingsName(const QModelIndex &AIndex)
   return QString::null;
 }
 
-void RostersViewPlugin::loadExpandedState(const QModelIndex &AIndex)
+void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
 {
   QString settingsName = getExpandSettingsName(AIndex);
   if (FSettings && !settingsName.isEmpty())
@@ -370,7 +372,7 @@ void RostersViewPlugin::loadExpandedState(const QModelIndex &AIndex)
   }
 }
 
-void RostersViewPlugin::saveExpandedState(const QModelIndex &AIndex)
+void RostersViewPlugin::saveExpandState(const QModelIndex &AIndex)
 {
   QString settingsName = getExpandSettingsName(AIndex);
   if (FSettings && !settingsName.isEmpty())
@@ -440,19 +442,20 @@ void RostersViewPlugin::onViewModelChanged(QAbstractItemModel *AModel)
 
 void RostersViewPlugin::onViewRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
 {
-  Q_UNUSED(AEnd);
   if (AStart == 0)
-    loadExpandedState(AParent);
+    loadExpandState(AParent);
+  for (int row=AStart; row<=AEnd; row++)
+    restoreExpandState(AParent.child(row,0));
 }
 
 void RostersViewPlugin::onViewIndexCollapsed(const QModelIndex &AIndex)
 {
-  saveExpandedState(AIndex);
+  saveExpandState(AIndex);
 }
 
 void RostersViewPlugin::onViewIndexExpanded(const QModelIndex &AIndex)
 {
-  saveExpandedState(AIndex);
+  saveExpandState(AIndex);
 }
 
 void RostersViewPlugin::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter)
