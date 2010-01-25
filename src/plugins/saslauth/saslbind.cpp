@@ -12,19 +12,23 @@ SASLBind::~SASLBind()
 
 }
 
-bool SASLBind::start(const QDomElement &/*AElem*/)
+bool SASLBind::start(const QDomElement &AElem)
 {
-  FNeedHook = true;
-  Stanza bind("iq");
-  bind.setType("set").setId("bind"); 
-  if (FXmppStream->streamJid().resource().isEmpty())
-    bind.addElement("bind",NS_FEATURE_BIND);
-  else
-    bind.addElement("bind",NS_FEATURE_BIND)
+  if (AElem.tagName() == "bind")
+  {
+    FNeedHook = true;
+    Stanza bind("iq");
+    bind.setType("set").setId("bind"); 
+    if (FXmppStream->streamJid().resource().isEmpty())
+      bind.addElement("bind",NS_FEATURE_BIND);
+    else
+      bind.addElement("bind",NS_FEATURE_BIND)
       .appendChild(bind.createElement("resource"))
       .appendChild(bind.createTextNode(FXmppStream->streamJid().resource()));
-  FXmppStream->sendStanza(bind); 
-  return true;
+    FXmppStream->sendStanza(bind); 
+    return true;
+  }
+  return false;
 }
 
 bool SASLBind::needHook(Direction ADirection) const

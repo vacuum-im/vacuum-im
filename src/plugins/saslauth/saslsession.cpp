@@ -12,14 +12,18 @@ SASLSession::~SASLSession()
 
 }
 
-bool SASLSession::start(const QDomElement &/*AElem*/)
+bool SASLSession::start(const QDomElement &AElem)
 {
-  FNeedHook = true;
-  Stanza session("iq");
-  session.setType("set").setId("session"); 
-  session.addElement("session",NS_FEATURE_SESSION);
-  FXmppStream->sendStanza(session); 
-  return true;
+  if (AElem.tagName() == "session")
+  {
+    FNeedHook = true;
+    Stanza session("iq");
+    session.setType("set").setId("session"); 
+    session.addElement("session",NS_FEATURE_SESSION);
+    FXmppStream->sendStanza(session); 
+    return true;
+  }
+  return false;
 }
 
 bool SASLSession::needHook(Direction ADirection) const

@@ -13,10 +13,10 @@ StartTLS::~StartTLS()
 
 }
 
-bool StartTLS::start(const QDomElement &/*AElem*/)
+bool StartTLS::start(const QDomElement &AElem)
 {
   FConnection = qobject_cast<IDefaultConnection *>(FXmppStream->connection()->instance());
-  if (FConnection)
+  if (FConnection && AElem.tagName()=="starttls")
   {
     FNeedHook = true;
     Stanza request("starttls");

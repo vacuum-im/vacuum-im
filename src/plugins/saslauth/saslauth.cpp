@@ -52,7 +52,7 @@ SASLAuth::~SASLAuth()
 
 bool SASLAuth::start(const QDomElement &AElem)
 {
-  if (!FAuthorized)
+  if (!FAuthorized && AElem.tagName()=="mechanisms")
   {
     QDomElement mechElem = AElem.firstChildElement("mechanism");
     while (!mechElem.isNull())
