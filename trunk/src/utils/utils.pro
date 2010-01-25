@@ -17,8 +17,9 @@ include(utils.pri)
 TRANS_SOURCE_ROOT  = ..
 include(../translations.inc)
 
-#Install
-include(../install.inc)
-!macx:target.path  = $$INSTALL_LIBS
-macx:target.path   = ../libs/$$TARGET_UTILS    #Install in loader.pro
-INSTALLS           = target
+#Install (for Mac OS X - in loader.pro)
+!macx:{
+  include(../install.inc)
+  target.path      = $$INSTALL_LIBS
+  INSTALLS         = target
+}
