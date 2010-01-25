@@ -20,25 +20,28 @@ Compression::~Compression()
 
 bool Compression::start(const QDomElement &AElem)
 {
-  FNeedHook = false;
-  QDomElement elem = AElem.firstChildElement("method");
-  while (!elem.isNull())
+  if (AElem.tagName() == "compression")
   {
-    if (elem.text() == "zlib")
+    FNeedHook = false;
+    QDomElement elem = AElem.firstChildElement("method");
+    while (!elem.isNull())
     {
-      if (startZlib())
+      if (elem.text() == "zlib")
       {
-        Stanza compress("compress");
-        compress.setAttribute("xmlns",NS_PROTOCOL_COMPRESS);
-        compress.addElement("method").appendChild(compress.createTextNode("zlib"));
-        FXmppStream->sendStanza(compress);   
-        FNeedHook = true;
-        FRequest = true;
-        return true;
+        if (startZlib())
+        {
+          Stanza compress("compress");
+          compress.setAttribute("xmlns",NS_PROTOCOL_COMPRESS);
+          compress.addElement("method").appendChild(compress.createTextNode("zlib"));
+          FXmppStream->sendStanza(compress);   
+          FNeedHook = true;
+          FRequest = true;
+          return true;
+        }
+        return false;
       }
-      return false;
+      elem = elem.nextSiblingElement("method");
     }
-    elem = elem.nextSiblingElement("method");
   }
   return false;
 }

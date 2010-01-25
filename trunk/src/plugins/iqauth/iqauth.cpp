@@ -14,20 +14,23 @@ IqAuth::~IqAuth()
 
 }
 
-bool IqAuth::start(const QDomElement &/*AElem*/)
+bool IqAuth::start(const QDomElement &AElem)
 {
-  Stanza auth("iq");
-  auth.setType("set").setTo(FXmppStream->streamJid().domain()).setId("auth"); 
-  QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
-  query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().eNode()));
-  QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8(); 
-  QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
-  query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
-  query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
-  
-  FNeedHook = true;
-  FXmppStream->sendStanza(auth);
-  return true;
+  if (AElem.tagName() == "auth")
+  {
+    FNeedHook = true;
+    Stanza auth("iq");
+    auth.setType("set").setTo(FXmppStream->streamJid().domain()).setId("auth"); 
+    QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
+    query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().eNode()));
+    QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8(); 
+    QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
+    query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
+    query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
+    FXmppStream->sendStanza(auth);
+    return true;
+  }
+  return false;
 }
 
 bool IqAuth::needHook(Direction ADirection) const
