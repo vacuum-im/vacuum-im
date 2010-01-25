@@ -47,11 +47,11 @@ macx {
   UTILS_LIB_LINK   = lib$${TARGET_UTILS}.1.dylib
 
   lib_utils.path   = $$INSTALL_LIBS
-  lib_utils.extra  = cp -f ../libs/$$TARGET_UTILS/$$UTILS_LIB_NAME $$INSTALL_LIBS/$$UTILS_LIB_NAME && \
-                     ln -sf $$UTILS_LIB_NAME $$INSTALL_LIBS/$$UTILS_LIB_LINK
+  lib_utils.extra  = cp -f ../libs/$$TARGET_UTILS/$$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_NAME && \
+                     ln -sf $$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_LINK
   INSTALLS        += lib_utils
 
   name_tool.path   = $$INSTALL_BINS
-  name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$TARGET_LOADER
+  name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $(INSTALL_ROOT)$$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$TARGET_LOADER
   INSTALLS        += name_tool
 }
