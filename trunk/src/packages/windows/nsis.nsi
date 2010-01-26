@@ -63,6 +63,7 @@ Section "VacuumIM (required)"
   ; Info files
   File "${PROGRAM_BIN_FOLDER}\README"
   File "${PROGRAM_BIN_FOLDER}\COPYING"
+  File "${PROGRAM_BIN_FOLDER}\CHANGELOG"
 	
   ; Binaries
   File "${PROGRAM_BIN_FOLDER}\vacuum.exe"

@@ -38,7 +38,7 @@ ln -s "${debdir}" "${pkgdir}" || exit 1
 
 
 DEBEMAIL="Sergey A Potapov <potapov.s.a@gmail.com>" dch --create --package vacuum -v "${VERSION}" "Preview release" || exit 1
-cp AUTHORS README "${debdir}" || exit 1
+cp AUTHORS README CHANGELOG "${debdir}" || exit 1
 dpkg-buildpackage -b -nc -uc || exit 1
 
 

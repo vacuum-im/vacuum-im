@@ -105,6 +105,9 @@
                         <distributionFile>
                             <origin>../../../COPYING</origin>
                         </distributionFile>
+                        <distributionFile>
+                            <origin>../../../CHANGELOG</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>
