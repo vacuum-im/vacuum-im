@@ -47,7 +47,7 @@ macx {
   UTILS_LIB_LINK   = lib$${TARGET_UTILS}.1.dylib
 
   lib_utils.path   = $$INSTALL_LIBS
-  lib_utils.extra  = cp -f ../libs/$$TARGET_UTILS/$$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_NAME && \
+  lib_utils.extra  = cp -f ../libs/$$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_NAME && \
                      ln -sf $$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_LINK
   INSTALLS        += lib_utils
 
