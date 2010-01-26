@@ -1,13 +1,23 @@
-Vacuum-IM Preview
------------------
+Vacuum-IM
+---------
+
+Web Site:
+  http://www.vacuum-im.org
+
+Source:
+  http://code.google.com/p/vacuum-im
+
 Jabber conference:
   vacuum@conference.jabber.ru
 
 Forum:
-  http://forum.jrudevels.org
+  http://forum.jrudevels.org/viewforum.php?f=11
 
-Source:
-  http://code.google.com/p/vacuum-im
+
+Known Issues
+------------
+  - on some systems popup window may capture input focus
+  - on GTalk accounts allways used default nested roster group delimiter
 
 
 The minimum list of plug-ins necessary for work 
@@ -36,8 +46,3 @@ The minimum list of plug-ins necessary for work
   22. statusicons
   23. traymanager
   24. xmppstreams
-
-
-Known Issues
-------------
-  - on MaxOS popup window captures input focus
