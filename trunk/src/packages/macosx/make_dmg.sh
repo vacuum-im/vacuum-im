@@ -56,7 +56,7 @@ TMP_DIR="./Applications"
 DYLD_PREFIX="@executable_path/../Frameworks"
 CONTENTS_DIR="$TMP_DIR/$ORIG_NAME.app/Contents"
 FW_DIR="$CONTENTS_DIR/Frameworks"
-SYS_PLUGINS_DIR=`$PATH_TO_QMAKE -query QT_INSTALL_PREFIX`/plugins
+SYS_PLUGINS_DIR=`$PATH_TO_QMAKE -query QT_INSTALL_PLUGINS`
 SYS_FW_DIR=`$PATH_TO_QMAKE -query QT_INSTALL_LIBS`
 SCRIPT_DIR=`pwd`/`dirname $0`
 
