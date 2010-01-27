@@ -37,7 +37,7 @@ ln -s "${debdir}" "${pkgdir}" || exit 1
 [ -f "${debdir}/changelog" ] && rm -vf "${debdir}/changelog"
 
 
-DEBEMAIL="Sergey A Potapov <potapov.s.a@gmail.com>" dch --create --package vacuum -v "${VERSION}" "Preview release" || exit 1
+DEBEMAIL="Sergey A Potapov <potapov.s.a@gmail.com>" dch --create --package vacuum -v "${VERSION}" "Release" || exit 1
 cp AUTHORS README CHANGELOG "${debdir}" || exit 1
 dpkg-buildpackage -b -nc -uc || exit 1
 
