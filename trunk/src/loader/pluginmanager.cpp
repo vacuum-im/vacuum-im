@@ -170,10 +170,14 @@ void PluginManager::restart()
   onApplicationAboutToQuit();
   loadSettings();
   loadPlugins();
-  initPlugins();
-  saveSettings();
-  createMenuActions();
-  startPlugins();
+  if (initPlugins())
+  {
+    saveSettings();
+    createMenuActions();
+    startPlugins();
+  }
+  else
+    QTimer::singleShot(0,this,SLOT(restart()));
 }
 
 void PluginManager::loadSettings()
@@ -352,11 +356,12 @@ void PluginManager::loadPlugins()
   }
 }
 
-void PluginManager::initPlugins()
+bool PluginManager::initPlugins()
 {
+  bool initOk = true;
   QMultiMap<int,IPlugin *> pluginOrder;
-  QHash<QUuid,PluginItem>::const_iterator it = FPluginItems.constBegin();
-  while (it!=FPluginItems.constEnd())
+  QHash<QUuid, PluginItem>::const_iterator it = FPluginItems.constBegin();
+  while (initOk && it!=FPluginItems.constEnd())
   {
     int initOrder = PIO_DEFAULT;
     IPlugin *plugin = it.value().plugin;
@@ -367,17 +372,22 @@ void PluginManager::initPlugins()
     }
     else
     {
+      initOk = false;
+      FBlockedPlugins.append(QFileInfo(it.value().loader->fileName()).fileName());
       unloadPlugin(it.key(), tr("Initialization failed"));
-      pluginOrder.clear();
-      it = FPluginItems.constBegin();
-    } 
+    }
   }
 
-  foreach(IPlugin *plugin, pluginOrder)
-    plugin->initObjects();
+  if (initOk)
+  {
+    foreach(IPlugin *plugin, pluginOrder)
+      plugin->initObjects();
 
-  foreach(IPlugin *plugin, pluginOrder)
-    plugin->initSettings();
+    foreach(IPlugin *plugin, pluginOrder)
+      plugin->initSettings();
+  }
+
+  return initOk;
 }
 
 void PluginManager::startPlugins()
@@ -491,7 +501,7 @@ void PluginManager::loadCoreTranslations(const QString &ADir)
 
 bool PluginManager::isPluginEnabled(const QString &AFile) const
 {
-  return FPluginsSetup.documentElement().firstChildElement(AFile).attribute("enabled","true") == "true";
+  return !FBlockedPlugins.contains(AFile) && FPluginsSetup.documentElement().firstChildElement(AFile).attribute("enabled","true") == "true";
 }
 
 QDomElement PluginManager::savePluginInfo(const QString &AFile, const IPluginInfo *AInfo)
