@@ -82,7 +82,7 @@
     </message>
     <message>
         <source>Settings saved. Do you want to restart application?</source>
-        <translation>Настройки сохранены. Вы хотите перезапистить приложение?</translation>
+        <translation>Настройки сохранены. Вы хотите перезапустить приложение?</translation>
     </message>
 </context>
 <context>
