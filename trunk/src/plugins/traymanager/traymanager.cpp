@@ -38,7 +38,7 @@ bool TrayManager::initConnections(IPluginManager *APluginManager, int &/*AInitOr
   connect(FQuitAction,SIGNAL(triggered()),APluginManager->instance(),SLOT(quit()));
   addAction(FQuitAction,AG_TMTM_TRAYMANAGER);
   
-  return FTrayIcon.isSystemTrayAvailable();
+  return true;
 }
 
 bool TrayManager::startPlugin()
