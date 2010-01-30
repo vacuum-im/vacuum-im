@@ -104,31 +104,33 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 bool Notifications::initObjects()
 {
+  FActivateAll = new Action(this);
+  FActivateAll->setVisible(false);
+  FActivateAll->setText(tr("Activate All Notifications"));
+  FActivateAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_ACTIVATE_ALL);
+  connect(FActivateAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
+
+  FRemoveAll = new Action(this);
+  FRemoveAll->setVisible(false);
+  FRemoveAll->setText(tr("Remove All Notifications"));
+  FRemoveAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_REMOVE_ALL);
+  connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
+
+  FNotifyMenu = new Menu;
+  FNotifyMenu->setTitle(tr("Pending Notifications"));
+  FNotifyMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS);
+  FNotifyMenu->menuAction()->setVisible(false);
+
   if (FSettingsPlugin)
   {
     FSettingsPlugin->openOptionsNode(ON_NOTIFICATIONS,tr("Notifications"),tr("Notification options"),MNI_NOTIFICATIONS,ONO_NOTIFICATIONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
+
   if (FTrayManager)
   {
-    FActivateAll = new Action(this);
-    FActivateAll->setVisible(false);
-    FActivateAll->setText(tr("Activate All Notifications"));
-    FActivateAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_ACTIVATE_ALL);
     FTrayManager->addAction(FActivateAll,AG_TMTM_NOTIFICATIONS,false);
-    connect(FActivateAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
-
-    FRemoveAll = new Action(this);
-    FRemoveAll->setVisible(false);
-    FRemoveAll->setText(tr("Remove All Notifications"));
-    FRemoveAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_REMOVE_ALL);
     FTrayManager->addAction(FRemoveAll,AG_TMTM_NOTIFICATIONS,false);
-    connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
-
-    FNotifyMenu = new Menu;
-    FNotifyMenu->setTitle(tr("Pending Notifications"));
-    FNotifyMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS);
-    FNotifyMenu->menuAction()->setVisible(false);
     FTrayManager->addAction(FNotifyMenu->menuAction(),AG_TMTM_NOTIFICATIONS,false);
   }
   return true;
