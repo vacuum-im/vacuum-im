@@ -59,7 +59,7 @@ protected:
   void loadSettings();
   void saveSettings();
   void loadPlugins();
-  void initPlugins();
+  bool initPlugins();
   void startPlugins();
 protected:
   void removePluginItem(const QUuid &AUuid, const QString &AError);
@@ -87,6 +87,7 @@ private:
   QTranslator *FQtTranslator;
   QTranslator *FUtilsTranslator;
   QTranslator *FLoaderTranslator;
+  QList<QString> FBlockedPlugins;
   QHash<QUuid, PluginItem> FPluginItems;
   mutable QMultiHash<QString, IPlugin *> FPlugins;
 };
