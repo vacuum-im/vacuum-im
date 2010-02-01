@@ -200,10 +200,19 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
       {
         if (!AMessage.body().isEmpty() && !isActive() && !AMessage.isDelayed())
         {
-          notify.kinds = ANotifications->notificatorKinds(GROUP_NOTIFICATOR_ID);
+          if (isMentionMessage(AMessage))
+          {
+            notify.kinds = ANotifications->notificatorKinds(MENTION_NOTIFICATOR_ID);
+            notify.data.insert(NDR_TOOLTIP,tr("Mention message in conference: %1").arg(contactJid.node()));
+            notify.data.insert(NDR_WINDOW_CAPTION,tr("Mention in conference"));
+          }
+          else
+          {
+            notify.kinds = ANotifications->notificatorKinds(GROUP_NOTIFICATOR_ID);
+            notify.data.insert(NDR_TOOLTIP,tr("New message in conference: %1").arg(contactJid.node()));
+            notify.data.insert(NDR_WINDOW_CAPTION,tr("Conference message"));
+          }
           notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));
-          notify.data.insert(NDR_TOOLTIP,tr("New message in conference: %1").arg(contactJid.node()));
-          notify.data.insert(NDR_WINDOW_CAPTION,tr("Conference message"));
           notify.data.insert(NDR_WINDOW_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.node()));
           notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
           notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
@@ -986,6 +995,12 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
   return hasCommand;
 }
 
+bool MultiUserChatWindow::isMentionMessage(const Message &AMessage) const
+{
+  QRegExp mention(QString("\\b%1\\b").arg(QRegExp::escape(FMultiChat->nickName())));
+  return AMessage.body().indexOf(mention)>=0;
+}
+
 void MultiUserChatWindow::setMessageStyle()
 {
   if (FMessageStyles)
@@ -1052,8 +1067,7 @@ void MultiUserChatWindow::showUserMessage(const Message &AMessage, const QString
   if (FMultiChat->nickName()!=ANick)
   {
     options.direction = IMessageContentOptions::DirectionIn;
-    QRegExp mention(QString("\\b%1\\b").arg(QRegExp::escape(FMultiChat->nickName())));
-    if (AMessage.body().indexOf(mention)>=0)
+    if (isMentionMessage(AMessage))
       options.type |= IMessageContentOptions::Mention;
   }
   else

@@ -33,6 +33,7 @@
 
 #define GROUP_NOTIFICATOR_ID      "GroupChatMessages"
 #define PRIVATE_NOTIFICATOR_ID    "PrivateMessages"
+#define MENTION_NOTIFICATOR_ID    "GroupChatMention"
 
 struct WindowStatus 
 {
@@ -104,6 +105,7 @@ protected:
   void setToolTipForUser(IMultiUser *AUser);
   bool execShortcutCommand(const QString &AText);
 protected:
+  bool isMentionMessage(const Message &AMessage) const;
   void setMessageStyle();
   void showTopic(const QString &ATopic);
   void showMessage(const QString &AMessage, int AContentType=0);

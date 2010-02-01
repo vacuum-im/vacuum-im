@@ -202,6 +202,9 @@ bool MultiUserChatPlugin::initObjects()
 
     kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
     FNotifications->insertNotificator(GROUP_NOTIFICATOR_ID,tr("Conference messages"),kindMask,INotification::TrayIcon|INotification::PlaySound);
+
+    kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(MENTION_NOTIFICATOR_ID,tr("Mention in conference"),kindMask,kindMask);
   }
 
   if (FXmppUriQueries)
