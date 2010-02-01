@@ -4,12 +4,12 @@
 <context>
     <name>StartTLS</name>
     <message>
-        <source>StartTLS negotiation failed.</source>
-        <translation>Ошибка при установке TLS соединения.</translation>
+        <source>StartTLS negotiation failed</source>
+        <translation>Инициализация StartTLS завершилась с ошибкой</translation>
     </message>
     <message>
-        <source>Wrong StartTLS negotiation answer.</source>
-        <translation>Неверный ответ при согласовании TLS соединения.</translation>
+        <source>Wrong StartTLS negotiation response</source>
+        <translation>Неверный ответ при инициализации StartTLS</translation>
     </message>
 </context>
 <context>

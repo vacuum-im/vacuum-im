@@ -2,6 +2,7 @@
 #define SASLPLUGIN_H
 
 #include <definations/namespaces.h>
+#include <definations/xmppfeatureorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include "saslauth.h"
@@ -13,10 +14,10 @@
 class SASLPlugin : 
   public QObject,
   public IPlugin,
-  public IStreamFeaturePlugin
+  public IXmppFeaturesPlugin
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IStreamFeaturePlugin);
+  Q_INTERFACES(IPlugin IXmppFeaturesPlugin);
 public:
   SASLPlugin();
   ~SASLPlugin();
@@ -28,19 +29,16 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IStreamFeaturePlugin
-  virtual QList<QString> streamFeatures() const;
-  virtual IStreamFeature *newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
-  virtual void destroyStreamFeature(IStreamFeature *AFeature);
+  //IXmppFeaturesPlugin
+  virtual QList<QString> xmppFeatures() const;
+  virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
 signals:
-  void featureCreated(IStreamFeature *AStreamFeature);
-  void featureDestroyed(IStreamFeature *AStreamFeature);
+  void featureCreated(IXmppFeature *AFeature);
+  void featureDestroyed(IXmppFeature *AFeature);
+protected slots:
+  void onFeatureDestroyed();
 private:
   IXmppStreams *FXmppStreams;
-private:
-  QHash<IXmppStream *, IStreamFeature *> FAuthFeatures;
-  QHash<IXmppStream *, IStreamFeature *> FBindFeatures;
-  QHash<IXmppStream *, IStreamFeature *> FSessionFeatures;
 };
 
 #endif // SASLPLUGIN_H

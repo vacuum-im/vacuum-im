@@ -3,6 +3,8 @@
 
 #include <QDomDocument>
 #include <definations/namespaces.h>
+#include <definations/xmppfeatureorders.h>
+#include <definations/xmppelementhandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <utils/errorhandler.h>
@@ -13,39 +15,37 @@
 
 class IqAuth : 
   public QObject,
-  public IStreamFeature
+  public IXmppFeature,
+  public IXmppElementHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IStreamFeature);
+  Q_INTERFACES(IXmppFeature IXmppElementHadler);
 public:
   IqAuth(IXmppStream *AXmppStream);
   ~IqAuth();
-  //IStreamFeature
   virtual QObject *instance() { return this; }
+  //IXmppElementHandler
+  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  //IXmppFeature
   virtual QString featureNS() const { return NS_FEATURE_IQAUTH; }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
-  virtual bool needHook(Direction ADirection) const;
-  virtual bool hookData(QByteArray &/*AData*/, Direction /*ADirection*/) { return false; }
-  virtual bool hookElement(QDomElement &AElem, Direction ADirection);
 signals:
-  void ready(bool ARestart); 
+  void finished(bool ARestart); 
   void error(const QString &AError);
-protected slots:
-  virtual void onStreamClosed();
+  void featureDestroyed();
 private:
   IXmppStream *FXmppStream;
-private:
-  bool FNeedHook;
 };
 
 class IqAuthPlugin :
   public QObject,
   public IPlugin,
-  public IStreamFeaturePlugin
+  public IXmppFeaturesPlugin
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IStreamFeaturePlugin);
+  Q_INTERFACES(IPlugin IXmppFeaturesPlugin);
 public:
   IqAuthPlugin();
   ~IqAuthPlugin();
@@ -57,17 +57,16 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IStreamFeaturePlugin
-  virtual QList<QString> streamFeatures() const { return QList<QString>() << NS_FEATURE_IQAUTH; }
-  virtual IStreamFeature *newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
-  virtual void destroyStreamFeature(IStreamFeature *AFeature);
+  //IXmppFeaturesPlugin
+  virtual QList<QString> xmppFeatures() const { return QList<QString>() << NS_FEATURE_IQAUTH; }
+  virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
 signals:
-  virtual void featureCreated(IStreamFeature *AStreamFeature);
-  virtual void featureDestroyed(IStreamFeature *AStreamFeature);
+  virtual void featureCreated(IXmppFeature *AStreamFeature);
+  virtual void featureDestroyed(IXmppFeature *AStreamFeature);
+protected slots:
+  void onFeatureDestroyed();
 private:
   IXmppStreams *FXmppStreams;
-private:
-  QHash<IXmppStream *, IStreamFeature *> FFeatures;
 };
 
 #endif // IQAUTH_H

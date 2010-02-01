@@ -3,6 +3,8 @@
 
 #include <QCheckBox>
 #include <definations/namespaces.h>
+#include <definations/accountvaluenames.h>
+#include <definations/xmppfeatureorders.h>
 #include <definations/discofeaturehandlerorders.h>
 #include <definations/optionnodes.h>
 #include <definations/optionwidgetorders.h>
@@ -31,12 +33,12 @@ class Registration :
   public IStanzaRequestOwner,
   public IXmppUriHandler,
   public IDiscoFeatureHandler,
-  public IStreamFeaturePlugin,
+  public IXmppFeaturesPlugin,
   public IOptionsHolder,
   public IDataLocalizer
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IStreamFeaturePlugin IOptionsHolder IDataLocalizer);
+  Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeaturesPlugin IOptionsHolder IDataLocalizer);
 public:
   Registration();
   ~Registration();
@@ -56,10 +58,9 @@ public:
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
-  //IStreamFeaturePlugin
-  virtual QList<QString> streamFeatures() const { return QList<QString>() << NS_FEATURE_REGISTER; }
-  virtual IStreamFeature *newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
-  virtual void destroyStreamFeature(IStreamFeature *AFeature);
+  //IXmppFeaturesPlugin
+  virtual QList<QString> xmppFeatures() const { return QList<QString>() << NS_FEATURE_REGISTER; }
+  virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IDataLocalizer
@@ -71,9 +72,9 @@ public:
   virtual QString sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit);
   virtual bool showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
 signals:
-  //IStreamFeaturePlugin
-  void featureCreated(IStreamFeature *AStreamFeature);
-  void featureDestroyed(IStreamFeature *AStreamFeature);
+  //IXmppFeaturesPlugin
+  void featureCreated(IXmppFeature *AStreamFeature);
+  void featureDestroyed(IXmppFeature *AStreamFeature);
   //IOptionsHolder
   void optionsAccepted();
   void optionsRejected();
@@ -85,12 +86,13 @@ protected:
   void registerDiscoFeatures();
 protected slots:
   void onRegisterActionTriggered(bool);
-  void onStreamDestroyed(IXmppStream *AXmppStream);
   void onOptionsAccepted();
   void onOptionsRejected();
   void onOptionsDialogClosed();
+  void onXmppFeatureDestroyed();
 private:
   IDataForms *FDataForms;
+  IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;
   IServiceDiscovery *FDiscovery;
   IPresencePlugin *FPresencePlugin;
@@ -101,7 +103,6 @@ private:
   QList<QString> FSendRequests;
   QList<QString> FSubmitRequests;
   QHash<QUuid, QCheckBox *> FOptionWidgets;
-  QHash<IXmppStream *, IStreamFeature *> FStreamFeatures;
 };
 
 #endif // REGISTRATION_H

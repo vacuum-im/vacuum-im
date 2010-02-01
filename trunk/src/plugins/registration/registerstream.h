@@ -2,37 +2,36 @@
 #define REGISTERSTREAM_H
 
 #include <definations/namespaces.h>
+#include <definations/xmppelementhandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iregistraton.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>
 
-class RegisterStream : 
+class RegisterStream :
   public QObject,
-  public IStreamFeature
+  public IXmppFeature,
+  public IXmppElementHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IStreamFeature);
+  Q_INTERFACES(IXmppFeature IXmppElementHadler);
 public:
-  RegisterStream(IStreamFeaturePlugin *ARegistration, IXmppStream *AXmppStream);
+  RegisterStream(IXmppStream *AXmppStream);
   ~RegisterStream();
   virtual QObject *instance() { return this; }
-  //IStreamFeature
+  //IXmppElementHandler
+  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  //IXmppFeature
   virtual QString featureNS() const { return NS_FEATURE_REGISTER; }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
-  virtual bool needHook(Direction ADirection) const;
-  virtual bool hookData(QByteArray &/*AData*/, Direction /*ADirection*/) { return false; }
-  virtual bool hookElement(QDomElement &AElem, Direction ADirection);
 signals:
-  void ready(bool ARestart); 
+  void finished(bool ARestart); 
   void error(const QString &AMessage);
+  void featureDestroyed();
 private:
   IXmppStream *FXmppStream;
-  IStreamFeaturePlugin *FFeaturePlugin;
-private:
-  bool FNeedHook;
-  bool FRegisterFinished;
 };
 
 #endif // REGISTERSTREAM_H

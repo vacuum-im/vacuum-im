@@ -2,27 +2,74 @@
 
 #define CHUNK 5120
 
-Compression::Compression(IXmppStream *AXmppStream)
-  : QObject(AXmppStream->instance())
+Compression::Compression(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
-  FNeedHook = false;
-  FRequest = false;
-  FCompress = false;
   FZlibInited = false;
   FXmppStream = AXmppStream;
-  connect(FXmppStream->instance(),SIGNAL(closed()), SLOT(onStreamClosed()));
 }
 
 Compression::~Compression()
 {
+  stopZlib();
+  FXmppStream->removeXmppDataHandler(this, XDHO_FEATURE_COMPRESS);
+  FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+  emit featureDestroyed();
+}
 
+bool Compression::xmppDataIn(IXmppStream *AXmppStream, QByteArray &AData, int AOrder)
+{
+  if (AXmppStream==FXmppStream && AOrder==XDHO_FEATURE_COMPRESS)
+  {
+    processData(AData, false);
+  }
+  return false;
+}
+
+bool Compression::xmppDataOut(IXmppStream *AXmppStream, QByteArray &AData, int AOrder)
+{
+  if (AXmppStream==FXmppStream && AOrder==XDHO_FEATURE_COMPRESS)
+  {
+    processData(AData, true);
+  }
+  return false;
+}
+
+bool Compression::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+{
+  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
+  {
+    FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+    if (AElem.tagName() == "compressed")
+    {
+      FXmppStream->insertXmppDataHandler(this, XDHO_FEATURE_COMPRESS);
+      emit finished(true);
+    }
+    else if (AElem.tagName() == "failure")
+    {
+      deleteLater();
+      emit finished(false);
+    }
+    else
+    {
+      emit error(tr("Wrong compression negotiation response"));
+    }
+    return true;
+  }
+  return false;
+}
+
+bool Compression::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+{
+  Q_UNUSED(AXmppStream);
+  Q_UNUSED(AElem);
+  Q_UNUSED(AOrder);
+  return false;
 }
 
 bool Compression::start(const QDomElement &AElem)
 {
   if (AElem.tagName() == "compression")
   {
-    FNeedHook = false;
     QDomElement elem = AElem.firstChildElement("method");
     while (!elem.isNull())
     {
@@ -33,91 +80,16 @@ bool Compression::start(const QDomElement &AElem)
           Stanza compress("compress");
           compress.setAttribute("xmlns",NS_PROTOCOL_COMPRESS);
           compress.addElement("method").appendChild(compress.createTextNode("zlib"));
+          FXmppStream->insertXmppElementHandler(this, XEHO_XMPP_FEATURE);
           FXmppStream->sendStanza(compress);   
-          FNeedHook = true;
-          FRequest = true;
           return true;
         }
-        return false;
+        break;
       }
       elem = elem.nextSiblingElement("method");
     }
   }
-  return false;
-}
-
-bool Compression::hookData(QByteArray &AData, Direction ADirection)
-{
-  if (FCompress && AData.size()>0)
-  {
-    z_streamp zstream;
-    int (*zfunc) OF((z_streamp strm, int flush));
-    if (ADirection == IStreamFeature::DirectionOut)
-    {
-      zstream = &FDefStruc;
-      zfunc = deflate;
-    }
-    else
-    {
-      zstream = &FInfStruc;
-      zfunc = inflate;
-    }
-
-    int ret;
-    int dataPosOut = 0;
-    zstream->avail_in = AData.size();
-    zstream->next_in = (Bytef *)(AData.constData());
-    do 
-    {
-      zstream->avail_out = FOutBuffer.capacity() - dataPosOut;
-      zstream->next_out = (Bytef *)(FOutBuffer.data() + dataPosOut);
-      ret = zfunc(zstream,Z_SYNC_FLUSH);
-      switch (ret)
-      {
-      case Z_OK:
-        dataPosOut = FOutBuffer.capacity() - zstream->avail_out;
-        if (zstream->avail_out == 0)
-          FOutBuffer.reserve(FOutBuffer.capacity() + CHUNK);
-        break;
-      case Z_STREAM_ERROR:
-        emit error(tr("Invalid compression level"));
-        break;
-      case Z_DATA_ERROR:
-        emit error(tr("invalid or incomplete deflate data"));
-        break;
-      case Z_MEM_ERROR:
-        emit error(tr("Out of memory for Zlib"));
-        break;
-      case Z_VERSION_ERROR:
-        emit error(tr("Zlib version mismatch!"));
-        break;
-      }
-    } while(ret == Z_OK && zstream->avail_out == 0);
-    AData.resize(dataPosOut);
-    memcpy(AData.data(),FOutBuffer.constData(),dataPosOut);
-  }
-  return false;
-}
-
-bool Compression::hookElement(QDomElement &AElem, Direction ADirection)
-{
-  if (!FRequest || ADirection != DirectionIn || AElem.namespaceURI() != NS_PROTOCOL_COMPRESS)
-    return false;
-
-  FRequest = false;
-  if (AElem.tagName() == "compressed")
-  {
-    FCompress = true;
-    emit ready(true);
-    return true;
-  }
-  else if (AElem.tagName() == "failure")
-  {
-    FNeedHook = false;
-    FCompress = false;
-    emit ready(false);
-    return true;
-  }
+  deleteLater();
   return false;
 }
 
@@ -164,10 +136,54 @@ void Compression::stopZlib()
   }
 }
 
-void Compression::onStreamClosed()
+void Compression::processData(QByteArray &AData, bool ADataOut)
 {
-  FNeedHook = false;
-  FCompress = false;
-  stopZlib();
-}
+  if (AData.size()>0)
+  {
+    z_streamp zstream;
+    int (*zfunc) OF((z_streamp strm, int flush));
+    if (ADataOut)
+    {
+      zstream = &FDefStruc;
+      zfunc = deflate;
+    }
+    else
+    {
+      zstream = &FInfStruc;
+      zfunc = inflate;
+    }
 
+    int ret;
+    int dataPosOut = 0;
+    zstream->avail_in = AData.size();
+    zstream->next_in = (Bytef *)(AData.constData());
+    do 
+    {
+      zstream->avail_out = FOutBuffer.capacity() - dataPosOut;
+      zstream->next_out = (Bytef *)(FOutBuffer.data() + dataPosOut);
+      ret = zfunc(zstream,Z_SYNC_FLUSH);
+      switch (ret)
+      {
+      case Z_OK:
+        dataPosOut = FOutBuffer.capacity() - zstream->avail_out;
+        if (zstream->avail_out == 0)
+          FOutBuffer.reserve(FOutBuffer.capacity() + CHUNK);
+        break;
+      case Z_STREAM_ERROR:
+        emit error(tr("Invalid compression level"));
+        break;
+      case Z_DATA_ERROR:
+        emit error(tr("invalid or incomplete deflate data"));
+        break;
+      case Z_MEM_ERROR:
+        emit error(tr("Out of memory for Zlib"));
+        break;
+      case Z_VERSION_ERROR:
+        emit error(tr("Zlib version mismatch!"));
+        break;
+      }
+    } while(ret == Z_OK && zstream->avail_out == 0);
+    AData.resize(dataPosOut);
+    memcpy(AData.data(),FOutBuffer.constData(),dataPosOut);
+  }
+}

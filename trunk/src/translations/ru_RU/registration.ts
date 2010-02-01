@@ -56,6 +56,13 @@
     </message>
 </context>
 <context>
+    <name>RegisterStream</name>
+    <message>
+        <source>Wrong registration response</source>
+        <translation>Неверный ответ во время регистрации</translation>
+    </message>
+</context>
+<context>
     <name>Registration</name>
     <message>
         <source>Registration</source>

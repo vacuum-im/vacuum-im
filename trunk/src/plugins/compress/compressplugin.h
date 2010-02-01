@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QObjectCleanupHandler>
 #include <definations/namespaces.h>
+#include <definations/xmppfeatureorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include "compression.h"
@@ -13,10 +14,10 @@
 class CompressPlugin : 
   public QObject,
   public IPlugin,
-  public IStreamFeaturePlugin
+  public IXmppFeaturesPlugin
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IStreamFeaturePlugin);
+  Q_INTERFACES(IPlugin IXmppFeaturesPlugin);
 public:
   CompressPlugin();
   ~CompressPlugin();
@@ -28,17 +29,16 @@ public:
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IStreamFeaturePlugin
-  virtual QList<QString> streamFeatures() const { return QList<QString>() << NS_FEATURE_COMPRESS; }
-  virtual IStreamFeature *newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
-  virtual void destroyStreamFeature(IStreamFeature *AFeature);
+  //IXmppFeaturesPlugin
+  virtual QList<QString> xmppFeatures() const { return QList<QString>() << NS_FEATURE_COMPRESS; }
+  virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
 signals:
-  void featureCreated(IStreamFeature *AStreamFeature);
-  void featureDestroyed(IStreamFeature *AStreamFeature);
+  void featureCreated(IXmppFeature *AFeature);
+  void featureDestroyed(IXmppFeature *AFeature);
+protected slots:
+  void onFeatureDestroyed();
 private:
   IXmppStreams *FXmppStreams;
-private:
-  QHash<IXmppStream *, IStreamFeature *> FFeatures;
 };
 
 #endif // COMPRESSPLUGIN_H

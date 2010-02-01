@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <definations/namespaces.h>
+#include <definations/xmppelementhandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
@@ -10,31 +11,31 @@
 
 class StartTLS : 
   public QObject,
-  public IStreamFeature
+  public IXmppFeature,
+  public IXmppElementHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IStreamFeature);
+  Q_INTERFACES(IXmppFeature IXmppElementHadler);
 public:
   StartTLS(IXmppStream *AXmppStream);
   ~StartTLS();
   virtual QObject *instance() { return this; }
+  //IXmppElementHandler
+  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  //IXmppFeature
   virtual QString featureNS() const { return NS_FEATURE_STARTTLS; }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
-  virtual bool needHook(Direction ADirection) const;
-  virtual bool hookData(QByteArray &/*AData*/, Direction /*ADirection*/) { return false; }
-  virtual bool hookElement(QDomElement &AElem, Direction ADirection);
 signals:
-  void ready(bool ARestart); 
+  void finished(bool ARestart);
   void error(const QString &AMessage);
+  void featureDestroyed();
 protected slots:
   void onConnectionEncrypted();
-  void onStreamClosed();
 private: 
   IXmppStream *FXmppStream;
   IDefaultConnection *FConnection;
-private:
-  bool FNeedHook;
 };
 
 #endif // STARTTLS_H

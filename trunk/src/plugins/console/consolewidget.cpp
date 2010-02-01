@@ -35,8 +35,6 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
       foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
         onStreamCreated(stream);
       connect(FXmppStreams->instance(), SIGNAL(created(IXmppStream *)), SLOT(onStreamCreated(IXmppStream *)));
-      connect(FXmppStreams->instance(), SIGNAL(consoleElement(IXmppStream *,const QDomElement &, bool)), 
-        SLOT(onStreamConsoleElement(IXmppStream *, const QDomElement &, bool))); 
       connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), 
         SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
       connect(FXmppStreams->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
@@ -88,7 +86,26 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 
 ConsoleWidget::~ConsoleWidget()
 {
+  foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+    stream->removeXmppElementHandler(this, XEHO_CONSOLE);
+}
 
+bool ConsoleWidget::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+{
+  if (AOrder == XEHO_CONSOLE)
+  {
+    showElement(AXmppStream,AElem,false);
+  }
+  return false;
+}
+
+bool ConsoleWidget::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+{
+  if (AOrder == XEHO_CONSOLE)
+  {
+    showElement(AXmppStream,AElem,true);
+  }
+  return false;
 }
 
 void ConsoleWidget::colorXml(QString &AXml) const
@@ -109,6 +126,38 @@ void ConsoleWidget::colorXml(QString &AXml) const
     QRegExp regexp(changes[i].regexp);
     regexp.setMinimal(changes[i].minimal);
     AXml.replace(regexp,changes[i].replace);
+  }
+}
+
+void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended)
+{
+  Jid streamJid = ui.cmbStreamJid->currentIndex() > 0 ? ui.cmbStreamJid->itemText(ui.cmbStreamJid->currentIndex()) : "";
+  if (streamJid.isEmpty() || streamJid==AXmppStream->streamJid())
+  {
+    Stanza stanza(AElem);
+    bool accepted = FStanzaProcessor==NULL || ui.ltwConditions->count()==0;
+    for (int i=0; !accepted && i<ui.ltwConditions->count(); i++)
+      accepted = FStanzaProcessor->checkStanza(stanza,ui.ltwConditions->item(i)->text());
+
+    if (accepted)
+    {
+      static QString sended =   Qt::escape(">>>>") + " <b>%1</b> %2 +%3 " + Qt::escape(">>>>");
+      static QString received = Qt::escape("<<<<") + " <b>%1</b> %2 +%3 " + Qt::escape("<<<<");
+
+      int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
+      FTimePoint = QTime::currentTime();
+      QString caption = (ASended ? sended : received).arg(AXmppStream->streamJid().hFull()).arg(FTimePoint.toString()).arg(delta);
+      ui.tedConsole->append(caption);
+
+      QString xml = stanza.toString(2);
+      if (ui.chbColoredXML->checkState() == Qt::Checked)
+        colorXml(xml);
+      else if (ui.chbColoredXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)
+        colorXml(xml);
+      else
+        xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
+      ui.tedConsole->append(xml);
+    }
   }
 }
 
@@ -227,38 +276,7 @@ void ConsoleWidget::onWordWrapStateChanged( int AState )
 void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)
 {
   ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
-}
-
-void ConsoleWidget::onStreamConsoleElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended)
-{
-  Jid streamJid = ui.cmbStreamJid->currentIndex() > 0 ? ui.cmbStreamJid->itemText(ui.cmbStreamJid->currentIndex()) : "";
-  if (streamJid.isEmpty() || streamJid==AXmppStream->streamJid())
-  {
-    Stanza stanza(AElem);
-    bool accepted = FStanzaProcessor==NULL || ui.ltwConditions->count()==0;
-    for (int i=0; !accepted && i<ui.ltwConditions->count(); i++)
-      accepted = FStanzaProcessor->checkStanza(stanza,ui.ltwConditions->item(i)->text());
-
-    if (accepted)
-    {
-      static QString sended =   Qt::escape(">>>>") + " <b>%1</b> %2 +%3 " + Qt::escape(">>>>");
-      static QString received = Qt::escape("<<<<") + " <b>%1</b> %2 +%3 " + Qt::escape("<<<<");
-
-      int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
-      FTimePoint = QTime::currentTime();
-      QString caption = (ASended ? sended : received).arg(AXmppStream->streamJid().hFull()).arg(FTimePoint.toString()).arg(delta);
-      ui.tedConsole->append(caption);
-
-      QString xml = stanza.toString(2);
-      if (ui.chbColoredXML->checkState() == Qt::Checked)
-        colorXml(xml);
-      else if (ui.chbColoredXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)
-        colorXml(xml);
-      else
-        xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
-      ui.tedConsole->append(xml);
-    }
-  }
+  AXmppStream->insertXmppElementHandler(this, XEHO_CONSOLE);
 }
 
 void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
@@ -274,6 +292,7 @@ void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABef
 void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
 {
   ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->streamJid().full()));
+  AXmppStream->removeXmppElementHandler(this, XEHO_CONSOLE);
 }
 
 void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle)
@@ -298,4 +317,3 @@ void ConsoleWidget::onSettingsClosed()
 {
   ui.cmbContext->clear();
 }
-

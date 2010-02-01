@@ -38,5 +38,9 @@
         <source>Zlib version mismatch!</source>
         <translation>Неверная версия Zlib!</translation>
     </message>
+    <message>
+        <source>Wrong compression negotiation response</source>
+        <translation>Неверный ответ во время инициализации сжатия</translation>
+    </message>
 </context>
 </TS>

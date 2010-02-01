@@ -38,84 +38,28 @@ static QByteArray getRespValue(const QByteArray &realm, const QByteArray &user, 
 
 SASLAuth::SASLAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
-  FAuthorized = false;
-  FNeedHook = false;
   FChallengeStep = 0;
   FXmppStream = AXmppStream;
-  connect(FXmppStream->instance(),SIGNAL(closed()), SLOT(onStreamClosed()));
 }
 
 SASLAuth::~SASLAuth()
 {
-
+  FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+  emit featureDestroyed();
 }
 
-bool SASLAuth::start(const QDomElement &AElem)
+bool SASLAuth::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
 {
-  if (!FAuthorized && AElem.tagName()=="mechanisms")
+  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
   {
-    QDomElement mechElem = AElem.firstChildElement("mechanism");
-    while (!mechElem.isNull())
-    {
-      FMechanism = mechElem.text();
-      if (FMechanism == "DIGEST-MD5")
-      {
-        FNeedHook = true;
-        Stanza auth("auth");
-        auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",FMechanism); 
-        FXmppStream->sendStanza(auth);   
-        return true;
-      }
-      else if (FMechanism == "PLAIN")
-      {
-        FNeedHook = true;
-        QByteArray resp;
-        resp.append('\0').append(FXmppStream->streamJid().pNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
-        Stanza auth("auth");
-        auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",FMechanism);
-        auth.element().appendChild(auth.createTextNode(resp.toBase64()));    
-        FXmppStream->sendStanza(auth);   
-        return true;
-      }
-      mechElem = mechElem.nextSiblingElement("mechanism");
-    }
-    FMechanism.clear();
-  }
-  return false;
-}
-
-bool SASLAuth::needHook(Direction ADirection) const
-{
-  return ADirection == DirectionIn ? FNeedHook : false;
-}
-
-bool SASLAuth::hookElement(QDomElement &AElem, Direction ADirection)
-{
-  if (ADirection == DirectionIn && AElem.namespaceURI() == NS_FEATURE_SASL)
-  {
-    if (AElem.tagName() == "success")
-    {
-      FAuthorized = true;
-      emit ready(true);
-    }
-    else if (AElem.tagName() == "failure")
-    {
-      ErrorHandler err(AElem,NS_FEATURE_SASL);
-      emit error(err.message()); 
-    }
-    else if (AElem.tagName() == "abort")
-    {
-      ErrorHandler err("aborted",NS_FEATURE_SASL);
-      emit error(err.message()); 
-    }
-    else if (AElem.tagName() == "challenge")
+    if (AElem.tagName() == "challenge")
     {
       if (FChallengeStep == 0)
       {
         FChallengeStep++;
         QString chl = QByteArray::fromBase64(AElem.text().toAscii()); 
         QMultiHash<QString, QString> params = parseChallenge(chl);
-        
+
         QString realm = params.value("realm");
         if (realm.isEmpty())
           realm = FXmppStream->streamJid().pDomain();
@@ -131,10 +75,10 @@ bool SASLAuth::hookElement(QDomElement &AElem, Direction ADirection)
         QString uri = "xmpp/" + FXmppStream->streamJid().pDomain();
         QByteArray respValue = getRespValue(realm.toUtf8(),user.toUtf8(),pass.toUtf8(),nonce.toAscii(), 
           cnonce.toAscii(),nc.toAscii(),qop.toAscii(), uri.toAscii(), "AUTHENTICATE");
-        
+
         QString resp = "username=\"%1\",realm=\"%2\",nonce=\"%3\",cnonce=\"%4\",nc=%5,qop=%6,digest-uri=\"%7\",response=%8,charset=utf-8";
         resp = resp.arg(user.toUtf8().data()).arg(realm).arg(nonce).arg(cnonce).arg(nc).arg(qop).arg(uri).arg(respValue.data());
-        
+
         Stanza response("response");
         response.setAttribute("xmlns",NS_FEATURE_SASL);
         response.element().appendChild(response.createTextNode(resp.toAscii().toBase64())); 
@@ -147,22 +91,74 @@ bool SASLAuth::hookElement(QDomElement &AElem, Direction ADirection)
         response.setAttribute("xmlns",NS_FEATURE_SASL);
         FXmppStream->sendStanza(response);   
       }
-      return true;
     }
-    else
+    else 
     {
-      emit error(ErrorHandler("bad-request").message()); 
+      FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+      if (AElem.tagName() == "success")
+      {
+        deleteLater();
+        emit finished(true);
+      }
+      else if (AElem.tagName() == "failure")
+      {
+        ErrorHandler err(AElem,NS_FEATURE_SASL);
+        emit error(err.message()); 
+      }
+      else if (AElem.tagName() == "abort")
+      {
+        ErrorHandler err("aborted",NS_FEATURE_SASL);
+        emit error(err.message()); 
+      }
+      else
+      {
+        emit error(tr("Wrong SASL authentication response")); 
+      }
     }
-    FNeedHook = false;
     return true;
   }
   return false;
 }
 
-void SASLAuth::onStreamClosed()
+bool SASLAuth::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
 {
-  FMechanism = "";
-  FNeedHook = false;
-  FAuthorized = false;
-  FChallengeStep = 0;
+  Q_UNUSED(AXmppStream);
+  Q_UNUSED(AElem);
+  Q_UNUSED(AOrder);
+  return false;
+}
+
+bool SASLAuth::start(const QDomElement &AElem)
+{
+  if (AElem.tagName()=="mechanisms")
+  {
+    FChallengeStep = 0;
+    QDomElement mechElem = AElem.firstChildElement("mechanism");
+    while (!mechElem.isNull())
+    {
+      QString mechanism = mechElem.text();
+      if (mechanism == "DIGEST-MD5")
+      {
+        Stanza auth("auth");
+        auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism); 
+        FXmppStream->insertXmppElementHandler(this, XEHO_XMPP_FEATURE);
+        FXmppStream->sendStanza(auth);   
+        return true;
+      }
+      else if (mechanism == "PLAIN")
+      {
+        QByteArray resp;
+        resp.append('\0').append(FXmppStream->streamJid().pNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
+        Stanza auth("auth");
+        auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
+        auth.element().appendChild(auth.createTextNode(resp.toBase64()));
+        FXmppStream->insertXmppElementHandler(this, XEHO_XMPP_FEATURE);
+        FXmppStream->sendStanza(auth);   
+        return true;
+      }
+      mechElem = mechElem.nextSiblingElement("mechanism");
+    }
+  }
+  deleteLater();
+  return false;
 }
