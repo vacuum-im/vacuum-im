@@ -2,6 +2,7 @@
 #define SASLSESSION_H
 
 #include <definations/namespaces.h>
+#include <definations/xmppelementhandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <utils/errorhandler.h>
@@ -9,29 +10,28 @@
 
 class SASLSession : 
   public QObject,
-  public IStreamFeature
+  public IXmppFeature,
+  public IXmppElementHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IStreamFeature);
+  Q_INTERFACES(IXmppFeature IXmppElementHadler);
 public:
   SASLSession(IXmppStream *AXmppStream);
   ~SASLSession();
+  //IXmppElementHandler
+  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  //IXmppFeature
   virtual QObject *instance() { return this; }
   virtual QString featureNS() const { return NS_FEATURE_SESSION; }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
   virtual bool start(const QDomElement &AElem); 
-  virtual bool needHook(Direction ADirection) const;
-  virtual bool hookData(QByteArray &/*AData*/, Direction /*ADisrection*/) { return false; }
-  virtual bool hookElement(QDomElement &AElem, Direction ADirection);
 signals:
-  void ready(bool ARestart); 
+  void finished(bool ARestart); 
   void error(const QString &AError);
-protected slots:
-  void onStreamClosed();
+  void featureDestroyed();
 private:
   IXmppStream *FXmppStream;
-private:
-  bool FNeedHook;
 };
 
-#endif // SASLSession_H
+#endif // SASLSESSION_H

@@ -2,15 +2,18 @@
 #define XMPPSTREAM_H
 
 #include <QTimer>
+#include <QMultiMap>
 #include <QDomDocument>
 #include <definations/namespaces.h>
+#include <definations/xmppelementhandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
 #include <utils/errorhandler.h>
 #include <utils/versionparser.h>
 #include "streamparser.h"
 
-enum StreamState {
+enum StreamState 
+{
   SS_OFFLINE, 
   SS_CONNECTING, 
   SS_INITIALIZE, 
@@ -21,14 +24,18 @@ enum StreamState {
 
 class XmppStream : 
   public QObject,
-  public IXmppStream
+  public IXmppStream,
+  public IXmppElementHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IXmppStream);
+  Q_INTERFACES(IXmppStream IXmppElementHadler);
 public:
   XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid);
   ~XmppStream();
   virtual QObject *instance() { return this; }
+  //IXmppElementHandler
+  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
   //IXmppStream
   virtual bool isOpen() const;
   virtual bool open();
@@ -44,35 +51,32 @@ public:
   virtual void setDefaultLang(const QString &ADefLang);
   virtual IConnection *connection() const;
   virtual void setConnection(IConnection *AConnection);
-  virtual void insertFeature(IStreamFeature *AFeature);
-  virtual QList<IStreamFeature *> features() const;
-  virtual void removeFeature(IStreamFeature *AFeature);
   virtual qint64 sendStanza(const Stanza &AStanza);
+  virtual void insertXmppDataHandler(IXmppDataHandler *AHandler, int AOrder);
+  virtual void removeXmppDataHandler(IXmppDataHandler *AHandler, int AOrder);
+  virtual void insertXmppElementHandler(IXmppElementHadler *AHandler, int AOrder);
+  virtual void removeXmppElementHandler(IXmppElementHadler *AHandler, int AOrder);
 signals:
   void opened();
-  void element(const QDomElement &elem);
-  void consoleElement(const QDomElement &AElem, bool ADirectionOut);
   void aboutToClose();
   void closed();
   void error(const QString &AError);
   void jidAboutToBeChanged(const Jid &AAfter);
   void jidChanged(const Jid &ABefour);
-  void connectionAdded(IConnection *AConnection);
-  void connectionRemoved(IConnection *AConnection);
-  void featureAdded(IStreamFeature *AFeature);
-  void featureRemoved(IStreamFeature *AFeature);
+  void connectionChanged(IConnection *AConnection);
+  void dataHandlerInserted(IXmppDataHandler *AHandler, int AOrder);
+  void dataHandlerRemoved(IXmppDataHandler *AHandler, int AOrder);
+  void elementHandlerInserted(IXmppElementHadler *AHandler, int AOrder);
+  void elementHandlerRemoved(IXmppElementHadler *AHandler, int AOrder);
   void streamDestroyed();
 protected:
   void startStream();
   void processFeatures();
-  IStreamFeature *getStreamFeature(const QString &AFeatureNS);
-  void sortFeature(IStreamFeature *AFeature = NULL);
   bool startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem);
-  bool hookFeatureData(QByteArray &AData, IStreamFeature::Direction ADirection);
-  bool hookFeatureElement(QDomElement &AElem, IStreamFeature::Direction ADirection);
+  bool processDataHandlers(QByteArray &AData, bool ADataOut);
+  bool processElementHandlers(QDomElement &AElem, bool AElementOut);
   qint64 sendData(const QByteArray &AData);
   QByteArray receiveData(qint64 ABytes);
-  void showInConsole(const QDomElement &AElem, IStreamFeature::Direction ADirection);
 protected slots:
   //IStreamConnection
   void onConnectionConnected();
@@ -84,18 +88,22 @@ protected slots:
   void onParserElement(QDomElement AElem);
   void onParserError(const QString &AError);
   void onParserClosed();
-  //IStreamFeature
-  void onFeatureReady(bool ARestart);
+  //IXmppFeature
+  void onFeatureFinished(bool ARestart);
   void onFeatureError(const QString &AError);
+  void onFeatureDestroyed();
   //KeepAlive
   void onKeepAliveTimeout();
 private:
   IXmppStreams *FXmppStreams;
   IConnection *FConnection;
 private:
-  QDomElement FFeaturesElement;
-  IStreamFeature *FActiveFeature;
-  QList<IStreamFeature *>	FFeatures; 
+  QDomElement FServerFeatures;
+  QList<QString>	FAvailFeatures; 
+  QList<IXmppFeature *>	FActiveFeatures; 
+private:
+  QMultiMap<int, IXmppDataHandler *> FDataHandlers;
+  QMultiMap<int, IXmppElementHadler *> FElementHandlers;
 private:
   bool FOpen;
   Jid FStreamJid;

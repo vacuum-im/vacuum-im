@@ -16,16 +16,12 @@
         <translation>Соединение не определено</translation>
     </message>
     <message>
-        <source>Required stream feature &apos;%1&apos; not available</source>
-        <translation>Требуемая функция XMPP-потока &apos;%1&apos; не доступна</translation>
-    </message>
-    <message>
-        <source>Invalid stream namespace</source>
-        <translation>Недопустимое пространство имён потока</translation>
-    </message>
-    <message>
         <source>XMPP connection timed out</source>
         <translation>Превышено время установки XMPP соединения</translation>
+    </message>
+    <message>
+        <source>Wrong XMPP stream negotiation response</source>
+        <translation>Неверный ответ при инициализации XMPP потока</translation>
     </message>
 </context>
 <context>

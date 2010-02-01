@@ -54,82 +54,49 @@ bool SASLPlugin::initObjects()
 
   if (FXmppStreams)
   {
-    FXmppStreams->registerFeature(NS_FEATURE_SASL,this);
-    FXmppStreams->registerFeature(NS_FEATURE_BIND,this);
-    FXmppStreams->registerFeature(NS_FEATURE_SESSION,this);
+    FXmppStreams->registerXmppFeature(this,NS_FEATURE_SASL,XFO_SASL);
+    FXmppStreams->registerXmppFeature(this,NS_FEATURE_BIND,XFO_BIND);
+    FXmppStreams->registerXmppFeature(this,NS_FEATURE_SESSION,XFO_SESSION);
   }
   return true;
 }
 
-QList<QString> SASLPlugin::streamFeatures() const
+QList<QString> SASLPlugin::xmppFeatures() const
 {
   return QList<QString>() << NS_FEATURE_SASL << NS_FEATURE_BIND << NS_FEATURE_SESSION;
 }
 
-IStreamFeature *SASLPlugin::newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
+IXmppFeature *SASLPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
   if (AFeatureNS == NS_FEATURE_SASL)
   {
-    IStreamFeature *feature = FAuthFeatures.value(AXmppStream);
-    if (!feature)
-    {
-      feature = new SASLAuth(AXmppStream);
-      FAuthFeatures.insert(AXmppStream,feature);
-      emit featureCreated(feature);
-    }
+    IXmppFeature *feature = new SASLAuth(AXmppStream);
+    connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
+    emit featureCreated(feature);
     return feature;
   }
   else if (AFeatureNS == NS_FEATURE_BIND)
   {
-    IStreamFeature *feature = FBindFeatures.value(AXmppStream);
-    if (!feature)
-    {
-      feature = new SASLBind(AXmppStream);
-      FBindFeatures.insert(AXmppStream,feature);
-      emit featureCreated(feature);
-    }
+    IXmppFeature *feature = new SASLBind(AXmppStream);
+    connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
+    emit featureCreated(feature);
     return feature;
   }
   else if (AFeatureNS == NS_FEATURE_SESSION)
   {
-    IStreamFeature *feature = FSessionFeatures.value(AXmppStream);
-    if (!feature)
-    {
-      feature = new SASLSession(AXmppStream);
-      FSessionFeatures.insert(AXmppStream,feature);
-      emit featureCreated(feature);
-    }
+    IXmppFeature *feature = new SASLSession(AXmppStream);
+    connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
+    emit featureCreated(feature);
     return feature;
   }
   return NULL;
 }
 
-void SASLPlugin::destroyStreamFeature(IStreamFeature *AFeature)
+void SASLPlugin::onFeatureDestroyed()
 {
-  if (AFeature)
-  {
-    if (FAuthFeatures.value(AFeature->xmppStream()) == AFeature)
-    {
-      FAuthFeatures.remove(AFeature->xmppStream());
-      AFeature->xmppStream()->removeFeature(AFeature);
-      emit featureDestroyed(AFeature);
-      AFeature->instance()->deleteLater();
-    }
-    else if (FBindFeatures.value(AFeature->xmppStream()) == AFeature)
-    {
-      FBindFeatures.remove(AFeature->xmppStream());
-      AFeature->xmppStream()->removeFeature(AFeature);
-      emit featureDestroyed(AFeature);
-      AFeature->instance()->deleteLater();
-    }
-    else if (FSessionFeatures.value(AFeature->xmppStream()) == AFeature)
-    {
-      FSessionFeatures.remove(AFeature->xmppStream());
-      AFeature->xmppStream()->removeFeature(AFeature);
-      emit featureDestroyed(AFeature);
-      AFeature->instance()->deleteLater();
-    }
-  }
+  IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
+  if (feature)
+    emit featureDestroyed(feature);
 }
 
 Q_EXPORT_PLUGIN2(plg_sasl, SASLPlugin)

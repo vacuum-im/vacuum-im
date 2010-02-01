@@ -1,42 +1,19 @@
 #include "registerstream.h"
 
-RegisterStream::RegisterStream(IStreamFeaturePlugin *AFeaturePlugin, IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
+RegisterStream::RegisterStream(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
-  FFeaturePlugin = AFeaturePlugin;
   FXmppStream = AXmppStream;
-  FNeedHook = false;
-  FRegisterFinished = false;
 }
 
 RegisterStream::~RegisterStream()
 {
-
+  FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+  emit featureDestroyed();
 }
 
-bool RegisterStream::start(const QDomElement &/*AElem*/)
+bool RegisterStream::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
 {
-  if (!FRegisterFinished && !FXmppStream->streamJid().node().isEmpty() && !FXmppStream->password().isEmpty())
-  {
-    Stanza reg("iq");
-    reg.setType("get").setId("getReg");
-    reg.addElement("query",NS_JABBER_REGISTER);
-    if (FXmppStream->sendStanza(reg)>0)
-    {
-      FNeedHook = true;
-      return true;
-    }
-  }
-  return false;
-}
-
-bool RegisterStream::needHook(Direction ADirection) const
-{
-  return ADirection==IStreamFeature::DirectionIn ? FNeedHook : false;
-}
-
-bool RegisterStream::hookElement(QDomElement &AElem, Direction ADirection)
-{
-  if (ADirection == IStreamFeature::DirectionIn)
+  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
   {
     if (AElem.attribute("id") == "getReg")
     {
@@ -49,22 +26,20 @@ bool RegisterStream::hookElement(QDomElement &AElem, Direction ADirection)
         query.appendChild(submit.createElement("password")).appendChild(submit.createTextNode(FXmppStream->password()));
         query.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(AElem.firstChildElement("query").attribute("key")));
         FXmppStream->sendStanza(submit);
-        return true;
       }
       else if (AElem.attribute("type") == "error")
       {
-        FNeedHook = false;
         ErrorHandler err(AElem);
         emit error(err.message());
       }
     }
     else if (AElem.attribute("id") == "setReg")
     {
-      FNeedHook = false;
-      FRegisterFinished = true;
+      FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
       if (AElem.attribute("type") == "result")
       {
-        emit ready(false);
+        deleteLater();
+        emit finished(false);
       }
       else if (AElem.attribute("type") == "error")
       {
@@ -72,9 +47,34 @@ bool RegisterStream::hookElement(QDomElement &AElem, Direction ADirection)
         emit error(err.message());
       }
     }
-    FFeaturePlugin->destroyStreamFeature(this);
+    else
+    {
+      emit error(tr("Wrong registration response"));
+    }
     return true;
   }
   return false;
 }
 
+bool RegisterStream::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+{
+  Q_UNUSED(AXmppStream);
+  Q_UNUSED(AElem);
+  Q_UNUSED(AOrder);
+  return false;
+}
+
+bool RegisterStream::start(const QDomElement &AElem)
+{
+  if (AElem.tagName()=="register" && !FXmppStream->password().isEmpty())
+  {
+    Stanza reg("iq");
+    reg.setType("get").setId("getReg");
+    reg.addElement("query",NS_JABBER_REGISTER);
+    FXmppStream->insertXmppElementHandler(this,XEHO_XMPP_FEATURE);
+    FXmppStream->sendStanza(reg);
+    return true;
+  }
+  deleteLater();
+  return false;
+}

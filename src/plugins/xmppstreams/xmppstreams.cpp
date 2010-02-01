@@ -132,17 +132,12 @@ void XmppStreams::addXmppStream(IXmppStream *AXmppStream)
   if (AXmppStream && !FActiveStreams.contains(AXmppStream))
   {
     connect(AXmppStream->instance(), SIGNAL(opened()), SLOT(onStreamOpened()));
-    connect(AXmppStream->instance(), SIGNAL(element(const QDomElement &)), SLOT(onStreamElement(const QDomElement &))); 
-    connect(AXmppStream->instance(), SIGNAL(consoleElement(const QDomElement &, bool)), SLOT(onStreamConsoleElement(const QDomElement &, bool))); 
     connect(AXmppStream->instance(), SIGNAL(aboutToClose()), SLOT(onStreamAboutToClose())); 
     connect(AXmppStream->instance(), SIGNAL(closed()), SLOT(onStreamClosed())); 
     connect(AXmppStream->instance(), SIGNAL(error(const QString &)), SLOT(onStreamError(const QString &)));
     connect(AXmppStream->instance(), SIGNAL(jidAboutToBeChanged(const Jid &)), SLOT(onStreamJidAboutToBeChanged(const Jid &))); 
     connect(AXmppStream->instance(), SIGNAL(jidChanged(const Jid &)), SLOT(onStreamJidChanged(const Jid &))); 
-    connect(AXmppStream->instance(), SIGNAL(connectionAdded(IConnection *)), SLOT(onStreamConnectionAdded(IConnection *))); 
-    connect(AXmppStream->instance(), SIGNAL(connectionRemoved(IConnection *)), SLOT(onStreamConnectionRemoved(IConnection *))); 
-    connect(AXmppStream->instance(), SIGNAL(featureAdded(IStreamFeature *)), SLOT(onStreamFeatureAdded(IStreamFeature *))); 
-    connect(AXmppStream->instance(), SIGNAL(featureRemoved(IStreamFeature *)), SLOT(onStreamFeatureRemoved(IStreamFeature *)));
+    connect(AXmppStream->instance(), SIGNAL(connectionChanged(IConnection *)), SLOT(onStreamConnectionChanged(IConnection *))); 
     FActiveStreams.append(AXmppStream);
     emit added(AXmppStream);
   }
@@ -167,22 +162,29 @@ void XmppStreams::destroyXmppStream(const Jid &AStreamJid)
     delete stream->instance();
 }
 
-IStreamFeaturePlugin *XmppStreams::featurePlugin(const QString &AFeatureNS) const
+QList<QString> XmppStreams::xmppFeaturesOrdered() const
+{
+  return FFeatureOrders.values();
+}
+
+IXmppFeaturesPlugin *XmppStreams::xmppFeaturePlugin(const QString &AFeatureNS) const
 {
   return FFeatures.value(AFeatureNS,NULL);
 }
 
-void XmppStreams::registerFeature(const QString &AFeatureNS, IStreamFeaturePlugin *AFeaturePlugin)
+void XmppStreams::registerXmppFeature(IXmppFeaturesPlugin *AFeaturePlugin, const QString &AFeatureNS, int AOrder)
 {
   if (AFeaturePlugin && !FFeatures.contains(AFeatureNS))
   {
     FFeatures.insert(AFeatureNS,AFeaturePlugin);
-    emit featureRegistered(AFeatureNS,AFeaturePlugin);
+    FFeatureOrders.insertMulti(AOrder, AFeatureNS);
+    emit featureRegistered(AFeaturePlugin,AFeatureNS,AOrder);
   }
   else if (!AFeaturePlugin && FFeatures.contains(AFeatureNS))
   {
     FFeatures.remove(AFeatureNS);
-    emit featureRegistered(AFeatureNS,AFeaturePlugin);
+    FFeatureOrders.remove(FFeatureOrders.key(AFeatureNS), AFeatureNS);
+    emit featureRegistered(AFeaturePlugin,AFeatureNS,AOrder);
   }
 }
 
@@ -191,20 +193,6 @@ void XmppStreams::onStreamOpened()
   IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
   if (stream)
     emit opened(stream);
-}
-
-void XmppStreams::onStreamElement(const QDomElement &elem)
-{
-  IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
-  if (stream)
-    emit element(stream, elem);
-}
-
-void XmppStreams::onStreamConsoleElement(const QDomElement &AElem, bool ASended)
-{
-  IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
-  if (stream)
-    emit consoleElement(stream,AElem,ASended);
 }
 
 void XmppStreams::onStreamAboutToClose()
@@ -241,32 +229,11 @@ void XmppStreams::onStreamJidChanged(const Jid &ABefour)
     emit jidChanged(stream,ABefour);
 }
 
-void XmppStreams::onStreamConnectionAdded(IConnection *AConnection)
+void XmppStreams::onStreamConnectionChanged(IConnection *AConnection)
 {
   IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
   if (stream)
-    emit connectionAdded(stream,AConnection);
-}
-
-void XmppStreams::onStreamConnectionRemoved(IConnection *AConnection)
-{
-  IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
-  if (stream)
-    emit connectionRemoved(stream,AConnection);
-}
-
-void XmppStreams::onStreamFeatureAdded(IStreamFeature *AFeature)
-{
-  IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
-  if (stream)
-    emit featureAdded(stream,AFeature);
-}
-
-void XmppStreams::onStreamFeatureRemoved(IStreamFeature *AFeature)
-{
-  IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
-  if (stream)
-    emit featureRemoved(stream,AFeature);
+    emit connectionChanged(stream,AConnection);
 }
 
 void XmppStreams::onStreamDestroyed()

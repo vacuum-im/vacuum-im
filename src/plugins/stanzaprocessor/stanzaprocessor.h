@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QMultiMap>
 #include <QDomDocument>
+#include <definations/xmppelementhandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
@@ -19,10 +20,11 @@ struct StanzaRequest
 class StanzaProcessor :
   public QObject,
   public IPlugin,
-  public IStanzaProcessor
+  public IStanzaProcessor,
+  public IXmppElementHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IStanzaProcessor);
+  Q_INTERFACES(IPlugin IStanzaProcessor IXmppElementHadler);
 public:
   StanzaProcessor();
   ~StanzaProcessor();
@@ -34,6 +36,9 @@ public:
   virtual bool initObjects() { return true; }
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
+  //IXmppElementHandler
+  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
   //IStanzaProcessor
   virtual QString newId() const;
   virtual bool sendStanzaIn(const Jid &AStreamJid, const Stanza &AStanza);
@@ -56,9 +61,10 @@ protected:
   virtual bool processStanzaRequest(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void removeStanzaRequest(const QString &AStanzaId);
 protected slots:
-  void onStreamElement(IXmppStream *AStream, const QDomElement &AElem);
-  void onStreamJidChanged(IXmppStream *AStream, const Jid &ABefour);
-  void onStreamClosed(IXmppStream *AStream);
+  void onStreamCreated(IXmppStream *AXmppStream);
+  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+  void onStreamClosed(IXmppStream *AXmppStream);
+  void onStreamDestroyed(IXmppStream *AXmppStream);
   void onStanzaRequestTimeout();
   void onStanzaRequestOwnerDestroyed(QObject *AOwner);
   void onStanzaHandlerDestroyed(QObject *AHandler);

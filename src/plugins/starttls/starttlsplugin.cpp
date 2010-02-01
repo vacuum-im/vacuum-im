@@ -34,36 +34,28 @@ bool StartTLSPlugin::initObjects()
 {
   if (FXmppStreams)
   {
-    FXmppStreams->registerFeature(NS_FEATURE_STARTTLS,this);
+    FXmppStreams->registerXmppFeature(this,NS_FEATURE_STARTTLS,XFO_STARTTLS);
   }
   return true;
 }
 
-IStreamFeature *StartTLSPlugin::newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
+IXmppFeature *StartTLSPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
   if (AFeatureNS == NS_FEATURE_STARTTLS)
   {
-    IStreamFeature *feature = FFeatures.value(AXmppStream);
-    if (!feature)
-    {
-      feature = new StartTLS(AXmppStream);
-      FFeatures.insert(AXmppStream,feature);
-      emit featureCreated(feature);
-    }
+    IXmppFeature *feature = new StartTLS(AXmppStream);
+    connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
+    emit featureCreated(feature);
     return feature;
   }
   return NULL;
 }
 
-void StartTLSPlugin::destroyStreamFeature(IStreamFeature *AFeature)
+void StartTLSPlugin::onFeatureDestroyed()
 {
-  if (AFeature && FFeatures.value(AFeature->xmppStream()) == AFeature)
-  {
-    FFeatures.remove(AFeature->xmppStream());
-    AFeature->xmppStream()->removeFeature(AFeature);
-    emit featureDestroyed(AFeature);
-    AFeature->instance()->deleteLater();
-  }
+  IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
+  if (feature)
+    emit featureDestroyed(feature);
 }
 
 Q_EXPORT_PLUGIN2(plg_starttls, StartTLSPlugin)

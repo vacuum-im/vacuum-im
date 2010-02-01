@@ -39,37 +39,29 @@ bool CompressPlugin::initObjects()
 
   if (FXmppStreams)
   {
-    FXmppStreams->registerFeature(NS_FEATURE_COMPRESS,this);
+    FXmppStreams->registerXmppFeature(this,NS_FEATURE_COMPRESS,XFO_COMPRESS);
   }
 
   return true;
 }
 
-IStreamFeature *CompressPlugin::newStreamFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
+IXmppFeature *CompressPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
   if (AFeatureNS == NS_FEATURE_COMPRESS)
   {
-    IStreamFeature *feature = FFeatures.value(AXmppStream);
-    if (!feature)
-    {
-      feature = new Compression(AXmppStream);
-      FFeatures.insert(AXmppStream,feature);
-      emit featureCreated(feature);
-    }
+    IXmppFeature *feature = new Compression(AXmppStream);
+    connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
+    emit featureCreated(feature);
     return feature;
   }
   return NULL;
 }
 
-void CompressPlugin::destroyStreamFeature(IStreamFeature *AFeature)
+void CompressPlugin::onFeatureDestroyed()
 {
-  if (AFeature && FFeatures.value(AFeature->xmppStream()) == AFeature)
-  {
-    FFeatures.remove(AFeature->xmppStream());
-    AFeature->xmppStream()->removeFeature(AFeature);
-    emit featureDestroyed(AFeature);
-    AFeature->instance()->deleteLater();
-  }
+  IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
+  if (feature)
+    emit featureDestroyed(feature);
 }
 
 Q_EXPORT_PLUGIN2(plg_compress, CompressPlugin)
