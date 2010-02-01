@@ -492,6 +492,10 @@ Check values and try again</source>
         <source>Supports the multi-user conferences</source>
         <translation>Поддерживает многопользовательские конференции</translation>
     </message>
+    <message>
+        <source>Mention in conference</source>
+        <translation>Обращение в конференции</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -894,6 +898,14 @@ Check values and try again</source>
     <message>
         <source>%1 has left the room. %2</source>
         <translation>%1 вышел из комнаты. %2</translation>
+    </message>
+    <message>
+        <source>Mention message in conference: %1</source>
+        <translation>Сообщение с обращением в конференции: %1</translation>
+    </message>
+    <message>
+        <source>Mention in conference</source>
+        <translation>Обращение в конференции</translation>
     </message>
 </context>
 <context>
