@@ -44,9 +44,9 @@ class IStanzaProcessor
 public:
   virtual QObject *instance() =0;
   virtual QString newId() const =0;
-  virtual bool sendStanzaIn(const Jid &AStreamJid, const Stanza &AStanza) =0;
-  virtual bool sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza) =0;
-  virtual bool sendStanzaRequest(IStanzaRequestOwner *AOwner, const Jid &AStreamJid, const Stanza &AStanza, int ATimeout) =0;
+  virtual bool sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza) =0;
+  virtual bool sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza) =0;
+  virtual bool sendStanzaRequest(IStanzaRequestOwner *AOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout) =0;
   virtual QList<int> stanzaHandles() const =0;
   virtual IStanzaHandle stanzaHandle(int AHandleId) const =0;
   virtual int insertStanzaHandle(const IStanzaHandle &AHandle) =0;

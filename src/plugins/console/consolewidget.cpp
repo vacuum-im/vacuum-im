@@ -87,23 +87,23 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 ConsoleWidget::~ConsoleWidget()
 {
   foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-    stream->removeXmppElementHandler(this, XEHO_CONSOLE);
+    stream->removeXmppStanzaHandler(this, XSHO_CONSOLE);
 }
 
-bool ConsoleWidget::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool ConsoleWidget::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AOrder == XEHO_CONSOLE)
+  if (AOrder == XSHO_CONSOLE)
   {
-    showElement(AXmppStream,AElem,false);
+    showElement(AXmppStream,AStanza.element(),false);
   }
   return false;
 }
 
-bool ConsoleWidget::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool ConsoleWidget::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AOrder == XEHO_CONSOLE)
+  if (AOrder == XSHO_CONSOLE)
   {
-    showElement(AXmppStream,AElem,true);
+    showElement(AXmppStream,AStanza.element(),true);
   }
   return false;
 }
@@ -276,7 +276,7 @@ void ConsoleWidget::onWordWrapStateChanged( int AState )
 void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)
 {
   ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
-  AXmppStream->insertXmppElementHandler(this, XEHO_CONSOLE);
+  AXmppStream->insertXmppStanzaHandler(this, XSHO_CONSOLE);
 }
 
 void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
@@ -292,7 +292,7 @@ void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABef
 void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
 {
   ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->streamJid().full()));
-  AXmppStream->removeXmppElementHandler(this, XEHO_CONSOLE);
+  AXmppStream->removeXmppStanzaHandler(this, XSHO_CONSOLE);
 }
 
 void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle)

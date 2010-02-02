@@ -44,20 +44,20 @@ SASLAuth::SASLAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 
 SASLAuth::~SASLAuth()
 {
-  FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+  FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
   emit featureDestroyed();
 }
 
-bool SASLAuth::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
   {
-    if (AElem.tagName() == "challenge")
+    if (AStanza.tagName() == "challenge")
     {
       if (FChallengeStep == 0)
       {
         FChallengeStep++;
-        QString chl = QByteArray::fromBase64(AElem.text().toAscii()); 
+        QString chl = QByteArray::fromBase64(AStanza.element().text().toAscii()); 
         QMultiHash<QString, QString> params = parseChallenge(chl);
 
         QString realm = params.value("realm");
@@ -94,18 +94,18 @@ bool SASLAuth::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int A
     }
     else 
     {
-      FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
-      if (AElem.tagName() == "success")
+      FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+      if (AStanza.tagName() == "success")
       {
         deleteLater();
         emit finished(true);
       }
-      else if (AElem.tagName() == "failure")
+      else if (AStanza.tagName() == "failure")
       {
-        ErrorHandler err(AElem,NS_FEATURE_SASL);
+        ErrorHandler err(AStanza.element(),NS_FEATURE_SASL);
         emit error(err.message()); 
       }
-      else if (AElem.tagName() == "abort")
+      else if (AStanza.tagName() == "abort")
       {
         ErrorHandler err("aborted",NS_FEATURE_SASL);
         emit error(err.message()); 
@@ -120,10 +120,10 @@ bool SASLAuth::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int A
   return false;
 }
 
-bool SASLAuth::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool SASLAuth::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
   Q_UNUSED(AXmppStream);
-  Q_UNUSED(AElem);
+  Q_UNUSED(AStanza);
   Q_UNUSED(AOrder);
   return false;
 }
@@ -141,7 +141,7 @@ bool SASLAuth::start(const QDomElement &AElem)
       {
         Stanza auth("auth");
         auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism); 
-        FXmppStream->insertXmppElementHandler(this, XEHO_XMPP_FEATURE);
+        FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
         FXmppStream->sendStanza(auth);   
         return true;
       }
@@ -152,7 +152,7 @@ bool SASLAuth::start(const QDomElement &AElem)
         Stanza auth("auth");
         auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
         auth.element().appendChild(auth.createTextNode(resp.toBase64()));
-        FXmppStream->insertXmppElementHandler(this, XEHO_XMPP_FEATURE);
+        FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
         FXmppStream->sendStanza(auth);   
         return true;
       }

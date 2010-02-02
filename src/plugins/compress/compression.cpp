@@ -12,7 +12,7 @@ Compression::~Compression()
 {
   stopZlib();
   FXmppStream->removeXmppDataHandler(this, XDHO_FEATURE_COMPRESS);
-  FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+  FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
   emit featureDestroyed();
 }
 
@@ -34,17 +34,17 @@ bool Compression::xmppDataOut(IXmppStream *AXmppStream, QByteArray &AData, int A
   return false;
 }
 
-bool Compression::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool Compression::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
   {
-    FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
-    if (AElem.tagName() == "compressed")
+    FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+    if (AStanza.tagName() == "compressed")
     {
       FXmppStream->insertXmppDataHandler(this, XDHO_FEATURE_COMPRESS);
       emit finished(true);
     }
-    else if (AElem.tagName() == "failure")
+    else if (AStanza.tagName() == "failure")
     {
       deleteLater();
       emit finished(false);
@@ -58,10 +58,10 @@ bool Compression::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, in
   return false;
 }
 
-bool Compression::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool Compression::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
   Q_UNUSED(AXmppStream);
-  Q_UNUSED(AElem);
+  Q_UNUSED(AStanza);
   Q_UNUSED(AOrder);
   return false;
 }
@@ -80,7 +80,7 @@ bool Compression::start(const QDomElement &AElem)
           Stanza compress("compress");
           compress.setAttribute("xmlns",NS_PROTOCOL_COMPRESS);
           compress.addElement("method").appendChild(compress.createTextNode("zlib"));
-          FXmppStream->insertXmppElementHandler(this, XEHO_XMPP_FEATURE);
+          FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
           FXmppStream->sendStanza(compress);   
           return true;
         }

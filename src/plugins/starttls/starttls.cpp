@@ -8,21 +8,21 @@ StartTLS::StartTLS(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 
 StartTLS::~StartTLS()
 {
-  FXmppStream->removeXmppElementHandler(this,XEHO_XMPP_FEATURE);
+  FXmppStream->removeXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
   emit featureDestroyed();
 }
 
-bool StartTLS::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool StartTLS::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
   {
-    FXmppStream->removeXmppElementHandler(this,XEHO_XMPP_FEATURE);
-    if (AElem.tagName() == "proceed")
+    FXmppStream->removeXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+    if (AStanza.tagName() == "proceed")
     {
       connect(FConnection->instance(),SIGNAL(encrypted()),SLOT(onConnectionEncrypted()));
       FConnection->startClientEncryption();
     }
-    else if (AElem.tagName() == "failure")
+    else if (AStanza.tagName() == "failure")
     {
       emit error(tr("StartTLS negotiation failed")); 
     }
@@ -35,10 +35,10 @@ bool StartTLS::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int A
   return false;
 }
 
-bool StartTLS::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool StartTLS::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
   Q_UNUSED(AXmppStream);
-  Q_UNUSED(AElem);
+  Q_UNUSED(AStanza);
   Q_UNUSED(AOrder);
   return false;
 }
@@ -50,7 +50,7 @@ bool StartTLS::start(const QDomElement &AElem)
   {
     Stanza request("starttls");
     request.setAttribute("xmlns",NS_FEATURE_STARTTLS);
-    FXmppStream->insertXmppElementHandler(this,XEHO_XMPP_FEATURE);
+    FXmppStream->insertXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
     FXmppStream->sendStanza(request);
     return true;
   }

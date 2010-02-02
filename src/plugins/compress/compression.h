@@ -3,7 +3,7 @@
 
 #include <definations/namespaces.h>
 #include <definations/xmppdatahandlerorders.h>
-#include <definations/xmppelementhandlerorders.h>
+#include <definations/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include "../../thirdparty/zlib/zlib.h"
 
@@ -11,19 +11,19 @@ class Compression :
   public QObject,
   public IXmppFeature,
   public IXmppDataHandler,
-  public IXmppElementHadler
+  public IXmppStanzaHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IXmppFeature IXmppDataHandler IXmppElementHadler);
+  Q_INTERFACES(IXmppFeature IXmppDataHandler IXmppStanzaHadler);
 public:
   Compression(IXmppStream *AXmppStream);
   ~Compression();
   //IXmppDataHandler
   virtual bool xmppDataIn(IXmppStream *AXmppStream, QByteArray &AData, int AOrder);
   virtual bool xmppDataOut(IXmppStream *AXmppStream, QByteArray &AData, int AOrder);
-  //IXmppElementHandler
-  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
-  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  //IXmppStanzaHadler
+  virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
+  virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
   //IXmppFeature
   virtual QObject *instance() { return this; }
   virtual QString featureNS() const { return NS_FEATURE_COMPRESS; }

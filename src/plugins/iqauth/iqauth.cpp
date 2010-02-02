@@ -9,25 +9,25 @@ IqAuth::IqAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 
 IqAuth::~IqAuth()
 {
-  FXmppStream->removeXmppElementHandler(this,XEHO_XMPP_FEATURE);
+  FXmppStream->removeXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
   emit featureDestroyed();
 }
 
-bool IqAuth::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
   {
-    FXmppStream->removeXmppElementHandler(this,XEHO_XMPP_FEATURE);
-    if (AElem.attribute("id") == "auth")
+    FXmppStream->removeXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+    if (AStanza.id() == "auth")
     {
-      if (AElem.attribute("type") == "result")
+      if (AStanza.type() == "result")
       {
         deleteLater();
         emit finished(false);
       }
-      else if (AElem.attribute("type") == "error")
+      else if (AStanza.type() == "error")
       {
-        ErrorHandler err(AElem);
+        ErrorHandler err(AStanza.element());
         emit error(err.message());
       }
     }
@@ -40,10 +40,10 @@ bool IqAuth::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOr
   return false;
 }
 
-bool IqAuth::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool IqAuth::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
   Q_UNUSED(AXmppStream);
-  Q_UNUSED(AElem);
+  Q_UNUSED(AStanza);
   Q_UNUSED(AOrder);
   return false;
 }
@@ -60,7 +60,7 @@ bool IqAuth::start(const QDomElement &AElem)
     QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
     query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
     query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
-    FXmppStream->insertXmppElementHandler(this, XEHO_XMPP_FEATURE);
+    FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
     FXmppStream->sendStanza(auth);
     return true;
   }
