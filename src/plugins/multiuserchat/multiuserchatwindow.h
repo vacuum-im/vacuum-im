@@ -1,6 +1,7 @@
 #ifndef MULTIUSERCHATWINDOW_H
 #define MULTIUSERCHATWINDOW_H
 
+#include <QStandardItemModel>
 #include <definations/messagedataroles.h>
 #include <definations/messagehandlerorders.h>
 #include <definations/multiuserdataroles.h>
@@ -29,6 +30,7 @@
 #include "edituserslistdialog.h"
 #include "usercontextmenu.h"
 #include "inputtextdialog.h"
+#include "usersproxymodel.h"
 #include "ui_multiuserchatwindow.h"
 
 #define GROUP_NOTIFICATOR_ID      "GroupChatMessages"
@@ -170,7 +172,7 @@ protected slots:
   void onAffiliationListDialogAccepted();
   void onConfigFormDialogAccepted();
 protected slots:
-  void onListItemActivated(QListWidgetItem *AItem);
+  void onUserItemActivated(const QModelIndex &AIndex);
   void onStatusIconsChanged();
   void onAccountChanged(const QString &AName, const QVariant &AValue);  
 private:
@@ -228,7 +230,10 @@ private:
   QMultiMap<IChatWindow *,int> FActiveChatMessages;
   QMap<int, IDataDialogWidget *> FDataFormMessages;
   QMap<IViewWidget *, WindowStatus> FWindowStatus;
-  QHash<IMultiUser *, QListWidgetItem *> FUsers;
+private:
+  UsersProxyModel *FUsersProxy;
+  QStandardItemModel *FUsersModel;
+  QHash<IMultiUser *, QStandardItem *> FUsers;
 };
 
 #endif // MULTIUSERCHATWINDOW_H

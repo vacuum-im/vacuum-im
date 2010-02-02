@@ -29,7 +29,6 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 
   ui.lblRoom->setText(AMultiChat->roomJid().hFull());
   ui.lblNick->setText(Qt::escape(AMultiChat->nickName()));
-  ui.ltwUsers->installEventFilter(this);
 
   FSettings = NULL;
   FStatusIcons = NULL;
@@ -56,10 +55,23 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
   setMessageStyle();
   connectMultiChat();
   createMenuBarActions();
+  updateMenuBarActions();
   createModeratorUtilsActions();
   loadWindowState();
 
-  connect(ui.ltwUsers,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
+  FUsersModel = new QStandardItemModel(0,1,ui.ltvUsers);
+
+  FUsersProxy = new UsersProxyModel(AMultiChat,FUsersModel);
+  FUsersProxy->setSortLocaleAware(true);
+  FUsersProxy->setDynamicSortFilter(true);
+  FUsersProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
+  FUsersProxy->setSourceModel(FUsersModel);
+  FUsersProxy->sort(0, Qt::AscendingOrder);
+  
+  ui.ltvUsers->setModel(FUsersProxy);
+  ui.ltvUsers->installEventFilter(this);
+  connect(ui.ltvUsers,SIGNAL(activated(const QModelIndex &)),SLOT(onUserItemActivated(const QModelIndex &)));
+
   connect(this,SIGNAL(windowActivated()),SLOT(onWindowActivated()));
 }
 
@@ -794,38 +806,38 @@ bool MultiUserChatWindow::showStatusCodes(const QString &ANick, const QList<int>
 
 void MultiUserChatWindow::highlightUserRole(IMultiUser *AUser)
 {
-  QListWidgetItem *listItem = FUsers.value(AUser);
-  if (listItem)
+  QStandardItem *userItem = FUsers.value(AUser);
+  if (userItem)
   {
     QColor itemColor;
-    QFont itemFont = listItem->font();
+    QFont itemFont = userItem->font();
     QString role = AUser->data(MUDR_ROLE).toString();
     if (role == MUC_ROLE_MODERATOR)
     {
       itemFont.setBold(true);
-      itemColor = ui.ltwUsers->palette().color(QPalette::Active, QPalette::Text);
+      itemColor = ui.ltvUsers->palette().color(QPalette::Active, QPalette::Text);
     }
     else if (role == MUC_ROLE_PARTICIPANT)
     {
       itemFont.setBold(false);
-      itemColor = ui.ltwUsers->palette().color(QPalette::Active, QPalette::Text);
+      itemColor = ui.ltvUsers->palette().color(QPalette::Active, QPalette::Text);
     }
     else
     {
       itemFont.setBold(false);
-      itemColor = ui.ltwUsers->palette().color(QPalette::Disabled, QPalette::Text);
+      itemColor = ui.ltvUsers->palette().color(QPalette::Disabled, QPalette::Text);
     }
-    listItem->setFont(itemFont);
-    listItem->setForeground(itemColor);
+    userItem->setFont(itemFont);
+    userItem->setForeground(itemColor);
   }
 }
 
 void MultiUserChatWindow::highlightUserAffiliation(IMultiUser *AUser)
 {
-  QListWidgetItem *listItem = FUsers.value(AUser);
-  if (listItem)
+  QStandardItem *userItem = FUsers.value(AUser);
+  if (userItem)
   {
-    QFont itemFont = listItem->font();
+    QFont itemFont = userItem->font();
     QString affilation = AUser->data(MUDR_AFFILIATION).toString();
     if (affilation == MUC_AFFIL_OWNER)
     {
@@ -857,14 +869,14 @@ void MultiUserChatWindow::highlightUserAffiliation(IMultiUser *AUser)
       itemFont.setUnderline(false);
       itemFont.setItalic(true);
     }
-    listItem->setFont(itemFont);
+    userItem->setFont(itemFont);
   }
 }
 
 void MultiUserChatWindow::setToolTipForUser(IMultiUser *AUser)
 {
-  QListWidgetItem *listItem = FUsers.value(AUser);
-  if (listItem)
+  QStandardItem *userItem = FUsers.value(AUser);
+  if (userItem)
   {
     QStringList toolTips;
     toolTips.append(Qt::escape(AUser->nickName()));
@@ -885,7 +897,7 @@ void MultiUserChatWindow::setToolTipForUser(IMultiUser *AUser)
     if (!status.isEmpty())
       toolTips.append(QString("%1 <div style='margin-left:10px;'>%2</div>").arg(tr("Status:")).arg(Qt::escape(status).replace("\n","<br>")));
 
-    listItem->setToolTip("<span>"+toolTips.join("<p/>")+"</span>");
+    userItem->setToolTip("<span>"+toolTips.join("<p/>")+"</span>");
   }
 }
 
@@ -1125,14 +1137,14 @@ void MultiUserChatWindow::updateWindow()
 void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
 {
   IMultiUser *user = FMultiChat->userByNick(AContactJid.resource());
-  QListWidgetItem *listItem = FUsers.value(user);
-  if (listItem)
+  QStandardItem *userItem = FUsers.value(user);
+  if (userItem)
   {
     IChatWindow *window = findChatWindow(AContactJid);
     if (FActiveChatMessages.contains(window))
-      listItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE));
+      userItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE));
     else if (FStatusIcons)
-      listItem->setIcon(FStatusIcons->iconByJidStatus(AContactJid,user->data(MUDR_SHOW).toInt(),"",false));
+      userItem->setIcon(FStatusIcons->iconByJidStatus(AContactJid,user->data(MUDR_SHOW).toInt(),"",false));
   }
 }
 
@@ -1354,13 +1366,13 @@ void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 
 bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 {
-  if (AObject == ui.ltwUsers)
+  if (AObject == ui.ltvUsers)
   {
     if (AEvent->type() == QEvent::ContextMenu)
     {
       QContextMenuEvent *menuEvent = static_cast<QContextMenuEvent *>(AEvent);
-      QListWidgetItem *listItem = ui.ltwUsers->itemAt(menuEvent->pos());
-      IMultiUser *user = FUsers.key(listItem,NULL);
+      QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(ui.ltvUsers->indexAt(menuEvent->pos())));
+      IMultiUser *user = FUsers.key(userItem,NULL);
       if (user && user!=FMultiChat->mainUser())
       {
         Menu *menu = new Menu(this);
@@ -1414,15 +1426,14 @@ void MultiUserChatWindow::onStreamJidChanged(const Jid &ABefour, const Jid &AAft
 
 void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus)
 {
-  QListWidgetItem *listItem = FUsers.value(AUser);
+  QStandardItem *userItem = FUsers.value(AUser);
   if (AShow!=IPresence::Offline && AShow!=IPresence::Error)
   {
-    if (listItem == NULL)
+    if (userItem == NULL)
     {
-      listItem = new QListWidgetItem(ui.ltwUsers);
-      listItem->setText(AUser->nickName());
-      ui.ltwUsers->addItem(listItem);
-      FUsers.insert(AUser,listItem);
+      userItem = new QStandardItem(AUser->nickName());
+      FUsersModel->appendRow(userItem);
+      FUsers.insert(AUser,userItem);
       highlightUserRole(AUser);
       highlightUserAffiliation(AUser);
 
@@ -1441,7 +1452,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
     setToolTipForUser(AUser);
     updateListItem(AUser->contactJid());
   }
-  else if (listItem)
+  else if (userItem)
   {
     if (!showStatusCodes(AUser->nickName(),FMultiChat->statusCodes()) && FMultiChat->isOpen())
     {
@@ -1454,8 +1465,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
       showMessage(message);
     }
     FUsers.remove(AUser);
-    ui.ltwUsers->takeItem(ui.ltwUsers->row(listItem));
-    delete listItem;
+    qDeleteAll(FUsersModel->takeRow(userItem->row()));
   }
 
   if (FMultiChat->isOpen())
@@ -1499,10 +1509,10 @@ void MultiUserChatWindow::onUserDataChanged(IMultiUser *AUser, int ARole, const 
 
 void MultiUserChatWindow::onUserNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick)
 {
-  QListWidgetItem *listItem = FUsers.value(AUser);
-  if (listItem)
+  QStandardItem *userItem = FUsers.value(AUser);
+  if (userItem)
   {
-    listItem->setText(ANewNick);
+    userItem->setText(ANewNick);
     Jid userOldJid = AUser->contactJid();
     userOldJid.setResource(AOldNick);
     IChatWindow *window = findChatWindow(userOldJid);
@@ -1907,9 +1917,9 @@ void MultiUserChatWindow::onConfigFormDialogAccepted()
     FMultiChat->sendConfigForm(FDataForms->dataSubmit(dialog->formWidget()->userDataForm()));
 }
 
-void MultiUserChatWindow::onListItemActivated(QListWidgetItem *AItem)
+void MultiUserChatWindow::onUserItemActivated(const QModelIndex &AIndex)
 {
-  IMultiUser *user = FUsers.key(AItem);
+  IMultiUser *user = FUsers.key(FUsersModel->itemFromIndex(FUsersProxy->mapToSource(AIndex)));
   if (user)
     openWindow(streamJid(),user->contactJid(),Message::Chat);
 }
