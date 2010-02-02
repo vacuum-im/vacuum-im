@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>NotifyKindsWidgetClass</class>
- <widget class="QWidget" name="NotifyKindsWidgetClass" >
-  <property name="geometry" >
+ <widget class="QWidget" name="NotifyKindsWidgetClass">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,47 +10,54 @@
     <height>47</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
-   <property name="spacing" >
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
     <number>0</number>
    </property>
-   <property name="margin" >
+   <property name="margin">
     <number>0</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="grbKinds" >
-     <property name="flat" >
+    <widget class="QGroupBox" name="grbKinds">
+     <property name="flat">
       <bool>false</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" >
-      <property name="margin" >
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="margin">
        <number>5</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="chbRoster" >
-        <property name="text" >
+       <widget class="QCheckBox" name="chbRoster">
+        <property name="text">
          <string>Roster</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="chbPopup" >
-        <property name="text" >
+       <widget class="QCheckBox" name="chbPopup">
+        <property name="text">
          <string>Popup</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="chbTray" >
-        <property name="text" >
+       <widget class="QCheckBox" name="chbTray">
+        <property name="text">
          <string>Tray</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="chbSound" >
-        <property name="text" >
+       <widget class="QCheckBox" name="chbSound">
+        <property name="text">
          <string>Sound</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chbActivate">
+        <property name="text">
+         <string>Activate</string>
         </property>
        </widget>
       </item>
@@ -58,7 +66,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

@@ -104,8 +104,9 @@ bool SessionNegotiation::initObjects()
   }
   if (FNotifications)
   {
-    uchar kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
-    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Negotiate session requests"),kindMask,kindMask);
+    uchar kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
+    uchar kindDefs = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Negotiate session requests"),kindMask,kindDefs);
   }
   if (FDataForms)
   {

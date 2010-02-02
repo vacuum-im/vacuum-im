@@ -1,6 +1,7 @@
 #ifndef NOTIFICATIONS_H
 #define NOTIFICATIONS_H
 
+#include <QTimer>
 #include <QSound>
 #include <definations/notificationdataroles.h>
 #include <definations/actiongroups.h>
@@ -95,6 +96,7 @@ protected:
   int notifyIdByTrayId(int ATrayId) const;
   int notifyIdByWidget(NotifyWidget *AWidget) const;
 protected slots:
+  void onActivateDelayedActivations();
   void onTrayActionTriggered(bool);
   void onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId);
   void onRosterNotifyRemoved(IRosterIndex *AIndex, int ANotifyId);
@@ -122,6 +124,7 @@ private:
   uint FOptions;
   int FNotifyId;
   QSound *FSound;
+  QList<int> FDelayedActivations;
   QMap<int, NotifyRecord> FNotifyRecords;
   mutable QMap<QString, Notificator> FNotificators;
 };

@@ -194,17 +194,21 @@ bool MultiUserChatPlugin::initObjects()
 
   if (FNotifications)
   {
-    uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
-    FNotifications->insertNotificator(INVITE_NOTIFICATOR_ID,tr("Invite chat messages"),kindMask,kindMask);
+    uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
+    uchar kindDefs = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(INVITE_NOTIFICATOR_ID,tr("Invite chat messages"),kindMask,kindDefs);
 
-    kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
-    FNotifications->insertNotificator(PRIVATE_NOTIFICATOR_ID,tr("Private conference messages"),kindMask,kindMask);
+    kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
+    kindDefs = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(PRIVATE_NOTIFICATOR_ID,tr("Private conference messages"),kindMask,kindDefs);
 
     kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
-    FNotifications->insertNotificator(GROUP_NOTIFICATOR_ID,tr("Conference messages"),kindMask,INotification::TrayIcon|INotification::PlaySound);
+    kindDefs = INotification::TrayIcon|INotification::PlaySound;
+    FNotifications->insertNotificator(GROUP_NOTIFICATOR_ID,tr("Conference messages"),kindMask,kindDefs);
 
-    kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
-    FNotifications->insertNotificator(MENTION_NOTIFICATOR_ID,tr("Mention in conference"),kindMask,kindMask);
+    kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
+    kindDefs = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(MENTION_NOTIFICATOR_ID,tr("Mention in conference"),kindMask,kindDefs);
   }
 
   if (FXmppUriQueries)

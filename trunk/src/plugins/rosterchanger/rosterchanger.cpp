@@ -128,8 +128,9 @@ bool RosterChanger::initObjects()
 {
   if (FNotifications)
   {
-    uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;;
-    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Subscription requests"),kindMask,kindMask);
+    uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
+    uchar kindDefs = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Subscription requests"),kindMask,kindDefs);
   }
   if (FSettingsPlugin)
   {

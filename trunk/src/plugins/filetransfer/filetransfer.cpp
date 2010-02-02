@@ -134,8 +134,9 @@ bool FileTransfer::initObjects()
   }
   if (FNotifications)
   {
-    uchar kindMask = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
-    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("File Transfer"),kindMask,kindMask);
+    uchar kindMask = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
+    uchar kindDefs = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
+    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("File Transfer"),kindMask,kindDefs);
   }
   if (FFileManager)
   {

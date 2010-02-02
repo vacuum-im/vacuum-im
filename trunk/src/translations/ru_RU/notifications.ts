@@ -50,6 +50,10 @@
         <source>Sound</source>
         <translation>Звук</translation>
     </message>
+    <message>
+        <source>Activate</source>
+        <translation>Открыть</translation>
+    </message>
 </context>
 <context>
     <name>NotifyWidget</name>
@@ -79,6 +83,10 @@
     <message>
         <source>Sound</source>
         <translation>Звук</translation>
+    </message>
+    <message>
+        <source>Activate</source>
+        <translation>Открыть</translation>
     </message>
 </context>
 </TS>

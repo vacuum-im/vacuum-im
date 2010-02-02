@@ -9,11 +9,12 @@
 
 struct INotification {
   enum NotifyKinds {
-    RosterIcon  = 0x01,
-    PopupWindow = 0x02,
-    TrayIcon    = 0x04,
-    TrayAction  = 0x08,
-    PlaySound   = 0x10
+    RosterIcon    = 0x01,
+    PopupWindow   = 0x02,
+    TrayIcon      = 0x04,
+    TrayAction    = 0x08,
+    PlaySound     = 0x10,
+    AutoActivate  = 0x20
   };
   INotification() { kinds = 0; }
   uchar kinds;
@@ -27,7 +28,8 @@ public:
     EnablePopupWindows    = 0x02,
     EnableTrayIcons       = 0x04,
     EnableTrayActions     = 0x08,
-    EnableSounds          = 0x10
+    EnableSounds          = 0x10,
+    EnableAutoActivate    = 0x20
   };
 public:
   virtual QObject *instance() =0;
