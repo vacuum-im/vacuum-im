@@ -4,7 +4,7 @@
 #include <QTimer>
 #include <QMultiMap>
 #include <QDomDocument>
-#include <definations/xmppelementhandlerorders.h>
+#include <definations/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
@@ -21,10 +21,10 @@ class StanzaProcessor :
   public QObject,
   public IPlugin,
   public IStanzaProcessor,
-  public IXmppElementHadler
+  public IXmppStanzaHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IStanzaProcessor IXmppElementHadler);
+  Q_INTERFACES(IPlugin IStanzaProcessor IXmppStanzaHadler);
 public:
   StanzaProcessor();
   ~StanzaProcessor();
@@ -36,14 +36,14 @@ public:
   virtual bool initObjects() { return true; }
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
-  //IXmppElementHandler
-  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
-  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  //IXmppStanzaHadler
+  virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
+  virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
   //IStanzaProcessor
   virtual QString newId() const;
-  virtual bool sendStanzaIn(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual bool sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual bool sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, const Stanza &AStanza, int ATimeout);
+  virtual bool sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza);
+  virtual bool sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza);
+  virtual bool sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout);
   virtual QList<int> stanzaHandles() const;
   virtual IStanzaHandle stanzaHandle(int AHandleId) const;
   virtual int insertStanzaHandle(const IStanzaHandle &AHandle);

@@ -7,20 +7,20 @@ SASLBind::SASLBind(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 
 SASLBind::~SASLBind()
 {
-  FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+  FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
   emit featureDestroyed();
 }
 
-bool SASLBind::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
   {
-    FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
-    if (AElem.attribute("id") == "bind")
+    FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+    if (AStanza.id() == "bind")
     {
-      if (AElem.attribute("type") == "result")
+      if (AStanza.type() == "result")
       {
-        Jid streamJid = AElem.firstChild().firstChild().toElement().text();  
+        Jid streamJid = AStanza.firstElement().firstChild().toElement().text();  
         if (streamJid.isValid())
         {
           deleteLater();
@@ -34,7 +34,7 @@ bool SASLBind::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int A
       }
       else
       {
-        ErrorHandler err(AElem);
+        ErrorHandler err(AStanza.element());
         emit error(err.message());
       }
     }
@@ -47,10 +47,10 @@ bool SASLBind::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int A
   return false;
 }
 
-bool SASLBind::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool SASLBind::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
   Q_UNUSED(AXmppStream);
-  Q_UNUSED(AElem);
+  Q_UNUSED(AStanza);
   Q_UNUSED(AOrder);
   return false;
 }
@@ -64,7 +64,7 @@ bool SASLBind::start(const QDomElement &AElem)
     bind.addElement("bind",NS_FEATURE_BIND);
     if (!FXmppStream->streamJid().resource().isEmpty())
       bind.firstElement("bind",NS_FEATURE_BIND).appendChild(bind.createElement("resource")).appendChild(bind.createTextNode(FXmppStream->streamJid().resource()));
-    FXmppStream->insertXmppElementHandler(this, XEHO_XMPP_FEATURE);
+    FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
     FXmppStream->sendStanza(bind); 
     return true;
   }

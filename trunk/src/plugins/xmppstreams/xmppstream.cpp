@@ -29,34 +29,34 @@ XmppStream::~XmppStream()
   emit streamDestroyed();
 }
 
-bool XmppStream::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream == this && AOrder == XEHO_XMPPSTREAM)
+  if (AXmppStream == this && AOrder == XSHO_XMPPSTREAM)
   {
-    if (FStreamState==SS_INITIALIZE && AElem.namespaceURI()==NS_JABBER_STREAMS)
+    if (FStreamState==SS_INITIALIZE && AStanza.element().namespaceURI()==NS_JABBER_STREAMS)
     {
-      FStreamId = AElem.attribute("id");
+      FStreamId = AStanza.id();
       FStreamState = SS_FEATURES;
-      if (VersionParser(AElem.attribute("version","0.0")) < VersionParser(1,0))
+      if (VersionParser(AStanza.element().attribute("version","0.0")) < VersionParser(1,0))
       {
         QDomDocument doc;
         QDomElement featuresElem = doc.appendChild(doc.createElement("stream:features")).toElement();
         featuresElem.appendChild(doc.createElementNS(NS_FEATURE_REGISTER, "register"));
         featuresElem.appendChild(doc.createElementNS(NS_FEATURE_IQAUTH, "auth"));
-        xmppElementIn(AXmppStream, featuresElem, AOrder);
+        xmppStanzaIn(AXmppStream, Stanza(featuresElem), AOrder);
       }
       return true;
     }
-    else if (FStreamState==SS_FEATURES && AElem.nodeName()=="stream:features")
+    else if (FStreamState==SS_FEATURES && AStanza.element().nodeName()=="stream:features")
     {
-      FServerFeatures = AElem.cloneNode(true).toElement();
+      FServerFeatures = AStanza.element().cloneNode(true).toElement();
       FAvailFeatures = FXmppStreams->xmppFeaturesOrdered();
       processFeatures();
       return true;
     }
-    else if(AElem.nodeName() == "stream:error")
+    else if(AStanza.element().nodeName() == "stream:error")
     {
-      ErrorHandler err(AElem,NS_XMPP_STREAMS);
+      ErrorHandler err(AStanza.element(),NS_XMPP_STREAMS);
       abort(err.message());
       return true;
     }
@@ -69,10 +69,10 @@ bool XmppStream::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int
   return false;
 }
 
-bool XmppStream::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool XmppStream::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
   Q_UNUSED(AXmppStream);
-  Q_UNUSED(AElem);
+  Q_UNUSED(AStanza);
   Q_UNUSED(AOrder);
   return false;
 }
@@ -215,15 +215,12 @@ void XmppStream::setConnection(IConnection *AConnection)
   }
 }
 
-qint64 XmppStream::sendStanza(const Stanza &AStanza)
+qint64 XmppStream::sendStanza(Stanza &AStanza)
 {
   if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
   {
-    Stanza stanza(AStanza);
-    stanza.detach();
-    QDomElement elem = stanza.element();
-    if (!processElementHandlers(elem,true))
-      return sendData(stanza.toByteArray());
+    if (!processStanzaHandlers(AStanza,true))
+      return sendData(AStanza.toByteArray());
   }
   return -1;
 }
@@ -246,21 +243,21 @@ void XmppStream::removeXmppDataHandler(IXmppDataHandler *AHandler, int AOrder)
   }
 }
 
-void XmppStream::insertXmppElementHandler(IXmppElementHadler *AHandler, int AOrder)
+void XmppStream::insertXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder)
 {
-  if (AHandler && !FElementHandlers.contains(AOrder, AHandler))
+  if (AHandler && !FStanzaHandlers.contains(AOrder, AHandler))
   {
-    FElementHandlers.insertMulti(AOrder, AHandler);
-    emit elementHandlerInserted(AHandler, AOrder);
+    FStanzaHandlers.insertMulti(AOrder, AHandler);
+    emit stanzaHandlerInserted(AHandler, AOrder);
   }
 }
 
-void XmppStream::removeXmppElementHandler(IXmppElementHadler *AHandler, int AOrder)
+void XmppStream::removeXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder)
 {
-  if (FElementHandlers.contains(AOrder, AHandler))
+  if (FStanzaHandlers.contains(AOrder, AHandler))
   {
-    FElementHandlers.remove(AOrder, AHandler);
-    emit elementHandlerRemoved(AHandler, AOrder);
+    FStanzaHandlers.remove(AOrder, AHandler);
+    emit stanzaHandlerRemoved(AHandler, AOrder);
   }
 }
 
@@ -279,13 +276,12 @@ void XmppStream::startStream()
     root.setAttribute("xml:lang",FDefLang);
 
   FStreamState = SS_INITIALIZE;
-  QDomElement elem = doc.documentElement();
-  if (!processElementHandlers(elem,true))
+  Stanza stanza(doc.documentElement());
+  if (!processStanzaHandlers(stanza,true))
   {
-    QByteArray data = QString("<?xml version=\"1.0\"?>").toUtf8()+doc.toByteArray().trimmed();
+    QByteArray data = QString("<?xml version=\"1.0\"?>").toUtf8()+stanza.toByteArray().trimmed();
     data.remove(data.size()-2,1);
-    if (!processDataHandlers(data,true))
-      FConnection->write(data);
+    sendData(data);
   }
 }
 
@@ -304,7 +300,7 @@ void XmppStream::processFeatures()
   {
     FOpen = true;
     FStreamState = SS_ONLINE;
-    removeXmppElementHandler(this,XEHO_XMPPSTREAM);
+    removeXmppStanzaHandler(this,XSHO_XMPPSTREAM);
     emit opened();
   }
 }
@@ -346,10 +342,10 @@ bool XmppStream::processDataHandlers(QByteArray &AData, bool ADataOut)
   return hooked;
 }
 
-bool XmppStream::processElementHandlers(QDomElement &AElem, bool AElementOut)
+bool XmppStream::processStanzaHandlers(Stanza &AStanza, bool AElementOut)
 {
   bool hooked = false;
-  QMapIterator<int, IXmppElementHadler *> it(FElementHandlers);
+  QMapIterator<int, IXmppStanzaHadler *> it(FStanzaHandlers);
   if (!AElementOut)
     it.toBack();
   while (!hooked && (AElementOut ? it.hasNext() : it.hasPrevious()))
@@ -357,24 +353,23 @@ bool XmppStream::processElementHandlers(QDomElement &AElem, bool AElementOut)
     if (AElementOut)
     {
       it.next();
-      hooked = it.value()->xmppElementOut(this, AElem, it.key());
+      hooked = it.value()->xmppStanzaOut(this, AStanza, it.key());
     }
     else
     {
       it.previous();
-      hooked = it.value()->xmppElementIn(this, AElem, it.key());
+      hooked = it.value()->xmppStanzaIn(this, AStanza, it.key());
     }
   }
   return hooked;
 }
 
-qint64 XmppStream::sendData(const QByteArray &AData)
+qint64 XmppStream::sendData(QByteArray AData)
 {
-  QByteArray data = AData;
-  if (!processDataHandlers(data,true))
+  if (!processDataHandlers(AData,true))
   {
     FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
-    return FConnection->write(data);
+    return FConnection->write(AData);
   }
   return 0;
 }
@@ -387,7 +382,7 @@ QByteArray XmppStream::receiveData(qint64 ABytes)
 
 void XmppStream::onConnectionConnected()
 {
-  insertXmppElementHandler(this,XEHO_XMPPSTREAM);
+  insertXmppStanzaHandler(this,XSHO_XMPPSTREAM);
   startStream();
 }
 
@@ -409,7 +404,7 @@ void XmppStream::onConnectionDisconnected()
   FOpen = false;
   FKeepAliveTimer.stop();
   FStreamState = SS_OFFLINE;
-  removeXmppElementHandler(this,XEHO_XMPPSTREAM);
+  removeXmppStanzaHandler(this,XSHO_XMPPSTREAM);
   emit closed();
 
   if (FOfflineJid.isValid())
@@ -421,12 +416,14 @@ void XmppStream::onConnectionDisconnected()
 
 void XmppStream::onParserOpened(QDomElement AElem)
 {
-  processElementHandlers(AElem,false);
+  Stanza stanza(AElem);
+  processStanzaHandlers(stanza,false);
 }
 
 void XmppStream::onParserElement(QDomElement AElem)
 {
-  processElementHandlers(AElem,false);
+  Stanza stanza(AElem);
+  processStanzaHandlers(stanza,false);
 }
 
 void XmppStream::onParserError(const QString &AError)

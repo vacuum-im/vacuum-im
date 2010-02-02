@@ -18,11 +18,11 @@ public:
   virtual bool xmppDataOut(IXmppStream *AXmppStream, QByteArray &AData, int AOrder) =0;
 };
 
-class IXmppElementHadler
+class IXmppStanzaHadler
 {
 public:
-  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder) =0;
-  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder) =0;
+  virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder) =0;
+  virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder) =0;
 };
 
 class IXmppFeature
@@ -67,11 +67,11 @@ public:
   virtual void setDefaultLang(const QString &ADefLang) =0;
   virtual IConnection *connection() const =0;
   virtual void setConnection(IConnection *AConnection) =0;
-  virtual qint64 sendStanza(const Stanza &AStanza) =0;
+  virtual qint64 sendStanza(Stanza &AStanza) =0;
   virtual void insertXmppDataHandler(IXmppDataHandler *AHandler, int AOrder) =0;
   virtual void removeXmppDataHandler(IXmppDataHandler *AHandler, int AOrder) =0;
-  virtual void insertXmppElementHandler(IXmppElementHadler *AHandler, int AOrder) =0;
-  virtual void removeXmppElementHandler(IXmppElementHadler *AHandler, int AOrder) =0;
+  virtual void insertXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder) =0;
+  virtual void removeXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder) =0;
 protected:
   virtual void opened() =0;
   virtual void aboutToClose() =0;
@@ -82,8 +82,8 @@ protected:
   virtual void connectionChanged(IConnection *AConnection) =0;
   virtual void dataHandlerInserted(IXmppDataHandler *AHandler, int AOrder) =0;
   virtual void dataHandlerRemoved(IXmppDataHandler *AHandler, int AOrder) =0;
-  virtual void elementHandlerInserted(IXmppElementHadler *AHandler, int AOrder) =0;
-  virtual void elementHandlerRemoved(IXmppElementHadler *AHandler, int AOrder) =0;
+  virtual void stanzaHandlerInserted(IXmppStanzaHadler *AHandler, int AOrder) =0;
+  virtual void stanzaHandlerRemoved(IXmppStanzaHadler *AHandler, int AOrder) =0;
   virtual void streamDestroyed() =0;
 };
 
@@ -117,7 +117,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IXmppDataHandler,"Vacuum.Plugin.IXmppDataHandler/1.0");
-Q_DECLARE_INTERFACE(IXmppElementHadler,"Vacuum.Plugin.IXmppElementHadler/1.0");
+Q_DECLARE_INTERFACE(IXmppStanzaHadler,"Vacuum.Plugin.IXmppStanzaHadler/1.0");
 Q_DECLARE_INTERFACE(IXmppFeature,"Vacuum.Plugin.IXmppFeature/1.0");
 Q_DECLARE_INTERFACE(IXmppFeaturesPlugin,"Vacuum.Plugin.IXmppFeaturesPlugin/1.0");
 Q_DECLARE_INTERFACE(IXmppStream, "Vacuum.Plugin.IXmppStream/1.0")

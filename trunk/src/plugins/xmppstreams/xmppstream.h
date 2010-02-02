@@ -5,7 +5,7 @@
 #include <QMultiMap>
 #include <QDomDocument>
 #include <definations/namespaces.h>
-#include <definations/xmppelementhandlerorders.h>
+#include <definations/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
 #include <utils/errorhandler.h>
@@ -25,17 +25,17 @@ enum StreamState
 class XmppStream : 
   public QObject,
   public IXmppStream,
-  public IXmppElementHadler
+  public IXmppStanzaHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IXmppStream IXmppElementHadler);
+  Q_INTERFACES(IXmppStream IXmppStanzaHadler);
 public:
   XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid);
   ~XmppStream();
   virtual QObject *instance() { return this; }
-  //IXmppElementHandler
-  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
-  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  //IXmppStanzaHandler
+  virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
+  virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
   //IXmppStream
   virtual bool isOpen() const;
   virtual bool open();
@@ -51,11 +51,11 @@ public:
   virtual void setDefaultLang(const QString &ADefLang);
   virtual IConnection *connection() const;
   virtual void setConnection(IConnection *AConnection);
-  virtual qint64 sendStanza(const Stanza &AStanza);
+  virtual qint64 sendStanza(Stanza &AStanza);
   virtual void insertXmppDataHandler(IXmppDataHandler *AHandler, int AOrder);
   virtual void removeXmppDataHandler(IXmppDataHandler *AHandler, int AOrder);
-  virtual void insertXmppElementHandler(IXmppElementHadler *AHandler, int AOrder);
-  virtual void removeXmppElementHandler(IXmppElementHadler *AHandler, int AOrder);
+  virtual void insertXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder);
+  virtual void removeXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder);
 signals:
   void opened();
   void aboutToClose();
@@ -66,16 +66,16 @@ signals:
   void connectionChanged(IConnection *AConnection);
   void dataHandlerInserted(IXmppDataHandler *AHandler, int AOrder);
   void dataHandlerRemoved(IXmppDataHandler *AHandler, int AOrder);
-  void elementHandlerInserted(IXmppElementHadler *AHandler, int AOrder);
-  void elementHandlerRemoved(IXmppElementHadler *AHandler, int AOrder);
+  void stanzaHandlerInserted(IXmppStanzaHadler *AHandler, int AOrder);
+  void stanzaHandlerRemoved(IXmppStanzaHadler *AHandler, int AOrder);
   void streamDestroyed();
 protected:
   void startStream();
   void processFeatures();
   bool startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem);
   bool processDataHandlers(QByteArray &AData, bool ADataOut);
-  bool processElementHandlers(QDomElement &AElem, bool AElementOut);
-  qint64 sendData(const QByteArray &AData);
+  bool processStanzaHandlers(Stanza &AStanza, bool AElementOut);
+  qint64 sendData(QByteArray AData);
   QByteArray receiveData(qint64 ABytes);
 protected slots:
   //IStreamConnection
@@ -103,7 +103,7 @@ private:
   QList<IXmppFeature *>	FActiveFeatures; 
 private:
   QMultiMap<int, IXmppDataHandler *> FDataHandlers;
-  QMultiMap<int, IXmppElementHadler *> FElementHandlers;
+  QMultiMap<int, IXmppStanzaHadler *> FStanzaHandlers;
 private:
   bool FOpen;
   Jid FStreamJid;

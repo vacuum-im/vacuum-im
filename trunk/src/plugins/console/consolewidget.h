@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
-#include <definations/xmppelementhandlerorders.h>
+#include <definations/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>
@@ -14,16 +14,16 @@
 
 class ConsoleWidget : 
   public QWidget,
-  public IXmppElementHadler
+  public IXmppStanzaHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IXmppElementHadler);
+  Q_INTERFACES(IXmppStanzaHadler);
 public:
   ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent = NULL);
   ~ConsoleWidget();
-  //IXmppElementHandler
-  virtual bool xmppElementIn(IXmppStream *AStream, QDomElement &AElem, int AOrder);
-  virtual bool xmppElementOut(IXmppStream *AStream, QDomElement &AElem, int AOrder);
+  //IXmppStanzaHadler
+  virtual bool xmppStanzaIn(IXmppStream *AStream, Stanza &AStanza, int AOrder);
+  virtual bool xmppStanzaOut(IXmppStream *AStream, Stanza &AStanza, int AOrder);
 protected:
   void colorXml(QString &AXml) const;
   void showElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);

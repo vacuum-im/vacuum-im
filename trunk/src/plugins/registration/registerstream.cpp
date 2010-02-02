@@ -7,43 +7,43 @@ RegisterStream::RegisterStream(IXmppStream *AXmppStream) : QObject(AXmppStream->
 
 RegisterStream::~RegisterStream()
 {
-  FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+  FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
   emit featureDestroyed();
 }
 
-bool RegisterStream::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
   {
-    if (AElem.attribute("id") == "getReg")
+    if (AStanza.id() == "getReg")
     {
-      if (AElem.attribute("type") == "result")
+      if (AStanza.type() == "result")
       {
         Stanza submit("iq");
         submit.setType("set").setId("setReg");
         QDomElement query = submit.addElement("query",NS_JABBER_REGISTER);
         query.appendChild(submit.createElement("username")).appendChild(submit.createTextNode(FXmppStream->streamJid().eNode()));
         query.appendChild(submit.createElement("password")).appendChild(submit.createTextNode(FXmppStream->password()));
-        query.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(AElem.firstChildElement("query").attribute("key")));
+        query.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(AStanza.firstElement("query").attribute("key")));
         FXmppStream->sendStanza(submit);
       }
-      else if (AElem.attribute("type") == "error")
+      else if (AStanza.type() == "error")
       {
-        ErrorHandler err(AElem);
+        ErrorHandler err(AStanza.element());
         emit error(err.message());
       }
     }
-    else if (AElem.attribute("id") == "setReg")
+    else if (AStanza.id() == "setReg")
     {
-      FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
-      if (AElem.attribute("type") == "result")
+      FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+      if (AStanza.type() == "result")
       {
         deleteLater();
         emit finished(false);
       }
-      else if (AElem.attribute("type") == "error")
+      else if (AStanza.type() == "error")
       {
-        ErrorHandler err(AElem);
+        ErrorHandler err(AStanza.element());
         emit error(err.message());
       }
     }
@@ -56,10 +56,10 @@ bool RegisterStream::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem,
   return false;
 }
 
-bool RegisterStream::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool RegisterStream::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
   Q_UNUSED(AXmppStream);
-  Q_UNUSED(AElem);
+  Q_UNUSED(AStanza);
   Q_UNUSED(AOrder);
   return false;
 }
@@ -71,7 +71,7 @@ bool RegisterStream::start(const QDomElement &AElem)
     Stanza reg("iq");
     reg.setType("get").setId("getReg");
     reg.addElement("query",NS_JABBER_REGISTER);
-    FXmppStream->insertXmppElementHandler(this,XEHO_XMPP_FEATURE);
+    FXmppStream->insertXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
     FXmppStream->sendStanza(reg);
     return true;
   }

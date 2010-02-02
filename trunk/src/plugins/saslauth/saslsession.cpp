@@ -7,25 +7,25 @@ SASLSession::SASLSession(IXmppStream *AXmppStream) : QObject(AXmppStream->instan
 
 SASLSession::~SASLSession()
 {
-  FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
+  FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
   emit featureDestroyed();
 }
 
-bool SASLSession::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool SASLSession::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XEHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
   {
-    FXmppStream->removeXmppElementHandler(this, XEHO_XMPP_FEATURE);
-    if (AElem.attribute("id") == "session")
+    FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+    if (AStanza.id() == "session")
     {
-      if (AElem.attribute("type") == "result")
+      if (AStanza.type() == "result")
       {
         deleteLater();
         emit finished(false);
       }
       else
       {
-        ErrorHandler err(AElem);
+        ErrorHandler err(AStanza.element());
         emit error(err.message());
       }
     }
@@ -38,10 +38,10 @@ bool SASLSession::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, in
   return false;
 }
 
-bool SASLSession::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool SASLSession::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
   Q_UNUSED(AXmppStream);
-  Q_UNUSED(AElem);
+  Q_UNUSED(AStanza);
   Q_UNUSED(AOrder);
   return false;
 }
@@ -53,7 +53,7 @@ bool SASLSession::start(const QDomElement &AElem)
     Stanza session("iq");
     session.setType("set").setId("session"); 
     session.addElement("session",NS_FEATURE_SESSION);
-    FXmppStream->insertXmppElementHandler(this, XEHO_XMPP_FEATURE);
+    FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
     FXmppStream->sendStanza(session); 
     return true;
   }

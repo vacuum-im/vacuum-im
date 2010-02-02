@@ -2,7 +2,7 @@
 #define REGISTERSTREAM_H
 
 #include <definations/namespaces.h>
-#include <definations/xmppelementhandlerorders.h>
+#include <definations/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iregistraton.h>
 #include <utils/errorhandler.h>
@@ -11,17 +11,17 @@
 class RegisterStream :
   public QObject,
   public IXmppFeature,
-  public IXmppElementHadler
+  public IXmppStanzaHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IXmppFeature IXmppElementHadler);
+  Q_INTERFACES(IXmppFeature IXmppStanzaHadler);
 public:
   RegisterStream(IXmppStream *AXmppStream);
   ~RegisterStream();
   virtual QObject *instance() { return this; }
-  //IXmppElementHandler
-  virtual bool xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
-  virtual bool xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder);
+  //IXmppStanzaHadler
+  virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
+  virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
   //IXmppFeature
   virtual QString featureNS() const { return NS_FEATURE_REGISTER; }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }

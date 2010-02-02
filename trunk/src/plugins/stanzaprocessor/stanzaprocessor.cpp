@@ -44,27 +44,26 @@ bool StanzaProcessor::initConnections(IPluginManager *APluginManager, int &/*AIn
   return FXmppStreams!=NULL;
 }
 
-//IXmppElementHandler
-bool StanzaProcessor::xmppElementIn(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+//IXmppStanzaHandler
+bool StanzaProcessor::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AOrder == XEHO_STANZAPROCESSOR)
+  if (AOrder == XSHO_STANZAPROCESSOR)
   {
-    Stanza stanza(AElem);
-    if (stanza.from().isEmpty())
-      stanza.setFrom(AXmppStream->streamJid().eFull());
-    stanza.setTo(AXmppStream->streamJid().eFull());
+    if (AStanza.from().isEmpty())
+      AStanza.setFrom(AXmppStream->streamJid().eFull());
+    AStanza.setTo(AXmppStream->streamJid().eFull());
 
-    if (!sendStanzaIn(AXmppStream->streamJid(),stanza))
-      if (stanza.canReplyError())
-        sendStanzaOut(AXmppStream->streamJid(), stanza.replyError("service-unavailable"));
+    if (!sendStanzaIn(AXmppStream->streamJid(),AStanza))
+      if (AStanza.canReplyError())
+        sendStanzaOut(AXmppStream->streamJid(), AStanza.replyError("service-unavailable"));
   }
   return false;
 }
 
-bool StanzaProcessor::xmppElementOut(IXmppStream *AXmppStream, QDomElement &AElem, int AOrder)
+bool StanzaProcessor::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
   Q_UNUSED(AXmppStream);
-  Q_UNUSED(AElem);
+  Q_UNUSED(AStanza);
   Q_UNUSED(AOrder);
   return false;
 }
@@ -75,31 +74,29 @@ QString StanzaProcessor::newId() const
   return QString::number((qrand()<<16)+qrand(),36);
 }
 
-bool StanzaProcessor::sendStanzaIn(const Jid &AStreamJid, const Stanza &AStanza)
+bool StanzaProcessor::sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza)
 {
-  Stanza stanza(AStanza);
-  emit stanzaReceived(AStreamJid, stanza);
-  bool acceptedIn = processStanzaIn(AStreamJid,stanza);
-  bool acceptedIq = processStanzaRequest(AStreamJid,stanza);
+  emit stanzaReceived(AStreamJid, AStanza);
+  bool acceptedIn = processStanzaIn(AStreamJid,AStanza);
+  bool acceptedIq = processStanzaRequest(AStreamJid,AStanza);
   return acceptedIn || acceptedIq;
 }
 
-bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, const Stanza &AStanza)
+bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza)
 {
-  Stanza stanza(AStanza);
-  if (!processStanzaOut(AStreamJid,stanza))
+  if (!processStanzaOut(AStreamJid,AStanza))
   {
     IXmppStream *stream = FXmppStreams->xmppStream(AStreamJid);
-    if (stream && stream->sendStanza(stanza)>=0)
+    if (stream && stream->sendStanza(AStanza)>=0)
     {
-      emit stanzaSent(AStreamJid, stanza);
+      emit stanzaSent(AStreamJid, AStanza);
       return true;
     }
   }
   return false;
 }
 
-bool StanzaProcessor::sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, const Stanza &AStanza, int ATimeout)
+bool StanzaProcessor::sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout)
 {
   if (AIqOwner && AStanza.tagName()=="iq" && !AStanza.id().isEmpty() && !FRequests.contains(AStanza.id()))
   {
@@ -110,7 +107,7 @@ bool StanzaProcessor::sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid
       request.owner = AIqOwner;
       if (ATimeout > 0)
       {
-        request.timer = new QTimer();
+        request.timer = new QTimer;
         request.timer->setSingleShot(true);  
         connect(request.timer,SIGNAL(timeout()),SLOT(onStanzaRequestTimeout()));
         request.timer->start(ATimeout); 
@@ -354,7 +351,7 @@ void StanzaProcessor::removeStanzaRequest(const QString &AStanzaId)
 
 void StanzaProcessor::onStreamCreated(IXmppStream *AXmppStream)
 {
-  AXmppStream->insertXmppElementHandler(this, XEHO_STANZAPROCESSOR);
+  AXmppStream->insertXmppStanzaHandler(this, XSHO_STANZAPROCESSOR);
 }
 
 void StanzaProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
@@ -379,7 +376,7 @@ void StanzaProcessor::onStreamClosed(IXmppStream *AXmppStream)
 
 void StanzaProcessor::onStreamDestroyed(IXmppStream *AXmppStream)
 {
-  AXmppStream->removeXmppElementHandler(this, XEHO_STANZAPROCESSOR);
+  AXmppStream->removeXmppStanzaHandler(this, XSHO_STANZAPROCESSOR);
 }
 
 void StanzaProcessor::onStanzaRequestTimeout()
