@@ -197,7 +197,8 @@ bool StatusChanger::initObjects()
   if (FNotifications)
   {
     uchar kindMask = INotification::PopupWindow|INotification::PlaySound;
-    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Connection errors"),kindMask,kindMask);
+    uchar kindDefs = INotification::PopupWindow|INotification::PlaySound;
+    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Connection errors"),kindMask,kindDefs);
   }
 
   return true;

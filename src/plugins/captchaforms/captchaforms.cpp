@@ -77,8 +77,9 @@ bool CaptchaForms::initObjects()
   }
   if (FNotifications)
   {
-    uchar kindMask = INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
-    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("CAPTCHA Challenges"),kindMask,kindMask);
+    uchar kindMask = INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
+    uchar kindDefs = INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
+    FNotifications->insertNotificator(NOTIFICATOR_ID,tr("CAPTCHA Challenges"),kindMask,kindDefs);
   }
   return true;
 }

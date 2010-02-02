@@ -8,6 +8,7 @@
 #define SVN_ENABLE_TRAYICONS            "enableTrayIcons"
 #define SVN_ENABLE_TRAYACTIONS          "enableTrayActions"
 #define SVN_ENABLE_SOUNDS               "enableSounds"
+#define SVN_ENABLE_AUTO_ACTIVATE        "enableAutoActivate"
 
 Notifications::Notifications()
 {
@@ -223,6 +224,12 @@ int Notifications::appendNotification(const INotification &ANotification)
     }
   }
 
+  if (checkOption(INotifications::EnableAutoActivate) && (record.notification.kinds & INotification::AutoActivate)>0)
+  {
+    FDelayedActivations.append(notifyId);
+    QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
+  }
+
   if (FNotifyRecords.isEmpty())
   {
     FActivateAll->setVisible(true);
@@ -379,6 +386,13 @@ int Notifications::notifyIdByWidget(NotifyWidget *AWidget) const
   return -1;
 }
 
+void Notifications::onActivateDelayedActivations()
+{
+  foreach(int notifyId, FDelayedActivations)
+    activateNotification(notifyId);
+  FDelayedActivations.clear();
+}
+
 void Notifications::onTrayActionTriggered(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
@@ -452,6 +466,7 @@ void Notifications::onSettingsOpened()
   setOption(EnableTrayIcons, settings->value(SVN_ENABLE_TRAYICONS,true).toBool());
   setOption(EnableTrayActions, settings->value(SVN_ENABLE_TRAYACTIONS,true).toBool());
   setOption(EnableSounds, settings->value(SVN_ENABLE_SOUNDS,true).toBool());
+  setOption(EnableAutoActivate, settings->value(SVN_ENABLE_AUTO_ACTIVATE,true).toBool());
 }
 
 void Notifications::onSettingsClosed()
@@ -462,6 +477,7 @@ void Notifications::onSettingsClosed()
   settings->setValue(SVN_ENABLE_TRAYICONS,checkOption(EnableTrayIcons));
   settings->setValue(SVN_ENABLE_TRAYACTIONS,checkOption(EnableTrayActions));
   settings->setValue(SVN_ENABLE_SOUNDS,checkOption(EnableSounds));
+  settings->setValue(SVN_ENABLE_AUTO_ACTIVATE, checkOption(EnableAutoActivate));
 }
 
 Q_EXPORT_PLUGIN2(plg_notifications, Notifications)
