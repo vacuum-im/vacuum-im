@@ -54,8 +54,13 @@ bool StanzaProcessor::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
     AStanza.setTo(AXmppStream->streamJid().eFull());
 
     if (!sendStanzaIn(AXmppStream->streamJid(),AStanza))
+    {
       if (AStanza.canReplyError())
-        sendStanzaOut(AXmppStream->streamJid(), AStanza.replyError("service-unavailable"));
+      {
+        Stanza reply = AStanza.replyError("service-unavailable");
+        sendStanzaOut(AXmppStream->streamJid(), reply);
+      }
+    }
   }
   return false;
 }
