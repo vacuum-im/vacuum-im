@@ -756,10 +756,6 @@ Check values and try again</source>
         <translation>Комната была уничтожена владельцем. %1</translation>
     </message>
     <message>
-        <source>%1: </source>
-        <translation>%1: </translation>
-    </message>
-    <message>
         <source>Change nick name</source>
         <translation>Изменить ник</translation>
     </message>
