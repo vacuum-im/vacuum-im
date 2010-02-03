@@ -39,11 +39,10 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
       FStreamState = SS_FEATURES;
       if (VersionParser(AStanza.element().attribute("version","0.0")) < VersionParser(1,0))
       {
-        QDomDocument doc;
-        QDomElement featuresElem = doc.appendChild(doc.createElement("stream:features")).toElement();
-        featuresElem.appendChild(doc.createElementNS(NS_FEATURE_REGISTER, "register"));
-        featuresElem.appendChild(doc.createElementNS(NS_FEATURE_IQAUTH, "auth"));
-        xmppStanzaIn(AXmppStream, Stanza(featuresElem), AOrder);
+        Stanza stanza("stream:features");
+        stanza.addElement("register",NS_FEATURE_REGISTER);
+        stanza.addElement("auth",NS_FEATURE_IQAUTH);
+        xmppStanzaIn(AXmppStream, stanza, AOrder);
       }
       return true;
     }
