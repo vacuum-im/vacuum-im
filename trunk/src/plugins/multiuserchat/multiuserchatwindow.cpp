@@ -69,7 +69,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
   FUsersProxy->sort(0, Qt::AscendingOrder);
   
   ui.ltvUsers->setModel(FUsersProxy);
-  ui.ltvUsers->installEventFilter(this);
+  ui.ltvUsers->viewport()->installEventFilter(this);
   connect(ui.ltvUsers,SIGNAL(activated(const QModelIndex &)),SLOT(onUserItemActivated(const QModelIndex &)));
 
   connect(this,SIGNAL(windowActivated()),SLOT(onWindowActivated()));
@@ -1366,7 +1366,7 @@ void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 
 bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 {
-  if (AObject == ui.ltvUsers)
+  if (AObject == ui.ltvUsers->viewport())
   {
     if (AEvent->type() == QEvent::ContextMenu)
     {
@@ -1382,6 +1382,20 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
           menu->popup(menuEvent->globalPos());
         else
           delete menu;
+      }
+    }
+    else if (AEvent->type() == QEvent::MouseButtonPress)
+    {
+      QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(AEvent);
+      if (FEditWidget && mouseEvent->button()==Qt::MidButton)
+      {
+        QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(ui.ltvUsers->indexAt(mouseEvent->pos())));
+        if (userItem)
+        {
+          QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? ": " : " ";
+          FEditWidget->textEdit()->textCursor().insertText(userItem->text() + sufix);
+          FEditWidget->textEdit()->setFocus();
+        }
       }
     }
   }
@@ -1671,7 +1685,8 @@ void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook
     }
     else if (!nicks.isEmpty())
     {
-      cursor.insertText(tr("%1: ").arg(nicks.first()));
+      QString sufix = cursor.atBlockStart() ? ": " : " ";
+      cursor.insertText(nicks.first() + sufix);
     }
 
     AHooked = true;
@@ -1763,7 +1778,8 @@ void MultiUserChatWindow::onNickMenuActionTriggered(bool)
     QString nick = action->data(ADR_USER_NICK).toString();
     QTextCursor cursor = FEditWidget->textEdit()->textCursor();
     cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
-    cursor.insertText(tr("%1: ").arg(nick));
+    QString sufix = cursor.atBlockStart() ? ": " : " ";
+    cursor.insertText(nick + sufix);
   }
 }
 
