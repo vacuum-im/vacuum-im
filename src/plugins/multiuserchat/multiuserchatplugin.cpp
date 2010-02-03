@@ -29,7 +29,6 @@ MultiUserChatPlugin::MultiUserChatPlugin()
   FXmppUriQueries = NULL;
 
   FChatMenu = NULL;
-  FJoinAction = NULL;
 }
 
 MultiUserChatPlugin::~MultiUserChatPlugin()
@@ -167,11 +166,17 @@ bool MultiUserChatPlugin::initObjects()
     FChatMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFERENCE);
     FChatMenu->setTitle(tr("Conferences"));
 
-    FJoinAction = new Action(FChatMenu);
-    FJoinAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
-    FJoinAction->setText(tr("Join conference"));
-    connect(FJoinAction,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
-    FChatMenu->addAction(FJoinAction,AG_DEFAULT+100,true);
+    Action *action = new Action(FChatMenu);
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_SHOW_ALL_ROOMS);
+    action->setText(tr("Show all active conferences"));
+    connect(action,SIGNAL(triggered(bool)),SLOT(onShowAllRoomsTriggered(bool)));
+    FChatMenu->addAction(action,AG_DEFAULT+100,false);
+
+    action = new Action(FChatMenu);
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
+    action->setText(tr("Join conference"));
+    connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
+    FChatMenu->addAction(action,AG_DEFAULT+100,false);
   }
 
   if (FRostersViewPlugin)
@@ -685,6 +690,12 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
     Jid roomJid(room,host,"");
     showJoinMultiChatDialog(streamJid,roomJid,nick,password);
   }
+}
+
+void MultiUserChatPlugin::onShowAllRoomsTriggered(bool)
+{
+  foreach(IMultiUserChatWindow *window, FChatWindows)
+    window->showWindow();
 }
 
 void MultiUserChatPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)

@@ -496,6 +496,10 @@ Check values and try again</source>
         <source>Mention in conference</source>
         <translation>Обращение в конференции</translation>
     </message>
+    <message>
+        <source>Show all active conferences</source>
+        <translation>Показать все активные конференции</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
