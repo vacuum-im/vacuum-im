@@ -2,6 +2,7 @@
 <icondef>
   <icon>
     <key>mucConference</key>
+    <key>mucShowAllRooms</key>
     <object mime="image/png">mucconference.png</object>
   </icon>
   <icon>

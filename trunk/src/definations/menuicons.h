@@ -128,6 +128,7 @@
 //MultiUserChat
 #define MNI_MUC_CONFERENCE              "mucConference"
 #define MNI_MUC_JOIN                    "mucJoin"
+#define MNI_MUC_SHOW_ALL_ROOMS          "mucShowAllRooms"
 #define MNI_MUC_INVITE                  "mucInvite"
 #define MNI_MUC_CHANGE_NICK             "mucChangeNick"
 #define MNI_MUC_CHANGE_TOPIC            "mucChangeTopic"

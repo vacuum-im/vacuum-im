@@ -104,6 +104,7 @@ protected slots:
   void onMultiChatWindowDestroyed();
   void onStreamRemoved(IXmppStream *AXmppStream);
   void onJoinActionTriggered(bool);
+  void onShowAllRoomsTriggered(bool);
   void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onChatActionTriggered(bool);
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
@@ -126,7 +127,6 @@ private:
   IXmppUriQueries *FXmppUriQueries;
 private:
   Menu *FChatMenu;
-  Action *FJoinAction;
 private:
   QList<int> FActiveInvites;
   QList<IMultiUserChat *> FChats;
