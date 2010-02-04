@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
-    <height>149</height>
+    <width>360</width>
+    <height>151</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -91,16 +91,33 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="lblDate">
-     <property name="text">
-      <string notr="true">Revision date: 2009/01/01 00:00:00</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="lblHomePage">
+       <property name="text">
+        <string notr="true">&lt;a href='http://www.vacuum-im.org'&gt;www.vacuum-im.org&lt;/a&gt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblSourcePage">
+       <property name="text">
+        <string notr="true">&lt;a href='http://code.google.com/p/vacuum-im/'&gt;vacuum-im.googlecode.com&lt;/a&gt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QLabel" name="lblCopyright">
      <property name="text">
-      <string notr="true">Copyright 2006-2009 Sergey Potapov. This software is released under the terms of the GNU General Public License version 3.</string>
+      <string notr="true">Copyright 2006-2010 Sergey Potapov. This software is released under the terms of the GNU General Public License version 3.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

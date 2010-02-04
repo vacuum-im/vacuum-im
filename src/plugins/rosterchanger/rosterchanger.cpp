@@ -49,7 +49,7 @@ void RosterChanger::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to edit roster");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(ROSTER_UUID); 
 }
 

@@ -16,7 +16,7 @@ void StartTLSPlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to establish a secure connection to the server after connecting");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);
   APluginInfo->dependences.append(DEFAULTCONNECTION_UUID);
 }

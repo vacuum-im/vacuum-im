@@ -35,7 +35,7 @@ void StatusIcons::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to set the status icons for contacts on the basis of standard rules or user-defined");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
 bool StatusIcons::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

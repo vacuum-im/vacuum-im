@@ -35,7 +35,7 @@ void RostersModel::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Creates a hierarchical model for display roster");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
 bool RostersModel::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

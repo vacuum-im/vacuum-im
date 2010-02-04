@@ -50,7 +50,7 @@ void ChatStates::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to share information about the user's activity in the chat");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(PRESENCE_UUID);
   APluginInfo->dependences.append(MESSAGEWIDGETS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);

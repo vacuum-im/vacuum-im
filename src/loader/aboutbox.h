@@ -13,6 +13,8 @@ class AboutBox :
 public:
   AboutBox(IPluginManager *APluginManager, QWidget *AParent = NULL);
   ~AboutBox();
+protected slots:
+  void onLabelLinkActivated(const QString &ALink);
 private:
   Ui::AboutBoxClass ui;
 };

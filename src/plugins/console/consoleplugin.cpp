@@ -17,7 +17,7 @@ void ConsolePlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to view XML stream between the client and server");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);
   APluginInfo->dependences.append(MAINWINDOW_UUID);
 }

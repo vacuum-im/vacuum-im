@@ -4,10 +4,6 @@
 <context>
     <name>AboutBox</name>
     <message>
-        <source>Revision date: %1</source>
-        <translation>Дата ревизии: %1</translation>
-    </message>
-    <message>
         <source>Version: %1.%2 %3</source>
         <translation>Версия: %1.%2 %3</translation>
     </message>
