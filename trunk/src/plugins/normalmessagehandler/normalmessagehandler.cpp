@@ -28,7 +28,7 @@ void NormalMessageHandler::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to exchange normal messages");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(MESSAGEWIDGETS_UUID);
   APluginInfo->dependences.append(MESSAGEPROCESSOR_UUID);
   APluginInfo->dependences.append(MESSAGESTYLES_UUID);

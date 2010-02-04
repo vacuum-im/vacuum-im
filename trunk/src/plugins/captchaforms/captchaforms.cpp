@@ -24,7 +24,7 @@ void CaptchaForms::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to undergo tests on humanity without the use of browser");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(DATAFORMS_UUID);
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);

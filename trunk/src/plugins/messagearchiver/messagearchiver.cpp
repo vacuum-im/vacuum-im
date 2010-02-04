@@ -66,7 +66,7 @@ void MessageArchiver::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to save the history of communications both locally and on the server");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 

@@ -43,7 +43,7 @@ void Notifications::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows other modules to notify the user of the events");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
 bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)

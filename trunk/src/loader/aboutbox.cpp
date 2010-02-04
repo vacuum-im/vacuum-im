@@ -1,5 +1,7 @@
 #include "aboutbox.h"
 
+#include <QDesktopServices>
+
 AboutBox::AboutBox(IPluginManager *APluginManager, QWidget *AParent) : QDialog(AParent)
 {
   ui.setupUi(this);
@@ -7,13 +9,17 @@ AboutBox::AboutBox(IPluginManager *APluginManager, QWidget *AParent) : QDialog(A
 
   ui.lblName->setText(CLIENT_NAME);
   ui.lblVersion->setText(tr("Version: %1.%2 %3").arg(APluginManager->version()).arg(APluginManager->revision()).arg(CLIENT_VERSION_SUFIX));
-  if (APluginManager->revisionDate().isValid())
-    ui.lblDate->setText(tr("Revision date: %1").arg(APluginManager->revisionDate().toString()));
-  else
-    ui.lblDate->setVisible(false);
+
+  connect(ui.lblHomePage,SIGNAL(linkActivated(const QString &)),SLOT(onLabelLinkActivated(const QString &)));
+  connect(ui.lblSourcePage,SIGNAL(linkActivated(const QString &)),SLOT(onLabelLinkActivated(const QString &)));
 }
 
 AboutBox::~AboutBox()
 {
 
+}
+
+void AboutBox::onLabelLinkActivated(const QString &ALink)
+{
+  QDesktopServices::openUrl(ALink);
 }

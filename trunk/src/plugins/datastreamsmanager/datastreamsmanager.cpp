@@ -29,7 +29,7 @@ void DataStreamsManger::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to initiate a custom stream of data between two XMPP entities");
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->version = "1.0";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(DATAFORMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }

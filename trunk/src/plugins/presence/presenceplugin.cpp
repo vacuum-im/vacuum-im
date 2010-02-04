@@ -18,7 +18,7 @@ void PresencePlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows other modules to obtain information about the status of contacts in the roster");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(XMPPSTREAMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }

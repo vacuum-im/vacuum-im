@@ -38,7 +38,7 @@ void SessionNegotiation::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to set the session between two entities, which explains the rules of the exchange of XMPP stanzas");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(DATAFORMS_UUID);
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }

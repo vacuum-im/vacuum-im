@@ -28,7 +28,7 @@ void InBandStreams::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to initiate in-band stream of data between two XMPP entities");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 

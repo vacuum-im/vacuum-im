@@ -44,7 +44,7 @@ void RosterSearch::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows to search for contacts in the roster");
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(ROSTERSVIEW_UUID);
   APluginInfo->dependences.append(MAINWINDOW_UUID);
 }

@@ -16,7 +16,7 @@ void XmppStreams::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->description = tr("Allows other modules to create XMPP streams and get access to them");
   APluginInfo ->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
-  APluginInfo->homePage = "http://jrudevels.org";
+  APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
 bool XmppStreams::initObjects()
