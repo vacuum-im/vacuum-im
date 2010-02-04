@@ -209,8 +209,11 @@ void DefaultConnection::onDnsResultsReady(int AId, const QJDns::Response &AResul
 {
   if (FSrvQueryId == AId)
   {
-    FSSLConnection = false;
-    FRecords = AResults.answerRecords;
+    if (!AResults.answerRecords.isEmpty())
+    {
+      FSSLConnection = false;
+      FRecords = AResults.answerRecords;
+    }
     FDns.shutdown();
   }
 }
