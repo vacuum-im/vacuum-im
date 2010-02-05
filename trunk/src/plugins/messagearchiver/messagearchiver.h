@@ -5,8 +5,6 @@
 #include <definations/namespaces.h>
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
-#include <definations/menubargroups.h>
-#include <definations/statusbargroups.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -192,7 +190,6 @@ protected slots:
   void onCollectionWriterDestroyed(CollectionWriter *AWriter);
   void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
-  void onMultiChatWindowMenuAboutToShow();
   void onSetMethodAction(bool);
   void onSetItemPrefsAction(bool);
   void onShowArchiveWindowAction(bool);
@@ -207,8 +204,7 @@ protected slots:
   void onStanzaSessionActivated(const IStanzaSession &ASession);
   void onStanzaSessionTerminated(const IStanzaSession &ASession);
   void onToolBarWidgetCreated(IToolBarWidget *AWidget);
-  void onStatusBarWidgetCreated(IStatusBarWidget *AWidget);
-  void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
+  void onToolBarSettingsMenuAboutToShow();
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;

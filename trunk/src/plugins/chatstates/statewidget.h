@@ -2,7 +2,7 @@
 #define SATEWIDGET_H
 
 #include <QLabel>
-#include <QPushButton>
+#include <QToolButton>
 #include <definations/menuicons.h>
 #include <definations/resources.h>
 #include <interfaces/ichatstates.h>
@@ -11,15 +11,12 @@
 #include <utils/iconstorage.h>
 
 class StateWidget : 
-  public QPushButton
+  public QToolButton
 {
   Q_OBJECT;
 public:
-  StateWidget(IChatStates *AChatStates, IChatWindow *AWindow);
+  StateWidget(IChatStates *AChatStates, IChatWindow *AWindow, QWidget *AParent);
   ~StateWidget();
-public:
-  QSize sizeHint() const;
-  QSize minimumSizeHint() const;
 protected slots:
   void onStatusActionTriggered(bool);
   void onPermitStatusChanged(const Jid &AContactJid, int AStatus);

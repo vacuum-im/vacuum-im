@@ -9,7 +9,6 @@
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
-
 #define CHAT_NOTIFICATOR_ID       "ChatMessages"
 
 ChatMessageHandler::ChatMessageHandler()
@@ -263,7 +262,9 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
       if (FRostersView && FRostersModel)
       {
         UserContextMenu *menu = new UserContextMenu(FRostersModel,FRostersView,window);
-        window->menuBarWidget()->menuBarChanger()->insertMenu(menu,MBG_MWCW_USERCONTEXT);
+        menu->menuAction()->setIcon(RSR_STORAGE_MENUICONS, MNI_CHAT_MHANDLER_USER_MENU);
+        QToolButton *button = window->toolBarWidget()->toolBarChanger()->insertAction(menu->menuAction(),TBG_CWTBW_USER_TOOLS);
+        button->setPopupMode(QToolButton::InstantPopup);
       }
       setMessageStyle(window);
       showHistory(window);

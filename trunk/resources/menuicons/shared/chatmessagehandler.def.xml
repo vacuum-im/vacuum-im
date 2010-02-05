@@ -4,4 +4,8 @@
     <key>chatmessagehandlerMessage</key>
     <object mime="image/png">chatmessagehandlermessage.png</object>
   </icon>
+  <icon>
+    <key>chatmessagehandlerUserMenu</key>
+    <object mime="image/png">chatmessagehandlerusermenu.png</object>
+  </icon>
 </icondef>

@@ -873,7 +873,7 @@ void ViewHistoryWindow::createGroupKindMenu()
   connect(action,SIGNAL(triggered()),ui.trvCollections,SLOT(collapseAll()));
   FGroupKindMenu->addAction(action,AG_DEFAULT+100);
 
-  QToolButton *button = FCollectionTools->addToolButton(FGroupKindMenu->menuAction(),TBG_MAVHG_ARCHIVE_GROUPING,false);
+  QToolButton *button = FCollectionTools->insertAction(FGroupKindMenu->menuAction(),TBG_MAVHG_ARCHIVE_GROUPING);
   button->setPopupMode(QToolButton::InstantPopup);
 }
 
@@ -906,7 +906,7 @@ void ViewHistoryWindow::createSourceMenu()
   connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSourceByAction(bool)));
   FSourceMenu->addAction(action);
 
-  QToolButton *button = FCollectionTools->addToolButton(FSourceMenu->menuAction(),TBG_MAVHG_ARCHIVE_GROUPING,false);
+  QToolButton *button = FCollectionTools->insertAction(FSourceMenu->menuAction(),TBG_MAVHG_ARCHIVE_GROUPING);
   button->setPopupMode(QToolButton::InstantPopup);
 
   FSourceMenu->setEnabled(FArchiver->isSupported(FStreamJid));
@@ -919,26 +919,26 @@ void ViewHistoryWindow::createHeaderActions()
   FFilterBy->setIcon(RSR_STORAGE_MENUICONS,MNI_HISRORY_FILTER);
   FFilterBy->setEnabled(false);
   connect(FFilterBy,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
-  FCollectionTools->addAction(FFilterBy,TBG_MAVHG_ARCHIVE_DEFACTIONS,false);
+  FCollectionTools->insertAction(FFilterBy,TBG_MAVHG_ARCHIVE_DEFACTIONS);
 
   FRename = new Action(FCollectionTools->toolBar());
   FRename->setText(tr("Rename"));
   FRename->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_RENAME);
   FRename->setEnabled(false);
   connect(FRename,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
-  FCollectionTools->addAction(FRename,TBG_MAVHG_ARCHIVE_DEFACTIONS,false);
+  FCollectionTools->insertAction(FRename,TBG_MAVHG_ARCHIVE_DEFACTIONS);
 
   FRemove = new Action(FCollectionTools->toolBar());
   FRemove->setText(tr("Remove"));
   FRemove->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_REMOVE);
   connect(FRemove,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
-  FCollectionTools->addAction(FRemove,TBG_MAVHG_ARCHIVE_DEFACTIONS,false);
+  FCollectionTools->insertAction(FRemove,TBG_MAVHG_ARCHIVE_DEFACTIONS);
 
   FReload = new Action(FCollectionTools->toolBar());
   FReload->setText(tr("Reload"));
   FReload->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_RELOAD);
   connect(FReload,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
-  FCollectionTools->addAction(FReload,TBG_MAVHG_ARCHIVE_DEFACTIONS,false);
+  FCollectionTools->insertAction(FReload,TBG_MAVHG_ARCHIVE_DEFACTIONS);
 }
 
 void ViewHistoryWindow::onLocalCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader)

@@ -592,8 +592,10 @@ void ChatStates::onPresenceClosed(IPresence *APresence)
 
 void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
 {
-  StateWidget *widget = new StateWidget(this,AWindow);
-  AWindow->statusBarWidget()->statusBarChanger()->insertWidget(widget,SBG_MWCW_CHATSTATES,true);
+  StateWidget *widget = new StateWidget(this,AWindow,AWindow->toolBarWidget()->toolBarChanger()->toolBar());
+  AWindow->toolBarWidget()->toolBarChanger()->insertWidget(widget,TBG_MWTBW_CHATSTATES);
+  widget->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  widget->setPopupMode(QToolButton::InstantPopup);
 
   FChatByEditor.insert(AWindow->editWidget()->textEdit(),AWindow);
   connect(AWindow->instance(),SIGNAL(windowActivated()),SLOT(onChatWindowActivated()));

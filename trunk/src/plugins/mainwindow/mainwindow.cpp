@@ -90,7 +90,7 @@ void MainWindow::createMenus()
   FMainMenu = new Menu(this);
   FMainMenu->setTitle(tr("Menu"));
   FMainMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_MENU);
-  QToolButton *button = FBottomToolBarChanger->addToolButton(FMainMenu->menuAction(),AG_DEFAULT,false);
+  QToolButton *button = FBottomToolBarChanger->insertAction(FMainMenu->menuAction());
   button->setPopupMode(QToolButton::InstantPopup);
 }
 

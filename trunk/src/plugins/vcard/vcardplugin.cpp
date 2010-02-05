@@ -395,7 +395,7 @@ void VCardPlugin::onChatWindowCreated(IChatWindow *AWindow)
     action->setText(tr("vCard"));
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByChatWindowAction(bool)));
-    AWindow->toolBarWidget()->toolBarChanger()->addAction(action,TBG_MWTBW_VCARD_VIEW,false);
+    AWindow->toolBarWidget()->toolBarChanger()->insertAction(action,TBG_MWTBW_VCARD_VIEW);
   }
 }
 

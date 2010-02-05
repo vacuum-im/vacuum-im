@@ -1,6 +1,6 @@
 #include "usercontextmenu.h"
 
-UserContextMenu::UserContextMenu(IRostersModel *AModel, IRostersView *AView, IChatWindow *AWindow) : Menu(AWindow->menuBarWidget()->menuBarChanger()->menuBar())
+UserContextMenu::UserContextMenu(IRostersModel *AModel, IRostersView *AView, IChatWindow *AWindow) : Menu(AWindow->instance())
 {
   FRosterIndex = NULL;
   FRostersModel = AModel;
@@ -13,7 +13,6 @@ UserContextMenu::UserContextMenu(IRostersModel *AModel, IRostersView *AView, ICh
   connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *,int)),SLOT(onRosterIndexDataChanged(IRosterIndex *,int)));
   connect(FRostersModel->instance(),SIGNAL(indexRemoved(IRosterIndex *)),SLOT(onRosterIndexRemoved(IRosterIndex *)));
   connect(FChatWindow->instance(),SIGNAL(contactJidChanged(const Jid &)),SLOT(onChatWindowContactJidChanged(const Jid &)));
-  connect(FChatWindow->instance(),SIGNAL(windowChanged()),SLOT(onChatWindowChanged()));
 
   onRosterIndexRemoved(FRosterIndex);
 }
@@ -56,7 +55,6 @@ void UserContextMenu::updateMenu()
     setTitle(FChatWindow->contactJid().full());
     menuAction()->setVisible(false);
   }
-  onChatWindowChanged();
 }
 
 void UserContextMenu::onAboutToShow()
@@ -114,9 +112,4 @@ void UserContextMenu::onRosterIndexRemoved(IRosterIndex *AIndex)
 void UserContextMenu::onChatWindowContactJidChanged(const Jid &/*ABefour*/)
 {
   onRosterIndexRemoved(FRosterIndex);
-}
-
-void UserContextMenu::onChatWindowChanged()
-{
-  //setIcon(FChatWindow->instance()->windowIcon());
 }

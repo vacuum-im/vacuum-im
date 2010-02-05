@@ -18,7 +18,7 @@ public:
   ~MenuBarChanger();
   bool isEmpty() const;
   QMenuBar *menuBar() const;
-  int menuGroup(const Menu *AMenu) const;
+  int menuGroup(Menu *AMenu) const;
   QList<Menu *> groupMenus(int AGroup = MBG_NULL) const;
   void insertMenu(Menu *AMenu, int AGroup = MBG_DEFAULT);
   void removeMenu(Menu *AMenu);

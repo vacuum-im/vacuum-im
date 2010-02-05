@@ -20,7 +20,7 @@ QMenuBar *MenuBarChanger::menuBar() const
   return FMenuBar;
 }
 
-int MenuBarChanger::menuGroup(const Menu *AMenu) const
+int MenuBarChanger::menuGroup(Menu *AMenu) const
 {
   QMultiMap<int, Menu *>::const_iterator it = qFind(FMenu.begin(),FMenu.end(),AMenu);
   if (it != FMenu.constEnd())

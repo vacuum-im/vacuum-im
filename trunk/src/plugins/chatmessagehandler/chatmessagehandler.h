@@ -14,7 +14,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/soundfiles.h>
-#include <definations/menubargroups.h>
+#include <definations/toolbargroups.h>
 #include <definations/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>

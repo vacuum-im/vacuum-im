@@ -145,7 +145,6 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     if (FMessageWidgets)
     {
       connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
-      connect(FMessageWidgets->instance(),SIGNAL(statusBarWidgetCreated(IStatusBarWidget *)),SLOT(onStatusBarWidgetCreated(IStatusBarWidget *)));
     }
   }
 
@@ -174,8 +173,6 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
     {
       connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
         SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
-      connect(FMultiUserChatPlugin->instance(),SIGNAL(multiChatWindowCreated(IMultiUserChatWindow *)),
-        SLOT(onMultiChatWindowCreated(IMultiUserChatWindow *)));
     }
   }
 
@@ -2629,27 +2626,6 @@ void MessageArchiver::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMul
     AMenu->addAction(menu->menuAction(),AG_MUCM_ARCHIVER,true);
 }
 
-void MessageArchiver::onMultiChatWindowMenuAboutToShow()
-{
-  Menu *roomMenu = qobject_cast<Menu *>(sender());
-  if (roomMenu)
-  {
-    QObject *object = roomMenu->parent();
-    IMultiUserChatWindow *mchatWindow = NULL;
-    while (object!=NULL && mchatWindow==NULL)
-    {
-      mchatWindow = qobject_cast<IMultiUserChatWindow *>(object);
-      object = object->parent();
-    }
-    if (mchatWindow)
-    {
-      Menu *menu = createContextMenu(mchatWindow->streamJid(),mchatWindow->roomJid(),roomMenu);
-      roomMenu->addAction(menu->menuAction(),AG_MURM_ARCHIVER, true);
-      connect(roomMenu,SIGNAL(aboutToHide()),menu,SLOT(deleteLater()));
-    }
-  }
-}
-
 void MessageArchiver::onSetMethodAction(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
@@ -2818,32 +2794,35 @@ void MessageArchiver::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 {
   if (AWidget->editWidget() != NULL)
   {
-    Action *action = new Action(AWidget->instance());
+    Action *action = new Action(AWidget->toolBarChanger()->toolBar());
     action->setText(tr("View History"));
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowToolBarAction(bool)));
-    AWidget->toolBarChanger()->addAction(action,TBG_MWTBW_ARCHIVE_VIEW,false);
+    QToolButton *viewButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
+
+    Menu *setupMenu = new Menu(AWidget->instance());
+    viewButton->setMenu(setupMenu);
+    connect(setupMenu,SIGNAL(aboutToShow()),SLOT(onToolBarSettingsMenuAboutToShow()));
+
+    ChatWindowMenu *chatMenu = new ChatWindowMenu(this,AWidget,AWidget->toolBarChanger()->toolBar());
+    QToolButton *chatButton = AWidget->toolBarChanger()->insertAction(chatMenu->menuAction(), TBG_MWTBW_ARCHIVE_SETTINGS); 
+    chatButton->setPopupMode(QToolButton::InstantPopup);
   }
 }
 
-void MessageArchiver::onStatusBarWidgetCreated(IStatusBarWidget *AWidget)
+void MessageArchiver::onToolBarSettingsMenuAboutToShow()
 {
-  if (AWidget->editWidget() != NULL)
+  Menu *setupMenu = qobject_cast<Menu *>(sender());
+  if (setupMenu)
   {
-    ChatWindowMenu *menu = new ChatWindowMenu(this,AWidget,AWidget->statusBarChanger()->statusBar());
-    QToolButton *button = new QToolButton(menu); 
-    button->setDefaultAction(menu->menuAction());
-    button->setPopupMode(QToolButton::InstantPopup);
-    button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    AWidget->statusBarChanger()->insertWidget(button, SBG_MWCW_ARCHIVE_SETTINGS, true);
+    IToolBarWidget *widget = qobject_cast<IToolBarWidget *>(setupMenu->parent());
+    if (widget)
+    {
+      Menu *menu = createContextMenu(widget->editWidget()->streamJid(),widget->editWidget()->contactJid(),setupMenu);
+      setupMenu->addMenuActions(menu, AG_NULL, false);
+      connect(setupMenu,SIGNAL(aboutToHide()),menu,SLOT(deleteLater()));
+    }
   }
-}
-
-void MessageArchiver::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
-{
-  Menu *roomMenu = AWindow->menuBarWidget()->menuBarChanger()->groupMenus(MBG_MUCW_ROOM).value(0,NULL);
-  if (roomMenu)
-    connect(roomMenu,SIGNAL(aboutToShow()),SLOT(onMultiChatWindowMenuAboutToShow()));
 }
 
 Q_EXPORT_PLUGIN2(plg_messagearchiver, MessageArchiver)
