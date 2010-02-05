@@ -16,6 +16,7 @@ class UTILS_EXPORT StatusBarChanger :
 public:
   StatusBarChanger(QStatusBar *AStatusBar);
   ~StatusBarChanger();
+  bool isEmpty() const;
   bool manageVisibitily() const;
   void setManageVisibility(bool AManageVisibility);
   QStatusBar *statusBar() const;
@@ -25,7 +26,7 @@ public:
   void removeWidget(QWidget *AWidget);
   void clear();
 signals:
-  void widgetInserted(QWidget *ABefour, QWidget *AWidget, int AGroup,bool APermanent, int AStretch);
+  void widgetInserted(QWidget *ABefour, QWidget *AWidget, int AGroup, bool APermanent, int AStretch);
   void widgetRemoved(QWidget *AWidget);
   void statusBarChangerDestroyed(StatusBarChanger *AStatusBarChanger);
 protected slots:

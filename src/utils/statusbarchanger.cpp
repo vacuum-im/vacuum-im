@@ -23,6 +23,11 @@ StatusBarChanger::~StatusBarChanger()
   emit statusBarChangerDestroyed(this);
 }
 
+bool StatusBarChanger::isEmpty() const
+{
+  return FWidgets.isEmpty();
+}
+
 bool StatusBarChanger::manageVisibitily() const
 {
   return FManageVisibility;
@@ -140,13 +145,15 @@ bool StatusBarChanger::eventFilter(QObject *AObject, QEvent *AEvent)
 
 void StatusBarChanger::onWidgetDestroyed(QObject *AObject)
 {
-  QWidget *widget = reinterpret_cast<QWidget *>(AObject);
-  QMultiMap<int, QWidget *>::iterator it = qFind(FWidgets.begin(),FWidgets.end(),widget);
-  if (it != FWidgets.end())
+  foreach(QWidget *widget, FWidgets.values())
   {
-    FWidgets.erase(it);
-    emit widgetRemoved(widget);
-    updateVisible();
+    if (qobject_cast<QObject *>(widget) == AObject)
+    {
+      FWidgets.remove(FWidgets.key(widget), widget);
+      emit widgetRemoved(widget);
+      updateVisible();
+      break;
+    }
   }
 }
 

@@ -6,7 +6,7 @@
 #include <definations/namespaces.h>
 #include <definations/stanzahandlerorders.h>
 #include <definations/archivehandlerorders.h>
-#include <definations/statusbargroups.h>
+#include <definations/toolbargroups.h>
 #include <definations/optionnodes.h>
 #include <definations/optionwidgetorders.h>
 #include <definations/sessionnegotiatororders.h>

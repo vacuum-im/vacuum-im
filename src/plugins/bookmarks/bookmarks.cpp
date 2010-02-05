@@ -126,7 +126,7 @@ bool BookMarks::initObjects()
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
-    QToolButton *button = changer->addToolButton(FBookMarksMenu->menuAction(),TBG_MWTTB_BOOKMARKS,false);
+    QToolButton *button = changer->insertAction(FBookMarksMenu->menuAction(),TBG_MWTTB_BOOKMARKS);
     button->setPopupMode(QToolButton::InstantPopup);
   }
   return true;
@@ -340,17 +340,11 @@ void BookMarks::onStorageDataError(const QString &AId, const QString &AError)
 
 void BookMarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 {
-  Menu *roomMenu = AWindow->menuBarWidget()->menuBarChanger()->groupMenus(MBG_MUCW_ROOM).value(0,NULL);
-  if (roomMenu)
-  {
-    Action *action = new Action(roomMenu);
-    action->setText(tr("Append to bookmarks"));
-    action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
-    action->setData(ADR_STREAM_JID,AWindow->streamJid().full());
-    action->setData(ADR_ROOM_JID,AWindow->roomJid().bare());
-    connect(action,SIGNAL(triggered(bool)),SLOT(onAddRoomBookmarkActionTriggered(bool)));
-    roomMenu->addAction(action,AG_MURM_BOOKMARKS,true);
-  }
+  Action *action = new Action(AWindow->instance());
+  action->setText(tr("Append to bookmarks"));
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
+  connect(action,SIGNAL(triggered(bool)),SLOT(onAddRoomBookmarkActionTriggered(bool)));
+  AWindow->toolBarWidget()->toolBarChanger()->insertAction(action, TBG_MCWTBW_BOOKMARKS);
 }
 
 void BookMarks::onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow)
@@ -388,19 +382,36 @@ void BookMarks::onAddRoomBookmarkActionTriggered(bool)
   Action *action = qobject_cast<Action *>(sender());
   if (action)
   {
-    Jid streamJid = action->data(ADR_STREAM_JID).toString();
-    Jid roomJid = action->data(ADR_ROOM_JID).toString();
-    IMultiUserChatWindow *window = FMultiChatPlugin->multiChatWindow(streamJid,roomJid);
+    IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(action->parent());
     if (window)
     {
-      IBookMark bookmark;
-      bookmark.name = roomJid.bare();
-      bookmark.conference = roomJid.bare();
-      bookmark.nick = window->multiUserChat()->nickName();
-      bookmark.password = window->multiUserChat()->password();
-      bookmark.autojoin = false;
-      if (execEditBookmarkDialog(&bookmark,window->instance()) == QDialog::Accepted)
-        addBookmark(streamJid,bookmark);
+      IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(window->streamJid()) : NULL;
+      if (presence && presence->isOpen())
+      {
+        QList<IBookMark> bookmarkList = bookmarks(window->streamJid());
+
+        int index = 0;
+        while (index<bookmarkList.count() && window->roomJid()!=bookmarkList.at(index).conference)
+          index++;
+
+        if (index == bookmarkList.count())
+          bookmarkList.append(IBookMark());
+
+        IBookMark &bookmark = bookmarkList[index];
+        if (bookmark.conference.isEmpty())
+        {
+          bookmark.name = window->roomJid().bare();
+          bookmark.conference = window->roomJid().bare();
+          bookmark.nick = window->multiUserChat()->nickName();
+          bookmark.password = window->multiUserChat()->password();
+          bookmark.autojoin = false;
+        }
+
+        if (execEditBookmarkDialog(&bookmark,window->instance()) == QDialog::Accepted)
+        {
+          setBookmarks(window->streamJid(),bookmarkList);
+        }
+      }
     }
   }
 }

@@ -4,22 +4,21 @@
 
 ToolBarChanger::ToolBarChanger(QToolBar *AToolBar) : QObject(AToolBar)
 {
-  FToolBar = AToolBar;
   FIntVisible = false;
-  FExtVisible = FToolBar->isVisible();
+  FExtVisible = AToolBar->isVisible();
   FSeparatorsVisible = true;
   FManageVisibility = true;
   FVisibleTimerStarted = false;
   FChangingIntVisible = 0;
 
+  FToolBar = AToolBar;
   FToolBar->clear();
   FToolBar->installEventFilter(this);
 
-  FToolBarMenu = new Menu;
-  connect(FToolBarMenu,SIGNAL(actionInserted(QAction *, Action *, int, bool)),SLOT(onActionInserted(QAction *, Action *, int, bool)));
-  connect(FToolBarMenu,SIGNAL(actionRemoved(Action *)),SLOT(onActionRemoved(Action *)));
-  connect(FToolBarMenu,SIGNAL(separatorInserted(Action *, QAction *)),SLOT(onSeparatorInserted(Action *, QAction *)));
-  connect(FToolBarMenu,SIGNAL(separatorRemoved(QAction *)),SLOT(onSeparatorRemoved(QAction *)));
+  QWidget *widget = new QWidget(FToolBar);
+  widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  FAllignChange = insertWidget(widget, TBG_ALLIGN_CHANGE);
+  FAllignChange->setVisible(false);
 
   updateVisible();
 }
@@ -27,12 +26,11 @@ ToolBarChanger::ToolBarChanger(QToolBar *AToolBar) : QObject(AToolBar)
 ToolBarChanger::~ToolBarChanger()
 {
   emit toolBarChangerDestroyed(this);
-  delete FToolBarMenu;
 }
 
 bool ToolBarChanger::isEmpty() const
 {
-  return FToolBarMenu->isEmpty() && FWidgetActions.isEmpty();
+  return FWidgets.count() < 2;
 }
 
 bool ToolBarChanger::separatorsVisible() const
@@ -43,8 +41,9 @@ bool ToolBarChanger::separatorsVisible() const
 void ToolBarChanger::setSeparatorsVisible(bool ASeparatorsVisible)
 {
   FSeparatorsVisible = ASeparatorsVisible;
-  foreach(QAction *separator, FBarSepByMenuSep)
+  foreach(QAction *separator, FSeparators.values())
     separator->setVisible(ASeparatorsVisible);
+  updateSeparatorVisible();
 }
 
 bool ToolBarChanger::manageVisibitily() const
@@ -63,72 +62,115 @@ QToolBar *ToolBarChanger::toolBar() const
   return FToolBar;
 }
 
-int ToolBarChanger::actionGroup(const Action *AAction) const
+int ToolBarChanger::itemGroup(QAction *AHandle) const
 {
-  return FToolBarMenu->actionGroup(AAction);
+  return FWidgets.key(FHandles.key(AHandle));
 }
 
-QList<Action *> ToolBarChanger::groupActions(int AGroup) const
+QList<QAction *> ToolBarChanger::groupItems(int AGroup) const
 {
-  return FToolBarMenu->groupActions(AGroup);
+  QList<QAction *> handles;
+  QList<QWidget *> widgets = AGroup!=TBG_NULL ? FWidgets.values(AGroup) : FWidgets.values();
+  foreach(QWidget *widget, widgets)
+    handles.append(FHandles.value(widget));
+  return handles;
 }
 
-QList<Action *> ToolBarChanger::findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu) const
+QAction *ToolBarChanger::widgetHandle(QWidget *AWidget) const
 {
-  return FToolBarMenu->findActions(AData,ASearchInSubMenu);
+  return FHandles.value(AWidget);
 }
 
-QAction * ToolBarChanger::widgetAction(QWidget *AWidget) const
+QWidget *ToolBarChanger::handleWidget(QAction *AHandle) const
 {
-  return FWidgetActions.value(AWidget);
+  return FHandles.key(AHandle);
 }
 
-void ToolBarChanger::addAction(Action *AAction, int AGroup, bool ASort)
+QAction *ToolBarChanger::actionHandle(Action *AAction) const
 {
-  FToolBarMenu->addAction(AAction,AGroup,ASort);
+  return FHandles.value(FButtons.value(AAction));
 }
 
-QToolButton *ToolBarChanger::addToolButton(Action *AAction, int AGroup , bool ASort)
+Action *ToolBarChanger::handleAction(QAction *AHandle) const
 {
-  QToolButton *button = new QToolButton;
+  return FButtons.key(qobject_cast<QToolButton *>(FHandles.key(AHandle)));
+}
+
+QAction *ToolBarChanger::insertWidget(QWidget *AWidget, int AGroup)
+{
+  if (!FWidgets.values().contains(AWidget))
+  {
+    if (AGroup > TBG_ALLIGN_CHANGE)
+      FAllignChange->setVisible(true);
+
+    QMap<int, QAction *>::const_iterator it = FSeparators.upperBound(AGroup);
+    QAction *before = it!=FSeparators.end() ? it.value() : NULL;
+    
+    QAction *handle = before!=NULL ? FToolBar->insertWidget(before, AWidget) : FToolBar->addWidget(AWidget);
+    if (!FSeparators.contains(AGroup))
+    {
+      QAction *separator = FToolBar->insertSeparator(handle);
+      separator->setVisible(FSeparatorsVisible);
+      FSeparators.insert(AGroup, separator);
+      updateSeparatorVisible();
+    }
+    FWidgets.insertMulti(AGroup,AWidget);
+    FHandles.insert(AWidget, handle);
+    connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
+    
+    emit itemInserted(before,handle,FButtons.key(qobject_cast<QToolButton *>(AWidget)),AWidget,AGroup);
+    updateVisible();
+  }
+  return FHandles.value(AWidget);
+}
+
+QToolButton *ToolBarChanger::insertAction(Action *AAction, int AGroup)
+{
+  QToolButton *button = new QToolButton(FToolBar);
+  button->setToolButtonStyle(FToolBar->toolButtonStyle());
   button->setDefaultAction(AAction);
-  FActionButtons.insert(AAction,button);
-  FToolBarMenu->addAction(AAction,AGroup,ASort);
+  FButtons.insert(AAction, button);
+  insertWidget(button, AGroup);
   return button;
 }
 
-void ToolBarChanger::removeAction(Action *AAction)
+void ToolBarChanger::removeItem(QAction *AHandle)
 {
-  FToolBarMenu->removeAction(AAction);
-}
-
-QAction *ToolBarChanger::addWidget(QWidget *AWidget, int AGroup)
-{
-  QAction *befour = FToolBarMenu->nextGroupSeparator(AGroup);
-  QAction *action = befour != NULL ? FToolBar->insertWidget(befour,AWidget) : FToolBar->addWidget(AWidget);
-  FWidgetActions.insert(AWidget,action);
-  connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
-  emit widgetInserted(befour,AWidget,action,AGroup);
-  updateVisible();
-  return action;
-}
-
-void ToolBarChanger::removeWidget(QWidget *AWidget)
-{
-  QAction *action = FWidgetActions.value(AWidget);
-  if (action)
+  QWidget *widget = FHandles.key(AHandle, NULL);
+  if (widget && AHandle!=FAllignChange)
   {
-    FToolBar->removeAction(action);
-    FWidgetActions.remove(AWidget);
-    disconnect(AWidget,SIGNAL(destroyed(QObject *)),this,SLOT(onWidgetDestroyed(QObject *)));
-    emit widgetRemoved(AWidget,action);
+    AHandle->deleteLater();
+    FToolBar->removeAction(AHandle);
+    disconnect(widget,SIGNAL(destroyed(QObject *)),this,SLOT(onWidgetDestroyed(QObject *)));
+
+    Action *action = FButtons.key(qobject_cast<QToolButton *>(widget), NULL);
+    if (action)
+      FButtons.take(action)->deleteLater();
+    
+    int group = FWidgets.key(widget);
+    FWidgets.remove(group,widget);
+    if (!FWidgets.contains(group))
+    {
+      QAction *separator = FSeparators.take(group);
+      FToolBar->removeAction(separator);
+      delete separator;
+      updateSeparatorVisible();
+    }
+    if (FWidgets.keys().last()<=TBG_ALLIGN_CHANGE)
+    {
+      FAllignChange->setVisible(false);
+    }
+
+    FHandles.remove(widget);
+    emit itemRemoved(AHandle);
     updateVisible();
   }
 }
 
 void ToolBarChanger::clear()
 {
-  FToolBarMenu->clear();
+  foreach(QAction *handle, FHandles.values())
+    removeItem(handle);
   FToolBar->clear();
 }
 
@@ -140,6 +182,15 @@ void ToolBarChanger::updateVisible()
     QTimer::singleShot(0,this,SLOT(onChangeVisible()));
     FVisibleTimerStarted = true;
   }
+}
+
+void ToolBarChanger::updateSeparatorVisible()
+{
+  const QList<QAction *> separators = FSeparators.values(); 
+  if (FSeparators.count() > 2)
+    separators.at(1)->setVisible(FSeparatorsVisible);
+  separators.first()->setVisible(false);
+  FSeparators.value(TBG_ALLIGN_CHANGE)->setVisible(false);
 }
 
 bool ToolBarChanger::eventFilter(QObject *AObject, QEvent *AEvent)
@@ -161,57 +212,11 @@ bool ToolBarChanger::eventFilter(QObject *AObject, QEvent *AEvent)
   return QObject::eventFilter(AObject,AEvent);
 }
 
-void ToolBarChanger::onActionInserted(QAction *ABefour, Action *AAction, int AGroup, bool ASort)
-{
-  QAction *befour = FWidgetActions.value(FActionButtons.value((Action*)ABefour),FBarSepByMenuSep.value(ABefour,ABefour));
-  if (FActionButtons.contains(AAction))
-  {
-    QToolButton *button = FActionButtons.value(AAction);
-    QAction *action = befour != NULL ? FToolBar->insertWidget(befour,button) : FToolBar->addWidget(button);
-    FWidgetActions.insert(button,action);
-  }
-  else
-    befour != NULL ? FToolBar->insertAction(befour,AAction) : FToolBar->addAction(AAction);
-  emit actionInserted(ABefour,AAction,AGroup,ASort);
-  updateVisible();
-}
-
-void ToolBarChanger::onActionRemoved(Action *AAction)
-{
-  if (FActionButtons.contains(AAction))
-  {
-    QToolButton *button = FActionButtons.take(AAction);
-    QAction *action = FWidgetActions.take(button);
-    FToolBar->removeAction(action);
-    delete button;
-  }
-  else
-    FToolBar->removeAction(AAction);
-  emit actionRemoved(AAction);
-  updateVisible();
-}
-
-void ToolBarChanger::onSeparatorInserted(Action *ABefour, QAction *ASeparator)
-{
-  QAction *befour = FWidgetActions.value(FActionButtons.value(ABefour),FBarSepByMenuSep.value(ABefour,ABefour));
-  QAction *separator = FToolBar->insertSeparator(befour);
-  separator->setVisible(FSeparatorsVisible);
-  FBarSepByMenuSep.insert(ASeparator,separator);
-  emit separatorInserted(ABefour,separator);
-  //emit toolBarChanged();
-}
-
-void ToolBarChanger::onSeparatorRemoved(QAction *ASeparator)
-{
-  QAction *separator = FBarSepByMenuSep.value(ASeparator);
-  FToolBar->removeAction(separator);
-  emit separatorRemoved(separator);
-}
-
 void ToolBarChanger::onWidgetDestroyed(QObject *AObject)
 {
-  QWidget *widget = qobject_cast<QWidget *>(AObject);
-  removeWidget(widget);
+  foreach(QWidget *widget, FWidgets.values())
+    if (qobject_cast<QObject *>(widget) == AObject)
+      removeItem(FHandles.value(widget));
 }
 
 void ToolBarChanger::onChangeVisible()

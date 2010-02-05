@@ -12,7 +12,7 @@
 #include <definations/soundfiles.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
-#include <definations/menubargroups.h>
+#include <definations/toolbargroups.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
@@ -93,10 +93,10 @@ protected:
   void initialize();
   void connectMultiChat();
   void createMessageWidgets();
-  void createMenuBarActions();
-  void updateMenuBarActions();
-  void createModeratorUtilsActions();
-  void insertModeratorUtilsActions(Menu *AMenu, IMultiUser *AUser);
+  void createStaticRoomActions();
+  void updateStaticRoomActions();
+  void createStaticUserContextActions();
+  void insertStaticUserContextActions(Menu *AMenu, IMultiUser *AUser);
   void saveWindowState();
   void loadWindowState();
   void saveWindowGeometry();
@@ -195,21 +195,20 @@ private:
   IToolBarWidget *FToolBarWidget;
   IStatusBarWidget *FStatusBarWidget;
 private:
-  Menu *FRoomMenu;
-    Action *FChangeNick;
-    Action *FChangeSubject;
-    Action *FClearChat;
-    Action *FEnterRoom;
-    Action *FExitRoom;
   Menu *FToolsMenu;
+    Action *FChangeNick;
     Action *FInviteContact;
     Action *FRequestVoice;
-    Action *FConfigRoom;
+    Action *FClearChat;
+    Action *FChangeSubject;
     Action *FBanList;
     Action *FMembersList;
     Action *FAdminsList;
     Action *FOwnersList;
+    Action *FConfigRoom;
     Action *FDestroyRoom;
+    Action *FEnterRoom;
+    Action *FExitRoom;
   Menu *FModeratorUtilsMenu;
     Action *FSetRoleNode;
     Action *FSetAffilOutcast;

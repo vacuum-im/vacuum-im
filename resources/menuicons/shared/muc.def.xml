@@ -2,12 +2,19 @@
 <icondef>
   <icon>
     <key>mucConference</key>
+    <object mime="image/png">mucconference.png</object>
+  </icon>
+  <icon>
     <key>mucShowAllRooms</key>
     <object mime="image/png">mucconference.png</object>
   </icon>
   <icon>
     <key>mucJoin</key>
     <object mime="image/png">mucjoin.png</object>
+  </icon>
+  <icon>
+    <key>mucToolsMenu</key>
+    <object mime="image/png">muctoolsmenu.png</object>
   </icon>
   <icon>
     <key>mucInvite</key>
@@ -72,5 +79,9 @@
   <icon>
     <key>mucDataMessage</key>
     <object mime="image/png">mucdatamessage.png</object>
+  </icon>
+  <icon>
+    <key>mucUserMenu</key>
+    <object mime="image/png">mucusermenu.png</object>
   </icon>
 </icondef>

@@ -4,7 +4,7 @@
 
 #define ADR_PERMIT_STATUS     Action::DR_Parametr1
 
-StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow) : QPushButton(AWindow->statusBarWidget()->statusBarChanger()->statusBar())
+StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow, QWidget *AParent) : QToolButton(AParent)
 {
   FWindow = AWindow;
   FChatStates = AChatStates;
@@ -33,8 +33,6 @@ StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow) : QPush
   FMenu->addAction(action);
 
   setMenu(FMenu);
-  setFlat(true);
-  setIconSize(QSize(12,12));
   setToolTip(tr("User chat status"));
 
   connect(FChatStates->instance(),SIGNAL(permitStatusChanged(const Jid &, int)),
@@ -49,18 +47,6 @@ StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow) : QPush
 StateWidget::~StateWidget()
 {
 
-}
-
-QSize StateWidget::sizeHint() const
-{
-  QSize hint = QPushButton::sizeHint();
-  hint.setHeight(qMax(fontMetrics().size(Qt::TextShowMnemonic,text()).height()+2,iconSize().height()));
-  return hint;
-}
-
-QSize StateWidget::minimumSizeHint() const
-{
-  return sizeHint();
 }
 
 void StateWidget::onStatusActionTriggered(bool)
@@ -122,7 +108,5 @@ void StateWidget::onUserChatStateChanged(const Jid &AStreamJid, const Jid &ACont
 
     setText(state);
     IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,iconKey);
-
-    setMinimumWidth(qMax(minimumWidth(),sizeHint().width()));
   }
 }

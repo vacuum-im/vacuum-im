@@ -197,7 +197,7 @@ void SearchDialog::createToolBarActions()
     FDiscoInfo = new Action(FToolBarChanger);
     FDiscoInfo->setText(tr("Disco info"));
     FDiscoInfo->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOINFO);
-    FToolBarChanger->addAction(FDiscoInfo,AG_DEFAULT,false);
+    FToolBarChanger->insertAction(FDiscoInfo,AG_DEFAULT);
     connect(FDiscoInfo,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   }
 
@@ -206,7 +206,7 @@ void SearchDialog::createToolBarActions()
     FAddContact = new Action(FToolBarChanger);
     FAddContact->setText(tr("Add Contact"));
     FAddContact->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
-    FToolBarChanger->addAction(FAddContact,AG_DEFAULT,false);
+    FToolBarChanger->insertAction(FAddContact,AG_DEFAULT);
     connect(FAddContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   }
 
@@ -215,7 +215,7 @@ void SearchDialog::createToolBarActions()
     FShowVCard = new Action(FToolBarChanger);
     FShowVCard->setText(tr("vCard"));
     FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-    FToolBarChanger->addAction(FShowVCard,AG_DEFAULT,false);
+    FToolBarChanger->insertAction(FShowVCard,AG_DEFAULT);
     connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   }
 }

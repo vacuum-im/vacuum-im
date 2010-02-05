@@ -65,15 +65,10 @@
 #define AG_MUCM_DISCOVERY_FEATURES                              600
 #define AG_MUCM_MULTIUSERCHAT_UTILS                             800
 
-//MultiuserChat - MultiUserRoomMenu
-#define AG_MURM_MULTIUSERCHAT                                   500
-#define AG_MURM_BOOKMARKS                                       700
-#define AG_MURM_ARCHIVER                                        700
-#define AG_MURM_MULTIUSERCHAT_EXIT                              1000
-
 //MultiUserChat - MultiUserToolsMenu
-#define AG_MUTM_MULTIUSERCHAT                                   500
-#define AG_MUTM_MULTIUSERCHAT_DESTROY                           700
+#define AG_MUTM_MULTIUSERCHAT_COMMON                            300
+#define AG_MUTM_MULTIUSERCHAT_TOOLS                             500
+#define AG_MUTM_MULTIUSERCHAT_EXIT                              1000
 
 //Bookmarks - BookmarksMenu
 #define AG_BMM_BOOKMARKS_STREAMS                                500

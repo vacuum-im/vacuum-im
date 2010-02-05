@@ -532,10 +532,6 @@ Check values and try again</source>
         <translation>Получена форма данных от: %1</translation>
     </message>
     <message>
-        <source>Conference</source>
-        <translation>Конференция</translation>
-    </message>
-    <message>
         <source>Change room nick</source>
         <translation>Изменить ник</translation>
     </message>

@@ -176,7 +176,7 @@ bool StatusChanger::initObjects()
   if (FMainWindowPlugin)
   {
     ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->bottomToolBarChanger();
-    QToolButton *button = changer->addToolButton(FMainMenu->menuAction(),AG_DEFAULT,false);
+    QToolButton *button = changer->insertAction(FMainMenu->menuAction());
     button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     button->setPopupMode(QToolButton::InstantPopup);
     button->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);

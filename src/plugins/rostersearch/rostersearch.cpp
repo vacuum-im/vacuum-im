@@ -25,12 +25,12 @@ RosterSearch::RosterSearch()
 
   FFieldsMenu = new Menu(searchToolBar);
   FFieldsMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
-  FSearchToolBarChanger->addAction(FFieldsMenu->menuAction());
+  FSearchToolBarChanger->insertAction(FFieldsMenu->menuAction());
 
   FSearchEdit = new QLineEdit(searchToolBar);
   FSearchEdit->setToolTip(tr("Search by regular expression"));
   connect(FSearchEdit,SIGNAL(textChanged(const QString &)),&FEditTimeout,SLOT(start()));
-  FSearchToolBarChanger->addWidget(FSearchEdit);
+  FSearchToolBarChanger->insertWidget(FSearchEdit);
 }
 
 RosterSearch::~RosterSearch()
@@ -77,7 +77,7 @@ bool RosterSearch::initObjects()
     searchAction->setToolTip(tr("Show search toolbar"));
     searchAction->setCheckable(true);
     connect(searchAction,SIGNAL(triggered(bool)),SLOT(onSearchActionTriggered(bool)));
-    FMainWindow->topToolBarChanger()->addAction(searchAction,TBG_MWTTB_ROSTERSEARCH);
+    FMainWindow->topToolBarChanger()->insertAction(searchAction,TBG_MWTTB_ROSTERSEARCH);
 
     FMainWindow->instance()->addToolBar(FSearchToolBarChanger->toolBar());
     FMainWindow->instance()->insertToolBarBreak(FSearchToolBarChanger->toolBar());

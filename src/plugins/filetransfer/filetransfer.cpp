@@ -476,7 +476,7 @@ void FileTransfer::insertToolBarAction(IToolBarWidget *AWidget)
       action->setIcon(RSR_STORAGE_MENUICONS, MNI_FILETRANSFER_SEND);
       action->setText(tr("Send File"));
       connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
-      AWidget->toolBarChanger()->addAction(action,TBG_MWTBW_FILETRANSFER);
+      AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_FILETRANSFER);
     }
     FToolBarActions.insert(AWidget, action);
   }
