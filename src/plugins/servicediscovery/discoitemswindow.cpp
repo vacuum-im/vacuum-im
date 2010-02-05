@@ -340,8 +340,8 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
 
 void DiscoItemsWindow::onComboReturnPressed()
 {
-  Jid itemJid = ui.cmbJid->currentText();
-  QString itemNode = ui.cmbNode->currentText();
+  Jid itemJid = ui.cmbJid->currentText().trimmed();
+  QString itemNode = ui.cmbNode->currentText().trimmed();
   if (itemJid.isValid() && FDiscoverySteps.value(FCurrentStep) != qMakePair(itemJid,itemNode))
     discover(itemJid,itemNode);
 }
@@ -350,4 +350,3 @@ void DiscoItemsWindow::onSearchTimerTimeout()
 {
   FProxy->setFilterRegExp(ui.lneSearch->text());
 }
-
