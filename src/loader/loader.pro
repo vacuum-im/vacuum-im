@@ -35,11 +35,24 @@ include(../translations.inc)
 #Install
 include(../install.inc)
 target.path        = $$INSTALL_BINS
-translations.path  = $$INSTALL_TRANSLATIONS
-translations.files = ../../translations/*
 resources.path     = $$INSTALL_RESOURCES
 resources.files    = ../../resources/*
-INSTALLS           = target translations resources
+documents.path     = $$INSTALL_DOCUMENTS
+documents.files    = ../../AUTHORS ../../CHANGELOG ../../README ../../COPYING
+translations.path  = $$INSTALL_TRANSLATIONS
+translations.files = ../../translations/*
+INSTALLS           = target resources documents translations
+
+#Linux desktop install
+unix:!macx {
+  icons.path       = $$INSTALL_PREFIX/$$INSTALL_RES_DIR/pixmaps
+  icons.files      = ../../resources/menuicons/shared/vacuum.png
+  INSTALLS        += icons
+
+  desktop.path     = $$INSTALL_PREFIX/$$INSTALL_RES_DIR/applications
+  desktop.files    = ../../src/packages/linux/*.desktop
+  INSTALLS        += desktop
+}
 
 #MaxOS Install
 macx {
