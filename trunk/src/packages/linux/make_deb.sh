@@ -38,7 +38,7 @@ ln -s "${debdir}" "${pkgdir}" || exit 1
 
 
 DEBEMAIL="Sergey A Potapov <potapov.s.a@gmail.com>" dch --create --package vacuum -v "${VERSION}" "Release" || exit 1
-cp AUTHORS README CHANGELOG "${debdir}" || exit 1
+cp AUTHORS README CHANGELOG COPYING "${debdir}" || exit 1
 dpkg-buildpackage -b -nc -uc || exit 1
 
 
@@ -54,7 +54,7 @@ dpkg-buildpackage -b -nc -uc || exit 1
 # Comment this part, if you want to to keep temporary files
 ###################################################################
 cd "${pkgdir}"
-rm -rfv vacuum* changelog files AUTHORS README
+rm -rfv vacuum* changelog files AUTHORS README COPYING
 cd "${sourcedir}"
 rm -fv "${pkgdir}" configure-stamp build-stamp
 ###################################################################

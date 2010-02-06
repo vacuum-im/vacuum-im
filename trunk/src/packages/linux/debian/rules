@@ -53,10 +53,6 @@ install: build
 
 	# Add here commands to install the package into debian/vacuum.
 	$(MAKE) INSTALL_ROOT=$(CURDIR)/debian/vacuum install
-	install -Dm644 $(CURDIR)/src/packages/linux/vacuum.desktop $(CURDIR)/debian/vacuum/usr/share/applications/vacuum.desktop
-	for size in 16 24 32 48 64 96 128 ; do \
-	    install -Dm644 $(CURDIR)/resources/menuicons/shared/mainwindowlogo$${size}.png $(CURDIR)/debian/vacuum/usr/share/icons/hicolor/$${size}x$${size}/apps/vacuum.png ; \
-	done
 
 	# remove .svn directories from package dir
 	find $(CURDIR)/debian/vacuum -depth -type d -name .svn -exec rm -rf \{\} \;

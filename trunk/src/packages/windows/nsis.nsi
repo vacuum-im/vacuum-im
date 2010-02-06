@@ -61,9 +61,10 @@ Section "VacuumIM (required)"
   SetOutPath $INSTDIR
 
   ; Info files
+  File "${PROGRAM_BIN_FOLDER}\AUTHORS"
   File "${PROGRAM_BIN_FOLDER}\README"
-  File "${PROGRAM_BIN_FOLDER}\COPYING"
   File "${PROGRAM_BIN_FOLDER}\CHANGELOG"
+  File "${PROGRAM_BIN_FOLDER}\COPYING"
 	
   ; Binaries
   File "${PROGRAM_BIN_FOLDER}\vacuum.exe"

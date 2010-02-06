@@ -112,15 +112,6 @@
                         <distributionFile>
                             <origin>../../../vacuum.ico</origin>
                         </distributionFile>
-                        <distributionFile>
-                            <origin>../../../README</origin>
-                        </distributionFile>
-                        <distributionFile>
-                            <origin>../../../COPYING</origin>
-                        </distributionFile>
-                        <distributionFile>
-                            <origin>../../../CHANGELOG</origin>
-                        </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>
@@ -132,6 +123,26 @@
                         <distributionDirectory>
                             <origin>../../../translations</origin>
                         </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Documents</description>
+                    <destination>${installdir}</destination>
+                    <name>documents</name>
+                    <platforms>windows</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>../../../AUTHORS</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../../../CHANGELOG</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../../../COPYING</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../../../README</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
             </folderList>

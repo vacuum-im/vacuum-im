@@ -121,9 +121,10 @@ echo "Build done!"
 # Copying info files
 cd $SCRIPT_DIR
 mkdir $TMP_DIR/doc
+cp $SVN_ROOT/AUTHORS $TMP_DIR/doc/
+cp $SVN_ROOT/CHANGELOG $TMP_DIR/doc/
 cp $SVN_ROOT/README $TMP_DIR/doc/
 cp $SVN_ROOT/COPYING $TMP_DIR/doc/
-cp $SVN_ROOT/CHANGELOG $TMP_DIR/doc/
 
 
 echo -n "Copying Qt plugins to bundle... "

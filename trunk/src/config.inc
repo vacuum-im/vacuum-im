@@ -21,7 +21,7 @@ isEmpty(INSTALL_LIB_DIR) {
   unix:!macx {
     UNAME                = $$system(uname -m)
     contains( UNAME, x86_64 ): LIB_SUFFIX = 64
-    INSTALL_LIB_DIR      = lib$${LIB_SUFIX}
+    INSTALL_LIB_DIR      = lib$${LIB_SUFFIX}
   }
   macx: INSTALL_LIB_DIR  = Frameworks
 }
