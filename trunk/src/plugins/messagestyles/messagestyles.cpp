@@ -119,7 +119,15 @@ IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString
 
   if (!FStylePlugins.contains(pluginId))
   {
-    pluginId = "Simple";
+    switch (AMessageType)
+    {
+    case Message::GroupChat:
+    case Message::Chat:
+      pluginId = "Adium";
+      break;
+    default:
+      pluginId = "Simple";
+    }
     if (!FStylePlugins.contains(pluginId) && !FStylePlugins.isEmpty())
       pluginId = FStylePlugins.keys().first();
   }
