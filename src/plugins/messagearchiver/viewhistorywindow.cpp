@@ -237,6 +237,7 @@ void ViewHistoryWindow::setArchiveSource(int ASource)
 void ViewHistoryWindow::setFilter(const IArchiveFilter &AFilter)
 {
   FFilter = AFilter;
+  ui.trvCollections->setCurrentIndex(QModelIndex());
   processRequests(createRequests(AFilter));
   updateFilterWidgets();
   FInvalidateTimer.start();
