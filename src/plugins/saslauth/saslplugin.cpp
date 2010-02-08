@@ -24,7 +24,13 @@ bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 {
   IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
+  {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+    if (FXmppStreams)
+    {
+      connect(FXmppStreams->instance(),SIGNAL(created(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
+    }
+  }
 
   return FXmppStreams!=NULL;
 }
@@ -61,6 +67,25 @@ bool SASLPlugin::initObjects()
   return true;
 }
 
+bool SASLPlugin::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
+{
+  Q_UNUSED(AXmppStream);
+  Q_UNUSED(AStanza);
+  Q_UNUSED(AOrder);
+  return false;
+}
+
+bool SASLPlugin::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
+{
+  Q_UNUSED(AXmppStream);
+  if (AOrder==XSHO_SASL_VERSION && AStanza.element().nodeName()=="stream:stream")
+  {
+    if (!AStanza.element().hasAttribute("version"))
+      AStanza.element().setAttribute("version","1.0");
+  }
+  return false;
+}
+
 QList<QString> SASLPlugin::xmppFeatures() const
 {
   return QList<QString>() << NS_FEATURE_SASL << NS_FEATURE_BIND << NS_FEATURE_SESSION;
@@ -90,6 +115,11 @@ IXmppFeature *SASLPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream 
     return feature;
   }
   return NULL;
+}
+
+void SASLPlugin::onXmppStreamCreated(IXmppStream *AXmppStream)
+{
+  AXmppStream->insertXmppStanzaHandler(this, XSHO_SASL_VERSION);
 }
 
 void SASLPlugin::onFeatureDestroyed()
