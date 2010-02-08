@@ -87,6 +87,9 @@
                         <distributionFile>
                             <origin>../../../msvcp90.dll</origin>
                         </distributionFile>
+                        <distributionFile>
+                            <origin>../../../Microsoft.VC90.CRT.manifest</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>
