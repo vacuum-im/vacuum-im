@@ -5,21 +5,9 @@
   margin-top		:2px;
 }
 
-.consecutive 
-{
-  margin-top		:0px;
-}
-
-.consecutive .xxxsender,
-.consecutive .xxxtime
-{
-  color			:transparent;
-}
-
 .xxxmessage
 {
-  padding-left		:5px;
-  padding-right		:5px;
+  white-space		:pre-wrap;
 }
 
 .xxxsender,
@@ -32,6 +20,17 @@
 {
   font-size             :small;
   color			:gray;
+}
+
+.consecutive 
+{
+  margin-top		:0px;
+}
+
+.consecutive .xxxsender,
+.consecutive .xxxtime
+{
+  color			:transparent;
 }
 
 .status .xxxmessage
