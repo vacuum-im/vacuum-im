@@ -31,9 +31,9 @@ XmppStream::~XmppStream()
 
 bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream == this && AOrder == XSHO_XMPPSTREAM)
+  if (AXmppStream == this && AOrder == XSHO_XMPP_STREAM)
   {
-    if (FStreamState==SS_INITIALIZE && AStanza.element().namespaceURI()==NS_JABBER_STREAMS)
+    if (FStreamState==SS_INITIALIZE && AStanza.element().nodeName()=="stream:stream")
     {
       FStreamId = AStanza.id();
       FStreamState = SS_FEATURES;
@@ -270,7 +270,6 @@ void XmppStream::startStream()
   doc.appendChild(root);
   root.setAttribute("xmlns",NS_JABBER_CLIENT);
   root.setAttribute("to", FStreamJid.domain());
-  root.setAttribute("version","1.0");
   if (!FDefLang.isEmpty())
     root.setAttribute("xml:lang",FDefLang);
 
@@ -299,7 +298,7 @@ void XmppStream::processFeatures()
   {
     FOpen = true;
     FStreamState = SS_ONLINE;
-    removeXmppStanzaHandler(this,XSHO_XMPPSTREAM);
+    removeXmppStanzaHandler(this,XSHO_XMPP_STREAM);
     emit opened();
   }
 }
@@ -381,7 +380,7 @@ QByteArray XmppStream::receiveData(qint64 ABytes)
 
 void XmppStream::onConnectionConnected()
 {
-  insertXmppStanzaHandler(this,XSHO_XMPPSTREAM);
+  insertXmppStanzaHandler(this,XSHO_XMPP_STREAM);
   startStream();
 }
 
@@ -403,7 +402,7 @@ void XmppStream::onConnectionDisconnected()
   FOpen = false;
   FKeepAliveTimer.stop();
   FStreamState = SS_OFFLINE;
-  removeXmppStanzaHandler(this,XSHO_XMPPSTREAM);
+  removeXmppStanzaHandler(this,XSHO_XMPP_STREAM);
   emit closed();
 
   if (FOfflineJid.isValid())
