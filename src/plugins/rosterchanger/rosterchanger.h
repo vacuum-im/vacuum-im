@@ -113,6 +113,7 @@ protected slots:
   void onSettingsOpened();
   void onSettingsClosed();
   void onShowAddContactDialog(bool);
+  void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onRosterClosed(IRoster *ARoster);
   void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onNotificationActivated(int ANotifyId);
