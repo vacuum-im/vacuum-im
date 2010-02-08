@@ -65,6 +65,8 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     {
       connect(FRosterPlugin->instance(),SIGNAL(rosterSubscription(IRoster *, const Jid &, int, const QString &)),
         SLOT(onReceiveSubscription(IRoster *, const Jid &, int, const QString &)));
+      connect(FRosterPlugin->instance(),SIGNAL(rosterItemRemoved(IRoster *, const IRosterItem &)),
+        SLOT(onRosterItemRemoved(IRoster *, const IRosterItem &)));
       connect(FRosterPlugin->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
     }
   }
@@ -1234,6 +1236,11 @@ void RosterChanger::onRemoveGroupItems(bool)
       }
     }
   }
+}
+
+void RosterChanger::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem)
+{
+  FAutoSubscriptions[ARoster->streamJid()].remove(ARosterItem.itemJid);
 }
 
 void RosterChanger::onRosterClosed(IRoster *ARoster)
