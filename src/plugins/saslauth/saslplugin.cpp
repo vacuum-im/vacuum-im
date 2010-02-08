@@ -81,7 +81,14 @@ bool SASLPlugin::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AO
   if (AOrder==XSHO_SASL_VERSION && AStanza.element().nodeName()=="stream:stream")
   {
     if (!AStanza.element().hasAttribute("version"))
-      AStanza.element().setAttribute("version","1.0");
+    {
+      // GOOGLE HACK - sending xmpp stream version 0.0 for IQ authorization
+      QString domain = AXmppStream->streamJid().domain().toLower();
+      if (AXmppStream->connection()->isEncrypted() && (domain=="googlemail.com" || domain=="gmail.com"))
+        AStanza.element().setAttribute("version","0.0");
+      else 
+        AStanza.element().setAttribute("version","1.0");
+    }
   }
   return false;
 }

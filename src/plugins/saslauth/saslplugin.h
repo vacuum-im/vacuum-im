@@ -6,6 +6,7 @@
 #include <definations/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
+#include <interfaces/iconnectionmanager.h>
 #include "saslauth.h"
 #include "saslbind.h"
 #include "saslsession.h"
