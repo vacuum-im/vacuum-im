@@ -77,6 +77,7 @@ Section "VacuumIM (required)"
   ; Visual Studio redistribute files
   File "${PROGRAM_BIN_FOLDER}\msvcr90.dll"
   File "${PROGRAM_BIN_FOLDER}\msvcp90.dll"
+  File "${PROGRAM_BIN_FOLDER}\Microsoft.VC90.CRT.manifest"
 	
   ; MinGW redistribute files
   ;File "${PROGRAM_BIN_FOLDER}\libgcc_s_dw2-1.dll"
