@@ -129,6 +129,13 @@ void ConsoleWidget::colorXml(QString &AXml) const
   }
 }
 
+void ConsoleWidget::hidePasswords(QString &AXml) const
+{
+  static const QRegExp passRegExp("<password>.*</password>", Qt::CaseInsensitive);
+  static const QString passNewStr = "<password>[password]</password>";
+  AXml.replace(passRegExp,passNewStr);
+}
+
 void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended)
 {
   Jid streamJid = ui.cmbStreamJid->currentIndex() > 0 ? ui.cmbStreamJid->itemText(ui.cmbStreamJid->currentIndex()) : "";
@@ -150,6 +157,7 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
       ui.tedConsole->append(caption);
 
       QString xml = stanza.toString(2);
+      hidePasswords(xml);
       if (ui.chbColoredXML->checkState() == Qt::Checked)
         colorXml(xml);
       else if (ui.chbColoredXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)

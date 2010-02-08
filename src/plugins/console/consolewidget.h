@@ -26,6 +26,7 @@ public:
   virtual bool xmppStanzaOut(IXmppStream *AStream, Stanza &AStanza, int AOrder);
 protected:
   void colorXml(QString &AXml) const;
+  void hidePasswords(QString &AXml) const;
   void showElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);
 protected slots:
   void onAddConditionClicked();
