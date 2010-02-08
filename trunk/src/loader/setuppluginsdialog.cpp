@@ -67,7 +67,8 @@ void SetupPluginsDialog::updatePlugins()
   QDomElement pluginElem = FPluginsSetup.documentElement().firstChildElement();
   while (!pluginElem.isNull())
   {
-    QTableWidgetItem *nameItem = new QTableWidgetItem(pluginElem.firstChildElement("name").text());
+    QString name = pluginElem.firstChildElement("name").text().isEmpty() ? pluginElem.tagName() : pluginElem.firstChildElement("name").text();
+    QTableWidgetItem *nameItem = new QTableWidgetItem(name);
     if (pluginElem.attribute("enabled","true")=="true")
     {
       if (FPluginManager->pluginInstance(pluginElem.attribute("uuid"))==NULL)
@@ -141,7 +142,8 @@ void SetupPluginsDialog::onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTab
   {
     QDomElement pluginElem = FItemElement.value(nameItem);
 
-    ui.lblName->setText(QString("<b>%1</b> %2").arg(Qt::escape(pluginElem.firstChildElement("name").text())).arg(Qt::escape(pluginElem.firstChildElement("version").text())));
+    QString name = pluginElem.firstChildElement("name").text().isEmpty() ? pluginElem.tagName() : pluginElem.firstChildElement("name").text();
+    ui.lblName->setText(QString("<b>%1</b> %2").arg(Qt::escape(name)).arg(Qt::escape(pluginElem.firstChildElement("version").text())));
     ui.lblDescription->setText(Qt::escape(pluginElem.firstChildElement("desc").text()));
     ui.lblError->setText(Qt::escape(pluginElem.firstChildElement("error").text()));
     ui.lblError->setVisible(!ui.lblError->text().isEmpty());
