@@ -48,6 +48,12 @@
         </item>
         <item>
          <widget class="QWidget" name="wdtReceivers" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <layout class="QHBoxLayout">
            <property name="leftMargin">
             <number>2</number>
@@ -116,7 +122,6 @@
             <widget class="QLineEdit" name="lneSubject"/>
            </item>
           </layout>
-          <zorder>lneSubject</zorder>
           <zorder>lneSubject</zorder>
           <zorder>lblSubject</zorder>
          </widget>
