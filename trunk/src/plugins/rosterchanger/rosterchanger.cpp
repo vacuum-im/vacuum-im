@@ -401,10 +401,8 @@ void RosterChanger::subscribeContact(const Jid &AStreamJid, const Jid &AContactJ
     const IRosterItem &ritem = roster->rosterItem(AContactJid);
     roster->sendSubscription(AContactJid,IRoster::Subscribed,AMessage);
     if (ritem.subscription!=SUBSCRIPTION_TO && ritem.subscription!=SUBSCRIPTION_BOTH)
-    {
-      insertAutoSubscribe(AStreamJid,AContactJid,AutoSubscribe,ASilently);
       roster->sendSubscription(AContactJid,IRoster::Subscribe,AMessage);
-    }
+    insertAutoSubscribe(AStreamJid,AContactJid,AutoSubscribe,ASilently);
   }
 }
 
@@ -416,10 +414,8 @@ void RosterChanger::unsubscribeContact(const Jid &AStreamJid, const Jid &AContac
     const IRosterItem &ritem = roster->rosterItem(AContactJid);
     roster->sendSubscription(AContactJid,IRoster::Unsubscribed,AMessage);
     if (ritem.subscription!=SUBSCRIPTION_FROM && ritem.subscription!=SUBSCRIPTION_NONE)
-    {
-      insertAutoSubscribe(AStreamJid,AContactJid,AutoUnsubscribe,ASilently);
       roster->sendSubscription(AContactJid,IRoster::Unsubscribe,AMessage);
-    }
+    insertAutoSubscribe(AStreamJid,AContactJid,AutoUnsubscribe,ASilently);
   }
 }
 
@@ -880,7 +876,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
     if (FNotifications && !isSilentSubsctiption(ARoster->streamJid(),AContactJid))
       notifyId = FNotifications->appendNotification(notify);
     
-    if (isAutoUnsubscribe(ARoster->streamJid(),AContactJid))
+    if (checkOption(AutoUnsubscribe))
       ARoster->sendSubscription(AContactJid,IRoster::Unsubscribed);
   }
   else  if (ASubsType == IRoster::Subscribed)
