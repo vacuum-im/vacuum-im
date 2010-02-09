@@ -362,16 +362,20 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 //IRosterChanger
 bool RosterChanger::isAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  if (FAutoSubscriptions.value(AStreamJid).contains(AContactJid.bare()))
+  if (checkOption(AutoSubscribe))
+    return true;
+  else if (FAutoSubscriptions.value(AStreamJid).contains(AContactJid.bare()))
     return (FAutoSubscriptions.value(AStreamJid).value(AContactJid.bare()).autoOptions & IRosterChanger::AutoSubscribe) > 0;
-  return checkOption(AutoSubscribe);
+  return false;
 }
 
 bool RosterChanger::isAutoUnsubscribe(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  if (FAutoSubscriptions.value(AStreamJid).contains(AContactJid.bare()))
+  if (checkOption(AutoUnsubscribe))
+    return true;
+  else if (FAutoSubscriptions.value(AStreamJid).contains(AContactJid.bare()))
     return (FAutoSubscriptions.value(AStreamJid).value(AContactJid.bare()).autoOptions & IRosterChanger::AutoUnsubscribe) > 0;
-  return checkOption(AutoUnsubscribe);
+  return false;
 }
 
 bool RosterChanger::isSilentSubsctiption(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -876,7 +880,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
     if (FNotifications && !isSilentSubsctiption(ARoster->streamJid(),AContactJid))
       notifyId = FNotifications->appendNotification(notify);
     
-    if (checkOption(AutoUnsubscribe))
+    if (isAutoUnsubscribe(ARoster->streamJid(),AContactJid))
       ARoster->sendSubscription(AContactJid,IRoster::Unsubscribed);
   }
   else  if (ASubsType == IRoster::Subscribed)
@@ -1236,7 +1240,10 @@ void RosterChanger::onRemoveGroupItems(bool)
 
 void RosterChanger::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem)
 {
-  FAutoSubscriptions[ARoster->streamJid()].remove(ARosterItem.itemJid);
+  if (isSilentSubsctiption(ARoster->streamJid(), ARosterItem.itemJid))
+    insertAutoSubscribe(ARoster->streamJid(), ARosterItem.itemJid, 0, true);
+  else
+    removeAutoSubscribe(ARoster->streamJid(), ARosterItem.itemJid);
 }
 
 void RosterChanger::onRosterClosed(IRoster *ARoster)
