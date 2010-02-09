@@ -113,11 +113,11 @@ private:
   QString FKeepRequest;
   QList<QString> FPromptRequests;
   QList<QString> FUserJidRequests;
-  QHash<QString, Jid> FRegisterRequests;
-  QMultiHash<Jid, Jid> FResolveNicks;
-  QMultiHash<Jid, Jid> FSubscribeServices;
-  QMultiHash<Jid, Jid> FKeepConnections;
-  QHash<Jid, QSet<Jid> > FPrivateStorageKeep;
+  QMap<QString, Jid> FRegisterRequests;
+  QMultiMap<Jid, Jid> FResolveNicks;
+  QMultiMap<Jid, Jid> FSubscribeServices;
+  QMultiMap<Jid, Jid> FKeepConnections;
+  QMap<Jid, QSet<Jid> > FPrivateStorageKeep;
 };
 
 #endif // GATEWAYS_H

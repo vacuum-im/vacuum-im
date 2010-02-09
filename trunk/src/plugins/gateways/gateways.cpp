@@ -347,7 +347,10 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
         else
           curItems += newItem;
         if (ARemove)
+        {
           oldItems.append(ritem);
+          FRosterChanger->insertAutoSubscribe(AStreamJid, ritem.itemJid, IRosterChanger::AutoUnsubscribe, true);
+        }
       }
     }
     roster->removeItems(oldItems);
