@@ -41,6 +41,7 @@ QWidget *Delegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AO
       comboBox->addItem(FStatusChanger->iconByShow(IPresence::Online),FStatusChanger->nameByShow(IPresence::Online),IPresence::Online);
       comboBox->addItem(FStatusChanger->iconByShow(IPresence::Chat),FStatusChanger->nameByShow(IPresence::Chat),IPresence::Chat);
       comboBox->addItem(FStatusChanger->iconByShow(IPresence::Offline),FStatusChanger->nameByShow(IPresence::Offline),IPresence::Offline);
+      comboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
       comboBox->setEditable(false);
       return comboBox;
     }
@@ -124,8 +125,11 @@ void Delegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem
     }
   case COL_SHOW: 
     {
-      AEditor->setGeometry(AOption.rect);
-     break;
+      AEditor->adjustSize();
+      QRect rect = AOption.rect;
+      rect.setWidth(AEditor->width());
+      AEditor->setGeometry(rect);
+      break;
     }
   default:
     QItemDelegate::updateEditorGeometry(AEditor,AOption,AIndex);
@@ -154,6 +158,7 @@ StatusOptionsWidget::StatusOptionsWidget(IAutoStatus *AAutoStatus, IStatusChange
   ui.tbwRules->horizontalHeader()->setResizeMode(COL_SHOW,QHeaderView::ResizeToContents);
   ui.tbwRules->horizontalHeader()->setResizeMode(COL_TEXT,QHeaderView::Stretch);
   ui.tbwRules->horizontalHeader()->setSortIndicatorShown(false);
+  ui.tbwRules->horizontalHeader()->setHighlightSections(false);
   ui.tbwRules->verticalHeader()->hide();
 
   connect(ui.pbtAdd,SIGNAL(clicked(bool)),SLOT(onAddButtonClicked(bool)));
@@ -245,4 +250,3 @@ void StatusOptionsWidget::onDeleteButtonClicked(bool)
   if (item)
     ui.tbwRules->removeRow(item->row());
 }
-
