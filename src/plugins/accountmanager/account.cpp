@@ -45,8 +45,8 @@ void Account::setActive(bool AActive)
   if (AActive && FXmppStream==NULL && isValid())
   {
     FXmppStream = FXmppStreams->newXmppStream(streamJid());
-    FXmppStream->setPassword(password());
-    FXmppStream->setDefaultLang(defaultLang()); 
+    connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(updateXmppStream()),Qt::QueuedConnection);
+    updateXmppStream();
     FXmppStreams->addXmppStream(FXmppStream);
     emit changed(AVN_ACTIVE,true);
   }
@@ -118,7 +118,7 @@ void Account::setValue(const QString &AName, const QVariant &AValue)
 {
   if (value(AName) != AValue)
   {
-    if (FXmppStream)
+    if (FXmppStream && !FXmppStream->isOpen())
     {
       if (AName == AVN_STREAM_JID)
         FXmppStream->setStreamJid(AValue.toString());
@@ -136,4 +136,14 @@ void Account::delValue(const QString &AName)
 {
   FSettings->deleteValueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId.toString());
   emit changed(AName,QVariant());
+}
+
+void Account::updateXmppStream()
+{
+  if (FXmppStream)
+  {
+    FXmppStream->setStreamJid(streamJid());
+    FXmppStream->setPassword(password());
+    FXmppStream->setDefaultLang(defaultLang()); 
+  }
 }
