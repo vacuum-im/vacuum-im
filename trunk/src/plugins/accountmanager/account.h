@@ -37,6 +37,8 @@ public:
   virtual void delValue(const QString &AName);
 signals:
   void changed(const QString &AName, const QVariant &AValue);
+protected slots:
+  void updateXmppStream();
 private:
   ISettings *FSettings;
   IXmppStream *FXmppStream;

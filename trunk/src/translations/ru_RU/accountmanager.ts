@@ -100,6 +100,14 @@
         <source>You are assured that wish to remove an account &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;All settings will be lost.</source>
         <translation>Вы уверены, что хотите удалить аккаунт &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;Все настройки будут потеряны.</translation>
     </message>
+    <message>
+        <source>Account options</source>
+        <translation>Настройки аккаунта</translation>
+    </message>
+    <message>
+        <source>Some accounts changes will be applied after disconnect</source>
+        <translation>Некоторые изменения в аккаунтах будут применены после отключения</translation>
+    </message>
 </context>
 <context>
     <name>AccountsOptionsClass</name>

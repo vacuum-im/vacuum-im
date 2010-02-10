@@ -51,6 +51,7 @@ QWidget *AccountsOptions::accountOptions(const QUuid &AAccountId)
 
 void AccountsOptions::apply()
 {
+  bool delayedApply = false;
   QList<IAccount *> curAccounts;
   for (QMap<QUuid, QTreeWidgetItem *>::const_iterator it = FAccountItems.constBegin(); it!=FAccountItems.constEnd(); it++)
   {
@@ -59,9 +60,12 @@ void AccountsOptions::apply()
     {
       if (FAccountOptions.contains(it.key()))
       {
+        Jid streamJidBefore = account->streamJid();
         FAccountOptions.value(it.key())->apply();
         if (!account->isValid())
           QMessageBox::warning(NULL,tr("Not valid account"),tr("Account %1 is not valid, change its Jabber ID").arg(Qt::escape(account->name())));
+        else if (account->isActive() && account->xmppStream()->isOpen() && account->streamJid()!=streamJidBefore)
+          delayedApply = true;
       }
       it.value()->setText(COL_NAME,account->name());
       it.value()->setText(COL_JID,account->streamJid().full());
@@ -74,6 +78,11 @@ void AccountsOptions::apply()
   foreach(IAccount *account, FManager->accounts())
     if (!curAccounts.contains(account))
       FManager->destroyAccount(account->accountId());
+
+  if (delayedApply)
+  {
+    QMessageBox::information(NULL,tr("Account options"),tr("Some accounts changes will be applied after disconnect"));
+  }
 
   emit optionsAccepted();
 }
