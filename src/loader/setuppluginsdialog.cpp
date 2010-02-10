@@ -190,10 +190,6 @@ void SetupPluginsDialog::onDialogButtonClicked(QAbstractButton *AButton)
   {
   case QDialogButtonBox::Ok:
     saveSettings();
-    accept();
-    break;
-  case QDialogButtonBox::Apply:
-    saveSettings();
     if (QMessageBox::question(this,tr("Restart Application"),tr("Settings saved. Do you want to restart application?"),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
       QTimer::singleShot(0,FPluginManager->instance(), SLOT(restart()));
     accept();

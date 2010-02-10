@@ -77,6 +77,7 @@ protected:
 protected slots:
   void onApplicationAboutToQuit();
   void onShowSetupPluginsDialog(bool);
+  void onSetupPluginsDialogAccepted();
   void onShowAboutBoxDialog();
 private:
   QPointer<AboutBox> FAboutDialog;

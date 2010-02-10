@@ -242,23 +242,28 @@ void PluginManager::loadSettings()
   QDir homeDir(FDataPath);
   QFile file(homeDir.absoluteFilePath(FILE_PLUGINS_SETTINGS));
   if (file.exists() && file.open(QFile::ReadOnly))
-  {
     FPluginsSetup.setContent(&file,true);
-  }
-  if (FPluginsSetup.isNull())
+  file.close();
+
+  if (FPluginsSetup.documentElement().tagName() != "plugins")
   {
+    FPluginsSetup.clear();
     FPluginsSetup.appendChild(FPluginsSetup.createElement("plugins"));
   }
 }
 
 void PluginManager::saveSettings()
 {
-  if (!FPluginsSetup.isNull())
+  if (!FPluginsSetup.documentElement().isNull())
   {
     QDir homeDir(FDataPath);
     QFile file(homeDir.absoluteFilePath(FILE_PLUGINS_SETTINGS));
     if (file.open(QFile::WriteOnly|QFile::Truncate))
+    {
       file.write(FPluginsSetup.toString(3).toUtf8());
+      file.flush();
+      file.close();
+    }
   }
 }
 
@@ -643,26 +648,30 @@ void PluginManager::onApplicationAboutToQuit()
   QCoreApplication::removeTranslator(FQtTranslator);
   QCoreApplication::removeTranslator(FUtilsTranslator);
   QCoreApplication::removeTranslator(FLoaderTranslator);
-
-  saveSettings();
 }
 
 void PluginManager::onShowSetupPluginsDialog(bool)
 {
   if (FPluginsDialog.isNull())
+  {
     FPluginsDialog = new SetupPluginsDialog(this,FPluginsSetup,NULL);
+    connect(FPluginsDialog, SIGNAL(accepted()),SLOT(onSetupPluginsDialogAccepted()));
+  }
   FPluginsDialog->show();
   WidgetManager::raiseWidget(FPluginsDialog);
   FPluginsDialog->activateWindow();
 }
 
+void PluginManager::onSetupPluginsDialogAccepted()
+{
+  saveSettings();
+}
+
 void PluginManager::onShowAboutBoxDialog()
 {
   if (FAboutDialog.isNull())
-  {
     FAboutDialog = new AboutBox(this);
-    FAboutDialog->show();
-  }
-  else
-    FAboutDialog->raise();
+  FAboutDialog->show();
+  WidgetManager::raiseWidget(FAboutDialog);
+  FAboutDialog->activateWindow();
 }
