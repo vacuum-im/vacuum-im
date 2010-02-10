@@ -839,7 +839,6 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
     {
       FStartDragFailed = true;
     }
-    delete drag;
   }
   QTreeView::mouseMoveEvent(AEvent);
 }
@@ -873,34 +872,26 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 
 void RostersView::dropEvent(QDropEvent *AEvent)
 {
-  QModelIndex index = indexAt(AEvent->pos());
   Menu *dropMenu = new Menu(this);
-  dropMenu->setAttribute(Qt::WA_DeleteOnClose,true);
 
   bool accepted = false;
+  QModelIndex index = indexAt(AEvent->pos());
   foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
     if (handler->rosterDropAction(AEvent,index,dropMenu))
       accepted = true;
 
-  if (accepted)
+  QAction *action= (AEvent->mouseButtons() & Qt::RightButton)>0 || dropMenu->defaultAction()==NULL ? dropMenu->exec(mapToGlobal(AEvent->pos())) : dropMenu->defaultAction();
+  if (accepted && action)
   {
-    if ((AEvent->mouseButtons() & Qt::RightButton)>0 || dropMenu->defaultAction()==NULL)
-    {
-      dropMenu->popup(mapToGlobal(AEvent->pos()));
-    }
-    else
-    {
-      dropMenu->defaultAction()->trigger();
-      delete dropMenu;
-    }
-    AEvent->accept();
+    action->trigger();
+    AEvent->acceptProposedAction();
   }
   else
   {
     AEvent->ignore();
-    delete dropMenu;
   }
 
+  delete dropMenu;
   stopAutoScroll();
   setDropIndicatorRect(QRect());
 }
@@ -916,10 +907,12 @@ void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
   {
     if (hasAutoScroll())
       startAutoScroll();
-    AEvent->accept();
+    AEvent->acceptProposedAction();
   }
   else
+  {
     AEvent->ignore();
+  }
 }
 
 void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
@@ -932,7 +925,7 @@ void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
       accepted = true;
 
   if (accepted)
-    AEvent->accept();
+    AEvent->acceptProposedAction();
   else
     AEvent->ignore();
 
