@@ -1,5 +1,7 @@
 #include "stanza.h"
 
+#include <QTextStream>
+
 StanzaData::StanzaData(const QString &ATagName)
 {
   FDoc.appendChild(FDoc.createElement(ATagName));
@@ -202,12 +204,15 @@ QDomText Stanza::createTextNode(const QString &AData)
 
 QString Stanza::toString(int AIndent) const
 {
-  return d->FDoc.toString(AIndent);
+  QString data;
+  QTextStream ts(&data, QIODevice::WriteOnly);
+  element().save(ts, AIndent);
+  return data;
 }
 
 QByteArray Stanza::toByteArray() const
 {
-  static QByteArray befour = QString(">\n").toUtf8();
-  static QByteArray after = QString(">").toUtf8();
-  return d->FDoc.toByteArray(0).replace(befour,after);
+  static const QByteArray befour = QString(">\n").toUtf8();
+  static const QByteArray after = QString(">").toUtf8();
+  return toString(0).toUtf8().replace(befour,after);
 }
