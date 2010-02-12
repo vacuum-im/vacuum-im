@@ -43,6 +43,8 @@ ServiceDiscovery::ServiceDiscovery()
   FDataForms = NULL;
   FXmppUriQueries = NULL;
 
+  FUpdateSelfCapsStarted = false;
+
   FDiscoMenu = NULL;
   FQueueTimer.setSingleShot(false);
   FQueueTimer.setInterval(QUEUE_TIMER_INTERVAL);
@@ -286,7 +288,8 @@ bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
       newCaps.hash = capsElem.attribute("hash");
 
       EntityCapabilities oldCaps = FEntityCaps.value(AStreamJid).value(contactJid);
-      if (capsElem.isNull() || oldCaps.ver!=newCaps.ver || oldCaps.node!=newCaps.node)
+      bool capsChanged = !capsElem.isNull() && (oldCaps.ver!=newCaps.ver || oldCaps.node!=newCaps.node);
+      if (capsElem.isNull() || capsChanged)
       {
         if (hasEntityCaps(newCaps))
         {
@@ -296,7 +299,7 @@ bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
           FDiscoInfo[dinfo.streamJid][dinfo.contactJid].insert(dinfo.node,dinfo);
           emit discoInfoReceived(dinfo);
         }
-        else if (!hasDiscoInfo(AStreamJid,contactJid))
+        else if (capsChanged || !hasDiscoInfo(AStreamJid,contactJid))
         {
           DiscoveryRequest request;
           request.streamJid = AStreamJid;
@@ -530,6 +533,15 @@ QIcon ServiceDiscovery::serviceIcon(const Jid &AStreamJid, const Jid AItemJid, c
   return icon;
 }
 
+void ServiceDiscovery::updateSelfEntityCapabilities()
+{
+  if (!FUpdateSelfCapsStarted)
+  {
+    FUpdateSelfCapsStarted = true;
+    QTimer::singleShot(0,this,SLOT(onSelfCapsChanged()));
+  }
+}
+
 void ServiceDiscovery::insertDiscoHandler(IDiscoHandler *AHandler)
 {
   if (!FDiscoHandlers.contains(AHandler))
@@ -601,8 +613,8 @@ void ServiceDiscovery::insertDiscoFeature(const IDiscoFeature &AFeature)
   {
     removeDiscoFeature(AFeature.var);
     FDiscoFeatures.insert(AFeature.var,AFeature);
-    QTimer::singleShot(0,this,SLOT(onSelfCapsChanged()));
     emit discoFeatureInserted(AFeature);
+    updateSelfEntityCapabilities();
   }
 }
 
@@ -621,8 +633,8 @@ void ServiceDiscovery::removeDiscoFeature(const QString &AFeatureVar)
   if (FDiscoFeatures.contains(AFeatureVar))
   {
     IDiscoFeature dfeature = FDiscoFeatures.take(AFeatureVar);
-    QTimer::singleShot(0,this,SLOT(onSelfCapsChanged()));
     emit discoFeatureRemoved(dfeature);
+    updateSelfEntityCapabilities();
   }
 }
 
@@ -1407,6 +1419,7 @@ void ServiceDiscovery::onSelfCapsChanged()
         presence->setPresence(presence->show(),presence->status(),presence->priority());
     }
   }
+  FUpdateSelfCapsStarted = false;
 }
 
 Q_EXPORT_PLUGIN2(plg_servicediscovery, ServiceDiscovery)

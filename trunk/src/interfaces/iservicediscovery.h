@@ -105,6 +105,7 @@ public:
   virtual QList<IDiscoInfo> findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const =0;
   virtual QIcon identityIcon(const QList<IDiscoIdentity> &AIdentity) const =0;
   virtual QIcon serviceIcon(const Jid &AStreamJid, const Jid AItemJid, const QString &ANode) const =0;
+  virtual void updateSelfEntityCapabilities() =0;
   //DiscoHandler
   virtual void insertDiscoHandler(IDiscoHandler *AHandler) =0;
   virtual void removeDiscoHandler(IDiscoHandler *AHandler) =0;

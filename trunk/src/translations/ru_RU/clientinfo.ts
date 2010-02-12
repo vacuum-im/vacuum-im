@@ -163,4 +163,11 @@
         <translation>%1с</translation>
     </message>
 </context>
+<context>
+    <name>MiscOptionsWidgetClass</name>
+    <message>
+        <source>Share information about OS version</source>
+        <translation>Раскрывать информацию о версии ОС</translation>
+    </message>
+</context>
 </TS>

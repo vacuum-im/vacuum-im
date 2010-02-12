@@ -99,6 +99,7 @@ public:
   virtual QList<IDiscoInfo> findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
   virtual QIcon identityIcon(const QList<IDiscoIdentity> &AIdentity) const;
   virtual QIcon serviceIcon(const Jid &AStreamJid, const Jid AItemJid, const QString &ANode) const;
+  virtual void updateSelfEntityCapabilities();
     //DiscoHandler
   virtual void insertDiscoHandler(IDiscoHandler *AHandler);
   virtual void removeDiscoHandler(IDiscoHandler *AHandler);
@@ -194,6 +195,7 @@ private:
   QMap<QString, DiscoveryRequest > FItemsRequestsId;
   QMultiMap<QDateTime, DiscoveryRequest> FQueuedRequests;
 private:
+  bool FUpdateSelfCapsStarted;
   QMap<Jid, EntityCapabilities> FSelfCaps;
   QMap<Jid, QHash<Jid, EntityCapabilities> > FEntityCaps;
   QMap<Jid, QHash<Jid, QMap<QString, IDiscoInfo> > > FDiscoInfo;
