@@ -178,12 +178,6 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="editable">
-          <bool>true</bool>
-         </property>
-         <property name="insertPolicy">
-          <enum>QComboBox::NoInsert</enum>
-         </property>
          <property name="sizeAdjustPolicy">
           <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
          </property>
@@ -194,14 +188,14 @@
      <item>
       <layout class="QHBoxLayout" name="hboxlayout_3">
        <item>
-        <widget class="QLabel" name="lblText">
+        <widget class="QLabel" name="lblSearch">
          <property name="text">
-          <string>Text:</string>
+          <string>Search:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lneText"/>
+        <widget class="QLineEdit" name="lneSearch"/>
        </item>
       </layout>
      </item>
@@ -233,7 +227,7 @@
  <tabstops>
   <tabstop>dedStart</tabstop>
   <tabstop>dedEnd</tabstop>
-  <tabstop>lneText</tabstop>
+  <tabstop>lneSearch</tabstop>
  </tabstops>
  <resources/>
  <connections/>

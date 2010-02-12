@@ -97,12 +97,12 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   cmbView->setModel(cmbSort);
   ui.cmbContact->setView(cmbView);
 
-  ui.lneText->setFocus();
+  ui.lneSearch->setFocus();
 
   FModel = new QStandardItemModel(0,3,this);
   FModel->setHorizontalHeaderLabels(QStringList() << tr("With") << tr("Date") << tr("Subject"));
   
-  FProxyModel = new SortFilterProxyModel(this);
+  FProxyModel = new SortFilterProxyModel(this,FModel);
   FProxyModel->setSourceModel(FModel);
   FProxyModel->setSortRole(HDR_SORT_ROLE);
 
@@ -137,8 +137,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
   connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),SLOT(onRequestFailed(const QString &, const QString &)));
 
   connect(ui.pbtApply,SIGNAL(clicked()),SLOT(onApplyFilterClicked()));
-  connect(ui.lneText,SIGNAL(returnPressed()),SLOT(onApplyFilterClicked()));
-  connect(ui.cmbContact->lineEdit(),SIGNAL(returnPressed()),SLOT(onApplyFilterClicked()));
+  connect(ui.lneSearch,SIGNAL(returnPressed()),SLOT(onApplyFilterClicked()));
 
   initialize();
   createGroupKindMenu();
@@ -147,6 +146,11 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
 
   FViewOptions.isGroupchat = false;
   setMessageStyle();
+
+  QIcon icon;
+  if (FStatusIcons)
+    icon = FStatusIcons->iconByJidStatus(AStreamJid,IPresence::Online,SUBSCRIPTION_BOTH,false);
+  ui.cmbContact->addItem(icon,tr(" <All contacts> "),QString(""));
 }
 
 ViewHistoryWindow::~ViewHistoryWindow()
@@ -156,7 +160,6 @@ ViewHistoryWindow::~ViewHistoryWindow()
     FSettings->saveBinaryData(BIN_WINDOW_GEOMETRY+FStreamJid.pBare(),saveGeometry());
     FSettings->saveBinaryData(BIN_WINDOW_STATE+FStreamJid.pBare(),saveState());
   }
-  clearModel();
   emit windowDestroyed(this);
 }
 
@@ -238,8 +241,9 @@ void ViewHistoryWindow::setFilter(const IArchiveFilter &AFilter)
 {
   FFilter = AFilter;
   ui.trvCollections->setCurrentIndex(QModelIndex());
-  processRequests(createRequests(AFilter));
+  insertContact(AFilter.with);
   updateFilterWidgets();
+  processRequests(createRequests(AFilter));
   FInvalidateTimer.start();
   emit filterChanged(AFilter);
 }
@@ -429,11 +433,8 @@ bool ViewHistoryWindow::loadServerCollection(const IArchiveHeader &AHeader, cons
 
 QString ViewHistoryWindow::contactName(const Jid &AContactJid, bool ABare) const
 {
-  QString name = FArchiver->gateNick(FStreamJid,AContactJid);
-  if (name==AContactJid.node() || name==AContactJid.domain())
-    return ABare ? AContactJid.bare() : AContactJid.full();
-  else
-    return !ABare && !AContactJid.resource().isEmpty() ? name+"/"+AContactJid.resource() : name;
+  QString nick = FArchiver->gateNick(FStreamJid,AContactJid);
+  return !ABare && !AContactJid.resource().isEmpty() ? nick+"/"+AContactJid.resource() : nick;
 }
 
 QStandardItem *ViewHistoryWindow::findChildItem(int ARole, const QVariant &AValue, QStandardItem *AParent) const
@@ -699,7 +700,7 @@ void ViewHistoryWindow::processHeaders(const QList<IArchiveHeader> &AHeaders)
       collection.header = header;
       FCollections.insert(header,collection);
       createHeaderItem(header);
-      insertFilterWith(header);
+      insertContact(header.with);
     }
   }
 }
@@ -772,40 +773,33 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
   }
 }
 
-void ViewHistoryWindow::insertFilterWith(const IArchiveHeader &AHeader)
+void ViewHistoryWindow::insertContact(const Jid &AContactJid)
 {
-  Jid gateWith = FArchiver->gateJid(AHeader.with);
-  QString name = contactName(AHeader.with,true);
-  if (!name.isEmpty() && !gateWith.isEmpty())
+  if (AContactJid.isValid())
   {
-    int index = ui.cmbContact->findData(gateWith.pBare());
-    if (index < 0)
+    Jid gateWith = FArchiver->gateJid(AContactJid);
+    QString name = contactName(AContactJid,true);
+    if (!name.isEmpty() && !gateWith.isEmpty())
     {
-      QIcon icon;
-      if (FStatusIcons)
-        icon = FStatusIcons->iconByJidStatus(AHeader.with,IPresence::Online,SUBSCRIPTION_BOTH,false);
-      ui.cmbContact->addItem(icon, name, gateWith.pBare());
-      updateFilterWidgets();
+      int index = ui.cmbContact->findData(gateWith.pBare());
+      if (index < 0)
+      {
+        QIcon icon;
+        if (FStatusIcons)
+          icon = FStatusIcons->iconByJidStatus(AContactJid,IPresence::Online,SUBSCRIPTION_BOTH,false);
+        ui.cmbContact->addItem(icon, name, gateWith.pBare());
+        ui.cmbContact->model()->sort(0);
+      }
     }
-    else
-      ui.cmbContact->setItemText(index,name);
-    ui.cmbContact->model()->sort(0);
   }
 }
 
 void ViewHistoryWindow::updateFilterWidgets()
 {
-  int index = ui.cmbContact->findData(FFilter.with.pFull());
-  if (index<0)
-  {
-    ui.cmbContact->setCurrentIndex(-1);
-    ui.cmbContact->setEditText(FFilter.with.full());
-  }
-  else
-    ui.cmbContact->setCurrentIndex(index);
+  ui.cmbContact->setCurrentIndex(ui.cmbContact->findData(FFilter.with.pBare()));
   ui.dedStart->setDate(FFilter.start.isValid() ? FFilter.start.date() : MINIMUM_DATETIME.date());
   ui.dedEnd->setDate(FFilter.end.isValid() ? FFilter.end.date() : MAXIMUM_DATETIME.date());
-  ui.lneText->setText(FFilter.body.pattern());
+  ui.lneSearch->setText(FFilter.body.pattern());
 }
 
 void ViewHistoryWindow::clearModel()
@@ -1002,8 +996,9 @@ void ViewHistoryWindow::onServerCollectionSaved(const QString &AId, const IArchi
   }
 }
 
-void ViewHistoryWindow::onServerCollectionsRemoved(const QString &AId, const IArchiveRequest &/*ARequest*/)
+void ViewHistoryWindow::onServerCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest)
 {
+  Q_UNUSED(ARequest);
   if (FRemoveRequests.contains(AId))
   {
     IArchiveHeader header = FRemoveRequests.take(AId);
@@ -1116,14 +1111,10 @@ void ViewHistoryWindow::onApplyFilterClicked()
   if (ui.dedStart->date() <= ui.dedEnd->date())
   {
     IArchiveFilter filter = FFilter;
-    int index = ui.cmbContact->currentIndex();
-    if (index>=0 && ui.cmbContact->itemText(index)==ui.cmbContact->currentText())
-      filter.with = ui.cmbContact->itemData(ui.cmbContact->currentIndex()).toString();
-    else
-      filter.with = ui.cmbContact->currentText();
+    filter.with = ui.cmbContact->itemData(ui.cmbContact->currentIndex()).toString();
     filter.start = ui.dedStart->dateTime();
     filter.end = ui.dedEnd->dateTime();
-    filter.body.setPattern(ui.lneText->text());
+    filter.body.setPattern(ui.lneSearch->text());
     filter.body.setCaseSensitivity(Qt::CaseInsensitive);
     setFilter(filter);
   }

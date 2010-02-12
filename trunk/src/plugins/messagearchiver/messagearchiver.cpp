@@ -1118,9 +1118,9 @@ QString MessageArchiver::gateNick(const Jid &AStreamJid, const Jid &AContactJid)
     Jid gcontactJid = gateJid(AContactJid.bare());
     foreach(IRosterItem ritem, roster->rosterItems())
       if (ritem.itemJid.pNode()==AContactJid.pNode() && gcontactJid==gateJid(ritem.itemJid))
-        return ritem.name.isEmpty() ? (ritem.itemJid.node().isEmpty() ? ritem.itemJid.domain() : ritem.itemJid.node()) : ritem.name;
+        return ritem.name.isEmpty() ? ritem.itemJid.bare() : ritem.name;
   }
-  return AContactJid.node().isEmpty() ? AContactJid.domain() : AContactJid.node();
+  return AContactJid.bare();
 }
 
 QList<Message> MessageArchiver::findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const
