@@ -1,7 +1,10 @@
-FORMS = clientinfodialog.ui
+FORMS = clientinfodialog.ui \
+        miscoptionswidget.ui
 
 HEADERS = clientinfo.h \
-          clientinfodialog.h
+          clientinfodialog.h \
+          miscoptionswidget.h
 
 SOURCES = clientinfo.cpp \
-          clientinfodialog.cpp
+          clientinfodialog.cpp \
+          miscoptionswidget.cpp

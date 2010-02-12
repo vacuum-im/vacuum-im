@@ -147,7 +147,7 @@ QWidget *SettingsPlugin::optionsWidget(const QString &ANode, int &AOrder)
 {
   if (ANode == ON_MISC)
   {
-    AOrder = OWO_MISC;
+    AOrder = OWO_MISC_AUTOSTART;
     MiscOptionsWidget *widget = new MiscOptionsWidget;
     connect(this,SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
     connect(widget,SIGNAL(applied()),this,SIGNAL(optionsAccepted()));
