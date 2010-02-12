@@ -93,7 +93,7 @@ protected:
   void processRequests(const QList<IArchiveRequest> &ARequests);
   void processHeaders(const QList<IArchiveHeader> &AHeaders);
   void processCollection(const IArchiveCollection &ACollection, bool AAppend = false);
-  void insertFilterWith(const IArchiveHeader &AHeader);
+  void insertContact(const Jid &AContactJid);
   void updateFilterWidgets();
   void clearModel();
   void rebuildModel();

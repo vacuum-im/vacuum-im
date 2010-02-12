@@ -483,6 +483,10 @@
         <source>Subject: %1</source>
         <translation>Тема: %1</translation>
     </message>
+    <message>
+        <source> &lt;All contacts&gt; </source>
+        <translation> &lt;Все контакты&gt; </translation>
+    </message>
 </context>
 <context>
     <name>ViewHistoryWindowClass</name>
@@ -499,10 +503,6 @@
         <translation>По:</translation>
     </message>
     <message>
-        <source>Text:</source>
-        <translation>Текст:</translation>
-    </message>
-    <message>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
@@ -513,6 +513,10 @@
     <message>
         <source>Conversations</source>
         <translation>Разговоры</translation>
+    </message>
+    <message>
+        <source>Search:</source>
+        <translation>Поиск:</translation>
     </message>
 </context>
 </TS>
