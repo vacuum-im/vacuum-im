@@ -237,7 +237,7 @@ void AdiumMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
   StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
   if (view)
   {
-    QString variant = FResourcePath+"/"+QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"../main").toString() : AVariant));
+    QString variant = QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"../main").toString() : AVariant));
     escapeStringForScript(variant);
     QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(variant);
     view->page()->mainFrame()->evaluateJavaScript(script);
@@ -269,10 +269,10 @@ QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOption
       variant = FInfo.value(MSIV_DEFAULT_VARIANT,"../main").toString();
     variant = QDir::cleanPath(QString("Variants/%1.css").arg(variant));
 
-    html.replace(html.indexOf("%@"),2,FResourcePath+"/");
+    html.replace(html.indexOf("%@"),2,QUrl::fromLocalFile(FResourcePath).toString()+"/");
     if (!usingCustomTemplate || version()>=3)
       html.replace(html.indexOf("%@"),2, version()>=3 ? "@import url( \"main.css\" );" : "");
-    html.replace(html.indexOf("%@"),2,FResourcePath+"/"+variant);
+    html.replace(html.indexOf("%@"),2,variant);
     html.replace(html.indexOf("%@"),2,headerHTML);
     html.replace(html.indexOf("%@"),2,footerHTML);
   }
@@ -285,8 +285,8 @@ void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOpt
   AHtml.replace("%sourceName%",AOptions.extended.value(MSO_ACCOUNT_NAME).toString());
   AHtml.replace("%destinationName%",AOptions.extended.value(MSO_CHAT_NAME).toString());
   AHtml.replace("%destinationDisplayName%",AOptions.extended.value(MSO_CHAT_NAME).toString());
-  AHtml.replace("%outgoingIconPath%",AOptions.extended.value(MSO_SELF_AVATAR,FResourcePath+"/outgoing_icon.png").toString());
-  AHtml.replace("%incomingIconPath%",AOptions.extended.value(MSO_CONTACT_AVATAR,FResourcePath+"/incoming_icon.png").toString());
+  AHtml.replace("%outgoingIconPath%",AOptions.extended.value(MSO_SELF_AVATAR,"outgoing_icon.png").toString());
+  AHtml.replace("%incomingIconPath%",AOptions.extended.value(MSO_CONTACT_AVATAR,"incoming_icon.png").toString());
   AHtml.replace("%timeOpened%",Qt::escape(AOptions.extended.value(MSO_START_TIME).toDateTime().toString()));
   AHtml.replace("%serviceIconImg%", "");
 
@@ -395,9 +395,9 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
   QString avatar = AOptions.senderAvatar;
   if (!QFile::exists(avatar))
   {
-    avatar = FResourcePath+(isDirectionIn ? "/Incoming/buddy_icon.png" : "/Outgoing/buddy_icon.png");
+    avatar = isDirectionIn ? "Incoming/buddy_icon.png" : "Outgoing/buddy_icon.png";
     if (!isDirectionIn && !QFile::exists(avatar))
-      avatar = FResourcePath+"/Incoming/buddy_icon.png";
+      avatar = "Incoming/buddy_icon.png";
   }
   AHtml.replace("%userIconPath%",avatar);
 
