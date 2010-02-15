@@ -1,7 +1,5 @@
 #include "roster.h"
 
-#include <QtDebug>
-
 #include <QSet>
 #include <QFile>
 
@@ -18,6 +16,7 @@ Roster::Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor) : Q
   FStanzaProcessor = AStanzaProcessor;
 
   FOpened = false;
+  FVerSupported = false;
   setStanzaHandlers();
 
   connect(FXmppStream->instance(),SIGNAL(opened()),SLOT(onStreamOpened()));
@@ -32,6 +31,15 @@ Roster::~Roster()
 {
   clearItems();
   removeStanzaHandlers();
+}
+
+bool Roster::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+  Q_UNUSED(AHandlerId);
+  Q_UNUSED(AStreamJid);
+  Q_UNUSED(AStanza);
+  Q_UNUSED(AAccept);
+  return false;
 }
 
 bool Roster::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
@@ -114,6 +122,24 @@ void Roster::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaI
   Q_UNUSED(AStreamJid);
   if (AStanzaId==FDelimRequestId || AStanzaId == FOpenRequestId)
     FXmppStream->abort(tr("Roster request failed"));
+}
+
+bool Roster::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
+{
+  if (!isOpen() && FXmppStream==AXmppStream && AOrder==XSHO_XMPP_FEATURE)
+  {
+    if (AStanza.element().nodeName()=="stream:features" && !AStanza.firstElement("ver",NS_FEATURE_ROSTER_VER).isNull())
+      FVerSupported = true;
+  }
+  return false;
+}
+
+bool Roster::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
+{
+  Q_UNUSED(AXmppStream);
+  Q_UNUSED(AStanza);
+  Q_UNUSED(AOrder);
+  return false;
 }
 
 IRosterItem Roster::rosterItem(const Jid &AItemJid) const
@@ -471,14 +497,6 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
         {
           removeRosterItem(itemJid);
         }
-        else
-        {
-          qDebug() << "IGNORED ROSTER ITEM WITH INVALID SUBSCRIPTION:" << itemJid.full() << subs;
-        }
-      }
-      else
-      {
-        qDebug() << "IGNORED ROSTER ITEM WITH INVALID JID:" << itemJid.full();
       }
       itemElem = itemElem.nextSiblingElement("item");  
     }
@@ -524,7 +542,12 @@ void Roster::requestRosterItems()
 {
   Stanza query("iq");
   query.setType("get").setId(FStanzaProcessor->newId());
-  query.addElement("query",NS_JABBER_ROSTER).setAttribute("ver",FRosterVer); 
+
+  if (!FVerSupported)
+    query.addElement("query",NS_JABBER_ROSTER);
+  else
+    query.addElement("query",NS_JABBER_ROSTER).setAttribute("ver",FRosterVer);
+
   if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,REQUEST_TIMEOUT))
     FOpenRequestId = query.id();
 }
@@ -543,16 +566,20 @@ void Roster::setStanzaHandlers()
   shandle.conditions.clear();
   shandle.conditions.append(SHC_PRESENCE);
   FSHISubscription = FStanzaProcessor->insertStanzaHandle(shandle);
+
+  FXmppStream->insertXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
 }
 
 void Roster::removeStanzaHandlers()
 {
   FStanzaProcessor->removeStanzaHandle(FSHIRosterPush); 
   FStanzaProcessor->removeStanzaHandle(FSHISubscription); 
+  FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
 }
 
 void Roster::onStreamOpened()
 {
+  FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
   requestGroupDelimiter();
 }
 
@@ -563,6 +590,8 @@ void Roster::onStreamClosed()
     FOpened = false;
     emit closed();
   }
+  FVerSupported = false;
+  FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
 }
 
 void Roster::onStreamJidAboutToBeChanged(const Jid &AAfter)

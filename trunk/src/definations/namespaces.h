@@ -38,6 +38,7 @@
 #define NS_PROTOCOL_COMPRESS                    "http://jabber.org/protocol/compress"
 #define NS_FEATURE_STARTTLS                     "urn:ietf:params:xml:ns:xmpp-tls"
 #define NS_FEATURE_REGISTER                     "http://jabber.org/features/iq-register"
+#define NS_FEATURE_ROSTER_VER                   "urn:xmpp:features:rosterver"
 
 #define NS_MUC                                  "http://jabber.org/protocol/muc"
 #define NS_MUC_USER                             "http://jabber.org/protocol/muc#user"
