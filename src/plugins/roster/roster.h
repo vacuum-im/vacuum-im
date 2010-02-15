@@ -2,27 +2,33 @@
 #define ROSTER_H
 
 #include <definations/namespaces.h>
+#include <definations/xmppstanzahandlerorders.h>
 #include <interfaces/iroster.h>
 #include <interfaces/istanzaprocessor.h>
+#include <interfaces/ixmppstreams.h>
 
 class Roster :
   public QObject,
   public IRoster,
-  private IStanzaHandler,
-  private IStanzaRequestOwner
+  public IStanzaHandler,
+  public IStanzaRequestOwner,
+  public IXmppStanzaHadler
 {
   Q_OBJECT;
-  Q_INTERFACES(IRoster IStanzaHandler IStanzaRequestOwner);
+  Q_INTERFACES(IRoster IStanzaHandler IStanzaRequestOwner IXmppStanzaHadler);
 public:
   Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor);
   ~Roster();
   virtual QObject *instance() { return this; }
   //IStanzaProcessorHandler
-  virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza &/*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
   virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IStanzaProcessorIqOwner
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
+  //IXmppStanzaHadler
+  virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
+  virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
   //IRoster
   virtual Jid streamJid() const { return FXmppStream->streamJid(); }
   virtual IXmppStream *xmppStream() const { return FXmppStream; }
@@ -77,6 +83,7 @@ private:
   IStanzaProcessor *FStanzaProcessor;
 private:
   bool FOpened;
+  bool FVerSupported;
   int FSHIRosterPush;
   int FSHISubscription;
   QString FOpenRequestId;
