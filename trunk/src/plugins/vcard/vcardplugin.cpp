@@ -369,7 +369,12 @@ void VCardPlugin::onShowVCardDialogByChatWindowAction(bool)
     IToolBarWidget *toolBarWidget = qobject_cast<IToolBarWidget *>(action->parent());
     if (toolBarWidget && toolBarWidget->viewWidget())
     {
-      showVCardDialog(toolBarWidget->viewWidget()->streamJid(), toolBarWidget->viewWidget()->contactJid());
+      bool isMucUser = false;
+      Jid contactJid = toolBarWidget->viewWidget()->contactJid();
+      QList<IMultiUserChatWindow *> windows = FMultiUserChatPlugin!=NULL ? FMultiUserChatPlugin->multiChatWindows() : QList<IMultiUserChatWindow *>();
+      for (int i=0; !isMucUser && i<windows.count(); i++)
+        isMucUser = windows.at(i)->findChatWindow(contactJid)!=NULL;
+      showVCardDialog(toolBarWidget->viewWidget()->streamJid(), isMucUser ? contactJid : contactJid.bare());
     }
   }
 }
