@@ -205,10 +205,8 @@ void Emoticons::createIconsetUrls()
 
 SelectIconMenu *Emoticons::createSelectIconMenu(const QString &ASubStorage, QWidget *AParent)
 {
-  SelectIconMenu *menu = new SelectIconMenu(AParent);
-  menu->setIconset(ASubStorage);
-  connect(menu->instance(),SIGNAL(iconSelected(const QString &, const QString &)),
-    SLOT(onIconSelected(const QString &, const QString &)));
+  SelectIconMenu *menu = new SelectIconMenu(ASubStorage, AParent);
+  connect(menu->instance(),SIGNAL(iconSelected(const QString &, const QString &)), SLOT(onIconSelected(const QString &, const QString &)));
   connect(menu->instance(),SIGNAL(destroyed(QObject *)),SLOT(onSelectIconMenuDestroyed(QObject *)));
   return menu;
 }

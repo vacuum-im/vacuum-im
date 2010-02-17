@@ -19,7 +19,6 @@
 #include <interfaces/isettings.h>
 #include <utils/iconstorage.h>
 #include <utils/menu.h>
-#include "selecticonwidget.h"
 #include "selecticonmenu.h"
 #include "emoticonsoptions.h"
 

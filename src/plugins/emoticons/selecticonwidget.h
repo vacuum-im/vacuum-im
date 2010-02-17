@@ -1,11 +1,13 @@
 #ifndef SELECTICONWIDGET_H
 #define SELECTICONWIDGET_H
 
-#include <QWidget>
+#include <QMap>
 #include <QLabel>
 #include <QEvent>
 #include <QGridLayout>
 #include <utils/iconstorage.h>
+
+#include <QMainWindow>
 
 class SelectIconWidget : 
   public QWidget
@@ -14,7 +16,6 @@ class SelectIconWidget :
 public:
   SelectIconWidget(IconStorage *AStorage, QWidget *AParent = NULL);
   ~SelectIconWidget();
-  QString iconset() const { return FStorage->subStorage(); }
 signals:
   void iconSelected(const QString &ASubStorage, const QString &AIconKey);
 protected:
@@ -22,11 +23,10 @@ protected:
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
-  QLabel *FCurrent;
   QLabel *FPressed;
   QGridLayout *FLayout;
   IconStorage *FStorage;
-  QHash<QLabel *, QString> FKeyByLabel;
+  QMap<QLabel *, QString> FKeyByLabel;
 };
 
 #endif // SELECTICONWIDGET_H
