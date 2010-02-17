@@ -1,11 +1,13 @@
 #include "selecticonmenu.h"
 
-SelectIconMenu::SelectIconMenu(QWidget *AParent) : Menu(AParent)
+SelectIconMenu::SelectIconMenu(const QString &AIconset, QWidget *AParent) : Menu(AParent)
 {
-  FWidget = NULL;
   FStorage = NULL;
+  setIconset(AIconset);
+
   FLayout = new QVBoxLayout(this);
   FLayout->setMargin(0);
+  setAttribute(Qt::WA_AlwaysShowToolTips,true);
   connect(this,SIGNAL(aboutToShow()),SLOT(onAboutToShow()));
 }
 
@@ -14,24 +16,9 @@ SelectIconMenu::~SelectIconMenu()
 
 }
 
-Action *SelectIconMenu::menuAction()
-{
-  return Menu::menuAction();
-}
-
-void SelectIconMenu::setIcon(const QIcon &AIcon)
-{
-  Menu::setIcon(AIcon);
-}
-
-void SelectIconMenu::setTitle(const QString &ATitle)
-{
-  Menu::setTitle(ATitle);
-}
-
 QString SelectIconMenu::iconset() const
 {
-  return FStorage!=NULL ? FStorage->subStorage() : "";
+  return FStorage!=NULL ? FStorage->subStorage() : QString::null;
 }
 
 void SelectIconMenu::setIconset(const QString &ASubStorage)
@@ -40,42 +27,19 @@ void SelectIconMenu::setIconset(const QString &ASubStorage)
   {
     delete FStorage;
     FStorage = new IconStorage(RSR_STORAGE_EMOTICONS,ASubStorage,this);
-    QString firstKey = FStorage->fileKeys().value(0);
-    FStorage->insertAutoIcon(this,firstKey);
+    FStorage->insertAutoIcon(this,FStorage->fileKeys().value(0));
   }
 }
 
 QSize SelectIconMenu::sizeHint() const
 {
-  return FSizeHint;
-}
-
-void SelectIconMenu::createWidget()
-{
-  destroyWidget();
-  FWidget = new SelectIconWidget(FStorage,this);
-  FLayout->addWidget(FWidget);
-  FSizeHint = FLayout->sizeHint();
-  connect(FWidget,SIGNAL(iconSelected(const QString &, const QString &)),SIGNAL(iconSelected(const QString &, const QString &)));
-}
-
-void SelectIconMenu::destroyWidget()
-{
-  if (FWidget)
-  {
-    FWidget->deleteLater();
-    FWidget = NULL;
-  }
-}
-
-void SelectIconMenu::hideEvent(QHideEvent *AEvent)
-{
-  destroyWidget();
-  Menu::hideEvent(AEvent);
+  return FLayout->sizeHint();
 }
 
 void SelectIconMenu::onAboutToShow()
 {
-  createWidget();
+  QWidget *widget = new SelectIconWidget(FStorage,this);
+  FLayout->addWidget(widget);
+  connect(this,SIGNAL(aboutToHide()),widget,SLOT(deleteLater()));
+  connect(widget,SIGNAL(iconSelected(const QString &, const QString &)),SIGNAL(iconSelected(const QString &, const QString &)));
 }
-
