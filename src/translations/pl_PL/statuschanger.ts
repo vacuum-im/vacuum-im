@@ -187,5 +187,9 @@
         <source>Status</source>
         <translation>Status</translation>
     </message>
+    <message>
+        <source>Connecting...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
