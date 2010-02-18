@@ -7,6 +7,7 @@
 #define STATUSCHANGER_UUID "{F0D57BD2-0CD4-4606-9CEE-15977423F8DC}"
 
 #define STATUS_NULL_ID                      0
+#define STATUS_CONNECTING_ID                -3
 #define STATUS_ERROR_ID                     -2
 #define STATUS_MAIN_ID                      -1
 

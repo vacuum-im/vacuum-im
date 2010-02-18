@@ -8,10 +8,9 @@
 #define AVN_DEFAULT_LANG          "defaultLang"
 #define AVN_CONNECTION_ID         "connectionId"
 #define AVN_REGISTER_ON_CONNECT   "registerOnConnect"
-#define AVN_LAST_ONLINE_STATUS    "statusChanger:lastOnlineStatus"
 #define AVN_IS_MAIN_STATUS        "statusChanger:isMainStatus"
+#define AVN_LAST_ONLINE_STATUS    "statusChanger:lastOnlineStatus"
 #define AVN_AUTO_CONNECT          "statusChanger:autoConnect"
 #define AVN_AUTO_RECONNECT        "statusChanger:autoReconnect"
-#define AVN_RECONNECT_TIME        "statusChanger:reconnectTime"
 
 #endif
