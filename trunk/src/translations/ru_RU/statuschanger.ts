@@ -187,5 +187,9 @@
         <source>Allows to change the status in Jabber network</source>
         <translation>Позволяет изменять статус в джаббер сети</translation>
     </message>
+    <message>
+        <source>Connecting...</source>
+        <translation>Подключение...</translation>
+    </message>
 </context>
 </TS>
