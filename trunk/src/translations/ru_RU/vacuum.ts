@@ -34,10 +34,6 @@
         <translation>Конфликт с плагином %1</translation>
     </message>
     <message>
-        <source>Plugins directory not fount</source>
-        <translation>Директория плагинов не найдена</translation>
-    </message>
-    <message>
         <source>Initialization failed</source>
         <translation>Инициализация завершилась с ошибкой</translation>
     </message>
@@ -52,6 +48,10 @@
     <message>
         <source>About the program</source>
         <translation>О Программе</translation>
+    </message>
+    <message>
+        <source>Plugins directory not found</source>
+        <translation>Директория с плагинами не найдена</translation>
     </message>
 </context>
 <context>

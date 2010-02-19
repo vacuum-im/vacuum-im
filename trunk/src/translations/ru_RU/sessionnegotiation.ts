@@ -73,7 +73,7 @@
     </message>
     <message>
         <source>Enable Message Receipts?</source>
-        <translation>Разрешить множественную адресацию?</translation>
+        <translation>Разрешить уведомления о доставке?</translation>
     </message>
     <message>
         <source>Session renegotiation</source>
