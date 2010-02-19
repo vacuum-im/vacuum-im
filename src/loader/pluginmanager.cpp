@@ -356,7 +356,7 @@ void PluginManager::loadPlugins()
   }
   else
   {
-    qDebug() << tr("Plugins directory not fount");
+    qDebug() << tr("Plugins directory not found");
     quit();
   }
 }

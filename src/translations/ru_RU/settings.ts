@@ -5,7 +5,7 @@
     <name>MiscOptionsWidgetClass</name>
     <message>
         <source>Autorun on system startup</source>
-        <translation>Автоматически запустать при старте системы</translation>
+        <translation>Автоматически запускать при старте системы</translation>
     </message>
 </context>
 <context>

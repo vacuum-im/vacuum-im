@@ -34,10 +34,6 @@
         <translation>Konflikt z wtyczką %1</translation>
     </message>
     <message>
-        <source>Plugins directory not fount</source>
-        <translation>Nie znaleziono folderu z wtyczkami</translation>
-    </message>
-    <message>
         <source>Initialization failed</source>
         <translation>Inicjalizacja zakończona błędem</translation>
     </message>
@@ -52,6 +48,10 @@
     <message>
         <source>About the program</source>
         <translation>O programie</translation>
+    </message>
+    <message>
+        <source>Plugins directory not found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
