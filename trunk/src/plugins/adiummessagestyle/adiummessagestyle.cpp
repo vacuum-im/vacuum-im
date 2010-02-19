@@ -75,7 +75,6 @@ QList<QWidget *> AdiumMessageStyle::styleWidgets() const
 QWidget *AdiumMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
 {
   StyleViewer *view = new StyleViewer(AParent);
-  view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
   changeOptions(view,AOptions,true);
   return view;
 }
