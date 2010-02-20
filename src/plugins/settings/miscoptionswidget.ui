@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MiscOptionsWidgetClass</class>
- <widget class="QWidget" name="MiscOptionsWidgetClass" >
-  <property name="geometry" >
+ <widget class="QWidget" name="MiscOptionsWidgetClass">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,23 +10,20 @@
     <height>22</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
-   <property name="margin" >
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="margin">
     <number>0</number>
    </property>
    <item>
-    <widget class="QCheckBox" name="chbAutorun" >
-     <property name="text" >
+    <widget class="QCheckBox" name="chbAutorun">
+     <property name="text">
       <string>Autorun on system startup</string>
-     </property>
-     <property name="tristate" >
-      <bool>true</bool>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>
