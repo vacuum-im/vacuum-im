@@ -88,7 +88,7 @@ protected:
   QByteArray loadAvatarFromVCard(const Jid &AContactJid) const;
   void updatePresence(const Jid &AStreamJid) const;
   void updateDataHolder(const Jid &AContactJid = Jid());
-  bool updateVCardAvatar(const Jid &AContactJid, const QString &AHash);
+  bool updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bool AFromVCard);
   bool updateIqAvatar(const Jid &AContactJid, const QString &AHash);
 protected slots:
   void onStreamOpened(IXmppStream *AXmppStream);
@@ -114,10 +114,11 @@ private:
 private:
   QMap<Jid, int> FSHIPresenceIn;
   QMap<Jid, int> FSHIPresenceOut;
-  QMap<Jid, QString> FVCardAvatars;
+  QHash<Jid, QString> FVCardAvatars;
+  QMultiMap<Jid, Jid> FBlockingResources;
 private:
   QMap<Jid, int> FSHIIqAvatarIn;
-  QMap<Jid, QString> FIqAvatars;
+  QHash<Jid, QString> FIqAvatars;
   QMap<QString, Jid> FIqAvatarRequests;
 private:
   QMap<Jid, QString> FCustomPictures;
