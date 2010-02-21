@@ -10,6 +10,7 @@ OptionsWidget::OptionsWidget(INotifications *ANotifications, QWidget *AParent) :
   ui.chbEnableTrayIcons->setChecked(FNotifications->checkOption(INotifications::EnableTrayIcons));
   ui.chbEnableSounds->setChecked(FNotifications->checkOption(INotifications::EnableSounds));
   ui.chbEnableAutoActivate->setChecked(FNotifications->checkOption(INotifications::EnableAutoActivate));
+  ui.chbExpandRosterGroups->setChecked(FNotifications->checkOption(INotifications::ExpandRosterGroups));
 }
 
 OptionsWidget::~OptionsWidget()
@@ -33,7 +34,7 @@ void OptionsWidget::apply()
   FNotifications->setOption(INotifications::EnableTrayIcons,ui.chbEnableTrayIcons->isChecked());
   FNotifications->setOption(INotifications::EnableSounds,ui.chbEnableSounds->isChecked());
   FNotifications->setOption(INotifications::EnableAutoActivate,ui.chbEnableAutoActivate->isChecked());
+  FNotifications->setOption(INotifications::ExpandRosterGroups,ui.chbExpandRosterGroups->isChecked());
 
   emit optionsAccepted();
 }
-

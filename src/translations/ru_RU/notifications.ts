@@ -88,5 +88,9 @@
         <source>Activate</source>
         <translation>Открыть</translation>
     </message>
+    <message>
+        <source>Expand contact groups in roster</source>
+        <translation>Раскрывать группы контакта в контакт-листе</translation>
+    </message>
 </context>
 </TS>

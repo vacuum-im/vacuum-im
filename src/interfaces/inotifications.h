@@ -29,7 +29,8 @@ public:
     EnableTrayIcons       = 0x04,
     EnableTrayActions     = 0x08,
     EnableSounds          = 0x10,
-    EnableAutoActivate    = 0x20
+    EnableAutoActivate    = 0x20,
+    ExpandRosterGroups    = 0x40
   };
 public:
   virtual QObject *instance() =0;
