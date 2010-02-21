@@ -176,13 +176,12 @@ int Notifications::appendNotification(const INotification &ANotification)
   QIcon icon = qvariant_cast<QIcon>(record.notification.data.value(NDR_ICON));
   QString toolTip = record.notification.data.value(NDR_TOOLTIP).toString();
   
-  if (FRostersModel && FRostersViewPlugin && checkOption(INotifications::EnableRosterIcons) && 
-    (record.notification.kinds & INotification::RosterIcon)>0)
+  if (FRostersModel && FRostersViewPlugin && checkOption(INotifications::EnableRosterIcons) && (record.notification.kinds & INotification::RosterIcon)>0)
   {
     Jid streamJid = record.notification.data.value(NDR_ROSTER_STREAM_JID).toString();
     Jid contactJid = record.notification.data.value(NDR_ROSTER_CONTACT_JID).toString();
     int order = record.notification.data.value(NDR_ROSTER_NOTIFY_ORDER).toInt();
-    int flags = IRostersView::LabelBlink|IRostersView::LabelVisible;
+    int flags = IRostersView::LabelBlink|IRostersView::LabelVisible|IRostersView::LabelExpandParents;
     QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,true);
     record.rosterId = FRostersViewPlugin->rostersView()->appendNotify(indexes,order,icon,toolTip,flags);
   }

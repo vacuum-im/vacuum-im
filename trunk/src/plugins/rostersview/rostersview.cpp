@@ -320,14 +320,18 @@ void RostersView::updateIndexLabel(int ALabelId, const QVariant &ALabel, int AFl
       QList<QVariant> ids = index->data(RDR_LABEL_ID).toList();
       QList<QVariant> labels = index->data(RDR_LABEL_VALUES).toList();
       QList<QVariant> flags = index->data(RDR_LABEL_FLAGS).toList();
+      
       int i = 0;
-      while (ids.at(i).toInt()!=ALabelId) i++;
+      while (ids.at(i).toInt() != ALabelId) 
+        i++;
+
       labels[i] = ALabel;
       flags[i] = AFlags;
       if (AFlags & IRostersView::LabelBlink)
         appendBlinkLabel(ALabelId);
       else
         removeBlinkLabel(ALabelId);
+
       index->setData(RDR_LABEL_VALUES,labels);
       index->setData(RDR_LABEL_FLAGS,flags);
     }
@@ -342,16 +346,21 @@ void RostersView::insertIndexLabel(int ALabelId, IRosterIndex *AIndex)
     QList<QVariant> labels = AIndex->data(RDR_LABEL_VALUES).toList();
     QList<QVariant> orders = AIndex->data(RDR_LABEL_ORDERS).toList();
     QList<QVariant> flags = AIndex->data(RDR_LABEL_FLAGS).toList();
+    
     int i = 0;
     int order = FIndexLabelOrders.value(ALabelId);
-    while (i<orders.count() && orders.at(i).toInt() < order) i++;
+    while (i<orders.count() && orders.at(i).toInt() < order) 
+      i++;
+    
     ids.insert(i,ALabelId);
     orders.insert(i,order);
     labels.insert(i,FIndexLabels.value(ALabelId)); 
     flags.insert(i,FIndexLabelFlags.value(ALabelId));
     FIndexLabelIndexes[ALabelId] += AIndex;
-    if (FIndexLabelFlags.value(ALabelId) && EnsureVisible > 0)
+
+    if ((FIndexLabelFlags.value(ALabelId) & LabelExpandParents) > 0)
       expandIndexParents(AIndex);
+
     AIndex->setData(RDR_LABEL_ID,ids);
     AIndex->setData(RDR_LABEL_VALUES,labels);
     AIndex->setData(RDR_LABEL_FLAGS,flags);
@@ -367,15 +376,21 @@ void RostersView::removeIndexLabel(int ALabelId, IRosterIndex *AIndex)
     QList<QVariant> labels = AIndex->data(RDR_LABEL_VALUES).toList();
     QList<QVariant> orders = AIndex->data(RDR_LABEL_ORDERS).toList();
     QList<QVariant> flags = AIndex->data(RDR_LABEL_FLAGS).toList();
+
     int i = 0;
-    while (i<ids.count() && ids.at(i).toInt()!=ALabelId) i++;
+    while (i<ids.count() && ids.at(i).toInt()!=ALabelId) 
+      i++;
+
     ids.removeAt(i);
     orders.removeAt(i);
     labels.removeAt(i);
     flags.removeAt(i);
-    FIndexLabelIndexes[ALabelId] -= AIndex;
-    if (FIndexLabelIndexes[ALabelId].isEmpty())
+
+    if (FIndexLabelIndexes.value(ALabelId).count() > 1)
+      FIndexLabelIndexes[ALabelId] -= AIndex;
+    else
       FIndexLabelIndexes.remove(ALabelId);
+
     AIndex->setData(RDR_LABEL_ORDERS,orders);
     AIndex->setData(RDR_LABEL_FLAGS,flags);
     AIndex->setData(RDR_LABEL_VALUES,labels);

@@ -28,14 +28,15 @@ class IRostersView
 {
 public:
   enum Option {
-    ShowOfflineContacts           =1,
-    ShowOnlineFirst               =2,
-    ShowResource                  =4,
-    ShowStatusText                =8
+    ShowOfflineContacts           =0x01,
+    ShowOnlineFirst               =0x02,
+    ShowResource                  =0x04,
+    ShowStatusText                =0x08
   };
   enum LabelFlags {
-    LabelBlink                    =1,
-    LabelVisible                  =2
+    LabelBlink                    =0x01,
+    LabelVisible                  =0x02,
+    LabelExpandParents            =0x04
   };
 public:
   //--RostersModel
