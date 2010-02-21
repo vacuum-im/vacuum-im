@@ -9,6 +9,7 @@
 #define SVN_ENABLE_TRAYACTIONS          "enableTrayActions"
 #define SVN_ENABLE_SOUNDS               "enableSounds"
 #define SVN_ENABLE_AUTO_ACTIVATE        "enableAutoActivate"
+#define SVN_EXPAND_ROSTER_GROUPS        "expandRosterGroups"
 
 Notifications::Notifications()
 {
@@ -181,7 +182,8 @@ int Notifications::appendNotification(const INotification &ANotification)
     Jid streamJid = record.notification.data.value(NDR_ROSTER_STREAM_JID).toString();
     Jid contactJid = record.notification.data.value(NDR_ROSTER_CONTACT_JID).toString();
     int order = record.notification.data.value(NDR_ROSTER_NOTIFY_ORDER).toInt();
-    int flags = IRostersView::LabelBlink|IRostersView::LabelVisible|IRostersView::LabelExpandParents;
+    int flags = IRostersView::LabelBlink|IRostersView::LabelVisible;
+    flags = flags | (checkOption(ExpandRosterGroups) ? IRostersView::LabelExpandParents : 0);
     QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,true);
     record.rosterId = FRostersViewPlugin->rostersView()->appendNotify(indexes,order,icon,toolTip,flags);
   }
@@ -466,6 +468,7 @@ void Notifications::onSettingsOpened()
   setOption(EnableTrayActions, settings->value(SVN_ENABLE_TRAYACTIONS,true).toBool());
   setOption(EnableSounds, settings->value(SVN_ENABLE_SOUNDS,true).toBool());
   setOption(EnableAutoActivate, settings->value(SVN_ENABLE_AUTO_ACTIVATE,true).toBool());
+  setOption(ExpandRosterGroups, settings->value(SVN_EXPAND_ROSTER_GROUPS,true).toBool());
 }
 
 void Notifications::onSettingsClosed()
@@ -477,6 +480,7 @@ void Notifications::onSettingsClosed()
   settings->setValue(SVN_ENABLE_TRAYACTIONS,checkOption(EnableTrayActions));
   settings->setValue(SVN_ENABLE_SOUNDS,checkOption(EnableSounds));
   settings->setValue(SVN_ENABLE_AUTO_ACTIVATE, checkOption(EnableAutoActivate));
+  settings->setValue(SVN_EXPAND_ROSTER_GROUPS, checkOption(ExpandRosterGroups));
 }
 
 Q_EXPORT_PLUGIN2(plg_notifications, Notifications)

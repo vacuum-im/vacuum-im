@@ -88,5 +88,9 @@
         <source>Activate</source>
         <translation>Aktywuj</translation>
     </message>
+    <message>
+        <source>Expand contact groups in roster</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
