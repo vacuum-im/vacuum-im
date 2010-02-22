@@ -45,8 +45,9 @@ void Gateways::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool Gateways::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+  Q_UNUSED(AInitOrder);
   IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
@@ -156,8 +157,9 @@ bool Gateways::initObjects()
   return true;
 }
 
-void Gateways::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
+  Q_UNUSED(AStreamJid);
   if (FPromptRequests.contains(AStanza.id()))
   {
     if (AStanza.type() == "result")
@@ -218,7 +220,7 @@ Action *Gateways::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_ADD_CONTACT);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_SERVICE_JID,ADiscoInfo.contactJid.full());
-    connect(action,SIGNAL(triggered(bool)),SLOT(onGatewayActionTriggered(bool)));
+    connect(action,SIGNAL(triggered(bool)),SLOT(onAddLegacyUserActionTriggered(bool)));
     return action;
   }
   return NULL;
@@ -390,7 +392,7 @@ QString Gateways::sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJi
     FPromptRequests.append(request.id());
     return request.id();
   }
-  return QString();
+  return QString::null;
 }
 
 QString Gateways::sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID)
@@ -404,7 +406,7 @@ QString Gateways::sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJ
     FUserJidRequests.append(request.id());
     return request.id();
   }
-  return QString();
+  return QString::null;
 }
 
 QDialog *Gateways::showAddLegacyContactDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent)
@@ -458,7 +460,7 @@ void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
   }
 }
 
-void Gateways::onGatewayActionTriggered(bool)
+void Gateways::onAddLegacyUserActionTriggered(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action)
@@ -539,7 +541,37 @@ void Gateways::onChangeActionTriggered(bool)
 
 void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-  if (AIndex->type() == RIT_AGENT)
+  if (AIndex->type() == RIT_STREAM_ROOT)
+  {
+    Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+    IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+    if (FDiscovery && presence && presence->isOpen())
+    {
+      Menu *addUserMenu = new Menu(AMenu);
+      addUserMenu->setTitle(tr("Add Legacy User"));
+      addUserMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_ADD_CONTACT);
+
+      foreach(IPresenceItem pitem, presence->presenceItems())
+      {
+        if (pitem.show!=IPresence::Error && pitem.itemJid.node().isEmpty() && FDiscovery->discoInfo(streamJid,pitem.itemJid).features.contains(NS_JABBER_GATEWAY))
+        {
+          Action *action = new Action(addUserMenu);
+          action->setText(pitem.itemJid.full());
+          action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,pitem.itemJid) : QIcon());
+          action->setData(ADR_STREAM_JID,streamJid.full());
+          action->setData(ADR_SERVICE_JID,pitem.itemJid.full());
+          connect(action,SIGNAL(triggered(bool)),SLOT(onAddLegacyUserActionTriggered(bool)));
+          addUserMenu->addAction(action,AG_DEFAULT,true);
+        }
+      }
+
+      if (!addUserMenu->isEmpty())
+        AMenu->addAction(addUserMenu->menuAction(), AG_RVCM_GATEWAYS_ADD_LEGACY_USER, true);
+      else
+        delete addUserMenu;
+    }
+  }
+  else if (AIndex->type() == RIT_AGENT)
   {
     Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
@@ -578,12 +610,12 @@ void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
     }
   }
 
-  if (FRosterPlugin && FVCardPlugin && (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT))
+  if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
   {
     Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     Jid contactJid = AIndex->data(RDR_JID).toString();
     IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
-    if (roster && roster->isOpen() && roster->rosterItem(contactJid).isValid && roster->rosterItem(contactJid.domain()).isValid)
+    if (FVCardPlugin && roster && roster->isOpen() && roster->rosterItem(contactJid).isValid)
     {
       Action *action = new Action(AMenu);
       action->setText(contactJid.node().isEmpty() ? tr("Resolve nick names") : tr("Resolve nick name"));
@@ -646,16 +678,18 @@ void Gateways::onRosterOpened(IRoster *ARoster)
   }
 }
 
-void Gateways::onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &/*AText*/)
+void Gateways::onRosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText)
 {
+  Q_UNUSED(AText);
   if (ASubsType==IRoster::Subscribed && FSubscribeServices.contains(ARoster->streamJid(),AItemJid))
   {
     sendLogPresence(ARoster->streamJid(),AItemJid,true);
   }
 }
 
-void Gateways::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &/*AAfter*/)
+void Gateways::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter)
 {
+  Q_UNUSED(AAfter);
   FKeepConnections.remove(ARoster->streamJid());
   FPrivateStorageKeep.remove(ARoster->streamJid());
 }
@@ -665,8 +699,9 @@ void Gateways::onPrivateStorateOpened(const Jid &AStreamJid)
   FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_SUBSCRIBE);
 }
 
-void Gateways::onPrivateStorageLoaded(const QString &/*AId*/, const Jid &AStreamJid, const QDomElement &AElement)
+void Gateways::onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
+  Q_UNUSED(AId);
   if (AElement.tagName() == PST_GATEWAYS_SERVICES && AElement.namespaceURI() == PSN_GATEWAYS_KEEP)
   {
     IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
@@ -749,8 +784,9 @@ void Gateways::onVCardReceived(const Jid &AContactJid)
   }
 }
 
-void Gateways::onVCardError(const Jid &AContactJid, const QString &/*AError*/)
+void Gateways::onVCardError(const Jid &AContactJid, const QString &AError)
 {
+  Q_UNUSED(AError);
   FResolveNicks.remove(AContactJid);
 }
 
@@ -813,8 +849,9 @@ void Gateways::onRegisterFields(const QString &AId, const IRegisterFields &AFiel
   }
 }
 
-void Gateways::onRegisterError(const QString &AId, const QString &/*AError*/)
+void Gateways::onRegisterError(const QString &AId, const QString &AError)
 {
+  Q_UNUSED(AError);
   FRegisterRequests.remove(AId);
 }
 
