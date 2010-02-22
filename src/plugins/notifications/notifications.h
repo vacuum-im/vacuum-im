@@ -5,6 +5,7 @@
 #include <QSound>
 #include <definations/notificationdataroles.h>
 #include <definations/actiongroups.h>
+#include <definations/toolbargroups.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -20,6 +21,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/isettings.h>
+#include <interfaces/imainwindow.h>
 #include <utils/action.h>
 #include "notifywidget.h"
 #include "optionswidget.h"
@@ -99,6 +101,7 @@ protected:
   int notifyIdByWidget(NotifyWidget *AWidget) const;
 protected slots:
   void onActivateDelayedActivations();
+  void onSoundOnOffActionTriggered(bool);
   void onTrayActionTriggered(bool);
   void onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId);
   void onRosterNotifyRemoved(IRosterIndex *AIndex, int ANotifyId);
@@ -119,7 +122,9 @@ private:
   IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
   ISettingsPlugin *FSettingsPlugin;
+  IMainWindowPlugin *FMainWindowPlugin;
 private:
+  Action *FSoundOnOff;
   Action *FActivateAll;
   Action *FRemoveAll;
   Menu *FNotifyMenu;

@@ -22,6 +22,7 @@ Notifications::Notifications()
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
   FSettingsPlugin = NULL;
+  FMainWindowPlugin = NULL;
 
   FActivateAll = NULL;
   FRemoveAll = NULL;
@@ -96,6 +97,10 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
   if (plugin)
     FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 
+  plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
+  if (plugin)
+    FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+
   plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
   {
@@ -112,6 +117,11 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 bool Notifications::initObjects()
 {
+  FSoundOnOff = new Action(this);
+  FSoundOnOff->setToolTip(tr("Enable/Disable notifications sound"));
+  FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, checkOption(EnableSounds) ? MNI_NOTIFICATIONS_SOUND_ON : MNI_NOTIFICATIONS_SOUND_OFF);
+  connect(FSoundOnOff,SIGNAL(triggered(bool)),SLOT(onSoundOnOffActionTriggered(bool)));
+
   FActivateAll = new Action(this);
   FActivateAll->setVisible(false);
   FActivateAll->setText(tr("Activate All Notifications"));
@@ -141,6 +151,12 @@ bool Notifications::initObjects()
     FTrayManager->addAction(FRemoveAll,AG_TMTM_NOTIFICATIONS,false);
     FTrayManager->addAction(FNotifyMenu->menuAction(),AG_TMTM_NOTIFICATIONS,false);
   }
+
+  if (FMainWindowPlugin)
+  {
+    FMainWindowPlugin->mainWindow()->topToolBarChanger()->insertAction(FSoundOnOff,TBG_MWTTB_NOTIFICATIONS_SOUND);
+  }
+
   return true;
 }
 
@@ -301,6 +317,10 @@ void Notifications::setOption(INotifications::Option AOption, bool AValue)
   if (checkOption(AOption) != AValue)
   {
     AValue ? FOptions |= AOption : FOptions &= ~AOption;
+    if (AOption == EnableSounds)
+    {
+      FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, AValue ? MNI_NOTIFICATIONS_SOUND_ON : MNI_NOTIFICATIONS_SOUND_OFF);
+    }
     emit optionChanged(AOption,AValue);
   }
 }
@@ -400,6 +420,11 @@ void Notifications::onActivateDelayedActivations()
   foreach(int notifyId, FDelayedActivations)
     activateNotification(notifyId);
   FDelayedActivations.clear();
+}
+
+void Notifications::onSoundOnOffActionTriggered(bool)
+{
+  setOption(EnableSounds, !checkOption(EnableSounds));
 }
 
 void Notifications::onTrayActionTriggered(bool)
