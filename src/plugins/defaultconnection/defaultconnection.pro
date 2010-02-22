@@ -3,4 +3,5 @@ include(defaultconnection.pri)
 include(../plugins.inc)
 
 include(../../thirdparty/jdns/jdns.pri)
-DEPENDPATH += ../../thirdparty/jdns
+DEPENDPATH  += ../../thirdparty/jdns
+INCLUDEPATH += ../../thirdparty/jdns
