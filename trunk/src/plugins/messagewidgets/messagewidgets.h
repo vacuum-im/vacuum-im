@@ -8,6 +8,7 @@
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
 #include <definations/widgeturlhandlerorders.h>
+#include <definations/toolbargroups.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/isettings.h>
@@ -117,10 +118,12 @@ signals:
   void optionsAccepted();
   void optionsRejected();
 protected:
+  void insertQuoteAction(IToolBarWidget *AWidget);
   void deleteWindows();
   void deleteStreamWindows(const Jid &AStreamJid);
 protected slots:
   void onViewWidgetUrlClicked(const QUrl &AUrl);
+  void onQuoteActionTriggered(bool);
   void onMessageWindowDestroyed();
   void onChatWindowDestroyed();
   void onTabWindowPageAdded(ITabWindowPage *APage);

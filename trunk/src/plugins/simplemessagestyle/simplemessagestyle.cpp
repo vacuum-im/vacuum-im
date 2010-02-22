@@ -8,6 +8,7 @@
 #include <QTextCursor>
 #include <QDomDocument>
 #include <QCoreApplication>
+#include <QTextDocumentFragment>
 
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
 
@@ -68,6 +69,12 @@ QString SimpleMessageStyle::senderColor(const QString &ASenderId) const
   if (!FSenderColors.isEmpty())
     return FSenderColors.at(qHash(ASenderId) % FSenderColors.count());
   return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
+}
+
+QString SimpleMessageStyle::selectedText(QWidget *AWidget) const
+{
+  StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+  return view!=NULL ? view->textCursor().selection().toPlainText() : QString::null;
 }
 
 bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)

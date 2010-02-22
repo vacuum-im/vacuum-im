@@ -147,6 +147,7 @@ IToolBarWidget *MessageWidgets::newToolBarWidget(IInfoWidget *AInfo, IViewWidget
 {
   IToolBarWidget *widget = new ToolBarWidget(AInfo,AView,AEdit,AReceivers);
   FCleanupHandler.add(widget->instance());
+  insertQuoteAction(widget);
   emit toolBarWidgetCreated(widget);
   return widget;
 }
@@ -426,6 +427,18 @@ void MessageWidgets::removeUrlHandler(IWidgetUrlHandler *AHandler, int AOrder)
   }
 }
 
+void MessageWidgets::insertQuoteAction(IToolBarWidget *AWidget)
+{
+  if (AWidget->viewWidget() && AWidget->editWidget())
+  {
+    Action *action = new Action(AWidget->instance());
+    action->setToolTip(tr("Quote selected text"));
+    action->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
+    connect(action,SIGNAL(triggered(bool)),SLOT(onQuoteActionTriggered(bool)));
+    AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_MESSAGEWIDGETS_QUOTE);
+  }
+}
+
 void MessageWidgets::deleteWindows()
 {
   foreach(ITabWindow *window, tabWindows())
@@ -453,6 +466,22 @@ void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
     for (QMap<int,IWidgetUrlHandler *>::const_iterator it = FUrlHandlers.constBegin(); it!=FUrlHandlers.constEnd(); it++)
       if (it.value()->widgetUrlOpen(widget,AUrl,it.key()))
         break;
+  }
+}
+
+void MessageWidgets::onQuoteActionTriggered(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  IToolBarWidget *widget = action!=NULL ? qobject_cast<IToolBarWidget *>(action->parent()) : NULL;
+  if (widget && widget->viewWidget() && widget->viewWidget()->messageStyle() && widget->editWidget())
+  {
+    QString quote = widget->viewWidget()->messageStyle()->selectedText(widget->viewWidget()->styleWidget()).trimmed();
+    if (!quote.isEmpty())
+    {
+      foreach(QString line, quote.split("\n"))
+        widget->editWidget()->textEdit()->textCursor().insertText("> "+line+"\n");
+      widget->editWidget()->textEdit()->setFocus();
+    }
   }
 }
 
