@@ -1,6 +1,7 @@
 #ifndef INOTIFICATIONS_H
 #define INOTIFICATIONS_H
 
+#include <QMap>
 #include <QIcon>
 #include <QImage>
 #include "../utils/jid.h"
@@ -18,7 +19,7 @@ struct INotification {
   };
   INotification() { kinds = 0; }
   uchar kinds;
-  QHash<int, QVariant> data;
+  QMap<int, QVariant> data;
 };
 
 class INotifications {
@@ -30,7 +31,8 @@ public:
     EnableTrayActions     = 0x08,
     EnableSounds          = 0x10,
     EnableAutoActivate    = 0x20,
-    ExpandRosterGroups    = 0x40
+    ExpandRosterGroups    = 0x40,
+    DisableSoundsWhenDND  = 0x80
   };
 public:
   virtual QObject *instance() =0;

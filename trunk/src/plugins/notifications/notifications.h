@@ -17,6 +17,8 @@
 #include <interfaces/iroster.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/istatusicons.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/istatuschanger.h>
 #include <interfaces/isettings.h>
 #include <utils/action.h>
 #include "notifywidget.h"
@@ -112,6 +114,7 @@ private:
   IAvatars *FAvatars;
   IRosterPlugin *FRosterPlugin;
   IStatusIcons *FStatusIcons;
+  IStatusChanger *FStatusChanger;
   ITrayManager *FTrayManager;
   IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;

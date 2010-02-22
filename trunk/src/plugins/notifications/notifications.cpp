@@ -10,12 +10,14 @@
 #define SVN_ENABLE_SOUNDS               "enableSounds"
 #define SVN_ENABLE_AUTO_ACTIVATE        "enableAutoActivate"
 #define SVN_EXPAND_ROSTER_GROUPS        "expandRosterGroups"
+#define SVN_DISABLE_SOUNDS_WHEN_DND     "disableSoundsWhenDND"
 
 Notifications::Notifications()
 {
   FAvatars = NULL;
   FRosterPlugin = NULL;
   FStatusIcons = NULL;
+  FStatusChanger = NULL;
   FTrayManager = NULL;
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
@@ -89,6 +91,10 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
   plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+
+  plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
+  if (plugin)
+    FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 
   plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
   if (plugin)
@@ -174,10 +180,12 @@ int Notifications::appendNotification(const INotification &ANotification)
   record.notification = ANotification;
   emit notificationAppend(notifyId, record.notification);
 
+  bool isDND = FStatusChanger!=NULL ? FStatusChanger->statusItemShow(STATUS_MAIN_ID)==IPresence::DoNotDisturb : false;
+
   QIcon icon = qvariant_cast<QIcon>(record.notification.data.value(NDR_ICON));
   QString toolTip = record.notification.data.value(NDR_TOOLTIP).toString();
   
-  if (FRostersModel && FRostersViewPlugin && checkOption(INotifications::EnableRosterIcons) && (record.notification.kinds & INotification::RosterIcon)>0)
+  if (FRostersModel && FRostersViewPlugin && checkOption(EnableRosterIcons) && (record.notification.kinds & INotification::RosterIcon)>0)
   {
     Jid streamJid = record.notification.data.value(NDR_ROSTER_STREAM_JID).toString();
     Jid contactJid = record.notification.data.value(NDR_ROSTER_CONTACT_JID).toString();
@@ -188,7 +196,7 @@ int Notifications::appendNotification(const INotification &ANotification)
     record.rosterId = FRostersViewPlugin->rostersView()->appendNotify(indexes,order,icon,toolTip,flags);
   }
   
-  if (checkOption(INotifications::EnablePopupWindows) && (record.notification.kinds & INotification::PopupWindow)>0)
+  if (checkOption(EnablePopupWindows) && (record.notification.kinds & INotification::PopupWindow)>0)
   {
     record.widget = new NotifyWidget(record.notification);
     connect(record.widget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
@@ -199,10 +207,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 
   if (FTrayManager)
   {
-    if (checkOption(INotifications::EnableTrayIcons) && (record.notification.kinds & INotification::TrayIcon)>0)
+    if (checkOption(EnableTrayIcons) && (record.notification.kinds & INotification::TrayIcon)>0)
       record.trayId = FTrayManager->appendNotify(icon,toolTip,true);
     
-    if (!toolTip.isEmpty() && checkOption(INotifications::EnableTrayActions) && (record.notification.kinds & INotification::TrayAction)>0)
+    if (!toolTip.isEmpty() && checkOption(EnableTrayActions) && (record.notification.kinds & INotification::TrayAction)>0)
     {
       record.action = new Action(FNotifyMenu);
       record.action->setIcon(icon);
@@ -213,7 +221,7 @@ int Notifications::appendNotification(const INotification &ANotification)
     }
   }
 
-  if (QSound::isAvailable() && checkOption(INotifications::EnableSounds) && (record.notification.kinds & INotification::PlaySound)>0)
+  if (QSound::isAvailable() && !(isDND && checkOption(DisableSoundsWhenDND)) && checkOption(EnableSounds) && (record.notification.kinds & INotification::PlaySound)>0)
   {
     QString soundName = record.notification.data.value(NDR_SOUND_FILE).toString();
     QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
@@ -225,7 +233,7 @@ int Notifications::appendNotification(const INotification &ANotification)
     }
   }
 
-  if (checkOption(INotifications::EnableAutoActivate) && (record.notification.kinds & INotification::AutoActivate)>0)
+  if (checkOption(EnableAutoActivate) && (record.notification.kinds & INotification::AutoActivate)>0)
   {
     FDelayedActivations.append(notifyId);
     QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
@@ -469,6 +477,7 @@ void Notifications::onSettingsOpened()
   setOption(EnableSounds, settings->value(SVN_ENABLE_SOUNDS,true).toBool());
   setOption(EnableAutoActivate, settings->value(SVN_ENABLE_AUTO_ACTIVATE,true).toBool());
   setOption(ExpandRosterGroups, settings->value(SVN_EXPAND_ROSTER_GROUPS,true).toBool());
+  setOption(DisableSoundsWhenDND,settings->value(SVN_DISABLE_SOUNDS_WHEN_DND,false).toBool());
 }
 
 void Notifications::onSettingsClosed()
@@ -481,6 +490,7 @@ void Notifications::onSettingsClosed()
   settings->setValue(SVN_ENABLE_SOUNDS,checkOption(EnableSounds));
   settings->setValue(SVN_ENABLE_AUTO_ACTIVATE, checkOption(EnableAutoActivate));
   settings->setValue(SVN_EXPAND_ROSTER_GROUPS, checkOption(ExpandRosterGroups));
+  settings->setValue(SVN_DISABLE_SOUNDS_WHEN_DND, checkOption(DisableSoundsWhenDND));
 }
 
 Q_EXPORT_PLUGIN2(plg_notifications, Notifications)
