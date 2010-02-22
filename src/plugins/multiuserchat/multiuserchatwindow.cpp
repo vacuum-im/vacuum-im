@@ -1582,14 +1582,24 @@ void MultiUserChatWindow::onInviteDeclined(const Jid &AContactJid, const QString
 
 void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &AReason, const QString &AByUser)
 {
-  showMessage(tr("%1 has been kicked from the room%2. %3").arg(ANick)
-    .arg(AByUser.isEmpty() ? "" : tr(" by %1").arg(AByUser)).arg(AReason),IMessageContentOptions::Event);
+  IMultiUser *user = FMultiChat->userByNick(ANick);
+  QString realJid = user!=NULL ? user->data(MUDR_REAL_JID).toString() : QString::null;
+  showMessage(tr("%1 has been kicked from the room%2. %3")
+    .arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid) : ANick)
+    .arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
+    .arg(AReason),
+    IMessageContentOptions::Event);
 }
 
 void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser)
 {
-  showMessage(tr("%1 has been banned from the room%2. %3").arg(ANick)
-    .arg(AByUser.isEmpty() ? "" : tr(" by %1").arg(AByUser)).arg(AReason),IMessageContentOptions::Event);
+  IMultiUser *user = FMultiChat->userByNick(ANick);
+  QString realJid = user!=NULL ? user->data(MUDR_REAL_JID).toString() : QString::null;
+  showMessage(tr("%1 has been banned from the room%2. %3")
+    .arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid) : ANick)
+    .arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
+    .arg(AReason),
+    IMessageContentOptions::Event);
 }
 
 void MultiUserChatWindow::onAffiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList)
