@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Enable/Disable notifications sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz/wyłącz dźwięk powiadomień</translation>
     </message>
 </context>
 <context>
@@ -94,11 +94,11 @@
     </message>
     <message>
         <source>Expand contact groups in roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozwiń grupy na liście kontaktów</translation>
     </message>
     <message>
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącz dźwięk jeśli ustawiony jest status &apos;Nie przeszkadzaj&apos;</translation>
     </message>
 </context>
 </TS>

@@ -100,7 +100,7 @@
     </message>
     <message>
         <source>Incoming mention message</source>
-        <translation>Przypomnienie przychodzące</translation>
+        <translation>Przychodząca wiadomość z uwagą na Twój temat</translation>
     </message>
     <message>
         <source>Outgoing message</source>

@@ -189,7 +189,7 @@
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Łączenie...</translation>
     </message>
 </context>
 </TS>

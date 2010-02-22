@@ -494,7 +494,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Mention in conference</source>
-        <translation>Uwaga na konferencji</translation>
+        <translation>Wspomniano Ciebie na konferencji</translation>
     </message>
     <message>
         <source>Show all active conferences</source>
@@ -898,11 +898,11 @@ Check values and try again</source>
     </message>
     <message>
         <source>Mention message in conference: %1</source>
-        <translation>Wiadomość z uwagą na konferencji: %1</translation>
+        <translation>Wiadomość z uwagą na twój temat na konferencji: %1</translation>
     </message>
     <message>
         <source>Mention in conference</source>
-        <translation>Uwaga na konferencji</translation>
+        <translation>Wspomniano Ciebie na konferencji</translation>
     </message>
 </context>
 <context>
