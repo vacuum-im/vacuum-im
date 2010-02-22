@@ -69,7 +69,7 @@
     </message>
     <message>
         <source>Enable Message Receipts?</source>
-        <translation>Włączyć potierdzenie odebrania wiadomości?</translation>
+        <translation>Włączyć potwierdzenie odebrania wiadomości?</translation>
     </message>
     <message>
         <source>Allow multiple sessions?</source>

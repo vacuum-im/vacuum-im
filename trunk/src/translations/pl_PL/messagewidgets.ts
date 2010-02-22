@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>Quote selected text</source>
-        <translation type="unfinished"></translation>
+        <translation>Cytuj zaznaczony tekst</translation>
     </message>
 </context>
 <context>

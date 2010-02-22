@@ -51,7 +51,7 @@
     </message>
     <message>
         <source>Plugins directory not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie znaleziono folderu wtyczek</translation>
     </message>
 </context>
 <context>
