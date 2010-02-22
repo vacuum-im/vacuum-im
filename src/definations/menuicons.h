@@ -122,6 +122,7 @@
 
 //MessageWidgets
 #define MNI_MESSAGEWIDGETS_TAB_MENU     "messagewidgetsTabMenu"
+#define MNI_MESSAGEWIDGETS_QUOTE        "messagewidgetsQuote"
 
 //MultiUserChat
 #define MNI_MUC_CONFERENCE              "mucConference"

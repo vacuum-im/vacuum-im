@@ -4,4 +4,8 @@
     <key>messagewidgetsTabMenu</key>
     <object mime="image/png">messagewidgetstabmenu.png</object>
   </icon>
+  <icon>
+    <key>messagewidgetsQuote</key>
+    <object mime="image/png">messagewidgetsquote.png</object>
+  </icon>
 </icondef>

@@ -46,6 +46,10 @@
         <source>Allows other modules to use standard widgets for messaging</source>
         <translation>Pozwala innym modułom używać standardowych narzędzi do wymiany wiadomości</translation>
     </message>
+    <message>
+        <source>Quote selected text</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>

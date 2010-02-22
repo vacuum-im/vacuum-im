@@ -86,6 +86,12 @@ QString AdiumMessageStyle::senderColor(const QString &ASenderId) const
   return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
+QString AdiumMessageStyle::selectedText(QWidget *AWidget) const
+{
+  StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+  return view!=NULL ? view->page()->selectedText() : QString::null;
+}
+
 bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
