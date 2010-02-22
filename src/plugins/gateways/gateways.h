@@ -74,7 +74,7 @@ protected:
   void savePrivateStorageKeep(const Jid &AStreamJid);
   void savePrivateStorageSubscribe(const Jid &AStreamJid);
 protected slots:
-  void onGatewayActionTriggered(bool);
+  void onAddLegacyUserActionTriggered(bool);
   void onLogActionTriggered(bool);
   void onResolveActionTriggered(bool);
   void onKeepActionTriggered(bool);
