@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>425</width>
-    <height>78</height>
+    <height>90</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -66,6 +66,13 @@
        <widget class="QCheckBox" name="chbExpandRosterGroups">
         <property name="text">
          <string>Expand contact groups in roster</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chbDisableSoundsWhenDND">
+        <property name="text">
+         <string>Disable sounds when status is 'Do not disturb'</string>
         </property>
        </widget>
       </item>

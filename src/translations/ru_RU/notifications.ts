@@ -92,5 +92,9 @@
         <source>Expand contact groups in roster</source>
         <translation>Раскрывать группы контакта в контакт-листе</translation>
     </message>
+    <message>
+        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
+        <translation>Отключать звуки, когда установлен статус &apos;Не беспокоить&apos;</translation>
+    </message>
 </context>
 </TS>

@@ -11,6 +11,7 @@ OptionsWidget::OptionsWidget(INotifications *ANotifications, QWidget *AParent) :
   ui.chbEnableSounds->setChecked(FNotifications->checkOption(INotifications::EnableSounds));
   ui.chbEnableAutoActivate->setChecked(FNotifications->checkOption(INotifications::EnableAutoActivate));
   ui.chbExpandRosterGroups->setChecked(FNotifications->checkOption(INotifications::ExpandRosterGroups));
+  ui.chbDisableSoundsWhenDND->setChecked(FNotifications->checkOption(INotifications::DisableSoundsWhenDND));
 }
 
 OptionsWidget::~OptionsWidget()
@@ -35,6 +36,7 @@ void OptionsWidget::apply()
   FNotifications->setOption(INotifications::EnableSounds,ui.chbEnableSounds->isChecked());
   FNotifications->setOption(INotifications::EnableAutoActivate,ui.chbEnableAutoActivate->isChecked());
   FNotifications->setOption(INotifications::ExpandRosterGroups,ui.chbExpandRosterGroups->isChecked());
+  FNotifications->setOption(INotifications::DisableSoundsWhenDND,ui.chbDisableSoundsWhenDND->isChecked());
 
   emit optionsAccepted();
 }

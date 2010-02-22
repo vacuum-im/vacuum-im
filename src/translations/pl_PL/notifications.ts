@@ -92,5 +92,9 @@
         <source>Expand contact groups in roster</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
