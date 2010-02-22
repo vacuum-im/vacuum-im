@@ -153,6 +153,8 @@
 #define MNI_NOTIFICATIONS               "notifications"
 #define MNI_NOTIFICATIONS_ACTIVATE_ALL  "notificationsActivateAll"
 #define MNI_NOTIFICATIONS_REMOVE_ALL    "notificationsRemoveAll"
+#define MNI_NOTIFICATIONS_SOUND_ON      "notificationsSoundOn"
+#define MNI_NOTIFICATIONS_SOUND_OFF     "notificationsSoundOff"
 
 //PrivacyLists
 #define MNI_PRIVACYLISTS                "privacylists"

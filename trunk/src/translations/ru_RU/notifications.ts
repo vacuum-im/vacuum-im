@@ -31,6 +31,10 @@
         <source>Allows other modules to notify the user of the events</source>
         <translation>Позволяет другим модулям уведомлять пользователя о случившихся событиях</translation>
     </message>
+    <message>
+        <source>Enable/Disable notifications sound</source>
+        <translation>Включить/Выключить звук уведомлений</translation>
+    </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>

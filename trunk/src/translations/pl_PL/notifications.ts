@@ -31,6 +31,10 @@
         <source>Notification options</source>
         <translation>Ustawienia powiadomień</translation>
     </message>
+    <message>
+        <source>Enable/Disable notifications sound</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>

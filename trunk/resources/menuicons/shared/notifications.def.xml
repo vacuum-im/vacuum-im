@@ -12,4 +12,12 @@
     <key>notificationsRemoveAll</key>
     <object mime="image/png">notificationsremoveall.png</object>
   </icon>
+  <icon>
+    <key>notificationsSoundOn</key>
+    <object mime="image/png">notificationssoundon.png</object>
+  </icon>
+  <icon>
+    <key>notificationsSoundOff</key>
+    <object mime="image/png">notificationssoundoff.png</object>
+  </icon>
 </icondef>

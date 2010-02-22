@@ -2,11 +2,12 @@
 #define DEF_TOOLBARGROUPS_H
 
 //MainWindow - TopToolBar
-#define TBG_MWTTB_ROSTERSVIEW                                   100
 #define TBG_MWTTB_DISCOVERY                                     200
-#define TBG_MWTTB_MULTIUSERCHAT                                 300
-#define TBG_MWTTB_BOOKMARKS                                     400
+#define TBG_MWTTB_MULTIUSERCHAT                                 500
+#define TBG_MWTTB_BOOKMARKS                                     700
 #define TBG_MWTTB_ROSTERSEARCH                                  900
+#define TBG_MWTTB_ROSTERSVIEW                                   10200
+#define TBG_MWTTB_NOTIFICATIONS_SOUND                           10500
 
 //MessageWidgets - ToolBarWidget
 #define TBG_MWTBW_EMOTICONS                                     200
