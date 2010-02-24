@@ -369,12 +369,12 @@ void SimpleMessageStyle::loadTemplates()
   FIn_ContentHTML =      loadFileData(FStylePath+"/Incoming/Content.html",QString::null);
   FIn_NextContentHTML =  loadFileData(FStylePath+"/Incoming/NextContent.html",FIn_ContentHTML);
   FIn_ContextHTML =      loadFileData(FStylePath+"/Incoming/Context.html",FIn_ContentHTML);
-  FIn_NextContextHTML =  loadFileData(FStylePath+"/Incoming/NextContext.html",FIn_ContextHTML);
+  FIn_NextContextHTML =  loadFileData(FStylePath+"/Incoming/NextContext.html",FIn_NextContentHTML);
 
   FOut_ContentHTML =     loadFileData(FStylePath+"/Outgoing/Content.html",FIn_ContentHTML);
   FOut_NextContentHTML = loadFileData(FStylePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
   FOut_ContextHTML =     loadFileData(FStylePath+"/Outgoing/Context.html",FOut_ContentHTML);
-  FOut_NextContextHTML = loadFileData(FStylePath+"/Outgoing/NextContext.html",FOut_ContextHTML);
+  FOut_NextContextHTML = loadFileData(FStylePath+"/Outgoing/NextContext.html",FOut_NextContentHTML);
 
   FTopicHTML =           loadFileData(FStylePath+"/Topic.html",QString::null);
   FStatusHTML =          loadFileData(FStylePath+"/Status.html",FIn_ContentHTML);

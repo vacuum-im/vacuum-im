@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Name</key>
-	<string>Style for messages</string>
+	<string>Message Style</string>
 	<key>DefaultVariant</key>
 	<string>Default</string>
 </dict>
