@@ -517,12 +517,12 @@ void AdiumMessageStyle::loadTemplates()
   FIn_ContentHTML =      loadFileData(FResourcePath+"/Incoming/Content.html",QString::null);
   FIn_NextContentHTML =  loadFileData(FResourcePath+"/Incoming/NextContent.html",FIn_ContentHTML);
   FIn_ContextHTML =      loadFileData(FResourcePath+"/Incoming/Context.html",FIn_ContentHTML);
-  FIn_NextContextHTML =  loadFileData(FResourcePath+"/Incoming/NextContext.html",FIn_ContextHTML);
+  FIn_NextContextHTML =  loadFileData(FResourcePath+"/Incoming/NextContext.html",FIn_NextContentHTML);
 
   FOut_ContentHTML =     loadFileData(FResourcePath+"/Outgoing/Content.html",FIn_ContentHTML);
   FOut_NextContentHTML = loadFileData(FResourcePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
   FOut_ContextHTML =     loadFileData(FResourcePath+"/Outgoing/Context.html",FOut_ContentHTML);
-  FOut_NextContextHTML = loadFileData(FResourcePath+"/Outgoing/NextContext.html",FOut_ContextHTML);
+  FOut_NextContextHTML = loadFileData(FResourcePath+"/Outgoing/NextContext.html",FOut_NextContentHTML);
 
   FStatusHTML =          loadFileData(FResourcePath+"/Status.html",FIn_ContentHTML);
   FTopicHTML =           loadFileData(FResourcePath+"/Topic.html",QString::null);

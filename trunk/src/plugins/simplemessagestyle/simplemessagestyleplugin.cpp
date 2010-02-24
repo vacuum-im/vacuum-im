@@ -112,13 +112,10 @@ IMessageStyleOptions SimpleMessageStylePlugin::styleOptions(int AMessageType, co
     case Message::Normal:
     case Message::Headline:
     case Message::Error:
-      styleId = "Style for messages";
-      break;
-    case Message::GroupChat:
-      styleId = "Style for conferences";
+      styleId = "Message Style";
       break;
     default:
-      styleId = "Style for chats";
+      styleId = "Chat Style";
     }
 
     if (!FStylePaths.contains(styleId.toString()))  

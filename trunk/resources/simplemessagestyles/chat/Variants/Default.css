@@ -2,35 +2,37 @@
 {
   border-style		:none;
   font-size		:medium;
-  margin-top		:2px;
+  margin-top		:5px;
 }
 
 .xxxmessage
 {
   white-space		:pre-wrap;
+  padding-left		:10px;
 }
 
-.xxxsender,
+.xxxsender
+{
+  white-space		:nowrap;
+  font-weight		:bold;
+}
+
 .xxxtime 
 {
   white-space		:nowrap;
-}
-
-.xxxtime 
-{
   font-size             :small;
   color			:gray;
 }
 
-.consecutive 
+.xxxtopic
 {
-  margin-top		:0px;
+  padding-left		:15px;
+  padding-right		:15px;
 }
 
-.consecutive .xxxsender,
-.consecutive .xxxtime
+.consecutive
 {
-  color			:transparent;
+  margin-top		:0px;
 }
 
 .status .xxxmessage
@@ -46,4 +48,9 @@
 .event .xxxmessage
 {
   color			:darkred;
+}
+
+.mention .xxxmessage
+{
+  background-color	:mistyrose;
 }
