@@ -904,23 +904,4 @@ Check values and try again</source>
         <translation>Обращение в конференции</translation>
     </message>
 </context>
-<context>
-    <name>MultiUserChatWindowClass</name>
-    <message>
-        <source>Room Info</source>
-        <translation>Информация о комнате</translation>
-    </message>
-    <message>
-        <source>Room:</source>
-        <translation>Комната:</translation>
-    </message>
-    <message>
-        <source>Nick:</source>
-        <translation>Ник:</translation>
-    </message>
-    <message>
-        <source>Account:</source>
-        <translation>Аккаунт:</translation>
-    </message>
-</context>
 </TS>

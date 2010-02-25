@@ -905,23 +905,4 @@ Check values and try again</source>
         <translation>Wspomniano Ciebie na konferencji</translation>
     </message>
 </context>
-<context>
-    <name>MultiUserChatWindowClass</name>
-    <message>
-        <source>Room Info</source>
-        <translation>Informacje o pokoju</translation>
-    </message>
-    <message>
-        <source>Room:</source>
-        <translation>Pokój:</translation>
-    </message>
-    <message>
-        <source>Nick:</source>
-        <translation>Nick:</translation>
-    </message>
-    <message>
-        <source>Account:</source>
-        <translation>Konto:</translation>
-    </message>
-</context>
 </TS>

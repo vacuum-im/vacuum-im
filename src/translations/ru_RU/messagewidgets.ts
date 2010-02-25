@@ -2,25 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
-    <name>InfoWidgetClass</name>
-    <message>
-        <source>Contact info</source>
-        <translation>Информация о контакте</translation>
-    </message>
-    <message>
-        <source>Name:</source>
-        <translation>Контакт:</translation>
-    </message>
-    <message>
-        <source>Account:</source>
-        <translation>Аккаунт:</translation>
-    </message>
-    <message>
-        <source>Status:</source>
-        <translation>Статус:</translation>
-    </message>
-</context>
-<context>
     <name>MessageWidgets</name>
     <message>
         <source>Messages</source>
