@@ -247,7 +247,6 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
       QString name = field(AField).toString();
       ui.lblAccount->setText(Qt::escape(name));
       ui.lblAccount->setVisible(isFieldVisible(AField) && !name.isEmpty());
-      ui.lblLabelAccount->setVisible(isFieldVisible(AField) && !name.isEmpty());
       break;
     }
   case ContactName:
@@ -258,10 +257,9 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
       if (isFiledAutoUpdated(AField) && ritem.name.isEmpty())
         ui.lblName->setText(FContactJid.hFull());
       else
-        ui.lblName->setText(QString("<b>%1</b> - %2").arg(Qt::escape(name)).arg(FContactJid.hFull()));
+        ui.lblName->setText(QString("<big><b>%1</b></big> - %2").arg(Qt::escape(name)).arg(FContactJid.hFull()));
 
       ui.lblName->setVisible(isFieldVisible(AField));
-      ui.lblLabelName->setVisible(isFieldVisible(AField));
       break;
     }
   case ContactStatus:
@@ -269,7 +267,6 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
       QString status = field(AField).toString();
       ui.lblStatus->setText(Qt::escape(status));
       ui.lblStatus->setVisible(isFieldVisible(AField) && !status.isEmpty());
-      ui.lblLabelStatus->setVisible(isFieldVisible(AField) && !status.isEmpty());
       break;
     }
   case ContactAvatar:

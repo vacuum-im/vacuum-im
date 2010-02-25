@@ -22,27 +22,17 @@
      <number>3</number>
     </property>
     <item>
-     <widget class="QGroupBox" name="grbRoomInfo">
+     <widget class="QWidget" name="widget" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="title">
-       <string>Room Info</string>
-      </property>
-      <layout class="QHBoxLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="margin">
-        <number>3</number>
+        <number>2</number>
        </property>
-       <item>
-        <widget class="QLabel" name="lblRoomLabel">
-         <property name="text">
-          <string>Room:</string>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QLabel" name="lblRoom">
          <property name="sizePolicy">
@@ -51,55 +41,13 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lblNickLabel">
-         <property name="text">
-          <string>Nick:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lblNick">
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lblAccountLabel">
-         <property name="text">
-          <string>Account:</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="lblAccount">
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
          </property>

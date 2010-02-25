@@ -27,9 +27,6 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose, false);
 
-  ui.lblRoom->setText(AMultiChat->roomJid().hFull());
-  ui.lblNick->setText(Qt::escape(AMultiChat->nickName()));
-
   FSettings = NULL;
   FStatusIcons = NULL;
   FMessageWidgets = NULL;
@@ -1128,6 +1125,8 @@ void MultiUserChatWindow::updateWindow()
   setWindowIconText(roomName);
   setWindowTitle(tr("%1 - Conference").arg(roomName));
 
+  ui.lblRoom->setText(QString("<big><b>%1</b></big> - %2").arg(FMultiChat->roomJid().hFull()).arg(Qt::escape(FMultiChat->nickName())));
+
   emit windowChanged();
 }
 
@@ -1536,8 +1535,10 @@ void MultiUserChatWindow::onUserNickChanged(IMultiUser *AUser, const QString &AO
       updateChatWindow(window);
     }
   }
+
   if (AUser == FMultiChat->mainUser())
-    ui.lblNick->setText(Qt::escape(ANewNick));
+    updateWindow();
+
   showMessage(tr("%1 changed nick to %2").arg(AOldNick).arg(ANewNick),IMessageContentOptions::Event);
 }
 
@@ -1963,3 +1964,4 @@ void MultiUserChatWindow::onAccountChanged(const QString &AName, const QVariant 
   if (AName == AVN_NAME)
     ui.lblAccount->setText(Qt::escape(AValue.toString()));
 }
+
