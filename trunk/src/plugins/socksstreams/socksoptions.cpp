@@ -4,8 +4,6 @@
 #include <QListWidgetItem>
 #include <utils/jid.h>
 
-#define PROXY_NS_PREFIX  "SocksStreams"
-
 SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStream, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
