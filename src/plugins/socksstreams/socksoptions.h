@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <interfaces/isocksstreams.h>
+#include <interfaces/iconnectionmanager.h>
 #include "ui_socksoptions.h"
 
 class SocksOptions : 
@@ -11,7 +12,8 @@ class SocksOptions :
   Q_OBJECT;
 public:
   SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStream, bool AReadOnly, QWidget *AParent = NULL);
-  SocksOptions(ISocksStreams *ASocksStreams, const QString &ASettingsNS, bool AReadOnly, QWidget *AParent = NULL);
+  SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager, const QString &ASettingsNS, 
+    bool AReadOnly, QWidget *AParent = NULL);
   ~SocksOptions();
   void saveSettings(ISocksStream *AStream);
   void saveSettings(const QString &ASettingsNS);
@@ -30,7 +32,9 @@ private:
   Ui::SocksOptionsClass ui;
 private:
   ISocksStreams *FSocksStreams;
+  IConnectionManager *FConnectionManager;
 private:
+  QWidget *FProxySettings;
   QString FSettingsNS;
   ISocksStream *FSocksStream;
 };

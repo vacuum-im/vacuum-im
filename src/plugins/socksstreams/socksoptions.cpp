@@ -1,12 +1,18 @@
 #include "socksoptions.h"
 
+#include <QVBoxLayout>
 #include <QListWidgetItem>
 #include <utils/jid.h>
 
+#define PROXY_NS_PREFIX  "SocksStreams"
+
 SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStream, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
 {
-  FSocksStreams = ASocksStreams;
+  ui.setupUi(this);
   FSocksStream = ASocksStream;
+  FProxySettings = NULL;
+  FSocksStreams = ASocksStreams;
+  FConnectionManager = NULL;
   initialize(AReadOnly);
 
   ui.spbPort->setVisible(false);
@@ -18,21 +24,18 @@ SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStr
   ui.chbUseNativeServerProxy->setVisible(false);
   ui.ltwStreamProxy->addItems(ASocksStream->proxyList());
 
-  QNetworkProxy proxy = ASocksStream->networkProxy();
-  ui.chbUseAccountProxy->setChecked(proxy == FSocksStreams->accountNetworkProxy(ASocksStream->streamJid()));
-  ui.cmbProxyType->setCurrentIndex(ui.cmbProxyType->findData(proxy.type()));
-  ui.lneProxyHost->setText(proxy.hostName());
-  ui.spbProxyPort->setValue(proxy.port());
-  ui.lneProxyUser->setText(proxy.user());
-  ui.lneProxyPassword->setText(proxy.password());
+  ui.grbConnectionProxy->setVisible(false);
 }
 
-SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, const QString &ASettingsNS, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
+SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager, 
+                           const QString &ASettingsNS, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
-  FSocksStreams = ASocksStreams;
   FSocksStream = NULL;
   FSettingsNS = ASettingsNS;
+  FProxySettings = NULL;
+  FSocksStreams = ASocksStreams;
+  FConnectionManager = AConnectionManager;
   initialize(AReadOnly);
 
   ui.spbPort->setValue(ASocksStreams->serverPort());
@@ -45,13 +48,14 @@ SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, const QString &ASetting
   ui.chbUseNativeServerProxy->setChecked(ASocksStreams->useNativeServerProxy(ASettingsNS));
   ui.ltwStreamProxy->addItems(ASocksStreams->proxyList(ASettingsNS));
 
+  FProxySettings = FConnectionManager!=NULL ? FConnectionManager->proxySettingsWidget(PROXY_NS_PREFIX+FSettingsNS, ui.wdtProxySettings) : NULL;
+  if (FProxySettings)
+  {
+    QVBoxLayout *layout = new QVBoxLayout(ui.wdtProxySettings);
+    layout->setMargin(0);
+    layout->addWidget(FProxySettings);
+  }
   ui.chbUseAccountProxy->setChecked(ASocksStreams->useAccountNetworkProxy(ASettingsNS));
-  QNetworkProxy proxy = ASocksStreams->networkProxy(ASettingsNS);
-  ui.cmbProxyType->setCurrentIndex(ui.cmbProxyType->findData(proxy.type()));
-  ui.lneProxyHost->setText(proxy.hostName());
-  ui.spbProxyPort->setValue(proxy.port());
-  ui.lneProxyUser->setText(proxy.user());
-  ui.lneProxyPassword->setText(proxy.password());
 }
 
 SocksOptions::~SocksOptions()
@@ -68,19 +72,6 @@ void SocksOptions::saveSettings(ISocksStream *ASocksStream)
   for (int row=0; row<ui.ltwStreamProxy->count(); row++)
     proxyItems.append(ui.ltwStreamProxy->item(row)->text());
   ASocksStream->setProxyList(proxyItems);
-
-  if (!ui.chbUseAccountProxy->isChecked())
-  {
-    QNetworkProxy proxy;
-    proxy.setType((QNetworkProxy::ProxyType)ui.cmbProxyType->itemData(ui.cmbProxyType->currentIndex()).toInt());
-    proxy.setHostName(ui.lneProxyHost->text());
-    proxy.setPort(ui.spbProxyPort->value());
-    proxy.setUser(ui.lneProxyUser->text());
-    proxy.setPassword(ui.lneProxyPassword->text());
-    ASocksStream->setNetworkProxy(proxy);
-  }
-  else
-    ASocksStream->setNetworkProxy(FSocksStreams->accountNetworkProxy(ASocksStream->streamJid()));
 }
 
 void SocksOptions::saveSettings(const QString &ASettingsNS)
@@ -97,13 +88,11 @@ void SocksOptions::saveSettings(const QString &ASettingsNS)
   FSocksStreams->setProxyList(ASettingsNS, proxyItems);
   FSocksStreams->setUseNativeServerProxy(ASettingsNS, ui.chbUseNativeServerProxy->isChecked());
 
-  QNetworkProxy proxy;
-  proxy.setType((QNetworkProxy::ProxyType)ui.cmbProxyType->itemData(ui.cmbProxyType->currentIndex()).toInt());
-  proxy.setHostName(ui.lneProxyHost->text());
-  proxy.setPort(ui.spbProxyPort->value());
-  proxy.setUser(ui.lneProxyUser->text());
-  proxy.setPassword(ui.lneProxyPassword->text());
-  FSocksStreams->setNetworkProxy(ASettingsNS, proxy);
+  if (FProxySettings)
+  {
+    FConnectionManager->saveProxySettings(FProxySettings);
+    FSocksStreams->setNetworkProxy(ASettingsNS, FConnectionManager->proxyById(FConnectionManager->proxySettings(PROXY_NS_PREFIX+FSettingsNS)).proxy);
+  }
   FSocksStreams->setUseAccountNetworkProxy(ASettingsNS, ui.chbUseAccountProxy->isChecked());
 }
 
@@ -134,14 +123,7 @@ void SocksOptions::initialize(bool AReadOnly)
   connect(ui.pbtStreamProxyDown,SIGNAL(clicked(bool)),SLOT(onStreamProxyDownClicked(bool)));
   connect(ui.pbtDeleteStreamProxy,SIGNAL(clicked(bool)),SLOT(onDeleteStreamProxyClicked(bool)));
 
-  ui.cmbProxyType->addItem(tr("No Proxy"), QNetworkProxy::NoProxy);
-  ui.cmbProxyType->addItem(tr("Socks5 Proxy"), QNetworkProxy::Socks5Proxy);
-  ui.cmbProxyType->addItem(tr("Http Proxy"), QNetworkProxy::HttpProxy);
-  ui.cmbProxyType->setEnabled(!AReadOnly);
-  ui.lneProxyHost->setReadOnly(AReadOnly);
-  ui.spbProxyPort->setReadOnly(AReadOnly);
-  ui.lneProxyUser->setReadOnly(AReadOnly);
-  ui.lneProxyPassword->setReadOnly(AReadOnly);
+  ui.wdtProxySettings->setEnabled(!AReadOnly);
 }
 
 void SocksOptions::onAddStreamProxyClicked(bool)

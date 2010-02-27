@@ -11,6 +11,7 @@
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
 #include <interfaces/iservicediscovery.h>
+#include <interfaces/iconnectionmanager.h>
 #include <interfaces/isettings.h>
 #include "socksstream.h"
 #include "socksoptions.h"
@@ -85,6 +86,7 @@ private:
   IDataStreamsManager *FDataManager;
   IStanzaProcessor *FStanzaProcessor;
   IServiceDiscovery *FDiscovery;
+  IConnectionManager *FConnectionManager;
   ISettings *FSettings;
   ISettingsPlugin *FSettingsPlugin;
 private:

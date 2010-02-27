@@ -26,6 +26,7 @@ SocksStreams::SocksStreams() : FServer(this)
   FDataManager = NULL;
   FStanzaProcessor = NULL;
   FDiscovery = NULL;
+  FConnectionManager = NULL;
   FSettings = NULL;
   FSettingsPlugin = NULL;
 
@@ -57,15 +58,15 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &/*AInitO
 {
   IPlugin *plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
   if (plugin)
-  {
     FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
-  }
 
   plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
   if (plugin)
-  {
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-  }
+
+  plugin = APluginManager->pluginInterface("IConnectionManager").value(0,NULL);
+  if (plugin)
+    FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
 
   plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
@@ -155,7 +156,7 @@ QWidget *SocksStreams::settingsWidget(IDataStreamSocket *ASocket, bool AReadOnly
 
 QWidget *SocksStreams::settingsWidget(const QString &ASettingsNS, bool AReadOnly)
 {
-  return new SocksOptions(this,ASettingsNS,AReadOnly,NULL);
+  return new SocksOptions(this,FConnectionManager,ASettingsNS,AReadOnly,NULL);
 }
 
 void SocksStreams::loadSettings(IDataStreamSocket *ASocket, QWidget *AWidget) const
@@ -325,24 +326,8 @@ QNetworkProxy SocksStreams::accountNetworkProxy(const Jid &AStreamJid) const
 {
   QNetworkProxy proxy(QNetworkProxy::NoProxy);
   IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
-  IConnection *connection = stream!=NULL ? stream->connection() : NULL;
-  if (connection)
-  {
-    int proxyType = connection->option(IDefaultConnection::CO_PROXY_TYPE).toInt();
-    if (proxyType==IDefaultConnection::PT_HTTP_PROXY || proxyType==IDefaultConnection::PT_SOCKET5_PROXY)
-    {
-      proxy.setType(proxyType==IDefaultConnection::PT_SOCKET5_PROXY ? QNetworkProxy::Socks5Proxy : QNetworkProxy::HttpProxy);
-      proxy.setHostName(connection->option(IDefaultConnection::CO_PROXY_HOST).toString());
-      proxy.setPort(connection->option(IDefaultConnection::CO_PROXY_PORT).toInt());
-      proxy.setUser(connection->option(IDefaultConnection::CO_PROXY_USER_NAME).toString());
-      proxy.setPassword(connection->option(IDefaultConnection::CO_PROXY_PASSWORD).toString());
-    }
-    else if (proxyType == IDefaultConnection::PT_DEFAULT_PROXY)
-    {
-      proxy = QNetworkProxy::applicationProxy();
-    }
-  }
-  return proxy;
+  IDefaultConnection *connection = stream!=NULL ? qobject_cast<IDefaultConnection *>(stream->connection()->instance()) : NULL;
+  return connection!=NULL ? connection->proxy() : QNetworkProxy(QNetworkProxy::NoProxy);
 }
 
 QNetworkProxy SocksStreams::networkProxy(const QString &ASettingsNS) const

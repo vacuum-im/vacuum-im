@@ -2,21 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl_PL" sourcelanguage="en">
 <context>
-    <name>SocksOptions</name>
-    <message>
-        <source>No Proxy</source>
-        <translation>Bez proxy</translation>
-    </message>
-    <message>
-        <source>Socks5 Proxy</source>
-        <translation>Socks5 Proxy</translation>
-    </message>
-    <message>
-        <source>Http Proxy</source>
-        <translation>Http Proxy</translation>
-    </message>
-</context>
-<context>
     <name>SocksOptionsClass</name>
     <message>
         <source>Incoming Direct Connections</source>
@@ -73,18 +58,6 @@
     <message>
         <source>Use account connection proxy settings</source>
         <translation>Używaj ustawień połączenia konta dla proxy</translation>
-    </message>
-    <message>
-        <source>Type:</source>
-        <translation>Typ:</translation>
-    </message>
-    <message>
-        <source>Username:</source>
-        <translation>Użytkownik:</translation>
-    </message>
-    <message>
-        <source>Password:</source>
-        <translation>Hasło:</translation>
     </message>
 </context>
 <context>

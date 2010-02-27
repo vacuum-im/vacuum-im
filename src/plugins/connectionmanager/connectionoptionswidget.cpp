@@ -7,7 +7,7 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(ConnectionManager *ACManager, I
   FConnectionManager = ACManager;
 
   FAccountId = AAccountId;
-  FOptionsWidget = NULL;
+  FPluginSettings = NULL;
 
   QList<IConnectionPlugin *> plugins = FConnectionManager->pluginList();
   foreach (IConnectionPlugin *plugin, plugins)
@@ -39,7 +39,7 @@ void ConnectionOptionsWidget::apply()
     IConnectionPlugin *plugin = FConnectionManager->pluginById(FPluginId);
     if (plugin)
     {
-      plugin->saveOptions(FAccountId.toString());
+      plugin->saveSettings(FPluginSettings, FAccountId.toString());
       IConnection *connection = FConnectionManager->insertConnection(account);
       if (connection)
         plugin->loadSettings(connection, FAccountId.toString());
@@ -52,21 +52,21 @@ void ConnectionOptionsWidget::setPluginById(const QUuid &APluginId)
 {
   if (FPluginId != APluginId)
   {
-    if (FOptionsWidget)
+    if (FPluginSettings)
     {
-      ui.grbOptions->layout()->removeWidget(FOptionsWidget);
-      FOptionsWidget->deleteLater();
-      FOptionsWidget = NULL;
+      ui.grbOptions->layout()->removeWidget(FPluginSettings);
+      FPluginSettings->deleteLater();
+      FPluginSettings = NULL;
       FPluginId = QUuid();
     }
 
     IConnectionPlugin *plugin = FConnectionManager->pluginById(APluginId);
     if (plugin)
     {
-      FOptionsWidget = plugin->optionsWidget(FAccountId.toString());
-      if (FOptionsWidget)
+      FPluginSettings = plugin->settingsWidget(FAccountId.toString());
+      if (FPluginSettings)
       {
-        ui.grbOptions->layout()->addWidget(FOptionsWidget);
+        ui.grbOptions->layout()->addWidget(FPluginSettings);
         FPluginId = APluginId;
       }
     }

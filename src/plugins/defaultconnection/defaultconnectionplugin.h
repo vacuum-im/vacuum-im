@@ -33,27 +33,23 @@ public:
   virtual QString displayName() const;
   virtual IConnection *newConnection(const QString &ASettingsNS, QObject *AParent);
   virtual void destroyConnection(IConnection *AConnection);
+  virtual QWidget *settingsWidget(const QString &ASettingsNS);
+  virtual void saveSettings(QWidget *AWidget, const QString &ASettingsNS = QString::null);
   virtual void loadSettings(IConnection *AConnection, const QString &ASettingsNS);
-  virtual void saveSettings(IConnection *AConnection, const QString &ASettingsNS);
-  virtual void deleteSettingsNS(const QString &ASettingsNS);
-  virtual QWidget *optionsWidget(const QString &ASettingsNS);
-  virtual void saveOptions(const QString &ASettingsNS);
-  //IDefaultConnectionPlugin
-  virtual QStringList proxyTypeNames() const;
+  virtual void deleteSettings(const QString &ASettingsNS);
 signals:
   void connectionCreated(IConnection *AConnection);
   void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
   void connectionDestroyed(IConnection *AConnection);
 protected slots:
   void onConnectionAboutToConnect();
-  void onOptionsDialogClosed();
 private:
   ISettings *FSettings;
   ISettingsPlugin *FSettingsPlugin;  
   IXmppStreams *FXmppStreams;
+  IConnectionManager *FConnectionManager;
 private:
   QObjectCleanupHandler FCleanupHandler;
-  QHash<QString, ConnectionOptionsWidget *> FWidgetsByNS;
 };
 
 #endif // DEFAULTCONNECTIONPLUGIN_H

@@ -2,21 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
-    <name>SocksOptions</name>
-    <message>
-        <source>No Proxy</source>
-        <translation>Без прокси</translation>
-    </message>
-    <message>
-        <source>Socks5 Proxy</source>
-        <translation>Socks5 прокси</translation>
-    </message>
-    <message>
-        <source>Http Proxy</source>
-        <translation>Http прокси</translation>
-    </message>
-</context>
-<context>
     <name>SocksOptionsClass</name>
     <message>
         <source>Incoming Direct Connections</source>
@@ -69,18 +54,6 @@
     <message>
         <source>Use account connection proxy settings</source>
         <translation>Использовать настройки прокси из аккаунта</translation>
-    </message>
-    <message>
-        <source>Type:</source>
-        <translation>Тип:</translation>
-    </message>
-    <message>
-        <source>Username:</source>
-        <translation>Пользователь:</translation>
-    </message>
-    <message>
-        <source>Password:</source>
-        <translation>Пароль:</translation>
     </message>
     <message>
         <source>Use proxy on native server</source>
