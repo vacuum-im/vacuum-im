@@ -6,6 +6,8 @@
 #include <interfaces/iconnectionmanager.h>
 #include "ui_socksoptions.h"
 
+#define PROXY_NS_PREFIX  "SocksStreams"
+
 class SocksOptions : 
   public QWidget
 {
