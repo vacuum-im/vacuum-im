@@ -1393,6 +1393,8 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
           QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? ": " : " ";
           FEditWidget->textEdit()->textCursor().insertText(userItem->text() + sufix);
           FEditWidget->textEdit()->setFocus();
+          AEvent->accept();
+          return true;
         }
       }
     }
