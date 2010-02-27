@@ -89,12 +89,13 @@ void DefaultConnectionPlugin::loadSettings(IConnection *AConnection, const QStri
   DefaultConnection *connection = qobject_cast<DefaultConnection *>(AConnection->instance());
   if (FSettings && connection)
   {
-    connection->setOption(IDefaultConnection::CO_HOST,FSettings->valueNS(SVN_CONNECTION_HOST,ASettingsNS,QString()));
+    connection->setOption(IDefaultConnection::CO_HOST,FSettings->valueNS(SVN_CONNECTION_HOST,ASettingsNS));
     connection->setOption(IDefaultConnection::CO_PORT,FSettings->valueNS(SVN_CONNECTION_PORT,ASettingsNS,5222));
     connection->setOption(IDefaultConnection::CO_USE_SSL,FSettings->valueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,false));
     connection->setOption(IDefaultConnection::CO_IGNORE_SSL_ERRORS,FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,true));
     if (FConnectionManager)
       connection->setProxy(FConnectionManager->proxyById(FConnectionManager->proxySettings(ASettingsNS)).proxy);
+    connection->setOption(IDefaultConnection::CO_SETTINGS_NS, ASettingsNS);
     emit connectionUpdated(AConnection,ASettingsNS);
   }
 }
@@ -115,6 +116,10 @@ void DefaultConnectionPlugin::onConnectionAboutToConnect()
     foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
       if (stream->connection() == connection)
         connection->setOption(IDefaultConnection::CO_DOMAINE,stream->streamJid().pDomain());
+
+    QString settingsNS = connection->option(IDefaultConnection::CO_SETTINGS_NS).toString();
+    if (!settingsNS.isEmpty())
+      loadSettings(connection, settingsNS);
   }
 }
 
