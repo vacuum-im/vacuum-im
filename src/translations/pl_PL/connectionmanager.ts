@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>&lt;No Proxy&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Bez Proxy&gt;</translation>
     </message>
 </context>
 <context>
@@ -31,76 +31,76 @@
     <name>EditProxyDialog</name>
     <message>
         <source>HTTP Proxy</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP Proxy</translation>
     </message>
     <message>
         <source>Socks5 Proxy</source>
-        <translation type="unfinished"></translation>
+        <translation>Socks5 Proxy</translation>
     </message>
     <message>
         <source>New Proxy</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowe Proxy</translation>
     </message>
 </context>
 <context>
     <name>EditProxyDialogClass</name>
     <message>
         <source>Proxy Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Proxy Menedżer</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa:</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ:</translation>
     </message>
     <message>
         <source>Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>Host:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Port:</translation>
     </message>
     <message>
         <source>User:</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownik:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło:</translation>
     </message>
     <message>
         <source>Default Proxy:</source>
-        <translation type="unfinished"></translation>
+        <translation>Domyślne Proxy:</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
 </context>
 <context>
     <name>ProxySettingsWidget</name>
     <message>
         <source>&lt;Default Proxy&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Domyślne Proxy&gt;</translation>
     </message>
 </context>
 <context>
     <name>ProxySettingsWidgetClass</name>
     <message>
         <source>Proxy:</source>
-        <translation type="unfinished"></translation>
+        <translation>Proxy:</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj</translation>
     </message>
 </context>
 </TS>
