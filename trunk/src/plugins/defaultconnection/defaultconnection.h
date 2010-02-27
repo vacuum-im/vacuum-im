@@ -26,7 +26,7 @@ public:
   virtual QByteArray read(qint64 ABytes);
   virtual QVariant option(int ARole) const;
   virtual void setOption(int ARole, const QVariant &AValue);
-  //DefaultConnection
+  //IDefaultConnection
   virtual void startClientEncryption();
   virtual QSsl::SslProtocol protocol() const;
   virtual void setProtocol(QSsl::SslProtocol AProtocol);
@@ -35,16 +35,20 @@ public:
   virtual QSslCertificate peerCertificate() const;
   virtual void ignoreSslErrors();
   virtual QList<QSslError> sslErrors() const;
+  virtual QNetworkProxy proxy() const;
+  virtual void setProxy(const QNetworkProxy &AProxy);
 signals:
   void aboutToConnect();
   void connected();
   void encrypted();
   void readyRead(qint64 ABytes);
-  void sslErrors(const QList<QSslError> &AErrors);
   void error(const QString &AMessage);
   void aboutToDisconnect();
   void disconnected();
+  //IDefaultConnection
   void modeChanged(QSslSocket::SslMode AMode);
+  void sslErrors(const QList<QSslError> &AErrors);
+  void proxyChanged(const QNetworkProxy &AProxy);
 protected:
   void connectToNextHost();
 protected slots:
@@ -69,7 +73,7 @@ private:
   bool FIgnoreSSLErrors;
   QSslSocket FSocket;
 private:
-  QHash<int, QVariant> FOptions;
+  QMap<int, QVariant> FOptions;
 };
 
 #endif // DEFAULTCONNECTION_H

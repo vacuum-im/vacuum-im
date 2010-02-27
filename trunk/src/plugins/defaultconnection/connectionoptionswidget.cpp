@@ -1,10 +1,30 @@
 #include "connectionoptionswidget.h"
 
-ConnectionOptionsWidget::ConnectionOptionsWidget()
+#include <QVBoxLayout>
+
+ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, ISettings *ASettings, 
+                                                 const QString &ASettingsNS, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
-  connect(ui.chbUseSSL,SIGNAL(stateChanged(int)),SLOT(onUseSSLStateChanged(int)));
-  connect(ui.cmbProxyType,SIGNAL(currentIndexChanged(int)),SLOT(onProxyTypeChanged(int)));
+  FManager = AManager;
+  FSettings = ASettings;
+  FSettingsNS = ASettingsNS;
+  FProxySettings = NULL;
+
+  if (FSettings)
+  {
+    ui.lneHost->setText(FSettings->valueNS(SVN_CONNECTION_HOST,FSettingsNS).toString());
+    ui.spbPort->setValue(FSettings->valueNS(SVN_CONNECTION_PORT,FSettingsNS,5222).toInt());
+    ui.chbUseSSL->setChecked(FSettings->valueNS(SVN_CONNECTION_USE_SSL,FSettingsNS,false).toBool());
+    ui.chbIgnoreSSLWarnings->setChecked(FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,FSettingsNS,true).toBool());
+    FProxySettings = FManager!=NULL ? FManager->proxySettingsWidget(FSettingsNS, ui.wdtProxy) : NULL;
+    if (FProxySettings)
+    {
+      QVBoxLayout *layout = new QVBoxLayout(ui.wdtProxy);
+      layout->setMargin(0);
+      layout->addWidget(FProxySettings);
+    }
+  }
 }
 
 ConnectionOptionsWidget::~ConnectionOptionsWidget()
@@ -12,116 +32,16 @@ ConnectionOptionsWidget::~ConnectionOptionsWidget()
 
 }
 
-QString ConnectionOptionsWidget::host() const
+void ConnectionOptionsWidget::apply(const QString &ASettingsNS)
 {
-  return ui.lneHost->text();  
+  if (FSettings)
+  {
+    QString settingsNS = ASettingsNS.isEmpty() ? FSettingsNS : ASettingsNS;
+    FSettings->setValueNS(SVN_CONNECTION_HOST, settingsNS, ui.lneHost->text());
+    FSettings->setValueNS(SVN_CONNECTION_PORT, settingsNS, ui.spbPort->value());
+    FSettings->setValueNS(SVN_CONNECTION_USE_SSL, settingsNS, ui.chbUseSSL->isChecked());
+    FSettings->setValueNS(SVN_CONNECTION_IGNORE_SSLERROR, settingsNS, ui.chbIgnoreSSLWarnings->isChecked());
+    if (FProxySettings)
+      FManager->saveProxySettings(FProxySettings, FSettingsNS);
+  }
 }
-
-void ConnectionOptionsWidget::setHost(const QString &AHost)
-{
-  ui.lneHost->setText(AHost);
-}
-
-int ConnectionOptionsWidget::port() const
-{
-  return ui.spbPort->value();
-}
-
-void ConnectionOptionsWidget::setPort( int APort )
-{
-  ui.spbPort->setValue(APort);
-}
-
-bool ConnectionOptionsWidget::useSSL() const
-{
-  return ui.chbUseSSL->isChecked();
-}
-
-void ConnectionOptionsWidget::setUseSSL(bool AUseSSL)
-{
-  ui.chbUseSSL->setCheckState(AUseSSL ? Qt::Checked : Qt::Unchecked);
-}
-
-bool ConnectionOptionsWidget::ignoreSSLErrors() const
-{
-  return ui.chbIgnoreSSLWarnings->isChecked();
-}
-
-void ConnectionOptionsWidget::setIgnoreSSLError(bool AIgnore)
-{
-  ui.chbIgnoreSSLWarnings->setCheckState(AIgnore ? Qt::Checked : Qt::Unchecked);
-}
-
-int ConnectionOptionsWidget::proxyType() const
-{
-  return ui.cmbProxyType->itemData(ui.cmbProxyType->currentIndex()).toInt();
-}
-
-void ConnectionOptionsWidget::setProxyTypes(const QStringList &AProxyTypes)
-{
-  for (int i = 0; i < AProxyTypes.count(); i++)
-    ui.cmbProxyType->addItem(AProxyTypes.at(i),i);
-}
-
-void ConnectionOptionsWidget::setProxyType(int AProxyType)
-{
-  ui.cmbProxyType->setCurrentIndex(AProxyType);
-}
-
-QString ConnectionOptionsWidget::proxyHost() const
-{
-  return ui.lneProxyHost->text();
-}
-
-void ConnectionOptionsWidget::setProxyHost(const QString &AProxyHost)
-{
-  ui.lneProxyHost->setText(AProxyHost);
-}
-
-int ConnectionOptionsWidget::proxyPort() const
-{
-  return ui.spbProxyPort->value();
-}
-
-void ConnectionOptionsWidget::setProxyPort(int AProxyPort)
-{
-  ui.spbProxyPort->setValue(AProxyPort);
-}
-
-QString ConnectionOptionsWidget::proxyUserName() const
-{
-  return ui.lneProxyUser->text();
-}
-
-void ConnectionOptionsWidget::setProxyUserName(const QString &AProxyUser)
-{
-  ui.lneProxyUser->setText(AProxyUser);
-}
-
-QString ConnectionOptionsWidget::proxyPassword() const
-{
-  return ui.lneProxyPassword->text();
-}
-
-void ConnectionOptionsWidget::setProxyPassword(const QString &APassword)
-{
-  ui.lneProxyPassword->setText(APassword);
-}
-
-void ConnectionOptionsWidget::onUseSSLStateChanged(int AState)
-{
-  if (AState == Qt::Checked && port()==5222)
-    setPort(5223);
-  else if (AState == Qt::Unchecked && port() == 5223)
-    setPort(5222);
- }
-
-void ConnectionOptionsWidget::onProxyTypeChanged(int AIndex)
-{
-  bool enableProxyParams = AIndex > IDefaultConnection::PT_NO_PROXY;
-  ui.lneProxyHost->setEnabled(enableProxyParams);
-  ui.spbProxyPort->setEnabled(enableProxyParams);
-  ui.lneProxyUser->setEnabled(enableProxyParams);
-  ui.lneProxyPassword->setEnabled(enableProxyParams);
-}
-

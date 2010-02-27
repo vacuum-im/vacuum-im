@@ -2,42 +2,33 @@
 #define CONNECTIONOPTIONSWIDGET_H
 
 #include <QWidget>
-#include <interfaces/idefaultconnection.h>
+#include <interfaces/iconnectionmanager.h>
+#include <interfaces/isettings.h>
 #include "ui_connectionoptionswidget.h"
+
+#define SVN_CONNECTION                      "connection[]"
+#define SVN_CONNECTION_HOST                 SVN_CONNECTION ":host"
+#define SVN_CONNECTION_PORT                 SVN_CONNECTION ":port"
+#define SVN_CONNECTION_USE_SSL              SVN_CONNECTION ":useSSL"
+#define SVN_CONNECTION_IGNORE_SSLERROR      SVN_CONNECTION ":ingnoreSSLErrors"
 
 class ConnectionOptionsWidget : 
   public QWidget
 {
   Q_OBJECT;
-
 public:
-  ConnectionOptionsWidget();
+  ConnectionOptionsWidget(IConnectionManager *AManager, ISettings *ASettings, const QString &ASettingsNS, QWidget *AParent = NULL);
   ~ConnectionOptionsWidget();
-
-  QString host() const;
-  void setHost(const QString &AHost);
-  int port() const;
-  void setPort(int APort);
-  bool useSSL() const;
-  void setUseSSL(bool AUseSSL);
-  bool ignoreSSLErrors() const;
-  void setIgnoreSSLError(bool AIgnore);
-  int proxyType() const;
-  void setProxyTypes(const QStringList &AProxyTypes);
-  void setProxyType(int AProxyType);
-  QString proxyHost() const;
-  void setProxyHost(const QString &AProxyHost);
-  int proxyPort() const;
-  void setProxyPort(int AProxyPort);
-  QString proxyUserName() const;
-  void setProxyUserName(const QString &AProxyUser);
-  QString proxyPassword() const;
-  void setProxyPassword(const QString &APassword);
-protected slots:
-  void onUseSSLStateChanged(int AState);
-  void onProxyTypeChanged(int AIndex);
+public slots:
+  void apply(const QString &ASettingsNS);
 private:
-    Ui::ConnectionOptionsWidgetClass ui;
+  Ui::ConnectionOptionsWidgetClass ui;
+private:
+  ISettings *FSettings;
+  IConnectionManager *FManager;
+private:
+  QString FSettingsNS;
+  QWidget *FProxySettings;
 };
 
 #endif // CONNECTIONOPTIONSWIDGET_H

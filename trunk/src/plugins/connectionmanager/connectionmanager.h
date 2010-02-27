@@ -15,6 +15,8 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/isettings.h>
+#include "editproxydialog.h"
+#include "proxysettingswidget.h"
 #include "connectionoptionswidget.h"
 
 class ConnectionManager :
@@ -39,13 +41,29 @@ public:
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IConnectionManager
-  virtual QList<IConnectionPlugin *> pluginList() const { return FConnectionPlugins; }
+  virtual QList<IConnectionPlugin *> pluginList() const;
   virtual IConnectionPlugin *pluginById(const QUuid &APluginId) const;
+  virtual QList<QUuid> proxyList() const;
+  virtual IConnectionProxy proxyById(const QUuid &AProxyId) const;
+  virtual void setProxy(const QUuid &AProxyId, const IConnectionProxy &AProxy);
+  virtual void removeProxy(const QUuid &AProxyId);
+  virtual QUuid defaultProxy() const;
+  virtual void setDefaultProxy(const QUuid &AProxyId);
+  virtual QDialog *showEditProxyDialog(QWidget *AParent = NULL);
+  virtual QWidget *proxySettingsWidget(const QString &ASettingsNS, QWidget *AParent);
+  virtual void saveProxySettings(QWidget *AWidget, const QString &ASettingsNS = QString::null);
+  virtual QUuid proxySettings(const QString &ASettingsNS) const;
+  virtual void setProxySettings(const QString &ASettingsNS, const QUuid &AProxyId);
+  virtual void deleteProxySettings(const QString &ASettingsNS);
 signals:
   void connectionCreated(IConnection *AConnection);
   void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
   void connectionDestroyed(IConnection *AConnection);
-signals:
+  void proxyChanged(const QUuid &AProxyId, const IConnectionProxy &AProxy);
+  void proxyRemoved(const QUuid &AProxyId);
+  void defaultProxyChanged(const QUuid &AProxyId);
+  void proxySettingsChanged(const QString &ASettingsNS, const QUuid &AProxyId);
+  //IOptionsHolder
   void optionsAccepted();
   void optionsRejected();
 public:
@@ -56,13 +74,18 @@ protected slots:
   void onAccountDestroyed(const QUuid &AAccount);
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
+  void onSettingsOpened();
+  void onSettingsClosed();
 private:
   IAccountManager *FAccountManager;
   ISettingsPlugin *FSettingsPlugin;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
   int FEncryptedLabelId;
-  QList<IConnectionPlugin *> FConnectionPlugins;
+  QList<IConnectionPlugin *> FPlugins;
+private:
+  QUuid FDefaultProxy;
+  QMap<QUuid, IConnectionProxy> FProxys;
 };
 
-#endif 
+#endif // CONNECTIONMANAGER_H

@@ -56,27 +56,6 @@ bool DefaultConnection::connectToHost()
     FSSLConnection = option(IDefaultConnection::CO_USE_SSL).toBool();
     FIgnoreSSLErrors = option(IDefaultConnection::CO_IGNORE_SSL_ERRORS).toBool();
     
-    QNetworkProxy proxy;
-    switch (option(IDefaultConnection::CO_PROXY_TYPE).toInt())
-    {
-    case PT_NO_PROXY: 
-      proxy.setType(QNetworkProxy::NoProxy);
-      break;
-    case PT_SOCKET5_PROXY: 
-      proxy.setType(QNetworkProxy::Socks5Proxy);
-      break;
-    case PT_HTTP_PROXY: 
-      proxy.setType(QNetworkProxy::HttpProxy);
-      break;
-    default:
-      proxy.setType(QNetworkProxy::DefaultProxy);
-    }
-    proxy.setHostName(option(IDefaultConnection::CO_PROXY_HOST).toString());
-    proxy.setPort(option(IDefaultConnection::CO_PROXY_PORT).toInt());
-    proxy.setUser(option(IDefaultConnection::CO_PROXY_USER_NAME).toString());
-    proxy.setPassword(option(IDefaultConnection::CO_PROXY_PASSWORD).toString());
-    FSocket.setProxy(proxy);
-
     QJDns::Record record;
     record.name = !host.isEmpty() ? host.toLatin1() : domain.toLatin1();
     record.port = port;
@@ -187,6 +166,20 @@ void DefaultConnection::ignoreSslErrors()
 QList<QSslError> DefaultConnection::sslErrors() const
 {
   return FSocket.sslErrors();
+}
+
+QNetworkProxy DefaultConnection::proxy() const
+{
+  return FSocket.proxy();
+}
+
+void DefaultConnection::setProxy(const QNetworkProxy &AProxy)
+{
+  if (AProxy!= FSocket.proxy())
+  {
+    FSocket.setProxy(AProxy);
+    emit proxyChanged(AProxy);
+  }
 }
 
 void DefaultConnection::connectToNextHost()

@@ -14,18 +14,7 @@ public:
     CO_DOMAINE,
     CO_USE_SSL,
     CO_IGNORE_SSL_ERRORS,
-    CO_PROXY_TYPE,
-    CO_PROXY_HOST,
-    CO_PROXY_PORT,
-    CO_PROXY_USER_NAME,
-    CO_PROXY_PASSWORD,
     CO_USER_OPTIONS = 100
-  };
-  enum ProxyTypes {
-    PT_DEFAULT_PROXY,
-    PT_NO_PROXY,
-    PT_SOCKET5_PROXY,
-    PT_HTTP_PROXY
   };
 public:
   virtual QObject *instance() =0;
@@ -37,16 +26,18 @@ public:
   virtual QSslCertificate peerCertificate() const =0;
   virtual void ignoreSslErrors() =0;
   virtual QList<QSslError> sslErrors() const =0;
+  virtual QNetworkProxy proxy() const =0;
+  virtual void setProxy(const QNetworkProxy &AProxy) =0;
 protected:
   virtual void modeChanged(QSslSocket::SslMode AMode) =0;
   virtual void sslErrors(const QList<QSslError> &AErrors) =0;
+  virtual void proxyChanged(const QNetworkProxy &AProxy) =0;
 };
 
 class IDefaultConnectionPlugin
 {
 public:
   virtual QObject *instance() =0;
-  virtual QStringList proxyTypeNames() const =0;
 };
 
 Q_DECLARE_INTERFACE(IDefaultConnection,"Vacuum.Plugin.IDefaultConnection/1.0")

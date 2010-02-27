@@ -19,22 +19,6 @@
         <source>Ignore SSL errors</source>
         <translation>Игнорировать ошибки SSL</translation>
     </message>
-    <message>
-        <source>Proxy</source>
-        <translation>Прокси</translation>
-    </message>
-    <message>
-        <source>Type:</source>
-        <translation>Тип:</translation>
-    </message>
-    <message>
-        <source>Username:</source>
-        <translation>Пользователь:</translation>
-    </message>
-    <message>
-        <source>Password:</source>
-        <translation>Пароль:</translation>
-    </message>
 </context>
 <context>
     <name>DefaultConnection</name>
@@ -48,22 +32,6 @@
     <message>
         <source>Default connection</source>
         <translation>Стандартное соединение</translation>
-    </message>
-    <message>
-        <source>Default proxy</source>
-        <translation>Прокси по умолчанию</translation>
-    </message>
-    <message>
-        <source>Without proxy</source>
-        <translation>Без прокси</translation>
-    </message>
-    <message>
-        <source>HTTP proxy</source>
-        <translation>HTTP прокси</translation>
-    </message>
-    <message>
-        <source>Socket5 proxy</source>
-        <translation>Socket5 прокси</translation>
     </message>
     <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>

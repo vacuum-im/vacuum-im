@@ -30,9 +30,9 @@ private:
 private:
   Ui::ConnectionOptionsWidgetClass ui;
 private:
-  QUuid FPluginId;
   QUuid FAccountId;
-  QWidget *FOptionsWidget;
+  QUuid FPluginId;
+  QWidget *FPluginSettings;
 };
 
 #endif // CONNECTIONOPTIONSWIDGET_H
