@@ -14,7 +14,7 @@ public:
     CO_DOMAINE,
     CO_USE_SSL,
     CO_IGNORE_SSL_ERRORS,
-    CO_USER_OPTIONS = 100
+    CO_SETTINGS_NS
   };
 public:
   virtual QObject *instance() =0;
