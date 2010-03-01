@@ -36,6 +36,7 @@ signals:
 protected:
   int appendTableRow(const IAutoStatusRule &ARule, int ARuleId);
 protected slots:
+  void onHelpButtonClicked(bool);
   void onAddButtonClicked(bool);
   void onDeleteButtonClicked(bool);
 private:
