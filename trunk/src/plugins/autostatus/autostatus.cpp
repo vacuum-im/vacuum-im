@@ -157,6 +157,26 @@ void AutoStatus::removeRule(int ARuleId)
   }
 }
 
+void AutoStatus::replaceDateTime(QString &AText, const QString &APattern, const QDateTime &ADateTime)
+{
+  int pos = 0;
+  QRegExp regExp(APattern);
+  regExp.setMinimal(true);
+  while ((pos = regExp.indexIn(AText, pos)) != -1) 
+  {
+    QString replText = !regExp.cap(1).isEmpty() ? ADateTime.toString(regExp.cap(1)) : ADateTime.toString();
+    AText.replace(pos,regExp.matchedLength(),replText);
+    pos += replText.size();
+  }
+}
+
+void AutoStatus::prepareRule(IAutoStatusRule &ARule)
+{
+  replaceDateTime(ARule.text,"\\%\\((.*)\\)",QDateTime::currentDateTime());
+  replaceDateTime(ARule.text,"\\$\\((.*)\\)",QDateTime::currentDateTime().addSecs(0-ARule.time));
+  replaceDateTime(ARule.text,"\\#\\((.*)\\)",QDateTime(QDate::currentDate()).addSecs(ARule.time));
+}
+
 void AutoStatus::setActiveRule(int ARuleId)
 {
   if (FStatusChanger && ARuleId!=FActiveRule)
@@ -164,6 +184,7 @@ void AutoStatus::setActiveRule(int ARuleId)
     if (ARuleId>0 && FRules.contains(ARuleId))
     {
       IAutoStatusRule rule = FRules.value(ARuleId).rule;
+      prepareRule(rule);
       if (FAutoStatusId == STATUS_NULL_ID)
       {
         FLastStatusId = FStatusChanger->mainStatus();
@@ -242,8 +263,9 @@ void AutoStatus::onSettingsOpened()
   }
 }
 
-void AutoStatus::onProfileClosed(const QString &/*AProfileName*/)
+void AutoStatus::onProfileClosed(const QString &AProfileName)
 {
+  Q_UNUSED(AProfileName);
   setActiveRule(0);
   FLastCursorTime = QDateTime::currentDateTime();
 }

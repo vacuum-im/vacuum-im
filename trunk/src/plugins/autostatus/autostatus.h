@@ -58,6 +58,8 @@ signals:
   void optionsAccepted();
   void optionsRejected();
 protected:
+  void replaceDateTime(QString &AText, const QString &APattern, const QDateTime &ADateTime);
+  void prepareRule(IAutoStatusRule &ARule);
   void setActiveRule(int ARuleId);
   void updateActiveRule();
 protected slots:
