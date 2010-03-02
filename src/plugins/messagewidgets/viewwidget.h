@@ -34,7 +34,6 @@ signals:
 protected:
   void initialize();
   QString getHtmlBody(const QString &AHtml);
-  bool processMeCommand(QTextDocument *ADocument, const IMessageContentOptions &AOptions);
 protected slots:
   void onContentAppended(QWidget *AWidget, const QString &AMessage, const IMessageContentOptions &AOptions);
   void onUrlClicked(QWidget *AWidget, const QUrl &AUrl);

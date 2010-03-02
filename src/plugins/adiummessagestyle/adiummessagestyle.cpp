@@ -7,6 +7,7 @@
 #include <QWebFrame>
 #include <QByteArray>
 #include <QStringList>
+#include <QTextCursor>
 #include <QWebSettings>
 #include <QDomDocument>
 #include <QTextDocument>
@@ -140,7 +141,7 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
     QString html = makeContentTemplate(AOptions,sameSender);
     fillContentKeywords(html,AOptions,sameSender);
 
-    html.replace("%message%",AHtml);
+    html.replace("%message%",processCommands(AHtml,AOptions));
     if (AOptions.kind == IMessageContentOptions::Topic)
       html.replace("%topic%",QString(TOPIC_INDIVIDUAL_WRAPPER).arg(AHtml));
 
@@ -287,13 +288,18 @@ QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOption
 void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const
 {
   AHtml.replace("%chatName%",AOptions.extended.value(MSO_CHAT_NAME).toString());
+  AHtml.replace("%timeOpened%",Qt::escape(AOptions.extended.value(MSO_START_DATE_TIME).toDateTime().time().toString()));
+  AHtml.replace("%dateOpened%",Qt::escape(AOptions.extended.value(MSO_START_DATE_TIME).toDateTime().date().toString()));
   AHtml.replace("%sourceName%",AOptions.extended.value(MSO_ACCOUNT_NAME).toString());
   AHtml.replace("%destinationName%",AOptions.extended.value(MSO_CHAT_NAME).toString());
   AHtml.replace("%destinationDisplayName%",AOptions.extended.value(MSO_CHAT_NAME).toString());
   AHtml.replace("%outgoingIconPath%",AOptions.extended.value(MSO_SELF_AVATAR,"outgoing_icon.png").toString());
   AHtml.replace("%incomingIconPath%",AOptions.extended.value(MSO_CONTACT_AVATAR,"incoming_icon.png").toString());
-  AHtml.replace("%timeOpened%",Qt::escape(AOptions.extended.value(MSO_START_TIME).toDateTime().toString()));
-  AHtml.replace("%serviceIconImg%", "");
+  AHtml.replace("%outgoingColor%",AOptions.extended.value(MSO_SELF_COLOR).toString());
+  AHtml.replace("%incomingColor%",AOptions.extended.value(MSO_CONTACT_COLOR).toString());
+  AHtml.replace("%serviceIconPath%", AOptions.extended.value(MSO_SERVICE_ICON_PATH).toString());
+  AHtml.replace("%serviceIconImg%", QString("<img class=\"serviceIcon\" src=\"%1\">")
+    .arg(AOptions.extended.value(MSO_SERVICE_ICON_PATH,"outgoing_icon.png").toString()));
 
   QString background;
   if (FAllowCustomBackground)
@@ -459,6 +465,34 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
       }
     }
   }
+}
+
+QString AdiumMessageStyle::processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const
+{
+  bool changed = false;
+  QTextDocument message;
+  message.setHtml(AHtml);
+
+  // "/me" command
+  if (!AOptions.senderName.isEmpty())
+  {
+    QRegExp me("^/me\\s");
+    for (QTextCursor cursor = message.find(me); !cursor.isNull();  cursor = message.find(me,cursor))
+    {
+      changed = true;
+      cursor.insertHtml("*&nbsp;<i>"+AOptions.senderName+"&nbsp;</i>");
+    }
+  }
+
+  if (changed)
+  {
+    QString html = message.toHtml();
+    QRegExp body("<body.*>(.*)</body>");
+    body.setMinimal(false);
+    return html.indexOf(body)>=0 ? body.cap(1).trimmed() : html;
+  }
+
+  return AHtml;
 }
 
 void AdiumMessageStyle::escapeStringForScript(QString &AText) const

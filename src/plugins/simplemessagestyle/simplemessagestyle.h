@@ -81,6 +81,7 @@ protected:
   void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
   QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;
   void fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const;
+  QString processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const;
   QString loadFileData(const QString &AFileName, const QString &DefValue) const;
   void loadTemplates();
   void loadSenderColors();
