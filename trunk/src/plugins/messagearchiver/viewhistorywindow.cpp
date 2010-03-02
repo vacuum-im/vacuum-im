@@ -796,7 +796,7 @@ void ViewHistoryWindow::insertContact(const Jid &AContactJid)
 
 void ViewHistoryWindow::updateFilterWidgets()
 {
-  ui.cmbContact->setCurrentIndex(ui.cmbContact->findData(FFilter.with.pBare()));
+  ui.cmbContact->setCurrentIndex(ui.cmbContact->findData(FArchiver->gateJid(FFilter.with).pBare()));
   ui.dedStart->setDate(FFilter.start.isValid() ? FFilter.start.date() : MINIMUM_DATETIME.date());
   ui.dedEnd->setDate(FFilter.end.isValid() ? FFilter.end.date() : MAXIMUM_DATETIME.date());
   ui.lneSearch->setText(FFilter.body.pattern());
