@@ -4,6 +4,7 @@
 #include <QTextTable>
 #include <QScrollBar>
 #include <QVBoxLayout>
+#include <QTextDocumentFragment>
 
 ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid)
 {
@@ -106,14 +107,7 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOpt
   else
     messageDoc.setPlainText(AMessage.body());
 
-  if (!AOptions.senderName.isEmpty() && processMeCommand(&messageDoc,AOptions))
-  {
-    IMessageContentOptions options = AOptions;
-    options.senderName = QString::null;
-    appendHtml(getHtmlBody(messageDoc.toHtml()),options);
-  }
-  else
-    appendHtml(getHtmlBody(messageDoc.toHtml()),AOptions);
+  appendHtml(getHtmlBody(messageDoc.toHtml()),AOptions);
 }
 
 void ViewWidget::initialize()
@@ -127,31 +121,7 @@ QString ViewWidget::getHtmlBody(const QString &AHtml)
 {
   QRegExp body("<body.*>(.*)</body>");
   body.setMinimal(false);
-  body.setCaseSensitivity(Qt::CaseInsensitive);
-  if (AHtml.indexOf(body)>=0)
-  {
-    QString html = body.cap(1).trimmed();
-    if (html.startsWith("<p ") && html.endsWith("</p>"))
-    {
-      html.remove(0,2);
-      html.prepend("<span");
-      html.chop(2);
-      html.append("span>");
-    }
-    return html;
-  }
-  return AHtml;
-}
-
-bool ViewWidget::processMeCommand(QTextDocument *ADocument, const IMessageContentOptions &AOptions)
-{
-  QRegExp regexp("^/me\\s");
-  for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
-  {
-    cursor.insertHtml("<i>* "+AOptions.senderName+"&nbsp;</i>");
-    return true;
-  }
-  return false;
+  return AHtml.indexOf(body)>=0 ? body.cap(1).trimmed() : AHtml;
 }
 
 void ViewWidget::onContentAppended(QWidget *AWidget, const QString &AMessage, const IMessageContentOptions &AOptions)

@@ -63,11 +63,14 @@
 #define MSO_HEADER_TYPE                     "headerType"
 #define MSO_CHAT_NAME                       "chatName"
 #define MSO_ACCOUNT_NAME                    "accountName"
-#define MSO_START_TIME                      "startTime"
+#define MSO_START_DATE_TIME                 "startDateTime"
 #define MSO_SELF_NAME                       "selfName"
 #define MSO_SELF_AVATAR                     "selfAvatar"
+#define MSO_SELF_COLOR                      "selfColor"
 #define MSO_CONTACT_NAME                    "contactName"
 #define MSO_CONTACT_AVATAR                  "contactAvatar"
+#define MSO_CONTACT_COLOR                   "contactColor"
+#define MSO_SERVICE_ICON_PATH               "serviceIconPath"
 #define MSO_BG_COLOR                        "bgColor"
 #define MSO_BG_IMAGE_FILE                   "bgImageFile"
 #define MSO_BG_IMAGE_LAYOUT                 "bgImageLayout"
@@ -129,6 +132,7 @@ protected:
   void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
   QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;
   void fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const;
+  QString processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const;
   void escapeStringForScript(QString &AText) const;
   QString scriptForAppendContent(bool ASameSender, bool ANoScroll) const;
   QString loadFileData(const QString &AFileName, const QString &DefValue) const;

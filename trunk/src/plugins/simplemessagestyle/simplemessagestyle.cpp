@@ -128,7 +128,7 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
     QString html = makeContentTemplate(AOptions,sameSender);
     fillContentKeywords(html,AOptions,sameSender);
 
-    html.replace("%message%",AHtml);
+    html.replace("%message%",processCommands(AHtml,AOptions));
 
     bool scrollAtEnd = view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum();
 
@@ -348,6 +348,34 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConte
   AHtml.replace("%sender%",AOptions.senderName);
   AHtml.replace("%senderScreenName%",AOptions.senderId);
   AHtml.replace("%textbackgroundcolor%",!AOptions.textBGColor.isEmpty() ? AOptions.textBGColor : "inherit");
+}
+
+QString SimpleMessageStyle::processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const
+{
+  bool changed = false;
+  QTextDocument message;
+  message.setHtml(AHtml);
+
+  // "/me" command
+  if (!AOptions.senderName.isEmpty())
+  {
+    QRegExp me("^/me\\s");
+    for (QTextCursor cursor = message.find(me); !cursor.isNull();  cursor = message.find(me,cursor))
+    {
+      changed = true;
+      cursor.insertHtml("*&nbsp;<i>"+AOptions.senderName+"&nbsp;</i>");
+    }
+  }
+
+  if (changed)
+  {
+    QString html = message.toHtml();
+    QRegExp body("<body.*>(.*)</body>");
+    body.setMinimal(false);
+    return html.indexOf(body)>=0 ? body.cap(1).trimmed() : html;
+  }
+
+  return AHtml;
 }
 
 QString SimpleMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
