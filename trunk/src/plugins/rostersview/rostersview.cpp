@@ -56,6 +56,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 
   connect(this,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
     SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
+  connect(this,SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
 }
 
 RostersView::~RostersView()
@@ -786,13 +787,6 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
     if (labelId!=RLID_DISPLAY && contextMenu->isEmpty())
       contextMenuForIndex(index,RLID_DISPLAY,contextMenu);
 
-    Menu *clipMenu = new Menu(contextMenu);
-    clipMenu->setTitle(tr("Copy to clipboard"));
-    clipMenu->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_CLIPBOARD);
-    clipboardMenuForIndex(index, clipMenu);
-    if (!clipMenu->isEmpty())
-      contextMenu->addAction(clipMenu->menuAction(), AG_RVCM_ROSTERSVIEW_CLIPBOARD, true);
-
     if (!contextMenu->isEmpty())
       contextMenu->popup(AEvent->globalPos());
     else
@@ -1002,6 +996,18 @@ void RostersView::dragLeaveEvent(QDragLeaveEvent *AEvent)
   setDropIndicatorRect(QRect());
 }
 
+void RostersView::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+{
+  Menu *clipMenu = new Menu(AMenu);
+  clipMenu->setTitle(tr("Copy to clipboard"));
+  clipMenu->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_CLIPBOARD);
+  clipboardMenuForIndex(AIndex, clipMenu);
+  if (!clipMenu->isEmpty())
+    AMenu->addAction(clipMenu->menuAction(), AG_RVCM_ROSTERSVIEW_CLIPBOARD, true);
+  else
+    delete clipMenu;
+}
+
 void RostersView::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
   if (ALabelId == RLID_DISPLAY)
@@ -1100,4 +1106,3 @@ void RostersView::onDragExpandTimer()
   QModelIndex index = indexAt(FDropIndicatorRect.center());
   setExpanded(index,true);
 }
-
