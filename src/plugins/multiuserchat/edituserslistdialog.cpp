@@ -105,7 +105,7 @@ void EditUsersListDialog::onAddClicked()
     FAddedItems.insert(userJid,jidItem);
     FDeletedItems.removeAt(FDeletedItems.indexOf(userJid));
   }
-  else
+  else if (!userJid.isEmpty())
   {
     QMessageBox::warning(this,tr("Wrong item JID"),tr("Entered item JID is not valid or already exists."));
   }

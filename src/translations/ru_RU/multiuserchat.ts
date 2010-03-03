@@ -358,7 +358,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Make Room Members-Only?</source>
-        <translation>Комната только для зерегистрированных участников?</translation>
+        <translation>Сделать комнату только для участников?</translation>
     </message>
     <message>
         <source>Make Room Moderated?</source>
