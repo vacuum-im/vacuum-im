@@ -34,6 +34,22 @@
         <source>Status:</source>
         <translation>Статус:</translation>
     </message>
+    <message>
+        <source>Jabber ID</source>
+        <translation>Jabber ID</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Статус</translation>
+    </message>
+    <message>
+        <source>Copy to clipboard</source>
+        <translation>Копировать в буфер</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
 </context>
 <context>
     <name>RostersViewPlugin</name>

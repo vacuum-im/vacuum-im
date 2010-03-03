@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QDropEvent>
 #include <QHelpEvent>
+#include <QClipboard>
 #include <QHeaderView>
 #include <QResizeEvent>
 #include <QApplication>
@@ -13,6 +14,8 @@
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QContextMenuEvent>
+
+#define ADR_CLIPBOARD_DATA      Action::DR_Parametr1
 
 RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 {
@@ -579,6 +582,38 @@ void RostersView::contextMenuForIndex(IRosterIndex *AIndex, int ALabelId, Menu *
   }
 }
 
+void RostersView::clipboardMenuForIndex(IRosterIndex *AIndex, Menu *AMenu)
+{
+  if (AIndex!=NULL && AMenu!=NULL)
+  {
+    if (!AIndex->data(RDR_JID).toString().isEmpty())
+    {
+      Action *action = new Action(AMenu);
+      action->setText(tr("Jabber ID"));
+      action->setData(ADR_CLIPBOARD_DATA, AIndex->data(RDR_JID));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+      AMenu->addAction(action, AG_DEFAULT, true);
+    }
+    if (!AIndex->data(RDR_STATUS).toString().isEmpty())
+    {
+      Action *action = new Action(AMenu);
+      action->setText(tr("Status"));
+      action->setData(ADR_CLIPBOARD_DATA, AIndex->data(RDR_STATUS));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+      AMenu->addAction(action, AG_DEFAULT, true);
+    }
+    if (!AIndex->data(RDR_NAME).toString().isEmpty())
+    {
+      Action *action = new Action(AMenu);
+      action->setText(tr("Name"));
+      action->setData(ADR_CLIPBOARD_DATA, AIndex->data(RDR_NAME));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+      AMenu->addAction(action, AG_DEFAULT, true);
+    }
+    emit indexClipboardMenu(AIndex, AMenu);
+  }
+}
+
 bool RostersView::checkOption(IRostersView::Option AOption) const
 {
   return (FOptions & AOption) > 0;
@@ -744,17 +779,24 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
     modelIndex = mapToModel(modelIndex);
     IRosterIndex *index = static_cast<IRosterIndex *>(modelIndex.internalPointer());
     
-    Menu *menu = new Menu(this);
-    menu->setAttribute(Qt::WA_DeleteOnClose, true);
+    Menu *contextMenu = new Menu(this);
+    contextMenu->setAttribute(Qt::WA_DeleteOnClose, true);
     
-    contextMenuForIndex(index,labelId,menu);
-    if (labelId!=RLID_DISPLAY && menu->isEmpty())
-      contextMenuForIndex(index,RLID_DISPLAY,menu);
+    contextMenuForIndex(index,labelId,contextMenu);
+    if (labelId!=RLID_DISPLAY && contextMenu->isEmpty())
+      contextMenuForIndex(index,RLID_DISPLAY,contextMenu);
 
-    if (!menu->isEmpty())
-      menu->popup(AEvent->globalPos());
+    Menu *clipMenu = new Menu(contextMenu);
+    clipMenu->setTitle(tr("Copy to clipboard"));
+    clipMenu->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_CLIPBOARD);
+    clipboardMenuForIndex(index, clipMenu);
+    if (!clipMenu->isEmpty())
+      contextMenu->addAction(clipMenu->menuAction(), AG_RVCM_ROSTERSVIEW_CLIPBOARD, true);
+
+    if (!contextMenu->isEmpty())
+      contextMenu->popup(AEvent->globalPos());
     else
-      delete menu;
+      delete contextMenu;
   }
 }
 
@@ -993,6 +1035,15 @@ void RostersView::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMul
   }
 }
 
+void RostersView::onCopyToClipboardActionTriggered(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QApplication::clipboard()->setText(action->data(ADR_CLIPBOARD_DATA).toString());
+  }
+}
+
 void RostersView::onIndexInserted(IRosterIndex *AIndex)
 {
   updateStatusText(AIndex);
@@ -1049,3 +1100,4 @@ void RostersView::onDragExpandTimer()
   QModelIndex index = indexAt(FDropIndicatorRect.center());
   setExpanded(index,true);
 }
+

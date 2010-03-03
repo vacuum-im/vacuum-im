@@ -2,6 +2,9 @@
 #define ROSTERSVIEW_H
 
 #include <QTimer>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
+#include <definations/actiongroups.h>
 #include <definations/rostertooltiporders.h>
 #include <definations/rosterlabelorders.h>
 #include <definations/rosterindextyperole.h>
@@ -70,6 +73,8 @@ public:
   virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
   //--ContextMenu
   virtual void contextMenuForIndex(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
+  //--ClipboardMenu
+  virtual void clipboardMenuForIndex(IRosterIndex *AIndex, Menu *AMenu);
 signals:
   void modelAboutToBeSeted(IRostersModel *AModel);
   void modelSeted(IRostersModel *AModel);
@@ -80,6 +85,7 @@ signals:
   void viewModelAboutToBeChanged(QAbstractItemModel *AModel);
   void viewModelChanged(QAbstractItemModel *AModel);
   void indexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+  void indexClipboardMenu(IRosterIndex *AIndex, Menu *AMenu);
   void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
   void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void labelClicked(IRosterIndex *AIndex, int ALabelId);
@@ -118,6 +124,7 @@ protected:
   virtual void dragMoveEvent(QDragMoveEvent *AEvent);
   virtual void dragLeaveEvent(QDragLeaveEvent *AEvent);
 protected slots:
+  void onCopyToClipboardActionTriggered(bool);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onIndexInserted(IRosterIndex *AIndex);
   void onIndexDestroyed(IRosterIndex *AIndex);
