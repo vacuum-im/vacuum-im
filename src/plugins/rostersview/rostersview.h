@@ -124,8 +124,9 @@ protected:
   virtual void dragMoveEvent(QDragMoveEvent *AEvent);
   virtual void dragLeaveEvent(QDragLeaveEvent *AEvent);
 protected slots:
-  void onCopyToClipboardActionTriggered(bool);
+  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+  void onCopyToClipboardActionTriggered(bool);
   void onIndexInserted(IRosterIndex *AIndex);
   void onIndexDestroyed(IRosterIndex *AIndex);
   void onBlinkTimer();
