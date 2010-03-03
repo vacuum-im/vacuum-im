@@ -30,6 +30,7 @@
 #define AG_RVCM_AVATARS                                         500
 #define AG_RVCM_ANNOTATIONS                                     500
 #define AG_RVCM_ARCHIVER                                        500
+#define AG_RVCM_ROSTERSVIEW_CLIPBOARD                           500
 #define AG_RVCM_ROSTERCHANGER_SUBSCRIPTION                      700
 #define AG_RVCM_ROSTERCHANGER                                   700
 

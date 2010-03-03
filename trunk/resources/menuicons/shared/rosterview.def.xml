@@ -12,4 +12,8 @@
     <key>rosterviewHideOffline</key>
     <object mime="image/png">rosterviewhideoffline.png</object>
   </icon>
+  <icon>
+    <key>rosterviewClipboard</key>
+    <object mime="image/png">rosterviewclipboard.png</object>
+  </icon>
 </icondef>

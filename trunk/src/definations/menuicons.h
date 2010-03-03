@@ -206,6 +206,7 @@
 #define MNI_ROSTERVIEW_OPTIONS          "rosterviewOptions"
 #define MNI_ROSTERVIEW_SHOW_OFFLINE     "rosterviewShowOffline"
 #define MNI_ROSTERVIEW_HIDE_OFFLINE     "rosterviewHideOffline"
+#define MNI_ROSTERVIEW_CLIPBOARD        "rosterviewClipboard"
 
 //ServiceDiscovery
 #define MNI_SDISCOVERY_ARROW_LEFT       "sdiscoveryArrowLeft"

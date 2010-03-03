@@ -1,10 +1,14 @@
 #include "annotations.h"
 
+#include <QClipboard>
+#include <QApplication>
+
 #define PST_ANNOTATIONS       "storage"
 #define PSN_ANNOTATIONS       "storage:rosternotes"
 
 #define ADR_STREAMJID         Action::DR_StreamJid
 #define ADR_CONTACTJID        Action::DR_Parametr1
+#define ADR_CLIPBOARD_DATA    Action::DR_Parametr2
 
 Annotations::Annotations()
 {
@@ -81,6 +85,7 @@ bool Annotations::initObjects()
   {
     IRostersView *rostersView = FRostersViewPlugin->rostersView();
     connect(rostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+    connect(rostersView->instance(),SIGNAL(indexClipboardMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexClipboardMenu(IRosterIndex *, Menu *)));
     connect(rostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
       SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
   }
@@ -333,6 +338,22 @@ void Annotations::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
   }
 }
 
+void Annotations::onRosterIndexClipboardMenu(IRosterIndex *AIndex, Menu *AMenu)
+{
+  if (rosterDataTypes().contains(AIndex->type()))
+  {
+    QString note = annotation(AIndex->data(RDR_STREAM_JID).toString(), AIndex->data(RDR_JID).toString());
+    if (!note.isEmpty())
+    {
+      Action *action = new Action(AMenu);
+      action->setText(tr("Annotation"));
+      action->setData(ADR_CLIPBOARD_DATA, note);
+      connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+      AMenu->addAction(action, AG_DEFAULT, true);
+    }
+  }
+}
+
 void Annotations::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
   if (ALabelId==RLID_DISPLAY && rosterDataTypes().contains(AIndex->type()))
@@ -340,6 +361,15 @@ void Annotations::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMul
     QString note = AIndex->data(RDR_ANNOTATIONS).toString();
     if (!note.isEmpty())
       AToolTips.insert(RTTO_ANNOTATIONS,QString("%1 <div style='margin-left:10px;'>%2</div>").arg(tr("Annotation:")).arg(Qt::escape(note).replace("\n","<br>")));
+  }
+}
+
+void Annotations::onCopyToClipboardActionTriggered(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+  {
+    QApplication::clipboard()->setText(action->data(ADR_CLIPBOARD_DATA).toString());
   }
 }
 
