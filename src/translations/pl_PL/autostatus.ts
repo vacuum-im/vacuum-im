@@ -148,11 +148,11 @@
     </message>
     <message>
         <source>   AP or A - interpret as an AM/PM time. AP must be either &apos;AM&apos; or &apos;PM&apos;</source>
-        <translation>   AP lub A - oznacza czas w trybie AM/PM. AP musi być albo &apos;AM&apos; albo &apos;PM&apos;</translation>
+        <translation>   AP lub A - oznacza czas w trybie AM/PM.</translation>
     </message>
     <message>
         <source>   ap or a - interpret as an AM/PM time. ap must be either &apos;am&apos; or &apos;pm&apos;</source>
-        <translation>   ap lub a - oznacza czas w trybie AM/PM. ap musi być albo &apos;am&apos; albo &apos;pm&apos;</translation>
+        <translation>   ap lub a - oznacza czas w trybie AM/PM.</translation>
     </message>
     <message>
         <source>Example:</source>
