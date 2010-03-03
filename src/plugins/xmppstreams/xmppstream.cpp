@@ -26,6 +26,10 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
 XmppStream::~XmppStream()
 {
   close();
+
+  foreach(IXmppFeature *feature, FActiveFeatures.toSet())
+    delete feature->instance();
+
   emit streamDestroyed();
 }
 
@@ -202,6 +206,7 @@ void XmppStream::setConnection(IConnection *AConnection)
   {
     if (FConnection)
       FConnection->instance()->disconnect(this);
+
     if (AConnection)
     {
       connect(AConnection->instance(),SIGNAL(connected()),SLOT(onConnectionConnected()));
@@ -209,6 +214,7 @@ void XmppStream::setConnection(IConnection *AConnection)
       connect(AConnection->instance(),SIGNAL(error(const QString &)),SLOT(onConnectionError(const QString &)));
       connect(AConnection->instance(),SIGNAL(disconnected()),SLOT(onConnectionDisconnected()));
     }
+
     FConnection = AConnection;
     emit connectionChanged(AConnection);
   }
