@@ -48,6 +48,16 @@ bool IqAuth::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder
   return false;
 }
 
+QString IqAuth::featureNS() const
+{
+  return NS_FEATURE_IQAUTH;
+}
+
+IXmppStream *IqAuth::xmppStream() const
+{
+  return FXmppStream;
+}
+
 bool IqAuth::start(const QDomElement &AElem)
 {
   if (AElem.tagName()=="auth")
@@ -75,7 +85,6 @@ bool IqAuth::start(const QDomElement &AElem)
   deleteLater();
   return false;
 }
-
 
 //IqAuthPlugin
 IqAuthPlugin::IqAuthPlugin()
@@ -114,6 +123,11 @@ bool IqAuthPlugin::initObjects()
     FXmppStreams->registerXmppFeature(this, NS_FEATURE_IQAUTH, XFO_IQAUTH);
   }
   return true;
+}
+
+QList<QString> IqAuthPlugin::xmppFeatures() const
+{
+  return QList<QString>() << NS_FEATURE_IQAUTH;
 }
 
 IXmppFeature *IqAuthPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)

@@ -29,9 +29,9 @@ public:
   virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
   virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
   //IXmppFeature
-  virtual QString featureNS() const { return NS_FEATURE_IQAUTH; }
-  virtual IXmppStream *xmppStream() const { return FXmppStream; }
-  virtual bool start(const QDomElement &AElem); 
+  virtual QString featureNS() const;
+  virtual IXmppStream *xmppStream() const;
+  virtual bool start(const QDomElement &AElem);
 signals:
   void finished(bool ARestart); 
   void error(const QString &AError);
@@ -59,11 +59,11 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IXmppFeaturesPlugin
-  virtual QList<QString> xmppFeatures() const { return QList<QString>() << NS_FEATURE_IQAUTH; }
+  virtual QList<QString> xmppFeatures() const;
   virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
 signals:
-  virtual void featureCreated(IXmppFeature *AStreamFeature);
-  virtual void featureDestroyed(IXmppFeature *AStreamFeature);
+  void featureCreated(IXmppFeature *AStreamFeature);
+  void featureDestroyed(IXmppFeature *AStreamFeature);
 protected slots:
   void onFeatureDestroyed();
 private:
