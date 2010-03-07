@@ -3,6 +3,7 @@ Vacuum-IM
 
 Web Site:
   http://www.vacuum-im.org
+  http://code.google.com/p/vacuum-im/
 
 Source:
   http://code.google.com/p/vacuum-im
@@ -14,35 +15,42 @@ Forum:
   http://forum.jrudevels.org/viewforum.php?f=11
 
 
+Portable Version
+----------------
+  To make Vacuum-IM portable just create folder VacuumIM (for Windows) 
+  in the directory where vacuum.exe is located.
+
+
 Known Issues
 ------------
   - on some systems popup window may capture input focus
   - on GTalk accounts allways used default nested roster group delimiter
+  - not native look and feel in Mac OS
 
 
-The minimum list of plug-ins necessary for work 
------------------------------------------------
-  01. accountmanager
-  02. chatmessagehandler
-  03. connectionmanager
-  04. defaultconnection
-  05. mainnwindow
-  06. messageprocessor
-  07. messagestyles
-  08. messagewidgets
-  09. normalmessagehandler
-  10. notifications
-  11. presence
-  12. roster
-  13. rosterchanger
-  14. rostersmodel
-  15. rostersview
-  16. saslauth
-  17. settings
-  18. simplemessagestyle
-  19. stanzaprocessor
-  20. starttls
-  21. statuschanger
-  22. statusicons
-  23. traymanager
-  24. xmppstreams
+List of plugins that SHOULD NOT be disabled 
+-------------------------------------------
+  01. Account Manager		- accountmanager
+  02. Chat Messages		- chatmessagehandler
+  03. Connection Manager	- connectionmanager
+  04. Default connection	- defaultconnection
+  05. Main Window		- mainnwindow
+  06. Message Manager		- messageprocessor
+  07. Message Styles Manager	- messagestyles
+  08. Message Widgets Manager	- messagewidgets
+  09. Normal Messages		- normalmessagehandler
+  10. Notifications Manager	- notifications
+  11. Presence Manager		- presence
+  12. Roster Manager		- roster
+  13. Roster Editor		- rosterchanger
+  14. Roster Model		- rostersmodel
+  15. Roster View		- rostersview
+  16. SASL Authentication	- saslauth
+  17. Settings Manager		- settings
+  18. Simple Message Style	- simplemessagestyle
+  19. Stanza Manager		- stanzaprocessor
+  20. StartTLS			- starttls
+  21. Status Manager		- statuschanger
+  22. Status Icons Manager	- statusicons
+  23. Tray Icon			- traymanager
+  24. XMPP Streams Manager	- xmppstreams
