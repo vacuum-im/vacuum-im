@@ -176,6 +176,8 @@ bool ChatWindow::event(QEvent *AEvent)
       FEditWidget->textEdit()->setFocus();
       QCoreApplication::sendEvent(FEditWidget->textEdit(),AEvent);
       sentEvent = NULL;
+      AEvent->accept();
+      return true;
     }
   }
   else if (AEvent->type() == QEvent::WindowActivate)
