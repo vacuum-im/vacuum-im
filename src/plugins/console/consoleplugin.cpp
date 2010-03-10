@@ -49,6 +49,7 @@ bool ConsolePlugin::initObjects()
 void ConsolePlugin::onShowXMLConsole(bool)
 {
   ConsoleWidget *widget = new ConsoleWidget(FPluginManager,NULL);
+  FCleanupHandler.add(widget);
   widget->show();
 }
 
