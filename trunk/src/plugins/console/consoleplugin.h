@@ -1,6 +1,7 @@
 #ifndef CONSOLEPLUGIN_H
 #define CONSOLEPLUGIN_H
 
+#include <QObjectCleanupHandler>
 #include <definations/actiongroups.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
@@ -36,6 +37,8 @@ protected slots:
 private:
   IPluginManager *FPluginManager;
   IMainWindowPlugin *FMainWindowPlugin;
+private:
+  QObjectCleanupHandler FCleanupHandler;
 };
 
 #endif // CONSOLEPLUGIN_H
