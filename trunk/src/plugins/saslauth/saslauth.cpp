@@ -8,17 +8,17 @@
 static QMultiHash<QString, QString> parseChallenge(const QString &AChallenge)
 {
   QMultiHash<QString, QString> hash;
-  QStringList params = AChallenge.split(",",QString::SkipEmptyParts); 
+  QStringList params = AChallenge.split(',',QString::SkipEmptyParts);
   QStringList param;
   QString value;
   for(int i = 0;i<params.count();i++)
   {
-    param = params.at(i).split("=");
+    param = params.at(i).split('=');
     if (param.count() == 2)
     {
       value = param.at(1);
-      if (value.endsWith("\""))
-        value.remove(0,1).chop(1);  
+      if (value.endsWith('"'))
+        value.remove(0,1).chop(1);
       hash.insert(param.at(0),value);
     }
   }
@@ -63,7 +63,7 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
         QString realm = params.value("realm");
         if (realm.isEmpty())
           realm = FXmppStream->streamJid().pDomain();
-        QString user = FXmppStream->streamJid().eNode();
+        QString user = FXmppStream->streamJid().prepared().eNode();
         QString pass = FXmppStream->password();
         QString nonce = params.value("nonce");
         QByteArray randBytes(32,' ');
@@ -140,15 +140,15 @@ bool SASLAuth::start(const QDomElement &AElem)
       if (mechanism == "DIGEST-MD5")
       {
         Stanza auth("auth");
-        auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism); 
+        auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
         FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-        FXmppStream->sendStanza(auth);   
+        FXmppStream->sendStanza(auth);
         return true;
       }
       else if (mechanism == "PLAIN")
       {
         QByteArray resp;
-        resp.append('\0').append(FXmppStream->streamJid().pNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
+        resp.append('\0').append(FXmppStream->streamJid().prepared().eNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
         Stanza auth("auth");
         auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
         auth.element().appendChild(auth.createTextNode(resp.toBase64()));
