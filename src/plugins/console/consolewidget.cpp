@@ -112,15 +112,19 @@ void ConsoleWidget::colorXml(QString &AXml) const
 {
   static const struct { const char *regexp ; const char *replace; bool minimal;} changes[] = 
   {
-    { "\n",                           "<br>"                                          ,                     false      },
-    { "&lt;([\\w:-]+)((\\s|/|&gt))",  "&lt;<span style='color:navy;'>\\1</span>\\2"   ,                     false      },   //open tagName
-    { "&lt;/([\\w:-]+)&gt;",          "&lt;/<span style='color:navy;'>\\1</span>&gt;" ,                     false      },   //close tagName
-    { " xmlns\\s?=\\s?\"(.+)\"",      " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },   //xmlns
-    { " ([\\w:-]+\\s?)=\\s?\"",       " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
+    { "\n",                                 "<br>"                                          ,                     false      },
+    { "&lt;([\\w:-]+)((\\s|/|&gt))",        "&lt;<span style='color:navy;'>\\1</span>\\2"   ,                     false      },   //open tagName
+    { "&lt;/([\\w:-]+)&gt;",                "&lt;/<span style='color:navy;'>\\1</span>&gt;" ,                     false      },   //close tagName
+#if QT_VERSION <= 0x040503
+    { "\\sxmlns\\s?=\\s?\"(.+)\"",          " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },   //xmlns
+    { "\\s([\\w:-]+\\s?)=\\s?\"",           " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
+#else
+    { "\\sxmlns\\s?=\\s?&quot;(.+)&quot;",  " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },   //xmlns
+    { "\\s([\\w:-]+\\s?)=\\s?&quot;",       " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
+#endif
   }; 
   static const int changesCount = sizeof(changes)/sizeof(changes[0]);
 
-  AXml = "<pre>"+Qt::escape(AXml)+"</pre>";
   for (int i=0; i<changesCount; i++)
   {
     QRegExp regexp(changes[i].regexp);
@@ -158,12 +162,11 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
 
       QString xml = stanza.toString(2);
       hidePasswords(xml);
+      xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
       if (ui.chbColoredXML->checkState() == Qt::Checked)
         colorXml(xml);
       else if (ui.chbColoredXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)
         colorXml(xml);
-      else
-        xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
       ui.tedConsole->append(xml);
     }
   }
