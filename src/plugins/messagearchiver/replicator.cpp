@@ -161,7 +161,7 @@ void Replicator::onStepTimerTimeout()
     if (modif.action != IArchiveModification::Removed)
     {
       IArchiveHeader header = FArchiver->loadLocalHeader(FStreamJid,modif.header.with,modif.header.start);
-      if (header!=modif.header || header.version < modif.header.version)
+      //if (header!=modif.header || header.version < modif.header.version)
       {
         loading = true;
         FServerRequest = FArchiver->loadServerCollection(FStreamJid,modif.header);
