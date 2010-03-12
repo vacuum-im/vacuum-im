@@ -1051,7 +1051,7 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
         IArchiveCollection collection = FCollections.value(header);
         if (collection.messages.isEmpty() && collection.notes.isEmpty())
         {
-          if (FArchiver->hasLocalCollection(FStreamJid,header))
+          if (FSource!=AS_SERVER_ARCHIVE && FArchiver->hasLocalCollection(FStreamJid,header))
           {
             collection = FArchiver->loadLocalCollection(FStreamJid,header);
             FCollections.insert(collection.header,collection);
