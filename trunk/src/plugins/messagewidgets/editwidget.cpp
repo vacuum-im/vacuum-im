@@ -18,6 +18,10 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
   FSendShortcut = new QShortcut(ui.medEditor);
   FSendShortcut->setContext(Qt::WidgetShortcut);
   connect(FSendShortcut,SIGNAL(activated()),SLOT(onShortcutActivated()));
+
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(ui.tlbSend,MNI_MESSAGEWIDGETS_SEND);
+  connect(ui.tlbSend,SIGNAL(clicked(bool)),SLOT(onSendButtonCliked(bool)));
+
   ui.medEditor->installEventFilter(this);
 
   setAutoResize(FMessageWidgets->editorAutoResize());
@@ -114,6 +118,16 @@ void EditWidget::setSendKey(const QKeySequence &AKey)
   emit sendKeyChanged(AKey);
 }
 
+bool EditWidget::sendButtonVisible() const
+{
+  return ui.tlbSend->isVisible();
+}
+
+void EditWidget::setSendButtonVisible(bool AVisible)
+{
+  ui.tlbSend->setVisible(AVisible);
+}
+
 bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
   bool hooked = false;
@@ -192,6 +206,11 @@ void EditWidget::onShortcutActivated()
   }
 }
 
+void EditWidget::onSendButtonCliked(bool)
+{
+  sendMessage();
+}
+
 void EditWidget::onEditorAutoResizeChanged(bool AResize)
 {
   setAutoResize(AResize);
@@ -206,4 +225,3 @@ void EditWidget::onEditorSendKeyChanged(const QKeySequence &AKey)
 {
   setSendKey(AKey);
 }
-

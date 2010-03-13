@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl_PL" sourcelanguage="en">
 <context>
+    <name>EditWidgetClass</name>
+    <message>
+        <source>Send</source>
+        <translation>Wyślij</translation>
+    </message>
+</context>
+<context>
     <name>MessageWidgets</name>
     <message>
         <source>Messages</source>

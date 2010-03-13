@@ -28,6 +28,7 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 
   FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid);
   FEditWidget->setSendKey(QKeySequence());
+  FEditWidget->setSendButtonVisible(false);
 
   FReceiversWidget = FMessageWidgets->newReceiversWidget(FStreamJid);
   connect(FReceiversWidget->instance(),SIGNAL(receiverAdded(const Jid &)),SLOT(onReceiversChanged(const Jid &)));

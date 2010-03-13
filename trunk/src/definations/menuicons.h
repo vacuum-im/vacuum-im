@@ -121,6 +121,7 @@
 #define MNI_MESSAGE_STYLES              "messagestyles"
 
 //MessageWidgets
+#define MNI_MESSAGEWIDGETS_SEND         "messagewidgetsSend"
 #define MNI_MESSAGEWIDGETS_TAB_MENU     "messagewidgetsTabMenu"
 #define MNI_MESSAGEWIDGETS_QUOTE        "messagewidgetsQuote"
 
