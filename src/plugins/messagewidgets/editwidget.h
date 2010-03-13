@@ -2,6 +2,8 @@
 #define EDITWIDGET_H
 
 #include <QShortcut>
+#include <definations/resources.h>
+#include <definations/menuicons.h>
 #include <interfaces/imessagewidgets.h>
 #include "ui_editwidget.h"
 
@@ -29,6 +31,8 @@ public:
   virtual void setMinimumLines(int ALines);
   virtual QKeySequence sendKey() const;
   virtual void setSendKey(const QKeySequence &AKey);
+  virtual bool sendButtonVisible() const;
+  virtual void setSendButtonVisible(bool AVisible);
 signals:
   void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
   void messageAboutToBeSend();
@@ -48,6 +52,7 @@ protected:
   void showPrevBufferedMessage();
 protected slots:
   void onShortcutActivated();
+  void onSendButtonCliked(bool);
   void onEditorAutoResizeChanged(bool AResize);
   void onEditorMinimumLinesChanged(int ALines);
   void onEditorSendKeyChanged(const QKeySequence &AKey);

@@ -88,6 +88,8 @@ public:
   virtual void setMinimumLines(int ALines) =0;
   virtual QKeySequence sendKey() const =0;
   virtual void setSendKey(const QKeySequence &AKey) =0;
+  virtual bool sendButtonVisible() const =0;
+  virtual void setSendButtonVisible(bool AVisible) =0;
 protected:
   virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook) =0;
   virtual void messageAboutToBeSend() =0;
