@@ -9,8 +9,11 @@ LIBS              += -L../libs
 LIBS              += -lidn -lminizip -lzlib
 DEPENDPATH        += ..
 INCLUDEPATH       += ..
-DESTDIR            = ../libs
-DLLDESTDIR         = ../..
+win32 {
+  DLLDESTDIR       = ../..
+  QMAKE_DISTCLEAN += $${DLLDESTDIR}/$${TARGET}.dll
+}
+unix:DESTDIR       = ../libs
 include(utils.pri)
 
 #Translation
