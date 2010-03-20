@@ -15,6 +15,11 @@ Forum:
   http://forum.jrudevels.org/viewforum.php?f=11
 
 
+Sound on X11 platforms
+----------------------
+  The Network Audio System is used if available, otherwise all operations work silently.
+
+
 Portable Version
 ----------------
   To make Vacuum-IM portable just create folder VacuumIM (for Windows) 
