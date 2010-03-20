@@ -10,6 +10,7 @@ LEGEND
   [+] Added status iconset for "vKontakte" users
   [+] Send button is added to the messages standard input field
   [*] In the case when failed to identify a registered conference nick, by default invited to use the nickname from the vCard
+  [*] Button "Exit room" moved from the tools menu directly on the toolbar
   [-] Unable to login to some servers in some cases
   [-] History continues to load from a local file after switching to a server archive
   [-] When the replication of server archive is enabled than the ongoing chat could not completely copied to a local disk
