@@ -25,6 +25,7 @@ MultiUserChatPlugin::MultiUserChatPlugin()
   FDiscovery = NULL;
   FNotifications = NULL;
   FDataForms = NULL;
+  FVCardPlugin = NULL;
   FRegistration = NULL;
   FXmppUriQueries = NULL;
 
@@ -119,6 +120,12 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
     if (plugin)
     {
       FNotifications = qobject_cast<INotifications *>(plugin->instance());
+    }
+
+    plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
+    if (plugin)
+    {
+      FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
     }
 
     plugin = APluginManager->pluginInterface("IRegistration").value(0,NULL);
@@ -416,7 +423,11 @@ INotification MultiUserChatPlugin::notification(INotifications *ANotifications, 
 
 bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid)
 {
-  if (FDataForms && FRegistration)
+  if (FDiscovery)
+  {
+    return FDiscovery->requestDiscoInfo(AStreamJid,ARoomJid.bare(),MUC_NODE_ROOM_NICK);
+  }
+  else if (FDataForms && FRegistration)
   {
     QString requestId = FRegistration->sendRegiterRequest(AStreamJid,ARoomJid.domain());
     if (!requestId.isEmpty())
@@ -424,10 +435,6 @@ bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoo
       FNickRequests.insert(requestId, qMakePair<Jid,Jid>(AStreamJid,ARoomJid));
       return true;
     }
-  }
-  else if (FDiscovery)
-  {
-    return FDiscovery->requestDiscoInfo(AStreamJid,ARoomJid.bare(),MUC_NODE_ROOM_NICK);
   }
   return false;
 }
@@ -583,6 +590,18 @@ void MultiUserChatPlugin::registerDiscoFeatures()
   FDiscovery->insertDiscoFeature(dfeature);
 }
 
+QString MultiUserChatPlugin::streamVCardNick(const Jid &AStreamJid) const
+{
+  QString nick;
+  if (FVCardPlugin!=NULL && FVCardPlugin->hasVCard(AStreamJid.bare()))
+  {
+    IVCard *vCard = FVCardPlugin->vcard(AStreamJid.bare());
+    nick = vCard->value(VVN_NICKNAME);
+    vCard->unlock();
+  }
+  return nick;
+}
+
 Menu *MultiUserChatPlugin::createInviteMenu(const Jid &AContactJid, QWidget *AParent) const
 {
   Menu *inviteMenu = new Menu(AParent);
@@ -723,8 +742,25 @@ void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
   if (ADiscoInfo.node == MUC_NODE_ROOM_NICK)
   {
-    QString nick = ADiscoInfo.identity.value(FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,DIT_TEXT)).name;
-    emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,nick);
+    if (ADiscoInfo.error.code == -1)
+    {
+      QString nick = ADiscoInfo.identity.value(FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,DIT_TEXT)).name;
+      if (nick.isEmpty())
+        nick = streamVCardNick(ADiscoInfo.streamJid);
+      emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,nick);
+    }
+    else if (FDataForms && FRegistration)
+    {
+      QString requestId = FRegistration->sendRegiterRequest(ADiscoInfo.streamJid,ADiscoInfo.contactJid.domain());
+      if (!requestId.isEmpty())
+        FNickRequests.insert(requestId, qMakePair<Jid,Jid>(ADiscoInfo.streamJid,ADiscoInfo.contactJid));
+      else
+        emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,streamVCardNick(ADiscoInfo.streamJid));
+    }
+    else
+    {
+      emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,streamVCardNick(ADiscoInfo.streamJid));
+    }
   }
 }
 
@@ -734,16 +770,19 @@ void MultiUserChatPlugin::onRegisterFieldsReceived(const QString &AId, const IRe
   {
     QPair<Jid,Jid> params = FNickRequests.take(AId);
     QString nick = FDataForms!=NULL ? FDataForms->fieldValue("nick",AFields.form.fields).toString() : AFields.username;
+    if (nick.isEmpty())
+      nick = streamVCardNick(params.first);
     emit roomNickReceived(params.first,params.second,nick);
   }
 }
 
-void MultiUserChatPlugin::onRegisterErrorReceived(const QString &AId, const QString &/*AError*/)
+void MultiUserChatPlugin::onRegisterErrorReceived(const QString &AId, const QString &AError)
 {
+  Q_UNUSED(AError);
   if (FNickRequests.contains(AId))
   {
     QPair<Jid,Jid> params = FNickRequests.take(AId);
-    emit roomNickReceived(params.first,params.second,"");
+    emit roomNickReceived(params.first,params.second,streamVCardNick(params.first));
   }
 }
 
