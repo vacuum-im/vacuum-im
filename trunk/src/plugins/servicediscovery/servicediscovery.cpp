@@ -805,6 +805,13 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const Discove
     result.error.condition = err.condition();
     result.error.message = err.message();
   }
+  else if (result.contactJid!=AStanza.from() || result.node!=query.attribute("node"))
+  {
+    ErrorHandler err(ErrorHandler::FEATURE_NOT_IMPLEMENTED);
+    result.error.code = err.code();
+    result.error.condition = err.condition();
+    result.error.message = err.message();
+  }
   else
   {
     discoInfoFromElem(query,result);
@@ -823,6 +830,13 @@ IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza, const Disco
   if (AStanza.type() == "error")
   {
     ErrorHandler err(AStanza.element());
+    result.error.code = err.code();
+    result.error.condition = err.condition();
+    result.error.message = err.message();
+  }
+  else if (result.contactJid!=AStanza.from() || result.node!=query.attribute("node"))
+  {
+    ErrorHandler err(ErrorHandler::FEATURE_NOT_IMPLEMENTED);
     result.error.code = err.code();
     result.error.condition = err.condition();
     result.error.message = err.message();
