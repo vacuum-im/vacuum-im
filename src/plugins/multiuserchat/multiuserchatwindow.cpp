@@ -454,81 +454,81 @@ void MultiUserChatWindow::createStaticRoomActions()
   FChangeNick = new Action(FToolsMenu);
   FChangeNick->setText(tr("Change room nick"));
   FChangeNick->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_NICK);
-  connect(FChangeNick,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FChangeNick,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FChangeNick,AG_MUTM_MULTIUSERCHAT_COMMON,false);
 
   FInviteContact = new Action(FToolsMenu);
   FInviteContact->setText(tr("Invite to this room"));
   FInviteContact->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
-  connect(FInviteContact,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FInviteContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FInviteContact,AG_MUTM_MULTIUSERCHAT_COMMON,false);
 
   FRequestVoice = new Action(FToolsMenu);
   FRequestVoice->setText(tr("Request voice"));
   FRequestVoice->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_REQUEST_VOICE);
-  connect(FRequestVoice,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FRequestVoice,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FRequestVoice,AG_MUTM_MULTIUSERCHAT_COMMON,false);
 
   FClearChat = new Action(FToolsMenu);
   FClearChat->setText(tr("Clear chat window"));
   FClearChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
-  connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FClearChat,AG_MUTM_MULTIUSERCHAT_COMMON,false);
 
   FChangeSubject = new Action(FToolsMenu);
   FChangeSubject->setText(tr("Change topic"));
   FChangeSubject->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_TOPIC);
-  connect(FChangeSubject,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FChangeSubject,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FChangeSubject,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
   FBanList = new Action(FToolsMenu);
   FBanList->setText(tr("Edit ban list"));
   FBanList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_BAN_LIST);
-  connect(FBanList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FBanList,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FBanList,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
   FMembersList = new Action(FToolsMenu);
   FMembersList->setText(tr("Edit members list"));
   FMembersList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_MEMBERS_LIST);
-  connect(FMembersList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FMembersList,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FMembersList,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
   FAdminsList = new Action(FToolsMenu);
   FAdminsList->setText(tr("Edit administrators list"));
   FAdminsList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_ADMINS_LIST);
-  connect(FAdminsList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FAdminsList,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FAdminsList,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
   FOwnersList = new Action(FToolsMenu);
   FOwnersList->setText(tr("Edit owners list"));
   FOwnersList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_OWNERS_LIST);
-  connect(FOwnersList,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FOwnersList,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FOwnersList,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
   FConfigRoom = new Action(FToolsMenu);
   FConfigRoom->setText(tr("Configure room"));
   FConfigRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFIGURE_ROOM);
-  connect(FConfigRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FConfigRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FConfigRoom,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
   FDestroyRoom = new Action(FToolsMenu);
   FDestroyRoom->setText(tr("Destroy room"));
   FDestroyRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_DESTROY_ROOM);
-  connect(FDestroyRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FDestroyRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FDestroyRoom,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
   FEnterRoom = new Action(FToolsMenu);
   FEnterRoom->setText(tr("Enter room"));
   FEnterRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
-  connect(FEnterRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
+  connect(FEnterRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
   FToolsMenu->addAction(FEnterRoom,AG_MUTM_MULTIUSERCHAT_EXIT,false);
 
-  FExitRoom = new Action(FToolsMenu);
+  FExitRoom = new Action(FToolBarWidget->toolBarChanger()->toolBar());
   FExitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
   FExitRoom->setText(tr("Exit room"));
   FExitRoom->setShortcut(tr("Ctrl+F4"));
-  connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onMenuBarActionTriggered(bool)));
-  FToolsMenu->addAction(FExitRoom,AG_MUTM_MULTIUSERCHAT_EXIT,false);
+  connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+  FToolBarWidget->toolBarChanger()->insertAction(FExitRoom, TBG_MCWTBW_ROOM_EXIT);
 }
 
 void MultiUserChatWindow::updateStaticRoomActions()
@@ -1795,7 +1795,7 @@ void MultiUserChatWindow::onNickMenuActionTriggered(bool)
   }
 }
 
-void MultiUserChatWindow::onMenuBarActionTriggered(bool)
+void MultiUserChatWindow::onToolBarActionTriggered(bool)
 {
   Action *action = qobject_cast<Action *>(sender());
   if (action == FChangeNick)

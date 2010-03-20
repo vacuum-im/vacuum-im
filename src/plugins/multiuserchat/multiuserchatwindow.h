@@ -166,7 +166,7 @@ protected slots:
   void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 protected slots:
   void onNickMenuActionTriggered(bool);
-  void onMenuBarActionTriggered(bool);
+  void onToolBarActionTriggered(bool);
   void onRoomUtilsActionTriggered(bool);
   void onDataFormMessageDialogAccepted();
   void onAffiliationListDialogAccepted();
@@ -208,7 +208,6 @@ private:
     Action *FConfigRoom;
     Action *FDestroyRoom;
     Action *FEnterRoom;
-    Action *FExitRoom;
   Menu *FModeratorUtilsMenu;
     Action *FSetRoleNode;
     Action *FSetAffilOutcast;
@@ -221,6 +220,7 @@ private:
       Action *FSetAffilMember;
       Action *FSetAffilAdmin;
       Action *FSetAffilOwner;
+  Action *FExitRoom;
 private:
   bool FShownDetached;
   bool FDestroyOnChatClosed;
