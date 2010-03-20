@@ -12,6 +12,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/soundfiles.h>
+#include <definations/vcardvaluenames.h>
 #include <definations/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imultiuserchat.h>
@@ -25,6 +26,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/idataforms.h>
+#include <interfaces/ivcard.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/message.h>
@@ -96,6 +98,7 @@ protected:
   void insertChatAction(IMultiUserChatWindow *AWindow);
   void removeChatAction(IMultiUserChatWindow *AWindow);
   void registerDiscoFeatures();
+  QString streamVCardNick(const Jid &AStreamJid) const;
   Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
   Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const;
 protected slots:
@@ -123,6 +126,7 @@ private:
   IServiceDiscovery *FDiscovery;
   INotifications *FNotifications;
   IDataForms *FDataForms;
+  IVCardPlugin *FVCardPlugin;
   IRegistration *FRegistration;
   IXmppUriQueries *FXmppUriQueries;
 private:
