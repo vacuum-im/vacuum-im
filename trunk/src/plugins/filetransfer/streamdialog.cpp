@@ -305,7 +305,8 @@ void StreamDialog::onFileButtonClicked(bool)
 {
   if (FFileStream->streamState() == IFileStream::Creating)
   {
-    QString file = QDir::home().absoluteFilePath(FFileStream->fileName());
+    static QString lastSelectedPath = QDir::homePath();
+    QString file = QDir(lastSelectedPath).absoluteFilePath(FFileStream->fileName());
 
     if (FFileStream->streamKind() == IFileStream::ReceiveFile) 
       file = QFileDialog::getSaveFileName(this,tr("Select file for receive"),file,QString::null,NULL,QFileDialog::DontConfirmOverwrite);
@@ -313,7 +314,10 @@ void StreamDialog::onFileButtonClicked(bool)
       file = QFileDialog::getOpenFileName(this,tr("Select file to send"),file);
 
     if (!file.isEmpty())
+    {
+      lastSelectedPath = QFileInfo(file).absolutePath();
       FFileStream->setFileName(file);
+    }
   }
 }
 
