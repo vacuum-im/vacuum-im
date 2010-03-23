@@ -4,24 +4,8 @@
 <context>
     <name>ClientInfo</name>
     <message>
-        <source>Software version</source>
-        <translation>Версия приложения</translation>
-    </message>
-    <message>
-        <source>Last activity</source>
-        <translation>Последняя активность</translation>
-    </message>
-    <message>
-        <source>Entity time</source>
-        <translation>Время контакта</translation>
-    </message>
-    <message>
         <source>Software: %1 %2</source>
         <translation>Приложение: %1 %2</translation>
-    </message>
-    <message>
-        <source>Offline since: %1</source>
-        <translation>Отключен с: %1</translation>
     </message>
     <message>
         <source>Entity time: %1</source>
@@ -75,16 +59,20 @@
         <source>Supports the exchanging of the information about the user local time</source>
         <translation>Поддерживает обмен информацией о локальном времени пользователя</translation>
     </message>
+    <message>
+        <source>Service Uptime</source>
+        <translation>Время работы сервиса</translation>
+    </message>
+    <message>
+        <source>Idle Time</source>
+        <translation>Время бездействия</translation>
+    </message>
 </context>
 <context>
     <name>ClientInfoDialog</name>
     <message>
         <source>Client info - %1</source>
         <translation>Информация о клиенте - %1</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Software Version&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Версия приложения&lt;/b&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -103,28 +91,8 @@
         <translation>Ошибка:</translation>
     </message>
     <message>
-        <source>Not loaded&lt;br&gt;</source>
-        <translation>Не удалось загрузить&lt;br&gt;</translation>
-    </message>
-    <message>
-        <source>Loading ...&lt;br&gt;</source>
-        <translation>Загружается...&lt;br&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Last Activity&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Последняя активность&lt;/b&gt;&lt;br&gt;</translation>
-    </message>
-    <message>
-        <source>Date:</source>
-        <translation>Дата:</translation>
-    </message>
-    <message>
         <source>Status:</source>
         <translation>Статус:</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Entity time&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Локальное время контакта&lt;/b&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -139,28 +107,69 @@
         <translation>Пинг, мсек:</translation>
     </message>
     <message>
-        <source>Not available&lt;br&gt;</source>
-        <translation>Недоступно&lt;br&gt;</translation>
+        <source>Software Version</source>
+        <translation>Версия приложения</translation>
     </message>
     <message>
-        <source>%1y </source>
+        <source>Service Uptime</source>
+        <translation>Время работы сервиса</translation>
+    </message>
+    <message>
+        <source>Last Activity</source>
+        <translation>Последняя активность</translation>
+    </message>
+    <message>
+        <source>Idle Time</source>
+        <translation>Время бездействия</translation>
+    </message>
+    <message>
+        <source>Uptime:</source>
+        <translation>Работает:</translation>
+    </message>
+    <message>
+        <source>Inactive:</source>
+        <translation>Не активен:</translation>
+    </message>
+    <message>
+        <source>Idle:</source>
+        <translation>Бездействует:</translation>
+    </message>
+    <message>
+        <source>Entity Time</source>
+        <translation>Время контакта</translation>
+    </message>
+    <message>
+        <source>Not available</source>
+        <translation>Не доступно</translation>
+    </message>
+    <message>
+        <source>%1y</source>
+        <comment>years</comment>
         <translation>%1г</translation>
     </message>
     <message>
-        <source>%1d </source>
+        <source>%1d</source>
+        <comment>days</comment>
         <translation>%1д</translation>
     </message>
     <message>
-        <source>%1h </source>
+        <source>%1h</source>
+        <comment>hours</comment>
         <translation>%1ч</translation>
     </message>
     <message>
-        <source>%1m </source>
+        <source>%1m</source>
+        <comment>minutes</comment>
         <translation>%1м</translation>
     </message>
     <message>
         <source>%1s</source>
+        <comment>seconds</comment>
         <translation>%1с</translation>
+    </message>
+    <message>
+        <source>Waiting response...</source>
+        <translation>Ожидание ответа...</translation>
     </message>
 </context>
 <context>

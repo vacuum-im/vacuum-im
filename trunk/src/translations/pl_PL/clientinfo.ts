@@ -4,24 +4,8 @@
 <context>
     <name>ClientInfo</name>
     <message>
-        <source>Software version</source>
-        <translation>Wersja oprogramowania</translation>
-    </message>
-    <message>
-        <source>Last activity</source>
-        <translation>Ostatnia aktywność</translation>
-    </message>
-    <message>
-        <source>Entity time</source>
-        <translation>Czas kontaktu</translation>
-    </message>
-    <message>
         <source>Software: %1 %2</source>
         <translation>Oprogramowanie: %1 %2</translation>
-    </message>
-    <message>
-        <source>Offline since: %1</source>
-        <translation>Odłączony od: %1</translation>
     </message>
     <message>
         <source>Entity time: %1</source>
@@ -76,16 +60,20 @@
         <source>Supports the exchanging of the information about the user local time</source>
         <translation>Obsługa wymiany informacji na temat czasu lokalnego użytkownika</translation>
     </message>
+    <message>
+        <source>Service Uptime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Idle Time</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ClientInfoDialog</name>
     <message>
         <source>Client info - %1</source>
         <translation>Informacja o kliencie - %1</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Software Version&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Wersja oprogramowania&lt;/b&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -104,28 +92,8 @@
         <translation>Błąd:</translation>
     </message>
     <message>
-        <source>Not loaded&lt;br&gt;</source>
-        <translation>Nie załadowano&lt;br&gt;</translation>
-    </message>
-    <message>
-        <source>Loading ...&lt;br&gt;</source>
-        <translation>Ładuję...&lt;br&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Last Activity&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Ostatnia aktywność&lt;/b&gt;&lt;br&gt;</translation>
-    </message>
-    <message>
-        <source>Date:</source>
-        <translation>Data:</translation>
-    </message>
-    <message>
         <source>Status:</source>
         <translation>Status:</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Entity time&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Lokalny czas kontaktu&lt;/b&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -140,28 +108,69 @@
         <translation>Ping, msek:</translation>
     </message>
     <message>
-        <source>Not available&lt;br&gt;</source>
-        <translation>Niedostępny&lt;br&gt;</translation>
+        <source>Software Version</source>
+        <translation type="unfinished">Wersja oprogramowania</translation>
     </message>
     <message>
-        <source>%1y </source>
-        <translation>%1r </translation>
+        <source>Service Uptime</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1d </source>
-        <translation>%1d </translation>
+        <source>Last Activity</source>
+        <translation type="unfinished">Ostatnia Aktywność</translation>
     </message>
     <message>
-        <source>%1h </source>
-        <translation>%1g </translation>
+        <source>Idle Time</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1m </source>
-        <translation>%1m </translation>
+        <source>Uptime:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Idle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Entity Time</source>
+        <translation type="unfinished">Czas kontaktu</translation>
+    </message>
+    <message>
+        <source>Not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1y</source>
+        <comment>years</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1d</source>
+        <comment>days</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1h</source>
+        <comment>hours</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1m</source>
+        <comment>minutes</comment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1s</source>
-        <translation>%1s</translation>
+        <comment>seconds</comment>
+        <translation type="unfinished">%1s</translation>
+    </message>
+    <message>
+        <source>Waiting response...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

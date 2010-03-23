@@ -10,6 +10,7 @@
 #endif
 
 #define SHC_SOFTWARE_VERSION            "/iq[@type='get']/query[@xmlns='" NS_JABBER_VERSION "']"
+#define SHC_LAST_ACTIVITY               "/iq[@type='get']/query[@xmlns='" NS_JABBER_LAST "']"
 #define SHC_ENTITY_TIME                 "/iq[@type='get']/time[@xmlns='" NS_XMPP_TIME "']"
 
 #define SOFTWARE_INFO_TIMEOUT           10000
@@ -36,10 +37,12 @@ ClientInfo::ClientInfo()
   FRostersViewPlugin = NULL;
   FDiscovery = NULL;
   FDataForms = NULL;
+  FAutoStatus = NULL;
   FSettingsPlugin = NULL;
 
-  FVersionHandle = 0;
   FTimeHandle = 0;
+  FVersionHandle = 0;
+  FActivityHandler = 0;
   FShareOSVersion = true;
 }
 
@@ -120,6 +123,12 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
   }
 
+  plugin = APluginManager->pluginInterface("IAutoStatus").value(0,NULL);
+  if (plugin)
+  {
+    FAutoStatus = qobject_cast<IAutoStatus *>(plugin->instance());
+  }
+
   return FStanzaProcessor != NULL;
 }
 
@@ -134,6 +143,10 @@ bool ClientInfo::initObjects()
     
     shandle.conditions.append(SHC_SOFTWARE_VERSION);
     FVersionHandle = FStanzaProcessor->insertStanzaHandle(shandle);
+
+    shandle.conditions.clear();
+    shandle.conditions.append(SHC_LAST_ACTIVITY);
+    FActivityHandler = FStanzaProcessor->insertStanzaHandle(shandle);
 
     shandle.conditions.clear();
     shandle.conditions.append(SHC_ENTITY_TIME);
@@ -202,6 +215,15 @@ bool ClientInfo::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza 
     elem.appendChild(iq.createElement("version")).appendChild(iq.createTextNode(QString("%1.%2 %3").arg(FPluginManager->version()).arg(FPluginManager->revision()).arg(CLIENT_VERSION_SUFIX).trimmed()));
     if (shareOSVersion())
       elem.appendChild(iq.createElement("os")).appendChild(iq.createTextNode(osVersion()));
+    FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
+  }
+  else if (AHandlerId == FActivityHandler)
+  {
+    AAccept = true;
+    Stanza iq("iq");
+    iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
+    QDomElement elem = iq.addElement("query",NS_JABBER_LAST);
+    elem.setAttribute("seconds", FAutoStatus!=NULL ? FAutoStatus->idleSeconds() : 0);
     FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
   }
   else if (AHandlerId == FTimeHandle)
@@ -400,11 +422,8 @@ Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QStrin
     }
     else if (AFeature == NS_JABBER_LAST)
     {
-      if (FPresencePlugin && !FPresencePlugin->isContactOnline(ADiscoInfo.contactJid))
-      {
-        Action *action = createInfoAction(AStreamJid,ADiscoInfo.contactJid,AFeature,AParent);
-        return action;
-      }
+      Action *action = createInfoAction(AStreamJid,ADiscoInfo.contactJid,AFeature,AParent);
+      return action;
     }
     else if (AFeature == NS_XMPP_TIME)
     {
@@ -578,7 +597,11 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
     ClientInfoDialog *dialog = FClientInfoDialogs.value(AContactJid,NULL);
     if (!dialog)
     {
-      QString contactName = !AContactJid.node().isEmpty() ? AContactJid.node() : FDiscovery!=NULL ? FDiscovery->discoInfo(AStreamJid,AContactJid).identity.value(0).name : AContactJid.domain();
+      QString contactName =  AContactJid.node();
+      if (FDiscovery!=NULL && FDiscovery->discoInfo(AStreamJid,AContactJid.bare()).identity.value(0).category == "conference")
+        contactName = AContactJid.resource();
+      if (contactName.isEmpty())
+        contactName = FDiscovery!=NULL ? FDiscovery->discoInfo(AStreamJid,AContactJid).identity.value(0).name : AContactJid.domain();
       if (FRosterPlugin)
       {
         IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
@@ -730,7 +753,7 @@ Action *ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJ
   if (AFeature == NS_JABBER_VERSION)
   {
     Action *action = new Action(AParent);
-    action->setText(tr("Software version"));
+    action->setText(tr("Software Version"));
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_VERSION);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_CONTACT_JID,AContactJid.full());
@@ -741,7 +764,14 @@ Action *ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJ
   else if (AFeature == NS_JABBER_LAST)
   {
     Action *action = new Action(AParent);
-    action->setText(tr("Last activity"));
+
+    if (AContactJid.node().isEmpty())
+      action->setText(tr("Service Uptime"));
+    else if (AContactJid.resource().isEmpty())
+      action->setText(tr("Last Activity"));
+    else
+      action->setText(tr("Idle Time"));
+
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_ACTIVITY);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_CONTACT_JID,AContactJid.full());
@@ -752,7 +782,7 @@ Action *ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJ
   else if (AFeature == NS_XMPP_TIME)
   {
     Action *action = new Action(AParent);
-    action->setText(tr("Entity time"));
+    action->setText(tr("Entity Time"));
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_CLIENTINFO_TIME);
     action->setData(ADR_STREAM_JID,AStreamJid.full());
     action->setData(ADR_CONTACT_JID,AContactJid.full());
@@ -781,7 +811,7 @@ void ClientInfo::registerDiscoFeatures()
   dfeature.description = tr("Supports the exchanging of the information about the application version");
   FDiscovery->insertDiscoFeature(dfeature);
 
-  dfeature.active = false;
+  dfeature.active = true;
   dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CLIENTINFO_ACTIVITY);
   dfeature.var = NS_JABBER_LAST;
   dfeature.name = tr("Last Activity");
@@ -846,7 +876,7 @@ void ClientInfo::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
         Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_VERSION,AMenu);
         AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
       }
-      if (show == IPresence::Offline && !features.contains(NS_JABBER_LAST))
+      if ((show == IPresence::Offline || show == IPresence::Error) && !features.contains(NS_JABBER_LAST))
       {
         Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_LAST,AMenu);
         AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
@@ -863,9 +893,6 @@ void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMult
 
     if (hasSoftwareInfo(contactJid))
       AToolTips.insert(RTTO_SOFTWARE_INFO,tr("Software: %1 %2").arg(Qt::escape(softwareName(contactJid))).arg(Qt::escape(softwareVersion(contactJid))));
-
-    if (hasLastActivity(contactJid) && AIndex->data(RDR_SHOW).toInt() == IPresence::Offline)
-      AToolTips.insert(RTTO_LAST_ACTIVITY,tr("Offline since: %1").arg(lastActivityTime(contactJid).toString()));
 
     if (hasEntityTime(contactJid))
       AToolTips.insert(RTTO_ENTITY_TIME,tr("Entity time: %1").arg(entityTime(contactJid).time().toString()));
