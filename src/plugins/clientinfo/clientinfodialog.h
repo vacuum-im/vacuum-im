@@ -13,11 +13,10 @@ class ClientInfoDialog :
 {
   Q_OBJECT;
 public:
-  ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid,
-    const QString &AContactName, int AInfoTypes, QWidget *AParent = NULL);
+  ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid, const QString &AContactName, int AInfoTypes, QWidget *AParent = NULL);
   ~ClientInfoDialog();
-  const Jid &streamJid() const { return FStreamJid; }
-  const Jid &contactJid() const { return FContactJid; }
+  Jid streamJid() const { return FStreamJid; }
+  Jid contactJid() const { return FContactJid; }
   int infoTypes() const { return FInfoTypes; }
   void setInfoTypes(int AInfoTypes);
 signals:
@@ -32,10 +31,10 @@ private:
 private:
   IClientInfo *FClientInfo;
 private:
+  int FInfoTypes;
   Jid FStreamJid;
   Jid FContactJid;
   QString FContactName;
-  int FInfoTypes;
 };
 
 #endif // CLIENTINFODIALOG_H

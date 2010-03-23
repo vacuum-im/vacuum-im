@@ -23,6 +23,7 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imainwindow.h>
+#include <interfaces/iautostatus.h>
 #include <interfaces/isettings.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>
@@ -147,10 +148,12 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
   IServiceDiscovery *FDiscovery;
   IDataForms *FDataForms;
+  IAutoStatus *FAutoStatus;
   ISettingsPlugin *FSettingsPlugin;
 private:
   int FTimeHandle;
   int FVersionHandle;
+  int FActivityHandler;
   bool FShareOSVersion;
   QMap<QString, Jid> FSoftwareId;
   QMap<Jid, SoftwareItem> FSoftwareItems;

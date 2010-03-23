@@ -46,42 +46,69 @@ void ClientInfoDialog::updateText()
   //Software Info
   if ((FInfoTypes & IClientInfo::SoftwareVersion)>0)
   {
-    html += tr("<b>Software Version</b><br>");
+    html += "<b>" + tr("Software Version") + "</b><br>";
     if (FClientInfo->hasSoftwareInfo(FContactJid))
     {
       html += itemMask.arg(tr("Name:")).arg(Qt::escape(FClientInfo->softwareName(FContactJid)));
-      html += itemMask.arg(tr("Version:")).arg(Qt::escape(FClientInfo->softwareVersion(FContactJid)));
-      html += itemMask.arg(tr("OS:")).arg(Qt::escape(FClientInfo->softwareOs(FContactJid)));
+      if (!FClientInfo->softwareVersion(FContactJid).isEmpty())
+        html += itemMask.arg(tr("Version:")).arg(Qt::escape(FClientInfo->softwareVersion(FContactJid)));
+      if (!FClientInfo->softwareOs(FContactJid).isEmpty())
+        html += itemMask.arg(tr("OS:")).arg(Qt::escape(FClientInfo->softwareOs(FContactJid)));
     }
     else if (FClientInfo->softwareStatus(FContactJid) == IClientInfo::SoftwareError)
+    {
       html += itemMask.arg(tr("Error:")).arg(FClientInfo->softwareName(FContactJid));
-    else if (FClientInfo->softwareStatus(FContactJid) == IClientInfo::SoftwareNotLoaded)
-      html += tr("Not loaded<br>");
+    }
     else
-      html += tr("Loading ...<br>");
+    {
+      html += tr("Waiting response...") + "<br>";
+    }
     html += "<br>";
   }
 
   //Last Activity
   if ((FInfoTypes & IClientInfo::LastActivity)>0)
   {
-    html += tr("<b>Last Activity</b><br>");
+    if (FContactJid.node().isEmpty())
+      html += "<b>" + tr("Service Uptime") + "</b>";
+    else if (FContactJid.resource().isEmpty())
+      html += "<b>" + tr("Last Activity") + "</b>";
+    else
+      html += "<b>" + tr("Idle Time") + "</b>";
+    html += "<br>";
+
     if (FClientInfo->hasLastActivity(FContactJid))
     {
-      html += itemMask.arg(tr("Date:")).arg(FClientInfo->lastActivityTime(FContactJid).toString());
-      html += itemMask.arg(tr("Status:")).arg(Qt::escape(FClientInfo->lastActivityText(FContactJid)));
+      if (FContactJid.node().isEmpty())
+      {
+        html += itemMask.arg(tr("Uptime:")).arg(secsToString(FClientInfo->lastActivityTime(FContactJid).secsTo(QDateTime::currentDateTime())));
+      }
+      else if (FContactJid.resource().isEmpty())
+      {
+        html += itemMask.arg(tr("Inactive:")).arg(secsToString(FClientInfo->lastActivityTime(FContactJid).secsTo(QDateTime::currentDateTime())));
+        if (!FClientInfo->lastActivityText(FContactJid).isEmpty())
+          html += itemMask.arg(tr("Status:")).arg(Qt::escape(FClientInfo->lastActivityText(FContactJid)));
+      }
+      else
+      {
+        html += itemMask.arg(tr("Idle:")).arg(secsToString(FClientInfo->lastActivityTime(FContactJid).secsTo(QDateTime::currentDateTime())));
+      }
     }
     else if (!FClientInfo->lastActivityText(FContactJid).isEmpty())
+    {
       html += itemMask.arg(tr("Error:")).arg(FClientInfo->lastActivityText(FContactJid));
+    }
     else
-      html += tr("Not loaded<br>");
+    {
+      html += tr("Waiting response...") + "<br>";
+    }
     html += "<br>";
   }
 
   //Entity Time
   if ((FInfoTypes & IClientInfo::EntityTime)>0)
   {
-    html += tr("<b>Entity time</b><br>");
+    html += "<b>" + tr("Entity Time") + "</b><br>";
     if (FClientInfo->hasEntityTime(FContactJid))
     {
       html += itemMask.arg(tr("Time:")).arg(FClientInfo->entityTime(FContactJid).time().toString());
@@ -89,9 +116,13 @@ void ClientInfoDialog::updateText()
       html += itemMask.arg(tr("Ping, msec:")).arg(FClientInfo->entityTimePing(FContactJid));
     }
     else if (FClientInfo->entityTimePing(FContactJid) < -1)
-      html += tr("Loading ...<br>");
+    {
+      html += tr("Waiting response...") + "<br>";
+    }
     else
-      html += tr("Not available<br>");
+    {
+      html += tr("Not available") + "<br>";
+    }
     html += "<br>";
   }
 
@@ -122,14 +153,14 @@ QString ClientInfoDialog::secsToString(int ASecs) const
   secs -= minutes * secsInMinute;
 
   if (years > 0)
-    time += tr("%1y ").arg(years);
+    time += tr("%1y","years").arg(years) + " ";
   if (days > 0)
-    time += tr("%1d ").arg(days);
+    time += tr("%1d","days").arg(days) + " ";
   if (hours > 0)
-    time += tr("%1h ").arg(hours);
+    time += tr("%1h","hours").arg(hours) + " ";
   if (minutes > 0)
-    time += tr("%1m ").arg(minutes);
-  time += tr("%1s").arg(secs);
+    time += tr("%1m","minutes").arg(minutes) + " ";
+  time += tr("%1s","seconds").arg(secs);
 
   return time;
 }
@@ -139,4 +170,3 @@ void ClientInfoDialog::onClientInfoChanged(const Jid &AConatctJid)
   if (FContactJid == AConatctJid)
     updateText();
 }
-
