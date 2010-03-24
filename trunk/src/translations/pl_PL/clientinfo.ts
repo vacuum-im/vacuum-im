@@ -62,11 +62,11 @@
     </message>
     <message>
         <source>Service Uptime</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas pracy serwisu</translation>
     </message>
     <message>
         <source>Idle Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas bezczynności</translation>
     </message>
 </context>
 <context>
@@ -109,68 +109,68 @@
     </message>
     <message>
         <source>Software Version</source>
-        <translation type="unfinished">Wersja oprogramowania</translation>
+        <translation>Wersja oprogramowania</translation>
     </message>
     <message>
         <source>Service Uptime</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas pracy serwisu</translation>
     </message>
     <message>
         <source>Last Activity</source>
-        <translation type="unfinished">Ostatnia Aktywność</translation>
+        <translation>Ostatnia Aktywność</translation>
     </message>
     <message>
         <source>Idle Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas bezczynności</translation>
     </message>
     <message>
         <source>Uptime:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywny:</translation>
     </message>
     <message>
         <source>Inactive:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie aktywny:</translation>
     </message>
     <message>
         <source>Idle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezczynny:</translation>
     </message>
     <message>
         <source>Entity Time</source>
-        <translation type="unfinished">Czas kontaktu</translation>
+        <translation>Czas kontaktu</translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie dostępny</translation>
     </message>
     <message>
         <source>%1y</source>
         <comment>years</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1r</translation>
     </message>
     <message>
         <source>%1d</source>
         <comment>days</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1d</translation>
     </message>
     <message>
         <source>%1h</source>
         <comment>hours</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1g</translation>
     </message>
     <message>
         <source>%1m</source>
         <comment>minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1m</translation>
     </message>
     <message>
         <source>%1s</source>
         <comment>seconds</comment>
-        <translation type="unfinished">%1s</translation>
+        <translation>%1s</translation>
     </message>
     <message>
         <source>Waiting response...</source>
-        <translation type="unfinished"></translation>
+        <translation>Oczekiwanie na odpowiedź...</translation>
     </message>
 </context>
 <context>
