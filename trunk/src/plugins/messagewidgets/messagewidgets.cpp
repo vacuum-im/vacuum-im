@@ -409,6 +409,29 @@ void MessageWidgets::setEditorSendKey(const QKeySequence &AKey)
   }
 }
 
+QList<IViewDropHandler *> MessageWidgets::viewDropHandlers() const
+{
+  return FViewDropHandlers;
+}
+
+void MessageWidgets::insertViewDropHandler(IViewDropHandler *AHandler)
+{
+  if (!FViewDropHandlers.contains(AHandler))
+  {
+    FViewDropHandlers.append(AHandler);
+    emit viewDropHandlerInserted(AHandler);
+  }
+}
+
+void MessageWidgets::removeViewDropHandler(IViewDropHandler *AHandler)
+{
+  if (FViewDropHandlers.contains(AHandler))
+  {
+    FViewDropHandlers.removeAll(AHandler);
+    emit viewDropHandlerRemoved(AHandler);
+  }
+}
+
 QMultiMap<int, IViewUrlHandler *> MessageWidgets::viewUrlHandlers() const
 {
   return FViewUrlHandlers;
@@ -418,7 +441,7 @@ void MessageWidgets::insertViewUrlHandler(IViewUrlHandler *AHandler, int AOrder)
 {
   if (!FViewUrlHandlers.values(AOrder).contains(AHandler))  
   {
-    FViewUrlHandlers.insert(AOrder,AHandler);
+    FViewUrlHandlers.insertMulti(AOrder,AHandler);
     emit viewUrlHandlerInserted(AHandler,AOrder);
   }
 }

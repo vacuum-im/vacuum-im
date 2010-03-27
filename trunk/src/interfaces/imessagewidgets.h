@@ -257,6 +257,15 @@ protected:
   virtual void windowClosed() =0;
 };
 
+class IViewDropHandler
+{
+public:
+  virtual bool viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent) =0;
+  virtual bool viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent) =0;
+  virtual void viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent) =0;
+  virtual bool viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu) =0;
+};
+
 class IViewUrlHandler 
 {
 public:
@@ -304,6 +313,9 @@ public:
   virtual void setEditorMinimumLines(int ALines) =0;
   virtual QKeySequence editorSendKey() const =0;
   virtual void setEditorSendKey(const QKeySequence &AKey) =0;
+  virtual QList<IViewDropHandler *> viewDropHandlers() const =0;
+  virtual void insertViewDropHandler(IViewDropHandler *AHandler) =0;
+  virtual void removeViewDropHandler(IViewDropHandler *AHandler) =0;
   virtual QMultiMap<int, IViewUrlHandler *> viewUrlHandlers() const =0;
   virtual void insertViewUrlHandler(IViewUrlHandler *AHandler, int AOrder) =0;
   virtual void removeViewUrlHandler(IViewUrlHandler *AHandler, int AOrder) =0;
@@ -331,6 +343,8 @@ protected:
   virtual void showInfoWidgetInChatWindowChanged(bool AShow) =0;
   virtual void editorMinimumLinesChanged(int ALines) =0;
   virtual void editorSendKeyChanged(const QKeySequence &AKey) =0;
+  virtual void viewDropHandlerInserted(IViewDropHandler *AHandler) =0;
+  virtual void viewDropHandlerRemoved(IViewDropHandler *AHandler) =0;
   virtual void viewUrlHandlerInserted(IViewUrlHandler *AHandler, int AOrder) =0;
   virtual void viewUrlHandlerRemoved(IViewUrlHandler *AHandler, int AOrder) =0;
 };
@@ -346,6 +360,7 @@ Q_DECLARE_INTERFACE(ITabWindowPage,"Vacuum.Plugin.ITabWindowPage/1.0")
 Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.0")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.0")
+Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
 Q_DECLARE_INTERFACE(IViewUrlHandler,"Vacuum.Plugin.IViewUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.0")
 

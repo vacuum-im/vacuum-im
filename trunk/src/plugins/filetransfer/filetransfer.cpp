@@ -2,10 +2,7 @@
 
 #include <QDir>
 #include <QTimer>
-#include <QDropEvent>
-#include <QDragMoveEvent>
-#include <QDragEnterEvent>
-#include <QDragLeaveEvent>
+#include <QFileInfo>
 
 
 #define ADR_STREAM_JID                Action::DR_StreamJid
@@ -150,6 +147,10 @@ bool FileTransfer::initObjects()
   {
     FRostersViewPlugin->rostersView()->insertDragDropHandler(this);
   }
+  if (FMessageWidgets)
+  {
+    FMessageWidgets->insertViewDropHandler(this);
+  }
   return true;
 }
 
@@ -203,7 +204,7 @@ bool FileTransfer::rosterDragEnter(const QDragEnterEvent *AEvent)
   if (AEvent->mimeData()->hasUrls())
   {
     QList<QUrl> urlList = AEvent->mimeData()->urls();
-    if (urlList.count()==1 && QFile::exists(urlList.first().toLocalFile()))
+    if (urlList.count()==1 && QFileInfo(urlList.first().toLocalFile()).isFile())
       return true;
   }
   return false;
@@ -229,6 +230,46 @@ bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, const QModelIndex 
     action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILETRANSFER_SEND);
     action->setData(ADR_STREAM_JID,AIndex.data(RDR_STREAM_JID).toString());
     action->setData(ADR_CONTACT_JID,AIndex.data(RDR_JID).toString());
+    action->setData(ADR_FILE_NAME, AEvent->mimeData()->urls().first().toLocalFile());
+    connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
+    AMenu->addAction(action, AG_DEFAULT, true);
+    AMenu->setDefaultAction(action);
+    return true;
+  }
+  return false;
+}
+
+bool FileTransfer::viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent)
+{
+  if (isSupported(AWidget->streamJid(), AWidget->contactJid()) && AEvent->mimeData()->hasUrls())
+  {
+    QList<QUrl> urlList = AEvent->mimeData()->urls();
+    if (urlList.count()==1 && QFileInfo(urlList.first().toLocalFile()).isFile())
+      return true;
+  }
+  return false;
+}
+
+bool FileTransfer::viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent)
+{
+  Q_UNUSED(AWidget); Q_UNUSED(AEvent);
+  return true;
+}
+
+void FileTransfer::viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent)
+{
+  Q_UNUSED(AWidget); Q_UNUSED(AEvent);
+}
+
+bool FileTransfer::viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
+{
+  if (AEvent->dropAction() != Qt::IgnoreAction)
+  {
+    Action *action = new Action(AMenu);
+    action->setText(tr("Send File"));
+    action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILETRANSFER_SEND);
+    action->setData(ADR_STREAM_JID,AWidget->streamJid().full());
+    action->setData(ADR_CONTACT_JID,AWidget->contactJid().full());
     action->setData(ADR_FILE_NAME, AEvent->mimeData()->urls().first().toLocalFile());
     connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
     AMenu->addAction(action, AG_DEFAULT, true);
