@@ -99,6 +99,8 @@ void OptionsDialog::showNode(const QString &ANode)
   QStandardItem *item = FNodeItems.value(ANode, NULL);
   if (item)
     ui.trvNodes->setCurrentIndex(FProxyModel->mapFromSource(FNodesModel->indexFromItem(item)));
+  else
+    ui.trvNodes->setCurrentIndex(FProxyModel->mapFromSource(FNodesModel->indexFromItem(FNodesModel->item(0))));
   ui.trvNodes->expandAll();
 }
 
@@ -163,12 +165,6 @@ bool OptionsDialog::canExpandVertically(const QWidget *AWidget) const
         expanding = canExpandVertically(qobject_cast<QWidget *>(childs.at(i)));
   }
   return expanding;
-}
-
-void OptionsDialog::showEvent(QShowEvent *AEvent)
-{
-  QDialog::showEvent(AEvent);
-  ui.trvNodes->setCurrentIndex(FProxyModel->mapFromSource(FNodesModel->indexFromItem(FNodesModel->item(0))));
 }
 
 void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)

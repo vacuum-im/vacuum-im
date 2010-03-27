@@ -36,8 +36,6 @@ protected:
   QStandardItem *createNodeItem(const QString &ANode);
   QString nodeFullName(const QString &ANode);
   bool canExpandVertically(const QWidget *AWidget) const;
-protected:
-  virtual void showEvent(QShowEvent *AEvent);
 protected slots:
   void onDialogButtonClicked(QAbstractButton *AButton);
   void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious);
