@@ -79,7 +79,7 @@ bool MessageWidgets::initObjects()
     FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"),tr("Message window options"),MNI_NORMAL_MHANDLER_MESSAGE,ONO_MESSAGES);
     FSettingsPlugin->insertOptionsHolder(this);
   }
-  insertUrlHandler(this,WUHO_MESSAGEWIDGETS_DEFAULT);
+  insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
   return true;
 }
 
@@ -97,7 +97,7 @@ QWidget *MessageWidgets::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
-bool MessageWidgets::widgetUrlOpen(IViewWidget * /*APage*/, const QUrl &AUrl, int /*AOrder*/)
+bool MessageWidgets::viewUrlOpen(IViewWidget * /*APage*/, const QUrl &AUrl, int /*AOrder*/)
 {
   return QDesktopServices::openUrl(AUrl);
 }
@@ -409,21 +409,26 @@ void MessageWidgets::setEditorSendKey(const QKeySequence &AKey)
   }
 }
 
-void MessageWidgets::insertUrlHandler(IWidgetUrlHandler *AHandler, int AOrder)
+QMultiMap<int, IViewUrlHandler *> MessageWidgets::viewUrlHandlers() const
 {
-  if (!FUrlHandlers.values(AOrder).contains(AHandler))  
+  return FViewUrlHandlers;
+}
+
+void MessageWidgets::insertViewUrlHandler(IViewUrlHandler *AHandler, int AOrder)
+{
+  if (!FViewUrlHandlers.values(AOrder).contains(AHandler))  
   {
-    FUrlHandlers.insert(AOrder,AHandler);
-    emit urlHandlerInserted(AHandler,AOrder);
+    FViewUrlHandlers.insert(AOrder,AHandler);
+    emit viewUrlHandlerInserted(AHandler,AOrder);
   }
 }
 
-void MessageWidgets::removeUrlHandler(IWidgetUrlHandler *AHandler, int AOrder)
+void MessageWidgets::removeViewUrlHandler(IViewUrlHandler *AHandler, int AOrder)
 {
-  if (FUrlHandlers.values(AOrder).contains(AHandler))  
+  if (FViewUrlHandlers.values(AOrder).contains(AHandler))  
   {
-    FUrlHandlers.remove(AOrder,AHandler);
-    emit urlHandlerRemoved(AHandler,AOrder);
+    FViewUrlHandlers.remove(AOrder,AHandler);
+    emit viewUrlHandlerRemoved(AHandler,AOrder);
   }
 }
 
@@ -463,8 +468,8 @@ void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
   IViewWidget *widget = qobject_cast<IViewWidget *>(sender());
   if (widget)
   {
-    for (QMap<int,IWidgetUrlHandler *>::const_iterator it = FUrlHandlers.constBegin(); it!=FUrlHandlers.constEnd(); it++)
-      if (it.value()->widgetUrlOpen(widget,AUrl,it.key()))
+    for (QMap<int,IViewUrlHandler *>::const_iterator it = FViewUrlHandlers.constBegin(); it!=FViewUrlHandlers.constEnd(); it++)
+      if (it.value()->viewUrlOpen(widget,AUrl,it.key()))
         break;
   }
 }

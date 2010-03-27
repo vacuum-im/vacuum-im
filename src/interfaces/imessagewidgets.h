@@ -2,6 +2,7 @@
 #define IMESSAGEWIDGETS_H
 
 #include <QUuid>
+#include <QMultiMap>
 #include <QTextBrowser>
 #include <QTextDocument>
 #include <interfaces/ipluginmanager.h>
@@ -256,10 +257,10 @@ protected:
   virtual void windowClosed() =0;
 };
 
-class IWidgetUrlHandler 
+class IViewUrlHandler 
 {
 public:
-  virtual bool widgetUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder) =0;
+  virtual bool viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder) =0;
 };
 
 class IMessageWidgets 
@@ -303,8 +304,9 @@ public:
   virtual void setEditorMinimumLines(int ALines) =0;
   virtual QKeySequence editorSendKey() const =0;
   virtual void setEditorSendKey(const QKeySequence &AKey) =0;
-  virtual void insertUrlHandler(IWidgetUrlHandler *AHandler, int AOrder) =0;
-  virtual void removeUrlHandler(IWidgetUrlHandler *AHandler, int AOrder) =0;
+  virtual QMultiMap<int, IViewUrlHandler *> viewUrlHandlers() const =0;
+  virtual void insertViewUrlHandler(IViewUrlHandler *AHandler, int AOrder) =0;
+  virtual void removeViewUrlHandler(IViewUrlHandler *AHandler, int AOrder) =0;
 protected:
   virtual void infoWidgetCreated(IInfoWidget *AInfoWidget) =0;
   virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
@@ -329,8 +331,8 @@ protected:
   virtual void showInfoWidgetInChatWindowChanged(bool AShow) =0;
   virtual void editorMinimumLinesChanged(int ALines) =0;
   virtual void editorSendKeyChanged(const QKeySequence &AKey) =0;
-  virtual void urlHandlerInserted(IWidgetUrlHandler *AHandler, int AOrder) =0;
-  virtual void urlHandlerRemoved(IWidgetUrlHandler *AHandler, int AOrder) =0;
+  virtual void viewUrlHandlerInserted(IViewUrlHandler *AHandler, int AOrder) =0;
+  virtual void viewUrlHandlerRemoved(IViewUrlHandler *AHandler, int AOrder) =0;
 };
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
@@ -344,7 +346,7 @@ Q_DECLARE_INTERFACE(ITabWindowPage,"Vacuum.Plugin.ITabWindowPage/1.0")
 Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.0")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.0")
-Q_DECLARE_INTERFACE(IWidgetUrlHandler,"Vacuum.Plugin.IWidgetUrlHandler/1.0")
+Q_DECLARE_INTERFACE(IViewUrlHandler,"Vacuum.Plugin.IViewUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.0")
 
 #endif

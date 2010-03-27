@@ -1,13 +1,12 @@
 #ifndef MESSAGEWIDGETS_H
 #define MESSAGEWIDGETS_H
 
-#include <QMultiMap>
 #include <QDesktopServices>
 #include <QObjectCleanupHandler>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
-#include <definations/widgeturlhandlerorders.h>
+#include <definations/viewurlhandlerorders.h>
 #include <definations/toolbargroups.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
@@ -29,10 +28,10 @@ class MessageWidgets :
   public IPlugin,
   public IMessageWidgets,
   public IOptionsHolder,
-  public IWidgetUrlHandler
+  public IViewUrlHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IWidgetUrlHandler);
+  Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IViewUrlHandler);
 public:
   MessageWidgets();
   ~MessageWidgets();
@@ -46,8 +45,8 @@ public:
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
-  //IWidgetUrlHandler
-  virtual bool widgetUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
+  //IViewUrlHandler
+  virtual bool viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
   //IMessageWidgets
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
   virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid);
@@ -86,8 +85,9 @@ public:
   virtual void setEditorMinimumLines(int ALines);
   virtual QKeySequence editorSendKey() const;
   virtual void setEditorSendKey(const QKeySequence &AKey);
-  virtual void insertUrlHandler(IWidgetUrlHandler *AHandler, int AOrder);
-  virtual void removeUrlHandler(IWidgetUrlHandler *AHandler, int AOrder);
+  virtual QMultiMap<int, IViewUrlHandler *> viewUrlHandlers() const;
+  virtual void insertViewUrlHandler(IViewUrlHandler *AHandler, int AOrder);
+  virtual void removeViewUrlHandler(IViewUrlHandler *AHandler, int AOrder);
 signals:
   void infoWidgetCreated(IInfoWidget *AInfoWidget);
   void viewWidgetCreated(IViewWidget *AViewWidget);
@@ -112,8 +112,8 @@ signals:
   void showInfoWidgetInChatWindowChanged(bool AShow);
   void editorMinimumLinesChanged(int ALines);
   void editorSendKeyChanged(const QKeySequence &AKey);
-  void urlHandlerInserted(IWidgetUrlHandler *AHandler, int AOrder);
-  void urlHandlerRemoved(IWidgetUrlHandler *AHandler, int AOrder);
+  void viewUrlHandlerInserted(IViewUrlHandler *AHandler, int AOrder);
+  void viewUrlHandlerRemoved(IViewUrlHandler *AHandler, int AOrder);
 signals:
   void optionsAccepted();
   void optionsRejected();
@@ -151,7 +151,7 @@ private:
   QKeySequence FEditorSendKey;
 private:
   QMap<QUuid, QString> FAvailTabWindows;
-  QMultiMap<int,IWidgetUrlHandler *> FUrlHandlers;
+  QMultiMap<int,IViewUrlHandler *> FViewUrlHandlers;
 };
 
 #endif // MESSAGEWIDGETS_H

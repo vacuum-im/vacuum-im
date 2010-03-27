@@ -36,14 +36,14 @@ bool XmppUriQueries::initObjects()
 {
   if (FMessageWidgets)
   {
-    FMessageWidgets->insertUrlHandler(this, WUHO_XMPPURIQUERIES);
+    FMessageWidgets->insertViewUrlHandler(this, VUHO_XMPPURIQUERIES);
   }
   return true;
 }
 
-bool XmppUriQueries::widgetUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder)
+bool XmppUriQueries::viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder)
 {
-  if (AOrder == WUHO_XMPPURIQUERIES)
+  if (AOrder == VUHO_XMPPURIQUERIES)
     return openXmppUri(AWidget->streamJid(), AUrl);
   return false;
 }
