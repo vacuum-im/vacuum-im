@@ -10,6 +10,7 @@ LEGEND
   [+] Added status iconset for "vKontakte" users
   [+] Send button is added to the messages standard input field
   [+] Added support for query of service uptime and idle time of contact
+  [+] Added support for sending a file by dragging it in the chat window
   [*] In the case when failed to identify a registered conference nick, by default invited to use the nickname from the vCard
   [*] Button "Exit room" moved from the tools menu directly on the toolbar
   [*] Saving the directory of the last selected file in the file transfer dialog

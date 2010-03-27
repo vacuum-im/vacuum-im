@@ -1,6 +1,10 @@
 #ifndef VIEWWIDGET_H
 #define VIEWWIDGET_H
 
+#include <QDropEvent>
+#include <QDragMoveEvent>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
 #include "ui_viewwidget.h"
@@ -34,6 +38,11 @@ signals:
 protected:
   void initialize();
   QString getHtmlBody(const QString &AHtml);
+protected:
+  virtual void dropEvent(QDropEvent *AEvent);
+  virtual void dragEnterEvent(QDragEnterEvent *AEvent);
+  virtual void dragMoveEvent(QDragMoveEvent *AEvent);
+  virtual void dragLeaveEvent(QDragLeaveEvent *AEvent);
 protected slots:
   void onContentAppended(QWidget *AWidget, const QString &AMessage, const IMessageContentOptions &AOptions);
   void onUrlClicked(QWidget *AWidget, const QUrl &AUrl);
@@ -47,6 +56,7 @@ private:
   Jid FStreamJid;
   Jid FContactJid;
   QWidget *FStyleWidget;
+  QList<IViewDropHandler *> FActiveDropHandlers;
 };
 
 #endif // VIEWWIDGET_H

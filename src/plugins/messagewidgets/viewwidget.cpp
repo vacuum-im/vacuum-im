@@ -9,6 +9,7 @@
 ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
+  setAcceptDrops(true);
 
   QVBoxLayout *layout = new QVBoxLayout(ui.wdtViewer);
   layout->setMargin(0);
@@ -122,6 +123,61 @@ QString ViewWidget::getHtmlBody(const QString &AHtml)
   QRegExp body("<body.*>(.*)</body>");
   body.setMinimal(false);
   return AHtml.indexOf(body)>=0 ? body.cap(1).trimmed() : AHtml;
+}
+
+void ViewWidget::dropEvent(QDropEvent *AEvent)
+{
+  Menu *dropMenu = new Menu(this);
+
+  bool accepted = false;
+  foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
+    if (handler->viewDropAction(this, AEvent, dropMenu))
+      accepted = true;
+
+  QAction *action= (AEvent->mouseButtons() & Qt::RightButton)>0 || dropMenu->defaultAction()==NULL ? dropMenu->exec(mapToGlobal(AEvent->pos())) : dropMenu->defaultAction();
+  if (accepted && action)
+  {
+    action->trigger();
+    AEvent->acceptProposedAction();
+  }
+  else
+  {
+    AEvent->ignore();
+  }
+
+  delete dropMenu;
+}
+
+void ViewWidget::dragEnterEvent(QDragEnterEvent *AEvent)
+{
+  FActiveDropHandlers.clear();
+  foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
+    if (handler->viewDragEnter(this, AEvent))
+      FActiveDropHandlers.append(handler);
+
+  if (!FActiveDropHandlers.isEmpty())
+    AEvent->acceptProposedAction();
+  else
+    AEvent->ignore();
+}
+
+void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
+{
+  bool accepted = false;
+  foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
+    if (handler->viewDragMove(this, AEvent))
+      accepted = true;
+
+  if (accepted)
+    AEvent->acceptProposedAction();
+  else
+    AEvent->ignore();
+}
+
+void ViewWidget::dragLeaveEvent(QDragLeaveEvent *AEvent)
+{
+  foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
+    handler->viewDragLeave(this, AEvent);
 }
 
 void ViewWidget::onContentAppended(QWidget *AWidget, const QString &AMessage, const IMessageContentOptions &AOptions)

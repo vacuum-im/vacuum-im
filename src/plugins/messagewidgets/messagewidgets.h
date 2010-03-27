@@ -85,6 +85,9 @@ public:
   virtual void setEditorMinimumLines(int ALines);
   virtual QKeySequence editorSendKey() const;
   virtual void setEditorSendKey(const QKeySequence &AKey);
+  virtual QList<IViewDropHandler *> viewDropHandlers() const;
+  virtual void insertViewDropHandler(IViewDropHandler *AHandler);
+  virtual void removeViewDropHandler(IViewDropHandler *AHandler);
   virtual QMultiMap<int, IViewUrlHandler *> viewUrlHandlers() const;
   virtual void insertViewUrlHandler(IViewUrlHandler *AHandler, int AOrder);
   virtual void removeViewUrlHandler(IViewUrlHandler *AHandler, int AOrder);
@@ -112,6 +115,8 @@ signals:
   void showInfoWidgetInChatWindowChanged(bool AShow);
   void editorMinimumLinesChanged(int ALines);
   void editorSendKeyChanged(const QKeySequence &AKey);
+  void viewDropHandlerInserted(IViewDropHandler *AHandler);
+  void viewDropHandlerRemoved(IViewDropHandler *AHandler);
   void viewUrlHandlerInserted(IViewUrlHandler *AHandler, int AOrder);
   void viewUrlHandlerRemoved(IViewUrlHandler *AHandler, int AOrder);
 signals:
@@ -151,6 +156,7 @@ private:
   QKeySequence FEditorSendKey;
 private:
   QMap<QUuid, QString> FAvailTabWindows;
+  QList<IViewDropHandler *> FViewDropHandlers;
   QMultiMap<int,IViewUrlHandler *> FViewUrlHandlers;
 };
 

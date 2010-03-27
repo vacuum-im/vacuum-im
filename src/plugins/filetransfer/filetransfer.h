@@ -1,6 +1,10 @@
 #ifndef FILETRANSFER_H
 #define FILETRANSFER_H
 
+#include <QDropEvent>
+#include <QDragMoveEvent>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
 #include <definations/namespaces.h>
 #include <definations/fshandlerorders.h>
 #include <definations/rosterindextyperole.h>
@@ -39,10 +43,11 @@ class FileTransfer :
   public IOptionsHolder,
   public IDiscoFeatureHandler,
   public IRostersDragDropHandler,
+  public IViewDropHandler,
   public IFileStreamsHandler
 {
   Q_OBJECT;
-  Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IFileStreamsHandler);
+  Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IViewDropHandler IFileStreamsHandler);
 public:
   FileTransfer();
   ~FileTransfer();
@@ -65,6 +70,11 @@ public:
   virtual bool rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
   virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
   virtual bool rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
+  //IViewDropHandler
+  virtual bool viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent);
+  virtual bool viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent);
+  virtual void viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent);
+  virtual bool viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
   //IFileTransferHandler
   virtual bool fileStreamRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);
   virtual bool fileStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS);
