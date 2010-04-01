@@ -118,10 +118,6 @@
         <translation>Kontynuuj transfer pliku</translation>
     </message>
     <message>
-        <source>A file with this name, but a smaller size already exists. Do you want to continue file transfer?</source>
-        <translation>Plik o tej nazwie, ale mniejszy, już istnieje. Chcesz kontynuować transfer pliku?</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation>Ostrzeżenie</translation>
     </message>
@@ -188,6 +184,22 @@
     <message>
         <source>Data transmission terminated</source>
         <translation>Połączenie zostało przerwane</translation>
+    </message>
+    <message>
+        <source>A file with this name, but a smaller size already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you want to change file name press &apos;Cancel&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you want to download the rest of file press &apos;Yes&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you want to start download from the beginning press &apos;Retry&apos;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

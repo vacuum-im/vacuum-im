@@ -819,7 +819,6 @@ void SocksStream::onHostSocketError(QAbstractSocket::SocketError)
 {
   if (FTcpSocket->state() != QAbstractSocket::ConnectedState)
     onHostSocketDisconnected();
-  qDebug() << FTcpSocket->errorString();
 }
 
 void SocksStream::onHostSocketDisconnected()

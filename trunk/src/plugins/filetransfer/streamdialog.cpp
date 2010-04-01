@@ -122,13 +122,16 @@ bool StreamDialog::acceptFileName(const QString AFile)
     if (FFileStream->isRangeSupported() && fileInfo.size()<FFileStream->fileSize())
     {
       QMessageBox::StandardButton button = QMessageBox::question(this,tr("Continue file transfer"),
-        tr("A file with this name, but a smaller size already exists. Do you want to continue file transfer?"),
-        QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+        tr("A file with this name, but a smaller size already exists.")+"<br>"+
+        tr("If you want to download the rest of file press 'Yes'")+"<br>"+
+        tr("If you want to start download from the beginning press 'Retry'")+"<br>"+
+        tr("If you want to change file name press 'Cancel'"),
+        QMessageBox::Yes|QMessageBox::Retry|QMessageBox::Cancel);
       if (button == QMessageBox::Yes)
       {
         FFileStream->setRangeOffset(fileInfo.size());
       }
-      else if (button == QMessageBox::No)
+      else if (button == QMessageBox::Retry)
       {
         if (!QFile::remove(fileInfo.absoluteFilePath()))
         {
@@ -145,7 +148,7 @@ bool StreamDialog::acceptFileName(const QString AFile)
     {
       QMessageBox::StandardButton button = QMessageBox::question(this,tr("Remove file"),
         tr("A file with this name already exists. Do you want to remove existing file?"),
-        QMessageBox::Yes|QMessageBox::No);
+        QMessageBox::Yes|QMessageBox::Cancel);
       if (button == QMessageBox::Yes)
       {
         if (!QFile::remove(AFile))
@@ -206,7 +209,7 @@ QString StreamDialog::sizeName(qint64 ABytes) const
 
 qint64 StreamDialog::minPosition() const
 {
-  return FFileStream->rangeLength()>0 ? FFileStream->rangeOffset() : 0;
+  return FFileStream->rangeOffset();
 }
 
 qint64 StreamDialog::maxPosition() const
@@ -223,7 +226,7 @@ int StreamDialog::curPercentPosition() const
 {
   qint64 minPos = minPosition();
   qint64 maxPos = maxPosition();
-  return maxPos>minPos ? (FFileStream->progress()*100 + minPos)/(maxPos-minPos) : 0;
+  return maxPos>0 ? curPosition()*100/maxPos : 0;
 }
 
 void StreamDialog::onStreamStateChanged()
