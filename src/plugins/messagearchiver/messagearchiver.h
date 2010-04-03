@@ -1,6 +1,8 @@
 #ifndef MESSAGEARCHIVER_H
 #define MESSAGEARCHIVER_H
 
+#include <QPair>
+#include <QList>
 #include <QMultiMap>
 #include <definations/namespaces.h>
 #include <definations/actiongroups.h>
@@ -246,6 +248,7 @@ private:
   QMultiMap<int,IArchiveHandler *> FArchiveHandlers;
   QMap<Jid,QMap<Jid,StanzaSession> > FSessions;
   QMap<Jid,QMultiMap<Jid,CollectionWriter *> > FCollectionWriters;
+  QMap<Jid,QList< QPair<Message,bool> > > FPendingMessages;
 };
 
 #endif // MESSAGEARCHIVER_H
