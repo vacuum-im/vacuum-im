@@ -187,19 +187,19 @@
     </message>
     <message>
         <source>A file with this name, but a smaller size already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik o tej nazwie, ale o mniejszym rozmiarze już istnieje.</translation>
     </message>
     <message>
         <source>If you want to change file name press &apos;Cancel&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Jesli chcesz zmienić nazwę pliku wciśnij &apos;Anuluj&apos;</translation>
     </message>
     <message>
         <source>If you want to download the rest of file press &apos;Yes&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeśli chcesz ściągnąć resztę pliku wciśnij &apos;Tak&apos;</translation>
     </message>
     <message>
         <source>If you want to start download from the beginning press &apos;Retry&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeśli chcesz ściągać od początku naciśnij &apos;Powtórz&apos;</translation>
     </message>
 </context>
 <context>
