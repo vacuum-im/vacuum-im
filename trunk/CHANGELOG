@@ -15,6 +15,7 @@ LEGEND
   [*] Button "Exit room" moved from the tools menu directly on the toolbar
   [*] Saving the directory of the last selected file in the file transfer dialog
   [-] Unable to login to some servers in some cases
+  [-] Offline messages may not be saved in the local message archive
   [-] History continues to load from a local file after switching to a server archive
   [-] When the replication of server archive is enabled than the ongoing chat could not completely copied to a local disk
 

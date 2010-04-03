@@ -20,6 +20,7 @@
 
 #define SHC_MESSAGE_BODY      "/message/body"
 #define SHC_PREFS             "/iq[@type='set']/pref[@xmlns="NS_ARCHIVE"]"
+#define SHC_PREFS_OLD         "/iq[@type='set']/pref[@xmlns="NS_ARCHIVE_OLD"]"
 
 #define ADR_STREAM_JID        Action::DR_StreamJid
 #define ADR_CONTACT_JID       Action::DR_Parametr1
@@ -1244,7 +1245,6 @@ IArchiveModifications MessageArchiver::loadLocalModifications(const Jid &AStream
     QFile log(dirPath+"/"LOG_FILE_NAME);
     if (log.open(QFile::ReadOnly|QIODevice::Text))
     {
-      //����� ������ ������� ������� �������
       qint64 sbound = 0;
       qint64 ebound = log.size();
       while (ebound - sbound > 1024)
@@ -1261,7 +1261,6 @@ IArchiveModifications MessageArchiver::loadLocalModifications(const Jid &AStream
       }
       log.seek(sbound);
 
-      //���������������� ������� �������
       while (!log.atEnd() && modifs.items.count()<ACount)
       {
         QString logLine = QString::fromUtf8(log.readLine());
@@ -1487,7 +1486,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
   }
   else
   {
-    //Костыль для jabberd 1.4.3
+    //Hack for Jabberd 1.4.3
     if (!FInStoragePrefs.contains(AStreamJid) && AElem.hasAttribute("j_private_flag"))
       FInStoragePrefs.append(AStreamJid);
 
@@ -1508,75 +1507,76 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 
     IArchiveStreamPrefs &prefs = FArchivePrefs[AStreamJid];
 
-    if (initPrefs && FInStoragePrefs.contains(AStreamJid) && !AElem.hasChildNodes())
+    QDomElement autoElem = AElem.firstChildElement("auto");
+    if (!autoElem.isNull())
     {
-      setArchivePrefs(AStreamJid,prefs);
+      prefs.autoSave = QVariant(autoElem.attribute("save","false")).toBool();
+    }
+
+    QDomElement defElem = AElem.firstChildElement("default");
+    if (!defElem.isNull())
+    {
+      prefs.defaultPrefs.save = defElem.attribute("save");
+      prefs.defaultPrefs.otr = defElem.attribute("otr");
+      prefs.defaultPrefs.expire = defElem.attribute("expire").toInt();
+    }
+
+    QDomElement methodElem = AElem.firstChildElement("method");
+    while (!methodElem.isNull())
+    {
+      if (methodElem.attribute("type") == "auto")
+        prefs.methodAuto = methodElem.attribute("use");
+      else if (methodElem.attribute("type") == "local")
+        prefs.methodLocal = methodElem.attribute("use");
+      else if (methodElem.attribute("type") == "manual")
+        prefs.methodManual = methodElem.attribute("use");
+      methodElem = methodElem.nextSiblingElement("method");
+    }
+
+    QSet<Jid> oldItemJids = prefs.itemPrefs.keys().toSet();
+    QDomElement itemElem = AElem.firstChildElement("item");
+    while (!itemElem.isNull())
+    {
+      IArchiveItemPrefs itemPrefs;
+      Jid itemJid = itemElem.attribute("jid");
+      itemPrefs.save = itemElem.attribute("save");
+      itemPrefs.otr = itemElem.attribute("otr");
+      itemPrefs.expire = itemElem.attribute("expire").toInt();
+      prefs.itemPrefs.insert(itemJid,itemPrefs);
+      emit archiveItemPrefsChanged(AStreamJid,itemJid,itemPrefs);
+      oldItemJids -= itemJid;
+      itemElem = itemElem.nextSiblingElement("item");
+    }
+
+    if (FInStoragePrefs.contains(AStreamJid))
+    {
+      foreach(Jid itemJid, oldItemJids)
+      {
+        prefs.itemPrefs.remove(itemJid);
+        emit archiveItemPrefsRemoved(AStreamJid,itemJid);
+      }
+    }
+    else if (initPrefs)
+    {
+      Replicator *replicator = insertReplicator(AStreamJid);
+      if (replicator)
+        replicator->setEnabled(replicationEnabled(AStreamJid));
+    }
+
+    if (initPrefs)
+    {
+      restoreStanzaSessionContext(AStreamJid);
+      QList< QPair<Message,bool> > messages = FPendingMessages.take(AStreamJid);
+      for(int i = 0; i<messages.count(); i++) 
+      {
+        QPair<Message, bool> message = messages.at(i);
+        processMessage(AStreamJid, message.first, message.second);
+      }
     }
     else
-    {
-      QDomElement autoElem = AElem.firstChildElement("auto");
-      if (!autoElem.isNull())
-      {
-        prefs.autoSave = QVariant(autoElem.attribute("save","false")).toBool();
-      }
+      renegotiateStanzaSessions(AStreamJid);
 
-      QDomElement defElem = AElem.firstChildElement("default");
-      if (!defElem.isNull())
-      {
-        prefs.defaultPrefs.save = defElem.attribute("save");
-        prefs.defaultPrefs.otr = defElem.attribute("otr");
-        prefs.defaultPrefs.expire = defElem.attribute("expire").toInt();
-      }
-
-      QDomElement methodElem = AElem.firstChildElement("method");
-      while (!methodElem.isNull())
-      {
-        if (methodElem.attribute("type") == "auto")
-          prefs.methodAuto = methodElem.attribute("use");
-        else if (methodElem.attribute("type") == "local")
-          prefs.methodLocal = methodElem.attribute("use");
-        else if (methodElem.attribute("type") == "manual")
-          prefs.methodManual = methodElem.attribute("use");
-        methodElem = methodElem.nextSiblingElement("method");
-      }
-
-      QSet<Jid> oldItemJids = prefs.itemPrefs.keys().toSet();
-      QDomElement itemElem = AElem.firstChildElement("item");
-      while (!itemElem.isNull())
-      {
-        IArchiveItemPrefs itemPrefs;
-        Jid itemJid = itemElem.attribute("jid");
-        itemPrefs.save = itemElem.attribute("save");
-        itemPrefs.otr = itemElem.attribute("otr");
-        itemPrefs.expire = itemElem.attribute("expire").toInt();
-        prefs.itemPrefs.insert(itemJid,itemPrefs);
-        emit archiveItemPrefsChanged(AStreamJid,itemJid,itemPrefs);
-        oldItemJids -= itemJid;
-        itemElem = itemElem.nextSiblingElement("item");
-      }
-
-      if (FInStoragePrefs.contains(AStreamJid))
-      {
-        foreach(Jid itemJid, oldItemJids)
-        {
-          prefs.itemPrefs.remove(itemJid);
-          emit archiveItemPrefsRemoved(AStreamJid,itemJid);
-        }
-      }
-      else if (initPrefs)
-      {
-        Replicator *replicator = insertReplicator(AStreamJid);
-        if (replicator)
-          replicator->setEnabled(replicationEnabled(AStreamJid));
-      }
-
-      if (initPrefs)
-        restoreStanzaSessionContext(AStreamJid);
-      else
-        renegotiateStanzaSessions(AStreamJid);
-
-      emit archivePrefsChanged(AStreamJid,prefs);
-    }
+    emit archivePrefsChanged(AStreamJid,prefs);
   }
 }
 
@@ -1958,9 +1958,15 @@ bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, b
 bool MessageArchiver::processMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
 {
   Jid contactJid = ADirectionIn ? AMessage.from() : AMessage.to();
-  if (isArchivingAllowed(AStreamJid,contactJid,AMessage.type()) && (isLocalArchiving(AStreamJid) || isManualArchiving(AStreamJid)))
+  if (!isReady(AStreamJid))
+  {
+    FPendingMessages[AStreamJid].append(qMakePair<Message,bool>(AMessage,ADirectionIn));
+  }
+  else if (isArchivingAllowed(AStreamJid,contactJid,AMessage.type()) && (isLocalArchiving(AStreamJid) || isManualArchiving(AStreamJid)))
+  {
     if (prepareMessage(AStreamJid,AMessage,ADirectionIn))
       return saveMessage(AStreamJid,contactJid,AMessage);
+  }
   return false;
 }
 
@@ -2507,6 +2513,7 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
     shandle.order = SHO_DEFAULT;
     shandle.direction = IStanzaHandle::DirectionIn;
     shandle.conditions.append(SHC_PREFS);
+    shandle.conditions.append(SHC_PREFS_OLD);
     FSHIPrefs.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
     shandle.conditions.clear();
@@ -2540,6 +2547,7 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
   FArchivePrefs.remove(AXmppStream->streamJid());
   FInStoragePrefs.removeAt(FInStoragePrefs.indexOf(AXmppStream->streamJid()));
   FSessions.remove(AXmppStream->streamJid());
+  FPendingMessages.remove(AXmppStream->streamJid());
 
   emit archivePrefsChanged(AXmppStream->streamJid(),IArchiveStreamPrefs());
 }
