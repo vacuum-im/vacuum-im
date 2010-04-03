@@ -13,25 +13,17 @@ SASLSession::~SASLSession()
 
 bool SASLSession::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE && AStanza.id()=="session")
   {
-    FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-    if (AStanza.id() == "session")
+    if (AStanza.type() == "result")
     {
-      if (AStanza.type() == "result")
-      {
-        deleteLater();
-        emit finished(false);
-      }
-      else
-      {
-        ErrorHandler err(AStanza.element());
-        emit error(err.message());
-      }
+      deleteLater();
+      emit finished(false);
     }
     else
     {
-      emit error(tr("Wrong SASL session response"));
+      ErrorHandler err(AStanza.element());
+      emit error(err.message());
     }
     return true;
   }

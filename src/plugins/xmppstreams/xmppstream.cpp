@@ -63,11 +63,6 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
       abort(err.message());
       return true;
     }
-    else if (FStreamState != SS_ONLINE)
-    {
-      abort(tr("Wrong XMPP stream negotiation response"));
-      return true;
-    }
   }
   return false;
 }

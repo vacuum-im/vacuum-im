@@ -15,25 +15,18 @@ IqAuth::~IqAuth()
 
 bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE && AStanza.id()=="auth")
   {
     FXmppStream->removeXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
-    if (AStanza.id() == "auth")
+    if (AStanza.type() == "result")
     {
-      if (AStanza.type() == "result")
-      {
-        deleteLater();
-        emit finished(false);
-      }
-      else if (AStanza.type() == "error")
-      {
-        ErrorHandler err(AStanza.element());
-        emit error(err.message());
-      }
+      deleteLater();
+      emit finished(false);
     }
-    else
+    else if (AStanza.type() == "error")
     {
-      emit error(tr("Wrong iq-auth response"));
+      ErrorHandler err(AStanza.element());
+      emit error(err.message());
     }
     return true;
   }

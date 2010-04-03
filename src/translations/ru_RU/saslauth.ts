@@ -14,10 +14,6 @@
         <source>Invalid XMPP stream JID in SASL bind response</source>
         <translation>Некорректный JID в ответе на SASL-Bind</translation>
     </message>
-    <message>
-        <source>Wrong SASL bind response</source>
-        <translation>Неверный отвер во время SASL-Bind</translation>
-    </message>
 </context>
 <context>
     <name>SASLPlugin</name>
@@ -56,13 +52,6 @@
     <message>
         <source>Allows to log in to Jabber server using SASL authentication</source>
         <translation>Позволяет авторизоваться на сервере используя SASL авторизацию</translation>
-    </message>
-</context>
-<context>
-    <name>SASLSession</name>
-    <message>
-        <source>Wrong SASL session response</source>
-        <translation>Неверный ответ во время установки SASL сессии</translation>
     </message>
 </context>
 </TS>
