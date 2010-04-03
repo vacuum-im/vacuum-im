@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl_PL" sourcelanguage="en">
 <context>
-    <name>IqAuth</name>
-    <message>
-        <source>Wrong iq-auth response</source>
-        <translation>Zła odpowiedź w autoryzacji IQ</translation>
-    </message>
-</context>
-<context>
     <name>IqAuthPlugin</name>
     <message>
         <source>Query Authentication</source>

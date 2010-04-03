@@ -32,6 +32,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
         ErrorHandler err(AStanza.element());
         emit error(err.message());
       }
+      return true;
     }
     else if (AStanza.id() == "setReg")
     {
@@ -46,12 +47,8 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
         ErrorHandler err(AStanza.element());
         emit error(err.message());
       }
+      return true;
     }
-    else
-    {
-      emit error(tr("Wrong registration response"));
-    }
-    return true;
   }
   return false;
 }

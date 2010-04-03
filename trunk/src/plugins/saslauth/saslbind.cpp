@@ -13,34 +13,27 @@ SASLBind::~SASLBind()
 
 bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
+  if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE && AStanza.id()=="bind")
   {
     FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-    if (AStanza.id() == "bind")
+    if (AStanza.type() == "result")
     {
-      if (AStanza.type() == "result")
+      Jid streamJid = AStanza.firstElement().firstChild().toElement().text();  
+      if (streamJid.isValid())
       {
-        Jid streamJid = AStanza.firstElement().firstChild().toElement().text();  
-        if (streamJid.isValid())
-        {
-          deleteLater();
-          FXmppStream->setStreamJid(streamJid); 
-          emit finished(false);
-        }
-        else 
-        {
-          emit error(tr("Invalid XMPP stream JID in SASL bind response"));
-        }
+        deleteLater();
+        FXmppStream->setStreamJid(streamJid); 
+        emit finished(false);
       }
-      else
+      else 
       {
-        ErrorHandler err(AStanza.element());
-        emit error(err.message());
+        emit error(tr("Invalid XMPP stream JID in SASL bind response"));
       }
     }
     else
     {
-      emit error(tr("Wrong SASL bind response"));
+      ErrorHandler err(AStanza.element());
+      emit error(err.message());
     }
     return true;
   }

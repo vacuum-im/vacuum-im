@@ -19,10 +19,6 @@
         <source>XMPP connection timed out</source>
         <translation>Превышено время установки XMPP соединения</translation>
     </message>
-    <message>
-        <source>Wrong XMPP stream negotiation response</source>
-        <translation>Неверный ответ при инициализации XMPP потока</translation>
-    </message>
 </context>
 <context>
     <name>XmppStreams</name>

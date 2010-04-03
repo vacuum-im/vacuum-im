@@ -4,10 +4,6 @@
 <context>
     <name>XmppStream</name>
     <message>
-        <source>Wrong XMPP stream negotiation response</source>
-        <translation>Nieprawidłowa odpowiedź podczas negocjacji połączenia XMPP</translation>
-    </message>
-    <message>
         <source>Password request</source>
         <translation>Żądanie hasła</translation>
     </message>

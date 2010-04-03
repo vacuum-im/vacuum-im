@@ -14,10 +14,6 @@
         <source>Invalid XMPP stream JID in SASL bind response</source>
         <translation>Nieprawidłowy JID w odpowiedzi na SASL-Bind</translation>
     </message>
-    <message>
-        <source>Wrong SASL bind response</source>
-        <translation>Zła odpowiedź podczas SASL-Bind</translation>
-    </message>
 </context>
 <context>
     <name>SASLPlugin</name>
@@ -56,13 +52,6 @@
     <message>
         <source>Temporary Auth Failure</source>
         <translation>Czasowa autoryzacja niepoprawna</translation>
-    </message>
-</context>
-<context>
-    <name>SASLSession</name>
-    <message>
-        <source>Wrong SASL session response</source>
-        <translation>Nieprawidłowa odpowiedź podczas ustalania sesji SASL</translation>
     </message>
 </context>
 </TS>
