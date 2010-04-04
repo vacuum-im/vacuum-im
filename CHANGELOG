@@ -7,6 +7,7 @@ LEGEND
 
 
 ------
+  [+] Added ability to store additional resources in the application data folder
   [+] Added status iconset for "vKontakte" users
   [+] Send button is added to the messages standard input field
   [+] Added support for query of service uptime and idle time of contact

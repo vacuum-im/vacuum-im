@@ -188,27 +188,21 @@ QMap<QString,QVariant> SimpleMessageStylePlugin::styleInfo(const QString &AStyle
 
 void SimpleMessageStylePlugin::updateAvailStyles()
 {
-  QDir dir(qApp->applicationDirPath());
-  if (dir.cd(RESOURCES_DIR) && dir.cd(RSR_STORAGE_SIMPLEMESSAGESTYLES))
+  foreach(QString substorage, FileStorage::availSubStorages(RSR_STORAGE_SIMPLEMESSAGESTYLES, false))
   {
-    QStringList styleDirs = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
-    styleDirs.removeAt(styleDirs.indexOf(STORAGE_SHARED_DIR));
-    foreach(QString styleDir, styleDirs)
+    QDir dir(FileStorage::subStorageDir(RSR_STORAGE_SIMPLEMESSAGESTYLES,substorage));
+    if (dir.exists())
     {
-      if (dir.cd(styleDir))
+      if (!FStylePaths.values().contains(dir.absolutePath()))
       {
-        if (!FStylePaths.values().contains(dir.absolutePath()))
+        bool valid = QFile::exists(dir.absoluteFilePath("Info.plist"));
+        valid = valid &&  QFile::exists(dir.absoluteFilePath("Incoming/Content.html"));
+        if (valid)
         {
-          bool valid = QFile::exists(dir.absoluteFilePath("Info.plist"));
-          valid = valid &&  QFile::exists(dir.absoluteFilePath("Incoming/Content.html"));
-          if (valid)
-          {
-            QMap<QString, QVariant> info = SimpleMessageStyle::styleInfo(dir.absolutePath());
-            if (!info.value(MSIV_NAME).toString().isEmpty())
-              FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
-          }
+          QMap<QString, QVariant> info = SimpleMessageStyle::styleInfo(dir.absolutePath());
+          if (!info.value(MSIV_NAME).toString().isEmpty())
+            FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
         }
-        dir.cdUp();
       }
     }
   }

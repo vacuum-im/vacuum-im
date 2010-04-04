@@ -46,7 +46,7 @@ void EmoticonsOptions::init()
     item->setCheckState(Qt::Checked);
   }
 
-  QStringList allstorages = FileStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
+  QList<QString> allstorages = FileStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
   for (int i = 0; i < allstorages.count(); i++)
   {
     if (!storages.contains(allstorages.at(i)))

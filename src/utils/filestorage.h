@@ -28,7 +28,6 @@ public:
   QString storage() const;
   QString subStorage() const;
   void setSubStorage(const QString &ASubStorage);
-  QString storageRootDir() const;
   QString option(const QString &AOption) const;
   QList<QString> fileKeys() const;
   QList<QString> fileFirstKeys() const;
@@ -37,20 +36,26 @@ public:
   QString fileFullName(const QString AKey, int AIndex = 0) const;
   QString fileMime(const QString AKey, int AIndex = 0) const;
   QString fileOption(const QString AKey, const QString &AOption) const;
+  QString fileCacheKey(const QString AKey, int AIndex =0) const;
 signals:
   void storageChanged();
 public:
-  static QStringList availStorages();
-  static QStringList availSubStorages(const QString &AStorage);
+  static QList<QString> availStorages();
+  static QList<QString> availSubStorages(const QString &AStorage, bool ACheckDefs = true);
+  static QString subStorageDir(const QString &AStorage, const QString &ASubStorage);
+  static QList<QString> resourcesDirs();
+  static void setResourcesDirs(const QList<QString> &ADirs);
   static FileStorage *staticStorage(const QString &AStorage);
 protected:
-  void loadDefinations(const QString &ADefFile, const QString APrefix);
+  void loadDefinations(const QString &ADefFile, bool AShared);
 private:
   QString FStorage;
   QString FSubStorage;
-  QString FFilePrefix;
+  QString FSubPrefix;
+  QString FSharedPrefix;
 private:
   struct StorageObject {
+    bool shared;
     QList<int> fileTypes;
     QList<QString> fileNames;
     QHash<QString, QString> fileOptions;
@@ -61,6 +66,7 @@ private:
   QHash<QString, QString> FOptions;
 private:
   static QList<QString> FMimeTypes;
+  static QList<QString> FResourceDirs;
   static QHash<QString, FileStorage *> FStaticStorages;
 private:
   static QList<QString> FObjectTags;

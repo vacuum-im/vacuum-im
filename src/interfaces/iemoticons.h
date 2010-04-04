@@ -12,8 +12,8 @@ class IEmoticons
 {
 public:
   virtual QObject *instance() =0;
-  virtual QStringList iconsets() const =0;
-  virtual void setIconsets(const QStringList &ASubStorages) =0;
+  virtual QList<QString> iconsets() const =0;
+  virtual void setIconsets(const QList<QString> &ASubStorages) =0;
   virtual void insertIconset(const QString &ASubStorage, const QString &ABefour = "") =0;
   virtual void removeIconset(const QString &ASubStorages) =0;
   virtual QUrl urlByKey(const QString &AKey) const =0;

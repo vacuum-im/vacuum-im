@@ -17,6 +17,7 @@
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
 #include <utils/widgetmanager.h>
+#include <utils/filestorage.h>
 #include <utils/action.h>
 #include "setuppluginsdialog.h"
 #include "aboutbox.h"
