@@ -217,6 +217,7 @@ QString Message::subject(const QString &ALang) const
 
 Message &Message::setSubject(const QString &ASubject, const QString &ALang)
 {
+  d->FStanza.detach();
   addChildByLang(d->FStanza.element(),"subject",ALang,ASubject);
   return *this;
 }
@@ -233,6 +234,7 @@ QString Message::body(const QString &ALang) const
 
 Message &Message::setBody(const QString &ABody, const QString &ALang)
 {
+  d->FStanza.detach();
   addChildByLang(d->FStanza.element(),"body",ALang,ABody);
   return *this;
 }
@@ -284,9 +286,9 @@ QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &A
   return elem;
 }
 
+// Be sure that d->FStanza.detach() is called before gettings AParent element for this function
 QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang, const QString &AText)
 {
-  d->FStanza.detach();
   QDomElement elem = findChidByLang(AParent,ATagName,ALang);
   if (elem.isNull() && !AText.isEmpty())
   {
