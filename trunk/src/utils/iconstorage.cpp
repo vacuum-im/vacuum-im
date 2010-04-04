@@ -24,18 +24,14 @@ IconStorage::~IconStorage()
 QIcon IconStorage::getIcon(const QString AKey, int AIndex) const
 {
   QIcon icon;
-  QString file = fileName(AKey,AIndex);
-  if (!file.isEmpty())
+  QString key = fileCacheKey(AKey,AIndex);
+  if (!key.isEmpty())
   {
-    icon = FIconCache[storage()].value(file);
+    icon = FIconCache[storage()].value(key);
     if (icon.isNull())
     {
-      QString filePath = storageRootDir() + file;
-      if (QFile::exists(filePath))
-      {
-        icon.addFile(filePath);
-        FIconCache[storage()].insert(file,icon);
-      }
+      icon.addFile(fileFullName(AKey,AIndex));
+      FIconCache[storage()].insert(key,icon);
     }
   }
   return icon;

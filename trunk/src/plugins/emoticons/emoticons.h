@@ -48,8 +48,8 @@ public:
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IEmoticons
-  virtual QStringList iconsets() const { return FStorageOrder; }
-  virtual void setIconsets(const QStringList &ASubStorages);
+  virtual QList<QString> iconsets() const { return FStorageOrder; }
+  virtual void setIconsets(const QList<QString> &ASubStorages);
   virtual void insertIconset(const QString &ASubStorage, const QString &ABefour = "");
   virtual void removeIconset(const QString &ASubStorage);
   virtual QUrl urlByKey(const QString &AKey) const;
@@ -77,7 +77,7 @@ private:
   IMessageProcessor *FMessageProcessor;
   ISettingsPlugin *FSettingsPlugin;
 private:
-  QStringList FStorageOrder;
+  QList<QString> FStorageOrder;
   QHash<QString, QUrl> FUrlByKey;
   QMap<QString, IconStorage *> FStorages;
   QList<IToolBarWidget *> FToolBarsWidgets;

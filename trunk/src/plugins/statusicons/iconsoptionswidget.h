@@ -46,7 +46,7 @@ private:
 private:
   IStatusIcons *FStatusIcons;
 private:
-  QStringList FSubStorages;
+  QList<QString> FSubStorages;
 };
 
 #endif // ICONSOPTIONSWIDGET_H

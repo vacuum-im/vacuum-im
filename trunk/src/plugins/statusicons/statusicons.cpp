@@ -378,7 +378,7 @@ void StatusIcons::loadStorages()
   connect(FDefaultIconAction,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
   FCustomIconMenu->addAction(FDefaultIconAction,AG_DEFAULT-1,true);
 
-  QStringList storages = FileStorage::availSubStorages(RSR_STORAGE_STATUSICONS);
+  QList<QString> storages = FileStorage::availSubStorages(RSR_STORAGE_STATUSICONS);
   foreach(QString substorage, storages)
   {
     IconStorage *storage = new IconStorage(RSR_STORAGE_STATUSICONS,substorage,this);

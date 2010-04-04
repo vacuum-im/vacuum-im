@@ -124,10 +124,10 @@ QWidget *Emoticons::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
-void Emoticons::setIconsets(const QStringList &ASubStorages)
+void Emoticons::setIconsets(const QList<QString> &ASubStorages)
 {
-  QStringList oldStorages = FStorageOrder;
-  QStringList availStorages = IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
+  QList<QString> oldStorages = FStorageOrder;
+  QList<QString> availStorages = IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
 
   FStorageOrder.clear();
   foreach (QString substorage, ASubStorages)
@@ -302,7 +302,7 @@ void Emoticons::onSettingsOpened()
 void Emoticons::onSettingsClosed()
 {
   ISettings *settings = FSettingsPlugin->settingsForPlugin(EMOTICONS_UUID);
-  settings->setValue(SVN_SUBSTORAGES,FStorageOrder);
+  settings->setValue(SVN_SUBSTORAGES,QStringList(FStorageOrder));
 }
 
 Q_EXPORT_PLUGIN2(plg_emoticons, Emoticons)

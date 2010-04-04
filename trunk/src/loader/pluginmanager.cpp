@@ -237,6 +237,7 @@ void PluginManager::loadSettings()
     if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
       FDataPath = dir.absolutePath();
   }
+  FileStorage::setResourcesDirs(QList<QString>() << qApp->applicationDirPath()+"/"RESOURCES_DIR << FDataPath+"/resources");
 
   FPluginsSetup.clear();
   QDir homeDir(FDataPath);
