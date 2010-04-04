@@ -13,7 +13,7 @@ win32 {
   DLLDESTDIR       = ../..
   QMAKE_DISTCLEAN += $${DLLDESTDIR}/$${TARGET}.dll
 }
-unix:DESTDIR       = ../libs
+DESTDIR       = ../libs
 include(utils.pri)
 
 #Translation
