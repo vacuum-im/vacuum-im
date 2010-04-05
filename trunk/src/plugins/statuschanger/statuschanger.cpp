@@ -722,17 +722,21 @@ int StatusChanger::visibleMainStatusId() const
 
   bool isOnline = false;
   QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin();
-  while (statusId!=STATUS_MAIN_ID && it!=FCurrentStatus.constEnd())
+  while ((!isOnline || statusId!=STATUS_MAIN_ID) && it!=FCurrentStatus.constEnd())
   {
     if (it.key()->xmppStream()->isOpen())
     {
       isOnline = true;
       statusId = it.value();
     }
-    else if (!isOnline)
+    else if (!isOnline && it.value()==STATUS_CONNECTING_ID)
+    {
+      isOnline = true;
+      statusId = STATUS_CONNECTING_ID;
+    }
+    else if (!isOnline && statusId!=STATUS_MAIN_ID)
     {
       statusId = it.value();
-      isOnline = statusId==STATUS_CONNECTING_ID;
     }
     it++;
   }
