@@ -206,13 +206,12 @@ QString Stanza::toString(int AIndent) const
 {
   QString data;
   QTextStream ts(&data, QIODevice::WriteOnly);
+  ts.setCodec("UTF-16");
   element().save(ts, AIndent);
   return data;
 }
 
 QByteArray Stanza::toByteArray() const
 {
-  static const QByteArray befour = QString(">\n").toUtf8();
-  static const QByteArray after = QString(">").toUtf8();
-  return toString(0).toUtf8().replace(befour,after);
+  return toString(0).toUtf8();
 }
