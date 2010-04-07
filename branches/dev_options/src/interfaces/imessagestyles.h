@@ -6,6 +6,8 @@
 #include <QVariant>
 #include <QDateTime>
 #include <QStringList>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include <utils/jid.h>
 
 #define MESSAGESTYLES_UUID  "{e3ab1bc7-35a6-431a-9b91-c778451b1eb1}"
@@ -49,20 +51,6 @@ struct IMessageContentOptions
   QString textBGColor;
 };
 
-class IMessageStyleSettings
-{
-public:
-  virtual QWidget *instance() =0;
-  virtual int messageType() const =0;
-  virtual QString context() const =0;
-  virtual bool isModified(int AMessageType, const QString &AContext) const =0;
-  virtual void setModified(bool AModified, int AMessageType, const QString &AContext) =0;
-  virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext) const =0;
-  virtual void loadSettings(int AMessageType, const QString &AContext) =0;
-protected:
-  virtual void settingsChanged() =0;
-};
-
 class IMessageStyle
 {
 public:
@@ -87,29 +75,30 @@ class IMessageStylePlugin
 {
 public:
   virtual QObject *instance() = 0;
-  virtual QString stylePluginId() const =0;
+  virtual QString pluginId() const =0;
+  virtual QString pluginName() const =0;
   virtual QList<QString> styles() const =0;
   virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions) =0;
-  virtual IMessageStyleSettings *styleSettings(int AMessageType, const QString &AContext, QWidget *AParent = NULL) =0;
-  virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const =0;
-  virtual void setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext = QString::null) =0;
+  virtual IMessageStyleOptions styleOptions(const OptionsNode &ANode, int AMessageType) const =0;
+  virtual IOptionsWidget *styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent) =0;
+  virtual void saveStyleSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
+  virtual void saveStyleSettings(IOptionsWidget *AWidget, IMessageStyleOptions &AOptions) = 0;
 protected:
   virtual void styleCreated(IMessageStyle *AStyle) const =0;
   virtual void styleDestroyed(IMessageStyle *AStyle) const =0;
   virtual void styleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget) const =0;
   virtual void styleWidgetRemoved(IMessageStyle *AStyle, QWidget *AWidget) const =0;
-  virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const =0;
 };
 
 class IMessageStyles 
 {
 public:
   virtual QObject *instance() = 0;
-  virtual QList<QString> stylePlugins() const =0;
-  virtual IMessageStylePlugin *stylePluginById(const QString &APluginId) const =0;
+  virtual QList<QString> pluginList() const =0;
+  virtual IMessageStylePlugin *pluginById(const QString &APluginId) const =0;
   virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions) const =0;
+  virtual IMessageStyleOptions styleOptions(const OptionsNode &ANode, int AMessageType) const =0;
   virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const =0;
-  virtual void setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext = QString::null) =0;
   virtual QString userAvatar(const Jid &AContactJid) const =0;
   virtual QString userName(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const =0;
   virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const =0;
@@ -119,7 +108,6 @@ protected:
   virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const =0;
 };
 
-Q_DECLARE_INTERFACE(IMessageStyleSettings,"Vacuum.Plugin.IMessageStyleSettings/1.0")
 Q_DECLARE_INTERFACE(IMessageStyle,"Vacuum.Plugin.IMessageStyle/1.0")
 Q_DECLARE_INTERFACE(IMessageStylePlugin,"Vacuum.Plugin.IMessageStylePlugin/1.0")
 Q_DECLARE_INTERFACE(IMessageStyles,"Vacuum.Plugin.IMessageStyles/1.0")

@@ -201,7 +201,7 @@ bool MessageArchiver::initObjects()
   }
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_HISTORY,tr("History"),tr("Common history settings"),MNI_HISTORY,ONO_HISTORY);
+    FSettingsPlugin->openOptionsNode(OPN_HISTORY,tr("History"),tr("Common history settings"),MNI_HISTORY,ONO_HISTORY);
   }
   return true;
 }
@@ -489,7 +489,7 @@ void MessageArchiver::stanzaRequestTimeout(const Jid &AStreamJid, const QString 
 QWidget *MessageArchiver::optionsWidget(const QString &ANode, int &AOrder)
 {
   QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
-  if (nodeTree.count()==2 && nodeTree.at(0)==ON_HISTORY)
+  if (nodeTree.count()==2 && nodeTree.at(0)==OPN_HISTORY)
   {
     AOrder = OWO_HISTORY;
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(nodeTree.at(1)) : NULL;
@@ -1312,24 +1312,24 @@ QDateTime MessageArchiver::replicationPoint(const Jid &AStreamJid) const
 
 bool MessageArchiver::replicationEnabled(const Jid &AStreamJid) const
 {
-  if (isSupported(AStreamJid))
-  {
-    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
-    if (account)
-      return account->value(AVN_REPLICATION,false).toBool();
-  }
+  //if (isSupported(AStreamJid))
+  //{
+  //  IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+  //  if (account)
+  //    return account->value(AVN_REPLICATION,false).toBool();
+  //}
   return false;
 }
 
 void MessageArchiver::setReplicationEnabled(const Jid &AStreamJid, bool AEnabled)
 {
-  if (FReplicators.contains(AStreamJid))
-  {
-    FReplicators.value(AStreamJid)->setEnabled(AEnabled);
-    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
-    if (account)  
-      account->setValue(AVN_REPLICATION,AEnabled);
-  }
+  //if (FReplicators.contains(AStreamJid))
+  //{
+  //  FReplicators.value(AStreamJid)->setEnabled(AEnabled);
+  //  IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+  //  if (account)  
+  //    account->setValue(AVN_REPLICATION,AEnabled);
+  //}
 }
 
 QString MessageArchiver::saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
@@ -1975,7 +1975,7 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
   IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
   if (FSettingsPlugin && account)
   {
-    QString node = ON_HISTORY"::"+account->accountId().toString();
+    QString node = OPN_HISTORY"::"+account->accountId().toString();
     FSettingsPlugin->openOptionsNode(node,account->name(),tr("Message archiving preferences"),MNI_HISTORY,ONO_HISTORY);
   }
 }
@@ -1985,7 +1985,7 @@ void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
   IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
   if (FSettingsPlugin && account)
   {
-    QString node = ON_HISTORY"::"+account->accountId().toString();
+    QString node = OPN_HISTORY"::"+account->accountId().toString();
     FSettingsPlugin->closeOptionsNode(node);
   }
 }
@@ -2710,7 +2710,7 @@ void MessageArchiver::onOpenHistoryOptionsAction(bool)
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     IAccount *account = FAccountManager->accountByStream(streamJid);
     if (account)
-      FSettingsPlugin->openOptionsDialog(ON_HISTORY"::"+account->accountId().toString());
+      FSettingsPlugin->openOptionsDialog(OPN_HISTORY"::"+account->accountId().toString());
   }
 }
 

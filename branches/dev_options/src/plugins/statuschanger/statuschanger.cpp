@@ -2,21 +2,12 @@
 
 #include <QTimer>
 #include <QToolButton>
+#include <QVBoxLayout>
 
 #define MAX_TEMP_STATUS_ID                  -10
 
 #define ADR_STREAMJID                       Action::DR_StreamJid
 #define ADR_STATUS_CODE                     Action::DR_Parametr1
-
-#define SVN_LAST_ONLINE_MAIN_STATUS         "lastOnlineMainStatus"
-#define SVN_MAIN_STATUS_ID                  "mainStatus"
-#define SVN_MODIFY_STATUS                   "modifyStatus"
-#define SVN_STATUS                          "status[]"
-#define SVN_STATUS_CODE                     "status[]:code"
-#define SVN_STATUS_NAME                     "status[]:name"
-#define SVN_STATUS_SHOW                     "status[]:show"
-#define SVN_STATUS_TEXT                     "status[]:text"
-#define SVN_STATUS_PRIORITY                 "status[]:priority"
 
 #define NOTIFICATOR_ID                      "StatusChanger"
 
@@ -29,7 +20,7 @@ StatusChanger::StatusChanger()
   FRostersViewPlugin = NULL;
   FRostersModel = NULL;
   FTrayManager = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
   FAccountManager = NULL;
   FNotifications = NULL;
 
@@ -110,20 +101,24 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
   if (plugin)
   {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+    if (FAccountManager)
+    {
+      connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),
+        SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+    }
   }
 
   plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
   if (plugin)
     FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
   
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+    if (FOptionsManager)
     {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+      connect(FOptionsManager->instance(),SIGNAL(profileOpened(const QString &)),SLOT(onProfileOpened(const QString &)),Qt::QueuedConnection);
     }
   }
 
@@ -147,6 +142,10 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+  connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+
   return FPresencePlugin!=NULL;
 }
 
@@ -156,12 +155,13 @@ bool StatusChanger::initObjects()
 
   FModifyStatus = new Action(FMainMenu);
   FModifyStatus->setCheckable(true);
-  FModifyStatus->setText(tr("Modify status"));
+  FModifyStatus->setText(tr("Modify Status"));
   FModifyStatus->setIcon(RSR_STORAGE_MENUICONS, MNI_SCHANGER_MODIFY_STATUS);
   FMainMenu->addAction(FModifyStatus,AG_SCSM_STATUSCHANGER_ACTIONS,false);
+  connect(FModifyStatus,SIGNAL(triggered(bool)),SLOT(onModifyStatusAction(bool)));
 
   Action *editStatus = new Action(FMainMenu);
-  editStatus->setText(tr("Edit statuses"));
+  editStatus->setText(tr("Edit Statuses"));
   editStatus->setIcon(RSR_STORAGE_MENUICONS,MNI_SCHANGER_EDIT_STATUSES);
   connect(editStatus,SIGNAL(triggered(bool)), SLOT(onEditStatusAction(bool)));
   FMainMenu->addAction(editStatus,AG_SCSM_STATUSCHANGER_ACTIONS,false);
@@ -169,8 +169,8 @@ bool StatusChanger::initObjects()
   createDefaultStatus();
   setMainStatusId(STATUS_OFFLINE);
 
-  if (FSettingsPlugin)
-    FSettingsPlugin->insertOptionsHolder(this);
+  if (FOptionsManager)
+    FOptionsManager->insertOptionsHolder(this);
 
   if (FMainWindowPlugin)
   {
@@ -203,35 +203,56 @@ bool StatusChanger::initObjects()
   return true;
 }
 
+bool StatusChanger::initSettings()
+{
+  Options::registerOption(OPV_STATUSES_ROOT,QVariant(),tr("Statuses"));
+  Options::registerOption(OPV_STATUS_ITEM,QVariant(),tr("Status"));
+  Options::registerOption(OPV_STATUS_NAME,QString(),tr("Name"));
+  Options::registerOption(OPV_STATUS_SHOW,IPresence::Online,tr("Status"));
+  Options::registerOption(OPV_STATUS_TEXT,nameByShow(IPresence::Online),tr("Text"));
+  Options::registerOption(OPV_STATUS_PRIORITY,0,tr("Priority"));
+  Options::registerOption(OPV_STATUSES_MAINSTATUS,STATUS_ONLINE,QString::null);
+  Options::registerOption(OPV_STATUSES_MODIFY,false,tr("Modify status before apply"));
+  Options::registerOption(OPV_ACCOUNT_AUTOCONNECT,false,tr("Auto connect on startup"));
+  Options::registerOption(OPV_ACCOUNT_AUTORECONNECT,true,tr("Auto reconnect if disconnected"));
+  Options::registerOption(OPV_ACCOUNT_STATUS_ISMAIN,true,QString::null);
+  Options::registerOption(OPV_ACCOUNT_STATUS_LASTONLINE,STATUS_MAIN_ID,QString::null);
+
+  if (FOptionsManager)
+  {
+    FOptionsManager->insertOptionsHolder(this);
+  }
+  return true;
+}
+
 bool StatusChanger::startPlugin()
 {
-  foreach(IPresence *presence, FCurrentStatus.keys())
-  {
-    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(presence->streamJid()) : NULL;
-    if (account!=NULL && account->value(AVN_AUTO_CONNECT,false).toBool())
-    {
-      int statusId = !FMainStatusStreams.contains(presence) ? FLastOnlineStatus.value(presence, STATUS_MAIN_ID) : STATUS_MAIN_ID;
-      if (!FStatusItems.contains(statusId))
-        statusId = STATUS_MAIN_ID;
-      setStreamStatus(presence->streamJid(), statusId);
-    }
-  }
   updateMainMenu();
   return true;
 }
 
 //IOptionsHolder
-QWidget *StatusChanger::optionsWidget(const QString &ANode, int &AOrder)
+IOptionsWidget *StatusChanger::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
-  QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
-  if (FAccountManager && nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
+  QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+  if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
   {
     AOrder = OWO_ACCOUNT_STATUS;
-    AccountOptionsWidget *widget = new AccountOptionsWidget(FAccountManager,nodeTree.at(1));
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),widget,SLOT(apply()));
-    connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SIGNAL(optionsRejected()));
-    return widget;
+    OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+
+    IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
+    container->instance()->setLayout(new QVBoxLayout);
+    container->instance()->layout()->setMargin(0);
+
+    IOptionsWidget *widget = FOptionsManager->optionsNodeWidget(aoptions.node("auto-connect"),container->instance());
+    container->registerChild(widget);
+    container->instance()->layout()->addWidget(widget->instance());
+
+    widget = FOptionsManager->optionsNodeWidget(aoptions.node("auto-reconnect"),container->instance());
+    container->registerChild(widget);
+    container->instance()->layout()->addWidget(widget->instance());
+
+    return container;
   }
   return NULL;
 }
@@ -664,7 +685,6 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
     if (account)
     {
       sMenu->setTitle(account->name());
-      connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),SLOT(onAccountChanged(const QString &, const QVariant &)));
     }
     else
       sMenu->setTitle(APresence->streamJid().hFull());
@@ -809,7 +829,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 void StatusChanger::autoReconnect(IPresence *APresence)
 {
   IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
-  if (account && account->value(AVN_AUTO_RECONNECT,true).toBool())
+  if (account && account->optionsNode().value("auto-reconnect").toBool())
   {
     int statusId = FLastOnlineStatus.value(APresence, STATUS_MAIN_ID);
     int statusShow = statusItemShow(statusId);
@@ -896,7 +916,7 @@ void StatusChanger::onSetStatusByAction(bool)
   {
     QString streamJid = action->data(ADR_STREAMJID).toString();
     int statusId = action->data(ADR_STATUS_CODE).toInt();
-    if (FModifyStatus->isChecked())
+    if (Options::node(OPV_STATUSES_MODIFY).value().toBool())
     {
       delete FModifyStatusDialog;
       FModifyStatusDialog = new ModifyStatusDialog(this,statusId,streamJid,NULL);
@@ -921,9 +941,9 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
   IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
   if (account)
   {
-    if (account->value(AVN_IS_MAIN_STATUS, true).toBool())
+    if (account->optionsNode().value("status.is-main").toBool())
       FMainStatusStreams += APresence;
-    FLastOnlineStatus.insert(APresence, account->value(AVN_LAST_ONLINE_STATUS, STATUS_MAIN_ID).toInt());
+    FLastOnlineStatus.insert(APresence, account->optionsNode().value("status.last-online").toInt());
   }
   
   updateStreamMenu(APresence);
@@ -967,11 +987,11 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
   if (account)
   {
     bool isMainStatus = FMainStatusStreams.contains(APresence);
-    account->setValue(AVN_IS_MAIN_STATUS,isMainStatus);
-    if (!isMainStatus && account->value(AVN_AUTO_CONNECT,false).toBool() && FLastOnlineStatus.contains(APresence))
-      account->setValue(AVN_LAST_ONLINE_STATUS,FLastOnlineStatus.value(APresence));
+    account->optionsNode().setValue(isMainStatus,"status.is-main");
+    if (!isMainStatus && account->optionsNode().value("auto-connect").toBool() && FLastOnlineStatus.contains(APresence))
+      account->optionsNode().setValue(FLastOnlineStatus.value(APresence),"status.last-online");
     else
-      account->delValue(AVN_LAST_ONLINE_STATUS);
+      account->optionsNode().setValue(QVariant(),"status.last-online");
   }
 
   removeStatusNotification(APresence);
@@ -1035,16 +1055,16 @@ void StatusChanger::onDefaultStatusIconsChanged()
   updateMainMenu();
 }
 
-void StatusChanger::onSettingsOpened()
+void StatusChanger::onOptionsOpened()
 {
   removeAllCustomStatuses();
 
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(STATUSCHANGER_UUID);
-  QList<QString> nsList = settings->values(SVN_STATUS_CODE).keys();
+  QList<QString> nsList = Options::node(OPV_STATUSES_ROOT).childNSpaces("account");
   foreach (QString ns, nsList)
   {
-    int statusId = settings->valueNS(SVN_STATUS_CODE,ns).toInt();
-    QString statusName = settings->valueNS(SVN_STATUS_NAME,ns).toString();
+    int statusId = ns.toInt();
+    OptionsNode soptions = Options::node(OPV_STATUS_ITEM, ns);
+    QString statusName = soptions.value("name").toString();
     if (statusId > STATUS_MAX_STANDART_ID)
     {
       if (!statusName.isEmpty() && statusByName(statusName)==STATUS_NULL_ID)
@@ -1052,9 +1072,9 @@ void StatusChanger::onSettingsOpened()
         StatusItem status;
         status.code = statusId;
         status.name = statusName;
-        status.show = (IPresence::Show)settings->valueNS(SVN_STATUS_SHOW,ns).toInt();
-        status.text = settings->valueNS(SVN_STATUS_TEXT,ns).toString();
-        status.priority = settings->valueNS(SVN_STATUS_PRIORITY,ns).toInt();
+        status.show = (IPresence::Show)soptions.value("show").toInt();
+        status.text = soptions.value("text").toString();
+        status.priority = soptions.value("priority").toInt();
         FStatusItems.insert(status.code,status);
         createStatusActions(status.code);
       }
@@ -1066,53 +1086,68 @@ void StatusChanger::onSettingsOpened()
         StatusItem &status = FStatusItems[statusId];
         if (!statusName.isEmpty())
           status.name = statusName;
-        status.text = settings->valueNS(SVN_STATUS_TEXT,ns,status.text).toString();
-        status.priority = settings->valueNS(SVN_STATUS_PRIORITY,ns,status.priority).toInt();
+        status.text = soptions.hasValue("text") ? soptions.value("text").toString() : status.text;
+        status.priority = soptions.hasValue("priority") ? soptions.value("priority").toInt() : status.priority;
         updateStatusActions(statusId);
       }
     }
   }
 
-  FModifyStatus->setChecked(settings->value(SVN_MODIFY_STATUS,false).toBool());
-  setMainStatusId(settings->value(SVN_MAIN_STATUS_ID,STATUS_OFFLINE).toInt());
+  FModifyStatus->setChecked(Options::node(OPV_STATUSES_MODIFY).value().toBool());
+  setMainStatusId(Options::node(OPV_STATUSES_MAINSTATUS).value().toInt());
 }
 
-void StatusChanger::onSettingsClosed()
+void StatusChanger::onOptionsClosed()
 {
   delete FEditStatusDialog;
   delete FModifyStatusDialog;
 
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(STATUSCHANGER_UUID);
-  QSet<QString> oldNS = settings->values(SVN_STATUS_CODE).keys().toSet();
+  QSet<QString> oldNS = Options::node(OPV_STATUSES_ROOT).childNSpaces("account").toSet();
   foreach (StatusItem status, FStatusItems)
   {
-    QString ns = QString::number(status.code);
-    if (status.code > STATUS_MAX_STANDART_ID)
+    if (status.code > STATUS_NULL_ID)
     {
-      settings->setValueNS(SVN_STATUS_CODE,ns,status.code);
-      settings->setValueNS(SVN_STATUS_NAME,ns,status.name);
-      settings->setValueNS(SVN_STATUS_SHOW,ns,status.show);
-      settings->setValueNS(SVN_STATUS_TEXT,ns,status.text);
-      settings->setValueNS(SVN_STATUS_PRIORITY,ns,status.priority);
+      OptionsNode soptions = Options::node(OPV_STATUS_ITEM, QString::number(status.code));
+      if (status.code > STATUS_MAX_STANDART_ID)
+        soptions.setValue(status.show,"show");
+      soptions.setValue(status.name,"name");
+      soptions.setValue(status.text,"text");
+      soptions.setValue(status.priority,"priority");
     }
-    else if (status.code > STATUS_NULL_ID)
-    {
-      settings->setValueNS(SVN_STATUS_CODE,ns,status.code);
-      settings->setValueNS(SVN_STATUS_NAME,ns,status.name);
-      settings->setValueNS(SVN_STATUS_TEXT,ns,status.text);
-      settings->setValueNS(SVN_STATUS_PRIORITY,ns,status.priority);
-    }
-    oldNS -= ns;
+    oldNS -= QString::number(status.code);
   }
 
   foreach(QString ns, oldNS)
-    settings->deleteValueNS(SVN_STATUS,ns);
+    Options::node(OPV_STATUSES_ROOT).removeChilds("status",ns);
 
-  settings->setValue(SVN_MAIN_STATUS_ID,FStatusItems.value(STATUS_MAIN_ID).code);
-  settings->setValue(SVN_MODIFY_STATUS, FModifyStatus->isChecked());
+  Options::node(OPV_STATUSES_MAINSTATUS).setValue(FStatusItems.value(STATUS_MAIN_ID).code);
 
   setMainStatusId(STATUS_OFFLINE);
   removeAllCustomStatuses();
+}
+
+void StatusChanger::onOptionsChanged(const OptionsNode &ANode)
+{
+  if (ANode.path() == OPV_STATUSES_MODIFY)
+  {
+    FModifyStatus->setChecked(ANode.value().toBool());
+  }
+}
+
+void StatusChanger::onProfileOpened(const QString &AProfile)
+{
+  Q_UNUSED(AProfile);
+  foreach(IPresence *presence, FCurrentStatus.keys())
+  {
+    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(presence->streamJid()) : NULL;
+    if (account!=NULL && account->optionsNode().value("auto-connect").toBool())
+    {
+      int statusId = !FMainStatusStreams.contains(presence) ? FLastOnlineStatus.value(presence, STATUS_MAIN_ID) : STATUS_MAIN_ID;
+      if (!FStatusItems.contains(statusId))
+        statusId = STATUS_MAIN_ID;
+      setStreamStatus(presence->streamJid(), statusId);
+    }
+  }
 }
 
 void StatusChanger::onReconnectTimer()
@@ -1146,17 +1181,18 @@ void StatusChanger::onEditStatusAction(bool)
     FEditStatusDialog->show();
 }
 
-void StatusChanger::onAccountChanged(const QString &AName, const QVariant &AValue)
+void StatusChanger::onModifyStatusAction(bool)
 {
-  if (AName == AVN_NAME)
+  Options::node(OPV_STATUSES_MODIFY).setValue(FModifyStatus->isChecked());
+}
+
+void StatusChanger::onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode)
+{
+  if (AAccount->optionsNode().childPath(ANode)=="name")
   {
-    IAccount *account = qobject_cast<IAccount *>(sender());
-    if (account)
-    {
-      Menu *sMenu = streamMenu(account->streamJid());
-      if (sMenu)
-        sMenu->setTitle(AValue.toString());
-    }
+    Menu *sMenu = streamMenu(AAccount->streamJid());
+    if (sMenu)
+      sMenu->setTitle(ANode.value().toString());
   }
 }
 

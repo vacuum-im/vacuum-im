@@ -120,7 +120,7 @@ bool RostersViewPlugin::initObjects()
   if (FSettingsPlugin)
   {
     FSettings = FSettingsPlugin->settingsForPlugin(ROSTERSVIEW_UUID);
-    FSettingsPlugin->openOptionsNode(ON_ROSTER,tr("Roster"),tr("Roster view options"),MNI_ROSTERVIEW_OPTIONS,ONO_ROSTER);
+    FSettingsPlugin->openOptionsNode(OPN_ROSTER,tr("Roster"),tr("Roster view options"),MNI_ROSTERVIEW_OPTIONS,ONO_ROSTER);
     FSettingsPlugin->insertOptionsHolder(this);
 
     connect(FRostersView,SIGNAL(collapsed(const QModelIndex &)),SLOT(onViewIndexCollapsed(const QModelIndex &)));
@@ -149,7 +149,7 @@ bool RostersViewPlugin::initObjects()
 
 QWidget *RostersViewPlugin::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_ROSTER)
+  if (ANode == OPN_ROSTER)
   {
     AOrder = OWO_ROSTER;
     RosterOptionsWidget *widget = new RosterOptionsWidget(this);

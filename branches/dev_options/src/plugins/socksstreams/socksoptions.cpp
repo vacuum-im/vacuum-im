@@ -46,13 +46,13 @@ SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *ACo
   ui.chbUseNativeServerProxy->setChecked(ASocksStreams->useNativeServerProxy(ASettingsNS));
   ui.ltwStreamProxy->addItems(ASocksStreams->proxyList(ASettingsNS));
 
-  FProxySettings = FConnectionManager!=NULL ? FConnectionManager->proxySettingsWidget(PROXY_NS_PREFIX+FSettingsNS, ui.wdtProxySettings) : NULL;
-  if (FProxySettings)
-  {
-    QVBoxLayout *layout = new QVBoxLayout(ui.wdtProxySettings);
-    layout->setMargin(0);
-    layout->addWidget(FProxySettings);
-  }
+  //FProxySettings = FConnectionManager!=NULL ? FConnectionManager->proxySettingsWidget(PROXY_NS_PREFIX+FSettingsNS, ui.wdtProxySettings) : NULL;
+  //if (FProxySettings)
+  //{
+  //  QVBoxLayout *layout = new QVBoxLayout(ui.wdtProxySettings);
+  //  layout->setMargin(0);
+  //  layout->addWidget(FProxySettings);
+  //}
   ui.chbUseAccountProxy->setChecked(ASocksStreams->useAccountNetworkProxy(ASettingsNS));
 }
 
@@ -86,11 +86,11 @@ void SocksOptions::saveSettings(const QString &ASettingsNS)
   FSocksStreams->setProxyList(ASettingsNS, proxyItems);
   FSocksStreams->setUseNativeServerProxy(ASettingsNS, ui.chbUseNativeServerProxy->isChecked());
 
-  if (FProxySettings)
-  {
-    FConnectionManager->saveProxySettings(FProxySettings);
-    FSocksStreams->setNetworkProxy(ASettingsNS, FConnectionManager->proxyById(FConnectionManager->proxySettings(PROXY_NS_PREFIX+FSettingsNS)).proxy);
-  }
+  //if (FProxySettings)
+  //{
+  //  FConnectionManager->saveProxySettings(FProxySettings);
+  //  FSocksStreams->setNetworkProxy(ASettingsNS, FConnectionManager->proxyById(FConnectionManager->loadProxySettings(PROXY_NS_PREFIX+FSettingsNS)).proxy);
+  //}
   FSocksStreams->setUseAccountNetworkProxy(ASettingsNS, ui.chbUseAccountProxy->isChecked());
 }
 

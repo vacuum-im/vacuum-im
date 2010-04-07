@@ -3,32 +3,35 @@
 
 #include <QWidget>
 #include <interfaces/iconnectionmanager.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include "ui_connectionoptionswidget.h"
 
-#define SVN_CONNECTION                      "connection[]"
-#define SVN_CONNECTION_HOST                 SVN_CONNECTION ":host"
-#define SVN_CONNECTION_PORT                 SVN_CONNECTION ":port"
-#define SVN_CONNECTION_USE_SSL              SVN_CONNECTION ":useSSL"
-#define SVN_CONNECTION_IGNORE_SSLERROR      SVN_CONNECTION ":ingnoreSSLErrors"
-
 class ConnectionOptionsWidget : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
-  ConnectionOptionsWidget(IConnectionManager *AManager, ISettings *ASettings, const QString &ASettingsNS, QWidget *AParent = NULL);
+  ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent = NULL);
   ~ConnectionOptionsWidget();
+  virtual QWidget* instance() { return this; }
 public slots:
-  void apply(const QString &ASettingsNS);
+  void apply(OptionsNode ANode);
+  void apply();
+  void reset();
+signals:
+  void modified();
+  void childApply();
+  void childReset();
 private:
   Ui::ConnectionOptionsWidgetClass ui;
 private:
-  ISettings *FSettings;
   IConnectionManager *FManager;
 private:
-  QString FSettingsNS;
-  QWidget *FProxySettings;
+  OptionsNode FOptions;
+  IOptionsWidget *FProxySettings;
 };
 
 #endif // CONNECTIONOPTIONSWIDGET_H

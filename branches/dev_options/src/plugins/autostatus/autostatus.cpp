@@ -69,7 +69,7 @@ bool AutoStatus::initObjects()
 {
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_AUTO_STATUS,tr("Auto status"),tr("Edit auto status rules"),MNI_AUTOSTATUS,ONO_AUTO_STATUS);
+    FSettingsPlugin->openOptionsNode(OPN_AUTO_STATUS,tr("Auto status"),tr("Edit auto status rules"),MNI_AUTOSTATUS,ONO_AUTO_STATUS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
   return true;
@@ -83,7 +83,7 @@ bool AutoStatus::startPlugin()
 
 QWidget *AutoStatus::optionsWidget(const QString &ANode, int &/*AOrder*/)
 {
-  if (ANode == ON_AUTO_STATUS)
+  if (ANode == OPN_AUTO_STATUS)
   {
     StatusOptionsWidget *widget = new StatusOptionsWidget(this,FStatusChanger,NULL);
     connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));

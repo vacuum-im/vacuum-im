@@ -1963,7 +1963,7 @@ void MultiUserChatWindow::onStatusIconsChanged()
 
 void MultiUserChatWindow::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
-  if (AName == AVN_NAME)
-    ui.lblAccount->setText(Qt::escape(AValue.toString()));
+  //if (AName == AVN_NAME)
+  //  ui.lblAccount->setText(Qt::escape(AValue.toString()));
 }
 

@@ -2,9 +2,8 @@
 
 DefaultConnectionPlugin::DefaultConnectionPlugin()
 {
-  FSettings = NULL;
-  FSettingsPlugin = NULL;
   FXmppStreams = NULL;
+  FOptionsManager = NULL;
   FConnectionManager = NULL;
 }
 
@@ -24,9 +23,9 @@ void DefaultConnectionPlugin::pluginInfo(IPluginInfo *APluginInfo)
 
 bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  IPlugin *plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
   
   plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
@@ -39,73 +38,62 @@ bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, in
   return true;
 }
 
-bool DefaultConnectionPlugin::initObjects()
+bool DefaultConnectionPlugin::initSettings()
 {
-  if (FSettingsPlugin)
-    FSettings = FSettingsPlugin->settingsForPlugin(pluginUuid());
+  Options::registerOption(OPV_ACCOUNT_CONNECTION_HOST,QString(),tr("Host"));
+  Options::registerOption(OPV_ACCOUNT_CONNECTION_PORT,5222,tr("Port"));
+  Options::registerOption(OPV_ACCOUNT_CONNECTION_PROXY,QString(APPLICATION_PROXY_REF_UUID),tr("Proxy"));
+  Options::registerOption(OPV_ACCOUNT_CONNECTION_USESSL,false,tr("Use SSL"));
+  Options::registerOption(OPV_ACCOUNT_CONNECTION_IGNORESSLERRORS,true,tr("Ignore SSL Errors"));
   return true;
 }
 
-QString DefaultConnectionPlugin::displayName() const
+QString DefaultConnectionPlugin::pluginId() const
 {
-  return tr("Default connection");
+  static const QString id = "DefaultConnection";
+  return id;
 }
 
-IConnection *DefaultConnectionPlugin::newConnection(const QString &ASettingsNS, QObject *AParent)
+QString DefaultConnectionPlugin::pluginName() const
+{
+  return tr("Default Connection");
+}
+
+IConnection *DefaultConnectionPlugin::newConnection(const OptionsNode &ANode, QObject *AParent)
 {
   DefaultConnection *connection = new DefaultConnection(this,AParent);
-  loadSettings(connection,ASettingsNS);
-  FCleanupHandler.add(connection);
   connect(connection,SIGNAL(aboutToConnect()),SLOT(onConnectionAboutToConnect()));
+  connect(connection,SIGNAL(connectionDestroyed()),SLOT(onConnectionDestroyed()));
+  loadConnectionSettings(connection,ANode);
+  FCleanupHandler.add(connection);
   emit connectionCreated(connection);
   return connection;
 }
 
-void DefaultConnectionPlugin::destroyConnection(IConnection *AConnection)
+IOptionsWidget *DefaultConnectionPlugin::connectionSettingsWidget(const OptionsNode &ANode, QWidget *AParent)
 {
-  DefaultConnection *connection = qobject_cast<DefaultConnection *>(AConnection->instance());
+  return new ConnectionOptionsWidget(FConnectionManager, ANode, AParent);
+}
+
+void DefaultConnectionPlugin::saveConnectionSettings(IOptionsWidget *AWidget, OptionsNode ANode)
+{
+  ConnectionOptionsWidget *widget = qobject_cast<ConnectionOptionsWidget *>(AWidget->instance());
+  if (widget)
+    widget->apply(ANode);
+}
+
+void DefaultConnectionPlugin::loadConnectionSettings(IConnection *AConnection, const OptionsNode &ANode)
+{
+  IDefaultConnection *connection = qobject_cast<IDefaultConnection *>(AConnection->instance());
   if (connection)
   {
-    emit connectionDestroyed(connection);
-    delete connection;
-  }
-}
-
-QWidget *DefaultConnectionPlugin::settingsWidget(const QString &ASettingsNS)
-{
-  ConnectionOptionsWidget *widget = new ConnectionOptionsWidget(FConnectionManager, FSettings, ASettingsNS);
-  return widget;
-}
-
-void DefaultConnectionPlugin::saveSettings(QWidget *AWidget, const QString &ASettingsNS)
-{
-  ConnectionOptionsWidget *widget = qobject_cast<ConnectionOptionsWidget *>(AWidget);
-  if (widget)
-    widget->apply(ASettingsNS);
-}
-
-void DefaultConnectionPlugin::loadSettings(IConnection *AConnection, const QString &ASettingsNS)
-{
-  DefaultConnection *connection = qobject_cast<DefaultConnection *>(AConnection->instance());
-  if (FSettings && connection)
-  {
-    connection->setOption(IDefaultConnection::CO_HOST,FSettings->valueNS(SVN_CONNECTION_HOST,ASettingsNS));
-    connection->setOption(IDefaultConnection::CO_PORT,FSettings->valueNS(SVN_CONNECTION_PORT,ASettingsNS,5222));
-    connection->setOption(IDefaultConnection::CO_USE_SSL,FSettings->valueNS(SVN_CONNECTION_USE_SSL,ASettingsNS,false));
-    connection->setOption(IDefaultConnection::CO_IGNORE_SSL_ERRORS,FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,ASettingsNS,true));
+    connection->setOption(IDefaultConnection::COR_HOST,ANode.value("host").toString());
+    connection->setOption(IDefaultConnection::COR_PORT,ANode.value("port").toInt());
+    connection->setOption(IDefaultConnection::COR_USE_SSL,ANode.value("use-ssl").toBool());
+    connection->setOption(IDefaultConnection::COR_IGNORE_SSL_ERRORS,ANode.value("ignore-ssl-errors").toBool());
     if (FConnectionManager)
-      connection->setProxy(FConnectionManager->proxyById(FConnectionManager->proxySettings(ASettingsNS)).proxy);
-    connection->setOption(IDefaultConnection::CO_SETTINGS_NS, ASettingsNS);
-    emit connectionUpdated(AConnection,ASettingsNS);
+      connection->setProxy(FConnectionManager->proxyById(FConnectionManager->loadProxySettings(ANode.node("proxy"))).proxy);
   }
-}
-
-void DefaultConnectionPlugin::deleteSettings(const QString &ASettingsNS)
-{
-  if (FSettings)
-    FSettings->deleteNS(ASettingsNS);
-  if (FConnectionManager)
-    FConnectionManager->deleteProxySettings(ASettingsNS);
 }
 
 void DefaultConnectionPlugin::onConnectionAboutToConnect()
@@ -115,12 +103,15 @@ void DefaultConnectionPlugin::onConnectionAboutToConnect()
   {
     foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
       if (stream->connection() == connection)
-        connection->setOption(IDefaultConnection::CO_DOMAINE,stream->streamJid().pDomain());
-
-    QString settingsNS = connection->option(IDefaultConnection::CO_SETTINGS_NS).toString();
-    if (!settingsNS.isEmpty())
-      loadSettings(connection, settingsNS);
+        connection->setOption(IDefaultConnection::COR_DOMAINE,stream->streamJid().pDomain());
   }
+}
+
+void DefaultConnectionPlugin::onConnectionDestroyed()
+{
+  IConnection *connection = qobject_cast<IConnection *>(sender());
+  if (connection)
+    emit connectionDestroyed(connection);
 }
 
 Q_EXPORT_PLUGIN2(plg_defaultconnection, DefaultConnectionPlugin)

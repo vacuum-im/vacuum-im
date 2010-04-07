@@ -1,11 +1,10 @@
 #ifndef REGISTRATION_H
 #define REGISTRATION_H
 
-#include <QCheckBox>
 #include <definations/namespaces.h>
-#include <definations/accountvaluenames.h>
 #include <definations/xmppfeatureorders.h>
 #include <definations/discofeaturehandlerorders.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionwidgetorders.h>
 #include <definations/dataformtypes.h>
@@ -18,11 +17,12 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/stanza.h>
+#include <utils/options.h>
 #include "registerdialog.h"
 #include "registerstream.h"
 
@@ -48,7 +48,7 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IStanzaRequestOwner
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
@@ -62,7 +62,7 @@ public:
   virtual QList<QString> xmppFeatures() const { return QList<QString>() << NS_FEATURE_REGISTER; }
   virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IDataLocalizer
   virtual IDataFormLocale dataFormLocale(const QString &AFormType);
   //IRegistration
@@ -75,9 +75,6 @@ signals:
   //IXmppFeaturesPlugin
   void featureCreated(IXmppFeature *AStreamFeature);
   void featureDestroyed(IXmppFeature *AStreamFeature);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
   //IRegistration
   void registerFields(const QString &AId, const IRegisterFields &AFields);
   void registerSuccessful(const QString &AId);
@@ -86,9 +83,6 @@ protected:
   void registerDiscoFeatures();
 protected slots:
   void onRegisterActionTriggered(bool);
-  void onOptionsAccepted();
-  void onOptionsRejected();
-  void onOptionsDialogClosed();
   void onXmppFeatureDestroyed();
 private:
   IDataForms *FDataForms;
@@ -96,13 +90,12 @@ private:
   IStanzaProcessor *FStanzaProcessor;
   IServiceDiscovery *FDiscovery;
   IPresencePlugin *FPresencePlugin;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
   IAccountManager *FAccountManager;
   IXmppUriQueries *FXmppUriQueries;
 private:
   QList<QString> FSendRequests;
   QList<QString> FSubmitRequests;
-  QHash<QUuid, QCheckBox *> FOptionWidgets;
 };
 
 #endif // REGISTRATION_H

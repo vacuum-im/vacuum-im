@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS = settings \
+SUBDIRS = optionsmanager \
           xmppstreams \
           iqauth \
           saslauth \

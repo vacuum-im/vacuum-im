@@ -65,35 +65,35 @@ bool SettingsPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
 bool SettingsPlugin::initObjects()
 {
   FProfileMenu = new Menu;
-  FProfileMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_SETTINGS_PROFILES);
+  FProfileMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_PROFILES);
   FProfileMenu->setTitle(tr("Profiles"));
 
   FOpenOptionsDialogAction = new Action(this);
   FOpenOptionsDialogAction->setEnabled(false);
-  FOpenOptionsDialogAction->setIcon(RSR_STORAGE_MENUICONS,MNI_SETTINGS_OPTIONS);
+  FOpenOptionsDialogAction->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_DIALOG);
   FOpenOptionsDialogAction->setText(tr("Options..."));
   connect(FOpenOptionsDialogAction,SIGNAL(triggered(bool)),SLOT(onOpenOptionsDialogByAction(bool)));
 
   FOpenProfileDialogAction = new Action(FProfileMenu);
-  FOpenProfileDialogAction->setIcon(RSR_STORAGE_MENUICONS,MNI_SETTINGS_EDIT_PROFILES);
+  FOpenProfileDialogAction->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_EDIT_PROFILES);
   FOpenProfileDialogAction->setText(tr("Edit profiles..."));
   FProfileMenu->addAction(FOpenProfileDialogAction,AG_DEFAULT+1);
   connect(FOpenProfileDialogAction,SIGNAL(triggered(bool)),SLOT(onOpenProfileDialogByAction(bool)));
 
   if (FMainWindowPlugin)
   {
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FOpenOptionsDialogAction,AG_MMENU_SETTINGS,true);
-    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FProfileMenu->menuAction(),AG_MMENU_SETTINGS,true);
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FOpenOptionsDialogAction,AG_MMENU_OPTIONS,true);
+    FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FProfileMenu->menuAction(),AG_MMENU_OPTIONS,true);
   }
 
   if (FTrayManager)
   {
-    FTrayManager->addAction(FOpenOptionsDialogAction,AG_TMTM_SETTINGS,true);
-    FTrayManager->addAction(FProfileMenu->menuAction(),AG_TMTM_SETTINGS,true);
+    FTrayManager->addAction(FOpenOptionsDialogAction,AG_TMTM_OPTIONS,true);
+    FTrayManager->addAction(FProfileMenu->menuAction(),AG_TMTM_OPTIONS,true);
   }
 
   insertOptionsHolder(this);
-  openOptionsNode(ON_MISC,tr("Misc"),tr("Extra options"),MNI_SETTINGS_OPTIONS,ONO_MISC);
+  openOptionsNode(OPN_MISC,tr("Misc"),tr("Extra options"),MNI_OPTIONS_DIALOG,ONO_MISC);
 
   return true;
 }
@@ -128,13 +128,6 @@ bool SettingsPlugin::initSettings()
 
     if (profiles().count() == 0)
       addProfile(DEFAULT_PROFILE);
-
-    QStringList args = qApp->arguments();
-    int profileIndex = args.indexOf(CLO_PROFILE);
-    if (profileIndex>0 && profiles().contains(args.value(profileIndex+1)))
-      setProfile(args.value(profileIndex+1));
-    else
-      setProfile(FProfiles.documentElement().attribute("profileName",DEFAULT_PROFILE));
   }
   else
     qDebug() << "CANT INITIALIZE SETTINGS";
@@ -142,10 +135,21 @@ bool SettingsPlugin::initSettings()
   return true;
 }
 
+bool SettingsPlugin::startPlugin()
+{
+  QStringList args = qApp->arguments();
+  int profileIndex = args.indexOf(CLO_PROFILE);
+  if (profileIndex>0 && profiles().contains(args.value(profileIndex+1)))
+    setProfile(args.value(profileIndex+1));
+  else
+    setProfile(FProfiles.documentElement().attribute("profileName",DEFAULT_PROFILE));
+  return true;
+}
+
 //IOptionsHolder
 QWidget *SettingsPlugin::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_MISC)
+  if (ANode == OPN_MISC)
   {
     AOrder = OWO_MISC_AUTOSTART;
     MiscOptionsWidget *widget = new MiscOptionsWidget;
@@ -528,7 +532,7 @@ void SettingsPlugin::updateSettings()
 void SettingsPlugin::addProfileAction(const QString &AProfile)
 {
   Action *action = new Action(FProfileMenu);
-  action->setIcon(RSR_STORAGE_MENUICONS,MNI_SETTINGS_PROFILE);
+  action->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_PROFILE);
   action->setText(AProfile);
   action->setCheckable(true);
   action->setData(ADR_PROFILE,AProfile);

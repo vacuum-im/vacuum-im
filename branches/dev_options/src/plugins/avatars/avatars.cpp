@@ -327,7 +327,7 @@ bool Avatars::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AVa
 
 QWidget *Avatars::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_ROSTER)
+  if (ANode == OPN_ROSTER)
   {
     AOrder = OWO_ROSTER_AVATARS;
     RosterOptionsWidget *widget = new RosterOptionsWidget(this,NULL);

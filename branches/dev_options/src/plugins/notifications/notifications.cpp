@@ -141,7 +141,7 @@ bool Notifications::initObjects()
 
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_NOTIFICATIONS,tr("Notifications"),tr("Notification options"),MNI_NOTIFICATIONS,ONO_NOTIFICATIONS);
+    FSettingsPlugin->openOptionsNode(OPN_NOTIFICATIONS,tr("Notifications"),tr("Notification options"),MNI_NOTIFICATIONS,ONO_NOTIFICATIONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
 
@@ -162,7 +162,7 @@ bool Notifications::initObjects()
 
 QWidget *Notifications::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_NOTIFICATIONS)
+  if (ANode == OPN_NOTIFICATIONS)
   {
     AOrder = OWO_NOTIFICATIONS;
     OptionsWidget *widget = new OptionsWidget(this);

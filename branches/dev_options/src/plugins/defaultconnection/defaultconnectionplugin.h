@@ -2,11 +2,12 @@
 #define DEFAULTCONNECTIONPLUGIN_H
 
 #include <QObjectCleanupHandler>
+#include <definations/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
 #include <interfaces/ixmppstreams.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include "defaultconnection.h"
 #include "connectionoptionswidget.h"
 
@@ -26,27 +27,25 @@ public:
   virtual QUuid pluginUuid() const { return DEFAULTCONNECTION_UUID; }
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initObjects() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IConnectionPlugin
-  virtual QString displayName() const;
-  virtual IConnection *newConnection(const QString &ASettingsNS, QObject *AParent);
-  virtual void destroyConnection(IConnection *AConnection);
-  virtual QWidget *settingsWidget(const QString &ASettingsNS);
-  virtual void saveSettings(QWidget *AWidget, const QString &ASettingsNS = QString::null);
-  virtual void loadSettings(IConnection *AConnection, const QString &ASettingsNS);
-  virtual void deleteSettings(const QString &ASettingsNS);
+  virtual QString pluginId() const;
+  virtual QString pluginName() const;
+  virtual IConnection *newConnection(const OptionsNode &ANode, QObject *AParent);
+  virtual IOptionsWidget *connectionSettingsWidget(const OptionsNode &ANode, QWidget *AParent);
+  virtual void saveConnectionSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null);
+  virtual void loadConnectionSettings(IConnection *AConnection, const OptionsNode &ANode);
 signals:
   void connectionCreated(IConnection *AConnection);
-  void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
   void connectionDestroyed(IConnection *AConnection);
 protected slots:
   void onConnectionAboutToConnect();
+  void onConnectionDestroyed();
 private:
-  ISettings *FSettings;
-  ISettingsPlugin *FSettingsPlugin;  
   IXmppStreams *FXmppStreams;
+  IOptionsManager *FOptionsManager;  
   IConnectionManager *FConnectionManager;
 private:
   QObjectCleanupHandler FCleanupHandler;

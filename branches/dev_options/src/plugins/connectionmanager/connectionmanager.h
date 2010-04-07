@@ -2,7 +2,7 @@
 #define CONNECTIONMANAGER_H 
 
 #include <QComboBox>
-#include <definations/accountvaluenames.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionwidgetorders.h>
 #include <definations/rosterlabelorders.h>
@@ -14,7 +14,8 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/widgetmanager.h>
 #include "editproxydialog.h"
 #include "proxysettingswidget.h"
 #include "connectionoptionswidget.h"
@@ -36,13 +37,13 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IConnectionManager
-  virtual QList<IConnectionPlugin *> pluginList() const;
-  virtual IConnectionPlugin *pluginById(const QUuid &APluginId) const;
+  virtual QList<QString> pluginList() const;
+  virtual IConnectionPlugin *pluginById(const QString &APluginId) const;
   virtual QList<QUuid> proxyList() const;
   virtual IConnectionProxy proxyById(const QUuid &AProxyId) const;
   virtual void setProxy(const QUuid &AProxyId, const IConnectionProxy &AProxy);
@@ -50,42 +51,30 @@ public:
   virtual QUuid defaultProxy() const;
   virtual void setDefaultProxy(const QUuid &AProxyId);
   virtual QDialog *showEditProxyDialog(QWidget *AParent = NULL);
-  virtual QWidget *proxySettingsWidget(const QString &ASettingsNS, QWidget *AParent);
-  virtual void saveProxySettings(QWidget *AWidget, const QString &ASettingsNS = QString::null);
-  virtual QUuid proxySettings(const QString &ASettingsNS) const;
-  virtual void setProxySettings(const QString &ASettingsNS, const QUuid &AProxyId);
-  virtual void deleteProxySettings(const QString &ASettingsNS);
+  virtual IOptionsWidget *proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent);
+  virtual void saveProxySettings(QWidget *AWidget, OptionsNode ANode = OptionsNode::null);
+  virtual QUuid loadProxySettings(const OptionsNode &ANode) const;
 signals:
   void connectionCreated(IConnection *AConnection);
-  void connectionUpdated(IConnection *AConnection, const QString &ASettingsNS);
   void connectionDestroyed(IConnection *AConnection);
   void proxyChanged(const QUuid &AProxyId, const IConnectionProxy &AProxy);
   void proxyRemoved(const QUuid &AProxyId);
   void defaultProxyChanged(const QUuid &AProxyId);
-  void proxySettingsChanged(const QString &ASettingsNS, const QUuid &AProxyId);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 public:
-  IConnectionPlugin *defaultPlugin() const;
-  IConnection *insertConnection(IAccount *AAccount) const;
+  IConnection *updateAccountConnection(IAccount *AAccount) const;
 protected slots:
   void onAccountShown(IAccount *AAccount);
-  void onAccountDestroyed(const QUuid &AAccount);
+  void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onOptionsOpened();
 private:
   IAccountManager *FAccountManager;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
   int FEncryptedLabelId;
-  QList<IConnectionPlugin *> FPlugins;
-private:
-  QUuid FDefaultProxy;
-  QMap<QUuid, IConnectionProxy> FProxys;
+  QMap<QString, IConnectionPlugin *> FPlugins;
 };
 
 #endif // CONNECTIONMANAGER_H

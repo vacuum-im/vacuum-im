@@ -158,6 +158,12 @@
 #define MNI_NOTIFICATIONS_SOUND_ON      "notificationsSoundOn"
 #define MNI_NOTIFICATIONS_SOUND_OFF     "notificationsSoundOff"
 
+//OptionsManager
+#define MNI_OPTIONS_DIALOG              "optionsDialog"
+#define MNI_OPTIONS_PROFILE             "optionsProfile"
+#define MNI_OPTIONS_PROFILES            "optionsProfiles"
+#define MNI_OPTIONS_EDIT_PROFILES       "optionsEditProfiles"
+
 //PrivacyLists
 #define MNI_PRIVACYLISTS                "privacylists"
 #define MNI_PRIVACYLISTS_LIST           "privacylistsList"
@@ -220,12 +226,6 @@
 #define MNI_SNEGOTIATION                "snegotiation"
 #define MNI_SNEGOTIATION_INIT           "snegotiationInit"
 #define MNI_SNEGOTIATION_TERMINATE      "snegotiationTerminate"
-
-//Settings
-#define MNI_SETTINGS_OPTIONS            "settingsOptions"
-#define MNI_SETTINGS_PROFILE            "settingsProfile"
-#define MNI_SETTINGS_PROFILES           "settingsProfiles"
-#define MNI_SETTINGS_EDIT_PROFILES      "settingsEditProfiles"
 
 //StatusChanger
 #define MNI_SCHANGER_MODIFY_STATUS      "schangerModifyStatus"

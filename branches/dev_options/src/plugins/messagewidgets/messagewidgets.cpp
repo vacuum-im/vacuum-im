@@ -76,7 +76,7 @@ bool MessageWidgets::initObjects()
 {
   if (FSettingsPlugin)
   {
-    FSettingsPlugin->openOptionsNode(ON_MESSAGES,tr("Messages"),tr("Message window options"),MNI_NORMAL_MHANDLER_MESSAGE,ONO_MESSAGES);
+    FSettingsPlugin->openOptionsNode(OPN_MESSAGES,tr("Messages"),tr("Message window options"),MNI_NORMAL_MHANDLER_MESSAGE,ONO_MESSAGES);
     FSettingsPlugin->insertOptionsHolder(this);
   }
   insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
@@ -85,7 +85,7 @@ bool MessageWidgets::initObjects()
 
 QWidget *MessageWidgets::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_MESSAGES)
+  if (ANode == OPN_MESSAGES)
   {
     AOrder = OWO_MESSAGES;
     MessengerOptions *widget = new MessengerOptions(this);

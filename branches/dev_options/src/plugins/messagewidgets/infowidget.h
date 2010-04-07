@@ -1,7 +1,6 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
-#include <definations/accountvaluenames.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/iroster.h>

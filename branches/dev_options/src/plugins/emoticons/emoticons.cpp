@@ -69,7 +69,7 @@ bool Emoticons::initObjects()
 
   if (FSettingsPlugin != NULL)
   {
-    FSettingsPlugin->openOptionsNode(ON_EMOTICONS ,tr("Emoticons"),tr("Select emoticons files"),MNI_EMOTICONS,ONO_EMOTICONS);
+    FSettingsPlugin->openOptionsNode(OPN_EMOTICONS ,tr("Emoticons"),tr("Select emoticons files"),MNI_EMOTICONS,ONO_EMOTICONS);
     FSettingsPlugin->insertOptionsHolder(this);
   }
 
@@ -112,7 +112,7 @@ void Emoticons::writeText(Message &AMessage, QTextDocument *ADocument, const QSt
 
 QWidget *Emoticons::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_EMOTICONS)
+  if (ANode == OPN_EMOTICONS)
   {
     AOrder = OWO_EMOTICONS;
     EmoticonsOptions *widget = new EmoticonsOptions(this);

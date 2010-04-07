@@ -218,10 +218,10 @@ void SocksStreams::deleteSettings(const QString &ASettingsNS)
   {
     FSettings->deleteNS(ASettingsNS);
   }
-  if (FConnectionManager)
-  {
-    FConnectionManager->deleteProxySettings(PROXY_NS_PREFIX+ASettingsNS);
-  }
+  //if (FConnectionManager)
+  //{
+  //  FConnectionManager->deleteProxySettings(PROXY_NS_PREFIX+ASettingsNS);
+  //}
 }
 
 quint16 SocksStreams::serverPort() const

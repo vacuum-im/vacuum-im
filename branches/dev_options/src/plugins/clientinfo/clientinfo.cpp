@@ -185,7 +185,7 @@ bool ClientInfo::initObjects()
 
 QWidget *ClientInfo::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_MISC)
+  if (ANode == OPN_MISC)
   {
     AOrder = OWO_MISC_CLIENTINFO;
     QWidget *widget = new MiscOptionsWidget(this);

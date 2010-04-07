@@ -13,7 +13,7 @@ Registration::Registration()
   FStanzaProcessor = NULL;
   FDiscovery = NULL;
   FPresencePlugin = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
   FAccountManager = NULL;
   FXmppUriQueries = NULL;
 }
@@ -60,26 +60,13 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
   if (plugin)
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
-  {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),SLOT(onOptionsDialogClosed()));
-    }
-  }
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 
   plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
   if (plugin)
-  {
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
-    if (FAccountManager)
-    {
-      connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),SLOT(onOptionsAccepted()));
-      connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SLOT(onOptionsRejected()));
-    }
-  }
 
   return FStanzaProcessor!=NULL && FDataForms!=NULL;
 }
@@ -95,10 +82,6 @@ bool Registration::initObjects()
     registerDiscoFeatures();
     FDiscovery->insertFeatureHandler(NS_JABBER_REGISTER,this,DFO_DEFAULT);
   }
-  if (FSettingsPlugin)
-  {
-    FSettingsPlugin->insertOptionsHolder(this);
-  }
   if (FDataForms)
   {
     FDataForms->insertLocalizer(this,DATA_FORM_REGISTER);
@@ -110,8 +93,17 @@ bool Registration::initObjects()
   return true;
 }
 
-void Registration::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+bool Registration::initSettings()
 {
+  Options::registerOption(OPV_ACCOUNT_REGISTER,false,tr("Register new account on server"));
+  if (FOptionsManager)
+    FOptionsManager->insertOptionsHolder(this);
+  return true;
+}
+
+void Registration::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
+{
+  Q_UNUSED(AStreamJid);
   if (FSendRequests.contains(AStanza.id()) || FSubmitRequests.contains(AStanza.id()))
   {
     QDomElement query = AStanza.firstElement("query",NS_JABBER_REGISTER);
@@ -260,31 +252,25 @@ IXmppFeature *Registration::newXmppFeature(const QString &AFeatureNS, IXmppStrea
   if (AFeatureNS == NS_FEATURE_REGISTER)
   {
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AXmppStream->streamJid()) : NULL;
-    if (account && account->value(AVN_REGISTER_ON_CONNECT,false).toBool())
+    if (account && account->optionsNode().value("register-on-server").toBool())
     {
       IXmppFeature *feature = new RegisterStream(AXmppStream);
       connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onXmppFeatureDestroyed()));
       emit featureCreated(feature);
-      account->delValue(AVN_REGISTER_ON_CONNECT);
+      account->optionsNode().setValue(false,"register-on-server");
       return feature;
     }
   }
   return NULL;
 }
 
-QWidget *Registration::optionsWidget(const QString &ANode, int &AOrder)
+IOptionsWidget *Registration::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
-  QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
-  if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
+  QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+  if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
   {
     AOrder = OWO_ACCOUNT_REGISTER;
-    QUuid accountId = nodeTree.at(1);
-    IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(accountId) : NULL;
-    QCheckBox *checkBox = new QCheckBox;
-    checkBox->setText(tr("Register new account on server"));
-    checkBox->setChecked(account!=NULL ? account->value(AVN_REGISTER_ON_CONNECT, false).toBool() : false);
-    FOptionWidgets.insert(accountId,checkBox);
-    return checkBox;
+    return FOptionsManager->optionsNodeWidget(Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)).node("register-on-server"),AParent);
   }
   return NULL;
 }
@@ -415,30 +401,6 @@ void Registration::onRegisterActionTriggered(bool)
     int operation = action->data(ADR_Operation).toInt();
     showRegisterDialog(streamJid,serviceJid,operation,NULL);
   }
-}
-
-void Registration::onOptionsAccepted()
-{
-  foreach(QUuid accountId, FOptionWidgets.keys())
-  {
-    IAccount *account = FAccountManager->accountById(accountId);
-    if (account && account->isActive())
-    {
-      QCheckBox *checkBox = FOptionWidgets.value(accountId);
-      account->setValue(AVN_REGISTER_ON_CONNECT, checkBox->isChecked());
-    }
-  }
-  emit optionsAccepted();
-}
-
-void Registration::onOptionsRejected()
-{
-  emit optionsRejected();
-}
-
-void Registration::onOptionsDialogClosed()
-{
-  FOptionWidgets.clear();
 }
 
 void Registration::onXmppFeatureDestroyed()

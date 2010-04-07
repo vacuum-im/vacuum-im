@@ -24,8 +24,6 @@ public:
   virtual void disconnectFromHost();
   virtual qint64 write(const QByteArray &AData);
   virtual QByteArray read(qint64 ABytes);
-  virtual QVariant option(int ARole) const;
-  virtual void setOption(int ARole, const QVariant &AValue);
   //IDefaultConnection
   virtual void startClientEncryption();
   virtual QSsl::SslProtocol protocol() const;
@@ -37,6 +35,8 @@ public:
   virtual QList<QSslError> sslErrors() const;
   virtual QNetworkProxy proxy() const;
   virtual void setProxy(const QNetworkProxy &AProxy);
+  virtual QVariant option(int ARole) const;
+  virtual void setOption(int ARole, const QVariant &AValue);
 signals:
   void aboutToConnect();
   void connected();
@@ -45,6 +45,7 @@ signals:
   void error(const QString &AMessage);
   void aboutToDisconnect();
   void disconnected();
+  void connectionDestroyed();
   //IDefaultConnection
   void modeChanged(QSslSocket::SslMode AMode);
   void sslErrors(const QList<QSslError> &AErrors);

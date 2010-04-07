@@ -5,19 +5,13 @@ AccountOptions::AccountOptions(IAccountManager *AManager, const QUuid &AAccountI
   ui.setupUi(this);
   FAccountId = AAccountId;
   FManager = AManager;
+  
+  reset();
 
-  IAccount *account = FManager->accountById(FAccountId);
-  if (account)
-  {
-    ui.lneName->setText(account->name());
-    ui.lneJabberId->setText(account->streamJid().bare());
-    ui.lneResource->setText(account->streamJid().resource());
-    ui.lnePassword->setText(account->password());
-  }
-  else
-  {
-    ui.lneResource->setText(CLIENT_NAME);
-  }
+  connect(ui.lneName,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+  connect(ui.lneJabberId,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+  connect(ui.lneResource,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+  connect(ui.lnePassword,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
 }
 
 AccountOptions::~AccountOptions()
@@ -42,6 +36,24 @@ void AccountOptions::apply()
     account->setStreamJid(streamJid);
     account->setPassword(ui.lnePassword->text());
   }
+  emit childApply();
+}
+
+void AccountOptions::reset()
+{
+  IAccount *account = FManager->accountById(FAccountId);
+  if (account)
+  {
+    ui.lneName->setText(account->name());
+    ui.lneJabberId->setText(account->streamJid().bare());
+    ui.lneResource->setText(account->streamJid().resource());
+    ui.lnePassword->setText(account->password());
+  }
+  else
+  {
+    ui.lneResource->setText(CLIENT_NAME);
+  }
+  emit childReset();
 }
 
 QString AccountOptions::name() const

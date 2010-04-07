@@ -2,15 +2,13 @@
 
 #include <QCoreApplication>
 
-#define SVN_PLUGIN_ID                  "style[]:pluginId"
-
 MessageStyles::MessageStyles()
 {
-  FSettingsPlugin = NULL;
   FAvatars = NULL;
   FStatusIcons = NULL;
   FVCardPlugin = NULL;
   FRosterPlugin = NULL;
+  FOptionsManager = NULL;
 }
 
 MessageStyles::~MessageStyles()
@@ -34,12 +32,12 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
   {
     IMessageStylePlugin *stylePlugin = qobject_cast<IMessageStylePlugin *>(plugin->instance());
     if (stylePlugin)
-      FStylePlugins.insert(stylePlugin->stylePluginId(),stylePlugin);
+      FStylePlugins.insert(stylePlugin->pluginId(),stylePlugin);
   }
 
-  IPlugin *plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 
   plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
   if (plugin)
@@ -64,58 +62,51 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+
   return !FStylePlugins.isEmpty();
 }
 
-bool MessageStyles::initObjects()
+bool MessageStyles::initSettings()
 {
-  if (FSettingsPlugin)
+  if (FOptionsManager)
   {
-    FSettingsPlugin->insertOptionsHolder(this);
-    FSettingsPlugin->openOptionsNode(ON_MESSAGE_STYLES,tr("Message Styles"),tr("Styles options for custom messages"),MNI_MESSAGE_STYLES,ONO_MESSAGE_STYLES);
+    IOptionsDialogNode styleNode = { ONO_MESSAGE_STYLES, OPN_MESSAGE_STYLES, tr("Message Styles"),tr("Styles options for custom messages"), MNI_MESSAGE_STYLES };
+    FOptionsManager->insertOptionsDialogNode(styleNode);
+    FOptionsManager->insertOptionsHolder(this);
   }
   return true;
 }
 
-QWidget *MessageStyles::optionsWidget(const QString &ANode, int &AOrder)
+IOptionsWidget *MessageStyles::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
-  if (ANode == ON_MESSAGE_STYLES && !FStylePlugins.isEmpty())
+  if (ANodeId == OPN_MESSAGE_STYLES && !FStylePlugins.isEmpty())
   {
     AOrder = OWO_MESSAGE_STYLES;
-    StyleOptionsWidget *widget = new StyleOptionsWidget(this);
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),this,SIGNAL(optionsRejected()));
-    connect(widget,SIGNAL(optionsAccepted()),this,SIGNAL(optionsAccepted()));
-    return widget;
+    return new StyleOptionsWidget(this,AParent);
   }
   return NULL;
 }
 
-QList<QString> MessageStyles::stylePlugins() const
+QList<QString> MessageStyles::pluginList() const
 {
   return FStylePlugins.keys();
 }
 
-IMessageStylePlugin *MessageStyles::stylePluginById(const QString &APluginId) const
+IMessageStylePlugin *MessageStyles::pluginById(const QString &APluginId) const
 {
   return FStylePlugins.value(APluginId,NULL);
 }
 
 IMessageStyle *MessageStyles::styleForOptions(const IMessageStyleOptions &AOptions) const
 {
-  IMessageStylePlugin *stylePlugin = stylePluginById(AOptions.pluginId);
+  IMessageStylePlugin *stylePlugin = pluginById(AOptions.pluginId);
   return stylePlugin!=NULL ? stylePlugin->styleForOptions(AOptions) : NULL;
 }
 
-IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString &AContext) const
+IMessageStyleOptions MessageStyles::styleOptions(const OptionsNode &ANode, int AMessageType) const
 {
-  QString pluginId;
-  if (FSettingsPlugin)
-  {
-    QString ns = QString::number(AMessageType)+"|"+AContext;
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    pluginId = settings->valueNS(SVN_PLUGIN_ID,ns).toString();
-  }
+  QString pluginId = ANode.value("style-type").toString();
 
   if (!FStylePlugins.contains(pluginId))
   {
@@ -123,36 +114,23 @@ IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString
     {
     case Message::GroupChat:
     case Message::Chat:
-      pluginId = "Adium";
+      pluginId = "AdiumMessageStyle";
       break;
     default:
-      pluginId = "Simple";
+      pluginId = "SimpleMessageStyle";
     }
-    if (!FStylePlugins.contains(pluginId) && !FStylePlugins.isEmpty())
-      pluginId = FStylePlugins.keys().first();
+    if (!FStylePlugins.contains(pluginId))
+      pluginId = FStylePlugins.keys().value(0);
   }
 
-  IMessageStylePlugin *stylePlugin = stylePluginById(pluginId);
-  return stylePlugin!=NULL ? stylePlugin->styleOptions(AMessageType,AContext) : IMessageStyleOptions();
+  IMessageStylePlugin *stylePlugin = pluginById(pluginId);
+  return stylePlugin!=NULL ? stylePlugin->styleOptions(ANode.node("style",pluginId),AMessageType) : IMessageStyleOptions();
 }
 
-void MessageStyles::setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)
+IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString &AContext) const
 {
-  IMessageStylePlugin *stylePlugin = stylePluginById(AOptions.pluginId);
-  if (FSettingsPlugin)
-  {
-    QString ns = QString::number(AMessageType)+"|"+AContext;
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    if (stylePlugin)
-      settings->setValueNS(SVN_PLUGIN_ID,ns,AOptions.pluginId);
-    else
-      settings->deleteNS(ns);
-  }
-
-  if (stylePlugin)
-    stylePlugin->setStyleOptions(AOptions,AMessageType,AContext);
-
-  emit styleOptionsChanged(AOptions,AMessageType,AContext);
+  OptionsNode node = Options::node(OPV_MESSAGESTYLE_MTYPE_ITEM,QString::number(AMessageType)).node("context",AContext);
+  return styleOptions(node,AMessageType);
 }
 
 QString MessageStyles::userAvatar(const Jid &AContactJid) const
@@ -245,6 +223,15 @@ void MessageStyles::onVCardChanged(const Jid &AContactJid)
       FStreamNames.insert(AContactJid.bare(),vcard->value(VVN_NICKNAME));
       vcard->unlock();
     }
+  }
+}
+
+void MessageStyles::onOptionsChanged(const OptionsNode &ANode)
+{
+  if (Options::cleanNSpaces(ANode.path()).startsWith(OPV_MESSAGESTYLE_STYLE_ITEM"."))
+  {
+    QList<QString> nspaces = ANode.parentNSpaces();
+
   }
 }
 

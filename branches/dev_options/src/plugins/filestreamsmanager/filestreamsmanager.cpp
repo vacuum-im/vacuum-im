@@ -91,14 +91,14 @@ bool FileStreamsManager::initObjects()
   if (FSettingsPlugin)
   {
     FSettingsPlugin->insertOptionsHolder(this);
-    FSettingsPlugin->openOptionsNode(ON_FILETRANSFER,tr("File Transfer"),tr("Common options for file transfer"),MNI_FILESTREAMSMANAGER,ONO_FILETRANSFER);
+    FSettingsPlugin->openOptionsNode(OPN_FILETRANSFER,tr("File Transfer"),tr("Common options for file transfer"),MNI_FILESTREAMSMANAGER,ONO_FILETRANSFER);
   }
   return true;
 }
 
 QWidget *FileStreamsManager::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_FILETRANSFER)
+  if (ANode == OPN_FILETRANSFER)
   {
     AOrder = OWO_FILESTREAMSMANAGER;
     if (FDataManager)

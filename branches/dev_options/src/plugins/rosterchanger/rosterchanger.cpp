@@ -152,7 +152,7 @@ bool RosterChanger::initObjects()
 //IoptionsHolder
 QWidget *RosterChanger::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_ROSTER)
+  if (ANode == OPN_ROSTER)
   {
     AOrder = OWO_ROSTER_CHENGER;
     SubscriptionOptions *widget = new SubscriptionOptions(this);

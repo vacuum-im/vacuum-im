@@ -13,40 +13,25 @@ AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : Q
   ui.setupUi(this);
   FManager = AManager;
 
-  foreach(IAccount *account, FManager->accounts())
-  {
-    QTreeWidgetItem *item = appendAccount(account->accountId(),account->name());
-    item->setCheckState(COL_NAME,account->isActive() ? Qt::Checked : Qt::Unchecked);
-    item->setText(COL_JID,account->streamJid().full());
-  }
+  reset();
 
   ui.trwAccounts->setHeaderLabels(QStringList() << tr("Name") << tr("Jabber ID"));
-  ui.trwAccounts->sortByColumn(COL_NAME,Qt::AscendingOrder);
-
   ui.trwAccounts->header()->setResizeMode(COL_NAME, QHeaderView::ResizeToContents);
   ui.trwAccounts->header()->setResizeMode(COL_JID, QHeaderView::Stretch);
+  ui.trwAccounts->sortByColumn(COL_NAME,Qt::AscendingOrder);
+  connect(ui.trwAccounts,SIGNAL(itemChanged(QTreeWidgetItem *, int)),SIGNAL(modified()));
 
-  connect(ui.pbtAdd,SIGNAL(clicked(bool)),SLOT(onAccountAdd()));
-  connect(ui.pbtRemove,SIGNAL(clicked(bool)),SLOT(onAccountRemove()));
+  connect(ui.pbtAdd,SIGNAL(clicked(bool)),SLOT(onAddButtonClicked(bool)));
+  connect(ui.pbtRemove,SIGNAL(clicked(bool)),SLOT(onRemoveButtonClicked(bool)));
   connect(ui.trwAccounts,SIGNAL(itemActivated(QTreeWidgetItem *,int)),SLOT(onItemActivated(QTreeWidgetItem *,int)));
 }
 
 AccountsOptions::~AccountsOptions()
 {
-
-}
-
-QWidget *AccountsOptions::accountOptions(const QUuid &AAccountId)
-{
-  AccountOptions *options = FAccountOptions.value(AAccountId);
-  if (options == NULL)
-  {
-    options = new AccountOptions(FManager,AAccountId);
-    if (options->name().isEmpty() && FAccountItems.contains(AAccountId))
-      options->setName(FAccountItems.value(AAccountId)->text(COL_NAME));
-    FAccountOptions.insert(AAccountId,options);
-  }
-  return options;
+  OptionsNode aoptions = Options::node(OPV_ACCOUNT_ROOT);
+  foreach(QString accountId, aoptions.childNSpaces("account"))
+    if (FManager->accountById(accountId) == NULL)
+      aoptions.removeChilds("account",accountId);
 }
 
 void AccountsOptions::apply()
@@ -84,20 +69,44 @@ void AccountsOptions::apply()
     QMessageBox::information(NULL,tr("Account options"),tr("Some accounts changes will be applied after disconnect"));
   }
 
-  emit optionsAccepted();
+  emit childApply();
 }
 
-void AccountsOptions::reject()
+void AccountsOptions::reset()
 {
   QList<QUuid> curAccounts;
   foreach(IAccount *account, FManager->accounts())
+  {
+    QTreeWidgetItem *item = appendAccount(account->accountId(),account->name());
+    item->setCheckState(COL_NAME,account->isActive() ? Qt::Checked : Qt::Unchecked);
+    item->setText(COL_JID,account->streamJid().full());
     curAccounts.append(account->accountId());
+  }
 
-  foreach(QUuid account, FAccountItems.keys())
-    if (!curAccounts.contains(account))
-      removeAccount(account);
+  foreach(QUuid accountId, FAccountItems.keys())
+  {
+    if (!curAccounts.contains(accountId))
+    {
+      removeAccount(accountId);
+      Options::node(OPV_ACCOUNT_ROOT).removeChilds("account",accountId.toString());
+    }
+  }
 
-  emit optionsRejected();
+  emit childReset();
+}
+
+AccountOptions *AccountsOptions::accountOptions(const QUuid &AAccountId, QWidget *AParent)
+{
+  AccountOptions *widget = FAccountOptions.value(AAccountId);
+  if (widget == NULL)
+  {
+    widget = new AccountOptions(FManager,AAccountId, AParent);
+    if (widget->name().isEmpty() && FAccountItems.contains(AAccountId))
+      widget->setName(FAccountItems.value(AAccountId)->text(COL_NAME));
+    FAccountOptions.insert(AAccountId,widget);
+    connect(widget,SIGNAL(destroyed(QObject *)),SLOT(onAccountOptionsDestroyed(QObject *)));
+  }
+  return widget;
 }
 
 QTreeWidgetItem *AccountsOptions::appendAccount(const QUuid &AAccountId, const QString &AName)
@@ -117,24 +126,23 @@ QTreeWidgetItem *AccountsOptions::appendAccount(const QUuid &AAccountId, const Q
 void AccountsOptions::removeAccount(const QUuid &AAccountId)
 {
   FManager->closeAccountOptionsNode(AAccountId);
-  if (FAccountOptions.contains(AAccountId))
-    FAccountOptions.take(AAccountId)->deleteLater();
-  QTreeWidgetItem *item = FAccountItems.take(AAccountId);
-  delete item;
+  FAccountOptions.remove(AAccountId);
+  delete FAccountItems.take(AAccountId);
 }
 
-void AccountsOptions::onAccountAdd()
+void AccountsOptions::onAddButtonClicked(bool)
 {
   QString name = QInputDialog::getText(this,tr("Enter account name"),tr("Account name:")).trimmed();
   if (!name.isEmpty())
   {
     QUuid id = QUuid::createUuid();
     appendAccount(id,name);
-    FManager->openAccountOptionsDialog(id);
+    FManager->showAccountOptionsDialog(id);
+    emit modified();
   }
 }
 
-void AccountsOptions::onAccountRemove()
+void AccountsOptions::onRemoveButtonClicked(bool)
 {
   QTreeWidgetItem *item = ui.trwAccounts->currentItem();
   if (item)
@@ -147,6 +155,7 @@ void AccountsOptions::onAccountRemove()
     if (res == QMessageBox::Ok)
     {
       removeAccount(FAccountItems.key(item));
+      emit modified();
     }
   }
 }
@@ -154,5 +163,12 @@ void AccountsOptions::onAccountRemove()
 void AccountsOptions::onItemActivated(QTreeWidgetItem *AItem, int /*AColumn*/)
 {
   if (AItem)
-    FManager->openAccountOptionsDialog(FAccountItems.key(AItem));
+    FManager->showAccountOptionsDialog(FAccountItems.key(AItem));
+}
+
+void AccountsOptions::onAccountOptionsDestroyed(QObject *AObject)
+{
+  foreach(AccountOptions *widget, FAccountOptions.values())
+    if (qobject_cast<QObject *>(widget) == AObject)
+      FAccountOptions.remove(FAccountOptions.key(widget));
 }

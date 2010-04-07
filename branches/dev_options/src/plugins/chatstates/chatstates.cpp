@@ -165,7 +165,7 @@ bool ChatStates::archiveMessage(int /*AOrder*/, const Jid &/*AStreamJid*/, Messa
 
 QWidget *ChatStates::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_MESSAGES)
+  if (ANode == OPN_MESSAGES)
   {
     AOrder = OWO_MESSAGES_CHATSTATES;
     StateOptionsWidget *widget = new StateOptionsWidget(this);

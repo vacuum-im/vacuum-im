@@ -27,7 +27,7 @@ OptionsDialog::OptionsDialog(SettingsPlugin *ASessingsPlugin, QWidget *AParent) 
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
   setWindowTitle(tr("Options"));
-  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SETTINGS_OPTIONS,0,0,"windowIcon");
+  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_OPTIONS_DIALOG,0,0,"windowIcon");
   
   delete ui.scaScroll->takeWidget();
   ui.trvNodes->sortByColumn(0,Qt::AscendingOrder);

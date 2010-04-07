@@ -104,7 +104,7 @@ bool DataStreamsManger::initObjects()
   if (FSettingsPlugin)
   {
     FSettingsPlugin->insertOptionsHolder(this);
-    FSettingsPlugin->openOptionsNode(ON_DATASTREAMS,tr("Data Streams"),tr("Common data streams settings"),MNI_DATASTREAMSMANAGER,ONO_DATASTREAMS);
+    FSettingsPlugin->openOptionsNode(OPN_DATASTREAMS,tr("Data Streams"),tr("Common data streams settings"),MNI_DATASTREAMSMANAGER,ONO_DATASTREAMS);
   }
 
   ErrorHandler::addErrorItem(ERC_NO_VALID_STREAMS,ErrorHandler::CANCEL,ErrorHandler::BAD_REQUEST,
@@ -117,7 +117,7 @@ bool DataStreamsManger::initObjects()
 
 QWidget *DataStreamsManger::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_DATASTREAMS)
+  if (ANode == OPN_DATASTREAMS)
   {
     AOrder = OWO_DATASTREAMS;
     DataStreamsOptions *widget = new DataStreamsOptions(this);

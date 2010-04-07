@@ -4,15 +4,15 @@
 #include <QPointer> 
 #include <definations/actiongroups.h>
 #include <definations/optionnodes.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
 #include <definations/rosterindextyperole.h>
-#include <definations/accountvaluenames.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
-#include <interfaces/iaccountmanager.h>
 #include <interfaces/ipluginmanager.h>
-#include <interfaces/isettings.h>
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/irostersview.h>
 #include <utils/action.h>
@@ -37,11 +37,11 @@ public:
   virtual QUuid pluginUuid() const { return ACCOUNTMANAGER_UUID; }
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initObjects() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeID, int &AOrder, QWidget *AParent);
   //IAccountManager
   virtual QList<IAccount *> accounts() const;
   virtual IAccount *accountById(const QUuid &AAcoountId) const;
@@ -56,26 +56,24 @@ signals:
   void shown(IAccount *AAccount);
   void hidden(IAccount *AAccount);
   void removed(IAccount *AAccount);
+  void changed(IAccount *AAcount, OptionsNode ANode);
   void destroyed(const QUuid &AAccountId);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 public:
-  void openAccountOptionsDialog(const QUuid &AAccountId);
+  void showAccountOptionsDialog(const QUuid &AAccountId);
   void openAccountOptionsNode(const QUuid &AAccountId, const QString &AName);
   void closeAccountOptionsNode(const QUuid &AAccountId);
 protected slots:
-  void onAccountChanged(const QString &AName, const QVariant &AValue);
-  void onOpenAccountOptions(bool);
   void onProfileOpened(const QString &AProfile);
   void onProfileClosed(const QString &AProfile);
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onOptionsOpened();
+  void onOptionsClosed();
+  void onShowAccountOptions(bool);
+  void onAccountActiveChanged(bool AActive);
+  void onAccountOptionsChanged(const OptionsNode &ANode);
   void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 private:
-  ISettings *FSettings;
-  ISettingsPlugin *FSettingsPlugin;
   IXmppStreams *FXmppStreams;
+  IOptionsManager *FOptionsManager;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
   QMap<QUuid, IAccount *> FAccounts;

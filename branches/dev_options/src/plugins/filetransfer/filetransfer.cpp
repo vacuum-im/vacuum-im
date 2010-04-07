@@ -156,7 +156,7 @@ bool FileTransfer::initObjects()
 
 QWidget *FileTransfer::optionsWidget(const QString &ANode, int &AOrder)
 {
-  if (ANode == ON_FILETRANSFER)
+  if (ANode == OPN_FILETRANSFER)
   {
     AOrder = OWO_FILETRANSFER;
     FileTransferOptions *widget = new FileTransferOptions(this);

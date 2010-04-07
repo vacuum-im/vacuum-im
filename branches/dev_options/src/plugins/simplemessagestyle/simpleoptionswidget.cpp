@@ -1,18 +1,16 @@
 #include "simpleoptionswidget.h"
 
-#include <QTimer>
 #include <QColor>
-#include <QPixmap>
 #include <QFileDialog>
 #include <QFontDialog>
 
-SimpleOptionsWidget::SimpleOptionsWidget(SimpleMessageStylePlugin *APlugin, int AMessageType, const QString &AContext, QWidget *AParent) : QWidget(AParent)
+SimpleOptionsWidget::SimpleOptionsWidget(SimpleMessageStylePlugin *APlugin, const OptionsNode &ANode, int AMessageType, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
 
-  FModifyEnabled = false;
-  FTimerStarted = false;
   FStylePlugin = APlugin;
+  FOptions = ANode;
+  FMessageType = AMessageType;
 
   foreach(QString styleId, FStylePlugin->styles())
     ui.cmbStyle->addItem(styleId,styleId);
@@ -34,9 +32,8 @@ SimpleOptionsWidget::SimpleOptionsWidget(SimpleMessageStylePlugin *APlugin, int 
   connect(ui.tlbDefaultFont,SIGNAL(clicked()),SLOT(onDefaultFontClicked()));
   connect(ui.tlbSetImage,SIGNAL(clicked()),SLOT(onSetImageClicked()));
   connect(ui.tlbDefaultImage,SIGNAL(clicked()),SLOT(onDefaultImageClicked()));
-  connect(this,SIGNAL(settingsChanged()),SLOT(onSettingsChanged()));
 
-  loadSettings(AMessageType,AContext);
+  reset();
 }
 
 SimpleOptionsWidget::~SimpleOptionsWidget()
@@ -44,71 +41,47 @@ SimpleOptionsWidget::~SimpleOptionsWidget()
 
 }
 
-int SimpleOptionsWidget::messageType() const
+void SimpleOptionsWidget::apply(OptionsNode ANode)
 {
-  return FActiveType;
+  OptionsNode node = ANode.isNull() ? FOptions : ANode;
+  node.setValue(FStyleOptions.extended.value(MSO_STYLE_ID),"style-id");
+  node.setValue(FStyleOptions.extended.value(MSO_VARIANT),"variant");
+  node.setValue(FStyleOptions.extended.value(MSO_FONT_FAMILY),"font-family");
+  node.setValue(FStyleOptions.extended.value(MSO_FONT_SIZE),"font-size");
+  node.setValue(FStyleOptions.extended.value(MSO_BG_COLOR),"bg-color");
+  node.setValue(FStyleOptions.extended.value(MSO_BG_IMAGE_FILE),"bg-image-file");
+  emit childApply();
 }
 
-QString SimpleOptionsWidget::context() const
+void SimpleOptionsWidget::apply()
 {
-  return FActiveContext;
+  apply(FOptions);
 }
 
-bool SimpleOptionsWidget::isModified( int AMessageType, const QString &AContext ) const
+void SimpleOptionsWidget::reset()
 {
-  return FModified.value(AMessageType).value(AContext,false);
-}
-
-void SimpleOptionsWidget::setModified(bool AModified, int AMessageType, const QString &AContext)
-{
-  FModified[AMessageType][AContext] = AModified;
-}
-
-IMessageStyleOptions SimpleOptionsWidget::styleOptions(int AMessageType, const QString &AContext) const
-{
-  if (FOptions.value(AMessageType).contains(AContext))
-    return FOptions.value(AMessageType).value(AContext);
-  return FStylePlugin->styleOptions(AMessageType,AContext);
-}
-
-void SimpleOptionsWidget::loadSettings(int AMessageType, const QString &AContext)
-{
-  FActiveType = AMessageType;
-  FActiveContext = AContext;
-
-  IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
-  if (soptions.pluginId.isEmpty())
-    soptions = FStylePlugin->styleOptions(FActiveType,FActiveContext);
-
-  FModifyEnabled = isModified(AMessageType,AContext);
   disconnect(ui.cmbVariant,SIGNAL(currentIndexChanged(int)),this,SLOT(onVariantChanged(int)));
 
-  ui.cmbStyle->setCurrentIndex(ui.cmbStyle->findData(soptions.extended.value(MSO_STYLE_ID)));
-  ui.cmbVariant->setCurrentIndex(ui.cmbVariant->findData(soptions.extended.value(MSO_VARIANT).toString()));
-  ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(soptions.extended.value(MSO_BG_COLOR)));
+  FStyleOptions = FStylePlugin->styleOptions(FOptions,FMessageType);
+  ui.cmbStyle->setCurrentIndex(ui.cmbStyle->findData(FStyleOptions.extended.value(MSO_STYLE_ID)));
+  ui.cmbVariant->setCurrentIndex(ui.cmbVariant->findData(FStyleOptions.extended.value(MSO_VARIANT)));
+  ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(FStyleOptions.extended.value(MSO_BG_COLOR)));
+  updateOptionsWidgets();
 
   connect(ui.cmbVariant,SIGNAL(currentIndexChanged(int)),SLOT(onVariantChanged(int)));
-  FModifyEnabled = true;
 
-  updateOptionsWidgets();
-  startSignalTimer();
+  emit childReset();
 }
 
-void SimpleOptionsWidget::startSignalTimer()
+IMessageStyleOptions SimpleOptionsWidget::styleOptions() const
 {
-  if (!FTimerStarted)
-  {
-    QTimer::singleShot(0,this,SIGNAL(settingsChanged()));
-    FTimerStarted = true;
-  }
+  return FStyleOptions;
 }
 
 void SimpleOptionsWidget::updateOptionsWidgets()
 {
-  const IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
-
-  QString family = soptions.extended.value(MSO_FONT_FAMILY).toString();
-  int size = soptions.extended.value(MSO_FONT_SIZE).toInt();
+  QString family = FStyleOptions.extended.value(MSO_FONT_FAMILY).toString();
+  int size = FStyleOptions.extended.value(MSO_FONT_SIZE).toInt();
   if (family.isEmpty())
     family = QFont().family();
   if (size==0)
@@ -125,9 +98,7 @@ void SimpleOptionsWidget::onStyleChanged(int AIndex)
     ui.cmbVariant->addItem(variant,variant);
   ui.cmbVariant->setEnabled(ui.cmbVariant->count() > 0);
 
-  IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
-  soptions.extended.insert(MSO_STYLE_ID,styleId);
-  FModified[FActiveType][FActiveContext] = FModifyEnabled;
+  FStyleOptions.extended.insert(MSO_STYLE_ID,styleId);
 
   QMap<QString, QVariant> info = FStylePlugin->styleInfo(styleId);
   if (info.contains(MSIV_DEFAULT_VARIANT))
@@ -148,55 +119,43 @@ void SimpleOptionsWidget::onStyleChanged(int AIndex)
     ui.tlbSetImage->setEnabled(true);
     ui.tlbDefaultImage->setEnabled(true);
     ui.cmbBackgoundColor->setEnabled(true);
-    startSignalTimer();
+    emit modified();
   }
 }
 
 void SimpleOptionsWidget::onVariantChanged(int AIndex)
 {
-  IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
-  soptions.extended.insert(MSO_VARIANT,ui.cmbVariant->itemData(AIndex));
-  FModified[FActiveType][FActiveContext] = FModifyEnabled;
-  startSignalTimer();
+  FStyleOptions.extended.insert(MSO_VARIANT,ui.cmbVariant->itemData(AIndex));
+  emit modified();
 }
 
 void SimpleOptionsWidget::onSetFontClicked()
 {
   bool ok;
-  IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
-
-  QFont font;
-  if (!soptions.extended.value(MSO_FONT_FAMILY).toString().isEmpty())
-    font.setFamily(soptions.extended.value(MSO_FONT_FAMILY).toString());
-  if (soptions.extended.value(MSO_FONT_SIZE).toInt()>0)
-    font.setPointSize(soptions.extended.value(MSO_FONT_SIZE).toInt());
-
+  QFont font(FStyleOptions.extended.value(MSO_FONT_FAMILY).toString(),FStyleOptions.extended.value(MSO_FONT_SIZE).toInt());
   font = QFontDialog::getFont(&ok,font,this,tr("Select font family and size"));
   if (ok)
   {
-    soptions.extended.insert(MSO_FONT_FAMILY,font.family());
-    soptions.extended.insert(MSO_FONT_SIZE,font.pointSize());
-    FModified[FActiveType][FActiveContext] = FModifyEnabled;
-    startSignalTimer();
+    FStyleOptions.extended.insert(MSO_FONT_FAMILY,font.family());
+    FStyleOptions.extended.insert(MSO_FONT_SIZE,font.pointSize());
+    updateOptionsWidgets();
+    emit modified();
   }
 }
 
 void SimpleOptionsWidget::onDefaultFontClicked()
 {
-  IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
   QMap<QString,QVariant> info = FStylePlugin->styleInfo(ui.cmbStyle->itemData(ui.cmbStyle->currentIndex()).toString());
-  soptions.extended.insert(MSO_FONT_FAMILY,info.value(MSIV_DEFAULT_FONT_FAMILY));
-  soptions.extended.insert(MSO_FONT_SIZE,info.value(MSIV_DEFAULT_FONT_SIZE));
-  FModified[FActiveType][FActiveContext] = FModifyEnabled;
-  startSignalTimer();
+  FStyleOptions.extended.insert(MSO_FONT_FAMILY,info.value(MSIV_DEFAULT_FONT_FAMILY));
+  FStyleOptions.extended.insert(MSO_FONT_SIZE,info.value(MSIV_DEFAULT_FONT_SIZE));
+  updateOptionsWidgets();
+  emit modified();
 }
 
 void SimpleOptionsWidget::onBackgroundColorChanged(int AIndex)
 {
-  IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
-  soptions.extended.insert(MSO_BG_COLOR,ui.cmbBackgoundColor->itemData(AIndex));
-  FModified[FActiveType][FActiveContext] = FModifyEnabled;
-  startSignalTimer();
+  FStyleOptions.extended.insert(MSO_BG_COLOR,ui.cmbBackgoundColor->itemData(AIndex));
+  emit modified();
 }
 
 void SimpleOptionsWidget::onSetImageClicked()
@@ -204,29 +163,20 @@ void SimpleOptionsWidget::onSetImageClicked()
   QString fileName = QFileDialog::getOpenFileName(this, tr("Select background image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
   if (!fileName.isEmpty())
   {
-    IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
-    soptions.extended.insert(MSO_BG_IMAGE_FILE,fileName);
-    FModified[FActiveType][FActiveContext] = FModifyEnabled;
-    startSignalTimer();
+    FStyleOptions.extended.insert(MSO_BG_IMAGE_FILE,fileName);
+    updateOptionsWidgets();
+    emit modified();
   }
 }
 
 void SimpleOptionsWidget::onDefaultImageClicked()
 {
-  IMessageStyleOptions &soptions = FOptions[FActiveType][FActiveContext];
-  soptions.extended.remove(MSO_BG_IMAGE_FILE);
+  FStyleOptions.extended.remove(MSO_BG_IMAGE_FILE);
 
   QMap<QString,QVariant> info = FStylePlugin->styleInfo(ui.cmbStyle->itemData(ui.cmbStyle->currentIndex()).toString());
-  soptions.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
-  ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(soptions.extended.value(MSO_BG_COLOR)));
+  FStyleOptions.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
+  ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(FStyleOptions.extended.value(MSO_BG_COLOR)));
 
-  FModified[FActiveType][FActiveContext] = FModifyEnabled;
-
-  startSignalTimer();
-}
-
-void SimpleOptionsWidget::onSettingsChanged()
-{
   updateOptionsWidgets();
-  FTimerStarted = false;
+  emit modified();
 }
