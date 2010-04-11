@@ -27,14 +27,6 @@ SocksStreams::SocksStreams() : FServer(this)
   FStanzaProcessor = NULL;
   FDiscovery = NULL;
   FConnectionManager = NULL;
-  FSettings = NULL;
-  FSettingsPlugin = NULL;
-
-  FForwardPort = 0;
-  FServerPort = DEFAULT_SERVER_PORT;
-  FDisableDirectConnect = DEFAULT_DIABLE_DIRECT_CONNECT;
-  FUseNativeServerProxy = DEFAULT_USE_NATIVE_SERVER_PROXY;
-  FUseAccountNetworkProxy = DEFAULT_USE_ACCOUNT_NETPROXY;
 
   connect(&FServer,SIGNAL(newConnection()),SLOT(onNewServerConnection()));
 }
@@ -89,17 +81,6 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &/*AInitO
     }
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-  {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
-  }
-
   return FStanzaProcessor!=NULL;
 }
 
@@ -118,6 +99,19 @@ bool SocksStreams::initObjects()
     feature.description = tr("Supports the initiating of the SOCKS5 stream of data between two XMPP entities");
     FDiscovery->insertDiscoFeature(feature);
   }
+  return true;
+}
+
+bool SocksStreams::initSettings()
+{
+  Options::registerOption(OPV_DATASTREAMS_SOCKSLISTENPORT,52227,tr("Listening Port"));
+  Options::registerOption(OPV_DATASTREAMS_METHOD_DISABLEDIRECT,false,tr("Disable Direct Connections"));
+  Options::registerOption(OPV_DATASTREAMS_METHOD_FORWARDHOST,QString(),tr("Forward Host"));
+  Options::registerOption(OPV_DATASTREAMS_METHOD_FORWARDPORT,0,tr("Forward Port"));
+  Options::registerOption(OPV_DATASTREAMS_METHOD_USEACCOUNTSTREAMPROXY,true,tr("Use Proxy on Account Server"));
+  Options::registerOption(OPV_DATASTREAMS_METHOD_STREAMPROXYLIST,QStringList(),tr("List of Proxies"));
+  Options::registerOption(OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY,true,tr("Use Account Network Proxy"));
+  Options::registerOption(OPV_DATASTREAMS_METHOD_NETWORKPROXY,QString(APPLICATION_PROXY_REF_UUID),tr("Network Proxy"));
   return true;
 }
 
@@ -148,181 +142,52 @@ IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, cons
   return NULL;
 }
 
-QWidget *SocksStreams::settingsWidget(IDataStreamSocket *ASocket, bool AReadOnly)
+IOptionsWidget *SocksStreams::methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent)
+{
+  return new SocksOptions(this,FConnectionManager,ANode,AReadOnly,AParent);
+}
+
+IOptionsWidget *SocksStreams::methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent)
 {
   ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());
-  return stream!=NULL ? new SocksOptions(this,stream,AReadOnly,NULL) : NULL;
+  return stream!=NULL ? new SocksOptions(this,stream,AReadOnly,AParent) : NULL;
 }
 
-QWidget *SocksStreams::settingsWidget(const QString &ASettingsNS, bool AReadOnly)
+void SocksStreams::saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode)
 {
-  return new SocksOptions(this,FConnectionManager,ASettingsNS,AReadOnly,NULL);
+  SocksOptions *widget = qobject_cast<SocksOptions *>(AWidget->instance());
+  if (widget)
+    widget->apply(ANode);
 }
 
-void SocksStreams::loadSettings(IDataStreamSocket *ASocket, QWidget *AWidget) const
+void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget)
 {
-  SocksOptions *widget = qobject_cast<SocksOptions *>(AWidget);
+  SocksOptions *widget = qobject_cast<SocksOptions *>(AWidget->instance());
   ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());
   if (widget && stream)
-    widget->saveSettings(stream);
+    widget->apply(stream);
 }
 
-void SocksStreams::loadSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS) const
+void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode)
 {
   ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());
   if (stream)
   {
-    QList<QString> proxyItems = proxyList(ASettingsNS);
-    if (useNativeServerProxy(ASettingsNS))
+    QStringList proxyItems = ANode.value("stream-proxy-list").toStringList();
+    if (ANode.value("use-account-stream-proxy").toBool())
     {
-      QString nativeProxy = nativeServerProxy(stream->streamJid());
-      if (!nativeProxy.isEmpty() && !proxyItems.contains(nativeProxy))
-        proxyItems.prepend(nativeProxy);
+      QString streamProxy = accountStreamProxy(stream->streamJid());
+      if (!streamProxy.isEmpty() && !proxyItems.contains(streamProxy))
+        proxyItems.prepend(streamProxy);
     }
-
-    stream->setDisableDirectConnection(disableDirectConnections(ASettingsNS));
-    stream->setForwardAddress(forwardHost(ASettingsNS), forwardPort(ASettingsNS));
-    stream->setNetworkProxy(useAccountNetworkProxy(ASettingsNS) ? accountNetworkProxy(stream->streamJid()) : networkProxy(ASettingsNS));
     stream->setProxyList(proxyItems);
-  }
-}
 
-void SocksStreams::saveSettings(const QString &ASettingsNS, QWidget *AWidget)
-{
-  SocksOptions *widget = qobject_cast<SocksOptions *>(AWidget);
-  if (widget)
-    widget->saveSettings(ASettingsNS);
-}
-
-void SocksStreams::saveSettings(const QString &ASettingsNS, IDataStreamSocket *ASocket)
-{
-  ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());
-  if (stream)
-  {
-    setDisableDirectConnections(ASettingsNS, stream->disableDirectConnection());
-    setForwardAddress(ASettingsNS, stream->forwardHost(), stream->forwardPort());
-    setNetworkProxy(ASettingsNS, stream->networkProxy());
-    setProxyList(ASettingsNS, stream->proxyList());
-  }
-}
-
-void SocksStreams::deleteSettings(const QString &ASettingsNS)
-{
-  if (ASettingsNS.isEmpty())
-  {
-    FDisableDirectConnect = DEFAULT_DIABLE_DIRECT_CONNECT;
-    FUseNativeServerProxy = DEFAULT_USE_NATIVE_SERVER_PROXY;
-    FUseAccountNetworkProxy = DEFAULT_USE_ACCOUNT_NETPROXY;
-  }
-  else if (FSettings)
-  {
-    FSettings->deleteNS(ASettingsNS);
-  }
-  //if (FConnectionManager)
-  //{
-  //  FConnectionManager->deleteProxySettings(PROXY_NS_PREFIX+ASettingsNS);
-  //}
-}
-
-quint16 SocksStreams::serverPort() const
-{
-  return FServerPort;
-}
-
-void SocksStreams::setServerPort(quint16 APort)
-{
-  if (FServerPort != APort)
-  {
-    FServerPort = APort;
-    if (FServer.isListening() && FServer.serverPort()!=FServerPort)
-    {
-      FServer.close();
-      FServer.listen(QHostAddress::Any, FServerPort);
-    }
-  }
-}
-
-bool SocksStreams::disableDirectConnections(const QString &ASettingsNS) const
-{
-  if (FSettings && !ASettingsNS.isEmpty())
-    return FSettings->valueNS(SVN_DISABLE_DIRECT_CONNECT,ASettingsNS,FDisableDirectConnect).toBool();
-  return FDisableDirectConnect;
-}
-
-void SocksStreams::setDisableDirectConnections(const QString &ASettingsNS, bool ADisable)
-{
-  if (ASettingsNS.isEmpty())
-    FDisableDirectConnect = ADisable;
-  else if (FSettings && FDisableDirectConnect == ADisable)
-    FSettings->deleteValueNS(SVN_DISABLE_DIRECT_CONNECT, ASettingsNS);
-  else if (FSettings)
-    FSettings->setValueNS(SVN_DISABLE_DIRECT_CONNECT, ASettingsNS, ADisable);
-}
-
-bool SocksStreams::useAccountNetworkProxy(const QString &ASettingsNS) const
-{
-  if (FSettings && !ASettingsNS.isEmpty())
-    return FSettings->valueNS(SVN_USE_ACCOUNT_NETPROXY, ASettingsNS, FUseAccountNetworkProxy).toBool();
-  return FUseAccountNetworkProxy;
-}
-
-void SocksStreams::setUseAccountNetworkProxy(const QString &ASettingsNS, bool AUse)
-{
-  if (ASettingsNS.isEmpty())
-    FUseAccountNetworkProxy = AUse;
-  else if (FSettings && FUseAccountNetworkProxy == AUse)
-    FSettings->deleteValueNS(SVN_USE_ACCOUNT_NETPROXY, ASettingsNS);
-  else if (FSettings)
-    FSettings->setValueNS(SVN_USE_ACCOUNT_NETPROXY, ASettingsNS, AUse);
-}
-
-bool SocksStreams::useNativeServerProxy(const QString &ASettingsNS) const
-{
-  if (FSettings && !ASettingsNS.isEmpty())
-    return FSettings->valueNS(SVN_USE_NATIVE_SERVER_PROXY,ASettingsNS,FUseNativeServerProxy).toBool();
-  return FUseNativeServerProxy;
-}
-
-void SocksStreams::setUseNativeServerProxy(const QString &ASettingsNS, bool AAppend)
-{
-  if (ASettingsNS.isEmpty())
-    FUseNativeServerProxy = AAppend;
-  else if (FSettings && FUseNativeServerProxy == AAppend)
-    FSettings->deleteValueNS(SVN_USE_NATIVE_SERVER_PROXY, ASettingsNS);
-  else if (FSettings)
-    FSettings->setValueNS(SVN_USE_NATIVE_SERVER_PROXY, ASettingsNS, AAppend);
-}
-
-QString SocksStreams::forwardHost(const QString &ASettingsNS) const
-{
-  if (FSettings && !ASettingsNS.isEmpty())
-    return FSettings->valueNS(SVN_FORWARD_HOST,ASettingsNS,FForwardHost).toString();
-  return FForwardHost;
-}
-
-quint16 SocksStreams::forwardPort(const QString &ASettingsNS) const
-{
-  if (FSettings && !ASettingsNS.isEmpty())
-    return FSettings->valueNS(SVN_FORWARD_PORT,ASettingsNS,FForwardPort).toInt();
-  return FForwardPort;
-}
-
-void SocksStreams::setForwardAddress(const QString &ASettingsNS, const QString &AHost, quint16 APort)
-{
-  if (ASettingsNS.isEmpty())
-  {
-    FForwardHost = AHost;
-    FForwardPort = APort;
-  }
-  else if (FSettings && FForwardHost==AHost && FForwardPort==APort)
-  {
-    FSettings->deleteValueNS(SVN_FORWARD_HOST, ASettingsNS);
-    FSettings->deleteValueNS(SVN_FORWARD_PORT, ASettingsNS);
-  }
-  else if (FSettings)
-  {
-    FSettings->setValueNS(SVN_FORWARD_HOST, ASettingsNS, AHost);
-    FSettings->setValueNS(SVN_FORWARD_PORT, ASettingsNS, APort);
+    stream->setDisableDirectConnection(ANode.value("disable-direct-connections").toBool());
+    stream->setForwardAddress(ANode.value("forward-host").toString(), ANode.value("forward-port").toInt());
+    if (ANode.value("use-account-network-proxy").toBool())
+      stream->setNetworkProxy(accountNetworkProxy(stream->streamJid()));
+    else if (FConnectionManager)
+      stream->setNetworkProxy(FConnectionManager->proxyById(ANode.value("network-proxy").toString()).proxy);
   }
 }
 
@@ -334,68 +199,14 @@ QNetworkProxy SocksStreams::accountNetworkProxy(const Jid &AStreamJid) const
   return connection!=NULL ? connection->proxy() : QNetworkProxy(QNetworkProxy::NoProxy);
 }
 
-QNetworkProxy SocksStreams::networkProxy(const QString &ASettingsNS) const
+quint16 SocksStreams::listeningPort() const
 {
-  if (FSettings && !ASettingsNS.isEmpty())
-  {
-    QNetworkProxy proxy;
-    proxy.setType((QNetworkProxy::ProxyType)FSettings->valueNS(SVN_NETPROXY_TYPE, ASettingsNS, FNetworkProxy.type()).toInt());
-    proxy.setHostName(FSettings->valueNS(SVN_NETPROXY_HOST, ASettingsNS, FNetworkProxy.hostName()).toString());
-    proxy.setPort(FSettings->valueNS(SVN_NETPROXY_PORT, ASettingsNS, FNetworkProxy.port()).toInt());
-    proxy.setUser(FSettings->valueNS(SVN_NETPROXY_USER, ASettingsNS, FNetworkProxy.user()).toString());
-    QString defPass = FSettings->encript(FNetworkProxy.password(), ASettingsNS.toUtf8());
-    proxy.setPassword(FSettings->decript(FSettings->valueNS(SVN_NETPROXY_PASSWORD, ASettingsNS, defPass).toByteArray(), ASettingsNS.toUtf8()));
-    return proxy;
-  }
-  return FNetworkProxy;
+  return FServer.isListening() ? FServer.serverPort() : Options::node(OPV_DATASTREAMS_SOCKSLISTENPORT).value().toInt();
 }
 
-void SocksStreams::setNetworkProxy(const QString &ASettingsNS, const QNetworkProxy &AProxy)
+QString SocksStreams::accountStreamProxy(const Jid &AStreamJid) const
 {
-  if (ASettingsNS.isEmpty())
-  {
-    FNetworkProxy = AProxy;
-  }
-  else if (FSettings && FNetworkProxy == AProxy)
-  {
-    FSettings->deleteValueNS(SVN_NETPROXY_TYPE, ASettingsNS);
-    FSettings->deleteValueNS(SVN_NETPROXY_HOST, ASettingsNS);
-    FSettings->deleteValueNS(SVN_NETPROXY_PORT, ASettingsNS);
-    FSettings->deleteValueNS(SVN_NETPROXY_USER, ASettingsNS);
-    FSettings->deleteValueNS(SVN_NETPROXY_PASSWORD, ASettingsNS);
-  }
-  else if (FSettings)
-  {
-    FSettings->setValueNS(SVN_NETPROXY_TYPE, ASettingsNS, AProxy.type());
-    FSettings->setValueNS(SVN_NETPROXY_HOST, ASettingsNS, AProxy.hostName());
-    FSettings->setValueNS(SVN_NETPROXY_PORT, ASettingsNS, AProxy.port());
-    FSettings->setValueNS(SVN_NETPROXY_USER, ASettingsNS, AProxy.user());
-    FSettings->setValueNS(SVN_NETPROXY_PASSWORD, ASettingsNS, FSettings->encript(AProxy.password(), ASettingsNS.toUtf8()));
-  }
-}
-
-QString SocksStreams::nativeServerProxy(const Jid &AStreamJid) const
-{
-  return FNativeProxy.value(AStreamJid);
-}
-
-QList<QString> SocksStreams::proxyList(const QString &ASettingsNS) const
-{
-  if (FSettings && !ASettingsNS.isEmpty())
-    return FSettings->valueNS(SVN_PROXY_LIST, ASettingsNS, QStringList(FProxyList).join("||")).toString().split("||",QString::SkipEmptyParts);
-  return FProxyList;
-}
-
-void SocksStreams::setProxyList(const QString &ASettingsNS, const QList<QString> &AProxyList)
-{
-  QList<QString> nsProxyList = proxyList(ASettingsNS);
-  if (nsProxyList != AProxyList)
-  {
-    if (ASettingsNS.isEmpty())
-      FProxyList = AProxyList;
-    else
-      FSettings->setValueNS(SVN_PROXY_LIST, ASettingsNS, QStringList(AProxyList).join("||"));
-  }
+  return FStreamProxy.value(AStreamJid);
 }
 
 QString SocksStreams::connectionKey(const QString &ASessionId, const Jid &AInitiator, const Jid &ATarget) const
@@ -409,7 +220,7 @@ bool SocksStreams::appendLocalConnection(const QString &AKey)
 {
   if (!AKey.isEmpty() && !FLocalKeys.contains(AKey))
   {
-    if (FServer.isListening() || FServer.listen(QHostAddress::Any, serverPort()))
+    if (FServer.isListening() || FServer.listen(QHostAddress::Any, listeningPort()))
     {
       FLocalKeys.append(AKey);
       return true;
@@ -426,46 +237,6 @@ void SocksStreams::removeLocalConnection(const QString &AKey)
     FServer.close();
 }
 
-void SocksStreams::onSettingsOpened()
-{
-  FSettings = FSettingsPlugin->settingsForPlugin(SOCKSSTREAMS_UUID);
-
-  FServerPort = FSettings->valueNS(SVN_SERVER_PORT, QString::null, DEFAULT_SERVER_PORT).toInt();
-  FDisableDirectConnect = FSettings->valueNS(SVN_DISABLE_DIRECT_CONNECT, QString::null, DEFAULT_DIABLE_DIRECT_CONNECT).toBool();
-  FUseNativeServerProxy = FSettings->valueNS(SVN_USE_NATIVE_SERVER_PROXY, QString::null, DEFAULT_USE_NATIVE_SERVER_PROXY).toBool();
-  FUseAccountNetworkProxy = FSettings->valueNS(SVN_USE_ACCOUNT_NETPROXY, QString::null, DEFAULT_USE_ACCOUNT_NETPROXY).toBool();
-  FForwardHost = FSettings->valueNS(SVN_FORWARD_HOST, QString::null).toString();
-  FForwardPort = FSettings->valueNS(SVN_FORWARD_PORT, QString::null).toInt();
-
-  FNetworkProxy.setType((QNetworkProxy::ProxyType)FSettings->valueNS(SVN_NETPROXY_TYPE, QString::null, QNetworkProxy::NoProxy).toInt());
-  FNetworkProxy.setHostName(FSettings->valueNS(SVN_NETPROXY_HOST, QString::null, FNetworkProxy.hostName()).toString());
-  FNetworkProxy.setPort(FSettings->valueNS(SVN_NETPROXY_PORT, QString::null, FNetworkProxy.port()).toInt());
-  FNetworkProxy.setUser(FSettings->valueNS(SVN_NETPROXY_USER, QString::null, FNetworkProxy.user()).toString());
-  FNetworkProxy.setPassword(FSettings->decript(FSettings->valueNS(SVN_NETPROXY_PASSWORD, QString::null).toByteArray(), QString(SVN_NETPROXY_PASSWORD).toUtf8()));
-  
-  FProxyList = FSettings->valueNS(SVN_PROXY_LIST, QString::null).toString().split("||", QString::SkipEmptyParts);
-}
-
-void SocksStreams::onSettingsClosed()
-{
-  FSettings->setValueNS(SVN_SERVER_PORT, QString::null, FServerPort);
-  FSettings->setValueNS(SVN_DISABLE_DIRECT_CONNECT, QString::null, FDisableDirectConnect);
-  FSettings->setValueNS(SVN_USE_NATIVE_SERVER_PROXY, QString::null, FUseNativeServerProxy);
-  FSettings->setValueNS(SVN_USE_ACCOUNT_NETPROXY, QString::null, FUseAccountNetworkProxy);
-  FSettings->setValueNS(SVN_FORWARD_HOST, QString::null, FForwardHost);
-  FSettings->setValueNS(SVN_FORWARD_PORT, QString::null, FForwardPort);
-
-  FSettings->setValueNS(SVN_NETPROXY_TYPE, QString::null, FNetworkProxy.type());
-  FSettings->setValueNS(SVN_NETPROXY_HOST, QString::null, FNetworkProxy.hostName());
-  FSettings->setValueNS(SVN_NETPROXY_PORT, QString::null, FNetworkProxy.port());
-  FSettings->setValueNS(SVN_NETPROXY_USER, QString::null, FNetworkProxy.user());
-  FSettings->setValueNS(SVN_NETPROXY_PASSWORD, QString::null, FSettings->encript(FNetworkProxy.password(), QString(SVN_NETPROXY_PASSWORD).toUtf8()));
-
-  FSettings->setValueNS(SVN_PROXY_LIST, QString::null, QStringList(FProxyList).join("||"));
-
-  FSettings = NULL;
-}
-
 void SocksStreams::onXmppStreamOpened(IXmppStream *AStream)
 {
   if (FDiscovery)
@@ -474,20 +245,20 @@ void SocksStreams::onXmppStreamOpened(IXmppStream *AStream)
 
 void SocksStreams::onXmppStreamClosed(IXmppStream *AStream)
 {
-  FNativeProxy.remove(AStream->streamJid());
+  FStreamProxy.remove(AStream->streamJid());
 }
 
 void SocksStreams::onDiscoItemsReceived(const IDiscoItems &AItems)
 {
   if (AItems.contactJid == AItems.streamJid.domain())
   {
-    FNativeProxy.remove(AItems.streamJid);
+    FStreamProxy.remove(AItems.streamJid);
     Jid proxyJid = "proxy." + AItems.streamJid.domain();
     foreach(IDiscoItem item, AItems.items)
     {
       if (item.itemJid == proxyJid)
       {
-        FNativeProxy.insert(AItems.streamJid, item.itemJid.full());
+        FStreamProxy.insert(AItems.streamJid, item.itemJid.full());
         break;
       }
     }

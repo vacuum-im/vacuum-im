@@ -2,12 +2,13 @@
 #define INBANDSTREAMS_H
 
 #include <definations/namespaces.h>
+#include <definations/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iinbandstreams.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/isettings.h>
+#include <utils/options.h>
 #include "inbandstream.h"
 #include "inbandoptions.h"
 
@@ -27,7 +28,7 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IDataStreamMethod
   virtual QString methodNS() const;
@@ -35,35 +36,17 @@ public:
   virtual QString methodDescription() const;
   virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, 
     const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent=NULL);
-  virtual QWidget *settingsWidget(IDataStreamSocket *ASocket, bool AReadOnly);
-  virtual QWidget *settingsWidget(const QString &ASettingsNS, bool AReadOnly);
-  virtual void loadSettings(IDataStreamSocket *ASocket, QWidget *AWidget) const;
-  virtual void loadSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS) const;
-  virtual void saveSettings(const QString &ASettingsNS, QWidget *AWidget);
-  virtual void saveSettings(const QString &ASettingsNS, IDataStreamSocket *ASocket);
-  virtual void deleteSettings(const QString &ASettingsNS);
-  //InBandStreams
-  virtual int blockSize(const QString &ASettingsNS) const;
-  virtual void setBlockSize(const QString &ASettingsNS, int ASize);
-  virtual int maximumBlockSize(const QString &ASettingsNS) const;
-  virtual void setMaximumBlockSize(const QString &ASettingsNS, int AMaxSize);
-  virtual int dataStanzaType(const QString &ASettingsNS) const;
-  virtual void setDataStanzaType(const QString &ASettingsNS, int AType);
+  virtual IOptionsWidget *methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent);
+  virtual IOptionsWidget *methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent);
+  virtual void saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null);
+  virtual void loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget);
+  virtual void loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode);
 signals:
   void socketCreated(IDataStreamSocket *ASocket);
-protected slots:
-  void onSettingsOpened();
-  void onSettingsClosed();
 private:
   IDataStreamsManager *FDataManager;
   IStanzaProcessor *FStanzaProcessor;
-  ISettings *FSettings;
-  ISettingsPlugin *FSettingsPlugin;
   IServiceDiscovery *FDiscovery;
-private:
-  int FBlockSize;
-  int FMaxBlockSize;
-  int FStatnzaType;
 };
 
 #endif // INBANDSTREAMS_H

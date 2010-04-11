@@ -285,7 +285,7 @@ bool FileStream::startStream(const QString &AMethodNS)
       FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Initiator,this) : NULL;
       if (FSocket)
       {
-        stremMethod->loadSettings(FSocket,FMethodSettings);
+        stremMethod->loadMethodSettings(FSocket,FMethodSettings);
         setStreamState(Connecting,tr("Connecting"));
         connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
         if (FSocket->open(QIODevice::WriteOnly))
@@ -309,7 +309,7 @@ bool FileStream::startStream(const QString &AMethodNS)
         FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Target,this) : NULL;
         if (FSocket)
         {
-          stremMethod->loadSettings(FSocket,FMethodSettings);
+          stremMethod->loadMethodSettings(FSocket,FMethodSettings);
           setStreamState(Connecting,tr("Connecting"));
           connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
           if (FSocket->open(QIODevice::ReadOnly))

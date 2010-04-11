@@ -3,20 +3,29 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QObjectCleanupHandler>
+#include <definations/optionvalues.h>
 #include <interfaces/idatastreamsmanager.h>
+#include <interfaces/ioptionsmanager.h>
 #include "ui_datastreamsoptions.h"
 
 class DataStreamsOptions : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
-  DataStreamsOptions(IDataStreamsManager *ADataManager, QWidget *AParent = NULL);
+  DataStreamsOptions(IDataStreamsManager *ADataManager, QWidget *AParent);
   ~DataStreamsOptions();
+  virtual QWidget* instance() { return this; }
 public slots:
-  void apply();
+  virtual void apply();
+  virtual void reset();
 signals:
-  void optionsAccepted();
+  void modified();
+  void childApply();
+  void childReset();
 protected slots:
   void onAddProfileButtonClicked(bool);
   void onDeleteProfileButtonClicked(bool);
@@ -27,9 +36,11 @@ private:
 private:
   IDataStreamsManager *FDataManager;
 private:
-  QString FSettingsNS;
+  QUuid FCurProfileId;
+  QList<QUuid> FNewProfiles;
   QVBoxLayout *FWidgetLayout;
-  QMap<QString, QMap<QString, QWidget *> > FWidgets;
+  QObjectCleanupHandler FCleanupHandler;
+  QMap<QUuid, QMap<QString, IOptionsWidget *> > FMethodWidgets;
 };
 
 #endif // DATASTREAMSOPTIONS_H

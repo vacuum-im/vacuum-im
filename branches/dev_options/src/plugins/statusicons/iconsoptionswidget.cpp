@@ -11,8 +11,10 @@ IconsetSelectableDelegate::IconsetSelectableDelegate(const QString &AStorage, co
   FSubStorages = ASubStorages;
 }
 
-QWidget *IconsetSelectableDelegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &/*AOption*/, const QModelIndex &/*AIndex*/) const
+QWidget *IconsetSelectableDelegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
+  Q_UNUSED(AOption);
+  Q_UNUSED(AIndex);
   if (!FSubStorages.isEmpty())
   {
     QComboBox *comboBox = new QComboBox(AParent);
@@ -49,13 +51,14 @@ void IconsetSelectableDelegate::setModelData(QWidget *AEditor, QAbstractItemMode
   }
 }
 
-void IconsetSelectableDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &/*AIndex*/) const
+void IconsetSelectableDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
+  Q_UNUSED(AIndex);
   AEditor->setGeometry(AOption.rect);
 }
 
 //IconsOptionsWidget
-IconsOptionsWidget::IconsOptionsWidget(IStatusIcons *AStatusIcons)
+IconsOptionsWidget::IconsOptionsWidget(IStatusIcons *AStatusIcons, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
   FStatusIcons = AStatusIcons;
@@ -70,34 +73,34 @@ IconsOptionsWidget::IconsOptionsWidget(IStatusIcons *AStatusIcons)
     item->setData(IDR_STORAGE_SUBDIR,FSubStorages.at(i));
     item->setData(IDR_ICON_ROWS,1);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-    item->setCheckState(FSubStorages.at(i)==FStatusIcons->defaultSubStorage() ? Qt::Checked : Qt::Unchecked);
     ui.lwtDefaultIconset->addItem(item);
   }
-  ui.lwtDefaultIconset->setCurrentRow(FSubStorages.indexOf(FStatusIcons->defaultSubStorage()));
-  connect(ui.lwtDefaultIconset,SIGNAL(itemChanged(QListWidgetItem *)),SLOT(onDefaultListItemChanged(QListWidgetItem *)));
-
-  populateRulesTable(ui.twtUserRules,IStatusIcons::UserRule);
-  populateRulesTable(ui.twtDefaultRules,IStatusIcons::DefaultRule);
 
   connect(ui.pbtAddUserRule,SIGNAL(clicked()),SLOT(onAddUserRule()));
   connect(ui.pbtDeleteUserRule,SIGNAL(clicked()),SLOT(onDeleteUserRule()));
+  connect(ui.lwtDefaultIconset,SIGNAL(itemChanged(QListWidgetItem *)),SLOT(onDefaultListItemChanged(QListWidgetItem *)));
+
+  connect(ui.twtDefaultRules,SIGNAL(itemChanged(QTableWidgetItem *)),SIGNAL(modified()));
+  connect(ui.twtUserRules,SIGNAL(itemChanged(QTableWidgetItem *)),SIGNAL(modified()));
+
+  reset();
 }
 
 void IconsOptionsWidget::apply()
 {
-  for (int i=0; i<ui.lwtDefaultIconset->count();i++)
-    if (ui.lwtDefaultIconset->item(i)->checkState() == Qt::Checked)
+  for (int row=0; row<ui.lwtDefaultIconset->count(); row++)
+    if (ui.lwtDefaultIconset->item(row)->checkState() == Qt::Checked)
     {
-      FStatusIcons->setDefaultSubStorage(ui.lwtDefaultIconset->item(i)->data(IDR_STORAGE_SUBDIR).toString());
+      Options::node(OPV_STATUSICONS_DEFAULT).setValue(ui.lwtDefaultIconset->item(row)->data(IDR_STORAGE_SUBDIR));
       break;
     }
   
   QSet<QString> rules = FStatusIcons->rules(IStatusIcons::UserRule).toSet();
-  for (int i =0; i< ui.twtUserRules->rowCount(); ++i)
+  for (int row =0; row<ui.twtUserRules->rowCount(); row++)
   {
-    QString rule = ui.twtUserRules->item(i,0)->data(Qt::DisplayRole).toString();
-    QString substorage = ui.twtUserRules->item(i,1)->data(IDR_STORAGE_SUBDIR).toString();
-    if (!rules.contains(rule) || FStatusIcons->ruleSubStorage(rule,IStatusIcons::UserRule)!=substorage)
+    QString rule = ui.twtUserRules->item(row,0)->data(Qt::DisplayRole).toString();
+    QString substorage = ui.twtUserRules->item(row,1)->data(IDR_STORAGE_SUBDIR).toString();
+    if (!rules.contains(rule) || FStatusIcons->ruleIconset(rule,IStatusIcons::UserRule)!=substorage)
       FStatusIcons->insertRule(rule,substorage,IStatusIcons::UserRule);
     rules -= rule;
   }
@@ -105,7 +108,27 @@ void IconsOptionsWidget::apply()
   foreach(QString rule,rules)
     FStatusIcons->removeRule(rule,IStatusIcons::UserRule);
 
-  emit optionsAccepted();
+  emit childApply();
+}
+
+void IconsOptionsWidget::reset()
+{
+  QString defIconset = Options::node(OPV_STATUSICONS_DEFAULT).value().toString();
+  for (int row = 0; row<ui.lwtDefaultIconset->count(); row++)
+  {
+    QListWidgetItem *item = ui.lwtDefaultIconset->item(row);
+    item->setCheckState(item->data(IDR_STORAGE_SUBDIR).toString()==defIconset ? Qt::Checked : Qt::Unchecked);
+  }
+
+  ui.twtDefaultRules->clearContents();
+  ui.twtDefaultRules->setRowCount(0);
+  populateRulesTable(ui.twtDefaultRules,IStatusIcons::DefaultRule);
+
+  ui.twtUserRules->clearContents();
+  ui.twtUserRules->setRowCount(0);
+  populateRulesTable(ui.twtUserRules,IStatusIcons::UserRule);
+
+  emit childReset();
 }
 
 void IconsOptionsWidget::populateRulesTable(QTableWidget *ATable, IStatusIcons::RuleType ARuleType)
@@ -115,7 +138,7 @@ void IconsOptionsWidget::populateRulesTable(QTableWidget *ATable, IStatusIcons::
   ATable->setItemDelegateForColumn(1,new IconsetSelectableDelegate(RSR_STORAGE_STATUSICONS,FSubStorages,ATable));
   foreach(QString rule, rules)
   {
-    QString substorage = FStatusIcons->ruleSubStorage(rule,ARuleType);
+    QString substorage = FStatusIcons->ruleIconset(rule,ARuleType);
     QTableWidgetItem *rulePattern = new QTableWidgetItem(rule);
     QTableWidgetItem *ruleStorage = new QTableWidgetItem();
     ruleStorage->setData(IDR_STORAGE_NAME,RSR_STORAGE_STATUSICONS);
@@ -144,11 +167,13 @@ void IconsOptionsWidget::onAddUserRule()
   ui.twtUserRules->setItem(row,0,rulePattern);
   ui.twtUserRules->setItem(row,1,ruleStorage);
   ui.twtUserRules->verticalHeader()->setResizeMode(row,QHeaderView::ResizeToContents);
+  emit modified();
 }
 
 void IconsOptionsWidget::onDeleteUserRule()
 {
   ui.twtUserRules->removeRow(ui.twtUserRules->currentRow());
+  emit modified();
 }
 
 void IconsOptionsWidget::onDefaultListItemChanged(QListWidgetItem *AItem)
@@ -158,5 +183,6 @@ void IconsOptionsWidget::onDefaultListItemChanged(QListWidgetItem *AItem)
     for (int i=0; i<ui.lwtDefaultIconset->count();i++)
       if (ui.lwtDefaultIconset->item(i)!=AItem)
         ui.lwtDefaultIconset->item(i)->setCheckState(Qt::Unchecked);
+    emit modified();
   }
 }

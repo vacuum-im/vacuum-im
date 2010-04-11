@@ -54,9 +54,12 @@ public:
   virtual QString timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const;
 signals:
   void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const;
+protected:
+  void appendPendingChanges(int AMessageType, const QString &AContext);
 protected slots:
   void onVCardChanged(const Jid &AContactJid);
   void onOptionsChanged(const OptionsNode &ANode);
+  void onApplyPendingChanges();
 private:
   IAvatars *FAvatars;
   IStatusIcons *FStatusIcons;

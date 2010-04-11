@@ -25,6 +25,25 @@
 #define OPV_ACCOUNT_STATUS_ISMAIN                       "accounts.account.status.is-main"
 #define OPV_ACCOUNT_STATUS_LASTONLINE                   "accounts.account.status.last-online"
 
+// DataStreamsManager
+#define OPV_DATASTREAMS_ROOT                            "datastreams"
+#define OPV_DATASTREAMS_SPROFILE_ITEM                   "datastreams.settings-profile"
+#define OPV_DATASTREAMS_SPROFILE_NAME                   "datastreams.settings-profile.name"
+#define OPV_DATASTREAMS_METHOD_ITEM                     "datastreams.settings-profile.method"
+// InBandStream
+#define OPV_DATASTREAMS_METHOD_BLOCKSIZE                "datastreams.settings-profile.method.block-size"
+#define OPV_DATASTREAMS_METHOD_MAXBLOCKSIZE             "datastreams.settings-profile.method.max-block-size"
+#define OPV_DATASTREAMS_METHOD_STANZATYPE               "datastreams.settings-profile.method.stanza-type"
+// SocksStreams
+#define OPV_DATASTREAMS_SOCKSLISTENPORT                 "datastreams.socks-listen-port"
+#define OPV_DATASTREAMS_METHOD_DISABLEDIRECT            "datastreams.settings-profile.method.disable-direct-connections"
+#define OPV_DATASTREAMS_METHOD_FORWARDHOST              "datastreams.settings-profile.method.forward-host"
+#define OPV_DATASTREAMS_METHOD_FORWARDPORT              "datastreams.settings-profile.method.forward-port"
+#define OPV_DATASTREAMS_METHOD_USEACCOUNTSTREAMPROXY    "datastreams.settings-profile.method.use-account-stream-proxy"
+#define OPV_DATASTREAMS_METHOD_STREAMPROXYLIST          "datastreams.settings-profile.method.stream-proxy-list"
+#define OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY       "datastreams.settings-profile.method.use-account-network-proxy"
+#define OPV_DATASTREAMS_METHOD_NETWORKPROXY             "datastreams.settings-profile.method.network-proxy"
+
 // MainWindow
 #define OPV_MAINWINDOW_SHOW                             "mainwindow.show"
 #define OPV_MAINWINDOW_SIZE                             "mainwindow.size"
@@ -46,7 +65,7 @@
 #define OPV_MESSAGESTYLE_STYLE_BGIMAGELAYOUT            "message-styles.message-type.context.style.bg-image-layout"
 
 // OptionsManager
-#define OPV_MISC                                        "misc"
+#define OPV_MISC_ROOT                                   "misc"
 #define OPV_MISC_AUTOSTART                              "misc.autostart"
 
 // ConnectionManager
@@ -69,5 +88,13 @@
 #define OPV_STATUS_SHOW                                 "statuses.status.show"
 #define OPV_STATUS_TEXT                                 "statuses.status.text"
 #define OPV_STATUS_PRIORITY                             "statuses.status.priority"
+
+// StatusIcons
+#define OPV_STATUSICONS                                 "statusicons"
+#define OPV_STATUSICONS_DEFAULT                         "statusicons.default-iconset"
+#define OPV_STATUSICONS_RULES_ROOT                      "statusicons.rules"
+#define OPV_STATUSICONS_RULE_ITEM                       "statusicons.rules.rule"
+#define OPV_STATUSICONS_RULE_PATTERN                    "statusicons.rules.rule.pattern"
+#define OPV_STATUSICONS_RULE_ICONSET                    "statusicons.rules.rule.iconset"
 
 #endif // DEF_OPTIONVALUES_H

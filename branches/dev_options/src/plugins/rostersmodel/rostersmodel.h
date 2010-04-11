@@ -1,7 +1,6 @@
 #ifndef ROSTERSMODEL_H
 #define ROSTERSMODEL_H
 
-#include <definations/accountvaluenames.h>
 #include <definations/rosterindextyperole.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersmodel.h>

@@ -106,7 +106,7 @@ bool OptionsManager::initObjects()
 
 bool OptionsManager::initSettings()
 {
-  Options::registerOption(OPV_MISC, QVariant(), tr("Misc"));
+  Options::registerOption(OPV_MISC_ROOT, QVariant(), tr("Misc"));
   Options::registerOption(OPV_MISC_AUTOSTART, false, tr("Auto run on system startup"));
 
   if (profiles().count() == 0)

@@ -1,5 +1,6 @@
 #include "messagestyles.h"
 
+#include <QTimer>
 #include <QCoreApplication>
 
 MessageStyles::MessageStyles()
@@ -186,7 +187,7 @@ QString MessageStyles::userIcon(const Jid &AStreamJid, const Jid &AContactJid) c
       iconKey = FStatusIcons->iconKeyByJid(AStreamJid,AContactJid);
     else
       iconKey = FStatusIcons->iconKeyByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false);
-    QString substorage = FStatusIcons->subStorageByJid(AContactJid.isValid() ? AContactJid : AStreamJid);
+    QString substorage = FStatusIcons->iconsetByJid(AContactJid.isValid() ? AContactJid : AStreamJid);
     return FStatusIcons->iconFileName(substorage,iconKey);
   }
   return QString::null;
@@ -197,7 +198,7 @@ QString MessageStyles::userIcon(const Jid &AContactJid, int AShow, const QString
   if (FStatusIcons)
   {
     QString iconKey = FStatusIcons->iconKeyByStatus(AShow,ASubscription,AAsk);
-    QString substorage = FStatusIcons->subStorageByJid(AContactJid);
+    QString substorage = FStatusIcons->iconsetByJid(AContactJid);
     return FStatusIcons->iconFileName(substorage,iconKey);
   }
   return QString::null;
@@ -211,6 +212,16 @@ QString MessageStyles::timeFormat(const QDateTime &AMessageTime, const QDateTime
   else if (daysDelta > 0)
     return tr("d MMM hh:mm");
   return tr("hh:mm:ss");
+}
+
+void MessageStyles::appendPendingChanges(int AMessageType, const QString &AContext)
+{
+  if (FPendingChages.isEmpty())
+    QTimer::singleShot(0,this,SLOT(onApplyPendingChanges()));
+
+  QPair<int,QString> item = qMakePair<int,QString>(AMessageType,AContext);
+  if (!FPendingChages.contains(item))
+    FPendingChages.append(item);
 }
 
 void MessageStyles::onVCardChanged(const Jid &AContactJid)
@@ -228,11 +239,31 @@ void MessageStyles::onVCardChanged(const Jid &AContactJid)
 
 void MessageStyles::onOptionsChanged(const OptionsNode &ANode)
 {
-  if (Options::cleanNSpaces(ANode.path()).startsWith(OPV_MESSAGESTYLE_STYLE_ITEM"."))
+  QString cleanPath = Options::cleanNSpaces(ANode.path());
+  if (cleanPath.startsWith(OPV_MESSAGESTYLE_STYLE_ITEM"."))
   {
     QList<QString> nspaces = ANode.parentNSpaces();
-
+    QString type = nspaces.value(1);
+    QString context = nspaces.value(2);
+    QString plugin = nspaces.value(3);
+    if (!plugin.isEmpty() && Options::node(OPV_MESSAGESTYLE_MTYPE_ITEM,type).node("context",context).value("style-type").toString() == plugin)
+      appendPendingChanges(type.toInt(),context);
   }
+  else if (cleanPath == OPV_MESSAGESTYLE_STYLE_TYPE)
+  {
+    QList<QString> nspaces = ANode.parentNSpaces();
+    appendPendingChanges(nspaces.value(1).toInt(),nspaces.value(2));
+  }
+}
+
+void MessageStyles::onApplyPendingChanges()
+{
+  for(int i=0; i<FPendingChages.count(); i++)
+  {
+    const QPair<int,QString> &item = FPendingChages.at(i);
+    emit styleOptionsChanged(styleOptions(item.first,item.second),item.first,item.second);
+  }
+  FPendingChages.clear();
 }
 
 Q_EXPORT_PLUGIN2(plg_messagestyles, MessageStyles)

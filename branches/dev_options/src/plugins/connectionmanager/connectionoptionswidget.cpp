@@ -28,7 +28,7 @@ void ConnectionOptionsWidget::apply()
   {
     FOptions.node("connection-type").setValue(FPluginId);
     if (FPluginSettings)
-      plugin->saveConnectionSettings(FPluginSettings->instance());
+      plugin->saveConnectionSettings(FPluginSettings);
   }
   emit childApply();
 }
@@ -50,6 +50,7 @@ void ConnectionOptionsWidget::setPluginById(const QString &APluginId)
     if (FPluginSettings)
     {
       ui.grbOptions->layout()->removeWidget(FPluginSettings->instance());
+      FPluginSettings->instance()->setParent(NULL);
       delete FPluginSettings->instance();
       FPluginSettings = NULL;
       FPluginId = QUuid();

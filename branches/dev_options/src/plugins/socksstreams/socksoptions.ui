@@ -28,7 +28,7 @@
            <item>
             <widget class="QLabel" name="pblPort">
              <property name="text">
-              <string>Listened port:</string>
+              <string>Listening port:</string>
              </property>
              <property name="buddy">
               <cstring>spbPort</cstring>
@@ -109,9 +109,9 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
-          <widget class="QCheckBox" name="chbUseNativeServerProxy">
+          <widget class="QCheckBox" name="chbUseAccountStreamProxy">
            <property name="text">
-            <string>Use proxy on native server</string>
+            <string>Use proxy on account server</string>
            </property>
           </widget>
          </item>
@@ -178,7 +178,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <item>
-          <widget class="QCheckBox" name="chbUseAccountProxy">
+          <widget class="QCheckBox" name="chbUseAccountNetworkProxy">
            <property name="text">
             <string>Use account connection proxy settings</string>
            </property>
@@ -201,14 +201,14 @@
   <tabstop>chbDisableDirectConnect</tabstop>
   <tabstop>lneForwardHost</tabstop>
   <tabstop>spbForwardPort</tabstop>
-  <tabstop>chbUseNativeServerProxy</tabstop>
+  <tabstop>chbUseAccountStreamProxy</tabstop>
   <tabstop>lneStreamProxy</tabstop>
   <tabstop>ltwStreamProxy</tabstop>
   <tabstop>pbtAddStreamProxy</tabstop>
   <tabstop>pbtStreamProxyUp</tabstop>
   <tabstop>pbtStreamProxyDown</tabstop>
   <tabstop>pbtDeleteStreamProxy</tabstop>
-  <tabstop>chbUseAccountProxy</tabstop>
+  <tabstop>chbUseAccountNetworkProxy</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -245,7 +245,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>chbUseAccountProxy</sender>
+   <sender>chbUseAccountNetworkProxy</sender>
    <signal>toggled(bool)</signal>
    <receiver>wdtProxySettings</receiver>
    <slot>setDisabled(bool)</slot>

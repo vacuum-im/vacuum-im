@@ -7,15 +7,13 @@
 
 #define SHC_INIT_STREAM               "/iq[@type='set']/si[@xmlns='" NS_STREAM_INITIATION "']"
 
-#define SVN_METHOD_SETTINGS_NAME      "settings[]:name"
-
 DataStreamsManger::DataStreamsManger()
 {
   FDataForms = NULL;
   FDiscovery = NULL;
   FXmppStreams = NULL;
   FStanzaProcessor = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
 }
 
 DataStreamsManger::~DataStreamsManger()
@@ -64,15 +62,10 @@ bool DataStreamsManger::initConnections(IPluginManager *APluginManager, int &/*A
     FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
   }
 
   return FStanzaProcessor!=NULL && FDataForms!=NULL;
@@ -101,12 +94,6 @@ bool DataStreamsManger::initObjects()
     FDiscovery->insertDiscoFeature(dfeature);
   }
 
-  if (FSettingsPlugin)
-  {
-    FSettingsPlugin->insertOptionsHolder(this);
-    FSettingsPlugin->openOptionsNode(OPN_DATASTREAMS,tr("Data Streams"),tr("Common data streams settings"),MNI_DATASTREAMSMANAGER,ONO_DATASTREAMS);
-  }
-
   ErrorHandler::addErrorItem(ERC_NO_VALID_STREAMS,ErrorHandler::CANCEL,ErrorHandler::BAD_REQUEST,
     tr("None of the available streams are acceptable"),NS_STREAM_INITIATION);
   ErrorHandler::addErrorItem(ERC_BAD_PROFILE,ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
@@ -115,16 +102,27 @@ bool DataStreamsManger::initObjects()
   return true;
 }
 
-QWidget *DataStreamsManger::optionsWidget(const QString &ANode, int &AOrder)
+bool DataStreamsManger::initSettings()
 {
-  if (ANode == OPN_DATASTREAMS)
+  Options::registerOption(OPV_DATASTREAMS_ROOT,QVariant(),tr("Data Streams"));
+  Options::registerOption(OPV_DATASTREAMS_SPROFILE_ITEM,QVariant(),tr("Settings Profile"));
+  Options::registerOption(OPV_DATASTREAMS_SPROFILE_NAME,tr("<Default Profile>"),tr("Name"));
+
+  if (FOptionsManager)
+  {
+    IOptionsDialogNode dataNode = { ONO_DATASTREAMS, OPN_DATASTREAMS, tr("Data Streams"),tr("Common data streams settings"), MNI_DATASTREAMSMANAGER };
+    FOptionsManager->insertOptionsDialogNode(dataNode);
+    FOptionsManager->insertOptionsHolder(this);
+  }
+  return true;
+}
+
+IOptionsWidget *DataStreamsManger::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+{
+  if (ANodeId == OPN_DATASTREAMS)
   {
     AOrder = OWO_DATASTREAMS;
-    DataStreamsOptions *widget = new DataStreamsOptions(this);
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
+    return new DataStreamsOptions(this,AParent);
   }
   return NULL;
 }
@@ -279,36 +277,6 @@ void DataStreamsManger::removeMethod(IDataStreamMethod *AMethod)
   }
 }
 
-QList<QString> DataStreamsManger::methodSettings() const
-{
-  return FMethodSettings.keys();
-}
-
-QString DataStreamsManger::methodSettingsName(const QString &ASettingsNS) const
-{
-  return !ASettingsNS.isEmpty() ? FMethodSettings.value(ASettingsNS) : tr("<Default Profile>");
-}
-
-void DataStreamsManger::insertMethodSettings(const QString &ASettingsNS, const QString &ASettingsName)
-{
-  if (!ASettingsNS.isEmpty() && !ASettingsName.isEmpty())
-  {
-    FMethodSettings.insert(ASettingsNS, ASettingsName);
-    emit methodSettingsInserted(ASettingsNS, ASettingsName);
-  }
-}
-
-void DataStreamsManger::removeMethodSettings(const QString &ASettingsNS)
-{
-  if (FMethodSettings.contains(ASettingsNS))
-  {
-    foreach(IDataStreamMethod *smethod, FMethods)
-      smethod->deleteSettings(ASettingsNS);
-    FMethodSettings.remove(ASettingsNS);
-    emit methodSettingsRemoved(ASettingsNS);
-  }
-}
-
 QList<QString> DataStreamsManger::profiles() const
 {
   return FProfiles.keys();
@@ -334,6 +302,44 @@ void DataStreamsManger::removeProfile(IDataStreamProfile *AProfile)
   {
     FProfiles.remove(FProfiles.key(AProfile));
     emit profileRemoved(AProfile);
+  }
+}
+
+QList<QUuid> DataStreamsManger::settingsProfiles() const
+{
+  QList<QUuid> sprofiles;
+  sprofiles.append(QUuid().toString());
+  foreach(QString sprofile, Options::node(OPV_DATASTREAMS_ROOT).childNSpaces("settings-profile"))
+    if (!sprofiles.contains(sprofile))
+      sprofiles.append(sprofile);
+  return sprofiles;
+}
+
+QString DataStreamsManger::settingsProfileName(const QUuid &AProfileId) const
+{
+  return Options::node(OPV_DATASTREAMS_SPROFILE_ITEM,AProfileId.toString()).value("name").toString();
+}
+
+OptionsNode DataStreamsManger::settingsProfileNode(const QUuid &AProfileId, const QString &AMethodNS) const
+{
+  return Options::node(OPV_DATASTREAMS_SPROFILE_ITEM,AProfileId.toString()).node("method",AMethodNS);
+}
+
+void DataStreamsManger::insertSettingsProfile(const QUuid &AProfileId, const QString &AName)
+{
+  if (!AProfileId.isNull() && !AName.isEmpty())
+  {
+    Options::node(OPV_DATASTREAMS_SPROFILE_ITEM,AProfileId.toString()).setValue(AName,"name");
+    emit settingsProfileInserted(AProfileId, AName);
+  }
+}
+
+void DataStreamsManger::removeSettingsProfile(const QUuid &AProfileId)
+{
+  if (!AProfileId.isNull())
+  {
+    Options::node(OPV_DATASTREAMS_ROOT).removeChilds("settings-profile",AProfileId.toString());
+    emit settingsProfileRemoved(AProfileId.toString());
   }
 }
 
@@ -466,30 +472,6 @@ void DataStreamsManger::onXmppStreamClosed(IXmppStream *AXmppStream)
     else
       it++;
   }
-}
-
-void DataStreamsManger::onSettingsOpened()
-{
-  FMethodSettings.clear();
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(DATASTREAMSMANAGER_UUID);
-  QHash<QString, QVariant> msettings = settings->values(SVN_METHOD_SETTINGS_NAME);
-  for (QHash<QString, QVariant>::const_iterator it = msettings.constBegin(); it != msettings.constEnd(); it++)
-    insertMethodSettings(it.key(), it.value().toString());
-}
-
-void DataStreamsManger::onSettingsClosed()
-{
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(DATASTREAMSMANAGER_UUID);
-  
-  QHash<QString, QVariant> msettings = settings->values(SVN_METHOD_SETTINGS_NAME);
-  for (QMap<QString, QString>::const_iterator it = FMethodSettings.constBegin(); it!=FMethodSettings.constEnd(); it++)
-  {
-    settings->setValueNS(SVN_METHOD_SETTINGS_NAME,it.key(),it.value());
-    msettings.remove(it.key());
-  }
-
-  foreach(QString oldSettingsNS, msettings.keys())
-    settings->deleteNS(oldSettingsNS);
 }
 
 Q_EXPORT_PLUGIN2(plg_datastreamsmanager, DataStreamsManger);

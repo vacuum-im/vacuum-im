@@ -182,7 +182,7 @@ QList<QString> OptionsNode::parentNSpaces() const
   QDomElement parentElem = d->node.parentNode().toElement();
   while (parentElem.parentNode().isElement())
   {
-    nspaces.append(parentElem.attribute("ns"));
+    nspaces.prepend(parentElem.attribute("ns"));
     parentElem = parentElem.parentNode().toElement();
   }
   return nspaces;

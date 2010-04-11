@@ -60,7 +60,10 @@ void StyleOptionsWidget::reset()
 {
   FActiveSettings = NULL;
   foreach(IOptionsWidget *widget, FMessageWidget.values())
+  {
+    widget->instance()->setParent(NULL);
     delete widget->instance();
+  }
   FMessageWidget.clear();
   FMessagePlugin.clear();
   onMessageTypeChanged(ui.cmbMessageType->currentIndex());

@@ -474,7 +474,6 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
       IRosterIndex *groupIndex = createGroup(!group.isEmpty() ? group : groupDisplay,groupDelim,groupType,streamIndex);
 
       QList<IRosterIndex *> groupItemList;
-      //Если есть возможность переносим контакты из старой группы в новую
       if (newGroups.contains(group) && !oldGroups.isEmpty())
       {
         IRosterIndex *oldGroupIndex;
@@ -496,7 +495,6 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
       else
         groupItemList = groupIndex->findChild(findData);
 
-      //Если в этой группе нет контактов, то создаем их
       if (groupItemList.isEmpty())
       {
         int presIndex = 0;
@@ -541,7 +539,6 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
       }
     }
 
-    //Удаляем контакты из старых групп
     foreach(IRosterIndex *index,curItemList)
       if (!itemList.contains(index))
         removeRosterIndex(index);

@@ -40,10 +40,10 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 
   if (AFileStream->streamState() == IFileStream::Creating)
   {
-    foreach(QString settingsNS, FDataManager->methodSettings())
-      ui.cmbMethodSettings->addItem(FDataManager->methodSettingsName(settingsNS), settingsNS);
+    foreach(QString settingsNS, FDataManager->settingsProfiles())
+      ui.cmbMethodSettings->addItem(FDataManager->settingsProfileName(settingsNS), settingsNS);
     ui.cmbMethodSettings->model()->sort(0, Qt::AscendingOrder);
-    ui.cmbMethodSettings->insertItem(0,FDataManager->methodSettingsName(QString::null), QVariant(QString::null));
+    ui.cmbMethodSettings->insertItem(0,FDataManager->settingsProfileName(QString::null), QVariant(QString::null));
     ui.cmbMethodSettings->setCurrentIndex(0);
     connect(ui.cmbMethodSettings, SIGNAL(currentIndexChanged(int)), SLOT(onMethodSettingsChanged(int)));
     connect(FDataManager->instance(),SIGNAL(methodSettingsInserted(const QString &, const QString &)),

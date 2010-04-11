@@ -39,7 +39,7 @@ void ConnectionOptionsWidget::apply(OptionsNode ANode)
   node.setValue(ui.chbUseSSL->isChecked(),"use-ssl");
   node.setValue(ui.chbIgnoreSSLWarnings->isChecked(),"ignore-ssl-errors");
   if (FProxySettings)
-    FManager->saveProxySettings(FProxySettings->instance(), node.node("proxy"));
+    FManager->saveProxySettings(FProxySettings, node.node("proxy"));
   emit childApply();
 }
 

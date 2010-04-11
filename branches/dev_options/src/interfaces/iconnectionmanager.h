@@ -69,7 +69,7 @@ public:
   virtual void setDefaultProxy(const QUuid &AProxyId) =0;
   virtual QDialog *showEditProxyDialog(QWidget *AParent = NULL) =0;
   virtual IOptionsWidget *proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent) =0;
-  virtual void saveProxySettings(QWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
+  virtual void saveProxySettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
   virtual QUuid loadProxySettings(const OptionsNode &ANode) const =0;
 protected:
   virtual void connectionCreated(IConnection *AConnection) =0;

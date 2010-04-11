@@ -2,27 +2,33 @@
 #define SOCKSOPTIONS_H
 
 #include <QWidget>
+#include <definations/optionvalues.h>
 #include <interfaces/isocksstreams.h>
 #include <interfaces/iconnectionmanager.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include "ui_socksoptions.h"
 
-#define PROXY_NS_PREFIX  "SocksStreams"
-
 class SocksOptions : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
   SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStream, bool AReadOnly, QWidget *AParent = NULL);
-  SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager, const QString &ASettingsNS, 
-    bool AReadOnly, QWidget *AParent = NULL);
+  SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager, const OptionsNode &ANode, bool AReadOnly, QWidget *AParent = NULL);
   ~SocksOptions();
-  void saveSettings(ISocksStream *AStream);
-  void saveSettings(const QString &ASettingsNS);
+  virtual QWidget *instance() { return this; }
 public slots:
-  void apply();
+  void apply(OptionsNode ANode);
+  void apply(ISocksStream *AStream);
+  virtual void apply();
+  virtual void reset();
 signals:
-  void optionsAccepted();
+  void modified();
+  void childApply();
+  void childReset();
 protected:
   void initialize(bool AReadOnly);
 protected slots:
@@ -36,9 +42,9 @@ private:
   ISocksStreams *FSocksStreams;
   IConnectionManager *FConnectionManager;
 private:
-  QWidget *FProxySettings;
-  QString FSettingsNS;
+  OptionsNode FOptions;
   ISocksStream *FSocksStream;
+  IOptionsWidget *FProxySettings;
 };
 
 #endif // SOCKSOPTIONS_H

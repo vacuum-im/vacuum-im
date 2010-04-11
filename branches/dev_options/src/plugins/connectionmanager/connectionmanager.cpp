@@ -217,9 +217,9 @@ IOptionsWidget *ConnectionManager::proxySettingsWidget(const OptionsNode &ANode,
   return widget;
 }
 
-void ConnectionManager::saveProxySettings(QWidget *AWidget, OptionsNode ANode)
+void ConnectionManager::saveProxySettings(IOptionsWidget *AWidget, OptionsNode ANode)
 {
-  ProxySettingsWidget *widget = qobject_cast<ProxySettingsWidget *>(AWidget);
+  ProxySettingsWidget *widget = qobject_cast<ProxySettingsWidget *>(AWidget->instance());
   if (widget)
     widget->apply(ANode);
 }
