@@ -614,14 +614,14 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
     IRosterIndex *index = FRostersView && FRostersModel ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
     if (APresence->show() == IPresence::Error)
     {
-      if (index && !FRostersViewPlugin->checkOption(IRostersView::ShowStatusText))
+      if (index)
         FRostersView->insertFooterText(FTO_ROSTERSVIEW_STATUS,APresence->status(),index);
       if (!FNotifyId.contains(APresence))
         insertStatusNotification(APresence);
     }
     else
     {
-      if (index && !FRostersViewPlugin->checkOption(IRostersView::ShowStatusText))
+      if (index)
         FRostersView->removeFooterText(FTO_ROSTERSVIEW_STATUS,index);
       removeStatusNotification(APresence);
     }

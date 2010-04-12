@@ -2,7 +2,8 @@
 
 SortFilterProxyModel::SortFilterProxyModel(IRostersViewPlugin *ARostersViewPlugin, QObject *AParent) : QSortFilterProxyModel(AParent)
 {
-  FOptions = 0;
+  FShowOffline = true;
+  FSortByStatus = false;
   FRostersViewPlugin = ARostersViewPlugin;
 }
 
@@ -11,20 +12,11 @@ SortFilterProxyModel::~SortFilterProxyModel()
 
 }
 
-bool SortFilterProxyModel::checkOption(IRostersView::Option AOption) const
+void SortFilterProxyModel::invalidate()
 {
-  return (FOptions & AOption) == AOption;
-}
-
-void SortFilterProxyModel::setOption(IRostersView::Option AOption, bool AValue)
-{
-  AValue ? FOptions |= AOption : FOptions &= ~AOption;
-  if (AOption == IRostersView::ShowOfflineContacts || AOption == IRostersView::ShowOnlineFirst)
-  {
-    invalidate();
-    if (AOption == IRostersView::ShowOfflineContacts && AValue)
-      FRostersViewPlugin->restoreExpandState();
-  }
+  FShowOffline = Options::node(OPV_ROSTERVIEW_SHOWOFFLINE).value().toBool();
+  FSortByStatus = Options::node(OPV_ROSTERVIEW_SORTBYSTATUS).value().toBool();
+  QSortFilterProxyModel::invalidate();
 }
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
@@ -35,8 +27,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
   {
     int leftShow = ALeft.data(RDR_SHOW).toInt();
     int rightShow = ARight.data(RDR_SHOW).toInt();
-    bool showOnlineFirst = checkOption(IRostersView::ShowOnlineFirst);
-    if (showOnlineFirst && leftType!=RIT_STREAM_ROOT && leftShow!=rightShow)
+    if (FSortByStatus && leftType!=RIT_STREAM_ROOT && leftShow!=rightShow)
     {
       const static int showOrders[] = {6,2,1,3,4,5,7,8};
       return showOrders[leftShow] < showOrders[rightShow];
@@ -50,7 +41,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
 {
-  if (checkOption(IRostersView::ShowOfflineContacts))
+  if (FShowOffline)
     return true;
 
   QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
@@ -85,4 +76,3 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
   }
   return true;
 }
-

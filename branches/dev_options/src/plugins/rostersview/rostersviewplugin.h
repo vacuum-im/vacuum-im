@@ -1,6 +1,7 @@
 #ifndef ROSTERSVIEWPLUGIN_H
 #define ROSTERSVIEWPLUGIN_H
 
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -17,11 +18,11 @@
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/iaccountmanager.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/action.h>
+#include <utils/options.h>
 #include "rostersview.h"
 #include "sortfilterproxymodel.h"
-#include "rosteroptionswidget.h"
 
 class RostersViewPlugin : 
   public QObject,
@@ -41,10 +42,10 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IRosterDataHolder
   virtual int rosterDataOrder() const;
   virtual QList<int> rosterDataRoles() const;
@@ -53,19 +54,12 @@ public:
   virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
   //IRostersViewPlugin
   virtual IRostersView *rostersView();
-  virtual bool checkOption(IRostersView::Option AOption) const;
-  virtual void setOption(IRostersView::Option AOption, bool AValue);
   virtual void startRestoreExpandState();
   virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
 signals:
-  void optionChanged(IRostersView::Option AOption, bool AValue);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
   //IRosterDataHolder
   void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
 protected:
-  QString getExpandSettingsName(const QModelIndex &AIndex);
   void loadExpandState(const QModelIndex &AIndex);
   void saveExpandState(const QModelIndex &AIndex);
 protected slots:
@@ -82,25 +76,23 @@ protected slots:
   void onAccountHidden(IAccount *AAccount);
   void onAccountDestroyed(const QUuid &AAccountId);
   void onRestoreExpandState();
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onOptionsOpened();
+  void onOptionsChanged(const OptionsNode &ANode);
   void onShowOfflineContactsAction(bool AChecked);
 private:
   IRosterPlugin *FRosterPlugin;
   IRostersModel *FRostersModel;
   IMainWindowPlugin *FMainWindowPlugin;
-  ISettings *FSettings;
-  ISettingsPlugin *FSettingsPlugin;
   IAccountManager *FAccountManager;
+  IOptionsManager *FOptionsManager;
 private:
-  Action *FShowOfflineAction;
-private:
-  int FOptions; 
+  bool FShowResource;
   bool FStartRestoreExpandState;
+  Action *FShowOfflineAction;
   RostersView *FRostersView; 
-  SortFilterProxyModel *FSortFilterProxyModel;
   QAbstractItemModel *FLastModel;
-  QHash<Jid,QString> FCollapseNS;
+  SortFilterProxyModel *FSortFilterProxyModel;
+  QMap<Jid, QHash<QString,bool> > FExpandState;
   struct { int sliderPos; IRosterIndex *currentIndex; } FViewSavedState;
 };
 

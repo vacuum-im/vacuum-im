@@ -79,6 +79,13 @@
 #define OPV_PROXY_USER                                  "proxy.proxy.user"
 #define OPV_PROXY_PASS                                  "proxy.proxy.pass"
 
+// RostersView
+#define OPV_ROSTERVIEW_ROOT                             "rosterview"
+#define OPV_ROSTERVIEW_SHOWOFFLINE                      "rosterview.show-offline"
+#define OPV_ROSTERVIEW_SHOWRESOURCE                     "rosterview.show-resource"
+#define OPV_ROSTERVIEW_SHOWSTATUSTEXT                   "rosterview.show-status-text"
+#define OPV_ROSTERVIEW_SORTBYSTATUS                     "rosterview.sort-by-status"
+
 // StatusChanger
 #define OPV_STATUSES_ROOT                               "statuses"
 #define OPV_STATUSES_MAINSTATUS                         "statuses.main-status"
