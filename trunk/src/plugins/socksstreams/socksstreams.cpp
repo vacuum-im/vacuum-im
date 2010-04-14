@@ -479,7 +479,7 @@ void SocksStreams::onXmppStreamClosed(IXmppStream *AStream)
 
 void SocksStreams::onDiscoItemsReceived(const IDiscoItems &AItems)
 {
-  if (AItems.contactJid == AItems.streamJid.domain())
+  if (AItems.contactJid==AItems.streamJid.domain() && AItems.node.isEmpty())
   {
     FNativeProxy.remove(AItems.streamJid);
     Jid proxyJid = "proxy." + AItems.streamJid.domain();

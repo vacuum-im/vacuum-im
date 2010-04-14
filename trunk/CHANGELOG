@@ -20,6 +20,7 @@ LEGEND
   [-] History continues to load from a local file after switching to a server archive
   [-] When the replication of server archive is enabled than the ongoing chat could not completely copied to a local disk
   [-] The main status could be displayed as "offline" even when one of the accounts is connected
+  [-] The socks5-proxy on native server has not been automatically added to available proxy list
 
 
 v1.0.1
