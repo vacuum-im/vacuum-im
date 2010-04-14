@@ -16,7 +16,6 @@ VCardPlugin::VCardPlugin()
   FRostersView = NULL; 
   FRostersViewPlugin = NULL;
   FStanzaProcessor = NULL;
-  FSettingsPlugin = NULL;
   FMultiUserChatPlugin = NULL;
   FDiscovery = NULL;
   FXmppUriQueries = NULL;
@@ -58,10 +57,6 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
   plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
   if (plugin)
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
 
   plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
   if (plugin)

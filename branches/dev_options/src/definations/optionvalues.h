@@ -24,6 +24,8 @@
 #define OPV_ACCOUNT_AUTORECONNECT                       "accounts.account.auto-reconnect"
 #define OPV_ACCOUNT_STATUS_ISMAIN                       "accounts.account.status.is-main"
 #define OPV_ACCOUNT_STATUS_LASTONLINE                   "accounts.account.status.last-online"
+// MessageArchiver
+#define OPV_ACCOUNT_ARCHIVEREPLICATION                  "accounts.account.archive-replication"
 
 // DataStreamsManager
 #define OPV_DATASTREAMS_ROOT                            "datastreams"
@@ -48,6 +50,11 @@
 #define OPV_MAINWINDOW_SHOW                             "mainwindow.show"
 #define OPV_MAINWINDOW_SIZE                             "mainwindow.size"
 #define OPV_MAINWINDOW_POSITION                         "mainwindow.position"
+
+// MessageWidgets
+#define OPV_MESSAGES_ROOT                               "messages"
+// Emoticons
+#define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
 
 // MessageStyles
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"
@@ -80,11 +87,14 @@
 #define OPV_PROXY_PASS                                  "proxy.proxy.pass"
 
 // RostersView
-#define OPV_ROSTERVIEW_ROOT                             "rosterview"
-#define OPV_ROSTERVIEW_SHOWOFFLINE                      "rosterview.show-offline"
-#define OPV_ROSTERVIEW_SHOWRESOURCE                     "rosterview.show-resource"
-#define OPV_ROSTERVIEW_SHOWSTATUSTEXT                   "rosterview.show-status-text"
-#define OPV_ROSTERVIEW_SORTBYSTATUS                     "rosterview.sort-by-status"
+#define OPV_ROSTER_ROOT                                 "roster"
+#define OPV_ROSTER_SHOWOFFLINE                          "roster.show-offline"
+#define OPV_ROSTER_SHOWRESOURCE                         "roster.show-resource"
+#define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
+#define OPV_ROSTER_SORTBYSTATUS                         "roster.sort-by-status"
+// RosterChanger
+#define OPV_ROSTER_AUTOSUBSCRIBE                        "roster.auto-subscribe"
+#define OPV_ROSTER_AUTOUNSUBSCRIBE                      "roster.auto-unsubscribe"
 
 // StatusChanger
 #define OPV_STATUSES_ROOT                               "statuses"
@@ -95,6 +105,13 @@
 #define OPV_STATUS_SHOW                                 "statuses.status.show"
 #define OPV_STATUS_TEXT                                 "statuses.status.text"
 #define OPV_STATUS_PRIORITY                             "statuses.status.priority"
+// AutoStatus
+#define OPV_AUTOSTARTUS_ROOT                            "statuses.autostatus"
+#define OPV_AUTOSTARTUS_RULE_ITEM                       "statuses.autostatus.rule"
+#define OPV_AUTOSTARTUS_RULE_ENABLED                    "statuses.autostatus.rule.enabled"
+#define OPV_AUTOSTARTUS_RULE_TIME                       "statuses.autostatus.rule.time"
+#define OPV_AUTOSTARTUS_RULE_SHOW                       "statuses.autostatus.rule.show"
+#define OPV_AUTOSTARTUS_RULE_TEXT                       "statuses.autostatus.rule.text"
 
 // StatusIcons
 #define OPV_STATUSICONS                                 "statusicons"

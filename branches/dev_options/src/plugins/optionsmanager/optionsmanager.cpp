@@ -131,9 +131,9 @@ bool OptionsManager::startPlugin()
   return true;
 }
 
-IOptionsWidget *OptionsManager::optionsWidget(const QString &ANodeID, int &AOrder, QWidget *AParent)
+IOptionsWidget *OptionsManager::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
-  if (ANodeID == OPN_MISC)
+  if (ANodeId == OPN_MISC)
   {
     AOrder = OWO_MISC_AUTOSTART;
     return optionsNodeWidget(Options::node(OPV_MISC_AUTOSTART), AParent);
@@ -437,9 +437,9 @@ QDialog *OptionsManager::showOptionsDialog(const QString &ANodeID, QWidget *APar
   return FOptionsDialog;
 }
 
-IOptionsContainer * OptionsManager::optionsContainer(QWidget *AParent) const
+IOptionsContainer *OptionsManager::optionsContainer(QWidget *AParent) const
 {
-  return new OptionsContainer(AParent);
+  return new OptionsContainer(this,AParent);
 }
 
 IOptionsWidget *OptionsManager::optionsNodeWidget(const OptionsNode &ANode, QWidget *AParent, const QString &ACaption) const

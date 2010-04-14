@@ -14,8 +14,8 @@ SortFilterProxyModel::~SortFilterProxyModel()
 
 void SortFilterProxyModel::invalidate()
 {
-  FShowOffline = Options::node(OPV_ROSTERVIEW_SHOWOFFLINE).value().toBool();
-  FSortByStatus = Options::node(OPV_ROSTERVIEW_SORTBYSTATUS).value().toBool();
+  FShowOffline = Options::node(OPV_ROSTER_SHOWOFFLINE).value().toBool();
+  FSortByStatus = Options::node(OPV_ROSTER_SORTBYSTATUS).value().toBool();
   QSortFilterProxyModel::invalidate();
 }
 

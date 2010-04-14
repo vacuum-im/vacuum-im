@@ -351,7 +351,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
         if (ARemove)
         {
           oldItems.append(ritem);
-          FRosterChanger->insertAutoSubscribe(AStreamJid, ritem.itemJid, IRosterChanger::AutoUnsubscribe, true);
+          FRosterChanger->insertAutoSubscribe(AStreamJid, ritem.itemJid, true, false, true);
         }
       }
     }
@@ -367,8 +367,8 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
       
       curItems+=newItems;
       foreach(IRosterItem ritem, curItems)
-        FRosterChanger->insertAutoSubscribe(AStreamJid,ritem.itemJid,IRosterChanger::AutoSubscribe,true);
-      FRosterChanger->insertAutoSubscribe(AStreamJid,AServiceTo,IRosterChanger::AutoSubscribe,true);
+        FRosterChanger->insertAutoSubscribe(AStreamJid,ritem.itemJid, true, true, false);
+      FRosterChanger->insertAutoSubscribe(AStreamJid,AServiceTo,true,true,false);
       roster->sendSubscription(AServiceTo,IRoster::Subscribe);
     }
     else if (FSubscribeServices.contains(AStreamJid,AServiceFrom.bare()))
@@ -674,7 +674,7 @@ void Gateways::onRosterOpened(IRoster *ARoster)
   {
     foreach(Jid serviceJid, FSubscribeServices.values(ARoster->streamJid()))
       foreach(Jid contactJid, serviceContacts(ARoster->streamJid(),serviceJid))
-        FRosterChanger->insertAutoSubscribe(ARoster->streamJid(),contactJid,IRosterChanger::AutoSubscribe,true);
+        FRosterChanger->insertAutoSubscribe(ARoster->streamJid(),contactJid,true,true,false);
   }
 }
 

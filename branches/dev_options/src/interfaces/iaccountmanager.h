@@ -48,7 +48,7 @@ protected:
   virtual void shown(IAccount *AAccount) =0;
   virtual void hidden(IAccount *AAccount) =0;
   virtual void removed(IAccount *AAccount) =0;
-  virtual void changed(IAccount *AAcount, OptionsNode ANode) =0;
+  virtual void changed(IAccount *AAcount, const OptionsNode &ANode) =0;
   virtual void destroyed(const QUuid &AAccountId) =0;
 };
 

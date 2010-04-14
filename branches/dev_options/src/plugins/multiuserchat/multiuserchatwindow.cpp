@@ -6,9 +6,6 @@
 #include <QCoreApplication>
 #include <QContextMenuEvent>
 
-#define BDI_WINDOW_GEOMETRY         "MultiChatWindowGeometry"
-#define BDI_WINDOW_HSPLITTER        "MultiChatWindowHSplitterState"
-
 #define ADR_STREAM_JID              Action::DR_StreamJid
 #define ADR_ROOM_JID                Action::DR_Parametr1
 #define ADR_USER_JID                Action::DR_Parametr2
@@ -27,7 +24,6 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose, false);
 
-  FSettings = NULL;
   FStatusIcons = NULL;
   FMessageWidgets = NULL;
   FMessageProcessor = NULL;
@@ -301,17 +297,7 @@ void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 
 void MultiUserChatWindow::initialize()
 {
-  IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-  {
-    ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (settingsPlugin)
-    {
-      FSettings = settingsPlugin->settingsForPlugin(MULTIUSERCHAT_UUID);
-    }
-  }
-
-  plugin = FChatPlugin->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
+  IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
   if (plugin)
   {
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
@@ -335,8 +321,8 @@ void MultiUserChatWindow::initialize()
       if (account)
       {
         ui.lblAccount->setText(Qt::escape(account->name()));
-        connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),
-          SLOT(onAccountChanged(const QString &, const QVariant &)));
+        connect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),
+          SLOT(onAccountOptionsChanged(const OptionsNode &)));
       }
     }
   }
@@ -679,38 +665,24 @@ void MultiUserChatWindow::insertStaticUserContextActions(Menu *AMenu, IMultiUser
 
 void MultiUserChatWindow::saveWindowState()
 {
-  if (FSettings)
-  {
-    QString dataId = streamJid().pBare()+"|"+roomJid().pBare();
-    FSettings->saveBinaryData(BDI_WINDOW_HSPLITTER"|"+dataId,ui.sprHSplitter->saveState());
-  }
+  Options::setFileValue(ui.sprHSplitter->saveState(),"muc.mucwindow.hsplitter-state",streamJid().pBare()+"|"+roomJid().pBare());
 }
 
 void MultiUserChatWindow::loadWindowState()
 {
-  if (FSettings)
-  {
-    QString dataId = streamJid().pBare()+"|"+roomJid().pBare();
-    ui.sprHSplitter->restoreState(FSettings->loadBinaryData(BDI_WINDOW_HSPLITTER"|"+dataId));
-  }
+  ui.sprHSplitter->restoreState(Options::fileValue("muc.mucwindow.hsplitter-state",streamJid().pBare()+"|"+roomJid().pBare()).toByteArray());
 }
 
 void MultiUserChatWindow::saveWindowGeometry()
 {
-  if (FSettings && isWindow())
-  {
-    QString dataId = streamJid().pBare()+"|"+roomJid().pBare();
-    FSettings->saveBinaryData(BDI_WINDOW_GEOMETRY"|"+dataId,saveGeometry());
-  }
+  if (isWindow())
+    Options::setFileValue(ui.sprHSplitter->saveState(),"muc.mucwindow.geometry",streamJid().pBare()+"|"+roomJid().pBare());
 }
 
 void MultiUserChatWindow::loadWindowGeometry()
 {
-  if (FSettings && isWindow())
-  {
-    QString dataId = streamJid().pBare()+"|"+roomJid().pBare();
-    restoreGeometry(FSettings->loadBinaryData(BDI_WINDOW_GEOMETRY"|"+dataId));
-  }
+  if (isWindow())
+    restoreGeometry(Options::fileValue("muc.mucwindow.geometry",streamJid().pBare()+"|"+roomJid().pBare()).toByteArray());
 }
 
 bool MultiUserChatWindow::showStatusCodes(const QString &ANick, const QList<int> &ACodes)
@@ -1961,9 +1933,9 @@ void MultiUserChatWindow::onStatusIconsChanged()
   updateWindow();
 }
 
-void MultiUserChatWindow::onAccountChanged(const QString &AName, const QVariant &AValue)
+void MultiUserChatWindow::onAccountOptionsChanged(const OptionsNode &ANode)
 {
-  //if (AName == AVN_NAME)
-  //  ui.lblAccount->setText(Qt::escape(AValue.toString()));
+  IAccount *account = qobject_cast<IAccount *>(sender());
+  if (account && account->optionsNode().childPath(ANode) == "name")
+    ui.lblAccount->setText(Qt::escape(ANode.value().toString()));
 }
-

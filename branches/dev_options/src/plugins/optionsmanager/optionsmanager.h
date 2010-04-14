@@ -47,7 +47,7 @@ public:
   virtual bool initSettings();
   virtual bool startPlugin();
   //IOptionsHolder
-  virtual IOptionsWidget *optionsWidget(const QString &ANodeID, int &AOrder, QWidget *AParent);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IOptionsManager
   virtual bool isOpened() const;
   virtual QList<QString> profiles() const;

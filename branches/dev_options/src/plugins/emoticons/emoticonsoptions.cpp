@@ -9,9 +9,12 @@ EmoticonsOptions::EmoticonsOptions(IEmoticons *AEmoticons, QWidget *AParent) : Q
 
   FEmoticons = AEmoticons;
   ui.lwtEmoticons->setItemDelegate(new IconsetDelegate(ui.lwtEmoticons));
+  connect(ui.lwtEmoticons,SIGNAL(itemChanged(QListWidgetItem *)),SIGNAL(modified()));
+
   connect(ui.tbtUp,SIGNAL(clicked()),SLOT(onUpButtonClicked()));
   connect(ui.tbtDown,SIGNAL(clicked()),SLOT(onDownButtonClicked()));
-  init();
+
+  reset();
 }
 
 EmoticonsOptions::~EmoticonsOptions()
@@ -21,21 +24,20 @@ EmoticonsOptions::~EmoticonsOptions()
 
 void EmoticonsOptions::apply()
 {
-  QStringList newFiles;
+  QStringList iconsets;
   for (int i = 0; i<ui.lwtEmoticons->count(); i++)
     if (ui.lwtEmoticons->item(i)->checkState() == Qt::Checked)
-      newFiles.append(ui.lwtEmoticons->item(i)->data(IDR_STORAGE_SUBDIR).toString());
+      iconsets.append(ui.lwtEmoticons->item(i)->data(IDR_STORAGE_SUBDIR).toString());
 
-  if (newFiles != FEmoticons->iconsets())
-    FEmoticons->setIconsets(newFiles);
+  Options::node(OPV_MESSAGES_EMOTICONS).setValue(iconsets);
 
-  emit optionsAccepted();
+  emit childApply();
 }
 
-void EmoticonsOptions::init()
+void EmoticonsOptions::reset()
 {
   ui.lwtEmoticons->clear();
-  QStringList storages = FEmoticons->iconsets();
+  QStringList storages = Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList();
   for (int i = 0; i < storages.count(); i++)
   {
     QListWidgetItem *item = new QListWidgetItem(RSR_STORAGE_EMOTICONS"/"+storages.at(i),ui.lwtEmoticons);
@@ -67,6 +69,7 @@ void EmoticonsOptions::onUpButtonClicked()
   {
     ui.lwtEmoticons->insertItem(ui.lwtEmoticons->currentRow()-1, ui.lwtEmoticons->takeItem(ui.lwtEmoticons->currentRow()));
     ui.lwtEmoticons->setCurrentRow(ui.lwtEmoticons->currentRow()-1);
+    emit modified();
   }
 }
 
@@ -76,5 +79,6 @@ void EmoticonsOptions::onDownButtonClicked()
   {
     ui.lwtEmoticons->insertItem(ui.lwtEmoticons->currentRow()+1, ui.lwtEmoticons->takeItem(ui.lwtEmoticons->currentRow()));
     ui.lwtEmoticons->setCurrentRow(ui.lwtEmoticons->currentRow()+1);
+    emit modified();
   }
 }

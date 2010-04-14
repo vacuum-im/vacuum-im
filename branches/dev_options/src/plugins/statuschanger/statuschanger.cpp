@@ -2,7 +2,6 @@
 
 #include <QTimer>
 #include <QToolButton>
-#include <QVBoxLayout>
 
 #define MAX_TEMP_STATUS_ID                  -10
 
@@ -235,23 +234,14 @@ bool StatusChanger::startPlugin()
 IOptionsWidget *StatusChanger::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
   QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-  if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+  if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
   {
     AOrder = OWO_ACCOUNT_STATUS;
     OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
 
     IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-    container->instance()->setLayout(new QVBoxLayout);
-    container->instance()->layout()->setMargin(0);
-
-    IOptionsWidget *widget = FOptionsManager->optionsNodeWidget(aoptions.node("auto-connect"),container->instance());
-    container->registerChild(widget);
-    container->instance()->layout()->addWidget(widget->instance());
-
-    widget = FOptionsManager->optionsNodeWidget(aoptions.node("auto-reconnect"),container->instance());
-    container->registerChild(widget);
-    container->instance()->layout()->addWidget(widget->instance());
-
+    container->appendChild(aoptions.node("auto-connect"));
+    container->appendChild(aoptions.node("auto-reconnect"));
     return container;
   }
   return NULL;

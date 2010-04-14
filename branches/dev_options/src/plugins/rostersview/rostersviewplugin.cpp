@@ -124,11 +124,11 @@ bool RostersViewPlugin::initObjects()
 
 bool RostersViewPlugin::initSettings()
 {
-  Options::registerOption(OPV_ROSTERVIEW_ROOT,QVariant(),tr("Roster"));
-  Options::registerOption(OPV_ROSTERVIEW_SHOWOFFLINE,true,tr("Show offline contact"));
-  Options::registerOption(OPV_ROSTERVIEW_SHOWRESOURCE,true,tr("Show contact resource in roster"));
-  Options::registerOption(OPV_ROSTERVIEW_SHOWSTATUSTEXT,true,tr("Show status message in roster"));
-  Options::registerOption(OPV_ROSTERVIEW_SORTBYSTATUS,false,tr("Sort contacts by status"));
+  Options::registerOption(OPV_ROSTER_ROOT,QVariant(),tr("Roster"));
+  Options::registerOption(OPV_ROSTER_SHOWOFFLINE,true,tr("Show offline contact"));
+  Options::registerOption(OPV_ROSTER_SHOWRESOURCE,true,tr("Show contact resource in roster"));
+  Options::registerOption(OPV_ROSTER_SHOWSTATUSTEXT,true,tr("Show status message in roster"));
+  Options::registerOption(OPV_ROSTER_SORTBYSTATUS,false,tr("Sort contacts by status"));
 
   if (FOptionsManager)
   {
@@ -146,25 +146,10 @@ IOptionsWidget *RostersViewPlugin::optionsWidget(const QString &ANodeId, int &AO
     AOrder = OWO_ROSTER;
 
     IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-    container->instance()->setLayout(new QVBoxLayout);
-    container->instance()->layout()->setMargin(0);
-
-    IOptionsWidget *widget = FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTERVIEW_SHOWOFFLINE),container->instance());
-    container->registerChild(widget);
-    container->instance()->layout()->addWidget(widget->instance());
-
-    widget = FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTERVIEW_SHOWRESOURCE),container->instance());
-    container->registerChild(widget);
-    container->instance()->layout()->addWidget(widget->instance());
-
-    widget = FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTERVIEW_SHOWSTATUSTEXT),container->instance());
-    container->registerChild(widget);
-    container->instance()->layout()->addWidget(widget->instance());
-
-    widget = FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTERVIEW_SORTBYSTATUS),container->instance());
-    container->registerChild(widget);
-    container->instance()->layout()->addWidget(widget->instance());
-
+    container->appendChild(Options::node(OPV_ROSTER_SHOWOFFLINE));
+    container->appendChild(Options::node(OPV_ROSTER_SHOWRESOURCE));
+    container->appendChild(Options::node(OPV_ROSTER_SHOWSTATUSTEXT));
+    container->appendChild(Options::node(OPV_ROSTER_SORTBYSTATUS));
     return container;
 
   }
@@ -461,32 +446,32 @@ void RostersViewPlugin::onRestoreExpandState()
 
 void RostersViewPlugin::onOptionsOpened()
 {
-  onOptionsChanged(Options::node(OPV_ROSTERVIEW_SHOWOFFLINE));
-  onOptionsChanged(Options::node(OPV_ROSTERVIEW_SHOWRESOURCE));
-  onOptionsChanged(Options::node(OPV_ROSTERVIEW_SHOWSTATUSTEXT));
-  onOptionsChanged(Options::node(OPV_ROSTERVIEW_SORTBYSTATUS));
+  onOptionsChanged(Options::node(OPV_ROSTER_SHOWOFFLINE));
+  onOptionsChanged(Options::node(OPV_ROSTER_SHOWRESOURCE));
+  onOptionsChanged(Options::node(OPV_ROSTER_SHOWSTATUSTEXT));
+  onOptionsChanged(Options::node(OPV_ROSTER_SORTBYSTATUS));
 }
 
 void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 {
-  if (ANode.path() == OPV_ROSTERVIEW_SHOWOFFLINE)
+  if (ANode.path() == OPV_ROSTER_SHOWOFFLINE)
   {
     FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, ANode.value().toBool() ? MNI_ROSTERVIEW_SHOW_OFFLINE : MNI_ROSTERVIEW_HIDE_OFFLINE);
     FSortFilterProxyModel->invalidate();
     if (ANode.value().toBool())
       restoreExpandState();
   }
-  else if (ANode.path() == OPV_ROSTERVIEW_SHOWRESOURCE)
+  else if (ANode.path() == OPV_ROSTER_SHOWRESOURCE)
   {
     FShowResource = ANode.value().toBool();
     emit rosterDataChanged(NULL, Qt::DisplayRole);
   }
-  else if (ANode.path() == OPV_ROSTERVIEW_SHOWSTATUSTEXT)
+  else if (ANode.path() == OPV_ROSTER_SHOWSTATUSTEXT)
   {
     FRostersView->updateStatusText();
     emit rosterDataChanged(NULL, Qt::DisplayRole);
   }
-  else if (ANode.path() == OPV_ROSTERVIEW_SORTBYSTATUS)
+  else if (ANode.path() == OPV_ROSTER_SORTBYSTATUS)
   {
     FSortFilterProxyModel->invalidate();
   }
@@ -494,7 +479,7 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 
 void RostersViewPlugin::onShowOfflineContactsAction(bool)
 {
-  OptionsNode node = Options::node(OPV_ROSTERVIEW_SHOWOFFLINE);
+  OptionsNode node = Options::node(OPV_ROSTER_SHOWOFFLINE);
   node.setValue(!node.value().toBool());
 }
 

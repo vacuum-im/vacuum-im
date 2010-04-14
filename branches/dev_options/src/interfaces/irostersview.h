@@ -27,12 +27,6 @@ public:
 class IRostersView
 {
 public:
-  enum Option {
-    ShowOfflineContacts           =0x01,
-    ShowOnlineFirst               =0x02,
-    ShowResource                  =0x04,
-    ShowStatusText                =0x08
-  };
   enum LabelFlags {
     LabelBlink                    =0x01,
     LabelVisible                  =0x02,

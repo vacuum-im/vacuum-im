@@ -11,10 +11,10 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/isettings.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagestyles.h>
+#include <utils/options.h>
 #include "ui_viewhistorywindow.h"
 
 class ViewHistoryWindow;
@@ -123,7 +123,6 @@ private:
   IRoster *FRoster;
   IMessageWidgets *FMessageWidgets;
   IMessageStyles *FMessageStyles;
-  ISettings *FSettings;
   IStatusIcons *FStatusIcons;
   IMessageArchiver *FArchiver;
 private:

@@ -1,13 +1,28 @@
 #include "optionscontainer.h"
 
-OptionsContainer::OptionsContainer(QWidget *AParent) : QWidget(AParent)
-{
+#include <QVBoxLayout>
 
+OptionsContainer::OptionsContainer(const IOptionsManager *AOptionsManager, QWidget *AParent) : QWidget(AParent)
+{
+  FOptionsManager = AOptionsManager;
 }
 
 OptionsContainer::~OptionsContainer()
 {
 
+}
+
+IOptionsWidget *OptionsContainer::appendChild(const OptionsNode &ANode, const QString &ACaption)
+{
+  IOptionsWidget *widget = FOptionsManager->optionsNodeWidget(ANode,this,ACaption);
+  if (layout() == NULL)
+  {
+    setLayout(new QVBoxLayout);
+    layout()->setMargin(0);
+  }
+  layout()->addWidget(widget->instance());
+  registerChild(widget);
+  return widget;
 }
 
 void OptionsContainer::registerChild(IOptionsWidget *AWidget)

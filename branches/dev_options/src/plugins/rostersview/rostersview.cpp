@@ -631,7 +631,7 @@ void RostersView::updateStatusText(IRosterIndex *AIndex)
     indexes.append(AIndex);
   }
 
-  bool show = Options::node(OPV_ROSTERVIEW_SHOWSTATUSTEXT).value().toBool();
+  bool show = Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool();
   foreach(IRosterIndex *index, indexes)
   {
     if (show)

@@ -10,10 +10,11 @@ class OptionsContainer :
   Q_OBJECT;
   Q_INTERFACES(IOptionsContainer);
 public:
-  OptionsContainer(QWidget *AParent);
+  OptionsContainer(const IOptionsManager *AOptionsManager, QWidget *AParent);
   ~OptionsContainer();
   virtual QWidget* instance() { return this; }
   virtual void registerChild(IOptionsWidget *AWidget);
+  virtual IOptionsWidget *appendChild(const OptionsNode &ANode, const QString &ACaption = QString::null);
 public slots:
   virtual void apply();
   virtual void reset();
@@ -21,6 +22,8 @@ signals:
   void modified();
   void childApply();
   void childReset();
+private:
+  const IOptionsManager *FOptionsManager;
 };
 
 #endif // OPTIONSCONTAINER_H

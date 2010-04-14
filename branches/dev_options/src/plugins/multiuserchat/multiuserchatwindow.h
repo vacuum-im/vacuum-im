@@ -19,12 +19,12 @@
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/isettings.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
+#include <utils/options.h>
 #include <utils/widgetmanager.h>
 #include "edituserslistdialog.h"
 #include "usercontextmenu.h"
@@ -173,7 +173,7 @@ protected slots:
 protected slots:
   void onUserItemActivated(const QModelIndex &AIndex);
   void onStatusIconsChanged();
-  void onAccountChanged(const QString &AName, const QVariant &AValue);  
+  void onAccountOptionsChanged(const OptionsNode &ANode);  
 private:
   Ui::MultiUserChatWindowClass ui;
 private:
@@ -182,7 +182,6 @@ private:
   IMessageStyles *FMessageStyles;
   IMessageArchiver *FMessageArchiver;
   IDataForms *FDataForms;
-  ISettings *FSettings;
   IStatusIcons *FStatusIcons;
   IStatusChanger *FStatusChanger;
   IMultiUserChat *FMultiChat;

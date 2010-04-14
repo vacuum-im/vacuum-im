@@ -148,11 +148,6 @@ StatusOptionsWidget::StatusOptionsWidget(IAutoStatus *AAutoStatus, IStatusChange
   ui.tbwRules->setColumnCount(4);
   ui.tbwRules->setHorizontalHeaderLabels(QStringList() << "" << tr("Time") << tr("Status") << tr("Text"));
 
-  foreach(int ruleId, FAutoStatus->rules())
-  {
-    appendTableRow(FAutoStatus->ruleValue(ruleId),ruleId);
-  }
-
   ui.tbwRules->sortItems(COL_TIME);
   ui.tbwRules->horizontalHeader()->setResizeMode(COL_ENABLED,QHeaderView::ResizeToContents);
   ui.tbwRules->horizontalHeader()->setResizeMode(COL_TIME,QHeaderView::ResizeToContents);
@@ -165,6 +160,9 @@ StatusOptionsWidget::StatusOptionsWidget(IAutoStatus *AAutoStatus, IStatusChange
   connect(ui.pbtHelp,SIGNAL(clicked(bool)),SLOT(onHelpButtonClicked(bool)));
   connect(ui.pbtAdd,SIGNAL(clicked(bool)),SLOT(onAddButtonClicked(bool)));
   connect(ui.pbtDelete,SIGNAL(clicked(bool)),SLOT(onDeleteButtonClicked(bool)));
+  connect(ui.tbwRules,SIGNAL(itemChanged(QTableWidgetItem *)),SIGNAL(modified()));
+
+  reset();
 }
 
 StatusOptionsWidget::~StatusOptionsWidget()
@@ -174,45 +172,54 @@ StatusOptionsWidget::~StatusOptionsWidget()
 
 void StatusOptionsWidget::apply()
 {
-  QList<int> oldRules = FAutoStatus->rules();
+  QList<QUuid> oldRules = FAutoStatus->rules();
   for (int i = 0; i<ui.tbwRules->rowCount(); i++)
   {
-    
     IAutoStatusRule rule;
     rule.time = ui.tbwRules->item(i,COL_TIME)->data(SDR_VALUE).toInt();
     rule.show = ui.tbwRules->item(i,COL_SHOW)->data(SDR_VALUE).toInt();
     rule.text = ui.tbwRules->item(i,COL_TEXT)->data(SDR_VALUE).toString();
 
-    int ruleId = ui.tbwRules->item(i,COL_ENABLED)->data(SDR_VALUE).toInt();
-    if (ruleId > 0)
+    QUuid ruleId = ui.tbwRules->item(i,COL_ENABLED)->data(SDR_VALUE).toString();
+    if (!ruleId.isNull())
     {
       IAutoStatusRule oldRule = FAutoStatus->ruleValue(ruleId);
-      if (oldRule.time!=rule.time || 
-          oldRule.show!=rule.show || 
-          oldRule.text!=rule.text)
+      if (oldRule.time!=rule.time || oldRule.show!=rule.show || oldRule.text!=rule.text)
         FAutoStatus->updateRule(ruleId,rule);
-      oldRules.removeAt(oldRules.indexOf(ruleId));
+      oldRules.removeAll(ruleId);
     }
     else
     {
       ruleId = FAutoStatus->insertRule(rule);
-      ui.tbwRules->item(i,COL_ENABLED)->setData(SDR_VALUE,ruleId);
+      ui.tbwRules->item(i,COL_ENABLED)->setData(SDR_VALUE,ruleId.toString());
     }
     FAutoStatus->setRuleEnabled(ruleId,ui.tbwRules->item(i,COL_ENABLED)->checkState()==Qt::Checked);
   }
 
-  foreach(int ruleId, oldRules)
-    FAutoStatus->removeRule(ruleId);
+  foreach(QUuid ruleId, oldRules)
+    FAutoStatus->removeRule(ruleId); 
 
-  emit optionsAccepted();
+  emit childApply();
 }
 
-int StatusOptionsWidget::appendTableRow(const IAutoStatusRule &ARule, int ARuleId)
+void StatusOptionsWidget::reset()
+{
+  ui.tbwRules->clearContents();
+  ui.tbwRules->setRowCount(0);
+  foreach(QUuid ruleId, FAutoStatus->rules()) 
+  {
+    appendTableRow(ruleId, FAutoStatus->ruleValue(ruleId)); 
+  }
+  ui.tbwRules->horizontalHeader()->doItemsLayout();
+  emit childReset();
+}
+
+int StatusOptionsWidget::appendTableRow(const QUuid &ARuleId, const IAutoStatusRule &ARule)
 {
   QTableWidgetItem *enabled = new QTableWidgetItem;
   enabled->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsUserCheckable);
   enabled->setCheckState(FAutoStatus->isRuleEnabled(ARuleId) ? Qt::Checked : Qt::Unchecked);
-  enabled->setData(SDR_VALUE,ARuleId);
+  enabled->setData(SDR_VALUE,ARuleId.toString());
 
   QTableWidgetItem *time = new QTableWidgetItem(QTime(0,0).addSecs(ARule.time).toString());
   time->setData(SDR_VALUE,ARule.time);
@@ -278,13 +285,17 @@ void StatusOptionsWidget::onAddButtonClicked(bool)
     rule.time = 10*60;
   rule.show = IPresence::Away;
   rule.text = tr("Auto status: away");
-  ui.tbwRules->setCurrentCell(appendTableRow(rule,-1),COL_ENABLED);
+  ui.tbwRules->setCurrentCell(appendTableRow(QUuid(),rule),COL_ENABLED);
   ui.tbwRules->horizontalHeader()->doItemsLayout();
+  emit modified();
 }
 
 void StatusOptionsWidget::onDeleteButtonClicked(bool)
 {
   QTableWidgetItem *item = ui.tbwRules->currentItem();
   if (item)
+  {
     ui.tbwRules->removeRow(item->row());
+    emit modified();
+  }
 }

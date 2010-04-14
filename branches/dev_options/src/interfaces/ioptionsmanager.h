@@ -37,6 +37,7 @@ class IOptionsContainer :
 {
 public:
   virtual void registerChild(IOptionsWidget *AWidget) =0;
+  virtual IOptionsWidget *appendChild(const OptionsNode &ANode, const QString &ACaption = QString::null) =0;
 };
 
 class IOptionsHolder

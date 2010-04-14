@@ -8,6 +8,7 @@
 #include <definations/toolbargroups.h>
 #include <definations/messagewriterorders.h>
 #include <definations/resourceloaderorders.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -16,8 +17,9 @@
 #include <interfaces/iemoticons.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/iconstorage.h>
+#include <utils/options.h>
 #include <utils/menu.h>
 #include "selecticonmenu.h"
 #include "emoticonsoptions.h"
@@ -40,26 +42,17 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IMessageWriter
   virtual void writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
   virtual void writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IEmoticons
-  virtual QList<QString> iconsets() const { return FStorageOrder; }
-  virtual void setIconsets(const QList<QString> &ASubStorages);
-  virtual void insertIconset(const QString &ASubStorage, const QString &ABefour = "");
-  virtual void removeIconset(const QString &ASubStorage);
+  virtual QList<QString> activeIconsets() const;
   virtual QUrl urlByKey(const QString &AKey) const;
   virtual QString keyByUrl(const QUrl &AUrl) const;
-signals:
-  void iconsetInserted(const QString &ASubStorage, const QString &ABefour);
-  void iconsetRemoved(const QString &ASubStorage);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 protected:
   void createIconsetUrls();
   SelectIconMenu *createSelectIconMenu(const QString &ASubStorage, QWidget *AParent);
@@ -70,14 +63,13 @@ protected slots:
   void onToolBarWidgetDestroyed(QObject *AObject);
   void onIconSelected(const QString &ASubStorage, const QString &AIconKey);
   void onSelectIconMenuDestroyed(QObject *AObject);
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onOptionsOpened();
+  void onOptionsChanged(const OptionsNode &ANode);
 private:
   IMessageWidgets *FMessageWidgets;
   IMessageProcessor *FMessageProcessor;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
 private:
-  QList<QString> FStorageOrder;
   QHash<QString, QUrl> FUrlByKey;
   QMap<QString, IconStorage *> FStorages;
   QList<IToolBarWidget *> FToolBarsWidgets;

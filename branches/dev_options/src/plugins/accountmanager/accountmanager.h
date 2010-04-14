@@ -56,7 +56,7 @@ signals:
   void shown(IAccount *AAccount);
   void hidden(IAccount *AAccount);
   void removed(IAccount *AAccount);
-  void changed(IAccount *AAcount, OptionsNode ANode);
+  void changed(IAccount *AAcount, const OptionsNode &ANode);
   void destroyed(const QUuid &AAccountId);
 public:
   void showAccountOptionsDialog(const QUuid &AAccountId);

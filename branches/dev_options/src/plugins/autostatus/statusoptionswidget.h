@@ -6,6 +6,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/iautostatus.h>
 #include <interfaces/istatuschanger.h>
+#include <interfaces/ioptionsmanager.h>
 #include "ui_statusoptionswidget.h"
 
 class Delegate : 
@@ -23,18 +24,24 @@ private:
 };
 
 class StatusOptionsWidget : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
-  StatusOptionsWidget(IAutoStatus *AAutoStatus, IStatusChanger *AStatusChanger, QWidget *AParent = NULL);
+  StatusOptionsWidget(IAutoStatus *AAutoStatus, IStatusChanger *AStatusChanger, QWidget *AParent);
   ~StatusOptionsWidget();
+  virtual QWidget* instance() { return this; }
 public slots:
-  void apply();
+  virtual void apply();
+  virtual void reset();
 signals:
-  void optionsAccepted();
+  void modified();
+  void childApply();
+  void childReset();
 protected:
-  int appendTableRow(const IAutoStatusRule &ARule, int ARuleId);
+  int appendTableRow(const QUuid &ARuleId, const IAutoStatusRule &ARule);
 protected slots:
   void onHelpButtonClicked(bool);
   void onAddButtonClicked(bool);

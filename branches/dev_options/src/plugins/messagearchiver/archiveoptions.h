@@ -3,6 +3,7 @@
 
 #include <QItemDelegate>
 #include <interfaces/imessagearchiver.h>
+#include <interfaces/ioptionsmanager.h>
 #include "ui_archiveoptions.h"
 
 class ArchiveDelegate : 
@@ -25,16 +26,22 @@ private:
 
 
 class ArchiveOptions : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
   ArchiveOptions(IMessageArchiver *AArchiver, const Jid &AStreamJid, QWidget *AParent);
   ~ArchiveOptions();
-  const Jid &streamJid() const { return FStreamJid; }
+  virtual QWidget* instance() { return this; }
 public slots:
-  void apply();
-  void reset();
+  virtual void apply();
+  virtual void reset();
+signals:
+  void modified();
+  void childApply();
+  void childReset();
 protected:
   void updateWidget();
   void updateColumnsSize();

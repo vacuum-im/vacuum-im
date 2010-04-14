@@ -14,6 +14,7 @@
 #include <interfaces/irosterchanger.h>
 #include <interfaces/ivcard.h>
 #include <utils/action.h>
+#include <utils/options.h>
 #include "discoitemsmodel.h"
 #include "ui_discoitemswindow.h"
 

@@ -27,7 +27,6 @@ SUBDIRS = optionsmanager \
           defaultconnection \
           starttls \
           statusicons \
-          skinmanager \
           emoticons \
           clientinfo \
           vcard \
