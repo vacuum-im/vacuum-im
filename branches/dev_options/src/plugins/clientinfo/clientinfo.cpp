@@ -26,8 +26,6 @@
 #define FORM_FIELD_OS                   "os"
 #define FORM_FIELD_OS_VERSION           "os_version"
 
-#define SVN_SAHRE_OS_VERSION            "shareOSVersion"
-
 ClientInfo::ClientInfo()
 {
   FPluginManager = NULL;
@@ -38,12 +36,11 @@ ClientInfo::ClientInfo()
   FDiscovery = NULL;
   FDataForms = NULL;
   FAutoStatus = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
 
   FTimeHandle = 0;
   FVersionHandle = 0;
   FActivityHandler = 0;
-  FShareOSVersion = true;
 }
 
 ClientInfo::~ClientInfo()
@@ -90,15 +87,10 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0);
   if (plugin)
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
   }
 
   plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
@@ -128,6 +120,8 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
   {
     FAutoStatus = qobject_cast<IAutoStatus *>(plugin->instance());
   }
+
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
   return FStanzaProcessor != NULL;
 }
@@ -175,24 +169,25 @@ bool ClientInfo::initObjects()
     FDataForms->insertLocalizer(this,DATA_FORM_SOFTWAREINFO);
   }
 
-  if (FSettingsPlugin)
-  {
-    FSettingsPlugin->insertOptionsHolder(this);
-  }
-
   return true;
 }
 
-QWidget *ClientInfo::optionsWidget(const QString &ANode, int &AOrder)
+bool ClientInfo::initSettings()
 {
-  if (ANode == OPN_MISC)
+  Options::registerOption(OPV_MISC_SHAREOSVERSION,true,tr("Share information about OS version"));
+  if (FOptionsManager)
+  {
+    FOptionsManager->insertOptionsHolder(this);
+  }
+  return true;
+}
+
+IOptionsWidget *ClientInfo::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+{
+  if (FOptionsManager && ANodeId == OPN_MISC)
   {
     AOrder = OWO_MISC_CLIENTINFO;
-    QWidget *widget = new MiscOptionsWidget(this);
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
+    return FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_SHAREOSVERSION),AParent);
   }
   return NULL;
 }
@@ -213,7 +208,7 @@ bool ClientInfo::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza 
     QDomElement elem = iq.addElement("query",NS_JABBER_VERSION);
     elem.appendChild(iq.createElement("name")).appendChild(iq.createTextNode(CLIENT_NAME));
     elem.appendChild(iq.createElement("version")).appendChild(iq.createTextNode(QString("%1.%2 %3").arg(FPluginManager->version()).arg(FPluginManager->revision()).arg(CLIENT_VERSION_SUFIX).trimmed()));
-    if (shareOSVersion())
+    if (Options::node(OPV_MISC_SHAREOSVERSION).value().toBool())
       elem.appendChild(iq.createElement("os")).appendChild(iq.createTextNode(osVersion()));
     FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
   }
@@ -377,11 +372,11 @@ void ClientInfo::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
     soft_ver.value = CLIENT_VERSION;
     form.fields.append(soft_ver);
 
-    if (shareOSVersion())
+    if (Options::node(OPV_MISC_SHAREOSVERSION).value().toBool())
     {
       IDataField os;
       os.required = false;
-      os.var   = FORM_FIELD_OS;
+      os.var = FORM_FIELD_OS;
       os.value = osVersion();
       form.fields.append(os);
     }
@@ -572,22 +567,6 @@ QString ClientInfo::osVersion() const
 #endif
   }
   return osver;
-}
-
-bool ClientInfo::shareOSVersion() const
-{
-  return FShareOSVersion;
-}
-
-void ClientInfo::setShareOSVersion(bool AShare)
-{
-  if (FShareOSVersion != AShare)
-  {
-    FShareOSVersion = AShare;
-    if (FDiscovery)
-      FDiscovery->updateSelfEntityCapabilities();
-    emit shareOsVersionChanged(AShare);
-  }
 }
 
 void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes)
@@ -942,21 +921,11 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
   }
 }
 
-void ClientInfo::onSettingsOpened()
+void ClientInfo::onOptionsChanged(const OptionsNode &ANode)
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-  if (settings)
+  if (FDiscovery && ANode.path()==OPV_MISC_SHAREOSVERSION)
   {
-    setShareOSVersion(settings->value(SVN_SAHRE_OS_VERSION, true).toBool());
-  }
-}
-
-void ClientInfo::onSettingsClosed()
-{
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-  if (settings)
-  {
-    settings->setValue(SVN_SAHRE_OS_VERSION, shareOSVersion());
+    FDiscovery->updateSelfEntityCapabilities();
   }
 }
 

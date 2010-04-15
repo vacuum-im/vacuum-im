@@ -803,7 +803,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
   INotification notify;
   if (FNotifications)
   {
-    notify.kinds = INotifications::EnablePopupWindows;
+    notify.kinds = INotification::PopupWindow;
     notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RCHANGER_SUBSCRIBTION));
     notify.data.insert(NDR_TOOLTIP,tr("Subscription message from %1").arg(FNotifications->contactName(ARoster->streamJid(),AContactJid)));
     notify.data.insert(NDR_ROSTER_STREAM_JID,ARoster->streamJid().full());

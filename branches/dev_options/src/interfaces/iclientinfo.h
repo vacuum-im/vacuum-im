@@ -23,8 +23,6 @@ public:
 public:
   virtual QObject *instance() =0;
   virtual QString osVersion() const =0;
-  virtual bool shareOSVersion() const =0;
-  virtual void setShareOSVersion(bool AShare) =0;
   virtual void showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes) =0;
   //Software Version
   virtual bool hasSoftwareInfo(const Jid &AContactJid) const =0;
@@ -48,7 +46,6 @@ protected:
   virtual void softwareInfoChanged(const Jid &AContactJid) =0;
   virtual void lastActivityChanged(const Jid &AContactJid) =0;
   virtual void entityTimeChanged(const Jid &AContactJid) =0;
-  virtual void shareOsVersionChanged(bool AShare) =0;
 };
 
 Q_DECLARE_INTERFACE(IClientInfo,"Vacuum.Plugin.IClientInfo/1.0")

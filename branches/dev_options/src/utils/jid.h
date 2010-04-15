@@ -87,7 +87,9 @@ private:
 extern "C" {
 #endif
 
-  UTILS_EXPORT uint qHash(const Jid &key);
+  UTILS_EXPORT uint qHash(const Jid &Akey);
+  UTILS_EXPORT QDataStream &operator<<(QDataStream &AStream, const Jid &AJid);
+  UTILS_EXPORT QDataStream &operator>>(QDataStream &AStream, Jid &AJid);
 
 #ifdef __cplusplus
 }

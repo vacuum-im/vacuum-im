@@ -6,6 +6,7 @@
 #include <definations/notificationdataroles.h>
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -20,9 +21,10 @@
 #include <interfaces/istatusicons.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/istatuschanger.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/imainwindow.h>
 #include <utils/action.h>
+#include <utils/options.h>
 #include "notifywidget.h"
 #include "optionswidget.h"
 #include "notifykindswidget.h"
@@ -65,18 +67,16 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //INotifications
   virtual QList<int> notifications() const;
   virtual INotification notificationById(int ANotifyId) const;
   virtual int appendNotification(const INotification &ANotification);
   virtual void activateNotification(int ANotifyId);
   virtual void removeNotification(int ANotifyId);
-  virtual bool checkOption(INotifications::Option AOption) const;
-  virtual void setOption(INotifications::Option AOption, bool AValue);
   //Kind options for notificators
   virtual void insertNotificator(const QString &AId, const QString &ATitle, uchar AKindMask, uchar ADefault);
   virtual uchar notificatorKinds(const QString &AId) const;
@@ -91,10 +91,6 @@ signals:
   void notificationRemoved(int ANotifyId);
   void notificationAppend(int ANotifyId, INotification &ANotification);
   void notificationAppended(int ANotifyId, const INotification &ANotification);
-  void optionChanged(INotifications::Option AOption, bool AValue);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 protected:
   int notifyIdByRosterId(int ARosterId) const;
   int notifyIdByTrayId(int ATrayId) const;
@@ -111,8 +107,8 @@ protected slots:
   void onWindowNotifyRemoved();
   void onWindowNotifyDestroyed();
   void onActionNotifyActivated(bool);
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onOptionsOpened();
+  void onOptionsChanged(const OptionsNode &ANode);
 private:
   IAvatars *FAvatars;
   IRosterPlugin *FRosterPlugin;
@@ -121,7 +117,7 @@ private:
   ITrayManager *FTrayManager;
   IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
   IMainWindowPlugin *FMainWindowPlugin;
 private:
   Action *FSoundOnOff;
@@ -129,7 +125,6 @@ private:
   Action *FRemoveAll;
   Menu *FNotifyMenu;
 private:
-  uint FOptions;
   int FNotifyId;
   QSound *FSound;
   QList<int> FDelayedActivations;

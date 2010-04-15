@@ -2,6 +2,7 @@
 
 #include <QFile>
 #include <QBuffer>
+#include <QDataStream>
 #include <QFileDialog>
 #include <QImageReader>
 #include <QCryptographicHash>
@@ -13,11 +14,6 @@
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
-
-#define SVN_SHOW_AVATARS          "showAvatar"
-#define SVN_SHOW_EMPTY_AVATARS    "showEmptyAvatar"
-#define SVN_CUSTOM_AVATARS        "customAvatars"
-#define SVN_CUSTOM_AVATAR_HASH    SVN_CUSTOM_AVATARS ":hash[]"
 
 #define AVATAR_IMAGE_TYPE         "jpeg"
 #define AVATAR_IQ_TIMEOUT         30000
@@ -34,7 +30,7 @@ Avatars::Avatars()
   FPresencePlugin = NULL;
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
   
   FRosterLabelId = -1;
   FAvatarsVisible = false;
@@ -114,16 +110,15 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
     }
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
   }
+
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+  connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
   return FVCardPlugin!=NULL;
 }
@@ -142,11 +137,18 @@ bool Avatars::initObjects()
   {
     FRostersModel->insertDefaultDataHolder(this);
   }
-  if (FSettingsPlugin)
-  {
-    FSettingsPlugin->insertOptionsHolder(this);
-  }
+  return true;
+}
 
+bool Avatars::initSettings()
+{
+  Options::registerOption(OPV_AVATARS_SHOW,true,tr("Show avatars"));
+  Options::registerOption(OPV_AVATARS_SHOWEMPTY,true,tr("Show empty avatars"));
+
+  if (FOptionsManager)
+  {
+    FOptionsManager->insertOptionsHolder(this);
+  }
   return true;
 }
 
@@ -308,7 +310,7 @@ QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
   if (ARole == RDR_AVATAR_IMAGE)
   {
     QImage avatar = avatarImage(AIndex->data(RDR_JID).toString());
-    if (avatar.isNull() && showEmptyAvatars())
+    if (avatar.isNull() && FShowEmptyAvatars)
       avatar = FEmptyAvatar;
     return avatar;
   }
@@ -325,16 +327,15 @@ bool Avatars::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AVa
   return false;
 }
 
-QWidget *Avatars::optionsWidget(const QString &ANode, int &AOrder)
+IOptionsWidget *Avatars::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
-  if (ANode == OPN_ROSTER)
+  if (FOptionsManager && ANodeId == OPN_ROSTER)
   {
     AOrder = OWO_ROSTER_AVATARS;
-    RosterOptionsWidget *widget = new RosterOptionsWidget(this,NULL);
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
+    IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
+    container->appendChild(Options::node(OPV_AVATARS_SHOW));
+    container->appendChild(Options::node(OPV_AVATARS_SHOWEMPTY));
+    return container;
   }
   return NULL;
 }
@@ -448,55 +449,6 @@ QString Avatars::setCustomPictire(const Jid &AContactJid, const QString &AImageF
     updateDataHolder(contactJid);
   }
   return EMPTY_AVATAR;
-}
-
-bool Avatars::avatarsVisible() const
-{
-  return FAvatarsVisible;
-}
-
-void Avatars::setAvatarsVisible(bool AVisible)
-{
-  if (FAvatarsVisible != AVisible)
-  {
-    FAvatarsVisible = AVisible;
-    if (FRostersViewPlugin && FRostersModel)
-    {
-      if (AVisible)
-      {
-        QMultiHash<int,QVariant> findData;
-        foreach(int type, rosterDataTypes())
-          findData.insertMulti(RDR_TYPE,type);
-        QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChild(findData, true);
-        
-        FRosterLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_AVATAR_IMAGE, RDR_AVATAR_IMAGE);
-        foreach (IRosterIndex *index, indexes)
-          FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, index);
-      }
-      else
-      {
-        FRostersViewPlugin->rostersView()->destroyIndexLabel(FRosterLabelId);
-        FRosterLabelId = -1;
-        FAvatarImages.clear();
-      }
-    }
-    emit avatarsVisibleChanged(AVisible);
-  }
-}
-
-bool Avatars::showEmptyAvatars() const
-{
-  return FShowEmptyAvatars;
-}
-
-void Avatars::setShowEmptyAvatars(bool AShow)
-{
-  if (FShowEmptyAvatars != AShow)
-  {
-    FShowEmptyAvatars = AShow;
-    updateDataHolder();
-    emit showEmptyAvatarsChanged(AShow);
-  }
 }
 
 QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
@@ -771,45 +723,73 @@ void Avatars::onClearAvatarByAction(bool)
   }
 }
 
-void Avatars::onSettingsOpened()
-{
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(AVATARTS_UUID);
-  setAvatarsVisible(settings->value(SVN_SHOW_AVATARS,true).toBool());
-  setShowEmptyAvatars(settings->value(SVN_SHOW_EMPTY_AVATARS,true).toBool());
-
-  QHash<QString,QVariant> customPictires = settings->values(SVN_CUSTOM_AVATAR_HASH);
-  for (QHash<QString,QVariant>::const_iterator it = customPictires.constBegin(); it != customPictires.constEnd(); it++)
-  {
-    if (hasAvatar(it.value().toString()))
-    {
-      Jid contactJid = it.key();
-      FCustomPictures.insert(contactJid,it.value().toString());
-    }
-  }
-}
-
-void Avatars::onSettingsClosed()
-{
-  FIqAvatars.clear();
-  FVCardAvatars.clear();
-  FAvatarImages.clear();
-
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(AVATARTS_UUID);
-  settings->setValue(SVN_SHOW_AVATARS,avatarsVisible());
-  settings->setValue(SVN_SHOW_EMPTY_AVATARS,showEmptyAvatars());
-
-  settings->deleteValue(SVN_CUSTOM_AVATARS);
-  QList<Jid> contacts = FCustomPictures.keys();
-  foreach(Jid contactJid, contacts)
-  {
-    settings->setValueNS(SVN_CUSTOM_AVATAR_HASH,contactJid.full(),FCustomPictures.value(contactJid));
-  }
-  FCustomPictures.clear();
-}
-
 void Avatars::onIconStorageChanged()
 {
   FEmptyAvatar = QImage(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->fileFullName(MNI_AVATAR_EMPTY)).scaled(FAvatarSize,Qt::KeepAspectRatio,Qt::FastTransformation);
+}
+
+void Avatars::onOptionsOpened()
+{
+  QByteArray data = Options::fileValue("roster.avatars.custom-pictures").toByteArray();
+  QDataStream stream(data);
+  stream >> FCustomPictures;
+
+  for (QMap<Jid,QString>::iterator it = FCustomPictures.begin(); it != FCustomPictures.end(); )
+  {
+    if (!hasAvatar(it.value()))
+      it = FCustomPictures.erase(it);
+    else
+      it++;
+  }
+
+  onOptionsChanged(Options::node(OPV_AVATARS_SHOW));
+  onOptionsChanged(Options::node(OPV_AVATARS_SHOWEMPTY));
+}
+
+void Avatars::onOptionsClosed()
+{
+  QByteArray data;
+  QDataStream stream(&data, QIODevice::WriteOnly);
+  stream << FCustomPictures;
+  Options::setFileValue(data,"roster.avatars.custom-pictures");
+
+  FIqAvatars.clear();
+  FVCardAvatars.clear();
+  FAvatarImages.clear();
+  FCustomPictures.clear();
+}
+
+void Avatars::onOptionsChanged(const OptionsNode &ANode)
+{
+  if (ANode.path() == OPV_AVATARS_SHOW)
+  {
+    FAvatarsVisible = ANode.value().toBool();
+    if (FRostersViewPlugin && FRostersModel)
+    {
+      if (FAvatarsVisible)
+      {
+        QMultiHash<int,QVariant> findData;
+        foreach(int type, rosterDataTypes())
+          findData.insertMulti(RDR_TYPE,type);
+        QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChild(findData, true);
+
+        FRosterLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_AVATAR_IMAGE, RDR_AVATAR_IMAGE);
+        foreach (IRosterIndex *index, indexes)
+          FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, index);
+      }
+      else
+      {
+        FRostersViewPlugin->rostersView()->destroyIndexLabel(FRosterLabelId);
+        FRosterLabelId = -1;
+        FAvatarImages.clear();
+      }
+    }
+  }
+  else if (ANode.path() == OPV_AVATARS_SHOWEMPTY)
+  {
+    FShowEmptyAvatars = ANode.value().toBool();
+    updateDataHolder();
+  }
 }
 
 Q_EXPORT_PLUGIN2(plg_avatars, Avatars)

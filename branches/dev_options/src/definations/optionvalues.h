@@ -84,6 +84,19 @@
 // OptionsManager
 #define OPV_MISC_ROOT                                   "misc"
 #define OPV_MISC_AUTOSTART                              "misc.autostart"
+#define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
+
+// Notifications
+#define OPV_NOTIFICATIONS_ROOT                          "notifications"
+#define OPV_NOTIFICATIONS_SOUND                         "notifications.sound"
+#define OPV_NOTIFICATIONS_ROSTERICON                    "notifications.roster-icon"
+#define OPV_NOTIFICATIONS_POPUPWINDOW                   "notifications.popup-window"
+#define OPV_NOTIFICATIONS_TRAYICON                      "notifications.tray-icon"
+#define OPV_NOTIFICATIONS_TRAYACTION                    "notifications.tray-action"
+#define OPV_NOTIFICATIONS_AUTOACTIVATE                  "notifications.auto-activate"
+#define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
+#define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
+#define OPV_NOTIFICATIONS_NOTIFICATOR_ITEM              "notifications.notificator"
 
 // ConnectionManager
 #define OPV_PROXY_ROOT                                  "proxy"
@@ -105,6 +118,10 @@
 // RosterChanger
 #define OPV_ROSTER_AUTOSUBSCRIBE                        "roster.auto-subscribe"
 #define OPV_ROSTER_AUTOUNSUBSCRIBE                      "roster.auto-unsubscribe"
+// Avatars
+#define OPV_AVATARS_SHOW                                "roster.avatars.show"
+#define OPV_AVATARS_SHOWEMPTY                           "roster.avatars.show-empty"
+#define OPV_AVATARS_CUSTOM_ITEM                         "roster.avatars.custom"
 
 // StatusChanger
 #define OPV_STATUSES_ROOT                               "statuses"

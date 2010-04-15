@@ -1,16 +1,8 @@
 #include "notifications.h"
 
-#define ADR_NOTIFYID                    Action::DR_Parametr1
+#include <QVBoxLayout>
 
-#define SVN_NOTIFICATORS                "notificators:notificator[]"
-#define SVN_ENABLE_ROSTERICONS          "enableRosterIcons"
-#define SVN_ENABLE_PUPUPWINDOWS         "enablePopupWindows"
-#define SVN_ENABLE_TRAYICONS            "enableTrayIcons"
-#define SVN_ENABLE_TRAYACTIONS          "enableTrayActions"
-#define SVN_ENABLE_SOUNDS               "enableSounds"
-#define SVN_ENABLE_AUTO_ACTIVATE        "enableAutoActivate"
-#define SVN_EXPAND_ROSTER_GROUPS        "expandRosterGroups"
-#define SVN_DISABLE_SOUNDS_WHEN_DND     "disableSoundsWhenDND"
+#define ADR_NOTIFYID                    Action::DR_Parametr1
 
 Notifications::Notifications()
 {
@@ -21,14 +13,13 @@ Notifications::Notifications()
   FTrayManager = NULL;
   FRostersModel = NULL;
   FRostersViewPlugin = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
   FMainWindowPlugin = NULL;
 
   FActivateAll = NULL;
   FRemoveAll = NULL;
   FNotifyMenu = NULL;
 
-  FOptions = 0;
   FNotifyId = 0;
   FSound = NULL;
 }
@@ -101,16 +92,12 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
   if (plugin)
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
-  {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
-  }
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
   return true;
 }
@@ -119,7 +106,7 @@ bool Notifications::initObjects()
 {
   FSoundOnOff = new Action(this);
   FSoundOnOff->setToolTip(tr("Enable/Disable notifications sound"));
-  FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, checkOption(EnableSounds) ? MNI_NOTIFICATIONS_SOUND_ON : MNI_NOTIFICATIONS_SOUND_OFF);
+  FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, MNI_NOTIFICATIONS_SOUND_ON);
   connect(FSoundOnOff,SIGNAL(triggered(bool)),SLOT(onSoundOnOffActionTriggered(bool)));
 
   FActivateAll = new Action(this);
@@ -139,12 +126,6 @@ bool Notifications::initObjects()
   FNotifyMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS);
   FNotifyMenu->menuAction()->setVisible(false);
 
-  if (FSettingsPlugin)
-  {
-    FSettingsPlugin->openOptionsNode(OPN_NOTIFICATIONS,tr("Notifications"),tr("Notification options"),MNI_NOTIFICATIONS,ONO_NOTIFICATIONS);
-    FSettingsPlugin->insertOptionsHolder(this);
-  }
-
   if (FTrayManager)
   {
     FTrayManager->addAction(FActivateAll,AG_TMTM_NOTIFICATIONS,false);
@@ -160,21 +141,49 @@ bool Notifications::initObjects()
   return true;
 }
 
-QWidget *Notifications::optionsWidget(const QString &ANode, int &AOrder)
+bool Notifications::initSettings()
 {
-  if (ANode == OPN_NOTIFICATIONS)
+  Options::registerOption(OPV_NOTIFICATIONS_ROOT,QVariant(),tr("Notifications"));
+  Options::registerOption(OPV_NOTIFICATIONS_SOUND,true,tr("Sounds"));
+  Options::registerOption(OPV_NOTIFICATIONS_ROSTERICON,true,tr("Roster icons"));
+  Options::registerOption(OPV_NOTIFICATIONS_POPUPWINDOW,true,tr("Popup windows"));
+  Options::registerOption(OPV_NOTIFICATIONS_TRAYICON,true,tr("Tray icons"));
+  Options::registerOption(OPV_NOTIFICATIONS_TRAYACTION,true,tr("Tray actions"));
+  Options::registerOption(OPV_NOTIFICATIONS_AUTOACTIVATE,true,tr("Auto activate"));
+  Options::registerOption(OPV_NOTIFICATIONS_EXPANDGROUP,true,tr("Expand groups"));
+  Options::registerOption(OPV_NOTIFICATIONS_NOSOUNDIFDND,false,tr("Disable sounds when DND"));
+
+  if (FOptionsManager)
+  {
+    IOptionsDialogNode dnode = { ONO_NOTIFICATIONS, OPN_NOTIFICATIONS, tr("Notifications"),tr("Notification options"), MNI_NOTIFICATIONS };
+    FOptionsManager->insertOptionsDialogNode(dnode);
+    FOptionsManager->insertOptionsHolder(this);
+  }
+  return true;
+}
+
+IOptionsWidget *Notifications::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+{
+  if (FOptionsManager && ANodeId == OPN_NOTIFICATIONS)
   {
     AOrder = OWO_NOTIFICATIONS;
-    OptionsWidget *widget = new OptionsWidget(this);
+    IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
+    container->instance()->setLayout(new QVBoxLayout);
+    container->instance()->layout()->setMargin(0);
+
+    IOptionsWidget *widget = new OptionsWidget(this, container->instance());
+    container->instance()->layout()->addWidget(widget->instance());
+    container->registerChild(widget);
+
     foreach(QString id, FNotificators.keys())
     {
       Notificator notificator = FNotificators.value(id);
-      widget->appendKindsWidget(new NotifyKindsWidget(this,id,notificator.title,notificator.kindMask,widget));
+      widget = new NotifyKindsWidget(this,id,notificator.title,notificator.kindMask,container->instance());
+      container->instance()->layout()->addWidget(widget->instance());
+      container->registerChild(widget);
     }
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
+
+    return container;
   }
   return NULL;
 }
@@ -201,18 +210,19 @@ int Notifications::appendNotification(const INotification &ANotification)
   QIcon icon = qvariant_cast<QIcon>(record.notification.data.value(NDR_ICON));
   QString toolTip = record.notification.data.value(NDR_TOOLTIP).toString();
   
-  if (FRostersModel && FRostersViewPlugin && checkOption(EnableRosterIcons) && (record.notification.kinds & INotification::RosterIcon)>0)
+  if (FRostersModel && FRostersViewPlugin && Options::node(OPV_NOTIFICATIONS_ROSTERICON).value().toBool() && 
+    (record.notification.kinds & INotification::RosterIcon)>0)
   {
     Jid streamJid = record.notification.data.value(NDR_ROSTER_STREAM_JID).toString();
     Jid contactJid = record.notification.data.value(NDR_ROSTER_CONTACT_JID).toString();
     int order = record.notification.data.value(NDR_ROSTER_NOTIFY_ORDER).toInt();
     int flags = IRostersView::LabelBlink|IRostersView::LabelVisible;
-    flags = flags | (checkOption(ExpandRosterGroups) ? IRostersView::LabelExpandParents : 0);
+    flags = flags | (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool() ? IRostersView::LabelExpandParents : 0);
     QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,true);
     record.rosterId = FRostersViewPlugin->rostersView()->appendNotify(indexes,order,icon,toolTip,flags);
   }
   
-  if (checkOption(EnablePopupWindows) && (record.notification.kinds & INotification::PopupWindow)>0)
+  if (Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).value().toBool() && (record.notification.kinds & INotification::PopupWindow)>0)
   {
     record.widget = new NotifyWidget(record.notification);
     connect(record.widget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
@@ -223,10 +233,11 @@ int Notifications::appendNotification(const INotification &ANotification)
 
   if (FTrayManager)
   {
-    if (checkOption(EnableTrayIcons) && (record.notification.kinds & INotification::TrayIcon)>0)
+    if (Options::node(OPV_NOTIFICATIONS_TRAYACTION).value().toBool() && (record.notification.kinds & INotification::TrayIcon)>0)
       record.trayId = FTrayManager->appendNotify(icon,toolTip,true);
     
-    if (!toolTip.isEmpty() && checkOption(EnableTrayActions) && (record.notification.kinds & INotification::TrayAction)>0)
+    if (!toolTip.isEmpty() && Options::node(OPV_NOTIFICATIONS_TRAYACTION).value().toBool() && 
+      (record.notification.kinds & INotification::TrayAction)>0)
     {
       record.action = new Action(FNotifyMenu);
       record.action->setIcon(icon);
@@ -237,7 +248,8 @@ int Notifications::appendNotification(const INotification &ANotification)
     }
   }
 
-  if (QSound::isAvailable() && !(isDND && checkOption(DisableSoundsWhenDND)) && checkOption(EnableSounds) && (record.notification.kinds & INotification::PlaySound)>0)
+  if (QSound::isAvailable() && !(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) && 
+    Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool() && (record.notification.kinds & INotification::PlaySound)>0)
   {
     QString soundName = record.notification.data.value(NDR_SOUND_FILE).toString();
     QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
@@ -249,7 +261,7 @@ int Notifications::appendNotification(const INotification &ANotification)
     }
   }
 
-  if (checkOption(EnableAutoActivate) && (record.notification.kinds & INotification::AutoActivate)>0)
+  if (Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).value().toBool() && (record.notification.kinds & INotification::AutoActivate)>0)
   {
     FDelayedActivations.append(notifyId);
     QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
@@ -307,24 +319,6 @@ void Notifications::removeNotification(int ANotifyId)
   }
 }
 
-bool Notifications::checkOption(INotifications::Option AOption) const
-{
-  return (FOptions & AOption) > 0;
-}
-
-void Notifications::setOption(INotifications::Option AOption, bool AValue)
-{
-  if (checkOption(AOption) != AValue)
-  {
-    AValue ? FOptions |= AOption : FOptions &= ~AOption;
-    if (AOption == EnableSounds)
-    {
-      FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, AValue ? MNI_NOTIFICATIONS_SOUND_ON : MNI_NOTIFICATIONS_SOUND_OFF);
-    }
-    emit optionChanged(AOption,AValue);
-  }
-}
-
 void Notifications::insertNotificator(const QString &AId, const QString &ATitle, uchar AKindMask, uchar ADefault)
 {
   if (!FNotificators.contains(AId))
@@ -345,8 +339,10 @@ uchar Notifications::notificatorKinds(const QString &AId) const
     Notificator &notificator = FNotificators[AId];
     if (notificator.kinds == 0xFF)
     {
-      ISettings *settings = FSettingsPlugin!=NULL ? FSettingsPlugin->settingsForPlugin(NOTIFICATIONS_UUID) : NULL;
-      notificator.kinds = settings!=NULL ? settings->valueNS(SVN_NOTIFICATORS,AId,notificator.defaults).toUInt() & notificator.kindMask : notificator.defaults;
+      if (Options::node(OPV_NOTIFICATIONS_ROOT).hasValue("notificator",AId))
+        notificator.kinds = Options::node(OPV_NOTIFICATIONS_NOTIFICATOR_ITEM,AId).value().toInt() & notificator.kindMask;
+      else
+        notificator.kindMask = notificator.defaults;
     }
     return notificator.kinds;
   }
@@ -359,14 +355,14 @@ void Notifications::setNotificatorKinds(const QString &AId, uchar AKinds)
   {
     Notificator &notificator = FNotificators[AId];
     notificator.kinds = AKinds & notificator.kindMask;
-    if (FSettingsPlugin)
-      FSettingsPlugin->settingsForPlugin(NOTIFICATIONS_UUID)->setValueNS(SVN_NOTIFICATORS,AId,notificator.kinds);
+    Options::node(OPV_NOTIFICATIONS_NOTIFICATOR_ITEM,AId).setValue(notificator.kinds);
   }
 }
 
 void Notifications::removeNotificator(const QString &AId)
 {
   FNotificators.remove(AId);
+  Options::node(OPV_NOTIFICATIONS_ROOT).removeChilds("notificator",AId);
 }
 
 QImage Notifications::contactAvatar(const Jid &AContactJid) const
@@ -424,7 +420,8 @@ void Notifications::onActivateDelayedActivations()
 
 void Notifications::onSoundOnOffActionTriggered(bool)
 {
-  setOption(EnableSounds, !checkOption(EnableSounds));
+  OptionsNode node = Options::node(OPV_NOTIFICATIONS_SOUND);
+  node.setValue(!node.value().toBool());
 }
 
 void Notifications::onTrayActionTriggered(bool)
@@ -442,13 +439,15 @@ void Notifications::onTrayActionTriggered(bool)
   }
 }
 
-void Notifications::onRosterNotifyActivated(IRosterIndex * /*AIndex*/, int ANotifyId)
+void Notifications::onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId)
 {
+  Q_UNUSED(AIndex);
   activateNotification(notifyIdByRosterId(ANotifyId));
 }
 
-void Notifications::onRosterNotifyRemoved(IRosterIndex * /*AIndex*/, int ANotifyId)
+void Notifications::onRosterNotifyRemoved(IRosterIndex *AIndex, int ANotifyId)
 {
+  Q_UNUSED(AIndex);
   removeNotification(notifyIdByRosterId(ANotifyId));
 }
 
@@ -492,30 +491,17 @@ void Notifications::onActionNotifyActivated(bool)
   }
 }
 
-void Notifications::onSettingsOpened()
+void Notifications::onOptionsOpened()
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(NOTIFICATIONS_UUID);
-  setOption(EnableRosterIcons, settings->value(SVN_ENABLE_ROSTERICONS,true).toBool());
-  setOption(EnablePopupWindows, settings->value(SVN_ENABLE_PUPUPWINDOWS,true).toBool());
-  setOption(EnableTrayIcons, settings->value(SVN_ENABLE_TRAYICONS,true).toBool());
-  setOption(EnableTrayActions, settings->value(SVN_ENABLE_TRAYACTIONS,true).toBool());
-  setOption(EnableSounds, settings->value(SVN_ENABLE_SOUNDS,true).toBool());
-  setOption(EnableAutoActivate, settings->value(SVN_ENABLE_AUTO_ACTIVATE,true).toBool());
-  setOption(ExpandRosterGroups, settings->value(SVN_EXPAND_ROSTER_GROUPS,true).toBool());
-  setOption(DisableSoundsWhenDND,settings->value(SVN_DISABLE_SOUNDS_WHEN_DND,false).toBool());
+  onOptionsChanged(Options::node(OPV_NOTIFICATIONS_SOUND));
 }
 
-void Notifications::onSettingsClosed()
+void Notifications::onOptionsChanged(const OptionsNode &ANode)
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(NOTIFICATIONS_UUID);
-  settings->setValue(SVN_ENABLE_ROSTERICONS,checkOption(EnableRosterIcons));
-  settings->setValue(SVN_ENABLE_PUPUPWINDOWS,checkOption(EnablePopupWindows));
-  settings->setValue(SVN_ENABLE_TRAYICONS,checkOption(EnableTrayIcons));
-  settings->setValue(SVN_ENABLE_TRAYACTIONS,checkOption(EnableTrayActions));
-  settings->setValue(SVN_ENABLE_SOUNDS,checkOption(EnableSounds));
-  settings->setValue(SVN_ENABLE_AUTO_ACTIVATE, checkOption(EnableAutoActivate));
-  settings->setValue(SVN_EXPAND_ROSTER_GROUPS, checkOption(ExpandRosterGroups));
-  settings->setValue(SVN_DISABLE_SOUNDS_WHEN_DND, checkOption(DisableSoundsWhenDND));
+  if (ANode.path() == OPV_NOTIFICATIONS_SOUND)
+  {
+    FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, ANode.value().toBool() ? MNI_NOTIFICATIONS_SOUND_ON : MNI_NOTIFICATIONS_SOUND_OFF);
+  }
 }
 
 Q_EXPORT_PLUGIN2(plg_notifications, Notifications)

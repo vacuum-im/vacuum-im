@@ -5,13 +5,15 @@ OptionsWidget::OptionsWidget(INotifications *ANotifications, QWidget *AParent) :
   ui.setupUi(this);
   FNotifications = ANotifications;
 
-  ui.chbEnableRosterIcons->setChecked(FNotifications->checkOption(INotifications::EnableRosterIcons));
-  ui.chbEnablePopupWindows->setChecked(FNotifications->checkOption(INotifications::EnablePopupWindows));
-  ui.chbEnableTrayIcons->setChecked(FNotifications->checkOption(INotifications::EnableTrayIcons));
-  ui.chbEnableSounds->setChecked(FNotifications->checkOption(INotifications::EnableSounds));
-  ui.chbEnableAutoActivate->setChecked(FNotifications->checkOption(INotifications::EnableAutoActivate));
-  ui.chbExpandRosterGroups->setChecked(FNotifications->checkOption(INotifications::ExpandRosterGroups));
-  ui.chbDisableSoundsWhenDND->setChecked(FNotifications->checkOption(INotifications::DisableSoundsWhenDND));
+  connect(ui.chbEnableRosterIcons,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbEnablePopupWindows,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbEnableTrayIcons,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbEnableSounds,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbEnableAutoActivate,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbExpandRosterGroups,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbDisableSoundsWhenDND,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  
+  reset();
 }
 
 OptionsWidget::~OptionsWidget()
@@ -19,24 +21,26 @@ OptionsWidget::~OptionsWidget()
 
 }
 
-void OptionsWidget::appendKindsWidget(NotifyKindsWidget *AWidget)
-{
-  layout()->addWidget(AWidget);
-  FKindsWidgets.append(AWidget);
-}
-
 void OptionsWidget::apply()
 {
-  foreach(NotifyKindsWidget *widget, FKindsWidgets)
-    widget->apply();
+  Options::node(OPV_NOTIFICATIONS_ROSTERICON).setValue(ui.chbEnableRosterIcons->isChecked());
+  Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).setValue(ui.chbEnablePopupWindows->isChecked());
+  Options::node(OPV_NOTIFICATIONS_TRAYICON).setValue(ui.chbEnableTrayIcons->isChecked());
+  Options::node(OPV_NOTIFICATIONS_SOUND).setValue(ui.chbEnableSounds->isChecked());
+  Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).setValue(ui.chbEnableAutoActivate->isChecked());
+  Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).setValue(ui.chbExpandRosterGroups->isChecked());
+  Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).setValue(ui.chbDisableSoundsWhenDND->isChecked());
+  emit childApply();
+}
 
-  FNotifications->setOption(INotifications::EnableRosterIcons,ui.chbEnableRosterIcons->isChecked());
-  FNotifications->setOption(INotifications::EnablePopupWindows,ui.chbEnablePopupWindows->isChecked());
-  FNotifications->setOption(INotifications::EnableTrayIcons,ui.chbEnableTrayIcons->isChecked());
-  FNotifications->setOption(INotifications::EnableSounds,ui.chbEnableSounds->isChecked());
-  FNotifications->setOption(INotifications::EnableAutoActivate,ui.chbEnableAutoActivate->isChecked());
-  FNotifications->setOption(INotifications::ExpandRosterGroups,ui.chbExpandRosterGroups->isChecked());
-  FNotifications->setOption(INotifications::DisableSoundsWhenDND,ui.chbDisableSoundsWhenDND->isChecked());
-
-  emit optionsAccepted();
+void OptionsWidget::reset()
+{
+  ui.chbEnableRosterIcons->setChecked(Options::node(OPV_NOTIFICATIONS_ROSTERICON).value().toBool());
+  ui.chbEnablePopupWindows->setChecked(Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).value().toBool());
+  ui.chbEnableTrayIcons->setChecked(Options::node(OPV_NOTIFICATIONS_TRAYICON).value().toBool());
+  ui.chbEnableSounds->setChecked(Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool());
+  ui.chbEnableAutoActivate->setChecked(Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).value().toBool());
+  ui.chbExpandRosterGroups->setChecked(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool());
+  ui.chbDisableSoundsWhenDND->setChecked(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool());
+  emit childReset();
 }

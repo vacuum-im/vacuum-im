@@ -18,14 +18,8 @@ public:
   virtual QImage avatarImage(const Jid &AContactJid) const =0;
   virtual bool setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat = NULL) =0;
   virtual QString setCustomPictire(const Jid &AContactJid, const QString &AImageFile) =0;
-  virtual bool avatarsVisible() const =0;
-  virtual void setAvatarsVisible(bool AVisible) =0;
-  virtual bool showEmptyAvatars() const =0;
-  virtual void setShowEmptyAvatars(bool AShow) =0;
 protected:
   virtual void avatarChanged(const Jid &AContactJid) =0;
-  virtual void avatarsVisibleChanged(bool AVisible) =0;
-  virtual void showEmptyAvatarsChanged(bool AShow) =0;
 };
 
 Q_DECLARE_INTERFACE(IAvatars,"Vacuum.Plugin.IAvatars/1.0")
