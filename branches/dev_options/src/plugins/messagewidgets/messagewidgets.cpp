@@ -1,30 +1,10 @@
 #include "messagewidgets.h"
 
-#define SVN_TAB_WINDOWS_ENABLED     "tabWindowsEnabled"
-#define SVN_CHATWINDOW_SHOW_STATUS  "chatWindowShowStatus"
-#define SVN_EDITOR_AUTO_RESIZE      "editorAutoResize"
-#define SVN_SHOW_INFO_WIDGET        "showInfoWidget"
-#define SVN_EDITOR_MINIMUM_LINES    "editorMinimumLines"
-#define SVN_EDITOR_SEND_KEY         "editorSendKey"
-#define SVN_DEFAULT_TABWINDOW       "defaultTabWindow"
-#define SVN_TABWINDOW               "tabWindow[]"
-#define SVN_TABWINDOW_NAME          SVN_TABWINDOW":name"
-#define SVN_TABPAGE                 "tabPage[]"
-#define SVN_TABPAGE_PAGEID          SVN_TABPAGE":pageId"
-
-
 MessageWidgets::MessageWidgets()
 {
   FPluginManager = NULL;
   FXmppStreams = NULL;
-  FSettingsPlugin = NULL;
-
-  FTabWindowsEnabled = true;
-  FChatWindowShowStatus = true;
-  FEditorAutoResize = true;
-  FShowInfoWidgetInChatWindow = true;
-  FEditorMinimumLines = 1;
-  FEditorSendKey = Qt::Key_Return;
+  FOptionsManager = NULL;
 }
 
 MessageWidgets::~MessageWidgets()
@@ -45,16 +25,10 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &/*AIni
 {
   FPluginManager = APluginManager;
 
-  IPlugin *plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin) 
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    }
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
   }
 
   plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
@@ -69,36 +43,62 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &/*AIni
     }
   }
 
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+  connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+
   return true;
 }
 
 bool MessageWidgets::initObjects()
 {
-  if (FSettingsPlugin)
-  {
-    FSettingsPlugin->openOptionsNode(OPN_MESSAGES,tr("Messages"),tr("Message window options"),MNI_NORMAL_MHANDLER_MESSAGE,ONO_MESSAGES);
-    FSettingsPlugin->insertOptionsHolder(this);
-  }
   insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
   return true;
 }
 
-QWidget *MessageWidgets::optionsWidget(const QString &ANode, int &AOrder)
+bool MessageWidgets::initSettings()
 {
-  if (ANode == OPN_MESSAGES)
+  Options::registerOption(OPV_MESSAGES_SHOWSTATUS,true,tr("Show status changes in chat windows"));
+  Options::registerOption(OPV_MESSAGES_EDITORAUTORESIZE,true,tr("Auto resize input field"));
+  Options::registerOption(OPV_MESSAGES_SHOWINFOWIDGET,true,tr("Show contact information in chat windows"));
+  Options::registerOption(OPV_MESSAGES_EDITORMINIMUMLINES,1,tr("Minimum input field lines"));
+  Options::registerOption(OPV_MESSAGES_EDITORSENDKEY,QKeySequence(Qt::Key_Return),tr("Send message key sequence"));
+  Options::registerOption(OPV_MESSAGES_TABWINDOWS_ROOT,QVariant(),tr("Tab windows"));
+  Options::registerOption(OPV_MESSAGES_TABWINDOWS_ENABLE,true,tr("Enable tab windows"));
+  Options::registerOption(OPV_MESSAGES_TABWINDOWS_DEFAULT,QVariant(),tr("Default tab window"));
+  Options::registerOption(OPV_MESSAGES_TABWINDOW_ITEM,QVariant(),tr("Tab window"));
+  Options::registerOption(OPV_MESSAGES_TABWINDOW_NAME,tr("Tab Window"),tr("Tab window name"));
+  Options::registerOption(OPV_MESSAGES_TABWINDOW_TABSCLOSABLE,true,tr("Tabs closable"));
+
+  if (FOptionsManager)
+  {
+    IOptionsDialogNode dnode = { ONO_MESSAGES, OPN_MESSAGES, tr("Messages"), tr("Message window options"), MNI_NORMAL_MHANDLER_MESSAGE };
+    FOptionsManager->insertOptionsDialogNode(dnode);
+    FOptionsManager->insertOptionsHolder(this);
+  }
+  return true;
+}
+
+IOptionsWidget *MessageWidgets::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+{
+  if (ANodeId == OPN_MESSAGES)
   {
     AOrder = OWO_MESSAGES;
-    MessengerOptions *widget = new MessengerOptions(this);
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
+    IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
+    container->appendChild(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE));
+    container->appendChild(Options::node(OPV_MESSAGES_SHOWSTATUS));
+    container->appendChild(Options::node(OPV_MESSAGES_EDITORAUTORESIZE));
+    container->appendChild(Options::node(OPV_MESSAGES_SHOWINFOWIDGET));
+    container->appendChild(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES));
+    container->appendChild(Options::node(OPV_MESSAGES_EDITORSENDKEY));
+    return container;
   }
   return NULL;
 }
 
-bool MessageWidgets::viewUrlOpen(IViewWidget * /*APage*/, const QUrl &AUrl, int /*AOrder*/)
+bool MessageWidgets::viewUrlOpen(IViewWidget *APage, const QUrl &AUrl, int AOrder)
 {
+  Q_UNUSED(APage);
+  Q_UNUSED(AOrder);
   return QDesktopServices::openUrl(AUrl);
 }
 
@@ -218,7 +218,10 @@ IChatWindow *MessageWidgets::findChatWindow(const Jid &AStreamJid, const Jid &AC
 
 QList<QUuid> MessageWidgets::tabWindowList() const
 {
-  return FAvailTabWindows.keys();
+  QList<QUuid> list;
+  foreach(QString tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
+    list.append(tabWindowId);
+  return list;
 }
 
 QUuid MessageWidgets::appendTabWindow(const QString &AName)
@@ -227,41 +230,46 @@ QUuid MessageWidgets::appendTabWindow(const QString &AName)
   QString name = AName;
   if (name.isEmpty())
   {
+    QList<QString> names;
+    foreach(QString tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
+      names.append(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,tabWindowId).value().toString());
+
     int i = 0;
-    QList<QString> names = FAvailTabWindows.values();
     do 
     {
       i++;
       name = tr("Tab Window %1").arg(i);
     } while (names.contains(name));
   }
-  FAvailTabWindows.insert(id,name);
+  Options::node(OPV_MESSAGES_TABWINDOW_ITEM,id.toString()).setValue(name,"name");
   emit tabWindowAppended(id,name);
   return id;
 }
 
 void MessageWidgets::deleteTabWindow(const QUuid &AWindowId)
 {
-  if (FDefaultTabWindow!=AWindowId && FAvailTabWindows.contains(AWindowId))
+  if (AWindowId!=Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString() && tabWindowList().contains(AWindowId))
   {
     ITabWindow *window = findTabWindow(AWindowId);
     if (window)
       window->instance()->deleteLater();
-    FAvailTabWindows.remove(AWindowId);
+    Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).removeChilds("window",AWindowId.toString());
     emit tabWindowDeleted(AWindowId);
   }
 }
 
 QString MessageWidgets::tabWindowName(const QUuid &AWindowId) const
 {
-  return FAvailTabWindows.value(AWindowId);
+  if (tabWindowList().contains(AWindowId))
+    return Options::node(OPV_MESSAGES_TABWINDOW_ITEM,AWindowId.toString()).value("name").toString();
+  return Options::defaultValue(OPV_MESSAGES_TABWINDOW_NAME).toString();
 }
 
 void MessageWidgets::setTabWindowName(const QUuid &AWindowId, const QString &AName)
 {
-  if (!AName.isEmpty() && FAvailTabWindows.contains(AWindowId))
+  if (!AName.isEmpty() && tabWindowList().contains(AWindowId))
   {
-    FAvailTabWindows.insert(AWindowId,AName);
+    Options::node(OPV_MESSAGES_TABWINDOW_ITEM,AWindowId.toString()).setValue(AName,"name");
     emit tabWindowNameChanged(AWindowId,AName);
   }
 }
@@ -296,116 +304,16 @@ ITabWindow *MessageWidgets::findTabWindow(const QUuid &AWindowId) const
 
 void MessageWidgets::assignTabWindowPage(ITabWindowPage *APage)
 {
-  if (tabWindowsEnabled())
+  if (Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
   {
-    QUuid windowId = FDefaultTabWindow;
-    if (FSettingsPlugin)
-    {
-      ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
-      windowId = settings->valueNS(SVN_TABPAGE_PAGEID,APage->tabPageId(),windowId.toString()).toString();
-    }
-    if (!FAvailTabWindows.contains(windowId))
-      windowId = FDefaultTabWindow;
+    QList<QUuid> availWindows = tabWindowList();
+    QUuid windowId = FPageWindows.value(APage->tabPageId());
+    if (!availWindows.contains(windowId))
+      windowId = Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString();
+    if (!availWindows.contains(windowId))
+      windowId = availWindows.value(0);
     ITabWindow *window = openTabWindow(windowId);
     window->addPage(APage);
-  }
-}
-
-bool MessageWidgets::tabWindowsEnabled() const
-{
-  return FTabWindowsEnabled;
-}
-
-void MessageWidgets::setTabWindowsEnabled(bool AEnabled)
-{
-  if (FTabWindowsEnabled != AEnabled)
-  {
-    FTabWindowsEnabled = AEnabled;
-    emit tabWindowsEnabledChanged(AEnabled);
-  }
-}
-
-QUuid MessageWidgets::defaultTabWindow() const
-{
-  return FDefaultTabWindow;
-}
-
-void MessageWidgets::setDefaultTabWindow(const QUuid &AWindowId)
-{
-  if (FDefaultTabWindow!=AWindowId && FAvailTabWindows.contains(AWindowId))
-  {
-    FDefaultTabWindow = AWindowId;
-    emit defaultTabWindowChanged(AWindowId);
-  }
-}
-
-bool MessageWidgets::chatWindowShowStatus() const
-{
-  return FChatWindowShowStatus;
-}
-
-void MessageWidgets::setChatWindowShowStatus(bool AShow)
-{
-  if (FChatWindowShowStatus != AShow)
-  {
-    FChatWindowShowStatus = AShow;
-    emit chatWindowShowStatusChanged(AShow);
-  }
-}
-
-bool MessageWidgets::editorAutoResize() const
-{
-  return FEditorAutoResize;
-}
-
-void MessageWidgets::setEditorAutoResize(bool AResize)
-{
-  if (FEditorAutoResize != AResize)
-  {
-    FEditorAutoResize = AResize;
-    emit editorAutoResizeChanged(AResize);
-  }
-}
-
-bool MessageWidgets::showInfoWidgetInChatWindow() const
-{
-  return FShowInfoWidgetInChatWindow;
-}
-
-void MessageWidgets::setShowInfoWidgetInChatWindow(bool AShow)
-{
-  if (FShowInfoWidgetInChatWindow != AShow)
-  {
-    FShowInfoWidgetInChatWindow = AShow;
-    emit showInfoWidgetInChatWindowChanged(AShow);
-  }
-}
-
-int MessageWidgets::editorMinimumLines() const
-{
-  return FEditorMinimumLines;
-}
-
-void MessageWidgets::setEditorMinimumLines(int ALines)
-{
-  if (FEditorMinimumLines!=ALines && ALines>0)
-  {
-    FEditorMinimumLines = ALines;
-    emit editorMinimumLinesChanged(ALines);
-  }
-}
-
-QKeySequence MessageWidgets::editorSendKey() const
-{
-  return FEditorSendKey;
-}
-
-void MessageWidgets::setEditorSendKey(const QKeySequence &AKey)
-{
-  if (FEditorSendKey!=AKey && !AKey.isEmpty())
-  {
-    FEditorSendKey = AKey;
-    emit editorSendKeyChanged(AKey);
   }
 }
 
@@ -536,13 +444,12 @@ void MessageWidgets::onChatWindowDestroyed()
 void MessageWidgets::onTabWindowPageAdded(ITabWindowPage *APage)
 {
   ITabWindow *window = qobject_cast<ITabWindow *>(sender());
-  if (FSettingsPlugin && window)
+  if (window)
   {
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
-    if (window->windowId() != FDefaultTabWindow)
-      settings->setValueNS(SVN_TABPAGE_PAGEID,APage->tabPageId(),window->windowId().toString());
+    if (window->windowId() != Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
+      FPageWindows.insert(APage->tabPageId(), window->windowId());
     else
-      settings->deleteNS(APage->tabPageId());
+      FPageWindows.remove(APage->tabPageId());
   }
 }
 
@@ -567,46 +474,26 @@ void MessageWidgets::onStreamRemoved(IXmppStream *AXmppStream)
   deleteStreamWindows(AXmppStream->streamJid());
 }
 
-void MessageWidgets::onSettingsOpened()
+void MessageWidgets::onOptionsOpened()
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
-  setTabWindowsEnabled(settings->value(SVN_TAB_WINDOWS_ENABLED,true).toBool());
-  setChatWindowShowStatus(settings->value(SVN_CHATWINDOW_SHOW_STATUS,true).toBool());
-  setEditorAutoResize(settings->value(SVN_EDITOR_AUTO_RESIZE,true).toBool());
-  setShowInfoWidgetInChatWindow(settings->value(SVN_SHOW_INFO_WIDGET,true).toBool());
-  setEditorMinimumLines(settings->value(SVN_EDITOR_MINIMUM_LINES,1).toInt());
-  setEditorSendKey(QKeySequence::fromString(settings->value(SVN_EDITOR_SEND_KEY,FEditorSendKey.toString()).toString()));
+  if (tabWindowList().isEmpty())
+    appendTabWindow(tr("Main Tab Window"));
 
-  QHash<QString, QVariant> windows = settings->values(SVN_TABWINDOW_NAME);
-  for (QHash<QString, QVariant>::const_iterator it = windows.constBegin(); it!=windows.constEnd(); it++)
-    FAvailTabWindows.insert(it.key(),it.value().toString());
+  if (!tabWindowList().contains(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString()))
+    Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).setValue(tabWindowList().value(0).toString());
 
-  FDefaultTabWindow = settings->value(SVN_DEFAULT_TABWINDOW).toString();
-  if (!FAvailTabWindows.contains(FDefaultTabWindow))
-    FDefaultTabWindow = appendTabWindow(tr("Main Tab Window"));
+  QByteArray data = Options::fileValue("messages.tab-window-pages").toByteArray();
+  QDataStream stream(data);
+  stream >> FPageWindows;
 }
 
-void MessageWidgets::onSettingsClosed()
+void MessageWidgets::onOptionsClosed()
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
-  settings->setValue(SVN_TAB_WINDOWS_ENABLED,tabWindowsEnabled());
-  settings->setValue(SVN_DEFAULT_TABWINDOW,FDefaultTabWindow.toString());
-  settings->setValue(SVN_CHATWINDOW_SHOW_STATUS,chatWindowShowStatus());
-  settings->setValue(SVN_EDITOR_AUTO_RESIZE,editorAutoResize());
-  settings->setValue(SVN_SHOW_INFO_WIDGET,showInfoWidgetInChatWindow());
-  settings->setValue(SVN_EDITOR_MINIMUM_LINES,editorMinimumLines());
-  settings->setValue(SVN_EDITOR_SEND_KEY,FEditorSendKey.toString());
+  QByteArray data;
+  QDataStream stream(&data, QIODevice::WriteOnly);
+  stream << FPageWindows;
+  Options::setFileValue(data,"messages.tab-window-pages");
 
-  QSet<QString> oldTabWindows = settings->values(SVN_TABWINDOW_NAME).keys().toSet();
-  for (QMap<QUuid, QString>::const_iterator it = FAvailTabWindows.constBegin(); it!=FAvailTabWindows.constEnd(); it++)
-  {
-    settings->setValueNS(SVN_TABWINDOW_NAME,it.key(),it.value());
-    oldTabWindows -= it.key().toString();
-  }
-  foreach(QString windowId, oldTabWindows)
-  {
-    settings->deleteNS(windowId);
-  }
   deleteWindows();
 }
 

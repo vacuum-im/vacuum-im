@@ -1462,7 +1462,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
   {
     window->infoWidget()->setField(IInfoWidget::ContactShow,AShow);
     window->infoWidget()->setField(IInfoWidget::ContactStatus,AStatus);
-    if (FMessageWidgets->chatWindowShowStatus())
+    if (Options::node(OPV_MESSAGES_SHOWSTATUS).value().toBool())
     {
       QString show = FStatusChanger ? FStatusChanger->nameByShow(AShow) : QString::null;
       WindowStatus &wstatus = FWindowStatus[window->viewWidget()];

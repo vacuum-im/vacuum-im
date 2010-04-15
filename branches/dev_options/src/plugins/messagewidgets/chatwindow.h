@@ -1,11 +1,12 @@
 #ifndef CHATWINDOW_H
 #define CHATWINDOW_H
 
+#include <definations/optionvalues.h>
 #include <definations/messagedataroles.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istatuschanger.h>
-#include <interfaces/isettings.h>
+#include <utils/options.h>
 #include <utils/widgetmanager.h>
 #include "ui_chatwindow.h"
 
@@ -58,13 +59,12 @@ protected:
 protected slots:
   void onMessageReady();
   void onStreamJidChanged(const Jid &ABefour);
-  void onShowInfoWidgetChanged(bool AShow);
+  void onOptionsChanged(const OptionsNode &ANode);
 private:
   Ui::ChatWindowClass ui;
 private:
   IMessageWidgets *FMessageWidgets;
   IStatusChanger *FStatusChanger;
-  ISettings *FSettings;
 private:
   IInfoWidget *FInfoWidget;
   IViewWidget *FViewWidget;

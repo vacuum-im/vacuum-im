@@ -63,8 +63,21 @@
 
 // MessageWidgets
 #define OPV_MESSAGES_ROOT                               "messages"
+#define OPV_MESSAGES_SHOWSTATUS                         "messages.show-status-changes"
+#define OPV_MESSAGES_SHOWINFOWIDGET                     "messages.show-info-widget"
+#define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
+#define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
+#define OPV_MESSAGES_EDITORSENDKEY                      "messages.editor-send-key"
+#define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
+#define OPV_MESSAGES_TABWINDOWS_ENABLE                  "messages.tab-windows.enable"
+#define OPV_MESSAGES_TABWINDOWS_DEFAULT                 "messages.tab-windows.default"
+#define OPV_MESSAGES_TABWINDOW_ITEM                     "messages.tab-windows.window"
+#define OPV_MESSAGES_TABWINDOW_NAME                     "messages.tab-windows.window.name"
+#define OPV_MESSAGES_TABWINDOW_TABSCLOSABLE             "messages.tab-windows.window.tabs-closable"
 // Emoticons
 #define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
+// ChatStates
+#define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
 
 // MessageStyles
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"

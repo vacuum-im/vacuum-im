@@ -40,7 +40,7 @@ protected:
   void initialize();
   void updateFieldLabel(IInfoWidget::InfoField AField);
 protected slots:
-  void onAccountChanged(const QString &AName, const QVariant &AValue);  
+  void onAccountChanged(const OptionsNode &ANode);  
   void onRosterItemReceived(const IRosterItem &ARosterItem);
   void onPresenceReceived(const IPresenceItem &APresenceItem);
   void onAvatarChanged(const Jid &AContactJid);

@@ -59,6 +59,7 @@ OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, 
   }
   else if (FValue.canConvert(QVariant::String))
   {
+    FLineEdit = new QLineEdit(this);
     if (FValue.type()==QVariant::Int || FValue.type()==QVariant::LongLong)
     {
       QIntValidator *validator = new QIntValidator(FLineEdit);
@@ -79,6 +80,7 @@ OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, 
     {
       FLineEdit->installEventFilter(this);
     }
+    FLineEdit->setText(FValue.toString());
     connect(FLineEdit,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
     insertCaption(ACaption,FLineEdit);
     layout()->addWidget(FLineEdit);

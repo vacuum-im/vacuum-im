@@ -11,6 +11,7 @@
 #include <definations/soundfiles.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
+#include <definations/optionvalues.h>
 #include <definations/toolbargroups.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imessagewidgets.h>

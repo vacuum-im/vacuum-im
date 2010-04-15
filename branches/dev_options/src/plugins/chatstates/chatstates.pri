@@ -1,9 +1,5 @@
-FORMS = stateoptionswidget.ui
-
 HEADERS = chatstates.h \
-          statewidget.h \
-          stateoptionswidget.h
+          statewidget.h
 
 SOURCES = chatstates.cpp \
-          statewidget.cpp \
-          stateoptionswidget.cpp
+          statewidget.cpp

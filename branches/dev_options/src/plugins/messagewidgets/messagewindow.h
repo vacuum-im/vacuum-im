@@ -8,7 +8,7 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/istatusicons.h>
-#include <interfaces/isettings.h>
+#include <utils/options.h>
 #include <utils/errorhandler.h>
 #include <utils/widgetmanager.h>
 #include "ui_messagewindow.h"
@@ -92,7 +92,6 @@ private:
   IToolBarWidget *FEditToolBarWidget;
 private:
   IMessageWidgets *FMessageWidgets;
-  ISettings *FSettings;
 private:
   Mode FMode;
   int FNextCount;

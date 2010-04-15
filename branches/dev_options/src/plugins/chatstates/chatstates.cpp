@@ -2,9 +2,7 @@
 
 #include <QSet>
 #include <QDateTime>
-
-#define SVN_ENABLED               "enabled"
-#define SVN_PERMIT_STATUS         "permitStatus[]"
+#include <QDataStream>
 
 #define SHC_CONTENT_MESSAGES      "/message[@type='chat']/body"
 #define SHC_STATE_MESSAGES        "/message[@type='chat']/[@xmlns='" NS_CHATSTATES "']"
@@ -27,13 +25,12 @@ ChatStates::ChatStates()
   FPresencePlugin = NULL;
   FMessageWidgets = NULL;
   FStanzaProcessor = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
   FDiscovery = NULL;
   FMessageArchiver = NULL;
   FDataForms = NULL;
   FSessionNegotiation = NULL;
 
-  FEnabled = true;
   FUpdateTimer.setSingleShot(false);
   FUpdateTimer.setInterval(5000);
   connect(&FUpdateTimer,SIGNAL(timeout()),SLOT(onUpdateSelfStates()));
@@ -88,15 +85,10 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0);
   if (plugin)
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
   }
 
   plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0);
@@ -126,23 +118,38 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+  connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+
   return FPresencePlugin!=NULL && FMessageWidgets!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool ChatStates::initObjects()
 {
   if (FDiscovery)
+  {
     registerDiscoFeatures();
-
+  }
   if (FMessageArchiver)
+  {
     FMessageArchiver->insertArchiveHandler(this,AHO_DEFAULT);
-
-  if (FSettingsPlugin)
-    FSettingsPlugin->insertOptionsHolder(this);
-
+  }
   if (FSessionNegotiation && FDataForms)
+  {
     FSessionNegotiation->insertNegotiator(this,SNO_DEFAULT);
+  }
+  return true;
+}
 
+bool ChatStates::initSettings()
+{
+  Options::registerOption(OPV_MESSAGES_CHATSTATESENABLED,true,tr("Send chat state notifications"));
+
+  if (FOptionsManager)
+  {
+    FOptionsManager->insertOptionsHolder(this);
+  }
   return true;
 }
 
@@ -152,8 +159,11 @@ bool ChatStates::startPlugin()
   return true;
 }
 
-bool ChatStates::archiveMessage(int /*AOrder*/, const Jid &/*AStreamJid*/, Message &AMessage, bool /*ADirectionIn*/)
+bool ChatStates::archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
 {
+  Q_UNUSED(AOrder);
+  Q_UNUSED(AStreamJid);
+  Q_UNUSED(ADirectionIn);
   if (!AMessage.stanza().firstElement(QString::null,NS_CHATSTATES).isNull())
   {
     AMessage.detach();
@@ -163,16 +173,12 @@ bool ChatStates::archiveMessage(int /*AOrder*/, const Jid &/*AStreamJid*/, Messa
   return true;
 }
 
-QWidget *ChatStates::optionsWidget(const QString &ANode, int &AOrder)
+IOptionsWidget *ChatStates::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
-  if (ANode == OPN_MESSAGES)
+  if (FOptionsManager && ANodeId == OPN_MESSAGES)
   {
     AOrder = OWO_MESSAGES_CHATSTATES;
-    StateOptionsWidget *widget = new StateOptionsWidget(this);
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
+    return FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),AParent);
   }
   return NULL;
 }
@@ -280,8 +286,9 @@ int ChatStates::sessionApply(const IStanzaSession &ASession)
   return ISessionNegotiator::Skip;
 }
 
-void ChatStates::sessionLocalize(const IStanzaSession &/*ASession*/, IDataForm &AForm)
+void ChatStates::sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm)
 {
+  Q_UNUSED(ASession);
   int index = FDataForms!=NULL ? FDataForms->fieldIndex(NS_CHATSTATES,AForm.fields) : -1;
   if (index >= 0)
   {
@@ -297,8 +304,9 @@ void ChatStates::sessionLocalize(const IStanzaSession &/*ASession*/, IDataForm &
   }
 }
 
-bool ChatStates::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &/*AAccept*/)
+bool ChatStates::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
+  Q_UNUSED(AAccept);
   if (FSHIMessagesOut.value(AStreamJid)==AHandlerId && FChatParams.contains(AStreamJid))
   {
     bool stateSent = false;
@@ -358,22 +366,6 @@ bool ChatStates::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza 
   return false;
 }
 
-bool ChatStates::isEnabled() const
-{
-  return FEnabled;
-}
-
-void ChatStates::setEnabled(bool AEnabled)
-{
-  if (FEnabled != AEnabled)
-  {
-    if (AEnabled)
-      resetSupported();
-    FEnabled = AEnabled;
-    emit chatStatesEnabled(AEnabled);
-  }
-}
-
 int ChatStates::permitStatus(const Jid &AContactJid) const
 {
   return FPermitStatus.value(AContactJid.bare(),IChatStates::StatusDefault);
@@ -415,7 +407,7 @@ bool ChatStates::isEnabled(const Jid &AStreamJid, const Jid &AContactJid) const
     return false;
 
   int status = permitStatus(AContactJid);
-  return (isEnabled() || status==IChatStates::StatusEnable) && status!=IChatStates::StatusDisable;
+  return (Options::node(OPV_MESSAGES_CHATSTATESENABLED).value().toBool() || status==IChatStates::StatusEnable) && status!=IChatStates::StatusDisable;
 }
 
 bool ChatStates::isSupported(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -673,44 +665,29 @@ void ChatStates::onUpdateSelfStates()
   }
 }
 
-void ChatStates::onSettingsOpened()
+void ChatStates::onOptionsOpened()
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-  if (settings)
-  {
-    FEnabled = settings->value(SVN_ENABLED,true).toBool();
+  QByteArray data = Options::fileValue("messages.chatstates.permit-status").toByteArray();
+  QDataStream stream(data);
+  stream >> FPermitStatus;
 
-    FPermitStatus.clear();
-    QHash<QString,QVariant> permits = settings->values(SVN_PERMIT_STATUS);
-    QHash<QString,QVariant>::const_iterator it = permits.constBegin();
-    while (it != permits.constEnd())
-    {
-      int status = it.value().toInt();
-      if (status==IChatStates::StatusEnable || status==IChatStates::StatusDisable)
-        FPermitStatus.insert(it.key(),status);
-      it++;
-    }
-  }
+  onOptionsChanged(Options::node(OPV_MESSAGES_CHATSTATESENABLED));
 }
 
-void ChatStates::onSettingsClosed()
+void ChatStates::onOptionsClosed()
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-  if (settings)
+  QByteArray data;
+  QDataStream stream(&data, QIODevice::WriteOnly);
+  stream << FPermitStatus;
+  Options::setFileValue(data,"messages.chatstates.permit-status");
+}
+
+void ChatStates::onOptionsChanged(const OptionsNode &ANode)
+{
+  if (ANode.path() == OPV_MESSAGES_CHATSTATESENABLED)
   {
-    settings->setValue(SVN_ENABLED,FEnabled);
-
-    QSet<QString> oldPermits = settings->values(SVN_PERMIT_STATUS).keys().toSet();
-    QMap<Jid,int>::const_iterator it = FPermitStatus.constBegin();
-    while (it != FPermitStatus.constEnd())
-    {
-      oldPermits -= it.key().pBare();
-      settings->setValueNS(SVN_PERMIT_STATUS,it.key().pBare(),it.value());
-      it++;
-    }
-
-    foreach(QString ns, oldPermits)
-      settings->deleteValueNS(SVN_PERMIT_STATUS,ns);
+    if (ANode.value().toBool())
+      resetSupported();
   }
 }
 
