@@ -6,10 +6,9 @@
 #include <QVariant>
 #include <QIODevice>
 #include <interfaces/ioptionsmanager.h>
+#include <utils/jid.h>
+#include <utils/stanza.h>
 #include <utils/options.h>
-
-class Jid;
-class Stanza;
 
 #define DATASTREAMSMANAGER_UUID "{b293dfe1-d8c3-445f-8e7f-b94cc78ec51b}"
 

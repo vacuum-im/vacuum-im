@@ -250,7 +250,7 @@ void SocksStreams::onXmppStreamClosed(IXmppStream *AStream)
 
 void SocksStreams::onDiscoItemsReceived(const IDiscoItems &AItems)
 {
-  if (AItems.contactJid == AItems.streamJid.domain())
+  if (AItems.contactJid == AItems.streamJid.domain() && AItems.node.isEmpty())
   {
     FStreamProxy.remove(AItems.streamJid);
     Jid proxyJid = "proxy." + AItems.streamJid.domain();
@@ -258,7 +258,7 @@ void SocksStreams::onDiscoItemsReceived(const IDiscoItems &AItems)
     {
       if (item.itemJid == proxyJid)
       {
-        FStreamProxy.insert(AItems.streamJid, item.itemJid.full());
+        FStreamProxy.insert(AItems.streamJid, item.itemJid.pBare());
         break;
       }
     }

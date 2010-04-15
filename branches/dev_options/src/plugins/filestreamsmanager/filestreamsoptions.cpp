@@ -9,26 +9,12 @@ FileStreamsOptions::FileStreamsOptions(IDataStreamsManager *ADataManager, IFileS
   FDataManager = ADataManager;
   FFileManager = AFileManager;
 
-  ui.lneDirectory->setText(FFileManager->defaultDirectory());
-  ui.chbSeparateDirectories->setChecked(FFileManager->separateDirectories());
-
-  ui.grbMethods->setLayout(new QVBoxLayout);
-  foreach(QString methodNS, FDataManager->methods())
-  {
-    IDataStreamMethod *streamMethod = FDataManager->method(methodNS);
-    if (streamMethod)
-    {
-      QCheckBox *button = new QCheckBox(streamMethod->methodName());
-      button->setToolTip(streamMethod->methodDescription());
-      connect(button, SIGNAL(toggled(bool)),SLOT(onMethodButtonToggled(bool)));
-      FMethods.insert(button, methodNS);
-      button->setChecked(FFileManager->streamMethods().contains(methodNS));
-      ui.grbMethods->layout()->addWidget(button);
-    }
-  }
-  ui.cmbMethod->setCurrentIndex(ui.cmbMethod->findData(FFileManager->defaultStreamMethod()));
-
   connect(ui.pbtDirectory, SIGNAL(clicked()), SLOT(onDirectoryButtonClicked()));
+
+  connect(ui.lneDirectory,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+  connect(ui.cmbMethod,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
+
+  reset();
 }
 
 FileStreamsOptions::~FileStreamsOptions()
@@ -38,26 +24,47 @@ FileStreamsOptions::~FileStreamsOptions()
 
 void FileStreamsOptions::apply()
 {
-  FFileManager->setDefaultDirectory(ui.lneDirectory->text());
-  FFileManager->setSeparateDirectories(ui.chbSeparateDirectories->isChecked());
+  Options::node(OPV_FILESTREAMS_DEFAULTDIR).setValue(ui.lneDirectory->text());
 
-  QList<QString> oldMethods = FFileManager->streamMethods();
+  QStringList acceptableMethods;
   foreach(QCheckBox *button, FMethods.keys())
-  {
     if (button->isChecked())
+      acceptableMethods.append(FMethods.value(button));
+  Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).setValue(acceptableMethods);
+
+  Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).setValue(ui.cmbMethod->itemData(ui.cmbMethod->currentIndex()).toString());
+
+  emit childApply();
+}
+
+void FileStreamsOptions::reset()
+{
+  ui.lneDirectory->setText(Options::node(OPV_FILESTREAMS_DEFAULTDIR).value().toString());
+
+  ui.grbMethods->setLayout(new QVBoxLayout);
+  QStringList acceptableMethods = Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList();
+  foreach(QString methodNS, FDataManager->methods())
+  {
+    IDataStreamMethod *streamMethod = FDataManager->method(methodNS);
+    if (streamMethod)
     {
-      QString methodNS = FMethods.value(button);
-      FFileManager->insertStreamMethod(methodNS);
-      oldMethods.removeAt(oldMethods.indexOf(methodNS));
+      QCheckBox *button = FMethods.key(methodNS);
+      if (!button)
+      {
+        button = new QCheckBox(streamMethod->methodName());
+        button->setToolTip(streamMethod->methodDescription());
+        connect(button, SIGNAL(toggled(bool)),SLOT(onMethodButtonToggled(bool)));
+        connect(button, SIGNAL(stateChanged(int)),SIGNAL(modified()));
+        ui.grbMethods->layout()->addWidget(button);
+        FMethods.insert(button, methodNS);
+      }
+      button->setChecked(acceptableMethods.contains(methodNS));
     }
   }
 
-  foreach(QString methodNS, oldMethods)
-    FFileManager->removeStreamMethod(methodNS);
-  
-  FFileManager->setDefaultStreamMethod(ui.cmbMethod->itemData(ui.cmbMethod->currentIndex()).toString());
+  ui.cmbMethod->setCurrentIndex(ui.cmbMethod->findData(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString()));
 
-  emit optionsAccepted();
+  emit childReset();
 }
 
 void FileStreamsOptions::onDirectoryButtonClicked()

@@ -46,6 +46,16 @@
 #define OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY       "datastreams.settings-profile.method.use-account-network-proxy"
 #define OPV_DATASTREAMS_METHOD_NETWORKPROXY             "datastreams.settings-profile.method.network-proxy"
 
+// FileStreamsManager
+#define OPV_FILESTREAMS_DEFAULTDIR                      "filestreams.default-dir"
+#define OPV_FILESTREAMS_DEFAULTMETHOD                   "filestreams.default-method"
+#define OPV_FILESTREAMS_ACCEPTABLEMETHODS               "filestreams.acceptable-methods"
+// FileTransfer
+#define OPV_FILETRANSFER_ROOT                           "filestreams.filetransfer"
+#define OPV_FILETRANSFER_AUTORECEIVE                    "filestreams.filetransfer.autoreceive"
+#define OPV_FILETRANSFER_HIDEONSTART                    "filestreams.filetransfer.hide-dialog-on-start"
+#define OPV_FILETRANSFER_REMOVEONFINISH                 "filestreams.filetransfer.remove-stream-on-finish"
+
 // MainWindow
 #define OPV_MAINWINDOW_SHOW                             "mainwindow.show"
 #define OPV_MAINWINDOW_SIZE                             "mainwindow.size"

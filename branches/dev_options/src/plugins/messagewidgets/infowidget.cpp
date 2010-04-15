@@ -299,9 +299,9 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
 
 void InfoWidget::onAccountChanged(const QString &AName, const QVariant &AValue)
 {
-  //Q_UNUSED(AValue);
-  //if (isFiledAutoUpdated(AccountName) && AName == AVN_NAME)
-  //  autoUpdateField(AccountName);
+  Q_UNUSED(AValue);
+  if (isFiledAutoUpdated(AccountName) && AName == AVN_NAME)
+    autoUpdateField(AccountName);
 }
 
 void InfoWidget::onRosterItemReceived(const IRosterItem &ARosterItem)

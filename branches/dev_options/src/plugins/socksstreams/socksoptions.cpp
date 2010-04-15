@@ -61,7 +61,11 @@ void SocksOptions::apply(OptionsNode ANode)
 
   QStringList proxyItems;
   for (int row=0; row<ui.ltwStreamProxy->count(); row++)
-    proxyItems.append(ui.ltwStreamProxy->item(row)->text());
+  {
+    QString proxyItem = Jid(ui.ltwStreamProxy->item(row)->text()).pBare();
+    if (!proxyItems.contains(proxyItem))
+      proxyItems.append(proxyItem);
+  }
   node.setValue(proxyItems,"stream-proxy-list");
 
   node.setValue(ui.chbUseAccountStreamProxy->isChecked(),"use-account-stream-proxy");

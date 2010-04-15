@@ -7,8 +7,8 @@
 #include <QDateTime>
 #include <QStringList>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
 #include <utils/jid.h>
+#include <utils/options.h>
 
 #define MESSAGESTYLES_UUID  "{e3ab1bc7-35a6-431a-9b91-c778451b1eb1}"
 

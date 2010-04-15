@@ -6,6 +6,7 @@
 #include <definations/menuicons.h>
 #include <definations/resources.h>
 #include <definations/actiongroups.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -14,9 +15,10 @@
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/itraymanager.h>
 #include <interfaces/imainwindow.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/jid.h>
 #include <utils/stanza.h>
+#include <utils/options.h>
 #include <utils/datetime.h>
 #include <utils/iconstorage.h>
 #include <utils/widgetmanager.h>
@@ -42,10 +44,10 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   // IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IDataStreamProfile
   virtual QString profileNS() const;
   virtual bool requestDataStream(const QString &AStreamId, Stanza &ARequest) const;
@@ -58,41 +60,22 @@ public:
   virtual IFileStream *streamById(const QString &ASessionId) const;
   virtual IFileStream *createStream(IFileStreamsHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, 
     const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL);
-  virtual QString defaultDirectory() const;
-  virtual QString defaultDirectory(const Jid &AContactJid) const;
-  virtual void setDefaultDirectory(const QString &ADirectory);
-  virtual bool separateDirectories() const;
-  virtual void setSeparateDirectories(bool ASeparate);
-  virtual QString defaultStreamMethod() const;
-  virtual void setDefaultStreamMethod(const QString &AMethodNS);
-  virtual QList<QString> streamMethods() const;
-  virtual void insertStreamMethod(const QString &AMethodNS);
-  virtual void removeStreamMethod(const QString &AMethodNS);
   virtual IFileStreamsHandler *streamHandler(const QString &AStreamId) const;
   virtual void insertStreamsHandler(IFileStreamsHandler *AHandler, int AOrder);
   virtual void removeStreamsHandler(IFileStreamsHandler *AHandler, int AOrder);
 signals:
   void streamCreated(IFileStream *AStream);
   void streamDestroyed(IFileStream *AStream);
-  // IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 protected slots:
   void onStreamDestroyed();
   void onShowFileStreamsWindow(bool);
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onProfileClosed(const QString &AName);
 private:
-  IPluginManager *FPluginManager;
   IDataStreamsManager *FDataManager;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
   ITrayManager *FTrayManager;
   IMainWindowPlugin *FMainWindowPlugin;
 private:
-  bool FSeparateDirectories;
-  QString FDefaultDirectory;
-  QString FDefaultMethod;
-  QList<QString> FMethods;
   QMap<QString, IFileStream *> FStreams;
   QMultiMap<int, IFileStreamsHandler *> FHandlers;
   QMap<QString, IFileStreamsHandler *> FStreamHandler;

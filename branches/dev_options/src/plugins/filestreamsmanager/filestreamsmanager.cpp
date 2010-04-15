@@ -3,21 +3,12 @@
 #include <QSet>
 #include <QDir>
 
-#define SVN_DEFAULT_DIRECTORY           "defaultDirectory"
-#define SVN_SEPARATE_DIRECTORIES        "separateDirectories"
-#define SVN_DEFAULT_STREAM_METHOD       "defaultStreamMethod"
-#define SVN_ACCEPTABLE_STREAM_METHODS   "acceptableStreamMethods"
-
 FileStreamsManager::FileStreamsManager()
 {
-  FPluginManager = NULL;
   FDataManager = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
   FTrayManager = NULL;
   FMainWindowPlugin = NULL;
-
-  FSeparateDirectories = false;
-  FDefaultDirectory = QDir::homePath()+"/"+tr("Downloads");
 }
 
 FileStreamsManager::~FileStreamsManager()
@@ -37,8 +28,6 @@ void FileStreamsManager::pluginInfo(IPluginInfo *APluginInfo)
 
 bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-  FPluginManager = APluginManager;
-
   IPlugin *plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
   if (plugin)
   {
@@ -57,14 +46,13 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &/*
      FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+    if (FOptionsManager)
     {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+      connect(FOptionsManager->instance(),SIGNAL(profileClosed(const QString &)),SLOT(onProfileClosed(const QString &)));
     }
   }
 
@@ -88,27 +76,31 @@ bool FileStreamsManager::initObjects()
     if (FTrayManager)
       FTrayManager->addAction(action, AG_TMTM_FILESTREAMSMANAGER, true);
   }
-  if (FSettingsPlugin)
+  return true;
+}
+
+bool FileStreamsManager::initSettings()
+{
+  QStringList availMethods = FDataManager!=NULL ? FDataManager->methods() : QStringList();
+  Options::registerOption(OPV_FILESTREAMS_DEFAULTDIR,QDir::homePath()+"/"+tr("Downloads"),tr("Default Download Directory"));
+  Options::registerOption(OPV_FILESTREAMS_DEFAULTMETHOD,QString(availMethods.contains(NS_SOCKS5_BYTESTREAMS) ? NS_SOCKS5_BYTESTREAMS : ""),tr("Default Stream Method"));
+  Options::registerOption(OPV_FILESTREAMS_ACCEPTABLEMETHODS,availMethods,tr("Acceptable Stream Methods"));
+
+  if (FOptionsManager)
   {
-    FSettingsPlugin->insertOptionsHolder(this);
-    FSettingsPlugin->openOptionsNode(OPN_FILETRANSFER,tr("File Transfer"),tr("Common options for file transfer"),MNI_FILESTREAMSMANAGER,ONO_FILETRANSFER);
+    IOptionsDialogNode fileNode = { ONO_FILETRANSFER, OPN_FILETRANSFER, tr("File Transfer"),tr("Common options for file transfer"), MNI_FILESTREAMSMANAGER };
+    FOptionsManager->insertOptionsDialogNode(fileNode);
+    FOptionsManager->insertOptionsHolder(this);
   }
   return true;
 }
 
-QWidget *FileStreamsManager::optionsWidget(const QString &ANode, int &AOrder)
+IOptionsWidget *FileStreamsManager::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
-  if (ANode == OPN_FILETRANSFER)
+  if (FDataManager && ANodeId == OPN_FILETRANSFER)
   {
     AOrder = OWO_FILESTREAMSMANAGER;
-    if (FDataManager)
-    {
-      FileStreamsOptions *widget = new FileStreamsOptions(FDataManager, this);
-      connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-      return widget;
-    }
+    return new FileStreamsOptions(FDataManager, this, AParent);
   }
   return NULL;
 }
@@ -174,7 +166,7 @@ bool FileStreamsManager::dataStreamRequest(const QString &AStreamId, const Stanz
 {
   if (!FStreams.contains(AStreamId))
   {
-    QList<QString> methods = AMethods.toSet().intersect(FMethods.toSet()).toList();
+    QList<QString> methods = AMethods.toSet().intersect(Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList().toSet()).toList();
     if (!methods.isEmpty())
     {
       for (QMultiMap<int, IFileStreamsHandler *>::const_iterator it = FHandlers.constBegin(); it!=FHandlers.constEnd(); it++)
@@ -232,65 +224,6 @@ IFileStream *FileStreamsManager::createStream(IFileStreamsHandler *AHandler, con
   return NULL;
 }
 
-QString FileStreamsManager::defaultDirectory() const
-{
-  return FDefaultDirectory;
-}
-
-QString FileStreamsManager::defaultDirectory(const Jid &AContactJid) const
-{
-  QString dir = FDefaultDirectory;
-  if (FSeparateDirectories && !AContactJid.domain().isEmpty())
-    dir += "/" + AContactJid.encode(AContactJid.pBare());
-  return dir;
-}
-
-void FileStreamsManager::setDefaultDirectory(const QString &ADirectory)
-{
-  FDefaultDirectory = ADirectory;
-}
-
-bool FileStreamsManager::separateDirectories() const
-{
-  return FSeparateDirectories;
-}
-
-void FileStreamsManager::setSeparateDirectories(bool ASeparate)
-{
-  FSeparateDirectories = ASeparate;
-}
-
-QString FileStreamsManager::defaultStreamMethod() const
-{
-  return FDefaultMethod;
-}
-
-void FileStreamsManager::setDefaultStreamMethod(const QString &AMethodNS)
-{
-  if (FMethods.contains(AMethodNS))
-    FDefaultMethod = AMethodNS;
-  else if (FMethods.isEmpty())
-    FDefaultMethod = QString::null;
-}
-
-QList<QString> FileStreamsManager::streamMethods() const
-{
-  return FMethods;
-}
-
-void FileStreamsManager::insertStreamMethod(const QString &AMethodNS)
-{
-  if (!FMethods.contains(AMethodNS))
-    FMethods.append(AMethodNS);
-}
-
-void FileStreamsManager::removeStreamMethod(const QString &AMethodNS)
-{
-  if (FDefaultMethod == AMethodNS)
-    FDefaultMethod = QString::null;
-  FMethods.removeAt(FMethods.indexOf(AMethodNS));
-}
-
 IFileStreamsHandler *FileStreamsManager::streamHandler(const QString &AStreamId) const
 {
   return FStreamHandler.value(AStreamId);
@@ -321,35 +254,21 @@ void FileStreamsManager::onStreamDestroyed()
 void FileStreamsManager::onShowFileStreamsWindow(bool)
 {
   if (FFileStreamsWindow.isNull())
-    FFileStreamsWindow = new FileStreamsWindow(this, FSettingsPlugin!=NULL ? FSettingsPlugin->settingsForPlugin(pluginUuid()) : NULL, NULL);
+    FFileStreamsWindow = new FileStreamsWindow(this, NULL);
   FFileStreamsWindow->show();
   WidgetManager::raiseWidget(FFileStreamsWindow);
   FFileStreamsWindow->activateWindow();
 }
 
-void FileStreamsManager::onSettingsOpened()
+void FileStreamsManager::onProfileClosed(const QString &AName)
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(FILESTREAMSMANAGER_UUID);
-  FDefaultDirectory = settings->value(SVN_DEFAULT_DIRECTORY, FPluginManager->homePath()+"/"+tr("Downloads")).toString();
-  FSeparateDirectories = settings->value(SVN_SEPARATE_DIRECTORIES, false).toBool();
-  QString allMethods = FDataManager!=NULL ? QStringList(FDataManager->methods()).join("||") : QString::null;
-  FMethods = settings->value(SVN_ACCEPTABLE_STREAM_METHODS,allMethods).toString().split("||",QString::SkipEmptyParts);
-  setDefaultStreamMethod(settings->value(SVN_DEFAULT_STREAM_METHOD).toString());
-}
+  Q_UNUSED(AName);
 
-void FileStreamsManager::onSettingsClosed()
-{
   if (!FFileStreamsWindow.isNull())
     delete FFileStreamsWindow;
 
   foreach(IFileStream *stream, FStreams.values())
     delete stream->instance();
-
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(FILESTREAMSMANAGER_UUID);
-  settings->setValue(SVN_DEFAULT_DIRECTORY, FDefaultDirectory);
-  settings->setValue(SVN_SEPARATE_DIRECTORIES, FSeparateDirectories);
-  settings->setValue(SVN_DEFAULT_STREAM_METHOD, FDefaultMethod);
-  settings->setValue(SVN_ACCEPTABLE_STREAM_METHODS, QStringList(FMethods).join("||"));
 }
 
 Q_EXPORT_PLUGIN2(plg_filestreamsmanager, FileStreamsManager);
