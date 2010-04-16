@@ -1049,8 +1049,7 @@ void StatusChanger::onOptionsOpened()
 {
   removeAllCustomStatuses();
 
-  QList<QString> nsList = Options::node(OPV_STATUSES_ROOT).childNSpaces("account");
-  foreach (QString ns, nsList)
+  foreach (QString ns, Options::node(OPV_STATUSES_ROOT).childNSpaces("status"))
   {
     int statusId = ns.toInt();
     OptionsNode soptions = Options::node(OPV_STATUS_ITEM, ns);
@@ -1069,17 +1068,14 @@ void StatusChanger::onOptionsOpened()
         createStatusActions(status.code);
       }
     }
-    else if (statusId > STATUS_NULL_ID)
+    else if (statusId > STATUS_NULL_ID && FStatusItems.contains(statusId))
     {
-      if (FStatusItems.contains(statusId))
-      {
-        StatusItem &status = FStatusItems[statusId];
-        if (!statusName.isEmpty())
-          status.name = statusName;
-        status.text = soptions.hasValue("text") ? soptions.value("text").toString() : status.text;
-        status.priority = soptions.hasValue("priority") ? soptions.value("priority").toInt() : status.priority;
-        updateStatusActions(statusId);
-      }
+      StatusItem &status = FStatusItems[statusId];
+      if (!statusName.isEmpty())
+        status.name = statusName;
+      status.text = soptions.hasValue("text") ? soptions.value("text").toString() : status.text;
+      status.priority = soptions.hasValue("priority") ? soptions.value("priority").toInt() : status.priority;
+      updateStatusActions(statusId);
     }
   }
 
@@ -1092,7 +1088,7 @@ void StatusChanger::onOptionsClosed()
   delete FEditStatusDialog;
   delete FModifyStatusDialog;
 
-  QSet<QString> oldNS = Options::node(OPV_STATUSES_ROOT).childNSpaces("account").toSet();
+  QList<QString> oldNS = Options::node(OPV_STATUSES_ROOT).childNSpaces("status");
   foreach (StatusItem status, FStatusItems)
   {
     if (status.code > STATUS_NULL_ID)
@@ -1104,7 +1100,7 @@ void StatusChanger::onOptionsClosed()
       soptions.setValue(status.text,"text");
       soptions.setValue(status.priority,"priority");
     }
-    oldNS -= QString::number(status.code);
+    oldNS.removeAll(QString::number(status.code));
   }
 
   foreach(QString ns, oldNS)

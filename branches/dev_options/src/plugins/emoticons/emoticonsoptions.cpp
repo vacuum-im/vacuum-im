@@ -67,8 +67,9 @@ void EmoticonsOptions::onUpButtonClicked()
 {
   if (ui.lwtEmoticons->currentRow() > 0)
   {
-    ui.lwtEmoticons->insertItem(ui.lwtEmoticons->currentRow()-1, ui.lwtEmoticons->takeItem(ui.lwtEmoticons->currentRow()));
-    ui.lwtEmoticons->setCurrentRow(ui.lwtEmoticons->currentRow()-1);
+    int row = ui.lwtEmoticons->currentRow();
+    ui.lwtEmoticons->insertItem(row-1, ui.lwtEmoticons->takeItem(ui.lwtEmoticons->currentRow()));
+    ui.lwtEmoticons->setCurrentRow(row-1);
     emit modified();
   }
 }
@@ -77,8 +78,9 @@ void EmoticonsOptions::onDownButtonClicked()
 {
   if (ui.lwtEmoticons->currentRow() < ui.lwtEmoticons->count()-1)
   {
-    ui.lwtEmoticons->insertItem(ui.lwtEmoticons->currentRow()+1, ui.lwtEmoticons->takeItem(ui.lwtEmoticons->currentRow()));
-    ui.lwtEmoticons->setCurrentRow(ui.lwtEmoticons->currentRow()+1);
+    int row = ui.lwtEmoticons->currentRow();
+    ui.lwtEmoticons->insertItem(row+1, ui.lwtEmoticons->takeItem(ui.lwtEmoticons->currentRow()));
+    ui.lwtEmoticons->setCurrentRow(row+1);
     emit modified();
   }
 }

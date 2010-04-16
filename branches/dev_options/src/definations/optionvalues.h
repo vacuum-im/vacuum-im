@@ -27,6 +27,15 @@
 // MessageArchiver
 #define OPV_ACCOUNT_ARCHIVEREPLICATION                  "accounts.account.archive-replication"
 
+// Console
+#define OPV_CONSOLE_ROOT                                "console"
+#define OPV_CONSOLE_CONTEXT_ITEM                        "console.context"
+#define OPV_CONSOLE_CONTEXT_NAME                        "console.context.name"
+#define OPV_CONSOLE_CONTEXT_STREAMJID                   "console.context.streamjid"
+#define OPV_CONSOLE_CONTEXT_CONDITIONS                  "console.context.conditions"
+#define OPV_CONSOLE_CONTEXT_HIGHLIGHTXML                "console.context.highlight-xml"
+#define OPV_CONSOLE_CONTEXT_WORDWRAP                    "console.context.word-wrap"
+
 // DataStreamsManager
 #define OPV_DATASTREAMS_ROOT                            "datastreams"
 #define OPV_DATASTREAMS_SPROFILE_ITEM                   "datastreams.settings-profile"

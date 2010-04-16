@@ -233,7 +233,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 
   if (FTrayManager)
   {
-    if (Options::node(OPV_NOTIFICATIONS_TRAYACTION).value().toBool() && (record.notification.kinds & INotification::TrayIcon)>0)
+    if (Options::node(OPV_NOTIFICATIONS_TRAYICON).value().toBool() && (record.notification.kinds & INotification::TrayIcon)>0)
       record.trayId = FTrayManager->appendNotify(icon,toolTip,true);
     
     if (!toolTip.isEmpty() && Options::node(OPV_NOTIFICATIONS_TRAYACTION).value().toBool() && 
@@ -342,7 +342,7 @@ uchar Notifications::notificatorKinds(const QString &AId) const
       if (Options::node(OPV_NOTIFICATIONS_ROOT).hasValue("notificator",AId))
         notificator.kinds = Options::node(OPV_NOTIFICATIONS_NOTIFICATOR_ITEM,AId).value().toInt() & notificator.kindMask;
       else
-        notificator.kindMask = notificator.defaults;
+        notificator.kinds = notificator.defaults;
     }
     return notificator.kinds;
   }

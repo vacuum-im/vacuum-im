@@ -23,6 +23,7 @@
 #include "messagewindow.h"
 #include "chatwindow.h"
 #include "tabwindow.h"
+#include "messengeroptions.h"
 
 class MessageWidgets : 
   public QObject,

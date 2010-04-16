@@ -83,13 +83,17 @@ IOptionsWidget *MessageWidgets::optionsWidget(const QString &ANodeId, int &AOrde
   if (ANodeId == OPN_MESSAGES)
   {
     AOrder = OWO_MESSAGES;
+    
     IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
     container->appendChild(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE));
     container->appendChild(Options::node(OPV_MESSAGES_SHOWSTATUS));
     container->appendChild(Options::node(OPV_MESSAGES_EDITORAUTORESIZE));
     container->appendChild(Options::node(OPV_MESSAGES_SHOWINFOWIDGET));
-    container->appendChild(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES));
-    container->appendChild(Options::node(OPV_MESSAGES_EDITORSENDKEY));
+
+    IOptionsWidget *widget = new MessengerOptions(this,container->instance());
+    container->instance()->layout()->addWidget(widget->instance());
+    container->registerChild(widget);
+
     return container;
   }
   return NULL;

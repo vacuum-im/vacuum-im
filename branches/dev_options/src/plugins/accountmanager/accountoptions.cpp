@@ -6,12 +6,12 @@ AccountOptions::AccountOptions(IAccountManager *AManager, const QUuid &AAccountI
   FAccountId = AAccountId;
   FManager = AManager;
   
-  reset();
-
   connect(ui.lneName,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
   connect(ui.lneJabberId,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
   connect(ui.lneResource,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
   connect(ui.lnePassword,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+
+  reset();
 }
 
 AccountOptions::~AccountOptions()

@@ -257,14 +257,14 @@ void Emoticons::onOptionsOpened()
   onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS));
 }
 
-void Emoticons::onOptionsChanged( const OptionsNode &ANode )
+void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 {
   if (ANode.path() == OPV_MESSAGES_EMOTICONS)
   {
     QList<QString> oldStorages = FStorages.keys();
     QList<QString> availStorages = IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
 
-    foreach(QString substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toString())
+    foreach(QString substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
     {
       if (availStorages.contains(substorage))
       {

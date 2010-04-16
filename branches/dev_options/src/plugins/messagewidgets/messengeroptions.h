@@ -2,20 +2,29 @@
 #define MESSENGEROPTIONS_H
 
 #include <QShortcut>
+#include <definations/optionvalues.h>
 #include <interfaces/imessagewidgets.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include "ui_messengeroptions.h"
 
 class MessengerOptions : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
-  MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AParent = NULL);
+  MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AParent);
   ~MessengerOptions();
+  virtual QWidget* instance() { return this; }
 public slots:
-  void apply();
+  virtual void apply();
+  virtual void reset();
 signals:
-  void optionsAccepted();
+  void modified();
+  void childApply();
+  void childReset();
 protected:
   virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
