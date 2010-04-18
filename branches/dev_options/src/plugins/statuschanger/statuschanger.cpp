@@ -204,18 +204,15 @@ bool StatusChanger::initObjects()
 
 bool StatusChanger::initSettings()
 {
-  Options::registerOption(OPV_STATUSES_ROOT,QVariant(),tr("Statuses"));
-  Options::registerOption(OPV_STATUS_ITEM,QVariant(),tr("Status"));
-  Options::registerOption(OPV_STATUS_NAME,QString(),tr("Name"));
-  Options::registerOption(OPV_STATUS_SHOW,IPresence::Online,tr("Status"));
-  Options::registerOption(OPV_STATUS_TEXT,nameByShow(IPresence::Online),tr("Text"));
-  Options::registerOption(OPV_STATUS_PRIORITY,0,tr("Priority"));
-  Options::registerOption(OPV_STATUSES_MAINSTATUS,STATUS_ONLINE,QString::null);
-  Options::registerOption(OPV_STATUSES_MODIFY,false,tr("Modify status before apply"));
-  Options::registerOption(OPV_ACCOUNT_AUTOCONNECT,false,tr("Auto connect on startup"));
-  Options::registerOption(OPV_ACCOUNT_AUTORECONNECT,true,tr("Auto reconnect if disconnected"));
-  Options::registerOption(OPV_ACCOUNT_STATUS_ISMAIN,true,QString::null);
-  Options::registerOption(OPV_ACCOUNT_STATUS_LASTONLINE,STATUS_MAIN_ID,QString::null);
+  Options::setDefaultValue(OPV_STATUS_SHOW,IPresence::Online);
+  Options::setDefaultValue(OPV_STATUS_TEXT,nameByShow(IPresence::Online));
+  Options::setDefaultValue(OPV_STATUS_PRIORITY,0);
+  Options::setDefaultValue(OPV_STATUSES_MAINSTATUS,STATUS_ONLINE);
+  Options::setDefaultValue(OPV_STATUSES_MODIFY,false);
+  Options::setDefaultValue(OPV_ACCOUNT_AUTOCONNECT,false);
+  Options::setDefaultValue(OPV_ACCOUNT_AUTORECONNECT,true);
+  Options::setDefaultValue(OPV_ACCOUNT_STATUS_ISMAIN,true);
+  Options::setDefaultValue(OPV_ACCOUNT_STATUS_LASTONLINE,STATUS_MAIN_ID);
 
   if (FOptionsManager)
   {
@@ -240,8 +237,8 @@ IOptionsWidget *StatusChanger::optionsWidget(const QString &ANodeId, int &AOrder
     OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
 
     IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-    container->appendChild(aoptions.node("auto-connect"));
-    container->appendChild(aoptions.node("auto-reconnect"));
+    container->appendChild(aoptions.node("auto-connect"),tr("Auto connect on startup"));
+    container->appendChild(aoptions.node("auto-reconnect"),tr("Auto reconnect if disconnected"));
     return container;
   }
   return NULL;

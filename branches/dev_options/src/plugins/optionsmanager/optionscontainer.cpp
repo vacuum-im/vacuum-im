@@ -14,7 +14,7 @@ OptionsContainer::~OptionsContainer()
 
 IOptionsWidget *OptionsContainer::appendChild(const OptionsNode &ANode, const QString &ACaption)
 {
-  IOptionsWidget *widget = FOptionsManager->optionsNodeWidget(ANode,this,ACaption);
+  IOptionsWidget *widget = FOptionsManager->optionsNodeWidget(ANode,ACaption,this);
   if (layout() == NULL)
   {
     setLayout(new QVBoxLayout);

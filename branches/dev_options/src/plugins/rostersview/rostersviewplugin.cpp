@@ -124,11 +124,10 @@ bool RostersViewPlugin::initObjects()
 
 bool RostersViewPlugin::initSettings()
 {
-  Options::registerOption(OPV_ROSTER_ROOT,QVariant(),tr("Roster"));
-  Options::registerOption(OPV_ROSTER_SHOWOFFLINE,true,tr("Show offline contact"));
-  Options::registerOption(OPV_ROSTER_SHOWRESOURCE,true,tr("Show contact resource in roster"));
-  Options::registerOption(OPV_ROSTER_SHOWSTATUSTEXT,true,tr("Show status message in roster"));
-  Options::registerOption(OPV_ROSTER_SORTBYSTATUS,false,tr("Sort contacts by status"));
+  Options::setDefaultValue(OPV_ROSTER_SHOWOFFLINE,true);
+  Options::setDefaultValue(OPV_ROSTER_SHOWRESOURCE,true);
+  Options::setDefaultValue(OPV_ROSTER_SHOWSTATUSTEXT,true);
+  Options::setDefaultValue(OPV_ROSTER_SORTBYSTATUS,false);
 
   if (FOptionsManager)
   {
@@ -146,10 +145,10 @@ IOptionsWidget *RostersViewPlugin::optionsWidget(const QString &ANodeId, int &AO
     AOrder = OWO_ROSTER;
 
     IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-    container->appendChild(Options::node(OPV_ROSTER_SHOWOFFLINE));
-    container->appendChild(Options::node(OPV_ROSTER_SHOWRESOURCE));
-    container->appendChild(Options::node(OPV_ROSTER_SHOWSTATUSTEXT));
-    container->appendChild(Options::node(OPV_ROSTER_SORTBYSTATUS));
+    container->appendChild(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show offline contact"));
+    container->appendChild(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource in roster"));
+    container->appendChild(Options::node(OPV_ROSTER_SHOWSTATUSTEXT),tr("Show status message in roster"));
+    container->appendChild(Options::node(OPV_ROSTER_SORTBYSTATUS),tr("Sort contacts by status"));
     return container;
 
   }

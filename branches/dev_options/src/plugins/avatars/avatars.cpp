@@ -142,8 +142,8 @@ bool Avatars::initObjects()
 
 bool Avatars::initSettings()
 {
-  Options::registerOption(OPV_AVATARS_SHOW,true,tr("Show avatars"));
-  Options::registerOption(OPV_AVATARS_SHOWEMPTY,true,tr("Show empty avatars"));
+  Options::setDefaultValue(OPV_AVATARS_SHOW,true);
+  Options::setDefaultValue(OPV_AVATARS_SHOWEMPTY,true);
 
   if (FOptionsManager)
   {
@@ -333,8 +333,8 @@ IOptionsWidget *Avatars::optionsWidget(const QString &ANodeId, int &AOrder, QWid
   {
     AOrder = OWO_ROSTER_AVATARS;
     IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-    container->appendChild(Options::node(OPV_AVATARS_SHOW));
-    container->appendChild(Options::node(OPV_AVATARS_SHOWEMPTY));
+    container->appendChild(Options::node(OPV_AVATARS_SHOW),tr("Show avatars"));
+    container->appendChild(Options::node(OPV_AVATARS_SHOWEMPTY),tr("Show empty avatars"));
     return container;
   }
   return NULL;

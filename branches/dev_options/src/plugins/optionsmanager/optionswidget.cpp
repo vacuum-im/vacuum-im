@@ -16,7 +16,7 @@ OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, 
 
   if (FValue.type() == QVariant::Bool)
   {
-    FCheckBox = new QCheckBox(Options::caption(ANode.path()),this);
+    FCheckBox = new QCheckBox(ACaption,this);
     FCheckBox->setChecked(FValue.toBool());
     connect(FCheckBox,SIGNAL(stateChanged(int)),SIGNAL(modified()));
     layout()->addWidget(FCheckBox);
@@ -165,10 +165,9 @@ void OptionsWidget::reset()
 
 void OptionsWidget::insertCaption(const QString &ACaption, QWidget *ABuddy)
 {
-  QString caption = ACaption.isNull() ? Options::caption(FNode.path()) : ACaption;
-  if (!caption.isEmpty())
+  if (!ACaption.isEmpty())
   {
-    FLabel = new QLabel(caption, this);
+    FLabel = new QLabel(ACaption, this);
     FLabel->setBuddy(ABuddy);
     layout()->addWidget(FLabel);
   }

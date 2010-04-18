@@ -67,7 +67,7 @@ bool Emoticons::initObjects()
 
 bool Emoticons::initSettings()
 {
-  Options::registerOption(OPV_MESSAGES_EMOTICONS,QStringList() << DEFAULT_ICONSET,tr("Emoticons"));
+  Options::setDefaultValue(OPV_MESSAGES_EMOTICONS,QStringList() << DEFAULT_ICONSET);
 
   if (FOptionsManager)
   {

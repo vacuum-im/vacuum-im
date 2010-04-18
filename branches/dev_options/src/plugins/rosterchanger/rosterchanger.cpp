@@ -135,8 +135,8 @@ bool RosterChanger::initObjects()
 
 bool RosterChanger::initSettings()
 {
-  Options::registerOption(OPV_ROSTER_AUTOSUBSCRIBE, false, tr("Auto accept subscription requests"));
-  Options::registerOption(OPV_ROSTER_AUTOUNSUBSCRIBE, true, tr("Auto unsubscribe contacts"));
+  Options::setDefaultValue(OPV_ROSTER_AUTOSUBSCRIBE, false);
+  Options::setDefaultValue(OPV_ROSTER_AUTOUNSUBSCRIBE, true);
 
   if (FOptionsManager)
   {
@@ -152,8 +152,8 @@ IOptionsWidget *RosterChanger::optionsWidget(const QString &ANode, int &AOrder, 
     AOrder = OWO_ROSTER_CHENGER;
 
     IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-    container->appendChild(Options::node(OPV_ROSTER_AUTOSUBSCRIBE));
-    container->appendChild(Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE));
+    container->appendChild(Options::node(OPV_ROSTER_AUTOSUBSCRIBE),tr("Auto accept subscription requests"));
+    container->appendChild(Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE),tr("Auto unsubscribe contacts"));
     return container;
   }
   return NULL;

@@ -2,24 +2,6 @@
 
 #include <QCryptographicHash>
 
-#define SVN_SERVER_PORT                     "serverPort"
-#define SVN_DISABLE_DIRECT_CONNECT          "settings[]:disableDirectConnect"
-#define SVN_USE_NATIVE_SERVER_PROXY         "settings[]:useNativeServerProxy"
-#define SVN_USE_ACCOUNT_NETPROXY            "settings[]:useAccountProxy"
-#define SVN_FORWARD_HOST                    "settings[]:forwardHost"
-#define SVN_FORWARD_PORT                    "settings[]:forwardPort"
-#define SVN_NETPROXY_TYPE                   "settings[]:netproxyType"
-#define SVN_NETPROXY_HOST                   "settings[]:netproxyHost"
-#define SVN_NETPROXY_PORT                   "settings[]:netproxyPort"
-#define SVN_NETPROXY_USER                   "settings[]:netproxyUser"
-#define SVN_NETPROXY_PASSWORD               "settings[]:netproxyPassword"
-#define SVN_PROXY_LIST                      "settings[]:proxyList"
-
-#define DEFAULT_SERVER_PORT                 52227
-#define DEFAULT_DIABLE_DIRECT_CONNECT       false
-#define DEFAULT_USE_NATIVE_SERVER_PROXY     true
-#define DEFAULT_USE_ACCOUNT_NETPROXY        true
-
 SocksStreams::SocksStreams() : FServer(this)
 {
   FXmppStreams = NULL;
@@ -104,14 +86,13 @@ bool SocksStreams::initObjects()
 
 bool SocksStreams::initSettings()
 {
-  Options::registerOption(OPV_DATASTREAMS_SOCKSLISTENPORT,52227,tr("Listening Port"));
-  Options::registerOption(OPV_DATASTREAMS_METHOD_DISABLEDIRECT,false,tr("Disable Direct Connections"));
-  Options::registerOption(OPV_DATASTREAMS_METHOD_FORWARDHOST,QString(),tr("Forward Host"));
-  Options::registerOption(OPV_DATASTREAMS_METHOD_FORWARDPORT,0,tr("Forward Port"));
-  Options::registerOption(OPV_DATASTREAMS_METHOD_USEACCOUNTSTREAMPROXY,true,tr("Use Proxy on Account Server"));
-  Options::registerOption(OPV_DATASTREAMS_METHOD_STREAMPROXYLIST,QStringList(),tr("List of Proxies"));
-  Options::registerOption(OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY,true,tr("Use Account Network Proxy"));
-  Options::registerOption(OPV_DATASTREAMS_METHOD_NETWORKPROXY,QString(APPLICATION_PROXY_REF_UUID),tr("Network Proxy"));
+  Options::setDefaultValue(OPV_DATASTREAMS_SOCKSLISTENPORT,52227);
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_DISABLEDIRECT,false);
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_FORWARDHOST,QString());
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_FORWARDPORT,0);
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USEACCOUNTSTREAMPROXY,true);
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY,true);
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_NETWORKPROXY,QString(APPLICATION_PROXY_REF_UUID));
   return true;
 }
 

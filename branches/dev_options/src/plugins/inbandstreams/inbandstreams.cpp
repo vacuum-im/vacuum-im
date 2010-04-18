@@ -65,9 +65,9 @@ bool InBandStreams::initObjects()
 
 bool InBandStreams::initSettings()
 {
-  Options::registerOption(OPV_DATASTREAMS_METHOD_BLOCKSIZE,4096,tr("Block Size"));
-  Options::registerOption(OPV_DATASTREAMS_METHOD_MAXBLOCKSIZE,10240,tr("Maximum Block Size"));
-  Options::registerOption(OPV_DATASTREAMS_METHOD_STANZATYPE,(int)IInBandStream::StanzaIq,tr("Stanza Type"));
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_BLOCKSIZE,4096);
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_MAXBLOCKSIZE,10240);
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_STANZATYPE,(int)IInBandStream::StanzaIq);
   return true;
 }
 

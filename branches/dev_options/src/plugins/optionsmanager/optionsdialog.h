@@ -29,14 +29,14 @@ public:
   OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent = NULL);
   ~OptionsDialog();
 public:
-  void showNode(const QString &ANodeID);
+  void showNode(const QString &ANodeId);
 signals:
   void applied();
   void reseted();
 protected:
-  QString nodeFullName(const QString &ANodeID);
-  QWidget *createNodeWidget(const QString &ANodeID);
-  QStandardItem *createNodeItem(const QString &ANodeID);
+  QString nodeFullName(const QString &ANodeId);
+  QWidget *createNodeWidget(const QString &ANodeId);
+  QStandardItem *createNodeItem(const QString &ANodeId);
   bool canExpandVertically(const QWidget *AWidget) const;
 protected slots:
   void onOptionsDialogNodeInserted(const IOptionsDialogNode &ANode);

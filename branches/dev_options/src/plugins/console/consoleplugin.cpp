@@ -48,13 +48,9 @@ bool ConsolePlugin::initObjects()
 
 bool ConsolePlugin::initSettings()
 {
-  Options::registerOption(OPV_CONSOLE_ROOT,QVariant(),tr("Console"));
-  Options::registerOption(OPV_CONSOLE_CONTEXT_ITEM,QVariant(),tr("Context"));
-  Options::registerOption(OPV_CONSOLE_CONTEXT_NAME,tr("Default Context"),tr("Name"));
-  Options::registerOption(OPV_CONSOLE_CONTEXT_STREAMJID,QVariant(),tr("Stream JID"));
-  Options::registerOption(OPV_CONSOLE_CONTEXT_WORDWRAP,false,tr("Word wrap"));
-  Options::registerOption(OPV_CONSOLE_CONTEXT_HIGHLIGHTXML,Qt::Checked,tr("Highlight XML"));
-  Options::registerOption(OPV_CONSOLE_CONTEXT_CONDITIONS,QStringList(),tr("Conditions"));
+  Options::setDefaultValue(OPV_CONSOLE_CONTEXT_NAME,tr("Default Context"));
+  Options::setDefaultValue(OPV_CONSOLE_CONTEXT_WORDWRAP,false);
+  Options::setDefaultValue(OPV_CONSOLE_CONTEXT_HIGHLIGHTXML,Qt::Checked);
   return true;
 }
 

@@ -77,9 +77,9 @@ bool MainWindowPlugin::initObjects()
 
 bool MainWindowPlugin::initSettings()
 {
-  Options::registerOption(OPV_MAINWINDOW_SHOW,true,QString::null);
-  Options::registerOption(OPV_MAINWINDOW_SIZE,QSize(200,500),QString::null);
-  Options::registerOption(OPV_MAINWINDOW_POSITION,QPoint(0,0),QString::null);
+  Options::setDefaultValue(OPV_MAINWINDOW_SHOW,true);
+  Options::setDefaultValue(OPV_MAINWINDOW_SIZE,QSize(200,500));
+  Options::setDefaultValue(OPV_MAINWINDOW_POSITION,QPoint(0,0));
   return true;
 }
 

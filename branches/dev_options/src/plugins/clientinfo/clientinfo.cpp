@@ -174,7 +174,7 @@ bool ClientInfo::initObjects()
 
 bool ClientInfo::initSettings()
 {
-  Options::registerOption(OPV_MISC_SHAREOSVERSION,true,tr("Share information about OS version"));
+  Options::setDefaultValue(OPV_MISC_SHAREOSVERSION,true);
   if (FOptionsManager)
   {
     FOptionsManager->insertOptionsHolder(this);
@@ -187,7 +187,7 @@ IOptionsWidget *ClientInfo::optionsWidget(const QString &ANodeId, int &AOrder, Q
   if (FOptionsManager && ANodeId == OPN_MISC)
   {
     AOrder = OWO_MISC_CLIENTINFO;
-    return FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_SHAREOSVERSION),AParent);
+    return FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_SHAREOSVERSION),tr("Share information about OS version"),AParent);
   }
   return NULL;
 }

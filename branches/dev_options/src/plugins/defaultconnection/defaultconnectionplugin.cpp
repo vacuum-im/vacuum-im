@@ -40,11 +40,11 @@ bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, in
 
 bool DefaultConnectionPlugin::initSettings()
 {
-  Options::registerOption(OPV_ACCOUNT_CONNECTION_HOST,QString(),tr("Host"));
-  Options::registerOption(OPV_ACCOUNT_CONNECTION_PORT,5222,tr("Port"));
-  Options::registerOption(OPV_ACCOUNT_CONNECTION_PROXY,QString(APPLICATION_PROXY_REF_UUID),tr("Proxy"));
-  Options::registerOption(OPV_ACCOUNT_CONNECTION_USESSL,false,tr("Use SSL"));
-  Options::registerOption(OPV_ACCOUNT_CONNECTION_IGNORESSLERRORS,true,tr("Ignore SSL Errors"));
+  Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_HOST,QString());
+  Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_PORT,5222);
+  Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_PROXY,QString(APPLICATION_PROXY_REF_UUID));
+  Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_USESSL,false);
+  Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_IGNORESSLERRORS,true);
   return true;
 }
 

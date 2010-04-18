@@ -30,8 +30,13 @@ AccountsOptions::~AccountsOptions()
 {
   OptionsNode aoptions = Options::node(OPV_ACCOUNT_ROOT);
   foreach(QString accountId, aoptions.childNSpaces("account"))
+  {
     if (FManager->accountById(accountId) == NULL)
+    {
       aoptions.removeChilds("account",accountId);
+      removeAccount(accountId);
+    }
+  }
 }
 
 void AccountsOptions::apply()

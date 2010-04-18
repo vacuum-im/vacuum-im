@@ -138,9 +138,9 @@ bool FileTransfer::initObjects()
 
 bool FileTransfer::initSettings()
 {
-  Options::registerOption(OPV_FILETRANSFER_AUTORECEIVE,false,tr("Automatically receive files from contacts in roster"));
-  Options::registerOption(OPV_FILETRANSFER_HIDEONSTART,false,tr("Hide dialog after transfer started"));
-  Options::registerOption(OPV_FILETRANSFER_REMOVEONFINISH,false,tr("Automatically remove finished transfers"));
+  Options::setDefaultValue(OPV_FILETRANSFER_AUTORECEIVE,false);
+  Options::setDefaultValue(OPV_FILETRANSFER_HIDEONSTART,false);
+  Options::setDefaultValue(OPV_FILETRANSFER_REMOVEONFINISH,false);
 
   if (FOptionsManager)
   {
@@ -155,9 +155,9 @@ IOptionsWidget *FileTransfer::optionsWidget(const QString &ANodeId, int &AOrder,
   {
     AOrder = OWO_FILETRANSFER;
     IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-    container->appendChild(Options::node(OPV_FILETRANSFER_AUTORECEIVE));
-    container->appendChild(Options::node(OPV_FILETRANSFER_HIDEONSTART));
-    container->appendChild(Options::node(OPV_FILETRANSFER_REMOVEONFINISH));
+    container->appendChild(Options::node(OPV_FILETRANSFER_AUTORECEIVE),tr("Automatically receive files from contacts in roster"));
+    container->appendChild(Options::node(OPV_FILETRANSFER_HIDEONSTART),tr("Hide dialog after transfer started"));
+    container->appendChild(Options::node(OPV_FILETRANSFER_REMOVEONFINISH),tr("Automatically remove finished transfers"));
     return container;
   }
   return NULL;

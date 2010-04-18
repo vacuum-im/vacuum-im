@@ -144,7 +144,7 @@ bool ChatStates::initObjects()
 
 bool ChatStates::initSettings()
 {
-  Options::registerOption(OPV_MESSAGES_CHATSTATESENABLED,true,tr("Send chat state notifications"));
+  Options::setDefaultValue(OPV_MESSAGES_CHATSTATESENABLED,true);
 
   if (FOptionsManager)
   {
@@ -178,7 +178,7 @@ IOptionsWidget *ChatStates::optionsWidget(const QString &ANodeId, int &AOrder, Q
   if (FOptionsManager && ANodeId == OPN_MESSAGES)
   {
     AOrder = OWO_MESSAGES_CHATSTATES;
-    return FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),AParent);
+    return FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send chat state notifications"),AParent);
   }
   return NULL;
 }

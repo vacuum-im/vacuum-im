@@ -60,13 +60,6 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool AccountManager::initSettings()
 {
-  Options::registerOption(OPV_ACCOUNT_ROOT,QVariant(),tr("Accounts"));
-  Options::registerOption(OPV_ACCOUNT_ITEM,QVariant(),tr("Account"));
-  Options::registerOption(OPV_ACCOUNT_NAME,QVariant(),tr("Name"));
-  Options::registerOption(OPV_ACCOUNT_ACTIVE,QVariant(),tr("Active"));
-  Options::registerOption(OPV_ACCOUNT_STREAMJID,QVariant(),tr("Jabber ID"));
-  Options::registerOption(OPV_ACCOUNT_PASSWORD,QVariant(),tr("Password"));
-
   if (FOptionsManager)
   {
     IOptionsDialogNode miscNode = { ONO_ACCOUNTS, OPN_ACCOUNTS, tr("Accounts"),tr("Creating and removing accounts"), MNI_ACCOUNT_LIST };

@@ -217,7 +217,7 @@ bool MessageArchiver::initObjects()
 
 bool MessageArchiver::initSettings()
 {
-  Options::registerOption(OPV_ACCOUNT_ARCHIVEREPLICATION,false,tr("Enable archive replication"));
+  Options::setDefaultValue(OPV_ACCOUNT_ARCHIVEREPLICATION,false);
 
   if (FOptionsManager)
   {

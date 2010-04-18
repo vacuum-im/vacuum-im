@@ -68,12 +68,12 @@ public:
   virtual void insertOptionsHolder(IOptionsHolder *AHolder);
   virtual void removeOptionsHolder(IOptionsHolder *AHolder);
   virtual QList<IOptionsDialogNode> optionsDialogNodes() const;
-  virtual IOptionsDialogNode optionsDialogNode(const QString &ANodeID) const;
+  virtual IOptionsDialogNode optionsDialogNode(const QString &ANodeId) const;
   virtual void insertOptionsDialogNode(const IOptionsDialogNode &ANode);
-  virtual void removeOptionsDialogNode(const QString &ANodeID);
-  virtual QDialog *showOptionsDialog(const QString &ANodeID = QString::null, QWidget *AParent = NULL);
+  virtual void removeOptionsDialogNode(const QString &ANodeId);
+  virtual QDialog *showOptionsDialog(const QString &ANodeId = QString::null, QWidget *AParent = NULL);
   virtual IOptionsContainer *optionsContainer(QWidget *AParent) const;
-  virtual IOptionsWidget *optionsNodeWidget(const OptionsNode &ANode, QWidget *AParent, const QString &ACaption = QString::null) const;
+  virtual IOptionsWidget *optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const;
 signals:
   void profileAdded(const QString &AProfile);
   void profileOpened(const QString &AProfile);

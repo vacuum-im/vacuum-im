@@ -56,10 +56,8 @@ public:
   static QVariant fileValue(const QString &APath, const QString &ANSpace = QString::null);
   static void setFileValue(const QVariant &AValue, const QString &APath, const QString &ANSpace = QString::null);
   static void setOptions(QDomDocument AOptions, const QString &AFilesPath, const QByteArray &ACryptKey);
-  static QString caption(const QString &APath);
   static QVariant defaultValue(const QString &APath);
-  static QList<QString> registeredOptions();
-  static void registerOption(const QString &APath, const QVariant &ADefault, const QString &ACaption);
+  static void setDefaultValue(const QString &APath, const QVariant &ADefault);
   static QByteArray encrypt(const QVariant &AValue, const QByteArray &AKey = cryptKey());
   static QVariant decrypt(const QByteArray &AData, const QByteArray &AKey = cryptKey());
 signals:
@@ -68,7 +66,7 @@ signals:
   void optionsCreated(const OptionsNode &ANode);
   void optionsChanged(const OptionsNode &ANode);
   void optionsRemoved(const OptionsNode &ANode);
-  void optionRegistered(const QString &APath, const QVariant &ADefault, const QString &ACaption);
+  void defaultValueChanged(const QString &APath, const QVariant &ADefault);
 private:
   struct OptionsData;
   static OptionsData *d;

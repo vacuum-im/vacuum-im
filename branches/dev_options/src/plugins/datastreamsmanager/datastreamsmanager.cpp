@@ -104,9 +104,7 @@ bool DataStreamsManger::initObjects()
 
 bool DataStreamsManger::initSettings()
 {
-  Options::registerOption(OPV_DATASTREAMS_ROOT,QVariant(),tr("Data Streams"));
-  Options::registerOption(OPV_DATASTREAMS_SPROFILE_ITEM,QVariant(),tr("Settings Profile"));
-  Options::registerOption(OPV_DATASTREAMS_SPROFILE_NAME,tr("<Default Profile>"),tr("Name"));
+  Options::setDefaultValue(OPV_DATASTREAMS_SPROFILE_NAME,tr("<Default Profile>"));
 
   if (FOptionsManager)
   {

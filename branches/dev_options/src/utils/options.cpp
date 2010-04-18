@@ -1,5 +1,7 @@
 #include "options.h"
 
+#include <stdlib.h>
+
 #include <QFile>
 #include <QRect>
 #include <QDataStream>
@@ -68,7 +70,7 @@ QString variantToString(const QVariant &AVariant)
   }
   else if (AVariant.type() == QVariant::ByteArray)
   {
-    return qCompress(AVariant.toByteArray()).toBase64();
+    return AVariant.toByteArray().toBase64();
   }
   else if (AVariant.type() == QVariant::StringList)
   {
@@ -99,7 +101,7 @@ QVariant stringToVariant(const QString &AString, QVariant::Type AType)
   }
   else if (AType == QVariant::ByteArray)
   {
-    return qUncompress(QByteArray::fromBase64(AString.toLatin1()));
+    return QByteArray::fromBase64(AString.toLatin1());
   }
   else if (AType == QVariant::StringList)
   {
@@ -112,6 +114,50 @@ QVariant stringToVariant(const QString &AString, QVariant::Type AType)
       return var;
   }
   return QVariant();
+}
+
+#define XTEA_ITERATIONS 64
+#define rol(N, R) _lrotl(N, R)
+void xtea2_encipher(unsigned int num_rounds, quint32 *v, quint32 const *k)
+{
+  unsigned int i;
+  unsigned long a, b, c, d, sum=0, t,delta=0x9E3779B9;
+  a = v[0];
+  b = v[1] + k[0];
+  c = v[2];
+  d = v[3] + k[1];
+  for (i = 0; i < num_rounds; i++) 
+  {
+    a += ((b << 4) ^ (b >> 5)) + (d ^ sum) + rol(k[sum & 3], b);
+    sum += delta;
+    c += ((d << 4) ^ (d >> 5)) + (b ^ sum) + rol(k[(sum >> 11) & 3], d);
+    t = a; a = b; b = c; c = d; d = t;
+  }
+  v[0] = a ^ k[2];
+  v[1] = b;
+  v[2] = c ^ k[3];
+  v[3] = d;
+}
+
+void xtea2_decipher(unsigned int num_rounds, quint32 *v, quint32 const *k)
+{
+  unsigned int i;
+  unsigned long a, b, c, d, t, delta=0x9E3779B9, sum=delta*num_rounds;
+  d = v[3];
+  c = v[2] ^ k[3];
+  b = v[1];
+  a = v[0] ^ k[2];
+  for (i = 0; i < num_rounds; i++) 
+  {
+    t = d; d = c; c = b; b = a; a = t;
+    c -= ((d << 4) ^ (d >> 5)) + (b ^ sum) + rol(k[(sum >> 11) & 3], d);
+    sum -= delta;
+    a -= ((b << 4) ^ (b >> 5)) + (d ^ sum) + rol(k[sum & 3], b);
+  }
+  v[0] = a;
+  v[1] = b - k[0];
+  v[2] = c;
+  v[3] = d - k[1];
 }
 
 //OptionNode
@@ -343,7 +389,6 @@ OptionsNode &OptionsNode::operator=(const OptionsNode &AOther)
 //Options
 struct OptionItem
 {
-  QString caption;
   QVariant defValue;
 };
 
@@ -442,51 +487,67 @@ void Options::setOptions(QDomDocument AOptions, const QString &AFilesPath, const
     emit instance()->optionsOpened();
 }
 
-QString Options::caption(const QString &APath)
-{
-  return d->items.value(cleanNSpaces(APath)).caption;
-}
-
 QVariant Options::defaultValue(const QString &APath)
 {
   return d->items.value(cleanNSpaces(APath)).defValue;
 }
 
-QList<QString> Options::registeredOptions()
-{
-  return d->items.keys();
-}
-
-void Options::registerOption(const QString &APath, const QVariant &ADefault, const QString &ACaption)
+void Options::setDefaultValue(const QString &APath, const QVariant &ADefault)
 {
   OptionItem &item = d->items[cleanNSpaces(APath)];
   item.defValue = ADefault;
-  item.caption = ACaption;
-  emit instance()->optionRegistered(APath,ADefault,ACaption);
+  emit instance()->defaultValueChanged(APath,ADefault);
 }
 
 QByteArray Options::encrypt(const QVariant &AValue, const QByteArray &AKey)
 {
-  if (AValue.type()>QVariant::Invalid && AValue.type()<QVariant::UserType)
+  if (AValue.type()>QVariant::Invalid && AValue.type()<QVariant::UserType && !AKey.isEmpty())
   {
-    QByteArray crypted = variantToString(AValue).toUtf8();
-    for (int i = 0; i<crypted.size(); ++i)
-      crypted[i] = crypted[i] ^ AKey[i % AKey.size()];
-    return QByteArray::number(AValue.type()) + QByteArray(1,';') + crypted.toBase64();
+    QByteArray cryptData = variantToString(AValue).toUtf8();
+    if (cryptData.size() % 16)
+      cryptData.append(QByteArray(16-(cryptData.size()%16),'\0'));
+
+    QByteArray cryptKey = AKey;
+    if (cryptKey.size() < 16)
+    {
+      int startSize = cryptKey.size();
+      cryptKey.resize(16);
+      for (int i = startSize; i < 16; i++)
+        cryptKey[i] = cryptKey[i % startSize];
+    }
+    
+    for (int i = 0; i<cryptData.size(); i+=16)
+      xtea2_encipher(XTEA_ITERATIONS,(quint32 *)(cryptData.data()+i),(const quint32 *)cryptKey.constData());
+
+    return QByteArray::number(AValue.type()) + QByteArray(1,';') + cryptData.toBase64();
   }
   return QByteArray();
 }
 
 QVariant Options::decrypt(const QByteArray &AData, const QByteArray &AKey)
 {
-  if (!AData.isEmpty())
+  if (!AData.isEmpty() && !AKey.isEmpty())
   {
     QList<QByteArray> parts = AData.split(';');
     QVariant::Type valType = parts.count()>1 ? (QVariant::Type)parts.value(0).toInt() : QVariant::String;
-    QByteArray valData = QByteArray::fromBase64(parts.value(parts.count()>1 ? 1 : 0));
-    for (int i = 0; i<valData.size(); ++i)
-      valData[i] = valData[i] ^ AKey[i % AKey.size()];
-    return stringToVariant(QString::fromUtf8(valData),valType);
+
+    QByteArray cryptData = QByteArray::fromBase64(parts.value(parts.count()>1 ? 1 : 0));
+    if ((cryptData.size() % 16) == 0)
+    {
+      QByteArray cryptKey = AKey;
+      if (cryptKey.size() < 16)
+      {
+        int startSize = cryptKey.size();
+        cryptKey.resize(16);
+        for (int i = startSize; i < 16; i++)
+          cryptKey[i] = cryptKey[i % startSize];
+      }
+
+      for (int i = 0; i<cryptData.size(); i+=16)
+        xtea2_decipher(XTEA_ITERATIONS,(quint32 *)(cryptData.data()+i),(const quint32 *)cryptKey.constData());
+
+      return stringToVariant(QString::fromUtf8(cryptData),valType);
+    }
   }
   return QVariant();
 }

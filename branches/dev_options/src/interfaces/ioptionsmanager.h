@@ -37,7 +37,7 @@ class IOptionsContainer :
 {
 public:
   virtual void registerChild(IOptionsWidget *AWidget) =0;
-  virtual IOptionsWidget *appendChild(const OptionsNode &ANode, const QString &ACaption = QString::null) =0;
+  virtual IOptionsWidget *appendChild(const OptionsNode &ANode, const QString &ACaption) =0;
 };
 
 class IOptionsHolder
@@ -77,7 +77,7 @@ public:
   virtual QDialog *showOptionsDialog(const QString &ANodeId = QString::null, QWidget *AParent = NULL) =0;
   //OptionsWidgets
   virtual IOptionsContainer *optionsContainer(QWidget *AParent) const =0;
-  virtual IOptionsWidget *optionsNodeWidget(const OptionsNode &ANode, QWidget *AParent, const QString &ACaption = QString::null) const =0;
+  virtual IOptionsWidget *optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const =0;
 protected:
   virtual void profileAdded(const QString &AProfile) =0;
   virtual void profileOpened(const QString &AProfile) =0;

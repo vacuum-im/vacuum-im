@@ -114,10 +114,8 @@ bool StatusIcons::initObjects()
 
 bool StatusIcons::initSettings()
 {
-  Options::registerOption(OPV_STATUSICONS_DEFAULT,STORAGE_SHARED_DIR,tr("Default Iconset"));
-  Options::registerOption(OPV_STATUSICONS_RULE_ITEM,QVariant(),tr("Rule"));
-  Options::registerOption(OPV_STATUSICONS_RULE_PATTERN,QVariant(),tr("Pattern"));
-  Options::registerOption(OPV_STATUSICONS_RULE_ICONSET,STORAGE_SHARED_DIR,tr("Iconset"));
+  Options::setDefaultValue(OPV_STATUSICONS_DEFAULT,STORAGE_SHARED_DIR);
+  Options::setDefaultValue(OPV_STATUSICONS_RULE_ICONSET,STORAGE_SHARED_DIR);
 
   if (FOptionsManager)
   {

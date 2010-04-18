@@ -106,8 +106,7 @@ bool OptionsManager::initObjects()
 
 bool OptionsManager::initSettings()
 {
-  Options::registerOption(OPV_MISC_ROOT, QVariant(), tr("Misc"));
-  Options::registerOption(OPV_MISC_AUTOSTART, false, tr("Auto run on system startup"));
+  Options::setDefaultValue(OPV_MISC_AUTOSTART, false);
 
   if (profiles().count() == 0)
     addProfile(DEFAULT_PROFILE, QString::null);
@@ -136,7 +135,7 @@ IOptionsWidget *OptionsManager::optionsWidget(const QString &ANodeId, int &AOrde
   if (ANodeId == OPN_MISC)
   {
     AOrder = OWO_MISC_AUTOSTART;
-    return optionsNodeWidget(Options::node(OPV_MISC_AUTOSTART), AParent);
+    return optionsNodeWidget(Options::node(OPV_MISC_AUTOSTART), tr("Auto run on system startup"), AParent);
   }
   return NULL;
 }
@@ -217,6 +216,9 @@ bool OptionsManager::setCurrentProfile(const QString &AProfile, const QString &A
       }
       optionsFile.close();
 
+      if (profileKey(AProfile,APassword).size() < 16)
+        changeProfilePassword(AProfile,APassword,APassword);
+
       openProfile(AProfile, APassword);
       return true;
     }
@@ -283,6 +285,12 @@ bool OptionsManager::changeProfilePassword(const QString &AProfile, const QStrin
     
     QByteArray keyValue = QByteArray::fromBase64(keyText.toText().data().toLatin1());
     keyValue = Options::decrypt(keyValue, QCryptographicHash::hash(AOldPassword.toUtf8(),QCryptographicHash::Md5)).toByteArray();
+    if (keyValue.size() < 16)
+    {
+      keyValue.resize(16);
+      for (int i=0; i<keyValue.size(); i++)
+        keyValue[i] = qrand();
+    }
     keyValue = Options::encrypt(keyValue, QCryptographicHash::hash(ANewPassword.toUtf8(),QCryptographicHash::Md5));
     keyText.toText().setData(keyValue.toBase64());
 
@@ -401,9 +409,9 @@ QList<IOptionsDialogNode> OptionsManager::optionsDialogNodes() const
   return FOptionsDialogNodes.values();
 }
 
-IOptionsDialogNode OptionsManager::optionsDialogNode(const QString &ANodeID) const
+IOptionsDialogNode OptionsManager::optionsDialogNode(const QString &ANodeId) const
 {
-  return FOptionsDialogNodes.value(ANodeID);
+  return FOptionsDialogNodes.value(ANodeId);
 }
 
 void OptionsManager::insertOptionsDialogNode(const IOptionsDialogNode &ANode)
@@ -415,21 +423,21 @@ void OptionsManager::insertOptionsDialogNode(const IOptionsDialogNode &ANode)
   }
 }
 
-void OptionsManager::removeOptionsDialogNode(const QString &ANodeID)
+void OptionsManager::removeOptionsDialogNode(const QString &ANodeId)
 {
-  if (FOptionsDialogNodes.contains(ANodeID))
+  if (FOptionsDialogNodes.contains(ANodeId))
   {
-    emit optionsDialogNodeRemoved(FOptionsDialogNodes.take(ANodeID));
+    emit optionsDialogNodeRemoved(FOptionsDialogNodes.take(ANodeId));
   }
 }
 
-QDialog *OptionsManager::showOptionsDialog(const QString &ANodeID, QWidget *AParent)
+QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, QWidget *AParent)
 {
   if (isOpened())
   {
     if (FOptionsDialog.isNull())
       FOptionsDialog = new OptionsDialog(this,AParent);
-    FOptionsDialog->showNode(ANodeID);
+    FOptionsDialog->showNode(ANodeId);
     FOptionsDialog->show();
     WidgetManager::raiseWidget(FOptionsDialog);
     FOptionsDialog->activateWindow();
@@ -442,7 +450,7 @@ IOptionsContainer *OptionsManager::optionsContainer(QWidget *AParent) const
   return new OptionsContainer(this,AParent);
 }
 
-IOptionsWidget *OptionsManager::optionsNodeWidget(const OptionsNode &ANode, QWidget *AParent, const QString &ACaption) const
+IOptionsWidget *OptionsManager::optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const
 {
   return new OptionsWidget(ANode, ACaption, AParent);
 }

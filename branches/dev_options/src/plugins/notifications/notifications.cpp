@@ -143,15 +143,14 @@ bool Notifications::initObjects()
 
 bool Notifications::initSettings()
 {
-  Options::registerOption(OPV_NOTIFICATIONS_ROOT,QVariant(),tr("Notifications"));
-  Options::registerOption(OPV_NOTIFICATIONS_SOUND,true,tr("Sounds"));
-  Options::registerOption(OPV_NOTIFICATIONS_ROSTERICON,true,tr("Roster icons"));
-  Options::registerOption(OPV_NOTIFICATIONS_POPUPWINDOW,true,tr("Popup windows"));
-  Options::registerOption(OPV_NOTIFICATIONS_TRAYICON,true,tr("Tray icons"));
-  Options::registerOption(OPV_NOTIFICATIONS_TRAYACTION,true,tr("Tray actions"));
-  Options::registerOption(OPV_NOTIFICATIONS_AUTOACTIVATE,true,tr("Auto activate"));
-  Options::registerOption(OPV_NOTIFICATIONS_EXPANDGROUP,true,tr("Expand groups"));
-  Options::registerOption(OPV_NOTIFICATIONS_NOSOUNDIFDND,false,tr("Disable sounds when DND"));
+  Options::setDefaultValue(OPV_NOTIFICATIONS_SOUND,true);
+  Options::setDefaultValue(OPV_NOTIFICATIONS_ROSTERICON,true);
+  Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPWINDOW,true);
+  Options::setDefaultValue(OPV_NOTIFICATIONS_TRAYICON,true);
+  Options::setDefaultValue(OPV_NOTIFICATIONS_TRAYACTION,true);
+  Options::setDefaultValue(OPV_NOTIFICATIONS_AUTOACTIVATE,true);
+  Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUP,true);
+  Options::setDefaultValue(OPV_NOTIFICATIONS_NOSOUNDIFDND,false);
 
   if (FOptionsManager)
   {

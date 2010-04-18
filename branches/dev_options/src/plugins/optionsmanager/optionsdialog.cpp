@@ -5,9 +5,6 @@
 #include <QHeaderView>
 #include <QTextDocument>
 
-#define FOPN_GEOMETRY             "optionsdialog.geometry"
-#define FOPN_SPLITTER_STATE       "optionsdialog.splitter.state"
-
 static const QString NodeDelimiter = ".";
 
 #define IDR_ORDER   Qt::UserRole + 1
@@ -26,8 +23,8 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
   setWindowTitle(tr("Options"));
   IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_OPTIONS_DIALOG,0,0,"windowIcon");
   
-  restoreGeometry(Options::fileValue(FOPN_GEOMETRY).toByteArray());
-  if (!ui.sprSplitter->restoreState(Options::fileValue(FOPN_SPLITTER_STATE).toByteArray()))
+  restoreGeometry(Options::fileValue("optionsmanager.optionsdialog.geometry").toByteArray());
+  if (!ui.sprSplitter->restoreState(Options::fileValue("optionsmanager.optionsdialog.splitter.state").toByteArray()))
     ui.sprSplitter->setSizes(QList<int>() << 150 << 450);
 
   delete ui.scaScroll->takeWidget();
@@ -51,6 +48,7 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
     SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
 
   ui.dbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
+  ui.dbbButtons->button(QDialogButtonBox::Reset)->setEnabled(false);
   connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
   foreach (const IOptionsDialogNode &node, FManager->optionsDialogNodes()) {
@@ -59,22 +57,22 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 
 OptionsDialog::~OptionsDialog()
 {
-  Options::setFileValue(saveGeometry(),FOPN_GEOMETRY);
-  Options::setFileValue(ui.sprSplitter->saveState(),FOPN_SPLITTER_STATE);
+  Options::setFileValue(saveGeometry(),"optionsmanager.optionsdialog.geometry");
+  Options::setFileValue(ui.sprSplitter->saveState(),"optionsmanager.optionsdialog.splitter.state");
 }
 
-void OptionsDialog::showNode(const QString &ANodeID)
+void OptionsDialog::showNode(const QString &ANodeId)
 {
-  QStandardItem *item = FNodeItems.value(ANodeID, NULL);
+  QStandardItem *item = FNodeItems.value(ANodeId, NULL);
   if (item)
     ui.trvNodes->setCurrentIndex(FProxyModel->mapFromSource(FItemsModel->indexFromItem(item)));
   ui.trvNodes->expandAll();
 }
 
-QString OptionsDialog::nodeFullName(const QString &ANodeID)
+QString OptionsDialog::nodeFullName(const QString &ANodeId)
 {
   QString fullName;
-  QStandardItem *item = FNodeItems.value(ANodeID);
+  QStandardItem *item = FNodeItems.value(ANodeId);
   if (item)
   {
     fullName = item->text();
@@ -87,7 +85,7 @@ QString OptionsDialog::nodeFullName(const QString &ANodeID)
   return fullName;
 }
 
-QWidget *OptionsDialog::createNodeWidget(const QString &ANodeID)
+QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 {
   QWidget *nodeWidget = new QWidget;
   nodeWidget->setLayout(new QVBoxLayout);
@@ -98,7 +96,7 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeID)
   foreach(IOptionsHolder *optionsHolder,FManager->optionsHolders())
   {
     int order = 500;
-    IOptionsWidget *widget = optionsHolder->optionsWidget(ANodeID,order,nodeWidget);
+    IOptionsWidget *widget = optionsHolder->optionsWidget(ANodeId,order,nodeWidget);
     if (widget)
     {
       orderedWidgets.insertMulti(order,widget);
@@ -227,6 +225,7 @@ void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QMod
 void OptionsDialog::onOptionsWidgetModified()
 {
   ui.dbbButtons->button(QDialogButtonBox::Apply)->setEnabled(true);
+  ui.dbbButtons->button(QDialogButtonBox::Reset)->setEnabled(true);
 }
 
 void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
@@ -240,10 +239,12 @@ void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)
   case QDialogButtonBox::ApplyRole:
     emit applied();
     ui.dbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
+    ui.dbbButtons->button(QDialogButtonBox::Reset)->setEnabled(false);
     break;
   case QDialogButtonBox::ResetRole:
     emit reseted();
     ui.dbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
+    ui.dbbButtons->button(QDialogButtonBox::Reset)->setEnabled(false);
     break;
   case QDialogButtonBox::RejectRole:
     reject();

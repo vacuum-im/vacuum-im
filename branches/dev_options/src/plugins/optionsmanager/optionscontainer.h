@@ -14,7 +14,7 @@ public:
   ~OptionsContainer();
   virtual QWidget* instance() { return this; }
   virtual void registerChild(IOptionsWidget *AWidget);
-  virtual IOptionsWidget *appendChild(const OptionsNode &ANode, const QString &ACaption = QString::null);
+  virtual IOptionsWidget *appendChild(const OptionsNode &ANode, const QString &ACaption);
 public slots:
   virtual void apply();
   virtual void reset();

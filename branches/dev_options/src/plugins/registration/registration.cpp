@@ -95,9 +95,12 @@ bool Registration::initObjects()
 
 bool Registration::initSettings()
 {
-  Options::registerOption(OPV_ACCOUNT_REGISTER,false,tr("Register new account on server"));
+  Options::setDefaultValue(OPV_ACCOUNT_REGISTER,false);
+
   if (FOptionsManager)
+  {
     FOptionsManager->insertOptionsHolder(this);
+  }
   return true;
 }
 
@@ -270,7 +273,7 @@ IOptionsWidget *Registration::optionsWidget(const QString &ANodeId, int &AOrder,
   if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
   {
     AOrder = OWO_ACCOUNT_REGISTER;
-    return FOptionsManager->optionsNodeWidget(Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)).node("register-on-server"),AParent);
+    return FOptionsManager->optionsNodeWidget(Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)).node("register-on-server"),tr("Register new account on server"),AParent);
   }
   return NULL;
 }

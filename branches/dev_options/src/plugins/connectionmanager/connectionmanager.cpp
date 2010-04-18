@@ -78,18 +78,11 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
 
 bool ConnectionManager::initObjects()
 {
-  Options::registerOption(OPV_ACCOUNT_CONNECTION_ITEM,QVariant(),tr("Connection Items"));
-  Options::registerOption(OPV_ACCOUNT_CONNECTION_TYPE,QString("DefaultConnection"),tr("Connection Type"));
+  Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_TYPE,QString("DefaultConnection"));
 
-  Options::registerOption(OPV_PROXY_ROOT,QVariant(),tr("Proxy Items"));
-  Options::registerOption(OPV_PROXY_DEFAULT,QString(APPLICATION_PROXY_REF_UUID),tr("Default Proxy"));
-  Options::registerOption(OPV_PROXY_ITEM,QVariant(),tr("Proxy"));
-  Options::registerOption(OPV_PROXY_NAME,tr("New Proxy"),tr("Name"));
-  Options::registerOption(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy,tr("Type"));
-  Options::registerOption(OPV_PROXY_HOST,QString(),tr("Host"));
-  Options::registerOption(OPV_PROXY_PORT,1080,tr("Port"));
-  Options::registerOption(OPV_PROXY_USER,QString(),tr("User"));
-  Options::registerOption(OPV_PROXY_PASS,QString(),tr("Password"));
+  Options::setDefaultValue(OPV_PROXY_DEFAULT,QString(APPLICATION_PROXY_REF_UUID));
+  Options::setDefaultValue(OPV_PROXY_NAME,tr("New Proxy"));
+  Options::setDefaultValue(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy);
 
   if (FRostersViewPlugin)
   {

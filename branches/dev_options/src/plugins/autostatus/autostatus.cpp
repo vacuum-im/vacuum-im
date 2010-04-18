@@ -63,12 +63,10 @@ bool AutoStatus::initObjects()
 
 bool AutoStatus::initSettings()
 {
-  Options::registerOption(OPV_AUTOSTARTUS_ROOT,QVariant(),tr("Auto Status"));
-  Options::registerOption(OPV_AUTOSTARTUS_RULE_ITEM,QVariant(),tr("Rule"));
-  Options::registerOption(OPV_AUTOSTARTUS_RULE_ENABLED,false,tr("Enabled"));
-  Options::registerOption(OPV_AUTOSTARTUS_RULE_TIME,15*60,tr("Timeout"));
-  Options::registerOption(OPV_AUTOSTARTUS_RULE_SHOW,IPresence::Away,tr("Status"));
-  Options::registerOption(OPV_AUTOSTARTUS_RULE_TEXT,tr("Status changed automatically to 'away'"),tr("Text"));
+  Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_ENABLED,false);
+  Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TIME,15*60);
+  Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_SHOW,IPresence::Away);
+  Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TEXT,tr("Status changed automatically to 'away'"));
 
   if (FOptionsManager)
   {

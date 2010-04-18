@@ -6,6 +6,8 @@
 FileStreamsOptions::FileStreamsOptions(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
+  ui.grbMethods->setLayout(new QVBoxLayout);
+
   FDataManager = ADataManager;
   FFileManager = AFileManager;
 
@@ -41,7 +43,6 @@ void FileStreamsOptions::reset()
 {
   ui.lneDirectory->setText(Options::node(OPV_FILESTREAMS_DEFAULTDIR).value().toString());
 
-  ui.grbMethods->setLayout(new QVBoxLayout);
   QStringList acceptableMethods = Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList();
   foreach(QString methodNS, FDataManager->methods())
   {
