@@ -1,7 +1,5 @@
 #include "options.h"
 
-#include <stdlib.h>
-
 #include <QFile>
 #include <QRect>
 #include <QDataStream>
@@ -117,7 +115,7 @@ QVariant stringToVariant(const QString &AString, QVariant::Type AType)
 }
 
 #define XTEA_ITERATIONS 64
-#define rol(N, R) _lrotl(N, R)
+#define rol(N, R) (((N) << (R)) | ((N) >> (32 - (R))))
 void xtea2_encipher(unsigned int num_rounds, quint32 *v, quint32 const *k)
 {
   unsigned int i;
@@ -446,7 +444,8 @@ QVariant Options::fileValue(const QString &APath, const QString &ANSpace)
     if (file.open(QFile::ReadOnly))
     {
       QVariant value;
-      QDataStream(&file) >> value;
+      QDataStream stream(&file);
+      stream >> value;
       file.close();
       return value;
     }
@@ -463,7 +462,8 @@ void Options::setFileValue(const QVariant &AValue, const QString &APath, const Q
       QFile file(fullFileName(APath,ANSpace));
       if (file.open(QFile::WriteOnly|QFile::Truncate))
       {
-        QDataStream(&file) << AValue;
+        QDataStream stream(&file);
+        stream << AValue;
         file.close();
       }
     }
