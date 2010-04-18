@@ -1,11 +1,25 @@
 #include "accountoptions.h"
 
+#include <QTimer>
+#include <QMessageBox>
+#include <QTextDocument>
+
 AccountOptions::AccountOptions(IAccountManager *AManager, const QUuid &AAccountId, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
-  FAccountId = AAccountId;
   FManager = AManager;
+
+  FAccountId = AAccountId;
+  FAccount = FManager->accountById(AAccountId);
   
+  if (FAccount == NULL)
+  {
+    ui.lneResource->setText(CLIENT_NAME);
+    ui.lneName->setText(tr("New Account"));
+    ui.lneName->selectAll();
+    QTimer::singleShot(0,ui.lneName,SLOT(setFocus()));
+  }
+
   connect(ui.lneName,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
   connect(ui.lneJabberId,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
   connect(ui.lneResource,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
@@ -16,52 +30,47 @@ AccountOptions::AccountOptions(IAccountManager *AManager, const QUuid &AAccountI
 
 AccountOptions::~AccountOptions()
 {
-
+  if (FAccount == NULL)
+  {
+    Options::node(OPV_ACCOUNT_ROOT).removeChilds("account",FAccountId.toString());
+  }
 }
 
 void AccountOptions::apply()
 {
-  IAccount *account = FManager->accountById(FAccountId);
-  if (account)
+  FAccount = FAccount==NULL ? FManager->appendAccount(FAccountId) : FAccount;
+  if (FAccount)
   {
     QString name = ui.lneName->text().trimmed();
     if (name.isEmpty())
       name = ui.lneJabberId->text().trimmed();
     if (name.isEmpty())
       name = tr("New Account");
-    Jid streamJid = ui.lneJabberId->text();
-    streamJid.setResource(ui.lneResource->text());
+    Jid jabberId = ui.lneJabberId->text();
+    jabberId.setResource(ui.lneResource->text());
 
-    account->setName(name);
-    account->setStreamJid(streamJid);
-    account->setPassword(ui.lnePassword->text());
+    bool changedJid = (FAccount->streamJid() != jabberId);
+
+    FAccount->setName(name);
+    FAccount->setStreamJid(jabberId);
+    FAccount->setPassword(ui.lnePassword->text());
+
+    if (!FAccount->isValid())
+      QMessageBox::warning(this,tr("Invalid Account"),tr("Account '%1' is not valid, change its Jabber ID").arg(Qt::escape(name)));
+    else if (changedJid && FAccount->isActive() && FAccount->xmppStream()->isOpen())
+      QMessageBox::information(NULL,tr("Delayed Apply"),tr("Some options of account '%1' will be applied after disconnect").arg(name));
   }
   emit childApply();
 }
 
 void AccountOptions::reset()
 {
-  IAccount *account = FManager->accountById(FAccountId);
-  if (account)
+  if (FAccount)
   {
-    ui.lneName->setText(account->name());
-    ui.lneJabberId->setText(account->streamJid().bare());
-    ui.lneResource->setText(account->streamJid().resource());
-    ui.lnePassword->setText(account->password());
-  }
-  else
-  {
-    ui.lneResource->setText(CLIENT_NAME);
+    ui.lneName->setText(FAccount->name());
+    ui.lneJabberId->setText(FAccount->streamJid().bare());
+    ui.lneResource->setText(FAccount->streamJid().resource());
+    ui.lnePassword->setText(FAccount->password());
   }
   emit childReset();
-}
-
-QString AccountOptions::name() const
-{
-  return ui.lneName->text();
-}
-
-void AccountOptions::setName(const QString &AName)
-{
-  ui.lneName->setText(AName);
 }

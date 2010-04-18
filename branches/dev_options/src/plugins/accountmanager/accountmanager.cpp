@@ -78,13 +78,11 @@ IOptionsWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder,
     if (ANode==OPN_ACCOUNTS || (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS))
     {
       AOrder = OWO_ACCOUNT_OPTIONS;
-      if (FAccountsOptions.isNull())
-        FAccountsOptions = new AccountsOptions(this,NULL);
 
       if (ANode==OPN_ACCOUNTS)
-        return FAccountsOptions;
+        return new AccountsOptions(this,AParent);
       else
-        return FAccountsOptions->accountOptions(nodeTree.at(1),AParent);
+        return new AccountOptions(this,nodeTree.at(1),AParent);
     }
   }
   return NULL;

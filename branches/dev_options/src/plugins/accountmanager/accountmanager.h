@@ -17,6 +17,7 @@
 #include <interfaces/irostersview.h>
 #include <utils/action.h>
 #include "account.h"
+#include "accountoptions.h"
 #include "accountsoptions.h"
 
 class AccountsOptions;
@@ -77,7 +78,6 @@ private:
   IRostersViewPlugin *FRostersViewPlugin;
 private:
   QMap<QUuid, IAccount *> FAccounts;
-  QPointer<AccountsOptions> FAccountsOptions;
 };
 
 #endif // ACCOUNTMANAGER_H
