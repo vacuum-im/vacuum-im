@@ -69,10 +69,6 @@
         <translation>...</translation>
     </message>
     <message>
-        <source>Separate directories for contacts</source>
-        <translation>Разделять директории для контактов</translation>
-    </message>
-    <message>
         <source>Default Downloads Directory:</source>
         <translation>Директория загрузок по умолчанию:</translation>
     </message>

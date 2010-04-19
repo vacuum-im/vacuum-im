@@ -86,7 +86,7 @@ bool OptionsManager::initObjects()
   FShowOptionsDialogAction = new Action(this);
   FShowOptionsDialogAction->setEnabled(false);
   FShowOptionsDialogAction->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_DIALOG);
-  FShowOptionsDialogAction->setText(tr("Options..."));
+  FShowOptionsDialogAction->setText(tr("Options"));
   connect(FShowOptionsDialogAction,SIGNAL(triggered(bool)),SLOT(onShowOptionsDialogByAction(bool)));
 
   if (FMainWindowPlugin)
@@ -109,10 +109,13 @@ bool OptionsManager::initSettings()
   Options::setDefaultValue(OPV_MISC_AUTOSTART, false);
 
   if (profiles().count() == 0)
+    importOldSettings();
+
+  if (profiles().count() == 0)
     addProfile(DEFAULT_PROFILE, QString::null);
 
-  IOptionsDialogNode miscNode = { ONO_MISC, OPN_MISC, tr("Misc"), tr("Extra options"), MNI_OPTIONS_DIALOG };
-  insertOptionsDialogNode(miscNode);
+  IOptionsDialogNode dnode = { ONO_MISC, OPN_MISC, tr("Misc"), tr("Extra options"), MNI_OPTIONS_DIALOG };
+  insertOptionsDialogNode(dnode);
   insertOptionsHolder(this);
 
   return true;
@@ -149,7 +152,7 @@ QList<QString> OptionsManager::profiles() const
 {
   QList<QString> profileList;
   
-  foreach(QString dirName, FProfilesDir.entryList(QDir::Dirs))
+  foreach(QString dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
     if (FProfilesDir.exists(dirName + "/" FILE_PROFILE))
       profileList.append(dirName);
 
@@ -525,6 +528,66 @@ QDomDocument OptionsManager::profileDocument(const QString &AProfile) const
     file.close();
   }
   return doc;
+}
+
+void OptionsManager::importOldSettings()
+{
+  IPlugin *plugin = FPluginManager->pluginInterface("IAccountManager").value(0);
+  IAccountManager *accountManager = plugin!=NULL ? qobject_cast<IAccountManager *>(plugin->instance()) : NULL;
+  if (accountManager)
+  {
+    foreach(QString dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
+    {
+      QFile settings(FProfilesDir.absoluteFilePath(dirName + "/settings.xml"));
+      if (!FProfilesDir.exists(dirName + "/" FILE_PROFILE) && settings.open(QFile::ReadOnly))
+      {
+        QDomDocument doc;
+        if (doc.setContent(&settings,true) && addProfile(dirName,QString::null) && setCurrentProfile(dirName,QString::null))
+        {
+          QDomElement accountElem = doc.documentElement().firstChildElement("plugin");
+          while (!accountElem.isNull() &&  QUuid(accountElem.attribute("pluginId"))!=QUuid(ACCOUNTMANAGER_UUID))
+            accountElem = accountElem.nextSiblingElement("plugin");
+
+          accountElem = accountElem.firstChildElement("account");
+          while (!accountElem.isNull())
+          {
+            IAccount *account = accountManager->appendAccount(accountElem.attribute("ns"));
+            if (account)
+            {
+              QByteArray key = QUuid(accountElem.attribute("ns")).toString().toUtf8();
+              QByteArray password = QByteArray::fromBase64(qUncompress(QByteArray::fromBase64(accountElem.firstChildElement("password").attribute("value").toLocal8Bit())));
+              for (int i = 0; i<password.size(); ++i)
+                password[i] = password[i] ^ key[i % key.size()];
+
+              account->setName(accountElem.firstChildElement("name").attribute("value"));
+              account->setStreamJid(accountElem.firstChildElement("streamJid").attribute("value"));
+              account->setPassword(QString::fromUtf8(password));
+
+              QDomElement connectElem = doc.documentElement().firstChildElement("plugin");
+              while (!connectElem.isNull() &&  QUuid(connectElem.attribute("pluginId"))!=QUuid(accountElem.firstChildElement("connectionId").attribute("value")))
+                connectElem = connectElem.nextSiblingElement("plugin");
+              
+              connectElem = connectElem.firstChildElement("connection");
+              while (!connectElem.isNull() && connectElem.attribute("ns")!=accountElem.attribute("ns"))
+                connectElem = connectElem.nextSiblingElement("connection");
+              
+              if (!connectElem.isNull())
+              {
+                OptionsNode cnode = account->optionsNode().node("connection",account->optionsNode().value("connection-type").toString());
+                cnode.setValue(connectElem.firstChildElement("host").attribute("value"),"host");
+                cnode.setValue(connectElem.firstChildElement("port").attribute("value").toInt(),"port");
+                cnode.setValue(QVariant(connectElem.firstChildElement("useSSL").attribute("value")).toBool(),"use-ssl");
+                cnode.setValue(QVariant(connectElem.firstChildElement("ingnoreSSLErrors").attribute("value")).toBool(),"ignore-ssl-errors");
+              }
+            }
+            accountElem = accountElem.nextSiblingElement("account");
+          }
+          setCurrentProfile(QString::null,QString::null);
+        }
+        settings.close();
+      }
+    }
+  }
 }
 
 void OptionsManager::onOptionsChanged(const OptionsNode &ANode)

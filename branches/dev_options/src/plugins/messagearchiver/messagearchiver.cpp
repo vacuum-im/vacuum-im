@@ -221,8 +221,8 @@ bool MessageArchiver::initSettings()
 
   if (FOptionsManager)
   {
-    IOptionsDialogNode historyNode = { ONO_HISTORY, OPN_HISTORY, tr("History"), tr("Common history settings"), MNI_HISTORY };
-    FOptionsManager->insertOptionsDialogNode(historyNode);
+    IOptionsDialogNode dnode = { ONO_HISTORY, OPN_HISTORY, tr("History"), tr("Common history settings"), MNI_HISTORY };
+    FOptionsManager->insertOptionsDialogNode(dnode);
     FOptionsManager->insertOptionsHolder(this);
   }
   return true;

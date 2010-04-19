@@ -171,10 +171,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Options...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Misc</source>
         <translation type="unfinished"></translation>
     </message>
@@ -187,7 +183,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>for test</source>
+        <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -8,12 +8,12 @@
         <translation>Emotki (buźki)</translation>
     </message>
     <message>
-        <source>Select emoticons files</source>
-        <translation>Wybierz pliki z buźkami</translation>
-    </message>
-    <message>
         <source>Allows to use your smiley images in messages</source>
         <translation>Pozwala korzystać z emotek w rozmowach</translation>
+    </message>
+    <message>
+        <source>Select emoticons iconsets</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
-    <name>AccountOptionsWidgetClass</name>
-    <message>
-        <source>Auto connect on startup</source>
-        <translation>Автоподключение при старте</translation>
-    </message>
-    <message>
-        <source>Auto reconnect if disconnected</source>
-        <translation>Автоматически восстанавливать соединение</translation>
-    </message>
-</context>
-<context>
     <name>EditStatusDialog</name>
     <message>
         <source>Name</source>
@@ -172,14 +161,6 @@
         <translation>Статус</translation>
     </message>
     <message>
-        <source>Modify status</source>
-        <translation>Изменять статус</translation>
-    </message>
-    <message>
-        <source>Edit statuses</source>
-        <translation>Редактировать статусы</translation>
-    </message>
-    <message>
         <source>Status Manager</source>
         <translation>Диспетчер статусов</translation>
     </message>
@@ -190,6 +171,22 @@
     <message>
         <source>Connecting...</source>
         <translation>Подключение...</translation>
+    </message>
+    <message>
+        <source>Modify Status</source>
+        <translation>Изменять статус</translation>
+    </message>
+    <message>
+        <source>Edit Statuses</source>
+        <translation>Редактировать статусы</translation>
+    </message>
+    <message>
+        <source>Auto connect on startup</source>
+        <translation>Автоподключение при старте</translation>
+    </message>
+    <message>
+        <source>Auto reconnect if disconnected</source>
+        <translation>Автоматически восстанавливать соединение</translation>
     </message>
 </context>
 </TS>

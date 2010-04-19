@@ -67,6 +67,10 @@
         <source>Idle Time</source>
         <translation>Время бездействия</translation>
     </message>
+    <message>
+        <source>Share information about OS version</source>
+        <translation>Раскрывать информацию о версии ОС</translation>
+    </message>
 </context>
 <context>
     <name>ClientInfoDialog</name>
@@ -170,13 +174,6 @@
     <message>
         <source>Waiting response...</source>
         <translation>Ожидание ответа...</translation>
-    </message>
-</context>
-<context>
-    <name>MiscOptionsWidgetClass</name>
-    <message>
-        <source>Share information about OS version</source>
-        <translation>Раскрывать информацию о версии ОС</translation>
     </message>
 </context>
 </TS>

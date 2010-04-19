@@ -108,8 +108,8 @@ bool DataStreamsManger::initSettings()
 
   if (FOptionsManager)
   {
-    IOptionsDialogNode dataNode = { ONO_DATASTREAMS, OPN_DATASTREAMS, tr("Data Streams"),tr("Common data streams settings"), MNI_DATASTREAMSMANAGER };
-    FOptionsManager->insertOptionsDialogNode(dataNode);
+    IOptionsDialogNode dnode = { ONO_DATASTREAMS, OPN_DATASTREAMS, tr("Data Streams"),tr("Common data streams settings"), MNI_DATASTREAMSMANAGER };
+    FOptionsManager->insertOptionsDialogNode(dnode);
     FOptionsManager->insertOptionsHolder(this);
   }
   return true;

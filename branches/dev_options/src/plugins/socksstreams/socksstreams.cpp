@@ -86,7 +86,7 @@ bool SocksStreams::initObjects()
 
 bool SocksStreams::initSettings()
 {
-  Options::setDefaultValue(OPV_DATASTREAMS_SOCKSLISTENPORT,52227);
+  Options::setDefaultValue(OPV_DATASTREAMS_SOCKSLISTENPORT,5277);
   Options::setDefaultValue(OPV_DATASTREAMS_METHOD_DISABLEDIRECT,false);
   Options::setDefaultValue(OPV_DATASTREAMS_METHOD_FORWARDHOST,QString());
   Options::setDefaultValue(OPV_DATASTREAMS_METHOD_FORWARDPORT,0);

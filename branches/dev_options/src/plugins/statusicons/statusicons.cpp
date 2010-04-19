@@ -119,8 +119,8 @@ bool StatusIcons::initSettings()
 
   if (FOptionsManager)
   {
-    IOptionsDialogNode statusNode = { ONO_STATUSICONS, OPN_STATUSICONS, tr("Status icons"),tr("Configure status icons"), MNI_STATUSICONS_OPTIONS };
-    FOptionsManager->insertOptionsDialogNode(statusNode);
+    IOptionsDialogNode dnode = { ONO_STATUSICONS, OPN_STATUSICONS, tr("Status icons"),tr("Configure status icons"), MNI_STATUSICONS_OPTIONS };
+    FOptionsManager->insertOptionsDialogNode(dnode);
     FOptionsManager->insertOptionsHolder(this);
   }
   return true;

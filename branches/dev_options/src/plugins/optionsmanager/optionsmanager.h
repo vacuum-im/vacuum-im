@@ -18,6 +18,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
+#include <interfaces/iaccountmanager.h>
 #include <utils/action.h>
 #include <utils/widgetmanager.h>
 #include <thirdparty/qtlockedfile/qtlockedfile.h>
@@ -90,6 +91,7 @@ protected:
   bool saveOptions() const;
   bool saveProfile(const QString &AProfile, const QDomDocument &AProfileDoc) const;
   QDomDocument profileDocument(const QString &AProfile) const;
+  void importOldSettings();
 protected slots:
   void onOptionsChanged(const OptionsNode &ANode);
   void onChangeProfileByAction(bool);

@@ -72,8 +72,8 @@ bool MessageStyles::initSettings()
 {
   if (FOptionsManager)
   {
-    IOptionsDialogNode styleNode = { ONO_MESSAGE_STYLES, OPN_MESSAGE_STYLES, tr("Message Styles"),tr("Styles options for custom messages"), MNI_MESSAGE_STYLES };
-    FOptionsManager->insertOptionsDialogNode(styleNode);
+    IOptionsDialogNode dnode = { ONO_MESSAGE_STYLES, OPN_MESSAGE_STYLES, tr("Message Styles"),tr("Styles options for custom messages"), MNI_MESSAGE_STYLES };
+    FOptionsManager->insertOptionsDialogNode(dnode);
     FOptionsManager->insertOptionsHolder(this);
   }
   return true;

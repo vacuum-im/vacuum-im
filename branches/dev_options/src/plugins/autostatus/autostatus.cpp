@@ -70,8 +70,8 @@ bool AutoStatus::initSettings()
 
   if (FOptionsManager)
   {
-    IOptionsDialogNode node = { ONO_AUTO_STATUS, OPN_AUTO_STATUS, tr("Auto status"),tr("Edit auto status rules"), MNI_AUTOSTATUS };
-    FOptionsManager->insertOptionsDialogNode(node);
+    IOptionsDialogNode dnode = { ONO_AUTO_STATUS, OPN_AUTO_STATUS, tr("Auto status"),tr("Edit auto status rules"), MNI_AUTOSTATUS };
+    FOptionsManager->insertOptionsDialogNode(dnode);
     FOptionsManager->insertOptionsHolder(this);
   }
   return true;

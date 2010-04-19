@@ -30,12 +30,12 @@
 <context>
     <name>DefaultConnectionPlugin</name>
     <message>
-        <source>Default connection</source>
-        <translation>Domyślne połączenie</translation>
-    </message>
-    <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>
         <translation>Pozwala na ustawienie standardowego połączenia TCP z serwerem</translation>
+    </message>
+    <message>
+        <source>Default Connection</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

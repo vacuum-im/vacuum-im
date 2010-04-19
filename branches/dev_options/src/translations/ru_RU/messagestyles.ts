@@ -118,6 +118,18 @@
         <source>Sender</source>
         <translation>Отправитель</translation>
     </message>
+    <message>
+        <source>Single</source>
+        <translation>Сообщение</translation>
+    </message>
+    <message>
+        <source>Headline</source>
+        <translation>Новость</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
 </context>
 <context>
     <name>StyleOptionsWidgetClass</name>

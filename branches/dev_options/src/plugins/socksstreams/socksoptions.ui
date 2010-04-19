@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>328</width>
-    <height>404</height>
+    <width>330</width>
+    <height>429</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -23,6 +23,19 @@
          <string>Incoming Direct Connections</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QCheckBox" name="chbDisableDirectConnect">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Disable direct connections</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
@@ -46,17 +59,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="chbDisableDirectConnect">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-             <property name="text">
-              <string>Disable direct connections</string>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
              </property>
-            </widget>
+            </spacer>
            </item>
           </layout>
          </item>
@@ -198,7 +211,6 @@
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>spbPort</tabstop>
-  <tabstop>chbDisableDirectConnect</tabstop>
   <tabstop>lneForwardHost</tabstop>
   <tabstop>spbForwardPort</tabstop>
   <tabstop>chbUseAccountStreamProxy</tabstop>

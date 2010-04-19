@@ -22,6 +22,10 @@
         <source>Allows to use a simplified style in message design</source>
         <translation>Umożliwia korzystanie z uproszczonego stylu wiadomości</translation>
     </message>
+    <message>
+        <source>Simple Style</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SimpleOptionsWidget</name>

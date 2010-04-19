@@ -69,10 +69,6 @@
         <translation>...</translation>
     </message>
     <message>
-        <source>Separate directories for contacts</source>
-        <translation>Oddzielne katalogi dla kontaktów</translation>
-    </message>
-    <message>
         <source>Default Downloads Directory:</source>
         <translation>Domyślny katalog do zapisu:</translation>
     </message>

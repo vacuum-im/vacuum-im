@@ -131,8 +131,8 @@ bool RostersViewPlugin::initSettings()
 
   if (FOptionsManager)
   {
-    IOptionsDialogNode rosterNode = { ONO_ROSTER, OPN_ROSTER, tr("Roster"),tr("Roster view options"), MNI_ROSTERVIEW_OPTIONS };
-    FOptionsManager->insertOptionsDialogNode(rosterNode);
+    IOptionsDialogNode dnode = { ONO_ROSTER, OPN_ROSTER, tr("Roster"),tr("Roster view options"), MNI_ROSTERVIEW_OPTIONS };
+    FOptionsManager->insertOptionsDialogNode(dnode);
     FOptionsManager->insertOptionsHolder(this);
   }
   return true;
