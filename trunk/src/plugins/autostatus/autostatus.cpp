@@ -14,12 +14,12 @@
 AutoStatus::AutoStatus()
 {
   FStatusChanger = NULL;
+  FAccountManager = NULL;
   FSettingsPlugin = NULL;
   
   FRuleId = 1;
   FActiveRule = 0;
   FAutoStatusId = STATUS_NULL_ID;
-  FLastStatusId = STATUS_ONLINE;
   FLastCursorPos = QCursor::pos();
   FLastCursorTime = QDateTime::currentDateTime();
 
@@ -40,6 +40,7 @@ void AutoStatus::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://www.vacuum-im.org";
   APluginInfo->dependences.append(STATUSCHANGER_UUID);
+  APluginInfo->dependences.append(ACCOUNTMANAGER_UUID);
 }
 
 bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -48,6 +49,12 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
   if (plugin)
   {
     FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
+  }
+
+  plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
+  if (plugin)
+  {
+    FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
   }
 
   plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
@@ -62,7 +69,7 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     }
   }
 
-  return FStatusChanger;
+  return FStatusChanger!=NULL && FAccountManager!=NULL;
 }
 
 bool AutoStatus::initObjects()
@@ -179,7 +186,7 @@ void AutoStatus::prepareRule(IAutoStatusRule &ARule)
 
 void AutoStatus::setActiveRule(int ARuleId)
 {
-  if (FStatusChanger && ARuleId!=FActiveRule)
+  if (FAccountManager && FStatusChanger && ARuleId!=FActiveRule)
   {
     if (ARuleId>0 && FRules.contains(ARuleId))
     {
@@ -187,18 +194,31 @@ void AutoStatus::setActiveRule(int ARuleId)
       prepareRule(rule);
       if (FAutoStatusId == STATUS_NULL_ID)
       {
-        FLastStatusId = FStatusChanger->mainStatus();
-        FAutoStatusId = FStatusChanger->addStatusItem(tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(FLastStatusId));
+        FAutoStatusId = FStatusChanger->addStatusItem(tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(STATUS_MAIN_ID));
+        foreach(IAccount *account, FAccountManager->accounts())
+        {
+          if (account->isActive() && account->xmppStream()->isOpen())
+          {
+            Jid streamJid = account->xmppStream()->streamJid();
+            int status = FStatusChanger->streamStatus(streamJid);
+            int show = FStatusChanger->statusItemShow(status);
+            if (show==IPresence::Online || show==IPresence::Chat)
+            {
+              FStreamStatus.insert(streamJid,status);
+              FStatusChanger->setStreamStatus(streamJid, FAutoStatusId);
+            }
+          }
+        }
       }
       else
-        FStatusChanger->updateStatusItem(FAutoStatusId,tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(FLastStatusId));
-      
-      if (FAutoStatusId!=FStatusChanger->mainStatus())
-        FStatusChanger->setMainStatus(FAutoStatusId);
+      {
+        FStatusChanger->updateStatusItem(FAutoStatusId,tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(STATUS_MAIN_ID));
+      }
     }
     else
     {
-      FStatusChanger->setMainStatus(FLastStatusId);
+      foreach(Jid streamJid, FStreamStatus.keys())
+        FStatusChanger->setStreamStatus(streamJid, FStreamStatus.take(streamJid));
       FStatusChanger->removeStatusItem(FAutoStatusId);
       FAutoStatusId = STATUS_NULL_ID;
     }
