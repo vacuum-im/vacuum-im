@@ -98,6 +98,10 @@ bool XmppStream::open()
         FStreamState = SS_CONNECTING;
         return true;
       }
+      else
+      {
+        abort(tr("Failed to start connection"));
+      }
     }
   }
   else if (!FConnection)
