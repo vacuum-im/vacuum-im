@@ -10,6 +10,8 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iautostatus.h>
 #include <interfaces/istatuschanger.h>
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/ipresence.h>
 #include <interfaces/isettings.h>
 #include "statusoptionswidget.h"
 
@@ -69,16 +71,17 @@ protected slots:
   void onSettingsClosed();
 private:
   IStatusChanger *FStatusChanger;
+  IAccountManager *FAccountManager;
   ISettingsPlugin *FSettingsPlugin;
 private:
   int FRuleId;
   int FActiveRule;
-  int FLastStatusId;
   int FAutoStatusId;
   QTimer FIdleTimer;
   QPoint FLastCursorPos;
   QDateTime FLastCursorTime;
-  QHash<int,StatusRuleItem> FRules;
+  QMap<Jid, int> FStreamStatus;
+  QMap<int, StatusRuleItem> FRules;
 };
 
 #endif // AUTOSTATUS_H
