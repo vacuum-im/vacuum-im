@@ -439,7 +439,10 @@ QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, QWidget *APar
   if (isOpened())
   {
     if (FOptionsDialog.isNull())
+    {
       FOptionsDialog = new OptionsDialog(this,AParent);
+      connect(FOptionsDialog,SIGNAL(applied()),SLOT(onOptionsDialogApplied()));
+    }
     FOptionsDialog->showNode(ANodeId);
     FOptionsDialog->show();
     WidgetManager::raiseWidget(FOptionsDialog);
@@ -478,7 +481,10 @@ void OptionsManager::closeProfile()
     emit profileClosed(currentProfile());
     FAutoSaveTimer.stop();
     if (!FOptionsDialog.isNull())
+    {
       FOptionsDialog->reject();
+      delete FOptionsDialog;
+    }
     FShowOptionsDialogAction->setEnabled(false);
     Options::setOptions(QDomDocument(), QString::null, QByteArray());
     saveOptions();
@@ -602,6 +608,11 @@ void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
       reg.remove(CLIENT_NAME);
 #endif
   }
+}
+
+void OptionsManager::onOptionsDialogApplied()
+{
+  saveOptions();
 }
 
 void OptionsManager::onChangeProfileByAction(bool)

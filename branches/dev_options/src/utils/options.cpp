@@ -103,7 +103,7 @@ QVariant stringToVariant(const QString &AString, QVariant::Type AType)
   }
   else if (AType == QVariant::StringList)
   {
-    return AString.split(" ;; ");
+    return !AString.isEmpty() ? AString.split(" ;; ") : QStringList();
   }
   else
   {
