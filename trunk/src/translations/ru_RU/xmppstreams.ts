@@ -19,6 +19,10 @@
         <source>XMPP connection timed out</source>
         <translation>Превышено время установки XMPP соединения</translation>
     </message>
+    <message>
+        <source>Failed to start connection</source>
+        <translation>Не удалось запустить соединение</translation>
+    </message>
 </context>
 <context>
     <name>XmppStreams</name>

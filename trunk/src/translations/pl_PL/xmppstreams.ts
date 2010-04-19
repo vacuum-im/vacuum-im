@@ -19,6 +19,10 @@
         <source>XMPP connection timed out</source>
         <translation>Został przekroczony czas nawiązywania połączenia XMPP</translation>
     </message>
+    <message>
+        <source>Failed to start connection</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XmppStreams</name>
