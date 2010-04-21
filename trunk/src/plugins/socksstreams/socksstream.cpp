@@ -685,7 +685,7 @@ bool SocksStream::sendAvailHosts()
     }
     else foreach(QHostAddress address, QNetworkInterface::allAddresses())
     {
-      if (address.toIPv4Address() != 0x7F000001)
+      if (address.protocol()!=QAbstractSocket::IPv6Protocol && address!=QHostAddress::LocalHost)
       {
         HostInfo info;
         info.jid = FStreamJid;

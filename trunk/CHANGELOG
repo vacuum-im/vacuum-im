@@ -22,6 +22,7 @@ LEGEND
   [-] The main status could be displayed as "offline" even when one of the accounts is connected
   [-] The socks5-proxy on native server has not been automatically added to available proxy list
   [-] Triggering of avtostatus rule could lead to connect of offline accounts
+  [-] It is not been possible to establish a direct connection for file transfer, if the default proxy has been set
 
 
 v1.0.1
