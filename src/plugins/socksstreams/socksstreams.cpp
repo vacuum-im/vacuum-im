@@ -36,6 +36,7 @@ SocksStreams::SocksStreams() : FServer(this)
   FUseNativeServerProxy = DEFAULT_USE_NATIVE_SERVER_PROXY;
   FUseAccountNetworkProxy = DEFAULT_USE_ACCOUNT_NETPROXY;
 
+  FServer.setProxy(QNetworkProxy::NoProxy);
   connect(&FServer,SIGNAL(newConnection()),SLOT(onNewServerConnection()));
 }
 
