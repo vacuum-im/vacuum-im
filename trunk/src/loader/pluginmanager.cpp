@@ -23,7 +23,7 @@
 #  define SVN_DATE                  ""
 #else
 #  define SVN_DATE                  ""
-#  define SVN_REVISION              "0"
+#  define SVN_REVISION              "0:0"
 #endif
 
 #if defined(Q_WS_WIN) 
@@ -67,7 +67,8 @@ QString PluginManager::version() const
 
 QString PluginManager::revision() const
 {
-  return SVN_REVISION;
+  static const QString rev = QString(SVN_REVISION).contains(':') ? QString(SVN_REVISION).split(':').value(1) : QString("0");
+  return rev;
 }
 
 QDateTime PluginManager::revisionDate() const
