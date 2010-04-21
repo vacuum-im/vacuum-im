@@ -204,8 +204,8 @@ bool OptionsManager::setCurrentProfile(const QString &AProfile, const QString &A
   else if (checkProfilePassword(AProfile, APassword))
   {
     closeProfile();
-    FProfileLocker.setFileName(QDir(profilePath(AProfile)).absoluteFilePath(FILE_BLOCKER));
-    if (FProfileLocker.open(QFile::WriteOnly) && FProfileLocker.lock(QtLockedFile::WriteLock, false))
+    FProfileLocker = new QtLockedFile(QDir(profilePath(AProfile)).absoluteFilePath(FILE_BLOCKER));
+    if (FProfileLocker->open(QFile::WriteOnly) && FProfileLocker->lock(QtLockedFile::WriteLock, false))
     {
       QDir profileDir(profilePath(AProfile));
       if (!profileDir.exists(DIR_BINARY))
@@ -225,7 +225,8 @@ bool OptionsManager::setCurrentProfile(const QString &AProfile, const QString &A
       openProfile(AProfile, APassword);
       return true;
     }
-    FProfileLocker.close();
+    FProfileLocker->close();
+    delete FProfileLocker;
   }
   return false;
 }
@@ -491,9 +492,10 @@ void OptionsManager::closeProfile()
     FProfile.clear();
     FProfileKey.clear();
     FProfileOptions.clear();
-    FProfileLocker.unlock();
-    FProfileLocker.close();
-    FProfileLocker.remove();
+    FProfileLocker->unlock();
+    FProfileLocker->close();
+    FProfileLocker->remove();
+    delete FProfileLocker;
   }
 }
 

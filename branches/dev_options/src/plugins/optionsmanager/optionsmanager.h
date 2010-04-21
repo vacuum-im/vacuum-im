@@ -111,7 +111,7 @@ private:
   QString FProfile;
   QByteArray FProfileKey;
   QDomDocument FProfileOptions;
-  QtLockedFile FProfileLocker;
+  QtLockedFile *FProfileLocker;
 private:
   Action *FChangeProfileAction;
   QPointer<LoginDialog> FLoginDialog;

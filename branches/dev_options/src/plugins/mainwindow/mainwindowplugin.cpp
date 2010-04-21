@@ -124,6 +124,7 @@ void MainWindowPlugin::onOptionsClosed()
   Options::node(OPV_MAINWINDOW_SIZE).setValue(FMainWindow->size());
   Options::node(OPV_MAINWINDOW_POSITION).setValue(FMainWindow->pos());
   updateTitle();
+  FMainWindow->close();
 }
 
 void MainWindowPlugin::onProfileRenamed(const QString &AProfile, const QString &ANewName)
