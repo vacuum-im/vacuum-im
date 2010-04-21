@@ -134,25 +134,27 @@ IConnectionProxy ConnectionManager::proxyById(const QUuid &AProxyId) const
 {
   static const IConnectionProxy noProxy = {" "+tr("<No Proxy>"), QNetworkProxy(QNetworkProxy::NoProxy) };
 
-  OptionsNode pnode;
-  QList<QUuid> plist = proxyList();
-  if (plist.contains(AProxyId))
-    pnode = Options::node(OPV_PROXY_ITEM,AProxyId.toString());
-  else if (plist.contains(defaultProxy()))
-    pnode = Options::node(OPV_PROXY_ITEM,defaultProxy().toString());
-
-  if (!pnode.isNull())
+  if (!AProxyId.isNull())
   {
-    IConnectionProxy proxy;
-    proxy.name = pnode.value("name").toString();
-    proxy.proxy.setType((QNetworkProxy::ProxyType)pnode.value("type").toInt());
-    proxy.proxy.setHostName(pnode.value("host").toString());
-    proxy.proxy.setPort(pnode.value("port").toInt());
-    proxy.proxy.setUser(pnode.value("user").toString());
-    proxy.proxy.setPassword(Options::decrypt(pnode.value("pass").toByteArray()).toString());
-    return proxy;
-  }
+    OptionsNode pnode;
+    QList<QUuid> plist = proxyList();
+    if (plist.contains(AProxyId))
+      pnode = Options::node(OPV_PROXY_ITEM,AProxyId.toString());
+    else if (plist.contains(defaultProxy()))
+      pnode = Options::node(OPV_PROXY_ITEM,defaultProxy().toString());
 
+    if (!pnode.isNull())
+    {
+      IConnectionProxy proxy;
+      proxy.name = pnode.value("name").toString();
+      proxy.proxy.setType((QNetworkProxy::ProxyType)pnode.value("type").toInt());
+      proxy.proxy.setHostName(pnode.value("host").toString());
+      proxy.proxy.setPort(pnode.value("port").toInt());
+      proxy.proxy.setUser(pnode.value("user").toString());
+      proxy.proxy.setPassword(Options::decrypt(pnode.value("pass").toByteArray()).toString());
+      return proxy;
+    }
+  }
   return noProxy;
 }
 

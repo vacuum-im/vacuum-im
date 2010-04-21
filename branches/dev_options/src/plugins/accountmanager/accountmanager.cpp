@@ -177,7 +177,7 @@ void AccountManager::openAccountOptionsNode(const QUuid &AAccountId, const QStri
   if (FOptionsManager)
   {
     QString node = OPN_ACCOUNTS "." + AAccountId.toString();
-    IOptionsDialogNode dnode = { ONO_ACCOUNTS, node, AName, tr("Account options"), MNI_ACCOUNT_LIST };
+    IOptionsDialogNode dnode = { ONO_ACCOUNTS, node, AName, tr("Account options"), MNI_ACCOUNT };
     FOptionsManager->insertOptionsDialogNode(dnode);
   }
 }
