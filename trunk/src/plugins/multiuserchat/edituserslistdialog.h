@@ -8,12 +8,6 @@
 #include <utils/iconstorage.h>
 #include "ui_edituserslistdialog.h"
 
-struct UsersListItem 
-{
-  Jid userJid;
-  QString reason;
-};
-
 class EditUsersListDialog : 
   public QDialog
 {
@@ -21,7 +15,7 @@ class EditUsersListDialog :
 public:
   EditUsersListDialog(const QString &AAffiliation, const QList<IMultiUserListItem> &AList, QWidget *AParent = NULL);
   ~EditUsersListDialog();
-  QString affiliation() const { return FAffiliation; }
+  QString affiliation() const;
   QList<IMultiUserListItem> deltaList() const;
   void setTitle(const QString &ATitle);
 protected slots:
@@ -31,9 +25,9 @@ private:
   Ui::EditUsersListDialogClass ui;
 private:
   QString FAffiliation;
-  QHash<Jid,QTableWidgetItem *> FCurrentItems;
-  QHash<Jid,QTableWidgetItem *> FAddedItems;
-  QList<Jid> FDeletedItems;
+  QList<QString> FDeletedItems;
+  QMap<QString,QTableWidgetItem *> FAddedItems;
+  QMap<QString,QTableWidgetItem *> FCurrentItems;
 };
 
 #endif // EDITUSERSLISTDIALOG_H
