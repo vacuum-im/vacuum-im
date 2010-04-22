@@ -64,7 +64,7 @@
 #define MUC_UNSECURED                   "muc_unsecured"
 
 struct IMultiUserListItem {
-  Jid userJid;
+  QString jid;
   QString role;
   QString affiliation;
   QString notes;

@@ -117,7 +117,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
         if (itemElem.attribute("affiliation") == affiliation)
         {
           IMultiUserListItem listitem;
-          listitem.userJid = itemElem.attribute("jid");
+          listitem.jid = itemElem.attribute("jid");
           listitem.affiliation = itemElem.attribute("affiliation");
           listitem.notes = itemElem.firstChildElement("reason").text();
           listItems.append(listitem);
@@ -452,7 +452,7 @@ bool MultiUserChat::changeAffiliationList(const QList<IMultiUserListItem> &ADelt
     {
       QDomElement itemElem = query.appendChild(iq.createElement("item")).toElement();
       itemElem.setAttribute("affiliation",listItem.affiliation);
-      itemElem.setAttribute("jid",listItem.userJid.eFull());
+      itemElem.setAttribute("jid",listItem.jid);
       if (!listItem.notes.isEmpty())
         itemElem.appendChild(iq.createElement("reason")).appendChild(iq.createTextNode(listItem.notes));
     }
