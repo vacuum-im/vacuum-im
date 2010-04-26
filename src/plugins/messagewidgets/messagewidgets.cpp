@@ -503,12 +503,18 @@ void MessageWidgets::onQuoteActionTriggered(bool)
   IToolBarWidget *widget = action!=NULL ? qobject_cast<IToolBarWidget *>(action->parent()) : NULL;
   if (widget && widget->viewWidget() && widget->viewWidget()->messageStyle() && widget->editWidget())
   {
-    QString quote = widget->viewWidget()->messageStyle()->selectedText(widget->viewWidget()->styleWidget()).trimmed();
-    if (!quote.isEmpty())
+    QTextDocumentFragment fragment = widget->viewWidget()->messageStyle()->selection(widget->viewWidget()->styleWidget());
+    if (!fragment.toPlainText().trimmed().isEmpty())
     {
-      foreach(QString line, quote.split("\n"))
-        widget->editWidget()->textEdit()->textCursor().insertText("> "+line+"\n");
-      widget->editWidget()->textEdit()->setFocus();
+      QTextEdit *editor = widget->editWidget()->textEdit();
+      editor->textCursor().beginEditBlock();
+      if (!editor->textCursor().atBlockStart())
+        editor->textCursor().insertText("\n");
+      editor->textCursor().insertText(">----\n");
+      editor->textCursor().insertFragment(fragment);
+      editor->textCursor().insertText("\n----<\n");
+      editor->textCursor().endEditBlock();
+      editor->setFocus();
     }
   }
 }

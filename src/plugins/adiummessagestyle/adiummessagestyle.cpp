@@ -4,14 +4,16 @@
 #include <QDir>
 #include <QFile>
 #include <QRegExp>
+#include <QMimeData>
 #include <QWebFrame>
 #include <QByteArray>
+#include <QClipboard>
 #include <QStringList>
 #include <QTextCursor>
 #include <QWebSettings>
 #include <QDomDocument>
+#include <QApplication>
 #include <QTextDocument>
-#include <QCoreApplication>
 
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
@@ -87,10 +89,15 @@ QString AdiumMessageStyle::senderColor(const QString &ASenderId) const
   return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
-QString AdiumMessageStyle::selectedText(QWidget *AWidget) const
+QTextDocumentFragment AdiumMessageStyle::selection(QWidget *AWidget) const
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-  return view!=NULL ? view->page()->selectedText() : QString::null;
+  if (view && !view->page()->selectedText().isEmpty())
+  {
+    view->page()->triggerAction(QWebPage::Copy);
+    return QTextDocumentFragment::fromHtml(QApplication::clipboard()->mimeData()->html());
+  }
+  return QTextDocumentFragment();
 }
 
 bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)

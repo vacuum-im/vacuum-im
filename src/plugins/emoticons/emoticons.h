@@ -62,12 +62,16 @@ signals:
   void optionsRejected();
 protected:
   void createIconsetUrls();
+  void replaceTextToImage(QTextDocument *ADocument) const;
+  void replaceImageToText(QTextDocument *ADocument) const;
   SelectIconMenu *createSelectIconMenu(const QString &ASubStorage, QWidget *AParent);
   void insertSelectIconMenu(const QString &ASubStorage);
   void removeSelectIconMenu(const QString &ASubStorage);
 protected slots:
   void onToolBarWidgetCreated(IToolBarWidget *AWidget);
   void onToolBarWidgetDestroyed(QObject *AObject);
+  void onEditWidgetCreated(IEditWidget *AEditWidget);
+  void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
   void onIconSelected(const QString &ASubStorage, const QString &AIconKey);
   void onSelectIconMenuDestroyed(QObject *AObject);
   void onSettingsOpened();

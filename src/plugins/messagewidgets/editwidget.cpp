@@ -7,7 +7,7 @@
 EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
-  ui.medEditor->setAcceptRichText(false);
+  ui.medEditor->setAcceptRichText(true);
   ui.medEditor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
   FMessageWidgets = AMessageWidgets;
