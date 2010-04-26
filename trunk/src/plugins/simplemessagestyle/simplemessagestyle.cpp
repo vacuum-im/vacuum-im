@@ -71,10 +71,10 @@ QString SimpleMessageStyle::senderColor(const QString &ASenderId) const
   return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
-QString SimpleMessageStyle::selectedText(QWidget *AWidget) const
+QTextDocumentFragment SimpleMessageStyle::selection(QWidget *AWidget) const
 {
   StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-  return view!=NULL ? view->textCursor().selection().toPlainText() : QString::null;
+  return view!=NULL ? view->textCursor().selection() : QTextDocumentFragment();
 }
 
 bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)

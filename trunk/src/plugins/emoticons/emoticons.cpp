@@ -1,6 +1,7 @@
 #include "emoticons.h"
 
 #include <QSet>
+#include <QTextBlock>
 
 #define DEFAULT_ICONSET                 "kolobok_dark"
 
@@ -43,6 +44,7 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     if (FMessageWidgets)
     {
       connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
+      connect(FMessageWidgets->instance(),SIGNAL(editWidgetCreated(IEditWidget *)),SLOT(onEditWidgetCreated(IEditWidget *)));
     }
   }
 
@@ -79,35 +81,15 @@ bool Emoticons::initObjects()
 void Emoticons::writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
 {
   Q_UNUSED(AMessage); Q_UNUSED(ALang);
-  static QChar imageChar = QChar::ObjectReplacementCharacter;
   if (AOrder == MWO_EMOTICONS)
-  {
-    for (QTextCursor cursor = ADocument->find(imageChar); !cursor.isNull();  cursor = ADocument->find(imageChar,cursor))
-    {
-      QUrl url = cursor.charFormat().toImageFormat().name();
-      QString key = keyByUrl(url);
-      if (!key.isEmpty())
-      {
-        cursor.insertText(key);
-        cursor.insertText(" ");
-      }
-    }
-  }
+    replaceImageToText(ADocument);
 }
 
 void Emoticons::writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
 {
   Q_UNUSED(AMessage); Q_UNUSED(ALang);
   if (AOrder == MWO_EMOTICONS)
-  {
-    QRegExp regexp("\\S+");
-    for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
-    {
-      QUrl url = FUrlByKey.value(cursor.selectedText());
-      if (!url.isEmpty())
-        cursor.insertImage(url.toString());
-    }
-  }
+    replaceTextToImage(ADocument);
 }
 
 QWidget *Emoticons::optionsWidget(const QString &ANode, int &AOrder)
@@ -203,6 +185,37 @@ void Emoticons::createIconsetUrls()
   }
 }
 
+void Emoticons::replaceTextToImage(QTextDocument *ADocument) const
+{
+  static const QRegExp regexp("\\S+");
+  for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
+  {
+    QUrl url = FUrlByKey.value(cursor.selectedText());
+    if (!url.isEmpty())
+    {
+      ADocument->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
+      cursor.insertImage(url.toString());
+    }
+  }
+}
+
+void Emoticons::replaceImageToText(QTextDocument *ADocument) const
+{
+  static const QString imageChar = QChar::ObjectReplacementCharacter;
+  for (QTextCursor cursor = ADocument->find(imageChar); !cursor.isNull();  cursor = ADocument->find(imageChar,cursor))
+  {
+    if (cursor.charFormat().isImageFormat())
+    {
+      QString key = FUrlByKey.key(cursor.charFormat().toImageFormat().name());
+      if (!key.isEmpty())
+      {
+        cursor.insertText(key);
+        cursor.insertText(" ");
+      }
+    }
+  }
+}
+
 SelectIconMenu *Emoticons::createSelectIconMenu(const QString &ASubStorage, QWidget *AParent)
 {
   SelectIconMenu *menu = new SelectIconMenu(ASubStorage, AParent);
@@ -270,6 +283,42 @@ void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
   }
 }
 
+void Emoticons::onEditWidgetCreated(IEditWidget *AEditWidget)
+{
+  connect(AEditWidget->textEdit()->document(),SIGNAL(contentsChange(int,int,int)),SLOT(onEditWidgetContentsChanged(int,int,int)));
+}
+
+void Emoticons::onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded)
+{
+  Q_UNUSED(ARemoved);
+  if (AAdded>0)
+  {
+    QTextDocument *doc = qobject_cast<QTextDocument *>(sender());
+    QList<QUrl> urlList = FUrlByKey.values();
+    QTextBlock block = doc->findBlock(APosition);
+    while (block.isValid() && block.position()<=APosition+AAdded)
+    {
+      for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+      {
+        QTextFragment fragment = it.fragment();
+        if (fragment.charFormat().isImageFormat())
+        {
+          QUrl url = fragment.charFormat().toImageFormat().name();
+          if (doc->resource(QTextDocument::ImageResource,url).isNull())
+          {
+            if (urlList.contains(url))
+            {
+              doc->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
+              doc->markContentsDirty(fragment.position(),fragment.length());
+            }
+          }
+        }
+      }
+      block = block.next();
+    }
+  }
+}
+
 void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconKey)
 {
   Q_UNUSED(ASubStorage);
@@ -279,9 +328,17 @@ void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconK
     IEditWidget *widget = FToolBarWidgetByMenu.value(menu)->editWidget();
     if (widget)
     {
-      widget->textEdit()->setFocus();
-      widget->textEdit()->textCursor().insertText(AIconKey);
-      widget->textEdit()->textCursor().insertText(" ");
+      QUrl url = FUrlByKey.value(AIconKey);
+      if (!url.isEmpty())
+      {
+        QTextEdit *editor = widget->textEdit();
+        editor->document()->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
+        editor->textCursor().beginEditBlock();
+        editor->textCursor().insertImage(url.toString());
+        editor->textCursor().insertText(" ");
+        editor->textCursor().endEditBlock();
+        editor->setFocus();
+      }
     }
   }
 }

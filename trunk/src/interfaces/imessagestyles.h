@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <QDateTime>
 #include <QStringList>
+#include <QTextDocumentFragment>
 #include <utils/jid.h>
 
 #define MESSAGESTYLES_UUID  "{e3ab1bc7-35a6-431a-9b91-c778451b1eb1}"
@@ -72,7 +73,7 @@ public:
   virtual QList<QWidget *> styleWidgets() const =0;
   virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent) =0;
   virtual QString senderColor(const QString &ASenderId) const =0;
-  virtual QString selectedText(QWidget *AWidget) const =0;
+  virtual QTextDocumentFragment selection(QWidget *AWidget) const =0;
   virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true) =0;
   virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 protected:
