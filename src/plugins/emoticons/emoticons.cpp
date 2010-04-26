@@ -201,7 +201,7 @@ void Emoticons::replaceTextToImage(QTextDocument *ADocument) const
 
 void Emoticons::replaceImageToText(QTextDocument *ADocument) const
 {
-  static const QString imageChar = QChar::ObjectReplacementCharacter;
+  static const QString imageChar = QString(QChar::ObjectReplacementCharacter);
   for (QTextCursor cursor = ADocument->find(imageChar); !cursor.isNull();  cursor = ADocument->find(imageChar,cursor))
   {
     if (cursor.charFormat().isImageFormat())
