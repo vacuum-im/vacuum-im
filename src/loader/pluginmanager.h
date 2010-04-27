@@ -7,6 +7,7 @@
 #include <QDomDocument>
 #include <QApplication>
 #include <QPluginLoader>
+#include <QSessionManager>
 #include <definations/plugininitorders.h>
 #include <definations/commandline.h>
 #include <definations/actiongroups.h>
@@ -77,6 +78,7 @@ protected:
   void createMenuActions();
 protected slots:
   void onApplicationAboutToQuit();
+  void onApplicationCommitDataRequested(QSessionManager &AManager);
   void onShowSetupPluginsDialog(bool);
   void onSetupPluginsDialogAccepted();
   void onShowAboutBoxDialog();

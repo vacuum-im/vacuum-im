@@ -53,6 +53,7 @@ PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
   FUtilsTranslator = new QTranslator(this);
   FLoaderTranslator = new QTranslator(this);
   connect(AParent,SIGNAL(aboutToQuit()),SLOT(onApplicationAboutToQuit()));
+  connect(AParent,SIGNAL(commitDataRequest(QSessionManager &)),SLOT(onApplicationCommitDataRequested(QSessionManager &)));
 }
 
 PluginManager::~PluginManager()
@@ -650,6 +651,12 @@ void PluginManager::onApplicationAboutToQuit()
   QCoreApplication::removeTranslator(FQtTranslator);
   QCoreApplication::removeTranslator(FUtilsTranslator);
   QCoreApplication::removeTranslator(FLoaderTranslator);
+}
+
+void PluginManager::onApplicationCommitDataRequested(QSessionManager &AManager)
+{
+  Q_UNUSED(AManager);
+  onApplicationAboutToQuit();
 }
 
 void PluginManager::onShowSetupPluginsDialog(bool)
