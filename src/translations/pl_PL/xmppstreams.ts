@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Failed to start connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można uruchomić połączenia</translation>
     </message>
 </context>
 <context>
