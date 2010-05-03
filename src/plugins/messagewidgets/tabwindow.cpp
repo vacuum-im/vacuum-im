@@ -11,13 +11,12 @@
 
 TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 {
+  ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
 
-  ui.setupUi(this);
   ui.twtTabs->widget(0)->deleteLater();
   ui.twtTabs->removeTab(0);
   ui.twtTabs->setMovable(true);
-  ui.twtTabs->setTabsClosable(true);
 
   FWindowId = AWindowId;
   FMessageWidgets = AMessageWidgets;
@@ -75,14 +74,17 @@ Menu *TabWindow::windowMenu() const
 
 void TabWindow::addPage(ITabWindowPage *APage)
 {
-  int index = ui.twtTabs->addTab(APage->instance(),APage->instance()->windowTitle());
-  connect(APage->instance(),SIGNAL(windowShow()),SLOT(onTabPageShow()));
-  connect(APage->instance(),SIGNAL(windowClose()),SLOT(onTabPageClose()));
-  connect(APage->instance(),SIGNAL(windowChanged()),SLOT(onTabPageChanged()));
-  connect(APage->instance(),SIGNAL(windowDestroyed()),SLOT(onTabPageDestroyed()));
-  updateTab(index);
-  updateWindow();
-  emit pageAdded(APage);
+  if (ui.twtTabs->indexOf(APage->instance()) < 0)
+  {
+    int index = ui.twtTabs->addTab(APage->instance(),APage->instance()->windowTitle());
+    connect(APage->instance(),SIGNAL(windowShow()),SLOT(onTabPageShow()));
+    connect(APage->instance(),SIGNAL(windowClose()),SLOT(onTabPageClose()));
+    connect(APage->instance(),SIGNAL(windowChanged()),SLOT(onTabPageChanged()));
+    connect(APage->instance(),SIGNAL(windowDestroyed()),SLOT(onTabPageDestroyed()));
+    updateTab(index);
+    updateWindow();
+    emit pageAdded(APage);
+  }
 }
 
 bool TabWindow::hasPage(ITabWindowPage *APage) const
@@ -97,8 +99,7 @@ ITabWindowPage *TabWindow::currentPage() const
 
 void TabWindow::setCurrentPage(ITabWindowPage *APage)
 {
-  if (APage)
-    ui.twtTabs->setCurrentWidget(APage->instance());
+  ui.twtTabs->setCurrentWidget(APage->instance());
 }
 
 void TabWindow::detachPage(ITabWindowPage *APage)
@@ -112,22 +113,19 @@ void TabWindow::detachPage(ITabWindowPage *APage)
 
 void TabWindow::removePage(ITabWindowPage *APage)
 {
-  if (APage)
+  int index = ui.twtTabs->indexOf(APage->instance());
+  if (index >=0)
   {
-    int index = ui.twtTabs->indexOf(APage->instance());
-    if (index >=0)
-    {
-      APage->instance()->close();
-      ui.twtTabs->removeTab(index);
-      APage->instance()->setParent(NULL);
-      disconnect(APage->instance(),SIGNAL(windowShow()),this,SLOT(onTabPageShow()));
-      disconnect(APage->instance(),SIGNAL(windowClose()),this,SLOT(onTabPageClose()));
-      disconnect(APage->instance(),SIGNAL(windowChanged()),this,SLOT(onTabPageChanged()));
-      disconnect(APage->instance(),SIGNAL(windowDestroyed()),this,SLOT(onTabPageDestroyed()));
-      emit pageRemoved(APage);
-      if (ui.twtTabs->count() == 0)
-        close();
-    }
+    ui.twtTabs->removeTab(index);
+    APage->instance()->close();
+    APage->instance()->setParent(NULL);
+    disconnect(APage->instance(),SIGNAL(windowShow()),this,SLOT(onTabPageShow()));
+    disconnect(APage->instance(),SIGNAL(windowClose()),this,SLOT(onTabPageClose()));
+    disconnect(APage->instance(),SIGNAL(windowChanged()),this,SLOT(onTabPageChanged()));
+    disconnect(APage->instance(),SIGNAL(windowDestroyed()),this,SLOT(onTabPageDestroyed()));
+    emit pageRemoved(APage);
+    if (ui.twtTabs->count() == 0)
+      close();
   }
 }
 
@@ -268,7 +266,9 @@ void TabWindow::onTabChanged(int /*AIndex*/)
 
 void TabWindow::onTabCloseRequested(int AIndex)
 {
-  removePage(qobject_cast<ITabWindowPage *>(ui.twtTabs->widget(AIndex)));
+  ITabWindowPage *page = qobject_cast<ITabWindowPage *>(ui.twtTabs->widget(AIndex));
+  if (page)
+    removePage(page);
 }
 
 void TabWindow::onTabPageShow()
@@ -290,10 +290,10 @@ void TabWindow::onTabPageClose()
 
 void TabWindow::onTabPageChanged()
 {
-  ITabWindowPage *widget = qobject_cast<ITabWindowPage *>(sender());
-  if (widget)
+  ITabWindowPage *page = qobject_cast<ITabWindowPage *>(sender());
+  if (page)
   {
-    int index = ui.twtTabs->indexOf(widget->instance());
+    int index = ui.twtTabs->indexOf(page->instance());
     updateTab(index);
     if (index == ui.twtTabs->currentIndex())
       updateWindow();

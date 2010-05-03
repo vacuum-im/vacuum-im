@@ -43,8 +43,8 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IMessageWriter
-  virtual void writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
-  virtual void writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
+  virtual void writeMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
+  virtual void writeText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
   //IOptionsHolder
   virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
   //IEmoticons

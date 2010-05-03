@@ -12,18 +12,18 @@
 class IMessageHandler
 {
 public:
-  virtual bool checkMessage(const Message &AMessage) =0;
+  virtual bool checkMessage(int AOrder, const Message &AMessage) =0;
   virtual void showMessage(int AMessageId) =0;
   virtual void receiveMessage(int AMessageId) =0;
-  virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) =0;
   virtual INotification notification(INotifications *ANotifications, const Message &AMessage) =0;
+  virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) =0;
 };
 
 class IMessageWriter
 {
 public:
-  virtual void writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder) =0;
-  virtual void writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder) =0;
+  virtual void writeText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang) =0;
+  virtual void writeMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang) =0;
 };
 
 class IMessageProcessor

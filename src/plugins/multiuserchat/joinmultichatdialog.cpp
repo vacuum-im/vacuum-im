@@ -80,8 +80,8 @@ void JoinMultiChatDialog::onDialogAccepted()
     IMultiUserChatWindow *chatWindow = FChatPlugin->getMultiChatWindow(FStreamJid,roomJid,nick,password);
     if (chatWindow)
     {
-      chatWindow->multiUserChat()->setAutoPresence(true);
       chatWindow->showWindow();
+      chatWindow->multiUserChat()->setAutoPresence(true);
     }
     accept();
   }

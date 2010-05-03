@@ -97,8 +97,9 @@ QWidget *MessageWidgets::optionsWidget(const QString &ANode, int &AOrder)
   return NULL;
 }
 
-bool MessageWidgets::viewUrlOpen(IViewWidget * /*APage*/, const QUrl &AUrl, int /*AOrder*/)
+bool MessageWidgets::viewUrlOpen(IViewWidget* APage, const QUrl &AUrl, int AOrder)
 {
+  Q_UNUSED(APage); Q_UNUSED(AOrder);
   return QDesktopServices::openUrl(AUrl);
 }
 
