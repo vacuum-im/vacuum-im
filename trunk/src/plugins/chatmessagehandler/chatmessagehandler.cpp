@@ -153,26 +153,28 @@ bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJ
     {
       IChatWindow *window = getWindow(AStreamJid, AContactJid);
       window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
-      showWindow(window);
+      window->showWindow();
       return true;
     }
   }
   return false;
 }
 
-bool ChatMessageHandler::rosterIndexClicked(IRosterIndex *AIndex, int /*AOrder*/)
+bool ChatMessageHandler::rosterIndexClicked(IRosterIndex *AIndex, int AOrder)
 {
+  Q_UNUSED(AOrder);
   if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE)
   {
     Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
     Jid contactJid = AIndex->data(RDR_JID).toString();
-    return openWindow(streamJid,contactJid,Message::Chat);
+    return openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat);
   }
   return false;
 }
 
-bool ChatMessageHandler::checkMessage(const Message &AMessage)
+bool ChatMessageHandler::checkMessage(int AOrder, const Message &AMessage)
 {
+  Q_UNUSED(AOrder);
   if (AMessage.type()==Message::Chat && !AMessage.body().isEmpty())
     return true;
   return false;
@@ -183,7 +185,7 @@ void ChatMessageHandler::showMessage(int AMessageId)
   Message message = FMessageProcessor->messageById(AMessageId);
   Jid streamJid = message.to();
   Jid contactJid = message.from();
-  openWindow(streamJid,contactJid,message.type());
+  openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,message.type());
 }
 
 void ChatMessageHandler::receiveMessage(int AMessageId)
@@ -201,20 +203,6 @@ void ChatMessageHandler::receiveMessage(int AMessageId)
     else
       FMessageProcessor->removeMessage(AMessageId);
   }
-}
-
-bool ChatMessageHandler::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
-{
-  if (AType == Message::Chat)
-  {
-    IChatWindow *window = getWindow(AStreamJid,AContactJid);
-    if (window)
-    {
-      showWindow(window);
-      return true;
-    }
-  }
-  return false;
 }
 
 INotification ChatMessageHandler::notification(INotifications *ANotifications, const Message &AMessage)
@@ -237,6 +225,21 @@ INotification ChatMessageHandler::notification(INotifications *ANotifications, c
   notify.data.insert(NDR_SOUND_FILE,SDF_CHAT_MHANDLER_MESSAGE);
 
   return notify;
+}
+
+bool ChatMessageHandler::openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
+{
+  Q_UNUSED(AOrder);
+  if (AType == Message::Chat)
+  {
+    IChatWindow *window = getWindow(AStreamJid,AContactJid);
+    if (window)
+    {
+      window->showWindow();
+      return true;
+    }
+  }
+  return false;
 }
 
 IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid)
@@ -281,13 +284,6 @@ IChatWindow *ChatMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AC
     if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
       return window;
   return NULL;
-}
-
-void ChatMessageHandler::showWindow(IChatWindow *AWindow)
-{
-  if (FMessageWidgets && AWindow->instance()->isWindow() && !AWindow->instance()->isVisible())
-    FMessageWidgets->assignTabWindowPage(AWindow);
-  AWindow->showWindow();
 }
 
 void ChatMessageHandler::updateWindow(IChatWindow *AWindow)
@@ -507,7 +503,7 @@ void ChatMessageHandler::onShowWindowAction(bool)
   {
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-    openWindow(streamJid,contactJid,Message::Chat);
+    openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat);
   }
 }
 

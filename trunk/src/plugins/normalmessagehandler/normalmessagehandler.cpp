@@ -138,8 +138,9 @@ bool NormalMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
   return false;
 }
 
-bool NormalMessageHandler::checkMessage(const Message &AMessage)
+bool NormalMessageHandler::checkMessage(int AOrder, const Message &AMessage)
 {
+  Q_UNUSED(AOrder);
   if (!AMessage.body().isEmpty() || !AMessage.subject().isEmpty())
     return true;
   return false;
@@ -150,7 +151,7 @@ void NormalMessageHandler::showMessage(int AMessageId)
   Message message = FMessageProcessor->messageById(AMessageId);
   Jid streamJid = message.to();
   Jid contactJid = message.from();
-  openWindow(streamJid,contactJid,message.type());
+  openWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,message.type());
 }
 
 void NormalMessageHandler::receiveMessage(int AMessageId)
@@ -164,17 +165,6 @@ void NormalMessageHandler::receiveMessage(int AMessageId)
   }
   else
     FActiveMessages.insertMulti(NULL,AMessageId);
-}
-
-bool NormalMessageHandler::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType /*AType*/)
-{
-  IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
-  if (window)
-  {
-    showWindow(window);
-    return true;
-  }
-  return false;
 }
 
 INotification NormalMessageHandler::notification(INotifications *ANotifications, const Message &AMessage)
@@ -197,6 +187,18 @@ INotification NormalMessageHandler::notification(INotifications *ANotifications,
   notify.data.insert(NDR_SOUND_FILE,SDF_NORMAL_MHANDLER_MESSAGE);
 
   return notify;
+}
+
+bool NormalMessageHandler::openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType /*AType*/)
+{
+  Q_UNUSED(AOrder);
+  IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
+  if (window)
+  {
+    showWindow(window);
+    return true;
+  }
+  return false;
 }
 
 IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
@@ -433,7 +435,7 @@ void NormalMessageHandler::onShowWindowAction(bool)
   {
     Jid streamJid = action->data(ADR_STREAM_JID).toString();
     Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-    openWindow(streamJid,contactJid,Message::Normal);
+    openWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal);
 
     QString group = action->data(ADR_GROUP).toString();
     if (!group.isEmpty())

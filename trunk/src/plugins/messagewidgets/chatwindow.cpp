@@ -70,6 +70,9 @@ QString ChatWindow::tabPageId() const
 
 void ChatWindow::showWindow()
 {
+  if (isWindow() && !isVisible())
+    FMessageWidgets->assignTabWindowPage(this);
+
   if (isWindow())
   {
     isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();

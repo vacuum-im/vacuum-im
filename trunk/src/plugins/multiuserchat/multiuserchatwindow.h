@@ -60,11 +60,11 @@ public:
   virtual void showWindow();
   virtual void closeWindow();
   //IMessageHandler
-  virtual bool checkMessage(const Message &AMessage);
+  virtual bool checkMessage(int AOrder, const Message &AMessage);
   virtual void receiveMessage(int AMessageId);
   virtual void showMessage(int AMessageId);
-  virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
+  virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   //IMultiUserChatWindow
   virtual Jid streamJid() const { return FMultiChat->streamJid(); }
   virtual Jid roomJid() const { return FMultiChat->roomJid(); }
@@ -123,7 +123,6 @@ protected:
   void showChatMessage(IChatWindow *AWindow, const Message &AMessage);
   void showChatHistory(IChatWindow *AWindow);
   IChatWindow *getChatWindow(const Jid &AContactJid);
-  void showChatWindow(IChatWindow *AWindow);
   void removeActiveChatMessages(IChatWindow *AWindow);
   void updateChatWindow(IChatWindow *AWindow);
 protected:

@@ -351,8 +351,9 @@ IDataFormLocale MultiUserChatPlugin::dataFormLocale(const QString &AFormType)
   return locale;
 }
 
-bool MultiUserChatPlugin::checkMessage(const Message &AMessage)
+bool MultiUserChatPlugin::checkMessage(int AOrder, const Message &AMessage)
 {
+  Q_UNUSED(AOrder);
   return !AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite").isNull();
 }
 
@@ -392,12 +393,6 @@ void MultiUserChatPlugin::showMessage(int AMessageId)
   FMessageProcessor->removeMessage(AMessageId);
 }
 
-bool MultiUserChatPlugin::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
-{
-  Q_UNUSED(AStreamJid); Q_UNUSED(AContactJid); Q_UNUSED(AType);
-  return false;
-}
-
 INotification MultiUserChatPlugin::notification(INotifications *ANotifications, const Message &AMessage)
 {
   INotification notify;
@@ -419,6 +414,12 @@ INotification MultiUserChatPlugin::notification(INotifications *ANotifications, 
     notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
   }
   return notify;
+}
+
+bool MultiUserChatPlugin::openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
+{
+  Q_UNUSED(AOrder); Q_UNUSED(AStreamJid); Q_UNUSED(AContactJid); Q_UNUSED(AType);
+  return false;
 }
 
 bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid)

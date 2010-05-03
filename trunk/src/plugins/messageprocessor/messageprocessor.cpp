@@ -69,6 +69,12 @@ bool MessageProcessor::initObjects()
   return true;
 }
 
+bool MessageProcessor::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+  Q_UNUSED(AHandlerId); Q_UNUSED(AStreamJid); Q_UNUSED(AStanza); Q_UNUSED(AAccept);
+  return false;
+}
+
 bool MessageProcessor::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
 {
   if (FSHIMessages.value(AStreamJid) == AHandlerId)
@@ -80,7 +86,7 @@ bool MessageProcessor::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
   return false;
 }
 
-void MessageProcessor::writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
+void MessageProcessor::writeMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
 {
   if (AOrder == MWO_MESSAGEPROCESSOR)
   {
@@ -88,7 +94,7 @@ void MessageProcessor::writeMessage(Message &AMessage, QTextDocument *ADocument,
   }
 }
 
-void MessageProcessor::writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
+void MessageProcessor::writeText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
 {
   if (AOrder == MWO_MESSAGEPROCESSOR)
   {
@@ -189,7 +195,7 @@ void MessageProcessor::textToMessage(Message &AMessage, const QTextDocument *ADo
   while(it.hasPrevious())
   {
     it.previous();
-    it.value()->writeMessage(AMessage,documentCopy,ALang,it.key());
+    it.value()->writeMessage(it.key(),AMessage,documentCopy,ALang);
   }
   delete documentCopy;
 }
@@ -202,14 +208,14 @@ void MessageProcessor::messageToText(QTextDocument *ADocument, const Message &AM
   while(it.hasNext())
   {
     it.next();
-    it.value()->writeText(messageCopy,ADocument,ALang,it.key());
+    it.value()->writeText(it.key(), messageCopy,ADocument,ALang);
   }
 }
 
 bool MessageProcessor::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) const
 {
-  foreach(IMessageHandler *handler, FMessageHandlers)
-    if (handler->openWindow(AStreamJid,AContactJid,AType))
+  for (QMultiMap<int, IMessageHandler *>::const_iterator it = FMessageHandlers.constBegin(); it!=FMessageHandlers.constEnd(); it++)
+    if (it.value()->openWindow(it.key(),AStreamJid,AContactJid,AType))
       return true;
   return false;
 }
@@ -258,9 +264,9 @@ int MessageProcessor::newMessageId()
 
 IMessageHandler *MessageProcessor::getMessageHandler(const Message &AMessage)
 {
-  foreach(IMessageHandler *handler, FMessageHandlers)
-    if (handler->checkMessage(AMessage))
-      return handler;
+  for (QMultiMap<int, IMessageHandler *>::const_iterator it = FMessageHandlers.constBegin(); it!=FMessageHandlers.constEnd(); it++)
+    if (it.value()->checkMessage(it.key(),AMessage))
+      return it.value();
   return NULL;
 }
 

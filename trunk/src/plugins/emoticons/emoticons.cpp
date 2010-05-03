@@ -78,14 +78,14 @@ bool Emoticons::initObjects()
   return true;
 }
 
-void Emoticons::writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
+void Emoticons::writeMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
 {
   Q_UNUSED(AMessage); Q_UNUSED(ALang);
   if (AOrder == MWO_EMOTICONS)
     replaceImageToText(ADocument);
 }
 
-void Emoticons::writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder)
+void Emoticons::writeText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
 {
   Q_UNUSED(AMessage); Q_UNUSED(ALang);
   if (AOrder == MWO_EMOTICONS)

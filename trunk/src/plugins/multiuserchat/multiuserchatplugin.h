@@ -72,11 +72,11 @@ public:
   //IDataLocalizer
   virtual IDataFormLocale dataFormLocale(const QString &AFormType);
   //IMessageHandler
-  virtual bool checkMessage(const Message &AMessage);
+  virtual bool checkMessage(int AOrder, const Message &AMessage);
   virtual void receiveMessage(int AMessageId);
   virtual void showMessage(int AMessageId);
-  virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
+  virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
   //IMultiUserChatPlugin
   virtual IPluginManager *pluginManager() const { return FPluginManager; }
   virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);

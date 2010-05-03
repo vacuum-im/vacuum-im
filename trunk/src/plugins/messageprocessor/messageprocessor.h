@@ -30,11 +30,11 @@ public:
   virtual bool initSettings() { return true; }
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
-  virtual bool stanzaEdit(int /*AHandlerId*/, const Jid &/*AStreamJid*/, Stanza &/*AStanza*/, bool &/*AAccept*/) { return false; }
+  virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
   virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
   //IMessageWriter
-  virtual void writeMessage(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
-  virtual void writeText(Message &AMessage, QTextDocument *ADocument, const QString &ALang, int AOrder);
+  virtual void writeMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
+  virtual void writeText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
   //IMessageProcessor
   virtual int receiveMessage(const Message &AMessage);
   virtual bool sendMessage(const Jid &AStreamJid, const Message &AMessage);

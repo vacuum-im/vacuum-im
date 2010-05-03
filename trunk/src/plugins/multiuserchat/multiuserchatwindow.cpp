@@ -79,7 +79,7 @@ MultiUserChatWindow::~MultiUserChatWindow()
     delete window->instance();
 
   if (FMessageProcessor)
-    FMessageProcessor->removeMessageHandler(this,MHO_MULTIUSERCHAT);
+    FMessageProcessor->removeMessageHandler(this,MHO_MULTIUSERCHAT_GROUPCHAT);
 
   saveWindowState();
   emit windowDestroyed();
@@ -112,8 +112,9 @@ void MultiUserChatWindow::closeWindow()
     emit windowClose();
 }
 
-bool MultiUserChatWindow::checkMessage(const Message &AMessage)
+bool MultiUserChatWindow::checkMessage(int AOrder, const Message &AMessage)
 {
+  Q_UNUSED(AOrder);
   return (streamJid() == AMessage.to()) && (roomJid() && AMessage.from());
 }
 
@@ -175,25 +176,8 @@ void MultiUserChatWindow::showMessage(int AMessageId)
   else
   {
     Message message = FMessageProcessor->messageById(AMessageId);
-    openWindow(message.to(),message.from(),message.type());
+    openWindow(MHO_MULTIUSERCHAT_GROUPCHAT,message.to(),message.from(),message.type());
   }
-}
-
-bool MultiUserChatWindow::openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
-{
-  if ((streamJid() == AStreamJid) && (roomJid() && AContactJid))
-  {
-    if (AType == Message::GroupChat)
-    {
-      showWindow();
-    }
-    else
-    {
-      openChatWindow(AContactJid);
-    }
-    return true;
-  }
-  return false;
 }
 
 INotification MultiUserChatWindow::notification(INotifications *ANotifications, const Message &AMessage)
@@ -260,11 +244,29 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
   return notify;
 }
 
+bool MultiUserChatWindow::openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
+{
+  Q_UNUSED(AOrder);
+  if ((streamJid() == AStreamJid) && (roomJid() && AContactJid))
+  {
+    if (AType == Message::GroupChat)
+    {
+      showWindow();
+    }
+    else
+    {
+      openChatWindow(AContactJid);
+    }
+    return true;
+  }
+  return false;
+}
+
 IChatWindow *MultiUserChatWindow::openChatWindow(const Jid &AContactJid)
 {
   IChatWindow *window = getChatWindow(AContactJid);
   if (window)
-    showChatWindow(window);
+    window->showWindow();
   return window;
 }
 
@@ -355,7 +357,7 @@ void MultiUserChatWindow::initialize()
     FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
     if (FMessageProcessor)
     {
-      FMessageProcessor->insertMessageHandler(this,MHO_MULTIUSERCHAT);
+      FMessageProcessor->insertMessageHandler(this,MHO_MULTIUSERCHAT_GROUPCHAT);
     }
   }
 
@@ -1289,13 +1291,6 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
   return window;
 }
 
-void MultiUserChatWindow::showChatWindow(IChatWindow *AWindow)
-{
-  if (FMessageWidgets && AWindow->instance()->isWindow() && !AWindow->instance()->isVisible())
-    FMessageWidgets->assignTabWindowPage(AWindow);
-  AWindow->showWindow();
-}
-
 void MultiUserChatWindow::removeActiveChatMessages(IChatWindow *AWindow)
 {
   if (FActiveChatMessages.contains(AWindow))
@@ -1949,7 +1944,7 @@ void MultiUserChatWindow::onUserItemActivated(const QModelIndex &AIndex)
 {
   IMultiUser *user = FUsers.key(FUsersModel->itemFromIndex(FUsersProxy->mapToSource(AIndex)));
   if (user)
-    openWindow(streamJid(),user->contactJid(),Message::Chat);
+    openWindow(MHO_MULTIUSERCHAT_GROUPCHAT,streamJid(),user->contactJid(),Message::Chat);
 }
 
 void MultiUserChatWindow::onStatusIconsChanged()
