@@ -15,6 +15,10 @@
         <source>&lt;No Proxy&gt;</source>
         <translation>&lt;Без прокси&gt;</translation>
     </message>
+    <message>
+        <source>New Proxy</source>
+        <translation>Новый прокси</translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>

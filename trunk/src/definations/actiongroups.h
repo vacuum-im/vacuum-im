@@ -2,7 +2,7 @@
 #define DEF_ACTIONGROUPS_H
 
 //MainWindow  - MainMenu
-#define AG_MMENU_SETTINGS                                       500
+#define AG_MMENU_OPTIONS                                        500
 #define AG_MMENU_ACCOUNTMANAGER                                 500
 #define AG_MMENU_SKINMANAGER                                    500
 #define AG_MMENU_CONSOLE                                        500
@@ -38,7 +38,7 @@
 #define AG_TMTM_MAINWINDOW                                      200                    
 #define AG_TMTM_NOTIFICATIONS                                   300                    
 #define AG_TMTM_STATUSCHANGER                                   400
-#define AG_TMTM_SETTINGS                                        500
+#define AG_TMTM_OPTIONS                                         500
 #define AG_TMTM_SKINMANAGER                                     500
 #define AG_TMTM_DISCOVERY                                       500
 #define AG_TMTM_MULTIUSERCHAT                                   500

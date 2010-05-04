@@ -24,8 +24,6 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
     SLOT(onTabWindowAppended(const QUuid &, const QString &)));
   connect(FMessageWidgets->instance(),SIGNAL(tabWindowNameChanged(const QUuid &, const QString &)),
     SLOT(onTabWindowNameChanged(const QUuid &, const QString &)));
-  connect(FMessageWidgets->instance(),SIGNAL(defaultTabWindowChanged(const QUuid &)),
-    SLOT(onDefaultTabWindowChanged(const QUuid &)));
   connect(FMessageWidgets->instance(),SIGNAL(tabWindowDeleted(const QUuid &)),SLOT(onTabWindowDeleted(const QUuid &)));
 
   QPushButton *menuButton = new QPushButton(ui.twtTabs);
@@ -143,15 +141,7 @@ void TabWindow::clear()
 
 void TabWindow::initialize()
 {
-  IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-  {
-    ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (settingsPlugin)
-    {
-      FSettings = settingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
-    }
-  }
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 }
 
 void TabWindow::createActions()
@@ -214,27 +204,19 @@ void TabWindow::createActions()
   FWindowMenu->addAction(FDeleteWindow,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
   connect(FDeleteWindow,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
-  onDefaultTabWindowChanged(FMessageWidgets->defaultTabWindow());
+  onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT));
 }
 
 void TabWindow::saveWindowState()
 {
-  if (FSettings)
-  {
-    QString ns = FWindowId.toString();
-    FSettings->setValueNS(SVN_SHOW_CLOSE_BUTTONS,ns,ui.twtTabs->tabsClosable());
-    FSettings->saveBinaryData(BDI_TABWINDOW_GEOMETRY"|"+ns,saveGeometry());
-  }
+  Options::setFileValue(saveGeometry(),"messages.tabwindows.window.geometry",FWindowId.toString());
+  Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).setValue(ui.twtTabs->tabsClosable(),"tabs-closable");
 }
 
 void TabWindow::loadWindowState()
 {
-  if (FSettings)
-  {
-    QString ns = FWindowId.toString();
-    ui.twtTabs->setTabsClosable(FSettings->valueNS(SVN_SHOW_CLOSE_BUTTONS,ns,true).toBool());
-    restoreGeometry(FSettings->loadBinaryData(BDI_TABWINDOW_GEOMETRY"|"+ns));
-  }
+  restoreGeometry(Options::fileValue("messages.tabwindows.window.geometry",FWindowId.toString()).toByteArray());
+  ui.twtTabs->setTabsClosable(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).value("tabs-closable").toBool());
 }
 
 void TabWindow::updateWindow()
@@ -333,10 +315,13 @@ void TabWindow::onTabWindowDeleted(const QUuid &AWindowId)
       FJoinMenu->removeAction(action);
 }
 
-void TabWindow::onDefaultTabWindowChanged(const QUuid &AWindowId)
+void TabWindow::onOptionsChanged( const OptionsNode &ANode )
 {
-  FSetAsDefault->setChecked(FWindowId==AWindowId);
-  FDeleteWindow->setVisible(FWindowId!=AWindowId);
+  if (ANode.path() == OPV_MESSAGES_TABWINDOWS_DEFAULT)
+  {
+    FSetAsDefault->setChecked(FWindowId==ANode.value().toString());
+    FDeleteWindow->setVisible(!FSetAsDefault->isChecked());
+  }
 }
 
 void TabWindow::onActionTriggered(bool)
@@ -375,8 +360,7 @@ void TabWindow::onActionTriggered(bool)
   }
   else if (action == FSetAsDefault)
   {
-    FMessageWidgets->setDefaultTabWindow(FWindowId);
-    FSetAsDefault->setChecked(true);
+    Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).setValue(true);
   }
   else if (action == FRenameWindow)
   {

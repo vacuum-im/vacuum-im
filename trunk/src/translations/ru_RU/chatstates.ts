@@ -23,9 +23,6 @@
         <source>Supports the exchanging of the information about the user&apos;s activity in the chat</source>
         <translation>Поддерживает обмен информацией об активности пользователя в чате</translation>
     </message>
-</context>
-<context>
-    <name>StateOptionsWidgetClass</name>
     <message>
         <source>Send chat state notifications</source>
         <translation>Отправлять уведомления об активности в чате</translation>

@@ -257,6 +257,14 @@
         <source>You are assured that wish to remove %1 contact(s) from roster?</source>
         <translation>Jesteś pewien, że chcesz usunąć %1 kontakt(y/ów) z rostera?</translation>
     </message>
+    <message>
+        <source>Auto accept subscription requests</source>
+        <translation type="unfinished">Akceptuj automatycznie prośby o autoryzację</translation>
+    </message>
+    <message>
+        <source>Auto unsubscribe contacts</source>
+        <translation type="unfinished">Automatycznie cofaj autoryzację</translation>
+    </message>
 </context>
 <context>
     <name>SubscriptionDialog</name>
@@ -302,17 +310,6 @@
     <message>
         <source>Remove presence subscription</source>
         <translation>Cofnij autoryzację</translation>
-    </message>
-</context>
-<context>
-    <name>SubscriptionOptionsClass</name>
-    <message>
-        <source>Auto accept subscription requests</source>
-        <translation>Akceptuj automatycznie prośby o autoryzację</translation>
-    </message>
-    <message>
-        <source>Auto unsubscribe contacts</source>
-        <translation>Automatycznie cofaj autoryzację</translation>
     </message>
 </context>
 </TS>

@@ -15,6 +15,10 @@
         <source>Allows to view XML stream between the client and server</source>
         <translation>Позволяет просматривать XML поток чежду клиентом и сервером</translation>
     </message>
+    <message>
+        <source>Default Context</source>
+        <translation>Контекст по умолчанию</translation>
+    </message>
 </context>
 <context>
     <name>ConsoleWidget</name>
@@ -27,24 +31,28 @@
         <translation>XML Консоль - %1</translation>
     </message>
     <message>
-        <source>Default</source>
-        <translation>По умолчанию</translation>
+        <source>Start sending user stanza...</source>
+        <translation>Ночало отправки станзы пользователя...</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Start sending user stanza...&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Начинается отправка XML-транзакции...&lt;/b&gt;&lt;br&gt;</translation>
+        <source>User stanza sended.</source>
+        <translation>Станза пользователя отправлена.</translation>
     </message>
     <message>
-        <source>&lt;b&gt;User stanza sended.&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;XML-транзакция отправлена.&lt;/b&gt;&lt;br&gt;</translation>
+        <source>Stanza is not well formed.</source>
+        <translation>Станза не верно сформирована.</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Stanza is not well formed.&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;XML-транзакция сформирована неправильно.&lt;/b&gt;&lt;br&gt;</translation>
+        <source>XML is not well formed.</source>
+        <translation>XML не верно сформирован.</translation>
     </message>
     <message>
-        <source>&lt;b&gt;XML is not well formed.&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;XML сформирован неправильно.&lt;/b&gt;&lt;br&gt;</translation>
+        <source>New Context</source>
+        <translation>Новый контекст</translation>
+    </message>
+    <message>
+        <source>Enter context name</source>
+        <translation>Введите имя контекста</translation>
     </message>
 </context>
 <context>
@@ -82,18 +90,6 @@
         <translation>Сохраненный контекст:</translation>
     </message>
     <message>
-        <source>Load</source>
-        <translation>Загрузить</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
         <source>Console</source>
         <translation>Консоль</translation>
     </message>
@@ -102,12 +98,12 @@
         <translation>Переносить по словам</translation>
     </message>
     <message>
-        <source>Colored XML</source>
-        <translation>Подсветка XML</translation>
-    </message>
-    <message>
         <source>Send</source>
         <translation>Отправить</translation>
+    </message>
+    <message>
+        <source>Hilight XML</source>
+        <translation>Подсвечивать XML</translation>
     </message>
 </context>
 </TS>

@@ -9,10 +9,10 @@
 #include <definations/resources.h>
 #include <definations/statusbargroups.h>
 #include <interfaces/ifilestreamsmanager.h>
-#include <interfaces/isettings.h>
 #include <utils/toolbarchanger.h>
 #include <utils/statusbarchanger.h>
 #include <utils/iconstorage.h>
+#include <utils/options.h>
 #include "ui_filestreamswindow.h"
 
 class FileStreamsWindow : 
@@ -20,7 +20,7 @@ class FileStreamsWindow :
 {
   Q_OBJECT;
 public:
-  FileStreamsWindow(IFileStreamsManager *AManager, ISettings *ASettings, QWidget *AParent = NULL);
+  FileStreamsWindow(IFileStreamsManager *AManager, QWidget *AParent);
   ~FileStreamsWindow();
 protected:
   void initialize();
@@ -45,7 +45,6 @@ protected slots:
 private:
   Ui::FileStreamsWindowClass ui;
 private:
-  ISettings *FSettings;
   IFileStreamsManager *FManager;
 private:
   QLabel *FStreamsCount;

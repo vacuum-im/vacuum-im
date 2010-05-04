@@ -14,6 +14,7 @@
 #include <definations/soundfiles.h>
 #include <definations/resources.h>
 #include <definations/toolbargroups.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -26,15 +27,15 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/jid.h>
 #include <utils/action.h>
 #include <utils/stanza.h>
+#include <utils/options.h>
 #include <utils/datetime.h>
 #include <utils/iconstorage.h>
 #include <utils/widgetmanager.h>
 #include "streamdialog.h"
-#include "filetransferoptions.h"
 
 class FileTransfer : 
   public QObject,
@@ -57,10 +58,10 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IDiscoFeatureHandler
   virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
@@ -80,18 +81,8 @@ public:
   virtual bool fileStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS);
   virtual bool fileStreamShowDialog(const QString &AStreamId);
   //IFileTransfer
-  virtual bool autoReceive() const;
-  virtual void setAutoReceive(bool AAuto);
-  virtual bool hideDialogWhenStarted() const;
-  virtual void setHideDialogWhenStarted(bool AHide);
-  virtual bool removeTransferWhenFinished() const;
-  virtual void setRemoveTransferWhenFinished(bool ARemove);
   virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName = QString::null, const QString &AFileDesc = QString::null);
-signals:
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 protected:
   void registerDiscoFeatures();
   void notifyStream(IFileStream *AStream, bool ANewStream = false);
@@ -113,8 +104,6 @@ protected slots:
   void onToolBarWidgetCreated(IToolBarWidget *AWidget);
   void onEditWidgetContactJidChanged(const Jid &ABefour);
   void onToolBarWidgetDestroyed(QObject *AObject);
-  void onSettingsOpened();
-  void onSettingsClosed();
 private:
   IRosterPlugin *FRosterPlugin;
   IServiceDiscovery *FDiscovery;
@@ -122,12 +111,9 @@ private:
   IDataStreamsManager *FDataManager;
   IFileStreamsManager *FFileManager;
   IMessageWidgets *FMessageWidgets;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
   IRostersViewPlugin *FRostersViewPlugin;
 private:
-  bool FAutoReceive;
-  bool FHideDialogWhenStarted;
-  bool FRemoveTransferWhenFinished;
   QMap<QString, int> FStreamNotify;
   QMap<QString, StreamDialog *> FStreamDialog;
   QMap<IToolBarWidget *, Action *> FToolBarActions;

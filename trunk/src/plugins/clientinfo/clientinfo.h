@@ -13,6 +13,7 @@
 #include <definations/discofeaturehandlerorders.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionwidgetorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -24,14 +25,14 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/iautostatus.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>
 #include <utils/menu.h>
+#include <utils/options.h>
 #include <utils/datetime.h>
 #include <utils/widgetmanager.h>
 #include "clientinfodialog.h"
-#include "miscoptionswidget.h"
 
 struct SoftwareItem {
   SoftwareItem() { status = IClientInfo::SoftwareNotLoaded; }
@@ -76,10 +77,10 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IStanzaHandler
   virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
   virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
@@ -96,8 +97,6 @@ public:
   virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
   //IClientInfo
   virtual QString osVersion() const;
-  virtual bool shareOSVersion() const;
-  virtual void setShareOSVersion(bool AShare);
   virtual void showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes);
   //Software Version
   virtual bool hasSoftwareInfo(const Jid &AContactJid) const;
@@ -122,10 +121,6 @@ signals:
   void softwareInfoChanged(const Jid &AContactJid); 
   void lastActivityChanged(const Jid &AContactJid);
   void entityTimeChanged(const Jid &AContactJid);
-  void shareOsVersionChanged(bool AShare);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 protected:
   Action *createInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, QObject *AParent) const;
   void deleteSoftwareDialogs(const Jid &AStreamJid);
@@ -138,8 +133,7 @@ protected slots:
   void onClientInfoDialogClosed(const Jid &AContactJid);
   void onRosterRemoved(IRoster *ARoster);
   void onDiscoInfoReceived(const IDiscoInfo &AInfo);
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onOptionsChanged(const OptionsNode &ANode);
 private:
   IPluginManager *FPluginManager;
   IRosterPlugin *FRosterPlugin;
@@ -149,12 +143,11 @@ private:
   IServiceDiscovery *FDiscovery;
   IDataForms *FDataForms;
   IAutoStatus *FAutoStatus;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
 private:
   int FTimeHandle;
   int FVersionHandle;
   int FActivityHandler;
-  bool FShareOSVersion;
   QMap<QString, Jid> FSoftwareId;
   QMap<Jid, SoftwareItem> FSoftwareItems;
   QMap<QString, Jid> FActivityId;

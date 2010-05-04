@@ -31,23 +31,9 @@ class ISocksStreams :
 {
 public:
   virtual QObject *instance() =0;
-  virtual quint16 serverPort() const =0;
-  virtual void setServerPort(quint16 APort) =0;
-  virtual bool disableDirectConnections(const QString &ASettingsNS) const =0;
-  virtual void setDisableDirectConnections(const QString &ASettingsNS, bool ADisable) =0;
-  virtual bool useAccountNetworkProxy(const QString &ASettingsNS) const =0;
-  virtual void setUseAccountNetworkProxy(const QString &ASettingsNS, bool AUse) =0;
-  virtual bool useNativeServerProxy(const QString &ASettingsNS) const =0;
-  virtual void setUseNativeServerProxy(const QString &ASettingsNS, bool AUse) =0;
-  virtual QString forwardHost(const QString &ASettingsNS) const =0;
-  virtual quint16 forwardPort(const QString &ASettingsNS) const =0;
-  virtual void setForwardAddress(const QString &ASettingsNS, const QString &AHost, quint16 APort) =0;
+  virtual quint16 listeningPort() const =0;
+  virtual QString accountStreamProxy(const Jid &AStreamJid) const =0;
   virtual QNetworkProxy accountNetworkProxy(const Jid &AStreamJid) const =0;
-  virtual QNetworkProxy networkProxy(const QString &ASettingsNS) const =0;
-  virtual void setNetworkProxy(const QString &ASettingsNS, const QNetworkProxy &AProxy) =0;
-  virtual QString nativeServerProxy(const Jid &AStreamJid) const =0;
-  virtual QList<QString> proxyList(const QString &ASettingsNS) const =0;
-  virtual void setProxyList(const QString &ASettingsNS, const QList<QString> &AProxyList) =0;
   virtual QString connectionKey(const QString &ASessionId, const Jid &AInitiator, const Jid &ATarget) const =0;
   virtual bool appendLocalConnection(const QString &AKey) =0;
   virtual void removeLocalConnection(const QString &AKey) =0;

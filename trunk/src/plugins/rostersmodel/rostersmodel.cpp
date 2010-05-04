@@ -161,9 +161,8 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
       }
       if (account)
       {
-        connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),
-          SLOT(onAccountChanged(const QString &, const QVariant &)));
         streamIndex->setData(RDR_NAME,account->name());
+        connect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
       }
 
       FStreamsRoot.insert(AStreamJid,streamIndex);
@@ -188,8 +187,7 @@ void RostersModel::removeStream(const Jid &AStreamJid)
     IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
     if (account)
     {
-      disconnect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),
-        this,SLOT(onAccountChanged(const QString &, const QVariant &)));
+      connect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),this,SLOT(onAccountOptionsChanged(const OptionsNode &)));
     }
     removeRosterIndex(streamIndex);
     emit streamRemoved(AStreamJid);
@@ -417,17 +415,14 @@ void RostersModel::onAccountHidden(IAccount *AAccount)
     removeStream(AAccount->xmppStream()->streamJid());
 }
 
-void RostersModel::onAccountChanged(const QString &AName, const QVariant &AValue)
+void RostersModel::onAccountOptionsChanged(const OptionsNode &ANode)
 {
-  if (AName == AVN_NAME)
+  IAccount *account = qobject_cast<IAccount *>(sender());
+  if (account && account->isActive() && account->optionsNode().childPath(ANode)=="name")
   {
-    IAccount *account = qobject_cast<IAccount *>(sender());
-    if (account && account->isActive())
-    {
-      IRosterIndex *streamIndex = FStreamsRoot.value(account->xmppStream()->streamJid());
-      if (streamIndex)
-        streamIndex->setData(RDR_NAME,AValue.toString());
-    }
+    IRosterIndex *streamIndex = FStreamsRoot.value(account->xmppStream()->streamJid());
+    if (streamIndex)
+      streamIndex->setData(RDR_NAME,account->name());
   }
 }
 
@@ -479,7 +474,6 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
       IRosterIndex *groupIndex = createGroup(!group.isEmpty() ? group : groupDisplay,groupDelim,groupType,streamIndex);
 
       QList<IRosterIndex *> groupItemList;
-      //Если есть возможность переносим контакты из старой группы в новую
       if (newGroups.contains(group) && !oldGroups.isEmpty())
       {
         IRosterIndex *oldGroupIndex;
@@ -501,7 +495,6 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
       else
         groupItemList = groupIndex->findChild(findData);
 
-      //Если в этой группе нет контактов, то создаем их
       if (groupItemList.isEmpty())
       {
         int presIndex = 0;
@@ -546,7 +539,6 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARo
       }
     }
 
-    //Удаляем контакты из старых групп
     foreach(IRosterIndex *index,curItemList)
       if (!itemList.contains(index))
         removeRosterIndex(index);

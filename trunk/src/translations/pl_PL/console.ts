@@ -15,6 +15,10 @@
         <source>Allows to view XML stream between the client and server</source>
         <translation>Umożliwia wyświetlanie strumienia XML pomiędzy klientem i serwerem</translation>
     </message>
+    <message>
+        <source>Default Context</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConsoleWidget</name>
@@ -27,24 +31,28 @@
         <translation>Konsola XML - %1</translation>
     </message>
     <message>
-        <source>Default</source>
-        <translation>Domyślny</translation>
+        <source>Start sending user stanza...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Start sending user stanza...&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Uruchamiam wysyłanie bloku użytkownika...&lt;/b&gt;&lt;br&gt;</translation>
+        <source>User stanza sended.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;User stanza sended.&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Blok XML użytkownika został wysłany.&lt;/b&gt;&lt;br&gt;</translation>
+        <source>Stanza is not well formed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Stanza is not well formed.&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Blok XML został napisany z błedem.&lt;/b&gt;&lt;br&gt;</translation>
+        <source>XML is not well formed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;XML is not well formed.&lt;/b&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;Kod XML został napisany z błedem.&lt;/b&gt;&lt;br&gt;</translation>
+        <source>New Context</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter context name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -82,18 +90,6 @@
         <translation>Zapisany kontekst:</translation>
     </message>
     <message>
-        <source>Load</source>
-        <translation>Wczytaj</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Zapisz</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Skasuj</translation>
-    </message>
-    <message>
         <source>Console</source>
         <translation>Konsola</translation>
     </message>
@@ -102,12 +98,12 @@
         <translation>Zawijanie wierszy</translation>
     </message>
     <message>
-        <source>Colored XML</source>
-        <translation>Kolorowanie XML</translation>
-    </message>
-    <message>
         <source>Send</source>
         <translation>Wyślij</translation>
+    </message>
+    <message>
+        <source>Hilight XML</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

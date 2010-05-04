@@ -4,7 +4,6 @@
 #include <definations/namespaces.h>
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
-#include <definations/accountvaluenames.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/discoitemdataroles.h>
@@ -18,6 +17,7 @@
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/iservicediscovery.h>
+#include <utils/options.h>
 #include <utils/menu.h>
 #include "editbookmarkdialog.h"
 #include "editbookmarksdialog.h"
@@ -65,7 +65,7 @@ protected slots:
   void onAddDiscoBookmarkActionTriggered(bool);
   void onEditBookmarksActionTriggered(bool);
   void onEditBookmarksDialogDestroyed();
-  void onAccountChanged(const QString &AName, const QVariant &AValue);
+  void onAccountOptionsChanged(const OptionsNode &ANode);
 private:
   IPrivateStorage *FStorage;
   IPresencePlugin *FPresencePlugin;

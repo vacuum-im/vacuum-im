@@ -58,7 +58,7 @@ public:
   //IInBandStream
   virtual int blockSize() const;
   virtual void setBlockSize(int ASize);
-  virtual int maximumBlockSize();
+  virtual int maximumBlockSize() const;
   virtual void setMaximumBlockSize(int ASize);
   virtual int dataStanzaType() const;
   virtual void setDataStanzaType(int AType);

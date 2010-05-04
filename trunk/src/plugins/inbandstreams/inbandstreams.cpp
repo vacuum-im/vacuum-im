@@ -1,20 +1,10 @@
 #include "inbandstreams.h"
 
-#define SVN_BLOCK_SIZE          "settings[]:blockSize"
-#define SVN_MAX_BLOCK_SIZE      "settings[]:maxBlockSize"
-#define SVN_DATA_STANZA_TYPE    "settings[]:dataStanzaType"
-
 InBandStreams::InBandStreams()
 {
   FDataManager = NULL;
   FStanzaProcessor = NULL;
-  FSettings = NULL;
-  FSettingsPlugin = NULL;
   FDiscovery = NULL;
-
-  FMaxBlockSize = DEFAULT_MAX_BLOCK_SIZE;
-  FBlockSize = DEFAULT_BLOCK_SIZE;
-  FStatnzaType = DEFAULT_DATA_STANZA_TYPE;
 }
 
 InBandStreams::~InBandStreams()
@@ -46,17 +36,6 @@ bool InBandStreams::initConnections(IPluginManager *APluginManager, int &/*AInit
     FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-  {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
-  }
-
   plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
   if (plugin)
   {
@@ -81,6 +60,14 @@ bool InBandStreams::initObjects()
     feature.description = tr("Supports the initiating of the in-band stream of data between two XMPP entities");
     FDiscovery->insertDiscoFeature(feature);
   }
+  return true;
+}
+
+bool InBandStreams::initSettings()
+{
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_BLOCKSIZE,4096);
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_MAXBLOCKSIZE,10240);
+  Options::setDefaultValue(OPV_DATASTREAMS_METHOD_STANZATYPE,(int)IInBandStream::StanzaIq);
   return true;
 }
 
@@ -111,139 +98,41 @@ IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &ASocketId, con
   return NULL;
 }
 
-QWidget *InBandStreams::settingsWidget(IDataStreamSocket *ASocket, bool AReadOnly)
+IOptionsWidget *InBandStreams::methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent)
+{
+  return new InBandOptions(this,ANode,AReadOnly,AParent);
+}
+
+IOptionsWidget *InBandStreams::methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent)
 {
   IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
-  return stream!=NULL ? new InBandOptions(this,stream,AReadOnly,NULL) : NULL;
+  return stream!=NULL ? new InBandOptions(this,stream,AReadOnly,AParent) : NULL;
 }
 
-QWidget *InBandStreams::settingsWidget(const QString &ASettingsNS, bool AReadOnly)
+void InBandStreams::saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode)
 {
-  return new InBandOptions(this,ASettingsNS,AReadOnly,NULL);
+  InBandOptions *widget = qobject_cast<InBandOptions *>(AWidget->instance());
+  if (widget)
+    widget->apply(ANode);
 }
 
-void InBandStreams::loadSettings(IDataStreamSocket *ASocket, QWidget *AWidget) const
+void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget)
 {
-  InBandOptions *widget = qobject_cast<InBandOptions *>(AWidget);
+  InBandOptions *widget = qobject_cast<InBandOptions *>(AWidget->instance());
   IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
   if (widget && stream)
-    widget->saveSettings(stream);
+    widget->apply(stream);
 }
 
-void InBandStreams::loadSettings(IDataStreamSocket *ASocket, const QString &ASettingsNS) const
+void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode)
 {
   IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
   if (stream)
   {
-    stream->setMaximumBlockSize(maximumBlockSize(ASettingsNS));
-    stream->setBlockSize(blockSize(ASettingsNS));
-    stream->setDataStanzaType(dataStanzaType(ASettingsNS));
+    stream->setMaximumBlockSize(ANode.value("max-block-size").toInt());
+    stream->setBlockSize(ANode.value("block-size").toInt());
+    stream->setDataStanzaType(ANode.value("stanza-type").toInt());
   }
-}
-
-void InBandStreams::saveSettings(const QString &ASettingsNS, QWidget *AWidget)
-{
-  InBandOptions *widget = qobject_cast<InBandOptions *>(AWidget);
-  if (widget)
-    widget->saveSettings(ASettingsNS);
-}
-
-void InBandStreams::saveSettings(const QString &ASettingsNS, IDataStreamSocket *ASocket)
-{
-  IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
-  if (stream)
-  {
-    setMaximumBlockSize(ASettingsNS, stream->maximumBlockSize());
-    setBlockSize(ASettingsNS, stream->blockSize());
-    setDataStanzaType(ASettingsNS, stream->dataStanzaType());
-  }
-}
-
-void InBandStreams::deleteSettings(const QString &ASettingsNS)
-{
-  if (ASettingsNS.isEmpty())
-  {
-    FMaxBlockSize = DEFAULT_MAX_BLOCK_SIZE;
-    FBlockSize = DEFAULT_BLOCK_SIZE;
-    FStatnzaType = DEFAULT_DATA_STANZA_TYPE;
-  }
-  else if (FSettings)
-  {
-    FSettings->deleteNS(ASettingsNS);
-  }
-}
-
-int InBandStreams::blockSize(const QString &ASettingsNS) const
-{
-  if (FSettings && !ASettingsNS.isEmpty())
-    return FSettings->valueNS(SVN_BLOCK_SIZE,ASettingsNS,FBlockSize).toInt();
-  return FBlockSize;
-}
-
-void InBandStreams::setBlockSize(const QString &ASettingsNS, int ASize)
-{
-  if (ASize>=MINIMUM_BLOCK_SIZE && ASize<=maximumBlockSize(ASettingsNS))
-  {
-    if (ASettingsNS.isEmpty())
-      FBlockSize = ASize;
-    else if (FSettings && FBlockSize == ASize)
-      FSettings->deleteValueNS(SVN_BLOCK_SIZE, ASettingsNS);
-    else if (FSettings)
-      FSettings->setValueNS(SVN_BLOCK_SIZE, ASettingsNS, ASize);
-  }
-}
-
-int InBandStreams::maximumBlockSize(const QString &ASettingsNS) const
-{
-  if (FSettings && !ASettingsNS.isEmpty())
-    return FSettings->valueNS(SVN_MAX_BLOCK_SIZE,ASettingsNS,FMaxBlockSize).toInt();
-  return FMaxBlockSize;
-}
-
-void InBandStreams::setMaximumBlockSize(const QString &ASettingsNS, int AMaxSize)
-{
-  if (AMaxSize>=MINIMUM_BLOCK_SIZE && AMaxSize<=USHRT_MAX)
-  {
-    if (ASettingsNS.isEmpty())
-      FMaxBlockSize = AMaxSize;
-    else if (FSettings && FMaxBlockSize == AMaxSize)
-      FSettings->deleteValueNS(SVN_MAX_BLOCK_SIZE, ASettingsNS);
-    else if (FSettings)
-      FSettings->setValueNS(SVN_MAX_BLOCK_SIZE, ASettingsNS, AMaxSize);
-  }
-}
-
-int InBandStreams::dataStanzaType(const QString &ASettingsNS) const
-{
-  if (FSettings && !ASettingsNS.isEmpty())
-    return FSettings->valueNS(SVN_DATA_STANZA_TYPE,ASettingsNS,FStatnzaType).toInt();
-  return FStatnzaType;
-}
-
-void InBandStreams::setDataStanzaType(const QString &ASettingsNS, int AType)
-{
-  if (ASettingsNS.isEmpty())
-    FStatnzaType = AType;
-  else if (FSettings && FStatnzaType == AType)
-    FSettings->deleteValueNS(SVN_DATA_STANZA_TYPE, ASettingsNS);
-  else if (FSettings)
-    FSettings->setValueNS(SVN_DATA_STANZA_TYPE, ASettingsNS, AType);
-}
-
-void InBandStreams::onSettingsOpened()
-{
-  FSettings = FSettingsPlugin->settingsForPlugin(INBANDSTREAMS_UUID);
-  FMaxBlockSize = FSettings->valueNS(SVN_MAX_BLOCK_SIZE, QString::null, DEFAULT_MAX_BLOCK_SIZE).toInt();
-  FBlockSize = FSettings->valueNS(SVN_BLOCK_SIZE, QString::null, DEFAULT_BLOCK_SIZE).toInt();
-  FStatnzaType = FSettings->valueNS(SVN_DATA_STANZA_TYPE, QString::null, DEFAULT_DATA_STANZA_TYPE).toInt();
-}
-
-void InBandStreams::onSettingsClosed()
-{
-  FSettings->setValueNS(SVN_MAX_BLOCK_SIZE, QString::null, FMaxBlockSize);
-  FSettings->setValueNS(SVN_BLOCK_SIZE, QString::null, FBlockSize);
-  FSettings->setValueNS(SVN_DATA_STANZA_TYPE, QString::null, FStatnzaType);
-  FSettings = NULL;
 }
 
 Q_EXPORT_PLUGIN2(plg_inbandstreams, InBandStreams);

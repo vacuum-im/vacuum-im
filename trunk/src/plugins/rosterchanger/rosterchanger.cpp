@@ -10,9 +10,6 @@
 
 #define NOTIFICATOR_ID      "RosterChanger"
 
-#define SVN_AUTOSUBSCRIBE   "autoSubscribe"
-#define SVN_AUTOUNSUBSCRIBE "autoUnsubscribe"
-
 #define ADR_STREAM_JID      Action::DR_StreamJid
 #define ADR_CONTACT_JID     Action::DR_Parametr1
 #define ADR_FROM_STREAM_JID Action::DR_Parametr2
@@ -30,11 +27,9 @@ RosterChanger::RosterChanger()
   FRostersModel = NULL;
   FRostersView = NULL;
   FNotifications = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
   FXmppUriQueries = NULL;
   FMultiUserChatPlugin = NULL;
-
-  FOptions = 0;
 }
 
 RosterChanger::~RosterChanger()
@@ -108,16 +103,9 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
     }
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
-  {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
-  }
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 
   plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
   if (plugin)
@@ -134,10 +122,6 @@ bool RosterChanger::initObjects()
     uchar kindDefs = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
     FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Subscription requests"),kindMask,kindDefs);
   }
-  if (FSettingsPlugin)
-  {
-    FSettingsPlugin->insertOptionsHolder(this);
-  }
   if (FRostersView)
   {
     FRostersView->insertDragDropHandler(this);
@@ -149,24 +133,37 @@ bool RosterChanger::initObjects()
   return true;
 }
 
-//IoptionsHolder
-QWidget *RosterChanger::optionsWidget(const QString &ANode, int &AOrder)
+bool RosterChanger::initSettings()
 {
-  if (ANode == ON_ROSTER)
+  Options::setDefaultValue(OPV_ROSTER_AUTOSUBSCRIBE, false);
+  Options::setDefaultValue(OPV_ROSTER_AUTOUNSUBSCRIBE, true);
+
+  if (FOptionsManager)
+  {
+    FOptionsManager->insertOptionsHolder(this);
+  }
+  return true;
+}
+
+IOptionsWidget *RosterChanger::optionsWidget(const QString &ANode, int &AOrder, QWidget *AParent)
+{
+  if (FOptionsManager && ANode == OPN_ROSTER)
   {
     AOrder = OWO_ROSTER_CHENGER;
-    SubscriptionOptions *widget = new SubscriptionOptions(this);
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
+
+    IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
+    container->appendChild(Options::node(OPV_ROSTER_AUTOSUBSCRIBE),tr("Auto accept subscription requests"));
+    container->appendChild(Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE),tr("Auto unsubscribe contacts"));
+    return container;
   }
   return NULL;
 }
 
 //IRostersDragDropHandler
-Qt::DropActions RosterChanger::rosterDragStart(const QMouseEvent * /*AEvent*/, const QModelIndex &AIndex, QDrag * /*ADrag*/)
+Qt::DropActions RosterChanger::rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag)
 {
+  Q_UNUSED(AEvent);
+  Q_UNUSED(ADrag);
   int indexType = AIndex.data(RDR_TYPE).toInt();
   if (indexType==RIT_CONTACT || indexType==RIT_GROUP)
     return Qt::CopyAction|Qt::MoveAction;
@@ -188,8 +185,9 @@ bool RosterChanger::rosterDragEnter(const QDragEnterEvent *AEvent)
   return false;
 }
 
-bool RosterChanger::rosterDragMove(const QDragMoveEvent * /*AEvent*/, const QModelIndex &AHover)
+bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
 {
+  Q_UNUSED(AEvent);
   int indexType = AHover.data(RDR_TYPE).toInt();
   if (indexType==RIT_GROUP || indexType==RIT_STREAM_ROOT)
   {
@@ -200,9 +198,9 @@ bool RosterChanger::rosterDragMove(const QDragMoveEvent * /*AEvent*/, const QMod
   return false;
 }
 
-void RosterChanger::rosterDragLeave(const QDragLeaveEvent * /*AEvent*/)
+void RosterChanger::rosterDragLeave(const QDragLeaveEvent *AEvent)
 {
-
+  Q_UNUSED(AEvent);
 }
 
 bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
@@ -362,19 +360,19 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 //IRosterChanger
 bool RosterChanger::isAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  if (checkOption(AutoSubscribe))
+  if (Options::node(OPV_ROSTER_AUTOSUBSCRIBE).value().toBool())
     return true;
   else if (FAutoSubscriptions.value(AStreamJid).contains(AContactJid.bare()))
-    return (FAutoSubscriptions.value(AStreamJid).value(AContactJid.bare()).autoOptions & IRosterChanger::AutoSubscribe) > 0;
+    return FAutoSubscriptions.value(AStreamJid).value(AContactJid.bare()).autoSubscribe;
   return false;
 }
 
 bool RosterChanger::isAutoUnsubscribe(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-  if (checkOption(AutoUnsubscribe))
+  if (Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE).value().toBool())
     return true;
   else if (FAutoSubscriptions.value(AStreamJid).contains(AContactJid.bare()))
-    return (FAutoSubscriptions.value(AStreamJid).value(AContactJid.bare()).autoOptions & IRosterChanger::AutoUnsubscribe) > 0;
+    return FAutoSubscriptions.value(AStreamJid).value(AContactJid.bare()).autoUnsubscribe;
   return false;
 }
 
@@ -385,11 +383,12 @@ bool RosterChanger::isSilentSubsctiption(const Jid &AStreamJid, const Jid &ACont
   return false;
 }
 
-void RosterChanger::insertAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid, int AAutoOptions, bool ASilently)
+void RosterChanger::insertAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid, bool ASilently, bool ASubscr, bool AUnsubscr)
 {
   AutoSubscription &asubscr = FAutoSubscriptions[AStreamJid][AContactJid.bare()];
   asubscr.silent = ASilently;
-  asubscr.autoOptions = AAutoOptions;
+  asubscr.autoSubscribe = ASubscr;
+  asubscr.autoUnsubscribe = AUnsubscr;
 }
 
 void RosterChanger::removeAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid)
@@ -406,7 +405,7 @@ void RosterChanger::subscribeContact(const Jid &AStreamJid, const Jid &AContactJ
     roster->sendSubscription(AContactJid,IRoster::Subscribed,AMessage);
     if (ritem.subscription!=SUBSCRIPTION_TO && ritem.subscription!=SUBSCRIPTION_BOTH)
       roster->sendSubscription(AContactJid,IRoster::Subscribe,AMessage);
-    insertAutoSubscribe(AStreamJid,AContactJid,AutoSubscribe,ASilently);
+    insertAutoSubscribe(AStreamJid,AContactJid,ASilently,true,false);
   }
 }
 
@@ -419,22 +418,7 @@ void RosterChanger::unsubscribeContact(const Jid &AStreamJid, const Jid &AContac
     roster->sendSubscription(AContactJid,IRoster::Unsubscribed,AMessage);
     if (ritem.subscription!=SUBSCRIPTION_FROM && ritem.subscription!=SUBSCRIPTION_NONE)
       roster->sendSubscription(AContactJid,IRoster::Unsubscribe,AMessage);
-    insertAutoSubscribe(AStreamJid,AContactJid,AutoUnsubscribe,ASilently);
-  }
-}
-
-bool RosterChanger::checkOption(IRosterChanger::Option AOption) const
-{
-  return (FOptions & AOption) > 0;
-}
-
-void RosterChanger::setOption(IRosterChanger::Option AOption, bool AValue)
-{
-  bool changed = checkOption(AOption) != AValue;
-  if (changed)
-  {
-    AValue ? FOptions |= AOption : FOptions &= ~AOption;
-    emit optionChanged(AOption,AValue);
+    insertAutoSubscribe(AStreamJid,AContactJid,ASilently,false,true);
   }
 }
 
@@ -579,20 +563,6 @@ SubscriptionDialog *RosterChanger::createSubscriptionDialog(const Jid &AStreamJi
     }
   }
   return dialog;
-}
-
-void RosterChanger::onSettingsOpened()
-{
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(ROSTERCHANGER_UUID);
-  setOption(IRosterChanger::AutoSubscribe,settings->value(SVN_AUTOSUBSCRIBE,false).toBool());
-  setOption(IRosterChanger::AutoUnsubscribe,settings->value(SVN_AUTOUNSUBSCRIBE,true).toBool());
-}
-
-void RosterChanger::onSettingsClosed()
-{
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(ROSTERCHANGER_UUID);
-  settings->setValue(SVN_AUTOSUBSCRIBE,checkOption(IRosterChanger::AutoSubscribe));
-  settings->setValue(SVN_AUTOUNSUBSCRIBE,checkOption(IRosterChanger::AutoUnsubscribe));
 }
 
 void RosterChanger::onShowAddContactDialog(bool)
@@ -833,7 +803,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
   INotification notify;
   if (FNotifications)
   {
-    notify.kinds = INotifications::EnablePopupWindows;
+    notify.kinds = INotification::PopupWindow;
     notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RCHANGER_SUBSCRIBTION));
     notify.data.insert(NDR_TOOLTIP,tr("Subscription message from %1").arg(FNotifications->contactName(ARoster->streamJid(),AContactJid)));
     notify.data.insert(NDR_ROSTER_STREAM_JID,ARoster->streamJid().full());
@@ -1241,7 +1211,7 @@ void RosterChanger::onRemoveGroupItems(bool)
 void RosterChanger::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem)
 {
   if (isSilentSubsctiption(ARoster->streamJid(), ARosterItem.itemJid))
-    insertAutoSubscribe(ARoster->streamJid(), ARosterItem.itemJid, 0, true);
+    insertAutoSubscribe(ARoster->streamJid(), ARosterItem.itemJid, true, false, false);
   else
     removeAutoSubscribe(ARoster->streamJid(), ARosterItem.itemJid);
 }

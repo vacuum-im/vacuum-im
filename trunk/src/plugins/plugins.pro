@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS = settings \
+SUBDIRS = optionsmanager \
           xmppstreams \
           iqauth \
           saslauth \
@@ -27,7 +27,6 @@ SUBDIRS = settings \
           defaultconnection \
           starttls \
           statusicons \
-          skinmanager \
           emoticons \
           clientinfo \
           vcard \

@@ -46,6 +46,14 @@ bool ConsolePlugin::initObjects()
   return true;
 }
 
+bool ConsolePlugin::initSettings()
+{
+  Options::setDefaultValue(OPV_CONSOLE_CONTEXT_NAME,tr("Default Context"));
+  Options::setDefaultValue(OPV_CONSOLE_CONTEXT_WORDWRAP,false);
+  Options::setDefaultValue(OPV_CONSOLE_CONTEXT_HIGHLIGHTXML,Qt::Checked);
+  return true;
+}
+
 void ConsolePlugin::onShowXMLConsole(bool)
 {
   ConsoleWidget *widget = new ConsoleWidget(FPluginManager,NULL);

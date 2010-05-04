@@ -1,15 +1,10 @@
 #include "accountmanager.h"
 
-#define SVN_ACCOUNT                 "account[]"
-#define SVN_ACCOUNT_ACTIVE          SVN_ACCOUNT":"AVN_ACTIVE
-#define SVN_ACCOUNT_STREAM          SVN_ACCOUNT":"AVN_STREAM_JID
-
 #define ADR_ACCOUNT_ID              Action::DR_Parametr1
 
 AccountManager::AccountManager()
 {
-  FSettingsPlugin = NULL;
-  FSettings = NULL;
+  FOptionsManager = NULL;
   FRostersViewPlugin = NULL;
 }
 
@@ -26,8 +21,7 @@ void AccountManager::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->version = "1.0";
   APluginInfo->author = "Potapov S.A. aka Lion";
   APluginInfo->homePage = "http://www.vacuum-im.org";
-  APluginInfo->dependences.append(XMPPSTREAMS_UUID); 
-  APluginInfo->dependences.append(SETTINGS_UUID);  
+  APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
 bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
@@ -36,16 +30,14 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
   if (plugin)
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+    if (FOptionsManager)
     {
-      connect(FSettingsPlugin->instance(),SIGNAL(profileOpened(const QString &)),SLOT(onProfileOpened(const QString &)));
-      connect(FSettingsPlugin->instance(),SIGNAL(profileClosed(const QString &)),SLOT(onProfileClosed(const QString &)));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+      connect(FOptionsManager->instance(),SIGNAL(profileOpened(const QString &)),SLOT(onProfileOpened(const QString &)));
+      connect(FOptionsManager->instance(),SIGNAL(profileClosed(const QString &)),SLOT(onProfileClosed(const QString &)));
     }
   }
 
@@ -60,44 +52,38 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
     }
   }
 
-  return FXmppStreams!=NULL && FSettingsPlugin!=NULL;
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+  connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+
+  return FXmppStreams!=NULL;
 }
 
-bool AccountManager::initObjects()
+bool AccountManager::initSettings()
 {
-  if (FSettingsPlugin)
+  if (FOptionsManager)
   {
-    FSettings = FSettingsPlugin->settingsForPlugin(ACCOUNTMANAGER_UUID);
-    FSettingsPlugin->openOptionsNode(ON_ACCOUNTS,tr("Accounts"),tr("Creating and removing accounts"),MNI_ACCOUNT_LIST,ONO_ACCOUNTS);
-    FSettingsPlugin->insertOptionsHolder(this);
+    IOptionsDialogNode miscNode = { ONO_ACCOUNTS, OPN_ACCOUNTS, tr("Accounts"),tr("Creating and removing accounts"), MNI_ACCOUNT_LIST };
+    FOptionsManager->insertOptionsDialogNode(miscNode);
+    FOptionsManager->insertOptionsHolder(this);
   }
+
   return true;
 }
 
-QWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder)
+IOptionsWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder, QWidget *AParent)
 {
-  if (ANode.startsWith(ON_ACCOUNTS))
+  if (ANode.startsWith(OPN_ACCOUNTS))
   {
-    AOrder = OWO_ACCOUNT_OPTIONS;
-    QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
-    
-    bool accountsWidget = ANode == ON_ACCOUNTS;
-    bool accountWidget = !accountsWidget && nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS;
-    
-    if (FAccountsOptions.isNull() && (accountsWidget || accountWidget))
+    QStringList nodeTree = ANode.split(".",QString::SkipEmptyParts);
+    if (ANode==OPN_ACCOUNTS || (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS))
     {
-      FAccountsOptions = new AccountsOptions(this,NULL);
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),FAccountsOptions,SLOT(apply()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),FAccountsOptions,SLOT(reject()));
-      connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogClosed()),FAccountsOptions,SLOT(deleteLater()));
-      connect(FAccountsOptions,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-      connect(FAccountsOptions,SIGNAL(optionsRejected()),SIGNAL(optionsRejected()));
-    }
+      AOrder = OWO_ACCOUNT_OPTIONS;
 
-    if (accountsWidget)
-      return FAccountsOptions;
-    else if (accountWidget)
-      return FAccountsOptions->accountOptions(nodeTree.at(1));
+      if (ANode==OPN_ACCOUNTS)
+        return new AccountsOptions(this,AParent);
+      else
+        return new AccountOptions(this,nodeTree.at(1),AParent);
+    }
   }
   return NULL;
 }
@@ -128,8 +114,9 @@ IAccount *AccountManager::appendAccount(const QUuid &AAccountId)
 {
   if (!AAccountId.isNull() && !FAccounts.contains(AAccountId))
   {
-    Account *account = new Account(FXmppStreams,FSettings,AAccountId,this);
-    connect(account,SIGNAL(changed(const QString &, const QVariant &)),SLOT(onAccountChanged(const QString &, const QVariant &)));
+    Account *account = new Account(FXmppStreams,Options::node(OPV_ACCOUNT_ITEM,AAccountId.toString()),this);
+    connect(account,SIGNAL(activeChanged(bool)),SLOT(onAccountActiveChanged(bool)));
+    connect(account,SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
     FAccounts.insert(AAccountId,account);
     openAccountOptionsNode(AAccountId,account->name());
     emit appended(account);
@@ -172,112 +159,95 @@ void AccountManager::destroyAccount(const QUuid &AAccountId)
   {
     hideAccount(AAccountId);
     removeAccount(AAccountId);
-    if (FSettings)
-      FSettings->deleteValueNS(SVN_ACCOUNT,AAccountId.toString());
+    Options::node(OPV_ACCOUNT_ROOT).removeChilds("account",AAccountId.toString());
     emit destroyed(AAccountId);
   }
 }
 
-void AccountManager::openAccountOptionsDialog(const QUuid &AAccountId)
+void AccountManager::showAccountOptionsDialog(const QUuid &AAccountId)
 {
-  if (FSettingsPlugin)
+  if (FOptionsManager)
   {
-    QString optionsNode = ON_ACCOUNTS"::"+AAccountId.toString();
-    FSettingsPlugin->openOptionsDialog(optionsNode);
+    FOptionsManager->showOptionsDialog(OPN_ACCOUNTS "." + AAccountId.toString());
   }
 }
 
 void AccountManager::openAccountOptionsNode(const QUuid &AAccountId, const QString &AName)
 {
-  if (FSettingsPlugin)
+  if (FOptionsManager)
   {
-    QString node = ON_ACCOUNTS"::"+AAccountId.toString();
-    FSettingsPlugin->openOptionsNode(node,AName,tr("Account options"),MNI_ACCOUNT,ONO_ACCOUNTS);
+    QString node = OPN_ACCOUNTS "." + AAccountId.toString();
+    IOptionsDialogNode dnode = { ONO_ACCOUNTS, node, AName, tr("Account options"), MNI_ACCOUNT };
+    FOptionsManager->insertOptionsDialogNode(dnode);
   }
 }
 
 void AccountManager::closeAccountOptionsNode(const QUuid &AAccountId)
 {
-  if (FSettingsPlugin)
+  if (FOptionsManager)
   {
-    QString node = ON_ACCOUNTS"::"+AAccountId.toString();
-    FSettingsPlugin->closeOptionsNode(node);
+    QString node = OPN_ACCOUNTS "." + AAccountId.toString();
+    FOptionsManager->removeOptionsDialogNode(node);
   }
 }
 
-void AccountManager::onAccountChanged(const QString &AName, const QVariant &AValue)
+void AccountManager::onProfileOpened(const QString &AProfile)
 {
-  Account *account = qobject_cast<Account *>(sender());
-  if (account)
-  {
-    if (AName == AVN_ACTIVE)
-      AValue.toBool() ? emit shown(account) : emit hidden(account);
-    if (AName == AVN_NAME)
-      openAccountOptionsNode(account->accountId(),AValue.toString());
-  }
-}
-
-void AccountManager::onOpenAccountOptions(bool)
-{
-  Action *action = qobject_cast<Action *>(sender());
-  if (action)
-    openAccountOptionsDialog(action->data(ADR_ACCOUNT_ID).toString());
-}
-
-void AccountManager::onProfileOpened(const QString &/*AProfile*/)
-{
+  Q_UNUSED(AProfile);
   foreach(IAccount *account, FAccounts)
-    account->setActive(FSettings->valueNS(SVN_ACCOUNT_ACTIVE,account->accountId().toString(),false).toBool());
+    account->setActive(Options::node(OPV_ACCOUNT_ITEM,account->accountId()).value("active").toBool());
 }
 
-void AccountManager::onProfileClosed(const QString &/*AProfile*/)
+void AccountManager::onProfileClosed(const QString &AProfile)
 {
+  Q_UNUSED(AProfile);
   foreach(IAccount *account, FAccounts)
   {
-    FSettings->setValueNS(SVN_ACCOUNT_ACTIVE,account->accountId().toString(),account->isActive());
+    Options::node(OPV_ACCOUNT_ITEM,account->accountId()).setValue(account->isActive(),"active");
     account->setActive(false);
   }
 }
 
-void AccountManager::onSettingsOpened()
+void AccountManager::onOptionsOpened()
 {
-  //Заменим старый идентификатор аккаунта на новый
-  QDomElement accountElem = FSettingsPlugin->pluginNode(pluginUuid()).firstChildElement("account");
-  while (!accountElem.isNull())
-  {
-    QString oldNS = accountElem.attribute("ns");
-    if (!oldNS.isEmpty() && QUuid(oldNS).isNull())
-    {
-      accountElem.setAttribute("ns",QUuid::createUuid().toString());
-
-      //Перекодируем пароль
-      QDomElement passElem = accountElem.firstChildElement("password");
-      if (!passElem.isNull())
-        passElem.setAttribute("value",QString(qCompress(FSettings->encript(FSettings->decript(qUncompress(QByteArray::fromBase64(passElem.attribute("value").toLatin1())),oldNS.toUtf8()),accountElem.attribute("ns").toUtf8())).toBase64()));
-
-      //Заменим старый идентификатор и в настройках DefaultConnection
-      QDomElement conElem = FSettingsPlugin->pluginNode("{68F9B5F2-5898-43f8-9DD1-19F37E9779AC}").firstChildElement("connection");
-      while (!conElem.isNull())
-      {
-        if (conElem.attribute("ns") == oldNS)
-        {
-          conElem.setAttribute("ns",accountElem.attribute("ns"));
-          break;
-        }
-        conElem = conElem.nextSiblingElement("connection");
-      }
-    }
-    accountElem = accountElem.nextSiblingElement("account");
-  }
-
-  foreach(QString id, FSettings->values(SVN_ACCOUNT).keys())
+  foreach(QString id, Options::node(OPV_ACCOUNT_ROOT).childNSpaces("account"))
     appendAccount(id);
 }
 
-void AccountManager::onSettingsClosed()
+void AccountManager::onOptionsClosed()
 {
   foreach(QUuid id, FAccounts.keys())
     removeAccount(id);
+}
+
+void AccountManager::onShowAccountOptions(bool)
+{
+  Action *action = qobject_cast<Action *>(sender());
+  if (action)
+    showAccountOptionsDialog(action->data(ADR_ACCOUNT_ID).toString());
+}
+
+void AccountManager::onAccountActiveChanged(bool AActive)
+{
+  IAccount *account = qobject_cast<IAccount *>(sender());
+  if (account)
+  {
+    if (AActive)
+      emit shown(account);
+    else
+      emit hidden(account);
+  }
+}
+
+void AccountManager::onAccountOptionsChanged(const OptionsNode &ANode)
+{
+  Account *account = qobject_cast<Account *>(sender());
+  if (account)
+  {
+    if (account->optionsNode().childPath(ANode) == "name")
+      openAccountOptionsNode(account->accountId(),ANode.value().toString());
+    emit changed(account, ANode);
+  }
 }
 
 void AccountManager::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
@@ -292,7 +262,7 @@ void AccountManager::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
       action->setIcon(RSR_STORAGE_MENUICONS,MNI_ACCOUNT_CHANGE);
       action->setText(tr("Modify account"));
       action->setData(ADR_ACCOUNT_ID,account->accountId().toString());
-      connect(action,SIGNAL(triggered(bool)),SLOT(onOpenAccountOptions(bool)));
+      connect(action,SIGNAL(triggered(bool)),SLOT(onShowAccountOptions(bool)));
       AMenu->addAction(action,AG_RVCM_ACCOUNTMANAGER,true);
     }
   }

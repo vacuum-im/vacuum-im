@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <interfaces/imessagestyles.h>
+#include <interfaces/ioptionsmanager.h>
 #include "adiummessagestyleplugin.h"
 #include "ui_adiumoptionswidget.h"
 
@@ -10,24 +11,25 @@ class AdiumMessageStylePlugin;
 
 class AdiumOptionsWidget : 
   public QWidget,
-  public IMessageStyleSettings
+  public IOptionsWidget
 {
   Q_OBJECT;
-  Q_INTERFACES(IMessageStyleSettings);
+  Q_INTERFACES(IOptionsWidget);
 public:
-  AdiumOptionsWidget(AdiumMessageStylePlugin *APlugin, int AMessageType, const QString &AContext, QWidget *AParent = NULL);
+  AdiumOptionsWidget(AdiumMessageStylePlugin *APlugin, const OptionsNode &ANode, int AMessageType, QWidget *AParent = NULL);
   ~AdiumOptionsWidget();
   virtual QWidget *instance() { return this; }
-  virtual int messageType() const;
-  virtual QString context() const;
-  virtual bool isModified(int AMessageType, const QString &AContext) const;
-  virtual void setModified(bool AModified, int AMessageType, const QString &AContext);
-  virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext) const;
-  virtual void loadSettings(int AMessageType, const QString &AContext);
+public slots:
+  virtual void apply(OptionsNode ANode);
+  virtual void apply();
+  virtual void reset();
 signals:
-  void settingsChanged();
+  void modified();
+  void childApply();
+  void childReset();
+public:
+  IMessageStyleOptions styleOptions() const;
 protected:
-  void startSignalTimer();
   void updateOptionsWidgets();
 protected slots:
   void onStyleChanged(int AIndex);
@@ -38,18 +40,14 @@ protected slots:
   void onBackgroundColorChanged(int AIndex);
   void onSetImageClicked();
   void onDefaultImageClicked();
-  void onSettingsChanged();
 private:
   Ui::AdiumOptionsWidgetClass ui;
 private:
   AdiumMessageStylePlugin *FStylePlugin;
 private:
-  bool FModifyEnabled;
-  bool FTimerStarted;
-  int FActiveType;
-  QString FActiveContext;
-  QMap<int, QMap<QString, bool> > FModified;
-  QMap<int, QMap<QString, IMessageStyleOptions> > FOptions;
+  int FMessageType;
+  OptionsNode FOptions;
+  IMessageStyleOptions FStyleOptions;
 };
 
 #endif // ADIUMOPTIONSWIDGET_H

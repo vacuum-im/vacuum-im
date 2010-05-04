@@ -1,28 +1,17 @@
 #include "account.h"
 
-#define SVN_VALUE_PREFIX    "account[]"
-
-Account::Account(IXmppStreams *AXmppStreams, ISettings *ASettings, const QString &AAccountId, QObject *AParent) : QObject(AParent)
+Account::Account(IXmppStreams *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent) : QObject(AParent)
 {
-  FAccountId = AAccountId;
-  FSettings = ASettings;
   FXmppStreams = AXmppStreams;
+  FOptionsNode = AOptionsNode;
   FXmppStream = NULL;
+
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 }
 
 Account::~Account()
 {
 
-}
-
-QUuid Account::accountId() const
-{
-  return FAccountId;
-}
-
-IXmppStream *Account::xmppStream() const
-{
-  return FXmppStream;
 }
 
 bool Account::isValid() const
@@ -35,6 +24,11 @@ bool Account::isValid() const
   return valid;
 }
 
+QUuid Account::accountId() const
+{
+  return FOptionsNode.nspace();
+}
+
 bool Account::isActive() const
 {
   return FXmppStream!=NULL;
@@ -45,15 +39,15 @@ void Account::setActive(bool AActive)
   if (AActive && FXmppStream==NULL && isValid())
   {
     FXmppStream = FXmppStreams->newXmppStream(streamJid());
-    connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(updateXmppStream()),Qt::QueuedConnection);
-    updateXmppStream();
+    connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onXmppStreamClosed()),Qt::QueuedConnection);
+    onXmppStreamClosed();
     FXmppStreams->addXmppStream(FXmppStream);
-    emit changed(AVN_ACTIVE,true);
+    emit activeChanged(true);
   }
   else if (!AActive && FXmppStream!=NULL)
   {
+    emit activeChanged(false);
     FXmppStreams->removeXmppStream(FXmppStream);
-    emit changed(AVN_ACTIVE,false);
     FXmppStreams->destroyXmppStream(FXmppStream->streamJid());
     FXmppStream = NULL;
   }
@@ -61,89 +55,68 @@ void Account::setActive(bool AActive)
 
 QString Account::name() const
 {
-  return value(AVN_NAME).toString();
+  return FOptionsNode.value("name").toString();
 }
 
 void Account::setName(const QString &AName)
 {
-  setValue(AVN_NAME,AName);
+  FOptionsNode.setValue(AName,"name");
 }
 
 Jid Account::streamJid() const
 {
-  return value(AVN_STREAM_JID).toString();
+  return FOptionsNode.value("streamJid").toString();
 }
 
 void Account::setStreamJid(const Jid &AJid)
 {
-  setValue(AVN_STREAM_JID,AJid.full());
+  FOptionsNode.setValue(AJid.full(),"streamJid");
 }
 
 QString Account::password() const
 {
-  return decript(value(AVN_PASSWORD).toByteArray(),FAccountId.toString().toUtf8());
+  return Options::decrypt(FOptionsNode.value("password").toByteArray()).toString();
 }
 
 void Account::setPassword(const QString &APassword)
 {
-  setValue(AVN_PASSWORD,encript(APassword,FAccountId.toString().toUtf8()));
+  FOptionsNode.setValue(Options::encrypt(APassword),"password");
 }
 
-QString Account::defaultLang() const
+OptionsNode Account::optionsNode() const
 {
-  return value(AVN_DEFAULT_LANG).toString();
+  return FOptionsNode;
 }
 
-void Account::setDefaultLang(const QString &ALang)
+IXmppStream *Account::xmppStream() const
 {
-  setValue(AVN_DEFAULT_LANG,ALang);
+  return FXmppStream;
 }
 
-QByteArray Account::encript(const QString &AValue, const QByteArray &AKey) const
-{
-  return FSettings->encript(AValue,AKey);
-}
-
-QString Account::decript(const QByteArray &AValue, const QByteArray &AKey) const
-{
-  return FSettings->decript(AValue,AKey);
-}
-
-QVariant Account::value(const QString &AName, const QVariant &ADefault) const
-{
-  return FSettings->valueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId.toString(),ADefault);
-}
-
-void Account::setValue(const QString &AName, const QVariant &AValue)
-{
-  if (value(AName) != AValue)
-  {
-    if (FXmppStream && !FXmppStream->isOpen())
-    {
-      if (AName == AVN_STREAM_JID)
-        FXmppStream->setStreamJid(AValue.toString());
-      else if (AName == AVN_PASSWORD)
-        FXmppStream->setPassword(decript(AValue.toByteArray(),FAccountId.toString().toUtf8()));
-      else if (AName == AVN_DEFAULT_LANG)
-        FXmppStream->setDefaultLang(AValue.toString());
-    }
-    FSettings->setValueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId.toString(),AValue);
-    emit changed(AName,AValue);
-  }
-}
-
-void Account::delValue(const QString &AName)
-{
-  FSettings->deleteValueNS(QString(SVN_VALUE_PREFIX":%1").arg(AName),FAccountId.toString());
-  emit changed(AName,QVariant());
-}
-
-void Account::updateXmppStream()
+void Account::onXmppStreamClosed()
 {
   if (FXmppStream)
   {
     FXmppStream->setStreamJid(streamJid());
     FXmppStream->setPassword(password());
-    FXmppStream->setDefaultLang(defaultLang()); 
+  }
+}
+
+void Account::onOptionsChanged(const OptionsNode &ANode)
+{
+  if (FOptionsNode.isChildNode(ANode))
+  {
+    if (FXmppStream && !FXmppStream->isOpen())
+    {
+      if (FOptionsNode.node("streamJid") == ANode)
+      {
+        FXmppStream->setStreamJid(ANode.value().toString());
+      }
+      else if (FOptionsNode.node("password") == ANode)
+      {
+        FXmppStream->setPassword(Options::decrypt(ANode.value().toByteArray()).toString());
+      }
+    }
+    emit optionsChanged(ANode);
   }
 }

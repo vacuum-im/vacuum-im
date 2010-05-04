@@ -2,9 +2,11 @@
 #define EDITWIDGET_H
 
 #include <QShortcut>
+#include <definations/optionvalues.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <interfaces/imessagewidgets.h>
+#include <utils/options.h>
 #include "ui_editwidget.h"
 
 class EditWidget : 
@@ -53,9 +55,7 @@ protected:
 protected slots:
   void onShortcutActivated();
   void onSendButtonCliked(bool);
-  void onEditorAutoResizeChanged(bool AResize);
-  void onEditorMinimumLinesChanged(int ALines);
-  void onEditorSendKeyChanged(const QKeySequence &AKey);
+  void onOptionsChanged(const OptionsNode &ANode);
 private:
   Ui::EditWidgetClass ui;
 private:

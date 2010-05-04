@@ -1,11 +1,12 @@
 #ifndef IFILESTREAMSMANAGER_H
 #define IFILESTREAMSMANAGER_H
 
+#include <QUuid>
 #include <QWidget>
 #include <QDateTime>
-
-class Jid;
-class Stanza;
+#include <utils/jid.h>
+#include <utils/stanza.h>
+#include <utils/options.h>
 
 #define FILESTREAMSMANAGER_UUID       "{ea9ea27a-5ad7-40e3-82b3-db8ac3bdc288}"
 
@@ -52,8 +53,8 @@ public:
   virtual void setFileDate(const QDateTime &ADate) =0;
   virtual QString fileDescription() const =0;
   virtual void setFileDescription(const QString &AFileDesc) =0;
-  virtual QString methodSettings() const =0;
-  virtual void setMethodSettings(const QString &ASettingsNS) =0;
+  virtual QUuid settingsProfile() const =0;
+  virtual void setSettingsProfile(const QUuid &AProfileId) =0;
   virtual bool initStream(const QList<QString> &AMethods) =0;
   virtual bool startStream(const QString &AMethodNS) =0;
   virtual void abortStream(const QString &AError) =0;
@@ -81,16 +82,6 @@ public:
   virtual IFileStream *streamById(const QString &AStreamId) const =0;
   virtual IFileStream *createStream(IFileStreamsHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, 
     const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL) =0;
-  virtual QString defaultDirectory() const =0;
-  virtual QString defaultDirectory(const Jid &AContactJid) const =0;
-  virtual void setDefaultDirectory(const QString &ADirectory) =0;
-  virtual bool separateDirectories() const =0;
-  virtual void setSeparateDirectories(bool ASeparate) =0;
-  virtual QString defaultStreamMethod() const =0;
-  virtual void setDefaultStreamMethod(const QString &AMethodNS) =0;
-  virtual QList<QString> streamMethods() const =0;
-  virtual void insertStreamMethod(const QString &AMethodNS) =0;
-  virtual void removeStreamMethod(const QString &AMethodNS) =0;
   virtual IFileStreamsHandler *streamHandler(const QString &AStreamId) const =0;
   virtual void insertStreamsHandler(IFileStreamsHandler *AHandler, int AOrder) =0;
   virtual void removeStreamsHandler(IFileStreamsHandler *AHandler, int AOrder) =0;

@@ -68,6 +68,10 @@
         <source>Idle Time</source>
         <translation>Czas bezczynności</translation>
     </message>
+    <message>
+        <source>Share information about OS version</source>
+        <translation type="unfinished">Udostępniaj informację o wersji systemu</translation>
+    </message>
 </context>
 <context>
     <name>ClientInfoDialog</name>
@@ -171,13 +175,6 @@
     <message>
         <source>Waiting response...</source>
         <translation>Oczekiwanie na odpowiedź...</translation>
-    </message>
-</context>
-<context>
-    <name>MiscOptionsWidgetClass</name>
-    <message>
-        <source>Share information about OS version</source>
-        <translation>Udostępniaj informację o wersji systemu</translation>
     </message>
 </context>
 </TS>

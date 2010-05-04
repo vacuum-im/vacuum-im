@@ -1,10 +1,9 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
-#include <definations/accountvaluenames.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ixmppstreams.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 
 class Account : 
   public QObject,
@@ -13,12 +12,11 @@ class Account :
   Q_OBJECT;
   Q_INTERFACES(IAccount);
 public:
-  Account(IXmppStreams *AXmppStreams, ISettings *ASettings, const QString &AAccountId, QObject *AParent);
+  Account(IXmppStreams *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent);
   ~Account();
   virtual QObject *instance() { return this; }
-  virtual QUuid accountId() const;
-  virtual IXmppStream *xmppStream() const;
   virtual bool isValid() const;
+  virtual QUuid accountId() const;
   virtual bool isActive() const;
   virtual void setActive(bool AActive);
   virtual QString name() const;
@@ -27,24 +25,19 @@ public:
   virtual void setStreamJid(const Jid &AJid);
   virtual QString password() const;
   virtual void setPassword(const QString &APassword);
-  virtual QString defaultLang() const;
-  virtual void setDefaultLang(const QString &ALang);
-  //AccountValues
-  virtual QByteArray encript(const QString &AValue, const QByteArray &AKey) const;
-  virtual QString decript(const QByteArray &AValue, const QByteArray &AKey) const;
-  virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const; 
-  virtual void setValue(const QString &AName, const QVariant &AValue);
-  virtual void delValue(const QString &AName);
+  virtual OptionsNode optionsNode() const;
+  virtual IXmppStream *xmppStream() const;
 signals:
-  void changed(const QString &AName, const QVariant &AValue);
+  void activeChanged(bool AActive);
+  void optionsChanged(const OptionsNode &ANode);
 protected slots:
-  void updateXmppStream();
+  void onXmppStreamClosed();
+  void onOptionsChanged(const OptionsNode &ANode);
 private:
-  ISettings *FSettings;
   IXmppStream *FXmppStream;
   IXmppStreams *FXmppStreams;
 private:
-  QUuid FAccountId;
+  OptionsNode FOptionsNode;
 };
 
 #endif // ACCOUNT_H

@@ -242,23 +242,19 @@ void FileStream::setFileDescription(const QString &AFileDesc)
   }
 }
 
-QString FileStream::methodSettings() const
+QUuid FileStream::settingsProfile() const
 {
-  return FMethodSettings;
+  return FProfileId;
 }
 
-void FileStream::setMethodSettings(const QString &ASettingsNS)
+void FileStream::setSettingsProfile(const QUuid &AProfileId)
 {
-  if (FStreamState == Creating)
+  if (FProfileId != AProfileId)
   {
-    if (FMethodSettings != ASettingsNS)
-    {
-      FMethodSettings = ASettingsNS;
-      emit propertiesChanged();
-    }
+    FProfileId = AProfileId;
+    emit propertiesChanged();
   }
 }
-
 bool FileStream::initStream(const QList<QString> &AMethods)
 {
   if (FStreamState==Creating && FStreamKind==SendFile)
@@ -285,7 +281,7 @@ bool FileStream::startStream(const QString &AMethodNS)
       FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Initiator,this) : NULL;
       if (FSocket)
       {
-        stremMethod->loadSettings(FSocket,FMethodSettings);
+        stremMethod->loadMethodSettings(FSocket,FDataManager->settingsProfileNode(FProfileId, AMethodNS));
         setStreamState(Connecting,tr("Connecting"));
         connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
         if (FSocket->open(QIODevice::WriteOnly))
@@ -309,7 +305,7 @@ bool FileStream::startStream(const QString &AMethodNS)
         FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Target,this) : NULL;
         if (FSocket)
         {
-          stremMethod->loadSettings(FSocket,FMethodSettings);
+          stremMethod->loadMethodSettings(FSocket,FDataManager->settingsProfileNode(FProfileId, AMethodNS));
           setStreamState(Connecting,tr("Connecting"));
           connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
           if (FSocket->open(QIODevice::ReadOnly))
@@ -466,4 +462,3 @@ void FileStream::onIncrementSpeedIndex()
   FSpeed[FSpeedIndex] = 0;
   emit speedChanged();
 }
-

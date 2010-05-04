@@ -40,15 +40,14 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 
   if (AFileStream->streamState() == IFileStream::Creating)
   {
-    foreach(QString settingsNS, FDataManager->methodSettings())
-      ui.cmbMethodSettings->addItem(FDataManager->methodSettingsName(settingsNS), settingsNS);
-    ui.cmbMethodSettings->model()->sort(0, Qt::AscendingOrder);
-    ui.cmbMethodSettings->insertItem(0,FDataManager->methodSettingsName(QString::null), QVariant(QString::null));
-    ui.cmbMethodSettings->setCurrentIndex(0);
-    connect(ui.cmbMethodSettings, SIGNAL(currentIndexChanged(int)), SLOT(onMethodSettingsChanged(int)));
-    connect(FDataManager->instance(),SIGNAL(methodSettingsInserted(const QString &, const QString &)),
-      SLOT(onMethodSettingsInserted(const QString &, const QString &)));
-    connect(FDataManager->instance(),SIGNAL(methodSettingsRemoved(const QString &)), SLOT(onMethodSettingsRemoved(const QString &)));
+    foreach(QUuid profileId, FDataManager->settingsProfiles())
+      ui.cmbSettingsProfile->addItem(FDataManager->settingsProfileName(profileId), profileId.toString());
+    ui.cmbSettingsProfile->setCurrentIndex(0);
+
+    connect(ui.cmbSettingsProfile, SIGNAL(currentIndexChanged(int)), SLOT(onMethodSettingsChanged(int)));
+    connect(FDataManager->instance(),SIGNAL(settingsProfileInserted(const QUuid &, const QString &)),
+      SLOT(onSettingsProfileInserted(const QUuid &, const QString &)));
+    connect(FDataManager->instance(),SIGNAL(settingsProfileRemoved(const QUuid &)), SLOT(onSettingsProfileRemoved(const QUuid &)));
   }
 
   connect(FFileStream->instance(),SIGNAL(stateChanged()),SLOT(onStreamStateChanged()));
@@ -81,6 +80,11 @@ IFileStream *StreamDialog::stream() const
   return FFileStream;
 }
 
+void StreamDialog::setContactName(const QString &AName)
+{
+  ui.lblContact->setText(AName);
+}
+
 QList<QString> StreamDialog::selectedMethods() const
 {
   QList<QString> methods;
@@ -102,16 +106,11 @@ void StreamDialog::setSelectableMethods(const QList<QString> &AMethods)
       QCheckBox *button = new QCheckBox(stremMethod->methodName(),ui.grbMethods);
       button->setToolTip(stremMethod->methodDescription());
       button->setAutoExclusive(FFileStream->streamKind() == IFileStream::ReceiveFile);
-      button->setChecked(FFileStream->streamKind()==IFileStream::SendFile || FFileManager->defaultStreamMethod()==methodNS);
+      button->setChecked(FFileStream->streamKind()==IFileStream::SendFile || Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString()==methodNS);
       ui.wdtMethods->layout()->addWidget(button);
       FMethodButtons.insert(button,methodNS);
     }
   }
-}
-
-void StreamDialog::setContactName(const QString &AName)
-{
-  ui.lblContact->setText(AName);
 }
 
 bool StreamDialog::acceptFileName(const QString AFile)
@@ -224,7 +223,6 @@ qint64 StreamDialog::curPosition() const
 
 int StreamDialog::curPercentPosition() const
 {
-  qint64 minPos = minPosition();
   qint64 maxPos = maxPosition();
   return maxPos>0 ? curPosition()*100/maxPos : 0;
 }
@@ -388,19 +386,19 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
 
 void StreamDialog::onMethodSettingsChanged(int AIndex)
 {
-  FFileStream->setMethodSettings(ui.cmbMethodSettings->itemData(AIndex).toString());
+  FFileStream->setSettingsProfile(ui.cmbSettingsProfile->itemData(AIndex).toString());
 }
 
-void StreamDialog::onMethodSettingsInserted(const QString &ASettingsNS, const QString &ASettingsName)
+void StreamDialog::onSettingsProfileInserted(const QUuid &AProfileId, const QString &AName)
 {
-  int index = ui.cmbMethodSettings->findData(ASettingsNS);
+  int index = ui.cmbSettingsProfile->findData(AProfileId.toString());
   if (index >= 0)
-    ui.cmbMethodSettings->setItemText(index, ASettingsName);
+    ui.cmbSettingsProfile->setItemText(index, AName);
   else
-    ui.cmbMethodSettings->addItem(ASettingsName, ASettingsNS);
+    ui.cmbSettingsProfile->addItem(AName, AProfileId.toString());
 }
 
-void StreamDialog::onMethodSettingsRemoved(const QString &ASettingsNS)
+void StreamDialog::onSettingsProfileRemoved(const QUuid &AProfileId)
 {
-  ui.cmbMethodSettings->removeItem(ui.cmbMethodSettings->findData(ASettingsNS));
+  ui.cmbSettingsProfile->removeItem(ui.cmbSettingsProfile->findData(AProfileId.toString()));
 }

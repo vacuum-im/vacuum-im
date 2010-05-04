@@ -43,16 +43,13 @@
         <source>Allows to set and display avatars</source>
         <translation>Позволяет устанавливать и отображать аватары</translation>
     </message>
-</context>
-<context>
-    <name>RosterOptionsWidgetClass</name>
     <message>
         <source>Show avatars</source>
         <translation>Показывать аватары</translation>
     </message>
     <message>
-        <source>Show empty avatar image</source>
-        <translation>Показывать изображение пустого аватара</translation>
+        <source>Show empty avatars</source>
+        <translation>Показывать пустые аватары</translation>
     </message>
 </context>
 </TS>

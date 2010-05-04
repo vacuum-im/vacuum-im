@@ -257,6 +257,14 @@
         <source>Allows to edit roster</source>
         <translation>Позволяет редактировать ростер</translation>
     </message>
+    <message>
+        <source>Auto accept subscription requests</source>
+        <translation>Автоматически принимать запросы на авторизации</translation>
+    </message>
+    <message>
+        <source>Auto unsubscribe contacts</source>
+        <translation>Автоматически удалять авторизацию</translation>
+    </message>
 </context>
 <context>
     <name>SubscriptionDialog</name>
@@ -302,17 +310,6 @@
     <message>
         <source>Remove presence subscription</source>
         <translation>Удалить авторизацию</translation>
-    </message>
-</context>
-<context>
-    <name>SubscriptionOptionsClass</name>
-    <message>
-        <source>Auto accept subscription requests</source>
-        <translation>Автоматически принимать запросы на авторизации</translation>
-    </message>
-    <message>
-        <source>Auto unsubscribe contacts</source>
-        <translation>Автоматически удалять авторизацию</translation>
     </message>
 </context>
 </TS>

@@ -29,6 +29,7 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
 DefaultConnection::~DefaultConnection()
 {
   disconnectFromHost();
+  emit connectionDestroyed();
 }
 
 bool DefaultConnection::isOpen() const
@@ -50,11 +51,11 @@ bool DefaultConnection::connectToHost()
     FRecords.clear();
     FSSLError = false;
 
-    QString host = option(IDefaultConnection::CO_HOST).toString();
-    quint16 port = option(IDefaultConnection::CO_PORT).toInt();
-    QString domain = option(IDefaultConnection::CO_DOMAINE).toString();
-    FSSLConnection = option(IDefaultConnection::CO_USE_SSL).toBool();
-    FIgnoreSSLErrors = option(IDefaultConnection::CO_IGNORE_SSL_ERRORS).toBool();
+    QString host = option(IDefaultConnection::COR_HOST).toString();
+    quint16 port = option(IDefaultConnection::COR_PORT).toInt();
+    QString domain = option(IDefaultConnection::COR_DOMAINE).toString();
+    FSSLConnection = option(IDefaultConnection::COR_USE_SSL).toBool();
+    FIgnoreSSLErrors = option(IDefaultConnection::COR_IGNORE_SSL_ERRORS).toBool();
     
     QJDns::Record record;
     record.name = !host.isEmpty() ? host.toLatin1() : domain.toLatin1();
@@ -117,16 +118,6 @@ QByteArray DefaultConnection::read(qint64 ABytes)
   return FSocket.read(ABytes);
 }
 
-QVariant DefaultConnection::option(int ARole) const
-{
-  return FOptions.value(ARole);
-}
-
-void DefaultConnection::setOption(int ARole, const QVariant &AValue)
-{
-  FOptions.insert(ARole, AValue);
-}
-
 void DefaultConnection::startClientEncryption()
 {
   FSocket.startClientEncryption();
@@ -180,6 +171,16 @@ void DefaultConnection::setProxy(const QNetworkProxy &AProxy)
     FSocket.setProxy(AProxy);
     emit proxyChanged(AProxy);
   }
+}
+
+QVariant DefaultConnection::option(int ARole) const
+{
+  return FOptions.value(ARole);
+}
+
+void DefaultConnection::setOption(int ARole, const QVariant &AValue)
+{
+  FOptions.insert(ARole, AValue);
 }
 
 void DefaultConnection::connectToNextHost()

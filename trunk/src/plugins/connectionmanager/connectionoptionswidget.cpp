@@ -1,28 +1,19 @@
 #include "connectionoptionswidget.h"
 
-ConnectionOptionsWidget::ConnectionOptionsWidget(ConnectionManager *ACManager, IAccountManager *AAManager, const QUuid &AAccountId)
+ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
-  FAccountManager = AAManager;
-  FConnectionManager = ACManager;
+  FManager = AManager;
 
-  FAccountId = AAccountId;
+  FOptions = ANode;
   FPluginSettings = NULL;
 
-  QList<IConnectionPlugin *> plugins = FConnectionManager->pluginList();
-  foreach (IConnectionPlugin *plugin, plugins)
-    ui.cmbConnections->addItem(plugin->displayName(),plugin->pluginUuid().toString());
+  foreach (QString pluginId, FManager->pluginList())
+    ui.cmbConnections->addItem(FManager->pluginById(pluginId)->pluginName(),pluginId);
   connect(ui.cmbConnections, SIGNAL(currentIndexChanged(int)),SLOT(onComboConnectionsChanged(int)));
+  ui.wdtSelectConnection->setVisible(ui.cmbConnections->count() > 1);
 
-  if (plugins.count() < 2)
-    ui.wdtSelectConnection->setVisible(false);
-
-  QUuid pluginId = FConnectionManager->defaultPlugin()->pluginUuid();
-  IAccount *account = FAccountManager->accountById(FAccountId);
-  if (account != NULL)
-    pluginId = account->value(AVN_CONNECTION_ID,pluginId.toString()).toString();
-
-  setPluginById(pluginId);
+  reset();
 }
 
 ConnectionOptionsWidget::~ConnectionOptionsWidget()
@@ -32,47 +23,55 @@ ConnectionOptionsWidget::~ConnectionOptionsWidget()
 
 void ConnectionOptionsWidget::apply()
 {
-  IAccount *account = FAccountManager->accountById(FAccountId);
-  if (account)
+  IConnectionPlugin *plugin = FManager->pluginById(FPluginId);
+  if (plugin)
   {
-    account->setValue(AVN_CONNECTION_ID,FPluginId.toString());
-    IConnectionPlugin *plugin = FConnectionManager->pluginById(FPluginId);
-    if (plugin)
-    {
-      plugin->saveSettings(FPluginSettings, FAccountId.toString());
-      IConnection *connection = FConnectionManager->insertConnection(account);
-      if (connection)
-        plugin->loadSettings(connection, FAccountId.toString());
-    }
+    FOptions.node("connection-type").setValue(FPluginId);
+    if (FPluginSettings)
+      plugin->saveConnectionSettings(FPluginSettings);
   }
-  emit optionsAccepted();
+  emit childApply();
 }
 
-void ConnectionOptionsWidget::setPluginById(const QUuid &APluginId)
+void ConnectionOptionsWidget::reset()
+{
+  QString pluginId = FOptions.value("connection-type").toString();
+  if (!FManager->pluginList().isEmpty())
+    setPluginById(FManager->pluginById(pluginId) ? pluginId : FManager->pluginList().first());
+  if (FPluginSettings)
+    FPluginSettings->reset();
+  emit childReset();
+}
+
+void ConnectionOptionsWidget::setPluginById(const QString &APluginId)
 {
   if (FPluginId != APluginId)
   {
     if (FPluginSettings)
     {
-      ui.grbOptions->layout()->removeWidget(FPluginSettings);
-      FPluginSettings->deleteLater();
+      ui.grbOptions->layout()->removeWidget(FPluginSettings->instance());
+      FPluginSettings->instance()->setParent(NULL);
+      delete FPluginSettings->instance();
       FPluginSettings = NULL;
       FPluginId = QUuid();
     }
 
-    IConnectionPlugin *plugin = FConnectionManager->pluginById(APluginId);
+    IConnectionPlugin *plugin = FManager->pluginById(APluginId);
     if (plugin)
     {
-      FPluginSettings = plugin->settingsWidget(FAccountId.toString());
+      FPluginSettings = plugin->connectionSettingsWidget(FOptions.node("connection",APluginId), ui.grbOptions);
       if (FPluginSettings)
       {
-        ui.grbOptions->layout()->addWidget(FPluginSettings);
         FPluginId = APluginId;
+        ui.grbOptions->layout()->addWidget(FPluginSettings->instance());
+        connect(FPluginSettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
       }
     }
 
     if (ui.cmbConnections->itemData(ui.cmbConnections->currentIndex()).toString() != APluginId)
-      ui.cmbConnections->setCurrentIndex(ui.cmbConnections->findData(APluginId.toString()));
+      ui.cmbConnections->setCurrentIndex(ui.cmbConnections->findData(APluginId));
+
+    emit modified();
   }
 }
 

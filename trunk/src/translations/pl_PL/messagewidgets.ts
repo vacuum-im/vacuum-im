@@ -38,6 +38,26 @@
         <source>Quote selected text</source>
         <translation>Cytuj zaznaczony tekst</translation>
     </message>
+    <message>
+        <source>Tab Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable tab windows</source>
+        <translation type="unfinished">Używaj okna z zakładkami</translation>
+    </message>
+    <message>
+        <source>Show status changes in chat windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto resize input field</source>
+        <translation type="unfinished">Automatyczna zmiana rozmiaru pola wpisywania wiadomości</translation>
+    </message>
+    <message>
+        <source>Show contact information in chat windows</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>
@@ -88,28 +108,12 @@
 <context>
     <name>MessengerOptionsClass</name>
     <message>
-        <source>Show status in chat window</source>
-        <translation>Pokazuj status w oknie rozmowy</translation>
-    </message>
-    <message>
         <source>Send message key sequence:</source>
         <translation>Kombinacja klawiszy, aby wysłać wiadomość:</translation>
     </message>
     <message>
-        <source>Enable tab windows</source>
-        <translation>Używaj okna z zakładkami</translation>
-    </message>
-    <message>
-        <source>Auto resize input field</source>
-        <translation>Automatyczna zmiana rozmiaru pola wpisywania wiadomości</translation>
-    </message>
-    <message>
         <source>Minimum input field lines:</source>
         <translation>Minimalna liczba wierszy pola wpisywania wiadomości:</translation>
-    </message>
-    <message>
-        <source>Show contact information in chat window</source>
-        <translation>Pokazuj informacje o kontakcie w oknie rozmowy</translation>
     </message>
 </context>
 <context>

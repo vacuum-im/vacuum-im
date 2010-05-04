@@ -1,24 +1,11 @@
 #include "connectionmanager.h" 
 
-#define SVN_PROXY             "proxy[]"
-#define SVN_PROXY_NAME        SVN_PROXY ":name"
-#define SVN_PROXY_TYPE        SVN_PROXY ":type"
-#define SVN_PROXY_HOST        SVN_PROXY ":host"
-#define SVN_PROXY_PORT        SVN_PROXY ":port"
-#define SVN_PROXY_USER        SVN_PROXY ":user"
-#define SVN_PROXY_PASS        SVN_PROXY ":pass"
-
-#define SVN_DEFAULT_PROXY     "defaultProxy"
-
-#define SVN_SETTINGS          "settings[]"
-#define SVN_SETTINGS_PROXY    SVN_SETTINGS ":proxy"
-
 ConnectionManager::ConnectionManager()
 {
   FEncryptedLabelId = -1;
   FAccountManager = NULL;
   FRostersViewPlugin = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
 }
 
 ConnectionManager::~ConnectionManager()
@@ -43,11 +30,9 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
     IConnectionPlugin *cplugin = qobject_cast<IConnectionPlugin *>(plugin->instance());
     if (cplugin)
     {
+      FPlugins.insert(cplugin->pluginId(), cplugin);
       connect(cplugin->instance(),SIGNAL(connectionCreated(IConnection *)),SIGNAL(connectionCreated(IConnection *)));
-      connect(cplugin->instance(),SIGNAL(connectionUpdated(IConnection *, const QString &)),
-        SIGNAL(connectionUpdated(IConnection *, const QString &)));
       connect(cplugin->instance(),SIGNAL(connectionDestroyed(IConnection *)),SIGNAL(connectionDestroyed(IConnection *)));
-      FPlugins.append(cplugin);
     }
   }
 
@@ -58,7 +43,8 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
     if (FAccountManager)
     {
       connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-      connect(FAccountManager->instance(),SIGNAL(destroyed(const QUuid &)),SLOT(onAccountDestroyed(const QUuid &)));
+      connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),
+        SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
     }
   }
 
@@ -66,6 +52,12 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
   if (plugin)
   {
     FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+  }
+
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+  if (plugin)
+  {
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
   }
 
   plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
@@ -79,106 +71,131 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
     }
   }
   
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-  {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
-  }
-
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 
   return !FPlugins.isEmpty();
 }
 
 bool ConnectionManager::initObjects()
 {
+  Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_TYPE,QString("DefaultConnection"));
+
+  Options::setDefaultValue(OPV_PROXY_DEFAULT,QString(APPLICATION_PROXY_REF_UUID));
+  Options::setDefaultValue(OPV_PROXY_NAME,tr("New Proxy"));
+  Options::setDefaultValue(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy);
+
   if (FRostersViewPlugin)
   {
     QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
     FEncryptedLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_CONNECTION_ENCRYPTED,icon);
   }
-  if (FAccountManager && FSettingsPlugin)
+  return true;
+}
+
+bool ConnectionManager::initSettings()
+{
+  if (FAccountManager && FOptionsManager)
   {
-    FSettingsPlugin->insertOptionsHolder(this);
+    FOptionsManager->insertOptionsHolder(this);
   }
   return true;
 }
 
-QWidget *ConnectionManager::optionsWidget(const QString &ANode, int &AOrder)
+IOptionsWidget *ConnectionManager::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
-  QStringList nodeTree = ANode.split("::",QString::SkipEmptyParts);
-  if (nodeTree.count()==2 && nodeTree.at(0)==ON_ACCOUNTS)
+  QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+  if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
   {
     AOrder = OWO_ACCOUNT_CONNECTION;
-    ConnectionOptionsWidget *widget = new ConnectionOptionsWidget(this,FAccountManager,nodeTree.at(1));
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FAccountManager->instance(),SIGNAL(optionsAccepted()),widget,SLOT(apply()));
-    connect(FAccountManager->instance(),SIGNAL(optionsRejected()),SIGNAL(optionsRejected()));
-    return widget;
+    return new ConnectionOptionsWidget(this,Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)),AParent);
   }
   return NULL;
 }
 
-QList<IConnectionPlugin *> ConnectionManager::pluginList() const
+QList<QString> ConnectionManager::pluginList() const
 {
-  return FPlugins;
+  return FPlugins.keys();
 }
 
-IConnectionPlugin *ConnectionManager::pluginById(const QUuid &APluginId) const
+IConnectionPlugin *ConnectionManager::pluginById(const QString &APluginId) const
 {
-  foreach (IConnectionPlugin *plugin, FPlugins)
-    if (plugin->pluginUuid() == APluginId)
-      return plugin;
-  return NULL;
+  return FPlugins.value(APluginId,NULL);
 }
 
 QList<QUuid> ConnectionManager::proxyList() const
 {
-  return FProxys.keys();
+  QList<QUuid> plist;
+  foreach(QString proxyId, Options::node(OPV_PROXY_ROOT).childNSpaces("proxy")) {
+    plist.append(proxyId); }
+  return plist;
 }
 
 IConnectionProxy ConnectionManager::proxyById(const QUuid &AProxyId) const
 {
   static const IConnectionProxy noProxy = {" "+tr("<No Proxy>"), QNetworkProxy(QNetworkProxy::NoProxy) };
-  return AProxyId!=DEFAULT_PROXY_REF_UUID ? FProxys.value(AProxyId,noProxy) : FProxys.value(FDefaultProxy,noProxy);
+
+  if (!AProxyId.isNull())
+  {
+    OptionsNode pnode;
+    QList<QUuid> plist = proxyList();
+    if (plist.contains(AProxyId))
+      pnode = Options::node(OPV_PROXY_ITEM,AProxyId.toString());
+    else if (plist.contains(defaultProxy()))
+      pnode = Options::node(OPV_PROXY_ITEM,defaultProxy().toString());
+
+    if (!pnode.isNull())
+    {
+      IConnectionProxy proxy;
+      proxy.name = pnode.value("name").toString();
+      proxy.proxy.setType((QNetworkProxy::ProxyType)pnode.value("type").toInt());
+      proxy.proxy.setHostName(pnode.value("host").toString());
+      proxy.proxy.setPort(pnode.value("port").toInt());
+      proxy.proxy.setUser(pnode.value("user").toString());
+      proxy.proxy.setPassword(Options::decrypt(pnode.value("pass").toByteArray()).toString());
+      return proxy;
+    }
+  }
+  return noProxy;
 }
 
 void ConnectionManager::setProxy(const QUuid &AProxyId, const IConnectionProxy &AProxy)
 {
-  if (!AProxyId.isNull() && AProxyId!=DEFAULT_PROXY_REF_UUID)
+  if (!AProxyId.isNull() && AProxyId!=APPLICATION_PROXY_REF_UUID)
   {
-    FProxys.insert(AProxyId, AProxy);
+    OptionsNode pnode = Options::node(OPV_PROXY_ITEM,AProxyId.toString());
+    pnode.setValue(AProxy.name,"name");
+    pnode.setValue(AProxy.proxy.type(),"type");
+    pnode.setValue(AProxy.proxy.hostName(),"host");
+    pnode.setValue(AProxy.proxy.port(),"port");
+    pnode.setValue(AProxy.proxy.user(),"user");
+    pnode.setValue(Options::encrypt(AProxy.proxy.password()),"pass");
     emit proxyChanged(AProxyId, AProxy);
   }
 }
 
 void ConnectionManager::removeProxy(const QUuid &AProxyId)
 {
-  if (FProxys.contains(AProxyId))
+  if (proxyList().contains(AProxyId))
   {
-    if (FDefaultProxy == AProxyId)
+    if (defaultProxy() == AProxyId)
       setDefaultProxy(QUuid());
-    FProxys.remove(AProxyId);
+    Options::node(OPV_PROXY_ROOT).removeChilds("proxy",AProxyId.toString());
     emit proxyRemoved(AProxyId);
   }
 }
 
 QUuid ConnectionManager::defaultProxy() const
 {
-  return FDefaultProxy;
+  return Options::node(OPV_PROXY_DEFAULT).value().toString();
 }
 
 void ConnectionManager::setDefaultProxy(const QUuid &AProxyId)
 {
-  if (FDefaultProxy!=AProxyId && (AProxyId.isNull() || FProxys.contains(AProxyId)))
+  if (defaultProxy()!=AProxyId && (AProxyId.isNull() || proxyList().contains(AProxyId)))
   {
-    FDefaultProxy = AProxyId;
-    QNetworkProxy::setApplicationProxy(proxyById(FDefaultProxy).proxy);
-    emit defaultProxyChanged(FDefaultProxy);
+    Options::node(OPV_PROXY_DEFAULT).setValue(AProxyId.toString());
+    QNetworkProxy::setApplicationProxy(proxyById(AProxyId).proxy);
+    emit defaultProxyChanged(AProxyId);
   }
 }
 
@@ -189,69 +206,41 @@ QDialog *ConnectionManager::showEditProxyDialog(QWidget *AParent)
   return dialog;
 }
 
-QWidget *ConnectionManager::proxySettingsWidget(const QString &ASettingsNS, QWidget *AParent)
+IOptionsWidget *ConnectionManager::proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent)
 {
-  ProxySettingsWidget *widget = new ProxySettingsWidget(this,ASettingsNS,AParent);
+  ProxySettingsWidget *widget = new ProxySettingsWidget(this,ANode,AParent);
   return widget;
 }
 
-void ConnectionManager::saveProxySettings(QWidget *AWidget, const QString &ASettingsNS)
+void ConnectionManager::saveProxySettings(IOptionsWidget *AWidget, OptionsNode ANode)
 {
-  ProxySettingsWidget *widget = qobject_cast<ProxySettingsWidget *>(AWidget);
+  ProxySettingsWidget *widget = qobject_cast<ProxySettingsWidget *>(AWidget->instance());
   if (widget)
-    widget->apply(ASettingsNS);
+    widget->apply(ANode);
 }
 
-QUuid ConnectionManager::proxySettings(const QString &ASettingsNS) const
+QUuid ConnectionManager::loadProxySettings(const OptionsNode &ANode) const
 {
-  if (FSettingsPlugin)
-  {
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    return settings->valueNS(SVN_SETTINGS_PROXY,ASettingsNS,DEFAULT_PROXY_REF_UUID).toString();
-  }
-  return DEFAULT_PROXY_REF_UUID;
+  return ANode.value().toString();
 }
 
-void ConnectionManager::setProxySettings(const QString &ASettingsNS, const QUuid &AProxyId)
-{
-  if (FSettingsPlugin)
-  {
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    settings->setValueNS(SVN_SETTINGS_PROXY,ASettingsNS,AProxyId.toString());
-  }
-}
-
-void ConnectionManager::deleteProxySettings(const QString &ASettingsNS)
-{
-  if (FSettingsPlugin)
-  {
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    settings->deleteValueNS(SVN_SETTINGS,ASettingsNS);
-  }
-}
-
-IConnectionPlugin *ConnectionManager::defaultPlugin() const
-{
-  IConnectionPlugin *plugin = pluginById(DEFAULTCONNECTION_UUID);
-  return plugin==NULL ? FPlugins.value(0) : plugin;
-}
-
-IConnection *ConnectionManager::insertConnection(IAccount *AAccount) const
+IConnection *ConnectionManager::updateAccountConnection(IAccount *AAccount) const
 {
   if (AAccount->isActive())
   {
-    QUuid pluginId = AAccount->value(AVN_CONNECTION_ID).toString();
-    IConnectionPlugin *plugin = pluginById(pluginId);
+    OptionsNode aoptions = AAccount->optionsNode();
+    QString pluginId = aoptions.value("connection-type").toString();
+    IConnectionPlugin *plugin = FPlugins.contains(pluginId) ? FPlugins.value(pluginId) : FPlugins.values().value(0);
     IConnection *connection = AAccount->xmppStream()->connection();
     if (connection && connection->ownerPlugin()!=plugin)
     {
       AAccount->xmppStream()->setConnection(NULL);
-      connection->ownerPlugin()->destroyConnection(connection);
+      delete connection->instance();
       connection = NULL;
     }
     if (plugin!=NULL && connection==NULL)
     {
-      connection = plugin->newConnection(AAccount->accountId().toString(),AAccount->xmppStream()->instance());
+      connection = plugin->newConnection(aoptions.node("connection",pluginId),AAccount->xmppStream()->instance());
       AAccount->xmppStream()->setConnection(connection);
     }
     return connection;
@@ -261,15 +250,27 @@ IConnection *ConnectionManager::insertConnection(IAccount *AAccount) const
 
 void ConnectionManager::onAccountShown(IAccount *AAccount)
 {
-  insertConnection(AAccount);
+  updateAccountConnection(AAccount);
 }
 
-void ConnectionManager::onAccountDestroyed(const QUuid &AAccount)
+void ConnectionManager::onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode)
 {
-  foreach (IConnectionPlugin *plugin, FPlugins)
-    plugin->deleteSettings(AAccount.toString());
+  const OptionsNode &aoptions = AAccount->optionsNode();
+  if (aoptions.childPath(ANode) == "connection-type")
+  {
+    updateAccountConnection(AAccount);
+  }
+  else if (AAccount->isActive() && AAccount->xmppStream()->connection())
+  {
+    OptionsNode coptions = aoptions.node("connection",aoptions.value("connection-type").toString());
+    if (coptions.isChildNode(ANode))
+    {
+      IConnectionPlugin *plugin = pluginById(coptions.nspace());
+      if (plugin)
+        plugin->loadConnectionSettings(AAccount->xmppStream()->connection(), coptions);
+    }
+  }
 }
-
 
 void ConnectionManager::onStreamOpened(IXmppStream *AXmppStream)
 {
@@ -293,48 +294,9 @@ void ConnectionManager::onStreamClosed(IXmppStream *AXmppStream)
   }
 }
 
-void ConnectionManager::onSettingsOpened()
+void ConnectionManager::onOptionsOpened()
 {
-  FProxys.clear();
-
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-  foreach(QString ns, settings->values(SVN_PROXY).keys())
-  {
-    IConnectionProxy proxy;
-    proxy.name = settings->valueNS(SVN_PROXY_NAME, ns).toString();
-    proxy.proxy.setType((QNetworkProxy::ProxyType)settings->valueNS(SVN_PROXY_TYPE, ns).toInt());
-    proxy.proxy.setHostName(settings->valueNS(SVN_PROXY_HOST, ns).toString());
-    proxy.proxy.setPort(settings->valueNS(SVN_PROXY_PORT, ns).toInt());
-    proxy.proxy.setUser(settings->valueNS(SVN_PROXY_USER, ns).toString());
-    proxy.proxy.setPassword(settings->decript(settings->valueNS(SVN_PROXY_PASS, ns).toByteArray(),ns.toUtf8()));
-    setProxy(ns, proxy);
-  }
-
-  setDefaultProxy(settings->value(SVN_DEFAULT_PROXY,QUuid().toString()).toString());
-}
-
-void ConnectionManager::onSettingsClosed()
-{
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-  
-  settings->setValue(SVN_DEFAULT_PROXY, FDefaultProxy.toString());
-
-  QSet<QString> oldProxy = settings->values(SVN_PROXY).keys().toSet();
-  foreach(QUuid id, FProxys.keys())
-  {
-    IConnectionProxy proxy = FProxys.value(id);
-    settings->setValueNS(SVN_PROXY_NAME, id.toString(), proxy.name);
-    settings->setValueNS(SVN_PROXY_TYPE, id.toString(), proxy.proxy.type());
-    settings->setValueNS(SVN_PROXY_HOST, id.toString(), proxy.proxy.hostName());
-    settings->setValueNS(SVN_PROXY_PORT, id.toString(), proxy.proxy.port());
-    settings->setValueNS(SVN_PROXY_USER, id.toString(), proxy.proxy.user());
-    settings->setValueNS(SVN_PROXY_PASS, id.toString(), settings->encript(proxy.proxy.password(), id.toString().toUtf8()));
-    oldProxy -= id.toString();
-    removeProxy(id);
-  }
-
-  foreach(QString ns, oldProxy)
-    settings->deleteValueNS(SVN_PROXY, ns);
+  QNetworkProxy::setApplicationProxy(proxyById(defaultProxy()).proxy);
 }
 
 Q_EXPORT_PLUGIN2(plg_connectionmanager, ConnectionManager)

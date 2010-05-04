@@ -30,12 +30,12 @@
 <context>
     <name>DefaultConnectionPlugin</name>
     <message>
-        <source>Default connection</source>
-        <translation>Стандартное соединение</translation>
-    </message>
-    <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>
         <translation>Позволяет установить стандартное TCP подключение к серверу</translation>
+    </message>
+    <message>
+        <source>Default Connection</source>
+        <translation>Стандартное соединение</translation>
     </message>
 </context>
 </TS>

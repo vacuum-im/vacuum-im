@@ -5,6 +5,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/actiongroups.h>
+#include <definations/optionvalues.h>
 #include <definations/rostertooltiporders.h>
 #include <definations/rosterlabelorders.h>
 #include <definations/rosterindextyperole.h>
@@ -12,7 +13,7 @@
 #include <definations/rosterdragdropmimetypes.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
-#include <interfaces/isettings.h>
+#include <utils/options.h>
 #include "rosterindexdelegate.h" 
 
 struct NotifyItem
@@ -96,15 +97,13 @@ signals:
   void dragDropHandlerInserted(IRostersDragDropHandler *AHandler);
   void dragDropHandlerRemoved(IRostersDragDropHandler *AHandler);
 public:
-  bool checkOption(IRostersView::Option AOption) const;
-  void setOption(IRostersView::Option AOption, bool AValue);
+  void updateStatusText(IRosterIndex *AIndex = NULL);
 protected:
   QStyleOptionViewItemV4 indexOption(const QModelIndex &AIndex) const;
   void appendBlinkLabel(int ALabelId);
   void removeBlinkLabel(int ALabelId);
   QString intId2StringId(int AIntId);
   void removeLabels();
-  void updateStatusText(IRosterIndex *AIndex = NULL);
   void setDropIndicatorRect(const QRect &ARect);
 protected:
   //QTreeView
@@ -154,7 +153,6 @@ private:
 private:
   QMultiMap<int, IRostersClickHooker *> FClickHookers;
 private:
-  int FOptions;
   RosterIndexDelegate *FRosterIndexDelegate;
   QMultiMap<int, QAbstractProxyModel *> FProxyModels;
 private:

@@ -2,23 +2,14 @@
 
 #include <QCursor>
 
-#define SVN_RULE            "rules:rule[]"
-#define SVN_RULE_ENABLED    SVN_RULE":enabled"
-#define SVN_RULE_TIME       SVN_RULE":time"
-#define SVN_RULE_SHOW       SVN_RULE":show"
-#define SVN_RULE_TEXT       SVN_RULE":text"
-#define SVN_RULE_PRIORITY   SVN_RULE":priority"
-
 #define IDLE_TIMER_TIMEOUT  1000
 
 AutoStatus::AutoStatus()
 {
   FStatusChanger = NULL;
   FAccountManager = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
   
-  FRuleId = 1;
-  FActiveRule = 0;
   FAutoStatusId = STATUS_NULL_ID;
   FLastCursorPos = QCursor::pos();
   FLastCursorTime = QDateTime::currentDateTime();
@@ -57,27 +48,37 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
     FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+    if (FOptionsManager)
     {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(profileClosed(const QString &)),SLOT(onProfileClosed(const QString &)));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
+      connect(FOptionsManager->instance(),SIGNAL(profileClosed(const QString &)),SLOT(onProfileClosed(const QString &)));
     }
   }
 
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
   return FStatusChanger!=NULL && FAccountManager!=NULL;
 }
 
 bool AutoStatus::initObjects()
 {
-  if (FSettingsPlugin)
+  return true;
+}
+
+bool AutoStatus::initSettings()
   {
-    FSettingsPlugin->openOptionsNode(ON_AUTO_STATUS,tr("Auto status"),tr("Edit auto status rules"),MNI_AUTOSTATUS,ONO_AUTO_STATUS);
-    FSettingsPlugin->insertOptionsHolder(this);
+  Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_ENABLED,false);
+  Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TIME,15*60);
+  Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_SHOW,IPresence::Away);
+  Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TEXT,tr("Status changed automatically to 'away'"));
+
+  if (FOptionsManager)
+  {
+    IOptionsDialogNode dnode = { ONO_AUTO_STATUS, OPN_AUTO_STATUS, tr("Auto status"),tr("Edit auto status rules"), MNI_AUTOSTATUS };
+    FOptionsManager->insertOptionsDialogNode(dnode);
+    FOptionsManager->insertOptionsHolder(this);
   }
   return true;
 }
@@ -88,15 +89,12 @@ bool AutoStatus::startPlugin()
   return true;
 }
 
-QWidget *AutoStatus::optionsWidget(const QString &ANode, int &/*AOrder*/)
+IOptionsWidget *AutoStatus::optionsWidget(const QString &ANode, int &AOrder, QWidget *AParent)
 {
-  if (ANode == ON_AUTO_STATUS)
+  if (ANode == OPN_AUTO_STATUS)
   {
-    StatusOptionsWidget *widget = new StatusOptionsWidget(this,FStatusChanger,NULL);
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
+    AOrder = OWO_AUTOSTATUS;
+    return new StatusOptionsWidget(this,FStatusChanger,AParent);
   }
   return NULL;
 }
@@ -106,61 +104,78 @@ int AutoStatus::idleSeconds() const
   return FLastCursorTime.secsTo(QDateTime::currentDateTime());
 }
 
-int AutoStatus::activeRule() const
+QUuid AutoStatus::activeRule() const
 {
   return FActiveRule;
 }
 
-int AutoStatus::insertRule(const IAutoStatusRule &ARule)
+QList<QUuid> AutoStatus::rules() const
 {
-  StatusRuleItem item;
-  item.id = FRuleId++;
-  item.enabled = true;
-  item.rule = ARule;
-  FRules.insert(item.id,item);
-  emit ruleInserted(item.id);
-  return item.id;
+  QList<QUuid> rulesIdList;
+  foreach(QString ruleId, Options::node(OPV_AUTOSTARTUS_ROOT).childNSpaces("rule"))
+    rulesIdList.append(ruleId);
+  return rulesIdList;
 }
 
-QList<int> AutoStatus::rules() const
+IAutoStatusRule AutoStatus::ruleValue(const QUuid &ARuleId) const
 {
-  return FRules.keys();
+  IAutoStatusRule rule;
+  if (rules().contains(ARuleId))
+{
+    OptionsNode ruleNode = Options::node(OPV_AUTOSTARTUS_RULE_ITEM,ARuleId.toString());
+    rule.time = ruleNode.value("time").toInt();
+    rule.show = ruleNode.value("show").toInt();
+    rule.text = ruleNode.value("text").toString();
+}
+  return rule;
 }
 
-IAutoStatusRule AutoStatus::ruleValue(int ARuleId) const
+bool AutoStatus::isRuleEnabled(const QUuid &ARuleId) const
 {
-  return FRules.value(ARuleId).rule;
+  if (rules().contains(ARuleId))
+    return Options::node(OPV_AUTOSTARTUS_RULE_ITEM,ARuleId.toString()).value("enabled").toBool();
+  return false;
 }
 
-bool AutoStatus::isRuleEnabled(int ARuleId) const
+void AutoStatus::setRuleEnabled(const QUuid &ARuleId, bool AEnabled)
 {
-  return FRules.value(ARuleId).enabled;
-}
-
-void AutoStatus::setRuleEnabled(int ARuleId, bool AEnabled)
-{
-  if (isRuleEnabled(ARuleId) != AEnabled)
+  if (rules().contains(ARuleId))
   {
-    FRules[ARuleId].enabled = AEnabled;
+    Options::node(OPV_AUTOSTARTUS_RULE_ITEM,ARuleId.toString()).setValue(AEnabled,"enabled");
     emit ruleChanged(ARuleId);
   }
 }
 
-void AutoStatus::updateRule(int ARuleId, const IAutoStatusRule &ARule)
+QUuid AutoStatus::insertRule(const IAutoStatusRule &ARule)
 {
-  if (FRules.contains(ARuleId))
+  QUuid ruleId = QUuid::createUuid();
+  OptionsNode ruleNode = Options::node(OPV_AUTOSTARTUS_RULE_ITEM,ruleId.toString());
+  ruleNode.setValue(true,"enabled");
+  ruleNode.setValue(ARule.time,"time");
+  ruleNode.setValue(ARule.show,"show");
+  ruleNode.setValue(ARule.text,"text");
+  emit ruleInserted(ruleId);
+  return ruleId;
+}
+
+void AutoStatus::updateRule(const QUuid &ARuleId, const IAutoStatusRule &ARule)
   {
-    FRules[ARuleId].rule = ARule;
+  if (rules().contains(ARuleId))
+  {
+    OptionsNode ruleNode = Options::node(OPV_AUTOSTARTUS_RULE_ITEM,ARuleId.toString());
+    ruleNode.setValue(ARule.time,"time");
+    ruleNode.setValue(ARule.show,"show");
+    ruleNode.setValue(ARule.text,"text");
     emit ruleChanged(ARuleId);
   }
 }
 
-void AutoStatus::removeRule(int ARuleId)
+void AutoStatus::removeRule(const QUuid &ARuleId)
 {
-  if (FRules.contains(ARuleId))
+  if (rules().contains(ARuleId))
   {
+    Options::node(OPV_AUTOSTARTUS_ROOT).removeChilds("rule",ARuleId.toString());
     emit ruleRemoved(ARuleId);
-    FRules.remove(ARuleId);
   }
 }
 
@@ -184,13 +199,13 @@ void AutoStatus::prepareRule(IAutoStatusRule &ARule)
   replaceDateTime(ARule.text,"\\#\\((.*)\\)",QDateTime(QDate::currentDate()).addSecs(ARule.time));
 }
 
-void AutoStatus::setActiveRule(int ARuleId)
+void AutoStatus::setActiveRule(const QUuid &ARuleId)
 {
   if (FAccountManager && FStatusChanger && ARuleId!=FActiveRule)
   {
-    if (ARuleId>0 && FRules.contains(ARuleId))
+    if (rules().contains(ARuleId))
     {
-      IAutoStatusRule rule = FRules.value(ARuleId).rule;
+      IAutoStatusRule rule = ruleValue(ARuleId);
       prepareRule(rule);
       if (FAutoStatusId == STATUS_NULL_ID)
       {
@@ -229,19 +244,20 @@ void AutoStatus::setActiveRule(int ARuleId)
 
 void AutoStatus::updateActiveRule()
 {
-  int ruleId = 0;
+  QUuid newRuleId;
   int ruleTime = 0;
   int idleSecs = idleSeconds();
   
-  foreach(StatusRuleItem item,FRules)
+  foreach(QUuid ruleId, rules())
   {
-    if (item.enabled && item.rule.time<idleSecs && item.rule.time>ruleTime)
+    IAutoStatusRule rule = ruleValue(ruleId);
+    if (isRuleEnabled(ruleId) && rule.time<idleSecs && rule.time>ruleTime)
     {
-      ruleId = item.id;
-      ruleTime = item.rule.time;
+      newRuleId = ruleId;
+      ruleTime = rule.time;
     }
   }
-  setActiveRule(ruleId);
+  setActiveRule(newRuleId);
 }
 
 void AutoStatus::onIdleTimerTimeout()
@@ -255,60 +271,24 @@ void AutoStatus::onIdleTimerTimeout()
   if (FStatusChanger)
   {
     int show = FStatusChanger->statusItemShow(FStatusChanger->mainStatus());
-    if (FActiveRule>0 || show==IPresence::Online || show==IPresence::Chat)
+    if (!FActiveRule.isNull() || show==IPresence::Online || show==IPresence::Chat)
       updateActiveRule();
   }
 }
 
-void AutoStatus::onSettingsOpened()
+void AutoStatus::onOptionsOpened()
 {
-  FRules.clear();
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(AUTOSTATUS_UUID);
-  QList<QString> nsList = settings->values(SVN_RULE).keys();
-  if (nsList.isEmpty())
+  if (Options::node(OPV_AUTOSTARTUS_ROOT).childNSpaces("rule").isEmpty())
   {
-    IAutoStatusRule rule;
-    rule.time = 15*60;
-    rule.show = IPresence::Away;
-    rule.text = tr("Status changed automatically to 'away'");
-    insertRule(rule);
+    Options::node(OPV_AUTOSTARTUS_RULE_ITEM,QUuid::createUuid().toString()).setValue(true,"enabled");
   }
-  else foreach (QString ns, nsList)
-  {
-    IAutoStatusRule rule;
-    rule.time = settings->valueNS(SVN_RULE_TIME,ns).toInt();
-    rule.show = settings->valueNS(SVN_RULE_SHOW,ns).toInt();
-    rule.text = settings->valueNS(SVN_RULE_TEXT,ns).toString();
-    setRuleEnabled(insertRule(rule),settings->valueNS(SVN_RULE_ENABLED,ns,true).toBool());
   }
-}
 
-void AutoStatus::onProfileClosed(const QString &AProfileName)
+void AutoStatus::onProfileClosed(const QString &AName)
 {
-  Q_UNUSED(AProfileName);
+  Q_UNUSED(AName);
   setActiveRule(0);
   FLastCursorTime = QDateTime::currentDateTime();
-}
-
-void AutoStatus::onSettingsClosed()
-{
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(AUTOSTATUS_UUID);
-  
-  foreach(QString ns, settings->values(SVN_RULE).keys())
-    settings->deleteValueNS(SVN_RULE,ns);
-
-  int index = 0;
-  foreach(StatusRuleItem item, FRules)
-  {
-    if (item.rule.time>0 && !item.rule.text.isEmpty())
-    {
-      QString ns = QString::number(index++);
-      settings->setValueNS(SVN_RULE_ENABLED,ns,item.enabled);
-      settings->setValueNS(SVN_RULE_TIME,ns,item.rule.time);
-      settings->setValueNS(SVN_RULE_SHOW,ns,item.rule.show);
-      settings->setValueNS(SVN_RULE_TEXT,ns,item.rule.text);
-    }
-  }
 }
 
 Q_EXPORT_PLUGIN2(plg_autostatus, AutoStatus)

@@ -23,12 +23,9 @@
         <source>Supports the exchanging of the information about the user&apos;s activity in the chat</source>
         <translation>Obsługa informacji na temat aktywności użytkownika w oknie rozmowy</translation>
     </message>
-</context>
-<context>
-    <name>StateOptionsWidgetClass</name>
     <message>
         <source>Send chat state notifications</source>
-        <translation>Wyślij powiadomienia o aktywności</translation>
+        <translation type="unfinished">Wyślij powiadomienia o aktywności</translation>
     </message>
 </context>
 <context>

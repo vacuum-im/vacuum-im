@@ -3,23 +3,24 @@
 NotifyKindsWidget::NotifyKindsWidget(INotifications *ANotifications, const QString &AId, const QString &ATitle, uchar AKindMask, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
-  FNotifications = ANotifications;
-  FNotificatorId = AId;
-
   ui.grbKinds->setTitle(ATitle);
 
-  uchar kinds = FNotifications->notificatorKinds(FNotificatorId);
-  ui.chbRoster->setChecked(kinds & INotification::RosterIcon);
-  ui.chbPopup->setChecked(kinds & INotification::PopupWindow);
-  ui.chbTray->setChecked(kinds & INotification::TrayIcon);
-  ui.chbSound->setChecked(kinds & INotification::PlaySound);
-  ui.chbActivate->setChecked(kinds & INotification::AutoActivate);
+  FNotifications = ANotifications;
+  FNotificatorId = AId;
 
   ui.chbRoster->setEnabled(AKindMask & INotification::RosterIcon);
   ui.chbPopup->setEnabled(AKindMask & INotification::PopupWindow);
   ui.chbTray->setEnabled(AKindMask & INotification::TrayIcon);
   ui.chbSound->setEnabled(AKindMask & INotification::PlaySound);
   ui.chbActivate->setEnabled(AKindMask & INotification::AutoActivate);
+
+  connect(ui.chbRoster,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbPopup,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbTray,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbSound,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbActivate,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+
+  reset();
 }
 
 NotifyKindsWidget::~NotifyKindsWidget()
@@ -41,4 +42,16 @@ void NotifyKindsWidget::apply()
   if (ui.chbActivate->isChecked())
     kinds |= INotification::AutoActivate;
   FNotifications->setNotificatorKinds(FNotificatorId,kinds);
+  emit childApply();
+}
+
+void NotifyKindsWidget::reset()
+{
+  uchar kinds = FNotifications->notificatorKinds(FNotificatorId);
+  ui.chbRoster->setChecked(kinds & INotification::RosterIcon);
+  ui.chbPopup->setChecked(kinds & INotification::PopupWindow);
+  ui.chbTray->setChecked(kinds & INotification::TrayIcon);
+  ui.chbSound->setChecked(kinds & INotification::PlaySound);
+  ui.chbActivate->setChecked(kinds & INotification::AutoActivate);
+  emit childReset();
 }

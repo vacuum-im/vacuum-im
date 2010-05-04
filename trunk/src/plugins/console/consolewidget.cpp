@@ -2,17 +2,7 @@
 
 #include <QRegExp>
 #include <QLineEdit>
-
-#define CONSOLE_UUID  "{2572D474-5F3E-8d24-B10A-BAA57C2BC693}"
-
-#define SVN_CONTEXT                   "context[]"
-#define SVN_CONTEXT_STREAM            SVN_CONTEXT":stream"
-#define SVN_CONTEXT_CONDITIONS        SVN_CONTEXT":conditions"
-#define SVN_CONTEXT_COLORXML          SVN_CONTEXT":colorXML"
-#define SBD_CONTEXT_SENDXML           "[%1]:sendXML"
-#define SBD_CONTEXT_GEOMETRY          "[%1]:geometry"
-#define SBD_CONTEXT_HSPLITTER         "[%1]:hsplitter"
-#define SBD_CONTEXT_VSPLITTER         "[%1]:vsplitter"
+#include <QInputDialog>
 
 ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) : QWidget(AParent)
 {
@@ -22,21 +12,61 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 
   FXmppStreams = NULL;
   FStanzaProcessor = NULL;
-  FSettingsPlugin = NULL;
 
   ui.cmbStreamJid->addItem(tr("<All Streams>"));
+  initialize(APluginManager);
+  
+  if (!Options::isNull())
+    onOptionsOpened();
 
+  connect(ui.tlbAddCondition,SIGNAL(clicked()),SLOT(onAddConditionClicked()));
+  connect(ui.tlbRemoveCondition,SIGNAL(clicked()),SLOT(onRemoveConditionClicked()));
+  connect(ui.tlbClearCondition,SIGNAL(clicked()),ui.ltwConditions,SLOT(clear()));
+  connect(ui.cmbCondition->lineEdit(),SIGNAL(returnPressed()),SLOT(onAddConditionClicked()));
+
+  connect(ui.tlbAddContext,SIGNAL(clicked()),SLOT(onAddContextClicked()));
+  connect(ui.tlbRemoveContext,SIGNAL(clicked()),SLOT(onRemoveContextClicked()));
+  connect(ui.cmbContext,SIGNAL(currentIndexChanged(int)),SLOT(onContextChanged(int)));
+
+  connect(ui.tlbSendXML,SIGNAL(clicked()),SLOT(onSendXMLClicked()));
+  connect(ui.tlbClearConsole,SIGNAL(clicked()),ui.tedConsole,SLOT(clear()));
+  connect(ui.chbWordWrap,SIGNAL(stateChanged(int)),SLOT(onWordWrapStateChanged(int)));
+}
+
+ConsoleWidget::~ConsoleWidget()
+{
+  foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+    stream->removeXmppStanzaHandler(this, XSHO_CONSOLE);
+  if (!Options::isNull())
+    onOptionsClosed();
+}
+
+bool ConsoleWidget::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
+{
+  if (AOrder == XSHO_CONSOLE)
+    showElement(AXmppStream,AStanza.element(),false);
+  return false;
+}
+
+bool ConsoleWidget::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
+{
+  if (AOrder == XSHO_CONSOLE)
+    showElement(AXmppStream,AStanza.element(),true);
+  return false;
+}
+
+void ConsoleWidget::initialize(IPluginManager *APluginManager)
+{
   IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
   if (plugin)
   {
     FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
     if (FXmppStreams)
     {
-      foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-        onStreamCreated(stream);
+      foreach(IXmppStream *stream, FXmppStreams->xmppStreams()) {
+        onStreamCreated(stream); }
       connect(FXmppStreams->instance(), SIGNAL(created(IXmppStream *)), SLOT(onStreamCreated(IXmppStream *)));
-      connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), 
-        SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
+      connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
       connect(FXmppStreams->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
     }
   }
@@ -50,62 +80,56 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
       foreach(int shandleId, FStanzaProcessor->stanzaHandles()) {
         onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId)); }
       ui.cmbCondition->clearEditText();
+
       connect(FStanzaProcessor->instance(),SIGNAL(stanzaHandleInserted(int, const IStanzaHandle &)),
         SLOT(onStanzaHandleInserted(int, const IStanzaHandle &)));
     }
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-  {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      if (FSettingsPlugin->isProfileOpened())
-      {
-        onSettingsOpened();
-      }
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
-  }
-
-  onLoadContextClicked();
-
-  connect(ui.tlbClearConsole,SIGNAL(clicked()),ui.tedConsole,SLOT(clear()));
-  connect(ui.tlbAddCondition,SIGNAL(clicked()),SLOT(onAddConditionClicked()));
-  connect(ui.tlbRemoveCondition,SIGNAL(clicked()),SLOT(onRemoveConditionClicked()));
-  connect(ui.tlbClearCondition,SIGNAL(clicked()),ui.ltwConditions,SLOT(clear()));
-  connect(ui.cmbCondition->lineEdit(),SIGNAL(returnPressed()),SLOT(onAddConditionClicked()));
-  connect(ui.tlbSendXML,SIGNAL(clicked()),SLOT(onSendXMLClicked()));
-  connect(ui.tlbLoadContext,SIGNAL(clicked()),SLOT(onLoadContextClicked()));
-  connect(ui.tlbSaveContext,SIGNAL(clicked()),SLOT(onSaveContextClicked()));
-  connect(ui.tlbDeleteContext,SIGNAL(clicked()),SLOT(onDeleteContextClicked()));
-  connect(ui.chbWordWrap,SIGNAL(stateChanged(int)),SLOT(onWordWrapStateChanged(int)));
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+  connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 }
 
-ConsoleWidget::~ConsoleWidget()
+void ConsoleWidget::loadContext(const QUuid &AContextId)
 {
-  foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-    stream->removeXmppStanzaHandler(this, XSHO_CONSOLE);
+  OptionsNode node = Options::node(OPV_CONSOLE_CONTEXT_ITEM, AContextId.toString());
+
+  QString streamJid = node.value("streamjid").toString();
+  if (streamJid.isEmpty())
+    ui.cmbStreamJid->setCurrentIndex(0);
+  else
+    ui.cmbStreamJid->setCurrentIndex(ui.cmbStreamJid->findText(streamJid));
+
+  ui.ltwConditions->clear();
+  ui.ltwConditions->addItems(node.value("conditions").toStringList());
+
+  ui.chbWordWrap->setChecked(node.value("word-wrap").toBool());
+  ui.chbHilightXML->setCheckState((Qt::CheckState)node.value("highlight-xml").toInt());
+
+  restoreGeometry(Options::fileValue("console.context.window-geometry",AContextId.toString()).toByteArray());
+  ui.sptHSplitter->restoreState(Options::fileValue("console.context.hsplitter-state",AContextId.toString()).toByteArray());
+  ui.sptVSplitter->restoreState(Options::fileValue("console.context.vsplitter-state",AContextId.toString()).toByteArray());
+
+  setWindowTitle(tr("XML Console - %1").arg(node.value("name").toString()));
 }
 
-bool ConsoleWidget::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
+void ConsoleWidget::saveContext(const QUuid &AContextId)
 {
-  if (AOrder == XSHO_CONSOLE)
-  {
-    showElement(AXmppStream,AStanza.element(),false);
-  }
-  return false;
-}
+  OptionsNode node = Options::node(OPV_CONSOLE_CONTEXT_ITEM, AContextId.toString());
 
-bool ConsoleWidget::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
-{
-  if (AOrder == XSHO_CONSOLE)
-  {
-    showElement(AXmppStream,AStanza.element(),true);
-  }
-  return false;
+  node.setValue(QString(ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->currentText() : ""),"streamjid");
+  
+  QStringList conditions;
+  for (int i=0; i<ui.ltwConditions->count(); i++)
+    conditions.append(ui.ltwConditions->item(i)->text());
+  node.setValue(conditions,"conditions");
+
+  node.setValue(ui.chbWordWrap->isChecked(),"word-wrap");
+  node.setValue(ui.chbHilightXML->checkState(),"highlight-xml");
+
+  Options::setFileValue(saveGeometry(),"console.context.window-geometry",AContextId.toString());
+  Options::setFileValue(ui.sptHSplitter->saveState(),"console.context.hsplitter-state",AContextId.toString());
+  Options::setFileValue(ui.sptVSplitter->saveState(),"console.context.vsplitter-state",AContextId.toString());
 }
 
 void ConsoleWidget::colorXml(QString &AXml) const
@@ -163,9 +187,9 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
       QString xml = stanza.toString(2);
       hidePasswords(xml);
       xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
-      if (ui.chbColoredXML->checkState() == Qt::Checked)
+      if (ui.chbHilightXML->checkState() == Qt::Checked)
         colorXml(xml);
-      else if (ui.chbColoredXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)
+      else if (ui.chbHilightXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)
         colorXml(xml);
       ui.tedConsole->append(xml);
     }
@@ -197,89 +221,53 @@ void ConsoleWidget::onSendXMLClicked()
     Stanza stanza(doc.documentElement());
     if (stanza.isValid())
     {
-      ui.tedConsole->append(tr("<b>Start sending user stanza...</b><br>"));
+      ui.tedConsole->append("<b>"+tr("Start sending user stanza...")+"</b><br>");
       foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
         if (ui.cmbStreamJid->currentIndex()==0 || stream->streamJid()==ui.cmbStreamJid->currentText())
           stream->sendStanza(stanza);
-      ui.tedConsole->append(tr("<b>User stanza sended.</b><br>"));
+      ui.tedConsole->append("<b>"+tr("User stanza sended.")+"</b><br>");
     }
     else
     {
-      ui.tedConsole->append(tr("<b>Stanza is not well formed.</b><br>"));
+      ui.tedConsole->append("<b>"+tr("Stanza is not well formed.")+"</b><br>");
     }
   }
   else
   {
-    ui.tedConsole->append(tr("<b>XML is not well formed.</b><br>"));
+    ui.tedConsole->append("<b>"+tr("XML is not well formed.")+"</b><br>");
   }
 }
 
-void ConsoleWidget::onLoadContextClicked()
+void ConsoleWidget::onAddContextClicked()
 {
-  if (FSettingsPlugin)
+  QString name = QInputDialog::getText(this,tr("New Context"),tr("Enter context name"));
+  if (!name.isNull())
   {
-    QString ns = ui.cmbContext->currentText();
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(CONSOLE_UUID);
-    if (settings->isValueNSExists(SVN_CONTEXT,ns))
-    {
-      QString streamJid = settings->valueNS(SVN_CONTEXT_STREAM,ns).toString();
-      if (streamJid.isEmpty())
-        ui.cmbStreamJid->setCurrentIndex(0);
-      else
-        ui.cmbStreamJid->setCurrentIndex(ui.cmbStreamJid->findText(streamJid));
-      
-      QStringList conditions = settings->valueNS(SVN_CONTEXT_CONDITIONS,ns).toStringList();
-      ui.ltwConditions->clear();
-      ui.ltwConditions->addItems(conditions);
-
-      ui.chbColoredXML->setCheckState((Qt::CheckState)settings->valueNS(SVN_CONTEXT_COLORXML,ns,Qt::PartiallyChecked).toInt());
-
-      ui.tedSendXML->setPlainText(QString::fromUtf8(settings->loadBinaryData(QString(SBD_CONTEXT_SENDXML).arg(ns))));
-      this->restoreGeometry(settings->loadBinaryData(QString(SBD_CONTEXT_GEOMETRY).arg(ns)));
-      ui.sptHSplitter->restoreState(settings->loadBinaryData(QString(SBD_CONTEXT_HSPLITTER).arg(ns)));
-      ui.sptVSplitter->restoreState(settings->loadBinaryData(QString(SBD_CONTEXT_VSPLITTER).arg(ns)));
-    }
+    QUuid newId = QUuid::createUuid();
+    Options::node(OPV_CONSOLE_CONTEXT_ITEM,newId.toString()).setValue(name,"name");
+    ui.cmbContext->addItem(name,newId.toString());
+    ui.cmbContext->setCurrentIndex(ui.cmbContext->findData(newId.toString()));
   }
-  setWindowTitle(tr("XML Console - %1").arg(!ui.cmbContext->currentText().isEmpty() ? ui.cmbContext->currentText() : tr("Default")));
 }
 
-void ConsoleWidget::onSaveContextClicked()
+void ConsoleWidget::onRemoveContextClicked()
 {
-  if (FSettingsPlugin)
+  QUuid oldId = ui.cmbContext->itemData(ui.cmbContext->currentIndex()).toString();
+  if (!oldId.isNull())
   {
-    QString ns = ui.cmbContext->currentText();
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(CONSOLE_UUID);
-    QString streamJid = ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->currentText() : "";
-    settings->setValueNS(SVN_CONTEXT_STREAM,ns,streamJid);
-
-    QStringList conditions;
-    for (int i=0; i<ui.ltwConditions->count(); i++)
-      conditions.append(ui.ltwConditions->item(i)->text());
-    settings->setValueNS(SVN_CONTEXT_CONDITIONS,ns,conditions);
-    
-    settings->setValueNS(SVN_CONTEXT_COLORXML,ns,ui.chbColoredXML->checkState());
-
-    settings->saveBinaryData(QString(SBD_CONTEXT_SENDXML).arg(ns),ui.tedSendXML->toPlainText().toUtf8());
-    settings->saveBinaryData(QString(SBD_CONTEXT_GEOMETRY).arg(ns),this->saveGeometry());
-    settings->saveBinaryData(QString(SBD_CONTEXT_HSPLITTER).arg(ns),ui.sptHSplitter->saveState());
-    settings->saveBinaryData(QString(SBD_CONTEXT_VSPLITTER).arg(ns),ui.sptVSplitter->saveState());
-
-    if (!ns.isEmpty() && ui.cmbContext->findText(ns)<0)
-      ui.cmbContext->addItem(ns);
+    ui.cmbContext->removeItem(ui.cmbContext->findData(oldId.toString()));
+    Options::node(OPV_CONSOLE_ROOT).removeChilds("context",oldId.toString());
   }
 }
 
-void ConsoleWidget::onDeleteContextClicked()
+void ConsoleWidget::onContextChanged(int AIndex)
 {
-  if (FSettingsPlugin && !ui.cmbContext->currentText().isEmpty())
-  {
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(CONSOLE_UUID);
-    settings->deleteValueNS(SVN_CONTEXT,ui.cmbContext->currentText());
-    ui.cmbContext->removeItem(ui.cmbContext->findText(ui.cmbContext->currentText()));
-  }
+  saveContext(FContext);
+  FContext = ui.cmbContext->itemData(AIndex).toString();
+  loadContext(FContext);
 }
 
-void ConsoleWidget::onWordWrapStateChanged( int AState )
+void ConsoleWidget::onWordWrapStateChanged(int AState)
 {
   ui.tedConsole->setLineWrapMode(AState == Qt::Checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
 }
@@ -314,17 +302,20 @@ void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &A
       ui.cmbCondition->addItem(condition);
 }
 
-void ConsoleWidget::onSettingsOpened()
+void ConsoleWidget::onOptionsOpened()
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(CONSOLE_UUID);
-  QList<QString> contexts = settings->values(SVN_CONTEXT).keys();
-  foreach(QString context, contexts)
-    if (!context.isEmpty())
-      ui.cmbContext->addItem(context);
-  ui.cmbContext->clearEditText();
+  ui.cmbContext->clear();
+  foreach(QString contextId, Options::node(OPV_CONSOLE_ROOT).childNSpaces("context"))
+    ui.cmbContext->addItem(Options::node(OPV_CONSOLE_CONTEXT_ITEM,contextId).value("name").toString(),contextId);
+
+  FContext = QUuid();
+  if (ui.cmbContext->count() == 0)
+    ui.cmbContext->addItem(Options::node(OPV_CONSOLE_CONTEXT_ITEM,FContext.toString()).value("name").toString(),FContext.toString());
+  loadContext(FContext);
 }
 
-void ConsoleWidget::onSettingsClosed()
+void ConsoleWidget::onOptionsClosed()
 {
+  saveContext(FContext);
   ui.cmbContext->clear();
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>328</width>
-    <height>404</height>
+    <width>330</width>
+    <height>429</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -24,11 +24,24 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
+          <widget class="QCheckBox" name="chbDisableDirectConnect">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Disable direct connections</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
             <widget class="QLabel" name="pblPort">
              <property name="text">
-              <string>Listened port:</string>
+              <string>Listening port:</string>
              </property>
              <property name="buddy">
               <cstring>spbPort</cstring>
@@ -46,17 +59,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="chbDisableDirectConnect">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-             <property name="text">
-              <string>Disable direct connections</string>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
              </property>
-            </widget>
+            </spacer>
            </item>
           </layout>
          </item>
@@ -109,9 +122,9 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
-          <widget class="QCheckBox" name="chbUseNativeServerProxy">
+          <widget class="QCheckBox" name="chbUseAccountStreamProxy">
            <property name="text">
-            <string>Use proxy on native server</string>
+            <string>Use proxy on account server</string>
            </property>
           </widget>
          </item>
@@ -178,7 +191,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <item>
-          <widget class="QCheckBox" name="chbUseAccountProxy">
+          <widget class="QCheckBox" name="chbUseAccountNetworkProxy">
            <property name="text">
             <string>Use account connection proxy settings</string>
            </property>
@@ -198,17 +211,16 @@
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>spbPort</tabstop>
-  <tabstop>chbDisableDirectConnect</tabstop>
   <tabstop>lneForwardHost</tabstop>
   <tabstop>spbForwardPort</tabstop>
-  <tabstop>chbUseNativeServerProxy</tabstop>
+  <tabstop>chbUseAccountStreamProxy</tabstop>
   <tabstop>lneStreamProxy</tabstop>
   <tabstop>ltwStreamProxy</tabstop>
   <tabstop>pbtAddStreamProxy</tabstop>
   <tabstop>pbtStreamProxyUp</tabstop>
   <tabstop>pbtStreamProxyDown</tabstop>
   <tabstop>pbtDeleteStreamProxy</tabstop>
-  <tabstop>chbUseAccountProxy</tabstop>
+  <tabstop>chbUseAccountNetworkProxy</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -245,7 +257,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>chbUseAccountProxy</sender>
+   <sender>chbUseAccountNetworkProxy</sender>
    <signal>toggled(bool)</signal>
    <receiver>wdtProxySettings</receiver>
    <slot>setDisabled(bool)</slot>

@@ -59,9 +59,6 @@
         <source>Supports the sending of the file to another contact</source>
         <translation>Поддерживает передачу файла другому контакту</translation>
     </message>
-</context>
-<context>
-    <name>FileTransferOptionsClass</name>
     <message>
         <source>Automatically receive files from contacts in roster</source>
         <translation>Автоматически принимать файлы от контактов в ростере</translation>

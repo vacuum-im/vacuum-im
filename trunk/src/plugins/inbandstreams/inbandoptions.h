@@ -3,22 +3,29 @@
 
 #include <QWidget>
 #include <interfaces/iinbandstreams.h>
+#include <interfaces/ioptionsmanager.h>
 #include "ui_inbandoptions.h"
 
 class InBandOptions : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
-  InBandOptions(IInBandStreams *AInBandStreams, IInBandStream *AStream, bool AReadOnly, QWidget *AParent = NULL);
-  InBandOptions(IInBandStreams *AInBandStreams, const QString &ASettingsNS, bool AReadOnly, QWidget *AParent = NULL);
+  InBandOptions(IInBandStreams *AInBandStreams, IInBandStream *AStream, bool AReadOnly, QWidget *AParent);
+  InBandOptions(IInBandStreams *AInBandStreams, const OptionsNode &ANode, bool AReadOnly, QWidget *AParent);
   ~InBandOptions();
-  void saveSettings(IInBandStream *AStream);
-  void saveSettings(const QString &ASettingsNS);
+  virtual QWidget *instance() { return this; }
 public slots:
-  void apply();
+  void apply(OptionsNode ANode);
+  void apply(IInBandStream *AStream);
+  virtual void apply();
+  virtual void reset();
 signals:
-  void optionsAccepted();
+  void modified();
+  void childApply();
+  void childReset();
 protected:
   void initialize(bool AReadOnly);
 protected slots:
@@ -28,7 +35,7 @@ private:
 private:
   IInBandStreams *FInBandStreams;
 private:
-  QString FSettingsNS;
+  OptionsNode FOptions;
   IInBandStream *FStream;
 };
 

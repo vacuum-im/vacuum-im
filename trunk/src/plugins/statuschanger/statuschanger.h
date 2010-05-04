@@ -7,11 +7,11 @@
 #include <QDateTime>
 #include <definations/actiongroups.h>
 #include <definations/rosterlabelorders.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionwidgetorders.h>
 #include <definations/rosterindextyperole.h>
 #include <definations/rosterfootertextorders.h>
-#include <definations/accountvaluenames.h>
 #include <definations/notificationdataroles.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
@@ -25,11 +25,11 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/itraymanager.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/inotifications.h>
+#include <utils/options.h>
 #include "editstatusdialog.h"
-#include "accountoptionswidget.h"
 #include "modifystatusdialog.h"
 
 struct StatusItem {
@@ -57,10 +57,10 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin();
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IStatusChanger
   virtual Menu *statusMenu() const;
   virtual Menu *streamMenu(const Jid &AStreamJid) const;
@@ -87,9 +87,6 @@ signals:
   void statusItemAdded(int AStatusId);
   void statusItemChanged(int AStatusId);
   void statusItemRemoved(int AStatusId);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 protected:
   void createDefaultStatus();
   void setMainStatusId(int AStatusId);
@@ -125,11 +122,14 @@ protected slots:
   void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
   void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
   void onDefaultStatusIconsChanged();
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onOptionsOpened();
+  void onOptionsClosed();
+  void onOptionsChanged(const OptionsNode &ANode);
+  void onProfileOpened(const QString &AProfile);
   void onReconnectTimer();
   void onEditStatusAction(bool);
-  void onAccountChanged(const QString &AName, const QVariant &AValue);
+  void onModifyStatusAction(bool);
+  void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
   void onNotificationActivated(int ANotifyId);
 private:
   IPresencePlugin *FPresencePlugin;
@@ -138,7 +138,7 @@ private:
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
   IRostersModel *FRostersModel;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
   ITrayManager *FTrayManager;
   IAccountManager *FAccountManager;
   IStatusIcons *FStatusIcons;

@@ -1,11 +1,10 @@
 #include "stanzaprocessor.h"
 
 #include <QSet>
-#include <QTime>
 
 StanzaProcessor::StanzaProcessor() 
 {
-  qsrand(QTime::currentTime().msec());
+
 }
 
 StanzaProcessor::~StanzaProcessor()
