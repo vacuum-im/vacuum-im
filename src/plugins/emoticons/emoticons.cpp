@@ -5,13 +5,11 @@
 
 #define DEFAULT_ICONSET                 "kolobok_dark"
 
-#define SVN_SUBSTORAGES                 "substorages"
-
 Emoticons::Emoticons()
 {
   FMessageWidgets = NULL;
   FMessageProcessor = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
 }
 
 Emoticons::~Emoticons()
@@ -48,16 +46,14 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
     }
   }
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin) 
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
-    {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-    }
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
   }
+
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
   return FMessageWidgets!=NULL;
 }
@@ -68,13 +64,19 @@ bool Emoticons::initObjects()
   {
     FMessageProcessor->insertMessageWriter(this,MWO_EMOTICONS);
   }
+  return true;
+}
 
-  if (FSettingsPlugin != NULL)
+bool Emoticons::initSettings()
+{
+  Options::setDefaultValue(OPV_MESSAGES_EMOTICONS,QStringList() << DEFAULT_ICONSET);
+
+  if (FOptionsManager)
   {
-    FSettingsPlugin->openOptionsNode(ON_EMOTICONS ,tr("Emoticons"),tr("Select emoticons files"),MNI_EMOTICONS,ONO_EMOTICONS);
-    FSettingsPlugin->insertOptionsHolder(this);
+    IOptionsDialogNode dnode = { ONO_EMOTICONS, OPN_EMOTICONS, tr("Emoticons"), tr("Select emoticons iconsets"), MNI_EMOTICONS };
+    FOptionsManager->insertOptionsDialogNode(dnode);
+    FOptionsManager->insertOptionsHolder(this);
   }
-
   return true;
 }
 
@@ -92,73 +94,27 @@ void Emoticons::writeText(int AOrder, Message &AMessage, QTextDocument *ADocumen
     replaceTextToImage(ADocument);
 }
 
-QWidget *Emoticons::optionsWidget(const QString &ANode, int &AOrder)
+IOptionsWidget *Emoticons::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
 {
-  if (ANode == ON_EMOTICONS)
+  if (ANodeId == OPN_EMOTICONS)
   {
     AOrder = OWO_EMOTICONS;
-    EmoticonsOptions *widget = new EmoticonsOptions(this);
-    connect(widget,SIGNAL(optionsAccepted()),SIGNAL(optionsAccepted()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogAccepted()),widget,SLOT(apply()));
-    connect(FSettingsPlugin->instance(),SIGNAL(optionsDialogRejected()),SIGNAL(optionsRejected()));
-    return widget;
+    return new EmoticonsOptions(this,AParent);
   }
   return NULL;
 }
 
-void Emoticons::setIconsets(const QList<QString> &ASubStorages)
+QList<QString> Emoticons::activeIconsets() const
 {
-  QList<QString> oldStorages = FStorageOrder;
-  QList<QString> availStorages = IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
-
-  FStorageOrder.clear();
-  foreach (QString substorage, ASubStorages)
+  QList<QString> iconsets = Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList();
+  for (QList<QString>::iterator it = iconsets.begin(); it != iconsets.end(); )
   {
-    if (availStorages.contains(substorage))
-    {
-      if (!FStorages.contains(substorage))
-      {
-        FStorages.insert(substorage, new IconStorage(RSR_STORAGE_EMOTICONS,substorage,this));
-        insertSelectIconMenu(substorage);
-        emit iconsetInserted(substorage,QString::null);
-      }
-      FStorageOrder.append(substorage);
-      oldStorages.removeAll(substorage);
-    }
+    if (!FStorages.contains(*it))
+      it = iconsets.erase(it);
+    else
+      it++;
   }
-
-  foreach (QString substorage, oldStorages)
-  {
-    removeSelectIconMenu(substorage);
-    delete FStorages.take(substorage);
-    emit iconsetRemoved(substorage);
-  }
-
-  createIconsetUrls();
-}
-
-void Emoticons::insertIconset(const QString &ASubStorage, const QString &ABefour)
-{
-  if (!FStorageOrder.contains(ASubStorage))
-  {
-    ABefour.isEmpty() ? FStorageOrder.append(ASubStorage) : FStorageOrder.insert(FStorageOrder.indexOf(ABefour),ASubStorage);
-    FStorages.insert(ASubStorage,new IconStorage(RSR_STORAGE_EMOTICONS,ASubStorage,this));
-    insertSelectIconMenu(ASubStorage);
-    createIconsetUrls();
-    emit iconsetInserted(ASubStorage,ABefour);
-  }
-}
-
-void Emoticons::removeIconset(const QString &ASubStorage)
-{
-  if (FStorageOrder.contains(ASubStorage))
-  {
-    removeSelectIconMenu(ASubStorage);
-    FStorageOrder.removeAll(ASubStorage);
-    delete FStorages.take(ASubStorage);
-    createIconsetUrls();
-    emit iconsetRemoved(ASubStorage);
-  }
+  return iconsets;
 }
 
 QUrl Emoticons::urlByKey(const QString &AKey) const
@@ -174,13 +130,16 @@ QString Emoticons::keyByUrl(const QUrl &AUrl) const
 void Emoticons::createIconsetUrls()
 {
   FUrlByKey.clear();
-  foreach(QString substorage, FStorageOrder)
+  foreach(QString substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
   {
     IconStorage *storage = FStorages.value(substorage);
-    foreach(QString key, storage->fileKeys())
+    if (storage)
     {
-      if (!FUrlByKey.contains(key))
-        FUrlByKey.insert(key,QUrl::fromLocalFile(storage->fileFullName(key)));
+      foreach(QString key, storage->fileKeys())
+      {
+        if (!FUrlByKey.contains(key))
+          FUrlByKey.insert(key,QUrl::fromLocalFile(storage->fileFullName(key)));
+      }
     }
   }
 }
@@ -259,7 +218,7 @@ void Emoticons::onToolBarWidgetCreated(IToolBarWidget *AWidget)
   if (AWidget->editWidget() != NULL)
   {
     FToolBarsWidgets.append(AWidget);
-    foreach(QString substorage, FStorageOrder)
+    foreach(QString substorage, activeIconsets())
     {
       SelectIconMenu *menu = createSelectIconMenu(substorage,AWidget->instance());
       FToolBarWidgetByMenu.insert(menu,AWidget);
@@ -350,16 +309,38 @@ void Emoticons::onSelectIconMenuDestroyed(QObject *AObject)
       FToolBarWidgetByMenu.remove(menu);
 }
 
-void Emoticons::onSettingsOpened()
+void Emoticons::onOptionsOpened()
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(EMOTICONS_UUID);
-  setIconsets(settings->value(SVN_SUBSTORAGES, QStringList() << DEFAULT_ICONSET).toStringList());
+  onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS));
 }
 
-void Emoticons::onSettingsClosed()
+void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(EMOTICONS_UUID);
-  settings->setValue(SVN_SUBSTORAGES,QStringList(FStorageOrder));
-}
+  if (ANode.path() == OPV_MESSAGES_EMOTICONS)
+  {
+    QList<QString> oldStorages = FStorages.keys();
+    QList<QString> availStorages = IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
 
+    foreach(QString substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
+    {
+      if (availStorages.contains(substorage))
+      {
+        if (!FStorages.contains(substorage))
+        {
+          FStorages.insert(substorage, new IconStorage(RSR_STORAGE_EMOTICONS,substorage,this));
+          insertSelectIconMenu(substorage);
+        }
+        oldStorages.removeAll(substorage);
+      }
+    }
+
+    foreach (QString substorage, oldStorages)
+    {
+      removeSelectIconMenu(substorage);
+      delete FStorages.take(substorage);
+    }
+
+    createIconsetUrls();
+  }
+}
 Q_EXPORT_PLUGIN2(plg_emoticons, Emoticons)

@@ -690,7 +690,7 @@ bool SocksStream::sendAvailHosts()
         HostInfo info;
         info.jid = FStreamJid;
         info.name = address.toString();
-        info.port = FSocksStreams->serverPort();
+        info.port = FSocksStreams->listeningPort();
         FHosts.prepend(info);
       }
     }

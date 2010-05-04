@@ -34,6 +34,22 @@
         <source>New Account</source>
         <translation>Nowe konto</translation>
     </message>
+    <message>
+        <source>Invalid Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Account &apos;%1&apos; is not valid, change its Jabber ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delayed Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some options of account &apos;%1&apos; will be applied after disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AccountOptionsClass</name>
@@ -62,8 +78,8 @@
         <translation>Hasło:</translation>
     </message>
     <message>
-        <source>Example: balcony; orchard</source>
-        <translation>Przykład:  balkon; sad</translation>
+        <source>Example: home; office; notebook</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -77,22 +93,6 @@
         <translation>Jabber ID</translation>
     </message>
     <message>
-        <source>Not valid account</source>
-        <translation>Nieprawidłowe konto</translation>
-    </message>
-    <message>
-        <source>Account %1 is not valid, change its Jabber ID</source>
-        <translation>Konto %1 jest nieprawidłowe, zmień Jabber ID</translation>
-    </message>
-    <message>
-        <source>Enter account name</source>
-        <translation>Wprowadź nazwę swojego konta</translation>
-    </message>
-    <message>
-        <source>Account name:</source>
-        <translation>Nazwa konta:</translation>
-    </message>
-    <message>
         <source>Confirm removal of an account</source>
         <translation>Potwierdź usunięcie konta</translation>
     </message>
@@ -101,12 +101,8 @@
         <translation>Czy na pewno chcesz usunąć konto &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;Wszystkie ustawienia zostaną utracone.</translation>
     </message>
     <message>
-        <source>Account options</source>
-        <translation>Ustawienia konta</translation>
-    </message>
-    <message>
-        <source>Some accounts changes will be applied after disconnect</source>
-        <translation>Niektóre zmiany w kontach zostaną zastosowane dopiero po rozłączeniu</translation>
+        <source>New Account</source>
+        <translation type="unfinished">Nowe konto</translation>
     </message>
 </context>
 <context>

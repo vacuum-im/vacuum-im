@@ -1,7 +1,3 @@
-FORMS = rosteroptionswidget.ui
+HEADERS = avatars.h
 
-HEADERS = rosteroptionswidget.h \
-          avatars.h
-
-SOURCES = rosteroptionswidget.cpp \
-          avatars.cpp
+SOURCES = avatars.cpp

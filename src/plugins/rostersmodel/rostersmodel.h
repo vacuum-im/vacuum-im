@@ -1,7 +1,6 @@
 #ifndef ROSTERSMODEL_H
 #define ROSTERSMODEL_H
 
-#include <definations/accountvaluenames.h>
 #include <definations/rosterindextyperole.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersmodel.h>
@@ -9,6 +8,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/iaccountmanager.h>
 #include <utils/jid.h>
+#include <utils/options.h>
 #include "rosterindex.h"
 
 class RostersModel : 
@@ -78,7 +78,7 @@ protected:
 protected slots:
   void onAccountShown(IAccount *AAccount);
   void onAccountHidden(IAccount *AAccount);
-  void onAccountChanged(const QString &AName, const QVariant &AValue);
+  void onAccountOptionsChanged(const OptionsNode &ANode);
   void onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);

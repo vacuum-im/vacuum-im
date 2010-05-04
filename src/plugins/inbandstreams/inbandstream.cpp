@@ -395,7 +395,7 @@ void InBandStream::setBlockSize(int ASize)
   }
 }
 
-int InBandStream::maximumBlockSize()
+int InBandStream::maximumBlockSize() const
 {
   return FMaxBlockSize;
 }

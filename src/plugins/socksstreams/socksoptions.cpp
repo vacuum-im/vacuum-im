@@ -7,53 +7,41 @@
 SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStream, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
+
+  FSocksStreams = ASocksStreams;
   FSocksStream = ASocksStream;
   FProxySettings = NULL;
-  FSocksStreams = ASocksStreams;
   FConnectionManager = NULL;
   initialize(AReadOnly);
 
   ui.spbPort->setVisible(false);
-
-  ui.chbDisableDirectConnect->setChecked(ASocksStream->disableDirectConnection());
-  ui.lneForwardHost->setText(ASocksStream->forwardHost());
-  ui.spbForwardPort->setValue(ASocksStream->forwardPort());
-
-  ui.chbUseNativeServerProxy->setVisible(false);
-  ui.ltwStreamProxy->addItems(ASocksStream->proxyList());
-
+  ui.chbUseAccountNetworkProxy->setVisible(false);
   ui.grbConnectionProxy->setVisible(false);
+
+  reset();
 }
 
 SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager, 
-                           const QString &ASettingsNS, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
+                           const OptionsNode &ANode, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
-  FSocksStream = NULL;
-  FSettingsNS = ASettingsNS;
-  FProxySettings = NULL;
   FSocksStreams = ASocksStreams;
+  FSocksStream = NULL;
+  FProxySettings = NULL;
+  FOptions = ANode;
   FConnectionManager = AConnectionManager;
   initialize(AReadOnly);
 
-  ui.spbPort->setValue(ASocksStreams->serverPort());
-  ui.spbPort->setEnabled(ASettingsNS.isEmpty());
-
-  ui.chbDisableDirectConnect->setChecked(ASocksStreams->disableDirectConnections(ASettingsNS));
-  ui.lneForwardHost->setText(ASocksStreams->forwardHost(ASettingsNS));
-  ui.spbForwardPort->setValue(ASocksStreams->forwardPort(ASettingsNS));
-  
-  ui.chbUseNativeServerProxy->setChecked(ASocksStreams->useNativeServerProxy(ASettingsNS));
-  ui.ltwStreamProxy->addItems(ASocksStreams->proxyList(ASettingsNS));
-
-  FProxySettings = FConnectionManager!=NULL ? FConnectionManager->proxySettingsWidget(PROXY_NS_PREFIX+FSettingsNS, ui.wdtProxySettings) : NULL;
+  FProxySettings = FConnectionManager!=NULL ? FConnectionManager->proxySettingsWidget(FOptions.node("network-proxy"),ui.wdtProxySettings) : NULL;
   if (FProxySettings)
   {
     QVBoxLayout *layout = new QVBoxLayout(ui.wdtProxySettings);
     layout->setMargin(0);
-    layout->addWidget(FProxySettings);
+    layout->addWidget(FProxySettings->instance());
+    connect(FProxySettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
   }
-  ui.chbUseAccountProxy->setChecked(ASocksStreams->useAccountNetworkProxy(ASettingsNS));
+
+  reset();
 }
 
 SocksOptions::~SocksOptions()
@@ -61,7 +49,35 @@ SocksOptions::~SocksOptions()
 
 }
 
-void SocksOptions::saveSettings(ISocksStream *ASocksStream)
+void SocksOptions::apply(OptionsNode ANode)
+{
+  OptionsNode node = ANode.isNull() ? FOptions : ANode;
+
+  Options::node(OPV_DATASTREAMS_SOCKSLISTENPORT).setValue(ui.spbPort->value());
+
+  node.setValue(ui.chbDisableDirectConnect->isChecked(),"disable-direct-connections");
+  node.setValue(ui.lneForwardHost->text(),"forward-host");
+  node.setValue(ui.spbForwardPort->value(),"forward-port");
+
+  QStringList proxyItems;
+  for (int row=0; row<ui.ltwStreamProxy->count(); row++)
+  {
+    QString proxyItem = Jid(ui.ltwStreamProxy->item(row)->text()).pBare();
+    if (!proxyItems.contains(proxyItem))
+      proxyItems.append(proxyItem);
+  }
+  node.setValue(proxyItems,"stream-proxy-list");
+
+  node.setValue(ui.chbUseAccountStreamProxy->isChecked(),"use-account-stream-proxy");
+  node.setValue(ui.chbUseAccountNetworkProxy->isChecked(),"use-account-network-proxy");
+
+  if (FProxySettings)
+    FConnectionManager->saveProxySettings(FProxySettings);
+
+  emit childApply();
+}
+
+void SocksOptions::apply(ISocksStream *ASocksStream)
 {
   ASocksStream->setDisableDirectConnection(ui.chbDisableDirectConnect->isChecked());
   ASocksStream->setForwardAddress(ui.lneForwardHost->text(), ui.spbForwardPort->value());
@@ -70,37 +86,41 @@ void SocksOptions::saveSettings(ISocksStream *ASocksStream)
   for (int row=0; row<ui.ltwStreamProxy->count(); row++)
     proxyItems.append(ui.ltwStreamProxy->item(row)->text());
   ASocksStream->setProxyList(proxyItems);
-}
 
-void SocksOptions::saveSettings(const QString &ASettingsNS)
-{
-  if (ASettingsNS.isEmpty())
-    FSocksStreams->setServerPort(ui.spbPort->value());
-
-  FSocksStreams->setDisableDirectConnections(ASettingsNS, ui.chbDisableDirectConnect->isChecked());
-  FSocksStreams->setForwardAddress(ASettingsNS, ui.lneForwardHost->text(), ui.spbForwardPort->value());
-
-  QList<QString> proxyItems;
-  for (int row=0; row<ui.ltwStreamProxy->count(); row++)
-    proxyItems.append(ui.ltwStreamProxy->item(row)->text());
-  FSocksStreams->setProxyList(ASettingsNS, proxyItems);
-  FSocksStreams->setUseNativeServerProxy(ASettingsNS, ui.chbUseNativeServerProxy->isChecked());
-
-  if (FProxySettings)
-  {
-    FConnectionManager->saveProxySettings(FProxySettings);
-    FSocksStreams->setNetworkProxy(ASettingsNS, FConnectionManager->proxyById(FConnectionManager->proxySettings(PROXY_NS_PREFIX+FSettingsNS)).proxy);
-  }
-  FSocksStreams->setUseAccountNetworkProxy(ASettingsNS, ui.chbUseAccountProxy->isChecked());
+  emit childApply();
 }
 
 void SocksOptions::apply()
 {
   if (FSocksStream)
-    saveSettings(FSocksStream);
+    apply(FSocksStream);
   else
-    saveSettings(FSettingsNS);
-  emit optionsAccepted();
+    apply(FOptions);
+}
+
+void SocksOptions::reset()
+{
+  if (FSocksStream)
+  {
+    ui.chbDisableDirectConnect->setChecked(FSocksStream->disableDirectConnection());
+    ui.lneForwardHost->setText(FSocksStream->forwardHost());
+    ui.spbForwardPort->setValue(FSocksStream->forwardPort());
+    ui.ltwStreamProxy->addItems(FSocksStream->proxyList());
+  }
+  else
+  {
+    ui.spbPort->setValue(Options::node(OPV_DATASTREAMS_SOCKSLISTENPORT).value().toInt());
+    ui.chbDisableDirectConnect->setChecked(FOptions.value("disable-direct-connections").toBool());
+    ui.lneForwardHost->setText(FOptions.value("forward-host").toString());
+    ui.spbForwardPort->setValue(FOptions.value("forward-port").toInt());
+    ui.ltwStreamProxy->clear();
+    ui.ltwStreamProxy->addItems(FOptions.value("stream-proxy-list").toStringList());
+    ui.chbUseAccountStreamProxy->setChecked(FOptions.value("use-account-stream-proxy").toBool());
+    ui.chbUseAccountNetworkProxy->setChecked(FOptions.value("use-account-network-proxy").toBool());
+    if (FProxySettings)
+      FProxySettings->reset();
+  }
+  emit childReset();
 }
 
 void SocksOptions::initialize(bool AReadOnly)
@@ -121,6 +141,13 @@ void SocksOptions::initialize(bool AReadOnly)
   connect(ui.pbtStreamProxyDown,SIGNAL(clicked(bool)),SLOT(onStreamProxyDownClicked(bool)));
   connect(ui.pbtDeleteStreamProxy,SIGNAL(clicked(bool)),SLOT(onDeleteStreamProxyClicked(bool)));
 
+  connect(ui.spbPort,SIGNAL(valueChanged(int)),SIGNAL(modified()));
+  connect(ui.chbDisableDirectConnect,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.lneForwardHost,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+  connect(ui.spbForwardPort,SIGNAL(valueChanged(int)),SIGNAL(modified()));
+  connect(ui.chbUseAccountStreamProxy,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbUseAccountNetworkProxy,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+
   ui.wdtProxySettings->setEnabled(!AReadOnly);
 }
 
@@ -131,6 +158,7 @@ void SocksOptions::onAddStreamProxyClicked(bool)
   {
     ui.ltwStreamProxy->addItem(proxy);
     ui.lneStreamProxy->clear();
+    emit modified();
   }
 }
 
@@ -141,6 +169,7 @@ void SocksOptions::onStreamProxyUpClicked(bool)
     int row = ui.ltwStreamProxy->currentRow();
     ui.ltwStreamProxy->insertItem(row-1, ui.ltwStreamProxy->takeItem(row));
     ui.ltwStreamProxy->setCurrentRow(row-1);
+    emit modified();
   }
 }
 
@@ -151,6 +180,7 @@ void SocksOptions::onStreamProxyDownClicked(bool)
     int row = ui.ltwStreamProxy->currentRow();
     ui.ltwStreamProxy->insertItem(row+1, ui.ltwStreamProxy->takeItem(row));
     ui.ltwStreamProxy->setCurrentRow(row+1);
+    emit modified();
   }
 }
 
@@ -159,5 +189,6 @@ void SocksOptions::onDeleteStreamProxyClicked(bool)
   if (ui.ltwStreamProxy->currentRow()>=0)
   {
     delete ui.ltwStreamProxy->takeItem(ui.ltwStreamProxy->currentRow());
+    emit modified();
   }
 }

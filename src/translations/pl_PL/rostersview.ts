@@ -2,25 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl_PL" sourcelanguage="en">
 <context>
-    <name>RosterOptionsWidgetClass</name>
-    <message>
-        <source>Show offline contacts</source>
-        <translation>Pokaż niezalogowane kontakty</translation>
-    </message>
-    <message>
-        <source>Show online contacts first</source>
-        <translation>Kontakty sortowane według statusu</translation>
-    </message>
-    <message>
-        <source>Show resource in roster</source>
-        <translation>Pokazuj zasoby kontaktów</translation>
-    </message>
-    <message>
-        <source>Show status in roster</source>
-        <translation>Pokazuj status kontaktów</translation>
-    </message>
-</context>
-<context>
     <name>RostersView</name>
     <message>
         <source>Priority: %1</source>
@@ -72,6 +53,22 @@
     <message>
         <source>Show/Hide offline contacts</source>
         <translation>Pokaż/ukryj kontakty niezalogowane</translation>
+    </message>
+    <message>
+        <source>Show offline contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show contact resource in roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort contacts by status</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

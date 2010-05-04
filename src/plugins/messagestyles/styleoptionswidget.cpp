@@ -7,23 +7,21 @@ StyleOptionsWidget::StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *
 {
   ui.setupUi(this);
 
-  FModifyEnabled = false;
   FUpdateStarted = false;
 
   FActiveView = NULL;
   FActiveStyle = NULL;
-  FActivePlugin = NULL;
   FActiveSettings = NULL;
   FMessageStyles = AMessageStyles;
 
   ui.cmbMessageType->addItem(tr("Chat"),Message::Chat);
   ui.cmbMessageType->addItem(tr("Conference"),Message::GroupChat);
-  //ui.cmbMessageType->addItem(tr("Single"),Message::Normal);
-  //ui.cmbMessageType->addItem(tr("Headline"),Message::Headline);
-  //ui.cmbMessageType->addItem(tr("Error"),Message::Error);
+  ui.cmbMessageType->addItem(tr("Single"),Message::Normal);
+  ui.cmbMessageType->addItem(tr("Headline"),Message::Headline);
+  ui.cmbMessageType->addItem(tr("Error"),Message::Error);
 
-  foreach(QString spluginId, FMessageStyles->stylePlugins())
-    ui.cmbStyleEngine->addItem(spluginId,spluginId);
+  foreach(QString spluginId, FMessageStyles->pluginList())
+    ui.cmbStyleEngine->addItem(FMessageStyles->pluginById(spluginId)->pluginName(),spluginId);
 
   ui.wdtStyleOptions->setLayout(new QVBoxLayout);
   ui.wdtStyleOptions->layout()->setMargin(0);
@@ -31,12 +29,10 @@ StyleOptionsWidget::StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *
   ui.frmExample->setLayout(new QVBoxLayout);
   ui.frmExample->layout()->setMargin(0);
 
-  onMessageTypeChanged(ui.cmbMessageType->currentIndex());
-  onStyleEngineChanged(ui.cmbStyleEngine->currentIndex());
-  FModifyEnabled = true;
-
   connect(ui.cmbMessageType,SIGNAL(currentIndexChanged(int)),SLOT(onMessageTypeChanged(int)));
   connect(ui.cmbStyleEngine,SIGNAL(currentIndexChanged(int)),SLOT(onStyleEngineChanged(int)));
+
+  reset();
 }
 
 StyleOptionsWidget::~StyleOptionsWidget()
@@ -46,18 +42,32 @@ StyleOptionsWidget::~StyleOptionsWidget()
 
 void StyleOptionsWidget::apply()
 {
-  QMap<int, QString>::const_iterator it = FPluginForMessage.constBegin();
-  while (it != FPluginForMessage.constEnd())
+  foreach(int messageType, FMessagePlugin.keys())
   {
-    IMessageStyleSettings *settings = FSettings.value(FMessageStyles->stylePluginById(it.value()));
-    if (settings && (FModified.value(it.key(),false) || settings->isModified(it.key(),QString::null)))
+    IOptionsWidget *widget = FMessageWidget.value(messageType);
+    IMessageStylePlugin *plugin = FMessageStyles->pluginById(FMessagePlugin.value(messageType));
+    if (plugin && widget)
     {
-      FMessageStyles->setStyleOptions(settings->styleOptions(it.key(),QString::null),it.key());
-      settings->setModified(false,it.key(),QString::null);
+      OptionsNode node = Options::node(OPV_MESSAGESTYLE_MTYPE_ITEM,QString::number(messageType)).node("context");
+      node.setValue(plugin->pluginId(),"style-type");
+      plugin->saveStyleSettings(widget,node.node("style",plugin->pluginId()));
     }
-    it++;
   }
-  emit optionsAccepted();
+  emit childApply();
+}
+
+void StyleOptionsWidget::reset()
+{
+  FActiveSettings = NULL;
+  foreach(IOptionsWidget *widget, FMessageWidget.values())
+  {
+    widget->instance()->setParent(NULL);
+    delete widget->instance();
+  }
+  FMessageWidget.clear();
+  FMessagePlugin.clear();
+  onMessageTypeChanged(ui.cmbMessageType->currentIndex());
+  emit childReset();
 }
 
 void StyleOptionsWidget::startStyleViewUpdate()
@@ -65,17 +75,8 @@ void StyleOptionsWidget::startStyleViewUpdate()
   if (!FUpdateStarted)
   {
     FUpdateStarted = true;
-    QTimer::singleShot(50,this,SLOT(onUpdateStyleView()));
+    QTimer::singleShot(0,this,SLOT(onUpdateStyleView()));
   }
-}
-
-void StyleOptionsWidget::updateActiveSettings()
-{
-  int curMessageType = ui.cmbMessageType->itemData(ui.cmbMessageType->currentIndex()).toInt();
-  if (FActiveSettings && FActiveSettings->messageType()!=curMessageType)
-    FActiveSettings->loadSettings(curMessageType,QString::null);
-  else
-    startStyleViewUpdate();
 }
 
 void StyleOptionsWidget::createViewContent()
@@ -192,10 +193,48 @@ void StyleOptionsWidget::createViewContent()
   }
 }
 
+QWidget *StyleOptionsWidget::updateActiveSettings()
+{
+  QWidget *oldWidget = NULL;
+
+  if (FActiveSettings)
+  {
+    oldWidget = FActiveSettings->instance();
+    oldWidget->setVisible(false);
+    ui.wdtStyleOptions->layout()->removeWidget(oldWidget);
+  }
+
+  int curMessageType = ui.cmbMessageType->itemData(ui.cmbMessageType->currentIndex()).toInt();
+  FActiveSettings = FMessageWidget.value(curMessageType,NULL);
+  if (!FActiveSettings)
+  {
+    QString pluginId = FMessagePlugin.value(curMessageType);
+    OptionsNode node = Options::node(OPV_MESSAGESTYLE_MTYPE_ITEM,QString::number(curMessageType)).node("context.style",pluginId);
+    FActiveSettings = FMessageStyles->pluginById(pluginId)->styleSettingsWidget(node,curMessageType,ui.wdtStyleOptions);
+    if (FActiveSettings)
+    {
+      connect(FActiveSettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
+      connect(FActiveSettings->instance(),SIGNAL(modified()),SLOT(startStyleViewUpdate()));
+    }
+  }
+
+  if (FActiveSettings)
+  {
+    ui.wdtStyleOptions->layout()->addWidget(FActiveSettings->instance());
+    FActiveSettings->instance()->setVisible(true);
+  }
+  FMessageWidget.insert(curMessageType, FActiveSettings);
+
+  return oldWidget;
+}
+
 void StyleOptionsWidget::onUpdateStyleView()
 {
-  IMessageStyleOptions soptions = FActiveSettings!=NULL ? FActiveSettings->styleOptions(FActiveSettings->messageType(),FActiveSettings->context()) : IMessageStyleOptions();
-  IMessageStyle *style = FActivePlugin!=NULL ? FActivePlugin->styleForOptions(soptions) : NULL;
+  IMessageStyleOptions soptions;
+  int curMessageType = ui.cmbMessageType->itemData(ui.cmbMessageType->currentIndex()).toInt();
+  IMessageStylePlugin *plugin = FMessageStyles->pluginById(FMessagePlugin.value(curMessageType));
+  plugin->saveStyleSettings(FActiveSettings,soptions);
+  IMessageStyle *style = plugin->styleForOptions(soptions);
   if (style != FActiveStyle)
   {
     if (FActiveView)
@@ -222,57 +261,26 @@ void StyleOptionsWidget::onUpdateStyleView()
 
 void StyleOptionsWidget::onMessageTypeChanged(int AIndex)
 {
-  int curMessageType = ui.cmbMessageType->itemData(AIndex).toInt();
-  QString curPluginId = ui.cmbStyleEngine->itemData(ui.cmbStyleEngine->currentIndex()).toString();
+  int newMessageType = ui.cmbMessageType->itemData(AIndex).toInt();
   
-  QString spluginId;
-  if (!FPluginForMessage.contains(curMessageType))
-  {
-    spluginId = FMessageStyles->styleOptions(ui.cmbMessageType->itemData(AIndex).toInt()).pluginId;
-    FPluginForMessage.insert(curMessageType,spluginId);
-  }
-  else
-    spluginId = FPluginForMessage.value(curMessageType);
+  if (!FMessagePlugin.contains(newMessageType))
+    FMessagePlugin.insert(newMessageType,FMessageStyles->styleOptions(newMessageType).pluginId);
+  updateActiveSettings();
+  startStyleViewUpdate();
 
-  if (spluginId != curPluginId)
-  {
-    FModifyEnabled = false;
-    ui.cmbStyleEngine->setCurrentIndex(ui.cmbStyleEngine->findData(spluginId));
-    FModifyEnabled = true;
-  }
-  else
-    updateActiveSettings();
+  ui.cmbStyleEngine->setCurrentIndex(ui.cmbStyleEngine->findData(FMessagePlugin.value(newMessageType)));
 }
 
 void StyleOptionsWidget::onStyleEngineChanged(int AIndex)
 {
-  QString curPluginId = ui.cmbStyleEngine->itemData(AIndex).toString();
+  QString newPluginId = ui.cmbStyleEngine->itemData(AIndex).toString();
   int curMessageType = ui.cmbMessageType->itemData(ui.cmbMessageType->currentIndex()).toInt();
-  FPluginForMessage.insert(curMessageType,curPluginId);
-  FModified[curMessageType] = FModifyEnabled;
-
-  FActivePlugin = FMessageStyles->stylePluginById(curPluginId);
-
-  if (FActiveSettings)
+  if (FMessagePlugin.value(curMessageType) != newPluginId)
   {
-    ui.wdtStyleOptions->layout()->removeWidget(FActiveSettings->instance());
-    FActiveSettings->instance()->setVisible(false);
-    disconnect(FActiveSettings->instance(),SIGNAL(settingsChanged()),this,SLOT(startStyleViewUpdate()));
+    FMessagePlugin.insert(curMessageType,newPluginId);
+    FMessageWidget.remove(curMessageType);
+    delete updateActiveSettings();
+    startStyleViewUpdate();
+    emit modified();
   }
-
-  if (FActivePlugin && !FSettings.contains(FActivePlugin))
-  {
-    FActiveSettings = FActivePlugin->styleSettings(Message::Chat,QString::null,ui.wdtStyleOptions);
-    FSettings.insert(FActivePlugin,FActiveSettings);
-  }
-  else
-    FActiveSettings = FSettings.value(FActivePlugin,NULL);
-
-  if (FActiveSettings)
-  {
-    ui.wdtStyleOptions->layout()->addWidget(FActiveSettings->instance());
-    FActiveSettings->instance()->setVisible(true);
-    connect(FActiveSettings->instance(),SIGNAL(settingsChanged()),SLOT(startStyleViewUpdate()));
-  }
-  updateActiveSettings();
 }

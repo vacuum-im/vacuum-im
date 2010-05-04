@@ -7,41 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>339</width>
-    <height>148</height>
+    <height>48</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="margin">
     <number>0</number>
    </property>
-   <item>
-    <widget class="QCheckBox" name="chbTabWindowsEnabled">
-     <property name="text">
-      <string>Enable tab windows</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="chbChatWindowShowStatus">
-     <property name="text">
-      <string>Show status in chat window</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="chbEditorAutoResize">
-     <property name="text">
-      <string>Auto resize input field</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="chbShowInfoWidget">
-     <property name="text">
-      <string>Show contact information in chat window</string>
-     </property>
-    </widget>
-   </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">

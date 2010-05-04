@@ -254,8 +254,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
       IAccount *account = FAccountManager->accountByStream(AStreamJid);
       if(account)
       {
-        connect(account->instance(),SIGNAL(changed(const QString &, const QVariant &)),
-          SLOT(onAccountChanged(const QString &, const QVariant &)));
+        connect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
         streamMenu->setTitle(account->name());
       }
       else
@@ -467,11 +466,11 @@ void BookMarks::onEditBookmarksDialogDestroyed()
     FDialogs.remove(dialog->streamJid());
 }
 
-void BookMarks::onAccountChanged(const QString &AName, const QVariant &AValue)
+void BookMarks::onAccountOptionsChanged(const OptionsNode &ANode)
 {
   IAccount *account = qobject_cast<IAccount *>(sender());
-  if (account && account->isActive() && AName == AVN_NAME && FStreamMenu.contains(account->xmppStream()->streamJid()))
-    FStreamMenu[account->xmppStream()->streamJid()]->setTitle(AValue.toString());
+  if (account && account->isActive() && account->optionsNode().childPath(ANode)=="name" &&  FStreamMenu.contains(account->xmppStream()->streamJid()))
+    FStreamMenu[account->xmppStream()->streamJid()]->setTitle(ANode.value().toString());
 }
 
 Q_EXPORT_PLUGIN2(plg_bookmarks, BookMarks)

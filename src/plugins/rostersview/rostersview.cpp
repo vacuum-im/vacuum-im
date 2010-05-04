@@ -19,7 +19,6 @@
 
 RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 {
-  FOptions = 0;
   FNotifyId = 1;
   FLabelIdCounter = 1;
 
@@ -615,16 +614,31 @@ void RostersView::clipboardMenuForIndex(IRosterIndex *AIndex, Menu *AMenu)
   }
 }
 
-bool RostersView::checkOption(IRostersView::Option AOption) const
+void RostersView::updateStatusText(IRosterIndex *AIndex)
 {
-  return (FOptions & AOption) > 0;
-}
+  const static QList<int> statusTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT << RIT_AGENT;
 
-void RostersView::setOption(IRostersView::Option AOption, bool AValue)
-{
-  AValue ? FOptions |= AOption : FOptions &= ~AOption;
-  if (AOption == IRostersView::ShowStatusText)
-    updateStatusText();
+  QList<IRosterIndex *> indexes;
+  if (AIndex == NULL)
+  {
+    QMultiHash<int,QVariant> findData;
+    foreach(int type, statusTypes)
+      findData.insert(RDR_TYPE,type);
+    indexes = FRostersModel!=NULL ? FRostersModel->rootIndex()->findChild(findData,true) : QList<IRosterIndex *>();
+  }
+  else if (statusTypes.contains(AIndex->type()))
+  {
+    indexes.append(AIndex);
+  }
+
+  bool show = Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool();
+  foreach(IRosterIndex *index, indexes)
+  {
+    if (show)
+      insertFooterText(FTO_ROSTERSVIEW_STATUS,RDR_STATUS,index);
+    else
+      removeFooterText(FTO_ROSTERSVIEW_STATUS,index);
+  }
 }
 
 QStyleOptionViewItemV4 RostersView::indexOption(const QModelIndex &AIndex) const
@@ -686,31 +700,6 @@ void RostersView::setDropIndicatorRect(const QRect &ARect)
   {
     FDropIndicatorRect = ARect;
     viewport()->update();
-  }
-}
-
-void RostersView::updateStatusText(IRosterIndex *AIndex)
-{
-  const static QList<int> statusTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT << RIT_AGENT;
-  
-  QList<IRosterIndex *> indexes;
-  if (AIndex == NULL)
-  {
-    QMultiHash<int,QVariant> findData;
-    foreach(int type, statusTypes)
-      findData.insert(RDR_TYPE,type);
-    indexes = FRostersModel!=NULL ? FRostersModel->rootIndex()->findChild(findData,true) : QList<IRosterIndex *>();
-  }
-  else if (statusTypes.contains(AIndex->type()))
-    indexes.append(AIndex);
-
-  bool show = checkOption(IRostersView::ShowStatusText);
-  foreach(IRosterIndex *index, indexes)
-  {
-    if (show)
-      insertFooterText(FTO_ROSTERSVIEW_STATUS,RDR_STATUS,index);
-    else
-      removeFooterText(FTO_ROSTERSVIEW_STATUS,index);
   }
 }
 

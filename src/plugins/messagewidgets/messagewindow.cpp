@@ -2,15 +2,12 @@
 
 #include <QHeaderView>
 
-#define BDI_MESSAGE_GEOMETRY        "MessageWindowGeometry"
-
 MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose,true);
 
   FMessageWidgets = AMessageWidgets;
-  FSettings = NULL;
 
   FMode = AMode;
   FNextCount = 0;
@@ -192,31 +189,21 @@ void MessageWindow::initialize()
       }
     }
   }
-
-  plugin = FMessageWidgets->pluginManager()->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-  {
-    ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (settingsPlugin)
-      FSettings = settingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
-  }
 }
 
 void MessageWindow::saveWindowGeometry()
 {
-  if (FSettings && isWindow())
+  if (isWindow())
   {
-    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    FSettings->saveBinaryData(BDI_MESSAGE_GEOMETRY"|"+dataId,saveGeometry());
+    Options::setFileValue(saveGeometry(),"messages.messagewindow.geometry",tabPageId());
   }
 }
 
 void MessageWindow::loadWindowGeometry()
 {
-  if (FSettings && isWindow())
+  if (isWindow())
   {
-    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    restoreGeometry(FSettings->loadBinaryData(BDI_MESSAGE_GEOMETRY"|"+dataId));
+    restoreGeometry(Options::fileValue("messages.messagewindow.geometry",tabPageId()).toByteArray());
   }
 }
 
@@ -302,8 +289,9 @@ void MessageWindow::onChatButtonClicked()
   emit showChatWindow();
 }
 
-void MessageWindow::onReceiversChanged(const Jid &/*AReceiver*/)
+void MessageWindow::onReceiversChanged(const Jid &AReceiver)
 {
+  Q_UNUSED(AReceiver);
   QString receiversStr;
   foreach(Jid contactJid,FReceiversWidget->receivers())
     receiversStr += QString("%1; ").arg(FReceiversWidget->receiverName(contactJid));

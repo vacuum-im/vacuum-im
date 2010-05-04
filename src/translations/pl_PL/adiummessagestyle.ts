@@ -22,6 +22,10 @@
         <source>Allows to use a Adium style in message design</source>
         <translation>Umożliwia wykorzystanie dla wiadomości styul Adium</translation>
     </message>
+    <message>
+        <source>Adium Style</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AdiumOptionsWidget</name>

@@ -2,25 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
-    <name>RosterOptionsWidgetClass</name>
-    <message>
-        <source>Show offline contacts</source>
-        <translation>Показывать отключенные контакты</translation>
-    </message>
-    <message>
-        <source>Show online contacts first</source>
-        <translation>Сортировать контакты по статусу</translation>
-    </message>
-    <message>
-        <source>Show resource in roster</source>
-        <translation>Показывать ресурс контактов</translation>
-    </message>
-    <message>
-        <source>Show status in roster</source>
-        <translation>Показывать статус контактов</translation>
-    </message>
-</context>
-<context>
     <name>RostersView</name>
     <message>
         <source>Priority: %1</source>
@@ -72,6 +53,22 @@
     <message>
         <source>Displays a hierarchical roster&apos;s model</source>
         <translation>Отображает иерархическую модель ростера</translation>
+    </message>
+    <message>
+        <source>Show offline contact</source>
+        <translation>Показывать отключенные контакты</translation>
+    </message>
+    <message>
+        <source>Show contact resource in roster</source>
+        <translation>Показывать ресурс контактов</translation>
+    </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation>Показывать статус контактов</translation>
+    </message>
+    <message>
+        <source>Sort contacts by status</source>
+        <translation>Сортировать контакты по статусу</translation>
     </message>
 </context>
 </TS>

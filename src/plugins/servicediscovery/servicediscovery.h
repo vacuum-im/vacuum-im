@@ -31,7 +31,6 @@
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
 #include <interfaces/istatusicons.h>
-#include <interfaces/isettings.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/errorhandler.h>
 #include <utils/iconstorage.h>
@@ -76,7 +75,7 @@ public:
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
   virtual bool initSettings() { return true; }
-  virtual bool startPlugin();
+  virtual bool startPlugin() { return true; }
   //IStanzaHandler
   virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
   virtual bool stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
@@ -182,7 +181,6 @@ private:
   ITrayManager *FTrayManager;
   IMainWindowPlugin *FMainWindowPlugin;
   IStatusIcons *FStatusIcons;
-  ISettingsPlugin *FSettingsPlugin;
   IDataForms *FDataForms;
   IXmppUriQueries *FXmppUriQueries;
 private:

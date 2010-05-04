@@ -1,13 +1,10 @@
 FORMS = addcontactdialog.ui \
-        subscriptiondialog.ui \
-        subscriptionoptions.ui
+        subscriptiondialog.ui
 
 HEADERS = rosterchanger.h \
           addcontactdialog.h \
-          subscriptiondialog.h \
-          subscriptionoptions.h
+          subscriptiondialog.h
 
 SOURCES = rosterchanger.cpp \
           addcontactdialog.cpp \
-          subscriptiondialog.cpp \
-          subscriptionoptions.cpp
+          subscriptiondialog.cpp

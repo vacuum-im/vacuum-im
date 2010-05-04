@@ -15,7 +15,6 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/isettings.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
@@ -88,7 +87,6 @@ private:
   IRostersView *FRostersView;
   IRostersViewPlugin *FRostersViewPlugin;
   IStanzaProcessor *FStanzaProcessor;
-  ISettingsPlugin *FSettingsPlugin;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
   IServiceDiscovery *FDiscovery;
   IXmppUriQueries *FXmppUriQueries;

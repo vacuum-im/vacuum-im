@@ -14,6 +14,7 @@
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/soundfiles.h>
+#include <definations/optionvalues.h>
 #include <definations/toolbargroups.h>
 #include <definations/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -30,6 +31,7 @@
 #include <interfaces/iavatars.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <utils/options.h>
 #include "usercontextmenu.h"
 
 struct WindowStatus 

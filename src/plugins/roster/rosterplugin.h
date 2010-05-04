@@ -4,7 +4,6 @@
 #include <QObjectCleanupHandler>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ipresence.h>
-#include <interfaces/isettings.h>
 #include "roster.h"
 
 class RosterPlugin : 
@@ -55,7 +54,6 @@ private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;
-  ISettingsPlugin *FSettingsPlugin;
 private:
   QList<IRoster *> FRosters;
   QObjectCleanupHandler FCleanupHandler;

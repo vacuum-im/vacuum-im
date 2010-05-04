@@ -3,9 +3,6 @@
 #include <QTimer>
 #include <QVariant>
 
-#define SVN_WINDOW_STATE            "FileStreamsWindowState"
-#define SVN_WINDOW_GEOMETRY         "FileStreamsWindowGeometry"
-
 #define UPDATE_STATUSBAR_INTERVAL   500
 
 enum StreamColumns {
@@ -22,13 +19,12 @@ enum ItemDataRoles {
   IDR_STREAMID
 };
 
-FileStreamsWindow::FileStreamsWindow(IFileStreamsManager *AManager, ISettings *ASettings, QWidget *AParent) : QMainWindow(AParent)
+FileStreamsWindow::FileStreamsWindow(IFileStreamsManager *AManager, QWidget *AParent) : QMainWindow(AParent)
 {
   ui.setupUi(this);
   setAttribute(Qt::WA_DeleteOnClose, true);
 
   FManager = AManager;
-  FSettings = ASettings;
 
   setWindowTitle(tr("File Transfers"));
   IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_FILESTREAMSMANAGER,0,0,"windowIcon");
@@ -53,20 +49,14 @@ FileStreamsWindow::FileStreamsWindow(IFileStreamsManager *AManager, ISettings *A
 
 FileStreamsWindow::~FileStreamsWindow()
 {
-  if (FSettings)
-  {
-    FSettings->saveBinaryData(SVN_WINDOW_STATE,saveState());
-    FSettings->saveBinaryData(SVN_WINDOW_GEOMETRY,saveGeometry());
-  }
+  Options::setFileValue(saveGeometry(),"filestreams.filestreamswindow.geometry");
+  Options::setFileValue(saveState(),"filestreams.filestreamswindow.state");
 }
 
 void FileStreamsWindow::initialize()
 {
-  if (FSettings)
-  {
-    restoreState(FSettings->loadBinaryData(SVN_WINDOW_STATE));
-    restoreGeometry(FSettings->loadBinaryData(SVN_WINDOW_GEOMETRY));
-  }
+  restoreGeometry(Options::fileValue("filestreams.filestreamswindow.geometry").toByteArray());
+  restoreState(Options::fileValue("filestreams.filestreamswindow.state").toByteArray());
 
   FStreamsModel.setColumnCount(CMN_COUNT);
   FStreamsModel.setHorizontalHeaderLabels(QStringList()<<tr("File Name")<<tr("State")<<tr("Size")<<tr("Progress")<<tr("Speed"));

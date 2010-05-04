@@ -178,13 +178,13 @@ void InfoWidget::initialize()
     {
       if (FAccount)
       {
-        disconnect(FAccount->instance(),SIGNAL(changed(const QString &, const QVariant &)), this, SLOT(onAccountChanged(const QString &, const QVariant &)));
+        disconnect(FAccount->instance(),SIGNAL(optionsChanged(const OptionsNode &)), this, SLOT(onAccountChanged(const OptionsNode &)));
       }
 
       FAccount = accountManager->accountByStream(FStreamJid);
       if (FAccount)
       {
-        connect(FAccount->instance(),SIGNAL(changed(const QString &, const QVariant &)),SLOT(onAccountChanged(const QString &, const QVariant &)));
+        connect(FAccount->instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountChanged(const OptionsNode &)));
       }
     }
   }
@@ -297,10 +297,9 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
   }
 }
 
-void InfoWidget::onAccountChanged(const QString &AName, const QVariant &AValue)
+void InfoWidget::onAccountChanged(const OptionsNode &ANode)
 {
-  Q_UNUSED(AValue);
-  if (isFiledAutoUpdated(AccountName) && AName == AVN_NAME)
+  if (FAccount && isFiledAutoUpdated(AccountName) && FAccount->optionsNode().childPath(ANode)=="name")
     autoUpdateField(AccountName);
 }
 

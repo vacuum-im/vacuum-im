@@ -7,15 +7,12 @@ MessengerOptions::MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AP
 {
   ui.setupUi(this);
   FMessageWidgets = AMessageWidgets;
-
-  ui.chbTabWindowsEnabled->setChecked(FMessageWidgets->tabWindowsEnabled());
-  ui.chbChatWindowShowStatus->setChecked(FMessageWidgets->chatWindowShowStatus());
-  ui.chbEditorAutoResize->setChecked(FMessageWidgets->editorAutoResize());
-  ui.chbShowInfoWidget->setChecked(FMessageWidgets->showInfoWidgetInChatWindow());
-  ui.spbEditorMinimumLines->setValue(FMessageWidgets->editorMinimumLines());
-  FSendKey = FMessageWidgets->editorSendKey();
-  ui.lneEditorSendKey->setText(FSendKey.toString());
   ui.lneEditorSendKey->installEventFilter(this);
+
+  connect(ui.spbEditorMinimumLines,SIGNAL(valueChanged(int)),SIGNAL(modified()));
+  connect(ui.lneEditorSendKey,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+
+  reset();
 }
 
 MessengerOptions::~MessengerOptions()
@@ -25,13 +22,17 @@ MessengerOptions::~MessengerOptions()
 
 void MessengerOptions::apply()
 {
-  FMessageWidgets->setTabWindowsEnabled(ui.chbTabWindowsEnabled->isChecked());
-  FMessageWidgets->setChatWindowShowStatus(ui.chbChatWindowShowStatus->isChecked());
-  FMessageWidgets->setEditorAutoResize(ui.chbEditorAutoResize->isChecked());
-  FMessageWidgets->setShowInfoWidgetInChatWindow(ui.chbShowInfoWidget->isChecked());
-  FMessageWidgets->setEditorMinimumLines(ui.spbEditorMinimumLines->value());
-  FMessageWidgets->setEditorSendKey(FSendKey);
-  emit optionsAccepted();
+  Options::node(OPV_MESSAGES_EDITORMINIMUMLINES).setValue(ui.spbEditorMinimumLines->value());
+  Options::node(OPV_MESSAGES_EDITORSENDKEY).setValue(FSendKey);
+  emit childApply();
+}
+
+void MessengerOptions::reset()
+{
+  ui.spbEditorMinimumLines->setValue(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES).value().toInt());
+  FSendKey = Options::node(OPV_MESSAGES_EDITORSENDKEY).value().value<QKeySequence>();
+  ui.lneEditorSendKey->setText(FSendKey.toString());
+  emit childReset();
 }
 
 bool MessengerOptions::eventFilter(QObject *AWatched, QEvent *AEvent)

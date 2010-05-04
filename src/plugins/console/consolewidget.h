@@ -2,13 +2,14 @@
 #define CONSOLEWIDGET_H
 
 #include <QWidget>
+#include <definations/optionvalues.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/isettings.h>
+#include <utils/options.h>
 #include <utils/iconstorage.h>
 #include "ui_consolewidget.h"
 
@@ -25,6 +26,9 @@ public:
   virtual bool xmppStanzaIn(IXmppStream *AStream, Stanza &AStanza, int AOrder);
   virtual bool xmppStanzaOut(IXmppStream *AStream, Stanza &AStanza, int AOrder);
 protected:
+  void initialize(IPluginManager *APluginManager);
+  void loadContext(const QUuid &AContextId);
+  void saveContext(const QUuid &AContextId);
   void colorXml(QString &AXml) const;
   void hidePasswords(QString &AXml) const;
   void showElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);
@@ -32,24 +36,24 @@ protected slots:
   void onAddConditionClicked();
   void onRemoveConditionClicked();
   void onSendXMLClicked();
-  void onLoadContextClicked();
-  void onSaveContextClicked();
-  void onDeleteContextClicked();
+  void onAddContextClicked();
+  void onRemoveContextClicked();
+  void onContextChanged(int AIndex);
   void onWordWrapStateChanged(int AState);
 protected slots:
   void onStreamCreated(IXmppStream *AXmppStream);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onStreamDestroyed(IXmppStream *AXmppStream);
   void onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle);
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onOptionsOpened();
+  void onOptionsClosed();
 private:
   Ui::ConsoleWidgetClass ui;
 private:
   IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;
-  ISettingsPlugin *FSettingsPlugin;
 private:
+  QUuid FContext;
   QTime FTimePoint;
 };
 

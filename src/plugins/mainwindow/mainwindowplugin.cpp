@@ -1,13 +1,9 @@
 #include "mainwindowplugin.h"
 
-#define SVN_SIZE              "size"
-#define SVN_POSITION          "position"
-#define SVN_SHOW_ON_START     "showOnStart"
-
 MainWindowPlugin::MainWindowPlugin()
 {
   FPluginManager = NULL;
-  FSettingsPlugin = NULL;
+  FOptionsManager = NULL;
   FTrayManager = NULL;
 
   FMainWindow = new MainWindow(new QWidget, Qt::Window|Qt::CustomizeWindowHint|Qt::WindowTitleHint|Qt::WindowCloseButtonHint);
@@ -31,15 +27,13 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
 {
   FPluginManager = APluginManager;
 
-  IPlugin *plugin = FPluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
+  IPlugin *plugin = FPluginManager->pluginInterface("IOptionsManager").value(0,NULL);
   if (plugin)
   {
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (FSettingsPlugin)
+    FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+    if (FOptionsManager)
     {
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsOpened()),SLOT(onSettingsOpened()));
-      connect(FSettingsPlugin->instance(),SIGNAL(settingsClosed()),SLOT(onSettingsClosed()));
-      connect(FSettingsPlugin->instance(), SIGNAL(profileRenamed(const QString &, const QString &)),
+      connect(FOptionsManager->instance(), SIGNAL(profileRenamed(const QString &, const QString &)),
         SLOT(onProfileRenamed(const QString &, const QString &)));
     }
   }
@@ -54,6 +48,10 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
         SLOT(onTrayNotifyActivated(int,QSystemTrayIcon::ActivationReason)));
     }
   }
+
+  connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+  connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+
   return true;
 }
 
@@ -77,12 +75,17 @@ bool MainWindowPlugin::initObjects()
   return true;
 }
 
+bool MainWindowPlugin::initSettings()
+{
+  Options::setDefaultValue(OPV_MAINWINDOW_SHOW,true);
+  Options::setDefaultValue(OPV_MAINWINDOW_SIZE,QSize(200,500));
+  Options::setDefaultValue(OPV_MAINWINDOW_POSITION,QPoint(0,0));
+  return true;
+}
+
 bool MainWindowPlugin::startPlugin()
 {
   updateTitle();
-  ISettings *settings = FSettingsPlugin!=NULL ? FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID) : NULL;
-  if (settings!=NULL ? settings->value(SVN_SHOW_ON_START,true).toBool() : true)
-    showMainWindow();
   return true;
 }
 
@@ -93,8 +96,8 @@ IMainWindow *MainWindowPlugin::mainWindow() const
 
 void MainWindowPlugin::updateTitle()
 {
-  if (FSettingsPlugin && FSettingsPlugin->isProfileOpened())
-    FMainWindow->setWindowTitle(CLIENT_NAME" - "+FSettingsPlugin->profile());
+  if (FOptionsManager && FOptionsManager->isOpened())
+    FMainWindow->setWindowTitle(CLIENT_NAME" - "+FOptionsManager->currentProfile());
   else
     FMainWindow->setWindowTitle(CLIENT_NAME);
 }
@@ -106,27 +109,28 @@ void MainWindowPlugin::showMainWindow()
   FMainWindow->activateWindow();
 }
 
-void MainWindowPlugin::onSettingsOpened()
+void MainWindowPlugin::onOptionsOpened()
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
-  FMainWindow->resize(settings->value(SVN_SIZE,QSize(200,500)).toSize());
-  FMainWindow->move(settings->value(SVN_POSITION,QPoint(0,0)).toPoint());
+  FMainWindow->resize(Options::node(OPV_MAINWINDOW_SIZE).value().toSize());
+  FMainWindow->move(Options::node(OPV_MAINWINDOW_POSITION).value().toPoint());
   updateTitle();
+  if (Options::node(OPV_MAINWINDOW_SHOW).value().toBool())
+    showMainWindow();
 }
 
-void MainWindowPlugin::onSettingsClosed()
+void MainWindowPlugin::onOptionsClosed()
 {
-  ISettings *settings = FSettingsPlugin->settingsForPlugin(MAINWINDOW_UUID);
-  settings->setValue(SVN_SHOW_ON_START,FMainWindow->isVisible());
-  settings->setValue(SVN_SIZE,FMainWindow->size());
-  settings->setValue(SVN_POSITION,FMainWindow->pos());
+  Options::node(OPV_MAINWINDOW_SHOW).setValue(FMainWindow->isVisible());
+  Options::node(OPV_MAINWINDOW_SIZE).setValue(FMainWindow->size());
+  Options::node(OPV_MAINWINDOW_POSITION).setValue(FMainWindow->pos());
   updateTitle();
+  FMainWindow->close();
 }
 
-void MainWindowPlugin::onProfileRenamed(const QString &AProfileFrom, const QString &AProfileTo)
+void MainWindowPlugin::onProfileRenamed(const QString &AProfile, const QString &ANewName)
 {
-  Q_UNUSED(AProfileFrom);
-  Q_UNUSED(AProfileTo);
+  Q_UNUSED(AProfile);
+  Q_UNUSED(ANewName);
   updateTitle();
 }
 

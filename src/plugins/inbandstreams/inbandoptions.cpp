@@ -4,27 +4,17 @@ InBandOptions::InBandOptions(IInBandStreams *AInBandStreams, IInBandStream *AStr
 {
   FStream = AStream;
   FInBandStreams = AInBandStreams;
-
   initialize(AReadOnly);
-
-  ui.spbMaxBlockSize->setValue(AStream->maximumBlockSize());
-  ui.spbBlockSize->setValue(AStream->blockSize());
-  ui.spbBlockSize->setMaximum(ui.spbMaxBlockSize->value());
-  ui.cmbStanzaType->setCurrentIndex(ui.cmbStanzaType->findData(AStream->dataStanzaType()));
+  reset();
 }
 
-InBandOptions::InBandOptions(IInBandStreams *AInBandStreams, const QString &ASettingsNS, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
+InBandOptions::InBandOptions(IInBandStreams *AInBandStreams, const OptionsNode &ANode, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
 {
   FStream = NULL;
-  FSettingsNS = ASettingsNS;
+  FOptions = ANode;
   FInBandStreams = AInBandStreams;
-
   initialize(AReadOnly);
- 
-  ui.spbMaxBlockSize->setValue(AInBandStreams->maximumBlockSize(ASettingsNS));
-  ui.spbBlockSize->setValue(AInBandStreams->blockSize(ASettingsNS));
-  ui.spbBlockSize->setMaximum(ui.spbMaxBlockSize->value());
-  ui.cmbStanzaType->setCurrentIndex(ui.cmbStanzaType->findData(FInBandStreams->dataStanzaType(ASettingsNS)));
+  reset();
 }
 
 InBandOptions::~InBandOptions()
@@ -32,19 +22,50 @@ InBandOptions::~InBandOptions()
 
 }
 
-void InBandOptions::saveSettings(const QString &ASettingsNS)
+void InBandOptions::apply(OptionsNode ANode)
 {
-  FInBandStreams->setMaximumBlockSize(ASettingsNS, ui.spbMaxBlockSize->value());
-  FInBandStreams->setBlockSize(ASettingsNS, ui.spbBlockSize->value());
-  FInBandStreams->setDataStanzaType(ASettingsNS, ui.cmbStanzaType->itemData(ui.cmbStanzaType->currentIndex()).toInt());
+  OptionsNode node = ANode.isNull() ? FOptions : ANode;
+  node.setValue(ui.spbMaxBlockSize->value(),"max-block-size");
+  node.setValue(ui.spbBlockSize->value(),"block-size");
+  node.setValue(ui.cmbStanzaType->itemData(ui.cmbStanzaType->currentIndex()).toInt(),"stanza-type");
+  emit childApply();
 }
 
-void InBandOptions::saveSettings(IInBandStream *AStream)
+void InBandOptions::apply(IInBandStream *AStream)
 {
   AStream->setMaximumBlockSize(ui.spbMaxBlockSize->value());
   AStream->setBlockSize(ui.spbBlockSize->value());
   AStream->setDataStanzaType(ui.cmbStanzaType->itemData(ui.cmbStanzaType->currentIndex()).toInt());
+  emit childApply();
 }
+
+void InBandOptions::apply()
+{
+  if (FStream)
+    apply(FStream);
+  else
+    apply(FOptions);
+}
+
+void InBandOptions::reset()
+{
+  if (FStream)
+  {
+    ui.spbMaxBlockSize->setValue(FStream->maximumBlockSize());
+    ui.spbBlockSize->setValue(FStream->blockSize());
+    ui.spbBlockSize->setMaximum(ui.spbMaxBlockSize->value());
+    ui.cmbStanzaType->setCurrentIndex(ui.cmbStanzaType->findData(FStream->dataStanzaType()));
+  }
+  else
+  {
+    ui.spbMaxBlockSize->setValue(FOptions.value("max-block-size").toInt());
+    ui.spbBlockSize->setValue(FOptions.value("block-size").toInt());
+    ui.spbBlockSize->setMaximum(ui.spbMaxBlockSize->value());
+    ui.cmbStanzaType->setCurrentIndex(ui.cmbStanzaType->findData(FOptions.value("stanza-type").toInt()));
+  }
+  emit childReset();
+}
+
 void InBandOptions::initialize(bool AReadOnly)
 {
   ui.setupUi(this);
@@ -57,19 +78,13 @@ void InBandOptions::initialize(bool AReadOnly)
   ui.spbMaxBlockSize->setReadOnly(AReadOnly);
   ui.cmbStanzaType->setEnabled(!AReadOnly);
 
+  connect(ui.spbBlockSize,SIGNAL(valueChanged(int)),SIGNAL(modified()));
+  connect(ui.spbMaxBlockSize,SIGNAL(valueChanged(int)),SIGNAL(modified()));
+  connect(ui.cmbStanzaType,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
   connect(ui.spbMaxBlockSize,SIGNAL(valueChanged(int)),SLOT(onMaxBlockSizeValueChanged(int)));
 }
 
 void InBandOptions::onMaxBlockSizeValueChanged(int AValue)
 {
   ui.spbBlockSize->setMaximum(AValue);
-}
-
-void InBandOptions::apply()
-{
-  if (FStream)
-    saveSettings(FStream);
-  else
-    saveSettings(FSettingsNS);
-  emit optionsAccepted();
 }

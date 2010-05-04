@@ -1,10 +1,7 @@
-FORMS = streamdialog.ui \
-        filetransferoptions.ui
+FORMS = streamdialog.ui
 
 HEADERS = streamdialog.h \
-          filetransferoptions.h \
           filetransfer.h
 
 SOURCES = streamdialog.cpp \
-          filetransferoptions.cpp \
           filetransfer.cpp

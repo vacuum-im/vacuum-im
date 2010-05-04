@@ -91,12 +91,19 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
   connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
   connect(FDiscovery->instance(),SIGNAL(discoItemsReceived(const IDiscoItems &)),SLOT(onDiscoItemsReceived(const IDiscoItems &)));
 
+
   initialize();
   createToolBarActions();
+
+  restoreState(Options::fileValue("servicediscovery.itemswindow.state",FStreamJid.pBare()).toByteArray());
+  restoreGeometry(Options::fileValue("servicediscovery.itemswindow.geometry",FStreamJid.pBare()).toByteArray());
 }
 
 DiscoItemsWindow::~DiscoItemsWindow()
 {
+  Options::setFileValue(saveState(),"servicediscovery.itemswindow.state",FStreamJid.pBare());
+  Options::setFileValue(saveGeometry(),"servicediscovery.itemswindow.geometry",FStreamJid.pBare());
+
   emit windowDestroyed(this);
 }
 

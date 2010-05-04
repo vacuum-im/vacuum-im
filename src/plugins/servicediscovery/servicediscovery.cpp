@@ -1,5 +1,6 @@
 #include "servicediscovery.h"
 
+#include <QDir>
 #include <QFile>
 #include <QCryptographicHash>
 
@@ -12,8 +13,6 @@
 #define ADR_STREAMJID           Action::DR_StreamJid
 #define ADR_CONTACTJID          Action::DR_Parametr1
 #define ADR_NODE                Action::DR_Parametr2
-
-#define BDI_ITEMS_GEOMETRY      "DiscoItemsWindowGeometry"
 
 #define DIC_CLIENT              "client"
 
@@ -139,10 +138,6 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
   if (plugin)
     FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 
-  plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-
   plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
   if (plugin)
     FDataForms = qobject_cast<IDataForms *>(plugin->instance());
@@ -190,11 +185,6 @@ bool ServiceDiscovery::initObjects()
     FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
   }
 
-  return true;
-}
-
-bool ServiceDiscovery::startPlugin()
-{
   return true;
 }
 
@@ -458,12 +448,6 @@ void ServiceDiscovery::showDiscoItems(const Jid &AStreamJid, const Jid &AContact
     DiscoItemsWindow *itemsWindow = new DiscoItemsWindow(this,AStreamJid,AParent);
     connect(itemsWindow,SIGNAL(windowDestroyed(IDiscoItemsWindow *)),SLOT(onDiscoItemsWindowDestroyed(IDiscoItemsWindow *)));
     FDiscoItemsWindows.append(itemsWindow);
-    if (FSettingsPlugin)
-    {
-      ISettings *settings = FSettingsPlugin->settingsForPlugin(SERVICEDISCOVERY_UUID);
-      QString dataId = BDI_ITEMS_GEOMETRY+itemsWindow->streamJid().pBare();
-      itemsWindow->restoreGeometry(settings->loadBinaryData(dataId));
-    }
     emit discoItemsWindowCreated(itemsWindow);
     itemsWindow->discover(AContactJid,ANode);
     itemsWindow->show();
@@ -1392,14 +1376,11 @@ void ServiceDiscovery::onDiscoInfoWindowDestroyed(QObject *AObject)
 void ServiceDiscovery::onDiscoItemsWindowDestroyed(IDiscoItemsWindow *AWindow)
 {
   DiscoItemsWindow *itemsWindow = static_cast<DiscoItemsWindow *>(AWindow->instance());
-  if (itemsWindow && FSettingsPlugin)
+  if (itemsWindow)
   {
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(SERVICEDISCOVERY_UUID);
-    QString dataId = BDI_ITEMS_GEOMETRY+itemsWindow->streamJid().pBare();
-    settings->saveBinaryData(dataId,itemsWindow->saveGeometry());
+    FDiscoItemsWindows.removeAt(FDiscoItemsWindows.indexOf(itemsWindow));
+    emit discoItemsWindowDestroyed(itemsWindow);
   }
-  FDiscoItemsWindows.removeAt(FDiscoItemsWindows.indexOf(itemsWindow));
-  emit discoItemsWindowDestroyed(itemsWindow);
 }
 
 void ServiceDiscovery::onQueueTimerTimeout()

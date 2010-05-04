@@ -24,13 +24,10 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 
   ui.medEditor->installEventFilter(this);
 
-  setAutoResize(FMessageWidgets->editorAutoResize());
-  setMinimumLines(FMessageWidgets->editorMinimumLines());
-  setSendKey(FMessageWidgets->editorSendKey());
-
-  connect(FMessageWidgets->instance(),SIGNAL(editorAutoResizeChanged(bool)), SLOT(onEditorAutoResizeChanged(bool)));
-  connect(FMessageWidgets->instance(),SIGNAL(editorMinimumLinesChanged(int)), SLOT(onEditorMinimumLinesChanged(int)));
-  connect(FMessageWidgets->instance(),SIGNAL(editorSendKeyChanged(const QKeySequence &)), SLOT(onEditorSendKeyChanged(const QKeySequence &)));
+  onOptionsChanged(Options::node(OPV_MESSAGES_EDITORAUTORESIZE));
+  onOptionsChanged(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES));
+  onOptionsChanged(Options::node(OPV_MESSAGES_EDITORSENDKEY));
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 }
 
 EditWidget::~EditWidget()
@@ -211,17 +208,18 @@ void EditWidget::onSendButtonCliked(bool)
   sendMessage();
 }
 
-void EditWidget::onEditorAutoResizeChanged(bool AResize)
+void EditWidget::onOptionsChanged(const OptionsNode &ANode)
 {
-  setAutoResize(AResize);
-}
-
-void EditWidget::onEditorMinimumLinesChanged(int ALines)
-{
-  setMinimumLines(ALines);
-}
-
-void EditWidget::onEditorSendKeyChanged(const QKeySequence &AKey)
-{
-  setSendKey(AKey);
+  if (ANode.path() == OPV_MESSAGES_EDITORAUTORESIZE)
+  {
+    setAutoResize(ANode.value().toBool());
+  }
+  else if (ANode.path() == OPV_MESSAGES_EDITORMINIMUMLINES)
+  {
+    setMinimumLines(ANode.value().toInt());
+  }
+  else if (ANode.path() == OPV_MESSAGES_EDITORSENDKEY)
+  {
+    setSendKey(ANode.value().value<QKeySequence>());
+  }
 }

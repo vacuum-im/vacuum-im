@@ -8,6 +8,7 @@
 #include <definations/multiuserdataroles.h>
 #include <definations/notificationdataroles.h>
 #include <definations/rosterdragdropmimetypes.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionwidgetorders.h>
 #include <definations/resources.h>
@@ -21,19 +22,20 @@
 #include <interfaces/iroster.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/inotifications.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
-#include "subscriptionoptions.h"
 
 struct AutoSubscription {
   AutoSubscription() {
     silent = false;
-    autoOptions = 0;
+    autoSubscribe = false;
+    autoUnsubscribe = false;
   }
   bool silent;
-  int autoOptions;
+  bool autoSubscribe;
+  bool autoUnsubscribe;
 };
 
 class RosterChanger : 
@@ -55,10 +57,10 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IRostersDragDropHandler
   virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag);
   virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
@@ -71,19 +73,14 @@ public:
   virtual bool isAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual bool isAutoUnsubscribe(const Jid &AStreamJid, const Jid &AContactJid) const;
   virtual bool isSilentSubsctiption(const Jid &AStreamJid, const Jid &AContactJid) const;
-  virtual void insertAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid, int AAutoOptions, bool ASilently);
+  virtual void insertAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid, bool ASilently, bool ASubscr, bool AUnsubscr);
   virtual void removeAutoSubscribe(const Jid &AStreamJid, const Jid &AContactJid);
   virtual void subscribeContact(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage = "", bool ASilently = false);
   virtual void unsubscribeContact(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage = "", bool ASilently = false);
-  virtual bool checkOption(IRosterChanger::Option AOption) const;
-  virtual void setOption(IRosterChanger::Option AOption, bool AValue);
   virtual IAddContactDialog *showAddContactDialog(const Jid &AStreamJid);
 signals:
   void addContactDialogCreated(IAddContactDialog *ADialog);
   void subscriptionDialogCreated(ISubscriptionDialog *ADialog);
-  void optionChanged(IRosterChanger::Option AOption, bool AValue);
-  void optionsAccepted();
-  void optionsRejected();
 protected:
   QString subscriptionNotify(int ASubsType, const Jid &AContactJid) const;
   Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups, 
@@ -110,8 +107,6 @@ protected slots:
   void onRemoveGroup(bool);
   void onRemoveGroupItems(bool);
 protected slots:
-  void onSettingsOpened();
-  void onSettingsClosed();
   void onShowAddContactDialog(bool);
   void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
   void onRosterClosed(IRoster *ARoster);
@@ -126,11 +121,10 @@ private:
   IRostersModel *FRostersModel;
   IRostersView *FRostersView;
   INotifications *FNotifications;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
   IXmppUriQueries *FXmppUriQueries;
   IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
-  int FOptions;
   QMap<int, SubscriptionDialog *> FNotifyDialog;
   QMap<Jid, QMap<Jid, AutoSubscription> > FAutoSubscriptions;
 };

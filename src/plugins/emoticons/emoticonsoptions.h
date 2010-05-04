@@ -4,23 +4,30 @@
 #include <QWidget>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
+#include <definations/optionvalues.h>
 #include <interfaces/iemoticons.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include <utils/iconsetdelegate.h>
 #include "ui_emoticonsoptions.h"
 
 class EmoticonsOptions : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
-  EmoticonsOptions(IEmoticons *AEmoticons, QWidget *AParent = NULL);
+  EmoticonsOptions(IEmoticons *AEmoticons, QWidget *AParent);
   ~EmoticonsOptions();
+  virtual QWidget* instance() { return this; }
 public slots:
-  void apply();
+  virtual void apply();
+  virtual void reset();
 signals:
-  void optionsAccepted();
-protected:
-  void init();
+  void modified();
+  void childApply();
+  void childReset();
 protected slots:
   void onUpButtonClicked();
   void onDownButtonClicked();

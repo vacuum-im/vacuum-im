@@ -1,11 +1,12 @@
 #ifndef ICONSOPTIONSWIDGET_H
 #define ICONSOPTIONSWIDGET_H
 
-#include <QStringList>
 #include <QItemDelegate>
-#include <QSignalMapper>
 #include <definations/resources.h>
+#include <definations/optionvalues.h>
 #include <interfaces/istatusicons.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include <utils/iconstorage.h>
 #include <utils/iconsetdelegate.h>
 #include "ui_iconsoptionswidget.h"
@@ -26,15 +27,21 @@ private:
 
 
 class IconsOptionsWidget : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
-  IconsOptionsWidget(IStatusIcons *AStatusIcons);
+  IconsOptionsWidget(IStatusIcons *AStatusIcons, QWidget *AParent);
+  virtual QWidget* instance() { return this; }
 public slots:
-  void apply();
+  virtual void apply();
+  virtual void reset();
 signals:
-  void optionsAccepted();
+  void modified();
+  void childApply();
+  void childReset();
 protected:
   void populateRulesTable(QTableWidget *ATable, IStatusIcons::RuleType ARuleType);
 protected slots:

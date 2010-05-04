@@ -118,6 +118,18 @@
         <source>Sender</source>
         <translation>Nadawca</translation>
     </message>
+    <message>
+        <source>Single</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Headline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StyleOptionsWidgetClass</name>

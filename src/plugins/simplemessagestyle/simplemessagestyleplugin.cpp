@@ -4,17 +4,9 @@
 #include <QTimer>
 #include <QCoreApplication>
 
-#define SVN_STYLE                     "style[]"
-#define SVN_STYLE_ID                  SVN_STYLE ":" "styleId"
-#define SVN_STYLE_VARIANT             SVN_STYLE ":" "variant"
-#define SVN_STYLE_FONT_FAMILY         SVN_STYLE ":" "fontFamily"
-#define SVN_STYLE_FONT_SIZE           SVN_STYLE ":" "fontSize"
-#define SVN_STYLE_BG_COLOR            SVN_STYLE ":" "bgColor"
-#define SVN_STYLE_BG_IMAGE_FILE       SVN_STYLE ":" "bgImageFile"
-
 SimpleMessageStylePlugin::SimpleMessageStylePlugin()
 {
-  FSettingsPlugin = NULL;
+
 }
 
 SimpleMessageStylePlugin::~SimpleMessageStylePlugin()
@@ -31,11 +23,10 @@ void SimpleMessageStylePlugin::pluginInfo(IPluginInfo *APluginInfo)
   APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool SimpleMessageStylePlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool SimpleMessageStylePlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-  IPlugin *plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+  Q_UNUSED(APluginManager);
+  Q_UNUSED(AInitOrder);
   return true;
 }
 
@@ -45,10 +36,15 @@ bool SimpleMessageStylePlugin::initObjects()
   return true;
 }
 
-QString SimpleMessageStylePlugin::stylePluginId() const
+QString SimpleMessageStylePlugin::pluginId() const
 {
-  static QString id = "Simple";
+  static QString id = "SimpleMessageStyle";
   return id;
+}
+
+QString SimpleMessageStylePlugin::pluginName() const
+{
+  return tr("Simple Style");
 }
 
 QList<QString> SimpleMessageStylePlugin::styles() const
@@ -81,29 +77,18 @@ IMessageStyle *SimpleMessageStylePlugin::styleForOptions(const IMessageStyleOpti
   return FStyles.value(styleId,NULL);
 }
 
-IMessageStyleSettings *SimpleMessageStylePlugin::styleSettings(int AMessageType, const QString &AContext, QWidget *AParent)
-{
-  updateAvailStyles();
-  return new SimpleOptionsWidget(this,AMessageType,AContext,AParent);
-}
-
-IMessageStyleOptions SimpleMessageStylePlugin::styleOptions(int AMessageType, const QString &AContext) const
+IMessageStyleOptions SimpleMessageStylePlugin::styleOptions(const OptionsNode &ANode, int AMessageType) const
 {
   IMessageStyleOptions soptions;
   QVariant &styleId = soptions.extended[MSO_STYLE_ID];
 
-  if (FSettingsPlugin)
-  {
-    QString ns = QString::number(AMessageType)+"|"+AContext;
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    soptions.pluginId = stylePluginId();
-    styleId = settings->valueNS(SVN_STYLE_ID,ns);
-    soptions.extended.insert(MSO_VARIANT,settings->valueNS(SVN_STYLE_VARIANT,ns).toString());
-    soptions.extended.insert(MSO_FONT_FAMILY,settings->valueNS(SVN_STYLE_FONT_FAMILY,ns).toString());
-    soptions.extended.insert(MSO_FONT_SIZE,settings->valueNS(SVN_STYLE_FONT_SIZE,ns).toInt());
-    soptions.extended.insert(MSO_BG_COLOR,settings->valueNS(SVN_STYLE_BG_COLOR,ns).toString());
-    soptions.extended.insert(MSO_BG_IMAGE_FILE,settings->valueNS(SVN_STYLE_BG_IMAGE_FILE,ns).toString());
-  }
+  soptions.pluginId = pluginId();
+  styleId = ANode.value("style-id").toString();
+  soptions.extended.insert(MSO_VARIANT,ANode.value("variant"));
+  soptions.extended.insert(MSO_FONT_FAMILY,ANode.value("font-family"));
+  soptions.extended.insert(MSO_FONT_SIZE,ANode.value("font-size"));
+  soptions.extended.insert(MSO_BG_COLOR,ANode.value("bg-color"));
+  soptions.extended.insert(MSO_BG_IMAGE_FILE,ANode.value("bg-image-file"));
 
   if (!FStylePaths.isEmpty() && !FStylePaths.contains(styleId.toString()))
   {
@@ -149,27 +134,24 @@ IMessageStyleOptions SimpleMessageStylePlugin::styleOptions(int AMessageType, co
   return soptions;
 }
 
-void SimpleMessageStylePlugin::setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)
+IOptionsWidget *SimpleMessageStylePlugin::styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent)
 {
-  if (FSettingsPlugin)
-  {
-    QString ns = QString::number(AMessageType)+"|"+AContext;
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    if (FStylePaths.contains(AOptions.extended.value(MSO_STYLE_ID).toString()))
-    {
-      settings->setValueNS(SVN_STYLE_ID,ns,AOptions.extended.value(MSO_STYLE_ID));
-      settings->setValueNS(SVN_STYLE_VARIANT,ns,AOptions.extended.value(MSO_VARIANT));
-      settings->setValueNS(SVN_STYLE_FONT_FAMILY,ns,AOptions.extended.value(MSO_FONT_FAMILY));
-      settings->setValueNS(SVN_STYLE_FONT_SIZE,ns,AOptions.extended.value(MSO_FONT_SIZE));
-      settings->setValueNS(SVN_STYLE_BG_COLOR,ns,AOptions.extended.value(MSO_BG_COLOR));
-      settings->setValueNS(SVN_STYLE_BG_IMAGE_FILE,ns,AOptions.extended.value(MSO_BG_IMAGE_FILE));
-    }
-    else
-    {
-      settings->deleteNS(ns);
-    }
-  }
-  emit styleOptionsChanged(AOptions,AMessageType,AContext);
+  updateAvailStyles();
+  return new SimpleOptionsWidget(this,ANode,AMessageType,AParent);
+}
+
+void SimpleMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, OptionsNode ANode)
+{
+  SimpleOptionsWidget *widget = qobject_cast<SimpleOptionsWidget *>(AWidget->instance());
+  if (widget)
+    widget->apply(ANode);
+}
+
+void SimpleMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, IMessageStyleOptions &AOptions)
+{
+  SimpleOptionsWidget *widget = qobject_cast<SimpleOptionsWidget *>(AWidget->instance());
+  if (widget)
+    AOptions = widget->styleOptions();
 }
 
 QList<QString> SimpleMessageStylePlugin::styleVariants(const QString &AStyleId) const

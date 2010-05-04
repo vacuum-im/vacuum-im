@@ -1,2 +1,2 @@
 TEMPLATE  = subdirs
-SUBDIRS   = zlib minizip idn
+SUBDIRS   = zlib minizip idn qtlockedfile

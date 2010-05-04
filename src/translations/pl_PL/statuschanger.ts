@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl_PL" sourcelanguage="en">
 <context>
-    <name>AccountOptionsWidgetClass</name>
-    <message>
-        <source>Auto connect on startup</source>
-        <translation>Połącz zaraz po uruchomieniu programu</translation>
-    </message>
-    <message>
-        <source>Auto reconnect if disconnected</source>
-        <translation>Automatycznie przywracaj połączenie</translation>
-    </message>
-</context>
-<context>
     <name>EditStatusDialog</name>
     <message>
         <source>Show</source>
@@ -112,14 +101,6 @@
         <translation>Pozwala zmieniać status w sieci Jabber</translation>
     </message>
     <message>
-        <source>Modify status</source>
-        <translation>Modyfikuj status</translation>
-    </message>
-    <message>
-        <source>Edit statuses</source>
-        <translation>Edytuj statusy</translation>
-    </message>
-    <message>
         <source>Connection errors</source>
         <translation>Błędy połączenia</translation>
     </message>
@@ -190,6 +171,22 @@
     <message>
         <source>Connecting...</source>
         <translation>Łączenie...</translation>
+    </message>
+    <message>
+        <source>Modify Status</source>
+        <translation type="unfinished">Modyfikuj status</translation>
+    </message>
+    <message>
+        <source>Edit Statuses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto connect on startup</source>
+        <translation type="unfinished">Połącz zaraz po uruchomieniu programu</translation>
+    </message>
+    <message>
+        <source>Auto reconnect if disconnected</source>
+        <translation type="unfinished">Automatycznie przywracaj połączenie</translation>
     </message>
 </context>
 </TS>

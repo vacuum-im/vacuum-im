@@ -3,6 +3,7 @@
 
 #include <QTimer>
 #include <QDateTime>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -10,16 +11,11 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iautostatus.h>
 #include <interfaces/istatuschanger.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ipresence.h>
-#include <interfaces/isettings.h>
+#include <utils/options.h>
 #include "statusoptionswidget.h"
-
-struct StatusRuleItem {
-  int id;
-  bool enabled;
-  IAutoStatusRule rule;
-};
 
 class AutoStatus : 
   public QObject,
@@ -38,50 +34,45 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin();
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IAutoStatus
   virtual int idleSeconds() const;
-  virtual int activeRule() const;
-  virtual int insertRule(const IAutoStatusRule &ARule);
-  virtual QList<int> rules() const;
-  virtual IAutoStatusRule ruleValue(int ARuleId) const;
-  virtual bool isRuleEnabled(int ARuleId) const;
-  virtual void setRuleEnabled(int ARuleId, bool AEnabled);
-  virtual void updateRule(int ARuleId, const IAutoStatusRule &ARule);
-  virtual void removeRule(int ARuleId);
+  virtual QUuid activeRule() const;
+  virtual QList<QUuid> rules() const;
+  virtual IAutoStatusRule ruleValue(const QUuid &ARuleId) const;
+  virtual bool isRuleEnabled(const QUuid &ARuleId) const;
+  virtual void setRuleEnabled(const QUuid &ARuleId, bool AEnabled);
+  virtual QUuid insertRule(const IAutoStatusRule &ARule);
+  virtual void updateRule(const QUuid &ARuleId, const IAutoStatusRule &ARule);
+  virtual void removeRule(const QUuid &ARuleId);
 signals:
-  void ruleInserted(int ARuleId);
-  void ruleChanged(int ARuleId);
-  void ruleRemoved(int ARuleId);
-  void ruleActivated(int ARuleId);
-  void optionsAccepted();
-  void optionsRejected();
+  void ruleInserted(const QUuid &ARuleId);
+  void ruleChanged(const QUuid &ARuleId);
+  void ruleRemoved(const QUuid &ARuleId);
+  void ruleActivated(const QUuid &ARuleId);
 protected:
   void replaceDateTime(QString &AText, const QString &APattern, const QDateTime &ADateTime);
   void prepareRule(IAutoStatusRule &ARule);
-  void setActiveRule(int ARuleId);
+  void setActiveRule(const QUuid &ARuleId);
   void updateActiveRule();
 protected slots:
   void onIdleTimerTimeout();
-  void onSettingsOpened();
-  void onProfileClosed(const QString &AProfileName);
-  void onSettingsClosed();
+  void onOptionsOpened();
+  void onProfileClosed(const QString &AName);
 private:
   IStatusChanger *FStatusChanger;
   IAccountManager *FAccountManager;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
 private:
-  int FRuleId;
-  int FActiveRule;
   int FAutoStatusId;
+  QUuid FActiveRule;
   QTimer FIdleTimer;
   QPoint FLastCursorPos;
   QDateTime FLastCursorTime;
   QMap<Jid, int> FStreamStatus;
-  QMap<int, StatusRuleItem> FRules;
 };
 
 #endif // AUTOSTATUS_H

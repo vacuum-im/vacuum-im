@@ -9,6 +9,7 @@
 #include <definations/rosterindextyperole.h>
 #include <definations/rosterdataholderorders.h>
 #include <definations/rostertooltiporders.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionwidgetorders.h>
 #include <definations/resources.h>
@@ -21,9 +22,9 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include <utils/iconstorage.h>
-#include "rosteroptionswidget.h"
 
 class Avatars : 
   public QObject,
@@ -45,7 +46,7 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IStanzaHandler
   virtual bool stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
@@ -60,7 +61,7 @@ public:
   virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
   virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IAvatars
   virtual QString avatarFileName(const QString &AHash) const;
   virtual bool hasAvatar(const QString &AHash) const;
@@ -71,19 +72,10 @@ public:
   virtual QImage avatarImage(const Jid &AContactJid) const;
   virtual bool setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat = NULL);
   virtual QString setCustomPictire(const Jid &AContactJid, const QString &AImageFile);
-  virtual bool avatarsVisible() const;
-  virtual void setAvatarsVisible(bool AVisible);
-  virtual bool showEmptyAvatars() const;
-  virtual void setShowEmptyAvatars(bool AShow);
 signals:
   void avatarChanged(const Jid &AContactJid);
-  void avatarsVisibleChanged(bool AVisible);
-  void showEmptyAvatarsChanged(bool AShow);
   //IRosterDataHolder
   void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 protected:
   QByteArray loadAvatarFromVCard(const Jid &AContactJid) const;
   void updatePresence(const Jid &AStreamJid) const;
@@ -99,9 +91,10 @@ protected slots:
   void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
   void onSetAvatarByAction(bool);
   void onClearAvatarByAction(bool);
-  void onSettingsOpened();
-  void onSettingsClosed();
   void onIconStorageChanged();
+  void onOptionsOpened();
+  void onOptionsClosed();
+  void onOptionsChanged(const OptionsNode &ANode);
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
@@ -110,7 +103,7 @@ private:
   IPresencePlugin *FPresencePlugin;
   IRostersModel *FRostersModel;
   IRostersViewPlugin *FRostersViewPlugin;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
 private:
   QMap<Jid, int> FSHIPresenceIn;
   QMap<Jid, int> FSHIPresenceOut;
@@ -121,11 +114,10 @@ private:
   QHash<Jid, QString> FIqAvatars;
   QMap<QString, Jid> FIqAvatarRequests;
 private:
-  QMap<Jid, QString> FCustomPictures;
-private:
   QSize FAvatarSize;
   bool FAvatarsVisible;
   bool FShowEmptyAvatars;
+  QMap<Jid, QString> FCustomPictures;
 private:
   int FRosterLabelId;
   QDir FAvatarsDir;

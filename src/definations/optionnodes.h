@@ -1,18 +1,17 @@
 #ifndef DEF_OPTIONNODES_H
 #define DEF_OPTIONNODES_H
 
-// ROOT
-#define ON_ACCOUNTS           "Accounts"
-#define ON_STATUSICONS        "StatusIcons"
-#define ON_ROSTER             "Roster"
-#define ON_MESSAGES           "Messages"
-#define ON_EMOTICONS          "Emoticons"
-#define ON_HISTORY            "History"
-#define ON_NOTIFICATIONS      "Notifications"
-#define ON_AUTO_STATUS        "AutoStatus"
-#define ON_MISC               "Misc"
-#define ON_MESSAGE_STYLES     "MessageStyles"
-#define ON_DATASTREAMS        "DataStreams"
-#define ON_FILETRANSFER       "FileTransfer"
+#define OPN_ACCOUNTS            "Accounts"
+#define OPN_STATUSICONS         "StatusIcons"
+#define OPN_ROSTER              "Roster"
+#define OPN_MESSAGES            "Messages"
+#define OPN_EMOTICONS           "Emoticons"
+#define OPN_HISTORY             "History"
+#define OPN_NOTIFICATIONS       "Notifications"
+#define OPN_AUTO_STATUS         "AutoStatus"
+#define OPN_MISC                "Misc"
+#define OPN_MESSAGE_STYLES      "MessageStyles"
+#define OPN_DATASTREAMS         "DataStreams"
+#define OPN_FILETRANSFER        "FileTransfer"
 
 #endif

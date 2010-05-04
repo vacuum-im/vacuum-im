@@ -3,11 +3,12 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <definations/optionvalues.h>
 #include <definations/resources.h>
 #include <definations/menuicons.h>
 #include <definations/actiongroups.h>
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/isettings.h>
+#include <utils/options.h>
 #include <utils/widgetmanager.h>
 #include "ui_tabwindow.h"
 
@@ -55,14 +56,13 @@ protected slots:
   void onTabPageDestroyed();
   void onTabWindowAppended(const QUuid &AWindowId, const QString &AName);
   void onTabWindowNameChanged(const QUuid &AWindowId, const QString &AName);
-  void onDefaultTabWindowChanged(const QUuid &AWindowId);
   void onTabWindowDeleted(const QUuid &AWindowId);
+  void onOptionsChanged(const OptionsNode &ANode);
   void onActionTriggered(bool);
 private:
   Ui::TabWindowClass ui;
 private:
   IMessageWidgets *FMessageWidgets;
-  ISettings *FSettings;
 private:
   Menu *FWindowMenu;
   Menu *FJoinMenu;

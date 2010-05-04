@@ -2,29 +2,28 @@
 
 #include <QVBoxLayout>
 
-ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, ISettings *ASettings, 
-                                                 const QString &ASettingsNS, QWidget *AParent) : QWidget(AParent)
+ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent) : QWidget(AParent)
 {
   ui.setupUi(this);
   FManager = AManager;
-  FSettings = ASettings;
-  FSettingsNS = ASettingsNS;
+  FOptions = ANode;
   FProxySettings = NULL;
 
-  if (FSettings)
+  reset();
+  FProxySettings = FManager!=NULL ? FManager->proxySettingsWidget(FOptions.node("proxy"), ui.wdtProxy) : NULL;
+  if (FProxySettings)
   {
-    ui.lneHost->setText(FSettings->valueNS(SVN_CONNECTION_HOST,FSettingsNS).toString());
-    ui.spbPort->setValue(FSettings->valueNS(SVN_CONNECTION_PORT,FSettingsNS,5222).toInt());
-    ui.chbUseSSL->setChecked(FSettings->valueNS(SVN_CONNECTION_USE_SSL,FSettingsNS,false).toBool());
-    ui.chbIgnoreSSLWarnings->setChecked(FSettings->valueNS(SVN_CONNECTION_IGNORE_SSLERROR,FSettingsNS,true).toBool());
-    FProxySettings = FManager!=NULL ? FManager->proxySettingsWidget(FSettingsNS, ui.wdtProxy) : NULL;
-    if (FProxySettings)
-    {
-      QVBoxLayout *layout = new QVBoxLayout(ui.wdtProxy);
-      layout->setMargin(0);
-      layout->addWidget(FProxySettings);
-    }
+    QVBoxLayout *layout = new QVBoxLayout(ui.wdtProxy);
+    layout->setMargin(0);
+    layout->addWidget(FProxySettings->instance());
+    connect(FProxySettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
   }
+  else
+    ui.wdtProxy->setVisible(false);
+
+  connect(ui.lneHost,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+  connect(ui.spbPort,SIGNAL(valueChanged(int)),SIGNAL(modified()));
+  connect(ui.chbUseSSL,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 }
 
 ConnectionOptionsWidget::~ConnectionOptionsWidget()
@@ -32,16 +31,30 @@ ConnectionOptionsWidget::~ConnectionOptionsWidget()
 
 }
 
-void ConnectionOptionsWidget::apply(const QString &ASettingsNS)
+void ConnectionOptionsWidget::apply(OptionsNode ANode)
 {
-  if (FSettings)
-  {
-    QString settingsNS = ASettingsNS.isEmpty() ? FSettingsNS : ASettingsNS;
-    FSettings->setValueNS(SVN_CONNECTION_HOST, settingsNS, ui.lneHost->text());
-    FSettings->setValueNS(SVN_CONNECTION_PORT, settingsNS, ui.spbPort->value());
-    FSettings->setValueNS(SVN_CONNECTION_USE_SSL, settingsNS, ui.chbUseSSL->isChecked());
-    FSettings->setValueNS(SVN_CONNECTION_IGNORE_SSLERROR, settingsNS, ui.chbIgnoreSSLWarnings->isChecked());
-    if (FProxySettings)
-      FManager->saveProxySettings(FProxySettings, FSettingsNS);
-  }
+  OptionsNode node = !ANode.isNull() ? ANode : FOptions;
+  node.setValue(ui.lneHost->text(),"host");
+  node.setValue(ui.spbPort->value(),"port");
+  node.setValue(ui.chbUseSSL->isChecked(),"use-ssl");
+  node.setValue(ui.chbIgnoreSSLWarnings->isChecked(),"ignore-ssl-errors");
+  if (FProxySettings)
+    FManager->saveProxySettings(FProxySettings, node.node("proxy"));
+  emit childApply();
+}
+
+void ConnectionOptionsWidget::apply()
+{
+  apply(FOptions);
+}
+
+void ConnectionOptionsWidget::reset()
+{
+  ui.lneHost->setText(FOptions.value("host").toString());
+  ui.spbPort->setValue(FOptions.value("port").toInt());
+  ui.chbUseSSL->setChecked(FOptions.value("use-ssl").toBool());
+  ui.chbIgnoreSSLWarnings->setChecked(FOptions.value("ignore-ssl-errors").toBool());
+  if (FProxySettings)
+    FProxySettings->reset();
+  emit childReset();
 }

@@ -3,19 +3,28 @@
 
 #include <QWidget>
 #include <interfaces/iconnectionmanager.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include "ui_proxysettingswidget.h"
 
-#define DEFAULT_PROXY_REF_UUID  "{b919d5c9-6def-43ba-87aa-892d49b9ac67}"
-
 class ProxySettingsWidget : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
-  ProxySettingsWidget(IConnectionManager *AManager, const QString &ASettingsNS, QWidget *AParent);
+  ProxySettingsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent);
   ~ProxySettingsWidget();
+  virtual QWidget* instance() { return this; }
 public slots:
-  void apply(const QString &ASettingsNS);
+  void apply(OptionsNode ANode);
+  void apply();
+  void reset();
+signals:
+  void modified();
+  void childApply();
+  void childReset();
 protected slots:
   void onEditButtonClicked(bool);
   void onProxyChanged(const QUuid &AProxyId, const IConnectionProxy &AProxy);
@@ -23,7 +32,7 @@ protected slots:
 private:
   Ui::ProxySettingsWidgetClass ui;
 private:
-  QString FSettingsNS;
+  OptionsNode FOptions;
   IConnectionManager *FManager;
 };
 

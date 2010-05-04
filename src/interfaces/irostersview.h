@@ -27,12 +27,6 @@ public:
 class IRostersView
 {
 public:
-  enum Option {
-    ShowOfflineContacts           =0x01,
-    ShowOnlineFirst               =0x02,
-    ShowResource                  =0x04,
-    ShowStatusText                =0x08
-  };
   enum LabelFlags {
     LabelBlink                    =0x01,
     LabelVisible                  =0x02,
@@ -107,12 +101,8 @@ class IRostersViewPlugin
 public:
   virtual QObject *instance() = 0;
   virtual IRostersView *rostersView() =0;
-  virtual bool checkOption(IRostersView::Option AOption) const =0;
-  virtual void setOption(IRostersView::Option AOption, bool AValue) =0;
   virtual void startRestoreExpandState() =0;
   virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
-protected:
-  virtual void optionChanged(IRostersView::Option AOption, bool AValue) =0;
 };
 
 Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.0");

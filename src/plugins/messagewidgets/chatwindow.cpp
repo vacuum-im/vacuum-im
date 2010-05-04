@@ -3,15 +3,10 @@
 #include <QKeyEvent>
 #include <QCoreApplication>
 
-#define SVN_CHATWINDOW              "chatWindow[]"
-#define SVN_CHAT_TABWINDOW_ID       SVN_CHATWINDOW":tabWindowId"
-#define BDI_CHAT_GEOMETRY           "ChatWindowGeometry"
-
 ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
   ui.setupUi(this);
 
-  FSettings = NULL;
   FStatusChanger = NULL;
   FMessageWidgets = AMessageWidgets;
 
@@ -23,8 +18,7 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
   ui.wdtInfo->setLayout(new QVBoxLayout);
   ui.wdtInfo->layout()->setMargin(0);
   ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
-  onShowInfoWidgetChanged(FMessageWidgets->showInfoWidgetInChatWindow());
-  connect(FMessageWidgets->instance(),SIGNAL(showInfoWidgetInChatWindowChanged(bool)),SLOT(onShowInfoWidgetChanged(bool)));
+  onOptionsChanged(Options::node(OPV_MESSAGES_SHOWINFOWIDGET));
 
   FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid);
   ui.wdtView->setLayout(new QVBoxLayout);
@@ -132,38 +126,28 @@ void ChatWindow::initialize()
     }
   }
 
-  plugin = FMessageWidgets->pluginManager()->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-  {
-    ISettingsPlugin *settingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
-    if (settingsPlugin)
-    {
-      FSettings = settingsPlugin->settingsForPlugin(MESSAGEWIDGETS_UUID);
-    }
-  }
-
   plugin = FMessageWidgets->pluginManager()->pluginInterface("IStatusChanger").value(0,NULL);
   if (plugin)
   {
     FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
   }
+
+  connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 }
 
 void ChatWindow::saveWindowGeometry()
 {
-  if (FSettings && isWindow())
+  if (isWindow())
   {
-    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    FSettings->saveBinaryData(BDI_CHAT_GEOMETRY"|"+dataId,saveGeometry());
+    Options::setFileValue(saveGeometry(),"messages.chatwindow.geometry",tabPageId());
   }
 }
 
 void ChatWindow::loadWindowGeometry()
 {
-  if (FSettings && isWindow())
+  if (isWindow())
   {
-    QString dataId = FStreamJid.pBare()+"|"+FContactJid.pBare();
-    restoreGeometry(FSettings->loadBinaryData(BDI_CHAT_GEOMETRY"|"+dataId));
+    restoreGeometry(Options::fileValue("messages.chatwindow.geometry",tabPageId()).toByteArray());
   }
 }
 
@@ -233,7 +217,10 @@ void ChatWindow::onStreamJidChanged(const Jid &ABefour)
   }
 }
 
-void ChatWindow::onShowInfoWidgetChanged(bool AShow)
+void ChatWindow::onOptionsChanged(const OptionsNode &ANode)
 {
-  FInfoWidget->instance()->setVisible(AShow);
+  if (ANode.path() == OPV_MESSAGES_SHOWINFOWIDGET)
+  {
+    FInfoWidget->instance()->setVisible(ANode.value().toBool());
+  }
 }

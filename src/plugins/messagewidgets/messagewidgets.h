@@ -3,6 +3,7 @@
 
 #include <QDesktopServices>
 #include <QObjectCleanupHandler>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -10,7 +11,8 @@
 #include <definations/toolbargroups.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include "infowidget.h"
 #include "editwidget.h"
 #include "viewwidget.h"
@@ -41,10 +43,10 @@ public:
   virtual void pluginInfo(IPluginInfo *APluginInfo);
   virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
   virtual bool initObjects();
-  virtual bool initSettings() { return true; }
+  virtual bool initSettings();
   virtual bool startPlugin() { return true; }
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //IViewUrlHandler
   virtual bool viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
   //IMessageWidgets
@@ -71,20 +73,6 @@ public:
   virtual ITabWindow *openTabWindow(const QUuid &AWindowId);
   virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const;
   virtual void assignTabWindowPage(ITabWindowPage *APage);
-  virtual bool tabWindowsEnabled() const;
-  virtual void setTabWindowsEnabled(bool AEnabled);
-  virtual QUuid defaultTabWindow() const;
-  virtual void setDefaultTabWindow(const QUuid &AWindowId);
-  virtual bool chatWindowShowStatus() const;
-  virtual void setChatWindowShowStatus(bool AShow);
-  virtual bool editorAutoResize() const;
-  virtual void setEditorAutoResize(bool AResize);
-  virtual bool showInfoWidgetInChatWindow() const;
-  virtual void setShowInfoWidgetInChatWindow(bool AShow);
-  virtual int editorMinimumLines() const;
-  virtual void setEditorMinimumLines(int ALines);
-  virtual QKeySequence editorSendKey() const;
-  virtual void setEditorSendKey(const QKeySequence &AKey);
   virtual QList<IViewDropHandler *> viewDropHandlers() const;
   virtual void insertViewDropHandler(IViewDropHandler *AHandler);
   virtual void removeViewDropHandler(IViewDropHandler *AHandler);
@@ -108,20 +96,10 @@ signals:
   void tabWindowDeleted(const QUuid &AWindowId);
   void tabWindowCreated(ITabWindow *AWindow);
   void tabWindowDestroyed(ITabWindow *AWindow);
-  void tabWindowsEnabledChanged(bool AEnabled);
-  void defaultTabWindowChanged(const QUuid &AWindowId);
-  void chatWindowShowStatusChanged(bool AShow);
-  void editorAutoResizeChanged(bool AResize);
-  void showInfoWidgetInChatWindowChanged(bool AShow);
-  void editorMinimumLinesChanged(int ALines);
-  void editorSendKeyChanged(const QKeySequence &AKey);
   void viewDropHandlerInserted(IViewDropHandler *AHandler);
   void viewDropHandlerRemoved(IViewDropHandler *AHandler);
   void viewUrlHandlerInserted(IViewUrlHandler *AHandler, int AOrder);
   void viewUrlHandlerRemoved(IViewUrlHandler *AHandler, int AOrder);
-signals:
-  void optionsAccepted();
-  void optionsRejected();
 protected:
   void insertQuoteAction(IToolBarWidget *AWidget);
   void deleteWindows();
@@ -135,27 +113,19 @@ protected slots:
   void onTabWindowDestroyed();
   void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
   void onStreamRemoved(IXmppStream *AXmppStream);
-  void onSettingsOpened();
-  void onSettingsClosed();
+  void onOptionsOpened();
+  void onOptionsClosed();
 private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
 private:
   QList<ITabWindow *> FTabWindows;
   QList<IChatWindow *> FChatWindows;
   QList<IMessageWindow *> FMessageWindows;
   QObjectCleanupHandler FCleanupHandler;
 private:
-  QUuid FDefaultTabWindow;
-  bool FTabWindowsEnabled;
-  bool FChatWindowShowStatus;
-  bool FEditorAutoResize;
-  bool FShowInfoWidgetInChatWindow;
-  int FEditorMinimumLines;
-  QKeySequence FEditorSendKey;
-private:
-  QMap<QUuid, QString> FAvailTabWindows;
+  QMap<QString, QUuid> FPageWindows;
   QList<IViewDropHandler *> FViewDropHandlers;
   QMultiMap<int,IViewUrlHandler *> FViewUrlHandlers;
 };

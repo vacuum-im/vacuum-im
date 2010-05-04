@@ -4,18 +4,9 @@
 #include <QTimer>
 #include <QCoreApplication>
 
-#define SVN_STYLE                     "style[]"
-#define SVN_STYLE_ID                  SVN_STYLE ":" "styleId"
-#define SVN_STYLE_VARIANT             SVN_STYLE ":" "variant"
-#define SVN_STYLE_FONT_FAMILY         SVN_STYLE ":" "fontFamily"
-#define SVN_STYLE_FONT_SIZE           SVN_STYLE ":" "fontSize"
-#define SVN_STYLE_BG_COLOR            SVN_STYLE ":" "bgColor"
-#define SVN_STYLE_BG_IMAGE_FILE       SVN_STYLE ":" "bgImageFile"
-#define SVN_STYLE_BG_IMAGE_LAYOUT     SVN_STYLE ":" "bgImageLayout"
-
 AdiumMessageStylePlugin::AdiumMessageStylePlugin()
 {
-  FSettingsPlugin = NULL;
+
 }
 
 AdiumMessageStylePlugin::~AdiumMessageStylePlugin()
@@ -32,11 +23,10 @@ void AdiumMessageStylePlugin::pluginInfo( IPluginInfo *APluginInfo )
   APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool AdiumMessageStylePlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool AdiumMessageStylePlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-  IPlugin *plugin = APluginManager->pluginInterface("ISettingsPlugin").value(0,NULL);
-  if (plugin)
-    FSettingsPlugin = qobject_cast<ISettingsPlugin *>(plugin->instance());
+  Q_UNUSED(APluginManager);
+  Q_UNUSED(AInitOrder);
   return true;
 }
 
@@ -46,10 +36,15 @@ bool AdiumMessageStylePlugin::initObjects()
   return true;
 }
 
-QString AdiumMessageStylePlugin::stylePluginId() const
+QString AdiumMessageStylePlugin::pluginId() const
 {
-  static QString id = "Adium";
+  static const QString id = "AdiumMessageStyle";
   return id;
+}
+
+QString AdiumMessageStylePlugin::pluginName() const
+{
+  return tr("Adium Style");
 }
 
 QList<QString> AdiumMessageStylePlugin::styles() const
@@ -82,31 +77,20 @@ IMessageStyle *AdiumMessageStylePlugin::styleForOptions(const IMessageStyleOptio
   return FStyles.value(styleId,NULL);
 }
 
-IMessageStyleSettings *AdiumMessageStylePlugin::styleSettings(int AMessageType, const QString &AContext, QWidget *AParent)
-{
-  updateAvailStyles();
-  return new AdiumOptionsWidget(this,AMessageType,AContext,AParent);
-}
-
-IMessageStyleOptions AdiumMessageStylePlugin::styleOptions(int AMessageType, const QString &AContext) const
+IMessageStyleOptions AdiumMessageStylePlugin::styleOptions(const OptionsNode &ANode, int AMessageType) const
 {
   IMessageStyleOptions soptions;
   QVariant &styleId = soptions.extended[MSO_STYLE_ID];
 
-  if (FSettingsPlugin)
-  {
-    QString ns = QString::number(AMessageType)+"|"+AContext;
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    soptions.pluginId = stylePluginId();
-    styleId = settings->valueNS(SVN_STYLE_ID,ns);
-    soptions.extended.insert(MSO_HEADER_TYPE,AdiumMessageStyle::HeaderNone);
-    soptions.extended.insert(MSO_VARIANT,settings->valueNS(SVN_STYLE_VARIANT,ns).toString());
-    soptions.extended.insert(MSO_FONT_FAMILY,settings->valueNS(SVN_STYLE_FONT_FAMILY,ns).toString());
-    soptions.extended.insert(MSO_FONT_SIZE,settings->valueNS(SVN_STYLE_FONT_SIZE,ns).toInt());
-    soptions.extended.insert(MSO_BG_COLOR,settings->valueNS(SVN_STYLE_BG_COLOR,ns).toString());
-    soptions.extended.insert(MSO_BG_IMAGE_FILE,settings->valueNS(SVN_STYLE_BG_IMAGE_FILE,ns).toString());
-    soptions.extended.insert(MSO_BG_IMAGE_LAYOUT,settings->valueNS(SVN_STYLE_BG_IMAGE_LAYOUT,ns,AdiumMessageStyle::ImageNormal).toInt());
-  }
+  soptions.pluginId = pluginId();
+  styleId = ANode.value("style-id").toString();
+  soptions.extended.insert(MSO_HEADER_TYPE,AdiumMessageStyle::HeaderNone);
+  soptions.extended.insert(MSO_VARIANT,ANode.value("variant"));
+  soptions.extended.insert(MSO_FONT_FAMILY,ANode.value("font-family"));
+  soptions.extended.insert(MSO_FONT_SIZE,ANode.value("font-size"));
+  soptions.extended.insert(MSO_BG_COLOR,ANode.value("bg-color"));
+  soptions.extended.insert(MSO_BG_IMAGE_FILE,ANode.value("bg-image-file"));
+  soptions.extended.insert(MSO_BG_IMAGE_LAYOUT,ANode.value("bg-image-layout"));
 
   if (!FStylePaths.isEmpty() && !FStylePaths.contains(styleId.toString()))
   {
@@ -128,7 +112,7 @@ IMessageStyleOptions AdiumMessageStylePlugin::styleOptions(int AMessageType, con
   {
     QList<QString> variants = styleVariants(styleId.toString());
     QMap<QString,QVariant> info = styleInfo(styleId.toString());
-   
+
     if (!variants.contains(soptions.extended.value(MSO_VARIANT).toString()))
       soptions.extended.insert(MSO_VARIANT,info.value(MSIV_DEFAULT_VARIANT, !variants.isEmpty() ? variants.first() : QString::null));
 
@@ -142,7 +126,7 @@ IMessageStyleOptions AdiumMessageStylePlugin::styleOptions(int AMessageType, con
     {
       soptions.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
     }
-    
+
     if (soptions.extended.value(MSO_FONT_FAMILY).toString().isEmpty())
       soptions.extended.insert(MSO_FONT_FAMILY,info.value(MSIV_DEFAULT_FONT_FAMILY));
     if (soptions.extended.value(MSO_FONT_SIZE).toInt()==0)
@@ -151,28 +135,24 @@ IMessageStyleOptions AdiumMessageStylePlugin::styleOptions(int AMessageType, con
   return soptions;
 }
 
-void AdiumMessageStylePlugin::setStyleOptions(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)
+IOptionsWidget *AdiumMessageStylePlugin::styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent)
 {
-  if (FSettingsPlugin)
-  {
-    QString ns = QString::number(AMessageType)+"|"+AContext;
-    ISettings *settings = FSettingsPlugin->settingsForPlugin(pluginUuid());
-    if (FStylePaths.contains(AOptions.extended.value(MSO_STYLE_ID).toString()))
-    {
-      settings->setValueNS(SVN_STYLE_ID,ns,AOptions.extended.value(MSO_STYLE_ID));
-      settings->setValueNS(SVN_STYLE_VARIANT,ns,AOptions.extended.value(MSO_VARIANT));
-      settings->setValueNS(SVN_STYLE_FONT_FAMILY,ns,AOptions.extended.value(MSO_FONT_FAMILY));
-      settings->setValueNS(SVN_STYLE_FONT_SIZE,ns,AOptions.extended.value(MSO_FONT_SIZE));
-      settings->setValueNS(SVN_STYLE_BG_COLOR,ns,AOptions.extended.value(MSO_BG_COLOR));
-      settings->setValueNS(SVN_STYLE_BG_IMAGE_FILE,ns,AOptions.extended.value(MSO_BG_IMAGE_FILE));
-      settings->setValueNS(SVN_STYLE_BG_IMAGE_LAYOUT,ns,AOptions.extended.value(MSO_BG_IMAGE_LAYOUT));
-    }
-    else
-    {
-      settings->deleteNS(ns);
-    }
-  }
-  emit styleOptionsChanged(AOptions,AMessageType,AContext);
+  updateAvailStyles();
+  return new AdiumOptionsWidget(this,ANode,AMessageType,AParent);
+}
+
+void AdiumMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, OptionsNode ANode)
+{
+  AdiumOptionsWidget *widget = qobject_cast<AdiumOptionsWidget *>(AWidget->instance());
+  if (widget)
+    widget->apply(ANode);
+}
+
+void AdiumMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, IMessageStyleOptions &AOptions)
+{
+  AdiumOptionsWidget *widget = qobject_cast<AdiumOptionsWidget *>(AWidget->instance());
+  if (widget)
+    AOptions = widget->styleOptions();
 }
 
 QList<QString> AdiumMessageStylePlugin::styleVariants(const QString &AStyleId) const

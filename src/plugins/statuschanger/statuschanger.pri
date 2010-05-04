@@ -1,13 +1,10 @@
 FORMS = editstatusdialog.ui \
-        modifystatusdialog.ui \
-        accountoptionswidget.ui
+        modifystatusdialog.ui 
 
 HEADERS = statuschanger.h \
           editstatusdialog.h \
-          modifystatusdialog.h \
-          accountoptionswidget.h
+          modifystatusdialog.h 
 
 SOURCES = statuschanger.cpp \
           editstatusdialog.cpp \
-          modifystatusdialog.cpp \
-          accountoptionswidget.cpp
+          modifystatusdialog.cpp 

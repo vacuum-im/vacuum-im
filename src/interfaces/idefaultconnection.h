@@ -8,13 +8,12 @@
 class IDefaultConnection
 {
 public:
-  enum Options {
-    CO_HOST,
-    CO_PORT,
-    CO_DOMAINE,
-    CO_USE_SSL,
-    CO_IGNORE_SSL_ERRORS,
-    CO_SETTINGS_NS
+  enum OptionRoles {
+    COR_HOST,
+    COR_PORT,
+    COR_DOMAINE,
+    COR_USE_SSL,
+    COR_IGNORE_SSL_ERRORS
   };
 public:
   virtual QObject *instance() =0;
@@ -28,6 +27,8 @@ public:
   virtual QList<QSslError> sslErrors() const =0;
   virtual QNetworkProxy proxy() const =0;
   virtual void setProxy(const QNetworkProxy &AProxy) =0;
+  virtual QVariant option(int ARole) const =0;
+  virtual void setOption(int ARole, const QVariant &AValue) =0;
 protected:
   virtual void modeChanged(QSslSocket::SslMode AMode) =0;
   virtual void sslErrors(const QList<QSslError> &AErrors) =0;

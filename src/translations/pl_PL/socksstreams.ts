@@ -8,10 +8,6 @@
         <translation>Bezpośrednie połączenie przychodzące</translation>
     </message>
     <message>
-        <source>Listened port:</source>
-        <translation>Port:</translation>
-    </message>
-    <message>
         <source>Disable direct connections</source>
         <translation>Wyłącz połączenie bezpośrednie</translation>
     </message>
@@ -30,10 +26,6 @@
     <message>
         <source>Stream Proxy</source>
         <translation>Proxy strumienia</translation>
-    </message>
-    <message>
-        <source>Use proxy on native server</source>
-        <translation>Użyj proxy na rodzimym serwerze</translation>
     </message>
     <message>
         <source>Add</source>
@@ -58,6 +50,14 @@
     <message>
         <source>Use account connection proxy settings</source>
         <translation>Używaj ustawień połączenia konta dla proxy</translation>
+    </message>
+    <message>
+        <source>Listening port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use proxy on account server</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

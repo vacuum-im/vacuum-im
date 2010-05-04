@@ -3,21 +3,30 @@
 
 #include <QWidget>
 #include <QCheckBox>
+#include <definations/optionvalues.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
+#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include "ui_filestreamsoptions.h"
 
 class FileStreamsOptions : 
-  public QWidget
+  public QWidget,
+  public IOptionsWidget
 {
   Q_OBJECT;
+  Q_INTERFACES(IOptionsWidget);
 public:
-  FileStreamsOptions(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, QWidget *AParent=NULL);
+  FileStreamsOptions(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, QWidget *AParent);
   ~FileStreamsOptions();
+  virtual QWidget* instance() { return this; }
 public slots:
-  void apply();
+  virtual void apply();
+  virtual void reset();
 signals:
-  void optionsAccepted();
+  void modified();
+  void childApply();
+  void childReset();
 protected slots:
   void onDirectoryButtonClicked();
   void onMethodButtonToggled(bool ACkecked);

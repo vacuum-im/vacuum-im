@@ -59,20 +59,17 @@
         <source>Supports the sending of the file to another contact</source>
         <translation>Obsługa wysyłki pliku do innego kontaktu</translation>
     </message>
-</context>
-<context>
-    <name>FileTransferOptionsClass</name>
     <message>
         <source>Automatically receive files from contacts in roster</source>
-        <translation>Automatycznie pobieraj pliki od kontaktów w rosterze</translation>
+        <translation type="unfinished">Automatycznie pobieraj pliki od kontaktów w rosterze</translation>
     </message>
     <message>
         <source>Hide dialog after transfer started</source>
-        <translation>Zamknij okno transferu kiedy zacznie się pobieranie</translation>
+        <translation type="unfinished">Zamknij okno transferu kiedy zacznie się pobieranie</translation>
     </message>
     <message>
         <source>Automatically remove finished transfers</source>
-        <translation>Automatycznie usuń ukończone transfery</translation>
+        <translation type="unfinished">Automatycznie usuń ukończone transfery</translation>
     </message>
 </context>
 <context>

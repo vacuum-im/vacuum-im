@@ -42,4 +42,7 @@
 #define OWO_FILESTREAMSMANAGER                    500
 #define OWO_FILETRANSFER                          600
 
+//Node = ON_AUTOSTATUS
+#define OWO_AUTOSTATUS                            500
+
 #endif

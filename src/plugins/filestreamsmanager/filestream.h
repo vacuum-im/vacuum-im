@@ -47,8 +47,8 @@ public:
   virtual void setFileDate(const QDateTime &ADate);
   virtual QString fileDescription() const;
   virtual void setFileDescription(const QString &AFileDesc);
-  virtual QString methodSettings() const;
-  virtual void setMethodSettings(const QString &ASettingsNS);
+  virtual QUuid settingsProfile() const;
+  virtual void setSettingsProfile(const QUuid &AProfileId);
   virtual bool initStream(const QList<QString> &AMethods);
   virtual bool startStream(const QString &AMethodNS);
   virtual void abortStream(const QString &AError);
@@ -78,10 +78,10 @@ private:
   qint64 FSpeed[SPEED_POINTS];
   qint64 FProgress;
   bool FAborted;
+  QUuid FProfileId;
   QString FMethodNS;
   QString FAbortString;
   QString FStateString;
-  QString FMethodSettings;
 private:
   bool FRangeSupported;
   qint64 FRangeOffset;

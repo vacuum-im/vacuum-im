@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <interfaces/ixmppstreams.h>
 #include <utils/jid.h>
+#include <utils/options.h>
 
 #define ACCOUNTMANAGER_UUID "{56F1AA4C-37A6-4007-ACFE-557EEBD86AF8}"
 
@@ -13,9 +14,8 @@ class IAccount
 {
 public:
   virtual QObject *instance() = 0;
-  virtual QUuid accountId() const =0;
-  virtual IXmppStream *xmppStream() const =0;
   virtual bool isValid() const =0;
+  virtual QUuid accountId() const =0;
   virtual bool isActive() const =0;
   virtual void setActive(bool AActive) =0;
   virtual QString name() const =0;
@@ -24,16 +24,11 @@ public:
   virtual void setStreamJid(const Jid &AStreamJid) =0;
   virtual QString password() const =0;
   virtual void setPassword(const QString &APassword) =0;
-  virtual QString defaultLang() const =0;
-  virtual void setDefaultLang(const QString &ADefLang) =0;
-  //AccountSettings
-  virtual QByteArray encript(const QString &AValue, const QByteArray &AKey) const =0;
-  virtual QString decript(const QByteArray &AValue, const QByteArray &AKey) const =0;
-  virtual QVariant value(const QString &AName, const QVariant &ADefault=QVariant()) const =0;
-  virtual void setValue(const QString &AName, const QVariant &AValue) =0;
-  virtual void delValue(const QString &AName) =0;
+  virtual OptionsNode optionsNode() const =0;
+  virtual IXmppStream *xmppStream() const =0;
 protected:
-  virtual void changed(const QString &AName, const QVariant &AValue) =0;
+  virtual void activeChanged(bool AActive) =0;
+  virtual void optionsChanged(const OptionsNode &ANode) =0;
 };
 
 class IAccountManager
@@ -53,6 +48,7 @@ protected:
   virtual void shown(IAccount *AAccount) =0;
   virtual void hidden(IAccount *AAccount) =0;
   virtual void removed(IAccount *AAccount) =0;
+  virtual void changed(IAccount *AAcount, const OptionsNode &ANode) =0;
   virtual void destroyed(const QUuid &AAccountId) =0;
 };
 

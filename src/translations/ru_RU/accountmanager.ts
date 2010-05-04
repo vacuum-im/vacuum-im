@@ -32,7 +32,23 @@
     <name>AccountOptions</name>
     <message>
         <source>New Account</source>
-        <translation>Новый Аккаунт</translation>
+        <translation>Новый аккаунт</translation>
+    </message>
+    <message>
+        <source>Invalid Account</source>
+        <translation>Неверный аккаунт</translation>
+    </message>
+    <message>
+        <source>Account &apos;%1&apos; is not valid, change its Jabber ID</source>
+        <translation>Аккаунт &apos;%1&apos; не верно настроен, измените его Jabber ID</translation>
+    </message>
+    <message>
+        <source>Delayed Apply</source>
+        <translation>Отложенное применение</translation>
+    </message>
+    <message>
+        <source>Some options of account &apos;%1&apos; will be applied after disconnect</source>
+        <translation>Некоторые настройки аккаунта &apos;%1&apos; будут применены после отключения</translation>
     </message>
 </context>
 <context>
@@ -62,8 +78,8 @@
         <translation>Пароль:</translation>
     </message>
     <message>
-        <source>Example: balcony; orchard</source>
-        <translation>Пример:  балкон; сад</translation>
+        <source>Example: home; office; notebook</source>
+        <translation>Пример: дом, оффис, ноутбук</translation>
     </message>
 </context>
 <context>
@@ -77,22 +93,6 @@
         <translation>Jabber ID</translation>
     </message>
     <message>
-        <source>Not valid account</source>
-        <translation>Ошибка в аккаунте</translation>
-    </message>
-    <message>
-        <source>Account %1 is not valid, change its Jabber ID</source>
-        <translation>Аккаунт %1 неправильный, измените его Jabber ID</translation>
-    </message>
-    <message>
-        <source>Enter account name</source>
-        <translation>Введите имя аккаунта</translation>
-    </message>
-    <message>
-        <source>Account name:</source>
-        <translation>Имя аккаунта:</translation>
-    </message>
-    <message>
         <source>Confirm removal of an account</source>
         <translation>Подтвердите удаление аккаунта</translation>
     </message>
@@ -101,12 +101,8 @@
         <translation>Вы уверены, что хотите удалить аккаунт &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;Все настройки будут потеряны.</translation>
     </message>
     <message>
-        <source>Account options</source>
-        <translation>Настройки аккаунта</translation>
-    </message>
-    <message>
-        <source>Some accounts changes will be applied after disconnect</source>
-        <translation>Некоторые изменения в аккаунтах будут применены после отключения</translation>
+        <source>New Account</source>
+        <translation>Новый аккаунт</translation>
     </message>
 </context>
 <context>

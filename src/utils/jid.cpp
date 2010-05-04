@@ -461,8 +461,21 @@ bool Jid::equals(const Jid &AJid, bool AFull) const
   return (d->FPrepNode == AJid.pNode()) && (d->FPrepDomain == AJid.pDomain()) && (!AFull || d->FPrepResource == AJid.pResource()); 
 }
 
-uint qHash(const Jid &key)
+uint qHash(const Jid &AKey)
 {
-  return qHash(key.pFull()); 
+  return qHash(AKey.pFull()); 
 }
 
+QDataStream &operator<<(QDataStream &AStream, const Jid &AJid)
+{
+  AStream << AJid.full();
+  return AStream;
+}
+
+QDataStream &operator>>(QDataStream &AStream, Jid &AJid)
+{
+  QString jid;
+  AStream >> jid;
+  AJid = jid;
+  return AStream;
+}

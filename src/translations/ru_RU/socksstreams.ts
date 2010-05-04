@@ -8,10 +8,6 @@
         <translation>Входящее прямое подключение</translation>
     </message>
     <message>
-        <source>Listened port:</source>
-        <translation>Открытый порт:</translation>
-    </message>
-    <message>
         <source>Disable direct connections</source>
         <translation>Запретить прямые подключения</translation>
     </message>
@@ -56,8 +52,12 @@
         <translation>Использовать настройки прокси из аккаунта</translation>
     </message>
     <message>
-        <source>Use proxy on native server</source>
-        <translation>Использовать прокси на родном сервере</translation>
+        <source>Listening port:</source>
+        <translation>Прослушиваемый порт:</translation>
+    </message>
+    <message>
+        <source>Use proxy on account server</source>
+        <translation>Использовать прокси на сервере аккаунта</translation>
     </message>
 </context>
 <context>

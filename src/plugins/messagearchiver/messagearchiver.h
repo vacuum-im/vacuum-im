@@ -7,6 +7,7 @@
 #include <definations/namespaces.h>
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
+#include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
 #include <definations/optionwidgetorders.h>
@@ -21,7 +22,7 @@
 #include <interfaces/imessagestyles.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/isettings.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/irostersview.h>
@@ -30,6 +31,7 @@
 #include <interfaces/idataforms.h>
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/iroster.h>
+#include <utils/options.h>
 #include <utils/errorhandler.h>
 #include <utils/widgetmanager.h>
 #include "collectionwriter.h"
@@ -75,7 +77,7 @@ public:
   virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
   virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
   //IOptionsHolder
-  virtual QWidget *optionsWidget(const QString &ANode, int &AOrder);
+  virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
   //SessionNegotiator
   virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest);
   virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit);
@@ -118,7 +120,7 @@ public:
   virtual IArchiveModifications loadLocalModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const;
   //Server Archive
   virtual QDateTime replicationPoint(const Jid &AStreamJid) const;
-  virtual bool replicationEnabled(const Jid &AStreamJid) const;
+  virtual bool isReplicationEnabled(const Jid &AStreamJid) const;
   virtual void setReplicationEnabled(const Jid &AStreamJid, bool AEnabled);
   virtual QString saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);
   virtual QString loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = "");
@@ -145,9 +147,6 @@ signals:
   //ArchiveWindow
   void archiveWindowCreated(IArchiveWindow *AWindow);
   void archiveWindowDestroyed(IArchiveWindow *AWindow);
-  //IOptionsHolder
-  void optionsAccepted();
-  void optionsRejected();
 protected:
   QString loadServerPrefs(const Jid &AStreamJid);
   QString loadStoragePrefs(const Jid &AStreamJid);
@@ -186,6 +185,7 @@ protected slots:
   void onStreamOpened(IXmppStream *AXmppStream);
   void onStreamClosed(IXmppStream *AXmppStream);
   void onAccountHidden(IAccount *AAccount);
+  void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
   void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
   void onPrivateDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
   void onPrivateDataError(const QString &AId, const QString &AError);
@@ -196,10 +196,8 @@ protected slots:
   void onSetItemPrefsAction(bool);
   void onShowArchiveWindowAction(bool);
   void onShowArchiveWindowToolBarAction(bool);
-  void onOpenHistoryOptionsAction(bool);
+  void onShowHistoryOptionsDialogAction(bool);
   void onRemoveItemPrefsAction(bool);
-  void onOptionsDialogAccepted();
-  void onOptionsDialogRejected();
   void onArchiveHandlerDestroyed(QObject *AHandler);
   void onArchiveWindowDestroyed(IArchiveWindow *AWindow);
   void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
@@ -211,7 +209,7 @@ private:
   IPluginManager *FPluginManager;
   IXmppStreams *FXmppStreams;
   IStanzaProcessor *FStanzaProcessor;    
-  ISettingsPlugin *FSettingsPlugin;
+  IOptionsManager *FOptionsManager;
   IPrivateStorage *FPrivateStorage;
   IAccountManager *FAccountManager;
   IRostersViewPlugin *FRostersViewPlugin;

@@ -13,9 +13,6 @@
 #define ADR_GROUP_KIND        Action::DR_Parametr1
 #define ADR_SOURCE            Action::DR_Parametr1
 
-#define BIN_WINDOW_STATE      "ArchiveWindowState"
-#define BIN_WINDOW_GEOMETRY   "ArchiveWindowGeometry"
-
 //SortFilterProxyModel
 SortFilterProxyModel::SortFilterProxyModel(ViewHistoryWindow *AWindow, QObject *AParent) : QSortFilterProxyModel(AParent)
 {
@@ -70,7 +67,6 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
 
   FRoster = NULL;
   FViewWidget = NULL;
-  FSettings = NULL;
   FMessageWidgets = NULL;
   FMessageStyles = NULL;
   FCollectionTools = NULL;
@@ -155,11 +151,8 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &ASt
 
 ViewHistoryWindow::~ViewHistoryWindow()
 {
-  if (FSettings)
-  {
-    FSettings->saveBinaryData(BIN_WINDOW_GEOMETRY+FStreamJid.pBare(),saveGeometry());
-    FSettings->saveBinaryData(BIN_WINDOW_STATE+FStreamJid.pBare(),saveState());
-  }
+  Options::setFileValue(saveGeometry(),"messagearchiver.viewhistorywindow.geometry",FStreamJid.pBare());
+  Options::setFileValue(saveState(),"messagearchiver.viewhistorywindow.state",FStreamJid.pBare());
   emit windowDestroyed(this);
 }
 
@@ -292,20 +285,12 @@ void ViewHistoryWindow::initialize()
   if (plugin)
     FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
 
-  plugin = manager->pluginInterface("ISettingsPlugin").value(0);
-  if (plugin)
-  {
-    FSettings = qobject_cast<ISettingsPlugin *>(plugin->instance())->settingsForPlugin(MESSAGEARCHIVER_UUID);
-    if (FSettings)
-    {
-      restoreGeometry(FSettings->loadBinaryData(BIN_WINDOW_GEOMETRY+FStreamJid.pBare()));
-      restoreState(FSettings->loadBinaryData(BIN_WINDOW_STATE+FStreamJid.pBare()));
-    }
-  }
-
   plugin = manager->pluginInterface("IStatusIcons").value(0);
   if (plugin)
     FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+
+  restoreGeometry(Options::fileValue("messagearchiver.viewhistorywindow.geometry",FStreamJid.pBare()).toByteArray());
+  restoreState(Options::fileValue("messagearchiver.viewhistorywindow.state",FStreamJid.pBare()).toByteArray());
 }
 
 QList<IArchiveHeader> ViewHistoryWindow::indexHeaders(const QModelIndex &AIndex) const
@@ -650,7 +635,7 @@ void ViewHistoryWindow::setViewOptions(const IArchiveCollection &ACollection)
 
 void ViewHistoryWindow::setMessageStyle()
 {
-  if (FMessageStyles)
+  if (FMessageStyles && FMessageWidgets)
   {
     IMessageStyleOptions soptions = FMessageStyles->styleOptions(FViewOptions.isGroupchat ? Message::GroupChat : Message::Chat);
     IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
@@ -664,12 +649,15 @@ void ViewHistoryWindow::setMessageStyle()
 
 void ViewHistoryWindow::showNotification(const QString &AMessage)
 {
-  IMessageContentOptions options;
-  options.kind = IMessageContentOptions::Status;
-  options.direction = IMessageContentOptions::DirectionIn;
-  options.time = QDateTime::currentDateTime();
-  options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
-  FViewWidget->appendText(AMessage,options);
+  if (FMessageWidgets)
+  {
+    IMessageContentOptions options;
+    options.kind = IMessageContentOptions::Status;
+    options.direction = IMessageContentOptions::DirectionIn;
+    options.time = QDateTime::currentDateTime();
+    options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
+    FViewWidget->appendText(AMessage,options);
+  }
 }
 
 void ViewHistoryWindow::processRequests(const QList<IArchiveRequest> &ARequests)
@@ -707,7 +695,7 @@ void ViewHistoryWindow::processHeaders(const QList<IArchiveHeader> &AHeaders)
 
 void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection, bool AAppend)
 {
-  if (FViewWidget && FCurrentHeaders.contains(ACollection.header))
+  if (FMessageWidgets && FCurrentHeaders.contains(ACollection.header))
   {
     if (!AAppend)
     {
@@ -1043,7 +1031,7 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
     QModelIndex index = ACurrent.column()==0 ? ACurrent : ui.trvCollections->model()->index(ACurrent.row(),0,ACurrent.parent());
     FCurrentHeaders = indexHeaders(index);
 
-    if (FViewWidget)
+    if (FMessageWidgets)
     {
       if (index.data(HDR_ITEM_TYPE).toInt() == HIT_HEADER_JID)
       {

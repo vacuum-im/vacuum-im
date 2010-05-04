@@ -169,6 +169,17 @@ ArchiveOptions::ArchiveOptions(IMessageArchiver *AArchiver, const Jid &AStreamJi
     SLOT(onArchiveRequestCompleted(const QString &)));
   connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
     SLOT(onArchiveRequestFailed(const QString &, const QString &)));
+
+  connect(ui.cmbMethodLocal,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
+  connect(ui.cmbMethodManual,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
+  connect(ui.cmbMethodAuto,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
+  connect(ui.cmbModeOTR,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
+  connect(ui.cmbModeSave,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
+  connect(ui.cmbExpireTime,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
+  connect(ui.cmbExpireTime->lineEdit(),SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+  connect(ui.chbAutoSave,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(ui.chbReplication,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+  connect(delegat,SIGNAL(commitData(QWidget *)),SIGNAL(modified()));
 }
 
 ArchiveOptions::~ArchiveOptions()
@@ -226,18 +237,20 @@ void ArchiveOptions::apply()
         FSaveRequests.append(requestId);
     }
 
-    if (FArchiver->replicationEnabled(FStreamJid) != ui.chbReplication->isChecked())
+    if (FArchiver->isReplicationEnabled(FStreamJid) != ui.chbReplication->isChecked())
       FArchiver->setReplicationEnabled(FStreamJid,ui.chbReplication->isChecked());
 
     FLastError.clear();
     updateWidget();
   }
+  emit childApply();
 }
 
 void ArchiveOptions::reset()
 {
   FTableItems.clear();
   ui.tbwItemPrefs->clearContents();
+  ui.tbwItemPrefs->setRowCount(0);
   if (FArchiver->isReady(FStreamJid))
   {
     IArchiveStreamPrefs prefs = FArchiver->archivePrefs(FStreamJid);
@@ -248,7 +261,7 @@ void ArchiveOptions::reset()
       it++;
     }
     onArchivePrefsChanged(FStreamJid,prefs);
-    ui.chbReplication->setCheckState(FArchiver->replicationEnabled(FStreamJid) ? Qt::Checked : Qt::Unchecked);
+    ui.chbReplication->setCheckState(FArchiver->isReplicationEnabled(FStreamJid) ? Qt::Checked : Qt::Unchecked);
     FLastError.clear();
   }
   else
@@ -256,6 +269,7 @@ void ArchiveOptions::reset()
     FLastError = tr("History preferences not loaded");
   }
   updateWidget();
+  emit childReset();
 }
 
 void ArchiveOptions::updateWidget()
@@ -293,6 +307,7 @@ void ArchiveOptions::onAddItemPrefClicked()
     IArchiveItemPrefs itemPrefs = FArchiver->archiveItemPrefs(FStreamJid,itemJid);
     onArchiveItemPrefsChanged(FStreamJid,itemJid,itemPrefs);
     ui.tbwItemPrefs->setCurrentItem(FTableItems.value(itemJid));
+    emit modified();
   }
   else if (!itemJid.isEmpty())
   {
@@ -306,6 +321,7 @@ void ArchiveOptions::onRemoveItemPrefClicked()
   {
     QTableWidgetItem *jidItem = ui.tbwItemPrefs->item(ui.tbwItemPrefs->currentRow(),JID_COLUMN);
     onArchiveItemPrefsRemoved(FStreamJid,FTableItems.key(jidItem));
+    emit modified();
   }
 }
 
@@ -393,4 +409,3 @@ void ArchiveOptions::onArchiveRequestFailed(const QString &AId, const QString &A
     updateWidget();
   }
 }
-
