@@ -5,17 +5,17 @@
 #include <definations/multiuserdataroles.h>
 #include <interfaces/imultiuserchat.h>
 
-class UsersProxyModel : 
-  public QSortFilterProxyModel
+class UsersProxyModel :
+			public QSortFilterProxyModel
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  UsersProxyModel(IMultiUserChat *AMultiChat, QObject *AParent);
-  ~UsersProxyModel();
+	UsersProxyModel(IMultiUserChat *AMultiChat, QObject *AParent);
+	~UsersProxyModel();
 protected:
-  virtual bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
+	virtual bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
 private:
-  IMultiUserChat *FMultiChat;
+	IMultiUserChat *FMultiChat;
 };
 
 #endif // USERSPROXYMODEL_H

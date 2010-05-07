@@ -9,39 +9,39 @@
 #include <utils/message.h>
 #include <utils/datetime.h>
 
-class CollectionWriter : 
-  public QObject
+class CollectionWriter :
+			public QObject
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  CollectionWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent);
-  ~CollectionWriter();
-  bool isOpened() const;
-  const Jid &streamJid() const { return FStreamJid; }
-  const QString &fileName() const { return FFileName; }
-  const IArchiveHeader &header() const { return FHeader; }
-  int recordsCount() const { return FRecsCount; }
-  int secondsFromStart() const { return FSecsSum; }
-  bool writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn);
-  bool writeNote(const QString &ANote);
+	CollectionWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent);
+	~CollectionWriter();
+	bool isOpened() const;
+	const Jid &streamJid() const { return FStreamJid; }
+	const QString &fileName() const { return FFileName; }
+	const IArchiveHeader &header() const { return FHeader; }
+	int recordsCount() const { return FRecsCount; }
+	int secondsFromStart() const { return FSecsSum; }
+	bool writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn);
+	bool writeNote(const QString &ANote);
 signals:
-  void writerDestroyed(CollectionWriter *AWriter);
+	void writerDestroyed(CollectionWriter *AWriter);
 protected:
-  void startCollection();
-  void stopCollection();
-  void writeElementChilds(const QDomElement &AElem);
-  void checkLimits();
+	void startCollection();
+	void stopCollection();
+	void writeElementChilds(const QDomElement &AElem);
+	void checkLimits();
 private:
-  QTimer FCloseTimer;
-  QFile *FXmlFile;
-  QXmlStreamWriter *FXmlWriter;
+	QTimer FCloseTimer;
+	QFile *FXmlFile;
+	QXmlStreamWriter *FXmlWriter;
 private:
-  int FRecsCount;
-  int FSecsSum;
-  bool FGroupchat;
-  Jid FStreamJid;
-  QString FFileName;
-  IArchiveHeader FHeader;
+	int FRecsCount;
+	int FSecsSum;
+	bool FGroupchat;
+	Jid FStreamJid;
+	QString FFileName;
+	IArchiveHeader FHeader;
 };
 
 #endif // COLLECTIONWRITER_H

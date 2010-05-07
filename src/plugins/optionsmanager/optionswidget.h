@@ -12,36 +12,36 @@
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 
-class OptionsWidget : 
-  public QWidget,
-  public IOptionsWidget
+class OptionsWidget :
+			public QWidget,
+			public IOptionsWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IOptionsWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IOptionsWidget);
 public:
-  OptionsWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent);
-  ~OptionsWidget();
-  virtual QWidget* instance() { return this; }
+	OptionsWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent);
+	~OptionsWidget();
+	virtual QWidget* instance() { return this; }
 public slots:
-  virtual void apply();
-  virtual void reset();
+	virtual void apply();
+	virtual void reset();
 signals:
-  void modified();
-  void childApply();
-  void childReset();
+	void modified();
+	void childApply();
+	void childReset();
 protected:
-  void insertCaption(const QString &ACaption, QWidget *ABuddy);
-  virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	void insertCaption(const QString &ACaption, QWidget *ABuddy);
+	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
-  QLabel *FLabel;
-  QCheckBox *FCheckBox;
-  QLineEdit *FLineEdit;
-  QComboBox *FComboBox;
-  QFontComboBox *FFontComboBox;
-  QDateTimeEdit *FDateTimeEdit;
+	QLabel *FLabel;
+	QCheckBox *FCheckBox;
+	QLineEdit *FLineEdit;
+	QComboBox *FComboBox;
+	QFontComboBox *FFontComboBox;
+	QDateTimeEdit *FDateTimeEdit;
 private:
-  QVariant FValue;
-  OptionsNode FNode;
+	QVariant FValue;
+	OptionsNode FNode;
 };
 
 #endif // OPTIONSWIDGET_H

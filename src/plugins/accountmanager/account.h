@@ -5,39 +5,39 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ioptionsmanager.h>
 
-class Account : 
-  public QObject,
-  public IAccount
+class Account :
+			public QObject,
+			public IAccount
 {
-  Q_OBJECT;
-  Q_INTERFACES(IAccount);
+	Q_OBJECT;
+	Q_INTERFACES(IAccount);
 public:
-  Account(IXmppStreams *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent);
-  ~Account();
-  virtual QObject *instance() { return this; }
-  virtual bool isValid() const;
-  virtual QUuid accountId() const;
-  virtual bool isActive() const;
-  virtual void setActive(bool AActive);
-  virtual QString name() const;
-  virtual void setName(const QString &AName);
-  virtual Jid streamJid() const;
-  virtual void setStreamJid(const Jid &AJid);
-  virtual QString password() const;
-  virtual void setPassword(const QString &APassword);
-  virtual OptionsNode optionsNode() const;
-  virtual IXmppStream *xmppStream() const;
+	Account(IXmppStreams *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent);
+	~Account();
+	virtual QObject *instance() { return this; }
+	virtual bool isValid() const;
+	virtual QUuid accountId() const;
+	virtual bool isActive() const;
+	virtual void setActive(bool AActive);
+	virtual QString name() const;
+	virtual void setName(const QString &AName);
+	virtual Jid streamJid() const;
+	virtual void setStreamJid(const Jid &AJid);
+	virtual QString password() const;
+	virtual void setPassword(const QString &APassword);
+	virtual OptionsNode optionsNode() const;
+	virtual IXmppStream *xmppStream() const;
 signals:
-  void activeChanged(bool AActive);
-  void optionsChanged(const OptionsNode &ANode);
+	void activeChanged(bool AActive);
+	void optionsChanged(const OptionsNode &ANode);
 protected slots:
-  void onXmppStreamClosed();
-  void onOptionsChanged(const OptionsNode &ANode);
+	void onXmppStreamClosed();
+	void onOptionsChanged(const OptionsNode &ANode);
 private:
-  IXmppStream *FXmppStream;
-  IXmppStreams *FXmppStreams;
+	IXmppStream *FXmppStream;
+	IXmppStreams *FXmppStreams;
 private:
-  OptionsNode FOptionsNode;
+	OptionsNode FOptionsNode;
 };
 
 #endif // ACCOUNT_H

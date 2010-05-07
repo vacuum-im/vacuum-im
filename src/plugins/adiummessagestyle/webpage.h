@@ -3,15 +3,15 @@
 
 #include <QWebPage>
 
-class WebPage : 
-  public QWebPage
+class WebPage :
+			public QWebPage
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  WebPage(QObject *AParent = NULL);
-  ~WebPage();
-  // QWebPage
-  virtual void triggerAction(WebAction AAction, bool AChecked = false);
+	WebPage(QObject *AParent = NULL);
+	~WebPage();
+	// QWebPage
+	virtual void triggerAction(WebAction AAction, bool AChecked = false);
 };
 
 #endif // WEBPAGE_H

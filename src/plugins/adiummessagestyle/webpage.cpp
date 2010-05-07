@@ -6,15 +6,15 @@ static const QList<QWebPage::WebAction> AllowedAction = QList<QWebPage::WebActio
 
 WebPage::WebPage(QObject *AParent) : QWebPage(AParent)
 {
-  setContentEditable(false);
-  setNetworkAccessManager(NULL);
-  setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+	setContentEditable(false);
+	setNetworkAccessManager(NULL);
+	setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 
-  for (int actionIndex = 0; action((QWebPage::WebAction)actionIndex); actionIndex++)
-  {
-    if (!AllowedAction.contains((QWebPage::WebAction)actionIndex))
-      action((QWebPage::WebAction)actionIndex)->setVisible(false);
-  }
+	for (int actionIndex = 0; action((QWebPage::WebAction)actionIndex); actionIndex++)
+	{
+		if (!AllowedAction.contains((QWebPage::WebAction)actionIndex))
+			action((QWebPage::WebAction)actionIndex)->setVisible(false);
+	}
 }
 
 WebPage::~WebPage()
@@ -24,6 +24,6 @@ WebPage::~WebPage()
 
 void WebPage::triggerAction(WebAction AAction, bool AChecked)
 {
-  if (AllowedAction.contains(AAction))
-    QWebPage::triggerAction(AAction, AChecked);
+	if (AllowedAction.contains(AAction))
+		QWebPage::triggerAction(AAction, AChecked);
 }

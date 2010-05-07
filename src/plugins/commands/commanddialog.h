@@ -10,47 +10,47 @@
 #include <interfaces/idataforms.h>
 #include "ui_commanddialog.h"
 
-class CommandDialog : 
-  public QDialog,
-  public ICommandClient
+class CommandDialog :
+			public QDialog,
+			public ICommandClient
 {
-  Q_OBJECT;
-  Q_INTERFACES(ICommandClient);
+	Q_OBJECT;
+	Q_INTERFACES(ICommandClient);
 public:
-  CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid FCommandJid, 
-    const QString &ANode, QWidget *AParent = NULL);
-  ~CommandDialog();
-  //ICommandClient
-  virtual Jid streamJid() const { return FStreamJid; }
-  virtual Jid commandJid() const { return FCommandJid; }
-  virtual QString node() const { return FNode; }
-  virtual QString sessionId() const { return FSessionId; }
-  virtual bool receiveCommandResult(const ICommandResult &AResult);
-  virtual bool receiveCommandError(const ICommandError &AError);
-  //CommandDialog
-  void executeCommand();
+	CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid FCommandJid,
+	              const QString &ANode, QWidget *AParent = NULL);
+	~CommandDialog();
+	//ICommandClient
+	virtual Jid streamJid() const { return FStreamJid; }
+	virtual Jid commandJid() const { return FCommandJid; }
+	virtual QString node() const { return FNode; }
+	virtual QString sessionId() const { return FSessionId; }
+	virtual bool receiveCommandResult(const ICommandResult &AResult);
+	virtual bool receiveCommandError(const ICommandError &AError);
+	//CommandDialog
+	void executeCommand();
 protected:
-  void resetDialog();
-  QString sendRequest(const QString &AAction);
-  void executeAction(const QString &AAction);
+	void resetDialog();
+	QString sendRequest(const QString &AAction);
+	void executeAction(const QString &AAction);
 protected slots:
-  void onDialogButtonClicked(QAbstractButton *AButton);
+	void onDialogButtonClicked(QAbstractButton *AButton);
 private:
-  Ui::CommandDialogClass ui;
+	Ui::CommandDialogClass ui;
 private:
-  ICommands *FCommands;
-  IDataForms *FDataForms;
+	ICommands *FCommands;
+	IDataForms *FDataForms;
 private:
-  QPushButton *FPrevButton;
-  QPushButton *FNextButton;
-  QPushButton *FCompleteButton;
+	QPushButton *FPrevButton;
+	QPushButton *FNextButton;
+	QPushButton *FCompleteButton;
 private:
-  Jid FStreamJid;
-  Jid FCommandJid;
-  QString FNode;
-  QString FRequestId;
-  QString FSessionId;
-  IDataFormWidget *FCurrentForm;
+	Jid FStreamJid;
+	Jid FCommandJid;
+	QString FNode;
+	QString FRequestId;
+	QString FSessionId;
+	IDataFormWidget *FCurrentForm;
 };
 
 #endif // COMMANDDIALOG_H

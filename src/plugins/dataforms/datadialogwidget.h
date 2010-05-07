@@ -3,36 +3,36 @@
 
 #include <interfaces/idataforms.h>
 
-class DataDialogWidget : 
-  public QDialog,
-  public IDataDialogWidget
+class DataDialogWidget :
+			public QDialog,
+			public IDataDialogWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IDataDialogWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IDataDialogWidget);
 public:
-  DataDialogWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent);
-  ~DataDialogWidget();
-  virtual QDialog *instance() { return this; }
-  virtual ToolBarChanger *toolBarChanged() const { return FToolBarChanger; }
-  virtual QDialogButtonBox *dialogButtons() const { return FDialogButtons; }
-  virtual IDataFormWidget *formWidget() const { return FFormWidget; }
-  virtual void setForm(const IDataForm &AForm);
-  virtual bool allowInvalid() const { return FAllowInvalid; }
-  virtual void setAllowInvalid(bool AAllowInvalid) { FAllowInvalid = AAllowInvalid; }
+	DataDialogWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent);
+	~DataDialogWidget();
+	virtual QDialog *instance() { return this; }
+	virtual ToolBarChanger *toolBarChanged() const { return FToolBarChanger; }
+	virtual QDialogButtonBox *dialogButtons() const { return FDialogButtons; }
+	virtual IDataFormWidget *formWidget() const { return FFormWidget; }
+	virtual void setForm(const IDataForm &AForm);
+	virtual bool allowInvalid() const { return FAllowInvalid; }
+	virtual void setAllowInvalid(bool AAllowInvalid) { FAllowInvalid = AAllowInvalid; }
 signals:
-  void formWidgetCreated(IDataFormWidget *AForm);
-  void formWidgetDestroyed(IDataFormWidget *AForm);
-  void dialogDestroyed(IDataDialogWidget *ADialog);
+	void formWidgetCreated(IDataFormWidget *AForm);
+	void formWidgetDestroyed(IDataFormWidget *AForm);
+	void dialogDestroyed(IDataDialogWidget *ADialog);
 protected slots:
-  void onDialogButtonClicked(QAbstractButton *AButton);
+	void onDialogButtonClicked(QAbstractButton *AButton);
 private:
-  IDataForms *FDataForms;   
+	IDataForms *FDataForms;
 private:
-  bool FAllowInvalid;
-  QWidget *FFormHolder;
-  IDataFormWidget *FFormWidget;
-  ToolBarChanger *FToolBarChanger;
-  QDialogButtonBox *FDialogButtons;
+	bool FAllowInvalid;
+	QWidget *FFormHolder;
+	IDataFormWidget *FFormWidget;
+	ToolBarChanger *FToolBarChanger;
+	QDialogButtonBox *FDialogButtons;
 };
 
 #endif // DATADIALOGWIDGET_H

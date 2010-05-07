@@ -3,18 +3,18 @@
 
 #include <QTabWidget>
 
-class TabWidget : 
-  public QTabWidget
+class TabWidget :
+			public QTabWidget
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  TabWidget(QWidget *AParent = NULL);
-  ~TabWidget();
+	TabWidget(QWidget *AParent = NULL);
+	~TabWidget();
 protected:
-  void mousePressEvent(QMouseEvent *AEvent);
-  void mouseReleaseEvent(QMouseEvent *AEvent);
+	void mousePressEvent(QMouseEvent *AEvent);
+	void mouseReleaseEvent(QMouseEvent *AEvent);
 private:
-  int FPressedTabIndex;
+	int FPressedTabIndex;
 };
 
 #endif // TABWIDGET_H

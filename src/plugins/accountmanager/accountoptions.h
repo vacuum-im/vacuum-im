@@ -10,30 +10,30 @@
 #include <utils/options.h>
 #include "ui_accountoptions.h"
 
-class AccountOptions : 
-  public QWidget,
-  public IOptionsWidget
+class AccountOptions :
+			public QWidget,
+			public IOptionsWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IOptionsWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IOptionsWidget);
 public:
-  AccountOptions(IAccountManager *AManager, const QUuid &AAccountId, QWidget *AParent);
-  ~AccountOptions();
-  virtual QWidget* instance() { return this; }
+	AccountOptions(IAccountManager *AManager, const QUuid &AAccountId, QWidget *AParent);
+	~AccountOptions();
+	virtual QWidget* instance() { return this; }
 public slots:
-  virtual void apply();
-  virtual void reset();
+	virtual void apply();
+	virtual void reset();
 signals:
-  void modified();
-  void childApply();
-  void childReset();
+	void modified();
+	void childApply();
+	void childReset();
 private:
-  Ui::AccountOptionsClass ui;
+	Ui::AccountOptionsClass ui;
 private:
-  IAccountManager *FManager;
+	IAccountManager *FManager;
 private:
-  QUuid FAccountId;
-  IAccount *FAccount;
+	QUuid FAccountId;
+	IAccount *FAccount;
 };
 
 #endif // ACCOUNTOPTIONS_H

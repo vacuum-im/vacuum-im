@@ -75,94 +75,94 @@
 #define MSO_BG_IMAGE_FILE                   "bgImageFile"
 #define MSO_BG_IMAGE_LAYOUT                 "bgImageLayout"
 
-class AdiumMessageStyle : 
-  public QObject,
-  public IMessageStyle
+class AdiumMessageStyle :
+			public QObject,
+			public IMessageStyle
 {
-  Q_OBJECT;
-  Q_INTERFACES(IMessageStyle);
+	Q_OBJECT;
+	Q_INTERFACES(IMessageStyle);
 public:
-  enum HeaderType {
-    HeaderNone,
-    HeaderNormal,
-    HeaderTopic
-  };
-  enum BGImageLayout {
-    ImageNormal,
-    ImageCenter,
-    ImageTitle,
-    ImageTitleCenter,
-    ImageScale
-  };
-  struct WidgetStatus {
-    int lastKind;
-    QString lastId;
-    QDateTime lastTime;
-  };
+	enum HeaderType {
+		HeaderNone,
+		HeaderNormal,
+		HeaderTopic
+	};
+	enum BGImageLayout {
+		ImageNormal,
+		ImageCenter,
+		ImageTitle,
+		ImageTitleCenter,
+		ImageScale
+	};
+	struct WidgetStatus {
+		int lastKind;
+		QString lastId;
+		QDateTime lastTime;
+	};
 public:
-  AdiumMessageStyle(const QString &AStylePath, QObject *AParent);
-  ~AdiumMessageStyle();
-  //IMessageStyle
-  virtual QObject *instance() { return this; }
-  virtual bool isValid() const;
-  virtual QString styleId() const;
-  virtual QList<QWidget *> styleWidgets() const;
-  virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
-  virtual QString senderColor(const QString &ASenderId) const;
-  virtual QTextDocumentFragment selection(QWidget *AWidget) const;
-  virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
-  virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
-  //AdiumMessageStyle
-  virtual int version() const;
-  virtual QMap<QString, QVariant> infoValues() const;
-  virtual QList<QString> variants() const;
+	AdiumMessageStyle(const QString &AStylePath, QObject *AParent);
+	~AdiumMessageStyle();
+	//IMessageStyle
+	virtual QObject *instance() { return this; }
+	virtual bool isValid() const;
+	virtual QString styleId() const;
+	virtual QList<QWidget *> styleWidgets() const;
+	virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
+	virtual QString senderColor(const QString &ASenderId) const;
+	virtual QTextDocumentFragment selection(QWidget *AWidget) const;
+	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
+	virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
+	//AdiumMessageStyle
+	virtual int version() const;
+	virtual QMap<QString, QVariant> infoValues() const;
+	virtual QList<QString> variants() const;
 signals:
-  void widgetAdded(QWidget *AWidget) const;
-  void widgetRemoved(QWidget *AWidget) const;
-  void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
-  void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const;
-  void urlClicked(QWidget *AWidget, const QUrl &AUrl) const;
+	void widgetAdded(QWidget *AWidget) const;
+	void widgetRemoved(QWidget *AWidget) const;
+	void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
+	void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const;
+	void urlClicked(QWidget *AWidget, const QUrl &AUrl) const;
 public:
-  static QList<QString> styleVariants(const QString &AStylePath);
-  static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
+	static QList<QString> styleVariants(const QString &AStylePath);
+	static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
 protected:
-  bool isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const;
-  void setVariant(QWidget *AWidget, const QString  &AVariant);
-  QString makeStyleTemplate(const IMessageStyleOptions &AOptions) const;
-  void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
-  QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;
-  void fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const;
-  QString processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const;
-  void escapeStringForScript(QString &AText) const;
-  QString scriptForAppendContent(bool ASameSender, bool ANoScroll) const;
-  QString loadFileData(const QString &AFileName, const QString &DefValue) const;
-  void loadTemplates();
-  void loadSenderColors();
-  void initStyleSettings();
+	bool isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const;
+	void setVariant(QWidget *AWidget, const QString  &AVariant);
+	QString makeStyleTemplate(const IMessageStyleOptions &AOptions) const;
+	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
+	QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;
+	void fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const;
+	QString processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const;
+	void escapeStringForScript(QString &AText) const;
+	QString scriptForAppendContent(bool ASameSender, bool ANoScroll) const;
+	QString loadFileData(const QString &AFileName, const QString &DefValue) const;
+	void loadTemplates();
+	void loadSenderColors();
+	void initStyleSettings();
 protected slots:
-  void onLinkClicked(const QUrl &AUrl);
-  void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
-  void onStyleWidgetDestroyed(QObject *AObject);
+	void onLinkClicked(const QUrl &AUrl);
+	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
+	void onStyleWidgetDestroyed(QObject *AObject);
 private:
-  QString FTopicHTML;
-  QString FStatusHTML;
-  QString FIn_ContentHTML;
-  QString FIn_NextContentHTML;
-  QString FIn_ContextHTML;
-  QString FIn_NextContextHTML;
-  QString FOut_ContentHTML;
-  QString FOut_NextContentHTML;
-  QString FOut_ContextHTML;
-  QString FOut_NextContextHTML;
+	QString FTopicHTML;
+	QString FStatusHTML;
+	QString FIn_ContentHTML;
+	QString FIn_NextContentHTML;
+	QString FIn_ContextHTML;
+	QString FIn_NextContextHTML;
+	QString FOut_ContentHTML;
+	QString FOut_NextContentHTML;
+	QString FOut_ContextHTML;
+	QString FOut_NextContextHTML;
 private:
-  bool FCombineConsecutive;
-  bool FAllowCustomBackground;
+	bool FCombineConsecutive;
+	bool FAllowCustomBackground;
 private:
-  QString FResourcePath;
-  QList<QString> FVariants;
-  QList<QString> FSenderColors;
-  QMap<QString, QVariant> FInfo;
-  QMap<QWidget *, WidgetStatus> FWidgetStatus;
+	QString FResourcePath;
+	QList<QString> FVariants;
+	QList<QString> FSenderColors;
+	QMap<QString, QVariant> FInfo;
+	QMap<QWidget *, WidgetStatus> FWidgetStatus;
 };
 
 #endif // ADIUMMESSAGESTYLE_H

@@ -5,26 +5,26 @@
 #include <interfaces/iconnectionmanager.h>
 #include "ui_editproxydialog.h"
 
-class EditProxyDialog : 
-  public QDialog
+class EditProxyDialog :
+			public QDialog
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  EditProxyDialog(IConnectionManager *AManager, QWidget *AParent = NULL);
-  ~EditProxyDialog();
+	EditProxyDialog(IConnectionManager *AManager, QWidget *AParent = NULL);
+	~EditProxyDialog();
 protected:
-  QListWidgetItem *createProxyItem(const QUuid &AId, const IConnectionProxy &AProxy) const;
-  void updateProxyItem(QListWidgetItem *AItem);
-  void updateProxyWidgets(QListWidgetItem *AItem);
+	QListWidgetItem *createProxyItem(const QUuid &AId, const IConnectionProxy &AProxy) const;
+	void updateProxyItem(QListWidgetItem *AItem);
+	void updateProxyWidgets(QListWidgetItem *AItem);
 protected slots:
-  void onAddButtonClicked(bool);
-  void onDeleteButtonClicked(bool);
-  void onCurrentProxyItemChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious);
-  void onDialogButtonBoxAccepted();
+	void onAddButtonClicked(bool);
+	void onDeleteButtonClicked(bool);
+	void onCurrentProxyItemChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious);
+	void onDialogButtonBoxAccepted();
 private:
-  Ui::EditProxyDialogClass ui;
+	Ui::EditProxyDialogClass ui;
 private:
-  IConnectionManager *FManager;
+	IConnectionManager *FManager;
 };
 
 #endif // EDITPROXYDIALOG_H

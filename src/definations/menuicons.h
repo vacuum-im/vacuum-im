@@ -92,8 +92,8 @@
 #define MNI_MAINWINDOW_LOGO96           "mainwindowLogo96"
 #define MNI_MAINWINDOW_LOGO128          "mainwindowLogo128"
 #define MNI_MAINWINDOW_QUIT             "mainwindowQuit"
-#define MNI_MAINWINDOW_MENU             "mainwindowMenu" 
-#define MNI_MAINWINDOW_SHOW_ROSTER      "mainwindowShowRoster" 
+#define MNI_MAINWINDOW_MENU             "mainwindowMenu"
+#define MNI_MAINWINDOW_SHOW_ROSTER      "mainwindowShowRoster"
 
 //MessageArchiver
 #define MNI_HISTORY                     "history"

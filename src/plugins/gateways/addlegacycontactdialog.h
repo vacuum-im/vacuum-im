@@ -8,35 +8,35 @@
 #include <utils/iconstorage.h>
 #include "ui_addlegacycontactdialog.h"
 
-class AddLegacyContactDialog : 
-  public QDialog
+class AddLegacyContactDialog :
+			public QDialog
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  AddLegacyContactDialog(IGateways *AGateways, IRosterChanger *ARosterChanger, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
-  ~AddLegacyContactDialog();
+	AddLegacyContactDialog(IGateways *AGateways, IRosterChanger *ARosterChanger, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
+	~AddLegacyContactDialog();
 public:
-  virtual const Jid &streamJid() const { return FStreamJid; }
-  virtual const Jid &serviceJid() const { return FServiceJid; }
+	virtual const Jid &streamJid() const { return FStreamJid; }
+	virtual const Jid &serviceJid() const { return FServiceJid; }
 protected:
-  void resetDialog();
-  void requestPrompt();
-  void requestUserJid();
+	void resetDialog();
+	void requestPrompt();
+	void requestUserJid();
 protected slots:
-  void onPromptReceived(const QString &AId, const QString &ADesc, const QString &APrompt);
-  void onUserJidReceived(const QString &AId, const Jid &AUserJid);
-  void onErrorReceived(const QString &AId, const QString &AError);
-  void onDialogButtonsClicked(QAbstractButton *AButton);
+	void onPromptReceived(const QString &AId, const QString &ADesc, const QString &APrompt);
+	void onUserJidReceived(const QString &AId, const Jid &AUserJid);
+	void onErrorReceived(const QString &AId, const QString &AError);
+	void onDialogButtonsClicked(QAbstractButton *AButton);
 private:
-  Ui::AddLegacyContactDialogClass ui;
+	Ui::AddLegacyContactDialogClass ui;
 private:
-  IGateways *FGateways;
-  IRosterChanger *FRosterChanger;
+	IGateways *FGateways;
+	IRosterChanger *FRosterChanger;
 private:
-  Jid FStreamJid;
-  Jid FServiceJid;
-  QString FContactId;
-  QString FRequestId;
+	Jid FStreamJid;
+	Jid FServiceJid;
+	QString FContactId;
+	QString FRequestId;
 };
 
 #endif // ADDLEGACYCONTACTDIALOG_H

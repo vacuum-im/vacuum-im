@@ -12,40 +12,40 @@
 
 class Action;
 
-class UTILS_EXPORT Menu : 
-  public QMenu
+class UTILS_EXPORT Menu :
+			public QMenu
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  Menu(QWidget *AParent = NULL);
-  ~Menu();
-  bool isEmpty() const;
-  Action *menuAction() const;
-  int actionGroup(const Action *AAction) const;
-  QAction *nextGroupSeparator(int AGroup) const;
-  QList<Action *> groupActions(int AGroup = AG_NULL) const;
-  QList<Action *> findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu = false) const;
-  void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
-  void addMenuActions(const Menu *AMenu, int AGroup = AG_DEFAULT, bool ASort = false);
-  void removeAction(Action *AAction);
-  void clear();
-  void setIcon(const QIcon &AIcon);
-  void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);
-  void setTitle(const QString &ATitle);
+	Menu(QWidget *AParent = NULL);
+	~Menu();
+	bool isEmpty() const;
+	Action *menuAction() const;
+	int actionGroup(const Action *AAction) const;
+	QAction *nextGroupSeparator(int AGroup) const;
+	QList<Action *> groupActions(int AGroup = AG_NULL) const;
+	QList<Action *> findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu = false) const;
+	void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
+	void addMenuActions(const Menu *AMenu, int AGroup = AG_DEFAULT, bool ASort = false);
+	void removeAction(Action *AAction);
+	void clear();
+	void setIcon(const QIcon &AIcon);
+	void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);
+	void setTitle(const QString &ATitle);
 signals:
-  void actionInserted(QAction *ABefour, Action *AAction, int AGroup, bool ASort);
-  void actionRemoved(Action *AAction);
-  void separatorInserted(Action *ABefour, QAction *ASeparator);
-  void separatorRemoved(QAction *ASeparator);
-  void menuDestroyed(Menu *AMenu);
+	void actionInserted(QAction *ABefour, Action *AAction, int AGroup, bool ASort);
+	void actionRemoved(Action *AAction);
+	void separatorInserted(Action *ABefour, QAction *ASeparator);
+	void separatorRemoved(QAction *ASeparator);
+	void menuDestroyed(Menu *AMenu);
 protected slots:
-  void onActionDestroyed(Action *AAction);
+	void onActionDestroyed(Action *AAction);
 private:
-  Action *FMenuAction;
-  IconStorage *FIconStorage;
+	Action *FMenuAction;
+	IconStorage *FIconStorage;
 private:
-  QMultiMap<int, Action *> FActions;
-  QMap<int, QAction *> FSeparators;
+	QMultiMap<int, Action *> FActions;
+	QMap<int, QAction *> FSeparators;
 };
 
 #endif // MENU_H

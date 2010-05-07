@@ -16,75 +16,75 @@
 #include <utils/errorhandler.h>
 #include <utils/iconstorage.h>
 
-struct ChallengeItem 
+struct ChallengeItem
 {
-  Jid streamJid;
-  Jid challenger;
-  IDataDialogWidget *dialog;
+	Jid streamJid;
+	Jid challenger;
+	IDataDialogWidget *dialog;
 };
 
-class CaptchaForms : 
-  public QObject,
-  public IPlugin,
-  public ICaptchaForms,
-  public IStanzaHandler,
-  public IStanzaRequestOwner,
-  public IDataLocalizer
+class CaptchaForms :
+			public QObject,
+			public IPlugin,
+			public ICaptchaForms,
+			public IStanzaHandler,
+			public IStanzaRequestOwner,
+			public IDataLocalizer
 {
-  Q_OBJECT;
-  Q_INTERFACES(IPlugin ICaptchaForms IStanzaHandler IStanzaRequestOwner IDataLocalizer);
+	Q_OBJECT;
+	Q_INTERFACES(IPlugin ICaptchaForms IStanzaHandler IStanzaRequestOwner IDataLocalizer);
 public:
-  CaptchaForms();
-  ~CaptchaForms();
-  //IPlugin
-  virtual QObject *instance() { return this; }
-  virtual QUuid pluginUuid() const { return CAPTCHAFORMS_UUID; }
-  virtual void pluginInfo(IPluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects();
-  virtual bool initSettings() { return true; }
-  virtual bool startPlugin() { return true; }
-  //IStanzaHandler
-  virtual bool stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
-  virtual bool stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
-  //IStanzaRequestOwner
-  virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
-  virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
-  //IDataLocalizer
-  virtual IDataFormLocale dataFormLocale(const QString &AFormType);
-  //ICaptchaForms
-  virtual bool submitChallenge(const QString &AChallengeId, const IDataForm &ASubmit);
-  virtual bool cancelChallenge(const QString &AChallengeId);
+	CaptchaForms();
+	~CaptchaForms();
+	//IPlugin
+	virtual QObject *instance() { return this; }
+	virtual QUuid pluginUuid() const { return CAPTCHAFORMS_UUID; }
+	virtual void pluginInfo(IPluginInfo *APluginInfo);
+	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+	virtual bool initObjects();
+	virtual bool initSettings() { return true; }
+	virtual bool startPlugin() { return true; }
+	//IStanzaHandler
+	virtual bool stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
+	virtual bool stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+	//IStanzaRequestOwner
+	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+	virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
+	//IDataLocalizer
+	virtual IDataFormLocale dataFormLocale(const QString &AFormType);
+	//ICaptchaForms
+	virtual bool submitChallenge(const QString &AChallengeId, const IDataForm &ASubmit);
+	virtual bool cancelChallenge(const QString &AChallengeId);
 signals:
-  void challengeReceived(const QString &AChallengeId, const IDataForm &AForm);
-  void challengeSubmited(const QString &AChallengeId, const IDataForm &ASubmit);
-  void challengeAccepted(const QString &AChallengeId);
-  void challengeRejected(const QString &AChallengeId, const QString &AError);
-  void challengeCanceled(const QString &AChallengeId);
+	void challengeReceived(const QString &AChallengeId, const IDataForm &AForm);
+	void challengeSubmited(const QString &AChallengeId, const IDataForm &ASubmit);
+	void challengeAccepted(const QString &AChallengeId);
+	void challengeRejected(const QString &AChallengeId, const QString &AError);
+	void challengeCanceled(const QString &AChallengeId);
 protected:
-  bool isSupportedChallenge(IDataForm &AForm) const;
-  bool isValidChallenge(const Jid &AStreamJid, const Stanza &AStanza, IDataForm &AForm) const;
-  void notifyChallenge(const ChallengeItem &AChallenge);
-  QString findChallenge(IDataDialogWidget *ADialog) const;
-  QString findChallenge(const Jid &AStreamJid, const Jid &AContactJid) const;
+	bool isSupportedChallenge(IDataForm &AForm) const;
+	bool isValidChallenge(const Jid &AStreamJid, const Stanza &AStanza, IDataForm &AForm) const;
+	void notifyChallenge(const ChallengeItem &AChallenge);
+	QString findChallenge(IDataDialogWidget *ADialog) const;
+	QString findChallenge(const Jid &AStreamJid, const Jid &AContactJid) const;
 protected slots:
-  void onStreamOpened(IXmppStream *AXmppStream);
-  void onStreamClosed(IXmppStream *AXmppStream);
-  void onChallengeDialogAccepted();
-  void onChallengeDialogRejected();
-  void onNotificationActivated(int ANotifyId);
-  void onNotificationRemoved(int ANotifyId);
+	void onStreamOpened(IXmppStream *AXmppStream);
+	void onStreamClosed(IXmppStream *AXmppStream);
+	void onChallengeDialogAccepted();
+	void onChallengeDialogRejected();
+	void onNotificationActivated(int ANotifyId);
+	void onNotificationRemoved(int ANotifyId);
 private:
-  IDataForms *FDataForms;
-  IXmppStreams *FXmppStreams;
-  INotifications *FNotifications;
-  IStanzaProcessor *FStanzaProcessor;
+	IDataForms *FDataForms;
+	IXmppStreams *FXmppStreams;
+	INotifications *FNotifications;
+	IStanzaProcessor *FStanzaProcessor;
 private:
-  QMap<Jid, int> FSHIChallenge;
+	QMap<Jid, int> FSHIChallenge;
 private:
-  QMap<int, QString> FChallengeNotify;
-  QMap<QString, QString> FChallengeRequest;
-  QMap<QString, ChallengeItem> FChallenges;
+	QMap<int, QString> FChallengeNotify;
+	QMap<QString, QString> FChallengeRequest;
+	QMap<QString, ChallengeItem> FChallenges;
 };
 
 #endif // CAPTCHAFORMS_H

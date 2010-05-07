@@ -34,80 +34,80 @@
 #include <utils/options.h>
 #include "usercontextmenu.h"
 
-struct WindowStatus 
+struct WindowStatus
 {
-  QDateTime startTime;
-  QDateTime createTime;
-  QString lastStatusShow;
+	QDateTime startTime;
+	QDateTime createTime;
+	QString lastStatusShow;
 };
 
-class ChatMessageHandler : 
-  public QObject,
-  public IPlugin,
-  public IMessageHandler,
-  public IXmppUriHandler,
-  public IRostersClickHooker
+class ChatMessageHandler :
+			public QObject,
+			public IPlugin,
+			public IMessageHandler,
+			public IXmppUriHandler,
+			public IRostersClickHooker
 {
-  Q_OBJECT;
-  Q_INTERFACES(IPlugin IMessageHandler IRostersClickHooker IXmppUriHandler);
+	Q_OBJECT;
+	Q_INTERFACES(IPlugin IMessageHandler IRostersClickHooker IXmppUriHandler);
 public:
-  ChatMessageHandler();
-  ~ChatMessageHandler();
-  //IPlugin
-  virtual QObject *instance() { return this; }
-  virtual QUuid pluginUuid() const { return CHATMESSAGEHANDLER_UUID; }
-  virtual void pluginInfo(IPluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects();
-  virtual bool initSettings() { return true; }
-  virtual bool startPlugin() { return true; }
-  //IXmppUriHandler
-  virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
-  //IRostersClickHooker
-  virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder);
-  //IMessageHandler
-  virtual bool checkMessage(int AOrder, const Message &AMessage);
-  virtual void showMessage(int AMessageId);
-  virtual void receiveMessage(int AMessageId);
-  virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
-  virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
+	ChatMessageHandler();
+	~ChatMessageHandler();
+	//IPlugin
+	virtual QObject *instance() { return this; }
+	virtual QUuid pluginUuid() const { return CHATMESSAGEHANDLER_UUID; }
+	virtual void pluginInfo(IPluginInfo *APluginInfo);
+	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+	virtual bool initObjects();
+	virtual bool initSettings() { return true; }
+	virtual bool startPlugin() { return true; }
+	//IXmppUriHandler
+	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
+	//IRostersClickHooker
+	virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder);
+	//IMessageHandler
+	virtual bool checkMessage(int AOrder, const Message &AMessage);
+	virtual void showMessage(int AMessageId);
+	virtual void receiveMessage(int AMessageId);
+	virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
+	virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
 protected:
-  IChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
-  IChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
-  void updateWindow(IChatWindow *AWindow);
-  void removeActiveMessages(IChatWindow *AWindow);
-  void showHistory(IChatWindow *AWindow);
-  void setMessageStyle(IChatWindow *AWindow);
-  void fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
-  void showStyledStatus(IChatWindow *AWindow, const QString &AMessage);
-  void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
+	IChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
+	IChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
+	void updateWindow(IChatWindow *AWindow);
+	void removeActiveMessages(IChatWindow *AWindow);
+	void showHistory(IChatWindow *AWindow);
+	void setMessageStyle(IChatWindow *AWindow);
+	void fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
+	void showStyledStatus(IChatWindow *AWindow, const QString &AMessage);
+	void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
 protected slots:
-  void onMessageReady();
-  void onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
-  void onWindowActivated();
-  void onWindowClosed();
-  void onWindowDestroyed();
-  void onStatusIconsChanged();
-  void onShowWindowAction(bool);
-  void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-  void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
-  void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
+	void onMessageReady();
+	void onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
+	void onWindowActivated();
+	void onWindowClosed();
+	void onWindowDestroyed();
+	void onStatusIconsChanged();
+	void onShowWindowAction(bool);
+	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+	void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
+	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
-  IMessageWidgets *FMessageWidgets;
-  IMessageProcessor *FMessageProcessor;
-  IMessageStyles *FMessageStyles;
-  IPresencePlugin *FPresencePlugin;
-  IMessageArchiver *FMessageArchiver;
-  IRostersView *FRostersView;
-  IRostersModel *FRostersModel;
-  IStatusIcons *FStatusIcons;
-  IStatusChanger *FStatusChanger;
-  IXmppUriQueries *FXmppUriQueries;
+	IMessageWidgets *FMessageWidgets;
+	IMessageProcessor *FMessageProcessor;
+	IMessageStyles *FMessageStyles;
+	IPresencePlugin *FPresencePlugin;
+	IMessageArchiver *FMessageArchiver;
+	IRostersView *FRostersView;
+	IRostersModel *FRostersModel;
+	IStatusIcons *FStatusIcons;
+	IStatusChanger *FStatusChanger;
+	IXmppUriQueries *FXmppUriQueries;
 private:
-  QList<IChatWindow *> FWindows;
-  QMultiMap<IChatWindow *,int> FActiveMessages;
-  QMap<IViewWidget *, WindowStatus> FWindowStatus;
-  QMap<IChatWindow *, QTimer *> FWindowTimers;
+	QList<IChatWindow *> FWindows;
+	QMultiMap<IChatWindow *,int> FActiveMessages;
+	QMap<IViewWidget *, WindowStatus> FWindowStatus;
+	QMap<IChatWindow *, QTimer *> FWindowTimers;
 };
 
 #endif // CHATMESSAGEHANDLER_H

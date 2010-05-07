@@ -7,33 +7,33 @@
 #include <interfaces/ixmppstreams.h>
 #include "ui_joinmultichatdialog.h"
 
-class JoinMultiChatDialog : 
-  public QDialog
+class JoinMultiChatDialog :
+			public QDialog
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, 
-    const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
-  ~JoinMultiChatDialog();
+	JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid,
+	                    const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
+	~JoinMultiChatDialog();
 protected:
-  void initialize();
-  void updateResolveNickState();
+	void initialize();
+	void updateResolveNickState();
 protected slots:
-  void onDialogAccepted();
-  void onStreamIndexChanged(int AIndex);
-  void onResolveNickClicked();
-  void onRoomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
-  void onStreamAdded(IXmppStream *AXmppStream);
-  void onStreamStateChanged(IXmppStream *AXmppStream);
-  void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
-  void onStreamRemoved(IXmppStream *AXmppStream);
+	void onDialogAccepted();
+	void onStreamIndexChanged(int AIndex);
+	void onResolveNickClicked();
+	void onRoomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
+	void onStreamAdded(IXmppStream *AXmppStream);
+	void onStreamStateChanged(IXmppStream *AXmppStream);
+	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+	void onStreamRemoved(IXmppStream *AXmppStream);
 private:
-  Ui::JoinMultiChatDialogClass ui;
+	Ui::JoinMultiChatDialogClass ui;
 private:
-  IXmppStreams *FXmppStreams;
-  IMultiUserChatPlugin *FChatPlugin;
+	IXmppStreams *FXmppStreams;
+	IMultiUserChatPlugin *FChatPlugin;
 private:
-  Jid FStreamJid;
+	Jid FStreamJid;
 };
 
 #endif // JOINMULTICHATDIALOG_H

@@ -18,9 +18,9 @@
 
   The following programs were used to create these smiles:
 
-* Ulead GIF Animator 5.05 – in this program I do everything (and I draw using it)
-* IrfanView 4.10 – for reviewing and processing of drawings
-* GIF Movie Gear 4.1.2 – for size reduction and cleaning of GIF final version.
+* Ulead GIF Animator 5.05 â€“ in this program I do everything (and I draw using it)
+* IrfanView 4.10 â€“ for reviewing and processing of drawings
+* GIF Movie Gear 4.1.2 â€“ for size reduction and cleaning of GIF final version.
 
 --------------------------------------------------------------------
                               LICENSE
@@ -35,7 +35,7 @@ This license agreement covers the conditions according to which you can use the 
 - You may not sell them or use them for profit either individually, or in any sort of collection or smiles-pack.
 - You should ask for my permission before using them in any programms or projects.
 - You should ASK FOR AUTHOR PERMISSION before using artworks of mine or of our site's artists at your own private gallery. Works of every author must be placed at separate section named accordingly with author's name. Also you should point to this website like to a source (if the author does not want to point his own).
-- When using my works, non-profit organisations are allowed not to ask for my permission but should place my copyright "Copyright © Aiwan. Kolobok Smiles" and a link to my Website http://www.kolobok.us on the bottom of every page where my works are used.
+- When using my works, non-profit organisations are allowed not to ask for my permission but should place my copyright "Copyright Â© Aiwan. Kolobok Smiles" and a link to my Website http://www.kolobok.us on the bottom of every page where my works are used.
 - If you do not agree with this licence, you must remove the files from your storage devices and stop using the archive.
 
 -----------------------------------------------------------
@@ -51,4 +51,4 @@ This license agreement covers the conditions according to which you can use the 
   http://www.kolobok.us - Welcome!
   DO NOT SEARCH for MY SMILES WHERE THEIR MUST NOT BE!
 
-  Copyright © 2004-2009 Kolobok Smiles
+  Copyright Â© 2004-2009 Kolobok Smiles

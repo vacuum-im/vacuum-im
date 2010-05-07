@@ -4,17 +4,17 @@
 #include <QWebView>
 #include <webpage.h>
 
-class StyleViewer : 
-  public QWebView
+class StyleViewer :
+			public QWebView
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  StyleViewer(QWidget *AParent);
-  ~StyleViewer();
+	StyleViewer(QWidget *AParent);
+	~StyleViewer();
 public:
-  virtual QSize sizeHint() const;
+	virtual QSize sizeHint() const;
 protected slots:
-  void onShortcutActivated();
+	void onShortcutActivated();
 };
 
 #endif // STYLEVIEWER_H

@@ -22,7 +22,7 @@
 #define SDF_RCHANGER_SUBSCRIPTION         "rchangerSubscription"
 
 //SessionNegotiation
-#define SDF_SNEGOTIATION_REQUEST          "snegotiationRequest" 
+#define SDF_SNEGOTIATION_REQUEST          "snegotiationRequest"
 
 //StatusChanger
 #define SDF_SCHANGER_CONNECTION_ERROR     "schangerConnectionError"

@@ -16,40 +16,40 @@
 #include "mainwindow.h"
 
 class MainWindowPlugin :
-  public QObject,
-  public IPlugin,
-  public IMainWindowPlugin
+			public QObject,
+			public IPlugin,
+			public IMainWindowPlugin
 {
-  Q_OBJECT;
-  Q_INTERFACES(IPlugin IMainWindowPlugin);
+	Q_OBJECT;
+	Q_INTERFACES(IPlugin IMainWindowPlugin);
 public:
-  MainWindowPlugin();
-  ~MainWindowPlugin();
-  virtual QObject* instance() { return this; }
-  //IPlugin
-  virtual QUuid pluginUuid() const { return MAINWINDOW_UUID; }
-  virtual void pluginInfo(IPluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects();
-  virtual bool initSettings();
-  virtual bool startPlugin();
-  //IMainWindowPlugin
-  virtual IMainWindow *mainWindow() const;
+	MainWindowPlugin();
+	~MainWindowPlugin();
+	virtual QObject* instance() { return this; }
+	//IPlugin
+	virtual QUuid pluginUuid() const { return MAINWINDOW_UUID; }
+	virtual void pluginInfo(IPluginInfo *APluginInfo);
+	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+	virtual bool initObjects();
+	virtual bool initSettings();
+	virtual bool startPlugin();
+	//IMainWindowPlugin
+	virtual IMainWindow *mainWindow() const;
 protected:
-  void updateTitle();
-  void showMainWindow();
+	void updateTitle();
+	void showMainWindow();
 protected slots:
-  void onOptionsOpened();
-  void onOptionsClosed();
-  void onProfileRenamed(const QString &AProfile, const QString &ANewName);
-  void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
-  void onShowMainWindowByAction(bool);
+	void onOptionsOpened();
+	void onOptionsClosed();
+	void onProfileRenamed(const QString &AProfile, const QString &ANewName);
+	void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
+	void onShowMainWindowByAction(bool);
 private:
-  IPluginManager *FPluginManager;
-  IOptionsManager *FOptionsManager;
-  ITrayManager *FTrayManager;
+	IPluginManager *FPluginManager;
+	IOptionsManager *FOptionsManager;
+	ITrayManager *FTrayManager;
 private:
-  MainWindow *FMainWindow;
+	MainWindow *FMainWindow;
 };
 
 #endif // MAINWINDOW_H

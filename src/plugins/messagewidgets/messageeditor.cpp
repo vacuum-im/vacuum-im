@@ -5,11 +5,11 @@
 
 MessageEditor::MessageEditor(QWidget *AParent) : QTextEdit(AParent)
 {
-  FAutoResize = true;
-  FMinimumLines = 1;
+	FAutoResize = true;
+	FMinimumLines = 1;
 
-  setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-  connect(this,SIGNAL(textChanged()),SLOT(onTextChanged()));
+	setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+	connect(this,SIGNAL(textChanged()),SLOT(onTextChanged()));
 }
 
 MessageEditor::~MessageEditor()
@@ -19,55 +19,55 @@ MessageEditor::~MessageEditor()
 
 bool MessageEditor::autoResize() const
 {
-  return FAutoResize;
+	return FAutoResize;
 }
 
 void MessageEditor::setAutoResize(bool AResize)
 {
-  if (AResize != FAutoResize)
-  {
-    FAutoResize = AResize;
-    updateGeometry();
-  }
+	if (AResize != FAutoResize)
+	{
+		FAutoResize = AResize;
+		updateGeometry();
+	}
 }
 
 int MessageEditor::minimumLines() const
 {
-  return FMinimumLines;
+	return FMinimumLines;
 }
 
 void MessageEditor::setMinimumLines(int ALines)
 {
-  if (ALines != FMinimumLines)
-  {
-    FMinimumLines = ALines>0 ? ALines : 1;
-    updateGeometry();
-  }
+	if (ALines != FMinimumLines)
+	{
+		FMinimumLines = ALines>0 ? ALines : 1;
+		updateGeometry();
+	}
 }
 
 QSize MessageEditor::sizeHint() const
 {
-  QSize sh = QTextEdit::sizeHint();
-  sh.setHeight(textHeight(!FAutoResize ? FMinimumLines : 0));
-  return sh;
+	QSize sh = QTextEdit::sizeHint();
+	sh.setHeight(textHeight(!FAutoResize ? FMinimumLines : 0));
+	return sh;
 }
 
 QSize MessageEditor::minimumSizeHint() const
 {
-  QSize sh = QTextEdit::minimumSizeHint();
-  sh.setHeight(textHeight(FMinimumLines));
-  return sh;
+	QSize sh = QTextEdit::minimumSizeHint();
+	sh.setHeight(textHeight(FMinimumLines));
+	return sh;
 }
 
 int MessageEditor::textHeight(int ALines) const
 {
-  if (ALines > 0)
-    return fontMetrics().height()*ALines + (frameWidth() + qRound(document()->documentMargin()))*2;
-  else
-    return qRound(document()->documentLayout()->documentSize().height()) + frameWidth()*2;
+	if (ALines > 0)
+		return fontMetrics().height()*ALines + (frameWidth() + qRound(document()->documentMargin()))*2;
+	else
+		return qRound(document()->documentLayout()->documentSize().height()) + frameWidth()*2;
 }
 
 void MessageEditor::onTextChanged()
 {
-  updateGeometry();
+	updateGeometry();
 }

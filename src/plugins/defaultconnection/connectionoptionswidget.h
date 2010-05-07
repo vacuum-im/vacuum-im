@@ -7,31 +7,31 @@
 #include <utils/options.h>
 #include "ui_connectionoptionswidget.h"
 
-class ConnectionOptionsWidget : 
-  public QWidget,
-  public IOptionsWidget
+class ConnectionOptionsWidget :
+			public QWidget,
+			public IOptionsWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IOptionsWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IOptionsWidget);
 public:
-  ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent = NULL);
-  ~ConnectionOptionsWidget();
-  virtual QWidget* instance() { return this; }
+	ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent = NULL);
+	~ConnectionOptionsWidget();
+	virtual QWidget* instance() { return this; }
 public slots:
-  void apply(OptionsNode ANode);
-  void apply();
-  void reset();
+	void apply(OptionsNode ANode);
+	void apply();
+	void reset();
 signals:
-  void modified();
-  void childApply();
-  void childReset();
+	void modified();
+	void childApply();
+	void childReset();
 private:
-  Ui::ConnectionOptionsWidgetClass ui;
+	Ui::ConnectionOptionsWidgetClass ui;
 private:
-  IConnectionManager *FManager;
+	IConnectionManager *FManager;
 private:
-  OptionsNode FOptions;
-  IOptionsWidget *FProxySettings;
+	OptionsNode FOptions;
+	IOptionsWidget *FProxySettings;
 };
 
 #endif // CONNECTIONOPTIONSWIDGET_H

@@ -8,33 +8,33 @@
 #include <utils/iconstorage.h>
 #include "ui_clientinfodialog.h"
 
-class ClientInfoDialog : 
-  public QDialog
+class ClientInfoDialog :
+			public QDialog
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid, const QString &AContactName, int AInfoTypes, QWidget *AParent = NULL);
-  ~ClientInfoDialog();
-  Jid streamJid() const { return FStreamJid; }
-  Jid contactJid() const { return FContactJid; }
-  int infoTypes() const { return FInfoTypes; }
-  void setInfoTypes(int AInfoTypes);
+	ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid, const QString &AContactName, int AInfoTypes, QWidget *AParent = NULL);
+	~ClientInfoDialog();
+	Jid streamJid() const { return FStreamJid; }
+	Jid contactJid() const { return FContactJid; }
+	int infoTypes() const { return FInfoTypes; }
+	void setInfoTypes(int AInfoTypes);
 signals:
-  void clientInfoDialogClosed(const Jid &FContactJid);
+	void clientInfoDialogClosed(const Jid &FContactJid);
 protected:
-  void updateText();
-  QString secsToString(int ASecs) const;
+	void updateText();
+	QString secsToString(int ASecs) const;
 protected slots:
-  void onClientInfoChanged(const Jid &AConatctJid);
+	void onClientInfoChanged(const Jid &AConatctJid);
 private:
-  Ui::ClientInfoDialogClass ui;
+	Ui::ClientInfoDialogClass ui;
 private:
-  IClientInfo *FClientInfo;
+	IClientInfo *FClientInfo;
 private:
-  int FInfoTypes;
-  Jid FStreamJid;
-  Jid FContactJid;
-  QString FContactName;
+	int FInfoTypes;
+	Jid FStreamJid;
+	Jid FContactJid;
+	QString FContactName;
 };
 
 #endif // CLIENTINFODIALOG_H

@@ -11,34 +11,34 @@
 class ConnectionManager;
 
 class ConnectionOptionsWidget :
-  public QWidget,
-  public IOptionsWidget
+			public QWidget,
+			public IOptionsWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IOptionsWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IOptionsWidget);
 public:
-  ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent);
-  ~ConnectionOptionsWidget();
-  virtual QWidget* instance() { return this; }
+	ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent);
+	~ConnectionOptionsWidget();
+	virtual QWidget* instance() { return this; }
 public slots:
-  void apply();
-  void reset();
+	void apply();
+	void reset();
 signals:
-  void modified();
-  void childApply();
-  void childReset();
+	void modified();
+	void childApply();
+	void childReset();
 protected:
-  void setPluginById(const QString &APluginId);
+	void setPluginById(const QString &APluginId);
 protected slots:
-  void onComboConnectionsChanged(int AIndex);
+	void onComboConnectionsChanged(int AIndex);
 private:
-  IConnectionManager *FManager;
+	IConnectionManager *FManager;
 private:
-  Ui::ConnectionOptionsWidgetClass ui;
+	Ui::ConnectionOptionsWidgetClass ui;
 private:
-  QString FPluginId;
-  OptionsNode FOptions;
-  IOptionsWidget *FPluginSettings;
+	QString FPluginId;
+	OptionsNode FOptions;
+	IOptionsWidget *FPluginSettings;
 };
 
 #endif // CONNECTIONOPTIONSWIDGET_H

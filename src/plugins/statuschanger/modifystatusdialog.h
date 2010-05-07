@@ -10,23 +10,23 @@
 #include <utils/jid.h>
 #include "ui_modifystatusdialog.h"
 
-class ModifyStatusDialog : 
-  public QDialog
+class ModifyStatusDialog :
+			public QDialog
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  ModifyStatusDialog(IStatusChanger *AStatusChanger, int AStatusId, const Jid &AStreamJid, QWidget *AParent = NULL);
-  ~ModifyStatusDialog();
-  void modifyStatus();
+	ModifyStatusDialog(IStatusChanger *AStatusChanger, int AStatusId, const Jid &AStreamJid, QWidget *AParent = NULL);
+	~ModifyStatusDialog();
+	void modifyStatus();
 protected slots:
-  void onDialogButtonBoxClicked(QAbstractButton *AButton);
+	void onDialogButtonBoxClicked(QAbstractButton *AButton);
 private:
-  Ui::ModifyStatusDialogClass ui;
+	Ui::ModifyStatusDialogClass ui;
 private:
-  IStatusChanger *FStatusChanger;
+	IStatusChanger *FStatusChanger;
 private:
-  int FStatusId;
-  Jid FStreamJid;
+	int FStatusId;
+	Jid FStreamJid;
 };
 
 #endif // MODIFYSTATUSDIALOG_H

@@ -8,28 +8,28 @@
 #include <interfaces/imessagewidgets.h>
 #include <utils/menu.h>
 
-class UserContextMenu : 
-  public Menu
+class UserContextMenu :
+			public Menu
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  UserContextMenu(IRostersModel *AModel, IRostersView *AView, IChatWindow *AWindow);
-  ~UserContextMenu();
+	UserContextMenu(IRostersModel *AModel, IRostersView *AView, IChatWindow *AWindow);
+	~UserContextMenu();
 protected:
-  bool isAcceptedIndex(IRosterIndex *AIndex);
-  void updateMenu();
+	bool isAcceptedIndex(IRosterIndex *AIndex);
+	void updateMenu();
 protected slots:
-  void onAboutToShow();
-  void onAboutToHide();
-  void onRosterIndexInserted(IRosterIndex *AIndex);
-  void onRosterIndexDataChanged(IRosterIndex *AIndex, int ARole);
-  void onRosterIndexRemoved(IRosterIndex *AIndex);
-  void onChatWindowContactJidChanged(const Jid &ABefour);
+	void onAboutToShow();
+	void onAboutToHide();
+	void onRosterIndexInserted(IRosterIndex *AIndex);
+	void onRosterIndexDataChanged(IRosterIndex *AIndex, int ARole);
+	void onRosterIndexRemoved(IRosterIndex *AIndex);
+	void onChatWindowContactJidChanged(const Jid &ABefour);
 private:
-  IRosterIndex *FRosterIndex;
-  IRostersModel *FRostersModel;
-  IRostersView *FRostersView;
-  IChatWindow *FChatWindow;
+	IRosterIndex *FRosterIndex;
+	IRostersModel *FRostersModel;
+	IRostersView *FRostersView;
+	IChatWindow *FChatWindow;
 };
 
 #endif // USERCONTEXTMENU_H

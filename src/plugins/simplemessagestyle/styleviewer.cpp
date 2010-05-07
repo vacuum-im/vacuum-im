@@ -2,10 +2,10 @@
 
 StyleViewer::StyleViewer(QWidget *AParent) : QTextBrowser(AParent)
 {
-  setOpenLinks(false);
-  setAcceptDrops(false);
-  setOpenExternalLinks(false);
-  setFrameShape(QFrame::NoFrame);
+	setOpenLinks(false);
+	setAcceptDrops(false);
+	setOpenExternalLinks(false);
+	setFrameShape(QFrame::NoFrame);
 }
 
 StyleViewer::~StyleViewer()
