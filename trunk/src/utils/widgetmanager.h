@@ -7,7 +7,7 @@
 class UTILS_EXPORT WidgetManager
 {
 public:
-  static void raiseWidget(QWidget *AWidget);
+	static void raiseWidget(QWidget *AWidget);
 };
 
 #endif //WIDGETMANAGER_H

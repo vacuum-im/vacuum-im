@@ -9,42 +9,42 @@
 #include <utils/options.h>
 #include "ui_socksoptions.h"
 
-class SocksOptions : 
-  public QWidget,
-  public IOptionsWidget
+class SocksOptions :
+			public QWidget,
+			public IOptionsWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IOptionsWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IOptionsWidget);
 public:
-  SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStream, bool AReadOnly, QWidget *AParent = NULL);
-  SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager, const OptionsNode &ANode, bool AReadOnly, QWidget *AParent = NULL);
-  ~SocksOptions();
-  virtual QWidget *instance() { return this; }
+	SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStream, bool AReadOnly, QWidget *AParent = NULL);
+	SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager, const OptionsNode &ANode, bool AReadOnly, QWidget *AParent = NULL);
+	~SocksOptions();
+	virtual QWidget *instance() { return this; }
 public slots:
-  void apply(OptionsNode ANode);
-  void apply(ISocksStream *AStream);
-  virtual void apply();
-  virtual void reset();
+	void apply(OptionsNode ANode);
+	void apply(ISocksStream *AStream);
+	virtual void apply();
+	virtual void reset();
 signals:
-  void modified();
-  void childApply();
-  void childReset();
+	void modified();
+	void childApply();
+	void childReset();
 protected:
-  void initialize(bool AReadOnly);
+	void initialize(bool AReadOnly);
 protected slots:
-  void onAddStreamProxyClicked(bool);
-  void onStreamProxyUpClicked(bool);
-  void onStreamProxyDownClicked(bool);
-  void onDeleteStreamProxyClicked(bool);
+	void onAddStreamProxyClicked(bool);
+	void onStreamProxyUpClicked(bool);
+	void onStreamProxyDownClicked(bool);
+	void onDeleteStreamProxyClicked(bool);
 private:
-  Ui::SocksOptionsClass ui;
+	Ui::SocksOptionsClass ui;
 private:
-  ISocksStreams *FSocksStreams;
-  IConnectionManager *FConnectionManager;
+	ISocksStreams *FSocksStreams;
+	IConnectionManager *FConnectionManager;
 private:
-  OptionsNode FOptions;
-  ISocksStream *FSocksStream;
-  IOptionsWidget *FProxySettings;
+	OptionsNode FOptions;
+	ISocksStream *FSocksStream;
+	IOptionsWidget *FProxySettings;
 };
 
 #endif // SOCKSOPTIONS_H

@@ -9,24 +9,24 @@
 
 #include <QMainWindow>
 
-class SelectIconWidget : 
-  public QWidget
+class SelectIconWidget :
+			public QWidget
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  SelectIconWidget(IconStorage *AStorage, QWidget *AParent = NULL);
-  ~SelectIconWidget();
+	SelectIconWidget(IconStorage *AStorage, QWidget *AParent = NULL);
+	~SelectIconWidget();
 signals:
-  void iconSelected(const QString &ASubStorage, const QString &AIconKey);
+	void iconSelected(const QString &ASubStorage, const QString &AIconKey);
 protected:
-  void createLabels();
+	void createLabels();
 protected:
-  virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
-  QLabel *FPressed;
-  QGridLayout *FLayout;
-  IconStorage *FStorage;
-  QMap<QLabel *, QString> FKeyByLabel;
+	QLabel *FPressed;
+	QGridLayout *FLayout;
+	IconStorage *FStorage;
+	QMap<QLabel *, QString> FKeyByLabel;
 };
 
 #endif // SELECTICONWIDGET_H

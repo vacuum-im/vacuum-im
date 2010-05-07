@@ -63,7 +63,7 @@
 #define SRI_HIERARCHY_LEAF                  SRI_HIERARCHY"/leaf"
 
 #define SRI_PROXY                           "proxy"
-#define SRI_PROXY_BYTESTREAMS               SRI_PROXY"/bytestreams"                           
+#define SRI_PROXY_BYTESTREAMS               SRI_PROXY"/bytestreams"
 
 #define SRI_PUBSUB                          "pubsub"
 #define SRI_PUBSUB_COLLECTION               SRI_PUBSUB"/collection"

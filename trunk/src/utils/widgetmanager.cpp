@@ -14,24 +14,24 @@
 void WidgetManager::raiseWidget(QWidget *AWidget)
 {
 #ifdef Q_WS_X11
-  static Atom         NET_ACTIVE_WINDOW = 0;
-  XClientMessageEvent xev;
+	static Atom         NET_ACTIVE_WINDOW = 0;
+	XClientMessageEvent xev;
 
-  if(NET_ACTIVE_WINDOW == 0)
-  {
-    Display *dpy      = QX11Info::display();
-    NET_ACTIVE_WINDOW = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
-  }
+	if (NET_ACTIVE_WINDOW == 0)
+	{
+		Display *dpy      = QX11Info::display();
+		NET_ACTIVE_WINDOW = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
+	}
 
-  xev.type         = ClientMessage;
-  xev.window       = AWidget->winId();
-  xev.message_type = NET_ACTIVE_WINDOW;
-  xev.format       = 32;
-  xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
-  xev.data.l[1]    = QX11Info::appUserTime();
-  xev.data.l[2]    = xev.data.l[3] = xev.data.l[4] = 0;
+	xev.type         = ClientMessage;
+	xev.window       = AWidget->winId();
+	xev.message_type = NET_ACTIVE_WINDOW;
+	xev.format       = 32;
+	xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
+	xev.data.l[1]    = QX11Info::appUserTime();
+	xev.data.l[2]    = xev.data.l[3] = xev.data.l[4] = 0;
 
-  XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
+	XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
 #endif//Q_WS_X11
-  AWidget->raise();
+	AWidget->raise();
 }

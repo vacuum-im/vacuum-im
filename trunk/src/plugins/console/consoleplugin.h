@@ -14,30 +14,30 @@
 
 #define CONSOLE_UUID  "{2572D474-5F3E-8d24-B10A-BAA57C2BC693}"
 
-class ConsolePlugin : 
-  public QObject,
-  public IPlugin
+class ConsolePlugin :
+			public QObject,
+			public IPlugin
 {
-  Q_OBJECT;
-  Q_INTERFACES(IPlugin);
+	Q_OBJECT;
+	Q_INTERFACES(IPlugin);
 public:
-  ConsolePlugin();
-  ~ConsolePlugin();
-  //IPlugin
-  virtual QObject *instance() { return this; }
-  virtual QUuid pluginUuid() const { return CONSOLE_UUID; }
-  virtual void pluginInfo(IPluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects();
-  virtual bool initSettings();
-  virtual bool startPlugin() { return true; }
+	ConsolePlugin();
+	~ConsolePlugin();
+	//IPlugin
+	virtual QObject *instance() { return this; }
+	virtual QUuid pluginUuid() const { return CONSOLE_UUID; }
+	virtual void pluginInfo(IPluginInfo *APluginInfo);
+	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+	virtual bool initObjects();
+	virtual bool initSettings();
+	virtual bool startPlugin() { return true; }
 protected slots:
-  void onShowXMLConsole(bool);
+	void onShowXMLConsole(bool);
 private:
-  IPluginManager *FPluginManager;
-  IMainWindowPlugin *FMainWindowPlugin;
+	IPluginManager *FPluginManager;
+	IMainWindowPlugin *FMainWindowPlugin;
 private:
-  QObjectCleanupHandler FCleanupHandler;
+	QObjectCleanupHandler FCleanupHandler;
 };
 
 #endif // CONSOLEPLUGIN_H

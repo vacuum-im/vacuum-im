@@ -8,31 +8,31 @@
 #include <utils/options.h>
 #include "ui_messengeroptions.h"
 
-class MessengerOptions : 
-  public QWidget,
-  public IOptionsWidget
+class MessengerOptions :
+			public QWidget,
+			public IOptionsWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IOptionsWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IOptionsWidget);
 public:
-  MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AParent);
-  ~MessengerOptions();
-  virtual QWidget* instance() { return this; }
+	MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AParent);
+	~MessengerOptions();
+	virtual QWidget* instance() { return this; }
 public slots:
-  virtual void apply();
-  virtual void reset();
+	virtual void apply();
+	virtual void reset();
 signals:
-  void modified();
-  void childApply();
-  void childReset();
+	void modified();
+	void childApply();
+	void childReset();
 protected:
-  virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
-  Ui::MessengerOptionsClass ui;
+	Ui::MessengerOptionsClass ui;
 private:
-  IMessageWidgets *FMessageWidgets;
+	IMessageWidgets *FMessageWidgets;
 private:
-  QKeySequence FSendKey;
+	QKeySequence FSendKey;
 };
 
 #endif // MESSENGEROPTIONS_H

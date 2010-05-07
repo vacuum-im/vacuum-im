@@ -17,58 +17,58 @@
 #include <utils/action.h>
 #include <utils/toolbarchanger.h>
 
-class RosterSearch : 
-  public QSortFilterProxyModel,
-  public IPlugin,
-  public IRosterSearch
+class RosterSearch :
+			public QSortFilterProxyModel,
+			public IPlugin,
+			public IRosterSearch
 {
-  Q_OBJECT;
-  Q_INTERFACES(IPlugin IRosterSearch);
+	Q_OBJECT;
+	Q_INTERFACES(IPlugin IRosterSearch);
 public:
-  RosterSearch();
-  ~RosterSearch();
-  //IPlugin
-  virtual QObject *instance() { return this; }
-  virtual QUuid pluginUuid() const { return ROSTERSEARCH_UUID; }
-  virtual void pluginInfo(IPluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects();
-  virtual bool initSettings() { return true; }
-  virtual bool startPlugin() { return true; }
-  //IRosterSearch
-  virtual void startSearch();
-  virtual QString searchPattern() const;
-  virtual void setSearchPattern(const QString &APattern);
-  virtual bool isSearchEnabled() const;
-  virtual void setSearchEnabled(bool AEnabled);
-  virtual void insertSearchField(int ADataRole, const QString &AName, bool AEnabled);
-  virtual Menu *searchFieldsMenu() const;
-  virtual QList<int> searchFields() const;
-  virtual bool isSearchFieldEnabled(int ADataRole) const;
-  virtual void setSearchFieldEnabled(int ADataRole, bool AEnabled);
-  virtual void removeSearchField(int ADataRole);
+	RosterSearch();
+	~RosterSearch();
+	//IPlugin
+	virtual QObject *instance() { return this; }
+	virtual QUuid pluginUuid() const { return ROSTERSEARCH_UUID; }
+	virtual void pluginInfo(IPluginInfo *APluginInfo);
+	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+	virtual bool initObjects();
+	virtual bool initSettings() { return true; }
+	virtual bool startPlugin() { return true; }
+	//IRosterSearch
+	virtual void startSearch();
+	virtual QString searchPattern() const;
+	virtual void setSearchPattern(const QString &APattern);
+	virtual bool isSearchEnabled() const;
+	virtual void setSearchEnabled(bool AEnabled);
+	virtual void insertSearchField(int ADataRole, const QString &AName, bool AEnabled);
+	virtual Menu *searchFieldsMenu() const;
+	virtual QList<int> searchFields() const;
+	virtual bool isSearchFieldEnabled(int ADataRole) const;
+	virtual void setSearchFieldEnabled(int ADataRole, bool AEnabled);
+	virtual void removeSearchField(int ADataRole);
 signals:
-  void searchResultUpdated();
-  void searchStateChanged(bool AEnabled);
-  void searchPatternChanged(const QString &APattern);
-  void searchFieldInserted(int ADataRole, const QString &AName);
-  void searchFieldChanged(int ADataRole);
-  void searchFieldRemoved(int ADataRole);
+	void searchResultUpdated();
+	void searchStateChanged(bool AEnabled);
+	void searchPatternChanged(const QString &APattern);
+	void searchFieldInserted(int ADataRole, const QString &AName);
+	void searchFieldChanged(int ADataRole);
+	void searchFieldRemoved(int ADataRole);
 protected:
-  virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
+	virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 protected slots:
-  void onFieldActionTriggered(bool);
-  void onSearchActionTriggered(bool AChecked);
-  void onEditTimedOut();
+	void onFieldActionTriggered(bool);
+	void onSearchActionTriggered(bool AChecked);
+	void onEditTimedOut();
 private:
-  IMainWindow *FMainWindow;
-  IRostersViewPlugin *FRostersViewPlugin;
+	IMainWindow *FMainWindow;
+	IRostersViewPlugin *FRostersViewPlugin;
 private:
-  Menu *FFieldsMenu;
-  QTimer FEditTimeout;
-  QLineEdit *FSearchEdit;
-  ToolBarChanger *FSearchToolBarChanger;
-  QHash<int,Action *> FFieldActions;
+	Menu *FFieldsMenu;
+	QTimer FEditTimeout;
+	QLineEdit *FSearchEdit;
+	ToolBarChanger *FSearchToolBarChanger;
+	QHash<int,Action *> FFieldActions;
 };
 
 #endif // ROSTERSEARCH_H

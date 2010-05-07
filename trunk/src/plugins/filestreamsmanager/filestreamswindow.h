@@ -15,46 +15,46 @@
 #include <utils/options.h>
 #include "ui_filestreamswindow.h"
 
-class FileStreamsWindow : 
-  public QMainWindow
+class FileStreamsWindow :
+			public QMainWindow
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  FileStreamsWindow(IFileStreamsManager *AManager, QWidget *AParent);
-  ~FileStreamsWindow();
+	FileStreamsWindow(IFileStreamsManager *AManager, QWidget *AParent);
+	~FileStreamsWindow();
 protected:
-  void initialize();
-  void appendStream(IFileStream *AStream);
-  void updateStreamState(IFileStream *AStream);
-  void updateStreamSpeed(IFileStream *AStream);
-  void updateStreamProgress(IFileStream *AStream);
-  void updateStreamProperties(IFileStream *AStream);
-  void removeStream(IFileStream *AStream);
-  int streamRow(const QString &AStreamId) const;
-  QList<QStandardItem *> streamColumns(const QString &AStreamId) const;
-  QString sizeName(qint64 ABytes) const;
+	void initialize();
+	void appendStream(IFileStream *AStream);
+	void updateStreamState(IFileStream *AStream);
+	void updateStreamSpeed(IFileStream *AStream);
+	void updateStreamProgress(IFileStream *AStream);
+	void updateStreamProperties(IFileStream *AStream);
+	void removeStream(IFileStream *AStream);
+	int streamRow(const QString &AStreamId) const;
+	QList<QStandardItem *> streamColumns(const QString &AStreamId) const;
+	QString sizeName(qint64 ABytes) const;
 protected slots:
-  void onStreamCreated(IFileStream *AStream);
-  void onStreamStateChanged();
-  void onStreamSpeedChanged();
-  void onStreamProgressChanged();
-  void onStreamPropertiesChanged();
-  void onStreamDestroyed(IFileStream *AStream);
-  void onTableIndexActivated(const QModelIndex &AIndex);
-  void onUpdateStatusBar();
+	void onStreamCreated(IFileStream *AStream);
+	void onStreamStateChanged();
+	void onStreamSpeedChanged();
+	void onStreamProgressChanged();
+	void onStreamPropertiesChanged();
+	void onStreamDestroyed(IFileStream *AStream);
+	void onTableIndexActivated(const QModelIndex &AIndex);
+	void onUpdateStatusBar();
 private:
-  Ui::FileStreamsWindowClass ui;
+	Ui::FileStreamsWindowClass ui;
 private:
-  IFileStreamsManager *FManager;
+	IFileStreamsManager *FManager;
 private:
-  QLabel *FStreamsCount;
-  QLabel *FStreamsSpeedIn;
-  QLabel *FStreamsSpeedOut;
+	QLabel *FStreamsCount;
+	QLabel *FStreamsSpeedIn;
+	QLabel *FStreamsSpeedOut;
 private:
-  ToolBarChanger *FToolBarChanger;
-  StatusBarChanger *FStatusBarChanger;
-  QSortFilterProxyModel FProxy;
-  QStandardItemModel FStreamsModel;
+	ToolBarChanger *FToolBarChanger;
+	StatusBarChanger *FStatusBarChanger;
+	QSortFilterProxyModel FProxy;
+	QStandardItemModel FStreamsModel;
 };
 
 #endif // FILESTREAMSWINDOW_H

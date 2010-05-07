@@ -9,73 +9,73 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/itraymanager.h>
 
-class TrayManager : 
-  public QObject,
-  public IPlugin,
-  public ITrayManager
+class TrayManager :
+			public QObject,
+			public IPlugin,
+			public ITrayManager
 {
-  Q_OBJECT;
-  Q_INTERFACES(IPlugin ITrayManager);
+	Q_OBJECT;
+	Q_INTERFACES(IPlugin ITrayManager);
 
 public:
-  TrayManager();
-  ~TrayManager();
+	TrayManager();
+	~TrayManager();
 
-  virtual QObject *instance() { return this; }
+	virtual QObject *instance() { return this; }
 
-  //IPlugin
-  virtual QUuid pluginUuid() const { return TRAYMANAGER_UUID; }
-  virtual void pluginInfo(IPluginInfo *APluginInfo);
-  virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-  virtual bool initObjects() { return true; }
-  virtual bool initSettings() { return true; }
-  virtual bool startPlugin();
+	//IPlugin
+	virtual QUuid pluginUuid() const { return TRAYMANAGER_UUID; }
+	virtual void pluginInfo(IPluginInfo *APluginInfo);
+	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
+	virtual bool initObjects() { return true; }
+	virtual bool initSettings() { return true; }
+	virtual bool startPlugin();
 
-  //ITrayManager
-  virtual QIcon currentIcon() const { return FCurIcon; }
-  virtual QString currentToolTip() const { return FTrayIcon.toolTip(); }
-  virtual int currentNotify() const { return FCurNotifyId; }
-  virtual QIcon mainIcon() const { return FMainIcon; }
-  virtual void setMainIcon(const QIcon &AIcon);
-  virtual QString mainToolTip() const { return FTrayIcon.toolTip(); }
-  virtual void setMainToolTip(const QString &AToolTip);
-  virtual void showMessage(const QString &ATitle, const QString &AMessage, 
-    QSystemTrayIcon::MessageIcon AIcon = QSystemTrayIcon::Information, int ATimeout = 10000);
-  virtual void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
-  virtual void removeAction(Action *AAction);
-  virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink);
-  virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, bool ABlink);
-  virtual void removeNotify(int ANotifyId);
+	//ITrayManager
+	virtual QIcon currentIcon() const { return FCurIcon; }
+	virtual QString currentToolTip() const { return FTrayIcon.toolTip(); }
+	virtual int currentNotify() const { return FCurNotifyId; }
+	virtual QIcon mainIcon() const { return FMainIcon; }
+	virtual void setMainIcon(const QIcon &AIcon);
+	virtual QString mainToolTip() const { return FTrayIcon.toolTip(); }
+	virtual void setMainToolTip(const QString &AToolTip);
+	virtual void showMessage(const QString &ATitle, const QString &AMessage,
+	                         QSystemTrayIcon::MessageIcon AIcon = QSystemTrayIcon::Information, int ATimeout = 10000);
+	virtual void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
+	virtual void removeAction(Action *AAction);
+	virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink);
+	virtual void updateNotify(int ANotifyId, const QIcon &AIcon, const QString &AToolTip, bool ABlink);
+	virtual void removeNotify(int ANotifyId);
 signals:
-  void messageClicked();
-  void messageShown(const QString &ATitle, const QString &AMessage,QSystemTrayIcon::MessageIcon AIcon, int ATimeout);
-  void notifyAdded(int ANotifyId);
-  void notifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
-  void notifyRemoved(int ANotifyId);
+	void messageClicked();
+	void messageShown(const QString &ATitle, const QString &AMessage,QSystemTrayIcon::MessageIcon AIcon, int ATimeout);
+	void notifyAdded(int ANotifyId);
+	void notifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
+	void notifyRemoved(int ANotifyId);
 protected:
-  void setTrayIcon(const QIcon &AIcon, const QString &AToolTip, bool ABlink);
+	void setTrayIcon(const QIcon &AIcon, const QString &AToolTip, bool ABlink);
 protected slots:
-  void onActivated(QSystemTrayIcon::ActivationReason AReason);
-  void onBlinkTimer();
+	void onActivated(QSystemTrayIcon::ActivationReason AReason);
+	void onBlinkTimer();
 private:
-  Menu *FContextMenu;
-  Action *FQuitAction;
+	Menu *FContextMenu;
+	Action *FQuitAction;
 private:
-  QTimer FBlinkTimer;
-  QSystemTrayIcon FTrayIcon;
+	QTimer FBlinkTimer;
+	QSystemTrayIcon FTrayIcon;
 private:
-  int FNextNotifyId;
-  int FCurNotifyId;
-  QIcon FMainIcon;
-  QString FMainToolTip;
-  struct NotifyItem {
-    QIcon icon;
-    QString toolTip;
-    bool blink;
-  };
-  QMap<int,NotifyItem *> FNotifyItems;
-  QIcon FCurIcon;
-  bool FBlinkShow;
+	int FNextNotifyId;
+	int FCurNotifyId;
+	QIcon FMainIcon;
+	QString FMainToolTip;
+	struct NotifyItem {
+		QIcon icon;
+		QString toolTip;
+		bool blink;
+	};
+	QMap<int,NotifyItem *> FNotifyItems;
+	QIcon FCurIcon;
+	bool FBlinkShow;
 };
 
 #endif // TRAYMANAGER_H

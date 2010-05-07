@@ -15,61 +15,61 @@
 
 struct IStanzaSession
 {
-  enum Status {
-    Empty,
-    Init,
-    Accept,
-    Pending,
-    Apply,
-    Active,
-    Renegotiate,
-    Continue,
-    Terminate,
-    Error
-  };
-  IStanzaSession() { status = Empty; }
-  QString sessionId;
-  Jid streamJid;
-  Jid contactJid;
-  int status;
-  IDataForm form;
-  QString errorCondition;
-  QStringList errorFields;
+	enum Status {
+		Empty,
+		Init,
+		Accept,
+		Pending,
+		Apply,
+		Active,
+		Renegotiate,
+		Continue,
+		Terminate,
+		Error
+	};
+	IStanzaSession() { status = Empty; }
+	QString sessionId;
+	Jid streamJid;
+	Jid contactJid;
+	int status;
+	IDataForm form;
+	QString errorCondition;
+	QStringList errorFields;
 };
 
 class ISessionNegotiator
 {
 public:
-  enum Result {
-    Skip    =0,
-    Cancel  =1,
-    Wait    =2,
-    Manual  =4,
-    Auto    =8
-  };
+	enum Result {
+		Skip    =0,
+		Cancel  =1,
+		Wait    =2,
+		Manual  =4,
+		Auto    =8
+	};
 public:
-  virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest) =0;
-  virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit) =0;
-  virtual int sessionApply(const IStanzaSession &ASession) =0;
-  virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm) =0;
+	virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest) =0;
+	virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit) =0;
+	virtual int sessionApply(const IStanzaSession &ASession) =0;
+	virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm) =0;
 };
 
 class ISessionNegotiation
 {
 public:
-  virtual QObject *instance() =0;
-  virtual IStanzaSession getSession(const QString &ASessionId) const =0;
-  virtual IStanzaSession getSession(const Jid &AStreamJid, const Jid &AContactJid) const =0;
-  virtual QList<IStanzaSession> getSessions(const Jid &AStreamJid, int AStatus = IStanzaSession::Active) const =0;
-  virtual int initSession(const Jid &AStreamJid, const Jid &AContactJid) =0;
-  virtual void resumeSession(const Jid &AStreamJid, const Jid &AContactJid) =0;
-  virtual void terminateSession(const Jid &AStreamJid, const Jid &AContactJid) =0;
-  virtual void showSessionParams(const Jid &AStreamJid, const Jid &AContactJid) =0;
-  virtual void insertNegotiator(ISessionNegotiator *ANegotiator, int AOrder) =0;
-  virtual void removeNegotiator(ISessionNegotiator *ANegotiator, int AOrder) =0;
+	virtual QObject *instance() =0;
+	virtual IStanzaSession getSession(const QString &ASessionId) const =0;
+	virtual IStanzaSession getSession(const Jid &AStreamJid, const Jid &AContactJid) const =0;
+	virtual QList<IStanzaSession> getSessions(const Jid &AStreamJid, int AStatus = IStanzaSession::Active) const =0;
+	virtual int initSession(const Jid &AStreamJid, const Jid &AContactJid) =0;
+	virtual void resumeSession(const Jid &AStreamJid, const Jid &AContactJid) =0;
+	virtual void terminateSession(const Jid &AStreamJid, const Jid &AContactJid) =0;
+	virtual void showSessionParams(const Jid &AStreamJid, const Jid &AContactJid) =0;
+	virtual void insertNegotiator(ISessionNegotiator *ANegotiator, int AOrder) =0;
+	virtual void removeNegotiator(ISessionNegotiator *ANegotiator, int AOrder) =0;
 protected:
-  virtual void sessionActivated(const IStanzaSession &ASession) =0;
-  virtual void sessionTerminated(const IStanzaSession &ASession) =0;
+	virtual void sessionActivated(const IStanzaSession &ASession) =0;
+	virtual void sessionTerminated(const IStanzaSession &ASession) =0;
 };
 
 Q_DECLARE_INTERFACE(ISessionNegotiator,"Vacuum.Plugin.ISessionNegotiator/1.0")

@@ -13,22 +13,22 @@
 class IMainWindow
 {
 public:
-  virtual QMainWindow *instance() =0;
-  virtual QVBoxLayout *mainLayout() const =0;
-  virtual QStackedWidget *upperWidget() const = 0;
-  virtual QStackedWidget *rostersWidget() const = 0;
-  virtual QStackedWidget *bottomWidget() const = 0;
-  virtual ToolBarChanger *topToolBarChanger() const =0;
-  virtual ToolBarChanger *leftToolBarChanger() const =0;
-  virtual ToolBarChanger *bottomToolBarChanger() const =0;
-  virtual Menu *mainMenu() const = 0;
+	virtual QMainWindow *instance() =0;
+	virtual QVBoxLayout *mainLayout() const =0;
+	virtual QStackedWidget *upperWidget() const = 0;
+	virtual QStackedWidget *rostersWidget() const = 0;
+	virtual QStackedWidget *bottomWidget() const = 0;
+	virtual ToolBarChanger *topToolBarChanger() const =0;
+	virtual ToolBarChanger *leftToolBarChanger() const =0;
+	virtual ToolBarChanger *bottomToolBarChanger() const =0;
+	virtual Menu *mainMenu() const = 0;
 };
 
-class IMainWindowPlugin 
+class IMainWindowPlugin
 {
 public:
-  virtual QObject *instance() = 0;
-  virtual IMainWindow *mainWindow() const = 0;
+	virtual QObject *instance() = 0;
+	virtual IMainWindow *mainWindow() const = 0;
 };
 
 Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.0")

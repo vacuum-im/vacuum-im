@@ -2,79 +2,79 @@
 
 Action::Action(QObject *AParent) : QAction(AParent)
 {
-  FMenu = NULL;
-  FIconStorage = NULL;
+	FMenu = NULL;
+	FIconStorage = NULL;
 }
 
 Action::~Action()
 {
-  if (FIconStorage)
-    FIconStorage->removeAutoIcon(this);
-  emit actionDestroyed(this);
+	if (FIconStorage)
+		FIconStorage->removeAutoIcon(this);
+	emit actionDestroyed(this);
 }
 
 Menu *Action::menu() const
 {
-  return FMenu;
+	return FMenu;
 }
 
 void Action::setMenu(Menu *AMenu)
 {
-  if (FMenu)
-  {
-    disconnect(FMenu,SIGNAL(menuDestroyed(Menu *)),this,SLOT(onMenuDestroyed(Menu *)));
-    if (FMenu!=AMenu && FMenu->parent()==this)
-      delete FMenu;
-  }
-  if (AMenu)
-  {
-    connect(AMenu,SIGNAL(menuDestroyed(Menu *)),SLOT(onMenuDestroyed(Menu *)));
-  }
-  QAction::setMenu(AMenu);  
-  FMenu = AMenu;
+	if (FMenu)
+	{
+		disconnect(FMenu,SIGNAL(menuDestroyed(Menu *)),this,SLOT(onMenuDestroyed(Menu *)));
+		if (FMenu!=AMenu && FMenu->parent()==this)
+			delete FMenu;
+	}
+	if (AMenu)
+	{
+		connect(AMenu,SIGNAL(menuDestroyed(Menu *)),SLOT(onMenuDestroyed(Menu *)));
+	}
+	QAction::setMenu(AMenu);
+	FMenu = AMenu;
 }
 
 void Action::setIcon(const QIcon &AIcon)
 {
-  setIcon(QString::null,QString::null,0);
-  QAction::setIcon(AIcon);
+	setIcon(QString::null,QString::null,0);
+	QAction::setIcon(AIcon);
 }
 
 void Action::setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex)
 {
-  if (!AStorageName.isEmpty() && !AIconKey.isEmpty())
-  {
-    FIconStorage = IconStorage::staticStorage(AStorageName);
-    FIconStorage->insertAutoIcon(this,AIconKey,AIconIndex);
-  }
-  else if (FIconStorage)
-  {
-    FIconStorage->removeAutoIcon(this);
-    FIconStorage = NULL;
-  }
+	if (!AStorageName.isEmpty() && !AIconKey.isEmpty())
+	{
+		FIconStorage = IconStorage::staticStorage(AStorageName);
+		FIconStorage->insertAutoIcon(this,AIconKey,AIconIndex);
+	}
+	else if (FIconStorage)
+	{
+		FIconStorage->removeAutoIcon(this);
+		FIconStorage = NULL;
+	}
 }
 
 QVariant Action::data(int ARole) const
 {
-  return FData.value(ARole);
+	return FData.value(ARole);
 }
 
 void Action::setData(int ARole, const QVariant &AData)
 {
-  if (AData.isValid())
-    FData.insert(ARole,AData);
-  else
-    FData.remove(ARole);
+	if (AData.isValid())
+		FData.insert(ARole,AData);
+	else
+		FData.remove(ARole);
 }
 
 void Action::setData(const QHash<int,QVariant> &AData)
 {
-  FData.unite(AData);
+	FData.unite(AData);
 }
 
 void Action::onMenuDestroyed(Menu *AMenu)
 {
-  if (AMenu == FMenu)
-    FMenu = NULL;
-  QAction::setMenu(NULL);
+	if (AMenu == FMenu)
+		FMenu = NULL;
+	QAction::setMenu(NULL);
 }

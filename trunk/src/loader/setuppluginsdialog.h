@@ -9,30 +9,30 @@
 #include <utils/iconstorage.h>
 #include "ui_setuppluginsdialog.h"
 
-class SetupPluginsDialog : 
-  public QDialog
+class SetupPluginsDialog :
+			public QDialog
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  SetupPluginsDialog(IPluginManager *APluginManager, QDomDocument APluginsSetup, QWidget *AParent = NULL);
-  ~SetupPluginsDialog();
+	SetupPluginsDialog(IPluginManager *APluginManager, QDomDocument APluginsSetup, QWidget *AParent = NULL);
+	~SetupPluginsDialog();
 protected:
-  void updateLanguage();
-  void updatePlugins();
-  void saveSettings();
-  QDomElement getPluginElement(const QUuid &AUuid) const;
+	void updateLanguage();
+	void updatePlugins();
+	void saveSettings();
+	QDomElement getPluginElement(const QUuid &AUuid) const;
 protected slots:
-  void onCurrentLanguageChanged(int AIndex);
-  void onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTableWidgetItem *APrevious);
-  void onDialogButtonClicked(QAbstractButton *AButton);
-  void onHomePageLinkActivated(const QString &ALink);
+	void onCurrentLanguageChanged(int AIndex);
+	void onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTableWidgetItem *APrevious);
+	void onDialogButtonClicked(QAbstractButton *AButton);
+	void onHomePageLinkActivated(const QString &ALink);
 private:
-  Ui::SetupPluginsDialogClass ui;
+	Ui::SetupPluginsDialogClass ui;
 private:
-  IPluginManager *FPluginManager;
+	IPluginManager *FPluginManager;
 private:
-  QDomDocument FPluginsSetup;
-  QMap<QTableWidgetItem *, QDomElement> FItemElement;
+	QDomDocument FPluginsSetup;
+	QMap<QTableWidgetItem *, QDomElement> FItemElement;
 };
 
 #endif // SETUPPLUGINSDIALOG_H

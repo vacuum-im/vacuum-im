@@ -3,13 +3,13 @@
 
 #include <QTextBrowser>
 
-class StyleViewer : 
-  public QTextBrowser
+class StyleViewer :
+			public QTextBrowser
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  StyleViewer(QWidget *AParent);
-  ~StyleViewer();
+	StyleViewer(QWidget *AParent);
+	~StyleViewer();
 };
 
 #endif // STYLEVIEWER_H

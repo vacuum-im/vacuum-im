@@ -5,33 +5,33 @@
 #include <QVBoxLayout>
 #include <interfaces/idataforms.h>
 
-class DataMediaWidget : 
-  public QLabel,
-  public IDataMediaWidget
+class DataMediaWidget :
+			public QLabel,
+			public IDataMediaWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IDataMediaWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IDataMediaWidget);
 public:
-  DataMediaWidget(IDataForms *ADataForms, const IDataMedia &AMedia, QWidget *AParent);
-  ~DataMediaWidget();
-  virtual QWidget *instance() { return this; }
-  virtual IDataMedia media() const;
-  virtual IDataMediaURI mediaUri() const;
+	DataMediaWidget(IDataForms *ADataForms, const IDataMedia &AMedia, QWidget *AParent);
+	~DataMediaWidget();
+	virtual QWidget *instance() { return this; }
+	virtual IDataMedia media() const;
+	virtual IDataMediaURI mediaUri() const;
 signals:
-  void mediaShown();
-  void mediaError(const QString &AError);
+	void mediaShown();
+	void mediaError(const QString &AError);
 protected:
-  void loadUri();
-  bool updateWidget(const IDataMediaURI &AUri, const QByteArray &AData);
+	void loadUri();
+	bool updateWidget(const IDataMediaURI &AUri, const QByteArray &AData);
 protected slots:
-  void onUrlLoaded(const QUrl &AUrl, const QByteArray &AData);
-  void onUrlLoadFailed(const QUrl &AUrl, const QString &AError);
+	void onUrlLoaded(const QUrl &AUrl, const QByteArray &AData);
+	void onUrlLoadFailed(const QUrl &AUrl, const QString &AError);
 private:
-  IDataForms *FDataForms;
+	IDataForms *FDataForms;
 private:
-  int uriIndex;
-  IDataMedia FMedia;
-  QString FLastError;
+	int uriIndex;
+	IDataMedia FMedia;
+	QString FLastError;
 };
 
 #endif // DATAMEDIAWIDGET_H

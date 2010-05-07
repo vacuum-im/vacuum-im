@@ -8,26 +8,26 @@
 #include <utils/iconstorage.h>
 #include "ui_editnotedialog.h"
 
-class EditNoteDialog : 
-  public QDialog
+class EditNoteDialog :
+			public QDialog
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent = NULL);
-  ~EditNoteDialog();
-  const Jid &streamJid() { return FStreamJid; }
-  const Jid &contactJid() { return FContactJid; }
+	EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent = NULL);
+	~EditNoteDialog();
+	const Jid &streamJid() { return FStreamJid; }
+	const Jid &contactJid() { return FContactJid; }
 signals:
-  void dialogDestroyed();
+	void dialogDestroyed();
 protected slots:
-  void onDialogAccepted();
+	void onDialogAccepted();
 private:
-  Ui::EditNoteDialogClass ui;
+	Ui::EditNoteDialogClass ui;
 private:
-  IAnnotations *FAnnotations;
+	IAnnotations *FAnnotations;
 private:
-  Jid FStreamJid;
-  Jid FContactJid;
+	Jid FStreamJid;
+	Jid FContactJid;
 };
 
 #endif // EDITNOTEDIALOG_H

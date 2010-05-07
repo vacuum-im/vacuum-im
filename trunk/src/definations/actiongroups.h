@@ -35,8 +35,8 @@
 #define AG_RVCM_ROSTERCHANGER                                   700
 
 //TrayManager - TrayMenu
-#define AG_TMTM_MAINWINDOW                                      200                    
-#define AG_TMTM_NOTIFICATIONS                                   300                    
+#define AG_TMTM_MAINWINDOW                                      200
+#define AG_TMTM_NOTIFICATIONS                                   300
 #define AG_TMTM_STATUSCHANGER                                   400
 #define AG_TMTM_OPTIONS                                         500
 #define AG_TMTM_SKINMANAGER                                     500

@@ -12,48 +12,48 @@
 #include "ui_iconsoptionswidget.h"
 
 class IconsetSelectableDelegate :
-  public IconsetDelegate
+			public IconsetDelegate
 {
 public:
-  IconsetSelectableDelegate(const QString &AStorage, const QStringList &ASubStorages, QObject *AParent = NULL);
-  virtual QWidget *createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-  virtual void setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const;
-  virtual void setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
-  virtual void updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	IconsetSelectableDelegate(const QString &AStorage, const QStringList &ASubStorages, QObject *AParent = NULL);
+	virtual QWidget *createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	virtual void setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const;
+	virtual void setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
+	virtual void updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 private:
-  QString FStorage;
-  QStringList FSubStorages;
+	QString FStorage;
+	QStringList FSubStorages;
 };
 
 
-class IconsOptionsWidget : 
-  public QWidget,
-  public IOptionsWidget
+class IconsOptionsWidget :
+			public QWidget,
+			public IOptionsWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IOptionsWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IOptionsWidget);
 public:
-  IconsOptionsWidget(IStatusIcons *AStatusIcons, QWidget *AParent);
-  virtual QWidget* instance() { return this; }
+	IconsOptionsWidget(IStatusIcons *AStatusIcons, QWidget *AParent);
+	virtual QWidget* instance() { return this; }
 public slots:
-  virtual void apply();
-  virtual void reset();
+	virtual void apply();
+	virtual void reset();
 signals:
-  void modified();
-  void childApply();
-  void childReset();
+	void modified();
+	void childApply();
+	void childReset();
 protected:
-  void populateRulesTable(QTableWidget *ATable, IStatusIcons::RuleType ARuleType);
+	void populateRulesTable(QTableWidget *ATable, IStatusIcons::RuleType ARuleType);
 protected slots:
-  void onAddUserRule();
-  void onDeleteUserRule();
-  void onDefaultListItemChanged(QListWidgetItem *AItem);
+	void onAddUserRule();
+	void onDeleteUserRule();
+	void onDefaultListItemChanged(QListWidgetItem *AItem);
 private:
-  Ui::IconsOptionsWidgetClass ui;
+	Ui::IconsOptionsWidgetClass ui;
 private:
-  IStatusIcons *FStatusIcons;
+	IStatusIcons *FStatusIcons;
 private:
-  QList<QString> FSubStorages;
+	QList<QString> FSubStorages;
 };
 
 #endif // ICONSOPTIONSWIDGET_H

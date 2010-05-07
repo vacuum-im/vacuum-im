@@ -12,38 +12,38 @@
 
 class AccountManager;
 
-class AccountsOptions : 
-  public QWidget,
-  public IOptionsWidget
+class AccountsOptions :
+			public QWidget,
+			public IOptionsWidget
 {
-  Q_OBJECT;
-  Q_INTERFACES(IOptionsWidget);
+	Q_OBJECT;
+	Q_INTERFACES(IOptionsWidget);
 public:
-  AccountsOptions(AccountManager *AManager, QWidget *AParent);
-  ~AccountsOptions();
-  virtual QWidget* instance() { return this; }
+	AccountsOptions(AccountManager *AManager, QWidget *AParent);
+	~AccountsOptions();
+	virtual QWidget* instance() { return this; }
 public slots:
-  virtual void apply();
-  virtual void reset();
+	virtual void apply();
+	virtual void reset();
 signals:
-  void modified();
-  void childApply();
-  void childReset();
+	void modified();
+	void childApply();
+	void childReset();
 protected:
-  QTreeWidgetItem *appendAccount(const QUuid &AAccountId, const QString &AName);
-  void removeAccount(const QUuid &AAccountId);
+	QTreeWidgetItem *appendAccount(const QUuid &AAccountId, const QString &AName);
+	void removeAccount(const QUuid &AAccountId);
 protected slots:
-  void onAddButtonClicked(bool);
-  void onRemoveButtonClicked(bool);
-  void onItemActivated(QTreeWidgetItem *AItem, int AColumn);
-  void onAccountOptionsChanged(IAccount *AAcount, const OptionsNode &ANode);
+	void onAddButtonClicked(bool);
+	void onRemoveButtonClicked(bool);
+	void onItemActivated(QTreeWidgetItem *AItem, int AColumn);
+	void onAccountOptionsChanged(IAccount *AAcount, const OptionsNode &ANode);
 private:
-  Ui::AccountsOptionsClass ui;
+	Ui::AccountsOptionsClass ui;
 private:
-  AccountManager *FManager;
+	AccountManager *FManager;
 private:
-  QList<QUuid> FPendingAccounts;
-  QMap<QUuid, QTreeWidgetItem *> FAccountItems;
+	QList<QUuid> FPendingAccounts;
+	QMap<QUuid, QTreeWidgetItem *> FAccountItems;
 };
 
 #endif // ACCOUNTSOPTIONS_H

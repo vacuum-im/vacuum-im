@@ -4,19 +4,19 @@
 #include <QDialog>
 #include "ui_inputtextdialog.h"
 
-class InputTextDialog : 
-  public QDialog
+class InputTextDialog :
+			public QDialog
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  InputTextDialog(QWidget *AParent,const QString &ATitle,  const QString &ALabel, QString &AText);
-  ~InputTextDialog();
+	InputTextDialog(QWidget *AParent,const QString &ATitle,  const QString &ALabel, QString &AText);
+	~InputTextDialog();
 private:
-  Ui::InputTextDialogClass ui;
+	Ui::InputTextDialogClass ui;
 protected slots:
-  void onDialogButtonClicked(QAbstractButton *AButton);
+	void onDialogButtonClicked(QAbstractButton *AButton);
 private:
-  QString &FText;
+	QString &FText;
 };
 
 #endif // INPUTTEXTDIALOG_H

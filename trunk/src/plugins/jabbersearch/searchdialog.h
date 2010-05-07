@@ -15,50 +15,50 @@
 #include <utils/toolbarchanger.h>
 #include "ui_searchdialog.h"
 
-class SearchDialog : 
-  public QDialog
+class SearchDialog :
+			public QDialog
 {
-  Q_OBJECT;
+	Q_OBJECT;
 public:
-  SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
-  ~SearchDialog();
+	SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
+	~SearchDialog();
 public:
-  virtual Jid streamJid() const { return FStreamJid; }
-  virtual Jid serviceJid() const { return FServiceJid; }
-  virtual ISearchItem currentItem() const;
+	virtual Jid streamJid() const { return FStreamJid; }
+	virtual Jid serviceJid() const { return FServiceJid; }
+	virtual ISearchItem currentItem() const;
 protected:
-  void resetDialog();
-  void requestFields();
-  void requestResult();
-  bool setDataForm(const IDataForm &AForm);
-  void initialize();
-  void createToolBarActions();
+	void resetDialog();
+	void requestFields();
+	void requestResult();
+	bool setDataForm(const IDataForm &AForm);
+	void initialize();
+	void createToolBarActions();
 protected slots:
-  void onSearchFields(const QString &AId, const ISearchFields &AFields);
-  void onSearchResult(const QString &AId, const ISearchResult &AResult);
-  void onSearchError(const QString &AId, const QString &AError);
-  void onToolBarActionTriggered(bool);
-  void onDialogButtonClicked(QAbstractButton *AButton);
+	void onSearchFields(const QString &AId, const ISearchFields &AFields);
+	void onSearchResult(const QString &AId, const ISearchResult &AResult);
+	void onSearchError(const QString &AId, const QString &AError);
+	void onToolBarActionTriggered(bool);
+	void onDialogButtonClicked(QAbstractButton *AButton);
 private:
-  Ui::SearchDialogClass ui;
+	Ui::SearchDialogClass ui;
 private:
-  IPluginManager *FPluginManager;
-  IJabberSearch *FSearch;
-  IDataForms *FDataForms;
-  IServiceDiscovery *FDiscovery;
-  IVCardPlugin *FVCardPlugin;
-  IRosterChanger *FRosterChanger;
+	IPluginManager *FPluginManager;
+	IJabberSearch *FSearch;
+	IDataForms *FDataForms;
+	IServiceDiscovery *FDiscovery;
+	IVCardPlugin *FVCardPlugin;
+	IRosterChanger *FRosterChanger;
 private:
-  Action *FDiscoInfo;
-  Action *FAddContact;
-  Action *FShowVCard;
-  ToolBarChanger *FToolBarChanger;
+	Action *FDiscoInfo;
+	Action *FAddContact;
+	Action *FShowVCard;
+	ToolBarChanger *FToolBarChanger;
 private:
-  Jid FStreamJid;
-  Jid FServiceJid;
-  QString FFieldsRequestId;
-  QString FRequestId;
-  IDataFormWidget *FCurrentForm;
+	Jid FStreamJid;
+	Jid FServiceJid;
+	QString FFieldsRequestId;
+	QString FRequestId;
+	IDataFormWidget *FCurrentForm;
 };
 
 #endif // SEARCHDIALOG_H
