@@ -209,14 +209,20 @@ void TabWindow::createActions()
 
 void TabWindow::saveWindowState()
 {
-  Options::setFileValue(saveGeometry(),"messages.tabwindows.window.geometry",FWindowId.toString());
-  Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).setValue(ui.twtTabs->tabsClosable(),"tabs-closable");
+  if (FMessageWidgets->tabWindowList().contains(FWindowId))
+  {
+    Options::setFileValue(saveGeometry(),"messages.tabwindows.window.geometry",FWindowId.toString());
+    Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).setValue(ui.twtTabs->tabsClosable(),"tabs-closable");
+  }
 }
 
 void TabWindow::loadWindowState()
 {
-  restoreGeometry(Options::fileValue("messages.tabwindows.window.geometry",FWindowId.toString()).toByteArray());
-  ui.twtTabs->setTabsClosable(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).value("tabs-closable").toBool());
+  if (FMessageWidgets->tabWindowList().contains(FWindowId))
+  {
+    restoreGeometry(Options::fileValue("messages.tabwindows.window.geometry",FWindowId.toString()).toByteArray());
+    ui.twtTabs->setTabsClosable(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).value("tabs-closable").toBool());
+  }
 }
 
 void TabWindow::updateWindow()
