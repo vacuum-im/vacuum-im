@@ -16,7 +16,7 @@
     <name>SimpleMessageStylePlugin</name>
     <message>
         <source>Simple Message Style</source>
-        <translation>Uproszczony styl wiadomości</translation>
+        <translation>Prosty styl wiadomości</translation>
     </message>
     <message>
         <source>Allows to use a simplified style in message design</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>Simple Style</source>
-        <translation type="unfinished"></translation>
+        <translation>Styl prosty</translation>
     </message>
 </context>
 <context>

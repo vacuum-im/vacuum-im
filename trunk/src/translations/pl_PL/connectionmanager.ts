@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>New Proxy</source>
-        <translation type="unfinished">Nowe Proxy</translation>
+        <translation>Nowe Proxy</translation>
     </message>
 </context>
 <context>

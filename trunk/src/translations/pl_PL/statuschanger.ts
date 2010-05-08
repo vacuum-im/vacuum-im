@@ -174,19 +174,19 @@
     </message>
     <message>
         <source>Modify Status</source>
-        <translation type="unfinished">Modyfikuj status</translation>
+        <translation>Modyfikuj status</translation>
     </message>
     <message>
         <source>Edit Statuses</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj statusy</translation>
     </message>
     <message>
         <source>Auto connect on startup</source>
-        <translation type="unfinished">Połącz zaraz po uruchomieniu programu</translation>
+        <translation>Połącz zaraz po uruchomieniu programu</translation>
     </message>
     <message>
         <source>Auto reconnect if disconnected</source>
-        <translation type="unfinished">Automatycznie przywracaj połączenie</translation>
+        <translation>Automatycznie przywracaj połączenie</translation>
     </message>
 </context>
 </TS>

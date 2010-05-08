@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>Default Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Domyślne połączenie</translation>
     </message>
 </context>
 </TS>

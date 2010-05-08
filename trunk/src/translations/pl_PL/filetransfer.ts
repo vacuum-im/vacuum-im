@@ -61,15 +61,15 @@
     </message>
     <message>
         <source>Automatically receive files from contacts in roster</source>
-        <translation type="unfinished">Automatycznie pobieraj pliki od kontaktów w rosterze</translation>
+        <translation>Automatycznie pobieraj pliki od kontaktów w rosterze</translation>
     </message>
     <message>
         <source>Hide dialog after transfer started</source>
-        <translation type="unfinished">Zamknij okno transferu kiedy zacznie się pobieranie</translation>
+        <translation>Zamknij okno transferu kiedy zacznie się pobieranie</translation>
     </message>
     <message>
         <source>Automatically remove finished transfers</source>
-        <translation type="unfinished">Automatycznie usuń ukończone transfery</translation>
+        <translation>Automatycznie usuń ukończone transfery</translation>
     </message>
 </context>
 <context>

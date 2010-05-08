@@ -36,19 +36,19 @@
     </message>
     <message>
         <source>Invalid Account</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowe konto</translation>
     </message>
     <message>
         <source>Account &apos;%1&apos; is not valid, change its Jabber ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Konto &apos;%1&apos; jest nie prawidłowe, zmień Jabber ID</translation>
     </message>
     <message>
         <source>Delayed Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmiana odłożona na później</translation>
     </message>
     <message>
         <source>Some options of account &apos;%1&apos; will be applied after disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>Niektóre opcje konta &apos;%1&apos; zostaną ustawione po rozłączeniu</translation>
     </message>
 </context>
 <context>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Example: home; office; notebook</source>
-        <translation type="unfinished"></translation>
+        <translation>Na przykład: dom, biuro, notebook</translation>
     </message>
 </context>
 <context>
@@ -102,7 +102,7 @@
     </message>
     <message>
         <source>New Account</source>
-        <translation type="unfinished">Nowe konto</translation>
+        <translation>Nowe konto</translation>
     </message>
 </context>
 <context>

@@ -56,19 +56,19 @@
     </message>
     <message>
         <source>Show offline contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż nieaktywne kontakty</translation>
     </message>
     <message>
         <source>Show contact resource in roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż zasoby kontaktów na liście</translation>
     </message>
     <message>
         <source>Show status message in roster</source>
-        <translation type="unfinished"></translation>
+        <translation>pokaż statusy kontaktów na liście</translation>
     </message>
     <message>
         <source>Sort contacts by status</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortuj kontakty według statusu</translation>
     </message>
 </context>
 </TS>

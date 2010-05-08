@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Send chat state notifications</source>
-        <translation type="unfinished">Wyślij powiadomienia o aktywności</translation>
+        <translation>Wyślij powiadomienia o aktywności</translation>
     </message>
 </context>
 <context>

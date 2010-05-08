@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Default Context</source>
-        <translation type="unfinished"></translation>
+        <translation>Domyślny kontekst</translation>
     </message>
 </context>
 <context>
@@ -32,27 +32,27 @@
     </message>
     <message>
         <source>Start sending user stanza...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zacznij wysyłaś dane...</translation>
     </message>
     <message>
         <source>User stanza sended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dane wysłane.</translation>
     </message>
     <message>
         <source>Stanza is not well formed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Blok danych został źle sformatowany.</translation>
     </message>
     <message>
         <source>XML is not well formed.</source>
-        <translation type="unfinished"></translation>
+        <translation>XML został źle sformatowany.</translation>
     </message>
     <message>
         <source>New Context</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy kontekst</translation>
     </message>
     <message>
         <source>Enter context name</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz nazwe kontekstu</translation>
     </message>
 </context>
 <context>
@@ -103,7 +103,7 @@
     </message>
     <message>
         <source>Hilight XML</source>
-        <translation type="unfinished"></translation>
+        <translation>Podświetl XML</translation>
     </message>
 </context>
 </TS>

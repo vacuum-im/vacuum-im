@@ -259,11 +259,11 @@
     </message>
     <message>
         <source>Auto accept subscription requests</source>
-        <translation type="unfinished">Akceptuj automatycznie prośby o autoryzację</translation>
+        <translation>Akceptuj automatycznie prośby o autoryzację</translation>
     </message>
     <message>
         <source>Auto unsubscribe contacts</source>
-        <translation type="unfinished">Automatycznie cofaj autoryzację</translation>
+        <translation>Automatycznie cofaj autoryzację</translation>
     </message>
 </context>
 <context>
