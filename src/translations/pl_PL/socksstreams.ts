@@ -53,11 +53,11 @@
     </message>
     <message>
         <source>Listening port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybrany port:</translation>
     </message>
     <message>
         <source>Use proxy on account server</source>
-        <translation type="unfinished"></translation>
+        <translation>Używaj proxy na serwerze konta</translation>
     </message>
 </context>
 <context>

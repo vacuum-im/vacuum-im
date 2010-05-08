@@ -70,7 +70,7 @@
     </message>
     <message>
         <source>Share information about OS version</source>
-        <translation type="unfinished">Udostępniaj informację o wersji systemu</translation>
+        <translation>Udostępniaj informację o wersji systemu</translation>
     </message>
 </context>
 <context>

@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Select emoticons iconsets</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaznacz zbiory emotek</translation>
     </message>
 </context>
 </TS>

@@ -45,11 +45,11 @@
     </message>
     <message>
         <source>Show avatars</source>
-        <translation type="unfinished">Pokazuj awatary</translation>
+        <translation>Pokazuj awatary</translation>
     </message>
     <message>
         <source>Show empty avatars</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokazuj puste avatary</translation>
     </message>
 </context>
 </TS>

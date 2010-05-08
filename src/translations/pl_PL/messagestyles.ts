@@ -120,15 +120,15 @@
     </message>
     <message>
         <source>Single</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiadomość</translation>
     </message>
     <message>
         <source>Headline</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualności</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
 </context>
 <context>

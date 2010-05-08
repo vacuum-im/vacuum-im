@@ -40,23 +40,23 @@
     </message>
     <message>
         <source>Tab Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Okno z zakładkami</translation>
     </message>
     <message>
         <source>Enable tab windows</source>
-        <translation type="unfinished">Używaj okna z zakładkami</translation>
+        <translation>Używaj okna z zakładkami</translation>
     </message>
     <message>
         <source>Show status changes in chat windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż zmianę statusu w oknie rozmów</translation>
     </message>
     <message>
         <source>Auto resize input field</source>
-        <translation type="unfinished">Automatyczna zmiana rozmiaru pola wpisywania wiadomości</translation>
+        <translation>Automatyczna zmiana rozmiaru pola wpisywania wiadomości</translation>
     </message>
     <message>
         <source>Show contact information in chat windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż informacje o kontakcie w oknie rozmów</translation>
     </message>
 </context>
 <context>

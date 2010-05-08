@@ -1,190 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="pl_PL">
 <context>
     <name>EditProfilesDialog</name>
     <message>
         <source>New Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy profil</translation>
     </message>
     <message>
         <source>Enter profile name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz nazwę profilu:</translation>
     </message>
     <message>
         <source>Profile Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło profilu</translation>
     </message>
     <message>
         <source>Enter profile password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz hasło profilu:</translation>
     </message>
     <message>
         <source>Confirm Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Potwierdź hasło</translation>
     </message>
     <message>
         <source>Reenter password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz hasło ponownie:</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
         <source>Could not create profile, maybe this profile already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można utworzyć profilu, możliwe, że taki już istnieje</translation>
     </message>
     <message>
         <source>Passwords did not match</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasła różnią się</translation>
     </message>
     <message>
         <source>Enter current profile password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wprowadź aktualne hasło:</translation>
     </message>
     <message>
         <source>Enter new profile password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wprowadź nowe hasło:</translation>
     </message>
     <message>
         <source>Failed to change profile password</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło nie zostało zmienione</translation>
     </message>
     <message>
         <source>Entered password is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation>Wprowadzono niepoprawne hasło</translation>
     </message>
     <message>
         <source>Rename Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień nazwę profilu</translation>
     </message>
     <message>
         <source>Enter new name for profile:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wprowadź nową nazwę profilu:</translation>
     </message>
     <message>
         <source>Failed to rename profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa profilu nie została zmieniona</translation>
     </message>
     <message>
         <source>Remove Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń profil</translation>
     </message>
     <message>
         <source>Are you sure you want to delete profile &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
-        <translation type="unfinished"></translation>
+        <translation>Jesteś pewien, że chcesz usunąć profil &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</translation>
     </message>
     <message>
         <source>Failed to remove profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil nie został usunięty</translation>
     </message>
 </context>
 <context>
     <name>EditProfilesDialogClass</name>
     <message>
         <source>Edit Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj profile</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień nazwę</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamknij</translation>
     </message>
 </context>
 <context>
     <name>LoginDialog</name>
     <message>
         <source>Profile Blocked</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil zablokowany</translation>
     </message>
     <message>
         <source>This profile is now blocked by another program</source>
-        <translation type="unfinished"></translation>
+        <translation>Ten profil jest zablokowany przez inną apikację</translation>
     </message>
     <message>
         <source>Wrong Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Złe hasło</translation>
     </message>
     <message>
         <source>Entered profile password is not correct</source>
-        <translation type="unfinished"></translation>
+        <translation>Wprowadzone hasło profilu jest nieprawidłowe</translation>
     </message>
 </context>
 <context>
     <name>LoginDialogClass</name>
     <message>
         <source>Open Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz profil</translation>
     </message>
     <message>
         <source>Profile:</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło:</translation>
     </message>
     <message>
         <source>Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Profile</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje</translation>
     </message>
     <message>
         <source>No Settings Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak ustawień</translation>
     </message>
 </context>
 <context>
     <name>OptionsManager</name>
     <message>
         <source>Options Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Menedżer ustawień</translation>
     </message>
     <message>
         <source>Allows to save, load and manage user preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Umożliwia zachowanie, wczytywanie i zmianę ustawień preferencji użytkownika</translation>
     </message>
     <message>
         <source>Change Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień profil</translation>
     </message>
     <message>
         <source>Misc</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogólne</translation>
     </message>
     <message>
         <source>Extra options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje dodatkowe</translation>
     </message>
     <message>
         <source>Auto run on system startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom automatycznie podczas startu systemu</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje</translation>
     </message>
 </context>
 </TS>
