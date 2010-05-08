@@ -7,7 +7,6 @@
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
 #include <definations/messagewriterorders.h>
-#include <definations/resourceloaderorders.h>
 #include <definations/optionvalues.h>
 #include <definations/optionnodes.h>
 #include <definations/optionnodeorders.h>
