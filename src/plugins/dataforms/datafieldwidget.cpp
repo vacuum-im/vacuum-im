@@ -40,10 +40,8 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 	{
 		FComboBox = new QComboBox(this);
 		appendLabel(label,FComboBox);
-		foreach(IDataOption option, FField.options)
-		{
-			FComboBox->addItem(option.label, option.value);
-		}
+		foreach(IDataOption option, FField.options) {
+			FComboBox->addItem(option.label, option.value); }
 		if (FField.validate.method == DATAVALIDATE_METHOD_OPEN)
 		{
 			FComboBox->setEditable(true);
@@ -243,7 +241,7 @@ void DataFieldWidget::setValue(const QVariant &AValue)
 	{
 		FTextEdit->clear();
 		foreach(QString line, AValue.toStringList())
-		FTextEdit->append(Jid(line).full());
+			FTextEdit->append(Jid(line).full());
 	}
 	else if (!FReadOnly && FField.type == DATAFIELD_TYPE_LISTSINGLE)
 	{
@@ -266,7 +264,7 @@ void DataFieldWidget::setValue(const QVariant &AValue)
 	{
 		FTextEdit->clear();
 		foreach(QString line, AValue.toStringList())
-		FTextEdit->append(line);
+			FTextEdit->append(line);
 	}
 	else if (FField.validate.type == DATAVALIDATE_TYPE_DATE)
 	{

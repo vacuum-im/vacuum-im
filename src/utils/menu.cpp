@@ -145,7 +145,7 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 void Menu::addMenuActions(const Menu *AMenu, int AGroup, bool ASort)
 {
 	foreach(Action *action,AMenu->groupActions(AGroup))
-	addAction(action,AMenu->actionGroup(action),ASort);
+		addAction(action,AMenu->actionGroup(action),ASort);
 }
 
 void Menu::removeAction(Action *AAction)
@@ -179,7 +179,7 @@ void Menu::removeAction(Action *AAction)
 void Menu::clear()
 {
 	foreach(Action *action,FActions.values())
-	removeAction(action);
+		removeAction(action);
 	QMenu::clear();
 }
 

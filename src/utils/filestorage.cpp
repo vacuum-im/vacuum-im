@@ -50,8 +50,7 @@ void FileStorage::setSubStorage(const QString &ASubStorage)
 			if (FSubStorage!=STORAGE_SHARED_DIR && dir.exists())
 			{
 				foreach(QString file, dir.entryList(QStringList() << STORAGE_DEFFILES_MASK)) {
-					loadDefinations(dir.absoluteFilePath(file),false);
-				}
+					loadDefinations(dir.absoluteFilePath(file),false); }
 			}
 		}
 
@@ -63,8 +62,7 @@ void FileStorage::setSubStorage(const QString &ASubStorage)
 			if (dir.exists())
 			{
 				foreach(QString file, dir.entryList(QStringList() << STORAGE_DEFFILES_MASK)) {
-					loadDefinations(dir.absoluteFilePath(file),true);
-				}
+					loadDefinations(dir.absoluteFilePath(file),true); }
 			}
 		}
 

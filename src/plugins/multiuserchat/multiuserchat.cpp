@@ -206,8 +206,8 @@ bool MultiUserChat::isUserPresent(const Jid &AContactJid) const
 		return true;
 
 	foreach (MultiUser *user, FUsers)
-	if (AContactJid == user->data(MUDR_REAL_JID).toString())
-		return true;
+		if (AContactJid == user->data(MUDR_REAL_JID).toString())
+			return true;
 
 	return false;
 }
@@ -221,7 +221,7 @@ QList<IMultiUser *> MultiUserChat::allUsers() const
 {
 	QList<IMultiUser *> result;
 	foreach(MultiUser *user, FUsers)
-	result.append(user);
+		result.append(user);
 	return result;
 }
 
@@ -928,7 +928,7 @@ void MultiUserChat::onStreamJidChanged(const Jid &ABefour)
 	{
 		FStreamJid = xmppStream->streamJid();
 		foreach(MultiUser *user, FUsers)
-		user->setData(MUDR_STREAM_JID,FStreamJid.full());
+			user->setData(MUDR_STREAM_JID,FStreamJid.full());
 		emit streamJidChanged(ABefour,FStreamJid);
 	}
 }

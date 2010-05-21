@@ -466,9 +466,9 @@ void ChatStates::sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid,
 void ChatStates::resetSupported(const Jid &AContactJid)
 {
 	foreach (Jid streamJid, FNotSupported.keys())
-	foreach (Jid contactJid, FNotSupported.value(streamJid))
-	if (AContactJid.isEmpty() || (AContactJid && contactJid))
-		setSupported(streamJid,contactJid,true);
+		foreach (Jid contactJid, FNotSupported.value(streamJid))
+			if (AContactJid.isEmpty() || (AContactJid && contactJid))
+				setSupported(streamJid,contactJid,true);
 }
 
 void ChatStates::setSupported(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported)

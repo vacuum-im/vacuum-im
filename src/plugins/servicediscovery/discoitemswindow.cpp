@@ -260,7 +260,7 @@ void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)
 		foreach(QString feature, dinfo.features)
 		{
 			foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,menu))
-			menu->addAction(action,TBG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
+				menu->addAction(action,TBG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
 		}
 		emit indexContextMenu(index,menu);
 		menu->popup(ui.trvItems->viewport()->mapToGlobal(APos));

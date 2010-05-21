@@ -108,8 +108,8 @@ QList<IPlugin *> PluginManager::pluginInterface(const QString &AInterface) const
 	if (!FPlugins.contains(AInterface))
 	{
 		foreach(PluginItem pluginItem, FPluginItems)
-		if (AInterface.isEmpty() || pluginItem.plugin->instance()->inherits(AInterface.toLatin1().data()))
-			FPlugins.insertMulti(AInterface,pluginItem.plugin);
+			if (AInterface.isEmpty() || pluginItem.plugin->instance()->inherits(AInterface.toLatin1().data()))
+				FPlugins.insertMulti(AInterface,pluginItem.plugin);
 	}
 	return FPlugins.values(AInterface);
 }
@@ -348,8 +348,7 @@ void PluginManager::loadPlugins()
 			else if (!checkConflicts(puid))
 			{
 				foreach(QUuid uid, getConflicts(puid)) {
-					unloadPlugin(uid, tr("Conflict with plugin %1").arg(puid.toString()));
-				}
+					unloadPlugin(uid, tr("Conflict with plugin %1").arg(puid.toString())); }
 				it = FPluginItems.constBegin();
 			}
 			else
@@ -390,10 +389,10 @@ bool PluginManager::initPlugins()
 	if (initOk)
 	{
 		foreach(IPlugin *plugin, pluginOrder)
-		plugin->initObjects();
+			plugin->initObjects();
 
 		foreach(IPlugin *plugin, pluginOrder)
-		plugin->initSettings();
+			plugin->initSettings();
 	}
 
 	return initOk;
@@ -402,7 +401,7 @@ bool PluginManager::initPlugins()
 void PluginManager::startPlugins()
 {
 	foreach(PluginItem pluginItem, FPluginItems)
-	pluginItem.plugin->startPlugin();
+		pluginItem.plugin->startPlugin();
 }
 
 void PluginManager::removePluginItem(const QUuid &AUuid, const QString &AError)
@@ -429,7 +428,7 @@ void PluginManager::unloadPlugin(const QUuid &AUuid, const QString &AError)
 	if (FPluginItems.contains(AUuid))
 	{
 		foreach(QUuid uid, pluginDependencesOn(AUuid))
-		removePluginItem(uid, AError);
+			removePluginItem(uid, AError);
 		removePluginItem(AUuid, AError);
 		FPlugins.clear();
 	}
@@ -467,8 +466,8 @@ bool PluginManager::checkConflicts(const QUuid AUuid) const
 			if (!FPluginItems.contains(conflict))
 			{
 				foreach(PluginItem pluginItem, FPluginItems)
-				if (pluginItem.info->implements.contains(conflict))
-					return false;
+					if (pluginItem.info->implements.contains(conflict))
+						return false;
 			}
 			else
 				return false;
@@ -551,7 +550,7 @@ QDomElement PluginManager::savePluginInfo(const QString &AFile, const IPluginInf
 	{
 		QDomElement dependsElem = pluginElem.appendChild(FPluginsSetup.createElement("depends")).toElement();
 		foreach(QUuid uid, AInfo->dependences)
-		dependsElem.appendChild(FPluginsSetup.createElement("uuid")).appendChild(FPluginsSetup.createTextNode(uid.toString()));
+			dependsElem.appendChild(FPluginsSetup.createElement("uuid")).appendChild(FPluginsSetup.createTextNode(uid.toString()));
 	}
 
 	pluginElem.removeChild(pluginElem.firstChildElement("error"));
@@ -647,7 +646,7 @@ void PluginManager::onApplicationAboutToQuit()
 	emit aboutToQuit();
 
 	foreach(QUuid uid, FPluginItems.keys())
-	unloadPlugin(uid);
+		unloadPlugin(uid);
 
 	QCoreApplication::removeTranslator(FQtTranslator);
 	QCoreApplication::removeTranslator(FUtilsTranslator);

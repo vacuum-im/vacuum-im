@@ -208,7 +208,7 @@ QStandardItem *ViewHistoryWindow::findHeaderItem(const IArchiveHeader &AHeader, 
 void ViewHistoryWindow::setGroupKind(int AGroupKind)
 {
 	foreach (Action *action, FGroupKindMenu->groupActions())
-	action->setChecked(action->data(ADR_GROUP_KIND).toInt() == AGroupKind);
+		action->setChecked(action->data(ADR_GROUP_KIND).toInt() == AGroupKind);
 	if (FGroupKind != AGroupKind)
 	{
 		FGroupKind = AGroupKind;
@@ -220,7 +220,7 @@ void ViewHistoryWindow::setGroupKind(int AGroupKind)
 void ViewHistoryWindow::setArchiveSource(int ASource)
 {
 	foreach (Action *action, FSourceMenu->groupActions())
-	action->setChecked(action->data(ADR_SOURCE).toInt() == ASource);
+		action->setChecked(action->data(ADR_SOURCE).toInt() == ASource);
 
 	if (FSource != ASource)
 	{
@@ -800,8 +800,7 @@ void ViewHistoryWindow::rebuildModel()
 {
 	clearModel();
 	foreach(IArchiveHeader header, FCollections.keys()) {
-		createHeaderItem(header);
-	}
+		createHeaderItem(header);	}
 }
 
 void ViewHistoryWindow::createGroupKindMenu()

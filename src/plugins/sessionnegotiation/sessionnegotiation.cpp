@@ -332,9 +332,9 @@ void SessionNegotiation::sessionLocalize(const IStanzaSession &/*ASession*/, IDa
 IStanzaSession SessionNegotiation::getSession(const QString &ASessionId) const
 {
 	foreach (Jid streamJid, FSessions.keys())
-	foreach (IStanzaSession session, FSessions.value(streamJid))
-	if (session.sessionId == ASessionId)
-		return session;
+		foreach (IStanzaSession session, FSessions.value(streamJid))
+			if (session.sessionId == ASessionId)
+				return session;
 	return IStanzaSession();
 }
 
@@ -347,8 +347,8 @@ QList<IStanzaSession> SessionNegotiation::getSessions(const Jid &AStreamJid, int
 {
 	QList<IStanzaSession> sessions;
 	foreach(IStanzaSession session, FSessions.value(AStreamJid).values())
-	if (session.status == AStatus)
-		sessions.append(session);
+		if (session.status == AStatus)
+			sessions.append(session);
 	return sessions;
 }
 
@@ -383,7 +383,7 @@ int SessionNegotiation::initSession(const Jid &AStreamJid, const Jid &AContactJi
 
 		int result = 0;
 		foreach(ISessionNegotiator *negotiator, FNegotiators)
-		result = result | negotiator->sessionInit(session,request);
+			result = result | negotiator->sessionInit(session,request);
 
 		if (!isRenegotiate && FDiscovery && !FDiscovery->discoInfo(AStreamJid,AContactJid).features.contains(NS_STANZA_SESSION))
 		{
@@ -541,8 +541,7 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const 
 		{
 			QDomElement featureElem = errorElem.appendChild(data.createElement("feature",NS_FEATURENEG)).toElement();
 			foreach(QString var, ASession.errorFields) {
-				featureElem.appendChild(data.createElement("field")).toElement().setAttribute("var",var);
-			}
+				featureElem.appendChild(data.createElement("field")).toElement().setAttribute("var",var); }
 		}
 		return FStanzaProcessor->sendStanzaOut(ASession.streamJid,data);
 	}
@@ -561,7 +560,7 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 
 		int result = 0;
 		foreach(ISessionNegotiator *negotiator, FNegotiators)
-		result = result | negotiator->sessionAccept(ASession,ARequest,submit);
+			result = result | negotiator->sessionAccept(ASession,ARequest,submit);
 
 		if (!FDataForms->isSubmitValid(ARequest,submit))
 		{
@@ -606,7 +605,7 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 
 			int result = 0;
 			foreach(ISessionNegotiator *negotiator, FNegotiators)
-			result = result | negotiator->sessionAccept(ASession,ARequest,submit);
+				result = result | negotiator->sessionAccept(ASession,ARequest,submit);
 
 			if (!FDataForms->isSubmitValid(ASession.form,ARequest))
 			{
@@ -679,7 +678,7 @@ void SessionNegotiation::processApply(IStanzaSession &ASession, const IDataForm 
 
 		int result = 0;
 		foreach(ISessionNegotiator *negotiator, FNegotiators)
-		result = result | negotiator->sessionApply(ASession);
+			result = result | negotiator->sessionApply(ASession);
 
 		if ((result & ISessionNegotiator::Cancel) > 0)
 		{
@@ -738,7 +737,7 @@ void SessionNegotiation::processRenegotiate(IStanzaSession &ASession, const IDat
 
 		int result = 0;
 		foreach(ISessionNegotiator *negotiator, FNegotiators)
-		result = result | negotiator->sessionAccept(ASession,ARequest,submit);
+			result = result | negotiator->sessionAccept(ASession,ARequest,submit);
 
 		if (!FDataForms->isSubmitValid(ARequest,submit) || (result & ISessionNegotiator::Cancel) > 0)
 		{
@@ -798,7 +797,7 @@ void SessionNegotiation::processContinue(IStanzaSession &ASession, const IDataFo
 
 			int result = 0;
 			foreach(ISessionNegotiator *negotiator, FNegotiators)
-			result = result | negotiator->sessionApply(ASession);
+				result = result | negotiator->sessionApply(ASession);
 
 			if ((result & ISessionNegotiator::Cancel) > 0)
 			{
@@ -893,7 +892,7 @@ void SessionNegotiation::localizeSession(IStanzaSession &ASession, IDataForm &AF
 	}
 
 	foreach(ISessionNegotiator *negotiator, FNegotiators)
-	negotiator->sessionLocalize(ASession,AForm);
+		negotiator->sessionLocalize(ASession,AForm);
 }
 
 void SessionNegotiation::removeSession(const IStanzaSession &ASession)
@@ -1006,8 +1005,8 @@ QStringList SessionNegotiation::unsubmitedFields(const IDataForm &ARequest, cons
 IStanzaSession &SessionNegotiation::dialogSession(IDataDialogWidget *ADialog)
 {
 	foreach(Jid streamJid, FDialogs.keys())
-	if (FDialogs.value(streamJid).values().contains(ADialog))
-		return FSessions[streamJid][FDialogs.value(streamJid).key(ADialog)];
+		if (FDialogs.value(streamJid).values().contains(ADialog))
+			return FSessions[streamJid][FDialogs.value(streamJid).key(ADialog)];
 	return FSessions[""][""];
 }
 

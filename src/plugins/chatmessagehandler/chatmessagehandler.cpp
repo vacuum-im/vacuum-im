@@ -281,8 +281,8 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 IChatWindow *ChatMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
 	foreach(IChatWindow *window,FWindows)
-	if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
-		return window;
+		if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
+			return window;
 	return NULL;
 }
 
@@ -304,7 +304,7 @@ void ChatMessageHandler::removeActiveMessages(IChatWindow *AWindow)
 	{
 		QList<int> messageIds = FActiveMessages.values(AWindow);
 		foreach(int messageId, messageIds)
-		FMessageProcessor->removeMessage(messageId);
+			FMessageProcessor->removeMessage(messageId);
 		FActiveMessages.remove(AWindow);
 		updateWindow(AWindow);
 	}
@@ -493,7 +493,7 @@ void ChatMessageHandler::onWindowDestroyed()
 void ChatMessageHandler::onStatusIconsChanged()
 {
 	foreach(IChatWindow *window, FWindows)
-	updateWindow(window);
+		updateWindow(window);
 }
 
 void ChatMessageHandler::onShowWindowAction(bool)

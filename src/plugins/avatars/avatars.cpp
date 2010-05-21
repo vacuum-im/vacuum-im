@@ -484,7 +484,7 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 	{
 		QMultiHash<int,QVariant> findData;
 		foreach(int type, rosterDataTypes())
-		findData.insert(RDR_TYPE,type);
+			findData.insert(RDR_TYPE,type);
 		if (!AContactJid.isEmpty())
 			findData.insert(RDR_BARE_JID,AContactJid.pBare());
 		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChild(findData,true);
@@ -772,12 +772,12 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 			{
 				QMultiHash<int,QVariant> findData;
 				foreach(int type, rosterDataTypes())
-				findData.insertMulti(RDR_TYPE,type);
+					findData.insertMulti(RDR_TYPE,type);
 				QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChild(findData, true);
 
 				FRosterLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_AVATAR_IMAGE, RDR_AVATAR_IMAGE);
 				foreach (IRosterIndex *index, indexes)
-				FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, index);
+					FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, index);
 			}
 			else
 			{

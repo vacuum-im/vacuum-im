@@ -65,8 +65,7 @@ void FileStreamsWindow::initialize()
 		ui.tbvStreams->horizontalHeader()->setResizeMode(column,column!=CMN_FILENAME ? QHeaderView::ResizeToContents : QHeaderView::Stretch);
 
 	foreach(IFileStream *stream, FManager->streams()) {
-		appendStream(stream);
-	}
+		appendStream(stream); }
 
 	FProxy.setSortRole(IDR_VALUE);
 	ui.tbvStreams->horizontalHeader()->setSortIndicator(CMN_FILENAME,Qt::AscendingOrder);

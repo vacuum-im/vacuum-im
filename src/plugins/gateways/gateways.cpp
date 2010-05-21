@@ -284,22 +284,24 @@ QList<Jid> Gateways::streamServices(const Jid &AStreamJid, const IDiscoIdentity 
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
 	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
 	foreach(IRosterItem ritem, ritems)
-	if (ritem.itemJid.node().isEmpty())
 	{
-		if (FDiscovery && (!AIdentity.category.isEmpty() || !AIdentity.type.isEmpty()))
+		if (ritem.itemJid.node().isEmpty())
 		{
-			IDiscoInfo dinfo = FDiscovery->discoInfo(AStreamJid, ritem.itemJid);
-			foreach(IDiscoIdentity identity, dinfo.identity)
+			if (FDiscovery && (!AIdentity.category.isEmpty() || !AIdentity.type.isEmpty()))
 			{
-				if ((AIdentity.category.isEmpty() || AIdentity.category == identity.category) && (AIdentity.type.isEmpty() || AIdentity.type == identity.type))
+				IDiscoInfo dinfo = FDiscovery->discoInfo(AStreamJid, ritem.itemJid);
+				foreach(IDiscoIdentity identity, dinfo.identity)
 				{
-					services.append(ritem.itemJid);
-					break;
+					if ((AIdentity.category.isEmpty() || AIdentity.category == identity.category) && (AIdentity.type.isEmpty() || AIdentity.type == identity.type))
+					{
+						services.append(ritem.itemJid);
+						break;
+					}
 				}
 			}
+			else
+				services.append(ritem.itemJid);
 		}
-		else
-			services.append(ritem.itemJid);
 	}
 	return services;
 }
@@ -310,8 +312,8 @@ QList<Jid> Gateways::serviceContacts(const Jid &AStreamJid, const Jid &AServiceJ
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
 	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
 	foreach(IRosterItem ritem, ritems)
-	if (!ritem.itemJid.node().isEmpty() && ritem.itemJid.pDomain()==AServiceJid.pDomain())
-		contacts.append(ritem.itemJid);
+		if (!ritem.itemJid.node().isEmpty() && ritem.itemJid.pDomain()==AServiceJid.pDomain())
+			contacts.append(ritem.itemJid);
 	return contacts;
 }
 
@@ -367,7 +369,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 
 			curItems+=newItems;
 			foreach(IRosterItem ritem, curItems)
-			FRosterChanger->insertAutoSubscribe(AStreamJid,ritem.itemJid, true, true, false);
+				FRosterChanger->insertAutoSubscribe(AStreamJid,ritem.itemJid, true, true, false);
 			FRosterChanger->insertAutoSubscribe(AStreamJid,AServiceTo,true,true,false);
 			roster->sendSubscription(AServiceTo,IRoster::Subscribe);
 		}
@@ -442,7 +444,7 @@ void Gateways::savePrivateStorageKeep(const Jid &AStreamJid)
 		QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_KEEP,PST_GATEWAYS_SERVICES)).toElement();
 		QSet<Jid> services = FPrivateStorageKeep.value(AStreamJid);
 		foreach(Jid service, services)
-		elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.eBare()));
+			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.eBare()));
 		FPrivateStorage->saveData(AStreamJid,elem);
 	}
 }
@@ -455,7 +457,7 @@ void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
 		doc.appendChild(doc.createElement("services"));
 		QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_SUBSCRIBE,PST_GATEWAYS_SERVICES)).toElement();
 		foreach(Jid service, FSubscribeServices.values(AStreamJid))
-		elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.eBare()));
+			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.eBare()));
 		FPrivateStorage->saveData(AStreamJid,elem);
 	}
 }
@@ -496,7 +498,7 @@ void Gateways::onResolveActionTriggered(bool)
 		{
 			QList<Jid> contactJids = serviceContacts(streamJid,contactJid);
 			foreach(Jid contact, contactJids)
-			resolveNickName(streamJid,contact);
+				resolveNickName(streamJid,contact);
 		}
 		else
 			resolveNickName(streamJid,contactJid);
@@ -673,8 +675,8 @@ void Gateways::onRosterOpened(IRoster *ARoster)
 	if (FRosterChanger)
 	{
 		foreach(Jid serviceJid, FSubscribeServices.values(ARoster->streamJid()))
-		foreach(Jid contactJid, serviceContacts(ARoster->streamJid(),serviceJid))
-		FRosterChanger->insertAutoSubscribe(ARoster->streamJid(),contactJid,true,true,false);
+			foreach(Jid contactJid, serviceContacts(ARoster->streamJid(),serviceJid))
+				FRosterChanger->insertAutoSubscribe(ARoster->streamJid(),contactJid,true,true,false);
 	}
 }
 
@@ -725,7 +727,7 @@ void Gateways::onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid,
 
 			QSet<Jid> oldServices = FPrivateStorageKeep.value(AStreamJid) - services;
 			foreach(Jid service, oldServices)
-			setKeepConnection(AStreamJid,service,false);
+				setKeepConnection(AStreamJid,service,false);
 			FPrivateStorageKeep[AStreamJid] = services;
 
 			if (changed)
@@ -779,7 +781,7 @@ void Gateways::onVCardReceived(const Jid &AContactJid)
 	{
 		QList<Jid> streamJids = FResolveNicks.values(AContactJid);
 		foreach(Jid streamJid, streamJids)
-		resolveNickName(streamJid,AContactJid);
+			resolveNickName(streamJid,AContactJid);
 		FResolveNicks.remove(AContactJid);
 	}
 }
@@ -808,11 +810,11 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
 		{
 			QList<Jid> services;
 			foreach(IDiscoIdentity ident, dinfo.identity)
-			services += streamServices(streamJid,ident);
+				services += streamServices(streamJid,ident);
 
 			foreach(Jid service, streamServices(streamJid))
-			if (!services.contains(service) && FDiscovery->discoInfo(streamJid,service).identity.isEmpty())
-				services.append(service);
+				if (!services.contains(service) && FDiscovery->discoInfo(streamJid,service).identity.isEmpty())
+					services.append(service);
 
 			if (!services.isEmpty() && !services.contains(itemJid))
 			{

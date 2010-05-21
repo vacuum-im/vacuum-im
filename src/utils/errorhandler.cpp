@@ -182,8 +182,8 @@ ErrorHandler::ErrorItem *ErrorHandler::itemByCode(int &ACode, const QString &ANs
 	init();
 	QList<ErrorItem *> items = FItemByNS.values(ANsURI);
 	foreach(ErrorItem *item, items)
-	if (item->code == ACode)
-		return item;
+		if (item->code == ACode)
+			return item;
 	return NULL;
 }
 
@@ -192,8 +192,8 @@ ErrorHandler::ErrorItem *ErrorHandler::itemByCondition(const QString &ACondition
 	init();
 	QList<ErrorItem *> items = FItemByNS.values(ANsURI);
 	foreach(ErrorItem *item, items)
-	if (item->condition == ACondition)
-		return item;
+		if (item->condition == ACondition)
+			return item;
 	return NULL;
 }
 
@@ -203,8 +203,8 @@ ErrorHandler::ErrorItem *ErrorHandler::itemByCodeCondition(int &ACode, const QSt
 	init();
 	QList<ErrorItem *> items = FItemByNS.values(ANsURI);
 	foreach(ErrorItem *item, items)
-	if (item->condition == ACondition && item->code == ACode)
-		return item;
+		if (item->condition == ACondition && item->code == ACode)
+			return item;
 	return NULL;
 }
 

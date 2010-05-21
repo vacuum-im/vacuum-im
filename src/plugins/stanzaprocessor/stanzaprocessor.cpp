@@ -361,8 +361,8 @@ void StanzaProcessor::onStreamCreated(IXmppStream *AXmppStream)
 void StanzaProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
 	foreach(int shandleId, FHandles.keys())
-	if (FHandles.value(shandleId).streamJid == ABefour)
-		FHandles[shandleId].streamJid = AXmppStream->streamJid();
+		if (FHandles.value(shandleId).streamJid == ABefour)
+			FHandles[shandleId].streamJid = AXmppStream->streamJid();
 }
 
 void StanzaProcessor::onStreamClosed(IXmppStream *AXmppStream)
@@ -404,15 +404,15 @@ void StanzaProcessor::onStanzaRequestTimeout()
 void StanzaProcessor::onStanzaRequestOwnerDestroyed(QObject *AOwner)
 {
 	foreach(QString stanzaId, FRequests.keys())
-	if (FRequests.value(stanzaId).owner->instance() == AOwner)
-		removeStanzaRequest(stanzaId);
+		if (FRequests.value(stanzaId).owner->instance() == AOwner)
+			removeStanzaRequest(stanzaId);
 }
 
 void StanzaProcessor::onStanzaHandlerDestroyed(QObject *AHandler)
 {
 	foreach (int shandleId, FHandles.keys())
-	if (FHandles.value(shandleId).handler->instance() == AHandler)
-		removeStanzaHandle(shandleId);
+		if (FHandles.value(shandleId).handler->instance() == AHandler)
+			removeStanzaHandle(shandleId);
 }
 
 Q_EXPORT_PLUGIN2(plg_stanzaprocessor, StanzaProcessor)

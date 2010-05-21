@@ -41,7 +41,7 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 	if (AFileStream->streamState() == IFileStream::Creating)
 	{
 		foreach(QUuid profileId, FDataManager->settingsProfiles())
-		ui.cmbSettingsProfile->addItem(FDataManager->settingsProfileName(profileId), profileId.toString());
+			ui.cmbSettingsProfile->addItem(FDataManager->settingsProfileName(profileId), profileId.toString());
 		ui.cmbSettingsProfile->setCurrentIndex(0);
 
 		connect(ui.cmbSettingsProfile, SIGNAL(currentIndexChanged(int)), SLOT(onMethodSettingsChanged(int)));
@@ -89,8 +89,8 @@ QList<QString> StreamDialog::selectedMethods() const
 {
 	QList<QString> methods;
 	foreach (QCheckBox *button, FMethodButtons.keys())
-	if (button->isChecked())
-		methods.append(FMethodButtons.value(button));
+		if (button->isChecked())
+			methods.append(FMethodButtons.value(button));
 	return methods;
 }
 

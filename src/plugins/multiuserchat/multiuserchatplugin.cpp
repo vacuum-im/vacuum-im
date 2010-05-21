@@ -244,7 +244,7 @@ bool MultiUserChatPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContact
 		if (mchat != NULL)
 		{
 			foreach(QString userJid, AParams.values("jid"))
-			mchat->inviteContact(userJid, QString::null);
+				mchat->inviteContact(userJid, QString::null);
 		}
 		return true;
 	}
@@ -459,8 +459,8 @@ IMultiUserChat *MultiUserChatPlugin::getMultiUserChat(const Jid &AStreamJid, con
 IMultiUserChat *MultiUserChatPlugin::multiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const
 {
 	foreach(IMultiUserChat *chat, FChats)
-	if (chat->streamJid() == AStreamJid && chat->roomJid() == ARoomJid)
-		return chat;
+		if (chat->streamJid() == AStreamJid && chat->roomJid() == ARoomJid)
+			return chat;
 	return NULL;
 }
 
@@ -483,8 +483,8 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStream
 IMultiUserChatWindow *MultiUserChatPlugin::multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const
 {
 	foreach(IMultiUserChatWindow *chatWindow,FChatWindows)
-	if (chatWindow->streamJid()==AStreamJid && chatWindow->roomJid()==ARoomJid)
-		return chatWindow;
+		if (chatWindow->streamJid()==AStreamJid && chatWindow->roomJid()==ARoomJid)
+			return chatWindow;
 	return NULL;
 }
 
@@ -652,7 +652,7 @@ void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
 			foreach(QString feature, info.features)
 			{
 				foreach(Action *action, FDiscovery->createFeatureActions(chatWindow->streamJid(),feature,info,AMenu))
-				AMenu->addAction(action, AG_MUCM_DISCOVERY_FEATURES, true);
+					AMenu->addAction(action, AG_MUCM_DISCOVERY_FEATURES, true);
 			}
 		}
 		emit multiUserContextMenu(chatWindow,AUser,AMenu);
@@ -684,13 +684,13 @@ void MultiUserChatPlugin::onStreamRemoved(IXmppStream *AXmppStream)
 {
 	QList<IMultiUserChatWindow *> chatWindows = FChatWindows;
 	foreach(IMultiUserChatWindow *chatWindow, chatWindows)
-	if (chatWindow->streamJid() == AXmppStream->streamJid())
-		chatWindow->exitAndDestroy("",0);
+		if (chatWindow->streamJid() == AXmppStream->streamJid())
+			chatWindow->exitAndDestroy("",0);
 
 	QList<QMessageBox *> inviteDialogs = FInviteDialogs.keys();
 	foreach(QMessageBox * inviteDialog,inviteDialogs)
-	if (FInviteDialogs.value(inviteDialog).streamJid == AXmppStream->streamJid())
-		inviteDialog->done(QMessageBox::Ignore);
+		if (FInviteDialogs.value(inviteDialog).streamJid == AXmppStream->streamJid())
+			inviteDialog->done(QMessageBox::Ignore);
 
 	for (int i=0; i<FActiveInvites.count();i++)
 		if (AXmppStream->streamJid() == FMessageProcessor->messageById(FActiveInvites.at(i)).to())
@@ -718,7 +718,7 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
 void MultiUserChatPlugin::onShowAllRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
-	window->showWindow();
+		window->showWindow();
 }
 
 void MultiUserChatPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)

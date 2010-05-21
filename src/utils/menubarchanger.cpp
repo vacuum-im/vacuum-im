@@ -76,7 +76,7 @@ void MenuBarChanger::removeMenu(Menu *AMenu)
 void MenuBarChanger::clear()
 {
 	foreach(Menu *menu,FMenu.values())
-	removeMenu(menu);
+		removeMenu(menu);
 	FMenuBar->clear();
 }
 

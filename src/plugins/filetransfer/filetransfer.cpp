@@ -508,8 +508,8 @@ QList<IToolBarWidget *> FileTransfer::findToolBarWidgets(const Jid &AContactJid)
 {
 	QList<IToolBarWidget *> toolBars;
 	foreach (IToolBarWidget *widget, FToolBarActions.keys())
-	if (widget->editWidget()->contactJid()==AContactJid)
-		toolBars.append(widget);
+		if (widget->editWidget()->contactJid()==AContactJid)
+			toolBars.append(widget);
 	return toolBars;
 }
 
@@ -627,7 +627,7 @@ void FileTransfer::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 void FileTransfer::onDiscoInfoRemoved(const IDiscoInfo &AInfo)
 {
 	foreach(IToolBarWidget *widget, findToolBarWidgets(AInfo.contactJid))
-	removeToolBarAction(widget);
+		removeToolBarAction(widget);
 }
 
 void FileTransfer::onToolBarWidgetCreated(IToolBarWidget *AWidget)
@@ -659,8 +659,8 @@ void FileTransfer::onEditWidgetContactJidChanged(const Jid &ABefour)
 void FileTransfer::onToolBarWidgetDestroyed(QObject *AObject)
 {
 	foreach(IToolBarWidget *widget, FToolBarActions.keys())
-	if (qobject_cast<QObject *>(widget->instance()) == AObject)
-		FToolBarActions.remove(widget);
+		if (qobject_cast<QObject *>(widget->instance()) == AObject)
+			FToolBarActions.remove(widget);
 }
 
 Q_EXPORT_PLUGIN2(plg_filetransfer, FileTransfer);

@@ -64,8 +64,8 @@ IRoster *RosterPlugin::addRoster(IXmppStream *AXmppStream)
 IRoster *RosterPlugin::getRoster(const Jid &AStreamJid) const
 {
 	foreach(IRoster *roster, FRosters)
-	if (roster->streamJid() == AStreamJid)
-		return roster;
+		if (roster->streamJid() == AStreamJid)
+			return roster;
 	return NULL;
 }
 

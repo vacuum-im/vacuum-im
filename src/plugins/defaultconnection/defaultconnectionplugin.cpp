@@ -102,8 +102,8 @@ void DefaultConnectionPlugin::onConnectionAboutToConnect()
 	if (FXmppStreams && connection)
 	{
 		foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-		if (stream->connection() == connection)
-			connection->setOption(IDefaultConnection::COR_DOMAINE,stream->streamJid().pDomain());
+			if (stream->connection() == connection)
+				connection->setOption(IDefaultConnection::COR_DOMAINE,stream->streamJid().pDomain());
 	}
 }
 

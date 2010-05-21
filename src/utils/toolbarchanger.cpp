@@ -42,7 +42,7 @@ void ToolBarChanger::setSeparatorsVisible(bool ASeparatorsVisible)
 {
 	FSeparatorsVisible = ASeparatorsVisible;
 	foreach(QAction *separator, FSeparators.values())
-	separator->setVisible(ASeparatorsVisible);
+		separator->setVisible(ASeparatorsVisible);
 	updateSeparatorVisible();
 }
 
@@ -72,7 +72,7 @@ QList<QAction *> ToolBarChanger::groupItems(int AGroup) const
 	QList<QAction *> handles;
 	QList<QWidget *> widgets = AGroup!=TBG_NULL ? FWidgets.values(AGroup) : FWidgets.values();
 	foreach(QWidget *widget, widgets)
-	handles.append(FHandles.value(widget));
+		handles.append(FHandles.value(widget));
 	return handles;
 }
 
@@ -170,7 +170,7 @@ void ToolBarChanger::removeItem(QAction *AHandle)
 void ToolBarChanger::clear()
 {
 	foreach(QAction *handle, FHandles.values())
-	removeItem(handle);
+		removeItem(handle);
 	FToolBar->clear();
 }
 
@@ -215,8 +215,8 @@ bool ToolBarChanger::eventFilter(QObject *AObject, QEvent *AEvent)
 void ToolBarChanger::onWidgetDestroyed(QObject *AObject)
 {
 	foreach(QWidget *widget, FWidgets.values())
-	if (qobject_cast<QObject *>(widget) == AObject)
-		removeItem(FHandles.value(widget));
+		if (qobject_cast<QObject *>(widget) == AObject)
+			removeItem(FHandles.value(widget));
 }
 
 void ToolBarChanger::onChangeVisible()

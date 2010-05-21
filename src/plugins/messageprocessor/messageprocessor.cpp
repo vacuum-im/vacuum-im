@@ -309,7 +309,7 @@ void MessageProcessor::unNotifyMessage(int AMessageId)
 void MessageProcessor::removeStreamMessages(const Jid &AStreamJid)
 {
 	foreach (int messageId, messages(AStreamJid))
-	removeMessage(messageId);
+		removeMessage(messageId);
 }
 
 QString MessageProcessor::prepareBodyForSend(const QString &AString) const

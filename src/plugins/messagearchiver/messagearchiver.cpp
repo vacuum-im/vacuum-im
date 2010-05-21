@@ -1120,8 +1120,8 @@ QString MessageArchiver::gateNick(const Jid &AStreamJid, const Jid &AContactJid)
 	{
 		Jid gcontactJid = gateJid(AContactJid.bare());
 		foreach(IRosterItem ritem, roster->rosterItems())
-		if (ritem.itemJid.pNode()==AContactJid.pNode() && gcontactJid==gateJid(ritem.itemJid))
-			return ritem.name.isEmpty() ? ritem.itemJid.bare() : ritem.name;
+			if (ritem.itemJid.pNode()==AContactJid.pNode() && gcontactJid==gateJid(ritem.itemJid))
+				return ritem.name.isEmpty() ? ritem.itemJid.bare() : ritem.name;
 	}
 	return AContactJid.bare();
 }
@@ -1648,8 +1648,8 @@ QMultiMap<QString,QString> MessageArchiver::filterCollectionFiles(const QStringL
 		QString startName = collectionFileName(ARequest.start);
 		QString endName = collectionFileName(ARequest.end);
 		foreach(QString file, AFiles)
-		if ((startName.isEmpty() || startName<=file) && (endName.isEmpty() || endName>=file))
-			filesMap.insert(file,APrefix);
+			if ((startName.isEmpty() || startName<=file) && (endName.isEmpty() || endName>=file))
+				filesMap.insert(file,APrefix);
 	}
 	return filesMap;
 }
@@ -1735,8 +1735,8 @@ CollectionWriter *MessageArchiver::findCollectionWriter(const Jid &AStreamJid, c
 {
 	QList<CollectionWriter *> writers = FCollectionWriters.value(AStreamJid).values(AWith);
 	foreach(CollectionWriter *writer, writers)
-	if (writer->header().threadId == AThreadId)
-		return writer;
+		if (writer->header().threadId == AThreadId)
+			return writer;
 	return NULL;
 }
 
@@ -2739,10 +2739,8 @@ void MessageArchiver::onRemoveItemPrefsAction(bool)
 void MessageArchiver::onArchiveHandlerDestroyed(QObject *AHandler)
 {
 	QList<int> orders = FArchiveHandlers.keys((IArchiveHandler *)AHandler);
-	foreach(int order, orders)
-	{
-		removeArchiveHandler((IArchiveHandler *)AHandler,order);
-	}
+	foreach(int order, orders) {
+		removeArchiveHandler((IArchiveHandler *)AHandler,order); }
 }
 
 void MessageArchiver::onArchiveWindowDestroyed(IArchiveWindow *AWindow)

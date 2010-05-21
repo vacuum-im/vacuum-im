@@ -145,8 +145,8 @@ bool Roster::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder
 IRosterItem Roster::rosterItem(const Jid &AItemJid) const
 {
 	foreach(IRosterItem ritem, FRosterItems)
-	if (AItemJid && ritem.itemJid)
-		return ritem;
+		if (AItemJid && ritem.itemJid)
+			return ritem;
 	return IRosterItem();
 }
 
@@ -159,8 +159,8 @@ QSet<QString> Roster::groups() const
 {
 	QSet<QString> allGroups;
 	foreach(IRosterItem ritem, FRosterItems)
-	if (!ritem.itemJid.node().isEmpty())
-		allGroups += ritem.groups;
+		if (!ritem.itemJid.node().isEmpty())
+			allGroups += ritem.groups;
 	return allGroups;
 }
 
@@ -197,8 +197,8 @@ void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QStri
 	if (!AName.isEmpty())
 		itemElem.setAttribute("name",AName);
 	foreach (QString groupName,AGroups)
-	if (!groupName.isEmpty())
-		itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(groupName));
+		if (!groupName.isEmpty())
+			itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(groupName));
 	FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),query);
 }
 
@@ -216,8 +216,8 @@ void Roster::setItems(const QList<IRosterItem> &AItems)
 			if (!ritem.name.isEmpty())
 				itemElem.setAttribute("name",ritem.name);
 			foreach (QString groupName,ritem.groups)
-			if (!groupName.isEmpty())
-				itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(groupName));
+				if (!groupName.isEmpty())
+					itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(groupName));
 		}
 		FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),query);
 	}
@@ -285,7 +285,7 @@ void Roster::saveRosterItems(const QString &AFileName) const
 		itemElem.setAttribute("subscription",ritem.subscription);
 		itemElem.setAttribute("ask",ritem.ask);
 		foreach(QString group, ritem.groups)
-		itemElem.appendChild(xml.createElement("group")).appendChild(xml.createTextNode(group));
+			itemElem.appendChild(xml.createElement("group")).appendChild(xml.createTextNode(group));
 	}
 
 	QFile rosterFile(AFileName);
@@ -451,8 +451,8 @@ void Roster::removeGroup(const QString &AGroup)
 	{
 		QSet<QString> newItemGroups = it->groups;
 		foreach(QString group, it->groups)
-		if (group.startsWith(AGroup))
-			newItemGroups -= group;
+			if (group.startsWith(AGroup))
+				newItemGroups -= group;
 		it->groups = newItemGroups;
 		it++;
 	}
@@ -502,7 +502,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 		}
 
 		foreach(Jid itemJid,oldItems)
-		removeRosterItem(itemJid);
+			removeRosterItem(itemJid);
 	}
 }
 
@@ -518,7 +518,7 @@ void Roster::removeRosterItem(const Jid &AItemJid)
 void Roster::clearItems()
 {
 	foreach(Jid itemJid,FRosterItems.keys())
-	removeRosterItem(itemJid);
+		removeRosterItem(itemJid);
 	FRosterVer.clear();
 }
 

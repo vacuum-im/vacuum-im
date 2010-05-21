@@ -232,7 +232,7 @@ QString DiscoItemsModel::itemToolTip(const IDiscoInfo &ADiscoInfo) const
 		{
 			toolTip+=tr("<li><b>Identity:</b></li>");
 			foreach(IDiscoIdentity identity, ADiscoInfo.identity)
-			toolTip+=tr("<li>%1 (Category: '%2'; Type: '%3')</li>").arg(identity.name).arg(identity.category).arg(identity.type);
+				toolTip+=tr("<li>%1 (Category: '%2'; Type: '%3')</li>").arg(identity.name).arg(identity.category).arg(identity.type);
 		}
 
 		if (!ADiscoInfo.features.isEmpty())

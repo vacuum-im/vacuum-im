@@ -233,10 +233,10 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
 	{
 		QMultiHash<int,QVariant> findData;
 		foreach(Jid contactJid, AContactJids)
-		findData.insertMulti(RDR_BARE_JID,contactJid.pBare());
+			findData.insertMulti(RDR_BARE_JID,contactJid.pBare());
 		QList<IRosterIndex *> indexes = FRostersModel->streamRoot(AStreamJid)->findChild(findData,true);
 		foreach (IRosterIndex *index, indexes)
-		emit rosterDataChanged(index,RDR_ANNOTATIONS);
+			emit rosterDataChanged(index,RDR_ANNOTATIONS);
 	}
 }
 

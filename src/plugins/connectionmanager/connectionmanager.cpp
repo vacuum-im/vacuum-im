@@ -126,8 +126,7 @@ QList<QUuid> ConnectionManager::proxyList() const
 {
 	QList<QUuid> plist;
 	foreach(QString proxyId, Options::node(OPV_PROXY_ROOT).childNSpaces("proxy")) {
-		plist.append(proxyId);
-	}
+		plist.append(proxyId); }
 	return plist;
 }
 

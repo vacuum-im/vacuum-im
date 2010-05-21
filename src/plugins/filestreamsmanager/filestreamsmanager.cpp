@@ -268,7 +268,7 @@ void FileStreamsManager::onProfileClosed(const QString &AName)
 		delete FFileStreamsWindow;
 
 	foreach(IFileStream *stream, FStreams.values())
-	delete stream->instance();
+		delete stream->instance();
 }
 
 Q_EXPORT_PLUGIN2(plg_filestreamsmanager, FileStreamsManager);

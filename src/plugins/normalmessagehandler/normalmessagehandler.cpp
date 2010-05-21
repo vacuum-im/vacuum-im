@@ -229,8 +229,8 @@ IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid
 IMessageWindow *NormalMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
 	foreach(IMessageWindow *window,FWindows)
-	if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
-		return window;
+		if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
+			return window;
 	return NULL;
 }
 
@@ -415,7 +415,7 @@ void NormalMessageHandler::onWindowDestroyed()
 	{
 		QList<int> messagesId = FActiveMessages.values(window);
 		foreach(int messageId, messagesId)
-		FActiveMessages.insertMulti(NULL,messageId);
+			FActiveMessages.insertMulti(NULL,messageId);
 		FActiveMessages.remove(window);
 		FLastMessages.remove(window);
 		FWindows.removeAt(FWindows.indexOf(window));
@@ -425,7 +425,7 @@ void NormalMessageHandler::onWindowDestroyed()
 void NormalMessageHandler::onStatusIconsChanged()
 {
 	foreach(IMessageWindow *window, FWindows)
-	updateWindow(window);
+		updateWindow(window);
 }
 
 void NormalMessageHandler::onShowWindowAction(bool)

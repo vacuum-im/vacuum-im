@@ -59,7 +59,7 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
 		{
 			QStringList notes;
 			foreach(ICommandNote note, AResult.notes)
-			notes.append(Qt::escape(note.message));
+				notes.append(Qt::escape(note.message));
 			ui.lblInfo->setText(notes.join("<br>"));
 		}
 		else if (AResult.status == COMMAND_STATUS_COMPLETED)

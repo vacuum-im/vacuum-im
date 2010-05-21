@@ -18,8 +18,7 @@ IconStorage::~IconStorage()
 {
 	QList<QObject*> objects = FUpdateParams.keys();
 	foreach(QObject *object, objects) {
-		removeObject(object);
-	}
+		removeObject(object); }
 }
 
 QIcon IconStorage::getIcon(const QString AKey, int AIndex) const

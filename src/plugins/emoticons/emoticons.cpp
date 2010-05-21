@@ -307,8 +307,8 @@ void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconK
 void Emoticons::onSelectIconMenuDestroyed(QObject *AObject)
 {
 	foreach(SelectIconMenu *menu, FToolBarWidgetByMenu.keys())
-	if (qobject_cast<QObject *>(menu) == AObject)
-		FToolBarWidgetByMenu.remove(menu);
+		if (qobject_cast<QObject *>(menu) == AObject)
+			FToolBarWidgetByMenu.remove(menu);
 }
 
 void Emoticons::onOptionsOpened()

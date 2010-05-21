@@ -184,8 +184,8 @@ IMessageWindow *MessageWidgets::newMessageWindow(const Jid &AStreamJid, const Ji
 IMessageWindow *MessageWidgets::findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const
 {
 	foreach(IMessageWindow *window,FMessageWindows)
-	if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
-		return window;
+		if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
+			return window;
 	return NULL;
 }
 
@@ -212,8 +212,8 @@ IChatWindow *MessageWidgets::newChatWindow(const Jid &AStreamJid, const Jid &ACo
 IChatWindow *MessageWidgets::findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) const
 {
 	foreach(IChatWindow *window,FChatWindows)
-	if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
-		return window;
+		if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
+			return window;
 	return NULL;
 }
 
@@ -221,7 +221,7 @@ QList<QUuid> MessageWidgets::tabWindowList() const
 {
 	QList<QUuid> list;
 	foreach(QString tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
-	list.append(tabWindowId);
+		list.append(tabWindowId);
 	return list;
 }
 
@@ -233,7 +233,7 @@ QUuid MessageWidgets::appendTabWindow(const QString &AName)
 	{
 		QList<QString> names;
 		foreach(QString tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
-		names.append(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,tabWindowId).value().toString());
+			names.append(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,tabWindowId).value().toString());
 
 		int i = 0;
 		do
@@ -298,8 +298,8 @@ ITabWindow *MessageWidgets::openTabWindow(const QUuid &AWindowId)
 ITabWindow *MessageWidgets::findTabWindow(const QUuid &AWindowId) const
 {
 	foreach(ITabWindow *window,FTabWindows)
-	if (window->windowId() == AWindowId)
-		return window;
+		if (window->windowId() == AWindowId)
+			return window;
 	return NULL;
 }
 
@@ -379,20 +379,20 @@ void MessageWidgets::insertQuoteAction(IToolBarWidget *AWidget)
 void MessageWidgets::deleteWindows()
 {
 	foreach(ITabWindow *window, tabWindows())
-	delete window->instance();
+		delete window->instance();
 }
 
 void MessageWidgets::deleteStreamWindows(const Jid &AStreamJid)
 {
 	QList<IChatWindow *> chatWindows = FChatWindows;
 	foreach(IChatWindow *window, chatWindows)
-	if (window->streamJid() == AStreamJid)
-		delete window->instance();
+		if (window->streamJid() == AStreamJid)
+			delete window->instance();
 
 	QList<IMessageWindow *> messageWindows = FMessageWindows;
 	foreach(IMessageWindow *window, messageWindows)
-	if (window->streamJid() == AStreamJid)
-		delete window->instance();
+		if (window->streamJid() == AStreamJid)
+			delete window->instance();
 }
 
 void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)

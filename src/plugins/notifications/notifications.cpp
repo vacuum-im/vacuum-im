@@ -413,7 +413,7 @@ int Notifications::notifyIdByWidget(NotifyWidget *AWidget) const
 void Notifications::onActivateDelayedActivations()
 {
 	foreach(int notifyId, FDelayedActivations)
-	activateNotification(notifyId);
+		activateNotification(notifyId);
 	FDelayedActivations.clear();
 }
 

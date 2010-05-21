@@ -543,8 +543,8 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 SubscriptionDialog *RosterChanger::findSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const
 {
 	foreach (SubscriptionDialog *dialog, FNotifyDialog)
-	if (dialog && dialog->streamJid()==AStreamJid && dialog->contactJid()==AContactJid)
-		return dialog;
+		if (dialog && dialog->streamJid()==AStreamJid && dialog->contactJid()==AContactJid)
+			return dialog;
 	return NULL;
 }
 
@@ -1021,7 +1021,7 @@ void RosterChanger::onRemoveItemFromRoster(bool)
 				data.insert(RDR_BARE_JID,rosterJid.pBare());
 				IRosterIndex *streamIndex = FRostersModel->streamRoot(streamJid);
 				foreach(IRosterIndex *index, streamIndex->findChild(data,true))
-				FRostersModel->removeRosterIndex(index);
+					FRostersModel->removeRosterIndex(index);
 			}
 		}
 	}

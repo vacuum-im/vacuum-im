@@ -104,8 +104,8 @@ QList<IXmppStream *> XmppStreams::xmppStreams() const
 IXmppStream *XmppStreams::xmppStream(const Jid &AStreamJid) const
 {
 	foreach(IXmppStream *stream,FStreams)
-	if (stream->streamJid() == AStreamJid)
-		return stream;
+		if (stream->streamJid() == AStreamJid)
+			return stream;
 	return NULL;
 }
 

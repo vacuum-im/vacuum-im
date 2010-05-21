@@ -57,8 +57,8 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
 		{
 			QList<QVariant> labelFlags = index.data(RDR_LABEL_FLAGS).toList();
 			foreach(QVariant flag, labelFlags)
-			if ((flag.toInt() & IRostersView::LabelVisible) > 0)
-				return true;
+				if ((flag.toInt() & IRostersView::LabelVisible) > 0)
+					return true;
 			int indexShow = index.data(RDR_SHOW).toInt();
 			return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
 		}

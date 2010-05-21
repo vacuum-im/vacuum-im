@@ -121,7 +121,7 @@ void SetupPluginsDialog::onCurrentLanguageChanged(int AIndex)
 	ui.cmbCountry->clear();
 	QLocale::Language lang = (QLocale::Language)ui.cmbLanguage->itemData(AIndex).toInt();
 	foreach (QLocale::Country country, QLocale::countriesForLanguage(lang))
-	ui.cmbCountry->addItem(QLocale::countryToString(country),(int)country);
+		ui.cmbCountry->addItem(QLocale::countryToString(country),(int)country);
 	ui.cmbCountry->model()->sort(0, Qt::AscendingOrder);
 
 	if (lang != QLocale::C)
