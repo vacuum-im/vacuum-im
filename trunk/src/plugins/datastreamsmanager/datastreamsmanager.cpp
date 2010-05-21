@@ -155,8 +155,8 @@ bool DataStreamsManger::stanzaRead(int AHandlerId, const Jid &AStreamJid, const 
 			int index = FDataForms->fieldIndex(DFV_STREAM_METHOD,form.fields);
 			if (index>=0)
 				foreach(IDataOption option, form.fields.at(index).options)
-				if (FMethods.contains(option.value))
-					smethods.append(option.value);
+					if (FMethods.contains(option.value))
+						smethods.append(option.value);
 
 			if (!smethods.isEmpty())
 			{
@@ -308,8 +308,8 @@ QList<QUuid> DataStreamsManger::settingsProfiles() const
 	QList<QUuid> sprofiles;
 	sprofiles.append(QUuid().toString());
 	foreach(QString sprofile, Options::node(OPV_DATASTREAMS_ROOT).childNSpaces("settings-profile"))
-	if (!sprofiles.contains(sprofile))
-		sprofiles.append(sprofile);
+		if (!sprofiles.contains(sprofile))
+			sprofiles.append(sprofile);
 	return sprofiles;
 }
 

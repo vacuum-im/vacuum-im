@@ -52,8 +52,7 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
 	foreach (const IOptionsDialogNode &node, FManager->optionsDialogNodes()) {
-		onOptionsDialogNodeInserted(node);
-	}
+		onOptionsDialogNodeInserted(node); }
 }
 
 OptionsDialog::~OptionsDialog()
@@ -108,7 +107,7 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 	}
 
 	foreach(IOptionsWidget *widget, orderedWidgets)
-	nodeWidget->layout()->addWidget(widget->instance());
+		nodeWidget->layout()->addWidget(widget->instance());
 
 	if (!canExpandVertically(nodeWidget))
 		nodeWidget->setMaximumHeight(nodeWidget->sizeHint().height());

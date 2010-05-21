@@ -208,8 +208,8 @@ void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 			}
 
 			foreach(ICommandClient *client, FClients)
-			if (client->receiveCommandResult(result))
-				break;
+				if (client->receiveCommandResult(result))
+					break;
 		}
 		else
 		{
@@ -220,8 +220,8 @@ void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 			error.condition = err.condition();
 			error.message = err.message();
 			foreach(ICommandClient *client, FClients)
-			if (client->receiveCommandError(error))
-				break;
+				if (client->receiveCommandError(error))
+					break;
 		}
 	}
 }
@@ -238,8 +238,8 @@ void Commands::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanz
 		error.condition = err.condition();
 		error.message = err.message();
 		foreach(ICommandClient *client, FClients)
-		if (client->receiveCommandError(error))
-			break;
+			if (client->receiveCommandError(error))
+				break;
 	}
 }
 
@@ -468,7 +468,7 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
 			QDomElement actElem = cmdElem.appendChild(result.createElement("actions")).toElement();
 			actElem.setAttribute("execute",AResult.execute);
 			foreach(QString action,AResult.actions)
-			actElem.appendChild(result.createElement(action));
+				actElem.appendChild(result.createElement(action));
 		}
 
 		if (FDataForms && !AResult.form.type.isEmpty())

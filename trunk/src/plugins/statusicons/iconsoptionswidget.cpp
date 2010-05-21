@@ -106,7 +106,7 @@ void IconsOptionsWidget::apply()
 	}
 
 	foreach(QString rule,rules)
-	FStatusIcons->removeRule(rule,IStatusIcons::UserRule);
+		FStatusIcons->removeRule(rule,IStatusIcons::UserRule);
 
 	emit childApply();
 }

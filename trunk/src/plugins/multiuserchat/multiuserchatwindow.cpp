@@ -72,7 +72,7 @@ MultiUserChatWindow::~MultiUserChatWindow()
 {
 	QList<IChatWindow *> chatWindows = FChatWindows;
 	foreach(IChatWindow *window,chatWindows)
-	delete window->instance();
+		delete window->instance();
 
 	if (FMessageProcessor)
 		FMessageProcessor->removeMessageHandler(this,MHO_MULTIUSERCHAT_GROUPCHAT);
@@ -269,8 +269,8 @@ IChatWindow *MultiUserChatWindow::openChatWindow(const Jid &AContactJid)
 IChatWindow *MultiUserChatWindow::findChatWindow(const Jid &AContactJid) const
 {
 	foreach(IChatWindow *window,FChatWindows)
-	if (window->contactJid() == AContactJid)
-		return window;
+		if (window->contactJid() == AContactJid)
+			return window;
 	return NULL;
 }
 
@@ -1122,7 +1122,7 @@ void MultiUserChatWindow::removeActiveMessages()
 {
 	if (FMessageProcessor)
 		foreach(int messageId, FActiveMessages)
-		FMessageProcessor->removeMessage(messageId);
+			FMessageProcessor->removeMessage(messageId);
 	FActiveMessages.clear();
 	updateWindow();
 }
@@ -1269,7 +1269,7 @@ void MultiUserChatWindow::removeActiveChatMessages(IChatWindow *AWindow)
 	{
 		if (FMessageProcessor)
 			foreach(int messageId, FActiveChatMessages.values(AWindow))
-			FMessageProcessor->removeMessage(messageId);
+				FMessageProcessor->removeMessage(messageId);
 		FActiveChatMessages.remove(AWindow);
 		updateChatWindow(AWindow);
 		updateListItem(AWindow->contactJid());
@@ -1922,11 +1922,9 @@ void MultiUserChatWindow::onUserItemActivated(const QModelIndex &AIndex)
 void MultiUserChatWindow::onStatusIconsChanged()
 {
 	foreach(IChatWindow *window, FChatWindows) {
-		updateChatWindow(window);
-	}
+		updateChatWindow(window);	}
 	foreach(IMultiUser *user, FUsers.keys()) {
-		updateListItem(user->contactJid());
-	}
+		updateListItem(user->contactJid());	}
 	updateWindow();
 }
 

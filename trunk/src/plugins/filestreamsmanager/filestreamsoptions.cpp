@@ -30,8 +30,8 @@ void FileStreamsOptions::apply()
 
 	QStringList acceptableMethods;
 	foreach(QCheckBox *button, FMethods.keys())
-	if (button->isChecked())
-		acceptableMethods.append(FMethods.value(button));
+		if (button->isChecked())
+			acceptableMethods.append(FMethods.value(button));
 	Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).setValue(acceptableMethods);
 
 	Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).setValue(ui.cmbMethod->itemData(ui.cmbMethod->currentIndex()).toString());

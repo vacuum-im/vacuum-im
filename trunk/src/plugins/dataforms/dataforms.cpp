@@ -401,8 +401,7 @@ void DataForms::xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const
 	QDomElement reportElem = AFormElem.appendChild(doc.createElement("reported")).toElement();
 
 	foreach(IDataField column, ATable.columns) {
-		xmlField(column,reportElem,DATAFORM_TYPE_TABLE);
-	}
+		xmlField(column,reportElem,DATAFORM_TYPE_TABLE); }
 
 	foreach(QStringList rowValues,ATable.rows)
 	{
@@ -440,20 +439,16 @@ void DataForms::xmlForm(const IDataForm &AForm, QDomElement &AParentElem) const
 		formElem.appendChild(doc.createElement("title")).appendChild(doc.createTextNode(AForm.title));
 
 	foreach(QString instruction, AForm.instructions) {
-		formElem.appendChild(doc.createElement("instructions")).appendChild(doc.createTextNode(instruction));
-	}
+		formElem.appendChild(doc.createElement("instructions")).appendChild(doc.createTextNode(instruction)); }
 
 	foreach(IDataLayout layout, AForm.pages) {
-		xmlPage(layout,AParentElem);
-	}
+		xmlPage(layout,AParentElem); }
 
 	if (!AForm.tabel.columns.isEmpty()) {
-		xmlTable(AForm.tabel,formElem);
-	}
+		xmlTable(AForm.tabel,formElem); }
 
 	foreach(IDataField field, AForm.fields) {
-		xmlField(field,formElem,AForm.type);
-	}
+		xmlField(field,formElem,AForm.type); }
 }
 
 bool DataForms::isDataValid(const IDataValidate &AValidate, const QString &AValue) const
@@ -594,8 +589,8 @@ bool DataForms::isOptionValid(const QList<IDataOption> &AOptions, const QString 
 bool DataForms::isMediaValid(const IDataMedia &AMedia) const
 {
 	foreach(IDataMediaURI uri, AMedia.uris)
-	if (!uri.type.isEmpty() && !uri.subtype.isEmpty() && !uri.url.isEmpty())
-		return true;
+		if (!uri.type.isEmpty() && !uri.subtype.isEmpty() && !uri.url.isEmpty())
+			return true;
 	return false;
 }
 
@@ -777,7 +772,7 @@ void DataForms::removeLocalizer(IDataLocalizer *ALocalizer, const QString &AType
 	if (ALocalizer!=NULL && ATypeField.isEmpty())
 	{
 		foreach (QString formType, FLocalizers.keys(ALocalizer))
-		FLocalizers.remove(formType);
+			FLocalizers.remove(formType);
 	}
 	else if (FLocalizers.value(ATypeField)==ALocalizer)
 		FLocalizers.remove(ATypeField);

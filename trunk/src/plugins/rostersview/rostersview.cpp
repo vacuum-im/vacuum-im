@@ -407,7 +407,7 @@ void RostersView::destroyIndexLabel(int ALabelId)
 	{
 		removeBlinkLabel(ALabelId);
 		foreach (IRosterIndex *index, FIndexLabelIndexes.value(ALabelId))
-		removeIndexLabel(ALabelId,index);
+			removeIndexLabel(ALabelId,index);
 		FIndexLabels.remove(ALabelId);
 		FIndexLabelOrders.remove(ALabelId);
 		FIndexLabelFlags.remove(ALabelId);
@@ -623,7 +623,7 @@ void RostersView::updateStatusText(IRosterIndex *AIndex)
 	{
 		QMultiHash<int,QVariant> findData;
 		foreach(int type, statusTypes)
-		findData.insert(RDR_TYPE,type);
+			findData.insert(RDR_TYPE,type);
 		indexes = FRostersModel!=NULL ? FRostersModel->rootIndex()->findChild(findData,true) : QList<IRosterIndex *>();
 	}
 	else if (statusTypes.contains(AIndex->type()))
@@ -690,7 +690,7 @@ void RostersView::removeLabels()
 	{
 		QSet<IRosterIndex *> indexes = FIndexLabelIndexes.value(label);
 		foreach(IRosterIndex *index, indexes)
-		removeIndexLabel(label,index);
+			removeIndexLabel(label,index);
 	}
 }
 
@@ -845,7 +845,7 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 
 		Qt::DropActions actions = Qt::IgnoreAction;
 		foreach(IRostersDragDropHandler *handler, FDragDropHandlers)
-		actions |= handler->rosterDragStart(AEvent,FPressedIndex,drag);
+			actions |= handler->rosterDragStart(AEvent,FPressedIndex,drag);
 
 		if (actions != Qt::IgnoreAction)
 		{
@@ -917,8 +917,8 @@ void RostersView::dropEvent(QDropEvent *AEvent)
 	bool accepted = false;
 	QModelIndex index = indexAt(AEvent->pos());
 	foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
-	if (handler->rosterDropAction(AEvent,index,dropMenu))
-		accepted = true;
+		if (handler->rosterDropAction(AEvent,index,dropMenu))
+			accepted = true;
 
 	QAction *action= (AEvent->mouseButtons() & Qt::RightButton)>0 || dropMenu->defaultAction()==NULL ? dropMenu->exec(mapToGlobal(AEvent->pos())) : dropMenu->defaultAction();
 	if (accepted && action)
@@ -940,8 +940,8 @@ void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
 {
 	FActiveDragHandlers.clear();
 	foreach (IRostersDragDropHandler *handler, FDragDropHandlers)
-	if (handler->rosterDragEnter(AEvent))
-		FActiveDragHandlers.append(handler);
+		if (handler->rosterDragEnter(AEvent))
+			FActiveDragHandlers.append(handler);
 
 	if (!FActiveDragHandlers.isEmpty())
 	{
@@ -961,8 +961,8 @@ void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
 
 	bool accepted = false;
 	foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
-	if (handler->rosterDragMove(AEvent,index))
-		accepted = true;
+		if (handler->rosterDragMove(AEvent,index))
+			accepted = true;
 
 	if (accepted)
 		AEvent->acceptProposedAction();
@@ -980,7 +980,7 @@ void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
 void RostersView::dragLeaveEvent(QDragLeaveEvent *AEvent)
 {
 	foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
-	handler->rosterDragLeave(AEvent);
+		handler->rosterDragLeave(AEvent);
 	stopAutoScroll();
 	setDropIndicatorRect(QRect());
 }
@@ -1086,8 +1086,8 @@ void RostersView::onBlinkTimer()
 	FBlinkShow = !FBlinkShow;
 	FRosterIndexDelegate->setShowBlinkLabels(FBlinkShow);
 	foreach(int labelId,FBlinkLabels)
-	foreach(IRosterIndex *index, FIndexLabelIndexes.value(labelId))
-	repaintRosterIndex(index);
+		foreach(IRosterIndex *index, FIndexLabelIndexes.value(labelId))
+			repaintRosterIndex(index);
 }
 
 void RostersView::onDragExpandTimer()

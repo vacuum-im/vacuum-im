@@ -404,7 +404,7 @@ QList<int> StatusChanger::activeStatusItems() const
 {
 	QList<int> active;
 	foreach (int statusId, FCurrentStatus)
-	active.append(statusId == STATUS_MAIN_ID ? FStatusItems.value(STATUS_MAIN_ID).code : statusId);
+		active.append(statusId == STATUS_MAIN_ID ? FStatusItems.value(STATUS_MAIN_ID).code : statusId);
 	return active;
 }
 
@@ -412,16 +412,16 @@ QList<int> StatusChanger::statusByShow(int AShow) const
 {
 	QList<int> statuses;
 	foreach(StatusItem status, FStatusItems)
-	if (status.show == AShow)
-		statuses.append(status.code);
+		if (status.show == AShow)
+			statuses.append(status.code);
 	return statuses;
 }
 
 int StatusChanger::statusByName(const QString &AName) const
 {
 	foreach(StatusItem status, FStatusItems)
-	if (status.name.toLower() == AName.toLower())
-		return status.code;
+		if (status.name.toLower() == AName.toLower())
+			return status.code;
 	return STATUS_NULL_ID;
 }
 
@@ -650,8 +650,8 @@ void StatusChanger::updateStatusActions(int AStatusId)
 	QMultiHash<int, QVariant> data;
 	data.insert(ADR_STATUS_CODE,AStatusId);
 	QList<Action *> actionList = FMainMenu->findActions(data,true);
-	foreach (Action *action, actionList)
-	updateStatusAction(AStatusId,action);
+	foreach (Action *action, actionList) {
+		updateStatusAction(AStatusId,action); }
 }
 
 void StatusChanger::removeStatusActions(int AStatusId)
@@ -866,8 +866,8 @@ void StatusChanger::resendUpdatedStatus(int AStatusId)
 void StatusChanger::removeAllCustomStatuses()
 {
 	foreach (int statusId, FStatusItems.keys())
-	if (statusId > STATUS_MAX_STANDART_ID)
-		removeStatusItem(statusId);
+		if (statusId > STATUS_MAX_STANDART_ID)
+			removeStatusItem(statusId);
 }
 
 void StatusChanger::insertStatusNotification(IPresence *APresence)
@@ -1011,7 +1011,7 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
 	data.insert(ADR_STREAMJID,ABefour.full());
 	QList<Action *> actionList = FMainMenu->findActions(data,true);
 	foreach (Action *action, actionList)
-	action->setData(ADR_STREAMJID,AAfter.full());
+		action->setData(ADR_STREAMJID,AAfter.full());
 }
 
 void StatusChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
@@ -1033,10 +1033,10 @@ void StatusChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 void StatusChanger::onDefaultStatusIconsChanged()
 {
 	foreach (StatusItem status, FStatusItems)
-	updateStatusActions(status.code);
+		updateStatusActions(status.code);
 
 	foreach (IPresence *presence, FStreamMenu.keys())
-	updateStreamMenu(presence);
+		updateStreamMenu(presence);
 
 	updateMainStatusActions();
 	updateMainMenu();
@@ -1101,7 +1101,7 @@ void StatusChanger::onOptionsClosed()
 	}
 
 	foreach(QString ns, oldNS)
-	Options::node(OPV_STATUSES_ROOT).removeChilds("status",ns);
+		Options::node(OPV_STATUSES_ROOT).removeChilds("status",ns);
 
 	Options::node(OPV_STATUSES_MAINSTATUS).setValue(FStatusItems.value(STATUS_MAIN_ID).code);
 

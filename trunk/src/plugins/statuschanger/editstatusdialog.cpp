@@ -322,7 +322,7 @@ void EditStatusDialog::onDeleteButton(bool)
 void EditStatusDialog::onDialogButtonsBoxAccepted()
 {
 	foreach (int statusId, FDeletedStatuses)
-	FStatusChanger->removeStatusItem(statusId);
+		FStatusChanger->removeStatusItem(statusId);
 
 	for (int i=0; i<tblStatus->rowCount(); i++)
 	{

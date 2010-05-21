@@ -153,8 +153,8 @@ QList<QString> OptionsManager::profiles() const
 	QList<QString> profileList;
 
 	foreach(QString dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
-	if (FProfilesDir.exists(dirName + "/" FILE_PROFILE))
-		profileList.append(dirName);
+		if (FProfilesDir.exists(dirName + "/" FILE_PROFILE))
+			profileList.append(dirName);
 
 	return profileList;
 }

@@ -1049,7 +1049,7 @@ void PrivacyLists::sendOfflinePresences(const Jid &AStreamJid, const IPrivacyLis
 		if (presence->isOpen())
 		{
 			foreach(Jid contactJid, offline)
-			presence->sendPresence(contactJid,IPresence::Offline,"",0);
+				presence->sendPresence(contactJid,IPresence::Offline,"",0);
 		}
 		FOfflinePresences[AStreamJid] += offline;
 	}
@@ -1085,12 +1085,10 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 		QSet<Jid> allow = FLabeledContacts.value(AStreamJid) - denyed;
 
 		foreach(Jid contactJid, deny) {
-			setPrivacyLabel(AStreamJid,contactJid,true);
-		}
+			setPrivacyLabel(AStreamJid,contactJid,true); }
 
 		foreach(Jid contactJid, allow) {
-			setPrivacyLabel(AStreamJid,contactJid,false);
-		}
+			setPrivacyLabel(AStreamJid,contactJid,false); }
 
 		IRosterIndex *rootIndex = FRostersModel->streamRoot(AStreamJid);
 		IRosterIndex *groupIndex = FRostersModel->findRosterIndex(RIT_GROUP_NOT_IN_ROSTER,FRostersModel->notInRosterGroupName(),rootIndex);

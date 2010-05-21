@@ -36,7 +36,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 ConsoleWidget::~ConsoleWidget()
 {
 	foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-	stream->removeXmppStanzaHandler(this, XSHO_CONSOLE);
+		stream->removeXmppStanzaHandler(this, XSHO_CONSOLE);
 	if (!Options::isNull())
 		onOptionsClosed();
 }
@@ -64,8 +64,7 @@ void ConsoleWidget::initialize(IPluginManager *APluginManager)
 		if (FXmppStreams)
 		{
 			foreach(IXmppStream *stream, FXmppStreams->xmppStreams()) {
-				onStreamCreated(stream);
-			}
+				onStreamCreated(stream); }
 			connect(FXmppStreams->instance(), SIGNAL(created(IXmppStream *)), SLOT(onStreamCreated(IXmppStream *)));
 			connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
 			connect(FXmppStreams->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
@@ -79,8 +78,7 @@ void ConsoleWidget::initialize(IPluginManager *APluginManager)
 		if (FStanzaProcessor)
 		{
 			foreach(int shandleId, FStanzaProcessor->stanzaHandles()) {
-				onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId));
-			}
+				onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId)); }
 			ui.cmbCondition->clearEditText();
 
 			connect(FStanzaProcessor->instance(),SIGNAL(stanzaHandleInserted(int, const IStanzaHandle &)),
@@ -225,8 +223,8 @@ void ConsoleWidget::onSendXMLClicked()
 		{
 			ui.tedConsole->append("<b>"+tr("Start sending user stanza...")+"</b><br>");
 			foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-			if (ui.cmbStreamJid->currentIndex()==0 || stream->streamJid()==ui.cmbStreamJid->currentText())
-				stream->sendStanza(stanza);
+				if (ui.cmbStreamJid->currentIndex()==0 || stream->streamJid()==ui.cmbStreamJid->currentText())
+					stream->sendStanza(stanza);
 			ui.tedConsole->append("<b>"+tr("User stanza sended.")+"</b><br>");
 		}
 		else
@@ -300,15 +298,15 @@ void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &A
 {
 	Q_UNUSED(AHandleId);
 	foreach(QString condition, AHandle.conditions)
-	if (ui.cmbCondition->findText(condition) < 0)
-		ui.cmbCondition->addItem(condition);
+		if (ui.cmbCondition->findText(condition) < 0)
+			ui.cmbCondition->addItem(condition);
 }
 
 void ConsoleWidget::onOptionsOpened()
 {
 	ui.cmbContext->clear();
 	foreach(QString contextId, Options::node(OPV_CONSOLE_ROOT).childNSpaces("context"))
-	ui.cmbContext->addItem(Options::node(OPV_CONSOLE_CONTEXT_ITEM,contextId).value("name").toString(),contextId);
+		ui.cmbContext->addItem(Options::node(OPV_CONSOLE_CONTEXT_ITEM,contextId).value("name").toString(),contextId);
 
 	FContext = QUuid();
 	if (ui.cmbContext->count() == 0)

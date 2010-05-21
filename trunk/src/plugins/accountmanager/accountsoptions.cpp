@@ -30,8 +30,8 @@ AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : Q
 AccountsOptions::~AccountsOptions()
 {
 	foreach(QString accountId, FAccountItems.keys())
-	if (FManager->accountById(accountId) == NULL)
-		removeAccount(accountId);
+		if (FManager->accountById(accountId) == NULL)
+			removeAccount(accountId);
 }
 
 void AccountsOptions::apply()
@@ -54,8 +54,8 @@ void AccountsOptions::apply()
 	}
 
 	foreach(IAccount *account, FManager->accounts())
-	if (!curAccounts.contains(account))
-		FManager->destroyAccount(account->accountId());
+		if (!curAccounts.contains(account))
+			FManager->destroyAccount(account->accountId());
 
 	emit childApply();
 }
@@ -72,8 +72,8 @@ void AccountsOptions::reset()
 	}
 
 	foreach(QUuid accountId, FAccountItems.keys())
-	if (!curAccounts.contains(accountId))
-		removeAccount(accountId);
+		if (!curAccounts.contains(accountId))
+			removeAccount(accountId);
 
 	emit childReset();
 }

@@ -17,8 +17,8 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
 	if (FXmppStreams)
 	{
 		foreach(IXmppStream *xmppStream, FXmppStreams->xmppStreams())
-		if (FXmppStreams->isActive(xmppStream))
-			onStreamAdded(xmppStream);
+			if (FXmppStreams->isActive(xmppStream))
+				onStreamAdded(xmppStream);
 		ui.cmbStreamJid->model()->sort(0,Qt::AscendingOrder);
 		ui.cmbStreamJid->setCurrentIndex(AStreamJid.isValid() ? ui.cmbStreamJid->findData(AStreamJid.pFull()) : 0);
 		connect(ui.cmbStreamJid,SIGNAL(currentIndexChanged(int)),SLOT(onStreamIndexChanged(int)));

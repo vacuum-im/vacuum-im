@@ -23,10 +23,8 @@ DataStreamsOptions::DataStreamsOptions(IDataStreamsManager *ADataManager, QWidge
 DataStreamsOptions::~DataStreamsOptions()
 {
 	FCleanupHandler.clear();
-	foreach(QUuid profileId, FNewProfiles)
-	{
-		Options::node(OPV_DATASTREAMS_ROOT).removeChilds("settings-profile",profileId.toString());
-	}
+	foreach(QUuid profileId, FNewProfiles) {
+		Options::node(OPV_DATASTREAMS_ROOT).removeChilds("settings-profile",profileId.toString()); }
 }
 
 void DataStreamsOptions::apply()
@@ -55,7 +53,7 @@ void DataStreamsOptions::apply()
 	}
 
 	foreach(QUuid profileId, oldProfiles)
-	FDataManager->removeSettingsProfile(profileId);
+		FDataManager->removeSettingsProfile(profileId);
 
 	FNewProfiles.clear();
 
@@ -87,8 +85,8 @@ void DataStreamsOptions::reset()
 			ui.cmbProfile->addItem(FDataManager->settingsProfileName(profileId), profileId.toString());
 
 		foreach(IOptionsWidget *widget, FMethodWidgets.value(profileId))
-		if (widget)
-			widget->reset();
+			if (widget)
+				widget->reset();
 	}
 
 	emit childReset();

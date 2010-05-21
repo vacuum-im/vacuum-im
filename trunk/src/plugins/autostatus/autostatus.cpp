@@ -113,7 +113,7 @@ QList<QUuid> AutoStatus::rules() const
 {
 	QList<QUuid> rulesIdList;
 	foreach(QString ruleId, Options::node(OPV_AUTOSTARTUS_ROOT).childNSpaces("rule"))
-	rulesIdList.append(ruleId);
+		rulesIdList.append(ruleId);
 	return rulesIdList;
 }
 
@@ -233,7 +233,7 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 		else
 		{
 			foreach(Jid streamJid, FStreamStatus.keys())
-			FStatusChanger->setStreamStatus(streamJid, FStreamStatus.take(streamJid));
+				FStatusChanger->setStreamStatus(streamJid, FStreamStatus.take(streamJid));
 			FStatusChanger->removeStatusItem(FAutoStatusId);
 			FAutoStatusId = STATUS_NULL_ID;
 		}

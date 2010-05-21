@@ -472,8 +472,8 @@ QString ClientInfo::osVersion() const
 #elif defined(Q_WS_X11)
 		QStringList path;
 		foreach(QString env, QProcess::systemEnvironment())
-		if (env.startsWith("PATH="))
-			path = env.split('=').value(1).split(':');
+			if (env.startsWith("PATH="))
+				path = env.split('=').value(1).split(':');
 
 		QString found;
 		foreach(QString dirname, path)
@@ -778,8 +778,8 @@ Action *ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJ
 void ClientInfo::deleteSoftwareDialogs(const Jid &AStreamJid)
 {
 	foreach(ClientInfoDialog *dialog, FClientInfoDialogs)
-	if (dialog->streamJid() == AStreamJid)
-		dialog->deleteLater();
+		if (dialog->streamJid() == AStreamJid)
+			dialog->deleteLater();
 }
 
 void ClientInfo::registerDiscoFeatures()

@@ -131,8 +131,8 @@ void ViewWidget::dropEvent(QDropEvent *AEvent)
 
 	bool accepted = false;
 	foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
-	if (handler->viewDropAction(this, AEvent, dropMenu))
-		accepted = true;
+		if (handler->viewDropAction(this, AEvent, dropMenu))
+			accepted = true;
 
 	QAction *action= (AEvent->mouseButtons() & Qt::RightButton)>0 || dropMenu->defaultAction()==NULL ? dropMenu->exec(mapToGlobal(AEvent->pos())) : dropMenu->defaultAction();
 	if (accepted && action)
@@ -152,8 +152,8 @@ void ViewWidget::dragEnterEvent(QDragEnterEvent *AEvent)
 {
 	FActiveDropHandlers.clear();
 	foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
-	if (handler->viewDragEnter(this, AEvent))
-		FActiveDropHandlers.append(handler);
+		if (handler->viewDragEnter(this, AEvent))
+			FActiveDropHandlers.append(handler);
 
 	if (!FActiveDropHandlers.isEmpty())
 		AEvent->acceptProposedAction();
@@ -165,8 +165,8 @@ void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 {
 	bool accepted = false;
 	foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
-	if (handler->viewDragMove(this, AEvent))
-		accepted = true;
+		if (handler->viewDragMove(this, AEvent))
+			accepted = true;
 
 	if (accepted)
 		AEvent->acceptProposedAction();
@@ -177,7 +177,7 @@ void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 void ViewWidget::dragLeaveEvent(QDragLeaveEvent *AEvent)
 {
 	foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
-	handler->viewDragLeave(this, AEvent);
+		handler->viewDragLeave(this, AEvent);
 }
 
 void ViewWidget::onContentAppended(QWidget *AWidget, const QString &AMessage, const IMessageContentOptions &AOptions)

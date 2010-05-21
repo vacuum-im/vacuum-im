@@ -145,7 +145,7 @@ void EditProxyDialog::onDialogButtonBoxAccepted()
 	FManager->setDefaultProxy(ui.cmbDefault->itemData(ui.cmbDefault->currentIndex()).toString());
 
 	foreach(QUuid id, oldProxy)
-	FManager->removeProxy(id);
+		FManager->removeProxy(id);
 
 	accept();
 }

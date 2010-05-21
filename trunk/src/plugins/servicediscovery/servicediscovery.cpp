@@ -235,7 +235,7 @@ bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
 		ditems.contactJid = AStanza.from();
 		ditems.node = query.attribute("node");
 		foreach(IDiscoHandler *AHandler, FDiscoHandlers)
-		AHandler->fillDiscoItems(ditems);
+			AHandler->fillDiscoItems(ditems);
 
 		if (ditems.error.code >= 0)
 		{
@@ -389,8 +389,8 @@ void ServiceDiscovery::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 		ADiscoInfo.identity.append(didentity);
 
 		foreach(IDiscoFeature feature, FDiscoFeatures)
-		if (feature.active)
-			ADiscoInfo.features.append(feature.var);
+			if (feature.active)
+				ADiscoInfo.features.append(feature.var);
 	}
 }
 
@@ -421,7 +421,7 @@ IDiscoInfo ServiceDiscovery::selfDiscoInfo(const Jid &AStreamJid, const QString 
 	dinfo.node = ANode!=capsNode ? ANode : "";
 
 	foreach(IDiscoHandler *handler, FDiscoHandlers)
-	handler->fillDiscoInfo(dinfo);
+		handler->fillDiscoInfo(dinfo);
 
 	dinfo.node = ANode;
 
@@ -562,8 +562,8 @@ bool ServiceDiscovery::execFeatureHandler(const Jid &AStreamJid, const QString &
 {
 	QList<IDiscoFeatureHandler *> handlers = FFeatureHandlers.value(AFeature).values();
 	foreach(IDiscoFeatureHandler *handler, handlers)
-	if (handler->execDiscoFeature(AStreamJid,AFeature,ADiscoInfo))
-		return true;
+		if (handler->execDiscoFeature(AStreamJid,AFeature,ADiscoInfo))
+			return true;
 	return false;
 }
 
@@ -1014,7 +1014,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 		QStringList sortList;
 
 		foreach(IDiscoIdentity identity, AInfo.identity)
-		sortList.append(identity.category+"/"+identity.type+"/"+identity.lang+"/"+identity.name);
+			sortList.append(identity.category+"/"+identity.type+"/"+identity.lang+"/"+identity.name);
 		qSort(sortList);
 		hashList += sortList;
 
@@ -1068,13 +1068,13 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 bool ServiceDiscovery::compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const
 {
 	foreach(IDiscoIdentity identity,AIdentities)
-	if (
-	  (AWith.category.isEmpty() || AWith.category==identity.category) &&
-	  (AWith.type.isEmpty() || AWith.type==identity.type) &&
-	  (AWith.lang.isEmpty() || AWith.lang==identity.lang) &&
-	  (AWith.name.isEmpty() || AWith.name==identity.name)
-	)
-		return true;
+		if (
+			(AWith.category.isEmpty() || AWith.category==identity.category) &&
+			(AWith.type.isEmpty() || AWith.type==identity.type) &&
+			(AWith.lang.isEmpty() || AWith.lang==identity.lang) &&
+			(AWith.name.isEmpty() || AWith.name==identity.name)
+		)
+			return true;
 	return false;
 }
 
@@ -1082,8 +1082,8 @@ bool ServiceDiscovery::compareFeatures(const QStringList &AFeatures, const QStri
 {
 	if (!AWith.isEmpty())
 		foreach(QString feature, AWith)
-		if (!AFeatures.contains(feature))
-			return false;
+			if (!AFeatures.contains(feature))
+				return false;
 	return true;
 }
 
@@ -1205,12 +1205,12 @@ void ServiceDiscovery::onStreamClosed(IXmppStream *AXmppStream)
 	removeQueuedRequest(request);
 
 	foreach(DiscoInfoWindow *infoWindow, FDiscoInfoWindows)
-	if (infoWindow->streamJid() == AXmppStream->streamJid())
-		infoWindow->deleteLater();
+		if (infoWindow->streamJid() == AXmppStream->streamJid())
+			infoWindow->deleteLater();
 
 	foreach(DiscoItemsWindow *itemsWindow, FDiscoItemsWindows)
-	if (itemsWindow->streamJid() == AXmppStream->streamJid())
-		itemsWindow->deleteLater();
+		if (itemsWindow->streamJid() == AXmppStream->streamJid())
+			itemsWindow->deleteLater();
 
 	removeStreamMenu(AXmppStream->streamJid());
 
@@ -1324,7 +1324,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMen
 		foreach(QString feature, dinfo.features)
 		{
 			foreach(Action *action, createFeatureActions(streamJid,feature,dinfo,AMenu))
-			AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
+				AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
 		}
 	}
 }
@@ -1339,8 +1339,8 @@ void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId,
 		{
 			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
 			foreach(IDiscoIdentity identity, dinfo.identity)
-			if (identity.category != DIC_CLIENT)
-				AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Categoty: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
+				if (identity.category != DIC_CLIENT)
+					AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Categoty: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
 		}
 	}
 }

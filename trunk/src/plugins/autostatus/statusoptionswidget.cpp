@@ -197,7 +197,7 @@ void StatusOptionsWidget::apply()
 	}
 
 	foreach(QUuid ruleId, oldRules)
-	FAutoStatus->removeRule(ruleId);
+		FAutoStatus->removeRule(ruleId);
 
 	emit childApply();
 }
@@ -206,10 +206,8 @@ void StatusOptionsWidget::reset()
 {
 	ui.tbwRules->clearContents();
 	ui.tbwRules->setRowCount(0);
-	foreach(QUuid ruleId, FAutoStatus->rules())
-	{
-		appendTableRow(ruleId, FAutoStatus->ruleValue(ruleId));
-	}
+	foreach(QUuid ruleId, FAutoStatus->rules()) {
+		appendTableRow(ruleId, FAutoStatus->ruleValue(ruleId)); }
 	ui.tbwRules->horizontalHeader()->doItemsLayout();
 	emit childReset();
 }

@@ -34,8 +34,8 @@ QStringList EditItemDialog::tags() const
 {
 	QStringList tagList;
 	foreach(QCheckBox *checkBox, FCheckBoxes)
-	if (checkBox->checkState() == Qt::Checked)
-		tagList.append(checkBox->text());
+		if (checkBox->checkState() == Qt::Checked)
+			tagList.append(checkBox->text());
 	return tagList;
 }
 

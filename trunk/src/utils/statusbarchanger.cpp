@@ -111,7 +111,7 @@ void StatusBarChanger::removeWidget(QWidget *AWidget)
 void StatusBarChanger::clear()
 {
 	foreach(QWidget *widget,FWidgets.values())
-	removeWidget(widget);
+		removeWidget(widget);
 }
 
 void StatusBarChanger::updateVisible()

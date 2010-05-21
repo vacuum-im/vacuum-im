@@ -13,7 +13,7 @@ SimpleOptionsWidget::SimpleOptionsWidget(SimpleMessageStylePlugin *APlugin, cons
 	FMessageType = AMessageType;
 
 	foreach(QString styleId, FStylePlugin->styles())
-	ui.cmbStyle->addItem(styleId,styleId);
+		ui.cmbStyle->addItem(styleId,styleId);
 	ui.cmbStyle->setCurrentIndex(-1);
 
 	ui.cmbBackgoundColor->addItem(tr("Default"));
@@ -95,7 +95,7 @@ void SimpleOptionsWidget::onStyleChanged(int AIndex)
 
 	ui.cmbVariant->clear();
 	foreach(QString variant, FStylePlugin->styleVariants(styleId))
-	ui.cmbVariant->addItem(variant,variant);
+		ui.cmbVariant->addItem(variant,variant);
 	ui.cmbVariant->setEnabled(ui.cmbVariant->count() > 0);
 
 	FStyleOptions.extended.insert(MSO_STYLE_ID,styleId);

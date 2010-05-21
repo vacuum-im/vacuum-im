@@ -392,7 +392,7 @@ void StatusIcons::loadStorages()
 void StatusIcons::clearStorages()
 {
 	foreach(QString rule, FStatusRules)
-	removeRule(rule,IStatusIcons::DefaultRule);
+		removeRule(rule,IStatusIcons::DefaultRule);
 	FStatusRules.clear();
 	FCustomIconActions.clear();
 	qDeleteAll(FStorages);

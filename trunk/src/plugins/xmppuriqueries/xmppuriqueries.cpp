@@ -65,8 +65,8 @@ bool XmppUriQueries::openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const
 					params.insertMulti(keyValues.at(i).first, keyValues.at(i).second);
 
 				foreach (IXmppUriHandler *handler, FHandlers)
-				if (handler->xmppUriOpen(AStreamJid, contactJid, action, params))
-					return true;
+					if (handler->xmppUriOpen(AStreamJid, contactJid, action, params))
+						return true;
 			}
 		}
 	}

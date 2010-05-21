@@ -61,8 +61,8 @@ IPresence *PresencePlugin::addPresence(IXmppStream *AXmppStream)
 IPresence *PresencePlugin::getPresence(const Jid &AStreamJid) const
 {
 	foreach(IPresence *presence, FPresences)
-	if (presence->streamJid() == AStreamJid)
-		return presence;
+		if (presence->streamJid() == AStreamJid)
+			return presence;
 	return NULL;
 }
 

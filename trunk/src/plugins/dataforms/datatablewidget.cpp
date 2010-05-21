@@ -28,7 +28,7 @@ DataTableWidget::DataTableWidget(IDataForms *ADataForms, const IDataTable &ATabl
 
 	QStringList headers;
 	foreach(IDataField field, ATable.columns)
-	headers.append(!field.label.isEmpty() ? field.label : field.var);
+		headers.append(!field.label.isEmpty() ? field.label : field.var);
 
 	setHorizontalHeaderLabels(headers);
 	horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);

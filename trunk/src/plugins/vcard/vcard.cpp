@@ -56,8 +56,8 @@ QMultiHash<QString,QStringList> VCard::values(const QString &AName, const QStrin
 			QStringList tags;
 			QDomElement parentElem = elem.parentNode().toElement();
 			foreach(QString tag, ATagList)
-			if (!parentElem.firstChildElement(tag).isNull())
-				tags.append(tag);
+				if (!parentElem.firstChildElement(tag).isNull())
+					tags.append(tag);
 			result.insertMulti(elem.text(),tags);
 		}
 		elem = nextElementByName(AName, elem);
@@ -82,8 +82,8 @@ void VCard::setTagsForValue(const QString &AName, const QString &AValue, const Q
 	{
 		elem = elem.parentNode().toElement();
 		foreach(QString tag, ATags)
-		if (elem.firstChildElement(tag).isNull())
-			elem.appendChild(FDoc.createElement(tag));
+			if (elem.firstChildElement(tag).isNull())
+				elem.appendChild(FDoc.createElement(tag));
 
 		elem = elem.firstChildElement();
 		while (!elem.isNull())
@@ -125,8 +125,8 @@ void VCard::setValueForTags(const QString &AName, const QString &AValue, const Q
 	{
 		elem = elem.parentNode().toElement();
 		foreach(QString tag, ATags)
-		if (elem.firstChildElement(tag).isNull())
-			elem.appendChild(FDoc.createElement(tag));
+			if (elem.firstChildElement(tag).isNull())
+				elem.appendChild(FDoc.createElement(tag));
 	}
 }
 

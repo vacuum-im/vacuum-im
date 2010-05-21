@@ -195,7 +195,7 @@ void AccountManager::onProfileOpened(const QString &AProfile)
 {
 	Q_UNUSED(AProfile);
 	foreach(IAccount *account, FAccounts)
-	account->setActive(Options::node(OPV_ACCOUNT_ITEM,account->accountId()).value("active").toBool());
+		account->setActive(Options::node(OPV_ACCOUNT_ITEM,account->accountId()).value("active").toBool());
 }
 
 void AccountManager::onProfileClosed(const QString &AProfile)
@@ -211,13 +211,13 @@ void AccountManager::onProfileClosed(const QString &AProfile)
 void AccountManager::onOptionsOpened()
 {
 	foreach(QString id, Options::node(OPV_ACCOUNT_ROOT).childNSpaces("account"))
-	appendAccount(id);
+		appendAccount(id);
 }
 
 void AccountManager::onOptionsClosed()
 {
 	foreach(QUuid id, FAccounts.keys())
-	removeAccount(id);
+		removeAccount(id);
 }
 
 void AccountManager::onShowAccountOptions(bool)

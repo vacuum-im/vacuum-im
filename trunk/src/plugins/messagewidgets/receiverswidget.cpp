@@ -194,7 +194,7 @@ void ReceiversWidget::createRosterTree()
 			QList<Jid> itemJids;
 			QList<IPresenceItem> pitems = FPresence->presenceItems(ritem.itemJid);
 			foreach(IPresenceItem pitem,pitems)
-			itemJids.append(pitem.itemJid);
+				itemJids.append(pitem.itemJid);
 
 			if (itemJids.isEmpty())
 				itemJids.append(ritem.itemJid);
@@ -246,7 +246,7 @@ void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int /*AColu
 
 		QList<QTreeWidgetItem *> contactItems = FContactItems.values(contactJid);
 		foreach(QTreeWidgetItem *contactItem,contactItems)
-		contactItem->setCheckState(0,AItem->checkState(0));
+			contactItem->setCheckState(0,AItem->checkState(0));
 	}
 	else if (blockUpdateChilds == 0 && AItem->data(0,RDR_TYPE).toInt() == RIT_GROUP)
 	{
@@ -275,13 +275,13 @@ void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int /*AColu
 void ReceiversWidget::onSelectAllClicked()
 {
 	foreach(QTreeWidgetItem *treeItem,FGroupItems)
-	treeItem->setCheckState(0,Qt::Checked);
+		treeItem->setCheckState(0,Qt::Checked);
 }
 
 void ReceiversWidget::onSelectNoneClicked()
 {
 	foreach(QTreeWidgetItem *treeItem,FContactItems)
-	treeItem->setCheckState(0,Qt::Unchecked);
+		treeItem->setCheckState(0,Qt::Unchecked);
 }
 
 void ReceiversWidget::onAddClicked()
@@ -296,6 +296,6 @@ void ReceiversWidget::onUpdateClicked()
 	QList<Jid> savedReceivers = FReceivers;
 	createRosterTree();
 	foreach(Jid receiver, savedReceivers)
-	addReceiver(receiver);
+		addReceiver(receiver);
 }
 

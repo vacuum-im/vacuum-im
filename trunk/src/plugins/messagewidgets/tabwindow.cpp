@@ -173,8 +173,8 @@ void TabWindow::createActions()
 	FJoinMenu->setTitle(tr("Join to"));
 	FWindowMenu->addAction(FJoinMenu->menuAction(),AG_MWTW_MWIDGETS_TAB_ACTIONS);
 	foreach(QUuid windowId,FMessageWidgets->tabWindowList())
-	if (windowId!=FWindowId)
-		onTabWindowAppended(windowId, FMessageWidgets->tabWindowName(windowId));
+		if (windowId!=FWindowId)
+			onTabWindowAppended(windowId, FMessageWidgets->tabWindowName(windowId));
 
 	FNewTab = new Action(FJoinMenu);
 	FNewTab->setText(tr("New Tab Window"));
@@ -310,15 +310,15 @@ void TabWindow::onTabWindowNameChanged(const QUuid &AWindowId, const QString &AN
 		updateWindow();
 
 	foreach(Action *action, FJoinMenu->groupActions(AG_DEFAULT))
-	if (AWindowId == action->data(ADR_TABWINDOWID).toString())
-		action->setText(AName);
+		if (AWindowId == action->data(ADR_TABWINDOWID).toString())
+			action->setText(AName);
 }
 
 void TabWindow::onTabWindowDeleted(const QUuid &AWindowId)
 {
 	foreach(Action *action, FJoinMenu->groupActions(AG_DEFAULT))
-	if (AWindowId == action->data(ADR_TABWINDOWID).toString())
-		FJoinMenu->removeAction(action);
+		if (AWindowId == action->data(ADR_TABWINDOWID).toString())
+			FJoinMenu->removeAction(action);
 }
 
 void TabWindow::onOptionsChanged( const OptionsNode &ANode )

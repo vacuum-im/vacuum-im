@@ -28,7 +28,7 @@ XmppStream::~XmppStream()
 	close();
 
 	foreach(IXmppFeature *feature, FActiveFeatures.toSet())
-	delete feature->instance();
+		delete feature->instance();
 
 	emit streamDestroyed();
 }

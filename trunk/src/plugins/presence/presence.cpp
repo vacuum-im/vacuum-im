@@ -103,8 +103,8 @@ QList<IPresenceItem> Presence::presenceItems(const Jid &AItemJid) const
 	{
 		QList<IPresenceItem> pitems;
 		foreach(IPresenceItem pitem, FItems)
-		if (AItemJid && pitem.itemJid)
-			pitems.append(pitem);
+			if (AItemJid && pitem.itemJid)
+				pitems.append(pitem);
 		return pitems;
 	}
 	return FItems.values();
