@@ -203,7 +203,7 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 {
 	if (FAccountManager && FStatusChanger && ARuleId!=FActiveRule)
 	{
-		if (rules().contains(ARuleId))
+		if (!ARuleId.isNull() && rules().contains(ARuleId))
 		{
 			IAutoStatusRule rule = ruleValue(ARuleId);
 			prepareRule(rule);
@@ -287,7 +287,7 @@ void AutoStatus::onOptionsOpened()
 void AutoStatus::onProfileClosed(const QString &AName)
 {
 	Q_UNUSED(AName);
-	setActiveRule(0);
+	setActiveRule(QUuid());
 	FLastCursorTime = QDateTime::currentDateTime();
 }
 
