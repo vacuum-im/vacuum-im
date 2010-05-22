@@ -58,6 +58,10 @@
         <source>Show contact information in chat windows</source>
         <translation>Pokaż informacje o kontakcie w oknie rozmów</translation>
     </message>
+    <message>
+        <source>Show tabs at the bottom of the tab window</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>

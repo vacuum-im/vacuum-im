@@ -6,6 +6,11 @@ LEGEND
   [-] Bug fix
 
 
+
+------
+  [+] Added ability to show tabs at the bottom of the tab windows
+
+
 v1.0.2
 ------
   [+] Added ability to store additional resources in the application data folder

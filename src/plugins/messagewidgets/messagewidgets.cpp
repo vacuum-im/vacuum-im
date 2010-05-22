@@ -38,7 +38,7 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &/*AIni
 		if (FXmppStreams)
 		{
 			connect(FXmppStreams->instance(),SIGNAL(jidAboutToBeChanged(IXmppStream *, const Jid &)),
-			        SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &)));
+				SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &)));
 			connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
 		}
 	}
@@ -63,6 +63,7 @@ bool MessageWidgets::initSettings()
 	Options::setDefaultValue(OPV_MESSAGES_EDITORMINIMUMLINES,1);
 	Options::setDefaultValue(OPV_MESSAGES_EDITORSENDKEY,QKeySequence(Qt::Key_Return));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_ENABLE,true);
+	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_TABSBOTTOM,true);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_NAME,tr("Tab Window"));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSCLOSABLE,true);
 
@@ -83,6 +84,7 @@ IOptionsWidget *MessageWidgets::optionsWidget(const QString &ANodeId, int &AOrde
 
 		IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
 		container->appendChild(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),tr("Enable tab windows"));
+		container->appendChild(Options::node(OPV_MESSAGES_TABWINDOWS_TABSBOTTOM),tr("Show tabs at the bottom of the tab window"));
 		container->appendChild(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show status changes in chat windows"));
 		container->appendChild(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Auto resize input field"));
 		container->appendChild(Options::node(OPV_MESSAGES_SHOWINFOWIDGET),tr("Show contact information in chat windows"));

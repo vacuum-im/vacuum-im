@@ -58,6 +58,10 @@
         <source>Show contact information in chat windows</source>
         <translation>Показывать информацию о контакте в окне чата</translation>
     </message>
+    <message>
+        <source>Show tabs at the bottom of the tab window</source>
+        <translation>Покарывать вкладки внизу окна со вкладками</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>
