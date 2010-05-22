@@ -3,10 +3,6 @@
 #include <QMessageBox>
 #include <QInputDialog>
 
-#define SVN_TABWINDOW               "tabWindow[]"
-#define SVN_SHOW_CLOSE_BUTTONS      SVN_TABWINDOW":showCloseButtons"
-#define BDI_TABWINDOW_GEOMETRY      "TabWindowGeometry"
-
 #define ADR_TABWINDOWID             Action::DR_Parametr1
 
 TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
@@ -21,9 +17,9 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	FWindowId = AWindowId;
 	FMessageWidgets = AMessageWidgets;
 	connect(FMessageWidgets->instance(),SIGNAL(tabWindowAppended(const QUuid &, const QString &)),
-	        SLOT(onTabWindowAppended(const QUuid &, const QString &)));
+		SLOT(onTabWindowAppended(const QUuid &, const QString &)));
 	connect(FMessageWidgets->instance(),SIGNAL(tabWindowNameChanged(const QUuid &, const QString &)),
-	        SLOT(onTabWindowNameChanged(const QUuid &, const QString &)));
+		SLOT(onTabWindowNameChanged(const QUuid &, const QString &)));
 	connect(FMessageWidgets->instance(),SIGNAL(tabWindowDeleted(const QUuid &)),SLOT(onTabWindowDeleted(const QUuid &)));
 
 	QPushButton *menuButton = new QPushButton(ui.twtTabs);
@@ -40,6 +36,8 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 
 	connect(ui.twtTabs,SIGNAL(currentChanged(int)),SLOT(onTabChanged(int)));
 	connect(ui.twtTabs,SIGNAL(tabCloseRequested(int)),SLOT(onTabCloseRequested(int)));
+
+	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_TABSBOTTOM));
 }
 
 TabWindow::~TabWindow()
@@ -321,12 +319,16 @@ void TabWindow::onTabWindowDeleted(const QUuid &AWindowId)
 			FJoinMenu->removeAction(action);
 }
 
-void TabWindow::onOptionsChanged( const OptionsNode &ANode )
+void TabWindow::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (ANode.path() == OPV_MESSAGES_TABWINDOWS_DEFAULT)
 	{
 		FSetAsDefault->setChecked(FWindowId==ANode.value().toString());
 		FDeleteWindow->setVisible(!FSetAsDefault->isChecked());
+	}
+	else if (ANode.path() == OPV_MESSAGES_TABWINDOWS_TABSBOTTOM)
+	{
+		ui.twtTabs->setTabPosition(ANode.value().toBool() ? QTabWidget::South : QTabWidget::North);
 	}
 }
 
