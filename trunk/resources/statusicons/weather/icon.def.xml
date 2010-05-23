@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <icondef>
-	<name>Send Mail</name>
+	<name>Weather Service</name>
 
-	<description>SMTP Iconset</description>
+	<description>Iconset for weather services</description>
 
- 	<version>1.0</version>
+	<version>1.0</version>
 
- 	<creation>2009-02-19</creation>
+ 	<creation>2010-05-23</creation>
 
  	<author>[AKI]`Rodent</author>
 
@@ -53,10 +53,5 @@
 	<icon>
 		<key>noauth</key>
 		<object mime='image/png'>noauth.png</object>
-	</icon>
-
-	<icon>
-		<key>error</key>
-		<object mime='image/png'>perr.png</object>
 	</icon>
 </icondef>

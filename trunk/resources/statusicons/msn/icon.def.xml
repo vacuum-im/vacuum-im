@@ -8,7 +8,7 @@
 
  	<creation>2005-11-02</creation>
 
- 	<author>Everaldo Coelho</author>
+ 	<author>Everaldo Coelho, [AKI]`Rodent</author>
 
 	<icon>
 		<key>online</key>
@@ -53,5 +53,10 @@
 	<icon>
 		<key>noauth</key>
 		<object mime='image/png'>noauth.png</object>
+	</icon>
+
+	<icon>
+		<key>error</key>
+		<object mime='image/png'>perr.png</object>
 	</icon>
 </icondef>

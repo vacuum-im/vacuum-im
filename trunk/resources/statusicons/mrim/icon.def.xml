@@ -8,7 +8,7 @@
 
  	<creation>2009-02-19</creation>
 
- 	<author>Unknown</author>
+ 	<author>[AKI]`Rodent</author>
 
 	<icon>
 		<key>online</key>
@@ -36,6 +36,11 @@
 	</icon>
 
 	<icon>
+		<key>invisible</key>
+		<object mime='image/png'>invisible.png</object>
+	</icon>
+
+	<icon>
 		<key>chat</key>
 		<object mime='image/png'>chatty.png</object>
 	</icon>
@@ -43,6 +48,16 @@
 	<icon>
 		<key>ask</key>
 		<object mime='image/png'>ask.png</object>
+	</icon>
+
+	<icon>
+		<key>noauth</key>
+		<object mime='image/png'>noauth.png</object>
+	</icon>
+
+	<icon>
+		<key>error</key>
+		<object mime='image/png'>perr.png</object>
 	</icon>
 
 </icondef>
