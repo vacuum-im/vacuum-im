@@ -587,6 +587,8 @@ void OptionsManager::importOldSettings()
 								cnode.setValue(QVariant(connectElem.firstChildElement("useSSL").attribute("value")).toBool(),"use-ssl");
 								cnode.setValue(QVariant(connectElem.firstChildElement("ingnoreSSLErrors").attribute("value")).toBool(),"ignore-ssl-errors");
 							}
+
+							account->setActive(QVariant(accountElem.firstChildElement("active").attribute("value")).toBool());
 						}
 						accountElem = accountElem.nextSiblingElement("account");
 					}
