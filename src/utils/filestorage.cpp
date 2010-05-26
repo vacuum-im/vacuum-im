@@ -264,7 +264,7 @@ void FileStorage::loadDefinations(const QString &ADefFile, bool AShared)
 							object.fileNames.append(keyElem.text());
 						}
 					}
-					else if (!keyElem.hasChildNodes() && keyElem.attributes().count()==0)
+					else if (keyElem.firstChildElement().isNull() && keyElem.attributes().count()==0)
 					{
 						object.fileOptions.insert(keyElem.tagName(),keyElem.text());
 					}
