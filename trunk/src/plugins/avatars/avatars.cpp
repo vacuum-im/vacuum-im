@@ -523,9 +523,9 @@ bool Avatars::updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bo
 	Jid contactJid = AContactJid.bare();
 	if (FVCardAvatars.value(contactJid) != AHash)
 	{
-		FVCardAvatars[contactJid] = AHash;
 		if (AHash.isEmpty() || hasAvatar(AHash))
 		{
+			FVCardAvatars[contactJid] = AHash;
 			updateDataHolder(contactJid);
 			emit avatarChanged(contactJid);
 		}
@@ -542,9 +542,9 @@ bool Avatars::updateIqAvatar(const Jid &AContactJid, const QString &AHash)
 {
 	if (FIqAvatars.value(AContactJid) != AHash)
 	{
-		FIqAvatars[AContactJid] = AHash;
 		if (AHash.isEmpty() || hasAvatar(AHash))
 		{
+			FIqAvatars[AContactJid] = AHash;
 			updateDataHolder(AContactJid);
 			emit avatarChanged(AContactJid);
 		}
