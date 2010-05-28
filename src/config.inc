@@ -21,9 +21,7 @@ isEmpty(INSTALL_APP_DIR) {
 isEmpty(INSTALL_LIB_DIR) {
   win32:INSTALL_LIB_DIR  = .
   unix:!macx {
-    UNAME                = $$system(uname -m)
-    contains( UNAME, x86_64 ): LIB_SUFFIX = 64
-    INSTALL_LIB_DIR      = lib$${LIB_SUFFIX}
+    INSTALL_LIB_DIR      = lib
   }
   macx: INSTALL_LIB_DIR  = Frameworks
 }
