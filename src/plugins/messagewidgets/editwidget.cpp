@@ -42,9 +42,12 @@ const Jid &EditWidget::streamJid() const
 
 void EditWidget::setStreamJid(const Jid &AStreamJid)
 {
-	Jid befour = FStreamJid;
-	FStreamJid = AStreamJid;
-	emit streamJidChanged(befour);
+	if (AStreamJid != FStreamJid)
+	{
+		Jid befour = FStreamJid;
+		FStreamJid = AStreamJid;
+		emit streamJidChanged(befour);
+	}
 }
 
 const Jid & EditWidget::contactJid() const
@@ -54,9 +57,12 @@ const Jid & EditWidget::contactJid() const
 
 void EditWidget::setContactJid(const Jid &AContactJid)
 {
-	Jid befour = FContactJid;
-	FContactJid = AContactJid;
-	emit contactJidChanged(AContactJid);
+	if (AContactJid != FContactJid)
+	{
+		Jid befour = FContactJid;
+		FContactJid = AContactJid;
+		emit contactJidChanged(befour);
+	}
 }
 
 QTextEdit *EditWidget::textEdit() const

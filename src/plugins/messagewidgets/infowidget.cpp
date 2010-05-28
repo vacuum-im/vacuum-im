@@ -55,7 +55,7 @@ void InfoWidget::setContactJid(const Jid &AContactJid)
 		Jid befour = FContactJid;
 		FContactJid = AContactJid;
 		autoUpdateFields();
-		emit contactJidChanged(AContactJid);
+		emit contactJidChanged(befour);
 	}
 }
 
