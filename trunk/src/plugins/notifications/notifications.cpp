@@ -1,5 +1,6 @@
 #include "notifications.h"
 
+#include <QProcess>
 #include <QVBoxLayout>
 
 #define ADR_NOTIFYID                    Action::DR_Parametr1
@@ -151,6 +152,7 @@ bool Notifications::initSettings()
 	Options::setDefaultValue(OPV_NOTIFICATIONS_AUTOACTIVATE,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUP,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_NOSOUNDIFDND,false);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUND_COMMAND,QString("aplay"));
 
 	if (FOptionsManager)
 	{
@@ -247,16 +249,25 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if (QSound::isAvailable() && !(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) &&
-	    Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool() && (record.notification.kinds & INotification::PlaySound)>0)
+	if (!(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) &&
+		Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool() && (record.notification.kinds & INotification::PlaySound)>0)
 	{
 		QString soundName = record.notification.data.value(NDR_SOUND_FILE).toString();
 		QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
-		if (!soundFile.isEmpty() && (FSound==NULL || FSound->isFinished()))
+		if (!soundFile.isEmpty())
 		{
-			delete FSound;
-			FSound = new QSound(soundFile);
-			FSound->play();
+			if (QSound::isAvailable())
+			{
+				delete FSound;
+				FSound = new QSound(soundFile);
+				FSound->play();
+			}
+#ifdef Q_WS_X11
+			else
+			{
+				QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUND_COMMAND).value().toString(),QStringList()<<soundFile);
+			}
+#endif
 		}
 	}
 
