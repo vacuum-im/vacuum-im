@@ -17,7 +17,7 @@ Forum:
 
 Sound on X11 platforms
 ----------------------
-  The Network Audio System is used if available, otherwise all operations work silently.
+  The Network Audio System is used if available, otherwise "aplay <soundfile>" command is used.
 
 
 Portable Version
