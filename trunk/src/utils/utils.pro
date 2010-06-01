@@ -7,7 +7,12 @@ CONFIG            += dll
 QT                += xml
 DEFINES           += UTILS_DLL
 LIBS              += -L../libs
-LIBS              += -lidn -lminizip -lzlib
+unix:!macx {
+  LIBS            += -lidn -lminizip -lz
+} else {
+  LIBS            += -lidn -lminizip -lzlib
+  INCLUDEPATH     += ../thirdparty/zlib
+}
 DEPENDPATH        += ..
 INCLUDEPATH       += ..
 win32 {

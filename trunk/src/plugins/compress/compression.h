@@ -5,7 +5,7 @@
 #include <definations/xmppdatahandlerorders.h>
 #include <definations/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
-#include "../../thirdparty/zlib/zlib.h"
+#include <zlib.h>
 
 class Compression :
 			public QObject,
