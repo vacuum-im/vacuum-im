@@ -6,8 +6,8 @@
 #include <QMetaType>
 #include <QByteArray>
 #include <QSharedData>
+#include <thirdparty/minizip/unzip.h>
 #include "utilsexport.h"
-#include "../thirdparty/minizip/unzip.h"
 
 class UnzipFileData :
 			public QSharedData
