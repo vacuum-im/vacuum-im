@@ -9,6 +9,7 @@ LEGEND
 
 ------
   [+] Added ability to show tabs at the bottom of the tab windows
+  [-] When converting smileys into the text instead of the first key an arbitrary one was inserted
 
 
 v1.0.2
