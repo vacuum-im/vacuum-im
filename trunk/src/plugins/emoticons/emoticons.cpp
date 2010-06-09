@@ -126,21 +126,31 @@ QUrl Emoticons::urlByKey(const QString &AKey) const
 
 QString Emoticons::keyByUrl(const QUrl &AUrl) const
 {
-	return FUrlByKey.key(AUrl);
+	return FKeyByUrl.value(AUrl.toString());
 }
 
 void Emoticons::createIconsetUrls()
 {
 	FUrlByKey.clear();
+   FKeyByUrl.clear();
 	foreach(QString substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
 	{
 		IconStorage *storage = FStorages.value(substorage);
 		if (storage)
 		{
+         QHash<QString, QString> fileFirstKey;
+         foreach(QString key, storage->fileFirstKeys())
+            fileFirstKey.insert(storage->fileFullName(key), key);
+
 			foreach(QString key, storage->fileKeys())
 			{
-				if (!FUrlByKey.contains(key))
-					FUrlByKey.insert(key,QUrl::fromLocalFile(storage->fileFullName(key)));
+				if (!FUrlByKey.contains(key)) 
+            {
+               QString file = storage->fileFullName(key);
+               QUrl url = QUrl::fromLocalFile(file);
+               FUrlByKey.insert(key,url);
+               FKeyByUrl.insert(url.toString(),fileFirstKey.value(file));
+            }
 			}
 		}
 	}
@@ -167,7 +177,7 @@ void Emoticons::replaceImageToText(QTextDocument *ADocument) const
 	{
 		if (cursor.charFormat().isImageFormat())
 		{
-			QString key = FUrlByKey.key(cursor.charFormat().toImageFormat().name());
+			QString key = FKeyByUrl.value(cursor.charFormat().toImageFormat().name());
 			if (!key.isEmpty())
 			{
 				cursor.insertText(key);
