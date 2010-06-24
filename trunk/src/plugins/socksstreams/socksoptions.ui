@@ -43,6 +43,9 @@
              <property name="text">
               <string>Listening port:</string>
              </property>
+             <property name="textFormat">
+              <enum>Qt::PlainText</enum>
+             </property>
              <property name="buddy">
               <cstring>spbPort</cstring>
              </property>
@@ -84,6 +87,9 @@
               <property name="text">
                <string>Host:</string>
               </property>
+              <property name="textFormat">
+               <enum>Qt::PlainText</enum>
+              </property>
               <property name="buddy">
                <cstring>lneForwardHost</cstring>
               </property>
@@ -96,6 +102,9 @@
              <widget class="QLabel" name="pblForwardPort">
               <property name="text">
                <string>Port:</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::PlainText</enum>
               </property>
               <property name="buddy">
                <cstring>spbForwardPort</cstring>

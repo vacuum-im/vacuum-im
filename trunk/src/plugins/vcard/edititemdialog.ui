@@ -1,10 +1,11 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>EditItemDialogClass</class>
- <widget class="QDialog" name="EditItemDialogClass" >
-  <property name="windowModality" >
+ <widget class="QDialog" name="EditItemDialogClass">
+  <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
-  <property name="geometry" >
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -12,27 +13,30 @@
     <height>175</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Edit item</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
+  <layout class="QVBoxLayout">
+   <property name="margin">
     <number>2</number>
    </property>
    <item>
-    <widget class="QLabel" name="lblLabel" >
-     <property name="text" >
+    <widget class="QLabel" name="lblLabel">
+     <property name="text">
       <string>Edit item</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="lneEdit" />
+    <widget class="QLineEdit" name="lneEdit"/>
    </item>
    <item>
-    <widget class="QGroupBox" name="grbTags" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+    <widget class="QGroupBox" name="grbTags">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -40,15 +44,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="btbButtons" >
-     <property name="standardButtons" >
+    <widget class="QDialogButtonBox" name="btbButtons">
+     <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections>
   <connection>
@@ -57,11 +61,11 @@
    <receiver>EditItemDialogClass</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>26</x>
      <y>234</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>4</x>
      <y>248</y>
     </hint>
@@ -73,11 +77,11 @@
    <receiver>EditItemDialogClass</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>155</x>
      <y>240</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>174</x>
      <y>248</y>
     </hint>

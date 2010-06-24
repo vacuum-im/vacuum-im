@@ -105,7 +105,7 @@ void AddLegacyContactDialog::onErrorReceived(const QString &AId, const QString &
 	if (FRequestId == AId)
 	{
 		resetDialog();
-		ui.lblDescription->setText(tr("Requested operation failed: %1").arg(Qt::escape(AError)));
+		ui.lblDescription->setText(tr("Requested operation failed: %1").arg(AError));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Cancel);
 	}
 }

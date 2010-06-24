@@ -11,6 +11,7 @@ DataMediaWidget::DataMediaWidget(IDataForms *ADataForms, const IDataMedia &AMedi
 	FMedia = AMedia;
 	FDataForms = ADataForms;
 
+	setTextFormat(Qt::PlainText);
 	setFrameShape(QLabel::Panel);
 	setFrameShadow(QLabel::Sunken);
 
@@ -57,7 +58,7 @@ void DataMediaWidget::loadUri()
 	else
 	{
 		disconnect(FDataForms->instance());
-		setText(Qt::escape(FLastError));
+		setText(FLastError);
 		emit mediaError(FLastError);
 	}
 }

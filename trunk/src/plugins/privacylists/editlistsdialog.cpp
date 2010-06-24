@@ -286,7 +286,7 @@ void EditListsDialog::updateEnabledState()
 	bool enabled = FSaveRequests.isEmpty() && FRemoveRequests.isEmpty() && FActiveRequests.isEmpty() && FDefaultRequests.isEmpty();
 	if (enabled && !FWarnings.isEmpty())
 	{
-		QMessageBox::warning(this,tr("Privacy List Error"),FWarnings.join("\n"));
+		QMessageBox::warning(this,tr("Privacy List Error"),FWarnings.join("<br>"));
 		FWarnings.clear();
 	}
 	ui.grbDefaults->setEnabled(enabled);
@@ -365,21 +365,21 @@ void EditListsDialog::onRequestFailed(const QString &AId, const QString &AError)
 	QString warning;
 	if (FActiveRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be active: %2").arg(Qt::escape(FActiveRequests.take(AId))).arg(AError);
+		warning = tr("Privacy list '%1' could not be active: %2").arg(Qt::escape(FActiveRequests.take(AId))).arg(Qt::escape(AError));
 		onActiveListChanged(FStreamJid,FPrivacyLists->activeList(FStreamJid));
 	}
 	else if (FDefaultRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be default: %2").arg(Qt::escape(FDefaultRequests.take(AId))).arg(AError);
+		warning = tr("Privacy list '%1' could not be default: %2").arg(Qt::escape(FDefaultRequests.take(AId))).arg(Qt::escape(AError));
 		onDefaultListChanged(FStreamJid,FPrivacyLists->defaultList(FStreamJid));
 	}
 	else if (FSaveRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be saved: %2").arg(Qt::escape(FSaveRequests.take(AId))).arg(AError);
+		warning = tr("Privacy list '%1' could not be saved: %2").arg(Qt::escape(FSaveRequests.take(AId))).arg(Qt::escape(AError));
 	}
 	else if (FRemoveRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be removed: %2").arg(Qt::escape(FRemoveRequests.take(AId))).arg(AError);
+		warning = tr("Privacy list '%1' could not be removed: %2").arg(Qt::escape(FRemoveRequests.take(AId))).arg(Qt::escape(AError));
 	}
 	if (!warning.isEmpty())
 		FWarnings.append(warning);

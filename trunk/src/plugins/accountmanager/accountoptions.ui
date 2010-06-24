@@ -30,6 +30,9 @@
        <property name="text">
         <string>Account Name:</string>
        </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
        <property name="buddy">
         <cstring>lneName</cstring>
        </property>
@@ -84,12 +87,18 @@
           <property name="text">
            <string>Example: romeo@example.net</string>
           </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
          </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="lblJabberId">
           <property name="text">
            <string>Jabber ID:</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
           </property>
           <property name="buddy">
            <cstring>lneJabberId</cstring>
@@ -104,6 +113,9 @@
           <property name="text">
            <string>Resource:</string>
           </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
           <property name="buddy">
            <cstring>lneResource</cstring>
           </property>
@@ -113,6 +125,9 @@
          <widget class="QLabel" name="lblPassword">
           <property name="text">
            <string>Password:</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
           </property>
           <property name="buddy">
            <cstring>lnePassword</cstring>
@@ -141,6 +156,9 @@
           </property>
           <property name="text">
            <string>Example: home; office; notebook</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
           </property>
          </widget>
         </item>

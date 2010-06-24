@@ -21,6 +21,9 @@
        <property name="text">
         <string>Message type:</string>
        </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
       </widget>
      </item>
      <item row="0" column="1">
@@ -37,6 +40,9 @@
       <widget class="QLabel" name="lblStyleEngine">
        <property name="text">
         <string>Style engine:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
        </property>
       </widget>
      </item>

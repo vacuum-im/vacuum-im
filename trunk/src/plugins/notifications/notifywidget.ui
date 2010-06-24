@@ -62,6 +62,9 @@
           <property name="text">
            <string notr="true">Icon</string>
           </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
          </widget>
         </item>
         <item>
@@ -110,6 +113,9 @@
           </property>
           <property name="text">
            <string notr="true">Image</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

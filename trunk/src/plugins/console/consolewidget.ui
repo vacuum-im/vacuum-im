@@ -41,6 +41,9 @@
          <property name="text">
           <string>Stream:</string>
          </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
         </widget>
        </item>
        <item>
@@ -57,6 +60,9 @@
         <widget class="QLabel" name="lblCondition">
          <property name="text">
           <string>Condition:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
          </property>
         </widget>
        </item>
@@ -127,6 +133,9 @@
         <widget class="QLabel" name="lblContext">
          <property name="text">
           <string>Available context:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
          </property>
         </widget>
        </item>

@@ -38,9 +38,10 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 	foreach(QString text, FForm.instructions)
 	{
 		QLabel *label = new QLabel(this);
-		label->setText(text);
 		label->setWordWrap(true);
+		label->setTextFormat(Qt::PlainText);
 		label->setAlignment(Qt::AlignCenter);
+		label->setText(text);
 		layout()->addWidget(label);
 	}
 
@@ -174,6 +175,7 @@ bool DataFormWidget::insertLayout(const IDataLayout &ALayout, QWidget *AWidget)
 		{
 			QLabel *label = new QLabel(AWidget);
 			label->setWordWrap(true);
+			label->setTextFormat(Qt::PlainText);
 			label->setText(ALayout.text.value(textCounter++));
 			AWidget->layout()->addWidget(label);
 		}

@@ -25,6 +25,9 @@
      <property name="text">
       <string/>
      </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
@@ -43,6 +46,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
        </property>
@@ -50,6 +56,9 @@
      </item>
      <item row="0" column="1">
       <widget class="QLabel" name="lblAccount">
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
        </property>
@@ -62,6 +71,9 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
        </property>
        <property name="wordWrap">
         <bool>true</bool>

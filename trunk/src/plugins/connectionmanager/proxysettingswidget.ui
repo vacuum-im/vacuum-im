@@ -19,6 +19,9 @@
      <property name="text">
       <string>Proxy:</string>
      </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
      <property name="buddy">
       <cstring>cmbProxy</cstring>
      </property>

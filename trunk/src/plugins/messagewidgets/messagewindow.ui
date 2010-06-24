@@ -72,6 +72,9 @@
              <property name="text">
               <string>To:</string>
              </property>
+             <property name="textFormat">
+              <enum>Qt::PlainText</enum>
+             </property>
             </widget>
            </item>
            <item>
@@ -90,6 +93,9 @@
              </property>
              <property name="text">
               <string/>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::PlainText</enum>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
@@ -112,6 +118,9 @@
             <widget class="QLabel" name="lblSubject">
              <property name="text">
               <string>Subject:</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::PlainText</enum>
              </property>
              <property name="buddy">
               <cstring>lneSubject</cstring>

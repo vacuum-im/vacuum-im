@@ -167,7 +167,10 @@ void OptionsWidget::insertCaption(const QString &ACaption, QWidget *ABuddy)
 {
 	if (!ACaption.isEmpty())
 	{
-		FLabel = new QLabel(ACaption, this);
+		FLabel = new QLabel(this);
+		FLabel->setWordWrap(true);
+		FLabel->setTextFormat(Qt::PlainText);
+		FLabel->setText(ACaption);
 		FLabel->setBuddy(ABuddy);
 		layout()->addWidget(FLabel);
 	}

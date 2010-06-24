@@ -58,6 +58,9 @@
          <property name="frameShadow">
           <enum>QFrame::Sunken</enum>
          </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
         </widget>
        </item>
        <item>
@@ -70,8 +73,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>92</width>
-            <height>434</height>
+            <width>106</width>
+            <height>437</height>
            </rect>
           </property>
          </widget>

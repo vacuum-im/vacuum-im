@@ -27,6 +27,9 @@
           <property name="text">
            <string>Profile:</string>
           </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
           <property name="buddy">
            <cstring>cmbProfile</cstring>
           </property>

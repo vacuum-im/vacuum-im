@@ -26,6 +26,9 @@
     </property>
     <item>
      <widget class="QLabel" name="lblCollectionInfo">
+      <property name="textFormat">
+       <enum>Qt::RichText</enum>
+      </property>
       <property name="wordWrap">
        <bool>true</bool>
       </property>
@@ -108,6 +111,9 @@
          <property name="text">
           <string>Start:</string>
          </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
          <property name="buddy">
           <cstring>dedStart</cstring>
          </property>
@@ -130,6 +136,9 @@
         <widget class="QLabel" name="lblEnd">
          <property name="text">
           <string>End:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
          </property>
          <property name="buddy">
           <cstring>dedEnd</cstring>
@@ -165,6 +174,9 @@
          <property name="text">
           <string>Contact:</string>
          </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
          <property name="buddy">
           <cstring>cmbContact</cstring>
          </property>
@@ -191,6 +203,9 @@
         <widget class="QLabel" name="lblSearch">
          <property name="text">
           <string>Search:</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
          </property>
         </widget>
        </item>
