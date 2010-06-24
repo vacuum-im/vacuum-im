@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>CommandDialogClass</class>
- <widget class="QDialog" name="CommandDialogClass" >
-  <property name="geometry" >
+ <widget class="QDialog" name="CommandDialogClass">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,21 +10,24 @@
     <height>325</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
+  <layout class="QVBoxLayout">
+   <property name="margin">
     <number>5</number>
    </property>
    <item>
-    <widget class="QLabel" name="lblInfo" >
-     <property name="alignment" >
+    <widget class="QLabel" name="lblInfo">
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QWidget" native="1" name="wdtForm" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+    <widget class="QWidget" name="wdtForm" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -31,25 +35,25 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="frame" >
-     <property name="frameShape" >
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
       <enum>QFrame::HLine</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="dbbButtons" >
-     <property name="standardButtons" >
+    <widget class="QDialogButtonBox" name="dbbButtons">
+     <property name="standardButtons">
       <set>QDialogButtonBox::Cancel</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

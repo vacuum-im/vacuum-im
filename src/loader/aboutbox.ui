@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
+    <width>364</width>
     <height>151</height>
    </rect>
   </property>
@@ -76,6 +76,9 @@
      </item>
      <item>
       <widget class="QLabel" name="lblLogo">
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
@@ -88,6 +91,9 @@
      <property name="text">
       <string notr="true">Version: 1.0.0.0 Revision: 0000</string>
      </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
     </widget>
    </item>
    <item>
@@ -96,6 +102,9 @@
       <widget class="QLabel" name="lblHomePage">
        <property name="text">
         <string notr="true">&lt;a href='http://www.vacuum-im.org'&gt;www.vacuum-im.org&lt;/a&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -106,6 +115,9 @@
       <widget class="QLabel" name="lblSourcePage">
        <property name="text">
         <string notr="true">&lt;a href='http://code.google.com/p/vacuum-im/'&gt;vacuum-im.googlecode.com&lt;/a&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -118,6 +130,9 @@
     <widget class="QLabel" name="lblCopyright">
      <property name="text">
       <string notr="true">Copyright 2006-2010 Sergey Potapov. This software is released under the terms of the GNU General Public License version 3.</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

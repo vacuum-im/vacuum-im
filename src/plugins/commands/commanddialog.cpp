@@ -59,8 +59,8 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
 		{
 			QStringList notes;
 			foreach(ICommandNote note, AResult.notes)
-				notes.append(Qt::escape(note.message));
-			ui.lblInfo->setText(notes.join("<br>"));
+				notes.append(note.message);
+			ui.lblInfo->setText(notes.join("\n"));
 		}
 		else if (AResult.status == COMMAND_STATUS_COMPLETED)
 			ui.lblInfo->setText(tr("Command execution completed."));
@@ -96,7 +96,7 @@ bool CommandDialog::receiveCommandError(const ICommandError &AError)
 	{
 		resetDialog();
 		FRequestId.clear();
-		ui.lblInfo->setText(tr("Requested operation failed: %1").arg(Qt::escape(AError.message)));
+		ui.lblInfo->setText(tr("Requested operation failed: %1").arg(AError.message));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
 		return true;
 	}

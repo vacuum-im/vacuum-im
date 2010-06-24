@@ -38,7 +38,7 @@ void SelectIconWidget::createLabels()
 		label->setAlignment(Qt::AlignCenter);
 		label->setFrameShape(QFrame::Box);
 		label->setFrameShadow(QFrame::Sunken);
-		label->setToolTip(key);
+		label->setToolTip(QString("<span>%1</span>").arg(key));
 		label->installEventFilter(this);
 		FStorage->insertAutoIcon(label,key,0,0,"pixmap");
 		FKeyByLabel.insert(label,key);

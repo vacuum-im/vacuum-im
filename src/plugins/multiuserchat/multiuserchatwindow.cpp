@@ -322,7 +322,7 @@ void MultiUserChatWindow::initialize()
 			IAccount *account = accountManager->accountByStream(streamJid());
 			if (account)
 			{
-				ui.lblAccount->setText(Qt::escape(account->name()));
+				ui.lblAccount->setText(account->name());
 				connect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),
 				        SLOT(onAccountOptionsChanged(const OptionsNode &)));
 			}
@@ -1932,5 +1932,5 @@ void MultiUserChatWindow::onAccountOptionsChanged(const OptionsNode &ANode)
 {
 	IAccount *account = qobject_cast<IAccount *>(sender());
 	if (account && account->optionsNode().childPath(ANode) == "name")
-		ui.lblAccount->setText(Qt::escape(ANode.value().toString()));
+		ui.lblAccount->setText(ANode.value().toString());
 }

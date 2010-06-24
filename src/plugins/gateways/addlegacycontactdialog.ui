@@ -1,10 +1,11 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>AddLegacyContactDialogClass</class>
- <widget class="QDialog" name="AddLegacyContactDialogClass" >
-  <property name="windowModality" >
+ <widget class="QDialog" name="AddLegacyContactDialogClass">
+  <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
-  <property name="geometry" >
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -12,50 +13,50 @@
     <height>84</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
+  <layout class="QVBoxLayout">
+   <property name="margin">
     <number>5</number>
    </property>
    <item>
-    <widget class="QLabel" name="lblDescription" >
-     <property name="textFormat" >
+    <widget class="QLabel" name="lblDescription">
+     <property name="textFormat">
       <enum>Qt::PlainText</enum>
      </property>
-     <property name="alignment" >
+     <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
-     <property name="wordWrap" >
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout">
      <item>
-      <widget class="QLabel" name="lblPrompt" >
-       <property name="text" >
+      <widget class="QLabel" name="lblPrompt">
+       <property name="text">
         <string>Contact ID:</string>
        </property>
-       <property name="textFormat" >
+       <property name="textFormat">
         <enum>Qt::PlainText</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lnePrompt" />
+      <widget class="QLineEdit" name="lnePrompt"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="dbbButtons" >
-     <property name="standardButtons" >
+    <widget class="QDialogButtonBox" name="dbbButtons">
+     <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

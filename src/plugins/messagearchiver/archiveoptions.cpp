@@ -288,7 +288,7 @@ void ArchiveOptions::updateWidget()
 		ui.grbDefault->setEnabled(true);
 		ui.grbIndividual->setEnabled(true);
 		if (!FLastError.isEmpty())
-			ui.lblStatus->setText(tr("Error received: %1").arg(Qt::escape(FLastError)));
+			ui.lblStatus->setText(tr("Error received: %1").arg(FLastError));
 		else
 			ui.lblStatus->setVisible(false);
 	}

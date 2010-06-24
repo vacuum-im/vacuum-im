@@ -70,6 +70,9 @@
        </property>
        <item>
         <widget class="QLabel" name="lblName">
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
          <property name="wordWrap">
           <bool>true</bool>
          </property>
@@ -85,6 +88,9 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -102,6 +108,9 @@
          <property name="text">
           <string>Home page:</string>
          </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
         </widget>
        </item>
        <item>
@@ -111,6 +120,9 @@
          </property>
          <property name="frameShadow">
           <enum>QFrame::Sunken</enum>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -202,6 +214,9 @@
          <property name="text">
           <string>Error Message:</string>
          </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
         </widget>
        </item>
        <item>
@@ -211,6 +226,9 @@
          </property>
          <property name="frameShadow">
           <enum>QFrame::Sunken</enum>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -238,6 +256,9 @@
         <property name="text">
          <string>Language:</string>
         </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
+        </property>
         <property name="buddy">
          <cstring>cmbLanguage</cstring>
         </property>
@@ -254,6 +275,9 @@
        <widget class="QLabel" name="lblCountry">
         <property name="text">
          <string>Country:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
         </property>
        </widget>
       </item>

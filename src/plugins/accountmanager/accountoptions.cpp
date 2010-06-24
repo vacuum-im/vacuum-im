@@ -56,7 +56,7 @@ void AccountOptions::apply()
 		FAccount->setPassword(ui.lnePassword->text());
 
 		if (!FAccount->isValid())
-			QMessageBox::warning(this,tr("Invalid Account"),tr("Account '%1' is not valid, change its Jabber ID").arg(Qt::escape(name)));
+			QMessageBox::warning(this,tr("Invalid Account"),tr("Account '%1' is not valid, change its Jabber ID").arg(name));
 		else if (changedJid && FAccount->isActive() && FAccount->xmppStream()->isOpen())
 			QMessageBox::information(NULL,tr("Delayed Apply"),tr("Some options of account '%1' will be applied after disconnect").arg(name));
 	}

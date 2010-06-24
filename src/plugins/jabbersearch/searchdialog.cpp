@@ -292,7 +292,7 @@ void SearchDialog::onSearchError(const QString &AId, const QString &AError)
 	if (FRequestId == AId)
 	{
 		resetDialog();
-		ui.lblInstructions->setText(tr("Requested operation failed: %1").arg(Qt::escape(AError)));
+		ui.lblInstructions->setText(tr("Requested operation failed: %1").arg(AError));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
 	}
 }

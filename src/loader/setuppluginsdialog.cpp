@@ -144,8 +144,8 @@ void SetupPluginsDialog::onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTab
 
 		QString name = pluginElem.firstChildElement("name").text().isEmpty() ? pluginElem.tagName() : pluginElem.firstChildElement("name").text();
 		ui.lblName->setText(QString("<b>%1</b> %2").arg(Qt::escape(name)).arg(Qt::escape(pluginElem.firstChildElement("version").text())));
-		ui.lblDescription->setText(Qt::escape(pluginElem.firstChildElement("desc").text()));
-		ui.lblError->setText(Qt::escape(pluginElem.firstChildElement("error").text()));
+		ui.lblDescription->setText(pluginElem.firstChildElement("desc").text());
+		ui.lblError->setText(pluginElem.firstChildElement("error").text());
 		ui.lblError->setVisible(!ui.lblError->text().isEmpty());
 		ui.lblLabelError->setVisible(ui.lblError->isVisible());
 
@@ -180,7 +180,7 @@ void SetupPluginsDialog::onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTab
 
 		const IPluginInfo *info = FPluginManager->pluginInfo(pluginElem.attribute("uuid"));
 		if (info)
-			ui.lblHomePage->setText(QString("<a href='%1'>%1</a>").arg(Qt::escape(info->homePage.toString())));
+			ui.lblHomePage->setText(QString("<a href='%1'>%2</a>").arg(info->homePage.toString()).arg(Qt::escape(info->homePage.toString())));
 	}
 }
 

@@ -19,6 +19,9 @@
      <property name="text">
       <string>Message Style:</string>
      </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
      <property name="buddy">
       <cstring>cmbStyle</cstring>
      </property>
@@ -38,6 +41,9 @@
     <widget class="QLabel" name="lblVariant">
      <property name="text">
       <string>Variant:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
      </property>
      <property name="buddy">
       <cstring>cmbVariant</cstring>
@@ -59,6 +65,9 @@
      <property name="text">
       <string>Text Font:</string>
      </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
     </widget>
    </item>
    <item row="2" column="1">
@@ -76,6 +85,9 @@
        </property>
        <property name="frameShadow">
         <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
        </property>
       </widget>
      </item>
@@ -103,6 +115,9 @@
      <property name="text">
       <string>Background:</string>
      </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
     </widget>
    </item>
    <item row="3" column="1">
@@ -111,6 +126,9 @@
       <widget class="QLabel" name="lblBackgoundColor">
        <property name="text">
         <string>Color:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
        </property>
        <property name="buddy">
         <cstring>cmbBackgoundColor</cstring>

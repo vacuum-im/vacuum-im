@@ -21,6 +21,9 @@
        <property name="text">
         <string>Contact:</string>
        </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
        <property name="buddy">
         <cstring>lneContact</cstring>
        </property>
@@ -34,6 +37,9 @@
        <property name="text">
         <string>Nick:</string>
        </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
        <property name="buddy">
         <cstring>lneNickName</cstring>
        </property>
@@ -46,6 +52,9 @@
       <widget class="QLabel" name="lblGroup">
        <property name="text">
         <string>Group:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
        </property>
        <property name="buddy">
         <cstring>cmbGroup</cstring>
@@ -66,6 +75,9 @@
       <widget class="QLabel" name="lblGroupDelim">
        <property name="text">
         <string/>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
        </property>
       </widget>
      </item>
@@ -136,12 +148,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>311</x>
-     <y>124</y>
+     <x>322</x>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
-     <x>299</x>
-     <y>134</y>
+     <x>310</x>
+     <y>248</y>
     </hint>
    </hints>
   </connection>

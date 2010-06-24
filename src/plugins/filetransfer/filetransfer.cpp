@@ -444,7 +444,7 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 				break;
 			case IFileStream::Aborted:
 				notify.data.insert(NDR_TOOLTIP,tr("Canceled transferring file: %1").arg(file));
-				notify.data.insert(NDR_WINDOW_TEXT, tr("File transfer canceled: %1").arg(Qt::escape(AStream->stateString())));
+				notify.data.insert(NDR_WINDOW_TEXT, tr("File transfer canceled: %1").arg(AStream->stateString()));
 				notify.data.insert(NDR_SOUND_FILE,SDF_FILETRANSFER_CANCELED);
 				break;
 			default:
