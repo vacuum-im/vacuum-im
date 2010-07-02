@@ -1,5 +1,8 @@
 #include "mainwindowplugin.h"
 
+#include <QApplication>
+#include <QDesktopWidget>
+
 MainWindowPlugin::MainWindowPlugin()
 {
 	FPluginManager = NULL;
@@ -23,8 +26,9 @@ void MainWindowPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
 	IPlugin *plugin = FPluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -34,7 +38,7 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
 		if (FOptionsManager)
 		{
 			connect(FOptionsManager->instance(), SIGNAL(profileRenamed(const QString &, const QString &)),
-			        SLOT(onProfileRenamed(const QString &, const QString &)));
+				SLOT(onProfileRenamed(const QString &, const QString &)));
 		}
 	}
 
@@ -45,7 +49,7 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &/*AI
 		if (FTrayManager)
 		{
 			connect(FTrayManager->instance(),SIGNAL(notifyActivated(int, QSystemTrayIcon::ActivationReason)),
-			        SLOT(onTrayNotifyActivated(int,QSystemTrayIcon::ActivationReason)));
+				SLOT(onTrayNotifyActivated(int,QSystemTrayIcon::ActivationReason)));
 		}
 	}
 
@@ -105,17 +109,36 @@ void MainWindowPlugin::updateTitle()
 void MainWindowPlugin::showMainWindow()
 {
 	FMainWindow->show();
+	correctWindowPosition();
 	WidgetManager::raiseWidget(FMainWindow);
 	FMainWindow->activateWindow();
+}
+
+void MainWindowPlugin::correctWindowPosition()
+{
+	QRect windowRect = FMainWindow->geometry();
+	QRect screenRect = qApp->desktop()->availableGeometry(qApp->desktop()->screenNumber(windowRect.topLeft()));
+	if (!screenRect.isEmpty() && !screenRect.adjusted(10,10,-10,-10).intersects(windowRect))
+	{
+		if (windowRect.right() <= screenRect.left())
+			windowRect.moveLeft(screenRect.left());
+		else if (windowRect.left() >= screenRect.right())
+			windowRect.moveRight(screenRect.right());
+		if (windowRect.top() >= screenRect.bottom())
+			windowRect.moveBottom(screenRect.bottom());
+		else if (windowRect.bottom() <= screenRect.top())
+			windowRect.moveTop(screenRect.top());
+		FMainWindow->move(windowRect.topLeft());
+	}
 }
 
 void MainWindowPlugin::onOptionsOpened()
 {
 	FMainWindow->resize(Options::node(OPV_MAINWINDOW_SIZE).value().toSize());
 	FMainWindow->move(Options::node(OPV_MAINWINDOW_POSITION).value().toPoint());
-	updateTitle();
 	if (Options::node(OPV_MAINWINDOW_SHOW).value().toBool())
 		showMainWindow();
+	updateTitle();
 }
 
 void MainWindowPlugin::onOptionsClosed()
