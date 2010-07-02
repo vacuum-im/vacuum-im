@@ -10,6 +10,7 @@ LEGEND
 ------
   [+] Added ability to show tabs at the bottom of the tab windows
   [-] When converting smileys into the text instead of the first key an arbitrary one was inserted
+  [-] Contacts list window could be displayed outside the visible screen area
 
 
 v1.0.2

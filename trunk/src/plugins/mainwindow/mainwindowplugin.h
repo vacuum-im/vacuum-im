@@ -38,6 +38,7 @@ public:
 protected:
 	void updateTitle();
 	void showMainWindow();
+	void correctWindowPosition();
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();

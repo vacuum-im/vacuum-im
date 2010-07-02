@@ -35,16 +35,16 @@ QMenu *MainWindow::createPopupMenu()
 
 void MainWindow::createLayouts()
 {
-	FUpperWidget = new QStackedWidget;
+	FUpperWidget = new QStackedWidget(this);
 	FUpperWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
 	FUpperWidget->layout()->setSizeConstraint(QLayout::SetFixedSize);
 	FUpperWidget->setVisible(false);
 	connect(FUpperWidget,SIGNAL(widgetRemoved(int)),SLOT(onStackedWidgetRemoved(int)));
 
-	FRostersWidget = new QStackedWidget;
+	FRostersWidget = new QStackedWidget(this);
 	FRostersWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-	FBottomWidget = new QStackedWidget;
+	FBottomWidget = new QStackedWidget(this);
 	FBottomWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
 	FBottomWidget->layout()->setSizeConstraint(QLayout::SetFixedSize);
 	FBottomWidget->setVisible(false);
@@ -94,8 +94,9 @@ void MainWindow::createMenus()
 	button->setPopupMode(QToolButton::InstantPopup);
 }
 
-void MainWindow::onStackedWidgetRemoved(int /*AIndex*/)
+void MainWindow::onStackedWidgetRemoved(int AIndex)
 {
+	Q_UNUSED(AIndex);
 	QStackedWidget *widget = qobject_cast<QStackedWidget *>(sender());
 	if (widget == FUpperWidget)
 		FUpperWidget->setVisible(FUpperWidget->count() > 0);
