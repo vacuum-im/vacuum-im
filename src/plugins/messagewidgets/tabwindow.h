@@ -72,6 +72,7 @@ private:
 	Action *FNewTab;
 	Action *FDetachWindow;
 	Action *FShowCloseButtons;
+	Action *FTabsBottom;
 	Action *FSetAsDefault;
 	Action *FRenameWindow;
 	Action *FDeleteWindow;

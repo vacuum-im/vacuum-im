@@ -58,10 +58,6 @@
         <source>Show contact information in chat windows</source>
         <translation>Pokaż informacje o kontakcie w oknie rozmów</translation>
     </message>
-    <message>
-        <source>Show tabs at the bottom of the tab window</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>MessageWindow</name>
@@ -239,6 +235,10 @@
     <message>
         <source>Are you sure you want to delete this tab window?</source>
         <translation>Na pewno chcesz skasować to okno z zakładkam?</translation>
+    </message>
+    <message>
+        <source>Show Tabs at Bootom of the Window</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -79,11 +79,11 @@
 #define OPV_MESSAGES_EDITORSENDKEY                      "messages.editor-send-key"
 #define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
 #define OPV_MESSAGES_TABWINDOWS_ENABLE                  "messages.tab-windows.enable"
-#define OPV_MESSAGES_TABWINDOWS_TABSBOTTOM              "messages.tab-windows.tabs-bottom"
 #define OPV_MESSAGES_TABWINDOWS_DEFAULT                 "messages.tab-windows.default"
 #define OPV_MESSAGES_TABWINDOW_ITEM                     "messages.tab-windows.window"
 #define OPV_MESSAGES_TABWINDOW_NAME                     "messages.tab-windows.window.name"
 #define OPV_MESSAGES_TABWINDOW_TABSCLOSABLE             "messages.tab-windows.window.tabs-closable"
+#define OPV_MESSAGES_TABWINDOW_TABSBOTTOM               "messages.tab-windows.window.tabs-bottom"
 // Emoticons
 #define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
 // ChatStates
