@@ -63,9 +63,9 @@ bool MessageWidgets::initSettings()
 	Options::setDefaultValue(OPV_MESSAGES_EDITORMINIMUMLINES,1);
 	Options::setDefaultValue(OPV_MESSAGES_EDITORSENDKEY,QKeySequence(Qt::Key_Return));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_ENABLE,true);
-	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_TABSBOTTOM,true);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_NAME,tr("Tab Window"));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSCLOSABLE,true);
+	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSBOTTOM,false);
 
 	if (FOptionsManager)
 	{
@@ -84,7 +84,6 @@ IOptionsWidget *MessageWidgets::optionsWidget(const QString &ANodeId, int &AOrde
 
 		IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
 		container->appendChild(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),tr("Enable tab windows"));
-		container->appendChild(Options::node(OPV_MESSAGES_TABWINDOWS_TABSBOTTOM),tr("Show tabs at the bottom of the tab window"));
 		container->appendChild(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show status changes in chat windows"));
 		container->appendChild(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Auto resize input field"));
 		container->appendChild(Options::node(OPV_MESSAGES_SHOWINFOWIDGET),tr("Show contact information in chat windows"));

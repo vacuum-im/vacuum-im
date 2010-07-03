@@ -58,10 +58,6 @@
         <source>Show contact information in chat windows</source>
         <translation>Показывать информацию о контакте в окне чата</translation>
     </message>
-    <message>
-        <source>Show tabs at the bottom of the tab window</source>
-        <translation>Покарывать вкладки внизу окна со вкладками</translation>
-    </message>
 </context>
 <context>
     <name>MessageWindow</name>
@@ -239,6 +235,10 @@
     <message>
         <source>Are you sure you want to delete this tab window?</source>
         <translation>Вы уверены что хотите удалить это окно со вкладками?</translation>
+    </message>
+    <message>
+        <source>Show Tabs at Bootom of the Window</source>
+        <translation>Показывать вкладки внизу окна</translation>
     </message>
 </context>
 <context>

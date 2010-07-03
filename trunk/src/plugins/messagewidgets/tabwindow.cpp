@@ -36,8 +36,6 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 
 	connect(ui.twtTabs,SIGNAL(currentChanged(int)),SLOT(onTabChanged(int)));
 	connect(ui.twtTabs,SIGNAL(tabCloseRequested(int)),SLOT(onTabCloseRequested(int)));
-
-	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_TABSBOTTOM));
 }
 
 TabWindow::~TabWindow()
@@ -186,6 +184,13 @@ void TabWindow::createActions()
 	FWindowMenu->addAction(FShowCloseButtons,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FShowCloseButtons,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
+	FTabsBottom = new Action(FWindowMenu);
+	FTabsBottom->setText(tr("Show Tabs at Bootom of the Window"));
+	FTabsBottom->setCheckable(true);
+	FTabsBottom->setChecked(ui.twtTabs->tabPosition() == QTabWidget::South);
+	FWindowMenu->addAction(FTabsBottom,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
+	connect(FTabsBottom,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+
 	FSetAsDefault = new Action(FWindowMenu);
 	FSetAsDefault->setText(tr("Use as Default Tab Window"));
 	FSetAsDefault->setCheckable(true);
@@ -211,6 +216,7 @@ void TabWindow::saveWindowState()
 	{
 		Options::setFileValue(saveGeometry(),"messages.tabwindows.window.geometry",FWindowId.toString());
 		Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).setValue(ui.twtTabs->tabsClosable(),"tabs-closable");
+		Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).setValue(ui.twtTabs->tabPosition()==QTabWidget::South,"tabs-bottom");
 	}
 }
 
@@ -220,6 +226,7 @@ void TabWindow::loadWindowState()
 	{
 		restoreGeometry(Options::fileValue("messages.tabwindows.window.geometry",FWindowId.toString()).toByteArray());
 		ui.twtTabs->setTabsClosable(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).value("tabs-closable").toBool());
+		ui.twtTabs->setTabPosition(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).value("tabs-bottom").toBool() ? QTabWidget::South : QTabWidget::North);
 	}
 }
 
@@ -326,10 +333,6 @@ void TabWindow::onOptionsChanged(const OptionsNode &ANode)
 		FSetAsDefault->setChecked(FWindowId==ANode.value().toString());
 		FDeleteWindow->setVisible(!FSetAsDefault->isChecked());
 	}
-	else if (ANode.path() == OPV_MESSAGES_TABWINDOWS_TABSBOTTOM)
-	{
-		ui.twtTabs->setTabPosition(ANode.value().toBool() ? QTabWidget::South : QTabWidget::North);
-	}
 }
 
 void TabWindow::onActionTriggered(bool)
@@ -365,6 +368,10 @@ void TabWindow::onActionTriggered(bool)
 	else if (action == FShowCloseButtons)
 	{
 		ui.twtTabs->setTabsClosable(action->isChecked());
+	}
+	else if (action == FTabsBottom)
+	{
+		ui.twtTabs->setTabPosition(action->isChecked() ? QTabWidget::South : QTabWidget::North);
 	}
 	else if (action == FSetAsDefault)
 	{
