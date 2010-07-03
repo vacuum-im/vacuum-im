@@ -27,11 +27,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="lneDirectory">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="lneDirectory"/>
      </item>
      <item>
       <widget class="QPushButton" name="pbtDirectory">
