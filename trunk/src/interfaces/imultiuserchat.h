@@ -125,8 +125,8 @@ public:
 	virtual bool destroyRoom(const QString &AReason) =0;
 protected:
 	virtual void chatOpened() =0;
-	virtual void chatNotify(const QString &ANick, const QString &ANotify) =0;
-	virtual void chatError(const QString &ANick, const QString &AError) =0;
+	virtual void chatNotify(const QString &ANotify) =0;
+	virtual void chatError(const QString &AMessage) =0;
 	virtual void chatClosed() =0;
 	virtual void chatDestroyed() =0;
 	virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;

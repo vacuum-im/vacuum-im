@@ -84,12 +84,12 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 			if (!formElem.isNull())
 				emit configFormReceived(FDataForms!=NULL ? FDataForms->dataForm(formElem) : IDataForm());
 			else
-				emit chatNotify("",tr("Room configuration is not available."));
+				emit chatNotify(tr("Room configuration is not available."));
 		}
 		else if (AStanza.type() == "error")
 		{
 			ErrorHandler err(AStanza.element());
-			emit chatError("",err.message());
+			emit chatError(err.message());
 		}
 		FConfigRequestId.clear();
 	}
@@ -98,13 +98,13 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		if (AStanza.type() == "result")
 		{
 			emit configFormAccepted();
-			emit chatNotify("",tr("Room configuration accepted."));
+			emit chatNotify(tr("Room configuration accepted."));
 		}
 		else if (AStanza.type() == "error")
 		{
 			ErrorHandler err(AStanza.element());
 			emit configFormRejected(err.message());
-			emit chatError("",err.message());
+			emit chatError(err.message());
 		}
 		FConfigSubmitId.clear();
 	}
@@ -132,7 +132,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		else if (AStanza.type() == "error")
 		{
 			ErrorHandler err(AStanza.element());
-			emit chatError("",tr("Request for list of %1s is failed: %2").arg(affiliation).arg(err.message()));
+			emit chatError(tr("Request for list of %1s is failed: %2").arg(affiliation).arg(err.message()));
 		}
 	}
 	else if (FAffilListSubmits.contains(AStanza.id()) && FRoomJid==AStanza.from())
@@ -141,16 +141,15 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		if (AStanza.type() == "error")
 		{
 			ErrorHandler err(AStanza.element());
-			emit chatError("",tr("Changes in list of %1s was not accepted: %2").arg(affiliation).arg(err.message()));
+			emit chatError(tr("Changes in list of %1s was not accepted: %2").arg(affiliation).arg(err.message()));
 		}
 		else if (AStanza.type() == "result")
-			emit chatNotify("",tr("Changes in list of %1s was accepted.").arg(affiliation));
+			emit chatNotify(tr("Changes in list of %1s was accepted.").arg(affiliation));
 	}
 	else if (AStanza.type() == "error")
 	{
-		Jid fromJid = AStanza.from();
 		ErrorHandler err(AStanza.element());
-		emit chatError(fromJid.resource(),err.message());
+		emit chatError(err.message());
 	}
 }
 
@@ -160,27 +159,27 @@ void MultiUserChat::stanzaRequestTimeout(const Jid &AStreamJid, const QString &A
 	if (AStanzaId == FConfigRequestId)
 	{
 		ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-		emit chatError("",err.message());
+		emit chatError(err.message());
 		FConfigRequestId.clear();
 	}
 	else if (AStanzaId == FConfigSubmitId)
 	{
 		ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-		emit chatError("",err.message());
+		emit chatError(err.message());
 		FConfigRequestId.clear();
 	}
 	else if (FAffilListRequests.contains(AStanzaId))
 	{
 		QString affiliation = FAffilListRequests.take(AStanzaId);
 		ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-		emit chatError("",tr("Request for list of %1s is failed: %2").arg(affiliation).arg(err.message()));
+		emit chatError(tr("Request for list of %1s is failed: %2").arg(affiliation).arg(err.message()));
 		FAffilListRequests.remove(AStanzaId);
 	}
 	else if (FAffilListSubmits.contains(AStanzaId))
 	{
 		QString affiliation = FAffilListSubmits.take(AStanzaId);
 		ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-		emit chatError("",tr("Changes in list of %1s may not be accepted: %2").arg(affiliation).arg(err.message()));
+		emit chatError(tr("Changes in list of %1s may not be accepted: %2").arg(affiliation).arg(err.message()));
 		FAffilListRequests.remove(AStanzaId);
 	}
 }
@@ -447,7 +446,7 @@ bool MultiUserChat::requestAffiliationList(const QString &AAffiliation)
 			return true;
 		}
 		else
-			emit chatError("",tr("Failed to send request for list of %1s.").arg(AAffiliation));
+			emit chatError(tr("Failed to send request for list of %1s.").arg(AAffiliation));
 	}
 	return false;
 }
@@ -474,7 +473,7 @@ bool MultiUserChat::changeAffiliationList(const QList<IMultiUserListItem> &ADelt
 			return true;
 		}
 		else
-			emit chatError("",tr("Failed to send changes in list of %1s").arg(ADeltaList.value(0).affiliation));
+			emit chatError(tr("Failed to send changes in list of %1s").arg(ADeltaList.value(0).affiliation));
 	}
 	return false;
 }
@@ -482,7 +481,9 @@ bool MultiUserChat::changeAffiliationList(const QList<IMultiUserListItem> &ADelt
 bool MultiUserChat::requestConfigForm()
 {
 	if (!FConfigRequestId.isEmpty())
+	{
 		return true;
+	}
 	else if (FStanzaProcessor && isOpen())
 	{
 		Stanza iq("iq");
@@ -494,7 +495,7 @@ bool MultiUserChat::requestConfigForm()
 			return true;
 		}
 	}
-	emit chatError("",tr("Room configuration request failed."));
+	emit chatError(tr("Room configuration request failed."));
 	return false;
 }
 
@@ -517,7 +518,7 @@ bool MultiUserChat::sendConfigForm(const IDataForm &AForm)
 			return true;
 		}
 	}
-	emit chatError("",tr("Room configuration submit failed."));
+	emit chatError(tr("Room configuration submit failed."));
 	return false;
 }
 
@@ -533,7 +534,7 @@ bool MultiUserChat::destroyRoom(const QString &AReason)
 			destroyElem.appendChild(iq.createElement("reason")).appendChild(iq.createTextNode(AReason));
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,iq,MUC_IQ_TIMEOUT))
 		{
-			emit chatNotify("",tr("Room destruction request was sent."));
+			emit chatNotify(tr("Room destruction request was sent."));
 			return true;
 		}
 	}
@@ -567,7 +568,7 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 	if (AStanza.type() == "error")
 	{
 		ErrorHandler err(AStanza.element());
-		emit chatError(fromNick,err.message());
+		emit chatError(err.message());
 	}
 	else if (message.type() == Message::GroupChat && !message.stanza().firstElement("subject").isNull())
 	{
@@ -745,7 +746,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			user->setData(MUDR_STATUS,err.message());
 			emit userPresence(user,IPresence::Error,err.message());
 		}
-		emit chatError(fromNick,err.message());
+		emit chatError(err.message());
 
 		if (fromNick != FNickName)
 		{
