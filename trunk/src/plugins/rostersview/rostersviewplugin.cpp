@@ -200,9 +200,9 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 			return display;
 		}
 		case Qt::ForegroundRole:
-			return FRostersView->palette().color(QPalette::BrightText);
+			return FRostersView->palette().color(QPalette::Active, QPalette::BrightText);
 		case Qt::BackgroundColorRole:
-			return FRostersView->palette().color(QPalette::Dark);
+			return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
 		case RDR_FONT_WEIGHT:
 			return QFont::Bold;
 		}
@@ -218,7 +218,7 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 		case Qt::DisplayRole:
 			return AIndex->data(RDR_NAME);
 		case Qt::ForegroundRole:
-			return FRostersView->palette().color(QPalette::Highlight);
+			return FRostersView->palette().color(QPalette::Active, QPalette::Highlight);
 		case RDR_FONT_WEIGHT:
 			return QFont::DemiBold;
 		}
