@@ -35,6 +35,8 @@ public:
 	virtual void setSendKey(const QKeySequence &AKey);
 	virtual bool sendButtonVisible() const;
 	virtual void setSendButtonVisible(bool AVisible);
+	virtual bool textFormatEnabled() const;
+	virtual void setTextFormatEnabled(bool AEnabled);
 signals:
 	void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
 	void messageAboutToBeSend();
@@ -56,11 +58,13 @@ protected slots:
 	void onShortcutActivated();
 	void onSendButtonCliked(bool);
 	void onOptionsChanged(const OptionsNode &ANode);
+	void onContentsChanged(int APosition, int ARemoved, int AAdded);
 private:
 	Ui::EditWidgetClass ui;
 private:
 	IMessageWidgets *FMessageWidgets;
 private:
+	bool FFormatEnabled;
 	int FBufferPos;
 	Jid FStreamJid;
 	Jid FContactJid;
