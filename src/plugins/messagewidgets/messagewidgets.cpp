@@ -420,9 +420,9 @@ void MessageWidgets::onQuoteActionTriggered(bool)
 			editor->textCursor().beginEditBlock();
 			if (!editor->textCursor().atBlockStart())
 				editor->textCursor().insertText("\n");
-			editor->textCursor().insertText(">----\n");
+			editor->textCursor().insertText("> ");
 			editor->textCursor().insertFragment(fragment);
-			editor->textCursor().insertText("\n----<\n");
+			editor->textCursor().insertText("\n");
 			editor->textCursor().endEditBlock();
 			editor->setFocus();
 		}
