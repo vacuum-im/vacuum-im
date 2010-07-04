@@ -684,16 +684,8 @@ Check values and try again</source>
         <translation>Уведомление: %1</translation>
     </message>
     <message>
-        <source>Notify from %1: %2</source>
-        <translation>Уведомление от %1: %2</translation>
-    </message>
-    <message>
         <source>Error: %1</source>
         <translation>Ошибка: %1</translation>
-    </message>
-    <message>
-        <source>Error from %1: %2</source>
-        <translation>Ошибка от %1: %2</translation>
     </message>
     <message>
         <source>%1 role changed from %2 to %3</source>

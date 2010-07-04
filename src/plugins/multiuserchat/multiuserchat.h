@@ -68,8 +68,8 @@ public:
 	virtual bool destroyRoom(const QString &AReason);
 signals:
 	void chatOpened();
-	void chatNotify(const QString &ANick, const QString &ANotify);
-	void chatError(const QString &ANick, const QString &AError);
+	void chatNotify(const QString &ANotify);
+	void chatError(const QString &AMessage);
 	void chatClosed();
 	void chatDestroyed();
 	void streamJidChanged(const Jid &ABefour, const Jid &AAfter);

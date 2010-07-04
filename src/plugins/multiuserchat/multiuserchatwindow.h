@@ -132,8 +132,8 @@ protected:
 	virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onChatOpened();
-	void onChatNotify(const QString &ANick, const QString &ANotify);
-	void onChatError(const QString &ANick, const QString &AError);
+	void onChatNotify(const QString &ANotify);
+	void onChatError(const QString &AMessage);
 	void onChatClosed();
 	void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
 	//Occupant

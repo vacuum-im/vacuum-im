@@ -366,35 +366,33 @@ void MultiUserChatWindow::initialize()
 void MultiUserChatWindow::connectMultiChat()
 {
 	connect(FMultiChat->instance(),SIGNAL(chatOpened()),SLOT(onChatOpened()));
-	connect(FMultiChat->instance(),SIGNAL(chatNotify(const QString &, const QString &)),
-	        SLOT(onChatNotify(const QString &, const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(chatError(const QString &, const QString &)),
-	        SLOT(onChatError(const QString &, const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(chatNotify(const QString &)),SLOT(onChatNotify(const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(chatError(const QString &)), SLOT(onChatError(const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(chatClosed()),SLOT(onChatClosed()));
 	connect(FMultiChat->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
-	        SLOT(onStreamJidChanged(const Jid &, const Jid &)));
+		SLOT(onStreamJidChanged(const Jid &, const Jid &)));
 	connect(FMultiChat->instance(),SIGNAL(userPresence(IMultiUser *,int,const QString &)),
-	        SLOT(onUserPresence(IMultiUser *,int,const QString &)));
+		SLOT(onUserPresence(IMultiUser *,int,const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(userDataChanged(IMultiUser *, int, const QVariant, const QVariant &)),
-	        SLOT(onUserDataChanged(IMultiUser *, int, const QVariant, const QVariant &)));
+		SLOT(onUserDataChanged(IMultiUser *, int, const QVariant, const QVariant &)));
 	connect(FMultiChat->instance(),SIGNAL(userNickChanged(IMultiUser *, const QString &, const QString &)),
-	        SLOT(onUserNickChanged(IMultiUser *, const QString &, const QString &)));
+		SLOT(onUserNickChanged(IMultiUser *, const QString &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(presenceChanged(int, const QString &)),
-	        SLOT(onPresenceChanged(int, const QString &)));
+		SLOT(onPresenceChanged(int, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(subjectChanged(const QString &, const QString &)),
-	        SLOT(onSubjectChanged(const QString &, const QString &)));
+		SLOT(onSubjectChanged(const QString &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(serviceMessageReceived(const Message &)),
-	        SLOT(onServiceMessageReceived(const Message &)));
+		SLOT(onServiceMessageReceived(const Message &)));
 	connect(FMultiChat->instance(),SIGNAL(messageReceived(const QString &, const Message &)),
-	        SLOT(onMessageReceived(const QString &, const Message &)));
+		SLOT(onMessageReceived(const QString &, const Message &)));
 	connect(FMultiChat->instance(),SIGNAL(inviteDeclined(const Jid &, const QString &)),
-	        SLOT(onInviteDeclined(const Jid &, const QString &)));
+		SLOT(onInviteDeclined(const Jid &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(userKicked(const QString &, const QString &, const QString &)),
-	        SLOT(onUserKicked(const QString &, const QString &, const QString &)));
+		SLOT(onUserKicked(const QString &, const QString &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(userBanned(const QString &, const QString &, const QString &)),
-	        SLOT(onUserBanned(const QString &, const QString &, const QString &)));
+		SLOT(onUserBanned(const QString &, const QString &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(affiliationListReceived(const QString &,const QList<IMultiUserListItem> &)),
-	        SLOT(onAffiliationListReceived(const QString &,const QList<IMultiUserListItem> &)));
+		SLOT(onAffiliationListReceived(const QString &,const QList<IMultiUserListItem> &)));
 	connect(FMultiChat->instance(),SIGNAL(configFormReceived(const IDataForm &)), SLOT(onConfigFormReceived(const IDataForm &)));
 	connect(FMultiChat->instance(),SIGNAL(roomDestroyed(const QString &)), SLOT(onRoomDestroyed(const QString &)));
 }
@@ -1376,20 +1374,14 @@ void MultiUserChatWindow::onChatOpened()
 	setMessageStyle();
 }
 
-void MultiUserChatWindow::onChatNotify(const QString &ANick, const QString &ANotify)
+void MultiUserChatWindow::onChatNotify(const QString &ANotify)
 {
-	if (ANick.isEmpty())
-		showMessage(tr("Notify: %1").arg(ANotify),IMessageContentOptions::Notification);
-	else
-		showMessage(tr("Notify from %1: %2").arg(ANick).arg(ANotify),IMessageContentOptions::Notification);
+	showMessage(tr("Notify: %1").arg(ANotify),IMessageContentOptions::Notification);
 }
 
-void MultiUserChatWindow::onChatError(const QString &ANick, const QString &AError)
+void MultiUserChatWindow::onChatError(const QString &AMessage)
 {
-	if (ANick.isEmpty())
-		showMessage(tr("Error: %1").arg(AError),IMessageContentOptions::Notification);
-	else
-		showMessage(tr("Error from %1: %2").arg(ANick).arg(AError),IMessageContentOptions::Notification);
+	showMessage(tr("Error: %1").arg(AMessage),IMessageContentOptions::Notification);
 }
 
 void MultiUserChatWindow::onChatClosed()

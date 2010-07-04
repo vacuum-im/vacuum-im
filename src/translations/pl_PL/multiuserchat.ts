@@ -684,16 +684,8 @@ Check values and try again</source>
         <translation>Powiadomienie: %1</translation>
     </message>
     <message>
-        <source>Notify from %1: %2</source>
-        <translation>Powiadomienie od %1: %2</translation>
-    </message>
-    <message>
         <source>Error: %1</source>
         <translation>Błąd: %1</translation>
-    </message>
-    <message>
-        <source>Error from %1: %2</source>
-        <translation>Błąd od %1: %2</translation>
     </message>
     <message>
         <source>%1 role changed from %2 to %3</source>
