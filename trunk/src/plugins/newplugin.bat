@@ -1,4 +1,5 @@
 mkdir %1
+echo SUBDIRS += %1 >> plugins.pro
 cd %1
 
 echo TARGET = %1 >> %1.pro
