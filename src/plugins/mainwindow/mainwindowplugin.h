@@ -1,6 +1,7 @@
 #ifndef MAINWINDOWPLUGIN_H
 #define MAINWINDOWPLUGIN_H
 
+#include <QTime>
 #include <definations/actiongroups.h>
 #include <definations/version.h>
 #include <definations/resources.h>
@@ -16,9 +17,9 @@
 #include "mainwindow.h"
 
 class MainWindowPlugin :
-			public QObject,
-			public IPlugin,
-			public IMainWindowPlugin
+		public QObject,
+		public IPlugin,
+		public IMainWindowPlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMainWindowPlugin);
@@ -39,6 +40,8 @@ protected:
 	void updateTitle();
 	void showMainWindow();
 	void correctWindowPosition();
+protected:
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
@@ -51,6 +54,8 @@ private:
 	ITrayManager *FTrayManager;
 private:
 	MainWindow *FMainWindow;
+private:
+	QTime FActivationChanged;
 };
 
 #endif // MAINWINDOW_H
