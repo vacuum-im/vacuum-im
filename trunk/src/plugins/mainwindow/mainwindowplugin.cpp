@@ -9,7 +9,9 @@ MainWindowPlugin::MainWindowPlugin()
 	FOptionsManager = NULL;
 	FTrayManager = NULL;
 
+	FActivationChanged = QTime::currentTime();
 	FMainWindow = new MainWindow(new QWidget, Qt::Window|Qt::CustomizeWindowHint|Qt::WindowTitleHint|Qt::WindowCloseButtonHint);
+	FMainWindow->installEventFilter(this);
 }
 
 MainWindowPlugin::~MainWindowPlugin()
@@ -132,6 +134,13 @@ void MainWindowPlugin::correctWindowPosition()
 	}
 }
 
+bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
+{
+	if (AWatched==FMainWindow && AEvent->type()==QEvent::ActivationChange)
+		FActivationChanged = QTime::currentTime();
+	return QObject::eventFilter(AWatched,AEvent);
+}
+
 void MainWindowPlugin::onOptionsOpened()
 {
 	FMainWindow->resize(Options::node(OPV_MAINWINDOW_SIZE).value().toSize());
@@ -161,10 +170,10 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
 {
 	if (ANotifyId==0 && AReason==QSystemTrayIcon::Trigger)
 	{
-		if (!FMainWindow->isVisible())
-			showMainWindow();
-		else
+		if (FMainWindow->isActiveWindow() || qAbs(FActivationChanged.msecsTo(QTime::currentTime()))<qApp->doubleClickInterval())
 			FMainWindow->close();
+		else
+			showMainWindow();
 	}
 }
 
