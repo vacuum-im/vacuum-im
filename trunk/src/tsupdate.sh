@@ -11,4 +11,4 @@ lupdate="${lupdate} ${LOPTIONS}"
 
 ${lupdate} utils/utils.pro
 ${lupdate} loader/loader.pro
-find plugins -name '*.pro' -exec ${lupdate} {}\;
+find plugins -name '*.pro' -exec ${lupdate} {} \;
