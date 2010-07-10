@@ -497,11 +497,11 @@ Check values and try again</source>
         <translation>Wspomniano Ciebie na konferencji</translation>
     </message>
     <message>
-        <source>Show all active conferences</source>
-        <translation>Pokaz wszystkie aktywne konferencje</translation>
+        <source>Leave all hidden conferences</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Leave all hidden conferences</source>
+        <source>Show all hidden conferences</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

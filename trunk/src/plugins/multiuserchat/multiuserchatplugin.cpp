@@ -174,15 +174,15 @@ bool MultiUserChatPlugin::initObjects()
 		FChatMenu->setTitle(tr("Conferences"));
 
 		Action *action = new Action(FChatMenu);
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_SHOW_ALL_ROOMS);
-		action->setText(tr("Show all active conferences"));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onShowAllRoomsTriggered(bool)));
-		FChatMenu->addAction(action,AG_DEFAULT+100,false);
-
-		action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
 		action->setText(tr("Join conference"));
 		connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
+		FChatMenu->addAction(action,AG_DEFAULT+100,false);
+
+		action = new Action(FChatMenu);
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_SHOW_ALL_ROOMS);
+		action->setText(tr("Show all hidden conferences"));
+		connect(action,SIGNAL(triggered(bool)),SLOT(onShowAllRoomsTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
 
 		action = new Action(FChatMenu);
@@ -724,14 +724,15 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
 void MultiUserChatPlugin::onShowAllRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
-		window->showWindow();
+		if (!window->isVisible())
+			window->showWindow();
 }
 
 void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
 {
-	foreach(IMultiUserChatWindow *w, FChatWindows)
-		if (!w->isVisible())
-			w->exitAndDestroy(QString::null);
+	foreach(IMultiUserChatWindow *window, FChatWindows)
+		if (!window->isVisible())
+			window->exitAndDestroy(QString::null);
 }
 
 void MultiUserChatPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
