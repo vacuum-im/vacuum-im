@@ -166,6 +166,7 @@ public:
 	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
 	virtual bool isActive() const =0;
+	virtual bool isVisible() const =0;
 	virtual IViewWidget *viewWidget() const =0;
 	virtual IEditWidget *editWidget() const =0;
 	virtual IMenuBarWidget *menuBarWidget() const =0;
@@ -208,7 +209,7 @@ protected:
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
 Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.0")
-Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.0")
+Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.1")
 Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.0")
 
 #endif

@@ -184,6 +184,12 @@ bool MultiUserChatPlugin::initObjects()
 		action->setText(tr("Join conference"));
 		connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
+
+		action = new Action(FChatMenu);
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_LEAVE_HIDDEN_ROOMS);
+		action->setText(tr("Leave all hidden conferences"));
+		connect(action,SIGNAL(triggered(bool)),SLOT(onLeaveHiddenRoomsTriggered(bool)));
+		FChatMenu->addAction(action,AG_DEFAULT+100,false);
 	}
 
 	if (FRostersViewPlugin)
@@ -719,6 +725,13 @@ void MultiUserChatPlugin::onShowAllRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
 		window->showWindow();
+}
+
+void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
+{
+	foreach(IMultiUserChatWindow *w, FChatWindows)
+		if (!w->isVisible())
+			w->exitAndDestroy(QString::null);
 }
 
 void MultiUserChatPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)

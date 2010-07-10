@@ -9,6 +9,10 @@
     <object mime="image/png">mucconference.png</object>
   </icon>
   <icon>
+    <key>mucLeaveHiddenRooms</key>
+    <object mime="image/png">mucexitroom.png</object>
+  </icon>
+  <icon>
     <key>mucJoin</key>
     <object mime="image/png">mucjoin.png</object>
   </icon>

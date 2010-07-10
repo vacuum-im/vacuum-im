@@ -68,7 +68,8 @@ public:
 	//IMultiUserChatWindow
 	virtual Jid streamJid() const { return FMultiChat->streamJid(); }
 	virtual Jid roomJid() const { return FMultiChat->roomJid(); }
-	virtual bool isActive() const { return isVisible() && isActiveWindow(); }
+	virtual bool isActive() const { return QMainWindow::isVisible() && isActiveWindow(); }
+	virtual bool isVisible() const { return bVisible; }
 	virtual IViewWidget *viewWidget() const { return FViewWidget; }
 	virtual IEditWidget *editWidget() const { return FEditWidget; }
 	virtual IMenuBarWidget *menuBarWidget() const { return FMenuBarWidget; }
@@ -222,6 +223,7 @@ private:
 private:
 	bool FShownDetached;
 	bool FDestroyOnChatClosed;
+	bool bVisible;
 	QList<int> FActiveMessages;
 	QList<IChatWindow *> FChatWindows;
 	QMultiMap<IChatWindow *,int> FActiveChatMessages;

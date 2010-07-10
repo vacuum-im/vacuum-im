@@ -108,6 +108,7 @@ protected slots:
 	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onJoinActionTriggered(bool);
 	void onShowAllRoomsTriggered(bool);
+	void onLeaveHiddenRoomsTriggered(bool);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onChatActionTriggered(bool);
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
