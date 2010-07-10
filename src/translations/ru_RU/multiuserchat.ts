@@ -497,12 +497,12 @@ Check values and try again</source>
         <translation>Обращение в конференции</translation>
     </message>
     <message>
-        <source>Show all active conferences</source>
-        <translation>Показать все активные конференции</translation>
-    </message>
-    <message>
         <source>Leave all hidden conferences</source>
         <translation>Покинуть все скрытые конференции</translation>
+    </message>
+    <message>
+        <source>Show all hidden conferences</source>
+        <translation>Показать все скрытые конференции</translation>
     </message>
 </context>
 <context>
