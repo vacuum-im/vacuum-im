@@ -106,7 +106,7 @@ void MessageProcessor::writeText(int AOrder, Message &AMessage, QTextDocument *A
 	}
 	else if (AOrder == MWO_MESSAGEPROCESSOR_ANCHORS)
 	{
-		QRegExp regexp("\\b((https?|ftp)://|www.|xmpp:)[\\w\\d/\\?.=:@&%#_;\\(\\)\\+\\-\\~\\*]+");
+		QRegExp regexp("\\b((https?|ftp)://|www.|xmpp:)[\\w\\d/\\?.=:@&%#_;\\(\\)\\+\\-\\~\\*\\,]+");
 		regexp.setCaseSensitivity(Qt::CaseInsensitive);
 		for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
 		{
