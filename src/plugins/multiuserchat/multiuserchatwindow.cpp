@@ -42,6 +42,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FStatusBarWidget = NULL;
 	FShownDetached = false;
 	FDestroyOnChatClosed = false;
+	bVisible = false;
 
 	initialize();
 	createMessageWidgets();
@@ -88,12 +89,12 @@ QString MultiUserChatWindow::tabPageId() const
 
 void MultiUserChatWindow::showWindow()
 {
-	if (FMessageWidgets && isWindow() && !isVisible())
+	if (FMessageWidgets && isWindow() && !QMainWindow::isVisible())
 		FMessageWidgets->assignTabWindowPage(this);
 
 	if (isWindow())
 	{
-		isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
+		QMainWindow::isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
 		WidgetManager::raiseWidget(this);
 	}
 	else
@@ -1316,6 +1317,7 @@ void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 	QMainWindow::showEvent(AEvent);
 	if (FEditWidget)
 		FEditWidget->textEdit()->setFocus();
+	bVisible = true;
 	emit windowActivated();
 }
 
@@ -1324,6 +1326,7 @@ void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 	if (FShownDetached)
 		saveWindowGeometry();
 	QMainWindow::closeEvent(AEvent);
+	bVisible = false;
 	emit windowClosed();
 }
 

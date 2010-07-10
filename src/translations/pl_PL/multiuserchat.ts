@@ -500,6 +500,10 @@ Check values and try again</source>
         <source>Show all active conferences</source>
         <translation>Pokaz wszystkie aktywne konferencje</translation>
     </message>
+    <message>
+        <source>Leave all hidden conferences</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

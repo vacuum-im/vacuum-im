@@ -129,6 +129,7 @@
 #define MNI_MUC_CONFERENCE              "mucConference"
 #define MNI_MUC_JOIN                    "mucJoin"
 #define MNI_MUC_SHOW_ALL_ROOMS          "mucShowAllRooms"
+#define MNI_MUC_LEAVE_HIDDEN_ROOMS      "mucLeaveHiddenRooms"
 #define MNI_MUC_TOOLS_MENU              "mucToolsMenu"
 #define MNI_MUC_INVITE                  "mucInvite"
 #define MNI_MUC_CHANGE_NICK             "mucChangeNick"
