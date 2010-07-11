@@ -122,7 +122,17 @@ QString ViewWidget::getHtmlBody(const QString &AHtml)
 {
 	QRegExp body("<body.*>(.*)</body>");
 	body.setMinimal(false);
-	return AHtml.indexOf(body)>=0 ? body.cap(1).trimmed() : AHtml;
+	QString html = AHtml.indexOf(body)>=0 ? body.cap(1).trimmed() : AHtml;
+
+	// XXX Replace <P> inserted by QTextDocument with <SPAN>
+	if (html.leftRef(3).compare("<p ", Qt::CaseInsensitive) == 0 &&
+		html.rightRef(4).compare("</p>", Qt::CaseInsensitive) == 0)
+	{
+		html.replace(1, 1, "span");
+		html.replace(html.length() - 2, 1, "span");
+	}
+
+	return html;
 }
 
 void ViewWidget::dropEvent(QDropEvent *AEvent)
