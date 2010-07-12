@@ -108,7 +108,7 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOpt
 	else
 		messageDoc.setPlainText(AMessage.body());
 
-	appendHtml(getHtmlBody(messageDoc.toHtml()),AOptions);
+	appendHtml(getDocumentBody(messageDoc),AOptions);
 }
 
 void ViewWidget::initialize()
@@ -116,23 +116,6 @@ void ViewWidget::initialize()
 	IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
-}
-
-QString ViewWidget::getHtmlBody(const QString &AHtml)
-{
-	QRegExp body("<body.*>(.*)</body>");
-	body.setMinimal(false);
-	QString html = AHtml.indexOf(body)>=0 ? body.cap(1).trimmed() : AHtml;
-
-	// XXX Replace <P> inserted by QTextDocument with <SPAN>
-	if (html.leftRef(3).compare("<p ", Qt::CaseInsensitive) == 0 &&
-		html.rightRef(4).compare("</p>", Qt::CaseInsensitive) == 0)
-	{
-		html.replace(1, 1, "span");
-		html.replace(html.length() - 2, 1, "span");
-	}
-
-	return html;
 }
 
 void ViewWidget::dropEvent(QDropEvent *AEvent)

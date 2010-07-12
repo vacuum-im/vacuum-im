@@ -14,6 +14,7 @@
 #include <QDomDocument>
 #include <QApplication>
 #include <QTextDocument>
+#include <utils/message.h>
 
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
@@ -493,10 +494,7 @@ QString AdiumMessageStyle::processCommands(const QString &AHtml, const IMessageC
 
 	if (changed)
 	{
-		QString html = message.toHtml();
-		QRegExp body("<body.*>(.*)</body>");
-		body.setMinimal(false);
-		return html.indexOf(body)>=0 ? body.cap(1).trimmed() : html;
+		return getDocumentBody(message);
 	}
 
 	return AHtml;

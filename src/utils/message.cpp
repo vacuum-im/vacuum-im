@@ -325,3 +325,21 @@ QDomElement Message::setTextToElem(QDomElement &AElem, const QString &AText) con
 	}
 	return AElem;
 }
+
+QString getDocumentBody(const QTextDocument &doc)
+{
+	QRegExp body("<body.*>(.*)</body>");
+	body.setMinimal(false);
+	QString html = doc.toHtml();
+	html = html.indexOf(body)>=0 ? body.cap(1).trimmed() : html;
+
+	// XXX Replace <P> inserted by QTextDocument with <SPAN>
+	if (html.leftRef(3).compare("<p ", Qt::CaseInsensitive) == 0 &&
+		html.rightRef(4).compare("</p>", Qt::CaseInsensitive) == 0)
+	{
+		html.replace(1, 1, "span");
+		html.replace(html.length() - 2, 1, "span");
+	}
+
+	return html;
+}
