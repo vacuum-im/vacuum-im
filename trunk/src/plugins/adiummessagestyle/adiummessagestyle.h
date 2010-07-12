@@ -6,6 +6,7 @@
 #include <definations/resources.h>
 #include <interfaces/imessagestyles.h>
 #include <utils/filestorage.h>
+#include <utils/message.h>
 #include "styleviewer.h"
 
 //Message Style Info Values

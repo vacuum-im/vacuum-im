@@ -37,7 +37,6 @@ signals:
 	void urlClicked(const QUrl &AUrl) const;
 protected:
 	void initialize();
-	QString getHtmlBody(const QString &AHtml);
 protected:
 	virtual void dropEvent(QDropEvent *AEvent);
 	virtual void dragEnterEvent(QDragEnterEvent *AEvent);

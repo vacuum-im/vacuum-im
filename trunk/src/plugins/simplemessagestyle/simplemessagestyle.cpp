@@ -9,6 +9,7 @@
 #include <QDomDocument>
 #include <QCoreApplication>
 #include <QTextDocumentFragment>
+#include <utils/message.h>
 
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
 
@@ -369,10 +370,7 @@ QString SimpleMessageStyle::processCommands(const QString &AHtml, const IMessage
 
 	if (changed)
 	{
-		QString html = message.toHtml();
-		QRegExp body("<body.*>(.*)</body>");
-		body.setMinimal(false);
-		return html.indexOf(body)>=0 ? body.cap(1).trimmed() : html;
+		return getDocumentBody(message);
 	}
 
 	return AHtml;
