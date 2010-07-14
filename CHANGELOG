@@ -10,6 +10,7 @@ LEGEND
 ------
   [+] Added ability to show tabs at the bottom of the tab windows
   [*} Changed the format of the qoutes design
+  [*] Server side archive preferences support is not longer required for retrieving messages history from server
   [-] When converting smileys into the text instead of the first key an arbitrary one was inserted
   [-] Contacts list window could be displayed outside the visible screen area
   [-] The roster window was closed by clicking on the tray even if it was inactive

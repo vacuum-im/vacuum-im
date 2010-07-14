@@ -3,7 +3,7 @@
 #define SFP_LOGGING           "logging"
 #define SFV_MUSTNOT_LOGGING   "mustnot"
 
-ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IToolBarWidget *AToolBarWidget, QWidget *AParent) : Menu(AParent)
+ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APluginManager, IToolBarWidget *AToolBarWidget, QWidget *AParent) : Menu(AParent)
 {
 	FToolBarWidget = AToolBarWidget;
 	FEditWidget = AToolBarWidget->editWidget();
@@ -12,7 +12,7 @@ ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IToolBarWidget *AToo
 	FDiscovery = NULL;
 	FSessionNegotiation = NULL;
 
-	initialize();
+	initialize(APluginManager);
 	createActions();
 	onEditWidgetContactJidChanged(Jid());
 }
@@ -22,26 +22,26 @@ ChatWindowMenu::~ChatWindowMenu()
 
 }
 
-void ChatWindowMenu::initialize()
+void ChatWindowMenu::initialize(IPluginManager *APluginManager)
 {
-	IPlugin *plugin = FArchiver->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-	plugin = FArchiver->pluginManager()->pluginInterface("ISessionNegotiation").value(0,NULL);
+	plugin = APluginManager->pluginInterface("ISessionNegotiation").value(0,NULL);
 	if (plugin && FDataForms)
 	{
 		FSessionNegotiation = qobject_cast<ISessionNegotiation *>(plugin->instance());
 		if (FSessionNegotiation)
 		{
 			connect(FSessionNegotiation->instance(),SIGNAL(sessionActivated(const IStanzaSession &)),
-			        SLOT(onStanzaSessionActivated(const IStanzaSession &)));
+				SLOT(onStanzaSessionActivated(const IStanzaSession &)));
 			connect(FSessionNegotiation->instance(),SIGNAL(sessionTerminated(const IStanzaSession &)),
-			        SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
+				SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
 		}
 	}
 
-	plugin = FArchiver->pluginManager()->pluginInterface("IServiceDiscovery").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
 	if (plugin && FSessionNegotiation)
 	{
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
@@ -52,11 +52,11 @@ void ChatWindowMenu::initialize()
 	}
 
 	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)),
-	        SLOT(onArchivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)));
+		SLOT(onArchivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)));
 	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),
-	        SLOT(onRequestCompleted(const QString &)));
+    SLOT(onRequestCompleted(const QString &)));
 	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-	        SLOT(onRequestFailed(const QString &,const QString &)));
+		SLOT(onRequestFailed(const QString &,const QString &)));
 	connect(FEditWidget->instance(),SIGNAL(contactJidChanged(const Jid &)),SLOT(onEditWidgetContactJidChanged(const Jid &)));
 }
 

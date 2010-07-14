@@ -96,23 +96,31 @@
         </item>
        </layout>
       </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grbAuto">
+     <property name="title">
+      <string>Auto Archiving Preferences</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="margin">
+       <number>5</number>
+      </property>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QCheckBox" name="chbAutoSave">
-          <property name="text">
-           <string>Enable auto archiving</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="chbReplication">
-          <property name="text">
-           <string>Enable replication</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QCheckBox" name="chbAutoSave">
+        <property name="text">
+         <string>Enable auto archiving</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chbReplication">
+        <property name="text">
+         <string>Enable replication</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
