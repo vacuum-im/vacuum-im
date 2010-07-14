@@ -2,9 +2,9 @@
 #define EMOTICONSOPTIONS_H
 
 #include <QWidget>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
-#include <definations/optionvalues.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/iemoticons.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>

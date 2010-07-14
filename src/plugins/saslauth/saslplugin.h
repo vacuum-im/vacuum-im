@@ -1,9 +1,9 @@
 #ifndef SASLPLUGIN_H
 #define SASLPLUGIN_H
 
-#include <definations/namespaces.h>
-#include <definations/xmppfeatureorders.h>
-#include <definations/xmppstanzahandlerorders.h>
+#include <definitions/namespaces.h>
+#include <definitions/xmppfeatureorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>

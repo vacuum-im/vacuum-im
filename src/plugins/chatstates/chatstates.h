@@ -3,14 +3,14 @@
 
 #include <QMap>
 #include <QTimer>
-#include <definations/namespaces.h>
-#include <definations/stanzahandlerorders.h>
-#include <definations/archivehandlerorders.h>
-#include <definations/toolbargroups.h>
-#include <definations/optionvalues.h>
-#include <definations/optionnodes.h>
-#include <definations/optionwidgetorders.h>
-#include <definations/sessionnegotiatororders.h>
+#include <definitions/namespaces.h>
+#include <definitions/stanzahandlerorders.h>
+#include <definitions/archivehandlerorders.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/sessionnegotiatororders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ichatstates.h>
 #include <interfaces/ipresence.h>

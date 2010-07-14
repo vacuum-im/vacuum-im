@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <interfaces/imainwindow.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 
 class MainWindow :
 			public QMainWindow,

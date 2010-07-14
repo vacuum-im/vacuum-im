@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QCheckBox>
-#include <definations/optionvalues.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ifiletransfer.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>

@@ -1,11 +1,11 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include <definations/namespaces.h>
-#include <definations/discofeaturehandlerorders.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
-#include <definations/xmppurihandlerorders.h>
+#include <definitions/namespaces.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icommands.h>
 #include <interfaces/idataforms.h>

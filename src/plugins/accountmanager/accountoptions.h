@@ -2,8 +2,8 @@
 #define ACCOUNTOPTIONS_H
 
 #include <QWidget>
-#include <definations/version.h>
-#include <definations/optionvalues.h>
+#include <definitions/version.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/jid.h>

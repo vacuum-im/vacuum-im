@@ -2,8 +2,8 @@
 #define CLIENTINFODIALOG_H
 
 #include <QDialog>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/iclientinfo.h>
 #include <utils/iconstorage.h>
 #include "ui_clientinfodialog.h"

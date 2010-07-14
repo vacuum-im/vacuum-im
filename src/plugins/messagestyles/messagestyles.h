@@ -1,12 +1,12 @@
 #ifndef MESSAGESTYLES_H
 #define MESSAGESTYLES_H
 
-#include <definations/optionvalues.h>
-#include <definations/optionnodes.h>
-#include <definations/optionnodeorders.h>
-#include <definations/optionwidgetorders.h>
-#include <definations/vcardvaluenames.h>
-#include <definations/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagestyles.h>
 #include <interfaces/ioptionsmanager.h>

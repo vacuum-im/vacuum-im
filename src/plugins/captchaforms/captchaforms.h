@@ -1,12 +1,12 @@
 #ifndef CAPTCHAFORMS_H
 #define CAPTCHAFORMS_H
 
-#include <definations/namespaces.h>
-#include <definations/stanzahandlerorders.h>
-#include <definations/notificationdataroles.h>
-#include <definations/menuicons.h>
-#include <definations/resources.h>
-#include <definations/dataformtypes.h>
+#include <definitions/namespaces.h>
+#include <definitions/stanzahandlerorders.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/dataformtypes.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icaptchaforms.h>
 #include <interfaces/idataforms.h>

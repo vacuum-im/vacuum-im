@@ -2,10 +2,10 @@
 #define CONSOLEWIDGET_H
 
 #include <QWidget>
-#include <definations/optionvalues.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
-#include <definations/xmppstanzahandlerorders.h>
+#include <definitions/optionvalues.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>

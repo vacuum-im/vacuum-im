@@ -5,7 +5,7 @@
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QObjectCleanupHandler>
-#include <definations/namespaces.h>
+#include <definitions/namespaces.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/ibitsofbinary.h>

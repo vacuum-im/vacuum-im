@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QCheckBox>
-#include <definations/optionvalues.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/ioptionsmanager.h>

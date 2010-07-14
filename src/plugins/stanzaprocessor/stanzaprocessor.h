@@ -4,7 +4,7 @@
 #include <QTimer>
 #include <QMultiMap>
 #include <QDomDocument>
-#include <definations/xmppstanzahandlerorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>

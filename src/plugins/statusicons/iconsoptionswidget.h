@@ -2,8 +2,8 @@
 #define ICONSOPTIONSWIDGET_H
 
 #include <QItemDelegate>
-#include <definations/resources.h>
-#include <definations/optionvalues.h>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>

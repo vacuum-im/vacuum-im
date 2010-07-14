@@ -1,11 +1,11 @@
 #ifndef JABBERSEARCH_H
 #define JABBERSEARCH_H
 
-#include <definations/namespaces.h>
-#include <definations/discofeaturehandlerorders.h>
-#include <definations/dataformtypes.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/namespaces.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/dataformtypes.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ijabbersearch.h>
 #include <interfaces/idataforms.h>

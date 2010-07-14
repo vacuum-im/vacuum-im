@@ -4,15 +4,15 @@
 #define NORMALMESSAGEHANDLER_UUID "{8592e3c3-ef5e-42a9-91c9-faf1ed9a91cc}"
 
 #include <QMultiMap>
-#include <definations/messagehandlerorders.h>
-#include <definations/rosterindextyperole.h>
-#include <definations/rosterlabelorders.h>
-#include <definations/notificationdataroles.h>
-#include <definations/actiongroups.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
-#include <definations/soundfiles.h>
-#include <definations/xmppurihandlerorders.h>
+#include <definitions/messagehandlerorders.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/actiongroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/soundfiles.h>
+#include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>

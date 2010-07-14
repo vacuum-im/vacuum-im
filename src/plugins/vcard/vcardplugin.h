@@ -1,14 +1,14 @@
 #ifndef VCARDPLUGIN_H
 #define VCARDPLUGIN_H
 
-#include <definations/namespaces.h>
-#include <definations/actiongroups.h>
-#include <definations/rosterindextyperole.h>
-#include <definations/multiuserdataroles.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
-#include <definations/xmppurihandlerorders.h>
-#include <definations/toolbargroups.h>
+#include <definitions/namespaces.h>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/multiuserdataroles.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/xmppurihandlerorders.h>
+#include <definitions/toolbargroups.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ivcard.h>
 #include <interfaces/ixmppstreams.h>

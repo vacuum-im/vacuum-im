@@ -3,8 +3,8 @@
 
 #include <QDir>
 #include <QMap>
-#include <definations/namespaces.h>
-#include <definations/stanzahandlerorders.h>
+#include <definitions/namespaces.h>
+#include <definitions/stanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibitsofbinary.h>
 #include <interfaces/istanzaprocessor.h>

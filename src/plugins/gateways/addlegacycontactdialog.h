@@ -1,8 +1,8 @@
 #ifndef ADDLEGACYCONTACTDIALOG_H
 #define ADDLEGACYCONTACTDIALOG_H
 
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/igateways.h>
 #include <interfaces/irosterchanger.h>
 #include <utils/iconstorage.h>

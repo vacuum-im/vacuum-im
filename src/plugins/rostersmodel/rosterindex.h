@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QHash>
 #include <QMultiHash>
-#include <definations/rosterindextyperole.h>
+#include <definitions/rosterindextyperole.h>
 #include <interfaces/irostersmodel.h>
 
 class RosterIndex :

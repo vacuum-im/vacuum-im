@@ -5,7 +5,7 @@
 #include <QList>
 #include <QHash>
 #include <QAbstractItemModel>
-#include <definations/discoitemdataroles.h>
+#include <definitions/discoitemdataroles.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/idataforms.h>
 

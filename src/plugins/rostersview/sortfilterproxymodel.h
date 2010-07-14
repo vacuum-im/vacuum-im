@@ -2,8 +2,8 @@
 #define SORTFILTERPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include <definations/optionvalues.h>
-#include <definations/rosterindextyperole.h>
+#include <definitions/optionvalues.h>
+#include <definitions/rosterindextyperole.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
 #include <utils/options.h>

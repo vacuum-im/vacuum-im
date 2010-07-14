@@ -1,7 +1,7 @@
 #ifndef ROSTERSMODEL_H
 #define ROSTERSMODEL_H
 
-#include <definations/rosterindextyperole.h>
+#include <definitions/rosterindextyperole.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/iroster.h>

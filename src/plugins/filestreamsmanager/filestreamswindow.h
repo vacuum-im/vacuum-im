@@ -5,9 +5,9 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
-#include <definations/menuicons.h>
-#include <definations/resources.h>
-#include <definations/statusbargroups.h>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/statusbargroups.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <utils/toolbarchanger.h>
 #include <utils/statusbarchanger.h>

@@ -1,9 +1,9 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
 
-#include <definations/namespaces.h>
-#include <definations/xmppdatahandlerorders.h>
-#include <definations/xmppstanzahandlerorders.h>
+#include <definitions/namespaces.h>
+#include <definitions/xmppdatahandlerorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <zlib.h>
 

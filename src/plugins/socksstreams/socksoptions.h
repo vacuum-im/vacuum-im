@@ -2,7 +2,7 @@
 #define SOCKSOPTIONS_H
 
 #include <QWidget>
-#include <definations/optionvalues.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/isocksstreams.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/ioptionsmanager.h>

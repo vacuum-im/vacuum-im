@@ -1,7 +1,7 @@
 #ifndef MULTIUSER_H
 #define MULTIUSER_H
 
-#include <definations/multiuserdataroles.h>
+#include <definitions/multiuserdataroles.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ipresence.h>
 

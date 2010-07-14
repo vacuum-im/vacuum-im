@@ -3,7 +3,7 @@
 
 #include <QMap>
 #include <QWidget>
-#include <definations/optionvalues.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>

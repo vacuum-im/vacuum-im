@@ -2,7 +2,7 @@
 #define SELECTICONMENU_H
 
 #include <QVBoxLayout>
-#include <definations/resources.h>
+#include <definitions/resources.h>
 #include <utils/menu.h>
 #include <utils/iconstorage.h>
 #include "selecticonwidget.h"

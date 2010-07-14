@@ -2,11 +2,11 @@
 #define MAINWINDOWPLUGIN_H
 
 #include <QTime>
-#include <definations/actiongroups.h>
-#include <definations/version.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
-#include <definations/optionvalues.h>
+#include <definitions/actiongroups.h>
+#include <definitions/version.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/ioptionsmanager.h>

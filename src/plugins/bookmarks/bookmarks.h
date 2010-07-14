@@ -1,12 +1,12 @@
 #ifndef BOOKMARKS_H
 #define BOOKMARKS_H
 
-#include <definations/namespaces.h>
-#include <definations/actiongroups.h>
-#include <definations/toolbargroups.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
-#include <definations/discoitemdataroles.h>
+#include <definitions/namespaces.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/discoitemdataroles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibookmarks.h>
 #include <interfaces/iprivatestorage.h>

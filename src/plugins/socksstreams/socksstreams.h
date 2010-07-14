@@ -2,8 +2,8 @@
 #define SOCKSSTREAMS_H
 
 #include <QTcpServer>
-#include <definations/namespaces.h>
-#include <definations/optionvalues.h>
+#include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/isocksstreams.h>
 #include <interfaces/idatastreamsmanager.h>

@@ -2,12 +2,12 @@
 #define CONNECTIONMANAGER_H
 
 #include <QComboBox>
-#include <definations/optionvalues.h>
-#include <definations/optionnodes.h>
-#include <definations/optionwidgetorders.h>
-#include <definations/rosterlabelorders.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>

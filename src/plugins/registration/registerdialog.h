@@ -2,8 +2,8 @@
 #define REGISTERDIALOG_H
 
 #include <QDialog>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/idataforms.h>
 #include <utils/iconstorage.h>

@@ -1,7 +1,7 @@
 #ifndef PRIVATESTORAGE_H
 #define PRIVATESTORAGE_H
 
-#include <definations/namespaces.h>
+#include <definitions/namespaces.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/istanzaprocessor.h>

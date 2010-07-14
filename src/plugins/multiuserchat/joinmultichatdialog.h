@@ -1,8 +1,8 @@
 #ifndef JOINMULTICHATDIALOG_H
 #define JOINMULTICHATDIALOG_H
 
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ixmppstreams.h>
 #include "ui_joinmultichatdialog.h"
