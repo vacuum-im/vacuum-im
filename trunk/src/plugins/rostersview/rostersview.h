@@ -2,15 +2,15 @@
 #define ROSTERSVIEW_H
 
 #include <QTimer>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
-#include <definations/actiongroups.h>
-#include <definations/optionvalues.h>
-#include <definations/rostertooltiporders.h>
-#include <definations/rosterlabelorders.h>
-#include <definations/rosterindextyperole.h>
-#include <definations/rosterfootertextorders.h>
-#include <definations/rosterdragdropmimetypes.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/actiongroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterfootertextorders.h>
+#include <definitions/rosterdragdropmimetypes.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <utils/options.h>

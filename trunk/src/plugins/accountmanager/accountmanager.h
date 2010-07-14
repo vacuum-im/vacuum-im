@@ -2,14 +2,14 @@
 #define ACCOUNTMANAGER_H
 
 #include <QPointer>
-#include <definations/actiongroups.h>
-#include <definations/optionnodes.h>
-#include <definations/optionvalues.h>
-#include <definations/optionnodeorders.h>
-#include <definations/optionwidgetorders.h>
-#include <definations/rosterindextyperole.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/actiongroups.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>

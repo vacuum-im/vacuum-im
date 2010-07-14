@@ -1,7 +1,7 @@
 #ifndef VCARD_H
 #define VCARD_H
 
-#include <definations/namespaces.h>
+#include <definitions/namespaces.h>
 #include <interfaces/ivcard.h>
 
 #define VCARD_FILE_ROOT_TAGNAME         "VCard"

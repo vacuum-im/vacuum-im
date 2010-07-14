@@ -1,8 +1,8 @@
 #ifndef STARTTLSPLUGIN_H
 #define STARTTLSPLUGIN_H
 
-#include <definations/namespaces.h>
-#include <definations/xmppfeatureorders.h>
+#include <definitions/namespaces.h>
+#include <definitions/xmppfeatureorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/idefaultconnection.h>

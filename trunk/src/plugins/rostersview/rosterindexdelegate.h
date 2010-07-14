@@ -3,8 +3,8 @@
 
 #include <QStyle>
 #include <QAbstractItemDelegate>
-#include <definations/rosterlabelorders.h>
-#include <definations/rosterindextyperole.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/rosterindextyperole.h>
 #include <interfaces/irostersview.h>
 
 struct LabelItem

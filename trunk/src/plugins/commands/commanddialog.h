@@ -3,9 +3,9 @@
 
 #include <QDialog>
 #include <QPushButton>
-#include <definations/namespaces.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/namespaces.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/icommands.h>
 #include <interfaces/idataforms.h>
 #include "ui_commanddialog.h"

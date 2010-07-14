@@ -2,13 +2,13 @@
 #define ANNOTATIONS_H
 
 #include <QDomDocument>
-#include <definations/actiongroups.h>
-#include <definations/rosterlabelorders.h>
-#include <definations/rosterindextyperole.h>
-#include <definations/rosterdataholderorders.h>
-#include <definations/rostertooltiporders.h>
-#include <definations/menuicons.h>
-#include <definations/resources.h>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterdataholderorders.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iannotations.h>
 #include <interfaces/iroster.h>

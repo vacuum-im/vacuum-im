@@ -1,9 +1,9 @@
 #ifndef MULTIUSERCHAT_H
 #define MULTIUSERCHAT_H
 
-#include <definations/multiuserdataroles.h>
-#include <definations/namespaces.h>
-#include <definations/stanzahandlerorders.h>
+#include <definitions/multiuserdataroles.h>
+#include <definitions/namespaces.h>
+#include <definitions/stanzahandlerorders.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>

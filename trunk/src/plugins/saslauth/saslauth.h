@@ -1,8 +1,8 @@
 #ifndef SASLAUTH_H
 #define SASLAUTH_H
 
-#include <definations/namespaces.h>
-#include <definations/xmppstanzahandlerorders.h>
+#include <definitions/namespaces.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>

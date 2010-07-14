@@ -3,11 +3,11 @@
 
 #include <QTimer>
 #include <QDateTime>
-#include <definations/optionvalues.h>
-#include <definations/optionnodes.h>
-#include <definations/optionnodeorders.h>
-#include <definations/optionwidgetorders.h>
-#include <definations/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iautostatus.h>
 #include <interfaces/istatuschanger.h>

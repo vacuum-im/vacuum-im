@@ -2,7 +2,7 @@
 #define MESSENGEROPTIONS_H
 
 #include <QShortcut>
-#include <definations/optionvalues.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>

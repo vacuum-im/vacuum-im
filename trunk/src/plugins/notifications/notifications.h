@@ -3,15 +3,15 @@
 
 #include <QTimer>
 #include <QSound>
-#include <definations/notificationdataroles.h>
-#include <definations/actiongroups.h>
-#include <definations/toolbargroups.h>
-#include <definations/optionvalues.h>
-#include <definations/optionnodes.h>
-#include <definations/optionnodeorders.h>
-#include <definations/optionwidgetorders.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/irostersview.h>

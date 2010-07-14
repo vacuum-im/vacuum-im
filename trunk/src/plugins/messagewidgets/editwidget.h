@@ -2,9 +2,9 @@
 #define EDITWIDGET_H
 
 #include <QShortcut>
-#include <definations/optionvalues.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/imessagewidgets.h>
 #include <utils/options.h>
 #include "ui_editwidget.h"

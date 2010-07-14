@@ -3,7 +3,7 @@
 
 #include <QWaitCondition>
 #include <QReadWriteLock>
-#include <definations/namespaces.h>
+#include <definitions/namespaces.h>
 #include <interfaces/isocksstreams.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/istanzaprocessor.h>

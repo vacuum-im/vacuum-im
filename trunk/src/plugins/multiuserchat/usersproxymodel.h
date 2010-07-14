@@ -2,7 +2,7 @@
 #define USERSPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include <definations/multiuserdataroles.h>
+#include <definitions/multiuserdataroles.h>
 #include <interfaces/imultiuserchat.h>
 
 class UsersProxyModel :

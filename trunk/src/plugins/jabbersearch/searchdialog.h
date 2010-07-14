@@ -2,10 +2,10 @@
 #define SEARCHDIALOG_H
 
 #include <QDialog>
-#include <definations/namespaces.h>
-#include <definations/actiongroups.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/namespaces.h>
+#include <definitions/actiongroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ijabbersearch.h>
 #include <interfaces/idataforms.h>

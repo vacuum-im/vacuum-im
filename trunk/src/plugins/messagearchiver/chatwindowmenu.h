@@ -1,9 +1,9 @@
 #ifndef CHATWINDOWMENU_H
 #define CHATWINDOWMENU_H
 
-#include <definations/namespaces.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/namespaces.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/idataforms.h>

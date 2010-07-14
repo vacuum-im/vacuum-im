@@ -4,7 +4,7 @@
 #include <QFile>
 #include <QTimer>
 #include <QXmlStreamWriter>
-#include <definations/namespaces.h>
+#include <definitions/namespaces.h>
 #include <interfaces/imessagearchiver.h>
 #include <utils/message.h>
 #include <utils/datetime.h>

@@ -1,8 +1,8 @@
 #ifndef CHATWINDOW_H
 #define CHATWINDOW_H
 
-#include <definations/optionvalues.h>
-#include <definations/messagedataroles.h>
+#include <definitions/optionvalues.h>
+#include <definitions/messagedataroles.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istatuschanger.h>

@@ -1,16 +1,16 @@
 #ifndef REGISTRATION_H
 #define REGISTRATION_H
 
-#include <definations/namespaces.h>
-#include <definations/xmppfeatureorders.h>
-#include <definations/discofeaturehandlerorders.h>
-#include <definations/optionvalues.h>
-#include <definations/optionnodes.h>
-#include <definations/optionwidgetorders.h>
-#include <definations/dataformtypes.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
-#include <definations/xmppurihandlerorders.h>
+#include <definitions/namespaces.h>
+#include <definitions/xmppfeatureorders.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/dataformtypes.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/idataforms.h>

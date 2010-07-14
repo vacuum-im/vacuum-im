@@ -1,7 +1,7 @@
 #ifndef USERCONTEXTMENU_H
 #define USERCONTEXTMENU_H
 
-#include <definations/multiuserdataroles.h>
+#include <definitions/multiuserdataroles.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ipresence.h>
 #include <utils/menu.h>

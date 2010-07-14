@@ -4,7 +4,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
-#include <definations/viewurlhandlerorders.h>
+#include <definitions/viewurlhandlerorders.h>
 
 class XmppUriQueries :
 			public QObject,

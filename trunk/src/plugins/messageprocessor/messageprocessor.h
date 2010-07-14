@@ -1,8 +1,8 @@
 #ifndef MESSAGEPROCESSOR_H
 #define MESSAGEPROCESSOR_H
 
-#include <definations/messagedataroles.h>
-#include <definations/messagewriterorders.h>
+#include <definitions/messagedataroles.h>
+#include <definitions/messagewriterorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/ixmppstreams.h>

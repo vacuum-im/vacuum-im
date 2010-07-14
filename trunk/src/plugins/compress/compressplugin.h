@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QObjectCleanupHandler>
-#include <definations/namespaces.h>
-#include <definations/xmppfeatureorders.h>
+#include <definitions/namespaces.h>
+#include <definitions/xmppfeatureorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include "compression.h"

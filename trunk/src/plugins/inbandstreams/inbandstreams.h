@@ -1,8 +1,8 @@
 #ifndef INBANDSTREAMS_H
 #define INBANDSTREAMS_H
 
-#include <definations/namespaces.h>
-#include <definations/optionvalues.h>
+#include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iinbandstreams.h>
 #include <interfaces/idatastreamsmanager.h>

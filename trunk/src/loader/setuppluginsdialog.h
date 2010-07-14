@@ -3,8 +3,8 @@
 
 #include <QDialog>
 #include <QDomDocument>
-#include <definations/menuicons.h>
-#include <definations/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
 #include <interfaces/ipluginmanager.h>
 #include <utils/iconstorage.h>
 #include "ui_setuppluginsdialog.h"

@@ -2,7 +2,7 @@
 #define FILESTREAM_H
 
 #include <QFile>
-#include <definations/namespaces.h>
+#include <definitions/namespaces.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <utils/jid.h>

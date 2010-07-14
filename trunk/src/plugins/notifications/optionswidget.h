@@ -1,7 +1,7 @@
 #ifndef OPTIONSWIDGET_H
 #define OPTIONSWIDGET_H
 
-#include <definations/optionvalues.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>

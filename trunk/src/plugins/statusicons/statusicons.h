@@ -2,16 +2,16 @@
 #define STATUSICONS_H
 
 #include <QRegExp>
-#include <definations/resources.h>
-#include <definations/statusicons.h>
-#include <definations/optionvalues.h>
-#include <definations/optionnodes.h>
-#include <definations/optionnodeorders.h>
-#include <definations/optionwidgetorders.h>
-#include <definations/actiongroups.h>
-#include <definations/menuicons.h>
-#include <definations/rosterindextyperole.h>
-#include <definations/rosterdataholderorders.h>
+#include <definitions/resources.h>
+#include <definitions/statusicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/actiongroups.h>
+#include <definitions/menuicons.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterdataholderorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/iroster.h>

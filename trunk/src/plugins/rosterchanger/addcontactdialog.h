@@ -2,10 +2,10 @@
 #define ADDCONTACTDIALOG_H
 
 #include <QDialog>
-#include <definations/toolbargroups.h>
-#include <definations/vcardvaluenames.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/irosterchanger.h>

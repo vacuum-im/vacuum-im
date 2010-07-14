@@ -3,15 +3,15 @@
 
 #include <QSet>
 #include <QTimer>
-#include <definations/namespaces.h>
-#include <definations/actiongroups.h>
-#include <definations/toolbargroups.h>
-#include <definations/rosterindextyperole.h>
-#include <definations/discofeaturehandlerorders.h>
-#include <definations/vcardvaluenames.h>
-#include <definations/discoitemdataroles.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/namespaces.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/discoitemdataroles.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/igateways.h>
 #include <interfaces/istanzaprocessor.h>

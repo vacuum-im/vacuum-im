@@ -1,8 +1,8 @@
 #ifndef SIMPLEMESSAGESTYLEPLUGIN_H
 #define SIMPLEMESSAGESTYLEPLUGIN_H
 
-#include <definations/resources.h>
-#include <definations/optionvalues.h>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagestyles.h>
 #include <utils/message.h>

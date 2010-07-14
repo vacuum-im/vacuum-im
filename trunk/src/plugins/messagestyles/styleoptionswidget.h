@@ -1,7 +1,7 @@
 #ifndef STYLEOPTIONSWIDGET_H
 #define STYLEOPTIONSWIDGET_H
 
-#include <definations/optionvalues.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/imessagestyles.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/ipresence.h>

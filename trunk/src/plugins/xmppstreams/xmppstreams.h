@@ -2,7 +2,7 @@
 #define XMPPSTREAMS_H
 
 #include <QMultiMap>
-#include <definations/namespaces.h>
+#include <definitions/namespaces.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <utils/errorhandler.h>

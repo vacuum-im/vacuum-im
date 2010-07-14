@@ -4,8 +4,8 @@
 #include <QIcon>
 #include <QDialog>
 #include <QItemDelegate>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ipresence.h>
 #include <utils/iconstorage.h>

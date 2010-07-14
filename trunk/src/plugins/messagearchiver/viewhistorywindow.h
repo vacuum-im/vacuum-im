@@ -3,12 +3,12 @@
 
 #include <QTimer>
 #include <QSortFilterProxyModel>
-#include <definations/namespaces.h>
-#include <definations/archiveindextyperole.h>
-#include <definations/actiongroups.h>
-#include <definations/toolbargroups.h>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/namespaces.h>
+#include <definitions/archiveindextyperole.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/imessagewidgets.h>

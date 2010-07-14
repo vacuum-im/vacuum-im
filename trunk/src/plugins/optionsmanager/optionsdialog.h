@@ -4,8 +4,8 @@
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <QObjectCleanupHandler>
-#include <definations/resources.h>
-#include <definations/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 #include <utils/iconstorage.h>

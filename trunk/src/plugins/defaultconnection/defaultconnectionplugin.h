@@ -2,7 +2,7 @@
 #define DEFAULTCONNECTIONPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include <definations/optionvalues.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
