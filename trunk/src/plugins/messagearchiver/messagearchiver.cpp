@@ -33,11 +33,15 @@
 #define ADR_FILTER_END        Action::DR_Parametr3
 #define ADR_GROUP_KIND        Action::DR_Parametr4
 
-#define AVN_REPLICATION       "archiveReplication"
-
 #define SFP_LOGGING           "logging"
 #define SFV_MAY_LOGGING       "may"
 #define SFV_MUSTNOT_LOGGING   "mustnot"
+
+#define NS_ARCHIVE_OLD        "http://www.xmpp.org/extensions/xep-0136.html#ns"
+#define NS_ARCHIVE_OLD_AUTO   "http://www.xmpp.org/extensions/xep-0136.html#ns-auto"
+#define NS_ARCHIVE_OLD_MANAGE "http://www.xmpp.org/extensions/xep-0136.html#ns-manage"
+#define NS_ARCHIVE_OLD_MANUAL "http://www.xmpp.org/extensions/xep-0136.html#ns-manual"
+#define NS_ARCHIVE_OLD_PREF   "http://www.xmpp.org/extensions/xep-0136.html#ns-pref"
 
 MessageArchiver::MessageArchiver()
 {
@@ -68,6 +72,7 @@ void MessageArchiver::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
+	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
@@ -186,7 +191,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		}
 	}
 
-	return FStanzaProcessor!=NULL;
+	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool MessageArchiver::initObjects()
@@ -511,7 +516,11 @@ int MessageArchiver::sessionInit(const IStanzaSession &ASession, IDataForm &AReq
 	IArchiveItemPrefs itemPrefs = archiveItemPrefs(ASession.streamJid,ASession.contactJid);
 	int result = itemPrefs.otr!=ARCHIVE_OTR_REQUIRE ? ISessionNegotiator::Skip : ISessionNegotiator::Cancel;
 
-	if (FDataForms)
+	if (!isSupported(ASession.streamJid,NS_ARCHIVE_PREF) && isAutoArchiving(ASession.streamJid))
+	{
+		return result;
+	}
+	else if (FDataForms)
 	{
 		IDataField logging;
 		logging.var = SFP_LOGGING;
@@ -715,19 +724,19 @@ bool MessageArchiver::isReady(const Jid &AStreamJid) const
 	return FArchivePrefs.contains(AStreamJid);
 }
 
-bool MessageArchiver::isSupported(const Jid &AStreamJid) const
+bool MessageArchiver::isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const
 {
-	return isReady(AStreamJid) && !FInStoragePrefs.contains(AStreamJid);
+	return isReady(AStreamJid) && FFeatures.value(AStreamJid).contains(AFeatureNS);
 }
 
 bool MessageArchiver::isAutoArchiving(const Jid &AStreamJid) const
 {
-	return isSupported(AStreamJid) && FArchivePrefs.value(AStreamJid).autoSave;
+	return isSupported(AStreamJid,NS_ARCHIVE_AUTO) && FArchivePrefs.value(AStreamJid).autoSave;
 }
 
 bool MessageArchiver::isManualArchiving(const Jid &AStreamJid) const
 {
-	if (isSupported(AStreamJid) && !isAutoArchiving(AStreamJid))
+	if (isSupported(AStreamJid,NS_ARCHIVE_MANUAL) && !isAutoArchiving(AStreamJid))
 	{
 		IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
 		return prefs.methodManual != ARCHIVE_METHOD_FORBID;
@@ -875,7 +884,7 @@ IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const
 
 QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto)
 {
-	if (isSupported(AStreamJid))
+	if (isSupported(AStreamJid,NS_ARCHIVE_AUTO))
 	{
 		Stanza autoSave("iq");
 		autoSave.setType("set").setId(FStanzaProcessor->newId());
@@ -1006,7 +1015,7 @@ QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid
 {
 	if (isReady(AStreamJid) && archivePrefs(AStreamJid).itemPrefs.contains(AItemJid))
 	{
-		if (isSupported(AStreamJid))
+		if (isSupported(AStreamJid,NS_ARCHIVE_PREF))
 		{
 			Stanza remove("iq");
 			remove.setType("set").setId(FStanzaProcessor->newId());
@@ -1034,7 +1043,7 @@ IArchiveWindow *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const 
 	ViewHistoryWindow *window = FArchiveWindows.value(AStreamJid);
 	if (!window)
 	{
-		window = new ViewHistoryWindow(this,AStreamJid,AParent);
+		window = new ViewHistoryWindow(this,FPluginManager,AStreamJid,AParent);
 		connect(window,SIGNAL(windowDestroyed(IArchiveWindow *)),SLOT(onArchiveWindowDestroyed(IArchiveWindow *)));
 		FArchiveWindows.insert(AStreamJid,window);
 		emit archiveWindowCreated(window);
@@ -1314,7 +1323,7 @@ QDateTime MessageArchiver::replicationPoint(const Jid &AStreamJid) const
 
 bool MessageArchiver::isReplicationEnabled(const Jid &AStreamJid) const
 {
-	if (isSupported(AStreamJid))
+	if (isSupported(AStreamJid,NS_ARCHIVE_MANAGE))
 	{
 		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
 		if (account)
@@ -1335,7 +1344,7 @@ void MessageArchiver::setReplicationEnabled(const Jid &AStreamJid, bool AEnabled
 
 QString MessageArchiver::saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
 {
-	if (FStanzaProcessor && isSupported(AStreamJid) && ACollection.header.with.isValid() && ACollection.header.start.isValid())
+	if (FStanzaProcessor && isSupported(AStreamJid,NS_ARCHIVE_MANUAL) && ACollection.header.with.isValid() && ACollection.header.start.isValid())
 	{
 		Stanza save("iq");
 		save.setType("set").setId(FStanzaProcessor->newId());
@@ -1352,7 +1361,7 @@ QString MessageArchiver::saveServerCollection(const Jid &AStreamJid, const IArch
 
 QString MessageArchiver::loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter)
 {
-	if (FStanzaProcessor && isSupported(AStreamJid))
+	if (FStanzaProcessor && isSupported(AStreamJid,NS_ARCHIVE_MANAGE))
 	{
 		Stanza request("iq");
 		request.setType("get").setId(FStanzaProcessor->newId());
@@ -1378,7 +1387,7 @@ QString MessageArchiver::loadServerHeaders(const Jid AStreamJid, const IArchiveR
 
 QString MessageArchiver::loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter)
 {
-	if (FStanzaProcessor && isSupported(AStreamJid) && AHeader.with.isValid() && AHeader.start.isValid())
+	if (FStanzaProcessor && isSupported(AStreamJid,NS_ARCHIVE_MANAGE) && AHeader.with.isValid() && AHeader.start.isValid())
 	{
 		Stanza retrieve("iq");
 		retrieve.setType("get").setId(FStanzaProcessor->newId());
@@ -1400,7 +1409,7 @@ QString MessageArchiver::loadServerCollection(const Jid AStreamJid, const IArchi
 
 QString MessageArchiver::removeServerCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened)
 {
-	if (FStanzaProcessor && isSupported(AStreamJid))
+	if (FStanzaProcessor && isSupported(AStreamJid,NS_ARCHIVE_MANAGE))
 	{
 		Stanza remove("iq");
 		remove.setType("set").setId(FStanzaProcessor->newId());
@@ -1424,7 +1433,7 @@ QString MessageArchiver::removeServerCollections(const Jid &AStreamJid, const IA
 
 QString MessageArchiver::loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter)
 {
-	if (FStanzaProcessor && isSupported(AStreamJid) && AStart.isValid() && ACount > 0)
+	if (FStanzaProcessor && isSupported(AStreamJid,NS_ARCHIVE_MANAGE) && AStart.isValid() && ACount > 0)
 	{
 		Stanza modify("iq");
 		modify.setType("get").setId(FStanzaProcessor->newId());
@@ -1448,16 +1457,17 @@ QString MessageArchiver::loadServerModifications(const Jid &AStreamJid, const QD
 
 QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
 {
-	if (FStanzaProcessor)
+	Stanza load("iq");
+	load.setType("get").setId(FStanzaProcessor!=NULL ? FStanzaProcessor->newId() : QString::null);
+	load.addElement("pref",FNamespaces.value(AStreamJid));
+	if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,ARCHIVE_TIMEOUT))
 	{
-		Stanza load("iq");
-		load.setType("get").setId(FStanzaProcessor->newId());
-		load.addElement("pref",FNamespaces.value(AStreamJid));
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,ARCHIVE_TIMEOUT))
-		{
-			FPrefsLoadRequests.insert(load.id(),AStreamJid);
-			return load.id();
-		}
+		FPrefsLoadRequests.insert(load.id(),AStreamJid);
+		return load.id();
+	}
+	else
+	{
+		applyArchivePrefs(AStreamJid,QDomElement());
 	}
 	return QString::null;
 }
@@ -1467,23 +1477,17 @@ QString MessageArchiver::loadStoragePrefs(const Jid &AStreamJid)
 	QString requestId = FPrivateStorage!=NULL ? FPrivateStorage->loadData(AStreamJid,"pref",NS_ARCHIVE) : QString::null;
 	if (!requestId.isEmpty())
 		FPrefsLoadRequests.insert(requestId,AStreamJid);
+	else
+		applyArchivePrefs(AStreamJid,QDomElement());
 	return requestId;
 }
 
 void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement &AElem)
 {
-	if (!AElem.hasChildNodes() && !isReady(AStreamJid) && !FInStoragePrefs.contains(AStreamJid))
+	if (!isReady(AStreamJid) && !AElem.hasChildNodes() && !FInStoragePrefs.contains(AStreamJid))
 	{
-		if (FNamespaces.value(AStreamJid) == NS_ARCHIVE)
-		{
-			FNamespaces.insert(AStreamJid,NS_ARCHIVE_OLD);
-			loadServerPrefs(AStreamJid);
-		}
-		else
-		{
-			FInStoragePrefs.append(AStreamJid);
-			loadStoragePrefs(AStreamJid);
-		}
+		FInStoragePrefs.append(AStreamJid);
+		loadStoragePrefs(AStreamJid);
 	}
 	else
 	{
@@ -1495,7 +1499,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 		if (initPrefs)
 		{
 			IArchiveStreamPrefs defPrefs;
-			defPrefs.autoSave = false;
+			defPrefs.autoSave = true;
 			defPrefs.methodAuto = ARCHIVE_METHOD_CONCEDE;
 			defPrefs.methodLocal = ARCHIVE_METHOD_CONCEDE;
 			defPrefs.methodManual = ARCHIVE_METHOD_CONCEDE;
@@ -1511,7 +1515,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 		QDomElement autoElem = AElem.firstChildElement("auto");
 		if (!autoElem.isNull())
 		{
-			prefs.autoSave = QVariant(autoElem.attribute("save","false")).toBool();
+			prefs.autoSave = QVariant(autoElem.attribute("save","true")).toBool();
 		}
 
 		QDomElement defElem = AElem.firstChildElement("default");
@@ -1902,7 +1906,7 @@ bool MessageArchiver::saveLocalModofication(const Jid &AStreamJid, const IArchiv
 
 Replicator *MessageArchiver::insertReplicator(const Jid &AStreamJid)
 {
-	if (isSupported(AStreamJid) && !FReplicators.contains(AStreamJid))
+	if (isSupported(AStreamJid,NS_ARCHIVE_MANAGE) && !FReplicators.contains(AStreamJid))
 	{
 		QString dirPath = collectionDirPath(AStreamJid,Jid());
 		if (AStreamJid.isValid() && !dirPath.isEmpty())
@@ -2016,7 +2020,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
 
 	if (isReady(AStreamJid))
 	{
-		if (isStreamMenu && isSupported(AStreamJid))
+		if (isStreamMenu && isSupported(AStreamJid,NS_ARCHIVE_PREF))
 		{
 			IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
 			Menu *autoMenu = new Menu(menu);
@@ -2290,11 +2294,6 @@ void MessageArchiver::registerDiscoFeatures()
 	FDiscovery->insertDiscoFeature(dfeature);
 	dfeature.var = NS_ARCHIVE_OLD_PREF;
 	FDiscovery->insertDiscoFeature(dfeature);
-
-	dfeature.var = NS_ARCHIVE_ENCRYPT;
-	dfeature.name = tr("Encrypted Messages Archiving");
-	dfeature.description = tr("Supports the archiving of the encrypted messages");
-	FDiscovery->insertDiscoFeature(dfeature);
 }
 
 void MessageArchiver::notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const
@@ -2527,8 +2526,11 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
 		FSHIMessageBlocks.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 	}
 
-	FNamespaces.insert(AXmppStream->streamJid(),NS_ARCHIVE);
-	loadServerPrefs(AXmppStream->streamJid());
+	if (!FDiscovery || !FDiscovery->requestDiscoInfo(AXmppStream->streamJid(),AXmppStream->streamJid().domain()))
+	{
+		FInStoragePrefs.append(AXmppStream->streamJid());
+		loadStoragePrefs(AXmppStream->streamJid());
+	}
 }
 
 void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
@@ -2543,8 +2545,10 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 	removeReplicator(AXmppStream->streamJid());
 	closeHistoryOptionsNode(AXmppStream->streamJid());
 	qDeleteAll(FCollectionWriters.take(AXmppStream->streamJid()));
+	FFeatures.remove(AXmppStream->streamJid());
 	FNamespaces.remove(AXmppStream->streamJid());
 	FArchivePrefs.remove(AXmppStream->streamJid());
+	FInStoragePrefs.removeAll(AXmppStream->streamJid());
 	FInStoragePrefs.removeAt(FInStoragePrefs.indexOf(AXmppStream->streamJid()));
 	FSessions.remove(AXmppStream->streamJid());
 	FPendingMessages.remove(AXmppStream->streamJid());
@@ -2569,8 +2573,9 @@ void MessageArchiver::onAccountOptionsChanged(IAccount *AAccount, const OptionsN
 	}
 }
 
-void MessageArchiver::onStreamJidChanged(IXmppStream * /*AXmppStream*/, const Jid &ABefour)
+void MessageArchiver::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
 {
+	Q_UNUSED(AXmppStream);
 	if (FArchiveWindows.contains(ABefour))
 		delete FArchiveWindows.take(ABefour);
 }
@@ -2749,12 +2754,43 @@ void MessageArchiver::onArchiveWindowDestroyed(IArchiveWindow *AWindow)
 	emit archiveWindowDestroyed(AWindow);
 }
 
-void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
+void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
-	if (ADiscoInfo.node.isEmpty() && ADiscoInfo.contactJid.node().isEmpty() &&  ADiscoInfo.contactJid.resource().isEmpty() &&
-	    !FGatewayTypes.contains(ADiscoInfo.contactJid))
+	if (!FNamespaces.contains(AInfo.streamJid) && !FInStoragePrefs.contains(AInfo.streamJid) && AInfo.node.isEmpty() && AInfo.streamJid.pDomain()==AInfo.contactJid.pFull())
 	{
-		foreach(IDiscoIdentity identity, ADiscoInfo.identity)
+		QList<QString> &features = FFeatures[AInfo.streamJid];
+		foreach(QString feature, AInfo.features)
+		{
+			if (feature==NS_ARCHIVE || feature==NS_ARCHIVE_OLD)
+				features.append(NS_ARCHIVE);
+			else if (feature==NS_ARCHIVE_AUTO || feature==NS_ARCHIVE_OLD_AUTO)
+				features.append(NS_ARCHIVE_AUTO);
+			else if (feature==NS_ARCHIVE_MANAGE || feature==NS_ARCHIVE_OLD_MANAGE)
+				features.append(NS_ARCHIVE_MANAGE);
+			else if (feature==NS_ARCHIVE_MANUAL || feature==NS_ARCHIVE_OLD_MANUAL)
+				features.append(NS_ARCHIVE_MANUAL);
+			else if (feature==NS_ARCHIVE_PREF || feature==NS_ARCHIVE_OLD_PREF)
+				features.append(NS_ARCHIVE_PREF);
+		}
+
+		if (!features.isEmpty() && !AInfo.features.contains(features.first()))
+			FNamespaces.insert(AInfo.streamJid, NS_ARCHIVE_OLD);
+		else
+			FNamespaces.insert(AInfo.streamJid, NS_ARCHIVE);
+
+		if (features.contains(NS_ARCHIVE_PREF))
+		{
+			loadServerPrefs(AInfo.streamJid);
+		}
+		else
+		{
+			FInStoragePrefs.append(AInfo.streamJid);
+			loadStoragePrefs(AInfo.streamJid);
+		}
+	}
+	else if (AInfo.node.isEmpty() && AInfo.contactJid.node().isEmpty() &&  AInfo.contactJid.resource().isEmpty() && !FGatewayTypes.contains(AInfo.contactJid))
+	{
+		foreach(IDiscoIdentity identity, AInfo.identity)
 		{
 			if (identity.category==CATEGORY_GATEWAY && !identity.type.isEmpty())
 			{
@@ -2763,13 +2799,13 @@ void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 				if (!dirPath.isEmpty() && gateways.open(QFile::WriteOnly|QFile::Append|QFile::Text))
 				{
 					QStringList gateway;
-					gateway << ADiscoInfo.contactJid.pDomain();
+					gateway << AInfo.contactJid.pDomain();
 					gateway << identity.type;
 					gateway << "\n";
 					gateways.write(gateway.join(" ").toUtf8());
 					gateways.close();
 				}
-				FGatewayTypes.insert(ADiscoInfo.contactJid,identity.type);
+				FGatewayTypes.insert(AInfo.contactJid,identity.type);
 				break;
 			}
 		}
@@ -2811,7 +2847,7 @@ void MessageArchiver::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 		viewButton->setMenu(setupMenu);
 		connect(setupMenu,SIGNAL(aboutToShow()),SLOT(onToolBarSettingsMenuAboutToShow()));
 
-		ChatWindowMenu *chatMenu = new ChatWindowMenu(this,AWidget,AWidget->toolBarChanger()->toolBar());
+		ChatWindowMenu *chatMenu = new ChatWindowMenu(this,FPluginManager,AWidget,AWidget->toolBarChanger()->toolBar());
 		QToolButton *chatButton = AWidget->toolBarChanger()->insertAction(chatMenu->menuAction(), TBG_MWTBW_ARCHIVE_SETTINGS);
 		chatButton->setPopupMode(QToolButton::InstantPopup);
 	}

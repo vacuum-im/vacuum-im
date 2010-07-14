@@ -3,6 +3,7 @@
 
 #include <QTimer>
 #include <QSortFilterProxyModel>
+#include <definations/namespaces.h>
 #include <definations/archiveindextyperole.h>
 #include <definations/actiongroups.h>
 #include <definations/toolbargroups.h>
@@ -45,7 +46,7 @@ class ViewHistoryWindow :
 	Q_OBJECT;
 	Q_INTERFACES(IArchiveWindow);
 public:
-	ViewHistoryWindow(IMessageArchiver *AArchiver, const Jid &AStreamJid, QWidget *AParent = NULL);
+	ViewHistoryWindow(IMessageArchiver *AArchiver, IPluginManager *APluginManager, const Jid &AStreamJid, QWidget *AParent = NULL);
 	~ViewHistoryWindow();
 	virtual QMainWindow *instance() { return this; }
 	virtual const Jid &streamJid() const { return FStreamJid; }
@@ -71,7 +72,7 @@ signals:
 	void itemDestroyed(QStandardItem *AItem);
 	void windowDestroyed(IArchiveWindow *AWindow);
 protected:
-	void initialize();
+	void initialize(IPluginManager *APluginManager);
 	QList<IArchiveHeader> indexHeaders(const QModelIndex &AIndex) const;
 	QList<IArchiveRequest> createRequests(const IArchiveFilter &AFilter) const;
 	void divideRequests(const QList<IArchiveRequest> &ARequests, QList<IArchiveRequest> &ALocal, QList<IArchiveRequest> &AServer) const;

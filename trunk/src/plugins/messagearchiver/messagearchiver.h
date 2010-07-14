@@ -84,9 +84,8 @@ public:
 	virtual int sessionApply(const IStanzaSession &ASession);
 	virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm);
 	//IMessageArchiver
-	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual bool isReady(const Jid &AStreamJid) const;
-	virtual bool isSupported(const Jid &AStreamJid) const;
+	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const;
 	virtual bool isAutoArchiving(const Jid &AStreamJid) const;
 	virtual bool isManualArchiving(const Jid &AStreamJid) const;
 	virtual bool isLocalArchiving(const Jid &AStreamJid) const;
@@ -200,7 +199,7 @@ protected slots:
 	void onRemoveItemPrefsAction(bool);
 	void onArchiveHandlerDestroyed(QObject *AHandler);
 	void onArchiveWindowDestroyed(IArchiveWindow *AWindow);
-	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
+	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
 	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
@@ -239,6 +238,7 @@ private:
 private:
 	QList<Jid> FInStoragePrefs;
 	QMap<Jid,QString> FNamespaces;
+	QMap<Jid,QList<QString> > FFeatures;
 	QMap<Jid,IArchiveStreamPrefs> FArchivePrefs;
 	QMap<Jid,Replicator *> FReplicators;
 	QMap<Jid,ViewHistoryWindow *> FArchiveWindows;

@@ -122,6 +122,10 @@
         <source>Expire Time, days:</source>
         <translation>Хранить, дней:</translation>
     </message>
+    <message>
+        <source>Auto Archiving Preferences</source>
+        <translation>Настройки авто-сохранения</translation>
+    </message>
 </context>
 <context>
     <name>ChatWindowMenu</name>
@@ -335,14 +339,6 @@
     <message>
         <source>Supports the storing of the archive preferences</source>
         <translation>Поддерживает хранение настроек архива сообщений</translation>
-    </message>
-    <message>
-        <source>Encrypted Messages Archiving</source>
-        <translation>Архивирование зашифрованных сообщений</translation>
-    </message>
-    <message>
-        <source>Supports the archiving of the encrypted messages</source>
-        <translation>Поддерживает архивирование зашифрованных сообщений</translation>
     </message>
     <message>
         <source>Messages Archive Preferences</source>

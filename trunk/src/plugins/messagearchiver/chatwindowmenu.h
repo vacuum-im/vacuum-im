@@ -16,10 +16,10 @@ class ChatWindowMenu :
 {
 	Q_OBJECT;
 public:
-	ChatWindowMenu(IMessageArchiver *AArchiver, IToolBarWidget *AToolBarWidget, QWidget *AParent);
+	ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APluginManager, IToolBarWidget *AToolBarWidget, QWidget *AParent);
 	~ChatWindowMenu();
 protected:
-	void initialize();
+	void initialize(IPluginManager *APluginManager);
 	void createActions();
 protected slots:
 	void onActionTriggered(bool);

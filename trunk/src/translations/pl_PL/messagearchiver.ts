@@ -122,6 +122,10 @@
         <source>Expire Time, days:</source>
         <translation>Chroń, dni:</translation>
     </message>
+    <message>
+        <source>Auto Archiving Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChatWindowMenu</name>
@@ -335,14 +339,6 @@
     <message>
         <source>Supports the storing of the archive preferences</source>
         <translation>Obsługa przechowywania ustawień zapisu historii</translation>
-    </message>
-    <message>
-        <source>Encrypted Messages Archiving</source>
-        <translation>Archiwizacja zaszyfrowanych wiadomości</translation>
-    </message>
-    <message>
-        <source>Supports the archiving of the encrypted messages</source>
-        <translation>Obsługa archiwizacji zaszyfrowanych wiadomości</translation>
     </message>
     <message>
         <source>Messages Archive Preferences</source>
