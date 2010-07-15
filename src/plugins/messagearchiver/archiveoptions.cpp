@@ -274,26 +274,18 @@ void ArchiveOptions::reset()
 
 void ArchiveOptions::updateWidget()
 {
-	if (!FSaveRequests.isEmpty())
-	{
-		ui.grbMethod->setEnabled(false);
-		ui.grbAuto->setEnabled(false);
-		ui.grbDefault->setEnabled(false);
-		ui.grbIndividual->setEnabled(false);
-		ui.lblStatus->setVisible(true);
+	bool requesting = !FSaveRequests.isEmpty();
+
+	ui.grbMethod->setEnabled(!requesting);
+	ui.grbAuto->setEnabled(!requesting);
+	ui.grbDefault->setEnabled(!requesting && FArchiver->isArchivePrefsEnabled(FStreamJid));
+	ui.grbIndividual->setEnabled(!requesting && FArchiver->isArchivePrefsEnabled(FStreamJid));
+
+	if (requesting)
 		ui.lblStatus->setText(tr("Waiting for host response..."));
-	}
-	else
-	{
-		ui.grbMethod->setEnabled(true);
-		ui.grbAuto->setEnabled(true);
-		ui.grbDefault->setEnabled(true);
-		ui.grbIndividual->setEnabled(true);
-		if (!FLastError.isEmpty())
-			ui.lblStatus->setText(tr("Error received: %1").arg(FLastError));
-		else
-			ui.lblStatus->setVisible(false);
-	}
+	else if (!FLastError.isEmpty())
+		ui.lblStatus->setText(tr("Error received: %1").arg(FLastError));
+	ui.lblStatus->setVisible(requesting || !FLastError.isEmpty());
 }
 
 void ArchiveOptions::updateColumnsSize()
@@ -332,6 +324,7 @@ void ArchiveOptions::onArchiveAutoSaveChanged(const Jid &AStreamJid, bool AAutoS
 	if (AStreamJid == FStreamJid)
 	{
 		ui.chbAutoSave->setChecked(AAutoSave);
+		updateWidget();
 	}
 }
 
@@ -339,8 +332,9 @@ void ArchiveOptions::onArchivePrefsChanged(const Jid &AStreamJid, const IArchive
 {
 	if (AStreamJid == FStreamJid)
 	{
-		onArchiveAutoSaveChanged(AStreamJid,APrefs.autoSave);
+		onArchiveAutoSaveChanged(FStreamJid,APrefs.autoSave);
 		ui.grbAuto->setVisible(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_AUTO));
+		ui.chbReplication->setEnabled(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_MANAGE));
 
 		ui.cmbMethodLocal->setCurrentIndex(ui.cmbMethodLocal->findData(APrefs.methodLocal));
 		ui.cmbMethodAuto->setCurrentIndex(ui.cmbMethodAuto->findData(APrefs.methodAuto));
@@ -350,6 +344,8 @@ void ArchiveOptions::onArchivePrefsChanged(const Jid &AStreamJid, const IArchive
 		ui.cmbModeOTR->setCurrentIndex(ui.cmbModeOTR->findData(APrefs.defaultPrefs.otr));
 		ui.cmbModeSave->setCurrentIndex(ui.cmbModeSave->findData(APrefs.defaultPrefs.save));
 		ui.cmbExpireTime->lineEdit()->setText(QString::number(APrefs.defaultPrefs.expire/ONE_DAY));
+
+		updateWidget();
 	}
 }
 
