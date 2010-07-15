@@ -85,6 +85,7 @@ public:
 	virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm);
 	//IMessageArchiver
 	virtual bool isReady(const Jid &AStreamJid) const;
+	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const;
 	virtual bool isAutoArchiving(const Jid &AStreamJid) const;
 	virtual bool isManualArchiving(const Jid &AStreamJid) const;

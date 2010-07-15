@@ -164,12 +164,13 @@ void ChatWindowMenu::onActionTriggered(bool)
 	}
 }
 
-void ChatWindowMenu::onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &/*APrefs*/)
+void ChatWindowMenu::onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
 {
+	Q_UNUSED(APrefs);
 	if (FEditWidget->streamJid() == AStreamJid)
 	{
-		bool logEnabled = false;
-		if (FArchiver->isReady(AStreamJid))
+		bool logEnabled = FArchiver->isAutoArchiving(AStreamJid);
+		if (FArchiver->isArchivePrefsEnabled(AStreamJid))
 		{
 			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(AStreamJid,FEditWidget->contactJid());
 			logEnabled = iprefs.save!=ARCHIVE_SAVE_FALSE;

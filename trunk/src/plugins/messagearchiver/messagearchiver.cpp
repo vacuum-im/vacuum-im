@@ -306,6 +306,12 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		{
 			bool autoSave = FPrefsAutoRequests.value(AStanza.id());
 			FArchivePrefs[AStreamJid].autoSave = autoSave;
+			
+			if (!isArchivePrefsEnabled(AStreamJid))
+				applyArchivePrefs(AStreamJid,QDomElement());
+			else if (!isSupported(AStreamJid,NS_ARCHIVE_PREF))
+				loadStoragePrefs(AStreamJid);
+
 			emit archiveAutoSaveChanged(AStreamJid,autoSave);
 		}
 		FPrefsAutoRequests.remove(AStanza.id());
@@ -516,11 +522,7 @@ int MessageArchiver::sessionInit(const IStanzaSession &ASession, IDataForm &AReq
 	IArchiveItemPrefs itemPrefs = archiveItemPrefs(ASession.streamJid,ASession.contactJid);
 	int result = itemPrefs.otr!=ARCHIVE_OTR_REQUIRE ? ISessionNegotiator::Skip : ISessionNegotiator::Cancel;
 
-	if (!isSupported(ASession.streamJid,NS_ARCHIVE_PREF) && isAutoArchiving(ASession.streamJid))
-	{
-		return result;
-	}
-	else if (FDataForms)
+	if (FDataForms && isArchivePrefsEnabled(ASession.streamJid))
 	{
 		IDataField logging;
 		logging.var = SFP_LOGGING;
@@ -724,6 +726,11 @@ bool MessageArchiver::isReady(const Jid &AStreamJid) const
 	return FArchivePrefs.contains(AStreamJid);
 }
 
+bool MessageArchiver::isArchivePrefsEnabled(const Jid &AStreamJid) const
+{
+	return isReady(AStreamJid) && (isSupported(AStreamJid,NS_ARCHIVE_PREF) || !isAutoArchiving(AStreamJid));
+}
+
 bool MessageArchiver::isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const
 {
 	return isReady(AStreamJid) && FFeatures.value(AStreamJid).contains(AFeatureNS);
@@ -731,7 +738,7 @@ bool MessageArchiver::isSupported(const Jid &AStreamJid, const QString &AFeature
 
 bool MessageArchiver::isAutoArchiving(const Jid &AStreamJid) const
 {
-	return isSupported(AStreamJid,NS_ARCHIVE_AUTO) && FArchivePrefs.value(AStreamJid).autoSave;
+	return isSupported(AStreamJid,NS_ARCHIVE_AUTO) && archivePrefs(AStreamJid).autoSave;
 }
 
 bool MessageArchiver::isManualArchiving(const Jid &AStreamJid) const
@@ -749,7 +756,7 @@ bool MessageArchiver::isLocalArchiving(const Jid &AStreamJid) const
 	if (isReady(AStreamJid) && !isAutoArchiving(AStreamJid))
 	{
 		IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
-		return prefs.methodLocal!=ARCHIVE_METHOD_FORBID;
+		return prefs.methodLocal != ARCHIVE_METHOD_FORBID;
 	}
 	return false;
 }
@@ -759,7 +766,7 @@ bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AItem
 	if (isReady(AStreamJid) && AItemJid.isValid())
 	{
 		IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid, AMessageType!=Message::GroupChat ? AItemJid : AItemJid.bare());
-		return itemPrefs.save!=ARCHIVE_SAVE_FALSE;
+		return itemPrefs.save != ARCHIVE_SAVE_FALSE;
 	}
 	return false;
 }
@@ -845,7 +852,7 @@ IArchiveStreamPrefs MessageArchiver::archivePrefs(const Jid &AStreamJid) const
 IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const
 {
 	IArchiveItemPrefs domainPrefs, barePrefs, fullPrefs;
-	IArchiveStreamPrefs prefs = FArchivePrefs.value(AStreamJid);
+	IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
 	QHash<Jid, IArchiveItemPrefs>::const_iterator it = prefs.itemPrefs.constBegin();
 	while (it != prefs.itemPrefs.constEnd())
 	{
@@ -901,7 +908,7 @@ QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto)
 
 QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
 {
-	if (isReady(AStreamJid))
+	if (isArchivePrefsEnabled(AStreamJid))
 	{
 		bool storage = FInStoragePrefs.contains(AStreamJid);
 
@@ -1013,7 +1020,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 
 QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid)
 {
-	if (isReady(AStreamJid) && archivePrefs(AStreamJid).itemPrefs.contains(AItemJid))
+	if (isArchivePrefsEnabled(AStreamJid) && archivePrefs(AStreamJid).itemPrefs.contains(AItemJid))
 	{
 		if (isSupported(AStreamJid,NS_ARCHIVE_PREF))
 		{
@@ -1484,57 +1491,52 @@ QString MessageArchiver::loadStoragePrefs(const Jid &AStreamJid)
 
 void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement &AElem)
 {
-	if (!isReady(AStreamJid) && !AElem.hasChildNodes() && !FInStoragePrefs.contains(AStreamJid))
-	{
-		FInStoragePrefs.append(AStreamJid);
-		loadStoragePrefs(AStreamJid);
-	}
-	else
+	if (isReady(AStreamJid) || AElem.hasChildNodes() || FInStoragePrefs.contains(AStreamJid))
 	{
 		//Hack for Jabberd 1.4.3
 		if (!FInStoragePrefs.contains(AStreamJid) && AElem.hasAttribute("j_private_flag"))
 			FInStoragePrefs.append(AStreamJid);
 
 		bool initPrefs = !isReady(AStreamJid);
-		if (initPrefs)
-		{
-			IArchiveStreamPrefs defPrefs;
-			defPrefs.autoSave = true;
-			defPrefs.methodAuto = ARCHIVE_METHOD_CONCEDE;
-			defPrefs.methodLocal = ARCHIVE_METHOD_CONCEDE;
-			defPrefs.methodManual = ARCHIVE_METHOD_CONCEDE;
-			defPrefs.defaultPrefs.otr = ARCHIVE_OTR_CONCEDE;
-			defPrefs.defaultPrefs.save = ARCHIVE_SAVE_BODY;
-			defPrefs.defaultPrefs.expire = 5*365*24*60*60;
-			FArchivePrefs.insert(AStreamJid,defPrefs);
-			openHistoryOptionsNode(AStreamJid);
-		}
-
 		IArchiveStreamPrefs &prefs = FArchivePrefs[AStreamJid];
 
-		QDomElement autoElem = AElem.firstChildElement("auto");
+		QDomElement autoElem = isSupported(AStreamJid,NS_ARCHIVE_PREF) ? AElem.firstChildElement("auto") : QDomElement();
 		if (!autoElem.isNull())
-		{
-			prefs.autoSave = QVariant(autoElem.attribute("save","true")).toBool();
-		}
+			prefs.autoSave = QVariant(autoElem.attribute("save","false")).toBool();
+		else if (initPrefs)
+			prefs.autoSave = isSupported(AStreamJid,NS_ARCHIVE_AUTO);
+
+		bool prefsDisabled = !isArchivePrefsEnabled(AStreamJid);
 
 		QDomElement defElem = AElem.firstChildElement("default");
 		if (!defElem.isNull())
 		{
-			prefs.defaultPrefs.save = defElem.attribute("save");
-			prefs.defaultPrefs.otr = defElem.attribute("otr");
-			prefs.defaultPrefs.expire = defElem.attribute("expire").toInt();
+			prefs.defaultPrefs.save = defElem.attribute("save",prefs.defaultPrefs.save);
+			prefs.defaultPrefs.otr = defElem.attribute("otr",prefs.defaultPrefs.otr);
+			prefs.defaultPrefs.expire = defElem.attribute("expire","0").toInt();
+		}
+		else if (initPrefs || prefsDisabled)
+		{
+			prefs.defaultPrefs.save = ARCHIVE_SAVE_MESSAGE;
+			prefs.defaultPrefs.otr = ARCHIVE_OTR_CONCEDE;
+			prefs.defaultPrefs.expire = 5*365*24*60*60;
 		}
 
 		QDomElement methodElem = AElem.firstChildElement("method");
-		while (!methodElem.isNull())
+		if (methodElem.isNull() && (initPrefs || prefsDisabled))
+		{
+			prefs.methodAuto = ARCHIVE_METHOD_CONCEDE;
+			prefs.methodLocal = ARCHIVE_METHOD_CONCEDE;
+			prefs.methodManual = ARCHIVE_METHOD_CONCEDE;
+		}
+		else while (!methodElem.isNull())
 		{
 			if (methodElem.attribute("type") == "auto")
-				prefs.methodAuto = methodElem.attribute("use");
+				prefs.methodAuto = methodElem.attribute("use",prefs.methodAuto);
 			else if (methodElem.attribute("type") == "local")
-				prefs.methodLocal = methodElem.attribute("use");
+				prefs.methodLocal = methodElem.attribute("use",prefs.methodLocal);
 			else if (methodElem.attribute("type") == "manual")
-				prefs.methodManual = methodElem.attribute("use");
+				prefs.methodManual = methodElem.attribute("use",prefs.methodManual);
 			methodElem = methodElem.nextSiblingElement("method");
 		}
 
@@ -1544,9 +1546,9 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 		{
 			IArchiveItemPrefs itemPrefs;
 			Jid itemJid = itemElem.attribute("jid");
-			itemPrefs.save = itemElem.attribute("save");
-			itemPrefs.otr = itemElem.attribute("otr");
-			itemPrefs.expire = itemElem.attribute("expire").toInt();
+			itemPrefs.save = itemElem.attribute("save",prefs.defaultPrefs.save);
+			itemPrefs.otr = itemElem.attribute("otr",prefs.defaultPrefs.otr);
+			itemPrefs.expire = itemElem.attribute("expire","0").toInt();
 			prefs.itemPrefs.insert(itemJid,itemPrefs);
 			emit archiveItemPrefsChanged(AStreamJid,itemJid,itemPrefs);
 			oldItemJids -= itemJid;
@@ -1577,11 +1579,21 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 				QPair<Message, bool> message = messages.at(i);
 				processMessage(AStreamJid, message.first, message.second);
 			}
+			if (prefsDisabled)
+				setArchiveAutoSave(AStreamJid,prefs.autoSave);
+			openHistoryOptionsNode(AStreamJid);
 		}
 		else
+		{
 			renegotiateStanzaSessions(AStreamJid);
+		}
 
 		emit archivePrefsChanged(AStreamJid,prefs);
+	}
+	else
+	{
+		FInStoragePrefs.append(AStreamJid);
+		loadStoragePrefs(AStreamJid);
 	}
 }
 
@@ -2018,7 +2030,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
 	connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowAction(bool)));
 	menu->addAction(action,AG_DEFAULT,false);
 
-	if (isReady(AStreamJid))
+	if (isArchivePrefsEnabled(AStreamJid))
 	{
 		if (isStreamMenu && isSupported(AStreamJid,NS_ARCHIVE_PREF))
 		{
@@ -2227,16 +2239,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
 		saveMenu->setEnabled(itemPrefs.otr!=ARCHIVE_OTR_REQUIRE);
 		menu->addAction(saveMenu->menuAction(),AG_DEFAULT+500,false);
 
-		if (isStreamMenu)
-		{
-			action = new Action(menu);
-			action->setText(tr("Options..."));
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OPTIONS);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			connect(action,SIGNAL(triggered(bool)),SLOT(onShowHistoryOptionsDialogAction(bool)));
-			menu->addAction(action,AG_DEFAULT+500,false);
-		}
-		else if (!isOTRStanzaSession(AStreamJid,AContactJid) && archivePrefs(AStreamJid).itemPrefs.contains(AContactJid))
+		if (!isStreamMenu && !isOTRStanzaSession(AStreamJid,AContactJid) && archivePrefs(AStreamJid).itemPrefs.contains(AContactJid))
 		{
 			action = new Action(menu);
 			action->setText(tr("Restore defaults"));
@@ -2247,6 +2250,17 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
 			menu->addAction(action,AG_DEFAULT+500,false);
 		}
 	}
+	
+	if (isStreamMenu && isReady(AStreamJid))
+	{
+		action = new Action(menu);
+		action->setText(tr("Options..."));
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OPTIONS);
+		action->setData(ADR_STREAM_JID,AStreamJid.full());
+		connect(action,SIGNAL(triggered(bool)),SLOT(onShowHistoryOptionsDialogAction(bool)));
+		menu->addAction(action,AG_DEFAULT+500,false);
+	}
+
 	return menu;
 }
 
@@ -2527,10 +2541,7 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
 	}
 
 	if (!FDiscovery || !FDiscovery->requestDiscoInfo(AXmppStream->streamJid(),AXmppStream->streamJid().domain()))
-	{
-		FInStoragePrefs.append(AXmppStream->streamJid());
-		loadStoragePrefs(AXmppStream->streamJid());
-	}
+		applyArchivePrefs(AXmppStream->streamJid(),QDomElement());
 }
 
 void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
@@ -2782,10 +2793,14 @@ void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 		{
 			loadServerPrefs(AInfo.streamJid);
 		}
-		else
+		else if (features.contains(NS_ARCHIVE_AUTO))
 		{
 			FInStoragePrefs.append(AInfo.streamJid);
-			loadStoragePrefs(AInfo.streamJid);
+			applyArchivePrefs(AInfo.streamJid,QDomElement());
+		}
+		else
+		{
+			applyArchivePrefs(AInfo.streamJid,QDomElement());
 		}
 	}
 	else if (AInfo.node.isEmpty() && AInfo.contactJid.node().isEmpty() &&  AInfo.contactJid.resource().isEmpty() && !FGatewayTypes.contains(AInfo.contactJid))

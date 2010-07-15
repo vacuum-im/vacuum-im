@@ -185,6 +185,7 @@ class IMessageArchiver
 public:
 	virtual QObject *instance() =0;
 	virtual bool isReady(const Jid &AStreamJid) const =0;
+	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const =0;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const =0;
 	virtual bool isAutoArchiving(const Jid &AStreamJid) const =0;
 	virtual bool isManualArchiving(const Jid &AStreamJid) const =0;
