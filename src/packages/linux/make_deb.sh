@@ -21,8 +21,8 @@ Package file will be created in the parent directory
 # Version
 [ -d .svn ] && svn_version=".$(sed -n -e '/^dir$/{n;p;q;}' .svn/entries 2>/dev/null)"||svn_version=""
 # LC_ALL=C svn info 2> /dev/null | grep Revision | cut -d' ' -f2
-#VER="$(echo `grep CLIENT_VERSION src/definations/version.h|awk -F'"' '{print $2}'`|tr ' ' '.')"
-VER="$(grep 'CLIENT_VERSION ' src/definations/version.h|awk -F'"' '{print $2}')"
+#VER="$(echo `grep CLIENT_VERSION src/definitions/version.h|awk -F'"' '{print $2}'`|tr ' ' '.')"
+VER="$(grep 'CLIENT_VERSION ' src/definitions/version.h|awk -F'"' '{print $2}')"
 VERSION="${VER}${svn_version}"
 
 

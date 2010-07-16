@@ -30,7 +30,7 @@
 
 # Version
 [ -d .svn ] && REVISION=".$(sed -n -e '/^dir$/{n;p;q;}' .svn/entries 2>/dev/null)"||REVISION=""
-VER_NUMBER="$(grep 'CLIENT_VERSION ' src/definations/version.h|awk -F'"' '{print $2}')"
+VER_NUMBER="$(grep 'CLIENT_VERSION ' src/definitions/version.h|awk -F'"' '{print $2}')"
 VERSION="${VER_NUMBER}${REVISION}"
 
 # Name of the original bundle
