@@ -21,10 +21,8 @@ RostersViewPlugin::RostersViewPlugin()
 	FViewSavedState.currentIndex = NULL;
 
 	FRostersView = new RostersView;
-	connect(FRostersView,SIGNAL(viewModelAboutToBeChanged(QAbstractItemModel *)),
-	        SLOT(onViewModelAboutToBeChanged(QAbstractItemModel *)));
-	connect(FRostersView,SIGNAL(viewModelChanged(QAbstractItemModel *)),
-	        SLOT(onViewModelChanged(QAbstractItemModel *)));
+	connect(FRostersView,SIGNAL(viewModelAboutToBeChanged(QAbstractItemModel *)),SLOT(onViewModelAboutToBeChanged(QAbstractItemModel *)));
+	connect(FRostersView,SIGNAL(viewModelChanged(QAbstractItemModel *)),SLOT(onViewModelChanged(QAbstractItemModel *)));
 	connect(FRostersView,SIGNAL(collapsed(const QModelIndex &)),SLOT(onViewIndexCollapsed(const QModelIndex &)));
 	connect(FRostersView,SIGNAL(expanded(const QModelIndex &)),SLOT(onViewIndexExpanded(const QModelIndex &)));
 	connect(FRostersView,SIGNAL(destroyed(QObject *)), SLOT(onRostersViewDestroyed(QObject *)));
@@ -344,7 +342,7 @@ void RostersViewPlugin::onViewModelAboutToBeReset()
 {
 	if (FRostersView->currentIndex().isValid())
 	{
-		FViewSavedState.currentIndex = (IRosterIndex *)FRostersView->mapToModel(FRostersView->currentIndex()).internalPointer();
+		FViewSavedState.currentIndex = FRostersView->rostersModel()->rosterIndexByModelIndex(FRostersView->mapToModel(FRostersView->currentIndex()));
 		FViewSavedState.sliderPos = FRostersView->verticalScrollBar()->sliderPosition();
 	}
 	else

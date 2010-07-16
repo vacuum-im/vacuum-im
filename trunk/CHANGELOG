@@ -14,6 +14,7 @@ LEGEND
   [-] When converting smileys into the text instead of the first key an arbitrary one was inserted
   [-] Contacts list window could be displayed outside the visible screen area
   [-] The roster window was closed by clicking on the tray even if it was inactive
+  [-] Application fails when turn on or off the search in roster
 
 
 v1.0.2
