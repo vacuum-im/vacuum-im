@@ -75,7 +75,9 @@ bool StanzaProcessor::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, i
 //IStanzaProcessor
 QString StanzaProcessor::newId() const
 {
-	return QString::number((qrand()<<16)+qrand(),36);
+	static unsigned long id = 1;
+	static const QString mask = "sid_%1";
+	return mask.arg(id++);
 }
 
 bool StanzaProcessor::sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza)
@@ -138,9 +140,9 @@ int StanzaProcessor::insertStanzaHandle(const IStanzaHandle &AHandle)
 {
 	if (AHandle.handler!=NULL && !AHandle.conditions.isEmpty())
 	{
-		int handleId = qAbs((qrand()<<16) + qrand());
-		while(handleId == 0 || FHandles.contains(handleId))
-			handleId = (handleId > 0) ? (handleId + 1) : 1;
+		int handleId = qrand();
+		while(handleId<=0 || FHandles.contains(handleId))
+			handleId++;
 		FHandles.insert(handleId,AHandle);
 		FHandleIdByOrder.insertMulti(AHandle.order,handleId);
 		connect(AHandle.handler->instance(),SIGNAL(destroyed(QObject *)),SLOT(onStanzaHandlerDestroyed(QObject *)));
