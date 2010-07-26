@@ -1072,8 +1072,9 @@ void DataForms::onNetworkReplyFinished()
 	}
 }
 
-void DataForms::onNetworkReplyError(QNetworkReply::NetworkError /*ACode*/)
+void DataForms::onNetworkReplyError(QNetworkReply::NetworkError ACode)
 {
+	Q_UNUSED(ACode);
 	QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
 	if (reply)
 	{
@@ -1083,16 +1084,19 @@ void DataForms::onNetworkReplyError(QNetworkReply::NetworkError /*ACode*/)
 	}
 }
 
-void DataForms::onNetworkReplySSLErrors(const QList<QSslError> &/*AErrors*/)
+void DataForms::onNetworkReplySSLErrors(const QList<QSslError> &AErrors)
 {
+	Q_UNUSED(AErrors);
 	QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
 	if (reply)
 		reply->ignoreSslErrors();
 }
 
+#if QT_VERSION < 0x040700
 uint qHash(const QUrl &key)
 {
-	return qHash(key.toString());
+	return qHash(key.toEncoded((QUrl::FormattingOptions)0x100));
 }
+#endif
 
 Q_EXPORT_PLUGIN2(plg_dataforms, DataForms);
