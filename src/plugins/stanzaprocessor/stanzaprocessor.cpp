@@ -138,8 +138,9 @@ int StanzaProcessor::insertStanzaHandle(const IStanzaHandle &AHandle)
 {
 	if (AHandle.handler!=NULL && !AHandle.conditions.isEmpty())
 	{
-		int handleId = (qrand()<<16) + qrand();
-		for (; handleId==0 || FHandles.contains(handleId); handleId++);
+		int handleId = qAbs((qrand()<<16) + qrand());
+		while(handleId == 0 || FHandles.contains(handleId))
+			handleId = (handleId > 0) ? (handleId + 1) : 1;
 		FHandles.insert(handleId,AHandle);
 		FHandleIdByOrder.insertMulti(AHandle.order,handleId);
 		connect(AHandle.handler->instance(),SIGNAL(destroyed(QObject *)),SLOT(onStanzaHandlerDestroyed(QObject *)));
