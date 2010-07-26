@@ -1,6 +1,6 @@
 #include "widgetmanager.h"
 
-#if QT_VERSION >= 0x040600
+#if QT_VERSION < 0x040600
 #ifdef Q_WS_X11
 	#include <QX11Info>
 	#include <X11/Xutil.h>
@@ -14,7 +14,7 @@
 
 void WidgetManager::raiseWidget(QWidget *AWidget)
 {
-#if QT_VERSION >= 0x040600
+#if QT_VERSION < 0x040600
 #ifdef Q_WS_X11
 	static Atom         NET_ACTIVE_WINDOW = 0;
 	XClientMessageEvent xev;
