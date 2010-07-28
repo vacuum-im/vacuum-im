@@ -3,7 +3,7 @@
 #define COMMAND_TAG_NAME              "command"
 #define COMMANDS_TIMEOUT              60000
 
-#define SHC_COMMANDS                  "/iq[@type='set']/query[@xmlns='" NS_COMMANDS "']"
+#define SHC_COMMANDS                  "/iq[@type='set']/command"
 
 #define ADR_STREAM_JID                Action::DR_StreamJid
 #define ADR_COMMAND_JID               Action::DR_Parametr1
