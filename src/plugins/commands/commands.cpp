@@ -253,7 +253,7 @@ bool Commands::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const 
 			QString action = AParams.value("action","execute");
 			if (action == "execute")
 			{
-				executeCommnad(AStreamJid, AContactJid, node);
+				executeCommand(AStreamJid, AContactJid, node);
 			}
 		}
 		return true;
@@ -323,7 +323,7 @@ bool Commands::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, 
 {
 	if (AFeature==NS_COMMANDS && !ADiscoInfo.node.isEmpty() && FDiscovery->findIdentity(ADiscoInfo.identity,DIC_AUTOMATION,DIT_COMMAND_NODE)>=0)
 	{
-		executeCommnad(AStreamJid,ADiscoInfo.contactJid,ADiscoInfo.node);
+		executeCommand(AStreamJid,ADiscoInfo.contactJid,ADiscoInfo.node);
 		return true;
 	}
 	return false;
@@ -491,7 +491,7 @@ QList<ICommand> Commands::contactCommands(const Jid &AStreamJid, const Jid &ACon
 	return FCommands.value(AStreamJid).value(AContactJid);
 }
 
-bool Commands::executeCommnad(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode)
+bool Commands::executeCommand(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode)
 {
 	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
 	if (FDataForms && stream && stream->isOpen())
@@ -609,7 +609,7 @@ void Commands::onExecuteActionTriggered(bool)
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		Jid commandJid = action->data(ADR_COMMAND_JID).toString();
 		QString node = action->data(ADR_COMMAND_NODE).toString();
-		executeCommnad(streamJid,commandJid,node);
+		executeCommand(streamJid,commandJid,node);
 	}
 }
 
