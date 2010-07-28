@@ -228,7 +228,7 @@ bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
 	}
 	else if (FSHIItems.value(AStreamJid) == AHandlerId)
 	{
-		QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
+		QDomElement query = AStanza.firstElement("query",NS_DISCO_ITEMS);
 
 		IDiscoItems ditems;
 		ditems.streamJid = AStreamJid;
