@@ -1,4 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <statusdef>
-	<pattern>(.*@|^)vkontakte\.</pattern>
+	<pattern>(.*@|^)(vkontakte\.|vk.com)</pattern>
 </statusdef>
