@@ -100,6 +100,7 @@ public:
 	virtual bool sendCommandResult(const ICommandResult &AResult) =0;
 	virtual QList<ICommand> contactCommands(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual bool executeCommand(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode) =0;
+	virtual ICommandResult makeResult(const ICommandRequest&) const =0;
 protected:
 	virtual void serverInserted(const QString &ANode, ICommandServer *AServer) =0;
 	virtual void serverRemoved(const QString &ANode) =0;
@@ -110,6 +111,6 @@ protected:
 
 Q_DECLARE_INTERFACE(ICommandServer,"Vacuum.Plugin.ICommandServer/1.0")
 Q_DECLARE_INTERFACE(ICommandClient,"Vacuum.Plugin.ICommandClient/1.0")
-Q_DECLARE_INTERFACE(ICommands,"Vacuum.Plugin.ICommands/1.0")
+Q_DECLARE_INTERFACE(ICommands,"Vacuum.Plugin.ICommands/1.1")
 
 #endif

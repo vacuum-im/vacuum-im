@@ -105,6 +105,8 @@ bool Commands::initObjects()
 	                           tr("Specified session not present"),NS_COMMANDS);
 	ErrorHandler::addErrorItem("session-expired",ErrorHandler::CANCEL,ErrorHandler::NOT_ALLOWED,
 	                           tr("Specified session is no longer active"),NS_COMMANDS);
+	ErrorHandler::addErrorItem("forbidden", ErrorHandler::AUTH, ErrorHandler::FORBIDDEN,
+							   tr("Forbidden"));
 
 	if (FDiscovery)
 	{
@@ -136,6 +138,14 @@ bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &A
 		request.streamJid = AStreamJid;
 		request.commandJid = AStanza.from();
 		request.stanzaId = AStanza.id();
+
+		if (AStreamJid.bare() != request.commandJid.bare())
+		{
+			Stanza reply = AStanza.replyError("forbidden", NS_COMMANDS, ErrorHandler::FORBIDDEN);
+			FStanzaProcessor->sendStanzaOut(AStreamJid, reply);
+			AAccept = true;
+			return false;
+		}
 
 		QDomElement cmdElem = AStanza.firstElement(COMMAND_TAG_NAME,NS_COMMANDS);
 		request.sessionId = cmdElem.attribute("sessionid");
@@ -291,7 +301,7 @@ void Commands::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 
 void Commands::fillDiscoItems(IDiscoItems &ADiscoItems)
 {
-	if (!FServers.isEmpty())
+	if (!FServers.isEmpty() && ADiscoItems.streamJid.bare() == ADiscoItems.contactJid.bare())
 	{
 		if (ADiscoItems.node == NS_COMMANDS)
 		{
@@ -503,6 +513,17 @@ bool Commands::executeCommand(const Jid &AStreamJid, const Jid &ACommandJid, con
 		return true;
 	}
 	return false;
+}
+
+ICommandResult Commands::makeResult(const ICommandRequest& req) const
+{
+	ICommandResult res;
+	res.streamJid = req.streamJid;
+	res.commandJid = req.commandJid;
+	res.node = req.node;
+	res.stanzaId = req.stanzaId;
+	res.sessionId = req.sessionId;
+	return res;
 }
 
 void Commands::registerDiscoFeatures()

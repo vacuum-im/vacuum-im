@@ -56,3 +56,4 @@ SUBDIRS += socksstreams
 SUBDIRS += captchaforms
 SUBDIRS += bitsofbinary
 SUBDIRS += xmppuriqueries
+SUBDIRS += remotecontrol

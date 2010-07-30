@@ -66,6 +66,7 @@ public:
 	virtual bool sendCommandResult(const ICommandResult &AResult);
 	virtual QList<ICommand> contactCommands(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual bool executeCommand(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode);
+	virtual ICommandResult makeResult(const ICommandRequest&) const;
 signals:
 	void serverInserted(const QString &ANode, ICommandServer *AServer);
 	void serverRemoved(const QString &ANode);
