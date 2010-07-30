@@ -90,5 +90,9 @@
         <source>Supports the running or performing of the special services commands</source>
         <translation>Obsługa wykonywania poleceń szczególnych serwisów</translation>
     </message>
+    <message>
+        <source>Forbidden</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
