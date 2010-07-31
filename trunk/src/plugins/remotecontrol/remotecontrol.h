@@ -2,6 +2,7 @@
 #define REMOTECONTROL_H
 
 #include <definitions/namespaces.h>
+#include <definitions/dataformtypes.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/icommands.h>
@@ -31,17 +32,16 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	// ICommandServer
+	virtual bool isCommandPermitted(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode) const;
 	virtual QString commandName(const QString &ANode) const;
 	virtual bool receiveCommandRequest(const ICommandRequest &ARequest);
-	virtual bool receiveCommandError(const ICommandError &AError);
 	// IDataLocalizer
 	virtual IDataFormLocale dataFormLocale(const QString &AFormType);
 private:
 	bool processPing(const ICommandRequest &ARequest);
 	bool processLeaveMUC(const ICommandRequest &ARequest);
 	bool processSetStatus(const ICommandRequest &ARequest);
-	bool processSetMainStatus(const ICommandRequest &ARequest);
-	IPluginManager *FPluginManager;
+private:
 	ICommands *FCommands;
 	IStatusChanger *FStatusChanger;
 	IMultiUserChatPlugin *FMUCPlugin;

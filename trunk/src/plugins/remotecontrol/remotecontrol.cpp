@@ -1,13 +1,16 @@
 #include "remotecontrol.h"
 
-#include <QtDebug>
+#define COMMAND_NODE_ROOT               "http://jabber.org/protocol/rc"
+#define COMMAND_NODE_PING               COMMAND_NODE_ROOT"#ping"
+#define COMMAND_NODE_SET_STATUS         COMMAND_NODE_ROOT"#set-status"
+#define COMMAND_NODE_SET_MAIN_STATUS    COMMAND_NODE_ROOT"#set-main-status"
+#define COMMAND_NODE_LEAVE_MUC          COMMAND_NODE_ROOT"#leave-groupchats"
 
-#define REMOTECONTROL_NODE "http://jabber.org/protocol/rc"
-#define DATA_FORM_REMOTECONTROL "http://jabber.org/protocol/rc"
+#define FIELD_STATUS                    "status"
+#define FIELD_GROUPCHATS                "groupchats"
 
 RemoteControl::RemoteControl()
 {
-	FPluginManager = NULL;
 	FCommands = NULL;
 	FStatusChanger = NULL;
 	FMUCPlugin = NULL;
@@ -22,16 +25,17 @@ RemoteControl::~RemoteControl()
 void RemoteControl::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Remote Control");
-	APluginInfo->description = tr("Allows remote entities execute local commands (XEP-0146)");
+	APluginInfo->description = tr("Allows to remotely control the client");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Maxim Ignatenko";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 	APluginInfo->dependences.append(COMMANDS_UUID);
+	APluginInfo->dependences.append(DATAFORMS_UUID);
 }
 
 bool RemoteControl::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-	FPluginManager = APluginManager;
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("ICommands").value(0,NULL);
 	if (plugin)
 	{
@@ -52,31 +56,29 @@ bool RemoteControl::initConnections(IPluginManager *APluginManager, int &AInitOr
 	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 	}
-
-	return (FCommands != NULL);
+	return (FCommands!=NULL && FDataForms!=NULL);
 }
 
 bool RemoteControl::initObjects()
 {
 	if (FCommands != NULL)
 	{
-		FCommands->insertServer("ping", this);
+		FCommands->insertServer(COMMAND_NODE_PING, this);
 		if (FStatusChanger != NULL)
 		{
-			FCommands->insertServer(REMOTECONTROL_NODE"#set-status", this);
-			FCommands->insertServer("set-main-status", this);
+			FCommands->insertServer(COMMAND_NODE_SET_STATUS, this);
+			FCommands->insertServer(COMMAND_NODE_SET_MAIN_STATUS, this);
 		}
 		if (FMUCPlugin != NULL)
 		{
-			FCommands->insertServer(REMOTECONTROL_NODE"#leave-groupchats", this);
+			FCommands->insertServer(COMMAND_NODE_LEAVE_MUC, this);
 		}
-		return true;
 	}
 	if (FDataForms != NULL)
 	{
 		FDataForms->insertLocalizer(this, DATA_FORM_REMOTECONTROL);
 	}
-	return false;
+	return true;
 }
 
 bool RemoteControl::initSettings()
@@ -89,244 +91,209 @@ bool RemoteControl::startPlugin()
 	return true;
 }
 
+bool RemoteControl::isCommandPermitted(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode) const
+{
+	Q_UNUSED(ANode);
+	return AStreamJid.pBare() == AContactJid.pBare();
+}
+
 QString RemoteControl::commandName(const QString &ANode) const
 {
-	if (ANode == "ping") return tr("Ping");
-	if (ANode == REMOTECONTROL_NODE"#set-status") return tr("Change status");
-	if (ANode == REMOTECONTROL_NODE"#leave-groupchats") return tr("Leave groupchats");
-	if (ANode == "set-main-status") return tr("Change main status");
-	return "";
+	if (ANode == COMMAND_NODE_PING) 
+		return tr("Ping");
+	if (ANode == COMMAND_NODE_SET_STATUS)
+		return tr("Change connection status");
+	if (ANode == COMMAND_NODE_SET_MAIN_STATUS)
+		return tr("Change main status");
+	if (ANode == COMMAND_NODE_LEAVE_MUC) 
+		return tr("Leave conferences");
+	return QString::null;
 }
 
 bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
 {
-	if (ARequest.node == "ping" && ARequest.action == COMMAND_ACTION_EXECUTE)
-		return processPing(ARequest);
+	if (isCommandPermitted(ARequest.streamJid, ARequest.contactJid, ARequest.node))
+	{
+		if (ARequest.node == COMMAND_NODE_PING)
+			return processPing(ARequest);
 
-	if (ARequest.node == REMOTECONTROL_NODE"#set-status" && FStatusChanger != NULL)
-		return processSetStatus(ARequest);
+		if (ARequest.node == COMMAND_NODE_SET_STATUS && FStatusChanger != NULL)
+			return processSetStatus(ARequest);
 
-	if (ARequest.node == "set-main-status" && FStatusChanger != NULL)
-		return processSetMainStatus(ARequest);
+		if (ARequest.node == COMMAND_NODE_SET_MAIN_STATUS && FStatusChanger != NULL)
+			return processSetStatus(ARequest);
 
-	if (ARequest.node == REMOTECONTROL_NODE"#leave-groupchats" && FMUCPlugin != NULL)
-		return processLeaveMUC(ARequest);
-
+		if (ARequest.node == COMMAND_NODE_LEAVE_MUC && FMUCPlugin != NULL)
+			return processLeaveMUC(ARequest);
+	}
 	return false;
 }
 
 bool RemoteControl::processPing(const ICommandRequest &ARequest)
 {
-	ICommandResult result = FCommands->makeResult(ARequest);
-	result.status = COMMAND_STATUS_COMPLETED;
-	ICommandNote pong;
-	pong.type = COMMAND_NOTE_INFO;
-	pong.message = tr("Pong!");
-	result.notes.append(pong);
-	FCommands->sendCommandResult(result);
-	return true;
+	if (ARequest.action == COMMAND_ACTION_EXECUTE)
+	{
+		ICommandResult result = FCommands->prepareResult(ARequest);
+		result.status = COMMAND_STATUS_COMPLETED;
+
+		ICommandNote pong;
+		pong.type = COMMAND_NOTE_INFO;
+		pong.message = tr("Pong!");
+		result.notes.append(pong);
+
+		return FCommands->sendCommandResult(result);
+	}
+	return false;
 }
 
 bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 {
-	ICommandResult result = FCommands->makeResult(ARequest);
+	ICommandResult result = FCommands->prepareResult(ARequest);
 	if (ARequest.action == COMMAND_ACTION_EXECUTE)
 	{
-		result.status = COMMAND_STATUS_EXECUTING;
 		result.sessionId = QUuid::createUuid().toString();
-
 		result.form.type = DATAFORM_TYPE_FORM;
-		result.form.title = tr("Leave groupchats");
-		result.form.instructions.append(tr("Choose groupchats you want to leave"));
+		result.form.title = commandName(ARequest.node);
 
 		IDataField field;
 		field.type = DATAFIELD_TYPE_HIDDEN;
 		field.var = "FORM_TYPE";
 		field.value = DATA_FORM_REMOTECONTROL;
+		field.required = false;
 		result.form.fields.append(field);
 
 		field.type = DATAFIELD_TYPE_LISTMULTI;
-		field.var = "groupchats";
-		field.label = tr("Groupchats");
+		field.var = FIELD_GROUPCHATS;
+		field.label = tr("A list of joined conferences");
 		field.required = true;
+
 		IDataOption opt;
-		QList<IMultiUserChat *> mucList = FMUCPlugin->multiUserChats();
-		foreach(IMultiUserChat* muc, mucList)
+		foreach(IMultiUserChat* muc, FMUCPlugin->multiUserChats())
 		{
-			if (muc->streamJid() == ARequest.streamJid)
+			if (muc->isOpen() && muc->streamJid()==ARequest.streamJid)
 			{
-				opt.label = tr("%1 on %2").arg(muc->nickName(), muc->roomJid().bare());
+				opt.label = tr("%1 on %2").arg(muc->nickName()).arg(muc->roomJid().bare());
 				opt.value = muc->roomJid().full();
 				field.options.append(opt);
 			}
 		}
-		result.form.fields.append(field);
-		FCommands->sendCommandResult(result);
-		return true;
-	}
-	else if (ARequest.action == "" || ARequest.action == COMMAND_ACTION_COMPLETE)
-	{
-		result.status = COMMAND_STATUS_COMPLETED;
-		foreach(IDataField field, ARequest.form.fields)
+
+		if (field.options.isEmpty())
 		{
-			if (field.var == "groupchats")
-			{
-				foreach(QString roomJid, field.value.toStringList())
-				{
-					IMultiUserChatWindow *w = FMUCPlugin->multiChatWindow(ARequest.streamJid, Jid(roomJid));
-					if (w != NULL) w->exitAndDestroy(tr("Remote request from \"%1\"").arg(ARequest.commandJid.full()));
-				}
-			}
+			ICommandNote note;
+			note.type = COMMAND_NOTE_INFO;
+			note.message = tr("This entity is not joined to any conferences");
+			result.notes.append(note);
+			result.status = COMMAND_STATUS_COMPLETED;
+			result.form = IDataForm();
 		}
-		FCommands->sendCommandResult(result);
-		return true;
+		else
+		{
+			result.form.fields.append(field);
+			result.status = COMMAND_STATUS_EXECUTING;
+		}
+		return FCommands->sendCommandResult(result);
+	}
+	else if (ARequest.action.isEmpty() || ARequest.action == COMMAND_ACTION_COMPLETE)
+	{
+		int index = FDataForms!=NULL ? FDataForms->fieldIndex(FIELD_GROUPCHATS,ARequest.form.fields) : -1;
+		if (index>=0)
+		{
+			foreach(QString roomJid, ARequest.form.fields.value(index).value.toStringList())
+			{
+				IMultiUserChatWindow *window = FMUCPlugin->multiChatWindow(ARequest.streamJid, roomJid);
+				if (window != NULL)
+					window->exitAndDestroy(tr("Remote command to leave"));
+			}
+			result.status = COMMAND_STATUS_COMPLETED;
+		}
+		else
+		{
+			result.status = COMMAND_STATUS_CANCELED;
+		}
+		return FCommands->sendCommandResult(result);
 	}
 	else if (ARequest.action == COMMAND_ACTION_CANCEL)
 	{
 		result.status = COMMAND_STATUS_CANCELED;
-		FCommands->sendCommandResult(result);
-		return true;
+		return FCommands->sendCommandResult(result);;
 	}
 	return false;
 }
 
 bool RemoteControl::processSetStatus(const ICommandRequest &ARequest)
 {
-	ICommandResult result = FCommands->makeResult(ARequest);
+	ICommandResult result = FCommands->prepareResult(ARequest);
+	bool isMainStatus = ARequest.node == COMMAND_NODE_SET_MAIN_STATUS;
 	if (ARequest.action == COMMAND_ACTION_EXECUTE)
 	{
 		result.status = COMMAND_STATUS_EXECUTING;
 		result.sessionId = QUuid::createUuid().toString();
 		result.form.type = DATAFORM_TYPE_FORM;
-		result.form.title = tr("Change status");
+		result.form.title = commandName(ARequest.node);
 
 		IDataField field;
 		field.type = DATAFIELD_TYPE_HIDDEN;
 		field.var = "FORM_TYPE";
 		field.value = DATA_FORM_REMOTECONTROL;
+		field.required = false;
 		result.form.fields.append(field);
 
 		field.type = DATAFIELD_TYPE_LISTSINGLE;
-		field.var = "status";
-		field.label = tr("Change status");
+		field.var = FIELD_STATUS;
+		field.label = tr("A presence or availability status");
+		field.value = QString::number(isMainStatus ? FStatusChanger->mainStatus() : FStatusChanger->streamStatus(ARequest.streamJid));
 		field.required = true;
 
 		IDataOption opt;
-		opt.label = tr("Main status");
-		opt.value = "-1";
-		field.options.append(opt);
-		foreach(int status, FStatusChanger->statusItems())
+		if (!isMainStatus)
 		{
-			if (status < 0) continue;
-			opt.label = tr("%1 (%2)").arg(FStatusChanger->nameByShow(FStatusChanger->statusItemShow(status)),
-										  FStatusChanger->statusItemName(status));
-			opt.value = QString::number(status);
+			opt.label = tr("Main status");
+			opt.value = QString::number(STATUS_MAIN_ID);
 			field.options.append(opt);
 		}
-		result.form.fields.append(field);
-		field.options.clear();
-
-		FCommands->sendCommandResult(result);
-		return true;
-	}
-	else if (ARequest.action == "" || ARequest.action == COMMAND_ACTION_COMPLETE)
-	{
-		// Следующий код считает что STATUS_MAIN_ID - наименьший допустимый статус
-		result.status = COMMAND_STATUS_COMPLETED;
-		int statusId = STATUS_MAIN_ID - 1;
-		foreach(IDataField field, ARequest.form.fields)
+		foreach(int status, FStatusChanger->statusItems())
 		{
-			if (field.var == "status")
+			if (status > STATUS_NULL_ID)
 			{
-				bool ok = true;
-				statusId = field.value.toInt(&ok);
-				if (!ok) statusId = STATUS_MAIN_ID - 1;
+				opt.label = tr("%1 (%2)")
+					.arg(FStatusChanger->nameByShow(FStatusChanger->statusItemShow(status)))
+					.arg(FStatusChanger->statusItemName(status));
+				opt.value = QString::number(status);
+				field.options.append(opt);
 			}
 		}
-		if (statusId >= STATUS_MAIN_ID)
-			FStatusChanger->setStreamStatus(ARequest.streamJid,statusId);
-
-		FCommands->sendCommandResult(result);
-		return true;
+		result.form.fields.append(field);
+		return FCommands->sendCommandResult(result);
+	}
+	else if (ARequest.action.isEmpty() || ARequest.action == COMMAND_ACTION_COMPLETE)
+	{
+		int index = FDataForms!=NULL ? FDataForms->fieldIndex(FIELD_STATUS, ARequest.form.fields) : -1;
+		int statusId = index>=0 ? ARequest.form.fields.value(index).value.toInt() : STATUS_NULL_ID;
+		if (statusId!=STATUS_NULL_ID && statusId>=(isMainStatus ? STATUS_MAIN_ID : STATUS_NULL_ID) && FStatusChanger->statusItems().contains(statusId))
+		{
+			if (isMainStatus)
+				FStatusChanger->setMainStatus(statusId);
+			else
+				FStatusChanger->setStreamStatus(ARequest.streamJid,statusId);
+			result.status = COMMAND_STATUS_COMPLETED;
+		}
+		else
+		{
+			ICommandNote note;
+			note.type = COMMAND_NOTE_ERROR;
+			note.message = tr("Requested status is not acceptable");
+			result.notes.append(note);
+			result.status = COMMAND_STATUS_CANCELED;
+		}
+		return FCommands->sendCommandResult(result);
 	}
 	else if (ARequest.action == COMMAND_ACTION_CANCEL)
 	{
 		result.status = COMMAND_STATUS_CANCELED;
-		FCommands->sendCommandResult(result);
-		return true;
+		return FCommands->sendCommandResult(result);
 	}
 	return false;
-}
-
-bool RemoteControl::processSetMainStatus(const ICommandRequest &ARequest)
-{
-	ICommandResult result = FCommands->makeResult(ARequest);
-	if (ARequest.action == COMMAND_ACTION_EXECUTE)
-	{
-		result.status = COMMAND_STATUS_EXECUTING;
-		result.sessionId = QUuid::createUuid().toString();
-		result.form.type = DATAFORM_TYPE_FORM;
-		result.form.title = tr("Change main status");
-
-		IDataField field;
-		field.type = DATAFIELD_TYPE_HIDDEN;
-		field.var = "FORM_TYPE";
-		field.value = DATA_FORM_REMOTECONTROL;
-		result.form.fields.append(field);
-
-		field.type = DATAFIELD_TYPE_LISTSINGLE;
-		field.var = "status";
-		field.label = tr("Change main status");
-		field.required = true;
-
-		IDataOption opt;
-		foreach(int status, FStatusChanger->statusItems())
-		{
-			if (status < 0) continue;
-			opt.label = tr("%1 (%2)").arg(FStatusChanger->nameByShow(FStatusChanger->statusItemShow(status)),
-										  FStatusChanger->statusItemName(status));
-			opt.value = QString::number(status);
-			field.options.append(opt);
-		}
-		result.form.fields.append(field);
-		field.options.clear();
-
-		FCommands->sendCommandResult(result);
-		return true;
-	}
-	else if (ARequest.action == "" || ARequest.action == COMMAND_ACTION_COMPLETE)
-	{
-		// Следующий код считает что все допустимые статусы неотрицательные
-		result.status = COMMAND_STATUS_COMPLETED;
-		int statusId = -1;
-		foreach(IDataField field, ARequest.form.fields)
-		{
-			if (field.var == "status")
-			{
-				bool ok = true;
-				statusId = field.value.toInt(&ok);
-				if (!ok) statusId = -1;
-			}
-		}
-		if (statusId >= 0)
-			FStatusChanger->setMainStatus(statusId);
-
-		FCommands->sendCommandResult(result);
-		return true;
-	}
-	else if (ARequest.action == COMMAND_ACTION_CANCEL)
-	{
-		result.status = COMMAND_STATUS_CANCELED;
-		FCommands->sendCommandResult(result);
-		return true;
-	}
-	return false;
-}
-
-
-bool RemoteControl::receiveCommandError(const ICommandError &AError)
-{
-	return true;
 }
 
 IDataFormLocale RemoteControl::dataFormLocale(const QString &AFormType)
@@ -334,13 +301,13 @@ IDataFormLocale RemoteControl::dataFormLocale(const QString &AFormType)
 	IDataFormLocale locale;
 	if (AFormType == DATA_FORM_REMOTECONTROL)
 	{
-		locale.fields["auto-auth"].label = tr("Wheter to automatically authorize subscription requests");
+		locale.fields["auto-auth"].label = tr("Whether to automatically authorize subscription requests");
 		locale.fields["auto-files"].label = tr("Whether to automatically accept file transfers");
 		locale.fields["auto-msg"].label = tr("Whether to automatically open new messages");
 		locale.fields["auto-offline"].label = tr("Whether to automatically go offline when idle");
 		locale.fields["sounds"].label = tr("Whether to play sounds");
 		locale.fields["files"].label = tr("A list of pending file transfers");
-		locale.fields["groupchats"].label = tr("A list of joined groupchat rooms");
+		locale.fields["groupchats"].label = tr("A list of joined conferences");
 		locale.fields["status"].label = tr("A presence or availability status");
 		locale.fields["status-message"].label = tr("The status message text");
 		locale.fields["status-priority"].label = tr("The new priority for the client");

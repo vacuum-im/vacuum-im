@@ -8,20 +8,8 @@
         <translation>Удалённое управление</translation>
     </message>
     <message>
-        <source>Allows remote entities execute local commands (XEP-0146)</source>
-        <translation>Позволяет удалённо контролировать клиент (XEP-0146)</translation>
-    </message>
-    <message>
         <source>Ping</source>
         <translation>Пинг</translation>
-    </message>
-    <message>
-        <source>Change status</source>
-        <translation>Изменить статус</translation>
-    </message>
-    <message>
-        <source>Leave groupchats</source>
-        <translation>Выйти из конференций</translation>
     </message>
     <message>
         <source>Change main status</source>
@@ -32,20 +20,8 @@
         <translation>Понг!</translation>
     </message>
     <message>
-        <source>Choose groupchats you want to leave</source>
-        <translation>Выберите конференции из которых нужно выйти</translation>
-    </message>
-    <message>
-        <source>Groupchats</source>
-        <translation>Конференции</translation>
-    </message>
-    <message>
         <source>%1 on %2</source>
         <translation>%1 в %2</translation>
-    </message>
-    <message>
-        <source>Remote request from &quot;%1&quot;</source>
-        <translation>Удалённый запрос от &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Main status</source>
@@ -54,10 +30,6 @@
     <message>
         <source>%1 (%2)</source>
         <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <source>Wheter to automatically authorize subscription requests</source>
-        <translation>Автоматически авторизировать новые контакты</translation>
     </message>
     <message>
         <source>Whether to automatically accept file transfers</source>
@@ -80,10 +52,6 @@
         <translation>Список ожидающих передач файлов</translation>
     </message>
     <message>
-        <source>A list of joined groupchat rooms</source>
-        <translation>Список конференций</translation>
-    </message>
-    <message>
         <source>A presence or availability status</source>
         <translation>Статус</translation>
     </message>
@@ -93,7 +61,7 @@
     </message>
     <message>
         <source>The new priority for the client</source>
-        <translation>Приоритет</translation>
+        <translation>Новый приоритет для клиента</translation>
     </message>
     <message>
         <source>Chat</source>
@@ -122,6 +90,38 @@
     <message>
         <source>Offline</source>
         <translation>Не в сети</translation>
+    </message>
+    <message>
+        <source>Leave conferences</source>
+        <translation>Выйти из конференций</translation>
+    </message>
+    <message>
+        <source>This entity is not joined to any conferences</source>
+        <translation>Это подключение не содержит подключенных конференций</translation>
+    </message>
+    <message>
+        <source>Remote command to leave</source>
+        <translation>Удаленная команда на выход</translation>
+    </message>
+    <message>
+        <source>Requested status is not acceptable</source>
+        <translation>Запрашиваемый статус неприемлем</translation>
+    </message>
+    <message>
+        <source>Whether to automatically authorize subscription requests</source>
+        <translation>Автоматически принимать запросы на авторизацию</translation>
+    </message>
+    <message>
+        <source>A list of joined conferences</source>
+        <translation>Список подключенных конференций</translation>
+    </message>
+    <message>
+        <source>Allows to remotely control the client</source>
+        <translation>Позволяет удаленно управлять клиентом</translation>
+    </message>
+    <message>
+        <source>Change connection status</source>
+        <translation>Изменить статус подключения</translation>
     </message>
 </context>
 </TS>

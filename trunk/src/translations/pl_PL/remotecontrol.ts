@@ -8,19 +8,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allows remote entities execute local commands (XEP-0146)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change status</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Leave groupchats</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -32,19 +20,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Choose groupchats you want to leave</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Groupchats</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 on %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remote request from &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -53,10 +29,6 @@
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wheter to automatically authorize subscription requests</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -77,10 +49,6 @@
     </message>
     <message>
         <source>A list of pending file transfers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A list of joined groupchat rooms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -121,6 +89,38 @@
     </message>
     <message>
         <source>Offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave conferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This entity is not joined to any conferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote command to leave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requested status is not acceptable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Whether to automatically authorize subscription requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A list of joined conferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows to remotely control the client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change connection status</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
