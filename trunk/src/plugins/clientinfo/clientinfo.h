@@ -145,6 +145,7 @@ private:
 	IAutoStatus *FAutoStatus;
 	IOptionsManager *FOptionsManager;
 private:
+	int FPingHandle;
 	int FTimeHandle;
 	int FVersionHandle;
 	int FActivityHandler;
