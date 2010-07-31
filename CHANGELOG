@@ -8,6 +8,7 @@ LEGEND
 
 
 ------
+  [!] Added new plugin for remote controlling
   [+] Added ability to show tabs at the bottom of the tab windows
   [*} Changed the format of the qoutes design
   [*] Server side archive preferences support is not longer required for retrieving messages history from server
