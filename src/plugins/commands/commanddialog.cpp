@@ -46,9 +46,10 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
 
 		if (!AResult.form.type.isEmpty())
 		{
-			FCurrentForm = FDataForms->formWidget(AResult.form,ui.wdtForm);
-			if (!AResult.form.title.isEmpty())
-				setWindowTitle(AResult.form.title);
+			IDataForm form = FDataForms!=NULL ? FDataForms->localizeForm(AResult.form) : AResult.form;
+			FCurrentForm = FDataForms->formWidget(form,ui.wdtForm);
+			if (!form.title.isEmpty())
+				setWindowTitle(form.title);
 			if (FCurrentForm->tableWidget())
 				FCurrentForm->tableWidget()->instance()->setSortingEnabled(true);
 			ui.wdtForm->layout()->addWidget(FCurrentForm->instance());
@@ -127,7 +128,7 @@ QString CommandDialog::sendRequest(const QString &AAction)
 {
 	ICommandRequest request;
 	request.streamJid = FStreamJid;
-	request.commandJid = FCommandJid;
+	request.contactJid = FCommandJid;
 	request.node = FNode;
 	request.sessionId = FSessionId;
 	request.action = AAction;
@@ -175,4 +176,3 @@ void CommandDialog::onDialogButtonClicked(QAbstractButton *AButton)
 	else if (ui.dbbButtons->standardButton(AButton) == QDialogButtonBox::Close)
 		close();
 }
-

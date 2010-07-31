@@ -37,7 +37,7 @@ struct ICommandNote
 struct ICommandRequest
 {
 	Jid streamJid;
-	Jid commandJid;
+	Jid contactJid;
 	QString node;
 	QString stanzaId;
 	QString sessionId;
@@ -48,7 +48,7 @@ struct ICommandRequest
 struct ICommandResult
 {
 	Jid streamJid;
-	Jid commandJid;
+	Jid contactJid;
 	QString node;
 	QString stanzaId;
 	QString sessionId;
@@ -70,9 +70,9 @@ struct ICommandError
 class ICommandServer
 {
 public:
+	virtual bool isCommandPermitted(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode) const =0;
 	virtual QString commandName(const QString &ANode) const = 0;
 	virtual bool receiveCommandRequest(const ICommandRequest &ARequest) =0;
-	virtual bool receiveCommandError(const ICommandError &AError) =0;
 };
 
 class ICommandClient
@@ -100,7 +100,7 @@ public:
 	virtual bool sendCommandResult(const ICommandResult &AResult) =0;
 	virtual QList<ICommand> contactCommands(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual bool executeCommand(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode) =0;
-	virtual ICommandResult makeResult(const ICommandRequest&) const =0;
+	virtual ICommandResult prepareResult(const ICommandRequest &ARequest) const =0;
 protected:
 	virtual void serverInserted(const QString &ANode, ICommandServer *AServer) =0;
 	virtual void serverRemoved(const QString &ANode) =0;
