@@ -4,6 +4,7 @@
 #define NS_XMPP_STREAMS                         "urn:ietf:params:xml:ns:xmpp-streams"
 #define NS_XMPP_DELAY                           "urn:xmpp:delay"
 #define NS_XMPP_TIME                            "urn:xmpp:time"
+#define NS_XMPP_PING                            "urn:xmpp:ping"
 #define NS_STANZA_SESSION                       "urn:xmpp:ssn"
 #define NS_CAPTCHA_FORMS                        "urn:xmpp:captcha"
 #define NS_BITS_OF_BINARY                       "urn:xmpp:bob"

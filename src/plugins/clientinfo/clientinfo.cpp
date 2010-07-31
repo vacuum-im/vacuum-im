@@ -12,6 +12,7 @@
 #define SHC_SOFTWARE_VERSION            "/iq[@type='get']/query[@xmlns='" NS_JABBER_VERSION "']"
 #define SHC_LAST_ACTIVITY               "/iq[@type='get']/query[@xmlns='" NS_JABBER_LAST "']"
 #define SHC_ENTITY_TIME                 "/iq[@type='get']/time[@xmlns='" NS_XMPP_TIME "']"
+#define SHC_XMPP_PING                   "/iq[@type='get']/ping[@xmlns='" NS_XMPP_PING "']"
 
 #define SOFTWARE_INFO_TIMEOUT           10000
 #define LAST_ACTIVITY_TIMEOUT           10000
@@ -38,6 +39,7 @@ ClientInfo::ClientInfo()
 	FAutoStatus = NULL;
 	FOptionsManager = NULL;
 
+	FPingHandle = 0;
 	FTimeHandle = 0;
 	FVersionHandle = 0;
 	FActivityHandler = 0;
@@ -145,6 +147,10 @@ bool ClientInfo::initObjects()
 		shandle.conditions.clear();
 		shandle.conditions.append(SHC_ENTITY_TIME);
 		FTimeHandle = FStanzaProcessor->insertStanzaHandle(shandle);
+
+		shandle.conditions.clear();
+		shandle.conditions.append(SHC_XMPP_PING);
+		FPingHandle = FStanzaProcessor->insertStanzaHandle(shandle);
 	}
 
 	if (FRostersViewPlugin)
@@ -233,6 +239,13 @@ bool ClientInfo::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza 
 		DateTime dateTime(QDateTime::currentDateTime());
 		elem.appendChild(iq.createElement("tzo")).appendChild(iq.createTextNode(dateTime.toX85TZD()));
 		elem.appendChild(iq.createElement("utc")).appendChild(iq.createTextNode(dateTime.toX85UTC()));
+		FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
+	}
+	else if (AHandlerId == FPingHandle)
+	{
+		AAccept = true;
+		Stanza iq("iq");
+		iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
 		FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
 	}
 	return false;
@@ -805,6 +818,13 @@ void ClientInfo::registerDiscoFeatures()
 	dfeature.var = NS_XMPP_TIME;
 	dfeature.name = tr("Entity Time");
 	dfeature.description = tr("Supports the exchanging of the information about the user local time");
+	FDiscovery->insertDiscoFeature(dfeature);
+
+	dfeature.active = true;
+	dfeature.icon = QIcon();
+	dfeature.var = NS_XMPP_PING;
+	dfeature.name = tr("XMPP Ping");
+	dfeature.description = tr("Supports the exchanging of the application-level pings over XML streams");
 	FDiscovery->insertDiscoFeature(dfeature);
 }
 
