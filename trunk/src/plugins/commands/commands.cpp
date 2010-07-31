@@ -3,7 +3,7 @@
 #define COMMAND_TAG_NAME              "command"
 #define COMMANDS_TIMEOUT              60000
 
-#define SHC_COMMANDS                  "/iq[@type='set']/command"
+#define SHC_COMMANDS                  "/iq[@type='set']/command[@xmlns='" NS_COMMANDS "']"
 
 #define ADR_STREAM_JID                Action::DR_StreamJid
 #define ADR_COMMAND_JID               Action::DR_Parametr1
@@ -106,7 +106,7 @@ bool Commands::initObjects()
 	ErrorHandler::addErrorItem("session-expired",ErrorHandler::CANCEL,ErrorHandler::NOT_ALLOWED,
 	                           tr("Specified session is no longer active"),NS_COMMANDS);
 	ErrorHandler::addErrorItem("forbidden", ErrorHandler::AUTH, ErrorHandler::FORBIDDEN,
-							   tr("Forbidden"));
+	                           tr("Forbidden"));
 
 	if (FDiscovery)
 	{
@@ -134,18 +134,12 @@ bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &A
 {
 	if (FSHICommands.value(AStreamJid) == AHandlerId)
 	{
+		AAccept = true;
+
 		ICommandRequest request;
 		request.streamJid = AStreamJid;
-		request.commandJid = AStanza.from();
+		request.contactJid = AStanza.from();
 		request.stanzaId = AStanza.id();
-
-		if (AStreamJid.bare() != request.commandJid.bare())
-		{
-			Stanza reply = AStanza.replyError("forbidden", NS_COMMANDS, ErrorHandler::FORBIDDEN);
-			FStanzaProcessor->sendStanzaOut(AStreamJid, reply);
-			AAccept = true;
-			return false;
-		}
 
 		QDomElement cmdElem = AStanza.firstElement(COMMAND_TAG_NAME,NS_COMMANDS);
 		request.sessionId = cmdElem.attribute("sessionid");
@@ -162,12 +156,16 @@ bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &A
 		}
 
 		ICommandServer *server = FServers.value(request.node);
-		if (!server || !server->receiveCommandRequest(request))
+		if (server && !server->isCommandPermitted(request.streamJid,request.contactJid,request.node))
+		{
+			Stanza reply = AStanza.replyError("forbidden",NS_COMMANDS,ErrorHandler::FORBIDDEN);
+			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
+		}
+		else if (!server || !server->receiveCommandRequest(request))
 		{
 			Stanza reply = AStanza.replyError("malformed-action",NS_COMMANDS,ErrorHandler::BAD_REQUEST);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
 		}
-		AAccept = true;
 	}
 	return false;
 }
@@ -181,7 +179,7 @@ void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		{
 			ICommandResult result;
 			result.streamJid = AStreamJid;
-			result.commandJid = AStanza.from();
+			result.contactJid = AStanza.from();
 			result.stanzaId = AStanza.id();
 
 			QDomElement cmdElem = AStanza.firstElement(COMMAND_TAG_NAME,NS_COMMANDS);
@@ -286,46 +284,47 @@ void Commands::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 	}
 	else if (FServers.contains(ADiscoInfo.node))
 	{
-		IDiscoIdentity identity;
-		identity.category = DIC_AUTOMATION;
-		identity.type = DIT_COMMAND_NODE;
-		identity.name = FServers.value(ADiscoInfo.node)->commandName(ADiscoInfo.node);
-		ADiscoInfo.identity.append(identity);
+		ICommandServer *server = FServers.value(ADiscoInfo.node);
+		if (server && server->isCommandPermitted(ADiscoInfo.streamJid,ADiscoInfo.contactJid,ADiscoInfo.node))
+		{
+			IDiscoIdentity identity;
+			identity.category = DIC_AUTOMATION;
+			identity.type = DIT_COMMAND_NODE;
+			identity.name = server->commandName(ADiscoInfo.node);
+			ADiscoInfo.identity.append(identity);
 
-		if (!ADiscoInfo.features.contains(NS_COMMANDS))
-			ADiscoInfo.features.append(NS_COMMANDS);
-		if (!ADiscoInfo.features.contains(NS_JABBER_DATA))
-			ADiscoInfo.features.append(NS_JABBER_DATA);
+			if (!ADiscoInfo.features.contains(NS_COMMANDS))
+				ADiscoInfo.features.append(NS_COMMANDS);
+			if (!ADiscoInfo.features.contains(NS_JABBER_DATA))
+				ADiscoInfo.features.append(NS_JABBER_DATA);
+		}
 	}
 }
 
 void Commands::fillDiscoItems(IDiscoItems &ADiscoItems)
 {
-	if (!FServers.isEmpty() && ADiscoItems.streamJid.bare() == ADiscoItems.contactJid.bare())
+	if (ADiscoItems.node == NS_COMMANDS)
 	{
-		if (ADiscoItems.node == NS_COMMANDS)
+		foreach(QString node, FServers.keys())
 		{
-			QList<QString> nodes = FServers.keys();
-			foreach(QString node, nodes)
+			ICommandServer *server = FServers.value(node);
+			if (server && server->isCommandPermitted(ADiscoItems.streamJid,ADiscoItems.contactJid,node))
 			{
-				QString name = FServers.value(node)->commandName(node);
-				if (!name.isEmpty())
-				{
-					IDiscoItem ditem;
-					ditem.itemJid = ADiscoItems.streamJid;
-					ditem.node = node;
-					ditem.name = name;
-					ADiscoItems.items.append(ditem);
-				}
+				IDiscoItem ditem;
+				ditem.itemJid = ADiscoItems.streamJid;
+				ditem.node = node;
+				ditem.name = server->commandName(node);
+				ADiscoItems.items.append(ditem);
 			}
 		}
-		else if (ADiscoItems.node.isEmpty())
-		{
-			IDiscoItem ditem;
-			ditem.itemJid = ADiscoItems.streamJid;
-			ditem.node = NS_COMMANDS;
-			ditem.name = "Commands";
-		}
+	}
+	else if (ADiscoItems.node.isEmpty() && !FServers.isEmpty())
+	{
+		IDiscoItem ditem;
+		ditem.itemJid = ADiscoItems.streamJid;
+		ditem.node = NS_COMMANDS;
+		ditem.name = "Commands";
+		ADiscoItems.items.append(ditem);
 	}
 }
 
@@ -443,7 +442,7 @@ QString Commands::sendCommandRequest(const ICommandRequest &ARequest)
 	if (FStanzaProcessor)
 	{
 		Stanza request("iq");
-		request.setTo(ARequest.commandJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
+		request.setTo(ARequest.contactJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
 		QDomElement cmdElem = request.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
 		cmdElem.setAttribute("node",ARequest.node);
 		if (!ARequest.sessionId.isEmpty())
@@ -466,7 +465,7 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
 	if (FStanzaProcessor)
 	{
 		Stanza result("iq");
-		result.setTo(AResult.commandJid.eFull()).setType("result").setId(AResult.stanzaId);
+		result.setTo(AResult.contactJid.eFull()).setType("result").setId(AResult.stanzaId);
 
 		QDomElement cmdElem = result.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
 		cmdElem.setAttribute("node",AResult.node);
@@ -515,15 +514,15 @@ bool Commands::executeCommand(const Jid &AStreamJid, const Jid &ACommandJid, con
 	return false;
 }
 
-ICommandResult Commands::makeResult(const ICommandRequest& req) const
+ICommandResult Commands::prepareResult(const ICommandRequest &ARequest) const
 {
-	ICommandResult res;
-	res.streamJid = req.streamJid;
-	res.commandJid = req.commandJid;
-	res.node = req.node;
-	res.stanzaId = req.stanzaId;
-	res.sessionId = req.sessionId;
-	return res;
+	ICommandResult result;
+	result.streamJid = ARequest.streamJid;
+	result.contactJid = ARequest.contactJid;
+	result.node = ARequest.node;
+	result.stanzaId = ARequest.stanzaId;
+	result.sessionId = ARequest.sessionId;
+	return result;
 }
 
 void Commands::registerDiscoFeatures()
