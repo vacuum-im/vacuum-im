@@ -22,4 +22,7 @@
 //SessionNegotiation
 #define DATA_FORM_SESSION_NEGOTIATION         "urn:xmpp:ssn"
 
+//RemoteControl
+#define DATA_FORM_REMOTECONTROL               "http://jabber.org/protocol/rc"
+
 #endif
