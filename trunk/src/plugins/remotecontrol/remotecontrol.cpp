@@ -149,7 +149,7 @@ bool RemoteControl::processPing(const ICommandRequest &ARequest)
 bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 {
 	ICommandResult result = FCommands->prepareResult(ARequest);
-	if (ARequest.action == COMMAND_ACTION_EXECUTE)
+	if (ARequest.action == COMMAND_ACTION_EXECUTE && ARequest.form.fields.isEmpty())
 	{
 		result.sessionId = QUuid::createUuid().toString();
 		result.form.type = DATAFORM_TYPE_FORM;
@@ -191,10 +191,11 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 		{
 			result.form.fields.append(field);
 			result.status = COMMAND_STATUS_EXECUTING;
+			result.actions.append(COMMAND_ACTION_COMPLETE);
 		}
 		return FCommands->sendCommandResult(result);
 	}
-	else if (ARequest.action.isEmpty() || ARequest.action == COMMAND_ACTION_COMPLETE)
+	else if (ARequest.action == COMMAND_ACTION_COMPLETE || ARequest.action == COMMAND_ACTION_EXECUTE)
 	{
 		int index = FDataForms!=NULL ? FDataForms->fieldIndex(FIELD_GROUPCHATS,ARequest.form.fields) : -1;
 		if (index>=0)
@@ -225,7 +226,7 @@ bool RemoteControl::processSetStatus(const ICommandRequest &ARequest)
 {
 	ICommandResult result = FCommands->prepareResult(ARequest);
 	bool isMainStatus = ARequest.node == COMMAND_NODE_SET_MAIN_STATUS;
-	if (ARequest.action == COMMAND_ACTION_EXECUTE)
+	if (ARequest.action == COMMAND_ACTION_EXECUTE && ARequest.form.fields.isEmpty())
 	{
 		result.status = COMMAND_STATUS_EXECUTING;
 		result.sessionId = QUuid::createUuid().toString();
@@ -264,9 +265,10 @@ bool RemoteControl::processSetStatus(const ICommandRequest &ARequest)
 			}
 		}
 		result.form.fields.append(field);
+		result.actions.append(COMMAND_ACTION_COMPLETE);
 		return FCommands->sendCommandResult(result);
 	}
-	else if (ARequest.action.isEmpty() || ARequest.action == COMMAND_ACTION_COMPLETE)
+	else if (ARequest.action == COMMAND_ACTION_COMPLETE || ARequest.action == COMMAND_ACTION_EXECUTE)
 	{
 		int index = FDataForms!=NULL ? FDataForms->fieldIndex(FIELD_STATUS, ARequest.form.fields) : -1;
 		int statusId = index>=0 ? ARequest.form.fields.value(index).value.toInt() : STATUS_NULL_ID;
