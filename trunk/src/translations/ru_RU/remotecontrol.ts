@@ -123,5 +123,21 @@
         <source>Change connection status</source>
         <translation>Изменить статус подключения</translation>
     </message>
+    <message>
+        <source>Accept pending file transfers</source>
+        <translation>Принять входящие передачи файлов</translation>
+    </message>
+    <message>
+        <source>Pending file transfers</source>
+        <translation>Входящие передачи файлов</translation>
+    </message>
+    <message>
+        <source>%1 (%2 bytes) from %3</source>
+        <translation>%1 (%2 байт) от %3</translation>
+    </message>
+    <message>
+        <source>There are no pending file transfers</source>
+        <translation>Нет неприянтых входящих передач файлов</translation>
+    </message>
 </context>
 </TS>

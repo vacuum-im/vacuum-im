@@ -9,6 +9,7 @@
 #include <interfaces/istatuschanger.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/idataforms.h>
+#include <interfaces/ifilestreamsmanager.h>
 
 #define REMOTECONTROL_UUID "{152A3172-9A38-11DF-A3E4-001CBF2EDCFC}"
 
@@ -41,11 +42,13 @@ private:
 	bool processPing(const ICommandRequest &ARequest);
 	bool processLeaveMUC(const ICommandRequest &ARequest);
 	bool processSetStatus(const ICommandRequest &ARequest);
+	bool processFileTransfers(const ICommandRequest &ARequest);
 private:
 	ICommands *FCommands;
 	IStatusChanger *FStatusChanger;
 	IMultiUserChatPlugin *FMUCPlugin;
 	IDataForms *FDataForms;
+	IFileStreamsManager *FFileStreamManager;
 };
 
 #endif // REMOTECONTROL_H

@@ -123,5 +123,21 @@
         <source>Change connection status</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Accept pending file transfers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pending file transfers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (%2 bytes) from %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no pending file transfers</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

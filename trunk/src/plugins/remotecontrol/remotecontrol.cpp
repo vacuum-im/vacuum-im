@@ -1,13 +1,18 @@
 #include "remotecontrol.h"
 
+#include <utils/options.h>
+#include <definitions/optionvalues.h>
+
 #define COMMAND_NODE_ROOT               "http://jabber.org/protocol/rc"
 #define COMMAND_NODE_PING               COMMAND_NODE_ROOT"#ping"
 #define COMMAND_NODE_SET_STATUS         COMMAND_NODE_ROOT"#set-status"
 #define COMMAND_NODE_SET_MAIN_STATUS    COMMAND_NODE_ROOT"#set-main-status"
 #define COMMAND_NODE_LEAVE_MUC          COMMAND_NODE_ROOT"#leave-groupchats"
+#define COMMAND_NODE_ACCEPT_FILES       COMMAND_NODE_ROOT"#accept-files"
 
 #define FIELD_STATUS                    "status"
 #define FIELD_GROUPCHATS                "groupchats"
+#define FIELD_FILES                     "files"
 
 RemoteControl::RemoteControl()
 {
@@ -15,6 +20,7 @@ RemoteControl::RemoteControl()
 	FStatusChanger = NULL;
 	FMUCPlugin = NULL;
 	FDataForms = NULL;
+	FFileStreamManager = NULL;
 }
 
 RemoteControl::~RemoteControl()
@@ -56,6 +62,11 @@ bool RemoteControl::initConnections(IPluginManager *APluginManager, int &AInitOr
 	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 	}
+	plugin = APluginManager->pluginInterface("IFileStreamsManager").value(0,NULL);
+	if (plugin)
+	{
+		FFileStreamManager = qobject_cast<IFileStreamsManager *>(plugin->instance());
+	}
 	return (FCommands!=NULL && FDataForms!=NULL);
 }
 
@@ -72,6 +83,10 @@ bool RemoteControl::initObjects()
 		if (FMUCPlugin != NULL)
 		{
 			FCommands->insertServer(COMMAND_NODE_LEAVE_MUC, this);
+		}
+		if (FFileStreamManager != NULL)
+		{
+			FCommands->insertServer(COMMAND_NODE_ACCEPT_FILES, this);
 		}
 	}
 	if (FDataForms != NULL)
@@ -107,6 +122,8 @@ QString RemoteControl::commandName(const QString &ANode) const
 		return tr("Change main status");
 	if (ANode == COMMAND_NODE_LEAVE_MUC) 
 		return tr("Leave conferences");
+	if (ANode == COMMAND_NODE_ACCEPT_FILES)
+		return tr("Accept pending file transfers");
 	return QString::null;
 }
 
@@ -125,6 +142,9 @@ bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
 
 		if (ARequest.node == COMMAND_NODE_LEAVE_MUC && FMUCPlugin != NULL)
 			return processLeaveMUC(ARequest);
+
+		if (ARequest.node == COMMAND_NODE_ACCEPT_FILES && FFileStreamManager != NULL)
+			return processFileTransfers(ARequest);
 	}
 	return false;
 }
@@ -286,6 +306,90 @@ bool RemoteControl::processSetStatus(const ICommandRequest &ARequest)
 			note.type = COMMAND_NOTE_ERROR;
 			note.message = tr("Requested status is not acceptable");
 			result.notes.append(note);
+			result.status = COMMAND_STATUS_CANCELED;
+		}
+		return FCommands->sendCommandResult(result);
+	}
+	else if (ARequest.action == COMMAND_ACTION_CANCEL)
+	{
+		result.status = COMMAND_STATUS_CANCELED;
+		return FCommands->sendCommandResult(result);
+	}
+	return false;
+}
+
+bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
+{
+	ICommandResult result = FCommands->prepareResult(ARequest);
+	if (ARequest.action == COMMAND_ACTION_EXECUTE && ARequest.form.fields.isEmpty())
+	{
+		result.status = COMMAND_STATUS_EXECUTING;
+		result.sessionId = QUuid::createUuid().toString();
+		result.form.type = DATAFORM_TYPE_FORM;
+		result.form.title = commandName(ARequest.node);
+
+		IDataField field;
+		field.type = DATAFIELD_TYPE_HIDDEN;
+		field.var = "FORM_TYPE";
+		field.value = DATA_FORM_REMOTECONTROL;
+		field.required = false;
+		result.form.fields.append(field);
+
+		field.type = DATAFIELD_TYPE_LISTMULTI;
+		field.var = FIELD_FILES;
+		field.label = tr("Pending file transfers");
+		field.required = true;
+
+		IDataOption opt;
+		foreach(IFileStream *stream, FFileStreamManager->streams())
+		{
+			if (stream->streamKind() == IFileStream::ReceiveFile &&
+				stream->streamState() == IFileStream::Creating)
+			{
+				opt.label = tr("%1 (%2 bytes) from %3").arg(stream->fileName()).arg(stream->fileSize()).arg(stream->contactJid().bare());
+				opt.value = stream->streamId();
+				field.options.append(opt);
+			}
+		}
+
+		if(field.options.isEmpty())
+		{
+			ICommandNote note;
+			note.type = COMMAND_NOTE_INFO;
+			note.message = tr("There are no pending file transfers");
+			result.notes.append(note);
+			result.status = COMMAND_STATUS_COMPLETED;
+			result.form = IDataForm();
+		}
+		else
+		{
+			result.form.fields.append(field);
+			result.actions.append(COMMAND_ACTION_COMPLETE);
+		}
+		return FCommands->sendCommandResult(result);
+	}
+	else if (ARequest.action == COMMAND_ACTION_COMPLETE || ARequest.action == COMMAND_ACTION_EXECUTE)
+	{
+		int index = (FDataForms != NULL) ? FDataForms->fieldIndex(FIELD_FILES, ARequest.form.fields) : -1;
+		if (index >= 0)
+		{
+			foreach(QString streamId, ARequest.form.fields.value(index).value.toStringList())
+			{
+				IFileStream *stream = FFileStreamManager->streamById(streamId);
+				QString defaultMethod = Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString();
+				if (stream->acceptableMethods().contains(defaultMethod))
+				{
+					stream->startStream(defaultMethod);
+				}
+				else if (!stream->acceptableMethods().isEmpty())
+				{
+					stream->startStream(stream->acceptableMethods().at(0));
+				}
+			}
+			result.status = COMMAND_STATUS_COMPLETED;
+		}
+		else
+		{
 			result.status = COMMAND_STATUS_CANCELED;
 		}
 		return FCommands->sendCommandResult(result);
