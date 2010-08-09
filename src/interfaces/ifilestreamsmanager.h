@@ -55,6 +55,8 @@ public:
 	virtual void setFileDescription(const QString &AFileDesc) =0;
 	virtual QUuid settingsProfile() const =0;
 	virtual void setSettingsProfile(const QUuid &AProfileId) =0;
+	virtual QStringList acceptableMethods() const =0;
+	virtual void setAcceptableMethods(const QStringList &AMethods) =0;
 	virtual bool initStream(const QList<QString> &AMethods) =0;
 	virtual bool startStream(const QString &AMethodNS) =0;
 	virtual void abortStream(const QString &AError) =0;
@@ -90,7 +92,7 @@ protected:
 	virtual void streamDestroyed(IFileStream *AStream) =0;
 };
 
-Q_DECLARE_INTERFACE(IFileStream,"Vacuum.Plugin.IFileStream/1.0")
+Q_DECLARE_INTERFACE(IFileStream,"Vacuum.Plugin.IFileStream/1.1")
 Q_DECLARE_INTERFACE(IFileStreamsHandler,"Vacuum.Plugin.IFileStreamsHandler/1.0")
 Q_DECLARE_INTERFACE(IFileStreamsManager,"Vacuum.Plugin.IFileStreamsManager/1.0")
 

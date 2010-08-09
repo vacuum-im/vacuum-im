@@ -49,6 +49,8 @@ public:
 	virtual void setFileDescription(const QString &AFileDesc);
 	virtual QUuid settingsProfile() const;
 	virtual void setSettingsProfile(const QUuid &AProfileId);
+	virtual QStringList acceptableMethods() const;
+	virtual void setAcceptableMethods(const QStringList &AMethods);
 	virtual bool initStream(const QList<QString> &AMethods);
 	virtual bool startStream(const QString &AMethodNS);
 	virtual void abortStream(const QString &AError);
@@ -82,6 +84,7 @@ private:
 	QString FMethodNS;
 	QString FAbortString;
 	QString FStateString;
+	QStringList FAcceptableMethods;
 private:
 	bool FRangeSupported;
 	qint64 FRangeOffset;
