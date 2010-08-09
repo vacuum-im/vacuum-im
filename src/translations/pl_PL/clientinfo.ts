@@ -72,6 +72,14 @@
         <source>Share information about OS version</source>
         <translation>Udostępniaj informację o wersji systemu</translation>
     </message>
+    <message>
+        <source>XMPP Ping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Supports the exchanging of the application-level pings over XML streams</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ClientInfoDialog</name>
