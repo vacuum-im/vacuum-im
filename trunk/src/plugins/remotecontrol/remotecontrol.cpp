@@ -2,6 +2,7 @@
 
 #include <utils/options.h>
 #include <definitions/optionvalues.h>
+#include <QMap>
 
 #define COMMAND_NODE_ROOT               "http://jabber.org/protocol/rc"
 #define COMMAND_NODE_PING               COMMAND_NODE_ROOT"#ping"
@@ -9,10 +10,25 @@
 #define COMMAND_NODE_SET_MAIN_STATUS    COMMAND_NODE_ROOT"#set-main-status"
 #define COMMAND_NODE_LEAVE_MUC          COMMAND_NODE_ROOT"#leave-groupchats"
 #define COMMAND_NODE_ACCEPT_FILES       COMMAND_NODE_ROOT"#accept-files"
+#define COMMAND_NODE_SET_OPTIONS        COMMAND_NODE_ROOT"#set-options"
 
 #define FIELD_STATUS                    "status"
 #define FIELD_GROUPCHATS                "groupchats"
 #define FIELD_FILES                     "files"
+#define FIELD_SOUNDS                    "sounds"
+#define FIELD_AUTO_MSG                  "auto-msg"
+#define FIELD_AUTO_FILES                "auto-files"
+#define FIELD_AUTO_AUTH                 "auto-auth"
+
+struct OptionsFormItem
+{
+	QString node;
+	QString label;
+
+	OptionsFormItem(QString ANode = QString(), QString ALabel = QString()) : node(ANode), label(ALabel) {}
+};
+
+QMap<QString, OptionsFormItem> optionItems;
 
 RemoteControl::RemoteControl()
 {
@@ -88,11 +104,19 @@ bool RemoteControl::initObjects()
 		{
 			FCommands->insertServer(COMMAND_NODE_ACCEPT_FILES, this);
 		}
+		FCommands->insertServer(COMMAND_NODE_SET_OPTIONS, this);
 	}
 	if (FDataForms != NULL)
 	{
 		FDataForms->insertLocalizer(this, DATA_FORM_REMOTECONTROL);
 	}
+
+	optionItems.clear();
+	optionItems[FIELD_SOUNDS] = OptionsFormItem(OPV_NOTIFICATIONS_SOUND, tr("Play sounds"));
+	optionItems[FIELD_AUTO_MSG] = OptionsFormItem(OPV_NOTIFICATIONS_AUTOACTIVATE, tr("Automatically Open New Messages"));
+	optionItems[FIELD_AUTO_FILES] = OptionsFormItem(OPV_FILETRANSFER_AUTORECEIVE, tr("Automatically Accept File Transfers"));
+	optionItems[FIELD_AUTO_AUTH] = OptionsFormItem(OPV_ROSTER_AUTOSUBSCRIBE, tr("Automatically Authorize Contacts"));
+
 	return true;
 }
 
@@ -124,6 +148,8 @@ QString RemoteControl::commandName(const QString &ANode) const
 		return tr("Leave conferences");
 	if (ANode == COMMAND_NODE_ACCEPT_FILES)
 		return tr("Accept pending file transfers");
+	if (ANode == COMMAND_NODE_SET_OPTIONS)
+		return tr("Set options");
 	return QString::null;
 }
 
@@ -145,6 +171,9 @@ bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
 
 		if (ARequest.node == COMMAND_NODE_ACCEPT_FILES && FFileStreamManager != NULL)
 			return processFileTransfers(ARequest);
+
+		if (ARequest.node == COMMAND_NODE_SET_OPTIONS)
+			return processSetOptions(ARequest);
 	}
 	return false;
 }
@@ -391,6 +420,55 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 		else
 		{
 			result.status = COMMAND_STATUS_CANCELED;
+		}
+		return FCommands->sendCommandResult(result);
+	}
+	else if (ARequest.action == COMMAND_ACTION_CANCEL)
+	{
+		result.status = COMMAND_STATUS_CANCELED;
+		return FCommands->sendCommandResult(result);
+	}
+	return false;
+}
+
+bool RemoteControl::processSetOptions(const ICommandRequest &ARequest)
+{
+	ICommandResult result = FCommands->prepareResult(ARequest);
+	if (ARequest.action == COMMAND_ACTION_EXECUTE && ARequest.form.fields.isEmpty())
+	{
+		result.status = COMMAND_STATUS_EXECUTING;
+		result.sessionId = QUuid::createUuid().toString();
+		result.form.type = DATAFORM_TYPE_FORM;
+		result.form.title = commandName(ARequest.node);
+
+		IDataField field;
+		field.type = DATAFIELD_TYPE_HIDDEN;
+		field.var = "FORM_TYPE";
+		field.value = DATA_FORM_REMOTECONTROL;
+		field.required = false;
+		result.form.fields.append(field);
+
+		field.type = DATAFIELD_TYPE_BOOLEAN;
+		foreach(QString fieldName, optionItems.keys())
+		{
+			field.var = fieldName;
+			field.label = optionItems[fieldName].label;
+			field.value = Options::node(optionItems[fieldName].node).value().toBool();
+			result.form.fields.append(field);
+		}
+
+		result.actions.append(COMMAND_ACTION_COMPLETE);
+		return FCommands->sendCommandResult(result);
+	}
+	else if (ARequest.action == COMMAND_ACTION_COMPLETE || ARequest.action == COMMAND_ACTION_EXECUTE)
+	{
+		foreach(IDataField field, ARequest.form.fields)
+		{
+			if (optionItems.contains(field.var) &&
+				Options::node(optionItems[field.var].node).value().toBool() != field.value.toBool())
+			{
+				Options::node(optionItems[field.var].node).setValue(field.value.toBool());
+			}
 		}
 		return FCommands->sendCommandResult(result);
 	}

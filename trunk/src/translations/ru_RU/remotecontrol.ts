@@ -139,5 +139,25 @@
         <source>There are no pending file transfers</source>
         <translation>Нет неприянтых входящих передач файлов</translation>
     </message>
+    <message>
+        <source>Play sounds</source>
+        <translation>Звуковые уведомления</translation>
+    </message>
+    <message>
+        <source>Automatically Open New Messages</source>
+        <translation>Автоматически открывать входящие сообщения</translation>
+    </message>
+    <message>
+        <source>Automatically Accept File Transfers</source>
+        <translation>Автоматически принимать передачи файлов</translation>
+    </message>
+    <message>
+        <source>Automatically Authorize Contacts</source>
+        <translation>Автоматически принимать запросы на авторизацию</translation>
+    </message>
+    <message>
+        <source>Set options</source>
+        <translation>Изменить настройки</translation>
+    </message>
 </context>
 </TS>

@@ -43,6 +43,7 @@ private:
 	bool processLeaveMUC(const ICommandRequest &ARequest);
 	bool processSetStatus(const ICommandRequest &ARequest);
 	bool processFileTransfers(const ICommandRequest &ARequest);
+	bool processSetOptions(const ICommandRequest &ARequest);
 private:
 	ICommands *FCommands;
 	IStatusChanger *FStatusChanger;

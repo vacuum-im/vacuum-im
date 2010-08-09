@@ -139,5 +139,25 @@
         <source>There are no pending file transfers</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Play sounds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Open New Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Accept File Transfers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Authorize Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set options</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
