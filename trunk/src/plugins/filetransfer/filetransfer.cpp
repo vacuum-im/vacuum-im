@@ -288,6 +288,8 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
 
 		QString fileName = fileElem.attribute("name");
 		qint64 fileSize = fileElem.attribute("size").toLongLong();
+
+		QList<QString> methods = AMethods.toSet().intersect(Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList().toSet()).toList();
 		if (!fileName.isEmpty() && fileSize>0)
 		{
 			IFileStream *stream = createStream(AStreamId,ARequest.to(),ARequest.from(),IFileStream::ReceiveFile);
@@ -299,11 +301,12 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
 				stream->setFileDate(DateTime(fileElem.attribute("date")).toLocal());
 				stream->setFileDescription(fileElem.firstChildElement("desc").text());
 				stream->setRangeSupported(!fileElem.firstChildElement("range").isNull());
+				stream->setAcceptableMethods(methods);
 
 				StreamDialog *dialog = createStreamDialog(stream);
-				dialog->setSelectableMethods(AMethods);
+				dialog->setSelectableMethods(methods);
 
-				if (AMethods.contains(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString()))
+				if (methods.contains(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString()))
 					autoStartStream(stream);
 
 				notifyStream(stream, true);

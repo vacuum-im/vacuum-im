@@ -166,13 +166,12 @@ bool FileStreamsManager::dataStreamRequest(const QString &AStreamId, const Stanz
 {
 	if (!FStreams.contains(AStreamId))
 	{
-		QList<QString> methods = AMethods.toSet().intersect(Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList().toSet()).toList();
-		if (!methods.isEmpty())
+		if (!AMethods.isEmpty())
 		{
 			for (QMultiMap<int, IFileStreamsHandler *>::const_iterator it = FHandlers.constBegin(); it!=FHandlers.constEnd(); it++)
 			{
 				IFileStreamsHandler *handler = it.value();
-				if (handler->fileStreamRequest(it.key(),AStreamId,ARequest,methods))
+				if (handler->fileStreamRequest(it.key(),AStreamId,ARequest,AMethods))
 				{
 					return true;
 				}

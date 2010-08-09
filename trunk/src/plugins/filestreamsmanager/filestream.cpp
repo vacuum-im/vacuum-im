@@ -386,6 +386,16 @@ void FileStream::setStreamState(int AState, const QString &AMessage)
 	}
 }
 
+QStringList FileStream::acceptableMethods() const
+{
+	return FAcceptableMethods;
+}
+
+void FileStream::setAcceptableMethods(const QStringList &AMethods)
+{
+	FAcceptableMethods = AMethods;
+}
+
 void FileStream::onSocketStateChanged(int AState)
 {
 	if (AState == IDataStreamSocket::Opened)
