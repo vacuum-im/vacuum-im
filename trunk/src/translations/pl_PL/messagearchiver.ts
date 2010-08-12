@@ -124,7 +124,7 @@
     </message>
     <message>
         <source>Auto Archiving Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje automatycznej archiwizacji</translation>
     </message>
 </context>
 <context>

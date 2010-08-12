@@ -238,7 +238,7 @@
     </message>
     <message>
         <source>Show Tabs at Bootom of the Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokazuj zakładki na dole</translation>
     </message>
 </context>
 <context>

@@ -74,11 +74,11 @@
     </message>
     <message>
         <source>XMPP Ping</source>
-        <translation type="unfinished"></translation>
+        <translation>XMPP Ping</translation>
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Obsługa pingów na poziomie aplikacji z wykorzytsaniem protokołu XMPP</translation>
     </message>
 </context>
 <context>

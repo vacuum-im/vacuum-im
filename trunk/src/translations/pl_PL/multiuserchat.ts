@@ -498,11 +498,11 @@ Check values and try again</source>
     </message>
     <message>
         <source>Leave all hidden conferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozostaw wszystkie ukryte konferencje</translation>
     </message>
     <message>
         <source>Show all hidden conferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż wszystkie ukryte konferencje</translation>
     </message>
 </context>
 <context>
