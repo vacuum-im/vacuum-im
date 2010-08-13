@@ -57,3 +57,4 @@ SUBDIRS += captchaforms
 SUBDIRS += bitsofbinary
 SUBDIRS += xmppuriqueries
 SUBDIRS += remotecontrol
+SUBDIRS += pep
