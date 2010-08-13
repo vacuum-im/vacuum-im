@@ -78,4 +78,9 @@
 #define NS_INBAND_BYTESTREAMS                   "http://jabber.org/protocol/ibb"
 #define NS_SOCKS5_BYTESTREAMS                   "http://jabber.org/protocol/bytestreams"
 
+#define NS_PUBSUB                               "http://jabber.org/protocol/pubsub"
+#define NS_PUBSUB_ERRORS                        "http://jabber.org/protocol/pubsub#errors"
+#define NS_PUBSUB_EVENT                         "http://jabber.org/protocol/pubsub#event"
+#define NS_PUBSUB_OWNER                         "http://jabber.org/protocol/pubsub#owner"
+
 #endif
