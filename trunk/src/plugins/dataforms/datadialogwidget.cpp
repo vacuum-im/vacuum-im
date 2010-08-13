@@ -7,7 +7,6 @@ DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AFor
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setLayout(new QVBoxLayout(this));
 	layout()->setMargin(5);
-	resize(500,325);
 
 	FFormWidget = NULL;
 	FAllowInvalid = false;
