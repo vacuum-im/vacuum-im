@@ -4,22 +4,6 @@
 <context>
     <name>EditStatusDialog</name>
     <message>
-        <source>Name</source>
-        <translation>Имя</translation>
-    </message>
-    <message>
-        <source>Show</source>
-        <translation>Статус</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation>Приоритет</translation>
-    </message>
-    <message>
         <source>Enter status name</source>
         <translation>Введите имя статуса</translation>
     </message>
@@ -69,6 +53,42 @@
     <message>
         <source>Edit statuses</source>
         <translation>Редактировать статусы</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <source>Status name displayed in status change menu</source>
+        <translation>Имя статуса, отображаемое в меню</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Сообщение</translation>
+    </message>
+    <message>
+        <source>Status message</source>
+        <translation>Статусное сообщение</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Приоритет</translation>
+    </message>
+    <message>
+        <source>Status priority</source>
+        <translation>Приоритет статуса</translation>
+    </message>
+    <message>
+        <source>Status type&lt;br&gt;
+Types for standard statuses are grayed out.
+You can set status class for additional statuses defined by you.</source>
+        <translation>Тип статуса&lt;br&gt;
+Типы для стандартных статусов неактивны.
+Вы можете изменить тип только для дополнительно созданных статусов.</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тип</translation>
     </message>
 </context>
 <context>
