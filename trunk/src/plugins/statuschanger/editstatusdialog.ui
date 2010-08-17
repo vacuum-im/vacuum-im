@@ -19,15 +19,58 @@
    </property>
    <item>
     <widget class="QTableWidget" name="tblStatus">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
      <property name="rowCount">
       <number>0</number>
      </property>
      <property name="columnCount">
-      <number>0</number>
+      <number>4</number>
      </property>
      <attribute name="horizontalHeaderHighlightSections">
       <bool>false</bool>
      </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Type</string>
+      </property>
+      <property name="toolTip">
+       <string>Status type&lt;br&gt;
+Types for standard statuses are grayed out.
+You can set status class for additional statuses defined by you.</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Name</string>
+      </property>
+      <property name="toolTip">
+       <string>Status name displayed in status change menu</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Message</string>
+      </property>
+      <property name="toolTip">
+       <string>Status message</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Priority</string>
+      </property>
+      <property name="toolTip">
+       <string>Status priority</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>

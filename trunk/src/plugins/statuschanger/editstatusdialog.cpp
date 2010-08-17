@@ -18,7 +18,7 @@
 #define COL_MESSAGE     2
 #define COL_PRIORITY    3
 
-Delegate::Delegate(IStatusChanger *AStatusChanger, QObject *AParent) : QItemDelegate(AParent)
+Delegate::Delegate(IStatusChanger *AStatusChanger, QObject *AParent) : QStyledItemDelegate(AParent)
 {
 	FStatusChanger = AStatusChanger;
 }
@@ -49,7 +49,7 @@ QWidget *Delegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AO
 		return spinBox;
 	}
 	default:
-		return QItemDelegate::createEditor(AParent,AOption,AIndex);
+		return QStyledItemDelegate::createEditor(AParent,AOption,AIndex);
 	}
 }
 
@@ -75,20 +75,22 @@ void Delegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const
 			spinBox->setValue(AIndex.data(TIR_VALUE).toInt());
 	}
 	default:
-		QItemDelegate::setEditorData(AEditor,AIndex);
+		QStyledItemDelegate::setEditorData(AEditor,AIndex);
 	}
 }
 
 void Delegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
 {
 	DelegateType type = (DelegateType)AIndex.data(TIR_DELEGATE).toInt();
+	bool allowEmptyText = true;
 	switch (type)
 	{
 	case DelegateName:
+		allowEmptyText = false;
 	case DelegateMessage:
 	{
 		QLineEdit *lineEdit = qobject_cast<QLineEdit *>(AEditor);
-		if (lineEdit && !lineEdit->text().trimmed().isEmpty())
+		if (lineEdit && (allowEmptyText || !lineEdit->text().trimmed().isEmpty()))
 		{
 			AModel->setData(AIndex, lineEdit->text(), Qt::DisplayRole);
 			AModel->setData(AIndex, lineEdit->text(), TIR_VALUE);
@@ -117,7 +119,7 @@ void Delegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const 
 		}
 	}
 	default:
-		QItemDelegate::setModelData(AEditor,AModel,AIndex);
+		QStyledItemDelegate::setModelData(AEditor,AModel,AIndex);
 	}
 }
 
@@ -132,7 +134,7 @@ void Delegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem
 		break;
 	}
 	default:
-		QItemDelegate::updateEditorGeometry(AEditor,AOption,AIndex);
+		QStyledItemDelegate::updateEditorGeometry(AEditor,AOption,AIndex);
 	}
 }
 
@@ -145,11 +147,6 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 
 	FStatusChanger = AStatusChanger;
 
-	tblStatus->setColumnCount(4);
-	tblStatus->setHorizontalHeaderLabels(QStringList() << tr("Show") << tr("Name") << tr("Message") << tr("Priority"));
-	tblStatus->setSelectionBehavior(QAbstractItemView::SelectRows);
-	tblStatus->setSelectionMode(QAbstractItemView::SingleSelection);
-	tblStatus->verticalHeader()->hide();
 	tblStatus->setWordWrap(true);
 	tblStatus->setItemDelegate(new Delegate(AStatusChanger,tblStatus));
 
@@ -214,7 +211,7 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 		}
 		else
 		{
-			show->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+			show->setFlags(Qt::ItemIsSelectable);
 			name->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
 			message->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
 			priority->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
@@ -231,7 +228,9 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 	connect(pbtAdd,SIGNAL(clicked(bool)),SLOT(onAddbutton(bool)));
 	connect(pbtDelete,SIGNAL(clicked(bool)),SLOT(onDeleteButton(bool)));
 	connect(dbtDialogButtons,SIGNAL(accepted()),SLOT(onDialogButtonsBoxAccepted()));
-}
+	connect(tblStatus,SIGNAL(itemSelectionChanged()),SLOT(onSelectionChanged()));
+
+	onSelectionChanged();}
 
 EditStatusDialog::~EditStatusDialog()
 {
@@ -347,3 +346,19 @@ void EditStatusDialog::onDialogButtonsBoxAccepted()
 	accept();
 }
 
+void EditStatusDialog::onSelectionChanged()
+{
+	QList<QTableWidgetItem *> tableItems = tblStatus->selectedItems();
+	bool allowDelete = true;
+	bool selectionEmpty = true;
+	foreach (QTableWidgetItem *tableItem, tableItems)
+	{
+		if (tableItem->data(TIR_STATUSID).isValid())
+		{
+			int statusId = tableItem->data(TIR_STATUSID).toInt();
+			allowDelete = allowDelete && (statusId > STATUS_MAX_STANDART_ID || statusId == STATUS_NULL_ID);
+			selectionEmpty = false;
+		}
+	}
+	pbtDelete->setEnabled(allowDelete && !selectionEmpty);
+}

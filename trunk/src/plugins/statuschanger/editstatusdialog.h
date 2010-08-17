@@ -3,7 +3,7 @@
 
 #include <QIcon>
 #include <QDialog>
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <interfaces/istatuschanger.h>
@@ -22,7 +22,7 @@ struct RowStatus {
 };
 
 class Delegate :
-			public QItemDelegate
+			public QStyledItemDelegate
 {
 	Q_OBJECT;
 public:
@@ -54,6 +54,7 @@ protected slots:
 	void onAddbutton(bool);
 	void onDeleteButton(bool);
 	void onDialogButtonsBoxAccepted();
+	void onSelectionChanged();
 private:
 	IStatusChanger *FStatusChanger;
 private:
