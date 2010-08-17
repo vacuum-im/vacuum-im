@@ -1,0 +1,7 @@
+add_subdirectory(minizip)
+add_subdirectory(idn)
+add_subdirectory(qtlockedfile)
+add_subdirectory(jdns)
+if (NOT UNIX OR APPLE)
+	add_subdirectory(zlib)
+endif (NOT UNIX OR APPLE)
