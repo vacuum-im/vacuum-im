@@ -18,7 +18,7 @@ if (IS_ENABLED)
 	qt4_wrap_cpp(MOC_SOURCES ${HEADERS})
 	qt4_wrap_ui(UI_HEADERS ${UIS})
 
-	add_translations(TRANSLATIONS ${PLUGIN_NAME})
+	add_translations(TRANSLATIONS ${PLUGIN_NAME} ${HEADERS} ${SOURCES} ${UIS})
 	add_library(${PLUGIN_NAME} SHARED ${SOURCES} ${MOC_SOURCES} ${UI_HEADERS} ${TRANSLATIONS})
 	set_target_properties(${PLUGIN_NAME} PROPERTIES
 		LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/plugins")
