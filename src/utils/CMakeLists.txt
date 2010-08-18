@@ -9,7 +9,7 @@ include(${QT_USE_FILE})
 add_definitions("-DUTILS_DLL")
 link_directories("${CMAKE_BINARY_DIR}/libs")
 
-add_translations(TRANSLATIONS "${TARGET_UTILS}")
+add_translations(TRANSLATIONS "${TARGET_UTILS}" ${SOURCES})
 add_library(${TARGET_UTILS} SHARED ${SOURCES} ${MOC_SOURCES} ${TRANSLATIONS})
 
 if (UNIX AND NOT APPLE)

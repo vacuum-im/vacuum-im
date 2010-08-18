@@ -4,4 +4,6 @@ project(vacuum-im)
 
 find_package(Qt4 REQUIRED)
 
+add_custom_target(updatets)
+
 add_subdirectory(src)
