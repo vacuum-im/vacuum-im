@@ -1,4 +1,4 @@
-include("${CMAKE_SOURCE_DIR}/src/config.cmake")
+include("${CMAKE_SOURCE_DIR}/config.cmake")
 
 project(zlib C)
 
