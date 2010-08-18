@@ -22,6 +22,10 @@ elseif (WIN32)
 	set(INSTALL_RES_DIR ".")
 endif (APPLE)
 
+if (CMAKE_INSTALL_PREFIX STREQUAL "")
+	set(CMAKE_INSTALL_PREFIX "${INSTALL_PREFIX}")
+endif (CMAKE_INSTALL_PREFIX STREQUAL "")
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set(PLUGINS_DIR "./plugins")
 	set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources")
@@ -46,4 +50,5 @@ add_definitions(-DTRANSLATIONS_DIR="${TRANSLATIONS_DIR}")
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
+include("${CMAKE_SOURCE_DIR}/install.cmake")
 include("${CMAKE_SOURCE_DIR}/translations.cmake")

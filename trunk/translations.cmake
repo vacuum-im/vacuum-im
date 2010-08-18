@@ -29,6 +29,8 @@ macro(add_translations outvar tsname)
 				COMMAND "${QT_LRELEASE_EXECUTABLE}" ${LRELEASE_OPTS} "${TS}" -qm "${QM}"
 				DEPENDS ${TS})
 		set(QMS ${QMS} "${QM}")
+		# Install *.qm
+		install(FILES "${QM}" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}")
 	endforeach(LANG)
 	set(${outvar} "${QMS}")
 endmacro(add_translations)
