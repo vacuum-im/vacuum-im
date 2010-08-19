@@ -2,6 +2,8 @@
 
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QSignalMapper>
+#include <QShortcut>
 
 #define ADR_TABWINDOWID             Action::DR_Parametr1
 
@@ -13,6 +15,18 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	ui.twtTabs->widget(0)->deleteLater();
 	ui.twtTabs->removeTab(0);
 	ui.twtTabs->setMovable(true);
+
+	QSignalMapper *tabMapper = new QSignalMapper(this);
+	for (int digit=1; digit<=10; digit++)
+	{
+		QKeySequence key(QString("Alt+%1").arg(digit % 10));
+		QShortcut *shortcut = new QShortcut(key, this);
+		tabMapper->setMapping(shortcut, digit-1); // QTabWidget's indices are 0-based
+		connect(shortcut, SIGNAL(activated()),
+				tabMapper, SLOT(map()));
+	}
+	connect(tabMapper, SIGNAL(mapped(int)),
+			ui.twtTabs, SLOT(setCurrentIndex(int)));
 
 	FWindowId = AWindowId;
 	FMessageWidgets = AMessageWidgets;
