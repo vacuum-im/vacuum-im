@@ -79,6 +79,7 @@
 #define OPV_MESSAGES_EDITORSENDKEY                      "messages.editor-send-key"
 #define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
 #define OPV_MESSAGES_TABWINDOWS_ENABLE                  "messages.tab-windows.enable"
+#define OPV_MESSAGES_TABWINDOWS_SHOW_INDICES            "messages.tab-windows.show-indices"
 #define OPV_MESSAGES_TABWINDOWS_DEFAULT                 "messages.tab-windows.default"
 #define OPV_MESSAGES_TABWINDOW_ITEM                     "messages.tab-windows.window"
 #define OPV_MESSAGES_TABWINDOW_NAME                     "messages.tab-windows.window.name"

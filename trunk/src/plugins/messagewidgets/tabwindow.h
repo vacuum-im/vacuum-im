@@ -77,6 +77,8 @@ private:
 	Action *FRenameWindow;
 	Action *FDeleteWindow;
 private:
+	bool FShowTabIndices;
+private:
 	QUuid FWindowId;
 };
 
