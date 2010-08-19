@@ -68,7 +68,7 @@ signals:
 	void filterChanged(const IArchiveFilter &AFilter);
 	void itemCreated(QStandardItem *AItem);
 	void itemContextMenu(QStandardItem *AItem, Menu *AMenu);
-	void currentItemChanged(QStandardItem *ACurrent, QStandardItem *ABefour);
+	void currentItemChanged(QStandardItem *ACurrent, QStandardItem *ABefore);
 	void itemDestroyed(QStandardItem *AItem);
 	void windowDestroyed(IArchiveWindow *AWindow);
 protected:
@@ -109,7 +109,7 @@ protected slots:
 	void onServerCollectionSaved(const QString &AId, const IArchiveHeader &AHeader);
 	void onServerCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	void onRequestFailed(const QString &AId, const QString &AError);
-	void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefour);
+	void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefore);
 	void onItemContextMenuRequested(const QPoint &APos);
 	void onApplyFilterClicked();
 	void onInvalidateTimeout();

@@ -78,7 +78,7 @@ protected:
 	virtual void closed() =0;
 	virtual void error(const QString &AError) =0;
 	virtual void jidAboutToBeChanged(const Jid &AAfter) =0;
-	virtual void jidChanged(const Jid &ABefour) =0;
+	virtual void jidChanged(const Jid &ABefore) =0;
 	virtual void connectionChanged(IConnection *AConnection) =0;
 	virtual void dataHandlerInserted(IXmppDataHandler *AHandler, int AOrder) =0;
 	virtual void dataHandlerRemoved(IXmppDataHandler *AHandler, int AOrder) =0;
@@ -109,7 +109,7 @@ protected:
 	virtual void closed(IXmppStream *AXmppStream) =0;
 	virtual void error(IXmppStream *AXmppStream, const QString &AError) =0;
 	virtual void jidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter) =0;
-	virtual void jidChanged(IXmppStream *AXmppStream, const Jid &ABefour) =0;
+	virtual void jidChanged(IXmppStream *AXmppStream, const Jid &ABefore) =0;
 	virtual void connectionChanged(IXmppStream *AXmppStream, IConnection *AConnection) =0;
 	virtual void removed(IXmppStream *AXmppStream) =0;
 	virtual void streamDestroyed(IXmppStream *AXmppStream) =0;

@@ -72,10 +72,10 @@ signals:
 	void chatError(const QString &AMessage);
 	void chatClosed();
 	void chatDestroyed();
-	void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
+	void streamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	//Occupant
 	void userPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
-	void userDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefour, const QVariant &AAfter);
+	void userDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter);
 	void userNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
 	void presenceChanged(int AShow, const QString &AStatus);
 	void serviceMessageReceived(const Message &AMessage);
@@ -110,11 +110,11 @@ protected slots:
 	void onMessageReceived(const Message &AMessage);
 	void onMessageSend(Message &AMessage);
 	void onMessageSent(const Message &AMessage);
-	void onUserDataChanged(int ARole, const QVariant &ABefour, const QVariant &AAfter);
+	void onUserDataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter);
 	void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
 	void onPresenceAboutToClose(int AShow, const QString &AStatus);
 	void onStreamClosed();
-	void onStreamJidChanged(const Jid &ABefour);
+	void onStreamJidChanged(const Jid &ABefore);
 private:
 	IPresence *FPresence;
 	IDataForms *FDataForms;

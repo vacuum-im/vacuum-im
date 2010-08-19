@@ -42,7 +42,7 @@ protected slots:
 	void onWordWrapStateChanged(int AState);
 protected slots:
 	void onStreamCreated(IXmppStream *AXmppStream);
-	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void onStreamDestroyed(IXmppStream *AXmppStream);
 	void onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle);
 	void onOptionsOpened();

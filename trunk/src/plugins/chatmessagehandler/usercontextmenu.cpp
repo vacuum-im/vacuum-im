@@ -109,7 +109,7 @@ void UserContextMenu::onRosterIndexRemoved(IRosterIndex *AIndex)
 	}
 }
 
-void UserContextMenu::onChatWindowContactJidChanged(const Jid &/*ABefour*/)
+void UserContextMenu::onChatWindowContactJidChanged(const Jid &/*ABefore*/)
 {
 	onRosterIndexRemoved(FRosterIndex);
 }

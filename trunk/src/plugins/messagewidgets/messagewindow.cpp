@@ -96,12 +96,12 @@ void MessageWindow::setContactJid(const Jid &AContactJid)
 {
 	if (FMessageWidgets->findMessageWindow(FStreamJid,AContactJid) == NULL)
 	{
-		Jid befour = FContactJid;
+		Jid before = FContactJid;
 		FContactJid = AContactJid;
 		FInfoWidget->setContactJid(FContactJid);
 		FViewWidget->setContactJid(FContactJid);
 		FEditWidget->setContactJid(FContactJid);
-		emit contactJidChanged(befour);
+		emit contactJidChanged(before);
 	}
 }
 
@@ -241,7 +241,7 @@ void MessageWindow::closeEvent(QCloseEvent *AEvent)
 	emit windowClosed();
 }
 
-void MessageWindow::onStreamJidChanged(const Jid &ABefour)
+void MessageWindow::onStreamJidChanged(const Jid &ABefore)
 {
 	IXmppStream *xmppStream = qobject_cast<IXmppStream *>(sender());
 	if (xmppStream)
@@ -252,7 +252,7 @@ void MessageWindow::onStreamJidChanged(const Jid &ABefour)
 			FInfoWidget->setStreamJid(FStreamJid);
 			FViewWidget->setStreamJid(FStreamJid);
 			FEditWidget->setStreamJid(FStreamJid);
-			emit streamJidChanged(ABefour);
+			emit streamJidChanged(ABefore);
 		}
 		else
 		{

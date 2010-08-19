@@ -278,9 +278,9 @@ void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)
 	AXmppStream->insertXmppStanzaHandler(this, XSHO_CONSOLE);
 }
 
-void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
+void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
-	int index = ui.cmbStreamJid->findText(ABefour.full());
+	int index = ui.cmbStreamJid->findText(ABefore.full());
 	if (index >= 0)
 	{
 		ui.cmbStreamJid->removeItem(index);

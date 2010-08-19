@@ -35,11 +35,11 @@ void InfoWidget::setStreamJid(const Jid &AStreamJid)
 {
 	if (FStreamJid != AStreamJid)
 	{
-		Jid befour = FStreamJid;
+		Jid before = FStreamJid;
 		FStreamJid = AStreamJid;
 		initialize();
 		autoUpdateFields();
-		emit streamJidChanged(befour);
+		emit streamJidChanged(before);
 	}
 }
 
@@ -52,10 +52,10 @@ void InfoWidget::setContactJid(const Jid &AContactJid)
 {
 	if (FContactJid != AContactJid)
 	{
-		Jid befour = FContactJid;
+		Jid before = FContactJid;
 		FContactJid = AContactJid;
 		autoUpdateFields();
-		emit contactJidChanged(befour);
+		emit contactJidChanged(before);
 	}
 }
 

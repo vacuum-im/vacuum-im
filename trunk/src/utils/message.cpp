@@ -77,8 +77,8 @@ QVariant Message::data(int ARole)  const
 
 void Message::setData(int ARole, const QVariant &AData)
 {
-	QVariant befour = data(ARole);
-	if (befour != AData)
+	QVariant before = data(ARole);
+	if (before != AData)
 	{
 		if (AData.isValid())
 			d->FData.insert(ARole,AData);

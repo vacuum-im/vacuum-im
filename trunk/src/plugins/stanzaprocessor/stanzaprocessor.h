@@ -62,7 +62,7 @@ protected:
 	virtual void removeStanzaRequest(const QString &AStanzaId);
 protected slots:
 	void onStreamCreated(IXmppStream *AXmppStream);
-	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onStreamDestroyed(IXmppStream *AXmppStream);
 	void onStanzaRequestTimeout();

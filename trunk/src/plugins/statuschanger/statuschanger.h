@@ -119,7 +119,7 @@ protected slots:
 	void onPresenceRemoved(IPresence *APresence);
 	void onRosterOpened(IRoster *ARoster);
 	void onRosterClosed(IRoster *ARoster);
-	void onStreamJidChanged(const Jid &ABefour, const Jid &AAfter);
+	void onStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onDefaultStatusIconsChanged();
 	void onOptionsOpened();

@@ -46,7 +46,7 @@ protected slots:
 	void onRosterSubscription(const Jid &AItemJid, int ASubsType, const QString &AText);
 	void onRosterClosed();
 	void onRosterStreamJidAboutToBeChanged(const Jid &AAfter);
-	void onRosterStreamJidChanged(const Jid &ABefour);
+	void onRosterStreamJidChanged(const Jid &ABefore);
 	void onRosterDestroyed(QObject *AObject);
 	void onStreamAdded(IXmppStream *AStream);
 	void onStreamRemoved(IXmppStream *AStream);

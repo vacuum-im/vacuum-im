@@ -133,9 +133,9 @@ void JoinMultiChatDialog::onStreamStateChanged(IXmppStream * AXmppStream)
 		updateResolveNickState();
 }
 
-void JoinMultiChatDialog::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
+void JoinMultiChatDialog::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
-	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(ABefour.pFull()));
+	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(ABefore.pFull()));
 	onStreamAdded(AXmppStream);
 }
 

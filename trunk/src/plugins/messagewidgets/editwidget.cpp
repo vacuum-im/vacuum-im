@@ -49,9 +49,9 @@ void EditWidget::setStreamJid(const Jid &AStreamJid)
 {
 	if (AStreamJid != FStreamJid)
 	{
-		Jid befour = FStreamJid;
+		Jid before = FStreamJid;
 		FStreamJid = AStreamJid;
-		emit streamJidChanged(befour);
+		emit streamJidChanged(before);
 	}
 }
 
@@ -64,9 +64,9 @@ void EditWidget::setContactJid(const Jid &AContactJid)
 {
 	if (AContactJid != FContactJid)
 	{
-		Jid befour = FContactJid;
+		Jid before = FContactJid;
 		FContactJid = AContactJid;
-		emit contactJidChanged(befour);
+		emit contactJidChanged(before);
 	}
 }
 

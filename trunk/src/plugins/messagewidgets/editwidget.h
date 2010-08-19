@@ -42,8 +42,8 @@ signals:
 	void messageAboutToBeSend();
 	void messageReady();
 	void editorCleared();
-	void streamJidChanged(const Jid &ABefour);
-	void contactJidChanged(const Jid &ABefour);
+	void streamJidChanged(const Jid &ABefore);
+	void contactJidChanged(const Jid &ABefore);
 	void autoResizeChanged(bool AResize);
 	void minimumLinesChanged(int ALines);
 	void sendKeyChanged(const QKeySequence &AKey);

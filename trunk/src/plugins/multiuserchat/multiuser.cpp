@@ -26,14 +26,14 @@ QVariant MultiUser::data(int ARole) const
 
 void MultiUser::setData(int ARole, const QVariant &AValue)
 {
-	QVariant befour = data(ARole);
-	if (befour != AValue)
+	QVariant before = data(ARole);
+	if (before != AValue)
 	{
 		if (AValue.isValid())
 			FData.insert(ARole,AValue);
 		else
 			FData.remove(ARole);
-		emit dataChanged(ARole,befour,AValue);
+		emit dataChanged(ARole,before,AValue);
 	}
 }
 

@@ -72,7 +72,7 @@ protected:
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
-	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onNotificationActivated(int ANotifyId);

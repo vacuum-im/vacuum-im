@@ -643,9 +643,9 @@ void FileTransfer::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 	}
 }
 
-void FileTransfer::onEditWidgetContactJidChanged(const Jid &ABefour)
+void FileTransfer::onEditWidgetContactJidChanged(const Jid &ABefore)
 {
-	Q_UNUSED(ABefour);
+	Q_UNUSED(ABefore);
 	IEditWidget *editWidget = qobject_cast<IEditWidget *>(sender());
 	if (editWidget)
 	{

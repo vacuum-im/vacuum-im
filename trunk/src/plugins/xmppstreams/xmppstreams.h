@@ -45,7 +45,7 @@ signals:
 	void closed(IXmppStream *AXmppStream);
 	void error(IXmppStream *AXmppStream, const QString &AError);
 	void jidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
-	void jidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+	void jidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void connectionChanged(IXmppStream *AXmppStream, IConnection *AConnection);
 	void removed(IXmppStream *AXmppStream);
 	void streamDestroyed(IXmppStream *AXmppStream);
@@ -56,7 +56,7 @@ protected slots:
 	void onStreamClosed();
 	void onStreamError(const QString &AError);
 	void onStreamJidAboutToBeChanged(const Jid &AAfter);
-	void onStreamJidChanged(const Jid &ABefour);
+	void onStreamJidChanged(const Jid &ABefore);
 	void onStreamConnectionChanged(IConnection *AConnection);
 	void onStreamDestroyed();
 private:

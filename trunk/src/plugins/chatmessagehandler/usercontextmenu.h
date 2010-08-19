@@ -24,7 +24,7 @@ protected slots:
 	void onRosterIndexInserted(IRosterIndex *AIndex);
 	void onRosterIndexDataChanged(IRosterIndex *AIndex, int ARole);
 	void onRosterIndexRemoved(IRosterIndex *AIndex);
-	void onChatWindowContactJidChanged(const Jid &ABefour);
+	void onChatWindowContactJidChanged(const Jid &ABefore);
 private:
 	IRosterIndex *FRosterIndex;
 	IRostersModel *FRostersModel;

@@ -102,7 +102,7 @@ protected slots:
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
 	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
-	void onEditWidgetContactJidChanged(const Jid &ABefour);
+	void onEditWidgetContactJidChanged(const Jid &ABefore);
 	void onToolBarWidgetDestroyed(QObject *AObject);
 private:
 	IRosterPlugin *FRosterPlugin;

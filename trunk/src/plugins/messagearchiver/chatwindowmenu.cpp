@@ -289,7 +289,7 @@ void ChatWindowMenu::onStanzaSessionTerminated(const IStanzaSession &ASession)
 	}
 }
 
-void ChatWindowMenu::onEditWidgetContactJidChanged(const Jid &ABefour)
+void ChatWindowMenu::onEditWidgetContactJidChanged(const Jid &ABefore)
 {
 	if (FDiscovery)
 	{
@@ -301,7 +301,7 @@ void ChatWindowMenu::onEditWidgetContactJidChanged(const Jid &ABefour)
 
 	if (FSessionNegotiation)
 	{
-		onStanzaSessionTerminated(FSessionNegotiation->getSession(FEditWidget->streamJid(),ABefour));
+		onStanzaSessionTerminated(FSessionNegotiation->getSession(FEditWidget->streamJid(),ABefore));
 
 		IStanzaSession session = FSessionNegotiation->getSession(FEditWidget->streamJid(),FEditWidget->contactJid());
 		if (session.status == IStanzaSession::Active)

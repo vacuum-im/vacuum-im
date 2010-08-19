@@ -34,9 +34,9 @@ void ViewWidget::setStreamJid(const Jid &AStreamJid)
 {
 	if (AStreamJid != FStreamJid)
 	{
-		Jid befour = FStreamJid;
+		Jid before = FStreamJid;
 		FStreamJid = AStreamJid;
-		emit streamJidChanged(befour);
+		emit streamJidChanged(before);
 	}
 }
 
@@ -44,9 +44,9 @@ void ViewWidget::setContactJid(const Jid &AContactJid)
 {
 	if (AContactJid != FContactJid)
 	{
-		Jid befour = FContactJid;
+		Jid before = FContactJid;
 		FContactJid = AContactJid;
-		emit contactJidChanged(befour);
+		emit contactJidChanged(before);
 	}
 }
 
@@ -64,13 +64,13 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 {
 	if (FMessageStyle != AStyle)
 	{
-		IMessageStyle *befour = FMessageStyle;
+		IMessageStyle *before = FMessageStyle;
 		FMessageStyle = AStyle;
-		if (befour)
+		if (before)
 		{
-			disconnect(befour->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
+			disconnect(before->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
 			           this, SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
-			disconnect(befour->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),this,SLOT(onUrlClicked(QWidget *, const QUrl &)));
+			disconnect(before->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),this,SLOT(onUrlClicked(QWidget *, const QUrl &)));
 			ui.wdtViewer->layout()->removeWidget(FStyleWidget);
 			FStyleWidget->deleteLater();
 			FStyleWidget = NULL;
@@ -83,7 +83,7 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 			connect(FMessageStyle->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),SLOT(onUrlClicked(QWidget *, const QUrl &)));
 			ui.wdtViewer->layout()->addWidget(FStyleWidget);
 		}
-		emit messageStyleChanged(befour,AOptions);
+		emit messageStyleChanged(before,AOptions);
 	}
 }
 

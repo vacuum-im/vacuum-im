@@ -25,7 +25,7 @@ protected slots:
 	void onRoomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
 	void onStreamAdded(IXmppStream *AXmppStream);
 	void onStreamStateChanged(IXmppStream *AXmppStream);
-	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void onStreamRemoved(IXmppStream *AXmppStream);
 private:
 	Ui::JoinMultiChatDialogClass ui;

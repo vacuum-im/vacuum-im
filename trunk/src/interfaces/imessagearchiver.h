@@ -175,7 +175,7 @@ protected:
 	virtual void filterChanged(const IArchiveFilter &AFilter) =0;
 	virtual void itemCreated(QStandardItem *AItem) =0;
 	virtual void itemContextMenu(QStandardItem *AItem, Menu *AMenu) =0;
-	virtual void currentItemChanged(QStandardItem *ACurrent, QStandardItem *ABefour) =0;
+	virtual void currentItemChanged(QStandardItem *ACurrent, QStandardItem *ABefore) =0;
 	virtual void itemDestroyed(QStandardItem *AItem) =0;
 	virtual void windowDestroyed(IArchiveWindow *AWindow) =0;
 };

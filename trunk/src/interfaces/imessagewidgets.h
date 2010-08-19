@@ -44,8 +44,8 @@ public:
 	virtual bool isFieldVisible(IInfoWidget::InfoField AField) const =0;
 	virtual void setFieldVisible(IInfoWidget::InfoField AField, bool AVisible) =0;
 protected:
-	virtual void streamJidChanged(const Jid &ABefour) =0;
-	virtual void contactJidChanged(const Jid &ABefour) =0;
+	virtual void streamJidChanged(const Jid &ABefore) =0;
+	virtual void contactJidChanged(const Jid &ABefore) =0;
 	virtual void fieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue) =0;
 };
 
@@ -64,9 +64,9 @@ public:
 	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions) =0;
 	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions) =0;
 protected:
-	virtual void streamJidChanged(const Jid &ABefour) =0;
-	virtual void contactJidChanged(const Jid &ABefour) =0;
-	virtual void messageStyleChanged(IMessageStyle *ABefour, const IMessageStyleOptions &AOptions) =0;
+	virtual void streamJidChanged(const Jid &ABefore) =0;
+	virtual void contactJidChanged(const Jid &ABefore) =0;
+	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
 	virtual void contentAppended(const QString &AMessage, const IMessageContentOptions &AOptions) =0;
 	virtual void urlClicked(const QUrl &AUrl) const =0;
 };
@@ -98,8 +98,8 @@ protected:
 	virtual void messageAboutToBeSend() =0;
 	virtual void messageReady() =0;
 	virtual void editorCleared() =0;
-	virtual void streamJidChanged(const Jid &ABefour) =0;
-	virtual void contactJidChanged(const Jid &ABefour) =0;
+	virtual void streamJidChanged(const Jid &ABefore) =0;
+	virtual void contactJidChanged(const Jid &ABefore) =0;
 	virtual void autoResizeChanged(bool AResize) =0;
 	virtual void minimumLinesChanged(int ALines) =0;
 	virtual void sendKeyChanged(const QKeySequence &AKey) =0;
@@ -119,7 +119,7 @@ public:
 	virtual void removeReceiver(const Jid &AReceiver) =0;
 	virtual void clear() =0;
 protected:
-	virtual void streamJidChanged(const Jid &ABefour) =0;
+	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void receiverAdded(const Jid &AReceiver) =0;
 	virtual void receiverRemoved(const Jid &AReceiver) =0;
 };
@@ -211,8 +211,8 @@ public:
 	virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 protected:
 	virtual void messageReady() =0;
-	virtual void streamJidChanged(const Jid &ABefour) =0;
-	virtual void contactJidChanged(const Jid &ABefour) =0;
+	virtual void streamJidChanged(const Jid &ABefore) =0;
+	virtual void contactJidChanged(const Jid &ABefore) =0;
 	virtual void windowActivated() =0;
 	virtual void windowClosed() =0;
 };
@@ -253,8 +253,8 @@ protected:
 	virtual void forwardMessage() =0;
 	virtual void showChatWindow() =0;
 	virtual void messageReady() =0;
-	virtual void streamJidChanged(const Jid &ABefour) =0;
-	virtual void contactJidChanged(const Jid &ABefour) =0;
+	virtual void streamJidChanged(const Jid &ABefore) =0;
+	virtual void contactJidChanged(const Jid &ABefore) =0;
 	virtual void windowActivated() =0;
 	virtual void windowClosed() =0;
 };
