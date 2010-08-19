@@ -18,4 +18,5 @@ set(SOURCES ${SOURCES}
 	"${CMAKE_SOURCE_DIR}/src/thirdparty/jdns/qjdns.cpp"
 	)
 
-qt4_generate_moc("${CMAKE_SOURCE_DIR}/src/thirdparty/jdns/qjdns.cpp" "qjdns.moc")
+qt4_generate_moc("${CMAKE_SOURCE_DIR}/src/thirdparty/jdns/qjdns.cpp"
+	"${CMAKE_CURRENT_BINARY_DIR}/qjdns.moc")

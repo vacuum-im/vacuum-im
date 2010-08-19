@@ -12,8 +12,8 @@ include("jdns.cmake")
 
 qt4_wrap_cpp(MOC_SOURCES ${HEADERS})
 
-add_library(jdns STATIC ${SOURCES} ${MOC_SOURCES} "qjdns.moc")
-target_link_libraries(jdns ${QT_LIBRARIES})
+add_library(jdns STATIC ${SOURCES} ${MOC_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/qjdns.moc")
+target_link_libraries(jdns ${QT_LIBRARIES} ${LIBS})
 target_link_libraries(jdns LINK_INTERFACE_LIBRARIES)
 set_target_properties(jdns PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs"
