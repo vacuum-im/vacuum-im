@@ -6,6 +6,7 @@
 TabWidget::TabWidget(QWidget *AParent) : QTabWidget(AParent)
 {
 	FPressedTabIndex = -1;
+	connect(tabBar(), SIGNAL(tabMoved(int,int)), SIGNAL(tabMoved(int,int)));
 }
 
 TabWidget::~TabWidget()

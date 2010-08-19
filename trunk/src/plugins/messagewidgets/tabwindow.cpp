@@ -50,6 +50,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 
 	connect(ui.twtTabs,SIGNAL(currentChanged(int)),SLOT(onTabChanged(int)));
 	connect(ui.twtTabs,SIGNAL(tabCloseRequested(int)),SLOT(onTabCloseRequested(int)));
+	connect(ui.twtTabs,SIGNAL(tabMoved(int,int)),SLOT(onTabMoved(int,int)));
 }
 
 TabWindow::~TabWindow()
@@ -271,6 +272,17 @@ void TabWindow::updateTab(int AIndex)
 			tabText = widget->windowIconText();
 		ui.twtTabs->setTabText(AIndex,tabText);
 	}
+}
+
+void TabWindow::onTabMoved(int from, int to)
+{
+	if (!FShowTabIndices)
+		return;
+
+	int first = qMin(from, to);
+	int last = qMax(from, to);
+	for (int tab=first; tab<=last; tab++)
+		updateTab(tab);
 }
 
 void TabWindow::onTabChanged(int /*AIndex*/)
