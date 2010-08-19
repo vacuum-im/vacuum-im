@@ -300,18 +300,17 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 		QDomElement time = AStanza.firstElement("time");
 		QString tzo = time.firstChildElement("tzo").text();
 		QString utc = time.firstChildElement("utc").text();
-		if (utc.endsWith('Z'))
-			utc.chop(1);
 		if (AStanza.type() == "result" && !tzo.isEmpty() && !utc.isEmpty())
 		{
 			TimeItem &tItem = FTimeItems[contactJid];
-			DateTime dateTime(utc+tzo);
-			tItem.zone = dateTime.timeZone();
-			tItem.delta = QDateTime::currentDateTime().secsTo(dateTime.toLocal());
+			tItem.zone = DateTime::tzdFromX85(tzo);
+			tItem.delta = QDateTime::currentDateTime().secsTo(DateTime(utc).toLocal());
 			tItem.ping = tItem.ping - QTime::currentTime().msecsTo(QTime(0,0,0,0));
 		}
 		else
+		{
 			FTimeItems.remove(contactJid);
+		}
 		emit entityTimeChanged(contactJid);
 	}
 }

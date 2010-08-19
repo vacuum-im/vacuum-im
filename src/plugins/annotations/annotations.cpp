@@ -270,8 +270,8 @@ void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid,
 			if (itemJid.isValid() && !elem.text().isEmpty())
 			{
 				Annotation item;
-				item.created.setDateTime(elem.attribute("cdate"));
-				item.modified.setDateTime(elem.attribute("mdate"));
+				item.created = elem.attribute("cdate");
+				item.modified = elem.attribute("mdate");
 				item.note = elem.text();
 				items.insert(itemJid.bare(),item);
 			}
