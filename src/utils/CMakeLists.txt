@@ -8,6 +8,7 @@ include(${QT_USE_FILE})
 
 add_definitions("-DUTILS_DLL")
 link_directories("${CMAKE_BINARY_DIR}/libs")
+include_directories(AFTER "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
 
 add_translations(TRANSLATIONS "${TARGET_UTILS}" ${SOURCES})
 add_library(${TARGET_UTILS} SHARED ${SOURCES} ${MOC_SOURCES} ${TRANSLATIONS})
@@ -22,10 +23,10 @@ target_link_libraries(${TARGET_UTILS} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
 target_link_libraries(${TARGET_UTILS} ${QT_LIBRARIES} ${ADD_LIBS})
 
 if (WIN32)
-	set_target_properties(${TARGET_UTILS} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+	set_target_properties(${TARGET_UTILS} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 else (WIN32)
 	set_target_properties(${TARGET_UTILS} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs")
 endif (WIN32)
 
 install(TARGETS ${TARGET_UTILS}
-	LIBRARY DESTINATION "${INSTALL_LIBS}")
+	DESTINATION "${INSTALL_LIBS}")

@@ -23,3 +23,10 @@ target_link_libraries(${TARGET_LOADER} ${TARGET_UTILS} ${QT_LIBRARIES})
 
 install(TARGETS ${TARGET_LOADER} RUNTIME
 	DESTINATION "${INSTALL_BINS}")
+if (UNIX AND NOT APPLE)
+	install(FILES "${CMAKE_SOURCE_DIR}/resources/menuicons/shared/vacuum.png"
+		DESTINATION "${INSTALL_RES_DIR}/pixmaps")
+	install(FILES "${CMAKE_SOURCE_DIR}/src/packages/linux/vacuum.desktop"
+		DESTINATION "${INSTALL_RES_DIR}/applications")
+endif (UNIX AND NOT APPLE)
+
