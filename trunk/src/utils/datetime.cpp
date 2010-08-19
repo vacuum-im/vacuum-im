@@ -3,32 +3,32 @@
 #include <QRegExp>
 #include <QStringList>
 
-DateTimeData::DateTimeData(const QDateTime &AUTC, int ATZD)
+DateTimeData::DateTimeData(const QDateTime &ADT, int ATZD)
 {
 	tzd = ATZD;
-	utc = AUTC;
-	utc.setTimeSpec(Qt::UTC);
+	dt = ADT;
+	dt.setTimeSpec(Qt::LocalTime);
 }
 
 DateTimeData::DateTimeData(const DateTimeData &AOther) : QSharedData(AOther)
 {
 	tzd = AOther.tzd;
-	utc = AOther.utc;
+	dt = AOther.dt;
 }
 
 
 DateTime::DateTime(const QString &AX85DateTime)
 {
-	d = new DateTimeData(utcFromX85(AX85DateTime),tzdFromX85(AX85DateTime));
+	d = new DateTimeData(dtFromX85(AX85DateTime),tzdFromX85(AX85DateTime));
 }
 
-DateTime::DateTime(const QDateTime &ADateTime, Qt::TimeSpec ASpec)
+DateTime::DateTime(const QDateTime &ADateTime)
 {
-	if (ASpec == Qt::LocalTime)
+	if (ADateTime.timeSpec() == Qt::LocalTime)
 	{
 		QDateTime utc = ADateTime.toUTC();
 		utc.setTimeSpec(Qt::LocalTime);
-		d= new DateTimeData(utc,utc.secsTo(ADateTime));
+		d = new DateTimeData(ADateTime,utc.secsTo(ADateTime));
 	}
 	else
 	{
@@ -43,12 +43,12 @@ DateTime::~DateTime()
 
 bool DateTime::isNull() const
 {
-	return d->utc.isNull();
+	return d->dt.isNull();
 }
 
 bool DateTime::isValid() const
 {
-	return d->utc.isValid();
+	return d->dt.isValid();
 }
 
 int DateTime::timeZone() const
@@ -61,52 +61,27 @@ void DateTime::setTimeZone(int ASecs)
 	d->tzd = ASecs;
 }
 
-QDateTime DateTime::utcDateTime() const
+QDateTime DateTime::dateTime() const
 {
-	return d->utc;
+	return d->dt;
 }
 
-void DateTime::setUTCDateTime(const QDateTime &AUTCDateTime)
+void DateTime::setDateTime(const QDateTime &ADateTime)
 {
-	d->utc = AUTCDateTime;
-	d->utc.setTimeSpec(Qt::UTC);
-}
-
-void DateTime::setDateTime(const QString &AX85DateTime)
-{
-	setUTCDateTime(utcFromX85(AX85DateTime));
-	setTimeZone(tzdFromX85(AX85DateTime));
+	d->dt = ADateTime;
+	d->dt.setTimeSpec(Qt::LocalTime);
 }
 
 QDateTime DateTime::toUTC() const
 {
-	return d->utc;
+	QDateTime utc = d->dt;
+	utc.setTimeSpec(Qt::UTC);
+	return utc.addSecs(-(d->tzd));
 }
 
 QDateTime DateTime::toLocal() const
 {
-	return d->utc.toLocalTime();
-}
-
-QDateTime DateTime::toRemote() const
-{
-	QDateTime dateTime = d->utc;
-	dateTime.setTimeSpec(Qt::LocalTime);
-	return dateTime.addSecs(d->tzd);
-}
-
-QString DateTime::toX85Date() const
-{
-	QString x85 = d->utc.date().toString(Qt::ISODate);
-	return x85;
-}
-
-QString DateTime::toX85Time(bool AMSec) const
-{
-	QString x85 = d->utc.time().toString(Qt::ISODate);
-	if (AMSec)
-		x85 += QString(".%1").arg(d->utc.time().msec(),3,10,QLatin1Char('0'));
-	return x85;
+	return toUTC().toLocalTime();
 }
 
 QString DateTime::toX85TZD() const
@@ -125,14 +100,29 @@ QString DateTime::toX85TZD() const
 	return x85;
 }
 
-QString DateTime::toX85UTC(bool AMSec) const
+QString DateTime::toX85Date() const
 {
-	return toX85Format(true,true,false,AMSec);
+	QString x85 = d->dt.date().toString(Qt::ISODate);
+	return x85;
 }
 
-QString DateTime::toX85Full(bool AMSec) const
+QString DateTime::toX85Time(bool AMSec) const
+{
+	QString x85 = d->dt.time().toString(Qt::ISODate);
+	if (AMSec)
+		x85 += QString(".%1").arg(d->dt.time().msec(),3,10,QLatin1Char('0'));
+	return x85;
+}
+
+QString DateTime::toX85DateTime(bool AMSec) const
 {
 	return toX85Format(true,true,true,AMSec);
+}
+
+QString DateTime::toX85UTC(bool AMSec) const
+{
+	DateTime utc = toUTC();
+	return utc.toX85Format(true,true,false,AMSec);
 }
 
 QString DateTime::toX85Format(bool ADate, bool ATime, bool ATZD, bool AMSec) const
@@ -151,15 +141,27 @@ QString DateTime::toX85Format(bool ADate, bool ATime, bool ATZD, bool AMSec) con
 	return x85;
 }
 
-QDateTime DateTime::utcFromX85(const QString &AX85DateTime)
+int DateTime::tzdFromX85(const QString &AX85DateTime)
 {
-	QDateTime utc;
-	QRegExp utcRegExp("((\\d{4}-?\\d{2}-?\\d{2})?T?(\\d{2}:\\d{2}:\\d{2})?(\\.\\d{3})?)");
-	if (utcRegExp.indexIn(AX85DateTime) > -1)
+	int tzd = 0;
+	QRegExp tzdRegExp("[+-](\\d{2}:\\d{2})");
+	if (tzdRegExp.indexIn(AX85DateTime) > -1)
 	{
-		QString utcStr = utcRegExp.cap(1);
-		utc = QDateTime::fromString(utcStr,Qt::ISODate);
-		if (!utc.isValid())
+		QTime time = QTime::fromString(tzdRegExp.cap(1),"hh:mm");
+		tzd = AX85DateTime.contains('+') ? QTime(0,0,0,0).secsTo(time) : time.secsTo(QTime(0,0,0,0));
+	}
+	return tzd;
+}
+
+QDateTime DateTime::dtFromX85(const QString &AX85DateTime)
+{
+	QDateTime dt;
+	QRegExp dtRegExp("((\\d{4}-?\\d{2}-?\\d{2})?T?(\\d{2}:\\d{2}:\\d{2})?(\\.\\d{3})?)");
+	if (dtRegExp.indexIn(AX85DateTime) > -1)
+	{
+		QString dtStr = dtRegExp.cap(1);
+		dt = QDateTime::fromString(dtStr,Qt::ISODate);
+		if (!dt.isValid())
 		{
 			QString format;
 			bool hasTime = AX85DateTime.contains(':');
@@ -173,23 +175,8 @@ QDateTime DateTime::utcFromX85(const QString &AX85DateTime)
 				format += "hh:mm:ss";
 			if (hasMSec)
 				format += ".zzz";
-			utc = QDateTime::fromString(utcStr,format);
+			dt = QDateTime::fromString(dtStr,format);
 		}
 	}
-	utc.setTimeSpec(Qt::UTC);
-	return utc;
+	return dt;
 }
-
-int DateTime::tzdFromX85(const QString &AX85DateTime)
-{
-	int tzd = 0;
-	QRegExp tzdRegExp("[+-](\\d{2}:\\d{2})");
-	if (tzdRegExp.indexIn(AX85DateTime) > -1)
-	{
-		QTime time = QTime::fromString(tzdRegExp.cap(1),"hh:mm");
-		tzd = AX85DateTime.contains('+') ? QTime(0,0,0,0).secsTo(time) : time.secsTo(QTime(0,0,0,0));
-	}
-	return tzd;
-}
-
-
