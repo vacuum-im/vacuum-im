@@ -10,6 +10,8 @@ class TabWidget :
 public:
 	TabWidget(QWidget *AParent = NULL);
 	~TabWidget();
+signals:
+	void tabMoved(int from, int to);
 protected:
 	void mousePressEvent(QMouseEvent *AEvent);
 	void mouseReleaseEvent(QMouseEvent *AEvent);

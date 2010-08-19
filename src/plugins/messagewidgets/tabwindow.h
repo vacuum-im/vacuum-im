@@ -48,6 +48,7 @@ protected:
 	void updateWindow();
 	void updateTab(int AIndex);
 protected slots:
+	void onTabMoved(int from, int to);
 	void onTabChanged(int AIndex);
 	void onTabCloseRequested(int AIndex);
 	void onTabPageShow();
