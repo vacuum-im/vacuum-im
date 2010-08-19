@@ -35,7 +35,7 @@ void UserContextMenu::onMultiUserPresence(IMultiUser *AUser, int AShow, const QS
 		menuAction()->setVisible(AShow!=IPresence::Offline && AShow!=IPresence::Error);
 }
 
-void UserContextMenu::onChatWindowContactJidChanged(const Jid &/*ABefour*/)
+void UserContextMenu::onChatWindowContactJidChanged(const Jid &/*ABefore*/)
 {
 	setTitle(FChatWindow->contactJid().resource());
 }

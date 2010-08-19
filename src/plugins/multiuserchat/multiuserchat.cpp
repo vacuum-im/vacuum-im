@@ -896,11 +896,11 @@ void MultiUserChat::onMessageSent(const Message &AMessage)
 		emit messageSent(AMessage);
 }
 
-void MultiUserChat::onUserDataChanged(int ARole, const QVariant &ABefour, const QVariant &AAfter)
+void MultiUserChat::onUserDataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter)
 {
 	IMultiUser *user = qobject_cast<IMultiUser *>(sender());
 	if (user)
-		emit userDataChanged(user,ARole,ABefour,AAfter);
+		emit userDataChanged(user,ARole,ABefore,AAfter);
 }
 
 void MultiUserChat::onPresenceChanged(int AShow, const QString &AStatus, int APriority)
@@ -922,7 +922,7 @@ void MultiUserChat::onStreamClosed()
 		closeChat(IPresence::Offline,QString::null);
 }
 
-void MultiUserChat::onStreamJidChanged(const Jid &ABefour)
+void MultiUserChat::onStreamJidChanged(const Jid &ABefore)
 {
 	IXmppStream *xmppStream = qobject_cast<IXmppStream *>(sender());
 	if (xmppStream)
@@ -930,6 +930,6 @@ void MultiUserChat::onStreamJidChanged(const Jid &ABefour)
 		FStreamJid = xmppStream->streamJid();
 		foreach(MultiUser *user, FUsers)
 			user->setData(MUDR_STREAM_JID,FStreamJid.full());
-		emit streamJidChanged(ABefour,FStreamJid);
+		emit streamJidChanged(ABefore,FStreamJid);
 	}
 }

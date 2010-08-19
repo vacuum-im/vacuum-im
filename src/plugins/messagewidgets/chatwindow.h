@@ -44,8 +44,8 @@ signals:
 	void windowDestroyed();
 	//IChatWindow
 	void messageReady();
-	void streamJidChanged(const Jid &ABefour);
-	void contactJidChanged(const Jid &ABefour);
+	void streamJidChanged(const Jid &ABefore);
+	void contactJidChanged(const Jid &ABefore);
 	void windowActivated();
 	void windowClosed();
 protected:
@@ -58,7 +58,7 @@ protected:
 	virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
 	void onMessageReady();
-	void onStreamJidChanged(const Jid &ABefour);
+	void onStreamJidChanged(const Jid &ABefore);
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	Ui::ChatWindowClass ui;

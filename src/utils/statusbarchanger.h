@@ -26,7 +26,7 @@ public:
 	void removeWidget(QWidget *AWidget);
 	void clear();
 signals:
-	void widgetInserted(QWidget *ABefour, QWidget *AWidget, int AGroup, bool APermanent, int AStretch);
+	void widgetInserted(QWidget *ABefore, QWidget *AWidget, int AGroup, bool APermanent, int AStretch);
 	void widgetRemoved(QWidget *AWidget);
 	void statusBarChangerDestroyed(StatusBarChanger *AStatusBarChanger);
 protected slots:

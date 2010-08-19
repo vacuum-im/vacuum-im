@@ -360,7 +360,7 @@ void MessageProcessor::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, con
 		removeStreamMessages(AXmppStream->streamJid());
 }
 
-void MessageProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &/*ABefour*/)
+void MessageProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &/*ABefore*/)
 {
 	QMap<int,Message>::iterator it = FMessages.begin();
 	while (it != FMessages.end())

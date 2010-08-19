@@ -186,7 +186,7 @@ protected slots:
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onAccountHidden(IAccount *AAccount);
 	void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
-	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour);
+	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void onPrivateDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onCollectionWriterDestroyed(CollectionWriter *AWriter);

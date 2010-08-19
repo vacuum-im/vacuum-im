@@ -89,7 +89,7 @@ public:
 protected:
 	virtual void streamAdded(const Jid &AStreamJid) =0;
 	virtual void streamRemoved(const Jid &AStreamJid) =0;
-	virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;
+	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
 	virtual void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
 	virtual void indexAboutToBeInserted(IRosterIndex *AIndex) =0;
 	virtual void indexInserted(IRosterIndex *AIndex) =0;

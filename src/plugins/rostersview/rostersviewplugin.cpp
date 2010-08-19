@@ -402,11 +402,11 @@ void RostersViewPlugin::onViewIndexExpanded(const QModelIndex &AIndex)
 
 void RostersViewPlugin::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter)
 {
-	Jid befour = ARoster->streamJid();
-	if (FExpandState.contains(befour))
+	Jid before = ARoster->streamJid();
+	if (FExpandState.contains(before))
 	{
-		QHash<QString, bool> state = FExpandState.take(befour);
-		if (befour && AAfter)
+		QHash<QString, bool> state = FExpandState.take(before);
+		if (before && AAfter)
 			FExpandState.insert(AAfter,state);
 	}
 }

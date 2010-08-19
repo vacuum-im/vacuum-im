@@ -362,10 +362,10 @@ void StanzaProcessor::onStreamCreated(IXmppStream *AXmppStream)
 	AXmppStream->insertXmppStanzaHandler(this, XSHO_STANZAPROCESSOR);
 }
 
-void StanzaProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
+void StanzaProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
 	foreach(int shandleId, FHandles.keys())
-		if (FHandles.value(shandleId).streamJid == ABefour)
+		if (FHandles.value(shandleId).streamJid == ABefore)
 			FHandles[shandleId].streamJid = AXmppStream->streamJid();
 }
 

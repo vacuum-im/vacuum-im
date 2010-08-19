@@ -1006,10 +1006,10 @@ void StatusChanger::onRosterClosed(IRoster *ARoster)
 		setStreamStatus(presence->streamJid(), FConnectStatus.value(presence));
 }
 
-void StatusChanger::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
+void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 {
 	QMultiHash<int,QVariant> data;
-	data.insert(ADR_STREAMJID,ABefour.full());
+	data.insert(ADR_STREAMJID,ABefore.full());
 	QList<Action *> actionList = FMainMenu->findActions(data,true);
 	foreach (Action *action, actionList)
 		action->setData(ADR_STREAMJID,AAfter.full());

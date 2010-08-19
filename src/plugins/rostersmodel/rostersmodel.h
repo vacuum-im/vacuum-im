@@ -62,7 +62,7 @@ public:
 signals:
 	void streamAdded(const Jid &AStreamJid);
 	void streamRemoved(const Jid &AStreamJid);
-	void streamJidChanged(const Jid &ABefour, const Jid &AAfter);
+	void streamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void indexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
 	void indexAboutToBeInserted(IRosterIndex *AIndex);
 	void indexInserted(IRosterIndex *AIndex);

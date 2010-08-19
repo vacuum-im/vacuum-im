@@ -33,8 +33,8 @@ public:
 	virtual bool isFieldVisible(IInfoWidget::InfoField AField) const;
 	virtual void setFieldVisible(IInfoWidget::InfoField AField, bool AVisible);
 signals:
-	void streamJidChanged(const Jid &ABefour);
-	void contactJidChanged(const Jid &ABefour);
+	void streamJidChanged(const Jid &ABefore);
+	void contactJidChanged(const Jid &ABefore);
 	void fieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
 protected:
 	void initialize();

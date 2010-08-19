@@ -136,13 +136,13 @@ void RosterPlugin::onRosterStreamJidAboutToBeChanged(const Jid &AAfter)
 	}
 }
 
-void RosterPlugin::onRosterStreamJidChanged(const Jid &ABefour)
+void RosterPlugin::onRosterStreamJidChanged(const Jid &ABefore)
 {
 	Roster *roster = qobject_cast<Roster *>(sender());
 	if (roster)
 	{
-		emit rosterStreamJidChanged(roster,ABefour);
-		if (!(roster->streamJid() && ABefour))
+		emit rosterStreamJidChanged(roster,ABefore);
+		if (!(roster->streamJid() && ABefore))
 			roster->loadRosterItems(rosterFileName(roster->streamJid()));
 	}
 }

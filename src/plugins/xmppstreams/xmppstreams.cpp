@@ -222,11 +222,11 @@ void XmppStreams::onStreamJidAboutToBeChanged(const Jid &AAfter)
 		emit jidAboutToBeChanged(stream,AAfter);
 }
 
-void XmppStreams::onStreamJidChanged(const Jid &ABefour)
+void XmppStreams::onStreamJidChanged(const Jid &ABefore)
 {
 	IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
 	if (stream)
-		emit jidChanged(stream,ABefour);
+		emit jidChanged(stream,ABefore);
 }
 
 void XmppStreams::onStreamConnectionChanged(IConnection *AConnection)

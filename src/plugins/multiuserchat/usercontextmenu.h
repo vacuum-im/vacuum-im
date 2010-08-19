@@ -17,7 +17,7 @@ protected slots:
 	void onAboutToShow();
 	void onAboutToHide();
 	void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
-	void onChatWindowContactJidChanged(const Jid &ABefour);
+	void onChatWindowContactJidChanged(const Jid &ABefore);
 private:
 	IChatWindow *FChatWindow;
 	IMultiUserChatWindow *FMUCWindow;

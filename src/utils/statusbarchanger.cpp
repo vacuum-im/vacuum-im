@@ -65,8 +65,8 @@ void StatusBarChanger::insertWidget(QWidget *AWidget, int AGroup, bool APermanen
 	if (it == FWidgets.end())
 	{
 		it = FWidgets.upperBound(AGroup);
-		QWidget *befour = it!=FWidgets.end() ? it.value() : NULL;
-		int index = FWidgets.values().indexOf(befour);
+		QWidget *before = it!=FWidgets.end() ? it.value() : NULL;
+		int index = FWidgets.values().indexOf(before);
 
 		if (index>=0)
 		{
@@ -85,7 +85,7 @@ void StatusBarChanger::insertWidget(QWidget *AWidget, int AGroup, bool APermanen
 
 		FWidgets.insertMulti(AGroup,AWidget);
 		connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
-		emit widgetInserted(befour,AWidget,AGroup,APermanent,AStretch);
+		emit widgetInserted(before,AWidget,AGroup,APermanent,AStretch);
 		updateVisible();
 	}
 }

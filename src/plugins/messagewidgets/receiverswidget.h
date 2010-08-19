@@ -28,7 +28,7 @@ public:
 	virtual void removeReceiver(const Jid &AReceiver);
 	virtual void clear();
 signals:
-	void streamJidChanged(const Jid &ABefour);
+	void streamJidChanged(const Jid &ABefore);
 	void receiverAdded(const Jid &AReceiver);
 	void receiverRemoved(const Jid &AReceiver);
 protected:

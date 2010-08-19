@@ -33,9 +33,9 @@ public:
 	void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);
 	void setTitle(const QString &ATitle);
 signals:
-	void actionInserted(QAction *ABefour, Action *AAction, int AGroup, bool ASort);
+	void actionInserted(QAction *ABefore, Action *AAction, int AGroup, bool ASort);
 	void actionRemoved(Action *AAction);
-	void separatorInserted(Action *ABefour, QAction *ASeparator);
+	void separatorInserted(Action *ABefore, QAction *ASeparator);
 	void separatorRemoved(QAction *ASeparator);
 	void menuDestroyed(Menu *AMenu);
 protected slots:

@@ -2582,11 +2582,11 @@ void MessageArchiver::onAccountOptionsChanged(IAccount *AAccount, const OptionsN
 	}
 }
 
-void MessageArchiver::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefour)
+void MessageArchiver::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
 	Q_UNUSED(AXmppStream);
-	if (FArchiveWindows.contains(ABefour))
-		delete FArchiveWindows.take(ABefour);
+	if (FArchiveWindows.contains(ABefore))
+		delete FArchiveWindows.take(ABefore);
 }
 
 void MessageArchiver::onPrivateDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)

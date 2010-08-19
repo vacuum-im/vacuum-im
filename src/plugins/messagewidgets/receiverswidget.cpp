@@ -31,10 +31,10 @@ ReceiversWidget::~ReceiversWidget()
 
 void ReceiversWidget::setStreamJid(const Jid &AStreamJid)
 {
-	Jid befour = FStreamJid;
+	Jid before = FStreamJid;
 	FStreamJid = AStreamJid;
 	initialize();
-	emit streamJidChanged(befour);
+	emit streamJidChanged(before);
 }
 
 QString ReceiversWidget::receiverName(const Jid &AReceiver) const

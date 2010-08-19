@@ -61,8 +61,8 @@ signals:
 	void forwardMessage();
 	void showChatWindow();
 	void messageReady();
-	void streamJidChanged(const Jid &ABefour);
-	void contactJidChanged(const Jid &ABefour);
+	void streamJidChanged(const Jid &ABefore);
+	void contactJidChanged(const Jid &ABefore);
 	void windowActivated();
 	void windowClosed();
 protected:
@@ -74,7 +74,7 @@ protected:
 	virtual void showEvent(QShowEvent *AEvent);
 	virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
-	void onStreamJidChanged(const Jid &ABefour);
+	void onStreamJidChanged(const Jid &ABefore);
 	void onSendButtonClicked();
 	void onNextButtonClicked();
 	void onReplyButtonClicked();

@@ -82,7 +82,7 @@ public:
 	virtual QVariant data(int ARole) const =0;
 	virtual void setData(int ARole, const QVariant &AValue) =0;
 protected:
-	virtual void dataChanged(int ARole, const QVariant &ABefour, const QVariant &AAfter) =0;
+	virtual void dataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter) =0;
 };
 
 class IMultiUserChat
@@ -129,10 +129,10 @@ protected:
 	virtual void chatError(const QString &AMessage) =0;
 	virtual void chatClosed() =0;
 	virtual void chatDestroyed() =0;
-	virtual void streamJidChanged(const Jid &ABefour, const Jid &AAfter) =0;
+	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
 	//Occupant
 	virtual void userPresence(IMultiUser *AUser, int AShow, const QString &AStatus) =0;
-	virtual void userDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefour, const QVariant &AAfter) =0;
+	virtual void userDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter) =0;
 	virtual void userNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick) =0;
 	virtual void presenceChanged(int AShow, const QString &AStatus) =0;
 	virtual void serviceMessageReceived(const Message &AMessage) =0;

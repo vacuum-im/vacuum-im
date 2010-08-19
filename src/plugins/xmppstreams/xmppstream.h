@@ -62,7 +62,7 @@ signals:
 	void closed();
 	void error(const QString &AError);
 	void jidAboutToBeChanged(const Jid &AAfter);
-	void jidChanged(const Jid &ABefour);
+	void jidChanged(const Jid &ABefore);
 	void connectionChanged(IConnection *AConnection);
 	void dataHandlerInserted(IXmppDataHandler *AHandler, int AOrder);
 	void dataHandlerRemoved(IXmppDataHandler *AHandler, int AOrder);

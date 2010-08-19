@@ -166,10 +166,10 @@ void XmppStream::setStreamJid(const Jid &AJid)
 		if (!(FStreamJid && AJid))
 			FSessionPassword.clear();
 
-		Jid befour = FStreamJid;
+		Jid before = FStreamJid;
 		emit jidAboutToBeChanged(AJid);
 		FStreamJid = AJid;
-		emit jidChanged(befour);
+		emit jidChanged(before);
 	}
 }
 

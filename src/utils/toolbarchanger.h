@@ -36,7 +36,7 @@ public:
 	void removeItem(QAction *AHandle);
 	void clear();
 signals:
-	void itemInserted(QAction *ABefour, QAction *AHandle, Action *AAction, QWidget *AWidget, int AGroup);
+	void itemInserted(QAction *ABefore, QAction *AHandle, Action *AAction, QWidget *AWidget, int AGroup);
 	void itemRemoved(QAction *AHandle);
 	void toolBarChangerDestroyed(ToolBarChanger *AToolBarChanger);
 protected:

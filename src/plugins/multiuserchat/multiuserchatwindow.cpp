@@ -1393,9 +1393,9 @@ void MultiUserChatWindow::onChatClosed()
 	updateWindow();
 }
 
-void MultiUserChatWindow::onStreamJidChanged(const Jid &ABefour, const Jid &AAfter)
+void MultiUserChatWindow::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 {
-	Q_UNUSED(ABefour);
+	Q_UNUSED(ABefore);
 	FViewWidget->setStreamJid(AAfter);
 	FEditWidget->setStreamJid(AAfter);
 }
@@ -1467,18 +1467,18 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 	}
 }
 
-void MultiUserChatWindow::onUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefour, const QVariant &AAfter)
+void MultiUserChatWindow::onUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter)
 {
 	if (ARole == MUDR_ROLE)
 	{
-		if (AAfter!=MUC_ROLE_NONE && ABefour!=MUC_ROLE_NONE)
-			showMessage(tr("%1 role changed from %2 to %3").arg(AUser->nickName()).arg(ABefour.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
+		if (AAfter!=MUC_ROLE_NONE && ABefore!=MUC_ROLE_NONE)
+			showMessage(tr("%1 role changed from %2 to %3").arg(AUser->nickName()).arg(ABefore.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
 		highlightUserRole(AUser);
 	}
 	else if (ARole == MUDR_AFFILIATION)
 	{
 		if (FUsers.contains(AUser))
-			showMessage(tr("%1 affiliation changed from %2 to %3").arg(AUser->nickName()).arg(ABefour.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
+			showMessage(tr("%1 affiliation changed from %2 to %3").arg(AUser->nickName()).arg(ABefore.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
 		highlightUserAffiliation(AUser);
 	}
 }

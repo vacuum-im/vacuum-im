@@ -29,7 +29,7 @@ protected slots:
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
-	void onEditWidgetContactJidChanged(const Jid &ABefour);
+	void onEditWidgetContactJidChanged(const Jid &ABefore);
 private:
 	IEditWidget *FEditWidget;
 	IToolBarWidget *FToolBarWidget;

@@ -45,16 +45,16 @@ void MenuBarChanger::insertMenu(Menu *AMenu, int AGroup)
 	}
 
 	it = FMenu.upperBound(AGroup);
-	Menu *befour = it!=FMenu.end() ? it.value() : NULL;
+	Menu *before = it!=FMenu.end() ? it.value() : NULL;
 
-	if (befour)
-		FMenuBar->insertAction(befour->menuAction(),AMenu->menuAction());
+	if (before)
+		FMenuBar->insertAction(before->menuAction(),AMenu->menuAction());
 	else
 		FMenuBar->addAction(AMenu->menuAction());
 
 	FMenu.insertMulti(AGroup,AMenu);
 	connect(AMenu,SIGNAL(menuDestroyed(Menu *)),SLOT(onMenuDestroyed(Menu *)));
-	emit menuInserted(befour,AMenu,AGroup);
+	emit menuInserted(before,AMenu,AGroup);
 }
 
 void MenuBarChanger::removeMenu(Menu *AMenu)

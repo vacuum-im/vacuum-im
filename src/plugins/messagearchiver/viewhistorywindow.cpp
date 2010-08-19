@@ -1020,9 +1020,9 @@ void ViewHistoryWindow::onRequestFailed(const QString &AId, const QString &AErro
 	}
 }
 
-void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefour)
+void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefore)
 {
-	if (ACurrent.parent()!=ABefour.parent() || ACurrent.row()!=ABefour.row())
+	if (ACurrent.parent()!=ABefore.parent() || ACurrent.row()!=ABefore.row())
 	{
 		QModelIndex index = ACurrent.column()==0 ? ACurrent : ui.trvCollections->model()->index(ACurrent.row(),0,ACurrent.parent());
 		FCurrentHeaders = indexHeaders(index);
@@ -1065,8 +1065,8 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
 			}
 		}
 		QStandardItem *current = FModel->itemFromIndex(FProxyModel->mapToSource(ACurrent));
-		QStandardItem *befour = FModel->itemFromIndex(FProxyModel->mapToSource(ABefour));
-		emit currentItemChanged(current,befour);
+		QStandardItem *before = FModel->itemFromIndex(FProxyModel->mapToSource(ABefore));
+		emit currentItemChanged(current,before);
 	}
 }
 

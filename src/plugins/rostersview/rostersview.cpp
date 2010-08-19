@@ -154,12 +154,12 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 		QList<QAbstractProxyModel *> proxies = FProxyModels.values();
 		int index = proxies.indexOf(AProxyModel);
 
-		QAbstractProxyModel *befour = proxies.value(index-1,NULL);
+		QAbstractProxyModel *before = proxies.value(index-1,NULL);
 		QAbstractProxyModel *after = proxies.value(index+1,NULL);
 
-		if (befour)
+		if (before)
 		{
-			AProxyModel->setSourceModel(befour);
+			AProxyModel->setSourceModel(before);
 		}
 		else
 		{
@@ -199,14 +199,14 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 		QList<QAbstractProxyModel *> proxies = FProxyModels.values();
 		int index = proxies.indexOf(AProxyModel);
 
-		QAbstractProxyModel *befour = proxies.value(index-1,NULL);
+		QAbstractProxyModel *before = proxies.value(index-1,NULL);
 		QAbstractProxyModel *after = proxies.value(index+1,NULL);
 
 		bool changeViewModel = after==NULL;
 		if (changeViewModel)
 		{
-			if (befour!=NULL)
-				emit viewModelAboutToBeChanged(befour);
+			if (before!=NULL)
+				emit viewModelAboutToBeChanged(before);
 			else
 				emit viewModelAboutToBeChanged(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
 		}
@@ -217,15 +217,15 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 
 		FProxyModels.remove(FProxyModels.key(AProxyModel),AProxyModel);
 
-		if (after == NULL && befour == NULL)
+		if (after == NULL && before == NULL)
 		{
 			QTreeView::setModel(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
 		}
 		else if (after == NULL)
 		{
-			QTreeView::setModel(befour);
+			QTreeView::setModel(before);
 		}
-		else if (befour == NULL)
+		else if (before == NULL)
 		{
 			after->setSourceModel(NULL);
 			after->setSourceModel(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
@@ -233,7 +233,7 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 		else
 		{
 			after->setSourceModel(NULL);
-			after->setSourceModel(befour);
+			after->setSourceModel(before);
 		}
 
 		AProxyModel->setSourceModel(NULL);
