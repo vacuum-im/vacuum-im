@@ -151,7 +151,9 @@ void TabWindow::clear()
 
 void TabWindow::initialize()
 {
-	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_SHOW_INDICES));
+	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),
+			SLOT(onOptionsChanged(const OptionsNode &)));
 }
 
 void TabWindow::createActions()
@@ -261,7 +263,13 @@ void TabWindow::updateTab(int AIndex)
 	if (widget)
 	{
 		ui.twtTabs->setTabIcon(AIndex,widget->windowIcon());
-		ui.twtTabs->setTabText(AIndex,widget->windowIconText());
+		QString tabText;
+		if (FShowTabIndices)
+			tabText = tr("%1. %2", "First is tab index, second is tab name")
+					  .arg(QString::number(AIndex+1)).arg(widget->windowIconText());
+		else
+			tabText = widget->windowIconText();
+		ui.twtTabs->setTabText(AIndex,tabText);
 	}
 }
 
@@ -346,6 +354,12 @@ void TabWindow::onOptionsChanged(const OptionsNode &ANode)
 	{
 		FSetAsDefault->setChecked(FWindowId==ANode.value().toString());
 		FDeleteWindow->setVisible(!FSetAsDefault->isChecked());
+	}
+	else if (ANode.path() == OPV_MESSAGES_TABWINDOWS_SHOW_INDICES)
+	{
+		FShowTabIndices = ANode.value().toBool();
+		for (int tab=0; tab<ui.twtTabs->count(); tab++)
+			updateTab(tab);
 	}
 }
 
