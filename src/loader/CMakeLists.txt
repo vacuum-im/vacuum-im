@@ -22,7 +22,7 @@ if (WIN32)
 			COMMAND windres.exe
 				"-I${CMAKE_CURRENT_SOURCE_DIR}"
 				"-i${CMAKE_CURRENT_SOURCE_DIR}/loader.rc"
-				-o "${CMAKE_CURRENT_BINARY_DIR}/loared.rc.obj")
+				-o "${CMAKE_CURRENT_BINARY_DIR}/loader.rc.obj")
 		set(SOURCES ${SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/loader.rc.obj")
 	else (MINGW)
 		set(SOURCES ${SOURCES} "loader.rc")
