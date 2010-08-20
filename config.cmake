@@ -50,5 +50,9 @@ add_definitions(-DTRANSLATIONS_DIR="${TRANSLATIONS_DIR}")
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
+if (WIN32)
+	set(CMAKE_SHARED_LIBRARY_PREFIX "")
+endif (WIN32)
+
 include("${CMAKE_SOURCE_DIR}/install.cmake")
 include("${CMAKE_SOURCE_DIR}/translations.cmake")

@@ -16,13 +16,26 @@ if (NOT (SVN_REVISION STREQUAL ""))
 	add_definitions(-DSVNINFO)
 endif (NOT (SVN_REVISION STREQUAL ""))
 
+if (WIN32)
+	if (MINGW)
+		add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/loader.rc.obj"
+			COMMAND windres.exe
+				"-I${CMAKE_CURRENT_SOURCE_DIR}"
+				"-i${CMAKE_CURRENT_SOURCE_DIR}/loader.rc"
+				-o "${CMAKE_CURRENT_BINARY_DIR}/loared.rc.obj")
+		set(SOURCES ${SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/loader.rc.obj")
+	else (MINGW)
+		set(SOURCES ${SOURCES} "loader.rc")
+	endif (MINGW)
+endif (WIN32)
+
 add_translations(TRANSLATIONS "${TARGET_LOADER}" ${SOURCES} ${UIS})
-add_executable(${TARGET_LOADER} ${SOURCES} ${MOC_SOURCES} ${UI_HEADERS} ${TRANSLATIONS})
+add_executable(${TARGET_LOADER} WIN32 ${SOURCES} ${MOC_SOURCES} ${UI_HEADERS} ${TRANSLATIONS})
 set_target_properties(${TARGET_LOADER} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 target_link_libraries(${TARGET_LOADER} ${TARGET_UTILS} ${QT_LIBRARIES})
 
-install(TARGETS ${TARGET_LOADER} RUNTIME
-	DESTINATION "${INSTALL_BINS}")
+install(TARGETS ${TARGET_LOADER}
+	RUNTIME	DESTINATION "${INSTALL_BINS}")
 if (UNIX AND NOT APPLE)
 	install(FILES "${CMAKE_SOURCE_DIR}/resources/menuicons/shared/vacuum.png"
 		DESTINATION "${INSTALL_RES_DIR}/pixmaps")
