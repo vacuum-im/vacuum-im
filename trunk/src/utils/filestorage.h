@@ -22,6 +22,7 @@ class UTILS_EXPORT FileStorage :
 			public QObject
 {
 	Q_OBJECT;
+	struct StorageObject;
 public:
 	FileStorage(const QString &AStorage, const QString &ASubStorage = STORAGE_SHARED_DIR, QObject *AParent = NULL);
 	virtual ~FileStorage();
@@ -54,12 +55,6 @@ private:
 	QString FSubPrefix;
 	QString FSharedPrefix;
 private:
-	struct StorageObject {
-		bool shared;
-		QList<int> fileTypes;
-		QList<QString> fileNames;
-		QHash<QString, QString> fileOptions;
-	};
 	QList<QString> FKeys;
 	QHash<QString, uint> FKey2Object;
 	QList<StorageObject> FObjects;

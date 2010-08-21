@@ -13,20 +13,16 @@ class UnzipFileData :
 			public QSharedData
 {
 public:
+	struct ZippedFile;
+public:
 	UnzipFileData();
 	UnzipFileData(const UnzipFileData &AOther);
 	~UnzipFileData();
 public:
-	struct ZippedFile {
-		QString name;
-		unsigned long size;
-		QByteArray data;
-	};
-public:
 	bool FFilesReaded;
 	unzFile FUNZFile;
 	QString FZipFileName;
-	QHash<QString,ZippedFile *> FZippedFiles;
+	QHash<QString, ZippedFile *> FZippedFiles;
 };
 
 

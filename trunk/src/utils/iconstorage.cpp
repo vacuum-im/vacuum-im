@@ -5,6 +5,37 @@
 #include <QVariant>
 #include <QApplication>
 
+struct IconStorage::IconAnimateParams {
+	IconAnimateParams() { 
+		timer = new QTimer; 
+		reader = NULL; 
+	}
+	~IconAnimateParams() { 
+		timer->stop();
+		timer->deleteLater();
+		delete reader; 
+	}
+	int frameIndex;
+	int frameCount;
+	QTimer *timer;
+	QImageReader *reader;
+};
+
+struct IconStorage::IconUpdateParams {
+	IconUpdateParams() { 
+		animation = NULL; 
+	}
+	~IconUpdateParams() { 
+		delete animation; 
+	}
+	QString key;
+	int index;
+	int animate;
+	QString prop;
+	QSize size;
+	IconAnimateParams *animation;
+};
+
 QHash<QString, QHash<QString,QIcon> > IconStorage::FIconCache;
 QHash<QString, IconStorage*> IconStorage::FStaticStorages;
 QHash<QObject*, IconStorage*> IconStorage::FObjectStorage;
