@@ -2,9 +2,9 @@
 #define ICAPTCHAFORMS_H
 
 #include <QString>
-struct IDataForm;
+#include <interfaces/idataforms.h>
 
-#define CAPTCHAFORMS_UUID   "{f733885c-2a25-438f-bfdb-dc7d139a222f}"
+#define CAPTCHAFORMS_UUID "{f733885c-2a25-438f-bfdb-dc7d139a222f}"
 
 class ICaptchaForms
 {

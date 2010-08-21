@@ -5,14 +5,15 @@
 #include <interfaces/idataforms.h>
 #include <utils/jid.h>
 
-#define REGISTRATION_UUID         "{441F0DD4-C2DF-4417-B2F7-1D180C125EE3}"
+#define REGISTRATION_UUID "{441F0DD4-C2DF-4417-B2F7-1D180C125EE3}"
 
-struct IRegisterFields {
+struct IRegisterFields 
+{
 	enum Fields {
-		Username  = 1,
-		Password  = 2,
-		Email     = 4,
-		URL       = 8
+		Username  = 0x01,
+		Password  = 0x02,
+		Email     = 0x04,
+		URL       = 0x08
 	};
 	int fieldMask;
 	bool registered;
@@ -26,7 +27,8 @@ struct IRegisterFields {
 	IDataForm form;
 };
 
-struct IRegisterSubmit {
+struct IRegisterSubmit 
+{
 	int fieldMask;
 	Jid serviceJid;
 	QString username;
@@ -36,7 +38,8 @@ struct IRegisterSubmit {
 	IDataForm form;
 };
 
-class IRegistration {
+class IRegistration 
+{
 public:
 	enum RegisterOperation {
 		Register,

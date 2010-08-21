@@ -1,11 +1,12 @@
 #ifndef IPEP_H
 #define IPEP_H
 
-#include <utils/stanza.h>
-#include <utils/jid.h>
+#include <QDomElement>
 #include <interfaces/iservicediscovery.h>
+#include <utils/jid.h>
+#include <utils/stanza.h>
 
-#define PEP_UUID                       "{36dbd5c1-a3cd-11df-87fc-001cbf2edcfc}"
+#define PEP_UUID "{36dbd5c1-a3cd-11df-87fc-001cbf2edcfc}"
 
 class IPEPHandler
 {
@@ -19,7 +20,7 @@ class IPEPManager
 {
 public:
 	virtual bool publishItem(const QString &ANode, const QDomElement &AItem) =0;
-	virtual bool publishItem(const QString &ANode, const QDomElement &AItem, const Jid& streamJid) =0;
+	virtual bool publishItem(const Jid &AStreamJid, const QString &ANode, const QDomElement &AItem) =0;
 	virtual int insertNodeHandler(const QString &ANode, IPEPHandler *AHandle) =0;
 	virtual bool removeNodeHandler(int AHandleId) =0;
 	virtual IPEPHandler* nodeHandler(int AHandleId) =0;

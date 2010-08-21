@@ -2,10 +2,10 @@
 #define IPRIVACYLISTS_H
 
 #include <QDialog>
-#include "../interfaces/iroster.h"
-#include "../utils/jid.h"
+#include <interfaces/iroster.h>
+#include <utils/jid.h>
 
-#define PRIVACYLISTS_UUID             "{B7B7F21A-DF0E-4f3e-B0C2-AA14976B546F}"
+#define PRIVACYLISTS_UUID "{B7B7F21A-DF0E-4f3e-B0C2-AA14976B546F}"
 
 #define PRIVACY_TYPE_JID              "jid"
 #define PRIVACY_TYPE_GROUP            "group"
@@ -33,7 +33,9 @@ struct IPrivacyRule
 		PresencesOut  =8,
 		AnyStanza     = Messages|Queries|PresencesIn|PresencesOut
 	};
-	IPrivacyRule() { stanzas = EmptyType; }
+	IPrivacyRule() { 
+		stanzas = EmptyType; 
+	}
 	int order;
 	QString type;
 	QString value;

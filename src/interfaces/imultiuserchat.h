@@ -9,7 +9,7 @@
 #include <utils/message.h>
 #include <utils/menubarchanger.h>
 
-#define MULTIUSERCHAT_UUID              "{EB960F92-59A9-4322-A646-F9AB4913706C}"
+#define MULTIUSERCHAT_UUID "{EB960F92-59A9-4322-A646-F9AB4913706C}"
 
 #define MUC_ROLE_NONE                   "none"
 #define MUC_ROLE_VISITOR                "visitor"
@@ -63,7 +63,8 @@
 #define MUC_UNMODERATED                 "muc_unmoderated"
 #define MUC_UNSECURED                   "muc_unsecured"
 
-struct IMultiUserListItem {
+struct IMultiUserListItem 
+{
 	QString jid;
 	QString role;
 	QString affiliation;

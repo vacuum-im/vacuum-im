@@ -3,15 +3,17 @@
 
 #include <QUuid>
 
-#define AUTOSTATUS_UUID   "{89687A92-B483-4d7a-B2CF-267A05D6CC5D}"
+#define AUTOSTATUS_UUID "{89687A92-B483-4d7a-B2CF-267A05D6CC5D}"
 
-struct IAutoStatusRule {
+struct IAutoStatusRule 
+{
 	int time;
 	int show;
 	QString text;
 };
 
-class IAutoStatus {
+class IAutoStatus 
+{
 public:
 	virtual QObject *instance() =0;
 	virtual int idleSeconds() const =0;

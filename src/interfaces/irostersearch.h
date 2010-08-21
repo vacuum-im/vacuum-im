@@ -3,9 +3,10 @@
 
 #include <utils/menu.h>
 
-#define ROSTERSEARCH_UUID   "{69632D37-C382-8b0d-C5DA-627A65D9DC8A}"
+#define ROSTERSEARCH_UUID "{69632D37-C382-8b0d-C5DA-627A65D9DC8A}"
 
-class IRosterSearch {
+class IRosterSearch 
+{
 public:
 	virtual QObject *instance() =0;
 	virtual void startSearch() =0;

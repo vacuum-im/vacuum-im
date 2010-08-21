@@ -8,7 +8,8 @@
 
 #define NOTIFICATIONS_UUID  "{59887A91-A483-4a7c-A2DE-227A01D6BC5E}"
 
-struct INotification {
+struct INotification 
+{
 	enum NotifyKinds {
 		RosterIcon    = 0x01,
 		PopupWindow   = 0x02,
@@ -17,12 +18,15 @@ struct INotification {
 		PlaySound     = 0x10,
 		AutoActivate  = 0x20
 	};
-	INotification() { kinds = 0; }
+	INotification() {
+		kinds = 0; 
+	}
 	uchar kinds;
 	QMap<int, QVariant> data;
 };
 
-class INotifications {
+class INotifications 
+{
 public:
 	virtual QObject *instance() =0;
 	virtual QList<int> notifications() const =0;

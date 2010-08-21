@@ -21,11 +21,11 @@ class IInfoWidget
 {
 public:
 	enum InfoField {
-		AccountName         =1,
-		ContactName         =2,
-		ContactShow         =4,
-		ContactStatus       =8,
-		ContactAvatar       =16
+		AccountName         =0x01,
+		ContactName         =0x02,
+		ContactShow         =0x04,
+		ContactStatus       =0x08,
+		ContactAvatar       =0x10
 	};
 public:
 	virtual QWidget *instance() = 0;
@@ -222,8 +222,8 @@ class IMessageWindow :
 {
 public:
 	enum Mode {
-		ReadMode    =1,
-		WriteMode   =2
+		ReadMode    =0x01,
+		WriteMode   =0x02
 	};
 public:
 	virtual const Jid &streamJid() const =0;

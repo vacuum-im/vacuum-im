@@ -5,14 +5,14 @@
 #include <utils/jid.h>
 #include <utils/stanza.h>
 
-#define STANZAPROCESSOR_UUID  "{1175D470-5D4A-4c29-A69E-EDA46C2BC387}"
+#define STANZAPROCESSOR_UUID "{1175D470-5D4A-4c29-A69E-EDA46C2BC387}"
 
-#define SHO_DEFAULT           1000
+#define SHO_DEFAULT  1000
 
 class IStanzaHandler
 {
 public:
-	virtual QObject* instance() =0;
+	virtual QObject *instance() =0;
 	virtual bool stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept) =0;
 	virtual bool stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept) =0;
 };
@@ -20,7 +20,7 @@ public:
 class IStanzaRequestOwner
 {
 public:
-	virtual QObject* instance() =0;
+	virtual QObject *instance() =0;
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza) =0;
 	virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId) =0;
 };
@@ -31,7 +31,11 @@ struct IStanzaHandle
 		DirectionIn,
 		DirectionOut
 	};
-	IStanzaHandle() { order=SHO_DEFAULT; direction=DirectionIn; handler=NULL; }
+	IStanzaHandle() { 
+		order = SHO_DEFAULT;
+		direction = DirectionIn;
+		handler = NULL;
+	}
 	int order;
 	int direction;
 	Jid streamJid;

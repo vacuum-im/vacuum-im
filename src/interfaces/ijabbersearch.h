@@ -1,12 +1,13 @@
 #ifndef IJABBERSEARCH_H
 #define IJABBERSEARCH_H
 
-#define JABBERSEARCH_UUID   "{F66BCFC9-F6BB-43b2-8101-8CA41EF227AF}"
+#include <interfaces/idataforms.h>
+#include <utils/jid.h>
 
-#include "../interfaces/idataforms.h"
-#include "../utils/jid.h"
+#define JABBERSEARCH_UUID "{F66BCFC9-F6BB-43b2-8101-8CA41EF227AF}"
 
-struct ISearchItem {
+struct ISearchItem 
+{
 	Jid itemJid;
 	QString firstName;
 	QString lastName;
@@ -14,7 +15,8 @@ struct ISearchItem {
 	QString email;
 };
 
-struct ISearchFields {
+struct ISearchFields 
+{
 	enum Fields {
 		First   = 1,
 		Last    = 2,
@@ -28,7 +30,8 @@ struct ISearchFields {
 	IDataForm form;
 };
 
-struct ISearchSubmit {
+struct ISearchSubmit 
+{
 	Jid serviceJid;
 	ISearchItem item;
 	IDataForm form;
@@ -41,7 +44,8 @@ struct ISearchResult
 	IDataForm form;
 };
 
-class IJabberSearch {
+class IJabberSearch 
+{
 public:
 	virtual QObject *instance() =0;
 	virtual QString sendRequest(const Jid &AStreamJid, const Jid &AServiceJid) =0;

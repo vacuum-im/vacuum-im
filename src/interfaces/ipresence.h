@@ -7,8 +7,13 @@
 
 #define PRESENCE_UUID "{511A07C4-FFA4-43ce-93B0-8C50409AFC0E}"
 
-struct IPresenceItem {
-	IPresenceItem() { isValid = false; show = 0; priority = 0; }
+struct IPresenceItem 
+{
+	IPresenceItem() { 
+		isValid = false;
+		show = 0;
+		priority = 0;
+	}
 	bool isValid;
 	Jid itemJid;
 	int show;

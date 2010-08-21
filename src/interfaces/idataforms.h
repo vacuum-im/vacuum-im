@@ -8,7 +8,7 @@
 #include <QDialogButtonBox>
 #include <utils/toolbarchanger.h>
 
-#define DATAFORMS_UUID                  "{2B8F89D0-EAA7-46eb-B2FD-AE30DF60E440}"
+#define DATAFORMS_UUID "{2B8F89D0-EAA7-46eb-B2FD-AE30DF60E440}"
 
 #define DATAVALIDATE_TYPE_STRING        "xs:string"
 #define DATAVALIDATE_TYPE_URI           "xs:anyURI"
@@ -57,7 +57,8 @@
 #define MEDIAELEM_TYPE_VIDEO            "video"
 
 
-struct IDataValidate {
+struct IDataValidate 
+{
 	QString type;
 	QString method;
 	QString min;
@@ -67,25 +68,29 @@ struct IDataValidate {
 	QString listMax;
 };
 
-struct IDataOption {
+struct IDataOption 
+{
 	QString label;
 	QString value;
 };
 
-struct IDataMediaURI {
+struct IDataMediaURI 
+{
 	QString type;
 	QString subtype;
 	QString codecs;
 	QUrl url;
 };
 
-struct IDataMedia {
+struct IDataMedia 
+{
 	int height;
 	int width;
 	QList<IDataMediaURI> uris;
 };
 
-struct IDataField {
+struct IDataField 
+{
 	bool required;
 	QString var;
 	QString type;
@@ -97,12 +102,14 @@ struct IDataField {
 	QList<IDataOption> options;
 };
 
-struct IDataTable {
+struct IDataTable 
+{
 	QList<IDataField> columns;
 	QMap<int,QStringList> rows;
 };
 
-struct IDataLayout {
+struct IDataLayout 
+{
 	QString label;
 	QList<QString> text;
 	QList<QString> fieldrefs;
@@ -110,7 +117,8 @@ struct IDataLayout {
 	QList<QString> childOrder;
 };
 
-struct IDataForm {
+struct IDataForm 
+{
 	QString type;
 	QString title;
 	IDataTable tabel;
@@ -119,17 +127,20 @@ struct IDataForm {
 	QList<IDataLayout> pages;
 };
 
-struct IDataOptionLocale {
+struct IDataOptionLocale 
+{
 	QString label;
 };
 
-struct IDataFieldLocale {
+struct IDataFieldLocale 
+{
 	QString label;
 	QString desc;
 	QMap<QString, IDataOptionLocale> options;
 };
 
-struct IDataFormLocale {
+struct IDataFormLocale 
+{
 	QString title;
 	QStringList instructions;
 	QMap<QString, IDataFieldLocale> fields;
@@ -207,7 +218,8 @@ protected:
 	virtual void dialogDestroyed(IDataDialogWidget *ADialog) =0;
 };
 
-class IDataLocalizer {
+class IDataLocalizer 
+{
 public:
 	virtual IDataFormLocale dataFormLocale(const QString &AFormType) =0;
 };
