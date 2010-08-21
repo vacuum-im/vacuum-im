@@ -343,7 +343,7 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 					{
 						insertConnectingLabel(presence);
 						setStreamStatusId(presence, STATUS_CONNECTING_ID);
-						FLastOnlineStatus.insert(presence,newStatusId);
+						FLastOnlineStatus.insert(presence,!isChangeMainStatus ? newStatusId : STATUS_MAIN_ID);
 						FConnectStatus.insert(presence,FMainStatusStreams.contains(presence) ? STATUS_MAIN_ID : newStatus.code);
 					}
 				}
@@ -354,7 +354,7 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 					updateStreamMenu(presence);
 
 					if (newStatus.show!=IPresence::Offline && newStatus.show!=IPresence::Error)
-						FLastOnlineStatus.insert(presence,newStatusId);
+						FLastOnlineStatus.insert(presence,!isChangeMainStatus ? newStatusId : STATUS_MAIN_ID);
 					else
 						presence->xmppStream()->close();
 
@@ -976,8 +976,8 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 	{
 		bool isMainStatus = FMainStatusStreams.contains(APresence);
 		account->optionsNode().setValue(isMainStatus,"status.is-main");
-		if (!isMainStatus && account->optionsNode().value("auto-connect").toBool() && FLastOnlineStatus.contains(APresence))
-			account->optionsNode().setValue(FLastOnlineStatus.value(APresence),"status.last-online");
+		if (!isMainStatus && account->optionsNode().value("auto-connect").toBool())
+			account->optionsNode().setValue(FLastOnlineStatus.value(APresence, STATUS_MAIN_ID),"status.last-online");
 		else
 			account->optionsNode().setValue(QVariant(),"status.last-online");
 	}
