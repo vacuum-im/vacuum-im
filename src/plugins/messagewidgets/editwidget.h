@@ -58,6 +58,7 @@ protected slots:
 	void onShortcutActivated();
 	void onSendButtonCliked(bool);
 	void onOptionsChanged(const OptionsNode &ANode);
+	void onContentsChanged(int APosition, int ARemoved, int AAdded);
 private:
 	Ui::EditWidgetClass ui;
 private:

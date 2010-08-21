@@ -315,6 +315,7 @@ void MessageProcessor::removeStreamMessages(const Jid &AStreamJid)
 QString MessageProcessor::prepareBodyForSend(const QString &AString) const
 {
 	QString result = AString;
+	result.remove(QChar::Null);
 	result.remove(QChar::ObjectReplacementCharacter);
 	return result;
 }
@@ -323,7 +324,7 @@ QString MessageProcessor::prepareBodyForReceive(const QString &AString) const
 {
 	QString result = Qt::escape(AString);
 	result.replace('\n',"<br>");
-	result.replace("  " ,"&nbsp; ");
+	result.replace("  ","&nbsp; ");
 	return result;
 }
 
