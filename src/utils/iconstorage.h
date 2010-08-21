@@ -7,30 +7,14 @@
 #include <QImageReader>
 #include "filestorage.h"
 
-#define OPTION_ANIMATE      "animate"
+#define OPTION_ANIMATE "animate"
 
 class UTILS_EXPORT IconStorage :
 			public FileStorage
 {
 	Q_OBJECT;
-	struct IconAnimateParams {
-		IconAnimateParams() { timer = new QTimer; reader = NULL; }
-		~IconAnimateParams() { timer->stop(); timer->deleteLater(); delete reader; }
-		int frameIndex;
-		int frameCount;
-		QTimer *timer;
-		QImageReader *reader;
-	};
-	struct IconUpdateParams {
-		IconUpdateParams() { animation = NULL; }
-		~IconUpdateParams() { delete animation; }
-		QString key;
-		int index;
-		int animate;
-		QString prop;
-		QSize size;
-		IconAnimateParams *animation;
-	};
+	struct IconAnimateParams;
+	struct IconUpdateParams;
 public:
 	IconStorage(const QString &AStorage, const QString &ASubStorage = QString::null, QObject *AParent = NULL);
 	~IconStorage();
@@ -50,12 +34,12 @@ protected slots:
 	void onAnimateTimer();
 	void onObjectDestroyed(QObject *AObject);
 private:
-	QHash<QTimer*, QObject*> FTimerObject;
-	QHash<QObject*, IconUpdateParams*> FUpdateParams;
+	QHash<QTimer *, QObject *> FTimerObject;
+	QHash<QObject *, IconUpdateParams *> FUpdateParams;
 private:
-	static QHash<QString, QHash<QString,QIcon> > FIconCache;
-	static QHash<QString, IconStorage*> FStaticStorages;
-	static QHash<QObject*, IconStorage*> FObjectStorage;
+	static QHash<QString, QHash<QString, QIcon> > FIconCache;
+	static QHash<QString, IconStorage *> FStaticStorages;
+	static QHash<QObject *, IconStorage *> FObjectStorage;
 };
 
 #endif // ICONSTORAGE_H

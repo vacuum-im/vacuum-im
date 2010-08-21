@@ -1,5 +1,11 @@
 #include "unzipfile.h"
 
+struct UnzipFileData::ZippedFile {
+	QString name;
+	unsigned long size;
+	QByteArray data;
+};
+
 UnzipFileData::UnzipFileData()
 {
 	FUNZFile = NULL;

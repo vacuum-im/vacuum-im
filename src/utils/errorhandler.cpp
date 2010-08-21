@@ -60,6 +60,31 @@ ErrorHandler::~ErrorHandler()
 
 }
 
+ErrorHandler::ErrorType ErrorHandler::type() const
+{
+	return FType;
+}
+
+int ErrorHandler::code() const
+{
+	return FCode;
+}
+
+QString ErrorHandler::condition() const
+{
+	return FCondition;
+}
+
+QString ErrorHandler::meaning() const
+{
+	return FMeaning;
+}
+
+QString ErrorHandler::text() const
+{
+	return FText;
+}
+
 QString ErrorHandler::message() const
 {
 	QString msg;
@@ -70,6 +95,17 @@ QString ErrorHandler::message() const
 	msg += FText.isEmpty() ? (FMeaning.isEmpty() ? FCondition : FMeaning) : FText;
 
 	return msg;
+}
+
+QString ErrorHandler::context() const
+{
+	return FContext;
+}
+
+ErrorHandler &ErrorHandler::setContext(const QString &AContext)
+{
+	FContext = AContext; 
+	return *this;
 }
 
 ErrorHandler &ErrorHandler::parseElement(const QDomElement &AErrElem, const QString &ANsURI)
@@ -294,4 +330,3 @@ void ErrorHandler::init()
 		addErrorItem("disconnected",            CANCEL, 510, qApp->translate("ErrorHandler", "Disconnected"));
 	}
 }
-

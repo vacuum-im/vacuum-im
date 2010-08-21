@@ -29,8 +29,7 @@ public:
 class UTILS_EXPORT Message
 {
 public:
-	enum MessageType
-	{
+	enum MessageType {
 		AnyType     =0x00,
 		Normal      =0x01,
 		Chat        =0x02,

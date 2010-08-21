@@ -43,8 +43,7 @@ public:
 	QString lang() const;
 	Stanza &setLang(const QString &ALang);
 	bool canReplyError() const;
-	Stanza replyError(const QString &ACondition, const QString &ANamespace = EHN_DEFAULT,
-	                  int ACode = ErrorHandler::SERVICE_UNAVAILABLE, const QString &AText = QString::null) const;
+	Stanza replyError(const QString &ACondition, const QString &ANamespace = EHN_DEFAULT, int ACode = ErrorHandler::SERVICE_UNAVAILABLE, const QString &AText = QString::null) const;
 	QDomElement firstElement(const QString &ATagName = QString::null, const QString ANamespace = QString::null) const;
 	QDomElement addElement(const QString &ATagName, const QString &ANamespace = QString::null);
 	QDomElement createElement(const QString &ATagName, const QString &ANamespace = QString::null);

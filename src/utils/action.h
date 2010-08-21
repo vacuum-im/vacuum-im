@@ -35,7 +35,7 @@ public:
 	//Action
 	QVariant data(int ARole) const;
 	void setData(int ARole, const QVariant &AData);
-	void setData(const QHash<int,QVariant> &AData);
+	void setData(const QHash<int, QVariant> &AData);
 signals:
 	void actionDestroyed(Action *AAction);
 protected slots:
@@ -44,7 +44,7 @@ private:
 	Menu *FMenu;
 	IconStorage *FIconStorage;
 private:
-	QHash<int,QVariant> FData;
+	QHash<int, QVariant> FData;
 };
 
 #endif // ACTION_H

@@ -4,6 +4,13 @@
 #include <QDomDocument>
 #include <QApplication>
 
+struct FileStorage::StorageObject {
+	bool shared;
+	QList<int> fileTypes;
+	QList<QString> fileNames;
+	QHash<QString, QString> fileOptions;
+};
+
 QList<QString> FileStorage::FMimeTypes;
 QList<QString> FileStorage::FResourceDirs;
 QHash<QString, FileStorage *> FileStorage::FStaticStorages;

@@ -10,6 +10,7 @@
 class UTILS_EXPORT OptionsNode
 {
 	friend class Options;
+	struct OptionsNodeData;
 public:
 	OptionsNode();
 	OptionsNode(const OptionsNode &ANode);
@@ -37,7 +38,6 @@ public:
 	static const OptionsNode null;
 private:
 	OptionsNode(const QDomElement &ANode);
-	struct OptionsNodeData;
 	OptionsNodeData *d;
 };
 
@@ -46,6 +46,7 @@ class UTILS_EXPORT Options :
 {
 	Q_OBJECT;
 	friend class OptionsNode;
+	struct OptionsData;
 public:
 	static Options *instance();
 	static bool isNull();
@@ -68,7 +69,6 @@ signals:
 	void optionsRemoved(const OptionsNode &ANode);
 	void defaultValueChanged(const QString &APath, const QVariant &ADefault);
 private:
-	struct OptionsData;
 	static OptionsData *d;
 };
 
