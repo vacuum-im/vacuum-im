@@ -1786,6 +1786,7 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 	ACollection.header.threadId = AChatElem.attribute("thread");
 	ACollection.header.version = AChatElem.attribute("version").toInt();
 
+	int secsSum = 0;
 	QDomElement nodeElem = AChatElem.firstChildElement();
 	while (!nodeElem.isNull())
 	{
@@ -1806,7 +1807,8 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 			if (utc.isEmpty())
 			{
 				QString secs = nodeElem.attribute("secs");
-				message.setDateTime(ACollection.header.start.addSecs(secs.toInt()));
+				secsSum += secs.toInt();
+				message.setDateTime(ACollection.header.start.addSecs(secsSum));
 			}
 			else
 				message.setDateTime(DateTime(utc).toLocal());
