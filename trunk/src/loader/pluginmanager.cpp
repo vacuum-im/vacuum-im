@@ -668,9 +668,7 @@ void PluginManager::onShowSetupPluginsDialog(bool)
 		FPluginsDialog = new SetupPluginsDialog(this,FPluginsSetup,NULL);
 		connect(FPluginsDialog, SIGNAL(accepted()),SLOT(onSetupPluginsDialogAccepted()));
 	}
-	FPluginsDialog->show();
-	WidgetManager::raiseWidget(FPluginsDialog);
-	FPluginsDialog->activateWindow();
+	WidgetManager::showActivateRaiseWindow(FPluginsDialog);
 }
 
 void PluginManager::onSetupPluginsDialogAccepted()
@@ -682,7 +680,5 @@ void PluginManager::onShowAboutBoxDialog()
 {
 	if (FAboutDialog.isNull())
 		FAboutDialog = new AboutBox(this);
-	FAboutDialog->show();
-	WidgetManager::raiseWidget(FAboutDialog);
-	FAboutDialog->activateWindow();
+	WidgetManager::showActivateRaiseWindow(FAboutDialog);
 }

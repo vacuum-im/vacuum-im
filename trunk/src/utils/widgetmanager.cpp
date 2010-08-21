@@ -39,3 +39,23 @@ void WidgetManager::raiseWidget(QWidget *AWidget)
 
 	AWidget->raise();
 }
+
+void WidgetManager::showActivateRaiseWindow(QWidget *AWindow)
+{
+	if (AWindow->isVisible())
+	{
+		if (AWindow->isMinimized())
+		{
+			if (AWindow->isMaximized())
+				AWindow->showMaximized();
+			else
+				AWindow->showNormal();
+		}
+	}
+	else
+	{
+		AWindow->show();
+	}
+	AWindow->activateWindow();
+	WidgetManager::raiseWidget(AWindow);
+}

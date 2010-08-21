@@ -614,8 +614,7 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
 		else
 		{
 			dialog->setInfoTypes(dialog->infoTypes() | AInfoTypes);
-			WidgetManager::raiseWidget(dialog);
-			dialog->activateWindow();
+			WidgetManager::showActivateRaiseWindow(dialog);
 		}
 	}
 }

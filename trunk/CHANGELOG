@@ -19,7 +19,8 @@ LEGEND
   [-] The roster window was closed by clicking on the tray even if it was inactive
   [-] Application fails when turn on or off the search in roster
   [-] It was impossible to set the empty status text
-  [-] At an account the following sign to the global status could be lost after reconnection because of breakage of connection with a server 
+  [-] At an account the following sign to the global status could be lost after reconnection because of breakage of connection with a server
+  [-] Windows with new messages does not always pop up on top of other windows
 
 
 v1.0.2
