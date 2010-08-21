@@ -58,6 +58,10 @@
         <source>Show contact information in chat windows</source>
         <translation>Pokaż informacje o kontakcie w oknie rozmów</translation>
     </message>
+    <message>
+        <source>Show tab indices</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>
@@ -239,6 +243,11 @@
     <message>
         <source>Show Tabs at Bootom of the Window</source>
         <translation>Pokazuj zakładki na dole</translation>
+    </message>
+    <message>
+        <source>%1. %2</source>
+        <comment>First is tab index, second is tab name</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
