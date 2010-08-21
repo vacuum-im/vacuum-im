@@ -114,6 +114,57 @@ QVariant stringToVariant(const QString &AString, QVariant::Type AType)
 	return QVariant();
 }
 
+void exportOptionNode(const OptionsNode &ANode, QDomElement &AToElem)
+{
+	QVariant value = ANode.value();
+	if (!value.isNull())
+	{
+		QDomText text = findChildText(AToElem);
+		if (!text.isNull())
+			text.setData(variantToString(value));
+		else
+			AToElem.appendChild(AToElem.ownerDocument().createTextNode(variantToString(value)));
+		AToElem.setAttribute("type",value.type());
+	}
+	else if (AToElem.hasAttribute("type"))
+	{
+		AToElem.removeAttribute("type");
+		AToElem.removeChild(findChildText(AToElem));
+	}
+
+	QString cname, spath, nspace;
+	foreach(QString childName, ANode.childNames())
+	{
+		foreach (QString childNSpace, ANode.childNSpaces(childName))
+		{
+			QDomElement childElem = findChildElement(AToElem,childName,childNSpace,cname,spath,nspace);
+			if (childElem.isNull())
+			{
+				childElem = AToElem.appendChild(AToElem.ownerDocument().createElement(cname)).toElement();
+				if (!nspace.isEmpty())
+					childElem.setAttribute("ns",nspace);
+			}
+			exportOptionNode(ANode.node(childName,childNSpace),childElem);
+		}
+	}
+}
+
+void importOptionNode(OptionsNode &ANode, const QDomElement &AFromElem)
+{
+	if (AFromElem.hasAttribute("type"))
+		ANode.setValue(stringToVariant(findChildText(AFromElem).data(), (QVariant::Type)AFromElem.attribute("type").toInt()));
+	else
+		ANode.setValue(QVariant());
+
+	QDomElement childElem = AFromElem.firstChildElement();
+	while (!childElem.isNull())
+	{
+		OptionsNode node = ANode.node(childElem.tagName(), childElem.attribute("ns"));
+		importOptionNode(node,childElem);
+		childElem = childElem.nextSiblingElement();
+	}
+}
+
 #define XTEA_ITERATIONS 64
 #define rol(N, R) (((N) << (R)) | ((N) >> (32 - (R))))
 void xtea2_encipher(unsigned int num_rounds, quint32 *v, quint32 const *k)
@@ -439,6 +490,20 @@ QString Options::cleanNSpaces(const QString &APath)
 	return cleanPath;
 }
 
+bool Options::hasNode(const QString &APath, const QString &ANSpace)
+{
+	QString path = APath;
+	QString cname, spath, nspace;
+	QDomElement nodeElem = d->options.documentElement();
+	while (!nodeElem.isNull() && !path.isEmpty())
+	{
+		QDomElement childElem = findChildElement(nodeElem,path,ANSpace,cname,spath,nspace);
+		path = spath;
+		nodeElem = childElem;
+	}
+	return !nodeElem.isNull();
+}
+
 OptionsNode Options::node(const QString &APath, const QString &ANSpace)
 {
 	return APath.isEmpty() ? OptionsNode(d->options.documentElement()) : OptionsNode(d->options.documentElement()).node(APath,ANSpace);
@@ -558,4 +623,46 @@ QVariant Options::decrypt(const QByteArray &AData, const QByteArray &AKey)
 		}
 	}
 	return QVariant();
+}
+
+void Options::exportNode(const QString &APath, QDomElement &AToElem)
+{
+	if (hasNode(APath))
+	{
+		QString path = APath;
+		QString cname, spath, nspace;
+		QDomElement nodeElem = AToElem;
+		while (!path.isEmpty())
+		{
+			QDomElement childElem = findChildElement(nodeElem,path,QString::null,cname,spath,nspace);
+			if (childElem.isNull())
+			{
+				childElem = nodeElem.appendChild(nodeElem.ownerDocument().createElement(cname)).toElement();
+				if (!nspace.isEmpty())
+					childElem.setAttribute("ns",nspace);
+			}
+			path = spath;
+			nodeElem = childElem;
+		}
+		exportOptionNode(Options::node(APath), nodeElem);
+	}
+}
+
+void Options::importNode(const QString &APath, const QDomElement &AFromElem)
+{
+	QString path = APath;
+	QString cname, spath, nspace;
+	QDomElement nodeElem = AFromElem;
+	while (!nodeElem.isNull() && !path.isEmpty())
+	{
+		QDomElement childElem = findChildElement(nodeElem,path,QString::null,cname,spath,nspace);
+		path = spath;
+		nodeElem = childElem;
+	}
+
+	if (!nodeElem.isNull())
+	{
+		OptionsNode node = Options::node(APath);
+		importOptionNode(node,nodeElem);
+	}
 }
