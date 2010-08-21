@@ -28,9 +28,9 @@ class IRostersView
 {
 public:
 	enum LabelFlags {
-		LabelBlink                    =0x01,
-		LabelVisible                  =0x02,
-		LabelExpandParents            =0x04
+		LabelBlink					=0x01,
+		LabelVisible        =0x02,
+		LabelExpandParents  =0x04
 	};
 public:
 	//--RostersModel

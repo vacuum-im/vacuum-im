@@ -5,7 +5,7 @@
 #include <QMultiMap>
 #include <utils/jid.h>
 
-#define XMPPURIQUERIES_UUID   "{fdd3ab79-25da-4f96-a3d5-add3188047aa}"
+#define XMPPURIQUERIES_UUID "{fdd3ab79-25da-4f96-a3d5-add3188047aa}"
 
 class IXmppUriHandler
 {

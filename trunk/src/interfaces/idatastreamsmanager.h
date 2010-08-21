@@ -54,8 +54,7 @@ public:
 	virtual QString methodNS() const =0;
 	virtual QString methodName() const =0;
 	virtual QString methodDescription() const =0;
-	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid,
-	    const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent = NULL) =0;
+	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent = NULL) =0;
 	virtual IOptionsWidget *methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent) =0;
 	virtual IOptionsWidget *methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent) =0;
 	virtual void saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
@@ -93,8 +92,7 @@ public:
 	virtual OptionsNode settingsProfileNode(const QUuid &AProfileId, const QString &AMethodNS) const =0;
 	virtual void insertSettingsProfile(const QUuid &AProfileId, const QString &AName) =0;
 	virtual void removeSettingsProfile(const QUuid &AProfileId) =0;
-	virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS,
-	                        const QList<QString> &AMethods, int ATimeout =0) =0;
+	virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS, const QList<QString> &AMethods, int ATimeout =0) =0;
 	virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS) =0;
 	virtual bool rejectStream(const QString &AStreamId, const QString &AError) =0;
 protected:

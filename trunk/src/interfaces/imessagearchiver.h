@@ -11,7 +11,7 @@
 #include <utils/menu.h>
 #include <utils/jid.h>
 
-#define MESSAGEARCHIVER_UUID    "{66FEAE08-BE4D-4fd4-BCEA-494F3A70997A}"
+#define MESSAGEARCHIVER_UUID "{66FEAE08-BE4D-4fd4-BCEA-494F3A70997A}"
 
 #define ARCHIVE_OTR_APPROVE     "approve"   //the user MUST explicitly approve off-the-record communication.
 #define ARCHIVE_OTR_CONCEDE     "concede"   //communications MAY be off the record if requested by another user.
@@ -54,7 +54,9 @@ struct IArchiveStreamPrefs
 
 struct IArchiveHeader
 {
-	IArchiveHeader() { version = 0; }
+	IArchiveHeader() { 
+		version = 0; 
+	}
 	Jid with;
 	QDateTime start;
 	QString subject;
@@ -125,7 +127,8 @@ struct IArchiveFilter
 	QRegExp body;
 };
 
-struct IArchiveResultSet {
+struct IArchiveResultSet 
+{
 	int count;
 	int index;
 	QString first;

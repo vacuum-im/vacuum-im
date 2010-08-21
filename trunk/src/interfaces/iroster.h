@@ -18,8 +18,12 @@
 #define SUBSCRIPTION_UNSUBSCRIBED     "unsubscribed"
 #define SUBSCRIPTION_REMOVE           "remove"
 
-struct IRosterItem {
-	IRosterItem() { isValid = false; subscription = SUBSCRIPTION_NONE; }
+struct IRosterItem 
+{
+	IRosterItem() { 
+		isValid = false;
+		subscription = SUBSCRIPTION_NONE;
+	}
 	bool isValid;
 	Jid itemJid;
 	QString name;
@@ -28,7 +32,8 @@ struct IRosterItem {
 	QSet<QString> groups;
 };
 
-class IRoster {
+class IRoster 
+{
 public:
 	enum SubscriptionType {
 		Subscribe,
@@ -75,7 +80,8 @@ protected:
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 };
 
-class IRosterPlugin {
+class IRosterPlugin 
+{
 public:
 	virtual QObject *instance() =0;
 	virtual IRoster *addRoster(IXmppStream *AXmppStream) =0;

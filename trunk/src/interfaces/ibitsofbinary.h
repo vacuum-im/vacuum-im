@@ -3,11 +3,10 @@
 
 #include <QString>
 #include <QByteArray>
+#include <utils/jid.h>
+#include <utils/stanza.h>
 
-class Jid;
-class Stanza;
-
-#define BITSOFBINARY_UUID       "{44d5c538-2254-4ae3-a78d-0c20a76ef87b}"
+#define BITSOFBINARY_UUID "{44d5c538-2254-4ae3-a78d-0c20a76ef87b}"
 
 class IBitsOfBinary
 {

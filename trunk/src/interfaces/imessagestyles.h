@@ -37,7 +37,12 @@ struct IMessageContentOptions
 		DirectionIn,
 		DirectionOut
 	};
-	IMessageContentOptions() { kind=Message; type=0; direction=DirectionIn; noScroll=false; }
+	IMessageContentOptions() { 
+		kind = Message;
+		type = 0;
+		direction = DirectionIn;
+		noScroll = false;
+	}
 	int kind;
 	int type;
 	int direction;

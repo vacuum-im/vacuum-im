@@ -2,10 +2,10 @@
 #define ISESSIONNEGOTIATION_H
 
 #include <QHash>
-#include "../interfaces/idataforms.h"
-#include "../utils/jid.h"
+#include <interfaces/idataforms.h>
+#include <utils/jid.h>
 
-#define SESSIONNEGOTIATION_UUID       "{D4908366-6204-4199-AFB8-BA0CB4CAC91C}"
+#define SESSIONNEGOTIATION_UUID "{D4908366-6204-4199-AFB8-BA0CB4CAC91C}"
 
 #define SESSION_FIELD_ACCEPT          "accept"
 #define SESSION_FIELD_CONTINUE        "continue"
@@ -27,7 +27,9 @@ struct IStanzaSession
 		Terminate,
 		Error
 	};
-	IStanzaSession() { status = Empty; }
+	IStanzaSession() { 
+		status = Empty; 
+	}
 	QString sessionId;
 	Jid streamJid;
 	Jid contactJid;
@@ -41,11 +43,11 @@ class ISessionNegotiator
 {
 public:
 	enum Result {
-		Skip    =0,
-		Cancel  =1,
-		Wait    =2,
-		Manual  =4,
-		Auto    =8
+		Skip    =0x00,
+		Cancel  =0x01,
+		Wait    =0x02,
+		Manual  =0x04,
+		Auto    =0x08
 	};
 public:
 	virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest) =0;

@@ -8,7 +8,7 @@
 #include <utils/stanza.h>
 #include <utils/options.h>
 
-#define FILESTREAMSMANAGER_UUID       "{ea9ea27a-5ad7-40e3-82b3-db8ac3bdc288}"
+#define FILESTREAMSMANAGER_UUID "{ea9ea27a-5ad7-40e3-82b3-db8ac3bdc288}"
 
 class IFileStream
 {
@@ -82,8 +82,7 @@ public:
 	virtual QObject *instance() =0;
 	virtual QList<IFileStream *> streams() const =0;
 	virtual IFileStream *streamById(const QString &AStreamId) const =0;
-	virtual IFileStream *createStream(IFileStreamsHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid,
-	                                  const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL) =0;
+	virtual IFileStream *createStream(IFileStreamsHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL) =0;
 	virtual IFileStreamsHandler *streamHandler(const QString &AStreamId) const =0;
 	virtual void insertStreamsHandler(IFileStreamsHandler *AHandler, int AOrder) =0;
 	virtual void removeStreamsHandler(IFileStreamsHandler *AHandler, int AOrder) =0;

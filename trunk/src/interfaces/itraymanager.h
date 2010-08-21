@@ -6,7 +6,8 @@
 
 #define TRAYMANAGER_UUID "{DF738BB8-B22B-4307-9EF8-F5833D7D2204}"
 
-class ITrayManager {
+class ITrayManager 
+{
 public:
 	virtual QObject *instance() =0;
 	virtual QIcon currentIcon() const =0;
@@ -16,8 +17,7 @@ public:
 	virtual void setMainIcon(const QIcon &AIcon) =0;
 	virtual QString mainToolTip() const =0;
 	virtual void setMainToolTip(const QString &AToolTip) =0;
-	virtual void showMessage(const QString &ATitle, const QString &AMessage,
-	                         QSystemTrayIcon::MessageIcon AIcon = QSystemTrayIcon::Information, int ATimeout = 10000) =0;
+	virtual void showMessage(const QString &ATitle, const QString &AMessage, QSystemTrayIcon::MessageIcon AIcon = QSystemTrayIcon::Information, int ATimeout = 10000) =0;
 	virtual void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false) =0;
 	virtual void removeAction(Action *AAction) =0;
 	virtual int appendNotify(const QIcon &AIcon, const QString &AToolTip, bool ABlink) =0;

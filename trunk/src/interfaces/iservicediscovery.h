@@ -28,7 +28,9 @@ struct IDiscoItem
 
 struct IDiscoFeature
 {
-	IDiscoFeature() { active = false; }
+	IDiscoFeature() { 
+		active = false;
+	}
 	bool active;
 	QIcon icon;
 	QString var;
@@ -38,7 +40,9 @@ struct IDiscoFeature
 
 struct IDiscoError
 {
-	IDiscoError() { code = -1; }
+	IDiscoError() { 
+		code = -1;
+	}
 	int code;
 	QString condition;
 	QString message;

@@ -2,11 +2,12 @@
 #define IAVATARS_H
 
 #include <QImage>
-#include "../utils/jid.h"
+#include <utils/jid.h>
 
 #define AVATARTS_UUID "{22F84EAF-683E-4a20-B5E5-1FE363FD206C}"
 
-class IAvatars {
+class IAvatars 
+{
 public:
 	virtual QObject *instance() =0;
 	virtual QString avatarFileName(const QString &AHash) const =0;

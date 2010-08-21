@@ -10,7 +10,8 @@
 
 #define VCARD_UUID "{8AD31549-AD09-4e84-BD6F-41928B3BDA7E}"
 
-class IVCard {
+class IVCard 
+{
 public:
 	virtual QObject *instance() =0;
 	virtual bool isValid() const =0;
@@ -18,13 +19,10 @@ public:
 	virtual const Jid &contactJid() const =0;
 	virtual QDomElement vcardElem() const =0;
 	virtual QDateTime loadDateTime() const =0;
-	virtual QString value(const QString &AName, const QStringList &ATags = QStringList(),
-	                      const QStringList &ATagList = QStringList()) const =0;
-	virtual QMultiHash<QString,QStringList> values(const QString &AName, const QStringList &ATagList) const =0;
-	virtual void setTagsForValue(const QString &AName, const QString &AValue, const QStringList &ATags = QStringList(),
-	                             const QStringList &ATagList = QStringList()) =0;
-	virtual void setValueForTags(const QString &AName, const QString &AValue, const QStringList &ATags = QStringList(),
-	                             const QStringList &ATagList = QStringList()) =0;
+	virtual QString value(const QString &AName, const QStringList &ATags = QStringList(), const QStringList &ATagList = QStringList()) const =0;
+	virtual QMultiHash<QString, QStringList> values(const QString &AName, const QStringList &ATagList) const =0;
+	virtual void setTagsForValue(const QString &AName, const QString &AValue, const QStringList &ATags = QStringList(), const QStringList &ATagList = QStringList()) =0;
+	virtual void setValueForTags(const QString &AName, const QString &AValue, const QStringList &ATags = QStringList(), const QStringList &ATagList = QStringList()) =0;
 	virtual QImage logoImage() const =0;
 	virtual void setLogoImage(const QImage &AImage, const QByteArray &AFormat = QByteArray()) =0;
 	virtual QImage photoImage() const =0;
@@ -39,7 +37,8 @@ protected:
 	virtual void vcardError(const QString &AError) =0;
 };
 
-class IVCardPlugin {
+class IVCardPlugin 
+{
 public:
 	virtual QObject *instance() =0;
 	virtual QString vcardFileName(const Jid &AContactJid) const =0;

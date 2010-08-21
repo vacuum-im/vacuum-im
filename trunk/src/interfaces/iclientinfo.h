@@ -10,9 +10,9 @@ class IClientInfo
 {
 public:
 	enum InfoType {
-		SoftwareVersion             =1,
-		LastActivity                =2,
-		EntityTime                  =4
+		SoftwareVersion =0x01,
+		LastActivity    =0x02,
+		EntityTime      =0x04
 	};
 	enum SoftwareStatus {
 		SoftwareNotLoaded,

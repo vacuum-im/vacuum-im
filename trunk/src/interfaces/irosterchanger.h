@@ -8,7 +8,8 @@
 
 #define ROSTERCHANGER_UUID "{018E7891-2743-4155-8A70-EAB430573500}"
 
-class IAddContactDialog {
+class IAddContactDialog 
+{
 public:
 	virtual QDialog *instance() =0;
 	virtual Jid streamJid() const =0;

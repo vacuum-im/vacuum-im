@@ -27,7 +27,7 @@ public:
 	virtual bool startPlugin();
 	// IPEPManager
 	virtual bool publishItem(const QString &ANode, const QDomElement &AItem);
-	virtual bool publishItem(const QString &ANode, const QDomElement &AItem, const Jid& streamJid);
+	virtual bool publishItem(const Jid &AStreamJid, const QString &ANode, const QDomElement &AItem);
 	virtual int insertNodeHandler(const QString &ANode, IPEPHandler *AHandle);
 	virtual bool removeNodeHandler(int AHandleId);
 	virtual IPEPHandler* nodeHandler(int AHandleId);

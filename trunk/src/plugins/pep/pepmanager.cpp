@@ -89,14 +89,14 @@ bool PEPManager::publishItem(const QString &ANode, const QDomElement &AItem)
 	return sent;
 }
 
-bool PEPManager::publishItem(const QString &ANode, const QDomElement &AItem, const Jid& streamJid)
+bool PEPManager::publishItem(const Jid &AStreamJid, const QString &ANode, const QDomElement &AItem)
 {
 	Stanza iq("iq");
 	iq.setType("set");
 	QDomElement publish = iq.addElement("pubsub", NS_PUBSUB).appendChild(QDomDocument().createElement("publish")).toElement();
 	publish.setAttribute("node", ANode);
 	publish.appendChild(AItem);
-	return pepCapableStreams.contains(streamJid) && FStanzaProcessor->sendStanzaOut(streamJid, iq);
+	return pepCapableStreams.contains(AStreamJid) && FStanzaProcessor->sendStanzaOut(AStreamJid, iq);
 }
 
 int PEPManager::insertNodeHandler(const QString &ANode, IPEPHandler *AHandle)
