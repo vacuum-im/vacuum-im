@@ -1,3 +1,7 @@
+# needed for translations.cmake to correctly generate CPack components
+set(PLUGIN_NAME ${TARGET_LOADER})
+set(PLUGIN_DISPLAY_NAME "loader")
+
 include("${CMAKE_SOURCE_DIR}/config.cmake")
 include("loader.cmake")
 
@@ -35,7 +39,8 @@ set_target_properties(${TARGET_LOADER} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CM
 target_link_libraries(${TARGET_LOADER} ${TARGET_UTILS} ${QT_LIBRARIES})
 
 install(TARGETS ${TARGET_LOADER}
-	RUNTIME	DESTINATION "${INSTALL_BINS}")
+	RUNTIME	DESTINATION "${INSTALL_BINS}"
+	COMPONENT ${TARGET_LOADER})
 if (UNIX AND NOT APPLE)
 	install(FILES "${CMAKE_SOURCE_DIR}/resources/menuicons/shared/vacuum.png"
 		DESTINATION "${INSTALL_RES_DIR}/pixmaps")
@@ -43,3 +48,7 @@ if (UNIX AND NOT APPLE)
 		DESTINATION "${INSTALL_RES_DIR}/applications")
 endif (UNIX AND NOT APPLE)
 
+cpack_add_component(${TARGET_LOADER}
+	DISPLAY_NAME "Loader"
+	REQUIRED
+	GROUP core)
