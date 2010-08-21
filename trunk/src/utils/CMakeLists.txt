@@ -1,3 +1,7 @@
+# needed for translations.cmake to correctly generate CPack components
+set(PLUGIN_NAME ${TARGET_UTILS})
+set(PLUGIN_DISPLAY_NAME "utils library")
+
 include("${CMAKE_SOURCE_DIR}/config.cmake")
 include("utils.cmake")
 
@@ -25,9 +29,28 @@ target_link_libraries(${TARGET_UTILS} ${QT_LIBRARIES} ${ADD_LIBS})
 if (WIN32)
 	set_target_properties(${TARGET_UTILS} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 	install(TARGETS ${TARGET_UTILS}
-		RUNTIME DESTINATION "${INSTALL_LIBS}")
+		RUNTIME DESTINATION "${INSTALL_LIBS}"
+		COMPONENT ${TARGET_UTILS})
 else (WIN32)
 	set_target_properties(${TARGET_UTILS} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs")
 	install(TARGETS ${TARGET_UTILS}
-		LIBRARY DESTINATION "${INSTALL_LIBS}")
+		LIBRARY DESTINATION "${INSTALL_LIBS}"
+		COMPONENT ${TARGET_UTILS})
 endif (WIN32)
+
+cpack_add_component(${TARGET_UTILS}
+	DISPLAY_NAME "Utils library"
+	REQUIRED
+	GROUP core)
+
+if (INSTALL_SDK)
+	file(GLOB ALL_HEADERS "*.h")
+	install(FILES ${ALL_HEADERS}
+		DESTINATION "${INSTALL_INCLUDES}/utils"
+		COMPONENT sdk)
+	if (WIN32)
+		install(TARGETS ${TARGET_UTILS}
+			ARCHIVE DESTINATION "${INSTALL_LIBS}"
+			COMPONENT sdk)
+	endif (WIN32)
+endif (INSTALL_SDK)

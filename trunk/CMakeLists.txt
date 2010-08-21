@@ -7,10 +7,81 @@ find_package(Qt4 REQUIRED)
 add_custom_target(updatets)
 
 include("config.cmake")
+
 install(DIRECTORY "resources/menuicons"
 	DESTINATION "${INSTALL_RESOURCES}"
 	PATTERN ".svn" EXCLUDE)
 install(FILES "AUTHORS" "CHANGELOG" "README" "COPYING"
 	DESTINATION "${INSTALL_DOCUMENTS}")
 
+include("package.cmake")
+
+set(INSTALL_SDK YES CACHE BOOL "Install files needed to build custom plugins")
+set(WEBKIT_WITHOUT_PHONON NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without Phonon support")
+set(WEBKIT_WITHOUT_XMLPATTERNS NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without QtXmlPatterns")
+
 add_subdirectory(src)
+
+# runtime deps on Windows
+if (WIN32)
+	cpack_add_component_group(libs
+		DISPLAY_NAME "Shared libraries"
+		DESCRIPTION "Required libraries that already may be present in your system")
+	set(QT_LIBS "${QT_LIBRARY_DIR}/../bin/QtCore4.dll"
+		"${QT_LIBRARY_DIR}/../bin/QtGui4.dll"
+		"${QT_LIBRARY_DIR}/../bin/QtNetwork4.dll"
+		"${QT_LIBRARY_DIR}/../bin/QtXml4.dll"
+		"${QT_LIBRARY_DIR}/../bin/QtWebkit4.dll")
+	if (NOT WEBKIT_WITHOUT_PHONON)
+		set(QT_LIBS ${QT_LIBS} "${QT_LIBRARY_DIR}/../bin/phonon4.dll")
+	endif (NOT WEBKIT_WITHOUT_PHONON)
+	if (NOT WEBKIT_WITHOUT_XMLPATTERNS)
+		set(QT_LIBS ${QT_LIBS} "${QT_LIBRARY_DIR}/../bin/QtXmlPatterns4.dll")
+	endif (NOT WEBKIT_WITHOUT_XMLPATTERNS)
+	install(FILES ${QT_LIBS}
+		DESTINATION "."
+		COMPONENT qt_libs)
+	install(DIRECTORY "imageformats"
+		DESTINATION "."
+		COMPONENT qt_libs)
+	cpack_add_component(qt_libs
+		DISPLAY_NAME "Qt4 libraries"
+		DESCRIPTION "May be unchecked if you already have working Qt4 installation"
+		GROUP libs)
+
+	install(FILES "libeay32.dll" "ssleay32.dll"
+		DESTINATION "."
+		COMPONENT openssl_libs)
+	cpack_add_component(openssl_libs
+		DISPLAY_NAME "OpenSSL libraries"
+		DESCRIPTION "May be unchecked if you already have OpenSSL installed"
+		GROUP libs)
+
+	if (MINGW)
+		install(FILES "mingwm10.dll" "libgcc_s_dw2-1.dll"
+			DESTINATION "."
+			COMPONENT mingw_runtime)
+		cpack_add_component(mingw_runtime
+			DISPLAY_NAME "MinGW runtime libraries"
+			DESCRIPTION "May be unchecked if you already have MinGW installed"
+			GROUP libs)
+	elseif (MSVC)
+		# TODO: check these patterns
+		file(GLOB MSVC_DLLS "msvc*.dll")
+		file(GLOB MANIFEST "Microsoft.VC*.CRT.manifest")
+		install(FILES ${MSVC_DLLS} ${MANIFEST}
+			DESTINATION "."
+			COMPONENT msvc_runtime)
+		cpack_add_component(msvc_runtime
+			DISPLAY_NAME "MSVC runtime libraries"
+			DESCRIPTION "May be unchecked if you already have MS Visual C++ or it's redistributable package installed"
+			GROUP libs)
+	endif (MINGW)
+endif (WIN32)
+
+if (INSTALL_SDK)
+	cpack_add_component(sdk
+		DISPLAY_NAME "SDK"
+		DESCRIPTION "Files needed to build custom plugins"
+		DISABLED)
+endif (INSTALL_SDK)

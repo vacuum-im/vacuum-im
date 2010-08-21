@@ -4,6 +4,17 @@ set(LOCALIZED_LANGS
 #	"uk_UA"
 )
 
+macro(lang_display_name outvar langname)
+	set(${outvar} "")
+	if (${langname} STREQUAL "ru_RU")
+		set(${outvar} "Russian")
+	elseif (${langname} STREQUAL "pl_PL")
+		set(${outvar} "Polish")
+	elseif (${langname} STREQUAL "uk_UA")
+		set(${outvar} "Ukrainian")
+	endif (${langname} STREQUAL "ru_RU")
+endmacro(lang_display_name)
+
 set(LUPDATE_OPTS -no-obsolete -locations none -source-language en)
 set(LRELEASE_OPTS -silent -compress)
 
@@ -30,7 +41,14 @@ macro(add_translations outvar tsname)
 				DEPENDS ${TS})
 		set(QMS ${QMS} "${QM}")
 		# Install *.qm
-		install(FILES "${QM}" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}")
+		install(FILES "${QM}" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}"
+			COMPONENT ${PLUGIN_NAME}_${LANG})
+		lang_display_name(LANG_NAME ${LANG})
+		cpack_add_component(${PLUGIN_NAME}_${LANG}
+			DISPLAY_NAME "${PLUGIN_DISPLAY_NAME}"
+			DESCRIPTION "${LANG_NAME} translation for ${PLUGIN_DISPLAY_NAME}"
+			GROUP ${LANG}_translation
+			DEPENDS ${PLUGIN_NAME})
 	endforeach(LANG)
 	set(${outvar} "${QMS}")
 endmacro(add_translations)
