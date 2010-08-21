@@ -41,13 +41,26 @@ if (WIN32)
 	install(FILES ${QT_LIBS}
 		DESTINATION "."
 		COMPONENT qt_libs)
-	install(DIRECTORY "imageformats"
+	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats"
 		DESTINATION "."
-		COMPONENT qt_libs)
+		COMPONENT qt_libs
+		FILES_MATCHING
+		PATTERN "*.dll")
 	cpack_add_component(qt_libs
 		DISPLAY_NAME "Qt4 libraries"
 		DESCRIPTION "May be unchecked if you already have working Qt4 installation"
 		GROUP libs)
+	# Qt localization
+	foreach(LANG ${LOCALIZED_LANGS})
+		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
+		install(FILES "${QT_TRANSLATIONS_DIR}/qt_${SHORTLANG}.qm"
+			DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}"
+			COMPONENT qt_${LANG})
+		cpack_add_component(qt_${LANG}
+			DISPLAY_NAME "Qt4 translation"
+			GROUP ${LANG}_translation
+			DEPENDS qt_libs)
+	endforeach(LANG)
 
 	install(FILES "libeay32.dll" "ssleay32.dll"
 		DESTINATION "."
