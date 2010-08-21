@@ -254,9 +254,7 @@ void FileStreamsManager::onShowFileStreamsWindow(bool)
 {
 	if (FFileStreamsWindow.isNull())
 		FFileStreamsWindow = new FileStreamsWindow(this, NULL);
-	FFileStreamsWindow->show();
-	WidgetManager::raiseWidget(FFileStreamsWindow);
-	FFileStreamsWindow->activateWindow();
+	WidgetManager::showActivateRaiseWindow(FFileStreamsWindow);
 }
 
 void FileStreamsManager::onProfileClosed(const QString &AName)

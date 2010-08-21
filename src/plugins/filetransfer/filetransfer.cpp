@@ -341,9 +341,7 @@ bool FileTransfer::fileStreamShowDialog(const QString &AStreamId)
 	if (stream && FFileManager->streamHandler(AStreamId)==this)
 	{
 		StreamDialog *dialog = createStreamDialog(stream);
-		dialog->show();
-		WidgetManager::raiseWidget(dialog);
-		dialog->activateWindow();
+		WidgetManager::showActivateRaiseWindow(dialog);
 		return true;
 	}
 	return false;

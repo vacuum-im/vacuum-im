@@ -76,10 +76,7 @@ QString MessageWindow::tabPageId() const
 void MessageWindow::showWindow()
 {
 	if (isWindow())
-	{
-		isVisible() ? (isMinimized() ? showNormal() : activateWindow()) : show();
-		WidgetManager::raiseWidget(this);
-	}
+		WidgetManager::showActivateRaiseWindow(this);
 	else
 		emit windowShow();
 }
