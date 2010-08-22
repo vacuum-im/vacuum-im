@@ -17,4 +17,6 @@ add_definitions(-DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT)
 
 add_library(qtlockedfile STATIC ${SOURCES})
 target_link_libraries(qtlockedfile ${QT_LIBRARIES})
-set_target_properties(qtlockedfile PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs")
+set_target_properties(qtlockedfile PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs"
+	COMPILE_FLAGS "${CMAKE_SHARED_LIBRARY_C_FLAGS}"
+	LINK_FLAGS "${CMAKE_SHARED_LIBRARY_C_FLAGS}")

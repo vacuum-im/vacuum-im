@@ -17,4 +17,5 @@ target_link_libraries(jdns ${QT_LIBRARIES} ${LIBS})
 target_link_libraries(jdns LINK_INTERFACE_LIBRARIES)
 set_target_properties(jdns PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs"
-	COMPILE_FLAGS "-w")
+	COMPILE_FLAGS "-w ${CMAKE_SHARED_LIBRARY_C_FLAGS}"
+	LINK_FLAGS "${CMAKE_SHARED_LIBRARY_C_FLAGS}")
