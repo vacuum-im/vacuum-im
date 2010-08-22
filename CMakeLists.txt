@@ -45,7 +45,8 @@ if (WIN32)
 		DESTINATION "."
 		COMPONENT qt_libs
 		FILES_MATCHING
-		PATTERN "*.dll")
+		PATTERN "*.dll"
+		PATTERN "*d4.dll" EXCLUDE)
 	cpack_add_component(qt_libs
 		DISPLAY_NAME "Qt4 libraries"
 		DESCRIPTION "May be unchecked if you already have working Qt4 installation"
