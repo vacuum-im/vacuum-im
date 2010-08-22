@@ -536,7 +536,7 @@ void Gateways::onChangeActionTriggered(bool)
 		{
 			QString id = FRegistration!=NULL ?  FRegistration->sendRegiterRequest(streamJid,serviceTo) : QString::null;
 			if (!id.isEmpty())
-				FRegisterRequests.insert(id,streamJid);
+				FShowRegisterRequests.insert(id,streamJid);
 		}
 	}
 }
@@ -660,7 +660,6 @@ void Gateways::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJ
 
 void Gateways::onPresenceClosed(IPresence *APresence)
 {
-	FResolveNicks.remove(APresence->streamJid());
 	FSubscribeServices.remove(APresence->streamJid());
 }
 
@@ -715,13 +714,18 @@ void Gateways::onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid,
 			while (!elem.isNull())
 			{
 				Jid service = elem.text();
-				if (roster->rosterItem(service).isValid)
+				IRosterItem ritem = roster->rosterItem(service);
+				if (ritem.isValid)
 				{
 					services += service;
+					if (ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_FROM)
+						sendLogPresence(AStreamJid,service,true);
 					setKeepConnection(AStreamJid,service,true);
 				}
 				else
+				{
 					changed = true;
+				}
 				elem = elem.nextSiblingElement("service");
 			}
 
@@ -743,7 +747,7 @@ void Gateways::onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid,
 			FSubscribeServices.insertMulti(AStreamJid,serviceJid);
 			QString id = FRegistration!=NULL ? FRegistration->sendRegiterRequest(AStreamJid,serviceJid) : QString::null;
 			if (!id.isEmpty())
-				FRegisterRequests.insert(id,AStreamJid);
+				FShowRegisterRequests.insert(id,AStreamJid);
 			elem = elem.nextSiblingElement("service");
 		}
 	}
@@ -843,9 +847,9 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
 
 void Gateways::onRegisterFields(const QString &AId, const IRegisterFields &AFields)
 {
-	if (FRegisterRequests.contains(AId))
+	if (FShowRegisterRequests.contains(AId))
 	{
-		Jid streamJid = FRegisterRequests.take(AId);
+		Jid streamJid = FShowRegisterRequests.take(AId);
 		if (!AFields.registered && FSubscribeServices.contains(streamJid,AFields.serviceJid))
 			FRegistration->showRegisterDialog(streamJid,AFields.serviceJid,IRegistration::Register);
 	}
@@ -854,7 +858,7 @@ void Gateways::onRegisterFields(const QString &AId, const IRegisterFields &AFiel
 void Gateways::onRegisterError(const QString &AId, const QString &AError)
 {
 	Q_UNUSED(AError);
-	FRegisterRequests.remove(AId);
+	FShowRegisterRequests.remove(AId);
 }
 
 Q_EXPORT_PLUGIN2(plg_gateways, Gateways)

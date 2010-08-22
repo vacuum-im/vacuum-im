@@ -109,15 +109,14 @@ private:
 	IRegistration *FRegistration;
 private:
 	QTimer FKeepTimer;
-private:
-	QString FKeepRequest;
-	QList<QString> FPromptRequests;
-	QList<QString> FUserJidRequests;
-	QMap<QString, Jid> FRegisterRequests;
-	QMultiMap<Jid, Jid> FResolveNicks;
-	QMultiMap<Jid, Jid> FSubscribeServices;
 	QMultiMap<Jid, Jid> FKeepConnections;
 	QMap<Jid, QSet<Jid> > FPrivateStorageKeep;
+private:
+	QList<QString> FPromptRequests;
+	QList<QString> FUserJidRequests;
+	QMultiMap<Jid, Jid> FResolveNicks;
+	QMultiMap<Jid, Jid> FSubscribeServices;
+	QMap<QString, Jid> FShowRegisterRequests;
 };
 
 #endif // GATEWAYS_H
