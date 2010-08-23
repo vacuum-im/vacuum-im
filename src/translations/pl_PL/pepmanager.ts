@@ -8,7 +8,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allows other plugins to recieve and publish PEP events</source>
+        <source>Allows other plugins to receive and publish PEP events</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

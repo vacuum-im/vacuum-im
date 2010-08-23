@@ -8,7 +8,7 @@
         <translation>Диспетчер PEP</translation>
     </message>
     <message>
-        <source>Allows other plugins to recieve and publish PEP events</source>
+        <source>Allows other plugins to receive and publish PEP events</source>
         <translation>Позволяет другим плагинам отправлять и получать информацию о личных событиях</translation>
     </message>
 </context>
