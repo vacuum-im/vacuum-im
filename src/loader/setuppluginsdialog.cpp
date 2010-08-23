@@ -21,9 +21,6 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 	FPluginManager = APluginManager;
 	FPluginsSetup = APluginsSetup;
 
-	ui.twtPlugins->setColumnCount(2);
-	ui.twtPlugins->verticalHeader()->hide();
-	ui.twtPlugins->setHorizontalHeaderLabels(QStringList() << tr("Name") << tr("Version"));
 	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_NAME,QHeaderView::Stretch);
 	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_VERSION,QHeaderView::ResizeToContents);
 
