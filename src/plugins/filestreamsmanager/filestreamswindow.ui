@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>FileStreamsWindowClass</class>
  <widget class="QMainWindow" name="FileStreamsWindowClass">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>415</width>
-    <height>290</height>
-   </rect>
-  </property>
   <property name="iconSize">
    <size>
     <width>16</width>
