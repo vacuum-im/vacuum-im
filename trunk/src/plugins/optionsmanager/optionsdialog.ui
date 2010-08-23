@@ -23,6 +23,9 @@
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
       </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideNone</enum>
+      </property>
       <property name="indentation">
        <number>12</number>
       </property>
@@ -73,8 +76,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>106</width>
-            <height>437</height>
+            <width>121</width>
+            <height>433</height>
            </rect>
           </property>
          </widget>
