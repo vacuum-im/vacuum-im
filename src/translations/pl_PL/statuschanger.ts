@@ -56,37 +56,39 @@
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
         <source>Status name displayed in status change menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa statusu wyświetlana w menu</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished">Wiadomość</translation>
+        <translation>Wiadomość</translation>
     </message>
     <message>
         <source>Status message</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiadomość statusowa</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished">Priorytet</translation>
+        <translation>Priorytet</translation>
     </message>
     <message>
         <source>Status priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Priorytet statusu</translation>
     </message>
     <message>
         <source>Status type&lt;br&gt;
 Types for standard statuses are grayed out.
 You can set status class for additional statuses defined by you.</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ statusu&lt;br&gt;
+Typy dla statusów standardowych nieaktywne.
+Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ</translation>
     </message>
 </context>
 <context>
