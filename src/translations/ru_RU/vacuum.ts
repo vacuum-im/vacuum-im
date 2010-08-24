@@ -11,7 +11,7 @@
 <context>
     <name>AboutBoxClass</name>
     <message>
-        <source>About the programm</source>
+        <source>About the program</source>
         <translation>О Программе</translation>
     </message>
 </context>
@@ -56,14 +56,6 @@
 </context>
 <context>
     <name>SetupPluginsDialog</name>
-    <message>
-        <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <source>Version</source>
-        <translation>Версия</translation>
-    </message>
     <message>
         <source>&lt;System&gt;</source>
         <translation>&lt;Системный&gt;</translation>
@@ -114,6 +106,14 @@
     <message>
         <source>Depend</source>
         <translation>Зависят</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Название</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation>Версия</translation>
     </message>
 </context>
 </TS>
