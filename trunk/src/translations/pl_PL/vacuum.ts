@@ -12,7 +12,7 @@
     <name>AboutBoxClass</name>
     <message>
         <source>About the program</source>
-        <translation type="unfinished">O programie</translation>
+        <translation>O programie</translation>
     </message>
 </context>
 <context>
@@ -109,11 +109,11 @@
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
         <source>Version</source>
-        <translation type="unfinished">Wersja</translation>
+        <translation>Wersja</translation>
     </message>
 </context>
 </TS>

@@ -60,7 +60,7 @@
     </message>
     <message>
         <source>Show tab indices</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokazuj numer zakładki</translation>
     </message>
 </context>
 <context>
@@ -247,7 +247,7 @@
     <message>
         <source>%1. %2</source>
         <comment>First is tab index, second is tab name</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1. %2</translation>
     </message>
 </context>
 <context>

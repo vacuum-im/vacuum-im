@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="pl_PL">
 <context>
     <name>PEPManager</name>
     <message>
         <source>PEP Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>PEP menedżer</translation>
     </message>
     <message>
         <source>Allows other plugins to receive and publish PEP events</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozwala innym wtyczkom na wysyłanie i otrzymywanie zdarzeń PEP</translation>
     </message>
 </context>
 </TS>
