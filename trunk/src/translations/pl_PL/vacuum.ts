@@ -11,8 +11,8 @@
 <context>
     <name>AboutBoxClass</name>
     <message>
-        <source>About the programm</source>
-        <translation>O programie</translation>
+        <source>About the program</source>
+        <translation type="unfinished">O programie</translation>
     </message>
 </context>
 <context>
@@ -56,14 +56,6 @@
 </context>
 <context>
     <name>SetupPluginsDialog</name>
-    <message>
-        <source>Name</source>
-        <translation>Nazwa</translation>
-    </message>
-    <message>
-        <source>Version</source>
-        <translation>Wersja</translation>
-    </message>
     <message>
         <source>&lt;System&gt;</source>
         <translation>&lt;System&gt;</translation>
@@ -114,6 +106,14 @@
     <message>
         <source>Country:</source>
         <translation>Kraj:</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Nazwa</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished">Wersja</translation>
     </message>
 </context>
 </TS>
