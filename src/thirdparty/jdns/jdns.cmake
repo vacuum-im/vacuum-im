@@ -1,5 +1,9 @@
 if (WIN32)
-	set(LIBS ${LIBS} -lWs2_32 -lAdvapi32)
+	if (MSVC)
+		set(LIBS ${LIBS} Ws2_32.lib Advapi32.lib)
+	elseif (MINGW)
+		set(LIBS ${LIBS} -lWs2_32 -lAdvapi32)
+	endif (MSVC)
 endif (WIN32)
 
 set(QT_USE_QTNETWORK YES)
