@@ -17,13 +17,22 @@ install(FILES "AUTHORS" "CHANGELOG" "README" "COPYING"
 include("package.cmake")
 
 set(INSTALL_SDK YES CACHE BOOL "Install files needed to build custom plugins")
-set(WEBKIT_WITHOUT_PHONON NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without Phonon support")
-set(WEBKIT_WITHOUT_XMLPATTERNS NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without QtXmlPatterns")
+set(LANGS "" CACHE STRING "List of languages to build localization for (this variable overrides any of LANG_*)")
+set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
+add_lang_options()
+
+if ("${LANGS}" STREQUAL "")
+	process_lang_options()
+else ("${LANGS}" STREQUAL "")
+	set_enabled_langs("${LANGS}")
+endif ("${LANGS}" STREQUAL "")
 
 add_subdirectory(src)
 
 # runtime deps on Windows
 if (WIN32)
+	set(WEBKIT_WITHOUT_PHONON NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without Phonon support")
+	set(WEBKIT_WITHOUT_XMLPATTERNS NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without QtXmlPatterns")
 	cpack_add_component_group(libs
 		DISPLAY_NAME "Shared libraries"
 		DESCRIPTION "Required libraries that already may be present in your system")
