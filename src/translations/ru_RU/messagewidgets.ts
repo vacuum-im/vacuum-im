@@ -117,7 +117,7 @@
     </message>
     <message>
         <source>Minimum input field lines:</source>
-        <translation>Минимальное число строк в поле воода:</translation>
+        <translation>Минимальное число строк в поле ввода:</translation>
     </message>
 </context>
 <context>
@@ -218,7 +218,7 @@
     </message>
     <message>
         <source>New Tab Window</source>
-        <translation>Новое окно со вкладкми</translation>
+        <translation>Новое окно со вкладками</translation>
     </message>
     <message>
         <source>Use as Default Tab Window</source>

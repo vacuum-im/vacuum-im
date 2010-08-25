@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>Configure status icons</source>
-        <translation>Настройка статус-иконкок</translation>
+        <translation>Настройка статус-иконок</translation>
     </message>
     <message>
         <source>Default</source>

@@ -45,7 +45,7 @@
     </message>
     <message>
         <source>Enable Chat State Notifications?</source>
-        <translation>Разрештить уведомления о статусе чата?</translation>
+        <translation>Разрешить уведомления о статусе чата?</translation>
     </message>
     <message>
         <source>Enable XHTML-IM formatting?</source>

@@ -97,11 +97,11 @@
     </message>
     <message>
         <source>This entity is not joined to any conferences</source>
-        <translation>Это подключение не содержит подключенных конференций</translation>
+        <translation>Это подключение не содержит подключённых конференций</translation>
     </message>
     <message>
         <source>Remote command to leave</source>
-        <translation>Удаленная команда на выход</translation>
+        <translation>Удалённая команда на выход</translation>
     </message>
     <message>
         <source>Requested status is not acceptable</source>
@@ -113,11 +113,11 @@
     </message>
     <message>
         <source>A list of joined conferences</source>
-        <translation>Список подключенных конференций</translation>
+        <translation>Список подключённых конференций</translation>
     </message>
     <message>
         <source>Allows to remotely control the client</source>
-        <translation>Позволяет удаленно управлять клиентом</translation>
+        <translation>Позволяет удалённо управлять клиентом</translation>
     </message>
     <message>
         <source>Change connection status</source>
@@ -137,7 +137,7 @@
     </message>
     <message>
         <source>There are no pending file transfers</source>
-        <translation>Нет неприянтых входящих передач файлов</translation>
+        <translation>Нет непринятых входящих передач файлов</translation>
     </message>
     <message>
         <source>Play sounds</source>

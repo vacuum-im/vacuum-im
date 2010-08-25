@@ -68,7 +68,7 @@
     </message>
     <message>
         <source>Gone %1</source>
-        <translation>Ушел %1</translation>
+        <translation>Ушёл %1</translation>
     </message>
 </context>
 </TS>

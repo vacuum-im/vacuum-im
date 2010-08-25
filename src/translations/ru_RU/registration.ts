@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Password was successfully changed at %1</source>
-        <translation>Пароль на %1 был успешно изменен</translation>
+        <translation>Пароль на %1 был успешно изменён</translation>
     </message>
     <message>
         <source>Requested operation failed: %1</source>

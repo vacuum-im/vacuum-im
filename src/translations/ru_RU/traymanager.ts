@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Tray Icon</source>
-        <translation>Инонка трея</translation>
+        <translation>Иконка трея</translation>
     </message>
     <message>
         <source>Allows other modules to access the icon and context menu in the tray</source>

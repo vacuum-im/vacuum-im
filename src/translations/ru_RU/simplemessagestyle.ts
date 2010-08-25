@@ -16,11 +16,11 @@
     <name>SimpleMessageStylePlugin</name>
     <message>
         <source>Simple Message Style</source>
-        <translation>Упрощенный стиль сообщений</translation>
+        <translation>Упрощённый стиль сообщений</translation>
     </message>
     <message>
         <source>Allows to use a simplified style in message design</source>
-        <translation>Позволяет использовать упрощенный стиль оформления сообщений</translation>
+        <translation>Позволяет использовать упрощённый стиль оформления сообщений</translation>
     </message>
     <message>
         <source>Simple Style</source>

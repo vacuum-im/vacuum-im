@@ -94,7 +94,7 @@
     </message>
     <message>
         <source>Forward</source>
-        <translation>Вперед</translation>
+        <translation>Вперёд</translation>
     </message>
     <message>
         <source>Discover</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
         <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
-        <translation>Поддерживает отобрадение джаббер идентификаторов с запрещенными символами</translation>
+        <translation>Поддерживает отображение джаббер идентификаторов с запрещёнными символами</translation>
     </message>
 </context>
 </TS>

@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Entered item JID is not valid or already exists.</source>
-        <translation>Введенный JID неправильный или уже существует.</translation>
+        <translation>Введённый JID неправильный или уже существует.</translation>
     </message>
     <message>
         <source>Wrong item JID</source>
@@ -218,7 +218,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Password-protected room</source>
-        <translation>Комната, защищенная паролем</translation>
+        <translation>Комната, защищённая паролем</translation>
     </message>
     <message>
         <source>A room that a user cannot enter without first providing the correct password</source>
@@ -266,7 +266,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Unsecured room</source>
-        <translation>Незащищенная комната</translation>
+        <translation>Незащищённая комната</translation>
     </message>
     <message>
         <source>A room that anyone is allowed to enter without first providing the correct password</source>
@@ -302,7 +302,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Register in conference</source>
-        <translation>Зарегистрироватся в конференции</translation>
+        <translation>Зарегистрироваться в конференции</translation>
     </message>
     <message>
         <source>Allow this person to register with the room?</source>
@@ -366,7 +366,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Password is Required to Enter?</source>
-        <translation>Сделать комнату защищенной паролем?</translation>
+        <translation>Сделать комнату защищённой паролем?</translation>
     </message>
     <message>
         <source>Make Room Persistent?</source>
@@ -462,7 +462,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Allow visitors to send status text in presence updates?</source>
-        <translation>Разрешить гостям вставлять текcт статуса в сообщения о присутствии?</translation>
+        <translation>Разрешить гостям вставлять текст статуса в сообщения о присутствии?</translation>
     </message>
     <message>
         <source>Allow visitors to change nickname?</source>
@@ -641,7 +641,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>The room is now fully-anonymous</source>
-        <translation>Комната поностью анонимная</translation>
+        <translation>Комната полностью анонимная</translation>
     </message>
     <message>
         <source>A new room has been created</source>
@@ -649,15 +649,15 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1 has been removed from the room because of an affiliation change</source>
-        <translation>%1 был удален из комнаты из-за изменения членства</translation>
+        <translation>%1 был удалён из комнаты из-за изменения членства</translation>
     </message>
     <message>
         <source>%1 has been removed from the room because the room has been changed to members-only</source>
-        <translation>%1 был удален из комнаты из-за установления статуса &quot;только для участников&quot;</translation>
+        <translation>%1 был удалён из комнаты из-за установления статуса &quot;только для участников&quot;</translation>
     </message>
     <message>
         <source>%1 is being removed from the room because of a system shutdown</source>
-        <translation>%1 был удален из комнаты из-за выключения системы</translation>
+        <translation>%1 был удалён из комнаты из-за выключения системы</translation>
     </message>
     <message>
         <source>User %1 is not present in the conference</source>
@@ -673,7 +673,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation>Отключен</translation>
+        <translation>Отключён</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
@@ -693,7 +693,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1 role changed from %2 to %3</source>
-        <translation>Тип пользователя %1 был изменен с %2 на %3</translation>
+        <translation>Тип пользователя %1 был изменён с %2 на %3</translation>
     </message>
     <message>
         <source>%1 affiliation changed from %2 to %3</source>

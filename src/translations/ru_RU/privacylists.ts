@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Privacy list &apos;%1&apos; could not be removed: %2</source>
-        <translation>Список приватности &apos;%1&apos; не может быть удален: %2</translation>
+        <translation>Список приватности &apos;%1&apos; не может быть удалён: %2</translation>
     </message>
     <message>
         <source>New Privacy List</source>
@@ -215,7 +215,7 @@
     </message>
     <message>
         <source>Disable privacy lists</source>
-        <translation>Оключить списки приватности</translation>
+        <translation>Отключить списки приватности</translation>
     </message>
     <message>
         <source>Block off roster contacts</source>

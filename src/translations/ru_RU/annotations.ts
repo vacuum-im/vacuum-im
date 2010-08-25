@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Allows to add comments to the contacts in the roster</source>
-        <translation>Позволяет добавлять коментарии к контактам в ростере</translation>
+        <translation>Позволяет добавлять комментарии к контактам в ростере</translation>
     </message>
 </context>
 <context>
@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>Modified:</source>
-        <translation>Изменен:</translation>
+        <translation>Изменён:</translation>
     </message>
 </context>
 </TS>

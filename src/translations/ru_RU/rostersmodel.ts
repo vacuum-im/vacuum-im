@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Creates a hierarchical model for display roster</source>
-        <translation>Создает иерархическую модель для отображения ростера</translation>
+        <translation>Создаёт иерархическую модель для отображения ростера</translation>
     </message>
 </context>
 </TS>

@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Add contact - %1</source>
-        <translation>Добавить конакт - %1</translation>
+        <translation>Добавить контакт - %1</translation>
     </message>
     <message>
         <source>Chat</source>

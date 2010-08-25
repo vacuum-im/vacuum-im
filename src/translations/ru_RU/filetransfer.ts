@@ -69,7 +69,7 @@
     </message>
     <message>
         <source>Automatically remove finished transfers</source>
-        <translation>Автоматически удалять завершенные передачи</translation>
+        <translation>Автоматически удалять завершённые передачи</translation>
     </message>
 </context>
 <context>
@@ -128,15 +128,15 @@
     </message>
     <message>
         <source>Unable to send request for file transfer, check settings and try again!</source>
-        <translation>Не удалось отправить запрос на передачу файла, проверте настройки и попробуйте еще раз!</translation>
+        <translation>Не удалось отправить запрос на передачу файла, проверьте настройки и попробуйте ещё раз!</translation>
     </message>
     <message>
         <source>Unable to start the file transfer, check settings and try again!</source>
-        <translation>Не удалось запустить передачу файла, проверте настройки и попробуйте еще раз!</translation>
+        <translation>Не удалось запустить передачу файла, проверьте настройки и попробуйте ещё раз!</translation>
     </message>
     <message>
         <source>Are you sure you want to cancel a file transfer?</source>
-        <translation>Вы уверешы, что хотите отменить передачу файла?</translation>
+        <translation>Вы уверены, что хотите отменить передачу файла?</translation>
     </message>
     <message>
         <source>Cancel file transfer</source>
@@ -188,11 +188,11 @@
     </message>
     <message>
         <source>If you want to change file name press &apos;Cancel&apos;</source>
-        <translation>Если хотите изменить имя файла, нажмине &apos;Отмена&apos;</translation>
+        <translation>Если хотите изменить имя файла, нажмите &apos;Отмена&apos;</translation>
     </message>
     <message>
         <source>If you want to download the rest of file press &apos;Yes&apos;</source>
-        <translation>Если хотите загрузить остаток файла, нажмине &apos;Да&apos;</translation>
+        <translation>Если хотите загрузить остаток файла, нажмите &apos;Да&apos;</translation>
     </message>
     <message>
         <source>If you want to start download from the beginning press &apos;Retry&apos;</source>

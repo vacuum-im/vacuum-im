@@ -20,7 +20,7 @@
     </message>
     <message>
         <source>Allows to establish a secure connection to the server after connecting</source>
-        <translation>Позволяет устанавливать защищенное соединение с сервером после подключения</translation>
+        <translation>Позволяет устанавливать защищённое соединение с сервером после подключения</translation>
     </message>
 </context>
 </TS>

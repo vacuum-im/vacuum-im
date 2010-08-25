@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Allows to view XML stream between the client and server</source>
-        <translation>Позволяет просматривать XML поток чежду клиентом и сервером</translation>
+        <translation>Позволяет просматривать XML поток между клиентом и сервером</translation>
     </message>
     <message>
         <source>Default Context</source>
@@ -32,7 +32,7 @@
     </message>
     <message>
         <source>Start sending user stanza...</source>
-        <translation>Ночало отправки станзы пользователя...</translation>
+        <translation>Начало отправки станзы пользователя...</translation>
     </message>
     <message>
         <source>User stanza sended.</source>
@@ -87,7 +87,7 @@
     </message>
     <message>
         <source>Available context:</source>
-        <translation>Сохраненный контекст:</translation>
+        <translation>Сохранённый контекст:</translation>
     </message>
     <message>
         <source>Console</source>
