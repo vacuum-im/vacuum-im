@@ -13,7 +13,7 @@ elseif (WIN32)
 	set(SOURCES ${SOURCES} "qtlockedfile_win.cpp")
 endif (UNIX)
 
-add_definitions(-DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT)
+add_definitions(-DUNICODE)
 
 add_library(qtlockedfile STATIC ${SOURCES})
 target_link_libraries(qtlockedfile ${QT_LIBRARIES})
