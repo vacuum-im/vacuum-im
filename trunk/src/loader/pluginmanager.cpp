@@ -9,6 +9,7 @@
 #include <QLibrary>
 #include <QFileInfo>
 #include <QSettings>
+#include <QLibraryInfo>
 
 #define ORGANIZATION_NAME           "JRuDevels"
 #define APPLICATION_NAME            "VacuumIM"
@@ -505,7 +506,8 @@ void PluginManager::loadCoreTranslations(const QString &ADir)
 	if (FUtilsTranslator->load("vacuumutils",ADir))
 		qApp->installTranslator(FUtilsTranslator);
 
-	if (FQtTranslator->load("qt_"+QLocale().name(),ADir))
+	if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath))
+		|| FQtTranslator->load("qt_"+QLocale().name(),ADir))
 		qApp->installTranslator(FQtTranslator);
 }
 
