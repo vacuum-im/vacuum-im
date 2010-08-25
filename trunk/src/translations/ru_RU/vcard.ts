@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Birthday</source>
-        <translation>Днь рождения</translation>
+        <translation>День рождения</translation>
     </message>
     <message>
         <source>dd.MMMM.yyyy</source>

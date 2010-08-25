@@ -45,7 +45,7 @@
     </message>
     <message>
         <source>Remote Server Not Found</source>
-        <translation>Удаленный сервер не найден</translation>
+        <translation>Удалённый сервер не найден</translation>
     </message>
     <message>
         <source>Not Allowed</source>
@@ -89,7 +89,7 @@
     </message>
     <message>
         <source>Remoute Server Error</source>
-        <translation>Ошибка удаленного сервера</translation>
+        <translation>Ошибка удалённого сервера</translation>
     </message>
     <message>
         <source>Service Unavailable</source>
@@ -97,11 +97,11 @@
     </message>
     <message>
         <source>Remote Server timeout</source>
-        <translation>Истекло время ожидания удаленного сервера</translation>
+        <translation>Истекло время ожидания удалённого сервера</translation>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation>Отключен</translation>
+        <translation>Отключён</translation>
     </message>
 </context>
 </TS>

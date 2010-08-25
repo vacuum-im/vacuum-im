@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Example: home; office; notebook</source>
-        <translation>Пример: дом, оффис, ноутбук</translation>
+        <translation>Пример: дом, офис, ноутбук</translation>
     </message>
 </context>
 <context>

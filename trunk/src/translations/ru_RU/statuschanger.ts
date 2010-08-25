@@ -158,7 +158,7 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>I`am away from my desk</source>
-        <translation>Отошел</translation>
+        <translation>Отошёл</translation>
     </message>
     <message>
         <source>Not available</source>
@@ -166,7 +166,7 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation>Отключен</translation>
+        <translation>Отключён</translation>
     </message>
     <message>
         <source>%1 - %2</source>

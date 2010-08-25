@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Data transmission terminated by remote user</source>
-        <translation>Передача данных прервана удаленным пользователем</translation>
+        <translation>Передача данных прервана удалённым пользователем</translation>
     </message>
 </context>
 <context>
@@ -78,7 +78,7 @@
     </message>
     <message>
         <source>Acceptable Data Streams</source>
-        <translation>Разрешенные потоки данных</translation>
+        <translation>Разрешённые потоки данных</translation>
     </message>
 </context>
 <context>

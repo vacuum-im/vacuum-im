@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Reenter password:</source>
-        <translation>Посторите пароль:</translation>
+        <translation>Повторите пароль:</translation>
     </message>
     <message>
         <source>Error</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
         <source>Enter new profile password:</source>
-        <translation>Введине новый пароль профиля:</translation>
+        <translation>Введите новый пароль профиля:</translation>
     </message>
     <message>
         <source>Failed to change profile password</source>
@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>Entered password is not valid</source>
-        <translation>Введен неправильный пароль</translation>
+        <translation>Введён неправильный пароль</translation>
     </message>
     <message>
         <source>Rename Profile</source>
@@ -123,7 +123,7 @@
     </message>
     <message>
         <source>Entered profile password is not correct</source>
-        <translation>Введен неверный пароль профиля</translation>
+        <translation>Введён неверный пароль профиля</translation>
     </message>
 </context>
 <context>
@@ -164,7 +164,7 @@
     </message>
     <message>
         <source>Allows to save, load and manage user preferences</source>
-        <translation>Позволяет сохранять, загружать и управлячть настройками пользователя</translation>
+        <translation>Позволяет сохранять, загружать и управлять настройками пользователя</translation>
     </message>
     <message>
         <source>Change Profile</source>

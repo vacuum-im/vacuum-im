@@ -84,7 +84,7 @@
     </message>
     <message>
         <source>Remote Connection Failed</source>
-        <translation>Сбой удаленного соединения</translation>
+        <translation>Сбой удалённого соединения</translation>
     </message>
     <message>
         <source>Resource Constraint</source>
@@ -92,7 +92,7 @@
     </message>
     <message>
         <source>Restricted XML</source>
-        <translation>Запрещенный XML</translation>
+        <translation>запрещённый XML</translation>
     </message>
     <message>
         <source>See Other Host</source>

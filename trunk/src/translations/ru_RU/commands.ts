@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Next&gt;</source>
-        <translation>Вперед&gt;</translation>
+        <translation>Вперёд&gt;</translation>
     </message>
     <message>
         <source>Complete</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Executing command &apos;%1&apos; at %2</source>
-        <translation>Выполение команды &apos;%1&apos; на %2</translation>
+        <translation>Выполнение команды &apos;%1&apos; на %2</translation>
     </message>
     <message>
         <source>Waiting for host response ...</source>
@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>Error: Can`t send request to host.</source>
-        <translation>Ошибка: невохможно отправить запрос на хост.</translation>
+        <translation>Ошибка: невозможно отправить запрос на хост.</translation>
     </message>
 </context>
 <context>
@@ -52,7 +52,7 @@
     </message>
     <message>
         <source>Can not accept the specified action</source>
-        <translation>Неприемлимая команда</translation>
+        <translation>Неприемлемая команда</translation>
     </message>
     <message>
         <source>Can not accept the specified language/locale</source>

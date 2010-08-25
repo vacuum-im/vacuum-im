@@ -44,7 +44,7 @@
     </message>
     <message>
         <source>Show/Hide offline contacts</source>
-        <translation>Скрыть/показать отключенные контакты</translation>
+        <translation>Скрыть/показать отключённые контакты</translation>
     </message>
     <message>
         <source>Roster View</source>
@@ -56,7 +56,7 @@
     </message>
     <message>
         <source>Show offline contact</source>
-        <translation>Показывать отключенные контакты</translation>
+        <translation>Показывать отключённые контакты</translation>
     </message>
     <message>
         <source>Show contact resource in roster</source>

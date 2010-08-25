@@ -16,7 +16,7 @@
     <name>AdiumMessageStylePlugin</name>
     <message>
         <source>Adium Message Style</source>
-        <translation>Adium cтиль сообщений</translation>
+        <translation>Adium стиль сообщений</translation>
     </message>
     <message>
         <source>Allows to use a Adium style in message design</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>Adium Style</source>
-        <translation>Адиум стиль</translation>
+        <translation>Adium стиль</translation>
     </message>
 </context>
 <context>
@@ -55,7 +55,7 @@
     </message>
     <message>
         <source>Select font family and size</source>
-        <translation>Сыберите тип шрифта и его размер</translation>
+        <translation>Выберите тип шрифта и его размер</translation>
     </message>
     <message>
         <source>Select background image</source>

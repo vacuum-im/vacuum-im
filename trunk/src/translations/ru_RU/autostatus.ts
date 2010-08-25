@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Status changed automatically to &apos;away&apos;</source>
-        <translation>Статус автоматически изменен на &apos;ушел&apos;</translation>
+        <translation>Статус автоматически изменён на &apos;ушёл&apos;</translation>
     </message>
     <message>
         <source>Auto Status</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>Auto status: away</source>
-        <translation>Автостатус: ушел</translation>
+        <translation>Автостатус: ушёл</translation>
     </message>
     <message>
         <source>You can insert date and time into auto status text:</source>
@@ -72,7 +72,7 @@
     </message>
     <message>
         <source>   ddd - the abbreviated localized day name (e.g. &apos;Mon&apos; to &apos;Sun&apos;)</source>
-        <translation>   ddd - абривиатурное локализованное наименование дня недели (&apos;Пн&apos; - &apos;Вск&apos;)</translation>
+        <translation>   ddd - аббревиатурное локализованное наименование дня недели (&apos;Пн&apos; - &apos;Вск&apos;)</translation>
     </message>
     <message>
         <source>   dddd - the long localized day name (e.g. &apos;Monday&apos; to &apos;Sunday&apos;)</source>
@@ -88,7 +88,7 @@
     </message>
     <message>
         <source>   MMM - the abbreviated localized month name (e.g. &apos;Jan&apos; to &apos;Dec&apos;)</source>
-        <translation>   MMM - абривиатурное локалированное наименование месяца (&apos;Янв&apos; - &apos;Дек&apos;)</translation>
+        <translation>   MMM - аббревиатурное локализованное наименование месяца (&apos;Янв&apos; - &apos;Дек&apos;)</translation>
     </message>
     <message>
         <source>   MMMM - the long localized month name (e.g. &apos;January&apos; to &apos;December&apos;)</source>
@@ -100,7 +100,7 @@
     </message>
     <message>
         <source>   yyyy - the year as four digit number</source>
-        <translation>   yyyy - год в виде цетырёхзначного числа</translation>
+        <translation>   yyyy - год в виде четырёхзначного числа</translation>
     </message>
     <message>
         <source>Time Format:</source>
@@ -140,11 +140,11 @@
     </message>
     <message>
         <source>   z - the milliseconds without leading zeroes (0 to 999)</source>
-        <translation>   z - милисекунды без ведущего нуля (0 - 999)</translation>
+        <translation>   z - миллисекунды без ведущего нуля (0 - 999)</translation>
     </message>
     <message>
         <source>   zzz - the milliseconds with leading zeroes (000 to 999)</source>
-        <translation>   zzz - милисекунды с ведущим нулём (000 - 999)</translation>
+        <translation>   zzz - миллисекунды с ведущим нулём (000 - 999)</translation>
     </message>
     <message>
         <source>   AP or A - interpret as an AM/PM time. AP must be either &apos;AM&apos; or &apos;PM&apos;</source>
@@ -164,7 +164,7 @@
     </message>
     <message>
         <source>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
-        <translation>   Сатус изменен на ушел&apos; в %(hh:mm:ss), из-за бездействия с $(hh:mm:ss) в течение #(mm) минут и #(ss) секунд</translation>
+        <translation>   Статус изменён на ушёл&apos; в %(hh:mm:ss) из-за бездействия с $(hh:mm:ss) в течение #(mm) минут и #(ss) секунд</translation>
     </message>
 </context>
 <context>

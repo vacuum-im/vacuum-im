@@ -32,7 +32,7 @@
     </message>
     <message>
         <source>Out of memory for Zlib</source>
-        <translation>Нехватает памяти для Zlib</translation>
+        <translation>Не хватает памяти для Zlib</translation>
     </message>
     <message>
         <source>Zlib version mismatch!</source>

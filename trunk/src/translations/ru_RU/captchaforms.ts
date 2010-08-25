@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Answer the question you see</source>
-        <translation>Ответте на вопрос, который вы видите</translation>
+        <translation>Ответьте на вопрос, который вы видите</translation>
     </message>
     <message>
         <source>Identify the picture</source>
@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>Answer the question you hear</source>
-        <translation>Ответте на вопрос, который вы слышите</translation>
+        <translation>Ответьте на вопрос, который вы слышите</translation>
     </message>
     <message>
         <source>Enter the words you hear</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
         <source>Answer the question in the video</source>
-        <translation>Ответте на вопрос заданный в видео ролике</translation>
+        <translation>Ответьте на вопрос заданный в видео ролике</translation>
     </message>
     <message>
         <source>Identify the video</source>

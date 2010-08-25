@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>None of the available streams are acceptable</source>
-        <translation>Ни одно из предложенных подключений не приемлимо</translation>
+        <translation>Ни одно из предложенных подключений неприемлем</translation>
     </message>
     <message>
         <source>The profile is not understood or invalid</source>
@@ -64,11 +64,11 @@
     </message>
     <message>
         <source>Delete Profile</source>
-        <translation>Удалить провиль</translation>
+        <translation>Удалить профиль</translation>
     </message>
     <message>
         <source>Do you really want to delete a current data streams profile?</source>
-        <translation>Вы дейстительно ходите удалить текущий профиль потоков данных?</translation>
+        <translation>Вы действительно ходите удалить текущий профиль потоков данных?</translation>
     </message>
 </context>
 <context>
