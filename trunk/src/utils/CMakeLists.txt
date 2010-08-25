@@ -16,6 +16,9 @@ include_directories(AFTER "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
 
 add_translations(TRANSLATIONS "${TARGET_UTILS}" ${SOURCES})
 add_library(${TARGET_UTILS} SHARED ${SOURCES} ${MOC_SOURCES} ${TRANSLATIONS})
+set_target_properties(${TARGET_UTILS} PROPERTIES
+	VERSION "${VERSION_UTILS}"
+	SOVERSION "${VERSION_UTILS_ABI}")
 
 if (UNIX AND NOT APPLE)
 	set(ADD_LIBS idn minizip "-lz")

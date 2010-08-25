@@ -3,6 +3,7 @@ set(TARGET_UTILS vacuumutils)
 
 if (UNIX)
 	set(VERSION_UTILS 1.2.0)
+	set(VERSION_UTILS_ABI 1.2)
 endif (UNIX)
 
 if (APPLE)
