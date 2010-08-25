@@ -16,7 +16,6 @@ if (IS_ENABLED)
 	set(QT_USE_QTXML YES)
 	include(${QT_USE_FILE})
 
-	link_directories("${CMAKE_BINARY_DIR}/src/libs")
 	include_directories("${CMAKE_SOURCE_DIR}/src"
 		"${CMAKE_BINARY_DIR}/src/plugins/${PLUGIN_NAME}"
 		".")
