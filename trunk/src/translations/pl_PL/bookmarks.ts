@@ -19,6 +19,10 @@
         <source>Append to bookmarks</source>
         <translation>Dodaj do zakładek</translation>
     </message>
+    <message>
+        <source>Ignore autojoin flag in bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>
