@@ -17,6 +17,7 @@
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/iservicediscovery.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 #include <utils/menu.h>
 #include "editbookmarkdialog.h"
@@ -25,10 +26,11 @@
 class BookMarks :
 			public QObject,
 			public IPlugin,
-			public IBookMarks
+			public IBookMarks,
+			public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IBookMarks);
+	Q_INTERFACES(IPlugin IBookMarks IOptionsHolder);
 public:
 	BookMarks();
 	~BookMarks();
@@ -38,7 +40,7 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IBookMarks
 	virtual QList<IBookMark> bookmarks(const Jid &AStreamJid) const { return FBookMarks.value(AStreamJid); }
@@ -46,6 +48,8 @@ public:
 	virtual QString setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &ABookmarks);
 	virtual int execEditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) const;
 	virtual void showEditBookmarksDialog(const Jid &AStreamJid);
+	//IOptionsHolder
+	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
 signals:
 	void bookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void bookmarksError(const QString &AId, const QString &AError);
@@ -75,6 +79,7 @@ private:
 	IMultiUserChatPlugin *FMultiChatPlugin;
 	IXmppUriQueries *FXmppUriQueries;
 	IServiceDiscovery *FDiscovery;
+	IOptionsManager *FOptionsManager;
 private:
 	Menu *FBookMarksMenu;
 	QMap<Jid, Menu *> FStreamMenu;

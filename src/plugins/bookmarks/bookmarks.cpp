@@ -1,6 +1,9 @@
 #include "bookmarks.h"
 
 #include <QDesktopServices>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
 
 #define PST_BOOKMARKS           "storage"
 
@@ -22,6 +25,7 @@ BookMarks::BookMarks()
 	FMultiChatPlugin = NULL;
 	FXmppUriQueries = NULL;
 	FDiscovery = NULL;
+	FOptionsManager = NULL;
 
 	FBookMarksMenu = NULL;
 }
@@ -108,6 +112,12 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 		}
 	}
 
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0, NULL);
+	if (plugin)
+	{
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
+
 	return FStorage!=NULL;
 }
 
@@ -129,6 +139,14 @@ bool BookMarks::initObjects()
 		QToolButton *button = changer->insertAction(FBookMarksMenu->menuAction(),TBG_MWTTB_BOOKMARKS);
 		button->setPopupMode(QToolButton::InstantPopup);
 	}
+	if (FOptionsManager)
+		FOptionsManager->insertOptionsHolder(this);
+	return true;
+}
+
+bool BookMarks::initSettings()
+{
+	Options::setDefaultValue(OPV_ACCOUNT_IGNORE_AUTOJOIN, false);
 	return true;
 }
 
@@ -225,6 +243,21 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
 	}
 }
 
+IOptionsWidget *BookMarks::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+{
+	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+	{
+		AOrder = OWO_ACCOUNT_STATUS;
+		OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+
+		IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
+		container->appendChild(aoptions.node("ignore-autojoin"),tr("Ignore autojoin flag in bookmarks"));
+		return container;
+	}
+	return NULL;
+}
+
 void BookMarks::onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline)
 {
 	if (!AStateOnline)
@@ -242,6 +275,11 @@ void BookMarks::onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline)
 
 void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
+	IAccount *account = FAccountManager != NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+	bool ignoreAutoJoin = false;
+	if (account && account->optionsNode().value("ignore-autojoin").toBool())
+		ignoreAutoJoin = true;
+
 	if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
 	{
 		QList<IBookMark> &streamBookmarks = FBookMarks[AStreamJid];
@@ -291,7 +329,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
 				bookmark.nick = elem.firstChildElement("nick").text();
 				bookmark.password = elem.firstChildElement("password").text();
 				streamBookmarks.append(bookmark);
-				if (bookmark.autojoin)
+				if (bookmark.autojoin && !ignoreAutoJoin)
 					startBookmark(AStreamJid,bookmark,false);
 			}
 			else if (elem.tagName() == "url")

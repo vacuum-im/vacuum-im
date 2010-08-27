@@ -26,6 +26,8 @@
 #define OPV_ACCOUNT_STATUS_LASTONLINE                   "accounts.account.status.last-online"
 // MessageArchiver
 #define OPV_ACCOUNT_ARCHIVEREPLICATION                  "accounts.account.archive-replication"
+// BookMarks
+#define OPV_ACCOUNT_IGNORE_AUTOJOIN                     "accounts.account.ignore-autojoin"
 
 // Console
 #define OPV_CONSOLE_ROOT                                "console"

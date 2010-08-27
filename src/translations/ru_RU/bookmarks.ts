@@ -19,6 +19,10 @@
         <source>Append to bookmarks</source>
         <translation>Добавить в закладки</translation>
     </message>
+    <message>
+        <source>Ignore autojoin flag in bookmarks</source>
+        <translation>Игнорировать флаг автоподключения в закладках</translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>
