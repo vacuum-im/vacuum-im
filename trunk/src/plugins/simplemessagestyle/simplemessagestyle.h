@@ -27,6 +27,7 @@
 #define MSMC_INCOMING                       "incoming"
 #define MSMC_GROUPCHAT                      "groupchat"
 #define MSMC_MENTION                        "mention"
+#define MSMC_ACTION                         "action"
 
 //Message Style Options
 #define MSO_STYLE_ID                        "styleId"
@@ -35,6 +36,8 @@
 #define MSO_FONT_SIZE                       "fontSize"
 #define MSO_BG_COLOR                        "bgColor"
 #define MSO_BG_IMAGE_FILE                   "bgImageFile"
+
+struct MessageContentOptions;
 
 class SimpleMessageStyle :
 			public QObject,
@@ -79,9 +82,9 @@ protected:
 	void setVariant(QWidget *AWidget, const QString  &AVariant);
 	QString makeStyleTemplate() const;
 	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
-	QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;
-	void fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const;
-	QString processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const;
+	QString makeContentTemplate(const MessageContentOptions &AOptions, bool ASameSender) const;
+	void fillContentKeywords(QString &AHtml, const MessageContentOptions &AOptions, bool ASameSender) const;
+	QString processCommands(const QString &AHtml, MessageContentOptions &AOptions) const;
 	QString loadFileData(const QString &AFileName, const QString &DefValue) const;
 	void loadTemplates();
 	void loadSenderColors();
@@ -101,12 +104,12 @@ private:
 	QString FStatusHTML;
 	QString FIn_ContentHTML;
 	QString FIn_NextContentHTML;
-	QString FIn_ContextHTML;
-	QString FIn_NextContextHTML;
+	QString FIn_ActionHTML;
+	QString FIn_NextActionHTML;
 	QString FOut_ContentHTML;
 	QString FOut_NextContentHTML;
-	QString FOut_ContextHTML;
-	QString FOut_NextContextHTML;
+	QString FOut_ActionHTML;
+	QString FOut_NextActionHTML;
 private:
 	QString FStylePath;
 	QList<QString> FVariants;
