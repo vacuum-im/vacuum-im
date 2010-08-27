@@ -13,6 +13,13 @@
 
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
 
+struct MessageContentOptions : public IMessageContentOptions
+{
+	bool isAction;
+	MessageContentOptions() : isAction(false) {}
+	MessageContentOptions(const IMessageContentOptions& a) : IMessageContentOptions(a), isAction(false) {}
+};
+
 static const char *SenderColors[] =  {
 	"blue", "blueviolet", "brown", "cadetblue", "chocolate", "coral", "cornflowerblue", "crimson",
 	"darkblue", "darkcyan", "darkgoldenrod", "darkgreen", "darkmagenta", "darkolivegreen", "darkorange",
@@ -125,15 +132,18 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 	StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
 	if (view)
 	{
-		bool sameSender = isSameSender(AWidget,AOptions);
-		QString html = makeContentTemplate(AOptions,sameSender);
-		fillContentKeywords(html,AOptions,sameSender);
+		MessageContentOptions options = AOptions;
+		bool sameSender = isSameSender(AWidget,options);
+		QString processedHtml = processCommands(AHtml,options);
+		QString html = makeContentTemplate(options,sameSender);
+		fillContentKeywords(html,options,sameSender);
 
-		html.replace("%message%",processCommands(AHtml,AOptions));
+		html.replace("%message%",processedHtml);
 
 		bool scrollAtEnd = view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum();
 
-		QTextCursor cursor = view->document()->rootFrame()->lastCursorPosition();
+		QTextCursor cursor(view->document());
+		cursor.movePosition(QTextCursor::End);
 		cursor.insertHtml(html);
 
 		if (!AOptions.noScroll && scrollAtEnd)
@@ -262,7 +272,7 @@ void SimpleMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOp
 	AHtml.replace("%bodyBackground%", background);
 }
 
-QString SimpleMessageStyle::makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const
+QString SimpleMessageStyle::makeContentTemplate(const MessageContentOptions &AOptions, bool ASameSender) const
 {
 	QString html;
 	if (AOptions.kind == IMessageContentOptions::Topic && !FTopicHTML.isEmpty())
@@ -273,16 +283,20 @@ QString SimpleMessageStyle::makeContentTemplate(const IMessageContentOptions &AO
 	{
 		html = FStatusHTML;
 	}
+	else if (AOptions.isAction)
+	{
+		if (AOptions.direction == IMessageContentOptions::DirectionIn)
+		{
+			html = ASameSender ? FIn_NextActionHTML : FIn_ActionHTML;
+		}
+		else
+		{
+			html = ASameSender ? FOut_NextActionHTML : FOut_ActionHTML;
+		}
+	}
 	else
 	{
-		if (AOptions.type & IMessageContentOptions::History)
-		{
-			if (AOptions.direction == IMessageContentOptions::DirectionIn)
-				html = ASameSender ? FIn_NextContextHTML : FIn_ContextHTML;
-			else
-				html = ASameSender ? FOut_NextContextHTML : FOut_ContextHTML;
-		}
-		else if (AOptions.direction == IMessageContentOptions::DirectionIn)
+		if (AOptions.direction == IMessageContentOptions::DirectionIn)
 		{
 			html = ASameSender ? FIn_NextContentHTML : FIn_ContentHTML;
 		}
@@ -294,7 +308,7 @@ QString SimpleMessageStyle::makeContentTemplate(const IMessageContentOptions &AO
 	return html;
 }
 
-void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const
+void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const MessageContentOptions &AOptions, bool ASameSender) const
 {
 	bool isDirectionIn = AOptions.direction == IMessageContentOptions::DirectionIn;
 
@@ -317,6 +331,8 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConte
 		messageClasses << MSMC_MENTION;
 	if (AOptions.type & IMessageContentOptions::Notification)
 		messageClasses << MSMC_NOTIFICATION;
+	if (AOptions.isAction)
+		messageClasses << MSMC_ACTION;
 
 	if (isDirectionIn)
 		messageClasses << MSMC_INCOMING;
@@ -351,7 +367,7 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConte
 	AHtml.replace("%textbackgroundcolor%",!AOptions.textBGColor.isEmpty() ? AOptions.textBGColor : "inherit");
 }
 
-QString SimpleMessageStyle::processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const
+QString SimpleMessageStyle::processCommands(const QString &AHtml, MessageContentOptions &AOptions) const
 {
 	bool changed = false;
 	QTextDocument message;
@@ -364,7 +380,8 @@ QString SimpleMessageStyle::processCommands(const QString &AHtml, const IMessage
 		for (QTextCursor cursor = message.find(me); !cursor.isNull();  cursor = message.find(me,cursor))
 		{
 			changed = true;
-			cursor.insertHtml("*&nbsp;<i>"+AOptions.senderName+"&nbsp;</i>");
+			AOptions.isAction = true;
+			cursor.removeSelectedText();
 		}
 	}
 
@@ -394,13 +411,13 @@ void SimpleMessageStyle::loadTemplates()
 {
 	FIn_ContentHTML =      loadFileData(FStylePath+"/Incoming/Content.html",QString::null);
 	FIn_NextContentHTML =  loadFileData(FStylePath+"/Incoming/NextContent.html",FIn_ContentHTML);
-	FIn_ContextHTML =      loadFileData(FStylePath+"/Incoming/Context.html",FIn_ContentHTML);
-	FIn_NextContextHTML =  loadFileData(FStylePath+"/Incoming/NextContext.html",FIn_NextContentHTML);
+	FIn_ActionHTML =       loadFileData(FStylePath+"/Incoming/Action.html",FIn_ContentHTML);
+	FIn_NextActionHTML =   loadFileData(FStylePath+"/Incoming/NextAction.html",FIn_ActionHTML);
 
 	FOut_ContentHTML =     loadFileData(FStylePath+"/Outgoing/Content.html",FIn_ContentHTML);
 	FOut_NextContentHTML = loadFileData(FStylePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
-	FOut_ContextHTML =     loadFileData(FStylePath+"/Outgoing/Context.html",FOut_ContentHTML);
-	FOut_NextContextHTML = loadFileData(FStylePath+"/Outgoing/NextContext.html",FOut_NextContentHTML);
+	FOut_ActionHTML =      loadFileData(FStylePath+"/Outgoing/Action.html",FIn_ActionHTML);
+	FOut_NextActionHTML =  loadFileData(FStylePath+"/Outgoing/NextAction.html",FIn_NextActionHTML);
 
 	FTopicHTML =           loadFileData(FStylePath+"/Topic.html",QString::null);
 	FStatusHTML =          loadFileData(FStylePath+"/Status.html",FIn_ContentHTML);
