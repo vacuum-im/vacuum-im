@@ -37,7 +37,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAutoStatus
 	virtual int idleSeconds() const;
 	virtual QUuid activeRule() const;

@@ -4,14 +4,14 @@ FORMS = editprofilesdialog.ui \
 
 HEADERS = optionsmanager.h \
           optionswidget.h \
-          optionscontainer.h \
+          optionsheader.h \
           editprofilesdialog.h \
           logindialog.h \
           optionsdialog.h
 
 SOURCES = optionsmanager.cpp \
           optionswidget.cpp \
-          optionscontainer.cpp \
+          optionsheader.cpp \
           editprofilesdialog.cpp \
           logindialog.cpp \
           optionsdialog.cpp

@@ -6,6 +6,9 @@
 #include <definitions/toolbargroups.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/discoitemdataroles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibookmarks.h>
@@ -42,14 +45,14 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
+	//IOptionsHolder
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IBookMarks
 	virtual QList<IBookMark> bookmarks(const Jid &AStreamJid) const { return FBookMarks.value(AStreamJid); }
 	virtual QString addBookmark(const Jid &AStreamJid, const IBookMark &ABookmark);
 	virtual QString setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &ABookmarks);
 	virtual int execEditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) const;
 	virtual void showEditBookmarksDialog(const Jid &AStreamJid);
-	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
 signals:
 	void bookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void bookmarksError(const QString &AId, const QString &AError);

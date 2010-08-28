@@ -4,20 +4,12 @@
 <context>
     <name>AccountManager</name>
     <message>
-        <source>Creating and removing accounts</source>
-        <translation>Tworzenie i usuwanie kont</translation>
-    </message>
-    <message>
         <source>Accounts</source>
         <translation>Konta</translation>
     </message>
     <message>
         <source>Modify account</source>
         <translation>Modyfikuj konto</translation>
-    </message>
-    <message>
-        <source>Account options</source>
-        <translation>Ustawienia konta</translation>
     </message>
     <message>
         <source>Account Manager</source>

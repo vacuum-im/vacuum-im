@@ -47,10 +47,6 @@
         <translation>Передача файлов</translation>
     </message>
     <message>
-        <source>Common options for file transfer</source>
-        <translation>Общие настройки передачи файлов</translation>
-    </message>
-    <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Позволяет инициировать поток для передачи файлов между двумя XMPP сущностями</translation>
     </message>

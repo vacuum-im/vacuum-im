@@ -47,10 +47,6 @@
         <translation>Lista kontaktów</translation>
     </message>
     <message>
-        <source>Roster view options</source>
-        <translation>Ustawienia widoku listy kontaktów</translation>
-    </message>
-    <message>
         <source>Show/Hide offline contacts</source>
         <translation>Pokaż/ukryj kontakty niezalogowane</translation>
     </message>

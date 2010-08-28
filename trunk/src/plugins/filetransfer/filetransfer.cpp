@@ -149,18 +149,16 @@ bool FileTransfer::initSettings()
 	return true;
 }
 
-IOptionsWidget *FileTransfer::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> FileTransfer::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	if (FOptionsManager && ANodeId==OPN_FILETRANSFER)
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (FOptionsManager && ANodeId == OPN_FILETRANSFER)
 	{
-		AOrder = OWO_FILETRANSFER;
-		IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-		container->appendChild(Options::node(OPV_FILETRANSFER_AUTORECEIVE),tr("Automatically receive files from contacts in roster"));
-		container->appendChild(Options::node(OPV_FILETRANSFER_HIDEONSTART),tr("Hide dialog after transfer started"));
-		container->appendChild(Options::node(OPV_FILETRANSFER_REMOVEONFINISH),tr("Automatically remove finished transfers"));
-		return container;
+		widgets.insertMulti(OWO_FILETRANSFER,FOptionsManager->optionsNodeWidget(Options::node(OPV_FILETRANSFER_AUTORECEIVE),tr("Automatically receive files from contacts in roster"),AParent));
+		widgets.insertMulti(OWO_FILETRANSFER,FOptionsManager->optionsNodeWidget(Options::node(OPV_FILETRANSFER_HIDEONSTART),tr("Hide dialog after transfer started"),AParent));
+		widgets.insertMulti(OWO_FILETRANSFER,FOptionsManager->optionsNodeWidget(Options::node(OPV_FILETRANSFER_REMOVEONFINISH),tr("Automatically remove finished transfers"),AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 bool FileTransfer::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)

@@ -20,10 +20,6 @@
         <translation>hh:mm:ss</translation>
     </message>
     <message>
-        <source>Styles options for custom messages</source>
-        <translation>Ustawienia stylów wiadomości</translation>
-    </message>
-    <message>
         <source>Message Styles Manager</source>
         <translation>Menedżer stylów wiadomości</translation>
     </message>

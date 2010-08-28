@@ -101,15 +101,15 @@ bool ConnectionManager::initSettings()
 	return true;
 }
 
-IOptionsWidget *ConnectionManager::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> ConnectionManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 	if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
 	{
-		AOrder = OWO_ACCOUNT_CONNECTION;
-		return new ConnectionOptionsWidget(this,Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)),AParent);
+		widgets.insertMulti(OWO_ACCOUNT_CONNECTION, new ConnectionOptionsWidget(this,Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)),AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 QList<QString> ConnectionManager::pluginList() const

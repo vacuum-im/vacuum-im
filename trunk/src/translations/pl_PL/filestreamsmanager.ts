@@ -47,10 +47,6 @@
         <translation>Transfer plików</translation>
     </message>
     <message>
-        <source>Common options for file transfer</source>
-        <translation>Ustawienia ogólne transferu plików</translation>
-    </message>
-    <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Pozwala na rozpoczęcie przesyłania plików pomiędzy dwoma jednostkami XMPP</translation>
     </message>

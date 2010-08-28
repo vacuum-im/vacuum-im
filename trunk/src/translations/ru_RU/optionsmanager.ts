@@ -152,8 +152,8 @@
         <translation>Настройки</translation>
     </message>
     <message>
-        <source>No Settings Available</source>
-        <translation>Настройки недоступны</translation>
+        <source>Options are absent</source>
+        <translation>Настройки отсутствуют</translation>
     </message>
 </context>
 <context>
@@ -173,10 +173,6 @@
     <message>
         <source>Misc</source>
         <translation>Разное</translation>
-    </message>
-    <message>
-        <source>Extra options</source>
-        <translation>Дополнительные настройки</translation>
     </message>
     <message>
         <source>Auto run on system startup</source>

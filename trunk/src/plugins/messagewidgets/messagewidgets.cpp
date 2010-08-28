@@ -70,38 +70,26 @@ bool MessageWidgets::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_MESSAGES, OPN_MESSAGES, tr("Messages"), tr("Message window options"), MNI_NORMAL_MHANDLER_MESSAGE };
+		IOptionsDialogNode dnode = { ONO_MESSAGES, OPN_MESSAGES, tr("Messages"), MNI_NORMAL_MHANDLER_MESSAGE };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
 	return true;
 }
 
-IOptionsWidget *MessageWidgets::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> MessageWidgets::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	if (ANodeId == OPN_MESSAGES)
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (FOptionsManager && ANodeId == OPN_MESSAGES)
 	{
-		AOrder = OWO_MESSAGES;
-
-		IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-		container->appendChild(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),
-							   tr("Enable tab windows"));
-		container->appendChild(Options::node(OPV_MESSAGES_TABWINDOWS_SHOW_INDICES),
-							   tr("Show tab indices"));
-		container->appendChild(Options::node(OPV_MESSAGES_SHOWSTATUS),
-							   tr("Show status changes in chat windows"));
-		container->appendChild(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),
-							   tr("Auto resize input field"));
-		container->appendChild(Options::node(OPV_MESSAGES_SHOWINFOWIDGET),
-							   tr("Show contact information in chat windows"));
-
-		IOptionsWidget *widget = new MessengerOptions(this,container->instance());
-		container->instance()->layout()->addWidget(widget->instance());
-		container->registerChild(widget);
-
-		return container;
+		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),tr("Enable tab windows"),AParent));
+		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_TABWINDOWS_SHOW_INDICES),tr("Show tab indices"),AParent));
+		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show status changes in chat windows"),AParent));
+		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Auto resize input field"),AParent));
+		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWINFOWIDGET),tr("Show contact information in chat windows"),AParent));
+		widgets.insertMulti(OWO_MESSAGES,new MessengerOptions(this,AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 bool MessageWidgets::viewUrlOpen(IViewWidget* APage, const QUrl &AUrl, int AOrder)

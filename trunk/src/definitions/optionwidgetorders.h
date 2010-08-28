@@ -6,6 +6,7 @@
 #define OWO_ACCOUNT_CONNECTION                    600
 #define OWO_ACCOUNT_REGISTER                      800
 #define OWO_ACCOUNT_STATUS                        900
+#define OWO_ACCOUNT_BOOKMARKS                     1000
 
 //Node = ON_STATUSICONS
 #define OWO_STATUSICONS                           500

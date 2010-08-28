@@ -226,15 +226,16 @@ bool MessageArchiver::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_HISTORY, OPN_HISTORY, tr("History"), tr("Common history settings"), MNI_HISTORY };
+		IOptionsDialogNode dnode = { ONO_HISTORY, OPN_HISTORY, tr("History"), MNI_HISTORY };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
 	return true;
 }
 
-bool MessageArchiver::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &/*AAccept*/)
+bool MessageArchiver::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
+	Q_UNUSED(AAccept);
 	if (FSHIMessageBlocks.value(AStreamJid) == AHandlerId)
 	{
 		Jid contactJid = AStanza.to();
@@ -502,19 +503,19 @@ void MessageArchiver::stanzaRequestTimeout(const Jid &AStreamJid, const QString 
 	emit requestFailed(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
 }
 
-IOptionsWidget *MessageArchiver::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *>  MessageArchiver::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *>  widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 	if (nodeTree.count()==2 && nodeTree.at(0)==OPN_HISTORY)
 	{
-		AOrder = OWO_HISTORY;
 		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(nodeTree.at(1)) : NULL;
 		if (account && account->isActive() && isReady(account->xmppStream()->streamJid()))
 		{
-			return new ArchiveOptions(this,account->xmppStream()->streamJid(),AParent);
+			widgets.insertMulti(OWO_HISTORY, new ArchiveOptions(this,account->xmppStream()->streamJid(),AParent));
 		}
 	}
-	return NULL;
+	return widgets;
 }
 
 int MessageArchiver::sessionInit(const IStanzaSession &ASession, IDataForm &ARequest)
@@ -1990,7 +1991,7 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
 	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
 	if (FOptionsManager && account)
 	{
-		IOptionsDialogNode node = { ONO_HISTORY, OPN_HISTORY"." + account->accountId().toString(), account->name(), tr("Message archiving preferences"), MNI_HISTORY };
+		IOptionsDialogNode node = { ONO_HISTORY, OPN_HISTORY"." + account->accountId().toString(), account->name(), MNI_HISTORY };
 		FOptionsManager->insertOptionsDialogNode(node);
 	}
 }

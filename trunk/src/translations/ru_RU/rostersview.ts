@@ -39,10 +39,6 @@
         <translation>Контакт-лист</translation>
     </message>
     <message>
-        <source>Roster view options</source>
-        <translation>Настройки отображения контакт-листа</translation>
-    </message>
-    <message>
         <source>Show/Hide offline contacts</source>
         <translation>Скрыть/показать отключённые контакты</translation>
     </message>

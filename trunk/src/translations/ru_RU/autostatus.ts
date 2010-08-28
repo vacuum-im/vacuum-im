@@ -8,10 +8,6 @@
         <translation>Автостатус</translation>
     </message>
     <message>
-        <source>Edit auto status rules</source>
-        <translation>Изменить правила автостатуса</translation>
-    </message>
-    <message>
         <source>Status changed automatically to &apos;away&apos;</source>
         <translation>Статус автоматически изменён на &apos;ушёл&apos;</translation>
     </message>

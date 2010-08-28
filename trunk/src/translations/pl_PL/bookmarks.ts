@@ -20,7 +20,7 @@
         <translation>Dodaj do zakładek</translation>
     </message>
     <message>
-        <source>Ignore autojoin flag in bookmarks</source>
+        <source>Disable autojoin to conferences</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

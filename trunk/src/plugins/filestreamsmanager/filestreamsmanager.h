@@ -47,7 +47,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	// IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IDataStreamProfile
 	virtual QString profileNS() const;
 	virtual bool requestDataStream(const QString &AStreamId, Stanza &ARequest) const;

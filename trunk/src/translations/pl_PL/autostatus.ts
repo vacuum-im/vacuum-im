@@ -8,10 +8,6 @@
         <translation>Autostatus</translation>
     </message>
     <message>
-        <source>Edit auto status rules</source>
-        <translation>Edycja ustawień autostatusu</translation>
-    </message>
-    <message>
         <source>Status changed automatically to &apos;away&apos;</source>
         <translation>Status zmieniony automatycznie na &apos;Odszedłem od komputera&apos;</translation>
     </message>

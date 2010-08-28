@@ -188,14 +188,14 @@ bool ClientInfo::initSettings()
 	return true;
 }
 
-IOptionsWidget *ClientInfo::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> ClientInfo::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_MISC)
 	{
-		AOrder = OWO_MISC_CLIENTINFO;
-		return FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_SHAREOSVERSION),tr("Share information about OS version"),AParent);
+		widgets.insertMulti(OWO_MISC_CLIENTINFO, FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_SHAREOSVERSION),tr("Share information about OS version"),AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 bool ClientInfo::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)

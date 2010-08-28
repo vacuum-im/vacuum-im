@@ -145,18 +145,15 @@ bool RosterChanger::initSettings()
 	return true;
 }
 
-IOptionsWidget *RosterChanger::optionsWidget(const QString &ANode, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> RosterChanger::optionsWidgets(const QString &ANode, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANode == OPN_ROSTER)
 	{
-		AOrder = OWO_ROSTER_CHENGER;
-
-		IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-		container->appendChild(Options::node(OPV_ROSTER_AUTOSUBSCRIBE),tr("Auto accept subscription requests"));
-		container->appendChild(Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE),tr("Auto unsubscribe contacts"));
-		return container;
+		widgets.insertMulti(OWO_ROSTER_CHENGER, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AUTOSUBSCRIBE),tr("Auto accept subscription requests"),AParent));
+		widgets.insertMulti(OWO_ROSTER_CHENGER, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE),tr("Auto unsubscribe contacts"),AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 //IRostersDragDropHandler

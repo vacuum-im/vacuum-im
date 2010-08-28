@@ -156,37 +156,26 @@ bool Notifications::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_NOTIFICATIONS, OPN_NOTIFICATIONS, tr("Notifications"),tr("Notification options"), MNI_NOTIFICATIONS };
+		IOptionsDialogNode dnode = { ONO_NOTIFICATIONS, OPN_NOTIFICATIONS, tr("Notifications"), MNI_NOTIFICATIONS };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
 	return true;
 }
 
-IOptionsWidget *Notifications::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> Notifications::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_NOTIFICATIONS)
 	{
-		AOrder = OWO_NOTIFICATIONS;
-		IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-		container->instance()->setLayout(new QVBoxLayout);
-		container->instance()->layout()->setMargin(0);
-
-		IOptionsWidget *widget = new OptionsWidget(this, container->instance());
-		container->instance()->layout()->addWidget(widget->instance());
-		container->registerChild(widget);
-
+		widgets.insertMulti(OWO_NOTIFICATIONS, new OptionsWidget(this, AParent));
 		foreach(QString id, FNotificators.keys())
 		{
 			Notificator notificator = FNotificators.value(id);
-			widget = new NotifyKindsWidget(this,id,notificator.title,notificator.kindMask,container->instance());
-			container->instance()->layout()->addWidget(widget->instance());
-			container->registerChild(widget);
+			widgets.insertMulti(OWO_NOTIFICATIONS, new NotifyKindsWidget(this,id,notificator.title,notificator.kindMask,AParent));
 		}
-
-		return container;
 	}
-	return NULL;
+	return widgets;
 }
 
 QList<int> Notifications::notifications() const

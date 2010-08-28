@@ -72,21 +72,21 @@ bool MessageStyles::initSettings()
 {
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_MESSAGE_STYLES, OPN_MESSAGE_STYLES, tr("Message Styles"),tr("Styles options for custom messages"), MNI_MESSAGE_STYLES };
+		IOptionsDialogNode dnode = { ONO_MESSAGE_STYLES, OPN_MESSAGE_STYLES, tr("Message Styles"), MNI_MESSAGE_STYLES };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
 	return true;
 }
 
-IOptionsWidget *MessageStyles::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> MessageStyles::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	if (ANodeId == OPN_MESSAGE_STYLES && !FStylePlugins.isEmpty())
 	{
-		AOrder = OWO_MESSAGE_STYLES;
-		return new StyleOptionsWidget(this,AParent);
+		widgets.insertMulti(OWO_MESSAGE_STYLES, new StyleOptionsWidget(this,AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 QList<QString> MessageStyles::pluginList() const

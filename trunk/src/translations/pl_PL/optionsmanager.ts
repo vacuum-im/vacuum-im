@@ -152,8 +152,8 @@
         <translation>Opcje</translation>
     </message>
     <message>
-        <source>No Settings Available</source>
-        <translation>Brak ustawień</translation>
+        <source>Options are absent</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -173,10 +173,6 @@
     <message>
         <source>Misc</source>
         <translation>Ogólne</translation>
-    </message>
-    <message>
-        <source>Extra options</source>
-        <translation>Opcje dodatkowe</translation>
     </message>
     <message>
         <source>Auto run on system startup</source>

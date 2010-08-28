@@ -63,7 +63,7 @@ public:
 	//IArchiveHandler
 	virtual bool archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//ISessionNegotiator
 	virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest);
 	virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit);

@@ -209,10 +209,6 @@
         <translation>dni</translation>
     </message>
     <message>
-        <source>Message archiving preferences</source>
-        <translation>Ustawienia zapisu historii</translation>
-    </message>
-    <message>
         <source>History</source>
         <translation>Historia</translation>
     </message>
@@ -243,10 +239,6 @@
     <message>
         <source>Options...</source>
         <translation>Ustawienia...</translation>
-    </message>
-    <message>
-        <source>Common history settings</source>
-        <translation>Ogólne ustawienia zapisu historii</translation>
     </message>
     <message>
         <source>OTR session not ready, please wait...</source>

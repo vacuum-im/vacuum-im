@@ -47,10 +47,6 @@
         <translation>Статус-иконки</translation>
     </message>
     <message>
-        <source>Configure status icons</source>
-        <translation>Настройка статус-иконок</translation>
-    </message>
-    <message>
         <source>Default</source>
         <translation>По умолчанию</translation>
     </message>

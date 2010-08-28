@@ -11,9 +11,5 @@
         <source>Allows to use your smiley images in messages</source>
         <translation>Pozwala korzystać z emotek w rozmowach</translation>
     </message>
-    <message>
-        <source>Select emoticons iconsets</source>
-        <translation>Zaznacz zbiory emotek</translation>
-    </message>
 </context>
 </TS>

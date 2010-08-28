@@ -88,21 +88,21 @@ bool FileStreamsManager::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode fileNode = { ONO_FILETRANSFER, OPN_FILETRANSFER, tr("File Transfer"),tr("Common options for file transfer"), MNI_FILESTREAMSMANAGER };
+		IOptionsDialogNode fileNode = { ONO_FILETRANSFER, OPN_FILETRANSFER, tr("File Transfer"), MNI_FILESTREAMSMANAGER };
 		FOptionsManager->insertOptionsDialogNode(fileNode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
 	return true;
 }
 
-IOptionsWidget *FileStreamsManager::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> FileStreamsManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FDataManager && ANodeId == OPN_FILETRANSFER)
 	{
-		AOrder = OWO_FILESTREAMSMANAGER;
-		return new FileStreamsOptions(FDataManager, this, AParent);
+		widgets.insertMulti(OWO_FILESTREAMSMANAGER, new FileStreamsOptions(FDataManager, this, AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 QString FileStreamsManager::profileNS() const

@@ -15,10 +15,6 @@
         <translation>Wiadomości</translation>
     </message>
     <message>
-        <source>Message window options</source>
-        <translation>Ustawienia wiadomości</translation>
-    </message>
-    <message>
         <source>Tab Window %1</source>
         <translation>Okno z zakładkami %1</translation>
     </message>

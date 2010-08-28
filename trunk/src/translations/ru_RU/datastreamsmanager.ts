@@ -36,10 +36,6 @@
         <translation>Потоки данных</translation>
     </message>
     <message>
-        <source>Common data streams settings</source>
-        <translation>Общие настройки потоков данных</translation>
-    </message>
-    <message>
         <source>&lt;Default Profile&gt;</source>
         <translation>&lt;Основной профиль&gt;</translation>
     </message>

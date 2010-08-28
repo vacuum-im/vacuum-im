@@ -228,20 +228,17 @@ bool StatusChanger::startPlugin()
 }
 
 //IOptionsHolder
-IOptionsWidget *StatusChanger::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> StatusChanger::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
 	{
-		AOrder = OWO_ACCOUNT_STATUS;
 		OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-
-		IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-		container->appendChild(aoptions.node("auto-connect"),tr("Auto connect on startup"));
-		container->appendChild(aoptions.node("auto-reconnect"),tr("Auto reconnect if disconnected"));
-		return container;
+		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-connect"),tr("Auto connect on startup"),AParent));
+		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-reconnect"),tr("Auto reconnect if disconnected"),AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 //IStatusChanger

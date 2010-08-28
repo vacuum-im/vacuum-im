@@ -25,8 +25,9 @@
 #include "logindialog.h"
 #include "editprofilesdialog.h"
 #include "optionswidget.h"
-#include "optionscontainer.h"
+#include "optionsheader.h"
 #include "optionsdialog.h"
+
 
 class OptionsManager :
 			public QObject,
@@ -48,7 +49,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IOptionsManager
 	virtual bool isOpened() const;
 	virtual QList<QString> profiles() const;
@@ -73,7 +74,7 @@ public:
 	virtual void insertOptionsDialogNode(const IOptionsDialogNode &ANode);
 	virtual void removeOptionsDialogNode(const QString &ANodeId);
 	virtual QDialog *showOptionsDialog(const QString &ANodeId = QString::null, QWidget *AParent = NULL);
-	virtual IOptionsContainer *optionsContainer(QWidget *AParent) const;
+	virtual IOptionsWidget *optionsHeaderWidget(const QString &ACaption, QWidget *AParent) const;
 	virtual IOptionsWidget *optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const;
 signals:
 	void profileAdded(const QString &AProfile);

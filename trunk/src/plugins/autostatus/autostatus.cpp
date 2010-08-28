@@ -76,7 +76,7 @@ bool AutoStatus::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_AUTO_STATUS, OPN_AUTO_STATUS, tr("Auto status"),tr("Edit auto status rules"), MNI_AUTOSTATUS };
+		IOptionsDialogNode dnode = { ONO_AUTO_STATUS, OPN_AUTO_STATUS, tr("Auto status"), MNI_AUTOSTATUS };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
@@ -89,14 +89,14 @@ bool AutoStatus::startPlugin()
 	return true;
 }
 
-IOptionsWidget *AutoStatus::optionsWidget(const QString &ANode, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> AutoStatus::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	if (ANode == OPN_AUTO_STATUS)
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (ANodeId == OPN_AUTO_STATUS)
 	{
-		AOrder = OWO_AUTOSTATUS;
-		return new StatusOptionsWidget(this,FStatusChanger,AParent);
+		widgets.insertMulti(OWO_AUTOSTATUS, new StatusOptionsWidget(this,FStatusChanger,AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 int AutoStatus::idleSeconds() const
