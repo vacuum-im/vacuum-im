@@ -114,7 +114,7 @@ bool OptionsManager::initSettings()
 	if (profiles().count() == 0)
 		addProfile(DEFAULT_PROFILE, QString::null);
 
-	IOptionsDialogNode dnode = { ONO_MISC, OPN_MISC, tr("Misc"), tr("Extra options"), MNI_OPTIONS_DIALOG };
+	IOptionsDialogNode dnode = { ONO_MISC, OPN_MISC, tr("Misc"), MNI_OPTIONS_DIALOG };
 	insertOptionsDialogNode(dnode);
 	insertOptionsHolder(this);
 
@@ -133,14 +133,14 @@ bool OptionsManager::startPlugin()
 	return true;
 }
 
-IOptionsWidget *OptionsManager::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> OptionsManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	if (ANodeId == OPN_MISC)
 	{
-		AOrder = OWO_MISC_AUTOSTART;
-		return optionsNodeWidget(Options::node(OPV_MISC_AUTOSTART), tr("Auto run on system startup"), AParent);
+		widgets.insertMulti(OWO_MISC_AUTOSTART, optionsNodeWidget(Options::node(OPV_MISC_AUTOSTART), tr("Auto run on system startup"), AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 bool OptionsManager::isOpened() const
@@ -446,9 +446,9 @@ QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, QWidget *APar
 	return FOptionsDialog;
 }
 
-IOptionsContainer *OptionsManager::optionsContainer(QWidget *AParent) const
+IOptionsWidget *OptionsManager::optionsHeaderWidget(const QString &ACaption, QWidget *AParent) const
 {
-	return new OptionsContainer(this,AParent);
+	return new OptionsHeader(ACaption,AParent);
 }
 
 IOptionsWidget *OptionsManager::optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const

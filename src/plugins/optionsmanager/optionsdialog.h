@@ -34,7 +34,6 @@ signals:
 	void applied();
 	void reseted();
 protected:
-	QString nodeFullName(const QString &ANodeId);
 	QWidget *createNodeWidget(const QString &ANodeId);
 	QStandardItem *createNodeItem(const QString &ANodeId);
 	bool canExpandVertically(const QWidget *AWidget) const;
@@ -47,7 +46,7 @@ protected slots:
 private:
 	Ui::OptionsDialogClass ui;
 private:
-	IOptionsManager *FManager;
+	IOptionsManager *FOptionsManager;
 private:
 	QStandardItemModel *FItemsModel;
 	SortFilterProxyModel *FProxyModel;

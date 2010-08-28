@@ -28,10 +28,6 @@
         <translation>Powiadomienia</translation>
     </message>
     <message>
-        <source>Notification options</source>
-        <translation>Ustawienia powiadomień</translation>
-    </message>
-    <message>
         <source>Enable/Disable notifications sound</source>
         <translation>Włącz/wyłącz dźwięk powiadomień</translation>
     </message>

@@ -20,8 +20,8 @@
         <translation>Добавить в закладки</translation>
     </message>
     <message>
-        <source>Ignore autojoin flag in bookmarks</source>
-        <translation>Игнорировать флаг автоподключения в закладках</translation>
+        <source>Disable autojoin to conferences</source>
+        <translation>Отключить автовход в конференции</translation>
     </message>
 </context>
 <context>

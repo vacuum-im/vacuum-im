@@ -47,7 +47,7 @@ public:
 	virtual void writeMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
 	virtual void writeText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IEmoticons
 	virtual QList<QString> activeIconsets() const;
 	virtual QUrl urlByKey(const QString &AKey) const;

@@ -15,7 +15,6 @@ struct IOptionsDialogNode
 	int order;
 	QString nodeId;
 	QString name;
-	QString description;
 	QString iconkey;
 };
 
@@ -32,18 +31,10 @@ protected:
 	virtual void childReset() =0;
 };
 
-class IOptionsContainer :
-			public IOptionsWidget
-{
-public:
-	virtual void registerChild(IOptionsWidget *AWidget) =0;
-	virtual IOptionsWidget *appendChild(const OptionsNode &ANode, const QString &ACaption) =0;
-};
-
 class IOptionsHolder
 {
 public:
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent) =0;
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent) =0;
 };
 
 class IOptionsManager
@@ -76,7 +67,7 @@ public:
 	virtual void removeOptionsDialogNode(const QString &ANodeId) =0;
 	virtual QDialog *showOptionsDialog(const QString &ANodeId = QString::null, QWidget *AParent = NULL) =0;
 	//OptionsWidgets
-	virtual IOptionsContainer *optionsContainer(QWidget *AParent) const =0;
+	virtual IOptionsWidget *optionsHeaderWidget(const QString &ACaption, QWidget *AParent) const =0;
 	virtual IOptionsWidget *optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const =0;
 protected:
 	virtual void profileAdded(const QString &AProfile) =0;
@@ -91,7 +82,6 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IOptionsWidget,"Vacuum.Plugin.IOptionsWidget/1.0")
-Q_DECLARE_INTERFACE(IOptionsContainer,"Vacuum.Plugin.IOptionsContainer/1.0")
 Q_DECLARE_INTERFACE(IOptionsHolder,"Vacuum.Plugin.IOptionsHolder/1.0")
 Q_DECLARE_INTERFACE(IOptionsManager,"Vacuum.Plugin.IOptionsManager/1.0")
 

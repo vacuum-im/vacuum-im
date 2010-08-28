@@ -4,20 +4,12 @@
 <context>
     <name>AccountManager</name>
     <message>
-        <source>Creating and removing accounts</source>
-        <translation>Управление аккаунтами</translation>
-    </message>
-    <message>
         <source>Accounts</source>
         <translation>Аккаунты</translation>
     </message>
     <message>
         <source>Modify account</source>
         <translation>Изменить аккаунт</translation>
-    </message>
-    <message>
-        <source>Account options</source>
-        <translation>Настройки аккаунта</translation>
     </message>
     <message>
         <source>Account Manager</source>

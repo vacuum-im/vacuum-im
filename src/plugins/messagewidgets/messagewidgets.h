@@ -46,7 +46,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IViewUrlHandler
 	virtual bool viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
 	//IMessageWidgets

@@ -61,7 +61,7 @@ public:
 	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
 	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAvatars
 	virtual QString avatarFileName(const QString &AHash) const;
 	virtual bool hasAvatar(const QString &AHash) const;

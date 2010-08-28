@@ -42,7 +42,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeID, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAccountManager
 	virtual QList<IAccount *> accounts() const;
 	virtual IAccount *accountById(const QUuid &AAcoountId) const;

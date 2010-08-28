@@ -39,7 +39,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageStyles
 	virtual QList<QString> pluginList() const;
 	virtual IMessageStylePlugin *pluginById(const QString &APluginId) const;

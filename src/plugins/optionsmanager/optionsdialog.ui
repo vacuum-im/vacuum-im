@@ -10,9 +10,9 @@
     <height>498</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="margin">
-    <number>3</number>
+    <number>5</number>
    </property>
    <item>
     <widget class="QSplitter" name="sprSplitter">
@@ -35,55 +35,24 @@
       <attribute name="headerVisible">
        <bool>false</bool>
       </attribute>
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
      </widget>
-     <widget class="QWidget" name="wdtRightWidget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     <widget class="QScrollArea" name="scaScroll">
+      <property name="widgetResizable">
+       <bool>true</bool>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="margin">
-        <number>0</number>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>105</width>
+         <height>457</height>
+        </rect>
        </property>
-       <item>
-        <widget class="QLabel" name="lblInfo">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Box</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::RichText</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QScrollArea" name="scaScroll">
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>121</width>
-            <height>433</height>
-           </rect>
-          </property>
-         </widget>
-        </widget>
-       </item>
-      </layout>
+      </widget>
      </widget>
     </widget>
    </item>
@@ -99,7 +68,6 @@
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>trvNodes</tabstop>
-  <tabstop>scaScroll</tabstop>
   <tabstop>dbbButtons</tabstop>
  </tabstops>
  <resources/>

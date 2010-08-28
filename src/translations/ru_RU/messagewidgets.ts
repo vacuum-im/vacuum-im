@@ -15,10 +15,6 @@
         <translation>Сообщения</translation>
     </message>
     <message>
-        <source>Message window options</source>
-        <translation>Настройки сообщений</translation>
-    </message>
-    <message>
         <source>Tab Window %1</source>
         <translation>Окно  со вкладками %1</translation>
     </message>

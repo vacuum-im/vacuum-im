@@ -36,10 +36,6 @@
         <translation>Strumienie danych</translation>
     </message>
     <message>
-        <source>Common data streams settings</source>
-        <translation>Ogólna konfiguracja strumieni danych</translation>
-    </message>
-    <message>
         <source>&lt;Default Profile&gt;</source>
         <translation>&lt;Profil domyślny&gt;</translation>
     </message>

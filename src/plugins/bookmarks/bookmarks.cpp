@@ -1,9 +1,6 @@
 #include "bookmarks.h"
 
 #include <QDesktopServices>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
 
 #define PST_BOOKMARKS           "storage"
 
@@ -150,6 +147,18 @@ bool BookMarks::initSettings()
 	return true;
 }
 
+QMultiMap<int, IOptionsWidget *> BookMarks::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsWidget *> widgets;
+	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+	{
+		OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+		widgets.insertMulti(OWO_ACCOUNT_BOOKMARKS, FOptionsManager->optionsNodeWidget(aoptions.node("ignore-autojoin"),tr("Disable autojoin to conferences"),AParent));
+	}
+	return widgets;
+}
+
 QString BookMarks::addBookmark(const Jid &AStreamJid, const IBookMark &ABookmark)
 {
 	if (!ABookmark.name.isEmpty())
@@ -241,21 +250,6 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
 		else
 			QDesktopServices::openUrl(ABookmark.url);
 	}
-}
-
-IOptionsWidget *BookMarks::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
-{
-	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
-	{
-		AOrder = OWO_ACCOUNT_STATUS;
-		OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-
-		IOptionsContainer *container = FOptionsManager->optionsContainer(AParent);
-		container->appendChild(aoptions.node("ignore-autojoin"),tr("Ignore autojoin flag in bookmarks"));
-		return container;
-	}
-	return NULL;
 }
 
 void BookMarks::onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline)

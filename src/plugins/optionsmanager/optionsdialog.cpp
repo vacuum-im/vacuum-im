@@ -1,5 +1,6 @@
 #include "optionsdialog.h"
 
+#include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHeaderView>
@@ -23,16 +24,17 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 	setWindowTitle(tr("Options"));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_OPTIONS_DIALOG,0,0,"windowIcon");
 
-	restoreGeometry(Options::fileValue("optionsmanager.optionsdialog.geometry").toByteArray());
+	if (!restoreGeometry(Options::fileValue("optionsmanager.optionsdialog.geometry").toByteArray()))
+		resize(600,520);
 	if (!ui.sprSplitter->restoreState(Options::fileValue("optionsmanager.optionsdialog.splitter.state").toByteArray()))
-		ui.sprSplitter->setSizes(QList<int>() << 150 << 450);
+		ui.sprSplitter->setSizes(QList<int>() << 160 << 440);
 
 	delete ui.scaScroll->takeWidget();
 	ui.trvNodes->sortByColumn(0,Qt::AscendingOrder);
 
-	FManager = AOptionsManager;
-	connect(FManager->instance(),SIGNAL(optionsDialogNodeInserted(const IOptionsDialogNode &)),SLOT(onOptionsDialogNodeInserted(const IOptionsDialogNode &)));
-	connect(FManager->instance(),SIGNAL(optionsDialogNodeRemoved(const IOptionsDialogNode &)),SLOT(onOptionsDialogNodeRemoved(const IOptionsDialogNode &)));
+	FOptionsManager = AOptionsManager;
+	connect(FOptionsManager->instance(),SIGNAL(optionsDialogNodeInserted(const IOptionsDialogNode &)),SLOT(onOptionsDialogNodeInserted(const IOptionsDialogNode &)));
+	connect(FOptionsManager->instance(),SIGNAL(optionsDialogNodeRemoved(const IOptionsDialogNode &)),SLOT(onOptionsDialogNodeRemoved(const IOptionsDialogNode &)));
 
 	FItemsModel = new QStandardItemModel(ui.trvNodes);
 	FItemsModel->setColumnCount(1);
@@ -51,7 +53,7 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 	ui.dbbButtons->button(QDialogButtonBox::Reset)->setEnabled(false);
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
-	foreach (const IOptionsDialogNode &node, FManager->optionsDialogNodes()) {
+	foreach (const IOptionsDialogNode &node, FOptionsManager->optionsDialogNodes()) {
 		onOptionsDialogNodeInserted(node); }
 }
 
@@ -69,48 +71,39 @@ void OptionsDialog::showNode(const QString &ANodeId)
 	ui.trvNodes->expandAll();
 }
 
-QString OptionsDialog::nodeFullName(const QString &ANodeId)
-{
-	QString fullName;
-	QStandardItem *item = FNodeItems.value(ANodeId);
-	if (item)
-	{
-		fullName = item->text();
-		while (item->parent())
-		{
-			item = item->parent();
-			fullName = item->text()+"->"+fullName;
-		}
-	}
-	return fullName;
-}
-
 QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 {
 	QWidget *nodeWidget = new QWidget;
 	nodeWidget->setLayout(new QVBoxLayout);
-	nodeWidget->layout()->setMargin(6);
-	nodeWidget->layout()->setSpacing(3);
+	nodeWidget->layout()->setMargin(5);
 
 	QMultiMap<int, IOptionsWidget *> orderedWidgets;
-	foreach(IOptionsHolder *optionsHolder,FManager->optionsHolders())
+	foreach(IOptionsHolder *optionsHolder,FOptionsManager->optionsHolders())
 	{
-		int order = 500;
-		IOptionsWidget *widget = optionsHolder->optionsWidget(ANodeId,order,nodeWidget);
-		if (widget)
+		QMultiMap<int, IOptionsWidget *> widgets = optionsHolder->optionsWidgets(ANodeId,nodeWidget);
+		for (QMultiMap<int, IOptionsWidget *>::const_iterator  it = widgets.constBegin(); it!=widgets.constEnd(); it++)
 		{
-			orderedWidgets.insertMulti(order,widget);
-			connect(this,SIGNAL(applied()),widget->instance(),SLOT(apply()));
-			connect(this,SIGNAL(reseted()),widget->instance(),SLOT(reset()));
-			connect(widget->instance(),SIGNAL(modified()),SLOT(onOptionsWidgetModified()));
+			orderedWidgets.insertMulti(it.key() ,it.value());
+			connect(this,SIGNAL(applied()),it.value()->instance(),SLOT(apply()));
+			connect(this,SIGNAL(reseted()),it.value()->instance(),SLOT(reset()));
+			connect(it.value()->instance(),SIGNAL(modified()),SLOT(onOptionsWidgetModified()));
 		}
 	}
 
-	foreach(IOptionsWidget *widget, orderedWidgets)
-		nodeWidget->layout()->addWidget(widget->instance());
-
-	if (!canExpandVertically(nodeWidget))
-		nodeWidget->setMaximumHeight(nodeWidget->sizeHint().height());
+	if (!orderedWidgets.isEmpty())
+	{
+		foreach(IOptionsWidget *widget, orderedWidgets)
+			nodeWidget->layout()->addWidget(widget->instance());
+		if (!canExpandVertically(nodeWidget))
+			nodeWidget->setMaximumHeight(nodeWidget->sizeHint().height());
+	}
+	else
+	{
+		QLabel *label = new QLabel(tr("Options are absent"),nodeWidget);
+		label->setAlignment(Qt::AlignCenter);
+		label->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+		nodeWidget->layout()->addWidget(label);
+	}
 
 	FCleanupHandler.add(nodeWidget);
 	return nodeWidget;
@@ -170,7 +163,6 @@ void OptionsDialog::onOptionsDialogNodeInserted(const IOptionsDialogNode &ANode)
 		QStandardItem *item = FNodeItems.contains(ANode.nodeId) ? FNodeItems.value(ANode.nodeId) : createNodeItem(ANode.nodeId);
 		item->setData(ANode.order, IDR_ORDER);
 		item->setText(ANode.name);
-		item->setWhatsThis(ANode.description);
 		item->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(ANode.iconkey));
 	}
 }
@@ -201,25 +193,16 @@ void OptionsDialog::onOptionsDialogNodeRemoved(const IOptionsDialogNode &ANode)
 void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious)
 {
 	Q_UNUSED(APrevious);
+	ui.scaScroll->takeWidget();
 
 	QStandardItem *curItem = FItemsModel->itemFromIndex(FProxyModel->mapToSource(ACurrent));
-
 	QString nodeID = FNodeItems.key(curItem);
 	if (curItem && !FItemWidgets.contains(curItem))
 		FItemWidgets.insert(curItem,createNodeWidget(nodeID));
 
 	QWidget *curWidget = FItemWidgets.value(curItem);
 	if (curWidget)
-	{
-		ui.lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(nodeID))).arg(Qt::escape(curItem->whatsThis())));
-		ui.scaScroll->takeWidget();
 		ui.scaScroll->setWidget(curWidget);
-	}
-	else if (curItem)
-	{
-		ui.lblInfo->setText(QString("<b>%1</b><br>%2").arg(Qt::escape(nodeFullName(nodeID))).arg(tr("No Settings Available")));
-		ui.scaScroll->takeWidget();
-	}
 }
 
 void OptionsDialog::onOptionsWidgetModified()

@@ -173,14 +173,14 @@ bool ChatStates::archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMes
 	return true;
 }
 
-IOptionsWidget *ChatStates::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> ChatStates::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_MESSAGES)
 	{
-		AOrder = OWO_MESSAGES_CHATSTATES;
-		return FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send chat state notifications"),AParent);
+		widgets.insertMulti(OWO_MESSAGES_CHATSTATES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send chat state notifications"),AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 int ChatStates::sessionInit(const IStanzaSession &ASession, IDataForm &ARequest)

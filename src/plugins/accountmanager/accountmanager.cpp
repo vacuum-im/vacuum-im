@@ -62,7 +62,7 @@ bool AccountManager::initSettings()
 {
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode miscNode = { ONO_ACCOUNTS, OPN_ACCOUNTS, tr("Accounts"),tr("Creating and removing accounts"), MNI_ACCOUNT_LIST };
+		IOptionsDialogNode miscNode = { ONO_ACCOUNTS, OPN_ACCOUNTS, tr("Accounts"), MNI_ACCOUNT_LIST };
 		FOptionsManager->insertOptionsDialogNode(miscNode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
@@ -70,22 +70,21 @@ bool AccountManager::initSettings()
 	return true;
 }
 
-IOptionsWidget *AccountManager::optionsWidget(const QString &ANode, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> AccountManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	if (ANode.startsWith(OPN_ACCOUNTS))
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (ANodeId.startsWith(OPN_ACCOUNTS))
 	{
-		QStringList nodeTree = ANode.split(".",QString::SkipEmptyParts);
-		if (ANode==OPN_ACCOUNTS || (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS))
+		QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+		if (ANodeId==OPN_ACCOUNTS || (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS))
 		{
-			AOrder = OWO_ACCOUNT_OPTIONS;
-
-			if (ANode==OPN_ACCOUNTS)
-				return new AccountsOptions(this,AParent);
+			if (ANodeId==OPN_ACCOUNTS)
+				widgets.insertMulti(OWO_ACCOUNT_OPTIONS, new AccountsOptions(this,AParent));
 			else
-				return new AccountOptions(this,nodeTree.at(1),AParent);
+				widgets.insertMulti(OWO_ACCOUNT_OPTIONS, new AccountOptions(this,nodeTree.at(1),AParent));
 		}
 	}
-	return NULL;
+	return widgets;
 }
 
 QList<IAccount *> AccountManager::accounts() const
@@ -177,7 +176,7 @@ void AccountManager::openAccountOptionsNode(const QUuid &AAccountId, const QStri
 	if (FOptionsManager)
 	{
 		QString node = OPN_ACCOUNTS "." + AAccountId.toString();
-		IOptionsDialogNode dnode = { ONO_ACCOUNTS, node, AName, tr("Account options"), MNI_ACCOUNT };
+		IOptionsDialogNode dnode = { ONO_ACCOUNTS, node, AName, MNI_ACCOUNT };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 	}
 }

@@ -70,7 +70,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//INotifications
 	virtual QList<int> notifications() const;
 	virtual INotification notificationById(int ANotifyId) const;

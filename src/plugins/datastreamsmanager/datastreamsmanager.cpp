@@ -108,21 +108,21 @@ bool DataStreamsManger::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_DATASTREAMS, OPN_DATASTREAMS, tr("Data Streams"),tr("Common data streams settings"), MNI_DATASTREAMSMANAGER };
+		IOptionsDialogNode dnode = { ONO_DATASTREAMS, OPN_DATASTREAMS, tr("Data Streams"), MNI_DATASTREAMSMANAGER };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
 	return true;
 }
 
-IOptionsWidget *DataStreamsManger::optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> DataStreamsManger::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
+	QMultiMap<int, IOptionsWidget *> widgets;
 	if (ANodeId == OPN_DATASTREAMS)
 	{
-		AOrder = OWO_DATASTREAMS;
-		return new DataStreamsOptions(this,AParent);
+		widgets.insertMulti(OWO_DATASTREAMS, new DataStreamsOptions(this,AParent));
 	}
-	return NULL;
+	return widgets;
 }
 
 bool DataStreamsManger::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)

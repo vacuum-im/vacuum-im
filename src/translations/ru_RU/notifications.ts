@@ -8,10 +8,6 @@
         <translation>Уведомления</translation>
     </message>
     <message>
-        <source>Notification options</source>
-        <translation>Параметры уведомления</translation>
-    </message>
-    <message>
         <source>Activate All Notifications</source>
         <translation>Активировать все уведомления</translation>
     </message>

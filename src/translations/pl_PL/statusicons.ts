@@ -51,10 +51,6 @@
         <translation>Ikony statusu</translation>
     </message>
     <message>
-        <source>Configure status icons</source>
-        <translation>Ustawienia ikon statusu</translation>
-    </message>
-    <message>
         <source>Default</source>
         <translation>Domyślne</translation>
     </message>

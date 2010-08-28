@@ -209,10 +209,6 @@
         <translation>дней</translation>
     </message>
     <message>
-        <source>Message archiving preferences</source>
-        <translation>Настройки хранения сообщений</translation>
-    </message>
-    <message>
         <source>History</source>
         <translation>История</translation>
     </message>
@@ -243,10 +239,6 @@
     <message>
         <source>Options...</source>
         <translation>Настройки...</translation>
-    </message>
-    <message>
-        <source>Common history settings</source>
-        <translation>Общие настройки архива</translation>
     </message>
     <message>
         <source>OTR session not ready, please wait...</source>

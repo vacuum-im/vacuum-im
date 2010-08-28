@@ -60,7 +60,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual IOptionsWidget *optionsWidget(const QString &ANodeId, int &AOrder, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IStatusChanger
 	virtual Menu *statusMenu() const;
 	virtual Menu *streamMenu(const Jid &AStreamJid) const;
