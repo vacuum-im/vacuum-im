@@ -76,13 +76,10 @@ QMultiMap<int, IOptionsWidget *> AccountManager::optionsWidgets(const QString &A
 	if (ANodeId.startsWith(OPN_ACCOUNTS))
 	{
 		QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-		if (ANodeId==OPN_ACCOUNTS || (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS))
-		{
-			if (ANodeId==OPN_ACCOUNTS)
-				widgets.insertMulti(OWO_ACCOUNT_OPTIONS, new AccountsOptions(this,AParent));
-			else
-				widgets.insertMulti(OWO_ACCOUNT_OPTIONS, new AccountOptions(this,nodeTree.at(1),AParent));
-		}
+		if (ANodeId == OPN_ACCOUNTS)
+			widgets.insertMulti(OWO_ACCOUNT_OPTIONS, new AccountsOptions(this,AParent));
+		else if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+			widgets.insertMulti(OWO_ACCOUNT_OPTIONS, new AccountOptions(this,nodeTree.at(1),AParent));
 	}
 	return widgets;
 }
