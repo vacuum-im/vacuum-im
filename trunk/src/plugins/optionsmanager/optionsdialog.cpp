@@ -185,7 +185,7 @@ void OptionsDialog::onOptionsDialogNodeRemoved(const IOptionsDialogNode &ANode)
 		if (item->parent())
 			item->parent()->removeRow(item->row());
 		else
-			delete FItemsModel->takeItem(item->row());
+			qDeleteAll(FItemsModel->takeRow(item->row()));
 		delete FItemWidgets.take(item);
 	}
 }
