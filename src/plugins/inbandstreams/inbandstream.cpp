@@ -7,7 +7,7 @@
 #include <QCoreApplication>
 
 #define BUFFER_INCREMENT_SIZE     1024
-#define MAX_BUFFER_SIZE     8192
+#define MAX_BUFFER_SIZE           8192
 
 #define DATA_TIMEOUT              60000
 #define OPEN_TIMEOUT              30000
@@ -113,7 +113,7 @@ bool InBandStream::stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza
 			FBlockSize = openElem.attribute("block-size").toInt();
 			if (FBlockSize>MINIMUM_BLOCK_SIZE && FBlockSize<=FMaxBlockSize)
 			{
-				FStanzaType = openElem.attribute("stanza","message") == "message" ? StanzaMessage : StanzaIq;
+				FStanzaType = openElem.attribute("stanza") == "message" ? StanzaMessage : StanzaIq;
 				FSHIData = insertStanzaHandle(FStanzaType==StanzaMessage ? SHC_INBAND_DATA_MESSAGE : SHC_INBAND_DATA_IQ);
 				FSHIClose = insertStanzaHandle(SHC_INBAND_CLOSE);
 				if (FSHIData>0 && FSHIClose>0)
