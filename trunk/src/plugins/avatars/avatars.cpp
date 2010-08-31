@@ -401,7 +401,7 @@ QImage Avatars::avatarImage(const Jid &AContactJid) const
 		QString fileName = avatarFileName(hash);
 		if (QFile::exists(fileName))
 		{
-			QImage image = QImage(fileName).scaled(FAvatarSize,Qt::KeepAspectRatio,Qt::FastTransformation);
+			QImage image = QImage(fileName).scaled(FAvatarSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
 			if (!image.isNull())
 				FAvatarImages.insert(hash,image);
 			return image;
