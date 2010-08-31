@@ -61,6 +61,10 @@ OptionsDialog::~OptionsDialog()
 {
 	Options::setFileValue(saveGeometry(),"optionsmanager.optionsdialog.geometry");
 	Options::setFileValue(ui.sprSplitter->saveState(),"optionsmanager.optionsdialog.splitter.state");
+
+	disconnect(FOptionsManager->instance(), 0, this, 0);
+	disconnect(ui.trvNodes->selectionModel(), 0, this, 0);
+	FCleanupHandler.clear();
 }
 
 void OptionsDialog::showNode(const QString &ANodeId)

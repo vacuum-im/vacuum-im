@@ -21,6 +21,7 @@ LEGEND
   [-] It was impossible to set the empty status text
   [-] At an account the following sign to the global status could be lost after reconnection because of breakage of connection with a server
   [-] Windows with new messages does not always pop up on top of other windows
+  [-] Application may fail on closing options dialog
 
 
 v1.0.2
