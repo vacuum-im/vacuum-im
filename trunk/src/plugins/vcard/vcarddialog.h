@@ -2,13 +2,12 @@
 #define VCARDDIALOG_H
 
 #include <QDialog>
-#include <QEvent>
-#include <QResizeEvent>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <interfaces/ivcard.h>
 #include <utils/iconstorage.h>
+#include "edititemdialog.h"
 #include "ui_vcarddialog.h"
 
 class VCardDialog :
@@ -21,24 +20,15 @@ public:
 	virtual Jid streamJid() const { return FStreamJid; }
 	virtual Jid contactJid() const { return FContactJid; }
 protected:
-	void reloadVCard();
-	void publishVCard();
 	void updateDialog();
 	void updateVCard();
 	void setPhoto(const QPixmap &APhoto);
 	void setLogo(const QPixmap &ALogo);
-	void updatePhotoLabel(const QSize &ASize);
-	void updateLogoLabel(const QSize &ASize);
-protected:
-	virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onVCardUpdated();
 	void onVCardPublished();
 	void onVCardError(const QString &AError);
-	void onUpdateClicked();
-	void onPublishClicked();
-	void onClearClicked();
-	void onCloseClicked();
+	void onUpdateDialogTimeout();
 	void onPhotoSaveClicked();
 	void onPhotoLoadClicked();
 	void onPhotoClearClicked();
@@ -51,15 +41,18 @@ protected slots:
 	void onPhoneAddClicked();
 	void onPhoneDeleteClicked();
 	void onPhoneItemActivated(QListWidgetItem *AItem);
+	void onDialogButtonClicked(QAbstractButton *AButton);
 private:
 	Ui::VCardDialogClass ui;
 private:
-	QPixmap FLogo;
-	QPixmap FPhoto;
-	Jid FContactJid;
-	Jid FStreamJid;
 	IVCard *FVCard;
 	IVCardPlugin *FVCardPlugin;
+private:
+	Jid FContactJid;
+	Jid FStreamJid;
+	QPixmap FLogo;
+	QPixmap FPhoto;
+	bool FSaveClisked;
 };
 
 #endif // VCARDDIALOG_H

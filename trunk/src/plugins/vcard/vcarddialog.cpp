@@ -2,8 +2,6 @@
 
 #include <QMessageBox>
 #include <QFileDialog>
-#include "edititemdialog.h"
-
 
 VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid)
 {
@@ -16,25 +14,20 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	FStreamJid = AStreamJid;
 	FVCardPlugin = AVCardPlugin;
 
-	ui.lblPhoto->installEventFilter(this);
-	ui.lblLogo->installEventFilter(this);
+	FSaveClisked = false;
 
-	ui.pbtPublish->setVisible(FContactJid && FStreamJid);
-	ui.pbtClear->setVisible(FContactJid && FStreamJid);
+	if (FStreamJid && FContactJid)
+		ui.btbButtons->setStandardButtons(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
+	else
+		ui.btbButtons->setStandardButtons(QDialogButtonBox::Ok);
+	ui.btbButtons->addButton(tr("Reload"),QDialogButtonBox::ResetRole);
+	connect(ui.btbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
 	FVCard = FVCardPlugin->vcard(FContactJid);
 	connect(FVCard->instance(),SIGNAL(vcardUpdated()),SLOT(onVCardUpdated()));
 	connect(FVCard->instance(),SIGNAL(vcardPublished()),SLOT(onVCardPublished()));
 	connect(FVCard->instance(),SIGNAL(vcardError(const QString &)),SLOT(onVCardError(const QString &)));
 
-	updateDialog();
-	if (FVCard->isEmpty())
-		reloadVCard();
-
-	connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
-	connect(ui.pbtPublish,SIGNAL(clicked()),SLOT(onPublishClicked()));
-	connect(ui.pbtClear,SIGNAL(clicked()),SLOT(onClearClicked()));
-	connect(ui.pbtClose,SIGNAL(clicked()),SLOT(onCloseClicked()));
 	connect(ui.tlbPhotoSave,SIGNAL(clicked()),SLOT(onPhotoSaveClicked()));
 	connect(ui.tlbPhotoLoad,SIGNAL(clicked()),SLOT(onPhotoLoadClicked()));
 	connect(ui.tlbPhotoClear,SIGNAL(clicked()),SLOT(onPhotoClearClicked()));
@@ -47,33 +40,17 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	connect(ui.tlbPhoneAdd,SIGNAL(clicked()),SLOT(onPhoneAddClicked()));
 	connect(ui.tlbPhoneDelete,SIGNAL(clicked()),SLOT(onPhoneDeleteClicked()));
 	connect(ui.ltwPhones,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onPhoneItemActivated(QListWidgetItem *)));
+	
+	if (FVCard->isEmpty())
+		FVCard->update(FStreamJid);
+
+	ui.twtVCard->setCurrentIndex(0);
+	updateDialog();
 }
 
 VCardDialog::~VCardDialog()
 {
 	FVCard->unlock();
-}
-
-void VCardDialog::reloadVCard()
-{
-	if (FVCard->update(FStreamJid))
-	{
-		ui.pbtUpdate->setEnabled(false);
-		ui.pbtPublish->setEnabled(false);
-		ui.pbtClear->setEnabled(false);
-		ui.twtVCard->setEnabled(false);
-	}
-}
-
-void VCardDialog::publishVCard()
-{
-	if (FVCard->publish(FStreamJid))
-	{
-		ui.pbtUpdate->setEnabled(false);
-		ui.pbtPublish->setEnabled(false);
-		ui.pbtClear->setEnabled(false);
-		ui.twtVCard->setEnabled(false);
-	}
 }
 
 void VCardDialog::updateDialog()
@@ -238,94 +215,48 @@ void VCardDialog::updateVCard()
 void VCardDialog::setPhoto(const QPixmap &APhoto)
 {
 	FPhoto = APhoto;
-	if (!FPhoto.isNull())
-		updatePhotoLabel(ui.lblPhoto->size());
-	else
-		ui.lblPhoto->clear();
+	ui.pmfPhoto->setPixmap(FPhoto);
 	ui.tlbPhotoSave->setVisible(!FPhoto.isNull());
 }
 
 void VCardDialog::setLogo(const QPixmap &ALogo)
 {
 	FLogo = ALogo;
-	if (!FLogo.isNull())
-		updateLogoLabel(ui.lblLogo->size());
-	else
-		ui.lblLogo->clear();
+	ui.pmfLogo->setPixmap(FLogo);
 	ui.tlbLogoSave->setVisible(!FLogo.isNull());
-}
-
-void VCardDialog::updatePhotoLabel(const QSize &ASize)
-{
-	if (!FPhoto.isNull())
-		ui.lblPhoto->setPixmap(FPhoto.scaled(ASize-QSize(5,5),Qt::KeepAspectRatio));
-}
-
-void VCardDialog::updateLogoLabel(const QSize &ASize)
-{
-	if (!FLogo.isNull())
-		ui.lblLogo->setPixmap(FLogo.scaled(ASize-QSize(5,5),Qt::KeepAspectRatio));
-}
-
-bool VCardDialog::eventFilter(QObject *AObject, QEvent *AEvent)
-{
-	if (AEvent->type() == QEvent::Resize)
-	{
-		QResizeEvent *resizeEvent = static_cast<QResizeEvent *>(AEvent);
-		if (AObject == ui.lblPhoto)
-			updatePhotoLabel(resizeEvent->size());
-		else if (AObject == ui.lblLogo)
-			updateLogoLabel(resizeEvent->size());
-	}
-	return QDialog::eventFilter(AObject,AEvent);
 }
 
 void VCardDialog::onVCardUpdated()
 {
-	ui.pbtUpdate->setEnabled(true);
-	ui.pbtPublish->setEnabled(true);
-	ui.pbtClear->setEnabled(true);
+	ui.btbButtons->setEnabled(true);
 	ui.twtVCard->setEnabled(true);
 	updateDialog();
 }
 
 void VCardDialog::onVCardPublished()
 {
-	ui.pbtUpdate->setEnabled(true);
-	ui.pbtPublish->setEnabled(true);
-	ui.pbtClear->setEnabled(true);
-	ui.twtVCard->setEnabled(true);
+	if (!FSaveClisked)
+	{
+		ui.btbButtons->setEnabled(true);
+		ui.twtVCard->setEnabled(true);
+	}
+	else
+	{
+		accept();
+	}
 }
 
 void VCardDialog::onVCardError(const QString &AError)
 {
-	QMessageBox::critical(this,tr("vCard error"),tr("vCard request or publish failed.<br>%1").arg(AError));
-	ui.pbtUpdate->setEnabled(true);
-	ui.pbtPublish->setEnabled(true);
-	ui.pbtClear->setEnabled(true);
+	FSaveClisked = false;
+	ui.btbButtons->setEnabled(true);
 	ui.twtVCard->setEnabled(true);
+	QMessageBox::critical(this,tr("vCard error"),tr("vCard request or publish failed.<br>%1").arg(Qt::escape(AError)));
 }
 
-void VCardDialog::onUpdateClicked()
+void VCardDialog::onUpdateDialogTimeout()
 {
-	reloadVCard();
-}
-
-void VCardDialog::onPublishClicked()
-{
-	updateVCard();
-	publishVCard();
-}
-
-void VCardDialog::onClearClicked()
-{
-	FVCard->clear();
 	updateDialog();
-}
-
-void VCardDialog::onCloseClicked()
-{
-	close();
 }
 
 void VCardDialog::onPhotoSaveClicked()
@@ -450,3 +381,32 @@ void VCardDialog::onPhoneItemActivated(QListWidgetItem *AItem)
 	}
 }
 
+void VCardDialog::onDialogButtonClicked(QAbstractButton *AButton)
+{
+	if (ui.btbButtons->standardButton(AButton) == QDialogButtonBox::Ok)
+	{
+		accept();
+	}
+	else if (ui.btbButtons->standardButton(AButton) == QDialogButtonBox::Save)
+	{
+		updateVCard();
+		if (FVCard->publish(FStreamJid))
+		{
+			ui.btbButtons->setEnabled(false);
+			ui.twtVCard->setEnabled(false);
+			FSaveClisked = true;
+		}
+	}
+	else if (ui.btbButtons->standardButton(AButton) == QDialogButtonBox::Cancel)
+	{
+		reject();
+	}
+	else if (ui.btbButtons->buttonRole(AButton) == QDialogButtonBox::ResetRole)
+	{
+		if (FVCard->update(FStreamJid))
+		{
+			ui.btbButtons->setEnabled(false);
+			ui.twtVCard->setEnabled(false);
+		}
+	}
+}
