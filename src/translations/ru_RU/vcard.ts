@@ -42,6 +42,10 @@
         <source>Phone:</source>
         <translation>Телефон:</translation>
     </message>
+    <message>
+        <source>Reload</source>
+        <translation>Обновить</translation>
+    </message>
 </context>
 <context>
     <name>VCardDialogClass</name>
@@ -192,18 +196,6 @@
     <message>
         <source>Comments</source>
         <translation>Комментарии</translation>
-    </message>
-    <message>
-        <source>Reload</source>
-        <translation>Обновить</translation>
-    </message>
-    <message>
-        <source>Publish</source>
-        <translation>Опубликовать</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Закрыть</translation>
     </message>
     <message>
         <source>Marital status</source>

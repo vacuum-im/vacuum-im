@@ -7,12 +7,12 @@
     <x>0</x>
     <y>0</y>
     <width>449</width>
-    <height>251</height>
+    <height>250</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="margin">
-    <number>3</number>
+    <number>5</number>
    </property>
    <item>
     <widget class="QTabWidget" name="twtVCard">
@@ -20,9 +20,6 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="tabGeneral">
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
       <attribute name="title">
        <string>General</string>
       </attribute>
@@ -129,9 +126,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabPersonal">
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
       <attribute name="title">
        <string>Personal</string>
       </attribute>
@@ -327,9 +321,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabAdress">
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
       <attribute name="title">
        <string>Adress</string>
       </attribute>
@@ -530,9 +521,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabContacts">
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
       <attribute name="title">
        <string>Contacts</string>
       </attribute>
@@ -639,9 +627,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabPhoto">
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
       <attribute name="title">
        <string>Photo</string>
       </attribute>
@@ -651,6 +636,12 @@
        </property>
        <item>
         <widget class="QGroupBox" name="grbPhoto">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="title">
           <string>Photo</string>
          </property>
@@ -662,7 +653,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="lblPhoto">
+           <widget class="PrixmapFrame" name="pmfPhoto">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -671,15 +662,6 @@
             </property>
             <property name="frameShape">
              <enum>QFrame::Box</enum>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::PlainText</enum>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -731,6 +713,12 @@
        </item>
        <item>
         <widget class="QGroupBox" name="grbLogo">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="title">
           <string>Logo</string>
          </property>
@@ -742,7 +730,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="lblLogo">
+           <widget class="PrixmapFrame" name="pmfLogo">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -751,15 +739,6 @@
             </property>
             <property name="frameShape">
              <enum>QFrame::Box</enum>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::PlainText</enum>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -812,9 +791,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabComments">
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
       <attribute name="title">
        <string>Comments</string>
       </attribute>
@@ -830,53 +806,23 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="lotButtons">
-     <item>
-      <widget class="QPushButton" name="pbtUpdate">
-       <property name="text">
-        <string>Reload</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbtPublish">
-       <property name="text">
-        <string>Publish</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbtClear">
-       <property name="text">
-        <string>Clear</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbtClose">
-       <property name="text">
-        <string>Close</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QDialogButtonBox" name="btbButtons">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>PrixmapFrame</class>
+   <extends>QFrame</extends>
+   <header>prixmapframe.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>twtVCard</tabstop>
   <tabstop>lneFullName</tabstop>
@@ -903,7 +849,6 @@
   <tabstop>lneWorkState</tabstop>
   <tabstop>lneWorkZip</tabstop>
   <tabstop>lneWorkCountry</tabstop>
-  <tabstop>pbtClose</tabstop>
  </tabstops>
  <resources/>
  <connections/>

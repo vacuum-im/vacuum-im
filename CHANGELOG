@@ -22,6 +22,7 @@ LEGEND
   [-] At an account the following sign to the global status could be lost after reconnection because of breakage of connection with a server
   [-] Windows with new messages does not always pop up on top of other windows
   [-] Application may fail on closing options dialog
+  [-] Fixed problems displaying photos in vCard
 
 
 v1.0.2
