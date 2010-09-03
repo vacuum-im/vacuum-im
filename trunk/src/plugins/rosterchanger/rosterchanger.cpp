@@ -818,8 +818,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 	const IRosterItem &ritem = ARoster->rosterItem(AContactJid);
 	if (ASubsType == IRoster::Subscribe)
 	{
-		bool autoSubscribe = isAutoSubscribe(ARoster->streamJid(),AContactJid);
-		if (!autoSubscribe && ritem.subscription!=SUBSCRIPTION_FROM && ritem.subscription!=SUBSCRIPTION_BOTH)
+		if (!isAutoSubscribe(ARoster->streamJid(),AContactJid) && ritem.subscription!=SUBSCRIPTION_FROM && ritem.subscription!=SUBSCRIPTION_BOTH)
 		{
 			dialog = createSubscriptionDialog(ARoster->streamJid(),AContactJid,subscriptionNotify(ASubsType,AContactJid),AMessage);
 			if (dialog!=NULL && !FNotifyDialog.values().contains(dialog))
@@ -838,7 +837,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 		else
 		{
 			ARoster->sendSubscription(AContactJid,IRoster::Subscribed);
-			if (autoSubscribe && ritem.subscription!=SUBSCRIPTION_TO && ritem.subscription!=SUBSCRIPTION_BOTH)
+			if (isAutoSubscribe(ARoster->streamJid(),AContactJid) && ritem.subscription!=SUBSCRIPTION_TO && ritem.subscription!=SUBSCRIPTION_BOTH)
 				ARoster->sendSubscription(AContactJid,IRoster::Subscribe);
 		}
 	}
@@ -847,7 +846,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 		if (FNotifications && !isSilentSubsctiption(ARoster->streamJid(),AContactJid))
 			notifyId = FNotifications->appendNotification(notify);
 
-		if (isAutoUnsubscribe(ARoster->streamJid(),AContactJid))
+		if (isAutoUnsubscribe(ARoster->streamJid(),AContactJid) && ritem.subscription!=SUBSCRIPTION_TO && ritem.subscription!=SUBSCRIPTION_NONE)
 			ARoster->sendSubscription(AContactJid,IRoster::Unsubscribed);
 	}
 	else  if (ASubsType == IRoster::Subscribed)
