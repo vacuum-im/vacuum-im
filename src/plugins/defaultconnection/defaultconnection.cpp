@@ -222,10 +222,15 @@ void DefaultConnection::onDnsError(int AId, QJDns::Error AError)
 void DefaultConnection::onDnsShutdownFinished()
 {
 	if (FSrvQueryId != STOP_QUERY_ID)
+	{
+		FSrvQueryId = START_QUERY_ID;
 		connectToNextHost();
+	}
 	else
+	{
+		FSrvQueryId = START_QUERY_ID;
 		emit disconnected();
-	FSrvQueryId = START_QUERY_ID;
+	}
 }
 
 void DefaultConnection::onSocketConnected()
