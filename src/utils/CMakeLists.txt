@@ -20,11 +20,11 @@ set_target_properties(${TARGET_UTILS} PROPERTIES
 	VERSION "${VERSION_UTILS}"
 	SOVERSION "${VERSION_UTILS_ABI}")
 
-if (UNIX AND NOT APPLE)
-	set(ADD_LIBS idn minizip "-lz")
-else (UNIX AND NOT APPLE)
+if (SYSTEM_ZLIB_FOUND)
+	set(ADD_LIBS idn minizip "${SYSTEM_ZLIB_FOUND}")
+else (SYSTEM_ZLIB_FOUND)
 	set(ADD_LIBS idn minizip zlib)
-endif (UNIX AND NOT APPLE)
+endif (SYSTEM_ZLIB_FOUND)
 
 target_link_libraries(${TARGET_UTILS} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
 target_link_libraries(${TARGET_UTILS} ${QT_LIBRARIES} ${ADD_LIBS})

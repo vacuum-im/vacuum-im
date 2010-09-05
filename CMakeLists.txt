@@ -20,6 +20,8 @@ set(LANGS "" CACHE STRING "List of languages to build localization for (this var
 set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
 add_lang_options()
 
+find_library(SYSTEM_ZLIB_FOUND z)
+
 if ("${LANGS}" STREQUAL "")
 	process_lang_options()
 else ("${LANGS}" STREQUAL "")
