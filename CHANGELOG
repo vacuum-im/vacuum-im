@@ -24,6 +24,7 @@ LEGEND
   [-] Application may fail on closing options dialog
   [-] Fixed problems displaying photos in vCard
   [-] Application may fail on unsuccessful attempt to connect
+  [-] Not all history messages collections with the same start time was displayed in hisroty window
 
 
 v1.0.2

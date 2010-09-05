@@ -63,7 +63,7 @@ struct IArchiveHeader
 	QString threadId;
 	int version;
 	bool operator<(const IArchiveHeader &AOther) const {
-		return start<AOther.start;
+		return start<AOther.start || with<AOther.with;
 	}
 	bool operator==(const IArchiveHeader &AOther) const {
 		return with==AOther.with && start==AOther.start;
