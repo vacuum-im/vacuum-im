@@ -303,6 +303,7 @@ QList<IArchiveHeader> ViewHistoryWindow::indexHeaders(const QModelIndex &AIndex)
 		IArchiveHeader header;
 		header.with = AIndex.data(HDR_HEADER_WITH).toString();
 		header.start = AIndex.data(HDR_HEADER_START).toDateTime();
+		header.threadId = AIndex.data(HDR_HEADER_THREAD).toString();
 		headers.append(header);
 	}
 
