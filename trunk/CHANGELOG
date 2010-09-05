@@ -23,6 +23,7 @@ LEGEND
   [-] Windows with new messages does not always pop up on top of other windows
   [-] Application may fail on closing options dialog
   [-] Fixed problems displaying photos in vCard
+  [-] Application may fail on unsuccessful attempt to connect
 
 
 v1.0.2
