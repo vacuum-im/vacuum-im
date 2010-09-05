@@ -25,7 +25,7 @@ LEGEND
   [-] Fixed problems displaying photos in vCard
   [-] Application may fail on unsuccessful attempt to connect
   [-] Not all history messages collections with the same start time was displayed in hisroty window
-
+  [-] Recent messages with specified ThreadId could not be deleted from local archive
 
 v1.0.2
 ------
