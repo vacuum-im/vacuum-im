@@ -1,0 +1,6 @@
+#ifndef DEF_FSHANDLERORDERS_H
+#define DEF_FSHANDLERORDERS_H
+
+#define FSHO_FILETRANSFER               500
+
+#endif // DEF_FSHANDLERORDERS_H

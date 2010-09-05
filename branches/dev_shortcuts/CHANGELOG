@@ -1,0 +1,87 @@
+LEGEND
+------
+  [!] New plugin
+  [+] New feature
+  [*] Enhancement
+  [-] Bug fix
+
+
+
+------
+  [!] Added new plugin for remote controlling
+  [+] Added ability to show tabs at the bottom of the tab windows
+  [+] Added support of XEP-0199 - XMPP Ping
+  [*} Changed the format of the qoutes design
+  [*] Server side archive preferences support is not longer required for retrieving messages history from server
+  [*] Added ability to switch between tabs by shortkeys Alt+Number
+  [-] When converting smileys into the text instead of the first key an arbitrary one was inserted
+  [-] Contacts list window could be displayed outside the visible screen area
+  [-] The roster window was closed by clicking on the tray even if it was inactive
+  [-] Application fails when turn on or off the search in roster
+  [-] It was impossible to set the empty status text
+  [-] At an account the following sign to the global status could be lost after reconnection because of breakage of connection with a server
+  [-] Windows with new messages does not always pop up on top of other windows
+  [-] Application may fail on closing options dialog
+  [-] Fixed problems displaying photos in vCard
+  [-] Application may fail on unsuccessful attempt to connect
+
+
+v1.0.2
+------
+  [+] Added ability to store additional resources in the application data folder
+  [+] Added status iconset for "vKontakte" users
+  [+] Send button is added to the messages standard input field
+  [+] Added support for query of service uptime and idle time of contact
+  [+] Added support for sending a file by dragging it in the chat window
+  [*] In the case when failed to identify a registered conference nick, by default invited to use the nickname from the vCard
+  [*] Button "Exit room" moved from the tools menu directly on the toolbar
+  [*] Saving the directory of the last selected file in the file transfer dialog
+  [-] Unable to login to some servers in some cases
+  [-] Offline messages may not be saved in the local message archive
+  [-] History continues to load from a local file after switching to a server archive
+  [-] When the replication of server archive is enabled than the ongoing chat could not completely copied to a local disk
+  [-] The main status could be displayed as "offline" even when one of the accounts is connected
+  [-] The socks5-proxy on native server has not been automatically added to available proxy list
+  [-] Triggering of avtostatus rule could lead to connect of offline accounts
+  [-] It is not been possible to establish a direct connection for file transfer, if the default proxy has been set
+  [-] Some settings can not be saved in case of turning off the computer without exit the application
+
+
+v1.0.1
+------
+  [+] Added a notification when referring to you in the conference
+  [+] Added option to automatically activate the notification
+  [+] Added possibility to open all active conference
+  [+] Added possibility to insert a nick on middle mouse click on the conference user 
+  [+] Added Polish localization (thanks les.kamil)
+  [+] Added the ability to quickly add a user through the gateways in the account context menu
+  [+] Button added to easily enable or disable sound notification
+  [+] Added ability to quote the selected text in chat windows and conferences
+  [+] Added ability to insert date and start time of inactivity in the auto status message
+  [+] Added ability to copy to the clipboard, some parameters of the roster elements
+  [*] Significantly redesigned interface of chat windows and conferences
+  [*] Implemented sorting user affiliation and roles in conferences
+  [*] Adium message style yMous in a white version set as default
+  [*] Optimized manage subscriptions
+  [*] Changed way to connect to GTalk account, so that the server could not change the connection resource
+  [*] Added the possibility not to transfer the OS version in response to request for information about the client
+  [*] Improved algorithm for management account status
+  [*] In the message kik/ban user in the conference indicated its real Jabber ID
+  [*] You can disable sound notification when the status is set "Do Not Disturb"
+  [*] Centralized configuration and management of proxy servers
+  [-] Application fails when using Drag-n-Drop in Linux systems
+  [-] Application fails on systems without the system tray
+  [-] Application does not run on a "clean machine" with Windows OS
+  [-] Could not initialize the XMPP stream with some servers
+  [-] It was impossible to connect to the server with an empty response to the SRV request
+  [-] Fixed work Adium styles in Qt 4.6.x
+  [-] VCard user could wrongly requested from the server when called from the menu of the chat window
+  [-] In the chat window and conferences using Adium style could open a random link
+  [-] The avatars data was not correctly sent in the response to iq-request
+  [-] Fixed client behavior when you connect the second resource without support vCrad-based avatars
+  [-] The contact group was not expanded when roster notification inserted
+
+
+v1.0.0
+------
+  initial version
