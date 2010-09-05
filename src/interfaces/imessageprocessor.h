@@ -13,8 +13,8 @@ class IMessageHandler
 {
 public:
 	virtual bool checkMessage(int AOrder, const Message &AMessage) =0;
-	virtual void showMessage(int AMessageId) =0;
-	virtual void receiveMessage(int AMessageId) =0;
+	virtual bool showMessage(int AMessageId) =0;
+	virtual bool receiveMessage(int AMessageId) =0;
 	virtual INotification notification(INotifications *ANotifications, const Message &AMessage) =0;
 	virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) =0;
 };

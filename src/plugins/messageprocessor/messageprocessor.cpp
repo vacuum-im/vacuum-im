@@ -27,8 +27,9 @@ void MessageProcessor::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
 	{
@@ -36,10 +37,8 @@ bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &/*AI
 		if (FXmppStreams)
 		{
 			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(jidAboutToBeChanged(IXmppStream *, const Jid &)),
-			        SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &)));
-			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),
-			        SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
+			connect(FXmppStreams->instance(),SIGNAL(jidAboutToBeChanged(IXmppStream *, const Jid &)),SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &)));
+			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
 		}
@@ -83,8 +82,7 @@ bool MessageProcessor::stanzaRead(int AHandlerId, const Jid &AStreamJid, const S
 	if (FSHIMessages.value(AStreamJid) == AHandlerId)
 	{
 		Message message(AStanza);
-		bool received = receiveMessage(message) > 0;
-		AAccept = AAccept || received;
+		AAccept = receiveMessage(message)>0 || AAccept;
 	}
 	return false;
 }
@@ -131,9 +129,16 @@ int MessageProcessor::receiveMessage(const Message &AMessage)
 		FHandlerForMessage.insert(messageId,handler);
 
 		emit messageReceive(message);
-		notifyMessage(messageId);
-		handler->receiveMessage(messageId);
-		emit messageReceived(message);
+		if (handler->receiveMessage(messageId))
+		{
+			notifyMessage(messageId);
+			emit messageReceived(message);
+		}
+		else
+		{
+			emit messageReceived(message);
+			removeMessage(messageId);
+		}
 	}
 	return messageId;
 }
@@ -361,8 +366,9 @@ void MessageProcessor::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, con
 		removeStreamMessages(AXmppStream->streamJid());
 }
 
-void MessageProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &/*ABefore*/)
+void MessageProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
+	Q_UNUSED(ABefore);
 	QMap<int,Message>::iterator it = FMessages.begin();
 	while (it != FMessages.end())
 	{

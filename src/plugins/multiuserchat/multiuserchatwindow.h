@@ -61,8 +61,8 @@ public:
 	virtual void closeWindow();
 	//IMessageHandler
 	virtual bool checkMessage(int AOrder, const Message &AMessage);
-	virtual void receiveMessage(int AMessageId);
-	virtual void showMessage(int AMessageId);
+	virtual bool receiveMessage(int AMessageId);
+	virtual bool showMessage(int AMessageId);
 	virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
 	virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
 	//IMultiUserChatWindow

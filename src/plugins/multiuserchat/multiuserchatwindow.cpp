@@ -14,8 +14,6 @@
 
 #define NICK_MENU_KEY               Qt::Key_Tab
 
-#define CONSECUTIVE_TIMEOUT         2*60
-
 #define HISTORY_MESSAGES            10
 #define HISTORY_TIME_PAST           5
 
@@ -112,51 +110,51 @@ bool MultiUserChatWindow::checkMessage(int AOrder, const Message &AMessage)
 	return (streamJid() == AMessage.to()) && (roomJid() && AMessage.from());
 }
 
-void MultiUserChatWindow::receiveMessage(int AMessageId)
+bool MultiUserChatWindow::receiveMessage(int AMessageId)
 {
+	bool notify = false;
 	Message message = FMessageProcessor->messageById(AMessageId);
 	Jid contactJid = message.from();
 
-	if (message.type() == Message::Error)
+	if (message.type() != Message::Error)
 	{
-		FMessageProcessor->removeMessage(AMessageId);
-	}
-	else if (contactJid.resource().isEmpty() && !message.stanza().firstElement("x",NS_JABBER_DATA).isNull())
-	{
-		IDataForm form = FDataForms->dataForm(message.stanza().firstElement("x",NS_JABBER_DATA));
-		IDataDialogWidget *dialog = FDataForms->dialogWidget(form,this);
-		connect(dialog->instance(),SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
-		showMessage(tr("Data form received: %1").arg(form.title),IMessageContentOptions::Notification);
-		FDataFormMessages.insert(AMessageId,dialog);
-	}
-	else if (message.type() == Message::GroupChat)
-	{
-		if (!isActive())
+		if (contactJid.resource().isEmpty() && !message.stanza().firstElement("x",NS_JABBER_DATA).isNull())
 		{
-			FActiveMessages.append(AMessageId);
-			updateWindow();
+			IDataForm form = FDataForms->dataForm(message.stanza().firstElement("x",NS_JABBER_DATA));
+			IDataDialogWidget *dialog = FDataForms->dialogWidget(form,this);
+			connect(dialog->instance(),SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
+			showMessage(tr("Data form received: %1").arg(form.title),IMessageContentOptions::Notification);
+			FDataFormMessages.insert(AMessageId,dialog);
+			notify = true;
+		}
+		else if (message.type() == Message::GroupChat)
+		{
+			if (!isActive())
+			{
+				notify = true;
+				FActiveMessages.append(AMessageId);
+				updateWindow();
+			}
 		}
 		else
-			FMessageProcessor->removeMessage(AMessageId);
-	}
-	else
-	{
-		IChatWindow *window = getChatWindow(contactJid);
-		if (window)
 		{
-			if (!window->isActive())
+			IChatWindow *window = getChatWindow(contactJid);
+			if (window)
 			{
-				FActiveChatMessages.insertMulti(window, AMessageId);
-				updateChatWindow(window);
-				updateListItem(contactJid);
+				if (!window->isActive())
+				{
+					notify = true;
+					FActiveChatMessages.insertMulti(window, AMessageId);
+					updateChatWindow(window);
+					updateListItem(contactJid);
+				}
 			}
-			else
-				FMessageProcessor->removeMessage(AMessageId);
 		}
 	}
+	return notify;
 }
 
-void MultiUserChatWindow::showMessage(int AMessageId)
+bool MultiUserChatWindow::showMessage(int AMessageId)
 {
 	if (FDataFormMessages.contains(AMessageId))
 	{
@@ -165,13 +163,15 @@ void MultiUserChatWindow::showMessage(int AMessageId)
 		{
 			dialog->instance()->show();
 			FMessageProcessor->removeMessage(AMessageId);
+			return true;
 		}
 	}
 	else
 	{
 		Message message = FMessageProcessor->messageById(AMessageId);
-		openWindow(MHO_MULTIUSERCHAT_GROUPCHAT,message.to(),message.from(),message.type());
+		return openWindow(MHO_MULTIUSERCHAT_GROUPCHAT,message.to(),message.from(),message.type());
 	}
+	return false;
 }
 
 INotification MultiUserChatWindow::notification(INotifications *ANotifications, const Message &AMessage)

@@ -4,7 +4,6 @@
 #define HISTORY_TIME_PAST         5
 
 #define DESTROYWINDOW_TIMEOUT     30*60*1000
-#define CONSECUTIVE_TIMEOUT       2*60
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
@@ -180,16 +179,17 @@ bool ChatMessageHandler::checkMessage(int AOrder, const Message &AMessage)
 	return false;
 }
 
-void ChatMessageHandler::showMessage(int AMessageId)
+bool ChatMessageHandler::showMessage(int AMessageId)
 {
 	Message message = FMessageProcessor->messageById(AMessageId);
 	Jid streamJid = message.to();
 	Jid contactJid = message.from();
-	openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,message.type());
+	return openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,message.type());
 }
 
-void ChatMessageHandler::receiveMessage(int AMessageId)
+bool ChatMessageHandler::receiveMessage(int AMessageId)
 {
+	bool notify = false;
 	Message message = FMessageProcessor->messageById(AMessageId);
 	IChatWindow *window = getWindow(message.to(),message.from());
 	if (window)
@@ -197,19 +197,19 @@ void ChatMessageHandler::receiveMessage(int AMessageId)
 		showStyledMessage(window,message);
 		if (!window->isActive())
 		{
+			notify = true;
 			FActiveMessages.insertMulti(window, AMessageId);
 			updateWindow(window);
 		}
-		else
-			FMessageProcessor->removeMessage(AMessageId);
 	}
+	return notify;
 }
 
 INotification ChatMessageHandler::notification(INotifications *ANotifications, const Message &AMessage)
 {
 	IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
-	QIcon icon =  storage->getIcon(MNI_CHAT_MHANDLER_MESSAGE);
-	QString name= ANotifications->contactName(AMessage.to(),AMessage.from());
+	QIcon icon = storage->getIcon(MNI_CHAT_MHANDLER_MESSAGE);
+	QString name = ANotifications->contactName(AMessage.to(),AMessage.from());
 
 	INotification notify;
 	notify.kinds = ANotifications->notificatorKinds(CHAT_NOTIFICATOR_ID);

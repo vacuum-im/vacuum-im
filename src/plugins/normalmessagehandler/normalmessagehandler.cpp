@@ -146,15 +146,15 @@ bool NormalMessageHandler::checkMessage(int AOrder, const Message &AMessage)
 	return false;
 }
 
-void NormalMessageHandler::showMessage(int AMessageId)
+bool NormalMessageHandler::showMessage(int AMessageId)
 {
 	Message message = FMessageProcessor->messageById(AMessageId);
 	Jid streamJid = message.to();
 	Jid contactJid = message.from();
-	openWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,message.type());
+	return openWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,message.type());
 }
 
-void NormalMessageHandler::receiveMessage(int AMessageId)
+bool NormalMessageHandler::receiveMessage(int AMessageId)
 {
 	Message message = FMessageProcessor->messageById(AMessageId);
 	IMessageWindow *window = findWindow(message.to(),message.from());
@@ -164,7 +164,10 @@ void NormalMessageHandler::receiveMessage(int AMessageId)
 		updateWindow(window);
 	}
 	else
+	{
 		FActiveMessages.insertMulti(NULL,AMessageId);
+	}
+	return true;
 }
 
 INotification NormalMessageHandler::notification(INotifications *ANotifications, const Message &AMessage)

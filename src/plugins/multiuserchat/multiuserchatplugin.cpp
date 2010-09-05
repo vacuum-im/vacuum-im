@@ -363,12 +363,13 @@ bool MultiUserChatPlugin::checkMessage(int AOrder, const Message &AMessage)
 	return !AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite").isNull();
 }
 
-void MultiUserChatPlugin::receiveMessage(int AMessageId)
+bool MultiUserChatPlugin::receiveMessage(int AMessageId)
 {
 	FActiveInvites.append(AMessageId);
+	return true;
 }
 
-void MultiUserChatPlugin::showMessage(int AMessageId)
+bool MultiUserChatPlugin::showMessage(int AMessageId)
 {
 	Message message = FMessageProcessor->messageById(AMessageId);
 	QDomElement inviteElem = message.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
@@ -397,6 +398,7 @@ void MultiUserChatPlugin::showMessage(int AMessageId)
 	}
 	FActiveInvites.removeAt(FActiveInvites.indexOf(AMessageId ));
 	FMessageProcessor->removeMessage(AMessageId);
+	return true;
 }
 
 INotification MultiUserChatPlugin::notification(INotifications *ANotifications, const Message &AMessage)
