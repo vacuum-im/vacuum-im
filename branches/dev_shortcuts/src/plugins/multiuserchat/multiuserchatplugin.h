@@ -12,6 +12,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
+#include <definitions/shortcuts.h>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -29,6 +30,7 @@
 #include <interfaces/ivcard.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <utils/shortcuts.h>
 #include <utils/message.h>
 #include <utils/action.h>
 #include "multiuserchat.h"

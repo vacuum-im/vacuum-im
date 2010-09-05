@@ -12,6 +12,7 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/irostersview.h>
@@ -25,6 +26,7 @@
 #include <interfaces/imainwindow.h>
 #include <utils/action.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include "notifywidget.h"
 #include "optionswidget.h"
 #include "notifykindswidget.h"

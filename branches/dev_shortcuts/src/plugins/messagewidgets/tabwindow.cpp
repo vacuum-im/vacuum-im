@@ -16,18 +16,6 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	ui.twtTabs->removeTab(0);
 	ui.twtTabs->setMovable(true);
 
-	QSignalMapper *tabMapper = new QSignalMapper(this);
-	for (int digit=1; digit<=10; digit++)
-	{
-		QKeySequence key(QString("Alt+%1").arg(digit % 10));
-		QShortcut *shortcut = new QShortcut(key, this);
-		tabMapper->setMapping(shortcut, digit-1); // QTabWidget's indices are 0-based
-		connect(shortcut, SIGNAL(activated()),
-				tabMapper, SLOT(map()));
-	}
-	connect(tabMapper, SIGNAL(mapped(int)),
-			ui.twtTabs, SLOT(setCurrentIndex(int)));
-
 	FWindowId = AWindowId;
 	FMessageWidgets = AMessageWidgets;
 	connect(FMessageWidgets->instance(),SIGNAL(tabWindowAppended(const QUuid &, const QString &)),
@@ -158,32 +146,48 @@ void TabWindow::initialize()
 
 void TabWindow::createActions()
 {
+	QSignalMapper *tabMapper = new QSignalMapper(this);
+	for (int tabNumber=1; tabNumber<=10; tabNumber++)
+	{
+		Action *action = new Action(this);
+		action->setText(tr("Activate tab number %1").arg(tabNumber));
+		action->setShortcutId(QString(SCT_MESSAGING_TABWINDOW_QUICK_TAB).arg(tabNumber));
+		addAction(action);
+
+		tabMapper->setMapping(action, tabNumber-1); // QTabWidget's indices are 0-based
+		connect(action, SIGNAL(triggered()), tabMapper, SLOT(map()));
+	}
+	connect(tabMapper, SIGNAL(mapped(int)),
+			ui.twtTabs, SLOT(setCurrentIndex(int)));
+
 	FNextTab = new Action(FWindowMenu);
 	FNextTab->setText(tr("Next Tab"));
-	FNextTab->setShortcut(tr("Ctrl+Tab"));
+	FNextTab->setShortcutId(SCT_MESSAGING_TABWINDOW_NEXT_TAB);
 	FWindowMenu->addAction(FNextTab,AG_MWTW_MWIDGETS_TAB_ACTIONS);
 	connect(FNextTab,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FPrevTab = new Action(FWindowMenu);
 	FPrevTab->setText(tr("Prev. Tab"));
-	FPrevTab->setShortcut(tr("Ctrl+Shift+Tab"));
+	FPrevTab->setShortcutId(SCT_MESSAGING_TABWINDOW_PREV_TAB);
 	FWindowMenu->addAction(FPrevTab,AG_MWTW_MWIDGETS_TAB_ACTIONS);
 	connect(FPrevTab,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FCloseTab = new Action(FWindowMenu);
 	FCloseTab->setText(tr("Close Tab"));
-	FCloseTab->setShortcut(tr("Esc"));
+	FCloseTab->setShortcutId(SCT_MESSAGING_TABWINDOW_CLOSE_TAB);
 	FWindowMenu->addAction(FCloseTab,AG_MWTW_MWIDGETS_TAB_ACTIONS);
 	connect(FCloseTab,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FDetachWindow = new Action(FWindowMenu);
 	FDetachWindow->setText(tr("Detach to Separate Window"));
+	FDetachWindow->setShortcutId(SCT_MESSAGING_TABWINDOW_DETACH_TAB);
 	FWindowMenu->addAction(FDetachWindow,AG_MWTW_MWIDGETS_TAB_ACTIONS);
 	connect(FDetachWindow,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FJoinMenu = new Menu(FWindowMenu);
 	FJoinMenu->setTitle(tr("Join to"));
 	FWindowMenu->addAction(FJoinMenu->menuAction(),AG_MWTW_MWIDGETS_TAB_ACTIONS);
+
 	foreach(QUuid windowId,FMessageWidgets->tabWindowList())
 		if (windowId!=FWindowId)
 			onTabWindowAppended(windowId, FMessageWidgets->tabWindowName(windowId));
@@ -197,29 +201,34 @@ void TabWindow::createActions()
 	FShowCloseButtons->setText(tr("Tabs Closable"));
 	FShowCloseButtons->setCheckable(true);
 	FShowCloseButtons->setChecked(ui.twtTabs->tabsClosable());
+	FShowCloseButtons->setShortcutId(SCT_MESSAGING_TABWINDOW_SHOW_CLOSE_BUTTTONS);
 	FWindowMenu->addAction(FShowCloseButtons,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FShowCloseButtons,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FTabsBottom = new Action(FWindowMenu);
-	FTabsBottom->setText(tr("Show Tabs at Bootom of the Window"));
+	FTabsBottom->setText(tr("Show Tabs at Bottom of the Window"));
 	FTabsBottom->setCheckable(true);
 	FTabsBottom->setChecked(ui.twtTabs->tabPosition() == QTabWidget::South);
+	FTabsBottom->setShortcutId(SCT_MESSAGING_TABWINDOW_TABS_BOTTOM);
 	FWindowMenu->addAction(FTabsBottom,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FTabsBottom,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FSetAsDefault = new Action(FWindowMenu);
 	FSetAsDefault->setText(tr("Use as Default Tab Window"));
 	FSetAsDefault->setCheckable(true);
+	FSetAsDefault->setShortcutId(SCT_MESSAGING_TABWINDOW_SET_AS_DEFAULT);
 	FWindowMenu->addAction(FSetAsDefault,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FSetAsDefault,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FRenameWindow = new Action(FWindowMenu);
 	FRenameWindow->setText(tr("Rename Tab Window"));
+	FRenameWindow->setShortcutId(SCT_MESSAGING_TABWINDOW_RENAME_WINDOW);
 	FWindowMenu->addAction(FRenameWindow,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FRenameWindow,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FDeleteWindow = new Action(FWindowMenu);
 	FDeleteWindow->setText(tr("Delete Tab Window"));
+	FDeleteWindow->setShortcutId(SCT_MESSAGING_TABWINDOW_DELETE_WINDOW);
 	FWindowMenu->addAction(FDeleteWindow,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FDeleteWindow,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 

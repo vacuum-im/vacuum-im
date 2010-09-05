@@ -7,6 +7,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/actiongroups.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/imessagewidgets.h>
 #include <utils/options.h>
 #include <utils/widgetmanager.h>

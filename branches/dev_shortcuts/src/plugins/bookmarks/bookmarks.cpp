@@ -120,6 +120,9 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 
 bool BookMarks::initObjects()
 {
+	Shortcuts::declareGroup(SCTG_BOOKMARKS, tr("Bookmarks"));
+	Shortcuts::declare(SCT_BOOKMARKS_EDIT, "Edit bookmarks");
+
 	FBookMarksMenu = new Menu;
 	FBookMarksMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
 	FBookMarksMenu->setTitle(tr("Bookmarks"));
@@ -296,6 +299,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
 			Action *action = new Action(streamMenu);
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
 			action->setText(tr("Edit bookmarks"));
+			action->setShortcutId(SCT_BOOKMARKS_EDIT);
 			action->setData(ADR_STREAM_JID,AStreamJid.full());
 			connect(action,SIGNAL(triggered(bool)),SLOT(onEditBookmarksActionTriggered(bool)));
 			streamMenu->addAction(action,AG_BBM_BOOKMARKS_TOOLS,true);

@@ -510,7 +510,6 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FExitRoom = new Action(FToolBarWidget->toolBarChanger()->toolBar());
 	FExitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
 	FExitRoom->setText(tr("Exit room"));
-	FExitRoom->setShortcut(tr("Ctrl+F4"));
 	connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 	FToolBarWidget->toolBarChanger()->insertAction(FExitRoom, TBG_MCWTBW_ROOM_EXIT);
 }

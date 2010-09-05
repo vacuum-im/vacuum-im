@@ -55,6 +55,12 @@ PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 	FLoaderTranslator = new QTranslator(this);
 	connect(AParent,SIGNAL(aboutToQuit()),SLOT(onApplicationAboutToQuit()));
 	connect(AParent,SIGNAL(commitDataRequest(QSessionManager &)),SLOT(onApplicationCommitDataRequested(QSessionManager &)));
+
+	Shortcuts::declareGroup(SCTG_CORE, tr("Core"));
+	Shortcuts::declare(SCT_CORE_QUIT, tr("Quit"), tr("Ctrl+Q"), QKeySequence::Quit);
+	Shortcuts::declare(SCT_CORE_ABOUT, tr("About"));
+	Shortcuts::declare(SCT_CORE_ABOUT_QT, tr("About Qt"));
+	Shortcuts::declare(SCT_CORE_SETUP_PLUGINS, tr("Setup plugins"));
 }
 
 PluginManager::~PluginManager()
@@ -603,33 +609,36 @@ void PluginManager::removePluginsInfo(const QStringList &ACurFiles)
 void PluginManager::createMenuActions()
 {
 	IPlugin *plugin = pluginInterface("IMainWindowPlugin").value(0);
-	IMainWindowPlugin *mainWindowPligin = plugin!=NULL ? qobject_cast<IMainWindowPlugin *>(plugin->instance()) : NULL;
+	IMainWindowPlugin *mainWindowPlugin = plugin!=NULL ? qobject_cast<IMainWindowPlugin *>(plugin->instance()) : NULL;
 
 	plugin = pluginInterface("ITrayManager").value(0);
 	ITrayManager *trayManager = plugin!=NULL ? qobject_cast<ITrayManager *>(plugin->instance()) : NULL;
 
-	if (mainWindowPligin || trayManager)
+	if (mainWindowPlugin || trayManager)
 	{
-		Action *pluginsDialog = new Action(mainWindowPligin!=NULL ? mainWindowPligin->instance() : trayManager->instance());
+		Action *pluginsDialog = new Action(mainWindowPlugin!=NULL ? mainWindowPlugin->instance() : trayManager->instance());
 		pluginsDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
+		pluginsDialog->setShortcutId(SCT_CORE_SETUP_PLUGINS);
 		connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
 		pluginsDialog->setText(tr("Setup plugins"));
 
-		if (mainWindowPligin)
+		if (mainWindowPlugin)
 		{
-			Action *aboutQt = new Action(mainWindowPligin->mainWindow()->mainMenu());
+			Action *aboutQt = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 			aboutQt->setText(tr("About Qt"));
 			aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT_QT);
+			aboutQt->setShortcutId(SCT_CORE_ABOUT_QT);
 			connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
-			mainWindowPligin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
+			mainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
 
-			Action *about = new Action(mainWindowPligin->mainWindow()->mainMenu());
+			Action *about = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 			about->setText(tr("About the program"));
 			about->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT);
+			about->setShortcutId(SCT_CORE_ABOUT);
 			connect(about,SIGNAL(triggered()),SLOT(onShowAboutBoxDialog()));
-			mainWindowPligin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
+			mainWindowPlugin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
 
-			mainWindowPligin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
+			mainWindowPlugin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
 		}
 
 		if (trayManager)

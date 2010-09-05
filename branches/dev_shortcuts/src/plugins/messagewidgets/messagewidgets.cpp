@@ -51,6 +51,23 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool MessageWidgets::initObjects()
 {
+	Shortcuts::declareGroup(SCTG_MESSAGING, tr("Messaging"));
+	Shortcuts::declareGroup(SCTG_MESSAGING_TABWINDOW, tr("Tabbed messaging window"));
+	Shortcuts::declare(SCT_MESSAGING_TABWINDOW_CLOSE_TAB, tr("Close tab"), tr("Ctrl+F4"), QKeySequence::Close);
+	Shortcuts::declare(SCT_MESSAGING_TABWINDOW_DELETE_WINDOW, tr("Delete window"));
+	Shortcuts::declare(SCT_MESSAGING_TABWINDOW_DETACH_TAB, tr("Detach tab"));
+	Shortcuts::declare(SCT_MESSAGING_TABWINDOW_NEXT_TAB, tr("Next tab"), tr("Ctrl+Tab"), QKeySequence::NextChild);
+	Shortcuts::declare(SCT_MESSAGING_TABWINDOW_PREV_TAB, tr("Previous tab"), tr("Ctrl+Shift+Tab"), QKeySequence::PreviousChild);
+	Shortcuts::declare(SCT_MESSAGING_TABWINDOW_RENAME_WINDOW, tr("Rename window"));
+	Shortcuts::declare(SCT_MESSAGING_TABWINDOW_SET_AS_DEFAULT, tr("Set window as default"));
+	Shortcuts::declare(SCT_MESSAGING_TABWINDOW_SHOW_CLOSE_BUTTTONS, tr("Show tab close buttons"));
+	Shortcuts::declare(SCT_MESSAGING_TABWINDOW_TABS_BOTTOM, tr("Show tabs at bottom"));
+
+	for (int tabNumber=1; tabNumber<=10; tabNumber++)
+		Shortcuts::declare(
+			QString(SCT_MESSAGING_TABWINDOW_QUICK_TAB).arg(tabNumber), tr("Quick select tab %1").arg(tabNumber),
+			tr("Alt+%1").arg(tabNumber % 10));
+
 	insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
 	return true;
 }
