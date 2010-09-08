@@ -156,6 +156,14 @@ bool SASLAuth::start(const QDomElement &AElem)
 				FXmppStream->sendStanza(auth);
 				return true;
 			}
+			else if (mechanism == "ANONYMOUS")
+			{
+				Stanza auth("auth");
+				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
+				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+				FXmppStream->sendStanza(auth);
+				return true;
+			}
 			mechElem = mechElem.nextSiblingElement("mechanism");
 		}
 	}
