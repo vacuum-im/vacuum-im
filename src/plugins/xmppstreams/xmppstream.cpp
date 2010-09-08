@@ -158,9 +158,9 @@ Jid XmppStream::streamJid() const
 
 void XmppStream::setStreamJid(const Jid &AJid)
 {
-	if (FStreamJid != AJid && (FStreamState == SS_OFFLINE || (FStreamState == SS_FEATURES && (FStreamJid && AJid))))
+	if (FStreamJid!=AJid && (FStreamState==SS_OFFLINE || FStreamState==SS_FEATURES))
 	{
-		if (FStreamState == SS_FEATURES && !FOfflineJid.isValid())
+		if (FStreamState==SS_FEATURES && !FOfflineJid.isValid())
 			FOfflineJid = FStreamJid;
 
 		if (!(FStreamJid && AJid))
