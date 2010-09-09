@@ -1,14 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <icondef>
-	<name>Send Mail</name>
-
-	<description>SMTP Iconset</description>
-
  	<version>1.0</version>
-
- 	<creation>2009-02-19</creation>
-
- 	<author>[AKI]`Rodent</author>
+	<name>SMTP</name>
+	<description>SMTP Iconset for Vacuum IM</description>
+ 	<creation>2010-05-21</creation>
+ 	<author>Artem Rogudeev / [AKI]`Rodent</author>
 
 	<icon>
 		<key>online</key>

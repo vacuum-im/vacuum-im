@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <icondef>
-	<version>0.5</version>
-	<name>Crystal (Yahoo)</name>
-	<description>Crystal Yahoo Iconset</description>
- 	<creation>2005-11-02</creation>
- 	<author>Everaldo Coelho</author>
+ 	<version>1.0</version>
+	<name>Facebook</name>
+	<description>Facebook Iconset for Vacuum IM</description>
+ 	<creation>2010-05-24</creation>
+ 	<author>Artem Rogudeev / [AKI]`Rodent</author>
 
 	<icon>
 		<key>online</key>

@@ -1,13 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <icondef>
-	<name>Crystal (ICQ)</name>
-
-	<description>Crystal ICQ Iconset</description>
-
 	<version>0.5</version>
-
+	<name>Crystal (ICQ)</name>
+	<description>Crystal ICQ Iconset</description>
  	<creation>2005-11-02</creation>
-
  	<author>Everaldo Coelho (Icons)</author>
 
 	<icon>

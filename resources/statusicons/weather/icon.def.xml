@@ -1,14 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <icondef>
-	<name>Weather Service</name>
-
-	<description>Iconset for weather services</description>
-
 	<version>1.0</version>
-
- 	<creation>2010-05-23</creation>
-
- 	<author>[AKI]`Rodent</author>
+	<name>Weather</name>
+	<description>Weather Iconset for Vacuum IM</description>
+ 	<creation>2010-05-08</creation>
+ 	<author>Artem Rogudeev / [AKI]`Rodent</author>
 
 	<icon>
 		<key>online</key>
