@@ -1,13 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <icondef>
-	<name>Crystal (AIM)</name>
-
-	<description>Crystal AIM Iconset</description>
-
  	<version>0.5</version>
-
+	<name>Crystal (AIM)</name>
+	<description>Crystal AIM Iconset</description>
  	<creation>2005-11-02</creation>
-
  	<author>Everaldo Coelho (Icons)</author>
 
 	<icon>

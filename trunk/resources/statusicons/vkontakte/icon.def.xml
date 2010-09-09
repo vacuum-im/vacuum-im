@@ -1,14 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <icondef>
-	<name>vKontakte</name>
-
-	<description>vKontakte Iconset</description>
-
 	<version>1.0</version>
-
- 	<creation>2010-03-15</creation>
-
- 	<author>Tosha, [AKI]`Rodent</author>
+	<name>Vkontakte</name>
+	<description>Vkontakte Iconset for Vacuum IM</description>
+ 	<creation>2010-05-24</creation>
+ 	<author>Artem Rogudeev / [AKI]`Rodent</author>
 
 	<icon>
 		<key>online</key>
