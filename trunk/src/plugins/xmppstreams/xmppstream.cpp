@@ -4,7 +4,6 @@
 
 #define KEEP_ALIVE_TIMEOUT          30000
 
-
 XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObject(AXmppStreams->instance())
 {
 	FXmppStreams = AXmppStreams;
@@ -379,7 +378,7 @@ qint64 XmppStream::sendData(QByteArray AData)
 
 QByteArray XmppStream::receiveData(qint64 ABytes)
 {
-	FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
+	//FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
 	return FConnection->read(ABytes);
 }
 
@@ -461,8 +460,9 @@ void XmppStream::onFeatureDestroyed()
 
 void XmppStream::onKeepAliveTimeout()
 {
+	static const QByteArray space(1,' ');
 	if (FStreamState!=SS_ONLINE)
 		abort(tr("XMPP connection timed out"));
 	else
-		sendData(" ");
+		sendData(space);
 }
