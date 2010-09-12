@@ -2,7 +2,8 @@
 
 StreamParser::StreamParser(QObject *AParent) : QObject(AParent)
 {
-	FReader.setNamespaceProcessing(true);
+	FReader.addExtraNamespaceDeclaration(QXmlStreamNamespaceDeclaration("ns20","strange-yandex-bug-20"));
+	FReader.addExtraNamespaceDeclaration(QXmlStreamNamespaceDeclaration("ns21","strange-yandex-bug-21"));
 }
 
 StreamParser::~StreamParser()
@@ -12,6 +13,8 @@ StreamParser::~StreamParser()
 
 void StreamParser::parseData(const QByteArray &AData)
 {
+	static QDomDocument doc;
+
 	FReader.addData(AData);
 	while (!FReader.atEnd())
 	{
@@ -19,15 +22,14 @@ void StreamParser::parseData(const QByteArray &AData)
 		if (FReader.isStartDocument())
 		{
 			FLevel = 0;
-			FDoc.clear();
 			FLevelNS.clear();
-			FLevelNS.push("");
+			FLevelNS.push(NS_JABBER_CLIENT);
 		}
 		else if (FReader.isStartElement())
 		{
 			QString nsURI = FReader.namespaceUri().toString();
 			QString elemName = FReader.qualifiedName().toString();
-			QDomElement newElement = FLevelNS.top()!=nsURI ? FDoc.createElementNS(nsURI,elemName) : FDoc.createElement(elemName);
+			QDomElement newElement = FLevelNS.top()!=nsURI ? doc.createElementNS(nsURI,elemName) : doc.createElement(elemName);
 			FLevelNS.push(nsURI);
 
 			foreach(QXmlStreamAttribute attribute, FReader.attributes())
@@ -42,24 +44,24 @@ void StreamParser::parseData(const QByteArray &AData)
 			FLevel++;
 			if (FLevel == 1)
 			{
-				FElement = newElement;
-				FDoc.appendChild(FElement);
-				emit opened(FDoc.documentElement());
+				FLevelNS.pop();
+				emit opened(newElement);
 			}
 			else if (FLevel == 2)
 			{
-				FDoc.removeChild(FElement);
-				FElement = FDoc.appendChild(newElement).toElement();
+				FRootElem = newElement;
+				FCurrentElem = FRootElem;
 			}
 			else
 			{
-				FElement = FElement.appendChild(newElement).toElement();
+				FCurrentElem.appendChild(newElement);
+				FCurrentElem = newElement;
 			}
 		}
 		else if (FReader.isCharacters())
 		{
 			if (!FReader.isCDATA() && !FReader.isWhitespace())
-				FElement.appendChild(FDoc.createTextNode(FReader.text().toString()));
+				FCurrentElem.appendChild(doc.createTextNode(FReader.text().toString()));
 		}
 		else if (FReader.isEndElement())
 		{
@@ -67,9 +69,9 @@ void StreamParser::parseData(const QByteArray &AData)
 			if (FLevel == 0)
 				emit closed();
 			else if (FLevel == 1)
-				emit element(FDoc.documentElement());
+				emit element(FRootElem);
 			else if (FLevel > 1)
-				FElement = FElement.parentNode().toElement();
+				FCurrentElem = FCurrentElem.parentNode().toElement();
 			FLevelNS.pop();
 		}
 	}

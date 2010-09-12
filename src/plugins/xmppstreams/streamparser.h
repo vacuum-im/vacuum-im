@@ -4,6 +4,7 @@
 #include <QStack>
 #include <QDomDocument>
 #include <QXmlStreamReader>
+#include <definitions/namespaces.h>
 
 class StreamParser :
 			public QObject
@@ -21,10 +22,10 @@ signals:
 	void closed();
 private:
 	int FLevel;
-	QStack<QString> FLevelNS;
-	QDomDocument FDoc;
-	QDomElement FElement;
+	QDomElement FRootElem;
+	QDomElement FCurrentElem;
 	QXmlStreamReader FReader;
+	QStack<QString> FLevelNS;
 };
 
 #endif // STREAMPARSER_H
