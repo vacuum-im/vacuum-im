@@ -23,6 +23,10 @@
         <source>Failed to start connection</source>
         <translation>Nie można uruchomić połączenia</translation>
     </message>
+    <message>
+        <source>Connection closed unexpectedly</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XmppStreams</name>

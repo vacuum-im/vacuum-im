@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
+    <name>Presence</name>
+    <message>
+        <source>XMPP stream closed unexpectedly</source>
+        <translation>XMPP поток неожиданно закрылся</translation>
+    </message>
+</context>
+<context>
     <name>PresencePlugin</name>
     <message>
         <source>Presence Manager</source>

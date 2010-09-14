@@ -27,6 +27,7 @@ LEGEND
   [-] Application may fail on unsuccessful attempt to connect
   [-] Not all history messages collections with the same start time was displayed in hisroty window
   [-] Recent messages with specified ThreadId could not be deleted from local archive
+  [-] When closing the connection initiated by the server vacuum does not generate an error and re-reconnection was not started
 
 v1.0.2
 ------
