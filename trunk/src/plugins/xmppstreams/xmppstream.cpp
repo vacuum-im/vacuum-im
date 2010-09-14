@@ -114,12 +114,14 @@ void XmppStream::close()
 {
 	if (FConnection && FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
 	{
+		FStreamState = SS_DISCONNECTING;
 		if (FConnection->isOpen())
 		{
 			emit aboutToClose();
 			QByteArray data = "</stream:stream>";
 			if (!processDataHandlers(data,true))
 				FConnection->write(data);
+			FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
 		}
 		FConnection->disconnectFromHost();
 	}
@@ -200,7 +202,7 @@ IConnection *XmppStream::connection() const
 
 void XmppStream::setConnection(IConnection *AConnection)
 {
-	if (FStreamState == SS_OFFLINE && FConnection != AConnection)
+	if (FStreamState==SS_OFFLINE && FConnection != AConnection)
 	{
 		if (FConnection)
 			FConnection->instance()->disconnect(this);
@@ -378,7 +380,6 @@ qint64 XmppStream::sendData(QByteArray AData)
 
 QByteArray XmppStream::receiveData(qint64 ABytes)
 {
-	//FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
 	return FConnection->read(ABytes);
 }
 
@@ -405,6 +406,10 @@ void XmppStream::onConnectionDisconnected()
 {
 	FOpen = false;
 	FKeepAliveTimer.stop();
+
+	if (FStreamState != SS_DISCONNECTING)
+		abort(tr("Connection closed unexpectedly"));
+
 	FStreamState = SS_OFFLINE;
 	removeXmppStanzaHandler(this,XSHO_XMPP_STREAM);
 	emit closed();
@@ -430,6 +435,18 @@ void XmppStream::onParserElement(QDomElement AElem)
 
 void XmppStream::onParserError(const QString &AError)
 {
+	if (FConnection && FConnection->isOpen())
+	{
+		static const QString xmlError(
+			"<stream:error>"
+				"<xml-not-well-formed xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"
+				"<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>%1</text>"
+			"</stream:error></stream:stream>");
+
+		QByteArray data = xmlError.arg(AError).toUtf8();
+		if (!processDataHandlers(data,true))
+			FConnection->write(data);
+	}
 	abort(AError);
 }
 
