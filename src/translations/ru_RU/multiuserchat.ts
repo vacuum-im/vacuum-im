@@ -42,14 +42,19 @@
 <context>
     <name>JoinMultiChatDialog</name>
     <message>
-        <source>Room parameters is not acceptable.
-Check values and try again</source>
-        <translation>Настройки комнаты недопустимы.
-Проверьте значения и попробуйте ещё раз</translation>
-    </message>
-    <message>
         <source>Join conference</source>
         <translation>Войти в конференцию</translation>
+    </message>
+    <message>
+        <source>%1 as %2</source>
+        <comment>room as nick</comment>
+        <translation>%1 как %2</translation>
+    </message>
+    <message>
+        <source>Conference parameters is not acceptable.
+Check values and try again</source>
+        <translation>Недопустимые параметры конференции
+Проверте параметры и попробуйте еще раз</translation>
     </message>
 </context>
 <context>
@@ -57,14 +62,6 @@ Check values and try again</source>
     <message>
         <source>Identity:</source>
         <translation>Подключение:</translation>
-    </message>
-    <message>
-        <source>Room</source>
-        <translation>Комната</translation>
-    </message>
-    <message>
-        <source>Host:</source>
-        <translation>Хост:</translation>
     </message>
     <message>
         <source>Room:</source>
@@ -81,6 +78,22 @@ Check values and try again</source>
     <message>
         <source>Resolve</source>
         <translation>Определить</translation>
+    </message>
+    <message>
+        <source>History:</source>
+        <translation>История:</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <source>Conference Parameters</source>
+        <translation>Параметры конференции</translation>
+    </message>
+    <message>
+        <source>Service:</source>
+        <translation>Сервис:</translation>
     </message>
 </context>
 <context>
