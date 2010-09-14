@@ -5,7 +5,18 @@
 #include <definitions/menuicons.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ixmppstreams.h>
+#include <utils/options.h>
 #include "ui_joinmultichatdialog.h"
+
+struct RoomParams
+{
+	RoomParams() {
+		enters = 0;
+	};
+	int enters;
+	QString nick;
+	QString password;
+};
 
 class JoinMultiChatDialog :
 			public QDialog
@@ -18,10 +29,14 @@ public:
 protected:
 	void initialize();
 	void updateResolveNickState();
+	void loadRecentConferences();
+	void saveRecentConferences();
 protected slots:
 	void onDialogAccepted();
 	void onStreamIndexChanged(int AIndex);
+	void onHistoryIndexChanged(int AIndex);
 	void onResolveNickClicked();
+	void onDeleteHistoryClicked();
 	void onRoomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
 	void onStreamAdded(IXmppStream *AXmppStream);
 	void onStreamStateChanged(IXmppStream *AXmppStream);
@@ -34,6 +49,7 @@ private:
 	IMultiUserChatPlugin *FChatPlugin;
 private:
 	Jid FStreamJid;
+	QMap<Jid, RoomParams> FRecentRooms;
 };
 
 #endif // JOINMULTICHATDIALOG_H
