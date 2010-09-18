@@ -1,228 +1,173 @@
 #include "shortcuts.h"
-#include "options.h"
 
 #include <QHash>
-#include <QPointer>
+#include <QVariant>
 
-#include <QDebug>
-
-struct ShortcutsPrivate
+struct Shortcuts::ShortcutsData
 {
-	Shortcuts::ShortcutMap FShortcuts;
-	Shortcuts::GroupMap FGroups;
-
-	// Internal functions
-	void applySettings(Shortcuts::ShortcutMap::iterator AShortcut, QObject *AObject);
-	void updateBoundObjects(Shortcuts::ShortcutMap::iterator AShortcut);
-
-	// Shortcuts API
-	void declareGroup(const QString &AId, const QString &ADescription);
-	void declare(const QString &AId, const QString &ADescription,
-				 const QString &ALiteralKey, QKeySequence::StandardKey AStandardKey,
-				 Qt::ShortcutContext AContext);
-	void bind(const QString &AId, QObject *AObject);
-
-	void update(const QString &AId, const QKeySequence &ANewKey);
+	QHash<QString, QString> groups;
+	QHash<QString, ShortcutDescriptor> shortcuts;
+	QHash<QObject *, QString> objects;
 };
-
-
-Shortcuts::ShortcutData::ShortcutData(const QString &ADescription,
-		const QKeySequence &ADefaultKeySequence,
-		Qt::ShortcutContext AContext)
-	: FDescription(ADescription),
-	  FDefaultKeySequence(ADefaultKeySequence),
-	  FContext(AContext)
-{
-}
-
-inline QKeySequence Shortcuts::ShortcutData::selectKeySequence() const
-{
-	if (FUserSetKeySequence.isEmpty())
-		return FDefaultKeySequence;
-	else
-		return FUserSetKeySequence;
-}
-
-
-/**
-  \internal
-  Apply options' contents to object
-  **/
-void ShortcutsPrivate::applySettings(Shortcuts::ShortcutMap::iterator AShortcut, QObject *AObject)
-{
-	//qDebug() << "ShortcutsData::applyOptions" << AShortcut.key() << AShortcut->selectKeySequence() << "->" << AObject;
-
-	AObject->setProperty("shortcut", AShortcut->selectKeySequence());
-	AObject->setProperty("shotcutContext", AShortcut->FContext);
-}
-
-
-/**
-  \internal
-  Apply options to all objects bound with id
-  **/
-void ShortcutsPrivate::updateBoundObjects(Shortcuts::ShortcutMap::iterator AShortcut)
-{
-	qDebug() << "ShortcutsData::updateShortcut" << AShortcut.key();
-
-	foreach(QPointer<QObject> object, AShortcut->FBoundObjects)
-		if (!object.isNull())
-			applySettings(AShortcut, object);
-}
-
-// ====== Shortcuts public API implementation
-
-void ShortcutsPrivate::declareGroup(const QString &AId, const QString &ADescription)
-{
-	// FIXME: does not support runtime language change
-	Shortcuts::GroupMap::iterator group = FGroups.find(AId);
-	if (!FGroups.contains(AId))
-		FGroups.insert(AId, ADescription);
-}
-
-void ShortcutsPrivate::declare(const QString &AId, const QString &ADescription, const QString &ALiteralKey,
-						QKeySequence::StandardKey AStandardKey, Qt::ShortcutContext AContext)
-{
-	QKeySequence key(AStandardKey);
-	if (key.isEmpty())
-		key = QKeySequence(ALiteralKey);
-
-	//qDebug() << "Shortcuts::declare" << AId << key << "<-" << ALiteralKey << AStandardKey;
-
-	if (!FShortcuts.contains(AId))
-		FShortcuts.insert(AId, Shortcuts::ShortcutData(ADescription, key, AContext));
-	else
-		qWarning() << this << "Trying to redeclare already declared shortcut" << AId;
-}
-
-void ShortcutsPrivate::update(const QString &AId, const QKeySequence &FNewKey)
-{
-	//qDebug() << "Shortcuts::setKey" << AId << FNewKey;
-
-	Shortcuts::ShortcutMap::iterator shortcut = FShortcuts.find(AId);
-	if (shortcut != FShortcuts.end())
-		shortcut->FUserSetKeySequence = FNewKey;
-	else
-		qWarning() << this << "Trying to update undeclared shortcut" << AId;
-
-	updateBoundObjects(shortcut);
-}
-
-void ShortcutsPrivate::bind(const QString &AId, QObject *AObject)
-{
-	if (AObject == NULL)
-	{
-		qWarning() << this << "Trying to bind" << AId << "to NULL object";
-		return;
-	}
-
-	//qDebug() << "Shortcuts::bind" << AId << "to" << AObject;
-
-	Shortcuts::ShortcutMap::iterator shortcut = FShortcuts.find(AId);
-	if (shortcut != FShortcuts.end())
-	{
-		shortcut->FBoundObjects << AObject;
-		applySettings(shortcut, AObject);
-	}
-	else
-		qWarning() << this << "Trying to bind undeclared shortcut" << AId;
-}
-
-
-
-
-// ====== Instantiation
-
-Shortcuts::Shortcuts() :
-	d(new ShortcutsPrivate)
-{
-	connect(Options::instance(), SIGNAL(optionsOpened()), SLOT(onOptionsOpened()));
-	connect(Options::instance(), SIGNAL(optionsClosed()), SLOT(onOptionsClosed()));
-}
-
-Shortcuts::~Shortcuts()
-{
-}
+Shortcuts::ShortcutsData *Shortcuts::d = new Shortcuts::ShortcutsData;
 
 Shortcuts *Shortcuts::instance()
 {
-	static Shortcuts *instance = NULL;
-	if (instance == NULL)
-		instance = new Shortcuts();
-	return instance;
+	static Shortcuts *inst = NULL;
+	if (inst == NULL)
+		inst = new Shortcuts();
+	return inst;
 }
 
-// ====== Public API
+QList<QString> Shortcuts::groups()
+{
+	return d->groups.keys();
+}
 
+QString Shortcuts::groupDescription( const QString &AId )
+{
+	return d->groups.value(AId);
+}
+
+/**
+  Declare a group of shortcuts.
+
+  A group has id of same format as a shortcut, is is expected to be a prefix of
+  shprtcuts belonging to this group, e.g.:
+
+  group: messages.tabwindow
+  shortcut: messages.tabwindow.close-tab
+
+  It's recommended to declareShortcut all groups a set of shorcuts belong to
+  just before declaring these shortcuts.
+**/
 void Shortcuts::declareGroup(const QString &AId, const QString &ADescription)
 {
-	instance()->d->declareGroup(AId, ADescription);
+	if (!AId.isEmpty())
+	{
+		d->groups.insert(AId,ADescription);
+		emit instance()->groupDeclared(AId,ADescription);
+	}
 }
 
-void Shortcuts::declare(const QString &AId, const QString &ADescription, const QString &ALiteralKey,
-						QKeySequence::StandardKey AStandardKey, Qt::ShortcutContext AContext)
+QList<QString> Shortcuts::shortcuts()
 {
-	instance()->d->declare(AId, ADescription, ALiteralKey, AStandardKey, AContext);
+	return d->shortcuts.keys();
 }
 
-void Shortcuts::declare(const QString &AId, const QString &ADescription, Qt::ShortcutContext AContext)
+ShortcutDescriptor Shortcuts::shortcutDescriptor(const QString &AId)
 {
-	instance()->d->declare(AId, ADescription, QString::null, QKeySequence::UnknownKey, AContext);
+	return d->shortcuts.value(AId);
 }
 
-void Shortcuts::bind(const QString &AId, QObject *AObject)
+/**
+  Declare shortcut identified by AId and supply default value to it.
+
+  ADescription is user-readable text shown to user in global hotkey settings.
+**/
+void Shortcuts::declareShortcut(const QString &AId, const QString &ADescription, const QKeySequence &ADefaultKey, Qt::ShortcutContext AContext)
 {
-	instance()->d->bind(AId, AObject);
+	if (!AId.isEmpty() && !ADescription.isEmpty())
+	{
+		ShortcutDescriptor &descriptor = d->shortcuts[AId];
+		descriptor.description = ADescription;
+		descriptor.defaultKey = ADefaultKey;
+		descriptor.context = AContext;
+		emit instance()->shortcutDeclared(AId,descriptor);
+	}
 }
 
-void Shortcuts::update(const QString &AId, const QKeySequence &ANewKey)
+/**
+  Update shortcut binding for id. All objects bound to it will be updated immediately.
+**/
+void Shortcuts::updateShortcut(const QString &AId, const QKeySequence &AUserKey)
 {
-	instance()->d->update(AId, ANewKey);
+	if (d->shortcuts.contains(AId))
+	{
+		ShortcutDescriptor &descriptor = d->shortcuts[AId];
+		descriptor.userKey = AUserKey!=descriptor.defaultKey ? AUserKey : QKeySequence();
+		foreach(QObject *object, d->objects.keys(AId)) {
+			updateObject(object); }
+		emit instance()->shortcutUpdated(AId,descriptor);
+	}
 }
 
-const Shortcuts::ShortcutMap Shortcuts::shortcutMap()
+/**
+  Set up a binding between id and object.
+
+  Following QObject properties are used
+	QKeySequence        "shortcut"
+	Qt::ShortcutContext "shortcutContext"
+
+  QAction supplies both of them, QAbstractButton supplies only "shortcut".
+**/
+void Shortcuts::bindShortcut(const QString &AId, QObject *AObject)
 {
-	return instance()->d->FShortcuts;
+	if (AObject)
+	{
+		if (!AId.isEmpty())
+			d->objects.insert(AObject,AId);
+		else 
+			d->objects.remove(AObject);
+		updateObject(AObject);
+		instance()->shortcutBinded(AId,AObject);
+	}
 }
 
-const Shortcuts::GroupMap Shortcuts::groupMap()
+void Shortcuts::updateObject(QObject *AObject)
 {
-	return instance()->d->FGroups;
+	QString id = d->objects.value(AObject);
+	if (!id.isEmpty())
+	{
+		ShortcutDescriptor descriptor = d->shortcuts.value(id);
+		AObject->setProperty("shortcut", descriptor.userKey.isEmpty() ? descriptor.defaultKey : descriptor.userKey);
+		AObject->setProperty("shotcutContext", descriptor.context);
+	}
+	else if (AObject)
+	{
+		AObject->setProperty("shortcut",QVariant());
+		AObject->setProperty("shotcutContext",QVariant());
+	}
+}
+
+void Shortcuts::onObjectDestroyed(QObject *AObject)
+{
+	d->objects.remove(AObject);
 }
 
 // ====== Options backend usage
 
-void Shortcuts::onOptionsOpened()
-{
-	// Load settings
-	//qDebug() << this << "Options opened";
-
-	OptionsNode options = Options::node("shortcuts");
-	for (ShortcutMap::iterator shortcut = d->FShortcuts.begin();
-		shortcut != d->FShortcuts.end(); shortcut++)
-	{
-		if (options.hasValue(shortcut.key()))
-		{
-			shortcut->FUserSetKeySequence = options.value(shortcut.key()).toString();
-			qDebug() << this << "Loaded from settings:" << shortcut.key();
-		}
-		else
-			shortcut->FUserSetKeySequence = QKeySequence();
-	}
-}
-
-void Shortcuts::onOptionsClosed()
-{
-	// Save settings
-	//qDebug() << this << "Options closing";
-
-	OptionsNode options = Options::node("shortcuts");
-	options.removeChilds(); // Wipe out all old settings
-
-	for (ShortcutMap::const_iterator shortcut = d->FShortcuts.constBegin();
-		shortcut != d->FShortcuts.constEnd(); shortcut++)
-	{
-		if (shortcut->selectKeySequence() != shortcut->FDefaultKeySequence)
-			options.setValue(shortcut->FUserSetKeySequence.toString(), shortcut.key());
-	}
-}
+//void Shortcuts::onOptionsOpened()
+//{
+//	// Load settings
+//	//qDebug() << this << "Options opened";
+//
+//	OptionsNode options = Options::node("shortcuts");
+//	for (ShortcutMap::iterator shortcut = d->shortcuts.begin();
+//		shortcut != d->shortcuts.end(); shortcut++)
+//	{
+//		if (options.hasValue(shortcut.key()))
+//		{
+//			shortcut->FUserSetKeySequence = options.value(shortcut.key()).toString();
+//			qDebug() << this << "Loaded from settings:" << shortcut.key();
+//		}
+//		else
+//			shortcut->FUserSetKeySequence = QKeySequence();
+//	}
+//}
+//
+//void Shortcuts::onOptionsClosed()
+//{
+//	// Save settings
+//	//qDebug() << this << "Options closing";
+//
+//	OptionsNode options = Options::node("shortcuts");
+//	options.removeChilds(); // Wipe out all old settings
+//
+//	for (ShortcutMap::const_iterator shortcut = d->shortcuts.constBegin();
+//		shortcut != d->shortcuts.constEnd(); shortcut++)
+//	{
+//		if (shortcut->selectKeySequence() != shortcut->FDefaultKeySequence)
+//			options.setValue(shortcut->FUserSetKeySequence.toString(), shortcut.key());
+//	}
+//}

@@ -74,8 +74,8 @@ bool OptionsManager::initConnections(IPluginManager *APluginManager, int &AInitO
 bool OptionsManager::initObjects()
 {
 	Shortcuts::declareGroup(SCTG_OPTIONS, tr("Options"));
-	Shortcuts::declare(SCT_OPTIONS_CHANGE_PROFILE, tr("Change profile"), Qt::ApplicationShortcut);
-	Shortcuts::declare(SCT_OPTIONS_SHOW_OPTIONS, tr("Show options dialog"), Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_OPTIONS_CHANGE_PROFILE, tr("Change Profile"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_OPTIONS_SHOW_OPTIONS, tr("Show Options Dialog"), QKeySequence::Preferences, Qt::ApplicationShortcut);
 
 	FProfilesDir.setPath(FPluginManager->homePath());
 	if (!FProfilesDir.exists(DIR_PROFILES))
@@ -83,16 +83,16 @@ bool OptionsManager::initObjects()
 	FProfilesDir.cd(DIR_PROFILES);
 
 	FChangeProfileAction = new Action(this);
+	//FChangeProfileAction->setText(tr("Change Profile"));
 	FChangeProfileAction->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_PROFILES);
 	FChangeProfileAction->setShortcutId(SCT_OPTIONS_CHANGE_PROFILE);
-	FChangeProfileAction->setText(tr("Change Profile"));
 	connect(FChangeProfileAction,SIGNAL(triggered(bool)),SLOT(onChangeProfileByAction(bool)));
 
 	FShowOptionsDialogAction = new Action(this);
-	FShowOptionsDialogAction->setEnabled(false);
+	FShowOptionsDialogAction->setText(tr("Options"));
 	FShowOptionsDialogAction->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_DIALOG);
 	FShowOptionsDialogAction->setShortcutId(SCT_OPTIONS_SHOW_OPTIONS);
-	FShowOptionsDialogAction->setText(tr("Options"));
+	FShowOptionsDialogAction->setEnabled(false);
 	connect(FShowOptionsDialogAction,SIGNAL(triggered(bool)),SLOT(onShowOptionsDialogByAction(bool)));
 
 	if (FMainWindowPlugin)

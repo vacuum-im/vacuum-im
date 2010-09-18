@@ -79,9 +79,10 @@ QString Action::shortcutId() const
 
 void Action::setShortcutId(const QString &AId)
 {
-	if (!AId.isEmpty())
-		Shortcuts::instance()->bind(AId, this);
 	FShortcutId = AId;
+	if (!AId.isEmpty() && text().isEmpty())
+		setText(Shortcuts::shortcutDescriptor(AId).description);
+	Shortcuts::bindShortcut(AId, this);
 }
 
 void Action::onMenuDestroyed(Menu *AMenu)

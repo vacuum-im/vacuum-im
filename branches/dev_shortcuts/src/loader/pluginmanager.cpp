@@ -57,10 +57,9 @@ PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 	connect(AParent,SIGNAL(commitDataRequest(QSessionManager &)),SLOT(onApplicationCommitDataRequested(QSessionManager &)));
 
 	Shortcuts::declareGroup(SCTG_CORE, tr("Core"));
-	Shortcuts::declare(SCT_CORE_QUIT, tr("Quit"), tr("Ctrl+Q"), QKeySequence::Quit);
-	Shortcuts::declare(SCT_CORE_ABOUT, tr("About"));
-	Shortcuts::declare(SCT_CORE_ABOUT_QT, tr("About Qt"));
-	Shortcuts::declare(SCT_CORE_SETUP_PLUGINS, tr("Setup plugins"));
+	Shortcuts::declareShortcut(SCT_CORE_ABOUT, tr("About the Program"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_CORE_ABOUT_QT, tr("About Qt"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_CORE_SETUP_PLUGINS, tr("Setup Plugins"), QKeySequence::UnknownKey);
 }
 
 PluginManager::~PluginManager()
@@ -617,22 +616,22 @@ void PluginManager::createMenuActions()
 	if (mainWindowPlugin || trayManager)
 	{
 		Action *pluginsDialog = new Action(mainWindowPlugin!=NULL ? mainWindowPlugin->instance() : trayManager->instance());
+		//pluginsDialog->setText(tr("Setup plugins"));
 		pluginsDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
 		pluginsDialog->setShortcutId(SCT_CORE_SETUP_PLUGINS);
 		connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
-		pluginsDialog->setText(tr("Setup plugins"));
 
 		if (mainWindowPlugin)
 		{
 			Action *aboutQt = new Action(mainWindowPlugin->mainWindow()->mainMenu());
-			aboutQt->setText(tr("About Qt"));
+			//aboutQt->setText(tr("About Qt"));
 			aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT_QT);
 			aboutQt->setShortcutId(SCT_CORE_ABOUT_QT);
 			connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
 			mainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
 
 			Action *about = new Action(mainWindowPlugin->mainWindow()->mainMenu());
-			about->setText(tr("About the program"));
+			//about->setText(tr("About the program"));
 			about->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT);
 			about->setShortcutId(SCT_CORE_ABOUT);
 			connect(about,SIGNAL(triggered()),SLOT(onShowAboutBoxDialog()));

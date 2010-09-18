@@ -7,9 +7,6 @@
 #define SCT_CORE_ABOUT_QT                                          "core.about-qt"
 #define SCT_CORE_ABOUT                                             "core.about"
 
-#define SCTG_BOOKMARKS                                             "bookmarks"
-#define SCT_BOOKMARKS_EDIT                                         "bookmarks.edit"
-
 #define SCTG_MESSAGING                                             "messaging"
 
 #define SCTG_MESSAGING_TABWINDOW                                   "messaging.tabwindow"
