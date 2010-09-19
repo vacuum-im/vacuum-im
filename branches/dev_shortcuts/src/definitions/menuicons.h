@@ -228,6 +228,9 @@
 #define MNI_SNEGOTIATION_INIT           "snegotiationInit"
 #define MNI_SNEGOTIATION_TERMINATE      "snegotiationTerminate"
 
+//ShortcutsManager
+#define MNI_SHORTCUTS                   "shortcuts"
+
 //StatusChanger
 #define MNI_SCHANGER_MODIFY_STATUS      "schangerModifyStatus"
 #define MNI_SCHANGER_EDIT_STATUSES      "schangerEditStatuses"

@@ -13,5 +13,6 @@
 #define OPN_MESSAGE_STYLES      "MessageStyles"
 #define OPN_DATASTREAMS         "DataStreams"
 #define OPN_FILETRANSFER        "FileTransfer"
+#define OPN_SHORTCUTS           "Shortcuts"
 
 #endif

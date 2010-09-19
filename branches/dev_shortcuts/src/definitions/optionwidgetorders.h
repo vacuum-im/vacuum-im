@@ -46,4 +46,7 @@
 //Node = ON_AUTOSTATUS
 #define OWO_AUTOSTATUS                            500
 
+//Node = ON_SHORTCUTS
+#define OWO_SHORTCUTS                             500
+
 #endif

@@ -83,7 +83,7 @@ bool OptionsManager::initObjects()
 	FProfilesDir.cd(DIR_PROFILES);
 
 	FChangeProfileAction = new Action(this);
-	//FChangeProfileAction->setText(tr("Change Profile"));
+	FChangeProfileAction->setText(tr("Change Profile"));
 	FChangeProfileAction->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_PROFILES);
 	FChangeProfileAction->setShortcutId(SCT_OPTIONS_CHANGE_PROFILE);
 	connect(FChangeProfileAction,SIGNAL(triggered(bool)),SLOT(onChangeProfileByAction(bool)));

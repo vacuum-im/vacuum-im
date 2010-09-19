@@ -118,14 +118,14 @@ bool Notifications::initObjects()
 
 	FActivateAll = new Action(this);
 	FActivateAll->setVisible(false);
-	//FActivateAll->setText(tr("Activate All Notifications"));
+	FActivateAll->setText(tr("Activate All Notifications"));
 	FActivateAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_ACTIVATE_ALL);
 	FActivateAll->setShortcutId(SCT_NOTIFICATIONS_ACTIVATE_ALL);
 	connect(FActivateAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
 	FRemoveAll = new Action(this);
 	FRemoveAll->setVisible(false);
-	//FRemoveAll->setText(tr("Remove All Notifications"));
+	FRemoveAll->setText(tr("Remove All Notifications"));
 	FRemoveAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_REMOVE_ALL);
 	FRemoveAll->setShortcutId(SCT_NOTIFICATIONS_REMOVE_ALL);
 	connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));

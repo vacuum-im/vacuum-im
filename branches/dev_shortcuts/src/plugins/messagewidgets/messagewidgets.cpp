@@ -64,9 +64,7 @@ bool MessageWidgets::initObjects()
 	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_TABS_BOTTOM, tr("Show Tabs at Bottom of the Window"), QKeySequence::UnknownKey);
 
 	for (int tabNumber=1; tabNumber<=10; tabNumber++)
-		Shortcuts::declareShortcut(
-			QString(SCT_MESSAGING_TABWINDOW_QUICK_TAB).arg(tabNumber), tr("Quick select tab %1").arg(tabNumber),
-			tr("Alt+%1").arg(tabNumber % 10));
+		Shortcuts::declareShortcut(QString(SCT_MESSAGING_TABWINDOW_QUICK_TAB).arg(tabNumber), QString::null, tr("Alt+%1").arg(tabNumber % 10));
 
 	insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
 	return true;

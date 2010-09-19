@@ -80,8 +80,6 @@ QString Action::shortcutId() const
 void Action::setShortcutId(const QString &AId)
 {
 	FShortcutId = AId;
-	if (!AId.isEmpty() && text().isEmpty())
-		setText(Shortcuts::shortcutDescriptor(AId).description);
 	Shortcuts::bindShortcut(AId, this);
 }
 

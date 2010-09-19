@@ -6,8 +6,8 @@
 struct Shortcuts::ShortcutsData
 {
 	QHash<QString, QString> groups;
-	QHash<QString, ShortcutDescriptor> shortcuts;
 	QHash<QObject *, QString> objects;
+	QHash<QString, ShortcutDescriptor> shortcuts;
 };
 Shortcuts::ShortcutsData *Shortcuts::d = new Shortcuts::ShortcutsData;
 
@@ -43,7 +43,7 @@ QString Shortcuts::groupDescription( const QString &AId )
 **/
 void Shortcuts::declareGroup(const QString &AId, const QString &ADescription)
 {
-	if (!AId.isEmpty())
+	if (!AId.isEmpty() && !ADescription.isEmpty())
 	{
 		d->groups.insert(AId,ADescription);
 		emit instance()->groupDeclared(AId,ADescription);
@@ -67,7 +67,7 @@ ShortcutDescriptor Shortcuts::shortcutDescriptor(const QString &AId)
 **/
 void Shortcuts::declareShortcut(const QString &AId, const QString &ADescription, const QKeySequence &ADefaultKey, Qt::ShortcutContext AContext)
 {
-	if (!AId.isEmpty() && !ADescription.isEmpty())
+	if (!AId.isEmpty())
 	{
 		ShortcutDescriptor &descriptor = d->shortcuts[AId];
 		descriptor.description = ADescription;
@@ -106,11 +106,17 @@ void Shortcuts::bindShortcut(const QString &AId, QObject *AObject)
 	if (AObject)
 	{
 		if (!AId.isEmpty())
+		{
 			d->objects.insert(AObject,AId);
+			connect(AObject,SIGNAL(destroyed(QObject *)),instance(),SLOT(onObjectDestroyed(QObject *)));
+		}
 		else 
+		{
 			d->objects.remove(AObject);
+			disconnect(AObject,SIGNAL(destroyed(QObject *)),instance(),SLOT(onObjectDestroyed(QObject *)));
+		}
 		updateObject(AObject);
-		instance()->shortcutBinded(AId,AObject);
+		emit instance()->shortcutBinded(AId,AObject);
 	}
 }
 
@@ -134,40 +140,3 @@ void Shortcuts::onObjectDestroyed(QObject *AObject)
 {
 	d->objects.remove(AObject);
 }
-
-// ====== Options backend usage
-
-//void Shortcuts::onOptionsOpened()
-//{
-//	// Load settings
-//	//qDebug() << this << "Options opened";
-//
-//	OptionsNode options = Options::node("shortcuts");
-//	for (ShortcutMap::iterator shortcut = d->shortcuts.begin();
-//		shortcut != d->shortcuts.end(); shortcut++)
-//	{
-//		if (options.hasValue(shortcut.key()))
-//		{
-//			shortcut->FUserSetKeySequence = options.value(shortcut.key()).toString();
-//			qDebug() << this << "Loaded from settings:" << shortcut.key();
-//		}
-//		else
-//			shortcut->FUserSetKeySequence = QKeySequence();
-//	}
-//}
-//
-//void Shortcuts::onOptionsClosed()
-//{
-//	// Save settings
-//	//qDebug() << this << "Options closing";
-//
-//	OptionsNode options = Options::node("shortcuts");
-//	options.removeChilds(); // Wipe out all old settings
-//
-//	for (ShortcutMap::const_iterator shortcut = d->shortcuts.constBegin();
-//		shortcut != d->shortcuts.constEnd(); shortcut++)
-//	{
-//		if (shortcut->selectKeySequence() != shortcut->FDefaultKeySequence)
-//			options.setValue(shortcut->FUserSetKeySequence.toString(), shortcut.key());
-//	}
-//}

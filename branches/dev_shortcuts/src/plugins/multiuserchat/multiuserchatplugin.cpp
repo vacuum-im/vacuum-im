@@ -181,21 +181,21 @@ bool MultiUserChatPlugin::initObjects()
 
 		Action *action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
-		//action->setText(tr("Join conference"));
+		action->setText(tr("Join conference"));
 		action->setShortcutId(SCT_MESSAGING_MUC_JOIN);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
 
 		action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_SHOW_ALL_ROOMS);
-		//action->setText(tr("Show all hidden conferences"));
+		action->setText(tr("Show all hidden conferences"));
 		action->setShortcutId(SCT_MESSAGING_MUC_SHOW_HIDDEN);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowAllRoomsTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
 
 		action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_LEAVE_HIDDEN_ROOMS);
-		//action->setText(tr("Leave all hidden conferences"));
+		action->setText(tr("Leave all hidden conferences"));
 		action->setShortcutId(SCT_MESSAGING_MUC_LEAVE_HIDDEN);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onLeaveHiddenRoomsTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);

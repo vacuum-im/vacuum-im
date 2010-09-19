@@ -150,6 +150,9 @@
 #define OPV_AVATARS_SHOWEMPTY                           "roster.avatars.show-empty"
 #define OPV_AVATARS_CUSTOM_ITEM                         "roster.avatars.custom"
 
+//ShortcutManager
+#define OPV_SHORTCUTS                                   "shortcuts"
+
 // StatusChanger
 #define OPV_STATUSES_ROOT                               "statuses"
 #define OPV_STATUSES_MAINSTATUS                         "statuses.main-status"
