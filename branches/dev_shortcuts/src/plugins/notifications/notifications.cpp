@@ -105,29 +105,28 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 bool Notifications::initObjects()
 {
-	Shortcuts::declareGroup(SCTG_NOTIFICATIONS, tr("Notifications"));
-	Shortcuts::declareShortcut(SCT_NOTIFICATIONS_ACTIVATE_ALL, tr("Activate All Notifications"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_NOTIFICATIONS_REMOVE_ALL, tr("Remove All Notifications"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_NOTIFICATIONS_TOGGLE_SOUND, tr("Enable/Disable notifications sound"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_TOGGLE_SOUND, tr("Enable/Disable notification sounds"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_ACTIVATE_NOTIFICATIONS, tr("Activate all notifications"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_REMOVE_NOTIFICATIONS, tr("Remove all notifications"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
 
 	FSoundOnOff = new Action(this);
 	FSoundOnOff->setToolTip(tr("Enable/Disable notifications sound"));
 	FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, MNI_NOTIFICATIONS_SOUND_ON);
-	FSoundOnOff->setShortcutId(SCT_NOTIFICATIONS_TOGGLE_SOUND);
+	FSoundOnOff->setShortcutId(SCT_APP_TOGGLE_SOUND);
 	connect(FSoundOnOff,SIGNAL(triggered(bool)),SLOT(onSoundOnOffActionTriggered(bool)));
 
 	FActivateAll = new Action(this);
 	FActivateAll->setVisible(false);
 	FActivateAll->setText(tr("Activate All Notifications"));
 	FActivateAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_ACTIVATE_ALL);
-	FActivateAll->setShortcutId(SCT_NOTIFICATIONS_ACTIVATE_ALL);
+	FActivateAll->setShortcutId(SCT_APP_ACTIVATE_NOTIFICATIONS);
 	connect(FActivateAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
 	FRemoveAll = new Action(this);
 	FRemoveAll->setVisible(false);
 	FRemoveAll->setText(tr("Remove All Notifications"));
 	FRemoveAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_REMOVE_ALL);
-	FRemoveAll->setShortcutId(SCT_NOTIFICATIONS_REMOVE_ALL);
+	FRemoveAll->setShortcutId(SCT_APP_REMOVE_NOTIFICATIONS);
 	connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
 	FNotifyMenu = new Menu;

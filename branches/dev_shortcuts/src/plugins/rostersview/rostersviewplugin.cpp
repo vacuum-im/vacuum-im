@@ -94,6 +94,8 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
 
 bool RostersViewPlugin::initObjects()
 {
+	Shortcuts::declareGroup(SCTG_ROSTER,tr("Contact list"));
+
 	FSortFilterProxyModel = new SortFilterProxyModel(this, this);
 	FSortFilterProxyModel->setSortLocaleAware(true);
 	FSortFilterProxyModel->setDynamicSortFilter(true);

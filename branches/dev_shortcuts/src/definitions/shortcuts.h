@@ -2,40 +2,53 @@
 #define DEF_SHORTCUTS_H
 
 //PluginManager
-#define SCTG_CORE                                                  "core"
-#define SCT_CORE_SETUP_PLUGINS                                     "core.setup-plugins"
-#define SCT_CORE_ABOUT_QT                                          "core.about-qt"
-#define SCT_CORE_ABOUT                                             "core.about"
+#define SCTG_APPLICATION                                           "application"
+#define SCT_APP_ABOUT_QT                                           "application.about-qt"
+#define SCT_APP_ABOUT_PROGRAM                                      "application.about-program"
+#define SCT_APP_SETUP_PLUGINS                                      "application.setup-plugins"
+//OptionsManager
+#define SCT_APP_SHOW_OPTIONS                                       "application.show-options"
+#define SCT_APP_CHANGE_PROFILE                                     "application.change-profile"
+//Notifications
+#define SCT_APP_TOGGLE_SOUND                                       "application.toggle-sound"
+#define SCT_APP_ACTIVATE_NOTIFICATIONS                             "application.activate-notifications"
+#define SCT_APP_REMOVE_NOTIFICATIONS                               "application.remove-notifications"
+//MainWindow
+#define SCT_APP_SHOW_ROSTER                                        "application.show-roster"
+//FileStreamsManager
+#define SCT_APP_SHOW_FILETRANSFERS                                 "application.show-filetransfers"
+//MultiUserChat
+#define SCT_APP_MUC_JOIN                                           "application.muc-join"
+#define SCT_APP_MUC_SHOW_HIDDEN                                    "application.muc-show-hidden"
+#define SCT_APP_MUC_LEAVE_HIDDEN                                   "application.muc-leave-hidden"
+
+//RosterView
+#define SCTG_ROSTER                                                "roster"
 
 //MessageWidgets
-#define SCTG_MESSAGING                                             "messaging"
-#define SCTG_MESSAGING_TABWINDOW                                   "messaging.tabwindow"
-#define SCT_MESSAGING_TABWINDOW_NEXT_TAB                           "messaging.tabwindow.next-tab"
-#define SCT_MESSAGING_TABWINDOW_PREV_TAB                           "messaging.tabwindow.prev-tab"
-#define SCT_MESSAGING_TABWINDOW_CLOSE_TAB                          "messaging.tabwindow.close-tab"
-#define SCT_MESSAGING_TABWINDOW_DETACH_TAB                         "messaging.tabwindow.detach-tab"
-#define SCT_MESSAGING_TABWINDOW_SHOW_CLOSE_BUTTTONS							   "messaging.tabwindow.show-close-buttons"
-#define SCT_MESSAGING_TABWINDOW_TABS_BOTTOM                        "messaging.tabwindow.show-tabs-at-bottom"
-#define SCT_MESSAGING_TABWINDOW_SET_AS_DEFAULT                     "messaging.tabwindow.set-as-default"
-#define SCT_MESSAGING_TABWINDOW_RENAME_WINDOW                      "messaging.tabwindow.rename-window"
-#define SCT_MESSAGING_TABWINDOW_DELETE_WINDOW                      "messaging.tabwindow.delete-window"
-#define SCT_MESSAGING_TABWINDOW_QUICK_TAB                          "messaging.tabwindow.quick-tabs.tab%1"
+#define SCTG_TABWINDOW                                             "tabwindow"
+#define SCT_TABWINDOW_NEXT_TAB                                     "tabwindow.next-tab"
+#define SCT_TABWINDOW_PREV_TAB                                     "tabwindow.prev-tab"
+#define SCT_TABWINDOW_CLOSE_TAB                                    "tabwindow.close-tab"
+#define SCT_TABWINDOW_DETACH_TAB                                   "tabwindow.detach-tab"
+#define SCT_TABWINDOW_SHOW_CLOSE_BUTTTONS							             "tabwindow.show-close-buttons"
+#define SCT_TABWINDOW_TABS_BOTTOM                                  "tabwindow.show-tabs-at-bottom"
+#define SCT_TABWINDOW_SET_AS_DEFAULT                               "tabwindow.set-as-default"
+#define SCT_TABWINDOW_RENAME_WINDOW                                "tabwindow.rename-window"
+#define SCT_TABWINDOW_DELETE_WINDOW                                "tabwindow.delete-window"
+#define SCT_TABWINDOW_QUICK_TAB                                    "tabwindow.quick-tabs.tab%1"
+
+//MessageWidgets
+#define SCTG_CHATWINDOW                                            "chatwindow"
+
+//MessageWidgets
+#define SCTG_MESSAGEWINDOW                                         "messagewindow"
 
 //MultiUserChat
-#define SCTG_MESSAGING_MUC                                         "messaging.muc"
-#define SCT_MESSAGING_MUC_JOIN                                     "messaging.muc.join"
-#define SCT_MESSAGING_MUC_SHOW_HIDDEN                              "messaging.muc.show-hidden"
-#define SCT_MESSAGING_MUC_LEAVE_HIDDEN                             "messaging.muc.leave-hidden"
+#define SCTG_MULTIUSERCHAT                                         "multiuserchat"
 
-//Notifications
-#define SCTG_NOTIFICATIONS                                         "notifications"
-#define SCT_NOTIFICATIONS_TOGGLE_SOUND                             "notifications.toggle-sound"
-#define SCT_NOTIFICATIONS_ACTIVATE_ALL                             "notifications.activate-all"
-#define SCT_NOTIFICATIONS_REMOVE_ALL                               "notifications.remove-all"
+//ServiceDiscovery
+#define SCTG_SERVICEDISCOVERY                                      "discovery"
 
-//OptionsManager
-#define SCTG_OPTIONS                                               "options"
-#define SCT_OPTIONS_CHANGE_PROFILE                                 "options.change-profile"
-#define SCT_OPTIONS_SHOW_OPTIONS                                   "options.show-options"
 
 #endif // DEF_SHORTCUTS_H

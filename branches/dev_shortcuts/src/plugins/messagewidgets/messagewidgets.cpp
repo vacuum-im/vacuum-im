@@ -51,20 +51,21 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool MessageWidgets::initObjects()
 {
-	Shortcuts::declareGroup(SCTG_MESSAGING, tr("Messaging"));
-	Shortcuts::declareGroup(SCTG_MESSAGING_TABWINDOW, tr("Tabbed messaging window"));
-	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_CLOSE_TAB, tr("Close Tab"), QKeySequence::Close);
-	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_DELETE_WINDOW, tr("Delete Tab Window"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_DETACH_TAB, tr("Detach to Separate Window"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_NEXT_TAB, tr("Next Tab"), QKeySequence::NextChild);
-	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_PREV_TAB, tr("Previous Tab"), QKeySequence::PreviousChild);
-	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_RENAME_WINDOW,tr("Rename Tab Window"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_SET_AS_DEFAULT, tr("Use as Default Tab Window"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_SHOW_CLOSE_BUTTTONS, tr("Tabs Closable"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGING_TABWINDOW_TABS_BOTTOM, tr("Show Tabs at Bottom of the Window"), QKeySequence::UnknownKey);
-
+	Shortcuts::declareGroup(SCTG_TABWINDOW, tr("Tab window"));
+	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSE_TAB, tr("Close tab"), QKeySequence::Close);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_DETACH_TAB, tr("Detach tab to separate window"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_NEXT_TAB, tr("Next tab"), QKeySequence::NextChild);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_PREV_TAB, tr("Previous tab"), QKeySequence::PreviousChild);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_SHOW_CLOSE_BUTTTONS, tr("Set tabs closable"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_TABS_BOTTOM, tr("Show tabs at bottom"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_RENAME_WINDOW,tr("Rename tab window"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_DELETE_WINDOW, tr("Delete tab window"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_SET_AS_DEFAULT, tr("Use as default tab window"), QKeySequence::UnknownKey);
 	for (int tabNumber=1; tabNumber<=10; tabNumber++)
-		Shortcuts::declareShortcut(QString(SCT_MESSAGING_TABWINDOW_QUICK_TAB).arg(tabNumber), QString::null, tr("Alt+%1").arg(tabNumber % 10));
+		Shortcuts::declareShortcut(QString(SCT_TABWINDOW_QUICK_TAB).arg(tabNumber), QString::null, tr("Alt+%1").arg(tabNumber % 10));
+
+	Shortcuts::declareGroup(SCTG_CHATWINDOW, tr("Chat window"));
+	Shortcuts::declareGroup(SCTG_MESSAGEWINDOW, tr("Message window"));
 
 	insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
 	return true;

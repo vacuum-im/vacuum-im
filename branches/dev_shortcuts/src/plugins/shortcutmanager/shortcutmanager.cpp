@@ -74,7 +74,7 @@ void ShortcutManager::onOptionsClosed()
 	{
 		QKeySequence userKey = Shortcuts::shortcutDescriptor(shortcutId).userKey;
 		if (!userKey.isEmpty())
-			options.setValue(userKey.toString());
+			options.setValue(userKey.toString(),shortcutId);
 		else
 			options.removeNode(shortcutId);
 	}

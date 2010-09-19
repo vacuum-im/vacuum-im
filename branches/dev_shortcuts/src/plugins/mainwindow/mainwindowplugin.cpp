@@ -63,6 +63,8 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 
 bool MainWindowPlugin::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_APP_SHOW_ROSTER,tr("Show roster"),QKeySequence::UnknownKey,Qt::ApplicationShortcut);
+
 	Action *action = new Action(this);
 	action->setText(tr("Quit"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
@@ -74,6 +76,7 @@ bool MainWindowPlugin::initObjects()
 		action = new Action(this);
 		action->setText(tr("Show roster"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_SHOW_ROSTER);
+		action->setShortcutId(SCT_APP_SHOW_ROSTER);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowMainWindowByAction(bool)));
 		FTrayManager->addAction(action,AG_TMTM_MAINWINDOW,true);
 	}

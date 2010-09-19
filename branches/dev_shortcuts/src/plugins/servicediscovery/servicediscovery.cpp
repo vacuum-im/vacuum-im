@@ -151,6 +151,8 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 
 bool ServiceDiscovery::initObjects()
 {
+	Shortcuts::declareGroup(SCTG_SERVICEDISCOVERY,tr("Service discovery"));
+
 	FDiscoMenu = new Menu;
 	FDiscoMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
 	FDiscoMenu->setTitle(tr("Service Discovery"));

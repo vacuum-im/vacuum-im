@@ -38,7 +38,7 @@ void ShortcutOptionsWidget::apply()
 		{
 			ShortcutDescriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
-			QKeySequence userKey = key->text();
+			QKeySequence userKey = qvariant_cast<QKeySequence>(key->data(MDR_ACTIVE_KEYSEQUENCE));
 			if (descriptor.userKey != userKey)
 				Shortcuts::updateShortcut(shortcut, userKey!=descriptor.defaultKey ? userKey : QKeySequence());
 		}
@@ -57,7 +57,7 @@ void ShortcutOptionsWidget::reset()
 			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
 			QKeySequence activeKey = descriptor.userKey.isEmpty() ? descriptor.defaultKey : descriptor.userKey;
 			key->setText(activeKey.toString(QKeySequence::NativeText));
-			key->setData(activeKey,MDR_KEYSEQUENCE);
+			key->setData(activeKey,MDR_ACTIVE_KEYSEQUENCE);
 		}
 	}
 	emit childReset();
@@ -80,6 +80,7 @@ void ShortcutOptionsWidget::createTreeModel()
 			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
 			key->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsEditable);
 			key->setData(shortcut,MDR_SHORTCUTID);
+			key->setData(descriptor.defaultKey,MDR_DEFAULT_KEYSEQUENCE);
 		}
 	}
 }
@@ -118,7 +119,7 @@ void ShortcutOptionsWidget::onResetDefaultsClicked()
 			ShortcutDescriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
 			key->setText(descriptor.defaultKey.toString(QKeySequence::NativeText));
-			key->setData(descriptor.defaultKey,MDR_KEYSEQUENCE);
+			key->setData(descriptor.defaultKey,MDR_ACTIVE_KEYSEQUENCE);
 		}
 	}
 }

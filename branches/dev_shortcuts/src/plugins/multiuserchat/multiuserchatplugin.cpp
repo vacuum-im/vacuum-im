@@ -147,11 +147,10 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 
 bool MultiUserChatPlugin::initObjects()
 {
-	Shortcuts::declareGroup(SCTG_MESSAGING, tr("Messaging"));
-	Shortcuts::declareGroup(SCTG_MESSAGING_MUC, tr("Multi-user chats"));
-	Shortcuts::declareShortcut(SCT_MESSAGING_MUC_JOIN, tr("Join conference"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGING_MUC_LEAVE_HIDDEN, tr("Leave all hidden conferences"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGING_MUC_SHOW_HIDDEN, tr("Show all hidden conferences"), QKeySequence::UnknownKey);
+	Shortcuts::declareGroup(SCTG_MULTIUSERCHAT, tr("Multi-user chats"));
+	Shortcuts::declareShortcut(SCT_APP_MUC_JOIN, tr("Join conference"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_MUC_LEAVE_HIDDEN, tr("Leave all hidden conferences"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_MUC_SHOW_HIDDEN, tr("Show all hidden conferences"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
 
 	if (FMessageProcessor)
 	{
@@ -182,21 +181,21 @@ bool MultiUserChatPlugin::initObjects()
 		Action *action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
 		action->setText(tr("Join conference"));
-		action->setShortcutId(SCT_MESSAGING_MUC_JOIN);
+		action->setShortcutId(SCT_APP_MUC_JOIN);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onJoinActionTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
 
 		action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_SHOW_ALL_ROOMS);
 		action->setText(tr("Show all hidden conferences"));
-		action->setShortcutId(SCT_MESSAGING_MUC_SHOW_HIDDEN);
+		action->setShortcutId(SCT_APP_MUC_SHOW_HIDDEN);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowAllRoomsTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
 
 		action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_LEAVE_HIDDEN_ROOMS);
 		action->setText(tr("Leave all hidden conferences"));
-		action->setShortcutId(SCT_MESSAGING_MUC_LEAVE_HIDDEN);
+		action->setShortcutId(SCT_APP_MUC_LEAVE_HIDDEN);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onLeaveHiddenRoomsTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
 	}

@@ -6,8 +6,9 @@
 #define COL_NAME  0
 #define COL_KEY   1
 
-#define MDR_SHORTCUTID      Qt::UserRole+1
-#define MDR_KEYSEQUENCE     Qt::UserRole+2
+#define MDR_SHORTCUTID              Qt::UserRole+1
+#define MDR_ACTIVE_KEYSEQUENCE      Qt::UserRole+2
+#define MDR_DEFAULT_KEYSEQUENCE     Qt::UserRole+3
 
 class ShortcutOptionsDelegate : 
 	public QStyledItemDelegate

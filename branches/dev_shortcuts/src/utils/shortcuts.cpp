@@ -127,12 +127,12 @@ void Shortcuts::updateObject(QObject *AObject)
 	{
 		ShortcutDescriptor descriptor = d->shortcuts.value(id);
 		AObject->setProperty("shortcut", descriptor.userKey.isEmpty() ? descriptor.defaultKey : descriptor.userKey);
-		AObject->setProperty("shotcutContext", descriptor.context);
+		AObject->setProperty("shortcutContext", descriptor.context);
 	}
 	else if (AObject)
 	{
 		AObject->setProperty("shortcut",QVariant());
-		AObject->setProperty("shotcutContext",QVariant());
+		AObject->setProperty("shortcutContext",QVariant());
 	}
 }
 

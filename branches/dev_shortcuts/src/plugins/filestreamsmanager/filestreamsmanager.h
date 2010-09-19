@@ -5,6 +5,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
+#include <definitions/shortcuts.h>
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
@@ -20,6 +21,7 @@
 #include <utils/stanza.h>
 #include <utils/options.h>
 #include <utils/datetime.h>
+#include <utils/shortcuts.h>
 #include <utils/iconstorage.h>
 #include <utils/widgetmanager.h>
 #include "filestream.h"

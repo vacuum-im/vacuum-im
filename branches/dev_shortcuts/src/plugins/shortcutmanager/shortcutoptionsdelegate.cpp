@@ -31,7 +31,7 @@ void ShortcutOptionsDelegate::setEditorData(QWidget *AEditor, const QModelIndex 
 	QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
 	if (editor)
 	{
-		QKeySequence key = qvariant_cast<QKeySequence>(AIndex.data(MDR_KEYSEQUENCE));
+		QKeySequence key = qvariant_cast<QKeySequence>(AIndex.data(MDR_ACTIVE_KEYSEQUENCE));
 		editor->setText(key.toString(QKeySequence::NativeText));
 	}
 }
@@ -41,9 +41,9 @@ void ShortcutOptionsDelegate::setModelData(QWidget *AEditor, QAbstractItemModel 
 	QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
 	if (editor)
 	{
-		QKeySequence key = editor->text().trimmed();
+		QKeySequence key = editor->text().isEmpty() ? qvariant_cast<QKeySequence>(AIndex.data(MDR_DEFAULT_KEYSEQUENCE)) : QKeySequence(editor->text());
 		AModel->setData(AIndex,key.toString(QKeySequence::NativeText),Qt::DisplayRole);
-		AModel->setData(AIndex,key,MDR_KEYSEQUENCE);
+		AModel->setData(AIndex,key,MDR_ACTIVE_KEYSEQUENCE);
 	}
 }
 
