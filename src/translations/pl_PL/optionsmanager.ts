@@ -153,7 +153,7 @@
     </message>
     <message>
         <source>Options are absent</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak opcji</translation>
     </message>
 </context>
 <context>

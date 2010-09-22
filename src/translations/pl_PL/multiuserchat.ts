@@ -48,12 +48,13 @@
     <message>
         <source>%1 as %2</source>
         <comment>room as nick</comment>
-        <translation type="unfinished">%1 jako %2</translation>
+        <translation>%1 jako %2</translation>
     </message>
     <message>
         <source>Conference parameters is not acceptable.
 Check values and try again</source>
-        <translation type="unfinished"></translation>
+        <translation>Niepoprawne parametry konferencji.
+Sprawdź wartości i spróbuj jeszcze raz</translation>
     </message>
 </context>
 <context>
@@ -80,19 +81,19 @@ Check values and try again</source>
     </message>
     <message>
         <source>History:</source>
-        <translation type="unfinished"></translation>
+        <translation>Historia:</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Usuń</translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <source>Conference Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Parametry konferencji</translation>
     </message>
     <message>
         <source>Service:</source>
-        <translation type="unfinished"></translation>
+        <translation>Usługa:</translation>
     </message>
 </context>
 <context>
