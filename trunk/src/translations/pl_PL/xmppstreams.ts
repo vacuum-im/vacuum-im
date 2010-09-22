@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Connection closed unexpectedly</source>
-        <translation type="unfinished"></translation>
+        <translation>Połączenie zostało nieoczekiwanie zamknięte</translation>
     </message>
 </context>
 <context>

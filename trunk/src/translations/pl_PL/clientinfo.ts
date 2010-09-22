@@ -78,7 +78,7 @@
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
-        <translation>Obsługa pingów na poziomie aplikacji z wykorzytsaniem protokołu XMPP</translation>
+        <translation>Obsługa pingów na poziomie aplikacji z wykorzystaniem protokołu XMPP</translation>
     </message>
 </context>
 <context>
