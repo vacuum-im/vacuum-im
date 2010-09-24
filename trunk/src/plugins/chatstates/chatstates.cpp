@@ -5,7 +5,7 @@
 #include <QDataStream>
 
 #define SHC_CONTENT_MESSAGES      "/message[@type='chat']/body"
-#define SHC_STATE_MESSAGES        "/message[@type='chat']/[@xmlns='" NS_CHATSTATES "']"
+#define SHC_STATE_MESSAGES        "/message/[@xmlns='" NS_CHATSTATES "']"
 
 #define STATE_ACTIVE              "active"
 #define STATE_COMPOSING           "composing"
