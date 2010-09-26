@@ -111,7 +111,7 @@ protected:
 	bool isMentionMessage(const Message &AMessage) const;
 	void setMessageStyle();
 	void showTopic(const QString &ATopic);
-	void showMessage(const QString &AMessage, int AContentType=0);
+	void showStatusMessage(const QString &AMessage, int AContentType=0);
 	void showUserMessage(const Message &AMessage, const QString &ANick);
 	void showHistory();
 	void updateWindow();
