@@ -1,6 +1,7 @@
 set(LOCALIZED_LANGS
 	"ru_RU"
 	"pl_PL"
+        "de_DE"
 #	"uk_UA"
 )
 
