@@ -713,7 +713,7 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
 		QMultiMap<QDateTime,QString>::const_iterator noteIt = ACollection.notes.constBegin();
 		while (noteIt!=ACollection.notes.constEnd() || messageIt!=ACollection.messages.constEnd())
 		{
-			if (noteIt==ACollection.notes.constEnd() || messageIt->dateTime()<noteIt.key())
+			if (messageIt!=ACollection.messages.constEnd() && (noteIt==ACollection.notes.constEnd() || messageIt->dateTime()<noteIt.key()))
 			{
 				options.type = 0;
 				options.kind = IMessageContentOptions::Message;
@@ -748,7 +748,7 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
 				FViewWidget->appendMessage(*messageIt,options);
 				messageIt++;
 			}
-			else if (noteIt!=ACollection.notes.constEnd())
+			else if (noteIt != ACollection.notes.constEnd())
 			{
 				options.kind = IMessageContentOptions::Status;
 				options.type = 0;
