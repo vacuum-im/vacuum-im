@@ -380,6 +380,9 @@ void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageConten
 
 void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &AMessage)
 {
+	if (FMessageArchiver)
+		FMessageArchiver->saveNote(AWindow->streamJid(), AWindow->contactJid(), AMessage);
+
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::Status;
 	options.time = QDateTime::currentDateTime();
