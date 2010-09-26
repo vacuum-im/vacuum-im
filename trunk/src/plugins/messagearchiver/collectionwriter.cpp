@@ -88,7 +88,7 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
 
 bool CollectionWriter::writeNote(const QString &ANote)
 {
-	if (isOpened() && ANote.isEmpty())
+	if (isOpened() && !ANote.isEmpty())
 	{
 		FRecsCount++;
 		FCloseTimer.stop();

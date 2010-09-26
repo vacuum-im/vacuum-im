@@ -706,54 +706,59 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
 		}
 
 		IMessageContentOptions options;
-		options.kind = IMessageContentOptions::Status;
 		options.direction = IMessageContentOptions::DirectionIn;
 		options.noScroll = true;
-
-		options.senderId = FStreamJid.full();
-		options.senderName = FViewOptions.selfName;
-		QMultiMap<QDateTime,QString>::const_iterator it = ACollection.notes.constBegin();
-		while (it!=ACollection.notes.constEnd())
+		
+		QList<Message>::const_iterator messageIt = ACollection.messages.constBegin();
+		QMultiMap<QDateTime,QString>::const_iterator noteIt = ACollection.notes.constBegin();
+		while (noteIt!=ACollection.notes.constEnd() || messageIt!=ACollection.messages.constEnd())
 		{
-			options.time = it.key();
-			options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
-			FViewWidget->appendText(it.value(),options);
-			it++;
-		}
-
-		options.kind = IMessageContentOptions::Message;
-		foreach(Message message, ACollection.messages)
-		{
-			options.type = 0;
-			options.time = message.dateTime();
-			options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
-			Jid senderJid = !message.from().isEmpty() ? message.from() : FStreamJid;
-
-			if (FViewOptions.isGroupchat)
+			if (noteIt==ACollection.notes.constEnd() || messageIt->dateTime()<noteIt.key())
 			{
-				options.direction = IMessageContentOptions::DirectionIn;
-				options.type |= IMessageContentOptions::Groupchat;
-				options.senderName = Qt::escape(senderJid.resource());
-				options.senderId = options.senderName;
-			}
-			else if (ACollection.header.with == senderJid)
-			{
-				options.direction = IMessageContentOptions::DirectionIn;
-				options.senderId = senderJid.full();
-				options.senderName = FViewOptions.contactName;
-				options.senderAvatar = FViewOptions.contactAvatar;
-				options.senderColor = "blue";
-			}
-			else
-			{
-				options.direction = IMessageContentOptions::DirectionOut;
-				options.senderId = senderJid.full();
-				options.senderName = FViewOptions.selfName;
-				options.senderAvatar = FViewOptions.selfAvatar;
-				options.senderColor = "red";
-			}
+				options.type = 0;
+				options.kind = IMessageContentOptions::Message;
+				options.time = messageIt->dateTime();
+				options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
+				Jid senderJid = !messageIt->from().isEmpty() ? messageIt->from() : FStreamJid;
 
-			FViewWidget->appendMessage(message,options);
+				if (FViewOptions.isGroupchat)
+				{
+					options.direction = IMessageContentOptions::DirectionIn;
+					options.type |= IMessageContentOptions::Groupchat;
+					options.senderName = Qt::escape(senderJid.resource());
+					options.senderId = options.senderName;
+				}
+				else if (ACollection.header.with == senderJid)
+				{
+					options.direction = IMessageContentOptions::DirectionIn;
+					options.senderId = senderJid.full();
+					options.senderName = FViewOptions.contactName;
+					options.senderAvatar = FViewOptions.contactAvatar;
+					options.senderColor = "blue";
+				}
+				else
+				{
+					options.direction = IMessageContentOptions::DirectionOut;
+					options.senderId = senderJid.full();
+					options.senderName = FViewOptions.selfName;
+					options.senderAvatar = FViewOptions.selfAvatar;
+					options.senderColor = "red";
+				}
+
+				FViewWidget->appendMessage(*messageIt,options);
+				messageIt++;
+			}
+			else if (noteIt!=ACollection.notes.constEnd())
+			{
+				options.kind = IMessageContentOptions::Status;
+				options.type = 0;
+				options.senderId = QString::null;
+				options.senderName = QString::null;
+				options.time = noteIt.key();
+				options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
+				FViewWidget->appendText(noteIt.value(),options);
+				noteIt++;
+			}
 		}
 	}
 }
