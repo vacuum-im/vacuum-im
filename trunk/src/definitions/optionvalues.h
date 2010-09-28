@@ -92,6 +92,14 @@
 // ChatStates
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
 
+// MessageArchive
+#define OPV_HISTORY_COLLECTION_SIZE                     "history.collection.size"
+#define OPV_HISTORY_COLLECTION_MAXSIZE                  "history.collection.max-size"
+#define OPV_HISTORY_COLLECTION_TIMEOUT                  "history.collection.timeout"
+#define OPV_HISTORY_COLLECTION_MINTIMEOUT               "history.collection.min-timeout"
+#define OPV_HISTORY_COLLECTION_MAXTIMEOUT               "history.collection.max-timeout"
+#define OPV_HISTORY_COLLECTION_MINMESSAGES              "history.collection.min-messages"
+
 // MessageStyles
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"
 #define OPV_MESSAGESTYLE_MTYPE_ITEM                     "message-styles.message-type"

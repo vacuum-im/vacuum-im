@@ -352,10 +352,6 @@
         <translation>Дата</translation>
     </message>
     <message>
-        <source>Subject</source>
-        <translation>Тема</translation>
-    </message>
-    <message>
         <source>Groups</source>
         <translation>Группы</translation>
     </message>
@@ -386,10 +382,6 @@
     <message>
         <source>Filter</source>
         <translation>Фильтр</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Переименовать</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -474,6 +466,10 @@
     <message>
         <source> &lt;All contacts&gt; </source>
         <translation> &lt;Все контакты&gt; </translation>
+    </message>
+    <message>
+        <source>Change Subject</source>
+        <translation>Изменить тему</translation>
     </message>
 </context>
 <context>

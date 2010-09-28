@@ -155,7 +155,6 @@ protected:
 	QString collectionFileName(const DateTime &AStart) const;
 	QString collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const;
 	QString collectionFilePath(const Jid &AStreamJid, const Jid &AWith, const DateTime &AStart) const;
-	QMultiMap<QString,QString> filterCollectionFiles(const QStringList &AFiles, const IArchiveRequest &ARequest, const QString &APrefix) const;
 	QStringList findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const;
 	IArchiveHeader loadCollectionHeader(const QString &AFileName) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;

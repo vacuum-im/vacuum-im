@@ -2,6 +2,7 @@
 
 #include <QDir>
 #include <QStack>
+#include <QDirIterator>
 
 #define ARCHIVE_DIR_NAME      "archive"
 #define COLLECTION_EXT        ".xml"
@@ -223,6 +224,12 @@ bool MessageArchiver::initObjects()
 bool MessageArchiver::initSettings()
 {
 	Options::setDefaultValue(OPV_ACCOUNT_ARCHIVEREPLICATION,false);
+	Options::setDefaultValue(OPV_HISTORY_COLLECTION_MINMESSAGES,5);
+	Options::setDefaultValue(OPV_HISTORY_COLLECTION_SIZE,20*1024);
+	Options::setDefaultValue(OPV_HISTORY_COLLECTION_MAXSIZE,30*1024);
+	Options::setDefaultValue(OPV_HISTORY_COLLECTION_TIMEOUT,20*60*1000);
+	Options::setDefaultValue(OPV_HISTORY_COLLECTION_MINTIMEOUT,5*60*1000);
+	Options::setDefaultValue(OPV_HISTORY_COLLECTION_MAXTIMEOUT,120*60*1000);
 
 	if (FOptionsManager)
 	{
@@ -1654,69 +1661,42 @@ QString MessageArchiver::collectionFilePath(const Jid &AStreamJid, const Jid &AW
 	return QString::null;
 }
 
-QMultiMap<QString,QString> MessageArchiver::filterCollectionFiles(const QStringList &AFiles, const IArchiveRequest &ARequest,
-    const QString &APrefix) const
-{
-	QMultiMap<QString,QString> filesMap;
-	if (!AFiles.isEmpty())
-	{
-		QString startName = collectionFileName(ARequest.start);
-		QString endName = collectionFileName(ARequest.end);
-		foreach(QString file, AFiles)
-			if ((startName.isEmpty() || startName<=file) && (endName.isEmpty() || endName>=file))
-				filesMap.insert(file,APrefix);
-	}
-	return filesMap;
-}
-
 QStringList MessageArchiver::findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const
 {
-	QMultiMap<QString,QString> filesMap;
-	QString dirPath = collectionDirPath(AStreamJid,ARequest.with);
-	QDir dir(dirPath);
-	if (AStreamJid.isValid() && dir.exists())
+	static const QString CollectionExt = COLLECTION_EXT;
+
+	QStringList files;
+	if (AStreamJid.isValid())
 	{
-		if (ARequest.with.isValid())
-			filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,""));
-		if (ARequest.with.resource().isEmpty())
+		QMultiMap<QString,QString> filesMap;
+		QString startName = collectionFileName(ARequest.start);
+		QString endName = collectionFileName(ARequest.end);
+		QDirIterator dirIt(collectionDirPath(AStreamJid,ARequest.with),QDir::Files,QDirIterator::Subdirectories);
+		while (dirIt.hasNext())
 		{
-			QStringList dirs1 = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-			foreach (QString dir1, dirs1)
+			QString fpath = dirIt.next();
+			QString fname = dirIt.fileName();
+			if (fname.endsWith(CollectionExt) && (startName.isEmpty() || startName<=fname) && (endName.isEmpty() || endName>=fname))
 			{
-				dir.cd(dir1);
-				QString dir1Prefix = dir1+"/";
-				filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,dir1Prefix));
-				if (!ARequest.with.isValid())
-				{
-					QStringList dirs2 = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-					foreach (QString dir2, dirs2)
-					{
-						dir.cd(dir2);
-						QString dir2Prefix = dir1Prefix+dir2+"/";
-						filesMap.unite(filterCollectionFiles(dir.entryList(QStringList() << "*"COLLECTION_EXT,QDir::Files),ARequest,dir2Prefix));
-						dir.cdUp();
-					}
-				}
-				dir.cdUp();
+				filesMap.insertMulti(fname,fpath);
+				if (filesMap.count() > ARequest.count)
+					filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
 			}
 		}
 
-		QStringList files;
-		QMapIterator<QString,QString> it(filesMap);
+		QMapIterator<QString,QString> fileIt(filesMap);
 		if (ARequest.order == Qt::DescendingOrder)
-			it.toBack();
-		while (files.count()<ARequest.count && (ARequest.order==Qt::AscendingOrder ? it.hasNext() : it.hasPrevious()))
+			fileIt.toBack();
+		while (ARequest.order==Qt::AscendingOrder ? fileIt.hasNext() : fileIt.hasPrevious())
 		{
 			if (ARequest.order == Qt::AscendingOrder)
-				it.next();
+				fileIt.next();
 			else
-				it.previous();
-			files.append(dir.absoluteFilePath(it.value()+it.key()));
+				fileIt.previous();
+			files.append(fileIt.value());
 		}
-
-		return files;
 	}
-	return QStringList();
+	return files;
 }
 
 IArchiveHeader MessageArchiver::loadCollectionHeader(const QString &AFileName) const

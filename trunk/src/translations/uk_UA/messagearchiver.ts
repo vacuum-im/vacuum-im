@@ -352,10 +352,6 @@
         <translation type="unfinished">Дата</translation>
     </message>
     <message>
-        <source>Subject</source>
-        <translation type="unfinished">Тема</translation>
-    </message>
-    <message>
         <source>Groups</source>
         <translation type="unfinished">Группы</translation>
     </message>
@@ -386,10 +382,6 @@
     <message>
         <source>Filter</source>
         <translation type="unfinished">Фильтр</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="unfinished">Переименовать</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -474,6 +466,10 @@
     <message>
         <source> &lt;All contacts&gt; </source>
         <translation type="unfinished"> &lt;Все контакты&gt; </translation>
+    </message>
+    <message>
+        <source>Change Subject</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
