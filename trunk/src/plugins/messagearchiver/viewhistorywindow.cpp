@@ -574,13 +574,14 @@ QStandardItem *ViewHistoryWindow::createHeaderItem(const IArchiveHeader &AHeader
 	
 	QStandardItem *itemDate = createCustomItem(HIT_HEADER_DATE,AHeader.start.date());
 	itemDate->setToolTip(AHeader.start.toString());
+	itemDate->setData(AHeader.start,HDR_SORT_ROLE);
 
 	QStandardItem *parentItem = createHeaderParent(AHeader,NULL);
 	QList<QStandardItem *> items = QList<QStandardItem *>() << itemName << itemDate;
 	parentItem!=NULL ? parentItem->appendRow(items) : FModel->appendRow(items);
 	emit itemCreated(itemName);
 
-	//FInvalidateTimer.start();
+	FInvalidateTimer.start();
 	return itemName;
 }
 
