@@ -1,18 +1,15 @@
 #include "collectionwriter.h"
 
-#define LIMIT_FILE_SIZE         7*1024
-#define MAX_FILE_SIZE           10*1024
-#define LIMIT_WAIT_TIME         1*60*100
-#define MAX_WAIT_TIME           5*60*1000
 
 CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent) : QObject(AParent)
 {
 	FXmlFile = NULL;
 	FXmlWriter = NULL;
 
-	FRecsCount = 0;
 	FSecsSum = 0;
 	FGroupchat = false;
+	FNotesCount = 0;
+	FMessagesCount = 0;
 
 	FStreamJid = AStreamJid;
 	FFileName = AFileName;
@@ -46,6 +43,31 @@ bool CollectionWriter::isOpened() const
 	return FXmlWriter!=NULL;
 }
 
+const Jid &CollectionWriter::streamJid() const
+{
+	return FStreamJid;
+}
+
+const QString &CollectionWriter::fileName() const
+{
+	return FFileName;
+}
+
+const IArchiveHeader &CollectionWriter::header() const
+{
+	return FHeader;
+}
+
+int CollectionWriter::recordsCount() const
+{
+	return FMessagesCount + FNotesCount;
+}
+
+int CollectionWriter::secondsFromStart() const
+{
+	return FSecsSum;
+}
+
 bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn)
 {
 	if (isOpened() && ASaveMode != ARCHIVE_SAVE_FALSE)
@@ -54,7 +76,7 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
 		FGroupchat |= AMessage.type()==Message::GroupChat;
 		if (!FGroupchat || !contactJid.resource().isEmpty())
 		{
-			FRecsCount++;
+			FMessagesCount++;
 			FCloseTimer.stop();
 
 			FXmlWriter->writeStartElement(ADirectionIn ? "from" : "to");
@@ -90,7 +112,7 @@ bool CollectionWriter::writeNote(const QString &ANote)
 {
 	if (isOpened() && !ANote.isEmpty())
 	{
-		FRecsCount++;
+		FNotesCount++;
 		FCloseTimer.stop();
 		FXmlWriter->writeStartElement("note");
 		FXmlWriter->writeAttribute("utc",DateTime(QDateTime::currentDateTime()).toX85UTC());
@@ -134,7 +156,7 @@ void CollectionWriter::stopCollection()
 		delete FXmlFile;
 		FXmlFile = NULL;
 	}
-	if (FRecsCount == 0)
+	if (FMessagesCount == 0)
 	{
 		QFile::remove(FFileName);
 	}
@@ -168,10 +190,12 @@ void CollectionWriter::writeElementChilds(const QDomElement &AElem)
 
 void CollectionWriter::checkLimits()
 {
-	int timeout = MAX_WAIT_TIME;
-	if (FXmlFile->size() > LIMIT_FILE_SIZE)
-		timeout = LIMIT_WAIT_TIME;
-	else if (FXmlFile->size() > MAX_FILE_SIZE)
-		timeout = 0;
-	FCloseTimer.start(timeout);
+	if (FXmlFile->size() > Options::node(OPV_HISTORY_COLLECTION_SIZE).value().toInt())
+		FCloseTimer.start(Options::node(OPV_HISTORY_COLLECTION_MINTIMEOUT).value().toInt());
+	else if (FXmlFile->size() > Options::node(OPV_HISTORY_COLLECTION_MAXSIZE).value().toInt())
+		FCloseTimer.start(0);
+	else if (FMessagesCount > Options::node(OPV_HISTORY_COLLECTION_MINMESSAGES).value().toInt())
+	   FCloseTimer.start(Options::node(OPV_HISTORY_COLLECTION_TIMEOUT).value().toInt());
+	else
+		FCloseTimer.start(Options::node(OPV_HISTORY_COLLECTION_MAXTIMEOUT).value().toInt());
 }

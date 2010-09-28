@@ -352,10 +352,6 @@
         <translation>Data</translation>
     </message>
     <message>
-        <source>Subject</source>
-        <translation>Temat</translation>
-    </message>
-    <message>
         <source>Groups</source>
         <translation>Grupy</translation>
     </message>
@@ -386,10 +382,6 @@
     <message>
         <source>Filter</source>
         <translation>Filtr</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Zmien nazwę</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -474,6 +466,10 @@
     <message>
         <source> &lt;All contacts&gt; </source>
         <translation>&lt;Wszystkie kontakty&gt;</translation>
+    </message>
+    <message>
+        <source>Change Subject</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

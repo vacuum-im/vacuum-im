@@ -144,15 +144,15 @@ private:
 	int FSource;
 	int FGroupKind;
 	Jid FStreamJid;
-	ViewOptions FViewOptions;
-	QTimer FInvalidateTimer;
 	IArchiveFilter FFilter;
-	QList<IArchiveHeader> FCurrentHeaders;
+	QTimer FInvalidateTimer;
+	ViewOptions FViewOptions;
 	QList<IArchiveRequest> FRequestList;
-	QMap<QString,IArchiveRequest> FHeaderRequests;
-	QMap<QString,IArchiveHeader> FCollectionRequests;
+	QList<IArchiveHeader> FCurrentHeaders;
 	QMap<QString,IArchiveHeader> FRenameRequests;
 	QMap<QString,IArchiveHeader> FRemoveRequests;
+	QMap<QString,IArchiveRequest> FHeaderRequests;
+	QMap<QString,IArchiveHeader> FCollectionRequests;
 	QMap<IArchiveHeader,IArchiveCollection> FCollections;
 };
 
