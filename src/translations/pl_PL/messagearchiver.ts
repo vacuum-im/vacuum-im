@@ -469,7 +469,7 @@
     </message>
     <message>
         <source>Change Subject</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień Temat</translation>
     </message>
 </context>
 <context>
