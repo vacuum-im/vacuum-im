@@ -45,15 +45,15 @@
     </message>
     <message>
         <source>pres-in</source>
-        <translation>wej. status</translation>
+        <translation>odebrany status</translation>
     </message>
     <message>
         <source>pres-out</source>
-        <translation>wyj. status</translation>
+        <translation>wysłany status</translation>
     </message>
     <message>
         <source>&lt;any stanza&gt;</source>
-        <translation>każdy blok XML</translation>
+        <translation>dowolny blok XML</translation>
     </message>
     <message>
         <source>%1: if %2 = &apos;%3&apos; then %4 [%5 ]</source>
@@ -61,7 +61,7 @@
     </message>
     <message>
         <source>&lt;action&gt;</source>
-        <translation>&lt;działania&gt;</translation>
+        <translation>&lt;akcje&gt;</translation>
     </message>
     <message>
         <source>%1: always %2 [%3 ]</source>
@@ -188,11 +188,11 @@
     </message>
     <message>
         <source>pres-in</source>
-        <translation>wej. status</translation>
+        <translation>odebrany status</translation>
     </message>
     <message>
         <source>pres-out</source>
-        <translation>wyj. status</translation>
+        <translation>wysłany status</translation>
     </message>
 </context>
 <context>
@@ -227,7 +227,7 @@
     </message>
     <message>
         <source>Visible to contact</source>
-        <translation>widoczny dla kontaktu</translation>
+        <translation>Widoczny dla kontaktu</translation>
     </message>
     <message>
         <source>Invisible to contact</source>
@@ -287,11 +287,11 @@
     </message>
     <message>
         <source>- presences in: %1</source>
-        <translation>- wej. status: %1</translation>
+        <translation>- odebrany status: %1</translation>
     </message>
     <message>
         <source>- presences out: %1</source>
-        <translation>- wyj. status: %1</translation>
+        <translation>- wysłany status: %1</translation>
     </message>
 </context>
 </TS>
