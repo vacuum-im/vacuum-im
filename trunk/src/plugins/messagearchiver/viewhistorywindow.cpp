@@ -6,7 +6,6 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QApplication>
 
 #define MINIMUM_DATETIME      QDateTime(QDate(1,1,1),QTime(0,0,0))
 #define MAXIMUM_DATETIME      QDateTime::currentDateTime()
@@ -692,7 +691,6 @@ void ViewHistoryWindow::processHeaders(const QList<IArchiveHeader> &AHeaders)
 			FCollections.insert(collection.header,collection);
 			createHeaderItem(collection.header);
 			insertContact(collection.header.with);
-			QApplication::processEvents();
 		}
 	}
 }
@@ -815,10 +813,7 @@ void ViewHistoryWindow::rebuildModel()
 {
 	clearModel();
 	for (QMap<IArchiveHeader,IArchiveCollection>::const_iterator it = FCollections.constBegin(); it!=FCollections.constEnd(); it++)  
-	{
 		createHeaderItem(it.key());
-		QApplication::processEvents();
-	}
 }
 
 void ViewHistoryWindow::createGroupKindMenu()

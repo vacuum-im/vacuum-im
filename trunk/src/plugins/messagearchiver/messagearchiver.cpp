@@ -1,7 +1,7 @@
 #include "messagearchiver.h"
 
+#include <QDir>
 #include <QStack>
-#include <QApplication>
 #include <QDirIterator>
 
 #define ARCHIVE_DIR_NAME      "archive"
@@ -1282,7 +1282,6 @@ IArchiveModifications MessageArchiver::loadLocalModifications(const Jid &AStream
 					ebound = log.pos();
 				else
 					sbound = log.pos();
-				QApplication::processEvents();
 			}
 			log.seek(sbound);
 
@@ -1316,7 +1315,6 @@ IArchiveModifications MessageArchiver::loadLocalModifications(const Jid &AStream
 							modifs.items.append(modif);
 						}
 					}
-					QApplication::processEvents();
 				}
 			}
 		}
@@ -1684,7 +1682,6 @@ QStringList MessageArchiver::findCollectionFiles(const Jid &AStreamJid, const IA
 				if (filesMap.count() > ARequest.count)
 					filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
 			}
-			QApplication::processEvents();
 		}
 
 		QMapIterator<QString,QString> fileIt(filesMap);
