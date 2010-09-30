@@ -5,106 +5,106 @@
     <name>ConnectionManager</name>
     <message>
         <source>Connection Manager</source>
-        <translation type="unfinished">Диспетчер соединений</translation>
+        <translation>Диспетчер з’єднань</translation>
     </message>
     <message>
         <source>Allows to use different types of connections to a Jabber server</source>
-        <translation type="unfinished">Позволяет использовать различные типы подключений к джаббер серверу</translation>
+        <translation>Дозволяє використовувати різні типи з’єднань</translation>
     </message>
     <message>
         <source>&lt;No Proxy&gt;</source>
-        <translation type="unfinished">&lt;Без прокси&gt;</translation>
+        <translation>&lt;Без проксі&gt;</translation>
     </message>
     <message>
         <source>New Proxy</source>
-        <translation type="unfinished">Новый прокси</translation>
+        <translation>Новий проксі</translation>
     </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <source>Connection</source>
-        <translation type="unfinished">Соединение</translation>
+        <translation>З’єднання</translation>
     </message>
     <message>
         <source>Connection:</source>
-        <translation type="unfinished">Соединение:</translation>
+        <translation>З’єднання:</translation>
     </message>
 </context>
 <context>
     <name>EditProxyDialog</name>
     <message>
         <source>HTTP Proxy</source>
-        <translation type="unfinished">HTTP прокси</translation>
+        <translation>HTTP проксі</translation>
     </message>
     <message>
         <source>Socks5 Proxy</source>
-        <translation type="unfinished">Socks5 прокси</translation>
+        <translation>Socks5 проксі</translation>
     </message>
     <message>
         <source>New Proxy</source>
-        <translation type="unfinished">Новый прокси</translation>
+        <translation>Новий проксі</translation>
     </message>
 </context>
 <context>
     <name>EditProxyDialogClass</name>
     <message>
         <source>Proxy Manager</source>
-        <translation type="unfinished">Диспетчер прокси</translation>
+        <translation>Диспетчер проксі</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation>Ім’я:</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="unfinished">Тип:</translation>
+        <translation>Тип:</translation>
     </message>
     <message>
         <source>Host:</source>
-        <translation type="unfinished">Хост:</translation>
+        <translation>Хост:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="unfinished">Порт:</translation>
+        <translation>Порт:</translation>
     </message>
     <message>
         <source>User:</source>
-        <translation type="unfinished">Логин:</translation>
+        <translation>Логін:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished">Пароль:</translation>
+        <translation>Пароль:</translation>
     </message>
     <message>
         <source>Default Proxy:</source>
-        <translation type="unfinished">Прокси по умолчанию:</translation>
+        <translation>Прокси за замовчуванням:</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Додати</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Видалити</translation>
     </message>
 </context>
 <context>
     <name>ProxySettingsWidget</name>
     <message>
         <source>&lt;Default Proxy&gt;</source>
-        <translation type="unfinished">&lt;Прокси по умолчанию&gt;</translation>
+        <translation>&lt;Прокси за замовчуванням&gt;</translation>
     </message>
 </context>
 <context>
     <name>ProxySettingsWidgetClass</name>
     <message>
         <source>Proxy:</source>
-        <translation type="unfinished">Прокси:</translation>
+        <translation>Проксі:</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished">Редактировать</translation>
+        <translation>Редагувати</translation>
     </message>
 </context>
 </TS>

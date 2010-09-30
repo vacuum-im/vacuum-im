@@ -73,11 +73,11 @@
     </message>
     <message>
         <source>XMPP Ping</source>
-        <translation type="unfinished"></translation>
+        <translation>Пінг</translation>
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Підтримує XMPP ping</translation>
     </message>
 </context>
 <context>

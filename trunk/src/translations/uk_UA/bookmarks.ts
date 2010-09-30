@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Disable autojoin to conferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Не входити автоматично до конференцій</translation>
     </message>
 </context>
 <context>

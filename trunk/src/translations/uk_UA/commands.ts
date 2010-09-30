@@ -92,7 +92,7 @@
     </message>
     <message>
         <source>Forbidden</source>
-        <translation type="unfinished"></translation>
+        <translation>Заборонено</translation>
     </message>
 </context>
 </TS>
