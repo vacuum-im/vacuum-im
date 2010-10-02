@@ -62,6 +62,14 @@ QString ChatWindow::tabPageId() const
 	return "ChatWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
 }
 
+bool ChatWindow::isActive() const
+{
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
+}
+
 void ChatWindow::showWindow()
 {
 	if (isWindow() && !isVisible())
@@ -92,11 +100,6 @@ void ChatWindow::setContactJid(const Jid &AContactJid)
 		FEditWidget->setContactJid(FContactJid);
 		emit contactJidChanged(before);
 	}
-}
-
-bool ChatWindow::isActive() const
-{
-	return isVisible() && isActiveWindow();
 }
 
 void ChatWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle)
@@ -168,6 +171,10 @@ bool ChatWindow::event(QEvent *AEvent)
 	{
 		emit windowActivated();
 	}
+	else if (AEvent->type() == QEvent::WindowDeactivate)
+	{
+		emit windowDeactivated();
+	}
 	return QMainWindow::event(AEvent);
 }
 
@@ -186,6 +193,7 @@ void ChatWindow::closeEvent(QCloseEvent *AEvent)
 	if (FShownDetached)
 		saveWindowGeometry();
 	QMainWindow::closeEvent(AEvent);
+	emit windowDeactivated();
 	emit windowClosed();
 }
 

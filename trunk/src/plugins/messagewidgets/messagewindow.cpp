@@ -73,6 +73,14 @@ QString MessageWindow::tabPageId() const
 	return "MessageWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
 }
 
+bool MessageWindow::isActive() const
+{
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
+}
+
 void MessageWindow::showWindow()
 {
 	if (isWindow())
@@ -215,7 +223,13 @@ void MessageWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, c
 bool MessageWindow::event(QEvent *AEvent)
 {
 	if (AEvent->type() == QEvent::WindowActivate)
+	{
 		emit windowActivated();
+	}
+	else if (AEvent->type() == QEvent::WindowDeactivate)
+	{
+		emit windowDeactivated();
+	}
 	return QMainWindow::event(AEvent);
 }
 
@@ -235,6 +249,7 @@ void MessageWindow::closeEvent(QCloseEvent *AEvent)
 	if (FShownDetached)
 		saveWindowGeometry();
 	QMainWindow::closeEvent(AEvent);
+	emit windowDeactivated();
 	emit windowClosed();
 }
 

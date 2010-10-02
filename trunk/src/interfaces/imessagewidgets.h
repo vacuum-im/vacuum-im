@@ -162,12 +162,15 @@ class ITabWindowPage
 public:
 	virtual QWidget *instance() =0;
 	virtual QString tabPageId() const =0;
+	virtual bool isActive() const =0;
 	virtual void showWindow() =0;
 	virtual void closeWindow() =0;
 protected:
 	virtual void windowShow() =0;
 	virtual void windowClose() =0;
 	virtual void windowChanged() =0;
+	virtual void windowActivated() =0;
+	virtual void windowDeactivated() =0;
 	virtual void windowDestroyed() =0;
 };
 
@@ -207,13 +210,11 @@ public:
 	virtual IMenuBarWidget *menuBarWidget() const =0;
 	virtual IToolBarWidget *toolBarWidget() const =0;
 	virtual IStatusBarWidget *statusBarWidget() const =0;
-	virtual bool isActive() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 protected:
 	virtual void messageReady() =0;
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void contactJidChanged(const Jid &ABefore) =0;
-	virtual void windowActivated() =0;
 	virtual void windowClosed() =0;
 };
 
@@ -255,7 +256,6 @@ protected:
 	virtual void messageReady() =0;
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void contactJidChanged(const Jid &ABefore) =0;
-	virtual void windowActivated() =0;
 	virtual void windowClosed() =0;
 };
 

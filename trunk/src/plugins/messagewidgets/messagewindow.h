@@ -25,6 +25,7 @@ public:
 	virtual QMainWindow *instance() { return this; }
 	//ITabWindowPage
 	virtual QString tabPageId() const;
+	virtual bool isActive() const;
 	virtual void showWindow();
 	virtual void closeWindow();
 	//IMessageWindow
@@ -54,6 +55,8 @@ signals:
 	void windowShow();
 	void windowClose();
 	void windowChanged();
+	void windowActivated();
+	void windowDeactivated();
 	void windowDestroyed();
 	//IMessageWindow
 	void showNextMessage();
@@ -63,7 +66,6 @@ signals:
 	void messageReady();
 	void streamJidChanged(const Jid &ABefore);
 	void contactJidChanged(const Jid &ABefore);
-	void windowActivated();
 	void windowClosed();
 protected:
 	void initialize();
