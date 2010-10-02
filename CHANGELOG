@@ -29,6 +29,7 @@ LEGEND
   [-] Not all history messages collections with the same start time was displayed in hisroty window
   [-] Recent messages with specified ThreadId could not be deleted from local archive
   [-] When closing the connection initiated by the server vacuum does not generate an error and re-reconnection was not started
+  [-] Notification of arrival of the new message would not occur if the chat window was closed by clicking on the Windows taskbar
 
 v1.0.2
 ------

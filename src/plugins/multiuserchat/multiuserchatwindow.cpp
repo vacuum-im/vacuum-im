@@ -40,7 +40,6 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FStatusBarWidget = NULL;
 	FShownDetached = false;
 	FDestroyOnChatClosed = false;
-	bVisible = false;
 
 	initialize();
 	createMessageWidgets();
@@ -83,6 +82,14 @@ MultiUserChatWindow::~MultiUserChatWindow()
 QString MultiUserChatWindow::tabPageId() const
 {
 	return "MessageWindow|"+streamJid().pBare()+"|"+roomJid().pBare();
+}
+
+bool MultiUserChatWindow::isActive() const
+{
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
 }
 
 void MultiUserChatWindow::showWindow()
@@ -254,6 +261,46 @@ bool MultiUserChatWindow::openWindow(int AOrder, const Jid &AStreamJid, const Ji
 		return true;
 	}
 	return false;
+}
+
+Jid MultiUserChatWindow::streamJid() const
+{
+	return FMultiChat->streamJid();
+}
+
+Jid MultiUserChatWindow::roomJid() const
+{
+	return FMultiChat->roomJid();
+}
+
+IViewWidget *MultiUserChatWindow::viewWidget() const
+{
+	return FViewWidget;
+}
+
+IEditWidget *MultiUserChatWindow::editWidget() const
+{
+	return FEditWidget;
+}
+
+IMenuBarWidget *MultiUserChatWindow::menuBarWidget() const
+{
+	return FMenuBarWidget;
+}
+
+IToolBarWidget *MultiUserChatWindow::toolBarWidget() const
+{
+	return FToolBarWidget;
+}
+
+IStatusBarWidget *MultiUserChatWindow::statusBarWidget() const
+{
+	return FStatusBarWidget;
+}
+
+IMultiUserChat *MultiUserChatWindow::multiUserChat() const
+{
+	return FMultiChat;
 }
 
 IChatWindow *MultiUserChatWindow::openChatWindow(const Jid &AContactJid)
@@ -1306,6 +1353,10 @@ bool MultiUserChatWindow::event(QEvent *AEvent)
 	{
 		emit windowActivated();
 	}
+	else if (AEvent->type() == QEvent::WindowDeactivate)
+	{
+		emit windowDeactivated();
+	}
 	return QMainWindow::event(AEvent);
 }
 
@@ -1317,7 +1368,6 @@ void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 	QMainWindow::showEvent(AEvent);
 	if (FEditWidget)
 		FEditWidget->textEdit()->setFocus();
-	bVisible = true;
 	emit windowActivated();
 }
 
@@ -1326,7 +1376,7 @@ void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 	if (FShownDetached)
 		saveWindowGeometry();
 	QMainWindow::closeEvent(AEvent);
-	bVisible = false;
+	emit windowDeactivated();
 	emit windowClosed();
 }
 

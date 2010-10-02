@@ -57,6 +57,7 @@ public:
 	virtual QMainWindow *instance() { return this; }
 	//ITabWindowPage
 	virtual QString tabPageId() const;
+	virtual bool isActive() const;
 	virtual void showWindow();
 	virtual void closeWindow();
 	//IMessageHandler
@@ -66,27 +67,28 @@ public:
 	virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
 	virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
 	//IMultiUserChatWindow
-	virtual Jid streamJid() const { return FMultiChat->streamJid(); }
-	virtual Jid roomJid() const { return FMultiChat->roomJid(); }
-	virtual bool isActive() const { return QMainWindow::isVisible() && isActiveWindow(); }
-	virtual bool isVisible() const { return bVisible; }
-	virtual IViewWidget *viewWidget() const { return FViewWidget; }
-	virtual IEditWidget *editWidget() const { return FEditWidget; }
-	virtual IMenuBarWidget *menuBarWidget() const { return FMenuBarWidget; }
-	virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
-	virtual IStatusBarWidget *statusBarWidget() const { return FStatusBarWidget; }
-	virtual IMultiUserChat *multiUserChat() const { return FMultiChat; }
+	virtual Jid streamJid() const;
+	virtual Jid roomJid() const;
+	virtual IViewWidget *viewWidget() const;
+	virtual IEditWidget *editWidget() const;
+	virtual IMenuBarWidget *menuBarWidget() const;
+	virtual IToolBarWidget *toolBarWidget() const;
+	virtual IStatusBarWidget *statusBarWidget() const;
+	virtual IMultiUserChat *multiUserChat() const;
 	virtual IChatWindow *openChatWindow(const Jid &AContactJid);
 	virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000);
 signals:
+	//ITabWindowPage
 	void windowShow();
 	void windowClose();
-	void windowActivated();
 	void windowChanged();
-	void windowClosed();
+	void windowActivated();
+	void windowDeactivated();
 	void windowDestroyed();
+	//IMultiUserChatWindow
+	void windowClosed();
 	void chatWindowCreated(IChatWindow *AWindow);
 	void chatWindowDestroyed(IChatWindow *AWindow);
 	void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
@@ -223,7 +225,6 @@ private:
 private:
 	bool FShownDetached;
 	bool FDestroyOnChatClosed;
-	bool bVisible;
 	QList<int> FActiveMessages;
 	QList<IChatWindow *> FChatWindows;
 	QMultiMap<IChatWindow *,int> FActiveChatMessages;

@@ -22,6 +22,7 @@ public:
 	virtual QMainWindow *instance() { return this; }
 	//ITabWindowPage
 	virtual QString tabPageId() const;
+	virtual bool isActive() const;
 	virtual void showWindow();
 	virtual void closeWindow();
 	//IChatWindow
@@ -34,19 +35,19 @@ public:
 	virtual IMenuBarWidget *menuBarWidget() const { return FMenuBarWidget; }
 	virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
 	virtual IStatusBarWidget *statusBarWidget() const { return FStatusBarWidget; }
-	virtual bool isActive() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
 	//ITabWindowPage
 	void windowShow();
 	void windowClose();
 	void windowChanged();
+	void windowActivated();
+	void windowDeactivated();
 	void windowDestroyed();
 	//IChatWindow
 	void messageReady();
 	void streamJidChanged(const Jid &ABefore);
 	void contactJidChanged(const Jid &ABefore);
-	void windowActivated();
 	void windowClosed();
 protected:
 	void initialize();

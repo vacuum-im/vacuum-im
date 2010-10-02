@@ -166,8 +166,6 @@ public:
 	//virtual QMainWindow *instance() =0;
 	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
-	virtual bool isActive() const =0;
-	virtual bool isVisible() const =0;
 	virtual IViewWidget *viewWidget() const =0;
 	virtual IEditWidget *editWidget() const =0;
 	virtual IMenuBarWidget *menuBarWidget() const =0;
@@ -179,7 +177,6 @@ public:
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000) =0;
 protected:
-	virtual void windowActivated() =0;
 	virtual void windowClosed() =0;
 	virtual void chatWindowCreated(IChatWindow *AWindow) =0;
 	virtual void chatWindowDestroyed(IChatWindow *AWindow) =0;

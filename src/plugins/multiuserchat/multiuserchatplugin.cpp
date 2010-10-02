@@ -726,14 +726,14 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
 void MultiUserChatPlugin::onShowAllRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
-		if (!window->isVisible())
+		if (!window->instance()->isVisible())
 			window->showWindow();
 }
 
 void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
-		if (!window->isVisible())
+		if (!window->instance()->isVisible())
 			window->exitAndDestroy(QString::null);
 }
 
