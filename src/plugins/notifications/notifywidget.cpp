@@ -27,11 +27,11 @@ NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Q
 	FAnimateStep = -1;
 
 	QIcon icon = qvariant_cast<QIcon>(ANotification.data.value(NDR_ICON));
-	QImage image = qvariant_cast<QImage>(ANotification.data.value(NDR_WINDOW_IMAGE));
-	QString caption = ANotification.data.value(NDR_WINDOW_CAPTION,tr("Notification")).toString();
-	QString title = ANotification.data.value(NDR_WINDOW_TITLE).toString();
-	QString text = ANotification.data.value(NDR_WINDOW_TEXT).toString();
-	FTimeOut = ANotification.data.value(NDR_WINDOW_TIMEOUT,DEFAUTL_TIMEOUT).toInt();
+	QImage image = qvariant_cast<QImage>(ANotification.data.value(NDR_POPUP_IMAGE));
+	QString caption = ANotification.data.value(NDR_POPUP_CAPTION,tr("Notification")).toString();
+	QString title = ANotification.data.value(NDR_POPUP_TITLE).toString();
+	QString text = ANotification.data.value(NDR_POPUP_TEXT).toString();
+	FTimeOut = ANotification.data.value(NDR_POPUP_TIMEOUT,DEFAUTL_TIMEOUT).toInt();
 
 	if (!caption.isEmpty())
 		ui.lblCaption->setText(caption);

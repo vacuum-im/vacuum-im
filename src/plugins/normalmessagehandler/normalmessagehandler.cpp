@@ -1,7 +1,5 @@
 #include "normalmessagehandler.h"
 
-#define NORMAL_NOTIFICATOR_ID     "NormalMessages"
-
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 #define ADR_GROUP                 Action::DR_Parametr3
@@ -84,7 +82,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		{
 			uchar kindMask = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
 			uchar kindDefs = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
-			notifications->insertNotificator(NORMAL_NOTIFICATOR_ID,tr("Single Messages"),kindMask,kindDefs);
+			notifications->registerNotificationType(NNT_NORMAL_MESSAGE,OWO_NOTIFICATIONS_NORMAL_MESSAGE,tr("Single Messages"),kindMask,kindDefs);
 		}
 	}
 
@@ -177,17 +175,21 @@ INotification NormalMessageHandler::notification(INotifications *ANotifications,
 	QString name= ANotifications->contactName(AMessage.to(),AMessage.from());
 
 	INotification notify;
-	notify.kinds = ANotifications->notificatorKinds(NORMAL_NOTIFICATOR_ID);
-	notify.data.insert(NDR_ICON,icon);
-	notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
-	notify.data.insert(NDR_ROSTER_STREAM_JID,AMessage.to());
-	notify.data.insert(NDR_ROSTER_CONTACT_JID,AMessage.from());
-	notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_MESSAGE);
-	notify.data.insert(NDR_WINDOW_IMAGE,ANotifications->contactAvatar(AMessage.from()));
-	notify.data.insert(NDR_WINDOW_CAPTION, tr("Message received"));
-	notify.data.insert(NDR_WINDOW_TITLE,name);
-	notify.data.insert(NDR_WINDOW_TEXT,AMessage.body());
-	notify.data.insert(NDR_SOUND_FILE,SDF_NORMAL_MHANDLER_MESSAGE);
+	notify.kinds = ANotifications->notificationKinds(NNT_NORMAL_MESSAGE);
+	if (notify.kinds > 0)
+	{
+		notify.type = NNT_NORMAL_MESSAGE;
+		notify.data.insert(NDR_ICON,icon);
+		notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
+		notify.data.insert(NDR_STREAM_JID,AMessage.to());
+		notify.data.insert(NDR_CONTACT_JID,AMessage.from());
+		notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_MESSAGE);
+		notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(AMessage.from()));
+		notify.data.insert(NDR_POPUP_CAPTION, tr("Message received"));
+		notify.data.insert(NDR_POPUP_TITLE,name);
+		notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
+		notify.data.insert(NDR_SOUND_FILE,SDF_NORMAL_MHANDLER_MESSAGE);
+	}
 
 	return notify;
 }

@@ -7,6 +7,7 @@
 #include <definitions/multiuserdataroles.h>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
+#include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/soundfiles.h>
 #include <definitions/resources.h>
@@ -32,10 +33,6 @@
 #include "inputtextdialog.h"
 #include "usersproxymodel.h"
 #include "ui_multiuserchatwindow.h"
-
-#define GROUP_NOTIFICATOR_ID      "GroupChatMessages"
-#define PRIVATE_NOTIFICATOR_ID    "PrivateMessages"
-#define MENTION_NOTIFICATOR_ID    "GroupChatMention"
 
 struct WindowStatus
 {

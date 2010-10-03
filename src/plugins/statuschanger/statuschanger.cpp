@@ -8,8 +8,6 @@
 #define ADR_STREAMJID                       Action::DR_StreamJid
 #define ADR_STATUS_CODE                     Action::DR_Parametr1
 
-#define NOTIFICATOR_ID                      "StatusChanger"
-
 StatusChanger::StatusChanger()
 {
 	FPresencePlugin = NULL;
@@ -196,7 +194,7 @@ bool StatusChanger::initObjects()
 	{
 		uchar kindMask = INotification::PopupWindow|INotification::PlaySound;
 		uchar kindDefs = INotification::PopupWindow|INotification::PlaySound;
-		FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Connection errors"),kindMask,kindDefs);
+		FNotifications->registerNotificationType(NNT_CONNECTION_ERROR,OWO_NOTIFICATIONS_CONNECTION_ERROR,tr("Connection errors"),kindMask,kindDefs);
 	}
 
 	return true;
@@ -874,15 +872,19 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 	if (FNotifications)
 	{
 		INotification notify;
-		notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
-		notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,"","") : QIcon());
-		notify.data.insert(NDR_WINDOW_CAPTION, tr("Connection error"));
-		notify.data.insert(NDR_WINDOW_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());
-		notify.data.insert(NDR_WINDOW_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
-		notify.data.insert(NDR_WINDOW_TEXT,APresence->status());
-		notify.data.insert(NDR_WINDOW_TEXT,APresence->status());
-		notify.data.insert(NDR_SOUND_FILE,SDF_SCHANGER_CONNECTION_ERROR);
-		FNotifyId.insert(APresence,FNotifications->appendNotification(notify));
+		notify.kinds = FNotifications->notificationKinds(NNT_CONNECTION_ERROR);
+		if (notify.kinds > 0)
+		{
+			notify.type = NNT_CONNECTION_ERROR;
+			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,"","") : QIcon());
+			notify.data.insert(NDR_POPUP_CAPTION, tr("Connection error"));
+			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());
+			notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
+			notify.data.insert(NDR_POPUP_TEXT,APresence->status());
+			notify.data.insert(NDR_POPUP_TEXT,APresence->status());
+			notify.data.insert(NDR_SOUND_FILE,SDF_SCHANGER_CONNECTION_ERROR);
+			FNotifyId.insert(APresence,FNotifications->appendNotification(notify));
+		}
 	}
 }
 

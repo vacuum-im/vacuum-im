@@ -13,6 +13,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/vcardvaluenames.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imultiuserchat.h>

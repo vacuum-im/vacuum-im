@@ -22,6 +22,7 @@ struct INotification
 		kinds = 0; 
 	}
 	uchar kinds;
+	QString type;
 	QMap<int, QVariant> data;
 };
 
@@ -34,10 +35,10 @@ public:
 	virtual int appendNotification(const INotification &ANotification) =0;
 	virtual void activateNotification(int ANotifyId) =0;
 	virtual void removeNotification(int ANotifyId) =0;
-	virtual void insertNotificator(const QString &AId, const QString &ATitle, uchar AKindMask, uchar ADefault) =0;
-	virtual uchar notificatorKinds(const QString &AId) const =0;
-	virtual void setNotificatorKinds(const QString &AId, uchar AKinds) =0;
-	virtual void removeNotificator(const QString &AId) =0;
+	virtual void registerNotificationType(const QString &AType, int AOptionsOrder, const QString &ATitle, uchar AKindMask, uchar ADefault) =0;
+	virtual uchar notificationKinds(const QString &AType) const =0;
+	virtual void setNotificationKinds(const QString &AType, uchar AKinds) =0;
+	virtual void removeNotificationType(const QString &AType) =0;
 	virtual QImage contactAvatar(const Jid &AContactJid) const =0;
 	virtual QIcon contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QString contactName(const Jid &AStreamJId, const Jid &AContactJid) const =0;

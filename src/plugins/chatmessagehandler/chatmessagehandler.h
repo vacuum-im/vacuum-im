@@ -8,6 +8,7 @@
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterlabelorders.h>
 #include <definitions/rosterclickhookerorders.h>
+#include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/actiongroups.h>
@@ -15,6 +16,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/optionvalues.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>

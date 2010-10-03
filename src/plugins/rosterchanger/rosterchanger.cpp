@@ -8,8 +8,6 @@
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 
-#define NOTIFICATOR_ID      "RosterChanger"
-
 #define ADR_STREAM_JID      Action::DR_StreamJid
 #define ADR_CONTACT_JID     Action::DR_Parametr1
 #define ADR_FROM_STREAM_JID Action::DR_Parametr2
@@ -120,7 +118,7 @@ bool RosterChanger::initObjects()
 	{
 		uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
 		uchar kindDefs = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
-		FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Subscription requests"),kindMask,kindDefs);
+		FNotifications->registerNotificationType(NNT_SUBSCRIPTION_REQUEST,OWO_NOTIFICATIONS_SUBSCRIPTION_REQUEST,tr("Subscription requests"),kindMask,kindDefs);
 	}
 	if (FRostersView)
 	{
@@ -800,16 +798,19 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 	INotification notify;
 	if (FNotifications)
 	{
-		notify.kinds = INotification::PopupWindow;
+		notify.kinds =  FNotifications->notificationKinds(NNT_SUBSCRIPTION_REQUEST);
+		if (ASubsType != IRoster::Subscribe)
+			notify.kinds = (notify.kinds & INotification::PopupWindow);
+		notify.type = NNT_SUBSCRIPTION_REQUEST;
 		notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RCHANGER_SUBSCRIBTION));
 		notify.data.insert(NDR_TOOLTIP,tr("Subscription message from %1").arg(FNotifications->contactName(ARoster->streamJid(),AContactJid)));
-		notify.data.insert(NDR_ROSTER_STREAM_JID,ARoster->streamJid().full());
-		notify.data.insert(NDR_ROSTER_CONTACT_JID,AContactJid.full());
+		notify.data.insert(NDR_STREAM_JID,ARoster->streamJid().full());
+		notify.data.insert(NDR_CONTACT_JID,AContactJid.full());
 		notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_SUBSCRIBTION);
-		notify.data.insert(NDR_WINDOW_CAPTION, tr("Subscription message"));
-		notify.data.insert(NDR_WINDOW_TITLE,FNotifications->contactName(ARoster->streamJid(),AContactJid));
-		notify.data.insert(NDR_WINDOW_IMAGE, FNotifications->contactAvatar(AContactJid));
-		notify.data.insert(NDR_WINDOW_TEXT,subscriptionNotify(ASubsType,AContactJid));
+		notify.data.insert(NDR_POPUP_CAPTION, tr("Subscription message"));
+		notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(ARoster->streamJid(),AContactJid));
+		notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(AContactJid));
+		notify.data.insert(NDR_POPUP_TEXT,subscriptionNotify(ASubsType,AContactJid));
 		notify.data.insert(NDR_SOUND_FILE,SDF_RCHANGER_SUBSCRIPTION);
 	}
 
@@ -825,8 +826,8 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 			{
 				if (FNotifications)
 				{
-					notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
-					notifyId = FNotifications->appendNotification(notify);
+					if (notify.kinds > 0)
+						notifyId = FNotifications->appendNotification(notify);
 				}
 				else
 				{
@@ -843,7 +844,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 	}
 	else if (ASubsType == IRoster::Unsubscribed)
 	{
-		if (FNotifications && !isSilentSubsctiption(ARoster->streamJid(),AContactJid))
+		if (FNotifications && notify.kinds > 0 && !isSilentSubsctiption(ARoster->streamJid(),AContactJid))
 			notifyId = FNotifications->appendNotification(notify);
 
 		if (isAutoUnsubscribe(ARoster->streamJid(),AContactJid) && ritem.subscription!=SUBSCRIPTION_TO && ritem.subscription!=SUBSCRIPTION_NONE)
@@ -851,12 +852,12 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 	}
 	else  if (ASubsType == IRoster::Subscribed)
 	{
-		if (FNotifications && !isSilentSubsctiption(ARoster->streamJid(),AContactJid))
+		if (FNotifications && notify.kinds > 0 && !isSilentSubsctiption(ARoster->streamJid(),AContactJid))
 			notifyId = FNotifications->appendNotification(notify);
 	}
 	else if (ASubsType == IRoster::Unsubscribe)
 	{
-		if (FNotifications && !isSilentSubsctiption(ARoster->streamJid(),AContactJid))
+		if (FNotifications && notify.kinds > 0 && !isSilentSubsctiption(ARoster->streamJid(),AContactJid))
 			notifyId = FNotifications->appendNotification(notify);
 	}
 

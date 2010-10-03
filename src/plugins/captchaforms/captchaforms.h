@@ -3,9 +3,11 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/stanzahandlerorders.h>
+#include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/dataformtypes.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icaptchaforms.h>
