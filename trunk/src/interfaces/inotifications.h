@@ -26,6 +26,12 @@ struct INotification
 	QMap<int, QVariant> data;
 };
 
+class INotificationHandler
+{
+public:
+	virtual bool showNotification(int AOrder, uchar AKind, int ANotifyId, const INotification &ANotification) =0;
+};
+
 class INotifications 
 {
 public:
@@ -39,6 +45,8 @@ public:
 	virtual uchar notificationKinds(const QString &AType) const =0;
 	virtual void setNotificationKinds(const QString &AType, uchar AKinds) =0;
 	virtual void removeNotificationType(const QString &AType) =0;
+	virtual void insertNotificationHandler(int AOrder, INotificationHandler *AHandler) =0;
+	virtual void removeNotificationHandler(int AOrder, INotificationHandler *AHandler) =0;
 	virtual QImage contactAvatar(const Jid &AContactJid) const =0;
 	virtual QIcon contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QString contactName(const Jid &AStreamJId, const Jid &AContactJid) const =0;
@@ -47,8 +55,11 @@ protected:
 	virtual void notificationRemoved(int ANotifyId) =0;
 	virtual void notificationAppend(int ANotifyId, INotification &ANotification) =0;
 	virtual void notificationAppended(int ANotifyId, const INotification &ANotification) =0;
+	virtual void notificationHandlerInserted(int AOrder, INotificationHandler *AHandler) =0;
+	virtual void notificationHandlerRemoved(int AOrder, INotificationHandler *AHandler) =0;
 };
 
+Q_DECLARE_INTERFACE(INotificationHandler,"Vacuum.Plugin.INotificationHandler/1.0")
 Q_DECLARE_INTERFACE(INotifications,"Vacuum.Plugin.INotifications/1.0")
 
-#endif
+#endif //INOTIFICATIONS_H
