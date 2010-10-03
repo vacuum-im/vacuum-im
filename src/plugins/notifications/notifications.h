@@ -85,6 +85,9 @@ public:
 	virtual uchar notificationKinds(const QString &AType) const;
 	virtual void setNotificationKinds(const QString &AType, uchar AKinds);
 	virtual void removeNotificationType(const QString &AType);
+	//Notification Handlers
+	virtual void insertNotificationHandler(int AOrder, INotificationHandler *AHandler);
+	virtual void removeNotificationHandler(int AOrder, INotificationHandler *AHandler);
 	//Notification Utilities
 	virtual QImage contactAvatar(const Jid &AContactJid) const;
 	virtual QIcon contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -94,10 +97,13 @@ signals:
 	void notificationRemoved(int ANotifyId);
 	void notificationAppend(int ANotifyId, INotification &ANotification);
 	void notificationAppended(int ANotifyId, const INotification &ANotification);
+	void notificationHandlerInserted(int AOrder, INotificationHandler *AHandler);
+	void notificationHandlerRemoved(int AOrder, INotificationHandler *AHandler);
 protected:
 	int notifyIdByRosterId(int ARosterId) const;
 	int notifyIdByTrayId(int ATrayId) const;
 	int notifyIdByWidget(NotifyWidget *AWidget) const;
+	bool showNotifyByHandler(uchar AKind, int ANotifyId, const INotification &ANotification) const;
 protected slots:
 	void onActivateDelayedActivations();
 	void onSoundOnOffActionTriggered(bool);
@@ -133,6 +139,7 @@ private:
 	QList<int> FDelayedActivations;
 	QMap<int, NotifyRecord> FNotifyRecords;
 	mutable QMap<QString, TypeRecord> FTypeRecords;
+	QMultiMap<int, INotificationHandler *> FHandlers;
 };
 
 #endif // NOTIFICATIONS_H

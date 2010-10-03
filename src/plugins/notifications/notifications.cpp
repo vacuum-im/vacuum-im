@@ -204,60 +204,77 @@ int Notifications::appendNotification(const INotification &ANotification)
 	if (FRostersModel && FRostersViewPlugin && Options::node(OPV_NOTIFICATIONS_ROSTERICON).value().toBool() &&
 		(notifyRecord.notification.kinds & INotification::RosterIcon)>0)
 	{
-		Jid streamJid = notifyRecord.notification.data.value(NDR_STREAM_JID).toString();
-		Jid contactJid = notifyRecord.notification.data.value(NDR_CONTACT_JID).toString();
-		int order = notifyRecord.notification.data.value(NDR_ROSTER_NOTIFY_ORDER).toInt();
-		int flags = IRostersView::LabelBlink|IRostersView::LabelVisible;
-		flags = flags | (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool() ? IRostersView::LabelExpandParents : 0);
-		QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,true);
-		notifyRecord.rosterId = FRostersViewPlugin->rostersView()->appendNotify(indexes,order,icon,toolTip,flags);
+		if (!showNotifyByHandler(INotification::RosterIcon,notifyId,notifyRecord.notification))
+		{
+			Jid streamJid = notifyRecord.notification.data.value(NDR_STREAM_JID).toString();
+			Jid contactJid = notifyRecord.notification.data.value(NDR_CONTACT_JID).toString();
+			int order = notifyRecord.notification.data.value(NDR_ROSTER_NOTIFY_ORDER).toInt();
+			int flags = IRostersView::LabelBlink|IRostersView::LabelVisible;
+			flags = flags | (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool() ? IRostersView::LabelExpandParents : 0);
+			QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,true);
+			notifyRecord.rosterId = FRostersViewPlugin->rostersView()->appendNotify(indexes,order,icon,toolTip,flags);
+		}
 	}
 
 	if (Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).value().toBool() && (notifyRecord.notification.kinds & INotification::PopupWindow)>0)
 	{
-		notifyRecord.widget = new NotifyWidget(notifyRecord.notification);
-		connect(notifyRecord.widget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
-		connect(notifyRecord.widget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
-		connect(notifyRecord.widget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
-		notifyRecord.widget->appear();
+		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,notifyRecord.notification))
+		{
+			notifyRecord.widget = new NotifyWidget(notifyRecord.notification);
+			connect(notifyRecord.widget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
+			connect(notifyRecord.widget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
+			connect(notifyRecord.widget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
+			notifyRecord.widget->appear();
+		}
 	}
 
 	if (FTrayManager)
 	{
 		if (Options::node(OPV_NOTIFICATIONS_TRAYICON).value().toBool() && (notifyRecord.notification.kinds & INotification::TrayIcon)>0)
-			notifyRecord.trayId = FTrayManager->appendNotify(icon,toolTip,true);
+		{
+			if (!showNotifyByHandler(INotification::TrayIcon,notifyId,notifyRecord.notification))
+			{
+				notifyRecord.trayId = FTrayManager->appendNotify(icon,toolTip,true);
+			}
+		}
 
 		if (!toolTip.isEmpty() && Options::node(OPV_NOTIFICATIONS_TRAYACTION).value().toBool() &&
 		    (notifyRecord.notification.kinds & INotification::TrayAction)>0)
 		{
-			notifyRecord.action = new Action(FNotifyMenu);
-			notifyRecord.action->setIcon(icon);
-			notifyRecord.action->setText(toolTip);
-			notifyRecord.action->setData(ADR_NOTIFYID,notifyId);
-			connect(notifyRecord.action,SIGNAL(triggered(bool)),SLOT(onActionNotifyActivated(bool)));
-			FNotifyMenu->addAction(notifyRecord.action);
+			if (!showNotifyByHandler(INotification::TrayAction,notifyId,notifyRecord.notification))
+			{
+				notifyRecord.action = new Action(FNotifyMenu);
+				notifyRecord.action->setIcon(icon);
+				notifyRecord.action->setText(toolTip);
+				notifyRecord.action->setData(ADR_NOTIFYID,notifyId);
+				connect(notifyRecord.action,SIGNAL(triggered(bool)),SLOT(onActionNotifyActivated(bool)));
+				FNotifyMenu->addAction(notifyRecord.action);
+			}
 		}
 	}
 
 	if (!(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) &&
 		Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool() && (notifyRecord.notification.kinds & INotification::PlaySound)>0)
 	{
-		QString soundName = notifyRecord.notification.data.value(NDR_SOUND_FILE).toString();
-		QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
-		if (!soundFile.isEmpty())
+		if (!showNotifyByHandler(INotification::PlaySound,notifyId,notifyRecord.notification))
 		{
-			if (QSound::isAvailable())
+			QString soundName = notifyRecord.notification.data.value(NDR_SOUND_FILE).toString();
+			QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
+			if (!soundFile.isEmpty())
 			{
-				delete FSound;
-				FSound = new QSound(soundFile);
-				FSound->play();
-			}
+				if (QSound::isAvailable())
+				{
+					delete FSound;
+					FSound = new QSound(soundFile);
+					FSound->play();
+				}
 #ifdef Q_WS_X11
-			else
-			{
-				QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUND_COMMAND).value().toString(),QStringList()<<soundFile);
-			}
+				else
+				{
+					QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUND_COMMAND).value().toString(),QStringList()<<soundFile);
+				}
 #endif
+			}
 		}
 	}
 
@@ -340,7 +357,7 @@ uchar Notifications::notificationKinds(const QString &AType) const
 		TypeRecord &typeRecord = FTypeRecords[AType];
 		if (typeRecord.kinds == 0xFF)
 		{
-			if (Options::node(OPV_NOTIFICATIONS_ROOT).hasValue("notificator",AType))
+			if (Options::node(OPV_NOTIFICATIONS_ROOT).hasValue("notification-type",AType))
 				typeRecord.kinds = Options::node(OPV_NOTIFICATIONS_NOTIFICATIONTYPE_ITEM,AType).value().toInt() & typeRecord.kindMask;
 			else
 				typeRecord.kinds = typeRecord.defaults;
@@ -363,7 +380,25 @@ void Notifications::setNotificationKinds(const QString &AType, uchar AKinds)
 void Notifications::removeNotificationType(const QString &AType)
 {
 	FTypeRecords.remove(AType);
-	Options::node(OPV_NOTIFICATIONS_ROOT).removeChilds("notificator",AType);
+	Options::node(OPV_NOTIFICATIONS_ROOT).removeChilds("notification-type",AType);
+}
+
+void Notifications::insertNotificationHandler(int AOrder, INotificationHandler *AHandler)
+{
+	if (AHandler != NULL)
+	{
+		FHandlers.insertMulti(AOrder, AHandler);
+		emit notificationHandlerInserted(AOrder,AHandler);
+	}
+}
+
+void Notifications::removeNotificationHandler(int AOrder, INotificationHandler *AHandler)
+{
+	if (FHandlers.contains(AOrder,AHandler))
+	{
+		FHandlers.remove(AOrder,AHandler);
+		emit notificationHandlerRemoved(AOrder,AHandler);
+	}
 }
 
 QImage Notifications::contactAvatar(const Jid &AContactJid) const
@@ -410,6 +445,18 @@ int Notifications::notifyIdByWidget(NotifyWidget *AWidget) const
 		if (it.value().widget == AWidget)
 			return it.key();
 	return -1;
+}
+
+bool Notifications::showNotifyByHandler(uchar AKind, int ANotifyId, const INotification &ANotification) const
+{
+	QMultiMap<int, INotificationHandler *>::const_iterator it = FHandlers.constBegin();
+	while (it != FHandlers.constEnd())
+	{
+		if (it.value()->showNotification(it.key(),AKind,ANotifyId,ANotification))
+			return true;
+		it++;
+	}
+	return false;
 }
 
 void Notifications::onActivateDelayedActivations()
