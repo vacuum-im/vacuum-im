@@ -6,6 +6,7 @@
 #include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/multiuserdataroles.h>
+#include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/optionvalues.h>

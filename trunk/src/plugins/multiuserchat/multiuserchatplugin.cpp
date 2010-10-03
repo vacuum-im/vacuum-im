@@ -11,8 +11,6 @@
 #define DIC_CONFERENCE            "conference"
 #define DIT_TEXT                  "text"
 
-#define INVITE_NOTIFICATOR_ID     "InviteMessages"
-
 MultiUserChatPlugin::MultiUserChatPlugin()
 {
 	FPluginManager = NULL;
@@ -214,19 +212,19 @@ bool MultiUserChatPlugin::initObjects()
 	{
 		uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
 		uchar kindDefs = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
-		FNotifications->insertNotificator(INVITE_NOTIFICATOR_ID,tr("Invite chat messages"),kindMask,kindDefs);
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_INVITE,OWO_NOTIFICATIONS_MUC_MESSAGE_INVITE,tr("Invite chat messages"),kindMask,kindDefs);
 
 		kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
 		kindDefs = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
-		FNotifications->insertNotificator(PRIVATE_NOTIFICATOR_ID,tr("Private conference messages"),kindMask,kindDefs);
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_PRIVATE,OWO_NOTIFICATIONS_MUC_MESSAGE_PRIVATE,tr("Private conference messages"),kindMask,kindDefs);
 
 		kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
 		kindDefs = INotification::TrayIcon|INotification::PlaySound;
-		FNotifications->insertNotificator(GROUP_NOTIFICATOR_ID,tr("Conference messages"),kindMask,kindDefs);
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_GROUPCHAT,OWO_NOTIFICATIONS_MUC_MESSAGE_GROUPCHAT,tr("Conference messages"),kindMask,kindDefs);
 
 		kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
 		kindDefs = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
-		FNotifications->insertNotificator(MENTION_NOTIFICATOR_ID,tr("Mention in conference"),kindMask,kindDefs);
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_MENTION,OWO_NOTIFICATIONS_MUC_MESSAGE_MENTION,tr("Mention in conference"),kindMask,kindDefs);
 	}
 
 	if (FXmppUriQueries)
@@ -408,18 +406,22 @@ INotification MultiUserChatPlugin::notification(INotifications *ANotifications, 
 	Jid roomJid = AMessage.from();
 	if (!multiChatWindow(AMessage.to(),roomJid))
 	{
-		Jid fromJid = inviteElem.attribute("from");
-		notify.kinds = ANotifications->notificatorKinds(INVITE_NOTIFICATOR_ID);
-		notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE));
-		notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
-		notify.data.insert(NDR_ROSTER_STREAM_JID,AMessage.to());
-		notify.data.insert(NDR_ROSTER_CONTACT_JID,fromJid.full());
-		notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_MESSAGE);
-		notify.data.insert(NDR_WINDOW_CAPTION,tr("Invitation received"));
-		notify.data.insert(NDR_WINDOW_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
-		notify.data.insert(NDR_WINDOW_IMAGE,ANotifications->contactAvatar(fromJid));
-		notify.data.insert(NDR_WINDOW_TEXT,notify.data.value(NDR_TOOLTIP));
-		notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
+		notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_INVITE);
+		if (notify.kinds > 0)
+		{
+			Jid fromJid = inviteElem.attribute("from");
+			notify.type = NNT_MUC_MESSAGE_INVITE;
+			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE));
+			notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
+			notify.data.insert(NDR_STREAM_JID,AMessage.to());
+			notify.data.insert(NDR_CONTACT_JID,fromJid.full());
+			notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_MESSAGE);
+			notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
+			notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
+			notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(fromJid));
+			notify.data.insert(NDR_POPUP_TEXT,notify.data.value(NDR_TOOLTIP));
+			notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
+		}
 	}
 	return notify;
 }

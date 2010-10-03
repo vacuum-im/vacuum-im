@@ -1,6 +1,5 @@
 #include "captchaforms.h"
 
-#define NOTIFICATOR_ID              "CaptchaForms"
 #define SHC_MESSAGE_CAPTCHA         "/message/captcha[@xmlns='" NS_CAPTCHA_FORMS "']"
 
 #define ACCEPT_CHALLENGE_TIMEOUT    30000
@@ -79,7 +78,7 @@ bool CaptchaForms::initObjects()
 	{
 		uchar kindMask = INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
 		uchar kindDefs = INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
-		FNotifications->insertNotificator(NOTIFICATOR_ID,tr("CAPTCHA Challenges"),kindMask,kindDefs);
+		FNotifications->registerNotificationType(NNT_CAPTCHA_REQUEST,OWO_NOTIFICATIONS_CAPTCHA_REQUEST,tr("CAPTCHA Challenges"),kindMask,kindDefs);
 	}
 	return true;
 }
@@ -279,15 +278,16 @@ void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 	if (FDataForms && FNotifications)
 	{
 		INotification notify;
-		notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
+		notify.kinds = FNotifications->notificationKinds(NNT_CAPTCHA_REQUEST);
 		if (notify.kinds > 0)
 		{
 			Jid contactJid = FDataForms->fieldValue("from", AChallenge.dialog->formWidget()->dataForm().fields).toString();
+			notify.type = NNT_CAPTCHA_REQUEST;
 			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CAPTCHAFORMS));
-			notify.data.insert(NDR_WINDOW_TITLE,FNotifications->contactName(AChallenge.streamJid,contactJid));
-			notify.data.insert(NDR_WINDOW_IMAGE,FNotifications->contactAvatar(contactJid));
-			notify.data.insert(NDR_WINDOW_CAPTION, tr("CAPTCHA Challenge"));
-			notify.data.insert(NDR_WINDOW_TEXT, tr("You have received the CAPTCHA challenge"));
+			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AChallenge.streamJid,contactJid));
+			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));
+			notify.data.insert(NDR_POPUP_CAPTION, tr("CAPTCHA Challenge"));
+			notify.data.insert(NDR_POPUP_TEXT, tr("You have received the CAPTCHA challenge"));
 			FChallengeNotify.insert(FNotifications->appendNotification(notify),FDataForms->fieldValue("challenge", AChallenge.dialog->formWidget()->dataForm().fields).toString());
 			return;
 		}

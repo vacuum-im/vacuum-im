@@ -16,8 +16,6 @@
 #define ADR_CONTACT_JID               Action::DR_Parametr2
 #define ADR_SESSION_FIELD             Action::DR_Parametr3
 
-#define NOTIFICATOR_ID                "SessionNegotiation"
-
 SessionNegotiation::SessionNegotiation()
 {
 	FDataForms = NULL;
@@ -106,7 +104,7 @@ bool SessionNegotiation::initObjects()
 	{
 		uchar kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
 		uchar kindDefs = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
-		FNotifications->insertNotificator(NOTIFICATOR_ID,tr("Negotiate session requests"),kindMask,kindDefs);
+		FNotifications->registerNotificationType(NNT_SESSION_NEGOTIATION,OWO_NOTIFICATIONS_SESSION_NEGOTIATION,tr("Negotiate session requests"),kindMask,kindDefs);
 	}
 	if (FDataForms)
 	{
@@ -852,16 +850,20 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 		if (FNotifications && !dialog->instance()->isVisible())
 		{
 			INotification notify;
-			notify.kinds = FNotifications->notificatorKinds(NOTIFICATOR_ID);
-			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SNEGOTIATION));
-			notify.data.insert(NDR_TOOLTIP,tr("Session negotiation - %1").arg(ASession.contactJid.full()));
-			notify.data.insert(NDR_WINDOW_CAPTION,tr("Session negotiation"));
-			notify.data.insert(NDR_WINDOW_TITLE,FNotifications->contactName(ASession.streamJid,ASession.contactJid));
-			notify.data.insert(NDR_WINDOW_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
-			notify.data.insert(NDR_WINDOW_TEXT, notify.data.value(NDR_TOOLTIP));
-			notify.data.insert(NDR_SOUND_FILE, notify.data.value(NDR_TOOLTIP));
-			int notifyId = FNotifications->appendNotification(notify);
-			FDialogByNotify.insert(notifyId,dialog);
+			notify.kinds = FNotifications->notificationKinds(NNT_SESSION_NEGOTIATION);
+			if (notify.kinds > 0)
+			{
+				notify.type = NNT_SESSION_NEGOTIATION;
+				notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SNEGOTIATION));
+				notify.data.insert(NDR_TOOLTIP,tr("Session negotiation - %1").arg(ASession.contactJid.full()));
+				notify.data.insert(NDR_POPUP_CAPTION,tr("Session negotiation"));
+				notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(ASession.streamJid,ASession.contactJid));
+				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
+				notify.data.insert(NDR_POPUP_TEXT, notify.data.value(NDR_TOOLTIP));
+				notify.data.insert(NDR_SOUND_FILE, notify.data.value(NDR_TOOLTIP));
+				int notifyId = FNotifications->appendNotification(notify);
+				FDialogByNotify.insert(notifyId,dialog);
+			}
 		}
 		else
 			dialog->instance()->show();

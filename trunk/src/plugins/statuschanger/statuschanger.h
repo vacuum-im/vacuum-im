@@ -12,6 +12,7 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterfootertextorders.h>
+#include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>

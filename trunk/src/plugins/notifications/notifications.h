@@ -29,7 +29,8 @@
 #include "optionswidget.h"
 #include "notifykindswidget.h"
 
-struct NotifyRecord {
+struct NotifyRecord 
+{
 	NotifyRecord() {
 		trayId=0;
 		rosterId=0;
@@ -43,7 +44,9 @@ struct NotifyRecord {
 	INotification notification;
 };
 
-struct Notificator {
+struct TypeRecord 
+{
+	int optionsOrder;
 	QString title;
 	uchar kinds;
 	uchar defaults;
@@ -78,10 +81,10 @@ public:
 	virtual void activateNotification(int ANotifyId);
 	virtual void removeNotification(int ANotifyId);
 	//Kind options for notificators
-	virtual void insertNotificator(const QString &AId, const QString &ATitle, uchar AKindMask, uchar ADefault);
-	virtual uchar notificatorKinds(const QString &AId) const;
-	virtual void setNotificatorKinds(const QString &AId, uchar AKinds);
-	virtual void removeNotificator(const QString &AId);
+	virtual void registerNotificationType(const QString &AType, int AOptionsOrder, const QString &ATitle, uchar AKindMask, uchar ADefault);
+	virtual uchar notificationKinds(const QString &AType) const;
+	virtual void setNotificationKinds(const QString &AType, uchar AKinds);
+	virtual void removeNotificationType(const QString &AType);
 	//Notification Utilities
 	virtual QImage contactAvatar(const Jid &AContactJid) const;
 	virtual QIcon contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -129,7 +132,7 @@ private:
 	QSound *FSound;
 	QList<int> FDelayedActivations;
 	QMap<int, NotifyRecord> FNotifyRecords;
-	mutable QMap<QString, Notificator> FNotificators;
+	mutable QMap<QString, TypeRecord> FTypeRecords;
 };
 
 #endif // NOTIFICATIONS_H

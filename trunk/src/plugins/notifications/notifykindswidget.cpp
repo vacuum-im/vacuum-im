@@ -41,13 +41,13 @@ void NotifyKindsWidget::apply()
 		kinds |= INotification::PlaySound;
 	if (ui.chbActivate->isChecked())
 		kinds |= INotification::AutoActivate;
-	FNotifications->setNotificatorKinds(FNotificatorId,kinds);
+	FNotifications->setNotificationKinds(FNotificatorId,kinds);
 	emit childApply();
 }
 
 void NotifyKindsWidget::reset()
 {
-	uchar kinds = FNotifications->notificatorKinds(FNotificatorId);
+	uchar kinds = FNotifications->notificationKinds(FNotificatorId);
 	ui.chbRoster->setChecked(kinds & INotification::RosterIcon);
 	ui.chbPopup->setChecked(kinds & INotification::PopupWindow);
 	ui.chbTray->setChecked(kinds & INotification::TrayIcon);

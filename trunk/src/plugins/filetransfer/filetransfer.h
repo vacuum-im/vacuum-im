@@ -9,6 +9,7 @@
 #include <definitions/fshandlerorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/discofeaturehandlerorders.h>
+#include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
