@@ -385,7 +385,7 @@ void NormalMessageHandler::onReplyMessage()
 		window->setMode(IMessageWindow::WriteMode);
 		window->setSubject(tr("Re: %1").arg(window->subject()));
 		window->editWidget()->clearEditor();
-		window->editWidget()->instance()->setFocus();
+		window->editWidget()->textEdit()->setFocus();
 		updateWindow(window);
 	}
 }
@@ -400,6 +400,7 @@ void NormalMessageHandler::onForwardMessage()
 		window->setSubject(tr("Fw: %1").arg(message.subject()));
 		window->setThreadId(message.threadId());
 		FMessageProcessor->messageToText(window->editWidget()->document(),message);
+		window->editWidget()->textEdit()->setFocus();
 		window->receiversWidget()->clear();
 		window->setCurrentTabWidget(window->receiversWidget()->instance());
 		updateWindow(window);
