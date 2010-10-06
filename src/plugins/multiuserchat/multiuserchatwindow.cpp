@@ -89,7 +89,7 @@ bool MultiUserChatWindow::isActive() const
 	const QWidget *widget = this;
 	while (widget->parentWidget())
 		widget = widget->parentWidget();
-	return widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
+	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
 }
 
 void MultiUserChatWindow::showWindow()
