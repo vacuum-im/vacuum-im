@@ -23,6 +23,10 @@
         <source>XMPP connection timed out</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Connection closed unexpectedly</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XmppStreams</name>

@@ -42,14 +42,18 @@
 <context>
     <name>JoinMultiChatDialog</name>
     <message>
-        <source>Room parameters is not acceptable.
-Check values and try again</source>
-        <translation>Raum Parameter nicht akzeptabel.
-Überprüfen Sie die Werte und versuchen Sie es erneut</translation>
-    </message>
-    <message>
         <source>Join conference</source>
         <translation>Konferenz beitreten</translation>
+    </message>
+    <message>
+        <source>%1 as %2</source>
+        <comment>room as nick</comment>
+        <translation type="unfinished">%1 als %2</translation>
+    </message>
+    <message>
+        <source>Conference parameters is not acceptable.
+Check values and try again</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -57,14 +61,6 @@ Check values and try again</source>
     <message>
         <source>Identity:</source>
         <translation>Identität:</translation>
-    </message>
-    <message>
-        <source>Room</source>
-        <translation>Raum</translation>
-    </message>
-    <message>
-        <source>Host:</source>
-        <translation>Host:</translation>
     </message>
     <message>
         <source>Room:</source>
@@ -81,6 +77,22 @@ Check values and try again</source>
     <message>
         <source>Resolve</source>
         <translation>Auflösen der JID</translation>
+    </message>
+    <message>
+        <source>History:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Löschen</translation>
+    </message>
+    <message>
+        <source>Conference Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Service:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
