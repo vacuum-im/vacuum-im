@@ -172,7 +172,7 @@ void SimpleMessageStylePlugin::updateAvailStyles()
 {
 	foreach(QString substorage, FileStorage::availSubStorages(RSR_STORAGE_SIMPLEMESSAGESTYLES, false))
 	{
-		QDir dir(FileStorage::subStorageDir(RSR_STORAGE_SIMPLEMESSAGESTYLES,substorage));
+		QDir dir(FileStorage::subStorageDirs(RSR_STORAGE_SIMPLEMESSAGESTYLES,substorage).value(0));
 		if (dir.exists())
 		{
 			if (!FStylePaths.values().contains(dir.absolutePath()))

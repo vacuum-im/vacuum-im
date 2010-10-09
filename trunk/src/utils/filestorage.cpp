@@ -1,11 +1,13 @@
 #include "filestorage.h"
 
 #include <QDir>
+#include <QSet>
 #include <QDomDocument>
 #include <QApplication>
 
-struct FileStorage::StorageObject {
-	bool shared;
+struct FileStorage::StorageObject 
+{
+	int prefix;
 	QList<int> fileTypes;
 	QList<QString> fileNames;
 	QHash<QString, QString> fileOptions;
@@ -13,21 +15,24 @@ struct FileStorage::StorageObject {
 
 QList<QString> FileStorage::FMimeTypes;
 QList<QString> FileStorage::FResourceDirs;
+QList<FileStorage *> FileStorage::FInstances;
 QHash<QString, FileStorage *> FileStorage::FStaticStorages;
 
-QList<QString> FileStorage::FObjectTags = QList<QString>() << "file" << "icon";
 QList<QString> FileStorage::FKeyTags    = QList<QString>() << "key"  << "text" << "name";
 QList<QString> FileStorage::FFileTags   = QList<QString>() << "object";
+QList<QString> FileStorage::FObjectTags = QList<QString>() << "file" << "icon";
 
 FileStorage::FileStorage(const QString &AStorage, const QString &ASubStorage, QObject *AParent) : QObject(AParent)
 {
+	FInstances.append(this);
+
 	FStorage = AStorage;
 	setSubStorage(ASubStorage);
 }
 
 FileStorage::~FileStorage()
 {
-
+	FInstances.removeAll(this);
 }
 
 QString FileStorage::storage() const
@@ -44,36 +49,8 @@ void FileStorage::setSubStorage(const QString &ASubStorage)
 {
 	if (FSubStorage.isNull() || FSubStorage!=ASubStorage)
 	{
-		FOptions.clear();
-		FObjects.clear();
-		FKey2Object.clear();
 		FSubStorage = !ASubStorage.isEmpty() ? ASubStorage : STORAGE_SHARED_DIR;
-
-		FSubPrefix = subStorageDir(FStorage,FSubStorage);
-		if (!FSubPrefix.isEmpty())
-		{
-			QDir dir(FSubPrefix);
-			FSubPrefix.append("/");
-			if (FSubStorage!=STORAGE_SHARED_DIR && dir.exists())
-			{
-				foreach(QString file, dir.entryList(QStringList() << STORAGE_DEFFILES_MASK)) {
-					loadDefinations(dir.absoluteFilePath(file),false); }
-			}
-		}
-
-		FSharedPrefix = subStorageDir(FStorage,STORAGE_SHARED_DIR);
-		if (!FSharedPrefix.isEmpty())
-		{
-			QDir dir(FSharedPrefix);
-			FSharedPrefix.append("/");
-			if (dir.exists())
-			{
-				foreach(QString file, dir.entryList(QStringList() << STORAGE_DEFFILES_MASK)) {
-					loadDefinations(dir.absoluteFilePath(file),true); }
-			}
-		}
-
-		emit storageChanged();
+		updateDefinitions();
 	}
 }
 
@@ -121,8 +98,12 @@ QString FileStorage::fileName(const QString AKey, int AIndex) const
 QString FileStorage::fileFullName(const QString AKey, int AIndex) const
 {
 	QString name = fileName(AKey,AIndex);
-	QString prefix = FObjects.value(FKey2Object.value(AKey,-1)).shared ? FSharedPrefix : FSubPrefix;
-	return !name.isEmpty() ? prefix + name : name;
+	if (!name.isEmpty())
+	{
+		int prefix = FObjects.value(FKey2Object.value(AKey,-1)).prefix;
+		return FPrefixes.at(prefix) + name;
+	}
+	return QString::null;
 }
 
 QString FileStorage::fileMime(const QString AKey, int AIndex) const
@@ -139,11 +120,7 @@ QString FileStorage::fileCacheKey(const QString AKey, int AIndex) const
 {
 	QString name = fileName(AKey,AIndex);
 	if (!name.isEmpty())
-	{
-		QString prefix = FObjects.at(FKey2Object.value(AKey,-1)).shared ? STORAGE_SHARED_DIR : FSubStorage;
-		prefix.append("/");
-		return prefix + name;
-	}
+		return FSubStorage + "/" + name;
 	return QString::null;
 }
 
@@ -197,18 +174,19 @@ QList<QString> FileStorage::availSubStorages(const QString &AStorage, bool AChec
 	return storages;
 }
 
-QString FileStorage::subStorageDir(const QString &AStorage, const QString &ASubStorage)
+QList<QString> FileStorage::subStorageDirs(const QString &AStorage, const QString &ASubStorage)
 {
+	QList<QString> subDirs;
 	foreach(QString dirPath, FResourceDirs)
 	{
 		QDir dir(dirPath);
 		if (dir.exists() && dir.cd(AStorage))
 		{
 			if (dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot).contains(ASubStorage))
-				return dir.absoluteFilePath(ASubStorage);
+				subDirs.append(QDir::cleanPath(dir.absoluteFilePath(ASubStorage)));
 		}
 	}
-	return QString::null;
+	return subDirs;
 }
 
 QList<QString> FileStorage::resourcesDirs()
@@ -218,7 +196,58 @@ QList<QString> FileStorage::resourcesDirs()
 
 void FileStorage::setResourcesDirs(const QList<QString> &ADirs)
 {
-	FResourceDirs = ADirs;
+	QList<QString> cleanDirs;
+	foreach(QString dir, ADirs)
+	{
+		if (!dir.isEmpty() && !cleanDirs.contains(dir) && QDir(dir).exists())
+			cleanDirs.append(QDir::cleanPath(dir));
+	}
+	if (FResourceDirs != cleanDirs)
+	{
+		QList<FileStorage *> updateStorages;
+		QSet<QString> oldDirs = FResourceDirs.toSet() - cleanDirs.toSet();
+		QSet<QString> newDirs = cleanDirs.toSet() - FResourceDirs.toSet();
+
+		foreach(FileStorage *fileStorage, FInstances)
+		{
+			bool update = false;
+			for(QSet<QString>::const_iterator dirIt = oldDirs.constBegin(); !update && dirIt!=oldDirs.constEnd(); dirIt++)
+			{
+				QList<QString> curPrefixes = fileStorage->FPrefixes;
+				for(QList<QString>::const_iterator prefIt = curPrefixes.constBegin(); !update && prefIt!=curPrefixes.constEnd(); prefIt++)
+					update = (*prefIt).startsWith(*dirIt);
+			}
+			if (update)
+			{
+				updateStorages.append(fileStorage);
+			}
+		}
+		
+		FResourceDirs = cleanDirs;
+
+		foreach(FileStorage *fileStorage, FInstances)
+		{
+			if (!updateStorages.contains(fileStorage))
+			{
+				bool update = false;
+				for(QSet<QString>::const_iterator dirIt = newDirs.constBegin(); !update && dirIt!=newDirs.constEnd(); dirIt++)
+				{
+					QList<QString> newPrefixes = subStorageDirs(fileStorage->storage(),fileStorage->subStorage());
+					for(QList<QString>::const_iterator prefIt = newPrefixes.constBegin(); !update && prefIt!=newPrefixes.constEnd(); prefIt++)
+						update = (*prefIt).startsWith(*dirIt);
+				}
+				if (update)
+				{
+					updateStorages.append(fileStorage);
+				}
+			}
+		}
+	
+		foreach(FileStorage *fileStorage, updateStorages)
+		{
+			fileStorage->updateDefinitions();
+		}
+	}
 }
 
 FileStorage *FileStorage::staticStorage(const QString &ASubStorage)
@@ -232,7 +261,34 @@ FileStorage *FileStorage::staticStorage(const QString &ASubStorage)
 	return fileStorage;
 }
 
-void FileStorage::loadDefinations(const QString &ADefFile, bool AShared)
+void FileStorage::updateDefinitions()
+{
+	FPrefixes.clear();
+	FOptions.clear();
+	FObjects.clear();
+	FKey2Object.clear();
+
+	QList<QString> subDirs = subStorageDirs(FStorage,FSubStorage);
+	if (FSubStorage != STORAGE_SHARED_DIR)
+		subDirs += subStorageDirs(FStorage,STORAGE_SHARED_DIR);
+
+	int prefixIndex = 0;
+	foreach(QString subDir, subDirs)
+	{
+		QDir dir(subDir);
+		if (dir.exists())
+		{
+			FPrefixes.append(subDir+"/");
+			foreach(QString file, dir.entryList(QStringList() << STORAGE_DEFFILES_MASK)) {
+				loadDefinitions(dir.absoluteFilePath(file),prefixIndex); }
+			prefixIndex++;
+		}
+	}
+
+	emit storageChanged();
+}
+
+void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 {
 	QDomDocument doc;
 	QFile file(ADefFile);
@@ -244,7 +300,7 @@ void FileStorage::loadDefinations(const QString &ADefFile, bool AShared)
 			if (FObjectTags.contains(objElem.tagName()))
 			{
 				StorageObject object;
-				object.shared = AShared;
+				object.prefix = APrefixIndex;
 
 				QList<QString> objKeys;
 				QDomElement keyElem = objElem.firstChildElement();
@@ -283,7 +339,7 @@ void FileStorage::loadDefinations(const QString &ADefFile, bool AShared)
 					bool valid = true;
 					for (int i=0; valid && i<object.fileNames.count(); i++)
 					{
-						valid = QFile::exists((AShared ? FSharedPrefix : FSubPrefix) + object.fileNames.at(i));
+						valid = QFile::exists(FPrefixes.at(object.prefix) + object.fileNames.at(i));
 					}
 					if (valid)
 					{
