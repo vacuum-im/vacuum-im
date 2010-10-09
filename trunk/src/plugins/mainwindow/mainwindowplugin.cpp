@@ -1,5 +1,6 @@
 #include "mainwindowplugin.h"
 
+#include <QShortcut>
 #include <QApplication>
 #include <QDesktopWidget>
 
@@ -12,6 +13,9 @@ MainWindowPlugin::MainWindowPlugin()
 	FActivationChanged = QTime::currentTime();
 	FMainWindow = new MainWindow(new QWidget, Qt::Window|Qt::CustomizeWindowHint|Qt::WindowTitleHint|Qt::WindowCloseButtonHint);
 	FMainWindow->installEventFilter(this);
+
+	QShortcut *shortcutClose = new QShortcut(tr("Esc","Close Roster"),FMainWindow);
+	connect(shortcutClose,SIGNAL(activated()),FMainWindow,SLOT(close()));
 }
 
 MainWindowPlugin::~MainWindowPlugin()

@@ -38,5 +38,10 @@
         <source>Allows other modules to place their widgets in the main window</source>
         <translation type="unfinished">Позволяет другим модулям размещать свои виджеты в главном окне</translation>
     </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close Roster</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
