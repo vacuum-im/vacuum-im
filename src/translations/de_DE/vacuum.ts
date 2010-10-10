@@ -84,14 +84,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Version</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Home page:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Depends</source>
         <translation type="unfinished"></translation>
     </message>
@@ -113,6 +105,10 @@
     </message>
     <message>
         <source>Country:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
