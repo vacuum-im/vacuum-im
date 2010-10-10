@@ -80,10 +80,6 @@
         <translation>Ustawienia wtyczek</translation>
     </message>
     <message>
-        <source>Home page:</source>
-        <translation>Strona domowa:</translation>
-    </message>
-    <message>
         <source>Depends</source>
         <translation>Wymaga do pracy</translation>
     </message>
@@ -112,8 +108,8 @@
         <translation>Nazwa</translation>
     </message>
     <message>
-        <source>Version</source>
-        <translation>Wersja</translation>
+        <source>File</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

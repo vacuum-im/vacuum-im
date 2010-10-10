@@ -9,7 +9,7 @@
 enum TableColumns
 {
 	COL_NAME,
-	COL_VERSION
+	COL_FILE
 };
 
 SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocument APluginsSetup, QWidget *AParent) : QDialog(AParent)
@@ -21,22 +21,23 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 	FPluginManager = APluginManager;
 	FPluginsSetup = APluginsSetup;
 
-	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_NAME,QHeaderView::Stretch);
-	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_VERSION,QHeaderView::ResizeToContents);
-
 	updateLanguage();
 	connect(ui.cmbLanguage,SIGNAL(currentIndexChanged(int)),SLOT(onCurrentLanguageChanged(int)));
 
 	updatePlugins();
+	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_NAME,QHeaderView::Stretch);
+	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_FILE,QHeaderView::ResizeToContents);
 	connect(ui.twtPlugins,SIGNAL(currentItemChanged(QTableWidgetItem *, QTableWidgetItem *)),SLOT(onCurrentPluginChanged(QTableWidgetItem *, QTableWidgetItem *)));
 
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 	connect(ui.lblHomePage, SIGNAL(linkActivated(const QString &)),SLOT(onHomePageLinkActivated(const QString &)));
+
+	restoreGeometry(Options::fileValue("misc.setup-plugins-dialog.geometry").toByteArray());
 }
 
 SetupPluginsDialog::~SetupPluginsDialog()
 {
-
+	Options::setFileValue(saveGeometry(),"misc.setup-plugins-dialog.geometry");
 }
 
 void SetupPluginsDialog::updateLanguage()
@@ -79,11 +80,12 @@ void SetupPluginsDialog::updatePlugins()
 		}
 		nameItem->setCheckState(pluginElem.attribute("enabled","true")=="true" ? Qt::Checked : Qt::Unchecked);
 
-		QTableWidgetItem *versionItem = new QTableWidgetItem(pluginElem.firstChildElement("version").text());
+		QTableWidgetItem *fileItem = new QTableWidgetItem(pluginElem.tagName());
 
 		ui.twtPlugins->setRowCount(ui.twtPlugins->rowCount()+1);
 		ui.twtPlugins->setItem(ui.twtPlugins->rowCount()-1, COL_NAME, nameItem);
-		ui.twtPlugins->setItem(nameItem->row(), COL_VERSION, versionItem);
+		ui.twtPlugins->setItem(nameItem->row(), COL_FILE, fileItem);
+		
 		FItemElement.insert(nameItem,pluginElem);
 		pluginElem = pluginElem.nextSiblingElement();
 	}

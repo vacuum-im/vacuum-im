@@ -96,10 +96,6 @@
         <translation>Страна:</translation>
     </message>
     <message>
-        <source>Home page:</source>
-        <translation>Домашняя страница:</translation>
-    </message>
-    <message>
         <source>Depends</source>
         <translation>Зависит</translation>
     </message>
@@ -112,8 +108,8 @@
         <translation>Название</translation>
     </message>
     <message>
-        <source>Version</source>
-        <translation>Версия</translation>
+        <source>File</source>
+        <translation>Файл</translation>
     </message>
 </context>
 </TS>
