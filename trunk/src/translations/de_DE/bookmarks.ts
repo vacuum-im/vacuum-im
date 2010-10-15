@@ -31,16 +31,16 @@
         <translation>Lesezeichen ist ungültig</translation>
     </message>
     <message>
-        <source>In conference bookmark fields &apos;Room&apos; and &apos;Nick&apos; should not be empty</source>
-        <translation>Die Konferenz-Lesezeichen Felder &apos;Raum&apos; und &apos;Spitzname&apos; dürfen nicht leer sein</translation>
-    </message>
-    <message>
         <source>Field &apos;Name&apos; should not be empty</source>
         <translation>Feld &apos;Name&apos; dürfen nicht leer sein</translation>
     </message>
     <message>
         <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
         <translation>Das URL-Lesezeichen Feld &apos;Adresse&apos; darf nicht leer sein</translation>
+    </message>
+    <message>
+        <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

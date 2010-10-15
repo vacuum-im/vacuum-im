@@ -50,18 +50,18 @@ void EditBookmarkDialog::onDialogAccepted()
 	{
 		if (ui.grbConference->isChecked())
 		{
-			if (!ui.lneRoom->text().isEmpty() && !ui.lneNick->text().isEmpty())
+			if (!ui.lneRoom->text().isEmpty())
 			{
 				FBookmark->name = ui.lneName->text();
 				FBookmark->conference = ui.lneRoom->text();
 				FBookmark->nick = ui.lneNick->text();
 				FBookmark->password = ui.lnePassword->text();
 				FBookmark->autojoin = ui.chbAutoJoin->isChecked();
-				FBookmark->url = "";
+				FBookmark->url = QString::null;
 				accept();
 			}
 			else
-				QMessageBox::warning(this,tr("Bookmark is not valid"),tr("In conference bookmark fields 'Room' and 'Nick' should not be empty"));
+				QMessageBox::warning(this,tr("Bookmark is not valid"),tr("In conference bookmark field 'Room' should not be empty"));
 		}
 		else
 		{
@@ -69,9 +69,9 @@ void EditBookmarkDialog::onDialogAccepted()
 			{
 				FBookmark->name = ui.lneName->text();
 				FBookmark->url = ui.lneUrl->text();
-				FBookmark->conference = "";
-				FBookmark->nick = "";
-				FBookmark->password = "";
+				FBookmark->conference = QString::null;
+				FBookmark->nick = QString::null;
+				FBookmark->password = QString::null;
 				FBookmark->autojoin = false;
 				accept();
 			}

@@ -179,7 +179,7 @@ QString BookMarks::setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &A
 	{
 		if (!bookmark.name.isEmpty())
 		{
-			if (!bookmark.conference.isEmpty() && !bookmark.nick.isEmpty())
+			if (!bookmark.conference.isEmpty())
 			{
 				QDomElement markElem = elem.appendChild(doc.createElement("conference")).toElement();
 				markElem.setAttribute("jid",bookmark.conference);

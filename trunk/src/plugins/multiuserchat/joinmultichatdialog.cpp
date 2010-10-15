@@ -131,7 +131,7 @@ void JoinMultiChatDialog::onDialogAccepted()
 	QString nick = ui.lneNick->text();
 	QString password = ui.lnePassword->text();
 
-	if (FStreamJid.isValid() && roomJid.isValid() && !roomJid.node().isEmpty() && roomJid.resource().isEmpty() && !nick.isEmpty())
+	if (FStreamJid.isValid() && roomJid.isValid() && !roomJid.node().isEmpty() && roomJid.resource().isEmpty())
 	{
 		IMultiUserChatWindow *chatWindow = FChatPlugin->getMultiChatWindow(FStreamJid,roomJid,nick,password);
 		if (chatWindow)
@@ -142,7 +142,7 @@ void JoinMultiChatDialog::onDialogAccepted()
 
 		RoomParams &params = FRecentRooms[roomJid];
 		params.enters++;
-		params.nick = nick;
+		params.nick = nick.isEmpty() ? FStreamJid.node() : nick;
 		params.password = password;
 		saveRecentConferences();
 

@@ -31,16 +31,16 @@
         <translation>Ошибка в закладке</translation>
     </message>
     <message>
-        <source>In conference bookmark fields &apos;Room&apos; and &apos;Nick&apos; should not be empty</source>
-        <translation>В закладке на конференцию поля &apos;Конференция&apos; и &apos;Ник&apos; не могут быть пустыми</translation>
-    </message>
-    <message>
         <source>Field &apos;Name&apos; should not be empty</source>
         <translation>Поле &apos;Имя&apos; не может быть пустым</translation>
     </message>
     <message>
         <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
         <translation>В закладке на ссылку поле &apos;Ссылка&apos; не может быть пустым</translation>
+    </message>
+    <message>
+        <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
+        <translation>В закладке на конференцию поле &apos;Комната&apos; не может быть пустым</translation>
     </message>
 </context>
 <context>
