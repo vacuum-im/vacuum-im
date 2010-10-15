@@ -19,6 +19,7 @@
 #define TBG_MWTBW_ARCHIVE_SETTINGS                              10600
 
 //ChatWindow - ToolBarWidget
+#define TBG_CWTBW_CLEAR_CHAT                                    1800
 #define TBG_CWTBW_USER_TOOLS                                    10900
 
 //MultiChatWindow - ToolBarWidget

@@ -55,6 +55,7 @@
 //ChatMessageHandler
 #define MNI_CHAT_MHANDLER_MESSAGE       "chatmessagehandlerMessage"
 #define MNI_CHAT_MHANDLER_USER_MENU     "chatmessagehandlerUserMenu"
+#define MNI_CHAT_MHANDLER_CLEAR_CHAT    "chatmessagehandlerClearChat"
 
 //DataStreamsManager
 #define MNI_DATASTREAMSMANAGER          "dataStreamsManager"
