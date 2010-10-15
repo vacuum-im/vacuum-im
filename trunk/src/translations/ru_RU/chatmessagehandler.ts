@@ -31,5 +31,9 @@
         <source>Allows to exchange chat messages</source>
         <translation>Позволяет обмениваться чат сообщениями</translation>
     </message>
+    <message>
+        <source>Clear Chat Window</source>
+        <translation>Очистить окно чата</translation>
+    </message>
 </context>
 </TS>

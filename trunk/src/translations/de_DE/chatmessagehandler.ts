@@ -31,5 +31,9 @@
         <source>Allows to exchange chat messages</source>
         <translation>Erlaubt das Austauschen von Chat Nachrichten</translation>
     </message>
+    <message>
+        <source>Clear Chat Window</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

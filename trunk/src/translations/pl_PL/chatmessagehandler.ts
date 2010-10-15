@@ -31,5 +31,9 @@
         <source>Allows to exchange chat messages</source>
         <translation>Pozwala wymieniać wiadomości w rozmowie</translation>
     </message>
+    <message>
+        <source>Clear Chat Window</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

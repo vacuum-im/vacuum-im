@@ -264,6 +264,12 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 			FWindowStatus[window->viewWidget()].createTime = QDateTime::currentDateTime();
 			updateWindow(window);
 
+         Action *clearAction = new Action(window->instance());
+         clearAction->setText(tr("Clear Chat Window"));
+         clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_CLEAR_CHAT);
+         connect(clearAction,SIGNAL(triggered(bool)),SLOT(onClearWindowAction(bool)));
+         window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_CWTBW_CLEAR_CHAT);
+
 			if (FRostersView && FRostersModel)
 			{
 				UserContextMenu *menu = new UserContextMenu(FRostersModel,FRostersView,window);
@@ -352,10 +358,10 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 
 void ChatMessageHandler::setMessageStyle(IChatWindow *AWindow)
 {
-	IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-	IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
-	AWindow->viewWidget()->setMessageStyle(style,soptions);
-}
+   IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
+   IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
+   AWindow->viewWidget()->setMessageStyle(style,soptions);
+} 
 
 void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const
 {
@@ -510,6 +516,21 @@ void ChatMessageHandler::onShowWindowAction(bool)
 		Jid contactJid = action->data(ADR_CONTACT_JID).toString();
 		openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat);
 	}
+}
+
+void ChatMessageHandler::onClearWindowAction(bool)
+{
+   Action *action = qobject_cast<Action *>(sender());
+   IChatWindow *window = action!=NULL ? qobject_cast<IChatWindow *>(action->parent()) : NULL;
+   if (window)
+   {
+      IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
+      if (style!=NULL)
+      {
+         IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
+         style->changeOptions(window->viewWidget()->styleWidget(),soptions,true);
+      }
+   }
 }
 
 void ChatMessageHandler::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)

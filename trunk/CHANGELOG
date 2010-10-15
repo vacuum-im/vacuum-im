@@ -16,6 +16,7 @@ LEGEND
   [*} Changed the format of the qoutes design
   [*] Server side archive preferences support is not longer required for retrieving messages history from server
   [*] Added ability to switch between tabs by shortkeys Alt+Number
+  [*} Added ability to clear chat window
   [-] When converting smileys into the text instead of the first key an arbitrary one was inserted
   [-] Contacts list window could be displayed outside the visible screen area
   [-] The roster window was closed by clicking on the tray even if it was inactive
