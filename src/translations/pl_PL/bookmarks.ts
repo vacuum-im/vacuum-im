@@ -31,16 +31,16 @@
         <translation>Nieprawidłowa zakładka</translation>
     </message>
     <message>
-        <source>In conference bookmark fields &apos;Room&apos; and &apos;Nick&apos; should not be empty</source>
-        <translation>W zakładce dla konferencji pola &apos;Pokój&apos; oraz &apos;Nick&apos; nie mogą pozostac puste</translation>
-    </message>
-    <message>
         <source>Field &apos;Name&apos; should not be empty</source>
         <translation>Pole &apos;Nazwa&apos; nie może pozostać puste</translation>
     </message>
     <message>
         <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
         <translation>W zakładce strony internetowej pole &apos;Adres&apos; nie może pozostać puste</translation>
+    </message>
+    <message>
+        <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

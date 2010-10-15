@@ -31,16 +31,16 @@
         <translation>Некоректна заклдка</translation>
     </message>
     <message>
-        <source>In conference bookmark fields &apos;Room&apos; and &apos;Nick&apos; should not be empty</source>
-        <translation>Поля &quot;Кімната&quot; та &quot;Нік&quot; закладки для конференції не можуть бути порожніми</translation>
-    </message>
-    <message>
         <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
         <translation>Поле &quot;URL&quot; не може бути порожнім</translation>
     </message>
     <message>
         <source>Field &apos;Name&apos; should not be empty</source>
         <translation>Поле &quot;Ім’я&quot; не може бути порожнім</translation>
+    </message>
+    <message>
+        <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

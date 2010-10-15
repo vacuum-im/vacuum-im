@@ -458,7 +458,7 @@ IMultiUserChat *MultiUserChatPlugin::getMultiUserChat(const Jid &AStreamJid, con
 	IMultiUserChat *chat = multiUserChat(AStreamJid,ARoomJid);
 	if (!chat)
 	{
-		chat = new MultiUserChat(this,AStreamJid,ARoomJid,ANick,APassword,this);
+		chat = new MultiUserChat(this,AStreamJid,ARoomJid,ANick.isEmpty() ? AStreamJid.node() : ANick,APassword,this);
 		connect(chat->instance(),SIGNAL(chatDestroyed()),SLOT(onMultiUserChatDestroyed()));
 		FChats.append(chat);
 		emit multiUserChatCreated(chat);
