@@ -41,7 +41,7 @@
     <message>
         <source>Esc</source>
         <comment>Close Roster</comment>
-        <translation type="unfinished"></translation>
+        <translation>Esc</translation>
     </message>
 </context>
 </TS>

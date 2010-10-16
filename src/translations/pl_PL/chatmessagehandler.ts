@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Clear Chat Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść okno rozmowy</translation>
     </message>
 </context>
 </TS>

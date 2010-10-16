@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>W zakładce konferencji pole &apos;Pokój&apos; nie może pozostać puste</translation>
     </message>
 </context>
 <context>
