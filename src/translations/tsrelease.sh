@@ -1,7 +1,7 @@
 #!/bin/sh
 
-TS_DIR=translations
-QM_DIR=../translations
+TS_DIR=.
+QM_DIR=../../translations
 
 lrelease=lrelease
 if which -s lrelease-qt4; then
