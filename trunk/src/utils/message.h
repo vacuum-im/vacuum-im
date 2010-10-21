@@ -12,7 +12,7 @@
 #include "datetime.h"
 
 class MessageData :
-			public QSharedData
+   public QSharedData
 {
 public:
 	MessageData();

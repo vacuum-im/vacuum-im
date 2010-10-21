@@ -1,12 +1,13 @@
 #ifndef DATETIME_H
 #define DATETIME_H
 
+#include <QMetaType>
 #include <QDateTime>
 #include <QSharedData>
 #include "utilsexport.h"
 
 class DateTimeData :
-			public QSharedData
+   public QSharedData
 {
 public:
 	DateTimeData(const QDateTime &ADT, int ATZD);
@@ -42,5 +43,8 @@ public:
 private:
 	QSharedDataPointer<DateTimeData> d;
 };
+
+Q_DECLARE_METATYPE(DateTime);
+#define DATETIME_METATYPE_ID qMetaTypeId<DateTime>()
 
 #endif // DATETIME_H

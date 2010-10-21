@@ -6,11 +6,10 @@
 #include <QString>
 #include <QMetaType>
 #include <QSharedData>
-#include <thirdparty/idn/stringprep.h>
 #include "utilsexport.h"
 
 class JidData :
-			public QSharedData
+   public QSharedData
 {
 public:
 	JidData();
@@ -67,7 +66,6 @@ public:
 	static QString decode822(const QString &AEncJid);
 	static QString escape106(const QString &ANode);
 	static QString unescape106(const QString &AEscNode);
-	static QString stringPrepare(const Stringprep_profile *AProfile, const QString &AString);
 	static QString nodePrepare(const QString &ANode);
 	static QString domainPrepare(const QString &ADomain);
 	static QString resourcePrepare(const QString &AResource);
@@ -77,11 +75,10 @@ protected:
 	bool equals(const Jid &AJid, bool AFull) const;
 private:
 	QSharedDataPointer<JidData> d;
-private:
-	static QList<QChar> escChars;
-	static QList<QString> escStrings;
-	static QHash<QString, Jid> FCache;
 };
+
+Q_DECLARE_METATYPE(Jid);
+#define JID_METATYPE_ID qMetaTypeId<Jid>()
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,8 +91,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-Q_DECLARE_METATYPE(Jid);
-#define JID_METATYPE_ID qMetaTypeId<Jid>()
 
 #endif // JID_H

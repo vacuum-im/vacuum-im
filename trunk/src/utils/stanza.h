@@ -8,7 +8,7 @@
 #include "errorhandler.h"
 
 class StanzaData :
-			public QSharedData
+   public QSharedData
 {
 public:
 	StanzaData(const QString &ATagName);
