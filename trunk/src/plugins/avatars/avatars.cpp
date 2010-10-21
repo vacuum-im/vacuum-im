@@ -152,9 +152,9 @@ bool Avatars::initSettings()
 	return true;
 }
 
-bool Avatars::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	Q_UNUSED(AAccept);
+	static const QList<QString> availStanzaTypes = QList<QString>() << QString("") << QString("unavailable");
 	if (FSHIPresenceOut.value(AStreamJid) == AHandlerId)
 	{
 		QDomElement vcardUpdate = AStanza.addElement("x",NS_VCARD_UPDATE);
@@ -174,13 +174,7 @@ bool Avatars::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza,
 			hashElem.appendChild(AStanza.createTextNode(hash));
 		}
 	}
-	return false;
-}
-
-bool Avatars::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
-{
-	static const QList<QString> availStanzaTypes = QList<QString>() << QString("") << QString("unavailable");
-	if (FSHIPresenceIn.value(AStreamJid)==AHandlerId && availStanzaTypes.contains(AStanza.type()))
+	else if (FSHIPresenceIn.value(AStreamJid)==AHandlerId && availStanzaTypes.contains(AStanza.type()))
 	{
 		Jid contactJid = AStanza.from();
 		if (AStreamJid!=contactJid && AStanza.firstElement("x",NS_MUC_USER).isNull())

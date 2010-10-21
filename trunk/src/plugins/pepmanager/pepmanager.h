@@ -28,8 +28,7 @@ public:
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	// IStanzaHandler
-	virtual bool stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
-	virtual bool stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept);
+	virtual bool stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	// IPEPManager
 	virtual bool isSupported(const Jid &AStreamJid) const;
 	virtual bool publishItem(const Jid &AStreamJid, const QString &ANode, const QDomElement &AItem);

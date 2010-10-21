@@ -68,16 +68,7 @@ bool MessageProcessor::initObjects()
 	return true;
 }
 
-bool MessageProcessor::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
-{
-	Q_UNUSED(AHandlerId);
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AAccept);
-	return false;
-}
-
-bool MessageProcessor::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool MessageProcessor::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	if (FSHIMessages.value(AStreamJid) == AHandlerId)
 	{

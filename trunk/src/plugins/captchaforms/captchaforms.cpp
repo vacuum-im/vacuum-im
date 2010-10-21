@@ -83,16 +83,7 @@ bool CaptchaForms::initObjects()
 	return true;
 }
 
-bool CaptchaForms::stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
-{
-	Q_UNUSED(AHandleId);
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AAccept);
-	return false;
-}
-
-bool CaptchaForms::stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	if (FSHIChallenge.value(AStreamJid) == AHandleId)
 	{

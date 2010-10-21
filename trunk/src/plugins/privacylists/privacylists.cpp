@@ -117,7 +117,7 @@ bool PrivacyLists::initObjects()
 	return true;
 }
 
-bool PrivacyLists::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	if (FSHIPrivacy.value(AStreamJid)==AHandlerId && (AStanza.from().isEmpty() || (AStreamJid && AStanza.from())))
 	{

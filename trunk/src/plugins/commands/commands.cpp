@@ -121,16 +121,7 @@ bool Commands::initObjects()
 	return true;
 }
 
-bool Commands::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
-{
-	Q_UNUSED(AHandlerId);
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AAccept);
-	return false;
-}
-
-bool Commands::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool Commands::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	if (FSHICommands.value(AStreamJid) == AHandlerId)
 	{

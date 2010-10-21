@@ -188,8 +188,9 @@ bool ServiceDiscovery::initObjects()
 	return true;
 }
 
-bool ServiceDiscovery::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &/*AAccept*/)
+bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
+	bool hooked = false;
 	if (FSHIPresenceOut.value(AStreamJid)==AHandlerId && !FSelfCaps.value(AStreamJid).ver.isEmpty())
 	{
 		QDomElement capsElem = AStanza.addElement("c",NS_CAPS);
@@ -197,13 +198,7 @@ bool ServiceDiscovery::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza 
 		capsElem.setAttribute("ver",FSelfCaps.value(AStreamJid).ver);
 		capsElem.setAttribute("hash",FSelfCaps.value(AStreamJid).hash);
 	}
-	return false;
-}
-
-bool ServiceDiscovery::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
-{
-	bool hooked = false;
-	if (FSHIInfo.value(AStreamJid) == AHandlerId)
+	else if (FSHIInfo.value(AStreamJid) == AHandlerId)
 	{
 		QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
 		IDiscoInfo dinfo = selfDiscoInfo(AStreamJid,query.attribute("node"));

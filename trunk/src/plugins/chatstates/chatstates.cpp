@@ -304,9 +304,8 @@ void ChatStates::sessionLocalize(const IStanzaSession &ASession, IDataForm &AFor
 	}
 }
 
-bool ChatStates::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	Q_UNUSED(AAccept);
 	if (FSHIMessagesOut.value(AStreamJid)==AHandlerId && FChatParams.contains(AStreamJid))
 	{
 		bool stateSent = false;
@@ -323,12 +322,7 @@ bool ChatStates::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStan
 		FChatParams[AStreamJid][contactJid].canSendStates = stateSent;
 		setSelfState(AStreamJid,contactJid,IChatStates::StateActive,false);
 	}
-	return false;
-}
-
-bool ChatStates::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
-{
-	if (FSHIMessagesIn.value(AStreamJid)==AHandlerId && FChatParams.contains(AStreamJid))
+	else if (FSHIMessagesIn.value(AStreamJid)==AHandlerId && FChatParams.contains(AStreamJid))
 	{
 		Jid contactJid = AStanza.from();
 		bool hasBody = !AStanza.firstElement("body").isNull();

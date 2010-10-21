@@ -198,16 +198,7 @@ QMultiMap<int, IOptionsWidget *> ClientInfo::optionsWidgets(const QString &ANode
 	return widgets;
 }
 
-bool ClientInfo::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
-{
-	Q_UNUSED(AHandlerId);
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AAccept);
-	return false;
-}
-
-bool ClientInfo::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	if (AHandlerId == FVersionHandle)
 	{

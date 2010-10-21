@@ -125,16 +125,7 @@ QMultiMap<int, IOptionsWidget *> DataStreamsManger::optionsWidgets(const QString
 	return widgets;
 }
 
-bool DataStreamsManger::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
-{
-	Q_UNUSED(AHandlerId);
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AAccept);
-	return false;
-}
-
-bool DataStreamsManger::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	if (FDataForms && AHandlerId==FSHIInitStream)
 	{

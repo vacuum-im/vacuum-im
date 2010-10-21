@@ -75,16 +75,7 @@ SocksStream::~SocksStream()
 	delete FTcpSocket;
 }
 
-bool SocksStream::stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
-{
-	Q_UNUSED(AHandleId);
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AAccept);
-	return false;
-}
-
-bool SocksStream::stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool SocksStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	QDomElement queryElem = AStanza.firstElement("query",NS_SOCKS5_BYTESTREAMS);
 	if (AHandleId==FSHIHosts && queryElem.attribute("sid")==FStreamId)
