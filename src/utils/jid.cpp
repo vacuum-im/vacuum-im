@@ -1,10 +1,23 @@
 #include "jid.h"
 
 #include <QTextDocument>
+#include <thirdparty/idn/stringprep.h>
 
-QList<QChar> Jid::escChars = QList<QChar>()       << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40; // << 0x5c;
-QList<QString> Jid::escStrings = QList<QString>() <<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40"; //<<"\\5c";
-QHash<QString,Jid> Jid::FCache = QHash<QString,Jid>();
+QList<QChar> EscChars = QList<QChar>()       << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40; // << 0x5c;
+QList<QString> EscStrings = QList<QString>() <<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40"; //<<"\\5c";
+QHash<QString,Jid> JidCache = QHash<QString,Jid>();
+
+QString stringPrepare(const Stringprep_profile *AProfile, const QString &AString)
+{
+   QByteArray buffer = AString.toUtf8();
+   if (!buffer.isEmpty() && buffer.size()<1024)
+   {
+      buffer.reserve(1024);
+      if (stringprep(buffer.data(),buffer.capacity(),(Stringprep_profile_flags)0, AProfile) == STRINGPREP_OK)
+         return QString::fromUtf8(buffer.constData());
+   }
+   return QString::null;
+}
 
 JidData::JidData()
 {
@@ -348,9 +361,9 @@ QString Jid::escape106(const QString &ANode)
 
 	for (int i = 0; i<ANode.length(); i++)
 	{
-		int index = escChars.indexOf(ANode.at(i));
+		int index = EscChars.indexOf(ANode.at(i));
 		if (index >= 0)
-			escNode.append(escStrings.at(index));
+			escNode.append(EscStrings.at(index));
 		else
 			escNode.append(ANode.at(i));
 	}
@@ -367,9 +380,9 @@ QString Jid::unescape106(const QString &AEscNode)
 	int index;
 	for (int i = 0; i<AEscNode.length(); i++)
 	{
-		if (AEscNode.at(i) == '\\' && (index = escStrings.indexOf(AEscNode.mid(i,3))) >= 0)
+		if (AEscNode.at(i) == '\\' && (index = EscStrings.indexOf(AEscNode.mid(i,3))) >= 0)
 		{
-			nodeStr.append(escChars.at(index));
+			nodeStr.append(EscChars.at(index));
 			i+=2;
 		}
 		else
@@ -378,18 +391,6 @@ QString Jid::unescape106(const QString &AEscNode)
 
 	nodeStr.squeeze();
 	return nodeStr;
-}
-
-QString Jid::stringPrepare(const Stringprep_profile *AProfile, const QString &AString)
-{
-	QByteArray buffer = AString.toUtf8();
-	if (!buffer.isEmpty() && buffer.size()<1024)
-	{
-		buffer.reserve(1024);
-		if (stringprep(buffer.data(),buffer.capacity(),(Stringprep_profile_flags)0, AProfile) == STRINGPREP_OK)
-			return QString::fromUtf8(buffer.constData());
-	}
-	return QString::null;
 }
 
 QString Jid::nodePrepare(const QString &ANode)
@@ -409,7 +410,7 @@ QString Jid::resourcePrepare(const QString &AResource)
 
 Jid &Jid::parseString(const QString &AJidStr)
 {
-	if (!FCache.contains(AJidStr))
+	if (!JidCache.contains(AJidStr))
 	{
 		if (!d)
 			d = new JidData;
@@ -429,10 +430,10 @@ Jid &Jid::parseString(const QString &AJidStr)
 			setDomain(QString::null);
 			setResource(QString::null);
 		}
-		FCache.insert(AJidStr,*this);
+		JidCache.insert(AJidStr,*this);
 	}
 	else
-		*this = FCache.value(AJidStr);
+		*this = JidCache.value(AJidStr);
 
 	return *this;
 }

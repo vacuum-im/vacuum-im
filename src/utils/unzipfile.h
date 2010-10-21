@@ -6,11 +6,10 @@
 #include <QMetaType>
 #include <QByteArray>
 #include <QSharedData>
-#include <thirdparty/minizip/unzip.h>
 #include "utilsexport.h"
 
 class UnzipFileData :
-			public QSharedData
+   public QSharedData
 {
 public:
 	struct ZippedFile;
@@ -20,11 +19,10 @@ public:
 	~UnzipFileData();
 public:
 	bool FFilesReaded;
-	unzFile FUNZFile;
+	void *FUNZFile;
 	QString FZipFileName;
 	QHash<QString, ZippedFile *> FZippedFiles;
 };
-
 
 class UTILS_EXPORT UnzipFile
 {

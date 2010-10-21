@@ -1,5 +1,7 @@
 #include "unzipfile.h"
 
+#include <thirdparty/minizip/unzip.h>
+
 struct UnzipFileData::ZippedFile {
 	QString name;
 	unsigned long size;
