@@ -59,16 +59,7 @@ bool PEPManager::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	return (FDiscovery != NULL && FStanzaProcessor != NULL);
 }
 
-bool PEPManager::stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
-{
-	Q_UNUSED(AHandleId);
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AAccept);
-	return false;
-}
-
-bool PEPManager::stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool PEPManager::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	if (stanzaHandles.value(AStreamJid) == AHandleId)
 	{

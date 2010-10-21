@@ -83,14 +83,14 @@ QString StanzaProcessor::newId() const
 bool StanzaProcessor::sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza)
 {
 	emit stanzaReceived(AStreamJid, AStanza);
-	bool acceptedIn = processStanzaIn(AStreamJid,AStanza);
+	bool acceptedIn = processStanza(AStreamJid,AStanza,IStanzaHandle::DirectionIn);
 	bool acceptedIq = processStanzaRequest(AStreamJid,AStanza);
 	return acceptedIn || acceptedIq;
 }
 
 bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza)
 {
-	if (!processStanzaOut(AStreamJid,AStanza))
+	if (!processStanza(AStreamJid,AStanza,IStanzaHandle::DirectionOut))
 	{
 		IXmppStream *stream = FXmppStreams->xmppStream(AStreamJid);
 		if (stream && stream->sendStanza(AStanza)>=0)
@@ -269,74 +269,30 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
 	return false;
 }
 
-bool StanzaProcessor::processStanzaIn(const Jid &AStreamJid, Stanza &AStanza) const
+bool StanzaProcessor::processStanza(const Jid &AStreamJid, Stanza &AStanza, int ADirection) const
 {
 	bool hooked = false;
 	bool accepted = false;
-	QList<int> checkedHandles;
 
 	QMapIterator<int, int> it(FHandleIdByOrder);
 	while (!hooked && it.hasNext())
 	{
 		it.next();
 		const IStanzaHandle &shandle = FHandles.value(it.value());
-		if (shandle.direction==IStanzaHandle::DirectionIn && (shandle.streamJid.isEmpty() || shandle.streamJid==AStreamJid))
+		if (shandle.direction==ADirection && (shandle.streamJid.isEmpty() || shandle.streamJid==AStreamJid))
 		{
 			for (int i = 0; i<shandle.conditions.count(); i++)
 			{
 				if (checkCondition(AStanza.element(), shandle.conditions.at(i)))
 				{
-					hooked = shandle.handler->stanzaEdit(it.value(),AStreamJid,AStanza,accepted);
-					checkedHandles.append(it.value());
+					hooked = shandle.handler->stanzaReadWrite(it.value(),AStreamJid,AStanza,accepted);
 					break;
 				}
 			}
 		}
 	}
 
-	for (int i = 0; !hooked && i<checkedHandles.count(); i++)
-	{
-		int shandleId = checkedHandles.at(i);
-		const IStanzaHandle &shandle = FHandles.value(shandleId);
-		hooked = shandle.handler->stanzaRead(shandleId,AStreamJid,AStanza,accepted);
-	}
-
-	return accepted;
-}
-
-bool StanzaProcessor::processStanzaOut(const Jid &AStreamJid, Stanza &AStanza) const
-{
-	bool hooked = false;
-	bool accepted = false;
-	QList<int> checkedHandlers;
-
-	QMapIterator<int, int> it(FHandleIdByOrder);
-	while (!hooked && it.hasNext())
-	{
-		it.next();
-		const IStanzaHandle &shandle = FHandles.value(it.value());
-		if (shandle.direction==IStanzaHandle::DirectionOut && (shandle.streamJid.isEmpty() || shandle.streamJid==AStreamJid))
-		{
-			for (int i = 0; i<shandle.conditions.count(); i++)
-			{
-				if (checkCondition(AStanza.element(), shandle.conditions.at(i)))
-				{
-					hooked = shandle.handler->stanzaEdit(it.value(),AStreamJid,AStanza,accepted);
-					checkedHandlers.append(it.value());
-					break;
-				}
-			}
-		}
-	}
-
-	for (int i = 0; !hooked && i<checkedHandlers.count(); i++)
-	{
-		int shandleId = checkedHandlers.at(i);
-		const IStanzaHandle &shandle = FHandles.value(shandleId);
-		hooked = shandle.handler->stanzaRead(shandleId,AStreamJid,AStanza,accepted);
-	}
-
-	return hooked;
+	return ADirection==IStanzaHandle::DirectionIn ? accepted : hooked;
 }
 
 bool StanzaProcessor::processStanzaRequest(const Jid &AStreamJid, const Stanza &AStanza)

@@ -55,11 +55,10 @@ signals:
 	void stanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle);
 	void stanzaHandleRemoved(int AHandleId, const IStanzaHandle &AHandle);
 protected:
-	virtual bool checkCondition(const QDomElement &AElem, const QString &ACondition, const int APos = 0) const;
-	virtual bool processStanzaIn(const Jid &AStreamJid, Stanza &AStanza) const;
-	virtual bool processStanzaOut(const Jid &AStreamJid, Stanza &AStanza) const;
-	virtual bool processStanzaRequest(const Jid &AStreamJid, const Stanza &AStanza);
-	virtual void removeStanzaRequest(const QString &AStanzaId);
+	bool checkCondition(const QDomElement &AElem, const QString &ACondition, const int APos = 0) const;
+	bool processStanza(const Jid &AStreamJid, Stanza &AStanza, int ADirection) const;
+	bool processStanzaRequest(const Jid &AStreamJid, const Stanza &AStanza);
+	void removeStanzaRequest(const QString &AStanzaId);
 protected slots:
 	void onStreamCreated(IXmppStream *AXmppStream);
 	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);

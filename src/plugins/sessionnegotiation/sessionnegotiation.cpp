@@ -114,7 +114,7 @@ bool SessionNegotiation::initObjects()
 	return true;
 }
 
-bool SessionNegotiation::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	if (FSHISession.value(AStreamJid) == AHandlerId)
 	{

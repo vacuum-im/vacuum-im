@@ -58,16 +58,7 @@ InBandStream::~InBandStream()
 	abort(tr("Stream destroyed"));
 }
 
-bool InBandStream::stanzaEdit(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
-{
-	Q_UNUSED(AHandleId);
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AAccept);
-	return false;
-}
-
-bool InBandStream::stanzaRead(int AHandleId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
+bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	QDomElement elem = AStanza.firstElement(QString::null,NS_INBAND_BYTESTREAMS);
 	if (AHandleId==FSHIData && elem.attribute("sid")==FStreamId)

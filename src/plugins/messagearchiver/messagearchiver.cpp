@@ -240,9 +240,8 @@ bool MessageArchiver::initSettings()
 	return true;
 }
 
-bool MessageArchiver::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+bool MessageArchiver::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	Q_UNUSED(AAccept);
 	if (FSHIMessageBlocks.value(AStreamJid) == AHandlerId)
 	{
 		Jid contactJid = AStanza.to();
@@ -257,12 +256,7 @@ bool MessageArchiver::stanzaEdit(int AHandlerId, const Jid &AStreamJid, Stanza &
 			return true;
 		}
 	}
-	return false;
-}
-
-bool MessageArchiver::stanzaRead(int AHandlerId, const Jid &AStreamJid, const Stanza &AStanza, bool &AAccept)
-{
-	if (FSHIMessageIn.value(AStreamJid) == AHandlerId)
+	else if (FSHIMessageIn.value(AStreamJid) == AHandlerId)
 	{
 		Message message(AStanza);
 		processMessage(AStreamJid,message,true);
