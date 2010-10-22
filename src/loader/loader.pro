@@ -32,6 +32,28 @@ win32 {
 TRANS_SOURCE_ROOT  = ..
 include(../translations.inc)
 
+#Qt Translations
+#qt_qm_all.target = build_qt_qm
+#for(LANG, TRANS_LANGS) {
+#  SHORT_LANG = $${LANG}
+#  SHORT_LANG ~= s/??_??/ru
+#
+#  TS_FILE = $$[QT_INSTALL_TRANSLATIONS]/qt_$${SHORT_LANG}.ts
+#  QM_FILE = $${TRANS_SOURCE_ROOT}/../translations/$${LANG}/qt_$${SHORT_LANG}.qm
+#
+#  LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+#  win32: LRELEASE = $$replace(LRELEASE, "/", "\\")
+#
+#  eval(qt_qm_$${LANG}.target   = $${QM_FILE})
+#  eval(qt_qm_$${LANG}.depends  = $${TS_FILE})
+#  eval(qt_qm_$${LANG}.commands = $${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE})
+#
+#  qt_qm_all.depends    += qt_qm_$${SHORT_LANG}
+#  QMAKE_EXTRA_TARGETS  += qt_qm_$${SHORT_LANG}
+#}
+#QMAKE_EXTRA_TARGETS  += qt_qm_all
+#POST_TARGETDEPS      += $${qt_qm_all.target}
+
 #Install
 include(../install.inc)
 target.path        = $$INSTALL_BINS
