@@ -1,1 +1,0 @@
-tsrelease.bat de_DE

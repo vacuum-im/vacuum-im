@@ -1,1 +1,0 @@
-tsrelease.bat pl_PL
