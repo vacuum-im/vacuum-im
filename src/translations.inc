@@ -20,12 +20,14 @@ for(LANG, TRANS_LANGS) {
 	LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 	win32: LRELEASE = $$replace(LRELEASE, "/", "\\")
 
-	eval(qm_$${LANG}.target       = $${QM_FILE})
-	eval(qm_$${LANG}.depends      = $${TS_FILE})
-	eval(qm_$${LANG}.commands     = ("$(CHK_DIR_EXISTS)" $${QM_DIR} "$(MKDIR)" $${QM_DIR}) && ($${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE}))
+	!win32:IF_DELIM = ||
+
+	eval(qm_$${LANG}.target   = $${QM_FILE})
+	eval(qm_$${LANG}.depends  = $${TS_FILE})
+	eval(qm_$${LANG}.commands = ("$(CHK_DIR_EXISTS)" $${QM_DIR} $${IF_DELIM} "$(MKDIR)" $${QM_DIR}) && ($${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE}))
 
 	qm_all.depends += qm_$${LANG}
 	QMAKE_EXTRA_TARGETS  += qm_$${LANG}
 }
 QMAKE_EXTRA_TARGETS  += qm_all
-POST_TARGETDEPS      += $${qm_all.target}
+POST_TARGETDEPS += $${qm_all.target}
