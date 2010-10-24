@@ -1,4 +1,5 @@
 include(../config.inc)
+include(../install.inc)
 
 TARGET             = $$TARGET_UTILS
 TEMPLATE           = lib
@@ -16,10 +17,10 @@ unix:!macx {
 DEPENDPATH        += ..
 INCLUDEPATH       += ..
 win32 {
-  DLLDESTDIR       = ../..
-  QMAKE_DISTCLEAN += $${DLLDESTDIR}/$${TARGET}.dll
+  DLLDESTDIR       = ..\\..
+  QMAKE_DISTCLEAN += $${DLLDESTDIR}\\$${TARGET}.dll
 }
-DESTDIR       = ../libs
+DESTDIR            = ../libs
 include(utils.pri)
 
 #Translation
@@ -28,7 +29,6 @@ include(../translations.inc)
 
 #Install (for Mac OS X - in loader.pro)
 !macx:{
-  include(../install.inc)
   target.path      = $$INSTALL_LIBS
-  INSTALLS         = target
+  INSTALLS        += target
 }
