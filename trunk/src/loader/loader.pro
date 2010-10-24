@@ -1,4 +1,5 @@
 include(../config.inc)
+include(../install.inc)
 
 TARGET             = $$TARGET_LOADER
 TEMPLATE           = app
@@ -19,12 +20,14 @@ SVN_REVISION=$$system(svnversion -n -c ./../../)
 win32 {
   exists(svninfo.h):system(del svninfo.h)
   !isEmpty(SVN_REVISION):system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
-    DEFINES       += SVNINFO
+    DEFINES         += SVNINFO
+    QMAKE_DISTCLEAN += svninfo.h
   }
 } else {
   exists(svninfo.h):system(rm -f svninfo.h)
   !isEmpty(SVN_REVISION):system(echo \\$${LITERAL_HASH}define SVN_REVISION \\\"$${SVN_REVISION}\\\" >> svninfo.h) {
-    DEFINES       += SVNINFO
+    DEFINES         += SVNINFO
+    QMAKE_DISTCLEAN += svninfo.h
   }
 }
 
@@ -32,38 +35,13 @@ win32 {
 TRANS_SOURCE_ROOT  = ..
 include(../translations.inc)
 
-#Qt Translations
-#qt_qm_all.target = build_qt_qm
-#for(LANG, TRANS_LANGS) {
-#  SHORT_LANG = $${LANG}
-#  SHORT_LANG ~= s/??_??/ru
-#
-#  TS_FILE = $$[QT_INSTALL_TRANSLATIONS]/qt_$${SHORT_LANG}.ts
-#  QM_FILE = $${TRANS_SOURCE_ROOT}/../translations/$${LANG}/qt_$${SHORT_LANG}.qm
-#
-#  LRELEASE = $$[QT_INSTALL_BINS]/lrelease
-#  win32: LRELEASE = $$replace(LRELEASE, "/", "\\")
-#
-#  eval(qt_qm_$${LANG}.target   = $${QM_FILE})
-#  eval(qt_qm_$${LANG}.depends  = $${TS_FILE})
-#  eval(qt_qm_$${LANG}.commands = $${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE})
-#
-#  qt_qm_all.depends    += qt_qm_$${SHORT_LANG}
-#  QMAKE_EXTRA_TARGETS  += qt_qm_$${SHORT_LANG}
-#}
-#QMAKE_EXTRA_TARGETS  += qt_qm_all
-#POST_TARGETDEPS      += $${qt_qm_all.target}
-
 #Install
-include(../install.inc)
 target.path        = $$INSTALL_BINS
 resources.path     = $$INSTALL_RESOURCES
 resources.files    = ../../resources/*
 documents.path     = $$INSTALL_DOCUMENTS
 documents.files    = ../../AUTHORS ../../CHANGELOG ../../README ../../COPYING ../../TRANSLATORS
-translations.path  = $$INSTALL_TRANSLATIONS
-translations.files = ../../translations/*
-INSTALLS           = target resources documents translations
+INSTALLS           += target resources documents
 
 #Linux desktop install
 unix:!macx {

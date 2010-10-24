@@ -1,4 +1,5 @@
 include(../config.inc)
+include(../install.inc)
 
 TEMPLATE            = lib
 CONFIG             += plugin
@@ -8,8 +9,8 @@ LIBS               += -l$$TARGET_UTILS
 DEPENDPATH         += ../..
 INCLUDEPATH        += ../..
 win32 {
-  DLLDESTDIR        = ../../../plugins
-  QMAKE_DISTCLEAN  += $${DLLDESTDIR}/$${TARGET}.dll
+  DLLDESTDIR        = ..\\..\\..\\plugins
+  QMAKE_DISTCLEAN  += $${DLLDESTDIR}\\$${TARGET}.dll
 }
 unix:DESTDIR        = ../../../plugins
 
@@ -18,9 +19,8 @@ TRANS_SOURCE_ROOT   = ../..
 include(../translations.inc)
 
 #Install
-include(../install.inc)
 target.path         = $$INSTALL_PLUGINS
-INSTALLS            = target
+INSTALLS           += target
 
 #MaxOS Install
 macx {
