@@ -13,6 +13,9 @@
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/vcardvaluenames.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -30,8 +33,10 @@
 #include <interfaces/ivcard.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/message.h>
 #include <utils/action.h>
+#include <utils/options.h>
 #include "multiuserchat.h"
 #include "multiuserchatwindow.h"
 #include "joinmultichatdialog.h"
@@ -50,10 +55,11 @@ class MultiUserChatPlugin :
 			public IXmppUriHandler,
 			public IDiscoFeatureHandler,
 			public IMessageHandler,
-			public IDataLocalizer
+			public IDataLocalizer,
+         public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer);
+	Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsHolder);
 public:
 	MultiUserChatPlugin();
 	~MultiUserChatPlugin();
@@ -63,8 +69,10 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
+   //IOptionsHolder
+   virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IDiscoFeatureHandler
@@ -131,6 +139,7 @@ private:
 	IVCardPlugin *FVCardPlugin;
 	IRegistration *FRegistration;
 	IXmppUriQueries *FXmppUriQueries;
+   IOptionsManager *FOptionsManager;
 private:
 	Menu *FChatMenu;
 private:

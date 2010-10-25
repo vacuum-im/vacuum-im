@@ -517,6 +517,14 @@ Check values and try again</source>
         <source>Show all hidden conferences</source>
         <translation>Показать все скрытые конференции</translation>
     </message>
+    <message>
+        <source>Show users connections/disconnections</source>
+        <translation>Показывать подключения/отключения пользователей</translation>
+    </message>
+    <message>
+        <source>Show users status changes</source>
+        <translation>Показывать изменения статусов пользователей</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

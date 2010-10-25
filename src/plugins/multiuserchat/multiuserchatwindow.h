@@ -38,8 +38,13 @@ struct WindowStatus
 {
 	QDateTime startTime;
 	QDateTime createTime;
-	QString lastStatusShow;
 };
+
+struct UserStatus
+{
+   QString lastStatusShow;
+};
+
 
 class MultiUserChatWindow :
 			public QMainWindow,
@@ -226,6 +231,7 @@ private:
 	QList<IChatWindow *> FChatWindows;
 	QMultiMap<IChatWindow *,int> FActiveChatMessages;
 	QMap<int, IDataDialogWidget *> FDataFormMessages;
+   QHash<IMultiUser *, UserStatus> FUserStatus;
 	QMap<IViewWidget *, WindowStatus> FWindowStatus;
 private:
 	UsersProxyModel *FUsersProxy;
