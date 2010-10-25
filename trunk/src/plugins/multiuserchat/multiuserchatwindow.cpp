@@ -373,7 +373,7 @@ void MultiUserChatWindow::initialize()
 			{
 				ui.lblAccount->setText(account->name());
 				connect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),
-				        SLOT(onAccountOptionsChanged(const OptionsNode &)));
+					SLOT(onAccountOptionsChanged(const OptionsNode &)));
 			}
 		}
 	}
@@ -403,7 +403,7 @@ void MultiUserChatWindow::initialize()
 		if (FMessageStyles)
 		{
 			connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
-			        SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
+				SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
 		}
 	}
 
@@ -1009,14 +1009,14 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 	else if (AText == "/help")
 	{
 		showStatusMessage(tr("Supported list of commands: \n"
-		               " /ban <roomnick> [comment] \n"
-		               " /invite <jid> [comment] \n"
-		               " /join <roomname> [pass] \n"
-		               " /kick <roomnick> [comment] \n"
-		               " /msg <roomnick> <foo> \n"
-		               " /nick <newnick> \n"
-		               " /leave [comment] \n"
-		               " /topic <foo>"),IMessageContentOptions::Notification);
+									" /ban <roomnick> [comment] \n"
+									" /invite <jid> [comment] \n"
+									" /join <roomname> [pass] \n"
+									" /kick <roomnick> [comment] \n"
+									" /msg <roomnick> <foo> \n"
+									" /nick <newnick> \n"
+									" /leave [comment] \n"
+									" /topic <foo>"),IMessageContentOptions::Notification);
 		hasCommand = true;
 	}
 	return hasCommand;
@@ -1456,9 +1456,9 @@ void MultiUserChatWindow::onStreamJidChanged(const Jid &ABefore, const Jid &AAft
 
 void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus)
 {
-   QString enterMessage;
-   QString statusMessage;
-   QStandardItem *userItem = FUsers.value(AUser);
+	QString enterMessage;
+	QString statusMessage;
+	QStandardItem *userItem = FUsers.value(AUser);
 	if (AShow!=IPresence::Offline && AShow!=IPresence::Error)
 	{
 		if (userItem == NULL)
@@ -1469,7 +1469,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 			highlightUserRole(AUser);
 			highlightUserAffiliation(AUser);
 
-         if (FMultiChat->isOpen() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
+			if (FMultiChat->isOpen() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
 			{
 				QString realJid = AUser->data(MUDR_REAL_JID).toString();
 				if (!realJid.isEmpty())
@@ -1479,17 +1479,17 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 				showStatusMessage(enterMessage);
 			}
 		}
-      else if (Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
-      {
-         QString show = FStatusChanger ? FStatusChanger->nameByShow(AShow) : QString::null;
-         UserStatus &userStatus = FUserStatus[AUser];
-         if (userStatus.lastStatusShow != AStatus+show)
-         {
-            userStatus.lastStatusShow = AStatus+show;
-            statusMessage = tr("%1 changed status to [%2] %3").arg(AUser->nickName()).arg(show).arg(AStatus);
-            showStatusMessage(statusMessage);
-         }
-      }
+		else if (Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
+		{
+			QString show = FStatusChanger ? FStatusChanger->nameByShow(AShow) : QString::null;
+			UserStatus &userStatus = FUserStatus[AUser];
+			if (userStatus.lastStatusShow != AStatus+show)
+			{
+				userStatus.lastStatusShow = AStatus+show;
+				statusMessage = tr("%1 changed status to [%2] %3").arg(AUser->nickName()).arg(show).arg(AStatus);
+				showStatusMessage(statusMessage);
+			}
+		}
 		showStatusCodes(AUser->nickName(),FMultiChat->statusCodes());
 		setToolTipForUser(AUser);
 		updateListItem(AUser->contactJid());
@@ -1498,32 +1498,32 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 	{
 		if (!showStatusCodes(AUser->nickName(),FMultiChat->statusCodes()))
 		{
-         if (FMultiChat->isOpen() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
-         {
-            QString realJid = AUser->data(MUDR_REAL_JID).toString();
-            if (!realJid.isEmpty())
-               enterMessage = tr("%1 <%2> has left the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
-            else
-               enterMessage = tr("%1 has left the room. %2").arg(AUser->nickName()).arg(AStatus);
-            showStatusMessage(enterMessage);
-         }
+			if (FMultiChat->isOpen() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
+			{
+				QString realJid = AUser->data(MUDR_REAL_JID).toString();
+				if (!realJid.isEmpty())
+					enterMessage = tr("%1 <%2> has left the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
+				else
+					enterMessage = tr("%1 has left the room. %2").arg(AUser->nickName()).arg(AStatus);
+				showStatusMessage(enterMessage);
+			}
 		}
 		FUsers.remove(AUser);
 		qDeleteAll(FUsersModel->takeRow(userItem->row()));
 	}
 
 	if (FMultiChat->isOpen())
-   {
-      updateWindow();
-   }
+	{
+		updateWindow();
+	}
 
 	IChatWindow *window = findChatWindow(AUser->contactJid());
 	if (window)
 	{
-      if (!enterMessage.isEmpty())
-         showChatStatus(window,enterMessage);
-      if (!statusMessage.isEmpty())
-         showChatStatus(window,statusMessage);
+		if (!enterMessage.isEmpty())
+			showChatStatus(window,enterMessage);
+		if (!statusMessage.isEmpty())
+			showChatStatus(window,statusMessage);
 		updateChatWindow(window);
 	}
 }
@@ -1611,10 +1611,9 @@ void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &ARea
 	IMultiUser *user = FMultiChat->userByNick(ANick);
 	QString realJid = user!=NULL ? user->data(MUDR_REAL_JID).toString() : QString::null;
 	showStatusMessage(tr("%1 has been kicked from the room%2. %3")
-	            .arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid) : ANick)
-	            .arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
-	            .arg(AReason),
-	            IMessageContentOptions::Event);
+		.arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid) : ANick)
+		.arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
+		.arg(AReason), IMessageContentOptions::Event);
 }
 
 void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser)
@@ -1622,10 +1621,9 @@ void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &ARea
 	IMultiUser *user = FMultiChat->userByNick(ANick);
 	QString realJid = user!=NULL ? user->data(MUDR_REAL_JID).toString() : QString::null;
 	showStatusMessage(tr("%1 has been banned from the room%2. %3")
-	            .arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid) : ANick)
-	            .arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
-	            .arg(AReason),
-	            IMessageContentOptions::Event);
+		.arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid) : ANick)
+		.arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
+		.arg(AReason), IMessageContentOptions::Event);
 }
 
 void MultiUserChatWindow::onAffiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList)
@@ -1824,7 +1822,7 @@ void MultiUserChatWindow::onToolBarActionTriggered(bool)
 	if (action == FChangeNick)
 	{
 		QString nick = QInputDialog::getText(this,tr("Change nick name"),tr("Enter your new nick name in room %1").arg(roomJid().node()),
-		                                     QLineEdit::Normal,FMultiChat->nickName());
+			QLineEdit::Normal,FMultiChat->nickName());
 		if (!nick.isEmpty())
 			FMultiChat->setNickName(nick);
 	}

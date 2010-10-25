@@ -42,7 +42,7 @@ struct WindowStatus
 
 struct UserStatus
 {
-   QString lastStatusShow;
+	QString lastStatusShow;
 };
 
 
@@ -231,7 +231,7 @@ private:
 	QList<IChatWindow *> FChatWindows;
 	QMultiMap<IChatWindow *,int> FActiveChatMessages;
 	QMap<int, IDataDialogWidget *> FDataFormMessages;
-   QHash<IMultiUser *, UserStatus> FUserStatus;
+	QHash<IMultiUser *, UserStatus> FUserStatus;
 	QMap<IViewWidget *, WindowStatus> FWindowStatus;
 private:
 	UsersProxyModel *FUsersProxy;
