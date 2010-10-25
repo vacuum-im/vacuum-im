@@ -58,6 +58,10 @@
         <source>Show tab indices</source>
         <translation>Показывать номера вкладок</translation>
     </message>
+    <message>
+        <source>Save status messages to history</source>
+        <translation>Сохранять статусные сообщения в истории</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>

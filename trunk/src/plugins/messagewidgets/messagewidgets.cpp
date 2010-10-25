@@ -58,6 +58,7 @@ bool MessageWidgets::initObjects()
 bool MessageWidgets::initSettings()
 {
 	Options::setDefaultValue(OPV_MESSAGES_SHOWSTATUS,true);
+	Options::setDefaultValue(OPV_MESSAGES_ARCHIVESTATUS,false);
 	Options::setDefaultValue(OPV_MESSAGES_EDITORAUTORESIZE,true);
 	Options::setDefaultValue(OPV_MESSAGES_SHOWINFOWIDGET,true);
 	Options::setDefaultValue(OPV_MESSAGES_EDITORMINIMUMLINES,1);
@@ -85,6 +86,7 @@ QMultiMap<int, IOptionsWidget *> MessageWidgets::optionsWidgets(const QString &A
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),tr("Enable tab windows"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_TABWINDOWS_SHOW_INDICES),tr("Show tab indices"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show status changes in chat windows"),AParent));
+		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_ARCHIVESTATUS),tr("Save status messages to history"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Auto resize input field"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWINFOWIDGET),tr("Show contact information in chat windows"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,new MessengerOptions(this,AParent));

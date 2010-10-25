@@ -246,6 +246,7 @@ bool MultiUserChatPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWENTERS,true);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWSTATUS,true);
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_ARCHIVESTATUS,false);
 
 	if (FOptionsManager)
 	{
@@ -263,6 +264,7 @@ QMultiMap<int, IOptionsWidget *> MultiUserChatPlugin::optionsWidgets(const QStri
 	{
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS),tr("Show users connections/disconnections"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS),tr("Show users status changes"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS),tr("Save status messages to history"),AParent));
 	}
 	return widgets;
 }
