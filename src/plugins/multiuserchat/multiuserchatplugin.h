@@ -56,7 +56,7 @@ class MultiUserChatPlugin :
 			public IDiscoFeatureHandler,
 			public IMessageHandler,
 			public IDataLocalizer,
-         public IOptionsHolder
+			public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsHolder);
@@ -71,8 +71,8 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
-   //IOptionsHolder
-   virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	//IOptionsHolder
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IDiscoFeatureHandler
@@ -139,7 +139,7 @@ private:
 	IVCardPlugin *FVCardPlugin;
 	IRegistration *FRegistration;
 	IXmppUriQueries *FXmppUriQueries;
-   IOptionsManager *FOptionsManager;
+	IOptionsManager *FOptionsManager;
 private:
 	Menu *FChatMenu;
 private:

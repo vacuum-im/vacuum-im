@@ -26,7 +26,7 @@ MultiUserChatPlugin::MultiUserChatPlugin()
 	FVCardPlugin = NULL;
 	FRegistration = NULL;
 	FXmppUriQueries = NULL;
-   FOptionsManager = NULL;
+	FOptionsManager = NULL;
 
 	FChatMenu = NULL;
 }
@@ -85,7 +85,7 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 		if (FDiscovery)
 		{
 			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),
-			        SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+				SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
 		}
 	}
 
@@ -95,11 +95,11 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 	}
 
-   plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
-   if (plugin)
-   {
-      FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-   }
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+	if (plugin)
+	{
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	if (FMessageWidgets)
 	{
@@ -140,9 +140,9 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 			if (FRegistration)
 			{
 				connect(FRegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
-				        SLOT(onRegisterFieldsReceived(const QString &, const IRegisterFields &)));
+					SLOT(onRegisterFieldsReceived(const QString &, const IRegisterFields &)));
 				connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
-				        SLOT(onRegisterErrorReceived(const QString &, const QString &)));
+					SLOT(onRegisterErrorReceived(const QString &, const QString &)));
 			}
 		}
 	}
@@ -200,7 +200,7 @@ bool MultiUserChatPlugin::initObjects()
 	if (FRostersViewPlugin)
 	{
 		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
-		        SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+			SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
 	}
 
 	if (FMainWindowPlugin)
@@ -244,27 +244,27 @@ bool MultiUserChatPlugin::initObjects()
 
 bool MultiUserChatPlugin::initSettings()
 {
-   Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWENTERS,true);
-   Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWSTATUS,true);
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWENTERS,true);
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWSTATUS,true);
 
-   if (FOptionsManager)
-   {
-      IOptionsDialogNode dnode = { ONO_CONFERENCES, OPN_CONFERENCES, tr("Conferences"), MNI_MUC_CONFERENCE };
-      FOptionsManager->insertOptionsDialogNode(dnode);
-      FOptionsManager->insertOptionsHolder(this);
-   }
-   return true;
+	if (FOptionsManager)
+	{
+		IOptionsDialogNode dnode = { ONO_CONFERENCES, OPN_CONFERENCES, tr("Conferences"), MNI_MUC_CONFERENCE };
+		FOptionsManager->insertOptionsDialogNode(dnode);
+		FOptionsManager->insertOptionsHolder(this);
+	}
+	return true;
 }
 
 QMultiMap<int, IOptionsWidget *> MultiUserChatPlugin::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
-   QMultiMap<int, IOptionsWidget *> widgets;
-   if (FOptionsManager && ANodeId==OPN_CONFERENCES)
-   {
-      widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS),tr("Show users connections/disconnections"),AParent));
-      widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS),tr("Show users status changes"),AParent));
-   }
-   return widgets;
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (FOptionsManager && ANodeId==OPN_CONFERENCES)
+	{
+		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS),tr("Show users connections/disconnections"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS),tr("Show users status changes"),AParent));
+	}
+	return widgets;
 }
 
 bool MultiUserChatPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
