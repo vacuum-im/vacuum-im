@@ -388,7 +388,7 @@ void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageConten
 
 void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &AMessage)
 {
-	if (FMessageArchiver)
+	if (FMessageArchiver && Options::node(OPV_MESSAGES_ARCHIVESTATUS).value().toBool())
 		FMessageArchiver->saveNote(AWindow->streamJid(), AWindow->contactJid(), AMessage);
 
 	IMessageContentOptions options;

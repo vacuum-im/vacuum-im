@@ -1064,7 +1064,7 @@ void MultiUserChatWindow::showStatusMessage(const QString &AMessage, int AConten
 	options.time = QDateTime::currentDateTime();
 	options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
 
-	if (FMessageArchiver)
+	if (FMessageArchiver && Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS).value().toBool())
 		FMessageArchiver->saveNote(FMultiChat->streamJid(), FMultiChat->roomJid(), AMessage);
 
 	FViewWidget->appendText(AMessage,options);

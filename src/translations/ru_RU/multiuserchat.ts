@@ -525,6 +525,10 @@ Check values and try again</source>
         <source>Show users status changes</source>
         <translation>Показывать изменения статусов пользователей</translation>
     </message>
+    <message>
+        <source>Save status messages to history</source>
+        <translation>Сохранять статусные сообщения в истории</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

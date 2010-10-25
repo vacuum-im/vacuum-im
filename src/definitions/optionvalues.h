@@ -75,6 +75,7 @@
 // MessageWidgets
 #define OPV_MESSAGES_ROOT                               "messages"
 #define OPV_MESSAGES_SHOWSTATUS                         "messages.show-status-changes"
+#define OPV_MESSAGES_ARCHIVESTATUS                      "messages.archive-status"
 #define OPV_MESSAGES_SHOWINFOWIDGET                     "messages.show-info-widget"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
@@ -95,6 +96,7 @@
 // MultiUserChat
 #define OPV_MUC_GROUPCHAT_SHOWENTERS                    "muc.groupchat.show-enters"
 #define OPV_MUC_GROUPCHAT_SHOWSTATUS                    "muc.groupchat.show-status"
+#define OPV_MUC_GROUPCHAT_ARCHIVESTATUS                 "muc.groupchat.archive-status"
 
 // MessageArchive
 #define OPV_HISTORY_COLLECTION_SIZE                     "history.collection.size"
