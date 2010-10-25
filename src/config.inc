@@ -37,7 +37,7 @@ isEmpty(INSTALL_RES_DIR) {
 CONFIG(debug, debug|release) {
   DEFINES               += PLUGINS_DIR='\\\"./plugins\\\"'
   DEFINES               += RESOURCES_DIR='\\\"./resources\\\"'
-  DEFINES               += TRANSLATIONS_DIR='\\\"./translations\\\"'
+  DEFINES               += TRANSLATIONS_DIR='\\\"./src/translations\\\"'
 } else:win32 {
   DEFINES               += PLUGINS_DIR='\\\"./$${INSTALL_LIB_DIR}/plugins\\\"'
   DEFINES               += RESOURCES_DIR='\\\"./$${INSTALL_RES_DIR}/resources\\\"'
