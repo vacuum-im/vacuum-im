@@ -58,4 +58,7 @@
 //Node = ON_AUTOSTATUS
 #define OWO_AUTOSTATUS                            500
 
+//Node = ON_COBFERENCES
+#define OWO_CONFERENCES                           500
+
 #endif

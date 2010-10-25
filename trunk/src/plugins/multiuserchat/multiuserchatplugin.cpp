@@ -26,6 +26,7 @@ MultiUserChatPlugin::MultiUserChatPlugin()
 	FVCardPlugin = NULL;
 	FRegistration = NULL;
 	FXmppUriQueries = NULL;
+   FOptionsManager = NULL;
 
 	FChatMenu = NULL;
 }
@@ -93,6 +94,12 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 	{
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 	}
+
+   plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+   if (plugin)
+   {
+      FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+   }
 
 	if (FMessageWidgets)
 	{
@@ -233,6 +240,31 @@ bool MultiUserChatPlugin::initObjects()
 	}
 
 	return true;
+}
+
+bool MultiUserChatPlugin::initSettings()
+{
+   Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWENTERS,true);
+   Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWSTATUS,true);
+
+   if (FOptionsManager)
+   {
+      IOptionsDialogNode dnode = { ONO_CONFERENCES, OPN_CONFERENCES, tr("Conferences"), MNI_MUC_CONFERENCE };
+      FOptionsManager->insertOptionsDialogNode(dnode);
+      FOptionsManager->insertOptionsHolder(this);
+   }
+   return true;
+}
+
+QMultiMap<int, IOptionsWidget *> MultiUserChatPlugin::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+   QMultiMap<int, IOptionsWidget *> widgets;
+   if (FOptionsManager && ANodeId==OPN_CONFERENCES)
+   {
+      widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS),tr("Show users connections/disconnections"),AParent));
+      widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS),tr("Show users status changes"),AParent));
+   }
+   return widgets;
 }
 
 bool MultiUserChatPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)

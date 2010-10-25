@@ -92,6 +92,10 @@
 // ChatStates
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
 
+// MultiUserChat
+#define OPV_MUC_GROUPCHAT_SHOWENTERS                    "muc.groupchat.show-enters"
+#define OPV_MUC_GROUPCHAT_SHOWSTATUS                    "muc.groupchat.show-status"
+
 // MessageArchive
 #define OPV_HISTORY_COLLECTION_SIZE                     "history.collection.size"
 #define OPV_HISTORY_COLLECTION_MAXSIZE                  "history.collection.max-size"

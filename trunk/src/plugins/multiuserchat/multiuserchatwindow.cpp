@@ -1456,7 +1456,9 @@ void MultiUserChatWindow::onStreamJidChanged(const Jid &ABefore, const Jid &AAft
 
 void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus)
 {
-	QStandardItem *userItem = FUsers.value(AUser);
+   QString enterMessage;
+   QString statusMessage;
+   QStandardItem *userItem = FUsers.value(AUser);
 	if (AShow!=IPresence::Offline && AShow!=IPresence::Error)
 	{
 		if (userItem == NULL)
@@ -1467,56 +1469,61 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 			highlightUserRole(AUser);
 			highlightUserAffiliation(AUser);
 
-			if (FMultiChat->isOpen())
+         if (FMultiChat->isOpen() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
 			{
-				QString message;
 				QString realJid = AUser->data(MUDR_REAL_JID).toString();
 				if (!realJid.isEmpty())
-					message = tr("%1 <%2> has joined the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
+					enterMessage = tr("%1 <%2> has joined the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
 				else
-					message = tr("%1 has joined the room. %2").arg(AUser->nickName()).arg(AStatus);
-				showStatusMessage(message);
+					enterMessage = tr("%1 has joined the room. %2").arg(AUser->nickName()).arg(AStatus);
+				showStatusMessage(enterMessage);
 			}
 		}
+      else if (Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
+      {
+         QString show = FStatusChanger ? FStatusChanger->nameByShow(AShow) : QString::null;
+         UserStatus &userStatus = FUserStatus[AUser];
+         if (userStatus.lastStatusShow != AStatus+show)
+         {
+            userStatus.lastStatusShow = AStatus+show;
+            statusMessage = tr("%1 changed status to [%2] %3").arg(AUser->nickName()).arg(show).arg(AStatus);
+            showStatusMessage(statusMessage);
+         }
+      }
 		showStatusCodes(AUser->nickName(),FMultiChat->statusCodes());
 		setToolTipForUser(AUser);
 		updateListItem(AUser->contactJid());
 	}
 	else if (userItem)
 	{
-		if (!showStatusCodes(AUser->nickName(),FMultiChat->statusCodes()) && FMultiChat->isOpen())
+		if (!showStatusCodes(AUser->nickName(),FMultiChat->statusCodes()))
 		{
-			QString message;
-			QString realJid = AUser->data(MUDR_REAL_JID).toString();
-			if (!realJid.isEmpty())
-				message = tr("%1 <%2> has left the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
-			else
-				message = tr("%1 has left the room. %2").arg(AUser->nickName()).arg(AStatus);
-			showStatusMessage(message);
+         if (FMultiChat->isOpen() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
+         {
+            QString realJid = AUser->data(MUDR_REAL_JID).toString();
+            if (!realJid.isEmpty())
+               enterMessage = tr("%1 <%2> has left the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
+            else
+               enterMessage = tr("%1 has left the room. %2").arg(AUser->nickName()).arg(AStatus);
+            showStatusMessage(enterMessage);
+         }
 		}
 		FUsers.remove(AUser);
 		qDeleteAll(FUsersModel->takeRow(userItem->row()));
 	}
 
 	if (FMultiChat->isOpen())
-		updateWindow();
+   {
+      updateWindow();
+   }
 
 	IChatWindow *window = findChatWindow(AUser->contactJid());
 	if (window)
 	{
-		window->infoWidget()->setField(IInfoWidget::ContactShow,AShow);
-		window->infoWidget()->setField(IInfoWidget::ContactStatus,AStatus);
-		if (Options::node(OPV_MESSAGES_SHOWSTATUS).value().toBool())
-		{
-			QString show = FStatusChanger ? FStatusChanger->nameByShow(AShow) : QString::null;
-			WindowStatus &wstatus = FWindowStatus[window->viewWidget()];
-			if (wstatus.lastStatusShow != AStatus+show)
-			{
-				wstatus.lastStatusShow = AStatus+show;
-				QString message = tr("%1 changed status to [%2] %3").arg(AUser->nickName()).arg(show).arg(AStatus);
-				showChatStatus(window,message);
-			}
-		}
+      if (!enterMessage.isEmpty())
+         showChatStatus(window,enterMessage);
+      if (!statusMessage.isEmpty())
+         showChatStatus(window,statusMessage);
 		updateChatWindow(window);
 	}
 }
