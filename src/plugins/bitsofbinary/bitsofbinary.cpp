@@ -117,7 +117,7 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 {
 	if (AHandleId == FSHIData)
 	{
-		QDomElement dataElem = AStanza.type()=="iq" ? AStanza.firstElement().firstChildElement("data") : AStanza.firstElement("data");
+		QDomElement dataElem = AStanza.tagName()=="iq" ? AStanza.firstElement().firstChildElement("data") : AStanza.firstElement("data");
 		while (!dataElem.isNull())
 		{
 			if (dataElem.namespaceURI() == NS_BITS_OF_BINARY)
