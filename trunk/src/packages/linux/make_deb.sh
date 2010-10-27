@@ -12,7 +12,7 @@ echo "
 Usage:
 sh src/packages/linux/make_deb.sh
 
-Build requirements: subversion build-essential devscripts fakeroot debhelper libqt4-dev
+Build requirements: subversion build-essential devscripts fakeroot debhelper libqt4-dev libxext-dev
 
 Package file will be created in the parent directory
 "
