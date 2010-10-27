@@ -10,6 +10,7 @@ DEFINES           += UTILS_DLL
 LIBS              += -L../libs
 unix:!macx {
   LIBS            += -lidn -lminizip -lz
+  CONFIG          += x11
 } else {
   LIBS            += -lidn -lminizip -lzlib
   INCLUDEPATH     += ../thirdparty/zlib
