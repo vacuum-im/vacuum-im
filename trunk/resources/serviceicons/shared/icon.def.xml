@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <icondef>
+
 	<!-- Common -->
 	<icon>
 		<key>_service_</key>
@@ -17,6 +18,55 @@
 		<key>_error_</key>
 		<object mime='image/png'>_error_.png</object>
 	</icon>
+
+	<!-- Account -->
+	<icon>
+		<key>account</key>
+		<object mime='image/png'>account.png</object>
+	</icon>
+	<icon>
+		<key>account/admin</key>
+		<object mime='image/png'>account_admin.png</object>
+	</icon>
+	<icon>
+		<key>account/anonymous</key>
+		<object mime='image/png'>account_anonymous.png</object>
+	</icon>
+	<icon>
+		<key>account/registered</key>
+		<object mime='image/png'>account_registered.png</object>
+	</icon>
+
+	<!-- Auth -->
+	<icon>
+		<key>auth</key>
+		<object mime='image/png'>auth.png</object>
+	</icon>
+	<icon>
+		<key>auth/cert</key>
+		<object mime='image/png'>auth_cert.png</object>
+	</icon>
+	<icon>
+		<key>auth/generic</key>
+		<object mime='image/png'>auth_generic.png</object>
+	</icon>
+	<icon>
+		<key>auth/ldap</key>
+		<object mime='image/png'>auth_ldap.png</object>
+	</icon>
+	<icon>
+		<key>auth/ntlm</key>
+		<object mime='image/png'>auth_ntlm.png</object>
+	</icon>
+	<icon>
+		<key>auth/pam</key>
+		<object mime='image/png'>auth_pam.png</object>
+	</icon>
+	<icon>
+		<key>auth/radius</key>
+		<object mime='image/png'>auth_radius.png</object>
+	</icon>
+
 	<!-- Automation -->
 	<icon>
 		<key>automation</key>
@@ -24,24 +74,25 @@
 	</icon>
 	<icon>
 		<key>automation/command-list</key>
-		<object mime='image/png'>automationcommandlist.png</object>
+		<object mime='image/png'>automation_commandlist.png</object>
 	</icon>
 	<icon>
 		<key>automation/command-node</key>
-		<object mime='image/png'>automationcommandnode.png</object>
+		<object mime='image/png'>automation_commandnode.png</object>
 	</icon>
 	<icon>
 		<key>automation/rpc</key>
-		<object mime='image/png'>automationrpc.png</object>
+		<object mime='image/png'>automation_rpc.png</object>
 	</icon>
 	<icon>
 		<key>automation/soap</key>
-		<object mime='image/png'>automationsoap.png</object>
+		<object mime='image/png'>automation_soap.png</object>
 	</icon>
 	<icon>
 		<key>automation/translation</key>
-		<object mime='image/png'>automationtranslation.png</object>
+		<object mime='image/png'>automation_translation.png</object>
 	</icon>
+
 	<!-- Client -->
 	<icon>
 		<key>client</key>
@@ -49,28 +100,29 @@
 	</icon>
 	<icon>
 		<key>client/bot</key>
-		<object mime='image/png'>clientbot.png</object>
+		<object mime='image/png'>client_bot.png</object>
 	</icon>
 	<icon>
 		<key>client/console</key>
-		<object mime='image/png'>clientconsole.png</object>
+		<object mime='image/png'>client_console.png</object>
 	</icon>
 	<icon>
 		<key>client/handheld</key>
-		<object mime='image/png'>clienthandheld.png</object>
+		<object mime='image/png'>client_handheld.png</object>
 	</icon>
 	<icon>
 		<key>client/pc</key>
-		<object mime='image/png'>clientpc.png</object>
+		<object mime='image/png'>client_pc.png</object>
 	</icon>
 	<icon>
 		<key>client/phone</key>
-		<object mime='image/png'>clientphone.png</object>
+		<object mime='image/png'>client_phone.png</object>
 	</icon>
 	<icon>
 		<key>client/web</key>
-		<object mime='image/png'>clientweb.png</object>
+		<object mime='image/png'>client_web.png</object>
 	</icon>
+
 	<!-- Collaboration -->
 	<icon>
 		<key>collaboration</key>
@@ -78,183 +130,283 @@
 	</icon>
 	<icon>
 		<key>collaboration/whiteboard</key>
-		<object mime='image/png'>collaborationwhiteboard.png</object>
+		<object mime='image/png'>collaboration_whiteboard.png</object>
 	</icon>
-  <!-- Conference -->
+
+	<!-- Component -->
+	<icon>
+		<key>component</key>
+		<object mime='image/png'>component.png</object>
+	</icon>
+	<icon>
+		<key>component/archive</key>
+		<object mime='image/png'>component_archive.png</object>
+	</icon>
+	<icon>
+		<key>component/c2s</key>
+		<object mime='image/png'>component_c2s.png</object>
+	</icon>
+	<icon>
+		<key>component/generic</key>
+		<object mime='image/png'>component_generic.png</object>
+	</icon>
+	<icon>
+		<key>component/load</key>
+		<object mime='image/png'>component_load.png</object>
+	</icon>
+	<icon>
+		<key>component/log</key>
+		<object mime='image/png'>component_log.png</object>
+	</icon>
+	<icon>
+		<key>component/presence</key>
+		<object mime='image/png'>component_presence.png</object>
+	</icon>
+	<icon>
+		<key>component/router</key>
+		<object mime='image/png'>component_router.png</object>
+	</icon>
+	<icon>
+		<key>component/s2s</key>
+		<object mime='image/png'>component_s2s.png</object>
+	</icon>
+	<icon>
+		<key>component/sm</key>
+		<object mime='image/png'>component_sm.png</object>
+	</icon>
+	<icon>
+		<key>component/stats</key>
+		<object mime='image/png'>component_stats.png</object>
+	</icon>
+
+
+	<!-- Conference -->
 	<icon>
 		<key>conference</key>
 		<object mime='image/png'>conference.png</object>
 	</icon>
 	<icon>
 		<key>conference/irc</key>
-		<object mime='image/png'>conferenceirc.png</object>
+		<object mime='image/png'>conference_irc.png</object>
 	</icon>
 	<icon>
 		<key>conference/text</key>
-		<object mime='image/png'>conferencetext.png</object>
+		<object mime='image/png'>conference_text.png</object>
 	</icon>
-  <!-- Directory -->
+
+	<!-- Directory -->
 	<icon>
 		<key>directory</key>
 		<object mime='image/png'>directory.png</object>
 	</icon>
 	<icon>
 		<key>directory/chatroom</key>
-		<object mime='image/png'>directorychatroom.png</object>
+		<object mime='image/png'>directory_chatroom.png</object>
 	</icon>
 	<icon>
 		<key>directory/group</key>
-		<object mime='image/png'>directorygroup.png</object>
+		<object mime='image/png'>directory_group.png</object>
 	</icon>
 	<icon>
 		<key>directory/user</key>
-		<object mime='image/png'>directoryuser.png</object>
+		<object mime='image/png'>directory_user.png</object>
 	</icon>
-  <icon>
-    <key>directory/waitinglist</key>
-    <object mime='image/png'>directorywaitinglist.png</object>
-  </icon>
-  <!-- Gateway -->
-  <icon>
-    <key>gateway</key>
-    <object mime='image/png'>gateway.png</object>
-  </icon>
-  <icon>
-    <key>gateway/aim</key>
-    <object mime='image/png'>gatewayaim.png</object>
-  </icon>
-  <icon>
-    <key>gateway/gadu-gadu</key>
-    <object mime='image/png'>gatewaygadugadu.png</object>
-  </icon>
-  <icon>
-    <key>gateway/http-ws</key>
-    <object mime='image/png'>gatewayhttpws.png</object>
-  </icon>
-  <icon>
-    <key>gateway/icq</key>
-    <object mime='image/png'>gatewayicq.png</object>
-  </icon>
-  <icon>
-    <key>gateway/lcs</key>
-    <object mime='image/png'>gatewaylcs.png</object>
-  </icon>
-  <icon>
-    <key>gateway/msn</key>
-    <object mime='image/png'>gatewaymsn.png</object>
-  </icon>
-  <icon>
-    <key>gateway/ocs</key>
-    <object mime='image/png'>gatewayocs.png</object>
-  </icon>
-  <icon>
-    <key>gateway/qq</key>
-    <object mime='image/png'>gatewayqq.png</object>
-  </icon>
-  <icon>
-    <key>gateway/sametime</key>
-    <object mime='image/png'>gatewaysametime.png</object>
-  </icon>
-  <icon>
-    <key>gateway/simple</key>
-    <object mime='image/png'>gatewaysimple.png</object>
-  </icon>
-  <icon>
-    <key>gateway/sms</key>
-    <object mime='image/png'>gatewaysms.png</object>
-  </icon>
-  <icon>
-    <key>gateway/smtp</key>
-    <object mime='image/png'>gatewaysmtp.png</object>
-  </icon>
-  <icon>
-    <key>gateway/lten</key>
-    <object mime='image/png'>gatewaylten.png</object>
-  </icon>
-  <icon>
-    <key>gateway/xfire</key>
-    <object mime='image/png'>gatewayxfire.png</object>
-  </icon>
-  <icon>
-    <key>gateway/xmpp</key>
-    <key>gateway/XMPP</key>
-    <object mime='image/png'>gatewayxmpp.png</object>
-  </icon>
-  <icon>
-    <key>gateway/yahoo</key>
-    <object mime='image/png'>gatewayyahoo.png</object>
-  </icon>
-  <icon>
-    <key>gateway/mrim</key>
-    <object mime='image/png'>gatewaymrim.png</object>
-  </icon>
-  <!-- Headline -->
-  <icon>
-    <key>headline</key>
-    <object mime='image/png'>headline.png</object>
-  </icon>
-  <icon>
-    <key>headline/newmail</key>
-    <object mime='image/png'>headlinenewmail.png</object>
-  </icon>
-  <icon>
-    <key>headline/rss</key>
-    <object mime='image/png'>headlinerss.png</object>
-  </icon>
-  <icon>
-    <key>headline/weather</key>
-    <object mime='image/png'>headlineweather.png</object>
-  </icon>
-  <!-- Hierarchy -->
-  <icon>
-    <key>hierarchy</key>
-    <object mime='image/png'>hierarchy.png</object>
-  </icon>
-  <icon>
-    <key>hierarchy/branch</key>
-    <object mime='image/png'>hierarchybranch.png</object>
-  </icon>
-  <icon>
-    <key>hierarchy/leaf</key>
-    <object mime='image/png'>hierarchyleaf.png</object>
-  </icon>
-  <!-- Proxy -->
-  <icon>
-    <key>proxy</key>
-    <object mime='image/png'>proxy.png</object>
-  </icon>
-  <icon>
-    <key>proxy/bytestreams</key>
-    <object mime='image/png'>proxybytestreams.png</object>
-  </icon>
-  <!-- Pubsub-->
-  <icon>
-    <key>pubsub</key>
-    <object mime='image/png'>pubsub.png</object>
-  </icon>
-  <icon>
-    <key>pubsub/collection</key>
-    <object mime='image/png'>pubsub/collection.png</object>
-  </icon>
-  <icon>
-    <key>pubsub/leaf</key>
-    <object mime='image/png'>pubsubleaf.png</object>
-  </icon>
-  <icon>
-    <key>pubsub/pep</key>
-    <object mime='image/png'>pubsubpep.png</object>
-  </icon>
-  <icon>
-    <key>pubsub/service</key>
-    <object mime='image/png'>pubsubservice.png</object>
-  </icon>
-  <!-- Server -->
-  <icon>
-    <key>server</key>
-    <object mime='image/png'>server.png</object>
-  </icon>
-  <icon>
-    <key>server/im</key>
-    <object mime='image/png'>serverim.png</object>
-  </icon>
+	<icon>
+		<key>directory/waitinglist</key>
+		<object mime='image/png'>directory_waitinglist.png</object>
+	</icon>
+
+	<!-- Gateway -->
+	<icon>
+		<key>gateway</key>
+		<object mime='image/png'>gateway.png</object>
+	</icon>
+	<icon>
+		<key>gateway/aim</key>
+		<object mime='image/png'>gateway_aim.png</object>
+	</icon>
+	<icon>
+		<key>gateway/facebook</key>
+		<object mime='image/png'>gateway_facebook.png</object>
+	</icon>
+	<icon>
+		<key>gateway/gadu-gadu</key>
+		<object mime='image/png'>gateway_gadugadu.png</object>
+	</icon>
+	<icon>
+		<key>gateway/http-ws</key>
+		<object mime='image/png'>gateway_httpws.png</object>
+	</icon>
+	<icon>
+		<key>gateway/icq</key>
+		<object mime='image/png'>gateway_icq.png</object>
+	</icon>
+	<icon>
+		<key>gateway/lcs</key>
+		<object mime='image/png'>gateway_lcs.png</object>
+	</icon>
+	<icon>
+		<key>gateway/msn</key>
+		<object mime='image/png'>gateway_msn.png</object>
+	</icon>
+	<icon>
+		<key>gateway/myspaceim</key>
+		<object mime='image/png'>gateway_myspaceim.png</object>
+	</icon>
+	<icon>
+		<key>gateway/ocs</key>
+		<object mime='image/png'>gateway_ocs.png</object>
+	</icon>
+	<icon>
+		<key>gateway/qq</key>
+		<object mime='image/png'>gateway_qq.png</object>
+	</icon>
+	<icon>
+		<key>gateway/sametime</key>
+		<object mime='image/png'>gateway_sametime.png</object>
+	</icon>
+	<icon>
+		<key>gateway/simple</key>
+		<object mime='image/png'>gateway_simple.png</object>
+	</icon>
+	<icon>
+		<key>gateway/skype</key>
+		<object mime='image/png'>gateway_skype.png</object>
+	</icon>
+	<icon>
+		<key>gateway/sms</key>
+		<object mime='image/png'>gateway_sms.png</object>
+	</icon>
+	<icon>
+		<key>gateway/smtp</key>
+		<object mime='image/png'>gateway_smtp.png</object>
+	</icon>
+	<icon>
+		<key>gateway/tlen</key>
+		<object mime='image/png'>gateway_tlen.png</object>
+	</icon>
+	<icon>
+		<key>gateway/xfire</key>
+		<object mime='image/png'>gateway_xfire.png</object>
+	</icon>
+	<icon>
+		<key>gateway/xmpp</key>
+		<object mime='image/png'>gateway_xmpp.png</object>
+	</icon>
+	<icon>
+		<key>gateway/yahoo</key>
+		<object mime='image/png'>gateway_yahoo.png</object>
+	</icon>
+	<icon>
+		<key>gateway/mrim</key>
+		<object mime='image/png'>gateway_mrim.png</object>
+	</icon>
+
+	<!-- Headline -->
+	<icon>
+		<key>headline</key>
+		<object mime='image/png'>headline.png</object>
+	</icon>
+	<icon>
+		<key>headline/newmail</key>
+		<object mime='image/png'>headline_newmail.png</object>
+	</icon>
+	<icon>
+		<key>headline/rss</key>
+		<object mime='image/png'>headline_rss.png</object>
+	</icon>
+	<icon>
+		<key>headline/weather</key>
+		<object mime='image/png'>headline_weather.png</object>
+	</icon>
+
+	<!-- Hierarchy -->
+	<icon>
+		<key>hierarchy</key>
+		<object mime='image/png'>hierarchy.png</object>
+	</icon>
+	<icon>
+		<key>hierarchy/branch</key>
+		<object mime='image/png'>hierarchy_branch.png</object>
+	</icon>
+	<icon>
+		<key>hierarchy/leaf</key>
+		<object mime='image/png'>hierarchy_leaf.png</object>
+	</icon>
+
+	<!-- Proxy -->
+	<icon>
+		<key>proxy</key>
+		<object mime='image/png'>proxy.png</object>
+	</icon>
+	<icon>
+		<key>proxy/bytestreams</key>
+		<object mime='image/png'>proxy_bytestreams.png</object>
+	</icon>
+
+	<!-- Pubsub -->
+	<icon>
+		<key>pubsub</key>
+		<object mime='image/png'>pubsub.png</object>
+	</icon>
+	<icon>
+		<key>pubsub/collection</key>
+		<object mime='image/png'>pubsub_collection.png</object>
+	</icon>
+	<icon>
+		<key>pubsub/leaf</key>
+		<object mime='image/png'>pubsub_leaf.png</object>
+	</icon>
+	<icon>
+		<key>pubsub/pep</key>
+		<object mime='image/png'>pubsub_pep.png</object>
+	</icon>
+	<icon>
+		<key>pubsub/service</key>
+		<object mime='image/png'>pubsub_service.png</object>
+	</icon>
+
+	<!-- Server -->
+	<icon>
+		<key>server</key>
+		<object mime='image/png'>server.png</object>
+	</icon>
+	<icon>
+		<key>server/im</key>
+		<object mime='image/png'>server_im.png</object>
+	</icon>
+
+	<!-- Store -->
+	<icon>
+		<key>store</key>
+		<object mime='image/png'>store.png</object>
+	</icon>
+	<icon>
+		<key>store/berkeley</key>
+		<object mime='image/png'>store_berkeley.png</object>
+	</icon>
+	<icon>
+		<key>store/file</key>
+		<object mime='image/png'>store_file.png</object>
+	</icon>
+	<icon>
+		<key>store/generic</key>
+		<object mime='image/png'>store_generic.png</object>
+	</icon>
+	<icon>
+		<key>store/ldap</key>
+		<object mime='image/png'>store_ldap.png</object>
+	</icon>
+	<icon>
+		<key>store/mysql</key>
+		<object mime='image/png'>store_mysql.png</object>
+	</icon>
+	<icon>
+		<key>store/oracle</key>
+		<object mime='image/png'>store_oracle.png</object>
+	</icon>
+	<icon>
+		<key>store/postgres</key>
+		<object mime='image/png'>store_postgres.png</object>
+	</icon>
 </icondef>
