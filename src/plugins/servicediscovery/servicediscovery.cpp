@@ -479,9 +479,9 @@ QIcon ServiceDiscovery::identityIcon(const QList<IDiscoIdentity> &AIdentity) con
 	IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
 	for (int i=0; icon.isNull() && i<AIdentity.count(); i++)
 	{
-		icon = storage->getIcon(AIdentity.at(i).category +"/"+ AIdentity.at(i).type);
+		icon = storage->getIcon(AIdentity.at(i).category.toLower() +"/"+ AIdentity.at(i).type.toLower());
 		if (icon.isNull())
-			icon = storage->getIcon(AIdentity.at(i).category);
+			icon = storage->getIcon(AIdentity.at(i).category.toLower());
 	}
 	if (icon.isNull())
 		icon = storage->getIcon(SRI_SERVICE);
