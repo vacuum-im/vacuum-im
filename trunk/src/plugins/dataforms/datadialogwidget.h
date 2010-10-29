@@ -13,16 +13,18 @@ public:
 	DataDialogWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent);
 	~DataDialogWidget();
 	virtual QDialog *instance() { return this; }
-	virtual ToolBarChanger *toolBarChanged() const { return FToolBarChanger; }
-	virtual QDialogButtonBox *dialogButtons() const { return FDialogButtons; }
-	virtual IDataFormWidget *formWidget() const { return FFormWidget; }
+	virtual ToolBarChanger *toolBarChanged() const;
+	virtual QDialogButtonBox *dialogButtons() const;
+	virtual IDataFormWidget *formWidget() const;
 	virtual void setForm(const IDataForm &AForm);
-	virtual bool allowInvalid() const { return FAllowInvalid; }
-	virtual void setAllowInvalid(bool AAllowInvalid) { FAllowInvalid = AAllowInvalid; }
+	virtual bool allowInvalid() const;
+	virtual void setAllowInvalid(bool AAllowInvalid);
 signals:
 	void formWidgetCreated(IDataFormWidget *AForm);
 	void formWidgetDestroyed(IDataFormWidget *AForm);
 	void dialogDestroyed(IDataDialogWidget *ADialog);
+public:
+   virtual QSize sizeHint() const;
 protected slots:
 	void onDialogButtonClicked(QAbstractButton *AButton);
 private:
