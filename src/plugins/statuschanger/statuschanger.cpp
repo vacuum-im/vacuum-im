@@ -608,6 +608,8 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
 				FRostersView->removeFooterText(FTO_ROSTERSVIEW_STATUS,index);
 			removeStatusNotification(APresence);
 		}
+
+		updateTrayToolTip();
 	}
 }
 
@@ -764,18 +766,21 @@ void StatusChanger::updateMainMenu()
 
 void StatusChanger::updateTrayToolTip()
 {
-	QString trayToolTip;
-	QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin();
-	while (it != FCurrentStatus.constEnd())
-	{
-		IAccount *account = FAccountManager->accountByStream(it.key()->streamJid());
-		if (!trayToolTip.isEmpty())
-			trayToolTip+="\n";
-		trayToolTip += tr("%1 - %2").arg(account->name()).arg(it.key()->status());
-		it++;
-	}
 	if (FTrayManager)
+	{
+		QString trayToolTip;
+		QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin();
+		while (it != FCurrentStatus.constEnd())
+		{
+			IPresence *presence = it.key();
+			IAccount *account = FAccountManager->accountByStream(presence->streamJid());
+			if (!trayToolTip.isEmpty())
+				trayToolTip+="\n";
+			trayToolTip += tr("%1 - %2").arg(account->name()).arg(statusItemName(it.value()));
+			it++;
+		}
 		FTrayManager->setMainToolTip(trayToolTip);
+	}
 }
 
 void StatusChanger::updateMainStatusActions()
@@ -920,7 +925,7 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
 		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(true);
 
 	createStreamMenu(APresence);
-	FCurrentStatus.insert(APresence,STATUS_OFFLINE);
+	setStreamStatusId(APresence,STATUS_OFFLINE);
 
 	if (FStreamMenu.count() == 1)
 		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
@@ -935,7 +940,6 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
 
 	updateStreamMenu(APresence);
 	updateMainMenu();
-	updateTrayToolTip();
 }
 
 void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QString &AText, int APriority)
@@ -964,7 +968,6 @@ void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QSt
 			removeConnectingLabel(APresence);
 			FConnectStatus.remove(APresence);
 		}
-		updateTrayToolTip();
 	}
 }
 
@@ -988,7 +991,7 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
 
 	updateMainMenu();
-	updateTrayToolTip();
+   updateTrayToolTip();
 }
 
 void StatusChanger::onRosterOpened(IRoster *ARoster)
