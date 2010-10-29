@@ -2,11 +2,33 @@
 
 #include <QLabel>
 #include <QGroupBox>
+#include <QScrollBar>
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QTabWidget>
 #include <QTextDocument>
 #include <QMessageBox>
+
+class ScrollArea : 
+   public QScrollArea
+{
+public:
+   ScrollArea(QWidget *AParent = NULL): QScrollArea(AParent)
+   {
+
+   }
+   virtual QSize sizeHint() const 
+   {
+      QSize sh(2*frameWidth()+1,2*frameWidth()+1);
+      if (verticalScrollBar())
+         sh.setWidth(sh.width() + verticalScrollBar()->sizeHint().width());
+      if (horizontalScrollBar())
+         sh.setHeight(sh.height() + horizontalScrollBar()->sizeHint().height());
+      if (widget())
+         sh += widgetResizable() ? widget()->sizeHint() : widget()->size();
+      return sh;
+   }
+};
 
 DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent) : QWidget(AParent)
 {
@@ -47,7 +69,7 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 
 	if (FForm.pages.count() < 2)
 	{
-		QScrollArea *scroll = new QScrollArea(this);
+		ScrollArea *scroll = new ScrollArea(this);
 		scroll->setWidgetResizable(true);
 		scroll->setFrameShape(QFrame::NoFrame);
 		layout()->addWidget(scroll);
@@ -88,7 +110,7 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 
 		foreach(IDataLayout page, FForm.pages)
 		{
-			QScrollArea *scroll = new QScrollArea(tabs);
+			ScrollArea *scroll = new ScrollArea(tabs);
 			scroll->setWidgetResizable(true);
 			scroll->setFrameShape(QFrame::NoFrame);
 			tabs->addTab(scroll, !page.label.isEmpty() ? page.label : tr("Page %1").arg(tabs->count()+1));
@@ -139,6 +161,11 @@ bool DataFormWidget::checkForm(bool AAllowInvalid) const
 	return true;
 }
 
+IDataTableWidget *DataFormWidget::tableWidget() const
+{
+   return FTableWidget;
+}
+
 IDataFieldWidget *DataFormWidget::fieldWidget(int AIndex) const
 {
 	return FFieldWidgets.value(AIndex);
@@ -155,6 +182,11 @@ IDataForm DataFormWidget::userDataForm() const
 	for (int i=0; i<FFieldWidgets.count(); i++)
 		form.fields[i] = FFieldWidgets.at(i)->userDataField();
 	return form;
+}
+
+const IDataForm &DataFormWidget::dataForm() const
+{
+   return FForm;
 }
 
 bool DataFormWidget::isStretch(IDataFieldWidget *AWidget) const
@@ -225,4 +257,3 @@ void DataFormWidget::onFieldFocusOut(Qt::FocusReason AReason)
 	if (fwidget)
 		emit fieldFocusOut(fwidget,AReason);
 }
-

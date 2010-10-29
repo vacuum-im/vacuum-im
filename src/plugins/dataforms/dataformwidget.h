@@ -14,11 +14,11 @@ public:
 	~DataFormWidget();
 	virtual QWidget *instance() { return this; }
 	virtual bool checkForm(bool AAllowInvalid) const;
-	virtual IDataTableWidget *tableWidget() const { return FTableWidget; }
+	virtual IDataTableWidget *tableWidget() const;
 	virtual IDataFieldWidget *fieldWidget(int AIndex) const;
 	virtual IDataFieldWidget *fieldWidget(const QString &AVar) const;
 	virtual IDataForm userDataForm() const;
-	virtual const IDataForm &dataForm() const { return FForm; }
+	virtual const IDataForm &dataForm() const;
 signals:
 	void cellActivated(int ARow, int AColumn);
 	void cellChanged(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn);

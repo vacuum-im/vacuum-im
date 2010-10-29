@@ -1,6 +1,8 @@
 #include "datadialogwidget.h"
 
 #include <QVBoxLayout>
+#include <QApplication>
+#include <QDesktopWidget>
 
 DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent) : QDialog(AParent)
 {
@@ -38,6 +40,21 @@ DataDialogWidget::~DataDialogWidget()
 	emit dialogDestroyed(this);
 }
 
+ToolBarChanger *DataDialogWidget::toolBarChanged() const
+{
+   return FToolBarChanger;
+}
+
+QDialogButtonBox *DataDialogWidget::dialogButtons() const
+{
+   return FDialogButtons;
+}
+
+IDataFormWidget *DataDialogWidget::formWidget() const
+{
+   return FFormWidget;
+}
+
 void DataDialogWidget::setForm(const IDataForm &AForm)
 {
 	if (FFormWidget)
@@ -50,6 +67,22 @@ void DataDialogWidget::setForm(const IDataForm &AForm)
 	FFormWidget = FDataForms->formWidget(AForm,this);
 	FFormHolder->layout()->addWidget(FFormWidget->instance());
 	emit formWidgetCreated(FFormWidget);
+}
+
+bool DataDialogWidget::allowInvalid() const
+{
+   return FAllowInvalid;
+}
+
+void DataDialogWidget::setAllowInvalid( bool AAllowInvalid )
+{
+   FAllowInvalid = AAllowInvalid;
+}
+
+QSize DataDialogWidget::sizeHint() const
+{
+   QSize desktopSize = QApplication::desktop()->availableGeometry(this).size();
+   return QDialog::sizeHint().boundedTo(desktopSize/2);
 }
 
 void DataDialogWidget::onDialogButtonClicked(QAbstractButton *AButton)
@@ -67,4 +100,3 @@ void DataDialogWidget::onDialogButtonClicked(QAbstractButton *AButton)
 		break;
 	}
 }
-
