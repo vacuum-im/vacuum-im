@@ -11,8 +11,8 @@ TRANSLATIONS = \
 #Building Translations
 qm_build_all.target = build_qm
 for(LANG, TRANS_LANGS) {
-	TS_FILE = $${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${FIRST_TARGET}.ts
-	QM_FILE = $${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${FIRST_TARGET}.qm
+	TS_FILE = $${_PRO_FILE_PWD_}/$${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${FIRST_TARGET}.ts
+	QM_FILE = $${_PRO_FILE_PWD_}/$${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${FIRST_TARGET}.qm
 
 	LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 	win32: LRELEASE = $$replace(LRELEASE, "/", "\\")
@@ -36,14 +36,14 @@ for(LANG, TRANS_LANGS) {
 	INST_DIR  = $${INSTALL_TRANSLATIONS}/$${LANG}
 	win32: INST_DIR = $$replace(INST_DIR, "/", "\\")
 	
-	INST_FILE = $${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${FIRST_TARGET}.qm
+	INST_FILE = $${_PRO_FILE_PWD_}/$${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${FIRST_TARGET}.qm
 	win32: INST_FILE = $$replace(INST_FILE, "/", "\\")
 	
 	eval(qm_inst_$${LANG}.path  = $${INST_DIR})
 	eval(qm_inst_$${LANG}.files = $${INST_FILE})
 
-	#If file is not exits right now, qmake will not install it o_O
-        !exists($${_PRO_FILE_PWD_}/$${INST_FILE}): eval(qm_inst_$${LANG}.extra = "-$(INSTALL_FILE)" \\\"$${INST_FILE}\\\" \\\"$(INSTALL_ROOT)$${INST_DIR}\\\")
+	#If file is not exits right now, qmake will not install it
+	!exists($${INST_FILE}): eval(qm_inst_$${LANG}.extra = "-$(INSTALL_FILE)" \\\"$${INST_FILE}\\\" \\\"$(INSTALL_ROOT)$${INST_DIR}\\\")
 
 	INSTALLS += qm_inst_$${LANG}
 }
