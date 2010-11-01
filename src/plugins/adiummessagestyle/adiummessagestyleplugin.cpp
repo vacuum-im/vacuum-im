@@ -94,14 +94,15 @@ IMessageStyleOptions AdiumMessageStylePlugin::styleOptions(const OptionsNode &AN
 
 	if (!FStylePaths.isEmpty() && !FStylePaths.contains(styleId.toString()))
 	{
-		styleId = QString("yMous");
 		switch (AMessageType)
 		{
 		case Message::GroupChat:
+			styleId = QLatin1String("yMous");
 			soptions.extended.insert(MSO_VARIANT,"Mercurial XtraColor Both");
 			break;
 		default:
-			soptions.extended.insert(MSO_VARIANT,"Mercurial Both");
+			styleId = QLatin1String("Renkoo");
+			soptions.extended.insert(MSO_VARIANT,"Blue on Green");
 		}
 
 		if (!FStylePaths.contains(styleId.toString()))

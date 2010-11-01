@@ -15,7 +15,7 @@
 	<key>DefaultFontFamily</key>
 	<string>Lucida Grande</string>
 	<key>DefaultFontSize</key>
-	<integer>10</integer>
+	<integer>12</integer>
 	<key>DefaultVariant</key>
 	<string>Mercurial Both</string>
 </dict>
