@@ -4,6 +4,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/idataforms.h>

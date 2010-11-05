@@ -72,9 +72,9 @@ void ShortcutManager::onOptionsClosed()
 	OptionsNode options = Options::node(OPV_SHORTCUTS);
 	foreach(QString shortcutId, Shortcuts::shortcuts())
 	{
-		QKeySequence userKey = Shortcuts::shortcutDescriptor(shortcutId).userKey;
-		if (!userKey.isEmpty())
-			options.setValue(userKey.toString(),shortcutId);
+		ShortcutDescriptor descriptor = Shortcuts::shortcutDescriptor(shortcutId);
+		if (descriptor.activeKey != descriptor.defaultKey)
+			options.setValue(descriptor.activeKey.toString(),shortcutId);
 		else
 			options.removeNode(shortcutId);
 	}

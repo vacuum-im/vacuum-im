@@ -9,6 +9,13 @@
 #include "shortcutoptionsdelegate.h"
 #include "ui_shortcutoptionswidget.h"
 
+class SortFilterProxyModel : 
+	public QSortFilterProxyModel
+{
+protected:
+	virtual bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
+};
+
 class ShortcutOptionsWidget : 
 	public QWidget,
 	public IOptionsWidget
@@ -29,13 +36,17 @@ signals:
 protected:
 	void createTreeModel();
 	QStandardItem *createTreeRow(const QString &AId, QStandardItem *AParent, bool AGroup);
+	void setItemBold(QStandardItem *AItem, bool ABold) const;
 protected slots:
-	void onResetDefaultsClicked();
+	void onDefaultClicked();
+	void onClearClicked();
+	void onRestoreDefaultsClicked();
+	void onModelItemChanged(QStandardItem *AItem);
 private:
 	Ui::ShortcutOptionsWidgetClass ui;
 private:
 	QStandardItemModel FModel;
-	QSortFilterProxyModel FSortModel;
+	SortFilterProxyModel FSortModel;
 	QHash<QString, QStandardItem *> FShortcutItem;
 };
 

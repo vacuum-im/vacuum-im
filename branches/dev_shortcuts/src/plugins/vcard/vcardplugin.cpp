@@ -96,6 +96,8 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 
 bool VCardPlugin::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I"));
+
 	if (FRostersViewPlugin)
 	{
 		FRostersView = FRostersViewPlugin->rostersView();
@@ -392,6 +394,7 @@ void VCardPlugin::onChatWindowCreated(IChatWindow *AWindow)
 		Action *action = new Action(AWindow->toolBarWidget()->instance());
 		action->setText(tr("vCard"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
+		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWVCARD);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByChatWindowAction(bool)));
 		AWindow->toolBarWidget()->toolBarChanger()->insertAction(action,TBG_MWTBW_VCARD_VIEW);
 	}

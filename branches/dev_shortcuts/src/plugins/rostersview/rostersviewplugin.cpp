@@ -94,7 +94,8 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
 
 bool RostersViewPlugin::initObjects()
 {
-	Shortcuts::declareGroup(SCTG_ROSTER,tr("Contact list"));
+	Shortcuts::declareShortcut(SCT_MAINWINDOW_TOGGLEOFFLINE, tr("Show/Hide offline contacts"),QKeySequence::UnknownKey);
+	Shortcuts::declareGroup(SCTG_ROSTERVIEW,tr("Roster"));
 
 	FSortFilterProxyModel = new SortFilterProxyModel(this, this);
 	FSortFilterProxyModel->setSortLocaleAware(true);
@@ -108,6 +109,7 @@ bool RostersViewPlugin::initObjects()
 		FShowOfflineAction = new Action(this);
 		FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_HIDE_OFFLINE);
 		FShowOfflineAction->setToolTip(tr("Show/Hide offline contacts"));
+		FShowOfflineAction->setShortcutId(SCT_MAINWINDOW_TOGGLEOFFLINE);
 		connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
 		FMainWindowPlugin->mainWindow()->topToolBarChanger()->insertAction(FShowOfflineAction,TBG_MWTTB_ROSTERSVIEW);
 		FMainWindowPlugin->mainWindow()->rostersWidget()->insertWidget(0,FRostersView);

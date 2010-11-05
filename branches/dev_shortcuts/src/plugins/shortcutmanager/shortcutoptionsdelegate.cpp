@@ -58,10 +58,7 @@ bool ShortcutOptionsDelegate::eventFilter(QObject *AWatched, QEvent *AEvent)
 	if (editor && AEvent->type()==QEvent::KeyPress)
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
-		if (keyEvent->key()==Qt::Key_Space && keyEvent->modifiers()==0)
-			editor->setText(QString::null);
-		else
-			editor->setText(QKeySequence(keyEvent->modifiers() | keyEvent->key()).toString(QKeySequence::NativeText));
+		editor->setText(QKeySequence(keyEvent->modifiers() | keyEvent->key()).toString(QKeySequence::NativeText));
 		return true;
 	}
 	else if (editor && AEvent->type()==QEvent::KeyRelease)

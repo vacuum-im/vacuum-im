@@ -196,6 +196,30 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 
 bool MessageArchiver::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWHISTORY, tr("Show history"), tr("Ctrl+H"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYENABLE, tr("Enable message logging"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYDISABLE, tr("Disable message logging"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR, tr("Require Off-The-Record session"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR, tr("Terminate Off-The-Record session"), QKeySequence::UnknownKey);
+
+	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_HISTORY, tr("View history window"));
+
+	Shortcuts::declareGroup(SCTG_HISTORYWINDOW, tr("View history window"));
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPNONE, tr("Group by nothing"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYDATE, tr("Group by date"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYCONTACT, tr("Group by contact"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYDATECONTACT, tr("Group by date and contact"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYCONTACTDATE, tr("Group by contact and date"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_EXPANDALL, tr("Expand All"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_COLLAPSEALL, tr("Collapse All"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_SOURCEAUTO, tr("Auto select archive"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_SOURCELOCAL, tr("Select local archive"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_SOURCESERVER, tr("Select server archive"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_FILTERBYCONTACT, tr("Filter by contact"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_RENAMECOLLECTION, tr("Change conversation subject"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_REMOVECOLLECTION, tr("Remove conversation"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_RELOADCOLLECTIONS, tr("Reload conversations"), QKeySequence::UnknownKey);
+
 	QString dirPath = collectionDirPath(Jid(),Jid());
 	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
 	if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
@@ -2854,6 +2878,7 @@ void MessageArchiver::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 		Action *action = new Action(AWidget->toolBarChanger()->toolBar());
 		action->setText(tr("View History"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
+		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWHISTORY);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowToolBarAction(bool)));
 		QToolButton *viewButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
 

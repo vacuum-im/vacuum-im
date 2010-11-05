@@ -50,6 +50,7 @@ protected slots:
 	void onProfileRenamed(const QString &AProfile, const QString &ANewName);
 	void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
 	void onShowMainWindowByAction(bool);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IPluginManager *FPluginManager;
 	IOptionsManager *FOptionsManager;

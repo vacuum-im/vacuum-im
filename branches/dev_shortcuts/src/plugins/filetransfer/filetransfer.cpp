@@ -110,6 +110,8 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitO
 
 bool FileTransfer::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDFILE, tr("Send file"), QKeySequence::UnknownKey);
+
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
@@ -484,6 +486,7 @@ void FileTransfer::insertToolBarAction(IToolBarWidget *AWidget)
 			action = new Action(AWidget->toolBarChanger()->toolBar());
 			action->setIcon(RSR_STORAGE_MENUICONS, MNI_FILETRANSFER_SEND);
 			action->setText(tr("Send File"));
+			action->setShortcutId(SCT_MESSAGEWINDOWS_SENDFILE);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
 			AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_FILETRANSFER);
 		}

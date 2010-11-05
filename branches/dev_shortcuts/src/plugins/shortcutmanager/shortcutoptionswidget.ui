@@ -39,6 +39,20 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QPushButton" name="pbtDefault">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtClear">
+       <property name="text">
+        <string>Clear</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -52,9 +66,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pbtResetToDefaults">
+      <widget class="QPushButton" name="pbtRestoreDefaults">
        <property name="text">
-        <string>Reset Defaults</string>
+        <string>Restore Defaults</string>
        </property>
       </widget>
      </item>

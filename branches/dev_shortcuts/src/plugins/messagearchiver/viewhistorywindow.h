@@ -9,6 +9,7 @@
 #include <definitions/toolbargroups.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/imessagewidgets.h>

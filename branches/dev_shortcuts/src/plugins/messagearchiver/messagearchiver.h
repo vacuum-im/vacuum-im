@@ -16,6 +16,7 @@
 #include <definitions/sessionnegotiatororders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
@@ -32,6 +33,7 @@
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/iroster.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include <utils/errorhandler.h>
 #include <utils/widgetmanager.h>
 #include "collectionwriter.h"

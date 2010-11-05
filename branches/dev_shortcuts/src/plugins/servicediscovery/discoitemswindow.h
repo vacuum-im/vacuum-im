@@ -10,6 +10,7 @@
 #include <definitions/discoitemdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/ivcard.h>

@@ -120,6 +120,8 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 
 bool BookMarks::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_BOOKMARK, tr("Edit bookmark"), QKeySequence::UnknownKey);
+
 	FBookMarksMenu = new Menu;
 	FBookMarksMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
 	FBookMarksMenu->setTitle(tr("Bookmarks"));
@@ -374,6 +376,7 @@ void BookMarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 	Action *action = new Action(AWindow->instance());
 	action->setText(tr("Append to bookmarks"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
+	action->setShortcutId(SCT_MESSAGEWINDOWS_MUC_BOOKMARK);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onAddRoomBookmarkActionTriggered(bool)));
 	AWindow->toolBarWidget()->toolBarChanger()->insertAction(action, TBG_MCWTBW_BOOKMARKS);
 }

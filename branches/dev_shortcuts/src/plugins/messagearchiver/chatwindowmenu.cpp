@@ -65,12 +65,14 @@ void ChatWindowMenu::createActions()
 	FSaveTrue = new Action(this);
 	FSaveTrue->setText(tr("Enable Message Logging"));
 	FSaveTrue->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_ENABLE_LOGGING);
+	FSaveTrue->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYENABLE);
 	connect(FSaveTrue,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FSaveTrue,AG_DEFAULT,false);
 
 	FSaveFalse = new Action(this);
 	FSaveFalse->setText(tr("Disable Message Logging"));
 	FSaveFalse->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_DISABLE_LOGGING);
+	FSaveFalse->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYDISABLE);
 	connect(FSaveFalse,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FSaveFalse,AG_DEFAULT,false);
 
@@ -79,6 +81,7 @@ void ChatWindowMenu::createActions()
 	FSessionRequire->setVisible(false);
 	FSessionRequire->setText(tr("Require OTR Session"));
 	FSessionRequire->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_REQUIRE_OTR);
+	FSessionRequire->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR);
 	connect(FSessionRequire,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FSessionRequire,AG_DEFAULT,false);
 
@@ -86,6 +89,7 @@ void ChatWindowMenu::createActions()
 	FSessionTerminate->setVisible(false);
 	FSessionTerminate->setText(tr("Terminate OTR Session"));
 	FSessionTerminate->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_TERMINATE_OTR);
+	FSessionTerminate->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR);
 	connect(FSessionTerminate,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FSessionTerminate,AG_DEFAULT,false);
 }

@@ -57,9 +57,9 @@ PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 	connect(AParent,SIGNAL(commitDataRequest(QSessionManager &)),SLOT(onApplicationCommitDataRequested(QSessionManager &)));
 
 	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application"));
-	Shortcuts::declareShortcut(SCT_APP_ABOUT_QT, tr("Show information about Qt"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_ABOUT_PROGRAM, tr("Show information about client"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_SETUP_PLUGINS, tr("Show setup plugins dialog"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_ABOUTQT, tr("Show information about Qt"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_ABOUTPROGRAM, tr("Show information about client"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_SETUPPLUGINS, tr("Show setup plugins dialog"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
 }
 
 PluginManager::~PluginManager()
@@ -618,7 +618,7 @@ void PluginManager::createMenuActions()
 		Action *pluginsDialog = new Action(mainWindowPlugin!=NULL ? mainWindowPlugin->instance() : trayManager->instance());
 		pluginsDialog->setText(tr("Setup plugins"));
 		pluginsDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
-		pluginsDialog->setShortcutId(SCT_APP_SETUP_PLUGINS);
+		pluginsDialog->setShortcutId(SCT_APP_SETUPPLUGINS);
 		connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
 
 		if (mainWindowPlugin)
@@ -626,14 +626,14 @@ void PluginManager::createMenuActions()
 			Action *aboutQt = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 			aboutQt->setText(tr("About Qt"));
 			aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT_QT);
-			aboutQt->setShortcutId(SCT_APP_ABOUT_QT);
+			aboutQt->setShortcutId(SCT_APP_ABOUTQT);
 			connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
 			mainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
 
 			Action *about = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 			about->setText(tr("About the program"));
 			about->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT);
-			about->setShortcutId(SCT_APP_ABOUT_PROGRAM);
+			about->setShortcutId(SCT_APP_ABOUTPROGRAM);
 			connect(about,SIGNAL(triggered()),SLOT(onShowAboutBoxDialog()));
 			mainWindowPlugin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
 

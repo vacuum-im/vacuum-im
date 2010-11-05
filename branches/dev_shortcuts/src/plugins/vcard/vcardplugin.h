@@ -7,6 +7,7 @@
 #include <definitions/multiuserdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <definitions/toolbargroups.h>
 #include <interfaces/ipluginmanager.h>
@@ -21,6 +22,7 @@
 #include <utils/widgetmanager.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
+#include <utils/shortcuts.h>
 #include "vcard.h"
 #include "vcarddialog.h"
 
