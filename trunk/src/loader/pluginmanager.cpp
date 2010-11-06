@@ -165,11 +165,13 @@ QList<QUuid> PluginManager::pluginDependencesFor(const QUuid &AUuid) const
 
 void PluginManager::quit()
 {
+	emit aboutToQuit();
 	QTimer::singleShot(0,qApp,SLOT(quit()));
 }
 
 void PluginManager::restart()
 {
+	emit aboutToQuit();
 	onApplicationAboutToQuit();
 	loadSettings();
 	loadPlugins();
@@ -649,8 +651,6 @@ void PluginManager::onApplicationAboutToQuit()
 	if (!FAboutDialog.isNull())
 		FAboutDialog->reject();
 
-	emit aboutToQuit();
-
 	foreach(QUuid uid, FPluginItems.keys())
 		unloadPlugin(uid);
 
@@ -662,6 +662,7 @@ void PluginManager::onApplicationAboutToQuit()
 void PluginManager::onApplicationCommitDataRequested(QSessionManager &AManager)
 {
 	Q_UNUSED(AManager);
+	emit aboutToQuit();
 	onApplicationAboutToQuit();
 }
 
