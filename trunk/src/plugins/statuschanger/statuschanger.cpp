@@ -399,24 +399,28 @@ QList<int> StatusChanger::activeStatusItems() const
 {
 	QList<int> active;
 	foreach (int statusId, FCurrentStatus)
-		active.append(statusId == STATUS_MAIN_ID ? FStatusItems.value(STATUS_MAIN_ID).code : statusId);
+		active.append(statusId > STATUS_NULL_ID ? statusId : FStatusItems.value(statusId).code);
 	return active;
 }
 
 QList<int> StatusChanger::statusByShow(int AShow) const
 {
 	QList<int> statuses;
-	foreach(StatusItem status, FStatusItems)
-		if (status.show == AShow)
-			statuses.append(status.code);
+	for (QMap<int, StatusItem>::const_iterator it = FStatusItems.constBegin(); it!=FStatusItems.constEnd(); it++)
+	{
+		if (it.key()>STATUS_NULL_ID && it->show==AShow)
+			statuses.append(it->code);
+	}
 	return statuses;
 }
 
 int StatusChanger::statusByName(const QString &AName) const
 {
-	foreach(StatusItem status, FStatusItems)
-		if (status.name.toLower() == AName.toLower())
-			return status.code;
+	for (QMap<int, StatusItem>::const_iterator it = FStatusItems.constBegin(); it!=FStatusItems.constEnd(); it++)
+	{
+		if (it->name.toLower() == AName.toLower())
+			return it->code;
+	}
 	return STATUS_NULL_ID;
 }
 

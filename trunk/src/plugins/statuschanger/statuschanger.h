@@ -34,6 +34,11 @@
 #include "modifystatusdialog.h"
 
 struct StatusItem {
+	StatusItem() {
+		code = STATUS_NULL_ID;
+		show = IPresence::Offline;
+		priority = 0;
+	}
 	int code;
 	QString name;
 	int show;
