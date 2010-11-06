@@ -28,6 +28,54 @@ MainWindow::~MainWindow()
 
 }
 
+bool MainWindow::isActive() const
+{
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
+}
+
+Menu *MainWindow::mainMenu() const
+{
+	return FMainMenu;
+}
+
+QVBoxLayout *MainWindow::mainLayout() const
+{
+	return FMainLayout;
+}
+
+QStackedWidget *MainWindow::upperWidget() const
+{
+	return FUpperWidget;
+}
+
+QStackedWidget *MainWindow::rostersWidget() const
+{
+	return FRostersWidget;
+}
+
+QStackedWidget *MainWindow::bottomWidget() const
+{
+	return FBottomWidget;
+}
+
+ToolBarChanger *MainWindow::topToolBarChanger() const
+{
+	return FTopToolBarChanger;
+}
+
+ToolBarChanger *MainWindow::leftToolBarChanger() const
+{
+	return FLeftToolBarChanger;
+}
+
+ToolBarChanger *MainWindow::bottomToolBarChanger() const
+{
+	return FBottomToolBarChanger;
+}
+
 QMenu *MainWindow::createPopupMenu()
 {
 	return NULL;
@@ -103,3 +151,4 @@ void MainWindow::onStackedWidgetRemoved(int AIndex)
 	else if (widget == FBottomWidget)
 		FBottomWidget->setVisible(FBottomWidget->count() > 0);
 }
+

@@ -16,14 +16,15 @@ public:
 	~MainWindow();
 	//IMainWindow
 	virtual QMainWindow *instance() { return this; }
-	virtual QVBoxLayout *mainLayout() const { return FMainLayout; }
-	virtual QStackedWidget *upperWidget() const { return FUpperWidget; }
-	virtual QStackedWidget *rostersWidget() const { return FRostersWidget; }
-	virtual QStackedWidget *bottomWidget() const { return FBottomWidget; }
-	virtual ToolBarChanger *topToolBarChanger() const { return FTopToolBarChanger; }
-	virtual ToolBarChanger *leftToolBarChanger() const { return FLeftToolBarChanger; }
-	virtual ToolBarChanger *bottomToolBarChanger() const { return FBottomToolBarChanger; }
-	virtual Menu *mainMenu() const { return FMainMenu; }
+	virtual bool isActive() const;
+	virtual Menu *mainMenu() const;
+	virtual QVBoxLayout *mainLayout() const;
+	virtual QStackedWidget *upperWidget() const;
+	virtual QStackedWidget *rostersWidget() const;
+	virtual QStackedWidget *bottomWidget() const;
+	virtual ToolBarChanger *topToolBarChanger() const;
+	virtual ToolBarChanger *leftToolBarChanger() const;
+	virtual ToolBarChanger *bottomToolBarChanger() const;
 public:
 	virtual QMenu *createPopupMenu();
 protected:
