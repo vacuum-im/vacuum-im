@@ -295,7 +295,7 @@ void Presence::clearItems()
 void Presence::onStreamClosed()
 {
 	if (isOpen())
-		setPresence(Error,tr("XMPP stream closed unexpectedly"),0);
+		setPresence(Offline,tr("XMPP stream closed unexpectedly"),0);
 }
 
 void Presence::onStreamError(const QString &AError)
