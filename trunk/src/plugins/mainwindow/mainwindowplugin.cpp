@@ -11,7 +11,11 @@ MainWindowPlugin::MainWindowPlugin()
 	FTrayManager = NULL;
 
 	FActivationChanged = QTime::currentTime();
+#ifdef Q_WS_WIN
 	FMainWindow = new MainWindow(new QWidget, Qt::Window|Qt::CustomizeWindowHint|Qt::WindowTitleHint|Qt::WindowCloseButtonHint);
+#else
+	FMainWindow = new MainWindow(NULL, Qt::Window|Qt::CustomizeWindowHint|Qt::WindowTitleHint|Qt::WindowCloseButtonHint);
+#endif
 	FMainWindow->installEventFilter(this);
 
 	QShortcut *shortcutClose = new QShortcut(tr("Esc","Close Roster"),FMainWindow);
