@@ -5,8 +5,10 @@
 #include <QMap>
 #include <definitions/namespaces.h>
 #include <definitions/stanzahandlerorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibitsofbinary.h>
+#include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>
@@ -15,11 +17,12 @@ class BitsOfBinary :
 			public QObject,
 			public IPlugin,
 			public IBitsOfBinary,
+			public IXmppStanzaHadler,
 			public IStanzaHandler,
 			public IStanzaRequestOwner
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IBitsOfBinary IStanzaHandler IStanzaRequestOwner);
+	Q_INTERFACES(IPlugin IBitsOfBinary IXmppStanzaHadler IStanzaHandler IStanzaRequestOwner);
 public:
 	BitsOfBinary();
 	~BitsOfBinary();
@@ -31,6 +34,9 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
+	//IXmppStanzaHadler
+	virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
+	virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	//IStanzaHandler
 	virtual bool stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IStanzaRequestOwner
@@ -50,11 +56,13 @@ signals:
 	void binaryRemoved(const QString &AContentId);
 protected:
 	QString contentFileName(const QString &AContentId) const;
+protected slots:
+	void onXmppStreamCreated(IXmppStream *AXmppStream);
 private:
 	IPluginManager *FPluginManager;
+	IXmppStreams *FXmppStreams;
 	IStanzaProcessor *FStanzaProcessor;
 private:
-	int FSHIData;
 	int FSHIRequest;
 private:
 	QDir FDataDir;
