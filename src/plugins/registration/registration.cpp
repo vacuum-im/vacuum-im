@@ -257,7 +257,7 @@ IXmppFeature *Registration::newXmppFeature(const QString &AFeatureNS, IXmppStrea
 		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AXmppStream->streamJid()) : NULL;
 		if (account && account->optionsNode().value("register-on-server").toBool())
 		{
-			IXmppFeature *feature = new RegisterStream(AXmppStream);
+			IXmppFeature *feature = new RegisterStream(FDataForms, AXmppStream);
 			connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onXmppFeatureDestroyed()));
 			emit featureCreated(feature);
 			account->optionsNode().setValue(false,"register-on-server");
@@ -288,15 +288,15 @@ IDataFormLocale Registration::dataFormLocale(const QString &AFormType)
 		locale.fields["nick"].label = tr("Nickname");
 		locale.fields["password"].label = tr("Password");
 		locale.fields["name"].label = tr("Full Name");
-		locale.fields["first"].label = tr("First Name");
-		locale.fields["last"].label = tr("Last Name");
+		locale.fields["first"].label = tr("Given Name");
+		locale.fields["last"].label = tr("Family Name");
 		locale.fields["email"].label = tr("Email Address");
 		locale.fields["address"].label = tr("Street");
 		locale.fields["city"].label = tr("City");
 		locale.fields["state"].label = tr("Region");
 		locale.fields["zip"].label = tr("Zip Code");
 		locale.fields["phone"].label = tr("Telephone Number");
-		locale.fields["url"].label = tr("Your Web Paqe");
+		locale.fields["url"].label = tr("Your Web Page");
 	}
 	return locale;
 }

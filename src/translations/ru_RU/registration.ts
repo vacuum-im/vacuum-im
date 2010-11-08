@@ -56,6 +56,25 @@
     </message>
 </context>
 <context>
+    <name>RegisterStream</name>
+    <message>
+        <source>Registration on %1</source>
+        <translation>Регистрация на %1</translation>
+    </message>
+    <message>
+        <source>Invalid registration form</source>
+        <translation>Неверная форма регистрации</translation>
+    </message>
+    <message>
+        <source>Invalid registration dialog</source>
+        <translation>Неверный диалог регистрации</translation>
+    </message>
+    <message>
+        <source>Registration rejected by user</source>
+        <translation>Регистрация отменена пользователем</translation>
+    </message>
+</context>
+<context>
     <name>Registration</name>
     <message>
         <source>Registration</source>
@@ -98,14 +117,6 @@
         <translation>Полное имя</translation>
     </message>
     <message>
-        <source>First Name</source>
-        <translation>Имя</translation>
-    </message>
-    <message>
-        <source>Last Name</source>
-        <translation>Фамилия</translation>
-    </message>
-    <message>
         <source>Email Address</source>
         <translation>E-mail</translation>
     </message>
@@ -130,16 +141,24 @@
         <translation>Телефон</translation>
     </message>
     <message>
-        <source>Your Web Paqe</source>
-        <translation>Web-страница</translation>
-    </message>
-    <message>
         <source>Allows to register on the Jabber servers and services</source>
         <translation>Позволяет регистрироваться на джаббер серверах и сервисах</translation>
     </message>
     <message>
         <source>Supports the registration</source>
         <translation>Поддерживает регистрацию</translation>
+    </message>
+    <message>
+        <source>Given Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation>Фамилия</translation>
+    </message>
+    <message>
+        <source>Your Web Page</source>
+        <translation>Ваша Web страница</translation>
     </message>
 </context>
 </TS>

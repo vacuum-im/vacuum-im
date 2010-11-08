@@ -5,6 +5,8 @@
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iregistraton.h>
+#include <interfaces/idataforms.h>
+#include <utils/widgetmanager.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>
 
@@ -16,7 +18,7 @@ class RegisterStream :
 	Q_OBJECT;
 	Q_INTERFACES(IXmppFeature IXmppStanzaHadler);
 public:
-	RegisterStream(IXmppStream *AXmppStream);
+	RegisterStream(IDataForms *ADataForms, IXmppStream *AXmppStream);
 	~RegisterStream();
 	virtual QObject *instance() { return this; }
 	//IXmppStanzaHadler
@@ -30,8 +32,15 @@ signals:
 	void finished(bool ARestart);
 	void error(const QString &AMessage);
 	void featureDestroyed();
+protected slots:
+	void onXmppStreamClosed();
+	void onRegisterDialogAccepred();
+	void onRegisterDialogRejected();
 private:
+   IDataForms *FDataForms;
 	IXmppStream *FXmppStream;
+private:
+	IDataDialogWidget *FDialog;
 };
 
 #endif // REGISTERSTREAM_H
