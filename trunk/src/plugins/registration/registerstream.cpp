@@ -1,8 +1,11 @@
 #include "registerstream.h"
 
-RegisterStream::RegisterStream(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
+RegisterStream::RegisterStream(IDataForms *ADataForms, IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
+	FDialog = NULL;
+   FDataForms = ADataForms;
 	FXmppStream = AXmppStream;
+	connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onXmppStreamClosed()));
 }
 
 RegisterStream::~RegisterStream()
@@ -19,13 +22,52 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 		{
 			if (AStanza.type() == "result")
 			{
-				Stanza submit("iq");
-				submit.setType("set").setId("setReg");
-				QDomElement query = submit.addElement("query",NS_JABBER_REGISTER);
-				query.appendChild(submit.createElement("username")).appendChild(submit.createTextNode(FXmppStream->streamJid().eNode()));
-				query.appendChild(submit.createElement("password")).appendChild(submit.createTextNode(FXmppStream->password()));
-				query.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(AStanza.firstElement("query").attribute("key")));
-				FXmppStream->sendStanza(submit);
+				QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_REGISTER);
+				QDomElement formElem = Stanza::findElement(queryElem,"x",NS_JABBER_DATA);
+				if (FDataForms && !formElem.isNull())
+				{
+					IDataForm form = FDataForms->dataForm(formElem);
+					if (FDataForms->isFormValid(form))
+					{
+						int userFiled = FDataForms->fieldIndex("username",form.fields);
+						if (userFiled >= 0)
+						{
+							form.fields[userFiled].value = FXmppStream->streamJid().eNode();
+							form.fields[userFiled].type = DATAFIELD_TYPE_HIDDEN;
+						}
+
+						int passFiled = FDataForms->fieldIndex("password",form.fields);
+						if (passFiled >= 0)
+						{
+							form.fields[passFiled].value = FXmppStream->password();
+							form.fields[passFiled].type = DATAFIELD_TYPE_HIDDEN;
+						}
+
+						FDialog = FDataForms->dialogWidget(form,NULL);
+						FDialog->setAllowInvalid(false);
+						FDialog->instance()->setWindowTitle(tr("Registration on %1").arg(FXmppStream->streamJid().domain()));
+						connect(FDialog->instance(),SIGNAL(accepted()),SLOT(onRegisterDialogAccepred()));
+						connect(FDialog->instance(),SIGNAL(rejected()),SLOT(onRegisterDialogRejected()));
+						WidgetManager::showActivateRaiseWindow(FDialog->instance());
+					}
+					else
+					{
+						emit error(tr("Invalid registration form"));
+					}
+				}
+				else
+				{
+					Stanza submit("iq");
+					submit.setType("set").setId("setReg");
+					QDomElement querySubmit = submit.addElement("query",NS_JABBER_REGISTER);
+					if (!queryElem.firstChildElement("username").isNull())
+						querySubmit.appendChild(submit.createElement("username")).appendChild(submit.createTextNode(FXmppStream->streamJid().eNode()));
+					if (!queryElem.firstChildElement("password").isNull())
+						querySubmit.appendChild(submit.createElement("password")).appendChild(submit.createTextNode(FXmppStream->password()));
+					if (!queryElem.firstChildElement("key").isNull())
+						querySubmit.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(AStanza.firstElement("query").attribute("key")));
+					FXmppStream->sendStanza(submit);
+				}
 			}
 			else if (AStanza.type() == "error")
 			{
@@ -74,4 +116,36 @@ bool RegisterStream::start(const QDomElement &AElem)
 	}
 	deleteLater();
 	return false;
+}
+
+void RegisterStream::onXmppStreamClosed()
+{
+	if (FDialog)
+	{
+		FDialog->instance()->close();
+		FDialog = NULL;
+	}
+}
+
+void RegisterStream::onRegisterDialogAccepred()
+{
+	if (FDialog)
+	{
+		Stanza submit("iq");
+		submit.setType("set").setId("setReg");
+		QDomElement query = submit.addElement("query",NS_JABBER_REGISTER);
+		FDataForms->xmlForm(FDataForms->dataSubmit(FDialog->formWidget()->userDataForm()),query);
+		FXmppStream->sendStanza(submit);
+	}
+	else
+	{
+		emit error(tr("Invalid registration dialog"));
+	}
+	FDialog = NULL;
+}
+
+void RegisterStream::onRegisterDialogRejected()
+{
+	emit error(tr("Registration rejected by user"));
+	FDialog = NULL;
 }
