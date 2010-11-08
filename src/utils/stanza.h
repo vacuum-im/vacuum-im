@@ -50,6 +50,8 @@ public:
 	QDomText createTextNode(const QString &AData);
 	QString toString(int AIndent = 1) const;
 	QByteArray toByteArray() const;
+public:
+	static QDomElement findElement(const QDomElement &AParent, const QString &ATagName = QString::null, const QString &ANamespace = QString::null);
 private:
 	QSharedDataPointer<StanzaData> d;
 };

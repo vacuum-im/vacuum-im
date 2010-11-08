@@ -177,11 +177,7 @@ Stanza Stanza::replyError(const QString &ACondition, const QString &ANamespace, 
 
 QDomElement Stanza::firstElement(const QString &ATagName, const QString ANamespace) const
 {
-	QDomElement elem = d->FDoc.documentElement().firstChildElement(ATagName);
-	if (!ANamespace.isEmpty())
-		while (!elem.isNull() && elem.namespaceURI()!=ANamespace)
-			elem = elem.nextSiblingElement(ATagName);
-	return elem;
+	return findElement(d->FDoc.documentElement(),ATagName,ANamespace);
 }
 
 QDomElement Stanza::addElement(const QString &ATagName, const QString &ANamespace)
@@ -214,4 +210,15 @@ QString Stanza::toString(int AIndent) const
 QByteArray Stanza::toByteArray() const
 {
 	return toString(0).toUtf8();
+}
+
+QDomElement Stanza::findElement(const QDomElement &AParent, const QString &ATagName, const QString &ANamespace)
+{
+	QDomElement elem = AParent.firstChildElement(ATagName);
+	if (!ANamespace.isNull())
+	{
+		while (!elem.isNull() && elem.namespaceURI()!=ANamespace)
+			elem = elem.nextSiblingElement(ATagName);
+	}
+	return elem;
 }
