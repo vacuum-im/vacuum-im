@@ -10,14 +10,12 @@
 #define DIR_DATA                "bitsofbinary"
 #define LOAD_TIMEOUT            30000
 
-#define SHC_DATA_IQ             "/iq"
-#define SHC_DATA_MESSAGE        "/message"
-#define SHC_DATA_PRESENCE       "/presence"
 #define SHC_REQUEST             "/iq[@type='get']/data[@xmlns='" NS_BITS_OF_BINARY "']"
 
 BitsOfBinary::BitsOfBinary()
 {
 	FPluginManager = NULL;
+	FXmppStreams = NULL;
 	FStanzaProcessor = NULL;
 }
 
@@ -33,6 +31,7 @@ void BitsOfBinary::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
+	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
@@ -45,7 +44,18 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &/*AInitO
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
-	return FStanzaProcessor!=NULL;
+	
+	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	if (plugin)
+	{
+		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		if (FXmppStreams)
+		{
+			connect(FXmppStreams->instance(),SIGNAL(created(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
+		}
+	}
+
+	return FStanzaProcessor!=NULL && FXmppStreams!=NULL;
 }
 
 bool BitsOfBinary::initObjects()
@@ -63,16 +73,6 @@ bool BitsOfBinary::initObjects()
 		requestHandle.direction = IStanzaHandle::DirectionIn;
 		requestHandle.conditions.append(SHC_REQUEST);
 		FSHIRequest = FStanzaProcessor->insertStanzaHandle(requestHandle);
-
-		IStanzaHandle dataHandle;
-		dataHandle.handler = this;
-		dataHandle.order = SHO_IMPI_BITSOFBINARY;
-		dataHandle.direction = IStanzaHandle::DirectionIn;
-		dataHandle.conditions.clear();
-		dataHandle.conditions.append(SHC_DATA_IQ);
-		dataHandle.conditions.append(SHC_DATA_MESSAGE);
-		dataHandle.conditions.append(SHC_DATA_PRESENCE);
-		FSHIData = FStanzaProcessor->insertStanzaHandle(dataHandle);
 	}
 
 	return true;
@@ -113,9 +113,10 @@ bool BitsOfBinary::initSettings()
 	return true;
 }
 
-bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+bool BitsOfBinary::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	if (AHandleId == FSHIData)
+	Q_UNUSED(AXmppStream);
+	if (AOrder == XSHO_BITSOFBINARY)
 	{
 		QDomElement dataElem = AStanza.tagName()=="iq" ? AStanza.firstElement().firstChildElement("data") : AStanza.firstElement("data");
 		while (!dataElem.isNull())
@@ -131,7 +132,20 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 			dataElem = dataElem.nextSiblingElement("data");
 		}
 	}
-	else if (AHandleId == FSHIRequest)
+	return false;
+}
+
+bool BitsOfBinary::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
+{
+	Q_UNUSED(AXmppStream);
+	Q_UNUSED(AStanza);
+	Q_UNUSED(AOrder);
+	return false;
+}
+
+bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+	if (AHandleId == FSHIRequest)
 	{
 		AAccept = true;
 		QDomElement dataElem = AStanza.firstElement("data",NS_BITS_OF_BINARY);
@@ -284,6 +298,11 @@ bool BitsOfBinary::removeBinary(const QString &AContentId)
 QString BitsOfBinary::contentFileName(const QString &AContentId) const
 {
 	return FDataDir.absoluteFilePath(QCryptographicHash::hash(AContentId.toUtf8(),QCryptographicHash::Sha1).toHex());
+}
+
+void BitsOfBinary::onXmppStreamCreated(IXmppStream *AXmppStream)
+{
+	AXmppStream->insertXmppStanzaHandler(this,XSHO_BITSOFBINARY);
 }
 
 Q_EXPORT_PLUGIN2(plg_bitsofbinary, BitsOfBinary)
