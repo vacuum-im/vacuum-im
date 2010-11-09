@@ -5,182 +5,182 @@
     <name>EditProfilesDialog</name>
     <message>
         <source>New Profile</source>
-        <translation type="unfinished">Новый профиль</translation>
+        <translation>Новый профіль</translation>
     </message>
     <message>
         <source>Enter profile name:</source>
-        <translation type="unfinished">Введите имя профиля:</translation>
+        <translation>Введіть им’я профілю:</translation>
     </message>
     <message>
         <source>Profile Password</source>
-        <translation type="unfinished">Пароль профиля</translation>
+        <translation>Пароль профілю</translation>
     </message>
     <message>
         <source>Enter profile password:</source>
-        <translation type="unfinished">Введите пароль профиля:</translation>
+        <translation>Ведіть пароль профілю:</translation>
     </message>
     <message>
         <source>Confirm Password</source>
-        <translation type="unfinished">Подтвердите пароль</translation>
+        <translation>Підтвердіть пароль</translation>
     </message>
     <message>
         <source>Reenter password:</source>
-        <translation type="unfinished">Посторите пароль:</translation>
+        <translation>Повторіть пароль:</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
+        <translation>Помилка</translation>
     </message>
     <message>
         <source>Could not create profile, maybe this profile already exists</source>
-        <translation type="unfinished">Не удалось создать профиль, возможно такой профиль уже существует</translation>
+        <translation>Не вдалось створити профіль, можливо такий профіль уже існуе</translation>
     </message>
     <message>
         <source>Passwords did not match</source>
-        <translation type="unfinished">Пароли не совпали</translation>
+        <translation>Паролі не співпали</translation>
     </message>
     <message>
         <source>Enter current profile password:</source>
-        <translation type="unfinished">Введите текущий пароль профиля:</translation>
+        <translation>Введіть текучий пароль профілю:</translation>
     </message>
     <message>
         <source>Enter new profile password:</source>
-        <translation type="unfinished">Введине новый пароль профиля:</translation>
+        <translation>Ввеліть новий пароль профІлю:</translation>
     </message>
     <message>
         <source>Failed to change profile password</source>
-        <translation type="unfinished">Не удалось изменить пароль профиля</translation>
+        <translation>Не вдалось змінити пароль профілю</translation>
     </message>
     <message>
         <source>Entered password is not valid</source>
-        <translation type="unfinished">Введен неправильный пароль</translation>
+        <translation>Введений неправильний пароль</translation>
     </message>
     <message>
         <source>Rename Profile</source>
-        <translation type="unfinished">Переименовать Профиль</translation>
+        <translation>Переіменувати Профіль</translation>
     </message>
     <message>
         <source>Enter new name for profile:</source>
-        <translation type="unfinished">Введите новое имя профиля:</translation>
+        <translation>Введіть нове ім’я профілю:</translation>
     </message>
     <message>
         <source>Failed to rename profile</source>
-        <translation type="unfinished">Не удалось переименовать профиль</translation>
+        <translation>Не вдалось переіменувати профіль</translation>
     </message>
     <message>
         <source>Remove Profile</source>
-        <translation type="unfinished">Удалить профиль</translation>
+        <translation>Видалити профіль</translation>
     </message>
     <message>
         <source>Are you sure you want to delete profile &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
-        <translation type="unfinished">Вы уверены, что хотите удалить профиль &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</translation>
+        <translation>Ви впевнені, що хочете видалити профіль &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</translation>
     </message>
     <message>
         <source>Failed to remove profile</source>
-        <translation type="unfinished">Не удалось удалить профиль</translation>
+        <translation>Не вдалось видалити профіль</translation>
     </message>
 </context>
 <context>
     <name>EditProfilesDialogClass</name>
     <message>
         <source>Edit Profiles</source>
-        <translation type="unfinished">Редактировать профиль</translation>
+        <translation>Редагувати профіль</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Додати</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Пароль</translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">Переименовать</translation>
+        <translation>переіменувати</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Відалити</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">Закрыть</translation>
+        <translation>Закрити</translation>
     </message>
 </context>
 <context>
     <name>LoginDialog</name>
     <message>
         <source>Profile Blocked</source>
-        <translation type="unfinished">Профиль заблокирован</translation>
+        <translation>Профіль заблокований</translation>
     </message>
     <message>
         <source>This profile is now blocked by another program</source>
-        <translation type="unfinished">Этот профиль сейчас заблокирован другой программой</translation>
+        <translation>Цей профіль зараз заблокований іншою программою</translation>
     </message>
     <message>
         <source>Wrong Password</source>
-        <translation type="unfinished">Неверный пароль</translation>
+        <translation>Невірний пароль</translation>
     </message>
     <message>
         <source>Entered profile password is not correct</source>
-        <translation type="unfinished">Введен неверный пароль профиля</translation>
+        <translation>Введений невірний пароль профілю</translation>
     </message>
 </context>
 <context>
     <name>LoginDialogClass</name>
     <message>
         <source>Open Profile</source>
-        <translation type="unfinished">Открыть профиль</translation>
+        <translation>Відкрити профіль</translation>
     </message>
     <message>
         <source>Profile:</source>
-        <translation type="unfinished">Профиль:</translation>
+        <translation>Профіль:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished">Пароль:</translation>
+        <translation>Пароль:</translation>
     </message>
     <message>
         <source>Profiles</source>
-        <translation type="unfinished">Профили</translation>
+        <translation>Профілі</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
         <source>Options</source>
-        <translation type="unfinished">Настройки</translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <source>Options are absent</source>
-        <translation type="unfinished"></translation>
+        <translation>Опціїї відсутні</translation>
     </message>
 </context>
 <context>
     <name>OptionsManager</name>
     <message>
         <source>Options Manager</source>
-        <translation type="unfinished">Диспетчер настроек</translation>
+        <translation>Менеджер настроєк</translation>
     </message>
     <message>
         <source>Allows to save, load and manage user preferences</source>
-        <translation type="unfinished">Позволяет сохранять, загружать и управлячть настройками пользователя</translation>
+        <translation>Дозволяе зберігати, загружати и керувати настройками користувача</translation>
     </message>
     <message>
         <source>Change Profile</source>
-        <translation type="unfinished">Сменить профиль</translation>
+        <translation>Змінити профіль</translation>
     </message>
     <message>
         <source>Misc</source>
-        <translation type="unfinished">Разное</translation>
+        <translation>Різне</translation>
     </message>
     <message>
         <source>Auto run on system startup</source>
-        <translation type="unfinished">Автоматически запускать при старте системы</translation>
+        <translation>Автоматично запускати при старті системи</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished">Настройки</translation>
+        <translation>Настройки</translation>
     </message>
 </context>
 </TS>

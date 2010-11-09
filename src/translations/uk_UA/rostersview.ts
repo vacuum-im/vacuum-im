@@ -5,66 +5,66 @@
     <name>RostersView</name>
     <message>
         <source>Priority: %1</source>
-        <translation type="unfinished">Приоритет: %1</translation>
+        <translation>Пріоритет: %1</translation>
     </message>
     <message>
         <source>Subscription: %1 %2</source>
-        <translation type="unfinished">Авторизация: %1 %2</translation>
+        <translation>Авторизація: %1 %2</translation>
     </message>
     <message>
         <source>Status:</source>
-        <translation type="unfinished">Статус:</translation>
+        <translation>Статус:</translation>
     </message>
     <message>
         <source>Jabber ID</source>
-        <translation type="unfinished">Jabber ID</translation>
+        <translation>Jabber ID</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Статус</translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <source>Copy to clipboard</source>
-        <translation type="unfinished">Копировать в буфер</translation>
+        <translation>Копіювати в буфер</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>І’мя</translation>
     </message>
 </context>
 <context>
     <name>RostersViewPlugin</name>
     <message>
         <source>Roster</source>
-        <translation type="unfinished">Контакт-лист</translation>
+        <translation>Контакт-лист</translation>
     </message>
     <message>
         <source>Show/Hide offline contacts</source>
-        <translation type="unfinished">Скрыть/показать отключенные контакты</translation>
+        <translation>Сховати/показати відключені контакти</translation>
     </message>
     <message>
         <source>Roster View</source>
-        <translation type="unfinished">Отображение ростера</translation>
+        <translation>Відображення ростеру</translation>
     </message>
     <message>
         <source>Displays a hierarchical roster&apos;s model</source>
-        <translation type="unfinished">Отображает иерархическую модель ростера</translation>
+        <translation>Відображае ієрархічну модель ростеру</translation>
     </message>
     <message>
         <source>Show offline contact</source>
-        <translation type="unfinished">Показывать отключенные контакты</translation>
+        <translation>Показувати відключені контакти</translation>
     </message>
     <message>
         <source>Show contact resource in roster</source>
-        <translation type="unfinished">Показывать ресурс контактов</translation>
+        <translation>Показувати ресурс контактів</translation>
     </message>
     <message>
         <source>Show status message in roster</source>
-        <translation type="unfinished">Показывать статус контактов</translation>
+        <translation>Показувати статус контактів</translation>
     </message>
     <message>
         <source>Sort contacts by status</source>
-        <translation type="unfinished">Сортировать контакты по статусу</translation>
+        <translation>Сортувати контакти по статусу</translation>
     </message>
 </context>
 </TS>

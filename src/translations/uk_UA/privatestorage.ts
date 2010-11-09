@@ -5,11 +5,11 @@
     <name>PrivateStorage</name>
     <message>
         <source>Private Storage</source>
-        <translation type="unfinished">Приватное хранилище</translation>
+        <translation>Приватне сховище</translation>
     </message>
     <message>
         <source>Allows other modules to store arbitrary data on a server</source>
-        <translation type="unfinished">Позволяет другим модулям сохранять произвольные данные на сервере</translation>
+        <translation>Дозволяе іншим модулям зберігати дозвільні данні на сервері</translation>
     </message>
 </context>
 </TS>

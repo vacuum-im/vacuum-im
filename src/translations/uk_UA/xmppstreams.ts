@@ -5,134 +5,134 @@
     <name>XmppStream</name>
     <message>
         <source>Password request</source>
-        <translation type="unfinished">Запрос пароля</translation>
+        <translation>Запрос паролю</translation>
     </message>
     <message>
         <source>Enter password for &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished">Введите пароль для &lt;b&gt;%1&lt;/b&gt;</translation>
+        <translation>Введіть пароль для &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Connection not specified</source>
-        <translation type="unfinished">Соединение не определено</translation>
+        <translation>З’єднання не визначене</translation>
     </message>
     <message>
         <source>XMPP connection timed out</source>
-        <translation type="unfinished">Превышено время установки XMPP соединения</translation>
+        <translation>Перевищений час установки XMPP з’єднання</translation>
     </message>
     <message>
         <source>Failed to start connection</source>
-        <translation type="unfinished">Не удалось запустить соединение</translation>
+        <translation>Не вдалось запустити з’єднання</translation>
     </message>
     <message>
         <source>Connection closed unexpectedly</source>
-        <translation type="unfinished"></translation>
+        <translation>З’єднання несподівано завершено</translation>
     </message>
 </context>
 <context>
     <name>XmppStreams</name>
     <message>
         <source>Bad Request Format</source>
-        <translation type="unfinished">Неверный формат запроса</translation>
+        <translation>Невірний формат запросу</translation>
     </message>
     <message>
         <source>Bad Namespace Prefix</source>
-        <translation type="unfinished">Неверный префикс пространства имён</translation>
+        <translation>Невірний префікс простору імен</translation>
     </message>
     <message>
         <source>Conflict</source>
-        <translation type="unfinished">Конфликт</translation>
+        <translation>Конфлікт</translation>
     </message>
     <message>
         <source>Connection timeout</source>
-        <translation type="unfinished">Превышено время ожидания соединения</translation>
+        <translation>перевищено час очікування з’єднання</translation>
     </message>
     <message>
         <source>Host Gone</source>
-        <translation type="unfinished">Хост недоступен</translation>
+        <translation>Хост недоступний</translation>
     </message>
     <message>
         <source>Host Unknown</source>
-        <translation type="unfinished">Неизвестный хост</translation>
+        <translation>Невідомий хост</translation>
     </message>
     <message>
         <source>Improper Addressing</source>
-        <translation type="unfinished">Неправильная адресация</translation>
+        <translation>Неправильна адресація</translation>
     </message>
     <message>
         <source>Internal Server Error</source>
-        <translation type="unfinished">Внутренняя ошибка сервера</translation>
+        <translation>Внутрішня помилка серверу</translation>
     </message>
     <message>
         <source>Invalid From</source>
-        <translation type="unfinished">Недопустимый отправитель</translation>
+        <translation>Недопустимий відправник</translation>
     </message>
     <message>
         <source>Invalid Id</source>
-        <translation type="unfinished">Недопустимый ID</translation>
+        <translation>Недопустимий ID</translation>
     </message>
     <message>
         <source>Invalid Namespace</source>
-        <translation type="unfinished">Недопустимое пространство имён</translation>
+        <translation>Недопустимий простір імен</translation>
     </message>
     <message>
         <source>Invalid XML</source>
-        <translation type="unfinished">Недопустимый XML</translation>
+        <translation>Недопустимий XML</translation>
     </message>
     <message>
         <source>Not Authorized</source>
-        <translation type="unfinished">Не авторизован</translation>
+        <translation>Не авторизований</translation>
     </message>
     <message>
         <source>Policy Violation</source>
-        <translation type="unfinished">Нарушение правил</translation>
+        <translation>Порушення правил</translation>
     </message>
     <message>
         <source>Remote Connection Failed</source>
-        <translation type="unfinished">Сбой удаленного соединения</translation>
+        <translation>Збій віддаленого з’єднання</translation>
     </message>
     <message>
         <source>Resource Constraint</source>
-        <translation type="unfinished">Ограничение ресурса</translation>
+        <translation>Обмеження ресурсу</translation>
     </message>
     <message>
         <source>Restricted XML</source>
-        <translation type="unfinished">Запрещенный XML</translation>
+        <translation>Заборонений XML</translation>
     </message>
     <message>
         <source>See Other Host</source>
-        <translation type="unfinished">Смотри другой хост</translation>
+        <translation>Дивись інший хост</translation>
     </message>
     <message>
         <source>System Shutdown</source>
-        <translation type="unfinished">Выключение системы</translation>
+        <translation>Вимкнення системи</translation>
     </message>
     <message>
         <source>Undefined Condition</source>
-        <translation type="unfinished">Неопределённое условие</translation>
+        <translation>Невизначена умова</translation>
     </message>
     <message>
         <source>Unsupported Encoding</source>
-        <translation type="unfinished">Неподдерживаемая кодировка</translation>
+        <translation>Непідтримуєме кодування</translation>
     </message>
     <message>
         <source>Unsupported Stanza Type</source>
-        <translation type="unfinished">Неподдерживаемый формат XML-транзакции</translation>
+        <translation>Непідтримуємий формат XML-транзакції</translation>
     </message>
     <message>
         <source>Unsupported Version</source>
-        <translation type="unfinished">Неподдерживаемая версия</translation>
+        <translation>Непідтримуєма версія</translation>
     </message>
     <message>
         <source>XML Not Well Formed</source>
-        <translation type="unfinished">XML сформирован неправильно</translation>
+        <translation>XML сформований неправильно</translation>
     </message>
     <message>
         <source>XMPP Streams Manager</source>
-        <translation type="unfinished">Диспетчер XMPP потоков</translation>
+        <translation>Менеджер XMPP потоків</translation>
     </message>
     <message>
         <source>Allows other modules to create XMPP streams and get access to them</source>
-        <translation type="unfinished">Позволяет другим модулям создавать XMPP потоки и получать доступ к ним</translation>
+        <translation>Дозволяе іншим модулям створювати XMPP потоки та отримувати доступ до них</translation>
     </message>
 </context>
 </TS>

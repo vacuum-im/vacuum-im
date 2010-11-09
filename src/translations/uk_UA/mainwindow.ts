@@ -5,43 +5,43 @@
     <name>MainWindow</name>
     <message>
         <source>Top toolbar</source>
-        <translation type="unfinished">Верхняя панель</translation>
+        <translation>Верхня панель</translation>
     </message>
     <message>
         <source>Left toolbar</source>
-        <translation type="unfinished">Левая панель</translation>
+        <translation>Ліва панель</translation>
     </message>
     <message>
         <source>Bottom toolbar</source>
-        <translation type="unfinished">Правая панель</translation>
+        <translation>Права панель</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished">Меню</translation>
+        <translation>Меню</translation>
     </message>
 </context>
 <context>
     <name>MainWindowPlugin</name>
     <message>
         <source>Main Window</source>
-        <translation type="unfinished">Основное окно</translation>
+        <translation>Основне вікно</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished">Выход</translation>
+        <translation>Вихід</translation>
     </message>
     <message>
         <source>Show roster</source>
-        <translation type="unfinished">Показать список контактов</translation>
+        <translation>Показати список контактів</translation>
     </message>
     <message>
         <source>Allows other modules to place their widgets in the main window</source>
-        <translation type="unfinished">Позволяет другим модулям размещать свои виджеты в главном окне</translation>
+        <translation>Дозволяе іншим модулям розміщати свої віджети в головному вікні</translation>
     </message>
     <message>
         <source>Esc</source>
         <comment>Close Roster</comment>
-        <translation type="unfinished"></translation>
+        <translation>Закрити ростер</translation>
     </message>
 </context>
 </TS>

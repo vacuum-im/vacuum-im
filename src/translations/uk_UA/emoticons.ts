@@ -5,11 +5,11 @@
     <name>Emoticons</name>
     <message>
         <source>Emoticons</source>
-        <translation type="unfinished">Смайлики</translation>
+        <translation>Смайли</translation>
     </message>
     <message>
         <source>Allows to use your smiley images in messages</source>
-        <translation type="unfinished">Позволяет использовать изображения смайликов в сообщениях</translation>
+        <translation>Дозволяе використовувати зображення смайлів в повідомленях</translation>
     </message>
 </context>
 </TS>

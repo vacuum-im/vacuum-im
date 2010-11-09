@@ -5,311 +5,311 @@
     <name>AddContactDialog</name>
     <message>
         <source>Please, authorize me to your presence.</source>
-        <translation type="unfinished">Пожалуйста, авторизуйте меня.</translation>
+        <translation>Будь-ласка, авторизуйте мене.</translation>
     </message>
     <message>
         <source>Add contact - %1</source>
-        <translation type="unfinished">Добавить конакт - %1</translation>
+        <translation>Додати конакт - %1</translation>
     </message>
     <message>
         <source>Chat</source>
-        <translation type="unfinished">Чат</translation>
+        <translation>Чат</translation>
     </message>
     <message>
         <source>Open chat window</source>
-        <translation type="unfinished">Открыть окно чата</translation>
+        <translation>Відкрити вікно чату</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished">Сообщение</translation>
+        <translation>Повідомлення</translation>
     </message>
     <message>
         <source>Send Message</source>
-        <translation type="unfinished">Послать сообщение</translation>
+        <translation>Надіслати повідомлення</translation>
     </message>
     <message>
         <source>VCard</source>
-        <translation type="unfinished">vCard</translation>
+        <translation>vCard</translation>
     </message>
     <message>
         <source>Show VCard</source>
-        <translation type="unfinished">Показать vCard</translation>
+        <translation>Показати vCard</translation>
     </message>
     <message>
         <source>Nick</source>
-        <translation type="unfinished">Ник</translation>
+        <translation>Нік</translation>
     </message>
     <message>
         <source>Resolve nick name</source>
-        <translation type="unfinished">Определить ник</translation>
+        <translation>Визначити нік</translation>
     </message>
     <message>
         <source>Contact &lt;b&gt;%1&lt;/b&gt; already exists.</source>
-        <translation type="unfinished">Контакт &lt;b&gt;%1&lt;/b&gt; уже существует.</translation>
+        <translation>Контакт &lt;b&gt;%1&lt;/b&gt; уже існуе.</translation>
     </message>
     <message>
         <source>Can`t add contact &apos;&lt;b&gt;%1&lt;/b&gt;&apos; because it is not a valid Jaber ID</source>
-        <translation type="unfinished">Невозможно добавить контакт &apos;&lt;b&gt;%1&lt;/b&gt;&apos;, т.к. он не является правильным JID</translation>
+        <translation>Неможливо додати контакт &apos;&lt;b&gt;%1&lt;/b&gt;&apos;, т.як. він не являєтся правильним JID</translation>
     </message>
     <message>
         <source>* nested group delimiter - &apos;%1&apos;</source>
-        <translation type="unfinished">* разделитель вложенных групп - &apos;%1&apos;</translation>
+        <translation>* розділювач вкладених груп - &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
     <name>AddContactDialogClass</name>
     <message>
         <source>Nick:</source>
-        <translation type="unfinished">Ник:</translation>
+        <translation>Нік:</translation>
     </message>
     <message>
         <source>Group:</source>
-        <translation type="unfinished">Группа:</translation>
+        <translation>Група:</translation>
     </message>
     <message>
         <source>Contact:</source>
-        <translation type="unfinished">Контакт:</translation>
+        <translation>Контакт:</translation>
     </message>
     <message>
         <source>Subscription</source>
-        <translation type="unfinished">Авторизация</translation>
+        <translation>Авторизація</translation>
     </message>
     <message>
         <source>Subscribe to contact presence</source>
-        <translation type="unfinished">Запросить авторизацию</translation>
+        <translation>Запросити авторизацію</translation>
     </message>
 </context>
 <context>
     <name>RosterChanger</name>
     <message>
         <source>Subscription requests</source>
-        <translation type="unfinished">Запросы авторизации</translation>
+        <translation>Запроси авторизації</translation>
     </message>
     <message>
         <source>%1 wants to subscribe to your presence.</source>
-        <translation type="unfinished">%1 хочет подписаться на ваш статус.</translation>
+        <translation>%1 хоче підписатись на ваш статус.</translation>
     </message>
     <message>
         <source>%1 unsubscribed from your presence.</source>
-        <translation type="unfinished">%1 отписался от вашего статуса.</translation>
+        <translation>%1 відписався від вашого статусу.</translation>
     </message>
     <message>
         <source>You are now unsubscribed from %1 presence.</source>
-        <translation type="unfinished">%1 удалил вашу авторизацию на получение статуса.</translation>
+        <translation>%1 видалив вашу авторизацію на отримання статусу.</translation>
     </message>
     <message>
         <source>This group</source>
-        <translation type="unfinished">В эту группу</translation>
+        <translation>В цю группу</translation>
     </message>
     <message>
         <source>Create new...</source>
-        <translation type="unfinished">Создать новую...</translation>
+        <translation>Створити нову...</translation>
     </message>
     <message>
         <source>Root</source>
-        <translation type="unfinished">В корень</translation>
+        <translation>В корінь</translation>
     </message>
     <message>
         <source>Subscription</source>
-        <translation type="unfinished">Авторизация</translation>
+        <translation>Авторизація</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished">Отправить</translation>
+        <translation>Надіслати</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Видалити</translation>
     </message>
     <message>
         <source>Request</source>
-        <translation type="unfinished">Запросить</translation>
+        <translation>Запросити</translation>
     </message>
     <message>
         <source>Copy contact</source>
-        <translation type="unfinished">Копировать контакт</translation>
+        <translation>Копіювати контакт</translation>
     </message>
     <message>
         <source>Move contact</source>
-        <translation type="unfinished">Переместить контакт</translation>
+        <translation>Перемістити контакт</translation>
     </message>
     <message>
         <source>Copy group</source>
-        <translation type="unfinished">Копировать группу</translation>
+        <translation>Копіювати групу</translation>
     </message>
     <message>
         <source>Move group</source>
-        <translation type="unfinished">Переместить группу</translation>
+        <translation>Перемістити групу</translation>
     </message>
     <message>
         <source>Refuse</source>
-        <translation type="unfinished">Отказаться</translation>
+        <translation>Відмовитись</translation>
     </message>
     <message>
         <source>Rename...</source>
-        <translation type="unfinished">Переименовать...</translation>
+        <translation>Переіменувати...</translation>
     </message>
     <message>
         <source>Copy to group</source>
-        <translation type="unfinished">Копировать в группу</translation>
+        <translation>Копіювати в групу</translation>
     </message>
     <message>
         <source>Move to group</source>
-        <translation type="unfinished">Переместить в группу</translation>
+        <translation>Перемістити в групу</translation>
     </message>
     <message>
         <source>Remove from group</source>
-        <translation type="unfinished">Удалить из группы</translation>
+        <translation>Видалити з групи</translation>
     </message>
     <message>
         <source>Remove from roster</source>
-        <translation type="unfinished">Удалить из контакт-листа</translation>
+        <translation>Видалити з контакт-листа</translation>
     </message>
     <message>
         <source>Remove group</source>
-        <translation type="unfinished">Удалить группу</translation>
+        <translation>Видалити групу</translation>
     </message>
     <message>
         <source>Remove contacts</source>
-        <translation type="unfinished">Удалить контакты</translation>
+        <translation>Видалити контакти</translation>
     </message>
     <message>
         <source>Subscription message from %1</source>
-        <translation type="unfinished">Сообщение авторизации от %1</translation>
+        <translation>Повідомлення авторизації від %1</translation>
     </message>
     <message>
         <source>Subscription message</source>
-        <translation type="unfinished">Сообщение авторизации</translation>
+        <translation>Повідомлення авторизації</translation>
     </message>
     <message>
         <source>Rename contact</source>
-        <translation type="unfinished">Переименовать контакт</translation>
+        <translation>переіменувати контакт</translation>
     </message>
     <message>
         <source>Enter name for: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished">Введите имя для: &lt;b&gt;%1&lt;/b&gt;</translation>
+        <translation>Введіть і’мя для: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Create new group</source>
-        <translation type="unfinished">Создать новую группу</translation>
+        <translation>Створити нову групу</translation>
     </message>
     <message>
         <source>Enter group name:</source>
-        <translation type="unfinished">Введите имя группы:</translation>
+        <translation>Введіть і’мя групы:</translation>
     </message>
     <message>
         <source>Remove contact</source>
-        <translation type="unfinished">Удалить контакт</translation>
+        <translation>Видалити контакт</translation>
     </message>
     <message>
         <source>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</source>
-        <translation type="unfinished">Вы уверены, что хотите удалить контакт &lt;b&gt;%1&lt;/b&gt; из контакт-листа?</translation>
+        <translation>Ви впевнені, що хочете видалити контакт &lt;b&gt;%1&lt;/b&gt; з контакт-листа?</translation>
     </message>
     <message>
         <source>Rename group</source>
-        <translation type="unfinished">Переименовать группу</translation>
+        <translation>Переіменувати групу</translation>
     </message>
     <message>
         <source>Enter new group name:</source>
-        <translation type="unfinished">Введите новое имя группы:</translation>
+        <translation>Введіть нове і’мя групы:</translation>
     </message>
     <message>
         <source>You are assured that wish to remove %1 contact(s) from roster?</source>
-        <translation type="unfinished">Вы уверены, что хотите удалить %1 контакт(ов) из контакт-листа?</translation>
+        <translation>Ви впевнені, що хочете відалити %1 контакт(ів) з контакт-листа?</translation>
     </message>
     <message>
         <source>You are now subscribed for %1 presence.</source>
-        <translation type="unfinished">%1 авторизовал вас на получение статуса.</translation>
+        <translation>%1 авторизував вас на отримання статуса.</translation>
     </message>
     <message>
         <source>Add contact</source>
-        <translation type="unfinished">Добавить контакт</translation>
+        <translation>Додати контакт</translation>
     </message>
     <message>
         <source>Subscribe contact</source>
-        <translation type="unfinished">Авторизовать контакт</translation>
+        <translation>Авторизувати контакт</translation>
     </message>
     <message>
         <source>Unsubscribe contact</source>
-        <translation type="unfinished">Удалить авторизацию</translation>
+        <translation>Видалити авторизацію</translation>
     </message>
     <message>
         <source>Subscribe for contact presence</source>
-        <translation type="unfinished">Подписаться на получение статуса контакта</translation>
+        <translation>Підписатись на отримання статусу контакту</translation>
     </message>
     <message>
         <source>You are assured that wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation type="unfinished">Вы уверены, что хотите подписаться на получение статуса контакта &lt;b&gt;%1&lt;/b&gt;?</translation>
+        <translation>Ви впевнені, що хочете підписатись на отримання статусу контакту &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>Unsubscribe from contact presence</source>
-        <translation type="unfinished">Отписаться от получения статуса контакта</translation>
+        <translation>Відписатись від отримання статусу контакта</translation>
     </message>
     <message>
         <source>You are assured that wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation type="unfinished">Вы уверены, что хотите отписаться от получения статуса контакта &lt;b&gt;%1&lt;/b&gt;?</translation>
+        <translation>Ви впевнені, що хочете відписатись на отримання статусу контакту &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>Roster Editor</source>
-        <translation type="unfinished">Редактор ростера</translation>
+        <translation>Редактор ростера</translation>
     </message>
     <message>
         <source>Allows to edit roster</source>
-        <translation type="unfinished">Позволяет редактировать ростер</translation>
+        <translation>Дозволяе редагувати ростер</translation>
     </message>
     <message>
         <source>Auto accept subscription requests</source>
-        <translation type="unfinished">Автоматически принимать запросы на авторизации</translation>
+        <translation>Автоматично приймати запроси на авторизацію</translation>
     </message>
     <message>
         <source>Auto unsubscribe contacts</source>
-        <translation type="unfinished">Автоматически удалять авторизацию</translation>
+        <translation>Автоматично видаляти авторизацію</translation>
     </message>
 </context>
 <context>
     <name>SubscriptionDialog</name>
     <message>
         <source>Subscription request - %1</source>
-        <translation type="unfinished">Запрос авторизации - %1</translation>
+        <translation>Запрос авторизації- %1</translation>
     </message>
     <message>
         <source>Chat</source>
-        <translation type="unfinished">Чат</translation>
+        <translation>Чат</translation>
     </message>
     <message>
         <source>Open chat window</source>
-        <translation type="unfinished">Открыть окно чата</translation>
+        <translation>Відкрити вікно чату</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished">Сообщение</translation>
+        <translation>Повідомлення</translation>
     </message>
     <message>
         <source>Send Message</source>
-        <translation type="unfinished">Послать сообщение</translation>
+        <translation>Надіслати повідомлення</translation>
     </message>
     <message>
         <source>VCard</source>
-        <translation type="unfinished">vCard</translation>
+        <translation>vCard</translation>
     </message>
     <message>
         <source>Show VCard</source>
-        <translation type="unfinished">Показать vCard</translation>
+        <translation>Показати vCard</translation>
     </message>
 </context>
 <context>
     <name>SubscriptionDialogClass</name>
     <message>
         <source>Add user to contact list</source>
-        <translation type="unfinished">Добавить пользователя в контакт-лист</translation>
+        <translation>Додати користувача у контакт-лист</translation>
     </message>
     <message>
         <source>Authorize presence subscription</source>
-        <translation type="unfinished">Авторизовать</translation>
+        <translation>Авторизувати</translation>
     </message>
     <message>
         <source>Remove presence subscription</source>
-        <translation type="unfinished">Удалить авторизацию</translation>
+        <translation>Видалитиь авторизацію</translation>
     </message>
 </context>
 </TS>

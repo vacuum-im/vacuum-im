@@ -5,233 +5,233 @@
     <name>FileTransfer</name>
     <message>
         <source>File Transfer</source>
-        <translation type="unfinished">Передача файла</translation>
+        <translation>Передача файлу</translation>
     </message>
     <message>
         <source>Send File</source>
-        <translation type="unfinished">Отправить файл</translation>
+        <translation>Відіслати файл</translation>
     </message>
     <message>
         <source>File transfer completed</source>
-        <translation type="unfinished">Передача файла завершена</translation>
+        <translation>Передача файлу завершена</translation>
     </message>
     <message>
         <source>Requested file transfer: %1</source>
-        <translation type="unfinished">Запрошена передача файла: %1</translation>
+        <translation>Запрошена передача файлу: %1</translation>
     </message>
     <message>
         <source>You received a request to transfer the file</source>
-        <translation type="unfinished">Вы получили запрос на передачу файла</translation>
+        <translation>Ви отримали запрос на передачу файлу</translation>
     </message>
     <message>
         <source>Completed transferring file: %1</source>
-        <translation type="unfinished">Завершена передача файла : %1</translation>
+        <translation>Завершена передача файлу : %1</translation>
     </message>
     <message>
         <source>Canceled transferring file: %1</source>
-        <translation type="unfinished">Отменена передача файла: %1</translation>
+        <translation>Відмінена передача файлу: %1</translation>
     </message>
     <message>
         <source>File transfer canceled: %1</source>
-        <translation type="unfinished">Передача файла отменена: %1</translation>
+        <translation>Передача файлу відмінена: %1</translation>
     </message>
     <message>
         <source>Auto sending file: %1</source>
-        <translation type="unfinished">Автоматическая отправка файла: %1</translation>
+        <translation>Автоматична відправка файлу: %1</translation>
     </message>
     <message>
         <source>File sending is started automatically</source>
-        <translation type="unfinished">Отправка файла запущена автоматически</translation>
+        <translation>Відправка файлу запущена автоматично</translation>
     </message>
     <message>
         <source>Auto receiving file: %1</source>
-        <translation type="unfinished">Автоматическое получение файла: %1</translation>
+        <translation>Автоматичне отримання файлу: %1</translation>
     </message>
     <message>
         <source>File receiving is started automatically</source>
-        <translation type="unfinished">Получение файла запущено автоматически</translation>
+        <translation>Отримання файлу запущено автоматично</translation>
     </message>
     <message>
         <source>Allows to send a file to another contact</source>
-        <translation type="unfinished">Позволяет передать файл другому контакту</translation>
+        <translation>Дозволяє передати файл іншому контакту</translation>
     </message>
     <message>
         <source>Supports the sending of the file to another contact</source>
-        <translation type="unfinished">Поддерживает передачу файла другому контакту</translation>
+        <translation>Підтримуе передачу файлу іншому контакту</translation>
     </message>
     <message>
         <source>Automatically receive files from contacts in roster</source>
-        <translation type="unfinished">Автоматически принимать файлы от контактов в ростере</translation>
+        <translation>Автоматично приймати файлы від контактів в ростері</translation>
     </message>
     <message>
         <source>Hide dialog after transfer started</source>
-        <translation type="unfinished">Прятать диалог после начала передачи</translation>
+        <translation>Ховати діалог після початку передачі</translation>
     </message>
     <message>
         <source>Automatically remove finished transfers</source>
-        <translation type="unfinished">Автоматически удалять завершенные передачи</translation>
+        <translation>Автоматично видаляти завершені передачі</translation>
     </message>
 </context>
 <context>
     <name>StreamDialog</name>
     <message>
         <source>Send File - %1</source>
-        <translation type="unfinished">Отправить файл - %1</translation>
+        <translation>Відправити файл - %1</translation>
     </message>
     <message>
         <source>Receive File - %1</source>
-        <translation type="unfinished">Получить файл - %1</translation>
+        <translation>Отримати файл - %1</translation>
     </message>
     <message>
         <source>B</source>
         <comment>Byte</comment>
-        <translation type="unfinished">Б</translation>
+        <translation>Б</translation>
     </message>
     <message>
         <source>KB</source>
         <comment>Kilobyte</comment>
-        <translation type="unfinished">КБ</translation>
+        <translation>КБ</translation>
     </message>
     <message>
         <source>MB</source>
         <comment>Megabyte</comment>
-        <translation type="unfinished">МБ</translation>
+        <translation>МБ</translation>
     </message>
     <message>
         <source>GB</source>
         <comment>Gigabyte</comment>
-        <translation type="unfinished">ГБ</translation>
+        <translation>ГБ</translation>
     </message>
     <message>
         <source>/sec</source>
-        <translation type="unfinished">/сек</translation>
+        <translation>/сек</translation>
     </message>
     <message>
         <source>Select file for receive</source>
-        <translation type="unfinished">Выберите файл для приёма</translation>
+        <translation>Виберіть файл для прийому</translation>
     </message>
     <message>
         <source>Continue file transfer</source>
-        <translation type="unfinished">Продолжить передачу файла</translation>
+        <translation>Продовжити передачу файлу</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">Предупреждение</translation>
+        <translation>Попередження</translation>
     </message>
     <message>
         <source>A file with this name already exists. Do you want to remove existing file?</source>
-        <translation type="unfinished">Файл с таким именем уже существует. Хотите удалить существующий файл?</translation>
+        <translation>Файл з таким ім’ям уже існуе. Хочете видалити існуючий файл?</translation>
     </message>
     <message>
         <source>Select file to send</source>
-        <translation type="unfinished">Выберите файл для отправки</translation>
+        <translation>Виберіть файл для відправки</translation>
     </message>
     <message>
         <source>Unable to send request for file transfer, check settings and try again!</source>
-        <translation type="unfinished">Не удалось отправить запрос на передачу файла, проверте настройки и попробуйте еще раз!</translation>
+        <translation>Не вдалось відправити запрос на передачу файлу, перевірте настройки і спробуйте ще раз!</translation>
     </message>
     <message>
         <source>Unable to start the file transfer, check settings and try again!</source>
-        <translation type="unfinished">Не удалось запустить передачу файла, проверте настройки и попробуйте еще раз!</translation>
+        <translation>Не вдалось запустити передачу файлу, перевірте настройки і спробуйте ще раз!</translation>
     </message>
     <message>
         <source>Are you sure you want to cancel a file transfer?</source>
-        <translation type="unfinished">Вы уверешы, что хотите отменить передачу файла?</translation>
+        <translation>Ви впевнені, що хочете відмінити передачу файлу?</translation>
     </message>
     <message>
         <source>Cancel file transfer</source>
-        <translation type="unfinished">Отмена передачи файла</translation>
+        <translation>Відміна передачі файлу</translation>
     </message>
     <message>
         <source>Can not delete existing file</source>
-        <translation type="unfinished">Не могу удалить существующий файл</translation>
+        <translation>Не можу відалити існуючий файл</translation>
     </message>
     <message>
         <source>Remove file</source>
-        <translation type="unfinished">Удалить файл</translation>
+        <translation>Видалити файл</translation>
     </message>
     <message>
         <source>Selected file does not exists</source>
-        <translation type="unfinished">Выбранный файл не существует</translation>
+        <translation>Вибраний файл не існуе</translation>
     </message>
     <message>
         <source>To:</source>
-        <translation type="unfinished">Кому:</translation>
+        <translation>Кому:</translation>
     </message>
     <message>
         <source>From:</source>
-        <translation type="unfinished">От:</translation>
+        <translation>Від кого:</translation>
     </message>
     <message>
         <source>Transfered %1 of %2.</source>
-        <translation type="unfinished">Передано %1 из %2.</translation>
+        <translation>Передано %1 из %2.</translation>
     </message>
     <message>
         <source>Speed %1.</source>
-        <translation type="unfinished">Скорость %1.</translation>
+        <translation>Швидкість %1.</translation>
     </message>
     <message>
         <source>Selected data stream is not available</source>
-        <translation type="unfinished">Выбранный поток данных не доступен</translation>
+        <translation>Вибранний потік данних не доступний</translation>
     </message>
     <message>
         <source>Please select at least one data stream</source>
-        <translation type="unfinished">Пожалуйста, выберите хотя бы один поток данных</translation>
+        <translation>Будь ласка, виберіть хоча б один потік данних</translation>
     </message>
     <message>
         <source>Data transmission terminated</source>
-        <translation type="unfinished">Передача данных прервана</translation>
+        <translation>Передача данних перервана</translation>
     </message>
     <message>
         <source>A file with this name, but a smaller size already exists.</source>
-        <translation type="unfinished">Файл с таким именем, но с меньшим размером уже существует.</translation>
+        <translation>Файл с таким іменем, але з меньшим розміром уже існуе.</translation>
     </message>
     <message>
         <source>If you want to change file name press &apos;Cancel&apos;</source>
-        <translation type="unfinished">Если хотите изменить имя файла, нажмине &apos;Отмена&apos;</translation>
+        <translation>Якщо хочете змінити ім’я файлу, натисніть &apos;Скасувати&apos;</translation>
     </message>
     <message>
         <source>If you want to download the rest of file press &apos;Yes&apos;</source>
-        <translation type="unfinished">Если хотите загрузить остаток файла, нажмине &apos;Да&apos;</translation>
+        <translation>Якщо хочете завантажити залишок файлу, натисніть &apos;Так&apos;</translation>
     </message>
     <message>
         <source>If you want to start download from the beginning press &apos;Retry&apos;</source>
-        <translation type="unfinished">Если хотите заново загрузить весь файл, нажмите &apos;Повторить&apos;</translation>
+        <translation>Якщо хочете заново завантажити весь файл, натисніть &apos;Повторити&apos;</translation>
     </message>
 </context>
 <context>
     <name>StreamDialogClass</name>
     <message>
         <source>To/From:</source>
-        <translation type="unfinished">К/От:</translation>
+        <translation>Кому/Від:</translation>
     </message>
     <message>
         <source>File:</source>
-        <translation type="unfinished">Файл:</translation>
+        <translation>Файл:</translation>
     </message>
     <message>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Описание:</translation>
+        <translation>Опис:</translation>
     </message>
     <message>
         <source>Progress:</source>
-        <translation type="unfinished">Прогресс:</translation>
+        <translation>Прогрес:</translation>
     </message>
     <message>
         <source>Status:</source>
-        <translation type="unfinished">Статус:</translation>
+        <translation>Статус:</translation>
     </message>
     <message>
         <source>Profile:</source>
-        <translation type="unfinished">Профиль:</translation>
+        <translation>Профіль:</translation>
     </message>
     <message>
         <source>Select data stream and settings profile</source>
-        <translation type="unfinished">Выберите поток данных и профиль настроек</translation>
+        <translation>Виберіть потік данних і профіль настроєк</translation>
     </message>
 </context>
 </TS>

@@ -5,107 +5,107 @@
     <name>SessionNegotiation</name>
     <message>
         <source>Session Negotiation</source>
-        <translation type="unfinished">Согласование сессии</translation>
+        <translation>Узгодження сесії</translation>
     </message>
     <message>
         <source>Negotiate session requests</source>
-        <translation type="unfinished">Запросы установки сессии</translation>
+        <translation>Запити установки сесії</translation>
     </message>
     <message>
         <source>Negotiate Session</source>
-        <translation type="unfinished">Согласовать сессию</translation>
+        <translation>Узгодити сессію</translation>
     </message>
     <message>
         <source>Terminate Session</source>
-        <translation type="unfinished">Разорвать сессию</translation>
+        <translation>Розірвати сесію</translation>
     </message>
     <message>
         <source>Allow multiple sessions?</source>
-        <translation type="unfinished">Разрешить множественные сессии?</translation>
+        <translation>Дозволити багатокористувальні сесії?</translation>
     </message>
     <message>
         <source>Session negotiation</source>
-        <translation type="unfinished">Согласование сессии</translation>
+        <translation>Узгодження сесії</translation>
     </message>
     <message>
         <source>Accept this session?</source>
-        <translation type="unfinished">Разрешить сессию?</translation>
+        <translation>Дозволити сесію?</translation>
     </message>
     <message>
         <source>Accept the Invitation?</source>
-        <translation type="unfinished">Принять приглашение?</translation>
+        <translation>Прийняти запрошення?</translation>
     </message>
     <message>
         <source>Another Resource</source>
-        <translation type="unfinished">Другой ресурс</translation>
+        <translation>Інший ресурс</translation>
     </message>
     <message>
         <source>Disclosure of Content</source>
-        <translation type="unfinished">Раскрытие содержания</translation>
+        <translation>Розкриття вмісту</translation>
     </message>
     <message>
         <source>Enable Chat State Notifications?</source>
-        <translation type="unfinished">Разрештить уведомления о статусе чата?</translation>
+        <translation>Дозволити сповіщення про статус чату?</translation>
     </message>
     <message>
         <source>Enable XHTML-IM formatting?</source>
-        <translation type="unfinished">Разрешить XHTML-IM форматирование?</translation>
+        <translation>Дозволити XHTML-IM форматування?</translation>
     </message>
     <message>
         <source>Primary Written Language of the Chat</source>
-        <translation type="unfinished">Основной язык переписки в чате</translation>
+        <translation>Основна мова листування в чаті</translation>
     </message>
     <message>
         <source>Enable Message Loggings?</source>
-        <translation type="unfinished">Разрешить протоколирование сообщений?</translation>
+        <translation>Дозволити протоколювання повідомлень?</translation>
     </message>
     <message>
         <source>Renegotiate the Session?</source>
-        <translation type="unfinished">Пересогласовать сессию?</translation>
+        <translation>Переузгодити сесію?</translation>
     </message>
     <message>
         <source>Minimum Security Level</source>
-        <translation type="unfinished">Минимальный уровень безопасности</translation>
+        <translation>Мінімальний рівень безпеки</translation>
     </message>
     <message>
         <source>Terminate the Session?</source>
-        <translation type="unfinished">Разорвать сессию?</translation>
+        <translation>Розірвати сесію?</translation>
     </message>
     <message>
         <source>Enable Message Receipts?</source>
-        <translation type="unfinished">Разрешить уведомления о доставке?</translation>
+        <translation>Дозволити сповіщення про доставку?</translation>
     </message>
     <message>
         <source>Session renegotiation</source>
-        <translation type="unfinished">Пересогласование сессии</translation>
+        <translation>Переузгодження сесії</translation>
     </message>
     <message>
         <source>Session negotiation - %1</source>
-        <translation type="unfinished">Пересогласование сессии - %1</translation>
+        <translation>Переузгодження сесії - %1</translation>
     </message>
     <message>
         <source>Set desirable session settings.</source>
-        <translation type="unfinished">Установите желаемые настройки сессии.</translation>
+        <translation>Встановити бажані настройки сесії.</translation>
     </message>
     <message>
         <source>Do you accept this session settings?</source>
-        <translation type="unfinished">Вы согласны с настройками сессии?</translation>
+        <translation>Ви згідні з настройками сесії?</translation>
     </message>
     <message>
         <source>Renegotiate this session?</source>
-        <translation type="unfinished">Пересогласовать сессию?</translation>
+        <translation>Переузгодити сесію?</translation>
     </message>
     <message>
         <source>Jabber Session Manager</source>
-        <translation type="unfinished">Диспетчер джаббер сессий</translation>
+        <translation>Менеджер джаббер сесій</translation>
     </message>
     <message>
         <source>Allows to set the session between two entities, which explains the rules of the exchange of XMPP stanzas</source>
-        <translation type="unfinished">Позволяет устанавливать сессию между двумя сущностями, которая определяет правила обмена XMPP строфами</translation>
+        <translation>Дозволяе встановлювати сесію між двома сутностями, що визначають правила обміну XMPP строфами</translation>
     </message>
     <message>
         <source>Supports the negotiating of the stanza session between two XMPP entities</source>
-        <translation type="unfinished">Поддерживает инициализацию сессии строф между двумя XMPP сущностями</translation>
+        <translation>Підтримуе ініціалізіцію сесії строф між двома XMPP сутностями</translation>
     </message>
 </context>
 </TS>

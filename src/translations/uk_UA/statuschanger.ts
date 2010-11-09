@@ -5,206 +5,208 @@
     <name>EditStatusDialog</name>
     <message>
         <source>Enter status name</source>
-        <translation type="unfinished">Введите имя статуса</translation>
+        <translation>Ведіть і’мя статуса</translation>
     </message>
     <message>
         <source>Status name:</source>
-        <translation type="unfinished">Имя статуса:</translation>
+        <translation>І’мя статуса:</translation>
     </message>
     <message>
         <source>Wrong status name</source>
-        <translation type="unfinished">Неверное имя статуса</translation>
+        <translation>Невірне і’мя статуса</translation>
     </message>
     <message>
         <source>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; allready exists</source>
-        <translation type="unfinished">Статус с именем &apos;&lt;b&gt;%1&lt;/b&gt;&apos; уже присутствует</translation>
+        <translation>Статус з іменем &apos;&lt;b&gt;%1&lt;/b&gt;&apos; вже присутній</translation>
     </message>
     <message>
         <source>Can&apos;t delete status</source>
-        <translation type="unfinished">Невозможно удалить статус</translation>
+        <translation>Неможливо видалити статус</translation>
     </message>
     <message>
         <source>You can not delete standard statuses.</source>
-        <translation type="unfinished">Вы не можете удалить стандартные статусы.</translation>
+        <translation>Ви не можете видалити стандартні статуси.</translation>
     </message>
     <message>
         <source>You can not delete active statuses.</source>
-        <translation type="unfinished">Вы не можете удалить активные статусы.</translation>
+        <translation>Ви не можете видалити активні статуси.</translation>
     </message>
     <message>
         <source>Delete status</source>
-        <translation type="unfinished">Удалить статус</translation>
+        <translation>Видалити статус</translation>
     </message>
     <message>
         <source>You are assured that wish to remove a status &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
-        <translation type="unfinished">Вы уверены, что хотите удалить статус &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</translation>
+        <translation>Ви впевнені що хочете видалити статус &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</translation>
     </message>
 </context>
 <context>
     <name>EditStatusDialogClass</name>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Додати</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Видалити</translation>
     </message>
     <message>
         <source>Edit statuses</source>
-        <translation type="unfinished">Редактировать статусы</translation>
+        <translation>Редагувати статуси</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>І’мя</translation>
     </message>
     <message>
         <source>Status name displayed in status change menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Ім’я статусу що відображается в меню зміни статусу</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished">Сообщение</translation>
+        <translation>Повідомлення</translation>
     </message>
     <message>
         <source>Status message</source>
-        <translation type="unfinished"></translation>
+        <translation>Повідомлення статусу</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished">Приоритет</translation>
+        <translation>Пріоритет</translation>
     </message>
     <message>
         <source>Status priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Пріоритет статусу</translation>
     </message>
     <message>
         <source>Status type&lt;br&gt;
 Types for standard statuses are grayed out.
 You can set status class for additional statuses defined by you.</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип статусу&lt;br&gt;
+Типи стандартних статусів виділені сірим кольором.
+Ви можете встановити статус клас для додаткових статусів визначених вами.</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип</translation>
     </message>
 </context>
 <context>
     <name>ModifyStatusDialogClass</name>
     <message>
         <source>Modify Status</source>
-        <translation type="unfinished">Изменить статус</translation>
+        <translation>Змінити статус</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Статус</translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>Ім’я</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished">Приоритет</translation>
+        <translation>Пріоритет</translation>
     </message>
 </context>
 <context>
     <name>StatusChanger</name>
     <message>
         <source>Connection errors</source>
-        <translation type="unfinished">Ошибки подключения</translation>
+        <translation>Помилки підключення</translation>
     </message>
     <message>
         <source>Offline</source>
-        <translation type="unfinished">Не в сети</translation>
+        <translation>Не в мережі</translation>
     </message>
     <message>
         <source>Online</source>
-        <translation type="unfinished">В сети</translation>
+        <translation>В мережі</translation>
     </message>
     <message>
         <source>Chat</source>
-        <translation type="unfinished">Готов общаться</translation>
+        <translation>Готовий до спілкування</translation>
     </message>
     <message>
         <source>Away</source>
-        <translation type="unfinished">Ушёл</translation>
+        <translation>Вийшов</translation>
     </message>
     <message>
         <source>Extended Away</source>
-        <translation type="unfinished">Ушёл надолго</translation>
+        <translation>Вийшов надовго</translation>
     </message>
     <message>
         <source>Do not disturb</source>
-        <translation type="unfinished">Не беспокоить</translation>
+        <translation>Не турбувати</translation>
     </message>
     <message>
         <source>Invisible</source>
-        <translation type="unfinished">Невидимый</translation>
+        <translation>Невидимый</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
+        <translation>Помилка</translation>
     </message>
     <message>
         <source>Unknown Status</source>
-        <translation type="unfinished">Неизвестный статус</translation>
+        <translation>Невідомий статус</translation>
     </message>
     <message>
         <source>Free for chat</source>
-        <translation type="unfinished">Поболтать</translation>
+        <translation>Поговорити</translation>
     </message>
     <message>
         <source>I`am away from my desk</source>
-        <translation type="unfinished">Отошел</translation>
+        <translation>Відійшов</translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation type="unfinished">Не доступен</translation>
+        <translation>Не доступний</translation>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation type="unfinished">Отключен</translation>
+        <translation>Відключенний</translation>
     </message>
     <message>
         <source>%1 - %2</source>
-        <translation type="unfinished">%1 - %2</translation>
+        <translation>%1 - %2</translation>
     </message>
     <message>
         <source>Connection error</source>
-        <translation type="unfinished">Ошибка подключения</translation>
+        <translation>Помилка підключення</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Статус</translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <source>Status Manager</source>
-        <translation type="unfinished">Диспетчер статусов</translation>
+        <translation>Менеджер статусів</translation>
     </message>
     <message>
         <source>Allows to change the status in Jabber network</source>
-        <translation type="unfinished">Позволяет изменять статус в джаббер сети</translation>
+        <translation>Дозволяе змінювати статус у джаббер мережі</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished">Подключение...</translation>
+        <translation>Підключення...</translation>
     </message>
     <message>
         <source>Modify Status</source>
-        <translation type="unfinished">Изменять статус</translation>
+        <translation>Змінювати статус</translation>
     </message>
     <message>
         <source>Edit Statuses</source>
-        <translation type="unfinished">Редактировать статусы</translation>
+        <translation>Редагувати статуси</translation>
     </message>
     <message>
         <source>Auto connect on startup</source>
-        <translation type="unfinished">Автоподключение при старте</translation>
+        <translation>Автопідключення при старті</translation>
     </message>
     <message>
         <source>Auto reconnect if disconnected</source>
-        <translation type="unfinished">Автоматически восстанавливать соединение</translation>
+        <translation>Автоматично відновлювати з’єднання</translation>
     </message>
 </context>
 </TS>

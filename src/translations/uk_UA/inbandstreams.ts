@@ -5,72 +5,72 @@
     <name>InBandOptions</name>
     <message>
         <source>Packet-Query (recommended)</source>
-        <translation type="unfinished">Пакет-Запрос (рекомендуется)</translation>
+        <translation>Пакет-Запит (рекомендуется)</translation>
     </message>
     <message>
         <source>Packet-Message</source>
-        <translation type="unfinished">Пакет-Сообщение</translation>
+        <translation>Пакет-Повідомлення</translation>
     </message>
 </context>
 <context>
     <name>InBandOptionsClass</name>
     <message>
         <source> Bytes</source>
-        <translation type="unfinished"> Байт</translation>
+        <translation> Байт</translation>
     </message>
     <message>
         <source>Size of data in packet:</source>
-        <translation type="unfinished">Размер данных в пакете:</translation>
+        <translation>Розмір данних в пакеті:</translation>
     </message>
     <message>
         <source>Maximum size of data in packet:</source>
-        <translation type="unfinished">Макс. размер данных в пакете:</translation>
+        <translation>Макс. розмір данних в пакеті:</translation>
     </message>
     <message>
         <source>Packet type:</source>
-        <translation type="unfinished">Тип пакета:</translation>
+        <translation>Тип пакету:</translation>
     </message>
 </context>
 <context>
     <name>InBandStream</name>
     <message>
         <source>Stream destroyed</source>
-        <translation type="unfinished">Подключение удалено</translation>
+        <translation>Підключення видаленно</translation>
     </message>
     <message>
         <source>Malformed data packet</source>
-        <translation type="unfinished">Неправильный пакет с данными</translation>
+        <translation>Неправильний пакет з данними</translation>
     </message>
     <message>
         <source>Failed to open stream</source>
-        <translation type="unfinished">Не удалось запустить подключение</translation>
+        <translation>Не вдалось запустити підключення</translation>
     </message>
     <message>
         <source>Block size is not acceptable</source>
-        <translation type="unfinished">Не приемлемый размер блока данных</translation>
+        <translation>Не дозволений розмір блоку данних</translation>
     </message>
     <message>
         <source>Failed to send data</source>
-        <translation type="unfinished">Не удалось отправить данные</translation>
+        <translation>Не вдалось відправити данні</translation>
     </message>
 </context>
 <context>
     <name>InBandStreams</name>
     <message>
         <source>Data is broken down into smaller chunks and transported in-band over XMPP</source>
-        <translation type="unfinished">Данные разбиваются на маленькие пакеты и передаются через XMPP канал</translation>
+        <translation>Данні розбиваются на маленькі пакети і передаются через XMPP канал</translation>
     </message>
     <message>
         <source>In-Band Data Stream</source>
-        <translation type="unfinished">Внутриканальный поток данных</translation>
+        <translation>Внутрішньоканальний потік данних</translation>
     </message>
     <message>
         <source>Allows to initiate in-band stream of data between two XMPP entities</source>
-        <translation type="unfinished">Позволяет инициировать внутриканальный поток данных между двумя XMPP сущностями</translation>
+        <translation>Дозволяе иніціювати внутрішньоканальний потік данних між двлма XMPP сутностями</translation>
     </message>
     <message>
         <source>Supports the initiating of the in-band stream of data between two XMPP entities</source>
-        <translation type="unfinished">Поддерживает инициализацию внутриканального потока данных между двумя XMPP сущностями</translation>
+        <translation>Підтримуе ініціалізацію внутрішньоканалного потоку данних між двома XMPP сутностями</translation>
     </message>
 </context>
 </TS>

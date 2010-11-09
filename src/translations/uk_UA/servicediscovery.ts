@@ -5,202 +5,202 @@
     <name>DiscoInfoWindow</name>
     <message>
         <source>Error %1: %2</source>
-        <translation type="unfinished">Ошибка %1: %2</translation>
+        <translation>Помилка %1: %2</translation>
     </message>
     <message>
         <source>Discovery Info - %1</source>
-        <translation type="unfinished">Обзорная информация - %1</translation>
+        <translation>Обзорна інформація - %1</translation>
     </message>
 </context>
 <context>
     <name>DiscoInfoWindowClass</name>
     <message>
         <source>Identities:</source>
-        <translation type="unfinished">Элементы:</translation>
+        <translation>Елементи:</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished">Категория</translation>
+        <translation>Категорія</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished">Тип</translation>
+        <translation>Тип</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>І’мя</translation>
     </message>
     <message>
         <source>Features:</source>
-        <translation type="unfinished">Возможности:</translation>
+        <translation>Можливості:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Описание:</translation>
+        <translation>Опис:</translation>
     </message>
     <message>
         <source>Update</source>
-        <translation type="unfinished">Обновить</translation>
+        <translation>Поновити</translation>
     </message>
     <message>
         <source>Extensions</source>
-        <translation type="unfinished">Расширения</translation>
+        <translation>Розширення</translation>
     </message>
 </context>
 <context>
     <name>DiscoItemsModel</name>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>І’мя</translation>
     </message>
     <message>
         <source>Jid</source>
-        <translation type="unfinished">JID</translation>
+        <translation>JID</translation>
     </message>
     <message>
         <source>Node</source>
-        <translation type="unfinished">Узел</translation>
+        <translation>Вузол</translation>
     </message>
     <message>
         <source>&lt;li&gt;&lt;b&gt;Identity:&lt;/b&gt;&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;&lt;b&gt;Элемент:&lt;/b&gt;&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;&lt;b&gt;Елемент:&lt;/b&gt;&lt;/li&gt;</translation>
     </message>
     <message>
         <source>&lt;li&gt;%1 (Category: &apos;%2&apos;; Type: &apos;%3&apos;)&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;%1 (Категория: &apos;%2&apos;; Тип: &apos;%3&apos;)&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;%1 (Категорія: &apos;%2&apos;; Тип: &apos;%3&apos;)&lt;/li&gt;</translation>
     </message>
     <message>
         <source>&lt;li&gt;&lt;b&gt;Features:&lt;/b&gt;&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;&lt;b&gt;Возможности:&lt;/b&gt;&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;&lt;b&gt;Можливості:&lt;/b&gt;&lt;/li&gt;</translation>
     </message>
     <message>
         <source>true</source>
-        <translation type="unfinished">Да</translation>
+        <translation>Так</translation>
     </message>
     <message>
         <source>false</source>
-        <translation type="unfinished">Нет</translation>
+        <translation>Ні</translation>
     </message>
     <message>
         <source>Error %1: %2</source>
-        <translation type="unfinished">Ошибка %1: %2</translation>
+        <translation>Помилка %1: %2</translation>
     </message>
 </context>
 <context>
     <name>DiscoItemsWindow</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Назад</translation>
+        <translation>Назад</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished">Вперед</translation>
+        <translation>Вперед</translation>
     </message>
     <message>
         <source>Discover</source>
-        <translation type="unfinished">Обзор</translation>
+        <translation>Огляд</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation type="unfinished">Обновить</translation>
+        <translation>Поновити</translation>
     </message>
     <message>
         <source>Disco info</source>
-        <translation type="unfinished">Информация</translation>
+        <translation>Інформація</translation>
     </message>
     <message>
         <source>Add Contact</source>
-        <translation type="unfinished">Добавить контакт</translation>
+        <translation>Додати контакт</translation>
     </message>
     <message>
         <source>vCard</source>
-        <translation type="unfinished">vCard</translation>
+        <translation>vCard</translation>
     </message>
     <message>
         <source>Service Discovery - %1</source>
-        <translation type="unfinished">Обзор сервисов - %1</translation>
+        <translation>Огляд сервісів - %1</translation>
     </message>
 </context>
 <context>
     <name>DiscoItemsWindowClass</name>
     <message>
         <source>Node:</source>
-        <translation type="unfinished">Узел:</translation>
+        <translation>Вузол:</translation>
     </message>
     <message>
         <source>Actions</source>
-        <translation type="unfinished">Действия</translation>
+        <translation>Дії</translation>
     </message>
     <message>
         <source>Item:</source>
-        <translation type="unfinished">Элемент:</translation>
+        <translation>Елемент:</translation>
     </message>
     <message>
         <source>Search:</source>
-        <translation type="unfinished">Поиск:</translation>
+        <translation>Пошук:</translation>
     </message>
 </context>
 <context>
     <name>ServiceDiscovery</name>
     <message>
         <source>Service Discovery</source>
-        <translation type="unfinished">Обзор сервисов</translation>
+        <translation>Огляд сервісів</translation>
     </message>
     <message>
         <source>JID Escaping</source>
-        <translation type="unfinished">Экранирование JID</translation>
+        <translation>Екранування JID</translation>
     </message>
     <message>
         <source>Discovery Info</source>
-        <translation type="unfinished">Обзорная информация</translation>
+        <translation>Оглядова інформація</translation>
     </message>
     <message>
         <source>Categoty: %1; Type: %2</source>
-        <translation type="unfinished">Категория: %1; Тип: %2</translation>
+        <translation>Категорія: %1; Тип: %2</translation>
     </message>
     <message>
         <source>Entity Capabilities</source>
-        <translation type="unfinished">Возможности объекта</translation>
+        <translation>Можливості об’екту</translation>
     </message>
     <message>
         <source>Allows to receive information about Jabber entities</source>
-        <translation type="unfinished">Позволяет получать информацию о джаббер сущностях</translation>
+        <translation>Дозволяе отримувати інформацію про джаббер сутності</translation>
     </message>
     <message>
         <source>Supports the exchange of the discovery information and items</source>
-        <translation type="unfinished">Поддерживает обмен обзорной информацией и элементами</translation>
+        <translation>Пцдтримуе обмін оглядовою інформацією та елементами</translation>
     </message>
     <message>
         <source>Discovery Information</source>
-        <translation type="unfinished">Обзорная информация</translation>
+        <translation>Оглядова інформація</translation>
     </message>
     <message>
         <source>Supports the exchange of the discovery information</source>
-        <translation type="unfinished">Поддерживает обмен обзорной информацией</translation>
+        <translation>Пцдтримуе обмін оглядовою інформацією</translation>
     </message>
     <message>
         <source>Discovery Items</source>
-        <translation type="unfinished">Обзорные элементы</translation>
+        <translation>Оглядові елементи</translation>
     </message>
     <message>
         <source>Supports the exchange of the discovery items</source>
-        <translation type="unfinished">Поддерживает обмен обзорными элементами</translation>
+        <translation>Пцдтримуе обмін оглядовими елементами</translation>
     </message>
     <message>
         <source>Publish Items</source>
-        <translation type="unfinished">Публикация элементов</translation>
+        <translation>Публікація елементів</translation>
     </message>
     <message>
         <source>Supports the publishing of the discovery items</source>
-        <translation type="unfinished">Поддерживает публикацию обзорных элементов</translation>
+        <translation>Підтримує публикацію обзорних елементів</translation>
     </message>
     <message>
         <source>Supports the caching of the discovery information</source>
-        <translation type="unfinished">Поддерживает кэширование обзорной информации</translation>
+        <translation>Підтримує кешування оглядової інформації</translation>
     </message>
     <message>
         <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
-        <translation type="unfinished">Поддерживает отобрадение джаббер идентификаторов с запрещенными символами</translation>
+        <translation>Підтримуе відображення джаббер ідентифікаторів з забороненими символами</translation>
     </message>
 </context>
 </TS>

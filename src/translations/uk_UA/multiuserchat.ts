@@ -5,839 +5,851 @@
     <name>EditUsersListDialog</name>
     <message>
         <source>Add new item</source>
-        <translation type="unfinished">Добавить элемент</translation>
+        <translation>Додати елемент</translation>
     </message>
     <message>
         <source>Enter new item JID:</source>
-        <translation type="unfinished">Введите новый JID:</translation>
+        <translation>Введіть новий JID:</translation>
     </message>
     <message>
         <source>Entered item JID is not valid or already exists.</source>
-        <translation type="unfinished">Введенный JID неправильный или уже существует.</translation>
+        <translation>Введений JID невірний або уже існуе.</translation>
     </message>
     <message>
         <source>Wrong item JID</source>
-        <translation type="unfinished">Неверный JID</translation>
+        <translation>Невірний JID</translation>
     </message>
 </context>
 <context>
     <name>EditUsersListDialogClass</name>
     <message>
         <source>Jid</source>
-        <translation type="unfinished">JID</translation>
+        <translation>JID</translation>
     </message>
     <message>
         <source>Reason</source>
-        <translation type="unfinished">Причина</translation>
+        <translation>Причина</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Додати</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Видалити</translation>
     </message>
 </context>
 <context>
     <name>JoinMultiChatDialog</name>
     <message>
         <source>Join conference</source>
-        <translation type="unfinished">Войти в конференцию</translation>
+        <translation>Зайти до конференції</translation>
     </message>
     <message>
         <source>%1 as %2</source>
         <comment>room as nick</comment>
-        <translation type="unfinished">%1 как %2</translation>
+        <translation>%1 як %2</translation>
     </message>
     <message>
         <source>Conference parameters is not acceptable.
 Check values and try again</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметри конференції неприйнятні перевірте параметри та спробуйте ще раз</translation>
     </message>
 </context>
 <context>
     <name>JoinMultiChatDialogClass</name>
     <message>
         <source>Identity:</source>
-        <translation type="unfinished">Подключение:</translation>
+        <translation>Підключення:</translation>
     </message>
     <message>
         <source>Room:</source>
-        <translation type="unfinished">Комната:</translation>
+        <translation>Кімната:</translation>
     </message>
     <message>
         <source>Nick:</source>
-        <translation type="unfinished">Ник:</translation>
+        <translation>Нік:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished">Пароль:</translation>
+        <translation>Пароль:</translation>
     </message>
     <message>
         <source>Resolve</source>
-        <translation type="unfinished">Определить</translation>
+        <translation>Визначити</translation>
     </message>
     <message>
         <source>History:</source>
-        <translation type="unfinished"></translation>
+        <translation>Історія:</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Видалити</translation>
     </message>
     <message>
         <source>Conference Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметри конференції</translation>
     </message>
     <message>
         <source>Service:</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервіс:</translation>
     </message>
 </context>
 <context>
     <name>MultiUserChat</name>
     <message>
         <source>Room configuration is not available.</source>
-        <translation type="unfinished">Настройка комнаты недоступна.</translation>
+        <translation>Настройка кімнати не доступна.</translation>
     </message>
     <message>
         <source>Room configuration accepted.</source>
-        <translation type="unfinished">Настройки комнаты применены.</translation>
+        <translation>НАстройки кімнати застосовані.</translation>
     </message>
     <message>
         <source>Request for list of %1s is failed: %2</source>
-        <translation type="unfinished">Не удалось получить список &apos;%1s&apos;: %2</translation>
+        <translation>Не вдалось отримати список &apos;%1s&apos;: %2</translation>
     </message>
     <message>
         <source>Changes in list of %1s was not accepted: %2</source>
-        <translation type="unfinished">Изменение в списке &apos;%1s&apos; не приняты: %2</translation>
+        <translation>Зміни в списку &apos;%1s&apos; не прийняті: %2</translation>
     </message>
     <message>
         <source>Changes in list of %1s was accepted.</source>
-        <translation type="unfinished">Изменения в списке &apos;%1s&apos; приняты.</translation>
+        <translation>Зміни в списку %1s прийняті.</translation>
     </message>
     <message>
         <source>Changes in list of %1s may not be accepted: %2</source>
-        <translation type="unfinished">Изменения в списке &apos;%1s&apos; не могут быть приняты: %2</translation>
+        <translation>Зміни в списку &apos;%1s&apos; не можуть бути прийняті: %2</translation>
     </message>
     <message>
         <source>Failed to send request for list of %1s.</source>
-        <translation type="unfinished">Не удалось отправить запрос списка &apos;%1s&apos;.</translation>
+        <translation>Не вдалось відіслати запит списку &apos;%1s&apos;.</translation>
     </message>
     <message>
         <source>Failed to send changes in list of %1s</source>
-        <translation type="unfinished">Не удалось отправить изменения в списке &apos;%1s&apos;</translation>
+        <translation>Не вдалось відіслати зміни в списку &apos;%1s&apos;</translation>
     </message>
     <message>
         <source>Room configuration request failed.</source>
-        <translation type="unfinished">Не удалось отправить запрос конфигурации комнаты.</translation>
+        <translation>Не вдалось відіслати запрос конфігурації кімнати.</translation>
     </message>
     <message>
         <source>Room configuration submit failed.</source>
-        <translation type="unfinished">Не удалось подтвердить конфигурацию комнаты.</translation>
+        <translation>Не вдалось підтвердити конфигурацію кімнати.</translation>
     </message>
     <message>
         <source>Room destruction request was sent.</source>
-        <translation type="unfinished">Запрос на уничтожение комнаты послан.</translation>
+        <translation>Запрос на знищення кімнати відправлений.</translation>
     </message>
 </context>
 <context>
     <name>MultiUserChatPlugin</name>
     <message>
         <source>Conferences</source>
-        <translation type="unfinished">Конференции</translation>
+        <translation>Конференції</translation>
     </message>
     <message>
         <source>Join conference</source>
-        <translation type="unfinished">Войти в конференцию</translation>
+        <translation>Зайти до конференції</translation>
     </message>
     <message>
         <source>Invite chat messages</source>
-        <translation type="unfinished">Приглашение в конференцию</translation>
+        <translation>Запрошення до конференції</translation>
     </message>
     <message>
         <source>Private conference messages</source>
-        <translation type="unfinished">Личные сообщения в конференции</translation>
+        <translation>Приватні повідомлення у конференції</translation>
     </message>
     <message>
         <source>Conference messages</source>
-        <translation type="unfinished">Сообщения в конференции</translation>
+        <translation>Повіжомлення у конференції</translation>
     </message>
     <message>
         <source>You are invited to the conference %1</source>
-        <translation type="unfinished">Вы приглашены в конференцию %1</translation>
+        <translation>Ви запрошені до конференції %1</translation>
     </message>
     <message>
         <source>Invitation received</source>
-        <translation type="unfinished">Получено приглашение</translation>
+        <translation>Отримано запрошення</translation>
     </message>
     <message>
         <source>You are invited to the conference %1 by %2.&lt;br&gt;Reason: %3</source>
-        <translation type="unfinished">%2 приглашает вас в конференцию %1. &lt;br&gt;Причина: %3</translation>
+        <translation>%2 запрошуе вас до конференції %1. &lt;br&gt;Причина: %3</translation>
     </message>
     <message>
         <source>Do you want to join this conference?</source>
-        <translation type="unfinished">Вы хотите присоединиться к этой конференции?</translation>
+        <translation>Ви хочете приеднатись до цієї конференції?</translation>
     </message>
     <message>
         <source>Invite</source>
-        <translation type="unfinished">Пригласить</translation>
+        <translation>Запросити</translation>
     </message>
     <message>
         <source>%1 as %2</source>
-        <translation type="unfinished">%1 как %2</translation>
+        <translation>%1 як %2</translation>
     </message>
     <message>
         <source>Hidden room</source>
-        <translation type="unfinished">Скрытая комната</translation>
+        <translation>Прихована кімната</translation>
     </message>
     <message>
         <source>A room that cannot be found by any user through normal means such as searching and service discovery</source>
-        <translation type="unfinished">Комната, которая не может быть найдена через поиск и обзор сервисов</translation>
+        <translation>Кімната, яка не може бути знайдена через пошук і огляд сервісів</translation>
     </message>
     <message>
         <source>Members-only room</source>
-        <translation type="unfinished">Комната только для участников</translation>
+        <translation>Кімната тільки для учасників</translation>
     </message>
     <message>
         <source>A room that a user cannot enter without being on the member list</source>
-        <translation type="unfinished">Комната, в которую не могут войти те, кто не состоит в списке участников</translation>
+        <translation>Кімната, в яку не можуть зайти ті, хто не включений до списку участників</translation>
     </message>
     <message>
         <source>Moderated room</source>
-        <translation type="unfinished">Модерируемая комната</translation>
+        <translation>Модеруєма кімната</translation>
     </message>
     <message>
         <source>A room in which only those with &apos;voice&apos; may send messages to all occupants</source>
-        <translation type="unfinished">Комната, в которой только те, у кого есть &apos;голос&apos;, могут посылать сообщение всем посетителям</translation>
+        <translation>Кімната в якій тільки ті, у кого є &apos;голос&apos;, можуть відсілати повідомлення усім присутнім</translation>
     </message>
     <message>
         <source>Non-anonymous room</source>
-        <translation type="unfinished">Не анонимная комната</translation>
+        <translation>Не анонимна кімната</translation>
     </message>
     <message>
         <source>A room in which an occupant&apos;s full JID is exposed to all other occupants</source>
-        <translation type="unfinished">Комната, в которой JID пользователей виден всем остальным пользователям</translation>
+        <translation>Кімната, в якій JID користувачів видимий усім іншим учасникам</translation>
     </message>
     <message>
         <source>Open room</source>
-        <translation type="unfinished">Открытая комната</translation>
+        <translation>Відкрита кімната</translation>
     </message>
     <message>
         <source>A room that anyone may enter without being on the member list</source>
-        <translation type="unfinished">Комната, в которую каждый может войти, не будучи в списке участников</translation>
+        <translation>Кімната, в яку кожен может зайти, не будучи в списку учасників</translation>
     </message>
     <message>
         <source>Password-protected room</source>
-        <translation type="unfinished">Комната, защищенная паролем</translation>
+        <translation>Кімната, захищена паролем</translation>
     </message>
     <message>
         <source>A room that a user cannot enter without first providing the correct password</source>
-        <translation type="unfinished">Комната, в которую пользователь может войти, только после предъявления правильного пароля</translation>
+        <translation>Кімната, в яку користувач может зайти, тільки після надання правильного паролю</translation>
     </message>
     <message>
         <source>Persistent room</source>
-        <translation type="unfinished">Постоянная комната</translation>
+        <translation>Постійна кімната</translation>
     </message>
     <message>
         <source>A room that is not destroyed if the last occupant exits</source>
-        <translation type="unfinished">Комната, которая не удаляется после выхода последнего пользователя</translation>
+        <translation>Кімната, яка не видаляется після виходу останнього користувача</translation>
     </message>
     <message>
         <source>Public room</source>
-        <translation type="unfinished">Публичная комната</translation>
+        <translation>Публічна кімната</translation>
     </message>
     <message>
         <source>A room that can be found by any user through normal means such as searching and service discovery</source>
-        <translation type="unfinished">Комната, которая может быть найдена через поиск и обзор сервисов</translation>
+        <translation>Кімната, яка може бути знайдена через пошук і огляд сервісів</translation>
     </message>
     <message>
         <source>Semi-anonymous room</source>
-        <translation type="unfinished">Полуанонимная комната</translation>
+        <translation>Напів анонімна кімната</translation>
     </message>
     <message>
         <source>A room in which an occupant&apos;s full JID can be discovered by room admins only</source>
-        <translation type="unfinished">Комната, в которой JID пользователей видят только аднимистраторы</translation>
+        <translation>Кімната, у якій JID користувачів бачать тільки адміністратори</translation>
     </message>
     <message>
         <source>Temporary room</source>
-        <translation type="unfinished">Временная комната</translation>
+        <translation>Тимчасова кімата</translation>
     </message>
     <message>
         <source>A room that is destroyed if the last occupant exits</source>
-        <translation type="unfinished">Комната, которая удаляется после выходя последнего пользователя</translation>
+        <translation>Кімната, яка видаляется після виходу останнього користувача</translation>
     </message>
     <message>
         <source>Unmoderated room</source>
-        <translation type="unfinished">Немодерируемая комната</translation>
+        <translation>Немодеруєма кімната</translation>
     </message>
     <message>
         <source>A room in which any occupant is allowed to send messages to all occupants</source>
-        <translation type="unfinished">Комната, в которой каждый может посылать сообщения всем пользователям</translation>
+        <translation>Кімната в якій всі, у кого є &apos;голос&apos;, можуть відсілати повідомлення усім присутнім</translation>
     </message>
     <message>
         <source>Unsecured room</source>
-        <translation type="unfinished">Незащищенная комната</translation>
+        <translation>Незахищена кімната</translation>
     </message>
     <message>
         <source>A room that anyone is allowed to enter without first providing the correct password</source>
-        <translation type="unfinished">Комната, в которую каждый может войти без предъявления правильного пароля</translation>
+        <translation>Кімната, в яку користувач может зайти, без надання правильного паролю</translation>
     </message>
     <message>
         <source>Invite to</source>
-        <translation type="unfinished">Пригласить в</translation>
+        <translation>Запросити в</translation>
     </message>
     <message>
         <source>%1 from %2</source>
-        <translation type="unfinished">%1 от %2</translation>
+        <translation>%1 від %2</translation>
     </message>
     <message>
         <source>I`am too busy right now</source>
-        <translation type="unfinished">Я слишком занят сейчас</translation>
+        <translation>Я надто зайнятий зараз</translation>
     </message>
     <message>
         <source>Decline invite</source>
-        <translation type="unfinished">Отклонить приглашение</translation>
+        <translation>Відхилити запрошення</translation>
     </message>
     <message>
         <source>Enter a reason</source>
-        <translation type="unfinished">Введите причину</translation>
+        <translation>Введіть причину</translation>
     </message>
     <message>
         <source>You are welcome here</source>
-        <translation type="unfinished">Вас здесь ждут</translation>
+        <translation>Вас тут чекають</translation>
     </message>
     <message>
         <source>Invite user</source>
-        <translation type="unfinished">Пригласить пользователя</translation>
+        <translation>Запросити користувача</translation>
     </message>
     <message>
         <source>Register in conference</source>
-        <translation type="unfinished">Зарегистрироватся в конференции</translation>
+        <translation>Зареєструватись у конференції</translation>
     </message>
     <message>
         <source>Allow this person to register with the room?</source>
-        <translation type="unfinished">Разрешить этому посетителю зарегистрироваться в комнате?</translation>
+        <translation>Дозволити цьому відвідувачу зареєструватись в кімнаті?</translation>
     </message>
     <message>
         <source>First Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>Им’я</translation>
     </message>
     <message>
         <source>Last Name</source>
-        <translation type="unfinished">Фамилия</translation>
+        <translation>Призвіще</translation>
     </message>
     <message>
         <source>Desired Nickname</source>
-        <translation type="unfinished">Желаемый ник</translation>
+        <translation>Бажаний нік</translation>
     </message>
     <message>
         <source>Your URL</source>
-        <translation type="unfinished">Ваш URL</translation>
+        <translation>Ваш URL</translation>
     </message>
     <message>
         <source>EMail Address</source>
-        <translation type="unfinished">Адрес E-mail</translation>
+        <translation>Адреса E-mail</translation>
     </message>
     <message>
         <source>Rules and Notes</source>
-        <translation type="unfinished">Правила и заметки</translation>
+        <translation>Правила і нотатки</translation>
     </message>
     <message>
         <source>Configure conference</source>
-        <translation type="unfinished">Настройка конференции</translation>
+        <translation>Настройка конференції</translation>
     </message>
     <message>
         <source>Allow Occupants to Invite Others?</source>
-        <translation type="unfinished">Разрешить пользователям посылать приглашения?</translation>
+        <translation>Дозволити користувачам відсилати запрошення?</translation>
     </message>
     <message>
         <source>Allow Occupants to Change Subject?</source>
-        <translation type="unfinished">Разрешить пользователям менять тему?</translation>
+        <translation>Дозволити користувачам міняти тему?</translation>
     </message>
     <message>
         <source>Enable Logging of Room Conversations?</source>
-        <translation type="unfinished">Включить протоколирование разговоров комнаты?</translation>
+        <translation>Включити протоколювання розмов кімнати?</translation>
     </message>
     <message>
         <source>Natural Language for Room Discussions</source>
-        <translation type="unfinished">Основной язык общения в комнате</translation>
+        <translation>Основна мова спілкування в кімнаті</translation>
     </message>
     <message>
         <source>Maximum Number of Room Occupants</source>
-        <translation type="unfinished">Максимальное количество пользователей в комнате</translation>
+        <translation>Максимальна кількість учасників в кімнаті</translation>
     </message>
     <message>
         <source>Make Room Members-Only?</source>
-        <translation type="unfinished">Сделать комнату только для участников?</translation>
+        <translation>Зробити кімнату тільки для учасників?</translation>
     </message>
     <message>
         <source>Make Room Moderated?</source>
-        <translation type="unfinished">Сделать комнату модерируемой?</translation>
+        <translation>Зробити кімнату модеруємою?</translation>
     </message>
     <message>
         <source>Password is Required to Enter?</source>
-        <translation type="unfinished">Сделать комнату защищенной паролем?</translation>
+        <translation>Зробіти кімнату захищену паролем?</translation>
     </message>
     <message>
         <source>Make Room Persistent?</source>
-        <translation type="unfinished">Сделать комнату постоянной?</translation>
+        <translation>Зробити кімнату постійною?</translation>
     </message>
     <message>
         <source>Roles for which Presence is Broadcast:</source>
-        <translation type="unfinished">Типы пользователей, которым рассылается статус:</translation>
+        <translation>Типи користувачів, яким розсилается статус:</translation>
     </message>
     <message>
         <source>Allow Public Searching for Room?</source>
-        <translation type="unfinished">Сделать комнату видимой всем?</translation>
+        <translation>Зробити кімнату видимою усім?</translation>
     </message>
     <message>
         <source>Full List of Room Admins</source>
-        <translation type="unfinished">Полный список администраторов комнаты</translation>
+        <translation>Повний список адміністраторів кімнати</translation>
     </message>
     <message>
         <source>Description of Room</source>
-        <translation type="unfinished">Описание комнаты</translation>
+        <translation>Опис кімнати</translation>
     </message>
     <message>
         <source>Natural-Language Room Name</source>
-        <translation type="unfinished">Название комнаты</translation>
+        <translation>Назва кімнати</translation>
     </message>
     <message>
         <source>Full List of Room Owners</source>
-        <translation type="unfinished">Полный список владельцев комнаты</translation>
+        <translation>Повний список власників кімнати</translation>
     </message>
     <message>
         <source>The Room Password</source>
-        <translation type="unfinished">Пароль комнаты</translation>
+        <translation>Пароль кімнати</translation>
     </message>
     <message>
         <source>Affiliations that May Discover Real JIDs of Occupants</source>
-        <translation type="unfinished">Сделать реальные JID пользователей видимыми</translation>
+        <translation>Зробити реальні JID користувачів видимими</translation>
     </message>
     <message>
         <source>Conference information</source>
-        <translation type="unfinished">Информация о конференции</translation>
+        <translation>Інформація про конференцію</translation>
     </message>
     <message>
         <source>Contact JID</source>
-        <translation type="unfinished">Контактный JID</translation>
+        <translation>Контактний JID</translation>
     </message>
     <message>
         <source>Natural Language for Room</source>
-        <translation type="unfinished">Основной язык общения в комнате</translation>
+        <translation>Основна мова спілкування в кімнаті</translation>
     </message>
     <message>
         <source>LDAP Group</source>
-        <translation type="unfinished">Группа LDAP</translation>
+        <translation>Группа LDAP</translation>
     </message>
     <message>
         <source>URL for Archived Discussion Logs</source>
-        <translation type="unfinished">URL для архива протоколов общения</translation>
+        <translation>URL для архіву протоколів спілкування</translation>
     </message>
     <message>
         <source>Current Number of Occupants in Room</source>
-        <translation type="unfinished">Текущее количество пользователей в комнате</translation>
+        <translation>Текуча кількість участників в кімнаті</translation>
     </message>
     <message>
         <source>Current Subject or Discussion Topic in Room</source>
-        <translation type="unfinished">Текущая тема в комнате</translation>
+        <translation>Текуча тема в кімнаті</translation>
     </message>
     <message>
         <source>The Room Subject Can be Modified by Participants?</source>
-        <translation type="unfinished">Тема комнаты может меняться пользователями?</translation>
+        <translation>Тема кімнати може змінюватись користувачем?</translation>
     </message>
     <message>
         <source>Request for voice</source>
-        <translation type="unfinished">Запрос &apos;голоса&apos;</translation>
+        <translation>Запрос &apos;голосу&apos;</translation>
     </message>
     <message>
         <source>Requested Role</source>
-        <translation type="unfinished">Запрошенный тип</translation>
+        <translation>Запрошений тип</translation>
     </message>
     <message>
         <source>User ID</source>
-        <translation type="unfinished">ID пользователя</translation>
+        <translation>ID користувача</translation>
     </message>
     <message>
         <source>Room Nickname</source>
-        <translation type="unfinished">Ник в комнате</translation>
+        <translation>Нік у кімнаті</translation>
     </message>
     <message>
         <source>Grant Voice?</source>
-        <translation type="unfinished">Предоставить &apos;голос&apos;?</translation>
+        <translation>Дати &apos;голос&apos;?</translation>
     </message>
     <message>
         <source>Make participants list public?</source>
-        <translation type="unfinished">Сделать список участников видимым всем?</translation>
+        <translation>Зробити список учасників видимим всім?</translation>
     </message>
     <message>
         <source>Allow visitors to send status text in presence updates?</source>
-        <translation type="unfinished">Разрешить гостям вставлять текcт статуса в сообщения о присутствии?</translation>
+        <translation>Дозволити гостям вставляти текcт статуса в повідомлення про присутність?</translation>
     </message>
     <message>
         <source>Allow visitors to change nickname?</source>
-        <translation type="unfinished">Разрешить гостям изменять ник?</translation>
+        <translation>Дозволити гостям міняти нік?</translation>
     </message>
     <message>
         <source>Default occupants as participants?</source>
-        <translation type="unfinished">Сделать пользователей участниками по умолчанию?</translation>
+        <translation>Зробити учасників учасниками за замовчуванням?</translation>
     </message>
     <message>
         <source>Allow occupants to send private messages?</source>
-        <translation type="unfinished">Разрешить пользователям посылать приватные сообщения?</translation>
+        <translation>Дозволити користувачам відсилати приватні повідомлення?</translation>
     </message>
     <message>
         <source>Allow occupants to query other occupants?</source>
-        <translation type="unfinished">Разрешить пользователям посылать iq-запросы?</translation>
+        <translation>Дозволити користувачам відсилати iq запроси?</translation>
     </message>
     <message>
         <source>Multi-User Conferences</source>
-        <translation type="unfinished">Многопользовательские конференции</translation>
+        <translation>Багатокористувацькі конференції</translation>
     </message>
     <message>
         <source>Allows to use Jabber multi-user conferences</source>
-        <translation type="unfinished">Позволяет использовать многопользовательские джаббер конференции</translation>
+        <translation>Дозволяе використовувати багатокористувацькі джаббер конференції</translation>
     </message>
     <message>
         <source>Supports the multi-user conferences</source>
-        <translation type="unfinished">Поддерживает многопользовательские конференции</translation>
+        <translation>Підтримуе багатокористувацькі конференції</translation>
     </message>
     <message>
         <source>Mention in conference</source>
-        <translation type="unfinished">Обращение в конференции</translation>
+        <translation>Звертання у конференції</translation>
     </message>
     <message>
         <source>Leave all hidden conferences</source>
-        <translation type="unfinished">Покинуть все скрытые конференции</translation>
+        <translation>Залишити всі приховані конференції</translation>
     </message>
     <message>
         <source>Show all hidden conferences</source>
-        <translation type="unfinished">Показать все скрытые конференции</translation>
+        <translation>Показати всі приховані конференції</translation>
+    </message>
+    <message>
+        <source>Show users connections/disconnections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show users status changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save status messages to history</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
     <message>
         <source>New message in conference: %1</source>
-        <translation type="unfinished">Новое сообщение в конференции: %1</translation>
+        <translation>Нове повідомлення у конференції: %1</translation>
     </message>
     <message>
         <source>Conference message</source>
-        <translation type="unfinished">Сообщение в конференции</translation>
+        <translation>Повідомлення у конференції</translation>
     </message>
     <message>
         <source>Private message from: [%1]</source>
-        <translation type="unfinished">Личное сообщение от: [%1]</translation>
+        <translation>Осодисте повідомлення від: [%1]</translation>
     </message>
     <message>
         <source>Private message</source>
-        <translation type="unfinished">Личное сообщение</translation>
+        <translation>Приватне повідомлення</translation>
     </message>
     <message>
         <source>Data form received from: %1</source>
-        <translation type="unfinished">Получена форма данных от: %1</translation>
+        <translation>Отримана форма данних від: %1</translation>
     </message>
     <message>
         <source>Data form received</source>
-        <translation type="unfinished">Получена форма данных</translation>
+        <translation>Отримана форма данних</translation>
     </message>
     <message>
         <source>Data form received: %1</source>
-        <translation type="unfinished">Получена форма данных от: %1</translation>
+        <translation>Отримана форма данних від: %1</translation>
     </message>
     <message>
         <source>Change room nick</source>
-        <translation type="unfinished">Изменить ник</translation>
+        <translation>Змінити нік</translation>
     </message>
     <message>
         <source>Change topic</source>
-        <translation type="unfinished">Изменить тему</translation>
+        <translation>Змінити тему</translation>
     </message>
     <message>
         <source>Clear chat window</source>
-        <translation type="unfinished">Очистить окно чата</translation>
+        <translation>Очистити вікно чату</translation>
     </message>
     <message>
         <source>Invite to this room</source>
-        <translation type="unfinished">Пригласить в эту комнату</translation>
+        <translation>Запросити до цієї кімнати</translation>
     </message>
     <message>
         <source>Request voice</source>
-        <translation type="unfinished">Запросить голос</translation>
+        <translation>Запитати голос</translation>
     </message>
     <message>
         <source>Edit ban list</source>
-        <translation type="unfinished">Редактировать список банов</translation>
+        <translation>Редагувати список банів</translation>
     </message>
     <message>
         <source>Edit members list</source>
-        <translation type="unfinished">Редактировать список участников</translation>
+        <translation>Редагувати список учасників</translation>
     </message>
     <message>
         <source>Edit administrators list</source>
-        <translation type="unfinished">Редактировать список администраторов</translation>
+        <translation>Редагувати список адміністраторів</translation>
     </message>
     <message>
         <source>Edit owners list</source>
-        <translation type="unfinished">Редактировать список владельцев</translation>
+        <translation>Редагувати список власників</translation>
     </message>
     <message>
         <source>Configure room</source>
-        <translation type="unfinished">Настроить комнату</translation>
+        <translation>Настроїти кімнату</translation>
     </message>
     <message>
         <source>Destroy room</source>
-        <translation type="unfinished">Уничтожить комнату</translation>
+        <translation>Знищити кімнату</translation>
     </message>
     <message>
         <source>Room Utilities</source>
-        <translation type="unfinished">Утилиты комнаты</translation>
+        <translation>Утиліти кімнати</translation>
     </message>
     <message>
         <source>Kick user</source>
-        <translation type="unfinished">Выгнать</translation>
+        <translation>Вигнати</translation>
     </message>
     <message>
         <source>Ban user</source>
-        <translation type="unfinished">Забанить</translation>
+        <translation>Забанити</translation>
     </message>
     <message>
         <source>Change Role</source>
-        <translation type="unfinished">Изменить тип</translation>
+        <translation>Змінити тип</translation>
     </message>
     <message>
         <source>Visitor</source>
-        <translation type="unfinished">Гость</translation>
+        <translation>Гість</translation>
     </message>
     <message>
         <source>Participant</source>
-        <translation type="unfinished">Пользователь</translation>
+        <translation>Користувач</translation>
     </message>
     <message>
         <source>Moderator</source>
-        <translation type="unfinished">Модератор</translation>
+        <translation>Модератор</translation>
     </message>
     <message>
         <source>Change Affiliation</source>
-        <translation type="unfinished">Изменить членство</translation>
+        <translation>Змінити членство</translation>
     </message>
     <message>
         <source>Any occupant is allowed to see the user&apos;s full JID</source>
-        <translation type="unfinished">Каждый может видеть реальный JID пользователей</translation>
+        <translation>Кожний може бачити реальний JID користувачів</translation>
     </message>
     <message>
         <source>%1 affiliation changed while not in the room</source>
-        <translation type="unfinished">У %1 членство изменилось во время отсутствия</translation>
+        <translation>У %1 членство змінилось за час відсутності</translation>
     </message>
     <message>
         <source>Room configuration change has occurred</source>
-        <translation type="unfinished">Произошло изменение конфигурации комнаты</translation>
+        <translation>Виникла зміна конфігурації кімнати</translation>
     </message>
     <message>
         <source>Room logging is now enabled</source>
-        <translation type="unfinished">Протоколирование сообщений в комнате включено</translation>
+        <translation>Протоколювання повідомлень в кімнаті включено</translation>
     </message>
     <message>
         <source>Room logging is now disabled</source>
-        <translation type="unfinished">Протоколирование сообщений в комнате выключено</translation>
+        <translation>Протоколювання повідомлень в кімнаті вимкнено</translation>
     </message>
     <message>
         <source>The room is now non-anonymous</source>
-        <translation type="unfinished">Комната не анонимная</translation>
+        <translation>Кімната не анонімна</translation>
     </message>
     <message>
         <source>The room is now semi-anonymous</source>
-        <translation type="unfinished">Комната полуанонимная</translation>
+        <translation>Кімната напів-анонімна</translation>
     </message>
     <message>
         <source>The room is now fully-anonymous</source>
-        <translation type="unfinished">Комната поностью анонимная</translation>
+        <translation>Кімната повністю анонімна</translation>
     </message>
     <message>
         <source>A new room has been created</source>
-        <translation type="unfinished">Была создана новая комната</translation>
+        <translation>Була створена новая кімната</translation>
     </message>
     <message>
         <source>%1 has been removed from the room because of an affiliation change</source>
-        <translation type="unfinished">%1 был удален из комнаты из-за изменения членства</translation>
+        <translation>%1 був видалений з кімнати із-за зміни членства</translation>
     </message>
     <message>
         <source>%1 has been removed from the room because the room has been changed to members-only</source>
-        <translation type="unfinished">%1 был удален из комнаты из-за установления статуса &quot;только для участников&quot;</translation>
+        <translation>%1 був видалений з кімнатиіз-за встановленого статусу &quot;тілько для учасників&quot;</translation>
     </message>
     <message>
         <source>%1 is being removed from the room because of a system shutdown</source>
-        <translation type="unfinished">%1 был удален из комнаты из-за выключения системы</translation>
+        <translation>%1 був видалений з кімнаты із-за вимкнення системи</translation>
     </message>
     <message>
         <source>User %1 is not present in the conference</source>
-        <translation type="unfinished">Пользователь %1 не присутствует в конференции</translation>
+        <translation>Користувач %1 не присутній в конференції</translation>
     </message>
     <message>
         <source>%1 is not valid contact JID</source>
-        <translation type="unfinished">%1 не является правильным JID</translation>
+        <translation>%1 не являєтся правильним JID</translation>
     </message>
     <message>
         <source>%1 is not valid room JID</source>
-        <translation type="unfinished">%1 не является правильным JID комнаты</translation>
+        <translation>%1 не являєтся правильним JID кімнати</translation>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation type="unfinished">Отключен</translation>
+        <translation>Від’єднаний</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="unfinished">%1 (%2)</translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>%1 - Private chat</source>
-        <translation type="unfinished">%1 - Личные сообщения</translation>
+        <translation>%1 - Особисті повідомлення</translation>
     </message>
     <message>
         <source>Notify: %1</source>
-        <translation type="unfinished">Уведомление: %1</translation>
+        <translation>Сповіщення: %1</translation>
     </message>
     <message>
         <source>Error: %1</source>
-        <translation type="unfinished">Ошибка: %1</translation>
+        <translation>Помилка: %1</translation>
     </message>
     <message>
         <source>%1 role changed from %2 to %3</source>
-        <translation type="unfinished">Тип пользователя %1 был изменен с %2 на %3</translation>
+        <translation>Тип користувача %1 був змінений з %2 на %3</translation>
     </message>
     <message>
         <source>%1 affiliation changed from %2 to %3</source>
-        <translation type="unfinished">Членство %1 было изменено с %2 на %3</translation>
+        <translation>Членство %1 було змінено з %2 на %3</translation>
     </message>
     <message>
         <source>%1 changed nick to %2</source>
-        <translation type="unfinished">%1 изменил ник на %2</translation>
+        <translation>%1 змінив нік на %2</translation>
     </message>
     <message>
         <source>Subject: %1</source>
-        <translation type="unfinished">Тема: %1</translation>
+        <translation>Тема: %1</translation>
     </message>
     <message>
         <source>%1 has changed the subject to: %2</source>
-        <translation type="unfinished">%1 изменил тему на: %2</translation>
+        <translation>%1 змінив тему на: %2</translation>
     </message>
     <message>
         <source>%1 has declined your invite to this room. %2</source>
-        <translation type="unfinished">%1 отклонил ваше приглашение в эту комнату. %2</translation>
+        <translation>%1 відхилив ваше запрошення в цю кімнату. %2</translation>
     </message>
     <message>
         <source>%1 has been kicked from the room%2. %3</source>
-        <translation type="unfinished">%1 был выкинут из комнаты%2. %3</translation>
+        <translation>%1 був викинутий з кімнати%2. %3</translation>
     </message>
     <message>
         <source> by %1</source>
-        <translation type="unfinished"> модератором %1</translation>
+        <translation> модератором %1</translation>
     </message>
     <message>
         <source>%1 has been banned from the room%2. %3</source>
-        <translation type="unfinished">%1 был забанен в комнате%2. %3</translation>
+        <translation>%1 був забанений в кімнаті%2. %3</translation>
     </message>
     <message>
         <source>Edit ban list - %1</source>
-        <translation type="unfinished">Редактировать список банов - %1</translation>
+        <translation>Редагувати список банів - %1</translation>
     </message>
     <message>
         <source>Edit members list - %1</source>
-        <translation type="unfinished">Редактировать список участников - %1</translation>
+        <translation>Редагувати список учасників - %1</translation>
     </message>
     <message>
         <source>Edit administrators list - %1</source>
-        <translation type="unfinished">Редактировать список администраторов - %1</translation>
+        <translation>Редагувати список адміністраторів - %1</translation>
     </message>
     <message>
         <source>Edit owners list - %1</source>
-        <translation type="unfinished">Редактировать список владельцев - %1</translation>
+        <translation>Редагувати список власників - %1</translation>
     </message>
     <message>
         <source>This room was destroyed by owner. %1</source>
-        <translation type="unfinished">Комната была уничтожена владельцем. %1</translation>
+        <translation>Кімната була знищена власником. %1</translation>
     </message>
     <message>
         <source>Change nick name</source>
-        <translation type="unfinished">Изменить ник</translation>
+        <translation>Змінити нік</translation>
     </message>
     <message>
         <source>Enter your new nick name in room %1</source>
-        <translation type="unfinished">Введите ваш новый ник в комнате %1</translation>
+        <translation>Введіть ваш новий нік в кімнаті %1</translation>
     </message>
     <message>
         <source>Change subject</source>
-        <translation type="unfinished">Изменить тему</translation>
+        <translation>Змінити тему</translation>
     </message>
     <message>
         <source>Enter new subject for room %1</source>
-        <translation type="unfinished">Введите новую тему для комнаты %1</translation>
+        <translation>Введіть нову тему для кімнати %1</translation>
     </message>
     <message>
         <source>Invite user</source>
-        <translation type="unfinished">Пригласить пользователя</translation>
+        <translation>Запросити користувача</translation>
     </message>
     <message>
         <source>Enter user JID:</source>
-        <translation type="unfinished">Введите JID пользователя:</translation>
+        <translation>Введіть JID користувача:</translation>
     </message>
     <message>
         <source>You are welcome here</source>
-        <translation type="unfinished">Вас здесь ждут</translation>
+        <translation>Вас тут чекають</translation>
     </message>
     <message>
         <source>Enter a reason:</source>
-        <translation type="unfinished">Введите причину:</translation>
+        <translation>Введіть причину:</translation>
     </message>
     <message>
         <source>Destroying room</source>
-        <translation type="unfinished">Уничтожение комнаты</translation>
+        <translation>Знищення кімнати</translation>
     </message>
     <message>
         <source>Kick reason</source>
-        <translation type="unfinished">Причина отключения</translation>
+        <translation>Причина відключення</translation>
     </message>
     <message>
         <source>Enter reason for kick</source>
-        <translation type="unfinished">Введите причину отключения</translation>
+        <translation>Введіть причину відключення</translation>
     </message>
     <message>
         <source>Ban reason</source>
-        <translation type="unfinished">Причина бана</translation>
+        <translation>Причина бану</translation>
     </message>
     <message>
         <source>Enter reason for ban</source>
-        <translation type="unfinished">Введите причину бана</translation>
+        <translation>Введіть причину бану</translation>
     </message>
     <message>
         <source>%1 - Conference</source>
-        <translation type="unfinished">%1 - Конференция</translation>
+        <translation>%1 - Конференція</translation>
     </message>
     <message>
         <source>Tools</source>
-        <translation type="unfinished">Инструменты</translation>
+        <translation>Інструменти</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">Нет</translation>
+        <translation>Ні</translation>
     </message>
     <message>
         <source>Member</source>
-        <translation type="unfinished">Участник</translation>
+        <translation>Учасник</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation type="unfinished">Администратор</translation>
+        <translation>Адміністратор</translation>
     </message>
     <message>
         <source>Owner</source>
-        <translation type="unfinished">Владелец</translation>
+        <translation>Власник</translation>
     </message>
     <message>
         <source>[%1] in conference %2</source>
-        <translation type="unfinished">[%1] в конференции %2</translation>
+        <translation>[%1] у конференції %2</translation>
     </message>
     <message>
         <source>Supported list of commands: 
@@ -849,67 +861,67 @@ Check values and try again</source>
  /nick &lt;newnick&gt; 
  /leave [comment] 
  /topic &lt;foo&gt;</source>
-        <translation type="unfinished">Список поддерживаемых команд:
- /ban &lt;ник&gt; [комментарий] 
- /invite &lt;jid&gt; [комментарий] 
- /join &lt;комната&gt; [пароль] 
- /kick &lt;ник&gt; [комментарий] 
- /msg &lt;ник&gt; &lt;сообщение&gt; 
- /nick &lt;новый_ник&gt; 
- /leave [коментарий] 
+        <translation>Список команд що підтримуются:
+ /ban &lt;нік&gt; [комментар] 
+ /invite &lt;jid&gt; [комментар] 
+ /join &lt;кімната&gt; [пароль] 
+ /kick &lt;нік&gt; [комментар] 
+ /msg &lt;нік&gt; &lt;повідомлення&gt; 
+ /nick &lt;новый_нік&gt; 
+ /leave [коментар] 
  /topic &lt;тема&gt;</translation>
     </message>
     <message>
         <source>%1 changed status to [%2] %3</source>
-        <translation type="unfinished">%1 изменил статус на [%2] %3</translation>
+        <translation>%1 змінив статус на [%2] %3</translation>
     </message>
     <message>
         <source>Role: %1</source>
-        <translation type="unfinished">Тип: %1</translation>
+        <translation>Тип: %1</translation>
     </message>
     <message>
         <source>Affiliation: %1</source>
-        <translation type="unfinished">Членство: %1</translation>
+        <translation>Членство: %1</translation>
     </message>
     <message>
         <source>Status:</source>
-        <translation type="unfinished">Статус:</translation>
+        <translation>Статус:</translation>
     </message>
     <message>
         <source>Enter room</source>
-        <translation type="unfinished">Войти в комнату</translation>
+        <translation>Зайти до кімнати</translation>
     </message>
     <message>
         <source>Exit room</source>
-        <translation type="unfinished">Выйти из комнаты</translation>
+        <translation>Выйти з кімнати</translation>
     </message>
     <message>
         <source>Ctrl+F4</source>
-        <translation type="unfinished">Ctrl+F4</translation>
+        <translation>Ctrl+F4</translation>
     </message>
     <message>
         <source>%1 &lt;%2&gt; has joined the room. %3</source>
-        <translation type="unfinished">%1 &lt;%2&gt; присоединился к комнате. %3</translation>
+        <translation>%1 &lt;%2&gt; приєднався до кімнати. %3</translation>
     </message>
     <message>
         <source>%1 has joined the room. %2</source>
-        <translation type="unfinished">%1 присоединился к комнате. %2</translation>
+        <translation>%1 приеднався до кімнати. %2</translation>
     </message>
     <message>
         <source>%1 &lt;%2&gt; has left the room. %3</source>
-        <translation type="unfinished">%1 &lt;%2&gt; вышел из комнаты. %3</translation>
+        <translation>%1 &lt;%2&gt; вийшов з кімнати. %3</translation>
     </message>
     <message>
         <source>%1 has left the room. %2</source>
-        <translation type="unfinished">%1 вышел из комнаты. %2</translation>
+        <translation>%1 вийшов з кімнати. %2</translation>
     </message>
     <message>
         <source>Mention message in conference: %1</source>
-        <translation type="unfinished">Сообщение с обращением в конференции: %1</translation>
+        <translation>Повідомлення з звертанням в конференції: %1</translation>
     </message>
     <message>
         <source>Mention in conference</source>
-        <translation type="unfinished">Обращение в конференции</translation>
+        <translation>Звертання у конференції</translation>
     </message>
 </context>
 </TS>

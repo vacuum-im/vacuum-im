@@ -5,11 +5,11 @@
     <name>XmppUriQueries</name>
     <message>
         <source>XMPP URI Queries</source>
-        <translation type="unfinished">XMPP URI запросы</translation>
+        <translation>XMPP URI запроси</translation>
     </message>
     <message>
         <source>Allows other plugins to handle XMPP URI queries</source>
-        <translation type="unfinished">Позволяет другим модулям обрабатывать XMPP URI запросы</translation>
+        <translation>Дозволяе іншим модулям обробляти XMPP URI запроси</translation>
     </message>
 </context>
 </TS>

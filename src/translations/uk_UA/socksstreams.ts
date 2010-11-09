@@ -5,121 +5,121 @@
     <name>SocksOptionsClass</name>
     <message>
         <source>Incoming Direct Connections</source>
-        <translation type="unfinished">Входящее прямое подключение</translation>
+        <translation>Вхідне пряме підключення</translation>
     </message>
     <message>
         <source>Disable direct connections</source>
-        <translation type="unfinished">Запретить прямые подключения</translation>
+        <translation>Заборонити прямі підключення</translation>
     </message>
     <message>
         <source>Port Forwarding</source>
-        <translation type="unfinished">Перенаправление портов</translation>
+        <translation>Перенаправленння портів</translation>
     </message>
     <message>
         <source>Host:</source>
-        <translation type="unfinished">Хост:</translation>
+        <translation>Хост:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="unfinished">Порт:</translation>
+        <translation>Порт:</translation>
     </message>
     <message>
         <source>Stream Proxy</source>
-        <translation type="unfinished">Прокси потока</translation>
+        <translation>Проксі потоку</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Додати</translation>
     </message>
     <message>
         <source>Up</source>
-        <translation type="unfinished">Вверх</translation>
+        <translation>Вверх</translation>
     </message>
     <message>
         <source>Down</source>
-        <translation type="unfinished">Вниз</translation>
+        <translation>Вниз</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Видалити</translation>
     </message>
     <message>
         <source>Connection Proxy</source>
-        <translation type="unfinished">Прокси подключения</translation>
+        <translation>Проксі підключення</translation>
     </message>
     <message>
         <source>Use account connection proxy settings</source>
-        <translation type="unfinished">Использовать настройки прокси из аккаунта</translation>
+        <translation>Використовуватиь настройки проксі з аккаунта</translation>
     </message>
     <message>
         <source>Listening port:</source>
-        <translation type="unfinished">Прослушиваемый порт:</translation>
+        <translation>Порт що слухается:</translation>
     </message>
     <message>
         <source>Use proxy on account server</source>
-        <translation type="unfinished">Использовать прокси на сервере аккаунта</translation>
+        <translation>Використовувати проксі на сервері аккаунту</translation>
     </message>
 </context>
 <context>
     <name>SocksStream</name>
     <message>
         <source>Stream destroyed</source>
-        <translation type="unfinished">Поток удалён</translation>
+        <translation>Потік видалений</translation>
     </message>
     <message>
         <source>Unsupported stream mode</source>
-        <translation type="unfinished">Не поддерживаемый режим потока</translation>
+        <translation>Не підтримуємий режим потоку</translation>
     </message>
     <message>
         <source>Remote client cant connect to given hosts</source>
-        <translation type="unfinished">Удалённый клиент не смог подключиться к полученным хостам</translation>
+        <translation>Віддалений кліент не зміг підключитись до отриманих хостів</translation>
     </message>
     <message>
         <source>Failed to activate stream</source>
-        <translation type="unfinished">Не удалось активировать поток</translation>
+        <translation>Не вдалось активувати потік</translation>
     </message>
     <message>
         <source>Remote client is timed out to connect</source>
-        <translation type="unfinished">Удалённый клиент не ответил на запрос подключения</translation>
+        <translation>Віддалений клієнт не відповів на запит підключення</translation>
     </message>
     <message>
         <source>Failed to create hosts</source>
-        <translation type="unfinished">Не удалось создать хост</translation>
+        <translation>Не вдалось створити хост</translation>
     </message>
     <message>
         <source>Direct connection not established</source>
-        <translation type="unfinished">Прямое подключение не установлено</translation>
+        <translation>Пряме підключення не встановлено</translation>
     </message>
     <message>
         <source>Invalid host</source>
-        <translation type="unfinished">Неверный хост</translation>
+        <translation>Невірний хост</translation>
     </message>
     <message>
         <source>Cant connect to given hosts</source>
-        <translation type="unfinished">Не удалось подключиться к полученным хостам</translation>
+        <translation>Не вдалось пдключитись до отриманих хостів</translation>
     </message>
     <message>
         <source>Failed to connect to host</source>
-        <translation type="unfinished">Не удалось подключиться к хосту</translation>
+        <translation>Не вдалось підключитись до хосту</translation>
     </message>
 </context>
 <context>
     <name>SocksStreams</name>
     <message>
         <source>Data is transfered out-band over TCP or UDP connection</source>
-        <translation type="unfinished">Данные передаются по отдельному TCP или UDP подключению</translation>
+        <translation>Данні передаются по окремому TCP або UDP підключенню</translation>
     </message>
     <message>
         <source>SOCKS5 Data Stream</source>
-        <translation type="unfinished">SOCKS5 поток данных</translation>
+        <translation>SOCKS5 потік даних</translation>
     </message>
     <message>
         <source>Allows to initiate SOCKS5 stream of data between two XMPP entities</source>
-        <translation type="unfinished">Позволяет инициировать SOCKS5 поток данных между двумя XMPP сущностями</translation>
+        <translation>Дозволяе інійіювати SOCKS5 потік даних між двома XMPP сутностями</translation>
     </message>
     <message>
         <source>Supports the initiating of the SOCKS5 stream of data between two XMPP entities</source>
-        <translation type="unfinished">Поддерживает инициализацию SOCKS5 потока данных между двумя XMPP сущностями</translation>
+        <translation>Підтримуе ініціалізацію SOCKS5 потоку даних між двома XMPP сутностями</translation>
     </message>
 </context>
 </TS>

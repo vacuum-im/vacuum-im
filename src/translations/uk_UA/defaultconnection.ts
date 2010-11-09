@@ -5,37 +5,37 @@
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <source>Host:</source>
-        <translation type="unfinished">Хост:</translation>
+        <translation>Хост:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="unfinished">Порт:</translation>
+        <translation>Порт:</translation>
     </message>
     <message>
         <source>Use SSL connection</source>
-        <translation type="unfinished">Использовать SSL-соединение</translation>
+        <translation>Використовувати SSL-з’єднання</translation>
     </message>
     <message>
         <source>Ignore SSL errors</source>
-        <translation type="unfinished">Игнорировать ошибки SSL</translation>
+        <translation>Ігнорувати помилки SSL</translation>
     </message>
 </context>
 <context>
     <name>DefaultConnection</name>
     <message>
         <source>Disconnection timed out</source>
-        <translation type="unfinished">Превышено время отключения</translation>
+        <translation>Перевищено час відключення</translation>
     </message>
 </context>
 <context>
     <name>DefaultConnectionPlugin</name>
     <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>
-        <translation type="unfinished">Позволяет установить стандартное TCP подключение к серверу</translation>
+        <translation>Дозволяе встановити стандартне TCP підключення до серверу</translation>
     </message>
     <message>
         <source>Default Connection</source>
-        <translation type="unfinished">Стандартное соединение</translation>
+        <translation>Стандартне з’єднання</translation>
     </message>
 </context>
 </TS>

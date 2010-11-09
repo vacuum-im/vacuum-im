@@ -5,293 +5,293 @@
     <name>EditListsDialog</name>
     <message>
         <source>Edit Privacy Lists - %1</source>
-        <translation type="unfinished">Редактор списков приватности - %1</translation>
+        <translation>Редактор списків приватності - %1</translation>
     </message>
     <message>
         <source>Privacy List Error</source>
-        <translation type="unfinished">Ошибка в списке приватности</translation>
+        <translation>Помилка в списку приватності</translation>
     </message>
     <message>
         <source>Privacy list &apos;%1&apos; could not be active: %2</source>
-        <translation type="unfinished">Список приватности &apos;%1&apos; не может быть активным: %2</translation>
+        <translation>Список приватності &apos;%1&apos; не може бути активним: %2</translation>
     </message>
     <message>
         <source>Privacy list &apos;%1&apos; could not be default: %2</source>
-        <translation type="unfinished">Список приватности &apos;%1&apos; не может быть по умолчанию: %2</translation>
+        <translation>Список приватності &apos;%1&apos; не може бути за замовчуванням: %2</translation>
     </message>
     <message>
         <source>Privacy list &apos;%1&apos; could not be saved: %2</source>
-        <translation type="unfinished">Список приватности &apos;%1&apos; не может быть сохранен: %2</translation>
+        <translation>Список приватності &apos;%1&apos; не може бути збережений: %2</translation>
     </message>
     <message>
         <source>Privacy list &apos;%1&apos; could not be removed: %2</source>
-        <translation type="unfinished">Список приватности &apos;%1&apos; не может быть удален: %2</translation>
+        <translation>Список приватності &apos;%1&apos; не може бути видалений: %2</translation>
     </message>
     <message>
         <source>New Privacy List</source>
-        <translation type="unfinished">Новый список приватности</translation>
+        <translation>Новий список приватності</translation>
     </message>
     <message>
         <source>Enter list name:</source>
-        <translation type="unfinished">Введите имя списка:</translation>
+        <translation>Введіть ім’я списку:</translation>
     </message>
     <message>
         <source>Remove Privacy List</source>
-        <translation type="unfinished">Удалить список приватности</translation>
+        <translation>Видалити список приватності</translation>
     </message>
     <message>
         <source>Are you really want to delete privacy list &apos;%1&apos; with rules?</source>
-        <translation type="unfinished">Вы действительно хотите удалить список приватности &apos;%1&apos; с правилами?</translation>
+        <translation>Ви дійсно хочете видалити список приватності &apos;%1&apos; з правилами?</translation>
     </message>
     <message>
         <source>&lt;always&gt;</source>
-        <translation type="unfinished">&lt;всегда&gt;</translation>
+        <translation>&lt;завжди&gt;</translation>
     </message>
     <message>
         <source>&lt;action&gt;</source>
-        <translation type="unfinished">&lt;действие&gt;</translation>
+        <translation>&lt;дія&gt;</translation>
     </message>
     <message>
         <source>jid</source>
-        <translation type="unfinished">jid</translation>
+        <translation>jid</translation>
     </message>
     <message>
         <source>group</source>
-        <translation type="unfinished">группа</translation>
+        <translation>група</translation>
     </message>
     <message>
         <source>subscription</source>
-        <translation type="unfinished">подписка</translation>
+        <translation>підписка</translation>
     </message>
     <message>
         <source>deny</source>
-        <translation type="unfinished">запретить</translation>
+        <translation>заборонити</translation>
     </message>
     <message>
         <source>allow</source>
-        <translation type="unfinished">разрешить</translation>
+        <translation>дозволити</translation>
     </message>
     <message>
         <source>&lt;None&gt;</source>
-        <translation type="unfinished">&lt;Нет&gt;</translation>
+        <translation>&lt;Ні&gt;</translation>
     </message>
     <message>
         <source>messages</source>
-        <translation type="unfinished">сообщения</translation>
+        <translation>повідомлення</translation>
     </message>
     <message>
         <source>queries</source>
-        <translation type="unfinished">запросы</translation>
+        <translation>запроси</translation>
     </message>
     <message>
         <source>pres-in</source>
-        <translation type="unfinished">вх. статус</translation>
+        <translation>вх. статус</translation>
     </message>
     <message>
         <source>pres-out</source>
-        <translation type="unfinished">исх. статус</translation>
+        <translation>вих. статус</translation>
     </message>
     <message>
         <source>&lt;any stanza&gt;</source>
-        <translation type="unfinished">любой станз</translation>
+        <translation>будь який станз</translation>
     </message>
     <message>
         <source>none</source>
         <comment>Subscription type</comment>
-        <translation type="unfinished">нет</translation>
+        <translation>ні</translation>
     </message>
     <message>
         <source>to</source>
         <comment>Subscription type</comment>
-        <translation type="unfinished">получена</translation>
+        <translation>отримана</translation>
     </message>
     <message>
         <source>from</source>
         <comment>Subscription type</comment>
-        <translation type="unfinished">разрешена</translation>
+        <translation>дозволена</translation>
     </message>
     <message>
         <source>both</source>
         <comment>Subscription type</comment>
-        <translation type="unfinished">полная</translation>
+        <translation>повна</translation>
     </message>
     <message>
         <source>%1: if %2 = &apos;%3&apos; then %4 [%5 ]</source>
-        <translation type="unfinished">%1: если %2 = &apos;%3&apos; тогда %4 [%5 ]</translation>
+        <translation>%1: якщо %2 = &apos;%3&apos; тоді %4 [%5 ]</translation>
     </message>
     <message>
         <source>%1: always %2 [%3 ]</source>
-        <translation type="unfinished">%1: в любом случае %2 [%3 ]</translation>
+        <translation>%1: в будь якому випадку%2 [%3 ]</translation>
     </message>
 </context>
 <context>
     <name>EditListsDialogClass</name>
     <message>
         <source>Setup Default and Active Lists</source>
-        <translation type="unfinished">Установка активного списка и списка по умолчанию</translation>
+        <translation>Установка активного списку і списку за замовчуванням</translation>
     </message>
     <message>
         <source>Default:</source>
-        <translation type="unfinished">По умолчанию:</translation>
+        <translation>За замовчуванням:</translation>
     </message>
     <message>
         <source>Active:</source>
-        <translation type="unfinished">Активный:</translation>
+        <translation>Активний:</translation>
     </message>
     <message>
         <source>Edit lists</source>
-        <translation type="unfinished">Редактировать списки</translation>
+        <translation>Редагувати списки</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Додати</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Видалити</translation>
     </message>
     <message>
         <source>Edit list rules</source>
-        <translation type="unfinished">Редактировать правила</translation>
+        <translation>Редагувати правила</translation>
     </message>
     <message>
         <source>Up</source>
-        <translation type="unfinished">Вверх</translation>
+        <translation>Вверх</translation>
     </message>
     <message>
         <source>Down</source>
-        <translation type="unfinished">Вниз</translation>
+        <translation>Вниз</translation>
     </message>
     <message>
         <source>Edit rule condition</source>
-        <translation type="unfinished">Редактировать условия</translation>
+        <translation>Редагувати умови</translation>
     </message>
     <message>
         <source>=</source>
-        <translation type="unfinished">=</translation>
+        <translation>=</translation>
     </message>
     <message>
         <source>if</source>
-        <translation type="unfinished">если</translation>
+        <translation>якщо</translation>
     </message>
     <message>
         <source>then</source>
-        <translation type="unfinished">тогда</translation>
+        <translation>тоді</translation>
     </message>
     <message>
         <source>messages</source>
-        <translation type="unfinished">сообщения</translation>
+        <translation>повідомлення</translation>
     </message>
     <message>
         <source>queries</source>
-        <translation type="unfinished">запросы</translation>
+        <translation>запроси</translation>
     </message>
     <message>
         <source>pres-in</source>
-        <translation type="unfinished">вх. статус</translation>
+        <translation>вх. статус</translation>
     </message>
     <message>
         <source>pres-out</source>
-        <translation type="unfinished">исх. статус</translation>
+        <translation>вих. статус</translation>
     </message>
 </context>
 <context>
     <name>PrivacyLists</name>
     <message>
         <source>Privacy Lists</source>
-        <translation type="unfinished">Списки приватности</translation>
+        <translation>Списки приватності</translation>
     </message>
     <message>
         <source>Privacy</source>
-        <translation type="unfinished">Приватность</translation>
+        <translation>Приватність</translation>
     </message>
     <message>
         <source>Visible Mode</source>
-        <translation type="unfinished">Видимый режим</translation>
+        <translation>Видимий режим</translation>
     </message>
     <message>
         <source>Invisible Mode</source>
-        <translation type="unfinished">Невидимый режим</translation>
+        <translation>Невидимий режим</translation>
     </message>
     <message>
         <source>Disable privacy lists</source>
-        <translation type="unfinished">Оключить списки приватности</translation>
+        <translation>Вимкнути списки приватності</translation>
     </message>
     <message>
         <source>Block off roster contacts</source>
-        <translation type="unfinished">Заблокировать контакты вне контакт-листа</translation>
+        <translation>Заблокувати контакти поза контакт-листом</translation>
     </message>
     <message>
         <source>Visible to contact</source>
-        <translation type="unfinished">Видим для контакта</translation>
+        <translation>Видимий для контакту</translation>
     </message>
     <message>
         <source>Invisible to contact</source>
-        <translation type="unfinished">Невидим для контакта</translation>
+        <translation>Невидимий для контакту</translation>
     </message>
     <message>
         <source>Ignore contact</source>
-        <translation type="unfinished">Игнорировать контакт</translation>
+        <translation>Ігнорувати контакт</translation>
     </message>
     <message>
         <source>Visible to group</source>
-        <translation type="unfinished">Видим для группы</translation>
+        <translation>Видимий для групи</translation>
     </message>
     <message>
         <source>Invisible to group</source>
-        <translation type="unfinished">Невидим для группы</translation>
+        <translation>Невидимий для групи</translation>
     </message>
     <message>
         <source>Ignore group</source>
-        <translation type="unfinished">Игнорировать группу</translation>
+        <translation>Ігнорувати групу</translation>
     </message>
     <message>
         <source>Set Active list</source>
-        <translation type="unfinished">Активный список</translation>
+        <translation>Активний список</translation>
     </message>
     <message>
         <source>&lt;None&gt;</source>
-        <translation type="unfinished">&lt;Нет&gt;</translation>
+        <translation>&lt;Ні&gt;</translation>
     </message>
     <message>
         <source>Set Default list</source>
-        <translation type="unfinished">Список по умолчанию</translation>
+        <translation>Список за замовчуванням</translation>
     </message>
     <message>
         <source>Advanced...</source>
-        <translation type="unfinished">Дополнительно...</translation>
+        <translation>Додатково...</translation>
     </message>
     <message>
         <source>&lt;b&gt;Privacy settings:&lt;/b&gt;</source>
-        <translation type="unfinished">&lt;b&gt;Настройки приватности:&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Настройки приватності:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>- queries: %1</source>
-        <translation type="unfinished">- запросы: %1</translation>
+        <translation>- запроси: %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;denyed&lt;/b&gt;</source>
-        <translation type="unfinished">&lt;b&gt;запрещено&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;заборонено&lt;/b&gt;</translation>
     </message>
     <message>
         <source>allowed</source>
-        <translation type="unfinished">разрешено</translation>
+        <translation>дозволено</translation>
     </message>
     <message>
         <source>- messages: %1</source>
-        <translation type="unfinished">- сообщения: %1</translation>
+        <translation>- повідомлення: %1</translation>
     </message>
     <message>
         <source>- presences in: %1</source>
-        <translation type="unfinished">- вх. статус: %1</translation>
+        <translation>- вх. статус: %1</translation>
     </message>
     <message>
         <source>- presences out: %1</source>
-        <translation type="unfinished">- исх. статус: %1</translation>
+        <translation>- вих. статус: %1</translation>
     </message>
     <message>
         <source>Allows to block unwanted contacts</source>
-        <translation type="unfinished">Позволяет блокировать нежелательные контакты</translation>
+        <translation>Дозволяе блокувати небажані контакти</translation>
     </message>
 </context>
 </TS>
