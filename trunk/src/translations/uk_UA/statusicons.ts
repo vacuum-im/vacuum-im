@@ -5,54 +5,54 @@
     <name>IconsOptionsWidgetClass</name>
     <message>
         <source>Default iconset</source>
-        <translation type="unfinished">Иконки по умолчанию</translation>
+        <translation>Значки за замовчуванням</translation>
     </message>
     <message>
         <source>Default rules</source>
-        <translation type="unfinished">Правила по умолчанию</translation>
+        <translation>Правила за замовчуванням</translation>
     </message>
     <message>
         <source>RegExp</source>
-        <translation type="unfinished">Условие</translation>
+        <translation>Умова</translation>
     </message>
     <message>
         <source>Iconset</source>
-        <translation type="unfinished">Иконки</translation>
+        <translation>Значки</translation>
     </message>
     <message>
         <source>User rules</source>
-        <translation type="unfinished">Правила пользователя</translation>
+        <translation>Правила користувача</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Додати</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Видалити</translation>
     </message>
 </context>
 <context>
     <name>StatusIcons</name>
     <message>
         <source>Status Icons Manager</source>
-        <translation type="unfinished">Диспетчер статус-иконок</translation>
+        <translation>Менеджер статус-значків</translation>
     </message>
     <message>
         <source>Status icon</source>
-        <translation type="unfinished">Статус-иконка</translation>
+        <translation>Статус-значок</translation>
     </message>
     <message>
         <source>Status icons</source>
-        <translation type="unfinished">Статус-иконки</translation>
+        <translation>Статус-значки</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished">По умолчанию</translation>
+        <translation>За замовчуванням</translation>
     </message>
     <message>
         <source>Allows to set the status icons for contacts on the basis of standard rules or user-defined</source>
-        <translation type="unfinished">Позволяет устанавливать статус иконки контактам на основе стандартных правил или определенных пользователем</translation>
+        <translation>Дозволяе встановлювати статус значки контактам на основі стандартних правил або визначених користувачем</translation>
     </message>
 </context>
 </TS>

@@ -5,105 +5,105 @@
     <name>JabberSearch</name>
     <message>
         <source>Jabber Search</source>
-        <translation type="unfinished">Jabber поиск</translation>
+        <translation>Jabber пошук</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Поиск</translation>
+        <translation>Пошук</translation>
     </message>
     <message>
         <source>First Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>Ім’я</translation>
     </message>
     <message>
         <source>Last Name</source>
-        <translation type="unfinished">Фамилия</translation>
+        <translation>Призвіще</translation>
     </message>
     <message>
         <source>Nickname</source>
-        <translation type="unfinished">Ник</translation>
+        <translation>Нік</translation>
     </message>
     <message>
         <source>Email Address</source>
-        <translation type="unfinished">Адрес e-mail</translation>
+        <translation>Адреса e-mail</translation>
     </message>
     <message>
         <source>Allows to search in the Jabber network</source>
-        <translation type="unfinished">Позволяет выполнять поиск в джаббер сети</translation>
+        <translation>Дозволяе виконувати пошук в джаббер мережі</translation>
     </message>
     <message>
         <source>Supports the searching of the information</source>
-        <translation type="unfinished">Поддерживает поиск информации</translation>
+        <translation>Підтримуе пошук інформації</translation>
     </message>
 </context>
 <context>
     <name>SearchDialog</name>
     <message>
         <source>Search in %1</source>
-        <translation type="unfinished">Поиск в %1</translation>
+        <translation>Пошук в %1</translation>
     </message>
     <message>
         <source>Waiting for host response ...</source>
-        <translation type="unfinished">Ожидание ответа хоста ...</translation>
+        <translation>Очікування відповіді хоста ...</translation>
     </message>
     <message>
         <source>Error: Can`t send request to host.</source>
-        <translation type="unfinished">Ошибка: невозможно отправить данные на хост.</translation>
+        <translation>Помилка: неможливо відправити данні на хост.</translation>
     </message>
     <message>
         <source>Disco info</source>
-        <translation type="unfinished">Информация</translation>
+        <translation>Информація</translation>
     </message>
     <message>
         <source>Add Contact</source>
-        <translation type="unfinished">Добавить контакт</translation>
+        <translation>Додати контакт</translation>
     </message>
     <message>
         <source>vCard</source>
-        <translation type="unfinished">vCard</translation>
+        <translation>vCard</translation>
     </message>
     <message>
         <source>Requested operation failed: %1</source>
-        <translation type="unfinished">Запрошенная операция завершилась с ошибкой: %1</translation>
+        <translation>Запрошена операція завершилась з помилкою: %1</translation>
     </message>
 </context>
 <context>
     <name>SearchDialogClass</name>
     <message>
         <source>First:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation>Ім’я:</translation>
     </message>
     <message>
         <source>Last:</source>
-        <translation type="unfinished">Фамилия:</translation>
+        <translation>Прізвище:</translation>
     </message>
     <message>
         <source>Nick:</source>
-        <translation type="unfinished">Ник:</translation>
+        <translation>Нік:</translation>
     </message>
     <message>
         <source>Email:</source>
-        <translation type="unfinished">E-mail:</translation>
+        <translation>E-mail:</translation>
     </message>
     <message>
         <source>JID</source>
-        <translation type="unfinished">JID</translation>
+        <translation>JID</translation>
     </message>
     <message>
         <source>First</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>Ім’я</translation>
     </message>
     <message>
         <source>Last</source>
-        <translation type="unfinished">Фамилия</translation>
+        <translation>Прізвище</translation>
     </message>
     <message>
         <source>Nick</source>
-        <translation type="unfinished">Ник</translation>
+        <translation>Нік</translation>
     </message>
     <message>
         <source>EMail</source>
-        <translation type="unfinished">E-mail</translation>
+        <translation>E-mail</translation>
     </message>
 </context>
 </TS>

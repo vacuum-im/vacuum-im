@@ -5,171 +5,171 @@
     <name>FileStream</name>
     <message>
         <source>Connecting</source>
-        <translation type="unfinished">Подключение</translation>
+        <translation>Підключення</translation>
     </message>
     <message>
         <source>Disconnecting</source>
-        <translation type="unfinished">Отключение</translation>
+        <translation>Відключення</translation>
     </message>
     <message>
         <source>Waiting for a response to send a file request</source>
-        <translation type="unfinished">Ожидание ответа на запрос отправки файла</translation>
+        <translation>Очікування відповіді на запрос Відправки файлу</translation>
     </message>
     <message>
         <source>Data transmission</source>
-        <translation type="unfinished">Передача данных</translation>
+        <translation>Передача данних</translation>
     </message>
     <message>
         <source>Data transmission finished</source>
-        <translation type="unfinished">Передача данных завершена</translation>
+        <translation>Передача данниих завершена</translation>
     </message>
     <message>
         <source>Data transmission terminated by remote user</source>
-        <translation type="unfinished">Передача данных прервана удаленным пользователем</translation>
+        <translation>Передача данних перервана віддаленим користувачем</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsManager</name>
     <message>
         <source>File Streams Manager</source>
-        <translation type="unfinished">Диспетчер файловых потоков</translation>
+        <translation>Менеджер файлових потоків</translation>
     </message>
     <message>
         <source>File Transfers</source>
-        <translation type="unfinished">Передачи файлов</translation>
+        <translation>Передачі файлів</translation>
     </message>
     <message>
         <source>Downloads</source>
-        <translation type="unfinished">Загрузки</translation>
+        <translation>Завантаження</translation>
     </message>
     <message>
         <source>File Transfer</source>
-        <translation type="unfinished">Передача файлов</translation>
+        <translation>Передача файлів</translation>
     </message>
     <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
-        <translation type="unfinished">Позволяет инициировать поток для передачи файлов между двумя XMPP сущностями</translation>
+        <translation>Дозволяе инійіювати потік для передачі файлів між двома XMPP сутностями</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsOptions</name>
     <message>
         <source>Select default directory</source>
-        <translation type="unfinished">Выберите директорию по умолчанию</translation>
+        <translation>Виберіть директорію за замовчуванням</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsOptionsClass</name>
     <message>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <source>Default Downloads Directory:</source>
-        <translation type="unfinished">Директория загрузок по умолчанию:</translation>
+        <translation>Директорія завантажень за замовчуванням:</translation>
     </message>
     <message>
         <source>Default Data Stream:</source>
-        <translation type="unfinished">Поток данных по умолчанию:</translation>
+        <translation>Поток данных по умолчанию:</translation>
     </message>
     <message>
         <source>Acceptable Data Streams</source>
-        <translation type="unfinished">Разрешенные потоки данных</translation>
+        <translation>Дозволені потоки данних</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsWindow</name>
     <message>
         <source>File Name</source>
-        <translation type="unfinished">Имя файла</translation>
+        <translation>Ім’я файлу</translation>
     </message>
     <message>
         <source>State</source>
-        <translation type="unfinished">Статус</translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <source>Size</source>
-        <translation type="unfinished">Размер</translation>
+        <translation>Розмір</translation>
     </message>
     <message>
         <source>Progress</source>
-        <translation type="unfinished">Завершено</translation>
+        <translation>Завершено</translation>
     </message>
     <message>
         <source>Speed</source>
-        <translation type="unfinished">Скорость</translation>
+        <translation>Швидкість</translation>
     </message>
     <message>
         <source>Create</source>
-        <translation type="unfinished">Создание</translation>
+        <translation>Створення</translation>
     </message>
     <message>
         <source>Negotiate</source>
-        <translation type="unfinished">Согласование</translation>
+        <translation>Узгодження</translation>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished">Подключение</translation>
+        <translation>Підключення</translation>
     </message>
     <message>
         <source>Transfer</source>
-        <translation type="unfinished">Передача</translation>
+        <translation>Передача</translation>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation type="unfinished">Отключение</translation>
+        <translation>Відключення</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished">Готово</translation>
+        <translation>Готово</translation>
     </message>
     <message>
         <source>Aborted</source>
-        <translation type="unfinished">Прервано</translation>
+        <translation>Перервано</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Неизвестно</translation>
+        <translation>Невідомо</translation>
     </message>
     <message>
         <source>/sec</source>
-        <translation type="unfinished">/сек</translation>
+        <translation>/сек</translation>
     </message>
     <message>
         <source>B</source>
         <comment>Byte</comment>
-        <translation type="unfinished">Б</translation>
+        <translation>Б</translation>
     </message>
     <message>
         <source>KB</source>
         <comment>Kilobyte</comment>
-        <translation type="unfinished">КБ</translation>
+        <translation>КБ</translation>
     </message>
     <message>
         <source>MB</source>
         <comment>Megabyte</comment>
-        <translation type="unfinished">МБ</translation>
+        <translation>МБ</translation>
     </message>
     <message>
         <source>GB</source>
         <comment>Gigabyte</comment>
-        <translation type="unfinished">ГБ</translation>
+        <translation>ГБ</translation>
     </message>
     <message>
         <source>Downloads: %1 at %2</source>
-        <translation type="unfinished">Загрузки: %1 на %2</translation>
+        <translation>Завантаження: %1 на %2</translation>
     </message>
     <message>
         <source>Uploads: %1 at %2</source>
-        <translation type="unfinished">Отдачи: %1 на %2</translation>
+        <translation>Віддачі: %1 на %2</translation>
     </message>
     <message>
         <source>Active: %1/%2</source>
-        <translation type="unfinished">Активные: %1/%2</translation>
+        <translation>Активні: %1/%2</translation>
     </message>
     <message>
         <source>File Transfers</source>
-        <translation type="unfinished">Передачи файлов</translation>
+        <translation>Передачі файлів</translation>
     </message>
 </context>
 </TS>

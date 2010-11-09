@@ -5,15 +5,15 @@
     <name>TrayManager</name>
     <message>
         <source>Quit</source>
-        <translation type="unfinished">Выход</translation>
+        <translation>Вихід</translation>
     </message>
     <message>
         <source>Tray Icon</source>
-        <translation type="unfinished">Инонка трея</translation>
+        <translation>Значок трею</translation>
     </message>
     <message>
         <source>Allows other modules to access the icon and context menu in the tray</source>
-        <translation type="unfinished">Позволяет другим модулям получать доступ к иконке и контекстному меню в трее</translation>
+        <translation>Дозволяе іншим модулям отримувати доступ до значка і контекстного меню в треї</translation>
     </message>
 </context>
 </TS>

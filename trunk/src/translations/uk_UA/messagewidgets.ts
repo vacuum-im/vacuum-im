@@ -5,57 +5,61 @@
     <name>EditWidgetClass</name>
     <message>
         <source>Send</source>
-        <translation type="unfinished">Отправить</translation>
+        <translation>Відіслати</translation>
     </message>
 </context>
 <context>
     <name>MessageWidgets</name>
     <message>
         <source>Messages</source>
-        <translation type="unfinished">Сообщения</translation>
+        <translation>Повідомлення</translation>
     </message>
     <message>
         <source>Tab Window %1</source>
-        <translation type="unfinished">Окно  со вкладками %1</translation>
+        <translation>Вікно  з вкладками %1</translation>
     </message>
     <message>
         <source>Main Tab Window</source>
-        <translation type="unfinished">Основное окно</translation>
+        <translation>Основне вікно</translation>
     </message>
     <message>
         <source>Message Widgets Manager</source>
-        <translation type="unfinished">Диспетчер виджетов сообщений</translation>
+        <translation>Менеджер віджетів повідомлень</translation>
     </message>
     <message>
         <source>Allows other modules to use standard widgets for messaging</source>
-        <translation type="unfinished">Позволяет другим модулям использовать стандартные виджеты для обмена сообщениями</translation>
+        <translation>Дозволяе іншим модулям вікористовувати стандартні віджети для обміну повідомленнями</translation>
     </message>
     <message>
         <source>Quote selected text</source>
-        <translation type="unfinished">Цитировать выделенный текст</translation>
+        <translation>Цитувати виділенний текст</translation>
     </message>
     <message>
         <source>Tab Window</source>
-        <translation type="unfinished">Окно  со вкладками</translation>
+        <translation>Вікно  з вкладками</translation>
     </message>
     <message>
         <source>Enable tab windows</source>
-        <translation type="unfinished">Использовать окна со вкладками</translation>
+        <translation>Використовувати вікна з вкладками</translation>
     </message>
     <message>
         <source>Show status changes in chat windows</source>
-        <translation type="unfinished">Показывать изменения статуса в окне чата</translation>
+        <translation>Показувати зміну статуса в вікні чату</translation>
     </message>
     <message>
         <source>Auto resize input field</source>
-        <translation type="unfinished">Автоматически изменять размер поля ввода</translation>
+        <translation>Автоматично змінювати розмір поля вводу</translation>
     </message>
     <message>
         <source>Show contact information in chat windows</source>
-        <translation type="unfinished">Показывать информацию о контакте в окне чата</translation>
+        <translation>Показувати інформацію про контакт в вікні чату</translation>
     </message>
     <message>
         <source>Show tab indices</source>
+        <translation>Показувати вкладки з індексами</translation>
+    </message>
+    <message>
+        <source>Save status messages to history</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -63,194 +67,194 @@
     <name>MessageWindow</name>
     <message>
         <source>Next - %1</source>
-        <translation type="unfinished">Следующий - %1</translation>
+        <translation>Наступний - %1</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">Закрыть</translation>
+        <translation>Закрити</translation>
     </message>
 </context>
 <context>
     <name>MessageWindowClass</name>
     <message>
         <source>Message</source>
-        <translation type="unfinished">Сообщение</translation>
+        <translation>Повідомлення</translation>
     </message>
     <message>
         <source>To:</source>
-        <translation type="unfinished">Кому:</translation>
+        <translation>Кому:</translation>
     </message>
     <message>
         <source>Subject:</source>
-        <translation type="unfinished">Тема:</translation>
+        <translation>Тема:</translation>
     </message>
     <message>
         <source>Reply</source>
-        <translation type="unfinished">Ответить</translation>
+        <translation>Відповісти</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished">Переслать</translation>
+        <translation>Переслати</translation>
     </message>
     <message>
         <source>Chat</source>
-        <translation type="unfinished">Чат</translation>
+        <translation>Чат</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished">Отправить</translation>
+        <translation>Відіслати</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Следующее</translation>
+        <translation>Наступне</translation>
     </message>
 </context>
 <context>
     <name>MessengerOptionsClass</name>
     <message>
         <source>Send message key sequence:</source>
-        <translation type="unfinished">Комбинация клавиш для отправки сообщения:</translation>
+        <translation>Комбінація клавіш для відправки повідомлення:</translation>
     </message>
     <message>
         <source>Minimum input field lines:</source>
-        <translation type="unfinished">Минимальное число строк в поле воода:</translation>
+        <translation>Мінімалне число строк в полі вводу:</translation>
     </message>
 </context>
 <context>
     <name>ReceiversWidget</name>
     <message>
         <source>Receivers</source>
-        <translation type="unfinished">Получатели</translation>
+        <translation>Отримувачі</translation>
     </message>
     <message>
         <source>Not in Roster</source>
-        <translation type="unfinished">Не в контакт-листе</translation>
+        <translation>Не в контакт-листі</translation>
     </message>
     <message>
         <source>Contact</source>
-        <translation type="unfinished">Контакт</translation>
+        <translation>Контакт</translation>
     </message>
     <message>
         <source>Jid</source>
-        <translation type="unfinished">JID</translation>
+        <translation>JID</translation>
     </message>
     <message>
         <source>Agents</source>
-        <translation type="unfinished">Агенты</translation>
+        <translation>Агенти</translation>
     </message>
     <message>
         <source>Blank group</source>
-        <translation type="unfinished">Общая группа</translation>
+        <translation>Загальна группа</translation>
     </message>
     <message>
         <source>My Resources</source>
-        <translation type="unfinished">Мои ресурсы</translation>
+        <translation>Мої ресурси</translation>
     </message>
     <message>
         <source>Add receiver</source>
-        <translation type="unfinished">Добавить получателя</translation>
+        <translation>Додати Отримувача</translation>
     </message>
     <message>
         <source>Enter valid contact jid:</source>
-        <translation type="unfinished">Введите корректный JID:</translation>
+        <translation>Ввдіть корректний JID:</translation>
     </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Додати</translation>
     </message>
     <message>
         <source>Update</source>
-        <translation type="unfinished">Обновить</translation>
+        <translation>Поновити</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished">Все</translation>
+        <translation>Всі</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">Никого</translation>
+        <translation>Нікого</translation>
     </message>
 </context>
 <context>
     <name>TabWindow</name>
     <message>
         <source>Esc</source>
-        <translation type="unfinished">Esc</translation>
+        <translation>Esc</translation>
     </message>
     <message>
         <source>Ctrl+Tab</source>
-        <translation type="unfinished">Ctrl+Tab</translation>
+        <translation>Ctrl+Tab</translation>
     </message>
     <message>
         <source>Ctrl+Shift+Tab</source>
-        <translation type="unfinished">Ctrl+Shift+Tab</translation>
+        <translation>Ctrl+Shift+Tab</translation>
     </message>
     <message>
         <source>Close Tab</source>
-        <translation type="unfinished">Закрыть вкладку</translation>
+        <translation>Закрити вкладку</translation>
     </message>
     <message>
         <source>Next Tab</source>
-        <translation type="unfinished">След. вкладка</translation>
+        <translation>Наст. вкладка</translation>
     </message>
     <message>
         <source>Prev. Tab</source>
-        <translation type="unfinished">Пред. вкладка</translation>
+        <translation>Мин. вкладка</translation>
     </message>
     <message>
         <source>Tabs Closable</source>
-        <translation type="unfinished">Закрываемые вкладки</translation>
+        <translation>Закриваємі вкладки</translation>
     </message>
     <message>
         <source>Detach to Separate Window</source>
-        <translation type="unfinished">Отцепить в отдельное окно</translation>
+        <translation>Відчепити в окреме вікно</translation>
     </message>
     <message>
         <source>Join to</source>
-        <translation type="unfinished">Присоединить к</translation>
+        <translation>Приєднати до</translation>
     </message>
     <message>
         <source>New Tab Window</source>
-        <translation type="unfinished">Новое окно со вкладкми</translation>
+        <translation>Нове вікно з вкладками</translation>
     </message>
     <message>
         <source>Use as Default Tab Window</source>
-        <translation type="unfinished">Использовать как окно по умолчанию</translation>
+        <translation>Використання як вікно за замовчуванням</translation>
     </message>
     <message>
         <source>Rename Tab Window</source>
-        <translation type="unfinished">Переименовать окно</translation>
+        <translation>Переіменувати вікно</translation>
     </message>
     <message>
         <source>Delete Tab Window</source>
-        <translation type="unfinished">Удалить окно</translation>
+        <translation>Видалити вікно</translation>
     </message>
     <message>
         <source>Tab window name:</source>
-        <translation type="unfinished">Наименование окна:</translation>
+        <translation>Наіменування вікна:</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this tab window?</source>
-        <translation type="unfinished">Вы уверены что хотите удалить это окно со вкладками?</translation>
+        <translation>Ви впевнені що хочете видалити це вікно з вкладками?</translation>
     </message>
     <message>
         <source>Show Tabs at Bootom of the Window</source>
-        <translation type="unfinished">Показывать вкладки внизу окна</translation>
+        <translation>Показувати вкладки внизу вікна</translation>
     </message>
     <message>
         <source>%1. %2</source>
         <comment>First is tab index, second is tab name</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1. %2</translation>
     </message>
 </context>
 <context>
     <name>TabWindowClass</name>
     <message>
         <source>Tab 1</source>
-        <translation type="unfinished">Tab 1</translation>
+        <translation>Tab 1</translation>
     </message>
 </context>
 </TS>

@@ -28,7 +28,7 @@
     <name>EditBookmarkDialog</name>
     <message>
         <source>Bookmark is not valid</source>
-        <translation>Некоректна заклдка</translation>
+        <translation>Некоректна закладка</translation>
     </message>
     <message>
         <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
-        <translation type="unfinished"></translation>
+        <translation> В закладці конференція поле &apos;Кімната&apos; не може бути вільним</translation>
     </message>
 </context>
 <context>

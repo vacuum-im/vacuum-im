@@ -5,11 +5,11 @@
     <name>MessageProcessor</name>
     <message>
         <source>Message Manager</source>
-        <translation type="unfinished">Диспетчер сообщений</translation>
+        <translation>Менеджер повідомлень</translation>
     </message>
     <message>
         <source>Allows other modules to send and receive messages</source>
-        <translation type="unfinished">Позволяет другим модулям отправлять и получать сообщения</translation>
+        <translation>Дозволяе іншим модулям відсилати і отримувати повідомлення</translation>
     </message>
 </context>
 </TS>

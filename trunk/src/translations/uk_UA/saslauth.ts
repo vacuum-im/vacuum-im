@@ -5,53 +5,53 @@
     <name>SASLAuth</name>
     <message>
         <source>Wrong SASL authentication response</source>
-        <translation type="unfinished">Неверный ответ во время SASL авторизации</translation>
+        <translation>Невірна відповідь під час SASL авторизації</translation>
     </message>
 </context>
 <context>
     <name>SASLBind</name>
     <message>
         <source>Invalid XMPP stream JID in SASL bind response</source>
-        <translation type="unfinished">Некорректный JID в ответе на SASL-Bind</translation>
+        <translation>Некоректний JID у відповіді на SASL-Bind</translation>
     </message>
 </context>
 <context>
     <name>SASLPlugin</name>
     <message>
         <source>Authorization Aborted</source>
-        <translation type="unfinished">Авторизация отменена</translation>
+        <translation>Авторизація відмінена</translation>
     </message>
     <message>
         <source>Incorrect Encoding</source>
-        <translation type="unfinished">Неправильная кодировка</translation>
+        <translation>Невірне кодування</translation>
     </message>
     <message>
         <source>Invalid Authzid</source>
-        <translation type="unfinished">Неправильный ID авторизации</translation>
+        <translation>Неправильний ID авторизації</translation>
     </message>
     <message>
         <source>Invalid Mechanism</source>
-        <translation type="unfinished">Неправильный механизм</translation>
+        <translation>Неправильный механізм</translation>
     </message>
     <message>
         <source>Mechanism Too Weak</source>
-        <translation type="unfinished">Механизм слишком слаб</translation>
+        <translation>Механизм надто слабкий</translation>
     </message>
     <message>
         <source>Not Authorized</source>
-        <translation type="unfinished">Не авторизован</translation>
+        <translation>Не авторизований</translation>
     </message>
     <message>
         <source>Temporary Auth Failure</source>
-        <translation type="unfinished">Временная авторизация не корректна</translation>
+        <translation>Тимчасова авторизація не коректна</translation>
     </message>
     <message>
         <source>SASL Authentication</source>
-        <translation type="unfinished">SASL авторизация</translation>
+        <translation>SASL авторизація</translation>
     </message>
     <message>
         <source>Allows to log in to Jabber server using SASL authentication</source>
-        <translation type="unfinished">Позволяет авторизоваться на сервере используя SASL авторизацию</translation>
+        <translation>Дозволяе авторизуватись на сервері використовуючи SASL авторизацію</translation>
     </message>
 </context>
 </TS>

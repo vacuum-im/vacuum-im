@@ -71,7 +71,7 @@
     <name>DataMediaWidget</name>
     <message>
         <source>Unsupported media type</source>
-        <translation type="unfinished"></translation>
+        <translation>Непідримуемий тип медіа</translation>
     </message>
     <message>
         <source>Loading data...</source>

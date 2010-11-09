@@ -5,103 +5,103 @@
     <name>ErrorHandler</name>
     <message>
         <source>Unknown Error</source>
-        <translation type="unfinished">Неизвестная ошибка</translation>
+        <translation>Невідома помилка</translation>
     </message>
     <message>
         <source>Redirect</source>
-        <translation type="unfinished">Перенаправление</translation>
+        <translation>Перенаправлення</translation>
     </message>
     <message>
         <source>Bad Request</source>
-        <translation type="unfinished">Плохой запрос</translation>
+        <translation>Поганий запрос</translation>
     </message>
     <message>
         <source>Unexpected Request</source>
-        <translation type="unfinished">Неожиданный запрос</translation>
+        <translation>Несподіваний запрос</translation>
     </message>
     <message>
         <source>Jid Malformed</source>
-        <translation type="unfinished">Неправильный JID</translation>
+        <translation>Невірний JID</translation>
     </message>
     <message>
         <source>Not Authorized</source>
-        <translation type="unfinished">Не авторизован</translation>
+        <translation>Не авторизований</translation>
     </message>
     <message>
         <source>Payment Required</source>
-        <translation type="unfinished">Необходима оплата</translation>
+        <translation>Необхідна оплата</translation>
     </message>
     <message>
         <source>Forbidden</source>
-        <translation type="unfinished">Запрещено</translation>
+        <translation>Заборонено</translation>
     </message>
     <message>
         <source>Not Found</source>
-        <translation type="unfinished">Не найдено</translation>
+        <translation>Не знайдено</translation>
     </message>
     <message>
         <source>Recipient Unavailable</source>
-        <translation type="unfinished">Получатель недоступен</translation>
+        <translation>Отримувач недоступний</translation>
     </message>
     <message>
         <source>Remote Server Not Found</source>
-        <translation type="unfinished">Удаленный сервер не найден</translation>
+        <translation>Віддалений сервер не знайдений</translation>
     </message>
     <message>
         <source>Not Allowed</source>
-        <translation type="unfinished">Не разрешено</translation>
+        <translation>Не дозволено</translation>
     </message>
     <message>
         <source>Not Acceptable</source>
-        <translation type="unfinished">Не приемлемо</translation>
+        <translation>Не допустимо</translation>
     </message>
     <message>
         <source>Registration Required</source>
-        <translation type="unfinished">Необходима регистрация</translation>
+        <translation>Необхідна реєстрація</translation>
     </message>
     <message>
         <source>Subscription Required</source>
-        <translation type="unfinished">Необходима подписка</translation>
+        <translation>Необхідна підписка</translation>
     </message>
     <message>
         <source>Request Timeout</source>
-        <translation type="unfinished">Истекло время выполнения запроса</translation>
+        <translation>Вичерпаний час виконання запросу</translation>
     </message>
     <message>
         <source>Conflict</source>
-        <translation type="unfinished">Конфликт</translation>
+        <translation>Конфлікт</translation>
     </message>
     <message>
         <source>Internal Server Error</source>
-        <translation type="unfinished">Внутренняя ошибка сервера</translation>
+        <translation>Внутрішня помилка серверу</translation>
     </message>
     <message>
         <source>Resource Constraint</source>
-        <translation type="unfinished">Недостаточно ресурсов</translation>
+        <translation>Недостатньо ресурсів</translation>
     </message>
     <message>
         <source>Undefined Condition</source>
-        <translation type="unfinished">Условие не определено</translation>
+        <translation>Умова не визначена</translation>
     </message>
     <message>
         <source>Not Implemented</source>
-        <translation type="unfinished">Не реализовано</translation>
+        <translation>Не реалізовано</translation>
     </message>
     <message>
         <source>Remoute Server Error</source>
-        <translation type="unfinished">Ошибка удаленного сервера</translation>
+        <translation>Помилка віддаленого сервера</translation>
     </message>
     <message>
         <source>Service Unavailable</source>
-        <translation type="unfinished">Сервис недоступен</translation>
+        <translation>Сервіс недоступний</translation>
     </message>
     <message>
         <source>Remote Server timeout</source>
-        <translation type="unfinished">Истекло время ожидания удаленного сервера</translation>
+        <translation>Вичерпаний час віддаленого серверу</translation>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation type="unfinished">Отключен</translation>
+        <translation>Відключений</translation>
     </message>
 </context>
 </TS>

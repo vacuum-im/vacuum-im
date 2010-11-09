@@ -5,96 +5,104 @@
     <name>Notifications</name>
     <message>
         <source>Notifications</source>
-        <translation type="unfinished">Уведомления</translation>
+        <translation>Сповіщення</translation>
     </message>
     <message>
         <source>Activate All Notifications</source>
-        <translation type="unfinished">Активировать все уведомления</translation>
+        <translation>Активувати всі сповіщення</translation>
     </message>
     <message>
         <source>Remove All Notifications</source>
-        <translation type="unfinished">Удалить все уведомления</translation>
+        <translation>Видалити всі сповіщення</translation>
     </message>
     <message>
         <source>Pending Notifications</source>
-        <translation type="unfinished">Ожидающие уведомления</translation>
+        <translation>Очікуючі сповіщення</translation>
     </message>
     <message>
         <source>Notifications Manager</source>
-        <translation type="unfinished">Диспетчер уведомлений</translation>
+        <translation>Менеджер сповіщень</translation>
     </message>
     <message>
         <source>Allows other modules to notify the user of the events</source>
-        <translation type="unfinished">Позволяет другим модулям уведомлять пользователя о случившихся событиях</translation>
+        <translation>Дозволяе іншим модулям сповіщувати користувача про події що трапились</translation>
     </message>
     <message>
         <source>Enable/Disable notifications sound</source>
-        <translation type="unfinished">Включить/Выключить звук уведомлений</translation>
+        <translation>Включити/Виключити звук сповіщень</translation>
     </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>
     <message>
         <source>Roster</source>
-        <translation type="unfinished">Контакт-лист</translation>
+        <translation>Контакт-лист</translation>
     </message>
     <message>
         <source>Popup</source>
-        <translation type="unfinished">Всплыв. окно</translation>
+        <translation>Всплив. вікно</translation>
     </message>
     <message>
         <source>Tray</source>
-        <translation type="unfinished">Трей</translation>
+        <translation>Трей</translation>
     </message>
     <message>
         <source>Sound</source>
-        <translation type="unfinished">Звук</translation>
+        <translation>Звук</translation>
     </message>
     <message>
         <source>Activate</source>
-        <translation type="unfinished">Открыть</translation>
+        <translation>Відкрити</translation>
     </message>
 </context>
 <context>
     <name>NotifyWidget</name>
     <message>
         <source>Notification</source>
-        <translation type="unfinished">Уведомление</translation>
+        <translation>Сповіщення</translation>
     </message>
 </context>
 <context>
     <name>OptionsWidgetClass</name>
     <message>
         <source>Common notification options</source>
-        <translation type="unfinished">Общие настройки уведомлений</translation>
+        <translation>Загальні настройки сповіщень</translation>
     </message>
     <message>
         <source>Roster</source>
-        <translation type="unfinished">Контакт-лист</translation>
+        <translation>Контакт-лист</translation>
     </message>
     <message>
         <source>Popup</source>
-        <translation type="unfinished">Всплыв. окно</translation>
+        <translation>Всплив. окно</translation>
     </message>
     <message>
         <source>Tray</source>
-        <translation type="unfinished">Трей</translation>
+        <translation>Трей</translation>
     </message>
     <message>
         <source>Sound</source>
-        <translation type="unfinished">Звук</translation>
+        <translation>Звук</translation>
     </message>
     <message>
         <source>Activate</source>
-        <translation type="unfinished">Открыть</translation>
+        <translation>Відкрити</translation>
     </message>
     <message>
         <source>Expand contact groups in roster</source>
-        <translation type="unfinished">Раскрывать группы контакта в контакт-листе</translation>
+        <translation>Розкривати группи контакта в контакт-листі</translation>
     </message>
     <message>
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
-        <translation type="unfinished">Отключать звуки, когда установлен статус &apos;Не беспокоить&apos;</translation>
+        <translation>Відключати звуки, коли встановлений статус &apos;Не турбувати&apos;</translation>
+    </message>
+    <message>
+        <source>Time to display a pop-up window (0 - always visible):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> seconds</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

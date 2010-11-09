@@ -5,85 +5,85 @@
     <name>DataStreamsManger</name>
     <message>
         <source>Data Streams Manager</source>
-        <translation type="unfinished">Диспетчер потоков данных</translation>
+        <translation>Менеджер потоків данних</translation>
     </message>
     <message>
         <source>None of the available streams are acceptable</source>
-        <translation type="unfinished">Ни одно из предложенных подключений не приемлимо</translation>
+        <translation>Ні одне з запрпонованіх подключень не вірне</translation>
     </message>
     <message>
         <source>The profile is not understood or invalid</source>
-        <translation type="unfinished">Профиль не распознан или повреждён</translation>
+        <translation>Профіль не розпізнаний або пошкоджений</translation>
     </message>
     <message>
         <source>Invalid profile settings</source>
-        <translation type="unfinished">Неверные параметры профиля</translation>
+        <translation>Невірні параметри профілю</translation>
     </message>
     <message>
         <source>Invalid stream initiation responce</source>
-        <translation type="unfinished">Неверный ответ на запрос инициализации потока</translation>
+        <translation>Невірна відповідь на запрос иніціалізацию потоку</translation>
     </message>
     <message>
         <source>Data Streams Initiation</source>
-        <translation type="unfinished">Инициализация потоков данных</translation>
+        <translation>Иніціалізація потоків данних</translation>
     </message>
     <message>
         <source>Stream with same ID already exists</source>
-        <translation type="unfinished">Поток с таким же ID уже существует</translation>
+        <translation>Потік з таким ID уже існуе</translation>
     </message>
     <message>
         <source>Data Streams</source>
-        <translation type="unfinished">Потоки данных</translation>
+        <translation>Потоки данних</translation>
     </message>
     <message>
         <source>&lt;Default Profile&gt;</source>
-        <translation type="unfinished">&lt;Основной профиль&gt;</translation>
+        <translation>&lt;Основний профіль&gt;</translation>
     </message>
     <message>
         <source>Allows to initiate a custom stream of data between two XMPP entities</source>
-        <translation type="unfinished">Позволяет инициировать произвольный поток данных между двумя XMPP сущностями</translation>
+        <translation>Дозволяе ініціювати довільній потік данних між двума XMPP сутностями</translation>
     </message>
     <message>
         <source>Supports the initiating of the custom stream of data between two XMPP entities</source>
-        <translation type="unfinished">Поддерживает инициализацию произвольного потока данных между двумя XMPP сущностями</translation>
+        <translation>Підтримуе ініціалізацію довільного потоку данних між двума XMPP сутностями</translation>
     </message>
 </context>
 <context>
     <name>DataStreamsOptions</name>
     <message>
         <source>Add Profile</source>
-        <translation type="unfinished">Добавить профиль</translation>
+        <translation>Додати профіль</translation>
     </message>
     <message>
         <source>Enter profile name:</source>
-        <translation type="unfinished">Введите имя профиля:</translation>
+        <translation>Введіть ім’я профілю:</translation>
     </message>
     <message>
         <source>Delete Profile</source>
-        <translation type="unfinished">Удалить провиль</translation>
+        <translation>Видалити профіль</translation>
     </message>
     <message>
         <source>Do you really want to delete a current data streams profile?</source>
-        <translation type="unfinished">Вы дейстительно ходите удалить текущий профиль потоков данных?</translation>
+        <translation>Ви дійсно хочете відалити діючий профіль потоків данних?</translation>
     </message>
 </context>
 <context>
     <name>DataStreamsOptionsClass</name>
     <message>
         <source>Data Streams Profiles</source>
-        <translation type="unfinished">Профили потоков данных</translation>
+        <translation>Профілі потоків данних</translation>
     </message>
     <message>
         <source>Profile:</source>
-        <translation type="unfinished">Профиль:</translation>
+        <translation>Профіль:</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Додати</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Видалити</translation>
     </message>
 </context>
 </TS>

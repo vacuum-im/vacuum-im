@@ -5,111 +5,111 @@
     <name>AboutBox</name>
     <message>
         <source>Version: %1.%2 %3</source>
-        <translation type="unfinished">Версия: %1.%2 %3</translation>
+        <translation>Версія: %1.%2 %3</translation>
     </message>
 </context>
 <context>
     <name>AboutBoxClass</name>
     <message>
         <source>About the program</source>
-        <translation type="unfinished">О Программе</translation>
+        <translation>Про Программу</translation>
     </message>
 </context>
 <context>
     <name>PluginManager</name>
     <message>
         <source>Duplicate plugin uuid</source>
-        <translation type="unfinished">Дублирующий uuid плагина</translation>
+        <translation>Дублюючий uuid плагіну</translation>
     </message>
     <message>
         <source>Wrong plugin interface</source>
-        <translation type="unfinished">Неверный интерфейс плагина</translation>
+        <translation>Помилковій інтерфейс плагіну</translation>
     </message>
     <message>
         <source>Dependences not found</source>
-        <translation type="unfinished">Зависимости не найдены</translation>
+        <translation>Залежності не знайдені</translation>
     </message>
     <message>
         <source>Conflict with plugin %1</source>
-        <translation type="unfinished">Конфликт с плагином %1</translation>
+        <translation>Конфлікт з плагіном %1</translation>
     </message>
     <message>
         <source>Initialization failed</source>
-        <translation type="unfinished">Инициализация завершилась с ошибкой</translation>
+        <translation>Ініціалізація завершилась з помилкою</translation>
     </message>
     <message>
         <source>Setup plugins</source>
-        <translation type="unfinished">Настроить плагины</translation>
+        <translation>Настроїти плагіни</translation>
     </message>
     <message>
         <source>About Qt</source>
-        <translation type="unfinished">О Qt</translation>
+        <translation>Про Qt</translation>
     </message>
     <message>
         <source>About the program</source>
-        <translation type="unfinished">О Программе</translation>
+        <translation>Про Программу</translation>
     </message>
     <message>
         <source>Plugins directory not found</source>
-        <translation type="unfinished">Директория с плагинами не найдена</translation>
+        <translation>Директорія з плагінами не знайдена</translation>
     </message>
 </context>
 <context>
     <name>SetupPluginsDialog</name>
     <message>
         <source>&lt;System&gt;</source>
-        <translation type="unfinished">&lt;Системный&gt;</translation>
+        <translation>&lt;Системний&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Country&gt;</source>
-        <translation type="unfinished">&lt;Любая страна&gt;</translation>
+        <translation>&lt;Будь-яка країна&gt;</translation>
     </message>
     <message>
         <source>Restart Application</source>
-        <translation type="unfinished">Перезапуск приложения</translation>
+        <translation>Перезапуск программи</translation>
     </message>
     <message>
         <source>Settings saved. Do you want to restart application?</source>
-        <translation type="unfinished">Настройки сохранены. Вы хотите перезапустить приложение?</translation>
+        <translation>Настройки збережені. Ви хочете перезапустити программу?</translation>
     </message>
 </context>
 <context>
     <name>SetupPluginsDialogClass</name>
     <message>
         <source>Setup Plugins</source>
-        <translation type="unfinished">Настроить плагины</translation>
+        <translation>Настроїти плагіни</translation>
     </message>
     <message>
         <source>Error Message:</source>
-        <translation type="unfinished">Сообщение об ошибке:</translation>
+        <translation>Повідомлення про помилку:</translation>
     </message>
     <message>
         <source>Common Settings</source>
-        <translation type="unfinished">Общие настройки</translation>
+        <translation>Загальні настройки</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation type="unfinished">Язык:</translation>
+        <translation>Мова:</translation>
     </message>
     <message>
         <source>Country:</source>
-        <translation type="unfinished">Страна:</translation>
+        <translation>Країна:</translation>
     </message>
     <message>
         <source>Depends</source>
-        <translation type="unfinished">Зависит</translation>
+        <translation>Залежить</translation>
     </message>
     <message>
         <source>Depend</source>
-        <translation type="unfinished">Зависят</translation>
+        <translation>Залежать</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Название</translation>
+        <translation>Назва</translation>
     </message>
     <message>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл</translation>
     </message>
 </context>
 </TS>
