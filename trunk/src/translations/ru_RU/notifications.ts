@@ -96,5 +96,13 @@
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
         <translation>Отключать звуки, когда установлен статус &apos;Не беспокоить&apos;</translation>
     </message>
+    <message>
+        <source>Time to display a pop-up window (0 - always visible):</source>
+        <translation>Время отображения всплывающего окна (0 - не закрывать):</translation>
+    </message>
+    <message>
+        <source> seconds</source>
+        <translation> секунд</translation>
+    </message>
 </context>
 </TS>

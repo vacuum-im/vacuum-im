@@ -2,7 +2,6 @@
 
 #include <QTimer>
 
-#define DEFAUTL_TIMEOUT           8000
 #define ANIMATE_STEPS             17
 #define ANIMATE_TIME              700
 #define ANIMATE_STEP_TIME         (ANIMATE_TIME/ANIMATE_STEPS)
@@ -31,7 +30,7 @@ NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Q
 	QString caption = ANotification.data.value(NDR_POPUP_CAPTION,tr("Notification")).toString();
 	QString title = ANotification.data.value(NDR_POPUP_TITLE).toString();
 	QString text = ANotification.data.value(NDR_POPUP_TEXT).toString();
-	FTimeOut = ANotification.data.value(NDR_POPUP_TIMEOUT,DEFAUTL_TIMEOUT).toInt();
+	FTimeOut = ANotification.data.value(NDR_POPUP_TIMEOUT,Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000).toInt();
 
 	if (!caption.isEmpty())
 		ui.lblCaption->setText(caption);

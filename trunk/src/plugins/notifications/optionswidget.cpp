@@ -12,6 +12,7 @@ OptionsWidget::OptionsWidget(INotifications *ANotifications, QWidget *AParent) :
 	connect(ui.chbEnableAutoActivate,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 	connect(ui.chbExpandRosterGroups,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 	connect(ui.chbDisableSoundsWhenDND,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+	connect(ui.spbPopupTimeout,SIGNAL(valueChanged(int)),SIGNAL(modified()));
 
 	reset();
 }
@@ -30,6 +31,7 @@ void OptionsWidget::apply()
 	Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).setValue(ui.chbEnableAutoActivate->isChecked());
 	Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).setValue(ui.chbExpandRosterGroups->isChecked());
 	Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).setValue(ui.chbDisableSoundsWhenDND->isChecked());
+	Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).setValue(ui.spbPopupTimeout->value());
 	emit childApply();
 }
 
@@ -42,5 +44,6 @@ void OptionsWidget::reset()
 	ui.chbEnableAutoActivate->setChecked(Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).value().toBool());
 	ui.chbExpandRosterGroups->setChecked(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool());
 	ui.chbDisableSoundsWhenDND->setChecked(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool());
+	ui.spbPopupTimeout->setValue(Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt());
 	emit childReset();
 }
