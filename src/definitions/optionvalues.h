@@ -136,6 +136,7 @@
 #define OPV_NOTIFICATIONS_AUTOACTIVATE                  "notifications.auto-activate"
 #define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
+#define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
 #define OPV_NOTIFICATIONS_SOUND_COMMAND                 "notifications.sound-command"
 #define OPV_NOTIFICATIONS_NOTIFICATIONTYPE_ITEM         "notifications.notification-type"
 

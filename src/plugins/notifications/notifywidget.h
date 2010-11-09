@@ -3,9 +3,11 @@
 
 #include <QMouseEvent>
 #include <QDesktopWidget>
+#include <definitions/optionvalues.h>
 #include <definitions/notificationdataroles.h>
 #include <interfaces/inotifications.h>
 #include <utils/widgetmanager.h>
+#include <utils/options.h>
 #include "ui_notifywidget.h"
 
 class NotifyWidget :
