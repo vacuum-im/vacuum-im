@@ -265,6 +265,10 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
 	case ContactStatus:
 	{
 		QString status = field(AField).toString();
+		ui.lblStatus->setToolTip(status);
+		int maxStatusChars = Options::node(OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS).value().toInt();
+		if (maxStatusChars>0 && status.length() > maxStatusChars)
+			status = status.left(maxStatusChars) + "...";
 		ui.lblStatus->setText(status);
 		ui.lblStatus->setVisible(isFieldVisible(AField) && !status.isEmpty());
 		break;
