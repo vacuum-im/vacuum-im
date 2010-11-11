@@ -1,11 +1,13 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
+#include <definitions/optionvalues.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/iavatars.h>
+#include <utils/options.h>
 #include "ui_infowidget.h"
 
 class InfoWidget :

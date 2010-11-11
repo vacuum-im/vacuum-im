@@ -228,4 +228,8 @@ void ChatWindow::onOptionsChanged(const OptionsNode &ANode)
 	{
 		FInfoWidget->instance()->setVisible(ANode.value().toBool());
 	}
+	else if (ANode.path() == OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS)
+	{
+		FInfoWidget->setField(IInfoWidget::ContactStatus,FInfoWidget->field(IInfoWidget::ContactStatus));
+	}
 }

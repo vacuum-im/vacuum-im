@@ -77,6 +77,7 @@
 #define OPV_MESSAGES_SHOWSTATUS                         "messages.show-status-changes"
 #define OPV_MESSAGES_ARCHIVESTATUS                      "messages.archive-status"
 #define OPV_MESSAGES_SHOWINFOWIDGET                     "messages.show-info-widget"
+#define OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS           "messages.info-widget-max-status-chars"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
 #define OPV_MESSAGES_EDITORSENDKEY                      "messages.editor-send-key"
