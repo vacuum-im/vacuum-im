@@ -17,9 +17,9 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	FSaveClisked = false;
 
 	if (FStreamJid && FContactJid)
-		ui.btbButtons->setStandardButtons(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
+		ui.btbButtons->setStandardButtons(QDialogButtonBox::Save|QDialogButtonBox::Close);
 	else
-		ui.btbButtons->setStandardButtons(QDialogButtonBox::Ok);
+		ui.btbButtons->setStandardButtons(QDialogButtonBox::Close);
 	ui.btbButtons->addButton(tr("Reload"),QDialogButtonBox::ResetRole);
 	connect(ui.btbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
@@ -42,7 +42,17 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	connect(ui.ltwPhones,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onPhoneItemActivated(QListWidgetItem *)));
 	
 	if (FVCard->isEmpty())
-		FVCard->update(FStreamJid);
+	{
+		if (FVCard->update(FStreamJid))
+		{
+			ui.twtVCard->setEnabled(false);
+			ui.btbButtons->setEnabled(false);
+		}
+		else
+		{
+			onVCardError(tr("Service unavailable"));
+		}
+	}
 
 	ui.twtVCard->setCurrentIndex(0);
 	updateDialog();
@@ -248,10 +258,14 @@ void VCardDialog::onVCardPublished()
 
 void VCardDialog::onVCardError(const QString &AError)
 {
-	FSaveClisked = false;
-	ui.btbButtons->setEnabled(true);
-	ui.twtVCard->setEnabled(true);
 	QMessageBox::critical(this,tr("vCard error"),tr("vCard request or publish failed.<br>%1").arg(Qt::escape(AError)));
+
+	if (!FSaveClisked)
+		deleteLater();
+
+	FSaveClisked = false;
+	ui.twtVCard->setEnabled(true);
+	ui.btbButtons->setEnabled(true);
 }
 
 void VCardDialog::onUpdateDialogTimeout()
@@ -383,9 +397,9 @@ void VCardDialog::onPhoneItemActivated(QListWidgetItem *AItem)
 
 void VCardDialog::onDialogButtonClicked(QAbstractButton *AButton)
 {
-	if (ui.btbButtons->standardButton(AButton) == QDialogButtonBox::Ok)
+	if (ui.btbButtons->standardButton(AButton) == QDialogButtonBox::Close)
 	{
-		accept();
+		close();
 	}
 	else if (ui.btbButtons->standardButton(AButton) == QDialogButtonBox::Save)
 	{
@@ -396,10 +410,10 @@ void VCardDialog::onDialogButtonClicked(QAbstractButton *AButton)
 			ui.twtVCard->setEnabled(false);
 			FSaveClisked = true;
 		}
-	}
-	else if (ui.btbButtons->standardButton(AButton) == QDialogButtonBox::Cancel)
-	{
-		reject();
+		else
+		{
+			QMessageBox::warning(this,tr("vCard error"),tr("Failed to publish vCard"));
+		}
 	}
 	else if (ui.btbButtons->buttonRole(AButton) == QDialogButtonBox::ResetRole)
 	{
@@ -407,6 +421,10 @@ void VCardDialog::onDialogButtonClicked(QAbstractButton *AButton)
 		{
 			ui.btbButtons->setEnabled(false);
 			ui.twtVCard->setEnabled(false);
+		}
+		else
+		{
+			QMessageBox::warning(this,tr("vCard error"),tr("Failed to update vCard"));
 		}
 	}
 }
