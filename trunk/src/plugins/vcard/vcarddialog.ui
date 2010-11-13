@@ -806,11 +806,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="btbButtons">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
+    <widget class="QDialogButtonBox" name="btbButtons"/>
    </item>
   </layout>
  </widget>
