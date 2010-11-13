@@ -15,6 +15,7 @@
 #include <interfaces/ivcard.h>
 #include <utils/action.h>
 #include <utils/options.h>
+#include <utils/widgetmanager.h>
 #include "discoitemsmodel.h"
 #include "ui_discoitemswindow.h"
 

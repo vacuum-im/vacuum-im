@@ -45,7 +45,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	ui.twtTabs->setCornerWidget(menuButton);
 
 	initialize();
-	loadWindowState();
+	loadWindowStateAndGeometry();
 	createActions();
 
 	connect(ui.twtTabs,SIGNAL(currentChanged(int)),SLOT(onTabChanged(int)));
@@ -56,7 +56,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 TabWindow::~TabWindow()
 {
 	clear();
-	saveWindowState();
+	saveWindowStateAndGeometry();
 	emit windowDestroyed();
 }
 
@@ -226,21 +226,30 @@ void TabWindow::createActions()
 	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT));
 }
 
-void TabWindow::saveWindowState()
+void TabWindow::saveWindowStateAndGeometry()
 {
 	if (FMessageWidgets->tabWindowList().contains(FWindowId))
 	{
-		Options::setFileValue(saveGeometry(),"messages.tabwindows.window.geometry",FWindowId.toString());
+		if (isWindow())
+		{
+			Options::setFileValue(saveState(),"messages.tabwindows.window.state",FWindowId.toString());
+			Options::setFileValue(saveGeometry(),"messages.tabwindows.window.geometry",FWindowId.toString());
+		}
 		Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).setValue(ui.twtTabs->tabsClosable(),"tabs-closable");
 		Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).setValue(ui.twtTabs->tabPosition()==QTabWidget::South,"tabs-bottom");
 	}
 }
 
-void TabWindow::loadWindowState()
+void TabWindow::loadWindowStateAndGeometry()
 {
 	if (FMessageWidgets->tabWindowList().contains(FWindowId))
 	{
-		restoreGeometry(Options::fileValue("messages.tabwindows.window.geometry",FWindowId.toString()).toByteArray());
+		if (isWindow())
+		{
+			if (!restoreGeometry(Options::fileValue("messages.tabwindows.window.geometry",FWindowId.toString()).toByteArray()))
+				setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
+			restoreState(Options::fileValue("messages.tabwindows.window.state",FWindowId.toString()).toByteArray());
+		}
 		ui.twtTabs->setTabsClosable(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).value("tabs-closable").toBool());
 		ui.twtTabs->setTabPosition(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).value("tabs-bottom").toBool() ? QTabWidget::South : QTabWidget::North);
 	}

@@ -148,14 +148,15 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, IPluginManager
 	QIcon icon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AStreamJid,IPresence::Online,SUBSCRIPTION_BOTH,false) : QIcon();
 	ui.cmbContact->addItem(icon,tr(" <All contacts> "),QString(""));
 
-	restoreGeometry(Options::fileValue("history.viewhistorywindow.geometry",FStreamJid.pBare()).toByteArray());
+	if (!restoreGeometry(Options::fileValue("history.viewhistorywindow.geometry",FStreamJid.pBare()).toByteArray()))
+		setGeometry(WidgetManager::alignGeometry(QSize(640,800),this));
 	restoreState(Options::fileValue("history.viewhistorywindow.state",FStreamJid.pBare()).toByteArray());
 }
 
 ViewHistoryWindow::~ViewHistoryWindow()
 {
-	Options::setFileValue(saveGeometry(),"history.viewhistorywindow.geometry",FStreamJid.pBare());
 	Options::setFileValue(saveState(),"history.viewhistorywindow.state",FStreamJid.pBare());
+	Options::setFileValue(saveGeometry(),"history.viewhistorywindow.geometry",FStreamJid.pBare());
 	emit windowDestroyed(this);
 }
 

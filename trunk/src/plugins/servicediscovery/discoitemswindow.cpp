@@ -95,8 +95,9 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	initialize();
 	createToolBarActions();
 
+	if (!restoreGeometry(Options::fileValue("servicediscovery.itemswindow.geometry",FStreamJid.pBare()).toByteArray()))
+		setGeometry(WidgetManager::alignGeometry(QSize(800,480),this));
 	restoreState(Options::fileValue("servicediscovery.itemswindow.state",FStreamJid.pBare()).toByteArray());
-	restoreGeometry(Options::fileValue("servicediscovery.itemswindow.geometry",FStreamJid.pBare()).toByteArray());
 }
 
 DiscoItemsWindow::~DiscoItemsWindow()

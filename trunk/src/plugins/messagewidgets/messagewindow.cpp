@@ -200,6 +200,7 @@ void MessageWindow::saveWindowGeometry()
 {
 	if (isWindow())
 	{
+		Options::setFileValue(saveState(),"messages.messagewindow.state",tabPageId());
 		Options::setFileValue(saveGeometry(),"messages.messagewindow.geometry",tabPageId());
 	}
 }
@@ -208,7 +209,9 @@ void MessageWindow::loadWindowGeometry()
 {
 	if (isWindow())
 	{
-		restoreGeometry(Options::fileValue("messages.messagewindow.geometry",tabPageId()).toByteArray());
+		if (!restoreGeometry(Options::fileValue("messages.messagewindow.geometry",tabPageId()).toByteArray()))
+			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
+		restoreState(Options::fileValue("messages.messagewindow.state",tabPageId()).toByteArray());
 	}
 }
 

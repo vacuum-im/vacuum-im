@@ -106,7 +106,8 @@ void ConsoleWidget::loadContext(const QUuid &AContextId)
 	ui.chbWordWrap->setChecked(node.value("word-wrap").toBool());
 	ui.chbHilightXML->setCheckState((Qt::CheckState)node.value("highlight-xml").toInt());
 
-	restoreGeometry(Options::fileValue("console.context.window-geometry",AContextId.toString()).toByteArray());
+	if (!restoreGeometry(Options::fileValue("console.context.window-geometry",AContextId.toString()).toByteArray()))
+		setGeometry(WidgetManager::alignGeometry(QSize(640,640),this));
 	ui.sptHSplitter->restoreState(Options::fileValue("console.context.hsplitter-state",AContextId.toString()).toByteArray());
 	ui.sptVSplitter->restoreState(Options::fileValue("console.context.vsplitter-state",AContextId.toString()).toByteArray());
 

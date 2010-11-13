@@ -11,6 +11,7 @@
 #include <interfaces/ifilestreamsmanager.h>
 #include <utils/toolbarchanger.h>
 #include <utils/statusbarchanger.h>
+#include <utils/widgetmanager.h>
 #include <utils/iconstorage.h>
 #include <utils/options.h>
 #include "ui_filestreamswindow.h"
