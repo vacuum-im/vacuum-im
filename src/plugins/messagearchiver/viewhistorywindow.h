@@ -16,6 +16,7 @@
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagestyles.h>
 #include <utils/options.h>
+#include <utils/widgetmanager.h>
 #include "ui_viewhistorywindow.h"
 
 class ViewHistoryWindow;

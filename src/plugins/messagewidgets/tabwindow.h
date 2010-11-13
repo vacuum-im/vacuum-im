@@ -43,8 +43,8 @@ signals:
 protected:
 	void initialize();
 	void createActions();
-	void saveWindowState();
-	void loadWindowState();
+	void saveWindowStateAndGeometry();
+	void loadWindowStateAndGeometry();
 	void updateWindow();
 	void updateTab(int AIndex);
 protected slots:

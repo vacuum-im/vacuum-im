@@ -2,6 +2,7 @@
 
 #include <QTimer>
 #include <QKeyEvent>
+#include <QResizeEvent>
 #include <QInputDialog>
 #include <QCoreApplication>
 #include <QContextMenuEvent>
@@ -40,6 +41,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FStatusBarWidget = NULL;
 	FShownDetached = false;
 	FDestroyOnChatClosed = false;
+	FUsersListWidth = -1;
 
 	initialize();
 	createMessageWidgets();
@@ -62,6 +64,9 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	ui.ltvUsers->setModel(FUsersProxy);
 	ui.ltvUsers->viewport()->installEventFilter(this);
 	connect(ui.ltvUsers,SIGNAL(activated(const QModelIndex &)),SLOT(onUserItemActivated(const QModelIndex &)));
+
+	ui.sprHSplitter->installEventFilter(this);
+	connect(ui.sprHSplitter,SIGNAL(splitterMoved(int,int)),SLOT(onHorizontalSplitterMoved(int,int)));
 
 	connect(this,SIGNAL(windowActivated()),SLOT(onWindowActivated()));
 }
@@ -714,24 +719,31 @@ void MultiUserChatWindow::insertStaticUserContextActions(Menu *AMenu, IMultiUser
 
 void MultiUserChatWindow::saveWindowState()
 {
-	Options::setFileValue(ui.sprHSplitter->saveState(),"muc.mucwindow.hsplitter-state",streamJid().pBare()+"|"+roomJid().pBare());
+	Options::setFileValue(ui.sprHSplitter->saveState(),"muc.mucwindow.hsplitter-state",tabPageId());
 }
 
 void MultiUserChatWindow::loadWindowState()
 {
-	ui.sprHSplitter->restoreState(Options::fileValue("muc.mucwindow.hsplitter-state",streamJid().pBare()+"|"+roomJid().pBare()).toByteArray());
+	ui.sprHSplitter->restoreState(Options::fileValue("muc.mucwindow.hsplitter-state",tabPageId()).toByteArray());
 }
 
 void MultiUserChatWindow::saveWindowGeometry()
 {
 	if (isWindow())
-		Options::setFileValue(ui.sprHSplitter->saveState(),"muc.mucwindow.geometry",streamJid().pBare()+"|"+roomJid().pBare());
+	{
+		Options::setFileValue(saveState(),"muc.mucwindow.state",tabPageId());
+		Options::setFileValue(saveGeometry(),"muc.mucwindow.geometry",tabPageId());
+	}
 }
 
 void MultiUserChatWindow::loadWindowGeometry()
 {
 	if (isWindow())
-		restoreGeometry(Options::fileValue("muc.mucwindow.geometry",streamJid().pBare()+"|"+roomJid().pBare()).toByteArray());
+	{
+		if (!restoreGeometry(Options::fileValue("muc.mucwindow.geometry",tabPageId()).toByteArray()))
+			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
+		restoreState(Options::fileValue("muc.mucwindow.state",tabPageId()).toByteArray());
+	}
 }
 
 bool MultiUserChatWindow::showStatusCodes(const QString &ANick, const QList<int> &ACodes)
@@ -1366,10 +1378,12 @@ bool MultiUserChatWindow::event(QEvent *AEvent)
 
 void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 {
-	if (!FShownDetached && isWindow())
+	if (!FShownDetached)
 		loadWindowGeometry();
 	FShownDetached = isWindow();
 	QMainWindow::showEvent(AEvent);
+	if (FUsersListWidth < 0)
+		FUsersListWidth = ui.sprHSplitter->sizes().value(ui.sprHSplitter->indexOf(ui.ltvUsers));
 	if (FEditWidget)
 		FEditWidget->textEdit()->setFocus();
 	emit windowActivated();
@@ -1417,6 +1431,28 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 					FEditWidget->textEdit()->setFocus();
 					AEvent->accept();
 					return true;
+				}
+			}
+		}
+	}
+	else if (AObject == ui.sprHSplitter)
+	{
+		if (AEvent->type() == QEvent::Resize)
+		{
+			int usersIndex = ui.sprHSplitter->indexOf(ui.ltvUsers);
+			QResizeEvent *resizeEvent = static_cast<QResizeEvent *>(AEvent);
+			if (resizeEvent && FUsersListWidth>0 && usersIndex>0 && resizeEvent->oldSize().width()>0)
+			{
+				double k = (double)resizeEvent->size().width() / resizeEvent->oldSize().width();
+				QList<int> sizes = ui.sprHSplitter->sizes();
+				for (int i=0; i<sizes.count(); i++)
+					sizes[i] = qRound(sizes[i]*k);
+				int delta = sizes.value(usersIndex) - FUsersListWidth;
+				if (delta != 0)
+				{
+					sizes[0] += delta;
+					sizes[usersIndex] -= delta;
+					ui.sprHSplitter->setSizes(sizes);
 				}
 			}
 		}
@@ -1776,6 +1812,13 @@ void MultiUserChatWindow::onChatWindowDestroyed()
 		FWindowStatus.remove(window->viewWidget());
 		emit chatWindowDestroyed(window);
 	}
+}
+
+void MultiUserChatWindow::onHorizontalSplitterMoved(int APos, int AIndex)
+{
+	Q_UNUSED(APos);
+	Q_UNUSED(AIndex);
+	FUsersListWidth = ui.sprHSplitter->sizes().value(ui.sprHSplitter->indexOf(ui.ltvUsers));
 }
 
 void MultiUserChatWindow::onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)

@@ -167,6 +167,7 @@ protected slots:
 	void onChatWindowActivated();
 	void onChatWindowClosed();
 	void onChatWindowDestroyed();
+	void onHorizontalSplitterMoved(int APos, int AIndex);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 protected slots:
 	void onNickMenuActionTriggered(bool);
@@ -225,6 +226,7 @@ private:
 	Action *FSetAffilOwner;
 	Action *FExitRoom;
 private:
+	int FUsersListWidth;
 	bool FShownDetached;
 	bool FDestroyOnChatClosed;
 	QList<int> FActiveMessages;

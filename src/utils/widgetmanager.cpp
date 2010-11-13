@@ -1,5 +1,9 @@
 #include "widgetmanager.h"
 
+#include <QStyle>
+#include <QApplication>
+#include <QDesktopWidget>
+
 #ifdef Q_WS_X11
 	#include <QX11Info>
 	#include <X11/Xutil.h>
@@ -55,4 +59,10 @@ void WidgetManager::showActivateRaiseWindow(QWidget *AWindow)
 	}
 	AWindow->activateWindow();
 	WidgetManager::raiseWidget(AWindow);
+}
+
+QRect WidgetManager::alignGeometry(const QSize &ASize, const QWidget *AWidget, Qt::Alignment AAlign)
+{
+	QRect availRect = AWidget!=NULL ? QApplication::desktop()->availableGeometry(AWidget) : QApplication::desktop()->availableGeometry();
+	return QStyle::alignedRect(Qt::LeftToRight,AAlign,ASize.boundedTo(availRect.size()),availRect);
 }

@@ -9,6 +9,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 #include <utils/iconstorage.h>
+#include <utils/widgetmanager.h>
 #include "ui_optionsdialog.h"
 
 class SortFilterProxyModel :

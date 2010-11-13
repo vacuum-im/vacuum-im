@@ -25,7 +25,7 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_OPTIONS_DIALOG,0,0,"windowIcon");
 
 	if (!restoreGeometry(Options::fileValue("optionsmanager.optionsdialog.geometry").toByteArray()))
-		resize(600,520);
+		setGeometry(WidgetManager::alignGeometry(QSize(600,520),this));
 	if (!ui.sprSplitter->restoreState(Options::fileValue("optionsmanager.optionsdialog.splitter.state").toByteArray()))
 		ui.sprSplitter->setSizes(QList<int>() << 160 << 440);
 

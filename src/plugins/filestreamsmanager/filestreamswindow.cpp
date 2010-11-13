@@ -44,20 +44,21 @@ FileStreamsWindow::FileStreamsWindow(IFileStreamsManager *AManager, QWidget *APa
 	connect(FManager->instance(),SIGNAL(streamCreated(IFileStream *)),SLOT(onStreamCreated(IFileStream *)));
 	connect(FManager->instance(),SIGNAL(streamDestroyed(IFileStream *)),SLOT(onStreamDestroyed(IFileStream *)));
 
+	if (!restoreGeometry(Options::fileValue("filestreams.filestreamswindow.geometry").toByteArray()))
+		setGeometry(WidgetManager::alignGeometry(QSize(640,320),this));
+	restoreState(Options::fileValue("filestreams.filestreamswindow.state").toByteArray());
+
 	initialize();
 }
 
 FileStreamsWindow::~FileStreamsWindow()
 {
-	Options::setFileValue(saveGeometry(),"filestreams.filestreamswindow.geometry");
 	Options::setFileValue(saveState(),"filestreams.filestreamswindow.state");
+	Options::setFileValue(saveGeometry(),"filestreams.filestreamswindow.geometry");
 }
 
 void FileStreamsWindow::initialize()
 {
-	restoreGeometry(Options::fileValue("filestreams.filestreamswindow.geometry").toByteArray());
-	restoreState(Options::fileValue("filestreams.filestreamswindow.state").toByteArray());
-
 	FStreamsModel.setColumnCount(CMN_COUNT);
 	FStreamsModel.setHorizontalHeaderLabels(QStringList()<<tr("File Name")<<tr("State")<<tr("Size")<<tr("Progress")<<tr("Speed"));
 
