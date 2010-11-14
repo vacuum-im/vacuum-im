@@ -177,7 +177,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 	else if (FSHIPresenceIn.value(AStreamJid)==AHandlerId && availStanzaTypes.contains(AStanza.type()))
 	{
 		Jid contactJid = AStanza.from();
-		if (AStreamJid!=contactJid && AStanza.firstElement("x",NS_MUC_USER).isNull())
+		if (!FStreamAvatars.keys().contains(contactJid) && AStanza.firstElement("x",NS_MUC_USER).isNull())
 		{
 			QDomElement vcardUpdate = AStanza.firstElement("x",NS_VCARD_UPDATE);
 			QDomElement iqUpdate = AStanza.firstElement("x",NS_JABBER_X_AVATAR);
