@@ -147,9 +147,9 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 
 bool MultiUserChatPlugin::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_MUCJOIN, tr("Join conference"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_MUC_LEAVEHIDDEN, tr("Leave all hidden conferences"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_MUC_SHOWHIDDEN, tr("Show all hidden conferences"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_MUCJOIN, tr("Join conference"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_MUC_LEAVEHIDDEN, tr("Leave all hidden conferences"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_MUC_SHOWHIDDEN, tr("Show all hidden conferences"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
 
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_MUC, tr("Multi-user chat window"));
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_CLEARWINDOW, tr("Clear window"), QKeySequence::UnknownKey);

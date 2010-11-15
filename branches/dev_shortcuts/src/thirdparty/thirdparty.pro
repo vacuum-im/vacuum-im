@@ -1,6 +1,4 @@
-TEMPLATE    = subdirs
-unix:!macx {
-  SUBDIRS   = minizip idn qtlockedfile
-} else {
-  SUBDIRS   = zlib minizip idn qtlockedfile
-}
+TEMPLATE          = subdirs
+SUBDIRS           = minizip idn qtlockedfile qxtglobalshortcut
+win32: SUBDIRS   += zlib
+macx:  SUBDIRS   += zlib

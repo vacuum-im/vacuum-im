@@ -80,7 +80,7 @@ QString Action::shortcutId() const
 void Action::setShortcutId(const QString &AId)
 {
 	FShortcutId = AId;
-	Shortcuts::bindShortcut(AId, this);
+	Shortcuts::bindObjectShortcut(AId, this);
 }
 
 void Action::onMenuDestroyed(Menu *AMenu)

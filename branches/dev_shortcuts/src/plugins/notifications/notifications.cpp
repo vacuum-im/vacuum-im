@@ -105,9 +105,9 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 bool Notifications::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_TOGGLESOUND, tr("Enable/Disable notification sounds"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_ACTIVATENOTIFICATIONS, tr("Activate all notifications"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_REMOVENOTIFICATIONS, tr("Remove all notifications"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_TOGGLESOUND, tr("Enable/Disable notification sounds"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_ACTIVATENOTIFICATIONS, tr("Activate all notifications"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_REMOVENOTIFICATIONS, tr("Remove all notifications"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
 
 	FSoundOnOff = new Action(this);
 	FSoundOnOff->setToolTip(tr("Enable/Disable notifications sound"));

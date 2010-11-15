@@ -2,6 +2,11 @@
 #define DEF_SHORTCUTS_H
 
 //PluginManager
+#define SCTG_GLOBAL                                                "global"
+//MainWindow
+#define   SCT_GLOBAL_SHOWROSTER                                    "global.show-roster"
+
+//PluginManager
 #define SCTG_APPLICATION                                           "application"
 #define   SCT_APP_ABOUTQT                                          "application.about-qt"
 #define   SCT_APP_ABOUTPROGRAM                                     "application.about-program"
@@ -13,8 +18,6 @@
 #define   SCT_APP_TOGGLESOUND                                      "application.toggle-sound"
 #define   SCT_APP_ACTIVATENOTIFICATIONS                            "application.activate-notifications"
 #define   SCT_APP_REMOVENOTIFICATIONS                              "application.remove-notifications"
-//MainWindow
-#define   SCT_APP_SHOWROSTER                                       "application.show-roster"
 //FileStreamsManager
 #define   SCT_APP_SHOWFILETRANSFERS                                "application.show-filetransfers"
 //MultiUserChat
@@ -94,7 +97,7 @@
 #define   SCT_TABWINDOW_PREVTAB                                    "tab-window.prev-tab"
 #define   SCT_TABWINDOW_CLOSETAB                                   "tab-window.close-tab"
 #define   SCT_TABWINDOW_DETACHTAB                                  "tab-window.detach-tab"
-#define   SCT_TABWINDOW_SHOWCLOSEBUTTTONS							             "tab-window.show-close-buttons"
+#define   SCT_TABWINDOW_SHOWCLOSEBUTTTONS							       "tab-window.show-close-buttons"
 #define   SCT_TABWINDOW_TABSBOTTOM                                 "tab-window.show-tabs-at-bottom"
 #define   SCT_TABWINDOW_SETASDEFAULT                               "tab-window.set-as-default"
 #define   SCT_TABWINDOW_RENAMEWINDOW                               "tab-window.rename-window"

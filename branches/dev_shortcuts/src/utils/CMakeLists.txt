@@ -11,6 +11,7 @@ set(QT_USE_QTXML YES)
 include(${QT_USE_FILE})
 
 add_definitions("-DUTILS_DLL")
+add_definitions("-DQXT_STATIC") 
 link_directories("${CMAKE_BINARY_DIR}/libs")
 include_directories(AFTER "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
 

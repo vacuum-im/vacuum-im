@@ -5,12 +5,12 @@ TEMPLATE           = lib
 VERSION            = $$VERSION_UTILS
 CONFIG            += dll
 QT                += xml
-DEFINES           += UTILS_DLL
+DEFINES           += UTILS_DLL QXT_STATIC
 LIBS              += -L../libs
 unix:!macx {
-  LIBS            += -lidn -lminizip -lz
+  LIBS            += -lidn -lminizip -lz -lqxtglobalshortcut
 } else {
-  LIBS            += -lidn -lminizip -lzlib
+  LIBS            += -lidn -lminizip -lzlib -lqxtglobalshortcut
   INCLUDEPATH     += ../thirdparty/zlib
 }
 DEPENDPATH        += ..

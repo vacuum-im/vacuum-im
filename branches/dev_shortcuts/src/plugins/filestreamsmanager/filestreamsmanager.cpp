@@ -61,7 +61,7 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &/*
 
 bool FileStreamsManager::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),QKeySequence::UnknownKey,Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),QKeySequence::UnknownKey,Shortcuts::ApplicationShortcut);
 
 	if (FDataManager)
 	{

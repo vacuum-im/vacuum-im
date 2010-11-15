@@ -52,7 +52,7 @@ void ShortcutOptionsWidget::apply()
 		QStandardItem *action = FShortcutItem.value(shortcut);
 		if (action)
 		{
-			ShortcutDescriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
+			Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
 			QKeySequence activeKey = qvariant_cast<QKeySequence>(key->data(MDR_ACTIVE_KEYSEQUENCE));
 			if (descriptor.activeKey != activeKey)
@@ -69,7 +69,7 @@ void ShortcutOptionsWidget::reset()
 		QStandardItem *action = FShortcutItem.value(shortcut);
 		if (action)
 		{
-			ShortcutDescriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
+			Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
 			key->setText(descriptor.activeKey.toString(QKeySequence::NativeText));
 			key->setData(descriptor.activeKey,MDR_ACTIVE_KEYSEQUENCE);
@@ -86,7 +86,7 @@ void ShortcutOptionsWidget::createTreeModel()
 
 	foreach(QString shortcut, Shortcuts::shortcuts())
 	{
-		ShortcutDescriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
+		Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 		if (!descriptor.description.isEmpty())
 		{
 			QStandardItem *action = createTreeRow(shortcut,FModel.invisibleRootItem(),false);
@@ -138,7 +138,7 @@ void ShortcutOptionsWidget::onDefaultClicked()
 	QString shortcut = FShortcutItem.key(action);
 	if (Shortcuts::shortcuts().contains(shortcut))
 	{
-		ShortcutDescriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
+		Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 		QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
 		key->setText(descriptor.defaultKey.toString(QKeySequence::NativeText));
 		key->setData(descriptor.defaultKey,MDR_ACTIVE_KEYSEQUENCE);
@@ -167,7 +167,7 @@ void ShortcutOptionsWidget::onRestoreDefaultsClicked()
 		QStandardItem *action = FShortcutItem.value(shortcut);
 		if (action)
 		{
-			ShortcutDescriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
+			Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
 			key->setText(descriptor.defaultKey.toString(QKeySequence::NativeText));
 			key->setData(descriptor.defaultKey,MDR_ACTIVE_KEYSEQUENCE);

@@ -73,8 +73,8 @@ bool OptionsManager::initConnections(IPluginManager *APluginManager, int &AInitO
 
 bool OptionsManager::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_CHANGEPROFILE, tr("Show change profile dialog"), QKeySequence::UnknownKey, Qt::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_SHOWOPTIONS, tr("Show options dialog"), QKeySequence::Preferences, Qt::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_CHANGEPROFILE, tr("Show change profile dialog"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_SHOWOPTIONS, tr("Show options dialog"), QKeySequence::Preferences, Shortcuts::ApplicationShortcut);
 
 	FProfilesDir.setPath(FPluginManager->homePath());
 	if (!FProfilesDir.exists(DIR_PROFILES))
