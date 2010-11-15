@@ -2,7 +2,6 @@
 
 #include <QHash>
 #include <QVariant>
-#include <QShortcut>
 #include <thirdparty/qxtglobalshortcut/qxtglobalshortcut.h>
 
 struct Shortcuts::ShortcutsData

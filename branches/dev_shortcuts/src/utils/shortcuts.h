@@ -2,6 +2,7 @@
 #define SHORTCUTS_H
 
 #include <QObject>
+#include <QShortcut>
 #include <QKeySequence>
 #include "utilsexport.h"
 

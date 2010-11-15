@@ -1,10 +1,14 @@
-HEADERS += $$PWD/qxtglobal.h \
-           $$PWD/qxtglobalshortcut.h \
-           $$PWD/qxtglobalshortcut_p.h
+HEADERS   += qxtglobal.h \
+				 qxtglobalshortcut.h \
+				 qxtglobalshortcut_p.h
 
-SOURCES += $$PWD/qxtglobal.cpp \
-           $$PWD/qxtglobalshortcut.cpp
+SOURCES   += qxtglobal.cpp \
+				 qxtglobalshortcut.cpp
 
-win32:      SOURCES += $$PWD/qxtglobalshortcut_win.cpp
-unix:!macx: SOURCES += $$PWD/qxtglobalshortcut_mac.cpp
-macx:       SOURCES += $$PWD/qxtglobalshortcut_x11.cpp
+win32 {
+  SOURCES += qxtglobalshortcut_win.cpp
+} else:macx {
+  SOURCES += qxtglobalshortcut_mac.cpp
+} else {
+  SOURCES += qxtglobalshortcut_x11.cpp
+}
