@@ -736,7 +736,10 @@ bool SocksStream::sendUsedHost()
 		Stanza reply("iq");
 		reply.setType("result").setTo(FContactJid.eFull()).setId(FHostRequest);
 
-		QDomElement hostElem = reply.addElement("query",NS_SOCKS5_BYTESTREAMS).appendChild(reply.addElement("streamhost-used")).toElement();
+		QDomElement query =  reply.addElement("query",NS_SOCKS5_BYTESTREAMS);
+		query.setAttribute("sid",FStreamId);
+
+		QDomElement hostElem = query.appendChild(reply.addElement("streamhost-used")).toElement();
 		hostElem.setAttribute("jid",FHosts.at(FHostIndex).jid.eFull());
 
 		if (FStanzaProcessor->sendStanzaOut(FStreamJid, reply))
