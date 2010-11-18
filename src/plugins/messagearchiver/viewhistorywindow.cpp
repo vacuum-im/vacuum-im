@@ -149,7 +149,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, IPluginManager
 	ui.cmbContact->addItem(icon,tr(" <All contacts> "),QString(""));
 
 	if (!restoreGeometry(Options::fileValue("history.viewhistorywindow.geometry",FStreamJid.pBare()).toByteArray()))
-		setGeometry(WidgetManager::alignGeometry(QSize(640,800),this));
+		setGeometry(WidgetManager::alignGeometry(QSize(640,640),this));
 	restoreState(Options::fileValue("history.viewhistorywindow.state",FStreamJid.pBare()).toByteArray());
 }
 
