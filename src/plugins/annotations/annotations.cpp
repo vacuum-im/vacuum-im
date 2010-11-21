@@ -95,7 +95,7 @@ bool Annotations::initObjects()
 	}
 	if (FRosterSearch)
 	{
-		FRosterSearch->insertSearchField(RDR_ANNOTATIONS,tr("Annotation"),true);
+		FRosterSearch->insertSearchField(RDR_ANNOTATIONS,tr("Annotation"));
 	}
 	return true;
 }

@@ -165,6 +165,9 @@
 #define OPV_AVATARS_SHOW                                "roster.avatars.show"
 #define OPV_AVATARS_SHOWEMPTY                           "roster.avatars.show-empty"
 #define OPV_AVATARS_CUSTOM_ITEM                         "roster.avatars.custom"
+// RosterSearch
+#define OPV_ROSTER_SEARCH_ENABLED                       "roster.search.enabled"
+#define OPV_ROSTER_SEARCH_FIELDEBANLED                  "roster.search.field-enabled"
 
 // StatusChanger
 #define OPV_STATUSES_ROOT                               "statuses"

@@ -35,5 +35,9 @@
         <source>Allows to search for contacts in the roster</source>
         <translation>Позволяет искать контакты в ростере</translation>
     </message>
+    <message>
+        <source>Group</source>
+        <translation>Группа</translation>
+    </message>
 </context>
 </TS>

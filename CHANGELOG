@@ -19,6 +19,7 @@ LEGEND
   [*] Added ability to switch between tabs by shortkeys Alt+Number
   [*} Added ability to clear chat window
   [*] Added ability to optionaly display of status changes and entry/exit of users in conferences
+  [*] Added ability to search for contacts in the roster by the group name.
   [-] When converting smileys into the text instead of the first key an arbitrary one was inserted
   [-] Contacts list window could be displayed outside the visible screen area
   [-] The roster window was closed by clicking on the tray even if it was inactive

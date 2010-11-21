@@ -16,12 +16,20 @@ RosterSearch::RosterSearch()
 	setDynamicSortFilter(false);
 	setFilterCaseSensitivity(Qt::CaseInsensitive);
 
+	FEnableAction = new Action(this);
+	FEnableAction->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
+	FEnableAction->setToolTip(tr("Show search toolbar"));
+	FEnableAction->setCheckable(true);
+	FEnableAction->setChecked(false);
+	connect(FEnableAction,SIGNAL(triggered(bool)),SLOT(onEnableActionTriggered(bool)));
+
 	QToolBar *searchToolBar = new QToolBar(tr("Search toolbar"));
 	searchToolBar->setAllowedAreas(Qt::TopToolBarArea);
 	searchToolBar->setMovable(false);
 	FSearchToolBarChanger = new ToolBarChanger(searchToolBar);
 	FSearchToolBarChanger->setManageVisibility(false);
 	FSearchToolBarChanger->setSeparatorsVisible(false);
+	FSearchToolBarChanger->toolBar()->setVisible(false);
 
 	FFieldsMenu = new Menu(searchToolBar);
 	FFieldsMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
@@ -65,6 +73,9 @@ bool RosterSearch::initConnections(IPluginManager *APluginManager, int &/*AInitO
 		}
 	}
 
+	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+
 	return FRostersViewPlugin!=NULL && FMainWindow!=NULL;
 }
 
@@ -72,23 +83,24 @@ bool RosterSearch::initObjects()
 {
 	if (FMainWindow)
 	{
-		Action *searchAction = new Action(FMainWindow->topToolBarChanger());
-		searchAction->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
-		searchAction->setToolTip(tr("Show search toolbar"));
-		searchAction->setCheckable(true);
-		connect(searchAction,SIGNAL(triggered(bool)),SLOT(onSearchActionTriggered(bool)));
-		FMainWindow->topToolBarChanger()->insertAction(searchAction,TBG_MWTTB_ROSTERSEARCH);
+		FMainWindow->topToolBarChanger()->insertAction(FEnableAction,TBG_MWTTB_ROSTERSEARCH);
 
 		FMainWindow->instance()->addToolBar(FSearchToolBarChanger->toolBar());
 		FMainWindow->instance()->insertToolBarBreak(FSearchToolBarChanger->toolBar());
-
-		FSearchToolBarChanger->toolBar()->setVisible(false);
 	}
 
-	insertSearchField(RDR_NAME,tr("Name"),true);
-	insertSearchField(RDR_STATUS,tr("Status"),true);
-	insertSearchField(RDR_JID,tr("Jabber ID"),true);
+	insertSearchField(RDR_NAME,tr("Name"));
+	insertSearchField(RDR_STATUS,tr("Status"));
+	insertSearchField(RDR_JID,tr("Jabber ID"));
+	insertSearchField(RDR_GROUP,tr("Group"));
 
+	return true;
+}
+
+bool RosterSearch::initSettings()
+{
+	Options::setDefaultValue(OPV_ROSTER_SEARCH_ENABLED,false);
+	Options::setDefaultValue(OPV_ROSTER_SEARCH_FIELDEBANLED,true);
 	return true;
 }
 
@@ -114,38 +126,37 @@ void RosterSearch::setSearchPattern(const QString &APattern)
 
 bool RosterSearch::isSearchEnabled() const
 {
-	return FSearchToolBarChanger->toolBar()->isVisible();
+	return FEnableAction->isChecked();
 }
 
 void RosterSearch::setSearchEnabled(bool AEnabled)
 {
-	if (isSearchEnabled() != AEnabled)
+	FEnableAction->setChecked(AEnabled);
+	if (FRostersViewPlugin)
 	{
-		if (FRostersViewPlugin)
-		{
-			if (AEnabled)
-				FRostersViewPlugin->rostersView()->insertProxyModel(this,RPO_ROSTERSEARCH_FILTER);
-			else
-				FRostersViewPlugin->rostersView()->removeProxyModel(this);
-		}
-		FSearchToolBarChanger->toolBar()->setVisible(AEnabled);
-		emit searchStateChanged(AEnabled);
+		if (AEnabled)
+			FRostersViewPlugin->rostersView()->insertProxyModel(this,RPO_ROSTERSEARCH_FILTER);
+		else
+			FRostersViewPlugin->rostersView()->removeProxyModel(this);
 	}
+	FSearchToolBarChanger->toolBar()->setVisible(AEnabled);
+	emit searchStateChanged(AEnabled);
 }
 
-void RosterSearch::insertSearchField(int ADataRole, const QString &AName, bool AEnabled)
+void RosterSearch::insertSearchField(int ADataRole, const QString &AName)
 {
 	Action *action = FFieldActions.value(ADataRole,NULL);
 	if (action == NULL)
 	{
 		action = new Action(FFieldsMenu);
+		action->setData(Action::DR_SortString,QString("%1").arg(ADataRole,5,10,QChar('0')));
 		connect(action,SIGNAL(triggered(bool)),SLOT(onFieldActionTriggered(bool)));
 		FFieldActions.insert(ADataRole,action);
 		FFieldsMenu->addAction(action,AG_DEFAULT,true);
 	}
 	action->setText(AName);
 	action->setCheckable(true);
-	action->setChecked(AEnabled);
+	action->setChecked(true);
 	emit searchFieldInserted(ADataRole,AName);
 }
 
@@ -227,7 +238,7 @@ void RosterSearch::onFieldActionTriggered(bool)
 	startSearch();
 }
 
-void RosterSearch::onSearchActionTriggered(bool AChecked)
+void RosterSearch::onEnableActionTriggered(bool AChecked)
 {
 	setSearchEnabled(AChecked);
 }
@@ -236,6 +247,20 @@ void RosterSearch::onEditTimedOut()
 {
 	emit searchPatternChanged(FSearchEdit->text());
 	startSearch();
+}
+
+void RosterSearch::onOptionsOpened()
+{
+	setSearchEnabled(Options::node(OPV_ROSTER_SEARCH_ENABLED).value().toBool());
+	foreach(int dataRole, FFieldActions.keys())
+		setSearchFieldEnabled(dataRole,Options::node(OPV_ROSTER_SEARCH_FIELDEBANLED,QString::number(dataRole)).value().toBool());
+}
+
+void RosterSearch::onOptionsClosed()
+{
+	Options::node(OPV_ROSTER_SEARCH_ENABLED).setValue(isSearchEnabled());
+	foreach(int dataRole, FFieldActions.keys())
+		Options::node(OPV_ROSTER_SEARCH_FIELDEBANLED,QString::number(dataRole)).setValue(isSearchFieldEnabled(dataRole));
 }
 
 Q_EXPORT_PLUGIN2(plg_rostersearch, RosterSearch)
