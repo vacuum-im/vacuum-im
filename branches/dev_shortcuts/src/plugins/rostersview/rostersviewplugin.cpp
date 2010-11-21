@@ -95,7 +95,11 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
 bool RostersViewPlugin::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_MAINWINDOW_TOGGLEOFFLINE, tr("Show/Hide offline contacts"),QKeySequence::UnknownKey);
+	
 	Shortcuts::declareGroup(SCTG_ROSTERVIEW,tr("Roster"));
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COPYJID,tr("Copy contact JID to clipboard"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COPYNAME,tr("Copy contact name to clipboard"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COPYSTATUS,tr("Copy contact status to clipboard"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
 
 	FSortFilterProxyModel = new SortFilterProxyModel(this, this);
 	FSortFilterProxyModel->setSortLocaleAware(true);
@@ -120,6 +124,10 @@ bool RostersViewPlugin::initObjects()
 		FRostersModel->insertDefaultDataHolder(this);
 		FRostersView->setRostersModel(FRostersModel);
 	}
+
+	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYJID,FRostersView);
+	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYNAME,FRostersView);
+	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYSTATUS,FRostersView);
 
 	return true;
 }

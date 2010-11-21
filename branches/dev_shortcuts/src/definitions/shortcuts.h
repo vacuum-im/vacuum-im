@@ -90,6 +90,33 @@
 
 //RosterView
 #define SCTG_ROSTERVIEW                                            "roster-view"
+#define   SCT_ROSTERVIEW_COPYJID                                   "roster-view.copy-jid"
+#define   SCT_ROSTERVIEW_COPYNAME                                  "roster-view.copy-name"
+#define   SCT_ROSTERVIEW_COPYSTATUS                                "roster-view.copy-status"
+//ChatMessageHandler
+#define   SCT_ROSTERVIEW_SHOWCHAT                                  "roster-view.show-chat"
+//NormalMessageHandler
+#define   SCT_ROSTERVIEW_SHOWESSAGE                                "roster-view.show-message"
+//RosterChanger
+#define   SCT_ROSTERVIEW_RENAME                                    "roster-view.rename"
+#define   SCT_ROSTERVIEW_REMOVEFROMGROUP                           "roster-view.remove-from-group"
+#define   SCT_ROSTERVIEW_REMOVEFROMROSTER                          "roster-view.remove-from-roster"
+#define   SCT_ROSTERVIEW_REMOVEGROUP                               "roster-view.remove-group"
+#define   SCT_ROSTERVIEW_REMOVEGROUPCONTACTS                       "roster-view.remove-group-contacts"
+#define   SCT_ROSTERVIEW_ADDCONTACTTOGROUP                         "roster-view.add-contact-to-group"
+#define   SCT_ROSTERVIEW_SUBSCRIBE                                 "roster-view.subscribe"
+#define   SCT_ROSTERVIEW_UNSUBSCRIBE                               "roster-view.unsubscribe"
+//MessageArchiver
+#define   SCT_ROSTERVIEW_SHOWHISTORY                               "roster-view.show-history"
+//vCard
+#define   SCT_ROSTERVIEW_SHOWVCARD                                 "roster-view.show-vcard"
+//FileTransfer
+#define   SCT_ROSTERVIEW_SENDFILE                                  "roster-view.send-file"
+//Gateways
+#define   SCT_ROSTERVIEW_GATELOGIN                                 "roster-view.gate-login"
+#define   SCT_ROSTERVIEW_GATELOGOUT                                "roster-view.gate-logout"
+//Annotations
+#define   SCT_ROSTERVIEW_EDITANNOTATION                            "roster-view.edit-annotation"
 
 //MessageWidgets
 #define SCTG_TABWINDOW                                             "tab-window"
@@ -97,7 +124,7 @@
 #define   SCT_TABWINDOW_PREVTAB                                    "tab-window.prev-tab"
 #define   SCT_TABWINDOW_CLOSETAB                                   "tab-window.close-tab"
 #define   SCT_TABWINDOW_DETACHTAB                                  "tab-window.detach-tab"
-#define   SCT_TABWINDOW_SHOWCLOSEBUTTTONS							       "tab-window.show-close-buttons"
+#define   SCT_TABWINDOW_SHOWCLOSEBUTTTONS							             "tab-window.show-close-buttons"
 #define   SCT_TABWINDOW_TABSBOTTOM                                 "tab-window.show-tabs-at-bottom"
 #define   SCT_TABWINDOW_SETASDEFAULT                               "tab-window.set-as-default"
 #define   SCT_TABWINDOW_RENAMEWINDOW                               "tab-window.rename-window"
