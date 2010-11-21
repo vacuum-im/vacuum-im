@@ -98,8 +98,9 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza)
 			emit stanzaSent(AStreamJid, AStanza);
 			return true;
 		}
+		return false;
 	}
-	return false;
+	return true;
 }
 
 bool StanzaProcessor::sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout)
