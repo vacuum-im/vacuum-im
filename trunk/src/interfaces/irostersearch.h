@@ -14,7 +14,7 @@ public:
 	virtual void setSearchPattern(const QString &APattern) =0;
 	virtual bool isSearchEnabled() const =0;
 	virtual void setSearchEnabled(bool AEnabled) =0;
-	virtual void insertSearchField(int ADataRole, const QString &AName, bool AEnabled) =0;
+	virtual void insertSearchField(int ADataRole, const QString &AName) =0;
 	virtual Menu *searchFieldsMenu() const =0;
 	virtual QList<int> searchFields() const =0;
 	virtual bool isSearchFieldEnabled(int ADataRole) const =0;

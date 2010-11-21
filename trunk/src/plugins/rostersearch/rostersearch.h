@@ -10,11 +10,13 @@
 #include <definitions/rosterproxyorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersearch.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersview.h>
 #include <utils/action.h>
+#include <utils/options.h>
 #include <utils/toolbarchanger.h>
 
 class RosterSearch :
@@ -33,7 +35,7 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IRosterSearch
 	virtual void startSearch();
@@ -41,7 +43,7 @@ public:
 	virtual void setSearchPattern(const QString &APattern);
 	virtual bool isSearchEnabled() const;
 	virtual void setSearchEnabled(bool AEnabled);
-	virtual void insertSearchField(int ADataRole, const QString &AName, bool AEnabled);
+	virtual void insertSearchField(int ADataRole, const QString &AName);
 	virtual Menu *searchFieldsMenu() const;
 	virtual QList<int> searchFields() const;
 	virtual bool isSearchFieldEnabled(int ADataRole) const;
@@ -58,17 +60,20 @@ protected:
 	virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 protected slots:
 	void onFieldActionTriggered(bool);
-	void onSearchActionTriggered(bool AChecked);
+	void onEnableActionTriggered(bool AChecked);
 	void onEditTimedOut();
+	void onOptionsOpened();
+	void onOptionsClosed();
 private:
 	IMainWindow *FMainWindow;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
 	Menu *FFieldsMenu;
 	QTimer FEditTimeout;
+	Action *FEnableAction;
 	QLineEdit *FSearchEdit;
 	ToolBarChanger *FSearchToolBarChanger;
-	QHash<int,Action *> FFieldActions;
+	QMap<int,Action *> FFieldActions;
 };
 
 #endif // ROSTERSEARCH_H
