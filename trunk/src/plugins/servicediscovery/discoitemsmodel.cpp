@@ -319,7 +319,7 @@ void DiscoItemsModel::appendChildren(DiscoItemIndex *AParent, QList<DiscoItemInd
 	}
 }
 
-void DiscoItemsModel::removeChildren(DiscoItemIndex *AParent, QList<DiscoItemIndex*> AChilds)
+void DiscoItemsModel::removeChildren(DiscoItemIndex *AParent, QList<DiscoItemIndex *> AChilds)
 {
 	if (AParent && !AChilds.isEmpty())
 	{
@@ -338,14 +338,14 @@ void DiscoItemsModel::removeChildren(DiscoItemIndex *AParent, QList<DiscoItemInd
 		{
 			if (firstRow < 0)
 			{
-				firstRow = rows.takeFirst();
+				firstRow = rows.takeLast();
 				lastRow = firstRow;
 			}
-			if (!rows.isEmpty() && lastRow+1==rows.first())
+			if (!rows.isEmpty() && firstRow-1==rows.last())
 			{
-				lastRow = rows.takeFirst();
+				firstRow = rows.takeLast();
 			}
-			if (rows.isEmpty() || lastRow+1!=rows.first())
+			if (rows.isEmpty() || firstRow-1!=rows.last())
 			{
 				emit beginRemoveRows(modelIndex(AParent,0),firstRow,lastRow);
 				while (lastRow >= firstRow)
