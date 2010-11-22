@@ -1,7 +1,7 @@
 TARGET_LOADER            = vacuum
 
 TARGET_UTILS             = vacuumutils
-unix:VERSION_UTILS       = 1.2.0
+unix:!macx:VERSION_UTILS = 1.2.0
 
 macx:CONFIG             += x86
 
@@ -20,9 +20,7 @@ isEmpty(INSTALL_APP_DIR) {
 
 isEmpty(INSTALL_LIB_DIR) {
   win32:INSTALL_LIB_DIR  = .
-  unix:!macx {
-    INSTALL_LIB_DIR      = lib
-  }
+  unix: INSTALL_LIB_DIR  = lib
   macx: INSTALL_LIB_DIR  = Frameworks
 }
 
