@@ -8,6 +8,7 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
 #include <utils/stanza.h>
+#include <utils/options.h>
 
 class PrivateStorage :
 			public QObject,
@@ -49,6 +50,9 @@ signals:
 protected:
 	QDomElement insertElement(const Jid &AStreamJid, const QDomElement &AElement);
 	void removeElement(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
+	void saveOptionsElement(const Jid &AStreamJid, const QDomElement &AElement) const;
+	QDomElement loadOptionsElement(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) const;
+	void removeOptionsElement(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) const;
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamAboutToClose(IXmppStream *AXmppStream);
