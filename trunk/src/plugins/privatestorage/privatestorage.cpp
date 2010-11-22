@@ -47,34 +47,25 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 	if (FSaveRequests.contains(AStanza.id()))
 	{
 		QDomElement elem = FSaveRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
-			emit dataSaved(AStanza.id(),AStreamJid,elem);
-		else
-			removeElement(AStreamJid,elem.tagName(),elem.namespaceURI());
+		saveOptionsElement(AStreamJid,elem);
+		emit dataSaved(AStanza.id(),AStreamJid,elem);
 	}
 	else if (FLoadRequests.contains(AStanza.id()))
 	{
-		FLoadRequests.remove(AStanza.id());
+		QDomElement dataElem; 
+		QDomElement loadElem = FLoadRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
-		{
-			QDomElement dataElem = AStanza.firstElement("query",NS_JABBER_PRIVATE).firstChildElement();
-			emit dataLoaded(AStanza.id(),AStreamJid,insertElement(AStreamJid,dataElem));
-		}
+			dataElem = AStanza.firstElement("query",NS_JABBER_PRIVATE).firstChildElement();
+		else
+			dataElem = loadOptionsElement(AStreamJid, loadElem.tagName(),loadElem.namespaceURI());
+		emit dataLoaded(AStanza.id(),AStreamJid,insertElement(AStreamJid,dataElem));
 	}
 	else if (FRemoveRequests.contains(AStanza.id()))
 	{
 		QDomElement dataElem = FRemoveRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
-		{
-			emit dataRemoved(AStanza.id(),AStreamJid,dataElem);
-			removeElement(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
-		}
-	}
-
-	if (AStanza.type() == "error")
-	{
-		ErrorHandler err(AStanza.element());
-		emit dataError(AStanza.id(),err.message());
+		removeElement(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
+		removeOptionsElement(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
+		emit dataRemoved(AStanza.id(),AStreamJid,dataElem);
 	}
 }
 
@@ -180,6 +171,43 @@ void PrivateStorage::removeElement(const Jid &AStreamJid, const QString &ATagNam
 {
 	if (FStreamElements.contains(AStreamJid))
 		FStreamElements[AStreamJid].removeChild(getData(AStreamJid,ATagName,ANamespace));
+}
+
+void PrivateStorage::saveOptionsElement(const Jid &AStreamJid, const QDomElement &AElement) const
+{
+	if (AStreamJid.isValid() && !AElement.tagName().isEmpty() && !AElement.namespaceURI().isEmpty())
+	{
+		QDomDocument doc;
+		doc.appendChild(doc.createElement("storage")).appendChild(AElement.cloneNode(true));
+		QString nodePath = QString("private-storage[%1].%2[%3]").arg(AStreamJid.pBare()).arg(AElement.tagName()).arg(AElement.namespaceURI());
+		Options::setFileValue(Options::encrypt(doc.toByteArray(0)),nodePath);
+	}
+}
+
+QDomElement PrivateStorage::loadOptionsElement(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) const
+{
+	QDomDocument doc;
+	if (AStreamJid.isValid() && !ATagName.isEmpty() && !ANamespace.isEmpty())
+	{
+		QString nodePath = QString("private-storage[%1].%2[%3]").arg(AStreamJid.pBare()).arg(ATagName).arg(ANamespace);
+		doc.setContent(Options::decrypt(Options::fileValue(nodePath).toByteArray()).toByteArray(),true);
+		QDomElement dataElem = doc.documentElement().firstChildElement();
+		if (dataElem.tagName()!=ATagName || dataElem.namespaceURI()!=ANamespace)
+		{
+			doc.clear();
+			doc.appendChild(doc.createElement("storage")).appendChild(doc.createElementNS(ANamespace,ATagName));
+		}
+	}
+	return doc.documentElement().firstChildElement();
+}
+
+void PrivateStorage::removeOptionsElement(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) const
+{
+	if (AStreamJid.isValid() && !ATagName.isEmpty() && !ANamespace.isEmpty())
+	{
+		QString nodePath = QString("private-storage[%1].%2[%3]").arg(AStreamJid.pBare()).arg(ATagName).arg(ANamespace);
+		Options::setFileValue(QVariant(),nodePath);
+	}
 }
 
 void PrivateStorage::onStreamOpened(IXmppStream *AXmppStream)
