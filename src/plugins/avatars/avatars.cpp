@@ -670,8 +670,9 @@ void Avatars::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMa
 		{
 			QString fileName = avatarFileName(hash);
 			QSize imageSize = QImageReader(fileName).size();
-			imageSize.scale(ALabelId==FRosterLabelId ? QSize(128,128) : QSize(64,64), Qt::KeepAspectRatio);
-			QString avatarMask = "<img src='%1' width=%2 height=%3>";
+         if (ALabelId!=FRosterLabelId && (imageSize.height()>64 || imageSize.width()>64))
+			   imageSize.scale(QSize(64,64), Qt::KeepAspectRatio);
+			QString avatarMask = "<img src='%1' width=%2 height=%3 />";
 			AToolTips.insert(RTTO_AVATAR_IMAGE,avatarMask.arg(fileName).arg(imageSize.width()).arg(imageSize.height()));
 		}
 	}
