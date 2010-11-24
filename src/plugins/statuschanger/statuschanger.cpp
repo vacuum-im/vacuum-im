@@ -165,6 +165,8 @@ bool StatusChanger::initObjects()
 
 	createDefaultStatus();
 	setMainStatusId(STATUS_OFFLINE);
+	updateMainMenu();
+	updateTrayToolTip();
 
 	if (FOptionsManager)
 		FOptionsManager->insertOptionsHolder(this);
