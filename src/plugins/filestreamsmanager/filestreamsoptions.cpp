@@ -14,6 +14,7 @@ FileStreamsOptions::FileStreamsOptions(IDataStreamsManager *ADataManager, IFileS
 	connect(ui.pbtDirectory, SIGNAL(clicked()), SLOT(onDirectoryButtonClicked()));
 
 	connect(ui.lneDirectory,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+	connect(ui.chbGroupBySender,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 	connect(ui.cmbMethod,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 
 	reset();
@@ -27,6 +28,7 @@ FileStreamsOptions::~FileStreamsOptions()
 void FileStreamsOptions::apply()
 {
 	Options::node(OPV_FILESTREAMS_DEFAULTDIR).setValue(ui.lneDirectory->text());
+	Options::node(OPV_FILESTREAMS_GROUPBYSENDER).setValue(ui.chbGroupBySender->isChecked());
 
 	QStringList acceptableMethods;
 	foreach(QCheckBox *button, FMethods.keys())
@@ -42,6 +44,7 @@ void FileStreamsOptions::apply()
 void FileStreamsOptions::reset()
 {
 	ui.lneDirectory->setText(Options::node(OPV_FILESTREAMS_DEFAULTDIR).value().toString());
+	ui.chbGroupBySender->setChecked(Options::node(OPV_FILESTREAMS_GROUPBYSENDER).value().toBool());
 
 	QStringList acceptableMethods = Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList();
 	foreach(QString methodNS, FDataManager->methods())

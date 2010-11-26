@@ -93,6 +93,7 @@ protected:
 	QList<IToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
 	StreamDialog *createStreamDialog(IFileStream *ASession);
 	IFileStream *createStream(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AStreamKind);
+	QString dirNameByUserName(const QString &AUserName) const;
 protected slots:
 	void onStreamStateChanged();
 	void onStreamDestroyed();

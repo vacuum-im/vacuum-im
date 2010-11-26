@@ -291,7 +291,15 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
 			IFileStream *stream = createStream(AStreamId,ARequest.to(),ARequest.from(),IFileStream::ReceiveFile);
 			if (stream)
 			{
-				stream->setFileName(QDir(Options::node(OPV_FILESTREAMS_DEFAULTDIR).value().toString()).absoluteFilePath(fileName));
+				QString dirName = Options::node(OPV_FILESTREAMS_DEFAULTDIR).value().toString();
+				if (Options::node(OPV_FILESTREAMS_GROUPBYSENDER).value().toBool())
+				{
+					QString userDir = dirNameByUserName(FNotifications!=NULL ? FNotifications->contactName(stream->streamJid(),stream->contactJid()) : stream->contactJid().node());
+					if (!userDir.isEmpty())
+						dirName += "/" + userDir;
+				}
+
+				stream->setFileName(QDir(dirName).absoluteFilePath(fileName));
 				stream->setFileSize(fileSize);
 				stream->setFileHash(fileElem.attribute("hash"));
 				stream->setFileDate(DateTime(fileElem.attribute("date")).toLocal());
@@ -543,6 +551,25 @@ IFileStream *FileTransfer::createStream(const QString &AStreamId, const Jid &ASt
 		connect(stream->instance(),SIGNAL(streamDestroyed()),SLOT(onStreamDestroyed()));
 	}
 	return stream;
+}
+
+QString FileTransfer::dirNameByUserName(const QString &AUserName) const
+{
+	QString fileName;
+	for (int i = 0; i < AUserName.length(); i++)
+	{
+		if (AUserName.at(i) == '.')
+			fileName.append('.');
+		else if (AUserName.at(i) == '_')
+			fileName.append('_');
+		else if (AUserName.at(i) == '-')
+			fileName.append('-');
+		else if (AUserName.at(i) == ' ')
+			fileName.append(' ');
+		else if (AUserName.at(i).isLetterOrNumber())
+			fileName.append(AUserName.at(i));
+	}
+	return fileName.trimmed();
 }
 
 void FileTransfer::onStreamStateChanged()
