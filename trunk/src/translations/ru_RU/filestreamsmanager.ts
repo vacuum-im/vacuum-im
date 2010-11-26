@@ -76,6 +76,10 @@
         <source>Acceptable Data Streams</source>
         <translation>Разрешённые потоки данных</translation>
     </message>
+    <message>
+        <source>Group downloads by sender</source>
+        <translation>Группировать загрузки по отправителю</translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsWindow</name>

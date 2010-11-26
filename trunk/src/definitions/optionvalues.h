@@ -59,6 +59,7 @@
 
 // FileStreamsManager
 #define OPV_FILESTREAMS_DEFAULTDIR                      "filestreams.default-dir"
+#define OPV_FILESTREAMS_GROUPBYSENDER                   "filestreams.group-by-sender"
 #define OPV_FILESTREAMS_DEFAULTMETHOD                   "filestreams.default-method"
 #define OPV_FILESTREAMS_ACCEPTABLEMETHODS               "filestreams.acceptable-methods"
 // FileTransfer
