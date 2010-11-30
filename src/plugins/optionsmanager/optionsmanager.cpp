@@ -438,7 +438,8 @@ QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, QWidget *APar
 		if (FOptionsDialog.isNull())
 		{
 			FOptionsDialog = new OptionsDialog(this,AParent);
-			connect(FOptionsDialog,SIGNAL(applied()),SLOT(onOptionsDialogApplied()));
+			connect(FOptionsDialog,SIGNAL(accepted()),SLOT(onOptionsDialogClosed()));
+			connect(FOptionsDialog,SIGNAL(rejected()),SLOT(onOptionsDialogClosed()));
 		}
 		FOptionsDialog->showNode(ANodeId);
 		WidgetManager::showActivateRaiseWindow(FOptionsDialog);
@@ -608,7 +609,7 @@ void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
 	}
 }
 
-void OptionsManager::onOptionsDialogApplied()
+void OptionsManager::onOptionsDialogClosed()
 {
 	saveOptions();
 }
