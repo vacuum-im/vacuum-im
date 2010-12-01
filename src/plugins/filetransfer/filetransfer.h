@@ -26,6 +26,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/iroster.h>
 #include <interfaces/inotifications.h>
+#include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ioptionsmanager.h>
@@ -113,6 +114,7 @@ private:
 	IDataStreamsManager *FDataManager;
 	IFileStreamsManager *FFileManager;
 	IMessageWidgets *FMessageWidgets;
+	IMessageArchiver *FMessageArchiver;
 	IOptionsManager *FOptionsManager;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
