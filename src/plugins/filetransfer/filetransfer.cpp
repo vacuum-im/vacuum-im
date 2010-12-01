@@ -341,7 +341,10 @@ bool FileTransfer::fileStreamResponce(const QString &AStreamId, const Stanza &AR
 			if (rangeElem.hasAttribute("length"))
 				stream->setRangeLength(rangeElem.attribute("length").toLongLong());
 		}
-		return stream->startStream(AMethodNS);
+		if (!stream->startStream(AMethodNS))
+			stream->abortStream(tr("Failed to start file transfer"));
+		else
+			return true;
 	}
 	return false;
 }

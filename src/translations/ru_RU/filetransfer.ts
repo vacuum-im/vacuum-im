@@ -79,6 +79,10 @@
         <source>File &apos;%1&apos; successfully received.</source>
         <translation>Файл &apos;%1&apos; успешно получен.</translation>
     </message>
+    <message>
+        <source>Failed to start file transfer</source>
+        <translation>Не удалось запустить передачу файлов</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>

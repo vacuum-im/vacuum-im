@@ -27,6 +27,10 @@
         <source>Data transmission terminated by remote user</source>
         <translation>Передача данных прервана удалённым пользователем</translation>
     </message>
+    <message>
+        <source>Connection timed out</source>
+        <translation>Превышено время установки соединения</translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsManager</name>

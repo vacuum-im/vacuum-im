@@ -13,7 +13,7 @@
 #define BUFFER_INCREMENT_SIZE     5120
 #define MAX_BUFFER_SIZE           51200
 
-#define SHC_HOSTS                 "/iq[@type='set']/query[@xmlns='" NS_SOCKS5_BYTESTREAMS "']/streamhost"
+#define SHC_HOSTS                 "/iq[@type='set']/query[@xmlns='" NS_SOCKS5_BYTESTREAMS "']"
 
 enum NegotiationCommands
 {
@@ -531,18 +531,22 @@ void SocksStream::readBufferedData(bool AFlush)
 
 int SocksStream::insertStanzaHandle(const QString &ACondition)
 {
-	IStanzaHandle shandle;
-	shandle.handler = this;
-	shandle.order = SHO_DEFAULT;
-	shandle.direction = IStanzaHandle::DirectionIn;
-	shandle.streamJid = FStreamJid;
-	shandle.conditions.append(ACondition);
-	return FStanzaProcessor->insertStanzaHandle(shandle);
+	if (FStanzaProcessor)
+	{
+		IStanzaHandle shandle;
+		shandle.handler = this;
+		shandle.order = SHO_DEFAULT;
+		shandle.direction = IStanzaHandle::DirectionIn;
+		shandle.streamJid = FStreamJid;
+		shandle.conditions.append(ACondition);
+		return FStanzaProcessor->insertStanzaHandle(shandle);
+	}
+	return -1;
 }
 
 void SocksStream::removeStanzaHandle(int &AHandleId)
 {
-	if (AHandleId>0)
+	if (FStanzaProcessor && AHandleId>0)
 	{
 		FStanzaProcessor->removeStanzaHandle(AHandleId);
 		AHandleId = -1;
@@ -577,7 +581,6 @@ bool SocksStream::negotiateConnection(int ACommand)
 		{
 			if (sendAvailHosts())
 				return true;
-
 			abort(tr("Failed to create hosts"));
 		}
 		else if (ACommand == NCMD_CONNECT_TO_HOST)
@@ -700,10 +703,10 @@ bool SocksStream::sendAvailHosts()
 		hostElem.setAttribute("port",info.port);
 	}
 
-	if (FHosts.count()>0 && FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,HOST_REQUEST_TIMEOUT))
+	if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,HOST_REQUEST_TIMEOUT))
 	{
 		FHostRequest = request.id();
-		return true;
+		return !FHosts.isEmpty();
 	}
 
 	return false;
