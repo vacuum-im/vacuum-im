@@ -68,6 +68,7 @@ protected slots:
 	void onTransferThreadProgress(qint64 ABytes);
 	void onTransferThreadFinished();
 	void onIncrementSpeedIndex();
+	void onConnectionTimeout();
 private:
 	IDataStreamsManager *FDataManager;
 private:
@@ -81,7 +82,6 @@ private:
 	qint64 FProgress;
 	bool FAborted;
 	QUuid FProfileId;
-	QString FMethodNS;
 	QString FAbortString;
 	QString FStateString;
 	QStringList FAcceptableMethods;

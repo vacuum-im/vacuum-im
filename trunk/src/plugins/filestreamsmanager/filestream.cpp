@@ -4,6 +4,8 @@
 #include <QTimer>
 #include <QFileInfo>
 
+#define CONNECTION_TIMEOUT 60000
+
 FileStream::FileStream(IDataStreamsManager *ADataManager, const QString &AStreamId, const Jid &AStreamJid,
                        const Jid &AContactJid, int AKind, QObject *AParent) : QObject(AParent)
 {
@@ -68,7 +70,7 @@ int FileStream::streamState() const
 
 QString FileStream::methodNS() const
 {
-	return FMethodNS;
+	return FSocket!=NULL ? FSocket->methodNS() : QString::null;
 }
 
 qint64 FileStream::speed() const
@@ -255,6 +257,7 @@ void FileStream::setSettingsProfile(const QUuid &AProfileId)
 		emit propertiesChanged();
 	}
 }
+
 bool FileStream::initStream(const QList<QString> &AMethods)
 {
 	if (FStreamState==Creating && FStreamKind==SendFile)
@@ -282,15 +285,16 @@ bool FileStream::startStream(const QString &AMethodNS)
 			if (FSocket)
 			{
 				stremMethod->loadMethodSettings(FSocket,FDataManager->settingsProfileNode(FProfileId, AMethodNS));
-				setStreamState(Connecting,tr("Connecting"));
 				connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
-				if (FSocket->open(QIODevice::WriteOnly))
+				if (!FSocket->open(QIODevice::WriteOnly))
 				{
-					FMethodNS = AMethodNS;
+					delete FSocket->instance();
+					FSocket = NULL;
+				}
+				else
+				{
 					return true;
 				}
-				delete FSocket->instance();
-				FSocket = NULL;
 			}
 			FFile.close();
 		}
@@ -306,15 +310,16 @@ bool FileStream::startStream(const QString &AMethodNS)
 				if (FSocket)
 				{
 					stremMethod->loadMethodSettings(FSocket,FDataManager->settingsProfileNode(FProfileId, AMethodNS));
-					setStreamState(Connecting,tr("Connecting"));
 					connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
-					if (FSocket->open(QIODevice::ReadOnly))
+					if (!FSocket->open(QIODevice::ReadOnly))
 					{
-						FMethodNS = AMethodNS;
+						delete FSocket->instance();
+						FSocket = NULL;
+					}
+					else
+					{
 						return true;
 					}
-					delete FSocket->instance();
-					FSocket = NULL;
 				}
 			}
 			FFile.close();
@@ -372,9 +377,13 @@ bool FileStream::openFile()
 
 void FileStream::setStreamState(int AState, const QString &AMessage)
 {
-	if (FStreamState!=AState)
+	if (FStreamState != AState)
 	{
-		if (AState == Transfering)
+		if (AState == Connecting)
+		{
+			QTimer::singleShot(CONNECTION_TIMEOUT,this,SLOT(onConnectionTimeout()));
+		}
+		else if (AState == Transfering)
 		{
 			FSpeedIndex = 0;
 			memset(&FSpeed,0,sizeof(FSpeed));
@@ -398,7 +407,11 @@ void FileStream::setAcceptableMethods(const QStringList &AMethods)
 
 void FileStream::onSocketStateChanged(int AState)
 {
-	if (AState == IDataStreamSocket::Opened)
+	if (AState == IDataStreamSocket::Opening)
+	{
+		setStreamState(Connecting,tr("Connecting"));
+	}
+	else if (AState == IDataStreamSocket::Opened)
 	{
 		if (FThread == NULL)
 		{
@@ -471,4 +484,12 @@ void FileStream::onIncrementSpeedIndex()
 	FSpeedIndex = (FSpeedIndex+1) % SPEED_POINTS;
 	FSpeed[FSpeedIndex] = 0;
 	emit speedChanged();
+}
+
+void FileStream::onConnectionTimeout()
+{
+	if (FStreamState == Connecting)
+	{
+		abortStream(tr("Connection timed out"));
+	}
 }
