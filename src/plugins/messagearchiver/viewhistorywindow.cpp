@@ -237,7 +237,6 @@ void ViewHistoryWindow::setArchiveSource(int ASource)
 void ViewHistoryWindow::setFilter(const IArchiveFilter &AFilter)
 {
 	FFilter = AFilter;
-	ui.trvCollections->setCurrentIndex(QModelIndex());
 	insertContact(AFilter.with);
 	updateFilterWidgets();
 	processRequests(createRequests(AFilter));
@@ -1129,8 +1128,7 @@ void ViewHistoryWindow::onApplyFilterClicked()
 void ViewHistoryWindow::onInvalidateTimeout()
 {
 	FProxyModel->invalidate();
-	QModelIndex index = ui.trvCollections->selectionModel()->currentIndex();
-	onCurrentItemChanged(index,index);
+	ui.trvCollections->setCurrentIndex(ui.trvCollections->model()->index(0,0));
 }
 
 void ViewHistoryWindow::onChangeGroupKindByAction(bool)
