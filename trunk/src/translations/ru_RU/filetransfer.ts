@@ -71,6 +71,14 @@
         <source>Automatically remove finished transfers</source>
         <translation>Автоматически удалять завершённые передачи</translation>
     </message>
+    <message>
+        <source>File &apos;%1&apos; successfully sent.</source>
+        <translation>Файл &apos;%1&apos; успешно передан.</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully received.</source>
+        <translation>Файл &apos;%1&apos; успешно получен.</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>

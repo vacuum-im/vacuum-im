@@ -19,6 +19,7 @@ FileTransfer::FileTransfer()
 	FFileManager = NULL;
 	FDataManager = NULL;
 	FMessageWidgets = NULL;
+	FMessageArchiver = NULL;
 	FOptionsManager = NULL;
 	FRostersViewPlugin = NULL;
 }
@@ -95,6 +96,12 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitO
 		{
 			connect(FMessageWidgets->instance(), SIGNAL(toolBarWidgetCreated(IToolBarWidget *)), SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
 		}
+	}
+
+	plugin = APluginManager->pluginInterface("IMessageArchiver").value(0,NULL);
+	if (plugin)
+	{
+		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
@@ -464,6 +471,29 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 				int notifyId = FNotifications->appendNotification(notify);
 				FStreamNotify.insert(AStream->streamId(),notifyId);
 			}
+		}
+	}
+
+	if (AStream->streamState() == IFileStream::Finished)
+	{
+		QString note = AStream->streamKind()==IFileStream::SendFile ? tr("File '%1' successfully sent.") : tr("File '%1' successfully received.");
+		note = note.arg(!AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString::null);
+		if (FMessageWidgets)
+		{
+			IChatWindow *window = FMessageWidgets->findChatWindow(AStream->streamJid(),AStream->contactJid());
+			if (window)
+			{
+				IMessageContentOptions options;
+				options.kind = IMessageContentOptions::Status;
+				options.type |= IMessageContentOptions::Event;
+				options.direction = IMessageContentOptions::DirectionIn;
+				options.time = QDateTime::currentDateTime();
+				window->viewWidget()->appendText(note,options);
+			}
+		}
+		if (FMessageArchiver)
+		{
+			FMessageArchiver->saveNote(AStream->streamJid(),AStream->contactJid(),note);
 		}
 	}
 }
