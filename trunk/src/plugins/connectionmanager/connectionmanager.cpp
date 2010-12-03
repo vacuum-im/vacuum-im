@@ -72,6 +72,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
 	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
 	return !FPlugins.isEmpty();
 }
@@ -194,8 +195,6 @@ void ConnectionManager::setDefaultProxy(const QUuid &AProxyId)
 	if (defaultProxy()!=AProxyId && (AProxyId.isNull() || proxyList().contains(AProxyId)))
 	{
 		Options::node(OPV_PROXY_DEFAULT).setValue(AProxyId.toString());
-		QNetworkProxy::setApplicationProxy(proxyById(AProxyId).proxy);
-		emit defaultProxyChanged(AProxyId);
 	}
 }
 
@@ -224,7 +223,7 @@ QUuid ConnectionManager::loadProxySettings(const OptionsNode &ANode) const
 	return ANode.value().toString();
 }
 
-IConnection *ConnectionManager::updateAccountConnection(IAccount *AAccount) const
+void ConnectionManager::updateAccountConnection(IAccount *AAccount) const
 {
 	if (AAccount->isActive())
 	{
@@ -243,9 +242,23 @@ IConnection *ConnectionManager::updateAccountConnection(IAccount *AAccount) cons
 			connection = plugin->newConnection(aoptions.node("connection",pluginId),AAccount->xmppStream()->instance());
 			AAccount->xmppStream()->setConnection(connection);
 		}
-		return connection;
 	}
-	return NULL;
+}
+
+void ConnectionManager::updateConnectionSettings(IAccount *AAccount) const
+{
+	QList<IAccount *> accountList = AAccount==NULL ? (FAccountManager!=NULL ? FAccountManager->accounts() : QList<IAccount *>()) : QList<IAccount *>()<<AAccount;
+	foreach(IAccount *account, accountList)
+	{
+		if (account->isActive() && account->xmppStream()->connection())
+		{
+			const OptionsNode &aoptions = account->optionsNode();
+			const OptionsNode &coptions = aoptions.node("connection",aoptions.value("connection-type").toString());
+			IConnectionPlugin *plugin = pluginById(coptions.nspace());
+			if (plugin)
+				plugin->loadConnectionSettings(account->xmppStream()->connection(), coptions);
+		}
+	}
 }
 
 void ConnectionManager::onAccountShown(IAccount *AAccount)
@@ -256,19 +269,14 @@ void ConnectionManager::onAccountShown(IAccount *AAccount)
 void ConnectionManager::onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode)
 {
 	const OptionsNode &aoptions = AAccount->optionsNode();
+	const OptionsNode &coptions = aoptions.node("connection",aoptions.value("connection-type").toString());
 	if (aoptions.childPath(ANode) == "connection-type")
 	{
 		updateAccountConnection(AAccount);
 	}
-	else if (AAccount->isActive() && AAccount->xmppStream()->connection())
+	else if (coptions.isChildNode(ANode))
 	{
-		OptionsNode coptions = aoptions.node("connection",aoptions.value("connection-type").toString());
-		if (coptions.isChildNode(ANode))
-		{
-			IConnectionPlugin *plugin = pluginById(coptions.nspace());
-			if (plugin)
-				plugin->loadConnectionSettings(AAccount->xmppStream()->connection(), coptions);
-		}
+		updateConnectionSettings(AAccount);
 	}
 }
 
@@ -297,6 +305,21 @@ void ConnectionManager::onStreamClosed(IXmppStream *AXmppStream)
 void ConnectionManager::onOptionsOpened()
 {
 	QNetworkProxy::setApplicationProxy(proxyById(defaultProxy()).proxy);
+}
+
+void ConnectionManager::onOptionsChanged(const OptionsNode &ANode)
+{
+	if (ANode.path() == OPV_PROXY_DEFAULT)
+	{
+		QUuid proxyId = ANode.value().toString();
+		QNetworkProxy::setApplicationProxy(proxyById(proxyId).proxy);
+		emit defaultProxyChanged(proxyId);
+		updateConnectionSettings();
+	}
+	else if (Options::node(OPV_PROXY_ROOT).isChildNode(ANode))
+	{
+		updateConnectionSettings();
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_connectionmanager, ConnectionManager)

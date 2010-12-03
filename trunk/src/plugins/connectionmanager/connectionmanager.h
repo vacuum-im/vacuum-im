@@ -60,14 +60,16 @@ signals:
 	void proxyChanged(const QUuid &AProxyId, const IConnectionProxy &AProxy);
 	void proxyRemoved(const QUuid &AProxyId);
 	void defaultProxyChanged(const QUuid &AProxyId);
-public:
-	IConnection *updateAccountConnection(IAccount *AAccount) const;
+protected:
+	void updateAccountConnection(IAccount *AAccount) const;
+	void updateConnectionSettings(IAccount *AAccount = NULL) const;
 protected slots:
 	void onAccountShown(IAccount *AAccount);
 	void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onOptionsOpened();
+	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IAccountManager *FAccountManager;
 	IOptionsManager *FOptionsManager;
