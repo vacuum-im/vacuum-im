@@ -57,11 +57,9 @@ void ProxySettingsWidget::onProxyChanged(const QUuid &AProxyId, const IConnectio
 		ui.cmbProxy->addItem(AProxy.name, AProxyId.toString());
 	else
 		ui.cmbProxy->setItemText(index, AProxy.name);
-	emit modified();
 }
 
 void ProxySettingsWidget::onProxyRemoved(const QUuid &AProxyId)
 {
 	ui.cmbProxy->removeItem(ui.cmbProxy->findData(AProxyId.toString()));
-	emit modified();
 }
