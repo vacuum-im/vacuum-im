@@ -362,7 +362,13 @@ bool FileStream::openFile()
 		if (FStreamKind==IFileStream::ReceiveFile ? QDir::root().mkpath(finfo.absolutePath()) : true)
 		{
 			FFile.setFileName(FFileName);
-			if (FFile.open(FStreamKind==IFileStream::SendFile ? QIODevice::ReadOnly : QIODevice::WriteOnly))
+			QIODevice::OpenMode mode = QIODevice::ReadOnly;
+			if (FStreamKind==IFileStream::ReceiveFile)
+			{
+				mode = QIODevice::WriteOnly;
+				mode |= FRangeOffset > 0 ? QIODevice::Append : QIODevice::Truncate;
+			}
+			if (FFile.open(mode))
 			{
 				if (FRangeOffset==0 || FFile.seek(FRangeOffset))
 					return true;
