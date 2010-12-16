@@ -35,6 +35,6 @@
 
 [MacOS X]
   * Default install directory /Applications/vacuum.app
-  qmake -recursive vacuum.pro
+  qmake CONFIG-=debug_and_release CONFIG-=debug -recursive vacuum.pro
   make
   make install
