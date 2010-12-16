@@ -35,27 +35,27 @@ Known Issues
 
 List of plugins that SHOULD NOT be disabled 
 -------------------------------------------
-  01. Account Manager		- accountmanager
-  02. Chat Messages		- chatmessagehandler
-  03. Connection Manager	- connectionmanager
-  04. Default connection	- defaultconnection
-  05. Main Window		- mainnwindow
-  06. Message Manager		- messageprocessor
-  07. Message Styles Manager	- messagestyles
-  08. Message Widgets Manager	- messagewidgets
-  09. Normal Messages		- normalmessagehandler
-  10. Notifications Manager	- notifications
-  11. Presence Manager		- presence
-  12. Roster Manager		- roster
-  13. Roster Editor		- rosterchanger
-  14. Roster Model		- rostersmodel
-  15. Roster View		- rostersview
-  16. SASL Authentication	- saslauth
-  17. Settings Manager		- settings
-  18. Simple Message Style	- simplemessagestyle
-  19. Stanza Manager		- stanzaprocessor
-  20. StartTLS			- starttls
-  21. Status Manager		- statuschanger
-  22. Status Icons Manager	- statusicons
-  23. Tray Icon			- traymanager
-  24. XMPP Streams Manager	- xmppstreams
+  01. Account Manager            - accountmanager
+  02. Chat Messages              - chatmessagehandler
+  03. Connection Manager         - connectionmanager
+  04. Default connection         - defaultconnection
+  05. Main Window                - mainnwindow
+  06. Message Manager            - messageprocessor
+  07. Message Styles Manager     - messagestyles
+  08. Message Widgets Manager    - messagewidgets
+  09. Normal Messages            - normalmessagehandler
+  10. Notifications Manager      - notifications
+  11. Presence Manager           - presence
+  12. Roster Manager             - roster
+  13. Roster Editor              - rosterchanger
+  14. Roster Model               - rostersmodel
+  15. Roster View                - rostersview
+  16. SASL Authentication        - saslauth
+  17. Settings Manager           - settings
+  18. Simple Message Style       - simplemessagestyle
+  19. Stanza Manager             - stanzaprocessor
+  20. StartTLS                   - starttls
+  21. Status Manager             - statuschanger
+  22. Status Icons Manager       - statusicons
+  23. Tray Icon                  - traymanager
+  24. XMPP Streams Manager       - xmppstreams
