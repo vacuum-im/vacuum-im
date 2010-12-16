@@ -1636,7 +1636,7 @@ QString MessageArchiver::collectionDirPath(const Jid &AStreamJid, const Jid &AWi
 	{
 		QString withDir = collectionDirName(AWith);
 		if (!dir.exists(withDir))
-			noError &= dir.mkdir(withDir);
+			noError &= dir.mkpath(withDir);
 		noError &= dir.cd(withDir);
 	}
 
@@ -1759,8 +1759,23 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 	ACollection.header.threadId = AChatElem.attribute("thread");
 	ACollection.header.version = AChatElem.attribute("version").toInt();
 
-	int secsSum = 0;
+	int secsLast = 0;
 	QDomElement nodeElem = AChatElem.firstChildElement();
+	bool isSecsFromStart = AChatElem.attribute("secsFromLast")!="true";
+	while (!nodeElem.isNull() && isSecsFromStart)
+	{
+		if (nodeElem.hasAttribute("secs"))
+		{
+			int secs = nodeElem.attribute("secs").toInt();
+			if (secs < secsLast)
+				isSecsFromStart = false;
+			secsLast = secs;
+		}
+		nodeElem = nodeElem.nextSiblingElement();
+	}
+
+	secsLast = 0;
+	nodeElem = AChatElem.firstChildElement();
 	while (!nodeElem.isNull())
 	{
 		if (nodeElem.tagName() == "to" || nodeElem.tagName() == "from")
@@ -1779,12 +1794,15 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 			QString utc = nodeElem.attribute("utc");
 			if (utc.isEmpty())
 			{
-				QString secs = nodeElem.attribute("secs");
-				secsSum += secs.toInt();
-				message.setDateTime(ACollection.header.start.addSecs(secsSum));
+				int secs = nodeElem.attribute("secs").toInt();
+				message.setDateTime(ACollection.header.start.addSecs(isSecsFromStart ? secs : secsLast+secs));
 			}
 			else
-				message.setDateTime(DateTime(utc).toLocal());
+			{
+				QDateTime messageDT = DateTime(utc).toLocal();
+				message.setDateTime(messageDT.isValid() ? messageDT : ACollection.header.start.addSecs(secsLast));
+			}
+			secsLast = ACollection.header.start.secsTo(message.dateTime());
 
 			message.setThreadId(ACollection.header.threadId);
 
@@ -1816,8 +1834,9 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 		AChatElem.setAttribute("subject",ACollection.header.subject);
 	if (!ACollection.header.threadId.isEmpty())
 		AChatElem.setAttribute("thread",ACollection.header.threadId);
+	AChatElem.setAttribute("secsFromLast","true");
 
-	int secSum = 0;
+	int secLast = 0;
 	bool groupChat = false;
 	foreach(Message message,ACollection.messages)
 	{
@@ -1829,10 +1848,10 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 			QDomElement messageElem = AChatElem.appendChild(ownerDoc.createElement(directionIn ? "from" : "to")).toElement();
 
 			int secs = ACollection.header.start.secsTo(message.dateTime());
-			if (secs >= secSum)
+			if (secs >= secLast)
 			{
-				messageElem.setAttribute("secs",secs-secSum);
-				secSum += secs;
+				messageElem.setAttribute("secs",secs-secLast);
+				secLast = secs;
 			}
 			else
 				messageElem.setAttribute("utc",DateTime(message.dateTime()).toX85UTC());
