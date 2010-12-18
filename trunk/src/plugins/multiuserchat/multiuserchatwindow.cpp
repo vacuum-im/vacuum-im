@@ -1497,6 +1497,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 	QStandardItem *userItem = FUsers.value(AUser);
 	if (AShow!=IPresence::Offline && AShow!=IPresence::Error)
 	{
+		QString show = FStatusChanger ? FStatusChanger->nameByShow(AShow) : QString::null;
 		if (userItem == NULL)
 		{
 			userItem = new QStandardItem(AUser->nickName());
@@ -1509,15 +1510,16 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 			{
 				QString realJid = AUser->data(MUDR_REAL_JID).toString();
 				if (!realJid.isEmpty())
-					enterMessage = tr("%1 <%2> has joined the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
+					enterMessage = tr("%1 <%2> has joined the room").arg(AUser->nickName()).arg(realJid);
 				else
-					enterMessage = tr("%1 has joined the room. %2").arg(AUser->nickName()).arg(AStatus);
+					enterMessage = tr("%1 has joined the room").arg(AUser->nickName());
+				if (!AStatus.isEmpty() && Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
+					enterMessage += QString(" - [%1] %2").arg(show).arg(AStatus);
 				showStatusMessage(enterMessage);
 			}
 		}
 		else if (Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
 		{
-			QString show = FStatusChanger ? FStatusChanger->nameByShow(AShow) : QString::null;
 			UserStatus &userStatus = FUserStatus[AUser];
 			if (userStatus.lastStatusShow != AStatus+show)
 			{
@@ -1538,9 +1540,11 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 			{
 				QString realJid = AUser->data(MUDR_REAL_JID).toString();
 				if (!realJid.isEmpty())
-					enterMessage = tr("%1 <%2> has left the room. %3").arg(AUser->nickName()).arg(realJid).arg(AStatus);
+					enterMessage = tr("%1 <%2> has left the room").arg(AUser->nickName()).arg(realJid);
 				else
-					enterMessage = tr("%1 has left the room. %2").arg(AUser->nickName()).arg(AStatus);
+					enterMessage = tr("%1 has left the room").arg(AUser->nickName());
+				if (AStatus.isEmpty() && Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
+					enterMessage += " - " + AStatus.trimmed();
 				showStatusMessage(enterMessage);
 			}
 		}

@@ -901,28 +901,28 @@ Check values and try again</source>
         <translation>Ctrl+F4</translation>
     </message>
     <message>
-        <source>%1 &lt;%2&gt; has joined the room. %3</source>
-        <translation>%1 &lt;%2&gt; присоединился к комнате. %3</translation>
-    </message>
-    <message>
-        <source>%1 has joined the room. %2</source>
-        <translation>%1 присоединился к комнате. %2</translation>
-    </message>
-    <message>
-        <source>%1 &lt;%2&gt; has left the room. %3</source>
-        <translation>%1 &lt;%2&gt; вышел из комнаты. %3</translation>
-    </message>
-    <message>
-        <source>%1 has left the room. %2</source>
-        <translation>%1 вышел из комнаты. %2</translation>
-    </message>
-    <message>
         <source>Mention message in conference: %1</source>
         <translation>Сообщение с обращением в конференции: %1</translation>
     </message>
     <message>
         <source>Mention in conference</source>
         <translation>Обращение в конференции</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has joined the room</source>
+        <translation>%1 &lt;%2&gt; присоединился к комнате</translation>
+    </message>
+    <message>
+        <source>%1 has joined the room</source>
+        <translation>%1 присоединился к комнате</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has left the room</source>
+        <translation>%1 &lt;%2&gt; вышел из комнаты</translation>
+    </message>
+    <message>
+        <source>%1 has left the room</source>
+        <translation>%1 вышел из комнаты</translation>
     </message>
 </context>
 </TS>
