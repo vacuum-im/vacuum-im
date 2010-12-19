@@ -118,10 +118,10 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 bool RosterChanger::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_ADDCONTACT,tr("Add contact"),tr("Ins"),Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_RENAME,tr("Rename contact/group"),tr("F2"),Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFROMGROUP,tr("Remove contact/group from group"),QKeySequence::Delete,Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFROMROSTER,tr("Remove contact/group from roster"),tr("Shift+Del"),Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_ADDCONTACT,tr("Add contact"),tr("Ins","Add contact"),Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_RENAME,tr("Rename contact/group"),tr("F2","Rename contact/group"),Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFROMGROUP,tr("Remove contact/group from group"),tr("Del","Remove contact/group from group"),Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFROMROSTER,tr("Remove contact/group from roster"),tr("Shift+Del","Remove contact/group from roster"),Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SUBSCRIBE,tr("Subscribe contact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_UNSUBSCRIBE,tr("Unsubscribe contact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
 

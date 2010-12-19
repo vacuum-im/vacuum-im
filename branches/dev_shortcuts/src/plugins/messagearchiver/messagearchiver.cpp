@@ -198,7 +198,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 
 bool MessageArchiver::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWHISTORY, tr("Show history"), tr("Ctrl+H"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWHISTORY, tr("Show history"), tr("Ctrl+H","Show history"));
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYENABLE, tr("Enable message logging"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYDISABLE, tr("Disable message logging"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR, tr("Require Off-The-Record session"), QKeySequence::UnknownKey);
@@ -222,7 +222,7 @@ bool MessageArchiver::initObjects()
 	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_REMOVECOLLECTION, tr("Remove conversation"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_RELOADCOLLECTIONS, tr("Reload conversations"), QKeySequence::UnknownKey);
 
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWHISTORY,tr("Show history"),tr("Ctrl+H"),Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWHISTORY,tr("Show history"),tr("Ctrl+H","Show history"),Shortcuts::WidgetShortcut);
 
 	QString dirPath = collectionDirPath(Jid(),Jid());
 	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);

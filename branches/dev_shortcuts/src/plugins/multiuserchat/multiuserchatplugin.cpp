@@ -152,13 +152,13 @@ bool MultiUserChatPlugin::initObjects()
 	Shortcuts::declareShortcut(SCT_APP_MUC_SHOWHIDDEN, tr("Show all hidden conferences"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
 
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_MUC, tr("Multi-user chat window"));
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE, tr("Send message"), tr("Return"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE, tr("Send message"), tr("Return","Send message"), Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_CLEARWINDOW, tr("Clear window"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_CHANGENICK, tr("Change nick"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_CHANGETOPIC, tr("Change topic"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_ROOMSETTINGS, tr("Setup conference"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_ENTER, tr("Enter the conference"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_EXIT, tr("Leave the conference"), tr("Ctrl+Q"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_EXIT, tr("Leave the conference"), tr("Ctrl+Q","Leave the conference"));
 
 	if (FMessageProcessor)
 	{

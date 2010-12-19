@@ -105,8 +105,8 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 
 bool VCardPlugin::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I"));
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I","Show vCard"));
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I","Show vCard"), Shortcuts::WidgetShortcut);
 
 	if (FRostersView)
 	{

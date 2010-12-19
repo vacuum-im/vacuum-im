@@ -114,7 +114,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 bool NormalMessageHandler::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWNORMALDIALOG, tr("Send message"), tr("Ctrl+Return"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWNORMALDIALOG, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
 
 	if (FMessageProcessor)
 	{

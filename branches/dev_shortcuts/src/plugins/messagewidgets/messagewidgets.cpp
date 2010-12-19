@@ -62,16 +62,16 @@ bool MessageWidgets::initObjects()
 	Shortcuts::declareShortcut(SCT_TABWINDOW_DELETEWINDOW, tr("Delete tab window"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_TABWINDOW_SETASDEFAULT, tr("Use as default tab window"), QKeySequence::UnknownKey);
 	for (int tabNumber=1; tabNumber<=10; tabNumber++)
-		Shortcuts::declareShortcut(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber), QString::null, tr("Alt+%1").arg(tabNumber % 10));
+		Shortcuts::declareShortcut(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber), QString::null, tr("Alt+%1","Show tab").arg(tabNumber % 10));
 
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS, tr("Message windows"));
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_QUOTE, tr("Quote selected text"), QKeySequence::UnknownKey);
 	
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_CHAT, tr("Chat window"));
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE, tr("Send message"), tr("Return"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE, tr("Send message"), tr("Return","Send message"), Shortcuts::WidgetShortcut);
 
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_NORMAL, tr("Message window"));
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE, tr("Send message"), tr("Ctrl+Return"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
 
 	insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
 	return true;
