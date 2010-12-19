@@ -27,6 +27,10 @@
         <source>Data transmission terminated by remote user</source>
         <translation>Transfer danych przerwany przez zdalnego użytkownika</translation>
     </message>
+    <message>
+        <source>Connection timed out</source>
+        <translation>Upłynął czas połączenia</translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsManager</name>
@@ -75,6 +79,10 @@
     <message>
         <source>Acceptable Data Streams</source>
         <translation>Akceptowane strumienie danych</translation>
+    </message>
+    <message>
+        <source>Group downloads by sender</source>
+        <translation>Grupuj pobrania według nadawcy</translation>
     </message>
 </context>
 <context>

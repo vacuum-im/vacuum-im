@@ -71,6 +71,18 @@
         <source>Automatically remove finished transfers</source>
         <translation>Automatycznie usuń ukończone transfery</translation>
     </message>
+    <message>
+        <source>Failed to start file transfer</source>
+        <translation>Nie udało się zainicjować transferu</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully sent.</source>
+        <translation>Plik &apos;%1&apos; został przesłany.</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully received.</source>
+        <translation>Plik &apos;%1&apos; został pobrany.</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>

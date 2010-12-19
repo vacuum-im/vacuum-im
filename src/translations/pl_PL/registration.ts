@@ -56,6 +56,25 @@
     </message>
 </context>
 <context>
+    <name>RegisterStream</name>
+    <message>
+        <source>Registration on %1</source>
+        <translation>Rejestracja na %1</translation>
+    </message>
+    <message>
+        <source>Invalid registration form</source>
+        <translation>Nieprawidłowa forma rejestracji</translation>
+    </message>
+    <message>
+        <source>Invalid registration dialog</source>
+        <translation>Nieprawidłowy dialog rejestracji</translation>
+    </message>
+    <message>
+        <source>Registration rejected by user</source>
+        <translation>Rejestracja odrzucona przez użytkownika</translation>
+    </message>
+</context>
+<context>
     <name>Registration</name>
     <message>
         <source>Registration</source>
@@ -102,14 +121,6 @@
         <translation>Pełna nazwa</translation>
     </message>
     <message>
-        <source>First Name</source>
-        <translation>Imię</translation>
-    </message>
-    <message>
-        <source>Last Name</source>
-        <translation>Nazwisko</translation>
-    </message>
-    <message>
         <source>Email Address</source>
         <translation>E-mail</translation>
     </message>
@@ -134,12 +145,20 @@
         <translation>Telefon</translation>
     </message>
     <message>
-        <source>Your Web Paqe</source>
-        <translation>Strona domowa</translation>
-    </message>
-    <message>
         <source>Supports the registration</source>
         <translation>Umożliwia rejestrację</translation>
+    </message>
+    <message>
+        <source>Given Name</source>
+        <translation>Imię</translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation>Nazwisko</translation>
+    </message>
+    <message>
+        <source>Your Web Page</source>
+        <translation>Strona internetowa</translation>
     </message>
 </context>
 </TS>
