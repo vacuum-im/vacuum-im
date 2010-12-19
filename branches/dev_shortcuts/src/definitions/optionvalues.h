@@ -78,7 +78,6 @@
 #define OPV_MESSAGES_SHOWINFOWIDGET                     "messages.show-info-widget"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
-#define OPV_MESSAGES_EDITORSENDKEY                      "messages.editor-send-key"
 #define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
 #define OPV_MESSAGES_TABWINDOWS_ENABLE                  "messages.tab-windows.enable"
 #define OPV_MESSAGES_TABWINDOWS_SHOW_INDICES            "messages.tab-windows.show-indices"

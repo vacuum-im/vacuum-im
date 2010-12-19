@@ -406,6 +406,7 @@ void MultiUserChatWindow::createMessageWidgets()
 		FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
 		FEditWidget = FMessageWidgets->newEditWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
+		FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE);
 		ui.wdtEdit->setLayout(new QVBoxLayout);
 		ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
 		ui.wdtEdit->layout()->setMargin(0);

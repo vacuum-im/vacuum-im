@@ -1,6 +1,7 @@
 #ifndef CHATWINDOW_H
 #define CHATWINDOW_H
 
+#include <definitions/shortcuts.h>
 #include <definitions/optionvalues.h>
 #include <definitions/messagedataroles.h>
 #include <interfaces/imessagewidgets.h>

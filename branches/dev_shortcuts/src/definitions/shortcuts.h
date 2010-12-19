@@ -46,10 +46,13 @@
 #define   SCT_MESSAGEWINDOWS_SHOWVCARD                             "message-windows.show-vcard"
 //MessageWidgets
 #define   SCTG_MESSAGEWINDOWS_CHAT                                 "message-windows.chat-window"
+#define     SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE                    "message-windows.chat-window.send-message"
 //MessageWidgets
 #define   SCTG_MESSAGEWINDOWS_NORMAL                               "message-windows.normal-window"
+#define     SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE                  "message-windows.normal-window.send-message"
 //MultiUserChat
 #define   SCTG_MESSAGEWINDOWS_MUC                                  "message-windows.muc-window"
+#define     SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE                     "message-windows.muc-window.send-message"
 #define     SCT_MESSAGEWINDOWS_MUC_CLEARWINDOW                     "message-windows.muc-window.clear-window"
 #define     SCT_MESSAGEWINDOWS_MUC_CHANGENICK                      "message-windows.muc-window.change-nick"
 #define     SCT_MESSAGEWINDOWS_MUC_CHANGETOPIC                     "message-windows.muc-window.change-topic"

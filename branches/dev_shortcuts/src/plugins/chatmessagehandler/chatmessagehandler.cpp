@@ -135,7 +135,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 
 bool ChatMessageHandler::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWCHATDIALOG,tr("Open chat dialog"),tr("Return","shortcut"),Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWCHATDIALOG, tr("Open chat dialog"), tr("Return"), Shortcuts::WidgetShortcut);
 
 	if (FRostersView)
 	{

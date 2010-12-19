@@ -66,8 +66,12 @@ bool MessageWidgets::initObjects()
 
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS, tr("Message windows"));
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_QUOTE, tr("Quote selected text"), QKeySequence::UnknownKey);
+	
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_CHAT, tr("Chat window"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE, tr("Send message"), tr("Return"), Shortcuts::WidgetShortcut);
+
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_NORMAL, tr("Message window"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE, tr("Send message"), tr("Ctrl+Return"), Shortcuts::WidgetShortcut);
 
 	insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
 	return true;
@@ -79,7 +83,6 @@ bool MessageWidgets::initSettings()
 	Options::setDefaultValue(OPV_MESSAGES_EDITORAUTORESIZE,true);
 	Options::setDefaultValue(OPV_MESSAGES_SHOWINFOWIDGET,true);
 	Options::setDefaultValue(OPV_MESSAGES_EDITORMINIMUMLINES,1);
-	Options::setDefaultValue(OPV_MESSAGES_EDITORSENDKEY,QKeySequence(Qt::Key_Return));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_ENABLE,true);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_NAME,tr("Tab Window"));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSCLOSABLE,true);

@@ -26,6 +26,7 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	ui.wdtView->layout()->addWidget(FViewWidget->instance());
 
 	FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid);
+	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
 	ui.wdtEdit->setLayout(new QVBoxLayout);
 	ui.wdtEdit->layout()->setMargin(0);
 	ui.wdtEdit->layout()->addWidget(FEditWidget->instance());

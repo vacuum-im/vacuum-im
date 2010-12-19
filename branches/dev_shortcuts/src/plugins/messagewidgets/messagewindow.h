@@ -1,6 +1,7 @@
 #ifndef MESSAGEWINDOW_H
 #define MESSAGEWINDOW_H
 
+#include <definitions/shortcuts.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/rosterindextyperole.h>
 #include <interfaces/imessagewidgets.h>
@@ -75,6 +76,7 @@ protected:
 	virtual void closeEvent(QCloseEvent *AEvent);
 protected slots:
 	void onStreamJidChanged(const Jid &ABefore);
+	void onMessageReady();
 	void onSendButtonClicked();
 	void onNextButtonClicked();
 	void onReplyButtonClicked();
