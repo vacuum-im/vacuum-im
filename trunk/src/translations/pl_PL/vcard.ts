@@ -46,6 +46,18 @@
         <source>Reload</source>
         <translation>Odśwież</translation>
     </message>
+    <message>
+        <source>Service unavailable</source>
+        <translation>Usługa niedostępna</translation>
+    </message>
+    <message>
+        <source>Failed to publish vCard</source>
+        <translation>Nie udało się uaktualnić vCard</translation>
+    </message>
+    <message>
+        <source>Failed to update vCard</source>
+        <translation>Nie udało się uaktualnić vCard</translation>
+    </message>
 </context>
 <context>
     <name>VCardDialogClass</name>

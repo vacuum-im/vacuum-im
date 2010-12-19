@@ -35,5 +35,9 @@
         <source>Jabber ID</source>
         <translation>Jabber ID</translation>
     </message>
+    <message>
+        <source>Group</source>
+        <translation>Grupa</translation>
+    </message>
 </context>
 </TS>

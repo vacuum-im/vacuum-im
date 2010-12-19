@@ -58,6 +58,10 @@
         <source>Show tab indices</source>
         <translation>Pokazuj numer zakładki</translation>
     </message>
+    <message>
+        <source>Save status messages to history</source>
+        <translation>Zapisuj zmiany statusu w historii</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>

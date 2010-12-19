@@ -96,5 +96,13 @@
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
         <translation>Wyłącz dźwięk jeśli ustawiony jest status &apos;Nie przeszkadzaj&apos;</translation>
     </message>
+    <message>
+        <source>Time to display a pop-up window (0 - always visible):</source>
+        <translation>Czas pokazywania wyskakujących okienek (0-zawsze widoczne):</translation>
+    </message>
+    <message>
+        <source> seconds</source>
+        <translation>sekund</translation>
+    </message>
 </context>
 </TS>

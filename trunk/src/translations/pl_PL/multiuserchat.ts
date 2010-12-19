@@ -517,6 +517,18 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <source>Show all hidden conferences</source>
         <translation>Pokaż wszystkie ukryte konferencje</translation>
     </message>
+    <message>
+        <source>Show users connections/disconnections</source>
+        <translation>Pokazuj podłączanie i rozłączanie użytkowników</translation>
+    </message>
+    <message>
+        <source>Show users status changes</source>
+        <translation>Pokazuj zmiany statusów użytkowników</translation>
+    </message>
+    <message>
+        <source>Save status messages to history</source>
+        <translation>Zapisuj statusy w historii</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -890,28 +902,28 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Ctrl+F4</translation>
     </message>
     <message>
-        <source>%1 &lt;%2&gt; has joined the room. %3</source>
-        <translation>%1 &lt;%2&gt; wszedł do pokoju. %3</translation>
-    </message>
-    <message>
-        <source>%1 has joined the room. %2</source>
-        <translation>%1 wszedł do pokoju. %2</translation>
-    </message>
-    <message>
-        <source>%1 &lt;%2&gt; has left the room. %3</source>
-        <translation>%1 &lt;%2&gt; opuścił pokoj. %3</translation>
-    </message>
-    <message>
-        <source>%1 has left the room. %2</source>
-        <translation>%1 opuścił pokój. %2</translation>
-    </message>
-    <message>
         <source>Mention message in conference: %1</source>
         <translation>Wiadomość z uwagą na twój temat na konferencji: %1</translation>
     </message>
     <message>
         <source>Mention in conference</source>
         <translation>Wspomniano Ciebie na konferencji</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has joined the room</source>
+        <translation>%1 &lt;%2&gt; pojawił sie w pokoju</translation>
+    </message>
+    <message>
+        <source>%1 has joined the room</source>
+        <translation>%1 pojawił sie w pokoju</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has left the room</source>
+        <translation>%1 &lt;%2&gt; opuścił pokój</translation>
+    </message>
+    <message>
+        <source>%1 has left the room</source>
+        <translation>%1 opuścił pokój</translation>
     </message>
 </context>
 </TS>
