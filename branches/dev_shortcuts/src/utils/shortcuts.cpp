@@ -11,7 +11,7 @@ struct Shortcuts::ShortcutsData
 	QMap<QObject *, QString> objectShortcutsId;
 	QMap<QShortcut *, QString> widgetShortcutsId;
 	QMap<QShortcut *, QWidget *> widgetShortcutsWidget;
-   QMap<QxtGlobalShortcut *, QString> globalShortcutsId;
+	QMap<QxtGlobalShortcut *, QString> globalShortcutsId;
 };
 Shortcuts::ShortcutsData *Shortcuts::d = new Shortcuts::ShortcutsData;
 

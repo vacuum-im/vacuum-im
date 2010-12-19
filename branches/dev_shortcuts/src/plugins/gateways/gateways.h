@@ -12,6 +12,7 @@
 #include <definitions/discoitemdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/igateways.h>
 #include <interfaces/istanzaprocessor.h>
@@ -26,6 +27,7 @@
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
+#include <utils/shortcuts.h>
 #include "addlegacycontactdialog.h"
 
 class Gateways :
@@ -79,6 +81,7 @@ protected slots:
 	void onResolveActionTriggered(bool);
 	void onKeepActionTriggered(bool);
 	void onChangeActionTriggered(bool);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onPresenceOpened(IPresence *APresence);
 	void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);

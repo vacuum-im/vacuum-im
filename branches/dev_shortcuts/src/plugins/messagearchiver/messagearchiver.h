@@ -192,6 +192,7 @@ protected slots:
 	void onPrivateDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onCollectionWriterDestroyed(CollectionWriter *AWriter);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onSetMethodAction(bool);

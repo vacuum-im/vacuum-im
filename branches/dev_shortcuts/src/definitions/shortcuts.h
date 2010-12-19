@@ -94,16 +94,14 @@
 #define   SCT_ROSTERVIEW_COPYNAME                                  "roster-view.copy-name"
 #define   SCT_ROSTERVIEW_COPYSTATUS                                "roster-view.copy-status"
 //ChatMessageHandler
-#define   SCT_ROSTERVIEW_SHOWCHAT                                  "roster-view.show-chat"
+#define   SCT_ROSTERVIEW_SHOWCHATDIALOG                            "roster-view.show-chat-dialog"
 //NormalMessageHandler
-#define   SCT_ROSTERVIEW_SHOWESSAGE                                "roster-view.show-message"
+#define   SCT_ROSTERVIEW_SHOWNORMALDIALOG                          "roster-view.show-normal-dialog"
 //RosterChanger
+#define   SCT_ROSTERVIEW_ADDCONTACT                                "roster-view.add-contact"
 #define   SCT_ROSTERVIEW_RENAME                                    "roster-view.rename"
 #define   SCT_ROSTERVIEW_REMOVEFROMGROUP                           "roster-view.remove-from-group"
 #define   SCT_ROSTERVIEW_REMOVEFROMROSTER                          "roster-view.remove-from-roster"
-#define   SCT_ROSTERVIEW_REMOVEGROUP                               "roster-view.remove-group"
-#define   SCT_ROSTERVIEW_REMOVEGROUPCONTACTS                       "roster-view.remove-group-contacts"
-#define   SCT_ROSTERVIEW_ADDCONTACTTOGROUP                         "roster-view.add-contact-to-group"
 #define   SCT_ROSTERVIEW_SUBSCRIBE                                 "roster-view.subscribe"
 #define   SCT_ROSTERVIEW_UNSUBSCRIBE                               "roster-view.unsubscribe"
 //MessageArchiver

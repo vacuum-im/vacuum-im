@@ -89,7 +89,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),
-			        SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
+				SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
 		}
 	}
 
@@ -108,11 +108,11 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		if (FPrivateStorage)
 		{
 			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
-			        SLOT(onPrivateDataError(const QString &, const QString &)));
+				SLOT(onPrivateDataError(const QString &, const QString &)));
 		}
 	}
 
@@ -124,7 +124,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		{
 			connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
 			connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),
-			        SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+				SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 		}
 	}
 
@@ -135,7 +135,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		if (FRostersViewPlugin)
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
-			        SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+				SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
 		}
 	}
 
@@ -170,9 +170,9 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		if (FSessionNegotiation)
 		{
 			connect(FSessionNegotiation->instance(),SIGNAL(sessionActivated(const IStanzaSession &)),
-			        SLOT(onStanzaSessionActivated(const IStanzaSession &)));
+				SLOT(onStanzaSessionActivated(const IStanzaSession &)));
 			connect(FSessionNegotiation->instance(),SIGNAL(sessionTerminated(const IStanzaSession &)),
-			        SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
+				SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
 		}
 	}
 
@@ -187,9 +187,11 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		if (FMultiUserChatPlugin)
 		{
 			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
-			        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
+				SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
 		}
 	}
+
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
@@ -220,6 +222,8 @@ bool MessageArchiver::initObjects()
 	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_REMOVECOLLECTION, tr("Remove conversation"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_RELOADCOLLECTIONS, tr("Reload conversations"), QKeySequence::UnknownKey);
 
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWHISTORY,tr("Show history"),tr("Ctrl+H"),Shortcuts::WidgetShortcut);
+
 	QString dirPath = collectionDirPath(Jid(),Jid());
 	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
 	if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
@@ -240,6 +244,10 @@ bool MessageArchiver::initObjects()
 	if (FSessionNegotiation)
 	{
 		FSessionNegotiation->insertNegotiator(this,SNO_DEFAULT);
+	}
+	if (FRostersViewPlugin)
+	{
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWHISTORY,FRostersViewPlugin->rostersView()->instance());
 	}
 	return true;
 }
@@ -2050,6 +2058,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
 	}
 	else
 		action->setData(ADR_GROUP_KIND,IArchiveWindow::GK_CONTACT);
+	action->setShortcutId(SCT_ROSTERVIEW_SHOWHISTORY);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowAction(bool)));
 	menu->addAction(action,AG_DEFAULT,false);
 
@@ -2662,6 +2671,26 @@ void MessageArchiver::onCollectionWriterDestroyed(CollectionWriter *AWriter)
 	{
 		saveLocalModofication(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
 		emit localCollectionSaved(AWriter->streamJid(),AWriter->header());
+	}
+}
+
+void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
+	{
+		if (AId == SCT_ROSTERVIEW_SHOWHISTORY)
+		{
+			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
+			int indexType = index.data(RDR_TYPE).toInt();
+			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
+			{
+				IArchiveFilter filter;
+				if (indexType != RIT_STREAM_ROOT)
+					filter.with = index.data(RDR_JID).toString();
+				filter.start = QDateTime::currentDateTime().addMonths(-1);
+				showArchiveWindow(index.data(RDR_STREAM_JID).toString(),filter,indexType==RIT_STREAM_ROOT ? IArchiveWindow::GK_CONTACT : IArchiveWindow::GK_NO_GROUPS);
+			}
+		}
 	}
 }
 

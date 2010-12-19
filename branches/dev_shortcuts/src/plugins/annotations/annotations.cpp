@@ -44,11 +44,11 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 		{
 			connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorageOpened(const Jid &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onPrivateDataSaved(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateDataSaved(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onPrivateDataLoaded(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateDataLoaded(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
-			        SLOT(onPrivateDataError(const QString &, const QString &)));
+				SLOT(onPrivateDataError(const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(storageClosed(const Jid &)),SLOT(onPrivateStorageClosed(const Jid &)));
 		}
 	}
@@ -60,7 +60,7 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 		if (FRosterPlugin)
 		{
 			connect(FRosterPlugin->instance(),SIGNAL(rosterItemRemoved(IRoster *, const IRosterItem &)),
-			        SLOT(onRosterItemRemoved(IRoster *, const IRosterItem &)));
+				SLOT(onRosterItemRemoved(IRoster *, const IRosterItem &)));
 		}
 	}
 
@@ -70,24 +70,34 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin)
+		{
+			IRostersView *rostersView = FRostersViewPlugin->rostersView();
+			connect(rostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+			connect(rostersView->instance(),SIGNAL(indexClipboardMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexClipboardMenu(IRosterIndex *, Menu *)));
+			connect(rostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
+				SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("IRosterSearch").value(0,NULL);
 	if (plugin)
 		FRosterSearch = qobject_cast<IRosterSearch *>(plugin->instance());
+
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FPrivateStorage!=NULL;
 }
 
 bool Annotations::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_EDITANNOTATION, tr("Edit annotation"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
+
 	if (FRostersViewPlugin)
 	{
-		IRostersView *rostersView = FRostersViewPlugin->rostersView();
-		connect(rostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
-		connect(rostersView->instance(),SIGNAL(indexClipboardMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexClipboardMenu(IRosterIndex *, Menu *)));
-		connect(rostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
-		        SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_EDITANNOTATION, FRostersViewPlugin->rostersView()->instance());
 	}
 	if (FRostersModel)
 	{
@@ -182,6 +192,23 @@ void Annotations::setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, c
 		emit annotationModified(AStreamJid,AContactJid);
 		updateDataHolder(AStreamJid,QList<Jid>()<<AContactJid);
 	}
+}
+
+QDialog *Annotations::showAnnotationDialog(const Jid &AStreamJid, const Jid &AContactJid)
+{
+	if (isEnabled(AStreamJid))
+	{
+		EditNoteDialog *dialog = FEditDialogs.value(AStreamJid).value(AContactJid);
+		if (!dialog)
+		{
+			dialog = new EditNoteDialog(this,AStreamJid,AContactJid);
+			FEditDialogs[AStreamJid].insert(AContactJid,dialog);
+			connect(dialog,SIGNAL(dialogDestroyed()),SLOT(onEditNoteDialogDestroyed()));
+		}
+		WidgetManager::showActivateRaiseWindow(dialog);
+		return dialog;
+	}
+	return NULL;
 }
 
 bool Annotations::loadAnnotations(const Jid &AStreamJid)
@@ -322,6 +349,21 @@ void Annotations::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARost
 	}
 }
 
+void Annotations::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
+	{
+		if (AId == SCT_ROSTERVIEW_EDITANNOTATION)
+		{
+			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
+			if (rosterDataTypes().contains(index.data(RDR_TYPE).toInt()))
+			{
+				showAnnotationDialog(index.data(RDR_STREAM_JID).toString(),index.data(RDR_BARE_JID).toString());
+			}
+		}
+	}
+}
+
 void Annotations::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
@@ -333,6 +375,7 @@ void Annotations::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_ANNOTATIONS);
 		action->setData(ADR_STREAMJID,streamJid.full());
 		action->setData(ADR_CONTACTJID,contactJid.bare());
+		action->setShortcutId(SCT_ROSTERVIEW_EDITANNOTATION);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onEditNoteActionTriggered(bool)));
 		AMenu->addAction(action,AG_RVCM_ANNOTATIONS,true);
 	}
@@ -378,16 +421,7 @@ void Annotations::onEditNoteActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAMJID).toString();
-		Jid contactJid = action->data(ADR_CONTACTJID).toString();
-		EditNoteDialog *dialog = FEditDialogs.value(streamJid).value(contactJid);
-		if (!dialog)
-		{
-			dialog = new EditNoteDialog(this,streamJid,contactJid);
-			FEditDialogs[streamJid].insert(contactJid,dialog);
-			connect(dialog,SIGNAL(dialogDestroyed()),SLOT(onEditNoteDialogDestroyed()));
-		}
-		dialog->show();
+		showAnnotationDialog(action->data(ADR_STREAMJID).toString(),action->data(ADR_CONTACTJID).toString());
 	}
 }
 

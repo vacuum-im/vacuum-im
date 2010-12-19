@@ -106,6 +106,7 @@ protected slots:
 	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
 	void onEditWidgetContactJidChanged(const Jid &ABefore);
 	void onToolBarWidgetDestroyed(QObject *AObject);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IRosterPlugin *FRosterPlugin;
 	IServiceDiscovery *FDiscovery;

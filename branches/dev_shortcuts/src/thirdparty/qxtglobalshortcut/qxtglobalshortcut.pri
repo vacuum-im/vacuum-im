@@ -1,9 +1,9 @@
 HEADERS   += qxtglobal.h \
-				 qxtglobalshortcut.h \
-				 qxtglobalshortcut_p.h
+             qxtglobalshortcut.h \
+             qxtglobalshortcut_p.h
 
 SOURCES   += qxtglobal.cpp \
-				 qxtglobalshortcut.cpp
+             qxtglobalshortcut.cpp
 
 win32 {
   SOURCES += qxtglobalshortcut_win.cpp

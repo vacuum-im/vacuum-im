@@ -105,12 +105,15 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitO
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 	}
 
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
+
 	return FFileManager!=NULL && FDataManager!=NULL;
 }
 
 bool FileTransfer::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDFILE, tr("Send file"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SENDFILE, tr("Send file"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
 
 	if (FDiscovery)
 	{
@@ -130,6 +133,7 @@ bool FileTransfer::initObjects()
 	if (FRostersViewPlugin)
 	{
 		FRostersViewPlugin->rostersView()->insertDragDropHandler(this);
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SENDFILE,FRostersViewPlugin->rostersView()->instance());
 	}
 	if (FMessageWidgets)
 	{
@@ -663,6 +667,22 @@ void FileTransfer::onToolBarWidgetDestroyed(QObject *AObject)
 	foreach(IToolBarWidget *widget, FToolBarActions.keys())
 		if (qobject_cast<QObject *>(widget->instance()) == AObject)
 			FToolBarActions.remove(widget);
+}
+
+void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
+	{
+		if (AId == SCT_ROSTERVIEW_SENDFILE)
+		{
+			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
+			int indexType = index.data(RDR_TYPE).toInt();
+			if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
+			{
+				sendFile(index.data(RDR_STREAM_JID).toString(),index.data(RDR_JID).toString());
+			}
+		}
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_filetransfer, FileTransfer);

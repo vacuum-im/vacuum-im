@@ -11,6 +11,8 @@
 
 #define CHAT_NOTIFICATOR_ID       "ChatMessages"
 
+static const QList<int> ChatActionTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+
 ChatMessageHandler::ChatMessageHandler()
 {
 	FMessageWidgets = NULL;
@@ -43,8 +45,10 @@ void ChatMessageHandler::pluginInfo(IPluginInfo *APluginInfo)
 }
 
 
-bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
 	if (plugin)
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
@@ -60,7 +64,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
 		if (FMessageStyles)
 		{
 			connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
-			        SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
+				SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
 		}
 	}
 
@@ -81,7 +85,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
 		if (FPresencePlugin)
 		{
 			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),
-			        SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
+				SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
 		}
 	}
 
@@ -124,14 +128,19 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &/*
 	if (plugin)
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
+
 	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
 }
 
 bool ChatMessageHandler::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWCHATDIALOG,tr("Open chat dialog"),tr("Return","shortcut"),Shortcuts::WidgetShortcut);
+
 	if (FRostersView)
 	{
 		FRostersView->insertClickHooker(RCHO_CHATMESSAGEHANDLER,this);
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWCHATDIALOG,FRostersView->instance());
 	}
 	if (FMessageProcessor)
 	{
@@ -507,22 +516,37 @@ void ChatMessageHandler::onShowWindowAction(bool)
 	}
 }
 
+void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (FRostersView && AWidget==FRostersView->instance())
+	{
+		if (AId == SCT_ROSTERVIEW_SHOWCHATDIALOG)
+		{
+			QModelIndex index = FRostersView->instance()->currentIndex();
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(index.data(RDR_STREAM_JID).toString()) : NULL;
+			if (presence && presence->isOpen() && ChatActionTypes.contains(index.data(RDR_TYPE).toInt()))
+			{
+				openWindow(MHO_CHATMESSAGEHANDLER,index.data(RDR_STREAM_JID).toString(),index.data(RDR_JID).toString(),Message::Chat);
+			}
+		}
+	}
+}
+
 void ChatMessageHandler::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-	static QList<int> chatActionTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
 		Jid contactJid = AIndex->data(RDR_JID).toString();
-		if (chatActionTypes.contains(AIndex->type()))
+		if (ChatActionTypes.contains(AIndex->type()))
 		{
 			Action *action = new Action(AMenu);
-			action->setText(tr("Chat"));
+			action->setText(tr("Open chat dialog"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
 			action->setData(ADR_STREAM_JID,streamJid.full());
 			action->setData(ADR_CONTACT_JID,contactJid.full());
+			action->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
 			AMenu->addAction(action,AG_RVCM_CHATMESSAGEHANDLER,true);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
 		}
