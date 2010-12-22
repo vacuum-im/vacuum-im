@@ -1,7 +1,10 @@
 #include "shortcuts.h"
 
 #include <QHash>
+#include <QAction>
 #include <QVariant>
+#include <QApplication>
+#include <QDesktopWidget>
 #include <thirdparty/qxtglobalshortcut/qxtglobalshortcut.h>
 
 struct Shortcuts::ShortcutsData
@@ -174,15 +177,29 @@ void Shortcuts::setGlobalShortcut(const QString &AId, bool AEnabled)
 
 void Shortcuts::updateObject(QObject *AObject)
 {
+	static QDesktopWidget *deskWidget = QApplication::desktop();
+
 	QString id = d->objectShortcutsId.value(AObject);
 	if (!id.isEmpty())
 	{
-		Descriptor descriptor = d->shortcuts.value(id);
+		const Descriptor &descriptor = d->shortcuts.value(id);
+		if (descriptor.context == ApplicationShortcut)
+		{
+			QAction *action = qobject_cast<QAction *>(AObject);
+			if (action && !deskWidget->actions().contains(action))
+				deskWidget->addAction(action);
+		}
 		AObject->setProperty("shortcut", descriptor.activeKey);
 		AObject->setProperty("shortcutContext", convertContext(descriptor.context));
 	}
 	else if (AObject)
 	{
+		if (AObject->property("shortcutContext").toInt() == Qt::ApplicationShortcut)
+		{
+			QAction *action = qobject_cast<QAction *>(AObject);
+			if (action)
+				deskWidget->removeAction(action);
+		}
 		AObject->setProperty("shortcut",QVariant());
 		AObject->setProperty("shortcutContext",QVariant());
 	}
