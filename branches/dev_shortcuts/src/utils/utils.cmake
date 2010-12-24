@@ -6,6 +6,7 @@ set(HEADERS "action.h"
 		"menu.h"
 		"menubarchanger.h"
 		"options.h"
+		"shortcuts.h"
 		"statusbarchanger.h"
 		"toolbarchanger.h")
 

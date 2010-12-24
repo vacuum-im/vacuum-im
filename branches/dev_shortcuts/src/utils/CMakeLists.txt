@@ -22,9 +22,9 @@ set_target_properties(${TARGET_UTILS} PROPERTIES
 	SOVERSION "${VERSION_UTILS_ABI}")
 
 if (UNIX AND NOT APPLE)
-	set(ADD_LIBS idn minizip "-lz")
+	set(ADD_LIBS qxtglobalshortcut idn minizip "-lz")
 else (UNIX AND NOT APPLE)
-	set(ADD_LIBS idn minizip zlib)
+	set(ADD_LIBS qxtglobalshortcut idn minizip zlib)
 endif (UNIX AND NOT APPLE)
 
 target_link_libraries(${TARGET_UTILS} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
