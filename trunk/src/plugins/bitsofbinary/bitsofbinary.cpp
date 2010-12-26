@@ -17,6 +17,7 @@ BitsOfBinary::BitsOfBinary()
 	FPluginManager = NULL;
 	FXmppStreams = NULL;
 	FStanzaProcessor = NULL;
+	FDiscovery = NULL;
 }
 
 BitsOfBinary::~BitsOfBinary()
@@ -55,6 +56,12 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &/*AInitO
 		}
 	}
 
+	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
+	if (plugin)
+	{
+		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+	}
+
 	return FStanzaProcessor!=NULL && FXmppStreams!=NULL;
 }
 
@@ -73,6 +80,16 @@ bool BitsOfBinary::initObjects()
 		requestHandle.direction = IStanzaHandle::DirectionIn;
 		requestHandle.conditions.append(SHC_REQUEST);
 		FSHIRequest = FStanzaProcessor->insertStanzaHandle(requestHandle);
+	}
+
+	if (FDiscovery)
+	{
+		IDiscoFeature feature;
+		feature.active = true;
+		feature.var = NS_BITS_OF_BINARY;
+		feature.name = tr("Bits Of Binary");
+		feature.description = tr("Supports the exchange of a small amount of binary data in XMPP stanza");
+		FDiscovery->insertDiscoFeature(feature);
 	}
 
 	return true;
@@ -206,6 +223,11 @@ void BitsOfBinary::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AS
 QString BitsOfBinary::contentIdentifier(const QByteArray &AData) const
 {
 	return "sha1+"+QCryptographicHash::hash(AData,QCryptographicHash::Sha1).toHex()+"@bob.xmpp.org";
+}
+
+bool BitsOfBinary::isSupported(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+	return FDiscovery==NULL || !FDiscovery->hasDiscoInfo(AStreamJid,AContactJid) || FDiscovery->discoInfo(AStreamJid,AContactJid).features.contains(NS_BITS_OF_BINARY);
 }
 
 bool BitsOfBinary::hasBinary(const QString &AContentId) const
