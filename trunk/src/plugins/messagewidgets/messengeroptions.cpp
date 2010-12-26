@@ -37,14 +37,14 @@ void MessengerOptions::reset()
 
 bool MessengerOptions::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
-	static const QList<int> controlKeys =  QList<int>() << Qt::Key_unknown << Qt::Key_Control << Qt::Key_Meta << Qt::Key_Alt << Qt::Key_AltGr;
+	static const QList<int> controlKeys =  QList<int>() << Qt::Key_unknown <<  Qt::Key_Shift << Qt::Key_Control << Qt::Key_Meta << Qt::Key_Alt << Qt::Key_AltGr;
 
 	if (AWatched==ui.lneEditorSendKey && AEvent->type()==QEvent::KeyPress)
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
 		if (!controlKeys.contains(keyEvent->key()))
 		{
-			FSendKey = QKeySequence(keyEvent->modifiers() | keyEvent->key());
+			FSendKey = QKeySequence((keyEvent->modifiers() & ~Qt::KeypadModifier) | keyEvent->key());
 			ui.lneEditorSendKey->setText(FSendKey.toString());
 		}
 		return true;
