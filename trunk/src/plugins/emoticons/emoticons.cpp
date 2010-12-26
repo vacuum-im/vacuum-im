@@ -158,14 +158,12 @@ void Emoticons::createIconsetUrls()
 
 void Emoticons::replaceTextToImage(QTextDocument *ADocument) const
 {
-	static const QRegExp regexp("\\S+");
-	for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
+	for (QHash<QString, QUrl>::const_iterator it = FUrlByKey.constBegin(); it!= FUrlByKey.constEnd(); it++)
 	{
-		QUrl url = FUrlByKey.value(cursor.selectedText());
-		if (!url.isEmpty())
+		for (QTextCursor cursor = ADocument->find(it.key()); !cursor.isNull();  cursor = ADocument->find(it.key(),cursor))
 		{
-			ADocument->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
-			cursor.insertImage(url.toString());
+			ADocument->addResource(QTextDocument::ImageResource,it.value(),QImage(it.value().toLocalFile()));
+			cursor.insertImage(it.value().toString());
 		}
 	}
 }
