@@ -10,6 +10,7 @@
 #include <interfaces/ibitsofbinary.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>
+#include <interfaces/iservicediscovery.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>
 
@@ -44,6 +45,7 @@ public:
 	virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
 	//IBitsOfBinary
 	virtual QString contentIdentifier(const QByteArray &AData) const;
+	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual bool hasBinary(const QString &AContentId) const;
 	virtual bool loadBinary(const QString &AContentId, const Jid &AStreamJid, const Jid &AContactJid);
 	virtual bool loadBinary(const QString &AContentId, QString &AType, QByteArray &AData, quint64 &AMaxAge);
@@ -62,6 +64,7 @@ private:
 	IPluginManager *FPluginManager;
 	IXmppStreams *FXmppStreams;
 	IStanzaProcessor *FStanzaProcessor;
+	IServiceDiscovery *FDiscovery;
 private:
 	int FSHIRequest;
 private:

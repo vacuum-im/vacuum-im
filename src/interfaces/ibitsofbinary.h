@@ -13,6 +13,7 @@ class IBitsOfBinary
 public:
 	virtual QObject *instance() =0;
 	virtual QString contentIdentifier(const QByteArray &AData) const =0;
+	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual bool hasBinary(const QString &AContentId) const =0;
 	virtual bool loadBinary(const QString &AContentId, const Jid &AStreamJid, const Jid &AContactJid) =0;
 	virtual bool loadBinary(const QString &AContentId, QString &AType, QByteArray &AData, quint64 &AMaxAge) =0;
