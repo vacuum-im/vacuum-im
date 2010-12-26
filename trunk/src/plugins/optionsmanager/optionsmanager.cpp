@@ -438,8 +438,8 @@ QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, QWidget *APar
 		if (FOptionsDialog.isNull())
 		{
 			FOptionsDialog = new OptionsDialog(this,AParent);
-			connect(FOptionsDialog,SIGNAL(accepted()),SLOT(onOptionsDialogClosed()));
-			connect(FOptionsDialog,SIGNAL(rejected()),SLOT(onOptionsDialogClosed()));
+			connect(FOptionsDialog,SIGNAL(accepted()),SLOT(onOptionsDialogClosed()),Qt::QueuedConnection);
+			connect(FOptionsDialog,SIGNAL(rejected()),SLOT(onOptionsDialogClosed()),Qt::QueuedConnection);
 		}
 		FOptionsDialog->showNode(ANodeId);
 		WidgetManager::showActivateRaiseWindow(FOptionsDialog);
