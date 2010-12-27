@@ -7,6 +7,10 @@ ShortcutOptionsDelegate::ShortcutOptionsDelegate(QObject *AParent) : QStyledItem
 {
 	FFilter = new QObject(this);
 	FFilter->installEventFilter(this);
+
+	QLineEdit *editor = new QLineEdit(NULL);
+	FMinHeight = editor->sizeHint().height();
+	delete editor;
 }
 
 ShortcutOptionsDelegate::~ShortcutOptionsDelegate()
@@ -52,13 +56,22 @@ void ShortcutOptionsDelegate::updateEditorGeometry(QWidget *AEditor, const QStyl
 	QStyledItemDelegate::updateEditorGeometry(AEditor,AOption,AIndex);
 }
 
+QSize ShortcutOptionsDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	QSize hint = QStyledItemDelegate::sizeHint(AOption,AIndex);
+	hint.setHeight(qMax(hint.height(),FMinHeight));
+	return hint;
+}
+
 bool ShortcutOptionsDelegate::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
 	QLineEdit *editor = qobject_cast<QLineEdit *>(AWatched);
 	if (editor && AEvent->type()==QEvent::KeyPress)
 	{
+		static const QList<int> controlKeys =  QList<int>() << Qt::Key_unknown <<  Qt::Key_Shift << Qt::Key_Control << Qt::Key_Meta << Qt::Key_Alt << Qt::Key_AltGr;
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
-		editor->setText(QKeySequence(keyEvent->modifiers() | keyEvent->key()).toString(QKeySequence::NativeText));
+		if (!controlKeys.contains(keyEvent->key()))
+			editor->setText(QKeySequence((keyEvent->modifiers() & ~Qt::KeypadModifier) | keyEvent->key()).toString(QKeySequence::NativeText));
 		return true;
 	}
 	else if (editor && AEvent->type()==QEvent::KeyRelease)

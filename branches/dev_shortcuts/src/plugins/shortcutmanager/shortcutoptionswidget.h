@@ -36,12 +36,14 @@ signals:
 protected:
 	void createTreeModel();
 	QStandardItem *createTreeRow(const QString &AId, QStandardItem *AParent, bool AGroup);
+	void setItemRed(QStandardItem *AItem, bool ARed) const;
 	void setItemBold(QStandardItem *AItem, bool ABold) const;
 protected slots:
 	void onDefaultClicked();
 	void onClearClicked();
 	void onRestoreDefaultsClicked();
 	void onModelItemChanged(QStandardItem *AItem);
+	void onIndexDoubleClicked(const QModelIndex &AIndex);
 private:
 	Ui::ShortcutOptionsWidgetClass ui;
 private:

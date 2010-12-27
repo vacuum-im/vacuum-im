@@ -36,6 +36,7 @@ ShortcutOptionsWidget::ShortcutOptionsWidget(QWidget *AParent) : QWidget(AParent
 	connect(ui.pbtClear,SIGNAL(clicked()),SLOT(onClearClicked()));
 	connect(ui.pbtRestoreDefaults,SIGNAL(clicked()),SLOT(onRestoreDefaultsClicked()));
 	connect(&FModel,SIGNAL(itemChanged(QStandardItem *)),SLOT(onModelItemChanged(QStandardItem *)));
+	connect(ui.trvShortcuts,SIGNAL(doubleClicked(const QModelIndex &)),SLOT(onIndexDoubleClicked(const QModelIndex &)));
 
 	reset();
 }
@@ -124,6 +125,11 @@ QStandardItem *ShortcutOptionsWidget::createTreeRow(const QString &AId, QStandar
 	return itemAction;
 }
 
+void ShortcutOptionsWidget::setItemRed(QStandardItem *AItem, bool ARed) const
+{
+	AItem->setForeground(ARed ? Qt::red : QBrush()/*this->palette().color(QPalette::WindowText)*/);
+}
+
 void ShortcutOptionsWidget::setItemBold(QStandardItem *AItem, bool ABold) const
 {
 	QFont font = AItem->font();
@@ -182,7 +188,31 @@ void ShortcutOptionsWidget::onModelItemChanged(QStandardItem *AItem)
 	QStandardItem *key = AItem->parent()!=NULL ? AItem->parent()->child(AItem->row(),COL_KEY) : NULL;
 	if (action!=NULL && key!=NULL)
 	{
-		setItemBold(action, key->data(MDR_ACTIVE_KEYSEQUENCE).toString()!=key->data(MDR_DEFAULT_KEYSEQUENCE).toString());
+		QMap<QKeySequence, int> keyCount;
+		for (int row=0; row<AItem->parent()->rowCount(); row++)
+		{
+			QKeySequence childKey = AItem->parent()->child(row,1)->data(MDR_ACTIVE_KEYSEQUENCE).toString();
+			keyCount[childKey]++;
+		}
+		for (int row=0; row<AItem->parent()->rowCount(); row++)
+		{
+			QKeySequence childKey = AItem->parent()->child(row,1)->data(MDR_ACTIVE_KEYSEQUENCE).toString();
+			bool conflict = !childKey.isEmpty() && keyCount.value(childKey)>1;
+			setItemRed(AItem->parent()->child(row,0),conflict);
+			setItemRed(AItem->parent()->child(row,1),conflict);
+		}
+		
+		bool notDefault = key->data(MDR_ACTIVE_KEYSEQUENCE).toString()!=key->data(MDR_DEFAULT_KEYSEQUENCE).toString();
+		setItemBold(action, notDefault);
+		setItemBold(key, notDefault);
+		
 		emit modified();
 	}
+}
+
+void ShortcutOptionsWidget::onIndexDoubleClicked(const QModelIndex &AIndex)
+{
+	QModelIndex editIndex = AIndex.parent().child(AIndex.row(),1);
+	if (editIndex.isValid())
+		ui.trvShortcuts->edit(editIndex);
 }
