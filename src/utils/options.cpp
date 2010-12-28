@@ -6,6 +6,8 @@
 #include <QStringList>
 #include <QCryptographicHash>
 
+#include <QtDebug>
+
 QDomElement findChildElement(const QDomElement &AParent, const QString &APath, const QString &ANSpace,
                              QString &ChildName, QString &SubPath, QString &NSpace)
 {
@@ -344,7 +346,7 @@ QString OptionsNode::childPath(const OptionsNode &ANode) const
 	return childElem==d->node ? result : QString::null;
 }
 
-void OptionsNode::removeChilds(const QString &AName, const QString &ANSpace) const
+void OptionsNode::removeChilds(const QString &AName, const QString &ANSpace)
 {
 	QDomElement childElem = d->node.firstChildElement();
 	while (!childElem.isNull())
@@ -360,6 +362,17 @@ void OptionsNode::removeChilds(const QString &AName, const QString &ANSpace) con
 	}
 }
 
+bool OptionsNode::hasNode(const QString &APath, const QString &ANSpace) const
+{
+	if (!APath.isEmpty())
+	{
+		QString cname, spath, nspace;
+		QDomElement childElem = findChildElement(d->node,APath,ANSpace,cname,spath,nspace);
+		return spath.isEmpty() || childElem.isNull() ? !childElem.isNull() : OptionsNode(childElem).hasNode(spath,ANSpace);
+	}
+	return !isNull();
+}
+
 OptionsNode OptionsNode::node(const QString &APath, const QString &ANSpace) const
 {
 	QString cname, spath, nspace;
@@ -372,6 +385,24 @@ OptionsNode OptionsNode::node(const QString &APath, const QString &ANSpace) cons
 		emit Options::instance()->optionsCreated(OptionsNode(childElem));
 	}
 	return spath.isEmpty() || childElem.isNull() ? OptionsNode(childElem) : OptionsNode(childElem).node(spath, ANSpace);
+}
+
+void OptionsNode::removeNode(const QString &APath, const QString &ANSpace)
+{
+	QString cname, spath, nspace;
+	QDomElement childElem = findChildElement(d->node,APath,ANSpace,cname,spath,nspace);
+	if (!isNull() && !childElem.isNull())
+	{
+		if (!spath.isEmpty())
+		{
+			OptionsNode(childElem).removeNode(spath,ANSpace);
+		}
+		if (spath.isEmpty() || (!childElem.hasAttribute("type") && !childElem.hasChildNodes()))
+		{
+			emit Options::instance()->optionsRemoved(OptionsNode(childElem));
+			d->node.removeChild(childElem);
+		}
+	}
 }
 
 bool OptionsNode::hasValue(const QString &APath, const QString &ANSpace) const
@@ -442,7 +473,6 @@ OptionsNode &OptionsNode::operator=(const OptionsNode &AOther)
 	return *this;
 }
 
-
 //Options
 struct OptionItem
 {
@@ -492,16 +522,7 @@ QString Options::cleanNSpaces(const QString &APath)
 
 bool Options::hasNode(const QString &APath, const QString &ANSpace)
 {
-	QString path = APath;
-	QString cname, spath, nspace;
-	QDomElement nodeElem = d->options.documentElement();
-	while (!nodeElem.isNull() && !path.isEmpty())
-	{
-		QDomElement childElem = findChildElement(nodeElem,path,ANSpace,cname,spath,nspace);
-		path = spath;
-		nodeElem = childElem;
-	}
-	return !nodeElem.isNull();
+	return OptionsNode(d->options.documentElement()).hasNode(APath,ANSpace);
 }
 
 OptionsNode Options::node(const QString &APath, const QString &ANSpace)

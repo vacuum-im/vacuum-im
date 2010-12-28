@@ -16,6 +16,7 @@
 #include <definitions/sessionnegotiatororders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
@@ -32,6 +33,7 @@
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/iroster.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include <utils/errorhandler.h>
 #include <utils/widgetmanager.h>
 #include "collectionwriter.h"
@@ -188,6 +190,7 @@ protected slots:
 	void onPrivateDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onCollectionWriterDestroyed(CollectionWriter *AWriter);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onSetMethodAction(bool);

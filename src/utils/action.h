@@ -6,6 +6,7 @@
 #include <QVariant>
 #include "utilsexport.h"
 #include "menu.h"
+#include "shortcuts.h"
 #include "iconstorage.h"
 
 class Menu;
@@ -36,6 +37,8 @@ public:
 	QVariant data(int ARole) const;
 	void setData(int ARole, const QVariant &AData);
 	void setData(const QHash<int, QVariant> &AData);
+	QString shortcutId() const;
+	void setShortcutId(const QString &AId);
 signals:
 	void actionDestroyed(Action *AAction);
 protected slots:
@@ -44,6 +47,7 @@ private:
 	Menu *FMenu;
 	IconStorage *FIconStorage;
 private:
+	QString FShortcutId;
 	QHash<int, QVariant> FData;
 };
 

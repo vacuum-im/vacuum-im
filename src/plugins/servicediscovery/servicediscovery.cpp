@@ -151,6 +151,15 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 
 bool ServiceDiscovery::initObjects()
 {
+	Shortcuts::declareGroup(SCTG_DISCOWINDOW,tr("Service discovery window"));
+	Shortcuts::declareShortcut(SCT_DISCOWINDOW_BACK,tr("Move back"),QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_DISCOWINDOW_FORWARD,tr("Move forward"),QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_DISCOWINDOW_DISCOVER,tr("Discover item"),QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_DISCOWINDOW_RELOAD,tr("Reload items"),QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_DISCOWINDOW_SHOWDISCOINFO,tr("Show discovery info"),QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_DISCOWINDOW_ADDCONTACT,tr("Add item to roster"),QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_DISCOWINDOW_SHOWVCARD,tr("Show vCard"),tr("Ctrl+I","Show vCard"));
+
 	FDiscoMenu = new Menu;
 	FDiscoMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
 	FDiscoMenu->setTitle(tr("Service Discovery"));

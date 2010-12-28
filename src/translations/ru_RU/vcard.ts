@@ -217,20 +217,29 @@
 <context>
     <name>VCardPlugin</name>
     <message>
-        <source>vCard</source>
-        <translation>vCard</translation>
-    </message>
-    <message>
-        <source>vCard Manager</source>
-        <translation>Диспетчер vCard</translation>
-    </message>
-    <message>
         <source>Allows to obtain personal contact information</source>
         <translation>Позволяет получать личную информацию о контакте</translation>
     </message>
     <message>
         <source>Supports the requesting of the personal contact information</source>
         <translation>Поддерживает запросы личной информации о контакте</translation>
+    </message>
+    <message>
+        <source>Visit Card Manager</source>
+        <translation>Менеджер визитных карточек</translation>
+    </message>
+    <message>
+        <source>Show vCard</source>
+        <translation>Показать vCard</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show vCard</comment>
+        <translation>Ctrl+I</translation>
+    </message>
+    <message>
+        <source>Visit Card</source>
+        <translation>Визитная карточка</translation>
     </message>
 </context>
 </TS>

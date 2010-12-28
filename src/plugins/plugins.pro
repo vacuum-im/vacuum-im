@@ -58,3 +58,4 @@ SUBDIRS += bitsofbinary
 SUBDIRS += xmppuriqueries
 SUBDIRS += remotecontrol
 SUBDIRS += pepmanager
+SUBDIRS += shortcutmanager 

@@ -12,6 +12,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
+#include <definitions/shortcuts.h>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
@@ -34,6 +35,7 @@
 #include <interfaces/iregistraton.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/ioptionsmanager.h>
+#include <utils/shortcuts.h>
 #include <utils/message.h>
 #include <utils/action.h>
 #include <utils/options.h>

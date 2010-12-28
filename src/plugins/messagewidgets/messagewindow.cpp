@@ -24,8 +24,9 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 	FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid);
 
 	FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid);
-	FEditWidget->setSendKey(QKeySequence());
+	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
 	FEditWidget->setSendButtonVisible(false);
+	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 
 	FReceiversWidget = FMessageWidgets->newReceiversWidget(FStreamJid);
 	connect(FReceiversWidget->instance(),SIGNAL(receiverAdded(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
@@ -274,6 +275,11 @@ void MessageWindow::onStreamJidChanged(const Jid &ABefore)
 			deleteLater();
 		}
 	}
+}
+
+void MessageWindow::onMessageReady()
+{
+	emit messageReady();
 }
 
 void MessageWindow::onSendButtonClicked()

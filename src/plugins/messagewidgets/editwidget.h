@@ -7,6 +7,7 @@
 #include <definitions/menuicons.h>
 #include <interfaces/imessagewidgets.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include "ui_editwidget.h"
 
 class EditWidget :
@@ -31,8 +32,8 @@ public:
 	virtual void setAutoResize(bool AResize);
 	virtual int minimumLines() const;
 	virtual void setMinimumLines(int ALines);
-	virtual QKeySequence sendKey() const;
-	virtual void setSendKey(const QKeySequence &AKey);
+	virtual QString sendShortcut() const;
+	virtual void setSendShortcut(const QString &AShortcutId);
 	virtual bool sendButtonVisible() const;
 	virtual void setSendButtonVisible(bool AVisible);
 	virtual bool textFormatEnabled() const;
@@ -46,7 +47,7 @@ signals:
 	void contactJidChanged(const Jid &ABefore);
 	void autoResizeChanged(bool AResize);
 	void minimumLinesChanged(int ALines);
-	void sendKeyChanged(const QKeySequence &AKey);
+	void sendShortcutChanged(const QString &AShortcutId);
 protected:
 	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected:
@@ -55,8 +56,8 @@ protected:
 	void showNextBufferedMessage();
 	void showPrevBufferedMessage();
 protected slots:
-	void onShortcutActivated();
 	void onSendButtonCliked(bool);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onContentsChanged(int APosition, int ARemoved, int AAdded);
 private:
@@ -68,7 +69,7 @@ private:
 	int FBufferPos;
 	Jid FStreamJid;
 	Jid FContactJid;
-	QShortcut *FSendShortcut;
+	QString FShortcutId;
 	QList<QString> FBuffer;
 };
 

@@ -14,11 +14,13 @@
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
 #include <definitions/version.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
 #include <utils/widgetmanager.h>
 #include <utils/filestorage.h>
+#include <utils/shortcuts.h>
 #include <utils/action.h>
 #include "setuppluginsdialog.h"
 #include "aboutbox.h"
@@ -76,6 +78,7 @@ protected:
 	void savePluginError(const QString &AFile, const QString &AEror);
 	void removePluginsInfo(const QStringList &ACurFiles);
 	void createMenuActions();
+	void declareShortcuts();
 protected slots:
 	void onApplicationAboutToQuit();
 	void onApplicationCommitDataRequested(QSessionManager &AManager);

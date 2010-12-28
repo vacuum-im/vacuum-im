@@ -54,10 +54,6 @@
         <translation>Отключить</translation>
     </message>
     <message>
-        <source>Log In</source>
-        <translation>Подключить</translation>
-    </message>
-    <message>
         <source>Keep connection</source>
         <translation>Поддерживать соединение</translation>
     </message>
@@ -80,6 +76,14 @@
     <message>
         <source>Supports the adding of the contact by the username of the legacy system</source>
         <translation>Поддерживает добавление контакта по имени пользователя другой системы</translation>
+    </message>
+    <message>
+        <source>Login on transport</source>
+        <translation>Подключиться к транспорту</translation>
+    </message>
+    <message>
+        <source>Logout from transport</source>
+        <translation>Отключиться от транспорта</translation>
     </message>
 </context>
 </TS>

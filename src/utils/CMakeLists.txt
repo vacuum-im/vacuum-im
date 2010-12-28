@@ -11,6 +11,7 @@ set(QT_USE_QTXML YES)
 include(${QT_USE_FILE})
 
 add_definitions("-DUTILS_DLL")
+add_definitions("-DQXT_STATIC") 
 link_directories("${CMAKE_BINARY_DIR}/libs")
 include_directories(AFTER "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
 
@@ -21,9 +22,9 @@ set_target_properties(${TARGET_UTILS} PROPERTIES
 	SOVERSION "${VERSION_UTILS_ABI}")
 
 if (SYSTEM_ZLIB_FOUND)
-	set(ADD_LIBS idn minizip "${SYSTEM_ZLIB_FOUND}")
+	set(ADD_LIBS qxtglobalshortcut idn minizip "${SYSTEM_ZLIB_FOUND}")
 else (SYSTEM_ZLIB_FOUND)
-	set(ADD_LIBS idn minizip zlib)
+	set(ADD_LIBS qxtglobalshortcut idn minizip zlib)
 endif (SYSTEM_ZLIB_FOUND)
 
 target_link_libraries(${TARGET_UTILS} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})

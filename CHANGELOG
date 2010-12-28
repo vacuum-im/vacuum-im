@@ -9,6 +9,7 @@ LEGEND
 
 ------
   [!] Added new plugin for remote controlling
+  [+] Added shortcuts support
   [+] Added ability to show tabs at the bottom of the tab windows
   [+] Added support of XEP-0199 - XMPP Ping
   [+] Added maintenance history of visited conferences

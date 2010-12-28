@@ -62,6 +62,77 @@
         <source>Save status messages to history</source>
         <translation>Сохранять статусные сообщения в истории</translation>
     </message>
+    <message>
+        <source>Tab window</source>
+        <translation>Окно со вкладками</translation>
+    </message>
+    <message>
+        <source>Close tab</source>
+        <translation>Закрыть вкладку</translation>
+    </message>
+    <message>
+        <source>Detach tab to separate window</source>
+        <translation>Отцепить вкладку в отдельное окно</translation>
+    </message>
+    <message>
+        <source>Next tab</source>
+        <translation>Следующая вкладка</translation>
+    </message>
+    <message>
+        <source>Previous tab</source>
+        <translation>Предыдущая вкладка</translation>
+    </message>
+    <message>
+        <source>Set tabs closable</source>
+        <translation>Сделать вкладки закрываемыми</translation>
+    </message>
+    <message>
+        <source>Show tabs at bottom</source>
+        <translation>Показывать вкладки внизу</translation>
+    </message>
+    <message>
+        <source>Rename tab window</source>
+        <translation>Переименовать окно со вкладками</translation>
+    </message>
+    <message>
+        <source>Delete tab window</source>
+        <translation>Удалить окно со вкладками</translation>
+    </message>
+    <message>
+        <source>Use as default tab window</source>
+        <translation>Использовать как основное окно со вкладками</translation>
+    </message>
+    <message>
+        <source>Alt+%1</source>
+        <comment>Show tab</comment>
+        <translation>Alt+%1</translation>
+    </message>
+    <message>
+        <source>Message windows</source>
+        <translation>Окна сообщений</translation>
+    </message>
+    <message>
+        <source>Chat window</source>
+        <translation>Окно чата</translation>
+    </message>
+    <message>
+        <source>Send message</source>
+        <translation>Отправить сообщение</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send message</comment>
+        <translation>Return</translation>
+    </message>
+    <message>
+        <source>Message window</source>
+        <translation>Окно сообщения</translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send message</comment>
+        <translation>Ctrl+Return</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>
@@ -111,10 +182,6 @@
 </context>
 <context>
     <name>MessengerOptionsClass</name>
-    <message>
-        <source>Send message key sequence:</source>
-        <translation>Комбинация клавиш для отправки сообщения:</translation>
-    </message>
     <message>
         <source>Minimum input field lines:</source>
         <translation>Минимальное число строк в поле ввода:</translation>
@@ -181,18 +248,6 @@
 <context>
     <name>TabWindow</name>
     <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Close Tab</source>
         <translation>Закрыть вкладку</translation>
     </message>
@@ -241,13 +296,13 @@
         <translation>Вы уверены что хотите удалить это окно со вкладками?</translation>
     </message>
     <message>
-        <source>Show Tabs at Bootom of the Window</source>
-        <translation>Показывать вкладки внизу окна</translation>
-    </message>
-    <message>
         <source>%1. %2</source>
         <comment>First is tab index, second is tab name</comment>
         <translation>%1. %2</translation>
+    </message>
+    <message>
+        <source>Show Tabs at Bottom of the Window</source>
+        <translation>Показывать вкладки внизу окна</translation>
     </message>
 </context>
 <context>

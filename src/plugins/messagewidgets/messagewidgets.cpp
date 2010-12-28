@@ -51,6 +51,28 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool MessageWidgets::initObjects()
 {
+	Shortcuts::declareGroup(SCTG_TABWINDOW, tr("Tab window"));
+	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSETAB, tr("Close tab"), QKeySequence::Close);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_DETACHTAB, tr("Detach tab to separate window"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_NEXTTAB, tr("Next tab"), QKeySequence::NextChild);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_PREVTAB, tr("Previous tab"), QKeySequence::PreviousChild);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_SHOWCLOSEBUTTTONS, tr("Set tabs closable"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_TABSBOTTOM, tr("Show tabs at bottom"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_RENAMEWINDOW, tr("Rename tab window"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_DELETEWINDOW, tr("Delete tab window"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_SETASDEFAULT, tr("Use as default tab window"), QKeySequence::UnknownKey);
+	for (int tabNumber=1; tabNumber<=10; tabNumber++)
+		Shortcuts::declareShortcut(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber), QString::null, tr("Alt+%1","Show tab").arg(tabNumber % 10));
+
+	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS, tr("Message windows"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_QUOTE, tr("Quote selected text"), QKeySequence::UnknownKey);
+	
+	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_CHAT, tr("Chat window"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE, tr("Send message"), tr("Return","Send message"), Shortcuts::WidgetShortcut);
+
+	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_NORMAL, tr("Message window"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
+
 	insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
 	return true;
 }
@@ -63,7 +85,6 @@ bool MessageWidgets::initSettings()
 	Options::setDefaultValue(OPV_MESSAGES_SHOWINFOWIDGET,true);
 	Options::setDefaultValue(OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS,140);
 	Options::setDefaultValue(OPV_MESSAGES_EDITORMINIMUMLINES,1);
-	Options::setDefaultValue(OPV_MESSAGES_EDITORSENDKEY,QKeySequence(Qt::Key_Return));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_ENABLE,true);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_NAME,tr("Tab Window"));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSCLOSABLE,true);
@@ -370,6 +391,7 @@ void MessageWidgets::insertQuoteAction(IToolBarWidget *AWidget)
 		Action *action = new Action(AWidget->instance());
 		action->setToolTip(tr("Quote selected text"));
 		action->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
+		action->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onQuoteActionTriggered(bool)));
 		AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_MESSAGEWIDGETS_QUOTE);
 	}

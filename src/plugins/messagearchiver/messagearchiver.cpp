@@ -90,7 +90,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),
-			        SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
+				SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
 		}
 	}
 
@@ -109,11 +109,11 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		if (FPrivateStorage)
 		{
 			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
-			        SLOT(onPrivateDataError(const QString &, const QString &)));
+				SLOT(onPrivateDataError(const QString &, const QString &)));
 		}
 	}
 
@@ -125,7 +125,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		{
 			connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
 			connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),
-			        SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+				SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 		}
 	}
 
@@ -136,7 +136,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		if (FRostersViewPlugin)
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
-			        SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+				SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
 		}
 	}
 
@@ -171,9 +171,9 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		if (FSessionNegotiation)
 		{
 			connect(FSessionNegotiation->instance(),SIGNAL(sessionActivated(const IStanzaSession &)),
-			        SLOT(onStanzaSessionActivated(const IStanzaSession &)));
+				SLOT(onStanzaSessionActivated(const IStanzaSession &)));
 			connect(FSessionNegotiation->instance(),SIGNAL(sessionTerminated(const IStanzaSession &)),
-			        SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
+				SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
 		}
 	}
 
@@ -188,15 +188,43 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &/*AIn
 		if (FMultiUserChatPlugin)
 		{
 			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
-			        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
+				SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
 		}
 	}
+
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool MessageArchiver::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWHISTORY, tr("Show history"), tr("Ctrl+H","Show history"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYENABLE, tr("Enable message logging"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYDISABLE, tr("Disable message logging"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR, tr("Require Off-The-Record session"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR, tr("Terminate Off-The-Record session"), QKeySequence::UnknownKey);
+
+	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_HISTORY, tr("History window"));
+
+	Shortcuts::declareGroup(SCTG_HISTORYWINDOW, tr("History window"));
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPNONE, tr("Group by nothing"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYDATE, tr("Group by date"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYCONTACT, tr("Group by contact"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYDATECONTACT, tr("Group by date and contact"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYCONTACTDATE, tr("Group by contact and date"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_EXPANDALL, tr("Expand All"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_COLLAPSEALL, tr("Collapse All"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_SOURCEAUTO, tr("Auto select archive"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_SOURCELOCAL, tr("Select local archive"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_SOURCESERVER, tr("Select server archive"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_FILTERBYCONTACT, tr("Filter by contact"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_RENAMECOLLECTION, tr("Change conversation subject"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_REMOVECOLLECTION, tr("Remove conversation"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_RELOADCOLLECTIONS, tr("Reload conversations"), QKeySequence::UnknownKey);
+
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWHISTORY,tr("Show history"),tr("Ctrl+H","Show history"),Shortcuts::WidgetShortcut);
+
 	QString dirPath = collectionDirPath(Jid(),Jid());
 	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
 	if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
@@ -217,6 +245,10 @@ bool MessageArchiver::initObjects()
 	if (FSessionNegotiation)
 	{
 		FSessionNegotiation->insertNegotiator(this,SNO_DEFAULT);
+	}
+	if (FRostersViewPlugin)
+	{
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWHISTORY,FRostersViewPlugin->rostersView()->instance());
 	}
 	return true;
 }
@@ -2019,6 +2051,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const Jid &ACont
 	}
 	else
 		action->setData(ADR_GROUP_KIND,IArchiveWindow::GK_CONTACT);
+	action->setShortcutId(SCT_ROSTERVIEW_SHOWHISTORY);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowAction(bool)));
 	menu->addAction(action,AG_DEFAULT,false);
 
@@ -2634,6 +2667,26 @@ void MessageArchiver::onCollectionWriterDestroyed(CollectionWriter *AWriter)
 	}
 }
 
+void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
+	{
+		if (AId == SCT_ROSTERVIEW_SHOWHISTORY)
+		{
+			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
+			int indexType = index.data(RDR_TYPE).toInt();
+			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
+			{
+				IArchiveFilter filter;
+				if (indexType != RIT_STREAM_ROOT)
+					filter.with = index.data(RDR_JID).toString();
+				filter.start = QDateTime::currentDateTime().addMonths(-1);
+				showArchiveWindow(index.data(RDR_STREAM_JID).toString(),filter,indexType==RIT_STREAM_ROOT ? IArchiveWindow::GK_CONTACT : IArchiveWindow::GK_NO_GROUPS);
+			}
+		}
+	}
+}
+
 void MessageArchiver::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
 	if (AIndex->type()==RIT_STREAM_ROOT || AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_AGENT)
@@ -2847,6 +2900,7 @@ void MessageArchiver::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 		Action *action = new Action(AWidget->toolBarChanger()->toolBar());
 		action->setText(tr("View History"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
+		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWHISTORY);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowToolBarAction(bool)));
 		QToolButton *viewButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
 

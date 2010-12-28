@@ -14,12 +14,14 @@
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/version.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <utils/action.h>
+#include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
 #include <thirdparty/qtlockedfile/qtlockedfile.h>
 #include "logindialog.h"

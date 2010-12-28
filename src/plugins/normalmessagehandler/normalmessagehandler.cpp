@@ -4,6 +4,8 @@
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 #define ADR_GROUP                 Action::DR_Parametr3
 
+static const QList<int> MessageActionTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+
 NormalMessageHandler::NormalMessageHandler()
 {
 	FMessageWidgets = NULL;
@@ -32,8 +34,10 @@ void NormalMessageHandler::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(MESSAGESTYLES_UUID);
 }
 
-bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
 	if (plugin)
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
@@ -101,11 +105,15 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 	if (plugin)
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
+
 	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
 }
 
 bool NormalMessageHandler::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWNORMALDIALOG, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
+
 	if (FMessageProcessor)
 	{
 		FMessageProcessor->insertMessageHandler(this,MHO_NORMALMESSAGEHANDLER);
@@ -113,6 +121,10 @@ bool NormalMessageHandler::initObjects()
 	if (FXmppUriQueries)
 	{
 		FXmppUriQueries->insertUriHandler(this,XUHO_DEFAULT);
+	}
+	if (FRostersView)
+	{
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWNORMALDIALOG, FRostersView->instance());
 	}
 	return true;
 }
@@ -453,25 +465,50 @@ void NormalMessageHandler::onShowWindowAction(bool)
 	}
 }
 
+void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (FRostersView && AWidget==FRostersView->instance())
+	{
+		if (AId == SCT_ROSTERVIEW_SHOWNORMALDIALOG)
+		{
+			QModelIndex index = FRostersView->instance()->currentIndex();
+			Jid streamJid = index.data(RDR_STREAM_JID).toString();
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+			if (presence && presence->isOpen() && MessageActionTypes.contains(index.data(RDR_TYPE).toInt()))
+			{
+				Jid contactJid = index.data(RDR_JID).toString();
+				openWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal);
+
+				QString group = index.data(RDR_TYPE).toInt()==RIT_GROUP ? index.data(RDR_GROUP).toString() : QString::null;
+				if (!group.isEmpty())
+				{
+					IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
+					if (window)
+						window->receiversWidget()->addReceiversGroup(group);
+				}
+			}
+		}
+	}
+}
+
 void NormalMessageHandler::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
-	static QList<int> messageActionTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
-		if (messageActionTypes.contains(AIndex->type()))
+		if (MessageActionTypes.contains(AIndex->type()))
 		{
 			Jid contactJid = AIndex->data(RDR_JID).toString();
 			Action *action = new Action(AMenu);
-			action->setText(tr("Message"));
+			action->setText(tr("Send message"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMAL_MHANDLER_MESSAGE);
 			action->setData(ADR_STREAM_JID,streamJid.full());
 			if (AIndex->type() == RIT_GROUP)
 				action->setData(ADR_GROUP,AIndex->data(RDR_GROUP));
 			else if (AIndex->type() != RIT_STREAM_ROOT)
 				action->setData(ADR_CONTACT_JID,contactJid.full());
+			action->setShortcutId(SCT_ROSTERVIEW_SHOWNORMALDIALOG);
 			AMenu->addAction(action,AG_RVCM_NORMALMESSAGEHANDLER,true);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
 		}

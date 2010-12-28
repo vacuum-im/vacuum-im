@@ -6,6 +6,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
+#include <definitions/shortcuts.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
@@ -14,6 +15,7 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include "rosterindexdelegate.h"
 
 struct NotifyItem
@@ -130,6 +132,7 @@ protected slots:
 	void onIndexDestroyed(IRosterIndex *AIndex);
 	void onBlinkTimer();
 	void onDragExpandTimer();
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IRostersModel *FRostersModel;
 private:

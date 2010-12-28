@@ -7,6 +7,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/optionvalues.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/ioptionsmanager.h>
@@ -14,6 +15,7 @@
 #include <utils/widgetmanager.h>
 #include <utils/action.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include "mainwindow.h"
 
 class MainWindowPlugin :
@@ -41,13 +43,14 @@ protected:
 	void showMainWindow();
 	void correctWindowPosition();
 protected:
-	bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
 	void onProfileRenamed(const QString &AProfile, const QString &ANewName);
 	void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
 	void onShowMainWindowByAction(bool);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IPluginManager *FPluginManager;
 	IOptionsManager *FOptionsManager;

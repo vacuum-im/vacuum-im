@@ -25,14 +25,10 @@ signals:
 	void modified();
 	void childApply();
 	void childReset();
-protected:
-	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
 	Ui::MessengerOptionsClass ui;
 private:
 	IMessageWidgets *FMessageWidgets;
-private:
-	QKeySequence FSendKey;
 };
 
 #endif // MESSENGEROPTIONS_H

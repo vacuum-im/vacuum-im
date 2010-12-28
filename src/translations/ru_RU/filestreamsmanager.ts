@@ -54,6 +54,10 @@
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Позволяет инициировать поток для передачи файлов между двумя XMPP сущностями</translation>
     </message>
+    <message>
+        <source>Show file transfers</source>
+        <translation>Показать передачи файлов</translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsOptions</name>

@@ -87,8 +87,8 @@ public:
 	virtual void setAutoResize(bool AResize) =0;
 	virtual int minimumLines() const =0;
 	virtual void setMinimumLines(int ALines) =0;
-	virtual QKeySequence sendKey() const =0;
-	virtual void setSendKey(const QKeySequence &AKey) =0;
+	virtual QString sendShortcut() const =0;
+	virtual void setSendShortcut(const QString &AShortcutId) =0;
 	virtual bool sendButtonVisible() const =0;
 	virtual void setSendButtonVisible(bool AVisible) =0;
 	virtual bool textFormatEnabled() const =0;
@@ -102,7 +102,7 @@ protected:
 	virtual void contactJidChanged(const Jid &ABefore) =0;
 	virtual void autoResizeChanged(bool AResize) =0;
 	virtual void minimumLinesChanged(int ALines) =0;
-	virtual void sendKeyChanged(const QKeySequence &AKey) =0;
+	virtual void sendShortcutChanged(const QString &AShortcutId) =0;
 };
 
 class IReceiversWidget

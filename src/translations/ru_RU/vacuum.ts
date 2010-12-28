@@ -53,6 +53,26 @@
         <source>Plugins directory not found</source>
         <translation>Директория с плагинами не найдена</translation>
     </message>
+    <message>
+        <source>Application</source>
+        <translation>Приложение</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>Показать информацию о Qt</translation>
+    </message>
+    <message>
+        <source>Show information about client</source>
+        <translation>Показать информацию о клиенте</translation>
+    </message>
+    <message>
+        <source>Show setup plugins dialog</source>
+        <translation>Показать диалог настройки плагинов</translation>
+    </message>
+    <message>
+        <source>Global</source>
+        <translation>Глобальные</translation>
+    </message>
 </context>
 <context>
     <name>SetupPluginsDialog</name>

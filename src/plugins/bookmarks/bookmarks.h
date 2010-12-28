@@ -8,6 +8,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
+#include <definitions/shortcuts.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/discoitemdataroles.h>
 #include <interfaces/ipluginmanager.h>
@@ -21,6 +22,7 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ioptionsmanager.h>
+#include <utils/shortcuts.h>
 #include <utils/options.h>
 #include <utils/menu.h>
 #include "editbookmarkdialog.h"

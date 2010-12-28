@@ -55,7 +55,7 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		if (FDiscovery)
 		{
 			connect(FDiscovery->instance(),SIGNAL(discoItemsWindowCreated(IDiscoItemsWindow *)),
-			        SLOT(onDiscoItemsWindowCreated(IDiscoItemsWindow *)));
+				SLOT(onDiscoItemsWindowCreated(IDiscoItemsWindow *)));
 		}
 	}
 
@@ -71,9 +71,9 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		{
 			connect(FRosterPlugin->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
 			connect(FRosterPlugin->instance(),SIGNAL(rosterSubscription(IRoster *, const Jid &, int , const QString &)),
-			        SLOT(onRosterSubscription(IRoster *, const Jid &, int , const QString &)));
+				SLOT(onRosterSubscription(IRoster *, const Jid &, int , const QString &)));
 			connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidAboutToBeChanged(IRoster *, const Jid &)),
-			        SLOT(onRosterStreamJidAboutToBeChanged(IRoster *, const Jid &)));
+				SLOT(onRosterStreamJidAboutToBeChanged(IRoster *, const Jid &)));
 		}
 	}
 
@@ -85,7 +85,7 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		{
 			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
 			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),
-			        SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
+				SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceRemoved(IPresence *)),SLOT(onPresenceRemoved(IPresence *)));
 		}
@@ -97,7 +97,14 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin)
+		{
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
+				SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
 	if (plugin)
@@ -118,7 +125,7 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		{
 			connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorateOpened(const Jid &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onPrivateStorageLoaded(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateStorageLoaded(const QString &, const Jid &, const QDomElement &)));
 		}
 	}
 
@@ -133,17 +140,22 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		if (FRegistration)
 		{
 			connect(FRegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
-			        SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
+				SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
 			connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
-			        SLOT(onRegisterError(const QString &, const QString &)));
+				SLOT(onRegisterError(const QString &, const QString &)));
 		}
 	}
+
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FStanzaProcessor!=NULL;
 }
 
 bool Gateways::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_GATELOGIN, tr("Login on transport"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_GATELOGOUT, tr("Logout from transport"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
+
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
@@ -151,8 +163,8 @@ bool Gateways::initObjects()
 	}
 	if (FRostersViewPlugin)
 	{
-		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
-		        SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_GATELOGIN,FRostersViewPlugin->rostersView()->instance());
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_GATELOGOUT,FRostersViewPlugin->rostersView()->instance());
 	}
 	return true;
 }
@@ -554,6 +566,26 @@ void Gateways::onChangeActionTriggered(bool)
 	}
 }
 
+void Gateways::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
+	{
+		if (AId == SCT_ROSTERVIEW_GATELOGIN || AId == SCT_ROSTERVIEW_GATELOGOUT)
+		{
+			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
+			if (index.data(RDR_TYPE).toInt() == RIT_AGENT)
+			{
+				Jid streamJid = index.data(RDR_STREAM_JID).toString();
+				Jid serviceJid = index.data(RDR_BARE_JID).toString();
+				bool logIn = AId==SCT_ROSTERVIEW_GATELOGIN;
+				if (FPrivateStorageKeep.value(streamJid).contains(serviceJid))
+					setKeepConnection(streamJid,serviceJid,logIn);
+				sendLogPresence(streamJid,serviceJid,logIn);
+			}
+		}
+	}
+}
+
 void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
 	if (AIndex->type() == RIT_STREAM_ROOT)
@@ -593,20 +625,22 @@ void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 		if (presence && presence->isOpen())
 		{
 			Action *action = new Action(AMenu);
-			action->setText(tr("Log In"));
+			action->setText(tr("Login on transport"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_IN);
 			action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
 			action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BARE_JID));
 			action->setData(ADR_LOG_IN,true);
+			action->setShortcutId(SCT_ROSTERVIEW_GATELOGIN);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
 			AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
 
 			action = new Action(AMenu);
-			action->setText(tr("Log Out"));
+			action->setText(tr("Logout from transport"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_OUT);
 			action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
 			action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BARE_JID));
 			action->setData(ADR_LOG_IN,false);
+			action->setShortcutId(SCT_ROSTERVIEW_GATELOGOUT);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
 			AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
 

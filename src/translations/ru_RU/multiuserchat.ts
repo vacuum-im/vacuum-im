@@ -529,6 +529,48 @@ Check values and try again</source>
         <source>Save status messages to history</source>
         <translation>Сохранять статусные сообщения в истории</translation>
     </message>
+    <message>
+        <source>Multi-user chat window</source>
+        <translation>Окно конференции</translation>
+    </message>
+    <message>
+        <source>Send message</source>
+        <translation>Отправить сообщение</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send message</comment>
+        <translation>Return</translation>
+    </message>
+    <message>
+        <source>Clear window</source>
+        <translation>Отчистить окно</translation>
+    </message>
+    <message>
+        <source>Change nick</source>
+        <translation>Изменить ник</translation>
+    </message>
+    <message>
+        <source>Change topic</source>
+        <translation>Изменить тему</translation>
+    </message>
+    <message>
+        <source>Setup conference</source>
+        <translation>Настроить комнату</translation>
+    </message>
+    <message>
+        <source>Enter the conference</source>
+        <translation>Войти в комнату</translation>
+    </message>
+    <message>
+        <source>Leave the conference</source>
+        <translation>Выйти из комнаты</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <comment>Leave the conference</comment>
+        <translation>Ctrl+Q</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -895,10 +937,6 @@ Check values and try again</source>
     <message>
         <source>Exit room</source>
         <translation>Выйти из комнаты</translation>
-    </message>
-    <message>
-        <source>Ctrl+F4</source>
-        <translation>Ctrl+F4</translation>
     </message>
     <message>
         <source>Mention message in conference: %1</source>

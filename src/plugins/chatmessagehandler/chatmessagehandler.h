@@ -15,6 +15,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
+#include <definitions/shortcuts.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/toolbargroups.h>
@@ -34,6 +35,7 @@
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include "usercontextmenu.h"
 
 struct WindowStatus
@@ -92,6 +94,7 @@ protected slots:
 	void onStatusIconsChanged();
 	void onShowWindowAction(bool);
    void onClearWindowAction(bool);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);

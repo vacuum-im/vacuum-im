@@ -72,9 +72,20 @@ void Action::setData(const QHash<int,QVariant> &AData)
 	FData.unite(AData);
 }
 
+QString Action::shortcutId() const
+{
+	return FShortcutId;
+}
+
+void Action::setShortcutId(const QString &AId)
+{
+	FShortcutId = AId;
+	Shortcuts::bindObjectShortcut(AId, this);
+}
+
 void Action::onMenuDestroyed(Menu *AMenu)
 {
-	if (AMenu == FMenu)
-		FMenu = NULL;
+	Q_UNUSED(AMenu);
+	FMenu = NULL;
 	QAction::setMenu(NULL);
 }

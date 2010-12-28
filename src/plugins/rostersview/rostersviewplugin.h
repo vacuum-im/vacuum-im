@@ -12,6 +12,7 @@
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/iroster.h>
@@ -21,6 +22,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <utils/action.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include "rostersview.h"
 #include "sortfilterproxymodel.h"
 
