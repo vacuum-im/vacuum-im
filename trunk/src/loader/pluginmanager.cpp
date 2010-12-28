@@ -179,6 +179,7 @@ void PluginManager::restart()
 	{
 		saveSettings();
 		createMenuActions();
+		declareShortcuts();
 		startPlugins();
 	}
 	else
@@ -508,8 +509,7 @@ void PluginManager::loadCoreTranslations(const QString &ADir)
 	if (FUtilsTranslator->load("vacuumutils",ADir))
 		qApp->installTranslator(FUtilsTranslator);
 
-	if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath))
-		|| FQtTranslator->load("qt_"+QLocale().name(),ADir))
+	if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)) || FQtTranslator->load("qt_"+QLocale().name(),ADir))
 		qApp->installTranslator(FQtTranslator);
 }
 
@@ -607,33 +607,36 @@ void PluginManager::removePluginsInfo(const QStringList &ACurFiles)
 void PluginManager::createMenuActions()
 {
 	IPlugin *plugin = pluginInterface("IMainWindowPlugin").value(0);
-	IMainWindowPlugin *mainWindowPligin = plugin!=NULL ? qobject_cast<IMainWindowPlugin *>(plugin->instance()) : NULL;
+	IMainWindowPlugin *mainWindowPlugin = plugin!=NULL ? qobject_cast<IMainWindowPlugin *>(plugin->instance()) : NULL;
 
 	plugin = pluginInterface("ITrayManager").value(0);
 	ITrayManager *trayManager = plugin!=NULL ? qobject_cast<ITrayManager *>(plugin->instance()) : NULL;
 
-	if (mainWindowPligin || trayManager)
+	if (mainWindowPlugin || trayManager)
 	{
-		Action *pluginsDialog = new Action(mainWindowPligin!=NULL ? mainWindowPligin->instance() : trayManager->instance());
-		pluginsDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
-		connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
+		Action *pluginsDialog = new Action(mainWindowPlugin!=NULL ? mainWindowPlugin->instance() : trayManager->instance());
 		pluginsDialog->setText(tr("Setup plugins"));
+		pluginsDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
+		pluginsDialog->setShortcutId(SCT_APP_SETUPPLUGINS);
+		connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
 
-		if (mainWindowPligin)
+		if (mainWindowPlugin)
 		{
-			Action *aboutQt = new Action(mainWindowPligin->mainWindow()->mainMenu());
+			Action *aboutQt = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 			aboutQt->setText(tr("About Qt"));
 			aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT_QT);
+			aboutQt->setShortcutId(SCT_APP_ABOUTQT);
 			connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
-			mainWindowPligin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
+			mainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
 
-			Action *about = new Action(mainWindowPligin->mainWindow()->mainMenu());
+			Action *about = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 			about->setText(tr("About the program"));
 			about->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT);
+			about->setShortcutId(SCT_APP_ABOUTPROGRAM);
 			connect(about,SIGNAL(triggered()),SLOT(onShowAboutBoxDialog()));
-			mainWindowPligin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
+			mainWindowPlugin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
 
-			mainWindowPligin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
+			mainWindowPlugin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
 		}
 
 		if (trayManager)
@@ -641,6 +644,16 @@ void PluginManager::createMenuActions()
 	}
 	else
 		onShowSetupPluginsDialog(false);
+}
+
+void PluginManager::declareShortcuts()
+{
+	Shortcuts::declareGroup(SCTG_GLOBAL, tr("Global"));
+
+	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application"));
+	Shortcuts::declareShortcut(SCT_APP_ABOUTQT, tr("Show information about Qt"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_ABOUTPROGRAM, tr("Show information about client"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_SETUPPLUGINS, tr("Show setup plugins dialog"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
 }
 
 void PluginManager::onApplicationAboutToQuit()

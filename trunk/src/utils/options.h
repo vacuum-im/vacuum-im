@@ -25,8 +25,10 @@ public:
 	QList<QString> childNSpaces(const QString &AName) const;
 	bool isChildNode(const OptionsNode &ANode) const;
 	QString childPath(const OptionsNode &ANode) const;
-	void removeChilds(const QString &AName = QString::null, const QString &ANSpace = QString::null) const;
+	void removeChilds(const QString &AName = QString::null, const QString &ANSpace = QString::null);
+	bool hasNode(const QString &APath, const QString &ANSpace = QString::null) const;
 	OptionsNode node(const QString &APath, const QString &ANSpace = QString::null) const;
+	void removeNode(const QString &APath, const QString &ANSpace = QString::null);
 	bool hasValue(const QString &APath = QString::null, const QString &ANSpace = QString::null) const;
 	QVariant value(const QString &APath = QString::null, const QString &ANSpace = QString::null) const;
 	void setValue(const QVariant &AValue, const QString &APath = QString::null, const QString &ANSpace = QString::null);

@@ -14,6 +14,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/resources.h>
+#include <definitions/shortcuts.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
@@ -35,6 +36,7 @@
 #include <utils/stanza.h>
 #include <utils/options.h>
 #include <utils/datetime.h>
+#include <utils/shortcuts.h>
 #include <utils/iconstorage.h>
 #include <utils/widgetmanager.h>
 #include "streamdialog.h"
@@ -107,6 +109,7 @@ protected slots:
 	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
 	void onEditWidgetContactJidChanged(const Jid &ABefore);
 	void onToolBarWidgetDestroyed(QObject *AObject);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IRosterPlugin *FRosterPlugin;
 	IServiceDiscovery *FDiscovery;

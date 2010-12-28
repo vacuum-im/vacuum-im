@@ -18,6 +18,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/serviceicons.h>
+#include <definitions/shortcuts.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -34,6 +35,7 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/errorhandler.h>
 #include <utils/iconstorage.h>
+#include <utils/shortcuts.h>
 #include "discoinfowindow.h"
 #include "discoitemswindow.h"
 

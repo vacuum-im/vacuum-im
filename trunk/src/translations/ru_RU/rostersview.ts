@@ -66,5 +66,17 @@
         <source>Sort contacts by status</source>
         <translation>Сортировать контакты по статусу</translation>
     </message>
+    <message>
+        <source>Copy contact JID to clipboard</source>
+        <translation>Копировать JID контакта в буфер обмена</translation>
+    </message>
+    <message>
+        <source>Copy contact name to clipboard</source>
+        <translation>Копировать имя контакта в буфер обмена</translation>
+    </message>
+    <message>
+        <source>Copy contact status to clipboard</source>
+        <translation>Копировать статус  контакта в буфер обмена</translation>
+    </message>
 </context>
 </TS>

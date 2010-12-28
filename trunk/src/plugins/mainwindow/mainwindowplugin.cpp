@@ -65,12 +65,18 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
 	return true;
 }
 
 bool MainWindowPlugin::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_GLOBAL_SHOWROSTER,tr("Show roster"),QKeySequence::UnknownKey,Shortcuts::GlobalShortcut);
+
+	Shortcuts::declareGroup(SCTG_MAINWINDOW, tr("Main window"));
+	Shortcuts::declareShortcut(SCT_MAINWINDOW_HIDEROSTER,tr("Hide roster"),tr("Esc","Hide roster"));
+
 	Action *action = new Action(this);
 	action->setText(tr("Quit"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
@@ -86,6 +92,8 @@ bool MainWindowPlugin::initObjects()
 		FTrayManager->addAction(action,AG_TMTM_MAINWINDOW,true);
 	}
 
+	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_HIDEROSTER,FMainWindow);
+
 	return true;
 }
 
@@ -99,6 +107,8 @@ bool MainWindowPlugin::initSettings()
 
 bool MainWindowPlugin::startPlugin()
 {
+	Shortcuts::setGlobalShortcut(SCT_GLOBAL_SHOWROSTER,true);
+
 	updateTitle();
 	return true;
 }
@@ -187,6 +197,18 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
 void MainWindowPlugin::onShowMainWindowByAction(bool)
 {
 	showMainWindow();
+}
+
+void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (AWidget==NULL && AId==SCT_GLOBAL_SHOWROSTER)
+	{
+		showMainWindow();
+	}
+	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_HIDEROSTER)
+	{
+		FMainWindow->close();
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_mainwindow, MainWindowPlugin)

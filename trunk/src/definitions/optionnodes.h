@@ -14,5 +14,6 @@
 #define OPN_DATASTREAMS         "DataStreams"
 #define OPN_FILETRANSFER        "FileTransfer"
 #define OPN_CONFERENCES         "Conferences"
+#define OPN_SHORTCUTS           "Shortcuts"
 
 #endif

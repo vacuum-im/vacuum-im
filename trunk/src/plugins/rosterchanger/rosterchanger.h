@@ -15,6 +15,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
+#include <definitions/shortcuts.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/ipluginmanager.h>
@@ -25,6 +26,7 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <utils/shortcuts.h>
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
 
@@ -84,33 +86,48 @@ signals:
 	void subscriptionDialogCreated(ISubscriptionDialog *ADialog);
 protected:
 	QString subscriptionNotify(int ASubsType, const Jid &AContactJid) const;
-	Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups,
-	                      bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
+	Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups,bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
 	SubscriptionDialog *findSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const;
 	SubscriptionDialog *createSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage);
+protected:
+	void contactSubscription(const Jid &AStreamJid, const Jid &AContactJid, int ASubsc);
+	void sendSubscription(const Jid &AStreamJid, const Jid &AContactJid, int ASubsc) const;
+	void addContactToGroup(const Jid &AStreamJid, const Jid &AContactJid, const QString &AGroup) const;
+	void renameContact(const Jid &AStreamJid, const Jid &AContactJid, const QString &AOldName) const;
+	void copyContactToGroup(const Jid &AStreamJid, const Jid &AContactJid, const QString &AGroup) const;
+	void moveContactToGroup(const Jid &AStreamJid, const Jid &AContactJid, const QString &AGroupFrom, const QString &AGroupTo) const;
+	void removeContactFromGroup(const Jid &AStreamJid, const Jid &AContactJid, const QString &AGroup) const;
+	void removeContactFromRoster(const Jid &AStreamJid, const Jid &AContactJid) const;
+	void addGroupToGroup(const Jid &AToStreamJid, const Jid &AFromStreamJid, const QString &AGroup, const QString &AGroupTo) const;
+	void renameGroup(const Jid &AStreamJid, const QString &AGroup) const;
+	void copyGroupToGroup(const Jid &AStreamJid, const QString &AGroup, const QString &AGroupTo) const;
+	void moveGroupToGroup(const Jid &AStreamJid, const QString &AGroup, const QString &AGroupTo) const;
+	void removeGroup(const Jid &AStreamJid, const QString &AGroup) const;
+	void removeGroupContacts(const Jid &AStreamJid, const QString &AGroup) const;
 protected slots:
+	void onReceiveSubscription(IRoster *ARoster, const Jid &AContactJid, int ASubsType, const QString &AMessage);
 	//Operations on subscription
 	void onContactSubscription(bool);
 	void onSendSubscription(bool);
-	void onReceiveSubscription(IRoster *ARoster, const Jid &AContactJid, int ASubsType, const QString &AMessage);
-	//Operations on items
-	void onAddItemToGroup(bool);
-	void onRenameItem(bool);
-	void onCopyItemToGroup(bool);
-	void onMoveItemToGroup(bool);
-	void onRemoveItemFromGroup(bool);
-	void onRemoveItemFromRoster(bool);
-	//Operations on group
+	//Operations on contacts
+	void onAddContactToGroup(bool);
+	void onRenameContact(bool);
+	void onCopyContactToGroup(bool);
+	void onMoveContactToGroup(bool);
+	void onRemoveContactFromGroup(bool);
+	void onRemoveContactFromRoster(bool);
+	//Operations on groups
 	void onAddGroupToGroup(bool);
 	void onRenameGroup(bool);
 	void onCopyGroupToGroup(bool);
 	void onMoveGroupToGroup(bool);
 	void onRemoveGroup(bool);
-	void onRemoveGroupItems(bool);
+	void onRemoveGroupContacts(bool);
 protected slots:
 	void onShowAddContactDialog(bool);
 	void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
 	void onRosterClosed(IRoster *ARoster);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);

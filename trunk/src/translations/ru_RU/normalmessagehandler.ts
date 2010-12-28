@@ -24,10 +24,6 @@
         <translation>%1 - Сообщение</translation>
     </message>
     <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
-    </message>
-    <message>
         <source>Re: %1</source>
         <translation>Re: %1</translation>
     </message>
@@ -54,6 +50,15 @@
     <message>
         <source>Allows to exchange normal messages</source>
         <translation>Позволяет обмениваться обычными сообщениями</translation>
+    </message>
+    <message>
+        <source>Send message</source>
+        <translation>Отправить сообщение</translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send message</comment>
+        <translation>Ctrl+Return</translation>
     </message>
 </context>
 </TS>

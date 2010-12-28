@@ -56,6 +56,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	connect(this,SIGNAL(labelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
 	        SLOT(onRosterLabelToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
 	connect(this,SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 }
 
 RostersView::~RostersView()
@@ -608,6 +609,7 @@ void RostersView::clipboardMenuForIndex(IRosterIndex *AIndex, Menu *AMenu)
 			Action *action = new Action(AMenu);
 			action->setText(tr("Jabber ID"));
 			action->setData(ADR_CLIPBOARD_DATA, AIndex->data(RDR_JID));
+			action->setShortcutId(SCT_ROSTERVIEW_COPYJID);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 			AMenu->addAction(action, AG_DEFAULT, true);
 		}
@@ -616,6 +618,7 @@ void RostersView::clipboardMenuForIndex(IRosterIndex *AIndex, Menu *AMenu)
 			Action *action = new Action(AMenu);
 			action->setText(tr("Status"));
 			action->setData(ADR_CLIPBOARD_DATA, AIndex->data(RDR_STATUS));
+			action->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 			AMenu->addAction(action, AG_DEFAULT, true);
 		}
@@ -624,6 +627,7 @@ void RostersView::clipboardMenuForIndex(IRosterIndex *AIndex, Menu *AMenu)
 			Action *action = new Action(AMenu);
 			action->setText(tr("Name"));
 			action->setData(ADR_CLIPBOARD_DATA, AIndex->data(RDR_NAME));
+			action->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 			AMenu->addAction(action, AG_DEFAULT, true);
 		}
@@ -1111,4 +1115,24 @@ void RostersView::onDragExpandTimer()
 {
 	QModelIndex index = indexAt(FDropIndicatorRect.center());
 	setExpanded(index,true);
+}
+
+void RostersView::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	QModelIndex index = currentIndex();
+	if (AId==SCT_ROSTERVIEW_COPYJID && AWidget==this)
+	{
+		if (!index.data(RDR_JID).toString().isEmpty())
+			QApplication::clipboard()->setText(index.data(RDR_JID).toString());
+	}
+	else if (AId==SCT_ROSTERVIEW_COPYNAME && AWidget==this)
+	{
+		if (!index.data(RDR_NAME).toString().isEmpty())
+			QApplication::clipboard()->setText(index.data(RDR_NAME).toString());
+	}
+	else if (AId==SCT_ROSTERVIEW_COPYSTATUS && AWidget==this)
+	{
+		if (!index.data(RDR_STATUS).toString().isEmpty())
+			QApplication::clipboard()->setText(index.data(RDR_STATUS).toString());
+	}
 }

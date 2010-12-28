@@ -8,6 +8,7 @@
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <definitions/resources.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iannotations.h>
@@ -17,6 +18,8 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <utils/datetime.h>
+#include <utils/shortcuts.h>
+#include <utils/widgetmanager.h>
 #include "editnotedialog.h"
 
 struct Annotation {
@@ -57,6 +60,7 @@ public:
 	virtual QDateTime annotationCreateDate(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QDateTime annotationModifyDate(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual void setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote);
+	virtual QDialog *showAnnotationDialog(const Jid &AStreamJid, const Jid &AContactJid);
 	virtual bool loadAnnotations(const Jid &AStreamJid);
 	virtual bool saveAnnotations(const Jid &AStreamJid);
 signals:
@@ -74,6 +78,7 @@ protected slots:
 	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onPrivateStorageClosed(const Jid &AStreamJid);
 	void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onRosterIndexClipboardMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);

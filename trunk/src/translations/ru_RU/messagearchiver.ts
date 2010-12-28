@@ -336,6 +336,91 @@
         <source>Messages Archive Preferences</source>
         <translation>Настройки архива сообщений</translation>
     </message>
+    <message>
+        <source>Show history</source>
+        <translation>Показать историю</translation>
+    </message>
+    <message>
+        <source>Ctrl+H</source>
+        <comment>Show history</comment>
+        <translation>Ctrl+H</translation>
+    </message>
+    <message>
+        <source>Enable message logging</source>
+        <translation>Включить сохранение истории</translation>
+    </message>
+    <message>
+        <source>Disable message logging</source>
+        <translation>Выключить сохранение истории</translation>
+    </message>
+    <message>
+        <source>Require Off-The-Record session</source>
+        <translation>Требовать сессию без записи истории</translation>
+    </message>
+    <message>
+        <source>Terminate Off-The-Record session</source>
+        <translation>Завершить сессию без записи истории</translation>
+    </message>
+    <message>
+        <source>Group by nothing</source>
+        <translation>Без группировки</translation>
+    </message>
+    <message>
+        <source>Group by date</source>
+        <translation>Группировать по дате</translation>
+    </message>
+    <message>
+        <source>Group by contact</source>
+        <translation>Группировать по контактам</translation>
+    </message>
+    <message>
+        <source>Group by date and contact</source>
+        <translation>Группировать по дате и контактам</translation>
+    </message>
+    <message>
+        <source>Group by contact and date</source>
+        <translation>Группировать по контактам и дате</translation>
+    </message>
+    <message>
+        <source>Expand All</source>
+        <translation>Развернуть всё</translation>
+    </message>
+    <message>
+        <source>Collapse All</source>
+        <translation>Свернуть всё</translation>
+    </message>
+    <message>
+        <source>Auto select archive</source>
+        <translation>Автоматически выбирать архив</translation>
+    </message>
+    <message>
+        <source>Select local archive</source>
+        <translation>Выбрать локальный архив</translation>
+    </message>
+    <message>
+        <source>Select server archive</source>
+        <translation>Выбрать архив на сервере</translation>
+    </message>
+    <message>
+        <source>Filter by contact</source>
+        <translation>Фильтровать по контакту</translation>
+    </message>
+    <message>
+        <source>Change conversation subject</source>
+        <translation>Изменить тему разговора</translation>
+    </message>
+    <message>
+        <source>Remove conversation</source>
+        <translation>Удалить разговор</translation>
+    </message>
+    <message>
+        <source>Reload conversations</source>
+        <translation>Перезагрузить разговор</translation>
+    </message>
+    <message>
+        <source>History window</source>
+        <translation>Окно истории</translation>
+    </message>
 </context>
 <context>
     <name>ViewHistoryWindow</name>

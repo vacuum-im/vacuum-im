@@ -9,10 +9,12 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/viewurlhandlerorders.h>
 #include <definitions/toolbargroups.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include "infowidget.h"
 #include "editwidget.h"
 #include "viewwidget.h"

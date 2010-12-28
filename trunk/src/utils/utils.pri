@@ -16,7 +16,8 @@ HEADERS  = utilsexport.h \
            statusbarchanger.h \
            ringbuffer.h \
            widgetmanager.h \
-           options.h
+           options.h \
+           shortcuts.h
           
 
 SOURCES  = jid.cpp \
@@ -36,4 +37,5 @@ SOURCES  = jid.cpp \
            statusbarchanger.cpp \
            ringbuffer.cpp \
            widgetmanager.cpp \
-           options.cpp
+           options.cpp \
+           shortcuts.cpp

@@ -83,6 +83,10 @@
         <source>Failed to start file transfer</source>
         <translation>Не удалось запустить передачу файлов</translation>
     </message>
+    <message>
+        <source>Send file</source>
+        <translation>Отправить файл</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>

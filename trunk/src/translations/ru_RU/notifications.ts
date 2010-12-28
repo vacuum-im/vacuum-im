@@ -31,6 +31,14 @@
         <source>Enable/Disable notifications sound</source>
         <translation>Включить/Выключить звук уведомлений</translation>
     </message>
+    <message>
+        <source>Activate all notifications</source>
+        <translation>Активировать все уведомления</translation>
+    </message>
+    <message>
+        <source>Remove all notifications</source>
+        <translation>Удалить все уведомления</translation>
+    </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>

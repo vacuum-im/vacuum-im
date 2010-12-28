@@ -13,6 +13,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
+#include <definitions/shortcuts.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -24,6 +25,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/errorhandler.h>
+#include <utils/shortcuts.h>
 
 class NormalMessageHandler :
 			public QObject,
@@ -71,6 +73,7 @@ protected slots:
 	void onWindowDestroyed();
 	void onStatusIconsChanged();
 	void onShowWindowAction(bool);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);

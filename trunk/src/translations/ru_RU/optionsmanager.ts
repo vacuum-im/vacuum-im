@@ -182,5 +182,13 @@
         <source>Options</source>
         <translation>Настройки</translation>
     </message>
+    <message>
+        <source>Show change profile dialog</source>
+        <translation>Показать диалог изменения профиля</translation>
+    </message>
+    <message>
+        <source>Show options dialog</source>
+        <translation>Показать диалог настроек</translation>
+    </message>
 </context>
 </TS>

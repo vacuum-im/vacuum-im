@@ -105,21 +105,28 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 bool Notifications::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_APP_TOGGLESOUND, tr("Enable/Disable notifications sound"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_ACTIVATENOTIFICATIONS, tr("Activate all notifications"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_REMOVENOTIFICATIONS, tr("Remove all notifications"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+
 	FSoundOnOff = new Action(this);
 	FSoundOnOff->setToolTip(tr("Enable/Disable notifications sound"));
 	FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, MNI_NOTIFICATIONS_SOUND_ON);
+	FSoundOnOff->setShortcutId(SCT_APP_TOGGLESOUND);
 	connect(FSoundOnOff,SIGNAL(triggered(bool)),SLOT(onSoundOnOffActionTriggered(bool)));
 
 	FActivateAll = new Action(this);
 	FActivateAll->setVisible(false);
 	FActivateAll->setText(tr("Activate All Notifications"));
 	FActivateAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_ACTIVATE_ALL);
+	FActivateAll->setShortcutId(SCT_APP_ACTIVATENOTIFICATIONS);
 	connect(FActivateAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
 	FRemoveAll = new Action(this);
 	FRemoveAll->setVisible(false);
 	FRemoveAll->setText(tr("Remove All Notifications"));
 	FRemoveAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_REMOVE_ALL);
+	FRemoveAll->setShortcutId(SCT_APP_REMOVENOTIFICATIONS);
 	connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
 	FNotifyMenu = new Menu;

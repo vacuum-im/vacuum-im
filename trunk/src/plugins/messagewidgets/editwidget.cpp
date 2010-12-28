@@ -20,10 +20,6 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FBufferPos = -1;
 	FFormatEnabled = false;
 
-	FSendShortcut = new QShortcut(ui.medEditor);
-	FSendShortcut->setContext(Qt::WidgetShortcut);
-	connect(FSendShortcut,SIGNAL(activated()),SLOT(onShortcutActivated()));
-
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(ui.tlbSend,MNI_MESSAGEWIDGETS_SEND);
 	connect(ui.tlbSend,SIGNAL(clicked(bool)),SLOT(onSendButtonCliked(bool)));
 
@@ -32,8 +28,9 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 
 	onOptionsChanged(Options::node(OPV_MESSAGES_EDITORAUTORESIZE));
 	onOptionsChanged(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES));
-	onOptionsChanged(Options::node(OPV_MESSAGES_EDITORSENDKEY));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 }
 
 EditWidget::~EditWidget()
@@ -116,15 +113,22 @@ void EditWidget::setMinimumLines(int ALines)
 	emit minimumLinesChanged(ui.medEditor->minimumLines());
 }
 
-QKeySequence EditWidget::sendKey() const
+QString EditWidget::sendShortcut() const
 {
-	return FSendShortcut->key();
+	return FShortcutId;
 }
 
-void EditWidget::setSendKey(const QKeySequence &AKey)
+void EditWidget::setSendShortcut(const QString &AShortcutId)
 {
-	FSendShortcut->setKey(AKey);
-	emit sendKeyChanged(AKey);
+	if (FShortcutId != AShortcutId)
+	{
+		if (!FShortcutId.isEmpty())
+			Shortcuts::removeWidgetShortcut(FShortcutId,ui.medEditor);
+		FShortcutId = AShortcutId;
+		if (!FShortcutId.isEmpty())
+			Shortcuts::insertWidgetShortcut(FShortcutId,ui.medEditor);
+		emit sendShortcutChanged(FShortcutId);
+	}
 }
 
 bool EditWidget::sendButtonVisible() const
@@ -160,7 +164,7 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 			hooked = true;
 			showNextBufferedMessage();
 		}
-		else if (!hooked && keyEvent->modifiers()==Qt::CTRL && keyEvent->key() == Qt::Key_Down)
+		else if (!hooked && keyEvent->modifiers()==Qt::CTRL && keyEvent->key()==Qt::Key_Down)
 		{
 			hooked = true;
 			showPrevBufferedMessage();
@@ -216,18 +220,17 @@ void EditWidget::showPrevBufferedMessage()
 	}
 }
 
-void EditWidget::onShortcutActivated()
-{
-	QShortcut *shortcut = qobject_cast<QShortcut *>(sender());
-	if (shortcut == FSendShortcut)
-	{
-		sendMessage();
-	}
-}
-
 void EditWidget::onSendButtonCliked(bool)
 {
 	sendMessage();
+}
+
+void EditWidget::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (AId==FShortcutId && AWidget==ui.medEditor)
+	{
+		sendMessage();
+	}
 }
 
 void EditWidget::onOptionsChanged(const OptionsNode &ANode)
@@ -239,10 +242,6 @@ void EditWidget::onOptionsChanged(const OptionsNode &ANode)
 	else if (ANode.path() == OPV_MESSAGES_EDITORMINIMUMLINES)
 	{
 		setMinimumLines(ANode.value().toInt());
-	}
-	else if (ANode.path() == OPV_MESSAGES_EDITORSENDKEY)
-	{
-		setSendKey(ANode.value().value<QKeySequence>());
 	}
 }
 

@@ -146,10 +146,6 @@
         <translation>Отказаться</translation>
     </message>
     <message>
-        <source>Rename...</source>
-        <translation>Переименовать...</translation>
-    </message>
-    <message>
         <source>Copy to group</source>
         <translation>Копировать в группу</translation>
     </message>
@@ -264,6 +260,42 @@
     <message>
         <source>Auto unsubscribe contacts</source>
         <translation>Автоматически удалять авторизацию</translation>
+    </message>
+    <message>
+        <source>Ins</source>
+        <comment>Add contact</comment>
+        <translation>Ins</translation>
+    </message>
+    <message>
+        <source>Rename contact/group</source>
+        <translation>Переименовать контакт/группу</translation>
+    </message>
+    <message>
+        <source>F2</source>
+        <comment>Rename contact/group</comment>
+        <translation>F2</translation>
+    </message>
+    <message>
+        <source>Remove contact/group from group</source>
+        <translation>Удалить контакт/группу из группы</translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <comment>Remove contact/group from group</comment>
+        <translation>Del</translation>
+    </message>
+    <message>
+        <source>Remove contact/group from roster</source>
+        <translation>Удалить контакт/группу из списка контактов</translation>
+    </message>
+    <message>
+        <source>Shift+Del</source>
+        <comment>Remove contact/group from roster</comment>
+        <translation>Shift+Del</translation>
+    </message>
+    <message>
+        <source>Add contact...</source>
+        <translation>Добавить контакт...</translation>
     </message>
 </context>
 <context>

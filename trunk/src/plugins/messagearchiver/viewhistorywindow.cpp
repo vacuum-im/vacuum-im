@@ -827,6 +827,7 @@ void ViewHistoryWindow::createGroupKindMenu()
 	action->setCheckable(true);
 	action->setText(tr("No groups"));
 	action->setData(ADR_GROUP_KIND,GK_NO_GROUPS);
+	action->setShortcutId(SCT_HISTORYWINDOW_GROUPNONE);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
 	FGroupKindMenu->addAction(action);
 
@@ -834,6 +835,7 @@ void ViewHistoryWindow::createGroupKindMenu()
 	action->setCheckable(true);
 	action->setText(tr("Date"));
 	action->setData(ADR_GROUP_KIND,GK_DATE);
+	action->setShortcutId(SCT_HISTORYWINDOW_GROUPBYDATE);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
 	FGroupKindMenu->addAction(action);
 
@@ -842,6 +844,7 @@ void ViewHistoryWindow::createGroupKindMenu()
 	action->setChecked(true);
 	action->setText(tr("Contact"));
 	action->setData(ADR_GROUP_KIND,GK_CONTACT);
+	action->setShortcutId(SCT_HISTORYWINDOW_GROUPBYCONTACT);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
 	FGroupKindMenu->addAction(action);
 
@@ -849,6 +852,7 @@ void ViewHistoryWindow::createGroupKindMenu()
 	action->setCheckable(true);
 	action->setText(tr("Date and Contact"));
 	action->setData(ADR_GROUP_KIND,GK_DATE_CONTACT);
+	action->setShortcutId(SCT_HISTORYWINDOW_GROUPBYDATECONTACT);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
 	FGroupKindMenu->addAction(action);
 
@@ -856,16 +860,19 @@ void ViewHistoryWindow::createGroupKindMenu()
 	action->setCheckable(true);
 	action->setText(tr("Contact and Date"));
 	action->setData(ADR_GROUP_KIND,GK_CONTACT_DATE);
+	action->setShortcutId(SCT_HISTORYWINDOW_GROUPBYCONTACTDATE);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupKindByAction(bool)));
 	FGroupKindMenu->addAction(action);
 
 	action = new Action(FGroupKindMenu);
 	action->setText(tr("Expand All"));
+	action->setShortcutId(SCT_HISTORYWINDOW_EXPANDALL);
 	connect(action,SIGNAL(triggered()),ui.trvCollections,SLOT(expandAll()));
 	FGroupKindMenu->addAction(action,AG_DEFAULT+100);
 
 	action = new Action(FGroupKindMenu);
 	action->setText(tr("Collapse All"));
+	action->setShortcutId(SCT_HISTORYWINDOW_COLLAPSEALL);
 	connect(action,SIGNAL(triggered()),ui.trvCollections,SLOT(collapseAll()));
 	FGroupKindMenu->addAction(action,AG_DEFAULT+100);
 
@@ -885,6 +892,7 @@ void ViewHistoryWindow::createSourceMenu()
 	action->setChecked(true);
 	action->setText(tr("Auto select"));
 	action->setData(ADR_SOURCE,AS_AUTO);
+	action->setShortcutId(SCT_HISTORYWINDOW_SOURCEAUTO);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSourceByAction(bool)));
 	FSourceMenu->addAction(action,AG_DEFAULT-1);
 
@@ -892,6 +900,7 @@ void ViewHistoryWindow::createSourceMenu()
 	action->setCheckable(true);
 	action->setText(tr("Local archive"));
 	action->setData(ADR_SOURCE,AS_LOCAL_ARCHIVE);
+	action->setShortcutId(SCT_HISTORYWINDOW_SOURCELOCAL);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSourceByAction(bool)));
 	FSourceMenu->addAction(action);
 
@@ -899,6 +908,7 @@ void ViewHistoryWindow::createSourceMenu()
 	action->setCheckable(true);
 	action->setText(tr("Server archive"));
 	action->setData(ADR_SOURCE,AS_SERVER_ARCHIVE);
+	action->setShortcutId(SCT_HISTORYWINDOW_SOURCESERVER);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSourceByAction(bool)));
 	FSourceMenu->addAction(action);
 
@@ -914,6 +924,7 @@ void ViewHistoryWindow::createHeaderActions()
 	FFilterBy->setText(tr("Filter"));
 	FFilterBy->setIcon(RSR_STORAGE_MENUICONS,MNI_HISRORY_FILTER);
 	FFilterBy->setEnabled(false);
+	FFilterBy->setShortcutId(SCT_HISTORYWINDOW_FILTERBYCONTACT);
 	connect(FFilterBy,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
 	FCollectionTools->insertAction(FFilterBy,TBG_MAVHG_ARCHIVE_DEFACTIONS);
 
@@ -921,18 +932,21 @@ void ViewHistoryWindow::createHeaderActions()
 	FRename->setText(tr("Change Subject"));
 	FRename->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_RENAME);
 	FRename->setEnabled(false);
+	FRename->setShortcutId(SCT_HISTORYWINDOW_RENAMECOLLECTION);
 	connect(FRename,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
 	FCollectionTools->insertAction(FRename,TBG_MAVHG_ARCHIVE_DEFACTIONS);
 
 	FRemove = new Action(FCollectionTools->toolBar());
 	FRemove->setText(tr("Remove"));
 	FRemove->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_REMOVE);
+	FRemove->setShortcutId(SCT_HISTORYWINDOW_REMOVECOLLECTION);
 	connect(FRemove,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
 	FCollectionTools->insertAction(FRemove,TBG_MAVHG_ARCHIVE_DEFACTIONS);
 
 	FReload = new Action(FCollectionTools->toolBar());
 	FReload->setText(tr("Reload"));
 	FReload->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_RELOAD);
+	FReload->setShortcutId(SCT_HISTORYWINDOW_RELOADCOLLECTIONS);
 	connect(FReload,SIGNAL(triggered(bool)),SLOT(onHeaderActionTriggered(bool)));
 	FCollectionTools->insertAction(FReload,TBG_MAVHG_ARCHIVE_DEFACTIONS);
 }

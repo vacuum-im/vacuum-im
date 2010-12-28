@@ -29,7 +29,7 @@ VCardPlugin::~VCardPlugin()
 
 void VCardPlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
-	APluginInfo->name = tr("vCard Manager");
+	APluginInfo->name = tr("Visit Card Manager");
 	APluginInfo->description = tr("Allows to obtain personal contact information");
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->version = "1.0";
@@ -56,7 +56,14 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin)
+		{
+			FRostersView = FRostersViewPlugin->rostersView();
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
 	if (plugin)
@@ -65,7 +72,7 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 		if (FMultiUserChatPlugin)
 		{
 			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)),
-			        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)));
+				SLOT(onMultiUserContextMenu(IMultiUserChatWindow *,IMultiUser *, Menu *)));
 		}
 	}
 
@@ -91,15 +98,19 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 		}
 	}
 
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
+
 	return true;
 }
 
 bool VCardPlugin::initObjects()
 {
-	if (FRostersViewPlugin)
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I","Show vCard"));
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I","Show vCard"), Shortcuts::WidgetShortcut);
+
+	if (FRostersView)
 	{
-		FRostersView = FRostersViewPlugin->rostersView();
-		connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWVCARD,FRostersView->instance());
 	}
 	if (FDiscovery)
 	{
@@ -310,9 +321,25 @@ void VCardPlugin::registerDiscoFeatures()
 	dfeature.active = false;
 	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_VCARD);
 	dfeature.var = NS_VCARD_TEMP;
-	dfeature.name = tr("vCard");
+	dfeature.name = tr("Visit Card");
 	dfeature.description = tr("Supports the requesting of the personal contact information");
 	FDiscovery->insertDiscoFeature(dfeature);
+}
+
+void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (FRostersView && AWidget==FRostersView->instance())
+	{
+		if (AId == SCT_ROSTERVIEW_SHOWVCARD)
+		{
+			QModelIndex index = FRostersView->instance()->currentIndex();
+			int indexType = index.data(RDR_TYPE).toInt();
+			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
+			{
+				showVCardDialog(index.data(RDR_STREAM_JID).toString(),index.data(RDR_BARE_JID).toString());
+			}
+		}
+	}
 }
 
 void VCardPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
@@ -320,19 +347,21 @@ void VCardPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 	if (AIndex->type() == RIT_STREAM_ROOT || AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
 	{
 		Action *action = new Action(AMenu);
-		action->setText(tr("vCard"));
+		action->setText(tr("Show vCard"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
 		action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
 		action->setData(ADR_CONTACT_JID,Jid(AIndex->data(RDR_JID).toString()).bare());
+		action->setShortcutId(SCT_ROSTERVIEW_SHOWVCARD);
 		AMenu->addAction(action,AG_RVCM_VCARD,true);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
 	}
 }
 
-void VCardPlugin::onMultiUserContextMenu(IMultiUserChatWindow * /*AWindow*/, IMultiUser *AUser, Menu *AMenu)
+void VCardPlugin::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
+	Q_UNUSED(AWindow);
 	Action *action = new Action(AMenu);
-	action->setText(tr("vCard"));
+	action->setText(tr("Show vCard"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
 	action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAM_JID));
 	if (!AUser->data(MUDR_REAL_JID).toString().isEmpty())
@@ -390,8 +419,9 @@ void VCardPlugin::onChatWindowCreated(IChatWindow *AWindow)
 	if (AWindow->toolBarWidget() && AWindow->toolBarWidget()->viewWidget())
 	{
 		Action *action = new Action(AWindow->toolBarWidget()->instance());
-		action->setText(tr("vCard"));
+		action->setText(tr("Show vCard"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
+		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWVCARD);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByChatWindowAction(bool)));
 		AWindow->toolBarWidget()->toolBarChanger()->insertAction(action,TBG_MWTBW_VCARD_VIEW);
 	}

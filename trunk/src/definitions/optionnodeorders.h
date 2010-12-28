@@ -10,6 +10,7 @@
 #define ONO_FILETRANSFER          375
 #define ONO_HISTORY               400
 #define ONO_NOTIFICATIONS         500
+#define ONO_SHORTCUTS             550
 #define ONO_EMOTICONS             600
 #define ONO_STATUSICONS           700
 #define ONO_AUTO_STATUS           800

@@ -61,6 +61,8 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &/*
 
 bool FileStreamsManager::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),QKeySequence::UnknownKey,Shortcuts::ApplicationShortcut);
+
 	if (FDataManager)
 	{
 		FDataManager->insertProfile(this);
@@ -68,8 +70,9 @@ bool FileStreamsManager::initObjects()
 	if (FTrayManager || FMainWindowPlugin)
 	{
 		Action *action = new Action;
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILESTREAMSMANAGER);
 		action->setText(tr("File Transfers"));
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILESTREAMSMANAGER);
+		action->setShortcutId(SCT_APP_SHOWFILETRANSFERS);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowFileStreamsWindow(bool)));
 		if (FMainWindowPlugin)
 			FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_FILESTREAMSMANAGER,true);

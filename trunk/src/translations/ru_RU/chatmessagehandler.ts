@@ -20,10 +20,6 @@
         <translation>%1 - Чат</translation>
     </message>
     <message>
-        <source>Chat</source>
-        <translation>Чат</translation>
-    </message>
-    <message>
         <source>%1 changed status to [%2] %3</source>
         <translation>%1 изменил(а) статус на [%2] %3</translation>
     </message>
@@ -34,6 +30,15 @@
     <message>
         <source>Clear Chat Window</source>
         <translation>Очистить окно чата</translation>
+    </message>
+    <message>
+        <source>Open chat dialog</source>
+        <translation>Открыть диалог чата</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Open chat dialog</comment>
+        <translation>Return</translation>
     </message>
 </context>
 </TS>
