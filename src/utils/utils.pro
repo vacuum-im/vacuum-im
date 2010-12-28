@@ -8,11 +8,14 @@ CONFIG            += dll
 QT                += xml
 DEFINES           += UTILS_DLL QXT_STATIC
 LIBS              += -L../libs
-unix:!macx {
+macx {
+  LIBS            += -lidn -lminizip -lzlib -lqxtglobalshortcut
+  INCLUDEPATH     += ../thirdparty/zlib
+} else:unix {
   LIBS            += -lidn -lminizip -lz -lqxtglobalshortcut
   CONFIG          += x11
-} else {
-  LIBS            += -lidn -lminizip -lzlib -lqxtglobalshortcut
+} else:win32 {
+  LIBS            += -lidn -lminizip -lzlib -lqxtglobalshortcut -luser32
   INCLUDEPATH     += ../thirdparty/zlib
 }
 DEPENDPATH        += ..
