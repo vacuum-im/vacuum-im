@@ -297,6 +297,10 @@
         <source>Add contact...</source>
         <translation>Добавить контакт...</translation>
     </message>
+    <message>
+        <source>Blank Group</source>
+        <translation>Общая группа</translation>
+    </message>
 </context>
 <context>
     <name>SubscriptionDialog</name>

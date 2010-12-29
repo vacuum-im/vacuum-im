@@ -3,6 +3,8 @@
 #include <QTimer>
 #include <QScrollBar>
 
+const QList<int> GroupItemTypes = QList<int>() << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_NOT_IN_ROSTER << RIT_GROUP_MY_RESOURCES << RIT_GROUP_AGENTS;
+
 RostersViewPlugin::RostersViewPlugin()
 {
 	FRostersModel = NULL;
@@ -313,7 +315,7 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 
 void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
 {
-	QString groupName = AIndex.data(RDR_GROUP).toString();
+	QString groupName = GroupItemTypes.contains(AIndex.data(RDR_TYPE).toInt()) ? AIndex.data(RDR_NAME).toString() : AIndex.parent().data(RDR_NAME).toString();
 	if (!groupName.isEmpty() || AIndex.data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
 	{
 		Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
@@ -328,7 +330,7 @@ void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
 
 void RostersViewPlugin::saveExpandState(const QModelIndex &AIndex)
 {
-	QString groupName = AIndex.data(RDR_GROUP).toString();
+	QString groupName = GroupItemTypes.contains(AIndex.data(RDR_TYPE).toInt()) ? AIndex.data(RDR_NAME).toString() : AIndex.parent().data(RDR_NAME).toString();
 	if (!groupName.isEmpty() || AIndex.data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
 	{
 		Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
