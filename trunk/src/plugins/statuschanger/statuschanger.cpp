@@ -600,17 +600,18 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
 		if (AStatusId > MAX_TEMP_STATUS_ID)
 			removeTempStatus(APresence);
 
+		bool statusShown = Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool();
 		IRosterIndex *index = FRostersView && FRostersModel ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
 		if (APresence->show() == IPresence::Error)
 		{
-			if (index)
+			if (index && !statusShown)
 				FRostersView->insertFooterText(FTO_ROSTERSVIEW_STATUS,APresence->status(),index);
 			if (!FNotifyId.contains(APresence))
 				insertStatusNotification(APresence);
 		}
 		else
 		{
-			if (index)
+			if (index && !statusShown)
 				FRostersView->removeFooterText(FTO_ROSTERSVIEW_STATUS,index);
 			removeStatusNotification(APresence);
 		}
