@@ -610,6 +610,8 @@ void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
 			reg.setValue(CLIENT_NAME, QDir::toNativeSeparators(QApplication::applicationFilePath()));
 		else
 			reg.remove(CLIENT_NAME);
+		//Remove old client name
+		reg.remove("Vacuum IM");
 #endif
 	}
 }

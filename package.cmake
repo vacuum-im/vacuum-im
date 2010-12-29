@@ -1,7 +1,7 @@
 if (WIN32)
 	set(CPACK_GENERATOR NSIS)
-	#set(CPACK_PACKAGE_EXECUTABLES ${TARGET_LOADER} "Vacuum IM")
-	set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Vacuum\ IM.lnk' '\$INSTDIR\\\\vacuum.exe'")
+	#set(CPACK_PACKAGE_EXECUTABLES ${TARGET_LOADER} "Vacuum-IM")
+	set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Vacuum-IM.lnk' '\$INSTDIR\\\\vacuum.exe'")
 	set(CPACK_NSIS_CONTACT "http://www.vacuum-im.org")
 	set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "VacuumIM")
 endif (WIN32)
@@ -9,7 +9,7 @@ endif (WIN32)
 execute_process(COMMAND svnversion -n "${CMAKE_SOURCE_DIR}"
 	OUTPUT_VARIABLE SVNREVISION)
 
-set(CPACK_PACKAGE_NAME "Vacuum IM")
+set(CPACK_PACKAGE_NAME "Vacuum-IM")
 set(VER_MAJOR 1)
 set(VER_MINOR 0)
 set(VER_PATCH 2)
