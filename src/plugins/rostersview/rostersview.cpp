@@ -645,7 +645,12 @@ void RostersView::updateStatusText(IRosterIndex *AIndex)
 		QMultiHash<int,QVariant> findData;
 		foreach(int type, statusTypes)
 			findData.insert(RDR_TYPE,type);
-		indexes = FRostersModel!=NULL ? FRostersModel->rootIndex()->findChild(findData,true) : QList<IRosterIndex *>();
+		IRosterIndex *streamRoot = FRostersModel!=NULL ? FRostersModel->rootIndex() : NULL;
+		if (streamRoot)
+		{
+			indexes = streamRoot->findChild(findData,true);
+			indexes.append(streamRoot);
+		}
 	}
 	else if (statusTypes.contains(AIndex->type()))
 	{
