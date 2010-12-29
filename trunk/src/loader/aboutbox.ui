@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>AboutBoxClass</class>
  <widget class="QDialog" name="AboutBoxClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>296</width>
+    <height>171</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>About the program</string>
   </property>
@@ -65,7 +73,7 @@
         </font>
        </property>
        <property name="text">
-        <string notr="true">Vacuum IM</string>
+        <string notr="true">Vacuum-IM</string>
        </property>
       </widget>
      </item>

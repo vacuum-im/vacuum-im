@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # make_dmg.sh - Add Qt libraries to Mac OS X bundle and pack it to .dmg image
-# Copyright (C) 2010 Konstantin Tseplyaev (for Vacuum IM project by Sergey Potapov)
+# Copyright (C) 2010 Konstantin Tseplyaev (for Vacuum-IM project by Sergey Potapov)
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -40,7 +40,7 @@ ORIG_NAME="vacuum"
 SVN_ROOT="../../.." 
 
 # Name of bundle, as it'll be included in .dmg
-TARGET_NAME="Vacuum IM.app" 
+TARGET_NAME="Vacuum-IM.app" 
 
 # Filename of the resulting .dmg image
 DMG_NAME="${ORIG_NAME}_${VERSION}_macosx" 
