@@ -86,7 +86,7 @@ signals:
 	void subscriptionDialogCreated(ISubscriptionDialog *ADialog);
 protected:
 	QString subscriptionNotify(int ASubsType, const Jid &AContactJid) const;
-	Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups,bool ANewGroup, bool ARootGroup, const char *ASlot, Menu *AParent);
+	Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups,bool ANewGroup, bool ARootGroup, bool ABlank, const char *ASlot, Menu *AParent);
 	SubscriptionDialog *findSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const;
 	SubscriptionDialog *createSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage);
 protected:

@@ -21,10 +21,8 @@ Roster::Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor) : Q
 
 	connect(FXmppStream->instance(),SIGNAL(opened()),SLOT(onStreamOpened()));
 	connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
-	connect(FXmppStream->instance(),SIGNAL(jidAboutToBeChanged(const Jid &)),
-	        SLOT(onStreamJidAboutToBeChanged(const Jid &)));
-	connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),
-	        SLOT(onStreamJidChanged(const Jid &)));
+	connect(FXmppStream->instance(),SIGNAL(jidAboutToBeChanged(const Jid &)),SLOT(onStreamJidAboutToBeChanged(const Jid &)));
+	connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onStreamJidChanged(const Jid &)));
 }
 
 Roster::~Roster()
@@ -329,11 +327,19 @@ void Roster::copyItemToGroup(const Jid &AItemJid, const QString &AGroup)
 void Roster::moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo)
 {
 	IRosterItem ritem = rosterItem(AItemJid);
-	if (ritem.isValid && !AGroupTo.isEmpty() && !ritem.groups.contains(AGroupTo))
+	if (ritem.isValid && !ritem.groups.contains(AGroupTo))
 	{
 		QSet<QString> allItemGroups = ritem.groups;
-		allItemGroups -= AGroupFrom;
-		setItem(AItemJid,ritem.name,allItemGroups += AGroupTo);
+		if (!AGroupTo.isEmpty())
+		{
+			allItemGroups += AGroupTo;
+			allItemGroups -= AGroupFrom;
+		}
+		else
+		{
+			allItemGroups.clear();
+		}
+		setItem(AItemJid,ritem.name,allItemGroups);
 	}
 }
 

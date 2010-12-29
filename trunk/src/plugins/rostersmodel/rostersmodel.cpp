@@ -12,16 +12,11 @@ RostersModel::RostersModel()
 
 	FRootIndex = new RosterIndex(RIT_ROOT,"IT_Root");
 	FRootIndex->setParent(this);
-	connect(FRootIndex,SIGNAL(dataChanged(IRosterIndex *, int)),
-	        SLOT(onIndexDataChanged(IRosterIndex *, int)));
-	connect(FRootIndex,SIGNAL(childAboutToBeInserted(IRosterIndex *)),
-	        SLOT(onIndexChildAboutToBeInserted(IRosterIndex *)));
-	connect(FRootIndex,SIGNAL(childInserted(IRosterIndex *)),
-	        SLOT(onIndexChildInserted(IRosterIndex *)));
-	connect(FRootIndex,SIGNAL(childAboutToBeRemoved(IRosterIndex *)),
-	        SLOT(onIndexChildAboutToBeRemoved(IRosterIndex *)));
-	connect(FRootIndex,SIGNAL(childRemoved(IRosterIndex *)),
-	        SLOT(onIndexChildRemoved(IRosterIndex *)));
+	connect(FRootIndex,SIGNAL(dataChanged(IRosterIndex *, int)),SLOT(onIndexDataChanged(IRosterIndex *, int)));
+	connect(FRootIndex,SIGNAL(childAboutToBeInserted(IRosterIndex *)),SLOT(onIndexChildAboutToBeInserted(IRosterIndex *)));
+	connect(FRootIndex,SIGNAL(childInserted(IRosterIndex *)),SLOT(onIndexChildInserted(IRosterIndex *)));
+	connect(FRootIndex,SIGNAL(childAboutToBeRemoved(IRosterIndex *)),SLOT(onIndexChildAboutToBeRemoved(IRosterIndex *)));
+	connect(FRootIndex,SIGNAL(childRemoved(IRosterIndex *)),SLOT(onIndexChildRemoved(IRosterIndex *)));
 }
 
 RostersModel::~RostersModel()
@@ -246,7 +241,7 @@ IRosterIndex *RostersModel::createGroup(const QString &AName, const QString &AGr
 		while (i<groupTree.count())
 		{
 			newIndex = createRosterIndex(AType,groupTree.at(i),index);
-			newIndex->setData(RDR_GROUP,group);
+			newIndex->setData(RDR_GROUP, AType==RIT_GROUP ? group : QVariant(QString("")));
 			newIndex->setData(RDR_NAME,groupTree.at(i));
 			insertRosterIndex(newIndex,index);
 			index = newIndex;
