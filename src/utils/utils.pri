@@ -17,7 +17,8 @@ HEADERS  = utilsexport.h \
            ringbuffer.h \
            widgetmanager.h \
            options.h \
-           shortcuts.h
+           shortcuts.h \
+           systemmanager.h
           
 
 SOURCES  = jid.cpp \
@@ -38,4 +39,5 @@ SOURCES  = jid.cpp \
            ringbuffer.cpp \
            widgetmanager.cpp \
            options.cpp \
-           shortcuts.cpp
+           shortcuts.cpp \
+           systemmanager.cpp

@@ -16,7 +16,6 @@ class IAutoStatus
 {
 public:
 	virtual QObject *instance() =0;
-	virtual int idleSeconds() const =0;
 	virtual QUuid activeRule() const =0;
 	virtual QList<QUuid> rules() const =0;
 	virtual IAutoStatusRule ruleValue(const QUuid &ARuleId) const =0;

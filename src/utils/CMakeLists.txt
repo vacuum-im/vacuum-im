@@ -22,9 +22,9 @@ set_target_properties(${TARGET_UTILS} PROPERTIES
 	SOVERSION "${VERSION_UTILS_ABI}")
 
 if (SYSTEM_ZLIB_FOUND)
-	set(ADD_LIBS qxtglobalshortcut idn minizip "${SYSTEM_ZLIB_FOUND}")
+	set(ADD_LIBS qxtglobalshortcut idn minizip idle "${SYSTEM_ZLIB_FOUND}")
 else (SYSTEM_ZLIB_FOUND)
-	set(ADD_LIBS qxtglobalshortcut idn minizip zlib)
+	set(ADD_LIBS qxtglobalshortcut idn minizip idle zlib)
 endif (SYSTEM_ZLIB_FOUND)
 
 target_link_libraries(${TARGET_UTILS} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})

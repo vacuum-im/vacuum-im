@@ -15,6 +15,7 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ipresence.h>
 #include <utils/options.h>
+#include <utils/systemmanager.h>
 #include "statusoptionswidget.h"
 
 class AutoStatus :
@@ -39,7 +40,6 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAutoStatus
-	virtual int idleSeconds() const;
 	virtual QUuid activeRule() const;
 	virtual QList<QUuid> rules() const;
 	virtual IAutoStatusRule ruleValue(const QUuid &ARuleId) const;
@@ -59,7 +59,7 @@ protected:
 	void setActiveRule(const QUuid &ARuleId);
 	void updateActiveRule();
 protected slots:
-	void onIdleTimerTimeout();
+	void onSystemIdleChanged(int ASeconds);
 	void onOptionsOpened();
 	void onProfileClosed(const QString &AName);
 private:
@@ -69,9 +69,6 @@ private:
 private:
 	int FAutoStatusId;
 	QUuid FActiveRule;
-	QTimer FIdleTimer;
-	QPoint FLastCursorPos;
-	QDateTime FLastCursorTime;
 	QMap<Jid, int> FStreamStatus;
 };
 

@@ -11,11 +11,6 @@ AutoStatus::AutoStatus()
 	FOptionsManager = NULL;
 
 	FAutoStatusId = STATUS_NULL_ID;
-	FLastCursorPos = QCursor::pos();
-	FLastCursorTime = QDateTime::currentDateTime();
-
-	FIdleTimer.setSingleShot(false);
-	connect(&FIdleTimer,SIGNAL(timeout()),SLOT(onIdleTimerTimeout()));
 }
 
 AutoStatus::~AutoStatus()
@@ -85,7 +80,8 @@ bool AutoStatus::initSettings()
 
 bool AutoStatus::startPlugin()
 {
-	FIdleTimer.start(IDLE_TIMER_TIMEOUT);
+	SystemManager::instance()->startSystemIdle();
+	connect(SystemManager::instance(),SIGNAL(systemIdleChanged(int)),SLOT(onSystemIdleChanged(int)));
 	return true;
 }
 
@@ -97,11 +93,6 @@ QMultiMap<int, IOptionsWidget *> AutoStatus::optionsWidgets(const QString &ANode
 		widgets.insertMulti(OWO_AUTOSTATUS, new StatusOptionsWidget(this,FStatusChanger,AParent));
 	}
 	return widgets;
-}
-
-int AutoStatus::idleSeconds() const
-{
-	return FLastCursorTime.secsTo(QDateTime::currentDateTime());
 }
 
 QUuid AutoStatus::activeRule() const
@@ -246,7 +237,7 @@ void AutoStatus::updateActiveRule()
 {
 	QUuid newRuleId;
 	int ruleTime = 0;
-	int idleSecs = idleSeconds();
+	int idleSecs = SystemManager::systemIdle();
 
 	foreach(QUuid ruleId, rules())
 	{
@@ -260,14 +251,9 @@ void AutoStatus::updateActiveRule()
 	setActiveRule(newRuleId);
 }
 
-void AutoStatus::onIdleTimerTimeout()
+void AutoStatus::onSystemIdleChanged(int ASeconds)
 {
-	if (FLastCursorPos != QCursor::pos())
-	{
-		FLastCursorPos = QCursor::pos();
-		FLastCursorTime = QDateTime::currentDateTime();
-	}
-
+	Q_UNUSED(ASeconds);
 	if (FStatusChanger)
 	{
 		int show = FStatusChanger->statusItemShow(FStatusChanger->mainStatus());
@@ -288,7 +274,6 @@ void AutoStatus::onProfileClosed(const QString &AName)
 {
 	Q_UNUSED(AName);
 	setActiveRule(QUuid());
-	FLastCursorTime = QDateTime::currentDateTime();
 }
 
 Q_EXPORT_PLUGIN2(plg_autostatus, AutoStatus)
