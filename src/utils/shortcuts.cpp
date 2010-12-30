@@ -156,6 +156,12 @@ QList<QString> Shortcuts::globalShortcuts()
 	return d->globalShortcutsId.values();
 }
 
+bool Shortcuts::isGlobalShortcutActive(const QString &AId)
+{
+	QxtGlobalShortcut *shortcut = d->globalShortcutsId.key(AId);
+	return shortcut!=NULL ? shortcut->isEnabled() : false;
+}
+
 void Shortcuts::setGlobalShortcut(const QString &AId, bool AEnabled)
 {
 	QxtGlobalShortcut *shortcut = d->globalShortcutsId.key(AId);
@@ -217,11 +223,12 @@ void Shortcuts::updateGlobal(QxtGlobalShortcut *AShortcut)
 	Descriptor descriptor = d->shortcuts.value(d->globalShortcutsId.value(AShortcut));
 	if (!descriptor.activeKey.isEmpty())
 	{
-		AShortcut->setShortcut(descriptor.activeKey);
-		AShortcut->setEnabled(true);
+		bool registered = AShortcut->setShortcut(descriptor.activeKey);
+		AShortcut->setEnabled(registered);
 	}
-	else
+	else if (!AShortcut->shortcut().isEmpty())
 	{
+		AShortcut->setShortcut(QKeySequence());
 		AShortcut->setEnabled(false);
 	}
 }

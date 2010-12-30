@@ -57,7 +57,10 @@ void ShortcutOptionsWidget::apply()
 			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
 			QKeySequence activeKey = qvariant_cast<QKeySequence>(key->data(MDR_ACTIVE_KEYSEQUENCE));
 			if (descriptor.activeKey != activeKey)
+			{
 				Shortcuts::updateShortcut(shortcut, activeKey);
+				onModelItemChanged(action);
+			}
 		}
 	}
 	emit childApply();
@@ -137,6 +140,15 @@ void ShortcutOptionsWidget::setItemBold(QStandardItem *AItem, bool ABold) const
 	AItem->setFont(font);
 }
 
+bool ShortcutOptionsWidget::isGlobalKeyFailed(const QString &AId, const QKeySequence &ANewKey) const
+{
+	if (Shortcuts::globalShortcuts().contains(AId) && !ANewKey.isEmpty())
+	{
+		return !Shortcuts::isGlobalShortcutActive(AId) && Shortcuts::shortcutDescriptor(AId).activeKey==ANewKey;
+	}
+	return false;
+}
+
 void ShortcutOptionsWidget::onDefaultClicked()
 {
 	QStandardItem *item = FModel.itemFromIndex(FSortModel.mapToSource(ui.trvShortcuts->currentIndex()));
@@ -184,28 +196,39 @@ void ShortcutOptionsWidget::onRestoreDefaultsClicked()
 
 void ShortcutOptionsWidget::onModelItemChanged(QStandardItem *AItem)
 {
+	static bool blocked = false;
 	QStandardItem *action = AItem->parent()!=NULL ? AItem->parent()->child(AItem->row(),COL_NAME) : NULL;
 	QStandardItem *key = AItem->parent()!=NULL ? AItem->parent()->child(AItem->row(),COL_KEY) : NULL;
-	if (action!=NULL && key!=NULL)
+	if (!blocked && action!=NULL && key!=NULL)
 	{
+		blocked = true;
+
 		QMap<QKeySequence, int> keyCount;
 		for (int row=0; row<AItem->parent()->rowCount(); row++)
 		{
-			QKeySequence childKey = AItem->parent()->child(row,1)->data(MDR_ACTIVE_KEYSEQUENCE).toString();
+			QKeySequence childKey = AItem->parent()->child(row,COL_KEY)->data(MDR_ACTIVE_KEYSEQUENCE).toString();
 			keyCount[childKey]++;
 		}
 		for (int row=0; row<AItem->parent()->rowCount(); row++)
 		{
-			QKeySequence childKey = AItem->parent()->child(row,1)->data(MDR_ACTIVE_KEYSEQUENCE).toString();
+			QKeySequence childKey = AItem->parent()->child(row,COL_KEY)->data(MDR_ACTIVE_KEYSEQUENCE).toString();
 			bool conflict = !childKey.isEmpty() && keyCount.value(childKey)>1;
-			setItemRed(AItem->parent()->child(row,0),conflict);
-			setItemRed(AItem->parent()->child(row,1),conflict);
+			setItemRed(AItem->parent()->child(row,COL_NAME),conflict);
+			setItemRed(AItem->parent()->child(row,COL_KEY),conflict);
 		}
 		
+		if (isGlobalKeyFailed(key->data(MDR_SHORTCUTID).toString(),key->data(MDR_ACTIVE_KEYSEQUENCE).toString()))
+		{
+			setItemRed(action,true);
+			setItemRed(key,true);
+		}
+
 		bool notDefault = key->data(MDR_ACTIVE_KEYSEQUENCE).toString()!=key->data(MDR_DEFAULT_KEYSEQUENCE).toString();
 		setItemBold(action, notDefault);
 		setItemBold(key, notDefault);
-		
+
+		blocked = false;
+
 		emit modified();
 	}
 }
