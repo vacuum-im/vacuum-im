@@ -62,6 +62,7 @@ signals:
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
 protected:
+	QString indexGroupName(const QModelIndex &AIndex) const;
 	void loadExpandState(const QModelIndex &AIndex);
 	void saveExpandState(const QModelIndex &AIndex);
 protected slots:

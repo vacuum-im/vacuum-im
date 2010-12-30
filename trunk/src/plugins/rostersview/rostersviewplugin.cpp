@@ -3,8 +3,6 @@
 #include <QTimer>
 #include <QScrollBar>
 
-const QList<int> GroupItemTypes = QList<int>() << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_NOT_IN_ROSTER << RIT_GROUP_MY_RESOURCES << RIT_GROUP_AGENTS;
-
 RostersViewPlugin::RostersViewPlugin()
 {
 	FRostersModel = NULL;
@@ -313,14 +311,34 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 	}
 }
 
+QString RostersViewPlugin::indexGroupName(const QModelIndex &AIndex) const
+{
+	int indexType = AIndex.data(RDR_TYPE).toInt();
+	switch (indexType)
+	{
+	case RIT_GROUP:
+		return AIndex.data(RDR_GROUP).toString();
+	case RIT_GROUP_BLANK:
+		return FRostersModel!=NULL ? FRostersModel->blankGroupName() : QString::null;
+	case RIT_GROUP_NOT_IN_ROSTER:
+		return FRostersModel!=NULL ? FRostersModel->notInRosterGroupName() : QString::null;
+	case RIT_GROUP_MY_RESOURCES:
+		return FRostersModel!=NULL ? FRostersModel->myResourcesGroupName() : QString::null;
+	case RIT_GROUP_AGENTS:
+		return FRostersModel!=NULL ? FRostersModel->agentsGroupName() : QString::null;
+	default:
+		return QString::null;
+	}
+	return QString::null;
+}
+
 void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
 {
-	QString groupName = GroupItemTypes.contains(AIndex.data(RDR_TYPE).toInt()) ? AIndex.data(RDR_NAME).toString() : AIndex.parent().data(RDR_NAME).toString();
+	QString groupName = indexGroupName(AIndex);
 	if (!groupName.isEmpty() || AIndex.data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
 	{
 		Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
-		QString key = AIndex.data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT ? groupName : QString::null;
-		bool isExpanded = FExpandState.value(streamJid).value(key,true);
+		bool isExpanded = FExpandState.value(streamJid).value(groupName,true);
 		if (isExpanded && !FRostersView->isExpanded(AIndex))
 			FRostersView->expand(AIndex);
 		else if (!isExpanded && FRostersView->isExpanded(AIndex))
@@ -330,15 +348,14 @@ void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
 
 void RostersViewPlugin::saveExpandState(const QModelIndex &AIndex)
 {
-	QString groupName = GroupItemTypes.contains(AIndex.data(RDR_TYPE).toInt()) ? AIndex.data(RDR_NAME).toString() : AIndex.parent().data(RDR_NAME).toString();
+	QString groupName = indexGroupName(AIndex);
 	if (!groupName.isEmpty() || AIndex.data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
 	{
 		Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
-		QString key = AIndex.data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT ? groupName : QString::null;
 		if (!FRostersView->isExpanded(AIndex))
-			FExpandState[streamJid][key] = false;
+			FExpandState[streamJid][groupName] = false;
 		else
-			FExpandState[streamJid].remove(key);
+			FExpandState[streamJid].remove(groupName);
 	}
 }
 
