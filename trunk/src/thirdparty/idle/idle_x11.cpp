@@ -79,7 +79,7 @@ bool IdlePlatform::init()
 	old_handler = XSetErrorHandler(xerrhandler);
 
 	int event_base, error_base;
-	if(XScreenSaverQueryExtension(QApplication::desktop()->screen()->x11Display(), &event_base, &error_base)) {
+	if(XScreenSaverQueryExtension(QX11Info::display(), &event_base, &error_base)) {
 		d->ss_info = XScreenSaverAllocInfo();
 		return true;
 	}
@@ -90,7 +90,7 @@ int IdlePlatform::secondsIdle()
 {
 	if(!d->ss_info)
 		return 0;
-	if(!XScreenSaverQueryInfo(QApplication::desktop()->screen()->x11Display(), QX11Info::appRootWindow(), d->ss_info))
+	if(!XScreenSaverQueryInfo(QX11Info::display(), QX11Info::appRootWindow(), d->ss_info))
 		return 0;
 	return d->ss_info->idle / 1000;
 }
