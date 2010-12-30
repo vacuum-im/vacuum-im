@@ -132,6 +132,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 
 bool ChatMessageHandler::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW, tr("Clear window"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWCHATDIALOG, tr("Open chat dialog"), tr("Return","Open chat dialog"), Shortcuts::WidgetShortcut);
 
 	if (FRostersView)
@@ -264,7 +265,7 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 			window->infoWidget()->autoUpdateFields();
 			connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 			connect(window->infoWidget()->instance(),SIGNAL(fieldChanged(IInfoWidget::InfoField, const QVariant &)),
-			        SLOT(onInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
+				SLOT(onInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
 			connect(window->instance(),SIGNAL(windowActivated()),SLOT(onWindowActivated()));
 			connect(window->instance(),SIGNAL(windowClosed()),SLOT(onWindowClosed()));
 			connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onWindowDestroyed()));
@@ -273,11 +274,12 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 			FWindowStatus[window->viewWidget()].createTime = QDateTime::currentDateTime();
 			updateWindow(window);
 
-         Action *clearAction = new Action(window->instance());
-         clearAction->setText(tr("Clear Chat Window"));
-         clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_CLEAR_CHAT);
-         connect(clearAction,SIGNAL(triggered(bool)),SLOT(onClearWindowAction(bool)));
-         window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_CWTBW_CLEAR_CHAT);
+			Action *clearAction = new Action(window->instance());
+			clearAction->setText(tr("Clear Chat Window"));
+			clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_CLEAR_CHAT);
+			clearAction->setShortcutId(SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW);
+			connect(clearAction,SIGNAL(triggered(bool)),SLOT(onClearWindowAction(bool)));
+			window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_CWTBW_CLEAR_CHAT);
 
 			if (FRostersView && FRostersModel)
 			{
@@ -529,17 +531,17 @@ void ChatMessageHandler::onShowWindowAction(bool)
 
 void ChatMessageHandler::onClearWindowAction(bool)
 {
-   Action *action = qobject_cast<Action *>(sender());
-   IChatWindow *window = action!=NULL ? qobject_cast<IChatWindow *>(action->parent()) : NULL;
-   if (window)
-   {
-      IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
-      if (style!=NULL)
-      {
-         IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-         style->changeOptions(window->viewWidget()->styleWidget(),soptions,true);
-      }
-   }
+	Action *action = qobject_cast<Action *>(sender());
+	IChatWindow *window = action!=NULL ? qobject_cast<IChatWindow *>(action->parent()) : NULL;
+	if (window)
+	{
+		IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
+		if (style!=NULL)
+		{
+			IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
+			style->changeOptions(window->viewWidget()->styleWidget(),soptions,true);
+		}
+	}
 }
 
 void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidget)
