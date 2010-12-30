@@ -52,6 +52,8 @@ public:
 	virtual void setDefaultLang(const QString &ADefLang);
 	virtual IConnection *connection() const;
 	virtual void setConnection(IConnection *AConnection);
+	virtual bool isKeepAliveTimerActive() const;
+	virtual void setKeepAliveTimerActive(bool AActive);
 	virtual qint64 sendStanza(Stanza &AStanza);
 	virtual void insertXmppDataHandler(IXmppDataHandler *AHandler, int AOrder);
 	virtual void removeXmppDataHandler(IXmppDataHandler *AHandler, int AOrder);
