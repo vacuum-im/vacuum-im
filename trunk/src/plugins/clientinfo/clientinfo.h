@@ -24,7 +24,6 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imainwindow.h>
-#include <interfaces/iautostatus.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>
@@ -32,6 +31,7 @@
 #include <utils/options.h>
 #include <utils/datetime.h>
 #include <utils/widgetmanager.h>
+#include <utils/systemmanager.h>
 #include "clientinfodialog.h"
 
 struct SoftwareItem {
@@ -78,7 +78,7 @@ public:
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
 	virtual bool initSettings();
-	virtual bool startPlugin() { return true; }
+	virtual bool startPlugin();
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IStanzaHandler
@@ -141,7 +141,6 @@ private:
 	IRostersViewPlugin *FRostersViewPlugin;
 	IServiceDiscovery *FDiscovery;
 	IDataForms *FDataForms;
-	IAutoStatus *FAutoStatus;
 	IOptionsManager *FOptionsManager;
 private:
 	int FPingHandle;

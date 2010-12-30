@@ -36,7 +36,6 @@ ClientInfo::ClientInfo()
 	FRostersViewPlugin = NULL;
 	FDiscovery = NULL;
 	FDataForms = NULL;
-	FAutoStatus = NULL;
 	FOptionsManager = NULL;
 
 	FPingHandle = 0;
@@ -117,12 +116,6 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IAutoStatus").value(0,NULL);
-	if (plugin)
-	{
-		FAutoStatus = qobject_cast<IAutoStatus *>(plugin->instance());
-	}
-
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
 	return FStanzaProcessor != NULL;
@@ -156,9 +149,9 @@ bool ClientInfo::initObjects()
 	if (FRostersViewPlugin)
 	{
 		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *,Menu*)),
-		        SLOT(onRosterIndexContextMenu(IRosterIndex *,Menu *)));
+			SLOT(onRosterIndexContextMenu(IRosterIndex *,Menu *)));
 		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
-		        SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+			SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
 	}
 
 	if (FDiscovery)
@@ -185,6 +178,12 @@ bool ClientInfo::initSettings()
 	{
 		FOptionsManager->insertOptionsHolder(this);
 	}
+	return true;
+}
+
+bool ClientInfo::startPlugin()
+{
+	SystemManager::instance()->startSystemIdle();
 	return true;
 }
 
@@ -218,7 +217,7 @@ bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		Stanza iq("iq");
 		iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
 		QDomElement elem = iq.addElement("query",NS_JABBER_LAST);
-		elem.setAttribute("seconds", FAutoStatus!=NULL ? FAutoStatus->idleSeconds() : 0);
+		elem.setAttribute("seconds", SystemManager::systemIdle());
 		FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
 	}
 	else if (AHandlerId == FTimeHandle)
