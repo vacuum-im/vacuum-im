@@ -1,14 +1,12 @@
-HEADERS += $$PWD/idle.h
-SOURCES += $$PWD/idle.cpp
-INCLUDEPATH += $$PWD
-DEPENDPATH  += $$PWD
+HEADERS += idle.h
+SOURCES += idle.cpp
 
-unix:!mac {
-	SOURCES += $$PWD/idle_x11.cpp
+unix:!macx {
+	SOURCES += idle_x11.cpp
 }
-win32: {
-	SOURCES += $$PWD/idle_win.cpp
+win32 {
+	SOURCES += idle_win.cpp
 }
-mac: {
-	SOURCES += $$PWD/idle_mac.cpp
+mac {
+	SOURCES += idle_mac.cpp
 }

@@ -13,7 +13,7 @@ macx {
   LIBS            += -lzlib
   INCLUDEPATH     += ../thirdparty/zlib
 } else:unix {
-  LIBS            += -lz
+  LIBS            += -lz -lXss
   CONFIG          += x11
 } else:win32 {
   LIBS            += -lzlib -luser32
