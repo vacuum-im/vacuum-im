@@ -8,6 +8,7 @@ set(HEADERS "action.h"
 		"options.h"
 		"shortcuts.h"
 		"statusbarchanger.h"
+		"systemmanager.h"
 		"toolbarchanger.h")
 
 qt4_wrap_cpp(MOC_SOURCES ${HEADERS})
