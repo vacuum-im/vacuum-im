@@ -3,7 +3,7 @@
 
 struct SystemManager::SystemManagerData
 {
-	SystemManager::SystemManagerData() {
+	SystemManagerData() {
 		idle = NULL;
 		idleSeconds = 0;
 	}
