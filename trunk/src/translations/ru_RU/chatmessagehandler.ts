@@ -40,5 +40,9 @@
         <comment>Open chat dialog</comment>
         <translation>Return</translation>
     </message>
+    <message>
+        <source>Clear window</source>
+        <translation>Очистить окно</translation>
+    </message>
 </context>
 </TS>

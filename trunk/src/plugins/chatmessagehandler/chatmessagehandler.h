@@ -93,7 +93,7 @@ protected slots:
 	void onWindowDestroyed();
 	void onStatusIconsChanged();
 	void onShowWindowAction(bool);
-   void onClearWindowAction(bool);
+	void onClearWindowAction(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
