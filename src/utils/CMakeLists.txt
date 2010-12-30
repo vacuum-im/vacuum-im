@@ -14,6 +14,8 @@ add_definitions("-DUTILS_DLL")
 add_definitions("-DQXT_STATIC") 
 link_directories("${CMAKE_BINARY_DIR}/libs")
 include_directories(AFTER "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
+include(FindX11)
+include_directories(AFTER ${X11_INCLUDE_DIR})
 
 add_translations(TRANSLATIONS "${TARGET_UTILS}" ${SOURCES})
 add_library(${TARGET_UTILS} SHARED ${SOURCES} ${MOC_SOURCES} ${TRANSLATIONS})
