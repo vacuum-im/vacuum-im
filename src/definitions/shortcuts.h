@@ -47,6 +47,8 @@
 //MessageWidgets
 #define   SCTG_MESSAGEWINDOWS_CHAT                                 "message-windows.chat-window"
 #define     SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE                    "message-windows.chat-window.send-message"
+//ChatMessageHandler
+#define     SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW                    "message-windows.chat-window.clear-window"
 //MessageWidgets
 #define   SCTG_MESSAGEWINDOWS_NORMAL                               "message-windows.normal-window"
 #define     SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE                  "message-windows.normal-window.send-message"
