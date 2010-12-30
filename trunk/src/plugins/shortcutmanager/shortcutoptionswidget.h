@@ -38,6 +38,7 @@ protected:
 	QStandardItem *createTreeRow(const QString &AId, QStandardItem *AParent, bool AGroup);
 	void setItemRed(QStandardItem *AItem, bool ARed) const;
 	void setItemBold(QStandardItem *AItem, bool ABold) const;
+	bool isGlobalKeyFailed(const QString &AId, const QKeySequence &ANewKey) const;
 protected slots:
 	void onDefaultClicked();
 	void onClearClicked();
