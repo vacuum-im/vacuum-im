@@ -3,7 +3,7 @@
 RegisterStream::RegisterStream(IDataForms *ADataForms, IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
 	FDialog = NULL;
-   FDataForms = ADataForms;
+	FDataForms = ADataForms;
 	FXmppStream = AXmppStream;
 	connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onXmppStreamClosed()));
 }
@@ -49,6 +49,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 						connect(FDialog->instance(),SIGNAL(accepted()),SLOT(onRegisterDialogAccepred()));
 						connect(FDialog->instance(),SIGNAL(rejected()),SLOT(onRegisterDialogRejected()));
 						WidgetManager::showActivateRaiseWindow(FDialog->instance());
+						FXmppStream->setKeepAliveTimerActive(false);
 					}
 					else
 					{
@@ -129,6 +130,7 @@ void RegisterStream::onXmppStreamClosed()
 
 void RegisterStream::onRegisterDialogAccepred()
 {
+	FXmppStream->setKeepAliveTimerActive(true);
 	if (FDialog)
 	{
 		Stanza submit("iq");
@@ -146,6 +148,7 @@ void RegisterStream::onRegisterDialogAccepred()
 
 void RegisterStream::onRegisterDialogRejected()
 {
+	FXmppStream->setKeepAliveTimerActive(true);
 	emit error(tr("Registration rejected by user"));
 	FDialog = NULL;
 }

@@ -11,9 +11,9 @@
 #include <utils/stanza.h>
 
 class RegisterStream :
-			public QObject,
-			public IXmppFeature,
-			public IXmppStanzaHadler
+	public QObject,
+	public IXmppFeature,
+	public IXmppStanzaHadler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IXmppFeature IXmppStanzaHadler);
@@ -37,7 +37,7 @@ protected slots:
 	void onRegisterDialogAccepred();
 	void onRegisterDialogRejected();
 private:
-   IDataForms *FDataForms;
+	IDataForms *FDataForms;
 	IXmppStream *FXmppStream;
 private:
 	IDataDialogWidget *FDialog;

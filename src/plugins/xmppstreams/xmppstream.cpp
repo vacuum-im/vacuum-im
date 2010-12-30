@@ -121,7 +121,7 @@ void XmppStream::close()
 			QByteArray data = "</stream:stream>";
 			if (!processDataHandlers(data,true))
 				FConnection->write(data);
-			FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
+			setKeepAliveTimerActive(true);
 		}
 		FConnection->disconnectFromHost();
 	}
@@ -220,6 +220,19 @@ void XmppStream::setConnection(IConnection *AConnection)
 	}
 }
 
+bool XmppStream::isKeepAliveTimerActive() const
+{
+	return FKeepAliveTimer.isActive();
+}
+
+void XmppStream::setKeepAliveTimerActive(bool AActive)
+{
+	if (AActive && FStreamState!=SS_OFFLINE)
+		FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
+	else if (!AActive)
+		FKeepAliveTimer.stop();
+}
+
 qint64 XmppStream::sendStanza(Stanza &AStanza)
 {
 	if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
@@ -269,7 +282,7 @@ void XmppStream::removeXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder
 void XmppStream::startStream()
 {
 	FParser.restart();
-	FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
+	setKeepAliveTimerActive(true);
 
 	QDomDocument doc;
 	QDomElement root = doc.createElementNS(NS_JABBER_STREAMS,"stream:stream");
@@ -372,7 +385,7 @@ qint64 XmppStream::sendData(QByteArray AData)
 {
 	if (!processDataHandlers(AData,true))
 	{
-		FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
+		setKeepAliveTimerActive(true);
 		return FConnection->write(AData);
 	}
 	return 0;
@@ -405,12 +418,12 @@ void XmppStream::onConnectionError(const QString &AError)
 void XmppStream::onConnectionDisconnected()
 {
 	FOpen = false;
-	FKeepAliveTimer.stop();
 
 	if (FStreamState != SS_DISCONNECTING)
 		abort(tr("Connection closed unexpectedly"));
 
 	FStreamState = SS_OFFLINE;
+	setKeepAliveTimerActive(false);
 	removeXmppStanzaHandler(this,XSHO_XMPP_STREAM);
 	emit closed();
 
@@ -478,7 +491,7 @@ void XmppStream::onFeatureDestroyed()
 void XmppStream::onKeepAliveTimeout()
 {
 	static const QByteArray space(1,' ');
-	if (FStreamState!=SS_ONLINE)
+	if (FStreamState != SS_ONLINE)
 		abort(tr("XMPP connection timed out"));
 	else
 		sendData(space);
