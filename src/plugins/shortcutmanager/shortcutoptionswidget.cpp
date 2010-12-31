@@ -130,7 +130,7 @@ QStandardItem *ShortcutOptionsWidget::createTreeRow(const QString &AId, QStandar
 
 void ShortcutOptionsWidget::setItemRed(QStandardItem *AItem, bool ARed) const
 {
-	AItem->setForeground(ARed ? Qt::red : QBrush()/*this->palette().color(QPalette::WindowText)*/);
+	AItem->setForeground(ARed ? Qt::red : ui.trvShortcuts->palette().color(QPalette::Text));
 }
 
 void ShortcutOptionsWidget::setItemBold(QStandardItem *AItem, bool ABold) const
