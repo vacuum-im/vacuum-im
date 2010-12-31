@@ -11,6 +11,7 @@ LIBS              += -L../libs
 LIBS              += -lidn -lminizip -lqxtglobalshortcut -lidle
 macx {
   LIBS            += -lzlib
+  QMAKE_LFLAGS    += -framework Carbon
   INCLUDEPATH     += ../thirdparty/zlib
 } else:unix {
   LIBS            += -lz -lXss
