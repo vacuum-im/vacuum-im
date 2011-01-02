@@ -501,7 +501,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 						curGroupAction->setData(AData);
 						curGroupAction->setData(ADR_TO_GROUP,groupName);
 						connect(curGroupAction,SIGNAL(triggered(bool)),ASlot);
-						groupMenu->addAction(curGroupAction,AG_RVCM_ROSTERCHANGER+1);
+						groupMenu->addAction(curGroupAction,AG_RVCM_RCHANGER+1);
 					}
 
 					if (ANewGroup)
@@ -512,11 +512,11 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 						newGroupAction->setData(AData);
 						newGroupAction->setData(ADR_TO_GROUP,groupName+groupDelim);
 						connect(newGroupAction,SIGNAL(triggered(bool)),ASlot);
-						groupMenu->addAction(newGroupAction,AG_RVCM_ROSTERCHANGER+1);
+						groupMenu->addAction(newGroupAction,AG_RVCM_RCHANGER+1);
 					}
 
 					menus.insert(groupName,groupMenu);
-					parentMenu->addAction(groupMenu->menuAction(),AG_RVCM_ROSTERCHANGER,true);
+					parentMenu->addAction(groupMenu->menuAction(),AG_RVCM_RCHANGER,true);
 					parentMenu = groupMenu;
 				}
 				else
@@ -534,7 +534,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 			curGroupAction->setData(AData);
 			curGroupAction->setData(ADR_TO_GROUP,QVariant(QString("")));
 			connect(curGroupAction,SIGNAL(triggered(bool)),ASlot);
-			menu->addAction(curGroupAction,AG_RVCM_ROSTERCHANGER+1);
+			menu->addAction(curGroupAction,AG_RVCM_RCHANGER+1);
 		}
 
 		if (ANewGroup)
@@ -545,7 +545,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 			newGroupAction->setData(AData);
 			newGroupAction->setData(ADR_TO_GROUP,groupDelim);
 			connect(newGroupAction,SIGNAL(triggered(bool)),ASlot);
-			menu->addAction(newGroupAction,AG_RVCM_ROSTERCHANGER+1);
+			menu->addAction(newGroupAction,AG_RVCM_RCHANGER+1);
 		}
 
 		if (ABlankGroup)
@@ -556,7 +556,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 			blankGroupAction->setData(AData);
 			blankGroupAction->setData(ADR_TO_GROUP,QVariant(QString("")));
 			connect(blankGroupAction,SIGNAL(triggered(bool)),ASlot);
-			menu->addAction(blankGroupAction,AG_RVCM_ROSTERCHANGER-1);
+			menu->addAction(blankGroupAction,AG_RVCM_RCHANGER-1);
 		}
 	}
 	return menu;
@@ -675,10 +675,15 @@ void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 			action->setData(ADR_STREAM_JID,AIndex->data(RDR_JID));
 			action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
-			AMenu->addAction(action,AG_RVCM_ROSTERCHANGER_ADD_CONTACT,true);
+			AMenu->addAction(action,AG_RVCM_RCHANGER_ADD_CONTACT,true);
 		}
 		else if (itemType == RIT_CONTACT || itemType == RIT_AGENT)
 		{
+			Menu *menu = new Menu (AMenu);
+			menu->setTitle(tr("Roster management"));
+			menu->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MANAGEMENT);
+			AMenu->addAction(menu->menuAction(),AG_RVCM_RCHANGER,true);
+
 			QHash<int,QVariant> data;
 			data.insert(ADR_STREAM_JID,streamJid);
 			data.insert(ADR_CONTACT_JID,AIndex->data(RDR_BARE_JID).toString());
@@ -686,6 +691,7 @@ void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 			Menu *subsMenu = new Menu(AMenu);
 			subsMenu->setTitle(tr("Subscription"));
 			subsMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_SUBSCRIBTION);
+			AMenu->addAction(subsMenu->menuAction(),AG_RVCM_RCHANGER,true);
 
 			Action *action = new Action(subsMenu);
 			action->setText(tr("Subscribe contact"));
@@ -737,8 +743,6 @@ void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 			connect(action,SIGNAL(triggered(bool)),SLOT(onSendSubscription(bool)));
 			subsMenu->addAction(action);
 
-			AMenu->addAction(subsMenu->menuAction(),AG_RVCM_ROSTERCHANGER_SUBSCRIPTION);
-
 			if (ritem.isValid)
 			{
 				QSet<QString> exceptGroups = ritem.groups;
@@ -746,36 +750,36 @@ void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 				data.insert(ADR_NICK,AIndex->data(RDR_NAME));
 				data.insert(ADR_GROUP,AIndex->data(RDR_GROUP));
 
-				action = new Action(AMenu);
+				action = new Action(menu);
 				action->setText(tr("Rename contact"));
 				action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_RENAME);
 				action->setData(data);
 				action->setShortcutId(SCT_ROSTERVIEW_RENAME);
 				connect(action,SIGNAL(triggered(bool)),SLOT(onRenameContact(bool)));
-				AMenu->addAction(action,AG_RVCM_ROSTERCHANGER);
+				menu->addAction(action);
 
 				if (itemType == RIT_CONTACT)
 				{
-					Menu *copyItem = createGroupMenu(data,exceptGroups,true,false,false,SLOT(onCopyContactToGroup(bool)),AMenu);
+					Menu *copyItem = createGroupMenu(data,exceptGroups,true,false,false,SLOT(onCopyContactToGroup(bool)),menu);
 					copyItem->setTitle(tr("Copy to group"));
 					copyItem->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
-					AMenu->addAction(copyItem->menuAction(),AG_RVCM_ROSTERCHANGER);
+					menu->addAction(copyItem->menuAction());
 
-					Menu *moveItem = createGroupMenu(data,exceptGroups,true,false,true,SLOT(onMoveContactToGroup(bool)),AMenu);
+					Menu *moveItem = createGroupMenu(data,exceptGroups,true,false,true,SLOT(onMoveContactToGroup(bool)),menu);
 					moveItem->setTitle(tr("Move to group"));
 					moveItem->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MOVE_GROUP);
-					AMenu->addAction(moveItem->menuAction(),AG_RVCM_ROSTERCHANGER);
+					menu->addAction(moveItem->menuAction());
 				}
 
 				if (!AIndex->data(RDR_GROUP).toString().isEmpty())
 				{
-					action = new Action(AMenu);
+					action = new Action(menu);
 					action->setText(tr("Remove from group"));
 					action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_REMOVE_FROM_GROUP);
 					action->setData(data);
 					action->setShortcutId(SCT_ROSTERVIEW_REMOVEFROMGROUP);
 					connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveContactFromGroup(bool)));
-					AMenu->addAction(action,AG_RVCM_ROSTERCHANGER);
+					menu->addAction(action);
 				}
 			}
 			else
@@ -787,19 +791,24 @@ void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 				action->setData(ADR_CONTACT_JID,AIndex->data(RDR_JID));
 				action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
 				connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
-				AMenu->addAction(action,AG_RVCM_ROSTERCHANGER_ADD_CONTACT,true);
+				AMenu->addAction(action,AG_RVCM_RCHANGER_ADD_CONTACT,true);
 			}
 
-			action = new Action(AMenu);
+			action = new Action(menu);
 			action->setText(tr("Remove from roster"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_REMOVE_CONTACT);
 			action->setData(data);
 			action->setShortcutId(SCT_ROSTERVIEW_REMOVEFROMROSTER);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveContactFromRoster(bool)));
-			AMenu->addAction(action,AG_RVCM_ROSTERCHANGER);
+			menu->addAction(action);
 		}
 		else if (itemType == RIT_GROUP)
 		{
+			Menu *menu = new Menu (AMenu);
+			menu->setTitle(tr("Roster management"));
+			menu->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MANAGEMENT);
+			AMenu->addAction(menu->menuAction(),AG_RVCM_RCHANGER,true);
+
 			QHash<int,QVariant> data;
 			data.insert(ADR_STREAM_JID,streamJid);
 			data.insert(ADR_GROUP,AIndex->data(RDR_GROUP));
@@ -810,44 +819,44 @@ void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 			action->setData(data);
 			action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
-			AMenu->addAction(action,AG_RVCM_ROSTERCHANGER_ADD_CONTACT,true);
+			AMenu->addAction(action,AG_RVCM_RCHANGER_ADD_CONTACT,true);
 
-			action = new Action(AMenu);
+			action = new Action(menu);
 			action->setText(tr("Rename group"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_RENAME);
 			action->setData(data);
 			action->setShortcutId(SCT_ROSTERVIEW_RENAME);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onRenameGroup(bool)));
-			AMenu->addAction(action,AG_RVCM_ROSTERCHANGER);
+			menu->addAction(action);
 
 			QSet<QString> exceptGroups;
 			exceptGroups << AIndex->data(RDR_GROUP).toString();
 
-			Menu *copyGroup = createGroupMenu(data,exceptGroups,true,true,false,SLOT(onCopyGroupToGroup(bool)),AMenu);
+			Menu *copyGroup = createGroupMenu(data,exceptGroups,true,true,false,SLOT(onCopyGroupToGroup(bool)),menu);
 			copyGroup->setTitle(tr("Copy to group"));
 			copyGroup->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
-			AMenu->addAction(copyGroup->menuAction(),AG_RVCM_ROSTERCHANGER);
+			menu->addAction(copyGroup->menuAction());
 
-			Menu *moveGroup = createGroupMenu(data,exceptGroups,true,true,false,SLOT(onMoveGroupToGroup(bool)),AMenu);
+			Menu *moveGroup = createGroupMenu(data,exceptGroups,true,true,false,SLOT(onMoveGroupToGroup(bool)),menu);
 			moveGroup->setTitle(tr("Move to group"));
 			moveGroup->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MOVE_GROUP);
-			AMenu->addAction(moveGroup->menuAction(),AG_RVCM_ROSTERCHANGER);
+			menu->addAction(moveGroup->menuAction());
 
-			action = new Action(AMenu);
+			action = new Action(menu);
 			action->setText(tr("Remove group"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_REMOVE_GROUP);
 			action->setData(data);
 			action->setShortcutId(SCT_ROSTERVIEW_REMOVEFROMGROUP);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveGroup(bool)));
-			AMenu->addAction(action,AG_RVCM_ROSTERCHANGER);
+			menu->addAction(action);
 
-			action = new Action(AMenu);
+			action = new Action(menu);
 			action->setText(tr("Remove contacts"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_REMOVE_CONTACTS);
 			action->setData(data);
 			action->setShortcutId(SCT_ROSTERVIEW_REMOVEFROMROSTER);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveGroupContacts(bool)));
-			AMenu->addAction(action,AG_RVCM_ROSTERCHANGER);
+			menu->addAction(action);
 		}
 	}
 }
