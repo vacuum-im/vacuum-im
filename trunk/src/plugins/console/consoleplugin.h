@@ -8,6 +8,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/imainwindow.h>
+#include <utils/widgetmanager.h>
 #include <utils/iconstorage.h>
 #include <utils/action.h>
 #include "consolewidget.h"

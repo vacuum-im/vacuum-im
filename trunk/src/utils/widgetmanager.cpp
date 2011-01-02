@@ -15,6 +15,114 @@
 	#define MESSAGE_SOURCE_PAGER          2
 #endif //Q_WS_X11
 
+class WindowSticker : 
+	public QObject
+{
+public:
+	WindowSticker();
+	static WindowSticker *instance();
+	void insertWindow(QWidget *AWindow);
+	void removeWindow(QWidget *AWindow);
+protected:
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
+private:
+	int FStickEvent;
+	QPoint FStickPos;
+	QWidget *FCurWindow;
+};
+
+WindowSticker::WindowSticker()
+{
+	FCurWindow = NULL;
+	FStickEvent = QEvent::registerEventType();
+}
+
+WindowSticker *WindowSticker::instance()
+{
+	static WindowSticker *sticker = NULL;
+	if (!sticker)
+		sticker = new WindowSticker;
+	return sticker;
+}
+
+void WindowSticker::insertWindow(QWidget *AWindow)
+{
+	if (AWindow)
+	{
+		AWindow->installEventFilter(this);
+	}
+}
+
+void WindowSticker::removeWindow(QWidget *AWindow)
+{
+	if (AWindow)
+	{
+		AWindow->removeEventFilter(this);
+	}
+}
+
+bool WindowSticker::eventFilter(QObject *AWatched, QEvent *AEvent)
+{
+	if (AEvent->type() == QEvent::NonClientAreaMouseButtonPress)
+	{
+		QWidget *window = qobject_cast<QWidget *>(AWatched);
+		if (window && window->isWindow())
+		{
+			FCurWindow = window;
+		}
+	}
+	else if (AEvent->type() == QEvent::NonClientAreaMouseButtonRelease)
+	{
+		FCurWindow = NULL;
+	}
+	else if (AEvent->type() == QEvent::NonClientAreaMouseMove)
+	{
+		FCurWindow = NULL;
+	}
+	else if (AWatched==FCurWindow && AEvent->type()==QEvent::Move)
+	{
+		const int delta = 15;
+		QPoint cursorPos = QCursor::pos();
+		QRect windowRect = FCurWindow->frameGeometry();
+		QRect desckRect = QApplication::desktop()->availableGeometry(FCurWindow);
+
+		int borderTop = cursorPos.y() - windowRect.y();
+		int borderLeft = cursorPos.x() - windowRect.x();
+		int borderRight = cursorPos.x() + desckRect.right() - windowRect.right();
+		int borderBottom = cursorPos.y() + desckRect.bottom() - windowRect.bottom();
+
+		FStickPos = windowRect.topLeft();
+		if (qAbs(borderTop - cursorPos.y()) < delta)
+		{
+			FStickPos.setY(0);
+		}
+		else if (qAbs(borderBottom - cursorPos.y()) < delta)
+		{
+			FStickPos.setY(desckRect.bottom() - windowRect.height());
+		}
+		if (qAbs(borderLeft - cursorPos.x()) < delta)
+		{
+			FStickPos.setX(0);
+		}
+		else if(qAbs(borderRight - cursorPos.x()) < delta)
+		{
+			FStickPos.setX(desckRect.right() - windowRect.width());
+		}
+
+		if (FStickPos != windowRect.topLeft())
+		{
+			QEvent *stickEvent = new QEvent((QEvent::Type)FStickEvent);
+			QApplication::postEvent(AWatched,stickEvent,Qt::HighEventPriority);
+		}
+	}
+	else if (FCurWindow==AWatched && AEvent->type()==FStickEvent)
+	{
+		FCurWindow->move(FStickPos);
+		return true;
+	}
+	return QObject::eventFilter(AWatched,AEvent);
+}
+
 void WidgetManager::raiseWidget(QWidget *AWidget)
 {
 #ifdef Q_WS_X11
@@ -59,6 +167,51 @@ void WidgetManager::showActivateRaiseWindow(QWidget *AWindow)
 	}
 	AWindow->activateWindow();
 	WidgetManager::raiseWidget(AWindow);
+}
+
+void WidgetManager::setWindowSticky( QWidget *AWindow, bool ASticky )
+{
+#ifdef Q_WS_WIN
+	if (ASticky)
+		WindowSticker::instance()->insertWindow(AWindow);
+	else
+		WindowSticker::instance()->removeWindow(AWindow);
+#else
+	Q_UNUSED(AWindow);
+	Q_UNUSED(ASticky);
+#endif
+}
+
+Qt::Alignment WidgetManager::windowAlignment(const QWidget *AWindow)
+{
+	static const int delta = 4;
+	Qt::Alignment align = 0;
+	QRect windowRect = AWindow->frameGeometry();
+	QRect screenRect = QApplication::desktop()->availableGeometry(AWindow);
+	if (!screenRect.isEmpty() && !windowRect.isEmpty())
+	{
+		if (qAbs(screenRect.left() - windowRect.left()) < delta)
+			align |= Qt::AlignLeft;
+		else if (qAbs(screenRect.right() - windowRect.right()) < delta)
+			align |= Qt::AlignRight;
+		if (qAbs(screenRect.top() - windowRect.top()) < delta)
+			align |= Qt::AlignTop;
+		else if (qAbs(screenRect.bottom() - windowRect.bottom()) < delta)
+			align |= Qt::AlignBottom;
+	}
+	return align;
+}
+
+void WidgetManager::alignWindow(QWidget *AWindow, Qt::Alignment AAlign)
+{
+	if (AAlign > 0)
+	{
+		QRect frameRect = AWindow->frameGeometry();
+		QRect windowRect = AWindow->geometry();
+		QRect rect = alignGeometry(frameRect.size(),AWindow,(Qt::Alignment)AAlign);
+		rect.adjust(windowRect.left()-frameRect.left(),windowRect.top()-frameRect.top(),windowRect.right()-frameRect.right(),windowRect.bottom()-frameRect.bottom());
+		AWindow->setGeometry(rect);
+	}
 }
 
 QRect WidgetManager::alignGeometry(const QSize &ASize, const QWidget *AWidget, Qt::Alignment AAlign)

@@ -17,6 +17,7 @@ MainWindowPlugin::MainWindowPlugin()
 	FMainWindow = new MainWindow(NULL, Qt::Window|Qt::CustomizeWindowHint|Qt::WindowTitleHint|Qt::WindowCloseButtonHint);
 #endif
 	FMainWindow->installEventFilter(this);
+	WidgetManager::setWindowSticky(FMainWindow,true);
 }
 
 MainWindowPlugin::~MainWindowPlugin()
@@ -126,25 +127,32 @@ void MainWindowPlugin::updateTitle()
 void MainWindowPlugin::showMainWindow()
 {
 	FMainWindow->show();
+	if (!FAligned)
+	{
+		FAligned = true;
+		WidgetManager::alignWindow(FMainWindow,(Qt::Alignment)Options::node(OPV_MAINWINDOW_ALIGN).value().toInt());
+	}
 	correctWindowPosition();
 	WidgetManager::showActivateRaiseWindow(FMainWindow);
 }
 
 void MainWindowPlugin::correctWindowPosition()
 {
+	static const int delta = 20;
 	QRect windowRect = FMainWindow->geometry();
-	QRect screenRect = qApp->desktop()->availableGeometry(qApp->desktop()->screenNumber(windowRect.topLeft()));
-	if (!screenRect.isEmpty() && !screenRect.adjusted(10,10,-10,-10).intersects(windowRect))
+	QRect screenRect = qApp->desktop()->availableGeometry(FMainWindow);
+	if (!screenRect.isEmpty() && !windowRect.isEmpty())
 	{
+		Qt::Alignment align = 0;
 		if (windowRect.right() <= screenRect.left())
-			windowRect.moveLeft(screenRect.left());
+			align |= Qt::AlignLeft;
 		else if (windowRect.left() >= screenRect.right())
-			windowRect.moveRight(screenRect.right());
+			align |= Qt::AlignRight;
 		if (windowRect.top() >= screenRect.bottom())
-			windowRect.moveBottom(screenRect.bottom());
+			align |= Qt::AlignBottom;
 		else if (windowRect.bottom() <= screenRect.top())
-			windowRect.moveTop(screenRect.top());
-		FMainWindow->move(windowRect.topLeft());
+			align |= Qt::AlignTop;
+		WidgetManager::alignWindow(FMainWindow,align);
 	}
 }
 
@@ -157,6 +165,7 @@ bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
 
 void MainWindowPlugin::onOptionsOpened()
 {
+	FAligned = false;
 	FMainWindow->resize(Options::node(OPV_MAINWINDOW_SIZE).value().toSize());
 	FMainWindow->move(Options::node(OPV_MAINWINDOW_POSITION).value().toPoint());
 	if (Options::node(OPV_MAINWINDOW_SHOW).value().toBool())
@@ -168,6 +177,7 @@ void MainWindowPlugin::onOptionsClosed()
 {
 	Options::node(OPV_MAINWINDOW_SHOW).setValue(FMainWindow->isVisible());
 	Options::node(OPV_MAINWINDOW_SIZE).setValue(FMainWindow->size());
+	Options::node(OPV_MAINWINDOW_ALIGN).setValue((int)WidgetManager::windowAlignment(FMainWindow));
 	Options::node(OPV_MAINWINDOW_POSITION).setValue(FMainWindow->pos());
 	updateTitle();
 	FMainWindow->close();

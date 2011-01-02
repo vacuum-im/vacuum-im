@@ -257,7 +257,10 @@ void FileStreamsManager::onStreamDestroyed()
 void FileStreamsManager::onShowFileStreamsWindow(bool)
 {
 	if (FFileStreamsWindow.isNull())
+	{
 		FFileStreamsWindow = new FileStreamsWindow(this, NULL);
+		WidgetManager::setWindowSticky(FFileStreamsWindow,true);
+	}
 	WidgetManager::showActivateRaiseWindow(FFileStreamsWindow);
 }
 

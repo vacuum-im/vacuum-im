@@ -57,6 +57,7 @@ bool ConsolePlugin::initSettings()
 void ConsolePlugin::onShowXMLConsole(bool)
 {
 	ConsoleWidget *widget = new ConsoleWidget(FPluginManager,NULL);
+	WidgetManager::setWindowSticky(widget,true);
 	FCleanupHandler.add(widget);
 	widget->show();
 }
