@@ -39,12 +39,6 @@
         <translation>Позволяет другим модулям размещать свои виджеты в главном окне</translation>
     </message>
     <message>
-        <source>Esc</source>
-        <comment>Close Roster</comment>
-        <translatorcomment>Закрыть ростер</translatorcomment>
-        <translation>Esc</translation>
-    </message>
-    <message>
         <source>Main window</source>
         <translation>Основное окно</translation>
     </message>
