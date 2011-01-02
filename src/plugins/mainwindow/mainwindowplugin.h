@@ -56,8 +56,8 @@ private:
 	IOptionsManager *FOptionsManager;
 	ITrayManager *FTrayManager;
 private:
+	bool FAligned;
 	MainWindow *FMainWindow;
-private:
 	QTime FActivationChanged;
 };
 

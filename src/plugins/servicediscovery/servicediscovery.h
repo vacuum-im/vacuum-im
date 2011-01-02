@@ -33,6 +33,7 @@
 #include <interfaces/itraymanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <utils/widgetmanager.h>
 #include <utils/errorhandler.h>
 #include <utils/iconstorage.h>
 #include <utils/shortcuts.h>

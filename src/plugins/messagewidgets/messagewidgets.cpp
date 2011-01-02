@@ -193,6 +193,7 @@ IMessageWindow *MessageWidgets::newMessageWindow(const Jid &AStreamJid, const Ji
 	{
 		window = new MessageWindow(this,AStreamJid,AContactJid,AMode);
 		FMessageWindows.append(window);
+		WidgetManager::setWindowSticky(window->instance(),true);
 		connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onMessageWindowDestroyed()));
 		FCleanupHandler.add(window->instance());
 		emit messageWindowCreated(window);
@@ -221,6 +222,7 @@ IChatWindow *MessageWidgets::newChatWindow(const Jid &AStreamJid, const Jid &ACo
 	{
 		window = new ChatWindow(this,AStreamJid,AContactJid);
 		FChatWindows.append(window);
+		WidgetManager::setWindowSticky(window->instance(),true);
 		connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onChatWindowDestroyed()));
 		FCleanupHandler.add(window->instance());
 		emit chatWindowCreated(window);
@@ -307,6 +309,7 @@ ITabWindow *MessageWidgets::openTabWindow(const QUuid &AWindowId)
 	{
 		window = new TabWindow(this,AWindowId);
 		FTabWindows.append(window);
+		WidgetManager::setWindowSticky(window->instance(),true);
 		connect(window->instance(),SIGNAL(pageAdded(ITabWindowPage *)),SLOT(onTabWindowPageAdded(ITabWindowPage *)));
 		connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onTabWindowDestroyed()));
 		emit tabWindowCreated(window);

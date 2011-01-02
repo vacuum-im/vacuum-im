@@ -450,6 +450,7 @@ void ServiceDiscovery::showDiscoItems(const Jid &AStreamJid, const Jid &AContact
 	if (FSelfCaps.contains(AStreamJid))
 	{
 		DiscoItemsWindow *itemsWindow = new DiscoItemsWindow(this,AStreamJid,AParent);
+		WidgetManager::setWindowSticky(itemsWindow,true);
 		connect(itemsWindow,SIGNAL(windowDestroyed(IDiscoItemsWindow *)),SLOT(onDiscoItemsWindowDestroyed(IDiscoItemsWindow *)));
 		FDiscoItemsWindows.append(itemsWindow);
 		emit discoItemsWindowCreated(itemsWindow);

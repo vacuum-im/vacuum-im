@@ -1085,6 +1085,7 @@ IArchiveWindow *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const 
 	if (!window)
 	{
 		window = new ViewHistoryWindow(this,FPluginManager,AStreamJid,AParent);
+		WidgetManager::setWindowSticky(window,true);
 		connect(window,SIGNAL(windowDestroyed(IArchiveWindow *)),SLOT(onArchiveWindowDestroyed(IArchiveWindow *)));
 		FArchiveWindows.insert(AStreamJid,window);
 		emit archiveWindowCreated(window);

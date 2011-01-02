@@ -15,6 +15,7 @@ LEGEND
   [+] Added maintenance history of visited conferences
   [+] Changes of contact status and entry/exit of participants in conference are stored in the history
   [+] Added support for arbitrary forms of registration when registering an account on the server
+  [+] Added sticking of some windows to the edges of the screen under Windows.
   [*} Changed the format of the qoutes design
   [*] Server side archive preferences support is not longer required for retrieving messages history from server
   [*] Added ability to switch between tabs by shortkeys Alt+Number

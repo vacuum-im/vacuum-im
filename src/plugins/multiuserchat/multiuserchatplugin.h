@@ -35,6 +35,7 @@
 #include <interfaces/iregistraton.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/ioptionsmanager.h>
+#include <utils/widgetmanager.h>
 #include <utils/shortcuts.h>
 #include <utils/message.h>
 #include <utils/action.h>
