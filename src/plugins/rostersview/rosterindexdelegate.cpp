@@ -4,7 +4,7 @@
 #include <QApplication>
 #include <QWindowsVistaStyle>
 
-#define BRANCH_WIDTH  10
+#define BRANCH_WIDTH  12
 
 RosterIndexDelegate::RosterIndexDelegate(QObject *AParent) : QAbstractItemDelegate(AParent)
 {
@@ -132,10 +132,9 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
 		drawBackground(APainter,option);
 	}
 
-	if (AIndex.parent().isValid() && AIndex.model()->hasChildren(AIndex))
+	if (option.state & QStyle::State_Children)
 	{
 		QStyleOption brachOption(option);
-		brachOption.state |= QStyle::State_Children;
 		brachOption.rect = QStyle::alignedRect(option.direction,Qt::AlignVCenter|Qt::AlignLeft,QSize(BRANCH_WIDTH,BRANCH_WIDTH),paintRect);
 		if (APainter)
 			style->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
@@ -330,6 +329,14 @@ QStyleOptionViewItemV4 RosterIndexDelegate::indexOptions(const QModelIndex &AInd
 	data = AIndex.data(RDR_FONT_UNDERLINE);
 	if (data.isValid())
 		option.font.setUnderline(data.toBool());
+
+	data = AIndex.data(RDR_STATES_FORCE_ON);
+	if (data.isValid())
+		option.state |= (QStyle::State)data.toInt();
+
+	data = AIndex.data(RDR_STATES_FORCE_OFF);
+	if (data.isValid())
+		option.state &= ~(QStyle::State)data.toInt();
 
 	data = AIndex.data(Qt::ForegroundRole);
 	if (qVariantCanConvert<QBrush>(data))
