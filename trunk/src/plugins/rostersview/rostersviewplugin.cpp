@@ -172,7 +172,8 @@ QList<int> RostersViewPlugin::rosterDataRoles() const
 	                               << Qt::DisplayRole
 	                               << Qt::BackgroundColorRole
 	                               << Qt::ForegroundRole
-	                               << RDR_FONT_WEIGHT;
+	                               << RDR_FONT_WEIGHT
+	                               << RDR_STATES_FORCE_ON;
 	return dataRoles;
 }
 
@@ -199,21 +200,22 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 		switch (ARole)
 		{
 		case Qt::DisplayRole:
-		{
-			QString display = AIndex->data(RDR_NAME).toString();
-			if (display.isEmpty())
-				display = AIndex->data(RDR_JID).toString();
-			return display;
-		}
+			{
+				QString display = AIndex->data(RDR_NAME).toString();
+				if (display.isEmpty())
+					display = AIndex->data(RDR_JID).toString();
+				return display;
+			}
 		case Qt::ForegroundRole:
 			return FRostersView->palette().color(QPalette::Active, QPalette::BrightText);
 		case Qt::BackgroundColorRole:
 			return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
 		case RDR_FONT_WEIGHT:
 			return QFont::Bold;
+		case RDR_STATES_FORCE_ON:
+			return QStyle::State_Children;
 		}
 		break;
-
 	case RIT_GROUP:
 	case RIT_GROUP_BLANK:
 	case RIT_GROUP_AGENTS:
@@ -227,49 +229,48 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 			return FRostersView->palette().color(QPalette::Active, QPalette::Highlight);
 		case RDR_FONT_WEIGHT:
 			return QFont::DemiBold;
+		case RDR_STATES_FORCE_ON:
+			return QStyle::State_Children;
 		}
 		break;
-
 	case RIT_CONTACT:
 		switch (ARole)
 		{
 		case Qt::DisplayRole:
-		{
-			Jid indexJid = AIndex->data(RDR_JID).toString();
-			QString display = AIndex->data(RDR_NAME).toString();
-			if (display.isEmpty())
-				display = indexJid.bare();
-			if (FShowResource && !indexJid.resource().isEmpty())
-				display += "/" + indexJid.resource();
-			return display;
-		}
+			{
+				Jid indexJid = AIndex->data(RDR_JID).toString();
+				QString display = AIndex->data(RDR_NAME).toString();
+				if (display.isEmpty())
+					display = indexJid.bare();
+				if (FShowResource && !indexJid.resource().isEmpty())
+					display += "/" + indexJid.resource();
+				return display;
+			}
 		}
 		break;
-
 	case RIT_AGENT:
 		switch (ARole)
 		{
 		case Qt::DisplayRole:
-		{
-			QString display = AIndex->data(RDR_NAME).toString();
-			if (display.isEmpty())
 			{
-				Jid indexJid = AIndex->data(RDR_JID).toString();
-				display = indexJid.bare();
+				QString display = AIndex->data(RDR_NAME).toString();
+				if (display.isEmpty())
+				{
+					Jid indexJid = AIndex->data(RDR_JID).toString();
+					display = indexJid.bare();
+				}
+				return display;
 			}
-			return display;
-		}
 		}
 		break;
-
 	case RIT_MY_RESOURCE:
 		switch (ARole)
 		{
 		case Qt::DisplayRole:
-		{
-			Jid indexJid = AIndex->data(RDR_JID).toString();
-			return indexJid.resource();
-		}
+			{
+				Jid indexJid = AIndex->data(RDR_JID).toString();
+				return indexJid.resource();
+			}
 		}
 		break;
 	}

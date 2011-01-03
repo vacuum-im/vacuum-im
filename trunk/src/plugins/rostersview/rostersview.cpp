@@ -682,8 +682,12 @@ QStyleOptionViewItemV4 RostersView::indexOption(const QModelIndex &AIndex) const
 		option.state &= ~QStyle::State_Enabled;
 	if (indexAt(viewport()->mapFromGlobal(QCursor::pos())) == AIndex)
 		option.state |= QStyle::State_MouseOver;
+	if (model() && model()->hasChildren(AIndex))
+		option.state |= QStyle::State_Children;
 	if (wordWrap())
 		option.features = QStyleOptionViewItemV2::WrapText;
+	option.state |= (QStyle::State)AIndex.data(RDR_STATES_FORCE_ON).toInt();
+	option.state &= ~(QStyle::State)AIndex.data(RDR_STATES_FORCE_OFF).toInt();
 	option.locale = locale();
 	option.locale.setNumberOptions(QLocale::OmitGroupSeparator);
 	option.widget = this;
