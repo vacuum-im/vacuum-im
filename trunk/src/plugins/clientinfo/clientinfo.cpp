@@ -616,20 +616,20 @@ bool ClientInfo::hasSoftwareInfo(const Jid &AContactJid) const
 
 bool ClientInfo::requestSoftwareInfo(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	bool sended = FSoftwareId.values().contains(AContactJid);
-	if (!sended && AStreamJid.isValid() && AContactJid.isValid())
+	bool sent = FSoftwareId.values().contains(AContactJid);
+	if (!sent && AStreamJid.isValid() && AContactJid.isValid())
 	{
 		Stanza iq("iq");
 		iq.addElement("query",NS_JABBER_VERSION);
 		iq.setTo(AContactJid.eFull()).setId(FStanzaProcessor->newId()).setType("get");
-		sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,SOFTWARE_INFO_TIMEOUT);
-		if (sended)
+		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,SOFTWARE_INFO_TIMEOUT);
+		if (sent)
 		{
 			FSoftwareId.insert(iq.id(),AContactJid);
 			FSoftwareItems[AContactJid].status = SoftwareLoading;
 		}
 	}
-	return sended;
+	return sent;
 }
 
 int ClientInfo::softwareStatus(const Jid &AContactJid) const
@@ -659,17 +659,17 @@ bool ClientInfo::hasLastActivity(const Jid &AContactJid) const
 
 bool ClientInfo::requestLastActivity(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	bool sended = FActivityId.values().contains(AContactJid);
-	if (!sended && AStreamJid.isValid() && AContactJid.isValid())
+	bool sent = FActivityId.values().contains(AContactJid);
+	if (!sent && AStreamJid.isValid() && AContactJid.isValid())
 	{
 		Stanza iq("iq");
 		iq.addElement("query",NS_JABBER_LAST);
-		iq.setTo(AContactJid.eBare()).setId(FStanzaProcessor->newId()).setType("get");
-		sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,LAST_ACTIVITY_TIMEOUT);
-		if (sended)
+		iq.setTo(AContactJid.eFull()).setId(FStanzaProcessor->newId()).setType("get");
+		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,LAST_ACTIVITY_TIMEOUT);
+		if (sent)
 			FActivityId.insert(iq.id(),AContactJid);
 	}
-	return sended;
+	return sent;
 }
 
 QDateTime ClientInfo::lastActivityTime(const Jid &AContactJid) const
@@ -689,14 +689,14 @@ bool ClientInfo::hasEntityTime(const Jid &AContactJid) const
 
 bool ClientInfo::requestEntityTime(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	bool sended = FTimeId.values().contains(AContactJid);
-	if (!sended && AStreamJid.isValid() && AContactJid.isValid())
+	bool sent = FTimeId.values().contains(AContactJid);
+	if (!sent && AStreamJid.isValid() && AContactJid.isValid())
 	{
 		Stanza iq("iq");
 		iq.addElement("time",NS_XMPP_TIME);
 		iq.setTo(AContactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
-		sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,ENTITY_TIME_TIMEOUT);
-		if (sended)
+		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,ENTITY_TIME_TIMEOUT);
+		if (sent)
 		{
 			TimeItem &tItem = FTimeItems[AContactJid];
 			tItem.ping = QTime::currentTime().msecsTo(QTime(0,0,0,0));
@@ -704,7 +704,7 @@ bool ClientInfo::requestEntityTime(const Jid &AStreamJid, const Jid &AContactJid
 			emit entityTimeChanged(AContactJid);
 		}
 	}
-	return sended;
+	return sent;
 }
 
 QDateTime ClientInfo::entityTime(const Jid &AContactJid) const
