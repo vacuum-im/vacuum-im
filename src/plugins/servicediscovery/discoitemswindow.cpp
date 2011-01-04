@@ -70,11 +70,9 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 
 	FHeader = ui.trvItems->header();
 	FHeader->setClickable(true);
-	FHeader->setStretchLastSection(false);
-	FHeader->setResizeMode(DiscoItemsModel::COL_NAME,QHeaderView::ResizeToContents);
-	FHeader->setResizeMode(DiscoItemsModel::COL_JID,QHeaderView::Stretch);
+	FHeader->setResizeMode(DiscoItemsModel::COL_NAME,QHeaderView::Interactive);
+	FHeader->setResizeMode(DiscoItemsModel::COL_JID,QHeaderView::Interactive);
 	FHeader->setResizeMode(DiscoItemsModel::COL_NODE,QHeaderView::Stretch);
-	FHeader->setSortIndicatorShown(true);
 	FHeader->setSortIndicator(DiscoItemsModel::COL_NAME,Qt::AscendingOrder);
 
 	FSearchTimer.setSingleShot(true);
@@ -91,19 +89,26 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
 	connect(FDiscovery->instance(),SIGNAL(discoItemsReceived(const IDiscoItems &)),SLOT(onDiscoItemsReceived(const IDiscoItems &)));
 
-
 	initialize();
 	createToolBarActions();
 
 	if (!restoreGeometry(Options::fileValue("servicediscovery.itemswindow.geometry",FStreamJid.pBare()).toByteArray()))
 		setGeometry(WidgetManager::alignGeometry(QSize(800,480),this));
 	restoreState(Options::fileValue("servicediscovery.itemswindow.state",FStreamJid.pBare()).toByteArray());
+	
+	if (!FHeader->restoreState(Options::fileValue("servicediscovery.itemswindow.header-state",FStreamJid.pBare()).toByteArray()))
+	{
+		FHeader->resizeSection(DiscoItemsModel::COL_NAME,300);
+		FHeader->resizeSection(DiscoItemsModel::COL_JID,200);
+		FHeader->resizeSection(DiscoItemsModel::COL_NODE,100);
+	}
 }
 
 DiscoItemsWindow::~DiscoItemsWindow()
 {
 	Options::setFileValue(saveState(),"servicediscovery.itemswindow.state",FStreamJid.pBare());
 	Options::setFileValue(saveGeometry(),"servicediscovery.itemswindow.geometry",FStreamJid.pBare());
+	Options::setFileValue(FHeader->saveState(),"servicediscovery.itemswindow.header-state",FStreamJid.pBare());
 
 	emit windowDestroyed(this);
 }
