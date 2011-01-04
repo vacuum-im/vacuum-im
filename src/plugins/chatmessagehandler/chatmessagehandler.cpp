@@ -369,9 +369,12 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 
 void ChatMessageHandler::setMessageStyle(IChatWindow *AWindow)
 {
-   IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-   IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
-   AWindow->viewWidget()->setMessageStyle(style,soptions);
+	IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
+	if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,true))
+	{
+		IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
+		AWindow->viewWidget()->setMessageStyle(style,soptions);
+	}
 } 
 
 void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const

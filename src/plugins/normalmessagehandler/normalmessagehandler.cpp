@@ -302,11 +302,11 @@ void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
 void NormalMessageHandler::setMessageStyle(IMessageWindow *AWindow)
 {
 	IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Normal);
-	IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
-	if (style != AWindow->viewWidget()->messageStyle())
+	if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,true))
+	{
+		IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
 		AWindow->viewWidget()->setMessageStyle(style,soptions);
-	else if (AWindow->viewWidget()->messageStyle() != NULL)
-		AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions);
+	}
 }
 
 void NormalMessageHandler::fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const
@@ -528,9 +528,14 @@ void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOp
 	{
 		foreach (IMessageWindow *window, FWindows)
 		{
-			if (FLastMessages.value(window).type()==AMessageType && window->viewWidget() && window->viewWidget()->messageStyle())
+			if (FLastMessages.value(window).type() == AMessageType)
 			{
-				window->viewWidget()->messageStyle()->changeOptions(window->viewWidget()->styleWidget(),AOptions,false);
+				IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
+				if (style==NULL || !style->changeOptions(window->viewWidget()->styleWidget(),AOptions,false))
+				{
+					setMessageStyle(window);
+					showStyledMessage(window,FLastMessages.value(window));
+				}
 			}
 		}
 	}
