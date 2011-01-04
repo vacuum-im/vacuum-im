@@ -31,6 +31,10 @@
         <source>Connection timed out</source>
         <translation>Превышено время установки соединения</translation>
     </message>
+    <message>
+        <source>File size unexpectedly changed</source>
+        <translation>Размер файла неожиданно изменился</translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsManager</name>

@@ -62,6 +62,7 @@ signals:
 	void streamDestroyed();
 protected:
 	bool openFile();
+	bool updateFileInfo();
 	void setStreamState(int AState, const QString &AMessage);
 protected slots:
 	void onSocketStateChanged(int AState);
