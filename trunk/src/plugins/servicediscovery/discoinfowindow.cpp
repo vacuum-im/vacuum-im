@@ -177,6 +177,7 @@ void DiscoInfoWindow::onShowExtensionForm(bool)
 		if (index<dinfo.extensions.count())
 		{
 			IDataForm form = FDataForms->localizeForm(dinfo.extensions.at(index));
+			form.type = DATAFORM_TYPE_RESULT;
 			IDataDialogWidget *widget = FDataForms->dialogWidget(form,this);
 			widget->dialogButtons()->setStandardButtons(QDialogButtonBox::Ok);
 			widget->instance()->setWindowModality(Qt::WindowModal);
