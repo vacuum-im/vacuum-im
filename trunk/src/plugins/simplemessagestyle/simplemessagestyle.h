@@ -27,7 +27,7 @@
 #define MSMC_INCOMING                       "incoming"
 #define MSMC_GROUPCHAT                      "groupchat"
 #define MSMC_MENTION                        "mention"
-#define MSMC_ACTION                         "action"
+#define MSMC_MECOMMAND                      "me_command"
 
 //Message Style Options
 #define MSO_STYLE_ID                        "styleId"
@@ -82,9 +82,9 @@ protected:
 	void setVariant(QWidget *AWidget, const QString  &AVariant);
 	QString makeStyleTemplate() const;
 	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
-	QString makeContentTemplate(const MessageContentOptions &AOptions, bool ASameSender) const;
-	void fillContentKeywords(QString &AHtml, const MessageContentOptions &AOptions, bool ASameSender) const;
-	QString processCommands(const QString &AHtml, MessageContentOptions &AOptions) const;
+	QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;
+	void fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const;
+	QString prepareMessage(const QString &AHtml, const IMessageContentOptions &AOptions) const;
 	QString loadFileData(const QString &AFileName, const QString &DefValue) const;
 	void loadTemplates();
 	void loadSenderColors();
@@ -102,14 +102,11 @@ private:
 private:
 	QString FTopicHTML;
 	QString FStatusHTML;
+	QString FMeCommandHTML;
 	QString FIn_ContentHTML;
 	QString FIn_NextContentHTML;
-	QString FIn_ActionHTML;
-	QString FIn_NextActionHTML;
 	QString FOut_ContentHTML;
 	QString FOut_NextContentHTML;
-	QString FOut_ActionHTML;
-	QString FOut_NextActionHTML;
 private:
 	QString FStylePath;
 	QList<QString> FVariants;

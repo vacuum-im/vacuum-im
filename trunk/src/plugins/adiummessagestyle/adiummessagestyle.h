@@ -37,6 +37,7 @@
 #define MSMC_GROUPCHAT                      "groupchat"
 #define MSMC_MENTION                        "mention"
 #define MSMC_AUTOREPLY                      "autoreply"
+#define MSMC_MECOMMAND                      "me_command"
 
 //Message Style Status Keywords
 #define MSSK_ONLINE                         "online"
@@ -132,9 +133,9 @@ protected:
 	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
 	QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;
 	void fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const;
-	QString processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const;
 	void escapeStringForScript(QString &AText) const;
 	QString scriptForAppendContent(bool ASameSender, bool ANoScroll) const;
+	QString prepareMessage(const QString &AHtml, const IMessageContentOptions &AOptions) const;
 	QString loadFileData(const QString &AFileName, const QString &DefValue) const;
 	void loadTemplates();
 	void loadSenderColors();
@@ -146,6 +147,7 @@ protected slots:
 private:
 	QString FTopicHTML;
 	QString FStatusHTML;
+	QString FMeCommandHTML;
 	QString FIn_ContentHTML;
 	QString FIn_NextContentHTML;
 	QString FIn_ContextHTML;

@@ -149,8 +149,7 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 		bool sameSender = isSameSender(AWidget,AOptions);
 		QString html = makeContentTemplate(AOptions,sameSender);
 		fillContentKeywords(html,AOptions,sameSender);
-
-		html.replace("%message%",processCommands(AHtml,AOptions));
+		html.replace("%message%",prepareMessage(AHtml,AOptions));
 		if (AOptions.kind == IMessageContentOptions::Topic)
 			html.replace("%topic%",QString(TOPIC_INDIVIDUAL_WRAPPER).arg(AHtml));
 
@@ -232,6 +231,8 @@ QMap<QString, QVariant> AdiumMessageStyle::styleInfo(const QString &AStylePath)
 bool AdiumMessageStyle::isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const
 {
 	if (!FCombineConsecutive)
+		return false;
+	if (AOptions.kind != IMessageContentOptions::Message)
 		return false;
 	if (AOptions.senderId.isEmpty())
 		return false;
@@ -355,6 +356,10 @@ QString AdiumMessageStyle::makeContentTemplate(const IMessageContentOptions &AOp
 	{
 		html = FStatusHTML;
 	}
+	else if (AOptions.kind==IMessageContentOptions::MeCommand && (!FMeCommandHTML.isEmpty() || !FStatusHTML.isEmpty()))
+	{
+		html = !FMeCommandHTML.isEmpty() ? FMeCommandHTML : FStatusHTML;
+	}
 	else
 	{
 		if (AOptions.type & IMessageContentOptions::History)
@@ -384,7 +389,9 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
 	if (FCombineConsecutive && ASameSender)
 		messageClasses << MSMC_CONSECUTIVE;
 
-	if (AOptions.kind == IMessageContentOptions::Status)
+	if (AOptions.kind==IMessageContentOptions::MeCommand)
+		messageClasses << (!FMeCommandHTML.isEmpty() ? MSMC_MECOMMAND : MSMC_STATUS);
+	else if (AOptions.kind == IMessageContentOptions::Status)
 		messageClasses << MSMC_STATUS;
 	else
 		messageClasses << MSMC_MESSAGE;
@@ -476,31 +483,6 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
 	}
 }
 
-QString AdiumMessageStyle::processCommands(const QString &AHtml, const IMessageContentOptions &AOptions) const
-{
-	bool changed = false;
-	QTextDocument message;
-	message.setHtml(AHtml);
-
-	// "/me" command
-	if (!AOptions.senderName.isEmpty())
-	{
-		QRegExp me("^/me\\s");
-		for (QTextCursor cursor = message.find(me); !cursor.isNull();  cursor = message.find(me,cursor))
-		{
-			changed = true;
-			cursor.insertHtml("*&nbsp;<i>"+AOptions.senderName+"&nbsp;</i>");
-		}
-	}
-
-	if (changed)
-	{
-		return getDocumentBody(message);
-	}
-
-	return AHtml;
-}
-
 void AdiumMessageStyle::escapeStringForScript(QString &AText) const
 {
 	AText.replace("\\","\\\\");
@@ -538,6 +520,19 @@ QString AdiumMessageStyle::scriptForAppendContent(bool ASameSender, bool ANoScro
 	return script;
 }
 
+QString AdiumMessageStyle::prepareMessage(const QString &AHtml, const IMessageContentOptions &AOptions) const
+{
+	if (AOptions.kind==IMessageContentOptions::MeCommand && FMeCommandHTML.isEmpty())
+	{
+		QTextDocument doc;
+		doc.setHtml(AHtml);
+		QTextCursor cursor(&doc);
+		cursor.insertHtml(QString("<i>*&nbsp;%1</i>&nbsp;").arg(AOptions.senderName));
+		return getDocumentBody(doc);
+	}
+	return AHtml;
+}
+
 QString AdiumMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
 {
 	if (QFile::exists(AFileName))
@@ -564,8 +559,9 @@ void AdiumMessageStyle::loadTemplates()
 	FOut_ContextHTML =     loadFileData(FResourcePath+"/Outgoing/Context.html",FOut_ContentHTML);
 	FOut_NextContextHTML = loadFileData(FResourcePath+"/Outgoing/NextContext.html",FOut_NextContentHTML);
 
-	FStatusHTML =          loadFileData(FResourcePath+"/Status.html",FIn_ContentHTML);
 	FTopicHTML =           loadFileData(FResourcePath+"/Topic.html",QString::null);
+	FStatusHTML =          loadFileData(FResourcePath+"/Status.html",FIn_ContentHTML);
+	FMeCommandHTML =       loadFileData(FResourcePath+"/MeCommand.html",QString::null);
 }
 
 void AdiumMessageStyle::loadSenderColors()
