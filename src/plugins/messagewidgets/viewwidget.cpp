@@ -102,13 +102,26 @@ void ViewWidget::appendText(const QString &AText, const IMessageContentOptions &
 
 void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions)
 {
-	QTextDocument messageDoc;
+	QTextDocument doc;
 	if (FMessageProcessor)
-		FMessageProcessor->messageToText(&messageDoc,AMessage);
+		FMessageProcessor->messageToText(&doc,AMessage);
 	else
-		messageDoc.setPlainText(AMessage.body());
+		doc.setPlainText(AMessage.body());
 
-	appendHtml(getDocumentBody(messageDoc),AOptions);
+	// "/me" command
+	IMessageContentOptions options = AOptions;
+	if (AOptions.kind==IMessageContentOptions::Message && !AOptions.senderName.isEmpty())
+	{
+		QTextCursor cursor(&doc);
+		cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,4);
+		if (cursor.selectedText() == "/me ")
+		{
+			options.kind = IMessageContentOptions::MeCommand;
+			cursor.removeSelectedText();
+		}
+	}
+
+	appendHtml(getDocumentBody(doc),options);
 }
 
 void ViewWidget::initialize()

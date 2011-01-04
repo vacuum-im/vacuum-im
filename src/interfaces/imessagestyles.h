@@ -24,7 +24,8 @@ struct IMessageContentOptions
 	enum ContentKind {
 		Message,
 		Status,
-		Topic
+		Topic,
+		MeCommand
 	};
 	enum ContentType {
 		Groupchat       =0x01,
