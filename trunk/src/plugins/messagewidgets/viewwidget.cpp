@@ -69,7 +69,7 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 		if (before)
 		{
 			disconnect(before->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
-			           this, SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
+				this, SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
 			disconnect(before->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),this,SLOT(onUrlClicked(QWidget *, const QUrl &)));
 			ui.wdtViewer->layout()->removeWidget(FStyleWidget);
 			FStyleWidget->deleteLater();
@@ -79,7 +79,7 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 		{
 			FStyleWidget = FMessageStyle->createWidget(AOptions,ui.wdtViewer);
 			connect(FMessageStyle->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
-			        SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
+				SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
 			connect(FMessageStyle->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),SLOT(onUrlClicked(QWidget *, const QUrl &)));
 			ui.wdtViewer->layout()->addWidget(FStyleWidget);
 		}
