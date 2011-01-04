@@ -159,13 +159,8 @@ void FileStream::setFileName(const QString &AFileName)
 	{
 		if (FFileName != AFileName)
 		{
-			if (FStreamKind == SendFile)
-			{
-				QFileInfo info(AFileName);
-				FFileSize = info.size();
-				FFileDate = info.lastModified();
-			}
 			FFileName = AFileName;
+			updateFileInfo();
 			emit propertiesChanged();
 		}
 	}
@@ -262,7 +257,7 @@ bool FileStream::initStream(const QList<QString> &AMethods)
 {
 	if (FStreamState==Creating && FStreamKind==SendFile)
 	{
-		if (!FFileName.isEmpty() && FFileSize>0)
+		if (updateFileInfo() && !FFileName.isEmpty() && FFileSize>0)
 		{
 			if (FDataManager->initStream(FStreamJid,FContactJid,FStreamId,NS_SI_FILETRANSFER,AMethods))
 			{
@@ -356,7 +351,7 @@ void FileStream::abortStream(const QString &AError)
 
 bool FileStream::openFile()
 {
-	if (!FFileName.isEmpty() && FFileSize>0)
+	if (updateFileInfo() && !FFileName.isEmpty() && FFileSize>0)
 	{
 		QFileInfo finfo(FFileName);
 		if (FStreamKind==IFileStream::ReceiveFile ? QDir::root().mkpath(finfo.absolutePath()) : true)
@@ -379,6 +374,29 @@ bool FileStream::openFile()
 		}
 	}
 	return false;
+}
+
+bool FileStream::updateFileInfo()
+{
+	if (FStreamKind == SendFile)
+	{
+		QFileInfo finfo(FFileName);
+		if (FFileSize != finfo.size())
+		{
+			if (FStreamState == Creating)
+			{
+				FFileSize = finfo.size();
+				FFileDate = finfo.lastModified();
+				emit propertiesChanged();
+			}
+			else
+			{
+				abortStream(tr("File size unexpectedly changed"));
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 void FileStream::setStreamState(int AState, const QString &AMessage)

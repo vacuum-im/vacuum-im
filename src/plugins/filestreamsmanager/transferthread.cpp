@@ -31,7 +31,7 @@ void TransferThread::run()
 	char buffer[TRANSFER_BUFFER_SIZE];
 
 	QIODevice *inDevice = FKind==IFileStream::SendFile ? FFile : FSocket->instance();
-	QIODevice *outDevice =  FKind==IFileStream::SendFile ? FSocket->instance() : FFile;
+	QIODevice *outDevice = FKind==IFileStream::SendFile ? FSocket->instance() : FFile;
 
 	while (!FAbort && transferedBytes<FBytesToTransfer)
 	{
