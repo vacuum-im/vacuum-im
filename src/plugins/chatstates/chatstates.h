@@ -21,6 +21,7 @@
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/isessionnegotiation.h>
+#include <interfaces/imultiuserchat.h>
 #include <utils/options.h>
 #include "statewidget.h"
 
@@ -95,6 +96,8 @@ protected slots:
 	void onPresenceOpened(IPresence *APresence);
 	void onPresenceReceived(IPresence *APresence, const IPresenceItem &AItem);
 	void onPresenceClosed(IPresence *APresence);
+	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
+	void onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const QString &AStatus);
 	void onChatWindowCreated(IChatWindow *AWindow);
 	void onChatWindowActivated();
 	void onChatWindowTextChanged();
@@ -114,6 +117,7 @@ private:
 	IMessageArchiver *FMessageArchiver;
 	IDataForms *FDataForms;
 	ISessionNegotiation *FSessionNegotiation;
+	IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
 	QMap<Jid,int> FSHIMessagesIn;
 	QMap<Jid,int> FSHIMessagesOut;

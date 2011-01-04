@@ -30,6 +30,7 @@ ChatStates::ChatStates()
 	FMessageArchiver = NULL;
 	FDataForms = NULL;
 	FSessionNegotiation = NULL;
+	FMultiUserChatPlugin = NULL;
 
 	FUpdateTimer.setSingleShot(false);
 	FUpdateTimer.setInterval(5000);
@@ -80,7 +81,7 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		{
 			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),
-			        SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
+				SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
 		}
 	}
@@ -114,7 +115,18 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		if (FSessionNegotiation && FDataForms)
 		{
 			connect(FSessionNegotiation->instance(),SIGNAL(sessionTerminated(const IStanzaSession &)),
-			        SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
+				SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
+		}
+	}
+
+	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
+	if (plugin)
+	{
+		FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
+		if (FMultiUserChatPlugin)
+		{
+			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),
+				SLOT(onMultiUserChatCreated(IMultiUserChat *)));
 		}
 	}
 
@@ -574,6 +586,23 @@ void ChatStates::onPresenceClosed(IPresence *APresence)
 	FNotSupported.remove(APresence->streamJid());
 	FChatParams.remove(APresence->streamJid());
 	FStanzaSessions.remove(APresence->streamJid());
+}
+
+void ChatStates::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
+{
+	connect(AMultiChat->instance(),SIGNAL(userPresence(IMultiUser *, int, const QString &)),
+		SLOT(onMultiUserPresenceReceived(IMultiUser *, int, const QString &)));
+}
+
+void ChatStates::onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const QString &AStatus)
+{
+	Q_UNUSED(AStatus);
+	if (AShow==IPresence::Offline || AShow==IPresence::Error)
+	{
+		IMultiUserChat *multiChat = qobject_cast<IMultiUserChat *>(sender());
+		if (userChatState(multiChat->streamJid(),AUser->contactJid()) != IChatStates::StateUnknown)
+			setUserState(multiChat->streamJid(),AUser->contactJid(),IChatStates::StateGone);
+	}
 }
 
 void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
