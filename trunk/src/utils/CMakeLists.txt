@@ -29,6 +29,13 @@ else (SYSTEM_ZLIB_FOUND)
 	set(ADD_LIBS qxtglobalshortcut idn minizip idle zlib)
 endif (SYSTEM_ZLIB_FOUND)
 
+if (X11_Xscreensaver_FOUND)
+	message(STATUS "Found Xscreensaver: ${X11_Xscreensaver_LIB}")
+	list(APPEND ADD_LIBS "${X11_Xscreensaver_LIB}")
+else (X11_Xscreensaver_FOUND)
+	message(STATUS "Xscreensaver not found")
+endif (X11_Xscreensaver_FOUND)
+
 target_link_libraries(${TARGET_UTILS} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
 target_link_libraries(${TARGET_UTILS} ${QT_LIBRARIES} ${ADD_LIBS})
 
