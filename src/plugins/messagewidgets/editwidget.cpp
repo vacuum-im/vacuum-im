@@ -24,6 +24,8 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	connect(ui.tlbSend,SIGNAL(clicked(bool)),SLOT(onSendButtonCliked(bool)));
 
 	ui.medEditor->installEventFilter(this);
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE,ui.medEditor);
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_EDITPREVMESSAGE,ui.medEditor);
 	connect(ui.medEditor->document(),SIGNAL(contentsChange(int,int,int)),SLOT(onContentsChanged(int,int,int)));
 
 	onOptionsChanged(Options::node(OPV_MESSAGES_EDITORAUTORESIZE));
@@ -158,17 +160,6 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
 		emit keyEventReceived(keyEvent,hooked);
-
-		if (!hooked && keyEvent->modifiers()==Qt::CTRL && keyEvent->key()==Qt::Key_Up)
-		{
-			hooked = true;
-			showNextBufferedMessage();
-		}
-		else if (!hooked && keyEvent->modifiers()==Qt::CTRL && keyEvent->key()==Qt::Key_Down)
-		{
-			hooked = true;
-			showPrevBufferedMessage();
-		}
 	}
 	else if (AWatched==ui.medEditor && AEvent->type()==QEvent::ShortcutOverride)
 	{
@@ -230,6 +221,14 @@ void EditWidget::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	if (AId==FShortcutId && AWidget==ui.medEditor)
 	{
 		sendMessage();
+	}
+	else if (AId==SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE && AWidget==ui.medEditor)
+	{
+		showPrevBufferedMessage();
+	}
+	else if (AId==SCT_MESSAGEWINDOWS_EDITPREVMESSAGE && AWidget==ui.medEditor)
+	{
+		showNextBufferedMessage();
 	}
 }
 

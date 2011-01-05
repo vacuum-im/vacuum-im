@@ -3,7 +3,6 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QSignalMapper>
-#include <QShortcut>
 
 #define ADR_TABWINDOWID             Action::DR_Parametr1
 
