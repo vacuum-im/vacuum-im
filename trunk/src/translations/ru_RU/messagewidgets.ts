@@ -133,6 +133,24 @@
         <comment>Send message</comment>
         <translation>Ctrl+Return</translation>
     </message>
+    <message>
+        <source>Edit next message</source>
+        <translation>Редактировать последующее сообщение</translation>
+    </message>
+    <message>
+        <source>Ctrl+Down</source>
+        <comment>Edit next message</comment>
+        <translation>Ctrl+Down</translation>
+    </message>
+    <message>
+        <source>Edit previous message</source>
+        <translation>Редактировать предыдущее сообщение</translation>
+    </message>
+    <message>
+        <source>Ctrl+Up</source>
+        <comment>Edit previous message</comment>
+        <translation>Ctrl+Up</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>

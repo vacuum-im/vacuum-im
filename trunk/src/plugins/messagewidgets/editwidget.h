@@ -1,10 +1,10 @@
 #ifndef EDITWIDGET_H
 #define EDITWIDGET_H
 
-#include <QShortcut>
 #include <definitions/optionvalues.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/imessagewidgets.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
