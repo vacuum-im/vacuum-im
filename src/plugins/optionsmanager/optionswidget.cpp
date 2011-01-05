@@ -178,15 +178,24 @@ void OptionsWidget::insertCaption(const QString &ACaption, QWidget *ABuddy)
 
 bool OptionsWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
-	static const QList<int> controlKeys =  QList<int>() << Qt::Key_unknown << Qt::Key_Control << Qt::Key_Meta << Qt::Key_Alt << Qt::Key_AltGr;
-
 	if (FValue.type()==QVariant::KeySequence && AWatched==FLineEdit && AEvent->type()==QEvent::KeyPress)
 	{
+		static const int extKeyMask = 0x01000000;
+		static const int modifMask = Qt::META|Qt::SHIFT|Qt::CTRL|Qt::ALT;
+		static const QList<int> controlKeys =  QList<int>() <<  Qt::Key_Shift << Qt::Key_Control << Qt::Key_Meta << Qt::Key_Alt << Qt::Key_AltGr;
+
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
-		if (!controlKeys.contains(keyEvent->key()))
-		{
-			FLineEdit->setText(QKeySequence(keyEvent->modifiers() | keyEvent->key()).toString());
-		}
+		if (keyEvent->key()==0 || keyEvent->key()==Qt::Key_unknown)
+			return true;
+		if (keyEvent->key()>0x7F && (keyEvent->key() & extKeyMask)==0)
+			return true;
+		if (controlKeys.contains(keyEvent->key()))
+			return true;
+		if ((keyEvent->modifiers() & modifMask)==Qt::SHIFT && (keyEvent->key() & extKeyMask)==0)
+			return true;
+
+		QKeySequence keySeq((keyEvent->modifiers() & modifMask) | keyEvent->key());
+		FLineEdit->setText(keySeq.toString(QKeySequence::NativeText));
 		return true;
 	}
 	return QWidget::eventFilter(AWatched,AEvent);

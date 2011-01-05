@@ -1,6 +1,5 @@
 #include "mainwindowplugin.h"
 
-#include <QShortcut>
 #include <QApplication>
 #include <QDesktopWidget>
 
