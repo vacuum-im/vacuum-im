@@ -25,6 +25,8 @@ signals:
 	void modified();
 	void childApply();
 	void childReset();
+protected slots:
+	void onUseLegacySSLStateChanged(int AState);
 private:
 	Ui::ConnectionOptionsWidgetClass ui;
 private:

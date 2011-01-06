@@ -9,7 +9,6 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	FOptions = ANode;
 	FProxySettings = NULL;
 
-	reset();
 	FProxySettings = FManager!=NULL ? FManager->proxySettingsWidget(FOptions.node("proxy"), ui.wdtProxy) : NULL;
 	if (FProxySettings)
 	{
@@ -23,7 +22,9 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 
 	connect(ui.lneHost,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
 	connect(ui.spbPort,SIGNAL(valueChanged(int)),SIGNAL(modified()));
-	connect(ui.chbUseSSL,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+	connect(ui.chbUseLegacySSL,SIGNAL(stateChanged(int)),SLOT(onUseLegacySSLStateChanged(int)));
+
+	reset();
 }
 
 ConnectionOptionsWidget::~ConnectionOptionsWidget()
@@ -36,8 +37,7 @@ void ConnectionOptionsWidget::apply(OptionsNode ANode)
 	OptionsNode node = !ANode.isNull() ? ANode : FOptions;
 	node.setValue(ui.lneHost->text(),"host");
 	node.setValue(ui.spbPort->value(),"port");
-	node.setValue(ui.chbUseSSL->isChecked(),"use-ssl");
-	node.setValue(ui.chbIgnoreSSLWarnings->isChecked(),"ignore-ssl-errors");
+	node.setValue(ui.chbUseLegacySSL->isChecked(),"use-legacy-ssl");
 	if (FProxySettings)
 		FManager->saveProxySettings(FProxySettings, node.node("proxy"));
 	emit childApply();
@@ -52,9 +52,14 @@ void ConnectionOptionsWidget::reset()
 {
 	ui.lneHost->setText(FOptions.value("host").toString());
 	ui.spbPort->setValue(FOptions.value("port").toInt());
-	ui.chbUseSSL->setChecked(FOptions.value("use-ssl").toBool());
-	ui.chbIgnoreSSLWarnings->setChecked(FOptions.value("ignore-ssl-errors").toBool());
+	ui.chbUseLegacySSL->setChecked(FOptions.value("use-legacy-ssl").toBool());
 	if (FProxySettings)
 		FProxySettings->reset();
 	emit childReset();
+}
+
+void ConnectionOptionsWidget::onUseLegacySSLStateChanged(int AState)
+{
+	ui.spbPort->setValue(AState==Qt::Checked ? 5223 : 5222);
+	emit modified();
 }

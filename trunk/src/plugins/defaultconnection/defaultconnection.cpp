@@ -54,8 +54,7 @@ bool DefaultConnection::connectToHost()
 		QString host = option(IDefaultConnection::COR_HOST).toString();
 		quint16 port = option(IDefaultConnection::COR_PORT).toInt();
 		QString domain = option(IDefaultConnection::COR_DOMAINE).toString();
-		FSSLConnection = option(IDefaultConnection::COR_USE_SSL).toBool();
-		FIgnoreSSLErrors = option(IDefaultConnection::COR_IGNORE_SSL_ERRORS).toBool();
+		FUseLegacySSL = option(IDefaultConnection::COR_USE_LEGACY_SSL).toBool();
 
 		QJDns::Record record;
 		record.name = !host.isEmpty() ? host.toLatin1() : domain.toLatin1();
@@ -118,9 +117,30 @@ QByteArray DefaultConnection::read(qint64 ABytes)
 	return FSocket.read(ABytes);
 }
 
+IConnectionPlugin *DefaultConnection::ownerPlugin() const
+{
+	return FPlugin;
+}
+
 void DefaultConnection::startClientEncryption()
 {
 	FSocket.startClientEncryption();
+}
+
+void DefaultConnection::ignoreSslErrors()
+{
+	FSSLError = false;
+	FSocket.ignoreSslErrors();
+}
+
+QList<QSslError> DefaultConnection::sslErrors() const
+{
+	return FSocket.sslErrors();
+}
+
+QSslCertificate DefaultConnection::peerCertificate() const
+{
+	return FSocket.peerCertificate();
 }
 
 QSsl::SslProtocol DefaultConnection::protocol() const
@@ -133,9 +153,24 @@ void DefaultConnection::setProtocol(QSsl::SslProtocol AProtocol)
 	FSocket.setProtocol(AProtocol);
 }
 
-void DefaultConnection::addCaCertificate(const QSslCertificate &ACertificate)
+QSslKey DefaultConnection::privateKey() const
 {
-	FSocket.addCaCertificate(ACertificate);
+	return FSocket.privateKey();
+}
+
+void DefaultConnection::setPrivateKey(const QSslKey &AKey)
+{
+	FSocket.setPrivateKey(AKey);
+}
+
+QSslCertificate DefaultConnection::localCertificate() const
+{
+	return FSocket.localCertificate();
+}
+
+void DefaultConnection::setLocalCertificate(const QSslCertificate &ACertificate)
+{
+	FSocket.setLocalCertificate(ACertificate);
 }
 
 QList<QSslCertificate> DefaultConnection::caCertificates() const
@@ -143,20 +178,9 @@ QList<QSslCertificate> DefaultConnection::caCertificates() const
 	return FSocket.caCertificates();
 }
 
-QSslCertificate DefaultConnection::peerCertificate() const
+void DefaultConnection::setCaCertificates(const QList<QSslCertificate> &ACertificates)
 {
-	return FSocket.peerCertificate();
-}
-
-void DefaultConnection::ignoreSslErrors()
-{
-	FSSLError = false;
-	FSocket.ignoreSslErrors();
-}
-
-QList<QSslError> DefaultConnection::sslErrors() const
-{
-	return FSocket.sslErrors();
+	FSocket.setCaCertificates(ACertificates);
 }
 
 QNetworkProxy DefaultConnection::proxy() const
@@ -192,7 +216,7 @@ void DefaultConnection::connectToNextHost()
 		while (record.name.endsWith('.'))
 			record.name.chop(1);
 
-		if (FSSLConnection)
+		if (FUseLegacySSL)
 			FSocket.connectToHostEncrypted(record.name, record.port);
 		else
 			FSocket.connectToHost(record.name, record.port);
@@ -205,7 +229,7 @@ void DefaultConnection::onDnsResultsReady(int AId, const QJDns::Response &AResul
 	{
 		if (!AResults.answerRecords.isEmpty())
 		{
-			FSSLConnection = false;
+			FUseLegacySSL = false;
 			FRecords = AResults.answerRecords;
 		}
 		FDns.shutdown();
@@ -235,7 +259,7 @@ void DefaultConnection::onDnsShutdownFinished()
 
 void DefaultConnection::onSocketConnected()
 {
-	if (!FSSLConnection)
+	if (!FUseLegacySSL)
 	{
 		FRecords.clear();
 		emit connected();
@@ -245,7 +269,7 @@ void DefaultConnection::onSocketConnected()
 void DefaultConnection::onSocketEncrypted()
 {
 	emit encrypted();
-	if (FSSLConnection)
+	if (FUseLegacySSL)
 	{
 		FRecords.clear();
 		emit connected();
@@ -260,10 +284,7 @@ void DefaultConnection::onSocketReadyRead()
 void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
 {
 	FSSLError = true;
-	if (!FIgnoreSSLErrors)
-		emit sslErrors(AErrors);
-	else
-		ignoreSslErrors();
+	emit sslErrorsOccured(AErrors);
 }
 
 void DefaultConnection::onSocketError(QAbstractSocket::SocketError)

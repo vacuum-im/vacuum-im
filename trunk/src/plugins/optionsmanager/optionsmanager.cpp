@@ -584,7 +584,7 @@ void OptionsManager::importOldSettings()
 								OptionsNode cnode = account->optionsNode().node("connection",account->optionsNode().value("connection-type").toString());
 								cnode.setValue(connectElem.firstChildElement("host").attribute("value"),"host");
 								cnode.setValue(connectElem.firstChildElement("port").attribute("value").toInt(),"port");
-								cnode.setValue(QVariant(connectElem.firstChildElement("useSSL").attribute("value")).toBool(),"use-ssl");
+								cnode.setValue(QVariant(connectElem.firstChildElement("useSSL").attribute("value")).toBool(),"use-legacy-ssl");
 								cnode.setValue(QVariant(connectElem.firstChildElement("ingnoreSSLErrors").attribute("value")).toBool(),"ignore-ssl-errors");
 							}
 
