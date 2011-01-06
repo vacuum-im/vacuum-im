@@ -23,13 +23,13 @@ class IConnection
 {
 public:
 	virtual QObject *instance() =0;
-	virtual IConnectionPlugin *ownerPlugin() const =0;
 	virtual bool isOpen() const =0;
 	virtual bool isEncrypted() const =0;
 	virtual bool connectToHost() =0;
 	virtual void disconnectFromHost() =0;
 	virtual qint64 write(const QByteArray &AData) =0;
 	virtual QByteArray read(qint64 ABytes) =0;
+	virtual IConnectionPlugin *ownerPlugin() const =0;
 protected:
 	virtual void aboutToConnect() =0;
 	virtual void connected() =0;

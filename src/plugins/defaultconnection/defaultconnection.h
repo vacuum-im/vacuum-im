@@ -17,27 +17,32 @@ public:
 	~DefaultConnection();
 	//IConnection
 	virtual QObject *instance() { return this; }
-	virtual IConnectionPlugin *ownerPlugin() const { return FPlugin; }
 	virtual bool isOpen() const;
 	virtual bool isEncrypted() const;
 	virtual bool connectToHost();
 	virtual void disconnectFromHost();
 	virtual qint64 write(const QByteArray &AData);
 	virtual QByteArray read(qint64 ABytes);
+	virtual IConnectionPlugin *ownerPlugin() const;
 	//IDefaultConnection
 	virtual void startClientEncryption();
-	virtual QSsl::SslProtocol protocol() const;
-	virtual void setProtocol(QSsl::SslProtocol AProtocol);
-	virtual void addCaCertificate(const QSslCertificate &ACertificate);
-	virtual QList<QSslCertificate> caCertificates() const;
-	virtual QSslCertificate peerCertificate() const;
 	virtual void ignoreSslErrors();
 	virtual QList<QSslError> sslErrors() const;
+	virtual QSslCertificate peerCertificate() const;
+	virtual QSsl::SslProtocol protocol() const;
+	virtual void setProtocol(QSsl::SslProtocol AProtocol);
+	virtual QSslKey privateKey() const;
+	virtual void setPrivateKey(const QSslKey &AKey);
+	virtual QSslCertificate localCertificate() const;
+	virtual void setLocalCertificate(const QSslCertificate &ACertificate);
+	virtual QList<QSslCertificate> caCertificates() const;
+	virtual void setCaCertificates(const QList<QSslCertificate> &ACertificates);
 	virtual QNetworkProxy proxy() const;
 	virtual void setProxy(const QNetworkProxy &AProxy);
 	virtual QVariant option(int ARole) const;
 	virtual void setOption(int ARole, const QVariant &AValue);
 signals:
+	//IConnection
 	void aboutToConnect();
 	void connected();
 	void encrypted();
@@ -48,8 +53,8 @@ signals:
 	void connectionDestroyed();
 	//IDefaultConnection
 	void modeChanged(QSslSocket::SslMode AMode);
-	void sslErrors(const QList<QSslError> &AErrors);
 	void proxyChanged(const QNetworkProxy &AProxy);
+	void sslErrorsOccured(const QList<QSslError> &AErrors);
 protected:
 	void connectToNextHost();
 protected slots:
@@ -70,7 +75,7 @@ private:
 	QList<QJDns::Record> FRecords;
 private:
 	bool FSSLError;
-	bool FSSLConnection;
+	bool FUseLegacySSL;
 	bool FIgnoreSSLErrors;
 	QSslSocket FSocket;
 private:

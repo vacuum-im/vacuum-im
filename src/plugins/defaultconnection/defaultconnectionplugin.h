@@ -8,6 +8,7 @@
 #include <interfaces/idefaultconnection.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include "defaultconnection.h"
 #include "connectionoptionswidget.h"
 
@@ -40,8 +41,11 @@ public:
 signals:
 	void connectionCreated(IConnection *AConnection);
 	void connectionDestroyed(IConnection *AConnection);
+protected:
+	IXmppStream *findXmppStream(IConnection *AConnection) const;
 protected slots:
 	void onConnectionAboutToConnect();
+	void onConnectionSSLErrorsOccured(const QList<QSslError> &AErrors);
 	void onConnectionDestroyed();
 private:
 	IXmppStreams *FXmppStreams;
